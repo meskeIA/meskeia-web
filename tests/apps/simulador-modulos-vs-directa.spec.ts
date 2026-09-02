@@ -128,11 +128,11 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
   });
 
   /**
-   * CASO 2 (LÍMITE) — tramo superior de IRPF (45%) alcanzable con los deslizadores al
-   * máximo: ingresos 200.000 € (tope del slider), gastos 0 €, RETA 600 €/mes (tope del
-   * slider), actividad Taxi con vehículo afecto = 1 (el único parámetro que taxi expone).
-   * El slider de ingresos tope en 200.000 € nunca deja alcanzar el tramo del 47% (desde
-   * 300.000 €), así que el tramo más alto que la UI puede ejercitar es el 45%.
+   * CASO 2 (LÍMITE) — tramo superior de IRPF (45%) con ingresos 200.000 € (por debajo del
+   * límite de exclusión de módulos, 250.000 €), gastos 0 €, RETA 600 €/mes, actividad Taxi
+   * con vehículo afecto = 1 (el único parámetro que taxi expone). Con 200.000 € de base
+   * imponible no se alcanza el tramo del 47% (desde 300.000 €), así que el tramo más alto
+   * ejercitado aquí es el 45%.
    *
    * ED (ancla: TRAMOS_IRPF_2025):
    *   Rendimiento neto previo = 200.000 − 0 = 200.000
@@ -265,8 +265,34 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
    */
   test('DataReference cita la fuente de lo que realmente se calcula (IRPF)', async ({ page }) => {
     await page.goto(RUTA);
-    const referencia = page.locator('[aria-label="Datos de referencia normativos"]');
-    await expect(referencia).toContainText('IRPF 2025');
-    await expect(referencia).toContainText('fórmula didáctica simplificada');
+    const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
+    await expect(referencias).toHaveCount(2);
+    await expect(referencias.first()).toContainText('IRPF 2025');
+    await expect(referencias.first()).toContainText('fórmula didáctica simplificada');
+  });
+
+  /**
+   * Hallazgo 567 (reparado 02/09/2026) — los umbrales de exclusión de módulos ahora viven
+   * en data/fiscal/modulos-irpf.ts (LIMITES_EXCLUSION_MODULOS_2025: 250.000 € ingresos,
+   * 125.000 € facturación a empresas, 250.000 € compras) y `esApta` los aplica de verdad:
+   * con parámetros físicos válidos pero ingresos por encima de 250.000 €, la actividad deja
+   * de ser apta aunque antes de la reparación SÍ lo fuera (bastaba con mesas > 0).
+   */
+  test('Hallazgo 567 (reparado) — superar el límite de ingresos excluye de módulos aunque haya parámetros físicos', async ({ page }) => {
+    await page.goto(RUTA);
+    // Segundo DataReference: cita los límites de exclusión, no el de IRPF.
+    const referenciaLimites = page.locator('[aria-label="Datos de referencia normativos"]').nth(1);
+    await expect(referenciaLimites).toContainText('Límites de exclusión de módulos');
+    await expect(referenciaLimites).toContainText('125.000');
+
+    await page.getByRole('button', { name: /Aplicar caso Bar pequeño rentable/ }).click();
+    // Preset original: mesas=8, ingresos=90.000 → apto.
+    expect(await panel(page, MOD)).not.toContain('NO es elegible');
+
+    // Subir ingresos por encima de 250.000 € sin tocar el resto de parámetros.
+    await mover(page, 'ingresos', 260000);
+    expect(await panel(page, MOD)).toContain('Ingresos o gastos superan los límites de exclusión');
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).toMatch(/te conviene más: Estimación Directa Simplificada/);
   });
 });

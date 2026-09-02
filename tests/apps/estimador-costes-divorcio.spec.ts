@@ -16,7 +16,8 @@ import { test, expect, Page } from '@playwright/test';
  *   orientativas (DisclaimerCard severity="critical"); lo único con respaldo normativo que
  *   usa la app es la exención de tasas judiciales para personas físicas desde 2015, que
  *   coincide con `TASAS_JUDICIALES.personasFisicasExentasDesde` en
- *   `data/fiscal/costas-judiciales.ts` — pero la app no la importa ni la cita (hallazgo 2).
+ *   `data/fiscal/costas-judiciales.ts` — desde el 02/09/2026 la app SÍ la importa y la cita
+ *   (hallazgo 572, reparado, ver test más abajo).
  *
  * Nota de formato (ya documentada en `estimador-costas-judiciales.spec.ts`): `formatCurrency`
  * usa es-ES con `useGrouping:'auto'`, que NO agrupa los millares de un número de cuatro cifras
@@ -46,17 +47,17 @@ import { test, expect, Page } from '@playwright/test';
  *       pegado en «Sí» por detrás del formulario —, y (d) el cálculo notarial con bienes
  *       simples da 900,00 € – 1.700,00 € (abogado 700–1.500, notario 150, registro 50).
  *
- * HALLAZGOS que este fichero por sí solo NO puede impedir en el futuro (ver acta)
- * ────────────────────────────────────────────────────────────────────────────
- *   1 — La tarjeta «Comparativa rápida» y las FAQ (metadata.ts) dan un rango fijo de
- *       650–2.550 € para el notarial. El propio motor, recorriendo sus 3 complejidades,
- *       solo puede dar 700–2.800 €: el rango publicado no es alcanzable por la calculadora
- *       que tiene al lado. Las otras dos tarjetas (mutuo acuerdo 750–3.750 €, contencioso
- *       2.000–12.800 €) SÍ coinciden exactamente con los extremos reales — ver el test de
- *       consistencia más abajo.
- *   2 — No hay `<DataReference>` ni cita de fuente para "exentas de tasas desde 2015",
- *       pese a que el dato ya vive con fuente y fecha de verificación en
- *       `data/fiscal/costas-judiciales.ts`.
+ * ── Reparado 02/09/2026 (hallazgos 571 y 572) ────────────────────────────────────
+ *   571 — La tarjeta «Comparativa rápida» y las FAQ (metadata.ts) daban un rango fijo de
+ *       650–2.550 € para el notarial, cuando el propio motor, recorriendo sus 3
+ *       complejidades, solo puede dar 700–2.800 €. Ahora ambos textos citan 700–2.800 €.
+ *       Las otras dos tarjetas (mutuo acuerdo 750–3.750 €, contencioso 2.000–12.800 €) YA
+ *       coincidían exactamente con los extremos reales — ver el test de consistencia.
+ *   572 — La app no importaba `data/fiscal` ni mostraba `<DataReference>`, pese a que la
+ *       exención de tasas ya vivía con fuente en `costas-judiciales.ts`. Ahora importa
+ *       `COSTAS_JUDICIALES_META` y `ARANCEL_PROCURA` y muestra un `<DataReference>` que cita
+ *       la Ley 10/2012 (exención) y el RD 434/2024 (arancel de Procura de MÁXIMOS), dejando
+ *       claro que los importes de procurador de la app son de mercado, no el arancel exacto.
  */
 
 const RUTA = '/estimador-costes-divorcio/';
@@ -110,8 +111,13 @@ async function duracion(page: Page): Promise<string> {
   return limpiar(await page.getByText(/^Duración estimada/).innerText());
 }
 
+/**
+ * Notas del resultado, acotadas al `notasCard` de la tarjeta de resultados: un selector
+ * `[class*="nota"]` sobre toda la página también atrapa el `<DataReference>` (su nota
+ * normativa usa `styles.nota`), que no es una nota del cálculo.
+ */
 async function notas(page: Page): Promise<string[]> {
-  const parrafos = page.locator('[class*="nota"]:not([class*="notasCard"])');
+  const parrafos = page.locator('[class*="notasCard"] [class*="nota"]');
   const salida: string[] = [];
   for (let i = 0; i < (await parrafos.count()); i++) {
     // Quita el emoji ℹ️ decorativo del principio.
@@ -221,7 +227,7 @@ test('CASO 3 (aviso claro) · el notarial oculta y resetea la pregunta de hijos,
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('HALLAZGO 1 · la "Comparativa rápida" del notarial no es alcanzable por el propio motor', async ({ page }) => {
+test('HALLAZGO 571 (reparado) · la "Comparativa rápida" del notarial coincide con lo que el propio motor puede producir', async ({ page }) => {
   // Recorremos las 3 complejidades patrimoniales del notarial y nos quedamos con el
   // mínimo y el máximo global que el propio `calcular()` puede llegar a producir.
   const complejidades = ['Sin bienes comunes', 'Bienes simples', 'Bienes complejos'];
@@ -234,9 +240,18 @@ test('HALLAZGO 1 · la "Comparativa rápida" del notarial no es alcanzable por e
   }
   // sin_bienes → 700–1.200 · bienes_simples → 900–1.700 · bienes_complejos → 1300–2800
   expect(totales).toEqual(['700,00 € – 1200,00 €', '900,00 € – 1700,00 €', '1300,00 € – 2800,00 €']);
-  // El mínimo real (700) y el máximo real (2.800) no coinciden con el "650 – 2.550 €"
-  // que muestra la tarjeta estática de comparación (ver hallazgo 1 del acta).
+  // Reparado: la tarjeta estática ahora cita exactamente el mínimo y el máximo reales.
   const comparativaNotarial = page.locator('[class*="comparativaItem"]', { hasText: 'Notarial' });
-  await expect(comparativaNotarial).toContainText('650');
-  await expect(comparativaNotarial).toContainText('2.550');
+  await expect(comparativaNotarial).toContainText('700');
+  await expect(comparativaNotarial).toContainText('2.800');
+  await expect(comparativaNotarial).not.toContainText('650');
+  await expect(comparativaNotarial).not.toContainText('2.550');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('HALLAZGO 572 (reparado) · DataReference cita la exención de tasas y el arancel de Procura', async ({ page }) => {
+  const referencia = page.locator('[aria-label="Datos de referencia normativos"]');
+  await expect(referencia).toContainText('Ley 10/2012');
+  await expect(referencia).toContainText('RD 434/2024');
+  await expect(referencia).toContainText('351,00');
 });

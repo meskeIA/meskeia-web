@@ -163,6 +163,15 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Alerta metodológica**: el sistema entero es reciente (precedente: RDL 13/2022 sustituyó la libre elección de base por ingresos reales en 2023). Cambios en la definición de "rendimientos netos computables" o regularización = alerta máxima.
 - **Verificado**: 2026-06-09 · vigencia 2026.
 
+#### `modulos-irpf.ts` — Límites de exclusión del régimen de módulos (estimación objetiva)
+- **Contiene**: `LIMITES_EXCLUSION_MODULOS_2025` — los tres límites cuantitativos excluyentes: volumen de ingresos del conjunto de actividades (250.000 €), facturación a otros empresarios/profesionales obligados a expedir factura (125.000 €) y volumen de compras en bienes y servicios excluido inmovilizado (250.000 €).
+- **Normativa**: art. 31 Ley 35/2006 IRPF + art. 32 Reglamento IRPF (RD 439/2007). Los tres importes están vigentes desde 2016 y se prorrogan cada año por la Orden HFP/HAC que desarrolla el método de estimación objetiva (última: Orden HAC/1425/2025, para 2026).
+- **Vigilar**: la Orden HFP/HAC de cada diciembre — hasta ahora solo prorroga las cifras sin tocarlas, pero es la norma que podría cambiarlas. Cualquier ley que modifique el art. 31 LIRPF o el art. 32 del Reglamento es alerta directa.
+- **Cadencia**: anual (dic), aunque las cifras llevan sin moverse desde 2016 — la expectativa correcta es "se prorroga siempre, hasta que un año no lo haga".
+- **Alerta metodológica**: sustitución del criterio "facturación a empresas > importe absoluto" por un umbral en porcentaje (o viceversa), o fin de la prórroga con una rebaja de los límites a los de 2015 (150.000 €/75.000 €), que es la reforma que Ley 26/2014 dejó prevista y que cada LPGE ha ido posponiendo.
+- **Consumido por**: `simulador-modulos-vs-directa` (hallazgo 567 del Inspector, reparado 02/09/2026: antes los umbrales estaban repetidos a mano en tres sitios del JSX sin aplicarse al cálculo de elegibilidad).
+- **Verificado**: 2026-09-02.
+
 #### `pensiones.ts` — Jubilación, viudedad, mínimos, brecha de género (4 bloques con META)
 - **Contiene**: edad ordinaria (tabla progresiva 2024-2027+), años mínimos, % por años cotizados, límites máx/mín del ejercicio, base reguladora, **sistema dual DT 40ª LGSS** (RDL 2/2023: elección 25/29 años en despliegue), coeficientes de anticipada, límites plan de pensiones, jubilación parcial, viudedad, complemento a mínimos, complemento brecha género (art. 60 LGSS + RDL 3/2026 + doctrina STJUE C-623/23).
 - **Normativa**: LGSS (RDL 8/2015) + Ley 21/2021 + RDL 2/2023 + RDL 16/2025.

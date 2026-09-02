@@ -4,10 +4,11 @@ import { useState } from 'react';
 import styles from './EstimadorCostesDivorcio.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard, RegionBadge,
+  ShareCard, DisclaimerCard, RegionBadge, DataReference,
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { COSTAS_JUDICIALES_META, ARANCEL_PROCURA } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -148,6 +149,13 @@ export default function EstimadorCostesDivorcioPage() {
         <RegionBadge variant="es-only" />
         <LegalNotice />
         <DisclaimerCard variant="financial" severity="critical" context="estimador-costes-divorcio" />
+        <DataReference
+          normativa="Tasas judiciales y arancel de Procura 2025-2026"
+          fuente={COSTAS_JUDICIALES_META.fuente}
+          verificado={COSTAS_JUDICIALES_META.verificado}
+          urlOficial={COSTAS_JUDICIALES_META.urlOficial}
+          nota={`Las tasas judiciales están exentas para personas físicas desde 2015 (Ley 10/2012 art. 4.2.a, tras el RDL 1/2015). El procurador tiene arancel de MÁXIMOS (RD 434/2024): ${formatCurrency(ARANCEL_PROCURA.cuantiaIndeterminada)} para cuantía indeterminada, o más si el divorcio acumula liquidación de bienes con cuantía propia. Los importes de procurador de esta app son orientativos de mercado, no el arancel exacto.`}
+        />
 
         <div className={styles.mainContent}>
           {/* ── Formulario ── */}
@@ -280,7 +288,7 @@ export default function EstimadorCostesDivorcioPage() {
                   <div className={styles.comparativaGrid}>
                     <div className={`${styles.comparativaItem} ${resultado.tipo === 'mutuo_acuerdo_notarial' ? styles.comparativaActivo : ''}`}>
                       <strong>Notarial</strong>
-                      <span>650 – 2.550 €</span>
+                      <span>700 – 2.800 €</span>
                       <span className={styles.comparativaTiempo}>1-2 meses</span>
                     </div>
                     <div className={`${styles.comparativaItem} ${resultado.tipo === 'mutuo_acuerdo_judicial' ? styles.comparativaActivo : ''}`}>
@@ -319,7 +327,7 @@ export default function EstimadorCostesDivorcioPage() {
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Cuánto cuesta un divorcio notarial?</summary>
-                <p>El divorcio notarial (Ley 15/2015) es la vía más rápida y económica, posible solo sin hijos menores ni personas con discapacidad a cargo. El coste total ronda los 650-2.550 €: un único abogado para ambos, la tarifa notarial de la escritura (150-250 €) y la inscripción en el Registro Civil (unos 50 €). No hay procurador ni tasas judiciales.</p>
+                <p>El divorcio notarial (Ley 15/2015) es la vía más rápida y económica, posible solo sin hijos menores ni personas con discapacidad a cargo. El coste total ronda los 700-2.800 €: un único abogado para ambos, la tarifa notarial de la escritura (150-250 €) y la inscripción en el Registro Civil (unos 50 €). No hay procurador ni tasas judiciales.</p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Puedo compartir abogado en un divorcio de mutuo acuerdo?</summary>

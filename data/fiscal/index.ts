@@ -38,3 +38,4 @@ export * from './cnae-iae';
 export * from './esperanza-vida';
 export * from './vivienda-joven';
 export * from './costas-judiciales';
+export * from './modulos-irpf';

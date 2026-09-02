@@ -55,7 +55,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta un divorcio en España en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El precio de un divorcio en España depende sobre todo de si es de mutuo acuerdo o contencioso. Un divorcio de mutuo acuerdo sin hijos ni bienes suele costar entre 600 y 1.500 € (abogado y procurador, o notaría si es extrajudicial), al compartirse un único abogado. Un divorcio contencioso es mucho más caro: cada cónyuge paga su propio abogado y procurador, con un coste por parte que suele ir de 2.000 a 12.000 € o más según los bienes y la disputa por los hijos. Las personas físicas están exentas de tasas judiciales desde 2015.',
+        text: 'El precio de un divorcio en España depende sobre todo de si es de mutuo acuerdo o contencioso. Un divorcio de mutuo acuerdo sin hijos ni bienes suele costar entre 700 y 1.500 € (abogado y procurador, o notaría si es extrajudicial), al compartirse un único abogado. Un divorcio contencioso es mucho más caro: cada cónyuge paga su propio abogado y procurador, con un coste por parte que suele ir de 2.000 a 12.000 € o más según los bienes y la disputa por los hijos. Las personas físicas están exentas de tasas judiciales desde 2015.',
       },
     },
     {
@@ -79,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta un divorcio notarial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El divorcio notarial (Ley 15/2015) es la vía más rápida y económica, pero solo es posible cuando no hay hijos menores ni personas con discapacidad a cargo. El coste total ronda los 650-2.550 €: incluye un único abogado para ambos cónyuges, la tarifa notarial de la escritura (unos 150-250 € según el patrimonio) y la inscripción en el Registro Civil (unos 50 €). No hay procurador ni tasas judiciales. La escritura notarial tiene la misma validez que una sentencia de divorcio.',
+        text: 'El divorcio notarial (Ley 15/2015) es la vía más rápida y económica, pero solo es posible cuando no hay hijos menores ni personas con discapacidad a cargo. El coste total ronda los 700-2.800 €: incluye un único abogado para ambos cónyuges, la tarifa notarial de la escritura (unos 150-250 € según el patrimonio) y la inscripción en el Registro Civil (unos 50 €). No hay procurador ni tasas judiciales. La escritura notarial tiene la misma validez que una sentencia de divorcio.',
       },
     },
     {

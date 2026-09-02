@@ -18,6 +18,9 @@ import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
   FISCAL_IRPF_META,
+  LIMITES_EXCLUSION_MODULOS_2025,
+  FISCAL_MODULOS_IRPF_META,
+  TRAMOS_RETA_2025,
 } from '@/data/fiscal';
 import styles from './SimuladorModulosVsDirecta.module.css';
 
@@ -204,6 +207,11 @@ function calcularIRPF(baseLiquidable: number): number {
 // Mínimo personal orientativo (sin familia)
 const MINIMO_PERSONAL_ORIENTATIVO = MINIMOS_IRPF_2025.personal;
 
+// Rango real de cuota RETA mensual (tabla de tramos por rendimiento neto), para que
+// el slider de cuota libre no ofrezca un recorrido menor que el de la tabla oficial.
+const RETA_CUOTA_MIN = Math.min(...TRAMOS_RETA_2025.map(t => t.cuotaMinima));
+const RETA_CUOTA_MAX = Math.max(...TRAMOS_RETA_2025.map(t => t.cuotaMaxima));
+
 interface ResultadoED {
   ingresos: number;
   gastos: number;
@@ -281,6 +289,7 @@ interface ResultadoModulos {
   cuotaReta: number;
   costeAnualTotal: number;
   esApta: boolean;
+  motivoNoApta: 'sin_parametros' | 'supera_limites' | null;
 }
 
 function calcularModulos(d: DatosComunes, m: DatosModulos): ResultadoModulos {
@@ -293,7 +302,20 @@ function calcularModulos(d: DatosComunes, m: DatosModulos): ResultadoModulos {
     m.personalAsalariado > 0 ||
     (m.actividad !== 'transporte' && m.actividad !== 'taxi' && m.personalNoAsalariado > 0 && m.superficie > 0);
 
-  const esApta = tieneParametros;
+  // Límites cuantitativos excluyentes (LIMITES_EXCLUSION_MODULOS_2025): superar
+  // ingresos o compras de bienes y servicios (aquí, "gastos" como proxy) excluye
+  // del régimen aunque la actividad física encaje. El umbral de facturación a
+  // empresas no se comprueba: la app no recoge ese dato.
+  const dentroDeLimites =
+    d.ingresos <= LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades &&
+    d.gastos <= LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios;
+
+  const esApta = tieneParametros && dentroDeLimites;
+  const motivoNoApta: 'sin_parametros' | 'supera_limites' | null = esApta
+    ? null
+    : !dentroDeLimites
+    ? 'supera_limites'
+    : 'sin_parametros';
 
   const rendimientoNetoPrevio = calcularRendimientoModulos(m);
   // Reducción 5% (sí aplicable también)
@@ -318,6 +340,7 @@ function calcularModulos(d: DatosComunes, m: DatosModulos): ResultadoModulos {
     cuotaReta,
     costeAnualTotal,
     esApta,
+    motivoNoApta,
   };
 }
 
@@ -393,7 +416,15 @@ export default function SimuladorModulosVsDirectaPage() {
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
-        nota="El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente (no hay tabla oficial enlazada) y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la Orden HFP."
+        nota="El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente dentro del rango real de la tabla de tramos (TRAMOS_RETA_2025) y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la Orden HFP."
+      />
+
+      <DataReference
+        normativa="Límites de exclusión de módulos"
+        fuente={FISCAL_MODULOS_IRPF_META.fuente}
+        verificado={FISCAL_MODULOS_IRPF_META.verificado}
+        urlOficial={FISCAL_MODULOS_IRPF_META.urlOficial}
+        nota="El simulador excluye la actividad de módulos si tus ingresos o gastos introducidos superan estos límites. El de facturación a empresas (125.000 €) es solo informativo: no hay campo para ese dato."
       />
 
       <LegalNotice />
@@ -430,7 +461,7 @@ export default function SimuladorModulosVsDirectaPage() {
               id="ingresos"
               type="range"
               min={0}
-              max={200000}
+              max={300000}
               step={1000}
               value={comunes.ingresos}
               onChange={e => setComunes({ ...comunes, ingresos: Number(e.target.value) })}
@@ -438,8 +469,11 @@ export default function SimuladorModulosVsDirectaPage() {
             />
             <div className={styles.sliderRange}>
               <span>0 €</span>
-              <span>200.000 €</span>
+              <span>300.000 €</span>
             </div>
+            <p className={styles.sliderHint}>
+              Por encima de {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} quedas excluido de módulos.
+            </p>
           </div>
 
           <div className={styles.sliderGroup}>
@@ -450,7 +484,7 @@ export default function SimuladorModulosVsDirectaPage() {
               id="gastos"
               type="range"
               min={0}
-              max={100000}
+              max={300000}
               step={500}
               value={comunes.gastos}
               onChange={e => setComunes({ ...comunes, gastos: Number(e.target.value) })}
@@ -458,7 +492,7 @@ export default function SimuladorModulosVsDirectaPage() {
             />
             <div className={styles.sliderRange}>
               <span>0 €</span>
-              <span>100.000 €</span>
+              <span>300.000 €</span>
             </div>
             <p className={styles.sliderHint}>
               Solo deducibles para Estimación Directa Simplificada (alquiler local, suministros afectos, material…).
@@ -472,19 +506,22 @@ export default function SimuladorModulosVsDirectaPage() {
             <input
               id="reta"
               type="range"
-              min={200}
-              max={600}
+              min={Math.floor(RETA_CUOTA_MIN / 10) * 10}
+              max={Math.ceil(RETA_CUOTA_MAX / 10) * 10}
               step={10}
               value={comunes.retaMensual}
               onChange={e => setComunes({ ...comunes, retaMensual: Number(e.target.value) })}
               className={styles.slider}
             />
             <div className={styles.sliderRange}>
-              <span>200 €</span>
-              <span>600 €</span>
+              <span>{formatCurrency(Math.floor(RETA_CUOTA_MIN / 10) * 10)}</span>
+              <span>{formatCurrency(Math.ceil(RETA_CUOTA_MAX / 10) * 10)}</span>
             </div>
             <p className={styles.sliderHint}>
-              Cuota mensual del RETA según tu base de cotización elegida.
+              Cuota mensual del RETA según tu base de cotización elegida. El recorrido del
+              slider ({formatCurrency(RETA_CUOTA_MIN)} a {formatCurrency(RETA_CUOTA_MAX)}) es
+              el rango real de la tabla de tramos por rendimiento neto — introduce tu cuota
+              exacta si ya la conoces.
             </p>
           </div>
         </div>
@@ -713,8 +750,10 @@ export default function SimuladorModulosVsDirectaPage() {
 
               {!resModulos.esApta && (
                 <p className={styles.avisoNoApta}>
-                  <span aria-hidden="true">⚠️</span> Sin parámetros suficientes — esta actividad/configuración probablemente NO es
-                  elegible para módulos.
+                  <span aria-hidden="true">⚠️</span>{' '}
+                  {resModulos.motivoNoApta === 'supera_limites'
+                    ? `Ingresos o gastos superan los límites de exclusión (${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} / ${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)}) — con estos datos quedarías excluido de módulos aunque la actividad encajase.`
+                    : 'Sin parámetros suficientes — esta actividad/configuración probablemente NO es elegible para módulos.'}
                 </p>
               )}
 
@@ -852,7 +891,7 @@ export default function SimuladorModulosVsDirectaPage() {
               <tr>
                 <td>Límite de ingresos</td>
                 <td>Sin límite</td>
-                <td>250.000 €/año (general) o 150.000 € en algunos casos</td>
+                <td>{formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)}/año (o {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)} facturados a empresas)</td>
                 <td>Volumen alto: ED</td>
               </tr>
               <tr>
@@ -943,8 +982,10 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.faqItem}>
             <strong>¿Qué pasa si supero los límites de módulos?</strong>
             <p>
-              Si superas 250.000 € de ingresos anuales (o 150.000 € si más del 50% de tus clientes
-              son empresarios y profesionales) o 150.000 € de gastos, quedas <strong>excluido
+              Si superas {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} de
+              ingresos anuales, {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)} facturados
+              a otros empresarios y profesionales, o {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)} de
+              compras en bienes y servicios (excluido el inmovilizado), quedas <strong>excluido
               automáticamente</strong> y pasas a Estimación Directa al año siguiente.
             </p>
           </div>
