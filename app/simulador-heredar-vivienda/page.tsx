@@ -25,9 +25,24 @@ import {
   COEFICIENTES_CATALUNA_IS,
   COEFICIENTES_IIVTNU_2025,
   REDUCCION_VIVIENDA_MAX_IS,
+  REDUCCION_EDAD_MENOR_21_IS,
+  REDUCCION_EDAD_MENOR_21_MAX_IS,
   desglosarCuotaBaseAhorro,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
+  FISCAL_INMUEBLES_META,
 } from '@/data/fiscal';
+
+/**
+ * La escala de la base del ahorro, LEÍDA de data/fiscal. Iba escrita a mano dos veces en
+ * este fichero —la nota de la tarjeta del IRPF y el desglose de la FAQ— aunque la propia
+ * página ya consume `desglosarCuotaBaseAhorro`. Residuo exacto del hallazgo 463, que derivó
+ * la escala en `metadata.ts` y dejó estas dos copias (hallazgo 609).
+ */
+const ESCALA_AHORRO = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
+const TIPOS_AHORRO = ESCALA_AHORRO.map((t) => `${t.tipo}%`).join(' / ');
+const TIPO_AHORRO_MIN = ESCALA_AHORRO[0].tipo;
+const TIPO_AHORRO_MAX = ESCALA_AHORRO[ESCALA_AHORRO.length - 1].tipo;
 import {
   calcularCuotaIntegraIS,
   evaluarReduccionVivienda,
@@ -38,7 +53,7 @@ import styles from './SimuladorHeredarVivienda.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type Parentesco = 'conyuge' | 'hijo' | 'padre' | 'hermano' | 'sin_parentesco';
+type Parentesco = 'conyuge' | 'hijo_menor21' | 'hijo' | 'padre' | 'hermano' | 'sin_parentesco';
 
 interface ResultadoISD {
   baseImponible: number;
@@ -109,6 +124,10 @@ const CCAA_BONIFICACION_CASI_TOTAL = Object.values(BONIFICACIONES_CCAA_IS)
 
 const PARENTESCOS: Array<{ id: Parentesco; label: string; grupo: string; reducKey: GrupoParentescoIS }> = [
   { id: 'conyuge', label: 'Cónyuge o pareja estable (Grupo II)', grupo: 'II', reducKey: 'I-conyuge' },
+  // El Grupo I no era expresable: el desplegable no lo ofrecía y el deslizador de edad
+  // arrancaba en 18, así que un heredero de 10 años solo podía simularse como Grupo II, sin
+  // la reducción del art. 20.2.a LISD que `data/fiscal` ya exportaba (hallazgo 612).
+  { id: 'hijo_menor21', label: 'Hijo o descendiente <21 años (Grupo I)', grupo: 'I', reducKey: 'I-descendiente' },
   { id: 'hijo', label: 'Hijo o descendiente ≥21 años (Grupo II)', grupo: 'II', reducKey: 'II' },
   { id: 'padre', label: 'Padre / Ascendiente (Grupo II)', grupo: 'II', reducKey: 'II-ascendiente' },
   { id: 'hermano', label: 'Hermano / Tío / Sobrino (Grupo III)', grupo: 'III', reducKey: 'III' },
@@ -275,7 +294,24 @@ function calcularISD(
 
   // Reducción por parentesco
   const reducciones = esCataluna ? REDUCCIONES_PARENTESCO_CATALUNA_IS : REDUCCIONES_PARENTESCO_IS;
-  const reduccionParentesco = reducciones[reducKey] ?? 0;
+  const reduccionBaseParentesco = reducciones[reducKey] ?? 0;
+
+  /**
+   * Incremento del Grupo I por cada año menos de 21 (art. 20.2.a LISD): la reducción de
+   * parentesco sube 3.990,72 € por año, sin que el TOTAL exceda de 47.858,59 €.
+   *
+   * Solo en régimen común. Cataluña tiene reducción propia por edad, con otra cuantía y otro
+   * tope, y `data/fiscal` no la modela: aplicarle la estatal sería inventarse un dato, así
+   * que allí se usa su reducción de parentesco sin incremento y la página lo advierte.
+   */
+  const anosPorDebajo = grupo === 'I' ? Math.max(0, 21 - edad) : 0;
+  const reduccionParentesco =
+    anosPorDebajo > 0 && !esCataluna
+      ? Math.min(
+          reduccionBaseParentesco + anosPorDebajo * REDUCCION_EDAD_MENOR_21_IS,
+          REDUCCION_EDAD_MENOR_21_MAX_IS,
+        )
+      : reduccionBaseParentesco;
 
   /**
    * Reducción por vivienda habitual (art. 20.2.c LISD, 95 % hasta 122.606,47 €).
@@ -554,8 +590,10 @@ export default function SimuladorHeredarViviendaPage() {
   const totalImpuestos = isd.cuotaFinal + plusvalia.cuotaFinal + (irpf?.cuota ?? 0);
   const porcSobreVenta = valorVenta > 0 ? (totalImpuestos / valorVenta) * 100 : 0;
 
-  // Aviso edad menor de 21 (informativo)
+  // Los tres avisos de coherencia entre parentesco y edad (hallazgo 612)
   const avisoEdad = edad < 21 && parentesco === 'hijo';
+  const avisoGrupoIMayor = edad >= 21 && parentesco === 'hijo_menor21';
+  const avisoGrupoICataluna = parentesco === 'hijo_menor21' && edad < 21 && ccaa === 'cataluna';
 
   // Grupo del parentesco elegido, para decidir qué campos tienen sentido en el formulario
   const grupoParentesco = PARENTESCOS.find(p => p.id === parentesco)?.grupo ?? 'II';
@@ -576,11 +614,23 @@ export default function SimuladorHeredarViviendaPage() {
 
       <DisclaimerCard variant="financial" severity="critical" />
 
+      {/* Un sello por MÓDULO, no uno solo con el rótulo de los tres impuestos. La página
+          liquida ISD, plusvalía municipal e IRPF de la venta con datos de DOS módulos de
+          data/fiscal, y el sello único rotulaba «ISD + IIVTNU 2025» mientras enseñaba la
+          fecha del de sucesiones —año y medio anterior— y una URL que no habla ni del
+          IIVTNU ni del IRPF (hallazgo 610). */}
       <DataReference
-        normativa="ISD + IIVTNU 2025"
+        normativa="ISD"
         fuente={FISCAL_SUCESIONES_META.fuente}
         verificado={FISCAL_SUCESIONES_META.verificado}
         urlOficial={FISCAL_SUCESIONES_META.urlOficial}
+      />
+      <DataReference
+        normativa="Plusvalía municipal (IIVTNU) e IRPF de la venta"
+        fuente={`${PLUSVALIA_MUNICIPAL_META.baseNormativa} · ${FISCAL_INMUEBLES_META.fuente}`}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialIRPF}
+        nota={PLUSVALIA_MUNICIPAL_META.aviso}
       />
 
       <LegalNotice />
@@ -684,10 +734,12 @@ export default function SimuladorHeredarViviendaPage() {
             <label className={styles.sliderLabel} htmlFor="edadHer">
               Edad del heredero: <span className={styles.sliderValue}>{edad} años</span>
             </label>
+            {/* Desde 0: el Grupo I son los descendientes MENORES de 21 años, y con el
+                mínimo en 18 su caso no se podía ni plantear (hallazgo 612). */}
             <input
               id="edadHer"
               type="range"
-              min={18}
+              min={0}
               max={90}
               step={1}
               value={edad}
@@ -695,13 +747,28 @@ export default function SimuladorHeredarViviendaPage() {
               className={styles.slider}
             />
             <div className={styles.sliderRange}>
-              <span>18</span>
+              <span>0</span>
               <span>90</span>
             </div>
             {avisoEdad && (
               <p className={styles.sliderHint} role="status" aria-live="polite">
-                <span aria-hidden="true">⚠️</span> Heredero menor de 21 años: existen
-                reducciones adicionales no incluidas aquí. Consulta con un asesor.
+                <span aria-hidden="true">⚠️</span> Con menos de 21 años, un hijo o descendiente
+                es <strong>Grupo I</strong>, no Grupo II: elige esa opción en el parentesco para
+                que se aplique la reducción del art. 20.2.a LISD.
+              </p>
+            )}
+            {avisoGrupoIMayor && (
+              <p className={styles.sliderHint} role="status" aria-live="polite">
+                <span aria-hidden="true">⚠️</span> El Grupo I es solo para descendientes de
+                menos de 21 años. Con {edad} años el parentesco correcto es el Grupo II.
+              </p>
+            )}
+            {avisoGrupoICataluna && (
+              <p className={styles.sliderHint} role="status" aria-live="polite">
+                <span aria-hidden="true">ℹ️</span> En Cataluña el Grupo I tiene reducción propia
+                por edad, con otra cuantía y otro tope que la estatal. Aquí se aplica su
+                reducción de parentesco sin ese incremento, así que el impuesto que sale es un
+                <strong> techo</strong>: consulta la cifra exacta con un asesor.
               </p>
             )}
           </div>
@@ -806,7 +873,7 @@ export default function SimuladorHeredarViviendaPage() {
               />
               <span>
                 Era vivienda habitual del fallecido{' '}
-                <span className={styles.muted}>(reducción 95% ISD hasta 122.606 €)</span>
+                <span className={styles.muted}>(reducción 95% ISD hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)})</span>
               </span>
             </label>
           </div>
@@ -886,8 +953,12 @@ export default function SimuladorHeredarViviendaPage() {
           )}
         </div>
 
-        {/* 3 paneles horizontales */}
-        <div className={styles.tresPaneles}>
+        {/* 3 paneles horizontales. `role="status"` + `aria-live="polite"`: los siete
+            deslizadores recalculan las tres liquidaciones y un lector de pantalla no oía
+            nada, en una herramienta cuyo contenido entero es el resultado (hallazgo 613).
+            Va en el contenedor y no en cada panel para que se anuncie UNA vez por cambio,
+            no tres. */}
+        <div className={styles.tresPaneles} role="status" aria-live="polite" aria-atomic="true">
           {/* Panel 1: ISD */}
           <div className={styles.panelISD}>
             <h3 className={styles.panelHeaderTitle}>1. ISD al heredar</h3>
@@ -1028,7 +1099,7 @@ export default function SimuladorHeredarViviendaPage() {
                 </div>
                 {!irpf.esPerdida && (
                   <p className={styles.muted}>
-                    Tramos: 19% / 21% / 23% / 27% / 30%
+                    Tramos: {TIPOS_AHORRO}
                   </p>
                 )}
                 <div className={styles.panelTotal}>
@@ -1043,8 +1114,10 @@ export default function SimuladorHeredarViviendaPage() {
           </div>
         </div>
 
-        {/* Bloque total */}
-        <div className={styles.bloqueTotal}>
+        {/* Bloque total. `role="status"` + `aria-live`: los siete deslizadores recalculan
+            todas las cifras y un lector de pantalla no se enteraba de nada, en una
+            herramienta cuyo contenido entero es el resultado (hallazgo 613). */}
+        <div className={styles.bloqueTotal} role="status" aria-live="polite" aria-atomic="true">
           <h2 className={styles.bloqueTitle}>Coste fiscal total acumulado</h2>
           <div className={styles.bloqueGrid}>
             <div className={styles.bloqueCard}>
@@ -1144,7 +1217,7 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.escenarioCard}>
             <h4>Hermano o sobrino hereda (Grupo III)</h4>
             <p>
-              Reducción de parentesco mucho menor (7.993 €) y coeficiente multiplicador 1,5882.
+              Reducción de parentesco mucho menor ({formatCurrency(REDUCCIONES_PARENTESCO_IS['III'] ?? 0)}) y coeficiente multiplicador {formatNumber(COEFICIENTES_IS['III'][0], 4)}.
               La mayoría de CCAA NO bonifican al Grupo III. Resultado: tributación notable, a
               menudo decenas de miles de euros sobre 200-300k.
             </p>
@@ -1154,7 +1227,7 @@ export default function SimuladorHeredarViviendaPage() {
             <p>
               Coeficiente multiplicador 2,0 y sin reducciones. Casi ninguna CCAA bonifica.
               Heredar 200.000 € supone {formatCurrency(EJEMPLO_GRUPO_IV.cuotaFinal)} de ISD en
-              régimen común, y más con un patrimonio previo alto (el coeficiente llega a 2,4).
+              régimen común, y más con un patrimonio previo alto (el coeficiente llega a {formatNumber(COEFICIENTES_IS['IV'][COEFICIENTES_IS['IV'].length - 1], 1)}).
               Conviene valorar si compensa renunciar a la herencia (la herencia es siempre
               voluntaria). Simula tu caso arriba: cada CCAA cambia el resultado.
             </p>
@@ -1203,9 +1276,13 @@ export default function SimuladorHeredarViviendaPage() {
             <strong>Si vendo en menos de 1 año, ¿hay diferencia en el IRPF?</strong>
             <p>
               No. En España, las ganancias patrimoniales de inmuebles tributan siempre en la
-              base del ahorro (19-30%) sea cual sea el plazo de tenencia. En 2025 los tramos son:
-              19% (hasta 6.000 €), 21% (hasta 50.000 €), 23% (hasta 200.000 €), 27% (hasta 300.000 €)
-              y 30% (más de 300.000 €).
+              base del ahorro ({TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}%) sea cual sea el plazo de tenencia. Los tramos son:{' '}
+              {ESCALA_AHORRO.map((tramo, i) => (
+                <span key={tramo.tipo}>
+                  {i > 0 && ', '}
+                  {tramo.tipo}% ({Number.isFinite(tramo.hasta) ? `hasta ${formatCurrency(tramo.hasta)}` : `más de ${formatCurrency(ESCALA_AHORRO[i - 1].hasta)}`})
+                </span>
+              ))}.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1213,7 +1290,7 @@ export default function SimuladorHeredarViviendaPage() {
             <p>
               Hay reducción del 95% en la base imponible del ISD para cónyuge, descendientes,
               ascendientes o un colateral mayor de 65 años que conviviera con el fallecido los
-              últimos 2 años. El tope estatal es 122.606,47 €/heredero (cada CCAA puede mejorarlo).
+              últimos 2 años. El tope estatal es {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}/heredero (cada CCAA puede mejorarlo).
               Requisito: mantener la vivienda al menos 10 años (en algunas CCAA es menor). Si la
               vendes antes, pierdes la reducción retroactivamente.
             </p>
@@ -1306,7 +1383,7 @@ export default function SimuladorHeredarViviendaPage() {
             <span className={styles.tipIcon} aria-hidden="true">💰</span>
             <div>
               <strong>Aprovecha la reducción de vivienda habitual</strong>
-              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del 95% (hasta 122.606 €) puede ser decisiva.</p>
+              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del 95% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}) puede ser decisiva.</p>
             </div>
           </div>
           <div className={styles.tipCard}>

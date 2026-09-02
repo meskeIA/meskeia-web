@@ -11,8 +11,20 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
+  COMPLEMENTO_MATERNIDAD_DEROGADO,
   LIMITES_PENSION_2025,
 } from '@/data/fiscal';
+
+/**
+ * Las dos resoluciones que fijan la igualdad de trato, LEÍDAS del módulo fiscal. Iban
+ * tecleadas a mano en siete sitios de esta página y en dos de `metadata.ts` (hallazgo 606).
+ */
+const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
+
+/** Escala del complemento de maternidad derogado, leída del módulo (hallazgo 607) */
+const MATERNIDAD = COMPLEMENTO_MATERNIDAD_DEROGADO;
+const ESCALA_MATERNIDAD = MATERNIDAD.escala.map((t) => `${t.porcentaje}%`).join(', ');
+const MAXIMO_MATERNIDAD = MATERNIDAD.escala[MATERNIDAD.escala.length - 1];
 
 /**
  * Las cifras del complemento se escriben UNA vez, aquí, y se interpolan en toda la página.
@@ -201,7 +213,7 @@ function evaluar(
       importeAnual,
       motivo:
         genero === 'hombre'
-          ? 'Tras la STJUE de 15-may-2025 (C-623/23) y la doctrina del Tribunal Supremo (9-jul-2025), ' +
+          ? `Tras la STJUE de ${DOCTRINA.stjue.fecha} (${DOCTRINA.stjue.asunto}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), ` +
             'las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. ' +
             'El complemento debe reconocerse en las mismas condiciones que a las mujeres.'
           : 'Cumples los requisitos básicos del art. 60 LGSS, así que conviene revisar por qué se te ' +
@@ -210,7 +222,7 @@ function evaluar(
       pasoSiguiente:
         genero === 'hombre'
           ? 'Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución ' +
-            'denegatoria, citando la STJUE C-623/23 y la doctrina TS. Recomendable acudir a un abogado ' +
+            `denegatoria, citando la ${DOCTRINA.stjue.corto} y la doctrina TS. Recomendable acudir a un abogado ` +
             'laboralista o al sindicato.'
           : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu ' +
             'sindicato antes de volver a solicitarlo.',
@@ -279,9 +291,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           hijosComputables: 0,
           importeMensual: 0,
           importeAnual: 0,
+          // El campo VACÍO tiene su propia frase: citar la cadena vacía entre comillas
+          // («" "» no se interpreta) es ruido, no información (hallazgo 608).
           motivo: hijosSuperaLimite
             ? `«${hijosTexto}» supera el tope de ${LIMITE_HIJOS_CAMPO} hijos de este campo, así que no hay nada que calcular todavía.`
-            : `«${hijosTexto}» no es un número entero de hijos, así que no hay nada que calcular todavía.`,
+            : hijosTexto.trim() === ''
+              ? 'Falta el número de hijos, así que no hay nada que calcular todavía.'
+              : `«${hijosTexto}» no es un número entero de hijos, así que no hay nada que calcular todavía.`,
           esReclamacion: false,
           pasoSiguiente: `Escribe en la pregunta 3 un número entero de 0 a ${LIMITE_HIJOS_CAMPO} y vuelve a verificar.`,
         };
@@ -409,7 +425,9 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <p className={styles.hint} role="alert">
                 <span aria-hidden="true">⚠️</span> {hijosSuperaLimite
                   ? `«${hijosTexto}» supera el tope de ${LIMITE_HIJOS_CAMPO} hijos de este campo: el cálculo no se hace.`
-                  : `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}: «${hijosTexto}» no se interpreta.`}
+                  : hijosTexto.trim() === ''
+                    ? `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}.`
+                    : `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}: «${hijosTexto}» no se interpreta.`}
               </p>
             )}
             <p className={styles.hint} id="hijos-ayuda">
@@ -438,7 +456,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               ))}
             </div>
             <p className={styles.hint}>
-              Desde la STJUE 15-may-2025 y la doctrina del TS, hombres y mujeres tienen derecho en
+              Desde la STJUE de {DOCTRINA.stjue.fecha} y la doctrina del TS, hombres y mujeres tienen derecho en
               igualdad de condiciones.
             </p>
           </div>
@@ -496,7 +514,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             </div>
             <p className={styles.hint}>
               Se refiere a una denegación a TI, no al otro progenitor. Las denegaciones a hombres
-              anteriores a 2025 por «requisitos adicionales» son revisables tras la STJUE C-623/23.
+              anteriores a 2025 por «requisitos adicionales» son revisables tras la {DOCTRINA.stjue.corto}.
             </p>
           </div>
 
@@ -619,26 +637,26 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <tbody>
                 <tr>
                   <td>Naturaleza del cálculo</td>
-                  <td>% sobre la pensión (5%, 10% o 15% según nº hijos)</td>
+                  <td>% sobre la pensión ({ESCALA_MATERNIDAD} según nº hijos)</td>
                   <td>Importe fijo por hijo/a ({CUANTIA_MES}/mes)</td>
                 </tr>
                 <tr>
                   <td>Nº de hijos exigido</td>
-                  <td>2 o más hijos</td>
+                  <td>{MATERNIDAD.minimoHijos} o más hijos</td>
                   <td>Desde 1 hijo/a</td>
                 </tr>
                 <tr>
                   <td>Máximo</td>
-                  <td>15% (4 o más hijos)</td>
+                  <td>{MAXIMO_MATERNIDAD.porcentaje}% ({MAXIMO_MATERNIDAD.hijos} o más hijos)</td>
                   <td>{MAX_HIJOS} hijos × {CUANTIA_MES} = {MAX_MES}/mes</td>
                 </tr>
                 <tr>
                   <td>Acceso de hombres</td>
-                  <td>Posible tras STJUE 2019 (caso WA)</td>
+                  <td>Posible tras la {MATERNIDAD.doctrinaAcceso}</td>
                   <td>Posible con requisitos adicionales hasta 2025</td>
                 </tr>
                 <tr>
-                  <td>Tras STJUE 15-may-2025</td>
+                  <td>Tras la STJUE de {DOCTRINA.stjue.fecha}</td>
                   <td>—</td>
                   <td>Igualdad plena de trato hombre/mujer</td>
                 </tr>
@@ -692,7 +710,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <p>
                 <strong>Situación:</strong> jubilación causada en 2019. <strong>Resultado:</strong>
                 no aplica el complemento actual. Si entonces percibía o se le denegó el antiguo
-                complemento de maternidad, conviene revisar la doctrina de la STJUE 2019 (caso WA)
+                complemento de maternidad, conviene revisar la doctrina de la {MATERNIDAD.doctrinaAcceso}
                 con un profesional.
               </p>
             </div>
@@ -744,7 +762,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <div className={styles.faqItem}>
               <h3>¿Puedo reclamar retroactivamente si soy hombre y me lo denegaron en 2022?</h3>
               <p>
-                Sí, tras la STJUE 15-may-2025 y la doctrina TS de 9-jul-2025. La estrategia procesal
+                Sí, tras la STJUE de {DOCTRINA.stjue.fecha} y la doctrina del TS de {DOCTRINA.ts.fecha}. La estrategia procesal
                 concreta (nueva solicitud, reclamación previa, demanda) depende de las fechas y de tu
                 resolución anterior. Es recomendable acudir a un abogado laboralista o al sindicato.
               </p>
@@ -874,8 +892,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <h3>Aporta jurisprudencia si reclamas</h3>
               <p>
-                En reclamaciones de hombres con denegaciones previas, citar la STJUE C-623/23
-                (15-may-2025) y la doctrina del TS de 9-jul-2025 refuerza la solicitud.
+                En reclamaciones de hombres con denegaciones previas, citar la {DOCTRINA.stjue.corto}
+                ({DOCTRINA.stjue.fecha}) y la doctrina del TS de {DOCTRINA.ts.fecha} refuerza la solicitud.
               </p>
             </div>
             <div className={styles.tipCard}>

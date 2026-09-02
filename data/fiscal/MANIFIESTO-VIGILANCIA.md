@@ -376,7 +376,12 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Trampa conocida**: NO existe tabla oficial de equivalencia CNAE ⇄ IAE (organismos y finalidades
   distintas). Cualquier presión para "convertir" entre ambas produce criterio disfrazado de dato;
   `FISCAL_CNAE_IAE_META.sinEquivalenciaOficial` lo deja sellado en el propio módulo.
-- **Verificado**: 2026-07-20.
+- **Al regenerar, actualizar el sello**: `verificado` de `cnae-iae.ts` se pone a la fecha de la
+  regeneración, porque el generador descarga las fuentes oficiales y regenerar ES verificar. La del
+  30/08/2026 no lo hizo y el mismo catálogo acabó publicando dos fechas distintas según la página
+  (hallazgo 588 del Inspector). Desde entonces la app lee `FISCAL_CNAE_IAE_META.verificado`, no el
+  `generado` del JSON, así que las dos páginas dicen lo mismo por construcción.
+- **Verificado**: 2026-08-30.
 
 ### 3.7 Módulos EXENTOS de vigilancia normativa
 

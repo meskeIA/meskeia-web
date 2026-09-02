@@ -592,9 +592,11 @@ sabañón garrafal, morado y frito.`,
           <div className={styles.reglaCard}>
             <h4>Diptongos</h4>
             <p>
-              Vocal fuerte (a, e, o) + vocal débil (i, u) = misma sílaba.
+              Vocal fuerte (a, e, o) + vocal débil (i, u), o dos débiles <strong>distintas</strong>, en la misma sílaba.
               <br />
-              <em>Ejemplo: ai-re, cau-sa, pei-ne</em>
+              <em>Ejemplo: ai-re, cau-sa, pei-ne, ciu-dad</em>
+              <br />
+              Dos débiles <strong>iguales</strong> forman hiato: <em>chi-i-ta, an-ti-in-fla-ma-to-rio</em>.
             </p>
           </div>
           <div className={styles.reglaCard}>
@@ -646,7 +648,7 @@ sabañón garrafal, morado y frito.`,
                 <tr>
                   <td><strong>Diptongo</strong></td>
                   <td>Dos vocales en la misma sílaba</td>
-                  <td>Vocal fuerte (a,e,o) + débil (i,u) sin tilde, o dos débiles</td>
+                  <td>Vocal fuerte (a,e,o) + débil (i,u) sin tilde, o dos débiles DISTINTAS</td>
                   <td>ai-re, cau-sa, cui-da</td>
                   <td>Reduce el número de sílabas</td>
                 </tr>
@@ -660,8 +662,8 @@ sabañón garrafal, morado y frito.`,
                 <tr>
                   <td><strong>Hiato</strong></td>
                   <td>Dos vocales en sílabas distintas</td>
-                  <td>Dos vocales fuertes, o débil tónica con tilde</td>
-                  <td>po-e-ta, pa-ís, Ma-rí-a</td>
+                  <td>Dos vocales fuertes, dos débiles IGUALES, o débil tónica con tilde</td>
+                  <td>po-e-ta, pa-ís, Ma-rí-a, chi-i-ta</td>
                   <td>Aumenta el número de sílabas</td>
                 </tr>
                 <tr>
@@ -725,7 +727,7 @@ sabañón garrafal, morado y frito.`,
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Cuándo se produce hiato y cuándo diptongo?</summary>
-              <p className={styles.eduFaqRespuesta}>La regla básica: las vocales <strong>fuertes</strong> son a, e, o; las <strong>débiles</strong> son i, u. Diptongo: fuerte + débil (sin tilde en la débil), débil + fuerte, o débil + débil. Hiato: fuerte + fuerte, o débil TÓNICA (con tilde) + cualquier vocal. Por eso &quot;país&quot; es hiato (i tónica lleva tilde), pero &quot;paisaje&quot; es diptongo (i átona). La tilde sobre la vocal débil siempre rompe el diptongo.</p>
+              <p className={styles.eduFaqRespuesta}>La regla básica: las vocales <strong>fuertes</strong> son a, e, o; las <strong>débiles</strong> son i, u. Diptongo: fuerte + débil (sin tilde en la débil), débil + fuerte, o dos débiles <strong>distintas</strong> (ciu-dad). Hiato: fuerte + fuerte, dos débiles <strong>iguales</strong> (chi-i-ta, du-un-vi-ro), o débil TÓNICA (con tilde) + cualquier vocal. Por eso &quot;país&quot; es hiato (i tónica lleva tilde), pero &quot;paisaje&quot; es diptongo (i átona). La tilde sobre la vocal débil siempre rompe el diptongo.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿La sinalefa es siempre obligatoria en poesía?</summary>
@@ -849,6 +851,7 @@ sabañón garrafal, morado y frito.`,
                 <li><strong>Las sinalefas sí se encadenan:</strong> cuando tres o más vocales entran en contacto, se funden todas en una sílaba. «Érase un hombre a una nariz pegado» tiene 14 sílabas fonéticas y tres contactos vocálicos (se_un, bre_a, a_u): 14 − 3 = 11, el endecasílabo que Quevedo escribió. La excepción es la conjunción <em>y</em>, que funde por un solo lado —«de rosa y azucena» ahorra una sílaba, no dos—, porque entre vocales se lee [ro-sa-<em>ja</em>-zu-ce-na].</li>
                 <li><strong>Palabras compuestas y prefijadas:</strong> En palabras como &quot;subrayar&quot;, &quot;deshacer&quot; o &quot;transatlántico&quot;, el silabeo puede variar según se considere la morfología o solo la fonética. La RAE y las distintas tradiciones gramaticales no siempre coinciden.</li>
                 <li><strong>Nombres propios y extranjerismos:</strong> El algoritmo puede fallar con nombres como &quot;Shakespeare&quot;, &quot;Nietzsche&quot; o topónimos poco frecuentes cuya pronunciación en español no sigue las reglas estándar.</li>
+                <li><strong>Siglas deletreadas:</strong> el silabeo trata cada palabra como una palabra española, no como una sigla. Las que se leen de corrido salen bien (ONU → o-nu, OTAN → o-tan), pero las que se deletrean se devuelven tal cual y cuentan una sola sílaba: &quot;DNI&quot; se lee <em>de-e-ne-i</em>, cuatro sílabas, y aquí aparece como una. Si tu verso lleva una sigla deletreada, cuenta sus letras aparte.</li>
                 <li><strong>Secuencias &quot;ui&quot;/&quot;iu&quot; en verbos como &quot;construir&quot;:</strong> la RAE admite tanto el diptongo (cons-truir, 2 sílabas) como el hiato (cons-tru-ir, 3 sílabas) según la pronunciación. El algoritmo aplica siempre el criterio de diptongo.</li>
                 <li><strong>No es árbitro de exámenes:</strong> Para dudas concretas en contexto académico, consulta la Nueva Gramática de la Lengua Española (RAE/ASALE, 2009) o el Diccionario panhispánico de dudas, que son las referencias normativas oficiales.</li>
               </ul>

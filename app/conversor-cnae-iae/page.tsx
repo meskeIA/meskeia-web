@@ -16,11 +16,19 @@ import {
 import { formatDate, formatNumber, parseISODateLocal } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
+  FISCAL_CNAE_IAE_META,
   SECCIONES_IAE,
   IAE_EXENCION,
   CNAE_VIGENCIA,
   CNAE_IAE_RUTA_CATALOGO,
 } from '@/data/fiscal';
+
+/**
+ * Retira del texto de la fuente el nombre de la normativa cuando `DataReference` ya lo va a
+ * imprimir delante: sin esto se leía «CNAE-2025 — CNAE-2025 — RD 10/2025 (INE)» (hallazgo 587).
+ */
+const sinPrefijo = (fuente: string, normativa: string) =>
+  fuente.startsWith(`${normativa} — `) ? fuente.slice(normativa.length + 3) : fuente;
 
 // ─── Tipos del catálogo oficial (public/datos/cnae-iae-catalogo.json) ────────
 
@@ -665,17 +673,20 @@ export default function ConversorCnaeIaePage() {
 
       {meta && (
         <>
+          {/* `normativa` NO repite el nombre del catálogo: la `fuente` del JSON ya lo trae
+              delante, y en pantalla se leía «CNAE-2025 — CNAE-2025 — RD 10/2025 (INE)»
+              (hallazgo 587). `sinPrefijo` retira ese primer tramo cuando coincide. */}
           <DataReference
-            normativa="CNAE-2025"
-            fuente={meta.cnae.fuente}
-            verificado={meta.generado}
+            normativa={CNAE_VIGENCIA.vigente}
+            fuente={sinPrefijo(meta.cnae.fuente, CNAE_VIGENCIA.vigente)}
+            verificado={FISCAL_CNAE_IAE_META.verificado}
             urlOficial={meta.cnae.urlOficial}
             nota={meta.cnae.nota}
           />
           <DataReference
             normativa="Tarifas del IAE"
-            fuente={meta.iae.fuente}
-            verificado={meta.generado}
+            fuente={sinPrefijo(meta.iae.fuente, 'Tarifas del IAE')}
+            verificado={FISCAL_CNAE_IAE_META.verificado}
             urlOficial={meta.iae.urlOficial}
             nota={meta.iae.nota}
           />
@@ -821,6 +832,11 @@ export default function ConversorCnaeIaePage() {
                   aria-pressed={seccionCnae === seccion.codigo}
                   onClick={() => setSeccionCnae(seccion.codigo)}
                   title={seccion.titulo}
+                  /* El nombre accesible era solo la letra («A», «B»…): `title` no lo forma y
+                     además no existe en táctil, así que en lector de pantalla los 22 filtros
+                     eran 22 letras sueltas. Los del IAE, tres bloques más abajo, sí llevan el
+                     nombre completo: la asimetría era interna a la misma app (hallazgo 589). */
+                  aria-label={`Sección ${seccion.codigo} · ${seccion.titulo}`}
                 >
                   {seccion.codigo}
                 </button>
@@ -1186,7 +1202,7 @@ export default function ConversorCnaeIaePage() {
                   <td>
                     <strong>Norma de referencia</strong>
                   </td>
-                  <td>RD 10/2025 (sustituye al RD 475/2007)</td>
+                  <td>{CNAE_VIGENCIA.normaVigente} (sustituye al {CNAE_VIGENCIA.normaAnterior})</td>
                   <td>RD Legislativo 1175/1990 y modificaciones</td>
                 </tr>
                 <tr>
@@ -1291,8 +1307,9 @@ export default function ConversorCnaeIaePage() {
             <div className={styles.faqItem}>
               <h4>¿Desde cuándo rige la CNAE-2025 y qué pasa con mi código antiguo?</h4>
               <p>
-                La CNAE-2025 fue aprobada por el RD 10/2025 y se aplica desde enero de 2026, en
-                sustitución de la CNAE-2009. Los códigos antiguos siguen apareciendo en documentos
+                La {CNAE_VIGENCIA.vigente} fue aprobada por el {CNAE_VIGENCIA.normaVigente} y se aplica
+                desde el {formatDate(parseISODateLocal(CNAE_VIGENCIA.desde))}, en
+                sustitución de la {CNAE_VIGENCIA.anterior}. Los códigos antiguos siguen apareciendo en documentos
                 previos; para saber a qué corresponden hoy basta con escribir los cuatro dígitos en
                 el buscador de esta página. En muchos casos la equivalencia es uno a uno, pero
                 algunas clases se han dividido o fusionado.

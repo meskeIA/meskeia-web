@@ -433,8 +433,54 @@ export const COMPLEMENTO_BRECHA_GENERO_META = {
   verificado: '2026-05-13',
   vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion/10963',
-  doctrina: 'STJUE C-623/23 (15-may-2025) y STS 9-jul-2025: igualdad de trato hombre/mujer',
+  /**
+   * La doctrina de igualdad de trato, DESGLOSADA en sus piezas para que la app pueda
+   * citarla sin teclearla.
+   *
+   * Hasta el 02/09/2026 esto era una sola cadena sin ningún consumidor, mientras las dos
+   * resoluciones iban escritas a mano NUEVE veces entre `page.tsx` y `metadata.ts` —una de
+   * ellas dentro del FAQPage que leen los asistentes de IA— (hallazgo 606). Es el mismo
+   * patrón que cerraron los hallazgos 503-505: el dato sube a data/fiscal y el consumidor
+   * se queda sin conectar. Hoy las nueve copias coincidían; el riesgo era la próxima
+   * sentencia que matice la doctrina.
+   */
+  doctrina: {
+    stjue: { asunto: 'C-623/23', fecha: '15 de mayo de 2025', corto: 'STJUE C-623/23' },
+    ts: { fecha: '9 de julio de 2025', corto: 'STS 9-jul-2025' },
+    efecto: 'igualdad de trato hombre/mujer en el acceso al complemento',
+    /** Una línea con las dos resoluciones, para los sellos y los textos que las citan juntas */
+    resumen:
+      'STJUE C-623/23 (15 de mayo de 2025) y STS de 9 de julio de 2025: igualdad de trato hombre/mujer',
+  },
   nota: 'El complemento es incompatible con que lo perciba el otro progenitor por los mismos hijos. En caso de concurrencia, se reconoce al progenitor con pensión pública de menor cuantía.',
+};
+
+/**
+ * El complemento de MATERNIDAD que el de brecha de género sustituyó en febrero de 2021.
+ *
+ * Está derogado, pero sigue vivo: quien lo tenía reconocido lo conserva (DT 33.ª LGSS) y las
+ * reclamaciones retroactivas de hombres por la STJUE de 2019 (caso WA, C-450/18) se siguen
+ * resolviendo sobre esta escala. Por eso la app lo compara con el vigente en una tabla.
+ *
+ * Sube aquí el 02/09/2026 (hallazgo 607): los tres porcentajes iban tecleados en el JSX,
+ * mientras la misma página ya había retirado por esta razón las cifras del complemento
+ * vigente. El criterio se estaba aplicando a medias.
+ *
+ * NO necesita vigilancia: es la redacción de una norma DEROGADA, así que sus cifras no
+ * pueden cambiar — solo dejarían de importar el día que no queden reclamaciones vivas.
+ */
+export const COMPLEMENTO_MATERNIDAD_DEROGADO = {
+  norma: 'Art. 60 LGSS en su redacción anterior al RDL 3/2021 (dada por la Ley 48/2015)',
+  vigenteHasta: '2021-02-03',
+  /** Porcentaje que se sumaba a la pensión, según el número de hijos */
+  escala: [
+    { hijos: 2, porcentaje: 5 },
+    { hijos: 3, porcentaje: 10 },
+    { hijos: 4, porcentaje: 15, oMas: true },
+  ] as const,
+  minimoHijos: 2,
+  naturaleza: 'porcentaje sobre la pensión' as const,
+  doctrinaAcceso: 'STJUE de 12 de diciembre de 2019 (C-450/18, caso WA)',
 };
 
 export const COMPLEMENTO_BRECHA_GENERO_2026 = {

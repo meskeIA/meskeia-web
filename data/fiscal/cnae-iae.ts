@@ -30,7 +30,16 @@ export const CNAE_IAE_RUTA_CATALOGO = '/datos/cnae-iae-catalogo.json';
 export const FISCAL_CNAE_IAE_META = {
   descripcion:
     'Catálogos oficiales completos de clasificación de actividad económica: CNAE-2025 (INE) y epígrafes del IAE (AEAT)',
-  verificado: '2026-07-20',
+  /**
+   * Se sella con la fecha de la última REGENERACIÓN del catálogo, porque el generador
+   * descarga las fuentes oficiales (BOE e INE) y compara con lo publicado: regenerar ES
+   * verificar. La del 30/08/2026 (commit 1a743d87) dejó este sello sin actualizar pese a
+   * que `generar-catalogos-cnae-iae.mjs` lo recuerda por consola al terminar, y el mismo
+   * catálogo pasó a mostrar dos fechas según la página: 30/08 en meskeIA (que leía el
+   * `generado` del JSON) y 20/07 en la ficha de Delegum (hallazgo 588). Ahora las dos
+   * páginas leen de aquí.
+   */
+  verificado: '2026-08-30',
   vigencia: '2026',
 
   iae: {

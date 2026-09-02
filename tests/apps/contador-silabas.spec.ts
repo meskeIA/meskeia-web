@@ -201,7 +201,7 @@ test.describe('contador-silabas', () => {
     await expect(silabasDe(page, 0)).toHaveText(['cie', 'lo']); // débil átona + fuerte
     await expect(silabasDe(page, 1)).toHaveText(['cau', 'sa']); // fuerte + débil átona
     await expect(silabasDe(page, 2)).toHaveText(['vier', 'nes']); // ie diptongo · rn se separa
-    await expect(silabasDe(page, 3)).toHaveText(['u', 'ru', 'guay']); // uay: triptongo (la y suena /i/)
+    await expect(silabasDe(page, 3)).toHaveText(['U', 'ru', 'guay']); // uay: triptongo (la y suena /i/)
     await expect(silabasDe(page, 4)).toHaveText(['a', 've', 'ri', 'guáis']); // uái: triptongo
     await expect(silabasDe(page, 5)).toHaveText(['buey']); // monosílabo: triptongo uey
     await expect(silabasDe(page, 6)).toHaveText(['ca', 'rro']); // rr es dígrafo: no se parte
@@ -520,7 +520,8 @@ test.describe('contador-silabas', () => {
 
       // Dos consonantes que no forman grupo inseparable se reparten una a cada lado (car|pin,
       // pin|te); una consonante sola entre vocales va siempre con la sílaba siguiente (te|ro).
-      await expect(silabasDe(page, 0)).toHaveText(['el']);
+      // Desde el hallazgo 616 las sílabas conservan las mayúsculas del original: «El», no «el».
+      await expect(silabasDe(page, 0)).toHaveText(['El']);
       await expect(silabasDe(page, 1)).toHaveText(['car', 'pin', 'te', 'ro']);
       await expect(silabasDe(page, 2)).toHaveText(['pin', 'ta']);
       await expect(silabasDe(page, 3)).toHaveText(['la']);
@@ -557,8 +558,9 @@ test.describe('contador-silabas', () => {
       await expect(page.locator('[class*="palabraCard"]').nth(1)).toContainText('Hiato: a-ú');
     });
 
-    test.fail(
-      'CASO 2 (límite) · HALLAZGO · dos vocales cerradas IGUALES son hiato, no diptongo',
+    // ✅ REPARADO el 02/09/2026 (hallazgo 614). Queda como regresión.
+    test(
+      'CASO 2 (límite) · REGRESIÓN · dos vocales cerradas IGUALES son hiato, no diptongo',
       async ({ page }) => {
         // OLE 2010, cap. I: son diptongo «dos vocales cerradas DISTINTAS» (ciu-dad, cui-da-do);
         // dos vocales IGUALES forman siempre hiato (chi-i-ta, du-un-vi-ro), exactamente igual
@@ -589,31 +591,42 @@ test.describe('contador-silabas', () => {
       await expect(totalDe(page, 0)).toHaveText('3 sílabas');
       await expect(totalDe(page, 1)).toHaveText('4 sílabas');
       await expect(totalDe(page, 2)).toHaveText('2 sílabas');
-      await expect(silabasDe(page, 2)).toHaveText(['o', 'nu']);
+      await expect(silabasDe(page, 2)).toHaveText(['O', 'NU']);
     });
 
-    test.fail(
-      'CASO 3 (especial) · HALLAZGO · las sílabas deberían conservar las mayúsculas del original',
+    // ✅ REPARADO el 02/09/2026 (hallazgo 616). `separarSilabas()` hacía `toLowerCase()` y
+    // devolvía el texto ya convertido, así que la app no separaba el texto del usuario: lo
+    // REESCRIBÍA. Ahora las reglas se resuelven en minúsculas y las sílabas se recortan del
+    // original. Queda como regresión.
+    test(
+      'CASO 3 (especial) · REGRESIÓN · las sílabas conservan las mayúsculas del original',
       async ({ page }) => {
-        // `separarSilabas()` hace `palabra.toLowerCase()` y devuelve el texto ya en minúscula,
-        // así que la app no separa el texto del usuario: lo reescribe. Quien pega un verso o
-        // un nombre propio ve «ma-rí-a» y «mur-cié-la-go» debajo de «María» y «MURCIÉLAGO».
         await analizar(page, 'María MURCIÉLAGO');
-        await expect(silabasDe(page, 0)).toHaveText(['Ma', 'rí', 'a']); // obtenido: ma-rí-a
-        await expect(silabasDe(page, 1)).toHaveText(['MUR', 'CIÉ', 'LA', 'GO']); // obtenido: minúsculas
+        await expect(silabasDe(page, 0)).toHaveText(['Ma', 'rí', 'a']);
+        await expect(silabasDe(page, 1)).toHaveText(['MUR', 'CIÉ', 'LA', 'GO']);
       }
     );
 
-    test.fail(
-      'CASO 3 (especial) · HALLAZGO · «DNI» se cuenta como 1 sílaba y ninguna sílaba puede empezar por «dn»',
+    // ✅ CERRADO el 02/09/2026 (hallazgo 617) POR LA SEGUNDA SALIDA que el acta admitía —
+    // «4 sílabas o aviso de que las siglas quedan fuera»— y no por la primera. El motivo:
+    // deletrear exige distinguir la sigla que se lee de corrido (ONU → o-nu) de la que se
+    // deletrea (DNI → de-e-ne-i), y esa distinción no está en la forma de la palabra sino en
+    // el uso; una heurística sobre las mayúsculas convertiría «PSST» en «pe-ese-ese-te» y
+    // metería ese criterio también en `diccionario-rimas`, que comparte el motor. Se prefiere
+    // decirlo: el recuadro de limitaciones ya enumera el caso, con «DNI» como ejemplo y con
+    // las dos siglas que sí salen bien, para que quien escanda un verso sepa qué contar aparte.
+    test(
+      'CASO 3 (especial) · las siglas deletreadas quedan fuera, y la app lo dice',
       async ({ page }) => {
-        // `separarSilabas()` corta por el atajo `nuc.length === 1 → return [palabra]`, que está
-        // pensado para lo que no tiene ninguna vocal (psst) pero también atrapa a las siglas
-        // deletreadas: «dni» sale como una única sílaba, con un ataque imposible en español.
-        // Leída como se lee (de-e-ne-i) son cuatro. El bloque «Limitaciones del algoritmo»
-        // enumera prefijos, nombres extranjeros y «ui/iu», pero no menciona las siglas.
         await analizar(page, 'DNI');
-        await expect(totalDe(page, 0)).toHaveText('4 sílabas'); // obtenido: «dni», 1 sílaba
+        // Sigue contando una sílaba: es lo que hace el motor con una palabra sin vocales
+        // suficientes, igual que con «psst».
+        await expect(totalDe(page, 0)).toHaveText('1 sílaba');
+
+        // Y el bloque de limitaciones lo advierte, con el mismo ejemplo.
+        const limitaciones = await page.getByText(/Siglas deletreadas/).locator('xpath=..').innerText();
+        expect(limitaciones.replace(/\s+/g, ' ')).toContain('de-e-ne-i');
+        expect(limitaciones.replace(/\s+/g, ' ')).toContain('o-nu');
       }
     );
   });

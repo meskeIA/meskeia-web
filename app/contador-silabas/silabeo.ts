@@ -103,16 +103,34 @@ function aUnidades(palabra: string): Unidad[] {
 }
 
 /**
+ * La vocal sin su tilde ni su diéresis, para poder comparar dos cerradas por su identidad
+ * y no por su acentuación: la í de «friísimo» y la i de delante son la MISMA vocal.
+ */
+const BASE_VOCAL: Record<string, string> = {
+  á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u',
+};
+const base = (c: string) => BASE_VOCAL[c] ?? c;
+
+/**
  * ¿Se pronuncian en la misma sílaba estas dos vocales contiguas?
  *
  *   · abierta + abierta → hiato (le-er, ca-os)
+ *   · cerrada + la MISMA cerrada → hiato (chi-i-ta, du-un-vi-ro, fri-í-si-mo)
  *   · cerrada tónica + abierta, o abierta + cerrada tónica → hiato (dí-a, pa-ís, ba-úl)
- *   · el resto → diptongo, incluidas dos cerradas distintas aunque una lleve tilde
+ *   · el resto → diptongo, incluidas dos cerradas DISTINTAS aunque una lleve tilde
  *     («cuí» de cuídate, «üí» de lingüística), como fija la RAE a efectos ortográficos
+ *
+ * ── El «distintas» (hallazgo 614, 02/09/2026) ─────────────────────────────────
+ * La regla decía «dos cerradas → diptongo» sin exigir que fueran distintas, que es lo que
+ * pide la OLE 2010: solo hay diptongo entre dos cerradas DIFERENTES (ciu-dad). Dos iguales
+ * forman siempre hiato. El motor ya lo acertaba con las abiertas iguales (azahar → a-a) y
+ * lo fallaba con las cerradas, de modo que se contradecía en la misma pantalla y rotulaba
+ * «Diptongo: ii». El error entraba además en la escansión del verso, porque la sinéresis
+ * y el cómputo de sílabas métricas salen de aquí.
  */
 function formanDiptongo(a: string, b: string): boolean {
   if (esFuerte(a) && esFuerte(b)) return false;
-  if (esDebil(a) && esDebil(b)) return true;
+  if (esDebil(a) && esDebil(b)) return base(a) !== base(b);
   return !(DEBILES_TONICAS.includes(a) || DEBILES_TONICAS.includes(b));
 }
 
@@ -178,13 +196,31 @@ function nucleos(unidades: Unidad[]): NucleoSilabico[] {
  * vocal no existe, así que en ese caso no se parte nada.
  */
 export function separarSilabas(palabra: string): string[] {
-  const limpia = palabra.toLowerCase().trim();
+  // El original SIN pasar a minúsculas: las reglas se resuelven sobre `limpia`, pero lo que
+  // se devuelve se recorta del texto tal y como lo escribió el usuario. Antes la app no
+  // separaba su texto, lo REESCRIBÍA: bajo «María MURCIÉLAGO» aparecía «ma-rí-a» y
+  // «mur-cié-la-go» (hallazgo 616). `toLowerCase` conserva la longitud en español, así que
+  // los cortes calculados sobre la versión en minúsculas valen tal cual sobre el original.
+  const original = palabra.trim();
+  const limpia = original.toLowerCase();
   if (!limpia) return [];
+
+  /** Devuelve las sílabas recortadas del ORIGINAL, respetando sus mayúsculas y tildes. */
+  const conMayusculas = (partes: string[]): string[] => {
+    if (original.length !== limpia.length) return partes;  // guarda: alguna letra cambió de tamaño
+    const salida: string[] = [];
+    let cursor = 0;
+    for (const parte of partes) {
+      salida.push(original.slice(cursor, cursor + parte.length));
+      cursor += parte.length;
+    }
+    return salida;
+  };
 
   const unidades = aUnidades(limpia);
   const nuc = nucleos(unidades);
-  if (nuc.length === 0) return [limpia];
-  if (nuc.length === 1) return [limpia];
+  if (nuc.length === 0) return conMayusculas([limpia]);
+  if (nuc.length === 1) return conMayusculas([limpia]);
 
   // Corte entre cada par de núcleos: se reparte el bloque de consonantes que hay en medio
   const cortes: number[] = []; // índice de unidad donde empieza cada sílaba nueva
@@ -216,7 +252,7 @@ export function separarSilabas(palabra: string): string[] {
     silabas.push(unidades.slice(inicio, corte).map((u) => u.texto).join(''));
     inicio = corte;
   }
-  return silabas.filter((s) => s !== '');
+  return conMayusculas(silabas.filter((s) => s !== ''));
 }
 
 export interface EncuentrosVocalicos {

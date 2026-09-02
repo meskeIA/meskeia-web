@@ -345,7 +345,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <div className={styles.resultadoIcon} aria-hidden="true">🎉</div>
               <h3 className={styles.resultadoTitulo}>¡Cumples todos los requisitos!</h3>
               <p className={styles.resultadoTexto}>
-                En principio puedes solicitar el Bono Joven al Alquiler y recibir hasta <strong>{formatCurrency(bonificacionEfectiva)}/mes durante hasta 4 años</strong> (2 años renovables).
+                En principio puedes solicitar el Bono Joven al Alquiler y recibir hasta <strong>{formatCurrency(bonificacionEfectiva)}/mes durante hasta {BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12} años</strong> ({BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} años prorrogables otros {BONO_ALQUILER_JOVEN_2026.plazo.prorrogaMaximaMeses / 12}, art. 134 RD 326/2026).
                 El siguiente paso es contactar con la oficina de vivienda de tu Comunidad Autónoma para tramitar la solicitud.
               </p>
             </div>
@@ -404,7 +404,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             { num: '1', titulo: 'Verifica disponibilidad en tu CA', desc: 'Cada Comunidad Autónoma gestiona su propia convocatoria. Algunas están activas todo el año, otras tienen plazos específicos.' },
             { num: '2', titulo: 'Reúne la documentación', desc: 'DNI/NIE, declaración de la renta, contrato de alquiler, certificado de empadronamiento y justificante de ingresos.' },
             { num: '3', titulo: 'Presenta la solicitud', desc: 'Normalmente se tramita online a través del portal de vivienda de tu CA o presencialmente en las oficinas de vivienda.' },
-            { num: '4', titulo: 'Resolución y cobro', desc: 'El plazo de resolución varía por CA (3-6 meses). Una vez aprobado, la ayuda se abona mensualmente o de forma retroactiva.' },
+            { num: '4', titulo: 'Resolución y cobro', desc: 'El plazo de resolución lo fija cada comunidad autónoma en su convocatoria: el RD 326/2026 no lo regula. Una vez aprobado, la ayuda se abona mensualmente o de forma retroactiva.' },
           ].map(paso => (
             <div key={paso.num} className={styles.pasoCard}>
               <div className={styles.pasoNum} aria-hidden="true">{paso.num}</div>
@@ -443,8 +443,11 @@ export default function SimuladorBonoJovenAlquilerPage() {
                 </tr>
                 <tr>
                   <td>Ayudas al alquiler de la CA</td>
-                  <td>Variable (30-40% renta)</td>
-                  <td>Variable (1-3 años)</td>
+                  {/* Sin cifra: las convocatorias autonómicas fijan cuantías y duraciones
+                      distintas cada año, y el «30-40 % de la renta / 1-3 años» que había aquí
+                      no salía de ninguna norma ni de data/fiscal (hallazgo 598). */}
+                  <td>La fija cada convocatoria autonómica</td>
+                  <td>La fija cada convocatoria autonómica</td>
                   <td>Sin límite (en general)</td>
                 </tr>
                 <tr>
@@ -471,12 +474,12 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👩‍🎓</span>
               <h3>Recién graduada, 23 años</h3>
-              <p>Alquiler de 600 €/mes (vivienda). Bono de 300 €/mes (el 50%, por debajo del límite del 60%). Paga 300 €/mes real. En 4 años ahorra 14.400 €.</p>
+              <p>Alquiler de 600 €/mes (vivienda). Bono de {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes (el 50%, por debajo del límite del {BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100}%). Paga {eur(600 - BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes real. En {BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12} años ahorra {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda * BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses)}.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👨‍💼</span>
               <h3>Trabajador de 32 años</h3>
-              <p>Alquiler de 800 €/mes. El bono máximo es 300 €/mes (el 37,5% de la renta, dentro del límite del 60%). Paga 500 €/mes reales.</p>
+              <p>Alquiler de 800 €/mes. El bono máximo es {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes (el 37,5% de la renta, dentro del límite del {BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100}%). Paga {eur(800 - BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes reales.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👫</span>
@@ -507,7 +510,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué pasa si cumplo 36 años mientras cobro el bono?</h3>
-              <p>En general, si cumples los requisitos al inicio, el bono se mantiene durante todo el período (hasta 4 años) aunque cumplas 36 años durante el cobro. Consulta con tu CA para confirmarlo, ya que la renovación tras los 2 primeros años puede requerir nueva evaluación.</p>
+              <p>El RD 326/2026 exige la edad para <strong>acceder</strong> a la ayuda (art. 133.1.b: menos de {BONO_ALQUILER_JOVEN_2026.edad.maxima} años, incluida esa edad), pero no dice qué ocurre si se cumplen {BONO_ALQUILER_JOVEN_2026.edad.maxima + 1} durante el cobro: esa es una cuestión que resuelve la convocatoria de cada comunidad autónoma, y por eso aquí no se afirma ninguna regla general. Pregúntalo en tu CA antes de contar con la prórroga, porque la renovación tras los {BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} primeros años puede requerir una nueva evaluación de los requisitos.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Es compatible el bono con otras ayudas?</h3>
@@ -529,7 +532,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuánto tarda en resolverse la solicitud?</h3>
-              <p>El plazo varía mucho por Comunidad Autónoma: desde 1-2 meses en algunas hasta 6 meses en otras. Es recomendable solicitarlo cuanto antes, ya que muchas CCAA agotan los fondos antes de fin de año.</p>
+              <p>Depende de tu comunidad autónoma: el RD 326/2026 no fija ningún plazo de resolución, así que lo marca cada convocatoria autonómica, y conviene mirarlo en la suya. Es recomendable solicitarlo cuanto antes, porque las CCAA resuelven por orden de entrada hasta agotar los fondos asignados.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Se puede pedir si tengo contrato de habitación?</h3>

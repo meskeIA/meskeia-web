@@ -122,7 +122,10 @@ export const acentuacionDe = (palabra: string, silabas: string[]): Acentuacion =
   if (silabas.length <= 1) return 'aguda';
 
   // Si lleva tilde, la tilde manda: buscamos en qué sílaba cae
-  const indiceTilde = silabas.findIndex((s) => /[áéíóú]/.test(s));
+  // Con la /i: desde el hallazgo 616 las sílabas conservan las mayúsculas del original, y
+  // «CIÉ» de «MURCIÉLAGO» no casaba con la clase en minúsculas, así que la palabra pasaba
+  // por no tildada y se computaba como llana.
+  const indiceTilde = silabas.findIndex((s) => /[áéíóú]/i.test(s));
   if (indiceTilde !== -1) {
     const desdeElFinal = silabas.length - 1 - indiceTilde;
     if (desdeElFinal === 0) return 'aguda';

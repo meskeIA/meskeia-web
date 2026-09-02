@@ -1,5 +1,19 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { SECCIONES_IAE, IAE_EXENCION, CNAE_VIGENCIA } from '@/data/fiscal/cnae-iae';
+import { formatNumber } from '@/lib/formatters';
+
+/**
+ * Los tipos y el umbral se LEEN de data/fiscal, no se teclean.
+ *
+ * `page.tsx` ya los importa desde el 27/08 (hallazgo 425), pero el JSON-LD se quedó fuera de
+ * aquella reparación y seguía con «15 %», «7 %» y «un millón de euros» a mano (hallazgo 585).
+ * Es justamente el texto que citan Bing Copilot, ChatGPT y Perplexity.
+ */
+const PROFESIONAL = SECCIONES_IAE.find((s) => s.tipoRetencion !== null);
+const RETENCION = PROFESIONAL?.tipoRetencion ?? 15;
+const RETENCION_INICIO = PROFESIONAL?.tipoRetencionInicio ?? 7;
+const UMBRAL_EXENCION = formatNumber(IAE_EXENCION.umbralCifraNegocio, 0);
 
 // App estructuralmente española (CNAE-2025 del INE y Tarifas del IAE de la AEAT):
 // no procede lenguaje dual ES/Latam. Ver <RegionBadge variant="es-only" />.
@@ -54,7 +68,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Buscador de códigos CNAE-2025 y epígrafes del IAE',
   description:
-    'Buscador sobre dos catálogos oficiales completos: la Clasificación Nacional de Actividades Económicas CNAE-2025 (RD 10/2025, INE) y las Tarifas del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990, AEAT). Permite localizar una actividad describiéndola en lenguaje corriente, buscar por código, resolver códigos antiguos de la CNAE-2009 y consultar la sección del IAE y su efecto sobre la retención de IRPF.',
+    `Buscador sobre dos catálogos oficiales completos: la Clasificación Nacional de Actividades Económicas CNAE-2025 (${CNAE_VIGENCIA.normaVigente}, INE) y las Tarifas del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990, AEAT). Permite localizar una actividad describiéndola en lenguaje corriente, buscar por código, resolver códigos antiguos de la CNAE-2009 y consultar la sección del IAE y su efecto sobre la retención de IRPF.`,
   url: 'https://meskeia.com/conversor-cnae-iae/',
   category: 'BusinessApplication',
   features: [
@@ -95,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Qué significa que un epígrafe del IAE sea de la Sección 1ª o de la Sección 2ª?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La Sección 1ª agrupa las actividades empresariales (organizadas con local, medios materiales o personal) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (15 % con carácter general y 7 % el año de inicio de la actividad y los dos siguientes), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.',
+        text: `La Sección 1ª agrupa las actividades empresariales (organizadas con local, medios materiales o personal) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (${RETENCION} % con carácter general y ${RETENCION_INICIO} % el año de inicio de la actividad y los dos siguientes), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.`,
       },
     },
     {
@@ -103,7 +117,7 @@ export const faqJsonLd = {
       name: '¿Se paga el IAE siendo autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Con carácter general, no: están exentas del pago las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a un millón de euros, lo que deja fuera del pago a la mayoría de autónomos y pequeñas empresas. Declarar el epígrafe es otra cosa distinta: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.',
+        text: `Con carácter general, no: están exentas del pago las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a ${UMBRAL_EXENCION} € (art. 82.1.c RDL 2/2004), lo que deja fuera del pago a la mayoría de autónomos y pequeñas empresas. Declarar el epígrafe es otra cosa distinta: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.`,
       },
     },
     {

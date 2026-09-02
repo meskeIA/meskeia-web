@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { SECCIONES_IAE } from '../../data/fiscal/cnae-iae';
+import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/fiscal/cnae-iae';
 
 /**
  * Buscador de códigos CNAE-2025 y epígrafes del IAE
@@ -1202,5 +1202,79 @@ test.describe('Buscador CNAE-IAE — re-verificación del 02/09/2026', () => {
     await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
       'No hay ninguna entrada que encaje con lo que has escrito.',
     );
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — los cinco hallazgos de la re-inspección del 02/09/2026 (585-589),
+// REPARADOS ese mismo día.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
+  // 585 — el faqJsonLd escribía a mano los tipos de retención y el umbral de exención,
+  // teniéndolos en data/fiscal. Es el texto que citan los asistentes de IA.
+  test('585 — el FAQPage deriva la retención y el umbral de data/fiscal', async ({ page }) => {
+    await abrir(page);
+    const textos: string[] = await page.evaluate(() => {
+      const salida: string[] = [];
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const datos = JSON.parse(s.textContent || '{}');
+        const grafo = datos['@graph'] ?? [datos];
+        for (const nodo of grafo) {
+          if (nodo['@type'] !== 'FAQPage') continue;
+          for (const q of nodo.mainEntity ?? []) salida.push(q.acceptedAnswer.text);
+        }
+      }
+      return salida;
+    });
+    expect(textos.length).toBeGreaterThan(0);
+    const todo = textos.join(' · ');
+
+    // Los valores publicados son EXACTAMENTE los del módulo, no una copia que pueda divergir.
+    expect(todo).toContain(`${SECCION_2.tipoRetencion} %`);
+    expect(todo).toContain(`${SECCION_2.tipoRetencionInicio} %`);
+    // Y el umbral se publica con su cifra, en formato español, no como «un millón de euros».
+    expect(todo).toContain('1.000.000 €');
+    expect(todo).not.toContain('un millón de euros');
+  });
+
+  // 586 — la tabla y la FAQ transcribían las normas pudiendo leerlas de CNAE_VIGENCIA.
+  test('586 — las normas de referencia salen de CNAE_VIGENCIA', async ({ page }) => {
+    await abrir(page);
+    const tabla = page.getByText('Norma de referencia').locator('xpath=../..');
+    const texto = (await tabla.innerText()).replace(/\s+/g, ' ');
+    expect(texto).toContain(CNAE_VIGENCIA.normaVigente);
+    expect(texto).toContain(CNAE_VIGENCIA.normaAnterior);
+  });
+
+  // 587 — el prop `normativa` repetía el prefijo que ya traía `fuente`: en pantalla se leía
+  // «CNAE-2025 — CNAE-2025 — RD 10/2025 (INE)».
+  test('587 — el sello de datos no repite el nombre del catálogo', async ({ page }) => {
+    await abrir(page);
+    const sellos = page.locator('[class*="dataReference"], [class*="DataReference"]');
+    const primero = (await sellos.first().innerText()).replace(/\s+/g, ' ');
+    expect(primero).not.toContain('CNAE-2025 — CNAE-2025');
+    expect(primero).toContain('CNAE-2025');
+  });
+
+  // 588 — el mismo catálogo publicaba dos fechas distintas según la página: la app leía el
+  // `generado` del JSON servido y la ficha de Delegum el `verificado` del módulo. Ahora las
+  // dos leen del módulo, así que no pueden volver a divergir.
+  test('588 — la fecha de verificación sale del módulo, la misma que ve Delegum', async ({ page }) => {
+    await abrir(page);
+    const sellos = await page.locator('[class*="dataReference"], [class*="DataReference"]').allInnerTexts();
+    const [anio, mes, dia] = FISCAL_CNAE_IAE_META.verificado.split('-');
+    const esperada = `${dia}/${mes}/${anio}`;
+    expect(sellos.join(' ')).toContain(esperada);
+  });
+
+  // 589 — los 22 filtros de sección CNAE tenían como nombre accesible una sola letra: el
+  // título completo iba en `title=`, que no forma el nombre accesible ni existe en táctil.
+  test('589 — los filtros de sección CNAE tienen nombre accesible completo', async ({ page }) => {
+    await abrir(page);
+    const filtroA = page.getByRole('button', { name: /^Sección A · / });
+    await expect(filtroA).toHaveCount(1);
+    // Y el nombre ya no es la letra suelta.
+    await expect(page.getByRole('button', { name: 'A', exact: true })).toHaveCount(0);
   });
 });

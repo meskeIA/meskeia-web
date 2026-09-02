@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { COMPLEMENTO_MATERNIDAD_DEROGADO } from '../../data/fiscal/pensiones';
 
 /**
  * Inspector — verificador-complemento-brecha-genero (segmento FISCAL / Seguridad Social,
@@ -1266,8 +1267,11 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * módulo, así que no hay error visible; el riesgo es la próxima sentencia que matice la
    * doctrina, con el módulo diciendo una cosa y nueve trozos de página la anterior.
    */
-  test.fail(
-    'HALLAZGO: META.doctrina no tiene consumidores y la jurisprudencia va tecleada a mano',
+  // ✅ REPARADO el 02/09/2026 (hallazgo 606). `doctrina` pasó de ser una cadena suelta sin
+  // consumidores a un objeto con las dos resoluciones desglosadas, y las nueve copias de
+  // `page.tsx` y `metadata.ts` lo interpolan. Queda como regresión.
+  test(
+    'REGRESIÓN: META.doctrina tiene consumidores y la jurisprudencia no va tecleada',
     async () => {
       const { readFileSync } = await import('node:fs');
       const { join } = await import('node:path');
@@ -1281,4 +1285,46 @@ test.describe('Verificador del complemento por brecha de género', () => {
       expect(consumidores).toContain('COMPLEMENTO_BRECHA_GENERO_META.doctrina');
     },
   );
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — hallazgos 607 y 608 del 02/09/2026, REPARADOS ese mismo día.
+// El 605 (los «30 días naturales» del art. 71.2 LRJS) sigue ABIERTO: es un dato
+// normativo YMYL y su corrección va por /triaje-fiscal, con fuente oficial y OK
+// del usuario. Decidido así el 02/09/2026.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — hallazgos 607 y 608, reparados', () => {
+  // 607 — la tabla comparativa tenía tecleada la escala del complemento de maternidad
+  // derogado (5 %, 10 %, 15 %), correcta pero sin módulo, mientras la misma página ya había
+  // retirado por esta razón las cifras del complemento vigente.
+  test('607 — la escala del complemento derogado sale de data/fiscal', async ({ page }) => {
+    await abrirGuia(page);
+    const fila = page.getByRole('row', { name: /Naturaleza del cálculo/ });
+    const texto = normalizar(await fila.innerText());
+    for (const tramo of COMPLEMENTO_MATERNIDAD_DEROGADO.escala) {
+      expect(texto).toContain(`${tramo.porcentaje}%`);
+    }
+    // Y el máximo se construye con el último tramo del módulo, no a mano.
+    const maximo = COMPLEMENTO_MATERNIDAD_DEROGADO.escala[COMPLEMENTO_MATERNIDAD_DEROGADO.escala.length - 1];
+    const filaMax = normalizar(await page.getByRole('row', { name: /^Máximo/ }).innerText());
+    expect(filaMax).toContain(`${maximo.porcentaje}% (${maximo.hijos} o más hijos)`);
+  });
+
+  // 608 — con el campo de hijos vacío, el error citaba la cadena vacía entre comillas:
+  // «Escribe un número entero de hijos, de 0 a 20: «» no se interpreta».
+  test('608 — el campo de hijos vacío tiene su propia frase, sin comillas vacías', async ({ page }) => {
+    await page.goto(RUTA, { waitUntil: 'domcontentloaded' });
+    const campo = page.locator('#hijos');
+    await campo.fill('');
+
+    const aviso = normalizar(await page.locator('p[role="alert"]').first().innerText());
+    expect(aviso).not.toContain('«»');
+    expect(aviso).toContain('Escribe un número entero de hijos');
+
+    // Y cuando SÍ hay algo escrito, la comilla informa: es la diferencia que el hallazgo pedía.
+    await campo.fill('99');
+    const conTexto = normalizar(await page.locator('p[role="alert"]').first().innerText());
+    expect(conTexto).toContain('«99»');
+  });
 });

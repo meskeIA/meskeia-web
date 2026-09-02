@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { COMPLEMENTO_BRECHA_GENERO_2026 } from '@/data/fiscal';
+import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '@/data/fiscal';
 import { formatCurrency, formatFechaLarga } from '@/lib/formatters';
 
 // Las cifras salen del módulo fiscal, nunca tecleadas: en la próxima revalorización el
@@ -8,6 +8,9 @@ const CUANTIA = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMens
 const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
 const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
 const FECHA_MINIMA = formatFechaLarga(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante);
+// Hallazgo 606: la jurisprudencia de igualdad de trato también se LEE del módulo. Iba
+// tecleada aquí y en siete sitios más de la página, con cuatro formatos de fecha distintos.
+const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 // Hallazgo 503: hasta esta reparación el faqJsonLd citaba estos dos artículos a mano —el
 // que excluye la jubilación parcial y el que hace compatible el complemento a mínimos—,
 // aunque el motivo por el que subieron a data/fiscal (hallazgo 280/472) era justo que el
@@ -90,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Pueden los hombres cobrar el complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. Tras la STJUE C-623/23 (15-mayo-2025) y la doctrina del Tribunal Supremo (9-julio-2025), los requisitos son idénticos para hombres y mujeres: pensión contributiva de jubilación, incapacidad permanente o viudedad con hecho causante desde el ${FECHA_MINIMA}, al menos un hijo o hija, y que el otro progenitor no perciba ya el complemento por los mismos hijos. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
+        text: `Sí. Tras la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los requisitos son idénticos para hombres y mujeres: pensión contributiva de jubilación, incapacidad permanente o viudedad con hecho causante desde el ${FECHA_MINIMA}, al menos un hijo o hija, y que el otro progenitor no perciba ya el complemento por los mismos hijos. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
       },
     },
     {

@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { BONO_ALQUILER_JOVEN_2026 } from '../../data/fiscal/vivienda-joven';
 
 /**
  * Inspector — simulador-bono-joven-alquiler (segmento fiscal, RIESGO 1 CRÍTICO)
@@ -205,5 +206,70 @@ test.describe('simulador-bono-joven-alquiler', () => {
     await page.fill('#alquiler', '-100');
     await expect(page.locator('#alquiler')).toHaveAttribute('aria-invalid', 'true');
     await expect(page.getByText('La renta no puede ser un importe negativo.')).toBeVisible();
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — los cuatro hallazgos de la inspección del 02/09/2026 (596-599),
+// REPARADOS ese mismo día.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
+  // 596 — el plazo y el ahorro de los escenarios se derivan de BONO_ALQUILER_JOVEN_2026, que
+  // la app ya usaba en el hero: el «4 años (2 renovables)» y el «14.400 €» estaban tecleados.
+  test('596 — el plazo y el ahorro salen del módulo, no de la prosa', async ({ page }) => {
+    await abrir(page);
+    const anios = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12;
+    const ahorro = BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda *
+      BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses;
+
+    // El escenario de la graduada publica exactamente el producto del módulo.
+    const escenario = norm(await page.getByText(/Recién graduada/).locator('xpath=..').innerText());
+    expect(escenario).toContain(`En ${anios} años ahorra`);
+    expect(escenario).toContain(ahorro.toLocaleString('es-ES'));
+
+    // Y el resultado de un caso apto cita el artículo del plazo.
+    await page.fill('#alquiler', '600');
+    for (const si of await page.getByRole('button', { name: 'Sí', exact: true }).all()) await si.click();
+    await expect(page.getByText(/art\. 134 RD 326\/2026/)).toBeVisible();
+  });
+
+  // 597 — la página daba DOS rangos distintos y sin fuente para el plazo de resolución: el
+  // paso 4 decía «3-6 meses» y la FAQ «desde 1-2 meses hasta 6 meses». El RD no lo regula.
+  test('597 — el plazo de resolución no se inventa: lo fija cada convocatoria', async ({ page }) => {
+    await abrir(page);
+    // La guía se monta siempre en el DOM (por SEO) pero se pinta colapsada: hay que abrirla
+    // para que `innerText` la devuelva.
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const pagina = norm(await page.locator('body').innerText());
+    expect(pagina).not.toContain('3-6 meses');
+    expect(pagina).not.toContain('1-2 meses');
+    expect(pagina).toContain('el RD 326/2026 no fija ningún plazo de resolución');
+  });
+
+  // 598 — la tabla comparativa atribuía a las ayudas autonómicas una cuantía «30-40 % renta» y
+  // una duración «1-3 años» sin fuente ni norma, junto a filas que sí vienen de data/fiscal.
+  test('598 — la fila de las ayudas autonómicas ya no publica cifras sin fuente', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const fila = page.getByRole('row', { name: /Ayudas al alquiler de la CA/ });
+    const texto = norm(await fila.innerText());
+    expect(texto).not.toContain('30-40%');
+    expect(texto).not.toContain('1-3 años');
+    expect(texto).toContain('convocatoria autonómica');
+  });
+
+  // 599 — la FAQ afirmaba, solo con un «en general», que el bono se mantiene tras cumplir la
+  // edad máxima. El módulo sella la edad de ACCESO, no la conservación del derecho.
+  test('599 — la FAQ de la edad no afirma una regla que la norma no da', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const faq = norm(
+      await page.getByRole('heading', { name: /cumplo 36 años/ }).locator('xpath=..').innerText(),
+    );
+    expect(faq).toContain('art. 133.1.b');
+    // Ya no se afirma la conservación como si fuera regla estatal.
+    expect(faq).not.toContain('el bono se mantiene durante todo el período');
+    expect(faq).toContain('no dice qué ocurre');
   });
 });

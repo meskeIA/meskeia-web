@@ -493,15 +493,17 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * filas valen 15.956,87 €) pero en Cataluña NO: `REDUCCIONES_PARENTESCO_CATALUNA_IS`
    * declara 100.000 € para el cónyuge y 50.000 € para el hijo ≥21.
    */
-  test('GUARDA — cinco parentescos distintos, Cataluña separa cónyuge de hijo, y ningún botón sin type', async ({
+  test('GUARDA — seis parentescos distintos, Cataluña separa cónyuge de hijo, y ningún botón sin type', async ({
     page,
   }) => {
     await page.goto(RUTA);
 
-    // Cinco opciones, ninguna repetida ni con el mismo significado
+    // Seis opciones, ninguna repetida ni con el mismo significado. La sexta es el Grupo I
+    // (descendientes menores de 21), que hasta el hallazgo 612 no era expresable.
     const opciones = await page.locator('#parentescoSel option').allTextContents();
-    expect(opciones).toHaveLength(5);
-    expect(new Set(opciones).size).toBe(5);
+    expect(opciones).toHaveLength(6);
+    expect(new Set(opciones).size).toBe(6);
+    expect(opciones).toContain('Hijo o descendiente <21 años (Grupo I)');
 
     // Las 17 CCAA que promete la metadata
     expect(await page.locator('#ccaaSel option').count()).toBe(17);
@@ -685,7 +687,8 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     // El saneado del navegador: valor por defecto (mitad del recorrido) o extremo del rango
     expect(valores.valorRef).toBe('1025000'); // (50.000 + 2.000.000) / 2
     expect(valores.valorSuelo).toBe('5000'); // mínimo del deslizador
-    expect(valores.edadHer).toBe('54'); // (18 + 90) / 2
+    // El deslizador arranca en 0 desde el hallazgo 612 (el Grupo I son los menores de 21).
+    expect(valores.edadHer).toBe('45'); // (0 + 90) / 2
 
     const cuerpo = await page.locator('body').innerText();
     expect(cuerpo).not.toContain('NaN');
@@ -1638,8 +1641,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
    * La comprobación es sobre el FUENTE y no sobre la página renderizada a propósito: lo que
    * está mal no es el número que se ve —hoy es correcto— sino que esté escrito.
    */
-  test.fail(
-    'HALLAZGO — el bloque educativo escribe a mano siete datos que data/fiscal ya exporta',
+  // ✅ REPARADO el 02/09/2026 (hallazgos 609 y 611). Queda como regresión.
+  test(
+    'REGRESIÓN — el bloque educativo no escribe a mano datos que data/fiscal ya exporta',
     async () => {
       const fuente = readFileSync(
         resolve(__dirname, '..', '..', 'app', 'simulador-heredar-vivienda', 'page.tsx'),
@@ -1678,8 +1682,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
    * `simulador-gastos-compraventa-garaje`, `-local-comercial`, `-trastero`,
    * `planificador-ahorro-jubilacion`, `conversor-cnae-iae` y `simulador-modulos-vs-directa`.
    */
-  test.fail(
-    'HALLAZGO — el sello de datos no declara el módulo de inmuebles, que aporta el IIVTNU y el IRPF',
+  // ✅ REPARADO el 02/09/2026 (hallazgo 610): dos sellos, uno por módulo. Queda como regresión.
+  test(
+    'REGRESIÓN — el sello de datos declara también el módulo de inmuebles (IIVTNU e IRPF)',
     async ({ page }) => {
       await page.goto(RUTA);
 
@@ -1695,4 +1700,80 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
       expect(todos).toContain('RDL 26/2021');
     }
   );
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — hallazgos 612 y 613 del 02/09/2026, REPARADOS ese mismo día.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
+  /**
+   * 612 — el Grupo I (descendientes menores de 21 años) no era expresable: el desplegable no
+   * lo ofrecía y el deslizador de edad arrancaba en 18, así que un heredero de 10 años solo
+   * podía simularse como Grupo II, sin la reducción del art. 20.2.a LISD —que `data/fiscal`
+   * exporta desde siempre en REDUCCION_EDAD_MENOR_21_IS— y con el impuesto sobreestimado.
+   *
+   * Caso resuelto A MANO antes de abrir el navegador. Madrid, heredero de 10 años, hijo,
+   * vivienda de 200.000 € que NO era la habitual del causante:
+   *   reducción de parentesco = 15.956,87 + 3.990,72 × (21 − 10) = 15.956,87 + 43.897,92
+   *                           = 59.854,79 → topada en 47.858,59 (art. 20.2.a, tope legal)
+   *   base liquidable = 200.000 − 47.858,59 = 152.141,41
+   * Frente al Grupo II, cuya reducción es 15.956,87: 31.901,72 € más de base liquidable.
+   */
+  test('612 — el Grupo I existe, baja la edad hasta 0 y aplica la reducción del art. 20.2.a', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#ccaaSel', 'madrid');
+    await page.locator('#parentescoSel').selectOption({ label: 'Hijo o descendiente <21 años (Grupo I)' });
+
+    // El deslizador ya llega a 0: antes su mínimo era 18 y el caso no se podía plantear.
+    await expect(page.locator('#edadHer')).toHaveAttribute('min', '0');
+    await page.locator('#edadHer').fill('10');
+
+    const reduccion = await page
+      .getByText('− Reducción parentesco')
+      .locator('xpath=following-sibling::strong[1]')
+      .innerText();
+    expect(reduccion.replace(/\u00a0/g, ' ')).toContain('47.858,59');
+
+    // Y el mismo heredero como Grupo II se queda en la reducción base: la diferencia es
+    // exactamente lo que el hallazgo decía que se estaba perdiendo.
+    await page.locator('#parentescoSel').selectOption({ label: 'Hijo o descendiente ≥21 años (Grupo II)' });
+    const reduccionII = await page
+      .getByText('− Reducción parentesco')
+      .locator('xpath=following-sibling::strong[1]')
+      .innerText();
+    expect(reduccionII.replace(/\u00a0/g, ' ')).toContain('15.956,87');
+    // Con 10 años y Grupo II, la app avisa de que el parentesco correcto es el Grupo I.
+    await expect(page.getByText(/es .*Grupo I.*, no Grupo II/)).toBeVisible();
+  });
+
+  test('612 bis — el Grupo I con 21 años o más avisa, y en Cataluña advierte de su régimen propio', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#parentescoSel').selectOption({ label: 'Hijo o descendiente <21 años (Grupo I)' });
+    await page.locator('#edadHer').fill('30');
+    await expect(page.getByText(/El Grupo I es solo para descendientes de menos de 21 años/)).toBeVisible();
+
+    // Cataluña tiene reducción propia por edad que data/fiscal no modela: se dice, no se inventa.
+    await page.locator('#edadHer').fill('10');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    await expect(page.getByText(/En Cataluña el Grupo I tiene reducción propia por edad/)).toBeVisible();
+  });
+
+  // 613 — al mover cualquiera de los siete deslizadores todas las cifras se recalculaban en
+  // silencio para un lector de pantalla, en una herramienta cuyo contenido es el resultado.
+  test('613 — los paneles de resultado y el total se anuncian a un lector de pantalla', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    const vivos = page.locator('[aria-live="polite"][role="status"]');
+    const textos = await vivos.allInnerTexts();
+    const todo = textos.join(' ');
+    // Las tres liquidaciones, en un solo anuncio por cambio, y el total acumulado.
+    expect(todo).toContain('1. ISD al heredar');
+    expect(todo).toContain('Coste fiscal total acumulado');
+  });
 });
