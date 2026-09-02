@@ -198,7 +198,11 @@ test.describe('Operativa básica de las otras 3 secciones (sin resultado numéri
 // ───────────────────────────────────────────────────────────────────────────────
 test.describe('Accesibilidad básica (CLAUDE.md global §5)', () => {
   test('todos los <button> llevan type="button"', async ({ page }) => {
-    const sinType = await page.locator('button:not([type])').count();
+    // Se excluye el overlay de `next dev`, cuyo botón «Open Next.js Dev Tools» no lleva
+    // type y no es de la app: contra el servidor de desarrollo daba un rojo que en
+    // producción no existe, y un test que solo pasa en un entorno no informa de nada.
+    // Mismo patrón ya aplicado en verificador-complemento-brecha-genero.spec.ts.
+    const sinType = await page.locator('button:not([type]):not([data-nextjs-dev-tools-button])').count();
     expect(sinType).toBe(0);
   });
 
