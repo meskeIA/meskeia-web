@@ -1074,3 +1074,133 @@ test.describe('Buscador CNAE-IAE — hallazgos reparados del 30/08/2026', () => 
     await expect(fichas(page).first()).not.toContainText('42.99');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 02/09/2026 — los tres casos con los que se volvió a verificar la app
+// (uno normal, uno en el límite y uno que debe rechazarse), resueltos A MANO sobre el
+// catálogo servido ANTES de abrir el navegador.
+//
+// De dónde sale cada valor esperado (nunca de lo que devolvió la app):
+//   · `public/datos/cnae-iae-catalogo.json`, generado desde el RD 10/2025 del INE
+//     (clases de la CNAE-2025, correspondencia oficial CNAE-2009 → CNAE-2025 y su
+//     inversa) y desde el RD Legislativo 1175/1990 (Tarifas del IAE, texto consolidado
+//     del BOE). Son las dos fuentes que la propia app declara en `meta.cnae.fuente` y
+//     `meta.iae.fuente`, y que `data/fiscal/cnae-iae.ts` sella con su contrato de
+//     vigilancia (FISCAL_CNAE_IAE_META).
+//   · El ORDEN se dedujo de la lógica documentada en `app/conversor-cnae-iae/page.tsx`
+//     (PESO_NIVEL_CNAE / PESO_TIPO_IAE, luego relevancia, luego localeCompare del
+//     código), no de lo que se veía en pantalla.
+//   · Los textos de retención por sección salen de SECCIONES_IAE, importado arriba.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — re-verificación del 02/09/2026', () => {
+  test('CASO 1 (normal) — «peluquería» localiza la misma actividad en los DOS catálogos, cada uno por su lado', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // ── CNAE-2025. Resuelto a mano sobre el catálogo: «peluqueria» aparece en tres
+    //    entradas. Primero las clases (PESO_NIVEL_CNAE) y, entre ellas, manda la
+    //    relevancia: 96.21 lleva el término en el TÍTULO (relevancia 2, «peluquerias y
+    //    barberias» empieza por la consulta) y 96.99 solo en un sinónimo, «peluquería
+    //    canina» (relevancia 3, palabra completa). El grupo 96.2 cierra la lista.
+    //    Jerarquía del catálogo: sección T «OTROS SERVICIOS» → división 96 «Servicios
+    //    personales» → grupo 96.2. Y correspondenciaInversa['9621'] = ['96.02'], de donde
+    //    sale la nota de equivalencia con la clasificación anterior.
+    await buscarCnae(page, 'peluquería');
+    await expect(contador(page)).toHaveText(/^3 resultados/);
+    await expect(fichas(page)).toHaveCount(3);
+
+    const clase = fichas(page).first();
+    await expect(clase).toContainText('96.21');
+    await expect(clase).toContainText('Peluquerías y barberías');
+    await expect(clase).toContainText('Clase');
+    await expect(clase).toContainText('Sección T: OTROS SERVICIOS');
+    await expect(clase).toContainText('División 96: Servicios personales');
+    await expect(clase).toContainText(
+      'Grupo 96.2: Peluquería, tratamientos de belleza, spas y actividades similares',
+    );
+    await expect(clase).toContainText('En la CNAE-2009 esto correspondía a 9602.');
+    await expect(fichas(page).nth(1)).toContainText('96.99');
+    await expect(fichas(page).nth(2)).toContainText('96.2');
+    await expect(fichas(page).nth(2)).toContainText('Grupo');
+
+    // ── Tarifas del IAE, búsqueda INDEPENDIENTE: la app no traslada el CNAE al IAE, y esa
+    //    es su tesis. RD Leg. 1175/1990, Sección 1ª, División 9 «OTROS SERVICIOS»,
+    //    Agrupación 97 «Servicios personales», Grupo 972 «Salones de peluquería e
+    //    institutos de belleza», Epígrafe 972.1 «Servicios de peluquería de señora y
+    //    caballero» — el código que se declara en el modelo 036/037.
+    await buscarIae(page, 'peluquería');
+    await expect(contador(page)).toHaveText(/^3 resultados/);
+    const epigrafe = fichas(page).first();
+    await expect(epigrafe).toContainText('972.1');
+    await expect(epigrafe).toContainText('Servicios de peluquería de señora y caballero');
+    await expect(epigrafe).toContainText('Sección 1ª');
+    await expect(epigrafe).toContainText('Grupo 972: Salones de peluquería e institutos de belleza');
+    // Peluquería con local es actividad EMPRESARIAL: sin retención de IRPF en factura.
+    await expect(epigrafe).toContainText(SECCION_1.retencion);
+    expect(SECCION_1.retencionIrpf).toBe(false);
+  });
+
+  test('CASO 2 (límite) — «4711», código antiguo que se reparte en dos clases y además conserva su número', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // El caso más ambiguo que admite el dato: 4711 es a la vez (a) código de la CNAE-2009
+    // con correspondencia MÚLTIPLE —correspondencia['4711'] = ['47.11','47.91']— y (b) un
+    // número que sigue existiendo como clase VIGENTE de la CNAE-2025. Como 47.11 figura en
+    // su propia correspondencia, el aviso debe decir que conserva el número, no que sea
+    // «otra clase» (esa rama es la de los 26 códigos tipo 2530, probada más arriba).
+    await buscarCnae(page, '4711');
+    await expect(avisoAntiguo(page)).toContainText('4711');
+    await expect(avisoAntiguo(page)).toContainText('existe en la CNAE-2009');
+    await expect(avisoAntiguo(page)).toContainText('Desde el 01/01/2026');
+    await expect(avisoAntiguo(page)).toContainText('entre ellas 47.11');
+    await expect(avisoAntiguo(page)).toContainText(
+      'que conserva el mismo número en la clasificación nueva',
+    );
+    await expect(avisoAntiguo(page)).not.toContainText('clase VIGENTE distinta');
+
+    // Las DOS clases de la correspondencia oficial, y solo esas dos: quedarse con una
+    // sería elegir por quien se da de alta.
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    await expect(fichas(page)).toHaveCount(2);
+    await expect(fichas(page).nth(0)).toContainText('47.11');
+    await expect(fichas(page).nth(0)).toContainText(
+      'Comercio al por menor no especializado con predominio de productos alimenticios, bebidas y tabaco',
+    );
+    await expect(fichas(page).nth(1)).toContainText('47.91');
+    await expect(fichas(page).nth(1)).toContainText(
+      'Actividades de servicios de intermediación para el comercio al por menor no especializado',
+    );
+
+    // La equivalencia INVERSA de cada una, tal cual la trae el catálogo:
+    //   correspondenciaInversa['4711'] = 47.11, 47.81, 47.91, 47.99
+    //   correspondenciaInversa['4791'] = 47.11, 47.19, 47.79, 47.91, 47.99, 82.99
+    await expect(fichas(page).nth(0)).toContainText(
+      'En la CNAE-2009 esto correspondía a 4711, 4781, 4791, 4799.',
+    );
+    await expect(fichas(page).nth(1)).toContainText(
+      'En la CNAE-2009 esto correspondía a 4711, 4719, 4779, 4791, 4799, 8299.',
+    );
+  });
+
+  test('CASO 3 (debe rechazarse) — «9999» no existe en ninguna de las dos clasificaciones', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // 9999 no es clave de `correspondencia` (los 629 códigos de la CNAE-2009 del catálogo)
+    // ni prefijo de ninguna clase de la CNAE-2025: la única división que empieza por 99 es
+    // la 99 «Organismos extraterritoriales», sección V. Lo correcto es cero resultados y,
+    // sobre todo, NINGÚN aviso que lo presente como código de la clasificación anterior:
+    // en una app de nivel 1 crítico, inventar una equivalencia es peor que no dar ninguna.
+    await buscarCnae(page, '9999');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+  });
+});

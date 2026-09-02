@@ -3,6 +3,8 @@ import { test, expect, Page } from '@playwright/test';
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
+ * TERCERA INSPECCIÓN: 02/09/2026 (segmento cálculo, riesgo 3). Sus tres casos, resueltos a
+ * mano antes de abrir el navegador, están al final del fichero, en su propio bloque.
  * SEGUNDA INSPECCIÓN: 24/08/2026, sobre el silabeador REESCRITO ese mismo día.
  * (Primera inspección: 24/08/2026, ocho hallazgos, los ocho reparados.)
  *
@@ -476,5 +478,143 @@ test.describe('contador-silabas', () => {
       await page.getByRole('button', { name: 'Analizar Sílabas' }).click();
       await expect(metricasDe(page, 1)).toHaveText('8'); // obtenido: 7, heptasílabo
     });
+  });
+
+  // ---------------------------------------------------------------------------------------
+  // TERCERA INSPECCIÓN — 02/09/2026 · segmento «cálculo», riesgo 3
+  //
+  // LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+  // (RAE, Ortografía de la lengua española 2010, cap. I «Diptongos, triptongos e hiatos
+  //  ortográficos»; y el DPD para «aun/aún» y «chií»)
+  //
+  //   CASO 1 (normal) — «El carpintero pinta la ventana»
+  //       el(1) · car-pin-te-ro(4): «rp» y «nt» no son grupos inseparables, se reparten una a
+  //       cada lado; «r» sola entre vocales va con la siguiente · pin-ta(2) · la(1) ·
+  //       ven-ta-na(3). Total 11 sílabas en 5 palabras, media 11/5 = 2,2 (coma decimal).
+  //       Como verso: 11 fonéticas, ningún contacto vocal-vocal entre palabras (0 sinalefas),
+  //       «ventana» llana → ±0 = 11, endecasílabo.
+  //
+  //   CASO 2 (límite) — tilde diacrítica y vocales iguales: «aun aún antiinflamatorio chiita»
+  //       aun(1): «au» es diptongo (abierta + cerrada átona); es la «aun» de «incluso».
+  //       aún(2): a-ún. La tilde sobre la cerrada la hace tónica y rompe el diptongo. Mismo
+  //           par de letras, un cómputo distinto: es el caso de tilde diacrítica que SÍ cambia
+  //           el número de sílabas (a diferencia de «solo/sólo» o «mas/más»).
+  //       antiinflamatorio(7): an-ti-in-fla-ma-to-rio. La OLE 2010 solo llama diptongo a «dos
+  //           vocales cerradas DISTINTAS»; dos vocales IGUALES son siempre hiato (chi-i-ta,
+  //           du-un-vi-ro), igual que a-a en a-za-har o e-e en le-er.
+  //       chiita(3): chi-i-ta.
+  //       Total esperado 1+2+7+3 = 13 sílabas en 4 palabras, media 3,3.
+  //
+  //   CASO 3 (especial) — siglas, mayúsculas y nombre propio: «María MURCIÉLAGO ONU DNI»
+  //       ma-rí-a(3): la í tónica rompe el diptongo · MURCIÉLAGO(4): mur-cié-la-go, la tilde
+  //       sobre vocal abierta no rompe nada · ONU(2): o-nu, sigla que se lee como palabra ·
+  //       DNI: sigla DELETREADA (de-e-ne-i), fuera del modelo de un silabeador ortográfico:
+  //       «dni» no es una sílaba posible en español, ninguna empieza por «dn».
+  // ---------------------------------------------------------------------------------------
+
+  test.describe('tercera inspección (02/09/2026)', () => {
+    test('CASO 1 (normal) · frase corriente: sílabas, palabras, media española y medida del verso', async ({
+      page,
+    }) => {
+      await analizar(page, 'El carpintero pinta la ventana');
+
+      // Dos consonantes que no forman grupo inseparable se reparten una a cada lado (car|pin,
+      // pin|te); una consonante sola entre vocales va siempre con la sílaba siguiente (te|ro).
+      await expect(silabasDe(page, 0)).toHaveText(['el']);
+      await expect(silabasDe(page, 1)).toHaveText(['car', 'pin', 'te', 'ro']);
+      await expect(silabasDe(page, 2)).toHaveText(['pin', 'ta']);
+      await expect(silabasDe(page, 3)).toHaveText(['la']);
+      await expect(silabasDe(page, 4)).toHaveText(['ven', 'ta', 'na']);
+
+      // 1+4+2+1+3 = 11 sílabas · 5 palabras · 11/5 = 2,2 con COMA decimal (formato español).
+      await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('11');
+      await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('5');
+      await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('2,2');
+
+      // Ninguna palabra termina en vocal ante palabra que empiece por vocal → 0 sinalefas.
+      // «ventana» es llana → ±0. 11 fonéticas = 11 métricas.
+      await expect(metricasDe(page)).toHaveText('11');
+      await expect(nombreDe(page)).toContainText('endecasílabo');
+      await expect(desgloseDe(page)).toContainText('llana');
+      await expect(desgloseDe(page)).not.toContainText('sinalefa');
+    });
+
+    test('CASO 2 (límite) · la tilde diacrítica de «aún» parte el diptongo de «aun»', async ({
+      page,
+    }) => {
+      await analizar(page, 'aun aún');
+
+      // DPD: «aun» (= incluso) es monosílabo, diptongo «au»; «aún» (= todavía) es bisílabo,
+      // porque la tilde marca tónica la vocal cerrada y crea hiato. Es la única pareja de
+      // tilde diacrítica del español en la que cambia el NÚMERO DE SÍLABAS.
+      await expect(silabasDe(page, 0)).toHaveText(['aun']);
+      await expect(totalDe(page, 0)).toHaveText('1 sílaba');
+      await expect(silabasDe(page, 1)).toHaveText(['a', 'ún']);
+      await expect(totalDe(page, 1)).toHaveText('2 sílabas');
+
+      // Y la tarjeta nombra bien cada encuentro vocálico.
+      await expect(page.locator('[class*="palabraCard"]').nth(0)).toContainText('Diptongo: au');
+      await expect(page.locator('[class*="palabraCard"]').nth(1)).toContainText('Hiato: a-ú');
+    });
+
+    test.fail(
+      'CASO 2 (límite) · HALLAZGO · dos vocales cerradas IGUALES son hiato, no diptongo',
+      async ({ page }) => {
+        // OLE 2010, cap. I: son diptongo «dos vocales cerradas DISTINTAS» (ciu-dad, cui-da-do);
+        // dos vocales IGUALES forman siempre hiato (chi-i-ta, du-un-vi-ro), exactamente igual
+        // que las abiertas iguales. El motor lo acierta con las abiertas —a-za-har es «Hiato:
+        // a-a», le-er es «Hiato: e-e»— y lo falla con las cerradas, porque `formanDiptongo()`
+        // resuelve `esDebil(a) && esDebil(b) → diptongo` sin comprobar que sean distintas.
+        // Se desmiente a sí mismo dentro de la misma pantalla.
+        await analizar(page, 'antiinflamatorio chiita');
+
+        await expect(silabasDe(page, 0)).toHaveText([
+          'an', 'ti', 'in', 'fla', 'ma', 'to', 'rio',
+        ]); // obtenido: an-tiin-fla-ma-to-rio (6 sílabas)
+        await expect(totalDe(page, 0)).toHaveText('7 sílabas');
+        await expect(silabasDe(page, 1)).toHaveText(['chi', 'i', 'ta']); // obtenido: chii-ta (2)
+        // Y encima lo ROTULA: la tarjeta dice «Diptongo: ii» donde debería decir «Hiato: i-i».
+        await expect(page.locator('[class*="palabraCard"]').nth(1)).toContainText('Hiato: i-i');
+      }
+    );
+
+    test('CASO 3 (especial) · nombre propio, mayúsculas y sigla que se lee como palabra', async ({
+      page,
+    }) => {
+      await analizar(page, 'María MURCIÉLAGO ONU DNI');
+
+      // El cómputo es correcto en las tres primeras: la í tónica rompe el diptongo (ma-rí-a),
+      // la tilde sobre vocal abierta no lo rompe (mur-cié-la-go) y una sigla legible como
+      // palabra se silabea como cualquier palabra (o-nu).
+      await expect(totalDe(page, 0)).toHaveText('3 sílabas');
+      await expect(totalDe(page, 1)).toHaveText('4 sílabas');
+      await expect(totalDe(page, 2)).toHaveText('2 sílabas');
+      await expect(silabasDe(page, 2)).toHaveText(['o', 'nu']);
+    });
+
+    test.fail(
+      'CASO 3 (especial) · HALLAZGO · las sílabas deberían conservar las mayúsculas del original',
+      async ({ page }) => {
+        // `separarSilabas()` hace `palabra.toLowerCase()` y devuelve el texto ya en minúscula,
+        // así que la app no separa el texto del usuario: lo reescribe. Quien pega un verso o
+        // un nombre propio ve «ma-rí-a» y «mur-cié-la-go» debajo de «María» y «MURCIÉLAGO».
+        await analizar(page, 'María MURCIÉLAGO');
+        await expect(silabasDe(page, 0)).toHaveText(['Ma', 'rí', 'a']); // obtenido: ma-rí-a
+        await expect(silabasDe(page, 1)).toHaveText(['MUR', 'CIÉ', 'LA', 'GO']); // obtenido: minúsculas
+      }
+    );
+
+    test.fail(
+      'CASO 3 (especial) · HALLAZGO · «DNI» se cuenta como 1 sílaba y ninguna sílaba puede empezar por «dn»',
+      async ({ page }) => {
+        // `separarSilabas()` corta por el atajo `nuc.length === 1 → return [palabra]`, que está
+        // pensado para lo que no tiene ninguna vocal (psst) pero también atrapa a las siglas
+        // deletreadas: «dni» sale como una única sílaba, con un ataque imposible en español.
+        // Leída como se lee (de-e-ne-i) son cuatro. El bloque «Limitaciones del algoritmo»
+        // enumera prefijos, nombres extranjeros y «ui/iu», pero no menciona las siglas.
+        await analizar(page, 'DNI');
+        await expect(totalDe(page, 0)).toHaveText('4 sílabas'); // obtenido: «dni», 1 sílaba
+      }
+    );
   });
 });

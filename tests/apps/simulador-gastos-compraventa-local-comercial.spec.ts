@@ -320,4 +320,191 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // El de la venta tiene que declarar SU fecha, no la de la compra.
     await expect(sellos.nth(1)).toContainText('15/01/2025');
   });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // RE-INSPECCIÓN 02/09/2026 — tres casos nuevos, resueltos a mano ANTES de
+  // ejecutar la app, sobre comunidades distintas a las ya cubiertas arriba.
+  // El disparador fue la tanda de la nave industrial del mismo día: dos
+  // hallazgos «medio» sobre TEXTOS de la rama de IVA, que aquí se comprueban
+  // expresamente (CASO 8, apartados 8c y 8d).
+  //
+  // HALLAZGOS ABIERTOS que esta re-inspección deja documentados y NO repara
+  // (el Inspector no repara; van sin aserción para que la suite siga en verde):
+  //   · [medio] El texto de ayuda del precio dice «Precio escriturado o valor de
+  //     referencia catastral (el mayor de ambos)» también en obra nueva y en la
+  //     renuncia. Esa regla es la base mínima del ITP/AJD (art. 10 TRLITPAJD);
+  //     la base del IVA es la contraprestación pactada (art. 78 LIVA). Mismo
+  //     defecto que el detectado en nave-industrial.
+  //   · [medio] En Ceuta y Melilla la etiqueta del AJD es el tipo NOMINAL
+  //     («AJD (0,50%)») mientras el importe lleva la bonificación del 50 % del
+  //     art. 57 bis.1 TRLITPAJD: 200.000 € → 500,00 €, que es el 0,25 %. La
+  //     tarjeta del ITP de esta misma app sí muestra el tipo EFECTIVO, y
+  //     nave-industrial ya lo corrigió (hallazgo 447).
+  //   · [medio] Los rótulos de los botones («Paga IVA 21% + AJD», «IVA 21% (ISP)
+  //     + AJD») y el panel de la comunidad («IVA (comercial) 21%») anuncian IVA
+  //     en Canarias, Ceuta y Melilla, donde no rige (TERRITORIOS_SIN_IVA), y la
+  //     propia app responde «IGIC/IPSI · No calculado». nave-industrial ya lo
+  //     corrigió (hallazgo 490).
+  //   · [bajo] Ese 21 % de los rótulos está escrito a mano, pudiendo derivarse de
+  //     IVA_INMUEBLES_2025.local, que la app YA importa para calcular.
+  //   · [bajo] La FAQ sitúa el AJD general «(0,5%-1,5%)» mientras el panel de la
+  //     misma página muestra «AJD 0%» en el País Vasco. `RANGO_AJD`
+  //     (data/itp-ccaa.ts) existe desde el 21/08/2026 para derivar ese rango.
+  //   · [bajo] En Ceuta y Melilla la descripción del ITP dice «Tipo general — los
+  //     locales comerciales no tienen tipos reducidos» sin nombrar la
+  //     bonificación del 50 % que sí se ha aplicado.
+  // ══════════════════════════════════════════════════════════════════════════
+
+  test('CASO 8 (normal) — Andalucía, local de 300.000 €: ITP 7 %, IVA + AJD en obra nueva y en la renuncia', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#select-ccaa').selectOption('andalucia');
+    await rellenar(page, 'Precio del local comercial', '300000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '500');
+
+    // ── 8a. Segunda mano: exenta de IVA (art. 20.Uno.22º LIVA) → ITP.
+    // TIPOS_ITP_CCAA_2025 'Andalucía'.tipo = 7 (data/fiscal/inmuebles.ts), del que
+    // ITP_CCAA.andalucia deriva su tipoGeneral. Sin escala progresiva:
+    //   300.000 × 7 % = 21.000. Los tipos reducidos del 6 % y el 3,5 % exigen
+    //   «Vivienda habitual», que un local no es nunca.
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (7,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('21.000,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+
+    // Notaría, ARANCELES_NOTARIO (RD 1426/1989) sobre 300.000 €:
+    //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 % + 149.746,97×0,05 %
+    //   = 408,43341 ; × 1,21 de IVA = 494,20443 ; × 1,75 (punto medio de FACTURA_NOTARIAL,
+    //   horquilla 1,5–2) = 864,85775. Horquilla: 741,30664 y 988,40885.
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('864,86 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('741,31 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('988,41 €');
+    // Registro, ARANCELES_REGISTRO (RD 1427/1989):
+    //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 % + 149.746,97×0,030 %
+    //   = 216,21206 ; + 6,010121 de presentación + 3,005061 de nota simple ; × 1,21 = 272,52497
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('272,52 €');
+    // Total = 21.000 + 864,85775 + 272,52497 + 500 = 22.637,38271 → 7,5458 % de 300.000
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('22.637,38 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('7,55%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('322.637,38 €');
+
+    // ── 8b. Obra nueva del promotor: IVA_INMUEBLES_2025.local = 21 (Ley 37/1992):
+    //   300.000 × 21 % = 63.000. AJD de ITP_CCAA.andalucia = 1,2 % → 3.600.
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21,00%)');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('63.000,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (1,20%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('3600,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    // Total = 63.000 + 3.600 + 864,85775 + 272,52497 + 500 = 68.237,38271 → 22,7458 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('68.237,38 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('22,75%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('368.237,38 €');
+
+    // ── 8c. Renuncia a la exención (art. 20.Dos LIVA): mismos importes que la obra
+    // nueva, porque el tipo es el mismo, pero con inversión del sujeto pasivo.
+    await page.getByRole('button', { name: /renuncia IVA/ }).click();
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('63.000,00 €');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('3600,00 €');
+    expect(await descripcionTarjeta(page, /^AJD/)).toContain('incrementado');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+
+    // ── 8d. Comprobación EXPRESA del hallazgo de la app hermana nave-industrial:
+    // allí la descripción de la tarjeta del IVA con renuncia caía al texto del ITP
+    // («Tipo general — no tienen tipos reducidos») porque la condición comparaba
+    // `tipoImpuesto === 'IVA'` y con renuncia el título es «IVA (renuncia · ISP)».
+    // Aquí la rama es `esRenuncia`, así que el texto es el del IVA. NO reproducido.
+    const descIva = await descripcionTarjeta(page, /^IVA/);
+    expect(descIva).toContain('inversión del sujeto pasivo');
+    expect(descIva).not.toContain('tipos reducidos');
+  });
+
+  test('CASO 9 (límite) — Baleares 2.500.000 € entra en el tramo del 13 %, y en Canarias la renuncia no devenga IVA', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await page.locator('#select-ccaa').selectOption('baleares');
+    await rellenar(page, 'Precio del local comercial', '2500000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '500');
+
+    // ITP_CCAA.baleares.tramosProgresivos = 8 % hasta 400.000 · 9 % hasta 600.000 ·
+    // 10 % hasta 1.000.000 · 12 % hasta 2.000.000 · 13 % el resto. Con 2.500.000 € se
+    // recorren los CINCO tramos, incluido el más alto de toda la tabla:
+    //   400.000×8 % + 200.000×9 % + 400.000×10 % + 1.000.000×12 % + 500.000×13 %
+    //   = 32.000 + 18.000 + 40.000 + 120.000 + 65.000 = 275.000
+    // Tipo efectivo = 275.000 / 2.500.000 = 11,00 % (no es ninguno de los nominales).
+    expect(await valorTarjeta(page, /^ITP/)).toBe('275.000,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (11,00%)');
+
+    // Notaría sobre 2.500.000 €: 90,15 + 108,18221 + 45,0759 + 90,15182 + 450.759,07×0,05 %
+    //   + 1.898.987,90×0,03 % = 1.128,63583 ; × 1,21 = 1.365,64935 ; × 1,75 = 2.389,88637
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('2389,89 €');
+    // Registro: 24,04 + 42,07086 + 37,56325 + 67,61387 + 135,22772 + 379,79758 = 686,31327
+    //   (por debajo del tope REGISTRO_MAXIMO de 2.181,67) ; + 9,015182 ; × 1,21 = 841,34743
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('841,35 €');
+    // Total = 275.000 + 2.389,88637 + 841,34743 + 500 = 278.731,2338 → 11,1492 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.731,23 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,15%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.731,23 €');
+
+    // ── Canarias con RENUNCIA: allí no se devenga IVA sino IGIC (TERRITORIOS_SIN_IVA),
+    // así que el impuesto principal no se calcula —no se inventa un 21 %— pero la cuota
+    // gradual de AJD sí se devenga: ITP_CCAA.canarias.ajd = 0,75 % → 300.000 × 0,75 % = 2.250.
+    await page.locator('#select-ccaa').selectOption('canarias');
+    await rellenar(page, 'Precio del local comercial', '300000');
+    await page.getByRole('button', { name: /renuncia IVA/ }).click();
+    await expect(page.locator('h3', { hasText: 'IGIC' }).first()).toHaveText('IGIC');
+    expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
+    // El texto nombra la operación ELEGIDA (la renuncia), no siempre la obra nueva.
+    expect(await descripcionTarjeta(page, 'IGIC')).toContain('la renuncia a la exención');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('2250,00 €');
+    await expect(page.getByText(/no se aplica el IVA/)).toBeVisible();
+    // Total PARCIAL = 2.250 + 864,85775 + 272,52497 + 500 = 3.887,38271 → 1,2958 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3887,38 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('SIN el IGIC');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('303.887,38 €');
+  });
+
+  test('CASO 10 (rechazo) — precio negativo, cero y texto, y una gestoría negativa que no puede abaratar la compra', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // Sin precio no hay cifras: ni totales ni el «No definido» que devuelve
+    // formatCurrency cuando le llega el NaN de un campo vacío.
+    await expect(page.getByText('Introduce el precio del local comercial')).toBeVisible();
+    await expect(page.getByText('No definido')).toHaveCount(0);
+
+    const campo = page.locator('input[aria-label="Precio del local comercial"]');
+
+    // Negativo: mientras el campo tiene el foco tampoco puede haber resultados
+    // (la guarda es `precio <= 0`, no solo el min del NumberInput).
+    await campo.fill('-50000');
+    await expect(page.getByText('Introduce el precio del local comercial')).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
+    await campo.blur();
+    await expect(campo).toHaveValue('0');   // min = 0 del NumberInput
+
+    // Cero: mismo tratamiento, sin tarjetas a 0,00 €.
+    await expect(page.getByText('Introduce el precio del local comercial')).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
+
+    // Texto: el input no admite los caracteres (regex /^-?[\d.,]*$/ de NumberInput).
+    await campo.fill('');
+    await campo.type('abc');
+    await expect(campo).toHaveValue('');
+    await expect(page.getByText('No definido')).toHaveCount(0);
+
+    // Gestoría negativa con precio válido: se acota con Math.max(0, …), así que NO
+    // resta del total ni pinta tarjeta. Andalucía 300.000 € sin gestoría:
+    //   21.000 + 864,85775 + 272,52497 = 22.137,38271
+    await page.locator('#select-ccaa').selectOption('andalucia');
+    await rellenar(page, 'Precio del local comercial', '300000');
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    const gestoria = page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]');
+    await gestoria.fill('-1000');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('22.137,38 €');
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    await gestoria.blur();
+    await expect(gestoria).toHaveValue('0');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('22.137,38 €');
+  });
 });

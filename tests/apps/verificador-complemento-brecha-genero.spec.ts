@@ -1103,4 +1103,182 @@ test.describe('Verificador del complemento por brecha de género', () => {
       expect(tarjeta).toMatch(/asistencia jurídica gratuita|afiliad|umbral|requisitos de renta/i);
     },
   );
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // RE-INSPECCIÓN 02/09/2026 — segmento fiscal, riesgo 1 CRÍTICO
+  //
+  // Los 24 tests anteriores se ejecutaron ANTES de tocar nada y pasaron los 24: el cálculo,
+  // el corte temporal, la exclusión del art. 60.4 y la paridad con el MCP siguen cerrados.
+  // Lo de aquí abajo son tres casos troncales resueltos a mano contra
+  // `COMPLEMENTO_BRECHA_GENERO_2026` (data/fiscal/pensiones.ts, líneas 440-513) ANTES de
+  // abrir el navegador, y dos hallazgos nuevos marcados con `test.fail()`.
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /**
+   * CASO 1 (NORMAL) — el perfil mayoritario: mujer con jubilación y tres hijos.
+   *
+   * Resuelto a mano con el módulo fiscal antes de ejecutar la app:
+   *   P1 jubilación ordinaria ∈ pensionesElegibles      → no cae en ninguna exclusión
+   *   P2 «El 4-feb-2021 o después» ≥ fechaMinimaHechoCausante ('2021-02-04')
+   *   P3 3 hijos → hijosComputables = mín(3, maxHijos 4) = 3
+   *   P5 el otro progenitor no lo percibe                → sin incompatibilidad
+   *   P6 sin denegación propia                           → NO es reclamación
+   *
+   *   mensual = 3 × cuantiaPorHijoMensual 36,90 = 110,70 €   ← valor esperado literal
+   *   anual   = 110,70 × pagasAnuales 14        = 1549,80 €   ← valor esperado literal
+   *
+   * Las dos cifras salen de `COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual` (36.90)
+   * y `.pagasAnuales` (14), sellados el 13/05/2026 contra el art. 60 LGSS + RDL 3/2026.
+   * es-ES no agrupa los millares de un número de cuatro cifras: 1549,80, no 1.549,80.
+   */
+  test('caso 1 (02/09): mujer, jubilación y 3 hijos → 110,70 €/mes y 1549,80 €/año', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 3,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+
+    const resultado = await textoResultado(page);
+
+    expect(resultado).toContain('+110,70 €/mes'); // 3 × cuantiaPorHijoMensual 36,90
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).toContain('Hijos computables 3 (máx. 4)'); // maxHijos = 4
+    expect(resultado).toContain('Cuantía por hijo 36,90 €/mes'); // cuantiaPorHijoMensual
+    expect(resultado).toContain('Mensual estimado 110,70 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1549,80 €/año'); // 110,70 × pagasAnuales 14
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — SEIS hijos, o sea dos por encima del tope, con todo lo demás igual.
+   *
+   * El borde de `maxHijos` estaba probado con 5 (caso 2 bis y caso 4). Con 6 se comprueba
+   * que el tope es un `Math.min` y no un «suma uno menos»:
+   *   hijosComputables = mín(6, maxHijos 4)               = 4
+   *   mensual          = 4 × cuantiaPorHijoMensual 36,90  = 147,60 € (= maxMensual)
+   *   anual            = 147,60 × pagasAnuales 14         = 2066,40 € (= maxAnual)
+   *
+   * Los tres valores están escritos literalmente en data/fiscal: `maxHijos: 4`,
+   * `maxMensual: 147.60`, `maxAnual: 2066.40`, así que el test los cruza contra el módulo
+   * y no contra la aritmética de la propia app.
+   */
+  test('caso 2 (02/09, límite): 6 hijos topan en maxHijos → 147,60 €/mes, ni un céntimo más', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 6,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+
+    const resultado = await textoResultado(page);
+
+    expect(resultado).toContain('+147,60 €/mes'); // maxMensual, NO 6 × 36,90 = 221,40 €
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)'); // maxHijos
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año'); // maxAnual
+    expect(resultado).not.toContain('221,40'); // 6 × 36,90 sin tope
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — hecho causante ANTERIOR al corte, que es el requisito que más gente
+   * deja fuera: el complemento nació con el RDL 3/2021 y no alcanza a las pensiones ya
+   * causadas.
+   *
+   *   P2 «Antes del 4-feb-2021» < fechaMinimaHechoCausante ('2021-02-04')
+   *   → procede = false, importe = 0, y el motivo tiene que NOMBRAR la fecha del corte,
+   *     formateada como `formatFechaLarga('2021-02-04')` = «4 de febrero de 2021».
+   *
+   * Con 2 hijos, que SÍ darían derecho (2 × 36,90 = 73,80 €/mes) si la fecha no lo impidiera:
+   * así el test distingue «no procede por la fecha» de «no procede por falta de hijos».
+   */
+  test('caso 3 (02/09, rechazo): pensión anterior al 4 de febrero de 2021 → no procede y 0 €', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'Antes del 4-feb-2021',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+
+    const resultado = await textoResultado(page);
+
+    expect(resultado).toContain('No procede ahora');
+    // La fecha del corte, tal y como la escribe formatFechaLarga(fechaMinimaHechoCausante)
+    expect(resultado).toContain('antes del 4 de febrero de 2021');
+    expect(resultado).toContain('complemento de maternidad'); // el régimen anterior, nombrado
+    // Ni el importe que habría correspondido ni desglose alguno
+    expect(resultado).not.toContain('73,80'); // 2 × cuantiaPorHijoMensual 36,90
+    expect(resultado).not.toContain('Desglose económico');
+    expect(resultado).not.toContain('Cumples los requisitos básicos');
+  });
+
+  /**
+   * HALLAZGO 02/09/2026 (a) — el plazo de la reclamación previa se publica como «30 días
+   * NATURALES», y el precepto que la propia página cita no dice eso.
+   *
+   * `COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaTipoDias` vale 'naturales', y de
+   * ahí sale tres veces en la guía visible (paso 5, tarjeta «Respeta los plazos» y errores
+   * frecuentes). El art. 71.2 LRJS —la norma citada— dice literalmente «en el plazo de
+   * treinta días desde la notificación de la misma», SIN calificarlos, y el criterio pacífico
+   * en prestaciones de Seguridad Social es que son HÁBILES (Ley 39/2015 art. 30.2: los plazos
+   * señalados por días son hábiles salvo que se diga otra cosa).
+   *
+   * Por qué importa aquí y no es una pedantería: 30 días naturales ≈ 21 hábiles. La página
+   * remata con «Pasado ese plazo, la resolución gana firmeza y la reclamación se complica»,
+   * así que a quien va por el día 35 natural —todavía en plazo— se le está diciendo que ha
+   * perdido el tren. En una app de riesgo 1 el encuadre es el producto.
+   *
+   * ⚠️ El dato vive en data/fiscal, así que su corrección va por /triaje-fiscal con fuente
+   * consultada en sesión y OK del usuario, no por una edición suelta desde aquí.
+   */
+  test.fail(
+    'HALLAZGO: la guía publica «30 días naturales» para la reclamación previa (art. 71.2 LRJS)',
+    async ({ page }) => {
+      await abrirGuia(page);
+      const guia = normalizar(await page.locator('body').innerText());
+      // Lo que debería leerse cuando el módulo fiscal se corrija
+      expect(guia).not.toContain('30 días naturales');
+    },
+  );
+
+  /**
+   * HALLAZGO 02/09/2026 (b) — `COMPLEMENTO_BRECHA_GENERO_META.doctrina` no tiene ni un solo
+   * consumidor, mientras la doctrina que describe está tecleada a mano nueve veces.
+   *
+   * El campo vale 'STJUE C-623/23 (15-may-2025) y STS 9-jul-2025: igualdad de trato
+   * hombre/mujer'. En `page.tsx` aparecen a mano «STJUE de 15-may-2025 (C-623/23)»,
+   * «9-jul-2025», «STJUE 15-may-2025», «STJUE C-623/23» y «doctrina TS de 9-jul-2025» (7
+   * sitios: dos motivos de `evaluar`, el hint de la P4, el de la P6, la tabla comparativa,
+   * una FAQ y la tarjeta «Aporta jurisprudencia»), y en `metadata.ts` otras dos, una de
+   * ellas dentro del `faqJsonLd` que leen Bing Copilot y ChatGPT.
+   *
+   * Es exactamente el patrón que cerraron los hallazgos 503, 504 y 505 para la fecha del
+   * corte, la exclusión del art. 60.4 y el cómputo del hijo fallecido: el dato subió a
+   * data/fiscal y el consumidor se quedó sin conectar. Hoy las nueve copias coinciden con el
+   * módulo, así que no hay error visible; el riesgo es la próxima sentencia que matice la
+   * doctrina, con el módulo diciendo una cosa y nueve trozos de página la anterior.
+   */
+  test.fail(
+    'HALLAZGO: META.doctrina no tiene consumidores y la jurisprudencia va tecleada a mano',
+    async () => {
+      const { readFileSync } = await import('node:fs');
+      const { join } = await import('node:path');
+      const consumidores = [
+        join('app', 'verificador-complemento-brecha-genero', 'page.tsx'),
+        join('app', 'verificador-complemento-brecha-genero', 'metadata.ts'),
+        join('lib', 'calculadoras', 'complementoBrechaGenero.ts'),
+      ]
+        .map(rel => readFileSync(join(process.cwd(), rel), 'utf8'))
+        .join('\n');
+      expect(consumidores).toContain('COMPLEMENTO_BRECHA_GENERO_META.doctrina');
+    },
+  );
 });

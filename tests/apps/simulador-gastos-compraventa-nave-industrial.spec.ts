@@ -86,6 +86,13 @@ async function leerFuente(): Promise<string> {
   return readFile(FUENTE_PAGE, 'utf8');
 }
 
+const FUENTE_METADATA = 'app/simulador-gastos-compraventa-nave-industrial/metadata.ts';
+
+async function leerMetadata(): Promise<string> {
+  const { readFile } = await import('node:fs/promises');
+  return readFile(FUENTE_METADATA, 'utf8');
+}
+
 test.describe('Simulador de gastos de compra de nave industrial — casos base', () => {
   /**
    * CASO 1 (NORMAL) — Madrid, segunda mano, 500.000 €, gestoría 500 €.
@@ -1082,5 +1089,296 @@ test.describe('Hallazgos reparados — 28/08/2026', () => {
     const fuente = await leerFuente();
     // El valor existe en data/fiscal y ya está importado aquí (lo fija `REPARADO D`).
     expect(fuente.match(/\b21%/g) ?? []).toHaveLength(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN — 02/09/2026 (Opus 5)
+//
+// Tres casos frescos, RESUELTOS A MANO ANTES de abrir el navegador, sobre terreno que las
+// vueltas anteriores no habían pisado: dos escalas progresivas sin probar (Aragón y
+// Extremadura) y el rechazo de entradas por la rama del IVA, que hasta hoy solo se había
+// comprobado por la del ITP.
+//
+// De dónde sale CADA cifra esperada (ninguna de memoria):
+//  - Tipo general de Aragón (8 %) y de Extremadura (8 %) → `TIPOS_ITP_CCAA_2025` en
+//    `data/fiscal/inmuebles.ts`, que `tipoGeneralDe()` lee para rellenar `ITP_CCAA`.
+//  - Escalas progresivas → `ITP_CCAA` en `data/itp-ccaa.ts`
+//    (Aragón: 8 % hasta 400.000 € y 10 % por encima · Extremadura: 8 % hasta 360.000 €,
+//     10 % hasta 600.000 € y 11 % por encima).
+//  - Aranceles → `ARANCELES_NOTARIO` (RD 1426/1989) y `ARANCELES_REGISTRO` (RD 1427/1989),
+//    con `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y `REGISTRO_CONCEPTOS`
+//    (presentación 6,010121 € + nota simple 3,005061 €). El 21 % de IVA va dentro.
+//  - IVA de la nave → `IVA_INMUEBLES_2025.local` = 21.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 02/09/2026 — tres casos nuevos', () => {
+  /**
+   * CASO 1 (NORMAL) — Aragón, segunda mano, 1.000.000 €, gestoría 500 €.
+   *
+   * Aragón es la escala progresiva más simple del catálogo (dos tramos con el corte en
+   * 400.000 €) y no se había probado nunca. Una nave usada de un millón la cruza, así que
+   * el tipo NOMINAL de la tabla (8 %) y el que de verdad se paga dejan de coincidir.
+   *
+   * A mano:
+   *   ITP = 400.000 × 8 % + 600.000 × 10 % = 32.000 + 60.000        =  92.000,00
+   *   tipo efectivo = 92.000 / 1.000.000                            =       9,20 %
+   *   AJD = 0 (segunda mano sin renuncia: no hay cuota gradual)
+   *   Notaría: arancel = 558,93946 (acumulado hasta 601.012,10)
+   *            + (1.000.000 − 601.012,10) × 0,0003 = 119,69637      = 678,63583
+   *            × 1,21 = 821,1493543
+   *            × 1,5 = 1.231,7240315 (min) · × 2 = 1.642,2987086 (max)
+   *            punto medio                                          =  1.437,0113700
+   *   Registro: 306,5156935 (acumulado hasta 601.012,10)
+   *            + (1.000.000 − 601.012,10) × 0,0002 = 79,79758       = 386,3132735
+   *            + 9,015182 = 395,3284555 · × 1,21                    =    478,3474311
+   *   Total gastos = 92.000 + 1.437,01137 + 478,3474311 + 500       =  94.415,3588011
+   *   % sobre el precio = 94.415,3588 / 1.000.000                   =       9,4415 % → «9,44%»
+   *   Total operación                                               = 1.094.415,3588011
+   */
+  test('CASO 1 (normal) — Aragón, segunda mano, 1.000.000 €: la escala 8/10 da un efectivo del 9,20%', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await rellenar(page, PRECIO, '1000000');
+    await rellenar(page, GESTORIA, '500');
+
+    // La app anuncia la escala en el recuadro de la comunidad; el caso comprueba que la aplica.
+    await expect(page.getByText(/escala progresiva \(8% → 10%\)/)).toBeVisible();
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (9,20%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('92.000,00 €');
+    // El tipo plano del primer tramo habría dado 80.000 €, y el del segundo 100.000 €: ninguno.
+    await expect(page.getByText('80.000,00 €')).toHaveCount(0);
+    await expect(page.getByText('100.000,00 €')).toHaveCount(0);
+    // En segunda mano sin renuncia no hay cuota gradual de AJD sobre la compraventa.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1437,01 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('1231,72 €');
+    expect(notaria).toContain('1642,30 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('478,35 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('94.415,36 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,44%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.094.415,36 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Extremadura, segunda mano, 600.000,00 € exactos.
+   *
+   * Es el corte EXACTO entre el tramo del 10 % y el del 11 % de
+   * `ITP_CCAA['extremadura'].tramosProgresivos` (8 % hasta 360.000, 10 % hasta 600.000,
+   * 11 % después). En ese punto el bucle de `calcularITPProgresivo` tiene que agotar la base
+   * en el segundo tramo y NO entrar en el tercero: un `<` por un `<=` mal puesto cobraría
+   * aquí un exceso al 11 % que la ley no devenga. El importe se teclea además en formato
+   * español con punto de millar («600.000»), donde el separador solo agrupa.
+   *
+   * A mano (gestoría 500 €):
+   *   ITP = 360.000 × 8 % + 240.000 × 10 % = 28.800 + 24.000        =  52.800,00
+   *   tipo efectivo = 52.800 / 600.000                              =       8,80 %
+   *   Notaría: arancel = 90,15 + 108,182205 + 45,0759 + 90,15182
+   *            + (600.000 − 150.253,03) × 0,0005 = 224,873485       = 558,43341
+   *            (el tramo 6 arranca en 601.012,10: 600.000 no lo alcanza)
+   *            × 1,21 = 675,7044261
+   *            × 1,5 = 1.013,5566392 (min) · × 2 = 1.351,4088522 (max)
+   *            punto medio                                          =  1.182,4827457
+   *   Registro: 24,04 + 42,0708575 + 37,56325 + 67,613865
+   *            + (600.000 − 150.253,03) × 0,0003 = 134,924091       = 306,2120635
+   *            + 9,015182 = 315,2272455 · × 1,21                    =    381,4249671
+   *   Total gastos = 52.800 + 1.182,4827457 + 381,4249671 + 500     =  54.863,9077128
+   *   % sobre el precio = 54.863,9077 / 600.000                     =       9,1440 % → «9,14%»
+   *   Total operación                                               = 654.863,9077128
+   */
+  test('CASO 2 (límite) — Extremadura, 600.000 € exactos: el corte 10 % → 11 % no se pasa de largo', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'extremadura');
+    await rellenar(page, PRECIO, '600.000');
+    await rellenar(page, GESTORIA, '500');
+
+    // El punto de millar del formato español no puede convertir el importe en 600 €.
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('600.000,00 €');
+    await expect(page.getByText(/escala progresiva \(8% → 10% → 11%\)/)).toBeVisible();
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,80%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('52.800,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1182,48 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('1013,56 €');
+    expect(notaria).toContain('1351,41 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('381,42 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('54.863,91 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,14%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('654.863,91 €');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — entradas que no son un precio, con la RENUNCIA seleccionada.
+   *
+   * `CASO 3` de la primera vuelta y `B4` de la del 28/08 comprueban el rechazo por la rama
+   * del ITP. Falta la otra: con «2ª mano con renuncia al IVA» el motor toma la rama
+   * `conIva`, donde el impuesto se calcula como `precio × 21 %` en vez de con `calcularITP`.
+   * Si la guarda `!Number.isFinite(precio) || precio <= 0` fallara ahí, la pantalla enseñaría
+   * un «IVA (21,00%) 0,00 €» —o un NaN— sobre una operación inexistente.
+   *
+   * Entradas y lo que debe pasar con cada una:
+   *   «0,00»    → cero escrito en formato español: parsea a 0 y la guarda lo rechaza
+   *   «0»       → cero pelado
+   *   «-250000» → negativo (el blur de NumberInput lo lleva a min=0, y 0 también se rechaza)
+   *   «,»       → solo el separador decimal: `parseSpanishNumber` devuelve NaN
+   *   «»        → vacío
+   *   «1.2.3»   → pasa el filtro del input pero no es un número (NaN)
+   * En los seis casos: marcador de posición visible, ninguna tarjeta de coste y ningún
+   * centinela de NaN en pantalla.
+   */
+  test('CASO 3 (rechazo) — con renuncia al IVA, ningún precio inválido produce cifra ni NaN', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+
+    const campo = page.locator('input[aria-label="' + PRECIO + '"]');
+    const marcador = page.getByText('Introduce el precio de la nave industrial para ver el desglose de gastos');
+
+    for (const entrada of ['0,00', '0', '-250000', ',', '', '1.2.3']) {
+      await campo.fill(entrada);
+      await expect(marcador).toBeVisible();
+      // Ni el total, ni el total parcial, ni una tarjeta de IVA vacía.
+      await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+      await expect(page.locator('h3', { hasText: /^IVA \(/ })).toHaveCount(0);
+      const cuerpo = await page.locator('body').innerText();
+      expect(cuerpo).not.toContain('NaN');
+      expect(cuerpo).not.toContain('No definido');
+      expect(cuerpo).not.toContain('∞');
+    }
+
+    // Y en cuanto el precio es válido, la rama del IVA vuelve a producir su cifra:
+    // 250.000 × 21 % (IVA_INMUEBLES_2025.local) = 52.500
+    await rellenar(page, PRECIO, '250000');
+    expect(await valorTarjeta(page, 'IVA (renuncia')).toBe('52.500,00 €');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — re-inspección del 02/09/2026. Marcados con `test.fail()`: afirman lo
+// que DEBERÍA ocurrir y hoy fallan a propósito. Al repararlos se les quita la marca y quedan
+// como regresión, igual que se hizo con los hallazgos 156-166 y 490-493.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 02/09/2026', () => {
+  /**
+   * HALLAZGO 1 (contenido, medio) — con RENUNCIA a la exención, la tarjeta del impuesto lleva
+   * debajo una descripción del ITP.
+   *
+   * El render decide el texto con `resultadosComprador.tipoImpuesto === 'IVA'`, una igualdad
+   * ESTRICTA, y en la renuncia ese campo vale `'IVA (renuncia · ISP)'`. Así que cae al último
+   * ramal del ternario y la pantalla queda: «IVA (renuncia · ISP) (21,00%) · 105.000,00 € ·
+   * Tipo general — naves industriales no tienen tipos reducidos». «Tipo general» y «tipos
+   * reducidos» son conceptos del ITP, que en esta operación NO se paga; y de paso se pierde lo
+   * único que había que decir ahí —que ese IVA lo autoliquida el comprador y suele ser
+   * deducible—, que es justo lo que sí aparece cuando la misma nave se compra en obra nueva.
+   *
+   * Verificado en Madrid con 500.000 € (2ª mano con renuncia). Alcanza a las 16 comunidades
+   * donde rige el IVA: en Canarias, Ceuta y Melilla manda `impuestoNoCalculado` y no se ve.
+   */
+  test.fail('HALLAZGO 1 — la tarjeta del IVA con renuncia describe el ITP', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, PRECIO, '500000');
+
+    expect(await valorTarjeta(page, 'IVA (renuncia')).toBe('105.000,00 €');
+    const desc = await descripcionTarjeta(page, 'IVA (renuncia');
+    // Hoy: «Tipo general — naves industriales no tienen tipos reducidos».
+    expect(desc).not.toContain('Tipo general');
+    expect(desc).not.toContain('tipos reducidos');
+    // Debería decir lo mismo que dice la obra nueva, que sí acierta el ramal.
+    expect(desc).toContain('deducible');
+  });
+
+  /**
+   * HALLAZGO 2 (contenido, medio) — el texto de ayuda del precio manda usar el valor de
+   * referencia catastral TAMBIÉN cuando la operación va por IVA, donde no pinta nada.
+   *
+   * El campo dice, en los tres modos, «Precio escriturado o valor de referencia catastral (el
+   * mayor de ambos)». Esa es la base del ITP y del AJD (arts. 10 y 30 del TRLITPAJD tras la
+   * Ley 11/2021), pero la base del IVA es la contraprestación pactada (art. 78 de la Ley
+   * 37/1992): en «Obra nueva / Promotor» y en «2ª mano con renuncia» —dos de los tres modos, y
+   * según la propia app el caso frecuente para empresas y autónomos— seguir la instrucción
+   * infla el 21 % sobre una base que la ley del IVA no reconoce.
+   *
+   * La página ya lo dice bien en otro sitio, y por eso se contradice: el recuadro de
+   * limitaciones acota el valor de referencia «al ITP».
+   */
+  test.fail('HALLAZGO 2 — el helper del precio ofrece la base del ITP también en los modos con IVA', async ({ page }) => {
+    await page.goto(RUTA);
+    const helper = page
+      .locator('input[aria-label="' + PRECIO + '"]')
+      .locator('xpath=following-sibling::p[1]');
+
+    // El recuadro de limitaciones sí acota el valor de referencia al ITP…
+    const limitaciones = (await page.locator('[class*="warningBox"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(limitaciones).toContain('base imponible real del ITP');
+
+    // …y el campo tendría que decir lo mismo cuando la operación tributa por IVA.
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    expect((await helper.innerText()).replace(/\s+/g, ' ')).not.toContain('valor de referencia catastral');
+  });
+
+  /**
+   * HALLAZGO 3 (dato, bajo) — el 21 % vuelve a estar escrito a mano, ahora en `metadata.ts`.
+   *
+   * Es el hallazgo 163 (el `const IVA_NAVE_INDUSTRIAL = 21` de la página) y el 493 (los tres
+   * literales del bloque educativo) por tercera vez, en el fichero que la barrida no miró:
+   * `title`, `description`, las dos descripciones sociales, la `description` del WebApplication
+   * y una de sus `features` dicen «IVA 21%» a mano —seis veces— mientras el FAQPage de ese
+   * mismo fichero ya lo deriva con `pct(IVA_INMUEBLES_2025.local)`. El import y el formateador
+   * están ahí; solo hay que usarlos.
+   *
+   * No hay ninguna cifra equivocada hoy: lo que hay es la divergencia en silencio que ya costó
+   * dos reparaciones, y encima en el texto que leen Google y los buscadores conversacionales.
+   */
+  test.fail('HALLAZGO 3 — metadata.ts escribe «IVA 21%» a mano pudiendo derivarlo de data/fiscal', async () => {
+    const meta = await leerMetadata();
+    // El valor vive en data/fiscal y el fichero ya lo importa (lo usa el FAQPage).
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+    expect(meta).toContain('IVA_INMUEBLES_2025');
+    // Ningún literal «21%» debería quedar en el metadata.
+    expect(meta.match(/\b21%/g) ?? []).toHaveLength(0);
+  });
+
+  /**
+   * HALLAZGO 4 (accesibilidad, bajo) — emoji pegado al texto sin `aria-hidden`.
+   *
+   * El aviso «💡 Si eres empresa o autónomo:» (línea 216 de `page.tsx`) lleva el emoji dentro
+   * del `<strong>`, sin el `<span aria-hidden="true">` que exige el CLAUDE.md §5, así que el
+   * lector de pantalla lo anuncia antes de la frase. Es una de las dos reglas de corrección
+   * unívoca: `npm run check:a11y-jsx` la señala y ROMPERÍA el build si esa línea se escribiera
+   * hoy — sobrevive porque el candado juzga las líneas que un commit añade y esta es anterior.
+   * Los demás emojis de la página sí van envueltos.
+   */
+  test.fail('HALLAZGO 4 — el emoji del aviso de IVA deducible va sin aria-hidden', async () => {
+    const fuente = await leerFuente();
+    expect(fuente).toContain('Si eres empresa o autónomo:');
+    // Debería ser <span aria-hidden="true">💡</span>, como el resto de emojis del fichero.
+    expect(fuente).not.toMatch(/<strong>💡 Si eres empresa/);
+  });
+
+  /**
+   * HALLAZGO 5 (operativa, bajo) — `calcularNotario` se importa y no se usa.
+   *
+   * La página pasó a `estimarFacturaNotarial` para poder enseñar la horquilla (min/medio/max)
+   * y el import antiguo se quedó. No cambia ningún importe —`calcularNotario` devuelve
+   * exactamente el punto medio que la app ya pinta— pero deja en la cabecera una dependencia
+   * muerta que sugiere un segundo camino de cálculo que no existe.
+   */
+  test.fail('HALLAZGO 5 — import muerto de calcularNotario en page.tsx', async () => {
+    const fuente = await leerFuente();
+    const usos = fuente.match(/calcularNotario/g) ?? [];
+    // Hoy aparece una sola vez: en el import.
+    expect(usos.length).not.toBe(1);
   });
 });

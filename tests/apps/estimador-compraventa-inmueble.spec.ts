@@ -8,6 +8,7 @@
  */
 import { test, expect, Page } from '@playwright/test';
 import { ITP_CCAA } from '../../data/itp-ccaa';
+import { PLUSVALIA_MUNICIPAL_META, IVA_INMUEBLES_2025 } from '../../data/fiscal/inmuebles';
 
 /**
  * Inspector — estimador-compraventa-inmueble (segmento fiscal, riesgo 1 CRÍTICO)
@@ -1563,5 +1564,225 @@ test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
     const tarjeta = page.locator('h4', { hasText: 'IRPF del vendedor' }).locator('xpath=..');
     await expect(tarjeta).not.toHaveText(/se restan la comisión, la gestoría y la plusvalía/);
     await expect(tarjeta).toContainText('la del comprador no cuenta');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Inspector — 02/09/2026 (segmento fiscal, riesgo 1 CRÍTICO)
+//
+// Tres casos resueltos A MANO antes de abrir el navegador. Cada tipo y cada
+// coeficiente sale de `data/fiscal` o de `data/itp-ccaa.ts`, nunca de memoria:
+//   · ITP general de Madrid = 6 → TIPOS_ITP_CCAA_2025 'Madrid' (data/fiscal/inmuebles.ts),
+//     leído por `tipoGeneralDe('Madrid')` en ITP_CCAA.madrid.tipoGeneral.
+//   · Escala de Cataluña 10/11/12/13 % → ITP_CCAA.cataluna.tramosProgresivos.
+//   · Aranceles → ARANCELES_NOTARIO (RD 1426/1989) y ARANCELES_REGISTRO (RD 1427/1989),
+//     con FACTURA_NOTARIAL (×1,5-2, medio ×1,75) y REGISTRO_CONCEPTOS.
+//   · Plusvalía → COEFICIENTES_IIVTNU_2025 y PLUSVALIA_MUNICIPAL_META.tipoOrientativo.
+//   · IRPF → TRAMOS_GANANCIAS_PATRIMONIALES_2025 vía calcularGananciaInmueble.
+// ═══════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', () => {
+  test('CASO 24 (normal) — Madrid, 200.000 €: las dos pestañas de la misma operación', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+
+    // ── Comprador ────────────────────────────────────────────────────────────
+    // ITP = 200.000 × 6 % (ITP_CCAA.madrid.tipoGeneral, sin escala progresiva) = 12.000
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
+    // Arancel notarial acumulado hasta 200.000 € = 358,43341 ; ×1,21 IVA = 433,704426 ;
+    // ×1,75 (punto medio de FACTURA_NOTARIAL) = 758,982746
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
+    // Registro = 186,212064 + 6,010121 (presentación) + 3,005061 (nota simple) = 195,227246 ;
+    // ×1,21 IVA = 236,224967
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    // 12.000 + 758,982746 + 236,224967 + 300 = 13.295,207713 → 6,6476 % del precio
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('13.295,21 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,65%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('213.295,21 €');
+
+    // ── Vendedor de la MISMA operación ──────────────────────────────────────
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '150000');
+    await rellenar(page, 'Años de propiedad', '10');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
+    // «Impuestos y gastos que pagaste al comprar», «mejoras» y «otros gastos» se dejan
+    // vacíos a propósito: son opcionales y `parseSpanishNumberOr` los lee como 0.
+
+    // Plusvalía municipal (art. 107 TRLHL, RDL 26/2021):
+    //   objetivo = 50.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años)
+    //              × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.000
+    //   real     = (200.000 − 150.000) × 50.000/120.000 × 25 % = 5.208,33
+    //   → el contribuyente elige el más favorable: 1.000 €
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1000,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (más favorable)',
+    );
+
+    // Art. 35 LIRPF (calcularGananciaInmueble):
+    //   adquisición = 150.000 + 0 gastos + 0 mejoras = 150.000
+    //   transmisión = 200.000 − 6.000 (comisión 3 %) − 1.000 (plusvalía) = 193.000
+    //   ganancia    = 193.000 − 150.000 = 43.000
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('150.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('193.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('43.000,00 €');
+    // TRAMOS_GANANCIAS_PATRIMONIALES_2025: 6.000×19 % + 37.000×21 % = 1.140 + 7.770 = 8.910
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8910,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('6000,00 €');
+    // 1.000 plusvalía + 6.000 comisión + 0 otros + 8.910 IRPF = 15.910 ; neto = 184.090
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('15.910,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('184.090,00 €');
+  });
+
+  test('CASO 25 (límite: el tramo MÁS ALTO de Cataluña) — 1.600.000 €, el 13 % que nadie pisaba', async ({
+    page,
+  }) => {
+    // El CASO 2 se queda en 1.000.000 € y por tanto en el tercer tramo (12 %). Este entra
+    // en el cuarto, que es el que fija RANGO_ITP.max = 13 y el que cita el bloque educativo.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('cataluna');
+    await rellenar(page, 'Precio de la vivienda', '1600000');
+
+    await expect(page.getByText('Esta comunidad aplica escala progresiva')).toBeVisible();
+
+    // ITP_CCAA.cataluna.tramosProgresivos = 10 % hasta 600.000 · 11 % hasta 900.000 ·
+    // 12 % hasta 1.500.000 · 13 % el resto:
+    //   600.000×10 % + 300.000×11 % + 600.000×12 % + 100.000×13 %
+    //   = 60.000 + 33.000 + 72.000 + 13.000 = 178.000
+    // Tipo EFECTIVO mostrado = 178.000 / 1.600.000 = 11,125 % → «11,13%»
+    expect(await valorTarjeta(page, /^ITP/)).toBe('178.000,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (11,13%)');
+
+    // Arancel notarial: 558,93946 + (1.600.000 − 601.012,10)×0,03 % = 858,63583 ;
+    //   ×1,21 = 1.038,949354 → horquilla 1.558,42-2.077,90 y medio 1.818,161370
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1818,16 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 1558,42 € y 2077,90 €',
+    );
+    // Registro: 306,51569 + (1.600.000 − 601.012,10)×0,020 % = 506,313274 (< tope 2.181,67)
+    //   + 6,010121 + 3,005061 = 515,328456 ; ×1,21 = 623,547431
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('623,55 €');
+
+    // 178.000 + 1.818,161370 + 623,547431 + 300 = 180.741,708801 → 11,2964 % del precio
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('180.741,71 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,30%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.780.741,71 €');
+    // Segunda mano: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+  });
+
+  // ⚠️ HALLAZGO ABIERTO (Inspector, 02/09/2026) — el NaN vuelve, ahora en el botón.
+  // `estimarGastosAdquisicion` se protege dos veces con la MISMA comparación rota:
+  //   disabled={parseSpanishNumber(precioCompraOriginal) <= 0}   (page.tsx:923)
+  //   if (precioC <= 0) return;                                  (page.tsx:417)
+  // Con el campo vacío `parseSpanishNumber` devuelve NaN y `NaN <= 0` es false, así que
+  // ni el botón se deshabilita ni la guarda corta: se calcula sobre NaN y el resultado se
+  // escribe con `formatNumber(NaN, 0)`, que devuelve la CADENA «No definido» — y va a
+  // parar a un campo de euros. Es el mismo defecto que el comentario de page.tsx:401
+  // dice haber cerrado («!(x > 0) y no «x <= 0»… el mismo bug que el hallazgo 512 venía
+  // a cerrar»), sin propagarlo a estas dos líneas.
+  // Medido: precio de venta 250.000 · compra 180.000 · 8 años. Pulsando el botón con el
+  // campo vacío, «No definido» se queda ahí, `parseSpanishNumberOr` lo lee como 0 y la
+  // adquisición sale 180.000,00 € con 13.255,00 € de IRPF; con el botón pulsado en su
+  // orden correcto escribe «11.767» y la adquisición sube a 191.767,00 €. El usuario ve
+  // el campo relleno y paga IRPF sobre una ganancia inflada.
+  test('CASO 26 (debe rechazarse) — «Estimar por mí» sin precio de compra no puede escribir texto en un campo de euros', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    // «Precio de compra original» se deja VACÍO a propósito: es lo que el botón necesita.
+
+    // Lo correcto es que el botón esté deshabilitado mientras no haya precio de compra.
+    await expect(page.getByRole('button', { name: /Estimar por mí/ })).toBeDisabled();
+
+    // Y, si aun así se pulsa, el campo de euros no puede acabar con una cadena dentro.
+    await page.getByRole('button', { name: /Estimar por mí/ }).click({ force: true });
+    await expect(
+      page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]'),
+    ).not.toHaveValue('No definido');
+  });
+
+  // Control del CASO 26: con el precio de compra relleno el botón SÍ estima, y lo hace
+  // bien. Es lo que convierte el 26 en un defecto demostrado y no en una preferencia.
+  test('CASO 26 bis (control) — con el precio de compra relleno, el botón estima y no escribe texto', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '180000');
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+
+    // 180.000 × 6 % (ITP_CCAA.madrid.tipoGeneral) = 10.800
+    //   + notaría 737,808  (arancel 421,604343 × 1,75)
+    //   + registro 228,957 (arancel 180,212064 + 9,015182, con el 21 % de IVA)
+    //   = 11.766,765 → formatNumber(…, 0) = «11.767»
+    await expect(
+      page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]'),
+    ).toHaveValue('11.767');
+  });
+
+  // ⚠️ HALLAZGO ABIERTO (dato) — el bloque educativo escribe a mano el tipo con el que
+  // ESTA calculadora liquida la plusvalía («un tipo del 25%») y el techo legal («máximo
+  // legal del 30%»), pudiendo leerlos de PLUSVALIA_MUNICIPAL_META (tipoOrientativo y
+  // tipoMaximoLegal, data/fiscal/inmuebles.ts), que es de donde los toma el motor. Hoy
+  // los tres coinciden; el día que el triaje fiscal mueva `tipoOrientativo`, el importe
+  // cambiará y la frase que dice «esta calculadora aplica…» quedará mintiendo sobre la
+  // propia calculadora. Es el mismo caso de RANGO_ITP y RANGO_AJD, ya derivados.
+  // Este test es el guardián mientras el literal siga ahí: no falla hoy, falla el día
+  // de la divergencia.
+  test('REGRESIÓN (dato) — el tipo de plusvalía del bloque educativo debe seguir a data/fiscal', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // `.first()`: «plusvalía municipal» también titula una pregunta de la FAQ más abajo.
+    const tarjeta = page
+      .locator('div[class*="contentCard"]')
+      .filter({ has: page.locator('h4', { hasText: 'Plusvalía municipal' }) })
+      .first();
+    await expect(tarjeta).toContainText(`tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}%`);
+    await expect(tarjeta).toContainText(
+      `máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%`,
+    );
+  });
+
+  // Mismo caso para los dos tipos de IVA del bloque educativo, que la propia página ya
+  // importa de data/fiscal y usa en el aviso de VPO (page.tsx:826-828) pero escribe a
+  // mano dos pantallas más abajo.
+  test('REGRESIÓN (dato) — los tipos de IVA del bloque educativo deben seguir a data/fiscal', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('h4', { hasText: 'Primera mano' }).locator('xpath=..');
+    await expect(tarjeta).toContainText(`IVA al ${IVA_INMUEBLES_2025.obraNueva}%`);
+    await expect(tarjeta).toContainText(`IVA al ${IVA_INMUEBLES_2025.local}%`);
+  });
+
+  // ⚠️ HALLAZGO ABIERTO (accesibilidad) — 14 emojis decorativos en nodo propio sin
+  // `aria-hidden="true"` (page.tsx:626, 864, 1177, 1401, 1412, 1422, 1435, 1561, 1567,
+  // 1573, 1579, 1585, 1593, 1605). El más visible es el 📍 que precede al nombre de la
+  // comunidad autónoma: un lector de pantalla lo anuncia justo delante del dato que más
+  // mueve el resultado. El resto de la app sí los marca.
+  test('CASO 27 (accesibilidad) — el icono de la comunidad es decorativo y debe ir oculto', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await expect(page.locator('span[class*="infoCcaaIcon"]')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
   });
 });

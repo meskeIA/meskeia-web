@@ -30,6 +30,10 @@
  *      en territorio y precio que ninguna ronda había usado (Murcia 40.000 € y Melilla
  *      30.000 €), que además vuelven a cerrar de cero los cinco defectos de la tanda 2. Al
  *      final, UN hallazgo abierto con `test.fail()`.
+ *   9. RE-INSPECCIÓN 02/09/2026 — CASOS 14-16, otra vez en territorio virgen: el País Vasco
+ *      con un perfil de comprador que ninguna ronda había elegido, la escala de Baleares en
+ *      su tramo MÁS ALTO (el 13 %, el techo de toda la tabla) y la plusvalía municipal a la
+ *      que le falta UN solo dato. Al final, UN hallazgo abierto con `test.fail()`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -1365,3 +1369,277 @@ test('527 — la nota de cabecera ya no contradice el aviso de IGIC/IPSI en Meli
   expect(nota).toMatch(/Canarias, Ceuta y Melilla/i);
   expect(nota).not.toMatch(/que no depende de la comunidad autónoma/i);
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 02/09/2026 — tres casos en zonas que ninguna ronda anterior pisó.
+//
+// Territorio y perfil elegidos a propósito para que las cifras no puedan venir copiadas de
+// un caso ya escrito: el País Vasco (el ITP más bajo de la tabla, 4 %, y el único con
+// `ajd: 0`) con el perfil «discapacidad», que ninguna ronda había seleccionado; y Baleares
+// en su QUINTO tramo, el 13 %, que es el techo de todas las escalas del catálogo y hasta hoy
+// no lo había ejercitado ningún test de esta app.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//  - País Vasco 4 % y Baleares 8 % → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
+//    leído por `tipoGeneralDe()` en `data/itp-ccaa.ts`.
+//  - Escala progresiva de Baleares (8/9/10/12/13 %) y `ajd: 0` del País Vasco → `ITP_CCAA`
+//    en `data/itp-ccaa.ts`, aplicada por `calcularITPProgresivo` a través de `importeITP`.
+//  - Reducidos y su elección → `elegirTipoITP` (mismo fichero), con `viviendaHabitual: false`
+//    porque un trastero suelto nunca lo es.
+//  - Aranceles → `ARANCELES_NOTARIO` (RD 1426/1989 nº 2) × `FACTURA_NOTARIAL` (horquilla
+//    ×1,5-×2; la tarjeta enseña el punto medio ×1,75) y `ARANCELES_REGISTRO` (RD 1427/1989
+//    nº 2) + `REGISTRO_CONCEPTOS` (presentación 6,010121 € y nota simple 3,005061 €). Los
+//    dos terminan en `× 1.21` de IVA.
+//  - Plusvalía municipal → `calcularPlusvaliaMunicipal` sobre `COEFICIENTES_IIVTNU_2025`
+//    (1 año → 0,13) y `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` = 25 %.
+//  - IRPF → `calcularGananciaInmueble` (art. 35 LIRPF) sobre
+//    `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000).
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la plusvalía incompleta', () => {
+  /**
+   * CASO 14 (NORMAL) — País Vasco, segunda mano, 22.000 €, perfil «Persona con discapacidad».
+   *
+   * Dos cosas que ninguna ronda anterior había comprobado a la vez: el tipo general más bajo
+   * de la tabla (4 %) y un perfil de comprador para el que esa comunidad NO tiene ningún
+   * reducido con ese nombre. `elegirTipoITP` no encuentra candidatos por perfil, así que cae
+   * al tipo general — y aun así tiene que ofrecer como oportunidad el reducido que no es de
+   * colectivo y que un trastero sí podría alcanzar (zonas despobladas de Álava, 1,5 %, cuyas
+   * condiciones no incluyen «Vivienda habitual»).
+   */
+  test('CASO 14 (normal) — País Vasco, segunda mano, 22.000 €, comprador con discapacidad', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('pais-vasco');
+    await selectPerfil(page).selectOption('discapacidad');
+    await rellenar(page, 'Precio del trastero', '22000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // ITP = 22.000 × 4 % = 880,00. El 4 % es TIPOS_ITP_CCAA_2025 → { ccaa: 'País Vasco',
+    // tipo: 4 }. El País Vasco no tiene escala progresiva, así que el tipo efectivo que
+    // rotula la tarjeta coincide con el nominal.
+    // Ninguno de sus tres reducidos se aplica: «Vivienda habitual (hasta 120 m²)» (2,5 %) y
+    // «Familia numerosa» (2,5 %) exigen vivienda habitual —y la app pasa
+    // `viviendaHabitual: false`—, y «Zonas despobladas (Álava)» (1,5 %) exige un municipio
+    // que la herramienta no pregunta. Además NINGUNO se llama «discapacidad», así que la
+    // lista de candidatos por perfil sale vacía y manda el tipo general.
+    expect(await valorTarjeta(page, 'ITP (4,00%)')).toBe('880,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (4,00%)')).toContain('País Vasco');
+
+    // El reducido que no es de colectivo y que no exige vivienda habitual sí tiene que
+    // enseñarse como oportunidad, con su cifra: es el criterio de `elegirTipoITP`, que lo
+    // ofrece «como oportunidad, nunca como cifra» del importe liquidado.
+    const aviso = await texto(page.locator('[class*="avisoReducidos"]').first());
+    expect(aviso).toContain('1,50%');
+    expect(aviso).toContain('Zonas despobladas (Álava)');
+
+    // Notaría — RD 1426/1989 nº 2 (ARANCELES_NOTARIO), dos tramos:
+    //   tramo 1 (hasta 6.010,12 €)             →                            90,15
+    //   tramo 2 (6.010,12→30.050,61, 0,45 %)   → 15.989,88 × 0,0045 =       71,95446
+    //   arancel sin IVA                        =                          162,10446
+    //   con el 21 % de IVA                     = 162,10446 × 1,21 =       196,1463966
+    // FACTURA_NOTARIAL: ×1,5 = 294,2195949 · ×2 = 392,2927932 · medio ×1,75 = 343,25619405
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('343,26 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('294,22 €');
+    expect(notaria).toContain('392,29 €');
+
+    // Registro — RD 1427/1989 nº 2 (ARANCELES_REGISTRO) + los dos fijos de REGISTRO_CONCEPTOS:
+    //   tramo 1                                →                            24,04
+    //   tramo 2 (0,175 %)                      → 15.989,88 × 0,00175 =      27,98229
+    //   inscripción                            =                            52,02229
+    //   + presentación 6,010121 + nota simple 3,005061 =                     61,037472
+    //   con el 21 % de IVA                     = 61,037472 × 1,21 =         73,85534112
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('73,86 €');
+
+    // ITP_CCAA['pais-vasco'].ajd = 0, y además es segunda mano: no hay tarjeta de AJD.
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    // Total = 880 + 343,25619405 + 73,85534112 + 300 = 1.597,11153517
+    //   % sobre el precio = 1.597,11153517 / 22.000 = 7,259598 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1597,11 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('7,26%');
+
+    // Coste total = 22.000 + 1.597,11153517 = 23.597,11153517
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('23.597,11 €');
+  });
+
+  /**
+   * CASO 15 (LÍMITE) — Baleares, 2.500.000 €: el TRAMO MÁS ALTO de todas las escalas del
+   * catálogo. `ITP_CCAA.baleares.tramosProgresivos` es la única escala de cinco tramos, y su
+   * quinto (13 %) marca el máximo que cita `FISCAL_INMUEBLES_META.nota`. Es también donde más
+   * se separan el tipo plano y el progresivo: el 8 % nominal daría 200.000 € y la escala da
+   * 275.000 €, 75.000 € de diferencia.
+   *
+   * El precio es deliberadamente absurdo para un trastero: lo que se prueba es la ARITMÉTICA
+   * de la escala, y solo por encima de 2.000.000 € se alcanza el quinto tramo.
+   */
+  test('CASO 15 (límite) — Baleares, 2.500.000 €: los cinco tramos hasta el 13 %', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('baleares');
+    await selectPerfil(page).selectOption('general');
+    await rellenar(page, 'Precio del trastero', '2500000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // La app tiene que ANUNCIAR la escala que va a aplicar, con sus cinco tipos.
+    await expect(page.getByText('8% → 9% → 10% → 12% → 13%')).toBeVisible();
+
+    // ITP progresivo (calcularITPProgresivo sobre ITP_CCAA.baleares.tramosProgresivos):
+    //         0 →   400.000  (  400.000) ×  8 % =  32.000
+    //   400.000 →   600.000  (  200.000) ×  9 % =  18.000
+    //   600.000 → 1.000.000  (  400.000) × 10 % =  40.000
+    // 1.000.000 → 2.000.000  (1.000.000) × 12 % = 120.000
+    // 2.000.000 → 2.500.000  (  500.000) × 13 % =  65.000
+    //                                     TOTAL = 275.000,00
+    //   tipo EFECTIVO = 275.000 / 2.500.000 = 11,00 % — y tiene que ser el efectivo el que
+    //   rotule la tarjeta: el 8 % nominal de la tabla desmentiría a la cifra de al lado.
+    expect(await valorTarjeta(page, 'ITP (11,00%)')).toBe('275.000,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (11,00%)')).toContain('Islas Baleares');
+
+    // Ningún reducido de Baleares está al alcance: los cuatro llevan `valorMaximo: 270151`,
+    // muy por debajo de este precio, así que ni se aplican ni se ofrecen como oportunidad.
+    await expect(page.getByText(/Podrías pagar menos/)).toHaveCount(0);
+
+    // Notaría — ARANCELES_NOTARIO, seis tramos acumulados hasta 2.500.000 €:
+    //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %
+    //         + 450.759,07×0,05 % + 1.898.987,90×0,03 %
+    //   = 90,15 + 108,182205 + 45,0759 + 90,15182 + 225,379535 + 569,69637 = 1.128,63583
+    //   con el 21 % de IVA = 1.365,6493543 · medio ×1,75 = 2.389,886370025
+    //   horquilla: ×1,5 = 2.048,47403145 · ×2 = 2.731,2987086
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('2389,89 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('2048,47 €');
+    expect(notaria).toContain('2731,30 €');
+
+    // Registro — ARANCELES_REGISTRO, seis tramos acumulados:
+    //   24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 %
+    //         + 450.759,07×0,030 % + 1.898.987,90×0,020 %
+    //   = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 135,227721 + 379,79758 = 686,3132735
+    //   sigue por DEBAJO del tope REGISTRO_MAXIMO (2.181,67), así que no se recorta
+    //   + presentación 6,010121 + nota simple 3,005061 = 695,3284555
+    //   con el 21 % de IVA = 841,34743116
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('841,35 €');
+
+    // Total = 275.000 + 2.389,886370025 + 841,34743116 + 300 = 278.531,23380119
+    //   % sobre el precio = 278.531,2338 / 2.500.000 = 11,141249 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.531,23 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,14%');
+
+    // Coste total = 2.500.000 + 278.531,2338 = 2.778.531,2338
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.531,23 €');
+  });
+
+  /**
+   * CASO 16 (DEBE RECHAZARSE) — la plusvalía municipal con UN solo dato ausente.
+   *
+   * Los años de propiedad son el multiplicador de la base objetiva (art. 107.4 TRLHL) y no
+   * admiten valor por defecto: `COEFICIENTES_IIVTNU_2025` va de 0,08 a 0,45, más de cinco
+   * veces de diferencia. Con el campo a 0 la app no puede inventar un coeficiente ni escribir
+   * «0,00 €» —que se leería como «no pagas nada»—, y el neto no puede presentarse como
+   * definitivo mientras esa partida falte.
+   *
+   * Se prueban las dos caras: sin el dato la plusvalía se declara SIN CALCULAR y el neto se
+   * rotula como techo; con el dato puesto (1 año, el mínimo que admite el campo) aparece la
+   * cifra exacta y el neto deja de ser un techo.
+   */
+  test('CASO 16 (debe rechazarse) — sin años de propiedad no hay plusvalía: ni 0,00 € ni NaN', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '20000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '12000');
+    await rellenar(page, 'Valor catastral del suelo', '6000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '15000');
+
+    // Años a 0 y SIN salir del campo, que es donde el `min={1}` de NumberInput todavía no ha
+    // actuado: es el estado en el que el motor recibe de verdad un 0.
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+    await anios.fill('0');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    await expect(page.getByText('No definido')).toHaveCount(0);
+    // Sobre el texto completo y en mayúsculas: `getByText('NaN')` no distingue mayúsculas y
+    // casaría con «ganancia», que lleva «nan» dentro.
+    expect(await page.locator('body').innerText()).not.toContain('NaN');
+
+    // El resto del art. 35 LIRPF sí se calcula, SIN plusvalía en el valor de transmisión:
+    //   comisión 3 % (la que trae por defecto) = 20.000 × 3 % = 600
+    //   valor de transmisión = 20.000 − 600 − 0 = 19.400 · valor de adquisición = 12.000
+    //   ganancia = 7.400 → 6.000 × 19 % + 1.400 × 21 % = 1.140 + 294 = 1.434,00
+    //   total gastos = 0 (plusvalía sin calcular) + 600 + 0 + 1.434 = 2.034
+    //   neto = 20.000 − 2.034 = 17.966,00
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('19.400,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7400,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1434,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2034,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.966,00 €');
+    // …y ese neto TIENE que anunciarse como techo, no como lo que se recibe.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
+
+    // Con el dato puesto (el blur normaliza el 0 al mínimo declarado, 1 año):
+    await anios.blur();
+    await expect(anios).toHaveValue('1');
+    // Plusvalía — COEFICIENTES_IIVTNU_2025 da 0,13 a 1 año:
+    //   objetivo (art. 107.4): 6.000 × 0,13 = 780 → × 25 % = 195,00
+    //     (el 25 % es PLUSVALIA_MUNICIPAL_META.tipoOrientativo, no el 30 % máximo legal)
+    //   real (art. 107.5): (20.000 − 12.000) × (6.000/15.000) × 25 % = 8.000 × 0,4 × 0,25 = 800
+    //   el contribuyente elige el más favorable → 195,00 €
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('195,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
+    //   valor de transmisión = 20.000 − 600 − 195 = 19.205 · ganancia = 19.205 − 12.000 = 7.205
+    //   IRPF = 6.000 × 19 % + 1.205 × 21 % = 1.140 + 253,05 = 1.393,05
+    //   total gastos = 195 + 600 + 0 + 1.393,05 = 2.188,05 · neto = 20.000 − 2.188,05
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('19.205,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7205,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1393,05 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2188,05 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.811,95 €');
+    // Ya no falta nada: el neto deja de ser un techo.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('realmente recibes');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGO ABIERTO — re-inspección del 02/09/2026.
+// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
+// Cuando se repare, se le quita la marca y queda como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ❌ ABIERTO (medio) — operativa.
+// Cuando la plusvalía no se puede calcular, la app manda al usuario a rellenar campos que YA
+// tiene rellenos y no nombra el que de verdad falta. El texto de la tarjeta es fijo —«No
+// calculada (faltan datos)»— y el del neto también: «añade los años de propiedad y el valor
+// catastral del suelo». La guarda del `useMemo`, en cambio, exige TRES cosas
+// (`valorSuelo > 0 && anios > 0 && precioC > 0`), y el precio de compra original no aparece
+// en ninguno de los dos mensajes.
+// Es el hallazgo 437, que la app hermana `simulador-gastos-compraventa-garaje` reparó
+// construyendo la lista `faltan` con lo que de verdad está vacío («No calculada (falta el
+// valor catastral del suelo)», etc.). A esta app no llegó.
+// Caso: 20.000 € de venta · 12.000 € de compra · suelo 6.000 · total catastral 15.000 · años
+//       de propiedad VACÍO → esperado que el aviso nombre los años de propiedad y NO mande a
+//       rellenar el valor catastral del suelo, que ya vale 6.000 · obtenido «No calculada
+//       (faltan datos)» en la tarjeta y «Techo: aún NO incluye la plusvalía municipal (añade
+//       los años de propiedad y el valor catastral del suelo)» sobre un neto de 17.966,00 €.
+test.fail(
+  'ABIERTO (operativa) — el aviso de plusvalía manda a rellenar un campo que ya está relleno',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '20000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '12000');
+    await rellenar(page, 'Valor catastral del suelo', '6000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '15000');
+    // Los años de propiedad son lo ÚNICO que falta.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+
+    // La aserción de fondo: no se puede pedir un dato que el usuario ya ha dado.
+    const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(neto).not.toContain('valor catastral del suelo');
+  },
+);
