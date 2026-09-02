@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -89,9 +89,13 @@ function calcularMinimosPersonales(
   // Adicional por hijos menores de 3 años
   minimos += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
 
-  // En familia monoparental, los mínimos por descendientes se incrementan
-  if (situacion === 'familia_monoparental' && numHijos > 0) {
-    minimos += 2150; // Incremento primer descendiente
+  // Reducción por tributación conjunta (art. 84.2.4º LIRPF): solo aplica cuando
+  // la unidad familiar declara conjunta, es decir, un único perceptor de ingresos
+  // (matrimonio con un solo ingreso, o unidad monoparental con hijos).
+  if (situacion === 'casado_un_ingreso') {
+    minimos += REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental;
+  } else if (situacion === 'familia_monoparental' && numHijos > 0) {
+    minimos += REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
   }
 
   return minimos;

@@ -66,6 +66,16 @@ export const MINIMOS_IRPF_2025 = {
   discapacidad_65_mas: 9000,
 };
 
+// Reducción por tributación conjunta (art. 84.2.4º LIRPF): se resta de la base
+// imponible general antes de aplicar la tarifa, igual que los mínimos personales.
+// Solo aplica si la unidad familiar opta por declarar conjunta (un cónyuge sin
+// ingresos, o unidad monoparental); con dos ingresos separados no hay tributación
+// conjunta y por tanto no procede.
+export const REDUCCION_TRIBUTACION_CONJUNTA_2025 = {
+  biparental:   3400, // matrimonio con un solo perceptor de ingresos
+  monoparental: 2150, // un progenitor + hijos (art. 82.1.2ª LIRPF)
+};
+
 // ─── Seguridad Social cuenta ajena ──────────────────────────────────────────
 
 export const FISCAL_SS_CUENTA_AJENA_META = {

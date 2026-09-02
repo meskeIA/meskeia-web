@@ -54,11 +54,15 @@ import { test, expect, Page } from '@playwright/test';
  * Los 5 tests de arriba se re-ejecutaron sin tocar el código de la app: los 5
  * siguen en verde. Además de repetir CASO 1 (30.000 €) con 80.000 € (tope de
  * BASES_SS_2026.maxima + entra en el tramo del 45 %) como segundo ancla al
- * mismo caso límite, esta ronda encontró un hallazgo nuevo (ver test
- * «Hallazgo — situación familiar» más abajo): el selector «Casado/a (un solo
- * ingreso)» no aplica ninguna reducción frente a «Soltero/a» — la reducción
- * por tributación conjunta (art. 84.2.4º LIRPF, ~3.400 €/año) no existe en
- * `calcularMinimosPersonales` ni en `data/fiscal`.
+ * mismo caso límite, esta ronda encontró un hallazgo nuevo (hallazgo 569, ver
+ * test más abajo): el selector «Casado/a (un solo ingreso)» no aplicaba
+ * ninguna reducción frente a «Soltero/a».
+ *
+ * ── Reparado 02/09/2026 (hallazgo 569) ───────────────────────────────────────
+ * `data/fiscal/irpf.ts` gana `REDUCCION_TRIBUTACION_CONJUNTA_2025` (art. 84.2.4º
+ * LIRPF: 3.400 €/año biparental con un solo perceptor, 2.150 €/año monoparental)
+ * y `calcularMinimosPersonales` la aplica según `situacion`. El caso monoparental
+ * ya sumaba 2.150 € a mano; ahora sale de la misma constante centralizada.
  */
 
 const RUTA = '/estimador-sueldo-neto/';
@@ -243,22 +247,16 @@ test('Hallazgo 561 — los 4 botones de la app llevan type="button"', async ({ p
 
 // ─────────────────────────────────────────────────────────────────────────────
 /**
- * Hallazgo (re-inspección 31/08/2026) — «Casado/a (un solo ingreso)» es un selector
- * sin efecto: `calcularMinimosPersonales` solo distingue 'familia_monoparental'
- * (+2.150 €, y solo con hijos); para 'casado_un_ingreso' devuelve EXACTAMENTE el
- * mismo mínimo que 'soltero'. En la declaración conjunta real, un matrimonio con un
- * solo perceptor de rentas del trabajo tiene derecho a la reducción del art. 84.2.4º
- * LIRPF (~3.400 €/año de reducción en la base imponible) — reducción que no está en
- * `data/fiscal` ni en esta app. Resultado: para el mismo bruto, el estimador devuelve
- * el MISMO neto para «Soltero/a» y para «Casado/a (un solo ingreso)», cuando en la
- * realidad el segundo pagaría menos IRPF. Este test documenta el comportamiento
- * ACTUAL (dos situaciones distintas dan resultados idénticos) para que un futuro
- * cambio en `calcularMinimosPersonales` que trate a 'casado_un_ingreso' de forma
- * distinta a 'soltero' se note aquí — momento en el que este test habrá que
- * actualizarlo a la baja (fallará porque los importes YA NO coinciden, lo cual será
- * la señal de que el hallazgo se reparó).
+ * Hallazgo 569 (reparado 02/09/2026) — «Casado/a (un solo ingreso)» debe aplicar
+ * la reducción por tributación conjunta del art. 84.2.4º LIRPF (3.400 €/año en
+ * la base imponible) frente a «Soltero/a». Con 30.000 € brutos:
+ *   RNT 26.050 € - reducción art.20 (2.364 €) = base imponible 23.686 €
+ *   Soltero:  base liquidable 23.686 - 5.550          = 18.136 € → IRPF 3.730,14 €
+ *   Casado 1: base liquidable 23.686 - (5.550 + 3.400) = 14.736 € → IRPF 2.914,14 €
+ *   (12.450 × 19 % + 2.286 × 24 % = 2.365,50 + 548,64 = 2.914,14 €)
+ *   Neto casado 1 ingreso = 30.000 - 1.950 (SS) - 2.914,14 = 25.135,86 €
  */
-test('Hallazgo — «Casado/a (un solo ingreso)» da el mismo neto que «Soltero/a» (falta la reducción por tributación conjunta, art. 84.2.4 LIRPF)', async ({ page }) => {
+test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF que «Soltero/a» por la reducción de tributación conjunta', async ({ page }) => {
   await page.goto(RUTA);
   await calcular(page, '30000');
   const netoSoltero = await valorTarjeta(page, 'Salario Neto Anual');
@@ -272,8 +270,8 @@ test('Hallazgo — «Casado/a (un solo ingreso)» da el mismo neto que «Soltero
   const netoCasadoUnIngreso = await valorTarjeta(page, 'Salario Neto Anual');
   const irpfCasadoUnIngreso = await filaDesglose(page, 'Retención IRPF anual');
 
-  // Comportamiento actual (el hallazgo): idénticos byte a byte al soltero.
-  // Si esto deja de cumplirse, la reducción por tributación conjunta ya se aplica.
-  expect(netoCasadoUnIngreso).toBe(netoSoltero);
-  expect(irpfCasadoUnIngreso).toBe(irpfSoltero);
+  // Reparado: ya NO coinciden con el soltero, y el importe es el que exige el art. 84.2.4º.
+  expect(irpfCasadoUnIngreso).toBe('2914,14 €');
+  expect(netoCasadoUnIngreso).toBe('25.135,86€');
+  expect(netoCasadoUnIngreso).not.toBe(netoSoltero);
 });
