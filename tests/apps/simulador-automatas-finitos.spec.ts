@@ -150,3 +150,58 @@ test.describe('Caso 3 · "0" (un 0, número impar) → RECHAZADA', () => {
     await expect(page.locator('[role="alert"]', { hasText: 'RECHAZADA' })).toBeVisible();
   });
 });
+
+// ============================================================
+// CASO 4 — REGRESIÓN: editar el autómata a media animación no debe tumbar la app
+// ============================================================
+//
+// Bug real, detectado en el digest del 03/09/2026: 4 caídas a la pantalla de error en
+// un día, todas con `TypeError: Cannot read properties of undefined (reading 'posicion')`.
+//
+// Mecanismo: `validacion` se recalcula con [cadena, tipo, estados, transiciones], pero
+// `pasoActual` solo se reseteaba al cambiar la cadena, cargar un ejemplo, limpiar el
+// lienzo, reiniciar o cambiar de tipo. Editando el AUTÓMATA a media animación, los pasos
+// se regeneran más cortos y el índice se queda fuera de rango: la cinta de la cadena leía
+// `validacion.pasos[pasoActual].posicion` sin guarda y reventaba durante el render.
+//
+// TRAZA A MANO — «Pares de 0» con la cadena "0101": 4 símbolos + inicial = 5 pasos, se
+// avanza hasta el 5/5. Al borrar q1 se van con él sus tres transiciones (q0-0->q1,
+// q1-0->q0, q1-1->q1) y solo queda q0-1->q0, así que "0101" ya no pasa del primer
+// símbolo: pasos = [inicial, «sin transición desde q0 con 0»] = 2. El índice 4 apunta
+// a un paso que ya no existe.
+test.describe('Caso 4 · regresión: borrar un estado a media animación', () => {
+  test('la app sobrevive y reencaja el paso en el último válido', async ({ page }) => {
+    const erroresDePagina: string[] = [];
+    page.on('pageerror', (err) => erroresDePagina.push(err.message));
+
+    // 1. Animación avanzada hasta el último paso de "0101" (5 de 5).
+    await page.locator('#cadena').fill('0101');
+    await page.getByRole('button', { name: '▶ Validar' }).click();
+    await page.getByRole('button', { name: '⏸ Pausar' }).click();
+    const pasoSiguiente = page.getByRole('button', { name: 'Paso siguiente ▶' });
+    for (let i = 0; i < 4; i++) {
+      await pasoSiguiente.click();
+    }
+    await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
+      'Paso 5 / 5',
+    );
+
+    // 2. Se borra q1 con la herramienta «Eliminar» mientras la animación sigue en el 5.
+    await page.getByRole('button', { name: 'Eliminar' }).click();
+    // El círculo es lo que recibe el clic (la etiqueta <text> queda debajo de él); las
+    // coordenadas son las que el ejemplo «Pares de 0» le da a q1 en EJEMPLOS.
+    await page.locator('svg circle[cx="520"][cy="250"]').click();
+
+    // 3. La app sigue en pie: antes del arreglo, aquí quedaba la pantalla de error.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Simulador de Autómatas Finitos',
+    );
+    expect(erroresDePagina).toEqual([]);
+
+    // 4. Y el paso se reencaja en el último válido, mostrando el efecto de la edición.
+    await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
+      'Paso 2 / 2',
+    );
+    await expect(page.locator('[role="alert"]', { hasText: 'SIN TRANSICIÓN' })).toBeVisible();
+  });
+});

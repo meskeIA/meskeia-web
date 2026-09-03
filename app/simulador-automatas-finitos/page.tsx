@@ -347,6 +347,17 @@ export default function SimuladorAutomatasFinitos() {
     [cadena, tipo, estados, transiciones],
   );
 
+  // Si el autómata se edita a media animación (borrar una transición, quitar un estado,
+  // cambiar cuál es final), la validación se regenera con menos pasos y el índice puede
+  // quedar fuera de rango. Se reencaja en el último paso válido, que además es el que
+  // muestra el resultado: así el usuario ve de inmediato el efecto de su edición.
+  useEffect(() => {
+    if (pasoActual >= validacion.pasos.length) {
+      setPasoActual(validacion.pasos.length - 1);
+      setReproduciendo(false);
+    }
+  }, [validacion.pasos.length, pasoActual]);
+
   // Estados activos según paso actual de la animación
   const estadosActivos = useMemo<string[]>(() => {
     if (pasoActual < 0) return [];
@@ -1030,7 +1041,8 @@ export default function SimuladorAutomatasFinitos() {
           {cadena.length > 0 && (
             <div className={styles.cintaValidacion}>
               {Array.from(cadena).map((c, i) => {
-                const pasoLeido = pasoActual >= 0 ? validacion.pasos[pasoActual].posicion : -1;
+                const pasoLeido =
+                  pasoActual >= 0 ? (validacion.pasos[pasoActual]?.posicion ?? -1) : -1;
                 const yaLeido = i < pasoLeido;
                 const actual = i === pasoLeido - 1 && pasoActual > 0;
                 return (
