@@ -13,6 +13,12 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorKmeans.module.css';
+import {
+  escalarAlLienzo,
+  parsearDatosTabulares,
+  MAX_PUNTOS_IMPORTADOS,
+  type PuntoDato,
+} from './parseo-datos';
 
 type MetodoInit = 'aleatorio' | 'kmeans++';
 type DatasetPreset = 'separados' | 'solapados' | 'alargado' | 'tamanos';
@@ -46,6 +52,27 @@ interface ResultadoElbow {
   inertia: number;
 }
 
+/** Lo que se cuenta a quien acaba de importar su tabla: qué se ha leído y con qué escala */
+interface ResumenImportado {
+  n: number;
+  nombres: { x: string; y: string };
+  rangoX: { min: number; max: number };
+  rangoY: { min: number; max: number };
+  filasIgnoradas: number;
+  recortadoA: number | null;
+}
+
+/** Ejemplo de la caja de texto: edad e ingresos anuales, dos magnitudes muy dispares */
+const EJEMPLO_DATOS = `edad;ingresos
+24;18500
+27;21000
+31;24500
+44;52000
+47;58000
+51;61500
+38;33000
+41;35500`;
+
 const COLORES_CLUSTER: string[] = [
   '#2E86AB', // azul meskeIA
   '#C73E1D', // rojo
@@ -60,6 +87,11 @@ const COLORES_CLUSTER: string[] = [
 const ANCHO_LIENZO = 600;
 const ALTO_LIENZO = 400;
 const MARGEN_LIENZO = 30;
+
+/** Los datos importados pueden ser enteros o decimales: no forzar 2 decimales a una edad */
+function formatoValor(valor: number): string {
+  return Number.isInteger(valor) ? formatNumber(valor, 0) : formatNumber(valor, 2);
+}
 
 let contadorIds = 0;
 function nuevoId(): string {
@@ -364,6 +396,9 @@ export default function SimuladorKmeans() {
   const [resultadoElbow, setResultadoElbow] = useState<ResultadoElbow[] | null>(null);
   const [arrastrandoId, setArrastrandoId] = useState<string | null>(null);
   const [ejecutandoAuto, setEjecutandoAuto] = useState<boolean>(false);
+  const [textoDatos, setTextoDatos] = useState<string>('');
+  const [errorImportacion, setErrorImportacion] = useState<string | null>(null);
+  const [resumenImportado, setResumenImportado] = useState<ResumenImportado | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const animTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -461,6 +496,7 @@ export default function SimuladorKmeans() {
   const limpiarPuntos = useCallback(() => {
     detenerEjecucion();
     setPuntos([]);
+    setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
     setIteracionActual(0);
@@ -468,6 +504,55 @@ export default function SimuladorKmeans() {
     setInertia(0);
     setResultadoElbow(null);
   }, [detenerEjecucion]);
+
+  // ===== Importar datos propios =====
+  const colocarPuntos = useCallback((valores: PuntoDato[]) => {
+    const { escalados, rangoX, rangoY } = escalarAlLienzo(
+      valores,
+      ANCHO_LIENZO,
+      ALTO_LIENZO,
+      MARGEN_LIENZO,
+    );
+    setPuntos(escalados.map((p) => ({ id: nuevoId(), x: p.x, y: p.y, cluster: -1 })));
+    setCentroides([]);
+    setAsignaciones([]);
+    setIteracionActual(0);
+    setConvergido(false);
+    setInertia(0);
+    setResultadoElbow(null);
+    return { rangoX, rangoY, n: escalados.length };
+  }, []);
+
+  const importarTexto = useCallback((texto: string) => {
+    const resultado = parsearDatosTabulares(texto);
+    if (!resultado.ok) {
+      setErrorImportacion(resultado.error);
+      setResumenImportado(null);
+      return;
+    }
+    detenerEjecucion();
+    const { puntos: valores, nombres, filasIgnoradas, recortadoA } = resultado.datos;
+    const { rangoX, rangoY, n } = colocarPuntos(valores);
+    setErrorImportacion(null);
+    setResumenImportado({ n, nombres, rangoX, rangoY, filasIgnoradas, recortadoA });
+  }, [colocarPuntos, detenerEjecucion]);
+
+  const cargarFichero = useCallback((evento: React.ChangeEvent<HTMLInputElement>) => {
+    const fichero = evento.target.files?.[0];
+    evento.target.value = '';   // permite volver a elegir el mismo archivo
+    if (!fichero) return;
+    const lector = new FileReader();
+    lector.onload = () => {
+      const contenido = typeof lector.result === 'string' ? lector.result : '';
+      setTextoDatos(contenido);
+      importarTexto(contenido);
+    };
+    lector.onerror = () => {
+      setErrorImportacion('No se ha podido leer el archivo. Prueba a abrirlo y pegar su contenido.');
+      setResumenImportado(null);
+    };
+    lector.readAsText(fichero);
+  }, [importarTexto]);
 
   const cargarPreset = useCallback((preset: DatasetPreset) => {
     detenerEjecucion();
@@ -477,6 +562,7 @@ export default function SimuladorKmeans() {
     else if (preset === 'alargado') nuevos = presetAlargado();
     else nuevos = presetTamanos();
     setPuntos(nuevos);
+    setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
     setIteracionActual(0);
@@ -489,6 +575,7 @@ export default function SimuladorKmeans() {
     detenerEjecucion();
     const nuevos = generarGaussianas(kReal, puntosPorCluster);
     setPuntos(nuevos);
+    setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
     setIteracionActual(0);
@@ -501,6 +588,7 @@ export default function SimuladorKmeans() {
     detenerEjecucion();
     const nuevos = generarUniforme(puntosUniforme);
     setPuntos(nuevos);
+    setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
     setIteracionActual(0);
@@ -526,6 +614,7 @@ export default function SimuladorKmeans() {
     if (c.x < MARGEN_LIENZO || c.x > ANCHO_LIENZO - MARGEN_LIENZO) return;
     if (c.y < MARGEN_LIENZO || c.y > ALTO_LIENZO - MARGEN_LIENZO) return;
     setPuntos((prev) => [...prev, { id: nuevoId(), x: c.x, y: c.y, cluster: -1 }]);
+    setResumenImportado(null);
     // Si ya había simulación, resetear
     if (centroides.length > 0) {
       setCentroides([]);
@@ -728,6 +817,93 @@ export default function SimuladorKmeans() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Datos propios */}
+        <div className={styles.panel}>
+          <h2 className={styles.panelTitle}>Tus propios datos</h2>
+          <p className={styles.datosAyuda}>
+            Pega dos columnas de números —o carga un archivo— y el simulador agrupa tus datos en
+            lugar de los de ejemplo. Sirve el tabulador de una hoja de cálculo, el punto y coma, el
+            espacio o la coma, y los decimales pueden ir con coma (12,5) o con punto (12.5). Si la
+            primera fila es una cabecera, se usa para nombrar los ejes. Todo el proceso ocurre en tu
+            navegador: los datos no se envían a ningún servidor.
+          </p>
+
+          <label className={styles.datosLabel} htmlFor="datosPropios">
+            Dos columnas: la primera es el eje X y la segunda el eje Y
+          </label>
+          <textarea
+            id="datosPropios"
+            className={styles.datosTextarea}
+            rows={7}
+            spellCheck={false}
+            value={textoDatos}
+            onChange={(e) => setTextoDatos(e.target.value)}
+            placeholder={'edad;ingresos\n24;18500\n27;21000\n44;52000'}
+          />
+
+          <div className={styles.datosAcciones}>
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={() => importarTexto(textoDatos)}
+            >
+              Agrupar mis datos
+            </button>
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={() => {
+                setTextoDatos(EJEMPLO_DATOS);
+                importarTexto(EJEMPLO_DATOS);
+              }}
+            >
+              Rellenar con un ejemplo
+            </button>
+            <span className={styles.datosFichero}>
+              <label htmlFor="ficheroDatos">Cargar archivo (CSV o texto):</label>
+              <input
+                id="ficheroDatos"
+                type="file"
+                accept=".csv,.tsv,.txt,text/csv,text/plain"
+                onChange={cargarFichero}
+              />
+            </span>
+          </div>
+
+          {errorImportacion && (
+            <p className={styles.datosError} role="alert">
+              <span aria-hidden="true">⚠️</span> {errorImportacion}
+            </p>
+          )}
+
+          {resumenImportado && (
+            <div className={styles.datosResumen} role="status" aria-live="polite">
+              <strong>{formatNumber(resumenImportado.n, 0)} puntos importados.</strong>{' '}
+              Eje X: {resumenImportado.nombres.x} (de {formatoValor(resumenImportado.rangoX.min)} a{' '}
+              {formatoValor(resumenImportado.rangoX.max)}) · Eje Y: {resumenImportado.nombres.y} (de{' '}
+              {formatoValor(resumenImportado.rangoY.min)} a {formatoValor(resumenImportado.rangoY.max)}).
+              {resumenImportado.filasIgnoradas > 0 && (
+                <> Se han descartado {formatNumber(resumenImportado.filasIgnoradas, 0)} filas que no
+                  contenían dos números.</>
+              )}
+              {resumenImportado.recortadoA !== null && (
+                <> Solo se han conservado los primeros{' '}
+                  {formatNumber(resumenImportado.recortadoA, 0)} puntos.</>
+              )}
+            </div>
+          )}
+
+          <p className={styles.datosNota}>
+            Cada eje se escala por separado al lienzo, y eso equivale a <strong>normalizar</strong>:
+            sin ese paso, la variable con los números más grandes (un salario frente a una edad)
+            dominaría la distancia euclídea y el agrupamiento la obedecería casi solo a ella. Dos
+            avisos: un número con exactamente tres cifras tras un punto se lee como millar español
+            (<code>1.234</code> es mil doscientos treinta y cuatro; escribe <code>1,234</code> si
+            querías decimales), y el máximo son{' '}
+            {formatNumber(MAX_PUNTOS_IMPORTADOS, 0)} puntos.
+          </p>
         </div>
 
         {/* Controles k-means */}

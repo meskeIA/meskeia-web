@@ -25,6 +25,100 @@ interface LinkedNode {
 // Generar ID único
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
+// Guía por estructura: cada una con su propio bloque y su propio <h2>, porque
+// «pila», «cola» o «lista enlazada» se buscan por separado, no como «estructuras de datos».
+interface GuiaEstructura {
+  type: StructureType;
+  ancla: string;
+  icon: string;
+  titulo: string;
+  corto: string;
+  principio: string;
+  que: string;
+  operaciones: { nombre: string; coste: string; detalle: string }[];
+  uso: string;
+  enlace?: { href: string; texto: string };
+}
+
+const GUIA_ESTRUCTURAS: GuiaEstructura[] = [
+  {
+    type: 'array',
+    ancla: 'array',
+    icon: '📊',
+    titulo: 'Array (arreglo o vector)',
+    corto: 'el array',
+    principio: 'Acceso directo por índice',
+    que: 'Una secuencia de elementos guardados uno detrás de otro en memoria. Como todos ocupan lo mismo y están contiguos, la posición de cualquiera se calcula con una suma: por eso leer el elemento 4.000 cuesta lo mismo que leer el primero.',
+    operaciones: [
+      { nombre: 'Acceso por índice', coste: 'O(1)', detalle: 'la dirección se calcula, no se recorre' },
+      { nombre: 'Búsqueda de un valor', coste: 'O(n)', detalle: 'hay que mirar elemento a elemento si no está ordenado' },
+      { nombre: 'Insertar o eliminar en medio', coste: 'O(n)', detalle: 'obliga a desplazar todo lo que viene detrás' },
+    ],
+    uso: 'tablas de píxeles de una imagen, matrices de un cálculo numérico, cualquier colección que se lee mucho por posición y cambia poco de tamaño.',
+  },
+  {
+    type: 'stack',
+    ancla: 'pila-stack',
+    icon: '📚',
+    titulo: 'Pila (Stack): el principio LIFO',
+    corto: 'la pila',
+    principio: 'LIFO — Last In, First Out: el último en entrar es el primero en salir',
+    que: 'Solo se toca un extremo: se apila encima (push) y se retira de encima (pop). Como una pila de platos, para llegar al de abajo hay que quitar los de arriba. Esa limitación es justo lo que la hace barata y predecible.',
+    operaciones: [
+      { nombre: 'push (apilar)', coste: 'O(1)', detalle: 'añade encima del todo' },
+      { nombre: 'pop (desapilar)', coste: 'O(1)', detalle: 'retira el elemento de encima' },
+      { nombre: 'peek (mirar la cima)', coste: 'O(1)', detalle: 'consulta sin retirar' },
+    ],
+    uso: 'la pila de llamadas de cualquier programa, el deshacer de un editor, la evaluación de expresiones con paréntesis y el recorrido en profundidad de un grafo (DFS).',
+  },
+  {
+    type: 'queue',
+    ancla: 'cola-queue',
+    icon: '🚶',
+    titulo: 'Cola (Queue): el principio FIFO',
+    corto: 'la cola',
+    principio: 'FIFO — First In, First Out: el primero en entrar es el primero en salir',
+    que: 'Se entra por un extremo (enqueue) y se sale por el contrario (dequeue), igual que la fila de una ventanilla. Nadie adelanta a nadie, así que el orden de llegada se respeta siempre: es la estructura del reparto justo.',
+    operaciones: [
+      { nombre: 'enqueue (encolar)', coste: 'O(1)', detalle: 'entra por el final' },
+      { nombre: 'dequeue (desencolar)', coste: 'O(1)', detalle: 'sale por el principio' },
+      { nombre: 'Buscar un elemento', coste: 'O(n)', detalle: 'hay que recorrerla; no es para eso' },
+    ],
+    uso: 'trabajos en espera de una impresora, el planificador de procesos de un sistema operativo, el recorrido en anchura de un grafo (BFS) y los búferes entre dos procesos con ritmos distintos.',
+  },
+  {
+    type: 'linkedList',
+    ancla: 'lista-enlazada',
+    icon: '🔗',
+    titulo: 'Lista enlazada (Linked List)',
+    corto: 'la lista enlazada',
+    principio: 'Cada nodo guarda su valor y la dirección del siguiente',
+    que: 'Los elementos no están contiguos en memoria: cada uno apunta al que le sigue. No hace falta reservar el espacio de golpe ni desplazar nada al insertar, pero se paga en el acceso, porque para llegar al elemento n hay que pasar por los n-1 anteriores.',
+    operaciones: [
+      { nombre: 'Insertar o eliminar con el nodo en la mano', coste: 'O(1)', detalle: 'basta con reenganchar dos punteros' },
+      { nombre: 'Acceder a la posición n', coste: 'O(n)', detalle: 'no hay atajo: se recorre desde la cabeza' },
+      { nombre: 'Búsqueda de un valor', coste: 'O(n)', detalle: 'igual que el array, pero sin poder saltar' },
+    ],
+    uso: 'listas que crecen y menguan mucho por el medio, implementación interna de pilas y colas, y estructuras donde reservar un bloque grande y contiguo no es posible.',
+  },
+  {
+    type: 'bst',
+    ancla: 'arbol-binario-busqueda-bst',
+    icon: '🌳',
+    titulo: 'Árbol binario de búsqueda (BST)',
+    corto: 'el árbol BST',
+    principio: 'A la izquierda lo menor, a la derecha lo mayor',
+    que: 'Cada nodo tiene como mucho dos hijos y cumple esa regla en todo el árbol. Buscar consiste en descender comparando: en cada paso se descarta la mitad de lo que queda, igual que en una búsqueda binaria. El matiz importante es que ese O(log n) es el caso promedio: si los datos entran ya ordenados el árbol degenera en una lista y vuelve a O(n), que es el problema que resuelven los árboles autobalanceados.',
+    operaciones: [
+      { nombre: 'Buscar un valor', coste: 'O(log n)', detalle: 'promedio; O(n) si el árbol está degenerado' },
+      { nombre: 'Insertar', coste: 'O(log n)', detalle: 'desciende hasta el hueco que le toca' },
+      { nombre: 'Recorrido en orden (inorden)', coste: 'O(n)', detalle: 'devuelve todos los valores ya ordenados' },
+    ],
+    uso: 'índices de bases de datos, diccionarios y conjuntos ordenados, autocompletado y cualquier caso donde haga falta consultar y mantener el orden a la vez.',
+    enlace: { href: '/simulador-arboles-bst-avl/', texto: 'Ver el balanceo con rotaciones en el simulador de árboles BST y AVL' },
+  },
+];
+
 // Componente principal
 export default function VisualizadorEstructurasDatosPage() {
   const [structure, setStructure] = useState<StructureType>('array');
@@ -58,6 +152,15 @@ export default function VisualizadorEstructurasDatosPage() {
   const showMessage = useCallback((msg: string) => {
     setMessage(msg);
     setTimeout(() => setMessage(''), 3000);
+  }, []);
+
+  // Desde la guía de abajo: selecciona la estructura y sube a la visualización
+  const irAlSimulador = useCallback((tipo: StructureType) => {
+    setStructure(tipo);
+    const destino = document.getElementById('simulador');
+    if (!destino) return;
+    const movimientoReducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    destino.scrollIntoView({ behavior: movimientoReducido ? 'auto' : 'smooth', block: 'start' });
   }, []);
 
   const animate = useCallback((index: number | null, state: AnimationState, duration = 500) => {
@@ -370,10 +473,10 @@ export default function VisualizadorEstructurasDatosPage() {
                 className={styles.input}
                 aria-label="Valor a insertar"
               />
-              <button onClick={handleArrayPush} className={styles.btnPrimary}>
+              <button type="button" onClick={handleArrayPush} className={styles.btnPrimary}>
                 Push (añadir)
               </button>
-              <button onClick={handleArrayPop} className={styles.btnSecondary}>
+              <button type="button" onClick={handleArrayPop} className={styles.btnSecondary}>
                 Pop (eliminar)
               </button>
             </div>
@@ -387,7 +490,7 @@ export default function VisualizadorEstructurasDatosPage() {
                 className={styles.input}
                 aria-label="Valor a buscar"
               />
-              <button onClick={handleArraySearch} className={styles.btnSearch}>
+              <button type="button" onClick={handleArraySearch} className={styles.btnSearch}>
                 Buscar
               </button>
             </div>
@@ -407,13 +510,13 @@ export default function VisualizadorEstructurasDatosPage() {
                 className={styles.input}
                 aria-label="Valor a insertar"
               />
-              <button onClick={handleStackPush} className={styles.btnPrimary}>
+              <button type="button" onClick={handleStackPush} className={styles.btnPrimary}>
                 Push
               </button>
-              <button onClick={handleStackPop} className={styles.btnSecondary}>
+              <button type="button" onClick={handleStackPop} className={styles.btnSecondary}>
                 Pop
               </button>
-              <button onClick={handleStackPeek} className={styles.btnSearch}>
+              <button type="button" onClick={handleStackPeek} className={styles.btnSearch}>
                 Peek
               </button>
             </div>
@@ -433,13 +536,13 @@ export default function VisualizadorEstructurasDatosPage() {
                 className={styles.input}
                 aria-label="Valor a insertar"
               />
-              <button onClick={handleQueueEnqueue} className={styles.btnPrimary}>
+              <button type="button" onClick={handleQueueEnqueue} className={styles.btnPrimary}>
                 Enqueue
               </button>
-              <button onClick={handleQueueDequeue} className={styles.btnSecondary}>
+              <button type="button" onClick={handleQueueDequeue} className={styles.btnSecondary}>
                 Dequeue
               </button>
-              <button onClick={handleQueueFront} className={styles.btnSearch}>
+              <button type="button" onClick={handleQueueFront} className={styles.btnSearch}>
                 Front
               </button>
             </div>
@@ -459,13 +562,13 @@ export default function VisualizadorEstructurasDatosPage() {
                 className={styles.input}
                 aria-label="Valor a insertar"
               />
-              <button onClick={handleLinkedInsertHead} className={styles.btnPrimary}>
+              <button type="button" onClick={handleLinkedInsertHead} className={styles.btnPrimary}>
                 Insertar Inicio
               </button>
-              <button onClick={handleLinkedInsertTail} className={styles.btnPrimary}>
+              <button type="button" onClick={handleLinkedInsertTail} className={styles.btnPrimary}>
                 Insertar Final
               </button>
-              <button onClick={handleLinkedRemoveHead} className={styles.btnSecondary}>
+              <button type="button" onClick={handleLinkedRemoveHead} className={styles.btnSecondary}>
                 Eliminar Inicio
               </button>
             </div>
@@ -485,7 +588,7 @@ export default function VisualizadorEstructurasDatosPage() {
                 className={styles.input}
                 aria-label="Valor a insertar"
               />
-              <button onClick={handleBstInsert} className={styles.btnPrimary}>
+              <button type="button" onClick={handleBstInsert} className={styles.btnPrimary}>
                 Insertar
               </button>
             </div>
@@ -499,7 +602,7 @@ export default function VisualizadorEstructurasDatosPage() {
                 className={styles.input}
                 aria-label="Valor a buscar"
               />
-              <button onClick={handleBstSearch} className={styles.btnSearch}>
+              <button type="button" onClick={handleBstSearch} className={styles.btnSearch}>
                 Buscar
               </button>
             </div>
@@ -540,6 +643,7 @@ export default function VisualizadorEstructurasDatosPage() {
           {structures.map((s) => (
             <button
               key={s.type}
+              type="button"
               role="tab"
               aria-selected={structure === s.type}
               className={`${styles.structureBtn} ${structure === s.type ? styles.structureBtnActive : ''}`}
@@ -553,7 +657,7 @@ export default function VisualizadorEstructurasDatosPage() {
       </section>
 
       {/* Visualización */}
-      <section className={styles.visualSection}>
+      <section className={styles.visualSection} id="simulador">
         {renderStructure()}
       </section>
 
@@ -621,6 +725,58 @@ export default function VisualizadorEstructurasDatosPage() {
           </p>
         </div>
       </section>
+
+      {/* Guía por estructura: un bloque y un <h2> propios para cada una */}
+      <div className={styles.guiaWrapper}>
+        {GUIA_ESTRUCTURAS.map((g) => (
+          <article key={g.type} id={g.ancla} className={styles.guiaCard}>
+            <h2 className={styles.guiaTitle}>
+              <span aria-hidden="true">{g.icon}</span> {g.titulo}
+            </h2>
+            <p className={styles.guiaPrincipio}>{g.principio}</p>
+            <p className={styles.guiaTexto}>{g.que}</p>
+
+            <table className={styles.guiaTabla}>
+              <caption className={styles.guiaTablaCaption}>Operaciones y coste</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Operación</th>
+                  <th scope="col">Coste</th>
+                  <th scope="col">Por qué</th>
+                </tr>
+              </thead>
+              <tbody>
+                {g.operaciones.map((op) => (
+                  <tr key={op.nombre}>
+                    <td>{op.nombre}</td>
+                    <td><code>{op.coste}</code></td>
+                    <td>{op.detalle}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <p className={styles.guiaUso}>
+              <strong>Dónde se usa:</strong> {g.uso}
+            </p>
+
+            <div className={styles.guiaAcciones}>
+              <button
+                type="button"
+                className={styles.guiaBtn}
+                onClick={() => irAlSimulador(g.type)}
+              >
+                Probar {g.corto} en el simulador
+              </button>
+              {g.enlace && (
+                <a className={styles.guiaEnlace} href={g.enlace.href}>
+                  {g.enlace.texto}
+                </a>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
 
       {/* Sección educativa */}
       <EducationalSection

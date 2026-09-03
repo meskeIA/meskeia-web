@@ -1013,3 +1013,168 @@
     padding: var(--spacing-xs) var(--spacing-sm);
   }
 }
+
+/* ===== Guía por estructura (un bloque y un h2 por cada una) ===== */
+.guiaWrapper {
+  display: grid;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.guiaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  scroll-margin-top: var(--spacing-xl);
+}
+
+.guiaTitle {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+.guiaPrincipio {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary-texto, var(--primary));
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.guiaTexto {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.guiaTabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.guiaTablaCaption {
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding-bottom: var(--spacing-xs);
+}
+
+.guiaTabla th {
+  text-align: left;
+  padding: var(--spacing-sm);
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.guiaTabla td {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.guiaTabla code {
+  background: var(--hover);
+  color: var(--text-primary);
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.guiaUso {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.guiaAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.guiaBtn {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.guiaBtn:hover {
+  background: var(--secondary);
+}
+
+.guiaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.guiaEnlace {
+  font-size: 0.9rem;
+  color: var(--primary-texto, var(--primary));
+  text-decoration: underline;
+}
+
+.guiaEnlace:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .guiaCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .guiaTabla td {
+  border-bottom-color: var(--border);
+}
+
+[data-theme='dark'] .guiaTabla code,
+[data-theme='dark'] .guiaUso {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 640px) {
+  .guiaCard {
+    padding: var(--spacing-lg);
+  }
+
+  .guiaTitle {
+    font-size: 1.1rem;
+  }
+
+  .guiaTabla {
+    font-size: 0.82rem;
+  }
+
+  .guiaTabla th,
+  .guiaTabla td {
+    padding: var(--spacing-xs);
+  }
+
+  .guiaBtn {
+    width: 100%;
+  }
+}
