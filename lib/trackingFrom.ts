@@ -115,3 +115,39 @@ export function withFrom(url: string, origin: string): string {
   if (url.includes('#')) return url;
   return `${url}#from=${safe}`;
 }
+
+/**
+ * URL con la que se comparte la página actual. La usan los DOS puntos de
+ * compartir del catálogo (`Footer` y `ShareCard`) para que no vuelvan a
+ * divergir: eran dos implementaciones del mismo gesto y solo una era correcta.
+ *
+ * Hace dos cosas, y las dos salen de un defecto medido el 04/09/2026:
+ *
+ * 1. `?ref=share` va en el QUERY, con `new URL`. Concatenarlo
+ *    (`${href}?ref=share`, la versión que tenía el Footer) lo pegaba DENTRO del
+ *    fragmento siempre que la URL llevara `#from=…` — o sea, siempre que se
+ *    hubiera llegado por un enlace interno, que los lleva todos. Quedaba
+ *    `…/simulador-pendulo/#from=related-x?ref=share`: un parámetro que no existe
+ *    ni para el servidor ni para `urlParams.get('ref')`, así que el share no se
+ *    contaba. Y como `URLSearchParams` parte por `&` y no por `?`, el valor
+ *    entero se guardaba como `from`.
+ *
+ * 2. Se retira el `#from=` de quien comparte. Esa marca atribuye SU navegación,
+ *    no la del destinatario: propagarla convierte un enlace compartido en un
+ *    clic de RelatedApps que nadie dio, y lo repite en CADA apertura mientras el
+ *    enlace circule. Caso de origen: 30 registros idénticos carácter por
+ *    carácter (`from: related-simulador-mas-resorte?ref=share`) en 5 días, de 9
+ *    IPs de Ecuador, atribuidos a una app que no participó en ninguna visita.
+ *    Este punto también afectaba a `ShareCard`, que colocaba bien el parámetro
+ *    pero arrastraba el hash igual — y ahí el `from` falso salía limpio, sin
+ *    ninguna firma que permitiera distinguirlo de un clic real.
+ *
+ * Un ancla normal (`#etapas`) SÍ se conserva: forma parte de lo que se comparte.
+ */
+export function urlParaCompartir(href: string = window.location.href): string {
+  const url = new URL(href);
+  url.searchParams.set('ref', 'share');
+  // Solo se retira el fragmento si es una marca de medición, no un ancla.
+  if (new URLSearchParams(url.hash.replace(/^#/, '')).has('from')) url.hash = '';
+  return url.toString();
+}

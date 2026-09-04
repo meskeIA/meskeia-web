@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import styles from './CronicumFooter.module.css';
+import { urlParaCompartir } from '@/lib/trackingFrom';
 
 /**
  * Footer propio de la marca Cronicum.
@@ -16,7 +17,9 @@ export default function CronicumFooter() {
   const [copiado, setCopiado] = useState(false);
 
   const compartir = async () => {
-    const url = window.location.href;
+    // El ?ref=share tiene que ir en el query y el #from= de quien comparte no
+    // viaja con el enlace. Ver lib/trackingFrom.ts.
+    const url = urlParaCompartir();
     const titulo = document.title;
     if (navigator.share) {
       try {

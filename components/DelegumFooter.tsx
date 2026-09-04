@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './DelegumFooter.module.css';
+import { urlParaCompartir } from '@/lib/trackingFrom';
 
 /**
  * Footer propio de la marca Delegum.
@@ -18,7 +19,9 @@ export default function DelegumFooter() {
   const [copiado, setCopiado] = useState(false);
 
   const compartir = async () => {
-    const url = window.location.href;
+    // El ?ref=share tiene que ir en el query y el #from= de quien comparte no
+    // viaja con el enlace. Ver lib/trackingFrom.ts.
+    const url = urlParaCompartir();
     const titulo = document.title;
     if (navigator.share) {
       try {

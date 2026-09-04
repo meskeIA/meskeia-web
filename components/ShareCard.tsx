@@ -15,6 +15,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './ShareCard.module.css';
+import { urlParaCompartir } from '@/lib/trackingFrom';
 
 interface ShareCardProps {
   appName: string; // slug de la app, ej: "calculadora-tension-arterial"
@@ -194,9 +195,9 @@ export default function ShareCard({ appName }: ShareCardProps) {
 
   const getShareUrl = useCallback((): string => {
     if (typeof window === 'undefined') return '';
-    const url = new URL(window.location.href);
-    url.searchParams.set('ref', 'share');
-    return url.toString();
+    // Colocaba bien el ?ref=share pero arrastraba el #from= de quien comparte,
+    // que atribuye su navegación y no la del destinatario. Ver lib/trackingFrom.ts.
+    return urlParaCompartir();
   }, []);
 
   const compartirWhatsApp = useCallback(() => {

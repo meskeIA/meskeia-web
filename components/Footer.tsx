@@ -14,6 +14,7 @@ import AnalyticsTracker from './AnalyticsTracker';
 import CoquinumMasDeCategoria from './CoquinumMasDeCategoria';
 import { VERTICALES } from '@/data/verticales';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
+import { urlParaCompartir } from '@/lib/trackingFrom';
 
 interface FooterProps {
   appName?: string; // Nombre de la app para compartir (opcional)
@@ -24,8 +25,9 @@ export default function Footer({ appName }: FooterProps) {
 
   const compartirApp = async () => {
     const titulo = appName || document.title;
-    const baseUrl = window.location.href;
-    const url = baseUrl.includes('?') ? `${baseUrl}&ref=share` : `${baseUrl}?ref=share`;
+    // Ver lib/trackingFrom.ts: el ?ref=share tiene que ir en el query y el
+    // #from= de quien comparte NO viaja con el enlace.
+    const url = urlParaCompartir();
     const texto = '¡Mira lo que he encontrado en meskeIA!';
 
     // Web Share API (móviles) - incluye texto + URL

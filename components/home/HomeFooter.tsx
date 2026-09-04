@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { URL_PRIVACIDAD, URL_TERMINOS } from '@/lib/urls-legales'
+import { urlParaCompartir } from '@/lib/trackingFrom'
 import styles from './HomeFooter.module.css'
 
 export default function HomeFooter() {
@@ -35,14 +36,17 @@ export default function HomeFooter() {
           <button
             type="button"
             onClick={() => {
+              // El ?ref=share tiene que ir en el query y el #from= de quien comparte
+              // no viaja con el enlace. Ver lib/trackingFrom.ts.
+              const url = urlParaCompartir()
               if (navigator.share) {
                 navigator.share({
                   title: 'meskeIA — Plataforma educativa gratuita',
                   text: 'Estudio, finanzas personales y herramientas prácticas. Aplicaciones gratuitas en español, sin registro.',
-                  url: window.location.href
+                  url
                 })
               } else {
-                navigator.clipboard.writeText(window.location.href)
+                navigator.clipboard.writeText(url)
                 alert('✅ Enlace copiado al portapapeles')
               }
             }}
