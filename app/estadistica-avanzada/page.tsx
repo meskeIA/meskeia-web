@@ -2,23 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstadisticaAvanzada.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatNumber } from '@/lib';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, LecturaSerie } from '@/components';
+import { formatNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import jStat from 'jstat';
 
 type TabType = 'ttest' | 'correlation' | 'regression' | 'chisquare' | 'confidence' | 'normality';
-
-// Función para parsear datos de texto
-const parseData = (text: string): number[] => {
-  if (!text.trim()) return [];
-  const values = text
-    .replace(/,/g, '.')
-    .split(/[\s\n;]+/)
-    .map(v => parseFloat(v.trim()))
-    .filter(v => !isNaN(v));
-  return values;
-};
 
 // Interpretación de p-value
 const interpretPValue = (p: number, alpha: number = 0.05): { text: string; significant: boolean } => {
@@ -41,6 +30,21 @@ const interpretCorrelation = (r: number): string => {
 };
 
 export default function EstadisticaAvanzadaPage() {
+  /**
+   * Cómo leer la coma en TODOS los campos de esta página.
+   *
+   * Hasta el 04/09/2026 la app hacía `replace(/,/g, '.')` sobre el texto entero antes de
+   * partirlo, de modo que la coma nunca podía separar valores: «23,25,28» se leía como un
+   * único dato de 23,25 y el test se calculaba con él sin decir nada. Ahora el papel de la
+   * coma lo deduce `parsearSerieNumerica` del propio texto —y el usuario puede imponerlo—,
+   * con el número de valores leídos a la vista bajo cada campo.
+   */
+  const [modoLectura, setModoLectura] = useState<ModoLectura>('auto');
+
+  /** Lectura completa de un campo, para enseñarla; `parseData` se queda con los valores. */
+  const leerSerie = (texto: string) => parsearSerieNumerica(texto, modoLectura);
+  const parseData = (texto: string): number[] => leerSerie(texto).valores;
+
   const [activeTab, setActiveTab] = useState<TabType>('ttest');
 
   // Estados para cada módulo
@@ -504,10 +508,11 @@ export default function EstadisticaAvanzadaPage() {
                 <textarea
                   value={ttestData1}
                   onChange={e => setTtestData1(e.target.value)}
-                  placeholder="Ej: 23 25 28 22 26 24"
+                  placeholder="Ej: 23 25 28 22 26 24 · con decimales: 23,5 25,1 o 23.5 25.1"
                   className={styles.textarea}
                   rows={3}
                 />
+                <LecturaSerie serie={leerSerie(ttestData1)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               {ttestType !== 'onesample' && (
@@ -516,10 +521,11 @@ export default function EstadisticaAvanzadaPage() {
                   <textarea
                     value={ttestData2}
                     onChange={e => setTtestData2(e.target.value)}
-                    placeholder="Ej: 20 22 24 21 23 19"
+                    placeholder="Ej: 20 22 24 21 23 19 · puedes pegar una columna de Excel"
                     className={styles.textarea}
                     rows={3}
                   />
+                  <LecturaSerie serie={leerSerie(ttestData2)} modo={modoLectura} onCambiarModo={setModoLectura} />
                 </div>
               )}
 
@@ -615,6 +621,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={3}
                 />
+                <LecturaSerie serie={leerSerie(corrData1)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               <div className={styles.inputGroup}>
@@ -626,6 +633,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={3}
                 />
+                <LecturaSerie serie={leerSerie(corrData2)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               <button type="button" onClick={() => loadExample('correlation')} className={styles.btnSecondary}>
@@ -690,6 +698,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={3}
                 />
+                <LecturaSerie serie={leerSerie(regX)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               <div className={styles.inputGroup}>
@@ -701,6 +710,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={3}
                 />
+                <LecturaSerie serie={leerSerie(regY)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               <button type="button" onClick={() => loadExample('regression')} className={styles.btnSecondary}>
@@ -773,6 +783,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={2}
                 />
+                <LecturaSerie serie={leerSerie(chiObserved)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               <div className={styles.inputGroup}>
@@ -784,6 +795,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={2}
                 />
+                <LecturaSerie serie={leerSerie(chiExpected)} modo={modoLectura} onCambiarModo={setModoLectura} />
                 <span className={styles.helperText}>
                   Si se deja vacío, se asume distribución uniforme
                 </span>
@@ -863,6 +875,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={3}
                 />
+                <LecturaSerie serie={leerSerie(confData)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               <div className={styles.inputGroup}>
@@ -952,6 +965,7 @@ export default function EstadisticaAvanzadaPage() {
                   className={styles.textarea}
                   rows={4}
                 />
+                <LecturaSerie serie={leerSerie(normData)} modo={modoLectura} onCambiarModo={setModoLectura} />
               </div>
 
               <button type="button" onClick={() => loadExample('normality')} className={styles.btnSecondary}>

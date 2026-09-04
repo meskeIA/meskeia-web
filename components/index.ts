@@ -41,6 +41,9 @@ export { default as TransparencyBanner } from './TransparencyBanner';
 // Tarjeta de compartir slide-up (crecimiento orgánico)
 export { default as ShareCard } from './ShareCard';
 
+// Eco de cómo se ha leído una serie numérica pegada por el usuario
+export { default as LecturaSerie } from './LecturaSerie';
+
 // Badge geográfico (señaliza ámbito España-only / España-data / global)
 export { default as RegionBadge } from './RegionBadge';
 export type { RegionVariant } from './RegionBadge';

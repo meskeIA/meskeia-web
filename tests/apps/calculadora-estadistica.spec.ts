@@ -63,7 +63,8 @@ test('una serie guardada sigue en el historial tras recargar, y al pulsarla vuel
 
   await entradasHistorial(page).first().click();
   await expect(textarea(page)).toHaveValue('5, 7, 8, 6, 9');
-  await expect(page.getByText('Valores detectados:')).toBeVisible();
+  // El contador escueto se sustituyó por el eco de lectura el 04/09/2026
+  await expect(page.getByText('5 valores leídos')).toBeVisible();
 });
 
 test('el historial conserva 5 series: la sexta desplaza a la más antigua', async ({ page }) => {

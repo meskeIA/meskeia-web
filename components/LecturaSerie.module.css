@@ -1,0 +1,90 @@
+/* Eco de la lectura de una serie numérica — ver LecturaSerie.tsx */
+
+.caja {
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--hover);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius, 8px);
+}
+
+.linea {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.detalle {
+  margin: 0.3rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.descartados {
+  margin: 0.3rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #a15c00;
+}
+
+.duda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--border);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.btnCambiar {
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--primary);
+  border-radius: 14px;
+  background: var(--bg-card);
+  color: var(--primary-texto, var(--primary));
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCambiar:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnCambiar:focus-visible,
+.btnAuto:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnAuto {
+  margin-top: 0.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--primary-texto, var(--primary));
+  font-size: 0.76rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+[data-theme='dark'] .caja {
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .descartados {
+  color: #e0a34a;
+}
+
+[data-theme='dark'] .btnCambiar {
+  background: #333;
+}

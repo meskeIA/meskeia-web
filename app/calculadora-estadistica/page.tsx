@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatNumber } from '@/lib';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, LecturaSerie } from '@/components';
+import { formatNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 /**
@@ -52,6 +52,8 @@ function leerHistorialGuardado(): string[] {
 
 export default function CalculadoraEstadisticaPage() {
   const [datos, setDatos] = useState('');
+  /** `auto` deduce el papel de la coma; el usuario puede imponerlo desde el eco de lectura. */
+  const [modoLectura, setModoLectura] = useState<ModoLectura>('auto');
   const [historial, setHistorial] = useState<string[]>([]);
 
   /**
@@ -76,15 +78,18 @@ export default function CalculadoraEstadisticaPage() {
     }
   }, [historial, historialCargado]);
 
-  const valores = useMemo(() => {
-    if (!datos.trim()) return [];
-    // Acepta separadores: coma, punto y coma, espacio, salto de línea
-    return datos
-      .split(/[,;\s\n]+/)
-      .map(v => parseFloat(v.replace(',', '.')))
-      .filter(v => !isNaN(v))
-      .sort((a, b) => a - b);
-  }, [datos]);
+  /**
+   * Lectura de los datos pegados.
+   *
+   * Antes se partía SIEMPRE por la coma, así que «1,5 2,3 4,7» daba seis valores en vez de
+   * tres y la media salía mal sin que nada lo delatara; el `replace(',', '.')` que venía
+   * detrás era código muerto, porque a esas alturas ya no quedaba ninguna coma. Ahora el
+   * papel de la coma lo decide `parsearSerieNumerica` mirando el resto del texto, y la app
+   * enseña siempre cuántos valores ha leído y con qué criterio.
+   */
+  const serie = useMemo(() => parsearSerieNumerica(datos, modoLectura), [datos, modoLectura]);
+
+  const valores = useMemo(() => [...serie.valores].sort((a, b) => a - b), [serie]);
 
   const estadisticas = useMemo(() => {
     if (valores.length === 0) return null;
@@ -217,18 +222,22 @@ export default function CalculadoraEstadisticaPage() {
             className={styles.textareaDatos}
             value={datos}
             onChange={(e) => setDatos(e.target.value)}
-            placeholder="Introduce los datos separados por comas, espacios o saltos de línea...
+            placeholder="Pega o escribe los datos separados por comas, espacios o saltos de línea. Puedes pegar una columna entera desde Excel.
 
-Ejemplo: 5, 7, 8, 6, 9, 7, 8"
+Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
             rows={6}
           />
 
-          <div className={styles.datosInfo}>
-            <span>Valores detectados: <strong>{valores.length}</strong></span>
-            {valores.length > 0 && (
-              <span>Ordenados: {valores.slice(0, 5).map(v => formatNumber(v, 2)).join(', ')}{valores.length > 5 ? '...' : ''}</span>
-            )}
-          </div>
+          <LecturaSerie serie={serie} modo={modoLectura} onCambiarModo={setModoLectura} />
+
+          {valores.length > 0 && (
+            <div className={styles.datosInfo}>
+              <span>
+                Ordenados: {valores.slice(0, 5).map(v => formatNumber(v, 2)).join(', ')}
+                {valores.length > 5 ? '...' : ''}
+              </span>
+            </div>
+          )}
 
           <div className={styles.btnRow}>
             <button type="button" onClick={() => setDatos('')} className={styles.btnSecundario}>

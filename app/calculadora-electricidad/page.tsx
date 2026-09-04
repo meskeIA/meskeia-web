@@ -5,7 +5,7 @@ import styles from './CalculadoraElectricidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
-import { formatNumber, parseSpanishNumber, formatCurrency } from '@/lib';
+import { formatNumber, parseSpanishNumber, parsearSerieNumerica, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'ohm' | 'potencia' | 'circuito' | 'consumo' | 'divisor' | 'mixto' | 'rcrl';
@@ -100,8 +100,11 @@ export default function CalculadoraElectricidadPage() {
 
   // Cálculos de Circuitos
   const resultadoCircuito = useMemo(() => {
-    const valoresStr = resistencias.split(',').map(s => s.trim());
-    const valores = valoresStr.map(parseSpanishNumber).filter(n => !isNaN(n) && n > 0);
+    // Partía solo por comas, así que «10,5, 22» daba tres resistencias en vez de dos: la
+    // coma decimal no tenía cabida. El lector compartido deduce su papel del propio texto
+    // (04/09/2026, mismo arreglo que en las dos apps de estadística). Aquí no hace falta el
+    // eco de LecturaSerie porque la app ya lista abajo cada resistencia interpretada.
+    const valores = parsearSerieNumerica(resistencias).valores.filter(n => n > 0);
 
     if (valores.length === 0) return null;
 

@@ -175,6 +175,37 @@ import { EducationalSection } from '@/components';
 
 ---
 
+### 7. **LecturaSerie** — cuando el usuario pega una serie de números
+
+Enseña cómo se ha leído una serie escrita o pegada (cuántos valores, qué papel se le ha dado
+a la coma, qué se ha descartado) y, si el texto admite dos lecturas válidas, ofrece la otra
+con un clic. Se usa junto a `parsearSerieNumerica` de `@/lib`.
+
+**Cuándo es obligatorio:** en cualquier campo donde el usuario introduzca **varios números a
+la vez**. El motivo no es cosmético: si la app lee «1,5 2,3» como cuatro valores en vez de
+dos, la media que sale después no parece equivocada, simplemente es otra. El error es
+invisible en el resultado, así que la lectura tiene que estar a la vista.
+
+```tsx
+import { LecturaSerie } from '@/components';
+import { parsearSerieNumerica, type ModoLectura } from '@/lib';
+
+const [modoLectura, setModoLectura] = useState<ModoLectura>('auto');
+const serie = useMemo(() => parsearSerieNumerica(datos, modoLectura), [datos, modoLectura]);
+
+<textarea value={datos} onChange={(e) => setDatos(e.target.value)} />
+<LecturaSerie serie={serie} modo={modoLectura} onCambiarModo={setModoLectura} />
+// serie.valores son los números ya leídos, en el orden en que se escribieron
+```
+
+⚠️ **No parsees una serie a mano.** `split(',')` convierte «1,5» en dos valores y
+`replace(/,/g, '.')` sobre el texto entero convierte «23,25,28» en uno solo: los dos fallos
+existían a la vez en el catálogo, en dos apps de estadística que daban resultados distintos
+para el mismo texto (04/09/2026). El caso que manda es **pegar una columna de Excel en
+español**, donde el decimal es coma y el separador es un salto de línea o un tabulador.
+
+---
+
 ## 📚 Utilidades (lib/formatters.ts)
 
 ### Funciones de Formato Español

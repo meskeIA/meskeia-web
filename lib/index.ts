@@ -38,5 +38,13 @@ export {
   getRotationCycleDays,
 } from './dailyApps';
 
+export {
+  parsearSerieNumerica,
+  describirLectura,
+  type SerieNumerica,
+  type ModoLectura,
+  type PapelComa,
+} from './parsearSerieNumerica';
+
 export { withFrom } from './trackingFrom';
 export { URL_PRIVACIDAD, URL_TERMINOS } from './urls-legales';
