@@ -6,6 +6,12 @@ import styles from './CalculadoraTeoriaNumeros.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  antiprimosHasta,
+  analizarAntiprimo,
+  LIMITE_EJEMPLOS,
+  LIMITE_MAXIMO,
+} from './motor-antiprimos';
 
 type TipoCalculo = 'primos' | 'factorizacion' | 'mcdmcm' | 'divisores' | 'modular';
 
@@ -16,6 +22,41 @@ export default function CalculadoraTeoriaNumerosPage() {
   const [numeroPrimo, setNumeroPrimo] = useState('');
   const [rangoInicio, setRangoInicio] = useState('');
   const [rangoFin, setRangoFin] = useState('');
+
+  /**
+   * Antiprimos: hasta dónde hay que cribar.
+   *
+   * Saber si un número es altamente compuesto exige conocer los divisores de TODOS los
+   * anteriores, así que se criba un intervalo entero. Solo se hace en el modo Divisores, y
+   * el tramo por defecto (100.000) cubre de sobra los ejemplos; solo si el usuario escribe
+   * algo mayor se amplía, hasta el tope del motor. Al teclear un número largo los prefijos
+   * caen todos dentro del tramo por defecto, de modo que la criba grande ocurre una vez y
+   * no en cada pulsación.
+   */
+  const limiteAntiprimos = useMemo(() => {
+    if (tipoCalculo !== 'divisores') return 0;
+    const n = parseInt(numeroPrimo);
+    if (!Number.isInteger(n) || n <= LIMITE_EJEMPLOS) return LIMITE_EJEMPLOS;
+    return Math.min(n, LIMITE_MAXIMO);
+  }, [tipoCalculo, numeroPrimo]);
+
+  const antiprimos = useMemo(
+    () => (limiteAntiprimos > 0 ? antiprimosHasta(limiteAntiprimos) : []),
+    [limiteAntiprimos]
+  );
+
+  /** Los antiprimos que se ofrecen como ejemplo, del 6 al 5040 que cierra la serie clásica. */
+  const ejemplosAntiprimos = useMemo(
+    () => antiprimos.filter((a) => a.numero >= 6 && a.numero <= 5040),
+    [antiprimos]
+  );
+
+  const analisisAntiprimo = useMemo(() => {
+    if (tipoCalculo !== 'divisores') return null;
+    const n = parseInt(numeroPrimo);
+    if (!Number.isInteger(n)) return null;
+    return analizarAntiprimo(n, antiprimos, limiteAntiprimos);
+  }, [tipoCalculo, numeroPrimo, antiprimos, limiteAntiprimos]);
 
   // MCD y MCM
   const [numero1, setNumero1] = useState('');
@@ -341,7 +382,7 @@ export default function CalculadoraTeoriaNumerosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔢 Calculadora de Teoría de Números</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔢</span> Calculadora de Teoría de Números</h1>
         <p className={styles.subtitle}>
           Números primos, factorización, MCD, MCM, divisores y aritmética modular
         </p>
@@ -429,12 +470,33 @@ export default function CalculadoraTeoriaNumerosPage() {
             )}
 
             {tipoCalculo === 'divisores' && (
-              <NumberInput
-                value={numeroPrimo}
-                onChange={setNumeroPrimo}
-                label="Número"
-                placeholder="60"
-              />
+              <>
+                <NumberInput
+                  value={numeroPrimo}
+                  onChange={setNumeroPrimo}
+                  label="Número"
+                  placeholder="60"
+                />
+                <div className={styles.antiprimoEjemplos}>
+                  <span className={styles.antiprimoEjemplosLabel}>
+                    Antiprimos para probar (cada uno bate el récord de divisores de su época):
+                  </span>
+                  <div className={styles.antiprimoEjemplosBtns}>
+                    {ejemplosAntiprimos.map((a) => (
+                      <button
+                        key={a.numero}
+                        type="button"
+                        className={styles.antiprimoBtn}
+                        onClick={() => setNumeroPrimo(String(a.numero))}
+                        aria-pressed={numeroPrimo === String(a.numero)}
+                        title={`${formatNumber(a.numero, 0)} tiene ${a.divisores} divisores`}
+                      >
+                        {formatNumber(a.numero, 0)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
 
             {tipoCalculo === 'modular' && (
@@ -608,6 +670,87 @@ export default function CalculadoraTeoriaNumerosPage() {
                     icon={resultados.clasificacion === 'Perfecto' ? '⭐' : resultados.clasificacion === 'Abundante' ? '📈' : '📉'}
                     description={`σ(n)-n ${resultados.clasificacion === 'Perfecto' ? '=' : resultados.clasificacion === 'Abundante' ? '>' : '<'} n`}
                   />
+                  {analisisAntiprimo && (
+                    <div
+                      className={`${styles.antiprimoPanel} ${analisisAntiprimo.esAntiprimo ? styles.antiprimoPanelSi : ''}`}
+                    >
+                      <h4 className={styles.antiprimoTitulo}>
+                        <span aria-hidden="true">{analisisAntiprimo.esAntiprimo ? '🏆' : '🔎'}</span>{' '}
+                        {formatNumber(analisisAntiprimo.numero, 0)}{' '}
+                        {analisisAntiprimo.esAntiprimo ? 'es un antiprimo' : 'no es un antiprimo'}
+                      </h4>
+                      <p className={styles.antiprimoTexto}>
+                        {analisisAntiprimo.esAntiprimo ? (
+                          <>
+                            Tiene {analisisAntiprimo.divisores} divisores y ningún número menor
+                            que él llega a esa cifra: es un récord. Por eso se le llama número
+                            altamente compuesto.
+                          </>
+                        ) : (
+                          <>
+                            Tiene {analisisAntiprimo.divisores}{' '}
+                            {analisisAntiprimo.divisores === 1 ? 'divisor' : 'divisores'}
+                            {analisisAntiprimo.primeroConTantos &&
+                            analisisAntiprimo.primeroConTantos.numero !== analisisAntiprimo.numero ? (
+                              <>
+                                , pero {formatNumber(analisisAntiprimo.primeroConTantos.numero, 0)} ya
+                                llegaba a {analisisAntiprimo.primeroConTantos.divisores} siendo más
+                                pequeño, así que no bate ningún récord.
+                              </>
+                            ) : (
+                              <>, que no baten el récord de ningún número anterior.</>
+                            )}
+                          </>
+                        )}
+                      </p>
+                      <p className={styles.antiprimoVecinos}>
+                        {analisisAntiprimo.anterior && (
+                          <>
+                            Antiprimo anterior:{' '}
+                            <button
+                              type="button"
+                              className={styles.antiprimoEnlace}
+                              onClick={() => setNumeroPrimo(String(analisisAntiprimo.anterior!.numero))}
+                              aria-label={`Analizar el antiprimo anterior, ${analisisAntiprimo.anterior.numero}`}
+                            >
+                              {formatNumber(analisisAntiprimo.anterior.numero, 0)}
+                            </button>{' '}
+                            ({analisisAntiprimo.anterior.divisores} divisores).{' '}
+                          </>
+                        )}
+                        {analisisAntiprimo.siguiente ? (
+                          <>
+                            Siguiente:{' '}
+                            <button
+                              type="button"
+                              className={styles.antiprimoEnlace}
+                              onClick={() => setNumeroPrimo(String(analisisAntiprimo.siguiente!.numero))}
+                              aria-label={`Analizar el antiprimo siguiente, ${analisisAntiprimo.siguiente.numero}`}
+                            >
+                              {formatNumber(analisisAntiprimo.siguiente.numero, 0)}
+                            </button>{' '}
+                            ({analisisAntiprimo.siguiente.divisores} divisores).
+                          </>
+                        ) : (
+                          <>
+                            El siguiente queda por encima de{' '}
+                            {formatNumber(analisisAntiprimo.limiteExplorado, 0)}, que es hasta donde
+                            se ha comprobado.
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                  {!analisisAntiprimo && (resultados.numero ?? 0) > LIMITE_MAXIMO && (
+                    <div className={styles.antiprimoPanel}>
+                      <p className={styles.antiprimoTexto}>
+                        Los divisores de este número sí se calculan, pero no si es un antiprimo:
+                        para eso hay que contar los divisores de todos los números menores, y por
+                        encima de {formatNumber(LIMITE_MAXIMO, 0)} la comprobación tardaría más de
+                        lo que vale.
+                      </p>
+                    </div>
+                  )}
                   <div className={styles.divisoresLista}>
                     <h4>Divisores de {resultados.numero}</h4>
                     <p className={styles.divisores}>
@@ -696,6 +839,14 @@ export default function CalculadoraTeoriaNumerosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
+              <h4>Antiprimos</h4>
+              <p>
+                Lo contrario de un primo: en vez de tener los divisores justos, tiene más
+                que cualquier número menor que él. 12 tiene 6 divisores y ninguno de los
+                once anteriores llega a 6. Siguen 24, 36, 48, 60, 120… hasta el infinito.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
               <h4>Aritmética Modular</h4>
               <p>
                 &quot;Matemáticas del reloj&quot;: a ≡ b (mod n) si n divide a (a-b).
@@ -703,6 +854,174 @@ export default function CalculadoraTeoriaNumerosPage() {
                 coprimos menores que n.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Antiprimos (números altamente compuestos) */}
+        <section className={styles.guideSection}>
+          <h2>Antiprimos: los números con más divisores que ningún otro antes que ellos</h2>
+          <p className={styles.introParagraph}>
+            Un número es <strong>altamente compuesto</strong> —«antiprimo» en su nombre
+            divulgativo— cuando tiene más divisores que <em>cualquier</em> número menor que él.
+            El primo es el número con los divisores justos, dos; el antiprimo es el que bate el
+            récord contrario. Ramanujan los estudió sistemáticamente en 1915, en el artículo
+            donde acuñó el término <em>highly composite number</em>, y la serie no se acaba
+            nunca: siempre hay un número con más divisores que todos los anteriores.
+          </p>
+
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Antiprimo</th>
+                  <th>Factorización</th>
+                  <th>Divisores</th>
+                  <th>Qué récord bate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>6</td>
+                  <td>2 × 3</td>
+                  <td>4</td>
+                  <td>El primero con 4 divisores</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>2² × 3</td>
+                  <td>6</td>
+                  <td>El primero con 6, y por eso la docena</td>
+                </tr>
+                <tr>
+                  <td>24</td>
+                  <td>2³ × 3</td>
+                  <td>8</td>
+                  <td>El primero con 8: las horas del día</td>
+                </tr>
+                <tr>
+                  <td>36</td>
+                  <td>2² × 3²</td>
+                  <td>9</td>
+                  <td>El primero con 9</td>
+                </tr>
+                <tr>
+                  <td>60</td>
+                  <td>2² × 3 × 5</td>
+                  <td>12</td>
+                  <td>El primero con 12: minutos y segundos</td>
+                </tr>
+                <tr>
+                  <td>360</td>
+                  <td>2³ × 3² × 5</td>
+                  <td>24</td>
+                  <td>El primero con 24: los grados del círculo</td>
+                </tr>
+                <tr>
+                  <td>2520</td>
+                  <td>2³ × 3² × 5 × 7</td>
+                  <td>48</td>
+                  <td>El menor divisible por todo del 1 al 10</td>
+                </tr>
+                <tr>
+                  <td>5040</td>
+                  <td>2⁴ × 3² × 5 × 7</td>
+                  <td>60</td>
+                  <td>El primero con 60 divisores</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Dónde te los encuentras sin saberlo</h3>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🕐</span>
+              <h4>60 minutos, 60 segundos</h4>
+              <p>
+                La hora no se parte en 100 sino en 60, que admite 12 formas de repartirse:
+                media hora, un tercio, un cuarto, un quinto, un sexto, diez minutos, un
+                cuarto de hora… Con 100 minutos, el tercio de hora no existiría. El sistema
+                sexagesimal viene de Babilonia y la explicación que más se repite es
+                justamente esa comodidad para dividir, aunque los historiadores discuten
+                cuánto pesó frente a otras razones de su forma de contar.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
+              <h4>360 grados</h4>
+              <p>
+                Con 24 divisores, el círculo se parte en mitades, tercios, cuartos, quintos,
+                sextos, octavos, novenos, décimos, doceavos… todos con grados enteros. Un
+                círculo de 100 grados solo admitiría mitades, cuartos, quintos y décimos: se
+                acabaron los 120° del triángulo equilátero.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🥚</span>
+              <h4>La docena y las 24 horas</h4>
+              <p>
+                12 tiene 6 divisores frente a los 4 del 10. Una docena de huevos se reparte
+                entre 2, 3, 4 o 6 personas sin partir ninguno; diez, solo entre 2 y 5. Lo
+                mismo explica los 12 meses, las 24 horas y que las cajas de la industria
+                vengan en 12, 24 o 36 unidades y no en 10, 20 o 30.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
+              <h4>Los 5040 vecinos de Platón</h4>
+              <p>
+                En <em>Las Leyes</em> (libro V), Platón propone que su ciudad ideal tenga
+                exactamente 5040 hogares, y da la razón: admite muchísimas divisiones para
+                repartir tierras, turnos e impuestos. Es divisible por todos los números del
+                1 al 10 y tiene 60 divisores en total. Un antiprimo elegido a propósito
+                veintitrés siglos antes de que tuvieran nombre.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">👥</span>
+              <h4>Repartir un grupo</h4>
+              <p>
+                Una clase de 24 se organiza en parejas, tríos, grupos de 4, de 6, de 8 o de
+                12 sin que sobre nadie. Una de 23 solo admite un grupo entero: 23 es primo.
+                Por eso los aforos, los equipos y los torneos tienden a números como 12, 16,
+                24 o 32.
+              </p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎵</span>
+              <h4>Compases y ritmo</h4>
+              <p>
+                El compás de 12/8 se subdivide en 2, 3, 4 o 6 pulsos, y de ahí que sostenga
+                a la vez el blues, la seguiriya y la nana. Un compás de 11 tiempos no se
+                deja partir: existe, pero suena a rompecabezas a propósito.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.warningBox}>
+            <div className={styles.warningHeader}>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+              <h4>Tener muchos divisores no basta: hay que batir el récord</h4>
+            </div>
+            <ul className={styles.warningList}>
+              <li>
+                <strong>40 no es antiprimo.</strong> Tiene 8 divisores, que no están mal, pero
+                24 ya llegaba a 8 siendo mucho más pequeño. El récord ya estaba puesto.
+              </li>
+              <li>
+                <strong>100 tampoco.</strong> Tiene 9 divisores, exactamente los mismos que 36.
+                Empatar no cuenta: hace falta superar a todos los anteriores.
+              </li>
+              <li>
+                <strong>96 tampoco</strong>, pese a sus 12 divisores, porque 60 ya tenía 12.
+                Prueba estos tres números arriba y verás la explicación en cada caso.
+              </li>
+              <li>
+                <strong>No son «lo contrario» de los primos en sentido estricto.</strong> El
+                nombre es divulgativo y funciona como imagen, pero un número puede no ser ni
+                primo ni antiprimo: la inmensa mayoría, de hecho, no es ninguna de las dos cosas.
+              </li>
+            </ul>
           </div>
         </section>
 

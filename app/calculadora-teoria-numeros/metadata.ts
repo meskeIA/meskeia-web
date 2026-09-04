@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Teoría de Números - Primos, MCD, MCM | meskeIA',
-  description: 'Factoriza números en primos, calcula MCD y MCM, encuentra todos los divisores, verifica primalidad y más. Herramienta completa de teoría de números. Gratis.',
-  keywords: 'números primos, factorización, MCD, MCM, divisores, teoría de números, criba, Euclides',
+  description: 'Factoriza en primos, calcula MCD y MCM y encuentra todos los divisores de un número. Te dice además si es un antiprimo: si tiene más divisores que cualquier número menor que él, como 12, 60, 360 o 5040.',
+  keywords: 'divisores de un número, antiprimos, números altamente compuestos, números primos, factorización, MCD, MCM, teoría de números, criba, Euclides',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Calculadora Teoría de Números | meskeIA',
-    description: 'Números primos, factorización, MCD, MCM y divisores.',
+    description: 'Números primos, factorización, MCD, MCM, divisores y antiprimos.',
     url: 'https://meskeia.com/calculadora-teoria-numeros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -36,13 +36,38 @@ export const jsonLd = generateWebAppSchema({
   description: "Factoriza números en primos, calcula MCD y MCM, encuentra todos los divisores, verifica primalidad y más. Herramienta completa de teoría de números. Gratis.",
   url: "https://meskeia.com/calculadora-teoria-numeros/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Divisores de un número, con sus pares complementarios y su suma',
+    'Detecta si el número es un antiprimo (número altamente compuesto) y por qué',
+    'Salta al antiprimo anterior y al siguiente para comparar la serie',
+    'Verificación de primalidad y criba de Eratóstenes por rangos',
+    'Factorización en factores primos',
+    'MCD y MCM de hasta tres números por el algoritmo de Euclides',
+    'Aritmética modular: residuo, potencia modular, función φ de Euler e inverso',
+    'Gratuito, en español y sin registro',
+  ],
 });
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un número antiprimo o altamente compuesto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un número es antiprimo —altamente compuesto, en su nombre formal— cuando tiene más divisores que cualquier número menor que él. 12 tiene 6 divisores y ninguno de los once anteriores llega a 6, así que 12 es antiprimo; 40 tiene 8, pero 24 ya llegaba a 8 siendo menor, así que no lo es. Empatar no basta: hay que superar el récord. La serie empieza 1, 2, 4, 6, 12, 24, 36, 48, 60, 120, 180, 240, 360 y sigue sin fin. Ramanujan la estudió en 1915 y acuñó el término «highly composite number».',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué la hora tiene 60 minutos y el círculo 360 grados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Porque 60 y 360 son antiprimos: tienen 12 y 24 divisores respectivamente, más que cualquier número menor. Eso permite partir la hora en mitades, tercios, cuartos, quintos y sextos con minutos enteros, y el círculo en muchísimas fracciones con grados enteros; con 100 minutos, el tercio de hora no existiría. El sistema sexagesimal viene de Babilonia y la comodidad para dividir es la explicación que más se repite, aunque los historiadores debaten cuánto pesó frente a otros rasgos de su forma de contar.',
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Qué es la teoría de números y para qué sirve?',

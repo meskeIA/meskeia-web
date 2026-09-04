@@ -210,6 +210,106 @@
   color: var(--secondary);
 }
 
+/* Antiprimos */
+.antiprimoEjemplos {
+  margin-top: var(--spacing-md);
+}
+
+.antiprimoEjemplosLabel {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-sm);
+}
+
+.antiprimoEjemplosBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.antiprimoBtn {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.antiprimoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.antiprimoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.antiprimoBtn[aria-pressed='true'] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* El veredicto ocupa el ancho entero de la rejilla de resultados */
+.antiprimoPanel {
+  grid-column: 1 / -1;
+  background: var(--hover);
+  border-left: 4px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.antiprimoPanelSi {
+  border-left-color: var(--primary);
+  background: #eaf4f9; /* el azul de marca aclarado; el borde izquierdo es quien lo distingue */
+}
+
+.antiprimoTitulo {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.antiprimoTexto {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.antiprimoVecinos {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: var(--spacing-sm) 0 0;
+}
+
+/* Salta al número que nombra, así que se comporta como un enlace dentro del texto */
+.antiprimoEnlace {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.antiprimoEnlace:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Factorización Box */
 .factorizacionBox {
   grid-column: 1 / -1;
@@ -359,6 +459,28 @@
 .comparativaTable td strong {
   color: var(--primary);
   white-space: nowrap;
+}
+
+[data-theme='dark'] .antiprimoBtn {
+  background: #333;
+  border-color: #444;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .antiprimoBtn[aria-pressed='true'] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .antiprimoPanel {
+  background: #2a2a2a;
+  border-left-color: #444;
+}
+
+[data-theme='dark'] .antiprimoPanelSi {
+  border-left-color: var(--primary);
+  background: #22333d;
 }
 
 [data-theme='dark'] .comparativaTable {
