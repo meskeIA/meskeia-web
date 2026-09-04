@@ -279,3 +279,137 @@ test.describe('REPARADO — HALLAZGO 570 (contenido, bajo) — el FAQPage ya no 
     expect(primeraRespuesta).not.toContain('más un número complementario');
   });
 });
+
+test.describe('S0115 — las combinaciones guardadas sobreviven al cierre de la pestaña', () => {
+  /**
+   * Semilla S0115 (04/09/2026). Hasta esta fecha `favorites` vivía solo en `useState`: la
+   * lista se vaciaba al recargar, mientras el texto de la propia app prometía «guardar las
+   * que quieras conservar» y, en Bonoloto, «guardarlas para la semana» — un juego que sortea
+   * de lunes a sábado, o sea que la promesa era justo lo que no se cumplía. Ahora se
+   * persisten en localStorage bajo la clave `meskeia-loteria-favoritas`.
+   *
+   * Lo que estos tests fijan, además de la persistencia: que la lista se compara por la
+   * COMBINACIÓN y no por el id. Al sobrevivir entre sesiones, una apuesta repetida llega con
+   * un id nuevo, así que comparar por id la duplicaría para siempre y dejaría la estrella sin
+   * marcar sobre una combinación que sí está guardada.
+   */
+
+  const CLAVE = 'meskeia-loteria-favoritas';
+
+  /** Marca como guardada la primera combinación del historial. */
+  async function guardarPrimera(page: Page) {
+    await page.locator('[class*="resultCard"]').first()
+      .getByRole('button', { name: /Guardar esta combinación/ }).click();
+  }
+
+  /** Lee la clave de localStorage tal cual la escribe la app. */
+  async function leerAlmacen(page: Page): Promise<unknown[]> {
+    const crudo = await page.evaluate((k) => window.localStorage.getItem(k), CLAVE);
+    return crudo ? JSON.parse(crudo) : [];
+  }
+
+  test('una combinación guardada sigue ahí tras recargar la página', async ({ page }) => {
+    await seleccionarLoteria(page, 'primitiva');
+    await limpiarHistorial(page);
+    await ponerCantidad(page, 1);
+    await botonGenerar(page).click();
+    await page.waitForTimeout(400);
+
+    const numeros = (await leerUltimasCombinaciones(page, 1))[0].main;
+    await guardarPrimera(page);
+    await expect(page.getByRole('heading', { name: /Mis combinaciones guardadas/ })).toBeVisible();
+
+    // Recargar equivale a volver otro día: el historial se pierde, las guardadas no
+    await page.reload();
+    await expect(page.locator('[class*="resultCard"]')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: /Mis combinaciones guardadas/ })).toBeVisible();
+
+    const tarjeta = page.locator('[class*="favoriteCard"]').first();
+    await expect(tarjeta).toContainText(numeros.join(' - '));
+    expect(await leerAlmacen(page)).toHaveLength(1);
+  });
+
+  test('la estrella es un conmutador y no deja duplicados en el almacén', async ({ page }) => {
+    // La lista se compara por la COMBINACIÓN, no por el id (ver cabecera del bloque). Aquí se
+    // fija lo observable sin depender del azar del generador: pulsar la estrella guarda,
+    // volver a pulsarla quita, y el almacén nunca acumula dos entradas por la misma apuesta.
+    await seleccionarLoteria(page, 'primitiva');
+    await limpiarHistorial(page);
+    await ponerCantidad(page, 1);
+    await botonGenerar(page).click();
+    await page.waitForTimeout(400);
+
+    const estrella = page.locator('[class*="resultCard"]').first().locator('[aria-pressed]');
+    await expect(estrella).toHaveAttribute('aria-pressed', 'false');
+
+    await estrella.click();
+    await expect(estrella).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(1);
+
+    await estrella.click();
+    await expect(estrella).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(0);
+    expect(await leerAlmacen(page)).toHaveLength(0);
+
+    await estrella.click();
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(1);
+    expect(await leerAlmacen(page)).toHaveLength(1);
+  });
+
+  test('una lista guardada de otra sesión se conserva al añadir combinaciones nuevas', async ({ page }) => {
+    await page.evaluate((k) => {
+      window.localStorage.setItem(k, JSON.stringify([{
+        id: 'sesion-anterior',
+        type: 'primitiva',
+        mainNumbers: [1, 2, 3, 4, 5, 6],
+        extraNumbers: [7],
+        timestamp: '2026-09-01T10:00:00.000Z',
+      }]));
+    }, CLAVE);
+    await page.reload();
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(1);
+    await expect(page.locator('[class*="favoriteCard"]').first()).toContainText('1 - 2 - 3 - 4 - 5 - 6');
+
+    await seleccionarLoteria(page, 'primitiva');
+    await limpiarHistorial(page);
+    await ponerCantidad(page, 1);
+    await botonGenerar(page).click();
+    await page.waitForTimeout(400);
+    await guardarPrimera(page);
+
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(2);
+    expect(await leerAlmacen(page)).toHaveLength(2);
+  });
+
+  test('un almacén corrupto o con basura no tumba la página', async ({ page }) => {
+    // Tres formas de dato inválido: JSON roto, modalidad inexistente y números que no lo son.
+    // La tercera es la que importa: LOTTERY_CONFIG[type] sería undefined y la página caería
+    // al pintar el icono de la tarjeta.
+    for (const basura of [
+      '{no es json',
+      JSON.stringify([{ id: 'x', type: 'quiniela', mainNumbers: [1, 2], timestamp: 'ayer' }]),
+      JSON.stringify([{ id: 'y', type: 'primitiva', mainNumbers: 'muchos', timestamp: 1 }]),
+    ]) {
+      await page.evaluate(([k, v]) => window.localStorage.setItem(k, v), [CLAVE, basura] as const);
+      await page.reload();
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText('Generador de Lotería');
+      await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(0);
+    }
+  });
+
+  test('el botón Vaciar borra la lista guardada, también tras recargar', async ({ page }) => {
+    await seleccionarLoteria(page, 'primitiva');
+    await limpiarHistorial(page);
+    await ponerCantidad(page, 1);
+    await botonGenerar(page).click();
+    await page.waitForTimeout(400);
+    await guardarPrimera(page);
+    expect(await leerAlmacen(page)).toHaveLength(1);
+
+    await page.getByRole('button', { name: /Vaciar/ }).click();
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(0);
+    await page.reload();
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(0);
+    expect(await leerAlmacen(page)).toHaveLength(0);
+  });
+});

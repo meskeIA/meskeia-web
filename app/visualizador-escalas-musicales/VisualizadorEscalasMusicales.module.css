@@ -333,6 +333,116 @@
 }
 
 /* ─────────────────────────────────────────────
+   Mástil (guitarra, bajo, ukelele)
+───────────────────────────────────────────── */
+
+.mastilSection {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.afinacionBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.afinacionBtn {
+  padding: 0.4rem 0.9rem;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.afinacionBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.afinacionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.afinacionBtnActiva {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.afinacionBtnActiva:hover {
+  color: #fff;
+}
+
+.mastilWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+/* El diapasón necesita más ancho que el teclado: con menos, los trastes se juntan
+   tanto que las notas se solapan. Por debajo de ese mínimo, el contenedor hace scroll. */
+.mastilSvg {
+  display: block;
+  width: 100%;
+  min-width: 600px;
+  max-width: 860px;
+  height: auto;
+  margin: 0 auto;
+  background: #f3e3cd;
+  border-radius: 4px;
+}
+
+.mastilCejuela {
+  fill: #4a3b2a;
+}
+
+.mastilTraste {
+  stroke: #b09a7c;
+  stroke-width: 2;
+}
+
+.mastilMarca {
+  fill: #cbb595;
+}
+
+.mastilCuerda {
+  stroke: #8a7a63;
+}
+
+.mastilNumTraste {
+  fill: #6b5a45;
+  user-select: none;
+}
+
+.mastilNota {
+  fill: #2E86AB;
+  stroke: #1a5278;
+  stroke-width: 1;
+}
+
+.mastilNotaTonica {
+  fill: #1a5278;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.mastilNotaLabel {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ─────────────────────────────────────────────
    Acordes diatónicos
 ───────────────────────────────────────────── */
 
@@ -717,6 +827,7 @@ details[open] .faqPregunta::before {
 [data-theme='dark'] .caracterCard,
 [data-theme='dark'] .notasEscalaSection,
 [data-theme='dark'] .pianoSection,
+[data-theme='dark'] .mastilSection,
 [data-theme='dark'] .acordesSection,
 [data-theme='dark'] .intervalosSection,
 [data-theme='dark'] .escenarioCard,
@@ -728,11 +839,19 @@ details[open] .faqPregunta::before {
 
 [data-theme='dark'] .notaBtn,
 [data-theme='dark'] .escalaBtn,
+[data-theme='dark'] .afinacionBtn,
 [data-theme='dark'] .intervaloItem,
 [data-theme='dark'] .acordeCard {
   background: #333;
   color: var(--text-primary);
   border-color: #444;
+}
+
+[data-theme='dark'] .escalaBtnActiva,
+[data-theme='dark'] .afinacionBtnActiva {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 
 [data-theme='dark'] .teclaBlanca {
@@ -743,6 +862,39 @@ details[open] .faqPregunta::before {
 [data-theme='dark'] .teclaBlancaActiva {
   fill: #2E86AB;
   stroke: #1a5278;
+}
+
+/* La madera clara del diapasón deslumbra en oscuro: se baja a un nogal apagado y se
+   suben los trazos para que trastes y cuerdas sigan leyéndose sobre él. */
+[data-theme='dark'] .mastilSvg {
+  background: #3a2e22;
+}
+
+[data-theme='dark'] .mastilCejuela {
+  fill: #d8c9b4;
+}
+
+[data-theme='dark'] .mastilTraste {
+  stroke: #8c7a60;
+}
+
+[data-theme='dark'] .mastilMarca {
+  fill: #6d5c46;
+}
+
+[data-theme='dark'] .mastilCuerda {
+  stroke: #b3a48c;
+}
+
+[data-theme='dark'] .mastilNumTraste {
+  fill: #cbb99f;
+}
+
+/* La tónica se distingue por el anillo claro, no por un relleno más claro: el nombre de
+   la nota va en blanco dentro del círculo y sobre un azul pálido dejaría de leerse. */
+[data-theme='dark'] .mastilNotaTonica {
+  fill: #1a5278;
+  stroke: #e8dcc8;
 }
 
 [data-theme='dark'] .warningBox {

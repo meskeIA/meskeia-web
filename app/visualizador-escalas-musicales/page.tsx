@@ -208,12 +208,166 @@ function PianoVisual({ notasActivas }: PianoProps) {
 }
 
 // ─────────────────────────────────────────────
+// Componente Mástil (guitarra, bajo y ukelele)
+// ─────────────────────────────────────────────
+
+interface Afinacion {
+  id: string;
+  nombre: string;
+  /** Cuerdas al aire ordenadas como se dibujan: de la más aguda (arriba) a la más grave. */
+  cuerdas: number[];
+  /** Cuántos trastes se dibujan además de la cuerda al aire. */
+  trastes: number;
+}
+
+/**
+ * Las cuatro afinaciones cubren los instrumentos de mástil más habituales sin convertir esto
+ * en un configurador: el patrón de la escala sobre el diapasón cambia por completo entre
+ * ellas, que es justo lo que un teclado de piano no puede enseñar.
+ */
+const AFINACIONES: Afinacion[] = [
+  { id: 'guitarra', nombre: 'Guitarra · Mi estándar', cuerdas: [4, 11, 7, 2, 9, 4], trastes: 12 },
+  { id: 'drop-d', nombre: 'Guitarra · Drop D', cuerdas: [4, 11, 7, 2, 9, 2], trastes: 12 },
+  { id: 'bajo', nombre: 'Bajo · 4 cuerdas', cuerdas: [7, 2, 9, 4], trastes: 12 },
+  { id: 'ukelele', nombre: 'Ukelele · Sol Do Mi La', cuerdas: [9, 4, 0, 7], trastes: 12 },
+];
+
+/** Trastes con marca de posición en la madera; el 12 lleva doble punto. */
+const TRASTES_MARCADOS = new Set([3, 5, 7, 9]);
+
+interface MastilProps {
+  afinacion: Afinacion;
+  notasActivas: Set<number>;
+  /** Nota tónica, que se pinta distinta: es la referencia para colocar la mano. */
+  tonica: number;
+}
+
+function MastilVisual({ afinacion, notasActivas, tonica }: MastilProps) {
+  const anchoNut = 26;
+  const anchoTraste = 44;
+  const altoCuerda = 30;
+  const margenSup = 22;
+  const numCuerdas = afinacion.cuerdas.length;
+  const totalAncho = anchoNut + afinacion.trastes * anchoTraste + 14;
+  const totalAlto = margenSup + (numCuerdas - 1) * altoCuerda + 26;
+
+  /** Centro horizontal de un traste; el 0 es la cuerda al aire, antes de la cejuela. */
+  const xDeTraste = (t: number) =>
+    t === 0 ? anchoNut / 2 : anchoNut + (t - 1) * anchoTraste + anchoTraste / 2;
+  const yDeCuerda = (c: number) => margenSup + c * altoCuerda;
+
+  const nombresCuerdas = afinacion.cuerdas.map((c) => NOTAS_CROMATICAS[c]).join(', ');
+
+  return (
+    <div className={styles.mastilWrapper}>
+      <svg
+        viewBox={`0 0 ${totalAncho} ${totalAlto}`}
+        className={styles.mastilSvg}
+        role="img"
+        aria-label={`Diapasón de ${afinacion.nombre} con ${numCuerdas} cuerdas (${nombresCuerdas}) y ${afinacion.trastes} trastes. Los puntos marcan dónde pisar las notas de la escala; el más destacado es la tónica.`}
+      >
+        {/* Cejuela */}
+        <rect x={anchoNut - 4} y={margenSup - 10} width={4} height={(numCuerdas - 1) * altoCuerda + 20} className={styles.mastilCejuela} />
+
+        {/* Barras de traste */}
+        {Array.from({ length: afinacion.trastes }, (_, i) => i + 1).map((t) => (
+          <line
+            key={`traste-${t}`}
+            x1={anchoNut + t * anchoTraste}
+            y1={margenSup - 10}
+            x2={anchoNut + t * anchoTraste}
+            y2={margenSup + (numCuerdas - 1) * altoCuerda + 10}
+            className={styles.mastilTraste}
+          />
+        ))}
+
+        {/* Marcas de posición de la madera */}
+        {Array.from({ length: afinacion.trastes }, (_, i) => i + 1).map((t) => {
+          if (!TRASTES_MARCADOS.has(t) && t !== 12) return null;
+          const cx = xDeTraste(t);
+          const cyMedio = margenSup + ((numCuerdas - 1) * altoCuerda) / 2;
+          if (t === 12) {
+            // Separadas un espacio entero de cuerda: a media distancia caerían justo ENCIMA
+            // de dos cuerdas, y en un mástil real las marcas van siempre entre ellas.
+            return (
+              <g key={`marca-${t}`}>
+                <circle cx={cx} cy={cyMedio - altoCuerda} r={4} className={styles.mastilMarca} />
+                <circle cx={cx} cy={cyMedio + altoCuerda} r={4} className={styles.mastilMarca} />
+              </g>
+            );
+          }
+          return <circle key={`marca-${t}`} cx={cx} cy={cyMedio} r={4} className={styles.mastilMarca} />;
+        })}
+
+        {/* Cuerdas: la más grave se dibuja más gruesa */}
+        {afinacion.cuerdas.map((_, c) => (
+          <line
+            key={`cuerda-${c}`}
+            x1={anchoNut - 4}
+            y1={yDeCuerda(c)}
+            x2={totalAncho - 8}
+            y2={yDeCuerda(c)}
+            className={styles.mastilCuerda}
+            strokeWidth={1 + (c / (numCuerdas - 1)) * 1.6}
+          />
+        ))}
+
+        {/* Números de traste */}
+        {Array.from({ length: afinacion.trastes + 1 }, (_, t) => t).map((t) => (
+          <text
+            key={`num-${t}`}
+            x={xDeTraste(t)}
+            y={margenSup + (numCuerdas - 1) * altoCuerda + 24}
+            textAnchor="middle"
+            fontSize="10"
+            className={styles.mastilNumTraste}
+          >
+            {t}
+          </text>
+        ))}
+
+        {/* Notas de la escala sobre el diapasón */}
+        {afinacion.cuerdas.map((cuerdaAlAire, c) =>
+          Array.from({ length: afinacion.trastes + 1 }, (_, t) => t).map((t) => {
+            const cromatico = (cuerdaAlAire + t) % 12;
+            if (!notasActivas.has(cromatico)) return null;
+            const esTonica = cromatico === tonica;
+            return (
+              <g key={`nota-${c}-${t}`}>
+                <circle
+                  cx={xDeTraste(t)}
+                  cy={yDeCuerda(c)}
+                  r={11}
+                  className={esTonica ? styles.mastilNotaTonica : styles.mastilNota}
+                />
+                <text
+                  x={xDeTraste(t)}
+                  y={yDeCuerda(c) + 3.5}
+                  textAnchor="middle"
+                  fontSize="9"
+                  fontWeight="700"
+                  fill="#fff"
+                  className={styles.mastilNotaLabel}
+                >
+                  {NOTAS_CROMATICAS[cromatico]}
+                </text>
+              </g>
+            );
+          })
+        )}
+      </svg>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
 
 export default function VisualizadorEscalasMusicales() {
   const [notaRaiz, setNotaRaiz] = useState(0); // índice en NOTAS_CROMATICAS
   const [escalaSeleccionada, setEscalaSeleccionada] = useState(0); // índice en TIPOS_ESCALA
+  const [afinacionSeleccionada, setAfinacionSeleccionada] = useState(0); // índice en AFINACIONES
 
   const escala = TIPOS_ESCALA[escalaSeleccionada];
 
@@ -315,6 +469,8 @@ export default function VisualizadorEscalasMusicales() {
       'El modo Dórico es la versión "más brillante" de la menor: tiene los mismos acordes base pero el VI grado mayor le da luminosidad.',
       'Aprende las escalas en todas las tonalidades. Una escala Mayor en Re tiene las mismas relaciones que en Do, solo transpuesta.',
       'Relaciona cada escala con canciones conocidas: "Happy Birthday" es Mayor, "Smoke on the Water" usa pentatónica menor.',
+      'En el diapasón, fíjate primero en las tónicas: son el mapa. Todo lo demás se aprende como distancias respecto a ellas, y así el patrón se traslada a cualquier tonalidad moviendo la mano por el mástil.',
+      'La misma escala se digita distinto en cada afinación. Cambia entre Mi estándar, Drop D, bajo y ukelele con la escala fija y verás que el patrón no se parece: por eso una digitación memorizada no se traslada sola de un instrumento a otro.',
     ],
   };
 
@@ -326,7 +482,8 @@ export default function VisualizadorEscalasMusicales() {
         <h1 className={styles.heroTitle}>Escalas Musicales</h1>
         <p className={styles.heroSubtitle}>
           Explora las notas, intervalos y grados de cualquier escala musical.
-          Visualiza su posición en el teclado de piano.
+          Visualiza su posición en el teclado de piano y sobre el diapasón de
+          guitarra, bajo o ukelele.
         </p>
       </header>
 
@@ -412,6 +569,36 @@ export default function VisualizadorEscalasMusicales() {
             <PianoVisual notasActivas={notasActivasSet} />
             <p className={styles.pianoLeyenda}>
               Las teclas resaltadas en azul corresponden a las notas de la escala seleccionada (2 octavas).
+            </p>
+          </div>
+
+          {/* Mástil */}
+          <div className={styles.mastilSection}>
+            <h3 className={styles.seccionTitulo}>Diapasón: guitarra, bajo y ukelele</h3>
+            <div className={styles.afinacionBtns} role="group" aria-label="Selecciona el instrumento y la afinación">
+              {AFINACIONES.map((af, idx) => (
+                <button
+                  key={af.id}
+                  type="button"
+                  className={`${styles.afinacionBtn} ${afinacionSeleccionada === idx ? styles.afinacionBtnActiva : ''}`}
+                  onClick={() => setAfinacionSeleccionada(idx)}
+                  aria-pressed={afinacionSeleccionada === idx}
+                >
+                  {af.nombre}
+                </button>
+              ))}
+            </div>
+            <MastilVisual
+              afinacion={AFINACIONES[afinacionSeleccionada]}
+              notasActivas={notasActivasSet}
+              tonica={notaRaiz}
+            />
+            <p className={styles.pianoLeyenda}>
+              Cada punto marca dónde pisar una nota de la escala; los destacados son la tónica
+              ({NOTAS_CROMATICAS[notaRaiz]}), que es la referencia para colocar la mano. La columna
+              del traste 0 son las cuerdas al aire y la cuerda más grave se dibuja abajo, como
+              cuando miras el mástil tocando. En el traste 12 el patrón se repite una octava más
+              agudo: por eso ahí va la doble marca.
             </p>
           </div>
 

@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Escalas Musicales: Notas, Intervalos y Piano Interactivo | meskeIA',
-  description: 'Explora las notas de cualquier escala musical: mayor, menor, pentatónica, blues y modos griegos. Visualización en teclado de piano, grados e intervalos.',
-  keywords: 'escalas musicales, escala mayor, escala menor, pentatónica, blues, modos griegos, intervalos musicales, teclado piano, teoría musical, solfeo',
+  title: 'Escalas Musicales en Piano y Guitarra: Notas, Intervalos y Acordes | meskeIA',
+  description: 'Explora las notas de cualquier escala musical: mayor, menor, pentatónica, blues y modos griegos. Visualización en teclado de piano y en el diapasón de guitarra, bajo y ukelele, con grados e intervalos.',
+  keywords: 'escalas musicales, escalas guitarra, diapason guitarra, escala mayor, escala menor, pentatónica, blues, modos griegos, intervalos musicales, teclado piano, bajo, ukelele, teoría musical, solfeo',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Escalas Musicales: Notas, Intervalos y Piano',
-    description: 'Selecciona nota raíz y tipo de escala para ver las notas, grados e intervalos sobre un teclado de piano interactivo.',
+    title: 'Escalas Musicales en Piano y Guitarra',
+    description: 'Selecciona nota raíz y tipo de escala para ver las notas, grados e intervalos sobre un teclado de piano y sobre el diapasón de guitarra, bajo o ukelele.',
     url: 'https://meskeia.com/visualizador-escalas-musicales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Escalas Musicales',
-    description: 'Explora escalas mayor, menor, pentatónica, blues y modos griegos con visualización en teclado de piano.',
+    description: 'Explora escalas mayor, menor, pentatónica, blues y modos griegos sobre el piano y sobre el mástil de guitarra, bajo o ukelele.',
     images: ['https://meskeia.com/og-image.png'],
   },
   other: {
@@ -37,13 +37,15 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Escalas Musicales: Notas, Intervalos y Piano',
-  description: 'Herramienta interactiva para explorar escalas musicales: mayor, menor, pentatónica, blues y todos los modos griegos. Muestra las notas, intervalos, grados y su posición en el teclado de piano.',
+  name: 'Escalas Musicales en Piano y Guitarra',
+  description: 'Herramienta interactiva para explorar escalas musicales: mayor, menor, pentatónica, blues y todos los modos griegos. Muestra las notas, intervalos, grados y su posición tanto en el teclado de piano como en el diapasón de guitarra, bajo y ukelele.',
   url: 'https://meskeia.com/visualizador-escalas-musicales/',
   category: 'EducationalApplication',
   features: [
     'Visualización de 12 tipos de escalas: mayor, menores, pentatónicas, blues y modos griegos',
     'Teclado de piano SVG con las notas de la escala resaltadas visualmente',
+    'Diapasón interactivo de 12 trastes con la escala sobre el mástil, y la tónica destacada',
+    'Cuatro afinaciones: guitarra en Mi estándar, guitarra en Drop D, bajo de 4 cuerdas y ukelele',
     'Muestra los grados de la escala (I, II, III, IV, V, VI, VII) para cada nota',
     'Acordes tríada diatónicos construidos sobre cada escala',
     'Descripción del carácter sonoro de cada escala',
@@ -86,6 +88,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Los acordes diatónicos son las tríadas que se construyen usando únicamente las notas de una escala dada. Conocerlos permite saber qué acordes "suenan bien juntos" en una tonalidad sin necesidad de probar combinaciones al azar. En la escala de Do mayor, por ejemplo, los acordes diatónicos son Do, Rem, Mim, Fa, Sol, Lam y Sim(b5). Esta información es fundamental para componer, improvisar y analizar canciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se lee una escala sobre el mástil de la guitarra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El diagrama representa el mástil visto de frente: cada línea horizontal es una cuerda (la más grave abajo) y cada columna, un traste. La columna 0 son las cuerdas al aire. Cada punto marca una nota de la escala y el destacado es la tónica, que sirve de referencia para colocar la mano. A partir del traste 12 el patrón se repite igual una octava más agudo, por eso ese traste lleva doble marca. El mismo dibujo cambia por completo según la afinación: en Drop D, en un bajo de 4 cuerdas o en un ukelele las posiciones no coinciden con las de la guitarra en Mi estándar.',
       },
     },
     {

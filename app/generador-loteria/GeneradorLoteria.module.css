@@ -399,6 +399,19 @@
   font-size: 1.1rem;
 }
 
+/* Dentro de la cabecera con el botón de vaciar, el título comparte línea con él */
+.favoritesSection .resultsSectionHeader h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.favoritesNota {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
 .favoritesList {
   display: flex;
   flex-direction: column;
@@ -428,6 +441,14 @@
 .favoriteExtra {
   color: var(--text-muted);
   font-weight: 400;
+}
+
+.favoriteFecha {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
 }
 
 .removeFavorite {
