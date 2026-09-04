@@ -1,14 +1,80 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
+/**
+ * El historial de series analizadas se guarda en el navegador del usuario.
+ *
+ * El botón dice «Guardar en Historial», pero hasta el 04/09/2026 la lista vivía solo en el
+ * estado de React y desaparecía al recargar: un botón de guardar que no guardaba. Quien
+ * compara varias series (dos grupos de notas, dos meses de temperaturas) las pierde justo
+ * cuando vuelve a mirarlas.
+ *
+ * No sale del dispositivo: no hay servidor ni cuenta detrás, solo `localStorage`. Aun así,
+ * lo que se guarda son los datos que el usuario ha pegado, así que la app lo dice en pantalla
+ * y ofrece vaciarlo.
+ */
+const CLAVE_HISTORIAL = 'meskeia-estadistica-historial';
+
+/** Series conservadas, las mismas que ya mantenía el estado en memoria. */
+const MAX_HISTORIAL = 5;
+
+/**
+ * Reconstruye el historial descartando lo que no sea una serie de texto utilizable.
+ *
+ * Lo de `localStorage` es dato de fuera —otra pestaña, una versión anterior, una edición a
+ * mano—, así que se valida en vez de confiar en su forma: un elemento que no fuera texto
+ * reventaría al llamar a `substring` para pintar la lista.
+ */
+function leerHistorialGuardado(): string[] {
+  let crudo: string | null = null;
+  try {
+    crudo = window.localStorage.getItem(CLAVE_HISTORIAL);
+  } catch {
+    return []; // Navegación privada o almacenamiento bloqueado: se sigue sin persistencia
+  }
+  if (!crudo) return [];
+
+  try {
+    const datos: unknown = JSON.parse(crudo);
+    if (!Array.isArray(datos)) return [];
+    return datos
+      .filter((d): d is string => typeof d === 'string' && d.trim().length > 0)
+      .slice(-MAX_HISTORIAL);
+  } catch {
+    return []; // JSON corrupto: mejor empezar de cero que tumbar la página
+  }
+}
+
 export default function CalculadoraEstadisticaPage() {
   const [datos, setDatos] = useState('');
   const [historial, setHistorial] = useState<string[]>([]);
+
+  /**
+   * `localStorage` no existe en el servidor, y leerlo en el `useState` inicial haría que el
+   * HTML servido y el primer render del navegador no coincidieran (error de hidratación).
+   * Por eso se carga tras montar, y `historialCargado` impide que el efecto de guardado
+   * escriba la lista vacía de ese primer render encima de lo que ya había.
+   */
+  const [historialCargado, setHistorialCargado] = useState(false);
+
+  useEffect(() => {
+    setHistorial(leerHistorialGuardado());
+    setHistorialCargado(true);
+  }, []);
+
+  useEffect(() => {
+    if (!historialCargado) return;
+    try {
+      window.localStorage.setItem(CLAVE_HISTORIAL, JSON.stringify(historial));
+    } catch {
+      // Cuota agotada o almacenamiento bloqueado: la sesión sigue funcionando en memoria
+    }
+  }, [historial, historialCargado]);
 
   const valores = useMemo(() => {
     if (!datos.trim()) return [];
@@ -108,16 +174,18 @@ export default function CalculadoraEstadisticaPage() {
 
   const guardarEnHistorial = () => {
     if (datos.trim() && !historial.includes(datos)) {
-      setHistorial(prev => [...prev.slice(-4), datos]);
+      setHistorial(prev => [...prev, datos].slice(-MAX_HISTORIAL));
     }
   };
+
+  const vaciarHistorial = () => setHistorial([]);
 
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Calculadora de Estadística Descriptiva</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📊</span> Calculadora de Estadística Descriptiva</h1>
         <p className={styles.subtitle}>
           Pega tus datos y obtén al instante todas las medidas descriptivas: media, mediana, moda, desviación típica y cuasidesviación (n−1), desviación media, coeficiente de variación, cuartiles y valores atípicos
         </p>
@@ -131,16 +199,16 @@ export default function CalculadoraEstadisticaPage() {
 
           <div className={styles.ejemplosRow}>
             <span>Ejemplos:</span>
-            <button onClick={() => cargarEjemplo('notas')} className={styles.btnEjemplo}>
+            <button type="button" onClick={() => cargarEjemplo('notas')} className={styles.btnEjemplo}>
               Notas
             </button>
-            <button onClick={() => cargarEjemplo('edades')} className={styles.btnEjemplo}>
+            <button type="button" onClick={() => cargarEjemplo('edades')} className={styles.btnEjemplo}>
               Edades
             </button>
-            <button onClick={() => cargarEjemplo('temperaturas')} className={styles.btnEjemplo}>
+            <button type="button" onClick={() => cargarEjemplo('temperaturas')} className={styles.btnEjemplo}>
               Temperaturas
             </button>
-            <button onClick={() => cargarEjemplo('precios')} className={styles.btnEjemplo}>
+            <button type="button" onClick={() => cargarEjemplo('precios')} className={styles.btnEjemplo}>
               Precios
             </button>
           </div>
@@ -163,25 +231,37 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
           </div>
 
           <div className={styles.btnRow}>
-            <button onClick={() => setDatos('')} className={styles.btnSecundario}>
+            <button type="button" onClick={() => setDatos('')} className={styles.btnSecundario}>
               Limpiar
             </button>
-            <button onClick={guardarEnHistorial} className={styles.btnPrimario}>
+            <button type="button" onClick={guardarEnHistorial} className={styles.btnPrimario}>
               Guardar en Historial
             </button>
           </div>
 
           {historial.length > 0 && (
             <div className={styles.historialSection}>
-              <h3>Historial</h3>
+              <div className={styles.historialCabecera}>
+                <h3>Historial</h3>
+                <button type="button" onClick={vaciarHistorial} className={styles.btnVaciar}>
+                  Vaciar
+                </button>
+              </div>
+              <p className={styles.historialNota}>
+                Las series se guardan en este navegador y siguen aquí cuando vuelvas. No se
+                envían a ningún sitio: si vacías los datos del navegador o entras desde otro
+                dispositivo, no aparecerán.
+              </p>
               <div className={styles.historialLista}>
                 {historial.map((h, i) => (
                   <button
                     key={i}
+                    type="button"
                     className={styles.historialItem}
                     onClick={() => setDatos(h)}
+                    title={h}
                   >
-                    {h.substring(0, 30)}...
+                    {h.length > 30 ? `${h.substring(0, 30)}…` : h}
                   </button>
                 ))}
               </div>

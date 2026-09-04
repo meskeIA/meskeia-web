@@ -197,10 +197,45 @@
   border-top: 1px solid var(--border);
 }
 
+.historialCabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+}
+
 .historialSection h3 {
   font-size: 0.9rem;
   color: var(--text-secondary);
   margin-bottom: var(--spacing-sm);
+}
+
+.btnVaciar {
+  padding: 2px var(--spacing-sm);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnVaciar:hover {
+  background: var(--hover);
+  color: var(--text-secondary);
+}
+
+.btnVaciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.historialNota {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-muted);
 }
 
 .historialLista {

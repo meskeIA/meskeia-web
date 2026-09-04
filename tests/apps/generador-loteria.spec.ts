@@ -302,6 +302,17 @@ test.describe('S0115 — las combinaciones guardadas sobreviven al cierre de la 
       .getByRole('button', { name: /Guardar esta combinación/ }).click();
   }
 
+  /**
+   * Siembra el almacén sin carrera con la hidratación: la app reescribe la clave al montar,
+   * así que sembrar antes de que eso ocurra pierde el valor sembrado de forma no determinista.
+   * Que la clave exista prueba que su efecto de guardado ya corrió.
+   */
+  async function sembrarAlmacen(page: Page, valor: string) {
+    await page.waitForFunction((k) => window.localStorage.getItem(k) !== null, CLAVE);
+    await page.evaluate(([k, v]) => window.localStorage.setItem(k, v), [CLAVE, valor] as const);
+    await page.reload();
+  }
+
   /** Lee la clave de localStorage tal cual la escribe la app. */
   async function leerAlmacen(page: Page): Promise<unknown[]> {
     const crudo = await page.evaluate((k) => window.localStorage.getItem(k), CLAVE);
@@ -357,16 +368,13 @@ test.describe('S0115 — las combinaciones guardadas sobreviven al cierre de la 
   });
 
   test('una lista guardada de otra sesión se conserva al añadir combinaciones nuevas', async ({ page }) => {
-    await page.evaluate((k) => {
-      window.localStorage.setItem(k, JSON.stringify([{
-        id: 'sesion-anterior',
-        type: 'primitiva',
-        mainNumbers: [1, 2, 3, 4, 5, 6],
-        extraNumbers: [7],
-        timestamp: '2026-09-01T10:00:00.000Z',
-      }]));
-    }, CLAVE);
-    await page.reload();
+    await sembrarAlmacen(page, JSON.stringify([{
+      id: 'sesion-anterior',
+      type: 'primitiva',
+      mainNumbers: [1, 2, 3, 4, 5, 6],
+      extraNumbers: [7],
+      timestamp: '2026-09-01T10:00:00.000Z',
+    }]));
     await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(1);
     await expect(page.locator('[class*="favoriteCard"]').first()).toContainText('1 - 2 - 3 - 4 - 5 - 6');
 
@@ -390,8 +398,7 @@ test.describe('S0115 — las combinaciones guardadas sobreviven al cierre de la 
       JSON.stringify([{ id: 'x', type: 'quiniela', mainNumbers: [1, 2], timestamp: 'ayer' }]),
       JSON.stringify([{ id: 'y', type: 'primitiva', mainNumbers: 'muchos', timestamp: 1 }]),
     ]) {
-      await page.evaluate(([k, v]) => window.localStorage.setItem(k, v), [CLAVE, basura] as const);
-      await page.reload();
+      await sembrarAlmacen(page, basura);
       await expect(page.getByRole('heading', { level: 1 })).toHaveText('Generador de Lotería');
       await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(0);
     }
