@@ -445,6 +445,9 @@ export const implementedAppsUrls = [
   "/visualizador-convolucion-kernels/",// Kernels 3×3 sobre imagen generada (blur/sharpen/Sobel/bordes) — puente a CNN
   "/visualizador-iluminacion-phong/",  // Esfera sombreada por píxel con modelo de Phong (ambiente/difuso/especular)
   "/visualizador-quadtree/",           // Quadtree interactivo: subdivisión + consulta de rango vs fuerza bruta
+  "/simulador-monticulo-binario/",
+  "/simulador-automata-pila/",
+  "/normalizacion-bases-datos/",
   "/simulador-arboles-bst-avl/",    // BST y AVL: insertar/eliminar/buscar con rotaciones LL/RR/LR/RL y 4 recorridos
   "/simulador-arboles-b/",          // Árbol B (B-Tree): inserción con división, borrado con préstamo/fusión, orden 3/4/5 — índices de BD
   "/simulador-concurrencia/",       // Concurrencia: semáforos, sección crítica/carrera, productor-consumidor, deadlock filósofos — sistemas operativos

@@ -1953,7 +1953,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: 'Los índices B-Tree se construyen con algoritmos de ordenación eficientes' },
     { url: '/visualizador-criptografia/', icon: '🔒', name: 'Criptografía', description: 'Las BD usan hashing y cifrado para proteger contraseñas y datos sensibles' },
     { url: '/visualizador-llm-funcionamiento/', icon: '💬', name: 'LLMs', description: 'Los grandes modelos de lenguaje almacenan embeddings en bases de datos vectoriales' },
-    { url: '/visualizador-blockchain/', icon: '⛓️', name: 'Blockchain', description: 'Una blockchain es una BD distribuida con propiedades de inmutabilidad' },
+    { url: '/normalizacion-bases-datos/', icon: '🗃️', name: 'Normalización de BD', description: 'De 1FN a BCNF sobre tus propias dependencias funcionales' },
   ],
   'visualizador-inflacion': [
     { url: '/visualizador-burbuja-especulativa/', icon: '🫧', name: 'Burbuja Especulativa', description: 'La inflación descontrolada puede desencadenar ciclos especulativos' },
@@ -3367,7 +3367,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-concurrencia/', icon: '🔀', name: 'Concurrencia', description: 'Semáforos, carreras y deadlock' },
     { url: '/simulador-reemplazo-paginas/', icon: '🧩', name: 'Reemplazo de Páginas', description: 'FIFO, LRU, Optimal, Clock, LFU' },
     { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Procesos, hilos, memoria y E/S' },
-    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: '7 algoritmos paso a paso' },
+    { url: '/simulador-monticulo-binario/', icon: '⛰️', name: 'Montículo Binario (Heap)', description: 'La estructura con la que se implementa una cola de prioridad' },
   ],
   'simulador-concurrencia': [
     { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador de Procesos', description: 'FCFS, SJF, Round Robin, Priority' },
@@ -3384,8 +3384,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-sql-join': [
     { url: '/playground-sql/', icon: '🗄️', name: 'Playground SQL', description: 'Editor SQL interactivo con ejercicios' },
     { url: '/visualizador-base-datos-relacional/', icon: '📚', name: 'Bases de Datos Relacionales', description: 'Modelo E-R, tablas y normalización' },
+    { url: '/normalizacion-bases-datos/', icon: '🗃️', name: 'Normalización de BD', description: '1FN, 2FN, 3FN y BCNF explicadas' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
-    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
 
   // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 2 (2026-05-07)
@@ -3459,17 +3459,35 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-boids/', icon: '🐦', name: 'Boids (Bandada)', description: 'Vecindad espacial de agentes' },
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Otras estructuras de árbol' },
   ],
+  'simulador-monticulo-binario': [
+    { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'El otro árbol binario del temario' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: 'Heapsort junto a los otros seis' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+    { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador de Procesos', description: 'Donde se usa una cola de prioridad' },
+  ],
+  'simulador-automata-pila': [
+    { url: '/simulador-automatas-finitos/', icon: '🔄', name: 'Autómatas Finitos', description: 'El escalón anterior: AFD y AFND' },
+    { url: '/simulador-maquina-turing/', icon: '📜', name: 'Máquina de Turing', description: 'El escalón siguiente: cinta infinita' },
+    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Formalismo y demostración' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
+  ],
+  'normalizacion-bases-datos': [
+    { url: '/playground-sql/', icon: '🗄️', name: 'Playground SQL', description: 'Practica consultas sobre lo normalizado' },
+    { url: '/simulador-sql-join/', icon: '🔗', name: 'Tipos de JOIN en SQL', description: 'INNER, LEFT, RIGHT y FULL' },
+    { url: '/simulador-arboles-b/', icon: '🌲', name: 'Árbol B (B-Tree)', description: 'Cómo se indexa una tabla por dentro' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+  ],
   'simulador-arboles-bst-avl': [
+    { url: '/simulador-monticulo-binario/', icon: '⛰️', name: 'Montículo Binario (Heap)', description: 'Heapify, heapsort y colas de prioridad' },
     { url: '/simulador-arboles-b/', icon: '🌲', name: 'Árbol B (B-Tree)', description: 'Índices de bases de datos' },
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
-    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
     { url: '/visualizador-algoritmos/', icon: '📊', name: 'Algoritmos de Ordenación', description: '7 algoritmos paso a paso' },
   ],
   'simulador-arboles-b': [
     { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Árboles binarios y rotaciones' },
     { url: '/simulador-sql-join/', icon: '🔗', name: 'JOINs de SQL', description: 'Cómo consultan las bases de datos' },
+    { url: '/normalizacion-bases-datos/', icon: '🗃️', name: 'Normalización de BD', description: '1FN, 2FN, 3FN y BCNF explicadas' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
-    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
   'simulador-recursion': [
     { url: '/simulador-programacion-dinamica/', icon: '📐', name: 'Programación Dinámica', description: 'De la recursión a la tabla DP' },
@@ -3493,15 +3511,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 3 (2026-05-07)
   'simulador-maquina-turing': [
     { url: '/simulador-automatas-finitos/', icon: '🔄', name: 'Autómatas Finitos DFA/NFA', description: 'Lenguajes regulares y editor visual' },
+    { url: '/simulador-automata-pila/', icon: '📚', name: 'Autómata a Pila', description: 'El escalón intermedio de la jerarquía de Chomsky' },
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Cifrados clásicos y modernos' },
-    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
   'simulador-automatas-finitos': [
+    { url: '/simulador-automata-pila/', icon: '📚', name: 'Autómata a Pila', description: 'Lenguajes que un AFD no reconoce' },
     { url: '/simulador-maquina-turing/', icon: '📜', name: 'Máquina de Turing', description: 'Modelo computacional universal' },
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
     { url: '/calculadora-algebra-booleana/', icon: '⚙️', name: 'Álgebra Booleana', description: 'Karnaugh, SOP/POS, tablas verdad' },
-    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
   'simulador-regresion': [
     { url: '/simulador-kmeans/', icon: '🎯', name: 'K-Means Clustering', description: 'Aprendizaje no supervisado' },

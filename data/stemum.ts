@@ -95,6 +95,27 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'computacion',
   },
   {
+    slug: 'simulador-monticulo-binario',
+    icon: '⛰️',
+    titulo: 'Montículo Binario (Heap)',
+    desc: 'Inserta, extrae y construye montículos de máximos y mínimos viendo cada comparación, y ordena con heapsort.',
+    disciplina: 'computacion',
+  },
+  {
+    slug: 'simulador-automata-pila',
+    icon: '📚',
+    titulo: 'Autómata a Pila (AFP)',
+    desc: 'Reconoce lenguajes que un autómata finito no puede, como aⁿbⁿ, con la pila dibujada paso a paso.',
+    disciplina: 'computacion',
+  },
+  {
+    slug: 'normalizacion-bases-datos',
+    icon: '🗃️',
+    titulo: 'Normalización de Bases de Datos',
+    desc: 'Calcula el cierre de atributos y las claves candidatas, y dice en qué forma normal está la relación y por qué.',
+    disciplina: 'computacion',
+  },
+  {
     slug: 'simulador-arboles-bst-avl',
     icon: '🌳',
     titulo: 'Árboles BST y AVL',
