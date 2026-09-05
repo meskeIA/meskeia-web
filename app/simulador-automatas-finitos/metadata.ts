@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Autómatas Finitos DFA y NFA | meskeIA',
   description:
-    'Simula autómatas finitos deterministas (DFA) y no deterministas (NFA) con editor visual. Diseña estados y transiciones, prueba cadenas y observa la ejecución animada. Lenguajes formales.',
+    'Simula autómatas finitos deterministas (DFA) y no deterministas (NFA) con editor visual. Diseña estados y transiciones, prueba cadenas, convierte AFND a AFD por construcción de subconjuntos y minimiza el AFD paso a paso.',
   keywords:
-    'autómatas finitos, DFA NFA, lenguajes regulares, expresiones regulares, ε-transiciones epsilon, teoría computación, lenguajes formales, FP informática, universidad',
+    'autómatas finitos, DFA NFA, convertir AFND a AFD, construcción de subconjuntos, determinizar autómata, minimizar AFD, lenguajes regulares, ε-transiciones epsilon, teoría computación, lenguajes formales, FP informática, universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -42,11 +42,13 @@ export const jsonLd = generateWebAppSchema({
     'Soporte para ε-transiciones (autómatas no deterministas)',
     'Validación animada de cadenas paso a paso',
     'Modo batch: validar múltiples cadenas a la vez',
+    'Determinización AFND → AFD con la tabla de subconjuntos completa',
+    'Minimización de AFD por refinamiento de particiones, ronda a ronda',
     '4 ejemplos clásicos predefinidos',
     'Estados iniciales y finales configurables',
     'En español',
   ],
-  keywords: ['autómatas finitos', 'DFA NFA', 'lenguajes formales', 'teoría computación'],
+  keywords: ['autómatas finitos', 'DFA NFA', 'convertir AFND a AFD', 'minimizar AFD', 'lenguajes formales', 'teoría computación'],
 });
 
 export const faqJsonLd = {

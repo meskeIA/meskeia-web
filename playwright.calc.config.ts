@@ -13,7 +13,7 @@ import { defineConfig } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
-  testMatch: /(calculadoras-invariantes|ganancia-inmueble|coordenadas|numero-a-letras|panaderia-motores|costas-judiciales-motor|conservacion-energia-motor|division-celular-motor|quiz-tabla-periodica-banco|kmeans-parseo-motor|antiprimos-motor|serie-numerica-motor)\.spec\.ts/,
+  testMatch: /(calculadoras-invariantes|ganancia-inmueble|coordenadas|numero-a-letras|panaderia-motores|costas-judiciales-motor|conservacion-energia-motor|division-celular-motor|quiz-tabla-periodica-banco|kmeans-parseo-motor|antiprimos-motor|serie-numerica-motor|automatas-motor)\.spec\.ts/,
   fullyParallel: false,
   workers: 1,
   reporter: 'list',

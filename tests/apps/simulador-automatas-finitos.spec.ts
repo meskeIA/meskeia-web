@@ -15,6 +15,12 @@ import { test, expect } from '@playwright/test';
  * que nunca cae en «sin transición»: solo puede terminar ACEPTADA o RECHAZADA según la
  * paridad de 0s leídos.
  *
+ * ACTUALIZADO 05/09/2026: los botones de la animación llevaban su emoji suelto dentro del
+ * nombre accesible («name: '▶ Validar'»). Al envolverlo en <span aria-hidden="true"> —regla
+ * obligatoria del CLAUDE.md §5, que un lector de pantalla agradece— el nombre pasó a ser
+ * «Validar» a secas y estos selectores dejaron de encontrar nada. Lo que el test comprueba
+ * no ha cambiado: solo cómo se localiza el botón.
+ *
  * Los 3 casos de este fichero se trazaron A MANO antes de tocar el navegador, y se
  * verifican por DOS vías independientes que comparten el mismo motor:
  *   1. Modo batch (`resultadosBatch`, síncrono) — sin depender de temporizadores.
@@ -67,12 +73,12 @@ test.describe('Caso 1 · "1001" (dos 0s, número par) → ACEPTADA', () => {
 
   test('validación animada paso a paso', async ({ page }) => {
     await page.locator('#cadena').fill('1001');
-    await page.getByRole('button', { name: '▶ Validar' }).click();
+    await page.getByRole('button', { name: 'Validar', exact: true }).click();
     // Se pausa de inmediato para no depender del temporizador de la animación:
     // el cómputo debe ser el mismo avanzando manualmente.
-    await page.getByRole('button', { name: '⏸ Pausar' }).click();
+    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
 
-    const pasoSiguiente = page.getByRole('button', { name: 'Paso siguiente ▶' });
+    const pasoSiguiente = page.getByRole('button', { name: 'Paso siguiente', exact: true });
     for (let i = 0; i < 4; i++) {
       await pasoSiguiente.click();
     }
@@ -107,7 +113,7 @@ test.describe('Caso 2 · cadena vacía (0 ceros, número par) → ACEPTADA', () 
     page,
   }) => {
     await page.locator('#cadena').fill('');
-    await expect(page.getByRole('button', { name: '▶ Validar' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Validar', exact: true })).toBeDisabled();
   });
 
   test('modo batch acepta la cadena vacía', async ({ page }) => {
@@ -140,9 +146,9 @@ test.describe('Caso 3 · "0" (un 0, número impar) → RECHAZADA', () => {
 
   test('validación animada paso a paso', async ({ page }) => {
     await page.locator('#cadena').fill('0');
-    await page.getByRole('button', { name: '▶ Validar' }).click();
-    await page.getByRole('button', { name: '⏸ Pausar' }).click();
-    await page.getByRole('button', { name: 'Paso siguiente ▶' }).click();
+    await page.getByRole('button', { name: 'Validar', exact: true }).click();
+    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+    await page.getByRole('button', { name: 'Paso siguiente', exact: true }).click();
 
     await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
       'Lee "0" → q1',
@@ -176,9 +182,9 @@ test.describe('Caso 4 · regresión: borrar un estado a media animación', () =>
 
     // 1. Animación avanzada hasta el último paso de "0101" (5 de 5).
     await page.locator('#cadena').fill('0101');
-    await page.getByRole('button', { name: '▶ Validar' }).click();
-    await page.getByRole('button', { name: '⏸ Pausar' }).click();
-    const pasoSiguiente = page.getByRole('button', { name: 'Paso siguiente ▶' });
+    await page.getByRole('button', { name: 'Validar', exact: true }).click();
+    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+    const pasoSiguiente = page.getByRole('button', { name: 'Paso siguiente', exact: true });
     for (let i = 0; i < 4; i++) {
       await pasoSiguiente.click();
     }

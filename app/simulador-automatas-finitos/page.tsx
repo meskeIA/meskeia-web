@@ -11,6 +11,13 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  determinizar,
+  minimizar,
+  type AutomataMotor,
+  type ResultadoDeterminizacion,
+  type ResultadoMinimizacion,
+} from './motor-conversiones';
 import styles from './SimuladorAutomatasFinitos.module.css';
 
 type TipoAuto = 'dfa' | 'nfa';
@@ -341,6 +348,10 @@ export default function SimuladorAutomatasFinitos() {
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
+  // Conversiones: determinización y minimización sobre el autómata del lienzo
+  const [determinizacion, setDeterminizacion] = useState<ResultadoDeterminizacion | null>(null);
+  const [minimizacion, setMinimizacion] = useState<ResultadoMinimizacion | null>(null);
+
   // Resultado de validación de la cadena actual
   const validacion = useMemo(
     () => generarPasosValidacion(cadena, tipo, estados, transiciones),
@@ -357,6 +368,66 @@ export default function SimuladorAutomatasFinitos() {
       setReproduciendo(false);
     }
   }, [validacion.pasos.length, pasoActual]);
+
+  // El autómata del lienzo, en los términos que entiende el motor (sin coordenadas)
+  const automataActual = useMemo<AutomataMotor>(
+    () => ({
+      estados: estados.map((e) => ({ id: e.id, etiqueta: e.etiqueta, esInicial: e.esInicial, esFinal: e.esFinal })),
+      transiciones: transiciones.map((t) => ({ from: t.from, to: t.to, simbolo: t.simbolo })),
+    }),
+    [estados, transiciones],
+  );
+
+  // Editar el autómata deja obsoleto cualquier resultado anterior: mostrar la tabla de
+  // subconjuntos de un autómata que ya no está en pantalla sería peor que no mostrar nada.
+  useEffect(() => {
+    setDeterminizacion(null);
+    setMinimizacion(null);
+  }, [automataActual]);
+
+  const convertirADeterminista = useCallback(() => {
+    setMinimizacion(null);
+    setDeterminizacion(determinizar(automataActual));
+  }, [automataActual]);
+
+  const convertirAMinimo = useCallback(() => {
+    setDeterminizacion(null);
+    setMinimizacion(minimizar(automataActual));
+  }, [automataActual]);
+
+  /**
+   * Vuelca un autómata calculado en el lienzo. Los estados nuevos se reparten en círculo
+   * porque el motor no sabe de coordenadas: le da igual dónde estén, pero a quien mira sí.
+   */
+  const cargarEnLienzo = useCallback((resultado: AutomataMotor) => {
+    const n = resultado.estados.length;
+    const cx = SVG_WIDTH / 2;
+    const cy = SVG_HEIGHT / 2;
+    const radio = Math.min(cx, cy) - 90;
+    const nuevos: Estado[] = resultado.estados.map((e, i) => {
+      const angulo = (2 * Math.PI * i) / Math.max(1, n) - Math.PI / 2;
+      return {
+        id: `s${i}`,
+        etiqueta: e.etiqueta,
+        x: n === 1 ? cx : cx + radio * Math.cos(angulo),
+        y: n === 1 ? cy : cy + radio * Math.sin(angulo),
+        esInicial: e.esInicial,
+        esFinal: e.esFinal,
+      };
+    });
+    const idPorEtiqueta = new Map(nuevos.map((e) => [e.etiqueta, e.id]));
+    const nuevasTransiciones: Transicion[] = resultado.transiciones.map((t, i) => ({
+      id: `tc${i}`,
+      from: idPorEtiqueta.get(t.from) ?? t.from,
+      to: idPorEtiqueta.get(t.to) ?? t.to,
+      simbolo: t.simbolo,
+    }));
+    setEstados(nuevos);
+    setTransiciones(nuevasTransiciones);
+    setTipo('dfa'); // lo que se carga es siempre un AFD
+    setPasoActual(-1);
+    setReproduciendo(false);
+  }, []);
 
   // Estados activos según paso actual de la animación
   const estadosActivos = useMemo<string[]>(() => {
@@ -621,6 +692,7 @@ export default function SimuladorAutomatasFinitos() {
               type="button"
               className={`${styles.tipoBtn} ${tipo === 'dfa' ? styles.tipoActive : ''}`}
               onClick={() => cambiarTipo('dfa')}
+              aria-pressed={tipo === 'dfa'}
             >
               <span className={styles.tipoNombre}>DFA</span>
               <span className={styles.tipoDesc}>Determinista</span>
@@ -629,6 +701,7 @@ export default function SimuladorAutomatasFinitos() {
               type="button"
               className={`${styles.tipoBtn} ${tipo === 'nfa' ? styles.tipoActive : ''}`}
               onClick={() => cambiarTipo('nfa')}
+              aria-pressed={tipo === 'nfa'}
             >
               <span className={styles.tipoNombre}>NFA</span>
               <span className={styles.tipoDesc}>No determinista (con ε)</span>
@@ -962,6 +1035,152 @@ export default function SimuladorAutomatasFinitos() {
           </div>
         </div>
 
+        {/* Conversiones: los dos algoritmos que se piden en examen, ejecutados sobre
+            el autómata que hay en el lienzo */}
+        <div className={styles.panel}>
+          <h2 className={styles.panelTitle}>Convertir el autómata</h2>
+          <p className={styles.convIntro}>
+            Los dos ejercicios clásicos, resueltos paso a paso sobre el autómata que acabas de dibujar:
+            pasar de no determinista a determinista por construcción de subconjuntos, y reducir un AFD
+            al mínimo número de estados por refinamiento de particiones.
+          </p>
+          <div className={styles.convBotones}>
+            <button type="button" className={styles.convBtn} onClick={convertirADeterminista}>
+              <span aria-hidden="true">🔀</span> Determinizar (AFND → AFD)
+            </button>
+            <button type="button" className={styles.convBtn} onClick={convertirAMinimo}>
+              <span aria-hidden="true">🧲</span> Minimizar el AFD
+            </button>
+          </div>
+
+          {/* ── Determinización ── */}
+          {determinizacion && !determinizacion.ok && (
+            <div className={styles.convError} role="alert">
+              <span aria-hidden="true">⚠️</span> {determinizacion.error}
+            </div>
+          )}
+          {determinizacion && determinizacion.ok && (
+            <div className={styles.convResultado} role="status" aria-live="polite">
+              <h3 className={styles.convSubtitulo}>Tabla de subconjuntos</h3>
+              <p className={styles.convNota}>
+                Cada fila es un paso del algoritmo: desde un conjunto de estados y con un símbolo, se
+                calcula el conjunto de llegada. Las filas marcadas como <strong>nuevo</strong> son las que
+                descubren un estado del AFD.
+                {determinizacion.omitidoVacio && (
+                  <>
+                    {' '}
+                    Las que llegan a <strong>∅</strong> se dejan en blanco: no generan estado sumidero, igual
+                    que al resolverlo en papel.
+                  </>
+                )}
+              </p>
+              <div className={styles.convTablaWrap}>
+                <table className={styles.convTabla}>
+                  <thead>
+                    <tr>
+                      <th scope="col">Conjunto</th>
+                      <th scope="col">Símbolo</th>
+                      <th scope="col">Llega a</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {determinizacion.filas.map((f, i) => (
+                      <tr key={`${f.desde}-${f.simbolo}-${i}`}>
+                        <td><code>{f.desde}</code></td>
+                        <td><code>{f.simbolo}</code></td>
+                        <td>
+                          {f.hasta === null ? (
+                            <span className={styles.convVacio}>∅</span>
+                          ) : (
+                            <>
+                              <code>{f.hasta}</code>
+                              {f.nuevo && <span className={styles.convNuevo}>nuevo</span>}
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className={styles.convResumen}>
+                El AFD resultante tiene <strong>{determinizacion.automata.estados.length}</strong> estados
+                sobre el alfabeto {'{'}
+                {determinizacion.alfabeto.join(', ')}
+                {'}'}. Son finales los conjuntos que contienen algún estado final del original:{' '}
+                <strong>
+                  {determinizacion.automata.estados.filter((e) => e.esFinal).map((e) => e.etiqueta).join(', ') ||
+                    'ninguno'}
+                </strong>
+                .
+              </p>
+              <button
+                type="button"
+                className={styles.convBtnCargar}
+                onClick={() => cargarEnLienzo(determinizacion.automata)}
+              >
+                Cargar el AFD en el lienzo
+              </button>
+            </div>
+          )}
+
+          {/* ── Minimización ── */}
+          {minimizacion && !minimizacion.ok && (
+            <div className={styles.convError} role="alert">
+              <span aria-hidden="true">⚠️</span> {minimizacion.error}
+            </div>
+          )}
+          {minimizacion && minimizacion.ok && (
+            <div className={styles.convResultado} role="status" aria-live="polite">
+              <h3 className={styles.convSubtitulo}>Refinamiento de particiones</h3>
+              {minimizacion.inalcanzables.length > 0 && (
+                <p className={styles.convNota}>
+                  Antes de particionar se descartan los estados a los que no se llega desde el inicial:{' '}
+                  <strong>{minimizacion.inalcanzables.join(', ')}</strong>. No cambian el lenguaje reconocido.
+                </p>
+              )}
+              <ol className={styles.convRondas}>
+                {minimizacion.rondas.map((r, i) => (
+                  <li key={i} className={styles.convRonda}>
+                    <p className={styles.convRondaDesc}>{r.descripcion}</p>
+                    <p className={styles.convRondaClases}>
+                      {r.clases.map((c, j) => (
+                        <code key={j} className={styles.convClase}>{`{${c.join(',')}}`}</code>
+                      ))}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+              <p className={styles.convResumen}>
+                {minimizacion.fusionados.length === 0 ? (
+                  <>
+                    Ningún par de estados resultó equivalente: el autómata{' '}
+                    <strong>ya era mínimo</strong> con sus {minimizacion.automata.estados.length} estados.
+                  </>
+                ) : (
+                  <>
+                    Se fusionan{' '}
+                    {minimizacion.fusionados.map((g, i) => (
+                      <span key={i}>
+                        {i > 0 && ', '}
+                        <code>{`{${g.join(',')}}`}</code>
+                      </span>
+                    ))}
+                    . El autómata mínimo tiene <strong>{minimizacion.automata.estados.length}</strong> estados.
+                  </>
+                )}
+              </p>
+              <button
+                type="button"
+                className={styles.convBtnCargar}
+                onClick={() => cargarEnLienzo(minimizacion.automata)}
+              >
+                Cargar el autómata mínimo en el lienzo
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Validación de cadena */}
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>Validar cadena</h2>
@@ -1002,7 +1221,7 @@ export default function SimuladorAutomatasFinitos() {
               onClick={iniciarValidacion}
               disabled={reproduciendo || cadena.length === 0}
             >
-              ▶ Validar
+              <span aria-hidden="true">▶</span> Validar
             </button>
             <button
               type="button"
@@ -1010,7 +1229,7 @@ export default function SimuladorAutomatasFinitos() {
               onClick={pausarValidacion}
               disabled={!reproduciendo}
             >
-              ⏸ Pausar
+              <span aria-hidden="true">⏸</span> Pausar
             </button>
             <button
               type="button"
@@ -1018,7 +1237,7 @@ export default function SimuladorAutomatasFinitos() {
               onClick={pasoAnterior}
               disabled={pasoActual <= 0}
             >
-              ◀ Paso anterior
+              <span aria-hidden="true">◀</span> Paso anterior
             </button>
             <button
               type="button"
@@ -1026,7 +1245,7 @@ export default function SimuladorAutomatasFinitos() {
               onClick={pasoSiguiente}
               disabled={pasoActual >= validacion.pasos.length - 1}
             >
-              Paso siguiente ▶
+              Paso siguiente <span aria-hidden="true">▶</span>
             </button>
             <button
               type="button"
@@ -1131,7 +1350,7 @@ export default function SimuladorAutomatasFinitos() {
                         )}
                         {r.resultado === 'sin-transicion' && (
                           <span className={styles.badgeSinTransicion}>
-                            ⚠ Sin transición
+                            <span aria-hidden="true">⚠</span> Sin transición
                           </span>
                         )}
                       </td>
@@ -1318,7 +1537,9 @@ export default function SimuladorAutomatasFinitos() {
             </p>
             <p className={styles.faqTip}>
               Calcula primero la ε-clausura del estado inicial; luego, para cada conjunto y
-              cada símbolo, determina el siguiente conjunto.
+              cada símbolo, determina el siguiente conjunto. El panel{' '}
+              <strong>Convertir el autómata</strong> hace esa tabla sobre el que tengas dibujado,
+              fila a fila, para que puedas contrastarla con la tuya.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1448,7 +1669,9 @@ export default function SimuladorAutomatasFinitos() {
             <strong>Minimiza estados</strong>
             <p>
               Si dos estados son equivalentes (mismas transiciones, mismo carácter de
-              final), fusiónalos. El algoritmo de Hopcroft minimiza un DFA en O(n log n).
+              final), fusiónalos. El botón <strong>Minimizar el AFD</strong> lo hace por
+              refinamiento de particiones y enseña cada ronda; el algoritmo de Hopcroft
+              resuelve lo mismo en O(n log n).
             </p>
           </div>
           <div className={styles.tipCard}>
