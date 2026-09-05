@@ -1,5 +1,8 @@
 import { test, expect, Page } from '@playwright/test';
-import { COMPLEMENTO_MATERNIDAD_DEROGADO } from '../../data/fiscal/pensiones';
+import {
+  COMPLEMENTO_MATERNIDAD_DEROGADO,
+  COMPLEMENTO_BRECHA_GENERO_2026,
+} from '../../data/fiscal/pensiones';
 
 /**
  * Inspector — verificador-complemento-brecha-genero (segmento FISCAL / Seguridad Social,
@@ -1239,16 +1242,60 @@ test.describe('Verificador del complemento por brecha de género', () => {
    *
    * ⚠️ El dato vive en data/fiscal, así que su corrección va por /triaje-fiscal con fuente
    * consultada en sesión y OK del usuario, no por una edición suelta desde aquí.
+   *
+   * REPARADO el 05/09/2026 con fuente oficial consultada en sesión (texto consolidado del
+   * BOE, API de datos abiertos): el art. 71.2 LRJS no califica los días y el art. 30.2 de la
+   * Ley 39/2015 los hace hábiles salvo que una ley diga lo contrario y lo haga constar. Por
+   * la vía procesal (LRJS + art. 182 LOPJ) el resultado es el mismo, así que los dos
+   * regímenes convergen. El sello está en COMPLEMENTO_BRECHA_GENERO_PLAZOS_META, aparte del
+   * general: se verificaron los plazos, no las cuantías.
    */
-  test.fail(
-    'HALLAZGO: la guía publica «30 días naturales» para la reclamación previa (art. 71.2 LRJS)',
-    async ({ page }) => {
-      await abrirGuia(page);
-      const guia = normalizar(await page.locator('body').innerText());
-      // Lo que debería leerse cuando el módulo fiscal se corrija
-      expect(guia).not.toContain('30 días naturales');
-    },
-  );
+  test('regresión hallazgo 605: el plazo de la reclamación previa se publica en días HÁBILES', async ({
+    page,
+  }) => {
+    await abrirGuia(page);
+    const guia = normalizar(await page.locator('body').innerText());
+    const { reclamacionPreviaDias: dias, reclamacionPreviaTipoDias: tipo } =
+      COMPLEMENTO_BRECHA_GENERO_2026.plazos;
+
+    // El módulo es la fuente: si alguien lo devuelve a 'naturales', esto cae aquí primero.
+    expect(tipo).toBe('hábiles');
+    expect(guia).toContain(`${dias} días ${tipo}`);
+    // La afirmación falsa concreta no puede volver. Ojo: NO se prohíbe la frase «días
+    // naturales» a secas — la página la usa para nombrar el error que hay que evitar, y
+    // explicar el contraste es justo lo que se le pide a un contenido de riesgo 1.
+    expect(guia).not.toContain(`${dias} días naturales`);
+  });
+
+  /**
+   * HALLAZGO 605 (b) — encontrado el 05/09/2026 al traer el art. 71 ENTERO del BOE en vez de
+   * solo el apartado 2 que citaba la página.
+   *
+   * La guía remataba el plazo con «Pasado ese plazo, la resolución gana firmeza y la
+   * reclamación se complica» y, en errores frecuentes, «hay que recurrir a vías más
+   * complejas». Las dos son falsas por sí solas, sin necesidad de discutir hábiles o
+   * naturales: el art. 71.4 LRJS dice literalmente que «podrá reiterarse la reclamación
+   * previa de haber caducado la anterior, en tanto no haya prescrito el derecho». Perder el
+   * plazo produce caducidad en la instancia, no pérdida del derecho ni firmeza del acto.
+   *
+   * Los dos defectos se sumaban en la misma dirección —plazo más corto del real + «lo has
+   * perdido»—, que es lo que convierte un matiz jurídico en que alguien deje de reclamar.
+   */
+  test('regresión hallazgo 605 (b): perder el plazo NO da firmeza a la resolución', async ({
+    page,
+  }) => {
+    await abrirGuia(page);
+    const guia = normalizar(await page.locator('body').innerText());
+
+    // Las dos afirmaciones retiradas
+    expect(guia).not.toContain('gana firmeza');
+    expect(guia).not.toContain('vías más complejas');
+    // Y la que las sustituye, derivada del módulo (no tecleada aquí)
+    const reiterable = COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaReiterable;
+    expect(reiterable.reiterable).toBe(true);
+    expect(guia).toContain(reiterable.detalle);
+    expect(guia).toContain(reiterable.norma);
+  });
 
   /**
    * HALLAZGO 02/09/2026 (b) — `COMPLEMENTO_BRECHA_GENERO_META.doctrina` no tiene ni un solo

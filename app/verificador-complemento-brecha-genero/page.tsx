@@ -902,8 +902,11 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <p>
                 {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaDias} días{' '}
                 {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaTipoDias} para reclamación previa
-                tras una denegación ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaNorma}).
-                Pasado ese plazo, la resolución gana firmeza y la reclamación se complica.
+                tras una denegación ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaNorma}):
+                no cuentan sábados, domingos ni festivos, así que el plazo real es más largo que
+                un mes de calendario.{' '}
+                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaReiterable.detalle}{' '}
+                ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaReiterable.norma})
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -947,10 +950,14 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 doctrina TJUE/TS.
               </li>
               <li>
-                <strong>Reclamar fuera de plazo.</strong> La reclamación previa tiene{' '}
+                <strong>Contar el plazo en días naturales.</strong> La reclamación previa tiene{' '}
                 {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaDias} días{' '}
-                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaTipoDias} desde la notificación.
-                Pasado ese plazo, hay que recurrir a vías más complejas.
+                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaTipoDias} desde la notificación
+                ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaNorma}), no naturales: al
+                descontar sábados, domingos y festivos, quien cuenta del calendario se da por fuera
+                de plazo antes de tiempo.{' '}
+                {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaReiterable.detalle}{' '}
+                ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaReiterable.norma})
               </li>
               {/* La serie 30,40 / 33,20 / 35,90 que había aquí no estaba en data/fiscal ni
                   citaba fuente: solo el valor vigente es verificable, y es el que se usa. */}

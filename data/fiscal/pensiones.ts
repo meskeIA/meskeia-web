@@ -547,13 +547,73 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
    * Plazos del procedimiento. El de la reclamación previa aparecía TRES veces en el JSX y
    * solo una lo calificaba de «naturales», así que la página no decía lo mismo tres veces
    * sobre un plazo de caducidad.
+   *
+   * ⚠️ Corregido el 05/09/2026 (hallazgo 605 del Inspector): decía «naturales» citando el
+   * art. 71.2 LRJS, y ese precepto NO califica los días. Los dos regímenes que podrían
+   * aplicarse convergen en HÁBILES —el razonamiento y las citas literales están en
+   * COMPLEMENTO_BRECHA_GENERO_PLAZOS_META—, así que «naturales» era falso por cualquiera de
+   * las dos vías y recortaba el plazo real en unos doce días naturales.
    */
   plazos: {
-    /** Reclamación previa ante el INSS tras una denegación (art. 71 LRJS) */
+    /** Reclamación previa ante el INSS tras una denegación (art. 71.2 LRJS) */
     reclamacionPreviaDias: 30,
-    reclamacionPreviaTipoDias: 'naturales' as const,
+    reclamacionPreviaTipoDias: 'hábiles' as const,
     reclamacionPreviaNorma: 'Art. 71.2 LRJS',
+    /**
+     * Perder el plazo NO extingue el derecho ni da firmeza a la resolución: el art. 71.4
+     * LRJS permite volver a presentar la reclamación previa mientras el derecho no haya
+     * prescrito. Sube aquí el 05/09/2026 porque la página afirmaba lo contrario en dos
+     * sitios («la resolución gana firmeza», «hay que recurrir a vías más complejas»), y es
+     * el mismo patrón de los hallazgos 503-505: la afirmación jurídica tecleada en el JSX,
+     * fuera del alcance de /triaje-fiscal. Se sumaba al defecto anterior en la misma
+     * dirección: a quien reclamaba el día 35 se le decía que había perdido el derecho, y lo
+     * conservaba por partida doble.
+     */
+    reclamacionPreviaReiterable: {
+      norma: 'Art. 71.4 LRJS',
+      reiterable: true,
+      detalle:
+        'Pasado el plazo no se pierde el derecho: la reclamación previa puede volver a ' +
+        'presentarse mientras el derecho no haya prescrito, aunque puedan perderse efectos ' +
+        'retroactivos.',
+    },
     /** Orientativo: lo que suele tardar el INSS en resolver. NO es un plazo legal. */
     resolucionInssDiasOrientativo: 90,
   },
+};
+
+/**
+ * Sello PROPIO de los plazos del procedimiento, separado de COMPLEMENTO_BRECHA_GENERO_META.
+ *
+ * Los plazos no salen del art. 60 LGSS ni de ningún RDL de revalorización —que es lo que
+ * declara la `fuente` del sello general— sino de la LRJS y de la Ley 39/2015. Vivían bajo un
+ * sello que no los cubría, así que /triaje-fiscal los revisaba contra una norma que no dice
+ * nada de ellos. Separarlos permite además re-sellar los plazos sin afirmar de paso que se
+ * han reverificado los importes, y al revés: el 05/09/2026 se verificaron los plazos, no las
+ * cuantías, y el sello general sigue en su fecha.
+ */
+export const COMPLEMENTO_BRECHA_GENERO_PLAZOS_META = {
+  fuente: 'Art. 71 LRJS (Ley 36/2011) + art. 30.2 Ley 39/2015',
+  verificado: '2026-09-05',
+  vigencia: 'sin caducidad conocida: depende de una reforma de la LRJS, no de la anual de pensiones',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2011-15936#a71',
+  /**
+   * Por qué los días son HÁBILES aunque el art. 71.2 LRJS no los califique. Las tres citas
+   * salen del texto consolidado del BOE, consultado en sesión el 05/09/2026:
+   *
+   * · Art. 71.2 LRJS: «en el plazo de treinta días desde la notificación de la misma». No
+   *   dice naturales ni hábiles.
+   * · Art. 30.2 Ley 39/2015: «cuando los plazos se señalen por días, se entiende que éstos
+   *   son hábiles, excluyéndose del cómputo los sábados, los domingos y los declarados
+   *   festivos»; y si una ley los quiere naturales «se hará constar esta circunstancia en
+   *   las correspondientes notificaciones». El art. 71.2 no lo hace.
+   * · Por la vía procesal (LRJS + art. 182 LOPJ) los días hábiles excluyen igualmente
+   *   sábados, domingos y festivos.
+   *
+   * Los dos regímenes posibles CONVERGEN, así que la calificación no depende de resolver si
+   * este plazo es administrativo o procesal — que es la discusión que lo tenía sin decidir.
+   * Única divergencia conocida: agosto, inhábil por la vía procesal (art. 43.4 LRJS) y hábil
+   * por la administrativa. No afecta a cómo lo enuncia la app, que no computa fechas.
+   */
+  computo: 'días hábiles: se excluyen sábados, domingos y festivos',
 };
