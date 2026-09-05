@@ -854,8 +854,11 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 <h3>Reclamación judicial (si procede)</h3>
                 <p>
                   Si la reclamación previa también se desestima, queda la vía del Juzgado de lo
-                  Social. Es momento de contar con un abogado laboralista, especialmente en casos
-                  de denegación previa a hombres (doctrina TJUE/TS 2025).
+                  Social. No hace falta esperar a una respuesta:{' '}
+                  {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaResolucion.detalle}{' '}
+                  ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaResolucion.norma}). Es
+                  momento de contar con un abogado laboralista, especialmente en casos de
+                  denegación previa a hombres (doctrina TJUE/TS 2025).
                 </p>
               </div>
             </li>

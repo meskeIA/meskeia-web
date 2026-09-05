@@ -1247,7 +1247,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
    * BOE, API de datos abiertos): el art. 71.2 LRJS no califica los días y el art. 30.2 de la
    * Ley 39/2015 los hace hábiles salvo que una ley diga lo contrario y lo haga constar. Por
    * la vía procesal (LRJS + art. 182 LOPJ) el resultado es el mismo, así que los dos
-   * regímenes convergen. El sello está en COMPLEMENTO_BRECHA_GENERO_PLAZOS_META, aparte del
+   * regímenes convergen. El sello está en RECLAMACION_PREVIA_SS_META, aparte del
    * general: se verificaron los plazos, no las cuantías.
    */
   test('regresión hallazgo 605: el plazo de la reclamación previa se publica en días HÁBILES', async ({
@@ -1292,7 +1292,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(guia).not.toContain('vías más complejas');
     // Y la que las sustituye, derivada del módulo (no tecleada aquí)
     const reiterable = COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaReiterable;
-    expect(reiterable.reiterable).toBe(true);
+    expect(reiterable.puede).toBe(true);
     expect(guia).toContain(reiterable.detalle);
     expect(guia).toContain(reiterable.norma);
   });

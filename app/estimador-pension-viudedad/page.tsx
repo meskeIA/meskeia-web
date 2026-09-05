@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, Rela
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { PENSION_VIUDEDAD_2026, minimoViudedad2026 } from '@/data/fiscal/pensiones';
+import { PENSION_VIUDEDAD_2026, minimoViudedad2026, RECLAMACION_PREVIA_SS } from '@/data/fiscal/pensiones';
 import { FISCAL_PENSIONES_META } from '@/data/fiscal';
 
 // Alias corto para legibilidad interna
@@ -593,7 +593,7 @@ export default function EstimadorPensionViudedad() {
             <span className={styles.stepNumber}>5</span>
             <div className={styles.stepContent}>
               <strong>Espera la resolución del INSS</strong>
-              <p>El INSS tiene un plazo de 90 días para resolver. En la práctica, suele tardar entre 1 y 3 meses. Si la resolución es denegatoria, tienes 30 días para presentar reclamación previa ante el INSS y, posteriormente, demanda ante el Juzgado de lo Social.</p>
+              <p>El INSS tiene un plazo de 90 días para resolver. En la práctica, suele tardar entre 1 y 3 meses. Si la resolución es denegatoria, tienes {RECLAMACION_PREVIA_SS.dias} días {RECLAMACION_PREVIA_SS.tipoDias} —no cuentan sábados, domingos ni festivos— para presentar reclamación previa ante el INSS ({RECLAMACION_PREVIA_SS.norma}). {RECLAMACION_PREVIA_SS.resolucion.detalle} ({RECLAMACION_PREVIA_SS.resolucion.norma}). {RECLAMACION_PREVIA_SS.reiteracion.detalle} ({RECLAMACION_PREVIA_SS.reiteracion.norma}).</p>
             </div>
           </div>
           <div className={styles.step}>

@@ -428,6 +428,88 @@ export const COMPLEMENTO_MINIMOS_LIMITES_2026 = {
 // Se abona junto con la pensión en 14 pagas. NO computa para el límite máximo
 // de pensiones públicas (LIMITES_PENSION_2025.maximaMensual).
 
+/**
+ * Reclamación previa ante el INSS: el trámite obligatorio antes de demandar en materia de
+ * prestaciones de Seguridad Social (art. 71 LRJS). NO es propio de ninguna prestación —lo
+ * usan igual el complemento por brecha de género, la pensión de viudedad y cualquier app que
+ * hable de reclamar una denegación—, así que vive aparte y no dentro de una de ellas.
+ *
+ * Nace el 05/09/2026 al reparar el hallazgo 605. El dato corregido vivía dentro de
+ * COMPLEMENTO_BRECHA_GENERO_2026.plazos, mientras `estimador-pension-viudedad` describía el
+ * MISMO trámite tecleado a mano y sin calificar los días: dos copias del mismo precepto que
+ * ya habían empezado a divergir en cuanto se corrigió una. Es el modo de fallo de
+ * data/itp-ccaa.ts, y subir el dato aquí es lo que impide que la próxima app lo teclee otra
+ * vez.
+ */
+export const RECLAMACION_PREVIA_SS = {
+  /** Plazo para interponerla, desde la notificación de la resolución denegatoria */
+  dias: 30,
+  tipoDias: 'hábiles' as const,
+  norma: 'Art. 71.2 LRJS',
+  /**
+   * Perder el plazo NO extingue el derecho ni da firmeza a la resolución: solo produce
+   * caducidad en la instancia. El art. 71.4 LRJS permite volver a presentarla mientras el
+   * derecho no haya prescrito.
+   */
+  reiteracion: {
+    norma: 'Art. 71.4 LRJS',
+    puede: true,
+    detalle:
+      'Pasado el plazo no se pierde el derecho: la reclamación previa puede volver a ' +
+      'presentarse mientras el derecho no haya prescrito, aunque puedan perderse efectos ' +
+      'retroactivos.',
+  },
+  /**
+   * Lo que tiene la entidad para contestarla y qué ocurre si no lo hace. Le importa más a
+   * quien reclama que el propio plazo de interposición, porque es el momento en que se abre
+   * la vía judicial: sin este dato, quien no recibe respuesta no sabe que ya puede demandar.
+   */
+  resolucion: {
+    dias: 45,
+    norma: 'Art. 71.5 LRJS',
+    detalle:
+      'La entidad debe contestar expresamente en 45 días. Si no lo hace, la reclamación se ' +
+      'entiende denegada por silencio administrativo y queda abierta la vía del Juzgado de ' +
+      'lo Social.',
+  },
+};
+
+/**
+ * Sello de la reclamación previa, SEPARADO de los sellos de cada prestación.
+ *
+ * Estos plazos no salen del art. 60 LGSS ni de ningún RDL de revalorización —que es lo que
+ * declaran las `fuente` de los sellos de prestación— sino de la LRJS y de la Ley 39/2015.
+ * Vivían bajo un sello que no los cubría, así que /triaje-fiscal los revisaba contra una
+ * norma que no dice nada de ellos. Separarlos permite además fechar la verificación de los
+ * plazos sin afirmar de paso que se han reverificado las cuantías, y al revés: el 05/09/2026
+ * se verificaron los plazos, no los importes.
+ */
+export const RECLAMACION_PREVIA_SS_META = {
+  fuente: 'Art. 71 LRJS (Ley 36/2011) + art. 30.2 Ley 39/2015',
+  verificado: '2026-09-05',
+  vigencia: 'sin caducidad conocida: depende de una reforma de la LRJS, no de la revisión anual de pensiones',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2011-15936#a71',
+  /**
+   * Por qué los días son HÁBILES aunque el art. 71.2 LRJS no los califique. Las citas salen
+   * del texto consolidado del BOE (API de datos abiertos), consultado el 05/09/2026:
+   *
+   * · Art. 71.2 LRJS: «en el plazo de treinta días desde la notificación de la misma». No
+   *   dice naturales ni hábiles.
+   * · Art. 30.2 Ley 39/2015: «cuando los plazos se señalen por días, se entiende que éstos
+   *   son hábiles, excluyéndose del cómputo los sábados, los domingos y los declarados
+   *   festivos»; y si una ley los quiere naturales «se hará constar esta circunstancia en
+   *   las correspondientes notificaciones». El art. 71.2 no lo hace.
+   * · Por la vía procesal (LRJS + art. 182 LOPJ) los días hábiles excluyen igualmente
+   *   sábados, domingos y festivos.
+   *
+   * Los dos regímenes posibles CONVERGEN, así que la calificación no depende de resolver si
+   * este plazo es administrativo o procesal — que es la discusión que lo tenía sin decidir.
+   * Única divergencia conocida: agosto, inhábil por la vía procesal (art. 43.4 LRJS) y hábil
+   * por la administrativa. No afecta a cómo lo enuncian las apps, que no computan fechas.
+   */
+  computo: 'días hábiles: se excluyen sábados, domingos y festivos',
+};
+
 export const COMPLEMENTO_BRECHA_GENERO_META = {
   fuente: 'Art. 60 LGSS (RDL 8/2015, modificado por RDL 3/2021) + RDL 3/2026',
   verificado: '2026-05-13',
@@ -551,69 +633,21 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
    * ⚠️ Corregido el 05/09/2026 (hallazgo 605 del Inspector): decía «naturales» citando el
    * art. 71.2 LRJS, y ese precepto NO califica los días. Los dos regímenes que podrían
    * aplicarse convergen en HÁBILES —el razonamiento y las citas literales están en
-   * COMPLEMENTO_BRECHA_GENERO_PLAZOS_META—, así que «naturales» era falso por cualquiera de
-   * las dos vías y recortaba el plazo real en unos doce días naturales.
+   * RECLAMACION_PREVIA_SS_META—, así que «naturales» era falso por cualquiera de las dos
+   * vías y recortaba el plazo real en unos doce días naturales.
+   *
+   * El trámite en sí NO es propio de esta prestación: vive en RECLAMACION_PREVIA_SS, y aquí
+   * solo se le ponen los nombres con los que ya lo consume la página. Lo único propio del
+   * complemento es el orientativo de resolución de la solicitud inicial.
    */
   plazos: {
-    /** Reclamación previa ante el INSS tras una denegación (art. 71.2 LRJS) */
-    reclamacionPreviaDias: 30,
-    reclamacionPreviaTipoDias: 'hábiles' as const,
-    reclamacionPreviaNorma: 'Art. 71.2 LRJS',
-    /**
-     * Perder el plazo NO extingue el derecho ni da firmeza a la resolución: el art. 71.4
-     * LRJS permite volver a presentar la reclamación previa mientras el derecho no haya
-     * prescrito. Sube aquí el 05/09/2026 porque la página afirmaba lo contrario en dos
-     * sitios («la resolución gana firmeza», «hay que recurrir a vías más complejas»), y es
-     * el mismo patrón de los hallazgos 503-505: la afirmación jurídica tecleada en el JSX,
-     * fuera del alcance de /triaje-fiscal. Se sumaba al defecto anterior en la misma
-     * dirección: a quien reclamaba el día 35 se le decía que había perdido el derecho, y lo
-     * conservaba por partida doble.
-     */
-    reclamacionPreviaReiterable: {
-      norma: 'Art. 71.4 LRJS',
-      reiterable: true,
-      detalle:
-        'Pasado el plazo no se pierde el derecho: la reclamación previa puede volver a ' +
-        'presentarse mientras el derecho no haya prescrito, aunque puedan perderse efectos ' +
-        'retroactivos.',
-    },
+    reclamacionPreviaDias: RECLAMACION_PREVIA_SS.dias,
+    reclamacionPreviaTipoDias: RECLAMACION_PREVIA_SS.tipoDias,
+    reclamacionPreviaNorma: RECLAMACION_PREVIA_SS.norma,
+    reclamacionPreviaReiterable: RECLAMACION_PREVIA_SS.reiteracion,
+    reclamacionPreviaResolucion: RECLAMACION_PREVIA_SS.resolucion,
     /** Orientativo: lo que suele tardar el INSS en resolver. NO es un plazo legal. */
     resolucionInssDiasOrientativo: 90,
   },
 };
 
-/**
- * Sello PROPIO de los plazos del procedimiento, separado de COMPLEMENTO_BRECHA_GENERO_META.
- *
- * Los plazos no salen del art. 60 LGSS ni de ningún RDL de revalorización —que es lo que
- * declara la `fuente` del sello general— sino de la LRJS y de la Ley 39/2015. Vivían bajo un
- * sello que no los cubría, así que /triaje-fiscal los revisaba contra una norma que no dice
- * nada de ellos. Separarlos permite además re-sellar los plazos sin afirmar de paso que se
- * han reverificado los importes, y al revés: el 05/09/2026 se verificaron los plazos, no las
- * cuantías, y el sello general sigue en su fecha.
- */
-export const COMPLEMENTO_BRECHA_GENERO_PLAZOS_META = {
-  fuente: 'Art. 71 LRJS (Ley 36/2011) + art. 30.2 Ley 39/2015',
-  verificado: '2026-09-05',
-  vigencia: 'sin caducidad conocida: depende de una reforma de la LRJS, no de la anual de pensiones',
-  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2011-15936#a71',
-  /**
-   * Por qué los días son HÁBILES aunque el art. 71.2 LRJS no los califique. Las tres citas
-   * salen del texto consolidado del BOE, consultado en sesión el 05/09/2026:
-   *
-   * · Art. 71.2 LRJS: «en el plazo de treinta días desde la notificación de la misma». No
-   *   dice naturales ni hábiles.
-   * · Art. 30.2 Ley 39/2015: «cuando los plazos se señalen por días, se entiende que éstos
-   *   son hábiles, excluyéndose del cómputo los sábados, los domingos y los declarados
-   *   festivos»; y si una ley los quiere naturales «se hará constar esta circunstancia en
-   *   las correspondientes notificaciones». El art. 71.2 no lo hace.
-   * · Por la vía procesal (LRJS + art. 182 LOPJ) los días hábiles excluyen igualmente
-   *   sábados, domingos y festivos.
-   *
-   * Los dos regímenes posibles CONVERGEN, así que la calificación no depende de resolver si
-   * este plazo es administrativo o procesal — que es la discusión que lo tenía sin decidir.
-   * Única divergencia conocida: agosto, inhábil por la vía procesal (art. 43.4 LRJS) y hábil
-   * por la administrativa. No afecta a cómo lo enuncia la app, que no computa fechas.
-   */
-  computo: 'días hábiles: se excluyen sábados, domingos y festivos',
-};
