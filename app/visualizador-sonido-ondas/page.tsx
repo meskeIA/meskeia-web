@@ -18,6 +18,10 @@ import { getRelatedApps } from '@/data/app-relations';
 // Tipos y constantes
 // ─────────────────────────────────────────────
 
+// Las cuatro secciones se sirven SIEMPRE, cada una con su ancla y su <h2>, porque
+// «decibelios», «rango audible» o «armónicos» se buscan por separado, no como «sonido
+// y ondas». Hasta el 05/09/2026 vivían tras `seccion === '...'` en un componente de
+// cliente, así que tres cuartas partes del contenido no llegaban al HTML servido.
 type Seccion = 'anatomia' | 'frecuencia' | 'decibelios' | 'timbre';
 
 interface SeccionInfo {
@@ -291,15 +295,14 @@ function stopTone() {
 // ─────────────────────────────────────────────
 
 export default function SonidoOndasPage() {
-  const [seccion, setSeccion] = useState<Seccion>('anatomia');
   const [frecuencia, setFrecuencia] = useState(200);
   const [amplitud, setAmplitud] = useState(70);
   const [instrumentoIdx, setInstrumentoIdx] = useState(0);
 
-  // Cleanup audio al desmontar o cambiar de sección
+  // Cleanup del audio al desmontar la página
   useEffect(() => {
     return () => { stopTone(); };
-  }, [seccion]);
+  }, []);
 
   // Cálculos derivados
   const longitudOnda = 343 / frecuencia;
@@ -854,27 +857,22 @@ export default function SonidoOndasPage() {
 
         <LegalNotice />
 
-        {/* Navegación */}
+        {/* Índice de secciones: enlaces de ancla, no pestañas — el contenido de las
+            cuatro está siempre en la página y cada una tiene su propia URL con # */}
         <nav className={styles.navSecciones} aria-label="Secciones del visualizador">
           {SECCIONES.map(s => (
-            <button
-              key={s.id}
-              type="button"
-              className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
-              onClick={() => setSeccion(s.id)}
-              aria-pressed={seccion === s.id}
-            >
+            <a key={s.id} href={`#${s.id}`} className={styles.navBtn}>
               <span className={styles.navIcono} aria-hidden="true">{s.icono}</span>
               <span className={styles.navTexto}>{s.titulo}</span>
-            </button>
+            </a>
           ))}
         </nav>
 
-        {/* Contenido de sección activa */}
-        {seccion === 'anatomia' && renderAnatomia()}
-        {seccion === 'frecuencia' && renderFrecuencia()}
-        {seccion === 'decibelios' && renderDecibelios()}
-        {seccion === 'timbre' && renderTimbre()}
+        {/* Las cuatro secciones, siempre servidas */}
+        <section id="anatomia" className={styles.seccion}>{renderAnatomia()}</section>
+        <section id="frecuencia" className={styles.seccion}>{renderFrecuencia()}</section>
+        <section id="decibelios" className={styles.seccion}>{renderDecibelios()}</section>
+        <section id="timbre" className={styles.seccion}>{renderTimbre()}</section>
 
         {/* Contenido educativo */}
         <EducationalSection

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -11,7 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorPlanificadorProcesos.module.css';
 
 type Algoritmo = 'fcfs' | 'sjf' | 'srtf' | 'rr' | 'priority';
@@ -464,15 +464,127 @@ function calcularResultado(
   };
 }
 
+// ─────────────────────────────────────────────
+// Modo «corrígeme»: comparar la tabla que ha rellenado quien practica
+// contra la que calcula el simulador, y señalar DÓNDE se torció
+// ─────────────────────────────────────────────
+
+type CampoRespuesta = 'fin' | 'espera' | 'turnaround';
+
+const CAMPOS_RESPUESTA: { campo: CampoRespuesta; etiqueta: string }[] = [
+  { campo: 'fin', etiqueta: 'Fin' },
+  { campo: 'espera', etiqueta: 'Espera' },
+  { campo: 'turnaround', etiqueta: 'Turnaround' },
+];
+
+type RespuestasAlumno = Record<string, Record<CampoRespuesta, string>>;
+
+interface CeldaCorregida {
+  pid: string;
+  campo: CampoRespuesta;
+  /** null = la casilla se dejó vacía o no contenía un número */
+  tuyo: number | null;
+  correcto: number;
+  ok: boolean;
+}
+
+interface Correccion {
+  celdas: CeldaCorregida[];
+  /** Primera casilla equivocada leyendo por filas y, dentro de cada fila, de izquierda a derecha */
+  primerFallo: CeldaCorregida | null;
+  aciertos: number;
+  rellenadas: number;
+  total: number;
+}
+
+/**
+ * El orden de recorrido importa: se lee proceso a proceso y, dentro de cada uno,
+ * fin → espera → turnaround, porque espera y turnaround se derivan del fin. Así, la
+ * primera casilla marcada es la que originó el error y no una de sus consecuencias.
+ */
+function corregirRespuestas(metricas: MetricasProceso[], respuestas: RespuestasAlumno): Correccion {
+  const celdas: CeldaCorregida[] = [];
+
+  for (const m of metricas) {
+    for (const { campo } of CAMPOS_RESPUESTA) {
+      const crudo = respuestas[m.pid]?.[campo] ?? '';
+      const valor = crudo.trim() === '' ? NaN : parseSpanishNumber(crudo);
+      const tuyo = Number.isFinite(valor) ? valor : null;
+      celdas.push({ pid: m.pid, campo, tuyo, correcto: m[campo], ok: tuyo === m[campo] });
+    }
+  }
+
+  const rellenadas = celdas.filter((c) => c.tuyo !== null);
+  return {
+    celdas,
+    primerFallo: celdas.find((c) => c.tuyo !== null && !c.ok) ?? null,
+    aciertos: celdas.filter((c) => c.ok).length,
+    rellenadas: rellenadas.length,
+    total: celdas.length,
+  };
+}
+
+/** Por qué esa casilla sale así: la regla, aplicada a los números de ESTE proceso. */
+function explicarCelda(celda: CeldaCorregida, m: MetricasProceso): string {
+  if (celda.campo === 'turnaround') {
+    return `Turnaround = fin − llegada. Para ${m.pid}: ${m.fin} − ${m.llegada} = ${m.turnaround}. Es el tiempo total que el proceso pasa en el sistema, desde que llega hasta que termina.`;
+  }
+  if (celda.campo === 'espera') {
+    return `Espera = turnaround − ráfaga. Para ${m.pid}: ${m.turnaround} − ${m.rafaga} = ${m.espera}. Es el tiempo que pasa en la cola de listos sin ocupar la CPU; si te falla, revisa antes el fin.`;
+  }
+  return `Fin = el instante en que ${m.pid} suelta la CPU por última vez, que en el diagrama de Gantt es el borde derecho de su último bloque. Aquí es ${m.fin}.`;
+}
+
 export default function SimuladorPlanificadorProcesos() {
   const [procesos, setProcesos] = useState<Proceso[]>(PROCESOS_INICIALES);
   const [algoritmo, setAlgoritmo] = useState<Algoritmo>('fcfs');
   const [quantum, setQuantum] = useState<number>(2);
   const [apropiativo, setApropiativo] = useState<boolean>(true);
 
+  // Modo «corrígeme»
+  const [practicando, setPracticando] = useState<boolean>(false);
+  const [respuestas, setRespuestas] = useState<RespuestasAlumno>({});
+  const [correccion, setCorreccion] = useState<Correccion | null>(null);
+
   const resultado = useMemo(
     () => calcularResultado(procesos, algoritmo, quantum, apropiativo),
     [procesos, algoritmo, quantum, apropiativo],
+  );
+
+  // Un enunciado distinto invalida la corrección anterior: si no se descarta, la
+  // pantalla seguiría marcando en verde casillas que ya no coinciden con nada.
+  useEffect(() => {
+    setCorreccion(null);
+  }, [procesos, algoritmo, quantum, apropiativo]);
+
+  const actualizarRespuesta = useCallback((pid: string, campo: CampoRespuesta, valor: string) => {
+    setRespuestas((prev) => {
+      const fila = prev[pid] ?? { fin: '', espera: '', turnaround: '' };
+      return { ...prev, [pid]: { ...fila, [campo]: valor } };
+    });
+    setCorreccion(null);
+  }, []);
+
+  const comprobarRespuestas = useCallback(() => {
+    setCorreccion(corregirRespuestas(resultado.metricas, respuestas));
+  }, [resultado.metricas, respuestas]);
+
+  const borrarRespuestas = useCallback(() => {
+    setRespuestas({});
+    setCorreccion(null);
+  }, []);
+
+  const alternarPractica = useCallback(() => {
+    setPracticando((prev) => {
+      if (prev) setCorreccion(null);
+      return !prev;
+    });
+  }, []);
+
+  const celdaCorregida = useCallback(
+    (pid: string, campo: CampoRespuesta): CeldaCorregida | undefined =>
+      correccion?.celdas.find((c) => c.pid === pid && c.campo === campo),
+    [correccion],
   );
 
   const actualizarProceso = useCallback(
@@ -738,8 +850,18 @@ export default function SimuladorPlanificadorProcesos() {
           </div>
         </div>
 
-        {/* Diagrama de Gantt */}
-        <div className={styles.ganttContainer}>
+        {/* Diagrama de Gantt — se retira mientras se practica, o no habría nada que resolver */}
+        {practicando && (
+          <div className={styles.practicaAviso} role="status">
+            <span aria-hidden="true">🙈</span>
+            <span>
+              <strong>Solución oculta.</strong> Resuelve el enunciado a mano, rellena la tabla de más abajo y
+              pulsa <em>Comprobar</em>. El diagrama de Gantt y las métricas vuelven al salir del modo práctica.
+            </span>
+          </div>
+        )}
+
+        <div className={styles.ganttContainer} hidden={practicando}>
           <h2 className={styles.ganttTitle}>Diagrama de Gantt</h2>
           {resultado.bloques.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>Añade procesos para ver el resultado.</p>
@@ -800,7 +922,7 @@ export default function SimuladorPlanificadorProcesos() {
         </div>
 
         {/* Métricas globales */}
-        {resultado.metricas.length > 0 && (
+        {resultado.metricas.length > 0 && !practicando && (
           <>
             <div className={styles.metricasGrid} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.metricCard}>
@@ -891,6 +1013,126 @@ export default function SimuladorPlanificadorProcesos() {
               </div>
             </div>
           </>
+        )}
+
+        {/* Modo «corrígeme»: el simulador deja de mostrar y pasa a corregir */}
+        {resultado.metricas.length > 0 && (
+          <div className={styles.panel}>
+            <h2 className={styles.panelTitle}>Comprueba tu ejercicio</h2>
+            <p className={styles.practicaIntro}>
+              Resuelve el enunciado de arriba con lápiz y papel, escribe aquí tus tiempos y el simulador te dirá
+              en qué casilla se torció. Marca el modo práctica si prefieres que la solución no esté a la vista.
+            </p>
+
+            <div className={styles.practicaControles}>
+              <button
+                type="button"
+                className={`${styles.actionBtn} ${practicando ? styles.practicaActivo : ''}`}
+                onClick={alternarPractica}
+                aria-pressed={practicando}
+              >
+                <span aria-hidden="true">🙈</span> Modo práctica (ocultar solución)
+              </button>
+              <button type="button" className={styles.actionBtn} onClick={comprobarRespuestas}>
+                Comprobar
+              </button>
+              <button type="button" className={styles.actionBtn} onClick={borrarRespuestas}>
+                Borrar mis respuestas
+              </button>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table className={styles.metricasTable}>
+                <caption className={styles.practicaCaption}>
+                  Tus tiempos para {algoritmo.toUpperCase()}
+                  {algoritmo === 'rr' ? ` con quantum ${quantum}` : ''}
+                </caption>
+                <thead>
+                  <tr>
+                    <th>PID</th>
+                    <th>Llegada</th>
+                    <th>Ráfaga</th>
+                    {CAMPOS_RESPUESTA.map((c) => (
+                      <th key={c.campo}>{c.etiqueta}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {resultado.metricas.map((m) => (
+                    <tr key={m.pid}>
+                      <td>{m.pid}</td>
+                      <td>{m.llegada}</td>
+                      <td>{m.rafaga}</td>
+                      {CAMPOS_RESPUESTA.map(({ campo, etiqueta }) => {
+                        const celda = celdaCorregida(m.pid, campo);
+                        const marca = !celda || celda.tuyo === null ? '' : celda.ok ? styles.celdaOk : styles.celdaMal;
+                        return (
+                          <td key={campo} className={marca}>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={respuestas[m.pid]?.[campo] ?? ''}
+                              onChange={(e) => actualizarRespuesta(m.pid, campo, e.target.value)}
+                              className={styles.procesoInput}
+                              aria-label={`${etiqueta} del proceso ${m.pid}`}
+                              aria-invalid={celda && celda.tuyo !== null && !celda.ok ? true : undefined}
+                            />
+                            {celda && celda.tuyo !== null && (
+                              <span className={styles.celdaMarca} aria-label={celda.ok ? 'Correcto' : 'Incorrecto'}>
+                                {celda.ok ? '✓' : '✗'}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {correccion && (
+              <div role="status" aria-live="polite">
+                {correccion.rellenadas === 0 ? (
+                  <div className={styles.practicaNeutro}>
+                    No has escrito ningún tiempo todavía. Rellena al menos una casilla y vuelve a pulsar
+                    <em> Comprobar</em>.
+                  </div>
+                ) : correccion.primerFallo === null ? (
+                  <div className={styles.inanicionOk}>
+                    <span aria-hidden="true">✓</span>
+                    <span>
+                      <strong>
+                        {correccion.aciertos === correccion.total
+                          ? 'Ejercicio correcto.'
+                          : `Correcto hasta aquí: ${correccion.aciertos} de ${correccion.total} casillas.`}
+                      </strong>{' '}
+                      {correccion.aciertos === correccion.total
+                        ? 'Los tiempos coinciden con los del simulador. Prueba a cambiar de algoritmo con el mismo enunciado.'
+                        : `Lo que has rellenado cuadra; quedan ${correccion.total - correccion.rellenadas} casillas vacías.`}
+                    </span>
+                  </div>
+                ) : (
+                  <div className={styles.practicaFallo} role="alert">
+                    <span aria-hidden="true">✗</span>
+                    <span>
+                      <strong>
+                        Primer error en {correccion.primerFallo.pid}, columna{' '}
+                        {CAMPOS_RESPUESTA.find((c) => c.campo === correccion.primerFallo?.campo)?.etiqueta}:
+                      </strong>{' '}
+                      has escrito {correccion.primerFallo.tuyo} y sale {correccion.primerFallo.correcto}.{' '}
+                      {explicarCelda(
+                        correccion.primerFallo,
+                        resultado.metricas.find((m) => m.pid === correccion.primerFallo?.pid) as MetricasProceso,
+                      )}{' '}
+                      Las casillas siguientes pueden estar marcadas por arrastrar este mismo error: corrige esta
+                      primero.
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </main>
 

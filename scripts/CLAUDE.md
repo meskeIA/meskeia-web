@@ -13,12 +13,15 @@ Ocurrió el 28/07/2026: el refactor de verticales convirtió `STEMUM_APP_DISCIPL
 `COQUINUM_APP_CATEGORIA` en `Record` derivados, y de golpe se quedaron mudos **tres**
 consumidores a la vez. Se descubrió por casualidad al abrir el generador.
 
-**Al cambiar el formato de `stemum.ts` / `coquinum.ts` / `applications.ts` / `historias/*.ts`,
-repasar los tres:**
+**Al cambiar el formato de `stemum.ts` / `coquinum.ts` / `applications.ts` / `implemented-apps.ts`
+/ `delegum/soluciones.ts` / `historias/*.ts`, repasar los cuatro:**
 
 1. `scripts/cuadrante-stem.mjs`
-2. `scripts/semilla-diaria.mjs` (su universo Coquinum)
-3. El **generador de posts para X**, que vive FUERA del repo:
+2. `scripts/cuadrante-catalogo.mjs` (universo desde `implemented-apps.ts`; los verticales, por
+   regex sobre `stemum.ts`, `coquinum.ts` y `delegum/soluciones.ts`). Avisa por consola del
+   portal que se queda mudo, pero **no** detiene el cruce: el vertical es una columna informativa.
+3. `scripts/semilla-diaria.mjs` (su universo Coquinum)
+4. El **generador de posts para X**, que vive FUERA del repo:
    `C:\Users\jaceb\Mis Desarrollos\Mis Programas\generador-posts-x\servidor.js` (puerto 3005).
    Es el más fácil de olvidar precisamente porque no está aquí. Sus parsers avisan por consola
    si el número de apps reconocidas no cuadra con el de claves `slug:`, pero solo si alguien lo

@@ -912,3 +912,120 @@
     display: none;
   }
 }
+
+/* ─── Modo «corrígeme» ─── */
+.practicaIntro {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.practicaControles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.practicaActivo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.practicaActivo:hover {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.practicaCaption {
+  caption-side: top;
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  padding-bottom: var(--spacing-sm);
+}
+
+.practicaAviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.practicaNeutro {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.practicaFallo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.practicaFallo strong {
+  color: rgb(239, 68, 68);
+}
+
+/* La marca ✓/✗ acompaña al color: quien no distingue el verde del rojo
+   sigue viendo qué casilla falla. */
+.celdaOk,
+.celdaMal {
+  white-space: nowrap;
+}
+
+.celdaOk {
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.celdaMal {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.celdaMarca {
+  margin-left: 0.35rem;
+  font-weight: 700;
+}
+
+.celdaOk .celdaMarca {
+  color: rgb(4, 120, 87);
+}
+
+.celdaMal .celdaMarca {
+  color: rgb(185, 28, 28);
+}
+
+[data-theme='dark'] .celdaOk .celdaMarca {
+  color: rgb(52, 211, 153);
+}
+
+[data-theme='dark'] .celdaMal .celdaMarca {
+  color: rgb(248, 113, 113);
+}
+
+[data-theme='dark'] .practicaNeutro {
+  background: rgba(255, 255, 255, 0.03);
+}
