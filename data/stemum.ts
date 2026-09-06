@@ -608,6 +608,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'matematicas',
   },
   {
+    slug: 'simulador-progresiones',
+    icon: '🔢',
+    titulo: 'Progresiones aritméticas y geométricas',
+    desc: 'Mueve el primer término y la razón para ver la sucesión crecer, con término general, suma de n términos, suma infinita e identificador de sucesiones.',
+    disciplina: 'matematicas',
+  },
+  {
     slug: 'simulador-teorema-pitagoras',
     icon: '📐',
     titulo: 'Teorema de Pitágoras',

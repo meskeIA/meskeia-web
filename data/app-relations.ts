@@ -780,7 +780,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
   ],
   'visualizador-funciones-mundo': [
-    { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad', description: 'Simulaciones interactivas' },
+    { url: '/simulador-progresiones/', icon: '🔢', name: 'Progresiones', description: 'La sucesión discreta detrás de la recta y de la exponencial' },
     { url: '/algebra-ecuaciones/', icon: '🧮', name: 'Álgebra y Ecuaciones', description: 'Resuelve ecuaciones' },
     { url: '/visualizador-dinero-y-tiempo/', icon: '⏳', name: 'El Dinero y el Tiempo', description: 'Interés compuesto visual' },
     { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
@@ -2539,6 +2539,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-regla-de-tres': matematicasBasicasApps.filter(a => a.url !== '/calculadora-regla-de-tres/'),
   'calculadora-mcd-mcm': matematicasBasicasApps.filter(a => a.url !== '/calculadora-mcd-mcm/'),
   'algebra-ecuaciones': matematicasAvanzadasApps.filter(a => a.url !== '/algebra-ecuaciones/'),
+  'simulador-progresiones': [
+    { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones que Gobiernan el Mundo', description: 'La aritmética crece como una recta; la geométrica, como una exponencial' },
+    { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'Otro clásico de secundaria, con demostración visual y 12 casos' },
+    { url: '/visualizador-dinero-y-tiempo/', icon: '⏳', name: 'El Dinero y el Tiempo', description: 'El interés compuesto es una progresión geométrica' },
+    { url: '/visualizador-series-convergencia/', icon: '∑', name: 'Series y Convergencia', description: 'El paso siguiente: cuándo sumar infinitos términos da un número' },
+  ],
+
   // Geometría del triángulo — matemáticas de secundaria (13-16 años).
   // Las tres se apoyan sobre el mismo objeto, así que se enlazan entre sí.
   'simulador-teorema-pitagoras': [
@@ -4553,7 +4560,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'Las series de Taylor son una de las aplicaciones más bellas del cálculo diferencial e integral' },
     { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Las series de Maclaurin de seno y coseno revelan su naturaleza algebraica profunda' },
     { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'La Transformada de Fourier es una generalización de las series de Fourier al dominio continuo' },
-    { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'La identidad de Euler e^(iπ)+1=0 emerge de las series de Taylor de eˣ, sin(x) y cos(x)' },
+    { url: '/simulador-progresiones/', icon: '🔢', name: 'Progresiones', description: 'La serie geométrica de secundaria: de dónde sale la suma infinita' },
   ],
 
   // EJE B — Física: óptica ondulatoria y electrónica (Roadmap v4, 2026-04-30)
