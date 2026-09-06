@@ -303,28 +303,13 @@ Tras revisión global de 189 apps en 2026-05-12 (~400 correcciones aplicadas en 
 
 ### 2. Ciclo de creación de nueva app (2 fases obligatorias)
 
-Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no opcional.
+Las apps se crean **siempre en dos fases**: **Fase 1 — app funcional** y **Fase 2 —
+profesionalización v2.0**, que es inmediata, no opcional. Los pasos concretos de ambas, con su
+checklist, están en la skill **`/nueva-app-meskeia`** (PASO 1 a PASO 5); las instrucciones
+técnicas del patrón v2.0, en `_private/PROFESIONALIZACION.md`.
 
-**Fase 1 — App funcional** (skill `/nueva-app-meskeia`):
-```
-[ ] 1. Crear carpeta app/[nombre-app]/ (usar template: templates/app-base/, copiar también layout.template.ts → layout.tsx)
-[ ] 2. Añadir entrada en data/applications.ts (suites)
-[ ] 3. Añadir URL en data/implemented-apps.ts
-[ ] 4. Añadir relaciones en data/app-relations.ts
-[ ] 5. Incluir <EducationalSection> con bloque educativo básico en page.tsx
-[ ] 6. Ejecutar npm run build (exit code 0) — genera ai-index.json automáticamente
-```
-
-**Fase 2 — Profesionalización v2.0** (inmediatamente después del build):
-```
-[ ] 8. Enriquecer el bloque educativo básico existente con el patrón v2.0 completo
-[ ] 9. Verificar clase .warningBox en CSS Module (indicador de v2.0 completo)
-[ ] 10. Build final, commit y push a GitHub
-```
-
-**Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por tener estructura propia. Juegos y ocio → patrón lite (ver `_private/PROFESIONALIZACION.md`).
-
-**Instrucciones técnicas completas del patrón v2.0**: `_private/PROFESIONALIZACION.md` (carpeta local, excluida del deploy)
+**Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por
+tener estructura propia. Juegos y ocio → patrón lite.
 
 ### 3. Creación de múltiples apps en paralelo (agentes)
 
@@ -415,31 +400,21 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 `npm run check:a11y-jsx` — lo ejecuta también `npm run build`, y **rompe el build** si el
 commit escribe un `<button>` sin `type=` o un emoji junto a texto sin `aria-hidden` (las dos
 reglas del CLAUDE.md global §5 cuya corrección es unívoca). Las otras **tres** situaciones
-—`aria-pressed` que falta en un toggle, `aria-pressed` que SOBRA, y emoji en nodo propio—
-exigen criterio y **solo avisan**: un `aria-pressed` en un botón de acción es una regresión,
-no una mejora.
-
-> La regla del `aria-pressed` que sobra es de 24/08/2026 y sale del hallazgo 285: las cuatro
-> opciones de `quiz-simbolos-quimicos` lo llevaban siendo botones de acción, y la regla que
-> vigila el caso contrario no podía verlo porque solo salta cuando el botón no tiene **ningún**
-> `aria-*` — allí había uno, del tipo equivocado. Señala solo lo que puede DEMOSTRAR por la
-> forma del código: que `disabled` sea verdadero siempre que `aria-pressed` lo sea, o sea que
-> pulsarlo lo deje fijo. Su caso de prueba —dos botones que debe cazar y dos conmutadores
-> legítimos que debe dejar pasar— está en `scripts/pruebas/a11y-regla5.tsx`.
+—`aria-pressed` que falta en un toggle, `aria-pressed` que **sobra**, y emoji en nodo propio—
+exigen criterio y **solo avisan**: un `aria-pressed` en un botón de acción es una regresión, no
+una mejora.
 
 ⚠️ Juzga **las líneas que el commit añade**, no el fichero entero, igual que `check:secrets`.
-El catálogo arrastra ~5.000 incumplimientos en 731 ficheros (medido el 23/08/2026 con
-`--todo`), así que un candado por fichero rompería el build al tocar cualquier app antigua y
-acabaría desactivado. Lo que el fichero ya arrastraba se cuenta y se nombra, pero no detiene
-nada. Falso positivo: `a11y-ok: <razón>` en esa línea o en la anterior.
+El catálogo arrastra ~5.000 incumplimientos en 731 ficheros (23/08/2026), así que un candado por
+fichero rompería el build al tocar cualquier app antigua y acabaría desactivado. Lo que el
+fichero ya arrastraba se cuenta y se nombra, pero no detiene nada. Falso positivo:
+`a11y-ok: <razón>` en esa línea o en la anterior.
 
 `npm run check:a11y-jsx -- --todo` mide el pasivo entero (2,5 s, no rompe nada) y
 `node scripts/check-a11y-jsx.mjs <fichero>` audita uno concreto.
 
-> Sale de la tanda del Inspector del 21/08/2026: 15 hallazgos de accesibilidad en **10 de 10**
-> apps, siempre las mismas tres reglas. No es que el candado fallara — no había candado. La
-> skill `/audit-accesibilidad-jsx` solo mira las apps de los últimos 60 días, y aquellas eran
-> de febrero-mayo. El pasivo sigue siendo suyo; lo nuevo ya es de este candado.
+> Qué demuestra cada regla por la forma del código, de qué caso salió y por qué tres solo avisan:
+> cabecera de `scripts/check-a11y-jsx.mjs`. Sus casos de prueba, en `scripts/pruebas/a11y-regla5.tsx`.
 
 ### Candado del parser numérico
 
@@ -451,25 +426,20 @@ canónico es **`parseSpanishNumber`** de `@/lib`.
 `'1e3'` → 1000, `'10.5.3'` → 10,5), y el `.replace(',', '.')` de delante lee el millar español
 mil veces más pequeño: «1.500» se convierte en 1,5.
 
-⚠️ Igual que `check:a11y-jsx`, juzga **las líneas que el commit añade**, no el fichero entero, y
-por una razón medida: el catálogo arrastra **191 usos en 87 ficheros** (25/08/2026), y de una
-muestra de 60 **35 no validan el resultado del parseo**. Sustituirlos en bloque haría aparecer
-«NaN» en pantalla en más de la mitad, porque `parseSpanishNumber` devuelve NaN donde `parseFloat`
-devolvía un número: sería cambiar un defecto silencioso por uno visible en 87 apps a la vez. El
+⚠️ Igual que `check:a11y-jsx`, juzga **las líneas que el commit añade**, y por una razón medida:
+el catálogo arrastra **191 usos en 87 ficheros** (25/08/2026), y de una muestra de 60 **35 no
+validan el resultado del parseo**. Sustituirlos en bloque haría aparecer «NaN» en pantalla en más
+de la mitad, porque `parseSpanishNumber` devuelve NaN donde `parseFloat` devolvía un número. El
 pasivo lo drena el Inspector app por app, que es donde se puede comprobar en navegador si esa app
 maneja el NaN o si hay que añadirle la guarda. Falso positivo: `parser-ok: <razón>` en esa línea
 o en la anterior — los hay de verdad, como parsear un `dataset` que escribe la propia app.
 
 `npm run check:parser -- --todo` mide el pasivo entero y `node scripts/check-parser-numerico.mjs
-<fichero>` audita uno concreto. Su caso de prueba —cuatro formas que debe cazar y cuatro que debe
-dejar pasar— está en `scripts/pruebas/parser-numerico.tsx`.
+<fichero>` audita uno concreto.
 
-> Sale de dos hallazgos del Inspector con el mismo defecto: `conversor-numeros-letras`
-> (24/08/2026), que es con lo que se rellenan pagarés, y `calculadora-masa-madre` (hallazgo 290).
-> Y su primera versión **era ciega a la forma más habitual del catálogo** —dos `replace`
-> encadenados, `x.replace(/\./g, '').replace(',', '.')`, donde el paréntesis del primero rompía
-> el patrón—: veía 153 de 188 usos reales. Se descubrió comparándolo con un `grep` independiente,
-> no ejecutándolo.
+> De qué dos hallazgos del Inspector salió, y cómo su primera versión era ciega a la forma más
+> habitual del catálogo: cabecera de `scripts/check-parser-numerico.mjs`. Sus casos de prueba, en
+> `scripts/pruebas/parser-numerico.tsx`.
 
 ### Candado de la tarjeta social
 
@@ -486,15 +456,13 @@ si la URL cae bajo un redirect de `next.config.ts` que la desvía a otro dominio
 detrás, la tarjeta se degrada a la pequeña con icono de documento. Por eso la plantilla
 `templates/app-base/` ya trae `images`: una app nueva nace con imagen.
 
-**Sin pasivo**: rompe también si cualquier app del catálogo declara `openGraph` sin `images`.
-Nació como aviso —arrastraba 159 apps, y romper por ellas lo habría dejado desactivado en una
-semana, criterio de `check:a11y-jsx` y `check:parser`—, pero el 29/08/2026 se drenó entero en
-cuatro tandas, así que ya solo puede encenderlo una app nueva escrita sin imagen. Escape:
-`og-ok: <razón>` en el `metadata.ts`. Al abrir un vertical nuevo se añade su entrada a `PORTALES` en el
-script y el candado pasa a exigirlo. Los cuatro están cubiertos: **Coquinum** (84 apps),
-**Stemum** (139 apps + 12 tablas de material de apoyo, que también se publican bajo stemum.com),
-**Cronicum** (sus 182 páginas salen de un solo `generateMetadata`) y **Delegum** (21 páginas de
-portal).
+**Sin pasivo**: rompe también si cualquier app del catálogo declara `openGraph` sin `images`. Se
+drenó entero el 29/08/2026, así que ya solo puede encenderlo una app nueva escrita sin imagen.
+Escape: `og-ok: <razón>` en el `metadata.ts`. Al abrir un vertical nuevo se añade su entrada a
+`PORTALES` en el script y el candado pasa a exigirlo. Los cuatro están cubiertos: **Coquinum**
+(84 apps), **Stemum** (139 apps + 12 tablas de material de apoyo, que también se publican bajo
+stemum.com), **Cronicum** (sus 182 páginas salen de un solo `generateMetadata`) y **Delegum**
+(21 páginas de portal).
 
 ⚠️ **Delegum es la excepción: sus apps NO llevan la og del portal.** No es por falta de lista
 —`DELEGUM_APP_SLUGS` existe, con 91 apps— sino porque **Delegum no sirve apps bajo su dominio**:
@@ -502,25 +470,12 @@ su proxy no hace passthrough de slugs del catálogo, así que `delegum.com/estim
 mientras `coquinum.com/escandallo-food-cost/` da 200. Esas apps solo se ven bajo `meskeia.com`, de
 modo que ponerles la og de Delegum las marcaría con una marca que el visitante nunca llega a ver.
 `DELEGUM_APP_SLUGS` alimenta *Soluciones* (enrutado por journey), no pertenencia al portal. Lo que
-sí es suyo son las páginas de su árbol: home, fichas de `/datos-fiscales/`, asistente y blog. De ahí que el candado
-recorra el **árbol** de cada portal en vez de una lista de páginas: las 20 páginas propias de
-Delegum llevaban sin imagen desde siempre y ninguna lista las habría echado de menos.
+sí es suyo son las páginas de su árbol: home, fichas de `/datos-fiscales/`, asistente y blog. De
+ahí que el candado recorra el **árbol** de cada portal en vez de una lista de páginas.
 
-> Sale de la pregunta de por qué los posts de X de Coquinum y Cronicum salían sin imagen y los de
-> meskeIA no (29/08/2026). No era X ni indexación: 159 apps declaraban `openGraph` sin `images`,
-> 54 de ellas del portal gastro, porque **la plantilla no la incluía**. Y la og de Cronicum
-> apuntaba a `meskeia.com/cronicum/og-image.png`, que el 308 canónico `/cronicum/:path+` desvía a
-> `cronicum.com/og-image.png` — la imagen de meskeIA: la de Cronicum **no se sirvió nunca**,
-> mientras el comentario del código afirmaba justo lo contrario. Ese segundo defecto es el que
-> ningún ojo detecta leyendo el metadata, y es el que obliga a que el candado cruce la URL con los
-> redirects. **Delegum tenía el mismo defecto, con el comentario falso palabra por palabra.** Los
-> seis casos reinyectados —más los tres que debe dejar pasar— están en `npm run og:probar-candado`.
->
-> ⚠️ **Dos de esos casos los escribió el propio candado fallando.** El de una página de portal sin
-> imagen destapó que comprobaba la URL sobre el fichero entero, así que un `openGraph` sin imagen
-> colaba si el `twitter` de al lado sí la tenía —y `og:image` es el que leen casi todas las
-> plataformas—; ahora verifica bloque a bloque. Sin esa prueba, el candado habría dado luz verde a
-> exactamente el defecto que existe para prevenir.
+> De qué fallo salió, por qué la og de Cronicum no se sirvió nunca pese a que el comentario del
+> código afirmaba lo contrario, y cuáles de sus casos de prueba los escribió el propio candado
+> fallando: cabecera de `scripts/check-og-image.mjs` y `npm run og:probar-candado`.
 
 ### TypeScript
 
@@ -554,27 +509,16 @@ Todas las API routes restringidas a `meskeia.com` (no `*`).
 
 ## Disciplina de Build (OBLIGATORIO)
 
-### Regla de UN solo build
+Las reglas generales —**UN solo build a la vez**, timeout de **10 minutos (600000 ms)** en primer
+plano y nunca en segundo, no lanzar nada en paralelo, y qué hacer con un `.next/lock` huérfano—
+están en el **CLAUDE.md global §7** y aplican aquí tal cual. Lo propio de meskeIA:
 
-**NUNCA** lanzar más de un `npm run build` simultáneamente. Un build duplicado crea un lock en `.next/lock` que bloquea todos los builds posteriores y genera cadenas de reintentos innecesarios.
+- El proyecto (+1.100 apps) tarda **~1-2 minutos** en este PC (i7-14700/32 GB). El margen hasta
+  los 10 minutos cubre los builds fríos: **no dar un build por fallido antes de ese tiempo**.
+- **NUNCA** `npm run check:tipos` mientras un build está corriendo — lo ejecuta ya el propio build.
+- Si hay lock huérfano (existe `.next/lock` sin proceso `next build` activo): `rm -f .next/lock`
+  y **un** solo build.
 
-### Protocolo correcto
-
-```bash
-# UN solo build, con timeout de 10 minutos (600000ms) — valor canónico único
-npm run build  # timeout: 600000
-
-# Si falla → diagnosticar error → corregir → UN solo rebuild
-# Si el build se queda "colgado" → verificar si .next/lock existe sin proceso node activo
-```
-
-### Reglas estrictas
-
-1. **Timeout de 10 minutos** (600000ms) para `npm run build` — valor canónico en todo el ecosistema (docs, skills, memoria). El proyecto (+1.100 apps) tarda ~1-2 minutos en el PC actual (i7-14700/32GB); el margen extra cubre builds fríos. NO asumir que ha fallado antes de ese tiempo.
-2. **NUNCA lanzar builds en paralelo** — ni siquiera `npm run check:tipos` mientras un build está corriendo.
-3. **NUNCA reintentar un build sin verificar primero** que el anterior ha terminado (comprobar si `.next/lock` existe).
-4. **Si hay lock stale** (lock existe pero no hay proceso `next build` activo): eliminar con `rm -f .next/lock` y ENTONCES hacer UN solo build.
-5. **No usar `run_in_background`** para builds — ejecutar siempre en foreground con timeout de 600000ms para poder ver el resultado directamente.
 
 ### Servidor local de pruebas: detenerlo siempre al terminar
 
@@ -693,17 +637,12 @@ Las rutas vivas son `ls app/api/analytics/`.
 
 ---
 
-## Archivos Auxiliares (Actualizar al crear apps)
+## Archivos Auxiliares
 
-### Automáticos (Next.js los genera)
-- `sitemap.xml` - Desde `app/sitemap.ts`
-- `robots.txt` - Desde `app/robots.ts`
-
-### Manuales (actualizar siempre)
-- `data/applications.ts` - Añadir app con suites
-- `data/implemented-apps.ts` - Añadir URL
-- `data/app-relations.ts` - Añadir relaciones
-- `public/ai-index.json` - **Auto-generado** por `npm run build`, no editar
+`sitemap.xml` y `robots.txt` los genera Next desde `app/sitemap.ts` y `app/robots.ts`;
+`public/ai-index.json` lo genera `npm run build`. **Ninguno se edita a mano.** Los tres registros
+manuales de toda app (`applications.ts` + `implemented-apps.ts` + `app-relations.ts`) están más
+arriba, en «Registro de una app en un portal vertical».
 
 ---
 
@@ -746,17 +685,14 @@ Detalle completo y formato de entrada: skill `/agenda`.
 
 ## Para instrucciones completas
 
-- **Global**: `~/.claude/CLAUDE.md` (reglas universales)
-- **Disclaimers**: `_private/DISCLAIMER-POLICY.md` (política completa — niveles, textos, colapsabilidad)
-- **Componentes**: `components/README.md`
-- **Templates**: `templates/README.md`
-- **Historial de cambios**: `git log` (CHANGELOG histórico archivado en `_private/archivo/`)
+`~/.claude/CLAUDE.md` (reglas universales) · `_private/DISCLAIMER-POLICY.md` (niveles, textos y
+colapsabilidad) · `components/README.md` · `templates/README.md`. El historial de este fichero es
+`git log CLAUDE.md`; el CHANGELOG antiguo, `_private/archivo/`.
 
 ---
 
----
+**Proyecto**: meskeIA Web (https://meskeia.com)
 
-**Proyecto**: meskeIA Web (https://meskeia.com) · el historial de este fichero es `git log CLAUDE.md`
 
 <!-- BEGIN:nextjs-agent-rules -->
 
