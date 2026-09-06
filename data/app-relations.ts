@@ -2539,7 +2539,23 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-regla-de-tres': matematicasBasicasApps.filter(a => a.url !== '/calculadora-regla-de-tres/'),
   'calculadora-mcd-mcm': matematicasBasicasApps.filter(a => a.url !== '/calculadora-mcd-mcm/'),
   'algebra-ecuaciones': matematicasAvanzadasApps.filter(a => a.url !== '/algebra-ecuaciones/'),
+  // Geometría del triángulo — matemáticas de secundaria (13-16 años).
+  // Las tres se apoyan sobre el mismo objeto, así que se enlazan entre sí.
+  'simulador-teorema-pitagoras': [
+    { url: '/simulador-teorema-tales/', icon: '📏', name: 'Teorema de Tales y Semejanza', description: 'El otro teorema del triángulo: proporciones, sombras y escalas' },
+    { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Áreas y perímetros de las figuras cuyo lado acabas de calcular' },
+    { url: '/tabla-areas-volumenes/', icon: '📐', name: 'Tabla de Áreas y Volúmenes', description: 'Las fórmulas de 48 figuras, con diagrama y ejemplo resuelto' },
+    { url: '/visualizador-trigonometria/', icon: '📐', name: 'Razones Trigonométricas', description: 'El paso siguiente: con un ángulo basta un solo lado' },
+  ],
+  'simulador-teorema-tales': [
+    { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'El lado que falta en un triángulo rectángulo, con demostración visual' },
+    { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Áreas y perímetros de las figuras semejantes' },
+    { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Si el área va por k², el volumen va por k³' },
+    { url: '/tabla-areas-volumenes/', icon: '📐', name: 'Tabla de Áreas y Volúmenes', description: 'Las fórmulas sobre las que actúa la razón de semejanza' },
+  ],
+
   'calculadora-geometria': [
+    { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'Calcula el lado que falta antes de aplicar la fórmula del área' },
     ...matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-geometria/'),
     { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Visualiza y calcula volúmenes de esfera, cubo, cilindro, cono y pirámide con sliders interactivos' },
   ],
@@ -4511,7 +4527,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-volumenes': [
     { url: '/calculadora-geometria/', icon: '📏', name: 'Geometría', description: 'Áreas, perímetros y volúmenes de figuras planas y sólidos' },
-    { url: '/visualizador-geometria-analitica/', icon: '📉', name: 'Geometría Analítica', description: 'Las secciones cónicas (elipse, parábola) dan lugar a las figuras de revolución' },
+    { url: '/simulador-teorema-tales/', icon: '📏', name: 'Teorema de Tales y Semejanza', description: 'Al ampliar por k, el área va por k² y el volumen por k³' },
     { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Sin y cos relacionan ángulos con las proporciones de esferas y cilindros' },
     { url: '/tabla-areas-volumenes/', icon: '📐', name: 'Tabla de Áreas y Volúmenes', description: 'Todas las fórmulas con diagrama y ejemplo resuelto' },
   ],
@@ -6855,7 +6871,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'tabla-areas-volumenes': [
     { url: '/visualizador-volumenes/', icon: '🧊', name: 'Volúmenes de Cuerpos', description: 'Ve el cuerpo en 3D mientras cambias sus medidas' },
     { url: '/visualizador-geometria-analitica/', icon: '🥚', name: 'Geometría Analítica', description: 'Cónicas y sus ecuaciones' },
-    { url: '/tabla-derivadas/', icon: '📐', name: 'Tabla de Derivadas', description: 'Cuando la geometría se hace cálculo' },
+    { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'Halla el lado que te falta para poder aplicar la fórmula' },
     { url: '/tabla-unidades-si/', icon: '📏', name: 'Tabla de Unidades del SI', description: 'En qué unidades van área y volumen' },
   ],
   'tabla-limites-notables': [

@@ -481,6 +481,8 @@ export const implementedAppsUrls = [
   "/simulador-distribucion-normal/", // Curva de Gauss interactiva: μ y σ, P(X<a/X>a/a<X<b), regla 68-95-99.7, tipificación Z, 6 problemas tipo
   "/simulador-derivada-pendiente/",  // Derivada como pendiente de la tangente: 8 funciones, modo secante (límite), curva f'(x), clasificación de pendiente
   "/simulador-teorema-central-limite/", // TCL Monte Carlo: 5 distribuciones, n y nº muestras configurables, comparación con N(μ, σ/√n) teórica
+  "/simulador-teorema-pitagoras/", // Pitágoras interactivo: triángulo con sliders, demostración visual de los tres cuadrados, recíproco y 12 casos numerados asignables
+  "/simulador-teorema-tales/", // Tales y semejanza: paralelas y secantes, razón k con el área por k², altura por sombras, escalas de planos y 12 casos numerados
   "/simulador-integral-area/", // Integral como suma de Riemann: 8 funciones, 4 métodos (izquierda/derecha/punto medio/trapecio), error vs valor exacto
   "/simulador-intervalos-confianza/", // 100 IC simulados (modo conceptual) + calculadora: nivel 80-99%, z o t Student, n 5-500
   "/simulador-test-hipotesis/", // Dos curvas H₀/H₁ superpuestas, regiones rechazo, α/β/p-valor/potencia visualizados

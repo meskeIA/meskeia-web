@@ -1,0 +1,1290 @@
+/* ============================================
+   Simulador del Teorema de Tales — paleta meskeIA
+   ============================================ */
+
+.container {
+  --primary: #2e86ab;
+  --primary-oscuro: #256a8a;
+  --secondary: #48a9a6;
+  --accent: #7fb3d3;
+  --hero-bg: #1a5278;
+  --bg-primary: #fafafa;
+  --bg-card: #ffffff;
+  --bg-suave: #f2f7fa;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5a5a5a;
+  --border: #e5e5e5;
+  --aviso: #b45309;
+  --aviso-bg: rgba(245, 158, 11, 0.1);
+  --ok: #15803d;
+  --ok-bg: rgba(21, 128, 61, 0.1);
+  --error: #b91c1c;
+  --error-bg: rgba(185, 28, 28, 0.08);
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --primary: #4ea3c7;
+  --primary-oscuro: #2e86ab;
+  --secondary: #5fc2bf;
+  --accent: #7fb3d3;
+  --bg-primary: #1a1a1a;
+  --bg-card: #2a2a2a;
+  --bg-suave: #223038;
+  --text-primary: #e5e5e5;
+  --text-secondary: #b0b0b0;
+  --border: #404040;
+  --aviso: #fbbf24;
+  --aviso-bg: rgba(251, 191, 36, 0.12);
+  --ok: #4ade80;
+  --ok-bg: rgba(74, 222, 128, 0.12);
+  --error: #f87171;
+  --error-bg: rgba(248, 113, 113, 0.12);
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: #1a5278;
+  border-radius: var(--radius-large);
+  color: #ffffff;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.heroBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+.heroBadge {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+/* ============================================
+   PESTAÑAS
+   ============================================ */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-xl) 0 var(--spacing-lg);
+}
+
+.tab {
+  flex: 1 1 180px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tabActiva {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.tabActiva:hover {
+  color: #ffffff;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ============================================
+   TARJETAS
+   ============================================ */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.cardSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.6;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+/* ============================================
+   CONTROLES
+   ============================================ */
+
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.controlEtiqueta {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.controlValor {
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.botonesFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.botonOpcion {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.botonOpcion:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.botonOpcion:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.botonOpcionActiva {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: #ffffff;
+}
+
+.botonOpcionActiva:hover {
+  color: #ffffff;
+}
+
+/* ============================================
+   FIGURAS SVG
+   ============================================ */
+
+.figuraWrapper {
+  overflow-x: auto;
+  background: var(--bg-suave);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.figura {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.svgParalela {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 8 5;
+}
+
+.svgSecante {
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+}
+
+.svgSegmentoA {
+  stroke: var(--primary);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.svgSegmentoB {
+  stroke: var(--secondary);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.svgPunto {
+  fill: var(--text-primary);
+}
+
+.svgTexto {
+  fill: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.svgTextoTenue {
+  fill: var(--text-secondary);
+  font-size: 12px;
+}
+
+.svgTrianguloOriginal {
+  fill: rgba(46, 134, 171, 0.18);
+  stroke: var(--primary);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.svgTrianguloSemejante {
+  fill: rgba(72, 169, 166, 0.18);
+  stroke: var(--secondary);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.svgSuelo {
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+}
+
+.svgRayo {
+  stroke: #d97706;
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+
+.svgObjeto {
+  fill: rgba(46, 134, 171, 0.25);
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+
+.svgVara {
+  stroke: var(--secondary);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.svgSombra {
+  stroke: var(--text-secondary);
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+/* ============================================
+   PROPORCIÓN
+   ============================================ */
+
+.proporcion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-suave);
+  border-radius: var(--radius);
+  margin: var(--spacing-md) 0;
+}
+
+.fraccion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 96px;
+}
+
+.fraccionArriba {
+  padding: 0 0.5rem 0.2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.fraccionAbajo {
+  padding: 0.2rem 0.5rem 0;
+  border-top: 2px solid var(--text-primary);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.fraccionEtiqueta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.35rem;
+}
+
+.igual {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.nota {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: var(--spacing-sm) 0 0;
+}
+
+/* ============================================
+   RESULTADOS
+   ============================================ */
+
+.resultadosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.resultado {
+  background: var(--bg-suave);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.resultadoDestacado {
+  border-left-color: var(--aviso);
+  background: var(--aviso-bg);
+}
+
+.resultadoEtiqueta {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.resultadoValor {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.resultadoNota {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* ============================================
+   CAMPOS DE ENTRADA
+   ============================================ */
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.campoEtiqueta {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.campoInput {
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.campoInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
+.campoAyuda {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.mensajeError {
+  color: var(--error);
+  background: var(--error-bg);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  margin: var(--spacing-sm) 0 0;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
+.btnPrimary {
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btnPrimary:hover {
+  background: var(--primary-oscuro);
+  transform: translateY(-1px);
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  padding: 0.55rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnSecundario:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   TABLA DE DATOS (semejanza)
+   ============================================ */
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+  border-radius: 8px;
+}
+
+.tablaDatos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.tablaDatos th {
+  background: var(--primary);
+  color: #ffffff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tablaDatos td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tablaDatos tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.filaDestacada td {
+  background: var(--aviso-bg) !important;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ============================================
+   AVISO CLAVE (el error de k²)
+   ============================================ */
+
+.avisoClave {
+  background: var(--aviso-bg);
+  border: 1px solid var(--aviso);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.avisoClaveTitulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--aviso);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.avisoClave p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* ============================================
+   CRITERIOS DE SEMEJANZA
+   ============================================ */
+
+.criterios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.criterioCard {
+  background: var(--bg-suave);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.criterioSigla {
+  display: inline-block;
+  background: var(--secondary);
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 0.15rem 0.55rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.criterioCard p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   LEYENDA
+   ============================================ */
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.leyendaMuestra {
+  width: 22px;
+  height: 6px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.muestraA {
+  background: var(--primary);
+}
+
+.muestraB {
+  background: var(--secondary);
+}
+
+/* ============================================
+   CASOS
+   ============================================ */
+
+.casosCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.contador {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.contadorBarra {
+  width: 100%;
+  height: 10px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: var(--spacing-sm);
+}
+
+.contadorRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.3s ease;
+}
+
+.casosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.casoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.casoResuelto {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+}
+
+.casoCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.casoNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.casoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+  flex: 1 1 auto;
+}
+
+.etiqueta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  background: var(--bg-suave);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.casoEnunciado {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.casoFila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+}
+
+.casoCampo {
+  flex: 1 1 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.casoMensaje {
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mensajeOk {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.mensajeCerca {
+  background: var(--aviso-bg);
+  color: var(--aviso);
+}
+
+.mensajeMal {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.pasosLista {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.pasosLista li {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.solucionValor {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: var(--spacing-sm) 0 0;
+}
+
+.aleatorioCard {
+  background: var(--bg-suave);
+  border: 1px dashed var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.semilla {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   SECCIONES EDUCATIVAS v2.0
+   ============================================ */
+
+.guideSection {
+  padding: var(--spacing-md) 0;
+}
+
+.guideSection h2 {
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  margin: 0 0 var(--spacing-sm);
+}
+
+.guideSection h3 {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  margin: var(--spacing-md) 0 var(--spacing-sm);
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.escenarioCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.15);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+}
+
+.escenarioExample {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  line-height: 1.55;
+}
+
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--secondary);
+  margin: 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.faqItem h4 {
+  color: var(--primary);
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  margin: 0.25rem 0;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.faqTip {
+  color: var(--secondary) !important;
+  background: rgba(72, 169, 166, 0.08);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.5rem !important;
+  font-size: 0.85rem !important;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.stepGuide::before {
+  content: '';
+  position: absolute;
+  left: 1.25rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary));
+}
+
+.step {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.stepNumber {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.stepContent {
+  flex: 1;
+  padding-top: 0.25rem;
+}
+
+.stepContent h4 {
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+  font-size: 0.98rem;
+}
+
+.stepContent p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipIcon {
+  font-size: 1.75rem;
+}
+
+.tipCard h4 {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.warningBox {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.warningHeader h3 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warningList li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: rgb(239, 68, 68);
+  font-weight: 700;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+[data-theme='dark'] .comparativaTable td,
+[data-theme='dark'] .tablaDatos td {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td,
+[data-theme='dark'] .tablaDatos tr:nth-child(even) td {
+  background: rgba(78, 163, 199, 0.08);
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  border-color: rgba(78, 163, 199, 0.28);
+}
+
+[data-theme='dark'] .escenarioTip,
+[data-theme='dark'] .faqTip {
+  background: rgba(95, 194, 191, 0.14);
+}
+
+[data-theme='dark'] .svgTrianguloOriginal {
+  fill: rgba(78, 163, 199, 0.22);
+}
+
+[data-theme='dark'] .svgTrianguloSemejante {
+  fill: rgba(95, 194, 191, 0.22);
+}
+
+[data-theme='dark'] .svgObjeto {
+  fill: rgba(78, 163, 199, 0.28);
+}
+
+[data-theme='dark'] .svgRayo {
+  stroke: #fbbf24;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.98rem;
+  }
+
+  .tab {
+    flex: 1 1 100%;
+  }
+
+  .casosGrid,
+  .escenariosGrid,
+  .tipsGrid,
+  .criterios {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable,
+  .tablaDatos {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td,
+  .tablaDatos th,
+  .tablaDatos td {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .stepGuide::before {
+    display: none;
+  }
+
+  .resultadoValor {
+    font-size: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnPrimary,
+  .escenarioCard,
+  .contadorRelleno {
+    transition: none;
+  }
+}

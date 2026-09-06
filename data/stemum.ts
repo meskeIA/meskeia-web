@@ -608,6 +608,20 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'matematicas',
   },
   {
+    slug: 'simulador-teorema-pitagoras',
+    icon: '📐',
+    titulo: 'Teorema de Pitágoras',
+    desc: 'Mueve los catetos y mira crecer la hipotenusa, con la demostración de los tres cuadrados, el recíproco y 12 casos numerados.',
+    disciplina: 'matematicas',
+  },
+  {
+    slug: 'simulador-teorema-tales',
+    icon: '📏',
+    titulo: 'Teorema de Tales y semejanza',
+    desc: 'Paralelas y secantes, razón de semejanza con el área por k², altura por sombras y escalas de planos, con 12 casos numerados.',
+    disciplina: 'matematicas',
+  },
+  {
     slug: 'simulador-derivada-pendiente',
     icon: '📐',
     titulo: 'La derivada como pendiente',
