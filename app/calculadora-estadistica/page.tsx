@@ -1,10 +1,19 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, LecturaSerie } from '@/components';
-import { formatNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
+import { formatNumber, parseSpanishNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  calcularEstadisticas,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  type Comprobacion,
+  type EjercicioEstadistica,
+} from './casos';
 
 /**
  * El historial de series analizadas se guarda en el navegador del usuario.
@@ -64,6 +73,25 @@ export default function CalculadoraEstadisticaPage() {
    */
   const [historialCargado, setHistorialCargado] = useState(false);
 
+  /** Para llevar la vista al campo de datos cuando un caso carga su serie en la calculadora. */
+  const refDatos = useRef<HTMLTextAreaElement>(null);
+
+  // Casos numerados para clase
+  const [respuestasCasos, setRespuestasCasos] = useState<Record<number, string>>({});
+  const [veredictos, setVeredictos] = useState<Record<number, Comprobacion>>({});
+  const [solucionesAbiertas, setSolucionesAbiertas] = useState<Record<number, boolean>>({});
+
+  // Práctica aleatoria
+  const [ejercicio, setEjercicio] = useState<EjercicioEstadistica | null>(null);
+  const [respuestaAleatoria, setRespuestaAleatoria] = useState('');
+  const [veredictoAleatorio, setVeredictoAleatorio] = useState<Comprobacion | null>(null);
+  const [solucionAleatoriaAbierta, setSolucionAleatoriaAbierta] = useState(false);
+
+  const casosResueltos = useMemo(
+    () => Object.values(veredictos).filter((v) => v.correcto).length,
+    [veredictos],
+  );
+
   useEffect(() => {
     setHistorial(leerHistorialGuardado());
     setHistorialCargado(true);
@@ -91,81 +119,17 @@ export default function CalculadoraEstadisticaPage() {
 
   const valores = useMemo(() => [...serie.valores].sort((a, b) => a - b), [serie]);
 
-  const estadisticas = useMemo(() => {
-    if (valores.length === 0) return null;
-
-    const n = valores.length;
-    const suma = valores.reduce((a, b) => a + b, 0);
-    const media = suma / n;
-
-    // Mediana
-    const mediana = n % 2 === 0
-      ? (valores[n / 2 - 1] + valores[n / 2]) / 2
-      : valores[Math.floor(n / 2)];
-
-    // Moda
-    const frecuencias: Record<number, number> = {};
-    valores.forEach(v => { frecuencias[v] = (frecuencias[v] || 0) + 1; });
-    const maxFrec = Math.max(...Object.values(frecuencias));
-    const modas = Object.entries(frecuencias)
-      .filter(([, f]) => f === maxFrec && f > 1)
-      .map(([v]) => parseFloat(v));
-
-    // Varianza y Desviación Estándar (muestral)
-    const varianzaMuestral = valores.reduce((acc, v) => acc + Math.pow(v - media, 2), 0) / (n - 1);
-    const desviacionMuestral = Math.sqrt(varianzaMuestral);
-
-    // Varianza y Desviación Estándar (poblacional)
-    const varianzaPoblacional = valores.reduce((acc, v) => acc + Math.pow(v - media, 2), 0) / n;
-    const desviacionPoblacional = Math.sqrt(varianzaPoblacional);
-
-    // Rango
-    const minimo = valores[0];
-    const maximo = valores[n - 1];
-    const rango = maximo - minimo;
-
-    // Cuartiles
-    const q1Index = Math.floor(n * 0.25);
-    const q3Index = Math.floor(n * 0.75);
-    const q1 = valores[q1Index];
-    const q3 = valores[q3Index];
-    const iqr = q3 - q1;
-
-    // Coeficiente de variación
-    const coefVariacion = (desviacionMuestral / media) * 100;
-
-    // Error estándar
-    const errorEstandar = desviacionMuestral / Math.sqrt(n);
-
-    // Suma de cuadrados
-    const sumaCuadrados = valores.reduce((acc, v) => acc + Math.pow(v - media, 2), 0);
-
-    // Desviación media (desviación absoluta media respecto a la media)
-    const desviacionMedia = valores.reduce((acc, v) => acc + Math.abs(v - media), 0) / n;
-
-    return {
-      n,
-      suma,
-      media,
-      mediana,
-      modas,
-      maxFrec,
-      varianzaMuestral,
-      varianzaPoblacional,
-      desviacionMuestral,
-      desviacionPoblacional,
-      minimo,
-      maximo,
-      rango,
-      q1,
-      q3,
-      iqr,
-      coefVariacion,
-      errorEstandar,
-      sumaCuadrados,
-      desviacionMedia
-    };
-  }, [valores]);
+  /**
+   * El cálculo vive en `casos.ts`, no aquí, y es la MISMA función que resuelve los 12 casos
+   * numerados de más abajo (movido el 06/09/2026, sin tocar una sola operación).
+   *
+   * Si cada lado tuviera su copia, la app podría acabar corrigiendo como mal una desviación
+   * típica o un cuartil que ella misma acaba de mostrar en pantalla: son medidas con varios
+   * convenios —÷n frente a ÷n−1, cuartil por posición frente a cuartil interpolado— y dos
+   * implementaciones separadas divergen en silencio. El convenio elegido, y por qué, está
+   * escrito en la cabecera de `casos.ts`.
+   */
+  const estadisticas = useMemo(() => calcularEstadisticas(valores), [valores]);
 
   const cargarEjemplo = (tipo: string) => {
     const ejemplos: Record<string, string> = {
@@ -184,6 +148,59 @@ export default function CalculadoraEstadisticaPage() {
   };
 
   const vaciarHistorial = () => setHistorial([]);
+
+  // ---------------------------------------------------------- Casos para clase
+
+  const comprobarCaso = (id: number, esperado: number) => {
+    const valor = parseSpanishNumber(respuestasCasos[id] ?? '');
+    setVeredictos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
+  };
+
+  const alternarSolucion = (id: number) => {
+    setSolucionesAbiertas((previas) => ({ ...previas, [id]: !previas[id] }));
+  };
+
+  const reiniciarCasos = () => {
+    setRespuestasCasos({});
+    setVeredictos({});
+    setSolucionesAbiertas({});
+  };
+
+  /**
+   * Lleva los datos del caso al campo de la calculadora, arriba del todo.
+   *
+   * Convierte el caso en una tarea de dos pasos —calcula tú, luego compruébalo con la
+   * herramienta— sin duplicar nada: el análisis lo hace el mismo panel de resultados de
+   * siempre. La serie se escribe con números enteros separados por comas, que es la única
+   * forma que se lee igual tanto si la coma es decimal como si es separador.
+   */
+  const cargarEnCalculadora = (texto: string) => {
+    setDatos(texto);
+    setModoLectura('auto');
+    refDatos.current?.scrollIntoView({ block: 'center' });
+  };
+
+  const nuevoEjercicio = () => {
+    setEjercicio(generarEjercicioAleatorio());
+    setRespuestaAleatoria('');
+    setVeredictoAleatorio(null);
+    setSolucionAleatoriaAbierta(false);
+  };
+
+  const comprobarAleatorio = () => {
+    if (!ejercicio) return;
+    setVeredictoAleatorio(comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta));
+  };
+
+  const textoVeredicto = (veredicto: Comprobacion, respuestaTexto: string, unidad: string) => {
+    if (veredicto.motivo === 'no-numerico') {
+      return 'Eso no es un número. Escribe solo la cifra, con coma o punto decimal (por ejemplo 14,5).';
+    }
+    if (veredicto.correcto) {
+      return `Correcto: ${respuestaTexto} ${unidad}.`;
+    }
+    return `Todavía no. La respuesta correcta es ${respuestaTexto} ${unidad}. Abre la solución para ver dónde se tuerce la cuenta.`;
+  };
 
   return (
     <div className={styles.container}>
@@ -219,6 +236,7 @@ export default function CalculadoraEstadisticaPage() {
           </div>
 
           <textarea
+            ref={refDatos}
             className={styles.textareaDatos}
             value={datos}
             onChange={(e) => setDatos(e.target.value)}
@@ -450,6 +468,263 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
         </div>
       </div>
 
+
+      {/* ---------------------------------------------------- Casos para clase */}
+      <section className={styles.aulaSection} aria-labelledby="casos-para-clase">
+        <h2 id="casos-para-clase" className={styles.aulaTitulo}>
+          <span aria-hidden="true">📝</span> Casos para clase
+        </h2>
+        <p className={styles.aulaIntro}>
+          Son <strong>12 casos fijos</strong>: el caso 3 es el mismo para todo el mundo, hoy y
+          dentro de un año, con los mismos números y la misma solución. Por eso se pueden asignar
+          por número —«resuelve el 3, el 7 y el 11»— y corregir igual para todo el grupo.
+        </p>
+        <p className={styles.aulaConvenio}>
+          <span aria-hidden="true">⚖️</span> <strong>Dos avisos de convenio</strong>, porque
+          cambian el resultado: cuando un caso pide «desviación típica» se refiere a la{' '}
+          <strong>poblacional (σ)</strong>, la que divide entre n —el caso 8 pide la muestral
+          (÷ n−1) sobre los mismos datos, justo para que la diferencia se vea en dos números—, y
+          los <strong>cuartiles</strong> se toman por posición sobre los datos ordenados. Los dos
+          casos de cuartiles usan conjuntos en los que todos los métodos habituales, incluido el
+          de las hojas de cálculo, dan el mismo número.
+        </p>
+
+        <div className={styles.aulaContador}>
+          <p className={styles.aulaContadorTexto} aria-live="polite">
+            Has resuelto <strong>{casosResueltos}</strong> de {TOTAL_CASOS}
+          </p>
+          <div
+            className={styles.aulaBarra}
+            role="progressbar"
+            aria-valuenow={casosResueltos}
+            aria-valuemin={0}
+            aria-valuemax={TOTAL_CASOS}
+            aria-label="Casos resueltos"
+          >
+            <div
+              className={styles.aulaBarraRelleno}
+              style={{ width: `${(casosResueltos / TOTAL_CASOS) * 100}%` }}
+            />
+          </div>
+          <button type="button" className={styles.aulaBtnSecundario} onClick={reiniciarCasos}>
+            Empezar de nuevo
+          </button>
+        </div>
+
+        <div className={styles.aulaGrid}>
+          {CASOS.map((caso) => {
+            const veredicto = veredictos[caso.id];
+            const abierta = solucionesAbiertas[caso.id] === true;
+            const comparacion = caso.textoDatosComparacion;
+            return (
+              <article key={caso.id} className={styles.aulaCaso}>
+                <div className={styles.aulaCabecera}>
+                  <span className={styles.aulaNumero}>{caso.id}</span>
+                  <h3 className={styles.aulaCasoTitulo}>{caso.titulo}</h3>
+                  <span className={styles.aulaEtiqueta}>
+                    {caso.categoria === 'abstracto' ? 'Cálculo directo' : 'Situación real'}
+                  </span>
+                </div>
+
+                <p className={styles.aulaEnunciado}>{caso.enunciado}</p>
+
+                <div className={styles.aulaDatos}>
+                  <p className={styles.aulaDatosLinea}>
+                    <span className={styles.aulaDatosEtiqueta}>{caso.etiquetaDatos}:</span>{' '}
+                    <span className={styles.aulaDatosValores}>{caso.textoDatos}</span>
+                  </p>
+                  {comparacion !== null && (
+                    <p className={styles.aulaDatosLinea}>
+                      <span className={styles.aulaDatosEtiqueta}>{caso.etiquetaComparacion}:</span>{' '}
+                      <span className={styles.aulaDatosValores}>{comparacion}</span>
+                    </p>
+                  )}
+                  <div className={styles.aulaAcciones}>
+                    <button
+                      type="button"
+                      className={styles.aulaBtnCargar}
+                      onClick={() => cargarEnCalculadora(caso.textoDatos)}
+                    >
+                      <span aria-hidden="true">⬆️</span> Cargar estos datos en la calculadora
+                    </button>
+                    {comparacion !== null && (
+                      <button
+                        type="button"
+                        className={styles.aulaBtnCargar}
+                        onClick={() => cargarEnCalculadora(comparacion)}
+                      >
+                        <span aria-hidden="true">⬆️</span> Cargar el otro conjunto
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.aulaRespuesta}>
+                  <label className={styles.aulaEtiquetaCampo} htmlFor={`respuesta-caso-${caso.id}`}>
+                    {caso.etiquetaRespuesta}
+                    {caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                  </label>
+                  <input
+                    id={`respuesta-caso-${caso.id}`}
+                    className={styles.aulaCampo}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    value={respuestasCasos[caso.id] ?? ''}
+                    placeholder="Escribe solo el número"
+                    onChange={(e) =>
+                      setRespuestasCasos((previas) => ({ ...previas, [caso.id]: e.target.value }))
+                    }
+                  />
+                </div>
+
+                <div className={styles.aulaAcciones}>
+                  <button
+                    type="button"
+                    className={styles.aulaBtnPrimario}
+                    onClick={() => comprobarCaso(caso.id, caso.respuesta)}
+                  >
+                    Comprobar
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.aulaBtnSecundario}
+                    aria-expanded={abierta}
+                    aria-controls={`solucion-caso-${caso.id}`}
+                    onClick={() => alternarSolucion(caso.id)}
+                  >
+                    {abierta ? 'Ocultar solución' : 'Ver solución'}
+                  </button>
+                </div>
+
+                {veredicto !== undefined && (
+                  <p
+                    className={`${styles.aulaVeredicto} ${veredicto.correcto ? styles.aulaVeredictoOk : styles.aulaVeredictoKo}`}
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <span aria-hidden="true">{veredicto.correcto ? '✅' : '❌'}</span>{' '}
+                    {textoVeredicto(veredicto, caso.respuestaTexto, caso.unidad)}
+                  </p>
+                )}
+
+                <div id={`solucion-caso-${caso.id}`} hidden={!abierta}>
+                  <div className={styles.aulaSolucion}>
+                    <p className={styles.aulaPista}>
+                      <span aria-hidden="true">💡</span> {caso.pista}
+                    </p>
+                    <ol className={styles.aulaPasos}>
+                      {caso.pasos.map((paso, indice) => (
+                        <li key={indice} className={styles.aulaPaso}>
+                          {paso}
+                        </li>
+                      ))}
+                    </ol>
+                    <p className={styles.aulaResultado}>
+                      Resultado: <strong>{caso.respuestaTexto}</strong> {caso.unidad}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* ------------------------------------------------ Práctica aleatoria */}
+        <div className={styles.aulaPractica}>
+          <h3 className={styles.aulaPracticaTitulo}>Práctica sin final</h3>
+          <p className={styles.aulaIntro}>
+            Cuando los 12 casos se queden cortos, este botón inventa uno nuevo cada vez, con
+            números distintos y la solución explicada igual que en los demás. Estos no son
+            asignables por número: para eso están los 12 de arriba.
+          </p>
+          <div className={styles.aulaAcciones}>
+            <button type="button" className={styles.aulaBtnPrimario} onClick={nuevoEjercicio}>
+              <span aria-hidden="true">🎲</span> Ejercicio aleatorio
+            </button>
+          </div>
+
+          {ejercicio !== null && (
+            <div className={styles.aulaCaso}>
+              <p className={styles.aulaEnunciado}>{ejercicio.enunciado}</p>
+
+              <div className={styles.aulaDatos}>
+                <p className={styles.aulaDatosLinea}>
+                  <span className={styles.aulaDatosEtiqueta}>Datos:</span>{' '}
+                  <span className={styles.aulaDatosValores}>{ejercicio.textoDatos}</span>
+                </p>
+                <div className={styles.aulaAcciones}>
+                  <button
+                    type="button"
+                    className={styles.aulaBtnCargar}
+                    onClick={() => cargarEnCalculadora(ejercicio.textoDatos)}
+                  >
+                    <span aria-hidden="true">⬆️</span> Cargar estos datos en la calculadora
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.aulaRespuesta}>
+                <label className={styles.aulaEtiquetaCampo} htmlFor="respuesta-aleatoria">
+                  {ejercicio.etiquetaRespuesta}
+                  {ejercicio.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                </label>
+                <input
+                  id="respuesta-aleatoria"
+                  className={styles.aulaCampo}
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={respuestaAleatoria}
+                  placeholder="Escribe solo el número"
+                  onChange={(e) => setRespuestaAleatoria(e.target.value)}
+                />
+              </div>
+
+              <div className={styles.aulaAcciones}>
+                <button type="button" className={styles.aulaBtnPrimario} onClick={comprobarAleatorio}>
+                  Comprobar
+                </button>
+                <button
+                  type="button"
+                  className={styles.aulaBtnSecundario}
+                  aria-expanded={solucionAleatoriaAbierta}
+                  aria-controls="solucion-aleatoria"
+                  onClick={() => setSolucionAleatoriaAbierta(!solucionAleatoriaAbierta)}
+                >
+                  {solucionAleatoriaAbierta ? 'Ocultar solución' : 'Ver solución'}
+                </button>
+              </div>
+
+              {veredictoAleatorio !== null && (
+                <p
+                  className={`${styles.aulaVeredicto} ${veredictoAleatorio.correcto ? styles.aulaVeredictoOk : styles.aulaVeredictoKo}`}
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <span aria-hidden="true">{veredictoAleatorio.correcto ? '✅' : '❌'}</span>{' '}
+                  {textoVeredicto(veredictoAleatorio, ejercicio.respuestaTexto, ejercicio.unidad)}
+                </p>
+              )}
+
+              <div id="solucion-aleatoria" hidden={!solucionAleatoriaAbierta}>
+                <div className={styles.aulaSolucion}>
+                  <ol className={styles.aulaPasos}>
+                    {ejercicio.pasos.map((paso, indice) => (
+                      <li key={indice} className={styles.aulaPaso}>
+                        {paso}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className={styles.aulaResultado}>
+                    Resultado: <strong>{ejercicio.respuestaTexto}</strong> {ejercicio.unidad}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       <DisclaimerCard variant="educational" severity="low" collapsible={true} context="calculadora-estadistica">
         <p>Esta calculadora es una <strong>herramienta educativa</strong> para estadística descriptiva:</p>

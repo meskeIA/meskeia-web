@@ -67,3 +67,85 @@
   .chartWrap { height: 260px; }
 }
 @media (prefers-reduced-motion: reduce) { }
+
+/* ─────────────────────────────────────────────
+   Casos numerados para clase (bloque añadido)
+   ───────────────────────────────────────────── */
+
+.casosSeccion { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
+.casosTitulo { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-md); }
+.casosIntro { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0 0 var(--spacing-sm); }
+.casosNota { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin: 0 0 var(--spacing-lg); }
+
+.casosContador { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-md); background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.casosContadorTexto { font-size: 0.9rem; color: var(--text-primary); margin: 0; }
+.casosBarra { flex: 1 1 160px; min-width: 120px; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.casosRelleno { height: 100%; background: linear-gradient(90deg, #2E86AB 0%, #48A9A6 100%); border-radius: 5px; transition: width 0.25s ease; }
+
+.casosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg); }
+.casoCard { display: flex; flex-direction: column; gap: var(--spacing-sm); background: var(--bg-primary); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); }
+.casoCabecera { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-sm); }
+.casoNumero { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: var(--primary); color: #FFFFFF; font-size: 0.9rem; font-weight: 700; }
+.casoTituloCard { flex: 1 1 auto; font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.casoEtiqueta { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #2F7B79; background: rgba(72,169,166,0.14); border-radius: 999px; padding: 0.15rem 0.6rem; }
+.casoFamilia { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+.casoExpresion { font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: 700; color: var(--primary); background: var(--hover); border-radius: 6px; padding: 0.12rem 0.45rem; }
+.casoEnunciado { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+
+.casoTablaWrap { overflow-x: auto; }
+.casoTabla { border-collapse: collapse; font-size: 0.85rem; min-width: 200px; }
+.casoTablaCaption { caption-side: top; text-align: left; font-size: 0.74rem; color: var(--text-muted); padding-bottom: 0.3rem; }
+.casoTabla th, .casoTabla td { border: 1px solid var(--border); padding: 0.35rem 0.7rem; color: var(--text-primary); text-align: right; }
+.casoTabla th { background: var(--hover); font-weight: 700; text-align: left; }
+
+.casoCampo { display: flex; flex-direction: column; gap: 0.3rem; }
+.casoEtiquetaCampo { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+.casoInput { width: 100%; padding: 0.55rem 0.75rem; font-size: 1rem; color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
+.casoInput:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.casoAcciones { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+.casoBtnPrimario { padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: #FFFFFF; background: var(--primary); border: 1px solid var(--primary); border-radius: 8px; cursor: pointer; }
+.casoBtnPrimario:hover { background: #256E8D; border-color: #256E8D; }
+.casoBtnSecundario { padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+.casoBtnSecundario:hover { background: var(--hover); color: var(--text-primary); }
+.casoBtnGrafica { padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: #2F7B79; background: rgba(72,169,166,0.10); border: 1px solid var(--secondary); border-radius: 8px; cursor: pointer; }
+.casoBtnGrafica:hover { background: rgba(72,169,166,0.20); }
+.casoBtnPrimario:focus-visible, .casoBtnSecundario:focus-visible, .casoBtnGrafica:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.casoFeedback { display: block; font-size: 0.86rem; line-height: 1.5; border-radius: 8px; padding: 0.55rem 0.8rem; margin: 0; }
+.casoFeedbackOk { background: #E7F5EC; border: 1px solid #2E7D4F; color: #1B5E38; }
+.casoFeedbackKo { background: #FDECEA; border: 1px solid #C0392B; color: #8E2A20; }
+
+.casoSolucion { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); margin-top: var(--spacing-sm); }
+.casoPista { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; margin: 0 0 var(--spacing-sm); }
+.casoPasos { display: flex; flex-direction: column; gap: 0.4rem; margin: 0; padding-left: 1.2rem; }
+.casoPaso { font-size: 0.85rem; color: var(--text-primary); line-height: 1.55; }
+.casoResultado { font-size: 0.9rem; color: var(--text-primary); margin: var(--spacing-md) 0 0; padding-top: var(--spacing-sm); border-top: 1px solid var(--border); }
+
+.casoAleatorio { margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 2px dashed var(--border); }
+.casoAleatorioTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm); }
+.casoAleatorioCaja { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg); background: var(--bg-primary); border: 1px solid var(--border); border-left: 4px solid var(--secondary); border-radius: var(--radius); padding: var(--spacing-lg); }
+
+[data-theme='dark'] .casoCard,
+[data-theme='dark'] .casoAleatorioCaja { background: #232323; }
+[data-theme='dark'] .casoEtiqueta { color: #8FD3D1; background: rgba(72,169,166,0.18); }
+[data-theme='dark'] .casoExpresion { color: #7FB3D3; }
+[data-theme='dark'] .casoBtnGrafica { color: #8FD3D1; background: rgba(72,169,166,0.16); }
+[data-theme='dark'] .casoBtnGrafica:hover { background: rgba(72,169,166,0.28); }
+[data-theme='dark'] .casoBtnPrimario:hover { background: #3F9AC4; border-color: #3F9AC4; }
+[data-theme='dark'] .casoFeedbackOk { background: #12291D; border-color: #3E9C6B; color: #A9E6C3; }
+[data-theme='dark'] .casoFeedbackKo { background: #2E1512; border-color: #D9705F; color: #F3BAB0; }
+
+@media (max-width: 768px) {
+  .casosSeccion { padding: var(--spacing-lg); }
+  .casosTitulo { font-size: 1.2rem; }
+  .casosGrid { grid-template-columns: 1fr; }
+  .casosContador { flex-direction: column; align-items: stretch; }
+  .casoAcciones { flex-direction: column; align-items: stretch; }
+  .casoBtnPrimario, .casoBtnSecundario, .casoBtnGrafica { width: 100%; }
+  .casoCard, .casoAleatorioCaja { padding: var(--spacing-md); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .casosRelleno { transition: none; }
+}

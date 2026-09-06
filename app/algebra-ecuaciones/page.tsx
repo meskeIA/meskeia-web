@@ -6,96 +6,32 @@ import { Footer, MeskeiaLogo, EducationalSection, RelatedApps, DisclaimerCard, L
 import { getRelatedApps } from '@/data/app-relations';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import * as Algebrite from 'algebrite';
+import { formatNumber as formatNumeroEs, parseSpanishNumber } from '@/lib';
+// La aritmética de fracciones y la división sintética viven en casos.ts: la usan por
+// igual la calculadora y los 12 casos numerados, y duplicarla dejaría que un arreglo en
+// Ruffini corrigiese una de las dos y dejase mintiendo a la otra.
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  dividirRuffini,
+  divisores,
+  fEsCero,
+  fTexto,
+  fValor,
+  frac,
+  generarEjercicioAleatorio,
+  polinomioATexto,
+  type Comprobacion,
+  type EjercicioAleatorio,
+  type Fraccion,
+  type PasoRuffini,
+} from './casos';
 
 Chart.register(...registerables);
 
 // Tipos de ecuaciones
 type EquationType = 'linear' | 'quadratic' | 'system' | 'polynomial';
-
-// ---------------------------------------------------------------------------
-// Aritmética racional exacta para la regla de Ruffini
-// Se trabaja con fracciones (no con coma flotante) para que la división
-// sintética dé restos exactamente 0 y no "0,0000000001".
-// ---------------------------------------------------------------------------
-interface Fraccion {
-  n: number; // numerador
-  d: number; // denominador, siempre > 0
-}
-
-const mcdEnteros = (a: number, b: number): number => {
-  let x = Math.abs(a);
-  let y = Math.abs(b);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-};
-
-const frac = (n: number, d: number = 1): Fraccion => {
-  if (d === 0) return { n: 0, d: 1 };
-  let num = n;
-  let den = d;
-  if (den < 0) {
-    num = -num;
-    den = -den;
-  }
-  const g = mcdEnteros(num, den) || 1;
-  return { n: num / g, d: den / g };
-};
-
-const fSuma = (a: Fraccion, b: Fraccion): Fraccion => frac(a.n * b.d + b.n * a.d, a.d * b.d);
-const fProducto = (a: Fraccion, b: Fraccion): Fraccion => frac(a.n * b.n, a.d * b.d);
-const fEsCero = (a: Fraccion): boolean => a.n === 0;
-const fValor = (a: Fraccion): number => a.n / a.d;
-const fTexto = (a: Fraccion): string => (a.d === 1 ? String(a.n) : `${a.n}/${a.d}`);
-
-// Divisores positivos de un entero (para el teorema de la raíz racional)
-const divisores = (num: number): number[] => {
-  const valor = Math.abs(num);
-  const salida: number[] = [];
-  for (let i = 1; i <= valor; i++) {
-    if (valor % i === 0) salida.push(i);
-  }
-  return salida;
-};
-
-// Un paso de división sintética (la tabla clásica de tres filas)
-interface PasoRuffini {
-  raiz: Fraccion;
-  coeficientes: Fraccion[]; // fila superior
-  arrastre: Fraccion[]; // fila central (bajo cada columna salvo la primera)
-  resultado: Fraccion[]; // fila inferior: cociente + resto final
-}
-
-// Divide P(x) entre (x - raiz) por Ruffini y devuelve el paso completo
-const dividirRuffini = (coeficientes: Fraccion[], raiz: Fraccion): PasoRuffini => {
-  const resultado: Fraccion[] = [coeficientes[0]];
-  const arrastre: Fraccion[] = [];
-  for (let i = 1; i < coeficientes.length; i++) {
-    const sube = fProducto(resultado[i - 1], raiz);
-    arrastre.push(sube);
-    resultado.push(fSuma(coeficientes[i], sube));
-  }
-  return { raiz, coeficientes, arrastre, resultado };
-};
-
-// Escribe un polinomio a partir de sus coeficientes (grado descendente)
-const polinomioATexto = (coeficientes: Fraccion[]): string => {
-  const grado = coeficientes.length - 1;
-  const partes: string[] = [];
-  coeficientes.forEach((c, i) => {
-    if (fEsCero(c)) return;
-    const exponente = grado - i;
-    const signo = c.n < 0 ? '−' : partes.length ? '+' : '';
-    const abs = frac(Math.abs(c.n), c.d);
-    const coefTexto = fTexto(abs) === '1' && exponente > 0 ? '' : fTexto(abs);
-    const variable = exponente === 0 ? '' : exponente === 1 ? 'x' : `x${exponente === 2 ? '²' : exponente === 3 ? '³' : exponente === 4 ? '⁴' : '⁵'}`;
-    partes.push(`${signo} ${coefTexto}${variable}`.trim());
-  });
-  return partes.length ? partes.join(' ') : '0';
-};
 
 // Resultado completo del análisis de un polinomio de grado ≥ 3
 interface ResultadoPolinomio {
@@ -147,6 +83,66 @@ export default function AlgebraEcuacionesPage() {
   const [polyGrado, setPolyGrado] = useState<number>(3);
   const [polyCoefs, setPolyCoefs] = useState<string[]>(['1', '-6', '11', '-6']);
   const [polyResultado, setPolyResultado] = useState<ResultadoPolinomio | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // Casos numerados para clase
+  //
+  // Estado propio, separado del de la calculadora: comparte el motor (casos.ts) pero no
+  // toca ninguna de las variables de arriba, así que las cuatro pestañas siguen igual.
+  // ---------------------------------------------------------------------------
+  const [respuestasCasos, setRespuestasCasos] = useState<Record<number, string>>({});
+  const [veredictosCasos, setVeredictosCasos] = useState<Record<number, Comprobacion>>({});
+  const [solucionesAbiertas, setSolucionesAbiertas] = useState<Record<number, boolean>>({});
+  const [ejercicioAleatorio, setEjercicioAleatorio] = useState<EjercicioAleatorio | null>(null);
+  const [respuestaAleatoria, setRespuestaAleatoria] = useState<string>('');
+  const [veredictoAleatorio, setVeredictoAleatorio] = useState<Comprobacion | null>(null);
+  const [solucionAleatoriaAbierta, setSolucionAleatoriaAbierta] = useState<boolean>(false);
+
+  const casosResueltos = Object.values(veredictosCasos).filter((v) => v.correcto).length;
+  const porcentajeCasos = (casosResueltos / TOTAL_CASOS) * 100;
+
+  const comprobarCaso = (id: number, esperado: number) => {
+    const valor = parseSpanishNumber(respuestasCasos[id] ?? '');
+    setVeredictosCasos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
+  };
+
+  const alternarSolucionCaso = (id: number) => {
+    setSolucionesAbiertas((previas) => ({ ...previas, [id]: !previas[id] }));
+  };
+
+  const reiniciarCasos = () => {
+    setRespuestasCasos({});
+    setVeredictosCasos({});
+    setSolucionesAbiertas({});
+  };
+
+  // generarEjercicioAleatorio() sin semilla toma la hora del reloj, así que se llama solo
+  // al pulsar el botón y NUNCA durante el render: ahí el servidor y el navegador
+  // obtendrían ejercicios distintos y la hidratación no cuadraría.
+  const nuevoEjercicioAleatorio = () => {
+    setEjercicioAleatorio(generarEjercicioAleatorio());
+    setRespuestaAleatoria('');
+    setVeredictoAleatorio(null);
+    setSolucionAleatoriaAbierta(false);
+  };
+
+  const comprobarAleatorio = () => {
+    if (!ejercicioAleatorio) return;
+    const valor = parseSpanishNumber(respuestaAleatoria);
+    setVeredictoAleatorio(comprobarRespuesta(valor, ejercicioAleatorio.respuesta));
+  };
+
+  // El veredicto en palabras. «no-numerico» se distingue del fallo a propósito: sin ese
+  // aviso, teclear «doce» dejaría un «NaN» en pantalla que parecería un error de la app.
+  const textoVeredicto = (veredicto: Comprobacion, respuestaTexto: string): string => {
+    if (veredicto.motivo === 'no-numerico') {
+      return 'Eso no es un número. Escribe solo la cifra, con coma o punto decimal (por ejemplo −16 o 2,5).';
+    }
+    if (veredicto.correcto) {
+      return `Correcto: ${respuestaTexto}.`;
+    }
+    return `Todavía no. La respuesta correcta es ${respuestaTexto}. Abre la solución para ver dónde se tuerce la cuenta.`;
+  };
 
   // Referencia para gráfica
   const chartRef = useRef<HTMLCanvasElement>(null);
@@ -1070,6 +1066,218 @@ export default function AlgebraEcuacionesPage() {
           )}
         </div>
       </div>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Casos numerados para clase                                         */}
+      {/* ------------------------------------------------------------------ */}
+      <section className={styles.casosSeccion} aria-labelledby="titulo-casos-clase">
+        <h2 id="titulo-casos-clase" className={styles.casosTitulo}>
+          <span aria-hidden="true">📝</span> Casos para clase
+        </h2>
+
+        <p className={styles.casosIntro}>
+          Son <strong>12 casos fijos</strong>: siempre los mismos, en el mismo orden y con los
+          mismos números. El caso 3 es idéntico para cualquiera que abra esta página, hoy y dentro
+          de un año, así que un encargo del tipo «resuelve el 3, el 7 y el 11» significa lo mismo
+          para toda la clase. Cada enunciado pide <strong>un solo número</strong> —la solución
+          mayor, el discriminante, un determinante, una raíz entera— para que no haya ninguna duda
+          sobre qué se escribe en la casilla.
+        </p>
+
+        <div className={styles.casosContador}>
+          <p className={styles.casosContadorTexto} aria-live="polite">
+            Has resuelto <strong>{casosResueltos}</strong> de {TOTAL_CASOS} (
+            {formatNumeroEs(porcentajeCasos, 0)} %)
+          </p>
+          <div
+            className={styles.casosBarra}
+            role="progressbar"
+            aria-valuenow={casosResueltos}
+            aria-valuemin={0}
+            aria-valuemax={TOTAL_CASOS}
+            aria-label="Casos resueltos"
+          >
+            <div className={styles.casosBarraRelleno} style={{ width: `${porcentajeCasos}%` }} />
+          </div>
+          <button type="button" className={styles.casosBtnSecundario} onClick={reiniciarCasos}>
+            Empezar de nuevo
+          </button>
+        </div>
+
+        <ol className={styles.casosLista}>
+          {CASOS.map((caso) => {
+            const veredicto = veredictosCasos[caso.id];
+            const abierta = solucionesAbiertas[caso.id] === true;
+            return (
+              <li key={caso.id} className={styles.casoTarjeta}>
+                <div className={styles.casoCabecera}>
+                  <span className={styles.casoNumero}>{caso.id}</span>
+                  <h3 className={styles.casoTitulo}>{caso.titulo}</h3>
+                  <span className={styles.casoEtiqueta}>
+                    {caso.categoria === 'abstracto' ? 'Cálculo directo' : 'Situación real'}
+                  </span>
+                </div>
+
+                <p className={styles.casoEnunciado}>{caso.enunciado}</p>
+
+                <div className={styles.casoRespuesta}>
+                  <label className={styles.casoLabel} htmlFor={`respuesta-caso-${caso.id}`}>
+                    Escribe {caso.etiquetaRespuesta}
+                  </label>
+                  <input
+                    id={`respuesta-caso-${caso.id}`}
+                    className={styles.casoInput}
+                    type="text"
+                    inputMode="text"
+                    autoComplete="off"
+                    placeholder="Solo el número"
+                    value={respuestasCasos[caso.id] ?? ''}
+                    onChange={(e) =>
+                      setRespuestasCasos((previas) => ({ ...previas, [caso.id]: e.target.value }))
+                    }
+                  />
+                </div>
+
+                <div className={styles.casoAcciones}>
+                  <button
+                    type="button"
+                    className={styles.casosBtnPrimario}
+                    onClick={() => comprobarCaso(caso.id, caso.respuesta)}
+                  >
+                    Comprobar
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.casosBtnSecundario}
+                    aria-expanded={abierta}
+                    aria-controls={`solucion-caso-${caso.id}`}
+                    onClick={() => alternarSolucionCaso(caso.id)}
+                  >
+                    {abierta ? 'Ocultar solución' : 'Ver solución'}
+                  </button>
+                </div>
+
+                {veredicto !== undefined && (
+                  <p
+                    className={`${styles.casoVeredicto} ${veredicto.correcto ? styles.casoVeredictoOk : styles.casoVeredictoKo}`}
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <span aria-hidden="true">{veredicto.correcto ? '✅' : '❌'}</span>{' '}
+                    {textoVeredicto(veredicto, caso.respuestaTexto)}
+                  </p>
+                )}
+
+                <div id={`solucion-caso-${caso.id}`} hidden={!abierta}>
+                  <div className={styles.casoSolucion}>
+                    <p className={styles.casoPista}>
+                      <span aria-hidden="true">💡</span> {caso.pista}
+                    </p>
+                    <ol className={styles.casoPasos}>
+                      {caso.pasos.map((paso, indice) => (
+                        <li key={indice} className={styles.casoPaso}>
+                          {paso}
+                        </li>
+                      ))}
+                    </ol>
+                    <p className={styles.casoResultado}>
+                      Resultado ({caso.etiquetaRespuesta}):{' '}
+                      <strong>{caso.respuestaTexto}</strong>
+                    </p>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+
+        {/* -------------------------------------------------- Práctica sin final */}
+        <div className={styles.casosAleatorio}>
+          <h3 className={styles.casosSubtitulo}>Práctica sin final</h3>
+          <p className={styles.casosIntro}>
+            Cuando los 12 casos se queden cortos, este botón inventa uno nuevo cada vez —lineal,
+            cuadrática o sistema— con números elegidos para que la solución salga limpia y con la
+            solución explicada igual que en los demás.
+          </p>
+          <button
+            type="button"
+            className={styles.casosBtnPrimario}
+            onClick={nuevoEjercicioAleatorio}
+          >
+            <span aria-hidden="true">🎲</span> Ejercicio aleatorio
+          </button>
+
+          {ejercicioAleatorio !== null && (
+            <div className={styles.casoTarjeta}>
+              <p className={styles.casoEnunciado}>{ejercicioAleatorio.enunciado}</p>
+
+              <div className={styles.casoRespuesta}>
+                <label className={styles.casoLabel} htmlFor="respuesta-aleatoria">
+                  Escribe {ejercicioAleatorio.etiquetaRespuesta}
+                </label>
+                <input
+                  id="respuesta-aleatoria"
+                  className={styles.casoInput}
+                  type="text"
+                  inputMode="text"
+                  autoComplete="off"
+                  placeholder="Solo el número"
+                  value={respuestaAleatoria}
+                  onChange={(e) => setRespuestaAleatoria(e.target.value)}
+                />
+              </div>
+
+              <div className={styles.casoAcciones}>
+                <button
+                  type="button"
+                  className={styles.casosBtnPrimario}
+                  onClick={comprobarAleatorio}
+                >
+                  Comprobar
+                </button>
+                <button
+                  type="button"
+                  className={styles.casosBtnSecundario}
+                  aria-expanded={solucionAleatoriaAbierta}
+                  aria-controls="solucion-aleatoria"
+                  onClick={() => setSolucionAleatoriaAbierta(!solucionAleatoriaAbierta)}
+                >
+                  {solucionAleatoriaAbierta ? 'Ocultar solución' : 'Ver solución'}
+                </button>
+              </div>
+
+              {veredictoAleatorio !== null && (
+                <p
+                  className={`${styles.casoVeredicto} ${veredictoAleatorio.correcto ? styles.casoVeredictoOk : styles.casoVeredictoKo}`}
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <span aria-hidden="true">{veredictoAleatorio.correcto ? '✅' : '❌'}</span>{' '}
+                  {textoVeredicto(veredictoAleatorio, ejercicioAleatorio.respuestaTexto)}
+                </p>
+              )}
+
+              <div id="solucion-aleatoria" hidden={!solucionAleatoriaAbierta}>
+                <div className={styles.casoSolucion}>
+                  <p className={styles.casoPista}>
+                    <span aria-hidden="true">💡</span> {ejercicioAleatorio.pista}
+                  </p>
+                  <ol className={styles.casoPasos}>
+                    {ejercicioAleatorio.pasos.map((paso, indice) => (
+                      <li key={indice} className={styles.casoPaso}>
+                        {paso}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className={styles.casoResultado}>
+                    Resultado: <strong>{ejercicioAleatorio.respuestaTexto}</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard

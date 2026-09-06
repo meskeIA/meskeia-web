@@ -1098,3 +1098,414 @@
     font-size: 0.8rem;
   }
 }
+
+/* ============================================================
+   Casos para clase (modo aula) — clases nuevas, prefijo .aula
+   Todas viven dentro de .container, así que heredan sus variables
+   y su bloque [data-theme='dark'].
+   ============================================================ */
+
+.aulaSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.aulaTitulo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.aulaIntro {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.aulaConvenio {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+[data-theme='dark'] .aulaConvenio {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+/* ---- Contador de progreso ---- */
+
+.aulaContador {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-lg);
+}
+
+.aulaContadorTexto {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.aulaBarra {
+  flex: 1 1 180px;
+  height: 10px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.aulaBarraRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ---- Rejilla de casos ---- */
+
+.aulaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.aulaCaso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .aulaCaso {
+  background: #232323;
+}
+
+.aulaCabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.aulaNumero {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.aulaCasoTitulo {
+  flex: 1 1 auto;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.aulaEtiqueta {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--secondary);
+  border: 1px solid var(--secondary);
+  border-radius: 999px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+.aulaEnunciado {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ---- Los datos del caso ---- */
+
+.aulaDatos {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.aulaDatosLinea {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.aulaDatosEtiqueta {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.aulaDatosValores {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+/* ---- Campo de respuesta ---- */
+
+.aulaRespuesta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.aulaEtiquetaCampo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.aulaCampo {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease;
+}
+
+.aulaCampo:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.aulaCampo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---- Botones ---- */
+
+.aulaAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.aulaBtnPrimario,
+.aulaBtnSecundario,
+.aulaBtnCargar {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.aulaBtnPrimario {
+  background: var(--primary);
+  color: #FFFFFF;
+  border: 2px solid var(--primary);
+}
+
+.aulaBtnPrimario:hover {
+  background: #256d8c;
+  border-color: #256d8c;
+}
+
+.aulaBtnSecundario {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.aulaBtnSecundario:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.aulaBtnCargar {
+  background: transparent;
+  color: var(--secondary);
+  border: 1px dashed var(--secondary);
+  font-size: 0.82rem;
+  padding: 0.4rem 0.75rem;
+}
+
+.aulaBtnCargar:hover {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+.aulaBtnPrimario:focus-visible,
+.aulaBtnSecundario:focus-visible,
+.aulaBtnCargar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .aulaBtnSecundario,
+[data-theme='dark'] .aulaBtnCargar {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+[data-theme='dark'] .aulaBtnSecundario:hover,
+[data-theme='dark'] .aulaBtnCargar:hover {
+  background: rgba(127, 179, 211, 0.15);
+}
+
+/* ---- Veredicto ---- */
+
+.aulaVeredicto {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  border-left: 4px solid transparent;
+}
+
+.aulaVeredictoOk {
+  background: rgba(16, 185, 129, 0.12);
+  border-left-color: var(--success);
+  color: var(--text-primary);
+}
+
+.aulaVeredictoKo {
+  background: rgba(239, 68, 68, 0.12);
+  border-left-color: var(--danger);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .aulaVeredictoOk {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+[data-theme='dark'] .aulaVeredictoKo {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* ---- Solución paso a paso ---- */
+
+.aulaSolucion {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.aulaPista {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.aulaPasos {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.aulaPaso {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.aulaResultado {
+  margin: var(--spacing-md) 0 0 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+}
+
+/* ---- Práctica aleatoria ---- */
+
+.aulaPractica {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 2px dashed var(--border);
+}
+
+.aulaPracticaTitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .aulaSection {
+    padding: var(--spacing-md);
+  }
+
+  .aulaTitulo {
+    font-size: 1.3rem;
+  }
+
+  .aulaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .aulaCaso {
+    padding: var(--spacing-md);
+  }
+
+  .aulaContador {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .aulaBarra {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .aulaAcciones {
+    flex-direction: column;
+  }
+
+  .aulaBtnPrimario,
+  .aulaBtnSecundario,
+  .aulaBtnCargar {
+    width: 100%;
+  }
+
+  .aulaDatosValores {
+    font-size: 0.85rem;
+  }
+}

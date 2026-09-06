@@ -806,3 +806,470 @@
   .coefGrid { gap: 0.5rem; }
   .ruffiniTable td, .ruffiniTable th { padding: 0.4rem 0.6rem; min-width: 2.6rem; font-size: 0.88rem; }
 }
+
+/* ================================================================= */
+/* CASOS NUMERADOS PARA CLASE                                        */
+/* Clases NUEVAS: no tocan ninguna de las de arriba. Los colores      */
+/* salen de los tokens de .container, que ya se redefinen en oscuro; */
+/* aquí abajo van además las variantes explícitas de lo que lleva     */
+/* color propio (insignias, veredictos, caja de solución).            */
+/* ================================================================= */
+
+.casosSeccion {
+  margin: var(--spacing-2xl) 0 var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-sm);
+}
+
+.casosTitulo {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.casosSubtitulo {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.casosIntro {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: 0.97rem;
+  max-width: 75ch;
+}
+
+/* ---------------------------------------------------- Contador */
+
+.casosContador {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.casosContadorTexto {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.97rem;
+}
+
+.casosBarra {
+  flex: 1 1 180px;
+  height: 10px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.casosBarraRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* ---------------------------------------------------- Botones */
+
+.casosBtnPrimario,
+.casosBtnSecundario {
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.casosBtnPrimario {
+  background: var(--primary);
+  color: #ffffff;
+  border: 1px solid var(--primary);
+}
+
+.casosBtnPrimario:hover {
+  background: #256d8c;
+  border-color: #256d8c;
+}
+
+.casosBtnSecundario {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.casosBtnSecundario:hover {
+  background: var(--focus);
+}
+
+.casosBtnPrimario:focus-visible,
+.casosBtnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------- Lista de casos */
+
+.casosLista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.casoTarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.casoCabecera {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.casoNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.casoTitulo {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.casoEtiqueta {
+  padding: 0.15rem 0.6rem;
+  background: var(--accent);
+  color: #10344a;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.casoEnunciado {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------------- Casilla de respuesta */
+
+.casoRespuesta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.casoLabel {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.casoInput {
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.casoInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus);
+}
+
+.casoAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* ---------------------------------------------------- Veredicto */
+
+.casoVeredicto {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius);
+  border-left: 4px solid transparent;
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+.casoVeredictoOk {
+  background: #e8f5ee;
+  border-left-color: #1c7c4a;
+  color: #14512f;
+}
+
+.casoVeredictoKo {
+  background: #fdecec;
+  border-left-color: #b3403a;
+  color: #7c2a26;
+}
+
+/* ---------------------------------------------------- Solución desplegable */
+
+.casoSolucion {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.casoPista {
+  margin: 0 0 var(--spacing-sm);
+  padding: 0.5rem 0.7rem;
+  background: var(--focus);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.casoPasos {
+  margin: 0;
+  padding-left: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.casoPaso {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  font-family: 'SF Mono', 'Consolas', 'Liberation Mono', monospace;
+  overflow-wrap: anywhere;
+}
+
+.casoResultado {
+  margin: var(--spacing-md) 0 0;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------------- Práctica sin final */
+
+.casosAleatorio {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.casosAleatorio .casoTarjeta {
+  width: 100%;
+  background: var(--bg-card);
+}
+
+/* ================================================================= */
+/* MODO OSCURO — solo lo que lleva color propio                      */
+/* ================================================================= */
+
+[data-theme='dark'] .casosSeccion {
+  background: #232323;
+  border-color: #404040;
+  border-top-color: var(--primary);
+}
+
+[data-theme='dark'] .casosTitulo {
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .casosSubtitulo {
+  color: #6FCFCB;
+}
+
+[data-theme='dark'] .casosIntro,
+[data-theme='dark'] .casoLabel,
+[data-theme='dark'] .casoPaso {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .casosContador,
+[data-theme='dark'] .casosAleatorio {
+  background: #2F2F2F;
+  border-color: #404040;
+}
+
+[data-theme='dark'] .casosBarra {
+  background: #404040;
+}
+
+[data-theme='dark'] .casoTarjeta {
+  background: #1F1F1F;
+  border-color: #404040;
+}
+
+[data-theme='dark'] .casosAleatorio .casoTarjeta {
+  background: #262626;
+}
+
+[data-theme='dark'] .casoEtiqueta {
+  background: #2E86AB;
+  color: #F0F7FB;
+}
+
+[data-theme='dark'] .casoInput {
+  background: #2A2A2A;
+  color: #E5E5E5;
+  border-color: #404040;
+}
+
+[data-theme='dark'] .casoInput:focus {
+  border-color: #7FB3D3;
+}
+
+[data-theme='dark'] .casosBtnSecundario {
+  color: #7FB3D3;
+  border-color: #7FB3D3;
+}
+
+[data-theme='dark'] .casoVeredictoOk {
+  background: #16301f;
+  border-left-color: #3FA76B;
+  color: #BDE7CD;
+}
+
+[data-theme='dark'] .casoVeredictoKo {
+  background: #351b1b;
+  border-left-color: #D46A64;
+  color: #F3C9C6;
+}
+
+[data-theme='dark'] .casoSolucion {
+  background: #262626;
+  border-color: #404040;
+}
+
+[data-theme='dark'] .casoPista {
+  background: rgba(46, 134, 171, 0.18);
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .casoResultado,
+[data-theme='dark'] .casoEnunciado,
+[data-theme='dark'] .casoTitulo,
+[data-theme='dark'] .casosContadorTexto {
+  color: #E5E5E5;
+}
+
+/* ================================================================= */
+/* RESPONSIVE                                                        */
+/* ================================================================= */
+
+@media (max-width: 768px) {
+  .casosSeccion {
+    padding: var(--spacing-md);
+  }
+
+  .casosTitulo {
+    font-size: 1.35rem;
+  }
+
+  .casosSubtitulo {
+    font-size: 1.1rem;
+  }
+
+  .casosLista {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .casoTarjeta {
+    padding: var(--spacing-md);
+  }
+
+  .casosContador {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .casosBarra {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .casosBtnPrimario,
+  .casosBtnSecundario {
+    width: 100%;
+    text-align: center;
+  }
+
+  .casoAcciones {
+    flex-direction: column;
+  }
+
+  .casoPaso {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .casoCabecera {
+    gap: 0.4rem;
+  }
+
+  .casoTitulo {
+    font-size: 0.98rem;
+  }
+
+  .casoEtiqueta {
+    font-size: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .casosBarraRelleno {
+    transition-duration: 0.01ms;
+  }
+}

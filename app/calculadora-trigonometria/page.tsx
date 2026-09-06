@@ -6,6 +6,21 @@ import styles from './CalculadoraTrigonometria.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+// La aritmética de los casos (y la conversión grados ⇄ radianes que usa toda la página)
+// vive en casos.ts, fuera de la vista, porque el build compila esta página sin comprobar
+// si la trigonometría está bien. Las dos conversiones se importan con los nombres que ya
+// usaba este componente, para que ninguna de sus cuentas cambie de forma.
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  conUnidad,
+  generarEjercicioAleatorio,
+  gradosARadianes as toRadians,
+  radianesAGrados as toDegrees,
+  type ComprobacionTrig,
+  type EjercicioTrigonometria,
+} from './casos';
 
 type TipoCalculo = 'funciones' | 'triangulo' | 'conversiones' | 'identidades';
 type UnidadAngulo = 'grados' | 'radianes';
@@ -31,10 +46,18 @@ export default function CalculadoraTrigonometriaPage() {
   const [anguloA, setAnguloA] = useState('');
   const [anguloB2, setAnguloB2] = useState('');
 
-  const PI = Math.PI;
+  // Casos numerados para clase
+  const [respuestasCasos, setRespuestasCasos] = useState<Record<number, string>>({});
+  const [veredictosCasos, setVeredictosCasos] = useState<Record<number, ComprobacionTrig>>({});
+  const [solucionesAbiertas, setSolucionesAbiertas] = useState<Record<number, boolean>>({});
 
-  const toRadians = (deg: number): number => (deg * PI) / 180;
-  const toDegrees = (rad: number): number => (rad * 180) / PI;
+  // Práctica aleatoria
+  const [ejercicio, setEjercicio] = useState<EjercicioTrigonometria | null>(null);
+  const [respuestaAleatoria, setRespuestaAleatoria] = useState('');
+  const [veredictoAleatorio, setVeredictoAleatorio] = useState<ComprobacionTrig | null>(null);
+  const [solucionAleatoriaAbierta, setSolucionAleatoriaAbierta] = useState(false);
+
+  const PI = Math.PI;
 
   const resultados = useMemo(() => {
     switch (tipoCalculo) {
@@ -238,6 +261,60 @@ export default function CalculadoraTrigonometriaPage() {
         return null;
     }
   }, [tipoCalculo, unidad, angulo, ladoA, ladoB, hipotenusa, anguloAlfa, valorConvertir, unidadOrigen, anguloA, anguloB2]);
+
+  // ---------------------------------------------------------- Casos para clase
+
+  const casosResueltos = useMemo(
+    () => Object.values(veredictosCasos).filter((v) => v.correcto).length,
+    [veredictosCasos]
+  );
+
+  const comprobarCaso = (id: number, esperado: number) => {
+    // parseSpanishNumber devuelve NaN con «doce» o «12 m»: comprobarRespuesta lo
+    // distingue de una respuesta equivocada y la vista lo dice con sus palabras.
+    const valor = parseSpanishNumber(respuestasCasos[id] ?? '');
+    setVeredictosCasos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
+  };
+
+  const alternarSolucion = (id: number) => {
+    setSolucionesAbiertas((previas) => ({ ...previas, [id]: !previas[id] }));
+  };
+
+  const reiniciarCasos = () => {
+    setRespuestasCasos({});
+    setVeredictosCasos({});
+    setSolucionesAbiertas({});
+  };
+
+  const nuevoEjercicio = () => {
+    // Sin semilla: la toma del reloj. Por eso se llama al pulsar y nunca en el render,
+    // donde servidor y navegador generarían ejercicios distintos.
+    setEjercicio(generarEjercicioAleatorio());
+    setRespuestaAleatoria('');
+    setVeredictoAleatorio(null);
+    setSolucionAleatoriaAbierta(false);
+  };
+
+  const comprobarAleatorio = () => {
+    if (!ejercicio) return;
+    setVeredictoAleatorio(
+      comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta)
+    );
+  };
+
+  const textoVeredicto = (
+    veredicto: ComprobacionTrig,
+    respuestaTexto: string,
+    etiqueta: string
+  ): string => {
+    if (veredicto.motivo === 'no-numerico') {
+      return 'Eso no es un número. Escribe solo la cifra, con coma o punto decimal (por ejemplo 12,5).';
+    }
+    if (veredicto.correcto) {
+      return `Correcto: ${conUnidad(respuestaTexto, etiqueta)}.`;
+    }
+    return `Todavía no. La respuesta correcta es ${conUnidad(respuestaTexto, etiqueta)}. Abre la solución para ver dónde se tuerce la cuenta.`;
+  };
 
   const tipos: { id: TipoCalculo; nombre: string; icono: string }[] = [
     { id: 'funciones', nombre: 'Funciones', icono: 'sin' },
@@ -638,6 +715,223 @@ export default function CalculadoraTrigonometriaPage() {
           </div>
         </div>
       </div>
+
+      {/* ---------------------------------------------------- Casos para clase */}
+      <section className={styles.casosSection} aria-labelledby="titulo-casos">
+        <h2 id="titulo-casos" className={styles.casosTitulo}>
+          <span aria-hidden="true">📝</span> Casos para clase
+        </h2>
+        <p className={styles.casosIntro}>
+          Son 12 casos fijos, siempre los mismos y en el mismo orden: el caso 3 es idéntico para
+          cualquiera que abra esta página, hoy y dentro de un año. Así un encargo del tipo
+          «resuelve el 3, el 7 y el 11» significa lo mismo para toda la clase. Todos los ángulos
+          están en grados.
+        </p>
+
+        <div className={styles.casosContador}>
+          <p className={styles.casosContadorTexto} aria-live="polite">
+            Has resuelto <strong>{casosResueltos}</strong> de {TOTAL_CASOS}
+          </p>
+          <div
+            className={styles.casosBarra}
+            role="progressbar"
+            aria-valuenow={casosResueltos}
+            aria-valuemin={0}
+            aria-valuemax={TOTAL_CASOS}
+            aria-label="Casos resueltos"
+          >
+            <div
+              className={styles.casosBarraRelleno}
+              style={{ width: `${(casosResueltos / TOTAL_CASOS) * 100}%` }}
+            />
+          </div>
+          <button type="button" className={styles.casosBtnSecundario} onClick={reiniciarCasos}>
+            Empezar de nuevo
+          </button>
+        </div>
+
+        <div className={styles.casosGrid}>
+          {CASOS.map((caso) => {
+            const veredicto = veredictosCasos[caso.id];
+            const abierta = solucionesAbiertas[caso.id] === true;
+            return (
+              <article key={caso.id} className={styles.casosTarjeta}>
+                <div className={styles.casosTarjetaCabecera}>
+                  <span className={styles.casosNumero}>{caso.id}</span>
+                  <h3 className={styles.casosTarjetaTitulo}>{caso.titulo}</h3>
+                  <span className={styles.casosEtiqueta}>
+                    {caso.categoria === 'abstracto' ? 'Cálculo directo' : 'Situación real'}
+                  </span>
+                </div>
+
+                <p className={styles.casosEnunciado}>{caso.enunciado}</p>
+
+                <div className={styles.casosCampo}>
+                  <label
+                    className={styles.casosCampoEtiqueta}
+                    htmlFor={`respuesta-caso-${caso.id}`}
+                  >
+                    Tu respuesta ({caso.etiquetaRespuesta})
+                    {caso.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                  </label>
+                  <input
+                    id={`respuesta-caso-${caso.id}`}
+                    className={styles.casosInput}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    value={respuestasCasos[caso.id] ?? ''}
+                    placeholder="Escribe solo el número"
+                    onChange={(e) =>
+                      setRespuestasCasos((previas) => ({ ...previas, [caso.id]: e.target.value }))
+                    }
+                  />
+                </div>
+
+                <div className={styles.casosAcciones}>
+                  <button
+                    type="button"
+                    className={styles.casosBtnPrimario}
+                    onClick={() => comprobarCaso(caso.id, caso.respuesta)}
+                  >
+                    Comprobar
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.casosBtnSecundario}
+                    aria-expanded={abierta}
+                    aria-controls={`solucion-caso-${caso.id}`}
+                    onClick={() => alternarSolucion(caso.id)}
+                  >
+                    {abierta ? 'Ocultar solución' : 'Ver solución'}
+                  </button>
+                </div>
+
+                {veredicto !== undefined && (
+                  <p
+                    className={`${styles.casosVeredicto} ${veredicto.correcto ? styles.casosVeredictoOk : styles.casosVeredictoKo}`}
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <span aria-hidden="true">{veredicto.correcto ? '✅' : '❌'}</span>{' '}
+                    {textoVeredicto(veredicto, caso.respuestaTexto, caso.etiquetaRespuesta)}
+                  </p>
+                )}
+
+                <div id={`solucion-caso-${caso.id}`} hidden={!abierta}>
+                  <div className={styles.casosSolucion}>
+                    <p className={styles.casosPista}>
+                      <span aria-hidden="true">💡</span> {caso.pista}
+                    </p>
+                    <ol className={styles.casosPasos}>
+                      {caso.pasos.map((paso, indice) => (
+                        <li key={indice} className={styles.casosPaso}>
+                          {paso}
+                        </li>
+                      ))}
+                    </ol>
+                    <p className={styles.casosResultado}>
+                      Resultado:{' '}
+                      <strong>{conUnidad(caso.respuestaTexto, caso.etiquetaRespuesta)}</strong>
+                    </p>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className={styles.casosAleatorio}>
+          <h3 className={styles.casosAleatorioTitulo}>Práctica sin final</h3>
+          <p className={styles.casosIntro}>
+            Cuando los 12 casos se queden cortos, este botón inventa uno nuevo cada vez, con
+            números distintos y con la solución explicada igual que los demás.
+          </p>
+          <div className={styles.casosAcciones}>
+            <button type="button" className={styles.casosBtnPrimario} onClick={nuevoEjercicio}>
+              <span aria-hidden="true">🎲</span> Ejercicio aleatorio
+            </button>
+          </div>
+
+          {ejercicio !== null && (
+            <div className={styles.casosAleatorioCaja}>
+              <p className={styles.casosEnunciado}>{ejercicio.enunciado}</p>
+
+              <div className={styles.casosCampo}>
+                <label className={styles.casosCampoEtiqueta} htmlFor="respuesta-aleatoria">
+                  Tu respuesta ({ejercicio.etiquetaRespuesta})
+                  {ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                </label>
+                <input
+                  id="respuesta-aleatoria"
+                  className={styles.casosInput}
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={respuestaAleatoria}
+                  placeholder="Escribe solo el número"
+                  onChange={(e) => setRespuestaAleatoria(e.target.value)}
+                />
+              </div>
+
+              <div className={styles.casosAcciones}>
+                <button
+                  type="button"
+                  className={styles.casosBtnPrimario}
+                  onClick={comprobarAleatorio}
+                >
+                  Comprobar
+                </button>
+                <button
+                  type="button"
+                  className={styles.casosBtnSecundario}
+                  aria-expanded={solucionAleatoriaAbierta}
+                  aria-controls="solucion-aleatoria"
+                  onClick={() => setSolucionAleatoriaAbierta(!solucionAleatoriaAbierta)}
+                >
+                  {solucionAleatoriaAbierta ? 'Ocultar solución' : 'Ver solución'}
+                </button>
+              </div>
+
+              {veredictoAleatorio !== null && (
+                <p
+                  className={`${styles.casosVeredicto} ${veredictoAleatorio.correcto ? styles.casosVeredictoOk : styles.casosVeredictoKo}`}
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <span aria-hidden="true">{veredictoAleatorio.correcto ? '✅' : '❌'}</span>{' '}
+                  {textoVeredicto(
+                    veredictoAleatorio,
+                    ejercicio.respuestaTexto,
+                    ejercicio.etiquetaRespuesta
+                  )}
+                </p>
+              )}
+
+              <div id="solucion-aleatoria" hidden={!solucionAleatoriaAbierta}>
+                <div className={styles.casosSolucion}>
+                  <p className={styles.casosPista}>
+                    <span aria-hidden="true">💡</span> {ejercicio.pista}
+                  </p>
+                  <ol className={styles.casosPasos}>
+                    {ejercicio.pasos.map((paso, indice) => (
+                      <li key={indice} className={styles.casosPaso}>
+                        {paso}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className={styles.casosResultado}>
+                    Resultado:{' '}
+                    <strong>
+                      {conUnidad(ejercicio.respuestaTexto, ejercicio.etiquetaRespuesta)}
+                    </strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       <EducationalSection
         title="Aprende Trigonometría: Funciones, Identidades y Aplicaciones"
