@@ -26,12 +26,87 @@
  * desde enero de 2025. `excedenteCotizacionSS.ts` usaba la base máxima de 2025, con lo que el
  * umbral de devolución por pluriactividad salía 1.222 € bajo, y podía negar una devolución
  * procedente. Los dos hardcodeaban lo que `data/fiscal` ya tenía bien.
+ *
+ * POR QUÉ SEPARA MOTORES CONECTADOS DE HUÉRFANOS (2026-09-07)
+ * ──────────────────────────────────────────────────────────
+ * Este cribado ordenaba por un riesgo ESTRUCTURAL —no importa `data/fiscal`, cifras propias,
+ * tool declarada, sello viejo— que dejaba 71 motores «de riesgo alto» en una lista donde casi
+ * todos empataban, porque comparten el mismo sello de 2025-01-15. Al cruzarlos con quién los
+ * IMPORTA de verdad, el cuadro era otro:
+ *
+ *   · 2 los usa una app web — y solo uno de ellos, `recargoPresentacionTardia`, con tráfico
+ *     real (1.338 visitas en tres apps de compraventa). Ahí sí había un error, y grave: el
+ *     recargo del art. 27.2 LGT iba un punto porcentual por debajo de la ley.
+ *   · 17 solo los sirve un endpoint de GPTs · 11 solo el MCP, que lleva 8 llamadas en 248 días.
+ *   · 66 NO LOS IMPORTA NADIE. Declaran una tool en su cabecera («Usada por: MCP server
+ *     (calcular_ibi)») que nunca se registró en ningún router: hay 153 tools declaradas en
+ *     comentarios y 46 registradas. No se pueden invocar por ninguna vía.
+ *
+ * De ahí que el «riesgo» del cribado pesara una exposición al MCP que en la práctica no existe,
+ * y que auditar la normativa de los 66 sea trabajo sin destinatario posible: nadie recibe hoy
+ * —ni puede recibir mañana— un número salido de ahí. Se decidió NO borrarlos (por si alguno se
+ * conecta), pero sí que el cribado deje de mezclarlos con lo que sí tiene lectores.
+ *
+ * ⚠️ La cabecera «Usada por: MCP server (...)» de un motor NO demuestra que la tool exista.
+ * Es un comentario, y en 107 casos miente. Para saber si una tool está viva, mirar los routers.
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 const DIR = 'lib/calculadoras';
+
+/** Ficheros del repo donde puede vivir un consumidor de un motor. */
+const RAIZ = process.cwd();
+const EXCLUIR = new Set(['node_modules', '.next', '.git', '_backups', 'digests', 'scratch', 'public']);
+
+function* ficherosDeCodigo(dir) {
+  let entradas;
+  try {
+    entradas = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const e of entradas) {
+    if (EXCLUIR.has(e.name)) continue;
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) yield* ficherosDeCodigo(p);
+    else if (/\.(tsx?|jsx?|mjs)$/.test(e.name)) yield p;
+  }
+}
+
+/**
+ * Quién importa cada motor, y por qué vía. Un motor que nadie importa no lo puede
+ * ejecutar nadie, por mucha tool que declare su cabecera.
+ */
+function mapaDeConsumidores(modulos) {
+  const mapa = new Map(modulos.map((f) => [f, new Set()]));
+  for (const p of ficherosDeCodigo(RAIZ)) {
+    const rel = path.relative(RAIZ, p).replace(/\\/g, '/');
+    let src;
+    try {
+      src = readFileSync(p, 'utf8');
+    } catch {
+      continue;
+    }
+    for (const f of modulos) {
+      if (rel === `${DIR}/${f}`) continue; // no cuenta como consumidor de sí mismo
+      if (src.includes(`calculadoras/${f.replace(/\.ts$/, '')}`)) mapa.get(f).add(rel);
+    }
+  }
+  return mapa;
+}
+
+/** Etiqueta la vía por la que un motor es alcanzable, de más expuesta a menos. */
+function viaDeAcceso(consumidores) {
+  const rutas = [...consumidores];
+  if (rutas.some((r) => r.startsWith('app/') && !r.startsWith('app/api/'))) return 'APP WEB';
+  if (rutas.some((r) => r.startsWith('app/api/chatgpt'))) return 'GPTs';
+  if (rutas.some((r) => r.startsWith('app/api/mcp'))) return 'MCP';
+  if (rutas.some((r) => r.startsWith(`${DIR}/`))) return 'otro motor';
+  if (rutas.length) return 'otros';
+  return 'HUÉRFANO';
+}
 
 const rojo = (s) => `\x1b[31m${s}\x1b[0m`;
 const verde = (s) => `\x1b[32m${s}\x1b[0m`;
@@ -119,14 +194,43 @@ for (const f of modulos) {
 
 riesgos.sort((a, b) => b.riesgo - a.riesgo || (a.sello ?? '').localeCompare(b.sello ?? ''));
 
+// ── Quién puede EJECUTAR cada motor ─────────────────────────────────────────────
+// El riesgo estructural de arriba no distingue un motor que ven miles de visitas de
+// otro que no puede invocar nadie. Sin esto, la lista ordena por un empate.
+const consumidores = mapaDeConsumidores(modulos);
+for (const r of riesgos) {
+  r.consumidores = consumidores.get(r.f) ?? new Set();
+  r.via = viaDeAcceso(r.consumidores);
+}
+
 console.log(`\n${riesgos.length} motor(es) con normativa de ${modulos.length} en ${DIR}\n`);
 
 const altos = riesgos.filter((r) => r.riesgo >= 8 && !r.importaFiscal);
-console.log(`${altos.length} con datos propios y riesgo alto (sello viejo y/o expuestos al MCP):\n`);
-for (const r of altos.slice(0, 25)) {
-  console.log(gris(`  [${String(r.riesgo).padStart(2)}] ${(r.sello ?? 'sin sello').padEnd(10)} ${(r.tool ?? '—').padEnd(42)} ${r.f}`));
+const conectados = altos.filter((r) => r.via !== 'HUÉRFANO');
+const huerfanos = altos.filter((r) => r.via === 'HUÉRFANO');
+
+console.log(`${altos.length} con datos propios y riesgo alto (sello viejo y/o cifras propias).`);
+console.log(gris(`Ordenados por quién puede EJECUTARLOS, que es lo que decide a quién afecta un error.\n`));
+
+console.log(`${conectados.length} CON CONSUMIDOR — auditar estos primero:\n`);
+for (const r of conectados) {
+  const marca = r.via === 'APP WEB' ? amarillo(r.via.padEnd(11)) : gris(r.via.padEnd(11));
+  console.log(`  ${marca} ${gris(`[${String(r.riesgo).padStart(2)}] ${(r.sello ?? 'sin sello').padEnd(10)}`)} ${r.f}`);
+  if (r.via === 'APP WEB') {
+    const apps = [...r.consumidores].filter((c) => c.startsWith('app/') && !c.startsWith('app/api/'));
+    console.log(gris(`              ${apps.map((a) => a.split('/')[1]).join(', ')}`));
+  }
 }
-if (altos.length > 25) console.log(gris(`  … y ${altos.length - 25} más`));
+
+console.log(gris(`\n${huerfanos.length} HUÉRFANOS — ningún fichero del repo los importa.`));
+console.log(gris('  No se pueden invocar por ninguna vía: ni web, ni MCP, ni GPTs. Auditar su'));
+console.log(gris('  normativa es trabajo sin destinatario. Su cabecera declara una tool que NO'));
+console.log(gris('  está registrada en ningún router — es un comentario, y aquí miente.'));
+console.log(gris(`  Se listan con: npm run audit:motores -- --huerfanos`));
+if (process.argv.includes('--huerfanos')) {
+  console.log('');
+  for (const r of huerfanos) console.log(gris(`    ${(r.tool ?? '—').padEnd(46)} ${r.f}`));
+}
 
 console.log(`\n${huellas.length ? rojo(`✗ ${huellas.length} huella(s) de cifras caducadas:`) : verde('✓ Sin huellas de cifras caducadas conocidas.')}`);
 for (const h of huellas) {

@@ -103,6 +103,30 @@ De los **210 motores de `lib/calculadoras/`, 172 no importan nada de `data/fisca
 cocina y no tienen normativa que envejecer, pero hay decenas fiscales selladas en enero de 2025. La
 auditoría está planificada en la Agenda Operativa (`auditoria-motores-lib-calculadoras`).
 
+> **Redimensionada el 07/09/2026, de 71 motores a 13 — la mitad de este trabajo no tenía
+> destinatario.** El cribado ordenaba por un riesgo *estructural* (cifras propias + tool declarada +
+> sello viejo) donde casi todos empataban, porque comparten el sello de 2025-01-15. Al cruzarlo con
+> **quién importa cada motor**, el reparto real era: 2 con app web, 17 solo con endpoint de GPTs, 11
+> solo con MCP —que lleva **8 llamadas en 248 días**— y **57 que no los importa nadie**. Estos
+> últimos declaran en su cabecera una tool que **nunca se registró en ningún router** (hay 153 tools
+> declaradas en comentarios y 46 registradas): no se pueden invocar por ninguna vía. No se borran,
+> por si alguno se conecta, pero auditar su normativa se descarta.
+>
+> ⚠️ **La cabecera «Usada por: MCP server (…)» no demuestra que la tool exista**: es un comentario, y
+> en 107 casos miente. Para saber si una tool está viva, mirar los routers.
+>
+> El cruce lo hace ya `npm run audit:motores`, que separa *con consumidor* de *huérfanos* y prioriza
+> por quién puede ejecutarlos (`-- --huerfanos` lista los apartados). El razonamiento completo está en
+> la cabecera de `scripts/audit-motores-fiscales.mjs`.
+>
+> **El único con tráfico web real se auditó y corrigió ese mismo día**: `recargoPresentacionTardia`
+> (1.338 visitas en tres apps de compraventa) calculaba el recargo del art. 27.2 LGT **un punto
+> porcentual por debajo de la ley** —faltaba el 1 % de partida, y con menos de un mes de retraso
+> respondía «no hay recargo»— y aplicaba la reducción del 25 % del art. 27.5 también sobre los
+> intereses de demora, que no son recargo. Se coló el 27/08/2026 al sustituir la escala derogada
+> (5/10/15/20 %) por la de la Ley 11/2021. Commit `13d2181b`, con 10 casos resueltos a mano contra el
+> BOE en `tests/recargo-extemporaneo-motor.spec.ts`.
+
 **Regla mientras tanto**: un motor de `lib/calculadoras/` **no declara datos normativos propios**. Los
 importa de `data/fiscal/`, y si el dato no existe allí, se crea el módulo primero. Es la misma regla
 que ya rige para las apps en `CLAUDE.md`, que nadie había extendido explícitamente a los motores.
