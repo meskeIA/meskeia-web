@@ -1837,3 +1837,392 @@ test.describe('Regresión — hallazgo 584, reparado', () => {
     expect(texto).toContain('1230 €');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 07/09/2026 — RE-INSPECCIÓN tras la reparación del 07/09
+//
+// La batería anterior (63 casos) pasa entera y ya no queda ningún `test.fail()`: los
+// hallazgos de la vuelta del 02/09 —el crítico de «Estimar por mí», la escala progresiva,
+// el perfil «Joven», los territorios sin IVA y el bloque de reinversión— cierran.
+//
+// Esta vuelta añade CUATRO caminos que ninguna de las anteriores había pisado, resueltos a
+// mano ANTES de abrir el navegador:
+//   · CASO 28 — Murcia (tipo general 7,75 %, sin escala) con perfil FAMILIA NUMEROSA, que
+//     no se había probado nunca: su reducido del 3 % exige una renta que la app no
+//     pregunta, así que tiene que quedarse en el aviso y NO en la cifra.
+//   · CASO 29 — Valencia en el CANTO EXACTO de su escala (1.000.000 €), más un euro por
+//     encima y 200.000 € por encima: es el único tramo del catálogo cuyo salto cae en una
+//     cifra redonda que un usuario teclea de verdad.
+//   · CASO 30 — «1.2.3», que el filtro del NumberInput SÍ deja entrar (solo cifras y
+//     puntos) y tiene que rechazar el parser, no la máscara. Distinto de «doscientos mil»
+//     (CASO 17), que ni siquiera llega al estado.
+//   · CASO 31 — la exención de los mayores de 65 años SIN vivienda habitual, que no estaba
+//     cubierta en 1.839 líneas de batería: es la única exención total del IRPF de la app y
+//     concederla de más deja al vendedor con una liquidación entera sin provisionar.
+//
+// Y DOS hallazgos nuevos, en `test.fail()` hasta que se reparen (H1 y H2 más abajo).
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
+  /**
+   * CASO 28 (normal) — Murcia, segunda mano, vivienda de 250.000 €, FAMILIA NUMEROSA.
+   *
+   * ITP: `elegirTipoITP('murcia', 'familia-numerosa', 250000, {viviendaHabitual:true})`.
+   * El candidato «Familia numerosa» (3 %) exige ['Familia numerosa', 'Vivienda habitual',
+   * 'Renta < 44.000 €'] y la renta NO es comprobable, así que NO se aplica: manda el tipo
+   * general de ITP_CCAA.murcia.tipoGeneral = 7,75 (TIPOS_ITP_CCAA_2025, Ley 3/2025).
+   *   ITP        = 250.000 × 7,75 %                              = 19.375,00 €
+   *   Notaría    = arancel(250.000) × 1,21 × 1,75                =    811,92 €
+   *     arancel = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %
+   *               + 99.746,97×0,05 % = 383,43341 → ×1,21 = 463,95 → ×1,75 = 811,92
+   *   Registro   = (201,2120635 + 6,010121 + 3,005061) × 1,21    =    254,37 €
+   *   Gestoría                                                    =    300,00 €
+   *   AJD        = 0 (segunda mano: no hay tarjeta)
+   *   Total      = 19.375,00 + 811,92 + 254,37 + 300,00          = 20.741,29 €
+   *   % sobre precio = 20.741,29 / 250.000                        =      8,30 %
+   *   Coste total = 250.000 + 20.741,29                          = 270.741,29 €
+   */
+  test('CASO 28 (normal) — Murcia, familia numerosa, 250.000 €: el reducido con límite de renta se enseña, no se cobra', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('murcia');
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+    await page.locator('#perfil-comprador').selectOption('familia-numerosa');
+
+    expect(ITP_CCAA.murcia.tipoGeneral).toBe(7.75);
+    await expect(page.locator('h3', { hasText: 'ITP (7,75%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('19.375,00 €');
+    expect(await valorTarjeta(page, /Gastos de notaría/)).toBe('811,92 €');
+    expect(await valorTarjeta(page, /Registro de la Propiedad/)).toBe('254,37 €');
+    expect(await valorTarjeta(page, /Gastos de gestoría/)).toBe('300,00 €');
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('20.741,29 €');
+    expect(await descripcionTarjeta(page, /^Total gastos adicionales/)).toBe('8,30% sobre el precio');
+    expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('270.741,29 €');
+
+    // En segunda mano no hay AJD: la tarjeta no debe existir
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    // El 3 % de familia numerosa se ofrece como oportunidad, con su límite de renta a la vista
+    const aviso = page.locator('div[class*="avisoReducidos"]');
+    await expect(aviso).toContainText('3,00% — Familia numerosa');
+    await expect(aviso).toContainText('Renta < 44.000 €');
+  });
+
+  /**
+   * CASO 29 (límite: el canto EXACTO de la escala) — Valencia, segunda mano, 1.000.000 €.
+   *
+   * ITP_CCAA.valencia.tramosProgresivos = [{hasta: 1.000.000, tipo: 9}, {∞, 11}]
+   * En el canto, el primer tramo agota el valor y el 11 % NO puede tocar nada:
+   *   ITP(1.000.000) = 1.000.000 × 9 %                            = 90.000,00 €  (9,00 %)
+   *   ITP(1.000.001) = 90.000 + 1 × 11 %                          = 90.000,11 €  (9,00 %)
+   *   ITP(1.200.000) = 90.000 + 200.000 × 11 %                    = 112.000,00 € (9,33 % efectivo)
+   * Notaría(1.000.000): arancel = 90,15 + 108,182205 + 45,0759 + 90,15182 + 225,379535
+   *   + 119,69637 = 678,63583 → ×1,21 = 821,1494 → ×1,75           = 1.437,01 €
+   * Registro(1.000.000) = (386,3132735 + 6,010121 + 3,005061) × 1,21 = 478,35 €
+   *   Total = 90.000,00 + 1.437,01 + 478,35 + 300,00              = 92.215,36 € (9,22 %)
+   *   Coste total                                                  = 1.092.215,36 €
+   */
+  test('CASO 29 (límite) — Valencia en el canto de la escala: 1.000.000 € tributa entero al 9 %', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('valencia');
+    await rellenar(page, 'Precio de la vivienda', '1000000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // La escala que la app anuncia es la que tiene que aplicar
+    expect(ITP_CCAA.valencia.tramosProgresivos).toEqual([
+      { hasta: 1000000, tipo: 9 },
+      { hasta: Infinity, tipo: 11 },
+    ]);
+    await expect(page.locator('p', { hasText: 'escala progresiva' }).first()).toContainText(
+      '9% → 11%',
+    );
+
+    expect(await valorTarjeta(page, /^ITP/)).toBe('90.000,00 €');
+    await expect(page.locator('h3', { hasText: 'ITP (9,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /Gastos de notaría/)).toBe('1437,01 €');
+    expect(await valorTarjeta(page, /Registro de la Propiedad/)).toBe('478,35 €');
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('92.215,36 €');
+    expect(await descripcionTarjeta(page, /^Total gastos adicionales/)).toBe('9,22% sobre el precio');
+    expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('1.092.215,36 €');
+
+    // Un euro por encima del canto: el 11 % grava el EXCESO, no el total
+    await rellenar(page, 'Precio de la vivienda', '1000001');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('90.000,11 €');
+
+    // Y 200.000 € por encima: 90.000 + 22.000
+    await rellenar(page, 'Precio de la vivienda', '1200000');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('112.000,00 €');
+    await expect(page.locator('h3', { hasText: 'ITP (9,33%)' })).toBeVisible();
+  });
+
+  /**
+   * CASO 30 (debe rechazarse) — «1.2.3» no es un precio.
+   *
+   * El filtro del NumberInput (`/^-?[\d.,]*$/`) lo deja ENTRAR —solo lleva cifras y
+   * puntos— y su blur tampoco lo toca, porque `parseFloat('1.2.3')` da 1,2 y no es NaN.
+   * Quien tiene que rechazarlo es `parseSpanishNumber`, que devuelve NaN con dos puntos
+   * y ningún grupo de tres cifras (lib/formatters.ts: «1.2.3 no es un número»).
+   * Esperado: las DOS pestañas se quedan en su marcador de posición y no aparece ni un
+   * importe. Lo contrario sería cobrar un ITP sobre 1,2 € o sobre 123.
+   */
+  test('CASO 30 (debe rechazarse) — «1.2.3» pasa el filtro del campo pero no puede producir un importe', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '1.2.3');
+
+    // El campo conserva lo tecleado (nadie lo ha "corregido" por detrás)
+    await expect(page.locator('input[aria-label="Precio de la vivienda"]')).toHaveValue('1.2.3');
+
+    await expect(
+      page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),
+    ).toBeVisible();
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL/ })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await expect(page.locator('h3', { hasText: /IMPORTE NETO/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^Precio de venta/ })).toHaveCount(0);
+  });
+
+  test('CASO 30 bis (control) — con un precio legible sí calcula', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    await rellenar(page, 'Precio de la vivienda', '1.200');
+    // «1.200» es el millar español: 1.200 × 6 % = 72,00 €
+    expect(await valorTarjeta(page, /^ITP/)).toBe('72,00 €');
+  });
+
+  /**
+   * CASO 31 (límite: exención que NO procede) — mayor de 65 años sin vivienda habitual.
+   *
+   * `exentoIRPF = vendedorMayor65 && esViviendaHabitual`. El art. 33.4.b LIRPF exige las
+   * DOS cosas; con solo la edad, la ganancia tributa entera.
+   * Venta 300.000 · compra 200.000 · 12 años · suelo 40.000 · catastral total 100.000 ·
+   * comisión 3 % · sin gastos de adquisición ni mejoras ni otros gastos.
+   *   Plusvalía municipal (COEFICIENTES_IIVTNU_2025[12] = 0,08; tipo orientativo 25 %):
+   *     objetivo = 40.000 × 0,08 × 25 %                            =    800,00 €
+   *     real     = 100.000 × (40.000/100.000) × 25 %               = 10.000,00 €
+   *     recomendado = min                                          =    800,00 € (objetivo)
+   *   Comisión = 300.000 × 3 %                                     =  9.000,00 €
+   *   Valor de adquisición = 200.000                               = 200.000,00 €
+   *   Valor de transmisión = 300.000 − 9.000 − 800                 = 290.200,00 €
+   *   Ganancia = 290.200 − 200.000                                 =  90.200,00 €
+   *   IRPF = 6.000×19 % + 44.000×21 % + 40.200×23 %
+   *        = 1.140 + 9.240 + 9.246                                 =  19.626,00 €
+   *   Total gastos = 800 + 9.000 + 19.626                          =  29.426,00 €
+   *   Neto = 300.000 − 29.426                                      = 270.574,00 €
+   */
+  test('CASO 31 (límite) — mayor de 65 años SIN vivienda habitual: la exención del art. 33.4.b no procede', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '200000');
+    await rellenar(page, 'Años de propiedad', '12');
+    await rellenar(page, 'Valor catastral del suelo', '40000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
+    await page.getByRole('checkbox', { name: 'Es mi vivienda habitual' }).uncheck();
+    await page.getByRole('checkbox', { name: 'Soy mayor de 65 años' }).check();
+
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('800,00 €');
+    expect(await descripcionTarjeta(page, /^Plusvalía municipal/)).toBe(
+      'Método objetivo (más favorable)',
+    );
+    expect(await valorTarjeta(page, /^Valor de adquisición/)).toBe('200.000,00 €');
+    expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('290.200,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('90.200,00 €');
+    expect(await valorTarjeta(page, /IRPF sobre ganancia/)).toBe('19.626,00 €');
+    expect(await descripcionTarjeta(page, /IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro',
+    );
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('29.426,00 €');
+    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('270.574,00 €');
+    // El neto está COMPLETO: no falta ninguna partida por descontar
+    expect(await descripcionTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe(
+      'Lo que realmente recibes',
+    );
+  });
+
+  test('CASO 31 bis (control) — con vivienda habitual, la misma venta sí queda exenta', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '200000');
+    await rellenar(page, 'Años de propiedad', '12');
+    await rellenar(page, 'Valor catastral del suelo', '40000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
+    await page.getByRole('checkbox', { name: 'Soy mayor de 65 años' }).check();
+    // «Es mi vivienda habitual» viene marcada por defecto
+
+    expect(await valorTarjeta(page, /IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /IRPF sobre ganancia/)).toBe(
+      'Mayor de 65 años + vivienda habitual',
+    );
+    // Sin IRPF, el total del vendedor son plusvalía (800) + comisión (9.000)
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('9800,00 €');
+    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('290.200,00 €');
+  });
+
+  /**
+   * H1 (contenido, medio) — HALLAZGO ABIERTO 07/09/2026.
+   *
+   * El perfil del comprador sobrevive al cambio de tipo de inmueble, y su selector
+   * DESAPARECE al elegir uno no residencial (`esInmuebleResidencial` esconde el bloque).
+   * Resultado: quien mira primero una vivienda con perfil «Joven» y luego cambia a
+   * «Local comercial» se lleva un aviso «Podrías pagar menos» que le ofrece el 3 % de
+   * Murcia con el requisito «Vivienda habitual» impreso al lado —una condición que un
+   * local no puede cumplir nunca— y no tiene ningún control en pantalla para deshacerlo.
+   *
+   * La regla ya existe en el motor: `elegirTipoITP` filtra por `viviendaHabitual` la lista
+   * `alAlcanceDeCualquiera`. Lo que no filtra es la rama `candidatos → noComprobables`,
+   * que es justo la que alimenta este aviso.
+   *
+   * Es el mismo criterio del comentario de `elegirTipoITP`: «se enseña como oportunidad,
+   * nunca como cifra» — pero una oportunidad imposible no es una oportunidad.
+   */
+  test('H1 (hallazgo) — un local comercial no puede recibir la oferta de un tipo de VIVIENDA HABITUAL', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('murcia');
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.locator('#perfil-comprador').selectOption('joven');
+    // Con vivienda el reducido SÍ se aplica: 250.000 × 3 % = 7.500 €
+    expect(await valorTarjeta(page, /^ITP/)).toBe('7500,00 €');
+
+    await page.getByRole('button', { name: /Local comercial/ }).click();
+    // El selector de perfil ya no está: el usuario no puede volver a «General»
+    await expect(page.locator('#perfil-comprador')).toHaveCount(0);
+    // Y el ITP vuelve al general, que es correcto
+    expect(await valorTarjeta(page, /^ITP/)).toBe('19.375,00 €');
+
+    // Lo que NO debe quedar es la oferta de un tipo reservado a la vivienda habitual
+    await expect(page.locator('div[class*="avisoReducidos"]')).toHaveCount(0);
+  });
+
+  /**
+   * H2 (contenido, medio) — HALLAZGO ABIERTO 07/09/2026.
+   *
+   * La app publica TRES horquillas incompatibles de «cuánto hay que sumar al precio», y
+   * NINGUNA contiene lo que su propio motor calcula para la comunidad que viene elegida
+   * por defecto:
+   *   · paso 1 del bloque visible ... «entre un 10% y 15% adicional»
+   *   · JSON-LD (WebApplication+FAQ) .. «del 10% al 14% ... segunda mano y del 12% al 15% en obra nueva»
+   *   · JSON-LD (FAQPage) ............ «entre el 8 % y el 13 % del precio de compra»
+   * Motor, Madrid segunda mano 200.000 € → 6,65 %. País Vasco, 4,65 %.
+   *
+   * Es la familia del hallazgo 584 (tres rangos para lo mismo, ninguno igual al motor),
+   * que se cerró para notaría y registro derivándolos del arancel — pero la cifra de
+   * cabecera de toda la app, la que el comprador usa para saber cuánto ahorrar aparte,
+   * se quedó escrita a mano en los tres sitios.
+   */
+  test('H2 (hallazgo) — el porcentaje que el paso 1 manda provisionar tiene que contener al que calcula la app', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+
+    const desc = await descripcionTarjeta(page, /^Total gastos adicionales/);
+    const pct = Number(desc.match(/([\d,]+)%/)![1].replace(',', '.'));
+    expect(pct).toBeCloseTo(6.65, 2);
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const paso1 = await page
+      .locator('li', { hasText: 'Calcula el presupuesto total antes de firmar' })
+      .first()
+      .innerText();
+    const rango = paso1.match(/entre un (\d+)% y (\d+)%/)!;
+    expect(pct).toBeGreaterThanOrEqual(Number(rango[1]));
+    expect(pct).toBeLessThanOrEqual(Number(rango[2]));
+  });
+
+  /**
+   * H3 (dato, bajo) — el AJD del caso «Carlos» va escrito a mano.
+   *
+   * `page.tsx:1438` publica «más el 1,5% de AJD (2.700 €)» para una obra nueva en Valencia
+   * mientras la misma página importa `ITP_CCAA` y calcula ese AJD tres pantallas más
+   * arriba. Hoy coincide (ITP_CCAA.valencia.ajd = 1,5), así que no hay ninguna cifra mal:
+   * lo que falta es el vínculo. Es el caso del hallazgo 434 —cuatro comunidades nombradas
+   * a mano en el JSON-LD— repetido en el bloque educativo, y lo mismo que ya hizo Valencia
+   * con su ITP (10 → 9 % el 01/06/2026) puede hacerlo con el AJD sin que nada avise.
+   *
+   * Este test es el candado que faltaba: si el AJD de Valencia se mueve, el ejemplo se
+   * pone rojo en vez de envejecer en silencio.
+   */
+  test('H3 (dato) — el AJD del ejemplo de obra nueva debe seguir a ITP_CCAA.valencia.ajd', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const caso = page.locator('div[class*="casoCard"]', { hasText: 'Carlos' }).first();
+    const ajdPct = String(ITP_CCAA.valencia.ajd).replace('.', ',');
+    await expect(caso).toContainText(`${ajdPct}% de AJD`);
+    // Y su importe: 180.000 × 1,5 %. El ejemplo escribe «2.700 €» con punto de millar,
+    // que no es lo que produce el formateador de la app para esa cifra —la tarjeta de AJD
+    // dice «2700,00 €» (CASO 8)—, otra señal de que va tecleado: se comparan las cifras.
+    const cuota = (180000 * ITP_CCAA.valencia.ajd) / 100;
+    const sinMillares = (await caso.innerText()).replace(/\./g, '');
+    expect(sinMillares).toContain(`${cuota} €`);
+  });
+
+  /**
+   * H4 (dato, bajo) — el IVA de la FAQ visible va escrito a mano.
+   *
+   * `page.tsx:1475` dice «el IVA al 10% se paga en viviendas nuevas» con el 10 tecleado,
+   * mientras la MISMA pregunta del JSON-LD (metadata.ts:99) ya lo interpola desde
+   * `IVA_INMUEBLES_2025.obraNueva`. El bloque «Primera mano» de más arriba también lo
+   * deriva, y desde el 02/09 tiene su propio candado: esta FAQ se quedó fuera de aquel
+   * barrido siendo el mismo dato en la misma página.
+   */
+  test('H4 (dato) — el IVA de la FAQ visible debe seguir a IVA_INMUEBLES_2025', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const faq = page
+      .locator('div[class*="faqItem"]')
+      .filter({ has: page.locator('h4', { hasText: '¿Qué diferencia hay entre ITP e IVA' }) })
+      .first();
+    await expect(faq).toContainText(`IVA al ${IVA_INMUEBLES_2025.obraNueva}%`);
+  });
+
+  /**
+   * CASO 32 (control de la vuelta) — País Vasco, obra nueva: un 0 que SÍ es correcto.
+   *
+   * `ITP_CCAA['pais-vasco'].ajd = 0` (régimen foral), así que la tarjeta de AJD no se
+   * pinta —el guard es `ajd > 0`— y eso es lo que debe pasar: aquí el cero no es un dato
+   * que falte, es que no se devenga. Se deja como control junto a H1 y H2, que sí son
+   * hallazgos, para que se vea que la ausencia de una tarjeta no siempre es un defecto.
+   *   IVA        = 200.000 × 10 %                                  = 20.000,00 €
+   *   Notaría    = 758,98 € · Registro = 236,22 € · Gestoría = 300 €
+   *   Total      = 21.295,20 € (10,65 %) · Coste total = 221.295,20 €
+   */
+  test('CASO 32 (control) — País Vasco, obra nueva: sin AJD porque su régimen foral no lo cobra', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('pais-vasco');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+
+    expect(ITP_CCAA['pais-vasco'].ajd).toBe(0);
+    expect(await valorTarjeta(page, /^IVA/)).toBe('20.000,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('21.295,20 €');
+    expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('221.295,20 €');
+  });
+});

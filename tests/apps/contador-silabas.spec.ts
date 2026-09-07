@@ -3,6 +3,8 @@ import { test, expect, Page } from '@playwright/test';
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
+ * CUARTA INSPECCIÓN: 07/09/2026, RE-INSPECCIÓN tras las reparaciones del 02/09. Sus casos y
+ * sus cuatro hallazgos abiertos, al final del fichero, en su propio bloque.
  * TERCERA INSPECCIÓN: 02/09/2026 (segmento cálculo, riesgo 3). Sus tres casos, resueltos a
  * mano antes de abrir el navegador, están al final del fichero, en su propio bloque.
  * SEGUNDA INSPECCIÓN: 24/08/2026, sobre el silabeador REESCRITO ese mismo día.
@@ -97,6 +99,29 @@ const nombreDe = (page: Page, indice = 0) =>
 
 const desgloseDe = (page: Page, indice = 0) =>
   page.locator('[class*="versoCard"]').nth(indice).locator('[class*="versoDesglose"]');
+
+/** Los lazos de sinalefa pintados en el verso n-esimo (anadido en la inspeccion del 07/09/2026) */
+const sinalefasDe = (page: Page, indice = 0) =>
+  page.locator('[class*="versoCard"]').nth(indice).locator('[class*="sinalefaTag"]');
+
+/**
+ * Las preguntas y respuestas del FAQPage que la app inyecta como JSON-LD (layout.tsx). Es lo
+ * que leen los buscadores y los asistentes de IA, y puede divergir del texto visible de la
+ * pagina: por eso se lee del <script>, no del DOM. Anadido en la inspeccion del 07/09/2026.
+ */
+async function leerFaqJsonLd(page: Page): Promise<{ pregunta: string; respuesta: string }[]> {
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  for (const bruto of bloques) {
+    const datos = JSON.parse(bruto) as {
+      '@type': string;
+      mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+    };
+    if (datos['@type'] === 'FAQPage' && datos.mainEntity) {
+      return datos.mainEntity.map((q) => ({ pregunta: q.name, respuesta: q.acceptedAnswer.text }));
+    }
+  }
+  return [];
+}
 
 test.describe('contador-silabas', () => {
   test.beforeEach(async ({ page }) => {
@@ -627,6 +652,293 @@ test.describe('contador-silabas', () => {
         const limitaciones = await page.getByText(/Siglas deletreadas/).locator('xpath=..').innerText();
         expect(limitaciones.replace(/\s+/g, ' ')).toContain('de-e-ne-i');
         expect(limitaciones.replace(/\s+/g, ' ')).toContain('o-nu');
+      }
+    );
+  });
+
+  // =====================================================================================
+  // CUARTA INSPECCIÓN — 07/09/2026 · RE-INSPECCIÓN de lo reparado el 02/09/2026
+  //
+  // Los altos que se cerraron entonces eran todos del mismo eslabón: la «u» ortográfica de
+  // «qu»/«gü» contada como una vocal más (hallazgos 207-208), ese error de silabeo entrando
+  // en las sílabas fonéticas del verso y falseando el TIPO DE VERSO —que es la promesa
+  // central de la app—, y el `i++` de `analizarVerso()` que saltaba la palabra siguiente
+  // ENTERA para no encadenar sinalefas, correcto solo cuando la vocal en juego es la misma
+  // (hallazgos 257 y 260). Aquí se vuelven a comprobar los tres, pero con entradas NUEVAS:
+  // repetir la entrada con la que se reparó no distingue «la regla es correcta» de «esa
+  // entrada está memorizada».
+  //
+  // LOS TRES CASOS DE ESTA RONDA, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+  //
+  //   CASO 1 (normal) — Machado, «Proverbios y cantares XXIX». Dos octosílabos de métrica
+  //       indiscutible, con la ley del acento final decidiendo el segundo:
+  //       «Caminante, no hay camino,»  Ca-mi-nan-te(4) no(1) hay(1) ca-mi-no(3) = 9 fonéticas.
+  //           «hay» empieza por h muda ante «a», así que «no hay» SÍ hace sinalefa: −1.
+  //           «camino» es llana: ±0. 9 − 1 = 8 → octosílabo.
+  //       «se hace camino al andar.»   se(1) ha-ce(2) ca-mi-no(3) al(1) an-dar(2) = 9 fonéticas.
+  //           Sinalefas «se_hace» (h muda otra vez) y «camino_al»: −2. «andar» es AGUDA: +1.
+  //           9 − 2 + 1 = 8 → octosílabo. Sin el ajuste por acento final saldría heptasílabo,
+  //           y el poema dejaría de ser lo que es.
+  //       Del texto entero: 18 sílabas en 9 palabras → media 2,0, con COMA decimal.
+  //
+  //   CASO 2 (límite) — «gü» ante vocal TILDADA, triptongo con diéresis, h intercalada que no
+  //       rompe el diptongo, y dos vocales IGUALES en contacto entre dos palabras:
+  //       ci-güe-ña(3)      la diéresis dice que la ü suena: la g va sola y la ü es vocal
+  //       a-ve-ri-güéis(4)  «üéi» es triptongo (cerrada + abierta tónica + cerrada)
+  //       des-hue-sar(3)    la h entre la s y el diptongo no parte nada (OLE 2010)
+  //       an-ti-güe-dad(4)
+  //       Y el tercer verso de la Rima LIII de Bécquer, endecasílabo de manual:
+  //       «y otra vez con el ala a sus cristales» → y(1) o-tra(2) vez(1) con(1) el(1)
+  //           a-la(2) a(1) sus(1) cris-ta-les(3) = 13 fonéticas. Sinalefas «y_otra» —la
+  //           conjunción funde por UN lado— y «ala_a», que son la MISMA vocal y aun así
+  //           funden. −2. «cristales» es llana: ±0. 13 − 2 = 11 → endecasílabo.
+  //
+  //   CASO 3 (rechazo) — dos líneas que no son un verso, distintas de la del 24/08:
+  //       ««¿...!?» — ;; ::»          solo signos, ni una cifra
+  //       «3,14 % 2026 · 1.234,56 €»  solo cifras, en formato español
+  //       En ambas, /[a-záéíóúüñ]+/gi no encuentra ninguna palabra: se espera el aviso
+  //       explícito, sin resumen con ceros, sin tarjetas de palabra y sin bloque de métrica.
+  //
+  // HALLAZGOS ABIERTOS de esta ronda: los cuatro `test.fail()` del final. Ninguno es del motor
+  // de silabeo ni del de escansión, que aguantaron todo lo que se les echó; son el material
+  // DIDÁCTICO contradiciendo al motor, y una cifra dentro del verso.
+  // =====================================================================================
+
+  test.describe('cuarta inspección (07/09/2026)', () => {
+    test('CASO 1 (normal) · dos octosílabos de Machado: la h muda funde y la aguda suma 1', async ({
+      page,
+    }) => {
+      await analizar(page, 'Caminante, no hay camino,\nse hace camino al andar.');
+
+      // Silabeo de las dos palabras que deciden el verso.
+      await expect(silabasDe(page, 0)).toHaveText(['Ca', 'mi', 'nan', 'te']);
+      await expect(silabasDe(page, 2)).toHaveText(['hay']); // «ay» diptongo: monosílabo
+
+      // 4+1+1+3 + 1+2+3+1+2 = 18 sílabas en 9 palabras → 2,0 con COMA decimal.
+      await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('18');
+      await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('9');
+      await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('2,0');
+
+      // Verso 1: la h de «hay» es muda, así que «no hay» funde. 9 − 1 ± 0 = 8.
+      await expect(metricasDe(page, 0)).toHaveText('8');
+      await expect(nombreDe(page, 0)).toContainText('octosílabo');
+      await expect(desgloseDe(page, 0)).toContainText('9 fonéticas');
+      await expect(desgloseDe(page, 0)).toContainText('1 sinalefa');
+      await expect(desgloseDe(page, 0)).toContainText('llana');
+      await expect(sinalefasDe(page, 0)).toHaveCount(1);
+      await expect(sinalefasDe(page, 0).first()).toContainText('hay');
+
+      // Verso 2: dos sinalefas y final AGUDO. 9 − 2 + 1 = 8; sin el +1 sería heptasílabo.
+      await expect(metricasDe(page, 1)).toHaveText('8');
+      await expect(nombreDe(page, 1)).toContainText('octosílabo');
+      await expect(desgloseDe(page, 1)).toContainText('9 fonéticas');
+      await expect(desgloseDe(page, 1)).toContainText('2 sinalefas');
+      await expect(desgloseDe(page, 1)).toContainText('+ 1');
+      await expect(desgloseDe(page, 1)).toContainText('aguda');
+      await expect(sinalefasDe(page, 1)).toHaveCount(2);
+    });
+
+    test('CASO 2 (límite) · «gü» ante vocal tildada, triptongo üéi, h intercalada y dos vocales iguales entre palabras', async ({
+      page,
+    }) => {
+      await analizar(page, 'cigüeña averigüéis deshuesar antigüedad');
+
+      // Con diéresis la ü SUENA: la g queda sola y la ü es el núcleo, aunque la vocal
+      // siguiente lleve tilde. Es el caso simétrico del «qu» de «aquí», donde la u NO suena.
+      await expect(silabasDe(page, 0)).toHaveText(['ci', 'güe', 'ña']);
+      await expect(silabasDe(page, 1)).toHaveText(['a', 've', 'ri', 'güéis']);
+      await expect(page.locator('[class*="palabraCard"]').nth(1)).toContainText('Triptongo: üéi');
+      // La h entre la s y el diptongo no separa nada: des-hue-sar, no des-hu-e-sar.
+      await expect(silabasDe(page, 2)).toHaveText(['des', 'hue', 'sar']);
+      await expect(silabasDe(page, 3)).toHaveText(['an', 'ti', 'güe', 'dad']);
+
+      // Bécquer, Rima LIII, verso 3.º. La conjunción «y» funde por un solo lado (con «otra»)
+      // y «ala a» funde dos veces la MISMA vocal, que es justo el caso en el que el antiguo
+      // salto de palabra parecía inofensivo. 13 − 2 ± 0 = 11.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, 'y otra vez con el ala a sus cristales');
+      await expect(metricasDe(page)).toHaveText('11');
+      await expect(nombreDe(page)).toContainText('endecasílabo');
+      await expect(desgloseDe(page)).toContainText('13 fonéticas');
+      await expect(desgloseDe(page)).toContainText('2 sinalefas');
+      await expect(sinalefasDe(page)).toHaveCount(2);
+      await expect(sinalefasDe(page).nth(0)).toContainText('otra');
+      await expect(sinalefasDe(page).nth(1)).toContainText('ala');
+    });
+
+    test('CASO 3 (rechazo) · una línea de solo signos y otra de solo cifras no son un verso', async ({
+      page,
+    }) => {
+      await analizar(page, '«¿...!?» — ;; ::');
+      await expect(page.getByText('No hay ninguna palabra que analizar')).toBeVisible();
+      await expect(page.locator('[class*="resumenValor"]')).toHaveCount(0);
+      await expect(page.locator('[class*="palabraCard"]')).toHaveCount(0);
+      await expect(page.locator('[class*="versoCard"]')).toHaveCount(0);
+
+      // Y con cifras en formato español, que es lo que teclea un hispanohablante.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, '3,14 % 2026 · 1.234,56 €');
+      await expect(page.getByText('No hay ninguna palabra que analizar')).toBeVisible();
+      await expect(page.locator('[class*="resumenValor"]')).toHaveCount(0);
+      await expect(page.locator('[class*="versoCard"]')).toHaveCount(0);
+    });
+
+    test('RE-INSPECCIÓN · los tres altos del 02/09 siguen cerrados, con entradas nuevas', async ({
+      page,
+    }) => {
+      // (1) La «u» ortográfica no es una vocal en «qu», y SÍ lo es cuando lleva diéresis.
+      //     Ninguna de estas tres palabras se usó para reparar el motor.
+      await analizar(page, 'maniquí averigüé pingüino');
+      await expect(silabasDe(page, 0)).toHaveText(['ma', 'ni', 'quí']);
+      await expect(silabasDe(page, 1)).toHaveText(['a', 've', 'ri', 'güé']);
+      await expect(silabasDe(page, 2)).toHaveText(['pin', 'güi', 'no']);
+
+      // (2) Y ese silabeo llega al TIPO DE VERSO. Verso construido, pero sin escansión
+      //     discutible: «nada aquí» funde dos «a», y «aquí» es aguda.
+      //     el(1) pin-güi-no(3) na-da(2) a-quí(2) = 8 fonéticas − 1 sinalefa + 1 = 8.
+      //     Con la u de «qu» contada como vocal serían 9 fonéticas y saldría eneasílabo.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, 'el pingüino nada aquí');
+      await expect(desgloseDe(page)).toContainText('8 fonéticas');
+      await expect(metricasDe(page)).toHaveText('8');
+      await expect(nombreDe(page)).toContainText('octosílabo');
+
+      // (3) Las sinalefas se ENCADENAN: tres vocales en contacto son dos contactos, no uno.
+      //     la(1) ca-sa(2) a(1) os-cu-ras(3) = 7 fonéticas; «casa_a» y «a_oscuras» → −2;
+      //     «oscuras» es llana. 7 − 2 = 5. Con el antiguo salto de palabra saldrían 6.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, 'la casa a oscuras');
+      await expect(desgloseDe(page)).toContainText('2 sinalefas');
+      await expect(metricasDe(page)).toHaveText('5');
+    });
+
+    test('TESTIGO · una redondilla ajena a los ejemplos de la app se mide y se nombra', async ({
+      page,
+    }) => {
+      // Calderón, «La vida es sueño». Cuatro octosílabos abba, ninguno de ellos entre los
+      // ejemplos que la app trae de serie — que es lo que le da valor como testigo.
+      //   Sue-ña(2) el(1) ri-co(2) en(1) su(1) ri-que-za(3) = 10 − 2 (sueña_el, rico_en) = 8
+      //   que(1) más(1) cui-da-dos(3) le(1) o-fre-ce(3) = 9 − 1 (le_ofrece) = 8
+      //   sue-ña(2) el(1) po-bre(2) que(1) pa-de-ce(3) = 9 − 1 (sueña_el) = 8
+      //   su(1) mi-se-ria(3) y(1) su(1) po-bre-za(3) = 9 − 1 (miseria_y) = 8
+      await analizar(
+        page,
+        'Sueña el rico en su riqueza,\nque más cuidados le ofrece;\nsueña el pobre que padece\nsu miseria y su pobreza.'
+      );
+
+      for (let i = 0; i < 4; i++) {
+        await expect(metricasDe(page, i)).toHaveText('8');
+      }
+      await expect(page.locator('[class*="rimaValor"]').first()).toHaveText('abba');
+      await expect(page.locator('[class*="rimaBloque"]')).toContainText('Consonante');
+      await expect(page.locator('[class*="rimaBloque"]')).toContainText('Redondilla');
+    });
+
+    // -----------------------------------------------------------------------------------
+    // HALLAZGOS ABIERTOS — escritos con test.fail(), afirmando lo que DEBERÍA ocurrir.
+    // Cuando se reparen, quitarles la marca y dejarlos como regresión (no antes de verificar
+    // a mano que lo que afirman sigue siendo correcto: la regla que dejó la ronda 1).
+    // -----------------------------------------------------------------------------------
+
+    // ❌ ABIERTO · El ejemplo resuelto de la FAQ educativa se salta las sinalefas que la
+    //    propia app detecta dos pantallas más arriba. Es el ejemplo de la pregunta sobre el
+    //    ajuste por acento final, o sea la lección misma: quien la copie en un examen contará
+    //    11 donde la app dice 9.
+    test.fail(
+      'HALLAZGO · el ejemplo resuelto de la FAQ educativa contradice al motor',
+      async ({ page }) => {
+        // En(1) el(1) prin-ci-pio(3) e-ra(2) el(1) a-mor(2) = 10 fonéticas.
+        // Sinalefas «principio_era» y «era_el» → −2. «amor» aguda → +1. 10 − 2 + 1 = 9.
+        await analizar(page, 'En el principio era el amor');
+        await expect(metricasDe(page)).toHaveText('9');
+        await expect(nombreDe(page)).toContainText('eneasílabo');
+        const metricas = (await metricasDe(page).innerText()).trim();
+
+        await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+        const pregunta = page.getByText('¿Cómo se cuenta una sílaba tónica para la métrica?');
+        await pregunta.click();
+        const respuesta = (await pregunta.locator('xpath=..').innerText()).replace(/\s+/g, ' ');
+
+        // El texto dice «tiene 11 sílabas métricas aunque tenga 10 fonéticas»: acierta las
+        // fonéticas y luego suma el +1 sin restar las dos sinalefas.
+        expect(respuesta).toContain(`${metricas} sílabas métricas`);
+      }
+    );
+
+    // ❌ ABIERTO · La reparación del hallazgo 614 (02/09) llegó al motor y al bloque educativo
+    //    visible —que ya dice «dos débiles DISTINTAS» y «dos débiles IGUALES forman hiato»—
+    //    pero NO al `faqJsonLd` de metadata.ts, que sigue enseñando la regla anterior. Y ese
+    //    es justo el bloque que leen Bing Copilot, ChatGPT y Perplexity para responder.
+    test.fail(
+      'HALLAZGO · el FAQPage del JSON-LD conserva la regla de diptongo anterior a la reparación',
+      async ({ page }) => {
+        // Lo que la app hace, y hace bien:
+        await analizar(page, 'chiita');
+        await expect(silabasDe(page, 0)).toHaveText(['chi', 'i', 'ta']);
+        await expect(page.locator('[class*="palabraCard"]').nth(0)).toContainText('Hiato: i-i');
+
+        // Lo que el FAQPage declara: «una vocal fuerte se combina con una vocal débil átona
+        // (i, u), o dos débiles juntas» — sin el «distintas» que la propia app enseña.
+        const faq = await leerFaqJsonLd(page);
+        const diptongo = faq.find((q) => q.pregunta.includes('¿Qué es un diptongo'));
+        expect(diptongo?.respuesta).toContain('distinta');
+      }
+    );
+
+    // ❌ ABIERTO · El FAQPage declara «tl» grupo inseparable. El motor lo excluye a propósito
+    //    (silabeo.ts documenta por qué: at-le-ta es la partición peninsular, la única que
+    //    produce un ataque válido en todas las variedades) y la ficha visible «Consonantes
+    //    Dobles» de la propia página lo enumera SIN tl. Dos textos de la misma app, dos reglas.
+    test.fail(
+      'HALLAZGO · el FAQPage declara «tl» inseparable y ni el motor ni la ficha visible lo aplican',
+      async ({ page }) => {
+        await analizar(page, 'atleta atlántico');
+        await expect(silabasDe(page, 0)).toHaveText(['at', 'le', 'ta']);
+        await expect(silabasDe(page, 1)).toHaveText(['at', 'lán', 'ti', 'co']);
+
+        const faq = await leerFaqJsonLd(page);
+        const separacion = faq.find((q) => q.pregunta.includes('¿Cómo se separan las sílabas'));
+        expect(separacion?.respuesta).not.toContain('tr y tl');
+      }
+    );
+
+    // ❌ ABIERTO · Una cifra dentro del verso desaparece del cómputo Y deja unidas dos palabras
+    //    que no se tocan. El extractor /[a-záéíóúüñ]+/gi descarta «20», y `analizarVerso()`
+    //    mira entonces «Tengo» y «años» como si fueran contiguas. La app pinta la fusión
+    //    «Tengo ⌣ años» con el lazo de sinalefa: no es que ignore la cifra, es que AFIRMA una
+    //    fusión que en el texto no existe. Y «letras de canciones» es un uso que la propia app
+    //    promociona (tiene un metro personalizado añadido para eso).
+    test.fail(
+      'HALLAZGO · una cifra dentro del verso deja una sinalefa entre palabras que no se tocan',
+      async ({ page }) => {
+        // Leído en voz alta: Ten-go-vein-tea-ño-sy-tres-hi-jos → 9 sílabas métricas.
+        // La app devuelve 5 (7 fonéticas − 2 sinalefas), una de ellas a través del «20».
+        await analizar(page, 'Tengo 20 años y 3 hijos');
+        const etiquetas = await page.locator('[class*="sinalefaTag"]').allTextContents();
+        const aTraves = etiquetas.some((t) => /Tengo[\s\S]*años/.test(t));
+        expect(aTraves).toBe(false);
+      }
+    );
+
+    // ❌ ABIERTO · El FAQPage atribuye a una sinalefa un 11 que sale sin ninguna. El verso
+    //    que pone de ejemplo del endecasílabo no tiene ni un contacto vocal-vocal entre
+    //    palabras: sus 11 sílabas métricas son sus 11 fonéticas, y la propia app lo enseña así
+    //    en pantalla. El número es correcto; la razón que se da, no — y es la razón lo que se
+    //    está explicando.
+    test.fail(
+      'HALLAZGO · el FAQPage atribuye a una sinalefa inexistente el ejemplo del endecasílabo',
+      async ({ page }) => {
+        // En(1) el(1) prin-ci-pio(3) de(1) tus(1) a-ños(2) tier-nos(2) = 11 fonéticas.
+        // Ninguna palabra acaba en vocal ante palabra que empiece por vocal: 0 sinalefas.
+        // «tiernos» es llana: ±0. 11 = 11, endecasílabo.
+        await analizar(page, 'En el principio de tus años tiernos');
+        await expect(metricasDe(page)).toHaveText('11');
+        await expect(desgloseDe(page)).toContainText('11 fonéticas');
+        await expect(sinalefasDe(page)).toHaveCount(0);
+
+        const faq = await leerFaqJsonLd(page);
+        const endeca = faq.find((q) => q.pregunta.includes('verso endecasílabo'));
+        expect(endeca?.respuesta).not.toContain('contando la sinalefa');
       }
     );
   });

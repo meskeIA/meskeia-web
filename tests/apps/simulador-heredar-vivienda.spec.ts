@@ -74,6 +74,11 @@
  * cuatro dígitos enteros van SIN punto de millares (5405,24 €) y los de cinco o más, con
  * él (509.405,24 €). Las cifras esperadas se escriben literales, tal cual las pinta la app.
  *
+ * ⚠️ ESTADO A 07/09/2026 — los tres «HALLAZGOS ABIERTOS» que enumera la cabecera de
+ * arriba están CERRADOS: ninguno lleva ya `test.fail()` y los 30 tests anteriores pasan.
+ * Los `test.fail()` que hay hoy en el fichero son los TRES hallazgos nuevos de la
+ * inspección del 07/09/2026, al final del todo.
+ *
  * ⚠️ 24/08/2026 — las cuotas íntegras de TODOS los casos cambiaron al cerrar el hallazgo
  * 277: la app aplica ya la COLUMNA `cuota` de la tabla oficial (`calcularCuotaIntegraIS`,
  * compartido con el MCP y los dos estimadores) en vez de acumular los tramos marginales,
@@ -84,6 +89,10 @@ import { resolve } from 'node:path';
 import { test, expect, Page } from '@playwright/test';
 import { calcularSucesion } from '../../lib/calculadoras/sucesiones';
 import { BONIFICACIONES_CCAA_IS } from '../../data/fiscal';
+import {
+  ESCALA_RECARGO_EXTEMPORANEO,
+  porcentajeRecargoExtemporaneo,
+} from '../../lib/calculadoras/recargoPresentacionTardia';
 
 const RUTA = '/simulador-heredar-vivienda/';
 
@@ -1775,5 +1784,515 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
     // Las tres liquidaciones, en un solo anuncio por cambio, y el total acumulado.
     expect(todo).toContain('1. ISD al heredar');
     expect(todo).toContain('Coste fiscal total acumulado');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 07/09/2026 — tres casos NUEVOS, resueltos a mano ANTES de abrir el
+// navegador, sobre ramas de `data/fiscal` que ninguna ronda anterior había
+// ejercitado:
+//
+//   · el escalonado de CANTABRIA (100 % hasta 100.000 €, 99 % por encima) con un
+//     ASCENDIENTE: la clave `II-ascendiente` no se había liquidado nunca en esta
+//     app, y Cantabria solo aparecía citada en la tarjeta educativa;
+//   · el TOPE de 47.858,59 € del art. 20.2.a LISD por sus DOS lados. El Grupo I
+//     entró en el catálogo con el hallazgo 612 y solo se probó con 10 años, muy
+//     dentro del tope: que el tope MUERDA de verdad —y en qué año exacto empieza
+//     a morder— no lo había mirado nadie;
+//   · la PRECEDENCIA entre el régimen propio de Cataluña y los requisitos del
+//     colateral del art. 20.2.c. Un hermano de 70 años que SÍ convivió los dos
+//     años anteriores es el único perfil del Grupo III al que el art. 20.2.c le
+//     concedería la reducción; en Cataluña no la recibe, y la app tiene que
+//     decir POR QUÉ. Las dos denegaciones se habían probado por separado, nunca
+//     juntas y en el orden en que el motor las evalúa.
+//
+// Y, además, la paridad WEB ↔ motor compartido sobre esas tres herencias nuevas,
+// porque la divergencia ya volvió una vez por un sitio distinto del reparado.
+//
+// De dónde sale cada cifra (ninguna de memoria — la cabecera del fichero tiene el
+// inventario completo de `data/fiscal`):
+//   REDUCCIONES_PARENTESCO_IS['II-ascendiente'] = 15.956,87 €
+//   REDUCCION_VIVIENDA_PORC_IS = 0,95 · REDUCCION_VIVIENDA_MAX_IS = 122.606,47 €
+//   REDUCCION_EDAD_MENOR_21_IS = 3.990,72 € · ..._MAX_IS = 47.858,59 €
+//   BONIFICACIONES_CCAA_IS['cantabria']…['II-ascendiente'].escalonado
+//   BONIFICACIONES_CCAA_IS['asturias']…['I-descendiente'].reduccionBase = 300.000 €
+//   REDUCCIONES_PARENTESCO_CATALUNA_IS['III'] = 8.000 €
+//   TARIFA_CATALUNA_IS · COEFICIENTES_CATALUNA_IS['III'][0] = 1,5882
+//   COEFICIENTES_IIVTNU_2025: 12 años → 0,08 · 15 años → 0,12 · 20 años → 0,45
+//   PLUSVALIA_MUNICIPAL_META.tipoOrientativo = 25 %
+//   TRAMOS_GANANCIAS_PATRIMONIALES_2025: 19/21/23/27/30 %
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — ASCENDIENTE en CANTABRIA, la cadena entera de los tres impuestos.
+   *
+   * Padre del causante (Grupo II, `reducKey` = 'II-ascendiente'), Cantabria, vivienda
+   * habitual del fallecido valorada en 400.000 €, comprada hace 12 años por 120.000 €,
+   * valor catastral del suelo 90.000 € sobre un catastral total de 180.000 €, y venta a
+   * los 4 años por 470.000 €.
+   *
+   * ISD:
+   *   Base imponible                                                   400.000,00
+   *   − Reducción parentesco  REDUCCIONES_PARENTESCO_IS['II-ascendiente'] −15.956,87
+   *   − Reducción vivienda    mín(400.000 × 0,95 = 380.000; 122.606,47)  −122.606,47
+   *   = Base liquidable                                                 261.436,66
+   *   Cuota íntegra por la COLUMNA `cuota` de TARIFA_ESTATAL_IS, tramo del 15,30 %:
+   *        23.409,28 + (261.436,66 − 239.389,13) × 15,30 %
+   *      = 23.409,28 + 22.047,53 × 0,153 = 23.409,28 + 3.373,27209
+   *      = 26.782,55209                                              → «26.782,55 €»
+   *   × COEFICIENTES_IS['II'][0] = 1,0000 → cuota tributaria 26.782,55209
+   *   Cantabria, escalonado: 261.436,66 > 100.000 → 99 % (NO el 100 % del primer tramo)
+   *      bonificación = 26.514,7265691                               → «26.514,73 €»
+   *   Cuota ISD final = 267,8255209                                  → «267,83 €»
+   *
+   * Plusvalía municipal (IIVTNU), tipo ORIENTATIVO del módulo (25 %):
+   *   12 años de tenencia → COEFICIENTES_IIVTNU_2025[12] = 0,08 (zona plana de la tabla)
+   *   Método objetivo = 90.000 × 0,08 × 0,25 =  1.800,00
+   *   Método real     = (400.000 − 120.000) × (90.000 / 180.000) × 0,25 = 35.000,00
+   *   Se elige el MENOR (RDL 26/2021) = 1.800,00 → objetivo
+   *
+   * IRPF al vender a los 4 años por 470.000 €:
+   *   Valor de adquisición fiscal = 400.000 + 267,8255209 + 1.800 = 402.067,8255209
+   *   Ganancia = 470.000 − 402.067,8255209 = 67.932,1744791
+   *        6.000,000000 × 19 % = 1.140,00
+   *       44.000,000000 × 21 % = 9.240,00
+   *       17.932,174479 × 23 % = 4.124,40013019
+   *                              ──────────────
+   *                               14.504,40013019                    → «14.504,40 €»
+   *
+   * TOTAL = 267,8255209 + 1.800 + 14.504,40013019 = 16.572,2256511  → «16.572,23 €»
+   * Sobre la venta = 16.572,2256511 / 470.000 × 100 = 3,5260 %       → «3,53 %»
+   */
+  test('CASO 1 (normal) — ascendiente en Cantabria: 267,83 € + 1800,00 € + 14.504,40 € = 16.572,23 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    await page.selectOption('#parentescoSel', 'padre');
+    await page.selectOption('#ccaaSel', 'cantabria');
+    await mover(page, 'edadHer', 68);
+    await mover(page, 'anioAdq', ANIO - 12);
+    await mover(page, 'valorAdq', 120000);
+    await mover(page, 'valorRef', 400000);
+    await mover(page, 'valorSuelo', 90000);
+    await mover(page, 'valorCatastralTotal', 180000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 4);
+    await mover(page, 'valorVta', 470000);
+
+    // ── ISD ──────────────────────────────────────────────────────────────────
+    expect(await panel(page, ISD)).toContain('Cantabria — Grupo II');
+    expect(await linea(page, ISD, 'Base imponible (valor referencia)')).toBe('400.000,00 €');
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−15.956,87 €');
+    // El tope manda: el 95 % de 400.000 son 380.000, muy por encima de 122.606,47
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−122.606,47 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('261.436,66 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('26.782,55 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo II)')).toBe('×1,0000');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('26.782,55 €');
+    // El segundo escalón de Cantabria: 99 %, no el 100 % que rige por debajo de 100.000 €
+    expect(await panel(page, ISD)).toContain('Bonificación CCAA (99,0%)');
+    expect(await linea(page, ISD, '− Bonificación CCAA (99,0%)')).toBe('−26.514,73 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('267,83 €');
+
+    // ── Plusvalía municipal ──────────────────────────────────────────────────
+    expect(await panel(page, IIVTNU)).toContain('12 años de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente 12 años')).toBe('0,08');
+    expect(await linea(page, IIVTNU, 'Tipo municipal (orientativo)')).toBe('25%');
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('1800,00 €');
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('35.000,00 €');
+    expect(await linea(page, IIVTNU, 'Método elegido')).toBe('Objetivo (menor)');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('1800,00 €');
+
+    // ── IRPF ─────────────────────────────────────────────────────────────────
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('402.067,83 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('67.932,17 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('14.504,40 €');
+
+    // ── Total ────────────────────────────────────────────────────────────────
+    const total = await bloqueTotal(page);
+    expect(total).toContain('16.572,23');
+    expect(total).toContain('3,53%');
+    expect(total).not.toMatch(/16,572\.23/); // nunca formato US
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — el TOPE del art. 20.2.a LISD, cercado por sus dos lados.
+   *
+   * `REDUCCION_EDAD_MENOR_21_IS` = 3.990,72 € por cada año por debajo de 21, sin que el
+   * TOTAL exceda de `REDUCCION_EDAD_MENOR_21_MAX_IS` = 47.858,59 €. Partiendo de los
+   * 15.956,87 € de la reducción de parentesco, el tope empieza a morder cuando
+   *
+   *      15.956,87 + (21 − edad) × 3.990,72 > 47.858,59
+   *      (21 − edad) > 7,9939…  →  21 − edad ≥ 8  →  edad ≤ 13
+   *
+   * O sea: 14 años es el último año en el que la reducción se calcula entera, y 13 el
+   * primero en el que el tope la recorta. Un año de diferencia y el comportamiento del
+   * artículo cambia de régimen, así que se prueban los dos, más un tercer año por debajo
+   * (12) para ver que el tope NO sigue subiendo.
+   *
+   * Asturias, porque es la única CCAA que no bonifica en cuota a los Grupos I y II
+   * (su beneficio es la reducción de 300.000 € en BASE): con un 99 % de bonificación
+   * encima, la diferencia entre los dos lados del tope quedaría escondida tras el
+   * redondeo. Vivienda de 500.000 € que NO era la habitual del causante, para que la
+   * única reducción en juego sea la del art. 20.2.a.
+   *
+   *  (a) 14 años → 15.956,87 + 7 × 3.990,72 = 15.956,87 + 27.935,04 = 43.891,91 (sin tope)
+   *      Base liquidable = 500.000 − 43.891,91 − 300.000 = 156.108,09
+   *      Cuota íntegra = 7.127,47 + (156.108,09 − 79.881,18) × 10,20 %
+   *                    = 7.127,47 + 7.775,14482 = 14.902,61482        → «14.902,61 €»
+   *
+   *  (b) 13 años → 15.956,87 + 8 × 3.990,72 = 47.882,63 → TOPADA en 47.858,59
+   *      Base liquidable = 500.000 − 47.858,59 − 300.000 = 152.141,41
+   *      Cuota íntegra = 7.127,47 + (152.141,41 − 79.881,18) × 10,20 %
+   *                    = 7.127,47 + 7.370,54346 = 14.498,01346        → «14.498,01 €»
+   *
+   *  (c) 12 años → 15.956,87 + 9 × 3.990,72 = 51.873,35 → TOPADA en los MISMOS 47.858,59,
+   *      así que la cuota no se mueve de 14.498,01 €. Si el tope no estuviera, aquí
+   *      bajaría otros 407 € y el test lo vería.
+   *
+   * Plusvalía en los tres: adquisición hace 20 años → COEFICIENTES_IIVTNU_2025[20] = 0,45
+   *   objetivo = 150.000 × 0,45 × 0,25 = 16.875,00
+   *   real     = (500.000 − 100.000) × (150.000 / 300.000) × 0,25 = 50.000,00 → gana el objetivo
+   * Sin venta (0 años), así que no hay IRPF: TOTAL = ISD + 16.875,00.
+   */
+  test('CASO 2 (límite) — el tope de 47.858,59 € del art. 20.2.a: muerde a los 13 años, no a los 14', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    await page.selectOption('#parentescoSel', 'hijo_menor21');
+    await page.selectOption('#ccaaSel', 'asturias');
+    await mover(page, 'anioAdq', ANIO - 20);
+    await mover(page, 'valorAdq', 100000);
+    await mover(page, 'valorRef', 500000);
+    await mover(page, 'valorSuelo', 150000);
+    await mover(page, 'valorCatastralTotal', 300000);
+    await casilla(page, 'viviendaHabitual', false);
+    await mover(page, 'aniosVenta', 0);
+
+    // (a) 14 años — el último año SIN tope
+    await mover(page, 'edadHer', 14);
+    expect(await panel(page, ISD)).toContain('Principado de Asturias — Grupo I');
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−43.891,91 €');
+    expect(await linea(page, ISD, '− Reducción autonómica (Principado de Asturias)')).toBe(
+      '−300.000,00 €'
+    );
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('156.108,09 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('14.902,61 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo I)')).toBe('×1,0000');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('14.902,61 €');
+
+    // (b) 13 años — el primer año CON tope: la reducción bruta serían 47.882,63 €
+    await mover(page, 'edadHer', 13);
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−47.858,59 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('152.141,41 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('14.498,01 €');
+
+    // (c) 12 años — el tope NO sigue subiendo: misma reducción y misma cuota que con 13
+    await mover(page, 'edadHer', 12);
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−47.858,59 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('14.498,01 €');
+
+    // La plusvalía no depende de la edad del heredero, y el IRPF no existe sin venta
+    expect(await linea(page, IIVTNU, 'Coeficiente 20 años')).toBe('0,45');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('16.875,00 €');
+    expect(await panel(page, IRPF)).toContain('Sin venta simulada');
+    expect(await bloqueTotal(page)).toContain('31.373,01'); // 14.498,01 + 16.875,00
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — la reducción por vivienda habitual se DENIEGA, y por el motivo
+   * correcto de los dos que concurren.
+   *
+   * Hermano de 70 años que SÍ convivió con el causante los dos años anteriores: el único
+   * perfil del Grupo III al que el art. 20.2.c LISD le concedería la reducción (edad ≥
+   * `EDAD_MIN_COLATERAL_VIVIENDA_IS` = 65 y convivencia). Pero la herencia es en CATALUÑA,
+   * que tiene régimen propio (Ley 19/2010) y que `data/fiscal` no modela.
+   *
+   * El orden en que `evaluarReduccionVivienda` evalúa las guardas importa: Cataluña va
+   * ANTES que el Grupo III, así que el motivo que se enseña tiene que ser el del régimen
+   * catalán —no «pariente colateral menor de 65 años», que sería falso— y marcar o
+   * desmarcar la casilla de convivencia NO puede mover la cuota.
+   *
+   *   Base imponible                                                    300.000,00
+   *   − Reducción parentesco  REDUCCIONES_PARENTESCO_CATALUNA_IS['III']    −8.000,00
+   *     Reducción vivienda    DENEGADA (Cataluña, Ley 19/2010)                 0,00
+   *   = Base liquidable                                                  292.000,00
+   *   Cuota íntegra por TARIFA_CATALUNA_IS, tramo del 17 %:
+   *        14.500 + (292.000 − 150.000) × 17 % = 14.500 + 24.140 = 38.640,00
+   *   × COEFICIENTES_CATALUNA_IS['III'][0] = 1,5882 → 61.368,048       → «61.368,05 €»
+   *   Cataluña no bonifica en cuota → Cuota ISD final = 61.368,048
+   *
+   * Y dos rechazos más en la misma pantalla:
+   *
+   *   Plusvalía: valor de adquisición = valor de referencia = 300.000 €, así que el
+   *   incremento es EXACTAMENTE cero. El RDL 26/2021 no sujeta la transmisión sin
+   *   incremento, y el borde es `<= 0`, no `< 0`: la cuota tiene que ser 0,00 € y el
+   *   método, «Exenta» — aunque el objetivo calculado (90.000 × 0,12 × 0,25 = 2.700,00 €)
+   *   siga a la vista.
+   *
+   *   IRPF: venta a los 3 años por 400.000 €.
+   *     Valor de adquisición fiscal = 300.000 + 61.368,048 + 0 = 361.368,048
+   *     Ganancia = 400.000 − 361.368,048 = 38.631,952
+   *          6.000,000 × 19 % = 1.140,00
+   *         32.631,952 × 21 % = 6.852,70992
+   *                             ───────────
+   *                              7.992,70992                            → «7992,71 €»
+   *
+   *   TOTAL = 61.368,048 + 0 + 7.992,70992 = 69.360,75792              → «69.360,76 €»
+   *   Sobre la venta = 17,3401… %                                      → «17,34 %»
+   */
+  test('CASO 3 (rechazo) — colateral de 70 años que convivió: en Cataluña se deniega, y se dice por qué', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    await page.selectOption('#parentescoSel', 'hermano');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    await mover(page, 'edadHer', 70);
+    await mover(page, 'anioAdq', ANIO - 15);
+    await mover(page, 'valorAdq', 300000);
+    await mover(page, 'valorRef', 300000);
+    await mover(page, 'valorSuelo', 90000);
+    await mover(page, 'valorCatastralTotal', 200000);
+    await casilla(page, 'viviendaHabitual', true);
+    await casilla(page, 'convivencia', true); // cumple el art. 20.2.c… y aun así no aplica
+    await mover(page, 'aniosVenta', 3);
+    await mover(page, 'valorVta', 400000);
+
+    // El motivo es el de CATALUÑA, no el del colateral: el heredero cumple 20.2.c
+    const isd = await panel(page, ISD);
+    expect(isd).toContain('Cataluña — Grupo III');
+    expect(isd).toContain('No aplicable: Cataluña tiene su propia reducción por vivienda habitual');
+    expect(isd).toContain('Ley 19/2010');
+    expect(isd).not.toContain('pariente colateral menor de');
+    expect(isd).not.toContain('que no convivió');
+    // No hay línea de reducción aplicada: la que existe es la del motivo
+    expect(isd).not.toContain('− Reducción vivienda habitual (95%)');
+
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−8000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('292.000,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('38.640,00 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,5882');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('61.368,05 €');
+
+    // Plusvalía: incremento EXACTAMENTE cero → no sujeta (el borde es «<= 0»)
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('2700,00 €');
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('Exenta (sin ganancia)');
+    expect(await linea(page, IIVTNU, 'Método elegido')).toBe('Exenta');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('0,00 €');
+
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('361.368,05 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('7992,71 €');
+    expect(await bloqueTotal(page)).toContain('69.360,76');
+
+    // Desmarcar la convivencia no puede mover NADA: en Cataluña esa casilla no decide
+    await casilla(page, 'convivencia', false);
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('61.368,05 €');
+    expect(await bloqueTotal(page)).toContain('69.360,76');
+  });
+
+  /**
+   * WEB ↔ MCP — las TRES herencias nuevas, por los dos caminos.
+   *
+   * La divergencia entre la web y el motor compartido ya se reparó una vez (hallazgo 276,
+   * Asturias) y volvió por otro sitio (hallazgos 461 y 462, Cataluña y el colateral). Los
+   * tres tests WEB ↔ MCP del 27/08 fijan aquellas tres herencias; estos son perfiles que
+   * ninguno de ellos toca: la clave `II-ascendiente`, el Grupo I con el tope del art.
+   * 20.2.a, y el colateral CON derecho al 20.2.c en la CCAA que se lo quita.
+   */
+  test('WEB ↔ MCP — ascendiente, Grupo I topado y colateral catalán: los dos caminos dicen lo mismo', async ({
+    page,
+  }) => {
+    const casos = [
+      {
+        nombre: 'ascendiente en Cantabria',
+        ui: { parentesco: 'padre', ccaa: 'cantabria', edad: 68, valorRef: 400000, vivienda: true },
+        motor: {
+          baseImponible: 400000, ccaa: 'cantabria', grupo: 'II-ascendiente' as const,
+          edadHeredero: 68, viviendaHabitual: 400000,
+        },
+      },
+      {
+        nombre: 'Grupo I de 13 años en Asturias (reducción topada)',
+        ui: { parentesco: 'hijo_menor21', ccaa: 'asturias', edad: 13, valorRef: 500000, vivienda: false },
+        motor: {
+          baseImponible: 500000, ccaa: 'asturias', grupo: 'I-descendiente' as const,
+          edadHeredero: 13,
+        },
+      },
+      {
+        nombre: 'colateral de 70 años que convivió, en Cataluña',
+        ui: { parentesco: 'hermano', ccaa: 'cataluna', edad: 70, valorRef: 300000, vivienda: true },
+        motor: {
+          baseImponible: 300000, ccaa: 'cataluna', grupo: 'III' as const, edadHeredero: 70,
+          convivenciaDosAnios: true, viviendaHabitual: 300000,
+        },
+      },
+    ];
+
+    await page.goto(RUTA);
+    for (const c of casos) {
+      await page.selectOption('#parentescoSel', c.ui.parentesco);
+      await page.selectOption('#ccaaSel', c.ui.ccaa);
+      await mover(page, 'edadHer', c.ui.edad);
+      await mover(page, 'valorRef', c.ui.valorRef);
+      await casilla(page, 'viviendaHabitual', c.ui.vivienda);
+      if (c.ui.parentesco === 'hermano' && c.ui.vivienda) await casilla(page, 'convivencia', true);
+
+      const web = importe(await linea(page, ISD, 'Cuota ISD final'));
+      const motor = calcularSucesion(c.motor).cuotaFinal;
+      expect(web, `${c.nombre}: la web dice ${web} y el motor compartido ${motor}`).toBeCloseTo(
+        motor,
+        2
+      );
+    }
+  });
+
+  /**
+   * ⚠️ HALLAZGO ABIERTO (07/09/2026) — el desglose IMPRESO no cuadra consigo mismo, y por
+   * el mismo céntimo la web se separa del motor compartido.
+   *
+   * El panel del ISD es una liquidación paso a paso: base → reducciones → base liquidable
+   * → cuota íntegra → × coeficiente → cuota tributaria → − bonificación → cuota final. Cada
+   * línea se redondea AL PINTARSE (`formatCurrency`), pero la cadena sigue por dentro con
+   * el número sin redondear, así que la multiplicación y la resta que el usuario ve escritas
+   * no dan el número que hay debajo:
+   *
+   *   Grupo IV, Madrid, 50.000 € (sin reducciones, coeficiente 2,0000):
+   *     cuota íntegra    = 2.648,88 + (50.000 − 31.956,87) × 9,35 % = 4.335,912655
+   *     pintada          → «4335,91 €»
+   *     × 2,0000         → la pantalla dice «8671,83 €», pero 4.335,91 × 2 = 8.671,82
+   *     `calcularSucesion` (motor del MCP Delegum y de /api/chatgpt/sucesiones) → 8.671,82 €
+   *
+   *   Y en la línea de la bonificación, que es la que ve la mayoría del catálogo (cualquier
+   *   CCAA con 99 %), pasa lo mismo restando — CASO 1 de esta misma tanda:
+   *     26.782,55 − 26.514,73 = 267,82, y la pantalla dice «267,83 €».
+   *
+   * Un barrido de las 664.700 combinaciones alcanzables con los deslizadores (17 CCAA × 6
+   * parentescos × valor de referencia de 50.000 a 2.000.000 en pasos de 5.000 × vivienda
+   * habitual × edad × convivencia) da 110.102 herencias —el 16,6 %— en las que la web y el
+   * motor difieren exactamente 1 céntimo, sistemáticamente en los Grupos III y IV, que son
+   * los del coeficiente distinto de 1.
+   *
+   * Es un céntimo, y ninguna decisión cambia por un céntimo. Pero el valor entero de esta
+   * app es el desglose auditable de una liquidación fiscal de riesgo 1 CRÍTICO, y la
+   * aritmética escrita en pantalla tiene que salir. La raíz es que la web NO llama a
+   * `calcularSucesion`: reconstruye la cadena llamando solo a `calcularCuotaIntegraIS` y
+   * `evaluarReduccionVivienda`, y por el camino se deja el redondeo a dos decimales que el
+   * motor sí aplica en cada paso.
+   */
+  test.fail(
+    'HALLAZGO — la cuota tributaria impresa no es la cuota íntegra impresa por el coeficiente',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.selectOption('#parentescoSel', 'sin_parentesco');
+      await page.selectOption('#ccaaSel', 'madrid');
+      await mover(page, 'edadHer', 40);
+      await mover(page, 'valorRef', 50000);
+      await mover(page, 'aniosVenta', 0);
+
+      const cuotaIntegra = importe(await linea(page, ISD, 'Cuota íntegra (tarifa)'));
+      const coeficiente = importe(await linea(page, ISD, '× Coef. patrimonio (Grupo IV)'));
+      const cuotaTributaria = importe(await linea(page, ISD, '= Cuota tributaria'));
+
+      expect(cuotaIntegra).toBe(4335.91);
+      expect(coeficiente).toBe(2);
+      // 4.335,91 × 2,0000 = 8.671,82 — la pantalla dice 8.671,83
+      expect(cuotaTributaria).toBe(Math.round(cuotaIntegra * coeficiente * 100) / 100);
+
+      // Y el motor compartido, con la misma herencia, liquida 8.671,82 €
+      const motor = calcularSucesion({ baseImponible: 50000, ccaa: 'madrid', grupo: 'IV', edadHeredero: 40 });
+      expect(importe(await linea(page, ISD, 'Cuota ISD final'))).toBe(motor.cuotaFinal);
+    }
+  );
+
+  /**
+   * ⚠️ HALLAZGO ABIERTO (07/09/2026) — la escala del recargo por presentar el ISD fuera de
+   * plazo está DEROGADA.
+   *
+   * La FAQ del bloque educativo dice: «Si superas el plazo sin liquidar, hay recargos del
+   * 5% al 20% más intereses». Ésa es la escala ANTERIOR a la Ley 11/2021. El art. 27.2 LGT
+   * vigente —redacción del art. 13.3 de la Ley 11/2021, BOE-A-2021-11473— es «1 por ciento
+   * más otro 1 por ciento adicional por cada mes completo de retraso», y 15 % más intereses
+   * de demora una vez transcurridos 12 meses. Nunca 5 %, nunca 20 %.
+   *
+   * La escala canónica NO hay que escribirla: `lib/calculadoras/recargoPresentacionTardia.ts`
+   * la exporta como `ESCALA_RECARGO_EXTEMPORANEO` y `porcentajeRecargoExtemporaneo(meses)`,
+   * verificada el 07/09/2026 contra el texto consolidado del BOE. Su propia cabecera dice
+   * que se hizo pública porque los hallazgos 436 y 454 del Inspector encontraron
+   * «recargos del 5% al 20%» en otras dos apps: es literalmente el mismo texto, aquí.
+   *
+   * Sobre la cuota de ISD de 267,83 € que esta misma app liquida en el CASO 1 de arriba:
+   *   · retraso de menos de un mes → art. 27.2: 1 % = 2,68 €.
+   *     El texto promete un suelo del 5 % = 13,39 €, cinco veces más.
+   *   · retraso de más de doce meses → art. 27.2: 15 % = 40,17 € + intereses de demora.
+   *     El texto promete un techo del 20 % = 53,57 €.
+   *
+   * Y es el párrafo que responde «¿Cuál es el plazo para liquidar el ISD?» en una app de
+   * riesgo 1 CRÍTICO: quien lo lee está decidiendo si le compensa apurar el plazo.
+   */
+  test.fail(
+    'HALLAZGO — la FAQ del plazo cita la escala de recargo derogada (5 %–20 %) en vez del art. 27.2 LGT',
+    async ({ page }) => {
+      await page.goto(RUTA);
+
+      const faq = await page.evaluate(() => {
+        const s = [...document.querySelectorAll('strong')].find(e =>
+          (e.textContent ?? '').includes('plazo para liquidar el ISD')
+        );
+        return (s?.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim();
+      });
+
+      expect(faq).toContain('6 meses'); // esto sí es correcto: el plazo del art. 67 RISD
+      // La escala derogada, tal cual la escribe hoy el JSX
+      expect(faq).not.toContain('recargos del 5% al 20%');
+
+      // Lo que dice el art. 27.2 LGT según la fuente única del repositorio
+      expect(porcentajeRecargoExtemporaneo(0)).toBe(1);   // menos de un mes
+      expect(porcentajeRecargoExtemporaneo(8)).toBe(9);   // 1 % + 8 meses completos
+      expect(porcentajeRecargoExtemporaneo(13)).toBe(15); // pasados 12 meses, fijo
+      expect(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses).toBe(15);
+
+      // El texto tendría que hablar del 1 % y del 15 %, no del 5 % y del 20 %
+      expect(faq).toMatch(/1\s*%/);
+      expect(faq).toMatch(/15\s*%/);
+      expect(faq).not.toMatch(/20\s*%/);
+    }
+  );
+
+  /**
+   * ⚠️ HALLAZGO ABIERTO (07/09/2026) — residuo del hallazgo 609: el JSX sigue escribiendo a
+   * mano datos normativos que `data/fiscal` exporta y que este MISMO fichero ya deriva unas
+   * líneas más abajo.
+   *
+   *   · La tabla «Los tres impuestos en cadena» dice «× tramos 19-30%», mientras la FAQ de
+   *     la misma página compone ese mismo rango con `TIPO_AHORRO_MIN`-`TIPO_AHORRO_MAX`,
+   *     leídos de `TRAMOS_GANANCIAS_PATRIMONIALES_2025`. Es exactamente la forma del
+   *     hallazgo 463: la escala escrita a mano se quedó en cuatro tramos cuando el módulo
+   *     ya tenía cinco, y nadie se enteró.
+   *   · La tarjeta del Grupo IV dice «Coeficiente multiplicador 2,0» en la misma frase en
+   *     la que SÍ deriva el otro extremo de la fila («el coeficiente llega a
+   *     {formatNumber(COEFICIENTES_IS['IV'][3], 1)}»). El 2,0 es
+   *     `COEFICIENTES_IS['IV'][0]`, que la página ya importa y usa en el motor.
+   *
+   * (En la misma familia, aunque más estable: el «95 %» de la reducción del art. 20.2.c
+   * aparece cinco veces a mano —etiqueta de la casilla, línea del panel, dos tarjetas y la
+   * FAQ— siendo `REDUCCION_VIVIENDA_PORC_IS`, mientras su tope SÍ se importa como
+   * `REDUCCION_VIVIENDA_MAX_IS` en las mismas frases.)
+   */
+  test.fail('HALLAZGO — el JSX escribe a mano tipos y coeficientes que data/fiscal exporta', async () => {
+    const fuente = readFileSync(
+      resolve(__dirname, '..', '..', 'app', 'simulador-heredar-vivienda', 'page.tsx'),
+      'utf8'
+    );
+    const jsx = fuente.slice(fuente.indexOf('export default function'));
+
+    // La escala de la base del ahorro, en la tabla comparativa
+    expect(jsx).not.toContain('19-30%');
+    // El coeficiente del Grupo IV, en la tarjeta de casos típicos
+    expect(jsx).not.toContain('Coeficiente multiplicador 2,0');
   });
 });

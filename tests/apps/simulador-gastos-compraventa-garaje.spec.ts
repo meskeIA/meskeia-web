@@ -29,7 +29,15 @@
  *      ninguna inspección había recorrido) y el rechazo de unos años de propiedad negativos.
  *      Los tres hallazgos 514-516 del 30/08 se han vuelto a ejecutar y hoy PASAN: están
  *      reparados en el código, y sus comentarios «❌ ABIERTO» son de la tanda anterior.
- *  10. HALLAZGOS ABIERTOS 02/09 — tres, con `test.fail()`.
+ *  10. HALLAZGOS ABIERTOS 02/09 — tres, con `test.fail()`. Los tres se repararon ese mismo
+ *      día: hoy pasan en verde y ya no llevan la marca.
+ *  11. INSPECCIÓN 07/09/2026 — la cola reabrió la app tras el commit 13d2181b (recargo del
+ *      art. 27.2 LGT, que toca su bloque educativo). Tres casos nuevos en zonas vírgenes:
+ *      el perfil FAMILIA NUMEROSA (Galicia), el TOPE DE 20 AÑOS del coeficiente de
+ *      plusvalía cruzado con el TERCER tramo del ahorro (23 %), y la gestoría del
+ *      COMPRADOR en negativo (País Vasco, el 4 % más bajo del catálogo y sin AJD).
+ *      Los tres cuadraron a la primera con lo calculado a mano.
+ *  12. HALLAZGOS ABIERTOS 07/09 — dos, con `test.fail()`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -1766,5 +1774,323 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
     const comprador = page.getByRole('tab', { name: 'Comprador' });
     await expect(comprador).toHaveAttribute('aria-controls', /.+/);
     await expect(page.locator('[role="tabpanel"]')).toHaveAttribute('aria-labelledby', /.+/);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 11. INSPECCIÓN 07/09/2026 — tres casos NUEVOS, resueltos a mano ANTES de abrir el
+//     navegador. La cola reabrió la app porque el commit 13d2181b (recargo del art. 27.2
+//     LGT) volvió a tocar su bloque educativo.
+//
+//     Los tres recorren zonas que ninguna tanda anterior había pisado:
+//       · el perfil FAMILIA NUMEROSA (solo se habían probado «joven» y «general»),
+//       · el TOPE DE 20 AÑOS del coeficiente de plusvalía y el TERCER tramo del ahorro
+//         (23 %), al que ningún caso del fichero llegaba,
+//       · la gestoría del COMPRADOR en negativo (solo se habían probado las del vendedor).
+//
+//     De dónde sale cada cifra: las mismas fuentes que cita la cabecera del fichero.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('INSPECCIÓN 07/09/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO D (NORMAL) — Galicia, segunda mano, 60.000 €, perfil FAMILIA NUMEROSA.
+   *
+   * Por qué este: Galicia declara un reducido del 3 % para familia numerosa
+   * (`ITP_CCAA.galicia.tiposReducidos`) con las condiciones «Familia numerosa · Vivienda
+   * habitual · Valor ≤ 150.000 €». Un garaje suelto NUNCA es vivienda habitual, así que
+   * `elegirTipoITP` lo recibe con `viviendaHabitual: false` y NO puede aplicarlo: tiene que
+   * liquidar el tipo general y enseñar el 3 % como oportunidad, no como cifra. El perfil
+   * «familia numerosa» no lo había recorrido ninguna tanda anterior.
+   *
+   * ITP — TIPOS_ITP_CCAA_2025 «Galicia» = 8 %, sin escala progresiva:
+   *   60.000 × 8 % =                                                              4.800,00
+   *
+   * Notaría — ARANCELES_NOTARIO, arancel sin IVA:
+   *   90,15 + (30.050,61 − 6.010,12)×0,45 % + (60.000 − 30.050,61)×0,15 %
+   *   = 90,15 + 108,182205 + 44,924085 =                                        243,25629
+   *   con el 21 % de IVA = 243,25629 × 1,21 =                                 294,3401109
+   *   FACTURA_NOTARIAL: ×1,5 = 441,510166 · ×2 = 588,680222 · medio ×1,75 =   515,095194
+   *
+   * Registro — ARANCELES_REGISTRO + REGISTRO_CONCEPTOS:
+   *   24,04 + 24.040,49×0,175 % + 29.949,39×0,125 % =                          103,547595
+   *   + presentación 6,010121 + nota simple 3,005061 =                         112,562777
+   *   con el 21 % de IVA =                                                     136,200960
+   *
+   * Total gastos (sumarLineasVisibles, cada línea ya redondeada al céntimo):
+   *   4.800,00 + 515,10 + 136,20 + 300,00 =                                     5.751,30
+   *   % sobre el precio = 5.751,30 / 60.000 =                                    9,5855 %
+   * Coste total = 60.000 + 5.751,30 =                                          65.751,30
+   */
+  test('CASO D (normal) — Galicia, 60.000 €, perfil Familia numerosa: el 3 % se enseña, no se cobra', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'galicia');
+    await page.selectOption('#select-perfil', 'familia-numerosa');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '60000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // El tipo que se liquida es el general, no el reducido de familia numerosa
+    expect(await tituloTarjeta(page, 'ITP')).toBe('ITP (8,00%)');
+    expect(await valorTarjeta(page, 'ITP')).toBe('4800,00 €');
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('515,10 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('441,51 €');
+    expect(notaria).toContain('588,68 €');
+
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('136,20 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('5751,30 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '9,59% sobre el precio',
+    );
+    expect(await tituloTarjeta(page, 'COSTE TOTAL')).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('65.751,30 €');
+
+    // El reducido del 3 % existe y se muestra como oportunidad, con sus condiciones
+    const aviso = page.getByText('Podrías pagar menos');
+    await expect(aviso).toBeVisible();
+    const bloque = page.locator('[role="note"]', { hasText: 'Podrías pagar menos' });
+    await expect(bloque).toContainText('3,00% — Familia numerosa');
+    await expect(bloque).toContainText('Vivienda habitual');
+    await expect(bloque).toContainText('El cálculo usa el tipo general (8,00%)');
+  });
+
+  /**
+   * CASO E (LÍMITE) — vendedor con 35 AÑOS de propiedad y una ganancia que cruza el TERCER
+   * tramo de la base del ahorro.
+   *
+   * Dos límites que ninguna tanda anterior había tocado:
+   *   (a) `calcularPlusvaliaMunicipal` topa la tenencia en 20 años
+   *       (`Math.min(Math.max(aniosPropiedad, 1), 20)`), porque COEFICIENTES_IIVTNU_2025 no
+   *       llega más allá: su última fila es «20 o más años → 0,45». Con 35 años el
+   *       coeficiente tiene que ser exactamente el mismo que con 20; si el motor buscara el
+   *       año 35 en la tabla, el `?? 0.45` de reserva daría por casualidad lo mismo, así que
+   *       la prueba se hace por PARTIDA DOBLE: 35 y 20 deben dar el MISMO importe.
+   *   (b) TRAMOS_GANANCIAS_PATRIMONIALES_2025 tiene cinco tramos y el caso más alto del
+   *       fichero se quedaba en el segundo (21 %). Aquí la ganancia entra en el tercero.
+   *
+   * Entrada: venta 300.000 · compra 100.000 · gastos de aquella compra 0 · años 35 ·
+   *          suelo catastral 40.000 · valor catastral total EN BLANCO · comisión 0 % ·
+   *          gestoría del vendedor 0.
+   *
+   * Plusvalía municipal (método objetivo, art. 107.4 TRLHL):
+   *   coeficiente de 20 o más años =                                                  0,45
+   *   base = 40.000 × 0,45 =                                                      18.000,00
+   *   cuota = 18.000 × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) =            4.500,00
+   *   Sin valor catastral total NO hay método real: `metodoRealDisponible` es false y el
+   *   recomendado se queda en el objetivo.
+   *
+   * Ganancia patrimonial (art. 35 LIRPF, motor `calcularGananciaInmueble`):
+   *   valor de adquisición = 100.000 + 0 =                                        100.000,00
+   *   valor de transmisión = 300.000 − 0 de gastos − 4.500 de plusvalía =         295.500,00
+   *   ganancia =                                                                  195.500,00
+   *
+   * IRPF de la base del ahorro:
+   *     6.000 × 19 % =                                                              1.140,00
+   *    44.000 × 21 % =                                                              9.240,00
+   *   145.500 × 23 % =                                                             33.465,00
+   *                                                                                43.845,00
+   *
+   * Total gastos vendedor = 4.500 + 43.845 =                                       48.345,00
+   * Neto = 300.000 − 48.345 =                                                     251.655,00
+   */
+  test('CASO E (límite) — 35 años topan en el coeficiente de 20, y la ganancia entra en el tramo del 23 %', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del garaje / plaza de parking', '300000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original del garaje', '100000');
+    await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '0');
+    await rellenar(page, 'Años de propiedad', '35');
+    await rellenar(page, 'Valor catastral del suelo (€)', '40000');
+    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await rellenar(page, 'Gestoría y certificados del vendedor (€)', '0');
+
+    // (a) El tope de 20 años: con 35 se aplica el coeficiente de 0,45, no el de un año 35
+    //     que no existe en la tabla
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('4500,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (falta el valor catastral total para comparar)',
+    );
+
+    // (b) El tercer tramo de la base del ahorro
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('100.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('295.500,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('195.500,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('43.845,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'Tributación en base del ahorro (19%-30%)',
+    );
+
+    // Sin comisión ni gestoría no se pinta su línea, y el total cuadra con lo que se ve
+    await expect(page.locator('h3', { hasText: 'Comisión inmobiliaria' })).toHaveCount(0);
+    await expect(
+      page.locator('h3', { hasText: 'Gestoría y certificados del vendedor' }),
+    ).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('48.345,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('251.655,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras gastos e impuestos',
+    );
+    await expect(page.getByText('No definido')).toHaveCount(0);
+
+    // Partida doble del tope: 20 años tiene que dar EXACTAMENTE lo mismo que 35
+    await rellenar(page, 'Años de propiedad', '20');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('4500,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('251.655,00 €');
+
+    // Y 19 años (coeficiente 0,36) tiene que dar OTRO importe: la prueba de que el tope no
+    // está aplanando toda la tabla. 40.000 × 0,36 × 25 % = 3.600,00
+    await rellenar(page, 'Años de propiedad', '19');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('3600,00 €');
+  });
+
+  /**
+   * CASO F (DEBE RECHAZARSE) — la gestoría del COMPRADOR en negativo.
+   *
+   * Las dos gestorías del VENDEDOR ya tienen testigo (28/08), pero la del comprador no: es
+   * el campo que viene relleno por defecto con 300 € y el único que el usuario suele tocar.
+   * Un importe negativo NO puede restar del presupuesto: su tarjeta no se pinta (la guarda
+   * es `> 0`), así que un total rebajado por una línea invisible sería justo el defecto que
+   * el hallazgo 474 describe en la otra pestaña.
+   *
+   * Se ejecuta en el PAÍS VASCO, que es el tipo más bajo del catálogo (4 %, el `min` de
+   * RANGO_ITP) y no cobra AJD (`ajd: 0`, régimen foral), de modo que el caso vale además
+   * como testigo del extremo bajo de la escala.
+   *
+   * ITP — TIPOS_ITP_CCAA_2025 «País Vasco» = 4 %, sin escala:
+   *   22.000 × 4 % =                                                                880,00
+   *
+   * Notaría — ARANCELES_NOTARIO:
+   *   90,15 + (22.000 − 6.010,12)×0,45 % = 90,15 + 71,95446 =                    162,10446
+   *   con el 21 % de IVA =                                                     196,1463966
+   *   ×1,5 = 294,219595 · ×2 = 392,292793 · medio ×1,75 =                       343,256194
+   *
+   * Registro — ARANCELES_REGISTRO + REGISTRO_CONCEPTOS:
+   *   24,04 + 15.989,88×0,175 % = 24,04 + 27,98229 =                              52,02229
+   *   + 6,010121 + 3,005061 =                                                     61,037472
+   *   con el 21 % de IVA =                                                        73,855341
+   *
+   * Total gastos = 880,00 + 343,26 + 73,86 + 0 (gestoría acotada) =              1.297,12
+   *   % sobre el precio = 1.297,12 / 22.000 =                                      5,896 %
+   * Coste total = 22.000 + 1.297,12 =                                            23.297,12
+   */
+  test('CASO F (debe rechazarse) — la gestoría negativa del comprador no rebaja el presupuesto', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'pais-vasco');
+    await page.selectOption('#select-perfil', 'general');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
+
+    const gestoria = page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]');
+    await gestoria.fill('-500');
+
+    // (a) Con el foco DENTRO del campo: ni línea de gestoría, ni total rebajado
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    expect(await tituloTarjeta(page, 'ITP')).toBe('ITP (4,00%)');
+    expect(await valorTarjeta(page, 'ITP')).toBe('880,00 €');
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('343,26 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('73,86 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1297,12 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '5,90% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('23.297,12 €');
+    await expect(page.getByText('No definido')).toHaveCount(0);
+
+    // (b) Al salir del campo, el mínimo declarado (0) queda escrito y el total no cambia
+    await gestoria.blur();
+    await expect(gestoria).toHaveValue('0');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1297,12 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('23.297,12 €');
+
+    // El País Vasco tiene un reducido que NO exige vivienda habitual (zonas despobladas de
+    // Álava, 1,5 %): se enseña como oportunidad, y sigue sin aplicarse al importe
+    const bloque = page.locator('[role="note"]', { hasText: 'Podrías pagar menos' });
+    await expect(bloque).toContainText('1,50% — Zonas despobladas (Álava)');
+    expect(await valorTarjeta(page, 'ITP')).toBe('880,00 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 12. HALLAZGOS ABIERTOS 07/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar, así
+//     que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como
+//     regresión, igual que los de las tandas anteriores.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — inspección del 07/09/2026', () => {
+  // ❌ ABIERTO (medio) — contenido. Es el hallazgo 578 (JSON-LD, reparado el 02/09) visto
+  // desde el otro lado: aquella tanda corrigió la QUINTA pregunta del FAQPage y, de paso,
+  // reescribió la SEGUNDA en `metadata.ts` («los tipos reducidos […] casi siempre exigen que
+  // el inmueble sea la vivienda habitual, condición que un garaje suelto no cumple»), pero la
+  // misma pregunta de la FAQ VISIBLE, en `page.tsx`, se quedó con la redacción vieja: «El
+  // garaje se considera inmueble residencial y puede beneficiarse de tipos reducidos para
+  // jóvenes, familias numerosas o personas con discapacidad si los cumple».
+  //
+  // Resultado: la página se contradice tres veces a sí misma. La FAQ visible nº 2 promete el
+  // reducido; la FAQ visible nº 5, dos párrafos más abajo, lo niega («Un garaje suelto nunca
+  // es vivienda habitual, así que ese tipo reducido no aplica»); y el motor lo descarta
+  // (`elegirTipoITP` recibe `viviendaHabitual: false`). El propio bloque educativo publica el
+  // caso de Carlos, que lo dice bien: en Andalucía se liquidan 1.260,00 € y no 630,00 €.
+  //
+  // Caso: abrir la guía educativa → FAQ «¿Qué ITP paga un garaje de segunda mano?» ·
+  //       esperado que condicione el reducido a la vivienda habitual, como ya hace el
+  //       JSON-LD de la misma página · obtenido «y puede beneficiarse de tipos reducidos
+  //       para jóvenes, familias numerosas o personas con discapacidad si los cumple».
+  test('la FAQ visible dice del reducido lo mismo que el JSON-LD y que el motor', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page
+      .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
+      .click();
+
+    const visible = await texto(page, /El garaje se considera inmueble residencial/);
+    expect(visible).toMatch(/vivienda habitual/i);
+    expect(visible).not.toMatch(/y puede beneficiarse de tipos reducidos/i);
+  });
+
+  // ❌ ABIERTO (bajo) — accesibilidad. Las cinco preguntas de la FAQ visible y el rótulo
+  // «Tipos reducidos en …» del panel de datos usan `<h4>` colgando directamente de un `<h2>`:
+  // el nivel h3 no existe en medio, así que el esquema del documento salta un escalón y un
+  // lector de pantalla que navegue por encabezados (la forma normal de leer una página larga)
+  // no puede situar las preguntas dentro de su sección. No lo ve `check:a11y-jsx`, que vigila
+  // `type=`, `aria-hidden` y `aria-pressed`, y aquí los tres están bien.
+  //
+  // La inversión h3 → h2 del bloque educativo NO entra aquí: la cabecera de
+  // `<EducationalSection>` es un `<h3>` del componente compartido y sus hijos son `<h2>` por
+  // diseño de `templates/app-base/page.template.tsx`, de modo que es del catálogo entero y no
+  // de esta app. Lo que sí es suyo son estos `<h4>`.
+  //
+  // Caso: abrir la guía educativa → los encabezados de «Preguntas frecuentes sobre compraventa
+  //       de garaje» (h2) · esperado h3 · obtenido h4, cinco veces.
+  test('las preguntas de la FAQ cuelgan del nivel siguiente a su sección', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page
+      .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
+      .click();
+
+    const niveles: string[] = await page.evaluate(() => {
+      const secciones = Array.from(document.querySelectorAll('section'));
+      const faq = secciones.find((s) =>
+        /Preguntas frecuentes/.test(s.querySelector('h2')?.textContent ?? ''),
+      );
+      if (!faq) return [];
+      return Array.from(faq.querySelectorAll('h3, h4, h5, h6')).map((h) => h.tagName);
+    });
+
+    expect(niveles.length).toBe(5);
+    expect(Array.from(new Set(niveles))).toEqual(['H3']);
   });
 });

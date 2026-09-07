@@ -9,6 +9,15 @@
  *    pasan al bloque de REGRESIÓN. Se añaden casos nuevos (Melilla, Cataluña en el tramo
  *    del 13 %, tope del arancel registral, formato español de entrada) y 4 hallazgos
  *    nuevos al final, con `test.fail()`.
+ *  · 28/08/2026 — re-inspección de cierre: los 4 hallazgos del 27/08 cerrados, 4 nuevos.
+ *  · 02/09/2026 — re-inspección: 5 hallazgos (600-604), reparados el mismo día.
+ *  · 07/09/2026 — RE-INSPECCIÓN. El fichero entero pasó en verde ANTES de tocar nada
+ *    (45/45, sin ningún `test.fail()` pendiente): las reparaciones anteriores siguen
+ *    cerradas y no hay regresiones. Se añaden tres casos nuevos —Murcia 350.000 €,
+ *    Ceuta en el corte exacto del arancel notarial (6.010.121,04 €) y Ceuta con
+ *    renuncia, donde el IPSI NO se cuantifica—, un barrido de las 19 comunidades que
+ *    comprueba que a ninguna nave se le cuela un tipo reducido de vivienda habitual,
+ *    y 6 hallazgos nuevos al final, con `test.fail()`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -44,7 +53,7 @@
  */
 import { test, expect, Page } from '@playwright/test';
 import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles';
-import { ITP_CCAA, RANGO_ITP } from '../../data/itp-ccaa';
+import { BONIFICACION_CUOTA_CEUTA_MELILLA, ITP_CCAA, RANGO_ITP } from '../../data/itp-ccaa';
 
 const RUTA = '/simulador-gastos-compraventa-nave-industrial/';
 const FUENTE_PAGE = 'app/simulador-gastos-compraventa-nave-industrial/page.tsx';
@@ -1380,5 +1389,476 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
     const usos = fuente.match(/calcularNotario/g) ?? [];
     // Hoy aparece una sola vez: en el import.
     expect(usos.length).not.toBe(1);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 07/09/2026 (Opus 5)
+//
+// RE-INSPECCIÓN. Antes de escribir nada se ejecutó el fichero entero: 45/45 en verde y
+// ningún bloque con `test.fail()` pendiente, así que las tres reparaciones que el encargo
+// nombraba (IVA español liquidado en Canarias/Ceuta/Melilla, bonificación del 50 % mal
+// aplicada y ausencia de `<DataReference>`) siguen cerradas y con red debajo. Esta tanda
+// añade CASOS NUEVOS, ninguno repetido de las anteriores.
+//
+// De dónde sale CADA cifra esperada de esta tanda:
+//  - Murcia, tipo general 7,75 % → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`
+//    (Ley 3/2025, efectos 25/07/2025), que `tipoGeneralDe()` vuelca en `ITP_CCAA.murcia`.
+//    Murcia NO tiene escala progresiva, así que el tipo efectivo coincide con el nominal.
+//  - Ceuta: tipo general 6 % y `ajd: 0.5` → `ITP_CCAA.ceuta`; bonificación del 50 % de la
+//    cuota → `BONIFICACION_CUOTA_CEUTA_MELILLA` (art. 57 bis TRLITPAJD), que aplican
+//    `calcularITP` y `calcularAJD`; IPSI → `TERRITORIOS_SIN_IVA.ceuta`.
+//  - Aranceles → `ARANCELES_NOTARIO` / `ARANCELES_REGISTRO` + la horquilla de
+//    `FACTURA_NOTARIAL` (medio ×1,75) + los fijos de `REGISTRO_CONCEPTOS`
+//    (6,010121 + 3,005061) + el 21 % de IVA que ambas funciones ya añaden.
+//  - IVA de la nave en primera entrega → `IVA_INMUEBLES_2025.local` (21). NO el 10 % de
+//    `obraNueva`, que es el reducido de VIVIENDA y una nave no puede tener nunca.
+//
+// Los tres casos se resolvieron a mano ANTES de abrir el navegador; el desarrollo va
+// comentado junto a cada aserción, con los importes sin redondear.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspección 07/09/2026 — tres casos nuevos', () => {
+  /**
+   * CASO 1 (NORMAL) — Murcia, segunda mano, 350.000 €, gestoría 500 €.
+   *
+   * Comunidad sin escala progresiva y con el único tipo general de dos decimales del mapa
+   * (7,75 %): comprueba de paso que el rótulo del tipo efectivo no lo redondea a «8%».
+   *
+   * ITP = 350.000 × 7,75 % = 27.125,00
+   * Arancel notarial = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %
+   *                  + (350.000 − 150.253,03)×0,05 %
+   *                  = 90,15 + 108,182205 + 45,0759 + 90,15182 + 99,873485 = 433,43341
+   *   × 1,21 = 524,4544261 → medio × 1,75 = 917,795246 (min ×1,5 = 786,681639 · max ×2 = 1.048,908852)
+   * Registro = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 59,924091 = 231,2120635
+   *   + 6,010121 + 3,005061 = 240,2272455 × 1,21 = 290,674967
+   * Total (líneas ya redondeadas) = 27.125,00 + 0 + 917,80 + 290,67 + 500 = 28.833,47
+   *   → 28.833,47 / 350.000 = 8,238134 % → 8,24 %
+   * COSTE TOTAL = 350.000 + 28.833,47 = 378.833,47
+   */
+  test('CASO 1 (normal) — Murcia, segunda mano, 350.000 €: el 7,75 % no se redondea a 8 %', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'murcia');
+    await rellenar(page, PRECIO, '350000');
+
+    // El tipo general de Murcia lo manda data/fiscal, no este test.
+    expect(ITP_CCAA['murcia'].tipoGeneral).toBe(7.75);
+    expect(ITP_CCAA['murcia'].tramosProgresivos).toBeUndefined();
+
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('350.000,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (7,75%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('27.125,00 €');
+    // Una nave no puede acogerse a ningún tipo reducido: todos exigen vivienda habitual.
+    expect(await descripcionTarjeta(page, 'ITP (')).toContain('no tienen tipos reducidos');
+
+    // Segunda mano sin renuncia: ITP y AJD son incompatibles, así que no hay tarjeta de AJD.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('917,80 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('entre 786,68 € y 1048,91 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('290,67 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('28.833,47 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,24% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('378.833,47 €');
+
+    // El recuadro de la comunidad dice lo mismo que la tarjeta, con el nominal sin inflar.
+    const info = (await page.locator('[class*="infoCcaa"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(info).toContain('ITP General 7,75%');
+    expect(info).toContain('AJD 1,50%');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Ceuta, segunda mano, 6.010.121,04 €.
+   *
+   * Doble frontera a propósito: el importe es EXACTAMENTE el último corte de
+   * `ARANCELES_NOTARIO` (6.010.121,04), donde el bucle tiene que parar sin entrar en el
+   * séptimo tramo; y el inmueble está en una ciudad con bonificación de cuota del 50 %.
+   *
+   * ITP = 6.010.121,04 × 6 % = 360.607,2624 → × 0,5 = 180.303,6312 (efectivo 3,00 %)
+   * Arancel notarial = 90,15 + 108,182205 + 45,0759 + 90,15182
+   *                  + 450.759,07 × 0,05 % (= 225,379535)
+   *                  + 5.409.108,94 × 0,03 % (= 1.622,732682) = 2.181,672142
+   *   × 1,21 = 2.639,823292 → medio × 1,75 = 4.619,690761 (min 3.959,734938 · max 5.279,646584)
+   * Registro = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 135,227721 + 1.081,821788
+   *          = 1.388,3374815 (aún por debajo del tope 2.181,67)
+   *   + 9,015182 = 1.397,3526635 × 1,21 = 1.690,796723
+   * Total = 180.303,63 + 0 + 4.619,69 + 1.690,80 + 500 = 187.114,12 → 3,113317 % → 3,11 %
+   * COSTE TOTAL = 6.010.121,04 + 187.114,12 = 6.197.235,16
+   */
+  test('CASO 2 (límite) — Ceuta, 6.010.121,04 €: el corte exacto del arancel notarial y la cuota bonificada', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await rellenar(page, PRECIO, '6.010.121,04');
+
+    // El importe en formato español llega entero al motor (parseSpanishNumber).
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('6.010.121,04 €');
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('180.303,63 €');
+    expect(await descripcionTarjeta(page, 'ITP (')).toContain('bonificación del 50 %');
+
+    // En segunda mano sin renuncia no hay cuota gradual de AJD.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    // Frontera del arancel: el séptimo tramo NO llega a entrar (valor == límite anterior).
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('4619,69 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('entre 3959,73 € y 5279,65 €');
+    // El registro se queda por debajo de su tope (REGISTRO_MAXIMO), que aquí aún no muerde.
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('1690,80 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('187.114,12 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,11% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('6.197.235,16 €');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — Ceuta, «2ª mano con renuncia al IVA», 450.000 €.
+   *
+   * Dos rechazos en el mismo caso:
+   *  a) el que importa fiscalmente — en Ceuta NO rige el IVA (IPSI, `TERRITORIOS_SIN_IVA`),
+   *     así que la app tiene que NEGARSE a cuantificar el impuesto indirecto en lugar de
+   *     liquidar el 21 % que sí correspondería en la Península. Con el 21 % serían
+   *     94.500 € inventados. Y aun así el AJD se devenga, bonificado.
+   *  b) el de entrada — «1,2,3» pasa el filtro del `NumberInput` (solo cifras y separadores)
+   *     pero `parseSpanishNumber` lo rechaza con NaN: dos comas no son un número.
+   *
+   * AJD = 450.000 × 0,5 % = 2.250 → × 0,5 = 1.125,00 (efectivo 0,25 %)
+   * Arancel notarial = 333,559925 + (450.000 − 150.253,03) × 0,05 % (= 149,873485) = 483,43341
+   *   × 1,21 = 584,9544261 → medio × 1,75 = 1.023,670246 (min 877,431639 · max 1.169,908852)
+   * Registro = 171,2879725 + 89,924091 = 261,2120635 + 9,015182 = 270,2272455 × 1,21 = 326,974967
+   * Total PARCIAL = 0 + 1.125,00 + 1.023,67 + 326,97 + 500 = 2.975,64 → 0,661253 % → 0,66 %
+   * COSTE TOTAL (PARCIAL) = 450.000 + 2.975,64 = 452.975,64
+   */
+  test('CASO 3 (rechazo) — Ceuta con renuncia: el IPSI no se cuantifica y «1,2,3» no produce cifra', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await rellenar(page, PRECIO, '450000');
+
+    // a) El impuesto indirecto se NOMBRA y no se inventa.
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(await descripcionTarjeta(page, 'IPSI')).toContain('la renuncia a la exención');
+    // Nunca aparece el 21 % peninsular sobre 450.000 € (= 94.500 €).
+    expect(await page.locator('body').innerText()).not.toContain('94.500');
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+
+    // …pero el AJD sí se devenga, y bonificado al 50 % (art. 57 bis.1).
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,25%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('1125,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1023,67 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('326,97 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('2975,64 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales (parcial)')).toContain('0,66% sobre el precio');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales (parcial)')).toContain('SIN el IPSI');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('452.975,64 €');
+
+    // b) «1,2,3» → dos comas, que `partesNumericas` rechaza. Vuelve el marcador y nada más.
+    const campo = page.locator('input[aria-label="' + PRECIO + '"]');
+    await campo.fill('1,2,3');
+    await campo.blur();
+    await expect(page.getByText('Introduce el precio de la nave industrial para ver el desglose de gastos')).toBeVisible();
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('NaN');
+    expect(cuerpo).not.toContain('No definido');
+    expect(cuerpo).not.toContain('∞');
+  });
+
+  /**
+   * Barrido de las 19 comunidades en segunda mano con el MISMO importe: comprueba que la
+   * página llama a `calcularITP(precio, ccaa)` sin forzar tipo en ninguna —es decir, que a
+   * ninguna nave se le cuela un tipo reducido de vivienda habitual— y que el rótulo del
+   * tipo efectivo cuadra siempre con el importe que hay al lado.
+   *
+   * El valor esperado sale del propio módulo `data/itp-ccaa`, no de memoria: para las 12
+   * comunidades sin escala es el tipo general; para las 7 con escala, el reparto por tramos;
+   * y en Ceuta y Melilla, la mitad, por la bonificación del art. 57 bis.
+   */
+  test('Barrido — las 19 comunidades cobran el tipo GENERAL (ningún reducido de vivienda)', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+
+    const PRECIO_BARRIDO = 700000;
+    await rellenar(page, PRECIO, String(PRECIO_BARRIDO));
+
+    for (const clave of Object.keys(ITP_CCAA) as (keyof typeof ITP_CCAA)[]) {
+      const datos = ITP_CCAA[clave];
+      // Cuota esperada, calculada aquí a partir de la tabla (no llamando a calcularITP):
+      let cuota: number;
+      if (datos.tramosProgresivos && datos.tramosProgresivos.length > 0) {
+        let restante = PRECIO_BARRIDO;
+        let anterior = 0;
+        cuota = 0;
+        for (const tramo of datos.tramosProgresivos) {
+          const base = Math.min(restante, tramo.hasta - anterior);
+          if (base <= 0) break;
+          cuota += base * (tramo.tipo / 100);
+          restante -= base;
+          anterior = tramo.hasta;
+        }
+      } else {
+        cuota = PRECIO_BARRIDO * (datos.tipoGeneral / 100);
+      }
+      if (clave === 'ceuta' || clave === 'melilla') cuota *= 0.5;
+
+      await page.selectOption('#select-ccaa', clave);
+
+      const esperado = cuota.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }).replace(/\s+/g, ' ');
+      expect(await valorTarjeta(page, 'ITP ('), `ITP de ${datos.nombre}`).toBe(esperado);
+
+      // Y el rótulo lleva el tipo EFECTIVO, que es cuota/precio y no el nominal de la tabla.
+      const efectivo = ((cuota / PRECIO_BARRIDO) * 100).toLocaleString('es-ES', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      expect(await rotuloTarjeta(page, /^ITP \(/), `rótulo de ${datos.nombre}`).toBe(`ITP (${efectivo}%)`);
+    }
+  });
+
+  /**
+   * El IVA de una nave en primera entrega es el GENERAL (21 %, `IVA_INMUEBLES_2025.local`),
+   * nunca el reducido del 10 % de vivienda nueva (`IVA_INMUEBLES_2025.obraNueva`): una nave
+   * industrial no es un inmueble residencial y no puede acogerse a él en ningún caso.
+   */
+  test('Obra nueva — el IVA de la nave es el general, no el reducido de vivienda', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await page.selectOption('#select-ccaa', 'murcia');
+    await rellenar(page, PRECIO, '350000');
+
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+    expect(IVA_INMUEBLES_2025.obraNueva).toBe(10);
+    // 350.000 × 21 % = 73.500 (con el 10 % de vivienda serían 35.000)
+    expect(await rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('73.500,00 €');
+    // AJD Murcia = 350.000 × 1,5 % = 5.250
+    expect(await valorTarjeta(page, 'AJD (')).toBe('5250,00 €');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — 07/09/2026. Marcados con `test.fail()`: afirman lo que DEBERÍA
+// pasar y hoy fallan a propósito. Cuando se reparen, se les quita la marca y se quedan
+// como regresión, igual que se hizo con los hallazgos 156-166, 490-493 y 600-604.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 07/09/2026', () => {
+  /**
+   * HALLAZGO 1 (dato, medio) — el SUELO del ranking de la quinta pregunta del FAQPage ignora
+   * la bonificación que el motor SÍ aplica. Es el defecto SIMÉTRICO del hallazgo C del
+   * 27/08/2026, que corrigió el TECHO derivándolo de las escalas progresivas (`techoDe`) y
+   * dejó el suelo en `tipoGeneral` a secas.
+   *
+   * El JSON-LD responde a «¿Qué comunidad autónoma tiene el ITP más bajo para la compra de
+   * una nave?» con «Los más bajos hoy son País Vasco (4%), Comunidad de Madrid (6%),
+   * Comunidad Foral de Navarra (6%)» — mientras la propia app, con Ceuta seleccionada y
+   * 500.000 €, rotula «ITP (3,00%)» y cobra 15.000 €. El más bajo para una nave es Ceuta o
+   * Melilla, no el País Vasco, y la frase que lo desmiente está en el mismo párrafo («En
+   * Ceuta y Melilla la cuota se bonifica al 50%»), lo que la deja contradiciéndose sola.
+   *
+   * Importa porque es el bloque que consumen Bing Copilot, ChatGPT y Perplexity para
+   * responder exactamente esa pregunta.
+   */
+  test.fail('HALLAZGO 1 — el ranking del FAQPage da el ITP más bajo al País Vasco, no a Ceuta', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // Lo que la app cobra de verdad en Ceuta: 500.000 × 6 % × 0,5 = 15.000 → 3,00 %.
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await rellenar(page, PRECIO, '500000');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
+
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faq).toContain('¿Qué comunidad autónoma tiene el ITP más bajo');
+    // El suelo del ranking debería reflejar el 3 % efectivo que la app cobra, o el ranking
+    // no debería presentarse como respuesta a «cuál es el más bajo».
+    expect(faq).not.toMatch(/Los más bajos hoy son País Vasco \(4%\)/);
+  });
+
+  /**
+   * HALLAZGO 2 (contenido, medio) — el aviso que hay bajo los botones de transmisión habla de
+   * un IVA que en Canarias, Ceuta y Melilla no existe.
+   *
+   * Es el hallazgo 490 una línea más abajo: allí se corrigió el RÓTULO del botón —que ya dice
+   * «Paga IPSI + AJD»— pero no el `role="note"` que lo acompaña. Con Ceuta y «2ª mano con
+   * renuncia al IVA» seleccionados, la pantalla dice a la vez:
+   *   · botón: «🤝 2ª mano con renuncia al IVA · Paga IPSI + AJD»
+   *   · tarjeta: «IPSI · No calculado · En Ciudad Autónoma de Ceuta no rige el IVA…»
+   *   · aviso:  «Con renuncia a la exención el IVA no se paga al vendedor: lo autoliquida el
+   *              comprador (inversión del sujeto pasivo), y suele ser deducible si tu
+   *              actividad está sujeta a IVA.»
+   * Y en «Segunda mano», el otro aviso remata «la operación vuelve al IVA … Si es tu caso,
+   * usa la tercera opción», que en esos tres territorios no ocurre: la tercera opción no
+   * devuelve ningún IVA. El público declarado de la app son empresas y autónomos, para los
+   * que la renuncia es el caso frecuente, así que el consejo se lee y se sigue.
+   */
+  test.fail('HALLAZGO 2 — en Ceuta el aviso de la renuncia promete un IVA que la misma pantalla niega', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'ceuta');
+
+    // Modo «2ª mano con renuncia»: la tarjeta niega el IVA…
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await rellenar(page, PRECIO, '450000');
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+
+    // …y el aviso de al lado lo sigue explicando como si se liquidase.
+    const avisoRenuncia = (await page.locator('[class*="avisoRenuncia"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(avisoRenuncia, 'el aviso no puede describir un IVA que en Ceuta no se devenga').not.toContain(
+      'lo autoliquida el comprador'
+    );
+
+    // Y en «Segunda mano», el aviso invita a una tercera opción que allí no devuelve el IVA.
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    const avisoSegundaMano = (await page.locator('[class*="avisoRenuncia"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(avisoSegundaMano, 'en Ceuta la tercera opción no devuelve la operación al IVA').not.toContain(
+      'la operación vuelve al IVA'
+    );
+  });
+
+  /**
+   * HALLAZGO 3 (accesibilidad, medio) — la tabla comparativa del bloque educativo pinta sus
+   * celdas de respuesta con dos literales hexadecimales (`#c0392b` rojo y `#27ae60` verde)
+   * que no tienen variante de tema, y ninguno de los dos llega al 4,5:1 que exige la
+   * WCAG 2.1 AA para texto normal en el tema donde le toca perder:
+   *   · modo OSCURO: «No aplican» → 2,16:1 sobre rgb(56,56,56) · «No» → 3,20:1 sobre rgb(26,26,26)
+   *   · modo CLARO:  «Sí (jóvenes, familia numerosa…)» → 2,64:1 · «Sí (si actividad sujeta a IVA)» → 2,75:1
+   * Son justo las celdas que contestan la pregunta que la tabla existe para contestar
+   * («¿tiene una nave tipos reducidos de ITP?»), y el color hace ahí trabajo informativo.
+   */
+  test.fail('HALLAZGO 3 — el rojo y el verde de la tabla comparativa no llegan a 4,5:1', async ({ page }) => {
+    await page.goto(RUTA);
+    // El bloque educativo vive en el DOM aunque esté plegado (igual que en las tandas
+    // anteriores), así que sus estilos y su texto se pueden leer sin desplegarlo.
+
+    const peorRatio = async (): Promise<number> =>
+      page.evaluate(() => {
+        const canal = (c: number) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        };
+        const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+        const rgb = (s: string) => (s.match(/\d+(\.\d+)?/g) ?? []).map(Number);
+        const fondoDe = (el: Element | null): number[] => {
+          let n: Element | null = el;
+          while (n) {
+            const p = rgb(getComputedStyle(n).backgroundColor);
+            if (p.length >= 3 && (p.length < 4 || p[3] > 0)) return p.slice(0, 3);
+            n = n.parentElement;
+          }
+          return [255, 255, 255];
+        };
+        let peor = 21;
+        for (const td of Array.from(document.querySelectorAll('table td'))) {
+          const txt = (td as HTMLElement).innerText.replace(/\s+/g, ' ').trim();
+          if (!/^No aplican$|^No$|^Sí \(/.test(txt)) continue;
+          const fg = rgb(getComputedStyle(td).color).slice(0, 3);
+          const bg = fondoDe(td);
+          const a = Math.max(lum(fg), lum(bg));
+          const b = Math.min(lum(fg), lum(bg));
+          peor = Math.min(peor, (a + 0.05) / (b + 0.05));
+        }
+        return Math.round(peor * 100) / 100;
+      });
+
+    const claro = await peorRatio();
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    const oscuro = await peorRatio();
+
+    // Hoy: claro 2,64 · oscuro 2,16.
+    expect(claro, 'peor contraste de la tabla en modo claro').toBeGreaterThanOrEqual(4.5);
+    expect(oscuro, 'peor contraste de la tabla en modo oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * HALLAZGO 4 (accesibilidad, bajo) — el bloque educativo lleva `border: 1px solid #e0e0e0`
+   * escrito en línea en 14 elementos (las 4 tarjetas de «Casos de uso», las 4 de «Consejos» y
+   * 6 celdas de la tabla). En modo oscuro esos bordes siguen siendo rgb(224,224,224) sobre
+   * tarjetas rgb(45,45,45): un filete casi blanco alrededor de cada tarjeta. El CLAUDE.md
+   * global §6 pide variante oscura en cada elemento; el resto de la página sí usa tokens
+   * (`var(--bg-card)`, `var(--primary)`) y por eso cambia sola.
+   */
+  test.fail('HALLAZGO 4 — los bordes #e0e0e0 del bloque educativo no tienen variante oscura', async ({ page }) => {
+    await page.goto(RUTA);
+    // El bloque educativo vive en el DOM aunque esté plegado (igual que en las tandas
+    // anteriores), así que sus estilos y su texto se pueden leer sin desplegarlo.
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+
+    const claros = await page.evaluate(() => {
+      let n = 0;
+      for (const el of Array.from(document.querySelectorAll('div,td'))) {
+        const cs = getComputedStyle(el);
+        for (const lado of ['Top', 'Bottom', 'Left', 'Right']) {
+          if (
+            cs.getPropertyValue(`border-${lado.toLowerCase()}-width`) !== '0px' &&
+            cs.getPropertyValue(`border-${lado.toLowerCase()}-color`) === 'rgb(224, 224, 224)'
+          ) {
+            n++;
+            break;
+          }
+        }
+      }
+      return n;
+    });
+
+    // Hoy: 14.
+    expect(claros, 'elementos con borde #e0e0e0 en modo oscuro').toBe(0);
+  });
+
+  /**
+   * HALLAZGO 5 (dato, bajo) — el 50 % de la bonificación de Ceuta y Melilla va escrito a mano
+   * cinco veces en `page.tsx` (recuadro de la comunidad, descripción de la tarjeta de ITP,
+   * descripción de la tarjeta de AJD, caso de uso del autónomo y FAQ de tipos) y dos más en
+   * `metadata.ts`, existiendo `BONIFICACION_CUOTA_CEUTA_MELILLA = 0.5` exportado por
+   * `data/itp-ccaa.ts` — el mismo módulo del que la página ya importa `CIUDADES_CON_BONIFICACION`.
+   *
+   * Es el patrón exacto del hallazgo D del 27/08/2026 (el «21 %» y el «19-30 %» escritos a
+   * mano teniendo la constante al lado): hoy los números coinciden, así que no hay error de
+   * importe; lo que hay es la divergencia-en-silencio garantizada para el día que cambien.
+   */
+  test.fail('HALLAZGO 5 — el 50 % de la bonificación está escrito a mano pudiendo derivarse', async () => {
+    const fuente = await leerFuente();
+    const meta = await leerMetadata();
+    expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
+
+    // Solo el texto que se VE: se descartan las líneas de comentario, donde explicar el
+    // 50 % es legítimo y no puede divergir de nada.
+    const esComentario = (l: string) => {
+      const t = l.trim();
+      return t.startsWith('//') || t.startsWith('*') || t.startsWith('/*');
+    };
+    const literales = [...fuente.split('\n'), ...meta.split('\n')].filter(
+      (l) => !esComentario(l) && /50 ?%/.test(l)
+    );
+    // Hoy: 5 en page.tsx + 2 en metadata.ts, y la constante no se importa en ninguno.
+    expect(literales.length, 'literales del 50 % teniendo la constante importable').toBe(0);
+  });
+
+  /**
+   * HALLAZGO 6 (contenido, bajo) — el bloque educativo rotula el rango de ITP con
+   * `formatNumber(RANGO_ITP.min, 2)`, así que dice «del 4,00% al 13,00%», mientras el
+   * recuadro de la comunidad de la misma página usa `formatTipoNominal` y dice «ITP General
+   * 6%» o «7,75%». Un tipo NOMINAL con dos decimales forzados es exactamente el ruido para
+   * el que se creó `formatTipoNominal` (hallazgo 331), función que esta página ya importa y
+   * usa tres veces. De paso, el `<DataReference>` de arriba escribe «del 4% (País Vasco)»:
+   * el mismo número, con dos formatos, a dos pantallas de distancia.
+   */
+  test.fail('HALLAZGO 6 — el rango de ITP se rotula «4,00%» donde el resto de la página dice «4%»', async ({ page }) => {
+    await page.goto(RUTA);
+    // El bloque educativo vive en el DOM aunque esté plegado (igual que en las tandas
+    // anteriores), así que sus estilos y su texto se pueden leer sin desplegarlo.
+
+    expect(RANGO_ITP.min).toBe(4);
+    // `textContent` y no `innerText`: el bloque está plegado y no se renderiza como texto.
+    const guia = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+    // Hoy: «que hoy va del 4,00% al 13,00%».
+    expect(guia).not.toContain('del 4,00% al 13,00%');
   });
 });

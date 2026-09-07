@@ -273,3 +273,292 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
     expect(faq).toContain('no dice qué ocurre');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 07/09/2026 — RE-INSPECCIÓN (segmento fiscal, RIESGO 1 CRÍTICO)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Lo primero fue ejecutar entera la batería del 02/09 antes de tocar nada:
+// **10/10 en verde y ningún `test.fail()` pendiente**, así que los cuatro hallazgos de
+// aquella inspección (596-599) cierran de verdad y no hay ninguna regresión. Comprobado
+// además a mano en el navegador lo que aquella acta daba por reparado y esta batería no
+// llegaba a cubrir:
+//
+//   · el parseo de la renta a la española (hallazgo 440) — la batería del 02/09 solo
+//     tecleaba «1100», sin punto de millar, que es justo la forma en que el fallo se
+//     manifestaba. Lo cubre ahora el CASO 6.
+//   · «Máximo en 4 años» sobre la ayuda EFECTIVA y no sobre el tope del programa —
+//     lo cubre el guardián del 60 % de más abajo (480,75 € → 13.845,60 €, no 14.400 €).
+//   · el panel de ahorro con un perfil declarado NO elegible — guardián de la edad.
+//   · la FAQ de compatibilidad contra el art. 136 — ya cubierta arriba en prosa y aquí
+//     por el guardián del art. 135 (hallazgo abierto H2).
+//
+// De dónde sale cada cifra esperada: `data/fiscal/vivienda-joven.ts`, sellado contra el
+// BOE (RD 326/2026, BOE-A-2026-8872) el 23/08/2026. Ninguna de memoria.
+//
+// CASOS NUEVOS (resueltos a mano ANTES de abrir el navegador)
+// ───────────────────────────────────────────────────────────
+//   CASO 4 (normal) — HABITACIÓN en municipio ordinario · 500 €/mes
+//       tope de renta   500 ≤ 600 (rentaMaximaMensual.habitacion, art. 133.1.e) → dentro
+//       60 % de 500 = 300 · cuantía máxima habitación = 200 (art. 137)
+//       ayuda           mín(200; 300) = 200,00 €   ← manda la cuantía fija, no el %
+//       pago real       500 − 200 = 300,00 €
+//       4 años          200 × 48 = 9.600 → «9600,00 €» (es-ES no agrupa cuatro cifras)
+//       veredicto       APTO, SIN la nota «Límite: 60% de la renta»
+//
+//   CASO 5 (límite exacto, doble) — VIVIENDA en municipio ≤ 10.000 hab. · 500 €/mes
+//       tope de renta   500 ≤ 500 (rentaMaximaMensual.municipioPequeno.vivienda) → dentro,
+//                       el art. 133.1.e es inclusive
+//       60 % de 500 = 300 = ayudaMaximaMensual.vivienda
+//       ayuda           mín(300; 300) = 300,00 €
+//       Es el punto EXACTO en que el tope porcentual alcanza la cuantía fija sin llegar a
+//       morderla: la nota «Límite: 60% de la renta» NO debe salir, porque no rebaja nada.
+//       Un euro más (501 €) cae del otro lado del art. 133.1.e y ya no hay ayuda.
+//       pago real       500 − 300 = 200,00 €
+//       4 años          300 × 48 = 14.400,00 €
+//       veredicto       APTO · y con 501 € → NO APTO (tope 500,00 €, introducido 501,00 €)
+//
+//   CASO 6 (rechazo + parser español) — VIVIENDA · renta escrita «1.200»
+//       parseSpanishNumber('1.200') = 1.200 — el punto parte el número en grupos de tres
+//       cifras exactas, así que agrupa millares y no es decimal
+//       1.200 > 1.000 (rentaMaximaMensual.vivienda) → NO APTO por el art. 133.1.e
+//       panel de ahorro: ninguna tarjeta (no hay ayuda que enseñar)
+//       Con el parseo casero anterior al 02/09 esto valía 1,20 €, quedaba muy por debajo
+//       del tope y la app CONCEDÍA la ayuda a quien no tiene derecho.
+//       Comprobado además TECLEANDO (no `fill`) con el navegador en locale es-ES:
+//       «1.200» llega al estado como «1.200» y «450,50» como «450.50» —Chrome normaliza
+//       la coma del teclado español al punto— y ninguno de los dos se lee mil veces menor.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspección 07/09/2026 — casos nuevos', () => {
+  test('CASO 4 (normal): habitación a 500 €/mes → manda la cuantía fija (200,00 €), no el 60 %', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    // 500 ≤ 600 = rentaMaximaMensual.habitacion (art. 133.1.e)
+    await page.fill('#alquiler', '500');
+    await marcarTodosLosRequisitos(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+
+    const panel = await panelDeAhorro(page);
+    // mín(200 € de ayudaMaximaMensual.habitacion; 60 % de 500 = 300 €) = 200 €
+    expect(panel[0]).toContain('200,00 €');
+    // 500 − 200
+    expect(panel[1]).toContain('300,00 €');
+    // 200 × 48 meses (plazo.totalMaximoMeses) — es-ES no agrupa cuatro cifras
+    expect(panel[2]).toContain('9600,00 €');
+
+    // El 60 % de 500 (300 €) queda por encima de la cuantía: el límite no muerde
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(0);
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('¡Cumples todos los requisitos!');
+    expect(resultado).toContain('200,00 €/mes');
+  });
+
+  test('CASO 5 (límite exacto): 500 €/mes en municipio ≤ 10.000 hab. es a la vez el tope de renta y el punto de cruce del 60 %', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await page.getByRole('button', { name: /El municipio tiene 10\.000 habitantes o menos/ }).click();
+    // 500 € = rentaMaximaMensual.municipioPequeno.vivienda (art. 133.1.e), tope INCLUSIVE
+    await page.fill('#alquiler', '500');
+    await marcarTodosLosRequisitos(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+
+    const panel = await panelDeAhorro(page);
+    // 60 % de 500 = 300 = ayudaMaximaMensual.vivienda → mín(300; 300) = 300
+    expect(panel[0]).toContain('300,00 €');
+    // 500 − 300
+    expect(panel[1]).toContain('200,00 €');
+    // 300 × 48
+    expect(panel[2]).toContain('14.400,00 €');
+
+    // En el punto de cruce el tope porcentual IGUALA la cuantía pero no la rebaja: avisar
+    // de un límite que no ha quitado ni un céntimo confundiría más de lo que informa.
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(0);
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('¡Cumples todos los requisitos!');
+
+    // Un euro por encima del tope del municipio pequeño cae al otro lado
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await page.getByRole('button', { name: /El municipio tiene 10\.000 habitantes o menos/ }).click();
+    await page.fill('#alquiler', '501');
+    await marcarTodosLosRequisitos(page);
+
+    const aviso = norm(await page.locator('[class*="avisoRenta"]').first().innerText());
+    expect(aviso).toContain('500,00 €/mes');
+    expect(aviso).toContain('501,00 €/mes');
+    expect(aviso).toContain('municipio de 10.000 habitantes o menos');
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+  });
+
+  test('CASO 6 (rechazo): la renta escrita «1.200» a la española vale 1.200 €, no 1,20 € (candado del hallazgo 440)', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // Punto de millar español: parseSpanishNumber lo agrupa, no lo toma por decimal
+    await page.fill('#alquiler', '1.200');
+    await marcarTodosLosRequisitos(page);
+
+    const aviso = norm(await page.locator('[class*="avisoRenta"]').first().innerText());
+    // Si se leyera 1,20 € no habría aviso ninguno: quedaría 998,80 € por debajo del tope
+    expect(aviso).toContain('1200,00 €/mes');
+    expect(aviso).toContain('1000,00 €/mes');
+    expect(aviso).toContain('art. 133.1.e');
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('No cumples los requisitos obligatorios');
+    expect(resultado).toContain('1200,00 €/mes');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+  });
+
+  test('El punto de millar y la coma decimal TECLEADOS con el teclado español dan el mismo importe', async ({ browser }) => {
+    // `fill` escribe el valor de golpe; un usuario teclea. Y con el navegador en es-ES
+    // Chrome normaliza la coma del teclado al punto ANTES de que la app lo lea: esa es la
+    // ruta por la que «1,500» acababa valiendo 1,5 antes de la reparación del 02/09.
+    const ctx = await browser.newContext({ locale: 'es-ES' });
+    const page = await ctx.newPage();
+    await abrir(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+
+    await page.click('#alquiler');
+    await page.keyboard.type('450,50', { delay: 10 });
+    // 450,50 ≤ 600 → dentro · 60 % = 270,30 > 200 → ayuda = 200,00 € · 450,50 − 200 = 250,50
+    let panel = await panelDeAhorro(page);
+    expect(panel[0]).toContain('200,00 €');
+    expect(panel[1]).toContain('250,50 €');
+
+    await page.locator('#alquiler').press('Control+a');
+    await page.keyboard.type('1.200', { delay: 10 });
+    // 1.200 > 1.000 → fuera de tope, y por tanto sin panel
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(1);
+    panel = await panelDeAhorro(page);
+    expect(panel).toHaveLength(0);
+
+    await ctx.close();
+  });
+
+  test('Cuando el 60 % muerde, el acumulado de 4 años sale de la ayuda EFECTIVA', async ({ page }) => {
+    // Guardián de uno de los altos del 02/09: la tarjeta usaba el tope del programa.
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await page.fill('#alquiler', '480.75');
+
+    const panel = await panelDeAhorro(page);
+    // 60 % de 480,75 = 288,45 < 300 → manda el porcentaje
+    expect(panel[0]).toContain('288,45 €');
+    // 480,75 − 288,45
+    expect(panel[1]).toContain('192,30 €');
+    // 288,45 × 48 = 13.845,60 — NO 300 × 48 = 14.400
+    expect(panel[2]).toContain('13.845,60 €');
+    expect(panel[2]).not.toContain('14.400,00 €');
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(1);
+  });
+
+  test('Con un requisito imprescindible a «No» no se calcula ahorro, aunque la renta sea válida', async ({ page }) => {
+    // El otro alto del 02/09: el panel seguía calculando para un perfil declarado NO elegible.
+    // Índice 0 = «Tienes entre 18 y 35 años (inclusive)», bloqueante.
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await page.fill('#alquiler', '750'); // 750 ≤ 1.000: la renta no es el problema
+    await marcarTodosLosRequisitos(page, { indice: 0, valor: 'No' });
+
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('No cumples los requisitos obligatorios');
+    expect(resultado).toContain('Existe al menos un requisito imprescindible que no cumples');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la inspección del 07/09/2026 — marcados con `test.fail()`
+// Afirman lo que DEBERÍA pasar, así que hoy fallan a propósito. Cuando se reparen,
+// se les quita el `test.fail()` y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** El `featureList` del Schema.org tal y como se sirve en producción */
+async function featureListServido(page: Page): Promise<string> {
+  const respuesta = await page.request.get(RUTA);
+  const html = await respuesta.text();
+  const m = html.match(/"featureList":\[(.*?)\]/);
+  return m ? m[1] : '';
+}
+
+test.describe('Hallazgos abiertos del 07/09/2026', () => {
+  // H1 — El JSON-LD anuncia una «Guía del proceso de solicitud paso a paso por Comunidad
+  // Autónoma». La app no tiene ninguna: los 4 pasos de «Proceso de solicitud» son idénticos
+  // para toda España y la página no nombra ni una sola comunidad autónoma. El featureList
+  // es la señal estructurada que consumen Bing Copilot, ChatGPT y Perplexity para grounding:
+  // prometer ahí un desglose por CA que no existe es exactamente lo que la app repite que
+  // NO puede hacer («cada CA concreta su convocatoria»).
+  test.fail('H1 — el featureList no debe prometer una guía por comunidad autónoma que la página no tiene', async ({ page }) => {
+    await abrir(page);
+    const features = await featureListServido(page);
+    const prometeGuiaPorCA = /paso a paso por Comunidad Autónoma/.test(features);
+
+    const CCAA = [
+      'Andalucía', 'Aragón', 'Asturias', 'Baleares', 'Canarias', 'Cantabria',
+      'Castilla-La Mancha', 'Castilla y León', 'Cataluña', 'Extremadura', 'Galicia',
+      'Madrid', 'Murcia', 'Navarra', 'País Vasco', 'La Rioja', 'Comunidad Valenciana',
+    ];
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const pagina = norm(await page.locator('body').innerText());
+    const nombradas = CCAA.filter(c => pagina.includes(c)).length;
+
+    // O la guía por CA existe (nombra comunidades concretas), o no se anuncia.
+    expect(prometeGuiaPorCA && nombradas < 3).toBe(false);
+  });
+
+  // H2 — La página se contradice sobre quién fija el límite de renta. El aviso de renta y el
+  // consejo 🔍 dicen, con el art. 135 del RD 326/2026 detrás, que la CA solo puede elevar el
+  // tope «con acuerdo previo del Ministerio»; el bloque final de advertencias afirma que los
+  // «límites de renta, duración y documentación varían significativamente según tu Comunidad
+  // Autónoma». Es la misma forma del hallazgo 599: prosa que contradice al módulo sellado, y
+  // aquí empuja a un solicitante rechazado por el art. 133.1.e a creer que su CA tendrá otro
+  // tope. El plazo, además, lo fija el art. 134 (24 meses + prórroga de hasta 24), no la CA.
+  test.fail('H2 — la advertencia final no debe contradecir el art. 135 que la propia app cita', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const pagina = norm(await page.locator('body').innerText());
+
+    // Lo que la app dice donde importa (aviso de renta y consejo): el tope es estatal
+    expect(pagina).toContain('solo con acuerdo previo del Ministerio');
+    // Lo que dice el bloque de advertencias, y que no puede convivir con lo anterior
+    expect(pagina).not.toContain('límites de renta, duración y documentación varían significativamente');
+  });
+
+  // H3 — «RegionBadge» es el nombre interno del componente React de meskeIA, y se publica tal
+  // cual como característica de la app en el featureList del Schema.org que leen usuarios y
+  // buscadores. La característica real es «ayuda aplicable exclusivamente en España».
+  test.fail('H3 — el featureList no debe publicar el nombre interno de un componente', async ({ page }) => {
+    await abrir(page);
+    const features = await featureListServido(page);
+    expect(features).toContain('exclusivamente en España');
+    expect(features).not.toContain('RegionBadge');
+  });
+
+  // H4 — Dos de los cuatro escenarios del bloque educativo tienen el porcentaje TECLEADO
+  // («el 50%», «el 37,5% de la renta») mientras el de habitación lo deriva del módulo
+  // —formatNumber((ayudaMaximaMensual.habitacion / 350) * 100, 0) = 57—. Es la forma exacta
+  // del hallazgo 596, que se reparó en el plazo y en el ahorro pero no aquí. Hoy las cifras
+  // son correctas (300/600 = 50 %, 300/800 = 37,5 %), y por eso el hallazgo es un latente que
+  // solo se ve en el código: si `ayudaMaximaMensual.vivienda` pasara de 300 a 400 €, la
+  // página seguiría diciendo «400 €/mes (el 50%, por debajo del límite del 60%)» cuando serían
+  // 400/600 = 66,7 %, POR ENCIMA del tope del art. 137 — la prosa afirmaría justo lo contrario
+  // de lo que el calculador de arriba estaría haciendo. Mismo patrón en la tarjeta del panel,
+  // cuya etiqueta «Máximo en 4 años» está tecleada aunque el número salga del módulo.
+  test.fail('H4 — los porcentajes de los escenarios deben derivarse del módulo, como el de habitación', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(
+      join(process.cwd(), 'app', 'simulador-bono-joven-alquiler', 'page.tsx'),
+      'utf8',
+    );
+    expect(fuente).not.toContain('(el 50%,');
+    expect(fuente).not.toContain('(el 37,5% de la renta');
+  });
+});

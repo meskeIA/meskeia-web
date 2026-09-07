@@ -15,6 +15,14 @@ import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/f
  *     tres casos a mano sobre el catálogo antes de abrir el navegador. Los cuatro siguen
  *     cerrados. Aparecen 4 hallazgos nuevos —dos de ellos efecto colateral de esa misma
  *     reparación— en el bloque «hallazgos abiertos del 30/08/2026», con `test.fail()`.
+ *   · RE-inspección  02/09/2026 → 3 casos nuevos (bloque «re-verificación del 02/09/2026»)
+ *     y 5 hallazgos (585-589), reparados ese mismo día y con su bloque de regresión.
+ *   · RE-inspección  07/09/2026 → la batería entera pasa en verde (42/42) antes de tocar
+ *     nada: ningún `test.fail()` abierto y ninguna regresión, así que los tres hallazgos
+ *     altos del 02/09 siguen cerrados. Tres casos nuevos en el bloque «inspección del
+ *     07/09/2026» y 6 hallazgos nuevos en «hallazgos abiertos del 07/09/2026», con
+ *     `test.fail()`. Cuatro de los seis son el mecanismo del hallazgo 423 sobreviviendo
+ *     en familias de sinónimos que su CANDADO no alcanza a ver.
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -1276,5 +1284,291 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
     await expect(filtroA).toHaveCount(1);
     // Y el nombre ya no es la letra suelta.
     await expect(page.getByRole('button', { name: 'A', exact: true })).toHaveCount(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 07/09/2026 — tres casos NUEVOS, resueltos A MANO sobre el catálogo
+// servido ANTES de abrir el navegador, más los hallazgos que destaparon.
+//
+// La batería anterior (42 tests) se ejecutó entera antes de escribir nada: 42 en verde,
+// ningún `test.fail()` abierto, ninguna regresión. Los tres hallazgos altos del 02/09
+// —el código de cuatro dígitos leído siempre como CNAE-2009, el aviso que llamaba «clase
+// VIGENTE distinta» a la equivalencia directa, y el reparto de sinónimos— siguen cerrados.
+//
+// De dónde sale cada valor esperado (nunca de lo que devuelve la app):
+//   · `public/datos/cnae-iae-catalogo.json`, generado desde el RD 10/2025 del INE (clases
+//     de la CNAE-2025 y correspondencia oficial con la CNAE-2009, directa e inversa) y
+//     desde el RD Legislativo 1175/1990 (Tarifas del IAE, texto consolidado del BOE). Son
+//     las fuentes que la app declara en `meta.cnae.fuente` / `meta.iae.fuente` y que
+//     `data/fiscal/cnae-iae.ts` sella con su contrato de vigilancia.
+//   · El ORDEN se dedujo de la lógica documentada en `page.tsx` (relevancia → PESO_TIPO_IAE
+//     → sección → localeCompare numérico del código), no de la pantalla.
+//   · Los textos de retención, de SECCIONES_IAE, importado en la cabecera del fichero.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — inspección del 07/09/2026', () => {
+  test('CASO 1 (normal) — «traductor» cae en 74.30 en la CNAE y en el grupo 774 de la Sección 2ª del IAE', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // ── CNAE-2025, resuelto a mano: «traductor» solo aparece en la clase 74.30, y en ella
+    //    a través de sus sinónimos («traductor», «traductor jurado», «traductora») además
+    //    del propio título «Actividades de traducción e interpretación». Ninguna otra
+    //    entrada del catálogo lleva esa cadena, así que el resultado ha de ser UNO.
+    //    Jerarquía del catálogo: sección N → división 74 → grupo 74.3.
+    //    correspondenciaInversa['7430'] = ['74.30'] → equivalencia uno a uno con la 2009.
+    await buscarCnae(page, 'traductor');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page)).toHaveCount(1);
+
+    const clase = fichas(page).first();
+    await expect(clase).toContainText('74.30');
+    await expect(clase).toContainText('Actividades de traducción e interpretación');
+    await expect(clase).toContainText('Clase');
+    await expect(clase).toContainText('Sección N: ACTIVIDADES PROFESIONALES, CIENTÍFICAS Y TÉCNICAS');
+    await expect(clase).toContainText('División 74: Otras actividades profesionales, científicas y técnicas');
+    await expect(clase).toContainText('Grupo 74.3: Actividades de traducción e interpretación');
+    await expect(clase).toContainText('traductor jurado');
+    await expect(clase).toContainText('En la CNAE-2009 esto correspondía a 7430.');
+
+    // ── Tarifas del IAE, búsqueda independiente. RD Leg. 1175/1990, Sección 2ª:
+    //      División 7    PROFESIONALES RELACIONADOS CON LAS ACTIVIDADES FINANCIERAS,
+    //                    JURÍDICAS, DE SEGUROS Y DE ALQUILERES
+    //      Agrupación 77 Profesionales de actividades diversas
+    //      Grupo 774     Traductores e Intérpretes   ← sin epígrafes por debajo
+    //    Es el caso con más consecuencia práctica de esta app: al ser Sección 2ª, sus
+    //    facturas a empresas y profesionales llevan retención de IRPF.
+    await buscarIae(page, 'traductor');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page)).toHaveCount(1);
+
+    const grupo = fichas(page).first();
+    await expect(grupo).toContainText('774');
+    await expect(grupo).toContainText('Traductores e Intérpretes');
+    await expect(grupo).toContainText('Sección 2ª');
+    await expect(grupo).toContainText('Grupo');
+    await expect(grupo).toContainText(
+      'División 7: PROFESIONALES RELACIONADOS CON LAS ACTIVIDADES FINANCIERAS, JURÍDICAS, DE SEGUROS Y DE ALQUILERES',
+    );
+    await expect(grupo).toContainText('Agrupación 77: Profesionales de actividades diversas');
+    await expect(grupo).toContainText(SECCION_2.retencion);
+    expect(SECCION_2.retencionIrpf).toBe(true);
+  });
+
+  test('CASO 2 (límite) — «411» es dos actividades distintas en dos secciones, y la sección decide la retención', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // El código ambiguo que de verdad tiene esta app: 107 códigos de las Tarifas existen en
+    // MÁS DE UNA sección, y 65 de ellos a nivel de grupo o epígrafe. El 411 es el más
+    // elocuente porque las dos actividades no se parecen en nada y la consecuencia fiscal
+    // es opuesta:
+    //   Sección 1ª · División 4 OTRAS INDUSTRIAS MANUFACTURERAS · Agrupación 41 Industrias
+    //     de productos alimenticios y bebidas · Grupo 411 Fabricación y envasado de aceite
+    //     de oliva  → empresarial, SIN retención
+    //   Sección 2ª · División 4 PROFESIONALES RELACIONADOS CON LA CONSTRUCCIÓN ·
+    //     Agrupación 41 Arquitectos e Ingenieros Superiores de Caminos, Canales y Puertos ·
+    //     Grupo 411 Arquitectos → profesional, CON retención
+    // Enseñar solo una de las dos sería elegir por quien se da de alta.
+    //
+    // Orden resuelto a mano: los dos grupos cuyo código ES la consulta van primero
+    // (relevancia 0) y entre ellos ordena la sección (1ª antes que 2ª); después los tres
+    // epígrafes 411.1/411.2/411.3, que solo empiezan por la consulta (relevancia 1).
+    // Cinco resultados en total, por debajo del corte de 10: se ven todos.
+    await buscarIae(page, '411');
+    await expect(contador(page)).toHaveText(/^5 resultados/);
+    await expect(fichas(page)).toHaveCount(5);
+
+    const aceite = fichas(page).nth(0);
+    await expect(aceite).toContainText('411');
+    await expect(aceite).toContainText('Fabricación y envasado de aceite de oliva');
+    await expect(aceite).toContainText('Sección 1ª');
+    await expect(aceite).toContainText('División 4: OTRAS INDUSTRIAS MANUFACTURERAS');
+    await expect(aceite).toContainText('Agrupación 41: Industrias de productos alimenticios y bebidas');
+    await expect(aceite).toContainText(SECCION_1.retencion);
+
+    const arquitectos = fichas(page).nth(1);
+    await expect(arquitectos).toContainText('411');
+    await expect(arquitectos).toContainText('Arquitectos');
+    await expect(arquitectos).toContainText('Sección 2ª');
+    await expect(arquitectos).toContainText('División 4: PROFESIONALES RELACIONADOS CON LA CONSTRUCCIÓN');
+    await expect(arquitectos).toContainText(
+      'Agrupación 41: Arquitectos e Ingenieros Superiores de Caminos, Canales y Puertos',
+    );
+    await expect(arquitectos).toContainText(SECCION_2.retencion);
+
+    // Los tres epígrafes de la 1ª, en orden numérico y colgando de su grupo.
+    await expect(fichas(page).nth(2)).toContainText('411.1');
+    await expect(fichas(page).nth(2)).toContainText('Grupo 411: Fabricación y envasado de aceite de oliva');
+    await expect(fichas(page).nth(3)).toContainText('411.2');
+    await expect(fichas(page).nth(3)).toContainText('Fabricación de aceite de oliva');
+    await expect(fichas(page).nth(4)).toContainText('411.3');
+    await expect(fichas(page).nth(4)).toContainText('Envasado de aceite de oliva');
+  });
+
+  test('CASO 3 (debe rechazarse) — «505.9» y «62.15» no existen, y la app no se inventa nada', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // 505.9 es la errata verosímil de esta app: el grupo 505 «Acabado de obras» llega hasta
+    // el 505.7 y la propia guía educativa cita el 505.6. Nada en las Tarifas empieza por
+    // 5059 ni lleva «505.9» en su texto: cero resultados, sin epígrafe aproximado.
+    await buscarIae(page, '505.9');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+
+    // 62.15 tampoco existe: la división 62 solo tiene las clases 62.10, 62.20 y 62.90, y
+    // «6215» no es clave de la tabla de correspondencia de la CNAE-2009. Lo importante en
+    // una app de nivel 1 crítico es que NO aparezca el aviso de código antiguo: presentar
+    // una equivalencia inventada es peor que no dar ninguna.
+    await buscarCnae(page, '62.15');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 07/09/2026 — marcados con `test.fail()`: afirman lo que
+// DEBERÍA ocurrir, así que hoy fallan a propósito. El día que se reparen pasarán a
+// ROJO («expected to fail, but passed»): entonces se les quita la marca y quedan
+// como regresión, sin reescribir el valor esperado.
+//
+// Los cuatro primeros son el MISMO mecanismo del hallazgo 423 —el término coloquial
+// se asignó al PRIMER destino de la tabla CNAE-2009 → CNAE-2025 en vez de al destino
+// que describe la actividad—, que aquella reparación drenó en las familias sanitaria y
+// administrativa pero dejó vivo en otras cuatro. El CANDADO que quedó de aquel hallazgo
+// no las ve porque compara raíces de SEIS caracteres: «lavandería» da «lavand» y el
+// título del hermano correcto dice «Lavado», que da «lavado». La forma del defecto es la
+// misma; lo que falla es el detector.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 07/09/2026', () => {
+  test('«lavandería» debe llevar a 96.10, la clase que la nombra, y no a una clase de mensajería', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // correspondencia['9601'] (Lavado y limpieza de prendas textiles y de piel, CNAE-2009)
+    // reparte en TRES clases de la CNAE-2025: 53.20 «Otras actividades postales y de
+    // mensajería», 96.10 «Lavado y limpieza de prendas de tela y de piel» y 96.91
+    // «Prestación de servicios personales domésticos». Los cinco términos de lavandería
+    // están en la PRIMERA, que es transporte y almacenamiento (sección H); la que lleva la
+    // actividad en su título oficial es la segunda, en la sección T, y su único sinónimo
+    // hoy es «limpieza en seco», así que por la palabra corriente no se llega a ella.
+    await buscarCnae(page, 'lavandería');
+    await expect(fichas(page).first()).toContainText('96.10');
+    await expect(fichas(page).first()).toContainText('Lavado y limpieza de prendas de tela y de piel');
+
+    // Misma familia, mismo destino equivocado.
+    for (const termino of ['tintorería', 'planchado', 'lavar ropa']) {
+      await buscarCnae(page, termino);
+      await expect(fichas(page).first()).toContainText('96.10');
+    }
+  });
+
+  test('«tienda de motos» y «taller de motos» deben llevar al comercio minorista y al taller, no a intermediarios del comercio al por mayor', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // correspondencia['4540'] (Venta, mantenimiento y reparación de motocicletas y de sus
+    // repuestos, CNAE-2009) reparte en 46.18, 46.73, 46.89, 47.83, 47.92 y 95.32. Los seis
+    // términos coloquiales están en la PRIMERA —46.18 «Actividades de intermediarios del
+    // comercio al por MAYOR de otros productos específicos»—, cuando el catálogo tiene
+    // 47.83 «Comercio al por menor de motocicletas, y repuestos y accesorios de
+    // motocicletas» y 95.32 «Reparación y mantenimiento de motocicletas» en esa misma
+    // correspondencia. Al dueño de una tienda de motos se le dice que es un intermediario
+    // mayorista, que es otro sector y otra sección de la CNAE.
+    await buscarCnae(page, 'tienda de motos');
+    await expect(fichas(page).first()).toContainText('47.83');
+    await expect(fichas(page).first()).toContainText('Comercio al por menor de motocicletas');
+
+    await buscarCnae(page, 'taller de motos');
+    await expect(fichas(page).first()).toContainText('95.32');
+    await expect(fichas(page).first()).toContainText('Reparación y mantenimiento de motocicletas');
+  });
+
+  test('«no encuentro mi actividad» debe caer en la clase residual 74.99, no en la de agentes de patentes', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // correspondencia['7490'] reparte en 74.91 «Actividades de los agentes de patentes y de
+    // los servicios de marketing», 74.99 «Todas las demás actividades profesionales,
+    // científicas y técnicas n.c.o.p.» y 80.09. El término que el propio diccionario pone
+    // como red de seguridad para quien no se reconoce en ninguna clase está en la PRIMERA,
+    // que es justo la especializada; la residual es la segunda, y su literal lo dice.
+    await buscarCnae(page, 'no encuentro mi actividad');
+    await expect(fichas(page).first()).toContainText('74.99');
+    await expect(fichas(page).first()).toContainText(
+      'Todas las demás actividades profesionales, científicas y técnicas',
+    );
+
+    // Mismo caso: tasar no es gestionar patentes ni prestar servicios de marketing.
+    await buscarCnae(page, 'perito tasador');
+    await expect(fichas(page).first()).toContainText('74.99');
+  });
+
+  test('«montaje de maquinaria» debe llevar a 33.20, que es la clase de instalar máquinas', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // 43.23 es «Instalación de aislamientos» (sección F, construcción) y arrastra los
+    // términos «montaje de maquinaria» e «instalador industrial». El catálogo tiene 33.20
+    // «Instalación de máquinas y equipos industriales» (sección C), cuyo título oficial
+    // nombra la actividad, y a esa clase no se llega por ninguna palabra corriente.
+    await buscarCnae(page, 'montaje de maquinaria');
+    await expect(fichas(page).first()).toContainText('33.20');
+    await expect(fichas(page).first()).toContainText('Instalación de máquinas y equipos industriales');
+  });
+
+  test('«Ver los N» debe soltarse al cambiar de consulta, no volcar el catálogo entero', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // `verTodosCnae` se pone a true al desplegar y no se reinicia cuando cambia la
+    // consulta: tras desplegar las 32 clases de la correspondencia de 4791, escribir
+    // «comercio» pinta sus 106 fichas de una vez y el contador deja de ofrecer el corte,
+    // de modo que no hay forma de volver a la vista de 10 sin recargar la página.
+    await buscarCnae(page, '4791');
+    await expect(fichas(page)).toHaveCount(10);
+    await page.getByRole('button', { name: /^Ver los / }).click();
+    await expect(fichas(page)).toHaveCount(32);
+
+    await buscarCnae(page, 'comercio');
+    await expect(fichas(page)).toHaveCount(10);
+    await expect(contador(page)).toContainText('se muestran los 10 primeros');
+  });
+
+  test('la norma del IAE de la tabla comparativa debe salir de data/fiscal, como ya sale la de la CNAE', async () => {
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'), 'utf8');
+
+    // La fila «Norma de referencia» de la comparativa deriva la celda de la CNAE de
+    // CNAE_VIGENCIA desde el hallazgo 586, y escribe la del IAE a mano: «RD Legislativo
+    // 1175/1990 y modificaciones». `page.tsx` ya importa FISCAL_CNAE_IAE_META, que publica
+    // esa misma norma en `.iae.fuente` con su contrato de vigilancia, así que hoy coinciden
+    // por casualidad y no por construcción — exactamente el defecto que se reparó del otro
+    // lado de la misma fila.
+    expect(FISCAL_CNAE_IAE_META.iae.fuente).toContain('RD Legislativo 1175/1990');
+    expect(fuente).not.toContain('RD Legislativo 1175/1990');
   });
 });

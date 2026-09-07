@@ -34,6 +34,12 @@
  *      con un perfil de comprador que ninguna ronda había elegido, la escala de Baleares en
  *      su tramo MÁS ALTO (el 13 %, el techo de toda la tabla) y la plusvalía municipal a la
  *      que le falta UN solo dato. Al final, UN hallazgo abierto con `test.fail()`.
+ *  10. RE-INSPECCIÓN 07/09/2026 — CASOS 17-19, posterior a la reparación del clúster de
+ *      compraventa (commit 0dba12c9) y a la del recargo del art. 27.2 LGT (13d2181b).
+ *      Territorio y perfil nuevos otra vez: Cantabria con familia numerosa, la FRONTERA
+ *      exacta de la escala de Aragón (400.000 €, donde un `<` en vez de `<=` se lleva el
+ *      segundo tramo por delante) y unos años de propiedad NEGATIVOS. Al final, CINCO
+ *      hallazgos abiertos con `test.fail()`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -793,9 +799,18 @@ test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
   }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-    const consejo = await texto(page.getByText(/recargos/i).first());
+    // 07/09/2026 — el localizador buscaba la palabra «recargos» EN PLURAL, y la reparación
+    // del art. 27.2 LGT (commit 13d2181b) reescribió el consejo en singular: «genera recargo
+    // desde el primer día: un 1% de partida más otro 1% por cada mes completo». El texto es
+    // hoy MÁS correcto que cuando se escribió esta aserción —antes se comía el 1% de partida—,
+    // así que lo que se corrige es el localizador, no la app: se ancla en el título del
+    // consejo, que no depende de cómo esté redactada la escala.
+    const consejo = await texto(page.getByText(/Liquida los impuestos a tiempo/i).first().locator('xpath=..'));
     expect(consejo).not.toMatch(/5\s*%?\s*al\s*20\s*%/);
     expect(consejo).toMatch(/1\s*%.*mes|15\s*%/);
+    // Y el 1 % de partida, que es lo que faltaba hasta el 07/09/2026 en los cuatro sitios
+    // que componían el texto desde la constante.
+    expect(consejo).toMatch(/1\s*%\s*de partida/);
   });
 
   // ✅ REPARADO 27/08 (medio) — accesibilidad. REPARACIÓN A MEDIAS del hallazgo 85 (21/08/2026).
@@ -1650,3 +1665,367 @@ test(
     expect(neto).not.toContain('valor catastral del suelo');
   },
 );
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 07/09/2026 — la cola la reabrió tras la reparación del clúster de
+// compraventa (commit 0dba12c9) y la del recargo del art. 27.2 LGT (13d2181b), que
+// tocó el bloque educativo de esta app.
+//
+// Tres casos NUEVOS, resueltos a mano ANTES de tocar el navegador, en territorio y
+// perfil que ninguna ronda anterior había usado (Cantabria y Aragón; 55.000 €,
+// 400.000 € y 450.000 €), para que ninguna cifra pueda venir copiada de un caso ya
+// escrito.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//  - Tipo general de Cantabria (9 %) y de Aragón (8 %) → `TIPOS_ITP_CCAA_2025` en
+//    `data/fiscal/inmuebles.ts`, leído por `tipoGeneralDe()` en `data/itp-ccaa.ts`.
+//  - Escala progresiva de Aragón → `ITP_CCAA.aragon.tramosProgresivos`
+//    ([{ hasta: 400000, tipo: 8 }, { hasta: Infinity, tipo: 10 }]).
+//  - Tipos reducidos de Cantabria y sus condiciones → `ITP_CCAA.cantabria.tiposReducidos`.
+//    Ninguno se aplica: los tres que casan con «familia numerosa» exigen «Vivienda
+//    habitual», y `elegirTipoITP` recibe `viviendaHabitual: false` porque un trastero
+//    suelto nunca lo es.
+//  - Aranceles → `ARANCELES_NOTARIO` (RD 1426/1989 nº 2) × `FACTURA_NOTARIAL`
+//    (×1,5 a ×2; la tarjeta enseña el punto medio ×1,75) y `ARANCELES_REGISTRO`
+//    (RD 1427/1989 nº 2) + `REGISTRO_CONCEPTOS` (presentación 6,010121 € y nota simple
+//    3,005061 €). Ambos terminan en `× 1.21` de IVA.
+//  - Ganancia patrimonial e IRPF → `calcularGananciaInmueble` (arts. 34-36 LIRPF) sobre
+//    `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000).
+//  - Plusvalía municipal → `calcularPlusvaliaMunicipal` sobre `COEFICIENTES_IIVTNU_2025`
+//    y `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` (25 %).
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala de Aragón y unos años negativos', () => {
+  /**
+   * CASO 17 (NORMAL) — Cantabria, comunidad que ninguna ronda había ejercitado, con el
+   * perfil «Familia numerosa», que hasta hoy solo se había probado en el País Vasco con
+   * discapacidad. Precio 55.000 €, dentro del tercer tramo de los dos aranceles, y una
+   * gestoría distinta de la que trae por defecto (250 € en vez de 300 €).
+   *
+   * Lo que se comprueba de fondo: que un perfil con derecho a un 4 % NO se lo lleve, porque
+   * los tres reducidos de Cantabria que casan con «familia» exigen vivienda habitual y un
+   * trastero suelto no lo es. Equivocarse aquí por defecto son 2.750 € de menos en el
+   * presupuesto (55.000 × 4 % = 2.200 frente a 55.000 × 9 % = 4.950).
+   */
+  test('CASO 17 (normal) — Cantabria, segunda mano, 55.000 €, familia numerosa', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('cantabria');
+    await selectPerfil(page).selectOption('familia-numerosa');
+    await rellenar(page, 'Precio del trastero', '55000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '250');
+
+    // ITP = 55.000 × 9 % = 4.950. El 9 % es TIPOS_ITP_CCAA_2025 → { ccaa: 'Cantabria', tipo: 9 }.
+    // Cantabria no tiene escala progresiva, así que el tipo efectivo coincide con el nominal.
+    expect(await valorTarjeta(page, 'ITP (9,00%)')).toBe('4950,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (9,00%)')).toContain('Cantabria');
+
+    // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
+    //   tramo 1 (hasta 6.010,12 €)             →                              90,15
+    //   tramo 2 (6.010,12→30.050,61, 0,45 %)   → 24.040,49 × 0,0045 =        108,182205
+    //   tramo 3 (30.050,61→55.000, 0,15 %)     → 24.949,39 × 0,0015 =         37,424085
+    //   arancel sin IVA                        =                             235,75629
+    //   con el 21 % de IVA                     = 235,75629 × 1,21 =          285,2651109
+    // FACTURA_NOTARIAL: ×1,5 = 427,89766635 · ×2 = 570,5302218 · medio ×1,75 = 499,213944075
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('499,21 €');
+    const notaria17 = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria17).toContain('427,90 €');
+    expect(notaria17).toContain('570,53 €');
+
+    // Registro — RD 1427/1989, números 1, 2 y 4:
+    //   tramo 1 (hasta 6.010,12 €)             →                              24,04
+    //   tramo 2 (6.010,12→30.050,61, 0,175 %)  → 24.040,49 × 0,00175 =         42,0708575
+    //   tramo 3 (30.050,61→55.000, 0,125 %)    → 24.949,39 × 0,00125 =         31,1867375
+    //   inscripción (número 2)                 =                              97,297595
+    //   + presentación 6,010121 + nota simple 3,005061 =                     106,312777
+    //   con el 21 % de IVA                     = 106,312777 × 1,21 =         128,63846017
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('128,64 €');
+
+    // En segunda mano no hay AJD: ITP y cuota gradual de AJD son incompatibles.
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('250,00 €');
+
+    // Total = 4.950 + 499,21 + 128,64 + 250 = 5.827,85 (líneas ya redondeadas al céntimo)
+    //   % sobre el precio = 5.827,85 / 55.000 = 10,5960909 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('5827,85 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,60%');
+    // Coste total = 55.000 + 5.827,85 = 60.827,85
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('60.827,85 €');
+
+    // Y el 4 % que NO se ha aplicado tiene que enseñarse como oportunidad, con sus
+    // requisitos: los dos de «familia» (que exigen vivienda habitual) y el de municipios
+    // despoblados, que no la exige y por eso también entra en `alAlcanceDeCualquiera`.
+    const aviso = await texto(page.locator('p', { hasText: 'Podrías pagar menos' }).first().locator('xpath=..'));
+    expect(aviso).toContain('4,00% — Familia numerosa');
+    expect(aviso).toContain('4,00% — Familia monoparental');
+    expect(aviso).toContain('4,00% — Municipios despoblados');
+    expect(aviso).toContain('Vivienda habitual');
+  });
+
+  /**
+   * CASO 18 (LÍMITE) — la FRONTERA exacta de una escala progresiva, que es donde un `<` en
+   * lugar de un `<=` se lleva por delante el tramo siguiente o cobra de más. Aragón parte
+   * en 400.000 € (8 % → 10 %), así que se prueba justo encima de la raya y 50.000 € más
+   * arriba, donde el segundo tramo ya tiene que morder.
+   *
+   * A 400.000 € el tipo efectivo debe seguir siendo 8,00 % clavado; a 450.000 €, 8,22 %.
+   * Si la app aplicara el tipo plano del primer tramo a todo (el defecto que `importeITP`
+   * vino a cerrar), a 450.000 € cobraría 36.000 € en vez de 37.000 €.
+   */
+  test('CASO 18 (límite) — Aragón, la raya de los 400.000 € entre el 8 % y el 10 %', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('aragon');
+    await selectPerfil(page).selectOption('general');
+    await rellenar(page, 'Precio del trastero', '400000');
+
+    // El recuadro de la comunidad tiene que anunciar la escala que luego aplica.
+    expect(await texto(page.locator('p', { hasText: 'escala progresiva (' }).first())).toContain('8% → 10%');
+
+    // ITP a 400.000 € exactos = 400.000 × 8 % = 32.000. El segundo tramo empieza DESPUÉS:
+    // `calcularITPProgresivo` agota el primero (baseTramo = 400.000 − 0) y sale del bucle
+    // porque al segundo le queda base 0.
+    expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('32.000,00 €');
+
+    // Notaría — ARANCELES_NOTARIO hasta el quinto tramo:
+    //   90,15 + 24.040,49×0,0045 + 30.050,60×0,0015 + 90.151,82×0,001 + 249.746,97×0,0005
+    //   = 90,15 + 108,182205 + 45,0759 + 90,15182 + 124,873485 = 458,43341
+    //   con IVA = 554,7044261 · ×1,5 = 832,05663915 · ×2 = 1.109,4088522 · medio = 970,732745675
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('970,73 €');
+    const notaria18 = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria18).toContain('832,06 €');
+    expect(notaria18).toContain('1109,41 €');
+
+    // Registro — ARANCELES_REGISTRO hasta el quinto tramo:
+    //   24,04 + 24.040,49×0,00175 + 30.050,60×0,00125 + 90.151,82×0,00075 + 249.746,97×0,0003
+    //   = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 74,924091 = 246,2120635
+    //   + 6,010121 + 3,005061 = 255,2272455 · con IVA = 308,8249671
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('308,82 €');
+
+    // Total = 32.000 + 970,73 + 308,82 + 300 (gestoría por defecto) = 33.579,55
+    //   % sobre el precio = 33.579,55 / 400.000 = 8,3948875 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('33.579,55 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,39%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('433.579,55 €');
+
+    // Los tres reducidos de Aragón son todos de colectivo (joven, familia numerosa,
+    // discapacidad) y ninguno queda «al alcance de cualquiera», así que con perfil general
+    // no hay nada que ofrecer: la caja de oportunidades NO debe pintarse.
+    await expect(page.locator('p', { hasText: 'Podrías pagar menos' })).toHaveCount(0);
+
+    // 50.000 € por encima de la raya, el segundo tramo ya muerde:
+    //   400.000 × 8 % + 50.000 × 10 % = 32.000 + 5.000 = 37.000
+    //   tipo EFECTIVO = 37.000 / 450.000 = 8,2222 % (el nominal, 8 %, mentiría)
+    await rellenar(page, 'Precio del trastero', '450000');
+    expect(await valorTarjeta(page, 'ITP (8,22%)')).toBe('37.000,00 €');
+    // Notaría: 483,43341 × 1,21 = 584,9544261 → medio ×1,75 = 1.023,669245675
+    // Registro: 261,2120635 + 9,015182 = 270,2272455 → ×1,21 = 326,97496706
+    // Total = 37.000 + 1.023,67 + 326,97 + 300 = 38.650,64
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('38.650,64 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('488.650,64 €');
+  });
+
+  /**
+   * CASO 19 (DEBE RECHAZARSE) — años de propiedad NEGATIVOS, tecleados mientras el campo
+   * conserva el foco, que es cuando el `min={1}` de NumberInput todavía no ha actuado.
+   *
+   * Por qué importa: `aniosPropiedad` se lee con `parseInt`, y el motor de la plusvalía
+   * acota con `Math.min(Math.max(anios, 1), 20)`. Si la guarda del `useMemo` dejara pasar
+   * un −5, el −5 se convertiría en el coeficiente de UN año (0,13) y la app publicaría una
+   * plusvalía de aspecto normal a partir de un dato imposible. Lo correcto es tratarlo como
+   * dato que falta —igual que el campo vacío del CASO 16— y decirlo.
+   *
+   * El resto de la pestaña sí tiene que calcular: el IRPF no depende de los años.
+   */
+  test('CASO 19 (debe rechazarse) — unos años de propiedad negativos no son un año de tenencia', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '24000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '14000');
+    await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo', '1200');
+    await rellenar(page, 'Valor catastral del suelo', '5000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '12000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '4');
+    await rellenar(page, 'Gestoría y certificados del vendedor (€)', '350');
+    // Sin blur: el min={1} de NumberInput aún no ha corregido el valor.
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+    await anios.fill('-5');
+
+    // La plusvalía NO se calcula, y no se calcula con el coeficiente de 1 año (0,13), que
+    // habría dado 5.000 × 0,13 × 25 % = 162,50 €.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('años de propiedad');
+
+    // Lo que sí se calcula (art. 35 LIRPF), con la plusvalía a 0 porque falta:
+    //   valor de adquisición = 14.000 + 1.200 = 15.200
+    //   comisión = 24.000 × 4 % = 960 · gestoría del vendedor = 350
+    //   valor de transmisión = 24.000 − 960 − 350 − 0 = 22.690
+    //   ganancia = 22.690 − 15.200 = 7.490
+    //   IRPF = 6.000 × 19 % + 1.490 × 21 % = 1.140 + 312,90 = 1.452,90
+    //   total gastos = 0 + 960 + 350 + 1.452,90 = 2.762,90 · neto = 24.000 − 2.762,90
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('15.200,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('22.690,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7490,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1452,90 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4%)')).toBe('960,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2762,90 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.237,10 €');
+    // Y el neto se anuncia como techo, nombrando el campo que de verdad falta.
+    const neto19 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(neto19).toContain('Techo');
+    expect(neto19).toContain('los años de propiedad');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 07/09/2026 — CINCO.
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a
+// propósito. Al repararlos hay que QUITAR la marca, no borrar el test.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ❌ ABIERTO (medio) — accesibilidad.
+// El aviso de la modalidad «Independiente» lleva el color escrito a mano en un `style`
+// inline (`color: '#856404'`, page.tsx:516) en vez del token `var(--text-secondary)` que usa
+// su hermana del mismo panel. En modo oscuro ese marrón queda rgb(133,100,4) sobre el
+// rgb(42,42,42) del panel: contraste 2,61:1, cuando WCAG AA pide 4,5:1 para texto normal
+// (0,85rem). La nota hermana, con el token, rinde rgb(176,176,176) sobre el mismo fondo.
+// No es decorativo: es el párrafo que avisa de que el trastero independiente paga el 21 %
+// y no el 10 %, o sea la diferencia entre 1.200 € y 2.520 € en un trastero de 12.000 €.
+// El CLAUDE.md global §6 exige el modo oscuro completo, y un color literal no lo tiene.
+// Caso: modo oscuro (botón «Cambiar a modo oscuro») · Primera mano · Modalidad
+//       «Independiente» → esperado contraste ≥ 4,5:1 · obtenido 2,61:1.
+test.fail(
+  'HALLAZGO 07/09 (accesibilidad) — el aviso de modalidad se pinta con un color literal ilegible en oscuro',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+    const ratio = await page.evaluate(() => {
+      const luminancia = (css: string) => {
+        const [r, g, b] = (css.match(/[\d.]+/g) as string[]).slice(0, 3).map(Number).map((v) => {
+          const s = v / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const p = Array.from(document.querySelectorAll('p')).find((e) =>
+        /el trastero independiente tributa al/.test(e.textContent || ''),
+      );
+      if (!p) return 0;
+      let fondo: string | null = null;
+      let el: HTMLElement | null = p.parentElement;
+      while (el && !fondo) {
+        const bg = getComputedStyle(el).backgroundColor;
+        if (bg && !/rgba\(0, 0, 0, 0\)/.test(bg) && !/, 0\)$/.test(bg)) fondo = bg;
+        el = el.parentElement;
+      }
+      const l1 = luminancia(getComputedStyle(p).color);
+      const l2 = luminancia(fondo || 'rgb(255, 255, 255)');
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    });
+
+    expect(ratio).toBeGreaterThanOrEqual(4.5);
+  },
+);
+
+// ❌ ABIERTO (bajo) — contenido.
+// La tarjeta de plusvalía compone el aviso como «No calculada (falta ...)» y le pega detrás
+// una lista, así que en cuanto lo que falta es un plural —o son dos campos— el verbo no
+// concuerda: «No calculada (falta los años de propiedad)» y «No calculada (falta el valor
+// catastral del suelo, los años de propiedad)». Es el texto que se lee al lado de un
+// «SIN CALCULAR» en una app fiscal.
+// Caso: pestaña Vendedor · venta 24.000 € · compra 14.000 € · suelo 5.000 € · total
+//       catastral 12.000 € · años de propiedad VACÍOS → esperado «faltan los años de
+//       propiedad» · obtenido «No calculada (falta los años de propiedad)».
+test.fail(
+  'HALLAZGO 07/09 (contenido) — «falta los años de propiedad» no concuerda en número',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '24000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '14000');
+    await rellenar(page, 'Valor catastral del suelo', '5000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '12000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toMatch(/faltan los años de propiedad/);
+  },
+);
+
+// ❌ ABIERTO (bajo) — contenido.
+// Cuando lo único que falta es el precio de compra original, ese campo bloquea a la vez la
+// plusvalía y el IRPF, y el aviso del neto lo pide DOS VECES en la misma frase: «Techo: aún
+// NO incluye la plusvalía municipal (añade el precio de compra original) ni el IRPF de la
+// ganancia (añade el precio de compra original)». Se construye concatenando dos avisos que
+// nombran cada uno sus campos, sin mirar si coinciden.
+// Caso: pestaña Vendedor · venta 24.000 € · suelo 5.000 € · años 10 · precio de compra
+//       VACÍO → esperado que el campo se pida una sola vez · obtenido dos veces en la
+//       misma descripción, sobre un neto de 23.280,00 €.
+test.fail(
+  'HALLAZGO 07/09 (contenido) — el aviso del neto pide dos veces el mismo campo',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '24000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Valor catastral del suelo', '5000');
+    await rellenar(page, 'Años de propiedad', '10');
+
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('23.280,00 €');
+    const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    const veces = neto.split('el precio de compra original').length - 1;
+    expect(veces).toBe(1);
+  },
+);
+
+// ❌ ABIERTO (bajo) — dato.
+// El sello `DataReference` de la plusvalía cierra su nota con «El IRPF de la ganancia usa
+// los tramos del ahorro de 2025 (19 % a 30 %)», con el rango TECLEADO A MANO, mientras la
+// propia página ya lo deriva de `TRAMOS_GANANCIAS_PATRIMONIALES_2025` en `TIPO_AHORRO_MIN`
+// y `TIPO_AHORRO_MAX` y lo publica cuatro tarjetas más abajo («Tributación en base del
+// ahorro (19%-30%)») y en la tabla comparativa. Hoy los dos dicen lo mismo; el día que se
+// mueva el tramo del 30 % se moverán los derivados y el sello se quedará atrás, que es
+// justo lo que un sello de verificación no puede hacer. Es el hallazgo 592 sin terminar de
+// drenar: aquella reparación derivó los extremos y dejó fuera el sello.
+// Caso: `app/simulador-gastos-compraventa-trastero/page.tsx` → esperado que el rango salga
+//       de TIPO_AHORRO_MIN/TIPO_AHORRO_MAX · obtenido el literal «(19 % a 30 %)» en el
+//       `nota` del segundo DataReference, visible en pantalla junto al sello de la IIVTNU.
+test.fail('HALLAZGO 07/09 (dato) — el sello de la plusvalía teclea a mano el rango del ahorro', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const fuente = readFileSync(
+    join(process.cwd(), 'app', 'simulador-gastos-compraventa-trastero', 'page.tsx'),
+    'utf8',
+  );
+  expect(fuente).not.toContain('(19 % a 30 %)');
+});
+
+// ❌ ABIERTO (bajo) — dato.
+// El IVA del trastero VINCULADO se calcula con `IVA_INMUEBLES_2025.garageCon`, que en
+// `data/fiscal/inmuebles.ts` está documentado como «IVA garaje incluido con la vivienda
+// (hasta 2 plazas)» —una regla del garaje, con su propio límite de plazas—, mientras el
+// botón «Primera mano», la nota de cabecera, la tabla comparativa, la FAQ y el JSON-LD de
+// `metadata.ts` anuncian ese mismo tipo desde `obraNueva`. La propia tabla de la página
+// reparte las dos constantes al revés de como calcula: fila «Trastero vinculado a vivienda»
+// → `obraNueva`; fila «Garaje / Plaza de parking» → `garageCon`. Las dos valen 10 hoy, así
+// que no hay divergencia visible; existen separadas precisamente para poder divergir.
+// Caso: Primera mano · Vinculado · Madrid · 12.000 € → la tarjeta cobra 1.200,00 € y se
+//       describe «IVA 10% — anejo transmitido con la vivienda» leyendo `garageCon`, mientras
+//       el botón de al lado dice «Paga IVA 10%» leyendo `obraNueva`. Esperado: una sola
+//       constante para el anejo residencial · obtenido: dos.
+test.fail('HALLAZGO 07/09 (dato) — el trastero vinculado liquida con la constante del garaje', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const fuente = readFileSync(
+    join(process.cwd(), 'app', 'simulador-gastos-compraventa-trastero', 'page.tsx'),
+    'utf8',
+  );
+  const inicio = fuente.indexOf('porcentaje = modalidadTrastero');
+  const motor = fuente.slice(inicio, inicio + 160);
+  expect(inicio).toBeGreaterThan(-1);
+  expect(motor).toContain('IVA_INMUEBLES_2025.obraNueva');
+});
