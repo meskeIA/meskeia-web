@@ -1068,11 +1068,12 @@ export default function SimuladorGarajeCompraventaPage() {
               <strong>Liquida el ITP en el plazo legal</strong>
               <p>
                 El ITP debe liquidarse en 30 días hábiles desde la firma de la escritura. Presentarlo
-                tarde por iniciativa propia, sin requerimiento de la Administración, genera recargos:
-                el {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso
-                hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses, y el{' '}
-                {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora a partir
-                de ahí ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}). Si el recargo se paga en período
+                tarde por iniciativa propia, sin requerimiento de la Administración, genera recargo
+                desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más
+                otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
+                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez
+                transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses{' '}
+                ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}). Si el recargo se paga en período
                 voluntario se reduce un {ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago}%. Planifica
                 la liquidación desde el día de la firma.
               </p>

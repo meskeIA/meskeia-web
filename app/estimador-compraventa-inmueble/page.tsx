@@ -1557,10 +1557,10 @@ export default function SimuladorCompraventaPage() {
               <div className={styles.stepContent}>
                 <strong>Liquida los impuestos en el plazo establecido</strong>
                 <p>El ITP o IVA+AJD debe liquidarse en un plazo de 30 días hábiles desde la firma.
-                El incumplimiento genera un recargo del {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}%
-                por cada mes completo hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses,
-                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora a partir
-                de ahí ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).</p>
+                El incumplimiento genera un recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}%
+                de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
+                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez transcurridos
+                {' '}{ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -1633,9 +1633,9 @@ export default function SimuladorCompraventaPage() {
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
-            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en 30 días hábiles desde la escritura. Pasado ese plazo, se genera un recargo automático
-            del {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por mes completo hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses,
-            y del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses a partir de ahí.</li>
+            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en 30 días hábiles desde la escritura. Pasado ese plazo hay recargo automático
+            desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
+            y del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses.</li>
           </ul>
         </div>
       </EducationalSection>

@@ -1174,10 +1174,11 @@ export default function SimuladorTrasteroCompraventaPage() {
               <p>
                 El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de la escritura.
                 Presentarlo tarde por iniciativa propia, sin requerimiento de la Administración, genera
-                recargos: el {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de
-                retraso hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses, y el{' '}
-                {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora a partir de
-                ahí ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}); se reduce un{' '}
+                recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida
+                más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
+                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez
+                transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses{' '}
+                ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}); se reduce un{' '}
                 {ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago}% si el recargo se paga en período voluntario.
               </p>
             </div>
