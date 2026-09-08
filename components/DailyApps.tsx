@@ -28,11 +28,11 @@ export default function DailyApps({ count = 4 }: DailyAppsProps) {
       <section className={styles.dailyAppsSection} aria-busy="true" aria-label="Cargando apps del día">
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>
-            <span className={styles.titleIcon}>✨</span>
+            <span className={styles.titleIcon} aria-hidden="true">✨</span>
             Apps del día
           </h2>
           <span className={styles.refreshInfo}>
-            🔄 Cambian cada día
+            <span aria-hidden="true">🔄</span> Cambian cada día
           </span>
         </div>
         <div className={styles.appsGrid}>
@@ -52,14 +52,14 @@ export default function DailyApps({ count = 4 }: DailyAppsProps) {
   }
 
   return (
-    <section className={styles.dailyAppsSection}>
+    <section className={styles.dailyAppsSection} aria-labelledby="titulo-apps-del-dia">
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>
-          <span className={styles.titleIcon}>✨</span>
+        <h2 className={styles.sectionTitle} id="titulo-apps-del-dia">
+          <span className={styles.titleIcon} aria-hidden="true">✨</span>
           Apps del día
         </h2>
         <span className={styles.refreshInfo}>
-          🔄 Cambian cada día
+          <span aria-hidden="true">🔄</span> Cambian cada día
         </span>
       </div>
 
