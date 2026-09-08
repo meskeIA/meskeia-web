@@ -48,7 +48,14 @@ segundos, no requiere red si ya se descargó antes) y siempre reescribe el catá
 sinónimos actuales, aunque imprima «Sin cambios respecto al catálogo publicado» — ese mensaje
 solo habla de las fuentes OFICIALES, no de los sinónimos.
 
-⚠️ El `meta.generado` del catálogo se muestra en la página como fecha de verificación
-(`DataReference verificado={meta.generado}`): regenerar el catálogo cambia esa fecha visible,
-así que hay que actualizar también los tests que la comprueban literalmente (Inspector, ronda 8,
-30/08/2026: `20/07/2026` → `30/08/2026` en `tests/apps/conversor-cnae-iae.spec.ts`).
+⚠️ **La fecha de verificación que se ve en pantalla NO sale del catálogo, sale de
+`FISCAL_CNAE_IAE_META.verificado` en `data/fiscal/cnae-iae.ts`** — y ese sello se pone A MANO.
+Regenerar ES verificar, así que tras regenerar hay que sellarlo con la fecha del día y
+actualizar los tests que la comprueban literalmente (`tests/apps/conversor-cnae-iae.spec.ts`).
+El generador la imprime al terminar, ya en las dos salidas.
+
+> La página leyó `meta.generado` hasta el hallazgo 588, que lo unificó aquí porque el mismo
+> catálogo mostraba dos fechas según la página (30/08 en meskeIA, 20/07 en la ficha de
+> Delegum). Y hasta el 08/09/2026 el aviso del generador solo se imprimía cuando cambiaban
+> las FUENTES OFICIALES: una regeneración por sinónimos —que es el caso habitual— salía por
+> «sin novedades» y dejaba el sello por detrás sin decir nada.

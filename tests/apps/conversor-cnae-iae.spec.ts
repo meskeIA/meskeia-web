@@ -23,6 +23,9 @@ import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/f
  *     07/09/2026» y 6 hallazgos nuevos en «hallazgos abiertos del 07/09/2026», con
  *     `test.fail()`. Cuatro de los seis son el mecanismo del hallazgo 423 sobreviviendo
  *     en familias de sinónimos que su CANDADO no alcanza a ver.
+ *   · Reparación     08/09/2026 → los DOS altos de esos seis (631 lavandería, 632 motos)
+ *     se reparan en `data/cnae-sinonimos.json` y pasan al bloque «Regresión — hallazgos
+ *     altos del 07/09/2026, reparados». Siguen abiertos los 4 medios/bajos (633-636).
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -314,12 +317,15 @@ test('REGRESIÓN — la app niega la conversión CNAE→IAE en la página, en el
     page.getByText('no decide qué código corresponde a tu actividad').first(),
   ).toBeVisible();
 
-  // DataReference con las dos fuentes normativas y su fecha de verificación, que es
-  // meta.generado del catálogo: se regeneró el 30/08/2026 al reordenar los sinónimos
-  // (hallazgos 524-525), así que la fecha visible avanzó con él.
+  // DataReference con las dos fuentes normativas y su fecha de verificación, que NO es
+  // `meta.generado` del catálogo sino `FISCAL_CNAE_IAE_META.verificado`, sellado a mano
+  // (así desde el hallazgo 588, para que meskeIA y la ficha de Delegum no muestren dos
+  // fechas del mismo catálogo). Se reselló el 08/09/2026 al sacar los sinónimos de
+  // lavandería y de motos del primer destino de su correspondencia (hallazgos 631-632):
+  // regenerar ES verificar.
   await expect(page.getByText('RD 10/2025', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('RD Legislativo 1175/1990', { exact: false }).first()).toBeVisible();
-  await expect(page.getByText('30/08/2026', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('08/09/2026', { exact: false }).first()).toBeVisible();
 
   // El FAQPage del JSON-LD dice lo mismo que la página: sin él, las IAs citarían la
   // app como si fuese un conversor.
@@ -1438,58 +1444,49 @@ test.describe('Buscador CNAE-IAE — inspección del 07/09/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 07/09/2026 — marcados con `test.fail()`: afirman lo que
-// DEBERÍA ocurrir, así que hoy fallan a propósito. El día que se reparen pasarán a
-// ROJO («expected to fail, but passed»): entonces se les quita la marca y quedan
-// como regresión, sin reescribir el valor esperado.
-//
-// Los cuatro primeros son el MISMO mecanismo del hallazgo 423 —el término coloquial
-// se asignó al PRIMER destino de la tabla CNAE-2009 → CNAE-2025 en vez de al destino
-// que describe la actividad—, que aquella reparación drenó en las familias sanitaria y
-// administrativa pero dejó vivo en otras cuatro. El CANDADO que quedó de aquel hallazgo
-// no las ve porque compara raíces de SEIS caracteres: «lavandería» da «lavand» y el
-// título del hermano correcto dice «Lavado», que da «lavado». La forma del defecto es la
-// misma; lo que falla es el detector.
+// REGRESIÓN — los dos hallazgos ALTOS del 07/09/2026 (631 y 632), REPARADOS el
+// 08/09/2026 en `data/cnae-sinonimos.json` + regeneración del catálogo servido.
+// Estaban marcados con `test.fail()`; ahora sujetan la reparación.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos abiertos del 07/09/2026', () => {
+test.describe('Regresión — hallazgos altos del 07/09/2026, reparados', () => {
   test('«lavandería» debe llevar a 96.10, la clase que la nombra, y no a una clase de mensajería', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // correspondencia['9601'] (Lavado y limpieza de prendas textiles y de piel, CNAE-2009)
     // reparte en TRES clases de la CNAE-2025: 53.20 «Otras actividades postales y de
     // mensajería», 96.10 «Lavado y limpieza de prendas de tela y de piel» y 96.91
     // «Prestación de servicios personales domésticos». Los cinco términos de lavandería
-    // están en la PRIMERA, que es transporte y almacenamiento (sección H); la que lleva la
+    // estaban en la PRIMERA, que es transporte y almacenamiento (sección H); la que lleva la
     // actividad en su título oficial es la segunda, en la sección T, y su único sinónimo
-    // hoy es «limpieza en seco», así que por la palabra corriente no se llega a ella.
+    // era «limpieza en seco», así que por la palabra corriente no se llegaba a ella.
+    // Los cinco pasaron a 96.10 el 08/09/2026; 53.20 conserva los suyos de mensajería.
     await buscarCnae(page, 'lavandería');
     await expect(fichas(page).first()).toContainText('96.10');
     await expect(fichas(page).first()).toContainText('Lavado y limpieza de prendas de tela y de piel');
 
-    // Misma familia, mismo destino equivocado.
-    for (const termino of ['tintorería', 'planchado', 'lavar ropa']) {
+    // Misma familia, mismo destino: los cinco llegan hoy a la clase que los nombra.
+    for (const termino of ['tintorería', 'planchado', 'lavar ropa', 'autoservicio de lavandería']) {
       await buscarCnae(page, termino);
       await expect(fichas(page).first()).toContainText('96.10');
     }
   });
 
-  test('«tienda de motos» y «taller de motos» deben llevar al comercio minorista y al taller, no a intermediarios del comercio al por mayor', async ({
+  test('los seis términos de motos y bicis deben llevar al minorista, al taller y a la tienda de deportes, no a intermediarios del comercio al por mayor', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // correspondencia['4540'] (Venta, mantenimiento y reparación de motocicletas y de sus
     // repuestos, CNAE-2009) reparte en 46.18, 46.73, 46.89, 47.83, 47.92 y 95.32. Los seis
-    // términos coloquiales están en la PRIMERA —46.18 «Actividades de intermediarios del
+    // términos coloquiales estaban en la PRIMERA —46.18 «Actividades de intermediarios del
     // comercio al por MAYOR de otros productos específicos»—, cuando el catálogo tiene
     // 47.83 «Comercio al por menor de motocicletas, y repuestos y accesorios de
     // motocicletas» y 95.32 «Reparación y mantenimiento de motocicletas» en esa misma
-    // correspondencia. Al dueño de una tienda de motos se le dice que es un intermediario
-    // mayorista, que es otro sector y otra sección de la CNAE.
+    // correspondencia. Al dueño de una tienda de motos se le decía que era un intermediario
+    // mayorista, que es otro sector y otra sección de la CNAE. Repartidos el 08/09/2026:
+    // la tienda a 47.83, el taller a 95.32, «motos» a las dos y las bicis a 47.63.
     await buscarCnae(page, 'tienda de motos');
     await expect(fichas(page).first()).toContainText('47.83');
     await expect(fichas(page).first()).toContainText('Comercio al por menor de motocicletas');
@@ -1497,8 +1494,47 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 07/09/2026', () => {
     await buscarCnae(page, 'taller de motos');
     await expect(fichas(page).first()).toContainText('95.32');
     await expect(fichas(page).first()).toContainText('Reparación y mantenimiento de motocicletas');
-  });
 
+    // «motos» a secas es ambiguo y NINGÚN título lo contiene —los oficiales dicen
+    // «motocicletas», que no lo lleva como subcadena—, así que sin sinónimo no llegaba a
+    // ninguna de las dos. Va a las dos clases que describen un alta real: la tienda y el
+    // taller. Se comprueban las dos primeras fichas, no solo la primera.
+    await buscarCnae(page, 'motos');
+    await expect(fichas(page).nth(0)).toContainText('47.83');
+    await expect(fichas(page).nth(1)).toContainText('95.32');
+
+    // Las bicicletas no están en la correspondencia de 4540: su comercio minorista es
+    // 47.63 «Comercio al por menor de artículos deportivos» (el 47.64 de la CNAE-2009,
+    // que en la CNAE-2025 pasó a ser juegos y juguetes). «reparar bicicletas» ya vivía
+    // en 95.29 y solo sobraba en 46.18.
+    for (const termino of ['bicicletería', 'ciclos']) {
+      await buscarCnae(page, termino);
+      await expect(fichas(page).first()).toContainText('47.63');
+      await expect(fichas(page).first()).toContainText('Comercio al por menor de artículos deportivos');
+    }
+
+    await buscarCnae(page, 'reparar bicicletas');
+    await expect(fichas(page).first()).toContainText('95.29');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 07/09/2026 — marcados con `test.fail()`: afirman lo que
+// DEBERÍA ocurrir, así que hoy fallan a propósito. El día que se reparen pasarán a
+// ROJO («expected to fail, but passed»): entonces se les quita la marca y quedan
+// como regresión, sin reescribir el valor esperado.
+//
+// Los dos primeros son el MISMO mecanismo del hallazgo 423 —el término coloquial
+// se asignó al PRIMER destino de la tabla CNAE-2009 → CNAE-2025 en vez de al destino
+// que describe la actividad—, que aquella reparación drenó en las familias sanitaria y
+// administrativa pero dejó vivo en otras cuatro. Los dos ALTOS de esa misma forma
+// (lavandería y motos, 631-632) están reparados en el bloque de regresión de arriba;
+// estos dos son los MEDIOS que quedan. El CANDADO que quedó de aquel hallazgo no las ve
+// porque compara raíces de SEIS caracteres: «lavandería» da «lavand» y el título del
+// hermano correcto dice «Lavado», que da «lavado». La forma del defecto es la misma;
+// lo que falla es el detector.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 07/09/2026', () => {
   test('«no encuentro mi actividad» debe caer en la clase residual 74.99, no en la de agentes de patentes', async ({
     page,
   }) => {

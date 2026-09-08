@@ -74,10 +74,11 @@
  * cuatro dígitos enteros van SIN punto de millares (5405,24 €) y los de cinco o más, con
  * él (509.405,24 €). Las cifras esperadas se escriben literales, tal cual las pinta la app.
  *
- * ⚠️ ESTADO A 07/09/2026 — los tres «HALLAZGOS ABIERTOS» que enumera la cabecera de
+ * ⚠️ ESTADO A 08/09/2026 — los tres «HALLAZGOS ABIERTOS» que enumera la cabecera de
  * arriba están CERRADOS: ninguno lleva ya `test.fail()` y los 30 tests anteriores pasan.
- * Los `test.fail()` que hay hoy en el fichero son los TRES hallazgos nuevos de la
- * inspección del 07/09/2026, al final del todo.
+ * De los TRES hallazgos de la inspección del 07/09/2026, que van al final del todo, el
+ * ALTO (656, la escala de recargo derogada de la FAQ del plazo) se reparó el 08/09/2026 y
+ * su test sujeta ya la reparación; los otros dos siguen con `test.fail()`.
  *
  * ⚠️ 24/08/2026 — las cuotas íntegras de TODOS los casos cambiaron al cerrar el hallazgo
  * 277: la app aplica ya la COLUMNA `cuota` de la tabla oficial (`calcularCuotaIntegraIS`,
@@ -2210,10 +2211,10 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   );
 
   /**
-   * ⚠️ HALLAZGO ABIERTO (07/09/2026) — la escala del recargo por presentar el ISD fuera de
-   * plazo está DEROGADA.
+   * ✅ HALLAZGO 07/09/2026 (ALTO) — REPARADO el 08/09/2026. Sujeta la reparación como
+   * regresión: llevaba `test.fail()` y hoy pasa en verde.
    *
-   * La FAQ del bloque educativo dice: «Si superas el plazo sin liquidar, hay recargos del
+   * La FAQ del bloque educativo decía: «Si superas el plazo sin liquidar, hay recargos del
    * 5% al 20% más intereses». Ésa es la escala ANTERIOR a la Ley 11/2021. El art. 27.2 LGT
    * vigente —redacción del art. 13.3 de la Ley 11/2021, BOE-A-2021-11473— es «1 por ciento
    * más otro 1 por ciento adicional por cada mes completo de retraso», y 15 % más intereses
@@ -2227,15 +2228,19 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
    *
    * Sobre la cuota de ISD de 267,83 € que esta misma app liquida en el CASO 1 de arriba:
    *   · retraso de menos de un mes → art. 27.2: 1 % = 2,68 €.
-   *     El texto promete un suelo del 5 % = 13,39 €, cinco veces más.
+   *     El texto prometía un suelo del 5 % = 13,39 €, cinco veces más.
    *   · retraso de más de doce meses → art. 27.2: 15 % = 40,17 € + intereses de demora.
-   *     El texto promete un techo del 20 % = 53,57 €.
+   *     El texto prometía un techo del 20 % = 53,57 €.
    *
    * Y es el párrafo que responde «¿Cuál es el plazo para liquidar el ISD?» en una app de
    * riesgo 1 CRÍTICO: quien lo lee está decidiendo si le compensa apurar el plazo.
+   *
+   * La FAQ compone hoy sus porcentajes con `ESCALA_RECARGO_EXTEMPORANEO`, así que el día
+   * que cambie el art. 27.2 cambia sola. El MISMO texto derogado vivía en
+   * `orientacion-tramitacion-herencias`, del mismo clúster, y se reparó igual.
    */
-  test.fail(
-    'HALLAZGO — la FAQ del plazo cita la escala de recargo derogada (5 %–20 %) en vez del art. 27.2 LGT',
+  test(
+    'HALLAZGO reparado — la FAQ del plazo compone el recargo con el art. 27.2 LGT, no con la escala derogada',
     async ({ page }) => {
       await page.goto(RUTA);
 

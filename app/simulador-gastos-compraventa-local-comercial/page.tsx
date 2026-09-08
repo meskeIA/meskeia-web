@@ -269,7 +269,7 @@ export default function SimuladorLocalComercialPage() {
     // adquisición (art. 40 RIRPF) y aumenta la ganancia; los impuestos y gastos de la
     // compra lo aumentan y la reducen (art. 35.1 LIRPF). Ambos van al motor compartido.
     const amortizaciones = perfilVendedor === 'afecto-actividad'
-      ? Math.max(0, parseSpanishNumber(amortizacionesAcumuladas))
+      ? Math.max(0, parseSpanishNumberOr(amortizacionesAcumuladas))
       : 0;
 
     const g = calcularGananciaInmueble({

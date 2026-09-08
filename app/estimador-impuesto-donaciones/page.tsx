@@ -20,7 +20,9 @@ import {
   BONIFICACIONES_CCAA_ID,
   TramoTarifaID,
   BonificacionGrupoID,
+  INTERES_DEMORA_TRIBUTARIO_2025,
 } from '@/data/fiscal';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -754,10 +756,15 @@ export default function EstimadorImpuestoDonacionesPage() {
                 <p>
                   Hacienda puede descubrir la donación en controles rutinarios (movimientos bancarios,
                   cambios en el Registro de la Propiedad, declaraciones de IRPF). Si se presenta
-                  fuera de plazo <strong>voluntariamente</strong>: recargo del 5% (hasta 3 meses),
-                  10% (3–6 meses), 15% (6–12 meses) o 20% (más de 12 meses).
+                  fuera de plazo <strong>voluntariamente</strong>: recargo del{' '}
+                  {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase} % más otro{' '}
+                  {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes} % por cada mes completo de retraso, y{' '}
+                  {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses} % más intereses de demora una vez
+                  transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses
+                  ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).
                   Si hay requerimiento previo de Hacienda, se aplica una <strong>sanción del 50%–150%</strong>
-                  de la cuota no ingresada, más intereses de demora (actualmente 4,0625% anual).
+                  de la cuota no ingresada, más intereses de demora (actualmente{' '}
+                  {formatNumber(INTERES_DEMORA_TRIBUTARIO_2025.tipo, 4)} % anual).
                 </p>
               </details>
             </li>

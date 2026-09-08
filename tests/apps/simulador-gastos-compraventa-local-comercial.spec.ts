@@ -795,28 +795,30 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
   });
 
   /**
-   * ⛔ HALLAZGO 07/09/2026 (ALTO) — ABIERTO. `test.fail()`: cuando se repare pasará a
-   * verde y habrá que quitarle la marca.
+   * ✅ HALLAZGO 07/09/2026 (ALTO) — REPARADO el 08/09/2026. Sujeta la reparación como
+   * regresión: llevaba `test.fail()` y hoy pasa en verde.
    *
-   * El perfil «Local afecto a actividad» nace con su campo de amortizaciones VACÍO
-   * (`useState('')`), y ese estado por defecto rompe el panel entero del vendedor:
+   * El perfil «Local afecto a actividad» nacía con su campo de amortizaciones VACÍO
+   * (`useState('')`), y ese estado por defecto rompía el panel entero del vendedor:
    *
    *   const amortizaciones = perfil === 'afecto-actividad'
    *     ? Math.max(0, parseSpanishNumber(amortizacionesAcumuladas))   // ← NaN si está vacío
    *     : 0;
    *
    * `parseSpanishNumber('')` devuelve NaN y `Math.max(0, NaN)` sigue siendo NaN, así que
-   * el NaN llega a `calcularGananciaInmueble` y se propaga a la cuota. En pantalla:
-   * desaparecen las tarjetas de valor de adquisición y de transmisión, la ganancia y el
-   * total y el neto dicen «No definido» y —lo grave— el IRPF pinta **«SIN CUOTA» en
+   * el NaN llegaba a `calcularGananciaInmueble` y se propagaba a la cuota. En pantalla:
+   * desaparecían las tarjetas de valor de adquisición y de transmisión, la ganancia y el
+   * total y el neto decían «No definido» y —lo grave— el IRPF pintaba **«SIN CUOTA» en
    * verde** (`variant="success"`), porque `NaN > 0` es `false`. Una app de riesgo 1
-   * CRÍTICO afirma que no se debe IRPF sobre una ganancia de 100.900 €.
+   * CRÍTICO afirmaba que no se debía IRPF sobre una ganancia de 100.900 €.
    *
-   * Los otros cinco campos opcionales del mismo `useMemo` usan `parseSpanishNumberOr`,
+   * Los otros cinco campos opcionales del mismo `useMemo` ya usaban `parseSpanishNumberOr`,
    * que existe justamente para esto: su docstring nombra la pestaña Vendedor de
    * `estimador-compraventa-inmueble`, del mismo clúster y con el mismo defecto (14/08/2026).
+   * La reparación es esa misma palabra, y el `Math.max(0, …)` se conserva porque sigue
+   * acotando lo que el usuario SÍ teclea en negativo.
    */
-  test.fail('HALLAZGO 07/09 (alto) — el perfil «afecto» con las amortizaciones sin rellenar debe valer 0, no NaN', async ({ page }) => {
+  test('HALLAZGO 07/09 (alto), reparado — el perfil «afecto» con las amortizaciones sin rellenar vale 0, no NaN', async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio del local comercial', '400000');
     await page.getByRole('button', { name: /Vendedor/ }).click();
@@ -834,10 +836,11 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
     // Sin amortizaciones declaradas no hay nada que minorar: mismos importes que el
     // perfil particular (CASO 11), no «No definido» ni un «SIN CUOTA» en verde.
     //
-    // El orden importa: las dos primeras tarjetas SÍ se pintan hoy (con «SIN CUOTA» y
-    // «No definido»), así que fallan al instante. Las de valor de adquisición y
-    // transmisión desaparecen por completo —`NaN > 0` es false— y esperarlas agotaría
-    // el timeout del test, que Playwright cuenta como fallo REAL aunque haya `test.fail()`.
+    // El orden de las aserciones es el que tenía cuando el test iba con `test.fail()`:
+    // las dos primeras tarjetas se pintaban aun con el NaN, así que fallaban al instante,
+    // mientras que esperar las de valor de adquisición y transmisión —que desaparecían
+    // por completo— habría agotado el timeout, y eso Playwright lo cuenta como fallo REAL
+    // aunque haya `test.fail()`. Se conserva para no reescribir lo que ya está verificado.
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('22.087,00 €');
     expect(await valorTarjeta(page, 'NETO QUE RECIBES')).toBe('358.813,00 €');
     expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('41.187,00 €');

@@ -347,7 +347,7 @@ function compararConPublicado(nuevo) {
     }
     if (c.modificados.length > 15) console.log(`    … y ${c.modificados.length - 15} modificaciones más`);
   }
-  console.log('\n  ⚠️ Revisa los cambios y actualiza el sello `verificado` de data/fiscal/cnae-iae.ts.');
+  console.log('\n  ⚠️ Revisa los cambios antes de dar el catálogo por bueno.');
   return true;
 }
 
@@ -355,4 +355,13 @@ const hayCambios = compararConPublicado(salida);
 
 if (!existsSync('public/datos')) mkdirSync('public/datos', { recursive: true });
 writeFileSync(destino, JSON.stringify(salida));
-console.log(`\n✅ ${destino} (${(readFileSync(destino).length / 1024).toFixed(0)} KB)${hayCambios ? ' · actualizado' : ' · sin novedades'}\n`);
+console.log(`\n✅ ${destino} (${(readFileSync(destino).length / 1024).toFixed(0)} KB)${hayCambios ? ' · actualizado' : ' · sin novedades'}`);
+
+// El sello se recuerda SIEMPRE, no solo cuando cambian las fuentes oficiales: una
+// regeneración por sinónimos reescribe el catálogo y su `meta.generado` sin que el BOE
+// ni el INE hayan tocado nada, y hasta el 08/09/2026 ese caso salía por «sin novedades»
+// dejando `verificado` por detrás en silencio (hallazgos 631-632). Es la fecha que se ve
+// en pantalla: `DataReference verificado={FISCAL_CNAE_IAE_META.verificado}`.
+console.log(`\n  ⚠️ Sella data/fiscal/cnae-iae.ts con \`verificado: '${salida.meta.generado}'\``);
+console.log('     — regenerar ES verificar, y esa es la fecha que la app y la ficha de');
+console.log('     Delegum muestran al usuario.\n');

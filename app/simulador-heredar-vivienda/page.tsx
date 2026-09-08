@@ -49,6 +49,7 @@ import {
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
   type GrupoParentescoIS,
 } from '@/lib/calculadoras/sucesiones';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import styles from './SimuladorHeredarVivienda.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -1250,8 +1251,13 @@ export default function SimuladorHeredarViviendaPage() {
             <strong>¿Cuál es el plazo para liquidar el ISD?</strong>
             <p>
               6 meses desde el fallecimiento. Se puede pedir prórroga de otros 6 meses dentro de los
-              5 primeros meses. Si superas el plazo sin liquidar, hay recargos del 5% al 20% más
-              intereses. Es clave: el reloj corre desde el fallecimiento, no desde que tú te enteras.
+              5 primeros meses. Si superas el plazo sin liquidar, el recargo se debe desde el primer
+              día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más otro{' '}
+              {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso, y el{' '}
+              {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez
+              transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses
+              ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}). Es clave: el reloj corre desde el
+              fallecimiento, no desde que tú te enteras.
             </p>
           </div>
           <div className={styles.faqItem}>

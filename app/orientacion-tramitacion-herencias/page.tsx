@@ -5,6 +5,7 @@ import styles from './OrientacionHerencias.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import Link from 'next/link';
 import { getRelatedApps } from '@/data/app-relations';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
 interface Respuestas {
@@ -539,7 +540,14 @@ export default function OrientacionTramitacionHerenciasPage() {
             <p className={styles.plazoPeriodo}>6 MESES desde fallecimiento</p>
             <ul>
               <li>Prórroga: 6 meses más (solicitar antes del 5.º mes)</li>
-              <li>Retraso sin prórroga: recargo 5%-20% + intereses</li>
+              {/* Art. 27.2 LGT, redacción de la Ley 11/2021: la escala 5-20 % que había
+                  aquí está DEROGADA. Se compone del motor, como el aviso de más abajo. */}
+              <li>
+                Retraso sin prórroga: recargo del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase} %
+                {' '}+ {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes} % por mes completo
+                {' '}({ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses} % pasados
+                {' '}{ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses) + intereses
+              </li>
             </ul>
           </div>
 
@@ -1001,7 +1009,7 @@ export default function OrientacionTramitacionHerenciasPage() {
               </li>
               <li>
                 <strong>No pedir prórroga del IS antes del mes 5.</strong>{' '}
-                La prórroga de 6 meses adicionales sin recargo solo puede solicitarse mientras aún no ha vencido el plazo original. Si esperas al mes 6 o dejas que venza, ya no podrás pedirla y se aplicarán recargos del 5 % al 20 % más intereses de demora.
+                La prórroga de 6 meses adicionales sin recargo solo puede solicitarse mientras aún no ha vencido el plazo original. Si esperas al mes 6 o dejas que venza, ya no podrás pedirla y se aplicará el recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase} % de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes} % por cada mes completo de retraso, y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses} % más intereses de demora una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).
               </li>
               <li>
                 <strong>Aceptar la herencia sin comprobar las deudas.</strong>{' '}

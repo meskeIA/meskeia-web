@@ -191,14 +191,6 @@
     "reformas",
     "reformista"
   ],
-  "46.18": [
-    "bicicletería",
-    "ciclos",
-    "motos",
-    "reparar bicicletas",
-    "taller de motos",
-    "tienda de motos"
-  ],
   "47.11": [
     "abarrotes",
     "autoservicio",
@@ -308,7 +300,9 @@
     "quiosco"
   ],
   "47.63": [
+    "bicicletería",
     "bicis y deporte",
+    "ciclos",
     "material deportivo",
     "ropa deportiva",
     "suplementos y deporte",
@@ -376,6 +370,10 @@
     "recambios",
     "repuestos",
     "tienda de piezas"
+  ],
+  "47.83": [
+    "motos",
+    "tienda de motos"
   ],
   "47.91": [
     "amazon fba",
@@ -449,18 +447,13 @@
     "vender vuelos"
   ],
   "53.20": [
-    "autoservicio de lavandería",
     "courier",
     "delivery",
-    "lavandería",
-    "lavar ropa",
     "mensajería",
-    "planchado",
     "recadería",
     "repartidor",
     "reparto de paquetes",
-    "rider",
-    "tintorería"
+    "rider"
   ],
   "53.30": [
     "servicios auxiliares"
@@ -1032,8 +1025,17 @@
     "taller de coches",
     "taller mecánico"
   ],
+  "95.32": [
+    "motos",
+    "taller de motos"
+  ],
   "96.10": [
-    "limpieza en seco"
+    "autoservicio de lavandería",
+    "lavandería",
+    "lavar ropa",
+    "limpieza en seco",
+    "planchado",
+    "tintorería"
   ],
   "96.21": [
     "barbero",

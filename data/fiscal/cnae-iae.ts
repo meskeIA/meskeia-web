@@ -38,8 +38,14 @@ export const FISCAL_CNAE_IAE_META = {
    * catálogo pasó a mostrar dos fechas según la página: 30/08 en meskeIA (que leía el
    * `generado` del JSON) y 20/07 en la ficha de Delegum (hallazgo 588). Ahora las dos
    * páginas leen de aquí.
+   *
+   * ⚠️ 08/09/2026 — el aviso del generador tampoco bastaba: solo se imprimía cuando
+   * cambiaban las FUENTES OFICIALES, y una regeneración por sinónimos —la de los
+   * hallazgos 631-632, sin novedades en el BOE ni en el INE— reescribía el catálogo y su
+   * `meta.generado` en silencio, dejando este sello otra vez por detrás. El generador lo
+   * recuerda ya en las dos salidas.
    */
-  verificado: '2026-08-30',
+  verificado: '2026-09-08',
   vigencia: '2026',
 
   iae: {
