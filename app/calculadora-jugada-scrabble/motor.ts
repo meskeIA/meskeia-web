@@ -9,6 +9,8 @@
  * Todo el cálculo ocurre en el navegador.
  */
 
+import { VALORES_FICHA, DIGRAFOS as DIGRAFOS_FICHA } from '@/lib/calculadoras/puntuacionScrabble';
+
 /** Ficha del juego: una letra simple, un dígrafo (CH, LL, RR) o el comodín. */
 export type Ficha = string;
 
@@ -17,16 +19,14 @@ export const COMODIN = '?';
 /** Modo de juego: con dígrafos (Scrabble español clásico) o sin ellos. */
 export type Modo = 'digrafos' | 'simple';
 
-/** Valores oficiales del Scrabble en español (edición de 100 fichas). */
-export const VALORES: Readonly<Record<string, number>> = {
-  A: 1, E: 1, O: 1, I: 1, S: 1, N: 1, R: 1, U: 1, L: 1, T: 1,
-  D: 2, G: 2,
-  C: 3, B: 3, M: 3, P: 3,
-  H: 4, F: 4, V: 4, Y: 4,
-  CH: 5, Q: 5,
-  J: 8, LL: 8, Ñ: 8, RR: 8, X: 8,
-  Z: 10,
-};
+/**
+ * Valores oficiales del Scrabble en español (edición de 100 fichas).
+ *
+ * La tabla vive en `lib/calculadoras/puntuacionScrabble.ts` desde que el
+ * generador de anagramas también puntúa: una sola copia, para que corregir un
+ * valor no deje la otra app diciendo otra cosa.
+ */
+export const VALORES = VALORES_FICHA;
 
 /** Número de fichas de cada tipo en la bolsa española (100 en total). */
 export const DISTRIBUCION: Readonly<Record<string, number>> = {
@@ -41,7 +41,7 @@ export const DISTRIBUCION: Readonly<Record<string, number>> = {
 };
 
 /** Dígrafos que en el Scrabble español ocupan una sola casilla del tablero. */
-export const DIGRAFOS: readonly string[] = ['CH', 'LL', 'RR'];
+export const DIGRAFOS = DIGRAFOS_FICHA;
 
 /** Letras simples jugables. K y W no tienen ficha en la edición española. */
 export const LETRAS_SIMPLES: readonly string[] = [

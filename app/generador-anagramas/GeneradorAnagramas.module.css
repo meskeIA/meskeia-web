@@ -948,3 +948,120 @@
   line-height: 1.6;
   color: var(--text-secondary);
 }
+
+/* ── Puntuación de fichas y criterio de orden ──────────────────────────────
+   La barra va ENCIMA de la lista y no dentro de los controles de búsqueda: no
+   filtra ni vuelve a buscar, solo reordena lo que ya está en pantalla, y
+   ponerla junto a los selectores de longitud la haría parecer un filtro más. */
+.ordenBarra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.ordenEtiqueta {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.ordenBotones {
+  display: inline-flex;
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.ordenBoton {
+  padding: 6px 16px;
+  border: none;
+  background: transparent;
+  color: var(--primary-texto);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ordenBoton:hover {
+  background: var(--hover);
+}
+
+.ordenBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ordenBotonActivo,
+.ordenBotonActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.ordenMejor {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.leyendaPuntos {
+  margin: 0 0 var(--spacing-md) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--hover);
+  border-left: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* El número va dentro del propio chip, no en una columna aparte: la rejilla
+   puede tener cientos de palabras y una segunda columna la partiría en dos
+   lecturas. */
+.chipPuntos {
+  position: relative;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.chipPuntosUnidad {
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* «pt» se lee bien con los ojos y fatal con un lector de pantalla, que diría
+   «casa seis pt». El abreviado se oculta a la voz y la palabra entera se oculta
+   a la vista. */
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[data-theme='dark'] .ordenBoton {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .ordenBotonActivo,
+[data-theme='dark'] .ordenBotonActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .chipPuntos {
+  background: var(--secondary);
+  color: #06222b;
+}

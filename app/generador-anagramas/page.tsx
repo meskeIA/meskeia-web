@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect, useRef, Fragment } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { puntuarPalabra } from '@/lib/calculadoras/puntuacionScrabble';
 
 /**
  * Diccionario español basado en el Lemario General del Español
@@ -146,7 +147,22 @@ interface ResultadoPalabra {
   /** Forma normalizada: es a la que se refieren las posiciones de `comodines` */
   normalizada: string;
   comodines: number[];
+  /** Puntuación base de la palabra en fichas españolas, con las blancas a 0 */
+  puntos: number;
 }
+
+/**
+ * Cómo se ordena la lista de palabras encontradas.
+ *
+ * La app se presenta como el atril de un juego de fichas, pero hasta ahora solo
+ * sabía ordenar por longitud, que no es el criterio del juego: del atril
+ * ZAPATAS salen PASTA (7 puntos con 5 fichas) y ZAPA (15 con 4), y la lista
+ * ponía delante la larga, que es la que menos puntúa. Las dos ordenaciones son
+ * legítimas y se eligen —la larga sirve para el bingo de siete fichas, la de
+ * puntos para la jugada de hoy—, así que se ofrecen las dos en vez de sustituir
+ * una por otra.
+ */
+type CriterioOrden = 'longitud' | 'puntos';
 
 /**
  * La palabra, con las letras que pone una ficha blanca resaltadas.
@@ -379,6 +395,12 @@ export default function GeneradorAnagramasPage() {
    * fueran los de las letras nuevas (hallazgos 194 y 195).
    */
   const [buscado, setBuscado] = useState(false);
+  /**
+   * Criterio de ordenación. Por defecto sigue siendo la longitud: es el que la app
+   * tenía y el que sirve al bingo de siete fichas, así que cambiarlo de oficio
+   * movería el suelo a quien ya la usa.
+   */
+  const [orden, setOrden] = useState<CriterioOrden>('longitud');
   const [isSearching, setIsSearching] = useState(false);
   const [dictionary, setDictionary] = useState<string[]>([]);
   const [dictStatus, setDictStatus] = useState<DictStatus>('loading');
@@ -476,21 +498,19 @@ export default function GeneradorAnagramasPage() {
         for (const { original, normalizada } of bucket) {
           if (mustContainNorm && !normalizada.includes(mustContainNorm)) continue;
           const posiciones = posicionesDeComodin(normalizada, disponibles, comodines);
-          if (posiciones) found.push({ palabra: original, normalizada, comodines: posiciones });
+          if (posiciones) {
+            found.push({
+              palabra: original,
+              normalizada,
+              comodines: posiciones,
+              // Se puntúa la NORMALIZADA, que es la forma a la que se refieren las
+              // posiciones de las blancas: sobre la original, un lema con guion las
+              // desplazaría y la blanca descontaría la ficha equivocada.
+              puntos: puntuarPalabra(normalizada, posiciones),
+            });
+          }
         }
       }
-
-      // Primero las largas; a igual longitud, las que NO gastan blanca, porque guardarla
-      // para la jugada siguiente vale más que cualquier desempate alfabético.
-      found.sort((a, b) => {
-        if (b.normalizada.length !== a.normalizada.length) {
-          return b.normalizada.length - a.normalizada.length;
-        }
-        if (a.comodines.length !== b.comodines.length) {
-          return a.comodines.length - b.comodines.length;
-        }
-        return a.palabra.localeCompare(b.palabra, 'es');
-      });
 
       setResults(found);
       setBuscado(true);
@@ -537,19 +557,63 @@ export default function GeneradorAnagramasPage() {
     setBuscado(false);
   };
 
+  /**
+   * La lista ya ordenada según el criterio elegido.
+   *
+   * Va aparte de la búsqueda —antes el `sort` vivía dentro de `findAnagrams`— para
+   * que cambiar de criterio no obligue a recorrer otra vez el lemario entero: son
+   * los mismos resultados vistos de otra manera, no una búsqueda nueva.
+   */
+  const resultadosOrdenados = useMemo(() => {
+    const lista = [...results];
+    if (orden === 'puntos') {
+      // A igual puntuación mandan las que NO gastan blanca: dos jugadas que valen
+      // lo mismo no son igual de buenas si una se deja la ficha comodín puesta.
+      lista.sort((a, b) => {
+        if (b.puntos !== a.puntos) return b.puntos - a.puntos;
+        if (a.comodines.length !== b.comodines.length) {
+          return a.comodines.length - b.comodines.length;
+        }
+        if (b.normalizada.length !== a.normalizada.length) {
+          return b.normalizada.length - a.normalizada.length;
+        }
+        return a.palabra.localeCompare(b.palabra, 'es');
+      });
+      return lista;
+    }
+    // Primero las largas; a igual longitud, las que NO gastan blanca, porque guardarla
+    // para la jugada siguiente vale más que cualquier desempate alfabético.
+    lista.sort((a, b) => {
+      if (b.normalizada.length !== a.normalizada.length) {
+        return b.normalizada.length - a.normalizada.length;
+      }
+      if (a.comodines.length !== b.comodines.length) {
+        return a.comodines.length - b.comodines.length;
+      }
+      return a.palabra.localeCompare(b.palabra, 'es');
+    });
+    return lista;
+  }, [results, orden]);
+
   // Se agrupa por la longitud de la forma NORMALIZADA, que es la que filtran los selectores de
   // longitud mínima y máxima. Hoy da igual —el lemario es solo letras del alfabeto español, así
   // que ambas longitudes coinciden—, pero agrupar por la que filtra evita que un lema con guion
   // o apóstrofo, si algún día entrara, cayera en un grupo distinto del que lo dejó pasar.
   const groupedResults = useMemo(() => {
     const groups: { [key: number]: ResultadoPalabra[] } = {};
-    for (const resultado of results) {
+    for (const resultado of resultadosOrdenados) {
       const len = resultado.normalizada.length;
       if (!groups[len]) groups[len] = [];
       groups[len].push(resultado);
     }
     return groups;
-  }, [results]);
+  }, [resultadosOrdenados]);
+
+  /** La jugada más valiosa de la lista: encabeza el resumen cuando se ordena por puntos. */
+  const mejorPuntuacion = useMemo(
+    () => results.reduce((maximo, r) => (r.puntos > maximo ? r.puntos : maximo), 0),
+    [results],
+  );
 
   /** Cuántas de las encontradas necesitan gastar una ficha blanca. */
   const conComodin = useMemo(
@@ -812,34 +876,112 @@ export default function GeneradorAnagramasPage() {
               <h3>Palabras encontradas: {results.length}</h3>
             </div>
 
+            <div className={styles.ordenBarra}>
+              <span className={styles.ordenEtiqueta} id="etiqueta-orden">
+                Ordenar por
+              </span>
+              <div className={styles.ordenBotones} role="group" aria-labelledby="etiqueta-orden">
+                <button
+                  type="button"
+                  className={`${styles.ordenBoton} ${orden === 'longitud' ? styles.ordenBotonActivo : ''}`}
+                  aria-pressed={orden === 'longitud'}
+                  onClick={() => setOrden('longitud')}
+                >
+                  Longitud
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.ordenBoton} ${orden === 'puntos' ? styles.ordenBotonActivo : ''}`}
+                  aria-pressed={orden === 'puntos'}
+                  onClick={() => setOrden('puntos')}
+                >
+                  Puntos
+                </button>
+              </div>
+              {mejorPuntuacion > 0 && (
+                <span className={styles.ordenMejor}>
+                  La más valiosa: <strong>{mejorPuntuacion} puntos</strong>
+                </span>
+              )}
+            </div>
+
+            <p className={styles.leyendaPuntos}>
+              Los puntos son los de las fichas del <strong>Scrabble en español</strong>, sumados
+              letra a letra y sin tablero: no incluyen los multiplicadores de casilla ni el
+              bonus por colocar las siete fichas. Las fichas CH, LL y RR se cuentan como letras
+              sueltas, porque un atril tecleado no puede decir cuál de las dos formas tienes.
+            </p>
+
             {conComodin > 0 && (
               <p className={styles.leyendaComodin}>
                 <span className={styles.letraComodin}>A</span> = letra que pone una ficha
                 blanca. {conComodin} de las {results.length} necesitan gastarla; las que no,
-                salen primero dentro de cada longitud, porque conservar la blanca vale más
-                que una jugada corta.
+                salen primero a igualdad de{' '}
+                {orden === 'puntos' ? 'puntuación' : 'longitud'}, porque conservar la blanca
+                vale más que una jugada corta. La blanca no suma puntos: por eso una palabra
+                cara con blanca puntúa menos de lo que parece.
               </p>
             )}
 
-            {Object.keys(groupedResults)
-              .sort((a, b) => Number(b) - Number(a))
-              .map(len => (
-                <div key={len} className={styles.resultGroup}>
-                  <h4 className={styles.groupTitle}>
-                    {len} letras ({groupedResults[Number(len)].length})
-                  </h4>
-                  <div className={styles.wordsGrid}>
-                    {groupedResults[Number(len)].map(resultado => (
-                      <span
-                        key={resultado.palabra}
-                        className={`${styles.wordChip} ${resultado.comodines.length > 0 ? styles.wordChipComodin : ''}`}
-                      >
-                        <PalabraConComodines resultado={resultado} />
+            {orden === 'puntos' ? (
+              <div className={styles.resultGroup}>
+                <h4 className={styles.groupTitle}>
+                  De más a menos puntos ({resultadosOrdenados.length})
+                </h4>
+                <div className={styles.wordsGrid}>
+                  {resultadosOrdenados.map(resultado => (
+                    <span
+                      key={resultado.palabra}
+                      className={`${styles.wordChip} ${resultado.comodines.length > 0 ? styles.wordChipComodin : ''}`}
+                    >
+                      <PalabraConComodines resultado={resultado} />
+                      <span className={styles.chipPuntos}>
+                        {resultado.puntos}
+                        <span className={styles.chipPuntosUnidad} aria-hidden="true">
+                          {' '}
+                          pt
+                        </span>
+                        <span className={styles.soloLectores}>
+                          {' '}
+                          {resultado.puntos === 1 ? 'punto' : 'puntos'}
+                        </span>
                       </span>
-                    ))}
-                  </div>
+                    </span>
+                  ))}
                 </div>
-              ))}
+              </div>
+            ) : (
+              Object.keys(groupedResults)
+                .sort((a, b) => Number(b) - Number(a))
+                .map(len => (
+                  <div key={len} className={styles.resultGroup}>
+                    <h4 className={styles.groupTitle}>
+                      {len} letras ({groupedResults[Number(len)].length})
+                    </h4>
+                    <div className={styles.wordsGrid}>
+                      {groupedResults[Number(len)].map(resultado => (
+                        <span
+                          key={resultado.palabra}
+                          className={`${styles.wordChip} ${resultado.comodines.length > 0 ? styles.wordChipComodin : ''}`}
+                        >
+                          <PalabraConComodines resultado={resultado} />
+                          <span className={styles.chipPuntos}>
+                            {resultado.puntos}
+                            <span className={styles.chipPuntosUnidad} aria-hidden="true">
+                              {' '}
+                              pt
+                            </span>
+                            <span className={styles.soloLectores}>
+                              {' '}
+                              {resultado.puntos === 1 ? 'punto' : 'puntos'}
+                            </span>
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))
+            )}
           </div>
         )}
 

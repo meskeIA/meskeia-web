@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Anagramas en Español - Anagramas Perfectos de Frases y Nombres',
-  description: 'Genera anagramas perfectos de una frase o un nombre (usando todas las letras), busca palabras formables con tus letras y verifica si dos textos son anagramas exactos. Gratis y sin registro.',
-  keywords: 'anagramas, anagrama de frase, anagrama de mi nombre, generador, palabras, letras, wordle, scrabble, apalabrados, crucigramas, español, diccionario',
+  description: 'Genera anagramas perfectos de una frase o un nombre (usando todas las letras), busca palabras formables con tus letras y verifica si dos textos son anagramas exactos. Ordena los resultados por puntos de Scrabble. Gratis y sin registro.',
+  keywords: 'anagramas, anagrama de frase, anagrama de mi nombre, generador, palabras, letras, wordle, scrabble, apalabrados, crucigramas, español, diccionario, puntos scrabble, puntuacion palabras scrabble, cuanto vale una palabra en scrabble',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
