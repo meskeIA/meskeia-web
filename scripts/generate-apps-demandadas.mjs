@@ -8,8 +8,8 @@
  * POR QUÉ EXISTE (medición del 08/09/2026, hito `medir-home-instrumentada`)
  * -------------------------------------------------------------------------
  * Con el sorteo aleatorio sobre las +1.100 apps del catálogo, «Apps del día» rendía
- * 36 clics en 30 días: el 3,7 % de las sesiones que entran por la portada, frente al
- * 40,1 % del buscador que tiene justo encima. Los 36 clics se repartían entre 25 apps
+ * 36 clics en 30 días: el 3,8 % de las sesiones que entran por la portada, frente al
+ * 40,0 % del buscador que tiene justo encima. Los 36 clics se repartían entre 25 apps
  * sin que ninguna pasara de 3 — la firma de un módulo que no se elige, se acepta.
  * La causa no era el espacio ni la posición: era que ofrecía 4 apps al azar de mil.
  *
@@ -26,6 +26,12 @@
  * no existen (800x600: 62 en US frente a 6 en todo el resto del mundo; 400x400: 48 y CERO).
  * Se filtran por resolución y no por país a propósito: excluir US entero descartaría también
  * a los hispanohablantes reales de allí, que sí existen (1.431 cargas con 83 s de media).
+ *
+ * Es una firma REAL pero PARCIAL, y conviene no creerla más de lo que es: sobre las entradas
+ * a la portada quita 7 de las 68 de US, y las que quedan siguen fugándose al 95,1 %. Aquí
+ * basta —lo que se ordena es un ranking de ~100 apps, donde ese resto no mueve el orden—,
+ * pero NO da por limpia una métrica de página de aterrizaje. Detalle y tabla de bases en
+ * la memoria `project_analytics_bots_duracion` (quinta especie).
  *
  * CADENCIA
  * --------

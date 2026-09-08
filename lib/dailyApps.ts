@@ -8,7 +8,7 @@
  *
  * ⚠️ La rotación NO va sobre el catálogo entero desde el 08/09/2026. Sorteando 4
  * apps al azar entre las +1.100 del catálogo, el módulo rendía 36 clics en 30 días
- * (3,7 % de las sesiones que entran por la portada) frente al 40,1 % del buscador
+ * (3,8 % de las sesiones que entran por la portada) frente al 40,0 % del buscador
  * que tiene justo encima, y esos 36 clics se repartían entre 25 apps sin que
  * ninguna pasara de 3: la firma de un módulo que no se elige, se acepta. El pool
  * lo genera `scripts/generate-apps-demandadas.mjs` con las visitas reales de los
