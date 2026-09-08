@@ -2562,6 +2562,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   'calculadora-geometria': [
+    { url: '/transportador-angulos/', icon: '📐', name: 'Transportador de Ángulos', description: 'Mide un ángulo sobre tu imagen' },
     { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'Calcula el lado que falta antes de aplicar la fórmula del área' },
     ...matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-geometria/'),
     { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Visualiza y calcula volúmenes de esfera, cubo, cilindro, cono y pirámide con sliders interactivos' },
@@ -3166,7 +3167,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-inflacion': finanzasPersonalesApps,
   'analizador-espectro': [{ url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/comprobador-altavoces/', icon: '🔊', name: 'Comprobador de Altavoces', description: 'Canales, fase y graves de tu equipo' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Del espectro al nivel total en dB' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/generador-ruido-blanco/', icon: '🌫️', name: 'Ruido Blanco, Rosa y Marrón', description: 'Ruido de banda ancha sintetizado' }],
-  'nivel-burbuja': [{ url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud y ángulos' }, { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }],
+  // Medida de angulos: el transportador mide sobre la IMAGEN y el nivel con el
+  // SENSOR del movil. Son dos situaciones distintas (pantalla y objeto fisico),
+  // asi que se enlazan entre si en vez de competir.
+  'transportador-angulos': [
+    { url: '/nivel-burbuja/', icon: '📐', name: 'Nivel de Burbuja', description: 'Inclinacion real con el sensor del movil' },
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Ampliar lo que no se ve a simple vista' },
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, superficie y angulos' },
+    { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometria', description: 'Senos, cosenos y tangentes del angulo medido' },
+  ],
+
+  'nivel-burbuja': [{ url: '/transportador-angulos/', icon: '📐', name: 'Transportador de Ángulos', description: 'Mide un ángulo sobre tu imagen' }, { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud y ángulos' }, { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }],
 
   // INSTRUMENTOS DIGITALES (sustituyen aparatos físicos)
   'contador-manual': [{ url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' }, { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica productividad' }, { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento Hábitos', description: 'Rastrea tus hábitos' }],

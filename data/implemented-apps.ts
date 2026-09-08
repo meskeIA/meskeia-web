@@ -1354,6 +1354,9 @@ export const implementedAppsUrls = [
 
   // Ruido de banda ancha (2026-08)
   "/generador-ruido-blanco/",          // Blanco, rosa, marrón, azul y violeta sintetizados; ambientes y temporizador con fundido
+
+  // Medida de ángulos (2026-09)
+  "/transportador-angulos/",           // Mide ángulos sobre una imagen plana arrastrando tres puntos, y transportador imprimible a escala real
 ];
 
 /**
