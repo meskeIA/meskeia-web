@@ -26,6 +26,10 @@ consumidores a la vez. Se descubrió por casualidad al abrir el generador.
    Es el más fácil de olvidar precisamente porque no está aquí. Sus parsers avisan por consola
    si el número de apps reconocidas no cuadra con el de claves `slug:`, pero solo si alguien lo
    arranca y mira.
+5. `scripts/generate-apps-demandadas.mjs` (08/09/2026) — saca los slugs de `applications.ts` con
+   `/url:\s*"\/([^"/]+)\/"/g` para cruzarlos con el ranking de Turso. Este **sí se planta**: si
+   quedan menos de 20 apps válidas aborta sin escribir, porque un `data/apps-demandadas.ts`
+   vacío dejaría la portada rotando sobre el catálogo entero otra vez y en silencio.
 
 La defensa no es el build —que no ve nada de esto— sino contar lo que sale: un parser que
 devuelve 0 items donde había 133 no está «vacío», está roto.
