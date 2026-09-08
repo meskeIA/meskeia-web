@@ -1016,6 +1016,14 @@
   color: var(--text-secondary);
 }
 
+/* Envuelve solo el lema, para separarlo de la insignia de puntos que comparte chip.
+   El `nowrap` es de verdad —una palabra del lemario no debe partirse en dos líneas
+   dentro de su propia pastilla—, pero la razón de que la clase exista es que el lema
+   sea direccionable: sin ella, leer el chip devuelve «casa6 pt puntos». */
+.chipLema {
+  white-space: nowrap;
+}
+
 /* El número va dentro del propio chip, no en una columna aparte: la rejilla
    puede tener cientos de palabras y una segunda columna la partiría en dos
    lecturas. */

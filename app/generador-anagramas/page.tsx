@@ -173,14 +173,23 @@ type CriterioOrden = 'longitud' | 'puntos';
  * recorre la original llevando aparte el contador de la normalizada, que avanza únicamente en
  * los caracteres que la normalización conserva, y así el resaltado no depende de esa suerte.
  */
+/**
+ * El lema va SIEMPRE dentro de `.chipLema`, con o sin comodines, porque desde que el
+ * chip lleva también la insignia de puntos su `textContent` es «casa6 pt puntos» y
+ * el lema dejó de ser legible desde fuera: los 14 tests que lo leían por el chip se
+ * pusieron en rojo de golpe (08/09/2026). Envolverlo aquí, y no en los dos sitios que
+ * pintan chips, deja un solo punto de verdad para «esto es la palabra».
+ */
 function PalabraConComodines({ resultado }: { resultado: ResultadoPalabra }) {
-  if (resultado.comodines.length === 0) return <>{resultado.palabra}</>;
+  if (resultado.comodines.length === 0) {
+    return <span className={styles.chipLema}>{resultado.palabra}</span>;
+  }
 
   const marcadas = new Set(resultado.comodines);
   let indiceNormalizado = -1;
 
   return (
-    <>
+    <span className={styles.chipLema}>
       {Array.from(resultado.palabra).map((caracter, posicion) => {
         const minuscula = caracter.toLowerCase();
         const base = SIN_TILDE[minuscula] ?? minuscula;
@@ -194,7 +203,7 @@ function PalabraConComodines({ resultado }: { resultado: ResultadoPalabra }) {
           <Fragment key={posicion}>{caracter}</Fragment>
         );
       })}
-    </>
+    </span>
   );
 }
 
@@ -1108,8 +1117,12 @@ export default function GeneradorAnagramasPage() {
             <div className={styles.solucionesGrid}>
               {resultadoFrase.soluciones.map((solucion) => (
                 <div key={solucion.join('|')} className={styles.solucionCard}>
-                  {solucion.map((palabra) => (
-                    <span key={palabra} className={styles.solucionPalabra}>{palabra}</span>
+                  {/* La posición entra en la key porque un reparto PUEDE repetir palabra
+                      —«roma amor» da «amor amor», «roma roma» y tres más—, y con la palabra
+                      sola React avisaba de claves duplicadas y se reserva el derecho a omitir
+                      uno de los dos hijos. Hoy los pinta, pero el reparto se leería «amor». */}
+                  {solucion.map((palabra, posicion) => (
+                    <span key={`${palabra}-${posicion}`} className={styles.solucionPalabra}>{palabra}</span>
                   ))}
                 </div>
               ))}

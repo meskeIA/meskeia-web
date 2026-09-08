@@ -119,7 +119,7 @@ test.describe('generador-anagramas', () => {
     // Oráculo propio sobre public/data/diccionario-es.txt: los lemas que caben en {a,m,o,r}
     // con longitud 2..10, ordenados como los ordena la app (longitud descendente y, dentro de
     // cada grupo, alfabético). Son 5 + 7 + 4.
-    await expect(page.locator('[class*="wordChip"]')).toHaveText([
+    await expect(page.locator('[class*="chipLema"]')).toHaveText([
       'amor', 'maro', 'mora', 'ramo', 'roma',
       'amo', 'aro', 'mar', 'moa', 'mor', 'ora', 'roa',
       'am', 'ar', 'oa', 'ro',
@@ -133,7 +133,7 @@ test.describe('generador-anagramas', () => {
     ]);
 
     // La verdad comprobable del modo: toda palabra devuelta cabe en las letras pedidas.
-    for (const palabra of await page.locator('[class*="wordChip"]').allTextContents()) {
+    for (const palabra of await page.locator('[class*="chipLema"]').allTextContents()) {
       expect(esFormable(palabra, 'amor'), `«${palabra}» no se forma con las letras de «amor»`).toBe(
         true
       );
@@ -147,7 +147,7 @@ test.describe('generador-anagramas', () => {
     page,
   }) => {
     await abrirConDiccionario(page);
-    const chips = page.locator('[class*="wordChip"]');
+    const chips = page.locator('[class*="chipLema"]');
 
     // «corazon» es uno de los botones de ejemplo de la propia app.
     await page.fill('#anagram-letters', 'corazon');
@@ -192,11 +192,11 @@ test.describe('generador-anagramas', () => {
 
     await page.fill('#anagram-letters', 'arbol');
     await page.getByRole('button', { name: 'Buscar palabras' }).click();
-    await expect(page.locator('[class*="wordChip"]')).toHaveText(esperadas);
+    await expect(page.locator('[class*="chipLema"]')).toHaveText(esperadas);
 
     await page.fill('#anagram-letters', 'árbol');
     await page.getByRole('button', { name: 'Buscar palabras' }).click();
-    await expect(page.locator('[class*="wordChip"]')).toHaveText(esperadas);
+    await expect(page.locator('[class*="chipLema"]')).toHaveText(esperadas);
   });
 
   test('CASO 2c-2d · verificador: «Salvador Dalí» = «Avida Dollars», pero «año» ≠ «ano»', async ({
@@ -391,7 +391,7 @@ test.describe('generador-anagramas', () => {
       await page.selectOption('#anagram-min', '7');
       await page.selectOption('#anagram-max', '7');
       await page.getByRole('button', { name: 'Buscar palabras' }).click();
-      await expect(page.locator('[class*="wordChip"]')).toHaveText(['corazón']);
+      await expect(page.locator('[class*="chipLema"]')).toHaveText(['corazón']);
 
       // Modo frase: «Dalí» y «dali» reparten las mismas letras.
       await pestana(page, /Anagrama perfecto de una frase/).click();
@@ -520,9 +520,13 @@ test.describe('generador-anagramas', () => {
   //   «abcdefghijklm??» (13 letras + 2 blancas, el máximo que admite el campo) → 8.847
   // ---------------------------------------------------------------------------------------
   test.describe('fichas blancas · tercera pasada 27/08/2026', () => {
-    /** Cada chip con la letra que pone la blanca entre corchetes, EN SU POSICIÓN. */
+    /**
+     * Cada chip con la letra que pone la blanca entre corchetes, EN SU POSICIÓN.
+     * Cuelga de `.chipLema`, no del chip: el chip lleva además la insignia de puntos,
+     * que es otro nodo ELEMENTO y saldría aquí como un «[6 pt puntos]» final.
+     */
     const chipsMarcados = (page: Page) =>
-      page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+      page.locator('[class*="chipLema"]').evaluateAll((nodos) =>
         nodos.map((n) =>
           Array.from(n.childNodes)
             .map((h) => (h.nodeType === 1 ? `[${h.textContent}]` : h.textContent))
@@ -751,9 +755,13 @@ test.describe('generador-anagramas', () => {
         nodos.map((n) => Array.from(n.querySelectorAll('span')).map((s) => s.textContent).join(' '))
       );
 
-    /** Cada chip con la letra que pone la blanca entre corchetes, EN SU POSICIÓN. */
+    /**
+     * Cada chip con la letra que pone la blanca entre corchetes, EN SU POSICIÓN.
+     * Cuelga de `.chipLema`, no del chip: el chip lleva además la insignia de puntos,
+     * que es otro nodo ELEMENTO y saldría aquí como un «[6 pt puntos]» final.
+     */
     const chipsMarcados = (page: Page) =>
-      page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+      page.locator('[class*="chipLema"]').evaluateAll((nodos) =>
         nodos.map((n) =>
           Array.from(n.childNodes)
             .map((h) => (h.nodeType === 1 ? `[${h.textContent}]` : h.textContent))
@@ -800,7 +808,7 @@ test.describe('generador-anagramas', () => {
         'Palabras encontradas: 1244'
       );
 
-      const planas = await page.locator('[class*="wordChip"]').allTextContents();
+      const planas = await page.locator('[class*="chipLema"]').allTextContents();
       const marcados = await chipsMarcados(page);
       expect(planas).toHaveLength(1244);
 
@@ -924,6 +932,18 @@ test.describe('generador-anagramas', () => {
     test('NUEVO · «roma amor» da 36 repartos y los que repiten palabra se pintan enteros', async ({
       page,
     }) => {
+      // Las claves duplicadas de React NO se ven en el DOM: con `key={palabra}`, los cinco
+      // repartos que repiten palabra daban dos hijos con la misma clave y React avisaba de
+      // que puede OMITIR uno —«amor amor» se leería «amor»—. Hoy los pinta, así que el
+      // `toHaveCount(2)` de más abajo pasaba igual y el defecto solo salía por consola.
+      // El aviso es de la compilación de desarrollo, que es con la que corre esta suite
+      // (`next dev` en playwright.config.ts); contra un `next start` React no lo emite y
+      // esta comprobación no dice nada, ni a favor ni en contra.
+      const clavesDuplicadas: string[] = [];
+      page.on('console', (mensaje) => {
+        if (/same key/i.test(mensaje.text())) clavesDuplicadas.push(mensaje.text());
+      });
+
       await abrirConDiccionario(page);
       await pestana(page, /Anagrama perfecto/).click();
       await page.selectOption('#anagram-max-palabras', '3');
@@ -950,6 +970,9 @@ test.describe('generador-anagramas', () => {
       }
       // El propio texto de partida, que también es reparto suyo, no se devuelve
       expect(lista).not.toContain('amor roma');
+
+      // Y ninguno de los cinco repartos repetidos ha dejado claves duplicadas por el camino
+      expect(clavesDuplicadas, clavesDuplicadas.join('\n')).toEqual([]);
     });
 
     // -------------------------------------------------------------------------------------

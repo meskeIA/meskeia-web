@@ -102,8 +102,11 @@ test.describe('generador-anagramas · fichas blancas', () => {
 
     // Las tres de cuatro letras que salen sin blanca (asa+c, casa, saca…) deben ir por
     // delante de las 71 que sí la necesitan: conservar la blanca vale más que la jugada.
+    // Se cuentan los spans DENTRO del lema —uno por letra que pone la blanca—, no los
+    // del chip: el chip lleva además la insignia de puntos, que son tres spans más y
+    // los mismos en todas las palabras, gasten blanca o no.
     const grupo = page.locator('h4', { hasText: '4 letras (74)' }).locator('..');
-    const chips = grupo.locator('span[class*="wordChip"]');
+    const chips = grupo.locator('span[class*="chipLema"]');
     const primeras = await chips.evaluateAll((nodos) =>
       nodos.slice(0, 3).map((n) => n.querySelectorAll('span').length),
     );
