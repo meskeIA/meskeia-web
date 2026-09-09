@@ -196,7 +196,7 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
     case 'trastero': {
       const bien = p.tipoInmueble === 'garaje' ? 'garaje' : 'trastero';
       if (obraNueva) {
-        const porcentaje = anejo ? IVA_INMUEBLES_2025.garageCon : IVA_INMUEBLES_2025.garaje;
+        const porcentaje = anejo ? IVA_INMUEBLES_2025.anejoVinculado : IVA_INMUEBLES_2025.garaje;
         aplicarIVA(porcentaje, 'IVA (obra nueva)', anejo
           ? `El ${bien} se transmite con la vivienda como anejo: IVA reducido del ${porcentaje}% (art. 91.Uno.1.7º LIVA).`
           : `El ${bien} se adquiere de forma independiente: IVA general del ${porcentaje}%, no el reducido del anejo.`);

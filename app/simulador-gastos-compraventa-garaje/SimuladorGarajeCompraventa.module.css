@@ -254,7 +254,7 @@
   border: 1px solid var(--border);
 }
 
-.tiposReducidosInfo h4 {
+.tiposReducidosInfo h3 {
   font-size: 0.9rem;
   margin: 0 0 var(--spacing-sm);
   color: var(--text-primary);
@@ -522,7 +522,7 @@
   padding: var(--spacing-md);
 }
 
-.faqItem h4 {
+.faqItem h3 {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { RANGO_AJD, RANGO_ITP } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 /** Los rangos que cita el JSON-LD se DERIVAN de la tabla: escritos a mano contradecían al
@@ -9,6 +9,18 @@ import { formatNumber } from '@/lib/formatters';
  *  tras la bonificación (hallazgo 622). */
 const AJD_MIN = formatNumber(RANGO_AJD.min, 0);
 const AJD_MAX = formatNumber(RANGO_AJD.max, 1);
+
+/** Y por la misma razón el rango del ITP, que la pregunta del ITP tenía escrito a mano
+ *  («del 4% al 10%-11%») mientras la primera pregunta del MISMO bloque ya lo derivaba y
+ *  decía «del 4% al 13%» — el 13 % que la propia app cobra en el tramo alto de Baleares y
+ *  de Cataluña (hallazgo 665). */
+const ITP_MIN = formatNumber(RANGO_ITP.min, 0);
+const ITP_MAX = formatNumber(RANGO_ITP.max, 0);
+
+/** Extremos de la base del ahorro, derivados de la tabla con la que la app calcula el
+ *  IRPF de la ganancia (`calcularGananciaInmueble`), en vez de teclearlos (hallazgo 667). */
+const AHORRO_MIN = formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0);
+const AHORRO_MAX = formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo, 0);
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Local Comercial - IVA, ITP, Plusvalía e IRPF | meskeIA',
@@ -67,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga al comprar un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}% más AJD (del ${AJD_MIN}% al ${AJD_MAX}% según la comunidad autónoma; el País Vasco no lo cobra). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${formatNumber(RANGO_ITP.min, 0)}% al ${formatNumber(RANGO_ITP.max, 0)}%. No coinciden IVA e ITP en la misma operación.`,
+        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}% más AJD (del ${AJD_MIN}% al ${AJD_MAX}% según la comunidad autónoma; el País Vasco no lo cobra). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}% al ${ITP_MAX}%. No coinciden IVA e ITP en la misma operación.`,
       },
     },
     {
@@ -99,7 +111,7 @@ export const faqJsonLd = {
       name: '¿Qué gastos e impuestos paga el vendedor de un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano, y tributa en el IRPF por la ganancia patrimonial en la base del ahorro (tipos del 19% al 30% en 2025). A diferencia de la vivienda habitual, no existe exención por reinversión ni por tener más de 65 años. Si el local estuvo afecto a una actividad económica, el valor de adquisición se minora en las amortizaciones deducidas, lo que aumenta la ganancia. A esto se suman la comisión de la inmobiliaria y la gestoría.',
+        text: `El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano, y tributa en el IRPF por la ganancia patrimonial en la base del ahorro (tipos del ${AHORRO_MIN}% al ${AHORRO_MAX}% en 2025). A diferencia de la vivienda habitual, no existe exención por reinversión ni por tener más de 65 años. Si el local estuvo afecto a una actividad económica, el valor de adquisición se minora en las amortizaciones deducidas, lo que aumenta la ganancia. A esto se suman la comisión de la inmobiliaria y la gestoría.`,
       },
     },
     {
@@ -107,7 +119,7 @@ export const faqJsonLd = {
       name: '¿Qué tipo de ITP aplica a un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) son exclusivos de la vivienda habitual. Para un local comercial siempre aplica el tipo general de la comunidad autónoma, que oscila entre el 4% (País Vasco) y el 10%-11% (Cataluña, Comunidad Valenciana). Estos tipos pueden variar, por lo que conviene consultar la normativa vigente de cada comunidad.',
+        text: `Los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) son exclusivos de la vivienda habitual. Para un local comercial siempre aplica el tipo general de la comunidad autónoma, que va del ${ITP_MIN}% al ${ITP_MAX}%: el extremo alto no es un tipo plano, sino el último tramo de las comunidades que aplican una escala progresiva por valor del inmueble. Estos tipos pueden variar, por lo que conviene consultar la normativa vigente de cada comunidad.`,
       },
     },
   ],

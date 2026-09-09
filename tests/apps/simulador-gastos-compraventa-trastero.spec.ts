@@ -38,8 +38,9 @@
  *      compraventa (commit 0dba12c9) y a la del recargo del art. 27.2 LGT (13d2181b).
  *      Territorio y perfil nuevos otra vez: Cantabria con familia numerosa, la FRONTERA
  *      exacta de la escala de Aragón (400.000 €, donde un `<` en vez de `<=` se lleva el
- *      segundo tramo por delante) y unos años de propiedad NEGATIVOS. Al final, CINCO
- *      hallazgos abiertos con `test.fail()`.
+ *      segundo tramo por delante) y unos años de propiedad NEGATIVOS. Al final, los CINCO
+ *      hallazgos de esa ronda (637-641), REPARADOS el 09/09/2026: se les quitó el
+ *      `test.fail()` y hoy quedan como REGRESIÓN de la reparación.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -48,7 +49,7 @@
  *  - Escala progresiva y AJD por CCAA → `ITP_CCAA` en `data/itp-ccaa.ts`
  *    (Cataluña 10/11/12/13 % y `ajd: 1.5` · Madrid `ajd: 0.75` · País Vasco `ajd: 0`).
  *  - IVA del trastero de obra nueva → `IVA_INMUEBLES_2025` en `data/fiscal/inmuebles.ts`.
- *    La app usa `garageCon: 10` para el trastero VINCULADO (anejo transmitido junto con la
+ *    La app usa `anejoVinculado: 10` para el trastero VINCULADO (anejo transmitido junto con la
  *    vivienda, art. 91.Uno.1.7º LIVA) y `garaje: 21` para el INDEPENDIENTE (finca registral
  *    propia, operación separada → tipo general).
  *  - Arancel notarial → `ARANCELES_NOTARIO` (RD 1426/1989, número 2: matriz + una copia) y
@@ -84,6 +85,32 @@
 import { test, expect, Page } from '@playwright/test';
 
 const RUTA = '/simulador-gastos-compraventa-trastero/';
+
+/**
+ * Repite una medición hasta que dos lecturas consecutivas coinciden.
+ *
+ * Leer un color computado justo después de cambiar de tema devuelve un fotograma
+ * INTERMEDIO de la transición CSS: un número que no existe en ninguno de los dos temas.
+ * El 09/09/2026 este test daba 1,72:1 midiendo texto ya oscuro (rgb(176,176,176)) sobre un
+ * panel a medio camino (rgb(132,132,132)), cuando el valor real con la transición
+ * terminada es 6,6:1 sobre rgb(42,42,42). El fallo estaba en la medición, no en el color.
+ *
+ * No sirve esperar `getAnimations()`: consultarlo en el mismo tick del clic devuelve una
+ * lista vacía —el navegador aún no ha creado las transiciones— y, con margen de fotogramas,
+ * nacen escalonadas. Lo único que no depende de cómo esté implementada la animación es
+ * esperar a que la medida deje de moverse.
+ */
+async function esperarEstable<T>(leer: () => Promise<T>): Promise<T> {
+  let anterior = await leer();
+  for (let intento = 0; intento < 30; intento++) {
+    await new Promise((r) => setTimeout(r, 100));
+    const actual = await leer();
+    if (JSON.stringify(actual) === JSON.stringify(anterior)) return actual;
+    anterior = actual;
+  }
+  return anterior;
+}
+
 
 /** El formato de moneda es-ES separa la cifra del € con un espacio duro (U+00A0). */
 const ESPACIO_DURO = new RegExp(String.fromCharCode(160), 'g');
@@ -199,7 +226,7 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
     // --- Trastero VINCULADO (es la modalidad por defecto) ---
-    // IVA = 3.000 × 10 % = 300 — IVA_INMUEBLES_2025.garageCon = 10 (anejo con la vivienda).
+    // IVA = 3.000 × 10 % = 300 — IVA_INMUEBLES_2025.anejoVinculado = 10 (anejo con la vivienda).
     await expect(page.getByRole('button', { name: /Vinculado a vivienda/ })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -1880,12 +1907,12 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 07/09/2026 — CINCO.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a
-// propósito. Al repararlos hay que QUITAR la marca, no borrar el test.
+// REGRESIÓN — los CINCO hallazgos de la re-inspección del 07/09/2026 (637-641),
+// REPARADOS el 09/09/2026. Estaban escritos con `test.fail()` afirmando lo que DEBERÍA
+// pasar; al repararlos se les quitó la marca y hoy sujetan la reparación.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ❌ ABIERTO (medio) — accesibilidad.
+// ✅ REPARADO 09/09/2026 (637, medio) — accesibilidad.
 // El aviso de la modalidad «Independiente» lleva el color escrito a mano en un `style`
 // inline (`color: '#856404'`, page.tsx:516) en vez del token `var(--text-secondary)` que usa
 // su hermana del mismo panel. En modo oscuro ese marrón queda rgb(133,100,4) sobre el
@@ -1896,8 +1923,10 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
 // El CLAUDE.md global §6 exige el modo oscuro completo, y un color literal no lo tiene.
 // Caso: modo oscuro (botón «Cambiar a modo oscuro») · Primera mano · Modalidad
 //       «Independiente» → esperado contraste ≥ 4,5:1 · obtenido 2,61:1.
-test.fail(
-  'HALLAZGO 07/09 (accesibilidad) — el aviso de modalidad se pinta con un color literal ilegible en oscuro',
+// Reparado retirando el literal: el párrafo se queda con el token del `.infoCcaaNote`,
+// que en oscuro rinde rgb(176,176,176) sobre el rgb(42,42,42) del panel (6,6:1).
+test(
+  'REGRESIÓN 637 (accesibilidad) — el aviso de modalidad es legible en modo oscuro',
   async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
@@ -1905,7 +1934,8 @@ test.fail(
     await page.getByRole('button', { name: /Independiente/ }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
-    const ratio = await page.evaluate(() => {
+    const medirRatio = () =>
+      page.evaluate(() => {
       const luminancia = (css: string) => {
         const [r, g, b] = (css.match(/[\d.]+/g) as string[]).slice(0, 3).map(Number).map((v) => {
           const s = v / 255;
@@ -1927,13 +1957,15 @@ test.fail(
       const l1 = luminancia(getComputedStyle(p).color);
       const l2 = luminancia(fondo || 'rgb(255, 255, 255)');
       return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
-    });
+      });
+
+    const ratio = await esperarEstable(medirRatio);
 
     expect(ratio).toBeGreaterThanOrEqual(4.5);
   },
 );
 
-// ❌ ABIERTO (bajo) — contenido.
+// ✅ REPARADO 09/09/2026 (638, bajo) — contenido.
 // La tarjeta de plusvalía compone el aviso como «No calculada (falta ...)» y le pega detrás
 // una lista, así que en cuanto lo que falta es un plural —o son dos campos— el verbo no
 // concuerda: «No calculada (falta los años de propiedad)» y «No calculada (falta el valor
@@ -1942,8 +1974,11 @@ test.fail(
 // Caso: pestaña Vendedor · venta 24.000 € · compra 14.000 € · suelo 5.000 € · total
 //       catastral 12.000 € · años de propiedad VACÍOS → esperado «faltan los años de
 //       propiedad» · obtenido «No calculada (falta los años de propiedad)».
-test.fail(
-  'HALLAZGO 07/09 (contenido) — «falta los años de propiedad» no concuerda en número',
+// Reparado marcando el número gramatical de cada campo (`CampoQueFalta`) y componiendo el
+// verbo y la enumeración aparte: «faltan» con dos o más campos o con uno solo en plural, y
+// «y» antes del último en vez de una coma.
+test(
+  'REGRESIÓN 638 (contenido) — el verbo del aviso concuerda con lo que falta',
   async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio del trastero', '24000');
@@ -1953,11 +1988,18 @@ test.fail(
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '12000');
 
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    // Un solo campo, pero PLURAL: «faltan los años de propiedad».
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toMatch(/faltan los años de propiedad/);
+
+    // Y con DOS campos vacíos, el verbo sigue en plural y la lista se cierra con «y», no
+    // con una coma: «faltan el valor catastral del suelo y los años de propiedad».
+    await rellenar(page, 'Valor catastral del suelo', '');
+    const dos = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(dos).toContain('faltan el valor catastral del suelo y los años de propiedad');
   },
 );
 
-// ❌ ABIERTO (bajo) — contenido.
+// ✅ REPARADO 09/09/2026 (639, bajo) — contenido.
 // Cuando lo único que falta es el precio de compra original, ese campo bloquea a la vez la
 // plusvalía y el IRPF, y el aviso del neto lo pide DOS VECES en la misma frase: «Techo: aún
 // NO incluye la plusvalía municipal (añade el precio de compra original) ni el IRPF de la
@@ -1966,8 +2008,11 @@ test.fail(
 // Caso: pestaña Vendedor · venta 24.000 € · suelo 5.000 € · años 10 · precio de compra
 //       VACÍO → esperado que el campo se pida una sola vez · obtenido dos veces en la
 //       misma descripción, sobre un neto de 23.280,00 €.
-test.fail(
-  'HALLAZGO 07/09 (contenido) — el aviso del neto pide dos veces el mismo campo',
+// Reparado separando los CONCEPTOS que faltan de los CAMPOS que hay que rellenar: los dos
+// conceptos se siguen nombrando («la plusvalía municipal ni el IRPF de la ganancia») y el
+// campo se pide una sola vez al final.
+test(
+  'REGRESIÓN 639 (contenido) — el aviso del neto no pide dos veces el mismo campo',
   async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio del trastero', '24000');
@@ -1979,10 +2024,13 @@ test.fail(
     const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
     const veces = neto.split('el precio de compra original').length - 1;
     expect(veces).toBe(1);
+    // Y sin perder ninguno de los dos conceptos que quedan fuera del neto.
+    expect(neto).toContain('la plusvalía municipal');
+    expect(neto).toContain('el IRPF de la ganancia');
   },
 );
 
-// ❌ ABIERTO (bajo) — dato.
+// ✅ REPARADO 09/09/2026 (640, bajo) — dato.
 // El sello `DataReference` de la plusvalía cierra su nota con «El IRPF de la ganancia usa
 // los tramos del ahorro de 2025 (19 % a 30 %)», con el rango TECLEADO A MANO, mientras la
 // propia página ya lo deriva de `TRAMOS_GANANCIAS_PATRIMONIALES_2025` en `TIPO_AHORRO_MIN`
@@ -1994,38 +2042,72 @@ test.fail(
 // Caso: `app/simulador-gastos-compraventa-trastero/page.tsx` → esperado que el rango salga
 //       de TIPO_AHORRO_MIN/TIPO_AHORRO_MAX · obtenido el literal «(19 % a 30 %)» en el
 //       `nota` del segundo DataReference, visible en pantalla junto al sello de la IIVTNU.
-test.fail('HALLAZGO 07/09 (dato) — el sello de la plusvalía teclea a mano el rango del ahorro', async () => {
+// Reparado interpolando `TIPO_AHORRO_MIN` y `TIPO_AHORRO_MAX` en la nota del sello: el
+// rango sale ya de `TRAMOS_GANANCIAS_PATRIMONIALES_2025`, como las otras tres veces que
+// aparece en la página.
+test('REGRESIÓN 640 (dato) — el sello de la plusvalía deriva el rango del ahorro', async ({ page }) => {
   const { readFileSync } = await import('node:fs');
   const { join } = await import('node:path');
   const fuente = readFileSync(
     join(process.cwd(), 'app', 'simulador-gastos-compraventa-trastero', 'page.tsx'),
     'utf8',
   );
+  // Ningún extremo tecleado a mano en el `nota` del sello…
   expect(fuente).not.toContain('(19 % a 30 %)');
+  expect(fuente).toContain('formatNumber(TIPO_AHORRO_MIN, 0)');
+  expect(fuente).toContain('formatNumber(TIPO_AHORRO_MAX, 0)');
+
+  // …y en pantalla el sello sigue publicando el rango vigente, el mismo que la tarjeta del
+  // IRPF, que ya lo derivaba (19 % a 30 % con los tramos de 2025).
+  await page.goto(RUTA);
+  await expect(
+    page.getByText('El IRPF de la ganancia usa los tramos del ahorro de 2025 (19 % a 30 %)').first(),
+  ).toBeVisible();
 });
 
-// ❌ ABIERTO (bajo) — dato.
-// El IVA del trastero VINCULADO se calcula con `IVA_INMUEBLES_2025.garageCon`, que en
-// `data/fiscal/inmuebles.ts` está documentado como «IVA garaje incluido con la vivienda
-// (hasta 2 plazas)» —una regla del garaje, con su propio límite de plazas—, mientras el
-// botón «Primera mano», la nota de cabecera, la tabla comparativa, la FAQ y el JSON-LD de
-// `metadata.ts` anuncian ese mismo tipo desde `obraNueva`. La propia tabla de la página
-// reparte las dos constantes al revés de como calcula: fila «Trastero vinculado a vivienda»
-// → `obraNueva`; fila «Garaje / Plaza de parking» → `garageCon`. Las dos valen 10 hoy, así
-// que no hay divergencia visible; existen separadas precisamente para poder divergir.
+// ✅ REPARADO 09/09/2026 (641, bajo) — dato.
+// El IVA del trastero VINCULADO se calculaba con la constante del garaje —`garageCon`, «IVA
+// garaje incluido con la vivienda (hasta 2 plazas)», una regla del garaje con su propio
+// límite de plazas— mientras el botón «Primera mano», la nota de cabecera, la tabla
+// comparativa, la FAQ y el JSON-LD de `metadata.ts` anunciaban ese mismo tipo desde
+// `obraNueva`. La propia tabla repartía las dos constantes al revés de como calculaba: fila
+// «Trastero vinculado a vivienda» → `obraNueva`; fila «Garaje / Plaza de parking» →
+// `garageCon`. Las dos valen 10 hoy, así que no había divergencia visible; existen separadas
+// precisamente para poder divergir.
 // Caso: Primera mano · Vinculado · Madrid · 12.000 € → la tarjeta cobra 1.200,00 € y se
-//       describe «IVA 10% — anejo transmitido con la vivienda» leyendo `garageCon`, mientras
-//       el botón de al lado dice «Paga IVA 10%» leyendo `obraNueva`. Esperado: una sola
+//       describe «IVA 10% — anejo transmitido con la vivienda» leyendo una constante, mientras
+//       el botón de al lado decía «Paga IVA 10%» leyendo la otra. Esperado: una sola
 //       constante para el anejo residencial · obtenido: dos.
-test.fail('HALLAZGO 07/09 (dato) — el trastero vinculado liquida con la constante del garaje', async () => {
+// REPARADO en dos mitades: en `data/fiscal/inmuebles.ts`, `garageCon` pasó a llamarse
+// `anejoVinculado` y su comentario cubre ya el art. 91.Uno.1.7º LIVA entero (garajes de hasta
+// dos plazas Y trasteros transmitidos con la vivienda); y aquí, el cálculo y TODOS los textos
+// —botón, nota de cabecera, tabla, FAQ y JSON-LD— leen esa única constante.
+test('REGRESIÓN 641 (dato) — el anejo residencial se calcula y se anuncia con la MISMA constante', async ({
+  page,
+}) => {
   const { readFileSync } = await import('node:fs');
   const { join } = await import('node:path');
-  const fuente = readFileSync(
-    join(process.cwd(), 'app', 'simulador-gastos-compraventa-trastero', 'page.tsx'),
-    'utf8',
-  );
+  const carpeta = join(process.cwd(), 'app', 'simulador-gastos-compraventa-trastero');
+  const fuente = readFileSync(join(carpeta, 'page.tsx'), 'utf8');
+  const meta = readFileSync(join(carpeta, 'metadata.ts'), 'utf8');
+
+  // El motor sigue liquidando el vinculado con `anejoVinculado`…
   const inicio = fuente.indexOf('porcentaje = modalidadTrastero');
-  const motor = fuente.slice(inicio, inicio + 160);
   expect(inicio).toBeGreaterThan(-1);
-  expect(motor).toContain('IVA_INMUEBLES_2025.obraNueva');
+  expect(fuente.slice(inicio, inicio + 160)).toContain('IVA_INMUEBLES_2025.anejoVinculado');
+
+  // …y ni la página ni el JSON-LD pueden volver a anunciar el anejo desde `obraNueva`, que
+  // es el IVA de la VIVIENDA y no el del anejo que esta app calcula.
+  expect(fuente).not.toContain('IVA_INMUEBLES_2025.obraNueva');
+  expect(meta).not.toContain('IVA_INMUEBLES_2025.obraNueva');
+  expect(meta).toContain('IVA_INMUEBLES_2025.anejoVinculado');
+
+  // Y en pantalla el botón y la tarjeta dicen lo mismo sobre el mismo caso:
+  // Madrid (por defecto) · Primera mano · Vinculado · 12.000 € → 12.000 × 10 % = 1.200.
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
+  await rellenar(page, 'Precio del trastero', '12000');
+  expect(await valorTarjeta(page, 'IVA (10,00%)')).toBe('1200,00 €');
+  await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 10%');
 });

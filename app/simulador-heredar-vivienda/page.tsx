@@ -24,6 +24,7 @@ import {
   COEFICIENTES_IS,
   COEFICIENTES_CATALUNA_IS,
   COEFICIENTES_IIVTNU_2025,
+  REDUCCION_VIVIENDA_PORC_IS,
   REDUCCION_VIVIENDA_MAX_IS,
   REDUCCION_EDAD_MENOR_21_IS,
   REDUCCION_EDAD_MENOR_21_MAX_IS,
@@ -54,6 +55,23 @@ import {
 } from '@/lib/calculadoras/sucesiones';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import styles from './SimuladorHeredarVivienda.module.css';
+
+/**
+ * El 95 % del art. 20.2.c LISD, LEÍDO de data/fiscal. Aparecía escrito a mano en las cinco
+ * frases que lo citan —etiqueta de la casilla, línea del panel, dos tarjetas educativas y la
+ * FAQ— mientras su tope viajaba derivado (`REDUCCION_VIVIENDA_MAX_IS`) en esas mismas
+ * frases: el porcentaje y el tope de la misma reducción, uno a mano y el otro no
+ * (hallazgo 658). Cataluña usa el mismo porcentaje con otro tope, así que la cifra vale para
+ * los dos regímenes.
+ */
+const PORC_REDUCCION_VIVIENDA = formatNumber(REDUCCION_VIVIENDA_PORC_IS * 100, 0);
+
+/**
+ * El coeficiente multiplicador del Grupo IV con el patrimonio preexistente más bajo, que es
+ * el supuesto que simula esta app (índice 0). La tarjeta educativa lo escribía a mano en la
+ * misma frase en la que SÍ derivaba el otro extremo de la fila (hallazgo 658).
+ */
+const COEF_GRUPO_IV_MIN = COEFICIENTES_IS['IV'][0];
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -283,6 +301,34 @@ const ANIO_REFERENCIA = 2026;
 /** Edad mínima del colateral (Grupo III) para la reducción de vivienda habitual, art. 20.2.c LISD */
 const EDAD_MIN_COLATERAL_VIVIENDA = EDAD_MIN_COLATERAL_VIVIENDA_IS;
 
+/**
+ * Redondeo al céntimo de CADA importe de la liquidación.
+ *
+ * ── De dónde sale la regla (hallazgo 657, 09/09/2026) ─────────────────────────
+ * Es literalmente el helper `r` de `calcularSucesion` en `lib/calculadoras/sucesiones.ts`
+ * —`Math.round(n * 100) / 100`—, aplicado en los MISMOS pasos: reducciones, base
+ * liquidable, cuota íntegra, cuota tributaria, bonificación y cuota final. Una liquidación
+ * del ISD se expresa al céntimo en cada concepto, no solo en el total.
+ *
+ * Hasta el 09/09/2026 esta app redondeaba solo AL PINTAR (`formatCurrency`) y la cadena
+ * seguía por dentro con el número largo, así que la multiplicación y la resta escritas en
+ * pantalla no daban el número de debajo: el panel decía «4335,91 × 2,0000 = 8671,83», y
+ * 4.335,91 × 2 son 8.671,82. En un barrido de las 2.233.392 combinaciones alcanzables con
+ * los deslizadores la cadena impresa no cuadraba en 787.942 (35 %); con este redondeo
+ * cuadra en las 2.233.392.
+ *
+ * ⚠️ La bonificación se redondea ANTES de restarla, y ahí esta app se separa a propósito
+ * del motor compartido, que redondea la RESTA (`r(cuotaTributaria - bonificacion)`) pero
+ * publica la bonificación ya redondeada. Cuando la bonificación cae en el medio céntimo
+ * exacto, sus dos campos se contradicen: con 26.782,55 € de cuota tributaria y el 90 % de
+ * Castilla-La Mancha devuelve bonificación 24.104,30 € y cuota final 2.678,26 €, que suman
+ * 26.782,56 €. Aquí manda la aritmética escrita: 26.782,55 − 24.104,30 = 2.678,25. Son
+ * 20.104 de esas 2.233.392 combinaciones (0,9 %), todas de un céntimo, y todas aquellas en
+ * las que el motor no cuadra consigo mismo. El día que `calcularSucesion` reste importes ya
+ * redondeados, la paridad vuelve a ser total sin tocar nada de aquí.
+ */
+const redondearCentimos = (n: number): number => Math.round(n * 100) / 100;
+
 function calcularISD(
   valorReferencia: number,
   parentesco: Parentesco,
@@ -319,13 +365,14 @@ function calcularISD(
    * hay que elegir entre inventarse el dato estatal y no dar ninguno.
    */
   const anosPorDebajo = grupo === 'I' ? Math.max(0, 21 - edad) : 0;
-  const reduccionParentesco =
+  const reduccionParentesco = redondearCentimos(
     anosPorDebajo > 0
       ? Math.min(
           reduccionBaseParentesco + anosPorDebajo * (esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS),
           esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS,
         )
-      : reduccionBaseParentesco;
+      : reduccionBaseParentesco
+  );
 
   /**
    * Reducción por vivienda habitual: 95 % hasta 122.606,47 € en régimen común (art. 20.2.c
@@ -345,7 +392,7 @@ function calcularISD(
     edadHeredero: edad,
     convivenciaDosAnios: convivioDosAnios,
   });
-  const reduccionVivienda = vivienda.reduccion;
+  const reduccionVivienda = redondearCentimos(vivienda.reduccion);
   const viviendaNoAplicada = vivienda.noAplicada;
 
   /**
@@ -355,22 +402,21 @@ function calcularISD(
    * Asturias como la comunidad más cara mientras `data/fiscal` decía que un hijo que hereda
    * 250.000 € de vivienda habitual no paga nada.
    */
-  const reduccionAutonomica = bonifGrupo?.reduccionBase ?? 0;
+  const reduccionAutonomica = redondearCentimos(bonifGrupo?.reduccionBase ?? 0);
 
-  const baseLiquidable = Math.max(
-    0,
-    baseImponible - reduccionParentesco - reduccionVivienda - reduccionAutonomica
+  const baseLiquidable = redondearCentimos(
+    Math.max(0, baseImponible - reduccionParentesco - reduccionVivienda - reduccionAutonomica)
   );
 
   // Aplicar tarifa
   const tarifa = esCataluna ? TARIFA_CATALUNA_IS : TARIFA_ESTATAL_IS;
-  const cuotaIntegra = calcularCuotaIntegraIS(baseLiquidable, tarifa);
+  const cuotaIntegra = redondearCentimos(calcularCuotaIntegraIS(baseLiquidable, tarifa));
 
   // Coeficiente por patrimonio preexistente, desde data/fiscal. Índice 0 = primer tramo
   // (patrimonio del heredero < 402.678,11 €), que es el supuesto que simula esta app.
   const tablaCoeficientes = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
   const coeficiente = tablaCoeficientes[grupo]?.[0] ?? 1.0;
-  const cuotaTributaria = cuotaIntegra * coeficiente;
+  const cuotaTributaria = redondearCentimos(cuotaIntegra * coeficiente);
 
   // Bonificación CCAA
   let bonificacionPorc = 0;
@@ -415,8 +461,10 @@ function calcularISD(
     }
   }
 
-  const bonificacion = cuotaTributaria * bonificacionPorc;
-  const cuotaFinal = Math.max(0, cuotaTributaria - bonificacion);
+  // La bonificación se redondea ANTES de restarla: es lo que hace cuadrar la resta escrita
+  // en el panel. Ver `redondearCentimos` para el céntimo en que esto se separa del motor.
+  const bonificacion = redondearCentimos(cuotaTributaria * bonificacionPorc);
+  const cuotaFinal = redondearCentimos(Math.max(0, cuotaTributaria - bonificacion));
 
   return {
     baseImponible,
@@ -897,7 +945,7 @@ export default function SimuladorHeredarViviendaPage() {
               />
               <span>
                 Era vivienda habitual del fallecido{' '}
-                <span className={styles.muted}>(reducción 95% ISD hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)})</span>
+                <span className={styles.muted}>(reducción {PORC_REDUCCION_VIVIENDA}% ISD hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)})</span>
               </span>
             </label>
           </div>
@@ -1000,7 +1048,7 @@ export default function SimuladorHeredarViviendaPage() {
             </div>
             {isd.reduccionVivienda > 0 && (
               <div className={styles.panelLine}>
-                <span>− Reducción vivienda habitual (95%)</span>
+                <span>− Reducción vivienda habitual ({PORC_REDUCCION_VIVIENDA}%)</span>
                 <strong>−{formatCurrency(isd.reduccionVivienda)}</strong>
               </div>
             )}
@@ -1201,7 +1249,7 @@ export default function SimuladorHeredarViviendaPage() {
               <tr>
                 <td><strong>IRPF</strong> (ganancia patrimonial)</td>
                 <td>Año siguiente a la venta (campaña Renta)</td>
-                <td>(Valor venta − valor adquisición fiscal) × tramos 19-30%. Valor adquisición fiscal incluye los impuestos pagados al heredar.</td>
+                <td>(Valor venta − valor adquisición fiscal) × tramos {TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}%. Valor adquisición fiscal incluye los impuestos pagados al heredar.</td>
                 <td>El que vende (heredero, si vendes)</td>
               </tr>
             </tbody>
@@ -1218,7 +1266,7 @@ export default function SimuladorHeredarViviendaPage() {
             <h4>Hijo hereda piso vivienda habitual del padre</h4>
             <p>
               Reducción de parentesco ({formatCurrency(REDUCCIONES_PARENTESCO_IS['II'] ?? 0)}) + reducción
-              vivienda habitual del 95% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). En las
+              vivienda habitual del {PORC_REDUCCION_VIVIENDA}% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). En las
               comunidades de régimen común que bonifican la cuota al 99% o más
               ({CCAA_BONIFICACION_CASI_TOTAL.join(', ')}) el ISD se queda en casi nada — Aragón, eso sí,
               deja de bonificar del todo por encima de 3.000.000 € de base liquidable. Ojo con las que
@@ -1249,7 +1297,7 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.escenarioCard}>
             <h4>Heredero del Grupo IV (sin parentesco)</h4>
             <p>
-              Coeficiente multiplicador 2,0 y sin reducciones. Casi ninguna CCAA bonifica.
+              Coeficiente multiplicador {formatNumber(COEF_GRUPO_IV_MIN, 1)} y sin reducciones. Casi ninguna CCAA bonifica.
               Heredar 200.000 € supone {formatCurrency(EJEMPLO_GRUPO_IV.cuotaFinal)} de ISD en
               régimen común, y más con un patrimonio previo alto (el coeficiente llega a {formatNumber(COEFICIENTES_IS['IV'][COEFICIENTES_IS['IV'].length - 1], 1)}).
               Conviene valorar si compensa renunciar a la herencia (la herencia es siempre
@@ -1317,7 +1365,7 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.faqItem}>
             <strong>¿Cómo afecta que fuera la vivienda habitual del fallecido?</strong>
             <p>
-              Hay reducción del 95% en la base imponible del ISD para cónyuge, descendientes,
+              Hay reducción del {PORC_REDUCCION_VIVIENDA}% en la base imponible del ISD para cónyuge, descendientes,
               ascendientes o un colateral mayor de 65 años que conviviera con el fallecido los
               últimos 2 años. El tope estatal es {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}/heredero (cada CCAA puede mejorarlo).
               Requisito: mantener la vivienda al menos 10 años (en algunas CCAA es menor). Si la
@@ -1412,7 +1460,7 @@ export default function SimuladorHeredarViviendaPage() {
             <span className={styles.tipIcon} aria-hidden="true">💰</span>
             <div>
               <strong>Aprovecha la reducción de vivienda habitual</strong>
-              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del 95% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}) puede ser decisiva.</p>
+              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del {PORC_REDUCCION_VIVIENDA}% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}) puede ser decisiva.</p>
             </div>
           </div>
           <div className={styles.tipCard}>

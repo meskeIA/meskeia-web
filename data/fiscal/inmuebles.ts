@@ -76,8 +76,18 @@ export const TIPOS_AJD_2025 = {
 export const IVA_INMUEBLES_2025 = {
   obraNueva:         10,   // % — IVA vivienda nueva (primera transmisión del promotor)
   viviendaProtegida: 4,    // % — IVA vivienda de protección oficial
-  garaje:            21,   // % — IVA garaje independiente (si no va con la vivienda)
-  garageCon:         10,   // % — IVA garaje incluido con la vivienda (hasta 2 plazas)
+  garaje:            21,   // % — IVA garaje o trastero independiente (si no va con la vivienda)
+  /**
+   * % — IVA del anejo transmitido CONJUNTAMENTE con la vivienda: garajes (máximo dos
+   * plazas) y trasteros. Art. 91.Uno.1.7º LIVA, que los grava al mismo tipo que la
+   * vivienda por ser «anexos que se transmitan conjuntamente».
+   *
+   * Se llamaba `garageCon` y solo documentaba el garaje, así que las apps de trastero
+   * calculaban con esta constante mientras sus textos anunciaban `obraNueva`: dos
+   * constantes para un único dato, que existen separadas precisamente para poder
+   * divergir (hallazgo 641 del Inspector, 07/09/2026).
+   */
+  anejoVinculado:    10,
   local:             21,   // % — IVA local comercial
 };
 

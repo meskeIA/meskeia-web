@@ -18,6 +18,12 @@
  *    renuncia, donde el IPSI NO se cuantifica—, un barrido de las 19 comunidades que
  *    comprueba que a ninguna nave se le cuela un tipo reducido de vivienda habitual,
  *    y 6 hallazgos nuevos al final, con `test.fail()`.
+ *  · 09/09/2026 — REPARACIÓN de los 6 hallazgos del 07/09 (646-651): el suelo del ranking del
+ *    FAQPage con `sueloDe()`, los dos avisos de transmisión mirando `TERRITORIOS_SIN_IVA`, los
+ *    colores de la tabla comparativa con contraste en ambos temas, los 14 bordes `#e0e0e0`
+ *    pasados a `var(--border)`, el 50 % derivado de `BONIFICACION_CUOTA_CEUTA_MELILLA` y el
+ *    rango de ITP con `formatTipoNominal`. Sus tests pierden el `test.fail()` y pasan al
+ *    bloque de REGRESIÓN. No queda ningún hallazgo abierto en el fichero.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -48,14 +54,61 @@
  * Todos los casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va comentado
  * junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()`. Afirman lo que DEBERÍA pasar y hoy
- * fallan a propósito; cuando se reparen, se les quita el `test.fail()` y quedan como regresión.
+ * HALLAZGOS ABIERTOS: ninguno a 09/09/2026. Los que hubo se escribieron con `test.fail()`
+ * afirmando lo que DEBERÍA pasar y, al repararse, perdieron la marca y se quedaron como
+ * regresión en los bloques que llevan su fecha.
  */
 import { test, expect, Page } from '@playwright/test';
 import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles';
 import { BONIFICACION_CUOTA_CEUTA_MELILLA, ITP_CCAA, RANGO_ITP } from '../../data/itp-ccaa';
 
 const RUTA = '/simulador-gastos-compraventa-nave-industrial/';
+
+/**
+ * Repite una medición hasta que dos lecturas consecutivas coinciden.
+ *
+ * Leer un color computado justo después de cambiar de tema devuelve un fotograma
+ * INTERMEDIO de la transición CSS: un número que no existe en ninguno de los dos temas.
+ * El 09/09/2026 esto daba 1,72:1 en el trastero (texto ya oscuro sobre un panel a medio
+ * camino, cuando lo real son 6,6:1) y 3,05:1 en la tabla de la nave, cuyo peor caso real
+ * es 5,72:1.
+ *
+ * No sirve esperar `getAnimations()`: consultarlo en el mismo tick del clic devuelve una
+ * lista vacía —el navegador aún no ha creado las transiciones— y, con margen de dos
+ * fotogramas, las transiciones nacen escalonadas, así que unas terminan mientras otras
+ * empiezan. Lo único que no depende de cómo esté implementada la animación es esperar a
+ * que la medida deje de moverse.
+ */
+async function esperarEstable<T>(leer: () => Promise<T>): Promise<T> {
+  let anterior = await leer();
+  for (let intento = 0; intento < 30; intento++) {
+    await new Promise((r) => setTimeout(r, 100));
+    const actual = await leer();
+    if (JSON.stringify(actual) === JSON.stringify(anterior)) return actual;
+    anterior = actual;
+  }
+  return anterior;
+}
+/**
+ * Pone la página en modo oscuro DE VERDAD, y lo comprueba.
+ *
+ * `document.documentElement.setAttribute('data-theme','dark')` a pelo no sirve: si se
+ * ejecuta antes de que la app hidrate, su gestor de tema lo pisa con la preferencia
+ * guardada y el atributo vuelve a `light` sin decir nada. El 09/09/2026 los dos tests de
+ * accesibilidad de esta app medían así el tema CLARO creyendo medir el oscuro — el de los
+ * bordes fallaba (en claro el borde ES #e0e0e0, y con razón) y el del contraste PASABA EN
+ * FALSO, midiendo dos veces lo mismo.
+ *
+ * Por eso se pulsa el botón real —lo que hace un usuario, y deja a la app como dueña del
+ * estado— y se AFIRMA el atributo: si algún día vuelve a revertirse, el test lo dice en vez
+ * de medir el tema equivocado en silencio.
+ */
+async function activarTemaOscuro(page: Page): Promise<void> {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+}
+
 const FUENTE_PAGE = 'app/simulador-gastos-compraventa-nave-industrial/page.tsx';
 
 /** Valor de una ResultCard, con el espacio duro del formato español normalizado. */
@@ -1641,12 +1694,27 @@ test.describe('Inspección 07/09/2026 — tres casos nuevos', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — 07/09/2026. Marcados con `test.fail()`: afirman lo que DEBERÍA
-// pasar y hoy fallan a propósito. Cuando se reparen, se les quita la marca y se quedan
-// como regresión, igual que se hizo con los hallazgos 156-166, 490-493 y 600-604.
+// REGRESIÓN — los seis hallazgos de la re-inspección del 07/09/2026 (646-651), REPARADOS
+// el 09/09/2026. Estaban escritos con `test.fail()` afirmando lo que DEBERÍA ocurrir; al
+// cerrarse han perdido la marca y ahora sujetan la reparación, igual que se hizo con los
+// hallazgos 156-166, 490-493 y 600-604.
+//
+// Qué se tocó en cada uno (solo `page.tsx`, `metadata.ts` y el `.module.css` de la app):
+//  · 646 — `metadata.ts` gana `sueloDe()`, simétrico de `techoDe()`, y ordena el ranking por
+//    el tipo EFECTIVO; el 6 % de Ceuta y Melilla sale ya bonificado al 3 %.
+//  · 647 — los dos `role="note"` de transmisión miran `TERRITORIOS_SIN_IVA` y dicen lo que
+//    corresponde en Canarias, Ceuta y Melilla, como ya hacía el rótulo del botón.
+//  · 648 — las celdas de respuesta de la tabla comparativa pasan a `.celdaSi` / `.celdaNo`
+//    del módulo CSS, con pareja clara y oscura medidas contra los dos fondos que llegan a
+//    tener. Los tokens globales `--success` / `--error` NO servían: 2,66:1 en claro.
+//  · 649 — los 14 `#e0e0e0` en línea pasan a `var(--border)`, que ya cambia con el tema.
+//  · 650 — el 50 % se deriva de `BONIFICACION_CUOTA_CEUTA_MELILLA` en los siete sitios.
+//  · 651 — el rango de ITP del bloque educativo usa `formatTipoNominal`, como el recuadro de
+//    la comunidad. El `<DataReference>` no se tocó: su nota viene sellada de `data/fiscal` y
+//    ya escribía «4%» y «13%», que es justo el formato al que se ha llevado el otro.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 07/09/2026', () => {
+test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
   /**
    * HALLAZGO 1 (dato, medio) — el SUELO del ranking de la quinta pregunta del FAQPage ignora
    * la bonificación que el motor SÍ aplica. Es el defecto SIMÉTRICO del hallazgo C del
@@ -1662,8 +1730,12 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
    *
    * Importa porque es el bloque que consumen Bing Copilot, ChatGPT y Perplexity para
    * responder exactamente esa pregunta.
+   *
+   * REPARADO el 09/09/2026: `metadata.ts` tiene ahora `sueloDe()`, simétrico de `techoDe()`,
+   * y ordena el ranking por el tipo EFECTIVO (el primer tramo de la escala si la hay, con la
+   * bonificación descontada donde la hay).
    */
-  test.fail('HALLAZGO 1 — el ranking del FAQPage da el ITP más bajo al País Vasco, no a Ceuta', async ({ page }) => {
+  test('REPARADO 646 — el ranking del FAQPage encabeza con el 3 % efectivo de Ceuta y Melilla', async ({ page }) => {
     await page.goto(RUTA);
 
     // Lo que la app cobra de verdad en Ceuta: 500.000 × 6 % × 0,5 = 15.000 → 3,00 %.
@@ -1675,9 +1747,14 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
     expect(faq).toContain('¿Qué comunidad autónoma tiene el ITP más bajo');
-    // El suelo del ranking debería reflejar el 3 % efectivo que la app cobra, o el ranking
-    // no debería presentarse como respuesta a «cuál es el más bajo».
+    // El País Vasco ya no encabeza el ranking…
     expect(faq).not.toMatch(/Los más bajos hoy son País Vasco \(4%\)/);
+    // …y el suelo que se sirve es el mismo 3 % que la pantalla acaba de rotular, DERIVADO de
+    // ITP_CCAA['ceuta'].tipoGeneral (6) y BONIFICACION_CUOTA_CEUTA_MELILLA (0,5).
+    const efectivoCeuta = ITP_CCAA['ceuta'].tipoGeneral * (1 - BONIFICACION_CUOTA_CEUTA_MELILLA);
+    expect(efectivoCeuta).toBe(3);
+    expect(faq).toContain(`${ITP_CCAA['ceuta'].nombre} (${String(efectivoCeuta)}% efectivo`);
+    expect(faq).toContain(`${ITP_CCAA['melilla'].nombre} (${String(efectivoCeuta)}% efectivo`);
   });
 
   /**
@@ -1696,8 +1773,12 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
    * usa la tercera opción», que en esos tres territorios no ocurre: la tercera opción no
    * devuelve ningún IVA. El público declarado de la app son empresas y autónomos, para los
    * que la renuncia es el caso frecuente, así que el consejo se lee y se sigue.
+   *
+   * REPARADO el 09/09/2026: los dos avisos miran `TERRITORIOS_SIN_IVA` y nombran el impuesto
+   * que sí rige (IGIC en Canarias, IPSI en Ceuta y Melilla), igual que el rótulo del botón
+   * desde la reparación del hallazgo 490. En el resto de España el texto no cambia.
    */
-  test.fail('HALLAZGO 2 — en Ceuta el aviso de la renuncia promete un IVA que la misma pantalla niega', async ({ page }) => {
+  test('REPARADO 647 — en Ceuta los dos avisos hablan del IPSI, no de un IVA que no se devenga', async ({ page }) => {
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'ceuta');
 
@@ -1706,18 +1787,30 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
     await rellenar(page, PRECIO, '450000');
     expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
 
-    // …y el aviso de al lado lo sigue explicando como si se liquidase.
+    // …y el aviso de al lado ya no lo explica como si se liquidase.
     const avisoRenuncia = (await page.locator('[class*="avisoRenuncia"]').first().innerText()).replace(/\s+/g, ' ');
     expect(avisoRenuncia, 'el aviso no puede describir un IVA que en Ceuta no se devenga').not.toContain(
       'lo autoliquida el comprador'
     );
+    expect(avisoRenuncia).toContain('IPSI');
 
-    // Y en «Segunda mano», el aviso invita a una tercera opción que allí no devuelve el IVA.
+    // Y en «Segunda mano», el aviso ya no invita a una tercera opción que allí no devuelve el IVA.
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     const avisoSegundaMano = (await page.locator('[class*="avisoRenuncia"]').first().innerText()).replace(/\s+/g, ' ');
     expect(avisoSegundaMano, 'en Ceuta la tercera opción no devuelve la operación al IVA').not.toContain(
       'la operación vuelve al IVA'
     );
+    expect(avisoSegundaMano).toContain('IPSI');
+
+    // En Canarias, el mismo aviso nombra el IGIC (TERRITORIOS_SIN_IVA.canarias).
+    await page.selectOption('#select-ccaa', 'canarias');
+    const avisoCanarias = (await page.locator('[class*="avisoRenuncia"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(avisoCanarias).toContain('IGIC');
+
+    // Y donde el IVA SÍ rige, el consejo útil sigue estando: la reparación no lo ha borrado.
+    await page.selectOption('#select-ccaa', 'madrid');
+    const avisoMadrid = (await page.locator('[class*="avisoRenuncia"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(avisoMadrid).toContain('la operación vuelve al IVA');
   });
 
   /**
@@ -1729,8 +1822,13 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
    *   · modo CLARO:  «Sí (jóvenes, familia numerosa…)» → 2,64:1 · «Sí (si actividad sujeta a IVA)» → 2,75:1
    * Son justo las celdas que contestan la pregunta que la tabla existe para contestar
    * («¿tiene una nave tipos reducidos de ITP?»), y el color hace ahí trabajo informativo.
+   *
+   * REPARADO el 09/09/2026: las celdas usan `.celdaSi` / `.celdaNo` del módulo CSS, con pareja
+   * clara y oscura medidas contra los DOS fondos que la tabla llega a tener en cada tema (el
+   * de `EducationalSection` y el `--bg-primary` de las filas alternas). Los tokens globales
+   * `--success` / `--error` no valían: #4CAF50 sobre el #F5F5F5 de la sección da 2,66:1.
    */
-  test.fail('HALLAZGO 3 — el rojo y el verde de la tabla comparativa no llegan a 4,5:1', async ({ page }) => {
+  test('REPARADO 648 — el rojo y el verde de la tabla comparativa llegan a 4,5:1 en los dos temas', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado (igual que en las tandas
     // anteriores), así que sus estilos y su texto se pueden leer sin desplegarlo.
@@ -1765,14 +1863,25 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
         return Math.round(peor * 100) / 100;
       });
 
-    const claro = await peorRatio();
-    await page.emulateMedia({ colorScheme: 'dark' });
-    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
-    const oscuro = await peorRatio();
+    const claro = await esperarEstable(peorRatio);
+    await activarTemaOscuro(page);
+    const oscuro = await esperarEstable(peorRatio);
 
-    // Hoy: claro 2,64 · oscuro 2,16.
+    // Antes de la reparación: claro 2,64 · oscuro 2,16.
     expect(claro, 'peor contraste de la tabla en modo claro').toBeGreaterThanOrEqual(4.5);
     expect(oscuro, 'peor contraste de la tabla en modo oscuro').toBeGreaterThanOrEqual(4.5);
+
+    // Y el color no puede volver a ser el ÚNICO portador del dato: la respuesta sigue estando
+    // escrita en palabras en las cuatro celdas, que es lo que la lee sin ver el color.
+    const respuestas = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('table td'))
+        .map((td) => (td.textContent ?? '').replace(/\s+/g, ' ').trim())
+        .filter((t) => /^No aplican$|^No$|^Sí /.test(t))
+    );
+    expect(respuestas.filter((t) => t === 'No aplican')).toHaveLength(1);
+    expect(respuestas.filter((t) => t === 'No')).toHaveLength(1);
+    expect(respuestas.some((t) => t.startsWith('Sí (jóvenes'))).toBe(true);
+    expect(respuestas.some((t) => t.startsWith('Sí (si actividad sujeta a IVA'))).toBe(true);
   });
 
   /**
@@ -1782,34 +1891,41 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
    * tarjetas rgb(45,45,45): un filete casi blanco alrededor de cada tarjeta. El CLAUDE.md
    * global §6 pide variante oscura en cada elemento; el resto de la página sí usa tokens
    * (`var(--bg-card)`, `var(--primary)`) y por eso cambia sola.
+   *
+   * REPARADO el 09/09/2026: los 14 pasan a `var(--border)` (#E5E5E5 en claro, #404040 en
+   * oscuro), que es el token que el resto de la página ya usaba.
    */
-  test.fail('HALLAZGO 4 — los bordes #e0e0e0 del bloque educativo no tienen variante oscura', async ({ page }) => {
+  test('REPARADO 649 — no quedan bordes #e0e0e0 en el bloque educativo en modo oscuro', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado (igual que en las tandas
     // anteriores), así que sus estilos y su texto se pueden leer sin desplegarlo.
 
-    await page.emulateMedia({ colorScheme: 'dark' });
-    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    await activarTemaOscuro(page);
 
-    const claros = await page.evaluate(() => {
-      let n = 0;
-      for (const el of Array.from(document.querySelectorAll('div,td'))) {
-        const cs = getComputedStyle(el);
-        for (const lado of ['Top', 'Bottom', 'Left', 'Right']) {
-          if (
-            cs.getPropertyValue(`border-${lado.toLowerCase()}-width`) !== '0px' &&
-            cs.getPropertyValue(`border-${lado.toLowerCase()}-color`) === 'rgb(224, 224, 224)'
-          ) {
-            n++;
-            break;
+    const contarBordesClaros = () =>
+      page.evaluate(() => {
+        let n = 0;
+        for (const el of Array.from(document.querySelectorAll('div,td'))) {
+          const cs = getComputedStyle(el);
+          for (const lado of ['Top', 'Bottom', 'Left', 'Right']) {
+            if (
+              cs.getPropertyValue(`border-${lado.toLowerCase()}-width`) !== '0px' &&
+              cs.getPropertyValue(`border-${lado.toLowerCase()}-color`) === 'rgb(224, 224, 224)'
+            ) {
+              n++;
+              break;
+            }
           }
         }
-      }
-      return n;
-    });
+        return n;
+      });
 
-    // Hoy: 14.
+    const claros = await esperarEstable(contarBordesClaros);
+
+    // Antes de la reparación: 14.
     expect(claros, 'elementos con borde #e0e0e0 en modo oscuro').toBe(0);
+    // Y tampoco pueden volver a aparecer en el fuente, que es donde se escriben.
+    expect(await leerFuente()).not.toContain('#e0e0e0');
   });
 
   /**
@@ -1822,8 +1938,11 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
    * Es el patrón exacto del hallazgo D del 27/08/2026 (el «21 %» y el «19-30 %» escritos a
    * mano teniendo la constante al lado): hoy los números coinciden, así que no hay error de
    * importe; lo que hay es la divergencia-en-silencio garantizada para el día que cambien.
+   *
+   * REPARADO el 09/09/2026: los siete salen de la constante — `page.tsx` la formatea una vez
+   * en `BONIFICACION_CIUDADES` y `metadata.ts` en `BONIFICACION_PCT`.
    */
-  test.fail('HALLAZGO 5 — el 50 % de la bonificación está escrito a mano pudiendo derivarse', async () => {
+  test('REPARADO 650 — el 50 % de la bonificación se deriva de la constante del motor', async () => {
     const fuente = await leerFuente();
     const meta = await leerMetadata();
     expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
@@ -1837,8 +1956,11 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
     const literales = [...fuente.split('\n'), ...meta.split('\n')].filter(
       (l) => !esComentario(l) && /50 ?%/.test(l)
     );
-    // Hoy: 5 en page.tsx + 2 en metadata.ts, y la constante no se importa en ninguno.
+    // Antes de la reparación: 5 en page.tsx + 2 en metadata.ts, sin importar la constante.
     expect(literales.length, 'literales del 50 % teniendo la constante importable').toBe(0);
+    // Y los dos ficheros la importan de verdad, que es lo que impide la divergencia.
+    expect(fuente).toContain('BONIFICACION_CUOTA_CEUTA_MELILLA');
+    expect(meta).toContain('BONIFICACION_CUOTA_CEUTA_MELILLA');
   });
 
   /**
@@ -1849,16 +1971,26 @@ test.describe('Hallazgos abiertos — 07/09/2026', () => {
    * el que se creó `formatTipoNominal` (hallazgo 331), función que esta página ya importa y
    * usa tres veces. De paso, el `<DataReference>` de arriba escribe «del 4% (País Vasco)»:
    * el mismo número, con dos formatos, a dos pantallas de distancia.
+   *
+   * REPARADO el 09/09/2026: el bloque educativo pasa a `formatTipoNominal`. El
+   * `<DataReference>` NO se tocó a propósito: su nota viene sellada de `FISCAL_INMUEBLES_META`
+   * (data/fiscal, con su fecha de verificación) y ya escribía «4%» y «13%» — es el formato al
+   * que se ha llevado el otro, no el que había que cambiar.
    */
-  test.fail('HALLAZGO 6 — el rango de ITP se rotula «4,00%» donde el resto de la página dice «4%»', async ({ page }) => {
+  test('REPARADO 651 — el rango de ITP se rotula «4%», igual que el resto de la página', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado (igual que en las tandas
     // anteriores), así que sus estilos y su texto se pueden leer sin desplegarlo.
 
     expect(RANGO_ITP.min).toBe(4);
+    expect(RANGO_ITP.max).toBe(13);
     // `textContent` y no `innerText`: el bloque está plegado y no se renderiza como texto.
     const guia = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
-    // Hoy: «que hoy va del 4,00% al 13,00%».
+    // Antes de la reparación: «que hoy va del 4,00% al 13,00%».
     expect(guia).not.toContain('del 4,00% al 13,00%');
+    // Los dos extremos, DERIVADOS de RANGO_ITP y sin decimales forzados.
+    expect(guia).toContain(`del ${String(RANGO_ITP.min)}% al ${String(RANGO_ITP.max)}%`);
+    // …y el mismo número, con el mismo formato, en la nota del <DataReference> de cabecera.
+    expect(guia).toContain(`del ${String(RANGO_ITP.min)}% (País Vasco)`);
   });
 });

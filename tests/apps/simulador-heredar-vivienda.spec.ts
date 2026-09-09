@@ -74,11 +74,19 @@
  * cuatro dígitos enteros van SIN punto de millares (5405,24 €) y los de cinco o más, con
  * él (509.405,24 €). Las cifras esperadas se escriben literales, tal cual las pinta la app.
  *
- * ⚠️ ESTADO A 08/09/2026 — los tres «HALLAZGOS ABIERTOS» que enumera la cabecera de
- * arriba están CERRADOS: ninguno lleva ya `test.fail()` y los 30 tests anteriores pasan.
- * De los TRES hallazgos de la inspección del 07/09/2026, que van al final del todo, el
- * ALTO (656, la escala de recargo derogada de la FAQ del plazo) se reparó el 08/09/2026 y
- * su test sujeta ya la reparación; los otros dos siguen con `test.fail()`.
+ * ⚠️ ESTADO A 09/09/2026 — NO queda ni un `test.fail()` en el fichero. Los tres «HALLAZGOS
+ * ABIERTOS» que enumera la cabecera de arriba se cerraron el 08/09/2026, y los TRES de la
+ * inspección del 07/09/2026 —que van al final del todo— están reparados: el ALTO (656, la
+ * escala de recargo derogada de la FAQ del plazo) el 08/09/2026, y el MEDIO 657 (el
+ * desglose impreso que no cuadraba consigo mismo) y el BAJO 658 (datos normativos
+ * tecleados que el mismo fichero ya deriva) el 09/09/2026. Sus tests quedan como REGRESIÓN.
+ *
+ * ⚠️ 09/09/2026 — al cerrar el hallazgo 657, la app redondea al céntimo CADA importe de la
+ * liquidación del ISD —igual que `calcularSucesion`— en vez de arrastrar el número largo y
+ * redondear solo al pintar. Seis cifras esperadas de los tests anteriores se movieron un
+ * céntimo por eso, y va dicho en el comentario de cada uno. El IRPF de los casos que venden
+ * también se mueve, porque el valor de adquisición fiscal suma la cuota de ISD PAGADA, que
+ * es la redondeada.
  *
  * ⚠️ 24/08/2026 — las cuotas íntegras de TODOS los casos cambiaron al cerrar el hallazgo
  * 277: la app aplica ya la COLUMNA `cuota` de la tabla oficial (`calcularCuotaIntegraIS`,
@@ -214,16 +222,18 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    *   (con el 30 % hardcodeado del hallazgo 199 saldrían 4.800,00 €)
    *
    * IRPF al vender a los 3 años por 600.000 €:
-   *   Valor de adquisición fiscal = 500.000 + 5.405,240365 + 4.000 = 509.405,240365
-   *   Ganancia = 600.000 − 509.405,240365 = 90.594,759635
-   *        6.000,000000 × 19 % =  1.140,00
-   *       44.000,000000 × 21 % =  9.240,00
-   *       40.594,759635 × 23 % =  9.336,79471605
-   *                               ─────────────
-   *                                19.716,79471605 → «19.716,79 €»
+   *   Valor de adquisición fiscal = 500.000 + 5.405,24 + 4.000 = 509.405,24
+   *   (la cuota de ISD entra ya redondeada al céntimo desde el hallazgo 657: es la que se paga)
+   *   Ganancia = 600.000 − 509.405,24 = 90.594,76
+   *        6.000,00 × 19 % =  1.140,00
+   *       44.000,00 × 21 % =  9.240,00
+   *       40.594,76 × 23 % =  9.336,7948
+   *                           ──────────
+   *                            19.716,7948 → «19.716,79 €»
    *
-   * TOTAL = 5.405,240365 + 4.000 + 19.716,79471605 = 29.122,03508105 → «29.122,04 €»
-   * Porcentaje sobre la venta = 29.121,657.../600.000 × 100 = 4,8536 → «4,85 %»
+   * TOTAL = 5.405,24 + 4.000 + 19.716,7948 = 29.122,0348 → «29.122,03 €»
+   * (hasta el 09/09/2026 eran «29.122,04 €», que no era la suma de los tres importes escritos)
+   * Porcentaje sobre la venta = 29.122,0348/600.000 × 100 = 4,8537 → «4,85 %»
    */
   test('CASO 1 (normal) — hijo hereda 500.000 € en Asturias y vende a los 3 años: ISD + IIVTNU + IRPF', async ({
     page,
@@ -281,9 +291,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
 
     // ── Total y formato español ──────────────────────────────────────────────
     const total = await bloqueTotal(page);
-    expect(total).toContain('29.122,04'); // 5.405,24 + 4.000,00 + 19.716,79
+    expect(total).toContain('29.122,03'); // 5.405,24 + 4.000,00 + 19.716,79 (hallazgo 657)
     expect(total).toContain('4,85%');
-    expect(total).not.toMatch(/29,122\.04/); // nunca formato US
+    expect(total).not.toMatch(/29,122\.03/); // nunca formato US
 
     // Hallazgo 202: el año ya no está congelado en el código, sale del reloj
     expect(await page.locator('#anioAdq').getAttribute('max')).toBe(String(ANIO));
@@ -450,13 +460,15 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    *   Cuota íntegra por la COLUMNA `cuota` del último tramo de TARIFA_ESTATAL_IS:
    *        132.549,07 + (2.000.000 − 797.555,08) × 25,50 %
    *      = 132.549,07 + 306.623,4546 = 439.172,5246 → «439.172,52 €»
-   *   × COEFICIENTES_IS['IV'][0] = 2,0000 = 878.345,0492 → «878.345,05 €»
-   *   Asturias no bonifica → Cuota ISD final = 878.345,05 €
+   *   × COEFICIENTES_IS['IV'][0] = 2,0000 → 439.172,52 × 2 = 878.345,04 → «878.345,04 €»
+   *   Asturias no bonifica → Cuota ISD final = 878.345,04 €
+   *   (hasta el 09/09/2026 la pantalla decía «878.345,05 €», que es 439.172,5246 × 2 sin
+   *    redondear el factor que ella misma escribe: exactamente el hallazgo 657)
    *
    *   Plusvalía: 0 años → COEFICIENTES_IIVTNU_2025[0] = 0,14
    *     objetivo = 500.000 × 0,14 × 0,25 = 17.500,00
    *     real     = (2.000.000 − 30.000) × (500.000 / 1.000.000) × 0,25 = 246.250,00
-   *   TOTAL (sin venta) = 878.345,0492 + 17.500 = 895.845,0492 → «895.845,05 €»
+   *   TOTAL (sin venta) = 878.345,04 + 17.500 = 895.845,04 → «895.845,04 €»
    */
   test('GUARDA — tramo del 25,50 %, coeficiente 2,0000 y 0 años de tenencia (Grupo IV, 2.000.000 € en Asturias)', async ({
     page,
@@ -478,8 +490,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     // 132.549,07 + (2.000.000 − 797.555,08) × 25,50 % = 439.172,5246 (columna `cuota`)
     expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('439.172,52 €');
     expect(await linea(page, ISD, '× Coef. patrimonio (Grupo IV)')).toBe('×2,0000');
-    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('878.345,05 €');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('878.345,05 €');
+    // 439.172,52 × 2,0000 = 878.345,04 — la cadena impresa cuadra desde el hallazgo 657
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('878.345,04 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('878.345,04 €');
     // El Grupo IV de Asturias declara reduccionBase 0: no debe aparecer la línea autonómica
     expect(await panel(page, ISD)).not.toContain('Reducción autonómica');
 
@@ -489,7 +502,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('246.250,00 €');
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('17.500,00 €');
 
-    expect(await bloqueTotal(page)).toContain('895.845,05');
+    expect(await bloqueTotal(page)).toContain('895.845,04');
     expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(0 años hasta hoy)');
   });
 
@@ -908,15 +921,16 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * `TRAMOS_GANANCIAS_PATRIMONIALES_2025`, y la edad del heredero que NO exime.
    *
    * Caso preconfigurado de Madrid pero vendiendo por el tope del deslizador (2.000.000 €):
-   *   Valor de adquisición fiscal = 200.000 + 54,05240365 + 6.750 = 206.804,05240365
-   *   Ganancia = 2.000.000 − 206.804,05240365 = 1.793.195,94759635
+   *   Valor de adquisición fiscal = 200.000 + 54,05 + 6.750 = 206.804,05
+   *   (la cuota de ISD entra ya redondeada al céntimo desde el hallazgo 657)
+   *   Ganancia = 2.000.000 − 206.804,05 = 1.793.195,95
    *          6.000,00 × 19 % =   1.140,00
    *         44.000,00 × 21 % =   9.240,00
    *        150.000,00 × 23 % =  34.500,00
    *        100.000,00 × 27 % =  27.000,00
-   *      1.493.195,95 × 30 % = 447.958,784278...
-   *                            ──────────────
-   *                             519.838,784278... → «519.838,78 €»
+   *      1.493.195,95 × 30 % = 447.958,785
+   *                            ───────────
+   *                             519.838,785 → «519.838,79 €»  (antes del 657: «519.838,78 €»)
    *
    * Con la escala que describe el `faqJsonLd` («27 % por encima» de 200.000 €) saldrían
    * 475.042,91 €: 44.795,88 € menos. Manda `data/fiscal`, que es lo que aplica el motor.
@@ -924,7 +938,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * Y con 90 años el heredero sigue pagando: la app no modela ninguna exención de IRPF
    * (ni la del art. 33.4.b LIRPF ni la del art. 38), pese a lo que dice el `faqJsonLd`.
    */
-  test('GUARDA — el tramo del 30 % del IRPF entra de verdad: ganancia de 1.793.195,95 € → 519.838,78 €', async ({
+  test('GUARDA — el tramo del 30 % del IRPF entra de verdad: ganancia de 1.793.195,95 € → 519.838,79 €', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -933,7 +947,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
 
     expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('206.804,05 €');
     expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('1.793.195,95 €');
-    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('519.838,78 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('519.838,79 €');
     expect(await panel(page, IRPF)).toContain('Tramos: 19% / 21% / 23% / 27% / 30%');
 
     // La edad del heredero no exime nada en el IRPF de esta app
@@ -951,7 +965,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * No es cosmético: el FAQPage es la señal estructurada que leen Bing Copilot, ChatGPT,
    * Perplexity y Gemini, y aquí describe mal la escala de un impuesto en una app de nivel 1
    * CRÍTICO. Sobre la ganancia de 1.793.195,95 € de la guarda anterior, la regla del
-   * `faqJsonLd` daría 475.042,91 € y el motor liquida 519.838,78 €.
+   * `faqJsonLd` daría 475.042,91 € y el motor liquida 519.838,79 €.
    */
   test('REGRESIÓN — el faqJsonLd sirve los cinco tramos de la base del ahorro', async ({
     page,
@@ -1008,8 +1022,19 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    *      Cuota íntegra = 23.409,28 + (361.436,66 − 239.389,13) × 15,30 % = 42.082,55209
    *      Cuota final = 42.082,55209 × 0,20 = 8.416,510418 → «8416,51 €»
    *  (b) 400.000 € → base liquidable 261.436,66 → peldaño del 90 %
-   *      Cuota íntegra = 23.409,28 + 22.047,53 × 15,30 % = 26.782,55209
-   *      Cuota final = 26.782,55209 × 0,10 = 2.678,255209 → «2678,26 €»
+   *      Cuota íntegra = 23.409,28 + 22.047,53 × 15,30 % = 26.782,55209 → «26.782,55 €»
+   *      Bonificación  = 26.782,55 × 90 % = 24.104,295                 → «24.104,30 €»
+   *      Cuota final   = 26.782,55 − 24.104,30 = 2.678,25              → «2678,25 €»
+   *
+   * ⚠️ Éste es el ÚNICO perfil de todo el fichero en el que la web y `calcularSucesion` dan
+   * cifras distintas, y es a propósito (hallazgo 657, reparado el 09/09/2026). El motor
+   * redondea la RESTA —`r(cuotaTributaria − bonificación)` = 2.678,26— pero publica la
+   * bonificación ya redondeada a 24.104,30, así que sus dos campos no suman su propia cuota
+   * tributaria: 24.104,30 + 2.678,26 = 26.782,56. La web redondea cada importe y resta los
+   * redondeados, que es como se escribe una liquidación y lo único con lo que la aritmética
+   * de la pantalla sale. Ocurre en 20.104 de las 2.233.392 combinaciones alcanzables con los
+   * deslizadores (0,9 %), todas de un céntimo y todas ellas justo aquellas en las que el
+   * motor se contradice a sí mismo: el defecto está en `lib/calculadoras/sucesiones.ts`.
    */
   test('GUARDA — Castilla-La Mancha baja del 90 % al 80 % al pasar de 300.000 € de base liquidable', async ({
     page,
@@ -1030,7 +1055,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     await mover(page, 'valorRef', 400000);
     expect(await linea(page, ISD, '= Base liquidable')).toBe('261.436,66 €');
     expect(await panel(page, ISD)).toContain('Bonificación CCAA (90,0%)');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('2678,26 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('2678,25 €');
   });
 
   /**
@@ -1182,16 +1207,17 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    *   real     = (200.000 − 195.000) × (60.000 / 120.000) × 0,25 =         625,00  ← el MENOR
    *
    * IRPF a los 2 años:
-   *   Valor de adquisición fiscal = 200.000 + 270,262018 + 625 = 200.895,262018
-   *   Ganancia = 210.000 − 200.895,262018 = 9.104,737982
-   *        6.000,000000 × 19 % = 1.140,00
-   *        3.104,737982 × 21 % =   651,994776
-   *                               ──────────
-   *                                1.791,994776 → «1791,99 €»
+   *   Valor de adquisición fiscal = 200.000 + 270,26 + 625 = 200.895,26
+   *   (la cuota de ISD entra ya redondeada al céntimo desde el hallazgo 657)
+   *   Ganancia = 210.000 − 200.895,26 = 9.104,74
+   *        6.000,00 × 19 % = 1.140,00
+   *        3.104,74 × 21 % =   651,9954
+   *                            ────────
+   *                             1.791,9954 → «1792,00 €»  (antes del 657: «1791,99 €»)
    *
-   * TOTAL = 270,262018 + 625 + 1.791,994776 = 2.687,256794 → «2687,26 €» = 1,28 % de 210.000
+   * TOTAL = 270,26 + 625 + 1.791,9954 = 2.687,2554 → «2687,26 €» = 1,28 % de 210.000
    */
-  test('CASO 7 (normal) — Baleares al 95 % y la plusvalía por el método REAL: 270,26 € + 625,00 € + 1791,99 €', async ({
+  test('CASO 7 (normal) — Baleares al 95 % y la plusvalía por el método REAL: 270,26 € + 625,00 € + 1792,00 €', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -1222,7 +1248,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
 
     expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('200.895,26 €');
     expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('9104,74 €');
-    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('1791,99 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('1792,00 €');
 
     const total = await bloqueTotal(page);
     expect(total).toContain('2687,26 €');
@@ -1884,8 +1910,11 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
    *      = 26.782,55209                                              → «26.782,55 €»
    *   × COEFICIENTES_IS['II'][0] = 1,0000 → cuota tributaria 26.782,55209
    *   Cantabria, escalonado: 261.436,66 > 100.000 → 99 % (NO el 100 % del primer tramo)
-   *      bonificación = 26.514,7265691                               → «26.514,73 €»
-   *   Cuota ISD final = 267,8255209                                  → «267,83 €»
+   *      bonificación = 26.782,55 × 99 % = 26.514,7245               → «26.514,72 €»
+   *   Cuota ISD final = 26.782,55 − 26.514,72                        → «267,83 €»
+   *   (hasta el 09/09/2026 la bonificación se pintaba «26.514,73 €», calculada sobre la cuota
+   *    tributaria SIN redondear, y entonces la resta escrita daba 267,82 y no 267,83: es la
+   *    segunda manifestación del hallazgo 657)
    *
    * Plusvalía municipal (IIVTNU), tipo ORIENTATIVO del módulo (25 %):
    *   12 años de tenencia → COEFICIENTES_IIVTNU_2025[12] = 0,08 (zona plana de la tabla)
@@ -1894,8 +1923,8 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
    *   Se elige el MENOR (RDL 26/2021) = 1.800,00 → objetivo
    *
    * IRPF al vender a los 4 años por 470.000 €:
-   *   Valor de adquisición fiscal = 400.000 + 267,8255209 + 1.800 = 402.067,8255209
-   *   Ganancia = 470.000 − 402.067,8255209 = 67.932,1744791
+   *   Valor de adquisición fiscal = 400.000 + 267,83 + 1.800 = 402.067,83
+   *   Ganancia = 470.000 − 402.067,83 = 67.932,17
    *        6.000,000000 × 19 % = 1.140,00
    *       44.000,000000 × 21 % = 9.240,00
    *       17.932,174479 × 23 % = 4.124,40013019
@@ -1934,7 +1963,8 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
     expect(await linea(page, ISD, '= Cuota tributaria')).toBe('26.782,55 €');
     // El segundo escalón de Cantabria: 99 %, no el 100 % que rige por debajo de 100.000 €
     expect(await panel(page, ISD)).toContain('Bonificación CCAA (99,0%)');
-    expect(await linea(page, ISD, '− Bonificación CCAA (99,0%)')).toBe('−26.514,73 €');
+    // 26.782,55 × 99 % = 26.514,7245 → 26.514,72, y 26.782,55 − 26.514,72 = 267,83 (657)
+    expect(await linea(page, ISD, '− Bonificación CCAA (99,0%)')).toBe('−26.514,72 €');
     expect(await linea(page, ISD, 'Cuota ISD final')).toBe('267,83 €');
 
     // ── Plusvalía municipal ──────────────────────────────────────────────────
@@ -2211,40 +2241,45 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   });
 
   /**
-   * ⚠️ HALLAZGO ABIERTO (07/09/2026) — el desglose IMPRESO no cuadra consigo mismo, y por
-   * el mismo céntimo la web se separa del motor compartido.
+   * ✅ HALLAZGO 657 (07/09/2026, MEDIO) — REPARADO el 09/09/2026. Sujeta la reparación como
+   * regresión: llevaba `test.fail()` y hoy pasa en verde.
    *
    * El panel del ISD es una liquidación paso a paso: base → reducciones → base liquidable
    * → cuota íntegra → × coeficiente → cuota tributaria → − bonificación → cuota final. Cada
-   * línea se redondea AL PINTARSE (`formatCurrency`), pero la cadena sigue por dentro con
-   * el número sin redondear, así que la multiplicación y la resta que el usuario ve escritas
-   * no dan el número que hay debajo:
+   * línea se redondeaba AL PINTARSE (`formatCurrency`) mientras la cadena seguía por dentro
+   * con el número sin redondear, así que la multiplicación y la resta que el usuario ve
+   * escritas no daban el número que hay debajo:
    *
    *   Grupo IV, Madrid, 50.000 € (sin reducciones, coeficiente 2,0000):
    *     cuota íntegra    = 2.648,88 + (50.000 − 31.956,87) × 9,35 % = 4.335,912655
    *     pintada          → «4335,91 €»
-   *     × 2,0000         → la pantalla dice «8671,83 €», pero 4.335,91 × 2 = 8.671,82
+   *     × 2,0000         → la pantalla decía «8671,83 €», y 4.335,91 × 2 son 8.671,82
    *     `calcularSucesion` (motor del MCP Delegum y de /api/chatgpt/sucesiones) → 8.671,82 €
    *
    *   Y en la línea de la bonificación, que es la que ve la mayoría del catálogo (cualquier
-   *   CCAA con 99 %), pasa lo mismo restando — CASO 1 de esta misma tanda:
-   *     26.782,55 − 26.514,73 = 267,82, y la pantalla dice «267,83 €».
+   *   CCAA con 99 %), pasaba lo mismo restando — CASO 1 de esta misma tanda: pintaba una
+   *   bonificación de 26.514,73 € calculada sobre la cuota tributaria SIN redondear, y
+   *   26.782,55 − 26.514,73 = 267,82 mientras el total decía 267,83 €.
    *
-   * Un barrido de las 664.700 combinaciones alcanzables con los deslizadores (17 CCAA × 6
-   * parentescos × valor de referencia de 50.000 a 2.000.000 en pasos de 5.000 × vivienda
-   * habitual × edad × convivencia) da 110.102 herencias —el 16,6 %— en las que la web y el
-   * motor difieren exactamente 1 céntimo, sistemáticamente en los Grupos III y IV, que son
-   * los del coeficiente distinto de 1.
+   * LA REPARACIÓN: `page.tsx` redondea al céntimo cada importe con `redondearCentimos`, que
+   * es el mismo `Math.round(n * 100) / 100` que `calcularSucesion` aplica en los mismos
+   * pasos. NO se pasó a llamar a `calcularSucesion`, y por dos razones medidas:
    *
-   * Es un céntimo, y ninguna decisión cambia por un céntimo. Pero el valor entero de esta
-   * app es el desglose auditable de una liquidación fiscal de riesgo 1 CRÍTICO, y la
-   * aritmética escrita en pantalla tiene que salir. La raíz es que la web NO llama a
-   * `calcularSucesion`: reconstruye la cadena llamando solo a `calcularCuotaIntegraIS` y
-   * `evaluarReduccionVivienda`, y por el camino se deja el redondeo a dos decimales que el
-   * motor sí aplica en cada paso.
+   *   1. El motor pierde la reducción en BASE de Asturias para el NIETO: lee
+   *      `bonificaciones[p.grupo]` con la clave `II-descendiente`, que ninguna CCAA declara,
+   *      así que `reduccionAutonomicaBase` se queda en 0 mientras `claveBonificacion` SÍ la
+   *      colapsa sobre `II` y rotula «Reducción adicional de 300.000 € … ya aplicada antes
+   *      de la tarifa». La web sí la aplica desde el hallazgo 200; llamarlo habría hecho
+   *      pagar hasta miles de euros de más a ese perfil (18.336 combinaciones del barrido).
+   *   2. El motor tampoco cuadra: publica la bonificación redondeada pero calcula la cuota
+   *      final redondeando la RESTA sin redondear, así que sus dos campos se contradicen en
+   *      20.104 combinaciones (ver la GUARDA de Castilla-La Mancha). Llamarlo no habría
+   *      cerrado este hallazgo, que va justamente de que la aritmética impresa salga.
+   *
+   * Los dos defectos son de `lib/calculadoras/sucesiones.ts` y se reportaron sin tocarlo.
    */
-  test.fail(
-    'HALLAZGO — la cuota tributaria impresa no es la cuota íntegra impresa por el coeficiente',
+  test(
+    'REGRESIÓN 657 — la cuota tributaria impresa es la cuota íntegra impresa por el coeficiente',
     async ({ page }) => {
       await page.goto(RUTA);
       await page.selectOption('#parentescoSel', 'sin_parentesco');
@@ -2259,7 +2294,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
 
       expect(cuotaIntegra).toBe(4335.91);
       expect(coeficiente).toBe(2);
-      // 4.335,91 × 2,0000 = 8.671,82 — la pantalla dice 8.671,83
+      // 4.335,91 × 2,0000 = 8.671,82 — hasta el 09/09/2026 la pantalla decía 8.671,83
       expect(cuotaTributaria).toBe(Math.round(cuotaIntegra * coeficiente * 100) / 100);
 
       // Y el motor compartido, con la misma herencia, liquida 8.671,82 €
@@ -2267,6 +2302,76 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
       expect(importe(await linea(page, ISD, 'Cuota ISD final'))).toBe(motor.cuotaFinal);
     }
   );
+
+  /**
+   * REGRESIÓN 657 (bis) — la INVARIANTE: la cadena impresa cuadra consigo misma.
+   *
+   * El test de arriba fija un importe concreto; éste fija lo que el hallazgo pedía de
+   * verdad. Lee los cinco números TAL COMO SE PINTAN y comprueba las dos operaciones que el
+   * usuario ve escritas en el panel:
+   *
+   *     cuota íntegra × coeficiente = cuota tributaria
+   *     cuota tributaria − bonificación = cuota ISD final
+   *
+   * Un importe esperado protege un caso; esto protege la propiedad, que es lo que hace
+   * auditable una liquidación. Los cinco perfiles son los que la rompían antes del
+   * 09/09/2026: dos por el PRODUCTO (los Grupos III y IV, los del coeficiente distinto de
+   * 1) y tres por la RESTA (las CCAA que bonifican, que es lo que ve casi todo el mundo).
+   * En el barrido de las 2.233.392 combinaciones alcanzables con los deslizadores, la
+   * cadena no cuadraba en 787.942 (el 35 %) y ahora cuadra en las 2.233.392.
+   */
+  test('REGRESIÓN 657 (bis) — el producto y la resta escritos dan el total escrito', async ({
+    page,
+  }) => {
+    /** El importe de la línea de bonificación, cuya etiqueta lleva dentro el porcentaje. */
+    const bonificacionImpresa = (textoPanel: string): number => {
+      const m = textoPanel.match(/Bonificaci\u00f3n CCAA \([^)]*\)\s*\u2212\s*([\d.]*\d,\d\d)/);
+      if (!m) throw new Error(`Sin línea de bonificación en el panel: ${textoPanel}`);
+      return importe(m[1]);
+    };
+
+    const perfiles = [
+      // Rompe el PRODUCTO: coeficiente 2,0000 sobre una cuota íntegra con decimales largos
+      { nombre: 'Grupo IV en Madrid, 50.000 €', parentesco: 'sin_parentesco', ccaa: 'madrid', edad: 40, valorRef: 50000, vivienda: false, grupoCoef: 'IV' },
+      // Rompe el PRODUCTO por el otro extremo del deslizador (tramo del 25,50 %)
+      { nombre: 'Grupo IV en Asturias, 2.000.000 €', parentesco: 'sin_parentesco', ccaa: 'asturias', edad: 50, valorRef: 2000000, vivienda: false, grupoCoef: 'IV' },
+      // Rompe la RESTA: el 99 % de Cantabria sobre el ascendiente (CASO 1 de esta tanda)
+      { nombre: 'ascendiente en Cantabria, 400.000 €', parentesco: 'padre', ccaa: 'cantabria', edad: 68, valorRef: 400000, vivienda: true, grupoCoef: 'II' },
+      // Rompe la RESTA con coeficiente 1,5882 y el 50 % de Madrid al Grupo III
+      { nombre: 'colateral en Madrid, 200.000 €', parentesco: 'hermano', ccaa: 'madrid', edad: 40, valorRef: 200000, vivienda: true, grupoCoef: 'III' },
+      // Rompe la RESTA en el peldaño del 90 % de Castilla-La Mancha (el céntimo en el que
+      // la web se separa del motor: ver la GUARDA de Castilla-La Mancha más arriba)
+      { nombre: 'hijo en Castilla-La Mancha, 400.000 €', parentesco: 'hijo', ccaa: 'castilla-mancha', edad: 45, valorRef: 400000, vivienda: true, grupoCoef: 'II' },
+    ];
+
+    await page.goto(RUTA);
+    await mover(page, 'aniosVenta', 0); // aislar el ISD
+
+    for (const p of perfiles) {
+      await page.selectOption('#parentescoSel', p.parentesco);
+      await page.selectOption('#ccaaSel', p.ccaa);
+      await mover(page, 'edadHer', p.edad);
+      await mover(page, 'valorRef', p.valorRef);
+      await casilla(page, 'viviendaHabitual', p.vivienda);
+
+      const texto = await panel(page, ISD);
+      const cuotaIntegra = importe(await linea(page, ISD, 'Cuota íntegra (tarifa)'));
+      const coeficiente = importe(await linea(page, ISD, `× Coef. patrimonio (Grupo ${p.grupoCoef})`));
+      const cuotaTributaria = importe(await linea(page, ISD, '= Cuota tributaria'));
+      const bonificacion = bonificacionImpresa(texto);
+      const cuotaFinal = importe(await linea(page, ISD, 'Cuota ISD final'));
+
+      expect(
+        cuotaTributaria,
+        `${p.nombre}: ${cuotaIntegra} × ${coeficiente} no da la cuota tributaria escrita`
+      ).toBe(Math.round(cuotaIntegra * coeficiente * 100) / 100);
+
+      expect(
+        cuotaFinal,
+        `${p.nombre}: ${cuotaTributaria} − ${bonificacion} no da la cuota final escrita`
+      ).toBe(Math.round((cuotaTributaria - bonificacion) * 100) / 100);
+    }
+  });
 
   /**
    * ✅ HALLAZGO 07/09/2026 (ALTO) — REPARADO el 08/09/2026. Sujeta la reparación como
@@ -2327,7 +2432,9 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   );
 
   /**
-   * ⚠️ HALLAZGO ABIERTO (07/09/2026) — residuo del hallazgo 609: el JSX sigue escribiendo a
+   * ✅ HALLAZGO 658 (07/09/2026, BAJO) — REPARADO el 09/09/2026. Sujeta la reparación como
+   * regresión: llevaba `test.fail()` y hoy pasa en verde. Era residuo del hallazgo 609: el
+   * JSX seguía escribiendo a
    * mano datos normativos que `data/fiscal` exporta y que este MISMO fichero ya deriva unas
    * líneas más abajo.
    *
@@ -2342,11 +2449,18 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
    *     `COEFICIENTES_IS['IV'][0]`, que la página ya importa y usa en el motor.
    *
    * (En la misma familia, aunque más estable: el «95 %» de la reducción del art. 20.2.c
-   * aparece cinco veces a mano —etiqueta de la casilla, línea del panel, dos tarjetas y la
-   * FAQ— siendo `REDUCCION_VIVIENDA_PORC_IS`, mientras su tope SÍ se importa como
+   * aparecía cinco veces a mano —etiqueta de la casilla, línea del panel, dos tarjetas y la
+   * FAQ— siendo `REDUCCION_VIVIENDA_PORC_IS`, mientras su tope SÍ se importaba como
    * `REDUCCION_VIVIENDA_MAX_IS` en las mismas frases.)
+   *
+   * REPARADO derivando los tres: `TIPO_AHORRO_MIN`-`TIPO_AHORRO_MAX` en la tabla,
+   * `COEF_GRUPO_IV_MIN` = `COEFICIENTES_IS['IV'][0]` en la tarjeta y `PORC_REDUCCION_VIVIENDA`
+   * = `REDUCCION_VIVIENDA_PORC_IS` en las cinco frases del 95 %. La comprobación es sobre el
+   * FUENTE y no sobre la página renderizada, igual que en la regresión de los hallazgos 609
+   * y 611: lo que estaba mal no era el número que se ve —era correcto— sino que estuviera
+   * escrito, porque una corrección en `data/fiscal` no llegaba al texto.
    */
-  test.fail('HALLAZGO — el JSX escribe a mano tipos y coeficientes que data/fiscal exporta', async () => {
+  test('REGRESIÓN 658 — el JSX no escribe a mano tipos, coeficientes ni el 95 % del art. 20.2.c', async () => {
     const fuente = readFileSync(
       resolve(__dirname, '..', '..', 'app', 'simulador-heredar-vivienda', 'page.tsx'),
       'utf8'
@@ -2355,6 +2469,8 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
 
     // La escala de la base del ahorro, en la tabla comparativa
     expect(jsx).not.toContain('19-30%');
+    // El porcentaje del art. 20.2.c, en sus cinco apariciones
+    expect(jsx).not.toContain('95%');
     // El coeficiente del Grupo IV, en la tarjeta de casos típicos
     expect(jsx).not.toContain('Coeficiente multiplicador 2,0');
   });

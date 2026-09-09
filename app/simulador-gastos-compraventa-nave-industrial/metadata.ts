@@ -1,6 +1,15 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { ITP_CCAA, RANGO_AJD, RANGO_ITP, calcularRegistro, estimarFacturaNotarial } from '@/data/itp-ccaa';
+import {
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
+  CIUDADES_CON_BONIFICACION,
+  ComunidadAutonoma,
+  ITP_CCAA,
+  RANGO_AJD,
+  RANGO_ITP,
+  calcularRegistro,
+  estimarFacturaNotarial,
+} from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
 /**
@@ -19,21 +28,57 @@ const REGISTRO_EJEMPLO = calcularRegistro(PRECIO_EJEMPLO);
 const euros = (n: number) => `${Math.round(n)} €`;
 const pct = (n: number) => `${String(n).replace('.', ',')}%`;
 
+/** El 50 % del art. 57 bis, DERIVADO de la constante que aplica el motor (hallazgo 650). */
+const BONIFICACION_PCT = pct(BONIFICACION_CUOTA_CEUTA_MELILLA * 100);
+
+/**
+ * Tipo EFECTIVO: el nominal de la tabla con la bonificación de cuota ya descontada donde la
+ * hay. `calcularITP` la aplica por el SITIO del inmueble, así que un ranking que la ignore
+ * no ordena lo que la app cobra.
+ */
+const efectivo = (clave: ComunidadAutonoma, tipo: number) =>
+  CIUDADES_CON_BONIFICACION.includes(clave) ? tipo * (1 - BONIFICACION_CUOTA_CEUTA_MELILLA) : tipo;
+
 /**
  * El extremo alto de cada comunidad: su tipo general, o el último tramo si tiene escala.
  * Sin esto la quinta pregunta hablaba de «10%-11%» mientras la app cobraba el 11,50 %
  * efectivo en Cataluña y el 11,00 % en Baleares (hallazgo 449).
  */
-const techoDe = (c: (typeof ITP_CCAA)[keyof typeof ITP_CCAA]) =>
-  Math.max(c.tipoGeneral, ...(c.tramosProgresivos ?? []).map((t) => t.tipo));
+const techoDe = (clave: ComunidadAutonoma) => {
+  const c = ITP_CCAA[clave];
+  return efectivo(clave, Math.max(c.tipoGeneral, ...(c.tramosProgresivos ?? []).map((t) => t.tipo)));
+};
 
-const ordenadas = Object.values(ITP_CCAA).slice().sort((a, b) => a.tipoGeneral - b.tipoGeneral);
-const masBaratas = ordenadas.slice(0, 3).map((c) => `${c.nombre} (${pct(c.tipoGeneral)})`).join(', ');
-const masCaras = ordenadas
-  .slice()
+/**
+ * El extremo bajo, SIMÉTRICO del anterior: el primer tramo de la escala si la hay, y la
+ * bonificación descontada donde la hay.
+ *
+ * Sin él, el suelo salía de `tipoGeneral` a secas y la respuesta se contradecía sola: coronaba
+ * al País Vasco (4%) como el ITP más bajo mientras la app cobraba el 3% efectivo en Ceuta y
+ * Melilla —15.000 € por una nave de 500.000 €— y el propio párrafo anunciaba la bonificación
+ * dos frases más abajo (hallazgo 646). Es el defecto simétrico del hallazgo C del 27/08/2026,
+ * que corrigió el techo y dejó el suelo sin tocar.
+ */
+const sueloDe = (clave: ComunidadAutonoma) => {
+  const c = ITP_CCAA[clave];
+  return efectivo(clave, Math.min(c.tipoGeneral, ...(c.tramosProgresivos ?? []).map((t) => t.tipo)));
+};
+
+const CLAVES = Object.keys(ITP_CCAA) as ComunidadAutonoma[];
+const rotulo = (clave: ComunidadAutonoma, tipo: number) =>
+  CIUDADES_CON_BONIFICACION.includes(clave)
+    ? `${ITP_CCAA[clave].nombre} (${pct(tipo)} efectivo, ya bonificado)`
+    : `${ITP_CCAA[clave].nombre} (${pct(tipo)})`;
+
+const masBaratas = CLAVES.slice()
+  .sort((a, b) => sueloDe(a) - sueloDe(b))
+  .slice(0, 3)
+  .map((clave) => rotulo(clave, sueloDe(clave)))
+  .join(', ');
+const masCaras = CLAVES.slice()
   .sort((a, b) => techoDe(b) - techoDe(a))
   .slice(0, 3)
-  .map((c) => `${c.nombre} (hasta el ${pct(techoDe(c))})`)
+  .map((clave) => `${ITP_CCAA[clave].nombre} (hasta el ${pct(techoDe(clave))})`)
   .join(', ');
 
 export const metadata: Metadata = {
@@ -90,7 +135,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto paga la compra de una nave industrial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Si la nave es de nueva construcción y la vende el promotor, se paga IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD (Actos Jurídicos Documentados), que va del ${pct(RANGO_AJD.min)} al ${pct(RANGO_AJD.max)} según la comunidad autónoma. Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, que va del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. No pueden coexistir IVA e ITP en la misma operación, salvo que se renuncie a la exención de IVA en la segunda transmisión entre empresarios: entonces vuelve a haber IVA con inversión del sujeto pasivo y no se paga ITP. En Ceuta y Melilla la cuota se bonifica al 50% (art. 57 bis del TRLITPAJD), sea cual sea el uso del inmueble.`,
+        text: `Si la nave es de nueva construcción y la vende el promotor, se paga IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD (Actos Jurídicos Documentados), que va del ${pct(RANGO_AJD.min)} al ${pct(RANGO_AJD.max)} según la comunidad autónoma. Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, que va del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. No pueden coexistir IVA e ITP en la misma operación, salvo que se renuncie a la exención de IVA en la segunda transmisión entre empresarios: entonces vuelve a haber IVA con inversión del sujeto pasivo y no se paga ITP. En Ceuta y Melilla la cuota se bonifica al ${BONIFICACION_PCT} (art. 57 bis del TRLITPAJD), sea cual sea el uso del inmueble.`,
       },
     },
     {
@@ -122,7 +167,7 @@ export const faqJsonLd = {
       name: '¿Qué comunidad autónoma tiene el ITP más bajo para la compra de una nave?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Los tipos generales de ITP van del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. Los más bajos hoy son ${masBaratas}. Los más altos, ${masCaras}. Una nave no tiene tipos reducidos por perfil del comprador —esos van ligados a la vivienda habitual—, así que se aplica el tipo general del sitio donde esté el inmueble. En Ceuta y Melilla la cuota se bonifica al 50% (art. 57 bis del TRLITPAJD). Estos tipos los fija cada comunidad y cambian: conviene comprobar la normativa vigente antes de firmar.`,
+        text: `Los tipos generales de ITP van del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. Para una nave, los más bajos hoy son ${masBaratas}: Ceuta y Melilla salen primeras porque su cuota se bonifica un ${BONIFICACION_PCT} (art. 57 bis del TRLITPAJD), lo que deja su ${pct(ITP_CCAA.ceuta.tipoGeneral)} general en el ${pct(sueloDe('ceuta'))} efectivo. Los más altos, ${masCaras}. Una nave no tiene tipos reducidos por perfil del comprador —esos van ligados a la vivienda habitual—, así que se aplica el tipo general del sitio donde esté el inmueble. Estos tipos los fija cada comunidad y cambian: conviene comprobar la normativa vigente antes de firmar.`,
       },
     },
   ],

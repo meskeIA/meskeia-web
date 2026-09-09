@@ -4,8 +4,14 @@ import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
 /** Los tipos de IVA se LEEN de data/fiscal, no se teclean: el mismo dato estaba escrito a
  *  mano en ocho sitios entre página y metadata, y es lo que citan los asistentes de IA
- *  (hallazgo 592). */
-const IVA_ANEJO = IVA_INMUEBLES_2025.obraNueva;
+ *  (hallazgo 592).
+ *
+ *  El anejo se lee de `anejoVinculado`, que es la constante con la que la página CALCULA el
+ *  trastero vinculado (art. 91.Uno.1.7º LIVA: anejos transmitidos conjuntamente con la
+ *  vivienda), y no de `obraNueva`, que es el IVA de la vivienda en sí. Anunciar el mismo dato
+ *  desde una constante distinta de la que lo calcula es lo que acaba divergiendo, y aquí el
+ *  texto lo leen los asistentes de IA (hallazgo 641). */
+const IVA_ANEJO = IVA_INMUEBLES_2025.anejoVinculado;
 const IVA_GENERAL = IVA_INMUEBLES_2025.garaje;
 
 export const metadata: Metadata = {

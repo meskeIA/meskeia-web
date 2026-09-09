@@ -37,7 +37,15 @@
  *      plusvalía cruzado con el TERCER tramo del ahorro (23 %), y la gestoría del
  *      COMPRADOR en negativo (País Vasco, el 4 % más bajo del catálogo y sin AJD).
  *      Los tres cuadraron a la primera con lo calculado a mano.
- *  12. HALLAZGOS ABIERTOS 07/09 — dos, con `test.fail()`.
+ *  12. REGRESIÓN 07/09 — los tres hallazgos de esa tanda (624, 625 y 626), REPARADOS el
+ *      09/09/2026. El 624 y el 626 estaban escritos con `test.fail()`; al repararlos se les
+ *      quitó la marca. El 625 no tenía testigo y se le ha escrito uno, que ancla los tipos
+ *      de ITP de los ejemplos contra `ITP_CCAA` en vez de contra un literal.
+ *
+ * ⚠️ Desde el 09/09/2026 las preguntas de la FAQ son `<h3>` (reparación del 626) y
+ * `EducationalSection` monta su contenido SIEMPRE en el DOM, así que un
+ * `page.locator('h3', { hasText: 'ITP' })` cuenta también preguntas: los títulos de tarjeta
+ * se anclan con `/^ITP/`, `/^IVA/` y compañía.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -45,7 +53,7 @@
  *  - Escala progresiva y AJD por CCAA → `ITP_CCAA` en `data/itp-ccaa.ts`
  *    (Cataluña: 10/11/12/13 % y `ajd: 1.5`).
  *  - IVA del garaje de obra nueva → `IVA_INMUEBLES_2025` en `data/fiscal/inmuebles.ts`
- *    (`garaje: 21` independiente · `garageCon: 10` vinculado a la vivienda).
+ *    (`garaje: 21` independiente · `anejoVinculado: 10` vinculado a la vivienda).
  *  - Arancel notarial → `ARANCELES_NOTARIO` (RD 1426/1989, número 2: matriz + una copia),
  *    y la FACTURA que se muestra → `FACTURA_NOTARIAL` (horquilla ×1,5 a ×2, que cubre los
  *    números 4, 6 y 7 —copias, folios y suplidos—; la tarjeta enseña el punto medio ×1,75).
@@ -59,6 +67,10 @@
  * comentado junto a cada aserción, con los importes sin redondear.
  */
 import { test, expect, Page } from '@playwright/test';
+// Los tipos esperados de la sección 12 NO se teclean: se leen de la misma ficha que compone
+// la página, que es lo que convierte esos tests en un ancla y no en una copia (hallazgo 625).
+import { ITP_CCAA } from '../../data/itp-ccaa';
+import { formatNumber, formatTipoNominal } from '../../lib/formatters';
 
 const RUTA = '/simulador-gastos-compraventa-garaje/';
 
@@ -166,7 +178,7 @@ test.describe('Simulador de gastos de compraventa de garaje — inspección 20/0
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
     // IVA = 3.000 × 21 % = 630 — IVA_INMUEBLES_2025.garaje = 21 (garaje independiente;
-    // el vinculado a vivienda sería garageCon = 10 y daría 300 €).
+    // el vinculado a vivienda sería anejoVinculado = 10 y daría 300 €).
     expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
 
     // AJD = 3.000 × 1,5 % = 45 — ITP_CCAA.cataluna.ajd = 1.5, el tipo más alto de la tabla.
@@ -667,8 +679,14 @@ test.describe('MITAD B — casos nuevos de la re-inspección (27/08/2026)', () =
     await expect(aviso).toBeVisible();
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
     await expect(page.getByText('No definido')).toHaveCount(0);
-    // Nada de un ITP de 0,07 € sobre un precio de 1,20 €
-    await expect(page.locator('h3', { hasText: 'ITP' })).toHaveCount(0);
+    // Nada de un ITP de 0,07 € sobre un precio de 1,20 €.
+    // El título va anclado con `/^ITP/` desde el 09/09/2026: al reparar el hallazgo 626 las
+    // preguntas de la FAQ subieron de `<h4>` a `<h3>`, y dos de ellas llevan «ITP» dentro
+    // («¿Qué ITP paga un garaje de segunda mano?»). Como `EducationalSection` monta su
+    // contenido SIEMPRE en el DOM —lo oculta por CSS, para que Googlebot lo lea—, un
+    // `hasText: 'ITP'` a secas dejaría de contar tarjetas de resultado y empezaría a contar
+    // preguntas. El rótulo de la tarjeta es «ITP (6,00%)»; las preguntas empiezan por «¿».
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
 
     await precio.fill('12abc');
     expect(await precio.inputValue()).toBe('1.2.3');
@@ -883,7 +901,7 @@ test.describe('MITAD A — el cierre del IVA en Canarias, verificado (28/08/2026
 
   /**
    * A2 — LO QUE NO DEBÍA CAMBIAR (1 de 2): el territorio donde el IVA sí rige.
-   * Madrid, obra nueva vinculada a la vivienda (IVA_INMUEBLES_2025.garageCon = 10):
+   * Madrid, obra nueva vinculada a la vivienda (IVA_INMUEBLES_2025.anejoVinculado = 10):
    *   IVA = 25.000 × 10 % =                                                     2.500,00
    *   AJD = 25.000 × 0,75 % (ITP_CCAA.madrid.ajd) =                               187,50
    *   total gastos = 2.500 + 187,50 + 371,842444 + 80,207841 + 300 =            3.439,550285
@@ -1408,7 +1426,10 @@ test.describe('Hallazgos 514-516 — re-inspección del 30/08/2026, reparados', 
     await page.selectOption('#select-perfil', 'joven');
     await rellenar(page, 'Precio del garaje / plaza de parking', '18000');
 
-    const lista = page.locator('h4', { hasText: /Tipos reducidos en/ }).locator('xpath=..');
+    // El rótulo subió de `<h4>` a `<h3>` con el hallazgo 626 (09/09/2026), que enderezó el
+    // esquema de encabezados de la app. Se localiza por su texto y su papel de encabezado,
+    // no por el nivel: lo que este test verifica es el CONTENIDO de la lista.
+    const lista = page.getByRole('heading', { name: /Tipos reducidos en/ }).locator('xpath=..');
     // Ya no se anuncian como «disponibles»: cada línea trae sus condiciones reales,
     // y la de Vivienda habitual es la que un garaje suelto nunca cumple.
     await expect(lista).toContainText('Vivienda habitual', { useInnerText: true });
@@ -2022,13 +2043,15 @@ test.describe('INSPECCIÓN 07/09/2026 — los tres casos, resueltos a mano antes
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// 12. HALLAZGOS ABIERTOS 07/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar, así
-//     que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como
-//     regresión, igual que los de las tandas anteriores.
+// 12. REGRESIÓN — los tres hallazgos de la inspección del 07/09/2026 (624, 625 y 626),
+//     REPARADOS el 09/09/2026. Los dos primeros estaban escritos con `test.fail()`
+//     afirmando lo que DEBERÍA pasar; al repararlos se les quitó la marca y se quedan como
+//     regresión, igual que los de las tandas anteriores. El 625 no tenía testigo y se le ha
+//     escrito uno, que es el que ancla la derivación desde `ITP_CCAA`.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — inspección del 07/09/2026', () => {
-  // ❌ ABIERTO (medio) — contenido. Es el hallazgo 578 (JSON-LD, reparado el 02/09) visto
+test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
+  // ✅ REPARADO 09/09/2026 (624, medio) — contenido. Es el hallazgo 578 (JSON-LD, reparado el 02/09) visto
   // desde el otro lado: aquella tanda corrigió la QUINTA pregunta del FAQPage y, de paso,
   // reescribió la SEGUNDA en `metadata.ts` («los tipos reducidos […] casi siempre exigen que
   // el inmueble sea la vivienda habitual, condición que un garaje suelto no cumple»), pero la
@@ -2046,10 +2069,13 @@ test.describe('Hallazgos abiertos — inspección del 07/09/2026', () => {
   //       esperado que condicione el reducido a la vivienda habitual, como ya hace el
   //       JSON-LD de la misma página · obtenido «y puede beneficiarse de tipos reducidos
   //       para jóvenes, familias numerosas o personas con discapacidad si los cumple».
-  test('la FAQ visible dice del reducido lo mismo que el JSON-LD y que el motor', async ({
+  //
+  // REPARACIÓN: la respuesta ya no se escribe dos veces. Vive en una sola constante,
+  // `RESPUESTA_ITP_GARAJE_SEGUNDA_MANO` de `metadata.ts`, que alimenta a la vez el FAQPage
+  // del JSON-LD y el `<p>` de la FAQ visible, de modo que no pueden volver a divergir.
+  test('624 — la FAQ visible dice del reducido lo mismo que el JSON-LD y que el motor', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await page
       .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
@@ -2058,10 +2084,87 @@ test.describe('Hallazgos abiertos — inspección del 07/09/2026', () => {
     const visible = await texto(page, /El garaje se considera inmueble residencial/);
     expect(visible).toMatch(/vivienda habitual/i);
     expect(visible).not.toMatch(/y puede beneficiarse de tipos reducidos/i);
+
+    // Y lo que se ve es LITERALMENTE la misma cadena que publica el FAQPage, no una parecida:
+    // es lo que la reparación garantiza al componer las dos desde una sola constante, y lo
+    // único que impide que dentro de tres meses vuelvan a divergir sin que nadie lo note.
+    // Hay DOS bloques: `jsonLd` (un `@graph` con WebApplication + FAQPage) y `faqJsonLd`
+    // (un FAQPage suelto). La pregunta aparece en los dos, y las dos copias tienen que
+    // coincidir con lo que se lee en pantalla.
+    interface Pregunta {
+      name?: string;
+      acceptedAnswer?: { text?: string };
+    }
+    interface Nodo {
+      '@graph'?: Nodo[];
+      mainEntity?: Pregunta[];
+    }
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const respuestas: string[] = [];
+    for (const bloque of bloques) {
+      const raiz = JSON.parse(bloque) as Nodo;
+      const nodos = [raiz, ...(Array.isArray(raiz['@graph']) ? raiz['@graph'] : [])];
+      for (const nodo of nodos) {
+        for (const pregunta of Array.isArray(nodo.mainEntity) ? nodo.mainEntity : []) {
+          if (pregunta.name === '¿Qué ITP paga un garaje de segunda mano?') {
+            respuestas.push((pregunta.acceptedAnswer?.text ?? '').replace(/\s+/g, ' ').trim());
+          }
+        }
+      }
+    }
+    expect(respuestas.length).toBe(2);
+    for (const respuesta of respuestas) {
+      expect(visible).toBe(respuesta);
+    }
   });
 
-  // ❌ ABIERTO (bajo) — accesibilidad. Las cinco preguntas de la FAQ visible y el rótulo
-  // «Tipos reducidos en …» del panel de datos usan `<h4>` colgando directamente de un `<h2>`:
+  // ✅ REPARADO 09/09/2026 (625, bajo) — dato. Los dos ejemplos del bloque educativo eran la
+  // única cifra normativa de la página escrita a mano: «el ITP general de Madrid (6%)» y, en
+  // el caso de Carlos, «el tipo reducido para jóvenes (3,5%)» frente al «tipo general
+  // (7,00%)». Todo lo demás de la página se compone desde constantes (IVA_INMUEBLES_2025,
+  // RANGO_ITP, RANGO_AJD, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  // ESCALA_RECARGO_EXTEMPORANEO). Coincidían con la ficha, así que no había diferencia en
+  // pantalla; pero en 2026 se movieron Murcia (8 → 7,75 %) y Valencia (10 → 9 %) sin que
+  // nadie avisara a los textos, y esa es exactamente la forma de fallo.
+  //
+  // REPARACIÓN: los tres tipos salen de `ITP_CCAA` (que los lee de `TIPOS_ITP_CCAA_2025`) a
+  // través de `ITP_GENERAL_MADRID`, `ITP_GENERAL_ANDALUCIA` e `ITP_REDUCIDO_JOVENES_ANDALUCIA`.
+  //
+  // Este test es el ancla: los valores esperados NO se teclean aquí, se leen de la misma
+  // ficha, así que si mañana una comunidad mueve su tipo y el texto se quedara atrás, falla.
+  // Los IMPORTES en euros de esos párrafos siguen siendo literales tomados de la app con esa
+  // entrada exacta —los fija la regresión del 20/08 (líneas 147-151)—, de modo que un cambio
+  // de tipo obliga además a rehacerlos a mano; el comentario de `page.tsx` lo advierte.
+  test('625 — los tipos de ITP de los ejemplos salen de ITP_CCAA, no de un literal', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page
+      .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })
+      .click();
+
+    // Ejemplo de Luis — tipo general de Madrid (TIPOS_ITP_CCAA_2025 → 6 %)
+    const luis = (
+      await page.getByText(/Luis compra una plaza de parking en Madrid/).innerText()
+    ).replace(/\s+/g, ' ');
+    expect(luis).toContain(`Madrid (${formatTipoNominal(ITP_CCAA.madrid.tipoGeneral)}%)`);
+
+    // Ejemplo de Carlos — reducido para jóvenes (3,5 %) frente al general (7 %) de Andalucía.
+    // El reducido se busca por nombre en la ficha, igual que hace la página.
+    const reducidoJoven = ITP_CCAA.andalucia.tiposReducidos.find((r) => /j[óo]ven/i.test(r.nombre));
+    if (!reducidoJoven) {
+      throw new Error(
+        'La ficha de Andalucía ya no trae un tipo reducido para jóvenes: el ejemplo de Carlos hay que rehacerlo.',
+      );
+    }
+    const carlos = (await page.getByText(/Carlos, 28 años/).innerText()).replace(/\s+/g, ' ');
+    expect(carlos).toContain(`para jóvenes (${formatTipoNominal(reducidoJoven.tipo)}%)`);
+    // El tipo general va con dos decimales fijos porque es lo que rotula la tarjeta de ITP
+    expect(carlos).toContain(`el tipo general (${formatNumber(ITP_CCAA.andalucia.tipoGeneral, 2)}%`);
+  });
+
+  // ✅ REPARADO 09/09/2026 (626, bajo) — accesibilidad. Las cinco preguntas de la FAQ visible y el rótulo
+  // «Tipos reducidos en …» del panel de datos usaban `<h4>` colgando directamente de un `<h2>`:
   // el nivel h3 no existe en medio, así que el esquema del documento salta un escalón y un
   // lector de pantalla que navegue por encabezados (la forma normal de leer una página larga)
   // no puede situar las preguntas dentro de su sección. No lo ve `check:a11y-jsx`, que vigila
@@ -2070,12 +2173,18 @@ test.describe('Hallazgos abiertos — inspección del 07/09/2026', () => {
   // La inversión h3 → h2 del bloque educativo NO entra aquí: la cabecera de
   // `<EducationalSection>` es un `<h3>` del componente compartido y sus hijos son `<h2>` por
   // diseño de `templates/app-base/page.template.tsx`, de modo que es del catálogo entero y no
-  // de esta app. Lo que sí es suyo son estos `<h4>`.
+  // de esta app. Lo que sí era suyo son esos `<h4>`.
   //
   // Caso: abrir la guía educativa → los encabezados de «Preguntas frecuentes sobre compraventa
   //       de garaje» (h2) · esperado h3 · obtenido h4, cinco veces.
-  test('las preguntas de la FAQ cuelgan del nivel siguiente a su sección', async ({ page }) => {
-    test.fail();
+  //
+  // REPARACIÓN: los seis `<h4>` de la app subieron a `<h3>` (las cinco preguntas y el rótulo
+  // «Tipos reducidos en …»), y con ellos los dos selectores del módulo CSS que colgaban de la
+  // etiqueta (`.faqItem h4` y `.tiposReducidosInfo h4`). Efecto colateral que hubo que
+  // atender: `EducationalSection` monta su contenido SIEMPRE en el DOM —lo oculta por CSS,
+  // para que Googlebot lo lea—, así que el `page.locator('h3', { hasText: 'ITP' })` del CASO 7
+  // pasó a contar también dos preguntas; se ancló con `/^ITP/`.
+  test('626 — las preguntas de la FAQ ya cuelgan de un h3, sin saltar un nivel', async ({ page }) => {
     await page.goto(RUTA);
     await page
       .getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i })

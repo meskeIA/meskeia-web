@@ -36,12 +36,34 @@ import {
   importeITP,
   TipoElegido,
   ENLACE_CATASTRO,
-  RANGO_ITP,
+  // RANGO_ITP ya no se importa aquí: la única frase que lo usaba (la FAQ del ITP de segunda
+  // mano) se compone ahora en `metadata.ts`, que sí lo lee, y la página la muestra tal cual.
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
   sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
+import { RESPUESTA_ITP_GARAJE_SEGUNDA_MANO } from './metadata';
+
+/**
+ * Los dos tipos de ITP que citan los ejemplos del bloque educativo, leídos de la ficha de su
+ * comunidad en vez de tecleados (hallazgo 625 del Inspector, 07/09/2026: eran la única cifra
+ * normativa de la página escrita a mano, y en 2026 se movieron Murcia —8 → 7,75 %— y Valencia
+ * —10 → 9 %— sin que nadie avisara a los textos).
+ *
+ * `tipoGeneral` sale de `TIPOS_ITP_CCAA_2025` a través de `tipoGeneralDe()`; el reducido para
+ * jóvenes se busca por nombre dentro de la ficha andaluza, con el más bajo que quede como
+ * salvavidas si algún día cambiara de rótulo.
+ *
+ * ⚠️ Los IMPORTES en euros de esos mismos párrafos siguen siendo literales tomados de la app
+ * con esa entrada exacta (los fija la regresión del 20/08/2026): si una comunidad mueve su
+ * tipo, el porcentaje se actualiza solo, pero el importe de al lado hay que rehacerlo a mano.
+ */
+const ITP_GENERAL_MADRID = ITP_CCAA.madrid.tipoGeneral;
+const ITP_GENERAL_ANDALUCIA = ITP_CCAA.andalucia.tipoGeneral;
+const ITP_REDUCIDO_JOVENES_ANDALUCIA =
+  ITP_CCAA.andalucia.tiposReducidos.find((r) => /j[óo]ven/i.test(r.nombre))?.tipo ??
+  Math.min(...ITP_CCAA.andalucia.tiposReducidos.map((r) => r.tipo));
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano';
@@ -177,7 +199,7 @@ export default function SimuladorGarajeCompraventaPage() {
         // Garaje nuevo: IVA reducido (10%) si va vinculado a la vivienda (máx. 2 plazas);
         // IVA general (21%) si es independiente o está en un edificio no residencial
         tipoImpuesto = 'IVA';
-        porcentaje = tipoGaraje === 'vinculado' ? IVA_INMUEBLES_2025.garageCon : IVA_INMUEBLES_2025.garaje;
+        porcentaje = tipoGaraje === 'vinculado' ? IVA_INMUEBLES_2025.anejoVinculado : IVA_INMUEBLES_2025.garaje;
         impuesto = precio * (porcentaje / 100);
       }
     } else {
@@ -385,7 +407,7 @@ export default function SimuladorGarajeCompraventaPage() {
       <section className={styles.mainContent}>
         {/* Panel izquierdo: datos */}
         <div className={styles.formPanel}>
-          <h2 className={styles.sectionTitle}>📋 Datos del garaje</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Datos del garaje</h2>
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
@@ -426,7 +448,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 >
                   <span aria-hidden="true" className={styles.transmisionIcon}>🏠</span>
                   <span>Vinculado a vivienda</span>
-                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.garageCon}%</span>
+                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.anejoVinculado}%</span>
                 </button>
                 <button
                   type="button"                  className={`${styles.transmisionBtn} ${tipoGaraje === 'independiente' ? styles.active : ''}`}
@@ -439,7 +461,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 </button>
               </div>
               <p className={styles.infoCcaaNote}>
-                Un garaje vinculado a la vivienda (máx. 2 plazas, mismo edificio y promotor) tributa al {IVA_INMUEBLES_2025.garageCon}% de IVA. Un garaje independiente, comprado por separado o en un edificio de uso no residencial, tributa al {IVA_INMUEBLES_2025.garaje}%.
+                Un garaje vinculado a la vivienda (máx. 2 plazas, mismo edificio y promotor) tributa al {IVA_INMUEBLES_2025.anejoVinculado}% de IVA. Un garaje independiente, comprado por separado o en un edificio de uso no residencial, tributa al {IVA_INMUEBLES_2025.garaje}%.
               </p>
             </div>
           )}
@@ -515,7 +537,7 @@ export default function SimuladorGarajeCompraventaPage() {
               </select>
               {perfilComprador !== 'general' && datosCcaaActual.tiposReducidos.length > 0 && (
                 <div className={styles.tiposReducidosInfo}>
-                  <h4>Tipos reducidos en {datosCcaaActual.nombre} (solo si se cumplen TODAS sus condiciones):</h4>
+                  <h3>Tipos reducidos en {datosCcaaActual.nombre} (solo si se cumplen TODAS sus condiciones):</h3>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
@@ -944,7 +966,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     en 2.750 € un garaje de 25.000 €, y presupuestar de menos es el error caro. */}
                 <tr>
                   <td>IVA obra nueva</td>
-                  <td>{formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% con la vivienda · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% independiente</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% con la vivienda · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% independiente</td>
                   <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% (residencial)</td>
                 </tr>
                 <tr>
@@ -992,7 +1014,7 @@ export default function SimuladorGarajeCompraventaPage() {
                   cerca de la verdad que el número exacto que los sustituyó. Un ejemplo que no
                   cuadra con la calculadora de al lado enseña a desconfiar del resultado correcto,
                   así que si vuelve a cambiar el motor, esta cifra cambia con él. */}
-              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid (6%) = 1.500 €, más notaría (371,84 €, dentro de una horquilla de 318,72 € a 424,96 €), registro (80,21 €) y gestoría (300 €). El coste total asciende a 27.252,05 €.</p>
+              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid ({formatTipoNominal(ITP_GENERAL_MADRID)}%) = 1.500 €, más notaría (371,84 €, dentro de una horquilla de 318,72 € a 424,96 €), registro (80,21 €) y gestoría (300 €). El coste total asciende a 27.252,05 €.</p>
               <div className={styles.casoResultado}>ITP + gastos = 9,01% del precio</div>
             </div>
             <div className={styles.casoCard}>
@@ -1000,8 +1022,8 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🏗️</span>
                 <span className={styles.casoTag}>Garaje de obra nueva con vivienda</span>
               </div>
-              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €) y está vinculado a la vivienda (máx. 2 plazas), el IVA del garaje es también el {formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}%. Si lo compra de forma independiente o en un edificio no residencial, el IVA sube al {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%.</p>
-              <div className={styles.casoResultado}>IVA {formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% (vinculado) o {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% (independiente) en garaje de obra nueva</div>
+              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €) y está vinculado a la vivienda (máx. 2 plazas), el IVA del garaje es también el {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%. Si lo compra de forma independiente o en un edificio no residencial, el IVA sube al {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%.</p>
+              <div className={styles.casoResultado}>IVA {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% (vinculado) o {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% (independiente) en garaje de obra nueva</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -1016,7 +1038,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🎯</span>
                 <span className={styles.casoTag}>Tipos reducidos de ITP para garaje</span>
               </div>
-              <p>Carlos, 28 años, compra un garaje suelto en Andalucía por 18.000 €. El tipo reducido para jóvenes (3,5%) exige que sea su <strong>vivienda habitual</strong>, y un garaje suelto nunca lo es: el simulador liquida el tipo general (7,00% = 1.260,00 €) y avisa de que el reducido no aplica, en vez de dar por buenos 630,00 €. Solo tributa como vivienda habitual si se compra vinculado a ella, en el mismo acto.</p>
+              <p>Carlos, 28 años, compra un garaje suelto en Andalucía por 18.000 €. El tipo reducido para jóvenes ({formatTipoNominal(ITP_REDUCIDO_JOVENES_ANDALUCIA)}%) exige que sea su <strong>vivienda habitual</strong>, y un garaje suelto nunca lo es: el simulador liquida el tipo general ({formatNumber(ITP_GENERAL_ANDALUCIA, 2)}% = 1.260,00 €) y avisa de que el reducido no aplica, en vez de dar por buenos 630,00 €. Solo tributa como vivienda habitual si se compra vinculado a ella, en el mismo acto.</p>
               <div className={styles.casoResultado}>Tipos reducidos: NO aplican a un garaje suelto, solo vinculado a la vivienda habitual</div>
             </div>
           </div>
@@ -1027,23 +1049,25 @@ export default function SimuladorGarajeCompraventaPage() {
           <h2>Preguntas frecuentes sobre compraventa de garaje</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>¿Se puede comprar un garaje sin ser propietario de una vivienda?</h4>
+              <h3>¿Se puede comprar un garaje sin ser propietario de una vivienda?</h3>
               <p>Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Qué ITP paga un garaje de segunda mano?</h4>
-              <p>El garaje tributa por el Impuesto de Transmisiones Patrimoniales (ITP) al mismo tipo que los inmuebles residenciales de su comunidad autónoma, que va del {formatNumber(RANGO_ITP.min, 0)}% (País Vasco) al {formatNumber(RANGO_ITP.max, 0)}% (tramo más alto de las escalas progresivas de Baleares y Cataluña). El garaje se considera inmueble residencial y puede beneficiarse de tipos reducidos para jóvenes, familias numerosas o personas con discapacidad si los cumple.</p>
+              <h3>¿Qué ITP paga un garaje de segunda mano?</h3>
+              {/* Texto compartido con el FAQPage del JSON-LD: una sola constante para que la
+                  respuesta visible y la estructurada no puedan volver a divergir (hallazgo 624). */}
+              <p>{RESPUESTA_ITP_GARAJE_SEGUNDA_MANO}</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Garaje nuevo o de segunda mano: qué impuesto se paga?</h4>
-              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del {formatNumber(IVA_INMUEBLES_2025.garageCon, 0)}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
+              <h3>¿Garaje nuevo o de segunda mano: qué impuesto se paga?</h3>
+              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿El vendedor de un garaje paga plusvalía municipal?</h4>
+              <h3>¿El vendedor de un garaje paga plusvalía municipal?</h3>
               <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Existen tipos reducidos de ITP para garajes?</h4>
+              <h3>¿Existen tipos reducidos de ITP para garajes?</h3>
               <p>Casi todos exigen que el inmueble sea <strong>vivienda habitual</strong>, además de cumplir el requisito del comprador (edad, familia numerosa, discapacidad). Un garaje suelto nunca es vivienda habitual, así que ese tipo reducido no aplica aunque el comprador cumpla el resto: solo tributa como vivienda habitual cuando se compra vinculado a ella, en el mismo acto y edificio. Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.</p>
             </div>
           </div>

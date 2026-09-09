@@ -29,6 +29,7 @@ import {
   sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
+import { HORQUILLA_GASTOS_COMPRAVENTA, GESTORIA_TIPICA } from './metadata';
 
 // ===== TIPOS =====
 type TipoInmueble = 'vivienda' | 'garaje' | 'trastero' | 'local' | 'nave' | 'terreno';
@@ -47,6 +48,21 @@ const HORQUILLA_FEDATARIOS = horquillaFedatarios(BANDA_PRECIO_VIVIENDA.min, BAND
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
 /** Redondeo a la decena de euros: son cifras orientativas, no una factura */
 const eurosOrientativos = (n: number) => eurosEnteros(Math.round(n / 10) * 10);
+
+/**
+ * Ejemplo «Carlos» del bloque educativo (obra nueva). Su IVA y su AJD salen del mismo
+ * motor que la calculadora, no de la memoria: el AJD iba tecleado —«1,5% de AJD
+ * (2.700 €)»— pudiendo derivarse de `ITP_CCAA.valencia.ajd`, que esta misma página usa
+ * tres pantallas más arriba (hallazgo 629). Hoy coincide, así que no había ninguna cifra
+ * mal; lo que faltaba era el vínculo, y el ITP de Valencia ya se movió del 10 al 9 % el
+ * 01/06/2026 sin que este bloque se enterase.
+ */
+const EJEMPLO_OBRA_NUEVA: { ccaa: ComunidadAutonoma; precio: number } = {
+  ccaa: 'valencia',
+  precio: 180000,
+};
+const EJEMPLO_OBRA_NUEVA_IVA = EJEMPLO_OBRA_NUEVA.precio * (IVA_INMUEBLES_2025.obraNueva / 100);
+const EJEMPLO_OBRA_NUEVA_AJD = calcularAJD(EJEMPLO_OBRA_NUEVA.precio, EJEMPLO_OBRA_NUEVA.ccaa);
 
 // Inmuebles que pueden optar a tipos reducidos de ITP (solo residenciales)
 const INMUEBLES_RESIDENCIALES: TipoInmueble[] = ['vivienda', 'garaje', 'trastero'];
@@ -202,7 +218,9 @@ export default function SimuladorCompraventaPage() {
   const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
   const [perfilComprador, setPerfilComprador] = useState<PerfilComprador>('general');
   const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
-  const [gastosGestoria, setGastosGestoria] = useState('300');
+  // La gestoría por defecto es la MISMA que entra en HORQUILLA_GASTOS_COMPRAVENTA: si las
+  // dos se separaran, la horquilla publicada dejaría de contener lo que la app suma.
+  const [gastosGestoria, setGastosGestoria] = useState(String(GESTORIA_TIPICA));
 
   // Datos del vendedor (para plusvalía)
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
@@ -268,7 +286,18 @@ export default function SimuladorCompraventaPage() {
       // eso daba un ITP del 0 % por un tipo reservado a municipios de menos de 2.500
       // habitantes que la app no pregunta. `viviendaHabitual` solo se da por cierta en
       // inmuebles residenciales; en local, nave o terreno esa condición no se cumple.
-      const elegido = elegirTipoITP(ccaa, perfilComprador, precio, {
+      //
+      // Y al motor NO se le pasa un perfil que el usuario no puede ver ni cambiar: el
+      // selector de perfil solo se pinta con inmueble residencial (`esInmuebleResidencial`),
+      // pero su estado sobrevivía al cambio de tipo de inmueble. Quien miraba una vivienda
+      // como «Joven» y pasaba a «Local comercial» se llevaba el aviso «Podrías pagar menos»
+      // ofreciéndole un tipo con el requisito «Vivienda habitual» impreso al lado —que un
+      // local no cumple nunca— y sin ningún control en pantalla para deshacerlo (hallazgo
+      // 627). `elegirTipoITP` ya descarta por `viviendaHabitual` la rama
+      // `alAlcanceDeCualquiera`, pero no la de `candidatos → noComprobables`, que es
+      // justo la que alimenta ese aviso: el filtro tiene que estar aquí.
+      const perfilEfectivo: PerfilComprador = esResidencial ? perfilComprador : 'general';
+      const elegido = elegirTipoITP(ccaa, perfilEfectivo, precio, {
         viviendaHabitual: esResidencial,
       });
       tipoElegido = elegido;
@@ -702,7 +731,7 @@ export default function SimuladorCompraventaPage() {
               value={gastosGestoria}
               onChange={setGastosGestoria}
               label="Gastos de gestoría del comprador (€)"
-              placeholder="300"
+              placeholder={String(GESTORIA_TIPICA)}
               helperText="Típico: 200-400€ (tramitación de escrituras)"
               min={0}
             />
@@ -1434,9 +1463,9 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji} aria-hidden="true">🏗️</span>
                 <span className={styles.casoTag}>Comprador obra nueva</span>
               </div>
-              <p>Carlos compra un piso nuevo en Valencia por 180.000 €. Paga el {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA ({eurosEnteros(180000 * IVA_INMUEBLES_2025.obraNueva / 100)})
-              más el 1,5% de AJD (2.700 €) al ser la primera transmisión del promotor.
-              El total de impuestos asciende a {eurosEnteros(180000 * IVA_INMUEBLES_2025.obraNueva / 100 + 2700)}.</p>
+              <p>Carlos compra un piso nuevo en Valencia por {eurosEnteros(EJEMPLO_OBRA_NUEVA.precio)}. Paga el {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA ({eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA)})
+              más el {formatTipoNominal(ITP_CCAA[EJEMPLO_OBRA_NUEVA.ccaa].ajd)}% de AJD ({eurosEnteros(EJEMPLO_OBRA_NUEVA_AJD)}) al ser la primera transmisión del promotor.
+              El total de impuestos asciende a {eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA + EJEMPLO_OBRA_NUEVA_AJD)}.</p>
               <div className={styles.casoResultado}>IVA + AJD frente a ITP en segunda mano</div>
             </div>
             <div className={styles.casoCard}>
@@ -1472,7 +1501,7 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre ITP e IVA en la compra de una vivienda?</h4>
               <p>El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que
-              el IVA al 10% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir
+              el IVA al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir
               en la misma operación: o se paga uno u otro, nunca ambos.</p>
             </div>
             <div className={styles.faqItem}>
@@ -1524,8 +1553,10 @@ export default function SimuladorCompraventaPage() {
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <strong>Calcula el presupuesto total antes de firmar</strong>
-                <p>Suma al precio del inmueble entre un 10% y 15% adicional para gastos e impuestos.
-                Usa el simulador para obtener una estimación personalizada según tu comunidad y perfil.</p>
+                <p>Suma al precio del inmueble entre un {formatNumber(HORQUILLA_GASTOS_COMPRAVENTA.min, 1)}% y un {formatNumber(HORQUILLA_GASTOS_COMPRAVENTA.max, 1)}% adicional
+                para gastos e impuestos: el punto exacto dentro de esa horquilla depende de la comunidad, del
+                precio y de si la compra es de obra nueva o de segunda mano. Usa el simulador para obtener la
+                cifra de tu caso.</p>
               </div>
             </li>
             <li className={styles.step}>

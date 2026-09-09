@@ -1860,7 +1860,23 @@ test.describe('Regresión — hallazgo 584, reparado', () => {
 //     cubierta en 1.839 líneas de batería: es la única exención total del IRPF de la app y
 //     concederla de más deja al vendedor con una liquidación entera sin provisionar.
 //
-// Y DOS hallazgos nuevos, en `test.fail()` hasta que se reparen (H1 y H2 más abajo).
+// Y CUATRO hallazgos: H1 y H2 (medios), que se escribieron con `test.fail()`, y H3 y H4
+// (bajos), que nacieron en verde porque eran candados sobre datos tecleados que todavía
+// coincidían con la tabla.
+//
+// ── REPARADOS el 09/09/2026 (hallazgos 627 a 630) ────────────────────────────
+// A H1 y H2 se les quitó el `test.fail()` y los cuatro se quedan como REGRESIÓN, que es de
+// lo que se trataba: sujetan la reparación en vez de describir el defecto.
+//   · 627 (H1) — `page.tsx` ya no le pasa al motor un perfil que el usuario no puede ver:
+//     con inmueble no residencial se le pasa «general», porque su selector no está en
+//     pantalla. El aviso de tipos reducidos desaparece con él.
+//   · 628 (H2) — las tres horquillas salen ahora de `HORQUILLA_GASTOS_COMPRAVENTA`
+//     (`metadata.ts`), derivada recorriendo las 19 comunidades y la banda de precios con
+//     el mismo motor de la pantalla: 3,3 % - 12,6 %, que contiene el 6,65 % de Madrid y el
+//     4,65 % del País Vasco.
+//   · 629 (H3) — el AJD del caso «Carlos» sale de `calcularAJD` y su tipo de
+//     `ITP_CCAA.valencia.ajd`.
+//   · 630 (H4) — el IVA de la FAQ visible sale de `IVA_INMUEBLES_2025.obraNueva`.
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
@@ -2075,26 +2091,29 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
   });
 
   /**
-   * H1 (contenido, medio) — HALLAZGO ABIERTO 07/09/2026.
+   * H1 (contenido, medio) — hallazgo 627, REPARADO el 09/09/2026. Queda como REGRESIÓN.
    *
-   * El perfil del comprador sobrevive al cambio de tipo de inmueble, y su selector
+   * El perfil del comprador sobrevivía al cambio de tipo de inmueble, y su selector
    * DESAPARECE al elegir uno no residencial (`esInmuebleResidencial` esconde el bloque).
-   * Resultado: quien mira primero una vivienda con perfil «Joven» y luego cambia a
-   * «Local comercial» se lleva un aviso «Podrías pagar menos» que le ofrece el 3 % de
+   * Resultado: quien miraba primero una vivienda con perfil «Joven» y luego cambiaba a
+   * «Local comercial» se llevaba un aviso «Podrías pagar menos» que le ofrecía el 3 % de
    * Murcia con el requisito «Vivienda habitual» impreso al lado —una condición que un
-   * local no puede cumplir nunca— y no tiene ningún control en pantalla para deshacerlo.
+   * local no puede cumplir nunca— y no tenía ningún control en pantalla para deshacerlo.
    *
-   * La regla ya existe en el motor: `elegirTipoITP` filtra por `viviendaHabitual` la lista
+   * La regla ya existía en el motor: `elegirTipoITP` filtra por `viviendaHabitual` la lista
    * `alAlcanceDeCualquiera`. Lo que no filtra es la rama `candidatos → noComprobables`,
-   * que es justo la que alimenta este aviso.
+   * que es justo la que alimenta este aviso. La reparación va en la app, que es donde está
+   * el defecto: con inmueble no residencial se llama al motor con perfil «general», porque
+   * un perfil que el usuario no puede ver ni cambiar no puede seguir decidiendo lo que se
+   * le ofrece. El ITP no se mueve (el reducido tampoco se aplicaba); lo que desaparece es
+   * la oferta imposible.
    *
    * Es el mismo criterio del comentario de `elegirTipoITP`: «se enseña como oportunidad,
    * nunca como cifra» — pero una oportunidad imposible no es una oportunidad.
    */
-  test('H1 (hallazgo) — un local comercial no puede recibir la oferta de un tipo de VIVIENDA HABITUAL', async ({
+  test('H1 (regresión) — un local comercial no puede recibir la oferta de un tipo de VIVIENDA HABITUAL', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.locator('#ccaa-inmueble').selectOption('murcia');
@@ -2114,10 +2133,10 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
   });
 
   /**
-   * H2 (contenido, medio) — HALLAZGO ABIERTO 07/09/2026.
+   * H2 (contenido, medio) — hallazgo 628, REPARADO el 09/09/2026. Queda como REGRESIÓN.
    *
-   * La app publica TRES horquillas incompatibles de «cuánto hay que sumar al precio», y
-   * NINGUNA contiene lo que su propio motor calcula para la comunidad que viene elegida
+   * La app publicaba TRES horquillas incompatibles de «cuánto hay que sumar al precio», y
+   * NINGUNA contenía lo que su propio motor calcula para la comunidad que viene elegida
    * por defecto:
    *   · paso 1 del bloque visible ... «entre un 10% y 15% adicional»
    *   · JSON-LD (WebApplication+FAQ) .. «del 10% al 14% ... segunda mano y del 12% al 15% en obra nueva»
@@ -2127,12 +2146,20 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
    * Es la familia del hallazgo 584 (tres rangos para lo mismo, ninguno igual al motor),
    * que se cerró para notaría y registro derivándolos del arancel — pero la cifra de
    * cabecera de toda la app, la que el comprador usa para saber cuánto ahorrar aparte,
-   * se quedó escrita a mano en los tres sitios.
+   * se había quedado escrita a mano en los tres sitios.
+   *
+   * Ahora las tres salen de `HORQUILLA_GASTOS_COMPRAVENTA` (`metadata.ts`), que recorre las
+   * 19 comunidades en la banda de BANDA_PRECIO_VIVIENDA reproduciendo las dos ramas del
+   * cálculo (ITP en segunda mano · IVA + AJD en obra nueva, más notaría, registro y
+   * gestoría) y redondea sus extremos hacia fuera: 3,3 % - 12,6 %.
+   *
+   * El test no comprueba esos dos números, sino la propiedad que importa y que se rompió:
+   * que lo que la app manda provisionar CONTENGA lo que ella misma cobra. Se mide en las
+   * dos comunidades que el hallazgo nombra, que son los extremos vivos del catálogo.
    */
-  test('H2 (hallazgo) — el porcentaje que el paso 1 manda provisionar tiene que contener al que calcula la app', async ({
+  test('H2 (regresión) — el porcentaje que el paso 1 manda provisionar tiene que contener al que calcula la app', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.locator('#ccaa-inmueble').selectOption('madrid');
@@ -2142,30 +2169,47 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     const pct = Number(desc.match(/([\d,]+)%/)![1].replace(',', '.'));
     expect(pct).toBeCloseTo(6.65, 2);
 
+    // Y el otro extremo que nombra el hallazgo: País Vasco sobre el mismo precio.
+    //   ITP 200.000 × 4 % = 8.000 · Notaría 758,98 · Registro 236,22 · Gestoría 300
+    //   Total 9.295,20 € → 4,65 % del precio
+    await page.locator('#ccaa-inmueble').selectOption('pais-vasco');
+    await expect
+      .poll(() => descripcionTarjeta(page, /^Total gastos adicionales/))
+      .toContain('4,65%');
+    const pctPv = 4.65;
+
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const paso1 = await page
       .locator('li', { hasText: 'Calcula el presupuesto total antes de firmar' })
       .first()
       .innerText();
-    const rango = paso1.match(/entre un (\d+)% y (\d+)%/)!;
-    expect(pct).toBeGreaterThanOrEqual(Number(rango[1]));
-    expect(pct).toBeLessThanOrEqual(Number(rango[2]));
+    // La horquilla se publica con decimales («3,3%»), así que el regex admite la coma.
+    const rango = paso1.match(/entre un ([\d,]+)% y un ([\d,]+)%/)!;
+    const min = Number(rango[1].replace(',', '.'));
+    const max = Number(rango[2].replace(',', '.'));
+    for (const medido of [pct, pctPv]) {
+      expect(medido).toBeGreaterThanOrEqual(min);
+      expect(medido).toBeLessThanOrEqual(max);
+    }
   });
 
   /**
-   * H3 (dato, bajo) — el AJD del caso «Carlos» va escrito a mano.
+   * H3 (dato, bajo) — hallazgo 629, REPARADO el 09/09/2026. Queda como REGRESIÓN.
    *
-   * `page.tsx:1438` publica «más el 1,5% de AJD (2.700 €)» para una obra nueva en Valencia
-   * mientras la misma página importa `ITP_CCAA` y calcula ese AJD tres pantallas más
-   * arriba. Hoy coincide (ITP_CCAA.valencia.ajd = 1,5), así que no hay ninguna cifra mal:
-   * lo que falta es el vínculo. Es el caso del hallazgo 434 —cuatro comunidades nombradas
-   * a mano en el JSON-LD— repetido en el bloque educativo, y lo mismo que ya hizo Valencia
-   * con su ITP (10 → 9 % el 01/06/2026) puede hacerlo con el AJD sin que nada avise.
+   * `page.tsx` publicaba «más el 1,5% de AJD (2.700 €)» para una obra nueva en Valencia
+   * mientras la misma página importaba `ITP_CCAA` y calculaba ese AJD tres pantallas más
+   * arriba. Coincidía (ITP_CCAA.valencia.ajd = 1,5), así que no había ninguna cifra mal:
+   * lo que faltaba era el vínculo. Es el caso del hallazgo 434 —cuatro comunidades
+   * nombradas a mano en el JSON-LD— repetido en el bloque educativo, y lo mismo que ya hizo
+   * Valencia con su ITP (10 → 9 % el 01/06/2026) podía hacerlo con el AJD sin que nada
+   * avisara.
    *
-   * Este test es el candado que faltaba: si el AJD de Valencia se mueve, el ejemplo se
-   * pone rojo en vez de envejecer en silencio.
+   * Ahora el tipo sale de `ITP_CCAA[...].ajd`, el importe de `calcularAJD` —el mismo motor
+   * de la tarjeta— y el precio del ejemplo de una constante, `EJEMPLO_OBRA_NUEVA`, de la
+   * que cuelgan también el IVA y el total. Este test es el candado: si el AJD de Valencia
+   * se mueve, el ejemplo se mueve con él en vez de envejecer en silencio.
    */
-  test('H3 (dato) — el AJD del ejemplo de obra nueva debe seguir a ITP_CCAA.valencia.ajd', async ({
+  test('H3 (regresión) — el AJD del ejemplo de obra nueva debe seguir a ITP_CCAA.valencia.ajd', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2173,24 +2217,25 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     const caso = page.locator('div[class*="casoCard"]', { hasText: 'Carlos' }).first();
     const ajdPct = String(ITP_CCAA.valencia.ajd).replace('.', ',');
     await expect(caso).toContainText(`${ajdPct}% de AJD`);
-    // Y su importe: 180.000 × 1,5 %. El ejemplo escribe «2.700 €» con punto de millar,
-    // que no es lo que produce el formateador de la app para esa cifra —la tarjeta de AJD
-    // dice «2700,00 €» (CASO 8)—, otra señal de que va tecleado: se comparan las cifras.
+    // Y su importe: 180.000 × 1,5 %. El ejemplo escribía «2.700 €» con punto de millar, que
+    // no es lo que produce el formateador de la app para esa cifra —la tarjeta de AJD dice
+    // «2700,00 €» (CASO 8)—, y esa fue la señal de que iba tecleado. Se comparan las cifras
+    // sin millares para que el test no dependa de cuál de los dos formatos salga.
     const cuota = (180000 * ITP_CCAA.valencia.ajd) / 100;
     const sinMillares = (await caso.innerText()).replace(/\./g, '');
     expect(sinMillares).toContain(`${cuota} €`);
   });
 
   /**
-   * H4 (dato, bajo) — el IVA de la FAQ visible va escrito a mano.
+   * H4 (dato, bajo) — hallazgo 630, REPARADO el 09/09/2026. Queda como REGRESIÓN.
    *
-   * `page.tsx:1475` dice «el IVA al 10% se paga en viviendas nuevas» con el 10 tecleado,
-   * mientras la MISMA pregunta del JSON-LD (metadata.ts:99) ya lo interpola desde
+   * `page.tsx` decía «el IVA al 10% se paga en viviendas nuevas» con el 10 tecleado,
+   * mientras la MISMA pregunta del JSON-LD (`metadata.ts`) ya lo interpolaba desde
    * `IVA_INMUEBLES_2025.obraNueva`. El bloque «Primera mano» de más arriba también lo
-   * deriva, y desde el 02/09 tiene su propio candado: esta FAQ se quedó fuera de aquel
-   * barrido siendo el mismo dato en la misma página.
+   * deriva, y desde el 02/09 tiene su propio candado: esta FAQ se había quedado fuera de
+   * aquel barrido siendo el mismo dato en la misma página. Ya sale de la ficha.
    */
-  test('H4 (dato) — el IVA de la FAQ visible debe seguir a IVA_INMUEBLES_2025', async ({ page }) => {
+  test('H4 (regresión) — el IVA de la FAQ visible debe seguir a IVA_INMUEBLES_2025', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const faq = page
@@ -2205,7 +2250,7 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
    *
    * `ITP_CCAA['pais-vasco'].ajd = 0` (régimen foral), así que la tarjeta de AJD no se
    * pinta —el guard es `ajd > 0`— y eso es lo que debe pasar: aquí el cero no es un dato
-   * que falte, es que no se devenga. Se deja como control junto a H1 y H2, que sí son
+   * que falte, es que no se devenga. Se dejó como control junto a H1 y H2, que sí eran
    * hallazgos, para que se vea que la ausencia de una tarjeta no siempre es un defecto.
    *   IVA        = 200.000 × 10 %                                  = 20.000,00 €
    *   Notaría    = 758,98 € · Registro = 236,22 € · Gestoría = 300 €

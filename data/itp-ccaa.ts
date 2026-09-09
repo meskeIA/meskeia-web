@@ -1360,7 +1360,13 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   } = datos;
 
   // Coeficientes oficiales (RDL 26/2021 + actualización anual), centralizados en data/fiscal/inmuebles.ts
-  const aniosCapped = Math.min(Math.max(aniosPropiedad, 1), 20);
+  //
+  // El suelo es 0, no 1: la tabla tiene fila propia para «Menos de 1 año» (coeficiente 0,14,
+  // el tercero más alto), porque desde el RDL 26/2021 la reventa antes del año SÍ tributa.
+  // Con el suelo en 1 ese coeficiente era inalcanzable desde cualquier app del catálogo y la
+  // transmisión más rápida se liquidaba con el del año 1, que es MENOR (hallazgo 666 del
+  // Inspector, 07/09/2026). Las apps que usan el 0 como «campo vacío» filtran antes de llamar.
+  const aniosCapped = Math.min(Math.max(aniosPropiedad, 0), 20);
   const coeficiente = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosCapped)?.coeficiente ?? 0.45;
 
   // Método objetivo (art. 107.4 TRLHL)

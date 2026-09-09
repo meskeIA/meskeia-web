@@ -19,7 +19,13 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { calcularGananciaInmueble, IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
+import {
+  calcularGananciaInmueble,
+  IVA_INMUEBLES_2025,
+  FISCAL_INMUEBLES_META,
+  PLUSVALIA_MUNICIPAL_META,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+} from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -64,6 +70,10 @@ interface ResultadosVendedor {
   precioVenta: number;
   plusvaliaMunicipal: number;
   metodoPlusvalia: string;
+  /** Falso cuando falta algún dato para liquidar el IIVTNU: entonces el 0 NO es un cero real */
+  plusvaliaCalculada: boolean;
+  /** Los campos concretos que faltan, para que el aviso del neto no los adivine */
+  camposQueFaltan: string[];
   exentoPlusvalia: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
@@ -104,6 +114,19 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
 // Tipo de IVA de inmueble no residencial. Sale de data/fiscal para no divergir en
 // silencio cuando cambie allí (hallazgo 163 del Inspector, del clúster entero).
 const IVA_LOCAL_COMERCIAL = IVA_INMUEBLES_2025.local;
+
+// Extremos de la base del ahorro DERIVADOS de la misma tabla con la que la app calcula
+// (`calcularGananciaInmueble` recorre TRAMOS_GANANCIAS_PATRIMONIALES_2025). Estaban
+// escritos a mano en tres rótulos y en el FAQPage: hoy coincidían, pero un cambio de los
+// tramos no habría llegado nunca al texto (hallazgo 667, misma forma que el 622 del AJD).
+const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
+const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
+
+/** Enumera en español: «a», «a y b», «a, b y c». */
+function enumerarEnEspanol(partes: string[]): string {
+  if (partes.length <= 1) return partes[0] ?? '';
+  return `${partes.slice(0, -1).join(', ')} y ${partes[partes.length - 1]}`;
+}
 
 export default function SimuladorLocalComercialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -231,7 +254,16 @@ export default function SimuladorLocalComercialPage() {
   const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
     const precioV = parseSpanishNumber(precioVenta);
     const precioC = parseSpanishNumber(precioCompraOriginal);
-    const anios = parseInt(aniosPropiedad) || 0;
+    // Los años se leen del STRING, no del número: «0» es un dato VÁLIDO —el local
+    // revendido antes de cumplir el año, que tributa con el coeficiente de «Menos de 1
+    // año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más alto de la tabla)— y lo que
+    // impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
+    // valían 0, así que el 0 explícito desactivaba la plusvalía y ese 0 se propagaba como
+    // un cero real: no minoraba el valor de transmisión, subía la ganancia y el neto se
+    // daba por firme (hallazgo 666 del Inspector, 07/09/2026).
+    const aniosTexto = aniosPropiedad.trim();
+    const anios = aniosTexto === '' ? NaN : Math.max(0, Math.trunc(parseSpanishNumber(aniosTexto)));
+    const aniosDisponibles = Number.isFinite(anios);
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
@@ -243,10 +275,23 @@ export default function SimuladorLocalComercialPage() {
 
     // Plusvalía municipal (IIVTNU): el local está en suelo urbano, sí tributa
     let plusvalia = 0;
-    let metodoPlusvalia = 'No calculada (faltan valor catastral del suelo, años y precio de compra)';
+    // El aviso nombra SOLO lo que de verdad falta, y concuerda el verbo. Era una cadena
+    // fija que enumeraba los tres campos aunque dos estuvieran rellenos, así que mandaba a
+    // releer datos ya escritos (hallazgo 666; es el 437/590 que las apps hermanas garaje y
+    // trastero ya repararon con este mismo patrón).
+    const camposPlusvalia = [
+      { texto: 'el valor catastral del suelo', plural: false, ausente: !(valorSuelo > 0) },
+      { texto: 'los años de propiedad', plural: true, ausente: !aniosDisponibles },
+      { texto: 'el precio de compra original', plural: false, ausente: !(precioC > 0) },
+    ];
+    const faltan = camposPlusvalia.filter((c) => c.ausente);
+    const camposQueFaltan = faltan.map((c) => c.texto);
+    const verboFaltar = faltan.length > 1 || (faltan.length === 1 && faltan[0].plural) ? 'faltan' : 'falta';
+    let metodoPlusvalia = `No calculada (${verboFaltar} ${enumerarEnEspanol(camposQueFaltan)})`;
     let exentoPlusvalia = false;
+    const plusvaliaCalculada = faltan.length === 0;
 
-    if (valorSuelo > 0 && anios > 0 && precioC > 0) {
+    if (plusvaliaCalculada) {
       const resultadoPlusvalia = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: valorSuelo,
         aniosPropiedad: anios,
@@ -289,6 +334,8 @@ export default function SimuladorLocalComercialPage() {
       precioVenta: precioV,
       plusvaliaMunicipal: plusvalia,
       metodoPlusvalia,
+      plusvaliaCalculada,
+      camposQueFaltan,
       exentoPlusvalia,
       comisionInmobiliaria: comision,
       gastosGestoria: gestoria,
@@ -781,8 +828,21 @@ export default function SimuladorLocalComercialPage() {
 
                   <ResultCard
                     title="Plusvalía municipal (IIVTNU)"
-                    value={formatCurrency(resultadosVendedor.plusvaliaMunicipal)}
-                    variant={resultadosVendedor.exentoPlusvalia ? 'info' : 'warning'}
+                    // «Sin calcular» y no «0,00 €»: un cero se lee como «no pagas nada», y
+                    // aquí significa «faltan datos». La partida tampoco se suma al total ni
+                    // se descuenta del neto, y por eso ambos van rotulados como parciales.
+                    value={
+                      resultadosVendedor.plusvaliaCalculada
+                        ? formatCurrency(resultadosVendedor.plusvaliaMunicipal)
+                        : 'Sin calcular'
+                    }
+                    variant={
+                      !resultadosVendedor.plusvaliaCalculada
+                        ? 'default'
+                        : resultadosVendedor.exentoPlusvalia
+                          ? 'info'
+                          : 'warning'
+                    }
                     icon="🏛️"
                     description={resultadosVendedor.metodoPlusvalia}
                   />
@@ -833,7 +893,7 @@ export default function SimuladorLocalComercialPage() {
                     value={resultadosVendedor.irpfGanancia > 0 ? formatCurrency(resultadosVendedor.irpfGanancia) : 'SIN CUOTA'}
                     variant={resultadosVendedor.irpfGanancia > 0 ? 'warning' : 'success'}
                     icon="🧾"
-                    description="Base del ahorro (19–30 %). Un local no tiene exención por reinversión ni por edad."
+                    description={`Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`}
                   />
 
                   <ResultCard
@@ -846,19 +906,30 @@ export default function SimuladorLocalComercialPage() {
                   <div className={styles.separador} />
 
                   <ResultCard
-                    title="Total gastos de la venta"
+                    title={resultadosVendedor.plusvaliaCalculada ? 'Total gastos de la venta' : 'Total gastos de la venta (parcial)'}
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="info"
                     icon="➖"
-                    description={`${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta`}
+                    description={
+                      resultadosVendedor.plusvaliaCalculada
+                        ? `${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta`
+                        : `${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta — SIN la plusvalía municipal, que no está incluida`
+                    }
                   />
 
+                  {/* El neto del vendedor no puede darse por firme cuando le falta un
+                      impuesto, igual que el panel del comprador rotula «COSTE TOTAL
+                      (PARCIAL)» donde no calcula el IGIC/IPSI (hallazgo 666). */}
                   <ResultCard
-                    title="NETO QUE RECIBES"
+                    title={resultadosVendedor.plusvaliaCalculada ? 'NETO QUE RECIBES' : 'NETO QUE RECIBES (PARCIAL)'}
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
-                    description="Precio de venta menos impuestos, comisión y gestoría"
+                    description={
+                      resultadosVendedor.plusvaliaCalculada
+                        ? 'Precio de venta menos impuestos, comisión y gestoría'
+                        : `No descuenta la plusvalía municipal: el neto real será menor. Rellena ${enumerarEnEspanol(resultadosVendedor.camposQueFaltan)} para obtenerlo.`
+                    }
                   />
 
                   <p className={styles.notaVendedor}>
@@ -951,7 +1022,8 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">📈</span> Vender el local con ganancia</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si vendes como persona física, la ganancia tributa en el IRPF del ahorro (19%-30%). Si vendes
+                Si vendes como persona física, la ganancia tributa en el IRPF del ahorro
+                ({formatNumber(TIPO_AHORRO_MIN, 0)}%-{formatNumber(TIPO_AHORRO_MAX, 0)}%). Si vendes
                 como empresa, tributa en el Impuesto de Sociedades. En ambos casos hay plusvalía municipal.
               </p>
             </div>
@@ -1026,7 +1098,8 @@ export default function SimuladorLocalComercialPage() {
             </li>
             <li>
               <strong>IRPF de la ganancia patrimonial.</strong> Tributa en la base del ahorro con los
-              tramos del 19% al 30% de 2025. <strong>No hay exención por reinversión ni por tener más
+              tramos del {formatNumber(TIPO_AHORRO_MIN, 0)}% al {formatNumber(TIPO_AHORRO_MAX, 0)}% de 2025.{' '}
+              <strong>No hay exención por reinversión ni por tener más
               de 65 años</strong>: esas dos ventajas son exclusivas de la vivienda habitual.
             </li>
             <li>

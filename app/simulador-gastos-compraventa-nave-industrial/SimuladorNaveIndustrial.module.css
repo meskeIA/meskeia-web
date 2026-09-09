@@ -347,6 +347,38 @@
   background: #444;
 }
 
+/* ===== TABLA COMPARATIVA NAVE vs VIVIENDA (bloque educativo) =====
+
+   Las celdas que contestan la pregunta que la tabla existe para contestar («¿tiene una nave
+   tipos reducidos de ITP?») iban pintadas con `#c0392b` y `#27ae60` en línea, sin token ni
+   variante de tema: en modo oscuro «No aplican» daba 2,16:1 y en claro el verde 2,64:1, muy
+   por debajo del 4,5:1 que la WCAG 2.1 AA exige para texto normal (hallazgo 648).
+
+   Los tokens globales `--success` / `--error` NO sirven aquí: #4CAF50 sobre el #F5F5F5 de
+   `EducationalSection` da 2,66:1. Estos dos pares están medidos contra los DOS fondos que la
+   tabla llega a tener en cada tema — el de la sección (#F5F5F5 claro / #383838 oscuro) y el de
+   las filas alternas, que es `--bg-primary` (#FAFAFA / #1A1A1A):
+     · claro:  #176A3A → 6,10:1 y 6,37:1 · #B32D1F → 5,82:1 y 6,07:1
+     · oscuro: #6FDC9C → 6,92:1 y 10,27:1 · #FF9A8C → 5,72:1 y 8,50:1
+
+   El color NO es el único portador del dato: la celda dice «Sí …» o «No …» en palabras, y así
+   debe seguir. */
+.celdaSi {
+  color: #176A3A;
+}
+
+.celdaNo {
+  color: #B32D1F;
+}
+
+[data-theme='dark'] .celdaSi {
+  color: #6FDC9C;
+}
+
+[data-theme='dark'] .celdaNo {
+  color: #FF9A8C;
+}
+
 /* ===== WARNING BOX ===== */
 .warningBox {
   background: #fff8e1;

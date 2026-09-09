@@ -1,6 +1,19 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
-import { ITP_CCAA, RANGO_ITP, BANDA_PRECIO_VIVIENDA, horquillaFedatarios, estimarFacturaNotarial } from '@/data/itp-ccaa';
+import {
+  ITP_CCAA,
+  ComunidadAutonoma,
+  RANGO_ITP,
+  BANDA_PRECIO_VIVIENDA,
+  horquillaFedatarios,
+  estimarFacturaNotarial,
+  calcularRegistro,
+  calcularAJD,
+  elegirTipoITP,
+  importeITP,
+  sumarLineasVisibles,
+  TERRITORIOS_SIN_IVA,
+} from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 
 /**
@@ -36,6 +49,82 @@ const notariaDe = (precio: number) => {
 const tipoDe = (id: keyof typeof ITP_CCAA) => pct(ITP_CCAA[id].tipoGeneral);
 const techoDe = (id: keyof typeof ITP_CCAA) =>
   pct(Math.max(ITP_CCAA[id].tipoGeneral, ...(ITP_CCAA[id].tramosProgresivos ?? []).map((t) => t.tipo)));
+
+/**
+ * Gestoría que la calculadora propone por defecto. Vive aquí porque entra en la horquilla
+ * de abajo, y `page.tsx` la importa para su valor inicial: si el defecto de la app y el de
+ * la horquilla se separaran, la cifra publicada dejaría de ser la que el motor suma.
+ */
+export const GESTORIA_TIPICA = 300;
+
+/**
+ * Cuánto hay que sumar al precio por gastos e impuestos — DERIVADO del mismo motor que
+ * ejecuta la calculadora, nunca escrito a mano.
+ *
+ * ── Por qué (09/09/2026, hallazgo 628) ────────────────────────────────────────
+ * La app publicaba TRES horquillas incompatibles de esta misma cifra —«entre un 10 % y
+ * 15 %» en el paso 1 del bloque educativo, «del 10 % al 14 % … y del 12 % al 15 % en obra
+ * nueva» en el JSON-LD WebApplication+FAQ y «entre el 8 % y el 13 %» en el FAQPage— y
+ * ninguna contenía lo que su propio motor calcula: 6,65 % para Madrid en segunda mano y
+ * 4,65 % para el País Vasco. Es la familia del hallazgo 584 (tres rangos para lo mismo,
+ * ninguno igual al motor), que se cerró derivando notaría y registro del arancel; esta es
+ * la cifra de cabecera de toda la app —la que el comprador usa para saber cuánto ahorrar
+ * aparte, porque no se financia con la hipoteca— y se había quedado a mano en los tres
+ * sitios, dos de ellos leídos por los asistentes de IA.
+ *
+ * ── Cómo se obtiene ───────────────────────────────────────────────────────────
+ * Se recorren las 19 comunidades en la banda de BANDA_PRECIO_VIVIENDA (100.000 € a
+ * 500.000 €, de 10.000 en 10.000) reproduciendo las dos ramas de `resultadosComprador`:
+ *   · segunda mano → ITP del tipo general (`elegirTipoITP` + `importeITP`, que aplica la
+ *     escala progresiva donde la hay y la bonificación del 50 % de Ceuta y Melilla),
+ *   · obra nueva   → IVA de obra nueva + AJD de la comunidad, salvo en los territorios
+ *     sin IVA, donde la app no da cifra (`impuestoNoCalculado`),
+ * y a las dos se les suman notaría (factura media), registro y la gestoría típica, con el
+ * mismo `sumarLineasVisibles` que usa la pantalla. Los extremos se redondean HACIA FUERA a
+ * una décima, para que la horquilla publicada contenga siempre lo que el motor calcula.
+ *
+ * Al ser derivada, no hay que recalcular nada a mano: si se mueve un tipo de ITP, el IVA,
+ * el AJD o el arancel, esta constante se mueve con ellos y las tres bocas que la publican
+ * dicen lo mismo el mismo día.
+ */
+export const HORQUILLA_GASTOS_COMPRAVENTA: { min: number; max: number } = (() => {
+  const porcentajes: number[] = [];
+  const PASO = 10000;
+
+  for (const ccaa of Object.keys(ITP_CCAA) as ComunidadAutonoma[]) {
+    for (
+      let precio = BANDA_PRECIO_VIVIENDA.min;
+      precio <= BANDA_PRECIO_VIVIENDA.max;
+      precio += PASO
+    ) {
+      const notaria = estimarFacturaNotarial(precio).medio;
+      const registro = calcularRegistro(precio);
+
+      const itp = importeITP(
+        precio,
+        ccaa,
+        elegirTipoITP(ccaa, 'general', precio, { viviendaHabitual: true }),
+      );
+      porcentajes.push(
+        (sumarLineasVisibles(itp, notaria, registro, GESTORIA_TIPICA) / precio) * 100,
+      );
+
+      if (!TERRITORIOS_SIN_IVA[ccaa]) {
+        const iva = precio * (IVA_INMUEBLES_2025.obraNueva / 100);
+        porcentajes.push(
+          (sumarLineasVisibles(iva, calcularAJD(precio, ccaa), notaria, registro, GESTORIA_TIPICA) /
+            precio) *
+            100,
+        );
+      }
+    }
+  }
+
+  return {
+    min: Math.floor(Math.min(...porcentajes) * 10) / 10,
+    max: Math.ceil(Math.max(...porcentajes) * 10) / 10,
+  };
+})();
 
 export const metadata: Metadata = {
   title: 'Gastos de Compraventa de Vivienda - Calculadora ITP, Notaría y Plusvalía | meskeIA',
@@ -100,7 +189,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
-      answer: `La horquilla habitual en España es del 10% al 14% del precio para una vivienda de segunda mano y del 12% al 15% en obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
+      answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',
@@ -152,7 +241,7 @@ export const faqJsonLd = {
       name: '¿Qué gastos tiene el comprador al adquirir una vivienda en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El comprador asume habitualmente: el ITP (segunda mano) o IVA + AJD (obra nueva), los gastos de notaría (entre ${euros(HORQUILLA.notaria.min)} y ${euros(HORQUILLA.notaria.max)} para viviendas de ${euros(BANDA_PRECIO_VIVIENDA.min)} a ${euros(BANDA_PRECIO_VIVIENDA.max)}), los gastos de inscripción en el Registro de la Propiedad (entre ${euros(HORQUILLA.registro.min)} y ${euros(HORQUILLA.registro.max)} en esa misma banda), y opcionalmente la gestoría (200-400 €). En total, los gastos de compraventa suelen representar entre el 8 % y el 13 % del precio de compra, dependiendo de la comunidad autónoma y si hay hipoteca.`,
+        text: `El comprador asume habitualmente: el ITP (segunda mano) o IVA + AJD (obra nueva), los gastos de notaría (entre ${euros(HORQUILLA.notaria.min)} y ${euros(HORQUILLA.notaria.max)} para viviendas de ${euros(BANDA_PRECIO_VIVIENDA.min)} a ${euros(BANDA_PRECIO_VIVIENDA.max)}), los gastos de inscripción en el Registro de la Propiedad (entre ${euros(HORQUILLA.registro.min)} y ${euros(HORQUILLA.registro.max)} en esa misma banda), y opcionalmente la gestoría (200-400 €). En total, los gastos de compraventa representan entre el ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} y el ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio de compra, según la comunidad autónoma, el importe de la operación y si es obra nueva o segunda mano.`,
       },
     },
     {

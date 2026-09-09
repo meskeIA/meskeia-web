@@ -29,6 +29,7 @@ import {
   RANGO_AJD,
   RANGO_ITP,
   TERRITORIOS_SIN_IVA,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
   CIUDADES_CON_BONIFICACION,
   sumarLineasVisibles,
 } from '@/data/itp-ccaa';
@@ -86,6 +87,12 @@ const IVA_NAVE_INDUSTRIAL = IVA_INMUEBLES_2025.local;
 // La bonificación del 50 % de Ceuta y Melilla (art. 57 bis TRLITPAJD) y la lista de
 // territorios sin IVA viven en el motor: se cumplen por el SITIO del inmueble, así que las
 // aplica calcularITP/calcularAJD y ninguna app tiene que acordarse de ellas.
+//
+// Su porcentaje tampoco se teclea: se DERIVA de la misma constante que aplica el motor. Iba
+// escrito a mano cinco veces en esta página y dos en metadata.ts, con la divergencia en
+// silencio garantizada para el día que la cifra cambie (hallazgo 650, mismo patrón que el
+// hallazgo D del 27/08/2026 con el 21 % y el 19-30 %).
+const BONIFICACION_CIUDADES = `${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} %`;
 
 // El helper `tipoNominal` que vivía aquí subió a `lib/formatters.ts` como
 // `formatTipoNominal` el 25/08/2026: el mismo defecto estaba en las otras seis apps del
@@ -281,21 +288,55 @@ export default function SimuladorNaveIndustrialPage() {
                 </span>
               </button>
             </div>
+            {/* Los dos avisos miran TERRITORIOS_SIN_IVA, igual que el rótulo del botón desde la
+                reparación del hallazgo 490: eran texto FIJO y explicaban en Canarias, Ceuta y
+                Melilla un IVA que la tarjeta de al lado niega en la misma pantalla — el de
+                «Segunda mano» invitaba a una tercera opción que allí no devuelve ningún IVA, y
+                el de la renuncia describía una autoliquidación por ISP que allí no se produce
+                (hallazgo 647). */}
             {tipoTransmision === 'segunda-mano' && (
               <p className={styles.avisoRenuncia} role="note">
-                <span aria-hidden="true">ℹ️</span> Entre empresarios con derecho a deducción es habitual{' '}
-                <strong>renunciar a la exención de IVA</strong> en la segunda transmisión: la operación
-                vuelve al IVA, lo autoliquida el comprador (inversión del sujeto pasivo) y no se paga ITP.
-                Si es tu caso, usa la tercera opción.
+                <span aria-hidden="true">ℹ️</span>{' '}
+                {territorioActualSinIva ? (
+                  <>
+                    En {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+                    ({territorioActualSinIva.nombre}), con sus propias exenciones: la{' '}
+                    <strong>renuncia a la exención de IVA</strong> —habitual entre empresarios en el resto
+                    de España— <strong>no se aplica aquí</strong>, así que la tercera opción no liquida
+                    ninguna cuota de IVA. Consulta el régimen del {territorioActualSinIva.impuesto} en la
+                    administración tributaria de {datosCcaaActual.nombre}.
+                  </>
+                ) : (
+                  <>
+                    Entre empresarios con derecho a deducción es habitual{' '}
+                    <strong>renunciar a la exención de IVA</strong> en la segunda transmisión: la operación
+                    vuelve al IVA, lo autoliquida el comprador (inversión del sujeto pasivo) y no se paga
+                    ITP. Si es tu caso, usa la tercera opción.
+                  </>
+                )}
               </p>
             )}
             {tipoTransmision === 'segunda-mano-renuncia' && (
               <p className={styles.avisoRenuncia} role="note">
-                <span aria-hidden="true">ℹ️</span> Con renuncia a la exención el IVA no se paga al vendedor:
-                lo <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
-                deducible si tu actividad está sujeta a IVA. Ojo al AJD: varias comunidades le aplican un{' '}
-                <strong>tipo incrementado</strong> cuando hay renuncia, y aquí se calcula con el tipo
-                general de la tabla — consúltalo en tu comunidad.
+                <span aria-hidden="true">ℹ️</span>{' '}
+                {territorioActualSinIva ? (
+                  <>
+                    En {datosCcaaActual.nombre} <strong>no se devenga IVA</strong>: allí rige el{' '}
+                    {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}), así que ni la
+                    renuncia a la exención ni la inversión del sujeto pasivo del IVA entran en juego, y
+                    este simulador no cuantifica ese impuesto. Lo que sí calcula es el AJD de la escritura,
+                    con el tipo general de la tabla; varias comunidades le aplican un{' '}
+                    <strong>tipo incrementado</strong> cuando hay renuncia.
+                  </>
+                ) : (
+                  <>
+                    Con renuncia a la exención el IVA no se paga al vendedor: lo{' '}
+                    <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
+                    deducible si tu actividad está sujeta a IVA. Ojo al AJD: varias comunidades le aplican
+                    un <strong>tipo incrementado</strong> cuando hay renuncia, y aquí se calcula con el
+                    tipo general de la tabla — consúltalo en tu comunidad.
+                  </>
+                )}
               </p>
             )}
           </div>
@@ -367,7 +408,8 @@ export default function SimuladorNaveIndustrialPage() {
             {esCiudadBonificada ? (
               <p className={styles.infoCcaaNote}>
                 Las naves industriales tributan por el <strong>tipo general</strong> de ITP, pero en{' '}
-                {datosCcaaActual.nombre} se aplica además la <strong>bonificación del 50 % de la cuota</strong>{' '}
+                {datosCcaaActual.nombre} se aplica además la{' '}
+                <strong>bonificación del {BONIFICACION_CIUDADES} de la cuota</strong>{' '}
                 del artículo 57 bis del TRLITPAJD, que corresponde a los inmuebles situados en la ciudad
                 sea cual sea su uso. El simulador ya la descuenta.
               </p>
@@ -450,7 +492,7 @@ export default function SimuladorNaveIndustrialPage() {
                         ? 'Lo autoliquida el comprador por inversión del sujeto pasivo (no se paga al vendedor) y es deducible si tienes derecho'
                         : 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
                       : resultadosComprador.bonificado
-                        ? 'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis TRLITPAJD)'
+                        ? `Tipo general con la bonificación del ${BONIFICACION_CIUDADES} de la cuota ya aplicada (art. 57 bis TRLITPAJD)`
                         : 'Tipo general — naves industriales no tienen tipos reducidos'
                 }
               />
@@ -464,7 +506,7 @@ export default function SimuladorNaveIndustrialPage() {
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
-                  description={resultadosComprador.bonificado ? 'Con la bonificación del 50 % de Ceuta y Melilla aplicada' : undefined}
+                  description={resultadosComprador.bonificado ? `Con la bonificación del ${BONIFICACION_CIUDADES} de Ceuta y Melilla aplicada` : undefined}
                 />
               )}
 
@@ -552,19 +594,23 @@ export default function SimuladorNaveIndustrialPage() {
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
-                  <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>ITP segunda mano</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>Tipo general CCAA</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>General o reducido</td>
+                  <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>ITP segunda mano</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>Tipo general CCAA</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>General o reducido</td>
                 </tr>
+                {/* Las celdas de respuesta van por clase (.celdaSi / .celdaNo) y no con el color
+                    en línea: los dos hexadecimales de antes no tenían variante de tema y ninguno
+                    llegaba al 4,5:1 donde le tocaba perder (hallazgo 648). El dato lo lleva la
+                    PALABRA —«Sí …» / «No aplican»—, no el color. */}
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Tipos reducidos ITP</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#c0392b' }}>No aplican</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#27ae60' }}>Sí (jóvenes, familia numerosa, etc.)</td>
+                  <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>No aplican</td>
+                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (jóvenes, familia numerosa, etc.)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
-                  <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>IVA deducible</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0', color: '#27ae60', fontWeight: 700 }}>Sí (si actividad sujeta a IVA)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0', color: '#c0392b' }}>No</td>
+                  <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>IVA deducible</td>
+                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>Sí (si actividad sujeta a IVA)</td>
+                  <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>No</td>
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px' }}>AJD obra nueva</td>
@@ -580,29 +626,30 @@ export default function SimuladorNaveIndustrialPage() {
         <section style={{ marginTop: '2rem' }}>
           <h2>Casos de uso habituales</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏭</span> Empresa compra nave nueva al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD. Si la empresa está dada de alta en
                 actividades sujetas a IVA, puede deducir el IVA en la declaración trimestral (modelo 303).
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🔄</span> Autónomo compra nave de segunda mano</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Paga ITP al tipo general de su CCAA — salvo en Ceuta y Melilla, donde la cuota se bonifica
-                un 50 % (art. 57 bis TRLITPAJD) para cualquier inmueble, también una nave. El ITP no es
+                un {BONIFICACION_CIUDADES} (art. 57 bis TRLITPAJD) para cualquier inmueble, también una
+                nave. El ITP no es
                 deducible como IVA, pero sí se añade al valor de adquisición del activo.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">💡</span> IVA deducible: cuándo y cómo</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Solo si el comprador es sujeto pasivo de IVA y la nave se destina a la actividad económica.
                 El IVA se recupera en la declaración trimestral, reduciendo el coste real de adquisición.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">📈</span> Vender nave con ganancia patrimonial</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si vendes la nave como persona física, la ganancia tributa en el IRPF base del ahorro
@@ -647,11 +694,12 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) son exclusivos de
                 inmuebles residenciales. Para naves industriales y locales comerciales aplica el tipo general
-                de la comunidad, que hoy va del {formatNumber(RANGO_ITP.min, 2)}% al {formatNumber(RANGO_ITP.max, 2)}%
+                de la comunidad, que hoy va del {formatTipoNominal(RANGO_ITP.min)}% al {formatTipoNominal(RANGO_ITP.max)}%
                 — el techo corresponde al tramo más alto de las comunidades con escala progresiva, así que una
                 nave cara puede pagar un tipo efectivo superior al nominal de su comunidad. La excepción no es
-                un tipo reducido sino una bonificación de cuota: en Ceuta y Melilla se descuenta el 50 %
-                (art. 57 bis del TRLITPAJD), y ahí sí entra cualquier inmueble, también una nave.
+                un tipo reducido sino una bonificación de cuota: en Ceuta y Melilla se descuenta el{' '}
+                {BONIFICACION_CIUDADES} (art. 57 bis del TRLITPAJD), y ahí sí entra cualquier inmueble,
+                también una nave.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -680,7 +728,7 @@ export default function SimuladorNaveIndustrialPage() {
         <section style={{ marginTop: '2rem' }}>
           <h2>Consejos para compradores de naves industriales</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
               <span style={{ fontSize: '1.5rem' }} aria-hidden="true">🔍</span>
               <strong>Verifica la calificación urbanística</strong>
               <p style={{ fontSize: '0.9rem' }}>
@@ -688,7 +736,7 @@ export default function SimuladorNaveIndustrialPage() {
                 Un cambio de uso puede implicar costes adicionales en obras y licencias.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
               <span style={{ fontSize: '1.5rem' }} aria-hidden="true">📑</span>
               <strong>Consulta el régimen de IVA antes de comprar</strong>
               <p style={{ fontSize: '0.9rem' }}>
@@ -696,7 +744,7 @@ export default function SimuladorNaveIndustrialPage() {
                 ventajoso que segunda mano (ITP no deducible), especialmente en naves de alto valor.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
               <span style={{ fontSize: '1.5rem' }} aria-hidden="true">💼</span>
               <strong>Compra con empresa o a título personal</strong>
               <p style={{ fontSize: '0.9rem' }}>
@@ -705,7 +753,7 @@ export default function SimuladorNaveIndustrialPage() {
                 Analiza con tu asesor cuál te conviene.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
               <span style={{ fontSize: '1.5rem' }} aria-hidden="true">📋</span>
               <strong>Guarda todos los justificantes</strong>
               <p style={{ fontSize: '0.9rem' }}>

@@ -16,6 +16,8 @@ import { test, expect, Page } from '@playwright/test';
  *    (RDL 1/1993), implementada en `aplicarBonificacionCiudad` de `data/itp-ccaa.ts`.
  *  - Plusvalía municipal: `COEFICIENTES_IIVTNU_2025` y `PLUSVALIA_MUNICIPAL_META.tipoOrientativo`
  *    (= 25 %) de `data/fiscal/inmuebles.ts` (RDL 26/2021), vía `calcularPlusvaliaMunicipal`.
+ *    La tabla tiene fila propia para «Menos de 1 año» (`anios: 0`, coeficiente 0,14): la
+ *    reventa antes del año SÍ tributa desde el RDL 26/2021, y la ejercita el CASO 14.
  *  - Ganancia patrimonial e IRPF: `calcularGananciaInmueble` (`data/fiscal/ganancia-inmueble.ts`,
  *    arts. 34-36 LIRPF) sobre `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 ·
  *    21 % hasta 50.000 · 23 % hasta 200.000 · 27 % hasta 300.000 · 30 % el resto).
@@ -610,9 +612,16 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
 // el CASO 11 vuelve a comprobar que el panel del vendedor se recalcula solo al
 // tocar sus PROPIOS campos, sin pasar por la gestoría del comprador.
 //
-// HALLAZGOS ABIERTOS de esta ronda: van abajo, cada uno en su test marcado
-// `test.fail()` con el resultado CORRECTO escrito. El día que se reparen pasarán
-// a verde y habrá que quitarles la marca, que es como se sabe que cerraron.
+// HALLAZGOS de esta ronda, los cuatro REPARADOS: el ALTO de las amortizaciones
+// vacías el 08/09/2026, y los tres restantes el 09/09/2026. Los tests que
+// llevaban `test.fail()` ya no lo llevan: pasan en verde y se quedan como
+// REGRESIÓN, que es como se sabe que cerraron.
+//
+//   · 665 (medio) — el FAQPage contradecía a RANGO_ITP en la pregunta del ITP.
+//   · 666 (medio) — «0 años de propiedad» se confundía con el campo vacío, así
+//     que la plusvalía del primer año no se calculaba y su 0 se sumaba al neto.
+//   · 667 (bajo)  — el rango de la base del ahorro estaba escrito a mano en tres
+//     rótulos y en el FAQPage, pudiendo derivarse de la tabla que la app usa.
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('Inspección 07/09/2026 — casos nuevos', () => {
@@ -850,20 +859,27 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
   });
 
   /**
-   * ⛔ HALLAZGO 07/09/2026 (MEDIO) — ABIERTO. `test.fail()`.
+   * ✅ HALLAZGO 666 (MEDIO) — REPARADO el 09/09/2026. Sujeta la reparación como regresión:
+   * llevaba `test.fail()` y hoy pasa en verde.
    *
    * Con «Años de propiedad» = 0 —un local revendido antes de cumplir el año, que es
    * cuando la plusvalía municipal más pesa: el coeficiente de COEFICIENTES_IIVTNU_2025
-   * para «menos de 1 año» es 0,14, el tercero más alto de la tabla— la app no calcula el
-   * impuesto y lo trata como CERO en todo lo demás: el valor de transmisión no se minora,
-   * la ganancia sube y el «NETO QUE RECIBES» se presenta como cifra firme (360.045,00 €)
-   * cuando le faltan unos 2.800 € de IIVTNU.
+   * para «Menos de 1 año» es 0,14, el tercero más alto de la tabla— la app no calculaba el
+   * impuesto y lo trataba como CERO en todo lo demás: el valor de transmisión no se
+   * minoraba, la ganancia subía y el «NETO QUE RECIBES» se presentaba como cifra firme
+   * (360.045,00 €) cuando le faltaban 2.800 € de IIVTNU.
    *
-   * Y la explicación que acompaña al 0,00 € enumera tres datos que faltarían —«valor
-   * catastral del suelo, años y precio de compra»— cuando dos de los tres están puestos:
-   * el único ausente es el de los años.
+   * La causa era `parseInt(aniosPropiedad) || 0`, que daba el mismo 0 para el campo VACÍO
+   * y para el 0 tecleado, de modo que la guarda `anios > 0` desactivaba los dos. Ahora la
+   * ausencia se lee del STRING (`aniosPropiedad.trim() === ''`) y el 0 explícito sí
+   * calcula. El motor acompañó: `calcularPlusvaliaMunicipal` hacía `Math.max(anios, 1)`,
+   * que dejaba el coeficiente 0,14 inalcanzable desde cualquier app del catálogo.
+   *
+   * Y la explicación que acompañaba al 0,00 € enumeraba los tres datos posibles —«valor
+   * catastral del suelo, años y precio de compra»— aunque dos de los tres estuvieran
+   * puestos; ahora se compone con los que de verdad faltan y concuerda el verbo.
    */
-  test.fail('HALLAZGO 07/09 (medio) — con 0 años de propiedad la plusvalía no puede darse por 0 € y sumarse al neto', async ({ page }) => {
+  test('CASO 14 (regresión 666) — 0 años de propiedad es un dato, no un campo vacío: la plusvalía del primer año se liquida', async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio del local comercial', '400000');
     await page.getByRole('button', { name: /Vendedor/ }).click();
@@ -875,37 +891,103 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
     await rellenar(page, 'Gestoría y certificados del vendedor (€)', '1500');
     await rellenar(page, 'Años de propiedad', '0');
 
-    // La descripción no puede echar en falta lo que el formulario ya tiene.
+    // ── Plusvalía municipal, por los dos métodos del RDL 26/2021, con el coeficiente de la
+    // fila `anios: 0` de COEFICIENTES_IIVTNU_2025 («Menos de 1 año», 0,14):
+    //   objetivo = 80.000 × 0,14 × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 2.800
+    //   real     = (400.000 − 250.000) × 80.000/200.000 × 25 % = 15.000
+    //   → gana el objetivo, 2.800 €
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2800,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
+
+    // ── Y ese impuesto SÍ minora el valor de transmisión (art. 35.2 LIRPF):
+    //   adquisición = 250.000 + 30.000 = 280.000
+    //   comisión    = 400.000 × 4 % = 16.000
+    //   transmisión = 400.000 − 16.000 − 1.500 − 2.800 = 379.700
+    //   ganancia    = 379.700 − 280.000 = 99.700
+    //   IRPF        = 6.000×19 % + 44.000×21 % + 49.700×23 %
+    //               = 1.140 + 9.240 + 11.431 = 21.811
+    //   gastos      = 2.800 + 16.000 + 1.500 + 21.811 = 42.111 → neto 357.889
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('280.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('379.700,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('99.700,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('21.811,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('42.111,00 €');
+    expect(await valorTarjeta(page, 'NETO QUE RECIBES')).toBe('357.889,00 €');
+    // Con los tres datos puestos el neto es firme: el rótulo NO lleva la marca de parcial.
+    await expect(page.locator('h3', { hasText: 'NETO QUE RECIBES' })).toHaveText('NETO QUE RECIBES');
+
+    // ── El campo VACÍO sigue sin calcular, y lo dice sin mandar a releer lo ya escrito:
+    // el aviso nombra solo los años y concuerda el verbo con ellos («faltan»).
+    await rellenar(page, 'Años de propiedad', '');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
     const motivo = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(motivo).toBe('No calculada (faltan los años de propiedad)');
     expect(motivo).not.toContain('valor catastral del suelo');
     expect(motivo).not.toContain('precio de compra');
-    // Y el impuesto no puede valer 0,00 € mientras el neto se presenta como cifra firme.
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).not.toBe('0,00 €');
+
+    // Y el neto deja de presentarse como cifra firme, igual que el «COSTE TOTAL (PARCIAL)»
+    // del panel del comprador cuando no calcula el IGIC/IPSI.
+    await expect(page.locator('h3', { hasText: 'NETO QUE RECIBES' })).toHaveText('NETO QUE RECIBES (PARCIAL)');
+    expect(await descripcionTarjeta(page, 'NETO QUE RECIBES')).toContain('No descuenta la plusvalía municipal');
+    await expect(page.locator('h3', { hasText: 'Total gastos de la venta' })).toHaveText('Total gastos de la venta (parcial)');
   });
 
   /**
-   * ⛔ HALLAZGO 07/09/2026 (MEDIO) — ABIERTO. `test.fail()`.
+   * ✅ HALLAZGO 665 (MEDIO) — REPARADO el 09/09/2026. Sujeta la reparación como regresión:
+   * llevaba `test.fail()` y hoy pasa en verde.
    *
-   * El MISMO bloque FAQPage del JSON-LD se contradice a sí mismo sobre el dato central de
+   * El MISMO bloque FAQPage del JSON-LD se contradecía a sí mismo sobre el dato central de
    * la app. La primera pregunta deriva el rango de `RANGO_ITP` (data/itp-ccaa.ts) y dice
    * «del 4% al 13%»; la sexta —«¿Qué tipo de ITP aplica a un local comercial?»— lo tiene
-   * escrito a mano y dice «entre el 4% (País Vasco) y el 10%-11% (Cataluña, Comunidad
+   * escrito a mano y decía «entre el 4% (País Vasco) y el 10%-11% (Cataluña, Comunidad
    * Valenciana)». El 13 % no es teórico: es lo que la propia app cobra en el tramo alto de
-   * Baleares y de Cataluña (CASO 2 y CASO 9 de este mismo fichero).
+   * Baleares y de Cataluña (CASO 2 y CASO 9 de este mismo fichero). Y citar a la Comunidad
+   * Valenciana como techo estaba doblemente atrasado: bajó al 9 %/11 % el 01/06/2026.
    *
    * Es el hallazgo 622 repetido —allí el rango escrito a mano era el del AJD, y se reparó
    * derivándolo de RANGO_AJD en este mismo metadata.ts— sobre la pregunta que peor sienta:
-   * la que un asistente de IA cita cuando le preguntan por el ITP de un local.
+   * la que un asistente de IA cita cuando le preguntan por el ITP de un local. La
+   * reparación es la misma: derivar de RANGO_ITP y no nombrar comunidades concretas, que
+   * es lo que envejece.
    */
-  test.fail('HALLAZGO 07/09 (medio) — el FAQPage del JSON-LD contradice a RANGO_ITP en la pregunta del ITP', async ({ page }) => {
+  test('CASO 15 (regresión 665) — las dos preguntas del FAQPage citan el MISMO rango de ITP, derivado de la tabla', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
     expect(faq).not.toBe('');
-    // Lo que sí está derivado (RANGO_ITP.min = 4, RANGO_ITP.max = 13):
-    expect(faq).toContain('del 4% al 13%');
-    // Lo que está escrito a mano y ya no cuadra:
+    // RANGO_ITP.min = 4 (País Vasco) y RANGO_ITP.max = 13 (tramo alto de las escalas
+    // progresivas): las DOS preguntas que hablan de ITP tienen que decir lo mismo.
+    expect(faq.match(/del 4% al 13%/g)?.length).toBe(2);
+    // Y lo que estaba escrito a mano ya no aparece.
     expect(faq).not.toContain('10%-11%');
+    expect(faq).not.toContain('Comunidad Valenciana');
+  });
+
+  /**
+   * ✅ HALLAZGO 667 (BAJO) — REPARADO el 09/09/2026. No tuvo testigo en rojo porque los
+   * valores coincidían: el defecto era que un cambio de la tabla no habría llegado nunca
+   * al texto. El rango «19–30 %» estaba escrito a mano en tres rótulos de `page.tsx` y en
+   * la quinta pregunta del `faqJsonLd`, pudiendo derivarse de
+   * TRAMOS_GANANCIAS_PATRIMONIALES_2025, que es exactamente la tabla con la que la app
+   * calcula a través de `calcularGananciaInmueble` (el CASO 12d recorre sus cinco tramos).
+   *
+   * Es la misma forma que RANGO_AJD (hallazgo 622) y que el 665 de aquí arriba, donde el
+   * desfase ya se había materializado. El test fija que el rótulo y el JSON-LD digan lo
+   * que dice la tabla.
+   */
+  test('CASO 16 (regresión 667) — el rango de la base del ahorro se deriva de la tabla de tramos', async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del local comercial', '400000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '250000');
+
+    // TRAMOS_GANANCIAS_PATRIMONIALES_2025: primer tramo 19 %, último 30 %.
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain('Base del ahorro (19–30 %)');
+
+    // Y el FAQPage cita ese mismo rango, en vez de uno tecleado aparte.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faq).toContain('del 19% al 30%');
   });
 
   /**
