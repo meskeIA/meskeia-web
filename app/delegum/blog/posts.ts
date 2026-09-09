@@ -37,6 +37,27 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
+    slug: 'deduccion-irpf-la-palma-2026',
+    titulo:
+      'La deducción del IRPF por residir en La Palma se amplía a 2026, con efectos desde el 1 de enero',
+    fecha: '2026-09-15',
+    resumen:
+      'El Real Decreto-ley 23/2026 lleva al ejercicio 2026 la deducción del 60 % en la cuota del IRPF para quien reside de forma habitual y efectiva en La Palma, la misma que se aplica en Ceuta y Melilla. Cubre el año entero, pero en las retenciones solo cuenta desde su entrada en vigor, así que la nómina se corrige a mitad de ejercicio.',
+    cuerpo: [
+      'El BOE del 9 de septiembre publicó el Real Decreto-ley 23/2026, de 8 de septiembre (BOE núm. 223), en vigor desde el día siguiente al de su publicación. Su artículo 1 da nueva redacción a la disposición adicional quincuagésima séptima de la Ley 35/2006 del IRPF, con efectos desde el 1 de enero de 2026, para que la deducción por obtención de rentas en Ceuta y Melilla resulte aplicable «en los mismos términos y condiciones, a los contribuyentes con residencia habitual y efectiva en la isla de La Palma». No es una deducción nueva: nació tras la erupción de Cumbre Vieja y se ha ido extendiendo ejercicio a ejercicio, de modo que la disposición cubre ya los períodos impositivos 2022, 2023, 2024, 2025 y 2026. Cada uno de esos años ha necesitado una norma propia que añadiera el siguiente, y esta es la de 2026.',
+      'La deducción a la que remite es la del número 1.º del apartado 4 del artículo 68 de la Ley del IRPF, que reconoce a quien tiene allí su residencia habitual y efectiva «el 60 por ciento de la parte de la suma de las cuotas íntegras estatal y autonómica que proporcionalmente corresponda a las rentas computadas para la determinación de las bases liquidables que hubieran sido obtenidas» en ese territorio. Conviene leer la frase entera antes de hacer cuentas: no es una reducción de la base imponible ni una exención, sino un porcentaje que se resta de la cuota, y solo de la parte de esa cuota que corresponde a las rentas obtenidas en la isla. La misma disposición extiende la equivalencia al artículo 101, que es donde se fijan los tipos de retención, y a su desarrollo reglamentario.',
+      'De ahí sale el detalle con más efecto práctico este otoño, que está en el apartado 2 y no en el titular. A efectos de retenciones y pagos fraccionados, la equivalencia solo se tiene en cuenta sobre los rendimientos satisfechos «a partir de la entrada en vigor del Real Decreto-ley 23/2026». Es decir: la deducción se aplicará a la declaración del ejercicio 2026 completo, la que se presenta en 2027, pero las retenciones practicadas desde enero se calcularon sin ella. La norma resuelve el desajuste regularizando el tipo en los primeros rendimientos del trabajo que se abonen a partir de esa fecha, con una alternativa expresa para quien paga: hacerlo a partir del mes siguiente. Quien cobra nómina en La Palma verá el ajuste en septiembre o en octubre según esa decisión del pagador, y lo que no se corrija por esa vía se regulariza igualmente al declarar.',
+      'El artículo 4 abre un plazo distinto, mucho más estrecho y con fecha cercana. Los deudores de los municipios de El Paso, Los Llanos de Aridane y Tazacorte inscritos en el Registro de personas afectadas por las erupciones volcánicas, cuyos ingresos principales provengan de la agricultura y que ya hubieran solicitado la suspensión de pagos o su prórroga al amparo de la disposición adicional cuarta del Real Decreto-ley 20/2021, pueden pedir «hasta el 15 de octubre de 2026» una nueva suspensión de seis meses, para el período que va del 1 de octubre de 2026 al 31 de marzo de 2027, de sus obligaciones de pago de intereses y principal en préstamos y créditos con garantía hipotecaria o sin ella. Ese requisito previo es el que acota de verdad la medida: prorroga la situación de quien ya estaba acogido, y no la abre a quien no la solicitó en su momento.',
+      'El artículo 5 cambia además dos reglas de la prestación extraordinaria por cese de actividad de los autónomos afectados: las subvenciones percibidas en el marco del POSEI, el programa comunitario de apoyo a las producciones agrarias canarias, dejan de computar para determinar los rendimientos netos y los ingresos de la actividad; y quienes iniciaron la actividad durante 2020 pasan a comparar con el trimestre equivalente de ese mismo año, en vez de con 2019, que era el término de comparación que los dejaba fuera. Por su parte, el artículo 2 habilita a Canarias a destinar 100 millones de euros de sus excesos de financiación a ayudas para personas físicas y entidades afectadas. Para situar sobre qué magnitud se calcula ese 60 %, el estimador enlazado abajo desglosa la cuota íntegra del IRPF por tramos, aunque no incorpora esta deducción territorial.',
+    ],
+    fuente:
+      'BOE — Real Decreto-ley 23/2026, de 8 de septiembre (BOE núm. 223, de 9 de septiembre de 2026)',
+    fuenteUrl: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-18828',
+    fichaSlug: 'irpf-tramos-minimos',
+    visualizadorUrl: 'https://meskeia.com/estimador-irpf/',
+    visualizadorTitulo: 'Estimador de IRPF',
+  },
+  {
     slug: 'becas-colaboracion-departamentos-universitarios-2026-2027',
     titulo:
       'Las becas de colaboración en departamentos universitarios cierran el 22 de septiembre',
