@@ -1065,17 +1065,37 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.cuotaFinal).toBeCloseTo(17751.99, 2);
   });
 
-  test('GOLDEN-AE: Cataluña, Grupo II, 300.000 € → tarifa propia → cuotaFinal 31.500 €', () => {
-    // Cataluña usa tarifa propia (7%–32%) y reducción parentesco propia (50.000 €).
-    // baseLiquidable = 300.000 − 50.000 = 250.000; tramo 17% → cuotaIntegra = 31.500 €
+  /**
+   * ⚠️ Este golden esperaba 31.500 € hasta el 08/09/2026, y esa cifra venía de aplicarle al
+   * HIJO la reducción de 50.000 € que el art. 2 de la Ley 19/2010 reserva al nieto. El golden
+   * no detectó el error: lo fijó, porque se escribió leyendo el mismo `data/fiscal` que estaba
+   * mal. La cifra de ahora está contrastada contra la Agència Tributària de Catalunya — el
+   * detalle, en `tests/sucesiones-cataluna-motor.spec.ts`.
+   */
+  test('GOLDEN-AE: Cataluña, HIJO ≥21, 300.000 € → tarifa propia y art. 58 bis → cuotaFinal 10.350 €', () => {
+    // Cataluña usa tarifa propia (7%–32%) y reducción de parentesco propia: 100.000 € al hijo.
+    // baseLiquidable = 300.000 − 100.000 = 200.000; tramo 17% → cuotaIntegra = 23.000 €
+    // Bonificación del art. 58 bis por la BASE IMPONIBLE de 300.000 €: 55,00 % → 10.350 €
     const res = calcularSucesion({ baseImponible: 300000, ccaa: 'cataluna', grupo: 'II' });
+    expect(res.reduccionParentesco).toBeCloseTo(100000, 2);
+    expect(res.baseLiquidable).toBe(200000);
+    expect(res.cuotaIntegra).toBeCloseTo(23000, 2);
+    expect(res.porcentajeBonificacion).toBeCloseTo(55, 2);
+    expect(res.cuotaFinal).toBeCloseTo(10350, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(3.45, 2);
+    expect(res.esForal).toBe(true);
+    expect(res.tarifaAplicada).toContain('Cataluña');
+  });
+
+  test('GOLDEN-AE2: Cataluña, NIETO ≥21, 300.000 € → reduce 50.000 € → cuotaFinal 14.175 €', () => {
+    // El mismo caso con el parentesco que de verdad reduce 50.000 €: la cifra que el golden
+    // original atribuía al hijo (31.500 € de cuota íntegra) es la que le corresponde al nieto.
+    // Misma escala del Grupo II —el art. 58 bis no distingue nieto de hijo—: 55,00 %.
+    const res = calcularSucesion({ baseImponible: 300000, ccaa: 'cataluna', grupo: 'II-descendiente' });
     expect(res.reduccionParentesco).toBeCloseTo(50000, 2);
     expect(res.baseLiquidable).toBe(250000);
     expect(res.cuotaIntegra).toBeCloseTo(31500, 2);
-    expect(res.cuotaFinal).toBeCloseTo(31500, 2);
-    expect(res.tipoEfectivo).toBeCloseTo(10.5, 2);
-    expect(res.esForal).toBe(true);
-    expect(res.tarifaAplicada).toContain('Cataluña');
+    expect(res.cuotaFinal).toBeCloseTo(14175, 2);
   });
 
   test('GOLDEN-AF: Madrid, I-descendiente, 200.000 € + vivienda 200.000 € → cuotaFinal 54,05 €', () => {

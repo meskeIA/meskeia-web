@@ -17,6 +17,8 @@ import {
   REDUCCIONES_PARENTESCO_CATALUNA_IS,
   REDUCCION_EDAD_MENOR_21_IS,
   REDUCCION_EDAD_MENOR_21_MAX_IS,
+  REDUCCION_EDAD_MENOR_21_CATALUNA_IS,
+  REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS,
   REDUCCION_SEGURO_VIDA_MAX_IS,
   REDUCCION_DISCAPACIDAD_33_IS,
   REDUCCION_DISCAPACIDAD_65_IS,
@@ -27,12 +29,16 @@ import {
 } from '@/data/fiscal';
 import {
   evaluarReduccionVivienda,
+  porcentajeBonificacionPonderada,
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
 } from '@/lib/calculadoras/sucesiones';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type GrupoParentesco = 'I-conyuge' | 'I-descendiente' | 'II' | 'II-ascendiente' | 'III' | 'IV';
+// 'II' es el HIJO de 21 o más y 'II-descendiente' el nieto o bisnieto de esa edad: Cataluña
+// les da 100.000 € y 50.000 € respectivamente (art. 2 Ley 19/2010) y el régimen común no los
+// distingue. Ver el tipo `GrupoParentescoIS` del motor, con el que este debe coincidir.
+type GrupoParentesco = 'I-conyuge' | 'I-descendiente' | 'II' | 'II-descendiente' | 'II-ascendiente' | 'III' | 'IV';
 type TipoAdquisicion = 'plena' | 'usufructo' | 'nuda';
 type NivelDiscapacidad = '0' | '33' | '65';
 
@@ -88,27 +94,53 @@ function calcularTarifa(base: number, tarifa: TramoTarifaIS[]): number {
 
 function getGrupoBase(grupo: string): string {
   if (grupo === 'I-conyuge' || grupo === 'I-descendiente') return 'I';
-  if (grupo === 'II' || grupo === 'II-ascendiente') return 'II';
+  if (grupo === 'II' || grupo === 'II-descendiente' || grupo === 'II-ascendiente') return 'II';
   if (grupo === 'III') return 'III';
   return 'IV';
+}
+
+/**
+ * Ninguna comunidad distingue al nieto del hijo para BONIFICAR la cuota: la distinción del
+ * art. 2 de la Ley 19/2010 es solo de reducción en base. Sin este colapso, un nieto se
+ * quedaría sin la bonificación del 99 % porque `bonificaciones['II-descendiente']` no existe
+ * en ninguna de las 17 comunidades. Igual que `claveBonificacion` en el motor.
+ */
+function claveBonificacion(grupo: string): string {
+  return grupo === 'II-descendiente' ? 'II' : grupo;
 }
 
 function aplicarBonificacion(
   cuotaTributaria: number,
   baseLiquidable: number,
   grupo: string,
-  ccaa: string
+  ccaa: string,
+  baseImponible: number
 ): { bonificacion: number; porcentaje: number; detalle: string } {
 
   const config = BONIFICACIONES_CCAA_IS[ccaa];
   if (!config) return { bonificacion: 0, porcentaje: 0, detalle: 'CCAA no configurada' };
 
-  const bGrupo: BonificacionGrupoIS | undefined = config.bonificaciones[grupo];
+  const bGrupo: BonificacionGrupoIS | undefined = config.bonificaciones[claveBonificacion(grupo)];
   if (!bGrupo) return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación para este grupo' };
 
   // Asturias: reducción en base (no bonificación), ya aplicada antes
   if (bGrupo.reduccionBase !== undefined) {
     return { bonificacion: 0, porcentaje: 0, detalle: 'Reducción aplicada en base liquidable' };
+  }
+
+  /**
+   * Cataluña (art. 58 bis Ley 19/2010): escala PONDERADA sobre la base IMPONIBLE, no un tramo
+   * plano sobre la liquidable como el `escalonado` de abajo. La regla la sirve el motor de
+   * sucesiones —`porcentajeBonificacionPonderada`—, que es el mismo que ejecuta el MCP: escribir
+   * aquí una segunda copia es exactamente lo que produjo los hallazgos 277, 461 y 462.
+   */
+  if (bGrupo.escalaPonderada && bGrupo.escalaPonderada.length > 0) {
+    const pct = porcentajeBonificacionPonderada(baseImponible, bGrupo.escalaPonderada);
+    return {
+      bonificacion: cuotaTributaria * pct,
+      porcentaje: pct * 100,
+      detalle: `Bonificación ${formatNumber(pct * 100, 2)}% por escala del art. 58 bis (${config.nombre})`,
+    };
   }
 
   // Exención total por importe
@@ -260,12 +292,27 @@ export default function EstimadorImpuestoSucesionesPage() {
       reducciones.push({ concepto: 'Por parentesco', importe: reduccionParentesco });
     }
 
-    // 2. Reducción por edad (solo grupo I descendiente, para menores de 21)
-    const edadNum = parseInt(edad) || 35;
+    // 2. Reducción por edad (solo grupo I descendiente, para menores de 21).
+    //    ⚠️ El tope legal es del TOTAL (parentesco + incremento), no del incremento suelto:
+    //    47.858,59 € en régimen común (art. 20.2.a LISD) y 196.000 € en Cataluña (art. 2 Ley
+    //    19/2010). Hasta el 08/09/2026 aquí se sumaba `reduccionParentesco + MAX`, así que un
+    //    recién nacido llegaba a 63.815,46 € estatales, un 33 % por encima del tope de la ley,
+    //    y además se le aplicaban las cifras estatales viviendo en Cataluña.
+    /**
+     * ⚠️ `parseInt(edad) || 35` convertía el CERO en 35, porque 0 es falsy: un heredero de
+     * meses —justo el que más reducción tiene, 3.990,72 € por año en régimen común y 12.000 €
+     * en Cataluña— se liquidaba como si tuviera 35 años y perdía la reducción entera. El
+     * campo admite `min="0"`, así que el caso era expresable en pantalla y no en el cálculo.
+     * El 35 solo debe salir cuando NO hay edad escrita.
+     */
+    const edadParseada = Number.parseInt(edad, 10);
+    const edadNum = Number.isFinite(edadParseada) ? edadParseada : 35;
     if (grupo === 'I-descendiente' && edadNum < 21) {
+      const porAnio = esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS;
+      const topeTotal = esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS;
       const reduccionEdad = Math.min(
-        reduccionParentesco + REDUCCION_EDAD_MENOR_21_IS * (21 - edadNum),
-        reduccionParentesco + REDUCCION_EDAD_MENOR_21_MAX_IS
+        reduccionParentesco + porAnio * (21 - edadNum),
+        topeTotal
       ) - reduccionParentesco;
       if (reduccionEdad > 0) {
         reducciones.push({ concepto: `Por edad (${21 - edadNum} años < 21)`, importe: reduccionEdad });
@@ -273,7 +320,7 @@ export default function EstimadorImpuestoSucesionesPage() {
     }
 
     // 3. Reducción por seguro de vida (solo para cónyuge, descendientes, ascendientes)
-    const gruposConSeguro = ['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente'];
+    const gruposConSeguro = ['I-conyuge', 'I-descendiente', 'II', 'II-descendiente', 'II-ascendiente'];
     if (gruposConSeguro.includes(grupo) && v_seguros > 0) {
       const reduccionSeguro = Math.min(v_seguros, REDUCCION_SEGURO_VIDA_MAX_IS);
       reducciones.push({ concepto: 'Seguro de vida', importe: reduccionSeguro });
@@ -288,7 +335,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       valorVivienda: baseViviendaHeredero > 0 ? baseViviendaHeredero : undefined,
       grupo,
       ccaa,
-      edadHeredero: parseInt(edad) || undefined,
+      edadHeredero: Number.isFinite(edadParseada) ? edadParseada : undefined,
       convivenciaDosAnios,
     });
     if (vivienda.reduccion > 0) {
@@ -305,7 +352,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
     // 6. Reducción adicional Asturias
     if (ccaa === 'asturias') {
-      const reducAdicionalAsturias = BONIFICACIONES_CCAA_IS['asturias'].bonificaciones[grupo]?.reduccionBase ?? 0;
+      const reducAdicionalAsturias = BONIFICACIONES_CCAA_IS['asturias'].bonificaciones[claveBonificacion(grupo)]?.reduccionBase ?? 0;
       if (reducAdicionalAsturias > 0) {
         reducciones.push({ concepto: 'Reducción adicional Asturias', importe: reducAdicionalAsturias });
       }
@@ -326,9 +373,12 @@ export default function EstimadorImpuestoSucesionesPage() {
 
     const cuotaTributaria = cuotaIntegra * coeficienteMultiplicador;
 
-    // Bonificación CCAA
+    // Bonificación CCAA. `baseAjustada` es la base IMPONIBLE de ESTE heredero —ya con el ajuar
+    // y con su porcentaje de herencia o su usufructo aplicados—, que es sobre la que la escala
+    // catalana del art. 58 bis construye el porcentaje. El resto de comunidades siguen mirando
+    // la liquidable.
     const { bonificacion, porcentaje, detalle } = aplicarBonificacion(
-      cuotaTributaria, baseLiquidable, grupo, ccaa
+      cuotaTributaria, baseLiquidable, grupo, ccaa, baseAjustada
     );
 
     const cuotaFinal = Math.max(0, cuotaTributaria - bonificacion);
@@ -448,7 +498,11 @@ export default function EstimadorImpuestoSucesionesPage() {
                   <option value="cantabria">Cantabria</option>
                   <option value="rioja">La Rioja</option>
                 </optgroup>
-                <optgroup label="Régimen Foral">
+                {/* Cataluña NO es territorio foral —los forales son País Vasco y Navarra—,
+                    aunque `data/fiscal` la agrupe con ellos bajo esa etiqueta interna. Lo que
+                    comparten es tener normativa propia que se aparta del régimen común, y eso
+                    es lo que aquí se le dice al usuario. */}
+                <optgroup label="Normativa propia">
                   <option value="cataluna">Cataluña ⚠️</option>
                   <option value="pais-vasco">País Vasco ⚠️</option>
                   <option value="navarra">Navarra ⚠️</option>
@@ -476,7 +530,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <option value="">— Selecciona —</option>
                 <option value="I-conyuge">Cónyuge / pareja de hecho</option>
                 <option value="I-descendiente">Descendiente menor de 21 años</option>
-                <option value="II">Descendiente de 21 años o más</option>
+                <option value="II">Hijo/a de 21 años o más</option>
+                <option value="II-descendiente">Nieto/a u otro descendiente de 21 años o más</option>
                 <option value="II-ascendiente">Ascendiente (padre, madre, abuelo/a)</option>
                 <option value="III">Hermano/a, tío/a, sobrino/a (2º–3º grado)</option>
                 <option value="IV">Primo/a, otro pariente o sin parentesco (4º grado+)</option>
@@ -762,11 +817,14 @@ export default function EstimadorImpuestoSucesionesPage() {
             </div>
           </div>
 
-          <h3>Regímenes forales: Cataluña, País Vasco y Navarra</h3>
+          <h3>Normativa propia: Cataluña, País Vasco y Navarra</h3>
           <p>
-            Estos territorios tienen normativa propia. Cataluña aplica una tarifa entre el 7% y el 32%,
-            con reducciones distintas. País Vasco (tres Haciendas Forales diferentes) y Navarra tienen
-            sistemas muy favorables para familiares directos, con reducciones cercanas al 100%.
+            Cataluña <strong>no es territorio foral</strong> —los forales son País Vasco y Navarra—,
+            pero sí tiene su propia ley del impuesto (Ley 19/2010): tarifa entre el 7% y el 32% y
+            reducciones distintas de las estatales, entre ellas 100.000 € para el cónyuge y para el
+            hijo, 50.000 € para el resto de descendientes y 30.000 € para los ascendientes. País Vasco
+            (tres Haciendas Forales diferentes) y Navarra tienen sistemas muy favorables para
+            familiares directos, con reducciones cercanas al 100%.
           </p>
 
           <h3>Plazos importantes</h3>
@@ -900,12 +958,16 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div className={styles.escenarioExample}>
                 <p>
                   Cataluña aplica tarifa propia (7%–32%) y coeficientes propios.
-                  La empresa familiar puede tener reducción del 95% si cumple requisitos
-                  (art. 20.2.c Ley 29/1987 y normativa catalana). Sin esa reducción:
-                  base liquidable aprox. 484.043 €. Cuota catalana: ~67.000 €.
+                  Sin más reducciones que la de parentesco del cónyuge (100.000 € en Cataluña),
+                  la base liquidable es de 400.000 € y la cuota, de 57.000 €.
                   Coeficiente cónyuge catalán: 1,0000.
                 </p>
-                <p><strong>Con reducción empresa familiar: cuota puede reducirse a ~3.350 €</strong></p>
+                <p>
+                  <strong>La reducción del 95% por empresa familiar</strong> (art. 20.2.c de la
+                  Ley 29/1987 y sección 3ª de la Ley 19/2010) puede dejar la cuota en cero si se
+                  cumplen los requisitos de permanencia, pero <strong>esta herramienta no la
+                  calcula</strong>: la cifra de arriba es el techo, no la factura.
+                </p>
               </div>
               <div className={styles.escenarioTip}>
                 La reducción por empresa familiar (95%) requiere que el causante ejerciera
@@ -1193,8 +1255,11 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <p>
                   Si heredas la vivienda habitual del causante, aplica la reducción del 95%
                   sobre su valor (con el límite estatal de 122.606,47 € por heredero). Cónyuge,
-                  descendientes y ascendientes pueden aplicarla. Solo en Cataluña aplica un régimen
-                  distinto. Requisito: mantener la vivienda 10 años (o 3 en algunas CCAA).
+                  descendientes y ascendientes pueden aplicarla. En Cataluña el límite es muy
+                  superior —500.000 € sobre el valor conjunto de la vivienda, con un mínimo de
+                  180.000 € por heredero tras el prorrateo—, y por eso allí esta reducción suele
+                  decidir el resultado. Requisito: mantener la vivienda 10 años (5 en Cataluña,
+                  o 3 en algunas CCAA).
                 </p>
               </div>
             </div>

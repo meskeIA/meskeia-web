@@ -13,6 +13,10 @@
 
 import { calcularSucesion } from '@/lib/calculadoras/sucesiones';
 import type { GrupoParentescoIS, NivelDiscapacidadIS, IndicePatrimonioIS } from '@/lib/calculadoras/sucesiones';
+import {
+  REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
+  REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS,
+} from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -111,6 +115,24 @@ export function calcularHerenciaConjunta(
     porcentajes = herederos.map(() => pct);
   }
 
+  /**
+   * Cataluña: el tope de 500.000 € del art. 17 de la Ley 19/2010 es del valor CONJUNTO de la
+   * vivienda, y se prorratea entre los adquirentes según su participación, con un suelo de
+   * 180.000 € por sujeto pasivo. Este es el único sitio del catálogo donde se conoce ese valor
+   * conjunto —las apps individuales solo ven la parte de un heredero—, así que el prorrateo se
+   * calcula aquí y se le pasa al motor. Sin esto, cinco herederos de un piso de 1.000.000 €
+   * reducirían 950.000 € entre todos, casi el doble del tope que fija la ley.
+   */
+  const viviendaConjuntaCataluna = herederos
+    .filter(h => h.ccaa === 'cataluna')
+    .reduce((s, h) => s + (h.viviendaHabitual ?? 0), 0);
+
+  const limiteViviendaCatalunaDe = (h: HerederoInput): number | undefined => {
+    if (h.ccaa !== 'cataluna' || !h.viviendaHabitual || viviendaConjuntaCataluna <= 0) return undefined;
+    const prorrateado = REDUCCION_VIVIENDA_MAX_CATALUNA_IS * (h.viviendaHabitual / viviendaConjuntaCataluna);
+    return Math.max(REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS, prorrateado);
+  };
+
   // Calcular impuesto de cada heredero
   const resultadosHerederos: ResultadoHeredero[] = herederos.map((h, i) => {
     const cuotaHereditaria = r(masaHereditaria * (porcentajes[i] / 100));
@@ -126,6 +148,7 @@ export function calcularHerenciaConjunta(
         patrimonioIdx: h.patrimonioIdx,
         viviendaHabitual: h.viviendaHabitual,
         convivenciaDosAnios: h.convivenciaDosAnios,
+        limiteViviendaCataluna: limiteViviendaCatalunaDe(h),
       });
     } catch {
       resultado = null;

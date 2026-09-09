@@ -614,12 +614,12 @@ function crearServidorDelegum(): McpServer {
         .describe('Valor neto que recibe este heredero en euros'),
       ccaa: z.enum(ENUM_CCAA)
         .describe('Comunidad autónoma del fallecido (causante)'),
-      grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV'])
-        .describe('Parentesco: I-conyuge=cónyuge/pareja, I-descendiente=hijo/nieto <21, II=hijo/nieto ≥21, II-ascendiente=padres/abuelos, III=hermanos/tíos/sobrinos, IV=primos/extraños'),
+      grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-descendiente', 'II-ascendiente', 'III', 'IV'])
+        .describe('Parentesco: I-conyuge=cónyuge/pareja, I-descendiente=hijo/nieto <21, II=HIJO de 21 o más, II-descendiente=nieto/bisnieto de 21 o más, II-ascendiente=padres/abuelos, III=hermanos/tíos/sobrinos, IV=primos/extraños. En Cataluña el hijo y el nieto NO reducen lo mismo (100.000 € frente a 50.000 €), así que ahí conviene elegir el valor exacto.'),
       edad_heredero: z.number().int().min(0).max(120).optional()
         .describe('Edad del heredero (reducción adicional si <21 y grupo I/II)'),
       vivienda_habitual: z.number().nonnegative().optional()
-        .describe('Valor de la vivienda habitual del fallecido incluida en la herencia (reducción 95%, tope 122.606,47 €)'),
+        .describe('Valor de la vivienda habitual del fallecido incluida en la herencia (reducción del 95 %, con tope de 122.606,47 € en régimen común y de 500.000 € en Cataluña)'),
       convivio_dos_anios: z.boolean().optional()
         .describe('Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III (colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
       seguro_vida: z.number().nonnegative().optional()
@@ -1303,7 +1303,8 @@ function crearServidorDelegum(): McpServer {
     {
       valor_herencia: z.number().positive().describe('Valor neto recibido por el heredero en euros'),
       ccaa: z.enum(ENUM_CCAA).describe('Comunidad autónoma del fallecido'),
-      grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV']).describe('Grupo de parentesco'),
+      grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-descendiente', 'II-ascendiente', 'III', 'IV'])
+        .describe('Grupo de parentesco. II=HIJO de 21 o más; II-descendiente=nieto/bisnieto de 21 o más (en Cataluña reducen distinto: 100.000 € frente a 50.000 €)'),
       vivienda_habitual: z.number().nonnegative().optional().describe('Valor de la vivienda habitual heredada (reducción 95%)'),
       seguro_vida: z.number().nonnegative().optional().describe('Importe de seguro de vida recibido'),
       discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad. Por defecto "0".'),

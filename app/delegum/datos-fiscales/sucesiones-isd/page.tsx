@@ -186,8 +186,14 @@ export default function SucesionesIsdPage() {
                     <tr key={c.nombre}>
                       <th scope="row" className={styles.rowHead}>
                         {c.nombre}
+                        {/* Cataluña comparte con los forales el `regimen: 'foral'` de
+                            `data/fiscal` —una etiqueta interna que significa «no sigue el
+                            régimen común»—, pero NO es territorio foral: tiene ley propia
+                            (19/2010) dentro del régimen común. Los forales son los otros dos. */}
                         {c.regimen === 'foral' && (
-                          <span className={styles.tipoTag} style={{ marginLeft: '0.4rem' }}>foral</span>
+                          <span className={styles.tipoTag} style={{ marginLeft: '0.4rem' }}>
+                            {c.nombre === 'Cataluña' ? 'ley propia' : 'foral'}
+                          </span>
                         )}
                       </th>
                       <td>{resumenBonificacion(c.bonificaciones['I-descendiente'])}</td>
@@ -199,9 +205,13 @@ export default function SucesionesIsdPage() {
               </table>
             </div>
             <p className={styles.tableFoot}>
-              Cataluña, País Vasco y Navarra (régimen foral) tienen tarifas y reducciones propias
-              distintas del régimen común; en esos territorios la estimación es solo orientativa.
-              Confirma siempre el tratamiento exacto en la hacienda autonómica correspondiente.
+              País Vasco y Navarra son territorios forales; Cataluña no lo es, pero tiene su propia
+              ley del impuesto (19/2010) con tarifa y reducciones distintas del régimen común
+              —100.000 € para el cónyuge y para el hijo, 50.000 € para el resto de descendientes,
+              30.000 € para los ascendientes, y vivienda habitual al 95 % con tope de 500.000 €—.
+              En los tres la estimación es solo orientativa: en Cataluña porque la bonificación en
+              cuota del art. 58 bis no está modelada. Confirma siempre el tratamiento exacto en la
+              hacienda autonómica correspondiente.
             </p>
           </section>
 

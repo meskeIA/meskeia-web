@@ -27,6 +27,8 @@ import {
   REDUCCION_VIVIENDA_MAX_IS,
   REDUCCION_EDAD_MENOR_21_IS,
   REDUCCION_EDAD_MENOR_21_MAX_IS,
+  REDUCCION_EDAD_MENOR_21_CATALUNA_IS,
+  REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS,
   desglosarCuotaBaseAhorro,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
@@ -46,6 +48,7 @@ const TIPO_AHORRO_MAX = ESCALA_AHORRO[ESCALA_AHORRO.length - 1].tipo;
 import {
   calcularCuotaIntegraIS,
   evaluarReduccionVivienda,
+  porcentajeBonificacionPonderada,
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
   type GrupoParentescoIS,
 } from '@/lib/calculadoras/sucesiones';
@@ -54,7 +57,7 @@ import styles from './SimuladorHeredarVivienda.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type Parentesco = 'conyuge' | 'hijo_menor21' | 'hijo' | 'padre' | 'hermano' | 'sin_parentesco';
+type Parentesco = 'conyuge' | 'hijo_menor21' | 'hijo' | 'nieto' | 'padre' | 'hermano' | 'sin_parentesco';
 
 interface ResultadoISD {
   baseImponible: number;
@@ -102,8 +105,13 @@ interface ResultadoIRPF {
  * compartían grupo y clave, así que devolvían exactamente el mismo resultado, y el sobrino
  * aparecía nombrado en las dos. Y «Cónyuge / Hijo / Descendiente ≥21» iba rotulada Grupo II
  * leyendo la fila `I-conyuge`: en régimen común da igual (las cuatro filas valen 15.956,87 €)
- * pero en Cataluña NO, porque allí el cónyuge reduce 100.000 € y el hijo ≥21, 50.000 €.
- * Separar cónyuge de hijo arregla las dos cosas a la vez.
+ * pero en Cataluña NO, porque allí cada parentesco reduce lo suyo.
+ *
+ * ⚠️ Corregido el 08/09/2026: este comentario afirmaba que en Cataluña «el hijo ≥21 reduce
+ * 50.000 €». No es cierto —el art. 2 de la Ley 19/2010 le da 100.000 €, y son 50.000 € los
+ * del NIETO—, y el dato mal escrito aquí era el mismo que servía `data/fiscal`. Por eso el
+ * nieto tiene ahora opción propia: mientras compartía fila con el hijo, uno de los dos tenía
+ * que salir mal por fuerza.
  */
 /**
   * Las comunidades de RÉGIMEN COMÚN cuya bonificación al Grupo II es un porcentaje FIJO de al
@@ -129,7 +137,8 @@ const PARENTESCOS: Array<{ id: Parentesco; label: string; grupo: string; reducKe
   // arrancaba en 18, así que un heredero de 10 años solo podía simularse como Grupo II, sin
   // la reducción del art. 20.2.a LISD que `data/fiscal` ya exportaba (hallazgo 612).
   { id: 'hijo_menor21', label: 'Hijo o descendiente <21 años (Grupo I)', grupo: 'I', reducKey: 'I-descendiente' },
-  { id: 'hijo', label: 'Hijo o descendiente ≥21 años (Grupo II)', grupo: 'II', reducKey: 'II' },
+  { id: 'hijo', label: 'Hijo o hija ≥21 años (Grupo II)', grupo: 'II', reducKey: 'II' },
+  { id: 'nieto', label: 'Nieto u otro descendiente ≥21 años (Grupo II)', grupo: 'II', reducKey: 'II-descendiente' },
   { id: 'padre', label: 'Padre / Ascendiente (Grupo II)', grupo: 'II', reducKey: 'II-ascendiente' },
   { id: 'hermano', label: 'Hermano / Tío / Sobrino (Grupo III)', grupo: 'III', reducKey: 'III' },
   { id: 'sin_parentesco', label: 'Primo, pariente lejano o sin parentesco (Grupo IV)', grupo: 'IV', reducKey: 'IV' },
@@ -289,7 +298,10 @@ function calcularISD(
   const ccaaInfo = BONIFICACIONES_CCAA_IS[ccaa];
   const ccaaNombre = ccaaInfo?.nombre ?? 'Régimen común';
   const esCataluna = ccaa === 'cataluna';
-  const bonifGrupo = ccaaInfo?.bonificaciones[reducKey];
+  // Ninguna comunidad bonifica distinto al nieto que al hijo —la distinción del art. 2 de la
+  // Ley 19/2010 es solo de reducción en base—, y `bonificaciones['II-descendiente']` no existe
+  // en ninguna de las 17: sin colapsarlo, el nieto perdería el 99 % de bonificación.
+  const bonifGrupo = ccaaInfo?.bonificaciones[reducKey === 'II-descendiente' ? 'II' : reducKey];
 
   const baseImponible = valorReferencia;
 
@@ -298,24 +310,26 @@ function calcularISD(
   const reduccionBaseParentesco = reducciones[reducKey] ?? 0;
 
   /**
-   * Incremento del Grupo I por cada año menos de 21 (art. 20.2.a LISD): la reducción de
-   * parentesco sube 3.990,72 € por año, sin que el TOTAL exceda de 47.858,59 €.
+   * Incremento del Grupo I por cada año menos de 21: la reducción de parentesco sube 3.990,72 €
+   * por año sin que el TOTAL exceda de 47.858,59 € (art. 20.2.a LISD), y en Cataluña 12.000 €
+   * por año con tope de 196.000 € (art. 2 Ley 19/2010).
    *
-   * Solo en régimen común. Cataluña tiene reducción propia por edad, con otra cuantía y otro
-   * tope, y `data/fiscal` no la modela: aplicarle la estatal sería inventarse un dato, así
-   * que allí se usa su reducción de parentesco sin incremento y la página lo advierte.
+   * Cataluña se saltaba entera esta figura porque `data/fiscal` no traía sus cuantías. Desde
+   * el 08/09/2026 sí las trae, verificadas en el BOE y en la Agència Tributària, así que ya no
+   * hay que elegir entre inventarse el dato estatal y no dar ninguno.
    */
   const anosPorDebajo = grupo === 'I' ? Math.max(0, 21 - edad) : 0;
   const reduccionParentesco =
-    anosPorDebajo > 0 && !esCataluna
+    anosPorDebajo > 0
       ? Math.min(
-          reduccionBaseParentesco + anosPorDebajo * REDUCCION_EDAD_MENOR_21_IS,
-          REDUCCION_EDAD_MENOR_21_MAX_IS,
+          reduccionBaseParentesco + anosPorDebajo * (esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS),
+          esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS,
         )
       : reduccionBaseParentesco;
 
   /**
-   * Reducción por vivienda habitual (art. 20.2.c LISD, 95 % hasta 122.606,47 €).
+   * Reducción por vivienda habitual: 95 % hasta 122.606,47 € en régimen común (art. 20.2.c
+   * LISD) y hasta 500.000 € en Cataluña (art. 17 Ley 19/2010).
    *
    * La regla ya NO se escribe aquí: la sirve `evaluarReduccionVivienda` del motor de
    * sucesiones, el mismo que ejecutan las tools `calcular_sucesiones` y `consulta_herencia`
@@ -363,6 +377,15 @@ function calcularISD(
   if (bonifGrupo) {
     if (typeof bonifGrupo.porcentaje === 'number') {
       bonificacionPorc = bonifGrupo.porcentaje;
+    }
+    /**
+     * Cataluña (art. 58 bis Ley 19/2010): escala PONDERADA sobre la base IMPONIBLE. No es el
+     * `escalonado` de abajo —que elige UN tramo por la base liquidable y aplica su porcentaje
+     * entero—, sino un porcentaje medio que casi nunca coincide con ninguno de la tabla. La
+     * regla la sirve el motor de sucesiones, el mismo que ejecuta el MCP Delegum.
+     */
+    if (bonifGrupo.escalaPonderada && bonifGrupo.escalaPonderada.length > 0) {
+      bonificacionPorc = porcentajeBonificacionPonderada(baseImponible, bonifGrupo.escalaPonderada);
     }
     if (bonifGrupo.escalonado && bonifGrupo.escalonado.length > 0) {
       // Tomar el primer tramo aplicable según base liquidable
@@ -592,7 +615,7 @@ export default function SimuladorHeredarViviendaPage() {
   const porcSobreVenta = valorVenta > 0 ? (totalImpuestos / valorVenta) * 100 : 0;
 
   // Los tres avisos de coherencia entre parentesco y edad (hallazgo 612)
-  const avisoEdad = edad < 21 && parentesco === 'hijo';
+  const avisoEdad = edad < 21 && (parentesco === 'hijo' || parentesco === 'nieto');
   const avisoGrupoIMayor = edad >= 21 && parentesco === 'hijo_menor21';
   const avisoGrupoICataluna = parentesco === 'hijo_menor21' && edad < 21 && ccaa === 'cataluna';
 
@@ -766,10 +789,10 @@ export default function SimuladorHeredarViviendaPage() {
             )}
             {avisoGrupoICataluna && (
               <p className={styles.sliderHint} role="status" aria-live="polite">
-                <span aria-hidden="true">ℹ️</span> En Cataluña el Grupo I tiene reducción propia
-                por edad, con otra cuantía y otro tope que la estatal. Aquí se aplica su
-                reducción de parentesco sin ese incremento, así que el impuesto que sale es un
-                <strong> techo</strong>: consulta la cifra exacta con un asesor.
+                <span aria-hidden="true">ℹ️</span> En Cataluña el Grupo I suma{' '}
+                <strong>12.000 € por cada año de menos de 21</strong> sobre los 100.000 € de
+                partida, con un tope de 196.000 € (art. 2 de la Ley 19/2010). Es la cuantía que
+                se aplica aquí, distinta de la estatal.
               </p>
             )}
           </div>

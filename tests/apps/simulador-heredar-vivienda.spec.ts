@@ -503,16 +503,18 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * filas valen 15.956,87 €) pero en Cataluña NO: `REDUCCIONES_PARENTESCO_CATALUNA_IS`
    * declara 100.000 € para el cónyuge y 50.000 € para el hijo ≥21.
    */
-  test('GUARDA — seis parentescos distintos, Cataluña separa cónyuge de hijo, y ningún botón sin type', async ({
+  test('GUARDA — siete parentescos distintos, Cataluña separa cónyuge, hijo y nieto, y ningún botón sin type', async ({
     page,
   }) => {
     await page.goto(RUTA);
 
-    // Seis opciones, ninguna repetida ni con el mismo significado. La sexta es el Grupo I
-    // (descendientes menores de 21), que hasta el hallazgo 612 no era expresable.
+    // Siete opciones, ninguna repetida ni con el mismo significado. La sexta es el Grupo I
+    // (descendientes menores de 21), que hasta el hallazgo 612 no era expresable; la séptima
+    // es el NIETO ≥21, que hasta el 08/09/2026 compartía opción con el hijo y le hacía
+    // reducir sus 50.000 € en vez de los 100.000 € del hijo.
     const opciones = await page.locator('#parentescoSel option').allTextContents();
-    expect(opciones).toHaveLength(6);
-    expect(new Set(opciones).size).toBe(6);
+    expect(opciones).toHaveLength(7);
+    expect(new Set(opciones).size).toBe(7);
     expect(opciones).toContain('Hijo o descendiente <21 años (Grupo I)');
 
     // Las 17 CCAA que promete la metadata
@@ -525,7 +527,10 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     );
     expect(sinType).toBe(0);
 
-    // Cataluña: el cónyuge reduce 100.000 € y el hijo ≥21, 50.000 €
+    // Cataluña (art. 2 Ley 19/2010): cónyuge e hijo reducen 100.000 €, el resto de
+    // descendientes 50.000 € y los ascendientes 30.000 €. Las cuatro filas son distintas y
+    // el desplegable tiene que poder expresarlas: mientras hijo y nieto compartían opción,
+    // uno de los dos salía mal por fuerza.
     await page.selectOption('#ccaaSel', 'cataluna');
     await mover(page, 'valorRef', 350000);
     await mover(page, 'aniosVenta', 0);
@@ -534,7 +539,13 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−100.000,00 €');
 
     await page.selectOption('#parentescoSel', 'hijo');
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−100.000,00 €');
+
+    await page.selectOption('#parentescoSel', 'nieto');
     expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−50.000,00 €');
+
+    await page.selectOption('#parentescoSel', 'padre');
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−30.000,00 €');
   });
 
   /**
@@ -767,17 +778,19 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    * (122.606,47 €) y el motor compartido no aplicaba ninguna: la misma herencia valía
    * 12.013,29 € por la web y 31.500,00 € por MCP, 19.486,71 € de diferencia.
    *
-   * ⚠️ Y no acertaba ninguno de los dos. Cataluña tiene régimen PROPIO de reducción por
-   * vivienda habitual (Ley 19/2010), con topes distintos del estatal: aplicarle los
-   * 122.606,47 € es inventarse una cifra que no es la suya. La reparación unifica los dos
-   * caminos en `evaluarReduccionVivienda` y resuelve Cataluña como el clúster de
-   * compraventa resuelve el IGIC: no se calcula lo que no está modelado, y se DICE. Modelar
-   * el régimen catalán exige fuente oficial y no cabe en una ronda de reparación.
+   * ⚠️ Y no acertaba ninguno de los dos. La reparación del 27/08/2026 unificó los dos caminos
+   * en `evaluarReduccionVivienda` y resolvió Cataluña como el clúster de compraventa resuelve
+   * el IGIC: no se calcula lo que no está modelado, y se DICE.
    *
-   *   350.000 − 100.000 (CATALUNA['I-conyuge']) = 250.000 de base liquidable
-   *   14.500 + (250.000 − 150.000) × 17 % = 31.500,00 €, por los dos caminos.
+   * ⚠️ 08/09/2026 — eso ya no vale, y el motivo está en `tests/sucesiones-cataluna-motor.spec.ts`:
+   * el aviso iba debajo de una cifra que se pasaba de largo, y el régimen catalán no era tal
+   * régimen sino tres cifras publicadas (95 %, tope de 500.000 € sobre el valor conjunto,
+   * mínimo individual de 180.000 €). Ahora se calcula, y el escenario de la app se queda en
+   * cero: 332.500 € de vivienda más 100.000 € de parentesco se comen los 350.000 € de base.
+   * Por eso el test añade después un caso con base positiva — una paridad de 0 contra 0
+   * sujetaría muy poco.
    */
-  test('WEB ↔ MCP (2/3) — Cataluña, cónyuge, 350.000 €: la web y el MCP dicen los mismos 31.500,00 €', async ({
+  test('WEB ↔ MCP (2/3) — Cataluña, cónyuge, 350.000 €: la web y el MCP dicen los mismos 0,00 €', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -785,10 +798,10 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     await mover(page, 'aniosVenta', 0);
 
     expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−100.000,00 €');
-    // No se aplica ninguna reducción de vivienda, y la app dice por qué en vez de callarlo
-    expect(await linea(page, ISD, 'Reducción vivienda habitual')).toContain('Cataluña tiene su propia reducción');
-    expect(await linea(page, ISD, '= Base liquidable')).toBe('250.000,00 €');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('31.500,00 €');
+    // 95 % de 350.000 = 332.500, por debajo del tope catalán de 500.000
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−332.500,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('0,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
 
     const mcp = calcularSucesion({
       baseImponible: 350000,
@@ -796,12 +809,31 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
       grupo: 'I-conyuge',
       viviendaHabitual: 350000,
     });
-    expect(mcp.reduccionVivienda).toBe(0);
-    expect(mcp.reduccionViviendaNoAplicada).toContain('Ley 19/2010');
-    expect(mcp.baseLiquidable).toBe(250000);
-    expect(mcp.cuotaFinal).toBe(31500);
-    // Y la paridad, que es lo que este test existe para sujetar
+    expect(mcp.reduccionVivienda).toBe(332500);
+    expect(mcp.reduccionViviendaNoAplicada).toBeNull();
+    expect(mcp.baseLiquidable).toBe(0);
+    expect(mcp.cuotaFinal).toBe(0);
     expect(mcp.cuotaFinal).toBe(importe(await linea(page, ISD, 'Cuota ISD final')));
+
+    // Y la misma paridad donde sí queda cuota, con el TOPE catalán mordiendo: vivienda de
+    // 900.000 € → 95 % son 855.000, topados en 500.000. Base = 900.000 − 100.000 − 500.000
+    // = 300.000 → 14.500 + (300.000 − 150.000) × 17 % = 40.000,00 € de cuota íntegra, y el
+    // 99 % del art. 58 bis que le corresponde al cónyuge la deja en 400,00 €.
+    await mover(page, 'valorRef', 900000);
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−500.000,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('40.000,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('400,00 €');
+
+    const mcpTope = calcularSucesion({
+      baseImponible: 900000,
+      ccaa: 'cataluna',
+      grupo: 'I-conyuge',
+      viviendaHabitual: 900000,
+    });
+    expect(mcpTope.reduccionVivienda).toBe(500000);
+    expect(mcpTope.porcentajeBonificacion).toBe(99);
+    expect(mcpTope.cuotaFinal).toBe(400);
+    expect(mcpTope.cuotaFinal).toBe(importe(await linea(page, ISD, 'Cuota ISD final')));
   });
 
   /**
@@ -1562,13 +1594,16 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
    *
    * ISD (Cataluña, hijo ≥21, 350.000 € de vivienda habitual del padre):
    *   Base imponible                                                    350.000,00
-   *   − REDUCCIONES_PARENTESCO_CATALUNA_IS['II']                        −50.000,00
-   *   − Reducción vivienda                                          NO PROCEDE (Ley 19/2010)
-   *   = Base liquidable                                                 300.000,00
-   *   Cuota íntegra por TARIFA_CATALUNA_IS, tramo «hasta 400.000» (cuota 14.500, tipo 17 %):
-   *        14.500 + (300.000 − 150.000) × 17 % = 14.500 + 25.500 = 40.000,00
-   *   × COEFICIENTES_CATALUNA_IS['II'][0] = 1,0000
-   *   Cataluña no bonifica en cuota (porcentaje 0) → Cuota ISD final = «40.000,00 €»
+   *   − REDUCCIONES_PARENTESCO_CATALUNA_IS['II']                       −100.000,00
+   *   − Reducción vivienda, 95 % de 350.000 (tope catalán 500.000)     −332.500,00
+   *   = Base liquidable                                                       0,00
+   *   → Cuota ISD final = «0,00 €»
+   *
+   * ⚠️ Actualizado el 08/09/2026. Este caso esperaba 40.000,00 €, y esa cifra salía de las
+   * dos cosas que la reparación de ese día corrigió: al hijo se le daban los 50.000 € del
+   * nieto, y la reducción catalana por vivienda habitual no se calculaba. Lo que el caso
+   * sigue comprobando —y por lo que se conserva— es que Cataluña NO usa el tope estatal de
+   * 122.606,47 €, sino el suyo.
    *
    * Plusvalía: 12 años → 0,08 · objetivo = 200.000 × 0,08 × 0,25 = 4.000,00 (el menor)
    *            real    = (350.000 − 200.000) × mín(1; 200.000/100.000) × 0,25 = 37.500,00
@@ -1594,19 +1629,15 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
     await casilla(page, 'viviendaHabitual', true);
     await mover(page, 'aniosVenta', 0);
 
-    // a) La reducción estatal NO se aplica, y la app dice por qué
+    // a) Se aplica la reducción CATALANA, no la estatal
     expect(await panel(page, ISD)).toContain('Cataluña — Grupo II');
-    // REDUCCIONES_PARENTESCO_CATALUNA_IS['II'] = 50.000 € (el cónyuge reduce 100.000 €)
-    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−50.000,00 €');
-    expect(await linea(page, ISD, 'Reducción vivienda habitual')).toContain('Ley 19/2010');
+    // REDUCCIONES_PARENTESCO_CATALUNA_IS['II'] = 100.000 € para el hijo (50.000 el nieto)
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−100.000,00 €');
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−332.500,00 €');
+    // El tope estatal no aparece por ningún lado: en Cataluña rigen 500.000 €
     expect(await panel(page, ISD)).not.toContain('−122.606,47 €');
-    expect(await linea(page, ISD, '= Base liquidable')).toBe('300.000,00 €');
-    // TARIFA_CATALUNA_IS, tramo «hasta 400.000»: 14.500 + (300.000 − 150.000) × 17 %
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('40.000,00 €');
-    // COEFICIENTES_CATALUNA_IS['II'][0] = 1,0000 (Cataluña no incrementa a los Grupos I-II)
-    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo II)')).toBe('×1,0000');
-    expect(await panel(page, ISD)).toContain('Bonificación CCAA (0,0%)');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('40.000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('0,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
 
     // b) La casilla del colateral no se ofrece fuera del Grupo III
     expect(await page.locator('#convivencia').count()).toBe(0);
@@ -1617,7 +1648,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
     expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('4000,00 €');
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('4000,00 €');
 
-    expect(await bloqueTotal(page)).toContain('44.000,00 €'); // 40.000,00 + 4.000,00
+    expect(await bloqueTotal(page)).toContain('4000,00 €'); // 0,00 de ISD + 4.000,00 de plusvalía
 
     // Contraste: la misma herencia en Madrid SÍ reduce por vivienda habitual
     await page.selectOption('#ccaaSel', 'madrid');
@@ -1749,7 +1780,7 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
 
     // Y el mismo heredero como Grupo II se queda en la reducción base: la diferencia es
     // exactamente lo que el hallazgo decía que se estaba perdiendo.
-    await page.locator('#parentescoSel').selectOption({ label: 'Hijo o descendiente ≥21 años (Grupo II)' });
+    await page.locator('#parentescoSel').selectOption({ label: 'Hijo o hija ≥21 años (Grupo II)' });
     const reduccionII = await page
       .getByText('− Reducción parentesco')
       .locator('xpath=following-sibling::strong[1]')
@@ -1759,7 +1790,7 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
     await expect(page.getByText(/es .*Grupo I.*, no Grupo II/)).toBeVisible();
   });
 
-  test('612 bis — el Grupo I con 21 años o más avisa, y en Cataluña advierte de su régimen propio', async ({
+  test('612 bis — el Grupo I con 21 años o más avisa, y en Cataluña se aplican SUS cuantías', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -1767,10 +1798,19 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
     await page.locator('#edadHer').fill('30');
     await expect(page.getByText(/El Grupo I es solo para descendientes de menos de 21 años/)).toBeVisible();
 
-    // Cataluña tiene reducción propia por edad que data/fiscal no modela: se dice, no se inventa.
+    // Cataluña tiene reducción propia por edad. Hasta el 08/09/2026 no se modelaba y la página
+    // se limitaba a advertirlo; ahora se calcula con sus cuantías (12.000 €/año, tope 196.000).
     await page.locator('#edadHer').fill('10');
     await page.selectOption('#ccaaSel', 'cataluna');
-    await expect(page.getByText(/En Cataluña el Grupo I tiene reducción propia por edad/)).toBeVisible();
+    await expect(page.getByText(/12\.000 € por cada año de menos de 21/)).toBeVisible();
+
+    // 100.000 + 11 × 12.000 = 232.000, topado en 196.000 (art. 2 Ley 19/2010). Con las
+    // cuantías estatales habrían salido 47.858,59 €: cuatro veces menos.
+    const reduccion = await page
+      .getByText('− Reducción parentesco')
+      .locator('xpath=following-sibling::strong[1]')
+      .innerText();
+    expect(reduccion.replace(/ /g, ' ')).toContain('196.000,00');
   });
 
   // 613 — al mover cualquiera de los siete deslizadores todas las cifras se recalculaban en
@@ -2008,25 +2048,26 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
    * correcto de los dos que concurren.
    *
    * Hermano de 70 años que SÍ convivió con el causante los dos años anteriores: el único
-   * perfil del Grupo III al que el art. 20.2.c LISD le concedería la reducción (edad ≥
-   * `EDAD_MIN_COLATERAL_VIVIENDA_IS` = 65 y convivencia). Pero la herencia es en CATALUÑA,
-   * que tiene régimen propio (Ley 19/2010) y que `data/fiscal` no modela.
+   * perfil del Grupo III con derecho a la reducción por vivienda habitual, tanto por el
+   * art. 20.2.c LISD como por el art. 17 de la Ley 19/2010 catalana (edad ≥
+   * `EDAD_MIN_COLATERAL_VIVIENDA_IS` = 65 y convivencia).
    *
-   * El orden en que `evaluarReduccionVivienda` evalúa las guardas importa: Cataluña va
-   * ANTES que el Grupo III, así que el motivo que se enseña tiene que ser el del régimen
-   * catalán —no «pariente colateral menor de 65 años», que sería falso— y marcar o
-   * desmarcar la casilla de convivencia NO puede mover la cuota.
+   * ⚠️ Reescrito el 08/09/2026. Nació como caso de RECHAZO: Cataluña denegaba la reducción a
+   * todo el mundo porque su régimen no estaba modelado, y el caso comprobaba que al menos se
+   * dijera el motivo correcto —el catalán, no «pariente colateral menor de 65 años», que
+   * habría sido falso—. Ahora que el régimen catalán se calcula, este heredero cobra la
+   * reducción que le corresponde y la casilla de convivencia vuelve a decidir. Lo que era su
+   * conclusión («marcar o desmarcar la casilla NO puede mover la cuota») era una consecuencia
+   * del agujero, no una regla: un caso escrito para ejercitar la casilla no ejercitaba nada.
    *
    *   Base imponible                                                    300.000,00
    *   − Reducción parentesco  REDUCCIONES_PARENTESCO_CATALUNA_IS['III']    −8.000,00
-   *     Reducción vivienda    DENEGADA (Cataluña, Ley 19/2010)                 0,00
-   *   = Base liquidable                                                  292.000,00
-   *   Cuota íntegra por TARIFA_CATALUNA_IS, tramo del 17 %:
-   *        14.500 + (292.000 − 150.000) × 17 % = 14.500 + 24.140 = 38.640,00
-   *   × COEFICIENTES_CATALUNA_IS['III'][0] = 1,5882 → 61.368,048       → «61.368,05 €»
-   *   Cataluña no bonifica en cuota → Cuota ISD final = 61.368,048
+   *   − Reducción vivienda    95 % de 300.000 (tope catalán 500.000)     −285.000,00
+   *   = Base liquidable                                                    7.000,00
+   *   Cuota íntegra por TARIFA_CATALUNA_IS, primer tramo: 7 % de 7.000 =      490,00
+   *   × COEFICIENTES_CATALUNA_IS['III'][0] = 1,5882 → 778,218            → «778,22 €»
    *
-   * Y dos rechazos más en la misma pantalla:
+   * Y en la misma pantalla:
    *
    *   Plusvalía: valor de adquisición = valor de referencia = 300.000 €, así que el
    *   incremento es EXACTAMENTE cero. El RDL 26/2021 no sujeta la transmisión sin
@@ -2035,17 +2076,12 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
    *   siga a la vista.
    *
    *   IRPF: venta a los 3 años por 400.000 €.
-   *     Valor de adquisición fiscal = 300.000 + 61.368,048 + 0 = 361.368,048
-   *     Ganancia = 400.000 − 361.368,048 = 38.631,952
-   *          6.000,000 × 19 % = 1.140,00
-   *         32.631,952 × 21 % = 6.852,70992
-   *                             ───────────
-   *                              7.992,70992                            → «7992,71 €»
+   *     Valor de adquisición fiscal = 300.000 + 778,218 + 0 = 300.778,218
+   *     Ganancia = 400.000 − 300.778,218 = 99.221,782 → 21.701,00986   → «21.701,01 €»
    *
-   *   TOTAL = 61.368,048 + 0 + 7.992,70992 = 69.360,75792              → «69.360,76 €»
-   *   Sobre la venta = 17,3401… %                                      → «17,34 %»
+   *   TOTAL = 778,218 + 0 + 21.701,00986 = 22.479,22786                → «22.479,23 €»
    */
-  test('CASO 3 (rechazo) — colateral de 70 años que convivió: en Cataluña se deniega, y se dice por qué', async ({
+  test('CASO 3 — colateral de 70 años que convivió: en Cataluña SÍ reduce, y la casilla decide', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2063,21 +2099,22 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
     await mover(page, 'aniosVenta', 3);
     await mover(page, 'valorVta', 400000);
 
-    // El motivo es el de CATALUÑA, no el del colateral: el heredero cumple 20.2.c
+    // El art. 17 de la Ley 19/2010 le concede la reducción al colateral de 65 o más que
+    // convivió los dos años anteriores, igual que el art. 20.2.c estatal: se aplica.
     const isd = await panel(page, ISD);
     expect(isd).toContain('Cataluña — Grupo III');
-    expect(isd).toContain('No aplicable: Cataluña tiene su propia reducción por vivienda habitual');
-    expect(isd).toContain('Ley 19/2010');
     expect(isd).not.toContain('pariente colateral menor de');
     expect(isd).not.toContain('que no convivió');
-    // No hay línea de reducción aplicada: la que existe es la del motivo
-    expect(isd).not.toContain('− Reducción vivienda habitual (95%)');
 
     expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−8000,00 €');
-    expect(await linea(page, ISD, '= Base liquidable')).toBe('292.000,00 €');
-    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('38.640,00 €');
+    // 95 % de 300.000 = 285.000, por debajo del tope catalán de 500.000
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−285.000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('7000,00 €');
+    // Primer tramo de TARIFA_CATALUNA_IS: 7 % de 7.000 = 490,00
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('490,00 €');
     expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,5882');
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('61.368,05 €');
+    // 490 × 1,5882 = 778,218
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('778,22 €');
 
     // Plusvalía: incremento EXACTAMENTE cero → no sujeta (el borde es «<= 0»)
     expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('2700,00 €');
@@ -2085,13 +2122,34 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
     expect(await linea(page, IIVTNU, 'Método elegido')).toBe('Exenta');
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('0,00 €');
 
+    // Valor de adquisición fiscal = 300.000 + 778,218 = 300.778,218
+    // Ganancia = 400.000 − 300.778,218 = 99.221,782
+    //      6.000,000 × 19 % =  1.140,00
+    //     44.000,000 × 21 % =  9.240,00
+    //     49.221,782 × 23 % = 11.321,00986
+    //                         ────────────
+    //                         21.701,00986
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('300.778,22 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('21.701,01 €');
+    expect(await bloqueTotal(page)).toContain('22.479,23');
+
+    /**
+     * Y desmarcar la convivencia SÍ mueve la cuota, que es lo que este caso vino a comprobar.
+     * Las cifras de esta segunda mitad son, literalmente, las que el test esperaba en su
+     * versión anterior para el heredero que sí convivía: mientras Cataluña denegaba la
+     * reducción a todo el mundo, cumplir el requisito o no cumplirlo daba igual, y un caso
+     * construido para ejercitar la casilla no ejercitaba nada.
+     *
+     *   Base liquidable 292.000 → 14.500 + (292.000 − 150.000) × 17 % = 38.640,00
+     *   × 1,5882 = 61.368,048 → «61.368,05 €»
+     *   Ganancia = 400.000 − 361.368,048 = 38.631,952 → 1.140 + 6.852,70992 = 7.992,70992
+     */
+    await casilla(page, 'convivencia', false);
+    expect(await panel(page, ISD)).toContain('que no convivió');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('292.000,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('61.368,05 €');
     expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('361.368,05 €');
     expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('7992,71 €');
-    expect(await bloqueTotal(page)).toContain('69.360,76');
-
-    // Desmarcar la convivencia no puede mover NADA: en Cataluña esa casilla no decide
-    await casilla(page, 'convivencia', false);
-    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('61.368,05 €');
     expect(await bloqueTotal(page)).toContain('69.360,76');
   });
 

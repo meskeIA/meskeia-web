@@ -24,19 +24,33 @@ import {
   REDUCCION_SEGURO_VIDA_MAX_IS,
   REDUCCION_VIVIENDA_PORC_IS,
   REDUCCION_VIVIENDA_MAX_IS,
+  REDUCCION_EDAD_MENOR_21_CATALUNA_IS,
+  REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS,
+  REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
+  REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS,
+  REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
   PORC_AJUAR_DOMESTICO_IS,
   BONIFICACIONES_CCAA_IS,
   FISCAL_SUCESIONES_META,
+  FISCAL_SUCESIONES_CATALUNA_META,
   type TramoTarifaIS,
   type BonificacionGrupoIS,
+  type TramoEscalaBonificacionIS,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
+/**
+ * `II` es el HIJO de 21 años o más, y `II-descendiente` el resto de descendientes de esa edad
+ * (nieto, bisnieto). El régimen común no los distingue —el art. 20.2.a LISD les da lo mismo a
+ * los dos—, pero Cataluña sí: 100.000 € al hijo y 50.000 € al nieto. Hasta el 08/09/2026 no
+ * había manera de decírselo al motor y todos entraban por 'II' cobrando lo del nieto.
+ */
 export type GrupoParentescoIS =
   | 'I-conyuge'
   | 'I-descendiente'
   | 'II'
+  | 'II-descendiente'
   | 'II-ascendiente'
   | 'III'
   | 'IV';
@@ -79,6 +93,12 @@ export interface ParametrosSucesiones {
   seguroVida?: number;
   /** Si se incluye el ajuar doméstico en la base (3% masa hereditaria) */
   incluyeAjuar?: boolean;
+  /**
+   * Cataluña: tope individual de la reducción por vivienda ya prorrateado. Solo lo pasa quien
+   * conoce el valor conjunto de la vivienda y el reparto (`calcularHerenciaConjunta`); en las
+   * apps individuales se deja vacío y rige el tope conjunto de 500.000 €.
+   */
+  limiteViviendaCataluna?: number;
 }
 
 export interface ResultadoSucesiones {
@@ -145,9 +165,56 @@ export function calcularCuotaIntegraIS(base: number, tarifa: TramoTarifaIS[]): n
 
 function getGrupoBase(grupo: GrupoParentescoIS): 'I' | 'II' | 'III' | 'IV' {
   if (grupo === 'I-conyuge' || grupo === 'I-descendiente') return 'I';
-  if (grupo === 'II' || grupo === 'II-ascendiente') return 'II';
+  if (grupo === 'II' || grupo === 'II-descendiente' || grupo === 'II-ascendiente') return 'II';
   if (grupo === 'III') return 'III';
   return 'IV';
+}
+
+/**
+ * Clave con la que buscar el grupo en `BONIFICACIONES_CCAA_IS`.
+ *
+ * `II-descendiente` (nieto ≥21) existe solo porque Cataluña le da una reducción distinta al
+ * hijo; para las bonificaciones en cuota NINGUNA comunidad los distingue, así que se colapsa
+ * sobre `II`. Sin esto, las 17 comunidades habrían tenido que declarar una clave más cada una,
+ * y la que se olvidara dejaría al nieto sin la bonificación del 99 % —convertir un error de
+ * miles de euros en otro— por el camino silencioso de `bonificaciones[grupo] === undefined`.
+ */
+function claveBonificacion(grupo: GrupoParentescoIS): GrupoParentescoIS {
+  return grupo === 'II-descendiente' ? 'II' : grupo;
+}
+
+/**
+ * Porcentaje MEDIO PONDERADO de una escala marginal de bonificación (art. 58 bis Ley 19/2010),
+ * en tanto por uno.
+ *
+ * Cada tramo bonifica solo la porción de base imponible que le corresponde, y el resultado es
+ * el conjunto dividido por la base. Por eso el porcentaje que sale casi nunca coincide con
+ * ninguno de los de la tabla: una base de 250.000 € del Grupo II da 56,00 %, que es
+ * (100.000 × 60 % + 100.000 × 55 % + 50.000 × 50 %) / 250.000.
+ *
+ * ⚠️ Va sobre la BASE IMPONIBLE, no sobre la liquidable. La ley construye la escala sobre lo
+ * que se hereda, no sobre lo que queda tras las reducciones, y la diferencia no es pequeña:
+ * un hijo con 250.000 € y la vivienda habitual reducida tiene 29.000 € de base liquidable, que
+ * bonificarían al 60 % en vez del 56 % que le toca.
+ *
+ * Es público para que las apps que llevan su propia aritmética —`estimador-impuesto-sucesiones`
+ * y `simulador-heredar-vivienda`— lean la misma regla que el MCP en vez de copiarla, que es de
+ * donde salieron los hallazgos 277, 461 y 462.
+ */
+export function porcentajeBonificacionPonderada(
+  baseImponible: number,
+  escala: TramoEscalaBonificacionIS[],
+): number {
+  if (baseImponible <= 0) return 0;
+  let previo = 0;
+  let bonificadoPonderado = 0;
+  for (const tramo of escala) {
+    const anchura = Math.min(baseImponible, tramo.hasta) - previo;
+    if (anchura > 0) bonificadoPonderado += anchura * (tramo.marginal / 100);
+    if (baseImponible <= tramo.hasta) break;
+    previo = tramo.hasta;
+  }
+  return bonificadoPonderado / baseImponible;
 }
 
 function aplicarBonificacionIS(
@@ -155,11 +222,12 @@ function aplicarBonificacionIS(
   baseLiquidable: number,
   grupo: GrupoParentescoIS,
   ccaa: string,
+  baseImponible: number,
 ): { bonificacion: number; porcentaje: number; detalle: string } {
   const config = BONIFICACIONES_CCAA_IS[ccaa];
   if (!config) return { bonificacion: 0, porcentaje: 0, detalle: 'CCAA no configurada' };
 
-  const bGrupo: BonificacionGrupoIS | undefined = config.bonificaciones[grupo];
+  const bGrupo: BonificacionGrupoIS | undefined = config.bonificaciones[claveBonificacion(grupo)];
   if (!bGrupo) return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación para este grupo' };
 
   /**
@@ -174,6 +242,20 @@ function aplicarBonificacionIS(
    */
   if (bGrupo.reduccionBase !== undefined && bGrupo.reduccionBase > 0) {
     return { bonificacion: 0, porcentaje: 0, detalle: `Reducción adicional de ${bGrupo.reduccionBase.toLocaleString('es-ES')} € en la base (${config.nombre}), ya aplicada antes de la tarifa. Sin bonificación en cuota.` };
+  }
+
+  /**
+   * Escala PONDERADA sobre la base imponible (Cataluña, art. 58 bis). Va antes que el resto
+   * de ramas porque es la única que no mira la base liquidable, y confundirla con `escalonado`
+   * —que sí es de tramos planos— daría un porcentaje de la tabla en vez del medio ponderado.
+   */
+  if (bGrupo.escalaPonderada && bGrupo.escalaPonderada.length > 0) {
+    const pct = porcentajeBonificacionPonderada(baseImponible, bGrupo.escalaPonderada);
+    return {
+      bonificacion: cuotaTributaria * pct,
+      porcentaje: pct * 100,
+      detalle: `Bonificación ${(pct * 100).toFixed(2).replace('.', ',')}% por escala del art. 58 bis (${config.nombre})`,
+    };
   }
 
   // Bonificación escalonada (Castilla-La Mancha, Cantabria)
@@ -233,12 +315,16 @@ export const EDAD_MIN_COLATERAL_VIVIENDA_IS = 65;
  *   · cónyuge, Cataluña, 350.000 € → 12.013,29 € en la web (aplicaba la reducción ESTATAL)
  *     y 31.500,00 € por MCP (no aplicaba ninguna). Aquí no acertaba ninguno de los dos.
  *
- * ⚠️ Cataluña: tiene régimen PROPIO de reducción por vivienda habitual (Ley 19/2010), con
- * topes distintos del estatal y requisito de mantenimiento. Este catálogo NO lo modela, y
- * aplicarle el tope estatal de 122.606,47 € es inventarse una cifra que no es la suya. Se
- * resuelve como el IGIC en el clúster de compraventa: no se calcula, y se DICE. Por eso el
- * motivo viaja en `noAplicada` en vez de dejar un cero mudo. Modelar el régimen catalán
- * exige fuente oficial y queda fuera de una ronda de reparación.
+ * ⚠️ Cataluña tiene régimen PROPIO (Ley 19/2010, arts. 17 y 19): mismo 95 %, pero el tope no
+ * es el estatal de 122.606,47 € sino 500.000 € sobre el valor CONJUNTO de la vivienda, y el
+ * mantenimiento es de 5 años en vez de 10.
+ *
+ * Hasta el 08/09/2026 esa rama devolvía 0 y lo decía —«no se calcula, y se DICE», como el
+ * IGIC—, pero el aviso iba debajo de una cifra que se quedaba 23.000 € por encima de la real
+ * en el caso de un hijo que hereda 250.000 € con vivienda de 180.000 €. Un aviso al pie de un
+ * número falso no protege a quien se queda con el número, que es lo que hace casi todo el
+ * mundo: la web tiene 93 usos con 94 s de media y nadie va a contrastarlo con la Agència
+ * Tributària. Se modela con el tope catalán, que son tres cifras publicadas, no un régimen.
  */
 export function evaluarReduccionVivienda(p: {
   valorVivienda?: number;
@@ -246,15 +332,35 @@ export function evaluarReduccionVivienda(p: {
   ccaa: string;
   edadHeredero?: number;
   convivenciaDosAnios?: boolean;
+  /**
+   * Cataluña: tope individual ya prorrateado, cuando quien llama conoce el valor conjunto de
+   * la vivienda y el reparto entre herederos (`calcularHerenciaConjunta`). Por defecto se usa
+   * el tope conjunto de 500.000 €, que es lo correcto para el heredero que se queda la
+   * vivienda entera — el caso que preguntan las apps individuales.
+   */
+  limiteViviendaCataluna?: number;
 }): { reduccion: number; noAplicada: string | null } {
   if (!p.valorVivienda || p.valorVivienda <= 0) return { reduccion: 0, noAplicada: null };
 
   if (p.ccaa === 'cataluna') {
+    // Grupo IV y colateral no cualificado quedan fuera también aquí: el art. 17 de la Ley
+    // 19/2010 enumera cónyuge, pareja estable, descendientes, ascendientes y el colateral de
+    // 65 años o más que hubiera convivido los 2 años anteriores.
+    if (p.grupo === 'IV') {
+      return { reduccion: 0, noAplicada: 'sin parentesco: el art. 17 de la Ley 19/2010 no la contempla' };
+    }
+    if (p.grupo === 'III') {
+      if (p.edadHeredero === undefined || p.edadHeredero < EDAD_MIN_COLATERAL_VIVIENDA_IS) {
+        return { reduccion: 0, noAplicada: `pariente colateral menor de ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años` };
+      }
+      if (!p.convivenciaDosAnios) {
+        return { reduccion: 0, noAplicada: 'pariente colateral que no convivió los 2 años anteriores' };
+      }
+    }
+    const limite = p.limiteViviendaCataluna ?? REDUCCION_VIVIENDA_MAX_CATALUNA_IS;
     return {
-      reduccion: 0,
-      noAplicada:
-        'Cataluña tiene su propia reducción por vivienda habitual (Ley 19/2010), con topes distintos ' +
-        'de los estatales: esta herramienta no la calcula, así que la cuota que sale es la de arriba',
+      reduccion: Math.min(p.valorVivienda * REDUCCION_VIVIENDA_PORC_IS, limite),
+      noAplicada: null,
     };
   }
 
@@ -308,14 +414,16 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     ? (REDUCCIONES_PARENTESCO_CATALUNA_IS[p.grupo] ?? 0)
     : (REDUCCIONES_PARENTESCO_IS[p.grupo] ?? 0);
 
-  // 3. Reducción por edad (menor de 21 años: solo descendientes/adoptados, art. 20.2.a LISD)
+  // 3. Reducción por edad (menor de 21 años: solo descendientes/adoptados, art. 20.2.a LISD).
+  //    Cataluña tiene la misma figura con importes propios —12.000 € por año con tope de
+  //    196.000 €, art. 2 Ley 19/2010—, y hasta el 08/09/2026 se la saltaba entera: un nieto
+  //    huérfano de 5 años perdía los 192.000 € de incremento que la ley catalana le da.
   let reduccionEdadMenor21 = 0;
-  if (!esCataluna && edad !== undefined && edad < 21 && p.grupo === 'I-descendiente') {
+  if (edad !== undefined && edad < 21 && p.grupo === 'I-descendiente') {
     const aniosDevida = 21 - edad;
-    reduccionEdadMenor21 = Math.min(
-      reduccionParentesco + aniosDevida * REDUCCION_EDAD_MENOR_21_IS,
-      REDUCCION_EDAD_MENOR_21_MAX_IS,
-    ) - reduccionParentesco;
+    const porAnio = esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS;
+    const tope = esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS;
+    reduccionEdadMenor21 = Math.min(reduccionParentesco + aniosDevida * porAnio, tope) - reduccionParentesco;
     reduccionEdadMenor21 = Math.max(0, r(reduccionEdadMenor21));
   }
 
@@ -332,6 +440,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     ccaa: p.ccaa,
     edadHeredero: edad,
     convivenciaDosAnios: p.convivenciaDosAnios,
+    limiteViviendaCataluna: p.limiteViviendaCataluna,
   });
   const reduccionVivienda = r(vivienda.reduccion);
 
@@ -368,7 +477,9 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   const cuotaTributaria = r(cuotaIntegra * coeficienteMultiplicador);
 
   // 9. Bonificación autonómica
-  const { bonificacion, porcentaje, detalle } = aplicarBonificacionIS(cuotaTributaria, baseLiquidable, p.grupo, p.ccaa);
+  // `baseConAjuar` es la base IMPONIBLE, que es sobre la que la escala catalana del art. 58 bis
+  // construye su porcentaje. Las demás comunidades siguen decidiendo por la base liquidable.
+  const { bonificacion, porcentaje, detalle } = aplicarBonificacionIS(cuotaTributaria, baseLiquidable, p.grupo, p.ccaa, baseConAjuar);
   const cuotaFinal = r(Math.max(0, cuotaTributaria - bonificacion));
   const tipoEfectivo = r(p.baseImponible > 0 ? (cuotaFinal / p.baseImponible) * 100 : 0);
 
@@ -396,7 +507,12 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     ccaaNombre:               ccaaInfo.nombre,
     esForal,
     tarifaAplicada,
-    notasCcaa:                ccaaInfo.notas,
-    fuenteDatos:              `${FISCAL_SUCESIONES_META.fuente} — verificado ${FISCAL_SUCESIONES_META.verificado}`,
+    notasCcaa:                esCataluna ? `${ccaaInfo.notas} ${FISCAL_SUCESIONES_CATALUNA_META.nota}` : ccaaInfo.notas,
+    // La rama catalana tiene su propio sello: se verificó el 08/09/2026 y las otras 16
+    // comunidades siguen con el del módulo, que es de enero de 2025. Decirlo por separado
+    // evita que un cálculo catalán presuma de una revisión que solo cubre a Cataluña.
+    fuenteDatos:              esCataluna
+      ? `${FISCAL_SUCESIONES_CATALUNA_META.fuente} — verificado ${FISCAL_SUCESIONES_CATALUNA_META.verificado}`
+      : `${FISCAL_SUCESIONES_META.fuente} — verificado ${FISCAL_SUCESIONES_META.verificado}`,
   };
 }
