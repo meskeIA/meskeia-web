@@ -235,7 +235,7 @@ export default function PermisoPrestacionNacimientoPage() {
                     <td className={styles.numCol}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeMensualPorHijo)}</td>
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>Incremento máximo por gastos de guardería</th>
+                    <th scope="row" className={styles.rowHead}>Incremento máximo por gastos de guardería (por cada hijo)</th>
                     <td className={styles.numCol}>{formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)}</td>
                   </tr>
                 </tbody>

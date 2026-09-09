@@ -18,6 +18,7 @@ import {
   BASES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
   FISCAL_IRPF_META,
 } from '@/data/fiscal';
 
@@ -114,10 +115,7 @@ function calcularCuotaSS(salarioBruto: number, cotizaSS: boolean): number {
 }
 
 function calcularReduccionRNT(rnt: number): number {
-  const red = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= red.limite1) return red.reduccion1;
-  if (rnt >= red.limite2) return red.reduccion2;
-  return red.reduccion1 - red.factorInterpolacion * (rnt - red.limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 function calcularCuotaIRPF(base: number): number {
@@ -183,14 +181,21 @@ export function calcularDeclaracionConjunta(p: ParametrosDeclaracionConjunta): R
 
   // ─── INDIVIDUAL ─────────────────────────────────────────────────────────────
 
+  // ⚠️ 09/09/2026: art. 63.1.2º LIRPF — la escala se aplica a la base completa y la cuota se
+  // minora con la escala aplicada AL MÍNIMO, en vez de restar el mínimo de la base (que lo
+  // valora al marginal y subestima la cuota). Ver la nota extensa en lib/calculadoras/irpf.ts.
+  const cuotaMinorada = (base: number, minimo: number): number =>
+    Math.max(0, calcularCuotaIRPF(base) - calcularCuotaIRPF(Math.min(minimo, base)));
+
   // Cónyuge 1 individual
-  const baseLiq1 = Math.max(0, baseImponible1 - MINIMOS_IRPF_2025.personal - (numHijos > 0 ? minimoIndividual - MINIMOS_IRPF_2025.personal : 0));
-  const cuotaInd1 = calcularCuotaIRPF(baseLiq1);
+  const minimo1 = numHijos > 0 ? minimoIndividual : MINIMOS_IRPF_2025.personal;
+  const baseLiq1 = Math.max(0, baseImponible1);
+  const cuotaInd1 = cuotaMinorada(baseLiq1, minimo1);
 
   // Cónyuge 2 individual (sin hijos — en individual los hijos se comparten pero
   // simplificamos asignándolos al cónyuge 1 que tiene más ingresos)
-  const baseLiq2 = Math.max(0, baseImponible2 - MINIMOS_IRPF_2025.personal);
-  const cuotaInd2 = calcularCuotaIRPF(baseLiq2);
+  const baseLiq2 = Math.max(0, baseImponible2);
+  const cuotaInd2 = cuotaMinorada(baseLiq2, MINIMOS_IRPF_2025.personal);
 
   const cuotaIRPFIndividual = r(cuotaInd1 + cuotaInd2);
   const retencionesTotal = ret1 + ret2;

@@ -115,7 +115,7 @@ export const faqJsonLd = {
       name: '¿Qué es la deducción por maternidad en el IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es una deducción de 1.200 € al año (100 € al mes) por cada hijo menor de 3 años, para madres trabajadoras dadas de alta en la Seguridad Social o mutualidad. Se puede ampliar hasta 1.000 € adicionales por gastos de guardería o centro de educación infantil autorizado, y se puede cobrar de forma anticipada con el Modelo 140.',
+        text: 'Es una deducción de 1.200 € al año (100 € al mes) por cada hijo menor de 3 años. Desde 2023 da derecho cualquiera de estas tres vías alternativas: estar de alta en la Seguridad Social o mutualidad, percibir prestación o subsidio de desempleo al nacer el menor, o darse de alta después del nacimiento y alcanzar 30 días cotizados (en ese caso se suman 150 € ese mes). Se puede ampliar hasta 1.000 € adicionales por cada hijo con gastos de guardería o centro de educación infantil autorizado, y la deducción base se puede cobrar de forma anticipada con el Modelo 140.',
       },
     },
     {

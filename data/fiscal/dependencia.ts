@@ -181,8 +181,8 @@ export const DEDUCCIONES_IRPF_DISCAPACIDAD_2025 = {
   contribuyente: {
     discapacidad33a65: 3000,
     discapacidad65oMas: 9000,
-    gastosAsistencia33a65: 3000,  // Adicional si acredita necesidad de ayuda de terceros o movilidad reducida
-    gastosAsistencia65oMas: 3000, // Adicional (acumulable al mínimo por discapacidad ≥65%)
+    gastosAsistencia33a65: 3000,  // Adicional SOLO si acredita ayuda de terceras personas o movilidad reducida
+    gastosAsistencia65oMas: 3000, // Adicional: el grado ≥65% da derecho por sí solo, sin acreditar nada más
   },
   // Mínimo por discapacidad de ascendientes/descendientes
   familiar: {
@@ -197,7 +197,7 @@ export const DEDUCCIONES_IRPF_DISCAPACIDAD_2025 = {
     rentaMaxima: 8000, // Rentas anuales máximas del ascendiente (excluidas exentas)
     convivencia: true, // Debe convivir con el contribuyente (o dependencia)
   },
-  nota: 'Los gastos de asistencia (3.000 €) se suman al mínimo por discapacidad si se acredita necesidad de ayuda de terceros o movilidad reducida (≥33% + certificado). El mínimo reduce la base liquidable, no la cuota directamente.',
+  nota: 'Los gastos de asistencia (3.000 €) se suman al mínimo por discapacidad ante cualquiera de tres supuestos ALTERNATIVOS (basta uno): acreditar necesidad de ayuda de terceras personas, acreditar movilidad reducida, o tener un grado de discapacidad igual o superior al 65%. Con grado del 33% al 64% la acreditación es condición necesaria; con grado ≥65% el propio grado da derecho al incremento. El mínimo reduce la base liquidable, no la cuota directamente.',
 };
 
 // ─── Escala Zarit (Caregiver Burden Interview) ──────────────────────────────

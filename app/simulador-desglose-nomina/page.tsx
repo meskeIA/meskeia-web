@@ -21,6 +21,7 @@ import {
   BASES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
   FISCAL_IRPF_META,
   calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
@@ -54,11 +55,7 @@ interface DesgloseTramoIRPF {
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
 function calcularReduccionRRT(rnt: number): number {
-  const { limite1, reduccion1, limite2, reduccion2, factorInterpolacion } =
-    REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= limite1) return reduccion1;
-  if (rnt >= limite2) return reduccion2;
-  return reduccion1 - factorInterpolacion * (rnt - limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 function calcularMinimoPersonalFamiliar(situacion: SituacionFamiliar): number {

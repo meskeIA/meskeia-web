@@ -19,6 +19,7 @@ import {
   FISCAL_PLAN_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
   COTIZACIONES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
 } from '@/data/fiscal';
@@ -79,15 +80,7 @@ function calcularBaseLiquidable(salarioBruto: number): number {
   const rnt = Math.max(0, salarioBruto - ss - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
 
   // Reducción art. 20 (rendimientos del trabajo)
-  const rd = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  let reduccion: number;
-  if (rnt <= rd.limite1) {
-    reduccion = rd.reduccion1;
-  } else if (rnt < rd.limite2) {
-    reduccion = rd.reduccion1 - rd.factorInterpolacion * (rnt - rd.limite1);
-  } else {
-    reduccion = rd.reduccion2;
-  }
+  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
 
   // Base imponible aproximada
   const baseImponible = Math.max(0, rnt - reduccion);

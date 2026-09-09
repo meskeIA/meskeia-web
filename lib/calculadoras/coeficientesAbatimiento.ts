@@ -46,6 +46,8 @@
  * Encadenable con: calcular_plusvalias_irpf, calcular_venta_inmueble, calcular_irpf
  */
 
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+
 // --- Constantes ---
 
 const FECHA_LIMITE_ADQUISICION = new Date('1994-12-31');
@@ -127,10 +129,9 @@ function diasEntre(d1: Date, d2: Date): number {
 
 function cuotaAhorro(base: number): number {
   if (base <= 0) return 0;
-  const tramos = [
-    { hasta: 6_000, tipo: 19 }, { hasta: 50_000, tipo: 21 },
-    { hasta: 200_000, tipo: 23 }, { hasta: 300_000, tipo: 27 }, { hasta: Infinity, tipo: 28 },
-  ];
+  // Escala del ahorro: importada de data/fiscal desde el 09/09/2026 (antes copiada
+  // aquí con el último tramo al 28 %, el valor de 2024; la Ley 7/2024 lo subió al 30 %).
+  const tramos = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
   let cuota = 0, resto = base, ant = 0;
   for (const t of tramos) {
     const tramo = Math.min(resto, t.hasta - ant);

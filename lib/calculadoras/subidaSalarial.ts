@@ -16,6 +16,7 @@ import {
   BASES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -89,10 +90,7 @@ function calcularCuotaSS(salarioBruto: number): number {
 }
 
 function calcularReduccionRNT(rnt: number): number {
-  const red = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= red.limite1) return red.reduccion1;
-  if (rnt >= red.limite2) return red.reduccion2;
-  return red.reduccion1 - red.factorInterpolacion * (rnt - red.limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 function calcularCuotaIRPF(baseLiquidable: number): number {
@@ -115,8 +113,18 @@ function calcularSnapshot(brutoAnual: number, pagas: number): SnapshotSalarial {
   const rnt = Math.max(0, brutoAnual - cuotaSSAnual - gastosD);
   const reduccionRNT = r(calcularReduccionRNT(rnt));
   const baseImponible = r(Math.max(0, rnt - reduccionRNT));
-  const baseLiquidable = r(Math.max(0, baseImponible - MINIMOS_IRPF_2025.personal));
-  const cuotaIRPF = calcularCuotaIRPF(baseLiquidable);
+  const baseLiquidable = r(baseImponible);
+  // ⚠️ 09/09/2026: el mínimo personal y familiar NO se resta de la base. El art. 63.1.2º
+  // LIRPF manda aplicar la escala a la base liquidable completa y minorar la cuota «en el
+  // importe derivado de aplicar a la parte de la base liquidable general correspondiente al
+  // mínimo personal y familiar esta misma escala» (AEAT, Manual Renta 2025). Restarlo de la
+  // base lo valora al tipo MARGINAL y subestima la cuota — hasta 1.443 € en rentas altas.
+  // `devolucionIRPF.ts` y `dividendoEmpresarial.ts` ya lo hacían así; estos motores no.
+  const cuotaIRPF = r(Math.max(
+    0,
+    calcularCuotaIRPF(baseImponible)
+      - calcularCuotaIRPF(Math.min(MINIMOS_IRPF_2025.personal, baseImponible)),
+  ));
   const tipoEfectivoIRPF = baseImponible > 0 ? r((cuotaIRPF / baseImponible) * 100) : 0;
   const netoAnual = r(brutoAnual - cuotaSSAnual - cuotaIRPF);
   const netoMensual = r(netoAnual / pagas);

@@ -209,8 +209,9 @@ export default function PrestacionesDependenciaPage() {
             <h2 className={styles.sectionTitle}>Deducciones de IRPF por discapacidad</h2>
             <p className={styles.sectionIntro}>
               El mínimo por discapacidad reduce la base imponible del IRPF (no la cuota directamente),
-              y se acumula con el mínimo por gastos de asistencia cuando se acredita ayuda de terceros
-              o movilidad reducida.
+              y se acumula con el mínimo por gastos de asistencia ante cualquiera de tres supuestos
+              alternativos: acreditar ayuda de terceras personas, acreditar movilidad reducida, o tener
+              un grado igual o superior al 65 %, que da derecho por sí solo sin acreditar nada más.
             </p>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>

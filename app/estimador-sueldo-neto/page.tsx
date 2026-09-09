@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularReduccionRendimientosTrabajo, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -66,10 +66,7 @@ function calcularSeguridadSocial(salarioBrutoAnual: number): { anual: number; me
 
 // Función para calcular la reducción por rendimientos del trabajo (art. 20 LIRPF)
 function calcularReduccionRNT(rnt: number): number {
-  const red = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= red.limite1) return red.reduccion1;
-  if (rnt >= red.limite2) return red.reduccion2;
-  return red.reduccion1 - red.factorInterpolacion * (rnt - red.limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 // Función para calcular mínimos personales

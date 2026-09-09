@@ -22,6 +22,7 @@ import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 
 // ─── Helpers IRPF ─────────────────────────────────────────────────────────────
@@ -44,15 +45,7 @@ function calcularCuotaIRPF(base: number): number {
 function calcularBaseSimplificada(ingresosBrutos: number): number {
   const gastos = GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
   const rnt = Math.max(0, ingresosBrutos - gastos);
-  const rd = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  let reduccion: number;
-  if (rnt <= rd.limite1) {
-    reduccion = rd.reduccion1;
-  } else if (rnt >= rd.limite2) {
-    reduccion = rd.reduccion2;
-  } else {
-    reduccion = rd.reduccion1 - rd.factorInterpolacion * (rnt - rd.limite1);
-  }
+  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
   return Math.max(0, rnt - reduccion);
 }
 

@@ -14,6 +14,7 @@ import {
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
@@ -83,10 +84,7 @@ function calcularSSLaboralAnual(brutoAnual: number): number {
 }
 
 function calcularReduccionRRT(rnt: number): number {
-  const { limite1, reduccion1, limite2, reduccion2, factorInterpolacion } = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= limite1) return reduccion1;
-  if (rnt >= limite2) return reduccion2;
-  return reduccion1 - factorInterpolacion * (rnt - limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────

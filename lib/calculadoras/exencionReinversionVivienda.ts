@@ -41,18 +41,20 @@
  * Encadenable con: calcular_plusvalias_irpf, calcular_compraventa_inmueble, calcular_venta_inmueble
  */
 
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+
 // --- Constantes ---
 
 const PCT_REDUCCION_IRREGULAR_GP = 30;   // no aplica directamente pero informativo
 const PLAZO_REINVERSION_ANOS = 2;        // anos para reinvertir
 const ANOS_RESIDENCIA_MINIMA = 3;        // anos minimos de residencia habitual
-const ESCALA_AHORRO_2025: { hasta: number; tipo: number }[] = [
-  { hasta: 6_000,   tipo: 19 },
-  { hasta: 50_000,  tipo: 21 },
-  { hasta: 200_000, tipo: 23 },
-  { hasta: 300_000, tipo: 27 },
-  { hasta: Infinity, tipo: 28 },
-];
+// ⚠️ 09/09/2026: esta escala ERA una copia local con el último tramo al 28 %, el valor de
+// 2024. La Ley 7/2024 lo elevó al 30 % con efectos 1/1/2025, y `data/fiscal/irpf.ts` ya deja
+// escrita la instrucción: «La escala de la BASE DEL AHORRO está centralizada en
+// data/fiscal/inmuebles.ts como TRAMOS_GANANCIAS_PATRIMONIALES_2025. Importar desde allí; no
+// duplicar aquí.» La copia estaba en NUEVE motores a la vez, mientras app/api/datos/[slug]
+// publicaba la canónica al 30 %: dos endpoints públicos servían cifras contradictorias.
+const ESCALA_AHORRO_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
 
 // --- Tipos publicos ---
 

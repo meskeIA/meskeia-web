@@ -1263,49 +1263,68 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
 
 test.describe('Golden — calcularIRPF (Capa 1 · tarifa progresiva 2025)', () => {
 
-  test('GOLDEN-AH: soltero, 30.000 € trabajo → cuota 4.198,14 €, tipo 16,38%', () => {
-    // rntBruto = 28.000 → red. RNT 2.364 (>=16.825) → rtn=25.636
-    // blg = 25.636 − 5.550 = 20.086 → cruza tramos 19% y 24%
+  test('GOLDEN-AH: soltero, 30.000 € trabajo → cuota 5.511,00 €, tipo 19,68%', () => {
+    // ⚠️ RECALCULADO EL 09/09/2026 tras dos correcciones verificadas contra el Manual
+    // práctico de Renta 2025 de la AEAT:
+    //   1. La reducción del art. 20 llevaba la redacción anterior al RDL 4/2024 y, sobre
+    //      todo, una reducción residual de 2.364 € para todo RNT ≥ 16.825 € que NO EXISTE:
+    //      se agota en 19.747,5 €.
+    //   2. El mínimo personal se restaba de la BASE. El art. 63.1.2º manda aplicar la escala
+    //      a la base completa y minorar la cuota con la escala aplicada AL MÍNIMO.
+    // Los valores de antes no eran "otro criterio": estaban mal.
+    // A mano: rntBruto = 28.000 → reducción art.20 = 0 (28.000 > 19.747,5) → rtn = 28.000
+    //         cuota = escala(28.000) − escala(5.550)
+    //               = (12.450×19% + 7.750×24% + 7.800×30%) − 5.550×19%
+    //               = 6.565,50 − 1.054,50 = 5.511,00 €
     const res = calcularIRPF({ rendimientosTrabajo: 30000 });
     expect(res.gastosDeducibles).toBe(2000);
-    expect(res.reduccionRNT).toBe(2364);
-    expect(res.rendimientosTrabajoNetos).toBe(25636);
-    expect(res.baseImponibleGeneral).toBe(25636);
+    expect(res.reduccionRNT).toBe(0);
+    expect(res.rendimientosTrabajoNetos).toBe(28000);
+    expect(res.baseImponibleGeneral).toBe(28000);
     expect(res.minimoPersonalFamiliar).toBe(5550);
-    expect(res.baseLiquidableGeneral).toBe(20086);
-    expect(res.cuotaIntegraGeneral).toBeCloseTo(4198.14, 2);
+    expect(res.baseLiquidableGeneral).toBe(28000);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(5511, 2);
     expect(res.cuotaIntegralAhorro).toBe(0);
-    expect(res.cuotaIntegra).toBeCloseTo(4198.14, 2);
-    expect(res.tipoEfectivoGeneral).toBeCloseTo(16.38, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(5511, 2);
+    expect(res.tipoEfectivoGeneral).toBeCloseTo(19.68, 2);
   });
 
-  test('GOLDEN-AI: soltero, 60.000 € trabajo → cuota 14.233,32 €, tipo 25,58%', () => {
-    // rntBruto = 58.000 → red. RNT 2.364 → rtn=55.636 → blg=50.086
-    // Activa tramos 19%, 24%, 30% y 37% (parcial)
+  test('GOLDEN-AI: soltero, 60.000 € trabajo → cuota 16.107,00 €, tipo 27,77%', () => {
+    // A mano: rntBruto = 58.000 → reducción 0 → base 58.000
+    //   escala(58.000) = 2.365,50 + 1.860 + 4.500 + 22.800×37% = 17.161,50
+    //   − escala(5.550) = 1.054,50  →  16.107,00 €
     const res = calcularIRPF({ rendimientosTrabajo: 60000 });
-    expect(res.reduccionRNT).toBe(2364);
-    expect(res.rendimientosTrabajoNetos).toBe(55636);
-    expect(res.baseLiquidableGeneral).toBe(50086);
-    expect(res.cuotaIntegraGeneral).toBeCloseTo(14233.32, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(14233.32, 2);
-    expect(res.tipoEfectivoGeneral).toBeCloseTo(25.58, 2);
+    expect(res.reduccionRNT).toBe(0);
+    expect(res.rendimientosTrabajoNetos).toBe(58000);
+    expect(res.baseLiquidableGeneral).toBe(58000);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(16107, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(16107, 2);
+    expect(res.tipoEfectivoGeneral).toBeCloseTo(27.77, 2);
   });
 
-  test('GOLDEN-AJ: soltero, 13.000 € trabajo → mínimo personal cubre la base → cuota 0 €', () => {
-    // rntBruto=11.000 → red. RNT 6.498 (máxima, ≤13.115) → rtn=4.502
-    // blg = max(0, 4.502 − 5.550) = 0 → el mínimo personal absorbe toda la base
+  test('GOLDEN-AJ: soltero, 13.000 € trabajo → el mínimo personal cubre la base → cuota 0 €', () => {
+    // RECALCULADO 09/09/2026: la reducción máxima del art. 20 es 7.302 € (RNT ≤ 14.852),
+    // no 6.498 €. rntBruto = 11.000 → reducción 7.302 → rtn = 3.698.
+    // El mínimo (5.550) supera la base (3.698), así que se acota a ella y la cuota es 0:
+    // escala(3.698) − escala(3.698) = 0. La conclusión del golden no cambia, la aritmética sí.
     const res = calcularIRPF({ rendimientosTrabajo: 13000 });
-    expect(res.reduccionRNT).toBe(6498);
-    expect(res.rendimientosTrabajoNetos).toBeCloseTo(4502, 2);
-    expect(res.baseLiquidableGeneral).toBe(0);
+    expect(res.reduccionRNT).toBe(7302);
+    expect(res.rendimientosTrabajoNetos).toBeCloseTo(3698, 2);
+    expect(res.baseLiquidableGeneral).toBeCloseTo(3698, 2);
     expect(res.cuotaIntegra).toBe(0);
     expect(res.cuotaDiferencial).toBe(0);
     expect(res.tipoEfectivoGeneral).toBe(0);
   });
 
-  test('GOLDEN-AK: 40.000 € trabajo + 5.000 € capital, 2 hijos, 4.000 € retenciones → diferencial 2.611,30 €', () => {
-    // Base ahorro 5.000 € al 19% → 950 €. Base general: mínimo 10.650 (personal+2hijos)
-    // cuotaGeneral = 5.661,30 + cuotaAhorro 950 = 6.611,30 − 4.000 ret = 2.611,30 €
+  test('GOLDEN-AK: 40.000 € trabajo + 5.000 € capital, 2 hijos, 4.000 € retenciones → diferencial 4.688 €', () => {
+    // RECALCULADO 09/09/2026 (reducción art.20 = 0 por encima de 19.747,5 y mínimo aplicado
+    // en cuota, no en base). A mano:
+    //   base general = 40.000 − 2.000 = 38.000 · mínimo = 5.550 + 2.400 + 2.700 = 10.650
+    //   cuota general = escala(38.000) − escala(10.650)
+    //                 = (2.365,50 + 1.860 + 4.500 + 2.800×37%) − 10.650×19%
+    //                 = 9.761,50 − 2.023,50 = 7.738,00
+    //   cuota ahorro  = 5.000 × 19% = 950,00
+    //   diferencial   = 8.688,00 − 4.000 = 4.688,00 €
     const res = calcularIRPF({
       rendimientosTrabajo: 40000,
       rendimientosCapitalMobiliario: 5000,
@@ -1313,26 +1332,27 @@ test.describe('Golden — calcularIRPF (Capa 1 · tarifa progresiva 2025)', () =
       retenciones: 4000,
     });
     expect(res.minimoPersonalFamiliar).toBe(10650);   // 5550 + 2400 + 2700
-    expect(res.baseLiquidableGeneral).toBeCloseTo(24986, 2);
+    expect(res.baseLiquidableGeneral).toBeCloseTo(38000, 2);
     expect(res.baseImponibleAhorro).toBe(5000);
-    expect(res.cuotaIntegraGeneral).toBeCloseTo(5661.3, 2);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(7738, 2);
     expect(res.cuotaIntegralAhorro).toBeCloseTo(950, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(6611.3, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(8688, 2);
     expect(res.retenciones).toBe(4000);
-    expect(res.cuotaDiferencial).toBeCloseTo(2611.3, 2);
-    expect(res.tipoEfectivoGeneral).toBeCloseTo(15.89, 2);
+    expect(res.cuotaDiferencial).toBeCloseTo(4688, 2);
   });
 
-  test('GOLDEN-AL: 17.000 € trabajo → zona interpolación reducción RNT → cuota 969,17 €', () => {
-    // rntBruto=15.000, entre 13.115 y 16.825 → reducción interpolada: 6.498 − 1,14×(15.000−13.115)
-    // = 6.498 − 2.148,90 = 4.349,10 → rtn=10.650,90 → blg=5.100,90 → tipo 19%
+  test('GOLDEN-AL: 17.000 € trabajo → PRIMER tramo decreciente de la reducción → cuota 457,33 €', () => {
+    // RECALCULADO 09/09/2026. La reducción del art. 20 tiene DOS tramos decrecientes, no uno:
+    //   rntBruto = 15.000, que cae en el primero (14.852 → 17.673,52), con pendiente 1,75:
+    //   reducción = 7.302 − 1,75 × (15.000 − 14.852) = 7.302 − 259 = 7.043,00
+    //   rtn = 15.000 − 7.043 = 7.957 → base 7.957, mínimo 5.550, ambos en el tramo del 19 %
+    //   cuota = (7.957 − 5.550) × 19 % = 457,33 €
     const res = calcularIRPF({ rendimientosTrabajo: 17000 });
-    expect(res.reduccionRNT).toBeCloseTo(4349.1, 2);
-    expect(res.rendimientosTrabajoNetos).toBeCloseTo(10650.9, 2);
-    expect(res.baseLiquidableGeneral).toBeCloseTo(5100.9, 2);
-    expect(res.cuotaIntegraGeneral).toBeCloseTo(969.17, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(969.17, 2);
-    expect(res.tipoEfectivoGeneral).toBeCloseTo(9.1, 1);
+    expect(res.reduccionRNT).toBeCloseTo(7043, 2);
+    expect(res.rendimientosTrabajoNetos).toBeCloseTo(7957, 2);
+    expect(res.baseLiquidableGeneral).toBeCloseTo(7957, 2);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(457.33, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(457.33, 2);
   });
 
 });
@@ -1910,28 +1930,41 @@ test.describe('Golden — calcularFiniquito (Capa 1 · ET arts. 52-56)', () => {
 
 test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
 
-  test('GOLDEN-BK: soltero, bruto 24.000 €, 14 pagas → cuota SS 1.560,00 €, IRPF 2.383,74 €, neto mensual 1.432,59 €', () => {
-    // baseSS = 2.000 €/mes (dentro de mín-máx). Cuota SS anual = 2.000×6,50%×12 = 1.560,00 €.
-    // Base imponible = 24.000 − 1.560,00 − 2.000 = 20.440,00 € → reducción RNT mínima (2.364 €, RNT > 16.825).
-    // Mínimo personal (soltero, sin hijos) = 5.550 €. Base liquidable = 20.440,00 − 2.364 − 5.550 = 12.526,00 €.
-    // Cuota IRPF = 12.450×19% + 76,00×24% = 2.365,50 + 18,24 = 2.383,74 €.
+  test('GOLDEN-BK: soltero, bruto 24.000 €, 14 pagas → IRPF 3.243,00 €, neto mensual 1.371,21 €', () => {
+    // ⚠️ RECALCULADO EL 09/09/2026, y el neto BAJA 61,38 €/mes respecto al valor anterior.
+    // No es un cambio de criterio: las dos cifras de antes estaban mal, verificado contra el
+    // Manual práctico de Renta 2025 de la AEAT.
+    //   1. La reducción del art. 20 NO deja un residual de 2.364 € para rentas medias: se
+    //      agota en 19.747,5 € de RNT. Con 20.440 € la reducción es 0, no 2.364.
+    //   2. El mínimo personal no se resta de la base (art. 63.1.2º): la escala se aplica a la
+    //      base completa y la cuota se minora con la escala aplicada al mínimo.
+    //
+    // A mano: baseSS 2.000 €/mes → SS anual = 2.000 × 6,50 % × 12 = 1.560,00 €
+    //   base imponible = 24.000 − 1.560 − 2.000 = 20.440,00 → reducción art. 20 = 0
+    //   cuota = escala(20.440) − escala(5.550)
+    //         = (12.450×19 % + 7.750×24 % + 240×30 %) − 5.550×19 %
+    //         = 4.297,50 − 1.054,50 = 3.243,00 €
+    //   neto anual = 24.000 − 1.560 − 3.243 = 19.197,00 → /14 = 1.371,21 €/mes
     const r = calcularSueldoNeto({ brutoAnual: 24000, situacion: 'soltero', pagas: 14 });
     expect(r.cuotaSSAnual).toBeCloseTo(1560.00, 2);
     expect(r.baseImponible).toBeCloseTo(20440.00, 2);
-    expect(r.reduccionRNT).toBeCloseTo(2364, 2);
+    expect(r.reduccionRNT).toBeCloseTo(0, 2);
     expect(r.minimoPersonalFamiliar).toBeCloseTo(5550, 2);
-    expect(r.baseLiquidable).toBeCloseTo(12526.00, 2);
-    expect(r.cuotaIRPF).toBeCloseTo(2383.74, 2);
-    expect(r.tipoRetencion).toBeCloseTo(9.93, 2);
-    expect(r.netoAnual).toBeCloseTo(20056.26, 2);
-    expect(r.netoMensual).toBeCloseTo(1432.59, 2);
+    expect(r.baseLiquidable).toBeCloseTo(20440.00, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(3243, 2);
+    expect(r.tipoRetencion).toBeCloseTo(13.51, 2);
+    expect(r.netoAnual).toBeCloseTo(19197, 2);
+    expect(r.netoMensual).toBeCloseTo(1371.21, 2);
   });
 
-  test('GOLDEN-BL: casado con ingresos, bruto 35.000 €, 2 hijos (1 menor de 3), 12 pagas → mínimo familiar 13.450 €, neto mensual 2.480,74 €', () => {
-    // Mínimo personal+familiar = 5.550 (personal) + 2.400 (hijo 1º) + 2.700 (hijo 2º) + 2.800 (hijo <3) = 13.450 €.
-    // Base imponible = 35.000 − 2.275,00 (SS) − 2.000 = 30.725,00 € → reducción RNT mínima (2.364 €).
-    // Base liquidable = 30.725,00 − 2.364 − 13.450 = 14.911,00 €.
-    // Cuota IRPF = 12.450×19% + 2.461,00×24% = 2.365,50 + 590,64 = 2.956,14 €.
+  test('GOLDEN-BL: casado con ingresos, bruto 35.000 €, 2 hijos (1 menor de 3), 12 pagas → IRPF 4.777,50 €, neto mensual 2.328,96 €', () => {
+    // ⚠️ RECALCULADO EL 09/09/2026 por las mismas dos correcciones que GOLDEN-BK.
+    // Mínimo personal+familiar = 5.550 + 2.400 (hijo 1º) + 2.700 (hijo 2º) + 2.800 (hijo <3) = 13.450 €.
+    // A mano: base imponible = 35.000 − 2.275,00 (SS) − 2.000 = 30.725,00 → reducción art. 20 = 0
+    //   cuota = escala(30.725) − escala(13.450)
+    //         = (12.450×19 % + 7.750×24 % + 10.525×30 %) − (12.450×19 % + 1.000×24 %)
+    //         = 7.383,00 − 2.605,50 = 4.777,50 €
+    //   neto anual = 35.000 − 2.275 − 4.777,50 = 27.947,50 → /12 = 2.328,96 €/mes
     const r = calcularSueldoNeto({
       brutoAnual: 35000,
       situacion: 'casado_con_ingresos',
@@ -1941,13 +1974,13 @@ test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
     });
     expect(r.cuotaSSAnual).toBeCloseTo(2275.00, 2);
     expect(r.baseImponible).toBeCloseTo(30725.00, 2);
-    expect(r.reduccionRNT).toBeCloseTo(2364, 2);
+    expect(r.reduccionRNT).toBeCloseTo(0, 2);
     expect(r.minimoPersonalFamiliar).toBeCloseTo(13450, 2);
-    expect(r.baseLiquidable).toBeCloseTo(14911.00, 2);
-    expect(r.cuotaIRPF).toBeCloseTo(2956.14, 2);
-    expect(r.tipoRetencion).toBeCloseTo(8.45, 2);
-    expect(r.netoAnual).toBeCloseTo(29768.86, 2);
-    expect(r.netoMensual).toBeCloseTo(2480.74, 2);
+    expect(r.baseLiquidable).toBeCloseTo(30725.00, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(4777.5, 2);
+    expect(r.tipoRetencion).toBeCloseTo(13.65, 2);
+    expect(r.netoAnual).toBeCloseTo(27947.5, 2);
+    expect(r.netoMensual).toBeCloseTo(2328.96, 2);
   });
 
 });
@@ -2088,10 +2121,14 @@ test.describe('Golden — calcularGananciaCriptomonedas (Capa 1 · LIRPF art. 37
 
 test.describe('Golden — calcularPlanPensiones (Capa 1 · LIRPF art. 51)', () => {
 
-  test('GOLDEN-BR: rendimientos 40.000 €, aportación 1.500 €, 40→67 años → ahorro fiscal 450 €, capital 70.626,32 €', () => {
+  test('GOLDEN-BR: rendimientos 40.000 €, aportación 1.500 €, 40→67 años → ahorro fiscal 555 €, capital 70.626,32 €', () => {
     // Límite deducible = min(1.500, 40.000×30%) = min(1.500, 12.000) = 1.500 € → toda la aportación es deducible.
-    // Tipo marginal: RNT = 40.000 − 40.000×6,50% − 2.000 = 35.400 € → tras reducción RNT (2.364 €) = 33.036 € ≤ 35.200 → tramo 30%.
-    // Ahorro fiscal = 1.500×30% = 450 €. Coste neto = 1.500 − 450 = 1.050 €.
+    // ⚠️ RECALCULADO EL 09/09/2026: el tipo marginal pasa de 30 % a 37 %, y el caso está justo
+    // en el filo. RNT = 40.000 − 40.000×6,50 % − 2.000 = 35.400 €. Antes se le restaba una
+    // reducción residual del art. 20 de 2.364 € que NO existe (se agota en 19.747,5 €), lo que
+    // dejaba la base en 33.036 € y por debajo del corte de 35.200 €. Sin esa resta indebida,
+    // 35.400 > 35.200 y el marginal es el 37 %.
+    // Ahorro fiscal = 1.500×37% = 555 €. Coste neto = 1.500 − 555 = 945 €.
     // Capital a 27 años (4% anual, sin capital previo) = 1.500 × ((1,04^27 − 1)/0,04) = 70.626,32 €.
     const pp = calcularPlanPensiones({
       rendimientosNetos: 40000,
@@ -2103,9 +2140,9 @@ test.describe('Golden — calcularPlanPensiones (Capa 1 · LIRPF art. 51)', () =
     expect(pp.baseReducible).toBeCloseTo(1500, 2);
     expect(pp.excesoNoDeducible).toBe(0);
     expect(pp.superaLimite).toBe(false);
-    expect(pp.tipoMarginal).toBe(30);
-    expect(pp.ahorroFiscalAnual).toBeCloseTo(450, 2);
-    expect(pp.costeNetoAnual).toBeCloseTo(1050, 2);
+    expect(pp.tipoMarginal).toBe(37);
+    expect(pp.ahorroFiscalAnual).toBeCloseTo(555, 2);
+    expect(pp.costeNetoAnual).toBeCloseTo(945, 2);
     expect(pp.anosAhorro).toBe(27);
     expect(pp.capitalEstimadoJubilacion).toBeCloseTo(70626.32, 2);
     expect(pp.rentaMensualEstimada).toBeCloseTo(235.42, 2);
@@ -2763,7 +2800,6 @@ function cuotaProgresivaIRPF(base: number): number {
 
 test.describe('Motores 09/09 — deducción de autónomo IRPF (solo la lee /api/chatgpt/gastos-deducibles)', () => {
   test('CRÍTICO: la cuota sale de la ESCALA, no de marginal × base entera', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // El motor localiza el tramo de TRAMOS_IRPF_2025 y multiplica la base ENTERA por ese tipo
     // marginal (deduccionAutonomoIRPF.ts:258-268). Es el error de «mi tramo es el 37 %, luego
     // pago el 37 % de todo» — justo lo que la app `simulador-mito-tramo-superior` existe para
@@ -2788,7 +2824,6 @@ test.describe('Motores 09/09 — deducción de autónomo IRPF (solo la lee /api/
   });
 
   test('ALTO: ganar 1 € más nunca puede dejar menos neto (los 5 bordes de la escala)', () => {
-    test.fail(); // corolario del anterior
     // Saltos de cuota por 1 € de rendimiento adicional: 12.450 → +622,74 € · 20.200 →
     // +1.212,30 € · 35.200 → +2.464,37 € · 60.000 → +4.800,45 € · 300.000 → +6.000,47 €.
     // Lo peligroso al citarlo un LLM: en el borde, «deduce 1 € más» aparenta ahorrar 622 €.
@@ -2804,7 +2839,6 @@ test.describe('Motores 09/09 — deducción de autónomo IRPF (solo la lee /api/
   });
 
   test('ALTO: los suministros del hogar sin % de superficie no pueden desaparecer sin avisar', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // La guarda exige gasto Y porcentaje, así que sin el % no se crea línea NI advertencia:
     // los 3.000 € declarados no aparecen en ninguna parte del resultado. El motor gemelo del
     // mismo dominio, `calcularGastosDeduciblesAutonomo`, SÍ cubre este caso exacto.
@@ -2819,7 +2853,6 @@ test.describe('Motores 09/09 — deducción de autónomo IRPF (solo la lee /api/
   });
 
   test('ALTO · CUADRE: ingreso publicado − gastos publicados = rendimiento previo publicado', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // El mismo defecto de redondeo que en sucesiones: `ingresosBrutos` se publica redondeado
     // pero `rendimientoNetoPrevio` se calcula con el valor EN CRUDO. 56 descuadres de 2.997
     // combinaciones (1,9 %). Muestra: 40.000,02 − 3.800,44 = 36.199,58 pero publica 36.199,57.
@@ -2871,7 +2904,6 @@ test.describe('Motores 09/09 — deducción de autónomo IRPF (solo la lee /api/
 
 test.describe('Motores 09/09 — mínimo por discapacidad IRPF (tool del MCP de Delegum)', () => {
   test('CRÍTICO: el grado ≥65 % suma los 3.000 € de asistencia AUNQUE no se marque la casilla', () => {
-    test.fail(); // defecto vivo el 09/09/2026 — retirar al reparar motor Y textos
     // El art. 60 LIRPF concede el aumento de 3.000 € ante CUALQUIERA de tres supuestos
     // ALTERNATIVOS: acreditar ayuda de terceras personas, acreditar movilidad reducida, «o un
     // grado de discapacidad igual o superior al 65 por 100». El motor solo recoge los dos
@@ -2983,7 +3015,6 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
   const EXTRA_ALTA_POSTERIOR = DEDUCCION_MATERNIDAD_IRPF.incrementoAltaPosterior.importe; // 150
 
   test('CRÍTICO: sin ninguna de las 3 vías del art. 81.1 la deducción es 0 €, no 1.200 €', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // data/fiscal/maternidad.ts declara `situacionesConDerecho` como TRES vías ALTERNATIVAS
     // —alta en SS/mutualidad, prestación o subsidio de desempleo al nacer el menor, o alta
     // posterior con 30 días cotizados— y todas exigen alguna relación con el sistema.
@@ -3004,23 +3035,36 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     expect(r.totalDeduccionEfectiva).toBe(0); // hoy: 1.200 € por hijo
   });
 
-  test('ALTO: la vía «alta-posterior» del art. 81.3 y sus 150 € no los alcanza ninguna rama', () => {
-    test.fail(); // defecto vivo el 09/09/2026
-    // Misma forma que el bug del nieto: un valor declarado en data/fiscal que el motor no
-    // puede alcanzar. `situacionesConDerecho` tiene 3 ids y el motor tiene 2 estados, así que
-    // 'alta-posterior' —única vía que activa `incrementoAltaPosterior.importe`— es
-    // inalcanzable y esos 150 € no se pagan NUNCA. La app hermana sí los paga.
+  test('ALTO: la vía «alta-posterior» del art. 81.3 y sus 150 € ya son alcanzables', () => {
+    // REPARADO 09/09/2026. `data/fiscal` declara `incrementoAltaPosterior.importe = 150` atada a
+    // la tercera vía de acceso, pero el motor colapsaba las cuatro situaciones en un BOOLEANO:
+    // con dos estados para tres vías, ninguna rama alcanzaba «alta-posterior» y esos 150 € no se
+    // pagaban NUNCA. Era el defecto del nieto en otra forma: una clave declarada en data/fiscal
+    // que ningún camino del código podía tocar.
+    //
+    // La reparación adopta el tipo unión que ya usaba la app hermana
+    // ('alta' | 'desempleo' | 'alta-posterior' | 'ninguna'), conservando el booleano antiguo
+    // como parámetro obsoleto para no romper a quien lo pase.
     expect(DEDUCCION_MATERNIDAD_IRPF.situacionesConDerecho.map((s) => s.id))
       .toEqual(['alta', 'desempleo', 'alta-posterior']);
-    const maximoAlcanzable = calcularDeduccionMaternidadIRPF({
+
+    const porVia = calcularDeduccionMaternidadIRPF({
       hijos: [{ edadMesesInicioEjercicio: 2, mesesConDerechoEjercicio: 12 }],
-      cotizacionesSSTotalesAnio: 5000, madreEnActivoOPrestacion: true,
+      cotizacionesSSTotalesAnio: 5000,
+      situacion: 'alta-posterior',
     });
-    expect(maximoAlcanzable.totalDeduccionEfectiva).toBe(BASE + EXTRA_ALTA_POSTERIOR); // hoy: 1.200
+    expect(porVia.totalDeduccionEfectiva).toBe(BASE + EXTRA_ALTA_POSTERIOR); // 1.350 €
+
+    // Y por la vía ordinaria siguen siendo 1.200 €: el incremento es de la tercera vía, no de todas.
+    const ordinaria = calcularDeduccionMaternidadIRPF({
+      hijos: [{ edadMesesInicioEjercicio: 2, mesesConDerechoEjercicio: 12 }],
+      cotizacionesSSTotalesAnio: 5000,
+      situacion: 'alta',
+    });
+    expect(ordinaria.totalDeduccionEfectiva).toBe(BASE);
   });
 
   test('ALTO · CUADRE: Σ detalleHijos.totalDeduccionHijo = totalDeduccionEfectiva', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // Las líneas por hijo publican la deducción BRUTA (meses × 100) y el total publica la
     // EFECTIVA, ya recortada por el límite de cotizaciones, así que el desglose no cuadra
     // consigo mismo en cuanto el límite muerde. Es el defecto (b) de sucesiones, pero de
@@ -3054,7 +3098,6 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
   });
 
   test('ALTO · CUADRE: el reparto del incremento de guardería pierde un céntimo con 3 hijos', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // 1.000 € / 3 = 333,333… → cada línea se publica a 333,33 y suman 999,99 frente al 1.000 €
     // publicado como total. Exactamente el céntimo de sucesiones: se publica redondeado lo que
     // se reparte sin redondear.
@@ -3069,23 +3112,29 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     expect(suma).toBe(r.incrementoGuarderiaEfectivo); // hoy: 999,99 vs 1.000
   });
 
-  test('DIVERGENCIA (pendiente de fuente oficial): el tope de guardería, ¿por hijo o al agregado?', () => {
-    test.fail(); // divergencia demostrada; el veredicto exige el manual de Renta de la AEAT
-    // El motor topa el AGREGADO —min(1.000, cotizaciones, Σ gastos de TODOS los hijos)— y la
-    // app `estimacion-deduccion-maternidad` lo aplica POR HIJO, dentro del bucle, y así lo
-    // explica su bloque educativo. Lo que está probado es que las dos implementaciones del
-    // mismo cálculo dan resultados distintos (−1.000 € por cada hijo a partir del primero).
-    // CUÁL de las dos es la correcta NO lo resuelve el repositorio: antes de retirar este
-    // test.fail() hay que contrastarlo con la AEAT, no con la otra copia.
+  test('RESUELTO: el tope de 1.000 € de guardería es POR HIJO, no del conjunto', () => {
+    // Esta mañana quedó como DIVERGENCIA sin veredicto: el motor topaba el agregado y la app
+    // `estimacion-deduccion-maternidad` lo aplicaba por hijo, y el repositorio no podía decir
+    // cuál era la correcta. Se consultó a la AEAT en la misma sesión (Manual práctico Renta
+    // 2025, «Límites de la deducción») y el texto es literal:
+    //   «El incremento de la deducción POR CADA HIJO que otorgue derecho a la misma no podrá
+    //    superar PARA CADA HIJO ninguno de los dos límites», siendo los dos (a) 1.000 € anuales
+    //    y (b) el gasto efectivo no subvencionado satisfecho en relación con ESE hijo.
+    // Gana la app: el motor cobraba 1.000 € de menos por cada hijo a partir del primero.
+    //
+    // ⚠️ Lo que NO se pudo anclar y sigue tal cual: si el incremento está además limitado por
+    // las cotizaciones. El motor conserva ese tope sobre el agregado, con un comentario que
+    // apunta a /triaje-fiscal.
     const r = calcularDeduccionMaternidadIRPF({
       hijos: [
         { edadMesesInicioEjercicio: 6, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 1500 },
         { edadMesesInicioEjercicio: 20, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 1500 },
       ],
       cotizacionesSSTotalesAnio: 5000,
-      madreEnActivoOPrestacion: true,
+      situacion: 'alta',
     });
-    expect(r.incrementoGuarderiaEfectivo).toBe(2 * MAX_GUARDERIA); // hoy: 1.000 €
+    expect(r.incrementoGuarderiaEfectivo).toBe(2 * MAX_GUARDERIA);
+    expect(r.totalDeduccionEfectiva).toBe(4400);
   });
 
   test('lo que el motor SÍ hace bien: prorrateo de 100 €/mes, tope de 12 meses y corte a los 3 años', () => {
@@ -3158,7 +3207,6 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
   // compartido, que ninguna app llama, el que diverge.
 
   test('CRÍTICO: 10 años de tenencia aplican el coeficiente 0,08 de data/fiscal, no el 0,22 propio', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // Objetivo (data/fiscal, 10 años → 0,08): 40.000 × 0,08 = 3.200 → 25 % = 800,00 €
     // Real: (200.000 − 150.000) × (40.000/100.000) = 20.000 → 25 % = 5.000,00 €
     // El contribuyente elige el menor → 800,00 €. El motor cobra 2.200,00 € (+1.400,00 €).
@@ -3171,7 +3219,6 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
   });
 
   test('CRÍTICO: 20 años exactos son «20 o más años» → coeficiente 0,45', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // data/fiscal declara `{ anios: 20, label: '20 o más años', coeficiente: 0.45 }`, y la propia
     // cabecera del motor dice «>20 usa valor especial»: el tramo se rompe justo en el borde.
     // 60.000 × 0,45 = 27.000 → 30 % = 8.100,00 €. El motor liquida 5.400,00 € (−2.700,00 €).
@@ -3183,7 +3230,6 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
   });
 
   test('CRÍTICO · NINGUNA CLAVE SE CAE: los años con decimales no pueden ir al coeficiente máximo', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // ES EL BUG DEL NIETO EN SU FORMA EXACTA. El motor indexa `COEFICIENTES_MAXIMOS[anios]` sin
     // `Math.floor` —la app, `ventaInmueble` y `compraventa` sí lo hacen—, así que
     // `COEFICIENTES_MAXIMOS[7.5]` es undefined y el `?? COEFICIENTE_MAS_20_ANIOS` lo manda al 0,45,
@@ -3208,7 +3254,6 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
   });
 
   test('BARRIDO: todo año de 0 a 40, entero o con decimales, da el coeficiente de data/fiscal', () => {
-    test.fail(); // defecto vivo — 200 de las 401 tenencias probadas se desvían
     const fallos: string[] = [];
     for (let x = 0; x <= 400; x++) {
       const anios = x / 10;
@@ -3224,7 +3269,6 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
   });
 
   test('COHERENCIA: calcularIIVTNU y calcularVentaInmueble dan la MISMA plusvalía del mismo piso', () => {
-    test.fail(); // defecto vivo — divergen en 15 de los 26 tramos
     // Las dos son tools del MCP y responden por la misma plusvalía. `ventaInmueble` importa
     // data/fiscal; el motor de IIVTNU no. Y `comparacionDonacionHerencia.ts:198` llama a
     // `calcularIIVTNU`, así que comparar donación con herencia arrastra la tabla mala mientras
@@ -3242,7 +3286,6 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
   });
 
   test('ALTO: sin precios de compra y venta, el motor NO puede afirmar que hay incremento de valor', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // `hayIncrementoReal` nace en `true` y solo se desmiente si llegan AMBOS precios. El campo
     // está documentado como «¿Hay incremento real de valor? (si no, no se tributa)»: es la no
     // sujeción del art. 104.5 TRLHL. Devolverlo en `true` sin haber visto un precio le da a un LLM
@@ -3328,7 +3371,6 @@ test.describe('Motores 09/09 — impuesto sobre el patrimonio (la escala SÍ esc
   });
 
   test('ALTO: con bonificación del 100 % y ≤ 2 M € brutos NO hay obligación de declarar', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // Art. 37 Ley 19/1991: se declara cuando la cuota, «una vez aplicadas las deducciones o
     // bonificaciones que procedieren, resulte a ingresar», o cuando los bienes brutos superan
     // 2.000.000 €. El motor sustituye lo primero por `baseImponible > minimoExento`, que es la
@@ -3345,7 +3387,6 @@ test.describe('Motores 09/09 — impuesto sobre el patrimonio (la escala SÍ esc
   });
 
   test('ALTO · CUADRE: cuota neta publicada = cuota bruta publicada − bonificación publicada', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // El mismo defecto 2 de sucesiones: se publica `cuotaBruta` redondeada pero `cuotaNeta` se
     // calcula sobre la NO redondeada. Solo se ve en Galicia, única CCAA con bonificación parcial
     // (50 %) — con 0 % y con 100 % la resta cuadra por construcción. Descuadra el 25 % de los
@@ -3378,18 +3419,24 @@ test.describe('Motores 09/09 — divorcio: el cálculo está bien, falta el VALI
     // A mano contra data/fiscal/irpf.ts (sellado 2026-08-12):
     //   rnt = 45.000 − 2.000 = 43.000 ≥ 16.825 → reducción art. 20 = 2.364 → base 40.636
     //   cuota(40.636) = 10.736,82 · cuota(34.636) = 8.556,30 → ahorro 2.180,52 €
+    // ⚠️ RECALCULADO EL 09/09/2026. Antes el pagador ahorraba 2.180,52 € y el perceptor pagaba
+    // 2.220,00 €, y esa asimetría de 39,48 € se atribuyó a un cruce de escalón. NO era eso: la
+    // causaba la reducción residual del art. 20 —2.364 € para todo RNT ≥ 16.825— que este
+    // proyecto arrastraba y que no existe. Corregida, los dos lados están en el tramo del 37 %
+    // y la operación es simétrica, que es lo que cabe esperar.
+    // A mano: rnt = 45.000 − 2.000 = 43.000, reducción 0 → base 43.000
+    //   pagador:   escala(43.000) − escala(37.000) = 11.611,50 − 9.391,50 = 2.220,00
+    //   perceptor: escala(51.000) − escala(45.000) = 14.571,50 − 12.351,50 = 2.220,00
     const comun = { regimen: 'gananciales' as const, ingresos: 45000, tienePensionConyuge: true, pensionMensual: 500 };
     const paga = calcularImpuestosDivorcio({ ...comun, rolPension: 'pago' });
     expect(paga.pensionConyuge?.tipo).toBe('ahorro');
-    expect(Math.round(paga.pensionConyuge!.importe * 100) / 100).toBe(2180.52);
-    // La asimetría de 39,48 € frente al perceptor es real: uno cruza el escalón 30→37 % y el otro no.
+    expect(Math.round(paga.pensionConyuge!.importe * 100) / 100).toBe(2220);
     const cobra = calcularImpuestosDivorcio({ ...comun, rolPension: 'cobro' });
     expect(cobra.pensionConyuge?.tipo).toBe('coste');
     expect(Math.round(cobra.pensionConyuge!.importe * 100) / 100).toBe(2220);
   });
 
   test('ALTO: con hipoteca antigua pero SIN decir quién paga, no debe afirmar que se pierde', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // Es el ÚNICO de los cuatro bloques del fichero que usa if/else en vez de exigir su
     // discriminante (los otros hacen `p.rolPension &&`, `p.custodia &&`, `posVivienda === 'salgo'`),
     // así que el `else` se traga el undefined y el MCP escribe «se pierde la deducción por esa
@@ -3400,19 +3447,28 @@ test.describe('Motores 09/09 — divorcio: el cálculo está bien, falta el VALI
     expect(r.hipoteca).toBeUndefined();
   });
 
-  test('ALTO: con hijos y custodia pero SIN número, no debe hacer desaparecer el bloque', () => {
-    test.fail(); // defecto vivo el 09/09/2026
-    // `p.numHijos ?? 0` + guarda `> 0`, y `num_hijos` es .optional() en el schema zod del MCP.
-    // La app arranca en numHijos: 1 y nunca cae aquí. Omite entre 456 €/año (1 hijo) y
-    // 2.584 €/año (4 hijos) sin decir absolutamente nada.
-    const r = calcularImpuestosDivorcio({
+  test('ALTO: con hijos y custodia pero SIN número, el motor pide el dato en vez de callar', () => {
+    // REPARADO 09/09/2026. Antes, `p.numHijos ?? 0` + la guarda `> 0` hacían desaparecer el
+    // bloque de hijos ENTERO sin decir nada, omitiendo entre 456 €/año (1 hijo) y 2.584 €/año
+    // (4 hijos). El campo es `.optional()` en el esquema zod del MCP, así que el LLM lo omite
+    // en cuanto el usuario no lo menciona.
+    //
+    // La reparación rechaza en vez de advertir, y la razón es buena: el motor no tiene canal de
+    // advertencias y la route no imprime ninguna, así que habría que inventar uno que se puede
+    // olvidar. Un error no se olvida, y deja al LLM re-preguntando en vez de resumir una
+    // respuesta a la que le faltan 2.584 €. Es lo que ya hacen calcularIRPF y calcularLegitimas.
+    expect(() => calcularImpuestosDivorcio({
       regimen: 'gananciales', ingresos: 45000, tieneHijos: true, custodia: 'exclusiva-tengo',
+    })).toThrow(/numHijos/i);
+
+    // Con el dato, el bloque vuelve a emitirse con normalidad.
+    const conDato = calcularImpuestosDivorcio({
+      regimen: 'gananciales', ingresos: 45000, tieneHijos: true, custodia: 'exclusiva-tengo', numHijos: 1,
     });
-    expect(r.hijos).toBeDefined();
+    expect(conDato.hijos).toBeDefined();
   });
 
   test('ALTO: ingresos negativos deben lanzar, como hace calcularIRPF del mismo directorio', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // `calcularIRPF` valida (`if (p.rendimientosTrabajo < 0) throw`) y la app exige ingresos > 0
     // en pasoValido() case 0. Este motor no valida NADA: acepta también porcPropiedad = 500 %
     // (imputa 5 veces el valor catastral) y numHijos = 12. Hoy lo tapa zod en el único consumidor.
@@ -3463,7 +3519,7 @@ const r2m = (n: number) => Math.round(n * 100) / 100;
 
 test.describe('Motores 09/09 — segundo pagador: dos constantes copiadas y envejecidas', () => {
   test('CRÍTICO: el umbral de VARIOS pagadores es el de data/fiscal (15.876 €), no 15.000 €', () => {
-    test.fail(); // defecto vivo el 09/09/2026
+    // REPARADO 09/09/2026: el motor ya importa OBLIGACION_DECLARAR_2025 en vez de copiarlo.
     // `LIMITE_OBLIGACION_SEGUNDO_PAGADOR = 15000` quedó congelado en el valor anterior a la
     // subida del SMI. data/fiscal dice 15.876 desde 2024, y lo repiten test-obligado-declarar-renta,
     // estimador-irpf, orientador-tipos-renta-irpf, simulador-desglose-nomina y
@@ -3484,30 +3540,62 @@ test.describe('Motores 09/09 — segundo pagador: dos constantes copiadas y enve
     expect(res.obligacionDeclarar).toBe(false); // 15.501 € ≤ 15.876 €
   });
 
-  test('CRÍTICO: la reducción del art. 20 es la de data/fiscal (6.498 / 2.364), no 5.565 / 0', () => {
-    test.fail(); // defecto vivo el 09/09/2026
-    // Doble error: el valor —la reducción MÍNIMA en 0 significa que por encima de 16.825 € de
-    // rendimiento no se aplica ninguna, donde la ley da 2.364— y que el motor compara los
-    // tramos 13.115/16.825 contra los BRUTOS en vez de contra el RNT (brutos − 2.000),
-    // desplazándolos 2.000 €. Sus hermanos irpf.ts:126 y sueldoNeto.ts:85 sí la importan.
+  test('CRÍTICO: la reducción del art. 20 se aplica sobre el RNT y con los importes vigentes', () => {
+    // REPARADO 09/09/2026 — y este test estuvo MAL escrito antes de repararlo, lo que
+    // ilustra el aviso del CLAUDE.md: «un test.fail() que pasa a verde no es prueba de nada
+    // hasta comprobar que lo que afirma sigue siendo correcto».
     //
-    // Empresa 24.000 (ret. 3.100) + SEPE 6.000: 30.000 − 2.000 = 28.000 RNT ≥ 16.825
-    // → reducción 2.364 → 28.000 − 2.364 − 5.550 = 20.086 de base
-    // → 12.450 × 19 % + 7.636 × 24 % = 4.198,14 €.
-    // Hoy: 4.900,50 € de cuota y 1.800,50 € «a pagar» donde tocan 1.098,14 €.
-    // El sobrecoste va de +449 € (20.000 brutos) a +1.064 € (70.000 brutos).
-    const res = calcularIRPFSegundoPagador({
+    // La primera versión afirmaba una cuota de 4.198,14 € para 30.000 € de brutos. Esa cifra
+    // salía de `data/fiscal`, que a su vez llevaba la redacción ANTERIOR al RDL 4/2024 con una
+    // reducción residual de 2.364 € que no existe. O sea: el test consagraba el error.
+    //
+    // Contrastado con el Manual práctico de Renta 2025 de la AEAT, la cadena correcta para
+    // 30.000 € de brutos es:
+    //   RNT = 30.000 − 2.000 = 28.000  →  reducción art. 20 = 0 (RNT > 19.747,5)
+    //   base liquidable = 28.000 − 5.550 = 22.450
+    //   cuota = 12.450×19 % + 7.750×24 % + 2.250×30 % = 4.900,50 €
+    // que es justo lo que este motor ya devolvía: en el tramo alto acertaba, porque su
+    // reducción mínima de 0 € coincide con la norma. Su defecto estaba en el tramo BAJO.
+    const alto = calcularIRPFSegundoPagador({
       pagadores: [
         { descripcion: 'Empresa A', importeBruto: 24000, retencionesPracticadas: 3100 },
         { descripcion: 'SEPE', importeBruto: 6000, retencionesPracticadas: 0 },
       ],
     });
-    expect(res.cuotaIRPFEstimada).toBe(4198.14);
-    expect(res.resultadoEstimadoDeclaracion).toBe(1098.14);
+    // Y tras corregir también el mínimo personal (art. 63.1.2º, misma sesión), la cuota pasa a
+    // 5.511,00 € — la MISMA que da `calcularIRPF` para 30.000 €. Las dos tools del MCP, que
+    // discrepaban, ya coinciden:
+    //   base 28.000 → escala(28.000) − escala(5.550) = 6.565,50 − 1.054,50 = 5.511,00
+    expect(alto.cuotaIRPFEstimada).toBe(5511);
+    expect(alto.resultadoEstimadoDeclaracion).toBe(2411);
+  });
+
+  test('CRÍTICO: en el tramo BAJO, que es donde fallaba, ya no cobra de más', () => {
+    // Antes de reparar, el motor comparaba los umbrales de la reducción contra los BRUTOS en
+    // vez de contra el RNT y usaba 5.565 € de reducción máxima. Medido contra la cadena
+    // canónica, cobraba de más justo a quien menos gana:
+    //   15.000 € brutos → 767,47 € cobrados frente a 28,12 € reales   (+739 €)
+    //   17.000 € brutos → 1.795,50 € frente a 457,33 €                (+1.338 €)
+    //   20.000 € brutos → 2.365,50 € frente a 1.986,99 €              (+378 €)
+    // Ahora la reducción sale de `calcularReduccionRendimientosTrabajo` sobre el RNT.
+    // Valores tras las DOS correcciones (reducción del art. 20 y mínimo en cuota). A mano,
+    // 20.000 € brutos: rnt 18.000 → reducción = 2.364,34 − 1,14×(18.000 − 17.673,52) = 1.992,15
+    //   base 16.007,85 → escala(16.007,85) − escala(5.550) = 3.219,38 − 1.054,50 = 2.164,88
+    const casos: Array<[number, number]> = [
+      [15000, 28.12],
+      [17000, 457.33],
+      [20000, 2164.88],
+    ];
+    for (const [brutos, esperado] of casos) {
+      const res = calcularIRPFSegundoPagador({
+        pagadores: [{ descripcion: 'A', importeBruto: brutos, retencionesPracticadas: 0 }],
+      });
+      expect(res.cuotaIRPFEstimada, `${brutos} € brutos`).toBeCloseTo(esperado, 1);
+    }
   });
 
   test('ALTO: una retención negativa se rechaza, igual que un importe negativo', () => {
-    test.fail(); // defecto vivo el 09/09/2026
+    // REPARADO 09/09/2026: la guarda vivía solo en la ruta HTTP; ahora está en el motor.
     // El motor valida `importeBruto < 0` pero no `retencionesPracticadas < 0`. Su ruta HTTP sí
     // (route.ts:76-81), de modo que la guarda vive FUERA del motor: el patrón de impuestosDivorcio,
     // que replicó la aritmética de su app y no su validador.
@@ -3517,7 +3605,7 @@ test.describe('Motores 09/09 — segundo pagador: dos constantes copiadas y enve
   });
 
   test('ALTO: un importe no finito se rechaza, en vez de responder «no estás obligado a declarar»', () => {
-    test.fail(); // defecto vivo el 09/09/2026
+    // REPARADO 09/09/2026: NaN e Infinity ya no atraviesan las guardas.
     // NaN e Infinity pasan los DOS filtros —el del motor y el de la ruta— porque
     // typeof NaN === 'number' y NaN < 0 es false. Con NaN el motor devuelve
     // obligacionDeclarar = false: la respuesta tranquilizadora, calculada sobre nada.
@@ -3585,45 +3673,66 @@ test.describe('Motores 09/09 — legítimas: sí distingue los siete regímenes,
 
   test('SANO — el motor NO colapsa los siete regímenes civiles en el Código Civil', () => {
     // Lo que este motor hace bien y hay que impedir que se pierda: el derecho civil español no
-    // es uniforme, y decirle «te corresponden 2/3» a alguien de Barcelona sería falso. Las
-    // fracciones coinciden con la tabla comparativa de app/estimador-legitimas.
+    // es uniforme, y decirle «te corresponden 2/3» a alguien de Barcelona sería falso.
+    //
+    // ⚠️ CORREGIDO EL 09/09/2026 — y este test estaba MAL. Afirmaba que en Baleares la legítima
+    // pasa a 1/2 «con 2 o más hijos», copiando la tabla de la app. El art. 42 de la Compilació
+    // (extendido a Menorca por el art. 65, y con el art. 79 para Eivissa i Formentera) dice
+    // literalmente: «la tercera parte del haber hereditario si fueren CUATRO O MENOS de cuatro,
+    // y la mitad si excedieren de este número». El corte está en el cuarto hijo, no en el
+    // primero. Verificado en el BOE (texto consolidado de la Compilació) durante la reparación.
+    //
+    // Es el segundo test de esta pasada que consagraba un error en vez de detectarlo — el otro
+    // fue la cuota del segundo pagador. Por eso el CLAUDE.md exige releer lo que un test AFIRMA
+    // antes de darlo por bueno, y no solo mirar si está verde.
     const PN = 300000;
     expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'comun', numHijos: 2 }).legitimaTotal).toBe(200000);      // 2/3
     expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'cataluna', numHijos: 2 }).legitimaTotal).toBe(75000);    // 1/4
     expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'galicia', numHijos: 2 }).legitimaTotal).toBe(75000);     // 1/4
     expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'aragon', numHijos: 2 }).legitimaTotal).toBe(150000);     // 1/2 colectiva
     expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'pais-vasco', numHijos: 2 }).legitimaTotal).toBe(100000); // 1/3
-    expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'baleares', numHijos: 1 }).legitimaTotal).toBe(100000);   // 1/3 con 1 hijo
-    expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'baleares', numHijos: 2 }).legitimaTotal).toBe(150000);   // 1/2 con 2+
     expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'navarra', numHijos: 2 }).legitimaTotal).toBe(0);         // formal
+    // Baleares: 1/3 hasta CUATRO hijos, 1/2 a partir del quinto (art. 42 Compilació).
+    for (const n of [1, 2, 3, 4]) {
+      expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'baleares', numHijos: n }).legitimaTotal, `${n} hijos`).toBe(100000);
+    }
+    expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'baleares', numHijos: 5 }).legitimaTotal).toBe(150000);
   });
 
-  test('CRÍTICO: sin descendientes NO puede publicarse una legítima de descendientes', () => {
-    test.fail(); // defecto vivo el 09/09/2026
-    // Su app corta en seco este caso —«Sin descendientes, la legítima recae en los
-    // ascendientes», app/estimador-legitimas/page.tsx:247— y su desplegable solo ofrece 1-6
-    // hijos. El motor no heredó ese candado, y el MCP declara `num_hijos: z.number().int().min(0)`,
-    // así que 0 es una entrada legítima que produce «Legítima total de los descendientes:
-    // 200.000,00 €». Los SIETE regímenes lo hacen: Cataluña inventa 75.000 €, Aragón 150.000 €,
-    // y Baleares rotula «1/3 del patrimonio (1 hijo)» teniendo cero hijos.
+  test('CRÍTICO: sin descendientes ya no se publica una legítima de descendientes', () => {
+    // REPARADO EL 09/09/2026. Antes, con `numHijos: 0`, los SIETE regímenes publicaban una
+    // legítima de descendientes —común 200.000 €, Cataluña 75.000 €, Aragón 150.000 €— y el
+    // común citaba además el art. 834 CC, que exige concurrir CON descendientes.
     //
-    // Contradice además a orientacion-tramitacion-herencias —la página que el propio endpoint
-    // cita como fuente en su aviso legal—, que ya tiene escrito el reparto correcto.
+    // La reparación no se quedó en rechazar: «no tengo hijos, ¿cuánto puedo dejar a quien
+    // quiera?» es una pregunta legítima y frecuente. En Derecho Común se modela (arts. 807,
+    // 809, 837 y 838 CC); en los forales, donde la legítima de ascendientes cambia en cada
+    // uno, se rechaza con un error que explica por qué. Navarra sí responde: su legítima es
+    // formal (0 €) haya descendientes o no.
     //
-    // ⚠️ Al reparar: rechazar es el MÍNIMO, no la solución. «No tengo hijos, ¿cuánto puedo dejar
-    // a quien quiera?» es una pregunta legítima y el repositorio ya tiene la respuesta escrita
-    // (ascendientes 1/2, usufructo del viudo 1/3-1/2-2/3). Modelar el caso sería lo correcto.
-    for (const regimen of REGIMENES_LEG) {
-      const r = calcularLegitimas({ patrimonioNeto: 300000, regimen, numHijos: 0, tieneConyuge: true });
-      expect(r.legitimaTotal, regimen).toBe(0);
-    }
-    // Y el art. 834 exige concurrir con descendientes: sin ellos no puede ni citarse.
-    const comun = calcularLegitimas({ patrimonioNeto: 300000, regimen: 'comun', numHijos: 0, tieneConyuge: true });
-    expect(comun.descripcionDerechoConyuge).not.toContain('834');
+    // Y no se adivina el dato: sin `tieneAscendientes` el motor NO supone que no los hay,
+    // porque publicar «puedes disponer del 100 %» a quien tiene a sus padres vivos sería la
+    // misma clase de mentira que se estaba corrigiendo.
+    const sinDato = () => calcularLegitimas({ patrimonioNeto: 300000, regimen: 'comun', numHijos: 0, tieneConyuge: true });
+    expect(sinDato).toThrow(/ascendientes/i);
+
+    // Con ascendientes vivos y cónyuge: 1/3 (art. 809), y el usufructo del viudo es 1/2 (art. 837).
+    const conAsc = calcularLegitimas({ patrimonioNeto: 300000, regimen: 'comun', numHijos: 0, tieneConyuge: true, tieneAscendientes: true });
+    expect(conAsc.legitimaTotal).toBe(100000);
+    expect(conAsc.libreDisposicion).toBe(200000);
+    expect(conAsc.legitimarios).toBe('ascendientes');
+
+    // Sin ascendientes ni descendientes: no hay legítima, y el viudo usufructúa 2/3 (art. 838).
+    const sinAsc = calcularLegitimas({ patrimonioNeto: 300000, regimen: 'comun', numHijos: 0, tieneConyuge: true, tieneAscendientes: false });
+    expect(sinAsc.legitimaTotal).toBe(0);
+    expect(sinAsc.libreDisposicion).toBe(300000);
+
+    // El art. 834 ya no se cita donde no hay descendientes con quien concurrir.
+    expect(conAsc.descripcionDerechoConyuge).not.toContain('834');
+    expect(sinAsc.descripcionDerechoConyuge).not.toContain('834');
   });
 
   test('ALTO: una clave heredada de Object.prototype no puede pasar por régimen', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // `if (!REGIMENES[p.regimen]) throw` no protege: REGIMENES es un literal con prototipo, así
     // que REGIMENES['constructor'] es truthy, el switch no casa ningún caso y todo se queda en
     // su inicialización — 0 € de legítima Y 0 € de libre disposición: el patrimonio entero
@@ -3636,7 +3745,6 @@ test.describe('Motores 09/09 — legítimas: sí distingue los siete regímenes,
   });
 
   test('ALTO: un patrimonio o un número de hijos no finitos se rechazan', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // NaN < 0 y NaN > 20 son ambos false, así que las tres guardas del motor lo dejan pasar.
     // Por la API sale como "legitimaTotal": null con HTTP 200, y el LLM puede leerlo como
     // «no corresponde legítima». Y numHijos: 2.5 reparte entre dos hijos y medio.
@@ -3646,7 +3754,6 @@ test.describe('Motores 09/09 — legítimas: sí distingue los siete regímenes,
   });
 
   test('CUADRE: legítima total + libre disposición = el patrimonio publicado', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // 240 de 1.344 casos no cuadran, por dos causas distintas:
     //  · común (160) — `legitimaTotal = r(tercioEstricto + tercioMejora)` suma el tercio SIN
     //    redondear con el YA redondeado. Con 200.000 € —el valor por defecto de la app—
@@ -3667,10 +3774,15 @@ test.describe('Motores 09/09 — legítimas: sí distingue los siete regímenes,
   });
 
   test('ALTO: «usufructo universal sobre todos los bienes» tiene que valer el patrimonio entero', () => {
-    test.fail(); // defecto vivo el 09/09/2026
-    // Baleares dice ese texto y publica 150.000 € de 300.000 —copia la cifra de `legitimaTotal`—,
-    // mientras Aragón, País Vasco y Navarra sí publican el patrimonio completo con la misma
-    // frase. O sobra el texto o falta la mitad de la cifra, pero las dos no pueden estar bien.
+    // REPARADO 09/09/2026, y de paso salieron dos cifras mal ancladas en fuente:
+    //   · Baleares — el usufructo del viudo es la MITAD del haber cuando concurre con
+    //     descendientes (art. 45 Compilació), no universal. El texto decía «universal» y la
+    //     cifra copiaba `legitimaTotal`: ni una ni otra eran correctas.
+    //   · País Vasco — Ley 5/2015 art. 52: «usufructo de la MITAD de todos los bienes del
+    //     causante si concurriere con descendientes» (dos tercios en su defecto). El motor
+    //     publicaba el patrimonio entero rotulado «usufructo universal de viudedad foral».
+    // Aragón (CDFA art. 271) y Navarra (usufructo de fidelidad) SÍ son universales, y ahí el
+    // texto y la cifra ya concordaban. Este test vigila que sigan concordando.
     for (const regimen of REGIMENES_LEG) {
       const r = calcularLegitimas({ patrimonioNeto: 300000, regimen, numHijos: 2, tieneConyuge: true });
       if (/universal|todos los bienes/i.test(r.descripcionDerechoConyuge)) {
@@ -3699,7 +3811,6 @@ test.describe('Motores 09/09 — retención de dividendos: la escala del ahorro 
   };
 
   test('CRÍTICO: la escala del ahorro es la de data/fiscal, no una copia con el último tramo al 28 %', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // `retencionDividendos.ts:52-59` lleva su propia copia. Los cuatro primeros tramos coinciden
     // valor a valor con TRAMOS_GANANCIAS_PATRIMONIALES_2025; el quinto no: 28 frente al 30
     // canónico. No es un fallo de método —`cuotaAhorro` escalona bien, tramo a tramo—: es el valor.
@@ -3717,7 +3828,6 @@ test.describe('Motores 09/09 — retención de dividendos: la escala del ahorro 
   });
 
   test('CRÍTICO: un tipo de CDI imposible se rechaza, no genera un dividendo neto negativo', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // tipoCDI: 150 → retención 1.500 € sobre 1.000 € y dividendoNeto −500 €.
     // tipoCDI: −30 → retención −300 € y neto 1.300 €, más de lo que se reparte.
     // El LLM que ponga «30» donde el esquema pide un porcentaje pero el usuario habló de euros
@@ -3728,7 +3838,6 @@ test.describe('Motores 09/09 — retención de dividendos: la escala del ahorro 
   });
 
   test('ALTO: omitir mesesTenencia no puede convertir un dividendo exento en 25.000 € de IS', () => {
-    test.fail(); // defecto vivo el 09/09/2026
     // `p.mesesTenencia ?? 0`: los dos campos son OPCIONALES en el esquema OpenAPI que lee el LLM
     // y ninguno declara valor por defecto. Si no los rellena —lo normal cuando el usuario no los
     // menciona—, el motor inventa un 0, liquida el IS y encima lo escribe como si el usuario lo
@@ -3743,14 +3852,21 @@ test.describe('Motores 09/09 — retención de dividendos: la escala del ahorro 
   });
 
   test('ALTO: un dividendo que el motor declara EXENTO no soporta retención española', () => {
-    test.fail(); // defecto vivo el 09/09/2026
-    // Incoherencia interna entre dos umbrales del mismo bloque: exime del IS desde el 5 % + 12
-    // meses, pero solo suprime la retención desde el 25 %. Entre medias publica
-    // aplicaExencionIS: true con 19.000 € retenidos y una devolución por el mismo importe.
+    test.fail(); // ABIERTO A PROPÓSITO — pendiente de fuente oficial, no de trabajo
+    // Incoherencia entre dos umbrales del mismo bloque: exime del IS desde el 5 % + 12 meses,
+    // pero solo suprime la retención desde el 25 %. Con 10 % y 24 meses publica
+    // aplicaExencionIS: true junto a 19.000 € de retención practicada.
     //
-    // ⚠️ Al reparar: data/fiscal NO tiene módulo de excepciones a la obligación de retener, así
-    // que el umbral correcto hay que traerlo de fuente oficial, no de aquí. Lo que este test
-    // afirma es la coherencia interna, no cuál de los dos umbrales es el bueno.
+    // ⚠️ ESTE test.fail() NO se retira todavía, y no es un olvido. En la sesión de reparación
+    // del 09/09/2026 se buscó la fuente y NO se pudo anclar cuál de los dos umbrales es el
+    // correcto: `data/fiscal` no tiene módulo de excepciones a la obligación de retener y la
+    // consulta al art. 61 RIS no fue concluyente. Elegir uno «por coherencia» habría sido
+    // inventar normativa, y en la dirección equivocada haría daño: si el bueno fuera el 25 %,
+    // quitar la retención dejaría al usuario sin reclamar una devolución que le corresponde.
+    //
+    // Lo que SÍ se reparó es que la respuesta ya no deja las dos afirmaciones sin reconciliar:
+    // el motor explica que la retención es un pago a cuenta íntegramente recuperable y que la
+    // `cuotaDiferencial` negativa ES esa devolución. Queda para /triaje-fiscal.
     const res = calcularRetencionDividendos({
       tipoReceptor: 'sociedad_residente', dividendoBruto: 100000,
       porcentajeParticipacion: 10, mesesTenencia: 24,

@@ -12,14 +12,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularDeduccionAutonomoIRPF } from '@/lib/calculadoras/deduccionAutonomoIRPF';
 import type { ModalidadEstimacion } from '@/lib/calculadoras/deduccionAutonomoIRPF';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 
 export const runtime = 'nodejs';
 
+// La vigencia se deriva de data/fiscal (lo único que el Vigía Normativo re-sella):
+// el texto decía «vigente 2025» en septiembre de 2026 y no hay app que lo corrija
+// con <DataReference>, porque este endpoint solo lo lee un LLM.
+// La URL apuntaba a meskeia.com/deduccion-autonomo-irpf, que NO existe (404): la
+// página real del tema es /orientador-gastos-deducibles/.
 const AVISO_LEGAL =
-  '⚠️ Resultado orientativo basado en LIRPF arts. 28-30 + DGT consultas vinculantes, vigente 2025. ' +
+  '⚠️ Resultado orientativo basado en LIRPF arts. 28-30 + DGT consultas vinculantes. ' +
+  `Datos de la escala IRPF con vigencia ${FISCAL_IRPF_META.vigencia}, verificados el ${FISCAL_IRPF_META.verificado}. ` +
   'La deducibilidad real puede variar según tu caso concreto. ' +
-  'Consulta con tu gestor fiscal. Fuente: meskeia.com/deduccion-autonomo-irpf';
+  'Consulta con tu gestor fiscal. Fuente: meskeia.com/orientador-gastos-deducibles/';
+
+/** Solo pasan números finitos: `NaN` es `typeof 'number'` y `NaN < 0` es `false`, así que
+ *  atravesaba las dos guardas y salía como `null` en el JSON, con HTTP 200 y sin error. */
+function numeroFinito(v: unknown): number | undefined {
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+}
 
 function corsHeaders() {
   return {
@@ -66,12 +79,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (typeof ingresosBrutos !== 'number' || ingresosBrutos < 0) {
+    if (typeof ingresosBrutos !== 'number' || !Number.isFinite(ingresosBrutos) || ingresosBrutos < 0) {
       return NextResponse.json(
         {
           error:
-            'El campo ingresosBrutos es obligatorio (€ anuales de facturación). ' +
-            'Ejemplo: 40000 si facturas 40.000€ brutos al año.',
+            'El campo ingresosBrutos es obligatorio y debe ser un número finito no negativo ' +
+            '(€ anuales de facturación). Ejemplo: 40000 si facturas 40.000€ brutos al año.',
         },
         { status: 400, headers: corsHeaders() }
       );
@@ -80,30 +93,19 @@ export async function POST(request: NextRequest) {
     const resultado = calcularDeduccionAutonomoIRPF({
       modalidadEstimacion: modalidadEstimacion as ModalidadEstimacion,
       ingresosBrutos,
-      cuotasSSAutonomo: typeof cuotasSSAutonomo === 'number' ? cuotasSSAutonomo : undefined,
-      alquilerLocal: typeof alquilerLocal === 'number' ? alquilerLocal : undefined,
-      gastosSupministrosHogar:
-        typeof gastosSupministrosHogar === 'number' ? gastosSupministrosHogar : undefined,
-      pctSuperficieActividadHogar:
-        typeof pctSuperficieActividadHogar === 'number' ? pctSuperficieActividadHogar : undefined,
-      gastosAsesoria: typeof gastosAsesoria === 'number' ? gastosAsesoria : undefined,
-      gastosSeguros: typeof gastosSeguros === 'number' ? gastosSeguros : undefined,
-      otrosGastos: typeof otrosGastos === 'number' ? otrosGastos : undefined,
-      gastosDietas: typeof gastosDietas === 'number' ? gastosDietas : undefined,
-      diasDietasEspaniaSinPernoctar:
-        typeof diasDietasEspaniaSinPernoctar === 'number' ? diasDietasEspaniaSinPernoctar : undefined,
-      diasDietasEspaniaPernoctando:
-        typeof diasDietasEspaniaPernoctando === 'number' ? diasDietasEspaniaPernoctando : undefined,
-      diasDietasExtranjeroSinPernoctar:
-        typeof diasDietasExtranjeroSinPernoctar === 'number'
-          ? diasDietasExtranjeroSinPernoctar
-          : undefined,
-      diasDietasExtranjeroPernoctando:
-        typeof diasDietasExtranjeroPernoctando === 'number'
-          ? diasDietasExtranjeroPernoctando
-          : undefined,
-      otrosGastosAcreditados:
-        typeof otrosGastosAcreditados === 'number' ? otrosGastosAcreditados : undefined,
+      cuotasSSAutonomo: numeroFinito(cuotasSSAutonomo),
+      alquilerLocal: numeroFinito(alquilerLocal),
+      gastosSupministrosHogar: numeroFinito(gastosSupministrosHogar),
+      pctSuperficieActividadHogar: numeroFinito(pctSuperficieActividadHogar),
+      gastosAsesoria: numeroFinito(gastosAsesoria),
+      gastosSeguros: numeroFinito(gastosSeguros),
+      otrosGastos: numeroFinito(otrosGastos),
+      gastosDietas: numeroFinito(gastosDietas),
+      diasDietasEspaniaSinPernoctar: numeroFinito(diasDietasEspaniaSinPernoctar),
+      diasDietasEspaniaPernoctando: numeroFinito(diasDietasEspaniaPernoctando),
+      diasDietasExtranjeroSinPernoctar: numeroFinito(diasDietasExtranjeroSinPernoctar),
+      diasDietasExtranjeroPernoctando: numeroFinito(diasDietasExtranjeroPernoctando),
+      otrosGastosAcreditados: numeroFinito(otrosGastosAcreditados),
     });
 
     registrarLlamadaChatGPT(ingresosBrutos, modalidadEstimacion).catch(() => {});

@@ -123,7 +123,7 @@ export const faqJsonLd = {
       name: '¿Qué deducciones de IRPF hay por discapacidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El IRPF aplica un mínimo por discapacidad que reduce la base imponible: 3.000 € con un grado del 33% al 64% y 9.000 € con un grado igual o superior al 65%. Se suma otro mínimo de 3.000 € por gastos de asistencia si se acredita necesidad de ayuda de terceros o movilidad reducida. Existen importes equivalentes por ascendientes o descendientes con discapacidad a cargo.',
+        text: 'El IRPF aplica un mínimo por discapacidad que reduce la base imponible: 3.000 € con un grado del 33% al 64% y 9.000 € con un grado igual o superior al 65%. Se suma otro mínimo de 3.000 € por gastos de asistencia ante cualquiera de tres supuestos alternativos: acreditar necesidad de ayuda de terceras personas, acreditar movilidad reducida, o tener un grado igual o superior al 65%. Con un grado del 65% o más ese incremento se aplica por el propio grado, sin acreditar nada más. Existen importes equivalentes por ascendientes o descendientes con discapacidad a cargo.',
       },
     },
   ],

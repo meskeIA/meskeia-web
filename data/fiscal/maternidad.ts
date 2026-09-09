@@ -221,12 +221,19 @@ export const DEDUCCION_MATERNIDAD_IRPF = {
   importeAnualPorHijo: 1200,
   /** Importe mensual (se puede cobrar anticipado) */
   importeMensualPorHijo: 100,
-  /** Incremento adicional por gastos de guardería/centro infantil autorizado */
+  /**
+   * Incremento adicional por gastos de guardería/centro infantil autorizado.
+   * Los dos límites son POR CADA HIJO, no sobre el agregado familiar (Manual práctico
+   * Renta 2025, «Límites de la deducción»: «El incremento de la deducción por cada hijo
+   * que otorgue derecho a la misma no podrá superar para cada hijo ninguno de los dos
+   * límites»). Con dos hijos de 1.500 € de gasto cada uno el incremento son 2.000 €.
+   */
   incrementoGuarderia: {
+    /** Tope anual POR CADA HIJO con derecho, no del conjunto de los hijos. */
     importeMaximoAnual: 1000,
     requisito: 'Gastos en guardería o centro de educación infantil autorizado',
-    /** Art. 81.3 in fine: además del tope de 1.000 €, límite del gasto realmente pagado. */
-    limiteGastoEfectivo: 'El importe total del gasto efectivo NO subvencionado satisfecho en el período al centro',
+    /** Art. 81.3 in fine: además del tope de 1.000 €, límite del gasto realmente pagado por ESE hijo. */
+    limiteGastoEfectivo: 'El importe total del gasto efectivo NO subvencionado satisfecho en el período al centro por cada hijo',
     nota: 'El centro debe comunicar los datos a la AEAT. Aplica hasta el mes anterior al inicio del segundo ciclo de educación infantil (generalmente septiembre del año en que el hijo cumple 3 años).',
   },
   /**

@@ -22,6 +22,7 @@ import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
   calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
 import Chart from 'chart.js/auto';
@@ -69,15 +70,7 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
   const rendimientoNeto = brutoAnual - totalSS - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
 
   // Reducción por rendimientos del trabajo
-  const red = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  let reduccion = 0;
-  if (rendimientoNeto <= red.limite1) {
-    reduccion = red.reduccion1;
-  } else if (rendimientoNeto < red.limite2) {
-    reduccion = red.reduccion1 - red.factorInterpolacion * (rendimientoNeto - red.limite1);
-  } else {
-    reduccion = red.reduccion2;
-  }
+  const reduccion = calcularReduccionRendimientosTrabajo(rendimientoNeto);
 
   const baseImponible = Math.max(0, rendimientoNeto - reduccion);
 

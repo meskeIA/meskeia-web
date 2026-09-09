@@ -56,6 +56,8 @@
  * Encadenable con: calcular_irpf, calcular_plan_pensiones, calcular_seguro_vida
  */
 
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+
 // ─── Constantes ────────────────────────────────────────────────────────────
 
 // Porcentajes tributables renta vitalicia (LIRPF art. 25.3.a.1ª)
@@ -77,13 +79,14 @@ const TRAMOS_TEMPORAL: { aniosMaximo: number; pctTributable: number }[] = [
 ];
 
 // Escala ahorro 2025
-const ESCALA_AHORRO_2025 = [
-  { limite: 6000,   tipo: 19 },
-  { limite: 50000,  tipo: 21 },
-  { limite: 200000, tipo: 23 },
-  { limite: 300000, tipo: 27 },
-  { limite: Infinity, tipo: 28 },
-];
+// ⚠️ 09/09/2026: esta escala ERA una copia local con el último tramo al 28 %, el valor de
+// 2024. La Ley 7/2024 lo elevó al 30 % con efectos 1/1/2025, y `data/fiscal/irpf.ts` ya deja
+// escrita la instrucción: «La escala de la BASE DEL AHORRO está centralizada en
+// data/fiscal/inmuebles.ts como TRAMOS_GANANCIAS_PATRIMONIALES_2025. Importar desde allí; no
+// duplicar aquí.» La copia estaba en NUEVE motores a la vez, mientras app/api/datos/[slug]
+// publicaba la canónica al 30 %: dos endpoints públicos servían cifras contradictorias.
+// Se remapea `hasta`→`limite` para no tocar el resto del fichero, que ya usa ese nombre.
+const ESCALA_AHORRO_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025.map(t => ({ limite: t.hasta, tipo: t.tipo }));
 
 const LIMITE_EXENCION_ART7V = 240000; // € capital máximo exento LIRPF art. 7.v
 

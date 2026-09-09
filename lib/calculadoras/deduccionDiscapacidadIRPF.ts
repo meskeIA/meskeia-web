@@ -22,6 +22,11 @@ export type GradoDiscapacidad = '33a65' | '65oMas';
 export interface ParametrosDeduccionDiscapacidad {
   titular: TitularDiscapacidad;
   grado: GradoDiscapacidad;
+  /**
+   * ¿Acredita necesitar ayuda de terceras personas o movilidad reducida?
+   * Es UNO de los tres supuestos alternativos del incremento por gastos de
+   * asistencia: con grado ≥65 % el incremento se aplica igual sin marcarla.
+   */
   necesitaAsistencia?: boolean;
   /** Tipo marginal de IRPF (%) para estimar el ahorro. */
   tipoMarginal: number;
@@ -43,6 +48,9 @@ export function calcularDeduccionDiscapacidadIRPF(
   if (!Number.isFinite(p.tipoMarginal) || p.tipoMarginal < 0 || p.tipoMarginal > 100) {
     throw new Error('El tipo marginal debe estar entre 0 y 100.');
   }
+  // `-0 < 0` es false, así que el cero negativo atraviesa la guarda y arrastra su signo
+  // hasta el ahorro (12.000 × -0 = -0), que se imprimía como «-0,00 €». Se normaliza.
+  const tipoMarginal = Object.is(p.tipoMarginal, -0) ? 0 : p.tipoMarginal;
 
   // El contribuyente usa sus propios importes; ascendiente/descendiente usan los familiares.
   const datos =
@@ -53,20 +61,30 @@ export function calcularDeduccionDiscapacidadIRPF(
   const minimoDiscapacidad =
     p.grado === '33a65' ? datos.discapacidad33a65 : datos.discapacidad65oMas;
 
-  const gastosAsistencia = p.necesitaAsistencia
+  // Art. 60 LIRPF (y art. 61 para ascendientes/descendientes): el incremento de 3.000 € por
+  // gastos de asistencia procede ante CUALQUIERA de tres supuestos ALTERNATIVOS —acreditar
+  // necesitar ayuda de terceras personas, acreditar movilidad reducida, O un grado de
+  // discapacidad igual o superior al 65 %—. Manual práctico Renta 2025 de la AEAT: «se
+  // incrementará, en concepto de gastos de asistencia, en 3.000 euros anuales por cada
+  // ascendiente o descendiente que acredite necesitar ayuda de terceras personas o movilidad
+  // reducida, o un grado de discapacidad igual o superior al 65 por 100».
+  // Con grado 33-64 % la acreditación SÍ es condición necesaria; con ≥65 % el grado basta.
+  const tieneDerechoAsistencia = p.necesitaAsistencia === true || p.grado === '65oMas';
+
+  const gastosAsistencia = tieneDerechoAsistencia
     ? p.grado === '33a65'
       ? datos.gastosAsistencia33a65
       : datos.gastosAsistencia65oMas
     : 0;
 
   const totalMinimo = minimoDiscapacidad + gastosAsistencia;
-  const ahorroEstimado = totalMinimo * (p.tipoMarginal / 100);
+  const ahorroEstimado = totalMinimo * (tipoMarginal / 100);
 
   return {
     minimoDiscapacidad,
     gastosAsistencia,
     totalMinimo,
-    tipoMarginal: p.tipoMarginal,
+    tipoMarginal,
     ahorroEstimado,
     fuente: FISCAL_DEPENDENCIA_META.fuente,
     verificado: FISCAL_DEPENDENCIA_META.verificado,

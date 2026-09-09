@@ -51,6 +51,8 @@
  * Encadenable con: calcular_irpf, calcular_reduccion_irregular_irpf, calcular_retribucion_especie
  */
 
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+
 // --- Constantes ---
 
 const PCT_REDUCCION_AUTOR = 60;           // % reduccion rendimientos autor capital mobiliario
@@ -130,10 +132,9 @@ function cuotaGeneral(base: number): number {
 
 function cuotaAhorro(base: number): number {
   if (base <= 0) return 0;
-  const tramos = [
-    { hasta: 6_000, tipo: 19 }, { hasta: 50_000, tipo: 21 },
-    { hasta: 200_000, tipo: 23 }, { hasta: 300_000, tipo: 27 }, { hasta: Infinity, tipo: 28 },
-  ];
+  // Escala del ahorro: importada de data/fiscal desde el 09/09/2026 (antes copiada
+  // aquí con el último tramo al 28 %, el valor de 2024; la Ley 7/2024 lo subió al 30 %).
+  const tramos = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
   let cuota = 0;
   let resto = base;
   let ant = 0;

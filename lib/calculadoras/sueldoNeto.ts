@@ -15,6 +15,7 @@ import {
   BASES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
   FISCAL_IRPF_META,
   calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
@@ -82,10 +83,7 @@ function calcularCuotaIRPF(baseLiquidable: number): number {
 
 /** Calcula la reducción por rendimientos netos del trabajo */
 function calcularReduccionRNT(rnt: number): number {
-  const red = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= red.limite1) return red.reduccion1;
-  if (rnt >= red.limite2) return red.reduccion2;
-  return red.reduccion1 - red.factorInterpolacion * (rnt - red.limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 /** Calcula el mínimo personal y familiar */
@@ -137,10 +135,20 @@ export function calcularSueldoNeto(p: ParametrosSueldoNeto): ResultadoSueldoNeto
   // Base liquidable general
   const minimoPersonalFamiliar = calcularMinimo(situacion, numHijos, hijosMenores3);
   const baseLiquidableGeneral = Math.max(0, baseImponible - reduccionRNT);
-  const baseLiquidable = Math.max(0, baseLiquidableGeneral - minimoPersonalFamiliar);
+  const baseLiquidable = baseLiquidableGeneral;
 
   // Cuota íntegra
-  const cuotaIntegra = calcularCuotaIRPF(baseLiquidable);
+  // ⚠️ 09/09/2026: el mínimo personal y familiar NO se resta de la base. El art. 63.1.2º
+  // LIRPF manda aplicar la escala a la base liquidable completa y minorar la cuota «en el
+  // importe derivado de aplicar a la parte de la base liquidable general correspondiente al
+  // mínimo personal y familiar esta misma escala» (AEAT, Manual Renta 2025). Restarlo de la
+  // base lo valora al tipo MARGINAL y subestima la cuota — hasta 1.443 € en rentas altas.
+  // `devolucionIRPF.ts` y `dividendoEmpresarial.ts` ya lo hacían así; estos motores no.
+  const cuotaIntegra = Math.max(
+    0,
+    calcularCuotaIRPF(baseLiquidableGeneral)
+      - calcularCuotaIRPF(Math.min(minimoPersonalFamiliar, baseLiquidableGeneral)),
+  );
 
   // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
   const deduccionRentasBajas = calcularDeduccionRentasBajas(baseImponible, 0);

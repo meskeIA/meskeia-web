@@ -28,6 +28,7 @@ import {
   calcularDeduccionRentasBajas,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 
 // ──────────────────────────────────────────
@@ -58,11 +59,7 @@ function calcularIRPFAnual(brutoAnual: number): number {
   const rnt = Math.max(0, brutoAnual - ssAnual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
 
   // Reducción por rendimientos del trabajo (art. 20)
-  const rd = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  let reduccion: number;
-  if (rnt <= rd.limite1) reduccion = rd.reduccion1;
-  else if (rnt < rd.limite2) reduccion = rd.reduccion1 - rd.factorInterpolacion * (rnt - rd.limite1);
-  else reduccion = rd.reduccion2;
+  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
 
   const baseImponible = Math.max(0, rnt - reduccion);
   const baseLiquidable = Math.max(0, baseImponible - MINIMOS_IRPF_2025.personal);

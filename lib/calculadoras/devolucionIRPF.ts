@@ -18,6 +18,7 @@ import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
   FISCAL_IRPF_META,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -136,13 +137,13 @@ function calcularCuotaTarifahGeneral(base: number): number {
 }
 
 // Tramos tarifa del ahorro 2025
-const TRAMOS_AHORRO_2025 = [
-  { hasta: 6000,     tipo: 19 },
-  { hasta: 50000,    tipo: 21 },
-  { hasta: 200000,   tipo: 23 },
-  { hasta: 300000,   tipo: 27 },
-  { hasta: Infinity, tipo: 28 },
-];
+// ⚠️ 09/09/2026: esta escala ERA una copia local con el último tramo al 28 %, el valor de
+// 2024. La Ley 7/2024 lo elevó al 30 % con efectos 1/1/2025, y `data/fiscal/irpf.ts` ya deja
+// escrita la instrucción: «La escala de la BASE DEL AHORRO está centralizada en
+// data/fiscal/inmuebles.ts como TRAMOS_GANANCIAS_PATRIMONIALES_2025. Importar desde allí; no
+// duplicar aquí.» La copia estaba en NUEVE motores a la vez, mientras app/api/datos/[slug]
+// publicaba la canónica al 30 %: dos endpoints públicos servían cifras contradictorias.
+const TRAMOS_AHORRO_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
 
 function calcularCuotaTarifaAhorro(base: number): number {
   if (base <= 0) return 0;

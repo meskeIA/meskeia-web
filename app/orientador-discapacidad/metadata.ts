@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿A partir de qué porcentaje de discapacidad se tienen deducciones en el IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Con un grado igual o superior al 33% se aplica el mínimo por discapacidad en el IRPF: 3.000 € anuales para el contribuyente, o 9.000 € si el grado es igual o superior al 65%. Si además se necesita ayuda de terceras personas o se tiene movilidad reducida, el mínimo adicional es de 3.000 €. Estos importes se deducen de la base imponible, reduciendo la cuota a pagar o aumentando la devolución.',
+        text: 'Con un grado igual o superior al 33% se aplica el mínimo por discapacidad en el IRPF: 3.000 € anuales para el contribuyente, o 9.000 € si el grado es igual o superior al 65%. A ese mínimo se suman otros 3.000 € por gastos de asistencia ante cualquiera de tres supuestos alternativos: acreditar ayuda de terceras personas, acreditar movilidad reducida, o tener un grado igual o superior al 65%, que da derecho por sí solo. Estos importes se deducen de la base imponible, reduciendo la cuota a pagar o aumentando la devolución.',
       },
     },
   ],

@@ -13,6 +13,7 @@ import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -49,10 +50,7 @@ function calcularCuotaIRPF(base: number): number {
 }
 
 function calcularReduccionRRT(rnt: number): number {
-  const { limite1, reduccion1, limite2, reduccion2, factorInterpolacion } = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= limite1) return reduccion1;
-  if (rnt >= limite2) return reduccion2;
-  return reduccion1 - factorInterpolacion * (rnt - limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 function minimoPersonalPorEdad(tramo: TramoEdad): number {
@@ -302,8 +300,8 @@ export default function EstimadorIrpfPensionista() {
         <p>Si tus únicos ingresos son la pensión, aplica una reducción en función de tu renta neta:</p>
         <ul>
           <li>Renta neta ≤ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)}: reducción de {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)}</li>
-          <li>Entre {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} y {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: reducción proporcional</li>
-          <li>Renta neta &gt; {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: reducción de {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion2)}</li>
+          <li>Entre {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} y {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: reducción decreciente, en dos tramos</li>
+          <li>Renta neta ≥ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: <strong>sin reducción</strong> — esta reducción se agota, no deja importe residual</li>
         </ul>
         <h3>Mínimo personal por edad</h3>
         <p>El mínimo personal genera una deducción efectiva sobre la cuota:</p>

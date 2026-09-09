@@ -24,6 +24,7 @@ import {
   UMBRAL_OBLIGACION_DECLARAR,
   calcularCuotaPatrimonioCCAA,
   ITSGF_UMBRAL,
+  MINIMO_EXENTO_ESTATAL,
   FISCAL_PATRIMONIO_META,
 } from '@/data/fiscal';
 
@@ -136,15 +137,29 @@ export default function OrientadorImpuestoPatrimonioPage() {
   const hayDatos = patrimonioBruto > 0;
 
   // ── Veredicto de obligación ──
+  //
+  // ⚠️ CORREGIDO EL 09/09/2026, igual que en `lib/calculadoras/impuestoPatrimonio.ts`.
+  // El art. 37 de la Ley 19/1991 obliga a declarar cuando la cuota, «una vez aplicadas las
+  // deducciones o bonificaciones que procedieren, resulte a ingresar», o cuando los bienes
+  // BRUTOS superan 2.000.000 €. Antes esta página usaba `baseImponible > minimoExento`, que es
+  // la cuota ANTES de bonificar, y por eso decía «obligado a declarar» a un madrileño con
+  // 1,5 M € mientras la FAQ de esta misma página (más abajo) enunciaba la regla correcta.
+  // Afecta a las 7 CCAA que bonifican al 100 %.
+  const cuotaNetaOrientativa = resultadoCuota
+    ? Math.round((resultadoCuota.cuotaNeta ?? 0) * 100) / 100
+    : 0;
   type TipoVeredicto = 'pendiente' | 'sin-datos' | 'obligado-2m' | 'obligado-base' | 'no-obligado';
   let veredicto: TipoVeredicto = 'pendiente';
   if (!ccaaId) veredicto = 'pendiente';
   else if (!hayDatos) veredicto = 'sin-datos';
   else if (patrimonioBruto > UMBRAL_OBLIGACION_DECLARAR) veredicto = 'obligado-2m';
-  else if (baseImponible > minimoExento) veredicto = 'obligado-base';
+  else if (cuotaNetaOrientativa > 0) veredicto = 'obligado-base';
   else veredicto = 'no-obligado';
 
-  const aplicaItsgf = patrimonioNeto >= ITSGF_UMBRAL;
+  // El aviso del ITSGF se comparaba con el neto SIN descontar la vivienda habitual exenta, así
+  // que saltaba ~800.000 € antes de que ese impuesto cobrase nada: su base liquidable es
+  // `neto − 700.000` y el primer tramo va al 0 % hasta 3.000.000 €.
+  const aplicaItsgf = baseImponible > ITSGF_UMBRAL + MINIMO_EXENTO_ESTATAL;
 
   const filas: { etiqueta: string; valor: number; signo?: string; destacado?: boolean }[] = [
     { etiqueta: 'Vivienda habitual (valor total)', valor: vhValor },
@@ -378,7 +393,7 @@ export default function OrientadorImpuestoPatrimonioPage() {
                     <div className={styles.cuotaFila}>
                       <span>− Bonificación {ccaa?.nombre} ({resultadoCuota.porcentajeBonificacion} %)</span>
                       <strong>
-                        −{formatCurrency(resultadoCuota.cuotaBruta * resultadoCuota.porcentajeBonificacion / 100)}
+                        −{formatCurrency(Math.round((resultadoCuota.cuotaBruta - (resultadoCuota.cuotaNeta ?? 0)) * 100) / 100)}
                       </strong>
                     </div>
                   )}
@@ -411,7 +426,7 @@ export default function OrientadorImpuestoPatrimonioPage() {
 
             {aplicaItsgf && (
               <p className={styles.itsgfAviso}>
-                <span aria-hidden="true">ℹ️</span> Tu patrimonio neto supera los {formatNumber(ITSGF_UMBRAL, 0)} €: además del
+                <span aria-hidden="true">ℹ️</span> Tu patrimonio supera los {formatNumber(ITSGF_UMBRAL + MINIMO_EXENTO_ESTATAL, 0)} €: además del
                 Impuesto sobre el Patrimonio, podría aplicarte el <strong>Impuesto Temporal de Solidaridad de las Grandes
                 Fortunas (ITSGF)</strong>, estatal. Consúltalo con un asesor.
               </p>

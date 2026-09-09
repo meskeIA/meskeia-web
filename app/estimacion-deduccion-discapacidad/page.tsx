@@ -55,7 +55,13 @@ export default function EstimacionDeduccionDiscapacidadPage() {
       ? datos.discapacidad33a65
       : datos.discapacidad65oMas;
 
-    const gastosAsistencia = necesitaAsistencia
+    // Art. 60 LIRPF: los tres supuestos del incremento por gastos de asistencia son
+    // ALTERNATIVOS —ayuda de terceras personas, movilidad reducida O grado ≥ 65 %—, según el
+    // Manual práctico Renta 2025 de la AEAT. Con grado 33-64 % la acreditación es condición
+    // necesaria; con grado ≥ 65 % el grado basta por sí solo.
+    const tieneDerechoAsistencia = necesitaAsistencia || grado === '65oMas';
+
+    const gastosAsistencia = tieneDerechoAsistencia
       ? (grado === '33a65' ? datos.gastosAsistencia33a65 : datos.gastosAsistencia65oMas)
       : 0;
 
@@ -217,6 +223,11 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             <p className={styles.helpText}>
               Añade {formatCurrency(3000)} adicionales al mínimo si se acredita la necesidad de ayuda
               de terceros o movilidad reducida (certificado oficial).
+              {grado === '65oMas' && (
+                <> Con un grado igual o superior al 65 % estos {formatCurrency(3000)} se aplican
+                  igualmente, aunque no marques la casilla: el grado es por sí solo uno de los tres
+                  supuestos del artículo 60 de la Ley del IRPF.</>
+              )}
             </p>
           </div>
 
@@ -360,11 +371,13 @@ export default function EstimacionDeduccionDiscapacidadPage() {
 
         <h3>¿Qué cuenta como &quot;gastos de asistencia&quot;?</h3>
         <p>
-          Los {formatCurrency(3000)} adicionales por gastos de asistencia se aplican cuando la persona
-          con discapacidad acredita <strong>necesidad de ayuda de terceras personas</strong> o
-          <strong> movilidad reducida</strong>. No es necesario justificar gastos concretos:
-          basta con que el certificado de discapacidad recoja esta circunstancia. Las personas con
-          discapacidad ≥ 65% también pueden aplicar este adicional.
+          Los {formatCurrency(3000)} adicionales por gastos de asistencia se aplican ante cualquiera de
+          estos <strong>tres supuestos alternativos</strong> (basta uno): acreditar
+          <strong> necesidad de ayuda de terceras personas</strong>, acreditar
+          <strong> movilidad reducida</strong>, o tener un <strong>grado de discapacidad igual o
+          superior al 65 %</strong>. No es necesario justificar gastos concretos: basta con que el
+          certificado de discapacidad recoja la circunstancia, y con el grado ≥ 65 % el propio grado
+          da derecho al incremento sin acreditar nada más.
         </p>
 
         {/* Tabla comparativa */}
@@ -464,7 +477,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">🧑‍🦽</span>
-              <h4>Contribuyente con discapacidad ≥ 65% y asistencia</h4>
+              <h4>Contribuyente con discapacidad ≥ 65%</h4>
             </div>
             <div className={styles.escenarioExample}>
               <p>Base imponible: {formatCurrency(50000)}. Tipo marginal: 37%.</p>
@@ -472,7 +485,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <p><strong>Ahorro: {formatCurrency(4440)}/año</strong></p>
             </div>
             <div className={styles.escenarioTip}>
-              Además del mínimo estatal, comprueba las deducciones autonómicas por discapacidad propia.
+              Los {formatCurrency(3000)} de asistencia salen aquí del propio grado ≥ 65 %: no hace falta
+              acreditar además ayuda de terceros ni movilidad reducida. Comprueba también las deducciones
+              autonómicas por discapacidad propia.
             </div>
           </div>
         </div>

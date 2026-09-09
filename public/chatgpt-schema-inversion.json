@@ -367,7 +367,7 @@
       "post": {
         "operationId": "calcularRetencionDividendos",
         "summary": "Calcula la retención e IRPF sobre dividendos recibidos",
-        "description": "Calcula la retención a cuenta del 19%, la cuota IRPF real según los tramos del ahorro 2025 para personas físicas residentes, y la posible exención IS art. 21 para sociedades con participación ≥ 5% durante ≥ 12 meses.",
+        "description": "Calcula la retención a cuenta del 19%, la cuota IRPF real según los tramos vigentes de la base del ahorro para personas físicas residentes, y la posible exención IS art. 21 para sociedades con participación ≥ 5% durante ≥ 12 meses. Para acciones extranjeras (EE. UU., Alemania...) usa origenDividendo='extranjero' con retencionOrigen: devuelve el cobro real y la deducción por doble imposición internacional (art. 80 LIRPF).",
         "requestBody": {
           "required": true,
           "content": {
@@ -395,15 +395,28 @@
                   },
                   "porcentajeParticipacion": {
                     "type": "number",
-                    "description": "Porcentaje de participación en la entidad pagadora (solo sociedades). Relevante para exención IS art. 21 si >= 5%."
+                    "description": "Porcentaje de participación en la entidad pagadora (solo sociedades). Relevante para la exención IS art. 21 si >= 5%. Si se omite NO se interpreta como 0: el cálculo lo declara como dato no aportado y no puede concluir si hay exención. Pregúntalo antes de llamar."
                   },
                   "mesesTenencia": {
                     "type": "number",
-                    "description": "Meses de tenencia de la participación (solo sociedades). Exención IS art. 21 requiere >= 12 meses."
+                    "description": "Meses de tenencia de la participación (solo sociedades). La exención IS art. 21 exige >= 12 meses. Si se omite NO se interpreta como 0: el cálculo lo declara como dato no aportado. Omitirlo en un dividendo de 100.000 EUR es la diferencia entre 0 EUR y 25.000 EUR de impuesto, así que pregúntalo antes de llamar."
                   },
                   "tipoCDI": {
                     "type": "number",
-                    "description": "Tipo reducido del Convenio de Doble Imposición aplicable en % (solo no residentes). Si no se indica, se aplica el tipo general del 19%."
+                    "description": "Tipo reducido del Convenio de Doble Imposición aplicable en % (solo no residentes). Es un PORCENTAJE entre 0 y 100 (ejemplo: 15 para un 15%), nunca un importe en euros."
+                  },
+                  "origenDividendo": {
+                    "type": "string",
+                    "enum": ["espana", "extranjero"],
+                    "description": "Origen del dividendo, que NO es la residencia de quien lo cobra: 'espana' si lo reparte una sociedad española, 'extranjero' si son acciones de una sociedad de otro país (EE. UU., Alemania, Reino Unido...), que retiene su propio impuesto antes de pagar. Si se omite se asume 'espana'. Con 'extranjero' solo se calcula el receptor persona_fisica_residente."
+                  },
+                  "retencionOrigen": {
+                    "type": "number",
+                    "description": "Solo si origenDividendo='extranjero': porcentaje retenido en el país que paga el dividendo (ejemplo: 15 en EE. UU. con el formulario W-8BEN presentado). Sin este dato no se calcula ni el cobro real ni la deducción por doble imposición."
+                  },
+                  "tipoMaximoCDIOrigen": {
+                    "type": "number",
+                    "description": "Solo si origenDividendo='extranjero': porcentaje máximo que el convenio de doble imposición permite retener en origen (ejemplo: 15). Lo retenido por encima de ese tope no se deduce en el IRPF español: solo se recupera reclamándolo al país de la fuente."
                   }
                 }
               }
@@ -412,7 +425,7 @@
         },
         "responses": {
           "200": {
-            "description": "Retención practicada, cuota IRPF real, tipo efectivo y resultado exención IS si aplica."
+            "description": "Retención practicada, cuota IRPF real, tipo efectivo y resultado exención IS si aplica. El campo datosNoAportados lista lo que faltaba: si no está vacío, el resultado es un escenario, no una conclusión, y hay que decirlo al usuario."
           }
         }
       }

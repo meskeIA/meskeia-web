@@ -14,19 +14,18 @@ import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  calcularReduccionRendimientosTrabajo,
   FISCAL_IRPF_META,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
-// Tramos base del ahorro 2025
-const TRAMOS_AHORRO_2025 = [
-  { hasta: 6000,    tipo: 19 },
-  { hasta: 50000,   tipo: 21 },
-  { hasta: 200000,  tipo: 23 },
-  { hasta: 300000,  tipo: 27 },
-  { hasta: Infinity, tipo: 30 },
-];
+// Tramos de la base del ahorro. Esta copia SÍ tenía el 30 % correcto, a diferencia de las
+// otras nueve del catálogo —que se quedaron en el 28 % de 2024 y se drenaron el 09/09/2026—,
+// pero se importa igualmente: una copia que hoy coincide es una copia que mañana diverge, y
+// es exactamente así como las otras nueve llegaron a divergir sin que nadie lo viera.
+const TRAMOS_AHORRO_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
 
 export type SituacionFamiliarIRPF = 'soltero' | 'casado_sin_ingresos' | 'casado_con_ingresos';
 
@@ -123,10 +122,7 @@ function calcularCuotaTramos(
 }
 
 function calcularReduccionRNT(rnt: number): number {
-  const red = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= red.limite1) return red.reduccion1;
-  if (rnt >= red.limite2) return red.reduccion2;
-  return red.reduccion1 - red.factorInterpolacion * (rnt - red.limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 function calcularMinimo(situacion: SituacionFamiliarIRPF, numHijos: number, hijosMenores3: number): number {
@@ -169,14 +165,33 @@ export function calcularIRPF(p: ParametrosIRPF): ResultadoIRPF {
   // Mínimo personal y familiar
   const minimoPersonalFamiliar = calcularMinimo(situacion, numHijos, hijosMenores3);
 
-  // Base liquidable general (reduce mínimo sobre base general)
-  const baseLiquidableGeneral = r(Math.max(0, baseImponibleGeneral - minimoPersonalFamiliar));
+  // Base liquidable general.
+  //
+  // ⚠️ CORREGIDO EL 09/09/2026. Hasta hoy esta línea era
+  //     baseLiquidableGeneral = baseImponibleGeneral − minimoPersonalFamiliar
+  // es decir, restaba el mínimo de la BASE. Eso lo valora al tipo MARGINAL del
+  // contribuyente, y el art. 63.1.2º LIRPF establece justo lo contrario: la escala se
+  // aplica a la base liquidable completa y la cuota resultante «se minorará en el importe
+  // derivado de aplicar a la parte de la base liquidable general correspondiente al mínimo
+  // personal y familiar esta misma escala» (AEAT, Manual práctico Renta 2025, «Gravamen
+  // estatal»). El mínimo se valora así a los tipos de los PRIMEROS tramos, no al marginal.
+  //
+  // El método antiguo subestimaba la cuota, y cuanto más alta la renta más: con 50.000 € de
+  // base y 5.550 € de mínimo daba 12.148,00 € donde corresponden 13.147,00 € — casi 1.000 €
+  // menos. Lo destapó que dos tools del mismo MCP discreparan 255 €/año en el mismo caso.
+  const baseLiquidableGeneral = baseImponibleGeneral;
 
-  // Cuota íntegra general
-  const { cuota: cuotaGeneral, desglose: desgloseGeneral } = calcularCuotaTramos(
+  // Cuota íntegra general = escala(base liquidable) − escala(mínimo personal y familiar).
+  // El mínimo se acota a la base: no puede minorar más de lo que hay que gravar.
+  const { cuota: cuotaGeneralBruta, desglose: desgloseGeneral } = calcularCuotaTramos(
     baseLiquidableGeneral,
     TRAMOS_IRPF_2025,
   );
+  const { cuota: cuotaDelMinimo } = calcularCuotaTramos(
+    Math.min(minimoPersonalFamiliar, baseLiquidableGeneral),
+    TRAMOS_IRPF_2025,
+  );
+  const cuotaGeneral = Math.max(0, cuotaGeneralBruta - cuotaDelMinimo);
 
   // Cuota íntegra ahorro
   const { cuota: cuotaAhorro, desglose: desgloseAhorro } = calcularCuotaTramos(

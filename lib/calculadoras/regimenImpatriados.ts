@@ -47,6 +47,8 @@
  * Encadenable con: calcular_irpf, calcular_sueldo_neto, calcular_irnr
  */
 
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+
 // --- Constantes ---
 
 const LIMITE_TIPO_REDUCIDO = 600_000;   // EUR - hasta aqui al 24%
@@ -55,13 +57,13 @@ const TIPO_EXCESO = 47;                 // % sobre el exceso de 600.000 EUR
 const DURACION_REGIMEN_ANOS = 6;        // anos de aplicacion del regimen
 
 // Escala del ahorro 2025 (misma que IRPF general)
-const TRAMOS_AHORRO: { hasta: number; tipo: number }[] = [
-  { hasta: 6_000,   tipo: 19 },
-  { hasta: 50_000,  tipo: 21 },
-  { hasta: 200_000, tipo: 23 },
-  { hasta: 300_000, tipo: 27 },
-  { hasta: Infinity, tipo: 28 },
-];
+// ⚠️ 09/09/2026: esta escala ERA una copia local con el último tramo al 28 %, el valor de
+// 2024. La Ley 7/2024 lo elevó al 30 % con efectos 1/1/2025, y `data/fiscal/irpf.ts` ya deja
+// escrita la instrucción: «La escala de la BASE DEL AHORRO está centralizada en
+// data/fiscal/inmuebles.ts como TRAMOS_GANANCIAS_PATRIMONIALES_2025. Importar desde allí; no
+// duplicar aquí.» La copia estaba en NUEVE motores a la vez, mientras app/api/datos/[slug]
+// publicaba la canónica al 30 %: dos endpoints públicos servían cifras contradictorias.
+const TRAMOS_AHORRO = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
 
 // --- Tipos publicos ---
 

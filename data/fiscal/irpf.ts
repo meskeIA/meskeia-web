@@ -24,7 +24,10 @@
 
 export const FISCAL_IRPF_META = {
   fuente: 'Ley 35/2006 del IRPF (texto consolidado, arts. 57 a 66)',
-  verificado: '2026-08-12',
+  // 2026-09-09: reducción del art. 20 corregida contra el Manual práctico de Renta 2025
+  // de la AEAT. La revisión del 2026-08-12 la dio por buena y llevaba la redacción
+  // anterior al RDL 4/2024, con una reducción residual de 2.364 € que no existe.
+  verificado: '2026-09-09',
   vigencia: '2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
   nota: 'Tramos estatales + tipo autonómico medio. Cada CCAA puede tener variaciones. Verificar en la Agencia Tributaria para cálculo exacto.',
@@ -126,21 +129,66 @@ export const GASTOS_DEDUCIBLES_TRABAJO_2025 = {
 };
 
 /**
- * Reducción por rendimientos netos del trabajo (RNT) 2025
- * Se aplica sobre el Rendimiento Neto del Trabajo (ingresos - gastos deducibles).
- * Ley 35/2006 IRPF art. 20 (según LPGE 2025)
+ * Reducción por obtención de rendimientos del trabajo (art. 20 LIRPF), ejercicio 2025.
+ * Se aplica sobre el Rendimiento Neto del Trabajo (ingresos íntegros − gastos del art. 19).
  *
- * - RNT ≤ 13.115 €: reducción de 6.498 €
- * - 13.115 < RNT < 16.825 €: 6.498 - 1,14 × (RNT - 13.115)
- * - RNT ≥ 16.825 €: reducción de 2.364 €
+ * ⚠️ CORREGIDA EL 09/09/2026 contra el Manual práctico de Renta 2025 de la AEAT
+ * («Fase 3ª: Determinación del rendimiento neto reducido»). Hasta esa fecha este módulo
+ * llevaba la redacción ANTERIOR al RDL 4/2024 —6.498 / 13.115 / 16.825 con factor 1,14—
+ * y, sobre todo, declaraba una **reducción residual permanente de 2.364 € para todo RNT
+ * ≥ 16.825 €**. Esa reducción residual NO EXISTE: la reducción se agota en 19.747,5 € y
+ * a partir de ahí vale CERO. El efecto era que 9 apps y 5 motores rebajaban la base
+ * imponible de todos los sueldos medios y altos en 2.364 € que no corresponden, y
+ * publicaban cuotas inferiores a las reales (≈700 € menos en un sueldo de 30.000 €).
+ *
+ * La escala vigente tiene DOS tramos decrecientes, no uno:
+ *
+ * - RNT ≤ 14.852 €                    → 7.302 €
+ * - 14.852 < RNT ≤ 17.673,52 €        → 7.302 − 1,75 × (RNT − 14.852)
+ * - 17.673,52 < RNT < 19.747,5 €      → 2.364,34 − 1,14 × (RNT − 17.673,52)
+ * - RNT ≥ 19.747,5 €                  → 0 €
+ *
+ * Los dos tramos empalman: en 17.673,52 el primero da exactamente 2.364,34, y en
+ * 19.747,5 el segundo da exactamente 0.
+ *
+ * ⚠️ La reducción exige además NO tener rentas distintas de las del trabajo superiores a
+ * 6.500 € (excluidas las exentas). Esa condición no la modela este módulo: quien la
+ * necesite debe comprobarla antes de llamar a `calcularReduccionRendimientosTrabajo`.
+ *
+ * Fuente: AEAT, Manual práctico Renta 2025, capítulo 3 — art. 20 Ley 35/2006 en la
+ * redacción dada por el RDL 4/2024.
  */
 export const REDUCCION_RENDIMIENTOS_TRABAJO_2025 = {
-  limite1:               13115,   // RNT hasta aquí: reducción máxima
-  reduccion1:             6498,   // €/año de reducción
-  limite2:               16825,   // RNT a partir de aquí: reducción mínima
-  reduccion2:             2364,   // €/año de reducción
-  factorInterpolacion:    1.14,   // Factor interpolación entre límite1 y límite2
+  limite1:                14852,     // RNT hasta aquí: reducción máxima
+  reduccion1:              7302,     // €/año de reducción máxima
+  limiteIntermedio:    17673.52,     // Frontera entre los dos tramos decrecientes
+  reduccionIntermedia:  2364.34,     // Reducción exacta en esa frontera
+  limite2:              19747.5,     // RNT a partir de aquí: SIN reducción (0 €)
+  reduccion2:                 0,     // €/año por encima de limite2 — NO hay residual
+  factorTramo1:            1.75,     // Pendiente entre limite1 y limiteIntermedio
+  factorTramo2:            1.14,     // Pendiente entre limiteIntermedio y limite2
 };
+
+/**
+ * Fuente ÚNICA de la reducción del art. 20. Devuelve la reducción que corresponde a un
+ * rendimiento neto del trabajo.
+ *
+ * Existe para que la fórmula no se reescriba en cada motor y cada app: hasta el 09/09/2026
+ * estaba copiada a mano en 14 sitios, y así fue como tres de ellos acabaron con tres
+ * versiones distintas de la misma norma (`irpfSegundoPagador` con 5.565/0,
+ * `devolucionIRPF` y `dividendoEmpresarial` con 7.302/14.047,5, y este módulo con la
+ * redacción vieja). **No reimplementar: importar.**
+ */
+export function calcularReduccionRendimientosTrabajo(rendimientoNetoTrabajo: number): number {
+  const r = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
+  if (!Number.isFinite(rendimientoNetoTrabajo) || rendimientoNetoTrabajo <= 0) return 0;
+  if (rendimientoNetoTrabajo <= r.limite1) return r.reduccion1;
+  if (rendimientoNetoTrabajo >= r.limite2) return 0;
+  const bruta = rendimientoNetoTrabajo <= r.limiteIntermedio
+    ? r.reduccion1 - r.factorTramo1 * (rendimientoNetoTrabajo - r.limite1)
+    : r.reduccionIntermedia - r.factorTramo2 * (rendimientoNetoTrabajo - r.limiteIntermedio);
+  return Math.max(0, Math.round(bruta * 100) / 100);
+}
 
 // ─── Deducción por rendimientos del trabajo para rentas bajas (art. 80 bis) ──
 
@@ -209,15 +257,7 @@ export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
  * Orientativo: no incluye mínimo personal ni otras circunstancias.
  */
 export function tipoMarginalDesdeRNT(rnt: number): number {
-  const rd = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  let reduccion: number;
-  if (rnt <= rd.limite1) {
-    reduccion = rd.reduccion1;
-  } else if (rnt < rd.limite2) {
-    reduccion = rd.reduccion1 - rd.factorInterpolacion * (rnt - rd.limite1);
-  } else {
-    reduccion = rd.reduccion2;
-  }
+  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
   const baseImponible = Math.max(0, rnt - reduccion);
   for (const tramo of TRAMOS_IRPF_2025) {
     if (baseImponible <= tramo.hasta) return tramo.tipo;

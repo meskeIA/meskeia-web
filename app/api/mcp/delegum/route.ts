@@ -98,7 +98,10 @@ import {
 } from '@/lib/calculadoras/pensionIncapacidad';
 // ── Grupo C: herencia civil, deducciones familiares, dependencia, divorcio, módulos ──
 import { calcularLegitimas, type RegimenId } from '@/lib/calculadoras/legitimas';
-import { calcularDeduccionMaternidadIRPF } from '@/lib/calculadoras/deduccionMaternidadIRPF';
+import {
+  calcularDeduccionMaternidadIRPF,
+  type SituacionMaternidad,
+} from '@/lib/calculadoras/deduccionMaternidadIRPF';
 import { calcularPrestacionesDependencia } from '@/lib/calculadoras/prestacionesDependencia';
 import {
   calcularDeduccionDiscapacidadIRPF,
@@ -2265,7 +2268,9 @@ function crearServidorDelegum(): McpServer {
                   `💰 **Cuota orientativa** (escala ${r.escalaUsada}):`,
                   `  • Cuota bruta: ${fmt(r.cuotaBruta)} €`,
                   r.porcentajeBonificacion > 0
-                    ? `  • Bonificación ${r.nombreCCAA} (${r.porcentajeBonificacion}%): −${fmt(r.cuotaBruta * r.porcentajeBonificacion / 100)} €`
+                    // La bonificación la publica el motor calculada sobre la cuota bruta ya
+                    // redondeada: recalcularla aquí volvía a descuadrar la resta por 1 céntimo.
+                    ? `  • Bonificación ${r.nombreCCAA} (${r.porcentajeBonificacion}%): −${fmt(r.bonificacionAplicada ?? 0)} €`
                     : '',
                   `  • **Cuota neta orientativa: ${fmt(r.cuotaNeta ?? 0)} €**`,
                 ].filter(l => l !== '').join('\n')
@@ -2702,15 +2707,18 @@ function crearServidorDelegum(): McpServer {
     'Calcula la herencia forzosa (legítima) que corresponde por ley a los descendientes según el régimen civil ' +
     'aplicable en España (Derecho Común, Cataluña, Aragón, Galicia, Baleares, País Vasco o Navarra). Devuelve la ' +
     'legítima total, la parte por hijo, el tercio de mejora, la parte de libre disposición y el derecho del cónyuge ' +
-    'viudo. No calcula el Impuesto de Sucesiones (para eso usa "calcular_sucesiones").',
+    'viudo. Si no hay descendientes, en Derecho Común calcula la legítima de los ascendientes (CC art. 809) ' +
+    'siempre que se indique "tienen_ascendientes". No calcula el Impuesto de Sucesiones (para eso usa ' +
+    '"calcular_sucesiones").',
     {
       patrimonio_neto: z.number().nonnegative().describe('Patrimonio neto hereditario (caudal relicto) en euros'),
       regimen: z.enum(['comun', 'cataluna', 'aragon', 'galicia', 'baleares', 'pais-vasco', 'navarra']).describe('Régimen civil aplicable. "comun" = Código Civil (mayoría de CCAA); el resto son derechos forales.'),
       num_hijos: z.number().int().min(0).max(20).describe('Número de hijos o descendientes'),
       tiene_conyuge: z.boolean().optional().describe('¿Hay cónyuge viudo con derecho a usufructo/cuota vidual? Por defecto false.'),
+      tienen_ascendientes: z.boolean().optional().describe('¿Viven los padres u otros ascendientes del causante? SOLO se usa cuando num_hijos es 0: sin descendientes la legítima pasa a los ascendientes (CC art. 809) y sin ellos no hay legítima. Con num_hijos 0 y régimen "comun" es OBLIGATORIO indicarlo; con hijos se ignora, porque los descendientes excluyen a los ascendientes (CC art. 807).'),
     },
     { title: 'Calcula la legítima (herencia forzosa) por régimen civil', readOnlyHint: true },
-    async ({ patrimonio_neto, regimen, num_hijos, tiene_conyuge }, extra) => {
+    async ({ patrimonio_neto, regimen, num_hijos, tiene_conyuge, tienen_ascendientes }, extra) => {
       await registrarUsoDelegum('calcular_legitimas', getCaller(extra));
       try {
         const r = calcularLegitimas({
@@ -2718,6 +2726,7 @@ function crearServidorDelegum(): McpServer {
           regimen: regimen as RegimenId,
           numHijos: num_hijos,
           tieneConyuge: tiene_conyuge,
+          tieneAscendientes: tienen_ascendientes,
         });
         const lineas = [
           `⚖️ **Legítima — ${r.nombreRegimen}**`,
@@ -2727,7 +2736,9 @@ function crearServidorDelegum(): McpServer {
           `💰 Patrimonio: ${fmt(r.patrimonioNeto)} €`,
           r.esNavarra
             ? '📝 En Navarra la legítima es **formal** (no hay reserva de cuota material): puede disponerse del 100% del patrimonio.'
-            : `🔒 **Legítima total de los descendientes: ${fmt(r.legitimaTotal)} €** — ${r.fraccionLegitima}`,
+            : r.legitimarios === 'ninguno'
+              ? `🔓 **Sin legítima: no hay herederos forzosos** — ${r.fraccionLegitima}`
+              : `🔒 **Legítima total de los ${r.legitimarios}: ${fmt(r.legitimaTotal)} €** — ${r.fraccionLegitima}`,
           r.legitimaPorHijo !== null
             ? `  • Por hijo: ${fmt(r.legitimaPorHijo)} €`
             : (r.esLegitivaColectiva ? '  • Legítima colectiva (Aragón): reparto libre entre los descendientes' : ''),
@@ -2746,21 +2757,26 @@ function crearServidorDelegum(): McpServer {
   // ── calcular_deduccion_maternidad_irpf ───────────────────────────────────
   servidor.tool(
     'calcular_deduccion_maternidad_irpf',
-    'Calcula la deducción por maternidad en el IRPF (art. 81 LIRPF): 1.200 €/año por hijo menor de 3 años para ' +
-    'madres que trabajen por cuenta propia o ajena, más el incremento por gastos de guardería (hasta 1.000 €/año). ' +
-    'Aplica el límite por cotizaciones a la Seguridad Social y descuenta el abono anticipado ya cobrado.',
+    'Calcula la deducción por maternidad en el IRPF (art. 81 LIRPF): 1.200 €/año por hijo menor de 3 años, más el ' +
+    'incremento por gastos de guardería (hasta 1.000 €/año POR CADA HIJO). Da derecho cualquiera de las TRES vías ' +
+    'alternativas del art. 81.1: estar de alta en la Seguridad Social o mutualidad, percibir prestación o subsidio ' +
+    'de desempleo al nacer el menor, o darse de alta después del nacimiento y alcanzar 30 días cotizados (esta ' +
+    'última suma 150 € por hijo, art. 81.3). La reforma de 2023 (Ley 31/2022) amplió esas vías, no las suprimió: ' +
+    'sin ninguna de ellas la deducción es 0 €. Aplica el límite por cotizaciones a la Seguridad Social y descuenta ' +
+    'el abono anticipado ya cobrado.',
     {
       hijos: z.array(z.object({
         edad_meses_inicio_ejercicio: z.number().int().min(0).describe('Edad del hijo en MESES al inicio del ejercicio. 36 o más = sin derecho (se descarta).'),
         meses_con_derecho: z.number().int().min(0).max(12).describe('Meses del año con derecho a la deducción (1-12)'),
-        gastos_guarderia_anuales: z.number().nonnegative().optional().describe('Gastos anuales de guardería o centro autorizado de este hijo (€). Por defecto 0.'),
+        gastos_guarderia_anuales: z.number().nonnegative().optional().describe('Gastos anuales de guardería o centro autorizado de este hijo (€). Por defecto 0. El tope de 1.000 € se aplica a cada hijo por separado.'),
       })).min(1).describe('Lista de hijos menores de 3 años'),
       cotizaciones_ss_anuales: z.number().nonnegative().describe('Suma de las cotizaciones de la madre a la Seguridad Social en el año (€) — límite de la deducción base'),
-      madre_en_activo: z.boolean().optional().describe('¿La madre está de alta como trabajadora o cobrando prestación contributiva? Por defecto true.'),
+      situacion: z.enum(['alta', 'desempleo', 'alta-posterior', 'ninguna']).optional().describe('Vía del art. 81.1 por la que se accede: "alta" (de alta en SS o mutualidad), "desempleo" (prestación o subsidio de desempleo al nacer el menor), "alta-posterior" (alta tras el nacimiento con 30 días cotizados; suma 150 €/hijo) o "ninguna" (ninguna de las tres → deducción 0 €). Por defecto "alta".'),
+      madre_en_activo: z.boolean().optional().describe('OBSOLETO: usar "situacion". Solo se lee si no se indica "situacion": false equivale a "ninguna" y true a "alta".'),
       importe_abono_anticipado_cobrado: z.number().nonnegative().optional().describe('Importe ya cobrado por abono anticipado (modelo 140) en €. Por defecto 0.'),
     },
     { title: 'Calcula la deducción por maternidad en el IRPF', readOnlyHint: true },
-    async ({ hijos, cotizaciones_ss_anuales, madre_en_activo, importe_abono_anticipado_cobrado }, extra) => {
+    async ({ hijos, cotizaciones_ss_anuales, situacion, madre_en_activo, importe_abono_anticipado_cobrado }, extra) => {
       await registrarUsoDelegum('calcular_deduccion_maternidad_irpf', getCaller(extra));
       try {
         const r = calcularDeduccionMaternidadIRPF({
@@ -2770,14 +2786,17 @@ function crearServidorDelegum(): McpServer {
             gastosGuarderiaAnuales: h.gastos_guarderia_anuales,
           })),
           cotizacionesSSTotalesAnio: cotizaciones_ss_anuales,
+          situacion: situacion as SituacionMaternidad | undefined,
           madreEnActivoOPrestacion: madre_en_activo,
           importeAbonoAnticipadoCobrado: importe_abono_anticipado_cobrado,
         });
         const lineas = [
           `👶 **Deducción por maternidad (IRPF)**`,
           `👧 Hijos con derecho (menores de 3 años): ${r.numHijosConDerecho}`,
+          r.tieneDerecho ? '' : `🚫 Sin derecho: no se cumple ninguna de las tres vías del art. 81.1 LIRPF.`,
           '',
           `💶 Deducción por maternidad: ${fmt(r.deduccionMaternidadEfectiva)} €`,
+          r.totalIncrementoAltaPosterior > 0 ? `➕ Incremento por alta posterior (art. 81.3): ${fmt(r.totalIncrementoAltaPosterior)} € (incluido en la línea anterior)` : '',
           r.incrementoGuarderiaEfectivo > 0 ? `➕ Incremento por gastos de guardería: ${fmt(r.incrementoGuarderiaEfectivo)} €` : '',
           `💰 **Total deducción: ${fmt(r.totalDeduccionEfectiva)} €**`,
           r.abonoAnticipadoCobrado > 0
@@ -2832,13 +2851,15 @@ function crearServidorDelegum(): McpServer {
   servidor.tool(
     'calcular_deduccion_discapacidad',
     'Calcula el mínimo por discapacidad en el IRPF (Ley 35/2006, arts. 60-65) del contribuyente o de un ascendiente/' +
-    'descendiente a cargo: 3.000 € (grado 33%-64%) o 9.000 € (≥65%), más 3.000 € adicionales por gastos de asistencia ' +
-    'si se acredita ayuda de terceros o movilidad reducida. Estima el ahorro aplicando el tipo marginal. El mínimo ' +
-    'reduce la base liquidable, no la cuota directamente.',
+    'descendiente a cargo: 3.000 € (grado 33%-64%) o 9.000 € (≥65%), más 3.000 € adicionales por gastos de asistencia. ' +
+    'Ese incremento procede ante CUALQUIERA de tres supuestos ALTERNATIVOS (basta uno): acreditar ayuda de terceras ' +
+    'personas, acreditar movilidad reducida, o tener un grado igual o superior al 65% —con grado ≥65% se aplica ' +
+    'siempre, sin acreditar nada más—. Estima el ahorro aplicando el tipo marginal. El mínimo reduce la base ' +
+    'liquidable, no la cuota directamente.',
     {
       titular: z.enum(['contribuyente', 'ascendiente', 'descendiente']).optional().describe('Quién tiene la discapacidad. Por defecto "contribuyente".'),
       grado: z.enum(['33a65', '65oMas']).optional().describe('Grado de discapacidad: "33a65" (entre 33% y 64%) o "65oMas" (65% o más). Por defecto "33a65".'),
-      necesita_asistencia: z.boolean().optional().describe('¿Acredita necesidad de ayuda de terceros o movilidad reducida? (añade 3.000 €). Por defecto false.'),
+      necesita_asistencia: z.boolean().optional().describe('¿Acredita necesidad de ayuda de terceras personas o movilidad reducida? (añade 3.000 €). Por defecto false. Irrelevante con grado "65oMas": ahí los 3.000 € se aplican por el propio grado aunque este parámetro sea false.'),
       tipo_marginal: z.number().min(0).max(100).optional().describe('Tipo marginal de IRPF para estimar el ahorro (%). Valores habituales: 19, 24, 30, 37, 45, 47. Por defecto 24.'),
     },
     { title: 'Calcula el mínimo por discapacidad en el IRPF', readOnlyHint: true },
@@ -2880,20 +2901,20 @@ function crearServidorDelegum(): McpServer {
       regimen: z.enum(['gananciales', 'separacion', 'participacion']).describe('Régimen económico matrimonial'),
       ingresos_brutos_anuales: z.number().nonnegative().describe('Ingresos brutos anuales del trabajo (€)'),
       tiene_hijos: z.boolean().optional().describe('¿Hay hijos a cargo? Por defecto false.'),
-      num_hijos: z.number().int().min(1).max(4).optional().describe('Número de hijos (1-4; 4 = "4 o más"). Solo si tiene_hijos.'),
+      num_hijos: z.number().int().min(1).max(4).optional().describe('Número de hijos (1-4; 4 = "4 o más"). OBLIGATORIO si tiene_hijos y custodia: sin él no se puede calcular el mínimo por descendientes y la llamada se rechaza.'),
       custodia: z.enum(['exclusiva-tengo', 'exclusiva-otro', 'compartida']).optional().describe('Tipo de custodia: "exclusiva-tengo" (100% del mínimo), "compartida" (50%), "exclusiva-otro" (0%).'),
       tiene_vivienda: z.boolean().optional().describe('¿Hay vivienda familiar en propiedad? Por defecto false.'),
       posicion_vivienda: z.enum(['me-quedo', 'salgo', 'vendemos']).optional().describe('Qué pasa con la vivienda. Solo "salgo" genera imputación de renta inmobiliaria.'),
-      valor_catastral: z.number().nonnegative().optional().describe('Valor catastral de la vivienda (€). Solo relevante si sales de ella.'),
+      valor_catastral: z.number().nonnegative().optional().describe('Valor catastral de la vivienda (€). OBLIGATORIO si posicion_vivienda = "salgo" y vivienda_asignada_hijos no es true: sin él no hay imputación que calcular y la llamada se rechaza.'),
       porcentaje_propiedad: z.number().min(0).max(100).optional().describe('Tu porcentaje de propiedad de la vivienda (%). Por defecto 50.'),
       catastro_revisado: z.boolean().optional().describe('¿El valor catastral se ha revisado en los últimos 10 años? true → tipo 1,1%; false → 2%. Por defecto false.'),
       vivienda_asignada_hijos: z.boolean().optional().describe('¿El uso de la vivienda se asigna a los hijos? (exime la imputación de renta). Por defecto false.'),
       tiene_pension_conyuge: z.boolean().optional().describe('¿Hay pensión compensatoria al ex cónyuge? Por defecto false.'),
       rol_pension: z.enum(['pago', 'cobro']).optional().describe('"pago" (la pagas, reduce tu base) o "cobro" (la recibes, tributa como renta).'),
-      pension_mensual: z.number().nonnegative().optional().describe('Importe mensual de la pensión compensatoria (€)'),
+      pension_mensual: z.number().nonnegative().optional().describe('Importe mensual de la pensión compensatoria (€). OBLIGATORIO (y mayor que 0) si tiene_pension_conyuge y rol_pension.'),
       tiene_hipoteca_antigua: z.boolean().optional().describe('¿Hipoteca sobre la vivienda habitual anterior a 2013? (deducción transitoria). Por defecto false.'),
-      posicion_hipoteca: z.enum(['me-quedo', 'otro-paga']).optional().describe('"me-quedo" (sigues pagándola y deduces) u "otro-paga".'),
-      cuota_hipoteca_anual: z.number().nonnegative().optional().describe('Cuota anual de la hipoteca que pagas tú (€)'),
+      posicion_hipoteca: z.enum(['me-quedo', 'otro-paga']).optional().describe('"me-quedo" (sigues pagándola y deduces) u "otro-paga". OBLIGATORIO si tiene_hipoteca_antigua: sin él no se dice nada sobre la deducción, porque afirmar que se pierde sería inventarlo.'),
+      cuota_hipoteca_anual: z.number().nonnegative().optional().describe('Cuota anual de la hipoteca que pagas tú (€). OBLIGATORIA (y mayor que 0) si posicion_hipoteca = "me-quedo".'),
     },
     { title: 'Estima el impacto en el IRPF de un divorcio', readOnlyHint: true },
     async (a, extra) => {

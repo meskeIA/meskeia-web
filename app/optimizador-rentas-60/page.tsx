@@ -12,6 +12,7 @@ import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularReduccionRendimientosTrabajo,
 } from '@/data/fiscal/irpf';
 import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal/inmuebles';
 import { FISCAL_IRPF_META } from '@/data/fiscal';
@@ -36,10 +37,7 @@ function calcularCuota(base: number, tramos: { hasta: number; tipo: number }[]):
 }
 
 function calcularReduccionRRT(rnt: number): number {
-  const r = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (rnt <= r.limite1) return r.reduccion1;
-  if (rnt >= r.limite2) return r.reduccion2;
-  return r.reduccion1 - r.factorInterpolacion * (rnt - r.limite1);
+  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 function getMinimoPersonal(edad: number): number {

@@ -11,12 +11,12 @@
  *   de declarar se activa cuando la suma de los importes percibidos del segundo
  *   y restantes pagadores supera 1.500 €/año.
  *
- *   Si supera 1.500 €: el límite de obligación de declarar baja de 22.000 € a 15.000 €
+ *   Si supera 1.500 €: el límite de obligación de declarar baja de 22.000 € a 15.876 €
  *   Si no supera 1.500 €: el límite sigue siendo 22.000 €
  *
  * Límites para 2025 (LIRPF art. 96.2-3):
  *   - Un pagador: obligación si rendimientos trabajo > 22.000 €
- *   - Dos o más pagadores y 2º pagador > 1.500 €: obligación si > 15.000 €
+ *   - Dos o más pagadores y 2º pagador > 1.500 €: obligación si > 15.876 €
  *   - Dos o más pagadores y 2º pagador ≤ 1.500 €: obligación si > 22.000 €
  *
  * Problema habitual: cuando hay dos trabajos simultáneos o sucesivos, cada
@@ -25,31 +25,40 @@
  * la renta (resultado "a pagar" inesperado).
  *
  * Fuente: LIRPF art. 96 + RIRPF art. 88 — vigente 2025
- * Verificado: 2025-01-15
+ * Verificado: 2026-09-09 (constantes importadas de data/fiscal, no copiadas)
  *
  * Encadenable con: calcular_irpf, calcular_sueldo_neto, calcular_devolucion_irpf
  */
 
-// ─── Constantes 2025 ────────────────────────────────────────────────────────────
+// ─── Constantes: TODAS importadas de data/fiscal ────────────────────────────────
+//
+// ⚠️ REPARADO EL 09/09/2026. Hasta esa fecha este fichero llevaba sus propias copias, y
+// dos de ellas habían envejecido: el umbral de varios pagadores estaba en 15.000 € (el
+// valor anterior a la subida del SMI; data/fiscal dice 15.876 desde 2024) y la reducción
+// del art. 20 en 5.565 € con los límites 13.115/16.825 comparados contra los BRUTOS en
+// vez de contra el rendimiento neto.
+//
+// Medido antes de reparar, frente a la cadena canónica: el motor cobraba de más entre
+// 15.000 y 21.000 € de brutos —hasta +1.338 € a 17.000 €—, o sea justo a quien menos
+// gana. Por encima de ~21.700 € acertaba, porque su reducción mínima de 0 € coincide
+// con lo que la norma dice a partir de 19.747,5 € de RNT.
+//
+// La escala (TRAMOS_IRPF_2025) sí coincidía tramo a tramo con el original, pero se
+// importa igualmente: una copia que hoy coincide es una copia que mañana diverge.
 
-const LIMITE_SEGUNDO_PAGADOR = 1500;             // €/año — umbral que activa el segundo pagador
-const LIMITE_OBLIGACION_UN_PAGADOR = 22000;      // €/año — límite con un solo pagador
-const LIMITE_OBLIGACION_SEGUNDO_PAGADOR = 15000; // €/año — límite con segundo pagador > 1.500 €
+import {
+  TRAMOS_IRPF_2025,
+  MINIMOS_IRPF_2025,
+  GASTOS_DEDUCIBLES_TRABAJO_2025,
+  OBLIGACION_DECLARAR_2025,
+  calcularReduccionRendimientosTrabajo,
+} from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
 
-// Escala IRPF 2025 (estatal + autonómica orientativa)
-const TRAMOS_IRPF_2025: Array<{ hasta: number; tipo: number }> = [
-  { hasta: 12450, tipo: 19 },
-  { hasta: 20200, tipo: 24 },
-  { hasta: 35200, tipo: 30 },
-  { hasta: 60000, tipo: 37 },
-  { hasta: 300000, tipo: 45 },
-  { hasta: Infinity, tipo: 47 },
-];
-
-// Reducción por rendimientos del trabajo (orientativa, art. 20 LIRPF)
-const REDUCCION_TRABAJO_MAX = 5565;   // € (rendimientos ≤ 13.115 €)
-const REDUCCION_TRABAJO_MIN = 0;
-const GASTOS_DEDUCIBLES_TRABAJO = 2000; // € (art. 19.2 LIRPF)
+const LIMITE_SEGUNDO_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador;
+const LIMITE_OBLIGACION_UN_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.unPagador;
+const LIMITE_OBLIGACION_SEGUNDO_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.variosPagadores;
+const GASTOS_DEDUCIBLES_TRABAJO = GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -109,32 +118,35 @@ export interface ResultadoIRPFSegundoPagador {
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function estimarCuotaIRPF(rendimientosBrutos: number): number {
-  // Reducción por rendimientos del trabajo (orientativa)
-  let reduccionTrabajo: number;
-  if (rendimientosBrutos <= 13115) {
-    reduccionTrabajo = REDUCCION_TRABAJO_MAX;
-  } else if (rendimientosBrutos <= 16825) {
-    reduccionTrabajo = Math.max(REDUCCION_TRABAJO_MIN, REDUCCION_TRABAJO_MAX - 1.14286 * (rendimientosBrutos - 13115));
-  } else {
-    reduccionTrabajo = REDUCCION_TRABAJO_MIN;
-  }
+  // Art. 19.2.f: los gastos deducibles se restan ANTES de la reducción del art. 20, y la
+  // reducción se calcula sobre el rendimiento NETO, no sobre los brutos. Compararla contra
+  // los brutos desplazaba los umbrales 2.000 € y era la mitad del defecto de este motor.
+  const rendimientoNetoTrabajo = Math.max(0, rendimientosBrutos - GASTOS_DEDUCIBLES_TRABAJO);
+  const reduccionTrabajo = calcularReduccionRendimientosTrabajo(rendimientoNetoTrabajo);
 
-  const rendimientoNeto = Math.max(0, rendimientosBrutos - GASTOS_DEDUCIBLES_TRABAJO - reduccionTrabajo);
+  const rendimientoNeto = Math.max(0, rendimientoNetoTrabajo - reduccionTrabajo);
 
   // Mínimo personal (soltero orientativo)
-  const minimoPersonal = 5550;
-  const baseLiquidable = Math.max(0, rendimientoNeto - minimoPersonal);
+  const minimoPersonal = MINIMOS_IRPF_2025.personal;
 
-  // Aplicar escala IRPF
-  let cuota = 0;
-  let baseAnterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (baseLiquidable <= baseAnterior) break;
-    const base = Math.min(baseLiquidable, tramo.hasta === Infinity ? baseLiquidable : tramo.hasta);
-    cuota += (base - baseAnterior) * tramo.tipo / 100;
-    baseAnterior = tramo.hasta === Infinity ? baseLiquidable : tramo.hasta;
-    if (baseLiquidable <= tramo.hasta) break;
-  }
+  // ⚠️ 09/09/2026: el mínimo personal y familiar NO se resta de la base. El art. 63.1.2º
+  // LIRPF manda aplicar la escala a la base liquidable completa y minorar la cuota «en el
+  // importe derivado de aplicar a la parte de la base liquidable general correspondiente al
+  // mínimo personal y familiar esta misma escala» (AEAT, Manual Renta 2025). Restarlo de la
+  // base lo valora al tipo MARGINAL y subestima la cuota — hasta 1.443 € en rentas altas.
+  // `devolucionIRPF.ts` y `dividendoEmpresarial.ts` ya lo hacían así; estos motores no.
+  const escala = (base: number): number => {
+    let cuota = 0;
+    let baseAnterior = 0;
+    for (const tramo of TRAMOS_IRPF_2025) {
+      if (base <= baseAnterior) break;
+      cuota += (Math.min(base, tramo.hasta) - baseAnterior) * tramo.tipo / 100;
+      baseAnterior = tramo.hasta;
+    }
+    return cuota;
+  };
+
+  const cuota = Math.max(0, escala(rendimientoNeto) - escala(Math.min(minimoPersonal, rendimientoNeto)));
   return Math.round(cuota * 100) / 100;
 }
 
@@ -143,6 +155,17 @@ function estimarCuotaIRPF(rendimientosBrutos: number): number {
 export function calcularIRPFSegundoPagador(p: ParametrosIRPFSegundoPagador): ResultadoIRPFSegundoPagador {
   if (!p.pagadores || p.pagadores.length < 1) throw new Error('Debe indicar al menos un pagador.');
   if (p.pagadores.some(pg => pg.importeBruto < 0)) throw new Error('Los importes de los pagadores no pueden ser negativos.');
+  // Las retenciones se validan igual que los importes: la guarda vivía solo en la ruta HTTP,
+  // así que cualquier otro consumidor del motor podía colar una retención negativa y obtener
+  // un «a pagar» inflado. Y NaN/Infinity atravesaban las dos: `NaN < 0` es false y
+  // `typeof NaN === 'number'`, con lo que el motor respondía «no estás obligado a declarar»
+  // calculado sobre nada. JSON.parse('1e999') devuelve Infinity, así que llegaba por HTTP.
+  if (p.pagadores.some(pg => pg.retencionesPracticadas < 0)) {
+    throw new Error('Las retenciones practicadas no pueden ser negativas.');
+  }
+  if (p.pagadores.some(pg => !Number.isFinite(pg.importeBruto) || !Number.isFinite(pg.retencionesPracticadas))) {
+    throw new Error('Los importes y las retenciones deben ser números finitos.');
+  }
 
   const r = (n: number) => Math.round(n * 100) / 100;
 
@@ -175,14 +198,14 @@ export function calcularIRPFSegundoPagador(p: ParametrosIRPFSegundoPagador): Res
   const retencionOptimaMensual = r(cuotaIRPFEstimada / 12);
 
   const advertencias: string[] = [
-    `Regla del segundo pagador (LIRPF art. 96.3): si el 2º pagador supera ${LIMITE_SEGUNDO_PAGADOR.toLocaleString('es-ES')} €/año, la obligación de declarar se activa con ingresos totales > ${LIMITE_OBLIGACION_SEGUNDO_PAGADOR.toLocaleString('es-ES')} € (en lugar de los ${LIMITE_OBLIGACION_UN_PAGADOR.toLocaleString('es-ES')} € habituales).`,
+    `Regla del segundo pagador (LIRPF art. 96.3): si el 2º pagador supera ${formatNumber(LIMITE_SEGUNDO_PAGADOR, 0)} €/año, la obligación de declarar se activa con ingresos totales > ${formatNumber(LIMITE_OBLIGACION_SEGUNDO_PAGADOR, 0)} € (en lugar de los ${formatNumber(LIMITE_OBLIGACION_UN_PAGADOR, 0)} € habituales).`,
     'Cada empresa retiene el IRPF solo sobre lo que ella paga, sin tener en cuenta los ingresos del otro pagador. Esto genera retención insuficiente y puede resultar en deuda en la declaración de la renta.',
     'Para evitar la deuda, comunicar al pagador principal los ingresos del segundo pagador mediante el modelo 145 actualizado, solicitando un tipo de retención mayor.',
     'La cuota IRPF estimada es orientativa (situación: soltero sin hijos, solo rendimientos del trabajo). La cuota real depende de deducciones adicionales, rendimientos de capital y circunstancias personales completas.',
   ];
 
   if (resultadoDeclaracion === 'a_pagar') {
-    advertencias.unshift(`⚠️ Resultado estimado A PAGAR: ${Math.abs(resultadoEstimado).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €. Las retenciones acumuladas son insuficientes. Solicita un tipo de retención mayor al pagador principal indicando los ingresos del segundo pagador en el modelo 145.`);
+    advertencias.unshift(`⚠️ Resultado estimado A PAGAR: ${formatNumber(Math.abs(resultadoEstimado))} €. Las retenciones acumuladas son insuficientes. Solicita un tipo de retención mayor al pagador principal indicando los ingresos del segundo pagador en el modelo 145.`);
   }
 
   return {
