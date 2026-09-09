@@ -444,6 +444,71 @@ test.describe('Invariantes de composición — consulta_herencia', () => {
 });
 
 // ────────────────────────────────────────────────────────────────────────────
+// REGRESIÓN 09/09/2026 — dos defectos del motor de sucesiones, encontrados al reparar
+// la tanda del Inspector del 07/09 en `simulador-heredar-vivienda`.
+//
+// No los levantó el Inspector, y no es un fallo suyo: sus actas cubren APPS, y este motor
+// —que alimenta además la tool `calcular_sucesiones` del MCP de Delegum y
+// /api/chatgpt/sucesiones— solo se mira desde la app que lo llama. Salieron de comparar la
+// cadena que la web reconstruye a mano con la que el motor calcula, y por eso quedan aquí:
+// en el fichero de invariantes del motor, no en el de la app.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Regresión — el motor de sucesiones no pierde al nieto ni descuadra su desglose', () => {
+  test('el NIETO de 21 o más años recibe la reducción en base de Asturias, igual que el hijo', () => {
+    // `reduccionAutonomicaBase` indexaba `bonificaciones[p.grupo]` en crudo, y ninguna
+    // comunidad declara la clave 'II-descendiente' —el grupo se separó SOLO para la escala
+    // catalana—, así que en Asturias el nieto perdía los 300.000 € que las notas de esa misma
+    // ficha reconocen a los «Grupos I y II». La otra función del fichero que lee esa tabla,
+    // `aplicarBonificacionIS`, sí colapsaba la clave con `claveBonificacion`.
+    const nieto = calcularSucesion({ baseImponible: 150000, ccaa: 'asturias', grupo: 'II-descendiente', edadHeredero: 40 });
+    const hijo = calcularSucesion({ baseImponible: 150000, ccaa: 'asturias', grupo: 'II', edadHeredero: 40 });
+
+    // Antes: el nieto pagaba 12.651,99 € donde le corresponden 0 €.
+    expect(nieto.reduccionAutonomicaBase).toBe(300000);
+    expect(nieto.cuotaFinal).toBe(hijo.cuotaFinal);
+    expect(nieto.cuotaFinal).toBe(0);
+
+    // Con base mayor la diferencia era de 56.926,11 €.
+    const nietoAlto = calcularSucesion({ baseImponible: 600000, ccaa: 'asturias', grupo: 'II-descendiente', edadHeredero: 40 });
+    const hijoAlto = calcularSucesion({ baseImponible: 600000, ccaa: 'asturias', grupo: 'II', edadHeredero: 40 });
+    expect(nietoAlto.cuotaFinal).toBe(hijoAlto.cuotaFinal);
+    expect(nietoAlto.cuotaFinal).toBe(30241.34);
+  });
+
+  test('pero Cataluña SIGUE distinguiendo al nieto del hijo, que es para lo que existe el grupo', () => {
+    // La reparación colapsa la clave solo donde el régimen común no distingue. Si esto se
+    // igualara, se habría deshecho la corrección catalana del 08/09/2026 (100.000 € al hijo,
+    // 50.000 € al nieto) sin que nada lo dijera.
+    const nieto = calcularSucesion({ baseImponible: 600000, ccaa: 'cataluna', grupo: 'II-descendiente', edadHeredero: 40 });
+    const hijo = calcularSucesion({ baseImponible: 600000, ccaa: 'cataluna', grupo: 'II', edadHeredero: 40 });
+    expect(nieto.cuotaFinal).toBeGreaterThan(hijo.cuotaFinal);
+    expect(hijo.cuotaFinal).toBe(41175);
+    expect(nieto.cuotaFinal).toBe(47275);
+  });
+
+  test('INVARIANTE: cuota tributaria − bonificación publicada = cuota final, en todo el barrido', () => {
+    // El motor publicaba `bonificacionCcaa` redondeada a dos decimales pero restaba la de
+    // dentro, sin redondear, así que el desglose no cuadraba consigo mismo por un céntimo en
+    // el 0,9 % de los casos. En una liquidación fiscal la aritmética escrita tiene que salir.
+    const ccaas = ['asturias', 'castilla-mancha', 'madrid', 'cantabria', 'andalucia', 'murcia', 'galicia', 'cataluna'];
+    const grupos = ['I-conyuge', 'I-descendiente', 'II', 'II-descendiente', 'II-ascendiente', 'III', 'IV'] as const;
+    let comprobados = 0;
+    for (const ccaa of ccaas) {
+      for (const grupo of grupos) {
+        for (let base = 20000; base <= 900000; base += 7137) {
+          const res = calcularSucesion({ baseImponible: base, ccaa, grupo, edadHeredero: 45 });
+          const resta = Math.round((res.cuotaTributaria - res.bonificacionCcaa) * 100) / 100;
+          expect(resta, `${ccaa}/${grupo}/${base}`).toBe(res.cuotaFinal);
+          comprobados++;
+        }
+      }
+    }
+    expect(comprobados).toBeGreaterThan(6000);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 // COMPOSICIÓN — consulta_jubilacion (pensión pública + brecha)
 // ────────────────────────────────────────────────────────────────────────────
 

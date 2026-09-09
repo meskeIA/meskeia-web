@@ -453,7 +453,16 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   // 6.bis Reducción autonómica sobre la BASE (hoy solo Asturias: 300.000 € para los Grupos I
   // y II, 50.000 € para el III). Es el único beneficio del catálogo modelado como reducción
   // en base en vez de como bonificación en cuota, y entra aquí porque va antes de la tarifa.
-  const reduccionAutonomicaBase = ccaaInfo.bonificaciones[p.grupo]?.reduccionBase ?? 0;
+  //
+  // La clave se colapsa con `claveBonificacion`, igual que en `aplicarBonificacionIS`: sin
+  // ella, `bonificaciones['II-descendiente']` no existe en ninguna comunidad —el grupo se
+  // separó solo para la escala catalana— y el NIETO de 21 o más años perdía en Asturias los
+  // 300.000 € que las notas de esa misma ficha le reconocen («Grupos I y II»). Con 150.000 €
+  // heredados pagaba 12.651,99 € en vez de 0 €, y con 600.000 €, 56.926,11 € de más. El
+  // defecto llegaba a la tool `calcular_sucesiones` del MCP y a /api/chatgpt/sucesiones.
+  // Detectado el 09/09/2026 al reparar la tanda del Inspector del 07/09, no por el Inspector:
+  // sus actas cubren apps, y este motor solo se mira desde la app que lo llama.
+  const reduccionAutonomicaBase = ccaaInfo.bonificaciones[claveBonificacion(p.grupo)]?.reduccionBase ?? 0;
 
   const totalReducciones = r(reduccionParentesco + reduccionEdadMenor21 + reduccionDiscapacidad + reduccionVivienda + reduccionSeguroVida + reduccionAutonomicaBase);
   const baseLiquidable = r(Math.max(0, baseConAjuar - totalReducciones));
@@ -480,7 +489,13 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   // `baseConAjuar` es la base IMPONIBLE, que es sobre la que la escala catalana del art. 58 bis
   // construye su porcentaje. Las demás comunidades siguen decidiendo por la base liquidable.
   const { bonificacion, porcentaje, detalle } = aplicarBonificacionIS(cuotaTributaria, baseLiquidable, p.grupo, p.ccaa, baseConAjuar);
-  const cuotaFinal = r(Math.max(0, cuotaTributaria - bonificacion));
+  // Se resta la bonificación REDONDEADA, que es la que se publica en `bonificacionCcaa` y la
+  // que el usuario ve escrita. Restando la de dentro, el desglose no cuadraba consigo mismo por
+  // un céntimo en el 0,9 % de los casos: cuota tributaria − bonificación publicada daba un
+  // número distinto de la cuota final publicada. Mismo origen que el de arriba: 09/09/2026,
+  // reparando en `simulador-heredar-vivienda` el desglose que no cuadraba consigo mismo.
+  const bonificacionPublicada = r(bonificacion);
+  const cuotaFinal = r(Math.max(0, cuotaTributaria - bonificacionPublicada));
   const tipoEfectivo = r(p.baseImponible > 0 ? (cuotaFinal / p.baseImponible) * 100 : 0);
 
   return {
@@ -499,7 +514,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     cuotaIntegra,
     coeficienteMultiplicador,
     cuotaTributaria,
-    bonificacionCcaa:         r(bonificacion),
+    bonificacionCcaa:         bonificacionPublicada,
     porcentajeBonificacion:   r(porcentaje),
     detalleBonificacion:      detalle,
     cuotaFinal,
