@@ -6,6 +6,17 @@ import styles from './GeneradorTonos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
+import {
+  frecuenciasDeMedida,
+  nivelPico,
+  restarRuido,
+  normalizarCurva,
+  compararCurvas,
+  resumirCurva,
+  pareceRuido,
+  evaluarMicrofono,
+  type PuntoMedida,
+} from './motor-respuesta';
 
 interface FrecuenciaPreset {
   nombre: string;
@@ -37,6 +48,136 @@ const PRESETS: FrecuenciaPreset[] = [
   { nombre: 'Muy agudos', frecuencia: 10000, categoria: 'Tests' },
   { nombre: 'Ultrasonido', frecuencia: 15000, categoria: 'Tests' },
 ];
+
+/**
+ * Rango que se mide con el micrófono. No es el rango audible entero a propósito: por debajo de
+ * 50 Hz un altavoz de móvil o de portátil no emite nada medible y por encima de 16 kHz el
+ * micrófono deja de responder, así que esos puntos solo añadirían huecos sin información.
+ */
+const MEDIDA_MIN = 50;
+const MEDIDA_MAX = 16000;
+
+/**
+ * 16.384 puntos de FFT dan 2,9 Hz por bin a 48 kHz. Hace falta esa resolución en los graves:
+ * con la FFT por defecto (2.048) cada bin abarca 23 Hz y los tercios de octava de la zona baja
+ * —50, 63, 80 Hz— caerían todos dentro del mismo bin.
+ */
+const FFT_MEDIDA = 16384;
+
+/** Lo que se espera a que el tono llene la sala antes de leer, y cuántas lecturas se promedian. */
+const MS_ESTABILIZACION = 140;
+const LECTURAS_POR_PUNTO = 3;
+const MS_ENTRE_LECTURAS = 35;
+
+/** Volumen de la medida: fijo y moderado, para no saturar el micrófono del propio aparato. */
+const VOLUMEN_MEDIDA = 0.35;
+
+type Ranura = 'A' | 'B';
+
+const esperar = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/** Etiqueta corta de una frecuencia: 1.000 Hz se lee mucho peor que «1k» en un eje. */
+const etiquetaFrecuencia = (f: number) => (f >= 1000 ? `${formatNumber(f / 1000, f % 1000 === 0 ? 0 : 1)}k` : formatNumber(f, 0));
+
+const VIS = { ancho: 720, alto: 300, izq: 46, der: 14, sup: 16, inf: 32 };
+const AREA_ANCHO = VIS.ancho - VIS.izq - VIS.der;
+const AREA_ALTO = VIS.alto - VIS.sup - VIS.inf;
+const LOG_MIN = Math.log10(MEDIDA_MIN);
+const LOG_MAX = Math.log10(MEDIDA_MAX);
+const MARCAS_X = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 16000];
+
+const posX = (f: number) => VIS.izq + ((Math.log10(f) - LOG_MIN) / (LOG_MAX - LOG_MIN)) * AREA_ANCHO;
+const posY = (db: number, tope: number) => VIS.sup + (1 - (db + tope) / (2 * tope)) * AREA_ALTO;
+
+/**
+ * Parte la curva en tramos continuos, cortando por los puntos sin medida.
+ *
+ * Es lo que impide la mentira más fácil de esta gráfica: si se unieran los puntos válidos
+ * saltándose los huecos, un agujero de tres octavas donde el altavoz no da nada se dibujaría
+ * como una recta limpia, es decir, como una respuesta perfecta.
+ */
+function tramosContinuos(puntos: PuntoMedida[]): { frecuencia: number; db: number }[][] {
+  const tramos: { frecuencia: number; db: number }[][] = [];
+  let actual: { frecuencia: number; db: number }[] = [];
+  for (const p of puntos) {
+    if (p.db === null) {
+      if (actual.length > 0) tramos.push(actual);
+      actual = [];
+    } else {
+      actual.push({ frecuencia: p.frecuencia, db: p.db });
+    }
+  }
+  if (actual.length > 0) tramos.push(actual);
+  return tramos;
+}
+
+interface SerieGrafica {
+  puntos: PuntoMedida[];
+  color: string;
+  nombre: string;
+}
+
+function GraficaRespuesta({ series, etiquetaEjeY, descripcion }: { series: SerieGrafica[]; etiquetaEjeY: string; descripcion: string }) {
+  const valores = series.flatMap((s) => s.puntos.map((p) => p.db).filter((db): db is number => db !== null));
+  const tope = Math.max(12, Math.ceil(Math.max(...valores.map(Math.abs), 0) / 6) * 6);
+  const marcasY = [tope, tope / 2, 0, -tope / 2, -tope];
+
+  return (
+    <svg
+      className={styles.grafica}
+      viewBox={`0 0 ${VIS.ancho} ${VIS.alto}`}
+      role="img"
+      aria-label={descripcion}
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {marcasY.map((db) => (
+        <g key={db}>
+          <line
+            x1={VIS.izq} y1={posY(db, tope)} x2={VIS.izq + AREA_ANCHO} y2={posY(db, tope)}
+            className={db === 0 ? styles.ejeCero : styles.rejilla}
+          />
+          <text x={VIS.izq - 8} y={posY(db, tope) + 4} className={styles.etiquetaEje} textAnchor="end">
+            {db > 0 ? '+' : ''}{formatNumber(db, 0)}
+          </text>
+        </g>
+      ))}
+
+      {MARCAS_X.map((f) => (
+        <g key={f}>
+          <line x1={posX(f)} y1={VIS.sup} x2={posX(f)} y2={VIS.sup + AREA_ALTO} className={styles.rejilla} />
+          <text x={posX(f)} y={VIS.sup + AREA_ALTO + 20} className={styles.etiquetaEje} textAnchor="middle">
+            {etiquetaFrecuencia(f)}
+          </text>
+        </g>
+      ))}
+
+      <text x={VIS.izq - 8} y={VIS.sup - 4} className={styles.etiquetaEje} textAnchor="end">{etiquetaEjeY}</text>
+      <text x={VIS.izq + AREA_ANCHO} y={VIS.sup - 4} className={styles.etiquetaEje} textAnchor="end">Hz</text>
+
+      {series.map((serie) => (
+        <g key={serie.nombre}>
+          {tramosContinuos(serie.puntos).map((tramo, i) => (
+            <polyline
+              key={i}
+              className={styles.trazo}
+              stroke={serie.color}
+              points={tramo.map((p) => `${posX(p.frecuencia)},${posY(Math.max(-tope, Math.min(tope, p.db)), tope)}`).join(' ')}
+            />
+          ))}
+          {serie.puntos.filter((p): p is { frecuencia: number; db: number } => p.db !== null).map((p) => (
+            <circle
+              key={p.frecuencia}
+              cx={posX(p.frecuencia)}
+              cy={posY(Math.max(-tope, Math.min(tope, p.db)), tope)}
+              r={3}
+              fill={serie.color}
+            />
+          ))}
+        </g>
+      ))}
+    </svg>
+  );
+}
 
 export default function GeneradorTonosPage() {
   const [frecuencia, setFrecuencia] = useState(440);
@@ -81,6 +222,20 @@ export default function GeneradorTonosPage() {
   const sweepIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
+  // --- Medida de respuesta con el micrófono -------------------------------------------------
+  const [curvaA, setCurvaA] = useState<PuntoMedida[] | null>(null);
+  const [curvaB, setCurvaB] = useState<PuntoMedida[] | null>(null);
+  const [midiendo, setMidiendo] = useState<Ranura | null>(null);
+  const [frecuenciaEnCurso, setFrecuenciaEnCurso] = useState<number | null>(null);
+  const [avisoMedida, setAvisoMedida] = useState<string | null>(null);
+  const streamMicroRef = useRef<MediaStream | null>(null);
+
+  const cerrarMicrofono = useCallback(() => {
+    streamMicroRef.current?.getTracks().forEach((t) => t.stop());
+    streamMicroRef.current = null;
+  }, []);
+
+
   /**
    * Un tono de prueba sostenido (calibrar altavoces, comprobar un pitido en el oído) se deja
    * sonando sin tocar la pantalla: sin esto, el sistema la apaga sola a los pocos segundos.
@@ -117,6 +272,9 @@ export default function GeneradorTonosPage() {
         clearInterval(sweepIntervalRef.current);
       }
       wakeLockRef.current?.release().catch(() => {});
+      // Un micrófono abierto deja el indicador de grabación encendido aunque se salga de la
+      // página: se suelta aquí y no solo al terminar la medida.
+      streamMicroRef.current?.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
@@ -192,6 +350,162 @@ export default function GeneradorTonosPage() {
       iniciarAudio();
     }
   };
+
+  /**
+   * Emite la retícula de tercios de octava por el altavoz y la escucha con el micrófono.
+   *
+   * El orden importa: primero se mide el ruido de fondo EN SILENCIO y solo después se emite,
+   * porque el nivel de fondo es lo que decide qué puntos valen. Medirlo con el tono ya sonando
+   * daría un suelo altísimo y descartaría la medida entera.
+   */
+  const medirRespuesta = useCallback(async (ranura: Ranura) => {
+    if (midiendo) return;
+    setAvisoMedida(null);
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setAvisoMedida('Este navegador no da acceso al micrófono, así que aquí no se puede medir.');
+      return;
+    }
+
+    // El generador manual no puede seguir sonando: contaminaría su propia medida.
+    if (reproduciendo) detenerAudio();
+    if (sweepIntervalRef.current) {
+      clearInterval(sweepIntervalRef.current);
+      sweepIntervalRef.current = null;
+      setSweep(false);
+    }
+
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+      });
+    } catch {
+      setAvisoMedida('No se ha podido abrir el micrófono. Hay que dar permiso al navegador para medir.');
+      return;
+    }
+    streamMicroRef.current = stream;
+
+    // La comprobación que decide si lo que salga de aquí significa algo: se pidieron los tres
+    // procesados apagados, pero hay navegadores que ignoran la petición sin avisar.
+    const veredicto = evaluarMicrofono(stream.getAudioTracks()[0]?.getSettings() ?? {});
+    if (!veredicto.sirve) {
+      cerrarMicrofono();
+      setAvisoMedida(
+        `Este navegador mantiene activa la ${veredicto.procesadosActivos.join(' y la ')} del micrófono, ` +
+        'que altera el sonido antes de que llegue a medirse. La curva que saldría no sería real, así que ' +
+        'no se mide. Suele funcionar en Chrome o Edge de escritorio.',
+      );
+      return;
+    }
+
+    setMidiendo(ranura);
+    void solicitarWakeLock();
+
+    let ctx: AudioContext | null = null;
+    let oscilador: OscillatorNode | null = null;
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      }
+      ctx = audioContextRef.current;
+      if (ctx.state === 'suspended') await ctx.resume();
+
+      const analizador = ctx.createAnalyser();
+      analizador.fftSize = FFT_MEDIDA;
+      // Sin suavizado: promediar entre lecturas arrastraría el nivel del tono anterior al
+      // siguiente punto y dejaría la curva contagiada de su propio pasado.
+      analizador.smoothingTimeConstant = 0;
+      ctx.createMediaStreamSource(stream).connect(analizador);
+
+      const espectro = new Float32Array(analizador.frequencyBinCount);
+      const frecuencias = frecuenciasDeMedida(MEDIDA_MIN, MEDIDA_MAX);
+
+      const leerNivel = async (f: number) => {
+        let acumulado = 0;
+        let leidas = 0;
+        for (let i = 0; i < LECTURAS_POR_PUNTO; i++) {
+          await esperar(MS_ENTRE_LECTURAS);
+          analizador.getFloatFrequencyData(espectro);
+          const v = nivelPico(espectro, f, ctx!.sampleRate, FFT_MEDIDA);
+          if (Number.isFinite(v)) {
+            acumulado += v;
+            leidas++;
+          }
+        }
+        return leidas > 0 ? acumulado / leidas : -Infinity;
+      };
+
+      // 1) Suelo de ruido, en silencio.
+      setFrecuenciaEnCurso(null);
+      await esperar(250);
+      const ruido = new Map<number, number>();
+      for (const f of frecuencias) {
+        analizador.getFloatFrequencyData(espectro);
+        ruido.set(f, nivelPico(espectro, f, ctx.sampleRate, FFT_MEDIDA));
+      }
+
+      // 2) Un tono por cada tercio de octava.
+      oscilador = ctx.createOscillator();
+      const ganancia = ctx.createGain();
+      oscilador.type = 'sine';
+      oscilador.frequency.setValueAtTime(frecuencias[0], ctx.currentTime);
+      ganancia.gain.setValueAtTime(0, ctx.currentTime);
+      ganancia.gain.linearRampToValueAtTime(VOLUMEN_MEDIDA, ctx.currentTime + 0.05);
+      oscilador.connect(ganancia);
+      ganancia.connect(ctx.destination);
+      oscilador.start();
+
+      const puntos: PuntoMedida[] = [];
+      for (const f of frecuencias) {
+        oscilador.frequency.setValueAtTime(f, ctx.currentTime);
+        setFrecuenciaEnCurso(f);
+        await esperar(MS_ESTABILIZACION);
+        const senal = await leerNivel(f);
+        puntos.push({ frecuencia: f, db: restarRuido(senal, ruido.get(f) ?? -Infinity) });
+      }
+
+      ganancia.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+      const curva = normalizarCurva(puntos);
+
+      if (resumirCurva(curva).medidos === 0) {
+        setAvisoMedida(
+          'Ningún tono llegó a despegar del ruido de fondo. Suele ser que el altavoz está en silencio, ' +
+          'que hay auriculares conectados o que el sitio es demasiado ruidoso.',
+        );
+        return;
+      }
+
+      // Lo medido tiene que TENER FORMA de respuesta para guardarse. Si los puntos saltan sin
+      // relación entre bandas vecinas, no se ha medido un altavoz: se ha medido ruido, y eso
+      // se dibuja igual de bien —con su eje y sus decimales— pero no significa nada.
+      if (pareceRuido(curva)) {
+        setAvisoMedida(
+          'Los niveles saltan demasiado entre frecuencias vecinas para ser la respuesta de un altavoz: ' +
+          'lo que ha entrado por el micrófono es ruido, no los tonos emitidos. La medida se descarta. ' +
+          'Comprueba que el altavoz suena, que no hay auriculares conectados, que nada tapa el micrófono ' +
+          'y que el sitio está en silencio.',
+        );
+        return;
+      }
+
+      if (ranura === 'A') setCurvaA(curva); else setCurvaB(curva);
+    } catch {
+      setAvisoMedida('La medida se ha interrumpido. Se puede volver a intentar.');
+    } finally {
+      if (oscilador) {
+        try {
+          oscilador.stop(ctx ? ctx.currentTime + 0.1 : undefined);
+        } catch {
+          // El oscilador de medida ya estaba parado
+        }
+      }
+      cerrarMicrofono();
+      liberarWakeLock();
+      setMidiendo(null);
+      setFrecuenciaEnCurso(null);
+    }
+  }, [midiendo, reproduciendo, detenerAudio, solicitarWakeLock, liberarWakeLock, cerrarMicrofono]);
 
   // El wake lock se libera solo al ocultar la pestaña; si se vuelve mientras el tono
   // sigue sonando, hay que volver a pedirlo.
@@ -270,6 +584,23 @@ export default function GeneradorTonosPage() {
   };
 
   const categoriasPresets = ['Notas', 'Tests'];
+
+  const resumenA = curvaA ? resumirCurva(curvaA) : null;
+  const resumenB = curvaB ? resumirCurva(curvaB) : null;
+  const diferencia = curvaA && curvaB ? compararCurvas(curvaA, curvaB) : null;
+  const resumenDiferencia = diferencia ? resumirCurva(diferencia) : null;
+
+  /** Lo que la gráfica dice, en palabras: es el aria-label del SVG y no puede ser decorativo. */
+  const describirCurva = (nombre: string, resumen: ReturnType<typeof resumirCurva> | null) => {
+    if (!resumen || resumen.medidos === 0) return '';
+    return `${nombre}: ${formatNumber(resumen.medidos, 0)} puntos medidos, ` +
+      `${formatNumber(resumen.desviacion ?? 0, 1)} dB entre el máximo y el mínimo, ` +
+      `con el punto más alto en ${formatNumber(resumen.frecuenciaPico ?? 0, 0)} Hz ` +
+      `y el más bajo en ${formatNumber(resumen.frecuenciaValle ?? 0, 0)} Hz.`;
+  };
+
+  const frecuenciasMedidas = frecuenciasDeMedida(MEDIDA_MIN, MEDIDA_MAX);
+  const dbEn = (curva: PuntoMedida[] | null, f: number) => curva?.find((p) => p.frecuencia === f)?.db ?? null;
 
   return (
     <div className={styles.container}>
@@ -467,6 +798,181 @@ export default function GeneradorTonosPage() {
           >
             {sweep ? '⏹️ Detener barrido' : '🔄 Iniciar barrido'}
           </button>
+        </div>
+      </div>
+
+      {/* Medida de respuesta con el micrófono */}
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Medir la respuesta con el micrófono</h3>
+        <p className={styles.medidaIntro}>
+          La app emite un tono en cada tercio de octava por el altavoz y lo escucha con el micrófono
+          del mismo aparato. Mide <strong>dos veces</strong> —cambiando de sitio el altavoz, o probando
+          otro— y compara: lo que aparece es la diferencia entre las dos situaciones, que es lo único
+          que un móvil sin calibrar puede decir de verdad.
+        </p>
+
+        <div className={styles.medidaBotones}>
+          <button
+            type="button"
+            className={styles.btnMedir}
+            onClick={() => void medirRespuesta('A')}
+            disabled={midiendo !== null}
+          >
+            {midiendo === 'A' ? (
+              'Midiendo A…'
+            ) : (
+              <>
+                <span aria-hidden="true">{curvaA ? '🔁' : '🎙️'}</span>{' '}
+                {curvaA ? 'Repetir medida A' : 'Medir A'}
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            className={styles.btnMedir}
+            onClick={() => void medirRespuesta('B')}
+            disabled={midiendo !== null}
+          >
+            {midiendo === 'B' ? (
+              'Midiendo B…'
+            ) : (
+              <>
+                <span aria-hidden="true">{curvaB ? '🔁' : '🎙️'}</span>{' '}
+                {curvaB ? 'Repetir medida B' : 'Medir B'}
+              </>
+            )}
+          </button>
+          {(curvaA || curvaB) && (
+            <button
+              type="button"
+              className={styles.btnBorrarMedida}
+              onClick={() => { setCurvaA(null); setCurvaB(null); setAvisoMedida(null); }}
+              disabled={midiendo !== null}
+            >
+              Borrar medidas
+            </button>
+          )}
+        </div>
+
+        {midiendo && (
+          <p className={styles.medidaProgreso} role="status" aria-live="polite">
+            {frecuenciaEnCurso === null
+              ? 'Midiendo el ruido de fondo: silencio un momento…'
+              : `Emitiendo ${formatNumber(frecuenciaEnCurso, 0)} Hz — no muevas el aparato.`}
+          </p>
+        )}
+
+        {avisoMedida && (
+          <div className={styles.medidaAviso} role="alert">
+            <span aria-hidden="true">⚠️</span> {avisoMedida}
+          </div>
+        )}
+
+        {(curvaA || curvaB) && (
+          <>
+            <GraficaRespuesta
+              series={[
+                ...(curvaA ? [{ puntos: curvaA, color: 'var(--primary)', nombre: 'A' }] : []),
+                ...(curvaB ? [{ puntos: curvaB, color: 'var(--secondary)', nombre: 'B' }] : []),
+              ]}
+              etiquetaEjeY="dB rel."
+              descripcion={`Respuesta en frecuencia relativa. ${describirCurva('Medida A', resumenA)} ${describirCurva('Medida B', resumenB)}`.trim()}
+            />
+
+            <div className={styles.leyenda}>
+              {curvaA && <span className={styles.leyendaItem}><span className={styles.puntoA} aria-hidden="true" /> Medida A</span>}
+              {curvaB && <span className={styles.leyendaItem}><span className={styles.puntoB} aria-hidden="true" /> Medida B</span>}
+            </div>
+
+            <div className={styles.medidaResumen}>
+              {resumenA && resumenA.medidos > 0 && (
+                <p>
+                  <strong>A</strong>: {formatNumber(resumenA.desviacion ?? 0, 1)} dB de recorrido
+                  ({formatNumber(resumenA.medidos, 0)} de {formatNumber(frecuenciasMedidas.length, 0)} puntos medidos).
+                  Máximo en {formatNumber(resumenA.frecuenciaPico ?? 0, 0)} Hz, mínimo en {formatNumber(resumenA.frecuenciaValle ?? 0, 0)} Hz.
+                </p>
+              )}
+              {resumenB && resumenB.medidos > 0 && (
+                <p>
+                  <strong>B</strong>: {formatNumber(resumenB.desviacion ?? 0, 1)} dB de recorrido
+                  ({formatNumber(resumenB.medidos, 0)} de {formatNumber(frecuenciasMedidas.length, 0)} puntos medidos).
+                  Máximo en {formatNumber(resumenB.frecuenciaPico ?? 0, 0)} Hz, mínimo en {formatNumber(resumenB.frecuenciaValle ?? 0, 0)} Hz.
+                </p>
+              )}
+              {resumenDiferencia && resumenDiferencia.medidos > 0 && (
+                <p className={styles.medidaComparacion}>
+                  <strong>B frente a A</strong>: se separan {formatNumber(resumenDiferencia.desviacion ?? 0, 1)} dB.
+                  Donde más gana B es en {formatNumber(resumenDiferencia.frecuenciaPico ?? 0, 0)} Hz;
+                  donde más pierde, en {formatNumber(resumenDiferencia.frecuenciaValle ?? 0, 0)} Hz.
+                  Comparadas sobre {formatNumber(resumenDiferencia.medidos, 0)} puntos con medida en las dos.
+                </p>
+              )}
+              {((resumenA && resumenA.medidos > 0 && resumenA.medidos < frecuenciasMedidas.length) ||
+                (resumenB && resumenB.medidos > 0 && resumenB.medidos < frecuenciasMedidas.length)) && (
+                <p className={styles.medidaHuecos}>
+                  Los puntos que faltan no se han medido: en esas frecuencias el tono no llegó a despegar
+                  del ruido de fondo. La línea se corta ahí en vez de cruzar el hueco, porque una recta
+                  sobre un agujero se leería como una respuesta perfecta.
+                </p>
+              )}
+            </div>
+
+            <details className={styles.medidaTabla}>
+              <summary>Ver los números</summary>
+              <div className={styles.eduTablaWrapper}>
+                <table className={styles.eduTabla}>
+                  <thead>
+                    <tr>
+                      <th>Frecuencia</th>
+                      {curvaA && <th>A (dB rel.)</th>}
+                      {curvaB && <th>B (dB rel.)</th>}
+                      {diferencia && <th>B − A</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {frecuenciasMedidas.map((f) => {
+                      const a = dbEn(curvaA, f);
+                      const b = dbEn(curvaB, f);
+                      const d = dbEn(diferencia, f);
+                      return (
+                        <tr key={f}>
+                          <td>{formatNumber(f, f % 1 === 0 ? 0 : 1)} Hz</td>
+                          {curvaA && <td>{a === null ? 'sin medida' : formatNumber(a, 1)}</td>}
+                          {curvaB && <td>{b === null ? 'sin medida' : formatNumber(b, 1)}</td>}
+                          {diferencia && <td>{d === null ? '—' : formatNumber(d, 1)}</td>}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          </>
+        )}
+
+        <div className={styles.medidaLimites}>
+          <strong>Qué es y qué no es esta medida</strong>
+          <ul>
+            <li>
+              Mide la cadena entera —altavoz, sala y micrófono juntos— y ninguna de las tres partes
+              está calibrada. Por eso el eje es <strong>dB relativos</strong>: el 0 es el nivel típico
+              de esa misma medida, no una presión sonora real.
+            </li>
+            <li>
+              Solo tiene sentido <strong>comparando dos medidas del mismo aparato</strong>. Una curva
+              suelta no dice si tu altavoz es bueno; dos medidas dicen cuál de las dos situaciones
+              suena más pareja.
+            </li>
+            <li>
+              El micrófono de un móvil recorta por arriba y por abajo, así que los extremos del rango
+              son los menos fiables. Y con auriculares puestos no hay nada que medir: el micrófono no
+              oye lo que suena dentro de ellos.
+            </li>
+            <li>
+              Si el navegador no deja apagar la cancelación de eco o el control de ganancia, la medida
+              no se hace y se avisa: esos procesados borran o aplanan justamente lo que se quiere medir.
+            </li>
+          </ul>
         </div>
       </div>
 

@@ -43,6 +43,8 @@ export const jsonLd = generateWebAppSchema({
     'Generación de tonos puros entre 20 Hz y 20.000 Hz',
     'Cuatro formas de onda: senoidal, cuadrada, triangular, sierra',
     'Control fino de frecuencia y volumen',
+    'Medida de la respuesta en frecuencia con el micrófono, en tercios de octava (ISO 266)',
+    'Comparación A/B de dos posiciones o dos altavoces en decibelios relativos',
     'Útil para tests de audio y calibración',
   ],
   keywords: ['generador tonos', 'frecuencias audio', 'test audio', 'calibración altavoces', 'tinnitus'],
