@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 
+import { urlSinMarcaFrom } from '@/lib/trackingFrom';
+
 interface AnalyticsTrackerProps {
   applicationName?: string;
   appName?: string;
@@ -190,6 +192,16 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
         return Object.keys(extras).length > 0 ? extras : undefined;
       })(),
     };
+
+    // La marca de origen se CONSUME: ya está capturada arriba en entryData, así
+    // que se retira de la URL. Es lo que la convierte en el registro de UN clic y
+    // no en una etiqueta pegada al visitante: sin esto, cada recarga y cada
+    // vuelta atrás volvían a registrar el mismo `from` mientras la pestaña
+    // siguiera abierta. El defecto medido y el caso de origen, en
+    // lib/trackingFrom.ts (urlSinMarcaFrom); el candado, en
+    // tests/marca-from.spec.ts.
+    const urlLimpia = urlSinMarcaFrom(window.location.href);
+    if (urlLimpia) window.history.replaceState(null, '', urlLimpia);
 
     // Registrar entrada (nueva API Turso)
     const registerEntry = async () => {

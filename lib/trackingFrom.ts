@@ -151,3 +151,62 @@ export function urlParaCompartir(href: string = window.location.href): string {
   if (new URLSearchParams(url.hash.replace(/^#/, '')).has('from')) url.hash = '';
   return url.toString();
 }
+
+/**
+ * La misma URL sin la marca `from`, o `null` si no llevaba ninguna.
+ *
+ * La usa `AnalyticsTracker` para CONSUMIR la marca: la lee, registra la visita y
+ * la retira de la barra de direcciones con `history.replaceState`. Eso es lo que
+ * convierte `from` en el registro de UN clic y no en una etiqueta pegada al
+ * visitante.
+ *
+ * POR QUÉ — defecto medido el 09/09/2026
+ * --------------------------------------
+ * `#from=` vive en el fragmento (ver arriba) y el fragmento se queda en la barra
+ * de direcciones. El efecto del tracker corre en cada montaje, así que CADA
+ * recarga y CADA vuelta atrás volvían a registrar el mismo `from`: un clic de
+ * RelatedApps que nadie dio, repetido mientras la pestaña siguiera abierta.
+ *
+ * Caso de origen (reinyectado en tests/marca-from.spec.ts): una sesión argentina
+ * del 08/09 con UN clic real desde `simulador-elasticidad-precio` a las 15:18 y
+ * tres registros idénticos más a las 20:02, 21:48 y 23:21 sin volver a pasar por
+ * la app de origen. Medido sobre 30 días: el 12,1% de los 2.191 clics `related-*`
+ * se atribuían a una app que esa IP no había visitado en las 2 h previas, y el
+ * 29,1% eran repeticiones exactas (misma IP · mismo destino · mismo `from` ·
+ * mismo día).
+ *
+ * Lo que lo hacía engañoso no era el volumen, sino que el sesgo NO es uniforme:
+ * se infla en proporción a cuánto se recargue cada superficie. `home-search`
+ * repetía el 50,3% y `home-daily` el 17,5%, así que el buscador de la home salía
+ * inflado justo frente a las cards con las que se le compara.
+ *
+ * Es el hermano de `urlParaCompartir` (04/09): allí el `from` viajaba a un
+ * tercero, aquí se repetía en el propio visitante. Aquella cura se queda —cubre
+ * el enlace que ya circula, que esta no puede alcanzar.
+ *
+ * ⚠️ `ref=share` NO se toca: describe cómo se llegó a la URL y cada apertura de
+ * un enlace compartido es un aterrizaje legítimo. Decisión consciente, no olvido.
+ */
+export function urlSinMarcaFrom(href: string): string | null {
+  const url = new URL(href);
+  const enQuery = url.searchParams.has('from');
+  const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
+  const enHash = hash.has('from');
+  // Un ancla normal (#etapas, #modulo-3) no lleva `from`: se devuelve null y el
+  // llamante no toca la URL. Que no haya nada que limpiar no es un caso de error.
+  if (!enQuery && !enHash) return null;
+
+  if (enQuery) url.searchParams.delete('from');
+  if (enHash) {
+    // El resto del fragmento se conserva LITERAL, no vía URLSearchParams.toString():
+    // ese round-trip convierte un ancla que acompañe a la marca (#from=x&modulo-3)
+    // en `#modulo-3=`, con un `=` que ya no apunta a ningún elemento de la página.
+    // Vacío ⇒ URL sin '#'.
+    url.hash = url.hash
+      .replace(/^#/, '')
+      .split('&')
+      .filter((parte) => !/^from=/.test(parte))
+      .join('&');
+  }
+  return url.toString();
+}
