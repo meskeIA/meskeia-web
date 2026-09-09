@@ -113,6 +113,22 @@ const empiezaPorVocal = (palabra: string): boolean => {
 const esConjuncionY = (palabra: string): boolean => palabra.toLowerCase() === 'y';
 
 /**
+ * ¿Entre estas dos palabras hay algo que el extractor tiró y que sí se pronuncia?
+ *
+ * El extractor de palabras es `/[a-záéíóúüñ]+/gi`, así que una cifra —o una letra que no esté
+ * en esa clase— desaparece del cómputo. Eso por sí solo es una limitación asumida (y avisada
+ * en el bloque de limitaciones de la app), pero además dejaba CONTIGUAS dos palabras que en el
+ * verso no se tocan: en «Tengo 20 años y 3 hijos» la app no se limitaba a ignorar el «20»,
+ * AFIRMABA en pantalla el lazo «Tengo ⌣ años», una fusión que nadie pronuncia porque en medio
+ * se dice «veinte» (hallazgo 660, 07/09/2026).
+ *
+ * La sinalefa exige contacto REAL entre la vocal final y la inicial. Solo pueden separarlas
+ * espacios y signos de puntuación; en cuanto entre medias queda una letra o un dígito que no
+ * se ha analizado, no hay contacto que valga.
+ */
+const hayTokenDescartado = (entreMedias: string): boolean => /[\p{L}\p{N}]/u.test(entreMedias);
+
+/**
  * Clasifica la acentuación de la última palabra del verso, que determina
  * el ajuste métrico final (aguda +1 · llana ±0 · esdrújula −1).
  */
@@ -207,12 +223,13 @@ export const analizarVerso = (linea: string): AnalisisVerso | null => {
   for (let i = 0; i < encontradas.length - 1; i++) {
     const actual = encontradas[i];
     const siguiente = encontradas[i + 1];
+    const entreMedias = linea.slice(actual.fin, siguiente.inicio);
     const funde: boolean =
+      !hayTokenDescartado(entreMedias) &&
       !(esConjuncionY(actual.palabra) && veniaFundida) &&
       terminaEnVocal(actual.palabra) &&
       empiezaPorVocal(siguiente.palabra);
     if (funde) {
-      const entreMedias = linea.slice(actual.fin, siguiente.inicio);
       sinalefas.push({
         indice: i,
         texto: `${actual.palabra.slice(-1)}_${siguiente.palabra[0]}`,

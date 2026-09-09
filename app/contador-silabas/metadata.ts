@@ -43,7 +43,7 @@ export const faqJsonLd = {
       name: '¿Cómo se separan las sílabas en español?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En español, cada sílaba debe contener al menos una vocal. Las reglas básicas son: una consonante entre vocales va con la vocal siguiente (ca-sa), dos consonantes entre vocales se separan (car-ta), salvo los grupos inseparables bl, br, cl, cr, dr, fl, fr, gl, gr, pl, pr, tr y tl. Las vocales fuertes (a, e, o) siempre forman sílabas distintas entre sí.',
+        text: 'En español, cada sílaba debe contener al menos una vocal. Las reglas básicas son: una consonante entre vocales va con la vocal siguiente (ca-sa), dos consonantes entre vocales se separan (car-ta), salvo los grupos inseparables bl, br, cl, cr, dr, fl, fr, gl, gr, pl, pr y tr, que viajan enteros a la sílaba siguiente (a-brir, o-tro). El grupo "tl" no entra en esa lista: en la mayor parte de España se silabea at-le-ta y at-lán-ti-co, y esa es la partición que se aplica aquí, aunque en México y otras zonas de América se pronuncie a-tle-ta. Las vocales fuertes (a, e, o) siempre forman sílabas distintas entre sí.',
       },
     },
     {
@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Qué es un diptongo y cómo afecta al conteo de sílabas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un diptongo es la unión de dos vocales que se pronuncian en una sola sílaba. Se forma cuando una vocal fuerte (a, e, o) se combina con una vocal débil átona (i, u), o dos débiles juntas. Por ejemplo, "aire" tiene 2 sílabas (ai-re) por el diptongo "ai". El diptongo reduce el conteo de sílabas respecto a si las vocales fueran independientes.',
+        text: 'Un diptongo es la unión de dos vocales que se pronuncian en una sola sílaba. Se forma cuando una vocal fuerte (a, e, o) se combina con una vocal débil átona (i, u), o cuando se juntan dos vocales débiles distintas: ciu-dad, cui-da. Dos vocales débiles iguales no forman diptongo, sino hiato (chi-i-ta, du-un-vi-ro). Por ejemplo, "aire" tiene 2 sílabas (ai-re) por el diptongo "ai". El diptongo reduce el conteo de sílabas respecto a si las vocales fueran independientes.',
       },
     },
     {
@@ -75,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Cuántas sílabas tiene un verso endecasílabo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un verso endecasílabo tiene 11 sílabas métricas. Es el verso más usado en la poesía española clásica y renacentista, empleado por Garcilaso de la Vega y en los sonetos. Ejemplo: "En el principio de tus años tiernos" tiene 11 sílabas métricas contando la sinalefa entre palabras.',
+        text: 'Un verso endecasílabo tiene 11 sílabas métricas. Es el verso más usado en la poesía española clásica y renacentista, empleado por Garcilaso de la Vega y en los sonetos. Esas 11 pueden salir sin ninguna fusión: "En el principio de tus años tiernos" tiene 11 sílabas fonéticas, ninguna sinalefa (ninguna palabra acabada en vocal va seguida de otra que empiece por vocal) y final llano, así que 11 fonéticas son 11 métricas. O pueden salir con ellas: "Érase un hombre a una nariz pegado" tiene 14 sílabas fonéticas y tres sinalefas encadenadas (se_un, bre_a, a_u), y también da 11.',
       },
     },
     {

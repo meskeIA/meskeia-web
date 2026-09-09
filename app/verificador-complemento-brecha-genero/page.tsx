@@ -12,8 +12,16 @@ import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
   COMPLEMENTO_MATERNIDAD_DEROGADO,
+  FISCAL_PENSIONES_META,
   LIMITES_PENSION_2025,
+  RECLAMACION_PREVIA_SS_META,
 } from '@/data/fiscal';
+/**
+ * El recuento de requisitos se importa del MOTOR del MCP, que es el gemelo de esta app: así
+ * la web, las dos tools del MCP y el FAQPage cuentan lo mismo por construcción (hallazgo
+ * 654, que había dejado «5 requisitos clave» donde el verificador evalúa cuatro).
+ */
+import { NUM_REQUISITOS_ART60 } from '@/lib/calculadoras/complementoBrechaGenero';
 
 /**
  * Las dos resoluciones que fijan la igualdad de trato, LEÍDAS del módulo fiscal. Iban
@@ -336,11 +344,40 @@ export default function VerificadorComplementoBrechaGeneroPage() {
         context="verificador-complemento-brecha-genero"
       />
 
+      {/*
+        TRES sellos, uno por módulo, porque la página publica datos de tres módulos fiscales
+        sellados por separado y hasta el 09/09/2026 declaraba solo el primero: el lector veía
+        «Art. 60 LGSS … verificado el 13/05/2026» debajo de unos plazos que salen de la LRJS
+        y de la Ley 39/2015 y que se verificaron el 05/09/2026, y de un límite de pensión que
+        se verificó el 12/08/2026 (hallazgo 652 — es el 610 con otro nombre).
+
+        `DataReference` admite un solo módulo por tarjeta a propósito: cada sello tiene su
+        fecha de verificación, y fundirlos obligaría a dar una sola, que es justamente lo que
+        se quería evitar al separar `RECLAMACION_PREVIA_SS_META` del sello del complemento.
+        Van los tres arriba y no junto a cada dato porque el resto de esa información vive
+        dentro de la guía, que arranca colapsada: un sello que hay que desplegar para leerlo
+        no ampara nada.
+      */}
       <DataReference
-        normativa="Complemento por Brecha de Género 2026"
+        normativa={`Complemento por Brecha de Género ${COMPLEMENTO_BRECHA_GENERO_META.vigencia}`}
         fuente={COMPLEMENTO_BRECHA_GENERO_META.fuente}
         verificado={COMPLEMENTO_BRECHA_GENERO_META.verificado}
         urlOficial={COMPLEMENTO_BRECHA_GENERO_META.urlOficial}
+      />
+
+      <DataReference
+        normativa="Reclamación previa ante el INSS"
+        fuente={RECLAMACION_PREVIA_SS_META.fuente}
+        verificado={RECLAMACION_PREVIA_SS_META.verificado}
+        urlOficial={RECLAMACION_PREVIA_SS_META.urlOficial}
+        nota={`El plazo se cuenta en ${RECLAMACION_PREVIA_SS_META.computo}.`}
+      />
+
+      <DataReference
+        normativa={`Límite máximo de pensiones públicas ${FISCAL_PENSIONES_META.vigencia}`}
+        fuente={FISCAL_PENSIONES_META.fuente}
+        verificado={FISCAL_PENSIONES_META.verificado}
+        urlOficial={FISCAL_PENSIONES_META.urlOficial}
       />
 
       <div className={styles.mainContent}>
@@ -594,8 +631,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               </div>
 
               <p className={styles.notaFinal}>
-                <strong>Aviso:</strong> esta herramienta orienta sobre los 5 requisitos clave del
-                art. 60 LGSS. El reconocimiento definitivo lo realiza el INSS tras valorar tu
+                <strong>Aviso:</strong> esta herramienta orienta sobre los {NUM_REQUISITOS_ART60} requisitos
+                clave del art. 60 LGSS. El reconocimiento definitivo lo realiza el INSS tras valorar tu
                 expediente completo. Si tu caso es complejo (denegaciones previas, concurrencia
                 entre progenitores, situaciones de adopción) consulta con un abogado laboralista.
               </p>
@@ -745,11 +782,17 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Y los hijos fallecidos antes de los 16 años?</h3>
+              {/* El titular enuncia la REGLA (nacer con vida), no una edad: hasta el
+                  09/09/2026 decía «¿Y los hijos fallecidos antes de los 16 años?», un umbral
+                  que no está ni en el art. 60.1 LGSS ni en la STS que la respuesta cita, y
+                  que dejaba fuera —en apariencia— a quien perdió a un hijo más tarde, cuando
+                  la regla también le da derecho (hallazgo 655). */}
+              <h3>¿Cuenta un hijo o hija que nació con vida y falleció después?</h3>
               <p>
                 {COMPUTO_HIJO_FALLECIDO.detalle} Lo fija la {COMPUTO_HIJO_FALLECIDO.sentencia},
                 que distingue este caso del hijo nacido sin vida, a quien el {COMPUTO_HIJO_FALLECIDO.norma}{' '}
-                sí excluye. En supuestos dudosos, mejor acudir a un asesor.
+                sí excluye. Lo que decide es el nacimiento con vida, no cuánto tiempo viviera
+                después: la norma no fija ninguna edad. En supuestos dudosos, mejor acudir a un asesor.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -800,7 +843,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 <h3>Verifica los requisitos básicos</h3>
                 <p>
                   Pensión contributiva, hecho causante posterior al {FECHA_MINIMA_CORTA} y al menos un hijo/a
-                  computable. Esta herramienta te orienta sobre los 5 puntos clave.
+                  computable. Esta herramienta te orienta sobre los {NUM_REQUISITOS_ART60} puntos clave.
                 </p>
               </div>
             </li>

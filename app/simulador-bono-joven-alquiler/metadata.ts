@@ -14,6 +14,8 @@ const AYUDA_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitac
 const AYUDA_ANUAL_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda * 12);
 const AYUDA_ANUAL_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion * 12);
 const LIMITE_PORC = formatNumber(BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100, 0);
+const RENTA_MAX_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.vivienda);
+const RENTA_MAX_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.habitacion);
 const DURACION_TOTAL_ANIOS = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12;
 const EDAD_MIN = BONO_ALQUILER_JOVEN_2026.edad.minima;
 const EDAD_MAX = BONO_ALQUILER_JOVEN_2026.edad.maxima;
@@ -58,14 +60,21 @@ export const jsonLd = generateWebAppSchema({
   description: `Simulador del Bono Joven Alquiler (Plan Estatal de Vivienda 2026-2030, RD 326/2026): comprueba si cumples los requisitos y calcula tu ayuda mensual. Hasta ${AYUDA_VIVIENDA}/mes para vivienda completa o ${AYUDA_HABITACION}/mes para habitación en piso compartido, durante hasta ${DURACION_TOTAL_ANIOS} años.`,
   url: "https://meskeia.com/simulador-bono-joven-alquiler/",
   category: 'FinanceApplication',
+  // El featureList es la señal que las IAs (Bing Copilot, ChatGPT, Perplexity) usan para
+  // decidir qué sabe hacer esta página: cada entrada tiene que corresponderse con algo que
+  // la página HACE de verdad. Antes anunciaba una «Guía del proceso de solicitud paso a paso
+  // por Comunidad Autónoma» que no existe —los pasos son idénticos para toda España y la
+  // página no nombra ni una comunidad— y publicaba «RegionBadge», el nombre interno del
+  // componente de meskeIA, como si fuera una característica (hallazgos 642 y 644).
   features: [
     "Comprueba elegibilidad para el Bono Joven Alquiler 2026-2030 (RD 326/2026) con checklist de requisitos",
     `Calcula la ayuda mensual efectiva: hasta ${AYUDA_VIVIENDA}/mes en vivienda completa o ${AYUDA_HABITACION}/mes en habitación`,
     `Muestra el límite del ${LIMITE_PORC}% de la renta y el ahorro total acumulado en hasta ${DURACION_TOTAL_ANIOS} años`,
+    `Comprueba la renta del contrato contra el tope estatal del art. 133.1.e (${RENTA_MAX_VIVIENDA}/mes en vivienda, ${RENTA_MAX_HABITACION}/mes en habitación), con el máximo reducido de los municipios pequeños`,
     "Diferencia entre requisitos imprescindibles y condicionantes para la aprobación",
-    "Guía del proceso de solicitud paso a paso por Comunidad Autónoma",
+    "Resume el proceso de solicitud y la documentación habitual, comunes a toda España: la convocatoria concreta la fija cada comunidad autónoma",
     "Funciona sin registro, sin enviar datos personales al servidor",
-    "RegionBadge: ayuda aplicable exclusivamente en España",
+    "Ayuda aplicable exclusivamente en España",
   ],
 });
 

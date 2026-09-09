@@ -4,7 +4,8 @@ import { test, expect, Page } from '@playwright/test';
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
  * CUARTA INSPECCIÓN: 07/09/2026, RE-INSPECCIÓN tras las reparaciones del 02/09. Sus casos y
- * sus cuatro hallazgos abiertos, al final del fichero, en su propio bloque.
+ * sus CINCO hallazgos (659-663), al final del fichero, en su propio bloque. Los cinco se
+ * REPARARON el 09/09/2026 y quedan ahí como regresión, sin test.fail().
  * TERCERA INSPECCIÓN: 02/09/2026 (segmento cálculo, riesgo 3). Sus tres casos, resueltos a
  * mano antes de abrir el navegador, están al final del fichero, en su propio bloque.
  * SEGUNDA INSPECCIÓN: 24/08/2026, sobre el silabeador REESCRITO ese mismo día.
@@ -51,7 +52,7 @@ import { test, expect, Page } from '@playwright/test';
  *       Con el campo vacío o solo con espacios, analizar() sale por `if (!texto.trim())` y
  *       la app se queda en el marcador de posición, sin inventarse un resultado.
  *
- * HALLAZGOS: al final del fichero, los de las dos inspecciones, todos REPARADOS y como
+ * HALLAZGOS: al final del fichero, los de las cuatro inspecciones, todos REPARADOS y como
  * regresión. Los seis de la segunda tanda (257-262) se cerraron el 24/08/2026 quitándoles
  * el test.fail() con el que se documentaron, tras comprobar uno a uno que lo que afirmaban
  * seguía siendo correcto — que es la regla que dejó la ronda 1: un test.fail() que pasa a
@@ -699,9 +700,10 @@ test.describe('contador-silabas', () => {
   //       En ambas, /[a-záéíóúüñ]+/gi no encuentra ninguna palabra: se espera el aviso
   //       explícito, sin resumen con ceros, sin tarjetas de palabra y sin bloque de métrica.
   //
-  // HALLAZGOS ABIERTOS de esta ronda: los cuatro `test.fail()` del final. Ninguno es del motor
-  // de silabeo ni del de escansión, que aguantaron todo lo que se les echó; son el material
-  // DIDÁCTICO contradiciendo al motor, y una cifra dentro del verso.
+  // HALLAZGOS de esta ronda (659-663): los cinco del final, REPARADOS el 09/09/2026 y ya sin
+  // test.fail(). Ninguno es del silabeador, que aguantó todo lo que se le echó; son el material
+  // DIDÁCTICO contradiciendo al motor (659, 661, 662, 663) y una cifra dentro del verso (660),
+  // que era el único con código detrás.
   // =====================================================================================
 
   test.describe('cuarta inspección (07/09/2026)', () => {
@@ -835,17 +837,20 @@ test.describe('contador-silabas', () => {
     });
 
     // -----------------------------------------------------------------------------------
-    // HALLAZGOS ABIERTOS — escritos con test.fail(), afirmando lo que DEBERÍA ocurrir.
-    // Cuando se reparen, quitarles la marca y dejarlos como regresión (no antes de verificar
-    // a mano que lo que afirman sigue siendo correcto: la regla que dejó la ronda 1).
+    // HALLAZGOS 659-663 — cuarta inspección, 07/09/2026 · REPARADOS el 09/09/2026
+    // Estaban escritos con test.fail(), afirmando lo que DEBERÍA ocurrir. Se les ha quitado
+    // la marca al repararlos, tras rehacer a mano la cuenta de cada verso y comprobar que lo
+    // que afirmaban sigue siendo lo correcto — la regla que dejó la ronda 1: un test.fail()
+    // que pasa a verde no prueba nada hasta verificar su contenido.
     // -----------------------------------------------------------------------------------
 
-    // ❌ ABIERTO · El ejemplo resuelto de la FAQ educativa se salta las sinalefas que la
-    //    propia app detecta dos pantallas más arriba. Es el ejemplo de la pregunta sobre el
-    //    ajuste por acento final, o sea la lección misma: quien la copie en un examen contará
-    //    11 donde la app dice 9.
-    test.fail(
-      'HALLAZGO · el ejemplo resuelto de la FAQ educativa contradice al motor',
+    // ✅ 659 · El ejemplo resuelto de la FAQ educativa se saltaba las sinalefas que la propia
+    //    app detecta dos pantallas más arriba, y era el ejemplo de la lección misma sobre el
+    //    ajuste por acento final: quien lo copiara en un examen contaría 11 donde la app dice
+    //    9. Ahora la respuesta aísla la regla con un verso SIN sinalefas («que van a dar en la
+    //    mar», 7 fonéticas + 1 aguda = 8) y cuenta bien el que ya estaba, restando las dos.
+    test(
+      '659 · el ejemplo resuelto de la FAQ educativa cuenta lo mismo que el motor',
       async ({ page }) => {
         // En(1) el(1) prin-ci-pio(3) e-ra(2) el(1) a-mor(2) = 10 fonéticas.
         // Sinalefas «principio_era» y «era_el» → −2. «amor» aguda → +1. 10 − 2 + 1 = 9.
@@ -859,38 +864,43 @@ test.describe('contador-silabas', () => {
         await pregunta.click();
         const respuesta = (await pregunta.locator('xpath=..').innerText()).replace(/\s+/g, ' ');
 
-        // El texto dice «tiene 11 sílabas métricas aunque tenga 10 fonéticas»: acierta las
-        // fonéticas y luego suma el +1 sin restar las dos sinalefas.
+        // Antes decía «tiene 11 sílabas métricas aunque tenga 10 fonéticas»: acertaba las
+        // fonéticas y luego sumaba el +1 sin restar las dos sinalefas.
         expect(respuesta).toContain(`${metricas} sílabas métricas`);
+        expect(respuesta).not.toContain('11 sílabas métricas');
+        // Y el verso que aísla la regla: 7 fonéticas, ninguna fusión, aguda +1 → 8.
+        expect(respuesta).toContain('8 sílabas métricas');
       }
     );
 
-    // ❌ ABIERTO · La reparación del hallazgo 614 (02/09) llegó al motor y al bloque educativo
+    // ✅ 661 · La reparación del hallazgo 614 (02/09) llegó al motor y al bloque educativo
     //    visible —que ya dice «dos débiles DISTINTAS» y «dos débiles IGUALES forman hiato»—
-    //    pero NO al `faqJsonLd` de metadata.ts, que sigue enseñando la regla anterior. Y ese
-    //    es justo el bloque que leen Bing Copilot, ChatGPT y Perplexity para responder.
-    test.fail(
-      'HALLAZGO · el FAQPage del JSON-LD conserva la regla de diptongo anterior a la reparación',
+    //    pero NO al `faqJsonLd` de metadata.ts, que se quedó con la regla anterior. Y ese es
+    //    justo el bloque que leen Bing Copilot, ChatGPT y Perplexity para responder.
+    test(
+      '661 · el FAQPage del JSON-LD enseña la regla de diptongo que aplica el motor',
       async ({ page }) => {
         // Lo que la app hace, y hace bien:
         await analizar(page, 'chiita');
         await expect(silabasDe(page, 0)).toHaveText(['chi', 'i', 'ta']);
         await expect(page.locator('[class*="palabraCard"]').nth(0)).toContainText('Hiato: i-i');
 
-        // Lo que el FAQPage declara: «una vocal fuerte se combina con una vocal débil átona
-        // (i, u), o dos débiles juntas» — sin el «distintas» que la propia app enseña.
+        // El FAQPage declaraba «una vocal fuerte se combina con una vocal débil átona (i, u),
+        // o dos débiles juntas» — sin el «distintas» que la propia app enseña.
         const faq = await leerFaqJsonLd(page);
         const diptongo = faq.find((q) => q.pregunta.includes('¿Qué es un diptongo'));
         expect(diptongo?.respuesta).toContain('distinta');
+        expect(diptongo?.respuesta).toContain('hiato');
       }
     );
 
-    // ❌ ABIERTO · El FAQPage declara «tl» grupo inseparable. El motor lo excluye a propósito
+    // ✅ 662 · El FAQPage declaraba «tl» grupo inseparable. El motor lo excluye a propósito
     //    (silabeo.ts documenta por qué: at-le-ta es la partición peninsular, la única que
     //    produce un ataque válido en todas las variedades) y la ficha visible «Consonantes
-    //    Dobles» de la propia página lo enumera SIN tl. Dos textos de la misma app, dos reglas.
-    test.fail(
-      'HALLAZGO · el FAQPage declara «tl» inseparable y ni el motor ni la ficha visible lo aplican',
+    //    Dobles» de la propia página lo enumera SIN tl. Eran dos textos de la misma app con
+    //    dos reglas distintas, y la servida a los buscadores era la que la app no aplica.
+    test(
+      '662 · el FAQPage ya no declara «tl» inseparable, como el motor y la ficha visible',
       async ({ page }) => {
         await analizar(page, 'atleta atlántico');
         await expect(silabasDe(page, 0)).toHaveText(['at', 'le', 'ta']);
@@ -899,34 +909,48 @@ test.describe('contador-silabas', () => {
         const faq = await leerFaqJsonLd(page);
         const separacion = faq.find((q) => q.pregunta.includes('¿Cómo se separan las sílabas'));
         expect(separacion?.respuesta).not.toContain('tr y tl');
+        // Y lo dice en positivo, que es lo que el motor hace: at-le-ta, no a-tle-ta.
+        expect(separacion?.respuesta).toContain('at-le-ta');
       }
     );
 
-    // ❌ ABIERTO · Una cifra dentro del verso desaparece del cómputo Y deja unidas dos palabras
+    // ✅ 660 · Una cifra dentro del verso desaparecía del cómputo Y dejaba unidas dos palabras
     //    que no se tocan. El extractor /[a-záéíóúüñ]+/gi descarta «20», y `analizarVerso()`
-    //    mira entonces «Tengo» y «años» como si fueran contiguas. La app pinta la fusión
-    //    «Tengo ⌣ años» con el lazo de sinalefa: no es que ignore la cifra, es que AFIRMA una
+    //    miraba entonces «Tengo» y «años» como si fueran contiguas: la app pintaba la fusión
+    //    «Tengo ⌣ años» con el lazo de sinalefa, o sea que no ignoraba la cifra, AFIRMABA una
     //    fusión que en el texto no existe. Y «letras de canciones» es un uso que la propia app
     //    promociona (tiene un metro personalizado añadido para eso).
-    test.fail(
-      'HALLAZGO · una cifra dentro del verso deja una sinalefa entre palabras que no se tocan',
+    //    Reparado en metrica.ts (`hayTokenDescartado`): un token descartado rompe la
+    //    contigüidad, así que entre dos palabras separadas por una cifra no hay sinalefa.
+    test(
+      '660 · una cifra dentro del verso rompe la contigüidad y no genera sinalefa',
       async ({ page }) => {
-        // Leído en voz alta: Ten-go-vein-tea-ño-sy-tres-hi-jos → 9 sílabas métricas.
-        // La app devuelve 5 (7 fonéticas − 2 sinalefas), una de ellas a través del «20».
+        // Ten-go(2) a-ños(2) y(1) hi-jos(2) = 7 fonéticas. El «20» y el «3» no son palabras y
+        // no aportan sílabas, pero SÍ separan: ni «Tengo»+«años» ni «y»+«hijos» se tocan, así
+        // que 0 sinalefas. «hijos» es llana: ±0. 7 − 0 + 0 = 7, heptasílabo.
         await analizar(page, 'Tengo 20 años y 3 hijos');
+
         const etiquetas = await page.locator('[class*="sinalefaTag"]').allTextContents();
         const aTraves = etiquetas.some((t) => /Tengo[\s\S]*años/.test(t));
-        expect(aTraves).toBe(false);
+        expect(aTraves).toBe(false); // obtenido antes de la reparación: «Tengo ⌣ años»
+        await expect(sinalefasDe(page)).toHaveCount(0);
+        await expect(metricasDe(page)).toHaveText('7'); // obtenido antes: 5
+        await expect(desgloseDe(page)).not.toContainText('sinalefa');
+
+        // Y la limitación queda dicha donde el usuario la busca, junto a siglas y compuestos.
+        await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+        await expect(page.getByText('Las cifras no se cuentan')).toBeVisible();
       }
     );
 
-    // ❌ ABIERTO · El FAQPage atribuye a una sinalefa un 11 que sale sin ninguna. El verso
-    //    que pone de ejemplo del endecasílabo no tiene ni un contacto vocal-vocal entre
-    //    palabras: sus 11 sílabas métricas son sus 11 fonéticas, y la propia app lo enseña así
-    //    en pantalla. El número es correcto; la razón que se da, no — y es la razón lo que se
-    //    está explicando.
-    test.fail(
-      'HALLAZGO · el FAQPage atribuye a una sinalefa inexistente el ejemplo del endecasílabo',
+    // ✅ 663 · El FAQPage atribuía a una sinalefa un 11 que sale sin ninguna. El verso que
+    //    pone de ejemplo del endecasílabo no tiene ni un contacto vocal-vocal entre palabras:
+    //    sus 11 sílabas métricas son sus 11 fonéticas, y la propia app lo enseña así en
+    //    pantalla. El número era correcto; la razón que se daba, no — y es la razón lo que se
+    //    está explicando. Ahora la respuesta cuenta los dos caminos al 11: sin fusión (este
+    //    verso) y con tres sinalefas encadenadas (el de Quevedo, 14 − 3).
+    test(
+      '663 · el FAQPage explica el endecasílabo con la razón que el motor aplica',
       async ({ page }) => {
         // En(1) el(1) prin-ci-pio(3) de(1) tus(1) a-ños(2) tier-nos(2) = 11 fonéticas.
         // Ninguna palabra acaba en vocal ante palabra que empiece por vocal: 0 sinalefas.
@@ -939,6 +963,7 @@ test.describe('contador-silabas', () => {
         const faq = await leerFaqJsonLd(page);
         const endeca = faq.find((q) => q.pregunta.includes('verso endecasílabo'));
         expect(endeca?.respuesta).not.toContain('contando la sinalefa');
+        expect(endeca?.respuesta).toContain('ninguna sinalefa');
       }
     );
   });

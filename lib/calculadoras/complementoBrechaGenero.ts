@@ -11,21 +11,23 @@
  *   - RDL 3/2021 (04/02/2021): crea el complemento de brecha de género, accesible a
  *     hombres y mujeres, pero EXIGÍA a los hombres requisitos adicionales (interrupción
  *     de jornada en los 2 años previos al nacimiento Y pensión inferior a la de la madre).
- *   - STJUE C-623/23 (15/05/2025) y STS de 09/07/2025: declaran que esos requisitos
- *     adicionales para los hombres son contrarios al principio de igualdad de trato
- *     (Directiva 79/7/CEE). El complemento debe reconocerse a hombres y mujeres EN LAS
- *     MISMAS CONDICIONES. El INSS asumió este criterio en 2025.
+ *   - Las dos resoluciones de 2025 que declaran esos requisitos adicionales contrarios al
+ *     principio de igualdad de trato (Directiva 79/7/CEE) NO van tecleadas aquí: viven en
+ *     `COMPLEMENTO_BRECHA_GENERO_META.doctrina` y de ahí las lee esta calculadora, igual
+ *     que la web. El complemento debe reconocerse a hombres y mujeres EN LAS MISMAS
+ *     CONDICIONES, criterio que el INSS asumió en 2025.
  *   - Por tanto, esta calculadora NO aplica ya requisitos extra a los hombres. Los
  *     requisitos son idénticos para ambos sexos.
  *
  * ── Requisitos (idénticos para hombre y mujer desde la doctrina 2025) ────────────
- *   1. Ser beneficiario de una pensión contributiva: jubilación, incapacidad
- *      permanente o viudedad. (Las no contributivas quedan fuera.)
- *   2. Hecho causante de la pensión a partir del 04/02/2021.
- *   3. Tener al menos 1 hijo/a nacido con vida o adoptado antes del hecho causante.
- *   4. Que el otro progenitor no perciba el complemento por los mismos hijos
- *      (incompatibilidad: solo uno de los dos). En caso de concurrencia, la SS lo
- *      reconoce al progenitor con pensión pública de menor cuantía.
+ *   La lista —y por tanto CUÁNTOS son— vive en `REQUISITOS_ART60`, aquí abajo: es la única
+ *   enumeración, y de ella salen también el aviso del panel de la web, el paso 1 de su
+ *   guía y su FAQPage. Contarlos a mano en cada sitio fue el hallazgo 654, que dejó un
+ *   «5 requisitos clave» en la web sin correspondencia con nada de lo que la app evalúa.
+ *
+ *   Dos reglas que NO son requisitos y que por eso quedan fuera de esa lista: la
+ *   jubilación parcial, excluida expresamente (art. 60.4 LGSS, ver abajo), y el sexo del
+ *   solicitante, que dejó de condicionar el derecho con la doctrina de 2025.
  *
  * ── Exclusión expresa (art. 60.4 LGSS) ───────────────────────────────────────────
  *   La JUBILACIÓN PARCIAL del art. 215 LGSS no da derecho al complemento, aunque sea
@@ -41,7 +43,9 @@
  *
  * Los importes y la doctrina se centralizan en data/fiscal/pensiones.ts.
  *
- * Fuente: art. 60 LGSS (RDL 3/2021) + RDL 3/2026 + STJUE C-623/23 + STS 09/07/2025
+ * Fuente: `COMPLEMENTO_BRECHA_GENERO_META.fuente` (art. 60 LGSS + RDL de revalorización) y,
+ * para la jurisprudencia, `COMPLEMENTO_BRECHA_GENERO_META.doctrina` — ambas en
+ * data/fiscal/pensiones.ts, que es donde se revisan por /triaje-fiscal.
  *
  * Encadenable con: calcular_pension_publica, calcular_pension_viudedad, calcular_jubilacion_anticipada
  */
@@ -62,6 +66,55 @@ const EXCLUSION_JUBILACION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones.
 
 /** Fecha mínima del hecho causante, leída del módulo fiscal (hallazgo 504) */
 export const FECHA_MINIMA_HECHO_CAUSANTE = formatFechaLarga(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante);
+
+/**
+ * Las dos resoluciones de igualdad de trato, LEÍDAS del módulo fiscal.
+ *
+ * La web ya las interpolaba desde aquí (hallazgo 606), pero la reparación no viajó a este
+ * gemelo, que las tecleaba en tres cadenas de runtime: mismas fechas, distinto origen. Con
+ * las dos vías leyendo el mismo campo, la próxima resolución que matice la doctrina se
+ * corrige una vez en data/fiscal y llega a la vez a la página y a las tools del MCP
+ * (hallazgo 653).
+ */
+const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
+
+/**
+ * Los requisitos del art. 60 LGSS que esta calculadora evalúa DE VERDAD, enumerados una
+ * sola vez para todo el conjunto app + MCP.
+ *
+ * Cada uno se corresponde con una rama de denegación de `calcularComplementoBrechaGenero`:
+ * pensión elegible (casos 1 y 1.bis), corte temporal (caso 2), hijos computables (caso 3) y
+ * concurrencia con el otro progenitor (caso 4). Ni el sexo ni la denegación propia están
+ * aquí: el primero dejó de condicionar el derecho con la doctrina de 2025 y la segunda no
+ * es un requisito, sino la vía de reclamación.
+ *
+ * `detalle` va redactado para poder encadenarse en prosa (lo consume el FAQPage de la app);
+ * `corto` es la etiqueta para listados.
+ */
+export const REQUISITOS_ART60 = [
+  {
+    corto: 'pensión contributiva elegible',
+    detalle:
+      'ser titular de una pensión contributiva de jubilación, incapacidad permanente o ' +
+      'viudedad (las no contributivas y la jubilación parcial quedan fuera)',
+  },
+  {
+    corto: `hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE}`,
+    detalle: `que el hecho causante de la pensión sea el ${FECHA_MINIMA_HECHO_CAUSANTE} o posterior`,
+  },
+  {
+    corto: 'al menos un hijo o hija computable',
+    detalle:
+      'tener al menos un hijo o hija nacido con vida o adoptado antes del hecho causante',
+  },
+  {
+    corto: 'que el otro progenitor no lo perciba',
+    detalle: 'que el otro progenitor no perciba ya el complemento por los mismos hijos',
+  },
+] as const;
+
+/** Cuántos requisitos evalúa el verificador. Se cuenta, no se teclea (hallazgo 654). */
+export const NUM_REQUISITOS_ART60 = REQUISITOS_ART60.length;
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -146,7 +199,7 @@ export function calcularComplementoBrechaGenero(
   const advertenciasBase = [
     'El complemento se abona en 14 pagas y NO computa a efectos del límite máximo de pensiones públicas: se suma aunque ya se perciba la pensión máxima.',
     'El complemento tributa en IRPF como rendimiento del trabajo.',
-    'Desde la STJUE C-623/23 (15-may-2025) y la STS de 09-jul-2025, hombres y mujeres tienen derecho en igualdad de condiciones: ya no se exigen requisitos adicionales a los hombres.',
+    `Desde la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la STS de ${DOCTRINA.ts.fecha}, hombres y mujeres tienen derecho en igualdad de condiciones: ya no se exigen requisitos adicionales a los hombres.`,
   ];
 
   // Helper para construir un resultado de "no procede"
@@ -242,7 +295,7 @@ export function calcularComplementoBrechaGenero(
 
   const motivo = esReclamacion
     ? (p.sexo === 'hombre'
-        ? 'Tras la STJUE C-623/23 (15-may-2025) y la doctrina del Tribunal Supremo (09-jul-2025), las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. El complemento debe reconocerse en las mismas condiciones que a las mujeres.'
+        ? `Tras la STJUE de ${DOCTRINA.stjue.fecha} (${DOCTRINA.stjue.asunto}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. El complemento debe reconocerse en las mismas condiciones que a las mujeres.`
         : 'Se cumplen los requisitos básicos del art. 60 LGSS, así que conviene revisar el motivo de la resolución denegatoria: de él depende si cabe reclamar o si hay algo que subsanar.')
     : (p.sexo === 'hombre'
         ? 'Tras la doctrina TJUE/TS 2025, los hombres tienen derecho al complemento en las mismas condiciones que las mujeres. Se cumplen los requisitos básicos del art. 60 LGSS.'
@@ -250,7 +303,7 @@ export function calcularComplementoBrechaGenero(
 
   const pasoSiguiente = esReclamacion
     ? (p.sexo === 'hombre'
-        ? 'Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución denegatoria, citando la STJUE C-623/23 y la doctrina del TS. Recomendable acudir a un abogado laboralista o al sindicato.'
+        ? `Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución denegatoria, citando la ${DOCTRINA.stjue.corto} y la doctrina del TS. Recomendable acudir a un abogado laboralista o al sindicato.`
         : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu sindicato antes de volver a solicitarlo.')
     : 'Si ya cobras la pensión y el complemento no aparece en tu nómina, presenta una solicitud expresa ante el INSS (Sede Electrónica de la SS) citando el art. 60 LGSS.';
 

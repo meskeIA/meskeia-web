@@ -94,6 +94,15 @@
     "plata",
     "platero"
   ],
+  "33.20": [
+    "instalación de maquinaria",
+    "instalación de máquinas",
+    "instalador industrial",
+    "maquinaria industrial",
+    "montaje de equipos industriales",
+    "montaje de maquinaria",
+    "montaje industrial"
+  ],
   "41.01": [
     "constructor",
     "constructora",
@@ -134,9 +143,7 @@
     "aislamientos",
     "escayolista",
     "falso techo",
-    "instalador industrial",
     "molduras",
-    "montaje de maquinaria",
     "pladur",
     "tabiquería seca",
     "yeso"
@@ -744,15 +751,20 @@
     "traductora"
   ],
   "74.91": [
+    "agencia de marketing",
+    "agente de marcas",
+    "agente de patentes",
+    "estudios de mercado",
+    "marketing",
+    "propiedad industrial",
+    "registro de marcas"
+  ],
+  "74.99": [
     "freelance",
     "gestor de proyectos",
     "no encuentro mi actividad",
     "otras actividades",
     "perito tasador",
-    "servicios profesionales varios"
-  ],
-  "74.99": [
-    "otras actividades",
     "servicios profesionales varios"
   ],
   "75.00": [

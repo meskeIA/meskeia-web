@@ -2,10 +2,17 @@ import { test, expect, Page } from '@playwright/test';
 import {
   COMPLEMENTO_MATERNIDAD_DEROGADO,
   COMPLEMENTO_BRECHA_GENERO_2026,
+  COMPLEMENTO_BRECHA_GENERO_META,
+  // Sello de las cuantías de pensión: ampara el límite máximo (3.359,60 €/mes) que la guía
+  // publica. Lo usa la regresión del hallazgo 652.
+  FISCAL_PENSIONES_META,
   // Sello propio de los plazos de la reclamación previa, nacido el 05/09/2026 al separar
-  // el trámite del complemento. Lo usa el hallazgo 07/09 (a) de la sección final.
+  // el trámite del complemento. Lo usa la regresión del hallazgo 652.
   RECLAMACION_PREVIA_SS_META,
 } from '../../data/fiscal/pensiones';
+// El recuento de requisitos del art. 60 que evalúa el verificador vive en el motor del MCP,
+// que es de donde lo leen la página y su faqJsonLd desde la reparación del hallazgo 654.
+import { NUM_REQUISITOS_ART60 } from '../../lib/calculadoras/complementoBrechaGenero';
 
 /**
  * Inspector — verificador-complemento-brecha-genero (segmento FISCAL / Seguridad Social,
@@ -24,6 +31,20 @@ import {
  *   · Tres hallazgos de la re-inspección del 27/08, REPARADOS ese mismo día. Estaban
  *     escritos con `test.fail()` afirmando lo que debería pasar; al repararlos se les
  *     quitó la marca y ahora sujetan la reparación.
+ *
+ * REPARACIÓN 09/09/2026 — los CUATRO hallazgos de la inspección del 07/09 (652, 653, 654 y
+ * 655) están reparados; sus testigos, al final del fichero, ya no llevan `test.fail()` y
+ * quedan como REGRESIÓN. Qué sujeta cada uno:
+ *   · 652 — la página declara TRES sellos `DataReference`, uno por módulo, en vez de uno
+ *     solo que no cubría ni los plazos del art. 71 LRJS ni el límite máximo de pensiones
+ *     públicas. `RECLAMACION_PREVIA_SS_META` estrena así su primer consumidor.
+ *   · 653 — el motor del MCP lee `COMPLEMENTO_BRECHA_GENERO_META.doctrina` en vez de
+ *     teclear la jurisprudencia, y la regresión que debía sujetarlo comprueba ahora
+ *     FICHERO A FICHERO en vez de concatenarlos, que era lo que la dejaba ciega.
+ *   · 654 — el recuento de requisitos sale de `REQUISITOS_ART60` (motor del MCP), que
+ *     consumen la página y su `faqJsonLd`: ya no hay ningún «5» tecleado.
+ *   · 655 — la FAQ de los hijos fallecidos enuncia la regla real (haber nacido con vida) y
+ *     no un umbral de 16 años que no está ni en el art. 60.1 LGSS ni en la STS que cita.
  *
  * DE DÓNDE SALE CADA CIFRA
  * ────────────────────────
@@ -1072,7 +1093,9 @@ test.describe('Verificador del complemento por brecha de género', () => {
       await abrirGuia(page);
       const respuesta = normalizar(
         await page
-          .locator('h3', { hasText: '¿Y los hijos fallecidos antes de los 16 años?' })
+          // El titular cambió el 09/09/2026 al reparar el hallazgo 655 («antes de los 16
+          // años» era un umbral inventado); lo que este test sujeta es la respuesta.
+          .locator('h3', { hasText: 'nació con vida y falleció después' })
           .locator('..')
           .innerText(),
       );
@@ -1320,6 +1343,12 @@ test.describe('Verificador del complemento por brecha de género', () => {
   // ✅ REPARADO el 02/09/2026 (hallazgo 606). `doctrina` pasó de ser una cadena suelta sin
   // consumidores a un objeto con las dos resoluciones desglosadas, y las nueve copias de
   // `page.tsx` y `metadata.ts` lo interpolan. Queda como regresión.
+  //
+  // ⚠️ Corregido el 09/09/2026 (hallazgo 653): este test CONCATENABA los tres ficheros y
+  // exigía la cadena en el conjunto, así que pasaba con que la consumiera solo `page.tsx` —
+  // y eso es justo lo que ocurría: el motor del MCP siguió tecleando la jurisprudencia seis
+  // días sin que nada lo viera. Ahora se comprueba fichero A fichero: un consumidor que se
+  // quede atrás nombra el fichero que falta.
   test(
     'REGRESIÓN: META.doctrina tiene consumidores y la jurisprudencia no va tecleada',
     async () => {
@@ -1329,10 +1358,13 @@ test.describe('Verificador del complemento por brecha de género', () => {
         join('app', 'verificador-complemento-brecha-genero', 'page.tsx'),
         join('app', 'verificador-complemento-brecha-genero', 'metadata.ts'),
         join('lib', 'calculadoras', 'complementoBrechaGenero.ts'),
-      ]
-        .map(rel => readFileSync(join(process.cwd(), rel), 'utf8'))
-        .join('\n');
-      expect(consumidores).toContain('COMPLEMENTO_BRECHA_GENERO_META.doctrina');
+      ];
+      for (const rel of consumidores) {
+        const fuente = readFileSync(join(process.cwd(), rel), 'utf8');
+        expect(fuente, `${rel} no lee COMPLEMENTO_BRECHA_GENERO_META.doctrina`).toContain(
+          'COMPLEMENTO_BRECHA_GENERO_META.doctrina',
+        );
+      }
     },
   );
 });
@@ -1398,8 +1430,12 @@ test.describe('Regresión — hallazgos 607 y 608, reparados', () => {
 // quedaba ningún `test.fail()` vivo: la reparación del 05/09 ya les quitó la marca.
 //
 // Lo de aquí abajo son tres casos NUEVOS resueltos a mano contra
-// `COMPLEMENTO_BRECHA_GENERO_2026` antes de abrir el navegador, el cierre de la P5, y
-// cuatro hallazgos nuevos marcados con `test.fail()`.
+// `COMPLEMENTO_BRECHA_GENERO_2026` antes de abrir el navegador, el cierre de la P5, y los
+// cuatro hallazgos de aquella vuelta (652, 653, 654 y 655).
+//
+// ✅ REPARADOS los cuatro el 09/09/2026. Se les quitó el `test.fail()` y quedan como
+// REGRESIÓN: cada uno describe primero el defecto que hubo —para que se reconozca si
+// vuelve— y después la reparación que ahora sujeta.
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('Inspección 07/09/2026', () => {
@@ -1610,23 +1646,43 @@ test.describe('Inspección 07/09/2026', () => {
    * exactamente poder fechar los plazos sin afirmar de paso que se han reverificado las
    * cuantías. El sello nació sin ningún consumidor: `grep -rn RECLAMACION_PREVIA_SS_META
    * app/` no devuelve nada en todo el catálogo.
+   *
+   * ✅ REPARADO el 09/09/2026 (hallazgo 652). La página declara los TRES sellos, uno por
+   * módulo, seguidos y antes de la herramienta: `DataReference` admite un solo módulo por
+   * tarjeta porque cada uno tiene SU fecha de verificación, y fundirlos obligaría a dar una
+   * sola. `RECLAMACION_PREVIA_SS_META` estrena consumidor. Queda como REGRESIÓN.
    */
-  test.fail(
-    'HALLAZGO 07/09 (a): el sello de los plazos (art. 71 LRJS) no se declara en la página',
+  test(
+    'REGRESIÓN: cada dato normativo publicado tiene su sello, con SU fecha de verificación',
     async ({ page }) => {
-      const sello = normalizar(
-        await page.locator('[aria-label="Datos de referencia normativos"]').innerText(),
+      /** DD/MM/AAAA, que es como `DataReference` imprime la fecha de verificación. */
+      const enEspanol = (iso: string): string => {
+        const [anio, mes, dia] = iso.split('-');
+        return `${dia}/${mes}/${anio}`;
+      };
+
+      const sellos = normalizar(
+        (
+          await page.locator('[aria-label="Datos de referencia normativos"]').allInnerTexts()
+        ).join(' · '),
       );
-      // Lo que se publica bajo ese sello incluye el plazo del art. 71 LRJS…
+
+      // Lo que se publica bajo esos sellos incluye el plazo del art. 71 LRJS…
       await abrirGuia(page);
       const guia = normalizar(await page.locator('body').innerText());
       expect(guia).toContain(COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaNorma);
 
-      // …luego el sello tiene que nombrar esa fuente y su fecha de verificación real,
-      // que es la de RECLAMACION_PREVIA_SS_META y no la del complemento.
-      const [anio, mes, dia] = RECLAMACION_PREVIA_SS_META.verificado.split('-');
-      expect(sello).toContain('71 LRJS');
-      expect(sello).toContain(`${dia}/${mes}/${anio}`); // 05/09/2026, no 13/05/2026
+      // …luego los sellos nombran esa fuente y su fecha de verificación REAL, que es la de
+      // RECLAMACION_PREVIA_SS_META y no la del complemento.
+      expect(sellos).toContain('71 LRJS');
+      expect(sellos).toContain(enEspanol(RECLAMACION_PREVIA_SS_META.verificado)); // 05/09/2026
+
+      // Y cada uno de los otros dos módulos conserva el suyo, sin contagiarse las fechas:
+      // el complemento (13/05/2026) y las cuantías de pensión (12/08/2026), de donde sale
+      // el límite máximo de pensiones públicas que la guía publica.
+      expect(sellos).toContain(enEspanol(COMPLEMENTO_BRECHA_GENERO_META.verificado));
+      expect(sellos).toContain(enEspanol(FISCAL_PENSIONES_META.verificado));
+      expect(sellos).toContain('Ley 39/2015');
     },
   );
 
@@ -1650,12 +1706,18 @@ test.describe('Inspección 07/09/2026', () => {
    * lo que diverge es la cita normativa y, sobre todo, de dónde sale. El día que una nueva
    * resolución matice la doctrina, la web dirá una cosa y las dos tools del MCP la anterior.
    *
-   * Por qué no lo veía nada: la regresión «META.doctrina tiene consumidores» (línea 1320)
-   * concatena los TRES ficheros y exige que la cadena aparezca en el conjunto, así que pasa
-   * con que la consuma solo `page.tsx`. Este test mira el fichero del motor por separado.
+   * Por qué no lo veía nada: la regresión «META.doctrina tiene consumidores» concatenaba
+   * los TRES ficheros y exigía que la cadena apareciera en el conjunto, así que pasaba con
+   * que la consumiera solo `page.tsx`. Este test mira el fichero del motor por separado.
+   *
+   * ✅ REPARADO el 09/09/2026 (hallazgo 653). El motor declara `const DOCTRINA =
+   * COMPLEMENTO_BRECHA_GENERO_META.doctrina` e interpola las tres cadenas de runtime desde
+   * ahí; su cabecera dejó también de repetir las dos resoluciones y remite al módulo. Y la
+   * regresión ciega se arregló en el mismo commit: ahora comprueba fichero a fichero.
+   * Quedan los dos como REGRESIÓN.
    */
-  test.fail(
-    'HALLAZGO 07/09 (b): el motor del MCP teclea la doctrina en vez de leer META.doctrina',
+  test(
+    'REGRESIÓN: el motor del MCP lee META.doctrina y no teclea la jurisprudencia',
     async () => {
       const { readFileSync } = await import('node:fs');
       const { join } = await import('node:path');
@@ -1669,6 +1731,12 @@ test.describe('Inspección 07/09/2026', () => {
       const cuerpo = motor.slice(motor.indexOf('export function calcularComplementoBrechaGenero'));
       expect(cuerpo).not.toContain('15-may-2025');
       expect(cuerpo).not.toContain('09-jul-2025');
+      // Tampoco la CABECERA, que las repetía otras dos veces: un comentario no se interpola,
+      // así que la única forma de que no envejezca es que remita al módulo en vez de copiarlo.
+      const cabecera = motor.slice(0, motor.indexOf('export function calcularComplementoBrechaGenero'));
+      for (const fecha of ['15-may-2025', '09-jul-2025', '15/05/2025', '09/07/2025']) {
+        expect(cabecera, `la cabecera del motor sigue tecleando ${fecha}`).not.toContain(fecha);
+      }
     },
   );
 
@@ -1692,9 +1760,16 @@ test.describe('Inspección 07/09/2026', () => {
    * O sea, el «5» no coincide ni con el motor, ni con la FAQ estructurada, ni con el
    * cuestionario. Es el pariente del hallazgo 281, donde el JSON-LD decía «5 preguntas»
    * teniendo 6: un recuento que sobrevivió a la reforma que lo dejó obsoleto.
+   *
+   * ✅ REPARADO el 09/09/2026 (hallazgo 654). Los requisitos se enumeran UNA vez, en
+   * `REQUISITOS_ART60` del motor del MCP —una entrada por rama de denegación—, y de ahí
+   * salen `NUM_REQUISITOS_ART60` para el aviso del panel y el paso 1 de la guía, y la lista
+   * en prosa para las dos preguntas del `faqJsonLd` que la enumeraban a mano. El recuento
+   * ya no se teclea en ningún sitio, así que no puede volver a divergir. Queda como
+   * REGRESIÓN: comprueba que el número que se lee en pantalla es el de la lista.
    */
-  test.fail(
-    'HALLAZGO 07/09 (c): «5 requisitos clave» no coincide con los 4 que el verificador evalúa',
+  test(
+    'REGRESIÓN: el recuento de requisitos sale de REQUISITOS_ART60, no tecleado',
     async ({ page }) => {
       await responderYVerificar(page, {
         pension: 'Jubilación (ordinaria o anticipada)',
@@ -1705,10 +1780,24 @@ test.describe('Inspección 07/09/2026', () => {
       });
       const resultado = await textoResultado(page);
       expect(resultado).not.toMatch(/5 requisitos clave/);
+      // Y dice el número REAL, el de la lista del motor (hoy 4)
+      expect(resultado).toContain(`${NUM_REQUISITOS_ART60} requisitos clave`);
 
       await abrirGuia(page);
       const guia = normalizar(await page.locator('body').innerText());
       expect(guia).not.toMatch(/5 puntos clave/);
+      expect(guia).toContain(`${NUM_REQUISITOS_ART60} puntos clave`);
+
+      // El faqJsonLd —lo que leen Bing Copilot y ChatGPT— cuenta lo mismo: enumeraba TRES
+      // requisitos a mano mientras la página anunciaba cinco.
+      const { readFileSync } = await import('node:fs');
+      const { join } = await import('node:path');
+      const meta = readFileSync(
+        join(process.cwd(), 'app', 'verificador-complemento-brecha-genero', 'metadata.ts'),
+        'utf8',
+      );
+      expect(meta).toContain('NUM_REQUISITOS_ART60');
+      expect(meta).toContain('REQUISITOS_ART60');
     },
   );
 
@@ -1731,18 +1820,30 @@ test.describe('Inspección 07/09/2026', () => {
    * El contenido de la respuesta es correcto: lo que falla es el titular, que introduce un
    * umbral inventado. Es el defecto simétrico del hallazgo 505 (la regla se afirmaba sin
    * norma): aquí la regla ya tiene norma y es el enunciado el que se sale de ella.
+   *
+   * ✅ REPARADO el 09/09/2026 (hallazgo 655). El titular pasó a enunciar la regla —«¿Cuenta
+   * un hijo o hija que nació con vida y falleció después?»— y la respuesta añade que lo que
+   * decide es el nacimiento con vida, no cuánto tiempo viviera después, porque la norma no
+   * fija ninguna edad. Queda como REGRESIÓN.
    */
-  test.fail(
-    'HALLAZGO 07/09 (d): la FAQ de los hijos fallecidos inventa un umbral de 16 años',
+  test(
+    'REGRESIÓN: la FAQ de los hijos fallecidos enuncia la regla, no un umbral de edad',
     async ({ page }) => {
       await abrirGuia(page);
       const bloque = normalizar(
-        await page.locator('h3', { hasText: 'hijos fallecidos' }).locator('..').innerText(),
+        await page
+          .locator('h3', { hasText: 'nació con vida y falleció después' })
+          .locator('..')
+          .innerText(),
       );
-      // O el umbral no se enuncia, o la respuesta lo aborda. Hoy no ocurre ninguna de las dos.
-      const enunciaUmbral = /16 años/.test(bloque);
-      const loAborda = /16 años/.test(bloque.slice(bloque.indexOf('?') + 1));
-      expect(enunciaUmbral && !loAborda).toBe(false);
+      // Ninguna edad en el enunciado: ni la de la pregunta ni ninguna otra. El umbral no
+      // está en el art. 60.1 LGSS ni en la STS 748/2023 que la propia respuesta cita.
+      const enunciado = bloque.slice(0, bloque.indexOf('?') + 1);
+      expect(enunciado).not.toMatch(/\d+\s*años/);
+      // Y la respuesta dice por qué la edad no interviene, que es lo que el titular prometía
+      // y no cumplía.
+      expect(bloque).toContain('la ley exige que haya nacido con vida, no que siga viviendo');
+      expect(bloque).toMatch(/no fija ninguna edad/);
     },
   );
 });

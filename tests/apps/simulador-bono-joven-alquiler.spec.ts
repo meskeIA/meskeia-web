@@ -3,7 +3,16 @@ import { BONO_ALQUILER_JOVEN_2026 } from '../../data/fiscal/vivienda-joven';
 
 /**
  * Inspector — simulador-bono-joven-alquiler (segmento fiscal, RIESGO 1 CRÍTICO)
- * Inspeccionada el 02/09/2026.
+ * Inspeccionada el 02/09/2026 y RE-INSPECCIONADA el 07/09/2026.
+ *
+ * ── Cómo está organizado este fichero ────────────────────────────────────────
+ *   1. CASOS 1-3 y guardianes — la inspección del 02/09/2026. Siguen pasando tal cual.
+ *   2. REGRESIÓN 02/09 — los cuatro hallazgos de aquella pasada (596-599), reparados ese
+ *      mismo día.
+ *   3. CASOS 4-6 y guardianes — los casos nuevos de la re-inspección del 07/09/2026.
+ *   4. REGRESIÓN 07/09 — los cuatro hallazgos de esa re-inspección (642-645), reparados el
+ *      09/09/2026. Se escribieron con `test.fail()` afirmando lo que DEBERÍA pasar; al
+ *      repararlos se les quitó la marca y quedan como regresión.
  *
  * Qué promete la app
  * ──────────────────
@@ -291,7 +300,7 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
 //     lo cubre el guardián del 60 % de más abajo (480,75 € → 13.845,60 €, no 14.400 €).
 //   · el panel de ahorro con un perfil declarado NO elegible — guardián de la edad.
 //   · la FAQ de compatibilidad contra el art. 136 — ya cubierta arriba en prosa y aquí
-//     por el guardián del art. 135 (hallazgo abierto H2).
+//     por el guardián del art. 135 (hallazgo 643, reparado el 09/09/2026).
 //
 // De dónde sale cada cifra esperada: `data/fiscal/vivienda-joven.ts`, sellado contra el
 // BOE (RD 326/2026, BOE-A-2026-8872) el 23/08/2026. Ninguna de memoria.
@@ -475,9 +484,9 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la inspección del 07/09/2026 — marcados con `test.fail()`
-// Afirman lo que DEBERÍA pasar, así que hoy fallan a propósito. Cuando se reparen,
-// se les quita el `test.fail()` y quedan como regresión.
+// REGRESIÓN — los cuatro hallazgos de la re-inspección del 07/09/2026 (642-645),
+// REPARADOS el 09/09/2026. Se escribieron con `test.fail()` afirmando lo que DEBERÍA
+// pasar; hecha la reparación se les quitó la marca y quedan como guardián.
 // ═════════════════════════════════════════════════════════════════════════════
 
 /** El `featureList` del Schema.org tal y como se sirve en producción */
@@ -488,17 +497,19 @@ async function featureListServido(page: Page): Promise<string> {
   return m ? m[1] : '';
 }
 
-test.describe('Hallazgos abiertos del 07/09/2026', () => {
-  // H1 — El JSON-LD anuncia una «Guía del proceso de solicitud paso a paso por Comunidad
-  // Autónoma». La app no tiene ninguna: los 4 pasos de «Proceso de solicitud» son idénticos
-  // para toda España y la página no nombra ni una sola comunidad autónoma. El featureList
-  // es la señal estructurada que consumen Bing Copilot, ChatGPT y Perplexity para grounding:
-  // prometer ahí un desglose por CA que no existe es exactamente lo que la app repite que
-  // NO puede hacer («cada CA concreta su convocatoria»).
-  test.fail('H1 — el featureList no debe prometer una guía por comunidad autónoma que la página no tiene', async ({ page }) => {
+test.describe('Regresión — hallazgos del 07/09/2026 (642-645), reparados el 09/09/2026', () => {
+  // 642 (H1) — El JSON-LD anunciaba una «Guía del proceso de solicitud paso a paso por
+  // Comunidad Autónoma». La app no tiene ninguna: los 4 pasos de «Proceso de solicitud» son
+  // idénticos para toda España y la página no nombra ni una sola comunidad autónoma. El
+  // featureList es la señal estructurada que consumen Bing Copilot, ChatGPT y Perplexity para
+  // grounding: prometer ahí un desglose por CA que no existe era exactamente lo que la app
+  // repite que NO puede hacer («cada CA concreta su convocatoria»). Ahora esa entrada dice lo
+  // que la página hace de verdad — resume el proceso y la documentación comunes a toda España.
+  test('642 — el featureList no promete una guía por comunidad autónoma que la página no tiene', async ({ page }) => {
     await abrir(page);
     const features = await featureListServido(page);
     const prometeGuiaPorCA = /paso a paso por Comunidad Autónoma/.test(features);
+    expect(prometeGuiaPorCA).toBe(false);
 
     const CCAA = [
       'Andalucía', 'Aragón', 'Asturias', 'Baleares', 'Canarias', 'Cantabria',
@@ -513,45 +524,55 @@ test.describe('Hallazgos abiertos del 07/09/2026', () => {
     expect(prometeGuiaPorCA && nombradas < 3).toBe(false);
   });
 
-  // H2 — La página se contradice sobre quién fija el límite de renta. El aviso de renta y el
-  // consejo 🔍 dicen, con el art. 135 del RD 326/2026 detrás, que la CA solo puede elevar el
-  // tope «con acuerdo previo del Ministerio»; el bloque final de advertencias afirma que los
-  // «límites de renta, duración y documentación varían significativamente según tu Comunidad
-  // Autónoma». Es la misma forma del hallazgo 599: prosa que contradice al módulo sellado, y
-  // aquí empuja a un solicitante rechazado por el art. 133.1.e a creer que su CA tendrá otro
-  // tope. El plazo, además, lo fija el art. 134 (24 meses + prórroga de hasta 24), no la CA.
-  test.fail('H2 — la advertencia final no debe contradecir el art. 135 que la propia app cita', async ({ page }) => {
+  // 643 (H2) — La página se contradecía sobre quién fija el límite de renta. El aviso de renta
+  // y el consejo «Consulta el límite de renta de tu CA» dicen, con el art. 135 del RD 326/2026
+  // detrás, que la CA solo puede elevar el tope «con acuerdo previo del Ministerio»; el bloque
+  // final de advertencias afirmaba que los «límites de renta, duración y documentación varían
+  // significativamente según tu Comunidad Autónoma». Es la misma forma del hallazgo 599: prosa
+  // que contradice al módulo sellado, y aquí empujaba a un solicitante rechazado por el
+  // art. 133.1.e a creer que su CA tendría otro tope. El plazo, además, lo fija el art. 134
+  // (24 meses + prórroga de hasta 24), no la CA. La advertencia reescrita separa lo que fija el
+  // Estado (renta y plazo) de lo que concreta la CA (convocatoria, documentación, plazos).
+  test('643 — la advertencia final ya no contradice el art. 135 que la propia app cita', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     const pagina = norm(await page.locator('body').innerText());
 
     // Lo que la app dice donde importa (aviso de renta y consejo): el tope es estatal
     expect(pagina).toContain('solo con acuerdo previo del Ministerio');
-    // Lo que dice el bloque de advertencias, y que no puede convivir con lo anterior
+    // Lo que decía el bloque de advertencias, y que no podía convivir con lo anterior
     expect(pagina).not.toContain('límites de renta, duración y documentación varían significativamente');
+    // Y lo que dice ahora: el Estado fija renta y plazo, la CA concreta su convocatoria
+    expect(pagina).toContain('art. 133.1.e) y el plazo de la ayuda');
+    expect(pagina).toContain('los fija el Real Decreto para toda España');
   });
 
-  // H3 — «RegionBadge» es el nombre interno del componente React de meskeIA, y se publica tal
-  // cual como característica de la app en el featureList del Schema.org que leen usuarios y
-  // buscadores. La característica real es «ayuda aplicable exclusivamente en España».
-  test.fail('H3 — el featureList no debe publicar el nombre interno de un componente', async ({ page }) => {
+  // 644 (H3) — «RegionBadge» es el nombre interno del componente React de meskeIA, y se
+  // publicaba tal cual como característica de la app en el featureList del Schema.org que leen
+  // usuarios y buscadores. La característica real es «ayuda aplicable exclusivamente en España».
+  test('644 — el featureList no publica el nombre interno de un componente', async ({ page }) => {
     await abrir(page);
     const features = await featureListServido(page);
     expect(features).toContain('exclusivamente en España');
     expect(features).not.toContain('RegionBadge');
   });
 
-  // H4 — Dos de los cuatro escenarios del bloque educativo tienen el porcentaje TECLEADO
-  // («el 50%», «el 37,5% de la renta») mientras el de habitación lo deriva del módulo
+  // 645 (H4) — Dos de los cuatro escenarios del bloque educativo tenían el porcentaje TECLEADO
+  // («el 50%», «el 37,5% de la renta») mientras el de habitación lo derivaba del módulo
   // —formatNumber((ayudaMaximaMensual.habitacion / 350) * 100, 0) = 57—. Es la forma exacta
-  // del hallazgo 596, que se reparó en el plazo y en el ahorro pero no aquí. Hoy las cifras
-  // son correctas (300/600 = 50 %, 300/800 = 37,5 %), y por eso el hallazgo es un latente que
-  // solo se ve en el código: si `ayudaMaximaMensual.vivienda` pasara de 300 a 400 €, la
+  // del hallazgo 596, que se reparó en el plazo y en el ahorro pero no aquí. Las cifras eran
+  // correctas (300/600 = 50 %, 300/800 = 37,5 %), y por eso el hallazgo era un latente que
+  // solo se veía en el código: si `ayudaMaximaMensual.vivienda` pasara de 300 a 400 €, la
   // página seguiría diciendo «400 €/mes (el 50%, por debajo del límite del 60%)» cuando serían
   // 400/600 = 66,7 %, POR ENCIMA del tope del art. 137 — la prosa afirmaría justo lo contrario
   // de lo que el calculador de arriba estaría haciendo. Mismo patrón en la tarjeta del panel,
-  // cuya etiqueta «Máximo en 4 años» está tecleada aunque el número salga del módulo.
-  test.fail('H4 — los porcentajes de los escenarios deben derivarse del módulo, como el de habitación', async () => {
+  // cuya etiqueta «Máximo en 4 años» estaba tecleada aunque el número saliera del módulo.
+  //
+  // Los cuatro escenarios pasan ahora por `calcularEscenario`, que hace la MISMA aritmética
+  // que el simulador (mín(cuantía del art. 137; 60 % de la renta)) y redacta también el
+  // veredicto sobre el tope: con la cuantía subida a 400 € la prosa diría «el 60% de la renta,
+  // que es el máximo que permite el art. 137», no «por debajo del límite».
+  test('645 — los porcentajes de los escenarios se derivan del módulo, como el de habitación', async ({ page }) => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const fuente = readFileSync(
@@ -560,5 +581,25 @@ test.describe('Hallazgos abiertos del 07/09/2026', () => {
     );
     expect(fuente).not.toContain('(el 50%,');
     expect(fuente).not.toContain('(el 37,5% de la renta');
+    // La etiqueta de la tarjeta compartía el patrón: el número salía del módulo y el rótulo no
+    expect(fuente).not.toContain('Máximo en 4 años');
+
+    // Y lo que la página publica coincide con ese cálculo, hoy y si la cuantía cambiara
+    await abrir(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const RENTA_EJEMPLO = 600; // la del escenario «Recién graduada»
+    const ayuda = Math.min(
+      BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda,
+      RENTA_EJEMPLO * BONO_ALQUILER_JOVEN_2026.limiteSobreRenta,
+    );
+    // Un decimal como mucho, igual que el `pct()` de la app
+    const porcentaje = Math.round((ayuda / RENTA_EJEMPLO) * 1000) / 10;
+    const escenario = norm(await page.getByText(/Recién graduada/).locator('xpath=..').innerText());
+    expect(escenario).toContain(`el ${porcentaje.toLocaleString('es-ES')}% de la renta`);
+
+    // El rótulo del panel sale del plazo del art. 134 que multiplica su propia cifra
+    await page.fill('#alquiler', '600');
+    const panel = await panelDeAhorro(page);
+    expect(panel[2]).toContain(`Máximo en ${BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12} años`);
   });
 });

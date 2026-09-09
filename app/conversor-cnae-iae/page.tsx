@@ -114,6 +114,24 @@ const RUTA_CATALOGO = CNAE_IAE_RUTA_CATALOGO;
  */
 const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.seccion === '2ª')!;
 
+/**
+ * La norma que aprueba las Tarifas del IAE, DERIVADA de `FISCAL_CNAE_IAE_META.iae.fuente`
+ * en vez de transcrita. La celda de la CNAE de la fila «Norma de referencia» de la
+ * comparativa ya sale de `CNAE_VIGENCIA` desde el hallazgo 586; la del IAE se escribía a
+ * mano y coincidía con el módulo por casualidad, no por construcción, de modo que el día
+ * que el módulo publicase otra referencia la tabla seguiría diciendo la anterior sin que
+ * nada avisara (hallazgo 636).
+ *
+ * La `fuente` del módulo lleva delante el nombre del catálogo, separado por « — », y detrás
+ * la coletilla de la edición entre paréntesis. Las dos sobran en una celda de tabla y en una
+ * frase corrida, así que se retiran aquí sin tocar el dato de origen.
+ */
+const NORMA_IAE: string = (() => {
+  const partes = FISCAL_CNAE_IAE_META.iae.fuente.split(' — ');
+  const norma = partes.length > 1 ? partes.slice(1).join(' — ') : partes[0];
+  return norma.replace(/\s*\([^)]*\)\s*$/, '').trim();
+})();
+
 const EJEMPLOS_CNAE: string[] = [
   'hago páginas web',
   'peluquería',
@@ -278,6 +296,25 @@ export default function ConversorCnaeIaePage() {
 
   const inputCnaeRef = useRef<HTMLInputElement>(null);
   const inputIaeRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * Cambiar la consulta SUELTA el despliegue. «Ver los N» es el remedio de una consulta
+   * concreta —la de arriba, por código—, no un modo permanente: como no se reiniciaba,
+   * la primera pulsación dejaba la app volcando el resultado entero en toda búsqueda
+   * posterior («comercio» pinta sus 106 fichas de golpe) y el contador dejaba de ofrecer
+   * el corte, así que no había forma de volver a la vista de 10 sin recargar la página
+   * (hallazgo 635). El filtro por sección no lo suelta: ese solo ESTRECHA lo que ya se
+   * está mirando, mientras que escribir otra cosa empieza una búsqueda distinta.
+   */
+  const cambiarConsultaCnae = (valor: string): void => {
+    setConsultaCnae(valor);
+    setVerTodosCnae(false);
+  };
+
+  const cambiarConsultaIae = (valor: string): void => {
+    setConsultaIae(valor);
+    setVerTodosIae(false);
+  };
 
   // Carga diferida del catálogo (más de 300 KB): nunca dentro del bundle
   useEffect(() => {
@@ -787,7 +824,7 @@ export default function ConversorCnaeIaePage() {
                 type="search"
                 className={styles.input}
                 value={consultaCnae}
-                onChange={(evento) => setConsultaCnae(evento.target.value)}
+                onChange={(evento) => cambiarConsultaCnae(evento.target.value)}
                 placeholder="hago páginas web, peluquería, 4711…"
                 autoComplete="off"
               />
@@ -804,7 +841,7 @@ export default function ConversorCnaeIaePage() {
                   key={ejemplo}
                   type="button"
                   className={styles.ejemploBtn}
-                  onClick={() => setConsultaCnae(ejemplo)}
+                  onClick={() => cambiarConsultaCnae(ejemplo)}
                 >
                   {ejemplo}
                 </button>
@@ -976,7 +1013,7 @@ export default function ConversorCnaeIaePage() {
                 type="search"
                 className={styles.input}
                 value={consultaIae}
-                onChange={(evento) => setConsultaIae(evento.target.value)}
+                onChange={(evento) => cambiarConsultaIae(evento.target.value)}
                 placeholder="peluquería, enseñanza, 505.6…"
                 autoComplete="off"
               />
@@ -992,7 +1029,7 @@ export default function ConversorCnaeIaePage() {
                   key={ejemplo}
                   type="button"
                   className={styles.ejemploBtn}
-                  onClick={() => setConsultaIae(ejemplo)}
+                  onClick={() => cambiarConsultaIae(ejemplo)}
                 >
                   {ejemplo}
                 </button>
@@ -1147,7 +1184,7 @@ export default function ConversorCnaeIaePage() {
             pero no lo son. El <strong>CNAE</strong> es la Clasificación Nacional de Actividades
             Económicas, la mantiene el INE y su finalidad es estadística: sirve para saber cuánta
             gente hace qué en el país. El <strong>epígrafe del IAE</strong> procede de las Tarifas
-            del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990), es de la AEAT y
+            del Impuesto sobre Actividades Económicas ({NORMA_IAE}), es de la AEAT y
             su finalidad es censal y tributaria: identifica qué actividad has declarado ejercer.
           </p>
           <p className={styles.introText}>
@@ -1203,7 +1240,7 @@ export default function ConversorCnaeIaePage() {
                     <strong>Norma de referencia</strong>
                   </td>
                   <td>{CNAE_VIGENCIA.normaVigente} (sustituye al {CNAE_VIGENCIA.normaAnterior})</td>
-                  <td>RD Legislativo 1175/1990 y modificaciones</td>
+                  <td>{NORMA_IAE} y modificaciones</td>
                 </tr>
                 <tr>
                   <td>

@@ -1,13 +1,15 @@
 import { Metadata } from 'next';
 import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '@/data/fiscal';
-import { formatCurrency, formatFechaLarga } from '@/lib/formatters';
+import { formatCurrency } from '@/lib/formatters';
+import { NUM_REQUISITOS_ART60, REQUISITOS_ART60 } from '@/lib/calculadoras/complementoBrechaGenero';
 
 // Las cifras salen del módulo fiscal, nunca tecleadas: en la próxima revalorización el
 // snippet de buscadores y el JSON-LD envejecían en silencio mientras la app decía otra cosa.
 const CUANTIA = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual);
 const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
 const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
-const FECHA_MINIMA = formatFechaLarga(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante);
+// La fecha del corte ya no se interpola aquí suelta: entra en el FAQPage dentro de
+// `REQUISITOS_ART60`, que la deriva de `fechaMinimaHechoCausante` en el motor.
 // Hallazgo 606: la jurisprudencia de igualdad de trato también se LEE del módulo. Iba
 // tecleada aquí y en siete sitios más de la página, con cuatro formatos de fecha distintos.
 const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
@@ -18,6 +20,14 @@ const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 const NORMA_EXCLUSION_JUBILACION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones
   .find(e => e.supuesto === 'jubilacion_parcial')!.norma;
 const NORMA_COMPATIBLE_MINIMOS = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.compatibleConComplementoAMinimos.norma;
+/**
+ * Hallazgo 654: el FAQPage enumeraba TRES requisitos a mano mientras la página anunciaba
+ * «5 requisitos clave» y el motor del MCP los listaba como cuatro. Ahora los tres sitios
+ * leen la MISMA lista, la del motor, que es la que se corresponde con las ramas de
+ * denegación que el verificador ejecuta.
+ */
+const REQUISITOS_EN_PROSA = REQUISITOS_ART60.map(r => r.detalle);
+const LISTA_REQUISITOS = `${REQUISITOS_EN_PROSA.slice(0, -1).join('; ')}; y ${REQUISITOS_EN_PROSA[REQUISITOS_EN_PROSA.length - 1]}`;
 
 const title = 'Verificador del Complemento por Brecha de Género 2026 — ¿Te corresponde? | meskeIA';
 const description = `Comprueba si tienes derecho al complemento por brecha de género en tu pensión: ${CUANTIA}/mes por hijo (máximo ${MAX_HIJOS}). Incluye los cambios tras la sentencia TJUE 2025 que iguala el trato a hombres y mujeres.`;
@@ -93,7 +103,7 @@ export const faqJsonLd = {
       name: '¿Pueden los hombres cobrar el complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. Tras la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los requisitos son idénticos para hombres y mujeres: pensión contributiva de jubilación, incapacidad permanente o viudedad con hecho causante desde el ${FECHA_MINIMA}, al menos un hijo o hija, y que el otro progenitor no perciba ya el complemento por los mismos hijos. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
+        text: `Sí. Tras la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los ${NUM_REQUISITOS_ART60} requisitos son idénticos para hombres y mujeres: ${LISTA_REQUISITOS}. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
       },
     },
     {
@@ -101,7 +111,7 @@ export const faqJsonLd = {
       name: '¿Cómo saber si tengo derecho al complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Los requisitos son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente con hecho causante desde el ${FECHA_MINIMA}; tener al menos un hijo o hija biológico o adoptado; y que el otro progenitor no perciba ya el complemento por los mismos hijos. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador comprueba estas condiciones en 6 preguntas y calcula el importe estimado según el número de hijos.`,
+        text: `Son ${NUM_REQUISITOS_ART60} requisitos: ${LISTA_REQUISITOS}. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador las comprueba en 6 preguntas y calcula el importe estimado según el número de hijos.`,
       },
     },
     {

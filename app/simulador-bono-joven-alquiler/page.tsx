@@ -29,6 +29,13 @@ import {
  */
 const eur = (n: number) => `${formatNumber(n, 0)} €`;
 
+/** Porcentaje con un decimal como mucho: «50», «37,5», «57,1». Redondea antes de formatear
+ *  para que un 60,000000000000004 de la aritmética en coma flotante se lea «60». */
+const pct = (n: number) => {
+  const redondeado = Math.round(n * 10) / 10;
+  return formatNumber(redondeado, Number.isInteger(redondeado) ? 0 : 1);
+};
+
 /** El umbral de renta se computa sobre 14 pagas (IPREM_2026.anual14), la referencia que
  *  el propio módulo fiscal declara para cálculo de topes (hallazgo 536). */
 const topeIngresos = (veces: number) => eur(IPREM_2026.anual14 * veces);
@@ -90,6 +97,52 @@ const BONO: Record<TipoVivienda, number> = BONO_ALQUILER_JOVEN_2026.ayudaMaximaM
 const DURACION_MAX_MESES = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses; // 2 + prórroga de 2
 const LIMITE_SOBRE_RENTA = BONO_ALQUILER_JOVEN_2026.limiteSobreRenta;
 const RENTA_MAX = BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual;
+const LIMITE_PORC = pct(LIMITE_SOBRE_RENTA * 100);
+const DURACION_MAX_ANIOS = DURACION_MAX_MESES / 12;
+
+interface EscenarioCalculado {
+  /** Renta mensual del ejemplo, en euros (es el dato del caso, no una cifra normativa) */
+  renta: number;
+  /** Ayuda efectiva: el MENOR entre la cuantía del art. 137 y el 60 % de la renta */
+  ayuda: number;
+  /** Lo que paga de su bolsillo */
+  pagoReal: number;
+  /** Acumulado si cobra la ayuda el plazo completo del art. 134 */
+  acumulado: number;
+  /** Porcentaje de la renta que cubre la ayuda, y su relación con el tope del art. 137 */
+  notaLimite: string;
+}
+
+/**
+ * Los casos prácticos del bloque educativo se calculan con la MISMA aritmética que el
+ * simulador de arriba, en vez de llevar el porcentaje y el veredicto tecleados (hallazgo 645).
+ * No basta con interpolar el importe: si la cuantía del art. 137 subiera, «el 50 %, por debajo
+ * del límite» pasaría a ser falso por partida doble —el porcentaje y la afirmación sobre el
+ * tope—, y la prosa contradiría al calculador de la misma página.
+ */
+const calcularEscenario = (renta: number, tipo: TipoVivienda): EscenarioCalculado => {
+  const cuantiaMaxima = BONO[tipo];
+  const porElLimite = renta * LIMITE_SOBRE_RENTA;
+  const ayuda = Math.min(cuantiaMaxima, porElLimite);
+  const porcentaje = pct((ayuda / renta) * 100);
+  return {
+    renta,
+    ayuda,
+    pagoReal: renta - ayuda,
+    acumulado: ayuda * DURACION_MAX_MESES,
+    notaLimite:
+      porElLimite < cuantiaMaxima
+        ? `el ${porcentaje}% de la renta, que es el máximo que permite el art. 137`
+        : porElLimite === cuantiaMaxima
+          ? `el ${porcentaje}% de la renta, justo en el límite del art. 137`
+          : `el ${porcentaje}% de la renta, por debajo del límite del ${LIMITE_PORC}%`,
+  };
+};
+
+/** Rentas de ejemplo de los casos prácticos; todo lo demás lo deriva el cálculo de arriba */
+const ESCENARIO_GRADUADA = calcularEscenario(600, 'vivienda');
+const ESCENARIO_TRABAJADOR = calcularEscenario(800, 'vivienda');
+const ESCENARIO_HABITACION = calcularEscenario(350, 'habitacion');
 
 export default function SimuladorBonoJovenAlquilerPage() {
   const [alquilMensual, setAlquilMensual] = useState('');
@@ -276,7 +329,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <span className={styles.ahorroValor}>{formatCurrency(bonificacionEfectiva)}</span>
               <span className={styles.ahorroLabel}>Ayuda mensual</span>
               {bonificacionEfectiva < bonificacionMaxima && (
-                <span className={styles.ahorroNota}>Límite: 60% de la renta</span>
+                <span className={styles.ahorroNota}>Límite: {LIMITE_PORC}% de la renta</span>
               )}
             </div>
             <div className={styles.ahorroCard}>
@@ -285,7 +338,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.ahorroCard}>
               <span className={styles.ahorroValor}>{formatCurrency(totalAyudaMax)}</span>
-              <span className={styles.ahorroLabel}>Máximo en 4 años</span>
+              {/* La etiqueta sale del mismo plazo del art. 134 que multiplica la cifra de al
+                  lado: tecleada, un cambio del módulo dejaría el rótulo mintiendo (hallazgo 645) */}
+              <span className={styles.ahorroLabel}>Máximo en {DURACION_MAX_ANIOS} años</span>
             </div>
           </div>
         )}
@@ -474,12 +529,12 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👩‍🎓</span>
               <h3>Recién graduada, 23 años</h3>
-              <p>Alquiler de 600 €/mes (vivienda). Bono de {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes (el 50%, por debajo del límite del {BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100}%). Paga {eur(600 - BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes real. En {BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12} años ahorra {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda * BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses)}.</p>
+              <p>Alquiler de {eur(ESCENARIO_GRADUADA.renta)}/mes (vivienda). Bono de {eur(ESCENARIO_GRADUADA.ayuda)}/mes ({ESCENARIO_GRADUADA.notaLimite}). Paga {eur(ESCENARIO_GRADUADA.pagoReal)}/mes real. En {DURACION_MAX_ANIOS} años ahorra {eur(ESCENARIO_GRADUADA.acumulado)}.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👨‍💼</span>
               <h3>Trabajador de 32 años</h3>
-              <p>Alquiler de 800 €/mes. El bono máximo es {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes (el 37,5% de la renta, dentro del límite del {BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100}%). Paga {eur(800 - BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda)}/mes reales.</p>
+              <p>Alquiler de {eur(ESCENARIO_TRABAJADOR.renta)}/mes. El bono es de {eur(ESCENARIO_TRABAJADOR.ayuda)}/mes ({ESCENARIO_TRABAJADOR.notaLimite}). Paga {eur(ESCENARIO_TRABAJADOR.pagoReal)}/mes reales.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👫</span>
@@ -491,10 +546,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <h3>Habitación en piso compartido</h3>
               <p>
                 El Plan 2026-2030 incluye expresamente la modalidad de habitación: hasta{' '}
-                {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes. Alquiler de 350 €/mes por
-                habitación → bono de {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes
-                ({formatNumber((BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion / 350) * 100, 0)}%, dentro del
-                límite del {formatNumber(BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100, 0)}%).
+                {eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion)}/mes. Alquiler de{' '}
+                {eur(ESCENARIO_HABITACION.renta)}/mes por habitación → bono de{' '}
+                {eur(ESCENARIO_HABITACION.ayuda)}/mes ({ESCENARIO_HABITACION.notaLimite}).
               </p>
             </div>
           </div>
@@ -547,7 +601,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué pasa si mis ingresos suben durante el cobro?</h3>
-              <p>Algunas CCAA realizan comprobaciones periódicas de ingresos. Si superas el límite de ingresos establecido por tu CA durante el cobro, podrías perder la ayuda. Informa siempre a tu CA de cualquier cambio relevante en tu situación económica.</p>
+              <p>El umbral de ingresos lo fija el Estado en {formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (art. 133.1.d); lo que concreta cada Comunidad Autónoma es el cómputo y las comprobaciones periódicas durante el cobro. Si dejas de cumplir ese umbral podrías perder la ayuda, así que informa a tu CA de cualquier cambio relevante en tu situación económica.</p>
             </div>
           </div>
         </section>
@@ -600,7 +654,11 @@ export default function SimuladorBonoJovenAlquilerPage() {
           <div className={styles.warningGrid}>
             {[
               { titulo: 'Los fondos son limitados y se agotan', desc: 'El Estado transfiere fondos a las CCAA, pero estos son finitos. Cada año puede haber convocatorias distintas o sin fondos disponibles.' },
-              { titulo: 'Cada CA tiene sus propias condiciones', desc: 'Los requisitos, límites de renta, duración y documentación varían significativamente según tu Comunidad Autónoma. Consulta siempre la normativa específica.' },
+              // El límite de renta y el plazo los fija el Estado, no la CA: decir lo contrario
+              // contradecía al aviso de renta y al consejo «Consulta el límite de renta de tu
+              // CA» de esta misma página, que citan el art. 135, y empujaba a quien queda fuera
+              // por el art. 133.1.e a esperar otro tope en su comunidad (hallazgo 643).
+              { titulo: 'Tu CA concreta la convocatoria, no los límites estatales', desc: `El límite de renta del contrato (${eur(RENTA_MAX.vivienda)}/mes en vivienda y ${eur(RENTA_MAX.habitacion)}/mes en habitación, art. 133.1.e) y el plazo de la ayuda (${BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} años prorrogables otros ${BONO_ALQUILER_JOVEN_2026.plazo.prorrogaMaximaMeses / 12}, art. 134) los fija el Real Decreto para toda España: tu Comunidad Autónoma solo puede elevar la renta máxima con acuerdo previo del Ministerio (art. 135). Lo que sí concreta cada CA es su convocatoria: cuándo abre el plazo de presentación, qué documentación exige y cómo se acreditan los requisitos. Consúltala antes de solicitar.` },
               { titulo: 'El fraude puede conllevar devolución + sanción', desc: 'Si se detecta que no cumplías los requisitos, deberás devolver todo lo cobrado más posibles sanciones. Declara siempre tu situación real.' },
               { titulo: 'La retroactividad no está garantizada en todas las CCAA', desc: 'Algunas CCAA pagan desde la fecha de solicitud, no desde el inicio del contrato. Solicita cuanto antes para no perder mensualidades.' },
             ].map(w => (

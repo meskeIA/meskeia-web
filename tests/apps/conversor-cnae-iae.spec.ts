@@ -26,6 +26,13 @@ import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/f
  *   · Reparación     08/09/2026 → los DOS altos de esos seis (631 lavandería, 632 motos)
  *     se reparan en `data/cnae-sinonimos.json` y pasan al bloque «Regresión — hallazgos
  *     altos del 07/09/2026, reparados». Siguen abiertos los 4 medios/bajos (633-636).
+ *   · Reparación     09/09/2026 → los DOS bajos (635 «Ver los N» que no se soltaba al
+ *     cambiar de consulta, 636 la norma del IAE transcrita a mano en la comparativa) se
+ *     reparan dentro de `app/conversor-cnae-iae/page.tsx` y pasan al bloque «Regresión —
+ *     hallazgos bajos del 07/09/2026, reparados». Siguen ABIERTOS los dos MEDIOS (633 «no
+ *     encuentro mi actividad» → 74.91 en vez de la residual 74.99, 634 «montaje de
+ *     maquinaria» → 43.23 en vez de 33.20): los dos son sinónimos mal repartidos y viven
+ *     en `data/cnae-sinonimos.json`, fuera del alcance de esa reparación.
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -1519,26 +1526,90 @@ test.describe('Regresión — hallazgos altos del 07/09/2026, reparados', () => 
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 07/09/2026 — marcados con `test.fail()`: afirman lo que
-// DEBERÍA ocurrir, así que hoy fallan a propósito. El día que se reparen pasarán a
-// ROJO («expected to fail, but passed»): entonces se les quita la marca y quedan
-// como regresión, sin reescribir el valor esperado.
+// REGRESIÓN — los dos hallazgos BAJOS del 07/09/2026 (635 y 636), REPARADOS el
+// 09/09/2026 dentro de `app/conversor-cnae-iae/page.tsx`. Estaban marcados con
+// `test.fail()`; ahora sujetan la reparación.
 //
-// Los dos primeros son el MISMO mecanismo del hallazgo 423 —el término coloquial
-// se asignó al PRIMER destino de la tabla CNAE-2009 → CNAE-2025 en vez de al destino
-// que describe la actividad—, que aquella reparación drenó en las familias sanitaria y
-// administrativa pero dejó vivo en otras cuatro. Los dos ALTOS de esa misma forma
-// (lavandería y motos, 631-632) están reparados en el bloque de regresión de arriba;
-// estos dos son los MEDIOS que quedan. El CANDADO que quedó de aquel hallazgo no las ve
-// porque compara raíces de SEIS caracteres: «lavandería» da «lavand» y el título del
-// hermano correcto dice «Lavado», que da «lavado». La forma del defecto es la misma;
-// lo que falla es el detector.
+// Los dos son de la app y no del dato, que es justo lo que los separa de los dos
+// MEDIOS que siguen abiertos más abajo: aquellos viven en `data/cnae-sinonimos.json`.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos abiertos del 07/09/2026', () => {
-  test('«no encuentro mi actividad» debe caer en la clase residual 74.99, no en la de agentes de patentes', async ({
+test.describe('Regresión — hallazgos bajos del 07/09/2026, reparados', () => {
+  test('«Ver los N» debe soltarse al cambiar de consulta, no volcar el catálogo entero', async ({
     page,
   }) => {
-    test.fail();
+    await abrir(page);
+
+    // `verTodosCnae` se ponía a true al desplegar y no se reiniciaba cuando cambiaba la
+    // consulta: tras desplegar las 32 clases de la correspondencia de 4791, escribir
+    // «comercio» pintaba sus 106 fichas de una vez y el contador dejaba de ofrecer el
+    // corte, de modo que no había forma de volver a la vista de 10 sin recargar la página.
+    // Desde el 09/09/2026 la consulta pasa por `cambiarConsultaCnae` /
+    // `cambiarConsultaIae`, que sueltan el despliegue; el filtro por SECCIÓN no lo suelta,
+    // porque ese solo estrecha lo que ya se está mirando.
+    await buscarCnae(page, '4791');
+    await expect(fichas(page)).toHaveCount(10);
+    await page.getByRole('button', { name: /^Ver los / }).click();
+    await expect(fichas(page)).toHaveCount(32);
+
+    await buscarCnae(page, 'comercio');
+    await expect(fichas(page)).toHaveCount(10);
+    await expect(contador(page)).toContainText('se muestran los 10 primeros');
+  });
+
+  test('la norma del IAE de la tabla comparativa debe salir de data/fiscal, como ya sale la de la CNAE', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'), 'utf8');
+
+    // La fila «Norma de referencia» de la comparativa deriva la celda de la CNAE de
+    // CNAE_VIGENCIA desde el hallazgo 586, y escribía la del IAE a mano —dos veces: en la
+    // celda y en el párrafo introductorio del bloque educativo—, de modo que coincidía con
+    // el módulo por casualidad y no por construcción, que es exactamente el defecto que se
+    // reparó del otro lado de la misma fila. Desde el 09/09/2026 las dos salen de
+    // `FISCAL_CNAE_IAE_META.iae.fuente` a través de la constante `NORMA_IAE`, que le retira
+    // el nombre del catálogo que lleva delante y la coletilla de la edición.
+    //
+    // El valor esperado NO se transcribe aquí: se pregunta al módulo, y lo que se le exige
+    // a `page.tsx` es que la cadena no vuelva a aparecer escrita a mano.
+    expect(FISCAL_CNAE_IAE_META.iae.fuente).toContain('RD Legislativo 1175/1990');
+    expect(fuente).not.toContain('RD Legislativo 1175/1990');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REGRESIÓN — los dos hallazgos MEDIOS del 07/09/2026 (633 y 634), REPARADOS el
+// 09/09/2026 en `data/cnae-sinonimos.json` y publicados regenerando el catálogo
+// servido (`node scripts/generar-catalogos-cnae-iae.mjs`). Estaban escritos con
+// `test.fail()` afirmando lo que DEBERÍA ocurrir; se les ha quitado la marca sin
+// tocar el valor esperado.
+//
+// Los dos que quedan (633 y 634, los MEDIOS) son el MISMO mecanismo del hallazgo 423
+// —el término coloquial se asignó al PRIMER destino de la tabla CNAE-2009 → CNAE-2025
+// en vez de al destino que describe la actividad—, que aquella reparación drenó en las
+// familias sanitaria y administrativa pero dejó vivo en otras cuatro. Los dos ALTOS de
+// esa misma forma (lavandería y motos, 631-632) están reparados en el bloque de
+// regresión de arriba. El CANDADO que quedó de aquel hallazgo no ve estos dos porque
+// compara raíces de SEIS caracteres: «lavandería» da «lavand» y el título del hermano
+// correcto dice «Lavado», que da «lavado». La forma del defecto es la misma; lo que
+// falla es el detector.
+//
+// La reparación NO estaba en la app: los tres términos devolvían UN solo resultado cada
+// uno, así que no había nada que reordenar — faltaba la entrada en el diccionario. Lo
+// que se hizo: los genéricos («freelance», «gestor de proyectos», «no encuentro mi
+// actividad») y «perito tasador» bajan de 74.91 a la residual 74.99, y 74.91 recibe los
+// términos de su propio título oficial (agente de patentes, registro de marcas,
+// marketing…) para no quedarse sin puerta de entrada; «montaje de maquinaria» e
+// «instalador industrial» salen de 43.23 (aislamientos) y estrenan la clave 33.20, que
+// no existía en el diccionario.
+//
+// El catálogo se regeneró SIN sellar `data/fiscal/cnae-iae.ts` con la fecha del día:
+// corregir sinónimos —material propio— no es re-verificar la CNAE contra el INE ni las
+// tarifas del IAE contra la AEAT, y la fecha del sello dice justamente eso.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — regresión de los hallazgos 633 y 634', () => {
+  test('«no encuentro mi actividad» cae en la clase residual 74.99, no en la de agentes de patentes', async ({
+    page,
+  }) => {
     await abrir(page);
 
     // correspondencia['7490'] reparte en 74.91 «Actividades de los agentes de patentes y de
@@ -1557,10 +1628,9 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 07/09/2026', () => {
     await expect(fichas(page).first()).toContainText('74.99');
   });
 
-  test('«montaje de maquinaria» debe llevar a 33.20, que es la clase de instalar máquinas', async ({
+  test('«montaje de maquinaria» lleva a 33.20, que es la clase de instalar máquinas', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // 43.23 es «Instalación de aislamientos» (sección F, construcción) y arrastra los
@@ -1570,41 +1640,5 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 07/09/2026', () => {
     await buscarCnae(page, 'montaje de maquinaria');
     await expect(fichas(page).first()).toContainText('33.20');
     await expect(fichas(page).first()).toContainText('Instalación de máquinas y equipos industriales');
-  });
-
-  test('«Ver los N» debe soltarse al cambiar de consulta, no volcar el catálogo entero', async ({
-    page,
-  }) => {
-    test.fail();
-    await abrir(page);
-
-    // `verTodosCnae` se pone a true al desplegar y no se reinicia cuando cambia la
-    // consulta: tras desplegar las 32 clases de la correspondencia de 4791, escribir
-    // «comercio» pinta sus 106 fichas de una vez y el contador deja de ofrecer el corte,
-    // de modo que no hay forma de volver a la vista de 10 sin recargar la página.
-    await buscarCnae(page, '4791');
-    await expect(fichas(page)).toHaveCount(10);
-    await page.getByRole('button', { name: /^Ver los / }).click();
-    await expect(fichas(page)).toHaveCount(32);
-
-    await buscarCnae(page, 'comercio');
-    await expect(fichas(page)).toHaveCount(10);
-    await expect(contador(page)).toContainText('se muestran los 10 primeros');
-  });
-
-  test('la norma del IAE de la tabla comparativa debe salir de data/fiscal, como ya sale la de la CNAE', async () => {
-    test.fail();
-    const { readFileSync } = await import('node:fs');
-    const { join } = await import('node:path');
-    const fuente = readFileSync(join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'), 'utf8');
-
-    // La fila «Norma de referencia» de la comparativa deriva la celda de la CNAE de
-    // CNAE_VIGENCIA desde el hallazgo 586, y escribe la del IAE a mano: «RD Legislativo
-    // 1175/1990 y modificaciones». `page.tsx` ya importa FISCAL_CNAE_IAE_META, que publica
-    // esa misma norma en `.iae.fuente` con su contrato de vigilancia, así que hoy coinciden
-    // por casualidad y no por construcción — exactamente el defecto que se reparó del otro
-    // lado de la misma fila.
-    expect(FISCAL_CNAE_IAE_META.iae.fuente).toContain('RD Legislativo 1175/1990');
-    expect(fuente).not.toContain('RD Legislativo 1175/1990');
   });
 });
