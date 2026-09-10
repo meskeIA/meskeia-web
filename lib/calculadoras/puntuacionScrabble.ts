@@ -28,6 +28,42 @@ export const VALORES_FICHA: Readonly<Record<string, number>> = {
 export const DIGRAFOS: readonly string[] = ['CH', 'LL', 'RR'];
 
 /**
+ * Letras del alfabeto español que NO tienen ficha en la edición española de 100 fichas.
+ *
+ * Son la K y la W: existen en el diccionario (kayak, whisky, waterpolo, kilo…) pero no en la
+ * bolsa, así que ninguna palabra que las lleve es jugable. `VALORES_FICHA[ficha] ?? 0` las
+ * puntuaba como 0 EN SILENCIO, de modo que «kayak» se presentaba como una jugada de 6 puntos
+ * —A1+Y4+A1, con las dos K a cero— y «ka» como una palabra de dos letras con el valor de
+ * una sola. Afecta a los 186 lemas con K y los 44 con W del diccionario que carga el
+ * generador de anagramas (hallazgo 704 del Inspector, 10/09/2026).
+ */
+export const LETRAS_SIN_FICHA: readonly string[] = ['K', 'W'];
+
+/**
+ * Las letras sin ficha que lleva la palabra, sin repetir y en el orden en que aparecen.
+ *
+ * Devuelve `[]` cuando la palabra es jugable, así que `letrasSinFicha(p).length === 0` es la
+ * pregunta «¿se puede jugar?». Las posiciones cubiertas por una ficha blanca NO cuentan: la
+ * blanca puede representar cualquier letra, K y W incluidas, y es la única forma de ponerlas
+ * sobre el tablero.
+ */
+export function letrasSinFicha(
+  palabra: string,
+  posicionesComodin: readonly number[] = [],
+): string[] {
+  const cubiertas = new Set(posicionesComodin);
+  const fichas = aFichas(palabra);
+  const sinFicha: string[] = [];
+  for (let i = 0; i < fichas.length; i++) {
+    if (cubiertas.has(i)) continue;
+    if (LETRAS_SIN_FICHA.includes(fichas[i]) && !sinFicha.includes(fichas[i])) {
+      sinFicha.push(fichas[i]);
+    }
+  }
+  return sinFicha;
+}
+
+/**
  * Puntúa una palabra letra a letra, con las posiciones cubiertas por comodín a 0.
  *
  * **Letra a letra a propósito**: quien teclea un atril de letras sueltas no puede

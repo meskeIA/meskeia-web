@@ -1141,7 +1141,6 @@ test.describe('contador-silabas', () => {
     test('HALLAZGO · la tarjeta «la tilde sobre i/u» declara sin excepciones una regla que el motor no aplica', async ({
       page,
     }) => {
-      test.fail();
       // Lo que la app hace, y hace bien (OLE 2010): dos vocales cerradas DISTINTAS forman
       // diptongo a efectos ortográficos aunque una lleve tilde.
       await analizar(page, 'casuístico cuídate lingüística');
@@ -1155,7 +1154,7 @@ test.describe('contador-silabas', () => {
       // rotulada por la propia app en la misma sesión, tres veces.
       await page.getByRole('button', { name: 'Ver guía educativa' }).click();
       const tarjeta = (
-        await page.getByText('La tilde sobre i/u siempre rompe el diptongo').locator('xpath=..').innerText()
+        await page.getByText(/La tilde sobre i\/u .*rompe el diptongo/).locator('xpath=..').innerText()
       ).replace(/\s+/g, ' ');
       expect(tarjeta).not.toContain('Regla sin excepciones');
       expect(tarjeta).toContain('distinta'); // la excepción de las dos cerradas distintas
@@ -1164,7 +1163,6 @@ test.describe('contador-silabas', () => {
     test('HALLAZGO · esa misma tarjeta escribe «mai-z», una sílaba sin ninguna vocal', async ({
       page,
     }) => {
-      test.fail();
       // El motor acierta: «ai» es diptongo, «maiz» es UNA sílaba.
       await analizar(page, 'maiz');
       await expect(silabasDe(page, 0)).toHaveText(['maiz']);
@@ -1175,7 +1173,7 @@ test.describe('contador-silabas', () => {
       // en el hallazgo 207, cuando «aquí» salía a-qu-í.
       await page.getByRole('button', { name: 'Ver guía educativa' }).click();
       const tarjeta = (
-        await page.getByText('La tilde sobre i/u siempre rompe el diptongo').locator('xpath=..').innerText()
+        await page.getByText(/La tilde sobre i\/u .*rompe el diptongo/).locator('xpath=..').innerText()
       ).replace(/\s+/g, ' ');
       expect(tarjeta).not.toContain('mai-z');
 
@@ -1187,7 +1185,6 @@ test.describe('contador-silabas', () => {
     test('HALLAZGO · la FAQ visible deja al octosílabo fuera del arte menor y del arte mayor', async ({
       page,
     }) => {
-      test.fail();
       // La app rotula el octosílabo como arte MENOR, igual que su código (`>= 9 → mayor`),
       // igual que la nota «Cómo se lee» del bloque de rima («arte mayor: nueve sílabas o
       // más») e igual que el FAQPage del JSON-LD («arte menor: ocho o menos»).
@@ -1210,7 +1207,6 @@ test.describe('contador-silabas', () => {
     test('HALLAZGO · el mnemotécnico de vocales fuertes y débiles coloca la O entre las débiles', async ({
       page,
     }) => {
-      test.fail();
       // El motor trata la «o» como abierta: «poeta» es po-e-ta y la tarjeta lo rotula
       // «Hiato: o-e», que solo se produce entre dos abiertas.
       await analizar(page, 'poeta');
@@ -1231,7 +1227,6 @@ test.describe('contador-silabas', () => {
     test('HALLAZGO · la h final no se trata como muda: «oh alma» no funde y «la hoja» sí', async ({
       page,
     }) => {
-      test.fail();
       // Testigo de que la app SÍ aplica la regla por el lado de la h inicial:
       // la(1) ho-ja(2) al-ta(2) = 5 − 2 sinalefas = 3.
       await analizar(page, 'la hoja alta');
@@ -1255,7 +1250,6 @@ test.describe('contador-silabas', () => {
     test('HALLAZGO · la diéresis poética sobre la i parte la palabra en dos palabras inventadas', async ({
       page,
     }) => {
-      test.fail();
       // El extractor de palabras es /[a-záéíóúüñ]+/gi, y la «ï» no está en esa clase. La app
       // promociona la diéresis en su bloque educativo («"suave" en verso puede leerse
       // su-a-ve»), y la diéresis sobre la i se escribe exactamente así: vïuda, crïado,

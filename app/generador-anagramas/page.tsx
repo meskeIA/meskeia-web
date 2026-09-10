@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect, useRef, Fragment } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { puntuarPalabra } from '@/lib/calculadoras/puntuacionScrabble';
+import { puntuarPalabra, letrasSinFicha } from '@/lib/calculadoras/puntuacionScrabble';
 
 /**
  * Diccionario español basado en el Lemario General del Español
@@ -149,6 +149,18 @@ interface ResultadoPalabra {
   comodines: number[];
   /** Puntuación base de la palabra en fichas españolas, con las blancas a 0 */
   puntos: number;
+  /**
+   * Letras que la palabra lleva y la bolsa española NO tiene (K y W). Vacío = jugable.
+   *
+   * La app puntuaba estas palabras como cualquier otra —`VALORES_FICHA[ficha] ?? 0` las
+   * dejaba a cero en silencio— y presentaba el total como el de una jugada legal, mientras
+   * su propia FAQ dice que «no tiene fichas K ni W, así que ninguna palabra que las lleve es
+   * jugable»: «kayak 6 pt» con las dos K a cero, «ka 1 pt» con el valor de una sola letra
+   * (hallazgo 704). Una blanca sobre esa letra sí la hace jugable —es la única manera de
+   * ponerla en el tablero—, y por eso `letrasSinFicha` no cuenta las posiciones cubiertas:
+   * ahí está la diferencia que el hallazgo 705 echaba en falta entre «yak» y «ya?».
+   */
+  sinFicha: string[];
 }
 
 /**
@@ -180,6 +192,43 @@ type CriterioOrden = 'longitud' | 'puntos';
  * pusieron en rojo de golpe (08/09/2026). Envolverlo aquí, y no en los dos sitios que
  * pintan chips, deja un solo punto de verdad para «esto es la palabra».
  */
+/**
+ * La insignia de puntos del chip, o el aviso de que esa palabra NO se puede jugar.
+ *
+ * Vive aquí por el mismo motivo que `PalabraConComodines`: los dos sitios que pintan chips
+ * —la lista ordenada por puntos y la agrupada por longitud— tenían la insignia copiada, y
+ * una corrección en uno no llegaba al otro.
+ *
+ * Una palabra con K o con W no tiene puntuación que dar: la bolsa española no trae esas
+ * fichas. Enseñar un número al lado sería presentar como jugada legal algo que la propia
+ * FAQ de la app declara injugable, y encima con las letras que faltan contadas a cero
+ * (hallazgo 704). Se dice cuál es la letra que falta, que es el dato accionable.
+ */
+function InsigniaPuntos({ resultado }: { resultado: ResultadoPalabra }) {
+  if (resultado.sinFicha.length > 0) {
+    const letras = resultado.sinFicha.join(' y ');
+    return (
+      <span className={styles.chipInjugable} title={`El Scrabble español no tiene ficha ${letras}`}>
+        <span aria-hidden="true">sin ficha {letras}</span>
+        <span className={styles.soloLectores}>
+          {' '}
+          no jugable: el Scrabble español no tiene ficha {letras}
+        </span>
+      </span>
+    );
+  }
+  return (
+    <span className={styles.chipPuntos}>
+      {resultado.puntos}
+      <span className={styles.chipPuntosUnidad} aria-hidden="true"> pt</span>
+      <span className={styles.soloLectores}>
+        {' '}
+        {resultado.puntos === 1 ? 'punto' : 'puntos'}
+      </span>
+    </span>
+  );
+}
+
 function PalabraConComodines({ resultado }: { resultado: ResultadoPalabra }) {
   if (resultado.comodines.length === 0) {
     return <span className={styles.chipLema}>{resultado.palabra}</span>;
@@ -516,6 +565,7 @@ export default function GeneradorAnagramasPage() {
               // posiciones de las blancas: sobre la original, un lema con guion las
               // desplazaría y la blanca descontaría la ficha equivocada.
               puntos: puntuarPalabra(normalizada, posiciones),
+              sinFicha: letrasSinFicha(normalizada, posiciones),
             });
           }
         }
@@ -618,9 +668,19 @@ export default function GeneradorAnagramasPage() {
     return groups;
   }, [resultadosOrdenados]);
 
-  /** La jugada más valiosa de la lista: encabeza el resumen cuando se ordena por puntos. */
+  /**
+   * La jugada más valiosa de la lista: encabeza el resumen cuando se ordena por puntos.
+   *
+   * Solo entre las JUGABLES. El resumen encabezaba el atril con una cifra construida sobre
+   * palabras que la propia app declara injugables —del atril «kayak» anunciaba «La más
+   * valiosa: 6 puntos», que es KAYAK con sus dos K a cero (hallazgo 704)—.
+   */
   const mejorPuntuacion = useMemo(
-    () => results.reduce((maximo, r) => (r.puntos > maximo ? r.puntos : maximo), 0),
+    () =>
+      results.reduce(
+        (maximo, r) => (r.sinFicha.length === 0 && r.puntos > maximo ? r.puntos : maximo),
+        0,
+      ),
     [results],
   );
 
@@ -944,17 +1004,7 @@ export default function GeneradorAnagramasPage() {
                       className={`${styles.wordChip} ${resultado.comodines.length > 0 ? styles.wordChipComodin : ''}`}
                     >
                       <PalabraConComodines resultado={resultado} />
-                      <span className={styles.chipPuntos}>
-                        {resultado.puntos}
-                        <span className={styles.chipPuntosUnidad} aria-hidden="true">
-                          {' '}
-                          pt
-                        </span>
-                        <span className={styles.soloLectores}>
-                          {' '}
-                          {resultado.puntos === 1 ? 'punto' : 'puntos'}
-                        </span>
-                      </span>
+                      <InsigniaPuntos resultado={resultado} />
                     </span>
                   ))}
                 </div>
@@ -974,17 +1024,7 @@ export default function GeneradorAnagramasPage() {
                           className={`${styles.wordChip} ${resultado.comodines.length > 0 ? styles.wordChipComodin : ''}`}
                         >
                           <PalabraConComodines resultado={resultado} />
-                          <span className={styles.chipPuntos}>
-                            {resultado.puntos}
-                            <span className={styles.chipPuntosUnidad} aria-hidden="true">
-                              {' '}
-                              pt
-                            </span>
-                            <span className={styles.soloLectores}>
-                              {' '}
-                              {resultado.puntos === 1 ? 'punto' : 'puntos'}
-                            </span>
-                          </span>
+                          <InsigniaPuntos resultado={resultado} />
                         </span>
                       ))}
                     </div>
@@ -1299,22 +1339,22 @@ export default function GeneradorAnagramasPage() {
           <h3><span aria-hidden="true">🎯</span> Casos de Uso y Aplicaciones</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎮</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎮</span>
               <h4>Wordle y Wordle en Español</h4>
               <p>Introduce las letras que ya conoces (verdes y amarillas) y usa el filtro &quot;debe contener&quot; para encontrar palabras válidas de 5 letras que maximicen información en cada intento.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🃏</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🃏</span>
               <h4>Scrabble y Palabras Cruzadas</h4>
               <p>Busca las palabras más largas posibles con las letras de tu atril; si tienes una ficha blanca, escríbela como <strong>?</strong> y verás resaltada la letra que pone. Las palabras de 7+ letras dan bingo (+50 puntos). Filtra por longitud mínima para encontrar jugadas de alto valor.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>📚</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">📚</span>
               <h4>Aprendizaje de Vocabulario</h4>
               <p>Descubrir que AMOR y ROMA comparten letras, o que SALA y ALAS son anagramas, ayuda a fijar palabras en la memoria. Técnica usada en métodos de enseñanza de idiomas.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>✍️</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">✍️</span>
               <h4>Seudónimos y Creatividad</h4>
               <p>Muchos escritores usaron anagramas como seudónimos: Voltaire es anagrama de AROVET LI (latinización de su apellido). En criptografía renacentista se usaban para ocultar autoría.</p>
             </div>
@@ -1330,7 +1370,7 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué es un anagrama perfecto?</summary>
-              <p className={styles.eduFaqAnswer}>Un <strong>anagrama perfecto</strong> usa exactamente todas las letras de la palabra original para formar otra palabra o frase con significado propio. Ejemplos famosos en español: ROMA/AMOR/MORA/RAMO/OMAR, SALTA/ATLAS/TALAS, PIEDRA/PARDIE. Los anagramas de frases completas son especialmente valorados: &quot;SALVADOR DALÍ&quot; → &quot;AVIDA DOLLARS&quot; (hecho por él mismo).</p>
+              <p className={styles.eduFaqAnswer}>Un <strong>anagrama perfecto</strong> usa exactamente todas las letras de la palabra original para formar otra palabra o frase con significado propio. Ejemplos en español, todos comprobables tecleándolos arriba: ROMA/AMOR/MORA/RAMO, RAPTO/TRAPO/TROPA/PARTO/PORTA y ASCO/CASO/COSA/SACO/CAOS. Los anagramas de frases completas son especialmente valorados: &quot;SALVADOR DALÍ&quot; → &quot;AVIDA DOLLARS&quot; (hecho por él mismo).</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué letras son más valiosas en Scrabble español?</summary>
@@ -1419,27 +1459,35 @@ export default function GeneradorAnagramasPage() {
           <h3><span aria-hidden="true">💡</span> Consejos de Estrategia para Juegos de Palabras</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📊</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📊</span>
               <h4>Frecuencia de letras en español</h4>
               <p>Las letras más frecuentes en español son: E (13,7%), A (12,5%), O (8,7%), S (7,9%), R (6,9%), N (6,7%), I (6,2%), D (5,9%). Prioriza palabras que usen estas letras.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🎯</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🎯</span>
               <h4>Memoriza palabras de 2-3 letras</h4>
-              <p>En Scrabble, las palabras cortas son cruciales para crear jugadas paralelas. Válidas: AX, XI, QI (si se aceptan anglicismos), OI, ID, ET. Verificar siempre en el diccionario oficial.</p>
+              {/* Las seis que había —AX, XI, QI, OI, ID, ET— venían del Scrabble en INGLÉS:
+                  QI, OI e ID no están en el lemario que esta app carga, así que quien las
+                  tecleaba aquí no obtenía nada. Es el mismo defecto que el hallazgo 499
+                  corrigió en la tarjeta de al lado quitando JOT, ZAG y QAT, y que su test de
+                  regresión no veía porque vigilaba solo aquella tarjeta (hallazgo 706).
+                  Las de ahora están comprobadas una a una contra public/data/diccionario-es.txt. */}
+              <p>En Scrabble, las palabras cortas son cruciales para crear jugadas paralelas. Las que más rinden son las que colocan una ficha cara en poco espacio: <strong>AX</strong>, <strong>XI</strong>, <strong>OX</strong> (8 puntos la X), <strong>JA</strong>, <strong>JE</strong>, <strong>JO</strong> (8 la J), <strong>ZA</strong> (10 la Z) y <strong>ÑU</strong> (8 la Ñ). Todas están en el diccionario que usa esta herramienta: tecléalas arriba para comprobarlo.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🔄</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🔄</span>
               <h4>Piensa en sufijos y prefijos</h4>
-              <p>Si ves letras como -CIÓN, -MENTE, -ANDO, -ANDO en tu atril, busca raíces que las complementen. Los sufijos son predecibles y permiten planificar jugadas de alto valor.</p>
+              {/* Enumeraba «-CIÓN, -MENTE, -ANDO, -ANDO»: prometía cuatro pistas y daba tres
+                  (hallazgo 708). */}
+              <p>Si ves letras como -CIÓN, -MENTE, -ANDO o -ADO en tu atril, busca raíces que las complementen. Los sufijos son predecibles y permiten planificar jugadas de alto valor.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🧠</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🧠</span>
               <h4>Entrena la visualización mental</h4>
               <p>Los mejores jugadores de Scrabble practican reorganizar letras mentalmente sin ayuda. Dedica 5 minutos al día a intentar encontrar palabras antes de usar el generador como verificación.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📖</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📖</span>
               <h4>Amplía tu vocabulario pasivo</h4>
               {/* JOT, ZAG y QAT son del léxico Collins de Scrabble en INGLÉS: no están en el
                   Lemario General del Español que usa este generador, y quien las jugara
@@ -1447,7 +1495,7 @@ export default function GeneradorAnagramasPage() {
               <p>No necesitas saber el significado exacto de una palabra para usarla en Scrabble — solo necesitas saber que existe y es válida. Lista de palabras raras válidas: OHM, ÑU, ZAS, YAK.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>⚡</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">⚡</span>
               <h4>Velocidad en Wordle competitivo</h4>
               <p>En Wordle competitivo contra el reloj, la segunda palabra debe eliminar el máximo de letras restantes. Si la primera palabra reveló A y R, elige una segunda que no las repita y cubra otras letras frecuentes.</p>
             </div>
@@ -1456,7 +1504,7 @@ export default function GeneradorAnagramasPage() {
 
         <section>
           <div className={styles.warningBox}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <div>
               <strong>Sobre el diccionario utilizado</strong>
               <ul>

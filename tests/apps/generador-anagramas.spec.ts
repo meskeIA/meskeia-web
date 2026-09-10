@@ -1188,7 +1188,7 @@ test.describe('generador-anagramas', () => {
       }
     });
 
-    test.fail(
+    test(
       'HALLAZGO · la K y la W no tienen ficha, y la app las cuenta como 0 sin decirlo',
       async ({ page }) => {
         await abrirConDiccionario(page);
@@ -1210,7 +1210,7 @@ test.describe('generador-anagramas', () => {
       },
     );
 
-    test.fail(
+    test(
       'HALLAZGO · gastar la ficha blanca en una K sale gratis: el mismo total con y sin ella',
       async ({ page }) => {
         await abrirConDiccionario(page);
@@ -1274,7 +1274,7 @@ test.describe('generador-anagramas', () => {
     // -------------------------------------------------------------------------------------
     // RESIDUOS DE REPARACIÓN — la corrección que no viajó a la tarjeta de al lado
     // -------------------------------------------------------------------------------------
-    test.fail(
+    test(
       'HALLAZGO · la tarjeta de palabras de 2-3 letras repite el defecto ya reparado en su vecina',
       async ({ page }) => {
         await page.goto(RUTA);
@@ -1292,7 +1292,7 @@ test.describe('generador-anagramas', () => {
       },
     );
 
-    test.fail(
+    test(
       'HALLAZGO · la FAQ del anagrama perfecto cita palabras que el lemario de la app no tiene',
       async ({ page }) => {
         await page.goto(RUTA);

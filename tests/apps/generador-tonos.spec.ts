@@ -423,11 +423,12 @@ test.describe('En móvil (Pixel 7)', () => {
     expect(foto?.estadoCtx).toBe('running');
     // 20.000 < Nyquist (24.000 con sampleRate 48.000): el tono se emite, no se satura.
     expect(foto?.maxFrecuencia ?? 0).toBeGreaterThan(20000);
-    // ⚠️ Este rótulo sale de `getDescripcionFrecuencia` (≥ 16.000 Hz → «Ultrasonido»), que
-    // contradice la tabla educativa de la propia página (8–20 kHz = «Muy agudos»; ultrasonido
-    // = «> 20 kHz, inaudible»). Es un hallazgo ABIERTO (ver el bloque final): si alguien
-    // corrige el rótulo, esta línea hay que actualizarla — no sería una regresión.
-    await expect(page.getByText('Ultrasonido - Límite audible')).toBeVisible();
+    // El rótulo sale de `getDescripcionFrecuencia`. Decía «Ultrasonido» desde 16.000 Hz, en
+    // contra de la tabla educativa de la propia página (8–20 kHz = «Muy agudos»; ultrasonido
+    // = «> 20 kHz, inaudible»), y este mismo comentario avisaba de que al corregirlo habría
+    // que actualizar la línea. Corregido el 10/09/2026 (hallazgo 692): 20.000 Hz es
+    // exactamente el umbral, y ahí sí se nombra el ultrasonido.
+    await expect(page.getByText('Umbral del ultrasonido - Inaudible para la mayoría')).toBeVisible();
 
     // Extremo inferior: 20 Hz, sobre el oscilador ya sonando.
     await page.getByRole('button', { name: 'Ir a 20 Hz' }).click();
@@ -832,7 +833,11 @@ test('REGRESIÓN 131 — los presets de notas usan coma decimal', async ({ page 
   await abrir(page);
   await expect(page.getByRole('button', { name: /Do \(C4\)/ })).toContainText('261,63 Hz');
   // Y los millares con punto, que es la otra mitad de la regla: 15.000, no 15,000.
-  await expect(page.getByRole('button', { name: /Ultrasonido/ })).toContainText('15.000 Hz');
+  // El preset se llamaba «Ultrasonido» y pasó a «Test de edad» el 10/09/2026 (hallazgo 692):
+  // 15 kHz los oye la mayoría de menores de 40, y la tabla de la propia página reserva el
+  // ultrasonido para «> 20 kHz». La frecuencia y su formato no cambian, que es lo que este
+  // caso vigila.
+  await expect(page.getByRole('button', { name: /Test de edad/ })).toContainText('15.000 Hz');
 });
 
 // ============================================================
@@ -853,7 +858,6 @@ test('REGRESIÓN 131 — los presets de notas usan coma decimal', async ({ page 
 test('HALLAZGO A — el campo «Duración» del barrido debe dejarse borrar y reteclear', async ({
   page,
 }) => {
-  test.fail();
   await abrir(page);
   const duracion = page.locator('#sweep-dur');
   await expect(duracion).toHaveValue('5');
@@ -882,7 +886,6 @@ test('HALLAZGO A — el campo «Duración» del barrido debe dejarse borrar y re
 test('HALLAZGO B — si el botón dice que está barriendo, el barrido tiene que barrer', async ({
   page,
 }) => {
-  test.fail();
   await abrir(page);
   await page.locator('#sweep-min').fill('20');
   await page.locator('#sweep-min').blur();
@@ -923,7 +926,6 @@ test('HALLAZGO B — si el botón dice que está barriendo, el barrido tiene que
 test('HALLAZGO C — enfocar y salir del campo no debe desafinar el preset elegido', async ({
   page,
 }) => {
-  test.fail();
   await abrir(page);
   await page.getByRole('button', { name: /Do \(C4\)/ }).click();
   await botonReproducir(page).click();
@@ -951,19 +953,34 @@ test('HALLAZGO C — enfocar y salir del campo no debe desafinar el preset elegi
  * llamarlo ultrasonido es incorrecto además de contradictorio.
  *
  * Medido el 10/09/2026: botón «Ultrasonido | 15.000 Hz» → franja mostrada «Muy agudos - Aire».
- * Cabe repararlo por cualquiera de los dos lados (renombrar el preset o subirlo a 20.000 Hz);
- * si se toca `getDescripcionFrecuencia`, hay que actualizar también el CASO 2.
+ *
+ * REPARADO ese mismo día por el lado del NOMBRE: el preset pasa a llamarse «Test de edad»,
+ * que es el uso que la propia tabla da a esa franja («límite audición, test de edad»), y
+ * `getDescripcionFrecuencia` deja de llamar ultrasonido a todo lo que pasa de 16 kHz. Subir
+ * el preset a 20.000 Hz habría sido la otra opción, pero deja un botón que casi nadie oye.
+ * Este test se queda como la invariante de fondo: ningún preset ni rótulo puede nombrar el
+ * ultrasonido por debajo del umbral que la tabla de la página declara.
  */
 test('HALLAZGO D — el preset llamado «Ultrasonido» debe emitir una frecuencia ultrasónica', async ({
   page,
 }) => {
-  test.fail();
   await abrir(page);
-  const boton = page.getByRole('button', { name: /Ultrasonido/ });
-  const hz = hzAnunciados(await boton.innerText());
+  const presetsUltrasonido = page.getByRole('button', { name: /Ultrasonido/i });
+  const cuantos = await presetsUltrasonido.count();
 
-  expect(
-    hz,
-    'la propia tabla de la página sitúa el ultrasonido por encima de 20 kHz',
-  ).toBeGreaterThanOrEqual(20000);
+  for (let i = 0; i < cuantos; i++) {
+    const hz = hzAnunciados(await presetsUltrasonido.nth(i).innerText());
+    expect(
+      hz,
+      'la propia tabla de la página sitúa el ultrasonido por encima de 20 kHz',
+    ).toBeGreaterThanOrEqual(20000);
+  }
+
+  // Y el RÓTULO de la frecuencia tampoco lo nombra por debajo del umbral: a 15.000 Hz, que
+  // es lo que emite el preset que antes se llamaba así, dice lo mismo que la tabla educativa
+  // de la propia página («Muy agudos: 8 – 20 kHz»).
+  await page.getByRole('button', { name: /Test de edad/ }).click();
+  const rotulo = page.locator('[class*="descripcionFrecuencia"]');
+  await expect(rotulo).toHaveText(/Muy agudos/);
+  await expect(rotulo).not.toHaveText(/ultrasonido/i);
 });

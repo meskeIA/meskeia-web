@@ -16,7 +16,7 @@
  * Ejecutar con: npx playwright test tests/metrica-verso.spec.ts
  */
 import { test, expect } from '@playwright/test';
-import { analizarVerso } from '../app/contador-silabas/metrica';
+import { analizarVerso, contarSilabasTexto } from '../app/contador-silabas/metrica';
 
 /** Sílabas métricas de un verso, o −1 si la línea no tiene palabras. */
 const medir = (verso: string): number => analizarVerso(verso)?.silabasMetricas ?? -1;
@@ -170,4 +170,64 @@ test('el ajuste por acento final se aplica sobre el recuento ya fundido', () => 
   expect(a.sinalefas).toHaveLength(2);
   expect(a.acentuacion).toBe('aguda');
   expect(a.silabasMetricas).toBe(8);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Inspector 10/09/2026 — hallazgos 702 y 703, reparados
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * HALLAZGO 702 — la h final es MUDA, igual que la inicial.
+ *
+ * `terminaEnVocal()` miraba el último CARÁCTER y veía una «h», mientras `empiezaPorVocal()`
+ * sí la saltaba: la misma regla de la OLE 2010 aplicada por un solo lado. El universo
+ * práctico son las interjecciones (oh, ah, eh), donde el poeta deshace a menudo la fusión,
+ * pero la app declara detectar «toda sinalefa posible» y marcar las deshacibles: no verla
+ * siquiera le quitaba al usuario la decisión.
+ *
+ * A mano: oh‿al-ma mí-a → 5 fonéticas − 1 sinalefa = 4 métricas, palabra llana, sin ajuste.
+ */
+test('la h FINAL no bloquea la sinalefa: es muda por los dos lados', () => {
+  const a = analizarVerso('oh alma mía')!;
+  expect(a.silabasFoneticas).toBe(5);
+  expect(sinalefasDe('oh alma mía')).toEqual(['h_a']);
+  expect(a.silabasMetricas).toBe(4);
+
+  // La h inicial ya funcionaba, y tiene que seguir funcionando igual
+  expect(sinalefasDe('la hoja alta')).toEqual(['a_h', 'a_a']);
+  // Y la h consonántica de «hue-/hui-/hie-/huy-» sigue bloqueando
+  expect(sinalefasDe('la huella')).toEqual([]);
+});
+
+/**
+ * HALLAZGO 703 — la diéresis poética no puede partir la palabra en dos.
+ *
+ * El extractor era una lista cerrada de caracteres sin la «ï», así que «vïuda» salía como
+ * dos palabras inventadas, «v» y «uda», la primera con una «sílaba» que no tiene ninguna
+ * vocal. Ahora las palabras son rachas de letras (`\p{L}+`), y de paso la diéresis hace lo
+ * que se escribe para hacer: deshacer el diptongo y ganar una sílaba.
+ *
+ * A mano: la vï-u-da del rey → 1 + 3 + 1 + 1 = 6 fonéticas − 1 sinalefa (a‿u de «la vïuda»
+ * no existe: son «la» y «vïuda», que empieza por consonante) = 6, aguda por «rey» → 7.
+ */
+test('la diéresis poética se lee como una palabra, y deshace el diptongo', () => {
+  const palabras = contarSilabasTexto('la vïuda del rey');
+  expect(palabras.map((p) => p.palabra)).toEqual(['la', 'vïuda', 'del', 'rey']);
+  // vï-u-da: la diéresis rompe el diptongo «iu», que es para lo único que se escribe
+  expect(palabras[1].silabas).toEqual(['vï', 'u', 'da']);
+  // Ninguna sílaba puede quedarse sin vocal, que es lo que producía el extractor viejo
+  for (const p of palabras) {
+    for (const s of p.silabas) {
+      expect(s, `sílaba sin vocal en «${p.palabra}»`).toMatch(/[aeiouáéíóúüïy]/i);
+    }
+  }
+  // Sin diéresis, «viuda» es bisílaba: es justo la sílaba que la diéresis gana
+  expect(contarSilabasTexto('viuda')[0].silabas).toEqual(['viu', 'da']);
+});
+
+test('las letras fuera del español tampoco parten la palabra', () => {
+  // ç, à, è, ã de nombres propios y grafías antiguas: antes cada una partía la palabra en dos
+  for (const palabra of ['Barça', 'Montserrat', 'Gonçalves', 'Bragança']) {
+    expect(contarSilabasTexto(palabra).map((p) => p.palabra)).toEqual([palabra]);
+  }
 });

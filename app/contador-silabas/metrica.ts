@@ -37,11 +37,24 @@ import { separarSilabas, encuentrosVocalicos } from './silabeo';
 export { separarSilabas, encuentrosVocalicos };
 export type { EncuentrosVocalicos } from './silabeo';
 
+/**
+ * Qué cuenta como palabra: una racha de LETRAS, las que sean.
+ *
+ * Era `/[a-záéíóúüñ]+/gi`, una lista cerrada en la que no estaba la «ï» —la diéresis poética
+ * se escribe exactamente así: vïuda, crïado, sïempre— ni la ç, la à, la è o la ã de un
+ * nombre propio o una grafía antigua. Cualquier palabra que las llevara se partía en DOS
+ * palabras inventadas: «la vïuda del rey» daba cinco tarjetas —«la», «v» (una «sílaba» sin
+ * ninguna vocal), «uda», «del», «rey»— y con ellas un recuento de palabras y una media
+ * falsos. No era la limitación declarada de «una sílaba de diferencia», sino inventar
+ * palabras (hallazgo 703, 10/09/2026). `\p{L}` no deja fuera ninguna letra.
+ */
+const RE_PALABRAS = /\p{L}+/gu;
+
 export const contarSilabasTexto = (
   texto: string
 ): { palabra: string; silabas: string[]; total: number }[] => {
   // Extraer solo palabras (ignorar números y símbolos)
-  const palabras = texto.match(/[a-záéíóúüñ]+/gi) || [];
+  const palabras = texto.match(RE_PALABRAS) || [];
 
   return palabras.map((palabra) => {
     const silabas = separarSilabas(palabra);
@@ -57,11 +70,22 @@ const esVocalMetrica = (c: string): boolean => VOCALES_METRICA.includes(c.toLowe
 /**
  * ¿La palabra termina en sonido vocálico?
  * La «y» final suena /i/ («hoy», «rey»), así que también permite sinalefa.
+ *
+ * ── La h final es MUDA (hallazgo 702, 10/09/2026) ────────────────────────────
+ * Miraba el último CARÁCTER y veía una «h», mientras su hermana `empiezaPorVocal` sí la
+ * saltaba: la misma regla de la OLE 2010 —«la h no representa hoy ningún sonido en
+ * español»— aplicada por un solo lado. El universo práctico son las interjecciones (oh,
+ * ah, eh), donde el poeta deshace a menudo la fusión; pero la app declara detectar «toda
+ * sinalefa posible» y marcar «con pausa» las deshacibles, así que no verla siquiera le
+ * quita al usuario la decisión. «oh alma mía» daba 5 sílabas y 0 sinalefas mientras «la
+ * hoja alta», en la misma pantalla, fundía dos veces.
  */
 const terminaEnVocal = (palabra: string): boolean => {
   const p = palabra.toLowerCase();
   if (!p) return false;
-  const ultima = p[p.length - 1];
+  const sinHFinal = p.replace(/h+$/, '');
+  if (!sinHFinal) return false; // una palabra que solo es «h» no tiene sonido vocálico
+  const ultima = sinHFinal[sinHFinal.length - 1];
   return esVocalMetrica(ultima) || ultima === 'y';
 };
 
@@ -185,7 +209,7 @@ export const nombreDelVerso = (silabas: number): string =>
  * Devuelve null si la línea no contiene palabras.
  */
 export const analizarVerso = (linea: string): AnalisisVerso | null => {
-  const encontradas = Array.from(linea.matchAll(/[a-záéíóúüñ]+/gi)).map((m) => ({
+  const encontradas = Array.from(linea.matchAll(RE_PALABRAS)).map((m) => ({
     palabra: m[0],
     inicio: m.index,
     fin: m.index + m[0].length,

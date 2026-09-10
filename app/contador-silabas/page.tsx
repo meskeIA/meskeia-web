@@ -735,7 +735,7 @@ sabañón garrafal, morado y frito.`,
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Cuáles son los tipos de verso más comunes en español?</summary>
-              <p className={styles.eduFaqRespuesta}>Por número de sílabas métricas: <strong>octosílabo (8)</strong> — el más tradicional, base del romance y la copla. <strong>Endecasílabo (11)</strong> — el más &quot;culto&quot;, base del soneto y la silva. <strong>Heptasílabo (7)</strong> — combinado con el endecasílabo en la lira. <strong>Alejandrino (14)</strong> — base del mester de clerecía medieval. <strong>Dodecasílabo (12)</strong> — usado en el modernismo. Los versos de menos de 8 sílabas se llaman &quot;de arte menor&quot;; los de 9 o más, &quot;de arte mayor&quot;.</p>
+              <p className={styles.eduFaqRespuesta}>Por número de sílabas métricas: <strong>octosílabo (8)</strong> — el más tradicional, base del romance y la copla. <strong>Endecasílabo (11)</strong> — el más &quot;culto&quot;, base del soneto y la silva. <strong>Heptasílabo (7)</strong> — combinado con el endecasílabo en la lira. <strong>Alejandrino (14)</strong> — base del mester de clerecía medieval. <strong>Dodecasílabo (12)</strong> — usado en el modernismo. Los versos de arte menor son los de <strong>ocho o menos</strong> sílabas; los de arte mayor, los de nueve o más — que es el corte que aplica la herramienta.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué son las licencias poéticas de dieresis y sineresis?</summary>
@@ -815,12 +815,30 @@ sabañón garrafal, morado y frito.`,
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>🔤</span>
               <h4>Recuerda las vocales fuertes y débiles</h4>
-              <p>Mnemotécnico: &quot;<strong>A</strong>-<strong>E</strong>-IO-U: las <strong>A</strong>plicadas <strong>E</strong>s los fuertes, IO-U los débiles&quot; (a, e, o = fuertes; i, u = débiles). Este es el dato más importante para resolver diptongos e hiatos.</p>
+              {/* El mnemotécnico —que es lo que un estudiante memoriza— partía las cinco
+                  vocales como «A-E-IO-U», metiendo la O en el grupo de las débiles y
+                  contradiciendo al paréntesis de su propia frase y al motor; y «las
+                  Aplicadas Es los fuertes» no significa nada. En una tarjeta que la app
+                  presenta como «el dato más importante para resolver diptongos e hiatos»
+                  (hallazgo 701). */}
+              <p>Mnemotécnico: las <strong>fuertes</strong> (o abiertas) son <strong>A</strong>, <strong>E</strong>, <strong>O</strong> —las tres que puedes gritar con la boca abierta— y las <strong>débiles</strong> (o cerradas) son <strong>I</strong> y <strong>U</strong>, las dos que se pronuncian con la boca casi cerrada. Dos fuertes nunca van juntas en la misma sílaba: po-e-ta, ca-os. Este es el dato más importante para resolver diptongos e hiatos.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>📌</span>
-              <h4>La tilde sobre i/u siempre rompe el diptongo</h4>
-              <p>Regla sin excepciones: si la i o la u llevan tilde (&iacute;, ú), siempre forman hiato con la vocal adyacente. &quot;Maíz&quot;: ma-íz (hiato porque í lleva tilde). &quot;Maiz&quot; hipotéticamente sería mai-z (diptongo). La tilde &quot;marca&quot; que esa vocal débil es tónica y por tanto autónoma.</p>
+              <h4>La tilde sobre i/u rompe el diptongo… con una excepción</h4>
+              {/* Decía «Regla sin excepciones», y es falso: la OLE 2010 fija que dos vocales
+                  cerradas DISTINTAS forman siempre diptongo ortográfico aunque una lleve
+                  tilde. El motor de esta misma página ya lo aplica —rotula «Diptongo: uí» en
+                  casuístico, cuídate y lingüística—, así que la lección se desmentía a sí
+                  misma en la misma sesión. Es el residuo simétrico del hallazgo 614/661, que
+                  añadió el «distintas» al bloque de diptongos y no a este (hallazgo 698).
+                  El contraejemplo escribía además «mai-z», una partición cuya segunda parte
+                  no tiene ninguna vocal: justo lo que el FAQPage de la app declara imposible
+                  y lo que se reparó en el hallazgo 207, cuando «aquí» salía a-qu-í
+                  (hallazgo 699). Se sustituye por la palabra entera, que es lo que el motor
+                  devuelve. */}
+              <p>Si la i o la u llevan tilde (&iacute;, ú) junto a una vocal <strong>abierta</strong> (a, e, o), siempre forman hiato. &quot;Maíz&quot;: ma-íz, dos sílabas, porque la í lleva tilde; sin ella, &quot;maiz&quot; sería una sola sílaba con el diptongo ai. La tilde &quot;marca&quot; que esa vocal cerrada es tónica y por tanto autónoma.</p>
+              <p><strong>La excepción:</strong> entre dos vocales <strong>cerradas distintas</strong> (i, u) hay diptongo aunque una lleve tilde, porque así lo fija la ortografía académica: ca-suís-ti-co, cuí-da-te, lin-güís-ti-ca. Pruébalas arriba y verás que la herramienta las rotula como diptongo.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>✍️</span>

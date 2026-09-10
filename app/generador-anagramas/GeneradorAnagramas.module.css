@@ -1039,6 +1039,27 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* La insignia que sustituye a la puntuación cuando la palabra lleva K o W: la bolsa
+   española no tiene esas fichas, así que no hay jugada que puntuar (hallazgo 704).
+   Ámbar y no rojo: no es un error del usuario, es un dato del juego. Medido: #FFFFFF sobre
+   #8A4B00 → 6,80:1 en claro; #1A1A1A sobre #E8B98A → 9,73:1 en oscuro. */
+.chipInjugable {
+  position: relative;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: #8A4B00;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .chipInjugable {
+  background: #E8B98A;
+  color: #1A1A1A;
+}
+
 .chipPuntosUnidad {
   font-weight: 500;
   opacity: 0.85;

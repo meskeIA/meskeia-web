@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorTonos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   frecuenciasDeMedida,
   nivelPico,
@@ -29,6 +29,12 @@ const FREC_MIN = 20;
 const FREC_MAX = 20000;
 const acotarFrecuencia = (n: number) => Math.max(FREC_MIN, Math.min(FREC_MAX, n));
 
+/** Duración del barrido, en segundos. Los mismos límites que declara su campo. */
+const DUR_MIN = 1;
+const DUR_MAX = 60;
+const DUR_DEFECTO = 5;
+const acotarDuracion = (n: number) => Math.max(DUR_MIN, Math.min(DUR_MAX, n));
+
 const PRESETS: FrecuenciaPreset[] = [
   // Notas musicales
   { nombre: 'Do (C4)', frecuencia: 261.63, categoria: 'Notas' },
@@ -46,7 +52,13 @@ const PRESETS: FrecuenciaPreset[] = [
   { nombre: 'Medios-altos', frecuencia: 2000, categoria: 'Tests' },
   { nombre: 'Agudos', frecuencia: 5000, categoria: 'Tests' },
   { nombre: 'Muy agudos', frecuencia: 10000, categoria: 'Tests' },
-  { nombre: 'Ultrasonido', frecuencia: 15000, categoria: 'Tests' },
+  // Se llamaba «Ultrasonido» y emite 15.000 Hz, una frecuencia que la mayoría de menores de
+  // 40 años oye sin dificultad y que la propia página clasifica de otras dos maneras: su
+  // tabla dice «Ultrasonido: > 20 kHz — inaudible para humanos» y «Muy agudos: 8 – 20 kHz».
+  // El nombre nuevo es el uso que esa misma tabla le da a esta franja, «límite audición,
+  // test de edad», y así el botón deja de contradecir a la franja que la app muestra al
+  // pulsarlo (hallazgo 692).
+  { nombre: 'Test de edad', frecuencia: 15000, categoria: 'Tests' },
 ];
 
 /**
@@ -214,7 +226,8 @@ export default function GeneradorTonosPage() {
     setFrecuenciaTexto(String(v));
   }, []);
   const [sweepMaxTexto, setSweepMaxTexto] = useState('2000');
-  const [sweepDuracion, setSweepDuracion] = useState(5);
+  const [sweepDuracion, setSweepDuracion] = useState(DUR_DEFECTO);
+  const [sweepDuracionTexto, setSweepDuracionTexto] = useState(String(DUR_DEFECTO));
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
@@ -553,7 +566,13 @@ export default function GeneradorTonosPage() {
 
     setSweep(true);
     let frecActual = desde;
-    const incremento = (hasta - desde) / (sweepDuracion * 20);
+    // La duración se acota AQUÍ y no solo en el blur del campo, por la misma razón que los
+    // límites de arriba: mientras el campo tiene el foco puede valer cualquier cosa, y con
+    // una duración negativa el incremento salía negativo, `acotarFrecuencia` clavaba la
+    // frecuencia en el suelo y el barrido no avanzaba nunca — con el botón anunciando
+    // «⏹️ Detener barrido» y aria-pressed=true (hallazgo 690).
+    const segundos = acotarDuracion(sweepDuracion);
+    const incremento = (hasta - desde) / (segundos * 20);
 
     sweepIntervalRef.current = setInterval(() => {
       frecActual += incremento;
@@ -580,7 +599,12 @@ export default function GeneradorTonosPage() {
     if (freq < 4000) return 'Medios-altos - Presencia';
     if (freq < 8000) return 'Agudos - Brillo';
     if (freq < 16000) return 'Muy agudos - Aire';
-    return 'Ultrasonido - Límite audible';
+    // El ultrasonido empieza en 20 kHz, que es lo que dice la tabla de esta misma página
+    // («Ultrasonido: > 20 kHz — inaudible para humanos» · «Muy agudos: 8 – 20 kHz»). Esta
+    // función llamaba «Ultrasonido» a todo lo que pasaba de 16 kHz, que es una franja que
+    // mucha gente joven oye perfectamente (hallazgo 692).
+    if (freq < 20000) return 'Muy agudos - Al límite de la audición';
+    return 'Umbral del ultrasonido - Inaudible para la mayoría';
   };
 
   const categoriasPresets = ['Notas', 'Tests'];
@@ -618,20 +642,37 @@ export default function GeneradorTonosPage() {
       {/* Panel principal */}
       <div className={styles.mainPanel}>
         <div className={styles.frecuenciaDisplay}>
+          {/* step="any": con el step implícito de 1, el navegador marcaba como inválido el
+              261,63 del preset «Do (C4)» que la propia app escribe en este campo. */}
           <input
             type="number"
             min="20"
             max="20000"
+            step="any"
             value={frecuenciaTexto}
             onChange={(e) => {
               setFrecuenciaTexto(e.target.value);
               // Solo se emite cuando lo escrito ya es una frecuencia válida; mientras tanto
               // el oscilador se queda en la última buena y el usuario termina de teclear.
-              const n = parseInt(e.target.value, 10);
+              //
+              // `parseSpanishNumber`, no parseInt: la frecuencia NO es un entero. Los
+              // presets de esta misma app son decimales —Do (C4) son 261,63 Hz— y
+              // `aplicarFrecuencia` deja escrito que no se redondean «porque redondear aquí
+              // las destruía». Este campo hacía justo eso: bastaba con enfocarlo y salir,
+              // sin teclear nada, para que 261,63 pasara a 261 —4,17 cents de
+              // desafinación— y el preset dejara de marcarse activo. Con 442,5 Hz, que el
+              // bloque educativo cita como afinación de orquesta, quedaba en 442
+              // (hallazgo 691, 10/09/2026).
+              //
+              // Es el parser canónico del proyecto y aquí gana además a `parseFloat`, que
+              // acepta la notación científica: con parseFloat, «1e4» se colaba como 10.000 Hz
+              // en un campo que el CASO 6 de este spec exige que rechace.
+              const n = parseSpanishNumber(e.target.value);
               if (Number.isFinite(n) && n >= FREC_MIN && n <= FREC_MAX) setFrecuencia(n);
             }}
             onBlur={() => {
-              const n = acotarFrecuencia(parseInt(frecuenciaTexto, 10) || FREC_MIN);
+              const leido = parseSpanishNumber(frecuenciaTexto);
+              const n = acotarFrecuencia(Number.isFinite(leido) ? leido : FREC_MIN);
               setFrecuencia(n);
               setFrecuenciaTexto(String(n));
             }}
@@ -779,13 +820,31 @@ export default function GeneradorTonosPage() {
             </div>
             <div className={styles.sweepInput}>
               <label htmlFor="sweep-dur">Duración</label>
+              {/* Texto espejo, como los otros tres campos desde el hallazgo 127. Este se
+                  quedó fuera: su onChange hacía `parseInt(v) || 5` y REESCRIBÍA el valor,
+                  así que el campo no se podía vaciar para teclear otro número —borrarlo
+                  ponía «5», y teclear «3» daba «53», un barrido de 53 s con el incremento 18
+                  veces menor y sin aviso (hallazgo 689)—. Y no acotaba lo que recibía pese a
+                  declarar min="1": con una duración negativa el incremento salía negativo,
+                  la frecuencia se clavaba en el suelo y el barrido no avanzaba nunca
+                  mientras el botón anunciaba que estaba barriendo (hallazgo 690, residuo del
+                  128). El acotado se hace en el blur, igual que en «Desde» y «Hasta». */}
               <input
                 id="sweep-dur"
                 type="number"
-                value={sweepDuracion}
-                onChange={(e) => setSweepDuracion(parseInt(e.target.value) || 5)}
-                min="1"
-                max="60"
+                value={sweepDuracionTexto}
+                onChange={(e) => {
+                  setSweepDuracionTexto(e.target.value);
+                  const n = parseInt(e.target.value, 10);
+                  if (Number.isFinite(n) && n >= DUR_MIN && n <= DUR_MAX) setSweepDuracion(n);
+                }}
+                onBlur={() => {
+                  const n = acotarDuracion(parseInt(sweepDuracionTexto, 10) || DUR_DEFECTO);
+                  setSweepDuracion(n);
+                  setSweepDuracionTexto(String(n));
+                }}
+                min={DUR_MIN}
+                max={DUR_MAX}
               />
               <span>seg</span>
             </div>

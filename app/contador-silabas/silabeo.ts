@@ -30,9 +30,11 @@ interface Unidad {
   tipo: 'V' | 'C' | 'H';
 }
 
-const VOCALES = 'aeiouáéíóúü';
+// La «ï» de la diéresis poética entra como vocal cerrada más: es una i, y como tal se
+// silabea. Lo que la distingue —que rompe el diptongo— lo resuelve `formanDiptongo`.
+const VOCALES = 'aeiouáéíóúüï';
 const FUERTES = 'aeoáéó';
-const DEBILES = 'iuíúü';
+const DEBILES = 'iuíúüï';
 /** Vocal cerrada CON tilde: rompe el diptongo con una abierta (día, país, baúl) */
 const DEBILES_TONICAS = 'íú';
 
@@ -107,9 +109,24 @@ function aUnidades(palabra: string): Unidad[] {
  * y no por su acentuación: la í de «friísimo» y la i de delante son la MISMA vocal.
  */
 const BASE_VOCAL: Record<string, string> = {
-  á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u',
+  á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u', ï: 'i',
 };
 const base = (c: string) => BASE_VOCAL[c] ?? c;
+
+/**
+ * La DIÉRESIS POÉTICA sobre la i («vïuda», «crïado», «sïempre»).
+ *
+ * Es la marca con la que el poeta deshace un diptongo para ganar una sílaba, y la propia app
+ * la promociona en su bloque educativo. La «ï» no existe en la ortografía española corriente,
+ * así que aquí no hay ambigüedad: donde aparece, hay hiato. Con la «ü» sí la habría —en
+ * «lingüística» la diéresis dice justo lo contrario, que la u suena—, de modo que esa se
+ * queda con su regla de siempre.
+ *
+ * Hasta el 10/09/2026 la «ï» ni siquiera llegaba al silabeador: el extractor de palabras de
+ * `metrica.ts` la excluía de su clase de caracteres y partía «vïuda» en dos palabras
+ * inventadas, «v» y «uda», la primera con una «sílaba» sin ninguna vocal (hallazgo 703).
+ */
+const DIERESIS_POETICA = 'ï';
 
 /**
  * ¿Se pronuncian en la misma sílaba estas dos vocales contiguas?
@@ -129,6 +146,8 @@ const base = (c: string) => BASE_VOCAL[c] ?? c;
  * y el cómputo de sílabas métricas salen de aquí.
  */
 function formanDiptongo(a: string, b: string): boolean {
+  // La diéresis poética deshace el diptongo: es para lo único que se escribe.
+  if (DIERESIS_POETICA.includes(a) || DIERESIS_POETICA.includes(b)) return false;
   if (esFuerte(a) && esFuerte(b)) return false;
   if (esDebil(a) && esDebil(b)) return base(a) !== base(b);
   return !(DEBILES_TONICAS.includes(a) || DEBILES_TONICAS.includes(b));
