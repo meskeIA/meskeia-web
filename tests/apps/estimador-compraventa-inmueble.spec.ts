@@ -6,9 +6,15 @@
  * siendo correctos como CÁLCULO DEL COMPONENTE: lo que ya no describen es la cifra final de
  * la tarjeta, que lleva encima el factor.
  */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { test, expect, Page } from '@playwright/test';
 import { ITP_CCAA } from '../../data/itp-ccaa';
-import { PLUSVALIA_MUNICIPAL_META, IVA_INMUEBLES_2025 } from '../../data/fiscal/inmuebles';
+import {
+  PLUSVALIA_MUNICIPAL_META,
+  IVA_INMUEBLES_2025,
+  COEFICIENTES_IIVTNU_2025,
+} from '../../data/fiscal/inmuebles';
 
 /**
  * Inspector — estimador-compraventa-inmueble (segmento fiscal, riesgo 1 CRÍTICO)
@@ -2270,4 +2276,387 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('21.295,20 €');
     expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('221.295,20 €');
   });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 10/09/2026 — RE-INSPECCIÓN tras el refactor de motores
+//
+// La app vuelve a la cola porque sus dependencias se movieron: el 09/09 (579b3a05) se
+// reparó `calcularPlusvaliaMunicipal` para que «menos de 1 año» dejara de ser inalcanzable
+// y se creó `IVA_INMUEBLES_2025.anejoVinculado`, y el 10/09 (1808419c) se retiraron 86
+// motores de `lib/calculadoras/`. Los 74 casos anteriores pasan enteros.
+//
+// Esta vuelta añade TRES caminos nuevos, resueltos a mano ANTES de abrir el navegador:
+//   · CASO 33 (normal)   — Cantabria, 300.000 €, LAS DOS PESTAÑAS de la misma operación.
+//     Cantabria no se había probado nunca: tipo general 9 % sin escala progresiva y con un
+//     reducido «Municipios despoblados» que NO es de colectivo, así que sale como aviso
+//     incluso con perfil General.
+//   · CASO 34 (límite)   — la REVENTA ANTES DEL AÑO (0 años de tenencia), que es el
+//     coeficiente 0,14 de COEFICIENTES_IIVTNU_2025, el tercero más alto de la tabla.
+//   · CASO 35 (rechazo)  — un precio NEGATIVO, que no puede producir ni un ITP negativo ni
+//     un coste total por debajo del precio, ni antes ni después de salir del campo.
+//
+// Y CUATRO hallazgos, los cuatro RESIDUOS DE REPARACIÓN (una corrección que llegó al motor
+// o a las apps hermanas y no a esta), declarados con el modificador `test.fail(...)`:
+// afirman lo que DEBERÍA ocurrir, así que hoy fallan a propósito. Cuando se reparen, se
+// cambia `test.fail(` por `test(` y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motores', () => {
+  /**
+   * CASO 33 (normal) — Cantabria, segunda mano, vivienda de 300.000 €, perfil General.
+   *
+   * ── COMPRADOR ─────────────────────────────────────────────────────────────
+   * ITP_CCAA.cantabria.tipoGeneral = tipoGeneralDe('Cantabria') = 9 (TIPOS_ITP_CCAA_2025,
+   * `data/fiscal/inmuebles.ts`). Cantabria NO tiene `tramosProgresivos`, así que el ITP es
+   * plano, y ninguno de sus reducidos se puede aplicar con perfil General:
+   *   ITP        = 300.000 × 9 %                                  = 27.000,00 €
+   *   Notaría    = arancel(300.000) × 1,21 × 1,75                 =    864,86 €
+   *     arancel = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 %
+   *               + 90.151,82×0,10 % + 149.746,97×0,05 % = 408,43341
+   *               → ×1,21 = 494,2044 → ×1,75 = 864,8577  (RD 1426/1989 nº 2 + FACTURA_NOTARIAL)
+   *     horquilla: ×1,5 = 741,31 € y ×2 = 988,41 €
+   *   Registro   = (216,2120635 + 6,010121 + 3,005061) × 1,21     =    272,52 €
+   *     (RD 1427/1989 nº 2, más el asiento de presentación nº 1 y la nota simple nº 4)
+   *   Gestoría (GESTORIA_TIPICA)                                   =    300,00 €
+   *   AJD        = 0 — segunda mano, no se pinta la tarjeta
+   *   Total gastos = 27.000,00 + 864,86 + 272,52 + 300,00         = 28.437,38 €
+   *   % sobre precio = 28.437,38 / 300.000                         =      9,48 %
+   *   Coste total  = 300.000 + 28.437,38                          = 328.437,38 €
+   *
+   * ── VENDEDOR ──────────────────────────────────────────────────────────────
+   * Compra 200.000 €, 10 años, suelo catastral 60.000 €, total catastral 100.000 €,
+   * comisión 3 %, sin otros gastos, sin gastos de adquisición, vivienda habitual, < 65 años.
+   *   Plusvalía objetivo = 60.000 × 0,08 × 25 %                    =  1.200,00 €
+   *     (COEFICIENTES_IIVTNU_2025 → 10 años = 0,08 · PLUSVALIA_MUNICIPAL_META.tipoOrientativo = 25)
+   *   Plusvalía real     = (300.000 − 200.000) × 0,6 × 25 %        = 15.000,00 €
+   *     → gana el OBJETIVO, que es el menor (art. 107.5 TRLHL)
+   *   Comisión           = 300.000 × 3 %                           =  9.000,00 €
+   *   Valor adquisición  = 200.000                                 = 200.000,00 €
+   *   Valor transmisión  = 300.000 − 9.000 − 1.200                 = 289.800,00 €
+   *   Ganancia           = 289.800 − 200.000                       =  89.800,00 €
+   *   IRPF (base del ahorro, TRAMOS_GANANCIAS_PATRIMONIALES_2025):
+   *     6.000×19 % = 1.140 · 44.000×21 % = 9.240 · 39.800×23 % = 9.154
+   *                                                              =  19.534,00 €
+   *   Total gastos vendedor = 1.200 + 9.000 + 19.534              =  29.734,00 €
+   *   Neto               = 300.000 − 29.734                        = 270.266,00 €
+   */
+  test('CASO 33 (normal) — Cantabria, 300.000 €: las dos pestañas de la misma operación', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('cantabria');
+    await rellenar(page, 'Precio de la vivienda', '300000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // El tipo general se lee de la tabla, no de la memoria del test
+    expect(ITP_CCAA.cantabria.tipoGeneral).toBe(9);
+    expect(ITP_CCAA.cantabria.tramosProgresivos).toBeUndefined();
+
+    expect(await valorTarjeta(page, /^ITP/)).toBe('27.000,00 €');
+    // Tipo EFECTIVO: sin escala progresiva coincide con el nominal
+    expect(await page.locator('h3', { hasText: /^ITP/ }).first().innerText()).toBe('ITP (9,00%)');
+    // En segunda mano no hay AJD de compraventa
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, /Gastos de notaría/)).toBe('864,86 €');
+    expect(await descripcionTarjeta(page, /Gastos de notaría/)).toContain(
+      'entre 741,31 € y 988,41 €',
+    );
+    expect(await valorTarjeta(page, /Registro de la Propiedad/)).toBe('272,52 €');
+    expect(await valorTarjeta(page, /Gastos de gestoría/)).toBe('300,00 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('28.437,38 €');
+    expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toBe('9,48% sobre el precio');
+    expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('328.437,38 €');
+
+    // Con perfil General, «Municipios despoblados» (4 %) no se aplica pero SÍ se ofrece:
+    // no es un tipo de colectivo, así que entra en `alAlcanceDeCualquiera`.
+    await expect(page.getByText('4,00% — Municipios despoblados')).toBeVisible();
+
+    // ── Vendedor ──
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '200000');
+    await rellenar(page, 'Años de propiedad', '10');
+    await rellenar(page, 'Valor catastral del suelo', '60000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+
+    // es-ES no agrupa los millares de una cifra de cuatro dígitos: «1200,00 €», no «1.200,00 €»
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('1200,00 €');
+    expect(await descripcionTarjeta(page, /^Plusvalía municipal/)).toBe(
+      'Método objetivo (más favorable)',
+    );
+    expect(await valorTarjeta(page, /^Valor de adquisición/)).toBe('200.000,00 €');
+    expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('289.800,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('89.800,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.534,00 €');
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('9000,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('29.734,00 €');
+    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('270.266,00 €');
+    // El neto está COMPLETO: no falta ninguna partida por descontar
+    expect(await descripcionTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * CASO 34 bis (control) — el mismo caso con 1 AÑO de tenencia, que sí funciona.
+   *
+   * Coeficiente de COEFICIENTES_IIVTNU_2025 para `anios: 1` = 0,13:
+   *   Plusvalía objetivo = 60.000 × 0,13 × 25 % = 1.950,00 €
+   * Sirve para aislar el CASO 34: lo que falla no es el año 1, es el año 0.
+   */
+  test('CASO 34 bis (control) — 1 año de tenencia liquida con el coeficiente 0,13', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('cantabria');
+    await rellenar(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '200000');
+    await rellenar(page, 'Años de propiedad', '1');
+    await rellenar(page, 'Valor catastral del suelo', '60000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
+    await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 1)?.coeficiente).toBe(0.13);
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('1950,00 €');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 10/09/2026 (ALTO) — CASO 34 (límite): la REVENTA ANTES DEL AÑO.
+   *
+   * `COEFICIENTES_IIVTNU_2025` tiene fila propia para `anios: 0` («Menos de 1 año»), con
+   * coeficiente 0,14 — el TERCERO MÁS ALTO de la tabla, por encima del año 1 (0,13). Desde
+   * el RDL 26/2021 la reventa antes del año SÍ tributa, y el 09/09/2026 se reparó
+   * `calcularPlusvaliaMunicipal` para que ese coeficiente dejara de ser inalcanzable
+   * (hallazgo 666), y con él `simulador-gastos-compraventa-local-comercial`, que hoy lee
+   * los años del STRING para distinguir «0» del campo VACÍO y deja `min={0}` en su campo.
+   *
+   * A ESTA app, que es el hub del clúster, la reparación no llegó:
+   *   · `<NumberInput label="Años de propiedad" min={1} />` — el blur del componente
+   *     REESCRIBE el campo de «0» a «1» sin decir nada, y
+   *   · `const anios = parseInt(aniosPropiedad) || 0` + `anios > 0` — mientras el campo
+   *     conserva el 0, la plusvalía sale «Sin calcular» y NO entra en el neto.
+   *
+   * Los dos caminos dan un impuesto por debajo del real, y el segundo lo deja fuera del
+   * neto entero. Caso: venta 300.000 €, compra 200.000 €, suelo catastral 60.000 €, total
+   * 100.000 €, comisión 3 %, 0 años de tenencia.
+   *
+   *   Esperado (coeficiente 0,14):
+   *     Plusvalía          = 60.000 × 0,14 × 25 %                  =  2.100,00 €
+   *     Valor transmisión  = 300.000 − 9.000 − 2.100               = 288.900,00 €
+   *     Ganancia           = 288.900 − 200.000                     =  88.900,00 €
+   *     IRPF   = 6.000×19 % + 44.000×21 % + 38.900×23 %            =  19.327,00 €
+   *     Total gastos       = 2.100 + 9.000 + 19.327                =  30.427,00 €
+   *     Neto               = 300.000 − 30.427                      = 269.573,00 €
+   *
+   *   Obtenido: el campo se reescribe a «1» y liquida con 0,13 →
+   *     Plusvalía 1.950,00 € · transmisión 289.050,00 € · ganancia 89.050,00 € ·
+   *     IRPF 19.361,50 € · total 30.311,50 € · neto 269.688,50 €
+   *     (y sin salir del campo: «Sin calcular», con el neto rotulado INCOMPLETO)
+   */
+  test.fail(
+    'CASO 34 (límite) — 0 años de tenencia: la reventa antes del año tributa con el coeficiente 0,14',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.locator('#ccaa-inmueble').selectOption('cantabria');
+      await rellenar(page, 'Precio de la vivienda', '300000');
+      await page.getByRole('button', { name: 'Vendedor' }).click();
+      await rellenar(page, 'Precio de compra original', '200000');
+      await rellenar(page, 'Valor catastral del suelo', '60000');
+      await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
+      await rellenar(page, 'Comisión inmobiliaria (%)', '3');
+
+      // El coeficiente existe en la tabla y es mayor que el del año 1
+      expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.14);
+
+      const campoAnios = page.locator('input[aria-label="Años de propiedad"]');
+      await campoAnios.fill('0');
+      await campoAnios.blur();
+
+      // 1) El campo no puede reescribirse solo: «0 años» es un dato válido, no un error
+      expect(await campoAnios.inputValue()).toBe('0');
+      // 2) Y la plusvalía sale por el coeficiente de «Menos de 1 año»
+      expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('2100,00 €');
+      expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('288.900,00 €');
+      expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('88.900,00 €');
+      expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.327,00 €');
+      expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('30.427,00 €');
+      expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('269.573,00 €');
+    },
+  );
+
+  /**
+   * CASO 35 (debe rechazarse) — un precio NEGATIVO no puede producir ningún importe.
+   *
+   * −250.000 € pasa el filtro del NumberInput (su regex admite el signo menos), así que la
+   * guarda tiene que estar en el cálculo y no en la máscara. Ni mientras el campo tiene el
+   * foco —donde el componente todavía no ha normalizado nada— ni después de salir de él
+   * puede aparecer un ITP negativo, un coste total por debajo del precio ni un neto de
+   * vendedor inventado. Es el simétrico del CASO C (0 €) y del CASO 30 («1.2.3»): aquellos
+   * comprobaban el cero y lo ilegible; este, el signo.
+   */
+  test('CASO 35 (debe rechazarse) — un precio negativo no produce ni impuesto ni total, en ninguna pestaña', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('cantabria');
+    const campoPrecio = page.locator('input[aria-label="Precio de la vivienda"]');
+
+    // a) Con el foco todavía dentro: el componente no ha normalizado y el cálculo tiene que cortar
+    await campoPrecio.fill('-250000');
+    expect(await campoPrecio.inputValue()).toBe('-250000');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL/ })).toHaveCount(0);
+    await expect(page.getByText('Introduce el precio del inmueble')).toBeVisible();
+
+    // b) La pestaña Vendedor tampoco puede inventarse un neto
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await expect(page.getByText('Introduce el precio de venta')).toBeVisible();
+    await expect(page.locator('h3', { hasText: /IMPORTE NETO VENDEDOR/ })).toHaveCount(0);
+
+    // c) Al salir del campo, el NumberInput lo acota a su `min` y sigue sin haber importes
+    await page.getByRole('button', { name: 'Comprador' }).click();
+    await campoPrecio.blur();
+    expect(await campoPrecio.inputValue()).toBe('0');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await expect(page.getByText('Introduce el precio del inmueble')).toBeVisible();
+  });
+
+  /**
+   * ⚠️ HALLAZGO 10/09/2026 (BAJO) — el IVA del garaje y del trastero se lee de la
+   * constante de la VIVIENDA, no de la del anejo.
+   *
+   * El 09/09/2026 (hallazgo 641) `IVA_INMUEBLES_2025.garageCon` pasó a llamarse
+   * `anejoVinculado`, con el art. 91.Uno.1.7º LIVA citado, y las apps de garaje y trastero
+   * se apuntaron a ella. Este estimador ofrece «Garaje/Parking» y «Trastero» en su selector
+   * y afirma en su propio texto de derivación «Aquí se aplica siempre el 10%», pero calcula
+   * con `IVA_INMUEBLES_2025.obraNueva`.
+   *
+   * Hoy las dos constantes valen 10, así que NINGUNA cifra está mal — existen separadas
+   * precisamente para poder divergir, y el día que lo hagan esta app se quedará atrás sin
+   * que nada avise. Es el mismo candado de fuente que ya sujeta al trastero.
+   *
+   * Caso: garaje de 30.000 €, Madrid, primera mano → IVA 3.000,00 € leyendo `obraNueva`
+   * (esperado: la misma cifra, pero leída de `anejoVinculado`).
+   */
+  test.fail(
+    'HALLAZGO — el IVA del anejo debe salir de anejoVinculado, no de obraNueva',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: /Primera mano/ }).click();
+      await page.locator('#ccaa-inmueble').selectOption('madrid');
+      await page.getByRole('button', { name: /Garaje\/Parking/ }).click();
+      await rellenar(page, 'Precio del inmueble', '30000');
+
+      // La cifra de hoy es correcta porque las dos constantes coinciden…
+      expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(IVA_INMUEBLES_2025.obraNueva);
+      expect(await valorTarjeta(page, /^IVA/)).toBe('3000,00 €');
+
+      // …pero la rama de anejos tiene que leer la constante del ANEJO, como el motor del clúster
+      const fuente = readFileSync(
+        join(process.cwd(), 'app/estimador-compraventa-inmueble/page.tsx'),
+        'utf8',
+      );
+      expect(fuente).toContain('IVA_INMUEBLES_2025.anejoVinculado');
+    },
+  );
+
+  /**
+   * ⚠️ HALLAZGO 10/09/2026 (BAJO) — «Estimar por mí» rellena el campo SIN la gestoría que
+   * el propio rótulo del campo incluye.
+   *
+   * El campo se llama «Impuestos y gastos que pagaste al comprar» y su ayuda dice, literal:
+   * «ITP o IVA, notaría, registro **y gestoría** de aquella compra». El botón que lo
+   * rellena suma solo tres de las cuatro líneas:
+   *     const estimado = calcularITP(precioC, ccaa) + calcularNotario(precioC) + calcularRegistro(precioC);
+   * mientras la pestaña Comprador de la MISMA app, para el mismo precio, suma también la
+   * gestoría (GESTORIA_TIPICA = 300). Y la cifra alimenta el valor de ADQUISICIÓN: quedarse
+   * corto infla la ganancia y el IRPF, que es justo la dirección contra la que avisa la
+   * cabecera de `data/fiscal/ganancia-inmueble.ts`.
+   *
+   * Caso: Cantabria, precio de compra 200.000 € → «Estimar por mí»
+   *   ITP      = 200.000 × 9 %                     = 18.000,00 €
+   *   Notaría  = 433,7044 × 1,75                   =    758,98 €
+   *   Registro = 195,2272455 × 1,21                =    236,22 €
+   *   Gestoría (GESTORIA_TIPICA)                   =    300,00 €
+   *   Esperado (las cuatro líneas del rótulo) = 19.295  ·  Obtenido = 18.995
+   */
+  test.fail(
+    'HALLAZGO — «Estimar por mí» omite la gestoría que su propio rótulo incluye',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.locator('#ccaa-inmueble').selectOption('cantabria');
+      await page.getByRole('button', { name: 'Vendedor' }).click();
+      await rellenar(page, 'Precio de compra original', '200000');
+
+      const campo = page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]');
+      // El rótulo del campo promete las cuatro partidas
+      expect(await campo.locator('xpath=../p').first().innerText()).toContain('gestoría');
+
+      await page.getByRole('button', { name: /Estimar por mí/ }).click();
+      // 18.000 + 758,98 + 236,22 + 300 = 19.295,21 → formatNumber(…, 0) = «19.295»
+      expect(await campo.inputValue()).toBe('19.295');
+    },
+  );
+
+  /**
+   * ⚠️ HALLAZGO 10/09/2026 (BAJO) — el caso «Marta» del bloque educativo publica un total
+   * que no suma lo que él mismo desglosa, y con las tres cifras tecleadas a mano.
+   *
+   * Literal en pantalla: «Además paga unos 1.193 € en notaría (685 €), registro (209 €) y
+   * gestoría (300 €)». 685 + 209 + 300 = 1.194, no 1.193.
+   *
+   * Es la familia del hallazgo 594 —un total que no cuadra con el desglose de encima—, que
+   * se cerró en la calculadora con `sumarLineasVisibles` (las líneas se redondean ANTES de
+   * sumarse, que es como las ve el usuario) y no llegó al bloque educativo. Con ese mismo
+   * criterio, la factura de 140.000 € es 684,60 + 208,86 + 300,00 = 1.193,46, así que las
+   * cifras redondeadas que se publican tienen que sumar 685 + 209 + 300 = 1.194.
+   *
+   * Agravante: las tres son literales, no derivadas del arancel como el resto de la página
+   * (`HORQUILLA_FEDATARIOS`, `EJEMPLO_OBRA_NUEVA_AJD`…), así que un cambio en
+   * FACTURA_NOTARIAL o en REGISTRO_CONCEPTOS las deja obsoletas en silencio — el hallazgo
+   * 584 otra vez.
+   */
+  test.fail(
+    'HALLAZGO — el caso «Marta» del bloque educativo no suma su propio desglose',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const texto = (await page.getByText(/Marta, 29 años/).innerText())
+        .replace(ESPACIO_DURO, ' ')
+        .replace(/\s+/g, ' ');
+
+      // Las tres partidas que publica el propio caso
+      expect(texto).toContain('notaría (685 €)');
+      expect(texto).toContain('registro (209 €)');
+      expect(texto).toContain('gestoría (300 €)');
+      // …y el total tiene que ser su suma
+      expect(texto).toContain('unos 1.194 €');
+    },
+  );
+
+  /**
+   * ⚠️ HALLAZGO 10/09/2026 (BAJO) — la horquilla de la gestoría se escribe de tres formas
+   * distintas en la misma página, y dos de ellas sin el espacio del formato español.
+   *
+   * CLAUDE.md global §2: la moneda va «1.234,56 €», con espacio antes del símbolo. En esta
+   * página conviven:
+   *   · «Típico: 200-400€ (tramitación de escrituras)»   — ayuda del campo de gestoría
+   *   · «Gestoría: Opcional, entre 200€ y 400€»          — lista de gastos de notaría y registro
+   *   · «Su coste oscila entre 200 € y 400 €»            — FAQ visible  ✔ correcto
+   *   · «opcionalmente la gestoría (200-400 €)»          — FAQPage del JSON-LD  ✔ correcto
+   */
+  test.fail(
+    'HALLAZGO — la horquilla de gestoría va sin espacio antes del € en dos de sus cuatro bocas',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const cuerpo = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
+
+      expect(cuerpo).not.toContain('200-400€');
+      expect(cuerpo).not.toContain('200€ y 400€');
+      // La forma correcta, que la FAQ de la misma página ya usa
+      expect(cuerpo).toContain('entre 200 € y 400 €');
+    },
+  );
 });

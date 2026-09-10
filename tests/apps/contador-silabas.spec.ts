@@ -3,6 +3,10 @@ import { test, expect, Page } from '@playwright/test';
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
+ * QUINTA INSPECCIÓN: 10/09/2026, RE-INSPECCIÓN tras el refactor de motores del 10/09. Sus
+ * tres casos y sus SEIS hallazgos, al final del fichero, en su propio bloque. El silabeador
+ * y la escansión salieron intactos; cinco de los seis hallazgos son material DIDÁCTICO que
+ * contradice al motor, y el sexto es el extractor de palabras ante la diéresis poética.
  * CUARTA INSPECCIÓN: 07/09/2026, RE-INSPECCIÓN tras las reparaciones del 02/09. Sus casos y
  * sus CINCO hallazgos (659-663), al final del fichero, en su propio bloque. Los cinco se
  * REPARARON el 09/09/2026 y quedan ahí como regresión, sin test.fail().
@@ -966,5 +970,306 @@ test.describe('contador-silabas', () => {
         expect(endeca?.respuesta).toContain('ninguna sinalefa');
       }
     );
+  });
+
+  // =====================================================================================
+  // QUINTA INSPECCIÓN — 10/09/2026 · RE-INSPECCIÓN tras el refactor de motores del 10/09
+  //
+  // El silabeador y la escansión volvieron a aguantar todo lo que se les echó: los tres
+  // casos de esta ronda salieron EXACTOS a la cuenta hecha a mano. Lo que falla otra vez es
+  // el material DIDÁCTICO, y en la misma forma que en la cuarta ronda: la reparación llegó
+  // al motor y al JSON-LD y se quedó sin llegar al texto visible (o al revés).
+  //
+  // LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+  // (RAE, Ortografía de la lengua española 2010, cap. I; y la métrica clásica para el verso)
+  //
+  //   CASO 1 (normal) — Bécquer, Rima XXI. Dos endecasílabos ajenos a los ejemplos de la app
+  //       y a las cuatro inspecciones anteriores:
+  //       «¿Qué es poesía?, dices mientras clavas»
+  //           Qué(1) es(1) po-e-sí-a(4) di-ces(2) mien-tras(2) cla-vas(2) = 12 fonéticas.
+  //           «poesía» lleva los dos hiatos del manual: «oe» son dos abiertas, e «ía» es
+  //           hiato acentual (la í tónica rompe el diptongo). «mientras»: «ie» es diptongo y
+  //           «ntr» reparte n a la izquierda porque solo «tr» puede abrir sílaba.
+  //           Una sola sinalefa, «Qué_es»; «clavas» es llana → 12 − 1 = 11, endecasílabo.
+  //       «en mi pupila tu pupila azul;»
+  //           en(1) mi(1) pu-pi-la(3) tu(1) pu-pi-la(3) a-zul(2) = 11 fonéticas.
+  //           Sinalefa «pupila_azul» → −1; «azul» es AGUDA → +1. 11 − 1 + 1 = 11.
+  //       Del texto entero: 23 sílabas en 12 palabras → media 1,9 con COMA decimal.
+  //
+  //   CASO 2 (límite) — el diptongo ORTOGRÁFICO de dos cerradas distintas con tilde, las dos
+  //       cerradas iguales, un triptongo y un grupo de CINCO consonantes:
+  //       ca-suís-ti-co(4)   OLE 2010: dos vocales cerradas DISTINTAS forman siempre diptongo
+  //                          a efectos ortográficos, AUNQUE una lleve tilde. Por eso no es
+  //                          ca-su-ís-ti-co. Igual «cuí-da-te» y «lin-güís-ti-ca».
+  //       fri-í-si-mo(4)     y dos cerradas IGUALES forman siempre hiato, aunque una lleve
+  //                          tilde: es el caso simétrico del anterior, y el que separa la
+  //                          regla de verdad de «la tilde sobre i/u siempre rompe el diptongo».
+  //       des-pre-ciáis(3)   triptongo «iái» (cerrada + abierta tónica + cerrada); «spr»
+  //                          reparte s a la izquierda porque solo «pr» abre sílaba.
+  //       angs-trom(2)       cinco consonantes seguidas: a la derecha pasa «tr» y nada más.
+  //       Y un verso con final ESDRÚJULO, donde el ajuste RESTA:
+  //       «La niña ya no oye la música» → La(1) ni-ña(2) ya(1) no(1) o-ye(2) la(1)
+  //           mú-si-ca(3) = 11 fonéticas. Una sinalefa, «no_oye» (dos «o» en contacto: la
+  //           misma vocal también funde). «música» es esdrújula → −1. 11 − 1 − 1 = 9,
+  //           eneasílabo. Sin el ajuste sería decasílabo.
+  //
+  //   CASO 3 (aparte) — entradas que no son texto analizable, distintas de las de las cuatro
+  //       rondas anteriores:
+  //       «psst»                    palabra sin ninguna vocal: el motor la devuelve entera y
+  //                                 cuenta 1 sílaba (documentado en silabeo.ts), y no marca
+  //                                 ningún encuentro vocálico ni abre el bloque de métrica.
+  //       «maiz»                    sin tilde, «ai» es diptongo → UNA sílaba, «maiz».
+  //       «~~~ ¿¿?? ¡¡!! «» ///»    ni una letra: aviso explícito, sin resumen ni tarjetas.
+  //       «la vïuda del rey»        la diéresis poética sobre la i → HALLAZGO, al final.
+  //
+  // HALLAZGOS de esta ronda: los seis del final, con test.fail(), afirmando lo que DEBERÍA
+  // ocurrir. Cinco son del material didáctico y uno del extractor de palabras.
+  //
+  // AUDITORÍA DE LOS CASOS PREVIOS (obligatoria en esta tanda): se rehízo a mano la cuenta de
+  // los versos afirmados por las cuatro inspecciones anteriores —Quevedo, Fray Luis, Machado,
+  // Bécquer LIII, Calderón, Darío, el romance viejo— y la partición de sus palabras. Todos
+  // siguen siendo lo que la app DEBE hacer: no hay ningún caso que fije como contrato un
+  // comportamiento hoy defectuoso. En particular se verificó que «lin-güís-ti-ca» (CASO 2 de
+  // la segunda ronda) es correcto y NO un despiste: es la misma regla que sostiene
+  // «ca-suís-ti-co», y es el texto educativo el que se ha quedado atrás.
+  // =====================================================================================
+
+  test.describe('quinta inspección (10/09/2026)', () => {
+    test('CASO 1 (normal) · dos endecasílabos de Bécquer: hiato doble, un contacto vocálico y una aguda', async ({
+      page,
+    }) => {
+      await analizar(page, '¿Qué es poesía?, dices mientras clavas\nen mi pupila tu pupila azul;');
+
+      // «oe» dos abiertas → hiato; «ía» hiato acentual. Los dos, rotulados en la tarjeta.
+      await expect(silabasDe(page, 2)).toHaveText(['po', 'e', 'sí', 'a']);
+      await expect(page.locator('[class*="palabraCard"]').nth(2)).toContainText('Hiato: o-e');
+      await expect(page.locator('[class*="palabraCard"]').nth(2)).toContainText('Hiato: í-a');
+      // «ie» diptongo · de «ntr» solo «tr» pasa a la derecha.
+      await expect(silabasDe(page, 4)).toHaveText(['mien', 'tras']);
+      await expect(silabasDe(page, 11)).toHaveText(['a', 'zul']);
+
+      // 12 + 11 = 23 sílabas en 12 palabras → 23/12 = 1,91… → 1,9 con COMA decimal.
+      await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('23');
+      await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('12');
+      await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('1,9');
+
+      // Verso 1: 12 fonéticas − 1 sinalefa («Qué_es») ± 0 (llana) = 11.
+      await expect(metricasDe(page, 0)).toHaveText('11');
+      await expect(nombreDe(page, 0)).toContainText('endecasílabo');
+      await expect(desgloseDe(page, 0)).toContainText('12 fonéticas');
+      await expect(desgloseDe(page, 0)).toContainText('1 sinalefa');
+      await expect(desgloseDe(page, 0)).toContainText('llana');
+      await expect(sinalefasDe(page, 0)).toHaveCount(1);
+      await expect(sinalefasDe(page, 0).first()).toContainText('Qué');
+
+      // Verso 2: 11 fonéticas − 1 sinalefa («pupila_azul») + 1 (aguda) = 11.
+      await expect(metricasDe(page, 1)).toHaveText('11');
+      await expect(nombreDe(page, 1)).toContainText('endecasílabo');
+      await expect(desgloseDe(page, 1)).toContainText('11 fonéticas');
+      await expect(desgloseDe(page, 1)).toContainText('+ 1');
+      await expect(desgloseDe(page, 1)).toContainText('aguda');
+      await expect(sinalefasDe(page, 1)).toHaveCount(1);
+      await expect(sinalefasDe(page, 1).first()).toContainText('azul');
+    });
+
+    test('CASO 2 (límite) · diptongo ortográfico con tilde, cerradas iguales, triptongo, cinco consonantes y final esdrújulo', async ({
+      page,
+    }) => {
+      await analizar(page, 'casuístico friísimo despreciáis angstrom');
+
+      // OLE 2010: dos cerradas DISTINTAS son diptongo aunque una lleve tilde → ca-suís-ti-co.
+      await expect(silabasDe(page, 0)).toHaveText(['ca', 'suís', 'ti', 'co']);
+      await expect(page.locator('[class*="palabraCard"]').nth(0)).toContainText('Diptongo: uí');
+      // Y dos cerradas IGUALES son hiato aunque una lleve tilde → fri-í-si-mo.
+      await expect(silabasDe(page, 1)).toHaveText(['fri', 'í', 'si', 'mo']);
+      await expect(page.locator('[class*="palabraCard"]').nth(1)).toContainText('Hiato: i-í');
+      // Triptongo «iái»; de «spr» solo «pr» puede abrir sílaba.
+      await expect(silabasDe(page, 2)).toHaveText(['des', 'pre', 'ciáis']);
+      await expect(page.locator('[class*="palabraCard"]').nth(2)).toContainText('Triptongo: iái');
+      // Cinco consonantes seguidas: a la derecha pasa «tr» y nada más.
+      await expect(silabasDe(page, 3)).toHaveText(['angs', 'trom']);
+      await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('13');
+
+      // Final ESDRÚJULO: el ajuste resta. 11 fonéticas − 1 sinalefa − 1 = 9.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, 'La niña ya no oye la música');
+      await expect(silabasDe(page, 4)).toHaveText(['o', 'ye']); // la «y» ante vocal es consonante
+      await expect(silabasDe(page, 6)).toHaveText(['mú', 'si', 'ca']);
+      await expect(metricasDe(page)).toHaveText('9');
+      await expect(nombreDe(page)).toContainText('eneasílabo');
+      await expect(desgloseDe(page)).toContainText('11 fonéticas');
+      await expect(desgloseDe(page)).toContainText('1 sinalefa');
+      await expect(desgloseDe(page)).toContainText('esdrújula');
+      await expect(sinalefasDe(page)).toHaveCount(1);
+      await expect(sinalefasDe(page).first()).toContainText('oye');
+    });
+
+    test('CASO 3 (aparte) · una palabra sin vocales, un diptongo sin tilde y una línea sin letras', async ({
+      page,
+    }) => {
+      // Sin ninguna vocal no hay sílaba que partir: el motor devuelve la palabra entera y no
+      // inventa encuentros vocálicos. Con una sola palabra tampoco abre el bloque de métrica.
+      await analizar(page, 'psst');
+      await expect(silabasDe(page, 0)).toHaveText(['psst']);
+      await expect(totalDe(page, 0)).toHaveText('1 sílaba');
+      await expect(page.locator('[class*="palabraEncuentros"]')).toHaveCount(0);
+      await expect(page.locator('[class*="versoCard"]')).toHaveCount(0);
+
+      // «maiz» sin tilde: «ai» es diptongo, así que es UNA sílaba. Ninguna sílaba del español
+      // puede quedarse sin vocal, que es lo que declara el propio FAQPage de la app.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, 'maiz');
+      await expect(silabasDe(page, 0)).toHaveText(['maiz']);
+      await expect(totalDe(page, 0)).toHaveText('1 sílaba');
+      await expect(page.locator('[class*="palabraCard"]').nth(0)).toContainText('Diptongo: ai');
+
+      // Ni una letra: aviso explícito, sin resumen y sin tarjetas.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, '~~~ ¿¿?? ¡¡!! «» ///');
+      await expect(page.getByText('No hay ninguna palabra que analizar')).toBeVisible();
+      await expect(page.locator('[class*="resumenValor"]')).toHaveCount(0);
+      await expect(page.locator('[class*="palabraCard"]')).toHaveCount(0);
+    });
+
+    // -----------------------------------------------------------------------------------
+    // HALLAZGOS 10/09/2026 — con test.fail(), afirmando lo que DEBERÍA ocurrir.
+    // Al repararlos, quitar la marca DESPUÉS de comprobar que lo que afirman sigue siendo
+    // lo correcto: un test.fail() que pasa a verde no prueba nada hasta verificar su
+    // contenido (regla de la ronda 1).
+    // -----------------------------------------------------------------------------------
+
+    test('HALLAZGO · la tarjeta «la tilde sobre i/u» declara sin excepciones una regla que el motor no aplica', async ({
+      page,
+    }) => {
+      test.fail();
+      // Lo que la app hace, y hace bien (OLE 2010): dos vocales cerradas DISTINTAS forman
+      // diptongo a efectos ortográficos aunque una lleve tilde.
+      await analizar(page, 'casuístico cuídate lingüística');
+      await expect(silabasDe(page, 0)).toHaveText(['ca', 'suís', 'ti', 'co']);
+      await expect(page.locator('[class*="palabraCard"]').nth(0)).toContainText('Diptongo: uí');
+      await expect(silabasDe(page, 1)).toHaveText(['cuí', 'da', 'te']);
+      await expect(silabasDe(page, 2)).toHaveText(['lin', 'güís', 'ti', 'ca']);
+
+      // Y lo que enseña dos pantallas más abajo: «Regla sin excepciones: si la i o la u
+      // llevan tilde (í, ú), siempre forman hiato con la vocal adyacente». La excepción está
+      // rotulada por la propia app en la misma sesión, tres veces.
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const tarjeta = (
+        await page.getByText('La tilde sobre i/u siempre rompe el diptongo').locator('xpath=..').innerText()
+      ).replace(/\s+/g, ' ');
+      expect(tarjeta).not.toContain('Regla sin excepciones');
+      expect(tarjeta).toContain('distinta'); // la excepción de las dos cerradas distintas
+    });
+
+    test('HALLAZGO · esa misma tarjeta escribe «mai-z», una sílaba sin ninguna vocal', async ({
+      page,
+    }) => {
+      test.fail();
+      // El motor acierta: «ai» es diptongo, «maiz» es UNA sílaba.
+      await analizar(page, 'maiz');
+      await expect(silabasDe(page, 0)).toHaveText(['maiz']);
+
+      // La tarjeta enseña «"Maiz" hipotéticamente sería mai-z (diptongo)»: una partición en la
+      // que la segunda parte, «z», no tiene vocal. Es exactamente lo que el FAQPage de la app
+      // declara imposible («cada sílaba debe contener al menos una vocal») y lo que se reparó
+      // en el hallazgo 207, cuando «aquí» salía a-qu-í.
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const tarjeta = (
+        await page.getByText('La tilde sobre i/u siempre rompe el diptongo').locator('xpath=..').innerText()
+      ).replace(/\s+/g, ' ');
+      expect(tarjeta).not.toContain('mai-z');
+
+      const faq = await leerFaqJsonLd(page);
+      const separacion = faq.find((q) => q.pregunta.includes('¿Cómo se separan las sílabas'));
+      expect(separacion?.respuesta).toContain('al menos una vocal'); // esto sí lo dice
+    });
+
+    test('HALLAZGO · la FAQ visible deja al octosílabo fuera del arte menor y del arte mayor', async ({
+      page,
+    }) => {
+      test.fail();
+      // La app rotula el octosílabo como arte MENOR, igual que su código (`>= 9 → mayor`),
+      // igual que la nota «Cómo se lee» del bloque de rima («arte mayor: nueve sílabas o
+      // más») e igual que el FAQPage del JSON-LD («arte menor: ocho o menos»).
+      await analizar(page, 'Ya no quiero estar aquí');
+      await expect(metricasDe(page)).toHaveText('8');
+      await expect(nombreDe(page)).toContainText('octosílabo');
+      await expect(nombreDe(page)).toContainText('arte menor');
+
+      // La FAQ visible dice «Los versos de menos de 8 sílabas se llaman de arte menor; los de
+      // 9 o más, de arte mayor», y deja sin clasificar justo el verso que ese mismo párrafo
+      // llama «el más tradicional, base del romance y la copla».
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const pregunta = page.getByText('¿Cuáles son los tipos de verso más comunes en español?');
+      await pregunta.click();
+      const respuesta = (await pregunta.locator('xpath=..').innerText()).replace(/\s+/g, ' ');
+      expect(respuesta).not.toContain('menos de 8');
+      expect(respuesta).toContain('ocho o menos'); // lo que ya dice bien el JSON-LD
+    });
+
+    test('HALLAZGO · el mnemotécnico de vocales fuertes y débiles coloca la O entre las débiles', async ({
+      page,
+    }) => {
+      test.fail();
+      // El motor trata la «o» como abierta: «poeta» es po-e-ta y la tarjeta lo rotula
+      // «Hiato: o-e», que solo se produce entre dos abiertas.
+      await analizar(page, 'poeta');
+      await expect(silabasDe(page, 0)).toHaveText(['po', 'e', 'ta']);
+      await expect(page.locator('[class*="palabraCard"]').nth(0)).toContainText('Hiato: o-e');
+
+      // El consejo enseña lo contrario dentro de la misma frase: «"A-E-IO-U: las Aplicadas Es
+      // los fuertes, IO-U los débiles" (a, e, o = fuertes; i, u = débiles)». El propio
+      // mnemotécnico —que es lo que un estudiante memoriza— mete la O en el grupo de las
+      // débiles, y encima la frase que lo desarrolla no significa nada.
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const tarjeta = (
+        await page.getByText('Recuerda las vocales fuertes y débiles').locator('xpath=..').innerText()
+      ).replace(/\s+/g, ' ');
+      expect(tarjeta).not.toContain('IO-U los débiles');
+    });
+
+    test('HALLAZGO · la h final no se trata como muda: «oh alma» no funde y «la hoja» sí', async ({
+      page,
+    }) => {
+      test.fail();
+      // Testigo de que la app SÍ aplica la regla por el lado de la h inicial:
+      // la(1) ho-ja(2) al-ta(2) = 5 − 2 sinalefas = 3.
+      await analizar(page, 'la hoja alta');
+      await expect(sinalefasDe(page)).toHaveCount(2);
+      await expect(metricasDe(page)).toHaveText('3');
+
+      // Por el otro lado no. La h no representa ningún sonido en español (OLE 2010), así que
+      // «oh» suena [o] y su vocal final está en contacto con la «a» de «alma»: hay sinalefa.
+      // oh(1) al-ma(2) mí-a(2) = 5 fonéticas − 1 sinalefa ± 0 (llana) = 4, tetrasílabo.
+      // `terminaEnVocal()` mira el último CARÁCTER y ve una «h», mientras su hermana
+      // `empiezaPorVocal()` sí salta la h inicial: la misma regla, aplicada por un solo lado.
+      // El universo práctico son las interjecciones («oh», «ah», «eh»), donde el poeta deshace
+      // a menudo la fusión — pero la app declara detectar «toda sinalefa posible» y marcar
+      // «con pausa» las deshacibles, y aquí ni siquiera llega a verla.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await analizar(page, 'oh alma mía');
+      await expect(sinalefasDe(page)).toHaveCount(1); // obtenido: 0
+      await expect(metricasDe(page)).toHaveText('4'); // obtenido: 5, pentasílabo
+    });
+
+    test('HALLAZGO · la diéresis poética sobre la i parte la palabra en dos palabras inventadas', async ({
+      page,
+    }) => {
+      test.fail();
+      // El extractor de palabras es /[a-záéíóúüñ]+/gi, y la «ï» no está en esa clase. La app
+      // promociona la diéresis en su bloque educativo («"suave" en verso puede leerse
+      // su-a-ve»), y la diéresis sobre la i se escribe exactamente así: vïuda, crïado,
+      // sïempre. Al no reconocer el carácter, «vïuda» se parte en «v» + «uda»: dos palabras
+      // que no existen, una de ellas con una «sílaba» sin ninguna vocal — lo mismo que el
+      // FAQPage de la app declara imposible.
+      // Esperado: 4 palabras (la · vïuda · del · rey), con «vïuda» entera.
+      await analizar(page, 'la vïuda del rey');
+      await expect(page.locator('[class*="palabraCard"]')).toHaveCount(4); // obtenido: 5
+      await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('4'); // obtenido: 5
+      await expect(page.locator('[class*="palabraCard"]').nth(1)).toContainText('vïuda');
+      // Y ninguna tarjeta puede ser una consonante suelta contada como una sílaba.
+      const palabras = await page.locator('[class*="palabraOriginal"]').allTextContents();
+      expect(palabras).not.toContain('v'); // obtenido: ['la', 'v', 'uda', 'del', 'rey']
+    });
   });
 });

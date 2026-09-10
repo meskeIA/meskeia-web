@@ -33,6 +33,14 @@ import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/f
  *     encuentro mi actividad» → 74.91 en vez de la residual 74.99, 634 «montaje de
  *     maquinaria» → 43.23 en vez de 33.20): los dos son sinónimos mal repartidos y viven
  *     en `data/cnae-sinonimos.json`, fuera del alcance de esa reparación.
+ *   · Reparación     09/09/2026 (tarde) → los dos MEDIOS (633 y 634) se reparan también en
+ *     el diccionario y el catálogo servido se regenera: `meta.generado` = 2026-09-09.
+ *   · RE-inspección  10/09/2026 → la batería entera (51) pasa en verde antes de tocar nada:
+ *     ningún `test.fail()` abierto y ninguna regresión, así que 631-636 siguen cerrados.
+ *     Tres casos nuevos en «re-inspección del 10/09/2026» y 5 hallazgos en «hallazgos
+ *     abiertos del 10/09/2026», con `test.fail()`. Dos de ellos son residuos de las
+ *     reparaciones anteriores: el mismo reparto de sinónimos del 423/633 sobreviviendo en
+ *     la familia 90.1x, y la norma del IAE del 636 escrita todavía a mano en `metadata.ts`.
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -1640,5 +1648,243 @@ test.describe('Buscador CNAE-IAE — regresión de los hallazgos 633 y 634', () 
     await buscarCnae(page, 'montaje de maquinaria');
     await expect(fichas(page).first()).toContainText('33.20');
     await expect(fichas(page).first()).toContainText('Instalación de máquinas y equipos industriales');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 10/09/2026 · tres casos nuevos, resueltos a mano sobre el catálogo
+// servido ANTES de abrir el navegador.
+//
+// La batería anterior (51 tests) se ejecutó entera antes de tocar nada: 51 en verde,
+// ningún `test.fail()` abierto y ninguna regresión, así que los hallazgos 631-636 del
+// 07/09 —reparados el 08 y el 09— siguen cerrados. Vuelve a la cola porque el catálogo
+// servido se regeneró el 09/09 (`meta.generado` = 2026-09-09) y `page.tsx` cambió con él.
+//
+// De dónde sale cada valor esperado (nunca de lo que devuelve la app):
+//   · `public/datos/cnae-iae-catalogo.json`: clases de la CNAE-2025 y correspondencia
+//     oficial con la CNAE-2009 (RD 10/2025, INE) y Tarifas del IAE (RD Legislativo
+//     1175/1990, texto consolidado del BOE). Son las fuentes que la app declara en
+//     `meta.cnae.fuente` / `meta.iae.fuente` y que sella `data/fiscal/cnae-iae.ts`.
+//   · Los textos y porcentajes de retención, de SECCIONES_IAE (importado arriba).
+//   · El ORDEN, de la lógica documentada en `page.tsx`, no de la pantalla.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — re-inspección del 10/09/2026', () => {
+  test('CASO 1 (normal) — «escultor», descrito con la palabra corriente, en los dos catálogos', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // ── Tarifas del IAE, resuelto a mano sobre el catálogo servido:
+    //      Sección 2ª · División 8 PROFESIONALES RELACIONADOS CON OTROS SERVICIOS ·
+    //      Agrupación 86 Profesiones liberales, artísticas, literarias y culturales ·
+    //      Grupo 861 «Pintores, Escultores, Ceramistas, Artesanos, Grabadores, Artistas
+    //      Falleros y artistas similares»  ← sin epígrafes por debajo.
+    //    Ninguna otra entrada de las Tarifas lleva «escultor» en su texto: UN resultado.
+    //    Al ser Sección 2ª, sus facturas a empresas y profesionales llevan retención.
+    await buscarIae(page, 'escultor');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page)).toHaveCount(1);
+
+    const grupo861 = fichas(page).first();
+    await expect(grupo861).toContainText('861');
+    await expect(grupo861).toContainText(
+      'Pintores, Escultores, Ceramistas, Artesanos, Grabadores, Artistas Falleros y artistas similares',
+    );
+    await expect(grupo861).toContainText('Sección 2ª');
+    await expect(grupo861).toContainText('División 8: PROFESIONALES RELACIONADOS CON OTROS SERVICIOS');
+    await expect(grupo861).toContainText(
+      'Agrupación 86: Profesiones liberales, artísticas, literarias y culturales',
+    );
+    await expect(grupo861).toContainText(SECCION_2.retencion);
+
+    // ── CNAE-2025: el grupo 90.1 «Actividades de creación artística» tiene TRES clases,
+    //    y sus literales se reparten el trabajo sin solaparse:
+    //      90.11 Actividades de creación literaria y composición musical
+    //      90.12 Actividades de creación de artes visuales
+    //      90.13 Otras actividades de creación artística
+    //    Esculpir no es creación literaria ni composición musical, así que la clase que
+    //    corresponde por el literal oficial es la 90.12. (La comprobación de que la app
+    //    llega hasta ella está en el bloque de hallazgos abiertos: hoy no llega.)
+    //    Lo que sí queda fijado aquí es la jerarquía que la app pinta bajo la ficha.
+    await buscarCnae(page, 'escultor');
+    await expect(fichas(page).first()).toContainText('Sección S: ACTIVIDADES ARTÍSTICAS, DEPORTIVAS Y DE ENTRETENIMIENTO');
+    await expect(fichas(page).first()).toContainText('División 90: Actividades de creación artística y artes escénicas');
+    await expect(fichas(page).first()).toContainText('Grupo 90.1: Actividades de creación artística');
+  });
+
+  test('CASO 2 (límite) — «4781», uno de los 26 códigos que existen en las DOS clasificaciones', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // Resuelto a mano sobre la tabla oficial del INE incorporada al catálogo:
+    //   correspondencia['4781'] = 47.11, 47.21, 47.22, 47.23, 47.24, 47.25, 47.26, 47.27
+    //     (el 4781 de la CNAE-2009 era el comercio al por menor de alimentos, bebidas y
+    //      tabaco en puestos de venta y mercadillos: se repartió entre las ocho clases
+    //      de alimentación de la CNAE-2025)
+    //   y además existe HOY la clase 47.81 «Comercio al por menor de vehículos de motor»,
+    //     que NO figura entre esas ocho y cuya propia ficha declara proceder de otras dos
+    //     (correspondenciaInversa['4781'] = 45.11, 45.19).
+    // Es el caso que el hallazgo 422 fijó: el aviso solo puede llamar «clase VIGENTE
+    // distinta» a la homónima cuando de verdad NO es una de las equivalencias. Aquí lo es.
+    await buscarCnae(page, '4781');
+
+    await expect(avisoAntiguo(page)).toHaveCount(1);
+    await expect(avisoAntiguo(page)).toContainText(`4781 existe en la ${CNAE_VIGENCIA.anterior}`);
+    await expect(avisoAntiguo(page)).toContainText('Ojo');
+    await expect(avisoAntiguo(page)).toContainText('47.81 Comercio al por menor de vehículos de motor');
+    await expect(avisoAntiguo(page)).toContainText('no recoge la actividad que buscas');
+
+    // 8 equivalencias + la homónima vigente = 9 fichas, la homónima la primera
+    // (relevancia 0: su código ES la consulta).
+    await expect(contador(page)).toHaveText(/^9 resultados/);
+    await expect(fichas(page)).toHaveCount(9);
+    await expect(fichas(page).nth(0)).toContainText('47.81');
+    await expect(fichas(page).nth(1)).toContainText('47.11');
+    await expect(fichas(page).nth(8)).toContainText('47.27');
+    await expect(fichas(page).nth(8)).toContainText('Comercio al por menor de otros productos alimenticios');
+  });
+
+  test('CASO 3 (debe rechazarse) — «90.14» y «861.9» no existen, y la app no aproxima', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    // 90.14 es la errata verosímil de la familia que abre el CASO 1: el grupo 90.1 llega
+    // hasta 90.13 y ahí se acaba. Tampoco «9014» es clave de la tabla de correspondencia
+    // de la CNAE-2009, así que lo importante en una app de nivel 1 crítico es que NO
+    // aparezca el aviso de código antiguo: una equivalencia inventada es peor que ninguna.
+    await buscarCnae(page, '90.14');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+
+    // 861.9: el grupo 861 de la Sección 2ª existe (CASO 1) pero no tiene epígrafes por
+    // debajo. Nada en las Tarifas empieza por 8619 ni lleva «861.9» en su texto.
+    await buscarIae(page, '861.9');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 10/09/2026 — escritos con `test.fail()`: afirman lo que
+// DEBERÍA ocurrir y hoy fallan a propósito. El día que se reparen pasarán a ROJO
+// («expected to fail, but passed»): entonces se les quita la marca y se quedan como
+// regresión. NO se reescribe el valor esperado.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 10/09/2026', () => {
+  test('ALTO — «escultor» y «ceramista» deben llevar a 90.12, la clase de las artes visuales', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // MISMO mecanismo que los hallazgos 633 y 634, reparado el 09/09 en las familias
+    // 74.9x y 43.23/33.20 y vivo todavía en esta: correspondencia['9003'] —«Creación
+    // artística y literaria» de la CNAE-2009— reparte en 90.11, 90.12, 90.13 y 91.30, y
+    // los términos coloquiales se quedaron en el PRIMER destino en vez de en el que
+    // describe la actividad. De los diez que cuelgan de 90.11 solo «escritor» encaja en su
+    // literal oficial, «Actividades de creación literaria y composición musical»: los otros
+    // nueve —«artesano», «artesanía», «ceramista», «escultor», «grabador», «ilustrador»,
+    // «obra propia», «pintor» y «vender arte»— son artes plásticas, y 90.12 «Actividades de
+    // creación de artes visuales» no tiene NI UNA puerta de entrada en el diccionario.
+    //
+    // El CANDADO de sinónimos no lo ve porque exige que el título del hermano NOMBRE el
+    // término, y 90.12 dice «artes visuales», no «escultor».
+    //
+    // La prueba de que los seis términos van juntos y son artes plásticas está en el otro
+    // catálogo de la propia app: el grupo 861 de la Sección 2ª del IAE se llama «Pintores,
+    // Escultores, Ceramistas, Artesanos, Grabadores, Artistas Falleros y artistas
+    // similares», y los escritores tienen el suyo aparte.
+    await buscarCnae(page, 'escultor');
+    await expect(fichas(page).first()).toContainText('90.12');
+    await expect(fichas(page).first()).toContainText('Actividades de creación de artes visuales');
+
+    await buscarCnae(page, 'ceramista');
+    await expect(fichas(page).first()).toContainText('90.12');
+  });
+
+  test('ALTO — el aviso de código antiguo no puede depender de que se teclee el punto', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // `consultaConFormatoVigente` (reparación de los hallazgos 424 y 481) da por vigente
+    // todo lo que venga con formato dd.dd y tenga clase homónima. La premisa —«si hay
+    // homónima, hoy significa lo mismo»— es cierta en 486 de los 512 códigos de la
+    // CNAE-2009 con homónima, y FALSA en los otros 26, que son justamente los que el
+    // hallazgo 422 obligó a distinguir: aquellos en los que la homónima NO está entre las
+    // equivalencias (2530, 2540, 3512, 4781, 4782, 4932, 8541…).
+    //
+    // Para esos 26, «4781» avisa con el «Ojo» y ofrece las ocho clases de alimentación
+    // (CASO 2), y «47.81» —el mismo código escrito como lo escriben las escrituras y la
+    // propia publicación del INE, que es el argumento con el que se reparó el 481— devuelve
+    // UNA ficha, «Comercio al por menor de vehículos de motor», sin una sola palabra de
+    // que ese número significaba otra cosa. La app tiene el dato: lo calcula en
+    // `homonimaEsOtraActividad` para la otra rama, y la propia ficha declara que el 47.81
+    // de hoy procede de 4511 y 4519, no de 4781.
+    await buscarCnae(page, '47.81');
+    await expect(avisoAntiguo(page)).toHaveCount(1);
+    await expect(avisoAntiguo(page)).toContainText(CNAE_VIGENCIA.anterior);
+    await expect(fichas(page).filter({ hasText: '47.11' })).toHaveCount(1);
+  });
+
+  test('MEDIO — un teleférico no se busca por «transporte escolar»', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+
+    // Los tres términos de la familia («furgoneta de pasajeros», «transporte de viajeros»,
+    // «transporte escolar») están copiados en las cuatro clases del grupo 49.3, y una de
+    // ellas es 49.34 «Transporte de pasajeros en teleféricos y remontes». La ficha del
+    // teleférico anuncia en pantalla «También se encuentra buscando: … transporte escolar».
+    // Las otras tres (49.31 regular, 49.32 no regular, 49.39 otros) sí pueden prestarlo.
+    await buscarCnae(page, 'transporte escolar');
+    await expect(fichas(page).filter({ hasText: '49.34' })).toHaveCount(0);
+    await expect(contador(page)).toHaveText(/^3 resultados/);
+  });
+
+  test('BAJO — «servicios profesionales varios» no puede llevar a la clase de seguridad', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    // correspondencia['7490'] reparte en 74.91, 74.99 y 80.09. El término genérico que la
+    // reparación del hallazgo 633 movió a la residual 74.99 se quedó ADEMÁS pegado a
+    // 80.09 «Servicios de seguridad n.c.o.p.», que no es una clase residual de servicios
+    // profesionales sino la de seguridad privada n.c.o.p. El orden es correcto (74.99 sale
+    // primero), pero la segunda ficha ofrece vigilancia a quien busca «varios».
+    await buscarCnae(page, 'servicios profesionales varios');
+    await expect(fichas(page).filter({ hasText: '80.09' })).toHaveCount(0);
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+  });
+
+  test('BAJO — la norma del IAE del JSON-LD debe salir de data/fiscal, como ya sale la de page.tsx', async () => {
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(
+      join(process.cwd(), 'app', 'conversor-cnae-iae', 'metadata.ts'),
+      'utf8',
+    );
+
+    // Residuo de la reparación del hallazgo 636, exactamente igual que el 585 lo fue de la
+    // del 425: `page.tsx` ya deriva la norma de las Tarifas de `FISCAL_CNAE_IAE_META.iae.fuente`
+    // (constante NORMA_IAE) y el test de arriba le prohíbe escribirla a mano, pero
+    // `metadata.ts` la sigue tecleando DOS veces —en `jsonLd.description` y en la primera
+    // respuesta del FAQPage—, y en la misma frase en la que la norma de la CNAE sí sale de
+    // `CNAE_VIGENCIA.normaVigente`. Es el texto que citan Bing Copilot, ChatGPT y Perplexity.
+    //
+    // El valor esperado no se transcribe: se le pregunta al módulo.
+    expect(FISCAL_CNAE_IAE_META.iae.fuente).toContain('RD Legislativo 1175/1990');
+    expect(fuente).not.toContain('RD Legislativo 1175/1990');
   });
 });

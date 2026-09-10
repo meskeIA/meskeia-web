@@ -41,6 +41,20 @@
  *      segundo tramo por delante) y unos años de propiedad NEGATIVOS. Al final, los CINCO
  *      hallazgos de esa ronda (637-641), REPARADOS el 09/09/2026: se les quitó el
  *      `test.fail()` y hoy quedan como REGRESIÓN de la reparación.
+ *  11. RE-INSPECCIÓN 10/09/2026 — CASOS 20-22, posterior al refactor de motores
+ *      (commits 3a507acb y 1808419c). Comunidad y precio nuevos otra vez (Comunidad
+ *      Valenciana, 24.000 €, con el tipo general del 9 % vigente desde el 01/06/2026), la
+ *      REVENTA ANTES DEL AÑO —el coeficiente 0,14 de `COEFICIENTES_IIVTNU_2025`, que esta
+ *      app no puede alcanzar— y un precio de compra malformado. Al final, UN hallazgo
+ *      abierto con `test.fail()`.
+ *
+ *      ⚠️ El CASO 16 (02/09) se REESCRIBIÓ ese día. Verificaba el rechazo escribiendo un
+ *      «0» en los años de propiedad y daba por buena la reescritura del `min={1}` a «1»:
+ *      eso era cierto cuando se escribió, y desde la reparación del motor del 07/09
+ *      (hallazgo 666, `calcularPlusvaliaMunicipal` acota en 0 y no en 1) ya no lo es. Un
+ *      test de regresión que fija el contrato anterior impide ver la reparación pendiente,
+ *      así que el mismo rechazo se comprueba ahora con el campo VACÍO —que es el dato que
+ *      de verdad falta— y el 0 pasa a ser el caso abierto de la parte 11.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -1593,8 +1607,15 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
    * definitivo mientras esa partida falte.
    *
    * Se prueban las dos caras: sin el dato la plusvalía se declara SIN CALCULAR y el neto se
-   * rotula como techo; con el dato puesto (1 año, el mínimo que admite el campo) aparece la
-   * cifra exacta y el neto deja de ser un techo.
+   * rotula como techo; con el dato puesto (1 año) aparece la cifra exacta y el neto deja de
+   * ser un techo.
+   *
+   * ⚠️ REESCRITO el 10/09/2026. Hasta hoy este caso escribía un «0» en el campo y lo daba por
+   * equivalente a «no hay dato», que es exactamente el defecto que la parte 11 deja abierto:
+   * desde la reparación del motor del 07/09 (hallazgo 666) el 0 es un dato VÁLIDO —la reventa
+   * antes del año, coeficiente 0,14— y lo único que falta de verdad es el campo VACÍO. Lo que
+   * este caso verifica sigue siendo lo mismo; lo que cambia es que el dato ausente se
+   * representa como ausente.
    */
   test('CASO 16 (debe rechazarse) — sin años de propiedad no hay plusvalía: ni 0,00 € ni NaN', async ({
     page,
@@ -1606,10 +1627,12 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
     await rellenar(page, 'Valor catastral del suelo', '6000');
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '15000');
 
-    // Años a 0 y SIN salir del campo, que es donde el `min={1}` de NumberInput todavía no ha
-    // actuado: es el estado en el que el motor recibe de verdad un 0.
+    // Los años de propiedad son lo ÚNICO que falta, y faltan de la única forma en que un dato
+    // puede faltar en un campo de texto: vacío.
     const anios = page.locator('input[aria-label="Años de propiedad"]');
-    await anios.fill('0');
+    await anios.fill('');
+    await anios.blur();
+    await expect(anios).toHaveValue('');
 
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
     await expect(page.getByText('No definido')).toHaveCount(0);
@@ -1631,8 +1654,8 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
     // …y ese neto TIENE que anunciarse como techo, no como lo que se recibe.
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
 
-    // Con el dato puesto (el blur normaliza el 0 al mínimo declarado, 1 año):
-    await anios.blur();
+    // Con el dato puesto (1 año de tenencia):
+    await rellenar(page, 'Años de propiedad', '1');
     await expect(anios).toHaveValue('1');
     // Plusvalía — COEFICIENTES_IIVTNU_2025 da 0,13 a 1 año:
     //   objetivo (art. 107.4): 6.000 × 0,13 = 780 → × 25 % = 195,00
@@ -2111,3 +2134,225 @@ test('REGRESIÓN 641 (dato) — el anejo residencial se calcula y se anuncia con
   expect(await valorTarjeta(page, 'IVA (10,00%)')).toBe('1200,00 €');
   await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 10%');
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 10/09/2026 — CASOS 20-22.
+// La cola reabrió la app tras el refactor de motores (3a507acb, 1808419c) y con una PISTA
+// de efecto familia: en `simulador-gastos-compraventa-garaje` el campo «Años de propiedad»
+// lleva `min={1}` y el motor lee `parseInt(aniosPropiedad) || 0`, de modo que la reventa
+// antes del año es inalcanzable. La hermana `local-comercial` ya está reparada. Este bloque
+// averigua de qué lado está el trastero (CASO 21) y estrena territorio y precio (CASO 20).
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa antes del año y un precio de compra malformado', () => {
+  /**
+   * CASO 20 (NORMAL) — Comunidad Valenciana, comunidad que ninguna ronda anterior había
+   * elegido, y en la que además el tipo general se movió hace tres meses: `TIPOS_ITP_CCAA_2025`
+   * la trae al 9 % «desde el 01/06/2026 (antes 10%)». Tiene escala progresiva declarada
+   * (`tramosProgresivos` 9 % hasta 1.000.000 € y 11 % por encima), así que a 24.000 € el
+   * tipo efectivo tiene que coincidir con el nominal del primer tramo y ni un céntimo más.
+   */
+  test('CASO 20 (normal) — Comunidad Valenciana, segunda mano, 24.000 €, comprador general', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('valencia');
+    await selectPerfil(page).selectOption('general');
+    await rellenar(page, 'Precio del trastero', '24000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // ITP — `calcularITPProgresivo` sobre ITP_CCAA.valencia.tramosProgresivos:
+    //   los 24.000 € caben enteros en el primer tramo (hasta 1.000.000 €, 9 %)
+    //   24.000 × 9 % = 2.160,00 · tipo efectivo = 2.160 / 24.000 = 9,00 %
+    // Ninguno de los siete reducidos de Valencia se aplica: seis son de colectivo (joven,
+    // familia, discapacidad, VPO) y el séptimo —víctimas de violencia de género, 3 %— exige
+    // «Vivienda habitual», y `elegirTipoITP` recibe `viviendaHabitual: false` porque un
+    // trastero suelto nunca lo es. Por eso tampoco sale el aviso «Podrías pagar menos».
+    expect(await valorTarjeta(page, 'ITP (9,00%)')).toBe('2160,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (9,00%)')).toContain('Comunidad Valenciana');
+    await expect(page.getByText(/Podrías pagar menos/)).toHaveCount(0);
+    // La escala SÍ se anuncia, aunque a este precio no se separe del tipo plano.
+    await expect(page.getByText(/aplica escala progresiva/)).toBeVisible();
+
+    // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
+    //   tramo 1 (hasta 6.010,12 €)             →                              90,15
+    //   tramo 2 (6.010,12→30.050,61, 0,45 %)   →  17.989,88 × 0,0045 =        80,95446
+    //   arancel sin IVA                        =                             171,10446
+    //   con el 21 % de IVA                     = 171,10446 × 1,21 =          207,0363966
+    // FACTURA_NOTARIAL: ×1,5 = 310,5545949 · ×2 = 414,0727932 · medio ×1,75 = 362,31369405
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('362,31 €');
+    const notaria20 = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria20).toContain('310,55 €');
+    expect(notaria20).toContain('414,07 €');
+
+    // Registro — RD 1427/1989, números 1, 2 y 4 (ARANCELES_REGISTRO + REGISTRO_CONCEPTOS):
+    //   tramo 1 (hasta 6.010,12 €)             →                              24,04
+    //   tramo 2 (6.010,12→30.050,61, 0,175 %)  →  17.989,88 × 0,00175 =       31,48229
+    //   inscripción (número 2)                 =                              55,52229
+    //   + asiento de presentación (número 1)   →                               6,010121
+    //   + nota simple (número 4)               →                               3,005061
+    //                                          =                              64,537472
+    //   con el 21 % de IVA                     = 64,537472 × 1,21 =           78,09014112
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('78,09 €');
+
+    // En segunda mano no hay AJD: ITP y AJD-cuota gradual son incompatibles.
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    // Total gastos — `sumarLineasVisibles` redondea cada línea al céntimo ANTES de sumar,
+    // que es como las ve el usuario: 2.160,00 + 362,31 + 78,09 + 300,00 = 2.900,40
+    //   % sobre el precio = 2.900,40 / 24.000 = 12,085 %, que el redondeo binario del doble
+    //   deja justo por debajo de la mitad y `formatNumber(x, 2)` imprime como 12,08 %.
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2900,40 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,08%');
+
+    // Coste total = 24.000 + 2.900,40 = 26.900,40
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('26.900,40 €');
+  });
+
+  /**
+   * CASO 22 (DEBE RECHAZARSE) — un precio de compra original malformado.
+   *
+   * `NumberInput` filtra las letras con su regex `/^-?[\d.,]*$/`, así que lo que de verdad
+   * puede llegar al motor es un número con dos separadores mal puestos. `parseSpanishNumber`
+   * devuelve NaN para «1.2.3» (está en su propia documentación) y ese NaN NO puede leerse
+   * como un 0: si lo fuera, el valor de adquisición sería 0, el precio de venta entero se
+   * convertiría en ganancia y la app publicaría una cuota de IRPF de 3.546,60 € que no debe
+   * nadie (6.000 × 19 % + 11.460 × 21 % sobre una ganancia inventada de 17.460 €). Tampoco
+   * puede leerse como el 1,2 que devolvería `parseFloat`.
+   *
+   * Es la contrapartida del CASO 7, que probaba lo mismo en el precio del comprador.
+   */
+  test('CASO 22 (debe rechazarse) — «1.2.3» no es un precio de compra: ni 0 € ni 1,2 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '18000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '1.2.3');
+    await rellenar(page, 'Años de propiedad', '6');
+    await rellenar(page, 'Valor catastral del suelo', '5000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '12000');
+
+    // El campo conserva lo escrito (el `handleBlur` de NumberInput solo acota min/max).
+    await expect(page.locator('input[aria-label="Precio de compra original"]')).toHaveValue('1.2.3');
+
+    // Sin precio de compra no hay incremento de valor que comparar, así que la plusvalía
+    // tampoco se calcula — y el aviso nombra ESE campo, no los otros dos, que están puestos.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    const metodo22 = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(metodo22).toContain('falta el precio de compra original');
+    expect(metodo22).not.toContain('valor catastral del suelo');
+    expect(metodo22).not.toContain('años de propiedad');
+
+    // El IRPF se declara sin calcular, y NO como «SIN CUOTA» en verde (hallazgo 483): un 0
+    // ahí se leería como una exención. Las tarjetas de ganancia/pérdida y de valor de
+    // adquisición no se pintan: no hay base sobre la que calcularlas.
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Pérdida patrimonial' })).toHaveCount(0);
+
+    // Lo único que sí se puede calcular es la comisión: 18.000 × 3 % (por defecto) = 540,00
+    //   total gastos = 0 de plusvalía + 540 + 0 de gestoría + 0 de IRPF = 540,00
+    //   neto = 18.000 − 540 = 17.460,00 — y se anuncia como TECHO, con los dos conceptos
+    //   que faltan y el ÚNICO campo que hay que rellenar (hallazgo 639: no se pide dos veces).
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('540,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('540,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.460,00 €');
+    const neto22 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(neto22).toContain('Techo');
+    expect(neto22).toContain('la plusvalía municipal ni el IRPF de la ganancia');
+    expect(neto22).toContain('añade el precio de compra original');
+
+    // Y en ninguna parte de la página puede haber NaN. Se busca sobre el texto completo y
+    // con mayúsculas: `getByText('NaN')` no distingue mayúsculas y casaría con «ganancia».
+    expect(await page.locator('body').innerText()).not.toContain('NaN');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGO ABIERTO — re-inspección del 10/09/2026.
+// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
+// Cuando se repare, se le quita la marca y queda como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ❌ ABIERTO 10/09/2026 (alto) — cálculo. La reventa antes del año es INALCANZABLE, y la
+// app liquida de menos sin decirlo.
+//
+// `COEFICIENTES_IIVTNU_2025` (data/fiscal/inmuebles.ts) tiene fila propia para la tenencia
+// de menos de un año —`{ anios: 0, label: 'Menos de 1 año', coeficiente: 0.14 }`, el TERCERO
+// más alto de toda la tabla, por encima del 0,13 de un año— porque desde el RDL 26/2021 esa
+// transmisión SÍ tributa. El motor ya sabe atenderla: `calcularPlusvaliaMunicipal` acota con
+// `Math.min(Math.max(aniosPropiedad, 0), 20)` desde la reparación del 07/09/2026 (hallazgo
+// 666), y su comentario dice literalmente «las apps que usan el 0 como campo vacío filtran
+// antes de llamar».
+//
+// Esta app es una de esas, y no ha filtrado: sigue leyendo `parseInt(aniosPropiedad) || 0`
+// (page.tsx:318), que confunde el 0 explícito con el campo vacío, y su `NumberInput` declara
+// `min={1}` (page.tsx:831), que al salir del campo REESCRIBE el 0 a 1 sin avisar. Las dos
+// mitades se tapan la una a la otra: mientras el foco está puesto, el 0 desactiva la
+// plusvalía («SIN CALCULAR»); al salir, el campo ya no dice 0 sino 1 y la app liquida con el
+// coeficiente equivocado presentándolo como firme («Lo que realmente recibes tras los
+// gastos»). El usuario no tiene forma de introducir el dato que la ley contempla.
+//
+// La hermana `simulador-gastos-compraventa-local-comercial` ya está reparada con este mismo
+// patrón (`min={0}`, los años leídos del STRING y el campo vacío distinguido del 0);
+// `simulador-gastos-compraventa-garaje` arrastra el defecto igual que esta.
+//
+// Y el error va A LA BAJA, que es el sentido irrecuperable en una herramienta fiscal: el
+// contribuyente presupuesta menos de lo que la oficina liquidadora le va a pedir.
+//
+// Caso: Precio 15.000 € · Vendedor · compra 12.000 € · años 0 · suelo 4.000 · total 9.000
+//       (comisión 3 % por defecto)
+//       → esperado plusvalía 140,00 € (4.000 × 0,14 × 25 %) y neto 13.952,10 €
+//       → obtenido plusvalía 130,00 € (4.000 × 0,13 × 25 %) y neto 13.960,20 €
+test.fail(
+  'ABIERTO (cálculo) — la reventa antes del año liquida con el coeficiente de 1 año',
+  async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '12000');
+    await rellenar(page, 'Valor catastral del suelo', '4000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '9000');
+
+    // Cero años de tenencia: el trastero se revende antes de cumplir el año. Se sale del
+    // campo a propósito, porque es el estado en el que el usuario deja el formulario.
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+    await anios.fill('0');
+    await anios.blur();
+
+    // ⚠️ La aserción de FONDO va primero a propósito: dentro de un `test.fail()` basta con
+    // que el test falle en algún punto, así que lo que se ejecuta de verdad es la primera
+    // que falla. Si la primera fuera la del valor del campo, la cifra fiscal —que es el
+    // hallazgo— nunca llegaría a comprobarse (es el aviso que dejó el CASO 8 el 28/08).
+    // Las tres de abajo están resueltas a mano y verificadas en navegador por separado.
+    //
+    // Plusvalía — calcularPlusvaliaMunicipal con COEFICIENTES_IIVTNU_2025:
+    //   objetivo (art. 107.4 TRLHL): 4.000 × 0,14 («Menos de 1 año») = 560 → × 25 % = 140,00
+    //     (el 25 % es PLUSVALIA_MUNICIPAL_META.tipoOrientativo, no el 30 % máximo legal)
+    //   real (art. 107.5): (15.000 − 12.000) × (4.000/9.000) × 25 % = 3.000 × 0,4444… × 0,25
+    //     = 333,33… → el contribuyente elige el más favorable: 140,00 €
+    //   Lo que la app publica hoy son 130,00 € — el coeficiente 0,13 de UN año.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('140,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
+
+    // Y el error se propaga al art. 35 LIRPF, porque la plusvalía resta del valor de
+    // transmisión: 10 € menos de plusvalía son 10 € más de ganancia.
+    //   comisión = 15.000 × 3 % = 450 · valor de adquisición = 12.000
+    //   valor de transmisión = 15.000 − 450 − 140 = 14.410 · ganancia = 2.410
+    //   IRPF = 2.410 × 19 % (primer tramo del ahorro) = 457,90
+    //   total gastos = 140 + 450 + 0 + 457,90 = 1.047,90 · neto = 15.000 − 1.047,90
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('14.410,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('2410,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('457,90 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1047,90 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.952,10 €');
+
+    // Segunda cara del defecto, y la que lo hace invisible: el `min={1}` reescribe a «1» el
+    // dato que el usuario ha escrito, sin decir nada. Al reparar, este campo debe conservar
+    // el 0 (es lo que `local-comercial` ya hace con `min={0}`).
+    await expect(anios).toHaveValue('0');
+  },
+);

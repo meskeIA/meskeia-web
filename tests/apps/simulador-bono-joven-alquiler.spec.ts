@@ -3,7 +3,7 @@ import { BONO_ALQUILER_JOVEN_2026 } from '../../data/fiscal/vivienda-joven';
 
 /**
  * Inspector — simulador-bono-joven-alquiler (segmento fiscal, RIESGO 1 CRÍTICO)
- * Inspeccionada el 02/09/2026 y RE-INSPECCIONADA el 07/09/2026.
+ * Inspeccionada el 02/09/2026 y RE-INSPECCIONADA el 07/09/2026 y el 10/09/2026.
  *
  * ── Cómo está organizado este fichero ────────────────────────────────────────
  *   1. CASOS 1-3 y guardianes — la inspección del 02/09/2026. Siguen pasando tal cual.
@@ -13,6 +13,9 @@ import { BONO_ALQUILER_JOVEN_2026 } from '../../data/fiscal/vivienda-joven';
  *   4. REGRESIÓN 07/09 — los cuatro hallazgos de esa re-inspección (642-645), reparados el
  *      09/09/2026. Se escribieron con `test.fail()` afirmando lo que DEBERÍA pasar; al
  *      repararlos se les quitó la marca y quedan como regresión.
+ *   5. CASOS 7-9 — los casos nuevos de la re-inspección del 10/09/2026.
+ *   6. HALLAZGOS ABIERTOS 10/09 — H1, H2 y H3, todavía marcados `test.fail()` con lo que la
+ *      app DEBERÍA hacer. Al repararlos se les quita la marca, como se hizo con 642-645.
  *
  * Qué promete la app
  * ──────────────────
@@ -601,5 +604,239 @@ test.describe('Regresión — hallazgos del 07/09/2026 (642-645), reparados el 0
     await page.fill('#alquiler', '600');
     const panel = await panelDeAhorro(page);
     expect(panel[2]).toContain(`Máximo en ${BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12} años`);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 10/09/2026 (segmento fiscal, RIESGO 1 CRÍTICO)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Primero se ejecutó entera la batería anterior: **20/20 en verde**, así que los ocho
+// hallazgos de las dos pasadas previas (596-599 y 642-645) siguen cerrados y el refactor
+// de motores del 10/09/2026 no ha tocado nada de esta app — no tiene motor propio: el
+// cálculo (una comparación y una multiplicación) vive en `page.tsx`, y ni
+// `check-motores-consumidos.mjs` ni `check-parser-numerico.mjs` ni `check-a11y-jsx.mjs`
+// señalan este fichero.
+//
+// AUDITORÍA DE LOS CASOS PREVIOS (obligatoria en esta tanda): se revisó uno por uno que
+// lo que cada test afirma siga siendo lo que la app DEBE hacer, no solo lo que hace.
+// Ninguno fija como contrato un comportamiento hoy defectuoso: los catorce casos y
+// guardianes anteriores anclan sus cifras en `data/fiscal/vivienda-joven.ts` y en
+// `data/fiscal/iprem.ts`, y las cuatro regresiones 642-645 siguen describiendo lo que la
+// norma pide. No se ha modificado ninguno.
+//
+// De dónde sale cada cifra esperada de los casos nuevos: `data/fiscal/vivienda-joven.ts`,
+// sellado contra el BOE (RD 326/2026, BOE-A-2026-8872) el 23/08/2026. Ninguna de memoria.
+//
+// CASOS NUEVOS (resueltos a mano ANTES de abrir el navegador)
+// ───────────────────────────────────────────────────────────
+//   CASO 7 (normal) — VIVIENDA en municipio ordinario · 450 €/mes · los 6 requisitos a «Sí»
+//       tope de renta   450 ≤ 1.000 (rentaMaximaMensual.vivienda, art. 133.1.e) → dentro
+//       60 % de 450 = 270 < 300 (ayudaMaximaMensual.vivienda, art. 137)
+//       ayuda           mín(300; 270) = 270,00 €   ← aquí manda el PORCENTAJE
+//       pago real       450 − 270 = 180,00 €
+//       4 años          270 × 48 (plazo.totalMaximoMeses, art. 134) = 12.960,00 €
+//       veredicto       APTO **citando 270,00 €/mes**, no los 300 € del programa
+//       Es el hueco que quedaba: el guardián del 480,75 € comprueba el panel cuando el
+//       60 % muerde, pero no marca los requisitos, así que nunca llega a la tarjeta de
+//       veredicto — que es justo donde esta app anunció una vez el máximo del programa
+//       en lugar de la ayuda efectiva.
+//
+//   CASO 8 (límite) — VIVIENDA en municipio ordinario · 1.000 €/mes CLAVADOS
+//       1.000 = rentaMaximaMensual.vivienda (art. 133.1.e), el tope de portada de la app,
+//       y hasta hoy sin cubrir: los casos previos probaban 1.100 y 1.200 (por encima),
+//       nunca el borde inclusive.
+//       tope de renta   1.000 ≤ 1.000 → dentro, sin aviso
+//       60 % de 1.000 = 600 > 300 → ayuda = mín(300; 600) = 300,00 €
+//       pago real       1.000 − 300 = 700,00 €
+//       4 años          300 × 48 = 14.400,00 €
+//       nota del 60 %   NO (la ayuda no queda rebajada por el porcentaje)
+//       veredicto       APTO · y con 1.001 € → NO APTO (tope 1000,00 €, introducido 1001,00 €)
+//
+//   CASO 9 (rechazo) — HABITACIÓN en municipio ordinario · 900 €/mes
+//       900 > 600 (rentaMaximaMensual.habitacion) → NO APTO por el art. 133.1.e
+//       El aviso debe citar el tope de la HABITACIÓN (600,00 €), no el de vivienda:
+//       equivocarse de tope aquí rechaza a quien tiene derecho o al revés.
+//       panel de ahorro: ninguna tarjeta
+//       Y con la MISMA renta cambiando el selector a vivienda completa:
+//       900 ≤ 1.000 → APTO · ayuda mín(300; 540) = 300,00 € · pago 600,00 € · 14.400,00 €
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspección 10/09/2026 — casos nuevos', () => {
+  test('CASO 7 (normal): vivienda a 450 €/mes → el 60 % manda (270,00 €) y el veredicto cita la ayuda EFECTIVA', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 450 ≤ 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e)
+    await page.fill('#alquiler', '450');
+    await marcarTodosLosRequisitos(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+
+    const panel = await panelDeAhorro(page);
+    // mín(300 € de ayudaMaximaMensual.vivienda; 60 % de 450 = 270 €) = 270 €
+    expect(panel[0]).toContain('270,00 €');
+    // 450 − 270
+    expect(panel[1]).toContain('180,00 €');
+    // 270 × 48 meses (plazo.totalMaximoMeses, art. 134)
+    expect(panel[2]).toContain('12.960,00 €');
+
+    // El porcentaje rebaja la cuantía: hay que decirlo
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(1);
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('¡Cumples todos los requisitos!');
+    // La tarjeta anuncia lo que este caso puede cobrar, no el tope del programa
+    expect(resultado).toContain('270,00 €/mes');
+    expect(resultado).not.toContain('300,00 €');
+  });
+
+  test('CASO 8 (límite): 1.000 €/mes clavados es el último importe con derecho a ayuda (art. 133.1.e, inclusive)', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 1.000 € = rentaMaximaMensual.vivienda (art. 133.1.e), tope INCLUSIVE
+    await page.fill('#alquiler', '1000');
+    await marcarTodosLosRequisitos(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+
+    const panel = await panelDeAhorro(page);
+    // 60 % de 1.000 = 600 > 300 → manda la cuantía fija del art. 137
+    expect(panel[0]).toContain('300,00 €');
+    // 1.000 − 300
+    expect(panel[1]).toContain('700,00 €');
+    // 300 × 48
+    expect(panel[2]).toContain('14.400,00 €');
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(0);
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('¡Cumples todos los requisitos!');
+
+    // Un euro por encima del tope de portada cae al otro lado
+    await abrir(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await page.fill('#alquiler', '1001');
+    await marcarTodosLosRequisitos(page);
+
+    const aviso = norm(await page.locator('[class*="avisoRenta"]').first().innerText());
+    expect(aviso).toContain('1000,00 €/mes'); // es-ES no agrupa los millares de cuatro cifras
+    expect(aviso).toContain('1001,00 €/mes');
+    expect(aviso).toContain('art. 133.1.e');
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+  });
+
+  test('CASO 9 (rechazo): 900 €/mes por una habitación supera SU tope de 600 €, y la misma renta sí vale como vivienda completa', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    // 600 € = rentaMaximaMensual.habitacion (art. 133.1.e); 900 lo supera
+    await page.fill('#alquiler', '900');
+    await marcarTodosLosRequisitos(page);
+
+    const aviso = norm(await page.locator('[class*="avisoRenta"]').first().innerText());
+    expect(aviso).toContain('Para una habitación el tope es 600,00 €/mes');
+    expect(aviso).toContain('900,00 €/mes');
+    // El tope de la vivienda completa no pinta nada en un contrato de habitación
+    expect(aviso).not.toContain('1000,00 €');
+
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(rechazo).toContain('600,00 €/mes');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+
+    // Misma renta, otro tipo de contrato: 900 ≤ 1.000 → sí hay derecho
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+    const panel = await panelDeAhorro(page);
+    // mín(300; 60 % de 900 = 540) = 300
+    expect(panel[0]).toContain('300,00 €');
+    // 900 − 300
+    expect(panel[1]).toContain('600,00 €');
+    expect(panel[2]).toContain('14.400,00 €');
+    const apto = norm(await page.locator('[role="status"]').first().innerText());
+    expect(apto).toContain('¡Cumples todos los requisitos!');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 10/09/2026 — marcados `test.fail()`
+// con lo que la app DEBERÍA hacer, igual que se hizo con 642-645. Al repararlos se
+// les quita la marca y quedan como guardián de regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 10/09/2026', () => {
+  // H1 (ALTO) — La incompatibilidad del art. 136 no llega nunca al veredicto.
+  // `BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler = false` está sellado en
+  // el módulo y NO lo lee nadie en todo el repositorio (grep: solo su definición). La regla
+  // sí se cuenta en tres canales de prosa —FAQ visible, faqJsonLd y el consejo de la
+  // deducción autonómica—, pero los tres viven dentro del `<EducationalSection>` colapsado
+  // o en el JSON-LD; fuera de la guía la página no dice «incompatible», ni «art. 136», ni
+  // «otra ayuda» ni «ayuda al pago». Es la misma forma de los hallazgos 596 y 645 (la
+  // corrección llega a un canal y no al otro), pero al revés: aquí lo que se quedó fuera
+  // es el veredicto. Consecuencia: quien ya cobra una ayuda autonómica al alquiler responde
+  // «Sí» a los 6 requisitos y recibe «¡Cumples todos los requisitos! En principio puedes
+  // solicitar el Bono Joven al Alquiler», cuando el RD lo excluye. Y el CLAUDE.md del
+  // proyecto prohíbe expresamente esconder una advertencia legal dentro de
+  // `<EducationalSection>`.
+  test('H1 — la incompatibilidad del art. 136 debería condicionar el veredicto, no solo la guía', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+
+    // O la checklist pregunta por otras ayudas al alquiler...
+    const tarjetas = page.locator('[class*="checkCard"]');
+    const preguntas: string[] = [];
+    for (let i = 0; i < await tarjetas.count(); i++) preguntas.push(norm(await tarjetas.nth(i).innerText()));
+    const laPregunta = preguntas.some(p => /otra ayuda al (pago del )?alquiler|incompatib/i.test(p));
+
+    // ...o el propio veredicto de «apto» avisa de que el art. 136 la excluye
+    await page.fill('#alquiler', '600');
+    await marcarTodosLosRequisitos(page);
+    const apto = norm(await page.locator('[role="status"]').first().innerText());
+    const loAvisa = /incompatib|art\. 136|otra ayuda al pago/i.test(apto);
+
+    expect(laPregunta || loAvisa).toBe(true);
+  });
+
+  // H2 (MEDIO) — El `faqJsonLd` afirma a los asistentes de IA que el bono «está sujeto al
+  // IRPF como ganancia patrimonial no derivada de la transmisión de elementos patrimoniales»
+  // y que debe declararse en el ejercicio en que se cobra. La página VISIBLE no contiene ni
+  // «tributa» ni «ganancia patrimonial» (0 apariciones con la guía educativa desplegada), el
+  // `<DataReference>` solo respalda el RD 326/2026 —que no regula el IRPF— y no hay módulo de
+  // `data/fiscal` que selle ese tratamiento. Es una afirmación fiscal de nivel 1 que solo
+  // circula por el canal que leen ChatGPT, Perplexity y Bing Copilot, donde ni el lector ni
+  // el Vigía Normativo la ven pasar. La invariante que se comprueba admite las dos
+  // reparaciones posibles: retirarla del FAQPage, o publicarla también en la página con su
+  // fuente.
+  test('H2 — lo que el FAQPage afirma sobre el IRPF debería poder leerse también en la página', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    const respuesta = await page.request.get(RUTA);
+    const html = await respuesta.text();
+    const afirmaTributacion = /ganancia patrimonial|tributa en el IRPF/i.test(html);
+
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const visible = norm(await page.locator('body').innerText());
+
+    // Si se le cuenta a un asistente de IA, se le cuenta también al lector
+    expect(afirmaTributacion ? /ganancia patrimonial|tributa/i.test(visible) : true).toBe(true);
+  });
+
+  // H3 (BAJO) — La ayuda mensual y el acumulado que la app enseña juntos no se multiplican.
+  // El 60 % del art. 137 puede dar fracciones de céntimo, y la app multiplica el número SIN
+  // redondear mientras publica el redondeado: con 333,33 €/mes de habitación la ayuda sale
+  // 199,998 €, que la tarjeta muestra como «200,00 €», y el acumulado 199,998 × 48 =
+  // 9.599,904 → «9599,90 €», cuando 200,00 × 48 son 9.600,00 €. Una ayuda se abona en
+  // céntimos: el redondeo pertenece a la cuantía mensual, no al total.
+  test('H3 — el acumulado de 4 años debería ser la ayuda mensual REDONDEADA por 48', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    // 333,33 ≤ 600 (art. 133.1.e) · 60 % de 333,33 = 199,998 < 200 (art. 137)
+    await page.fill('#alquiler', '333.33');
+
+    const panel = await panelDeAhorro(page);
+    expect(panel[0]).toContain('200,00 €');
+    // 200,00 × 48 = 9.600 → «9600,00 €» (es-ES no agrupa cuatro cifras). Hoy sale 9599,90 €.
+    expect(panel[2]).toContain('9600,00 €');
   });
 });

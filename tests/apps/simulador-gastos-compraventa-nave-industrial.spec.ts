@@ -1519,7 +1519,12 @@ test.describe('Inspección 07/09/2026 — tres casos nuevos', () => {
     // El recuadro de la comunidad dice lo mismo que la tarjeta, con el nominal sin inflar.
     const info = (await page.locator('[class*="infoCcaa"]').first().innerText()).replace(/\s+/g, ' ');
     expect(info).toContain('ITP General 7,75%');
-    expect(info).toContain('AJD 1,50%');
+    // Relajado el 10/09/2026: lo que este caso comprueba es que el AJD del recuadro lleva
+    // COMA decimal (hallazgo 161), no cuántos decimales. La cuenta de decimales es el
+    // HALLAZGO 3 de esta re-inspección: hoy sale «1,50%» y debería salir «1,5%», como su
+    // vecino «ITP General 7,75%». Fijar aquí el formato viejo haría fallar este test al
+    // repararlo, que es exactamente la falsa alarma que se quiere evitar.
+    expect(info).toMatch(/AJD 1,50?%/);
   });
 
   /**
@@ -1992,5 +1997,492 @@ test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
     expect(guia).toContain(`del ${String(RANGO_ITP.min)}% al ${String(RANGO_ITP.max)}%`);
     // …y el mismo número, con el mismo formato, en la nota del <DataReference> de cabecera.
     expect(guia).toContain(`del ${String(RANGO_ITP.min)}% (País Vasco)`);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN — 10/09/2026 (Opus 5)
+//
+// Antes de escribir nada se ejecutó el fichero entero: 56/56 en verde y ningún `test.fail()`
+// pendiente, así que todo lo reparado el 23/08, 27/08, 28/08, 02/09 y 09/09 sigue cerrado.
+// El refactor de motores del 10/09 (commits 3a507acb y 1808419c) NO tocó esta app: no está
+// entre las cinco que calculaban por su cuenta, y sus dependencias —`data/itp-ccaa.ts` y
+// `data/fiscal/inmuebles.ts`— siguen en el commit 579b3a05 del 09/09.
+//
+// PISTA DE EFECTO FAMILIA (garaje / estimador: «Años de propiedad» con `min={1}` y
+// `parseInt(x) || 0`, que hace inalcanzable el coeficiente 0,14 de COEFICIENTES_IIVTNU_2025):
+// NO APLICA AQUÍ, y no por estar reparada sino porque el defecto no tiene dónde ocurrir —
+// esta app no tiene parte de vendedor. Se comprueba abajo, en «efecto familia», para que si
+// alguien le añade un día la plusvalía municipal, el test lo cace en vez de callar.
+//
+// De dónde sale CADA cifra esperada de esta tanda (ninguna de memoria):
+//  - Escala de Asturias (8 % hasta 300.000 · 9 % hasta 500.000 · 10 % después) y de
+//    Castilla y León (8 % hasta 250.000 · 10 % después) → `ITP_CCAA` en `data/itp-ccaa.ts`.
+//    Son las DOS únicas de las siete comunidades con escala progresiva que ninguna vuelta
+//    anterior había pisado (Aragón, Baleares, Cataluña, Valencia y Extremadura ya estaban).
+//  - Tipo general de Baleares (8 %) y de Canarias (6,5 %) → `TIPOS_ITP_CCAA_2025` en
+//    `data/fiscal/inmuebles.ts`, vía `tipoGeneralDe()`.
+//  - Tipos REDUCIDOS que NO pueden aplicarse a una nave → `ITP_CCAA[x].tiposReducidos`
+//    (Baleares: 0 % para menores de 30 y 4 % de vivienda habitual, ambos con techo de
+//    270.151 € · Canarias: 5 % de vivienda habitual con techo de 150.000 €). El caso de
+//    rechazo compra POR DEBAJO de esos techos, que es donde un motor que mirase solo el
+//    valor —y no el uso del inmueble— se los concedería.
+//  - Aranceles → `ARANCELES_NOTARIO` (RD 1426/1989) y `ARANCELES_REGISTRO` (RD 1427/1989),
+//    con `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y `REGISTRO_CONCEPTOS`
+//    (presentación 6,010121 € + nota simple 3,005061 €). El 21 % de IVA va dentro.
+//
+// Los tres casos se resolvieron a mano ANTES de abrir el navegador; el desarrollo va
+// comentado junto a cada aserción, con los importes sin redondear.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Peor contraste de un conjunto de elementos, COMPONIENDO los fondos translúcidos.
+ *
+ * ⚠️ No vale quedarse con el primer `backgroundColor` que no sea transparente, que es lo que
+ * hace el medidor de `REPARADO 648`: allí los fondos son tokens opacos y da igual, pero esta
+ * página pinta el botón de transmisión activo y el aviso de la renuncia con
+ * `rgba(46, 134, 171, 0.08)`. Leído como si fuese el azul opaco, el subtítulo «Paga ITP (tipo
+ * general)» sale a 1,40:1 —un fallo gravísimo— cuando en pantalla ese botón es casi blanco y
+ * el texto pasa de sobra. Es un falso positivo que se comió la primera medición del 10/09.
+ */
+async function peorContrasteDe(page: Page, selector: string): Promise<{ ratio: number; texto: string }> {
+  return page.evaluate((sel) => {
+    const canal = (c: number) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+    const rgba = (s: string) => {
+      const n = (s.match(/[\d.]+/g) ?? []).map(Number);
+      return n.length < 3 ? null : { r: n[0], g: n[1], b: n[2], a: n.length > 3 ? n[3] : 1 };
+    };
+    const fondoDe = (el: Element): number[] => {
+      const capas: { r: number; g: number; b: number; a: number }[] = [];
+      let n: Element | null = el;
+      while (n) {
+        const c = rgba(getComputedStyle(n).backgroundColor);
+        if (c && c.a > 0) {
+          capas.push(c);
+          if (c.a >= 1) break;
+        }
+        n = n.parentElement;
+      }
+      let base = [255, 255, 255];
+      for (let i = capas.length - 1; i >= 0; i--) {
+        const c = capas[i];
+        base = [
+          c.r * c.a + base[0] * (1 - c.a),
+          c.g * c.a + base[1] * (1 - c.a),
+          c.b * c.a + base[2] * (1 - c.a),
+        ];
+      }
+      return base;
+    };
+    let peor = { ratio: 21, texto: '' };
+    for (const el of Array.from(document.querySelectorAll(sel))) {
+      const propio = Array.from(el.childNodes).some(
+        (n) => n.nodeType === 3 && (n.textContent ?? '').trim().length > 1
+      );
+      if (!propio) continue;
+      const cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+      const bg = fondoDe(el);
+      const f = rgba(cs.color)!;
+      const fg = [
+        f.r * f.a + bg[0] * (1 - f.a),
+        f.g * f.a + bg[1] * (1 - f.a),
+        f.b * f.a + bg[2] * (1 - f.a),
+      ];
+      const a = Math.max(lum(fg), lum(bg));
+      const b = Math.min(lum(fg), lum(bg));
+      const ratio = Math.round(((a + 0.05) / (b + 0.05)) * 100) / 100;
+      if (ratio < peor.ratio) {
+        peor = { ratio, texto: (el.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 60) };
+      }
+    }
+    return peor;
+  }, selector);
+}
+
+test.describe('Re-inspección 10/09/2026 — tres casos nuevos', () => {
+  /**
+   * CASO 1 (NORMAL) — Asturias, segunda mano, 750.000 €, gestoría 500 €.
+   *
+   * Asturias es una de las dos escalas progresivas que ninguna vuelta anterior había
+   * probado, y la única de TRES tramos con los dos cortes por debajo del precio: a 750.000 €
+   * la nave cruza los dos (300.000 y 500.000), así que el importe no puede salir de ningún
+   * tipo plano. `ITP_CCAA['asturias'].tramosProgresivos` = 8 % hasta 300.000, 9 % hasta
+   * 500.000, 10 % después.
+   *
+   * A mano:
+   *   ITP = 300.000 × 8 % + 200.000 × 9 % + 250.000 × 10 %
+   *       = 24.000 + 18.000 + 25.000                                   =  67.000,00
+   *   tipo efectivo = 67.000 / 750.000                                 =       8,9333 % → «8,93%»
+   *   AJD = 0 (segunda mano sin renuncia: no hay cuota gradual)
+   *   Notaría: arancel = 90,15 + 24.040,49×0,45 % (108,182205)
+   *            + 30.050,60×0,15 % (45,0759) + 90.151,82×0,10 % (90,15182)
+   *            + 450.759,07×0,05 % (225,379535)                        = 558,93946 (hasta 601.012,10)
+   *            + (750.000 − 601.012,10) × 0,03 % = 44,69637            = 603,63583
+   *            × 1,21 = 730,3993543
+   *            × 1,5 = 1.095,5990315 (min) · × 2 = 1.460,7987086 (max)
+   *            punto medio × 1,75                                      =  1.278,1988700
+   *   Registro: 24,04 + 42,0708575 + 37,56325 + 67,613865
+   *            + 450.759,07×0,030 % (135,227721)                       = 306,5156935
+   *            + (750.000 − 601.012,10) × 0,020 % = 29,79758           = 336,3132735
+   *            + 9,015182 = 345,3284555 · × 1,21                       =    417,8476312
+   *   Total gastos (líneas ya redondeadas)
+   *            = 67.000 + 1.278,20 + 417,85 + 500                      =  69.196,05
+   *   % sobre el precio = 69.196,05 / 750.000                          =       9,2261 % → «9,23%»
+   *   Total operación                                                  = 819.196,05
+   */
+  test('CASO 1 (normal) — Asturias, segunda mano, 750.000 €: la escala 8/9/10 cruza SUS DOS cortes', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'asturias');
+    await rellenar(page, PRECIO, '750000');
+    await rellenar(page, GESTORIA, '500');
+
+    // La escala la manda data/itp-ccaa, no este test.
+    expect(ITP_CCAA['asturias'].tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 9, 10]);
+    await expect(page.getByText(/escala progresiva \(8% → 9% → 10%\)/)).toBeVisible();
+
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('750.000,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,93%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('67.000,00 €');
+    // Ningún tipo plano de la escala da esta cifra: 8 % → 60.000, 9 % → 67.500, 10 % → 75.000.
+    // El 9 % es el que más se le parece, y por eso el caso lo nombra.
+    await expect(page.getByText('67.500,00 €')).toHaveCount(0);
+    await expect(page.getByText('60.000,00 €')).toHaveCount(0);
+    // Segunda mano sin renuncia: ITP y AJD son incompatibles.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1278,20 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('1095,60 €');
+    expect(notaria).toContain('1460,80 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('417,85 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('69.196,05 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,23% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('819.196,05 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Castilla y León, segunda mano, 601.012,10 € exactos.
+   *
+   * Frontera TRIPLE en un solo importe, y ninguna de las tres estaba probada junta:
+   *  · 601.012,10 € es el último corte del tramo 6 de `ARANCELES_NOTARIO` (0,03 %) y del
+   *    tramo 5 de `ARANCELES_REGISTRO` (0,030 %). El bucle tiene que parar ahí —`valor <=
+   *    limiteAnterior` → break— sin abrir el tramo siguiente con un exceso de cero euros.
+   *  · Castilla y León es la otra escala progresiva sin estrenar (8 % hasta 250.000, 10 %
+   *    después) y el precio la cruza, así que el nominal de la tabla (8 %) y el efectivo
+   *    dejan de coincidir.
+   *  · El importe se teclea en formato español con los DOS separadores («601.012,10»), donde
+   *    manda el último como decimal.
+   *
+   * A mano (gestoría 500 €):
+   *   ITP = 250.000 × 8 % + 351.012,10 × 10 % = 20.000 + 35.101,21     =  55.101,21
+   *   tipo efectivo = 55.101,21 / 601.012,10                           =       9,1681 % → «9,17%»
+   *   Notaría: arancel = 558,93946 EXACTO (el tramo 7 no llega a abrirse)
+   *            × 1,21 = 676,3167466
+   *            × 1,5 = 1.014,4751199 (min) · × 2 = 1.352,6334932 (max)
+   *            punto medio × 1,75                                      =  1.183,5543066
+   *   Registro: 306,5156935 EXACTO (ídem, y muy por debajo del tope 2.181,67)
+   *            + 9,015182 = 315,5308755 · × 1,21                       =    381,7923594
+   *   Total gastos = 55.101,21 + 1.183,55 + 381,79 + 500               =  57.166,55
+   *   % sobre el precio = 57.166,55 / 601.012,10                       =       9,5117 % → «9,51%»
+   *   Total operación                                                  = 658.178,65
+   */
+  test('CASO 2 (límite) — Castilla y León, 601.012,10 € exactos: el corte compartido de los dos aranceles', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'castilla-leon');
+    await rellenar(page, PRECIO, '601.012,10');
+    await rellenar(page, GESTORIA, '500');
+
+    expect(ITP_CCAA['castilla-leon'].tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 10]);
+    // Los dos separadores del formato español llegan enteros al motor.
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('601.012,10 €');
+    await expect(page.getByText(/escala progresiva \(8% → 10%\)/)).toBeVisible();
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (9,17%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('55.101,21 €');
+    // Tipos planos descartados: 8 % → 48.080,97 · 10 % → 60.101,21.
+    await expect(page.getByText('48.080,97 €')).toHaveCount(0);
+    await expect(page.getByText('60.101,21 €')).toHaveCount(0);
+
+    // Frontera de los aranceles: ni un céntimo del tramo siguiente.
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1183,55 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('1014,48 €');
+    expect(notaria).toContain('1352,63 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('381,79 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('57.166,55 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,51% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('658.178,65 €');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — lo que la app tiene que NEGARSE a aplicar.
+   *
+   * Los rechazos probados hasta hoy eran todos de ENTRADA (0, negativo, vacío, «1.2.3»,
+   * «1,2,3»). Falta el rechazo que de verdad importa en una app fiscal: el del tipo REDUCIDO.
+   * El «Barrido» del 07/09 comprueba las 19 comunidades con un solo precio (700.000 €), que
+   * está por encima de todos los techos de los reducidos y, por tanto, no puede distinguir
+   * «la app no los aplica» de «no cabían». Este caso compra DEBAJO del techo:
+   *
+   *  a) Baleares, 250.000 € — por debajo de los 270.151 € que `ITP_CCAA['baleares']
+   *     .tiposReducidos` fija como techo del 0 % (menores de 30 o discapacidad ≥33 %),
+   *     del 4 % (vivienda habitual) y del 5 % (familia numerosa / VPO). Todos exigen
+   *     VIVIENDA, así que a una nave le corresponde el primer tramo de la escala, el 8 %:
+   *       ITP = 250.000 × 8 %                                          =  20.000,00
+   *       (con el 4 % serían 10.000 €, con el 5 % 12.500 € y con el 0 % ninguno)
+   *       Notaría: arancel = 333,559925 + 99.746,97 × 0,05 % (49,873485) = 383,43341
+   *                × 1,21 = 463,9544261 · medio × 1,75                 =    811,9202457
+   *                (min 695,9316392 · max 927,9088522)
+   *       Registro: 171,2879725 + 99.746,97 × 0,030 % (29,924091)      = 201,2120635
+   *                + 9,015182 = 210,2272455 · × 1,21                   =    254,3749671
+   *       Total gastos = 20.000 + 811,92 + 254,37 + 500                =  21.566,29
+   *       % sobre el precio                                            =       8,6265 % → «8,63%»
+   *       Total operación                                              = 271.566,29
+   *
+   *  b) Canarias, 140.000 € — por debajo de los 150.000 € del 5 % de vivienda habitual.
+   *       ITP = 140.000 × 6,5 % (TIPOS_ITP_CCAA_2025)                  =   9.100,00
+   *       (con el 5 % serían 7.000 € y con el 1 % de familia numerosa 1.400 €)
+   *
+   *  c) Y un rechazo de entrada que tampoco estaba: un precio de 320 dígitos. `parseFloat`
+   *     lo desborda a Infinito y `parseSpanishNumber` devuelve NaN por su guarda
+   *     `Number.isFinite`. Es la única rama de la guarda del `useMemo` que ninguna vuelta
+   *     había ejercitado: las anteriores entraban siempre por NaN o por «≤ 0».
+   */
+  test('CASO 3 (rechazo) — ningún tipo reducido de vivienda alcanza a una nave, ni bajo su techo', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+
+    // a) Baleares, 250.000 € — bajo el techo de los tres reducidos de la tabla.
+    await page.selectOption('#select-ccaa', 'baleares');
+    await rellenar(page, PRECIO, '250000');
+    await rellenar(page, GESTORIA, '500');
+
+    const techos = ITP_CCAA['baleares'].tiposReducidos?.map((t) => t.valorMaximo ?? 0) ?? [];
+    expect(Math.min(...techos)).toBeGreaterThan(250000); // el precio cabe en todos ellos
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('20.000,00 €');
+    // Ninguno de los tres reducidos se ha colado: 4 % → 10.000 · 5 % → 12.500 · 0 % → 0.
+    expect(await valorTarjeta(page, 'ITP (')).not.toBe('10.000,00 €');
+    expect(await valorTarjeta(page, 'ITP (')).not.toBe('12.500,00 €');
+    expect(await valorTarjeta(page, 'ITP (')).not.toBe('0,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (')).toContain('no tienen tipos reducidos');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('811,92 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('entre 695,93 € y 927,91 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('254,37 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.566,29 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,63% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('271.566,29 €');
+
+    // b) Canarias, 140.000 € — bajo el techo de 150.000 € del 5 % de vivienda habitual.
+    await page.selectOption('#select-ccaa', 'canarias');
+    await rellenar(page, PRECIO, '140000');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,50%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('9100,00 €');
+    expect(await valorTarjeta(page, 'ITP (')).not.toBe('7000,00 €');
+
+    // c) Precio de 320 dígitos: desborda a Infinito y la guarda lo rechaza.
+    const campo = page.locator('input[aria-label="' + PRECIO + '"]');
+    await campo.fill('9'.repeat(320));
+    await campo.blur();
+    expect((await campo.inputValue()).length).toBe(320); // el filtro del input SÍ lo admite
+    await expect(
+      page.getByText('Introduce el precio de la nave industrial para ver el desglose de gastos')
+    ).toBeVisible();
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('NaN');
+    expect(cuerpo).not.toContain('No definido');
+    expect(cuerpo).not.toContain('∞');
+  });
+
+  /**
+   * EFECTO FAMILIA — el defecto de «Años de propiedad» no aplica aquí, y no por reparado.
+   *
+   * En `simulador-gastos-compraventa-garaje` y en `estimador-compraventa-inmueble` el campo
+   * «Años de propiedad» lleva `min={1}` y el motor lee `parseInt(aniosPropiedad) || 0`, de
+   * modo que la reventa antes del año es inalcanzable y con ella el coeficiente 0,14 de
+   * `COEFICIENTES_IIVTNU_2025`; `simulador-gastos-compraventa-local-comercial` ya está
+   * reparada. Esta app cae fuera de las tres: NO tiene parte de vendedor —ni campo de años,
+   * ni valor catastral del suelo, ni plusvalía municipal, ni ganancia patrimonial—, así que
+   * el defecto no tiene dónde ocurrir. Su `useMemo` devuelve un único `resultadosComprador`.
+   *
+   * El test se queda por lo que puede pasar mañana: si alguien le añade la plusvalía copiando
+   * de una hermana sin reparar, esto lo caza en vez de callar.
+   */
+  test('efecto familia — la app no tiene parte de vendedor, así que el defecto de «Años de propiedad» no tiene dónde ocurrir', async ({ page }) => {
+    await page.goto(RUTA);
+    await expect(page.locator('input[aria-label*="Años"]')).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /[Pp]lusval/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /[Gg]anancia patrimonial/ })).toHaveCount(0);
+
+    const fuente = await leerFuente();
+    expect(fuente).not.toContain('aniosPropiedad');
+    expect(fuente).not.toContain('calcularPlusvaliaMunicipal');
+    // Y si alguna vez se añade, que sea con la guarda buena: el 0 tiene que poder escribirse.
+    expect(fuente).not.toMatch(/parseInt\(\s*aniosPropiedad\s*\)\s*\|\|\s*0/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 10/09/2026.
+// Escritos con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan y, cuando se
+// reparen, se les quita la marca y se quedan como regresión — igual que con los hallazgos
+// 156-166, 490-493, 600-604 y 646-651.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 10/09/2026', () => {
+  /**
+   * HALLAZGO 1 (accesibilidad, medio) — la herramienta pinta texto con `var(--primary)`,
+   * que es el azul de MARCA y no llega al 4,5:1 de la WCAG 2.1 AA en tema claro.
+   *
+   * Medido con Ceuta seleccionada y 500.000 € (los ratios no dependen del contenido):
+   *   · `.infoCcaaNombre` «Ciudad Autónoma de Ceuta» → 3,93:1 sobre rgb(250,250,250)
+   *   · `.infoCcaaValue` «0,50%» / «No calculado» / «6,5%» → 4,11:1 sobre blanco
+   *   · `.catastroLink` «🔗 Consultar valor de referencia catastral…» → 4,11:1 sobre blanco
+   * Son las tres cifras del recuadro de la comunidad —el ITP general, el AJD y el IVA— y el
+   * único enlace de la herramienta: justo lo que hay que poder leer.
+   *
+   * El proyecto ya resolvió esto: `app/globals.css` define `--primary-texto` (#26718F en
+   * claro) con el comentario «5,47:1 sobre blanco · 5,24 sobre la tarjeta», y lo usan
+   * `Footer`, `LegalNotice`, `MeskeiaLogo` y una quincena de apps. Esta no.
+   *
+   * En OSCURO no ocurre: allí `--primary` ya resuelve a #3FA5D1 y las tres pasan.
+   */
+  test.fail('HALLAZGO 1 — el azul de marca como texto no llega a 4,5:1 en tema claro', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await rellenar(page, PRECIO, '500000');
+
+    const peor = await esperarEstable(() =>
+      peorContrasteDe(page, '[class*="infoCcaaNombre"], [class*="infoCcaaValue"], [class*="catastroLink"]')
+    );
+    // Hoy: 3,93:1 en «Ciudad Autónoma de Ceuta».
+    expect(peor.ratio, `peor contraste en claro: «${peor.texto}»`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * HALLAZGO 2 (accesibilidad, medio) — la celda «21%» de la tabla comparativa se quedó
+   * fuera de la reparación del hallazgo 648, y falla en LOS DOS temas.
+   *
+   * El 09/09 esa tabla se arregló: las cuatro celdas de respuesta («No aplican», «No»,
+   * «Sí (jóvenes…)», «Sí (si actividad sujeta a IVA)») pasaron de dos hexadecimales sin
+   * variante de tema a `.celdaSi`/`.celdaNo`, con pareja clara y oscura medida contra los dos
+   * fondos que la tabla llega a tener. La quinta celda con color propio —la que lleva el IVA
+   * de la nave, `fontWeight: 700` y `color: 'var(--primary)'` en línea— no se tocó:
+   *   · claro:  rgb(46,134,171) sobre rgb(245,245,245) → 3,77:1
+   *   · oscuro: rgb(63,165,209) sobre rgb(56,56,56)    → 4,20:1
+   * Con 14,4 px y peso 700 no es «texto grande» (la WCAG pide ≥18,66 px en negrita), así que
+   * el umbral es 4,5:1 en los dos temas. Y es la cifra que la tabla existe para dar: el 21 %
+   * que separa una nave de una vivienda.
+   */
+  test.fail('HALLAZGO 2 — la celda del IVA de la tabla comparativa no llega a 4,5:1 en ningún tema', async ({ page }) => {
+    await page.goto(RUTA);
+    // El bloque educativo vive en el DOM aunque esté plegado, pero un elemento con
+    // `display: none` no tiene color computado útil: se despliega para medirlo.
+    const abrir = page.locator('button', { hasText: /Guía fiscal para la compra de naves industriales/ }).first();
+    if (await abrir.count()) await abrir.click();
+
+    const celdaIva = 'table td[style*="fontWeight"], table td';
+    const medirCelda = async (): Promise<number> =>
+      page.evaluate((sel) => {
+        const canal = (c: number) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        };
+        const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+        const rgba = (s: string) => {
+          const n = (s.match(/[\d.]+/g) ?? []).map(Number);
+          return n.length < 3 ? null : { r: n[0], g: n[1], b: n[2], a: n.length > 3 ? n[3] : 1 };
+        };
+        const fondoDe = (el: Element): number[] => {
+          const capas: { r: number; g: number; b: number; a: number }[] = [];
+          let n: Element | null = el;
+          while (n) {
+            const c = rgba(getComputedStyle(n).backgroundColor);
+            if (c && c.a > 0) {
+              capas.push(c);
+              if (c.a >= 1) break;
+            }
+            n = n.parentElement;
+          }
+          let base = [255, 255, 255];
+          for (let i = capas.length - 1; i >= 0; i--) {
+            const c = capas[i];
+            base = [
+              c.r * c.a + base[0] * (1 - c.a),
+              c.g * c.a + base[1] * (1 - c.a),
+              c.b * c.a + base[2] * (1 - c.a),
+            ];
+          }
+          return base;
+        };
+        const td = Array.from(document.querySelectorAll(sel)).find(
+          (e) => (e.textContent ?? '').replace(/\s+/g, ' ').trim() === '21%'
+        );
+        if (!td) return 21;
+        const cs = getComputedStyle(td);
+        const bg = fondoDe(td);
+        const f = rgba(cs.color)!;
+        const fg = [
+          f.r * f.a + bg[0] * (1 - f.a),
+          f.g * f.a + bg[1] * (1 - f.a),
+          f.b * f.a + bg[2] * (1 - f.a),
+        ];
+        const a = Math.max(lum(fg), lum(bg));
+        const b = Math.min(lum(fg), lum(bg));
+        return Math.round(((a + 0.05) / (b + 0.05)) * 100) / 100;
+      }, celdaIva);
+
+    const claro = await esperarEstable(medirCelda);
+    await activarTemaOscuro(page);
+    const oscuro = await esperarEstable(medirCelda);
+
+    // Hoy: claro 3,77 · oscuro 4,20.
+    expect(claro, 'celda «21%» en tema claro').toBeGreaterThanOrEqual(4.5);
+    expect(oscuro, 'celda «21%» en tema oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * HALLAZGO 3 (contenido, bajo) — el AJD del recuadro de la comunidad es el único tipo
+   * NOMINAL de la página al que todavía se le fuerzan dos decimales.
+   *
+   * En la misma caja y en la línea de al lado, «ITP General» usa `formatTipoNominal` desde el
+   * hallazgo 331 y el bloque educativo pasó a usarlo el 09/09 (hallazgo 651). El AJD se quedó
+   * con `formatNumber(datosCcaaActual.ajd, 2)`, así que la caja dice a la vez:
+   *   · Navarra     → «ITP General 6%»    junto a «AJD 0,50%»
+   *   · País Vasco  → «ITP General 4%»    junto a «AJD 0,00%»
+   *   · La Rioja    → «ITP General 7%»    junto a «AJD 1,00%»
+   * y la tabla comparativa de la MISMA página escribe ese mismo rango como «Sí (0% – 1,5%)».
+   *
+   * Es efecto familia con la reparación ya hecha en el clúster: `trastero`,
+   * `local-comercial`, `solar` y `terreno-rustico` ya escriben ahí
+   * `formatTipoNominal(datosCcaaActual.ajd)`. Solo `nave-industrial` y `garaje` no.
+   * No hay ninguna cifra equivocada: lo que hay es el ruido para el que se creó la función.
+   */
+  test.fail('HALLAZGO 3 — el AJD del recuadro fuerza dos decimales a un tipo nominal', async ({ page }) => {
+    await page.goto(RUTA);
+    const recuadro = page.locator('[class*="infoCcaa"]').first();
+
+    await page.selectOption('#select-ccaa', 'navarra');
+    expect(ITP_CCAA['navarra'].ajd).toBe(0.5);
+    // Hoy: «ITP General 6% … AJD 0,50%».
+    await expect(recuadro).toContainText('AJD 0,5%');
+
+    await page.selectOption('#select-ccaa', 'rioja');
+    expect(ITP_CCAA['rioja'].ajd).toBe(1);
+    await expect(recuadro).toContainText('AJD 1%');
+
+    await page.selectOption('#select-ccaa', 'pais-vasco');
+    expect(ITP_CCAA['pais-vasco'].ajd).toBe(0);
+    await expect(recuadro).toContainText('AJD 0%');
   });
 });

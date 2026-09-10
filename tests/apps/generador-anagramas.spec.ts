@@ -1058,4 +1058,255 @@ test.describe('generador-anagramas', () => {
     );
   });
 
+
+  // ---------------------------------------------------------------------------------------
+  // QUINTA PASADA — 10/09/2026 · RE-INSPECCIÓN (segmento MOTOR)
+  //
+  // La app vuelve a la cola porque desde la cuarta pasada estrenó la PUNTUACIÓN de Scrabble
+  // (commit b1f96c8a) y esa tabla vive ya en un motor compartido,
+  // `lib/calculadoras/puntuacionScrabble.ts`, que usan dos apps. Lo que se mira aquí es por
+  // tanto el eslabón nuevo: qué número pinta cada chip y de dónde sale.
+  //
+  // Verificado antes de tocar nada: `git log` confirma que ni page.tsx ni ese motor cambiaron
+  // en el refactor de motores del 10/09 (1808419c / 3a507acb), así que las 48 pruebas previas
+  // siguen midiendo lo que dicen medir; se re-ejecutaron las tres en verde.
+  //
+  // ORÁCULO INDEPENDIENTE, ANOTADO ANTES DE ABRIR EL NAVEGADOR
+  // Escrito en Node contra `public/data/diccionario-es.txt` (86.973 lemas) y contra la tabla
+  // de fichas de la edición española TECLEADA A MANO desde el reglamento —no importada del
+  // proyecto—: A E O I S N R U L T = 1 · D G = 2 · C B M P = 3 · H F V Y = 4 · Q = 5 ·
+  // J Ñ X = 8 · Z = 10. La edición española NO tiene fichas K ni W, cosa que la propia FAQ
+  // de la app afirma.
+  //
+  //   CASO 1 (normal)  atril «zapatas» 2..10 → 25 palabras · la más valiosa, ZAPATA = 17
+  //   CASO 2 (límite)  atril «kayak»   2..10 →  5 palabras, todas con una letra SIN ficha en
+  //                    el juego español: es el borde exacto de la tabla de puntos
+  //   CASO 3 (rechazo) verificador con un solo lado escrito: no hay nada que comparar, así
+  //                    que no puede salir ningún veredicto
+  // ---------------------------------------------------------------------------------------
+  test.describe('puntuación y borde de la tabla de fichas · 10/09/2026', () => {
+    /** «lema=puntos» de cada chip, en el orden en que la app los pinta. */
+    const chipsConPuntos = (page: Page) =>
+      page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+        nodos.map((chip) => {
+          const lema = chip.querySelector('[class*="chipLema"]');
+          // `$=` y no `*=`: con `*=` entraría también .chipPuntosUnidad.
+          const puntos = chip.querySelector('[class$="chipPuntos"]');
+          return `${lema?.textContent}=${(puntos?.textContent ?? '').replace(/\D/g, '')}`;
+        }),
+      );
+
+    /** Los puntos que la app pinta para un lema concreto, o `null` si no lleva insignia. */
+    const puntosDe = (chips: string[], lema: string): string | null => {
+      const chip = chips.find((c) => c.startsWith(`${lema}=`));
+      return chip === undefined ? null : chip.slice(lema.length + 1);
+    };
+
+    const buscarAtril = async (page: Page, atril: string, min: number, max: number) => {
+      await page.fill('#anagram-letters', '');
+      await page.selectOption('#anagram-min', String(min));
+      await page.selectOption('#anagram-max', String(max));
+      await page.fill('#anagram-letters', atril);
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeEnabled();
+    };
+
+    // -------------------------------------------------------------------------------------
+    // CASO 1 · NORMAL — atril «zapatas», longitudes 2..10
+    //
+    // 25 lemas caben en {z,a,p,a,t,a,s}. Las puntuaciones salen de sumar las fichas a mano:
+    //   ZAPATA = Z10+A1+P3+A1+T1+A1 = 17   ZAPA = Z10+A1+P3+A1 = 15   PAZ = P3+A1+Z10 = 14
+    //   TAZA = T1+A1+Z10+A1 = 13           ZAS = Z10+A1+S1 = 12       ZA = Z10+A1 = 11
+    //   PASTA = P3+A1+S1+T1+A1 = 7         TAPA = T1+A1+P3+A1 = 6     ASTA = A1+S1+T1+A1 = 4
+    //   APA = A1+P3+A1 = 5                 ASA = 3   TAS = 3   AS = 2   TA = 2
+    // Es además el atril que el propio código pone de ejemplo para justificar los dos
+    // criterios de orden («del atril ZAPATAS salen PASTA, 7 puntos con 5 fichas, y ZAPA, 15
+    // con 4»): los dos números se confirman abajo, dentro de la lista.
+    // -------------------------------------------------------------------------------------
+    test('CASO 1 · «zapatas» da 25 palabras y cada una vale lo que suman sus fichas', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await buscarAtril(page, 'zapatas', 2, 10);
+
+      await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+        'Palabras encontradas: 25',
+      );
+
+      // Orden por LONGITUD (el de partida): longitud descendente y, dentro de cada grupo,
+      // alfabético español —«apá» detrás de «apa», y la tilde no cambia la puntuación—.
+      expect(await chipsConPuntos(page)).toEqual([
+        'zapata=17',
+        'pasta=7', 'patas=7',
+        'asaz=13', 'aspa=6', 'asta=4', 'pasa=6', 'pata=6', 'sapa=6', 'tapa=6', 'tasa=4',
+        'taza=13', 'zapa=15', 'zata=13',
+        'apa=5', 'apá=5', 'asa=3', 'paz=14', 'saz=12', 'tas=3', 'taz=12', 'zas=12',
+        'as=2', 'ta=2', 'za=11',
+      ]);
+      await expect(page.locator('[class*="groupTitle"]')).toHaveText([
+        '6 letras (1)', '5 letras (2)', '4 letras (11)', '3 letras (8)', '2 letras (3)',
+      ]);
+
+      // El resumen no es un adorno: la más valiosa es ZAPATA con 17. Y al ordenar por puntos,
+      // ZAPA (15, cuatro fichas) va DELANTE de PASTA (7, cinco fichas), que es exactamente la
+      // inversión que motivó el criterio nuevo.
+      await expect(page.locator('[class*="ordenMejor"]')).toHaveText('La más valiosa: 17 puntos');
+      await page.getByRole('button', { name: 'Puntos', exact: true }).click();
+      expect(await chipsConPuntos(page)).toEqual([
+        'zapata=17', 'zapa=15', 'paz=14', 'asaz=13', 'taza=13', 'zata=13',
+        'saz=12', 'taz=12', 'zas=12', 'za=11',
+        'pasta=7', 'patas=7',
+        'aspa=6', 'pasa=6', 'pata=6', 'sapa=6', 'tapa=6',
+        'apa=5', 'apá=5', 'asta=4', 'tasa=4', 'asa=3', 'tas=3', 'as=2', 'ta=2',
+      ]);
+    });
+
+    // -------------------------------------------------------------------------------------
+    // CASO 2 · LÍMITE — una letra que NO tiene ficha en la edición española
+    //
+    // El lemario trae 186 lemas con K y 44 con W (`grep -ci` sobre el fichero), y la edición
+    // española del juego no tiene ninguna de las dos fichas: la propia FAQ de la app lo dice
+    // con esas palabras («no tiene fichas K ni W, así que ninguna palabra que las lleve es
+    // jugable»). El buscador SÍ debe devolverlas —son palabras del español, y la app sirve
+    // también a Wordle y a los crucigramas—, y eso es lo que se fija aquí en positivo. Lo que
+    // hace con sus PUNTOS va en los dos tests siguientes.
+    // -------------------------------------------------------------------------------------
+    test('CASO 2 · LÍMITE · «kayak» devuelve los 5 lemas que caben, K incluida', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await buscarAtril(page, 'kayak', 2, 10);
+
+      // Oráculo: los únicos lemas que caben en {k,a,y,a,k}. «yaya» necesitaría dos íes
+      // griegas y «ayayay» tres aes y tres íes griegas: ninguno cabe.
+      await expect(page.locator('[class*="chipLema"]')).toHaveText([
+        'kayak', 'yak', 'ay', 'ka', 'ya',
+      ]);
+      // Y siguen siendo formables con las letras del atril, que es la promesa del modo.
+      for (const palabra of await page.locator('[class*="chipLema"]').allTextContents()) {
+        expect(esFormable(palabra, 'kayak'), `«${palabra}» no se forma con «kayak»`).toBe(true);
+      }
+    });
+
+    test.fail(
+      'HALLAZGO · la K y la W no tienen ficha, y la app las cuenta como 0 sin decirlo',
+      async ({ page }) => {
+        await abrirConDiccionario(page);
+        await buscarAtril(page, 'kayak', 2, 10);
+
+        // `puntuarPalabra` hace `VALORES_FICHA[ficha] ?? 0`: una letra sin ficha suma cero y
+        // el chip presenta el total como el de cualquier jugada legal. Sale KAYAK=6 (A1+Y4+A1,
+        // las dos K a cero) y, más llamativo, KA=1: una palabra de dos letras anunciada con el
+        // valor de una sola. El resumen hereda el error y encabeza el atril con «La más
+        // valiosa: 6 puntos», sobre cinco palabras que la propia FAQ declara injugables.
+        //
+        // Va con `test.fail()` mientras no esté reparado, igual que se hizo con los hallazgos
+        // 264-268: en cuanto la app deje de dar por buena esa cuenta —marcando la palabra,
+        // retirando la insignia o lo que se decida— este test pasará y Playwright avisará de
+        // que hay que quitarle la marca.
+        const chips = await chipsConPuntos(page);
+        expect(puntosDe(chips, 'kayak'), 'KAYAK no puede valer 6 sin las dos K').not.toBe('6');
+        expect(puntosDe(chips, 'ka'), 'KA no puede valer 1 con dos letras').not.toBe('1');
+      },
+    );
+
+    test.fail(
+      'HALLAZGO · gastar la ficha blanca en una K sale gratis: el mismo total con y sin ella',
+      async ({ page }) => {
+        await abrirConDiccionario(page);
+
+        // Con la K de verdad en el atril, la app da YAK = Y4+A1+K(sin ficha) = 5.
+        await buscarAtril(page, 'yak', 3, 4);
+        const conFicha = puntosDe(await chipsConPuntos(page), 'yak');
+
+        // Y poniendo esa misma K con una ficha blanca —que según la leyenda de la app rebaja
+        // la puntuación: «La blanca no suma puntos: por eso una palabra cara con blanca
+        // puntúa menos de lo que parece»— sale EL MISMO número. Contraprueba con una letra
+        // que sí tiene ficha: «casa» vale 6 con la A propia y 5 poniéndola con la blanca.
+        await buscarAtril(page, 'ya?', 3, 4);
+        const conBlanca = puntosDe(await chipsConPuntos(page), 'yak');
+
+        expect(
+          `${conFicha}|${conBlanca}`,
+          'la blanca sobre la K no descuenta nada porque la K ya valía 0',
+        ).not.toBe('5|5');
+      },
+    );
+
+    // -------------------------------------------------------------------------------------
+    // CASO 3 · RECHAZO — el verificador con un solo lado escrito
+    //
+    // Es el modo con historial de veredictos emitidos antes de tener con qué juzgar (H4 y
+    // hallazgo 265). Con un campo vacío, o con solo espacios, no hay comparación posible: la
+    // app no debe pintar NINGÚN veredicto, ni el ❌ ni el ✅. Verificado que hoy es así, y se
+    // fija como regresión junto al contraste que sí tiene respuesta.
+    // -------------------------------------------------------------------------------------
+    test('CASO 3 · RECHAZO · el verificador calla mientras falte uno de los dos textos', async ({
+      page,
+    }) => {
+      await abrirConDiccionario(page);
+      await pestana(page, /Verificar dos textos/).click();
+      const veredicto = page.locator('[class*="veredicto"]');
+
+      await page.fill('#anagram-texto-a', 'roma');
+      await expect(veredicto).toHaveCount(0); // falta la propuesta: nada que comparar
+
+      await page.fill('#anagram-texto-b', '   ');
+      await expect(veredicto).toHaveCount(0); // solo espacios: sigue faltando
+
+      // En cuanto la propuesta trae algo —aunque no sean letras— sí hay veredicto, y dice
+      // cuáles son las cuatro letras que se han quedado sin pareja.
+      await page.fill('#anagram-texto-b', '123');
+      await expect(veredicto.first()).toContainText('No son anagramas exactos');
+      await expect(veredicto.first()).toContainText(
+        'El original tiene 4 letras y la propuesta 0',
+      );
+      await expect(veredicto.first()).toContainText(
+        'Sobran en el original (faltan en la propuesta): A, M, O, R',
+      );
+
+      // Y al revés: vaciar el original vuelve a dejar la comparación sin sujeto.
+      await page.fill('#anagram-texto-a', '  ');
+      await page.fill('#anagram-texto-b', 'roma');
+      await expect(veredicto).toHaveCount(0);
+    });
+
+    // -------------------------------------------------------------------------------------
+    // RESIDUOS DE REPARACIÓN — la corrección que no viajó a la tarjeta de al lado
+    // -------------------------------------------------------------------------------------
+    test.fail(
+      'HALLAZGO · la tarjeta de palabras de 2-3 letras repite el defecto ya reparado en su vecina',
+      async ({ page }) => {
+        await page.goto(RUTA);
+        await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+        const tarjeta = page.locator('[class*="eduTipCard"]', {
+          hasText: 'Memoriza palabras de 2-3 letras',
+        });
+
+        // El hallazgo 499 quitó JOT, ZAG y QAT de «Amplía tu vocabulario pasivo» por ser
+        // léxico Collins de Scrabble en INGLÉS y no estar en el lemario de la app. La tarjeta
+        // de al lado sigue diciendo «Válidas: AX, XI, QI (si se aceptan anglicismos), OI, ID,
+        // ET»: AX, XI y ET sí están en el lemario; QI, OI e ID NO (comprobado con `grep -ix`
+        // sobre public/data/diccionario-es.txt). Quien las teclee no obtiene nada.
+        await expect(tarjeta).not.toContainText(/\bQI\b|\bOI\b|\bID\b/);
+      },
+    );
+
+    test.fail(
+      'HALLAZGO · la FAQ del anagrama perfecto cita palabras que el lemario de la app no tiene',
+      async ({ page }) => {
+        await page.goto(RUTA);
+        await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+        const faq = page.locator('details', { hasText: '¿Qué es un anagrama perfecto?' });
+
+        // «Ejemplos famosos en español: ROMA/AMOR/MORA/RAMO/OMAR, SALTA/ATLAS/TALAS,
+        // PIEDRA/PARDIE». De los nueve, cuatro no están en el lemario (OMAR, SALTA, TALAS y
+        // PARDIE) y PARDIE no es una palabra del español: es la forma anglofrancesa que
+        // admite el Scrabble inglés. Con «piedra» y longitud 6..6 la app devuelve una sola
+        // palabra, «piedra», así que la propia app desmiente su ejemplo.
+        await expect(faq).not.toContainText('PARDIE');
+      },
+    );
+  });
+
 });

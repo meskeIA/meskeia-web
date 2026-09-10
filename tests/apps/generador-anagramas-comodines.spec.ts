@@ -91,8 +91,12 @@ test.describe('generador-anagramas · fichas blancas', () => {
     const basca = page.locator('span').filter({ hasText: /^basca$/ }).first();
     await expect(basca.locator('span')).toHaveText('b');
 
-    // «casa» cabe con las fichas reales: no lleva ninguna letra resaltada
+    // «casa» cabe con las fichas reales: no lleva ninguna letra resaltada.
+    // El `toBeVisible()` no sobra: `toHaveCount(0)` sobre los hijos de un locator que no
+    // encuentra nada da 0 igualmente, así que sin esta línea el test seguiría en verde
+    // aunque «casa» hubiera desaparecido de los resultados (auditoría del 10/09/2026).
     const casa = page.locator('span').filter({ hasText: /^casa$/ }).first();
+    await expect(casa).toBeVisible();
     await expect(casa.locator('span')).toHaveCount(0);
   });
 

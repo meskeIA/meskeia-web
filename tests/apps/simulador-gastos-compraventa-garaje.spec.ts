@@ -2203,3 +2203,343 @@ test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
     expect(Array.from(new Set(niveles))).toEqual(['H3']);
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 13. INSPECCIÓN 10/09/2026 — RE-INSPECCIÓN
+//
+// La cola reabrió la app tras el refactor de motores (commit 1808419c, 10/09/2026). De todo
+// lo que esta página importa, ese commit solo tocó `lib/calculadoras/recargoPresentacionTardia.ts`
+// y solo su COMENTARIO de cabecera («Usada por: …»): ninguna constante ni fórmula cambió, y
+// los 52 tests anteriores siguen los 52 en verde.
+//
+// Tres casos nuevos, resueltos a mano ANTES de abrir el navegador, en zonas vírgenes:
+//   · CASO G (normal)   — perfil DISCAPACIDAD, el único de los cuatro sin testigo, sobre
+//                         Extremadura (escala progresiva 8/10/11 %, tampoco probada nunca).
+//   · CASO H (límite)   — la REVENTA ANTES DEL AÑO: 0 años de propiedad, el coeficiente 0,14
+//                         que el hallazgo 666 añadió a COEFICIENTES_IIVTNU_2025 el 07/09/2026
+//                         y que es el TERCERO MÁS ALTO de la tabla.
+//   · CASO I (rechazo)  — gastos de adquisición NEGATIVOS con el foco dentro del campo: no
+//                         pueden rebajar el valor de adquisición ni, por tanto, subir el IRPF.
+//
+// De dónde sale cada cifra (ninguna de memoria):
+//   · Tipo general y escala de Extremadura → `ITP_CCAA.extremadura` en `data/itp-ccaa.ts`
+//     (tipoGeneral leído de TIPOS_ITP_CCAA_2025 → { ccaa: 'Extremadura', tipo: 8 };
+//      tramos 8 % hasta 360.000, 10 % hasta 600.000, 11 % en adelante).
+//   · Tipo reducido por discapacidad de Extremadura → misma ficha, «Discapacidad (bonif. 20%)»
+//     al 6,4 %, con la condición «Vivienda habitual» que un garaje suelto no cumple.
+//   · Coeficientes de plusvalía → `COEFICIENTES_IIVTNU_2025` en `data/fiscal/inmuebles.ts`
+//     (0 años → 0,14 · 1 año → 0,13) y `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` = 25 %.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000, 21 % hasta
+//     50.000) y la fórmula del art. 35 LIRPF en `data/fiscal/ganancia-inmueble.ts`.
+//   · Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y
+//     `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, ambos con el 21 % de IVA dentro.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('INSPECCIÓN 10/09/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO G (NORMAL) — Extremadura · segunda mano · 45.000 € · perfil DISCAPACIDAD.
+   *
+   * ITP — `elegirTipoITP('extremadura', 'discapacidad', 45000, { viviendaHabitual: false })`:
+   *   el único candidato por nombre es «Discapacidad (bonif. 20%)» (6,4 %), y su condición
+   *   «Vivienda habitual» NO se cumple en un garaje suelto → cae en `noComprobables`.
+   *   Se liquida el tipo general por la escala progresiva de la comunidad:
+   *     tramo 1 (hasta 360.000, 8 %) = 45.000 × 8 % =                            3.600,000000
+   *   tipo EFECTIVO mostrado = 3.600 / 45.000 =                                       8,00 %
+   *
+   * Notaría — `calcularArancelNotarial(45000)` (RD 1426/1989, número 2):
+   *     90,15 + (30.050,61 − 6.010,12) × 0,45 % + (45.000 − 30.050,61) × 0,15 % = 220,756290
+   *     × 1,21 (IVA) =                                                              267,115111
+   *   `estimarFacturaNotarial`: min ×1,5 = 400,672666 · max ×2 = 534,230222
+   *                             medio ×1,75 =                                       467,451444
+   *
+   * Registro — `calcularRegistro(45000)` (RD 1427/1989, número 2 + REGISTRO_CONCEPTOS):
+   *     24,04 + (30.050,61 − 6.010,12) × 0,175 % + (45.000 − 30.050,61) × 0,125 % = 84,797595
+   *     + 6,010121 (presentación) + 3,005061 (nota simple) = 93,812777
+   *     × 1,21 (IVA) =                                                              113,513450
+   *
+   * Total gastos — `sumarLineasVisibles` redondea cada línea ANTES de sumar:
+   *     3.600,00 + 0 (sin AJD en segunda mano) + 467,45 + 113,51 + 300,00 =        4.480,96
+   *     % sobre el precio = 4.480,96 / 45.000 =                                        9,96 %
+   * Coste total = 45.000 + 4.480,96 =                                            49.480,96
+   */
+  test('CASO G (normal) — Extremadura, 45.000 €, perfil Discapacidad: el 6,4 % se enseña, no se cobra', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'extremadura');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '45000');
+    await page.selectOption('#select-perfil', 'discapacidad');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    expect(await valorTarjeta(page, 'Precio del garaje')).toBe('45.000,00 €');
+    // El rótulo lleva el tipo EFECTIVO, que aquí coincide con el nominal porque 45.000 €
+    // no salen del primer tramo de la escala.
+    expect(await tituloTarjeta(page, 'ITP (')).toBe('ITP (8,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('3600,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('467,45 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 400,67 € y 534,23 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('113,51 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('4480,96 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '9,96% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('49.480,96 €');
+
+    // El reducido del 6,4 % se ENSEÑA como oportunidad y no se cobra: presupuestar de menos
+    // es el error caro, y su condición «Vivienda habitual» no la cumple un garaje suelto.
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    await expect(aviso).toHaveCount(1);
+    const textoAviso = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+    expect(textoAviso).toContain('El cálculo usa el tipo general (8,00%)');
+    expect(textoAviso).toContain('En Extremadura existe');
+    expect(textoAviso).toContain('6,40% — Discapacidad (bonif. 20%)');
+    expect(textoAviso).toContain('Persona con discapacidad · Vivienda habitual');
+  });
+
+  /**
+   * CASO H (LÍMITE) — la REVENTA ANTES DEL AÑO.
+   *
+   * ❌ ABIERTO 10/09/2026 (cálculo, medio) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   *
+   * Desde el RDL 26/2021 la transmisión anterior al año SÍ tributa, y por eso
+   * `COEFICIENTES_IIVTNU_2025` tiene fila propia para «Menos de 1 año» con el coeficiente
+   * 0,14 —el tercero más alto de la tabla—, añadida el 07/09/2026 al reparar el hallazgo 666.
+   * Esta app no puede llegar a él: `min={1}` en el campo y `parseInt(aniosPropiedad) || 0`
+   * en el motor, que además usa el 0 como marca de «campo vacío».
+   *
+   * Entrada: Madrid · venta 30.000 € · compra 26.000 € · suelo catastral 5.000 € ·
+   *          0 años de propiedad · comisión 0 % · sin valor catastral total.
+   *
+   * ESPERADO (COEFICIENTES_IIVTNU_2025 → { anios: 0, coeficiente: 0.14 }):
+   *   plusvalía objetivo   = 5.000 × 0,14 × 25 % =                                175,00
+   *   valor de transmisión = 30.000 − 0 − 175 =                                29.825,00
+   *   ganancia             = 29.825 − 26.000 =                                  3.825,00
+   *   IRPF                 = 3.825 × 19 % =                                       726,75
+   *   neto                 = 30.000 − (175 + 726,75) =                        29.098,25
+   *
+   * OBTENIDO hoy: con el foco dentro, «Sin calcular — No calculada (falta los años de
+   *   propiedad)» pese a que el campo lleva un 0; al salir, el campo se fuerza a «1» y la
+   *   plusvalía sale con el coeficiente del año 1 (0,13):
+   *   162,50 € de plusvalía, 3.837,50 € de ganancia, 729,13 € de IRPF y 29.108,37 € de neto.
+   *   Se liquida DE MENOS, que es el error caro. La app hermana
+   *   `simulador-gastos-compraventa-local-comercial` ya está reparada (min={0} y el campo
+   *   vacío distinguido del 0); esta se quedó atrás.
+   */
+  test('CASO H (límite) — 0 años de propiedad: la reventa antes del año usa el coeficiente 0,14', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original del garaje', '26000');
+    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await rellenar(page, 'Valor catastral del suelo (€)', '5000');
+    await rellenar(page, 'Años de propiedad', '0');
+
+    // El 0 es un dato del usuario («lo revendí antes del año»), no un campo vacío.
+    expect(await page.locator('input[aria-label="Años de propiedad"]').inputValue()).toBe('0');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('175,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('3825,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('726,75 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.098,25 €');
+  });
+
+  /**
+   * CASO I (DEBE RECHAZARSE) — gastos de adquisición NEGATIVOS, con el foco dentro.
+   *
+   * El art. 35.1 LIRPF suma al valor de adquisición «los gastos y tributos inherentes a la
+   * adquisición SATISFECHOS por el adquirente»: un importe negativo no existe, y si se
+   * restara bajaría el valor de adquisición y SUBIRÍA el impuesto. El campo tiene `min={0}`,
+   * pero eso solo actúa al salir; mientras se teclea, quien tiene que rechazarlo es el motor
+   * (`positivo()` en `calcularGananciaInmueble`).
+   *
+   * Entrada: Madrid · venta 30.000 € · compra 20.000 € · gastos de adquisición «-3000»
+   *          (sin salir del campo) · comisión 0 % · sin datos de plusvalía.
+   *
+   * ESPERADO — el negativo se ignora:
+   *   valor de adquisición = 20.000 + 0 =                                      20.000,00
+   *   valor de transmisión = 30.000 − 0 − 0 =                                  30.000,00
+   *   ganancia             =                                                   10.000,00
+   *   IRPF = 6.000 × 19 % + 4.000 × 21 % = 1.140 + 840 =                        1.980,00
+   *   neto = 30.000 − 1.980 =                                                  28.020,00
+   *   (si el −3.000 se hubiera restado: adquisición 17.000 → ganancia 13.000 →
+   *    IRPF 2.610,00 €, o sea 630,00 € de impuesto inventado)
+   */
+  test('CASO I (debe rechazarse) — unos gastos de adquisición negativos no inflan el IRPF', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original del garaje', '20000');
+    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+
+    const campo = page.locator(
+      'input[aria-label="Impuestos y gastos que pagaste al comprarlo (€)"]',
+    );
+    await campo.fill('-3000'); // a propósito SIN blur: así lo ve quien está tecleando
+
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('20.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('30.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('10.000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1980,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('28.020,00 €');
+    // Y el neto se declara incompleto, porque la plusvalía municipal sigue sin datos.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+
+    // Al salir del campo, el valor se normaliza a 0 y nada cambia.
+    await campo.blur();
+    expect(await campo.inputValue()).toBe('0');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1980,00 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS 10/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar, así que
+// hoy fallan a propósito. Al repararlos se les quita la marca y quedan como regresión.
+//
+// Los tres son RESIDUOS DE REPARACIÓN: una corrección que llegó al motor (o a la app
+// hermana, o a la FAQ visible) y no al texto que la acompaña.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
+  /**
+   * ❌ ABIERTO (contenido, medio) — el contrafactual del ejemplo de Ana está calculado a un
+   * 19 % PLANO, que es justo el error contra el que avisa la frase.
+   *
+   * El párrafo dice: «la ganancia queda en 6.340 € y el IRPF en 1.211,40 € (19% hasta 6000 €
+   * y 21% sobre el resto), no los 1.330 € que saldrían de los 7.000 € brutos».
+   * 1.330 = 7.000 × 19 %. Con la escala que la propia frase acaba de enunciar y que el motor
+   * aplica (TRAMOS_GANANCIAS_PATRIMONIALES_2025): 6.000 × 19 % + 1.000 × 21 % = 1.350,00 €.
+   * La app lo confirma con la misma entrada y comisión 0 %.
+   */
+  test('el contrafactual del ejemplo de Ana usa la escala del ahorro, no un 19 % plano', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original del garaje', '15000');
+    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+
+    // Lo que el motor cobra por esos 7.000 € brutos que el ejemplo cita
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1350,00 €');
+
+    const ejemplo = (
+      await page.locator('p', { hasText: 'Ana compró un garaje' }).first().innerText()
+    )
+      .replace(/\s+/g, ' ')
+      .trim();
+    expect(ejemplo).toContain('1.350 €');
+    expect(ejemplo).not.toContain('1.330 €');
+  });
+
+  /**
+   * ❌ ABIERTO (contenido, medio) — la FAQ y la tabla comparativa afirman SIN EXCEPCIÓN que
+   * un garaje de obra nueva paga IVA, mientras la calculadora de la misma página dice
+   * «IGIC · No calculado» en Canarias.
+   *
+   * Es el residuo del commit d787b81b (23/08/2026, hallazgos 156 y 475): la reparación entró
+   * en el motor y en el aviso condicional, pero no en el bloque educativo ni en el FAQPage
+   * del JSON-LD, que es el canal que leen los asistentes de IA. La app hermana
+   * `simulador-gastos-compraventa-trastero` sí lo dice en texto visible.
+   */
+  test('la FAQ del IVA nombra los territorios donde no rige (IGIC/IPSI)', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.selectOption('#select-ccaa', 'canarias');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
+
+    // La calculadora ya lo hace bien: nombra el impuesto y no inventa cifra.
+    expect(await tituloTarjeta(page, 'IGIC')).toBe('IGIC');
+    expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
+
+    // Pero el texto de la misma página lo desmiente.
+    const faqIva = (
+      await page
+        .locator('h3', { hasText: 'Garaje nuevo o de segunda mano' })
+        .locator('xpath=following-sibling::p[1]')
+        .innerText()
+    )
+      .replace(/\s+/g, ' ')
+      .trim();
+    expect(faqIva).toMatch(/IGIC|IPSI/);
+
+    const filaTabla = (
+      await page.locator('td', { hasText: 'IVA obra nueva' }).locator('xpath=..').innerText()
+    )
+      .replace(/\s+/g, ' ')
+      .trim();
+    expect(filaTabla).toMatch(/IGIC|IPSI/);
+  });
+
+  /**
+   * ❌ ABIERTO (contenido, bajo) — el tipo del 25 % con el que se calcula la plusvalía se
+   * publicó en la FAQ VISIBLE (reparación del hallazgo 516, 30/08/2026) y no llegó a
+   * ninguno de los dos FAQPage del JSON-LD. Uno de ellos nombra solo el 30 % (el máximo
+   * legal), de modo que un asistente de IA responde con el tipo que la app NO aplica.
+   *
+   * Lo que el motor aplica, comprobado en la propia página:
+   *   suelo catastral 5.000 € · 10 años → COEFICIENTES_IIVTNU_2025[10] = 0,08
+   *   5.000 × 0,08 × PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25 %) = 100,00 €
+   *   (al 30 % habrían salido 120,00 €)
+   */
+  test('el 25 % con el que se calcula la plusvalía también está en el FAQPage', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original del garaje', '26000');
+    await rellenar(page, 'Años de propiedad', '10');
+    await rellenar(page, 'Valor catastral del suelo (€)', '5000');
+    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('100,00 €');
+
+    // La FAQ visible sí lo dice (hallazgo 516, reparado)
+    const faqVisible = (
+      await page
+        .locator('h3', { hasText: 'El vendedor de un garaje paga plusvalía municipal' })
+        .locator('xpath=following-sibling::p[1]')
+        .innerText()
+    )
+      .replace(/\s+/g, ' ')
+      .trim();
+    expect(faqVisible).toContain('25%');
+
+    // Y los dos FAQPage del JSON-LD deberían decir lo mismo
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const respuestas: string[] = [];
+    for (const bruto of bloques) {
+      const json = JSON.parse(bruto);
+      const grafo: Record<string, unknown>[] = Array.isArray(json['@graph'])
+        ? json['@graph']
+        : [json];
+      for (const nodo of grafo) {
+        if (nodo['@type'] !== 'FAQPage') continue;
+        const preguntas = nodo.mainEntity as {
+          name: string;
+          acceptedAnswer: { text: string };
+        }[];
+        const q = preguntas.find((p) => /plusval[ií]a municipal/i.test(p.name));
+        if (q) respuestas.push(q.acceptedAnswer.text);
+      }
+    }
+    expect(respuestas.length).toBe(2);
+    for (const texto of respuestas) expect(texto).toContain('25%');
+  });
+});
