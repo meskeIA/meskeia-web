@@ -319,8 +319,14 @@ Cuando se crean **3 o más apps** en una misma sesión, usar agentes en paralelo
 ```
 1. Crear/actualizar data/fiscal/*.ts si se necesitan datos normativos
 2. Actualizar data/fiscal/index.ts con el nuevo export
-3. Verificar que compila: npx tsc --noEmit data/fiscal/index.ts
+3. Verificar que compila: npm run check:tipos
 ```
+
+⚠️ Aquí decía `npx tsc --noEmit data/fiscal/index.ts`, y **devolvía siempre error** (código 2)
+aunque el código estuviese perfecto: pasarle un fichero hace que tsc ignore el `tsconfig.json`,
+así que el alias `@/lib/formatters` no resuelve y encima entra en conflicto un tipo de
+`@types/dom-webcodecs`. Es el caso simétrico del validador ciego del 14/08 (§TypeScript): uno
+decía siempre «0 errores» sin mirar y este siempre «error» sin que lo haya. Medido el 10/09/2026.
 
 **Fase paralela (agentes crean apps):**
 
