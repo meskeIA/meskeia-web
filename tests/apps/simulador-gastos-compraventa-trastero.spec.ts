@@ -1899,12 +1899,14 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '12000');
     await rellenar(page, 'Comisión inmobiliaria (%)', '4');
     await rellenar(page, 'Gestoría y certificados del vendedor (€)', '350');
-    // Sin blur: el min={1} de NumberInput aún no ha corregido el valor.
+    // Sin blur: el min del NumberInput (0 desde el hallazgo 682) aún no ha corregido el valor.
     const anios = page.locator('input[aria-label="Años de propiedad"]');
     await anios.fill('-5');
 
     // La plusvalía NO se calcula, y no se calcula con el coeficiente de 1 año (0,13), que
-    // habría dado 5.000 × 0,13 × 25 % = 162,50 €.
+    // habría dado 5.000 × 0,13 × 25 % = 162,50 €. Tampoco con el de «menos de 1 año» (0,14):
+    // un año negativo se RECHAZA, no se acota a 0. Acotarlo lo convertiría en una reventa
+    // antes del año y liquidaría un impuesto a partir de un dato imposible.
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('años de propiedad');
 
@@ -2307,7 +2309,10 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
 //       (comisión 3 % por defecto)
 //       → esperado plusvalía 140,00 € (4.000 × 0,14 × 25 %) y neto 13.952,10 €
 //       → obtenido plusvalía 130,00 € (4.000 × 0,13 × 25 %) y neto 13.960,20 €
-test.fail(
+// REPARADO el 10/09/2026 (hallazgo 682): los años se leen del STRING —el «0» explícito ya no
+// se confunde con el campo vacío— y el NumberInput baja a `min={0}`, así que el blur deja de
+// reescribir el 0 a «1».
+test(
   'ABIERTO (cálculo) — la reventa antes del año liquida con el coeficiente de 1 año',
   async ({ page }) => {
     await page.goto(RUTA);

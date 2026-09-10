@@ -261,9 +261,14 @@ export default function SimuladorLocalComercialPage() {
     // valían 0, así que el 0 explícito desactivaba la plusvalía y ese 0 se propagaba como
     // un cero real: no minoraba el valor de transmisión, subía la ganancia y el neto se
     // daba por firme (hallazgo 666 del Inspector, 07/09/2026).
+    // Un año NEGATIVO se rechaza, no se acota a 0: acotarlo lo convertiría en una reventa
+    // antes del año y liquidaría un impuesto a partir de un dato imposible. Aquí se acotaba
+    // con Math.max(0, …), que era inofensivo mientras el 0 desactivaba la plusvalía y dejó
+    // de serlo en cuanto el 0 pasó a ser un dato válido (10/09/2026, al propagar esta misma
+    // reparación a garaje, trastero y al hub del clúster, donde sus tests sí lo exigían).
     const aniosTexto = aniosPropiedad.trim();
-    const anios = aniosTexto === '' ? NaN : Math.max(0, Math.trunc(parseSpanishNumber(aniosTexto)));
-    const aniosDisponibles = Number.isFinite(anios);
+    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
+    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 

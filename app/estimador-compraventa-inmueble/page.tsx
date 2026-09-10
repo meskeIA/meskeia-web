@@ -29,7 +29,7 @@ import {
   sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
-import { HORQUILLA_GASTOS_COMPRAVENTA, GESTORIA_TIPICA } from './metadata';
+import { HORQUILLA_GASTOS_COMPRAVENTA, GESTORIA_TIPICA, HORQUILLA_GESTORIA } from './metadata';
 
 // ===== TIPOS =====
 type TipoInmueble = 'vivienda' | 'garaje' | 'trastero' | 'local' | 'nave' | 'terreno';
@@ -63,6 +63,39 @@ const EJEMPLO_OBRA_NUEVA: { ccaa: ComunidadAutonoma; precio: number } = {
 };
 const EJEMPLO_OBRA_NUEVA_IVA = EJEMPLO_OBRA_NUEVA.precio * (IVA_INMUEBLES_2025.obraNueva / 100);
 const EJEMPLO_OBRA_NUEVA_AJD = calcularAJD(EJEMPLO_OBRA_NUEVA.precio, EJEMPLO_OBRA_NUEVA.ccaa);
+
+/**
+ * El caso de Marta, por la misma vía que el de Carlos: DEL MOTOR, no de la memoria.
+ *
+ * Sus tres partidas iban tecleadas a mano y el total no sumaba su propio desglose —«unos
+ * 1.193 € en notaría (685 €), registro (209 €) y gestoría (300 €)», cuando 685 + 209 + 300
+ * son 1.194 €—. Es la familia del hallazgo 594, que la calculadora ya cerró con
+ * `sumarLineasVisibles` (cada línea se redondea ANTES de sumarse, que es como las ve el
+ * usuario) y que no había llegado al bloque educativo. Al ir a mano, además, un cambio en
+ * FACTURA_NOTARIAL o en REGISTRO_CONCEPTOS las dejaba obsoletas en silencio: el hallazgo
+ * 584 otra vez (hallazgo 675 del Inspector).
+ *
+ * Aquí las líneas se redondean al EURO y no al céntimo como en `sumarLineasVisibles`,
+ * porque este bloque las escribe con `eurosEnteros`: el principio es el mismo —el total
+ * suma lo que el lector tiene delante— y la unidad es la que se enseña.
+ */
+const EJEMPLO_MARTA: { ccaa: ComunidadAutonoma; precio: number } = {
+  ccaa: 'andalucia',
+  precio: 140000,
+};
+const EJEMPLO_MARTA_NOTARIA = Math.round(calcularNotario(EJEMPLO_MARTA.precio));
+const EJEMPLO_MARTA_REGISTRO = Math.round(calcularRegistro(EJEMPLO_MARTA.precio));
+const EJEMPLO_MARTA_GESTORIA = Math.round(GESTORIA_TIPICA);
+const EJEMPLO_MARTA_GASTOS =
+  EJEMPLO_MARTA_NOTARIA + EJEMPLO_MARTA_REGISTRO + EJEMPLO_MARTA_GESTORIA;
+/** El tipo de jóvenes y el general salen de ITP_CCAA, por el mismo motivo que el arancel. */
+const EJEMPLO_MARTA_TIPO_GENERAL = ITP_CCAA[EJEMPLO_MARTA.ccaa].tipoGeneral;
+const EJEMPLO_MARTA_TIPO_JOVEN =
+  ITP_CCAA[EJEMPLO_MARTA.ccaa].tiposReducidos?.find((t) => t.nombre.includes('Jóvenes'))?.tipo
+  ?? EJEMPLO_MARTA_TIPO_GENERAL;
+const EJEMPLO_MARTA_ITP = EJEMPLO_MARTA.precio * (EJEMPLO_MARTA_TIPO_JOVEN / 100);
+const EJEMPLO_MARTA_AHORRO =
+  EJEMPLO_MARTA.precio * ((EJEMPLO_MARTA_TIPO_GENERAL - EJEMPLO_MARTA_TIPO_JOVEN) / 100);
 
 // Inmuebles que pueden optar a tipos reducidos de ITP (solo residenciales)
 const INMUEBLES_RESIDENCIALES: TipoInmueble[] = ['vivienda', 'garaje', 'trastero'];
@@ -274,7 +307,19 @@ export default function SimuladorCompraventaPage() {
       } else {
         // IVA desde data/fiscal, no desde un literal: así un cambio de tipo llega aquí
         tipoImpuesto = 'IVA';
-        porcentaje = esResidencial ? IVA_INMUEBLES_2025.obraNueva : IVA_INMUEBLES_2025.local;
+        // Cada rama lee SU constante, aunque hoy dos valgan lo mismo. La vivienda tributa
+        // por `obraNueva` y el anejo —garaje de hasta dos plazas y trastero transmitidos
+        // con ella— por `anejoVinculado` (art. 91.Uno.1.7º LIVA), que es la que ya usan las
+        // apps de garaje y trastero y lib/calculadoras/gastosCompraInmueble.ts desde el
+        // hallazgo 641. Aquí la rama del anejo se calculaba con la constante de la VIVIENDA:
+        // ninguna cifra salía mal porque ambas valen 10, pero existen separadas justamente
+        // para poder divergir, y el día que lo hicieran esta app se quedaba atrás sin que
+        // nada avisara (hallazgo 674 del Inspector).
+        porcentaje = tipoInmueble === 'vivienda'
+          ? IVA_INMUEBLES_2025.obraNueva
+          : esResidencial
+            ? IVA_INMUEBLES_2025.anejoVinculado
+            : IVA_INMUEBLES_2025.local;
         impuesto = precio * (porcentaje / 100);
       }
     } else {
@@ -344,7 +389,20 @@ export default function SimuladorCompraventaPage() {
   const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
     const precioV = parseSpanishNumber(precioVenta);
     const precioC = parseSpanishNumber(precioCompraOriginal);
-    const anios = parseInt(aniosPropiedad) || 0;
+    // Los años se leen del STRING, no del número: «0» es un dato VÁLIDO —el inmueble
+    // revendido antes de cumplir el año, que tributa con el coeficiente de «Menos de 1
+    // año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más alto de la tabla)— y lo que
+    // impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
+    // valían 0: el 0 explícito dejaba la plusvalía «Sin calcular» y fuera del neto, y en
+    // cuanto el blur del NumberInput reescribía el campo a «1» por su min={1} se liquidaba
+    // con el coeficiente del año 1 (0,13), es decir DE MENOS. Los dos caminos infravaloran
+    // un impuesto del vendedor (hallazgo 672 del Inspector; este hub del clúster se quedó
+    // fuera de la reparación que ya tienen local-comercial, garaje y trastero).
+    // Un año NEGATIVO no se acota a 0: se rechaza. Acotarlo lo convertiría en una reventa
+    // antes del año y liquidaría un impuesto a partir de un dato imposible.
+    const aniosTexto = aniosPropiedad.trim();
+    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
+    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
@@ -364,7 +422,7 @@ export default function SimuladorCompraventaPage() {
     let plusvalia = 0;
     let metodoPlusvalia = 'No calculada';
     let exentoPlusvalia = false;
-    const plusvaliaCalculada = valorSuelo > 0 && anios > 0 && precioC > 0;
+    const plusvaliaCalculada = valorSuelo > 0 && aniosDisponibles && precioC > 0;
 
     if (plusvaliaCalculada) {
       const resultadoPlusvalia = calcularPlusvaliaMunicipal({
@@ -450,15 +508,15 @@ export default function SimuladorCompraventaPage() {
       // NaN <= 0 es false — el mismo bug que el propio hallazgo 512 venía a cerrar.
       faltaPrecioCompra: !(precioC > 0),
       faltaValorSuelo: !(valorSuelo > 0),
-      faltaAnios: !(anios > 0),
+      faltaAnios: !aniosDisponibles,
     };
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
 
   /**
    * Estima los impuestos y gastos que el vendedor pagó al comprar el inmueble, para
    * que no tenga que buscarlos en una escritura de hace años. Usa el mismo motor que
-   * la pestaña Comprador (ITP del tipo general de la CCAA + notaría + registro),
-   * aplicado sobre el precio de compra original.
+   * la pestaña Comprador (ITP del tipo general de la CCAA + notaría + registro +
+   * gestoría), aplicado sobre el precio de compra original.
    */
   const estimarGastosAdquisicion = () => {
     const precioC = parseSpanishNumber(precioCompraOriginal);
@@ -474,7 +532,13 @@ export default function SimuladorCompraventaPage() {
     // el mismo precio. No se aplican tipos reducidos a propósito: es una estimación de
     // lo que se pagó hace años, y el perfil del comprador de entonces no se pregunta.
     const itp = calcularITP(precioC, ccaa);
-    const estimado = itp + calcularNotario(precioC) + calcularRegistro(precioC);
+    // Las CUATRO partidas que enumera el rótulo del campo que se rellena («ITP o IVA,
+    // notaría, registro y gestoría de aquella compra»). La gestoría faltaba: la pestaña
+    // Comprador de esta misma app la suma para el mismo precio (GESTORIA_TIPICA), así que
+    // el botón se quedaba corto en el valor de ADQUISICIÓN, y quedarse corto ahí infla la
+    // ganancia y el IRPF — la dirección contra la que avisa la cabecera de
+    // data/fiscal/ganancia-inmueble.ts (hallazgo 673 del Inspector).
+    const estimado = itp + calcularNotario(precioC) + calcularRegistro(precioC) + GESTORIA_TIPICA;
     setGastosAdquisicion(formatNumber(estimado, 0));
   };
 
@@ -732,7 +796,7 @@ export default function SimuladorCompraventaPage() {
               onChange={setGastosGestoria}
               label="Gastos de gestoría del comprador (€)"
               placeholder={String(GESTORIA_TIPICA)}
-              helperText="Típico: 200-400€ (tramitación de escrituras)"
+              helperText={`Típico: entre ${eurosEnteros(HORQUILLA_GESTORIA.min)} y ${eurosEnteros(HORQUILLA_GESTORIA.max)} (tramitación de escrituras)`}
               min={0}
             />
           </div>
@@ -953,8 +1017,8 @@ export default function SimuladorCompraventaPage() {
                   onChange={setAniosPropiedad}
                   label="Años de propiedad"
                   placeholder="10"
-                  helperText="Desde la compra hasta ahora"
-                  min={1}
+                  helperText="Años completos desde la compra hasta ahora. Escribe 0 si vendes antes de cumplir el año: esa reventa también tributa, y con un coeficiente mayor."
+                  min={0}
                   max={50}
                 />
 
@@ -1378,7 +1442,7 @@ export default function SimuladorCompraventaPage() {
           <ul>
             <li><strong>Notaría:</strong> entre {eurosOrientativos(HORQUILLA_FEDATARIOS.notaria.min)} y {eurosOrientativos(HORQUILLA_FEDATARIOS.notaria.max)} para viviendas de {eurosEnteros(BANDA_PRECIO_VIVIENDA.min)} a {eurosEnteros(BANDA_PRECIO_VIVIENDA.max)}, IVA incluido</li>
             <li><strong>Registro:</strong> entre {eurosOrientativos(HORQUILLA_FEDATARIOS.registro.min)} y {eurosOrientativos(HORQUILLA_FEDATARIOS.registro.max)} en esa misma banda, IVA incluido</li>
-            <li><strong>Gestoría:</strong> Opcional, entre 200€ y 400€ (tramitación de documentos)</li>
+            <li><strong>Gestoría:</strong> Opcional, entre {eurosEnteros(HORQUILLA_GESTORIA.min)} y {eurosEnteros(HORQUILLA_GESTORIA.max)} (tramitación de documentos)</li>
           </ul>
         </section>
 
@@ -1452,11 +1516,12 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji} aria-hidden="true">🏠</span>
                 <span className={styles.casoTag}>Comprador primera vivienda</span>
               </div>
-              <p>Marta, 29 años, compra su primera vivienda habitual de segunda mano en Andalucía por
-              140.000 €. Al ser menor de 35 años y no superar los 150.000 €, se aplica el tipo
-              reducido de ITP del 3,5% (4.900 €) en lugar del tipo general del 7%. Además paga
-              unos 1.193 € en notaría (685 €), registro (209 €) y gestoría (300 €).</p>
-              <div className={styles.casoResultado}>Ahorra 4.900 € frente al tipo general del 7%</div>
+              <p>Marta, 29 años, compra su primera vivienda habitual de segunda mano en {ITP_CCAA[EJEMPLO_MARTA.ccaa].nombre} por
+              {' '}{eurosEnteros(EJEMPLO_MARTA.precio)}. Al ser menor de 35 años y no superar los 150.000 €, se aplica el tipo
+              reducido de ITP del {formatTipoNominal(EJEMPLO_MARTA_TIPO_JOVEN)}% ({eurosEnteros(EJEMPLO_MARTA_ITP)}) en lugar del tipo general
+              del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%. Además paga
+              unos {eurosEnteros(EJEMPLO_MARTA_GASTOS)} en notaría ({eurosEnteros(EJEMPLO_MARTA_NOTARIA)}), registro ({eurosEnteros(EJEMPLO_MARTA_REGISTRO)}) y gestoría ({eurosEnteros(EJEMPLO_MARTA_GESTORIA)}).</p>
+              <div className={styles.casoResultado}>Ahorra {eurosEnteros(EJEMPLO_MARTA_AHORRO)} frente al tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -1539,7 +1604,7 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.faqItem}>
               <h4>¿La gestoría es obligatoria en la compraventa?</h4>
               <p>No es obligatoria por ley, pero los bancos suelen exigirla cuando hay hipoteca para asegurarse
-              de que la documentación se tramita correctamente. Su coste oscila entre 200 € y 400 €.
+              de que la documentación se tramita correctamente. Su coste oscila entre {eurosEnteros(HORQUILLA_GESTORIA.min)} y {eurosEnteros(HORQUILLA_GESTORIA.max)}.
               Sin hipoteca, puedes presentar los impuestos directamente o contratar una gestoría por comodidad.</p>
             </div>
           </div>

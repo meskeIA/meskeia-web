@@ -223,10 +223,15 @@
   font-size: 1.1rem;
 }
 
+/* --primary-texto y no --primary: el azul de MARCA (#2E86AB) se queda en 3,93:1 sobre la
+   tarjeta en tema claro, por debajo del 4,5:1 que pide la WCAG 2.1 AA para texto normal.
+   El token de globals.css existe precisamente para esto (#26718F, 5,47:1 sobre blanco) y
+   en oscuro resuelve al mismo #3FA5D1 que ya se usaba, así que allí nada cambia
+   (hallazgo 683 del Inspector). */
 .infoCcaaNombre {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoCcaaGrid {
@@ -255,10 +260,12 @@
   font-weight: 500;
 }
 
+/* Las tres cifras del recuadro (ITP general, AJD e IVA/IGIC): mismo motivo que
+   .infoCcaaNombre — 4,11:1 sobre el blanco de la tarjeta con --primary. */
 .infoCcaaValue {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoCcaaNote {
@@ -290,9 +297,12 @@
   padding-top: 0.25rem;
 }
 
+/* El único enlace de la herramienta: 4,11:1 con --primary, y un enlace es justo el texto
+   que hay que poder leer (hallazgo 683). El borde del :hover sigue en --primary porque
+   es decoración, no texto. */
 .catastroLink {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -377,6 +387,24 @@
 
 [data-theme='dark'] .celdaNo {
   color: #FF9A8C;
+}
+
+/* La QUINTA celda con color propio de esta tabla —el 21 % del IVA de la nave, que es la
+   cifra que la tabla existe para dar— se quedó fuera de la reparación del hallazgo 648:
+   seguía con `color: 'var(--primary)'` en línea y fallaba en LOS DOS temas (3,77:1 en claro
+   sobre #F5F5F5 y 4,20:1 en oscuro sobre #383838). Con 14,4 px y peso 700 no es «texto
+   grande» —la WCAG pide ≥18,66 px en negrita—, así que el umbral son 4,5:1 en ambos.
+   Medido contra los dos fondos que la tabla llega a tener en cada tema, igual que sus
+   hermanas de arriba (hallazgo 684):
+     · claro:  #26718F → 5,01:1 sobre #F5F5F5 y 5,24:1 sobre #FAFAFA
+     · oscuro: #6BC5EC → 6,04:1 sobre #383838 y 8,97:1 sobre #1A1A1A */
+.celdaCifra {
+  color: #26718F;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .celdaCifra {
+  color: #6BC5EC;
 }
 
 /* ===== WARNING BOX ===== */

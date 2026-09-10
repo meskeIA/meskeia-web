@@ -389,7 +389,12 @@ export default function SimuladorNaveIndustrialPage() {
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{formatNumber(datosCcaaActual.ajd, 2)}%</span>
+                {/* formatTipoNominal, como el ITP General de la línea de al lado desde el
+                    hallazgo 331 y como el bloque educativo desde el 651: un tipo NOMINAL no
+                    lleva los decimales que no tiene. Este era el último de la página al que
+                    se le forzaban dos, mientras la tabla comparativa de la misma página ya
+                    escribía ese rango sin ellos (hallazgo 685). */}
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>
@@ -590,7 +595,7 @@ export default function SimuladorNaveIndustrialPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>IVA obra nueva</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>{formatNumber(IVA_INMUEBLES_2025.local, 0)}%</td>
+                  <td className={styles.celdaCifra} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.local, 0)}%</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>

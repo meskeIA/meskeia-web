@@ -360,8 +360,17 @@ test('REGRESIÓN (contenido) — el ejemplo de venta cuadra con lo que calcula e
 
   await page.getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i }).click();
   const ejemplo = await texto(page, /Ana compró un garaje por 15.000/);
-  expect(ejemplo).toContain('6.340 €');
-  expect(ejemplo).toContain('1.211,40 €');
+  // Las cifras del ejemplo se derivan del MISMO motor desde el 10/09/2026 (hallazgo 669),
+  // así que salen con el formateador canónico y coinciden LITERALMENTE con las tarjetas de
+  // arriba. Antes iban escritas a mano y agrupaban el millar de cuatro cifras («6.340 €»)
+  // donde la tarjeta no lo agrupa («6340,00 €»): la misma página daba dos formatos.
+  expect(ejemplo).toContain('6340 €');
+  expect(ejemplo).toContain('1211,40 €');
+  // El contrafactual —el error que el párrafo desmonta— tributaba los 7.000 € brutos a un
+  // 19 % PLANO (1.330 €), que es exactamente el error contra el que avisa. Con la escala del
+  // ahorro son 6.000×19 % + 1.000×21 % = 1.350,00 €, lo que la app calcula para esos datos.
+  expect(ejemplo).toContain('1350,00 €');
+  expect(ejemplo).not.toContain('1330');
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -476,7 +485,12 @@ test.describe('MITAD A — los hallazgos reparados siguen reparados (27/08/2026)
   //     «0.75%» de AJD en Madrid), en formato estadounidense.
   // 37: el tipo efectivo del título se redondeaba a UN decimal y dejaba de cuadrar con el
   //     importe de debajo: «ITP (7,8%) — 1.937,50 €», cuando 25.000 × 7,8 % = 1.950 €.
-  // Esperado: panel «7,75%» y «1,50%»; título «ITP (7,75%)» con 25.000 × 7,75 % = 1.937,50 €.
+  // Esperado: panel «7,75%» y «1,5%»; título «ITP (7,75%)» con 25.000 × 7,75 % = 1.937,50 €.
+  //
+  // El AJD pasó de «1,50%» a «1,5%» el 10/09/2026 (hallazgo 685): un tipo NOMINAL se escribe
+  // con `formatTipoNominal`, sin decimales que no tiene, igual que el ITP General de la línea
+  // de al lado desde el hallazgo 331. Lo que este caso vigila —que no salga formato inglés y
+  // que el tipo del título cuadre con su importe— sigue vigilándolo igual.
   test('36 y 37 · Murcia: porcentajes en formato español y con los decimales que cuadran', async ({
     page,
   }) => {
@@ -485,7 +499,7 @@ test.describe('MITAD A — los hallazgos reparados siguen reparados (27/08/2026)
     await rellenar(page, 'Precio del garaje / plaza de parking', '25000');
 
     expect(await valorPanelCcaa(page, 'ITP General')).toBe('7,75%');
-    expect(await valorPanelCcaa(page, 'AJD')).toBe('1,50%');
+    expect(await valorPanelCcaa(page, 'AJD')).toBe('1,5%');
     expect(await valorTarjeta(page, 'ITP (7,75%)')).toBe('1937,50 €');
     // 25.000 × 7,75 % = 1.937,50 exactos: el título y el importe dicen lo mismo.
     expect(25000 * 0.0775).toBeCloseTo(1937.5, 2);
@@ -1685,18 +1699,33 @@ test.describe('INSPECCIÓN 02/09/2026 — los tres casos, resueltos a mano antes
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
     await expect(page.getByText('No definido')).toHaveCount(0);
 
-    // (b) Al salir del campo, el mínimo declarado (1 año) y su coeficiente de 0,13
+    // (b) Al salir del campo, el mínimo declarado y su coeficiente.
+    //
+    // Desde el 10/09/2026 (hallazgo 668) ese mínimo es 0 y no 1: el 0 es un dato VÁLIDO —la
+    // reventa antes de cumplir el año, que desde el RDL 26/2021 tributa con el coeficiente
+    // más alto de la tabla— y lo que impide calcular es el campo vacío. Así que el blur
+    // acota el −3 a «0» y liquida la reventa antes del año, que es lo que el campo ENSEÑA:
+    //   plusvalía objetiva = 4.000 × 0,14 × 25 % =                                 140,00
+    //   (la real sería (30.000 − 20.000) × 4.000/12.000 × 25 % = 833,33 → gana la objetiva)
+    //   transmisión = 30.000 − 900 de comisión − 140 =                          28.960,00
+    //   ganancia = 28.960 − 20.000 =                                             8.960,00
+    //   IRPF = 6.000×19 % + 2.960×21 % = 1.140 + 621,60 =                        1.761,60
+    //   total gastos = 140 + 900 + 1.761,60 =                                    2.801,60
+    //   neto = 30.000 − 2.801,60 =                                              27.198,40
+    //
+    // Lo que este caso vigila sigue intacto: con el dato imposible EN el campo no se liquida
+    // nada (parte a), y lo que se liquida después se corresponde con lo que el campo muestra.
     await anios.blur();
-    await expect(anios).toHaveValue('1');
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('130,00 €');
+    await expect(anios).toHaveValue('0');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('140,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
       'Método objetivo (más favorable)',
     );
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('28.970,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('8970,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1763,70 €');
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2793,70 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.206,30 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('28.960,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('8960,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1761,60 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2801,60 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.198,40 €');
   });
 });
 
@@ -2331,10 +2360,11 @@ test.describe('INSPECCIÓN 10/09/2026 — los tres casos, resueltos a mano antes
    *   `simulador-gastos-compraventa-local-comercial` ya está reparada (min={0} y el campo
    *   vacío distinguido del 0); esta se quedó atrás.
    */
+  // REPARADO el 10/09/2026 (hallazgo 668): los años se leen del STRING —el «0» explícito ya
+  // no se confunde con el campo vacío— y el NumberInput baja a `min={0}`.
   test('CASO H (límite) — 0 años de propiedad: la reventa antes del año usa el coeficiente 0,14', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'madrid');
     await rellenar(page, 'Precio del garaje / plaza de parking', '30000');
@@ -2455,8 +2485,9 @@ test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
    * del JSON-LD, que es el canal que leen los asistentes de IA. La app hermana
    * `simulador-gastos-compraventa-trastero` sí lo dice en texto visible.
    */
+  // REPARADO el 10/09/2026 (hallazgo 670): la excepción territorial entra en la FAQ visible,
+  // en la tabla comparativa y en los dos FAQPage del JSON-LD.
   test('la FAQ del IVA nombra los territorios donde no rige (IGIC/IPSI)', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Primera mano/ }).click();
     await page.selectOption('#select-ccaa', 'canarias');
@@ -2496,10 +2527,11 @@ test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
    *   5.000 × 0,08 × PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25 %) = 100,00 €
    *   (al 30 % habrían salido 120,00 €)
    */
+  // REPARADO el 10/09/2026 (hallazgo 671): los dos FAQPage publican el tipo orientativo que
+  // la calculadora APLICA, no solo el máximo legal.
   test('el 25 % con el que se calcula la plusvalía también está en el FAQPage', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'madrid');
     await rellenar(page, 'Precio del garaje / plaza de parking', '30000');

@@ -115,6 +115,33 @@ interface ResultadosVendedor {
 const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
 const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
 
+/**
+ * El ejemplo de Ana, derivado del MISMO motor que ejecuta la app.
+ *
+ * Su contrafactual —«no los 1.330 € que saldrían de los 7.000 € brutos»— estaba calculado
+ * a un 19 % PLANO, que es exactamente el error contra el que avisa la frase y contradice la
+ * escala que ella misma enuncia dos palabras antes: con TRAMOS_GANANCIAS_PATRIMONIALES_2025
+ * son 6.000 × 19 % + 1.000 × 21 % = 1.350,00 €, que es además lo que la tarjeta de al lado
+ * de la calculadora marca para esos mismos datos (hallazgo 669 del Inspector).
+ *
+ * Derivarlo, y no solo corregir el número, evita que vuelva a desincronizarse cuando cambien
+ * los tramos del ahorro.
+ */
+const EJEMPLO_ANA = { compra: 15000, venta: 22000, comisionPct: 3 };
+const EJEMPLO_ANA_COMISION = EJEMPLO_ANA.venta * (EJEMPLO_ANA.comisionPct / 100);
+const EJEMPLO_ANA_BRUTO = EJEMPLO_ANA.venta - EJEMPLO_ANA.compra;
+/** Lo que de verdad tributa: el art. 35 LIRPF resta los gastos del valor de transmisión. */
+const EJEMPLO_ANA_REAL = calcularGananciaInmueble({
+  precioVenta: EJEMPLO_ANA.venta,
+  precioCompra: EJEMPLO_ANA.compra,
+  gastosTransmision: EJEMPLO_ANA_COMISION,
+});
+/** El error que el párrafo desmonta: tributar la diferencia bruta, sin restar gastos. */
+const EJEMPLO_ANA_BRUTO_IRPF = calcularGananciaInmueble({
+  precioVenta: EJEMPLO_ANA.venta,
+  precioCompra: EJEMPLO_ANA.compra,
+}).cuotaIRPF;
+
 const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'andalucia', label: 'Andalucía' },
   { value: 'aragon', label: 'Aragón' },
@@ -247,7 +274,20 @@ export default function SimuladorGarajeCompraventaPage() {
   const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
     const precioV = parseSpanishNumber(precioGaraje);
     const precioC = parseSpanishNumber(precioCompraOriginal);
-    const anios = parseInt(aniosPropiedad) || 0;
+    // Los años se leen del STRING, no del número: «0» es un dato VÁLIDO —el garaje
+    // revendido antes de cumplir el año, que tributa con el coeficiente de «Menos de 1
+    // año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más alto de la tabla)— y lo que
+    // impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
+    // valían 0: el 0 explícito desactivaba la plusvalía y, en cuanto el blur del
+    // NumberInput reescribía el campo a «1» por su min={1}, se liquidaba con el
+    // coeficiente del año 1 (0,13), es decir DE MENOS (hallazgo 668 del Inspector;
+    // mismo patrón ya reparado en local-comercial y trastero).
+    // Un año NEGATIVO no se acota a 0: se rechaza, como venía haciéndose. Acotarlo lo
+    // convertiría en una reventa antes del año y liquidaría un impuesto a partir de un dato
+    // imposible, que es justo lo que el CASO C de esta app exige que no pase.
+    const aniosTexto = aniosPropiedad.trim();
+    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
+    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
@@ -269,7 +309,7 @@ export default function SimuladorGarajeCompraventaPage() {
     // campo que ya tenía relleno (Inspector, hallazgo 437).
     const faltan = [
       valorSuelo > 0 ? null : 'el valor catastral del suelo',
-      anios > 0 ? null : 'los años de propiedad',
+      aniosDisponibles ? null : 'los años de propiedad',
       precioC > 0 ? null : 'el precio de compra original',
     ].filter((x): x is string => x !== null);
     let metodoPlusvalia = `No calculada (falta ${faltan.join(', ')})`;
@@ -508,7 +548,10 @@ export default function SimuladorGarajeCompraventaPage() {
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{formatNumber(datosCcaaActual.ajd, 2)}%</span>
+                {/* formatTipoNominal, igual que el ITP General de al lado. El hallazgo 685
+                    lo levantó en nave-industrial y nombra a garaje como la otra app del
+                    clúster que seguía forzando dos decimales a un tipo nominal. */}
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
               </div>
             </div>
             {datosCcaaActual.tramosProgresivos && (
@@ -760,8 +803,8 @@ export default function SimuladorGarajeCompraventaPage() {
                   onChange={setAniosPropiedad}
                   label="Años de propiedad"
                   placeholder="8"
-                  helperText="Desde la compra hasta la venta actual"
-                  min={1}
+                  helperText="Años completos desde la compra hasta la venta actual. Escribe 0 si vendes antes de cumplir el año: esa reventa también tributa, y con un coeficiente mayor."
+                  min={0}
                   max={50}
                 />
                 <NumberInput
@@ -966,7 +1009,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     en 2.750 € un garaje de 25.000 €, y presupuestar de menos es el error caro. */}
                 <tr>
                   <td>IVA obra nueva</td>
-                  <td>{formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% con la vivienda · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% independiente</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% con la vivienda · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% independiente<br /><small>(IGIC/IPSI en Canarias, Ceuta y Melilla)</small></td>
                   <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% (residencial)</td>
                 </tr>
                 <tr>
@@ -1030,7 +1073,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>💸</span>
                 <span className={styles.casoTag}>Vender garaje con ganancia</span>
               </div>
-              <p>Ana compró un garaje por 15.000 € hace 10 años y lo vende por 22.000 €. La diferencia bruta son 7.000 €, pero no es la base que tributa: el art. 35 LIRPF resta del valor de transmisión los gastos que paga el vendedor. Con la comisión del 3% que trae el simulador (660 €), sin plusvalía municipal y sin declarar los gastos de aquella compra, la ganancia queda en 6.340 € y el IRPF en 1.211,40 € ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)} y {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}% sobre el resto), no los 1.330 € que saldrían de los 7.000 € brutos. Si además hay plusvalía municipal, o Ana declara los impuestos y gastos que pagó al comprarlo, la ganancia baja todavía más.</p>
+              <p>Ana compró un garaje por {eurosEnteros(EJEMPLO_ANA.compra)} hace 10 años y lo vende por {eurosEnteros(EJEMPLO_ANA.venta)}. La diferencia bruta son {eurosEnteros(EJEMPLO_ANA_BRUTO)}, pero no es la base que tributa: el art. 35 LIRPF resta del valor de transmisión los gastos que paga el vendedor. Con la comisión del {formatTipoNominal(EJEMPLO_ANA.comisionPct)}% que trae el simulador ({eurosEnteros(EJEMPLO_ANA_COMISION)}), sin plusvalía municipal y sin declarar los gastos de aquella compra, la ganancia queda en {eurosEnteros(EJEMPLO_ANA_REAL.ganancia)} y el IRPF en {formatCurrency(EJEMPLO_ANA_REAL.cuotaIRPF)} ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)} y {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}% sobre el resto), no los {formatCurrency(EJEMPLO_ANA_BRUTO_IRPF)} que saldrían de los {eurosEnteros(EJEMPLO_ANA_BRUTO)} brutos. Si además hay plusvalía municipal, o Ana declara los impuestos y gastos que pagó al comprarlo, la ganancia baja todavía más.</p>
               <div className={styles.casoResultado}>Ganancia tributa: IRPF ahorro + plusvalía municipal</div>
             </div>
             <div className={styles.casoCard}>
@@ -1060,7 +1103,12 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Garaje nuevo o de segunda mano: qué impuesto se paga?</h3>
-              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
+              {/* La excepción territorial va aquí y no solo en el aviso condicional de la
+                  calculadora: la reparación de los hallazgos 156 y 475 entró en el motor y en
+                  el aviso, pero ni en el bloque educativo ni en el FAQPage, así que la página
+                  afirmaba sin matiz que un garaje nuevo paga IVA mientras la tarjeta de arriba
+                  contestaba «IGIC — No calculado» en Canarias (hallazgo 670). */}
+              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% si se adquiere de forma independiente o en un edificio de uso no residencial. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador no calcula ahí el impuesto de la primera transmisión. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿El vendedor de un garaje paga plusvalía municipal?</h3>

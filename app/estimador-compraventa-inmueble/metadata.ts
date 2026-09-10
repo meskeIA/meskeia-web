@@ -58,6 +58,22 @@ const techoDe = (id: keyof typeof ITP_CCAA) =>
 export const GESTORIA_TIPICA = 300;
 
 /**
+ * Horquilla de la gestoría, en una sola boca.
+ *
+ * La misma cifra se escribía de CUATRO formas distintas en la página —«200-400€»,
+ * «200€ y 400€», «200 € y 400 €» y «(200-400 €)»— y dos de ellas incumplían el formato
+ * español de moneda del CLAUDE.md global §2, que exige espacio antes del símbolo. La
+ * página se contradecía consigo misma en la manera de imprimir el mismo dato (hallazgo
+ * 676 del Inspector). Ahora las cuatro salen de aquí, así que no pueden divergir ni en
+ * el valor ni en el formato.
+ */
+export const HORQUILLA_GESTORIA = { min: 200, max: 400 };
+
+/** «200 € y 400 €» — la horquilla ya formateada, para intercalar en prosa. */
+export const gestoriaEnTexto = () =>
+  `${HORQUILLA_GESTORIA.min.toLocaleString('es-ES')} € y ${HORQUILLA_GESTORIA.max.toLocaleString('es-ES')} €`;
+
+/**
  * Cuánto hay que sumar al precio por gastos e impuestos — DERIVADO del mismo motor que
  * ejecuta la calculadora, nunca escrito a mano.
  *
@@ -217,7 +233,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿La gestoría es obligatoria en la compraventa?',
-      answer: 'No es obligatoria por ley, pero los bancos suelen exigirla cuando hay hipoteca para asegurarse de que la documentación se tramita correctamente. Su coste oscila entre 200 € y 400 €. Sin hipoteca, puedes presentar los impuestos directamente o contratar una gestoría por comodidad.',
+      answer: `No es obligatoria por ley, pero los bancos suelen exigirla cuando hay hipoteca para asegurarse de que la documentación se tramita correctamente. Su coste oscila entre ${gestoriaEnTexto()}. Sin hipoteca, puedes presentar los impuestos directamente o contratar una gestoría por comodidad.`,
     },
   ],
 });
@@ -241,7 +257,7 @@ export const faqJsonLd = {
       name: '¿Qué gastos tiene el comprador al adquirir una vivienda en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El comprador asume habitualmente: el ITP (segunda mano) o IVA + AJD (obra nueva), los gastos de notaría (entre ${euros(HORQUILLA.notaria.min)} y ${euros(HORQUILLA.notaria.max)} para viviendas de ${euros(BANDA_PRECIO_VIVIENDA.min)} a ${euros(BANDA_PRECIO_VIVIENDA.max)}), los gastos de inscripción en el Registro de la Propiedad (entre ${euros(HORQUILLA.registro.min)} y ${euros(HORQUILLA.registro.max)} en esa misma banda), y opcionalmente la gestoría (200-400 €). En total, los gastos de compraventa representan entre el ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} y el ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio de compra, según la comunidad autónoma, el importe de la operación y si es obra nueva o segunda mano.`,
+        text: `El comprador asume habitualmente: el ITP (segunda mano) o IVA + AJD (obra nueva), los gastos de notaría (entre ${euros(HORQUILLA.notaria.min)} y ${euros(HORQUILLA.notaria.max)} para viviendas de ${euros(BANDA_PRECIO_VIVIENDA.min)} a ${euros(BANDA_PRECIO_VIVIENDA.max)}), los gastos de inscripción en el Registro de la Propiedad (entre ${euros(HORQUILLA.registro.min)} y ${euros(HORQUILLA.registro.max)} en esa misma banda), y opcionalmente la gestoría (entre ${gestoriaEnTexto()}). En total, los gastos de compraventa representan entre el ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} y el ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio de compra, según la comunidad autónoma, el importe de la operación y si es obra nueva o segunda mano.`,
       },
     },
     {

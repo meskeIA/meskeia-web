@@ -315,7 +315,21 @@ export default function SimuladorTrasteroCompraventaPage() {
   const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
     const precioV = parseSpanishNumber(precioVenta);
     const precioC = parseSpanishNumber(precioCompraOriginal);
-    const anios = parseInt(aniosPropiedad) || 0;
+    // Los años se leen del STRING, no del número: «0» es un dato VÁLIDO —el trastero
+    // revendido antes de cumplir el año, que desde el RDL 26/2021 sí tributa y lo hace con
+    // el coeficiente de «Menos de 1 año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más
+    // alto de la tabla)— y lo que impide calcular es el campo VACÍO. Con
+    // `parseInt(aniosPropiedad) || 0` los dos valían 0: el 0 explícito desactivaba la
+    // plusvalía y, en cuanto el blur del NumberInput reescribía el campo a «1» por su
+    // min={1}, se liquidaba con el coeficiente del año 1 (0,13), es decir DE MENOS, y el
+    // error se propagaba al art. 35 LIRPF porque la plusvalía resta del valor de
+    // transmisión (hallazgo 682 del Inspector; patrón ya reparado en local-comercial).
+    // Un año NEGATIVO no se acota a 0: se rechaza, como venía haciéndose (CASO 19 de esta
+    // app). Acotarlo lo convertiría en una reventa antes del año y liquidaría un impuesto a
+    // partir de un dato imposible.
+    const aniosTexto = aniosPropiedad.trim();
+    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
+    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
@@ -341,7 +355,7 @@ export default function SimuladorTrasteroCompraventaPage() {
     // hallazgo 638).
     const camposFaltantes: CampoQueFalta[] = [
       valorSuelo > 0 ? null : { texto: 'el valor catastral del suelo', plural: false },
-      anios > 0 ? null : { texto: 'los años de propiedad', plural: true },
+      aniosDisponibles ? null : { texto: 'los años de propiedad', plural: true },
       precioC > 0 ? null : { texto: 'el precio de compra original', plural: false },
     ].filter((x): x is CampoQueFalta => x !== null);
     const faltan = camposFaltantes.map(c => c.texto);
@@ -827,8 +841,8 @@ export default function SimuladorTrasteroCompraventaPage() {
                   onChange={setAniosPropiedad}
                   label="Años de propiedad"
                   placeholder="5"
-                  helperText="Desde la compra hasta ahora"
-                  min={1}
+                  helperText="Años completos desde la compra hasta ahora. Escribe 0 si vendes antes de cumplir el año: esa reventa también tributa, y con un coeficiente mayor."
+                  min={0}
                   max={50}
                 />
 

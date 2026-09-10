@@ -2356,8 +2356,12 @@ test.describe('Hallazgos abiertos — 10/09/2026', () => {
    * `Footer`, `LegalNotice`, `MeskeiaLogo` y una quincena de apps. Esta no.
    *
    * En OSCURO no ocurre: allí `--primary` ya resuelve a #3FA5D1 y las tres pasan.
+   *
+   * REPARADO el 10/09/2026: las tres clases pasan a `--primary-texto`, el token que el
+   * proyecto tiene justo para esto. En oscuro resuelve al mismo #3FA5D1 que ya usaban, así
+   * que allí no cambia nada. Queda como regresión, sin `test.fail()`.
    */
-  test.fail('HALLAZGO 1 — el azul de marca como texto no llega a 4,5:1 en tema claro', async ({ page }) => {
+  test('HALLAZGO 1 — el azul de marca como texto no llega a 4,5:1 en tema claro', async ({ page }) => {
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'ceuta');
     await rellenar(page, PRECIO, '500000');
@@ -2383,8 +2387,12 @@ test.describe('Hallazgos abiertos — 10/09/2026', () => {
    * Con 14,4 px y peso 700 no es «texto grande» (la WCAG pide ≥18,66 px en negrita), así que
    * el umbral es 4,5:1 en los dos temas. Y es la cifra que la tabla existe para dar: el 21 %
    * que separa una nave de una vivienda.
+   *
+   * REPARADO el 10/09/2026 con `.celdaCifra`, la quinta clase de esta tabla, medida contra
+   * sus dos fondos en cada tema igual que sus hermanas: #26718F → 5,01:1 sobre #F5F5F5 y
+   * 5,24:1 sobre #FAFAFA · #6BC5EC → 6,04:1 sobre #383838 y 8,97:1 sobre #1A1A1A.
    */
-  test.fail('HALLAZGO 2 — la celda del IVA de la tabla comparativa no llega a 4,5:1 en ningún tema', async ({ page }) => {
+  test('HALLAZGO 2 — la celda del IVA de la tabla comparativa no llega a 4,5:1 en ningún tema', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado, pero un elemento con
     // `display: none` no tiene color computado útil: se despliega para medirlo.

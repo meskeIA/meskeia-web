@@ -227,16 +227,21 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     //            = 11.766,77 → redondeado a 11.767 (el campo muestra «11.767»)
     //   Cifras revisadas el 27/08/2026: desde el 20/08 calcularNotario devuelve la FACTURA
     //   (arancel 421,6044 × 1,75) y calcularRegistro suma presentación y nota simple.
-    //   valor de adquisición = 180.000 + 11.767 = 191.767
+    //   Desde el 10/09/2026 (hallazgo 673) el botón suma también la GESTORÍA de aquella
+    //   compra, que es la cuarta partida que enumera el rótulo del campo que rellena y que la
+    //   pestaña Comprador ya sumaba para el mismo precio (GESTORIA_TIPICA = 300). Faltaba, y
+    //   quedarse corto en el valor de ADQUISICIÓN infla la ganancia y el IRPF.
+    //   estimación = 11.766,77 + 300 = 12.066,77 → el campo muestra «12.067»
+    //   valor de adquisición = 180.000 + 12.067 = 192.067
     //   valor de transmisión = 250.000 − 7.500 de comisión − 1.250 de plusvalía = 241.250
-    //   (la gestoría de 300 € la paga el COMPRADOR y ya no resta aquí: art. 35.1 LIRPF,
-    //    reparado el 21/08/2026)
-    //   ganancia = 241.250 − 191.767 = 49.483
-    //   IRPF = 6.000×19 % + 43.483×21 % = 1.140 + 9.131,43 = 10.271,43
+    //   (la gestoría de la VENTA la paga el comprador y no resta aquí: art. 35.1 LIRPF,
+    //    reparado el 21/08/2026 — es otra partida distinta de la de la compra de entonces)
+    //   ganancia = 241.250 − 192.067 = 49.183
+    //   IRPF = 6.000×19 % + 43.183×21 % = 1.140 + 9.068,43 = 10.208,43
     // Antes de la corrección daba: adquisición 180.011,44 € · ganancia 60.938,56 € · IRPF 12.895,87 €
-    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('191.767,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('49.483,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('10.271,43 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('192.067,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('49.183,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('10.208,43 €');
   });
 
   // ✅ CORREGIDO el 14/08/2026 — con el perfil «Joven (< 35 años)» la app
@@ -467,23 +472,26 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
 
     // ITP de 1.000.000 € en Cataluña con la escala de ITP_CCAA.cataluna (la misma que el
     // CASO 2 exige en la pestaña Comprador): 600.000×10 % + 300.000×11 % + 100.000×12 %
-    // = 105.000. Más notaría 821,15 y registro 467,44 → 106.288,59, que el botón redondea
-    // a «106.289». Obtenido hoy: «101.289» (ITP plano del 10 %, 5.000 € menos).
+    // = 105.000. Más notaría, registro y —desde el 10/09/2026, hallazgo 673— la GESTORÍA de
+    // 300 € que el rótulo del campo enumera y el botón no sumaba.
+    // Obtenido antes de la reparación de la escala: «101.289» (ITP plano del 10 %, 5.000 €
+    // menos); antes de la de la gestoría: «106.915», 300 € menos.
     await expect(
       page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]'),
-    ).toHaveValue('106.915');
+    ).toHaveValue('107.215');
 
     // Consecuencia en cadena, con la plusvalía municipal fuera (sin valor catastral no se calcula):
     //   adquisición = 1.000.000 + 106.289 = 1.106.289
     //   transmisión = 1.200.000 − 36.000 de comisión = 1.164.000 (la gestoría es del
     //                 comprador: art. 35.1 LIRPF, reparado el 21/08/2026)
-    //   ganancia    = 1.164.000 − 1.106.915 = 57.085
-    //   IRPF        = 6.000×19 % + 44.000×21 % + 7.085×23 % = 1.140 + 9.240 + 1.629,55
-    // Obtenido hoy: adquisición 1.101.289,00 € · ganancia 62.411,00 € · IRPF 13.234,53 €,
-    // es decir 1.150,00 € de IRPF de más.
-    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('1.106.915,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('57.085,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('12.009,55 €');
+    //   adquisición = 1.000.000 + 107.215 = 1.107.215
+    //   ganancia    = 1.164.000 − 1.107.215 = 56.785
+    //   IRPF        = 6.000×19 % + 44.000×21 % + 6.785×23 % = 1.140 + 9.240 + 1.560,55
+    // Obtenido antes de la reparación: adquisición 1.101.289,00 € · ganancia 62.411,00 € ·
+    // IRPF 13.234,53 €, es decir 1.150,00 € de IRPF de más.
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('1.107.215,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('56.785,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('11.940,55 €');
   });
 
   // ⚠️ HALLAZGO ABIERTO (Inspector, 16/08/2026) — accesibilidad.
@@ -733,13 +741,17 @@ test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('4,35%');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('146.093,46 €');
 
-    // Contraste con el texto publicado: 684,60 → «685 €», 208,86 → «209 €» y
-    // 684,60 + 208,86 + 300 = 1.193,46 → «unos 1.193 €». Si el motor y la tarjeta educativa
-    // vuelven a separarse —que es exactamente lo que se reparó el 20/08— salta aquí.
+    // Contraste con el texto publicado. Desde el 10/09/2026 (hallazgo 675) las tres partidas
+    // y su total salen del MISMO arancel que la calculadora, y el total suma exactamente las
+    // líneas que el propio párrafo enseña: 684,60 → «685 €», 208,86 → «209 €», gestoría
+    // 300 € y total 685 + 209 + 300 = 1.194 €. Antes iba tecleado y publicaba «unos 1.193 €»,
+    // que no es la suma de su propio desglose (la familia del hallazgo 594).
+    // Formato: es-ES no agrupa los millares de un número de cuatro cifras, igual que en las
+    // tarjetas de arriba — antes el texto sí lo agrupaba porque estaba escrito a mano.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const marta = page.getByText(/Marta, 29 años/).first();
-    await expect(marta).toContainText(/3,5%\s*\(4\.900\s*€\)/);
-    await expect(marta).toContainText(/1\.193\s*€ en notaría \(685\s*€\), registro \(209\s*€\)/);
+    await expect(marta).toContainText(/3,5%\s*\(4900\s*€\)/);
+    await expect(marta).toContainText(/1194\s*€ en notaría \(685\s*€\), registro \(209\s*€\), y gestoría \(300\s*€\)|1194\s*€ en notaría \(685\s*€\), registro \(209\s*€\) y gestoría \(300\s*€\)/);
   });
 
   test('CASO C (debe rechazarse) — un precio de 0 € no puede producir impuesto ni total', async ({
@@ -1731,10 +1743,11 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
     // 180.000 × 6 % (ITP_CCAA.madrid.tipoGeneral) = 10.800
     //   + notaría 737,808  (arancel 421,604343 × 1,75)
     //   + registro 228,957 (arancel 180,212064 + 9,015182, con el 21 % de IVA)
-    //   = 11.766,765 → formatNumber(…, 0) = «11.767»
+    //   + gestoría 300 (GESTORIA_TIPICA, la cuarta partida del rótulo — hallazgo 673)
+    //   = 12.066,765 → formatNumber(…, 0) = «12.067»
     await expect(
       page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]'),
-    ).toHaveValue('11.767');
+    ).toHaveValue('12.067');
   });
 
   // ✅ REPARADO el 02/09/2026 (hallazgo 581) — el bloque educativo escribía a mano el tipo con el que
@@ -2454,7 +2467,7 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
    *     IRPF 19.361,50 € · total 30.311,50 € · neto 269.688,50 €
    *     (y sin salir del campo: «Sin calcular», con el neto rotulado INCOMPLETO)
    */
-  test.fail(
+  test(
     'CASO 34 (límite) — 0 años de tenencia: la reventa antes del año tributa con el coeficiente 0,14',
     async ({ page }) => {
       await page.goto(RUTA);
@@ -2539,7 +2552,7 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
    * Caso: garaje de 30.000 €, Madrid, primera mano → IVA 3.000,00 € leyendo `obraNueva`
    * (esperado: la misma cifra, pero leída de `anejoVinculado`).
    */
-  test.fail(
+  test(
     'HALLAZGO — el IVA del anejo debe salir de anejoVinculado, no de obraNueva',
     async ({ page }) => {
       await page.goto(RUTA);
@@ -2581,7 +2594,7 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
    *   Gestoría (GESTORIA_TIPICA)                   =    300,00 €
    *   Esperado (las cuatro líneas del rótulo) = 19.295  ·  Obtenido = 18.995
    */
-  test.fail(
+  test(
     'HALLAZGO — «Estimar por mí» omite la gestoría que su propio rótulo incluye',
     async ({ page }) => {
       await page.goto(RUTA);
@@ -2616,8 +2629,19 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
    * (`HORQUILLA_FEDATARIOS`, `EJEMPLO_OBRA_NUEVA_AJD`…), así que un cambio en
    * FACTURA_NOTARIAL o en REGISTRO_CONCEPTOS las deja obsoletas en silencio — el hallazgo
    * 584 otra vez.
+   *
+   * REPARADO el 10/09/2026: las tres partidas salen de `calcularNotario` / `calcularRegistro`
+   * / `GESTORIA_TIPICA` y el total es su suma, redondeando cada línea al EURO —que es la
+   * unidad en la que este bloque las escribe— por el mismo criterio con el que
+   * `sumarLineasVisibles` redondea al céntimo en la calculadora. De paso, el ITP y el ahorro
+   * pasan a derivarse de `ITP_CCAA`.
+   *
+   * Al derivarse, el total se escribe con el formateador canónico y `es-ES` NO agrupa el
+   * millar de un número de cuatro cifras: «1194 €», igual que las tarjetas de la propia
+   * calculadora («6093,46 €», «1937,50 €»). Antes ponía el punto porque estaba tecleado a
+   * mano, y era la única cifra de la página que lo hacía.
    */
-  test.fail(
+  test(
     'HALLAZGO — el caso «Marta» del bloque educativo no suma su propio desglose',
     async ({ page }) => {
       await page.goto(RUTA);
@@ -2630,8 +2654,16 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
       expect(texto).toContain('notaría (685 €)');
       expect(texto).toContain('registro (209 €)');
       expect(texto).toContain('gestoría (300 €)');
-      // …y el total tiene que ser su suma
-      expect(texto).toContain('unos 1.194 €');
+      // …y el total tiene que ser su suma, escrita como la escribe el formateador del proyecto
+      expect(texto).toContain('unos 1194 €');
+      // La prueba de fondo, independiente del formato: el total ES la suma del desglose.
+      // Solo el tramo que va del total a su punto final — antes está el ITP, que no es una
+      // de las partidas que ese total suma.
+      const desglose = texto.match(/unos (\d+) € en (.+?)\./);
+      expect(desglose, 'la frase del total y su desglose').not.toBeNull();
+      const partidas = [...desglose![2].matchAll(/\((\d+) €\)/g)].map((m) => Number(m[1]));
+      expect(partidas).toHaveLength(3);
+      expect(partidas.reduce((a, b) => a + b, 0)).toBe(Number(desglose![1]));
     },
   );
 
@@ -2646,7 +2678,7 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
    *   · «Su coste oscila entre 200 € y 400 €»            — FAQ visible  ✔ correcto
    *   · «opcionalmente la gestoría (200-400 €)»          — FAQPage del JSON-LD  ✔ correcto
    */
-  test.fail(
+  test(
     'HALLAZGO — la horquilla de gestoría va sin espacio antes del € en dos de sus cuatro bocas',
     async ({ page }) => {
       await page.goto(RUTA);

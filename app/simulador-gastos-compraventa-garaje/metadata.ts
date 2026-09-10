@@ -78,11 +78,15 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Garaje nuevo o de segunda mano: qué impuesto se paga?',
-      answer: `Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del ${formatNumber(RANGO_AJD.min, 0)}% al ${formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del ${IVA_INMUEBLES_2025.anejoVinculado}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del ${IVA_INMUEBLES_2025.garaje}% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.`,
+      answer: `Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del ${formatNumber(RANGO_AJD.min, 0)}% al ${formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del ${IVA_INMUEBLES_2025.anejoVinculado}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del ${IVA_INMUEBLES_2025.garaje}% si se adquiere de forma independiente o en un edificio de uso no residencial. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.`,
     },
     {
       question: '¿El vendedor de un garaje paga plusvalía municipal?',
-      answer: 'Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida.',
+      // El tipo que la calculadora APLICA (el orientativo del 25 %) se publicó en la FAQ
+      // visible al reparar el hallazgo 516 y no llegó a ninguno de los dos FAQPage: uno
+      // nombraba solo el 30 %, el máximo legal, así que un asistente de IA respondía con el
+      // tipo que la app NO usa, un 20 % por encima (hallazgo 671).
+      answer: `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`,
     },
     {
       question: '¿Existen tipos reducidos de ITP para garajes?',
@@ -118,7 +122,7 @@ export const faqJsonLd = {
       name: '¿Garaje nuevo o de segunda mano: qué impuesto se paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del ${formatNumber(RANGO_AJD.min, 0)}% al ${formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del ${IVA_INMUEBLES_2025.anejoVinculado}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del ${IVA_INMUEBLES_2025.garaje}% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.`,
+        text: `Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del ${formatNumber(RANGO_AJD.min, 0)}% al ${formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del ${IVA_INMUEBLES_2025.anejoVinculado}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del ${IVA_INMUEBLES_2025.garaje}% si se adquiere de forma independiente o en un edificio de uso no residencial. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.`,
       },
     },
     {
@@ -126,7 +130,7 @@ export const faqJsonLd = {
       name: '¿El vendedor de un garaje paga plusvalía municipal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. El tipo lo fija cada ayuntamiento hasta el máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`,
+        text: `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; el tipo lo fija cada ayuntamiento hasta el máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`,
       },
     },
     {
