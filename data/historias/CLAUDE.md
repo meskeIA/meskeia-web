@@ -12,7 +12,7 @@ Catálogo cerrado (2026-05-09) con ~170 archivos en `data/historias/` — la lis
 
 **Fase paralela** (N agentes, uno por historia — no tocan archivos compartidos):
 - Cada agente crea SOLO `data/historias/[slug].ts`
-- Verifica con `npx tsc --noEmit` una vez y termina
+- Verifica con `npm run check:tipos` una vez y termina (NO `npx tsc --noEmit`: ciego a secas, y con un fichero concreto falla siempre por ignorar el `tsconfig.json`)
 - PROHIBIDO en agentes: `npm run build`, modificar index.ts, applications.ts, etc.
 
 **Fase secuencial** (director de proyecto después de que todos los agentes terminan):
