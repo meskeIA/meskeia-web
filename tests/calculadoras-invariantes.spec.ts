@@ -90,7 +90,12 @@ import { calcularIIVTNU } from '../lib/calculadoras/iivtnuPlusvaliaMunicipal';
 import { calcularImpuestoPatrimonio } from '../lib/calculadoras/impuestoPatrimonio';
 import { calcularImpuestosDivorcio } from '../lib/calculadoras/impuestosDivorcio';
 import { calcularIRPFSegundoPagador } from '../lib/calculadoras/irpfSegundoPagador';
-import { calcularLegitimas, type RegimenId } from '../lib/calculadoras/legitimas';
+import {
+  calcularLegitimas,
+  REGIMENES_INFO,
+  REGIMENES_VALIDOS,
+  type RegimenId,
+} from '../lib/calculadoras/legitimas';
 import { calcularRetencionDividendos } from '../lib/calculadoras/retencionDividendos';
 import { TRAMOS_IRPF_2025, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025 } from '../data/fiscal/irpf';
 import { DEDUCCIONES_IRPF_DISCAPACIDAD_2025 } from '../data/fiscal/dependencia';
@@ -3918,5 +3923,246 @@ test.describe('Motores 09/09 — retención de dividendos: la escala del ahorro 
     expect(soc.cuotaImpuesto).toBe(100000 * TIPOS_IS_2025.general / 100);
     const pf = calcularRetencionDividendos({ tipoReceptor: 'persona_fisica_residente', dividendoBruto: 100000 });
     expect(pf.retencionPracticada).toBe(100000 * RETENCIONES_IS_2025.dividendos / 100);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UNIFICACIÓN APP ↔ MOTOR — 10/09/2026
+//
+// La pasada del 09/09 dejó escrito que la causa raíz de sus once críticos no era que los
+// motores estuvieran mal escritos, sino que CADA CÁLCULO ESTABA ESCRITO DOS VECES —una en el
+// motor que lee un LLM y otra inline en la app que ve la persona— y solo se miraba una.
+//
+// El 10/09 se retiraron las cinco copias inline nombradas en el acta: `estimador-legitimas`,
+// `impuestos-divorcio`, `estimacion-deduccion-discapacidad`, `estimacion-deduccion-maternidad` y
+// `orientador-impuesto-patrimonio`. Las cinco apps importan ahora su motor.
+//
+// Lo que sigue clava los valores en los que la web y la API DIVERGÍAN cuando esas dos copias
+// convivían. No son casos inventados para la ocasión: cada uno es una cifra que meskeIA publicaba
+// de dos maneras distintas según se preguntase por el navegador o por un LLM. Si alguien vuelve a
+// escribir el cálculo en la app, estos son los números que tendrá que reproducir.
+//
+// ⚠️ Un test en verde no prueba nada hasta releer lo que AFIRMA. El 09/09 dos tests escritos esa
+// misma mañana consagraban errores, y se cazaron leyéndolos, no mirando el color. Cada afirmación
+// de aquí abajo lleva el artículo que la sostiene.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Unificación 10/09 — legítimas: la web publicaba otra cifra que la API', () => {
+  test('Baleares: el corte está en CUATRO hijos, no en uno (art. 42 Compilació)', () => {
+    // La copia inline de `app/estimador-legitimas` cortaba en `numHijos === 1 ? 1/3 : 1/2`. El
+    // art. 42 de la Compilació —y el 79 para Eivissa— reserva 1/3 «si fueren CUATRO O MENOS de
+    // cuatro, y la mitad si excedieren de este número». Con 200.000 € y 2 hijos la web decía
+    // 100.000 € y la API 66.666,67 €: 33.333,33 € de diferencia sobre la misma herencia.
+    const PN = 200000;
+    for (const n of [1, 2, 3, 4]) {
+      const res = calcularLegitimas({ patrimonioNeto: PN, regimen: 'baleares', numHijos: n });
+      expect(res.legitimaTotal, `${n} hijo(s): 1/3 hasta cuatro`).toBe(66666.67);
+      expect(res.fraccionLegitima).toContain('1/3');
+    }
+    // El quinto hijo es el que cambia la fracción, y es el único punto donde debe cambiar.
+    expect(calcularLegitimas({ patrimonioNeto: PN, regimen: 'baleares', numHijos: 5 }).legitimaTotal).toBe(100000);
+  });
+
+  test('el usufructo viudal balear y el vasco son de LA MITAD, no universales', () => {
+    // La copia inline atribuía al viudo el patrimonio ENTERO en País Vasco («usufructo universal
+    // de todos los bienes») y la legítima en Baleares bajo el rótulo «usufructo universal».
+    // Art. 45 de la Compilació (Ley 7/2017) y art. 52 de la Ley 5/2015 vasca: en concurrencia
+    // con descendientes, el usufructo alcanza la MITAD del haber.
+    const PN = 300000;
+    for (const regimen of ['baleares', 'pais-vasco'] as const) {
+      const res = calcularLegitimas({ patrimonioNeto: PN, regimen, numHijos: 2, tieneConyuge: true });
+      expect(res.derechoConyuge, `${regimen}: la mitad del haber`).toBe(150000);
+      // «Universal» es la palabra que delataba el defecto: no puede volver a aparecer aquí.
+      expect(res.descripcionDerechoConyuge.toLowerCase()).not.toContain('universal');
+    }
+  });
+
+  test('los textos normativos del selector salen del motor, no de una copia', () => {
+    // La tabla de regímenes de la app afirmaba que «en Menorca rige el Derecho Común», y el
+    // art. 65 de la Compilació le extiende el régimen de Mallorca. Ahora la ficha de cada
+    // régimen se exporta desde el motor: `REGIMENES_INFO`. Este candado exige que siga estando
+    // completa —siete regímenes con nombre, CCAA y norma— porque es lo que la app enseña.
+    expect(REGIMENES_VALIDOS).toHaveLength(7);
+    for (const id of REGIMENES_VALIDOS) {
+      const info = REGIMENES_INFO[id];
+      expect(info.nombre.length, `${id}: nombre`).toBeGreaterThan(0);
+      expect(info.ccaas.length, `${id}: CCAA`).toBeGreaterThan(0);
+      expect(info.fuente.length, `${id}: norma`).toBeGreaterThan(0);
+    }
+    // Y que no reaparezca la afirmación falsa sobre Menorca por ninguna de sus dos vías.
+    const balear = calcularLegitimas({ patrimonioNeto: 100000, regimen: 'baleares', numHijos: 2, tieneConyuge: true });
+    const textoBalear = [balear.descripcionDerechoConyuge, ...balear.notas].join(' ');
+    expect(textoBalear).not.toMatch(/Menorca[^.]*Derecho Común/i);
+  });
+});
+
+test.describe('Unificación 10/09 — divorcio: el validador que la copia no replicó', () => {
+  test('sin decir quién paga la hipoteca, el bloque NO se emite', () => {
+    // Es el caso que motivó el «TODO: unificar»: el motor era el único de los cuatro bloques con
+    // `if/else`, y ese `else` se tragaba el `undefined` afirmando que se perdía una deducción de
+    // hasta 1.356 €/año sin que nadie hubiera dicho quién paga. La app lo impedía con
+    // `pasoValido()`; ahora la regla vive una sola vez, aquí.
+    const sinDecir = calcularImpuestosDivorcio({
+      regimen: 'gananciales', ingresos: 30000, tieneHipotecaAntigua: true,
+    });
+    expect(sinDecir.hipoteca).toBeUndefined();
+
+    // Con el discriminante presente sí se emite, en los dos sentidos.
+    const meQuedo = calcularImpuestosDivorcio({
+      regimen: 'gananciales', ingresos: 30000, tieneHipotecaAntigua: true,
+      posHipoteca: 'me-quedo', cuotaHipoteca: 6000,
+    });
+    expect(meQuedo.hipoteca).toEqual({ deduccionAnual: 900, tipo: 'mantiene' }); // 6.000 × 15 %
+    const otroPaga = calcularImpuestosDivorcio({
+      regimen: 'gananciales', ingresos: 30000, tieneHipotecaAntigua: true, posHipoteca: 'otro-paga',
+    });
+    expect(otroPaga.hipoteca).toEqual({ deduccionAnual: 0, tipo: 'pierde' });
+  });
+
+  test('el tope de la deducción de vivienda son 9.040 € de base, no de cuota', () => {
+    // Con una cuota muy por encima del tope, la deducción se clava en 9.040 × 15 % = 1.356 €.
+    // Es el techo que la app anunciaba y que ahora se comprueba en un solo sitio.
+    const res = calcularImpuestosDivorcio({
+      regimen: 'separacion', ingresos: 60000, tieneHipotecaAntigua: true,
+      posHipoteca: 'me-quedo', cuotaHipoteca: 50000,
+    });
+    expect(res.hipoteca?.deduccionAnual).toBe(1356);
+  });
+
+  test('faltando la MAGNITUD con el discriminante puesto, se rechaza en vez de callar', () => {
+    // La regla uniforme de los cuatro bloques: falta el discriminante → no se emite; falta la
+    // magnitud → se rechaza nombrando el campo. Callar omitiría hasta 2.584 €/año en silencio.
+    expect(() => calcularImpuestosDivorcio({
+      regimen: 'gananciales', ingresos: 30000, tieneHijos: true, custodia: 'exclusiva-tengo',
+    })).toThrow(/numHijos/);
+    expect(() => calcularImpuestosDivorcio({
+      regimen: 'gananciales', ingresos: 30000, tienePensionConyuge: true, rolPension: 'pago',
+    })).toThrow(/pensionMensual/);
+    // Y los ingresos negativos, que la app rechazaba y el motor aceptaba sin protestar.
+    expect(() => calcularImpuestosDivorcio({ regimen: 'gananciales', ingresos: -1000 })).toThrow();
+  });
+});
+
+test.describe('Unificación 10/09 — deducciones de IRPF por discapacidad y maternidad', () => {
+  test('discapacidad ≥65 %: los 3.000 € no dependen de acreditar ayuda de terceros', () => {
+    // Los tres supuestos del art. 60 LIRPF son ALTERNATIVOS y el tercero es el propio grado
+    // ≥65 %. Esta era la regla que el motor tenía mal y la APP tenía bien: al unificar hay que
+    // conservar la versión de la app, no la del motor. Son 3.000 € de mínimo.
+    const sinAcreditar = calcularDeduccionDiscapacidadIRPF({
+      titular: 'ascendiente', grado: '65oMas', necesitaAsistencia: false, tipoMarginal: 37,
+    });
+    expect(sinAcreditar.gastosAsistencia).toBe(3000);
+    expect(sinAcreditar.totalMinimo).toBe(12000);
+    expect(sinAcreditar.ahorroEstimado).toBeCloseTo(4440, 2);
+
+    // Con grado 33-64 % la acreditación SÍ es condición necesaria: ahí el incremento no procede.
+    const grado33 = calcularDeduccionDiscapacidadIRPF({
+      titular: 'ascendiente', grado: '33a65', necesitaAsistencia: false, tipoMarginal: 37,
+    });
+    expect(grado33.gastosAsistencia).toBe(0);
+  });
+
+  test('maternidad: el tope de guardería es POR HIJO — aquí tenía razón la app', () => {
+    // Divergencia demostrada el 09/09 y resuelta contra el Manual práctico Renta 2025, «Límites
+    // de la deducción»: el incremento «no podrá superar PARA CADA HIJO» los 1.000 €. El motor lo
+    // aplicaba al agregado y perdía 1.000 € por cada hijo adicional; la app lo hacía bien.
+    const tresHijos = calcularDeduccionMaternidadIRPF({
+      situacion: 'alta',
+      cotizacionesSSTotalesAnio: 99999,
+      hijos: [0, 0, 0].map(() => ({
+        edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 2500,
+      })),
+    });
+    expect(tresHijos.totalIncrementoGuarderia).toBe(3000); // 1.000 × 3, no 1.000 en total
+  });
+
+  test('maternidad: sin ninguna de las tres vías del art. 81.1 la deducción es 0', () => {
+    // El defecto era del signo contrario al que uno esperaría: la falta de derecho se convertía
+    // en AUSENCIA de límite y se cobraba el máximo. Sin derecho no hay deducción ni guardería.
+    const sinDerecho = calcularDeduccionMaternidadIRPF({
+      situacion: 'ninguna',
+      cotizacionesSSTotalesAnio: 0,
+      hijos: [{ edadMesesInicioEjercicio: 12, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 3000 }],
+    });
+    expect(sinDerecho.tieneDerecho).toBe(false);
+    expect(sinDerecho.totalDeduccionEfectiva).toBe(0);
+    expect(sinDerecho.limiteMaternidadCotizaciones).toBe(0);
+  });
+
+  test('CUADRE: las líneas por hijo suman EXACTAMENTE el total publicado', () => {
+    // El descuadre llegó a ser de 4.800 € porque el detalle publicaba la deducción bruta y el
+    // total la efectiva. Se barre el reparto en céntimos, que es donde 1.000/3 producía 999,99.
+    const fallos: string[] = [];
+    for (const numHijos of [1, 2, 3, 4]) {
+      for (const cotizaciones of [0, 500, 1200, 2400, 99999]) {
+        for (const gasto of [0, 333.33, 1000, 5000]) {
+          const res = calcularDeduccionMaternidadIRPF({
+            situacion: 'alta',
+            cotizacionesSSTotalesAnio: cotizaciones,
+            hijos: Array.from({ length: numHijos }, () => ({
+              edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: gasto,
+            })),
+          });
+          const suma = Math.round(
+            res.detalleHijos.reduce((s, d) => s + d.totalDeduccionHijo, 0) * 100
+          ) / 100;
+          if (suma !== res.totalDeduccionEfectiva) {
+            fallos.push(`${numHijos}h/${cotizaciones}€/${gasto}€: ${suma} ≠ ${res.totalDeduccionEfectiva}`);
+          }
+        }
+      }
+    }
+    expect(fallos, `${fallos.length} descuadres`).toEqual([]);
+  });
+});
+
+test.describe('Unificación 10/09 — patrimonio: el veredicto del art. 37', () => {
+  test('bonificación del 100 % y cuota cero NO obligan a declarar por sí solas', () => {
+    // El art. 37 de la Ley 19/1991 obliga cuando la cuota, «una vez aplicadas las deducciones o
+    // bonificaciones que procedieren, resulte a ingresar». Con 1,5 M € en Madrid el motor
+    // publicaba a la vez cuota 0, bonificación del 100 % y «obligado a declarar»: se contradecía
+    // consigo mismo, y la copia inline de la app hacía lo mismo. Afecta a 7 de 17 CCAA.
+    const madrid = calcularImpuestoPatrimonio({ ccaaId: 'madrid', otrosBienes: 1500000 });
+    expect(madrid.cuotaNeta).toBe(0);
+    expect(madrid.porcentajeBonificacion).toBe(100);
+    expect(madrid.obligadoDeclarar).toBe(false);
+    expect(madrid.obligacion).toBe('no-obligado');
+  });
+
+  test('pero por encima de 2.000.000 € de bienes BRUTOS sí obliga, bonifique quien bonifique', () => {
+    // La segunda vía del art. 37 es independiente de la cuota, y es la que sigue viva en Madrid.
+    // Los bienes brutos NO descuentan deudas ni la exención de vivienda habitual: por eso el
+    // caso se construye con deudas grandes, que son las que tentarían a mirar el neto.
+    const rico = calcularImpuestoPatrimonio({ ccaaId: 'madrid', otrosBienes: 2500000, deudas: 2000000 });
+    expect(rico.patrimonioBruto).toBe(2500000);
+    expect(rico.obligadoDeclarar).toBe(true);
+    expect(rico.obligacion).toBe('obligado-bruto-2m');
+  });
+
+  test('CUADRE: cuota bruta − bonificación publicada = cuota neta publicada', () => {
+    // Se publicaba `cuotaBruta` redondeada y se calculaba `cuotaNeta` sobre la NO redondeada.
+    // Galicia es la única CCAA con bonificación parcial (50 %), así que es la única donde se ve
+    // —y descuadraba el 25 % de los casos—. La app restaba las dos cifras a mano en pantalla, que
+    // es justo lo que reproducía el descuadre; ahora imprime `bonificacionAplicada` del motor.
+    const fallos: string[] = [];
+    for (let base = 700001; base <= 12000000; base = base * 1.21 + 0.37) {
+      const res = calcularImpuestoPatrimonio({ ccaaId: 'galicia', otrosBienes: base });
+      if (res.cuotaBruta === null || res.cuotaNeta === null || res.bonificacionAplicada === null) continue;
+      const neta = Math.round((res.cuotaBruta - res.bonificacionAplicada) * 100) / 100;
+      if (neta !== res.cuotaNeta) fallos.push(`${base}: ${neta} ≠ ${res.cuotaNeta}`);
+    }
+    expect(fallos, `${fallos.length} descuadres`).toEqual([]);
+  });
+
+  test('el aviso del ITSGF se mide sobre la base imponible, no sobre el neto', () => {
+    // Se comparaba contra el neto SIN descontar la vivienda habitual exenta, así que saltaba
+    // ~800.000 € antes de que ese impuesto cobrase nada: su escala deja el 0 % hasta 3.700.000 €
+    // de patrimonio neto una vez restado el mínimo de 700.000 €.
+    const justoDebajo = calcularImpuestoPatrimonio({
+      ccaaId: 'madrid', viviendaHabitual: 300000, otrosBienes: 3600000,
+    });
+    expect(justoDebajo.aplicaItsgf).toBe(false);
+    const porEncima = calcularImpuestoPatrimonio({ ccaaId: 'madrid', otrosBienes: 3800000 });
+    expect(porEncima.aplicaItsgf).toBe(true);
   });
 });

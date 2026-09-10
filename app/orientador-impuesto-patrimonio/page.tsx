@@ -19,16 +19,25 @@ import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   BONIFICACIONES_CCAA_PATRIMONIO,
-  getMinimoExentoPatrimonio,
   EXENCION_VIVIENDA_HABITUAL,
   UMBRAL_OBLIGACION_DECLARAR,
-  calcularCuotaPatrimonioCCAA,
   ITSGF_UMBRAL,
   MINIMO_EXENTO_ESTATAL,
   FISCAL_PATRIMONIO_META,
 } from '@/data/fiscal';
+import { calcularImpuestoPatrimonio } from '@/lib/calculadoras/impuestoPatrimonio';
 
 // ─── Utilidades ────────────────────────────────────────────────────────────────
+
+// El cálculo —base imponible, mínimo exento, cuota, bonificación, obligación de declarar y
+// aviso del ITSGF— vive en `lib/calculadoras/impuestoPatrimonio.ts`, que es también lo que
+// responde la tool `calcular_impuesto_patrimonio` del MCP de Delegum. Aquí solo se valoran los
+// bienes a partir de los campos del formulario, que es lo propio de esta pantalla.
+//
+// El 09/09/2026 los dos mismos defectos —el veredicto del art. 37 sobre la cuota SIN bonificar y
+// el umbral del ITSGF medido sobre el neto sin descontar la vivienda habitual— hubo que
+// repararlos DOS veces, aquí y en el motor, porque el cálculo estaba escrito dos veces. Desde el
+// 10/09/2026 ya solo hay un sitio donde repararlo.
 
 const p = (s: string): number => parseSpanishNumber(s) || 0;
 
@@ -120,46 +129,46 @@ export default function OrientadorImpuestoPatrimonioPage() {
   const otros = p(otrosBienes);
   const deudasVal = p(deudas);
 
-  // Bruto (para el umbral de 2 M): incluye la vivienda habitual completa, sin restar deudas
-  const patrimonioBruto = vhValor + inmValor + cuentas + acciones + fondos + seguros + otros;
-  // Base imponible: vivienda habitual solo en la parte no exenta, menos deudas
-  const baseImponible = Math.max(0, vhComputable + inmValor + cuentas + acciones + fondos + seguros + otros - deudasVal);
-  const patrimonioNeto = patrimonioBruto - deudasVal;
-
   const ccaa = BONIFICACIONES_CCAA_PATRIMONIO.find((c) => c.id === ccaaId);
-  const minimoExento = ccaaId ? getMinimoExentoPatrimonio(ccaaId) : 0;
-  const baseLiquidable = ccaaId ? Math.max(0, baseImponible - minimoExento) : 0;
-  // Cuota por CCAA: null si no se ha seleccionado CCAA o es foral
-  const resultadoCuota = (ccaaId && !ccaa?.foral && baseLiquidable > 0)
-    ? calcularCuotaPatrimonioCCAA(ccaaId, baseLiquidable)
+
+  // Todo el cálculo en una llamada. El motor recibe los bienes ya valorados (que es lo que hace
+  // esta pantalla con sus campos) y devuelve base, cuota, bonificación, veredicto e ITSGF.
+  const r = ccaaId
+    ? calcularImpuestoPatrimonio({
+        ccaaId,
+        viviendaHabitual: vhValor,
+        otrosInmuebles: inmValor,
+        cuentasDepositos: cuentas,
+        // El motor agrupa acciones y fondos en un solo campo; el formulario los pide por
+        // separado porque se valoran distinto (media del 4.º trimestre / liquidativo a 31/12).
+        accionesFondos: acciones + fondos,
+        segurosVida: seguros,
+        otrosBienes: otros,
+        deudas: deudasVal,
+      })
     : null;
+
+  const patrimonioBruto = r?.patrimonioBruto ?? 0;
+  const baseImponible = r?.baseImponible ?? 0;
+  const patrimonioNeto = r?.patrimonioNeto ?? 0;
+  const minimoExento = r?.minimoExento ?? 0;
+  const baseLiquidable = r?.baseLiquidable ?? 0;
+  const resultadoCuota = r && r.cuotaBruta !== null ? r : null;
+  const cuotaNetaOrientativa = r?.cuotaNeta ?? 0;
+  const aplicaItsgf = r?.aplicaItsgf ?? false;
 
   const hayDatos = patrimonioBruto > 0;
 
-  // ── Veredicto de obligación ──
-  //
-  // ⚠️ CORREGIDO EL 09/09/2026, igual que en `lib/calculadoras/impuestoPatrimonio.ts`.
-  // El art. 37 de la Ley 19/1991 obliga a declarar cuando la cuota, «una vez aplicadas las
-  // deducciones o bonificaciones que procedieren, resulte a ingresar», o cuando los bienes
-  // BRUTOS superan 2.000.000 €. Antes esta página usaba `baseImponible > minimoExento`, que es
-  // la cuota ANTES de bonificar, y por eso decía «obligado a declarar» a un madrileño con
-  // 1,5 M € mientras la FAQ de esta misma página (más abajo) enunciaba la regla correcta.
-  // Afecta a las 7 CCAA que bonifican al 100 %.
-  const cuotaNetaOrientativa = resultadoCuota
-    ? Math.round((resultadoCuota.cuotaNeta ?? 0) * 100) / 100
-    : 0;
+  // El veredicto lo decide el motor (art. 37 Ley 19/1991, sobre la cuota YA bonificada); aquí
+  // solo se traduce a los estados que dibuja esta pantalla, que además distingue dos que el
+  // motor no necesita: «aún no has elegido CCAA» y «aún no has metido bienes».
   type TipoVeredicto = 'pendiente' | 'sin-datos' | 'obligado-2m' | 'obligado-base' | 'no-obligado';
   let veredicto: TipoVeredicto = 'pendiente';
-  if (!ccaaId) veredicto = 'pendiente';
+  if (!r) veredicto = 'pendiente';
   else if (!hayDatos) veredicto = 'sin-datos';
-  else if (patrimonioBruto > UMBRAL_OBLIGACION_DECLARAR) veredicto = 'obligado-2m';
-  else if (cuotaNetaOrientativa > 0) veredicto = 'obligado-base';
+  else if (r.obligacion === 'obligado-bruto-2m') veredicto = 'obligado-2m';
+  else if (r.obligacion === 'obligado-cuota') veredicto = 'obligado-base';
   else veredicto = 'no-obligado';
-
-  // El aviso del ITSGF se comparaba con el neto SIN descontar la vivienda habitual exenta, así
-  // que saltaba ~800.000 € antes de que ese impuesto cobrase nada: su base liquidable es
-  // `neto − 700.000` y el primer tramo va al 0 % hasta 3.000.000 €.
-  const aplicaItsgf = baseImponible > ITSGF_UMBRAL + MINIMO_EXENTO_ESTATAL;
 
   const filas: { etiqueta: string; valor: number; signo?: string; destacado?: boolean }[] = [
     { etiqueta: 'Vivienda habitual (valor total)', valor: vhValor },
@@ -387,24 +396,25 @@ export default function OrientadorImpuestoPatrimonioPage() {
                 <div className={styles.cuotaFilas}>
                   <div className={styles.cuotaFila}>
                     <span>Cuota bruta (tarifa {resultadoCuota.escalaUsada})</span>
-                    <strong>{formatCurrency(resultadoCuota.cuotaBruta)}</strong>
+                    <strong>{formatCurrency(resultadoCuota.cuotaBruta ?? 0)}</strong>
                   </div>
                   {resultadoCuota.porcentajeBonificacion > 0 && (
                     <div className={styles.cuotaFila}>
                       <span>− Bonificación {ccaa?.nombre} ({resultadoCuota.porcentajeBonificacion} %)</span>
-                      <strong>
-                        −{formatCurrency(Math.round((resultadoCuota.cuotaBruta - (resultadoCuota.cuotaNeta ?? 0)) * 100) / 100)}
-                      </strong>
+                      {/* El importe lo publica el motor ya calculado: restarlo aquí a mano era
+                          lo que descuadraba el desglose por un céntimo en Galicia, la única
+                          CCAA con bonificación parcial. */}
+                      <strong>−{formatCurrency(resultadoCuota.bonificacionAplicada ?? 0)}</strong>
                     </div>
                   )}
                   <div className={`${styles.cuotaFila} ${styles.cuotaFilaNeta}`}>
                     <span>Cuota neta orientativa</span>
-                    <strong className={styles.cuotaValor}>{formatCurrency(resultadoCuota.cuotaNeta)}</strong>
+                    <strong className={styles.cuotaValor}>{formatCurrency(resultadoCuota.cuotaNeta ?? 0)}</strong>
                   </div>
                 </div>
                 <p className={styles.cuotaAviso}>
                   <span aria-hidden="true">⚠️</span>{' '}
-                  {resultadoCuota.itsgfInteraccion
+                  {resultadoCuota.bonificacionVariableItsgf
                     ? `La bonificación de ${ccaa?.nombre ?? ''} es variable — interactúa con el Impuesto Temporal de Solidaridad de las Grandes Fortunas (ITSGF). La cuota real puede diferir de esta orientación. `
                     : resultadoCuota.porcentajeBonificacion === 100
                     ? `${ccaa?.nombre ?? ''} aplica bonificación del 100% — la cuota es orientativa (sin ITSGF). `

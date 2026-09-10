@@ -3,223 +3,70 @@
 import { useState } from 'react';
 import styles from './EstimadorLegitimas.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  calcularLegitimas,
+  REGIMENES_INFO,
+  REGIMENES_VALIDOS,
+  type RegimenId,
+  type ResultadoLegitimas,
+} from '@/lib/calculadoras/legitimas';
 
 // ─── Datos normativos ─────────────────────────────────────────────────────────
 
-// Regímenes de legítima en España
-// Fuentes: CC arts. 806-840 | Codi Civil de Catalunya | CFA Aragón | Ley 2/2006 Galicia
-//          Compilació Illes Balears | Ley 5/2015 País Vasco | Compilación Navarra
+// El cálculo y los textos normativos (nombre del régimen, CCAA donde rige y norma que lo
+// sostiene) viven en `lib/calculadoras/legitimas.ts`, que es también lo que responden el MCP de
+// Delegum y /api/chatgpt/legitimas. Aquí NO se recalcula nada: esta página es la interfaz.
+//
+// Hasta el 10/09/2026 esta app llevaba su propio motor copiado, y ya había divergido del real:
+// cortaba la legítima balear en UN hijo (el art. 42 de la Compilació la corta en CUATRO),
+// atribuía al viudo un «usufructo universal» en Baleares y País Vasco donde ambas normas dan la
+// MITAD (art. 45 Compilació y art. 52 Ley 5/2015), y afirmaba que «en Menorca rige el Derecho
+// Común» cuando el art. 65 le extiende el régimen de Mallorca. Con 200.000 € y 2 hijos en
+// Baleares, la web decía 100.000 € de legítima y la API 66.666,67 €.
 
-type RegimenId = 'comun' | 'cataluna' | 'aragon' | 'galicia' | 'baleares' | 'pais-vasco' | 'navarra';
+/** Lo único propio de esta pantalla: el resumen de una línea que acompaña a cada opción. */
+const DESCRIPCION_BREVE: Record<RegimenId, string> = {
+  comun: 'Tres tercios: legítima estricta (1/3) + mejora (1/3) + libre disposición (1/3)',
+  cataluna: 'Legítima global = 1/4 del haber hereditario para todos los descendientes',
+  aragon: 'Legítima colectiva = 1/2 para todos los descendientes; el testador elige la distribución',
+  galicia: 'Legítima = 1/4 del haber hereditario para descendientes',
+  baleares: '1/3 con cuatro hijos o menos; 1/2 si son más de cuatro (arts. 42 y 79 de la Compilació)',
+  'pais-vasco': 'Legítima = 1/3 del haber hereditario para descendientes',
+  navarra: 'Legítima formal (simbólica). Práctica libertad total de testar',
+};
 
-interface Regimen {
-  id: RegimenId;
-  nombre: string;
-  ccaas: string;
-  fuente: string;
-  descripcionBreve: string;
-}
+// ─── Presentación ─────────────────────────────────────────────────────────────
 
-const REGIMENES: Regimen[] = [
-  {
-    id: 'comun',
-    nombre: 'Derecho Común (Código Civil)',
-    ccaas: 'Madrid, Andalucía, Castilla y León, Castilla-La Mancha, Extremadura, La Rioja, Cantabria, Asturias, Murcia, Comunidad Valenciana, Canarias',
-    fuente: 'CC arts. 806-840',
-    descripcionBreve: 'Tres tercios: legítima estricta (1/3) + mejora (1/3) + libre disposición (1/3)',
-  },
-  {
-    id: 'cataluna',
-    nombre: 'Cataluña',
-    ccaas: 'Catalunya',
-    fuente: 'Codi Civil de Catalunya, Libro IV, arts. 451-1 y ss.',
-    descripcionBreve: 'Legítima global = 1/4 del haber hereditario para todos los descendientes',
-  },
-  {
-    id: 'aragon',
-    nombre: 'Aragón',
-    ccaas: 'Aragón',
-    fuente: 'Código del Derecho Foral de Aragón (CDFA), arts. 486 y ss.',
-    descripcionBreve: 'Legítima colectiva = 1/2 para todos los descendientes; el testador elige la distribución',
-  },
-  {
-    id: 'galicia',
-    nombre: 'Galicia',
-    ccaas: 'Galicia',
-    fuente: 'Ley 2/2006 de Derecho Civil de Galicia, art. 243 y ss.',
-    descripcionBreve: 'Legítima = 1/4 del haber hereditario para descendientes',
-  },
-  {
-    id: 'baleares',
-    nombre: 'Islas Baleares',
-    ccaas: 'Illes Balears (Mallorca e Ibiza)',
-    fuente: 'Compilació de Dret Civil de les Illes Balears',
-    descripcionBreve: '1/3 con un solo hijo; 1/2 con dos o más hijos. Menorca sigue el Derecho Común',
-  },
-  {
-    id: 'pais-vasco',
-    nombre: 'País Vasco',
-    ccaas: 'Bizkaia y Álava (Territorio Histórico). Gipuzkoa: con particularidades',
-    fuente: 'Ley 5/2015 de Derecho Civil Vasco, arts. 47 y ss.',
-    descripcionBreve: 'Legítima = 1/3 del haber hereditario para descendientes',
-  },
-  {
-    id: 'navarra',
-    nombre: 'Navarra',
-    ccaas: 'Comunidad Foral de Navarra',
-    fuente: 'Compilación del Derecho Civil Foral de Navarra, Leyes 267-270',
-    descripcionBreve: 'Legítima formal (simbólica). Práctica libertad total de testar',
-  },
-];
-
-// ─── Lógica ───────────────────────────────────────────────────────────────────
-
-interface ResultadoLegitimas {
-  regimen: Regimen;
-  patrimonioNeto: number;
+/** Lo que esta pantalla guarda tras pulsar «Calcular»: la respuesta del motor y lo que se le pidió. */
+interface EstadoResultado {
+  motor: ResultadoLegitimas;
+  regimenId: RegimenId;
   numHijos: number;
   tieneConyuge: boolean;
-
-  legitimaTotal: number;           // Importe mínimo obligatorio para todos los herederos forzosos
-  legitimaPorHijo: number;         // Cuota mínima de cada hijo (en régimenes individuales)
-  tercioMejora: number;            // Solo en Derecho Común
-  libreDisposicion: number;        // Parte que el testador puede dejar a quien quiera
-  usufructoConyuge: number;        // Estimación del valor del usufructo del cónyuge
-
-  esLegitivaColectiva: boolean;   // Si la legítima es colectiva (Aragón)
-  esNavarra: boolean;              // Régimen de libertad de testar
-  notas: string[];
 }
 
-function calcularLegitimas(
-  patrimonioNeto: number,
-  regimenId: RegimenId,
-  numHijos: number,
-  tieneConyuge: boolean,
-): ResultadoLegitimas {
-  const regimen = REGIMENES.find(r => r.id === regimenId)!;
-  const notas: string[] = [];
-
-  let legitimaTotal = 0;
-  let legitimaPorHijo = 0;
-  let tercioMejora = 0;
-  let libreDisposicion = 0;
-  let usufructoConyuge = 0;
-  let esLegitivaColectiva = false;
-  let esNavarra = false;
-
-  switch (regimenId) {
-    case 'comun': {
-      // 1/3 estricta (individual) + 1/3 mejora (descendientes) + 1/3 libre
-      const tercioEstricto = patrimonioNeto / 3;
-      tercioMejora = patrimonioNeto / 3;
-      libreDisposicion = patrimonioNeto / 3;
-      legitimaTotal = tercioEstricto + tercioMejora; // 2/3 "largo" para descendientes
-      legitimaPorHijo = numHijos > 0 ? tercioEstricto / numHijos : 0;
-      if (tieneConyuge) {
-        usufructoConyuge = tercioMejora; // Usufructo del tercio de mejora
-        notas.push('El cónyuge viudo tiene derecho al usufructo del tercio de mejora (1/3 del patrimonio).');
-        notas.push('El usufructo puede conmutarse por una renta vitalicia, un lote de bienes o un capital en efectivo (CC art. 839).');
-      }
-      notas.push('El tercio de mejora puede distribuirse libremente entre hijos y/o nietos, sin partes iguales.');
-      notas.push('El testador puede dejar el tercio de libre disposición a cualquier persona (familiar o no).');
-      break;
-    }
-    case 'cataluna': {
-      // 1/4 global para todos los descendientes
-      legitimaTotal = patrimonioNeto / 4;
-      legitimaPorHijo = numHijos > 0 ? legitimaTotal / numHijos : 0;
-      libreDisposicion = patrimonioNeto - legitimaTotal;
-      if (tieneConyuge) {
-        notas.push('En Cataluña, el cónyuge superviviente tiene derecho a la cuarta viudal si el causante tenía descendientes, con limitaciones patrimoniales.');
-      }
-      notas.push('En Cataluña la legítima es una mera prestación económica: el heredero forzoso no tiene derecho a bienes concretos, solo a una cantidad dineraria.');
-      notas.push('El testador puede dejar los 3/4 restantes a quien desee (pareja de hecho, terceros, fundaciones, etc.).');
-      break;
-    }
-    case 'aragon': {
-      // Legítima colectiva = 1/2, distribución libre entre descendientes
-      legitimaTotal = patrimonioNeto / 2;
-      libreDisposicion = patrimonioNeto / 2;
-      esLegitivaColectiva = true;
-      if (tieneConyuge) {
-        notas.push('En Aragón, el cónyuge o pareja estable tiene derecho al usufructo universal de viudedad sobre todos los bienes del causante.');
-        usufructoConyuge = patrimonioNeto; // Usufructo universal, estimación
-      }
-      notas.push('La legítima aragonesa es colectiva: el testador puede dejarla a uno solo de los hijos, desheredando a los demás, siempre que el conjunto de descendientes reciba al menos 1/2 del patrimonio.');
-      notas.push('El 1/2 restante es de libre disposición: puede ir a no descendientes.');
-      break;
-    }
-    case 'galicia': {
-      // 1/4 para descendientes (igual que Cataluña en cuantía)
-      legitimaTotal = patrimonioNeto / 4;
-      legitimaPorHijo = numHijos > 0 ? legitimaTotal / numHijos : 0;
-      libreDisposicion = patrimonioNeto - legitimaTotal;
-      if (tieneConyuge) {
-        notas.push('En Galicia el cónyuge viudo tiene derecho al usufructo del 1/4 del haber hereditario si hay descendientes.');
-        usufructoConyuge = patrimonioNeto / 4;
-      }
-      notas.push('En Galicia existe la figura del "pacto de mejora": permite transmitir bienes en vida, anticipando la herencia y afectando al cálculo de legítimas.');
-      break;
-    }
-    case 'baleares': {
-      // Mallorca e Ibiza: 1/3 con 1 hijo; 1/2 con 2+ hijos
-      const fraccion = numHijos === 1 ? 1 / 3 : 1 / 2;
-      legitimaTotal = patrimonioNeto * fraccion;
-      legitimaPorHijo = numHijos > 0 ? legitimaTotal / numHijos : 0;
-      libreDisposicion = patrimonioNeto - legitimaTotal;
-      if (tieneConyuge) {
-        notas.push('En Baleares el cónyuge viudo tiene derecho al usufructo universal si concurre con descendientes comunes (similar al Derecho Común).');
-        usufructoConyuge = legitimaTotal;
-      }
-      notas.push('Esta estimación aplica para Mallorca e Ibiza. En Menorca rige el Derecho Común (1/3 + 1/3 + 1/3).');
-      notas.push(`Con ${numHijos} hijo${numHijos > 1 ? 's' : ''} se aplica la fracción ${numHijos === 1 ? '1/3' : '1/2'} del patrimonio neto.`);
-      break;
-    }
-    case 'pais-vasco': {
-      // Bizkaia/Álava: 1/3 para descendientes
-      legitimaTotal = patrimonioNeto / 3;
-      legitimaPorHijo = numHijos > 0 ? legitimaTotal / numHijos : 0;
-      libreDisposicion = (patrimonioNeto * 2) / 3;
-      if (tieneConyuge) {
-        notas.push('En el País Vasco existe el usufructo foral de viudedad: el cónyuge superviviente tiene derecho al usufructo universal de todos los bienes del causante.');
-        usufructoConyuge = patrimonioNeto;
-      }
-      notas.push('En Bizkaia existe la troncalidad: ciertos bienes (troncales) solo pueden dejarse a parientes de la línea de donde proceden, con independencia de la legítima.');
-      notas.push('Esta estimación aplica a Bizkaia y Álava. En Gipuzkoa rige el Derecho Común con algunas particularidades.');
-      break;
-    }
-    case 'navarra': {
-      // Legítima formal: simbólica (5 sueldos febles)
-      legitimaTotal = 0;
-      libreDisposicion = patrimonioNeto;
-      esNavarra = true;
-      if (tieneConyuge) {
-        notas.push('En Navarra el cónyuge viudo tiene derecho al usufructo de fidelidad sobre todos los bienes del causante mientras no contraiga nuevo matrimonio o pareja estable.');
-        usufructoConyuge = patrimonioNeto;
-      }
-      notas.push('En Navarra la legítima es puramente formal: basta con mencionar a los herederos forzosos en el testamento sin dejarles nada efectivo.');
-      notas.push('El testador navarro puede disponer libremente de todo su patrimonio, con la única restricción del usufructo de fidelidad del cónyuge.');
-      break;
-    }
+/**
+ * Etiqueta corta para el badge de cada bloque («1/3», «2/3»…), DERIVADA del importe que ha
+ * devuelto el motor en vez de reescrita a mano.
+ *
+ * Antes cada badge llevaba su propia cadena de ternarios por régimen, y por eso el corte balear
+ * malo estaba escrito tres veces en el fichero: en el cálculo y en dos badges. Derivándola del
+ * resultado, la etiqueta no puede contradecir a la cifra que acompaña.
+ */
+function etiquetaFraccion(parte: number, total: number): string {
+  if (total <= 0) return '—';
+  const FRACCIONES: ReadonlyArray<[string, number]> = [
+    ['1/4', 1 / 4], ['1/3', 1 / 3], ['1/2', 1 / 2], ['2/3', 2 / 3], ['3/4', 3 / 4], ['100%', 1],
+  ];
+  const razon = parte / total;
+  for (const [etiqueta, valor] of FRACCIONES) {
+    // Tolerancia amplia: el motor publica ya redondeado al céntimo, así que 2/3 de 100.000 €
+    // llega como 66.666,67 y nunca da la fracción exacta.
+    if (Math.abs(razon - valor) < 0.005) return etiqueta;
   }
-
-  return {
-    regimen,
-    patrimonioNeto,
-    numHijos,
-    tieneConyuge,
-    legitimaTotal,
-    legitimaPorHijo,
-    tercioMejora,
-    libreDisposicion,
-    usufructoConyuge,
-    esLegitivaColectiva: esLegitivaColectiva,
-    esNavarra,
-    notas,
-  };
+  return `${Math.round(razon * 100)} %`;
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -229,31 +76,45 @@ export default function EstimadorLegitimas() {
   const [regimenId, setRegimenId] = useState<RegimenId>('comun');
   const [numHijosStr, setNumHijosStr] = useState('2');
   const [tieneConyuge, setTieneConyuge] = useState(true);
-  const [resultado, setResultado] = useState<ResultadoLegitimas | null>(null);
+  const [resultado, setResultado] = useState<EstadoResultado | null>(null);
   const [error, setError] = useState('');
 
   function calcular() {
     setError('');
-    const pat = parseFloat(patrimonio.replace(/\./g, '').replace(',', '.'));
-    const hijos = parseInt(numHijosStr);
+    const pat = parseSpanishNumber(patrimonio);
+    const hijos = parseInt(numHijosStr, 10);
 
-    if (isNaN(pat) || pat < 0) {
+    if (Number.isNaN(pat) || pat < 0) {
       setError('Introduce un patrimonio neto válido (puede ser 0 si las deudas igualan al activo).');
       return;
     }
-    if (isNaN(hijos) || hijos < 0 || hijos > 20) {
+    if (Number.isNaN(hijos) || hijos < 0 || hijos > 20) {
       setError('Introduce un número de hijos/descendientes válido (0–20).');
       return;
     }
-    if (hijos === 0) {
-      setError('Sin descendientes, la legítima recae en los ascendientes. Esta herramienta está orientada a herencias con hijos.');
-      return;
-    }
 
-    setResultado(calcularLegitimas(pat, regimenId, hijos, tieneConyuge));
+    // El motor rechaza con un mensaje que EXPLICA por qué (régimen desconocido, patrimonio no
+    // finito, hijos fraccionarios, o el caso sin descendientes en los forales). Se muestra tal
+    // cual en vez de traducirlo aquí: si se reescribiera, volvería a haber dos versiones.
+    try {
+      setResultado({
+        motor: calcularLegitimas({
+          patrimonioNeto: pat,
+          regimen: regimenId,
+          numHijos: hijos,
+          tieneConyuge,
+        }),
+        regimenId,
+        numHijos: hijos,
+        tieneConyuge,
+      });
+    } catch (e) {
+      setResultado(null);
+      setError(e instanceof Error ? e.message : 'No ha sido posible calcular la legítima con estos datos.');
+    }
   }
 
-  const regimenSeleccionado = REGIMENES.find(r => r.id === regimenId);
+  const regimenSeleccionado = REGIMENES_INFO[regimenId];
 
   return (
     <div className={styles.container}>
@@ -301,8 +162,8 @@ export default function EstimadorLegitimas() {
               value={regimenId}
               onChange={e => { setRegimenId(e.target.value as RegimenId); setResultado(null); }}
             >
-              {REGIMENES.map(r => (
-                <option key={r.id} value={r.id}>{r.nombre}</option>
+              {REGIMENES_VALIDOS.map(id => (
+                <option key={id} value={id}>{REGIMENES_INFO[id].nombre}</option>
               ))}
             </select>
             {regimenSeleccionado && (
@@ -364,7 +225,7 @@ export default function EstimadorLegitimas() {
             <p className={styles.placeholder}>
               Introduce los datos y pulsa el botón para ver la distribución orientativa de la herencia según el régimen civil aplicable.
             </p>
-          ) : resultado.esNavarra ? (
+          ) : resultado.motor.esNavarra ? (
             <div className={styles.resultados}>
               <div className={`${styles.regimenBadge} ${styles.regimenLibertad}`}>
                 <span aria-hidden="true">🟢</span>
@@ -376,56 +237,63 @@ export default function EstimadorLegitimas() {
               <div className={styles.distribucionGrid}>
                 <div className={`${styles.bloqueDistrib} ${styles.bloqueLibre}`}>
                   <span className={styles.bloquePorcentaje}>100%</span>
-                  <span className={styles.bloqueImporte}>{formatCurrency(resultado.patrimonioNeto)}</span>
+                  <span className={styles.bloqueImporte}>{formatCurrency(resultado.motor.patrimonioNeto)}</span>
                   <span className={styles.bloqueLabel}>Libre disposición total</span>
                 </div>
               </div>
-              <NotasLista notas={resultado.notas} stylesModule={styles} />
+              <NotasLista notas={resultado.motor.notas} stylesModule={styles} />
             </div>
           ) : (
             <div className={styles.resultados}>
               <div className={styles.regimenBadge}>
                 <span aria-hidden="true">📜</span>
                 <div>
-                  <strong>{resultado.regimen.nombre}</strong>
-                  <p>{resultado.regimen.descripcionBreve}</p>
+                  <strong>{resultado.motor.nombreRegimen}</strong>
+                  <p>{DESCRIPCION_BREVE[resultado.regimenId]}</p>
                 </div>
               </div>
 
               <div className={styles.distribucionGrid}>
-                {/* Legítima estricta — solo Derecho Común */}
-                {resultado.regimen.id === 'comun' && (
+                {/* Legítima estricta — solo Derecho Común (el motor devuelve su tercio de mejora) */}
+                {resultado.motor.tercioMejora !== null && (
                   <div className={`${styles.bloqueDistrib} ${styles.bloqueEstricta}`}>
-                    <span className={styles.bloquePorcentaje}>1/3</span>
-                    <span className={styles.bloqueImporte}>{formatCurrency(resultado.legitimaTotal - resultado.tercioMejora)}</span>
+                    <span className={styles.bloquePorcentaje}>
+                      {etiquetaFraccion(resultado.motor.legitimaTotal - resultado.motor.tercioMejora, resultado.motor.patrimonioNeto)}
+                    </span>
+                    <span className={styles.bloqueImporte}>{formatCurrency(resultado.motor.legitimaTotal - resultado.motor.tercioMejora)}</span>
                     <span className={styles.bloqueLabel}>Legítima estricta</span>
-                    <span className={styles.bloqueSublabel}>{formatCurrency(resultado.legitimaPorHijo)}/hijo · Obligatoria e igual para todos</span>
+                    <span className={styles.bloqueSublabel}>
+                      {resultado.motor.legitimaPorHijo !== null && `${formatCurrency(resultado.motor.legitimaPorHijo)}/hijo · `}
+                      Obligatoria e igual para todos
+                    </span>
                   </div>
                 )}
 
                 {/* Legítima global — otros regímenes */}
-                {resultado.regimen.id !== 'comun' && resultado.legitimaTotal > 0 && (
+                {resultado.motor.tercioMejora === null && resultado.motor.legitimaTotal > 0 && (
                   <div className={`${styles.bloqueDistrib} ${styles.bloqueEstricta}`}>
                     <span className={styles.bloquePorcentaje}>
-                      {resultado.regimen.id === 'aragon' ? '1/2' : resultado.regimen.id === 'baleares' && resultado.numHijos === 1 ? '1/3' : resultado.regimen.id === 'baleares' ? '1/2' : '1/4'}
+                      {etiquetaFraccion(resultado.motor.legitimaTotal, resultado.motor.patrimonioNeto)}
                     </span>
-                    <span className={styles.bloqueImporte}>{formatCurrency(resultado.legitimaTotal)}</span>
+                    <span className={styles.bloqueImporte}>{formatCurrency(resultado.motor.legitimaTotal)}</span>
                     <span className={styles.bloqueLabel}>
-                      Legítima {resultado.esLegitivaColectiva ? 'colectiva' : 'total'}
+                      Legítima {resultado.motor.esLegitivaColectiva ? 'colectiva' : 'total'}
                     </span>
                     <span className={styles.bloqueSublabel}>
-                      {resultado.esLegitivaColectiva
+                      {resultado.motor.esLegitivaColectiva || resultado.motor.legitimaPorHijo === null
                         ? 'Distribución libre entre descendientes'
-                        : `${formatCurrency(resultado.legitimaPorHijo)}/hijo · Obligatoria`}
+                        : `${formatCurrency(resultado.motor.legitimaPorHijo)}/hijo · Obligatoria`}
                     </span>
                   </div>
                 )}
 
                 {/* Tercio de mejora — solo Derecho Común */}
-                {resultado.regimen.id === 'comun' && (
+                {resultado.motor.tercioMejora !== null && (
                   <div className={`${styles.bloqueDistrib} ${styles.bloqueMejora}`}>
-                    <span className={styles.bloquePorcentaje}>1/3</span>
-                    <span className={styles.bloqueImporte}>{formatCurrency(resultado.tercioMejora)}</span>
+                    <span className={styles.bloquePorcentaje}>
+                      {etiquetaFraccion(resultado.motor.tercioMejora, resultado.motor.patrimonioNeto)}
+                    </span>
+                    <span className={styles.bloqueImporte}>{formatCurrency(resultado.motor.tercioMejora)}</span>
                     <span className={styles.bloqueLabel}>Tercio de mejora</span>
                     <span className={styles.bloqueSublabel}>
                       {resultado.tieneConyuge
@@ -438,21 +306,23 @@ export default function EstimadorLegitimas() {
                 {/* Libre disposición */}
                 <div className={`${styles.bloqueDistrib} ${styles.bloqueLibre}`}>
                   <span className={styles.bloquePorcentaje}>
-                    {resultado.regimen.id === 'comun' ? '1/3' : resultado.regimen.id === 'aragon' ? '1/2' : resultado.regimen.id === 'baleares' && resultado.numHijos === 1 ? '2/3' : resultado.regimen.id === 'baleares' ? '1/2' : '3/4'}
+                    {etiquetaFraccion(resultado.motor.libreDisposicion, resultado.motor.patrimonioNeto)}
                   </span>
-                  <span className={styles.bloqueImporte}>{formatCurrency(resultado.libreDisposicion)}</span>
+                  <span className={styles.bloqueImporte}>{formatCurrency(resultado.motor.libreDisposicion)}</span>
                   <span className={styles.bloqueLabel}>Libre disposición</span>
                   <span className={styles.bloqueSublabel}>Para cualquier persona o entidad</span>
                 </div>
               </div>
 
-              {resultado.tieneConyuge && resultado.usufructoConyuge > 0 && (
+              {resultado.motor.derechoConyuge !== null && resultado.motor.derechoConyuge > 0 && (
                 <div className={styles.conyugeCard}>
                   <span aria-hidden="true">💍</span>
                   <div>
                     <strong>Cónyuge superviviente</strong>
-                    <p>Usufructo estimado sobre {formatCurrency(resultado.usufructoConyuge)}</p>
-                    <p className={styles.conyugeNota}>El usufructo no reduce los derechos de los herederos en plena propiedad, pero limita el disfrute de los bienes mientras viva el cónyuge.</p>
+                    <p>Usufructo estimado sobre {formatCurrency(resultado.motor.derechoConyuge)}</p>
+                    {/* La descripción la da el motor porque cita el artículo que sostiene la
+                        fracción: es donde se colaba el «usufructo universal» balear y vasco. */}
+                    <p className={styles.conyugeNota}>{resultado.motor.descripcionDerechoConyuge}</p>
                   </div>
                 </div>
               )}
@@ -460,7 +330,7 @@ export default function EstimadorLegitimas() {
               <div className={styles.resumenRow}>
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenLabel}>Patrimonio neto</span>
-                  <strong>{formatCurrency(resultado.patrimonioNeto)}</strong>
+                  <strong>{formatCurrency(resultado.motor.patrimonioNeto)}</strong>
                 </div>
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenLabel}>Herederos forzosos</span>
@@ -468,7 +338,7 @@ export default function EstimadorLegitimas() {
                 </div>
               </div>
 
-              <NotasLista notas={resultado.notas} stylesModule={styles} />
+              <NotasLista notas={resultado.motor.notas} stylesModule={styles} />
             </div>
           )}
         </div>

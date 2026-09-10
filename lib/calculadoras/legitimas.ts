@@ -108,7 +108,7 @@ export interface ResultadoLegitimas {
 
 // ─── Datos de regímenes ────────────────────────────────────────────────────────
 
-interface DatosRegimen {
+export interface DatosRegimen {
   nombre: string;
   ccaas: string;
   fuente: string;
@@ -123,6 +123,16 @@ const REGIMENES: Record<RegimenId, DatosRegimen> = {
   'pais-vasco':{ nombre: 'País Vasco', ccaas: 'Bizkaia y Álava (Gipuzkoa: sin legítima)', fuente: 'Ley 5/2015 de Derecho Civil Vasco' },
   navarra:     { nombre: 'Navarra', ccaas: 'Comunidad Foral de Navarra', fuente: 'Compilación del Derecho Civil Foral de Navarra' },
 };
+
+/**
+ * Ficha normativa de cada régimen (nombre, CCAA donde rige y norma que lo sostiene).
+ *
+ * Se exporta para que la app `estimador-legitimas` la muestre en su selector ANTES de calcular
+ * sin volver a escribirla: hasta el 10/09/2026 la app llevaba su propia tabla y ya divergía
+ * —anunciaba que «en Menorca rige el Derecho Común», cuando el art. 65 de la Compilació le
+ * extiende el régimen de Mallorca—. El texto normativo vive aquí, con el cálculo.
+ */
+export const REGIMENES_INFO: Readonly<Record<RegimenId, Readonly<DatosRegimen>>> = REGIMENES;
 
 /** Claves realmente definidas — evita que 'constructor', 'toString' o 'valueOf' pasen por régimen. */
 export const REGIMENES_VALIDOS: readonly RegimenId[] = Object.keys(REGIMENES) as RegimenId[];

@@ -16,55 +16,35 @@ import {
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
 import {
-  FISCAL_IRPF_META,
-  TRAMOS_IRPF_2025,
-  MINIMOS_IRPF_2025,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
-  REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
-} from '@/data/fiscal';
-
-// ─── Helpers IRPF ─────────────────────────────────────────────────────────────
-
-function calcularCuotaIRPF(base: number): number {
-  if (base <= 0) return 0;
-  let cuota = 0;
-  let prevHasta = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (base <= tramo.hasta) {
-      cuota += (base - prevHasta) * (tramo.tipo / 100);
-      break;
-    }
-    cuota += (tramo.hasta - prevHasta) * (tramo.tipo / 100);
-    prevHasta = tramo.hasta;
-  }
-  return cuota;
-}
-
-function calcularBaseSimplificada(ingresosBrutos: number): number {
-  const gastos = GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
-  const rnt = Math.max(0, ingresosBrutos - gastos);
-  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
-  return Math.max(0, rnt - reduccion);
-}
-
-function calcularMinimoHijos(numHijos: number): number {
-  if (numHijos <= 0) return 0;
-  const m = MINIMOS_IRPF_2025;
-  if (numHijos === 1) return m.hijo_1;
-  if (numHijos === 2) return m.hijo_1 + m.hijo_2;
-  if (numHijos === 3) return m.hijo_1 + m.hijo_2 + m.hijo_3;
-  return m.hijo_1 + m.hijo_2 + m.hijo_3 + m.hijo_4_mas * (numHijos - 3);
-}
+  calcularImpuestosDivorcio,
+  type ParametrosImpuestosDivorcio,
+  type ResultadoImpuestosDivorcio,
+  type RegimenDivorcio,
+  type CustodiaDivorcio,
+  type PosViviendaDivorcio,
+  type RolPensionDivorcio,
+  type PosHipotecaDivorcio,
+} from '@/lib/calculadoras/impuestosDivorcio';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type Regimen = 'gananciales' | 'separacion' | 'participacion';
-type Custodia = 'exclusiva-tengo' | 'exclusiva-otro' | 'compartida';
-type PosVivienda = 'me-quedo' | 'salgo' | 'vendemos';
-type RolPension = 'pago' | 'cobro';
-type PosHipoteca = 'me-quedo' | 'otro-paga';
+// El cálculo vive en `lib/calculadoras/impuestosDivorcio.ts`, que es también lo que responde la
+// tool `calcular_impuestos_divorcio` del MCP de Delegum. Esta página solo recoge los datos del
+// asistente y presenta la respuesta.
+//
+// Hasta el 10/09/2026 el cálculo estaba escrito dos veces: el motor se creó como «réplica
+// server-side de la lógica inline de esta página» y arrastraba un «TODO: unificar». Al replicarlo
+// se dejó fuera `pasoValido()`, así que el motor resolvía casos que la web no acepta —afirmaba
+// que se perdía la deducción de la hipoteca sin saber quién la paga, y omitía el bloque de hijos
+// entero por faltar el número—. Ese validador ya está en el motor, y aquí no queda cálculo.
+
+type Regimen = RegimenDivorcio;
+type Custodia = CustodiaDivorcio;
+type PosVivienda = PosViviendaDivorcio;
+type RolPension = RolPensionDivorcio;
+type PosHipoteca = PosHipotecaDivorcio;
 
 interface DatosDivorcio {
   regimen: Regimen | null;
@@ -86,39 +66,6 @@ interface DatosDivorcio {
   cuotaHipoteca: string;
 }
 
-interface ResultadoPension {
-  pensionAnual: number;
-  tipo: 'ahorro' | 'coste';
-  importe: number;
-}
-
-interface ResultadoHijos {
-  minimoTotal: number;
-  minimoAplicable: number;
-  porcentaje: number;
-  ahorroEstimado: number;
-  custodia: Custodia;
-}
-
-interface ResultadoVivienda {
-  imputacionAnual: number;
-  costeFiscal: number;
-  exenta: boolean;
-}
-
-interface ResultadoHipoteca {
-  deduccionAnual: number;
-  tipo: 'mantiene' | 'pierde';
-}
-
-interface Resultados {
-  pensionConyuge?: ResultadoPension;
-  hijos?: ResultadoHijos;
-  vivienda?: ResultadoVivienda;
-  hipoteca?: ResultadoHipoteca;
-  gananciales: boolean;
-}
-
 const DATOS_INICIALES: DatosDivorcio = {
   regimen: null, ingresos: '', tieneHijos: null, numHijos: 1, custodia: null,
   tieneVivienda: null, posVivienda: null, valorCatastral: '', porcPropiedad: '50',
@@ -127,63 +74,40 @@ const DATOS_INICIALES: DatosDivorcio = {
   tieneHipotecaAntigua: null, posHipoteca: null, cuotaHipoteca: '',
 };
 
-function calcularResultados(d: DatosDivorcio): Resultados {
-  const ingresos = parseSpanishNumber(d.ingresos);
-  const base = calcularBaseSimplificada(ingresos);
-  const res: Resultados = { gananciales: d.regimen === 'gananciales' };
+/**
+ * Traduce lo que el asistente ha recogido (cadenas de formulario y `null` para «aún sin
+ * responder») a los parámetros del motor. NO calcula: solo convierte y decide qué campos ha
+ * llegado a declarar el usuario, que es lo que el motor exige para emitir cada bloque.
+ *
+ * Un campo numérico vacío se pasa como `undefined` en vez de como 0: el motor distingue «no me
+ * lo has dicho» de «es cero», y con 0 publicaría una cifra donde no hay dato.
+ */
+function aParametrosMotor(d: DatosDivorcio): ParametrosImpuestosDivorcio {
+  const numeroOpcional = (texto: string): number | undefined => {
+    const n = parseSpanishNumber(texto);
+    return Number.isNaN(n) ? undefined : n;
+  };
 
-  if (d.tienePensionConyuge && d.rolPension && d.pensionMensual) {
-    const pensionAnual = parseSpanishNumber(d.pensionMensual) * 12;
-    if (pensionAnual > 0) {
-      if (d.rolPension === 'pago') {
-        const ahorro = calcularCuotaIRPF(base) - calcularCuotaIRPF(Math.max(0, base - pensionAnual));
-        res.pensionConyuge = { pensionAnual, tipo: 'ahorro', importe: Math.max(0, ahorro) };
-      } else {
-        const baseCon = calcularBaseSimplificada(ingresos + pensionAnual);
-        const coste = calcularCuotaIRPF(baseCon) - calcularCuotaIRPF(base);
-        res.pensionConyuge = { pensionAnual, tipo: 'coste', importe: Math.max(0, coste) };
-      }
-    }
-  }
-
-  if (d.tieneHijos && d.custodia && d.numHijos > 0) {
-    const minimoTotal = calcularMinimoHijos(d.numHijos);
-    const porcentaje = d.custodia === 'exclusiva-otro' ? 0 : d.custodia === 'compartida' ? 50 : 100;
-    const minimoAplicable = minimoTotal * porcentaje / 100;
-    res.hijos = {
-      minimoTotal, minimoAplicable, porcentaje,
-      ahorroEstimado: minimoAplicable * 0.19,
-      custodia: d.custodia,
-    };
-  }
-
-  if (d.tieneVivienda && d.posVivienda === 'salgo') {
-    const exenta = d.viviendasignadaHijos === true;
-    if (exenta) {
-      res.vivienda = { imputacionAnual: 0, costeFiscal: 0, exenta: true };
-    } else {
-      const catastral = parseSpanishNumber(d.valorCatastral);
-      const porc = parseSpanishNumber(d.porcPropiedad) / 100;
-      if (catastral > 0) {
-        const tipoImputacion = d.catastroRevisado ? 0.011 : 0.02;
-        const imputacionAnual = catastral * porc * tipoImputacion;
-        const costeFiscal = calcularCuotaIRPF(base + imputacionAnual) - calcularCuotaIRPF(base);
-        res.vivienda = { imputacionAnual, costeFiscal, exenta: false };
-      }
-    }
-  }
-
-  if (d.tieneHipotecaAntigua) {
-    if (d.posHipoteca === 'me-quedo') {
-      const cuotaAnual = parseSpanishNumber(d.cuotaHipoteca);
-      const deduccionAnual = Math.min(cuotaAnual, 9040) * 0.15;
-      res.hipoteca = { deduccionAnual, tipo: 'mantiene' };
-    } else {
-      res.hipoteca = { deduccionAnual: 0, tipo: 'pierde' };
-    }
-  }
-
-  return res;
+  return {
+    // `pasoValido()` no deja pasar el paso 0 sin régimen, así que aquí ya no puede ser null.
+    regimen: d.regimen ?? 'gananciales',
+    ingresos: numeroOpcional(d.ingresos) ?? 0,
+    tieneHijos: d.tieneHijos ?? false,
+    numHijos: d.tieneHijos ? d.numHijos : undefined,
+    custodia: d.custodia ?? undefined,
+    tieneVivienda: d.tieneVivienda ?? false,
+    posVivienda: d.posVivienda ?? undefined,
+    valorCatastral: numeroOpcional(d.valorCatastral),
+    porcPropiedad: numeroOpcional(d.porcPropiedad),
+    catastroRevisado: d.catastroRevisado ?? undefined,
+    viviendaAsignadaHijos: d.viviendasignadaHijos ?? undefined,
+    tienePensionConyuge: d.tienePensionConyuge ?? false,
+    rolPension: d.rolPension ?? undefined,
+    pensionMensual: numeroOpcional(d.pensionMensual),
+    tieneHipotecaAntigua: d.tieneHipotecaAntigua ?? false,
+    posHipoteca: d.posHipoteca ?? undefined,
+    cuotaHipoteca: numeroOpcional(d.cuotaHipoteca),
+  };
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -239,7 +163,19 @@ export default function ImpuestosDivorcioPage() {
     'Hipoteca anterior a 2013',
   ];
 
-  const resultados = paso === 5 ? calcularResultados(datos) : null;
+  // El motor rechaza con un error los casos incompletos. Al paso 5 solo se llega superando
+  // `pasoValido()` en los cinco anteriores, que exige exactamente lo mismo, así que el catch es
+  // una red y no una vía habitual: si algún día las dos reglas dejan de coincidir, el usuario ve
+  // el motivo en pantalla en vez de una pantalla de error.
+  let resultados: ResultadoImpuestosDivorcio | null = null;
+  let errorCalculo = '';
+  if (paso === 5) {
+    try {
+      resultados = calcularImpuestosDivorcio(aParametrosMotor(datos));
+    } catch (e) {
+      errorCalculo = e instanceof Error ? e.message : 'No ha sido posible calcular el impacto fiscal con estos datos.';
+    }
+  }
 
   const regimenOpciones: { value: Regimen; label: string; desc: string }[] = [
     { value: 'gananciales', label: 'Sociedad de gananciales', desc: 'Los bienes adquiridos durante el matrimonio son comunes' },
@@ -585,6 +521,16 @@ export default function ImpuestosDivorcioPage() {
                   Ver mi análisis fiscal →
                 </button>
               )}
+            </div>
+          </div>
+        ) : errorCalculo ? (
+          <div className={styles.resultados}>
+            <div role="alert" aria-live="polite" className={styles.resultCard}>
+              <p><strong>No se puede calcular con estos datos.</strong></p>
+              <p>{errorCalculo}</p>
+              <button type="button" className={styles.btnSecundario} onClick={() => setPaso(0)}>
+                ← Modificar respuestas
+              </button>
             </div>
           </div>
         ) : (

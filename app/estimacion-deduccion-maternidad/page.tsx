@@ -13,18 +13,39 @@ import {
   DataReference, RegionBadge
 } from '@/components';
 import NumberInput from '@/components/NumberInput';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_MATERNIDAD_META,
   DEDUCCION_MATERNIDAD_IRPF,
 } from '@/data/fiscal';
+import {
+  calcularDeduccionMaternidadIRPF,
+  type SituacionMaternidad,
+  type ResultadoDeduccionMaternidadIRPF,
+} from '@/lib/calculadoras/deduccionMaternidadIRPF';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
+
+// El cálculo vive en `lib/calculadoras/deduccionMaternidadIRPF.ts`, que es también lo que
+// responde la tool `calcular_deduccion_maternidad_irpf` del MCP de Delegum. Esta página es la
+// interfaz.
+//
+// Hasta el 10/09/2026 el cálculo estaba escrito dos veces y ya divergían: el tope de guardería lo
+// aplicaba el motor AL AGREGADO y esta app POR HIJO. La AEAT da la razón a la app —Manual
+// práctico Renta 2025, «Límites de la deducción»: el incremento «no podrá superar PARA CADA HIJO»
+// los 1.000 €—, así que el 09/09 se corrigió el motor, no la página.
+//
+// Al unificar aparecen dos datos que esta página nunca pidió y el art. 81 sí exige: los MESES en
+// que cada hijo da derecho (no todos los bebés nacen en enero) y las COTIZACIONES del año, que
+// son el techo legal de la deducción. Se preguntan ahora: sin ellos la página publicaba 1.200 €
+// por hijo a cualquiera, que es la cifra máxima y rara vez la de nadie.
 
 interface HijoData {
   tieneGuarderia: boolean;
   gastoGuarderia: string;
+  /** Meses del ejercicio en que el hijo es menor de 3 años y da derecho (1-12). */
+  mesesConDerecho: number;
 }
 
 /**
@@ -32,30 +53,22 @@ interface HijoData {
  * con efectos desde el 01-ene-2023). Las tres primeras dan derecho: no estar
  * de alta HOY no excluye por sí solo, porque la reforma de 2023 incorporó a
  * las perceptoras de desempleo y al alta posterior con 30 días cotizados.
+ *
+ * Es el mismo tipo unión del motor: aquí solo se le pone el nombre que usa esta pantalla.
  */
-type SituacionLaboral = 'alta' | 'desempleo' | 'alta-posterior' | 'ninguna';
-
-interface Resultado {
-  esElegible: boolean;
-  motivoNoElegible: string;
-  numHijos: number;
-  deduccionBase: number;
-  incrementoGuarderia: number;
-  incrementoAltaPosterior: number;
-  totalAnual: number;
-  mensualAnticipado: number;
-  detalleHijos: { hijo: number; base: number; guarderia: number }[];
-}
+type SituacionLaboral = SituacionMaternidad;
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function EstimacionDeduccionMaternidadPage() {
+  const HIJO_NUEVO: HijoData = { tieneGuarderia: false, gastoGuarderia: '', mesesConDerecho: 12 };
+
   const [numHijos, setNumHijos] = useState(1);
   const [situacion, setSituacion] = useState<SituacionLaboral>('alta');
-  const [hijos, setHijos] = useState<HijoData[]>([
-    { tieneGuarderia: false, gastoGuarderia: '' },
-  ]);
-  const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [cotizaciones, setCotizaciones] = useState('');
+  const [hijos, setHijos] = useState<HijoData[]>([{ ...HIJO_NUEVO }]);
+  const [resultado, setResultado] = useState<ResultadoDeduccionMaternidadIRPF | null>(null);
+  const [error, setError] = useState('');
 
   // Sincronizar array de hijos cuando cambia el selector
   const cambiarNumHijos = useCallback((n: number) => {
@@ -64,92 +77,72 @@ export default function EstimacionDeduccionMaternidadPage() {
       if (n > prev.length) {
         return [
           ...prev,
-          ...Array.from({ length: n - prev.length }, () => ({
-            tieneGuarderia: false,
-            gastoGuarderia: '',
-          })),
+          ...Array.from({ length: n - prev.length }, () => ({ ...HIJO_NUEVO })),
         ];
       }
       return prev.slice(0, n);
     });
     setResultado(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const actualizarHijo = useCallback((index: number, campo: keyof HijoData, valor: boolean | string) => {
-    setHijos((prev) => {
-      const copia = [...prev];
-      copia[index] = { ...copia[index], [campo]: valor };
-      return copia;
-    });
-  }, []);
+  const actualizarHijo = useCallback(
+    (index: number, campo: keyof HijoData, valor: boolean | string | number) => {
+      setHijos((prev) => {
+        const copia = [...prev];
+        copia[index] = { ...copia[index], [campo]: valor };
+        return copia;
+      });
+    },
+    [],
+  );
 
   const calcular = useCallback(() => {
-    // Solo queda fuera quien no encaja en ninguna de las tres vías del art. 81.1
-    if (situacion === 'ninguna') {
-      setResultado({
-        esElegible: false,
-        motivoNoElegible: 'Con los datos indicados no se cumple ninguna de las tres vias del articulo 81.1 de la Ley del IRPF: alta en la Seguridad Social o mutualidad, prestacion o subsidio de desempleo al nacer el menor, o alta posterior con 30 dias cotizados. Si tu situacion cambia durante el ano, la deduccion se calcula por los meses en que si se cumple.',
-        numHijos,
-        deduccionBase: 0,
-        incrementoGuarderia: 0,
-        incrementoAltaPosterior: 0,
-        totalAnual: 0,
-        mensualAnticipado: 0,
-        detalleHijos: [],
-      });
+    setError('');
+
+    const cotizacionesAnuales = parseSpanishNumber(cotizaciones);
+    if (Number.isNaN(cotizacionesAnuales) || cotizacionesAnuales < 0) {
+      setResultado(null);
+      setError(
+        'Indica cuanto has cotizado a la Seguridad Social en el ejercicio: el articulo 81.1 limita la deduccion a esa cantidad, asi que sin el dato no se puede saber cuanto se cobra.',
+      );
       return;
     }
 
-    const importeBase = DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo;
-    const maxGuarderia = DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual;
-
-    let deduccionBase = 0;
-    let incrementoGuarderia = 0;
-    const detalleHijos: { hijo: number; base: number; guarderia: number }[] = [];
-
-    for (let i = 0; i < numHijos; i++) {
-      const hijo = hijos[i];
-      const base = importeBase;
-      let guarderia = 0;
-
-      if (hijo && hijo.tieneGuarderia) {
-        const gastoStr = hijo.gastoGuarderia.replace(/\./g, '').replace(',', '.');
-        const gastoNum = parseFloat(gastoStr) || 0;
-        guarderia = Math.min(gastoNum, maxGuarderia);
-      }
-
-      deduccionBase += base;
-      incrementoGuarderia += guarderia;
-      detalleHijos.push({ hijo: i + 1, base, guarderia });
+    // El motor resuelve TODO el cálculo, incluidas las tres vías del art. 81.1 y el caso sin
+    // derecho: aquí no se decide nada, solo se traducen los campos del formulario.
+    try {
+      setResultado(
+        calcularDeduccionMaternidadIRPF({
+          situacion,
+          cotizacionesSSTotalesAnio: cotizacionesAnuales,
+          hijos: hijos.slice(0, numHijos).map((h) => {
+            const gasto = parseSpanishNumber(h.gastoGuarderia);
+            return {
+              // El formulario pregunta por hijos menores de 3 años, sin pedir la edad exacta:
+              // 0 es el valor que no recorta meses por sí mismo, y quien acota el derecho es
+              // `mesesConDerechoEjercicio`, que sí se pregunta.
+              edadMesesInicioEjercicio: 0,
+              mesesConDerechoEjercicio: h.mesesConDerecho,
+              gastosGuarderiaAnuales: h.tieneGuarderia && !Number.isNaN(gasto) ? gasto : 0,
+            };
+          }),
+        }),
+      );
+    } catch (e) {
+      setResultado(null);
+      setError(e instanceof Error ? e.message : 'No ha sido posible estimar la deduccion con estos datos.');
     }
-
-    // Art. 81.3, párrafo 2: 150 € adicionales el mes en que se completan los
-    // 30 días cotizados, cuando el derecho nace por un alta posterior al parto.
-    const incrementoAltaPosterior =
-      situacion === 'alta-posterior'
-        ? DEDUCCION_MATERNIDAD_IRPF.incrementoAltaPosterior.importe * numHijos
-        : 0;
-
-    const totalAnual = deduccionBase + incrementoGuarderia + incrementoAltaPosterior;
-
-    setResultado({
-      esElegible: true,
-      motivoNoElegible: '',
-      numHijos,
-      deduccionBase,
-      incrementoGuarderia,
-      incrementoAltaPosterior,
-      totalAnual,
-      mensualAnticipado: totalAnual / 12,
-      detalleHijos,
-    });
-  }, [numHijos, situacion, hijos]);
+  }, [numHijos, situacion, hijos, cotizaciones]);
 
   const limpiar = useCallback(() => {
     setNumHijos(1);
     setSituacion('alta');
-    setHijos([{ tieneGuarderia: false, gastoGuarderia: '' }]);
+    setCotizaciones('');
+    setHijos([{ ...HIJO_NUEVO }]);
     setResultado(null);
+    setError('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -280,12 +273,47 @@ export default function EstimacionDeduccionMaternidadPage() {
             </p>
           </fieldset>
 
+          {/* Cotizaciones: es el TECHO legal de la deduccion (art. 81.1), no un dato accesorio */}
+          <div className={styles.formGroup}>
+            <NumberInput
+              label="Cotizaciones a la Seguridad Social del ejercicio"
+              value={cotizaciones}
+              onChange={setCotizaciones}
+              placeholder="0"
+              min={0}
+              suffix="euro"
+              helperText="Cuota obrera del Regimen General o cuota de autonomos pagadas en el ano. La deduccion no puede superar esta cantidad (art. 81.1 LIRPF)."
+            />
+          </div>
+
           {/* Datos por hijo */}
           {hijos.map((hijo, index) => (
             <div key={index} className={styles.childCard}>
               <p className={styles.childCardTitle}>
                 <span aria-hidden="true">&#x1F476;</span> Hijo/a {index + 1}
               </p>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label} htmlFor={`meses-${index}`}>
+                  Meses del ano en que fue menor de 3 anos
+                </label>
+                <select
+                  id={`meses-${index}`}
+                  className={styles.select}
+                  value={hijo.mesesConDerecho}
+                  onChange={(e) => actualizarHijo(index, 'mesesConDerecho', Number(e.target.value))}
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>
+                      {m} {m === 1 ? 'mes' : 'meses'}
+                    </option>
+                  ))}
+                </select>
+                <p className={styles.helpText}>
+                  12 si cumplio menos de 3 anos todo el ano. Si nacio o cumplio 3 anos durante el
+                  ejercicio, cuenta solo los meses completos con derecho.
+                </p>
+              </div>
 
               <label className={styles.checkboxLabel}>
                 <input
@@ -343,12 +371,17 @@ export default function EstimacionDeduccionMaternidadPage() {
             <span aria-hidden="true">&#x1F4CA;</span> Resultado estimado
           </h2>
 
-          {!resultado ? (
+          {error ? (
+            <div role="alert" aria-live="polite" className={styles.noEligibleBox}>
+              <h3>No se puede estimar con estos datos</h3>
+              <p>{error}</p>
+            </div>
+          ) : !resultado ? (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">&#x1F469;&#x200D;&#x1F467;</span>
               <p>Completa los datos y pulsa &quot;Estimar deduccion&quot; para ver el resultado</p>
             </div>
-          ) : !resultado.esElegible ? (
+          ) : !resultado.tieneDerecho ? (
             <>
               {/* Requisitos no cumplidos */}
               <div className={styles.requisitosGrid}>
@@ -358,13 +391,19 @@ export default function EstimacionDeduccionMaternidadPage() {
                 </div>
                 <div className={`${styles.requisitoItem} ${styles.requisitoOk}`}>
                   <span className={styles.requisitoIcon} aria-hidden="true">&#x2705;</span>
-                  <span className={styles.requisitoText}>Hijos menores de 3 anos ({resultado.numHijos})</span>
+                  <span className={styles.requisitoText}>Hijos menores de 3 anos ({numHijos})</span>
                 </div>
               </div>
 
               <div className={styles.noEligibleBox}>
                 <h3>No cumples los requisitos actualmente</h3>
-                <p>{resultado.motivoNoElegible}</p>
+                <p>
+                  Con los datos indicados no se cumple ninguna de las tres vias del articulo 81.1 de
+                  la Ley del IRPF: alta en la Seguridad Social o mutualidad, prestacion o subsidio de
+                  desempleo al nacer el menor, o alta posterior con 30 dias cotizados. Si tu
+                  situacion cambia durante el ano, la deduccion se calcula por los meses en que si se
+                  cumple.
+                </p>
                 <p style={{ marginTop: '0.75rem' }}>
                   <strong>Alternativa:</strong> si te das de alta en la Seguridad Social (por cuenta
                   propia o ajena), tendras derecho a la deduccion al alcanzar los 30 dias cotizados, y
@@ -389,40 +428,67 @@ export default function EstimacionDeduccionMaternidadPage() {
                 </div>
                 <div className={`${styles.requisitoItem} ${styles.requisitoOk}`}>
                   <span className={styles.requisitoIcon} aria-hidden="true">&#x2705;</span>
-                  <span className={styles.requisitoText}>Hijos menores de 3 anos ({resultado.numHijos})</span>
+                  <span className={styles.requisitoText}>
+                    Hijos menores de 3 anos ({resultado.numHijosConDerecho})
+                  </span>
                 </div>
               </div>
 
               <div className={styles.resultGrid}>
                 <div className={styles.resultItem}>
-                  <span className={styles.resultLabel}>Deduccion base</span>
+                  <span className={styles.resultLabel}>Deduccion por maternidad</span>
                   <span className={styles.resultValue}>
-                    {resultado.numHijos} x {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo)} = {formatCurrency(resultado.deduccionBase)}
+                    {formatCurrency(resultado.deduccionMaternidadEfectiva)}
                   </span>
                 </div>
+                {/* El limite por cotizaciones solo se nombra cuando ha recortado algo: decirlo
+                    siempre lo convertiria en ruido, y callarlo cuando muerde ocultaria por que
+                    la cifra final no es la suma de las lineas de arriba. */}
+                {resultado.deduccionMaternidadEfectiva < resultado.totalDeduccionBruta && (
+                  <div className={styles.resultItem}>
+                    <span className={styles.resultLabel}>Limite por cotizaciones (art. 81.1)</span>
+                    <span className={styles.resultValue}>
+                      {formatCurrency(resultado.totalDeduccionBruta)} &rarr;{' '}
+                      {formatCurrency(resultado.limiteMaternidadCotizaciones)}
+                    </span>
+                  </div>
+                )}
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Incremento guarderia</span>
-                  <span className={styles.resultValue}>{formatCurrency(resultado.incrementoGuarderia)}</span>
+                  <span className={styles.resultValue}>
+                    {formatCurrency(resultado.incrementoGuarderiaEfectivo)}
+                  </span>
                 </div>
-                {resultado.detalleHijos.map((d) => (
-                  d.guarderia > 0 && (
-                    <div key={d.hijo} className={styles.resultItem}>
-                      <span className={styles.resultLabel}>Guarderia hijo/a {d.hijo}</span>
+                {resultado.detalleHijos.map((d, i) => (
+                  d.incrementoGuarderia > 0 && (
+                    <div key={i} className={styles.resultItem}>
+                      <span className={styles.resultLabel}>Guarderia hijo/a {i + 1}</span>
                       <span className={styles.resultValue}>
-                        {formatCurrency(d.guarderia)} (max {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)})
+                        {formatCurrency(d.incrementoGuarderia)} (max {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)})
                       </span>
                     </div>
                   )
                 ))}
-                {resultado.incrementoAltaPosterior > 0 && (
+                {resultado.totalIncrementoAltaPosterior > 0 && (
                   <div className={styles.resultItem}>
                     <span className={styles.resultLabel}>Incremento por alta posterior</span>
                     <span className={styles.resultValue}>
-                      {formatCurrency(resultado.incrementoAltaPosterior)} (una vez, art. 81.3)
+                      {formatCurrency(resultado.totalIncrementoAltaPosterior)} (una vez, art. 81.3)
                     </span>
                   </div>
                 )}
               </div>
+
+              {resultado.advertencias.length > 0 && (
+                <div className={styles.resultNote} role="note">
+                  <span aria-hidden="true">&#x26A0;&#xFE0F;</span>
+                  <div>
+                    {resultado.advertencias.map((a, i) => (
+                      <p key={i}>{a}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className={styles.resultNote} role="note">
                 <span aria-hidden="true">&#x26A0;&#xFE0F;</span>
@@ -437,14 +503,14 @@ export default function EstimacionDeduccionMaternidadPage() {
 
               <div className={styles.resultadoFinal}>
                 <p className={styles.resultadoLabel}>Total deduccion anual</p>
-                <p className={styles.resultadoValor}>{formatCurrency(resultado.totalAnual)}</p>
+                <p className={styles.resultadoValor}>{formatCurrency(resultado.totalDeduccionEfectiva)}</p>
                 <span className={styles.resultadoBadge}>al ano</span>
               </div>
 
               <div className={styles.resultGrid}>
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Cobro anticipado mensual</span>
-                  <span className={styles.resultValue}>{formatCurrency(resultado.mensualAnticipado)}/mes</span>
+                  <span className={styles.resultValue}>{formatCurrency(resultado.totalDeduccionEfectiva / 12)}/mes</span>
                 </div>
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Formulario</span>
@@ -456,7 +522,7 @@ export default function EstimacionDeduccionMaternidadPage() {
                 <span aria-hidden="true">&#x1F4DD;</span>
                 <p>
                   Puedes solicitar el <strong>cobro anticipado mensual</strong> de{' '}
-                  {formatCurrency(resultado.mensualAnticipado)}/mes presentando el{' '}
+                  {formatCurrency(resultado.totalDeduccionEfectiva / 12)}/mes presentando el{' '}
                   <strong>Modelo 140</strong> en la Agencia Tributaria. Tambien puedes incluirlo
                   directamente en la declaracion de la renta anual.
                 </p>

@@ -1,11 +1,12 @@
 /**
  * Impacto en el IRPF de un divorcio o separación (modelo estatal orientativo).
  *
- * Réplica server-side de la lógica inline de app/impuestos-divorcio/page.tsx.
- * La fuente única de tramos, mínimos y reducciones es data/fiscal/irpf.ts.
+ * Fuente ÚNICA del cálculo: lo usan la tool `calcular_impuestos_divorcio` del MCP de Delegum y
+ * la app `app/impuestos-divorcio/`, que desde el 10/09/2026 ya no lleva su copia inline. La
+ * fuente única de tramos, mínimos y reducciones es data/fiscal/irpf.ts.
  *
- * Usada por: MCP server (calcular_impuestos_divorcio).
- * TODO: unificar — la app aún mantiene su propia versión inline del mismo cálculo.
+ * Nació como «réplica server-side» de la app y arrastró un «TODO: unificar» durante tres meses;
+ * mientras estuvo abierto, la copia de la app y esta divergieron en el validador (ver abajo).
  *
  * Alcance: SOLO IRPF (pensión compensatoria art. 55, mínimo por descendientes,
  * imputación de rentas inmobiliarias art. 85, deducción transitoria vivienda D.T. 18ª).

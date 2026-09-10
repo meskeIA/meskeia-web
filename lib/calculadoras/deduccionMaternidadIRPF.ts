@@ -1,6 +1,10 @@
 /**
  * Calculadora de la Deduccion por Maternidad en IRPF
- * Usada por: MCP server (calcular_deduccion_maternidad_irpf)
+ *
+ * Fuente UNICA del calculo: lo usan la tool `calcular_deduccion_maternidad_irpf` del MCP de
+ * Delegum y la app `app/estimacion-deduccion-maternidad/`, que desde el 10/09/2026 ya no lleva su
+ * copia inline. Mientras las dos convivieron divergieron en el tope de guarderia —este lo aplicaba
+ * al agregado y la app POR HIJO— y la que tenia razon era LA APP (Manual practico Renta 2025).
  *
  * Calcula la deduccion por maternidad y el incremento adicional por gastos
  * en guarderia o centros de educacion infantil, aplicables en el IRPF.

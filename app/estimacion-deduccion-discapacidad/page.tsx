@@ -20,18 +20,23 @@ import {
   TRAMOS_IRPF_2025,
 } from '@/data/fiscal';
 
+import {
+  calcularDeduccionDiscapacidadIRPF,
+  type TitularDiscapacidad,
+  type GradoDiscapacidad,
+  type ResultadoDeduccionDiscapacidad,
+} from '@/lib/calculadoras/deduccionDiscapacidadIRPF';
+
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type TitularDiscapacidad = 'contribuyente' | 'ascendiente' | 'descendiente';
-type GradoDiscapacidad = '33a65' | '65oMas';
-
-interface Resultado {
-  minimoDiscapacidad: number;
-  gastosAsistencia: number;
-  totalMinimo: number;
-  tipoMarginal: number;
-  ahorroEstimado: number;
-}
+// El cálculo vive en `lib/calculadoras/deduccionDiscapacidadIRPF.ts`, que es también lo que
+// responde la tool `calcular_deduccion_discapacidad` del MCP de Delegum. Esta página es la
+// interfaz: recoge las cuatro respuestas y muestra el desglose.
+//
+// Hasta el 10/09/2026 el cálculo estaba escrito dos veces. La regla del art. 60 LIRPF —los tres
+// supuestos del incremento por gastos de asistencia son ALTERNATIVOS— llegó a estar mal en el
+// motor y bien en esta página: quien preguntaba por un LLM perdía 3.000 € de mínimo que la web
+// sí reconocía. Se reparó el 09/09 en los dos sitios; ahora ya solo hay uno que reparar.
 
 // ─── Tipos marginales disponibles ─────────────────────────────────────────────
 
@@ -44,37 +49,12 @@ export default function EstimacionDeduccionDiscapacidadPage() {
   const [grado, setGrado] = useState<GradoDiscapacidad>('33a65');
   const [necesitaAsistencia, setNecesitaAsistencia] = useState(false);
   const [tipoMarginal, setTipoMarginal] = useState(24);
-  const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [resultado, setResultado] = useState<ResultadoDeduccionDiscapacidad | null>(null);
 
   const calcular = useCallback(() => {
-    const datos = titular === 'contribuyente'
-      ? DEDUCCIONES_IRPF_DISCAPACIDAD_2025.contribuyente
-      : DEDUCCIONES_IRPF_DISCAPACIDAD_2025.familiar;
-
-    const minimoDiscapacidad = grado === '33a65'
-      ? datos.discapacidad33a65
-      : datos.discapacidad65oMas;
-
-    // Art. 60 LIRPF: los tres supuestos del incremento por gastos de asistencia son
-    // ALTERNATIVOS —ayuda de terceras personas, movilidad reducida O grado ≥ 65 %—, según el
-    // Manual práctico Renta 2025 de la AEAT. Con grado 33-64 % la acreditación es condición
-    // necesaria; con grado ≥ 65 % el grado basta por sí solo.
-    const tieneDerechoAsistencia = necesitaAsistencia || grado === '65oMas';
-
-    const gastosAsistencia = tieneDerechoAsistencia
-      ? (grado === '33a65' ? datos.gastosAsistencia33a65 : datos.gastosAsistencia65oMas)
-      : 0;
-
-    const totalMinimo = minimoDiscapacidad + gastosAsistencia;
-    const ahorroEstimado = totalMinimo * (tipoMarginal / 100);
-
-    setResultado({
-      minimoDiscapacidad,
-      gastosAsistencia,
-      totalMinimo,
-      tipoMarginal,
-      ahorroEstimado,
-    });
+    setResultado(
+      calcularDeduccionDiscapacidadIRPF({ titular, grado, necesitaAsistencia, tipoMarginal })
+    );
   }, [titular, grado, necesitaAsistencia, tipoMarginal]);
 
   const limpiar = useCallback(() => {

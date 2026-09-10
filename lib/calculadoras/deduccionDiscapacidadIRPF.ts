@@ -1,12 +1,14 @@
 /**
  * Mínimo por discapacidad en el IRPF (Ley 35/2006, arts. 60-65).
  *
- * Réplica server-side de la lógica inline de
- * app/estimacion-deduccion-discapacidad/page.tsx. La fuente única de los importes
- * es data/fiscal/dependencia.ts (DEDUCCIONES_IRPF_DISCAPACIDAD_2025).
+ * Fuente ÚNICA del cálculo: lo usan la tool `calcular_deduccion_discapacidad` del MCP de Delegum
+ * y la app `app/estimacion-deduccion-discapacidad/`, que desde el 10/09/2026 ya no lleva su copia
+ * inline. La fuente única de los importes es data/fiscal/dependencia.ts
+ * (DEDUCCIONES_IRPF_DISCAPACIDAD_2025).
  *
- * Usada por: MCP server (calcular_deduccion_discapacidad).
- * TODO: unificar — la app aún mantiene su propia versión inline del mismo cálculo.
+ * Nació como «réplica server-side» de esa app, y mientras las dos copias convivieron divergieron:
+ * el 09/09/2026 se encontró aquí condicionado a `necesitaAsistencia` un incremento que el art. 60
+ * concede también por grado ≥65 %, con la app haciéndolo bien. Eran 3.000 € de mínimo.
  *
  * El mínimo reduce la base liquidable, no la cuota. El "ahorro" es una estimación
  * aplicando un tipo marginal plano (puede repartirse entre dos tramos en la realidad).
