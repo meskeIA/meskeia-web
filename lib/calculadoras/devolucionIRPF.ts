@@ -1,6 +1,6 @@
 /**
  * Simulador de Devolución / Pago IRPF — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_devolucion_irpf)
+ * Usada por: /chatgpt/devolucion-irpf
  *
  * Estima si la declaración de la renta saldrá a devolver o a pagar,
  * comparando las retenciones practicadas durante el año con la cuota

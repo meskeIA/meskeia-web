@@ -1,6 +1,6 @@
 /**
  * Calculadora de Imputación de Rentas Inmobiliarias — lógica pura
- * Usada por: MCP server (calcular_imputacion_rentas_inmuebles)
+ * Usada por: /chatgpt/imputacion-rentas
  *
  * Calcula la imputación de rentas inmobiliarias que deben declararse en el
  * IRPF por el mero hecho de ser propietario o usufructuario de inmuebles

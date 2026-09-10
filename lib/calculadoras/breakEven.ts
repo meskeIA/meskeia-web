@@ -1,6 +1,6 @@
 /**
  * Calculadora de Punto de Equilibrio (Break-Even) — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_break_even)
+ * Usada por: /chatgpt/break-even
  *
  * Calcula las unidades y euros de ventas necesarios para cubrir todos los costes.
  * Incluye análisis de escenarios what-if.

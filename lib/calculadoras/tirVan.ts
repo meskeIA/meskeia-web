@@ -1,6 +1,6 @@
 /**
  * Calculadora de TIR y VAN — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_tir_van)
+ * Usada por: /chatgpt/tir-van
  *
  * Calcula el Valor Actual Neto (VAN) y la Tasa Interna de Retorno (TIR)
  * para analizar la rentabilidad de una inversión.

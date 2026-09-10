@@ -1,6 +1,6 @@
 /**
  * Calculadora de Herencia Conjunta — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_herencia_conjunta)
+ * Usada por: solo sus tests (tests/sucesiones-cataluna-motor.spec.ts)
  *
  * Divide una masa hereditaria entre varios herederos y calcula
  * el Impuesto de Sucesiones de cada uno.

@@ -1,6 +1,6 @@
 /**
  * Calculadora del IIVTNU (Plusvalía Municipal) — lógica pura
- * Usada por: MCP server (calcular_iivtnu_plusvalia_municipal)
+ * Usada por: /chatgpt/plusvalia-municipal
  *
  * Calcula el Impuesto sobre el Incremento del Valor de los Terrenos de
  * Naturaleza Urbana (IIVTNU), conocido como "plusvalía municipal", aplicando

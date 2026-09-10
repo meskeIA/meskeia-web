@@ -1,6 +1,6 @@
 /**
  * Calculadora de Rescate de Plan de Pensiones en IRPF
- * Usada por: MCP server (calcular_rescate_plan_pensiones)
+ * Usada por: /chatgpt/rescate-plan-pensiones
  *
  * Calcula la tributacion del rescate de un plan de pensiones (u otro
  * sistema de prevision social: PPA, PIAS, mutualidades, planes de empleo)

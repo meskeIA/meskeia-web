@@ -1,6 +1,6 @@
 /**
  * Calculadora IRPF Segundo Pagador — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_irpf_segunda_pagador)
+ * Usada por: /chatgpt/irpf-segundo-pagador
  *
  * Determina si existe obligación de presentar la declaración de IRPF cuando
  * hay más de un pagador, y calcula el impacto en la retención y la posible

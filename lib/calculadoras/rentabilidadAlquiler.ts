@@ -1,6 +1,6 @@
 /**
  * Calculadora de Rentabilidad de Alquiler — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_rentabilidad_alquiler)
+ * Usada por: /chatgpt/rentabilidad-alquiler
  *
  * Calcula la rentabilidad bruta, neta, cash flow mensual y período de
  * recuperación de una inversión inmobiliaria destinada al alquiler.

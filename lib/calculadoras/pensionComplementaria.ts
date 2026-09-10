@@ -1,6 +1,6 @@
 /**
  * Calculadora de Pensión Complementaria — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_pension_complementaria)
+ * Usada por: /chatgpt/pension-complementaria
  *
  * Calcula cuánto capital privado necesitas acumular y cuánto debes ahorrar
  * mensualmente para complementar la pensión pública hasta el nivel de renta

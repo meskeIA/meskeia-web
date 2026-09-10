@@ -1,6 +1,6 @@
 /**
  * Calculadora de ROI de Marketing — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_roi_marketing)
+ * Usada por: /chatgpt/roi-marketing
  *
  * Calcula el retorno de inversión por canal de marketing:
  * ROI, beneficio, CAC (coste por cliente), ROAS y ratio CLV/CAC.

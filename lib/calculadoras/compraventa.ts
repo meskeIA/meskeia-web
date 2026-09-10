@@ -1,6 +1,6 @@
 /**
  * Calculadora de Gastos de Compraventa Inmobiliaria — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_compraventa_inmueble)
+ * Usada por: MCP de Delegum · /chatgpt/compraventa
  *
  * Cubre los gastos del comprador (ITP/IVA, AJD, notaría, registro, gestoría)
  * y los del vendedor (plusvalía municipal IIVTNU, IRPF sobre ganancia patrimonial).

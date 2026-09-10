@@ -1,6 +1,6 @@
 /**
  * Calculadora de Coste Real de un Empleado — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_coste_empleado)
+ * Usada por: /chatgpt/coste-empleado
  *
  * Calcula el coste total para el empleador: salario bruto + cuotas
  * de Seguridad Social a cargo de la empresa (contingencias comunes,

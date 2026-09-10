@@ -44,11 +44,29 @@
  *
  * De ahí que el «riesgo» del cribado pesara una exposición al MCP que en la práctica no existe,
  * y que auditar la normativa de los 66 sea trabajo sin destinatario posible: nadie recibe hoy
- * —ni puede recibir mañana— un número salido de ahí. Se decidió NO borrarlos (por si alguno se
- * conecta), pero sí que el cribado deje de mezclarlos con lo que sí tiene lectores.
+ * —ni puede recibir mañana— un número salido de ahí. Se decidió NO borrarlos, por si alguno se
+ * conectaba, y que el cribado dejara de mezclarlos con lo que sí tiene lectores.
+ *
+ * SE REVIRTIÓ EL 10/09/2026: LOS HUÉRFANOS SE RETIRARON
+ * ─────────────────────────────────────────────────────
+ * «Por si alguno se conecta» no llegó a ocurrir en los quince meses que llevaban sin lector, y
+ * mientras tanto el coste sí se materializó dos veces: el 13/08/2026 se repararon `permisoParental`
+ * y `excedenteCotizacionSS`, y el 09/09/2026 ocho más en la pasada de motores compartidos. Once
+ * reparaciones de normativa sobre código que nadie podía ejecutar.
+ *
+ * Y la razón para conservarlos se cayó al mirarla de cerca: conectarlos habría significado
+ * sustituir, en apps que están en producción, un cálculo que la gente usa por otro que no se ha
+ * ejecutado jamás y no tiene ni un test. La prueba de que no eran el material de partida ya
+ * existía: cuando se construyó el MCP de Delegum en junio de 2026 se escribieron 42 tools nuevas
+ * teniéndolos delante, sin reutilizar ninguno.
+ *
+ * Se retiraron 86 (17.698 líneas). `herenciaConjunta` se conservó: tiene test y lo cita
+ * `sucesiones.ts`. Siguen en el historial de git si alguna vez hacen falta.
  *
  * ⚠️ La cabecera «Usada por: MCP server (...)» de un motor NO demuestra que la tool exista.
- * Es un comentario, y en 107 casos miente. Para saber si una tool está viva, mirar los routers.
+ * Es un comentario, y llegó a mentir en 107 casos. Para saber si una tool está viva, mirar los
+ * routers — o dejar que lo haga `npm run check:motores`, que desde el 10/09/2026 rompe el build
+ * si un motor se queda sin lector o si su cabecera promete una tool que no está registrada.
  */
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';

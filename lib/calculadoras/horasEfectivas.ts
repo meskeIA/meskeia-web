@@ -1,6 +1,6 @@
 /**
  * Calculadora de Horas Efectivas y Coste Hora Real — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_horas_efectivas)
+ * Usada por: /chatgpt/horas-facturables
  *
  * Calcula las horas realmente trabajadas al año (descontando vacaciones, festivos,
  * bajas por enfermedad, formación, etc.) y el coste hora efectivo resultante.

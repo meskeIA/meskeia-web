@@ -1,6 +1,6 @@
 /**
  * Calculadora de Costes de Venta de Inmueble — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_venta_inmueble)
+ * Usada por: MCP de Delegum
  *
  * Calcula todos los costes e impuestos que asume el VENDEDOR al vender un
  * inmueble en España: plusvalía municipal (IIVTNU), IRPF sobre la ganancia

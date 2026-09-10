@@ -1,6 +1,6 @@
 /**
  * Calculadora de Gastos Deducibles IRPF Autónomo — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_deduccion_autonomo_irpf) y la API Route
+ * Usada por: /chatgpt/gastos-deducibles
  * /api/chatgpt/gastos-deducibles (ChatGPT Actions).
  *
  * ⚠️ Este motor NO tiene app: sus cifras solo las lee un LLM, que se las recita a

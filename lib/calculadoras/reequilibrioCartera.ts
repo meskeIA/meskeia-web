@@ -1,6 +1,6 @@
 /**
  * Calculadora de Reequilibrio de Cartera de Inversión — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_reequilibrio_cartera)
+ * Usada por: /chatgpt/reequilibrio-cartera
  *
  * Calcula cómo reequilibrar (rebalancear) una cartera de inversión cuando los pesos
  * actuales de los activos han divergido de los pesos objetivo por la evolución

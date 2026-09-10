@@ -1,6 +1,6 @@
 /**
  * Calculadora de Impuesto sobre Sociedades (IS) — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_impuesto_sociedades)
+ * Usada por: /chatgpt/impuesto-sociedades
  *
  * Calcula la cuota del IS para sociedades españolas, aplicando los tipos
  * vigentes en 2026 y las principales deducciones (LIS arts. 19, 29, 68).

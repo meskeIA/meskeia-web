@@ -1,6 +1,6 @@
 /**
  * Calculadora de Objetivo de Ahorro — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_objetivo_ahorro)
+ * Usada por: /chatgpt/objetivo-ahorro
  *
  * Responde dos preguntas complementarias:
  * A) ¿Cuántos meses necesito para ahorrar un objetivo dado un ahorro mensual?

@@ -1,6 +1,6 @@
 /**
  * Calculadora de Recargo por Presentación Fuera de Plazo — lógica pura
- * Usada por: MCP server (calcular_recargo_presentacion_tardia)
+ * Usada por: app/estimador-compraventa-inmueble/, app/estimador-impuesto-donaciones/, app/orientacion-tramitacion-herencias/ y 3 app(s) más
  *
  * Calcula el recargo extemporáneo por presentación de declaraciones tributarias
  * fuera del plazo legal sin requerimiento previo de la Administración (LGT art. 27).

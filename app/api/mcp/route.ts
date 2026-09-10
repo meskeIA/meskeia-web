@@ -33,11 +33,6 @@ import { calcularInflacion } from '@/lib/calculadoras/inflacion';
 import { calcularMcdMcm } from '@/lib/calculadoras/mcdMcm';
 import { calcularKilometraje, type PerfilKilometraje } from '@/lib/calculadoras/kilometraje';
 import { calcularEstadisticas } from '@/lib/calculadoras/estadisticas';
-// ── Lote P:
-// ── Lote Q:
-// ── Lote R:
-// ── Lote S:
-// ── Lote T:
 // ── Fotografía:
 import { calcularProfundidadCampo, calcularAstrofoto, calcularExposicionEquivalente, type TipoSensor, type ParametroFijo } from '@/lib/calculadoras/fotografia';
 // ── Deporte:
@@ -1083,19 +1078,12 @@ function crearServidorMCP(): McpServer {
     }
   );
 
-  // ── Lote S: rendimiento capital inmobiliario, pension alimenticia, deduccion maternidad, familia numerosa, intangibles, operaciones vinculadas, impuesto plasticos, startups ──
 
-  // ── Lote R: ITF, inversion sujeto pasivo IVA, TFI, simplificado IVA, modelo 111, cese actividad, MSCT, complemento brecha genero ──
 
-  // ── Lote Q: impatriados, recargo equivalencia, irregulares IRPF, reinversion vivienda, jubilacion parcial, movilidad geografica, derechos autor, abatimiento ──
 
-  // ── Lote P: criptomonedas, bonificacion contratacion, I+D+i, prorrata IVA, modelo 347, empresa familiar ISD, retribucion especie, grandes fortunas ──
 
-  // ── Lote O: AJD, renta vitalicia, plan pensión empresa, despido objetivo, ERTE, dietas, descuento efectos, provisión insolvencias ──
 
-  // ── Lote N: IIVTNU, arrendamiento, maternidad, ITP, imputación, vivienda CCAA, módulos, nocturnidad rotativa ──
 
-  // ── Lote T: reduccion plan pensiones IRPF, compensacion BINs IS, gastos deducibles autonomo, retencion dividendos, IBI, modelo 720, rescate plan pensiones, doble imposicion IS ──
 
   // TOOL: recomendar_vehiculo
   // ------------------------------------------------------------------
