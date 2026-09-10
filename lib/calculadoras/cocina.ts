@@ -8,69 +8,192 @@ export interface IngredienteBaker {
   nombre: string;
   gramos: number;
   porcentajePanadero: number;
+  /** Hidratación declarada si el ingrediente es un prefermento; undefined si es simple. */
+  prefermentoHidratacion_pct?: number;
+}
+
+/**
+ * Un prefermento (masa madre, poolish, biga, esponja) NO es un ingrediente simple: es harina
+ * y agua ya mezcladas. Sus dos mitades tienen que sumarse a la harina y al agua de la fórmula,
+ * o la hidratación que se enseña es falsa. Ver `descomponerPrefermento`.
+ */
+export interface DesglosePrefermento {
+  nombre: string;
+  gramos: number;
+  hidratacion_pct: number;
+  harina_g: number;
+  agua_g: number;
+}
+
+export interface EntradaBakerGramos {
+  nombre: string;
+  gramos: number;
+  /** Hidratación del prefermento en % sobre su propia harina (100 = mitad harina, mitad agua). */
+  prefermentoHidratacion_pct?: number;
+}
+
+export interface EntradaBakerPorcentaje {
+  nombre: string;
+  porcentaje: number;
+  prefermentoHidratacion_pct?: number;
 }
 
 export interface ResultadoBakersPercentage {
+  /** Harina TOTAL de la fórmula (la pesada aparte + la que aportan los prefermentos). Es el 100%. */
   harina_g: number;
+  /** La harina que se pesa aparte, sin contar la de los prefermentos. */
+  harinaAnadida_g: number;
+  /** Agua TOTAL de la fórmula (la pesada aparte + la que aportan los prefermentos). */
+  agua_g: number;
+  /** El agua que se pesa aparte, sin contar la de los prefermentos. Negativa = fórmula imposible. */
+  aguaAnadida_g: number;
   ingredientes: IngredienteBaker[];
+  prefermentos: DesglosePrefermento[];
+  /** Qué fracción de la harina total llega ya fermentada. 0 si no hay prefermentos. */
+  harinaPrefermentada_pct: number;
   hidratacion_pct: number;
   pesoMasa_g: number;
   rendimiento_porciones?: number;
 }
 
+const ES_AGUA = /agua|water|h2o/i;
+
+const redondear1 = (n: number) => Math.round(n * 10) / 10;
+
+/** Porcentaje sobre la harina total, con guarda: sin harina no hay sistema del panadero. */
+const pctSobreHarina = (gramos: number, harinaTotal_g: number) =>
+  harinaTotal_g > 0 ? redondear1((gramos / harinaTotal_g) * 100) : 0;
+
+/**
+ * Reparte los gramos de un prefermento entre la harina y el agua que lo componen.
+ * Con hidratación h: harina = g / (1 + h/100) y el resto es agua. Una masa madre al 100%
+ * de 200 g son 100 g de harina y 100 g de agua; al 50%, 133 g de harina y 67 g de agua.
+ * El agua se obtiene por resta para que las dos mitades sumen SIEMPRE los gramos de partida.
+ */
+export function descomponerPrefermento(
+  nombre: string,
+  gramos: number,
+  hidratacion_pct: number,
+): DesglosePrefermento {
+  const h = Math.max(0, hidratacion_pct);
+  const harina_g = Math.round(gramos / (1 + h / 100));
+  return { nombre, gramos, hidratacion_pct: h, harina_g, agua_g: gramos - harina_g };
+}
+
+const esPrefermento = (i: { prefermentoHidratacion_pct?: number }) =>
+  typeof i.prefermentoHidratacion_pct === 'number' && Number.isFinite(i.prefermentoHidratacion_pct);
+
 export function calcularBakersPercentage(
   harina_g: number,
-  otros: { nombre: string; gramos: number }[],
+  otros: EntradaBakerGramos[],
   peso_porcion_g?: number,
 ): ResultadoBakersPercentage {
+  const prefermentos = otros
+    .filter(esPrefermento)
+    .map(i => descomponerPrefermento(i.nombre, i.gramos, i.prefermentoHidratacion_pct as number));
+
+  const harinaDePrefermentos = prefermentos.reduce((s, p) => s + p.harina_g, 0);
+  const aguaDePrefermentos = prefermentos.reduce((s, p) => s + p.agua_g, 0);
+
+  // El 100% del sistema es la harina TOTAL: la que se pesa más la que llega dentro del
+  // prefermento. Si no se cuenta la segunda, todos los porcentajes salen inflados.
+  const harinaTotal_g = harina_g + harinaDePrefermentos;
+
+  // Se suman TODAS las filas de agua, no solo la primera: dos aguas («agua», «agua tibia»)
+  // eran media hidratación perdida.
+  const aguaAnadida_g = otros
+    .filter(i => !esPrefermento(i) && ES_AGUA.test(i.nombre))
+    .reduce((s, i) => s + i.gramos, 0);
+  const agua_g = aguaAnadida_g + aguaDePrefermentos;
+
   const ingredientes: IngredienteBaker[] = otros.map(i => ({
     nombre: i.nombre,
     gramos: i.gramos,
-    porcentajePanadero: Math.round((i.gramos / harina_g) * 1000) / 10,
+    porcentajePanadero: pctSobreHarina(i.gramos, harinaTotal_g),
+    prefermentoHidratacion_pct: esPrefermento(i) ? i.prefermentoHidratacion_pct : undefined,
   }));
-
-  const agua = otros.find(i =>
-    /agua|water|h2o/i.test(i.nombre),
-  );
-  const hidratacion_pct = agua
-    ? Math.round((agua.gramos / harina_g) * 1000) / 10
-    : 0;
 
   const pesoMasa_g = harina_g + otros.reduce((s, i) => s + i.gramos, 0);
   const rendimiento_porciones = peso_porcion_g
     ? Math.floor(pesoMasa_g / peso_porcion_g)
     : undefined;
 
-  return { harina_g, ingredientes, hidratacion_pct, pesoMasa_g, rendimiento_porciones };
+  return {
+    harina_g: harinaTotal_g,
+    harinaAnadida_g: harina_g,
+    agua_g,
+    aguaAnadida_g,
+    ingredientes,
+    prefermentos,
+    harinaPrefermentada_pct: pctSobreHarina(harinaDePrefermentos, harinaTotal_g),
+    hidratacion_pct: pctSobreHarina(agua_g, harinaTotal_g),
+    pesoMasa_g,
+    rendimiento_porciones,
+  };
 }
 
 // Modo inverso: en vez de partir de gramos por ingrediente, se fija el peso final de la masa
 // (el molde, la bandeja) y los porcentajes de cada ingrediente sobre la harina, y se resuelve
 // cuánta harina hace falta. harina = pesoMasaTotal / (1 + Σporcentajes/100).
+//
+// Aquí los porcentajes son los de la FÓRMULA TOTAL, que es como se habla en porcentajes: el
+// agua declarada ya incluye la que aporta el prefermento, y por eso el prefermento no suma
+// peso propio (su harina y su agua ya están contadas). En la mesa se pesa menos harina y
+// menos agua, y esa resta es `harinaAnadida_g` / `aguaAnadida_g`.
 export function calcularBakersPercentageDesdePeso(
   pesoMasaTotal_g: number,
-  otros: { nombre: string; porcentaje: number }[],
+  otros: EntradaBakerPorcentaje[],
   peso_porcion_g?: number,
 ): ResultadoBakersPercentage {
-  const sumaPorcentajes = otros.reduce((s, i) => s + i.porcentaje, 0);
-  const harina_g = Math.round(pesoMasaTotal_g / (1 + sumaPorcentajes / 100));
+  const sumaNoPrefermentos = otros
+    .filter(i => !esPrefermento(i))
+    .reduce((s, i) => s + i.porcentaje, 0);
+  const harinaTotal_g = Math.round(pesoMasaTotal_g / (1 + sumaNoPrefermentos / 100));
 
   const ingredientes: IngredienteBaker[] = otros.map(i => ({
     nombre: i.nombre,
-    gramos: Math.round((harina_g * i.porcentaje) / 100),
+    gramos: Math.round((harinaTotal_g * i.porcentaje) / 100),
     porcentajePanadero: i.porcentaje,
+    prefermentoHidratacion_pct: esPrefermento(i) ? i.prefermentoHidratacion_pct : undefined,
   }));
 
-  const agua = otros.find(i => /agua|water|h2o/i.test(i.nombre));
-  const hidratacion_pct = agua ? agua.porcentaje : 0;
+  const prefermentos = ingredientes
+    .filter(esPrefermento)
+    .map(i => descomponerPrefermento(i.nombre, i.gramos, i.prefermentoHidratacion_pct as number));
+
+  const harinaDePrefermentos = prefermentos.reduce((s, p) => s + p.harina_g, 0);
+  const aguaDePrefermentos = prefermentos.reduce((s, p) => s + p.agua_g, 0);
+
+  // La hidratación sale de los porcentajes declarados, no de los gramos ya redondeados:
+  // un 65% pedido tiene que seguir leyéndose 65,0% y no 65,1% por el redondeo a gramos.
+  const hidratacion_pct = redondear1(
+    otros.filter(i => !esPrefermento(i) && ES_AGUA.test(i.nombre))
+      .reduce((s, i) => s + i.porcentaje, 0),
+  );
+  const agua_g = ingredientes
+    .filter(i => !esPrefermento(i) && ES_AGUA.test(i.nombre))
+    .reduce((s, i) => s + i.gramos, 0);
 
   // El peso real puede diferir en 1-2 g del objetivo por el redondeo a gramos enteros.
-  const pesoMasa_g = harina_g + ingredientes.reduce((s, i) => s + i.gramos, 0);
+  const pesoMasa_g = harinaTotal_g + ingredientes
+    .filter(i => !esPrefermento(i))
+    .reduce((s, i) => s + i.gramos, 0);
   const rendimiento_porciones = peso_porcion_g
     ? Math.floor(pesoMasa_g / peso_porcion_g)
     : undefined;
 
-  return { harina_g, ingredientes, hidratacion_pct, pesoMasa_g, rendimiento_porciones };
+  return {
+    harina_g: harinaTotal_g,
+    harinaAnadida_g: harinaTotal_g - harinaDePrefermentos,
+    agua_g,
+    aguaAnadida_g: agua_g - aguaDePrefermentos,
+    ingredientes,
+    prefermentos,
+    harinaPrefermentada_pct: pctSobreHarina(harinaDePrefermentos, harinaTotal_g),
+    hidratacion_pct,
+    pesoMasa_g,
+    rendimiento_porciones,
+  };
 }
 
 // ─── 2. Hidratación del pan (bidireccional) ───────────────────────────────────

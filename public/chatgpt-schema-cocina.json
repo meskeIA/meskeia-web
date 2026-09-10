@@ -13,7 +13,7 @@
       "post": {
         "operationId": "calcularPorcentajePanadero",
         "summary": "Calcula el porcentaje del panadero (baker's percentage)",
-        "description": "Expresa cada ingrediente como % del peso de harina (la harina siempre es 100%). Detecta el agua para calcular la hidratación automáticamente.",
+        "description": "Expresa cada ingrediente como % del peso de harina (la harina siempre es 100%). Detecta el agua para calcular la hidratación automáticamente. Si la receta lleva un prefermento (masa madre, poolish, biga, esponja), hay que marcarlo con prefermento_hidratacion_pct: es harina y agua ya mezcladas, y sin declararlo la hidratación sale más baja de la real.",
         "requestBody": {
           "required": true,
           "content": {
@@ -22,7 +22,7 @@
                 "type": "object",
                 "required": ["harina_g", "ingredientes"],
                 "properties": {
-                  "harina_g": { "type": "number", "description": "Peso de la harina en gramos." },
+                  "harina_g": { "type": "number", "description": "Peso de la harina que se pesa aparte, en gramos (sin contar la que va dentro de un prefermento)." },
                   "ingredientes": {
                     "type": "array",
                     "description": "Demás ingredientes de la receta.",
@@ -31,7 +31,8 @@
                       "required": ["nombre", "gramos"],
                       "properties": {
                         "nombre": { "type": "string" },
-                        "gramos": { "type": "number" }
+                        "gramos": { "type": "number" },
+                        "prefermento_hidratacion_pct": { "type": "number", "description": "Solo para prefermentos (masa madre, poolish, biga, esponja): su hidratación en % sobre su propia harina. 100 = mitad harina y mitad agua; una biga o una madre firme van a 50-60. Omitir en los ingredientes normales." }
                       }
                     }
                   },

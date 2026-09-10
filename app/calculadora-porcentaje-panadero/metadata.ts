@@ -48,8 +48,10 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Calcula el porcentaje del panadero de cada ingrediente respecto a la harina',
+    'Trata la masa madre, el poolish y la biga como lo que son: harina y agua ya mezcladas',
+    'Da la hidratación real de la masa, contando la del prefermento, y el % de harina prefermentada',
+    'Separa la fórmula total de lo que hay que pesar en la balanza',
     'Modo inverso: fija un peso final de masa y los porcentajes, y obtén los gramos exactos',
-    'Muestra la hidratación de la masa de forma destacada',
     'Permite añadir y eliminar ingredientes dinámicamente',
     'Calcula el número de porciones según el peso por porción',
     'Estado inicial con receta básica: harina, agua, sal y levadura',
@@ -98,6 +100,22 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Sí, con el modo inverso. En vez de introducir gramos y obtener porcentajes, se introducen los porcentajes de la fórmula (agua, sal, levadura...) y el peso final de masa que se necesita —el que cabe en un molde o una bandeja concreta— y la calculadora reparte los gramos exactos de harina y de cada ingrediente para llegar a ese peso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se cuenta la masa madre en el porcentaje del panadero?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La masa madre no es un ingrediente simple: es harina y agua ya mezcladas, y las dos mitades cuentan en la fórmula. Una masa madre al 100% de hidratación lleva partes iguales, así que 200 g son 100 g de harina y 100 g de agua. En una receta de 1000 g de harina y 650 g de agua, la harina real pasa a 1100 g y el agua a 750 g: la hidratación es del 68,2%, no del 65% que sale al apuntar la masa madre como un ingrediente más. Lo mismo vale para el poolish (100%) y para la biga o una madre firme (50-60%).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el porcentaje de harina prefermentada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es la fracción de la harina total que llega a la masa ya fermentada, dentro del prefermento. Con 200 g de masa madre al 100% sobre 1000 g de harina, la harina prefermentada es de 100 g sobre 1100 g totales: un 9,1%. Es la cifra con la que los panaderos hablan de fuerza y de tiempos, porque un 10% y un 40% de harina prefermentada dan panes distintos aunque la hidratación sea la misma. No puede calcularse sin separar antes la harina y el agua del prefermento.',
       },
     },
     {

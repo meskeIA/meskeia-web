@@ -21,6 +21,7 @@ import {
   calcularBakersPercentage,
   calcularBakersPercentageDesdePeso,
   calcularDDT,
+  descomponerPrefermento,
 } from '../lib/calculadoras/cocina';
 import {
   ajustarFermentacion,
@@ -150,5 +151,137 @@ test.describe('Porcentaje del panadero — modo inverso (peso final → gramos)'
     expect(inverso.ingredientes.map(i => i.gramos)).toEqual(
       directo.ingredientes.map(i => i.gramos),
     );
+  });
+});
+
+/**
+ * Prefermentos (masa madre, poolish, biga, esponja).
+ *
+ * De dónde sale: hasta el 10/09/2026 un prefermento entraba en la lista como un ingrediente
+ * plano, así que su harina y su agua no se contaban. La app enseñaba entonces una hidratación
+ * FALSA y encima la etiquetaba («masa seca» / «hidratación muy alta»), que es justo lo que
+ * prohíbe la regla de no dar una cifra bajo un aviso. La app hermana `calculadora-masa-madre`
+ * ya explicaba el problema en su bloque educativo y sí lo resolvía; la que lo necesitaba, no.
+ *
+ * La descomposición es aritmética elemental: un prefermento de g gramos a hidratación h lleva
+ * g/(1+h/100) de harina y el resto de agua.
+ */
+test.describe('Porcentaje del panadero — prefermentos', () => {
+  test('A MANO: 200 g de masa madre al 100% son 100 g de harina y 100 g de agua', () => {
+    expect(descomponerPrefermento('Masa madre', 200, 100)).toEqual({
+      nombre: 'Masa madre', gramos: 200, hidratacion_pct: 100, harina_g: 100, agua_g: 100,
+    });
+    // Masa madre firme (50%): 300 / 1,5 = 200 g de harina, 100 g de agua.
+    expect(descomponerPrefermento('Masa madre firme', 300, 50)).toMatchObject({
+      harina_g: 200, agua_g: 100,
+    });
+  });
+
+  test('LAS DOS MITADES SUMAN SIEMPRE LOS GRAMOS DE PARTIDA, pese al redondeo', () => {
+    for (const [g, h] of [[100, 65], [237, 80], [55, 33], [1, 100]] as const) {
+      const p = descomponerPrefermento('Prefermento', g, h);
+      expect(p.harina_g + p.agua_g).toBe(g);
+    }
+  });
+
+  test('EL CASO QUE MOTIVÓ EL ARREGLO: 1000 harina + 650 agua + 200 masa madre al 100%', () => {
+    const receta = [
+      { nombre: 'Agua', gramos: 650 },
+      { nombre: 'Sal', gramos: 20 },
+      { nombre: 'Levadura', gramos: 3 },
+    ];
+
+    // Sin declarar el prefermento la masa madre es un ingrediente plano: 650/1000 = 65,0%.
+    const plano = calcularBakersPercentage(1000, [...receta, { nombre: 'Masa madre', gramos: 200 }]);
+    expect(plano.hidratacion_pct).toBe(65);
+
+    // Declarado: harina 1000+100 = 1100, agua 650+100 = 750 → 68,2%, y la sal deja de estar
+    // al 2,0%. (La desviación crece con el prefermento: ver el caso de 400 g más abajo, que
+    // sí cambia de categoría.)
+    const real = calcularBakersPercentage(1000, [
+      ...receta,
+      { nombre: 'Masa madre', gramos: 200, prefermentoHidratacion_pct: 100 },
+    ]);
+    expect(real.harina_g).toBe(1100);
+    expect(real.harinaAnadida_g).toBe(1000);
+    expect(real.agua_g).toBe(750);
+    expect(real.aguaAnadida_g).toBe(650);
+    expect(real.hidratacion_pct).toBe(68.2);
+    expect(real.harinaPrefermentada_pct).toBe(9.1);   // 100/1100
+    expect(real.ingredientes.find(i => i.nombre === 'Sal')?.porcentajePanadero).toBe(1.8);
+
+    // El peso de la masa no cambia: el prefermento pesa lo que pesa, se declare o no.
+    expect(real.pesoMasa_g).toBe(plano.pesoMasa_g);
+    expect(real.pesoMasa_g).toBe(1873);
+  });
+
+  test('CUANTO MÁS PREFERMENTO, MÁS SE DESVÍA: con 400 g la masa cambia de categoría', () => {
+    // 400 g de masa madre al 100% = 200 de harina + 200 de agua.
+    // harina 1200, agua 850 → 70,8%, que en la escala de la app ya es «hidratación alta»
+    // (70-80), mientras sin declararla seguiría marcando 65,0% («estándar», 60-70).
+    const r = calcularBakersPercentage(1000, [
+      { nombre: 'Agua', gramos: 650 },
+      { nombre: 'Masa madre', gramos: 400, prefermentoHidratacion_pct: 100 },
+    ]);
+    expect(r.harina_g).toBe(1200);
+    expect(r.agua_g).toBe(850);
+    expect(r.hidratacion_pct).toBe(70.8);
+    expect(r.harinaPrefermentada_pct).toBe(16.7);   // 200/1200
+  });
+
+  test('DOS AGUAS: se suman todas las filas de agua, no solo la primera', () => {
+    const r = calcularBakersPercentage(1000, [
+      { nombre: 'Agua', gramos: 400 },
+      { nombre: 'Agua tibia', gramos: 250 },
+    ]);
+    expect(r.hidratacion_pct).toBe(65);
+  });
+
+  test('MODO INVERSO: con prefermento al 20%, en la mesa se pesa menos harina y menos agua', () => {
+    // Fórmula total: harina 100%, agua 65%, sal 2%, masa madre 20% al 100% de hidratación.
+    // El prefermento NO suma peso propio (su harina y su agua ya están en los totales):
+    // harina = 1670 / (1 + 67/100) = 1000.
+    const r = calcularBakersPercentageDesdePeso(1670, [
+      { nombre: 'Agua', porcentaje: 65 },
+      { nombre: 'Sal', porcentaje: 2 },
+      { nombre: 'Masa madre', porcentaje: 20, prefermentoHidratacion_pct: 100 },
+    ]);
+    expect(r.harina_g).toBe(1000);
+    expect(r.pesoMasa_g).toBe(1670);
+    expect(r.hidratacion_pct).toBe(65);
+    // 200 g de masa madre = 100 de harina + 100 de agua, que se restan de lo que se pesa.
+    expect(r.harinaAnadida_g).toBe(900);
+    expect(r.aguaAnadida_g).toBe(550);
+    // Y lo que se pone en la balanza vuelve a sumar el peso objetivo.
+    expect(r.harinaAnadida_g + r.aguaAnadida_g + 20 + 200).toBe(1670);
+  });
+
+  test('FÓRMULA IMPOSIBLE: si el prefermento aporta más agua de la declarada, sale en negativo', () => {
+    // Agua total 5% con una masa madre al 20%: el prefermento solo ya trae el 10%.
+    const r = calcularBakersPercentageDesdePeso(1070, [
+      { nombre: 'Agua', porcentaje: 5 },
+      { nombre: 'Masa madre', porcentaje: 20, prefermentoHidratacion_pct: 100 },
+    ]);
+    expect(r.aguaAnadida_g).toBeLessThan(0);
+  });
+
+  test('REGRESIÓN: sin prefermentos, el resultado es el de toda la vida', () => {
+    const r = calcularBakersPercentage(1000, [
+      { nombre: 'Agua', gramos: 650 },
+      { nombre: 'Sal', gramos: 20 },
+      { nombre: 'Levadura', gramos: 3 },
+    ]);
+    expect(r.harina_g).toBe(r.harinaAnadida_g);
+    expect(r.agua_g).toBe(r.aguaAnadida_g);
+    expect(r.hidratacion_pct).toBe(65);
+    expect(r.harinaPrefermentada_pct).toBe(0);
+    expect(r.prefermentos).toEqual([]);
+    expect(r.ingredientes.map(i => i.porcentajePanadero)).toEqual([65, 2, 0.3]);
+  });
+
+  test('SIN HARINA NINGUNA no se divide entre cero: los porcentajes salen a 0', () => {
+    const r = calcularBakersPercentage(0, [{ nombre: 'Agua', gramos: 100 }]);
+    expect(r.hidratacion_pct).toBe(0);
+    expect(r.ingredientes[0].porcentajePanadero).toBe(0);
   });
 });

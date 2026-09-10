@@ -1945,13 +1945,18 @@ function crearServidorMCP(): McpServer {
     'calcular_porcentaje_panadero',
     "Calcula el porcentaje del panadero (baker's percentage) para una receta. " +
     'La harina siempre es 100%; cada ingrediente se expresa como % de su peso. ' +
-    'Detecta el agua automáticamente para calcular la hidratación.',
+    'Detecta el agua automáticamente para calcular la hidratación. ' +
+    'Los prefermentos (masa madre, poolish, biga, esponja) hay que marcarlos con ' +
+    'prefermento_hidratacion_pct: son harina y agua ya mezcladas, y sin declararlos ' +
+    'la hidratación sale más baja que la real.',
     {
       harina_g: z.number().positive()
-        .describe('Peso de la harina en gramos (siempre 100% en el sistema del panadero).'),
+        .describe('Peso de la harina que se pesa aparte, en gramos (sin la que va dentro de un prefermento).'),
       ingredientes: z.array(z.object({
         nombre: z.string().describe('Nombre del ingrediente (agua, sal, levadura, mantequilla...).'),
         gramos: z.number().positive().describe('Peso del ingrediente en gramos.'),
+        prefermento_hidratacion_pct: z.number().nonnegative().optional()
+          .describe('Solo para prefermentos: su hidratación en % sobre su propia harina. 100 = mitad harina y mitad agua (masa madre líquida, poolish); 50-60 para biga o madre firme. Omitir en ingredientes normales.'),
       })).describe('Lista de ingredientes además de la harina.'),
       peso_porcion_g: z.number().positive().optional()
         .describe('Peso de cada pieza/porción en gramos. Opcional: calcula el número de porciones.'),
@@ -1961,17 +1966,34 @@ function crearServidorMCP(): McpServer {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_porcentaje_panadero', aiCaller);
 
-      const r = calcularBakersPercentage(harina_g, ingredientes, peso_porcion_g);
+      const r = calcularBakersPercentage(
+        harina_g,
+        ingredientes.map(i => ({
+          nombre: i.nombre,
+          gramos: i.gramos,
+          prefermentoHidratacion_pct: i.prefermento_hidratacion_pct,
+        })),
+        peso_porcion_g,
+      );
+      const conPrefermento = r.prefermentos.length > 0;
 
       const lineas = [
-        `🥖 **Porcentaje del Panadero — ${harina_g}g harina (100%)**`,
+        `🥖 **Porcentaje del Panadero — ${r.harina_g}g de harina total (100%)**`,
         ``,
         `📊 **Ingredientes:**`,
         ...r.ingredientes.map(i => `   ${i.nombre.padEnd(22)} ${i.gramos}g = **${i.porcentajePanadero}%**`),
         ``,
-        `💧 **Hidratación: ${r.hidratacion_pct}%** (agua/harina)`,
+        `💧 **Hidratación: ${r.hidratacion_pct}%** (agua total / harina total)`,
         `⚖️ Peso total de masa: ${r.pesoMasa_g}g`,
         ...(r.rendimiento_porciones !== undefined ? [`🍞 Porciones (~${peso_porcion_g}g/ud.): **${r.rendimiento_porciones}**`] : []),
+        ...(conPrefermento ? [
+          ``,
+          `🫧 **Prefermentos** (harina y agua ya mezcladas):`,
+          ...r.prefermentos.map(p => `   ${p.nombre} ${p.gramos}g al ${p.hidratacion_pct}% → ${p.harina_g}g harina + ${p.agua_g}g agua`),
+          `   Harina prefermentada: **${r.harinaPrefermentada_pct}%** de la harina total.`,
+          ``,
+          `⚖️ **En la balanza:** ${r.harinaAnadida_g}g de harina y ${r.aguaAnadida_g}g de agua aparte, más el prefermento entero.`,
+        ] : []),
         ``,
         `ℹ️ El % del panadero siempre usa la harina como 100% — no el peso total de la masa.`,
       ].join('\n');

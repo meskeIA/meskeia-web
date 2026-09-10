@@ -196,10 +196,94 @@
   margin-bottom: var(--spacing-md);
 }
 
+.ingredienteBloque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
 .ingredienteRow {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+}
+
+/* Prefermento: marca que el ingrediente lleva harina y agua dentro */
+.btnPrefermento {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--hover);
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.btnPrefermento:hover {
+  opacity: 0.85;
+  border-color: var(--secondary);
+}
+
+.btnPrefermentoActivo {
+  filter: none;
+  opacity: 1;
+  background: color-mix(in srgb, var(--secondary) 16%, transparent);
+  border-color: var(--secondary);
+}
+
+.btnPrefermento:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.prefermentoRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  margin-left: var(--spacing-md);
+  border-left: 3px solid var(--secondary);
+  background: color-mix(in srgb, var(--secondary) 7%, transparent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.prefermentoLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.inputFieldPref {
+  width: 70px;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.inputFieldPref:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
+.prefermentoAyuda {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
 }
 
 .inputNombre {
@@ -378,6 +462,11 @@
   overflow-x: auto;
 }
 
+/* Con prefermento salen dos tablas seguidas: la fórmula total y lo que va a la balanza. */
+.tableWrapper + .tableWrapper {
+  margin-top: var(--spacing-md);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -425,6 +514,38 @@
 
 .rowHarina .pct {
   color: var(--primary);
+}
+
+.tableCaption {
+  caption-side: top;
+  text-align: left;
+  padding: 0 0.8rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.rowPrefermento td {
+  background: color-mix(in srgb, var(--secondary) 7%, transparent);
+}
+
+.prefBadge {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--secondary) 18%, transparent);
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.aporta {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 /* Nota hidratación */

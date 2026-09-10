@@ -29,23 +29,47 @@ interface OtroIngrediente {
   id: number;
   nombre: string;
   valor: string;
+  // Un prefermento no es un ingrediente simple: es harina y agua ya mezcladas, y las dos
+  // mitades cuentan en la fórmula. `prefTocado` recuerda que la decisión la tomó el usuario,
+  // para que la detección automática por el nombre no la pise al seguir escribiendo.
+  esPrefermento: boolean;
+  hidratacionPref: string;
+  prefTocado: boolean;
 }
 
 type ModoCalculo = 'gramos' | 'porcentaje';
 
+// La hidratación más habitual (masa madre líquida, poolish). La biga o una madre firme van
+// al 50-60 %, y por eso el campo queda siempre a la vista y editable.
+const HIDRATACION_PREF_DEFECTO = '100';
+
+// Nombres que delatan un prefermento. La detección importa porque el fallo era silencioso:
+// quien escribe «Masa madre» en la lista no tiene ningún motivo para sospechar que la
+// hidratación que le sale abajo no cuenta la harina ni el agua que esa masa madre lleva dentro.
+const NOMBRE_DE_PREFERMENTO = /masa\s*madre|madre\s*natural|prefermento|pre-?fermento|poolish|biga|esponja|levain|sourdough|starter|fermento|masa\s*vieja|pie\s*de\s*masa/i;
+
+const parecePrefermento = (nombre: string) => NOMBRE_DE_PREFERMENTO.test(nombre);
+
+const nuevoIngrediente = (id: number, nombre: string, valor: string): OtroIngrediente => ({
+  id, nombre, valor,
+  esPrefermento: false,
+  hidratacionPref: HIDRATACION_PREF_DEFECTO,
+  prefTocado: false,
+});
+
 // Modo 'gramos' (por defecto): se parte de gramos por ingrediente y se obtienen los porcentajes.
 const INGREDIENTES_POR_GRAMOS: OtroIngrediente[] = [
-  { id: 1, nombre: 'Agua', valor: '650' },
-  { id: 2, nombre: 'Sal', valor: '20' },
-  { id: 3, nombre: 'Levadura', valor: '3' },
+  nuevoIngrediente(1, 'Agua', '650'),
+  nuevoIngrediente(2, 'Sal', '20'),
+  nuevoIngrediente(3, 'Levadura', '3'),
 ];
 
 // Modo 'porcentaje': se parte de los porcentajes de la fórmula y de un peso final de masa
 // (un molde, una bandeja) y se obtienen los gramos — el camino inverso al de arriba.
 const INGREDIENTES_POR_PORCENTAJE: OtroIngrediente[] = [
-  { id: 1, nombre: 'Agua', valor: '65' },
-  { id: 2, nombre: 'Sal', valor: '2' },
-  { id: 3, nombre: 'Levadura', valor: '0,3' },
+  nuevoIngrediente(1, 'Agua', '65'),
+  nuevoIngrediente(2, 'Sal', '2'),
+  nuevoIngrediente(3, 'Levadura', '0,3'),
 ];
 
 // Los dos pasos que vienen justo después de tener la fórmula: a qué temperatura poner el agua
@@ -119,7 +143,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
   }, [fermHoras, fermTempReceta, fermTempReal]);
 
   const agregarIngrediente = useCallback(() => {
-    setOtros(prev => [...prev, { id: nextId, nombre: '', valor: '' }]);
+    setOtros(prev => [...prev, nuevoIngrediente(nextId, '', '')]);
     setNextId(n => n + 1);
   }, [nextId]);
 
@@ -130,11 +154,33 @@ export default function CalculadoraPorcentajePanaderoPage() {
   const actualizarIngrediente = useCallback(
     (id: number, campo: 'nombre' | 'valor', valor: string) => {
       setOtros(prev =>
-        prev.map(i => (i.id === id ? { ...i, [campo]: valor } : i)),
+        prev.map(i => {
+          if (i.id !== id) return i;
+          const actualizado = { ...i, [campo]: valor };
+          // Al escribir el nombre se marca solo si delata un prefermento, salvo que el
+          // usuario ya haya decidido por su cuenta. Marcarlo por defecto, y no limitarse a
+          // avisar, es lo que evita que siga saliendo una hidratación que no es la real.
+          if (campo === 'nombre' && !i.prefTocado) {
+            actualizado.esPrefermento = parecePrefermento(valor);
+          }
+          return actualizado;
+        }),
       );
     },
     [],
   );
+
+  const alternarPrefermento = useCallback((id: number) => {
+    setOtros(prev =>
+      prev.map(i =>
+        i.id === id ? { ...i, esPrefermento: !i.esPrefermento, prefTocado: true } : i,
+      ),
+    );
+  }, []);
+
+  const actualizarHidratacionPref = useCallback((id: number, valor: string) => {
+    setOtros(prev => prev.map(i => (i.id === id ? { ...i, hidratacionPref: valor } : i)));
+  }, []);
 
   const calcular = useCallback(() => {
     setError('');
@@ -152,7 +198,18 @@ export default function CalculadoraPorcentajePanaderoPage() {
       .filter(i => i.nombre.trim() !== '' && i.valor.trim() !== '')
       .map(i => {
         const valor = parseSpanishNumber(i.valor);
-        return { nombre: i.nombre.trim(), valor: valor > 0 ? valor : 0 };
+        // Un prefermento sin hidratación legible se trata al 100 %, que es su valor por
+        // defecto y el que se muestra en el campo: nunca se cuela como ingrediente plano.
+        const hidratacion = i.esPrefermento
+          ? (leerNumero(i.hidratacionPref) ?? 100)
+          : undefined;
+        return {
+          nombre: i.nombre.trim(),
+          valor: valor > 0 ? valor : 0,
+          prefermentoHidratacion_pct: hidratacion !== undefined && hidratacion >= 0
+            ? hidratacion
+            : undefined,
+        };
       });
 
     if (otrosValidos.length === 0) {
@@ -172,7 +229,11 @@ export default function CalculadoraPorcentajePanaderoPage() {
       setResultado(
         calcularBakersPercentage(
           valorPrincipal,
-          otrosValidos.map(i => ({ nombre: i.nombre, gramos: i.valor })),
+          otrosValidos.map(i => ({
+            nombre: i.nombre,
+            gramos: i.valor,
+            prefermentoHidratacion_pct: i.prefermentoHidratacion_pct,
+          })),
           pesoPorcionValido,
         ),
       );
@@ -181,12 +242,29 @@ export default function CalculadoraPorcentajePanaderoPage() {
       setResultado(
         calcularBakersPercentageDesdePeso(
           valorPrincipal,
-          otrosValidos.map(i => ({ nombre: i.nombre, porcentaje: i.valor })),
+          otrosValidos.map(i => ({
+            nombre: i.nombre,
+            porcentaje: i.valor,
+            prefermentoHidratacion_pct: i.prefermentoHidratacion_pct,
+          })),
           pesoPorcionValido,
         ),
       );
     }
   }, [harinaStr, otros, porcioStr, modo]);
+
+  const hayPrefermentos = (resultado?.prefermentos.length ?? 0) > 0;
+
+  // Con la fórmula total mal planteada puede no quedar agua (o harina) que pesar aparte.
+  const formulaImposible = hayPrefermentos && resultado !== null
+    && (resultado.aguaAnadida_g < 0 || resultado.harinaAnadida_g < 0);
+
+  // La cifra que salía antes de contar el prefermento. Se enseña al lado de la buena porque
+  // es la que el usuario ha visto en todas partes, y sin el contraste no sabría cuál creer.
+  const hidratacionSinContarPrefermento = useMemo(() => {
+    if (!resultado || !hayPrefermentos || resultado.harinaAnadida_g <= 0) return 0;
+    return Math.round((resultado.aguaAnadida_g / resultado.harinaAnadida_g) * 1000) / 10;
+  }, [resultado, hayPrefermentos]);
 
   return (
     <div className={styles.container}>
@@ -259,45 +337,89 @@ export default function CalculadoraPorcentajePanaderoPage() {
               Introduce el porcentaje de cada ingrediente respecto a la harina (el mismo que
               verías en modo &quot;Por gramos&quot;) y la calculadora reparte los gramos para que
               la masa dé justo ese peso final.
+              {otros.some(i => i.esPrefermento) && (
+                <>
+                  {' '}Con prefermento, el agua que declares es el <strong>agua total</strong> de
+                  la fórmula: abajo verás cuánta hay que pesar aparte una vez descontada la que
+                  ya viene dentro del prefermento.
+                </>
+              )}
             </p>
           )}
 
           {/* Otros ingredientes */}
           <div className={styles.ingredientesList} role="list" aria-label="Lista de ingredientes">
             {otros.map(ing => (
-              <div key={ing.id} className={styles.ingredienteRow} role="listitem">
-                <input
-                  type="text"
-                  className={styles.inputNombre}
-                  value={ing.nombre}
-                  onChange={e => actualizarIngrediente(ing.id, 'nombre', e.target.value)}
-                  placeholder="Ingrediente"
-                  aria-label="Nombre del ingrediente"
-                />
-                <div className={styles.inputGroup}>
+              <div key={ing.id} className={styles.ingredienteBloque} role="listitem">
+                <div className={styles.ingredienteRow}>
                   <input
                     type="text"
-                    inputMode="decimal"
-                    className={styles.inputField}
-                    value={ing.valor}
-                    onChange={e => actualizarIngrediente(ing.id, 'valor', e.target.value)}
-                    placeholder="0"
-                    aria-label={
-                      modo === 'gramos'
-                        ? `Gramos de ${ing.nombre || 'ingrediente'}`
-                        : `Porcentaje de ${ing.nombre || 'ingrediente'}`
-                    }
+                    className={styles.inputNombre}
+                    value={ing.nombre}
+                    onChange={e => actualizarIngrediente(ing.id, 'nombre', e.target.value)}
+                    placeholder="Ingrediente"
+                    aria-label="Nombre del ingrediente"
                   />
-                  <span className={styles.unidad}>{modo === 'gramos' ? 'g' : '%'}</span>
+                  <div className={styles.inputGroup}>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      className={styles.inputField}
+                      value={ing.valor}
+                      onChange={e => actualizarIngrediente(ing.id, 'valor', e.target.value)}
+                      placeholder="0"
+                      aria-label={
+                        modo === 'gramos'
+                          ? `Gramos de ${ing.nombre || 'ingrediente'}`
+                          : `Porcentaje de ${ing.nombre || 'ingrediente'}`
+                      }
+                    />
+                    <span className={styles.unidad}>{modo === 'gramos' ? 'g' : '%'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alternarPrefermento(ing.id)}
+                    className={`${styles.btnPrefermento} ${ing.esPrefermento ? styles.btnPrefermentoActivo : ''}`}
+                    aria-pressed={ing.esPrefermento}
+                    aria-label={`Tratar ${ing.nombre || 'este ingrediente'} como prefermento (lleva harina y agua dentro)`}
+                    title="Prefermento: lleva harina y agua dentro"
+                  >
+                    🫧
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => quitarIngrediente(ing.id)}
+                    className={styles.btnQuitar}
+                    aria-label={`Eliminar ${ing.nombre || 'ingrediente'}`}
+                  >
+                    ✕
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => quitarIngrediente(ing.id)}
-                  className={styles.btnQuitar}
-                  aria-label={`Eliminar ${ing.nombre || 'ingrediente'}`}
-                >
-                  ✕
-                </button>
+
+                {ing.esPrefermento && (
+                  <div className={styles.prefermentoRow}>
+                    <label htmlFor={`hidr-pref-${ing.id}`} className={styles.prefermentoLabel}>
+                      <span aria-hidden="true">🫧</span> Hidratación de este prefermento
+                    </label>
+                    <div className={styles.inputGroup}>
+                      <input
+                        id={`hidr-pref-${ing.id}`}
+                        type="text"
+                        inputMode="decimal"
+                        className={styles.inputFieldPref}
+                        value={ing.hidratacionPref}
+                        onChange={e => actualizarHidratacionPref(ing.id, e.target.value)}
+                        placeholder="100"
+                        aria-label={`Hidratación de ${ing.nombre || 'el prefermento'} en porcentaje`}
+                      />
+                      <span className={styles.unidad}>%</span>
+                    </div>
+                    <p className={styles.prefermentoAyuda}>
+                      Se contará su harina y su agua aparte. Masa madre líquida o poolish: 100 %.
+                      Biga o madre firme: 50-60 %.
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -362,13 +484,26 @@ export default function CalculadoraPorcentajePanaderoPage() {
                     )}
                 </div>
                 <div className={`${styles.summaryCard} ${styles.summaryHidratacion}`}>
-                  <span className={styles.summaryLabel}>Hidratación</span>
+                  <span className={styles.summaryLabel}>
+                    {hayPrefermentos ? 'Hidratación total' : 'Hidratación'}
+                  </span>
                   <span className={styles.summaryValue}>
                     {resultado.hidratacion_pct > 0
                       ? `${formatNumber(resultado.hidratacion_pct, 1)} %`
                       : '—'}
                   </span>
+                  {hayPrefermentos && (
+                    <span className={styles.summaryNote}>prefermento incluido</span>
+                  )}
                 </div>
+                {hayPrefermentos && (
+                  <div className={styles.summaryCard}>
+                    <span className={styles.summaryLabel}>Harina prefermentada</span>
+                    <span className={styles.summaryValue}>
+                      {formatNumber(resultado.harinaPrefermentada_pct, 1)} %
+                    </span>
+                  </div>
+                )}
                 {resultado.rendimiento_porciones !== undefined && (
                   <div className={styles.summaryCard}>
                     <span className={styles.summaryLabel}>Porciones</span>
@@ -377,9 +512,21 @@ export default function CalculadoraPorcentajePanaderoPage() {
                 )}
               </div>
 
+              {formulaImposible && (
+                <div role="alert" aria-live="polite" className={styles.errorMsg}>
+                  El prefermento aporta por sí solo más{' '}
+                  {resultado.aguaAnadida_g < 0 ? 'agua' : 'harina'} de la que declara la fórmula
+                  total, así que no queda nada que pesar aparte. Sube el porcentaje de{' '}
+                  {resultado.aguaAnadida_g < 0 ? 'agua' : 'harina'} o baja el del prefermento.
+                </div>
+              )}
+
               {/* Tabla de porcentajes */}
               <div className={styles.tableWrapper} role="region" aria-label="Tabla de porcentajes del panadero">
                 <table className={styles.table}>
+                  <caption className={styles.tableCaption}>
+                    {hayPrefermentos ? 'Fórmula total (la harina de dentro del prefermento ya cuenta)' : 'Fórmula'}
+                  </caption>
                   <thead>
                     <tr>
                       <th>Ingrediente</th>
@@ -390,34 +537,117 @@ export default function CalculadoraPorcentajePanaderoPage() {
                   <tbody>
                     {/* Harina siempre primero */}
                     <tr className={styles.rowHarina}>
-                      <td><span aria-hidden="true">🌾</span> Harina</td>
+                      <td>
+                        <span aria-hidden="true">🌾</span> Harina{hayPrefermentos ? ' (total)' : ''}
+                      </td>
                       <td>{formatNumber(resultado.harina_g, 0)} g</td>
                       <td className={styles.pct}>100,0 %</td>
                     </tr>
-                    {resultado.ingredientes.map((ing, idx) => {
-                      const esAgua = /agua/i.test(ing.nombre);
-                      return (
-                        <tr
-                          key={idx}
-                          className={esAgua ? styles.rowAgua : styles.rowNormal}
-                        >
-                          <td><span aria-hidden="true">{esAgua ? '💧' : '•'}</span> {ing.nombre}</td>
-                          <td>{formatNumber(ing.gramos, 0)} g</td>
-                          <td className={styles.pct}>{formatNumber(ing.porcentajePanadero, 1)} %</td>
-                        </tr>
-                      );
-                    })}
+
+                    {/* Con prefermento el agua se consolida: la de la jarra más la que ya
+                        viene mezclada dentro. Es la única cifra que responde de verdad
+                        «¿qué hidratación tiene esta masa?». */}
+                    {hayPrefermentos && resultado.agua_g > 0 && (
+                      <tr className={styles.rowAgua}>
+                        <td><span aria-hidden="true">💧</span> Agua (total)</td>
+                        <td>{formatNumber(resultado.agua_g, 0)} g</td>
+                        <td className={styles.pct}>{formatNumber(resultado.hidratacion_pct, 1)} %</td>
+                      </tr>
+                    )}
+
+                    {resultado.ingredientes
+                      .filter(ing => !hayPrefermentos
+                        || (ing.prefermentoHidratacion_pct === undefined && !/agua/i.test(ing.nombre)))
+                      .map((ing, idx) => {
+                        const esAgua = /agua/i.test(ing.nombre);
+                        return (
+                          <tr
+                            key={idx}
+                            className={esAgua ? styles.rowAgua : styles.rowNormal}
+                          >
+                            <td><span aria-hidden="true">{esAgua ? '💧' : '•'}</span> {ing.nombre}</td>
+                            <td>{formatNumber(ing.gramos, 0)} g</td>
+                            <td className={styles.pct}>{formatNumber(ing.porcentajePanadero, 1)} %</td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               </div>
 
+              {/* Lo que va en la balanza. Solo con prefermento: sin él, la fórmula total y la
+                  lista de la compra son la misma tabla y repetirla no aportaría nada. */}
+              {hayPrefermentos && (
+                <div className={styles.tableWrapper} role="region" aria-label="Lo que se pesa en la balanza">
+                  <table className={styles.table}>
+                    <caption className={styles.tableCaption}>
+                      Lo que pesas en la balanza
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th>Ingrediente</th>
+                        <th>Gramos</th>
+                        <th>Aporta</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className={styles.rowHarina}>
+                        <td><span aria-hidden="true">🌾</span> Harina</td>
+                        <td>{formatNumber(resultado.harinaAnadida_g, 0)} g</td>
+                        <td className={styles.aporta}>—</td>
+                      </tr>
+                      {resultado.agua_g > 0 && (
+                        <tr className={styles.rowAgua}>
+                          <td><span aria-hidden="true">💧</span> Agua</td>
+                          <td>{formatNumber(resultado.aguaAnadida_g, 0)} g</td>
+                          <td className={styles.aporta}>—</td>
+                        </tr>
+                      )}
+                      {resultado.ingredientes
+                        .filter(ing => ing.prefermentoHidratacion_pct === undefined && !/agua/i.test(ing.nombre))
+                        .map((ing, idx) => (
+                          <tr key={idx} className={styles.rowNormal}>
+                            <td><span aria-hidden="true">•</span> {ing.nombre}</td>
+                            <td>{formatNumber(ing.gramos, 0)} g</td>
+                            <td className={styles.aporta}>—</td>
+                          </tr>
+                        ))}
+                      {resultado.prefermentos.map((p, idx) => (
+                        <tr key={`pref-${idx}`} className={styles.rowPrefermento}>
+                          <td>
+                            <span aria-hidden="true">🫧</span> {p.nombre}{' '}
+                            <span className={styles.prefBadge}>
+                              {formatNumber(p.hidratacion_pct, 0)} % hidr.
+                            </span>
+                          </td>
+                          <td>{formatNumber(p.gramos, 0)} g</td>
+                          <td className={styles.aporta}>
+                            {formatNumber(p.harina_g, 0)} g harina + {formatNumber(p.agua_g, 0)} g agua
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
               {resultado.hidratacion_pct > 0 && (
                 <div className={styles.hidratacionNote} role="note">
-                  <span aria-hidden="true">💧</span> La hidratación de esta masa es <strong>{formatNumber(resultado.hidratacion_pct, 1)} %</strong>
+                  <span aria-hidden="true">💧</span> La hidratación{hayPrefermentos ? ' real' : ''} de
+                  esta masa es <strong>{formatNumber(resultado.hidratacion_pct, 1)} %</strong>
                   {resultado.hidratacion_pct < 60 && ' — masa seca, fácil de moldear'}
                   {resultado.hidratacion_pct >= 60 && resultado.hidratacion_pct < 70 && ' — hidratación estándar, equilibrada'}
                   {resultado.hidratacion_pct >= 70 && resultado.hidratacion_pct < 80 && ' — hidratación alta, miga abierta'}
                   {resultado.hidratacion_pct >= 80 && ' — hidratación muy alta, técnica avanzada'}
+                  {hayPrefermentos && (
+                    <>
+                      {' '}Contando la harina y el agua que trae dentro el prefermento: sin
+                      contarlas saldría{' '}
+                      <strong>{formatNumber(hidratacionSinContarPrefermento, 1)} %</strong>, que
+                      es la cifra que da cualquier calculadora que trate la masa madre como un
+                      ingrediente más.
+                    </>
+                  )}
                 </div>
               )}
             </>
@@ -707,6 +937,39 @@ export default function CalculadoraPorcentajePanaderoPage() {
             cuando ven recetas con porcentajes que suman más de 100%.
           </p>
 
+          <h2>Masa madre, poolish y biga: por qué no son un ingrediente más</h2>
+          <p>
+            Un prefermento <strong>no es un ingrediente simple: es harina y agua ya mezcladas</strong>,
+            y las dos mitades cuentan en la fórmula. Si escribes &quot;masa madre: 200 g&quot; en la
+            lista como escribirías la sal, esos 200 g quedan fuera de la harina y fuera del agua, y
+            entonces la hidratación que sale no es la de tu masa.
+          </p>
+          <p>
+            La cuenta es elemental. Una masa madre al 100% de hidratación lleva partes iguales de
+            harina y agua, así que 200 g son 100 g de harina y 100 g de agua. En una receta de 1000 g
+            de harina y 650 g de agua, la harina real pasa a ser 1100 g y el agua real 750 g:
+            la hidratación no es <strong>65,0%</strong> sino <strong>68,2%</strong>, y la sal, que
+            creías al 2,0%, está en realidad al 1,8%. Cuanto más prefermento lleve la receta, mayor
+            es la desviación: con 400 g de la misma masa madre la hidratación real sube al
+            <strong> 70,8%</strong> mientras la calculadora seguiría diciendo 65,0%, y ahí ya son
+            dos masas distintas —una &quot;estándar&quot; y otra de &quot;hidratación alta&quot;—
+            que no se amasan ni se manejan igual.
+          </p>
+          <p>
+            Por eso el botón <span aria-hidden="true">🫧</span> de cada fila marca el ingrediente
+            como prefermento y pide su hidratación: al 100% para masa madre líquida y poolish, al
+            50-60% para una biga o una madre firme. Con él marcado, la calculadora reparte su
+            harina y su agua donde corresponde, enseña la <strong>fórmula total</strong> con los
+            porcentajes buenos y, debajo, lo que hay que poner en la balanza.
+          </p>
+          <p>
+            La otra cifra que aparece entonces es la <strong>harina prefermentada</strong>: qué
+            fracción de la harina total llega ya fermentada. Es la que usan los panaderos para
+            hablar de fuerza y de tiempos —un 10% de harina prefermentada y un 40% dan panes
+            distintos con la misma hidratación—, y no se puede calcular sin haber separado antes
+            las dos mitades del prefermento.
+          </p>
+
           <h2>Hidrataciones típicas según el tipo de pan</h2>
           <div className={styles.tablaComparativa}>
             <table className={styles.table}>
@@ -771,6 +1034,33 @@ export default function CalculadoraPorcentajePanaderoPage() {
               levadura fermenta toda la masa. En levadura fresca, 1–2% es una cantidad alta
               (fermentación rápida); 0,1–0,3% es fermentación lenta o masa madre reducida.
               Trabajar con porcentajes del panadero hace estos decimales comparables entre recetas.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>¿Cómo meto la masa madre en la fórmula?</h3>
+            <p>
+              Añádela como un ingrediente más y pulsa el botón <span aria-hidden="true">🫧</span> de
+              su fila para marcarla como prefermento; si el nombre ya la delata (&quot;masa
+              madre&quot;, &quot;poolish&quot;, &quot;biga&quot;…), se marca sola. Luego indica su
+              hidratación: 100% si la refrescas con partes iguales de harina y agua, 50-60% si es
+              firme. A partir de ahí la calculadora suma su harina a la harina y su agua al agua,
+              que es lo que hace que la hidratación y todos los porcentajes sean los reales. Para
+              convertir una receta de levadura a masa madre (o al revés), la herramienta es la{' '}
+              <a href="/calculadora-masa-madre/">calculadora de masa madre</a>.
+            </p>
+          </div>
+
+          <div className={styles.faqItem}>
+            <h3>¿Por qué salen dos tablas cuando uso prefermento?</h3>
+            <p>
+              Porque son dos cosas distintas y los panaderos las manejan por separado. La
+              <strong> fórmula total</strong> cuenta toda la harina y toda el agua de la masa,
+              venga de donde venga: es la que responde &quot;¿qué hidratación tiene este pan?&quot;
+              y la que permite comparar recetas entre sí. La tabla de <strong>lo que pesas</strong>
+              {' '}es la lista de la balanza: harina y agua ya descontadas las que vienen dentro del
+              prefermento, más el prefermento entero. Sin prefermento las dos coinciden, y por eso
+              solo se muestra una.
             </p>
           </div>
 
