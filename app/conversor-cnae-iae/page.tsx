@@ -115,22 +115,12 @@ const RUTA_CATALOGO = CNAE_IAE_RUTA_CATALOGO;
 const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.seccion === '2ª')!;
 
 /**
- * La norma que aprueba las Tarifas del IAE, DERIVADA de `FISCAL_CNAE_IAE_META.iae.fuente`
- * en vez de transcrita. La celda de la CNAE de la fila «Norma de referencia» de la
- * comparativa ya sale de `CNAE_VIGENCIA` desde el hallazgo 586; la del IAE se escribía a
- * mano y coincidía con el módulo por casualidad, no por construcción, de modo que el día
- * que el módulo publicase otra referencia la tabla seguiría diciendo la anterior sin que
- * nada avisara (hallazgo 636).
- *
- * La `fuente` del módulo lleva delante el nombre del catálogo, separado por « — », y detrás
- * la coletilla de la edición entre paréntesis. Las dos sobran en una celda de tabla y en una
- * frase corrida, así que se retiran aquí sin tocar el dato de origen.
+ * La norma que aprueba las Tarifas del IAE. Se deriva de `FISCAL_CNAE_IAE_META.iae.fuente`
+ * (hallazgo 636), y la derivación vive en `./metadata` desde el hallazgo 681, porque aquel
+ * fichero la seguía tecleando a mano en el JSON-LD que citan los asistentes de IA. Una sola
+ * derivación para las dos bocas de la app.
  */
-const NORMA_IAE: string = (() => {
-  const partes = FISCAL_CNAE_IAE_META.iae.fuente.split(' — ');
-  const norma = partes.length > 1 ? partes.slice(1).join(' — ') : partes[0];
-  return norma.replace(/\s*\([^)]*\)\s*$/, '').trim();
-})();
+import { NORMA_IAE } from './metadata';
 
 const EJEMPLOS_CNAE: string[] = [
   'hago páginas web',
@@ -474,16 +464,33 @@ export default function ConversorCnaeIaePage() {
    * punto —la que aparece en escrituras, contratos y en la propia publicación del INE—
    * dejaba de devolver nada. Exigir `vigenteHomonima` es lo que distingue «47.11, que hoy
    * significa lo mismo» de «14.11, que hoy no significa nada: solo su equivalencia lo hace».
+   *
+   * Y tampoco basta con que EXISTA la homónima (hallazgo 678). La premisa de fondo —si hay
+   * clase homónima, hoy significa lo mismo— es cierta en 486 de los 512 códigos con homónima
+   * y FALSA en los 26 restantes, que son exactamente los que el hallazgo 422 obligó a
+   * distinguir: aquellos en los que la homónima NO está entre sus propias equivalencias
+   * (2530, 2540, 2561, 3512, 4781, 4782, 4932, 8541…). Para esos, escrito con punto, la app
+   * devolvía una sola ficha de OTRA actividad y no mencionaba la clasificación anterior
+   * —aunque tenía el dato, y su propia ficha declaraba proceder de códigos distintos—,
+   * mientras el mismo código sin punto sí avisaba. Afecta a códigos frecuentes: 47.81 y
+   * 47.82 (mercadillos y venta ambulante), 49.32 (taxi), 85.41 (formación).
    */
-  const consultaConFormatoVigente = /^\s*\d{2}\.\d{2}\s*$/.test(consultaCnae) && vigenteHomonima !== null;
-
-  /** Código anterior: 4 dígitos presentes en la tabla oficial CNAE-2009 → CNAE-2025. */
-  const equivalenciaAntigua = useMemo<string[] | null>(() => {
+  /** Equivalencias que la tabla oficial declara para esos 4 dígitos, sin juzgar el formato. */
+  const correspondenciaDeclarada = useMemo<string[] | null>(() => {
     if (!catalogo) return null;
     if (digitosConsultaCnae.length !== 4) return null;
-    if (consultaConFormatoVigente) return null;
     return catalogo.correspondencia[digitosConsultaCnae] ?? null;
-  }, [catalogo, digitosConsultaCnae, consultaConFormatoVigente]);
+  }, [catalogo, digitosConsultaCnae]);
+
+  const consultaConFormatoVigente =
+    /^\s*\d{2}\.\d{2}\s*$/.test(consultaCnae) &&
+    vigenteHomonima !== null &&
+    // El código no era también uno antiguo, o lo era y su homónima SÍ es una de sus
+    // equivalencias: en ambos casos, lo tecleado significa hoy lo que la ficha enseña.
+    (correspondenciaDeclarada === null || correspondenciaDeclarada.includes(vigenteHomonima.codigo));
+
+  /** Código anterior: 4 dígitos presentes en la tabla oficial CNAE-2009 → CNAE-2025. */
+  const equivalenciaAntigua = consultaConFormatoVigente ? null : correspondenciaDeclarada;
 
   /**
    * ¿La clase vigente con ese mismo número es DISTINTA de la actividad que se buscaba?

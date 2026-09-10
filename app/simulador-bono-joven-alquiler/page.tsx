@@ -40,6 +40,9 @@ const pct = (n: number) => {
  *  el propio módulo fiscal declara para cálculo de topes (hallazgo 536). */
 const topeIngresos = (veces: number) => eur(IPREM_2026.anual14 * veces);
 
+/** Una ayuda se abona en céntimos: el redondeo pertenece a la cuantía mensual (hallazgo 688) */
+const redondearCentimos = (n: number): number => Math.round(n * 100) / 100;
+
 interface Requisito {
   id: string;
   pregunta: string;
@@ -70,6 +73,27 @@ const REQUISITOS: Requisito[] = [
     id: 'habitual',
     pregunta: 'La vivienda es tu residencia habitual y permanente',
     explicacion: 'Debes destinar la vivienda alquilada a tu domicilio habitual y permanente.',
+    bloqueante: true,
+  },
+  /**
+   * La incompatibilidad del art. 136 tiene que llegar al VEREDICTO, no solo a la prosa.
+   *
+   * `BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler` está sellado en `false` desde
+   * que se creó el módulo y no lo leía NADIE en todo el repositorio. La regla se contaba en
+   * tres canales —la FAQ visible, el faqJsonLd y el consejo de la deducción autonómica—, y
+   * los tres viven dentro del `<EducationalSection>` colapsado o en el JSON-LD: con la guía
+   * sin desplegar, la página no contenía «incompatible», ni «art. 136», ni «otra ayuda».
+   * Así que a quien ya cobraba una ayuda autonómica al alquiler se le respondía «🎉 ¡Cumples
+   * todos los requisitos!» sin una sola mención de lo que le excluye (hallazgo 686).
+   *
+   * Va como BLOQUEANTE porque el art. 136 no admite matiz —es incompatibilidad, no
+   * preferencia—, y además el CLAUDE.md del proyecto prohíbe expresamente esconder una
+   * advertencia legal dentro de `<EducationalSection>`.
+   */
+  {
+    id: 'sinOtrasAyudas',
+    pregunta: 'No cobras ninguna otra ayuda al pago del alquiler',
+    explicacion: `El art. 136 del RD 326/2026 declara el Bono Joven ${BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler ? 'compatible' : 'INCOMPATIBLE'} con cualquier otra ayuda al pago del alquiler o de la cesión de uso de la vivienda, venga del Estado, de tu Comunidad Autónoma o de tu ayuntamiento. Si ya cobras una, no puedes solicitar este bono mientras la percibas.`,
     bloqueante: true,
   },
   {
@@ -123,7 +147,9 @@ interface EscenarioCalculado {
 const calcularEscenario = (renta: number, tipo: TipoVivienda): EscenarioCalculado => {
   const cuantiaMaxima = BONO[tipo];
   const porElLimite = renta * LIMITE_SOBRE_RENTA;
-  const ayuda = Math.min(cuantiaMaxima, porElLimite);
+  // Misma regla que en el simulador de arriba: se redondea la cuantía MENSUAL, y el
+  // acumulado se calcula sobre ella (hallazgo 688).
+  const ayuda = redondearCentimos(Math.min(cuantiaMaxima, porElLimite));
   const porcentaje = pct((ayuda / renta) * 100);
   return {
     renta,
@@ -169,9 +195,16 @@ export default function SimuladorBonoJovenAlquilerPage() {
   const alquilerNum = Math.max(0, parseSpanishNumberOr(alquilMensual));
   const bonificacionMaxima = BONO[tipoVivienda];
   // El bono no puede superar el 60% de la renta mensual (RD 326/2026, art. 137)
-  const bonificacionEfectiva = alquilerNum > 0
-    ? Math.min(bonificacionMaxima, alquilerNum * LIMITE_SOBRE_RENTA)
-    : bonificacionMaxima;
+  // El redondeo al céntimo pertenece a la CUANTÍA MENSUAL, no al total: una ayuda se abona
+  // en céntimos, y el 60 % del art. 137 puede dar fracciones de céntimo (con 333,33 €/mes de
+  // renta salen 199,998 €). La app publicaba el mensual redondeado y multiplicaba por 48 el
+  // valor SIN redondear, así que las dos cifras que enseña una al lado de la otra no se
+  // multiplicaban: «200,00 €» y «9599,90 €» en vez de 9.600,00 € (hallazgo 688).
+  const bonificacionEfectiva = redondearCentimos(
+    alquilerNum > 0
+      ? Math.min(bonificacionMaxima, alquilerNum * LIMITE_SOBRE_RENTA)
+      : bonificacionMaxima,
+  );
   // El acumulado se calcula sobre la ayuda EFECTIVA: con el tope del 60% mordiendo, el
   // total del programa es un número que este caso concreto no puede llegar a cobrar.
   const totalAyudaMax = bonificacionEfectiva * DURACION_MAX_MESES;

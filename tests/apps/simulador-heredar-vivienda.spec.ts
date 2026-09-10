@@ -2885,17 +2885,22 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
    * misma página no calcula— pero en el canal que leen Bing Copilot, ChatGPT, Perplexity y
    * Gemini, donde la cifra viaja sin el disclaimer al lado y sin la app debajo para
    * contrastarla. Y es la pregunta que responde «¿me conviene una comunidad u otra?».
+   *
+   * REPARADO el 10/09/2026: la respuesta ya no lleva la cifra tecleada, la DERIVA llamando a
+   * `calcularSucesion` con ese mismo supuesto, y nombra además el caso que invertía el signo.
+   * Este test pasa a ser la regresión de esa derivación: no comprueba un número concreto,
+   * sino que el número publicado es EL QUE LA APP CALCULA, que es lo que impide que vuelvan
+   * a separarse.
    */
   test('HALLAZGO 10/09/2026 — el faqJsonLd promete 20.000 € de diferencia Madrid/Cataluña', async ({
     page,
   }) => {
-    test.fail(); // hallazgo ABIERTO: se retira al reparar el texto
     await page.goto(RUTA);
 
     const respuesta =
       (await faqServida(page)).find(q => q.name.includes('Madrid y en Cataluña'))?.acceptedAnswer
         .text ?? '';
-    expect(respuesta).toContain('20.000 €');
+    expect(respuesta, 'la promesa que el motor no alcanzaba').not.toContain('20.000 €');
 
     // La misma herencia, por el motor de la propia página, en los dos escenarios posibles
     await page.selectOption('#parentescoSel', 'hijo');
@@ -2923,11 +2928,16 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
     );
     expect(maxDiferencia).toBeCloseTo(10047.59, 2);
 
-    // Lo que el faqJsonLd promete a los asistentes de IA
-    expect(
-      maxDiferencia,
-      `el faqJsonLd promete «más de 20.000 €» y el motor de la página da como mucho ${maxDiferencia} €`
-    ).toBeGreaterThan(20000);
+    // Y lo que el faqJsonLd publica a los asistentes de IA es ESA cifra, redondeada al euro:
+    // la del escenario sin vivienda habitual, que es el que la propia frase enuncia.
+    const diferenciaSinVivienda = cuotas.false.cataluna - cuotas.false.madrid;
+    expect(respuesta).toContain(`${Math.round(diferenciaSinVivienda).toLocaleString('es-ES')} €`);
+
+    // Y no se calla el escenario que invierte el signo, que es lo que convertía la respuesta
+    // en un mal consejo justo en la pregunta «¿me conviene una comunidad u otra?».
+    expect(respuesta, 'el caso de la vivienda habitual, donde Cataluña sale más barata')
+      .toMatch(/vivienda habitual/i);
+    expect(cuotas.true.cataluna).toBeLessThan(cuotas.true.madrid);
   });
 
   /**
@@ -2953,7 +2963,6 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   test('HALLAZGO 10/09/2026 — el faqJsonLd llama «más limitadas» a las reducciones catalanas', async ({
     page,
   }) => {
-    test.fail(); // hallazgo ABIERTO: se retira al reparar el texto
     // Lo que dice data/fiscal, verificado el 08/09/2026 contra la Agència Tributària
     expect(REDUCCIONES_PARENTESCO_CATALUNA_IS['II']).toBe(100000);
     expect(REDUCCIONES_PARENTESCO_IS['II']).toBe(15956.87);
@@ -2996,7 +3005,6 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   test('HALLAZGO 10/09/2026 — el sello del IIVTNU enseña la fecha del módulo, no la del dato', async ({
     page,
   }) => {
-    test.fail(); // hallazgo ABIERTO: se retira al reparar el sello
     // Los dos sellos del fichero de inmuebles, con 17 meses entre ellos
     expect(FISCAL_INMUEBLES_META.verificado).toBe('2026-06-17');
     expect(PLUSVALIA_MUNICIPAL_META.verificado).toBe('2025-01-15');
@@ -3036,7 +3044,6 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   test('HALLAZGO 10/09/2026 — los 10 años de mantenimiento no conocen los 5 de Cataluña', async ({
     page,
   }) => {
-    test.fail(); // hallazgo ABIERTO: se retira al reparar el texto
     expect(REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS).toBe(5);
 
     await page.goto(RUTA);

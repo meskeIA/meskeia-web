@@ -1774,16 +1774,22 @@ test.describe('Buscador CNAE-IAE — re-inspección del 10/09/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 10/09/2026 — escritos con `test.fail()`: afirman lo que
-// DEBERÍA ocurrir y hoy fallan a propósito. El día que se reparen pasarán a ROJO
-// («expected to fail, but passed»): entonces se les quita la marca y se quedan como
-// regresión. NO se reescribe el valor esperado.
+// HALLAZGOS del 10/09/2026 (677-681), REPARADOS ese mismo día. Se escribieron con
+// `test.fail()` afirmando lo que DEBERÍA ocurrir; al repararlos se les quitó la marca sin
+// tocar un solo valor esperado, y hoy sujetan la reparación:
+//   · 677 — las nueve puertas de artes plásticas pasan de 90.11 («creación literaria y
+//     composición musical») a 90.12 («creación de artes visuales»), que no tenía ninguna.
+//   · 678 — el aviso de código antiguo ya no depende de teclear el punto: la consulta con
+//     formato vigente solo se da por vigente si la homónima ES una de sus equivalencias.
+//   · 679 — el teleférico (49.34) deja de anunciarse como transporte escolar.
+//   · 680 — «servicios profesionales varios» deja de llevar a la clase de seguridad (80.09).
+//   · 681 — la norma del IAE del JSON-LD se deriva de data/fiscal, como la de page.tsx.
+// Los cuatro primeros se reparan en `data/cnae-sinonimos.json` y en el catálogo servido.
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('Buscador CNAE-IAE — hallazgos abiertos del 10/09/2026', () => {
   test('ALTO — «escultor» y «ceramista» deben llevar a 90.12, la clase de las artes visuales', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // MISMO mecanismo que los hallazgos 633 y 634, reparado el 09/09 en las familias
@@ -1814,7 +1820,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 10/09/2026', () => {
   test('ALTO — el aviso de código antiguo no puede depender de que se teclee el punto', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // `consultaConFormatoVigente` (reparación de los hallazgos 424 y 481) da por vigente
@@ -1838,7 +1843,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 10/09/2026', () => {
   });
 
   test('MEDIO — un teleférico no se busca por «transporte escolar»', async ({ page }) => {
-    test.fail();
     await abrir(page);
 
     // Los tres términos de la familia («furgoneta de pasajeros», «transporte de viajeros»,
@@ -1854,7 +1858,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 10/09/2026', () => {
   test('BAJO — «servicios profesionales varios» no puede llevar a la clase de seguridad', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     // correspondencia['7490'] reparte en 74.91, 74.99 y 80.09. El término genérico que la
@@ -1868,7 +1871,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 10/09/2026', () => {
   });
 
   test('BAJO — la norma del IAE del JSON-LD debe salir de data/fiscal, como ya sale la de page.tsx', async () => {
-    test.fail();
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const fuente = readFileSync(

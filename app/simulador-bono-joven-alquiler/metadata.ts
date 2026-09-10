@@ -11,8 +11,6 @@ import { BONO_ALQUILER_JOVEN_2026, UMBRAL_IPREM_VIVIENDA_JOVEN } from '@/data/fi
 const eur = (n: number) => `${formatNumber(n, 0)} €`;
 const AYUDA_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda);
 const AYUDA_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion);
-const AYUDA_ANUAL_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda * 12);
-const AYUDA_ANUAL_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion * 12);
 const LIMITE_PORC = formatNumber(BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100, 0);
 const RENTA_MAX_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.vivienda);
 const RENTA_MAX_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.habitacion);
@@ -116,10 +114,24 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿El Bono Joven Alquiler tributa en el IRPF?',
+      // ── Por qué esta pregunta y no la del IRPF (10/09/2026, hallazgo 687) ──────
+      // Aquí había una pregunta —«¿El Bono Joven Alquiler tributa en el IRPF?»— que afirmaba
+      // categóricamente un tratamiento fiscal de nivel 1 («ganancia patrimonial no derivada
+      // de la transmisión de elementos patrimoniales») que NO sella ningún módulo de
+      // data/fiscal: irpf.ts no cubre ayudas al alquiler y vivienda-joven.ts solo los arts.
+      // 132-145 del RD 326/2026, que no regula el IRPF. El <DataReference> de la página
+      // respalda únicamente ese RD, la página no lo dice en ninguna parte y el Vigía
+      // Normativo tampoco lo ve pasar, porque no hay módulo que caduque. Es decir: una
+      // afirmación fiscal que solo veían ChatGPT, Perplexity y Bing Copilot, y que nadie
+      // podía contrastar ni revisar — el residuo inverso de los hallazgos 642/644.
+      //
+      // Se retira, y su hueco lo ocupa una pregunta que la propia app SÍ responde y cuyo
+      // dato está sellado contra el BOE. Si algún día se quiere volver a publicar la del
+      // IRPF, hace falta antes su módulo en data/fiscal con la consulta de la DGT.
+      name: '¿Hasta qué alquiler mensual puedo pedir el Bono Joven?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí, el Bono Joven Alquiler está sujeto al IRPF como ganancia patrimonial no derivada de la transmisión de elementos patrimoniales. Debe declararse en la renta del ejercicio en que se cobra. No obstante, al integrarse en la base general del impuesto y dada su cuantía (máximo ${AYUDA_ANUAL_VIVIENDA} anuales con los ${AYUDA_VIVIENDA}/mes de vivienda completa, o ${AYUDA_ANUAL_HABITACION} con los ${AYUDA_HABITACION}/mes de habitación), el impacto fiscal suele ser moderado. Es recomendable verificar la tributación exacta con un asesor fiscal según el perfil concreto.`,
+        text: `El art. 133.1.e del Real Decreto 326/2026 fija la renta máxima del contrato en ${RENTA_MAX_VIVIENDA} al mes para una vivienda completa y ${RENTA_MAX_HABITACION} al mes para una habitación. Si tu alquiler los supera, no puedes acceder a la ayuda aunque cumplas la edad y el límite de ingresos. Tu Comunidad Autónoma puede elevar esos topes, pero solo con acuerdo previo del Ministerio (art. 135), así que conviene mirar su convocatoria. Por debajo del tope, la ayuda es el ${LIMITE_PORC}% de la renta con un máximo de ${AYUDA_VIVIENDA} al mes en vivienda y ${AYUDA_HABITACION} en habitación (art. 137).`,
       },
     },
   ],

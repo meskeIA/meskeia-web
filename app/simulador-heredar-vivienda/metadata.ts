@@ -1,6 +1,14 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import {
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  REDUCCIONES_PARENTESCO_IS,
+  REDUCCIONES_PARENTESCO_CATALUNA_IS,
+  REDUCCION_VIVIENDA_MAX_IS,
+  REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
+  BONIFICACIONES_CCAA_IS,
+} from '@/data/fiscal';
+import { calcularSucesion } from '@/lib/calculadoras/sucesiones';
 
 /**
  * La escala de la base del ahorro que sirve el FAQPage se DERIVA de `data/fiscal`.
@@ -19,6 +27,41 @@ const ESCALA_AHORRO = TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t, i, todos) => {
   if (t.hasta === Infinity) return `${t.tipo}% a partir de ${euros(desde)}`;
   return i === 0 ? `${t.tipo}% hasta ${euros(t.hasta)}` : `${t.tipo}% de ${euros(desde)} a ${euros(t.hasta)}`;
 }).join(', ');
+
+/**
+ * La comparativa Madrid–Cataluña, calculada con el MOTOR de la propia página.
+ *
+ * ── Por qué (10/09/2026, hallazgos 693 y 694) ─────────────────────────────────
+ * Esta respuesta —la que contesta «¿me conviene una comunidad u otra?», y la que leen Bing
+ * Copilot, ChatGPT, Perplexity y Gemini sin el disclaimer al lado— prometía una diferencia
+ * «que puede superar los 20.000 €» que el motor de la página no alcanza ni en su escenario
+ * más extremo (el máximo son 10.047,59 €, menos de la mitad), y que además CAMBIA DE SIGNO
+ * cuando la vivienda era la habitual del fallecido: ahí Cataluña sale más barata. Es la
+ * forma exacta del hallazgo 275: la prosa contando una versión que el motor no calcula.
+ *
+ * Y decía que «Cataluña tiene reducciones más limitadas», que es la imagen ANTERIOR a la
+ * reparación del 08/09/2026 (f6c0650a, verificada contra la Agència Tributària): las
+ * reducciones catalanas son 6 y 4 veces MAYORES que las estatales. Lo que Cataluña tiene
+ * más limitado es la BONIFICACIÓN EN CUOTA. La corrección llegó a data/fiscal y al motor, y
+ * no había llegado a este canal.
+ *
+ * Derivarlo del motor, y no corregir el número, es lo que impide que vuelva a separarse.
+ */
+const EJEMPLO_COMPARATIVA = { valor: 300000, edad: 45 };
+const isdDe = (ccaa: string, viviendaHabitual: boolean) =>
+  calcularSucesion({
+    baseImponible: EJEMPLO_COMPARATIVA.valor,
+    ccaa,
+    grupo: 'II',
+    edadHeredero: EJEMPLO_COMPARATIVA.edad,
+    ...(viviendaHabitual ? { viviendaHabitual: EJEMPLO_COMPARATIVA.valor } : {}),
+  }).cuotaFinal;
+const DIFERENCIA_MADRID_CATALUNA = Math.round(
+  Math.abs(isdDe('cataluna', false) - isdDe('madrid', false)),
+);
+const BONIFICACION_MADRID_PCT = Math.round(
+  (BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['I-descendiente']?.porcentaje ?? 0) * 100,
+);
 
 export const metadata: Metadata = {
   title: 'Simulador Heredar Vivienda - ISD + Plusvalía + IRPF | meskeIA',
@@ -118,7 +161,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre heredar en Madrid y en Cataluña?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La diferencia puede ser muy significativa. Madrid aplica una bonificación del 99% en el ISD para cónyuge, descendientes y ascendientes, lo que reduce el impuesto de sucesiones casi a cero. Cataluña tiene reducciones más limitadas y tipos efectivos más altos para importes elevados. Para una vivienda de 300.000 € heredada por un hijo, la diferencia de ISD entre ambas comunidades puede superar los 20.000 €.',
+        text: `La diferencia puede ser significativa, aunque menor de lo que suele decirse. Madrid aplica una bonificación del ${BONIFICACION_MADRID_PCT}% en la cuota del ISD para cónyuge, descendientes y ascendientes, lo que lo reduce casi a cero. Cataluña, al contrario de lo que se repite, tiene reducciones de parentesco y de vivienda habitual MAYORES que las estatales (${euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['II'])} y hasta ${euros(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)}, frente a ${euros(Math.round(REDUCCIONES_PARENTESCO_IS['II']))} y ${euros(Math.round(REDUCCION_VIVIENDA_MAX_IS))}); lo que tiene más limitado es la BONIFICACIÓN EN CUOTA, que es una escala ponderada (art. 58 bis de la Ley 19/2010) en vez del ${BONIFICACION_MADRID_PCT}% fijo de Madrid. Para una vivienda de ${euros(EJEMPLO_COMPARATIVA.valor)} heredada por un hijo, la diferencia que calcula este simulador es de ${euros(DIFERENCIA_MADRID_CATALUNA)} si no era la vivienda habitual del fallecido. Si lo era, la reducción catalana es tan amplia que el ISD sale a 0 € y es Cataluña la más barata de las dos.`,
       },
     },
   ],

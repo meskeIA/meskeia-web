@@ -84,11 +84,18 @@ async function abrir(page: Page) {
   await page.waitForSelector('#alquiler');
 }
 
-/** Marca «Sí» en los 6 requisitos de la checklist (cada uno es un role="group") */
+/**
+ * Marca «Sí» en los 7 requisitos de la checklist (cada uno es un role="group").
+ *
+ * Eran 6 hasta el 10/09/2026, cuando el hallazgo 686 añadió el de la incompatibilidad del
+ * art. 136 con otras ayudas al pago del alquiler: la regla estaba sellada en
+ * `BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler` y no la leía nadie, así que
+ * quien ya cobraba una ayuda autonómica recibía «🎉 ¡Cumples todos los requisitos!».
+ */
 async function marcarTodosLosRequisitos(page: Page, salvo?: { indice: number; valor: 'No' }) {
   const grupos = page.getByRole('group');
   const total = await grupos.count();
-  expect(total).toBe(6); // 4 bloqueantes + 2 condicionantes
+  expect(total).toBe(7); // 5 bloqueantes + 2 condicionantes
   for (let i = 0; i < total; i++) {
     const valor = salvo && salvo.indice === i ? salvo.valor : 'Sí';
     await grupos.nth(i).getByRole('button', { name: valor, exact: true }).click();
@@ -204,8 +211,9 @@ test.describe('simulador-bono-joven-alquiler', () => {
     await abrir(page);
     await page.fill('#alquiler', '600');
     // El requisito «Tu CA tiene el Bono Joven activo» es el último y NO es bloqueante:
-    // respondido «No» el veredicto no puede ser APTO, pero tampoco un rechazo tajante
-    await marcarTodosLosRequisitos(page, { indice: 5, valor: 'No' });
+    // respondido «No» el veredicto no puede ser APTO, pero tampoco un rechazo tajante.
+    // Es el índice 6 desde que el hallazgo 686 insertó el del art. 136 en la quinta posición.
+    await marcarTodosLosRequisitos(page, { indice: 6, valor: 'No' });
 
     const resultado = norm(await page.locator('[role="status"]').first().innerText());
     expect(resultado).toContain('Cumples los requisitos básicos');
@@ -778,8 +786,9 @@ test.describe('Hallazgos abiertos — 10/09/2026', () => {
   // solicitar el Bono Joven al Alquiler», cuando el RD lo excluye. Y el CLAUDE.md del
   // proyecto prohíbe expresamente esconder una advertencia legal dentro de
   // `<EducationalSection>`.
+  // REPARADO 10/09/2026 (hallazgo 686): la checklist pregunta por otras ayudas al pago del
+  // alquiler, y el requisito es BLOQUEANTE, como exige el art. 136.
   test('H1 — la incompatibilidad del art. 136 debería condicionar el veredicto, no solo la guía', async ({ page }) => {
-    test.fail();
     await abrir(page);
 
     // O la checklist pregunta por otras ayudas al alquiler...
@@ -807,8 +816,10 @@ test.describe('Hallazgos abiertos — 10/09/2026', () => {
   // el Vigía Normativo la ven pasar. La invariante que se comprueba admite las dos
   // reparaciones posibles: retirarla del FAQPage, o publicarla también en la página con su
   // fuente.
+  // REPARADO 10/09/2026 (hallazgo 687): se retira del FAQPage, que era la reparación que el
+  // propio hallazgo ofrecía como primera opción. No había módulo de data/fiscal que sellara
+  // ese tratamiento, así que publicarlo en la página habría sido afirmarlo sin fuente.
   test('H2 — lo que el FAQPage afirma sobre el IRPF debería poder leerse también en la página', async ({ page }) => {
-    test.fail();
     await abrir(page);
     const respuesta = await page.request.get(RUTA);
     const html = await respuesta.text();
@@ -827,8 +838,9 @@ test.describe('Hallazgos abiertos — 10/09/2026', () => {
   // 199,998 €, que la tarjeta muestra como «200,00 €», y el acumulado 199,998 × 48 =
   // 9.599,904 → «9599,90 €», cuando 200,00 × 48 son 9.600,00 €. Una ayuda se abona en
   // céntimos: el redondeo pertenece a la cuantía mensual, no al total.
+  // REPARADO 10/09/2026 (hallazgo 688): el redondeo al céntimo se aplica a la cuantía MENSUAL,
+  // y el acumulado se calcula sobre ella.
   test('H3 — el acumulado de 4 años debería ser la ayuda mensual REDONDEADA por 48', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
     // 333,33 ≤ 600 (art. 133.1.e) · 60 % de 333,33 = 199,998 < 200 (art. 137)

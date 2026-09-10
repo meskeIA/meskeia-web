@@ -26,6 +26,8 @@ import {
   COEFICIENTES_IIVTNU_2025,
   REDUCCION_VIVIENDA_PORC_IS,
   REDUCCION_VIVIENDA_MAX_IS,
+  REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
+  REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
   REDUCCION_EDAD_MENOR_21_IS,
   REDUCCION_EDAD_MENOR_21_MAX_IS,
   REDUCCION_EDAD_MENOR_21_CATALUNA_IS,
@@ -317,15 +319,17 @@ const EDAD_MIN_COLATERAL_VIVIENDA = EDAD_MIN_COLATERAL_VIVIENDA_IS;
  * los deslizadores la cadena impresa no cuadraba en 787.942 (35 %); con este redondeo
  * cuadra en las 2.233.392.
  *
- * ⚠️ La bonificación se redondea ANTES de restarla, y ahí esta app se separa a propósito
- * del motor compartido, que redondea la RESTA (`r(cuotaTributaria - bonificacion)`) pero
- * publica la bonificación ya redondeada. Cuando la bonificación cae en el medio céntimo
- * exacto, sus dos campos se contradicen: con 26.782,55 € de cuota tributaria y el 90 % de
- * Castilla-La Mancha devuelve bonificación 24.104,30 € y cuota final 2.678,26 €, que suman
- * 26.782,56 €. Aquí manda la aritmética escrita: 26.782,55 − 24.104,30 = 2.678,25. Son
- * 20.104 de esas 2.233.392 combinaciones (0,9 %), todas de un céntimo, y todas aquellas en
- * las que el motor no cuadra consigo mismo. El día que `calcularSucesion` reste importes ya
- * redondeados, la paridad vuelve a ser total sin tocar nada de aquí.
+ * La bonificación se redondea ANTES de restarla, y así lo hace también el motor compartido
+ * desde el commit 0a2fa220 (09/09/2026): `calcularSucesion` publica `bonificacionPublicada`
+ * y resta ESA, no la larga. Los dos coinciden hoy al céntimo, incluido el caso que separaba
+ * a los dos (hijo de 45 años, Castilla-La Mancha, 400.000 € de vivienda habitual: cuota
+ * tributaria 26.782,55 €, bonificación del 90 % = 24.104,30 € y cuota final 2.678,25 € por
+ * ambas vías).
+ *
+ * ⚠️ Hasta el 10/09/2026 estas líneas seguían documentando esa divergencia como VIGENTE —y
+ * la daban como razón escrita para NO llamar al motor, con un recuento de 20.104
+ * combinaciones (0,9 %) que ya no existían—. El riesgo no era cosmético: quien la leyera la
+ * habría dado por buena sin medirla (hallazgo 697 del Inspector).
  */
 const redondearCentimos = (n: number): number => Math.round(n * 100) / 100;
 
@@ -697,12 +701,26 @@ export default function SimuladorHeredarViviendaPage() {
         verificado={FISCAL_SUCESIONES_META.verificado}
         urlOficial={FISCAL_SUCESIONES_META.urlOficial}
       />
+      {/* Y el segundo se parte a su vez en DOS, por la misma razón que el 610 partió el
+          primero: juntaba el IIVTNU y el IRPF bajo una sola fecha —la del módulo entero,
+          FISCAL_INMUEBLES_META— que es 17 meses MÁS NUEVA que la que declara el dato que
+          rotula. PLUSVALIA_MUNICIPAL_META lleva su propio sello dentro del mismo fichero,
+          igual que FISCAL_SUCESIONES_CATALUNA_META lo lleva aparte del de sucesiones y por
+          idéntico motivo. Era el 610 dado la vuelta: entonces el sello único enseñaba una
+          fecha año y medio ANTERIOR, y aquí se quedaba con la más nueva de las dos —y
+          justo debajo, la nota que pide mirar esa fecha (hallazgo 695). */}
       <DataReference
-        normativa="Plusvalía municipal (IIVTNU) e IRPF de la venta"
-        fuente={`${PLUSVALIA_MUNICIPAL_META.baseNormativa} · ${FISCAL_INMUEBLES_META.fuente}`}
+        normativa="Plusvalía municipal (IIVTNU)"
+        fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
+        verificado={PLUSVALIA_MUNICIPAL_META.verificado}
+        urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
+        nota={PLUSVALIA_MUNICIPAL_META.aviso}
+      />
+      <DataReference
+        normativa="IRPF de la venta"
+        fuente={FISCAL_INMUEBLES_META.fuente}
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialIRPF}
-        nota={PLUSVALIA_MUNICIPAL_META.aviso}
       />
 
       <LegalNotice />
@@ -1368,8 +1386,9 @@ export default function SimuladorHeredarViviendaPage() {
               Hay reducción del {PORC_REDUCCION_VIVIENDA}% en la base imponible del ISD para cónyuge, descendientes,
               ascendientes o un colateral mayor de 65 años que conviviera con el fallecido los
               últimos 2 años. El tope estatal es {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}/heredero (cada CCAA puede mejorarlo).
-              Requisito: mantener la vivienda al menos 10 años (en algunas CCAA es menor). Si la
-              vendes antes, pierdes la reducción retroactivamente.
+              Requisito: mantener la vivienda al menos {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años
+              (art. 20.2.c LISD). Algunas CCAA piden menos: en Cataluña son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} años
+              (art. 19 de la Ley 19/2010). Si la vendes antes, pierdes la reducción retroactivamente.
             </p>
           </div>
         </div>
@@ -1489,7 +1508,7 @@ export default function SimuladorHeredarViviendaPage() {
             <li>No declarar la herencia pensando que "como no hay dinero líquido, no pasa nada": el plazo corre y los recargos llegan automáticamente.</li>
             <li>Renunciar a favor de otra persona: tributa como donación + ISD (doble coste).</li>
             <li>Olvidar la plusvalía municipal: es un impuesto distinto del ISD que también vence a los 6 meses.</li>
-            <li>Vender antes de los 10 años cuando se aplicó la reducción de vivienda habitual: pierdes la reducción retroactivamente.</li>
+            <li>Vender antes del plazo de mantenimiento cuando se aplicó la reducción de vivienda habitual: pierdes la reducción retroactivamente. Son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años con la norma estatal y {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} en Cataluña.</li>
             <li>Calcular la ganancia patrimonial al vender sin sumar ISD ni plusvalía pagados al valor de adquisición fiscal: pagas IRPF de más.</li>
           </ul>
           <p className={styles.warningFootnote}>

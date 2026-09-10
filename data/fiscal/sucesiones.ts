@@ -146,6 +146,16 @@ export const REDUCCION_EDAD_MENOR_21_MAX_IS = 47858.59;  // Tope máximo
 export const REDUCCION_SEGURO_VIDA_MAX_IS = 9195.49;     // 100% cónyuge/desc/asc, con límite
 export const REDUCCION_VIVIENDA_PORC_IS = 0.95;          // 95% del valor neto
 export const REDUCCION_VIVIENDA_MAX_IS = 122606.47;      // Tope máximo reducción vivienda
+/**
+ * Art. 20.2.c LISD: años que hay que mantener la vivienda para conservar la reducción.
+ *
+ * Vive aquí y no escrito a mano en cada app porque su hermana catalana
+ * —`REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS`, que son 5 y no 10— ya estaba
+ * sellada desde el 08/09/2026, y las apps seguían tecleando el plazo estatal en su prosa:
+ * al usuario catalán se le decía que no podía vender hasta el décimo año cuando la app SÍ
+ * le estaba aplicando el tope catalán del art. 17 (hallazgo 696 del Inspector).
+ */
+export const REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS = 10;
 export const REDUCCION_DISCAPACIDAD_33_IS = 47858.59;    // Grado 33%–64%
 export const REDUCCION_DISCAPACIDAD_65_IS = 150253.03;   // Grado ≥65%
 export const PORC_AJUAR_DOMESTICO_IS = 0.03;             // 3% de la masa hereditaria

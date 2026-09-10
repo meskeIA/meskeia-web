@@ -1,7 +1,29 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { SECCIONES_IAE, IAE_EXENCION, CNAE_VIGENCIA } from '@/data/fiscal/cnae-iae';
+import { SECCIONES_IAE, IAE_EXENCION, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '@/data/fiscal/cnae-iae';
 import { formatNumber } from '@/lib/formatters';
+
+/**
+ * La norma que aprueba las Tarifas del IAE, DERIVADA de `FISCAL_CNAE_IAE_META.iae.fuente`
+ * en vez de transcrita.
+ *
+ * Vive aquí y `page.tsx` la importa, para que la derivación sea UNA. `page.tsx` ya la
+ * derivaba desde el hallazgo 636 —y su test de regresión le prohíbe escribirla a mano—, pero
+ * este fichero la seguía tecleando DOS veces, en `jsonLd.description` y en la primera
+ * respuesta del FAQPage, y encima en la misma frase en la que la norma de la CNAE sí salía
+ * de `CNAE_VIGENCIA.normaVigente`. Coincidía con el módulo por casualidad, no por
+ * construcción, y es el texto que citan Bing Copilot, ChatGPT y Perplexity. Es la misma
+ * forma que el hallazgo 585 tuvo respecto del 425 (hallazgo 681).
+ *
+ * La `fuente` del módulo lleva delante el nombre del catálogo, separado por « — », y detrás
+ * la coletilla de la edición entre paréntesis. Las dos sobran en una celda de tabla y en una
+ * frase corrida, así que se retiran aquí sin tocar el dato de origen.
+ */
+export const NORMA_IAE: string = (() => {
+  const partes = FISCAL_CNAE_IAE_META.iae.fuente.split(' — ');
+  const norma = partes.length > 1 ? partes.slice(1).join(' — ') : partes[0];
+  return norma.replace(/\s*\([^)]*\)\s*$/, '').trim();
+})();
 
 /**
  * Los tipos y el umbral se LEEN de data/fiscal, no se teclean.
@@ -68,7 +90,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Buscador de códigos CNAE-2025 y epígrafes del IAE',
   description:
-    `Buscador sobre dos catálogos oficiales completos: la Clasificación Nacional de Actividades Económicas CNAE-2025 (${CNAE_VIGENCIA.normaVigente}, INE) y las Tarifas del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990, AEAT). Permite localizar una actividad describiéndola en lenguaje corriente, buscar por código, resolver códigos antiguos de la CNAE-2009 y consultar la sección del IAE y su efecto sobre la retención de IRPF.`,
+    `Buscador sobre dos catálogos oficiales completos: la Clasificación Nacional de Actividades Económicas CNAE-2025 (${CNAE_VIGENCIA.normaVigente}, INE) y las Tarifas del Impuesto sobre Actividades Económicas (${NORMA_IAE}, AEAT). Permite localizar una actividad describiéndola en lenguaje corriente, buscar por código, resolver códigos antiguos de la CNAE-2009 y consultar la sección del IAE y su efecto sobre la retención de IRPF.`,
   url: 'https://meskeia.com/conversor-cnae-iae/',
   category: 'BusinessApplication',
   features: [
@@ -93,7 +115,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre el código CNAE y el epígrafe del IAE?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El CNAE es la Clasificación Nacional de Actividades Económicas del INE y tiene finalidad estadística: aparece en el alta en la Seguridad Social, en el Registro Mercantil o al pedir financiación. El epígrafe del IAE procede de las Tarifas del Impuesto sobre Actividades Económicas (RD Legislativo 1175/1990) y tiene finalidad censal y tributaria: es el que se declara a la AEAT en el modelo 036 o 037. Son códigos distintos, de organismos distintos, y no existe una tabla oficial de equivalencia entre ellos.',
+        text: `El CNAE es la Clasificación Nacional de Actividades Económicas del INE y tiene finalidad estadística: aparece en el alta en la Seguridad Social, en el Registro Mercantil o al pedir financiación. El epígrafe del IAE procede de las Tarifas del Impuesto sobre Actividades Económicas (${NORMA_IAE}) y tiene finalidad censal y tributaria: es el que se declara a la AEAT en el modelo 036 o 037. Son códigos distintos, de organismos distintos, y no existe una tabla oficial de equivalencia entre ellos.`,
       },
     },
     {

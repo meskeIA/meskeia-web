@@ -417,11 +417,6 @@
     "taxi",
     "taxista"
   ],
-  "49.34": [
-    "furgoneta de pasajeros",
-    "transporte de viajeros",
-    "transporte escolar"
-  ],
   "49.39": [
     "furgoneta de pasajeros",
     "transporte de viajeros",
@@ -793,9 +788,6 @@
     "agente de viajes",
     "viajes"
   ],
-  "80.09": [
-    "servicios profesionales varios"
-  ],
   "81.21": [
     "aseo",
     "empresa de limpieza",
@@ -964,10 +956,12 @@
     "cuidado de niños"
   ],
   "90.11": [
-    "artesano",
+    "escritor"
+  ],
+  "90.12": [
     "artesanía",
+    "artesano",
     "ceramista",
-    "escritor",
     "escultor",
     "grabador",
     "ilustrador",
