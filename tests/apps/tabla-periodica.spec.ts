@@ -1,4 +1,20 @@
 import { test, expect, devices, Page } from '@playwright/test';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  buscarPorConfiguracion,
+  buscarPorGrupoPeriodo,
+  buscarPorNumero,
+  buscarPorSimbolo,
+  comprobarRespuesta,
+  extremoElectronegatividad,
+  extremoRadio,
+  generarEjercicioAleatorio,
+  normalizar,
+  resolverCaso,
+  toleranciaDe,
+  unicoPorEstadoYFamilia,
+} from '../../app/tabla-periodica/casos';
 
 /**
  * Inspector — tabla-periodica (segmento interactiva, riesgo 3, 1.182 usos reales)
@@ -696,5 +712,315 @@ test.describe('hallazgos reparados · 30/08/2026', () => {
       el.getAttribute('aria-live') !== null || el.getAttribute('role') === 'status',
     );
     expect(anuncia).toBe(true);
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASOS PARA CLASE (11/09/2026) — sin navegador, sobre casos.ts
+//
+// Lo de arriba es el acta del Inspector y NO se toca: es el contrato de la app.
+// Lo de aquí abajo prueba el motor de los casos asignables, que corrige respuestas
+// de alumnos y por tanto no puede fallar en silencio.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Tabla Periódica — fichas de búsqueda para clase (11/09/2026)
+ *
+ * Es la app nº 1 del canal aula de todo meskeIA: 373 de sus visitas de los últimos meses
+ * llegaron dentro de eventos de clase, repartidos en siete meses y cuatro países. Cuando un
+ * profesor manda «haz las fichas 3, 7 y 11», la corrección tiene que ser la misma para todo
+ * el grupo, y una ficha que corrige mal no se ve: la app carga igual de bien.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO
+ *   Todos los datos de este fichero están tomados de la definición de la tabla periódica,
+ *   NUNCA copiados de lo que devuelve la app. Los tres que fijan el convenio:
+ *
+ *     · Z = 26 es el hierro. El número atómico ES el número de protones, por definición.
+ *     · [Ar] 3d¹⁰ 4s¹ es el cobre, no el níquel ni el cinc: es la excepción al orden de
+ *       llenado que se estudia junto a la del cromo ([Ar] 3d⁵ 4s¹).
+ *     · El único metal líquido a temperatura ambiente es el mercurio. El otro líquido de la
+ *       tabla, el bromo, NO es metal: es un halógeno. Esa es justo la trampa de la ficha 9.
+ *
+ *   Y la tendencia que sostiene las fichas 3, 7 y 12, que son tres preguntas sobre lo mismo
+ *   visto por sus dos caras: al BAJAR por un grupo el radio atómico CRECE (se añade una capa)
+ *   y la electronegatividad BAJA (el núcleo atrae peor lo que está más lejos).
+ */
+
+test.describe('Tabla Periódica · fichas de búsqueda', () => {
+  // ----------------------------------------------------------------
+  // Invariante 1 — hay 12 fichas, con ids 1..12 sin huecos
+  // ----------------------------------------------------------------
+  test('hay exactamente 12 fichas con ids consecutivos', () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS).toHaveLength(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 2 — deterministas
+  // ----------------------------------------------------------------
+  test('dos lecturas dan el mismo enunciado y la misma respuesta', () => {
+    const primera = CASOS.map((c) => `${c.id}|${c.enunciado}|${c.respuestaTexto}`);
+    const segunda = CASOS.map((c) => `${c.id}|${c.enunciado}|${c.respuestaTexto}`);
+    expect(segunda).toEqual(primera);
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 3 — la respuesta declarada coincide con recalcularla
+  //
+  // La que caza a quien edita un enunciado y olvida la solución.
+  // ----------------------------------------------------------------
+  test('recalcular cada ficha desde sus datos devuelve la respuesta declarada', () => {
+    for (const caso of CASOS) {
+      const recalculado = resolverCaso(caso.datos);
+      expect(recalculado.ok, `ficha ${caso.id} no se puede resolver`).toBe(true);
+      expect(recalculado.texto, `ficha ${caso.id}`).toBe(caso.respuestaTexto);
+      if (caso.respuestaNumerica !== null) {
+        expect(recalculado.numero, `ficha ${caso.id}`).toBe(caso.respuestaNumerica);
+      }
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 4 — cada ficha está completa
+  // ----------------------------------------------------------------
+  test('cada ficha tiene enunciado, etiqueta no vacía, respuesta y camino', () => {
+    for (const caso of CASOS) {
+      expect(caso.titulo.length, `ficha ${caso.id}`).toBeGreaterThan(0);
+      expect(caso.enunciado.length, `ficha ${caso.id}`).toBeGreaterThan(20);
+      expect(caso.etiquetaRespuesta.trim(), `ficha ${caso.id}`).not.toBe('');
+      expect(caso.respuestaTexto.trim(), `ficha ${caso.id}`).not.toBe('');
+      expect(caso.pasos.length, `ficha ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `ficha ${caso.id}`).not.toBe('');
+      expect(caso.sinonimos.length, `ficha ${caso.id}`).toBeGreaterThan(0);
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 5 — enunciados universales
+  //
+  // España es el 8,6 % de este canal: un enunciado anclado a un país excluye
+  // a la mayor parte del público que de verdad usa la app en clase.
+  // ----------------------------------------------------------------
+  test('ningún enunciado nombra un país ni una ciudad', () => {
+    const prohibido =
+      /\b(españa|espana|madrid|barcelona|méxico|mexico|colombia|argentina|perú|peru|chile|bogotá|bogota|lima|buenos aires|euros?|pesos?)\b/i;
+    for (const caso of CASOS) {
+      expect(prohibido.test(caso.titulo), `título de la ficha ${caso.id}`).toBe(false);
+      expect(prohibido.test(caso.enunciado), `enunciado de la ficha ${caso.id}`).toBe(false);
+      for (const paso of caso.pasos) {
+        expect(prohibido.test(paso), `paso de la ficha ${caso.id}`).toBe(false);
+      }
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 6 (variante B) — el generador saca datos de la propia tabla
+  // ----------------------------------------------------------------
+  test('el ejercicio aleatorio es reproducible por semilla', () => {
+    const primero = generarEjercicioAleatorio(12345);
+    const segundo = generarEjercicioAleatorio(12345);
+    expect(segundo.enunciado).toBe(primero.enunciado);
+    expect(segundo.respuestaTexto).toBe(primero.respuestaTexto);
+
+    const otro = generarEjercicioAleatorio(999);
+    expect(otro.enunciado === primero.enunciado && otro.respuestaTexto === primero.respuestaTexto)
+      .toBe(false);
+  });
+
+  test('el ejercicio aleatorio siempre sale resuelto y de un elemento de los 4 primeros períodos', () => {
+    for (let semilla = 1; semilla <= 60; semilla++) {
+      const ejercicio = generarEjercicioAleatorio(semilla);
+      expect(ejercicio.respuestaTexto.trim(), `semilla ${semilla}`).not.toBe('');
+      expect(ejercicio.etiquetaRespuesta.trim(), `semilla ${semilla}`).not.toBe('');
+      expect(ejercicio.pasos.length, `semilla ${semilla}`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 7 (variante B) — comparar normalizado acepta los sinónimos
+  // declarados y RECHAZA lo demás
+  //
+  // Es el convenio propio de esta app: el alumno que sabe química no puede
+  // suspender por cómo teclea, pero «cobre» no puede colar donde se pedía hierro.
+  // ----------------------------------------------------------------
+  test('normalizar quita tildes, mayúsculas y puntuación final', () => {
+    expect(normalizar('Flúor')).toBe('fluor');
+    expect(normalizar('  HIERRO  ')).toBe('hierro');
+    expect(normalizar('Fe.')).toBe('fe');
+    expect(normalizar('metales   de   transición')).toBe('metales de transicion');
+  });
+
+  test('la ficha del hierro acepta símbolo y nombre, en cualquier grafía', () => {
+    const ficha = CASOS[0];
+    expect(ficha.respuestaTexto).toBe('Hierro');
+    for (const forma of ['Fe', 'fe', 'FE', 'Hierro', 'hierro', ' hierro ']) {
+      expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(true);
+    }
+    for (const forma of ['Cu', 'cobre', 'Co', '26', 'hierr']) {
+      expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(false);
+    }
+  });
+
+  test('una respuesta vacía no es un acierto ni un fallo cualquiera', () => {
+    expect(comprobarRespuesta('', CASOS[0])).toEqual({ correcto: false, motivo: 'vacia' });
+    expect(comprobarRespuesta('   ', CASOS[0])).toEqual({ correcto: false, motivo: 'vacia' });
+  });
+
+  test('una ficha de texto NUNCA se compara como número', () => {
+    // «26» es el número atómico del hierro, pero la ficha 1 pide el símbolo o el nombre:
+    // aceptarlo por la vía numérica sería dar por buena una respuesta a otra pregunta.
+    const ficha = CASOS[0];
+    expect(ficha.respuestaNumerica).toBeNull();
+    expect(comprobarRespuesta('26', ficha).correcto).toBe(false);
+  });
+
+  // ----------------------------------------------------------------
+  // Los datos concretos, derivados a mano de la definición
+  // ----------------------------------------------------------------
+  test('ficha 1 · Z = 26 es el hierro', () => {
+    expect(buscarPorNumero(26)?.simbolo).toBe('Fe');
+    expect(CASOS[0].respuestaTexto).toBe('Hierro');
+  });
+
+  test('ficha 2 · grupo 16 y período 3 es el azufre', () => {
+    expect(buscarPorGrupoPeriodo(16, 3)?.simbolo).toBe('S');
+    expect(CASOS[1].respuestaTexto).toBe('Azufre');
+  });
+
+  test('ficha 3 · el flúor es el más electronegativo de los cuatro', () => {
+    expect(extremoElectronegatividad(['F', 'O', 'Cl', 'N'], 'max')?.simbolo).toBe('F');
+    expect(CASOS[2].respuestaTexto).toBe('Flúor');
+  });
+
+  test('ficha 4 · la masa del cobre se compara con tolerancia', () => {
+    const ficha = CASOS[3];
+    expect(buscarPorSimbolo('Cu')?.masa).toBe(63.546);
+    expect(ficha.respuestaNumerica).toBe(63.546);
+    // El 1 % de 63,546 es 0,635: quien copia «63,5» del recuadro ha encontrado el dato.
+    expect(toleranciaDe(63.546)).toBeCloseTo(0.63546, 5);
+    for (const forma of ['63,546', '63,5', '64']) {
+      expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(true);
+    }
+    for (const forma of ['29', '65', 'cobre']) {
+      expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(false);
+    }
+    // ⚠️ «63.546» con PUNTO no vale, y no es un descuido: `parseSpanishNumber` es el parser
+    // canónico del catálogo y con un solo separador gana la lectura española, así que lee
+    // sesenta y tres mil quinientos cuarenta y seis. La ambigüedad es irreducible —«1.234» son
+    // mil doscientos treinta y cuatro para casi todo el público de este sitio— y la ficha
+    // muestra el dato como «63,546», que es la forma que se copia.
+    expect(comprobarRespuesta('63.546', ficha).correcto).toBe(false);
+  });
+
+  test('ficha 5 · [Ar] 3d¹⁰ 4s¹ es el cobre, y la escritura sin espacios también lo encuentra', () => {
+    expect(buscarPorConfiguracion('[Ar] 3d¹⁰ 4s¹')?.simbolo).toBe('Cu');
+    expect(buscarPorConfiguracion('[Ar]3d¹⁰4s¹')?.simbolo).toBe('Cu');
+    expect(CASOS[4].respuestaTexto).toBe('Cobre');
+  });
+
+  test('ficha 6 · el gas noble del período 2 es el neón', () => {
+    expect(buscarPorGrupoPeriodo(18, 2)?.simbolo).toBe('Ne');
+    expect(CASOS[5].respuestaTexto).toBe('Neón');
+  });
+
+  test('ficha 7 · de Li, Na y K el mayor radio es el del potasio', () => {
+    // Al bajar por el grupo 1 se añade una capa, así que el radio crece: 167 < 190 < 243 pm.
+    const li = buscarPorSimbolo('Li')?.radioAtomico as number;
+    const na = buscarPorSimbolo('Na')?.radioAtomico as number;
+    const k = buscarPorSimbolo('K')?.radioAtomico as number;
+    expect(li).toBeLessThan(na);
+    expect(na).toBeLessThan(k);
+    expect(extremoRadio(['Li', 'Na', 'K'], 'max')?.simbolo).toBe('K');
+    expect(CASOS[6].respuestaTexto).toBe('Potasio');
+  });
+
+  test('ficha 8 · el yodo es un halógeno, y se acepta en singular y en plural', () => {
+    const ficha = CASOS[7];
+    expect(buscarPorSimbolo('I')?.familia).toBe('halogenos');
+    expect(ficha.respuestaTexto).toBe('halógenos');
+    for (const forma of ['halógenos', 'halogenos', 'halógeno', 'grupo 17']) {
+      expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(true);
+    }
+    expect(comprobarRespuesta('gases nobles', ficha).correcto).toBe(false);
+  });
+
+  test('ficha 9 · el único metal de transición líquido es el mercurio', () => {
+    // La salvaguarda: si un día hubiera dos, la búsqueda devolvería null y la ficha daría
+    // error en vez de corregir por uno de los dos.
+    expect(unicoPorEstadoYFamilia('liquido', 'metales-transicion')?.simbolo).toBe('Hg');
+    expect(CASOS[8].respuestaTexto).toBe('Mercurio');
+    // Y el bromo, el otro líquido de la tabla, NO es un metal de transición: es la trampa.
+    expect(buscarPorSimbolo('Br')?.familia).toBe('halogenos');
+    expect(comprobarRespuesta('bromo', CASOS[8]).correcto).toBe(false);
+  });
+
+  test('ficha 10 · el número atómico del potasio es 19', () => {
+    expect(buscarPorSimbolo('K')?.numero).toBe(19);
+    expect(CASOS[9].respuestaNumerica).toBe(19);
+  });
+
+  test('ficha 11 · la configuración del silicio se acepta con y sin superíndices', () => {
+    const ficha = CASOS[10];
+    expect(buscarPorSimbolo('Si')?.configuracionElectronica).toBe('[Ne] 3s² 3p²');
+    expect(ficha.respuestaTexto).toBe('[Ne] 3s² 3p²');
+    for (const forma of ['[Ne] 3s² 3p²', '[ne] 3s2 3p2', '[Ne]3s23p2']) {
+      expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(true);
+    }
+    expect(comprobarRespuesta('[Ne] 3s² 3p³', ficha).correcto).toBe(false);
+  });
+
+  test('ficha 12 · de los halógenos el menos electronegativo es el yodo', () => {
+    // La cara contraria de la ficha 7: al bajar por el grupo, la electronegatividad baja.
+    const f = buscarPorSimbolo('F')?.electronegatividad as number;
+    const i = buscarPorSimbolo('I')?.electronegatividad as number;
+    expect(i).toBeLessThan(f);
+    expect(extremoElectronegatividad(['F', 'Cl', 'Br', 'I'], 'min')?.simbolo).toBe('I');
+    expect(CASOS[11].respuestaTexto).toBe('Yodo');
+  });
+
+  // ----------------------------------------------------------------
+  // Las búsquedas que deben negarse a responder
+  //
+  // Una pregunta de búsqueda solo es asignable si su respuesta es ÚNICA. Estas
+  // son las tres formas en que eso se rompe, y en las tres el motor devuelve
+  // null en vez de inventar una respuesta.
+  // ----------------------------------------------------------------
+  test('el motor se niega a responder cuando la respuesta no sería única', () => {
+    // Casilla compartida por lantánidos y actínidos: varios elementos, no uno.
+    expect(buscarPorGrupoPeriodo(3, 6)).toBeNull();
+    // Un elemento inexistente.
+    expect(buscarPorNumero(999)).toBeNull();
+    expect(buscarPorSimbolo('Xx')).toBeNull();
+    // Un empate en el extremo.
+    expect(extremoElectronegatividad(['Na', 'Na'], 'max')).toBeNull();
+    // Una configuración que no existe.
+    expect(buscarPorConfiguracion('[Ar] 9z⁹')).toBeNull();
+  });
+
+  test('resolverCaso nunca lanza: los datos incompletos salen como no-ok', () => {
+    expect(resolverCaso({ tipo: 'elemento-por-numero' }).ok).toBe(false);
+    expect(resolverCaso({ tipo: 'propiedad-numerica', simbolo: 'Fe' }).ok).toBe(false);
+    expect(resolverCaso({ tipo: 'elemento-por-grupo-periodo', grupo: 3 }).ok).toBe(false);
+    // El gas noble sin electronegatividad asignada: no-ok, no NaN en pantalla.
+    const sinDato = resolverCaso({
+      tipo: 'propiedad-numerica',
+      simbolo: 'He',
+      propiedad: 'electronegatividad',
+    });
+    expect(sinDato.ok).toBe(false);
+    expect(sinDato.error).not.toBeNull();
+  });
+
+  // ----------------------------------------------------------------
+  // Mezcla de categorías
+  // ----------------------------------------------------------------
+  test('hay fichas de cálculo directo y fichas de situación real', () => {
+    const abstractos = CASOS.filter((c) => c.categoria === 'abstracto').length;
+    const aplicados = CASOS.filter((c) => c.categoria === 'aplicado').length;
+    expect(abstractos).toBeGreaterThanOrEqual(3);
+    expect(aplicados).toBeGreaterThanOrEqual(3);
+    expect(abstractos + aplicados).toBe(12);
   });
 });

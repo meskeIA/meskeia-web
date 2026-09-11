@@ -484,6 +484,7 @@ export const implementedAppsUrls = [
   "/simulador-progresiones/", // Progresiones aritméticas y geométricas: término general, suma de n términos, suma infinita, identificador de sucesiones y 12 casos numerados
   "/simulador-teorema-pitagoras/", // Pitágoras interactivo: triángulo con sliders, demostración visual de los tres cuadrados, recíproco y 12 casos numerados asignables
   "/simulador-teorema-tales/", // Tales y semejanza: paralelas y secantes, razón k con el área por k², altura por sombras, escalas de planos y 12 casos numerados
+  "/calculadora-escalas/", // Escalas de planos, mapas y maquetas: plano<->realidad, deducir la escala, cambio de escala, superficies por el cuadrado, escala grafica imprimible y 12 casos numerados
   "/simulador-integral-area/", // Integral como suma de Riemann: 8 funciones, 4 métodos (izquierda/derecha/punto medio/trapecio), error vs valor exacto
   "/simulador-intervalos-confianza/", // 100 IC simulados (modo conceptual) + calculadora: nivel 80-99%, z o t Student, n 5-500
   "/simulador-test-hipotesis/", // Dos curvas H₀/H₁ superpuestas, regiones rechazo, α/β/p-valor/potencia visualizados

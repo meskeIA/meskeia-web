@@ -14,341 +14,32 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorEquilibrioQuimico.module.css';
 
-// ============================================================
-// Tipos
-// ============================================================
-
-type EstadoFisico = 'g' | 'l' | 's' | 'aq';
-type DireccionDesplazamiento = 'derecha' | 'izquierda' | 'equilibrio';
-
-interface Especie {
-  simbolo: string;
-  coef: number;
-  estado: EstadoFisico;
-}
-
-interface Reaccion {
-  id: string;
-  nombre: string;
-  ecuacion: string;
-  reactivos: Especie[];
-  productos: Especie[];
-  Kc: number;
-  /**
-   * ΔH de reacción en kJ/mol. El SIGNO ya dice si es exotérmica (ΔH<0) o endotérmica
-   * (ΔH>0), así que no hay un campo `exotermica` aparte: tenerlo permitía que se
-   * contradijeran, y eso es lo que pasó — la esterificación llevaba `exotermica: false`
-   * con `deltaH: -3` y la tarjeta se rotulaba «endotérmica · ΔH = -3 kJ/mol», que es
-   * imposible (hallazgo 172).
-   */
-  deltaH: number; // kJ/mol
-  contexto: string;
-  // Concentraciones iniciales sugeridas (orden = reactivos + productos)
-  inicialesSugeridas: Record<string, number>;
-}
-
-type TipoPerturbacion =
-  | 'anadir-reactivo'
-  | 'quitar-reactivo'
-  | 'anadir-producto'
-  | 'quitar-producto'
-  | 'subir-temperatura'
-  | 'bajar-temperatura'
-  | 'comprimir'
-  | 'expandir'
-  | 'catalizador';
-
-interface Perturbacion {
-  tipo: TipoPerturbacion;
-  especie?: string;
-  cantidad?: number;
-  descripcion: string;
-}
-
-// ============================================================
-// Reacciones del simulador
-// ============================================================
-
-const REACCIONES: Reaccion[] = [
-  {
-    id: 'haber-bosch',
-    nombre: 'Síntesis de amoníaco (Haber-Bosch)',
-    ecuacion: 'N₂(g) + 3 H₂(g) ⇌ 2 NH₃(g)',
-    reactivos: [
-      { simbolo: 'N₂', coef: 1, estado: 'g' },
-      { simbolo: 'H₂', coef: 3, estado: 'g' },
-    ],
-    productos: [{ simbolo: 'NH₃', coef: 2, estado: 'g' }],
-    Kc: 0.5,
-    deltaH: -92,
-    contexto: 'Producción industrial de fertilizantes. Δn = 2 − 4 = −2 (mol gas).',
-    inicialesSugeridas: { 'N₂': 1.0, 'H₂': 3.0, 'NH₃': 0.5 },
-  },
-  {
-    id: 'esterificacion',
-    nombre: 'Esterificación (acetato de etilo)',
-    ecuacion: 'CH₃COOH(l) + C₂H₅OH(l) ⇌ CH₃COOC₂H₅(l) + H₂O(l)',
-    reactivos: [
-      { simbolo: 'CH₃COOH', coef: 1, estado: 'l' },
-      { simbolo: 'C₂H₅OH', coef: 1, estado: 'l' },
-    ],
-    productos: [
-      { simbolo: 'CH₃COOC₂H₅', coef: 1, estado: 'l' },
-      { simbolo: 'H₂O', coef: 1, estado: 'l' },
-    ],
-    Kc: 4.0,
-    deltaH: -3,
-    contexto: 'Equilibrio en disolución líquida. Δn = 0, la presión no afecta.',
-    inicialesSugeridas: { 'CH₃COOH': 1.0, 'C₂H₅OH': 1.0, 'CH₃COOC₂H₅': 0.2, 'H₂O': 0.2 },
-  },
-  {
-    id: 'pcl5',
-    nombre: 'Disociación de PCl₅',
-    ecuacion: 'PCl₅(g) ⇌ PCl₃(g) + Cl₂(g)',
-    reactivos: [{ simbolo: 'PCl₅', coef: 1, estado: 'g' }],
-    productos: [
-      { simbolo: 'PCl₃', coef: 1, estado: 'g' },
-      { simbolo: 'Cl₂', coef: 1, estado: 'g' },
-    ],
-    Kc: 0.04,
-    deltaH: 88,
-    contexto: 'Reacción endotérmica. Δn = +1: la presión sí afecta.',
-    inicialesSugeridas: { 'PCl₅': 1.0, 'PCl₃': 0.1, 'Cl₂': 0.1 },
-  },
-  {
-    id: 'so3',
-    nombre: 'Síntesis de SO₃ (proceso de contacto)',
-    ecuacion: '2 SO₂(g) + O₂(g) ⇌ 2 SO₃(g)',
-    reactivos: [
-      { simbolo: 'SO₂', coef: 2, estado: 'g' },
-      { simbolo: 'O₂', coef: 1, estado: 'g' },
-    ],
-    productos: [{ simbolo: 'SO₃', coef: 2, estado: 'g' }],
-    Kc: 4.32,
-    deltaH: -198,
-    contexto: 'Producción de ácido sulfúrico. Δn = −1: comprimir favorece productos.',
-    inicialesSugeridas: { 'SO₂': 1.0, 'O₂': 0.5, 'SO₃': 0.5 },
-  },
-  {
-    id: 'no2-n2o4',
-    nombre: 'Equilibrio NO₂ / N₂O₄',
-    ecuacion: '2 NO₂(g) ⇌ N₂O₄(g)',
-    reactivos: [{ simbolo: 'NO₂', coef: 2, estado: 'g' }],
-    productos: [{ simbolo: 'N₂O₄', coef: 1, estado: 'g' }],
-    Kc: 170,
-    deltaH: -57,
-    contexto: 'Equilibrio rojizo/incoloro clásico. Δn = −1.',
-    inicialesSugeridas: { 'NO₂': 0.2, 'N₂O₄': 1.0 },
-  },
-  {
-    id: 'water-gas-shift',
-    nombre: 'Water-gas shift (CO + H₂O)',
-    ecuacion: 'CO(g) + H₂O(g) ⇌ CO₂(g) + H₂(g)',
-    reactivos: [
-      { simbolo: 'CO', coef: 1, estado: 'g' },
-      { simbolo: 'H₂O', coef: 1, estado: 'g' },
-    ],
-    productos: [
-      { simbolo: 'CO₂', coef: 1, estado: 'g' },
-      { simbolo: 'H₂', coef: 1, estado: 'g' },
-    ],
-    Kc: 5.0,
-    deltaH: -41,
-    contexto: 'Producción de hidrógeno industrial. Δn = 0, P no afecta.',
-    inicialesSugeridas: { 'CO': 1.0, 'H₂O': 1.0, 'CO₂': 0.5, 'H₂': 0.5 },
-  },
-];
-
-// ============================================================
-// Funciones de cálculo
-// ============================================================
-
-function especieParticipaEnK(estado: EstadoFisico, reaccionTodaEnLiquido: boolean): boolean {
-  // Sólidos y líquidos puros NO entran en Kc.
-  // Excepción didáctica: la esterificación se trata como en disolución, así que
-  // si TODA la reacción es líquida, las concentraciones sí entran en Kc.
-  if (reaccionTodaEnLiquido) return true;
-  return estado === 'g' || estado === 'aq';
-}
-
-function calcularQ(reaccion: Reaccion, concentraciones: Record<string, number>): number {
-  const todaEnLiquido =
-    reaccion.reactivos.every((e) => e.estado === 'l') &&
-    reaccion.productos.every((e) => e.estado === 'l');
-
-  let numerador = 1;
-  let denominador = 1;
-  let hayNumerador = false;
-  let hayDenominador = false;
-
-  for (const p of reaccion.productos) {
-    if (especieParticipaEnK(p.estado, todaEnLiquido)) {
-      const c = Math.max(concentraciones[p.simbolo] ?? 0, 1e-12);
-      numerador *= Math.pow(c, p.coef);
-      hayNumerador = true;
-    }
-  }
-  for (const r of reaccion.reactivos) {
-    if (especieParticipaEnK(r.estado, todaEnLiquido)) {
-      const c = concentraciones[r.simbolo] ?? 0;
-      // Con un reactivo agotado el cociente DIVERGE. Antes se sustituía por un suelo de
-      // 1e-12 y el resultado —«9.259.259.259,2593»— se presentaba como una cifra exacta a
-      // cuatro decimales: el epsilon interno asomando en pantalla (hallazgo 175). Se
-      // devuelve Infinity y la interfaz lo rotula como lo que es.
-      if (c === 0) return Infinity;
-      denominador *= Math.pow(c, r.coef);
-      hayDenominador = true;
-    }
-  }
-  if (!hayNumerador) numerador = 1;
-  if (!hayDenominador) denominador = 1;
-  return numerador / denominador;
-}
-
-function deltaN(reaccion: Reaccion): number {
-  const sumProd = reaccion.productos
-    .filter((e) => e.estado === 'g')
-    .reduce((s, e) => s + e.coef, 0);
-  const sumReact = reaccion.reactivos
-    .filter((e) => e.estado === 'g')
-    .reduce((s, e) => s + e.coef, 0);
-  return sumProd - sumReact;
-}
-
-/**
- * Calcula nuevo equilibrio resolviendo numéricamente el avance ξ tal que Q(ξ) = Kc.
- * Usa búsqueda binaria sobre el rango físicamente posible de ξ.
- */
-function nuevoEquilibrio(
-  reaccion: Reaccion,
-  concentraciones: Record<string, number>,
-  KcEfectiva: number,
-): Record<string, number> {
-  const todaEnLiquido =
-    reaccion.reactivos.every((e) => e.estado === 'l') &&
-    reaccion.productos.every((e) => e.estado === 'l');
-
-  // Rango de ξ
-  // ξ > 0: avanza hacia productos, consume reactivos. Limit: min(c[r]/coef)
-  let ximax = Infinity;
-  for (const r of reaccion.reactivos) {
-    if (especieParticipaEnK(r.estado, todaEnLiquido)) {
-      const c = concentraciones[r.simbolo] ?? 0;
-      ximax = Math.min(ximax, c / r.coef);
-    }
-  }
-  // ξ < 0: avanza hacia reactivos, consume productos. Limit: -min(c[p]/coef)
-  let ximin = -Infinity;
-  for (const p of reaccion.productos) {
-    if (especieParticipaEnK(p.estado, todaEnLiquido)) {
-      const c = concentraciones[p.simbolo] ?? 0;
-      ximin = Math.max(ximin, -c / p.coef);
-    }
-  }
-  if (!isFinite(ximax)) ximax = 100;
-  if (!isFinite(ximin)) ximin = -100;
-
-  // f(ξ) = Q(concentraciones desplazadas en ξ) - Kc
-  const f = (xi: number): number => {
-    const conc: Record<string, number> = {};
-    for (const r of reaccion.reactivos) {
-      conc[r.simbolo] = Math.max((concentraciones[r.simbolo] ?? 0) - r.coef * xi, 1e-12);
-    }
-    for (const p of reaccion.productos) {
-      conc[p.simbolo] = Math.max((concentraciones[p.simbolo] ?? 0) + p.coef * xi, 1e-12);
-    }
-    return calcularQ(reaccion, conc) - KcEfectiva;
-  };
-
-  // Búsqueda binaria con ε
-  const eps = 1e-6;
-  let lo = ximin + eps;
-  let hi = ximax - eps;
-  const flo = f(lo);
-  const fhi = f(hi);
-  let xi = 0;
-  if (flo * fhi > 0) {
-    // No hay raíz en el rango (caso patológico): devolver tal cual
-    return { ...concentraciones };
-  }
-  for (let i = 0; i < 80; i++) {
-    const mid = (lo + hi) / 2;
-    const fm = f(mid);
-    if (Math.abs(fm) < 1e-9) {
-      xi = mid;
-      break;
-    }
-    if (fm * f(lo) < 0) {
-      hi = mid;
-    } else {
-      lo = mid;
-    }
-    xi = mid;
-  }
-
-  const resultado: Record<string, number> = {};
-  for (const r of reaccion.reactivos) {
-    resultado[r.simbolo] = Math.max((concentraciones[r.simbolo] ?? 0) - r.coef * xi, 0);
-  }
-  for (const p of reaccion.productos) {
-    resultado[p.simbolo] = Math.max((concentraciones[p.simbolo] ?? 0) + p.coef * xi, 0);
-  }
-  return resultado;
-}
-
-/**
- * Ecuación de van't Hoff simplificada: ln(K2/K1) = -ΔH/R · (1/T2 − 1/T1)
- * R = 8.314 J/(mol·K), ΔH en J/mol
- */
-/**
- * Temperatura de referencia del simulador, en kelvin, y ancla de van 't Hoff.
- *
- * ⚠️ Las Kc de este simulador son DIDÁCTICAS: valores elegidos para que la simulación sea
- * legible, no constantes tabuladas. Hasta el 23/08/2026 la interfaz las rotulaba «Kc (a
- * 298 K, referencia)», y eso era falso para cuatro de las seis reacciones: la Kc real a
- * 298 K del proceso Haber-Bosch es del orden de 10⁸, y la del proceso de contacto, de 10²⁶
- * (hallazgo 173). Con esos números la simulación no se puede ver, así que se usan valores
- * de aula — pero no se presentan como lo que no son.
- *
- * Lo que SÍ es real y es lo que la app enseña: los ΔH de cada reacción, el signo del
- * desplazamiento y cómo cambia Kc con la temperatura según van 't Hoff. Esa física es
- * correcta sea cual sea el valor de partida.
- */
-export const T_REFERENCIA_K = 298;
-
-/** Rango de temperatura que admite el simulador, en kelvin (no hay temperaturas absolutas negativas) */
-export const T_MIN_K = 100;
-export const T_MAX_K = 2000;
-
-/**
- * Equilibrio de partida, redondeado a cuatro decimales.
- *
- * `nuevoEquilibrio` resuelve numéricamente y devuelve valores como 0,5964470977695575, que
- * es exacto pero ilegible en un campo de concentración. Cuatro decimales bastan de sobra:
- * la tolerancia con la que la app decide «⇌ Equilibrio» es del 2 %.
- */
-function equilibrioDePartida(reaccion: Reaccion): Record<string, number> {
-  const eq = nuevoEquilibrio(reaccion, reaccion.inicialesSugeridas, reaccion.Kc);
-  return Object.fromEntries(Object.entries(eq).map(([k, v]) => [k, Math.round(v * 10000) / 10000]));
-}
-
-/** Exotérmica ⟺ ΔH < 0. Es la ÚNICA definición que usa la app, para que no pueda divergir. */
-function esExotermicaDe(deltaH: number): boolean {
-  return deltaH < 0;
-}
-
-function nuevoKcConTemperatura(
-  KcInicial: number,
-  deltaH_kJmol: number,
-  T1: number,
-  T2: number,
-): number {
-  if (T1 === T2) return KcInicial;
-  const R = 8.314;
-  const dHJ = deltaH_kJmol * 1000;
-  const lnRatio = (-dHJ / R) * (1 / T2 - 1 / T1);
-  return KcInicial * Math.exp(lnRatio);
-}
+// El motor de esta app —las reacciones, el cociente Q, el nuevo equilibrio y van 't Hoff—
+// vive en ./casos.ts, no aquí. Se movió el 11/09/2026 para que los 12 casos para clase y el
+// simulador no puedan calcular con convenios distintos: si divergieran, la app suspendería
+// una respuesta que ella misma produce. Aquí no se calcula nada de química.
+import {
+  CASOS,
+  OPCIONES_DIRECCION,
+  REACCIONES,
+  TEXTO_DIRECCION,
+  TOTAL_CASOS,
+  T_MAX_K,
+  T_MIN_K,
+  T_REFERENCIA_K,
+  calcularQ,
+  comprobarPrediccion,
+  comprobarRespuesta,
+  deltaN,
+  equilibrioDePartida,
+  esExotermicaDe,
+  nuevoEquilibrio,
+  nuevoKcConTemperatura,
+  type Comprobacion,
+  type DireccionDesplazamiento,
+  type Perturbacion,
+  type TipoPerturbacion,
+} from './casos';
 
 // ============================================================
 // Componente principal
@@ -377,7 +68,47 @@ export default function SimuladorEquilibrioQuimicoPage() {
   );
   const [temperaturaK, setTemperaturaK] = useState<number>(298);
   const [historialPerturbaciones, setHistorialPerturbaciones] = useState<Perturbacion[]>([]);
+
+  // Casos para clase. La corrección vive en `casos.ts`, fuera de la vista.
+  const [respuestasCasos, setRespuestasCasos] = useState<Record<number, string>>({});
+  const [prediccionesElegidas, setPrediccionesElegidas] = useState<
+    Record<number, DireccionDesplazamiento>
+  >({});
+  const [veredictos, setVeredictos] = useState<Record<number, Comprobacion>>({});
+  const [solucionesAbiertas, setSolucionesAbiertas] = useState<Record<number, boolean>>({});
   const [mensaje, setMensaje] = useState<string>('Selecciona una reacción y aplica una perturbación para ver Le Chatelier en acción.');
+
+  const casosResueltos = useMemo(
+    () => Object.values(veredictos).filter((v) => v.correcto).length,
+    [veredictos],
+  );
+
+  // ---------------------------------------------------------- Casos para clase
+
+  const comprobarCasoNumerico = (id: number, esperado: number) => {
+    setVeredictos((previos) => ({
+      ...previos,
+      [id]: comprobarRespuesta(respuestasCasos[id] ?? '', esperado),
+    }));
+  };
+
+  const comprobarCasoPrediccion = (id: number, esperada: DireccionDesplazamiento) => {
+    setVeredictos((previos) => ({
+      ...previos,
+      [id]: comprobarPrediccion(prediccionesElegidas[id] ?? null, esperada),
+    }));
+  };
+
+  const alternarSolucion = (id: number) => {
+    setSolucionesAbiertas((previas) => ({ ...previas, [id]: previas[id] !== true }));
+  };
+
+  const reiniciarCasos = () => {
+    setRespuestasCasos({});
+    setPrediccionesElegidas({});
+    setVeredictos({});
+    setSolucionesAbiertas({});
+  };
 
   // Cambia de reacción y resetea estado
   const cambiarReaccion = useCallback((id: string) => {
@@ -389,6 +120,18 @@ export default function SimuladorEquilibrioQuimicoPage() {
     setHistorialPerturbaciones([]);
     setMensaje(`Reacción cargada: ${nueva.nombre}. Pulsa una perturbación para experimentar.`);
   }, []);
+
+  /**
+   * Deja el simulador preparado con la reacción de un caso, para comprobar la predicción
+   * moviendo los controles de verdad.
+   *
+   * Solo carga la REACCIÓN, nunca la perturbación: aplicarla sería resolver el caso, y el
+   * valor pedagógico de estos doce está justo en comprometerse ANTES de mover nada.
+   */
+  const abrirReaccionDelCaso = (reaccionIdDelCaso: string) => {
+    cambiarReaccion(reaccionIdDelCaso);
+    document.getElementById('panel-simulador')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const esExotermica = esExotermicaDe(reaccion.deltaH);
 
@@ -627,8 +370,8 @@ export default function SimuladorEquilibrioQuimicoPage() {
       <LegalNotice />
 
       <main className={styles.main}>
-        {/* Selector de reacción */}
-        <section className={styles.panel} aria-labelledby="seleccion-reaccion">
+        {/* Selector de reacción. El id es el ancla a la que vuelven los casos para clase. */}
+        <section id="panel-simulador" className={styles.panel} aria-labelledby="seleccion-reaccion">
           <h2 id="seleccion-reaccion" className={styles.panelTitle}>
             1. Elige una reacción reversible
           </h2>
@@ -910,6 +653,202 @@ export default function SimuladorEquilibrioQuimicoPage() {
               </ol>
             </div>
           )}
+        </section>
+
+        {/* ---------------------------------------------- Casos para clase */}
+        <section className={styles.aulaSection} aria-labelledby="casos-para-clase">
+          <h2 id="casos-para-clase" className={styles.aulaTitulo}>
+            <span aria-hidden="true">📝</span> Casos para clase
+          </h2>
+          <p className={styles.aulaIntro}>
+            Son <strong>12 casos fijos</strong>: el caso 3 es el mismo para todo el mundo, hoy y
+            dentro de un año, con los mismos números y la misma solución. Por eso se pueden asignar
+            por número —«resuelve el 3, el 7 y el 11»— y corregir igual para todo el grupo.
+          </p>
+          <p className={styles.aulaConvenio}>
+            <span aria-hidden="true">⚖️</span> <strong>Dos avisos de convenio</strong>, porque
+            cambian el resultado: en el cociente <strong>solo entran gases y especies en
+            disolución</strong> —los sólidos y los líquidos puros no—, con la excepción de la
+            esterificación, que al ser toda líquida se trata como una disolución y entonces sí
+            cuentan sus cuatro especies; y <strong>Δn se cuenta solo sobre moles de gas</strong>,
+            que es lo que decide si comprimir desplaza algo. Las Kc de este simulador son{' '}
+            <strong>didácticas</strong>, elegidas para que la simulación se vea, no constantes
+            tabuladas.
+          </p>
+          <p className={styles.aulaConvenio}>
+            <span aria-hidden="true">🔮</span> <strong>Los casos 7 a 12 se responden antes de
+            tocar nada.</strong> Elige hacia dónde crees que se moverá el equilibrio, comprueba, y
+            solo entonces vuelve al simulador a verlo. Mover un control y mirar la gráfica no
+            enseña nada si no había una predicción que confirmar o romper.
+          </p>
+
+          <div className={styles.aulaContador}>
+            <p className={styles.aulaContadorTexto} aria-live="polite">
+              Has resuelto <strong>{casosResueltos}</strong> de {TOTAL_CASOS}
+            </p>
+            <div
+              className={styles.aulaBarra}
+              role="progressbar"
+              aria-valuenow={casosResueltos}
+              aria-valuemin={0}
+              aria-valuemax={TOTAL_CASOS}
+              aria-label="Casos resueltos"
+            >
+              <div
+                className={styles.aulaBarraRelleno}
+                style={{ width: `${(casosResueltos / TOTAL_CASOS) * 100}%` }}
+              />
+            </div>
+            <button type="button" className={styles.aulaBtnSecundario} onClick={reiniciarCasos}>
+              Empezar de nuevo
+            </button>
+          </div>
+
+          <div className={styles.aulaGrid}>
+            {CASOS.map((caso) => {
+              const veredicto = veredictos[caso.id];
+              const abierta = solucionesAbiertas[caso.id] === true;
+              return (
+                <article key={caso.id} className={styles.aulaCaso}>
+                  <div className={styles.aulaCabecera}>
+                    <span className={styles.aulaNumero}>{caso.id}</span>
+                    <h3 className={styles.aulaCasoTitulo}>{caso.titulo}</h3>
+                    <span className={styles.aulaEtiqueta}>
+                      {caso.tipo === 'prediccion' ? 'Predicción' : 'Cálculo'}
+                    </span>
+                  </div>
+
+                  <p className={styles.aulaEcuacion}>{caso.ecuacion}</p>
+                  <p className={styles.aulaEnunciado}>{caso.enunciado}</p>
+
+                  {caso.tipo === 'numerico' ? (
+                    <div className={styles.aulaRespuesta}>
+                      <label
+                        className={styles.aulaEtiquetaCampo}
+                        htmlFor={`respuesta-caso-${caso.id}`}
+                      >
+                        {caso.etiquetaRespuesta}
+                        {caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                      </label>
+                      <input
+                        id={`respuesta-caso-${caso.id}`}
+                        className={styles.aulaCampo}
+                        type="text"
+                        /* `text` y no `decimal`: el Δn del caso 3 es negativo y el teclado
+                           decimal de iOS no ofrece el signo menos. */
+                        inputMode="text"
+                        autoComplete="off"
+                        value={respuestasCasos[caso.id] ?? ''}
+                        placeholder="Escribe solo el número"
+                        onChange={(e) =>
+                          setRespuestasCasos((previas) => ({
+                            ...previas,
+                            [caso.id]: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <fieldset className={styles.aulaOpciones}>
+                      <legend className={styles.aulaEtiquetaCampo}>{caso.etiquetaRespuesta}</legend>
+                      {OPCIONES_DIRECCION.map((opcion) => (
+                        <label key={opcion} className={styles.aulaOpcion}>
+                          <input
+                            type="radio"
+                            name={`prediccion-${caso.id}`}
+                            value={opcion}
+                            checked={prediccionesElegidas[caso.id] === opcion}
+                            onChange={() =>
+                              setPrediccionesElegidas((previas) => ({
+                                ...previas,
+                                [caso.id]: opcion,
+                              }))
+                            }
+                          />
+                          <span>{TEXTO_DIRECCION[opcion]}</span>
+                        </label>
+                      ))}
+                    </fieldset>
+                  )}
+
+                  <div className={styles.aulaAcciones}>
+                    <button
+                      type="button"
+                      className={styles.aulaBtnPrimario}
+                      onClick={() =>
+                        caso.tipo === 'numerico'
+                          ? comprobarCasoNumerico(caso.id, caso.respuesta)
+                          : comprobarCasoPrediccion(caso.id, caso.respuesta)
+                      }
+                    >
+                      Comprobar
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.aulaBtnCargar}
+                      onClick={() => abrirReaccionDelCaso(caso.datos.reaccionId)}
+                    >
+                      <span aria-hidden="true">⬆️</span> Abrir esta reacción en el simulador
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.aulaBtnSecundario}
+                      aria-expanded={abierta}
+                      aria-controls={`solucion-caso-${caso.id}`}
+                      onClick={() => alternarSolucion(caso.id)}
+                    >
+                      {abierta ? 'Ocultar solución' : 'Ver solución'}
+                    </button>
+                  </div>
+
+                  {veredicto !== undefined && (
+                    <p
+                      className={`${styles.aulaVeredicto} ${veredicto.correcto ? styles.aulaVeredictoOk : styles.aulaVeredictoKo}`}
+                      role="alert"
+                      aria-live="polite"
+                    >
+                      <span aria-hidden="true">
+                        {veredicto.correcto
+                          ? '✅'
+                          : veredicto.motivo === 'vacia'
+                            ? '✏️'
+                            : veredicto.motivo === 'no-numerico'
+                              ? '🔢'
+                              : '❌'}
+                      </span>{' '}
+                      {veredicto.correcto
+                        ? '¡Correcto!'
+                        : veredicto.motivo === 'vacia'
+                          ? caso.tipo === 'numerico'
+                            ? 'Escribe una respuesta antes de comprobar.'
+                            : 'Elige una de las tres opciones antes de comprobar.'
+                          : veredicto.motivo === 'no-numerico'
+                            ? 'Eso no es un número. Escribe solo la cifra, con coma decimal.'
+                            : 'Todavía no. Despliega la solución o vuelve a intentarlo.'}
+                    </p>
+                  )}
+
+                  <div id={`solucion-caso-${caso.id}`} hidden={!abierta}>
+                    <div className={styles.aulaSolucion}>
+                      <p className={styles.aulaPista}>
+                        <span aria-hidden="true">💡</span> {caso.pista}
+                      </p>
+                      <ol className={styles.aulaPasos}>
+                        {caso.pasos.map((paso, indice) => (
+                          <li key={indice} className={styles.aulaPaso}>
+                            {paso}
+                          </li>
+                        ))}
+                      </ol>
+                      <p className={styles.aulaResultado}>
+                        Resultado: <strong>{caso.respuestaTexto}</strong>
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </section>
 
         <EducationalSection

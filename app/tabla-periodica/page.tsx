@@ -8,6 +8,15 @@ import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
 import { parsearFormulaQuimica } from '@/lib/formula-quimica';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarEjercicio,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  type ComprobacionBusqueda,
+  type EjercicioBusqueda,
+} from './casos';
 
 /** Minúsculas sin diacríticos, para que buscar «oxigeno» sin tilde encuentre «Oxígeno»
  *  (hallazgo 528: 14 de 118 elementos eran inalcanzables sin la tilde exacta). */
@@ -46,6 +55,20 @@ export default function TablaPerodicaPage() {
   const [formulaMolar, setFormulaMolar] = useState<string>('');
   const [resultadoMasa, setResultadoMasa] = useState<{ masa: number; desglose: { simbolo: string; cantidad: number; masa: number }[] } | null>(null);
   const [errorMasa, setErrorMasa] = useState<string>('');
+
+  // Fichas de búsqueda para clase. La corrección vive en `casos.ts`, fuera de la vista.
+  const [respuestasFichas, setRespuestasFichas] = useState<Record<number, string>>({});
+  const [veredictos, setVeredictos] = useState<Record<number, ComprobacionBusqueda>>({});
+  const [solucionesAbiertas, setSolucionesAbiertas] = useState<Record<number, boolean>>({});
+  const [ejercicio, setEjercicio] = useState<EjercicioBusqueda | null>(null);
+  const [respuestaEjercicio, setRespuestaEjercicio] = useState<string>('');
+  const [veredictoEjercicio, setVeredictoEjercicio] = useState<ComprobacionBusqueda | null>(null);
+  const [solucionEjercicioAbierta, setSolucionEjercicioAbierta] = useState<boolean>(false);
+
+  const fichasResueltas = useMemo(
+    () => Object.values(veredictos).filter((v) => v.correcto).length,
+    [veredictos],
+  );
 
   // Filtrar elementos
   const elementosFiltrados = useMemo(() => {
@@ -146,6 +169,52 @@ export default function TablaPerodicaPage() {
       origenFocoRef.current?.focus();
     };
   }, [elementoSeleccionado]);
+
+  // ---------------------------------------------------------- Fichas para clase
+
+  const comprobarFicha = (id: number) => {
+    const ficha = CASOS.find((c) => c.id === id);
+    if (ficha === undefined) return;
+    setVeredictos((previos) => ({
+      ...previos,
+      [id]: comprobarRespuesta(respuestasFichas[id] ?? '', ficha),
+    }));
+  };
+
+  const alternarSolucion = (id: number) => {
+    setSolucionesAbiertas((previas) => ({ ...previas, [id]: previas[id] !== true }));
+  };
+
+  const reiniciarFichas = () => {
+    setRespuestasFichas({});
+    setVeredictos({});
+    setSolucionesAbiertas({});
+  };
+
+  /**
+   * Abre la ficha del elemento solución en la propia tabla.
+   *
+   * Solo se ofrece DESPUÉS de comprobar o de desplegar la solución: enseñar dónde está el
+   * elemento es la mitad del ejercicio, así que darlo antes de responder lo resolvería.
+   */
+  const verEnLaTabla = (simbolo: string | null) => {
+    if (simbolo === null) return;
+    const elemento = elementosPorSimbolo[simbolo];
+    if (elemento === undefined) return;
+    setElementoSeleccionado(elemento);
+  };
+
+  const nuevoEjercicio = () => {
+    setEjercicio(generarEjercicioAleatorio());
+    setRespuestaEjercicio('');
+    setVeredictoEjercicio(null);
+    setSolucionEjercicioAbierta(false);
+  };
+
+  const comprobarPractica = () => {
+    if (ejercicio === null) return;
+    setVeredictoEjercicio(comprobarEjercicio(respuestaEjercicio, ejercicio));
+  };
 
   return (
     <div className={styles.container}>
@@ -423,6 +492,240 @@ export default function TablaPerodicaPage() {
           </div>
         </div>
       )}
+
+      {/* ---------------------------------------------------- Fichas para clase */}
+      <section className={styles.aulaSection} aria-labelledby="fichas-para-clase">
+        <h2 id="fichas-para-clase" className={styles.aulaTitulo}>
+          <span aria-hidden="true">🔎</span> Fichas de búsqueda para clase
+        </h2>
+        <p className={styles.aulaIntro}>
+          Son <strong>12 fichas fijas</strong>: la ficha 3 es la misma para todo el mundo, hoy y
+          dentro de un año, con el mismo enunciado y la misma solución. Por eso se pueden asignar
+          por número —«haz las fichas 3, 7 y 11»— y corregir igual para todo el grupo.
+        </p>
+        <p className={styles.aulaConvenio}>
+          <span aria-hidden="true">✍️</span> <strong>Cómo se corrigen</strong>: en las fichas que
+          piden un elemento vale tanto el <strong>símbolo</strong> como el <strong>nombre</strong>,
+          con tildes o sin ellas —«Fe», «fe» y «hierro» son la misma respuesta—. En las que piden
+          un número se admite un margen del 1 %, porque copiar 63,5 de un recuadro que pone 63,546
+          es haber encontrado el dato. Lo que se evalúa es si sabes buscarlo, no cómo lo tecleas.
+        </p>
+
+        <div className={styles.aulaContador}>
+          <p className={styles.aulaContadorTexto} aria-live="polite">
+            Has resuelto <strong>{fichasResueltas}</strong> de {TOTAL_CASOS}
+          </p>
+          <div
+            className={styles.aulaBarra}
+            role="progressbar"
+            aria-valuenow={fichasResueltas}
+            aria-valuemin={0}
+            aria-valuemax={TOTAL_CASOS}
+            aria-label="Fichas resueltas"
+          >
+            <div
+              className={styles.aulaBarraRelleno}
+              style={{ width: `${(fichasResueltas / TOTAL_CASOS) * 100}%` }}
+            />
+          </div>
+          <button type="button" className={styles.aulaBtnSecundario} onClick={reiniciarFichas}>
+            Empezar de nuevo
+          </button>
+        </div>
+
+        <div className={styles.aulaGrid}>
+          {CASOS.map((ficha) => {
+            const veredicto = veredictos[ficha.id];
+            const abierta = solucionesAbiertas[ficha.id] === true;
+            const resuelta = veredicto !== undefined || abierta;
+            return (
+              <article key={ficha.id} className={styles.aulaCaso}>
+                <div className={styles.aulaCabecera}>
+                  <span className={styles.aulaNumero}>{ficha.id}</span>
+                  <h3 className={styles.aulaCasoTitulo}>{ficha.titulo}</h3>
+                  <span className={styles.aulaEtiqueta}>
+                    {ficha.categoria === 'abstracto' ? 'Búsqueda directa' : 'Situación real'}
+                  </span>
+                </div>
+
+                <p className={styles.aulaEnunciado}>{ficha.enunciado}</p>
+
+                <div className={styles.aulaRespuesta}>
+                  <label className={styles.aulaEtiquetaCampo} htmlFor={`respuesta-ficha-${ficha.id}`}>
+                    {ficha.etiquetaRespuesta}
+                  </label>
+                  <input
+                    id={`respuesta-ficha-${ficha.id}`}
+                    className={styles.aulaCampo}
+                    type="text"
+                    inputMode="text"
+                    autoComplete="off"
+                    value={respuestasFichas[ficha.id] ?? ''}
+                    placeholder="Escribe lo que has encontrado"
+                    onChange={(e) =>
+                      setRespuestasFichas((previas) => ({ ...previas, [ficha.id]: e.target.value }))
+                    }
+                  />
+                </div>
+
+                <div className={styles.aulaAcciones}>
+                  <button
+                    type="button"
+                    className={styles.aulaBtnPrimario}
+                    onClick={() => comprobarFicha(ficha.id)}
+                  >
+                    Comprobar
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.aulaBtnSecundario}
+                    aria-expanded={abierta}
+                    aria-controls={`solucion-ficha-${ficha.id}`}
+                    onClick={() => alternarSolucion(ficha.id)}
+                  >
+                    {abierta ? 'Ocultar solución' : 'Ver solución'}
+                  </button>
+                </div>
+
+                {veredicto !== undefined && (
+                  <p
+                    className={`${styles.aulaVeredicto} ${veredicto.correcto ? styles.aulaVeredictoOk : styles.aulaVeredictoKo}`}
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <span aria-hidden="true">
+                      {veredicto.correcto ? '✅' : veredicto.motivo === 'vacia' ? '✏️' : '❌'}
+                    </span>{' '}
+                    {veredicto.correcto
+                      ? '¡Correcto! Lo has encontrado.'
+                      : veredicto.motivo === 'vacia'
+                        ? 'Escribe una respuesta antes de comprobar.'
+                        : 'Todavía no. Vuelve a la tabla y fíjate en la pista.'}
+                  </p>
+                )}
+
+                {resuelta && ficha.simboloSolucion !== null && (
+                  <button
+                    type="button"
+                    className={styles.aulaBtnCargar}
+                    onClick={() => verEnLaTabla(ficha.simboloSolucion)}
+                  >
+                    <span aria-hidden="true">🔬</span> Abrir este elemento en la tabla
+                  </button>
+                )}
+
+                <div id={`solucion-ficha-${ficha.id}`} hidden={!abierta}>
+                  <div className={styles.aulaSolucion}>
+                    <p className={styles.aulaPista}>
+                      <span aria-hidden="true">💡</span> {ficha.pista}
+                    </p>
+                    <p className={styles.aulaDondeMirar}>Dónde mirar:</p>
+                    <ol className={styles.aulaPasos}>
+                      {ficha.pasos.map((paso, indice) => (
+                        <li key={indice} className={styles.aulaPaso}>
+                          {paso}
+                        </li>
+                      ))}
+                    </ol>
+                    <p className={styles.aulaResultado}>
+                      Respuesta: <strong>{ficha.respuestaTexto}</strong> {ficha.unidad}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* ------------------------------------------------ Práctica sin final */}
+        <div className={styles.aulaPractica}>
+          <h3 className={styles.aulaPracticaTitulo}>Práctica sin final</h3>
+          <p className={styles.aulaIntro}>
+            Cuando las 12 fichas se queden cortas, este botón saca un elemento distinto cada vez y
+            pregunta por uno de sus datos. Estos ejercicios <strong>no son asignables por
+            número</strong>: para eso están las 12 fichas de arriba.
+          </p>
+          <button type="button" className={styles.aulaBtnPrimario} onClick={nuevoEjercicio}>
+            <span aria-hidden="true">🎲</span> Generar un ejercicio nuevo
+          </button>
+
+          {ejercicio !== null && (
+            <div className={styles.aulaCaso}>
+              <p className={styles.aulaEnunciado}>{ejercicio.enunciado}</p>
+              <div className={styles.aulaRespuesta}>
+                <label className={styles.aulaEtiquetaCampo} htmlFor="respuesta-practica">
+                  {ejercicio.etiquetaRespuesta}
+                </label>
+                <input
+                  id="respuesta-practica"
+                  className={styles.aulaCampo}
+                  type="text"
+                  inputMode="text"
+                  autoComplete="off"
+                  value={respuestaEjercicio}
+                  placeholder="Escribe lo que has encontrado"
+                  onChange={(e) => setRespuestaEjercicio(e.target.value)}
+                />
+              </div>
+              <div className={styles.aulaAcciones}>
+                <button
+                  type="button"
+                  className={styles.aulaBtnPrimario}
+                  onClick={comprobarPractica}
+                >
+                  Comprobar
+                </button>
+                <button
+                  type="button"
+                  className={styles.aulaBtnSecundario}
+                  aria-expanded={solucionEjercicioAbierta}
+                  aria-controls="solucion-practica"
+                  onClick={() => setSolucionEjercicioAbierta((abierta) => !abierta)}
+                >
+                  {solucionEjercicioAbierta ? 'Ocultar solución' : 'Ver solución'}
+                </button>
+              </div>
+
+              {veredictoEjercicio !== null && (
+                <p
+                  className={`${styles.aulaVeredicto} ${veredictoEjercicio.correcto ? styles.aulaVeredictoOk : styles.aulaVeredictoKo}`}
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <span aria-hidden="true">
+                    {veredictoEjercicio.correcto
+                      ? '✅'
+                      : veredictoEjercicio.motivo === 'vacia'
+                        ? '✏️'
+                        : '❌'}
+                  </span>{' '}
+                  {veredictoEjercicio.correcto
+                    ? '¡Correcto! Lo has encontrado.'
+                    : veredictoEjercicio.motivo === 'vacia'
+                      ? 'Escribe una respuesta antes de comprobar.'
+                      : 'Todavía no. Busca el elemento en la tabla y abre su ficha.'}
+                </p>
+              )}
+
+              <div id="solucion-practica" hidden={!solucionEjercicioAbierta}>
+                <div className={styles.aulaSolucion}>
+                  <p className={styles.aulaDondeMirar}>Dónde mirar:</p>
+                  <ol className={styles.aulaPasos}>
+                    {ejercicio.pasos.map((paso, indice) => (
+                      <li key={indice} className={styles.aulaPaso}>
+                        {paso}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className={styles.aulaResultado}>
+                    Respuesta: <strong>{ejercicio.respuestaTexto}</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Contenido educativo */}
       <EducationalSection

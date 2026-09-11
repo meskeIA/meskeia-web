@@ -2555,17 +2555,23 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-trigonometria/', icon: '📐', name: 'Razones Trigonométricas', description: 'El paso siguiente: con un ángulo basta un solo lado' },
   ],
   'simulador-teorema-tales': [
+    { url: '/calculadora-escalas/', icon: '📐', name: 'Calculadora de Escalas', description: 'Del plano a la realidad en 1:50, 1:100 o la escala que sea' },
     { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'El lado que falta en un triángulo rectángulo, con demostración visual' },
     { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Áreas y perímetros de las figuras semejantes' },
-    { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Si el área va por k², el volumen va por k³' },
     { url: '/tabla-areas-volumenes/', icon: '📐', name: 'Tabla de Áreas y Volúmenes', description: 'Las fórmulas sobre las que actúa la razón de semejanza' },
+  ],
+  'calculadora-escalas': [
+    { url: '/simulador-teorema-tales/', icon: '📏', name: 'Teorema de Tales y Semejanza', description: 'La proporcionalidad que hay detrás de toda escala' },
+    { url: '/transportador-angulos/', icon: '📐', name: 'Transportador de Ángulos', description: 'Mide un ángulo sobre la foto del plano' },
+    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor de Unidades', description: 'Cuando lo que hay que cambiar es la unidad, no la escala' },
+    { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Áreas y perímetros, ya con la medida real en la mano' },
   ],
 
   'calculadora-geometria': [
+    { url: '/calculadora-escalas/', icon: '📐', name: 'Calculadora de Escalas', description: 'Del plano a la realidad en 1:50, 1:100 o la escala que sea' },
     { url: '/transportador-angulos/', icon: '📐', name: 'Transportador de Ángulos', description: 'Mide un ángulo sobre tu imagen' },
     { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'Calcula el lado que falta antes de aplicar la fórmula del área' },
     ...matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-geometria/'),
-    { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Visualiza y calcula volúmenes de esfera, cubo, cilindro, cono y pirámide con sliders interactivos' },
   ],
   'calculadora-trigonometria': matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-trigonometria/'),
   'calculadora-calculo': matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-calculo/'),
@@ -3171,7 +3177,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // SENSOR del movil. Son dos situaciones distintas (pantalla y objeto fisico),
   // asi que se enlazan entre si en vez de competir.
   'transportador-angulos': [
-    { url: '/nivel-burbuja/', icon: '📐', name: 'Nivel de Burbuja', description: 'Inclinacion real con el sensor del movil' },
+    { url: '/calculadora-escalas/', icon: '📐', name: 'Calculadora de Escalas', description: 'Del plano a la realidad en 1:50, 1:100 o la escala que sea' },
     { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Ampliar lo que no se ve a simple vista' },
     { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, superficie y angulos' },
     { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometria', description: 'Senos, cosenos y tangentes del angulo medido' },

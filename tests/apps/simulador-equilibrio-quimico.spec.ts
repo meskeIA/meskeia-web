@@ -1,4 +1,24 @@
 import { test, expect, Page } from '@playwright/test';
+import {
+  CASOS,
+  OPCIONES_DIRECCION,
+  REACCIONES,
+  TOTAL_CASOS,
+  T_REFERENCIA_K,
+  calcularQ,
+  comprobarPrediccion,
+  comprobarRespuesta,
+  deltaN,
+  equilibrioDePartida,
+  esExotermicaDe,
+  nuevoEquilibrio,
+  nuevoKcConTemperatura,
+  resolverCasoNumerico,
+  simularPerturbacion,
+  toleranciaDe,
+  type CasoNumerico,
+  type CasoPrediccion,
+} from '../../app/simulador-equilibrio-quimico/casos';
 
 /**
  * Inspector — simulador-equilibrio-quimico (segmento cálculo/química, riesgo 3, 497 usos reales)
@@ -171,7 +191,15 @@ test('CASO 1 (normal) — water-gas shift: Q, Kc, Δn y la ICE completa', async 
   await reaccion(page, /Water-gas shift/).click();
 
   // La ecuación sobre la que descansa el cálculo hecho a mano.
-  await expect(page.getByText('CO(g) + H₂O(g) ⇌ CO₂(g) + H₂(g)')).toBeVisible();
+  //
+  // ⚠️ ACOTADO al panel del simulador el 11/09/2026. La comprobación es la misma —que la
+  // ecuación de esta reacción está a la vista antes de calcular nada—, pero desde que la app
+  // tiene casos para clase la misma ecuación aparece además en las tarjetas de los casos 2 y
+  // 11 y dentro del enunciado del 11, así que el locator global encontraba cuatro nodos y
+  // Playwright lo rechazaba por ambiguo. No se ha relajado la aserción: se ha dicho DÓNDE.
+  await expect(
+    page.locator('#panel-simulador').getByText('CO(g) + H₂O(g) ⇌ CO₂(g) + H₂(g)'),
+  ).toBeVisible();
 
   // ⚠️ ACTUALIZADO el 23/08/2026 (hallazgo 171). La app ya no arranca en las concentraciones
   // sugeridas en crudo —que no eran un equilibrio— sino EN el equilibrio, porque Le Chatelier
@@ -487,4 +515,487 @@ test('HALLAZGO [6] — los emojis decorativos propios de la app van sin aria-hid
   // Hoy salen 🧪 📐 🌡️ 🔢 ⚖️ 🔍 de «Mejores Prácticas» y ⚠️ de «Errores Frecuentes»; todos van
   // junto a texto, así que ninguno debería llegar al lector de pantalla.
   expect(sinAriaHidden).toEqual([]);
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASOS PARA CLASE (11/09/2026) — sin navegador, sobre casos.ts
+//
+// Lo de arriba es el acta del Inspector y NO se toca: es el contrato de la app.
+// Lo de aquí abajo prueba el motor de los casos asignables, que corrige respuestas
+// de alumnos y por tanto no puede fallar en silencio.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Simulador de Equilibrio Químico — casos para clase (11/09/2026)
+ *
+ * Es la app con MÁS peso de aula de todo meskeIA: 353 de sus 549 visitas del último mes
+ * llegaron dentro de eventos de clase (el 64 %). Cuando un profesor manda «resuelve los
+ * casos 3, 7 y 11», la corrección tiene que ser la misma para todo el grupo, y una
+ * corrección equivocada no se ve: la app carga igual de bien.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO
+ *   Todos calculados a mano desde la definición, NUNCA copiados de lo que devuelve la app.
+ *
+ *   · Caso 1, Q de la síntesis de amoníaco con [N₂]=1, [H₂]=2, [NH₃]=0,4:
+ *       Q = [NH₃]² / ([N₂]·[H₂]³) = 0,16 / (1 · 8) = 0,02
+ *   · Caso 2, Q del gas de agua con todo a coeficiente 1:
+ *       Q = (1·1) / (0,5·0,5) = 1 / 0,25 = 4
+ *   · Caso 3, Δn de 2 SO₂ + O₂ ⇌ 2 SO₃: 2 − 3 = −1
+ *   · Caso 4, Q de la esterificación: (1·1) / (1·0,5) = 2
+ *   · Caso 5, Q del PCl₅: (0,2·0,1) / 0,5 = 0,04, que es exactamente su Kc
+ *   · Caso 6, van 't Hoff sobre el PCl₅ (ΔH = +88 kJ/mol, K₁ = 0,04, 298 K → 350 K):
+ *       1/350 − 1/298 = 0,00285714 − 0,00335570 = −0,00049856
+ *       ln(K₂/K₁) = −(88000/8,314)·(−0,00049856) = −10584,6·(−0,00049856) = 5,277
+ *       K₂ = 0,04 · e^5,277 ≈ 0,04 · 195,8 ≈ 7,83
+ *
+ *   Y las seis predicciones, derivadas del principio de Le Chatelier, NO de ejecutar la app:
+ *       7  añadir N₂ a un equilibrio → se consume avanzando  → DERECHA
+ *       8  calentar una exotérmica (el calor es un producto) → IZQUIERDA
+ *       9  calentar una endotérmica (el calor es un reactivo)→ DERECHA
+ *      10  comprimir con Δn = −1 (menos gas a la derecha)    → DERECHA
+ *      11  comprimir con Δn = 0                              → NO SE DESPLAZA
+ *      12  catalizador (acelera los dos sentidos por igual)  → NO SE DESPLAZA
+ */
+
+const numericos = CASOS.filter((c): c is CasoNumerico => c.tipo === 'numerico');
+const predicciones = CASOS.filter((c): c is CasoPrediccion => c.tipo === 'prediccion');
+
+test.describe('Simulador de Equilibrio Químico · casos para clase', () => {
+  // ----------------------------------------------------------------
+  // Invariante 1 — 12 casos con ids 1..12 sin huecos
+  // ----------------------------------------------------------------
+  test('hay exactamente 12 casos con ids consecutivos', () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(numericos).toHaveLength(6);
+    expect(predicciones).toHaveLength(6);
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 2 — deterministas
+  // ----------------------------------------------------------------
+  test('dos lecturas dan el mismo enunciado y la misma respuesta', () => {
+    const huella = () => CASOS.map((c) => `${c.id}|${c.enunciado}|${c.respuestaTexto}`);
+    expect(huella()).toEqual(huella());
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 3 — la respuesta declarada coincide con recalcularla
+  // ----------------------------------------------------------------
+  test('recalcular cada caso numérico desde sus datos devuelve la respuesta declarada', () => {
+    for (const caso of numericos) {
+      const recalculado = resolverCasoNumerico(caso.datos);
+      expect(recalculado.ok, `caso ${caso.id}`).toBe(true);
+      expect(recalculado.valor, `caso ${caso.id}`).toBeCloseTo(caso.respuesta, 9);
+    }
+  });
+
+  test('recalcular cada predicción ejecutando el modelo devuelve la dirección declarada', () => {
+    for (const caso of predicciones) {
+      const simulacion = simularPerturbacion(caso.datos);
+      expect(simulacion.ok, `caso ${caso.id}`).toBe(true);
+      expect(simulacion.direccion, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 4 — cada caso está completo
+  // ----------------------------------------------------------------
+  test('cada caso tiene enunciado, etiqueta no vacía, respuesta y desarrollo', () => {
+    for (const caso of CASOS) {
+      expect(caso.titulo.length, `caso ${caso.id}`).toBeGreaterThan(0);
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(30);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.respuestaTexto.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(3);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.ecuacion.trim(), `caso ${caso.id}`).not.toBe('');
+      if (caso.tipo === 'numerico') {
+        expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      }
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 5 — enunciados universales
+  // ----------------------------------------------------------------
+  test('ningún enunciado nombra un país ni una ciudad', () => {
+    const prohibido =
+      /\b(españa|espana|madrid|barcelona|méxico|mexico|colombia|argentina|perú|peru|chile|bogotá|bogota|lima|buenos aires|euros?|pesos?)\b/i;
+    for (const caso of CASOS) {
+      expect(prohibido.test(caso.titulo), `título del caso ${caso.id}`).toBe(false);
+      expect(prohibido.test(caso.enunciado), `enunciado del caso ${caso.id}`).toBe(false);
+      for (const paso of caso.pasos) {
+        expect(prohibido.test(paso), `paso del caso ${caso.id}`).toBe(false);
+      }
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Invariante 7 — el convenio de la app, fijado a mano
+  // ----------------------------------------------------------------
+  test('convenio · en Kc solo entran gases y especies en disolución', () => {
+    // Haber-Bosch, todo gas: entran las tres especies.
+    const haber = REACCIONES.find((r) => r.id === 'haber-bosch')!;
+    expect(calcularQ(haber, { 'N₂': 1, 'H₂': 2, 'NH₃': 0.4 })).toBeCloseTo(0.02, 10);
+  });
+
+  test('convenio · la esterificación es TODA líquida y por eso sus cuatro especies cuentan', () => {
+    const ester = REACCIONES.find((r) => r.id === 'esterificacion')!;
+    expect(ester.reactivos.every((e) => e.estado === 'l')).toBe(true);
+    expect(ester.productos.every((e) => e.estado === 'l')).toBe(true);
+    // (1·1) / (1·0,5) = 2. Si los líquidos no contaran, el cociente daría 1.
+    expect(
+      calcularQ(ester, { 'CH₃COOH': 1, 'C₂H₅OH': 0.5, 'CH₃COOC₂H₅': 1, 'H₂O': 1 }),
+    ).toBeCloseTo(2, 10);
+  });
+
+  test('convenio · Δn cuenta SOLO moles de gas', () => {
+    expect(deltaN(REACCIONES.find((r) => r.id === 'so3')!)).toBe(-1); // 2 − 3
+    expect(deltaN(REACCIONES.find((r) => r.id === 'haber-bosch')!)).toBe(-2); // 2 − 4
+    expect(deltaN(REACCIONES.find((r) => r.id === 'pcl5')!)).toBe(1); // 2 − 1
+    expect(deltaN(REACCIONES.find((r) => r.id === 'water-gas-shift')!)).toBe(0); // 2 − 2
+    // La esterificación no tiene NINGÚN gas, así que su Δn es 0 aunque haya 4 especies.
+    expect(deltaN(REACCIONES.find((r) => r.id === 'esterificacion')!)).toBe(0);
+  });
+
+  test('convenio · exotérmica ⟺ ΔH < 0, sin excepciones', () => {
+    for (const reaccion of REACCIONES) {
+      expect(esExotermicaDe(reaccion.deltaH), reaccion.id).toBe(reaccion.deltaH < 0);
+    }
+  });
+
+  test('convenio · un reactivo agotado hace diverger el cociente, no devuelve un número enorme', () => {
+    const haber = REACCIONES.find((r) => r.id === 'haber-bosch')!;
+    expect(calcularQ(haber, { 'N₂': 0, 'H₂': 2, 'NH₃': 0.4 })).toBe(Infinity);
+  });
+
+  // ----------------------------------------------------------------
+  // Los seis valores numéricos, derivados a mano
+  // ----------------------------------------------------------------
+  test('caso 1 · Q = 0,16 / 8 = 0,02', () => {
+    expect(numericos[0].respuesta).toBeCloseTo(0.02, 10);
+    expect(numericos[0].respuestaTexto).toBe('0,02');
+  });
+
+  test('caso 2 · Q = 1 / 0,25 = 4', () => {
+    expect(numericos[1].respuesta).toBeCloseTo(4, 10);
+    expect(numericos[1].respuestaTexto).toBe('4');
+  });
+
+  test('caso 3 · Δn = 2 − 3 = −1', () => {
+    expect(numericos[2].respuesta).toBe(-1);
+    expect(numericos[2].respuestaTexto).toBe('-1');
+  });
+
+  test('caso 4 · Q = 1 / 0,5 = 2', () => {
+    expect(numericos[3].respuesta).toBeCloseTo(2, 10);
+  });
+
+  test('caso 5 · Q = 0,02 / 0,5 = 0,04, que es exactamente la Kc de esa reacción', () => {
+    expect(numericos[4].respuesta).toBeCloseTo(0.04, 10);
+    expect(numericos[4].respuestaTexto).toBe('0,04');
+    const pcl5 = REACCIONES.find((r) => r.id === 'pcl5')!;
+    expect(numericos[4].respuesta).toBeCloseTo(pcl5.Kc, 10);
+  });
+
+  test('caso 6 · van ’t Hoff: 0,04 a 298 K pasa a ≈ 7,83 a 350 K', () => {
+    const esperado = 7.83;
+    expect(numericos[5].respuesta).toBeGreaterThan(esperado * 0.99);
+    expect(numericos[5].respuesta).toBeLessThan(esperado * 1.01);
+    expect(numericos[5].requiereRedondeo).toBe(true);
+    expect(numericos[5].respuestaTexto).toBe('7,83');
+  });
+
+  test('caso 6 · usar R = 8,31 en vez de 8,314 sigue cayendo dentro de la tolerancia', () => {
+    // Un alumno que redondea la constante de los gases no puede suspender por eso.
+    const conRmenosPreciso = 0.04 * Math.exp(-(88000 / 8.31) * (1 / 350 - 1 / 298));
+    expect(comprobarRespuesta(String(conRmenosPreciso).replace('.', ','), numericos[5].respuesta)
+      .correcto).toBe(true);
+  });
+
+  test('van ’t Hoff sube la K de una endotérmica y baja la de una exotérmica', () => {
+    const pcl5 = REACCIONES.find((r) => r.id === 'pcl5')!; // ΔH > 0
+    const so3 = REACCIONES.find((r) => r.id === 'so3')!; // ΔH < 0
+    expect(nuevoKcConTemperatura(pcl5.Kc, pcl5.deltaH, T_REFERENCIA_K, 500)).toBeGreaterThan(
+      pcl5.Kc,
+    );
+    expect(nuevoKcConTemperatura(so3.Kc, so3.deltaH, T_REFERENCIA_K, 500)).toBeLessThan(so3.Kc);
+    // Sin cambio de temperatura, la constante es exactamente la misma.
+    expect(nuevoKcConTemperatura(so3.Kc, so3.deltaH, 298, 298)).toBe(so3.Kc);
+  });
+
+  // ----------------------------------------------------------------
+  // Las seis predicciones, una por mecanismo
+  //
+  // Es LA invariante del tipo C: la opción correcta sale de ejecutar el
+  // modelo, con un caso a mano por cada mecanismo.
+  // ----------------------------------------------------------------
+  test('caso 7 · añadir un reactivo desplaza hacia la derecha', () => {
+    expect(predicciones[0].respuesta).toBe('derecha');
+    const simulacion = simularPerturbacion({
+      perturbacion: 'anadir-especie',
+      reaccionId: 'haber-bosch',
+      especie: 'N₂',
+      cantidad: 0.5,
+    });
+    expect(simulacion.direccion).toBe('derecha');
+    expect(simulacion.avance).toBeGreaterThan(0);
+    // Y se forma más amoníaco del que había justo tras la inyección.
+    expect(simulacion.despues['NH₃']).toBeGreaterThan(simulacion.perturbado['NH₃']);
+  });
+
+  test('caso 7 bis · QUITAR ese mismo reactivo desplaza hacia el otro lado', () => {
+    // La simetría es lo que demuestra que el modelo responde al cambio, no al enunciado.
+    const simulacion = simularPerturbacion({
+      perturbacion: 'quitar-especie',
+      reaccionId: 'haber-bosch',
+      especie: 'N₂',
+      cantidad: 0.5,
+    });
+    expect(simulacion.direccion).toBe('izquierda');
+    expect(simulacion.avance).toBeLessThan(0);
+  });
+
+  test('caso 8 · calentar una EXOTÉRMICA desplaza hacia la izquierda', () => {
+    expect(predicciones[1].respuesta).toBe('izquierda');
+    const so3 = REACCIONES.find((r) => r.id === 'so3')!;
+    expect(so3.deltaH).toBeLessThan(0);
+    const simulacion = simularPerturbacion({
+      perturbacion: 'cambiar-temperatura',
+      reaccionId: 'so3',
+      temperaturaFinalK: 500,
+    });
+    expect(simulacion.direccion).toBe('izquierda');
+    expect(simulacion.KcEfectiva).toBeLessThan(so3.Kc);
+  });
+
+  test('caso 9 · calentar una ENDOTÉRMICA desplaza hacia la derecha', () => {
+    expect(predicciones[2].respuesta).toBe('derecha');
+    const pcl5 = REACCIONES.find((r) => r.id === 'pcl5')!;
+    expect(pcl5.deltaH).toBeGreaterThan(0);
+    const simulacion = simularPerturbacion({
+      perturbacion: 'cambiar-temperatura',
+      reaccionId: 'pcl5',
+      temperaturaFinalK: 500,
+    });
+    expect(simulacion.direccion).toBe('derecha');
+    expect(simulacion.KcEfectiva).toBeGreaterThan(pcl5.Kc);
+  });
+
+  test('casos 8 y 9 · la ÚNICA diferencia entre ambos es el signo de ΔH', () => {
+    // Misma perturbación, misma temperatura final, direcciones opuestas.
+    expect(predicciones[1].datos.perturbacion).toBe(predicciones[2].datos.perturbacion);
+    expect(predicciones[1].datos.temperaturaFinalK).toBe(predicciones[2].datos.temperaturaFinalK);
+    expect(predicciones[1].respuesta).not.toBe(predicciones[2].respuesta);
+  });
+
+  test('caso 10 · comprimir con Δn negativo desplaza hacia la derecha', () => {
+    expect(predicciones[3].respuesta).toBe('derecha');
+    const no2 = REACCIONES.find((r) => r.id === 'no2-n2o4')!;
+    expect(deltaN(no2)).toBe(-1);
+    const simulacion = simularPerturbacion({
+      perturbacion: 'cambiar-volumen',
+      reaccionId: 'no2-n2o4',
+      factorVolumen: 0.5,
+    });
+    expect(simulacion.direccion).toBe('derecha');
+    // Reducir el volumen a la mitad duplica las concentraciones de partida.
+    expect(simulacion.perturbado['NO₂']).toBeCloseTo(simulacion.antes['NO₂'] * 2, 8);
+  });
+
+  test('caso 11 · comprimir con Δn = 0 NO desplaza nada', () => {
+    expect(predicciones[4].respuesta).toBe('equilibrio');
+    const wgs = REACCIONES.find((r) => r.id === 'water-gas-shift')!;
+    expect(deltaN(wgs)).toBe(0);
+    const simulacion = simularPerturbacion({
+      perturbacion: 'cambiar-volumen',
+      reaccionId: 'water-gas-shift',
+      factorVolumen: 0.5,
+    });
+    expect(simulacion.direccion).toBe('equilibrio');
+    // Y esto es lo que lo explica: al escalar todo por igual, Q no se mueve.
+    const qAntes = calcularQ(wgs, simulacion.antes);
+    const qPerturbado = calcularQ(wgs, simulacion.perturbado);
+    expect(qPerturbado).toBeCloseTo(qAntes, 8);
+  });
+
+  test('caso 12 · un catalizador NO desplaza el equilibrio', () => {
+    expect(predicciones[5].respuesta).toBe('equilibrio');
+    const simulacion = simularPerturbacion({
+      perturbacion: 'catalizador',
+      reaccionId: 'haber-bosch',
+    });
+    expect(simulacion.direccion).toBe('equilibrio');
+    const haber = REACCIONES.find((r) => r.id === 'haber-bosch')!;
+    expect(simulacion.KcEfectiva).toBe(haber.Kc);
+  });
+
+  test('el umbral de avance no se traga un desplazamiento real ni inventa uno falso', () => {
+    // El catalizador y la compresión con Δn = 0 dejan un ξ residual del redondeo a 4
+    // decimales de `equilibrioDePartida`: tiene que quedar POR DEBAJO del umbral...
+    for (const id of ['haber-bosch', 'so3', 'pcl5', 'water-gas-shift', 'no2-n2o4']) {
+      const simulacion = simularPerturbacion({ perturbacion: 'catalizador', reaccionId: id });
+      expect(simulacion.direccion, `catalizador en ${id}`).toBe('equilibrio');
+    }
+    // ...y el desplazamiento real de añadir reactivo, muy POR ENCIMA.
+    const real = simularPerturbacion({
+      perturbacion: 'anadir-especie',
+      reaccionId: 'haber-bosch',
+      especie: 'N₂',
+      cantidad: 0.5,
+    });
+    expect(Math.abs(real.avance)).toBeGreaterThan(1e-3);
+  });
+
+  // ----------------------------------------------------------------
+  // El equilibrio de partida ES un equilibrio
+  //
+  // Si no lo fuera, TODAS las predicciones medirían el reajuste del
+  // punto de partida en vez de la perturbación que se les pide.
+  // ----------------------------------------------------------------
+  test('el estado de partida de cada reacción cumple Q ≈ Kc', () => {
+    for (const reaccion of REACCIONES) {
+      const equilibrio = equilibrioDePartida(reaccion);
+      const q = calcularQ(reaccion, equilibrio);
+      expect(q / reaccion.Kc, `${reaccion.id}: Q = ${q}, Kc = ${reaccion.Kc}`).toBeCloseTo(1, 2);
+    }
+  });
+
+  /**
+   * REGRESIÓN (11/09/2026) · la zona muda de las reacciones muy exotérmicas.
+   *
+   * Con el proceso de contacto, a partir de unos 470 K la Kc cae por debajo de 1e-13 y
+   * `nuevoEquilibrio` dejaba de mover el sistema: devolvía las concentraciones intactas. En
+   * pantalla eso era un deslizador de temperatura que a partir de cierto punto no hacía
+   * nada, justo cuando enseña la lección (una exotérmica se descompone al calentar). Lo
+   * destapó el caso 8 de esta misma tanda, que preguntaba a 500 K.
+   *
+   * La prueba no es que a 500 K se desplace, sino que la serie sea CONTINUA: si a 450 K el
+   * SO₃ casi ha desaparecido, a 500 K no puede volver a aparecer entero.
+   */
+  test('regresión · calentar una exotérmica sigue desplazando el equilibrio con Kc diminutas', () => {
+    const so3 = REACCIONES.find((r) => r.id === 'so3')!;
+    const partida = equilibrioDePartida(so3);
+
+    let anterior = partida['SO₃'];
+    for (const T of [320, 350, 400, 450, 500, 700, 1200, 2000]) {
+      const simulacion = simularPerturbacion({
+        perturbacion: 'cambiar-temperatura',
+        reaccionId: 'so3',
+        temperaturaFinalK: T,
+      });
+      expect(simulacion.ok, `T = ${T} K`).toBe(true);
+      expect(simulacion.direccion, `T = ${T} K`).toBe('izquierda');
+      // Monótona: a más temperatura, menos SO₃. Nunca vuelve a subir.
+      expect(simulacion.despues['SO₃'], `T = ${T} K`).toBeLessThanOrEqual(anterior + 1e-9);
+      anterior = simulacion.despues['SO₃'];
+    }
+    // Y al final del recorrido el producto está prácticamente agotado, no intacto.
+    expect(anterior).toBeLessThan(partida['SO₃'] / 1000);
+  });
+
+  test('regresión · sin raíz interior, el sistema va al extremo, no se queda quieto', () => {
+    const so3 = REACCIONES.find((r) => r.id === 'so3')!;
+    const partida = equilibrioDePartida(so3);
+    // Una Kc absurdamente pequeña: la reacción es completa hacia la izquierda.
+    const casiCero = nuevoEquilibrio(so3, partida, 1e-30);
+    expect(casiCero['SO₃']).toBeLessThan(partida['SO₃'] / 1000);
+    expect(casiCero['SO₂']).toBeGreaterThan(partida['SO₂']);
+    // Y una absurdamente grande: completa hacia la derecha.
+    const casiInfinito = nuevoEquilibrio(so3, partida, 1e30);
+    expect(casiInfinito['SO₃']).toBeGreaterThan(partida['SO₃']);
+    expect(casiInfinito['SO₂']).toBeLessThan(partida['SO₂']);
+  });
+
+  test('nuevoEquilibrio deja el sistema en equilibrio, venga de donde venga', () => {
+    const haber = REACCIONES.find((r) => r.id === 'haber-bosch')!;
+    const desdeLejos = nuevoEquilibrio(haber, { 'N₂': 2, 'H₂': 4, 'NH₃': 0.1 }, haber.Kc);
+    expect(calcularQ(haber, desdeLejos) / haber.Kc).toBeCloseTo(1, 2);
+  });
+
+  // ----------------------------------------------------------------
+  // Comprobación de respuestas
+  // ----------------------------------------------------------------
+  test('la tolerancia es el mayor entre 0,01 y el 1 %', () => {
+    expect(toleranciaDe(0.02)).toBe(0.01); // el 1 % sería 0,0002
+    expect(toleranciaDe(7.83)).toBeCloseTo(0.0783, 6);
+    expect(toleranciaDe(-1)).toBe(0.01);
+  });
+
+  test('la coma decimal española se acepta, y «0,02» no se lee como 0', () => {
+    // Es lo que pasaría con parseFloat: se queda con el prefijo y tira el resto.
+    expect(comprobarRespuesta('0,02', 0.02).correcto).toBe(true);
+    expect(comprobarRespuesta('0.02', 0.02).correcto).toBe(true);
+    expect(comprobarRespuesta('0,021', 0.02).correcto).toBe(true); // dentro de 0,01
+    expect(comprobarRespuesta('0,5', 0.02).correcto).toBe(false);
+  });
+
+  test('una respuesta vacía o no numérica se distingue de un fallo', () => {
+    expect(comprobarRespuesta('', 4).motivo).toBe('vacia');
+    expect(comprobarRespuesta('   ', 4).motivo).toBe('vacia');
+    expect(comprobarRespuesta('cuatro', 4).motivo).toBe('no-numerico');
+    expect(comprobarRespuesta('12abc', 4).motivo).toBe('no-numerico');
+    expect(comprobarRespuesta('9', 4).motivo).toBe('fallo');
+  });
+
+  test('una predicción sin elegir no cuenta como fallo cualquiera', () => {
+    expect(comprobarPrediccion(null, 'derecha')).toEqual({ correcto: false, motivo: 'vacia' });
+    expect(comprobarPrediccion('derecha', 'derecha').correcto).toBe(true);
+    expect(comprobarPrediccion('izquierda', 'derecha').correcto).toBe(false);
+  });
+
+  test('las tres opciones son siempre las mismas y en el mismo orden', () => {
+    expect(OPCIONES_DIRECCION).toEqual(['derecha', 'izquierda', 'equilibrio']);
+    for (const caso of predicciones) {
+      expect(caso.opciones, `caso ${caso.id}`).toEqual(OPCIONES_DIRECCION);
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // Nada lanza
+  // ----------------------------------------------------------------
+  test('los datos incompletos o imposibles salen como no-ok, nunca como excepción', () => {
+    expect(resolverCasoNumerico({ magnitud: 'cociente-Q', reaccionId: 'inventada' }).ok).toBe(false);
+    expect(resolverCasoNumerico({ magnitud: 'cociente-Q', reaccionId: 'pcl5' }).ok).toBe(false);
+    expect(
+      resolverCasoNumerico({ magnitud: 'Kc-a-temperatura', reaccionId: 'pcl5' }).ok,
+    ).toBe(false);
+    expect(simularPerturbacion({ perturbacion: 'catalizador', reaccionId: 'inventada' }).ok).toBe(
+      false,
+    );
+    expect(
+      simularPerturbacion({ perturbacion: 'anadir-especie', reaccionId: 'pcl5', especie: 'Xx', cantidad: 1 })
+        .ok,
+    ).toBe(false);
+    // Retirar más de lo que hay agotaría la especie: no-ok, no una división entre cero.
+    expect(
+      simularPerturbacion({
+        perturbacion: 'quitar-especie',
+        reaccionId: 'pcl5',
+        especie: 'PCl₅',
+        cantidad: 99,
+      }).ok,
+    ).toBe(false);
+    // Una temperatura fuera del rango del simulador tampoco cuela.
+    expect(
+      simularPerturbacion({
+        perturbacion: 'cambiar-temperatura',
+        reaccionId: 'pcl5',
+        temperaturaFinalK: 5000,
+      }).ok,
+    ).toBe(false);
+  });
+
+  // ----------------------------------------------------------------
+  // Mezcla de categorías
+  // ----------------------------------------------------------------
+  test('hay casos de cálculo directo y casos de situación real', () => {
+    const abstractos = CASOS.filter((c) => c.categoria === 'abstracto').length;
+    const aplicados = CASOS.filter((c) => c.categoria === 'aplicado').length;
+    expect(abstractos).toBeGreaterThanOrEqual(4);
+    expect(aplicados).toBeGreaterThanOrEqual(4);
+    expect(abstractos + aplicados).toBe(12);
+  });
 });
