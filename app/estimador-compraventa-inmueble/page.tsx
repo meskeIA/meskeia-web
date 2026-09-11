@@ -25,11 +25,21 @@ import {
   RANGO_AJD,
   BANDA_PRECIO_VIVIENDA,
   horquillaFedatarios,
+  horquillaEdadJoven,
   TERRITORIOS_SIN_IVA,
   sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import { HORQUILLA_GASTOS_COMPRAVENTA, GESTORIA_TIPICA, HORQUILLA_GESTORIA } from './metadata';
+
+/**
+ * La edad tope del tipo joven se LEE de la tabla, igual que en el FAQPage de metadata.ts.
+ *
+ * Es el dato que el 27/08/2026 se corrigió aquí y no en el <script> del JSON-LD, de modo que
+ * la pantalla y la señal que leen los asistentes de IA llevaban desde entonces diciendo cosas
+ * distintas (hallazgos 719 y 720). Ahora las dos bocas llaman a la misma función.
+ */
+const EDAD_JOVEN = horquillaEdadJoven();
 
 // ===== TIPOS =====
 type TipoInmueble = 'vivienda' | 'garaje' | 'trastero' | 'local' | 'nave' | 'terreno';
@@ -1598,7 +1608,7 @@ export default function SimuladorCompraventaPage() {
               <p>Muchas comunidades aplican tipos reducidos para jóvenes, familias numerosas,
               personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos
               (edad, ingresos, valor máximo del inmueble) varían por comunidad: la edad tope del tipo joven
-              va de los 32 a los 40 años según dónde compres, y el panel «Tipos reducidos disponibles» de la
+              va de los {EDAD_JOVEN.min} a los {EDAD_JOVEN.max} años según dónde compres, y el panel «Tipos reducidos disponibles» de la
               calculadora muestra la que aplica en cada caso. Consulta la normativa de tu CC.AA.</p>
             </div>
             <div className={styles.faqItem}>

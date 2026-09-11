@@ -294,10 +294,13 @@ const ANIO_REFERENCIA = 2026;
  *
  * Hasta el 24/08/2026 esta app tenía aquí su propia versión, que acumulaba los tramos
  * marginales e ignoraba la columna `cuota` que declara cada fila de `TARIFA_ESTATAL_IS`.
- * Como esa columna no es exactamente la acumulación de sus propios tipos —arrastra los
- * redondeos de la tabla oficial condensada—, las dos lecturas divergían por encima de
- * 31.956,87 € de base liquidable y dos apps fiscales de meskeIA daban cuotas distintas
+ * Como esa columna arrastra los redondeos a céntimo con los que el BOE la publica, las dos
+ * lecturas no tienen por qué coincidir, y dos apps fiscales de meskeIA daban cuotas distintas
  * para la misma herencia (hallazgo 277 del Inspector). Manda la tabla publicada.
+ *
+ * (Las divergencias de euros que este comentario citaba hasta el 11/09/2026 no eran de la ley:
+ *  venían de que `TARIFA_ESTATAL_IS` tenía entonces siete tramos mal emparejados — hallazgo
+ *  735. Con la escala del art. 21.2 bien transcrita la diferencia máxima es de 0,0045 €.)
  */
 
 /** Edad mínima del colateral (Grupo III) para la reducción de vivienda habitual, art. 20.2.c LISD */

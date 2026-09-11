@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { RANGO_ITP } from '@/data/itp-ccaa';
+import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
 /** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
 const pct = (n: number) => `${String(n).replace('.', ',')}%`;
@@ -74,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Puede aplicarse IVA en la compra de una finca rústica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Por regla general la operación está exenta de IVA y tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a la exención (Art. 20.Dos LIVA): la compra pasa a tributar por IVA al 21% con inversión del sujeto pasivo, que el comprador autoliquida y deduce en el modelo 303.',
+        text: `Por regla general la operación está exenta de IVA y tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a la exención (Art. 20.Dos LIVA): la compra pasa a tributar por IVA al ${pct(IVA_INMUEBLES_2025.local)} con inversión del sujeto pasivo, que el comprador autoliquida y deduce en el modelo 303. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos y su propia mecánica: la calculadora no cifra ese impuesto.`,
       },
     },
     {
@@ -90,7 +91,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia comprar una finca rústica de comprar un solar edificable?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La fiscalidad cambia. El terreno rústico no edificable está exento de IVA, tributa por ITP y no genera plusvalía municipal. En cambio, un solar o terreno edificable vendido por un promotor o empresario tributa por IVA al 21% más AJD, y al ser suelo urbano sí genera plusvalía municipal para el vendedor. Son dos operaciones distintas con impuestos distintos.',
+        text: `La fiscalidad cambia. El terreno rústico no edificable está exento de IVA, tributa por ITP y no genera plusvalía municipal. En cambio, un solar o terreno edificable vendido por un promotor o empresario tributa por IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD, y al ser suelo urbano sí genera plusvalía municipal para el vendedor. Son dos operaciones distintas con impuestos distintos. En Canarias, Ceuta y Melilla el IVA de esa segunda operación se sustituye por el IGIC o el IPSI.`,
       },
     },
   ],

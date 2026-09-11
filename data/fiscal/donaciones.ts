@@ -1,7 +1,8 @@
 /**
  * data/fiscal/donaciones.ts
  * Datos fiscales Impuesto de Sucesiones y Donaciones (ISD) — rama donaciones
- * Tarifa estatal (16 tramos) + tarifa Cataluña (general + reducida) + bonificaciones CCAA
+ * Tarifa estatal (16 tramos, art. 21.2 LISD, común con sucesiones) + tarifa Cataluña
+ * (general + reducida) + bonificaciones CCAA
  * Última revisión: 2025-01-01
  *
  * ⚠️ 2026-08-12: incorporada la advertencia de la Ley 3/2026 de Madrid (empresa
@@ -10,6 +11,8 @@
  *    significa el sello de un módulo cedido. La inmersión por CCAA es de enero
  *    (skill /revision-fiscal-enero).
  */
+
+import { TARIFA_ESTATAL_ISD } from './sucesiones';
 
 // ─── Metadatos ───────────────────────────────────────────────────────────────
 
@@ -45,26 +48,20 @@ export interface BonificacionCCAA_ID {
   requiereEscritura?: boolean;
 }
 
-// ─── Tarifa estatal donaciones (16 tramos — diferente a sucesiones) ───────────
+// ─── Tarifa estatal del ISD (art. 21.2 LISD — 16 tramos) ─────────────────────
 
-export const TARIFA_ESTATAL_ID: TramoTarifaID[] = [
-  { hasta: 7993.46,    cuota: 0,          tipo: 7.65  },
-  { hasta: 15980.91,   cuota: 611.50,     tipo: 8.50  },
-  { hasta: 23968.36,   cuota: 1290.43,    tipo: 9.35  },
-  { hasta: 31955.81,   cuota: 2037.26,    tipo: 10.20 },
-  { hasta: 39943.26,   cuota: 2851.98,    tipo: 11.05 },
-  { hasta: 47930.72,   cuota: 3734.59,    tipo: 11.90 },
-  { hasta: 55918.17,   cuota: 4685.10,    tipo: 12.75 },
-  { hasta: 63905.62,   cuota: 5703.50,    tipo: 13.60 },
-  { hasta: 71893.07,   cuota: 6789.79,    tipo: 14.45 },
-  { hasta: 79880.52,   cuota: 7943.98,    tipo: 15.30 },
-  { hasta: 119757.67,  cuota: 9166.06,    tipo: 16.15 },
-  { hasta: 159634.83,  cuota: 15606.22,   tipo: 18.70 },
-  { hasta: 239389.13,  cuota: 23063.25,   tipo: 21.25 },
-  { hasta: 398777.54,  cuota: 40011.04,   tipo: 25.50 },
-  { hasta: 797555.08,  cuota: 80655.08,   tipo: 29.75 },
-  { hasta: Infinity,   cuota: 199291.40,  tipo: 34.00 },
-];
+/**
+ * La MISMA escala que liquida una herencia. El art. 21 LISD no distingue entre adquisiciones
+ * mortis causa e inter vivos: una sola tarifa para todo el impuesto, y lo que separa a las
+ * dos modalidades son las reducciones del art. 20.
+ *
+ * Vive en `./sucesiones` y aquí solo se le pone el nombre de esta rama. Hasta el 11/09/2026
+ * estaba transcrita a mano en los dos módulos bajo el rótulo «diferente a sucesiones», y esa
+ * afirmación —falsa— es la que dejó pasar que la copia de la rama de sucesiones tuviera siete
+ * tramos y se quedara en el 25,50 % (hallazgo 735 del Inspector). Dos copias de un dato
+ * normativo existen exactamente para poder divergir.
+ */
+export const TARIFA_ESTATAL_ID: TramoTarifaID[] = TARIFA_ESTATAL_ISD;
 
 // ─── Tarifa Cataluña donaciones — general (5 tramos) ─────────────────────────
 

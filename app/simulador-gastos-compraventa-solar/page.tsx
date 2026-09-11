@@ -205,9 +205,10 @@ export default function SimuladorSolarPage() {
       {/* Aviso clave: quién vende decide el impuesto */}
       <div className={styles.ivaAviso} role="note">
         <strong><span aria-hidden="true">💡</span> Clave del solar:</strong> a diferencia del suelo rústico, el terreno edificable <strong>no
-        está exento de IVA</strong>. Si lo vende un <strong>promotor o empresario</strong> pagas IVA 21% + AJD;
-        si lo vende un <strong>particular</strong>, pagas ITP. En ambos casos, al ser suelo urbano, el vendedor
-        paga <strong>plusvalía municipal</strong>.
+        está exento de IVA</strong>. Si lo vende un <strong>promotor o empresario</strong> pagas IVA {formatNumber(IVA_SOLAR, 0)}% + AJD;
+        si lo vende un <strong>particular</strong>, pagas ITP. En <strong>Canarias, Ceuta y Melilla</strong> no
+        rige el IVA: allí la operación va por <strong>IGIC</strong> o <strong>IPSI</strong>, que esta calculadora
+        no cifra. En todos los casos, al ser suelo urbano, el vendedor paga <strong>plusvalía municipal</strong>.
       </div>
 
       {/* Formulario principal */}
@@ -535,8 +536,9 @@ export default function SimuladorSolarPage() {
               <strong>¿Se paga IVA o ITP al comprar un solar?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Depende del vendedor. Si vende un promotor o empresario en el ejercicio de su actividad, la
-                compra tributa por IVA al 21% más AJD. Si vende un particular, tributa por ITP al tipo general de
-                la comunidad autónoma. Nunca se pagan IVA e ITP a la vez.
+                compra tributa por IVA al {formatNumber(IVA_SOLAR, 0)}% más AJD. Si vende un particular, tributa
+                por ITP al tipo general de la comunidad autónoma. Nunca se pagan IVA e ITP a la vez. En Canarias,
+                Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -544,7 +546,8 @@ export default function SimuladorSolarPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 La exención de IVA se aplica al terreno rústico y no edificable. Los solares y terrenos
                 edificables quedan expresamente excluidos de esa exención, por lo que su entrega por un empresario
-                está sujeta a IVA al 21%.
+                está sujeta a IVA al {formatNumber(IVA_SOLAR, 0)}% — o al IGIC o el IPSI en Canarias, Ceuta y
+                Melilla, donde el IVA no se aplica.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>

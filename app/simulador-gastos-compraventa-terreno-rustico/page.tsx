@@ -539,7 +539,8 @@ export default function SimuladorTerrenoRusticoPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Por regla general, ITP. El terreno rústico no edificable está exento de IVA (Art. 20.Uno.20º LIVA),
                 incluso cuando lo vende un empresario. Solo se paga IVA si hay renuncia a la exención entre
-                profesionales con derecho a deducción.
+                profesionales con derecho a deducción — y en Canarias, Ceuta y Melilla ni siquiera entonces:
+                allí rige el IGIC o el IPSI, que esta calculadora no cifra.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -554,9 +555,10 @@ export default function SimuladorTerrenoRusticoPage() {
               <strong>¿Qué es la renuncia a la exención de IVA en tierras rústicas?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Es la opción (Art. 20.Dos LIVA) por la que el vendedor renuncia a la exención y la operación pasa
-                a tributar por IVA al 21% en lugar de ITP, con inversión del sujeto pasivo. Solo cabe entre
-                empresarios o profesionales con derecho a deducir el IVA; interesa cuando el comprador puede
-                deducirlo y así evita un ITP no recuperable.
+                a tributar por IVA al {formatNumber(IVA_RENUNCIA, 0)}% en lugar de ITP, con inversión del sujeto
+                pasivo. Solo cabe entre empresarios o profesionales con derecho a deducir el IVA; interesa cuando
+                el comprador puede deducirlo y así evita un ITP no recuperable. En Canarias, Ceuta y Melilla no
+                hay IVA al que renunciar: allí la operación va por IGIC o IPSI.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>

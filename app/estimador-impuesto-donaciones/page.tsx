@@ -857,7 +857,7 @@ export default function EstimadorImpuestoDonacionesPage() {
                 <p>
                   Base imponible = valor real del bien donado − cargas deducibles.
                   Base liquidable = base imponible − reducciones.
-                  La tarifa estatal (17 tramos del 7,65% al 34%) se aplica sobre la base liquidable
+                  La tarifa estatal (16 tramos del 7,65% al 34%) se aplica sobre la base liquidable
                   para obtener la cuota íntegra, que se multiplica por el coeficiente según
                   patrimonio preexistente (1,0000–2,4000 para Grupo I; hasta 2,4000 para Grupo III/IV).
                 </p>

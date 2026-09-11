@@ -1344,6 +1344,43 @@ export function horquillaFedatarios(precioMin: number, precioMax: number): {
 }
 
 /**
+ * Hasta qué edad llega el tipo reducido para jóvenes, DERIVADO de la tabla.
+ *
+ * ── De dónde sale (11/09/2026, hallazgos 719 y 720) ──────────────────────────
+ * La edad tope se venía escribiendo a mano y envejeció en las dos bocas de
+ * `estimador-compraventa-inmueble`, cada una por su lado: el FAQPage del JSON-LD seguía
+ * diciendo «menores de 35-36 años» —corregido en la página visible el 27/08/2026 y nunca
+ * en el `<script>`, que es justo lo que leen ChatGPT, Bing Copilot y Perplexity— y la FAQ
+ * visible decía «de los 32 a los 40 años», con un 32 que era el tope de Cataluña ANTES del
+ * Decreto-ley 5/2025 y que la propia tabla ya documenta como superado. Ninguna de las dos
+ * contenía el suelo real, que es el de Baleares.
+ *
+ * Se lee de las condiciones, no del nombre: el perfil joven se reconoce por el mismo
+ * patrón con el que `elegirTipoITP` decide si una condición la cubre el perfil
+ * (`CUBIERTAS_POR_PERFIL.joven`), así que si mañana una comunidad mueve su edad, las dos
+ * bocas se mueven con ella el mismo día.
+ */
+export function horquillaEdadJoven(): { min: number; max: number } {
+  const edades: number[] = [];
+
+  for (const datos of Object.values(ITP_CCAA)) {
+    for (const reducido of datos.tiposReducidos) {
+      if (!normaliza(reducido.nombre).includes('joven')) continue;
+      for (const condicion of reducido.condiciones) {
+        if (!CUBIERTAS_POR_PERFIL.joven.test(condicion)) continue;
+        const anios = condicion.match(/(\d{2})\s*a[nñ]os/i);
+        if (anios) edades.push(Number(anios[1]));
+      }
+    }
+  }
+
+  if (edades.length === 0) {
+    throw new Error('horquillaEdadJoven: ningún tipo reducido de jóvenes declara su edad tope');
+  }
+  return { min: Math.min(...edades), max: Math.max(...edades) };
+}
+
+/**
  * Calcula gastos de registro de la propiedad
  */
 export function calcularRegistro(valor: number): number {

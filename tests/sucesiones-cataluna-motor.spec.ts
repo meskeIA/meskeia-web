@@ -251,12 +251,13 @@ test.describe('Régimen común — que la corrección catalana no se haya llevad
     });
     expect(r.reduccionVivienda).toBeCloseTo(122606.47, 2);
     expect(r.reduccionParentesco).toBeCloseTo(15956.87, 2);
-    expect(r.cuotaFinal).toBeCloseTo(103.46, CENTIMO);
+    // Base 111.436,66 → 9.166,06 + 16,15 % de 31.556,14 = 14.262,3766 → −99 % = 142,62
+    expect(r.cuotaFinal).toBeCloseTo(142.62, CENTIMO);
   });
 
   test('el nieto NO pierde la bonificación del 99 % por tener grupo propio', () => {
     // 'II-descendiente' no existe en `BONIFICACIONES_CCAA_IS`: si no se colapsara sobre 'II',
-    // el nieto se quedaría sin bonificación y pagaría 10.346 € en vez de 103,46 €.
+    // el nieto se quedaría sin bonificación y pagaría 14.262 € en vez de 142,62 €.
     const hijo = calcularSucesion({ baseImponible: 250000, ccaa: 'madrid', grupo: 'II', edadHeredero: 45, viviendaHabitual: 180000 });
     const nieto = calcularSucesion({ baseImponible: 250000, ccaa: 'madrid', grupo: 'II-descendiente', edadHeredero: 45, viviendaHabitual: 180000 });
     expect(nieto.porcentajeBonificacion).toBe(99);

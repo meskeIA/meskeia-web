@@ -12,6 +12,7 @@ import { test, expect, Page } from '@playwright/test';
 import {
   ITP_CCAA,
   BANDA_PRECIO_VIVIENDA,
+  horquillaEdadJoven,
   estimarFacturaNotarial,
   calcularRegistro,
   sumarLineasVisibles,
@@ -3075,4 +3076,54 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     expect(bloques.join(' ')).not.toContain('menores de 35-36 años');
   });
+});
+
+// ✅ REPARADO 11/09/2026 (medio y bajo) — contenido. Los tres son el mismo defecto: una cifra
+// que se quedó TECLEADA en el FAQPage mientras la de al lado ya se derivaba del motor.
+//
+//  · 718 — «notaría, registro y gestoría, que en conjunto rondan el 1%-2%». El motor no llega
+//    al 2 % en ningún punto de la banda que la propia app publica, y por encima de ~107.000 €
+//    tampoco al 1 %. Residuo del 628: en la MISMA frase la horquilla total sí se derivó.
+//  · 719 — «tipos reducidos para jóvenes (menores de 35-36 años)», que es el texto que el
+//    27/08/2026 se corrigió en la FAQ visible y no en el <script>. El test que lo vigilaba
+//    usaba getByText, que no entra en un script: de ahí que sobreviviera dos semanas.
+//  · 720 — y la FAQ visible decía «de los 32 a los 40 años», con un 32 que era el tope de
+//    Cataluña ANTES del Decreto-ley 5/2025. El suelo real es el de Baleares.
+//
+// Los tres se cierran igual: la cifra se deriva (HORQUILLA_FEDATARIOS_PCT y horquillaEdadJoven)
+// y las dos bocas la leen del mismo sitio.
+test('REPARADO 11/09 (contenido) — el FAQPage publica las cifras del motor, no las tecleadas', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+
+  // 718 — la horquilla de fedatarios ya no es la inventada, y contiene lo que el motor cobra.
+  expect(jsonLd).not.toContain('rondan el 1%-2%');
+  const fedatarios200k =
+    estimarFacturaNotarial(200000).medio + calcularRegistro(200000) + 300; // gestoría típica
+  const pct200k = (fedatarios200k / 200000) * 100;
+  const horquilla = jsonLd.match(/rondan el (\d+,\d+) % al (\d+,\d+) %/);
+  expect(horquilla, 'el FAQPage publica la horquilla de fedatarios').not.toBeNull();
+  const [minPct, maxPct] = horquilla!.slice(1, 3).map((n) => Number(n.replace(',', '.')));
+  expect(minPct).toBeLessThanOrEqual(pct200k);
+  expect(maxPct).toBeGreaterThanOrEqual(pct200k);
+  expect(maxPct).toBeLessThan(2); // el 2 % tecleado no lo alcanza el motor en ningún punto
+
+  // 719 y 720 — la edad tope sale de la tabla, y las dos bocas dicen lo mismo.
+  const edad = horquillaEdadJoven();
+  expect(jsonLd).not.toContain('35-36 años');
+  expect(jsonLd).toContain(`de los ${edad.min} a los ${edad.max} años`);
+
+  // El párrafo concreto, no `body.innerText()`: la FAQ vive dentro de la sección educativa
+  // colapsable y el innerText del documento no la recoge.
+  const respuestaReducidos = page
+    .locator('h4', { hasText: '¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?' })
+    .locator('xpath=following-sibling::p[1]');
+  const visible = (await respuestaReducidos.innerText()).replace(ESPACIO_DURO, ' ');
+  expect(visible).toContain(`va de los ${edad.min} a los ${edad.max} años`);
+
+  // Y que la tabla no ha dejado de declararlas: 30 es Baleares y 40 Murcia y La Rioja.
+  expect(edad.min).toBe(30);
+  expect(edad.max).toBe(40);
 });

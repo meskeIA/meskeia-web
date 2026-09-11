@@ -2624,7 +2624,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
 // y ninguna de las tres llegó a esta app, que tiene el mismo defecto en el mismo sitio.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ❌ ABIERTO 11/09/2026 (medio) — contenido. EFECTO FAMILIA del hallazgo 670.
+// ✅ REPARADO 11/09/2026 (medio) — contenido. EFECTO FAMILIA del hallazgo 670.
 // La FAQ visible y los DOS bloques FAQPage de `metadata.ts` afirman sin ninguna excepción
 // territorial que un trastero nuevo paga IVA (10 % como anejo, 21 % independiente), mientras
 // la calculadora responde «IGIC — No calculado» en Canarias y «IPSI» en Ceuta y Melilla.
@@ -2636,10 +2636,12 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
 //       Esperado: la misma excepción que la hermana garaje añadió el 10/09 («En Canarias,
 //       Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos»).
 //       Obtenido: ni «IGIC» ni «IPSI» aparecen en la FAQ ni en ninguno de los dos FAQPage.
-test('ABIERTO 11/09 (contenido) — la FAQ y el FAQPage afirman IVA sin la excepción de Canarias', async ({
+// Reparado con el patrón que garaje estrenó en el hallazgo 624: la respuesta vive en UNA
+// constante de metadata.ts (`RESPUESTA_IVA_TRASTERO_NUEVO`) que importan los dos FAQPage, y
+// la FAQ visible nombra la misma excepción. Este test queda de candado de regresión.
+test('REPARADO 11/09 (contenido) — la FAQ y el FAQPage recogen la excepción de Canarias', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await selectCcaa(page).selectOption('canarias');
@@ -2665,7 +2667,7 @@ test('ABIERTO 11/09 (contenido) — la FAQ y el FAQPage afirman IVA sin la excep
   expect(meta).toContain('IGIC');
 });
 
-// ❌ ABIERTO 11/09/2026 (medio) — dato. EFECTO FAMILIA del hallazgo 671.
+// ✅ REPARADO 11/09/2026 (medio) — dato. EFECTO FAMILIA del hallazgo 671.
 // El ÚNICO tipo de plusvalía municipal que la página publica es el 30 % máximo legal, que
 // llega por `PLUSVALIA_MUNICIPAL_META.nota` dentro del segundo `DataReference`. El tipo que
 // el motor APLICA es el 25 % orientativo (`PLUSVALIA_MUNICIPAL_META.tipoOrientativo`, que es
@@ -2681,10 +2683,11 @@ test('ABIERTO 11/09 (contenido) — la FAQ y el FAQPage afirman IVA sin la excep
 //       → con el 30 % que la propia página anuncia serían 255,00 €
 //       Esperado: que la página diga qué tipo aplica · obtenido: «25 %» no aparece en
 //       ninguna parte del documento, y «30%» sí.
-test('ABIERTO 11/09 (dato) — la página publica el 30 % máximo y aplica el 25 % orientativo', async ({
+// Reparado igual que garaje: la FAQ visible y los dos FAQPage dicen ahora qué tipo APLICA la
+// calculadora, leído de `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` y no tecleado.
+test('REPARADO 11/09 (dato) — la página dice el 25 % orientativo que aplica, no solo el 30 % máximo', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await rellenar(page, 'Precio del trastero', '20000');
   await page.getByRole('button', { name: /Vendedor/ }).click();
@@ -2700,10 +2703,19 @@ test('ABIERTO 11/09 (dato) — la página publica el 30 % máximo y aplica el 25
   expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('212,50 €');
   expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
 
-  // Con el 30 % que la página anuncia, esa misma base daría 255,00 €. El tipo aplicado
-  // tiene que estar escrito en alguna parte del documento.
-  const cuerpo = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
-  expect(cuerpo).toMatch(/25\s?%/);
+  // Con el 30 % que la página anuncia, esa misma base daría 255,00 €. El tipo que la
+  // calculadora APLICA tiene que estar escrito donde el usuario pregunta por él.
+  //
+  // Se lee el párrafo concreto y no `body.innerText()`: la FAQ vive dentro de la sección
+  // educativa colapsable y el innerText del documento no la recoge.
+  const respuestaPlusvalia = page
+    .locator('h4', { hasText: '¿Se paga plusvalía municipal al vender un trastero?' })
+    .locator('xpath=following-sibling::p[1]');
+  expect(await texto(respuestaPlusvalia)).toMatch(/25\s?%/);
+
+  // Y los dos FAQPage de metadata.ts, que es lo que citan los asistentes de IA.
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(jsonLd).toMatch(/25% como referencia orientativa/);
 });
 
 // ❌ ABIERTO 11/09/2026 (medio) — accesibilidad. EFECTO FAMILIA del hallazgo 683.

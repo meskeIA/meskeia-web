@@ -6,6 +6,7 @@ import {
   RANGO_ITP,
   BANDA_PRECIO_VIVIENDA,
   horquillaFedatarios,
+  horquillaEdadJoven,
   estimarFacturaNotarial,
   calcularRegistro,
   calcularAJD,
@@ -142,6 +143,44 @@ export const HORQUILLA_GASTOS_COMPRAVENTA: { min: number; max: number } = (() =>
   };
 })();
 
+/**
+ * Lo que pesan notaría, registro y gestoría sobre el precio — DERIVADO del mismo motor.
+ *
+ * ── Por qué (11/09/2026, hallazgo 718) ────────────────────────────────────────
+ * Es el residuo del hallazgo 628: en la MISMA frase la horquilla total sí se derivó del
+ * motor y la coletilla de los fedatarios se quedó tecleada en «rondan el 1%-2%». El motor
+ * no llega al 2 % en ningún punto de la banda que la propia app publica, y por encima de
+ * ~107.000 € tampoco al 1 %. La frase ni siquiera cuadraba consigo misma: un 4 % de ITP
+ * mínimo más un 1 % son 5 %, por encima del 3,3 % que ella misma publica como suelo del
+ * total.
+ *
+ * Aquí el redondeo hacia fuera es a la CENTÉSIMA, no a la décima como en la horquilla de
+ * gastos totales: ésta se mueve entre valores pequeños, y una décima de margen sobre un
+ * 0,34 % es un tercio de la cifra.
+ */
+export const HORQUILLA_FEDATARIOS_PCT: { min: number; max: number } = (() => {
+  const porcentajes: number[] = [];
+  const PASO = 10000;
+
+  for (
+    let precio = BANDA_PRECIO_VIVIENDA.min;
+    precio <= BANDA_PRECIO_VIVIENDA.max;
+    precio += PASO
+  ) {
+    const fedatarios =
+      estimarFacturaNotarial(precio).medio + calcularRegistro(precio) + GESTORIA_TIPICA;
+    porcentajes.push((fedatarios / precio) * 100);
+  }
+
+  return {
+    min: Math.floor(Math.min(...porcentajes) * 100) / 100,
+    max: Math.ceil(Math.max(...porcentajes) * 100) / 100,
+  };
+})();
+
+/** Hasta qué edad llega el tipo reducido para jóvenes, leído de `data/itp-ccaa.ts`. */
+const EDAD_JOVEN = horquillaEdadJoven();
+
 export const metadata: Metadata = {
   title: 'Gastos de Compraventa de Vivienda - Calculadora ITP, Notaría y Plusvalía | meskeIA',
   description: 'Calcula los gastos de comprar o vender una vivienda en España: ITP o IVA por comunidad autónoma, notaría, registro, plusvalía municipal e IRPF del vendedor. También orienta sobre garaje, trastero, local, nave y terreno.',
@@ -205,7 +244,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
-      answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el 1%-2%. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
+      answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el ${pct(HORQUILLA_FEDATARIOS_PCT.min)} al ${pct(HORQUILLA_FEDATARIOS_PCT.max)} del precio. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',
@@ -229,7 +268,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?',
-      answer: 'Muchas comunidades aplican tipos reducidos para jóvenes (menores de 35-36 años), familias numerosas, personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos (edad, ingresos, valor máximo del inmueble) varían por comunidad. Consulta la normativa de tu CC.AA.',
+      answer: `Muchas comunidades aplican tipos reducidos para jóvenes (el tope va de los ${EDAD_JOVEN.min} a los ${EDAD_JOVEN.max} años según la comunidad), familias numerosas, personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos (edad, ingresos, valor máximo del inmueble) varían por comunidad. Consulta la normativa de tu CC.AA.`,
     },
     {
       question: '¿La gestoría es obligatoria en la compraventa?',

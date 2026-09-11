@@ -816,3 +816,35 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
     expect(IVA_INMUEBLES_2025.local).toBe(PORCENTAJES_IVA.general);
   });
 });
+
+// ✅ REPARADO 11/09/2026 (medio) — contenido. EL EFECTO FAMILIA, INVERTIDO.
+// Aquí el punto ciego era el contrario al de las hermanas: el FAQPage de metadata.ts SÍ
+// llevaba la excepción territorial desde el origen («En Canarias, Ceuta y Melilla no rige el
+// IVA: la operación tributa por IGIC o IPSI») y lo que nunca llegó fue el TEXTO VISIBLE. Las
+// palabras IGIC e IPSI no aparecían en ningún texto estático de page.tsx: solo salían en el
+// aviso reactivo <AvisoTerritorioSinIva>, que exige haber elegido ya ese territorio, de modo
+// que quien leía la página en Madrid se llevaba una regla sin excepciones.
+// Caso: abrir la página SIN tocar nada y leer la FAQ «¿Se paga IVA o ITP al comprar un solar?»
+//       → antes: «tributa por IVA al 21% más AJD», con 0 apariciones de IGIC o IPSI en todo
+//         el texto visible (y 1 de cada una en el JSON-LD)
+//       → ahora: la misma excepción que ya publicaba el JSON-LD, también en pantalla.
+test('REPARADO 11/09 (contenido) — la FAQ visible recoge la excepción que el JSON-LD ya publicaba', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+
+  // La FAQ visible, sin haber elegido territorio: la regla general con su excepción.
+  const respuesta = page
+    .locator('strong', { hasText: '¿Se paga IVA o ITP al comprar un solar?' })
+    .locator('xpath=following-sibling::p[1]');
+  expect(await respuesta.innerText()).toMatch(/IGIC|IPSI/);
+
+  // Y el recuadro de cabecera, que es donde el visitante lee la regla antes de calcular.
+  const cuerpo = await page.locator('body').innerText();
+  expect(cuerpo).toContain('IGIC');
+  expect(cuerpo).toContain('IPSI');
+
+  // El JSON-LD servido seguía siendo el canal bueno: sigue siéndolo.
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(jsonLd).toContain('IGIC');
+});

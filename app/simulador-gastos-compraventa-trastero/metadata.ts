@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
-import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 
 /** Los tipos de IVA se LEEN de data/fiscal, no se teclean: el mismo dato estaba escrito a
  *  mano en ocho sitios entre página y metadata, y es lo que citan los asistentes de IA
@@ -13,6 +13,28 @@ import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
  *  texto lo leen los asistentes de IA (hallazgo 641). */
 const IVA_ANEJO = IVA_INMUEBLES_2025.anejoVinculado;
 const IVA_GENERAL = IVA_INMUEBLES_2025.garaje;
+
+/**
+ * Las dos respuestas que se contradecían con la propia calculadora, en UN solo sitio.
+ *
+ * Las importan las tres bocas que las publican: el FAQPage de `generateFAQSchema`, el
+ * `faqJsonLd` de abajo y la FAQ VISIBLE de `page.tsx`. Es el patrón que
+ * `simulador-gastos-compraventa-garaje` estrenó con el hallazgo 624, y aquí cierra dos
+ * hallazgos del 11/09/2026 que son sus hermanos de familia:
+ *
+ *  · 714 — la excepción territorial. La nota de cabecera de la página ya la llevaba desde el
+ *    hallazgo 527, pero la FAQ y los dos FAQPage seguían diciendo que un trastero nuevo paga
+ *    IVA sin matiz, mientras la calculadora responde «IGIC · No calculado» en Canarias y
+ *    «IPSI» en Ceuta y Melilla. La palabra IGIC no aparecía en todo el metadata.ts.
+ *  · 715 — el tipo de plusvalía. El único que la página publicaba era el 30 % del máximo
+ *    legal, y el que el motor APLICA es el 25 % orientativo: quien rehiciera la cuenta con el
+ *    único tipo escrito obtenía un 20 % más de lo que la propia app le acababa de dar.
+ *
+ * Las dos reparaciones ya estaban hechas en garaje (10/09/2026) con este mismo texto.
+ */
+export const RESPUESTA_IVA_TRASTERO_NUEVO = `Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del ${IVA_ANEJO}% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del ${IVA_GENERAL}%. Es el mismo criterio que se aplica a las plazas de garaje. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos.`;
+
+export const RESPUESTA_PLUSVALIA_TRASTERO = `Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay ganancia, se puede acreditar la pérdida y quedar exento. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Trastero - ITP y Costes | meskeIA',
@@ -64,7 +86,7 @@ const faqSchema = generateFAQSchema({
   mainEntity: [
     {
       question: '¿Qué IVA paga un trastero nuevo?',
-      answer: `Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del ${IVA_ANEJO}% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del ${IVA_GENERAL}%. Es el mismo criterio que se aplica a las plazas de garaje.`,
+      answer: RESPUESTA_IVA_TRASTERO_NUEVO,
     },
     {
       question: '¿Qué diferencia hay entre trastero vinculado y trastero independiente?',
@@ -76,7 +98,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Se paga plusvalía municipal al vender un trastero?',
-      answer: 'Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay ganancia, se puede acreditar la pérdida y quedar exento.',
+      answer: RESPUESTA_PLUSVALIA_TRASTERO,
     },
     {
       question: '¿Tienen tipos reducidos de ITP los trasteros?',
@@ -96,7 +118,7 @@ export const faqJsonLd = {
       name: '¿Qué IVA paga un trastero nuevo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del ${IVA_ANEJO}% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del ${IVA_GENERAL}%. Es el mismo criterio que se aplica a las plazas de garaje.`,
+        text: RESPUESTA_IVA_TRASTERO_NUEVO,
       },
     },
     {
@@ -120,7 +142,7 @@ export const faqJsonLd = {
       name: '¿Se paga plusvalía municipal al vender un trastero?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay ganancia, se puede acreditar la pérdida y quedar exento.',
+        text: RESPUESTA_PLUSVALIA_TRASTERO,
       },
     },
     {

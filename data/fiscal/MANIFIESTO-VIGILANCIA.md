@@ -257,7 +257,7 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 > filtrar el BOE por "Comunidad Autónoma" + "medidas fiscales" / "ISD" / "ITP".
 
 #### `sucesiones.ts` — ISD rama sucesiones
-- **Contiene**: tarifa estatal (7 tramos), tarifa propia de Cataluña, coeficientes multiplicadores por grupo y patrimonio preexistente (estatal y Cataluña), reducciones estatales (parentesco, edad <21, seguro de vida, vivienda 95%, discapacidad), ajuar 3%, **bonificaciones de las 17 CCAA** por grupo.
+- **Contiene**: tarifa estatal (los 16 tramos del art. 21.2 LISD, del 7,65 % al 34 %, comunes con la rama de donaciones, que los reexporta desde aquí), tarifa propia de Cataluña, coeficientes multiplicadores por grupo y patrimonio preexistente (estatal y Cataluña), reducciones estatales (parentesco, edad <21, seguro de vida, vivienda 95%, discapacidad), ajuar 3%, **bonificaciones de las 17 CCAA** por grupo.
 - **Sistema de cálculo vigente** (contra el que comparar): base imponible (+ ajuar 3%) → reducciones (parentesco/edad/discapacidad/vivienda/seguro) → base liquidable → tarifa progresiva (estatal o autonómica propia) → cuota íntegra → × coeficiente multiplicador (grupo × patrimonio preexistente) → cuota tributaria → − bonificación autonómica → cuota a pagar.
 - **Normativa**: Ley 29/1987 + normativas de las 17 CCAA.
 - **Vigilar**: leyes de medidas fiscales autonómicas (bonificaciones y reducciones cambian con los ciclos políticos autonómicos); cualquier reforma de la Ley 29/1987.

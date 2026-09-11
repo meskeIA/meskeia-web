@@ -116,9 +116,9 @@ test.describe('Estimador ISD — el tope del Grupo I es del TOTAL', () => {
    * 47.858,59 €. La app sumaba `reduccionParentesco + MAX` y llegaba a 63.815,46 €.
    *
    *   Bien:  257.500 − 47.858,59 = 209.641,41 de base liquidable
-   *          7.127,47 + (209.641,41 − 79.881,18) × 10,20 % = 20.363,01346
-   *          × 1,0000 − 99 % (Madrid) = 203,6301346                    → «203,63 €»
-   *   Mal:   257.500 − 63.815,46 = 193.684,54 → … → «187,35 €»
+   *          23.063,25 + (209.641,41 − 159.634,83) × 21,25 % = 33.689,64825
+   *          × 1,0000 − 99 % (Madrid) = 336,8964825                    → «336,90 €»
+   *   Mal:   257.500 − 63.815,46 = 193.684,54 → … → «302,99 €»
    */
   test('en régimen común corta en 47.858,59 €, no en 63.815,46 €', async ({ page }) => {
     await page.goto(RUTA);
@@ -128,7 +128,7 @@ test.describe('Estimador ISD — el tope del Grupo I es del TOTAL', () => {
     await page.locator('input[type="number"]').first().fill('0');
     await importe(page, CAMPO.saldos, '250000');
 
-    expect(await cuota(page)).toBe('203,63 €');
+    expect(await cuota(page)).toBe('336,90 €');
   });
 
   /**
@@ -182,13 +182,16 @@ test.describe('Estimador ISD — que la corrección no se lleve por delante el r
  * la app debe rechazar. Todos los importes salen de `data/fiscal/sucesiones.ts` y están
  * resueltos a mano antes de ejecutarlos, con el tramo y la constante citados en cada paso.
  *
- * ⚠️ Los dos primeros dependen de `TARIFA_ESTATAL_IS`, que hoy tiene SIETE tramos y un tipo
- * máximo del 25,50 %. La escala del art. 21 LISD tiene DIECISÉIS y llega al 34 % — está
- * transcrita entera en `data/fiscal/donaciones.ts` como `TARIFA_ESTATAL_ID`, y el propio
- * `faqJsonLd` de esta app la describe así («7,65 %… 34 % para importes superiores a
- * 797.555 €»). Es el hallazgo crítico del acta. El día que se unifique la tarifa, estos dos
- * valores cambian a 154,74 € y 3.306,56 € respectivamente: que el test se ponga rojo
- * entonces es lo que se busca, no un fallo del test.
+ * ✅ TARIFA UNIFICADA el 11/09/2026 (hallazgo 735, crítico). `TARIFA_ESTATAL_IS` tenía SIETE
+ * tramos y se quedaba en el 25,50 %, cuando la escala del art. 21 LISD tiene DIECISÉIS y llega
+ * al 34 %. Estaba transcrita bien en `data/fiscal/donaciones.ts` —a un directorio de
+ * distancia— y el propio `faqJsonLd` de esta app ya la describía así («7,65 %… 34 % para
+ * importes superiores a 797.555 €»), de modo que la app le contaba a las IAs una escala que
+ * no liquidaba. Hoy las dos ramas son el MISMO array y lo vigila
+ * `tests/tarifa-isd-motor.spec.ts`, que la compara fila a fila con el BOE.
+ *
+ * Los valores de los dos primeros casos cambiaron al repararlo, y son exactamente los que el
+ * acta había anticipado: 154,74 € y 3.306,56 €. Los de abajo ya están recalculados.
  */
 test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a rechazar', () => {
   /**
@@ -200,13 +203,13 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
    *   − parentesco        15.956,87   REDUCCIONES_PARENTESCO_IS['II']
    *   − vivienda 95 %    122.606,47   min(200.000 × 0,95 ; REDUCCION_VIVIENDA_MAX_IS)
    *   = base liquidable  118.936,66
-   *   cuota íntegra       11.111,13   TARIFA_ESTATAL_IS, tramo «hasta 239.389,13»:
-   *                                   7.127,47 + 10,20 % × (118.936,66 − 79.881,18)
+   *   cuota íntegra       15.473,63   TARIFA_ESTATAL_IS, tramo «hasta 119.757,67»:
+   *                                   9.166,06 + 16,15 % × (118.936,66 − 79.880,52)
    *   × coeficiente          1,0000   COEFICIENTES_IS['II'][0] (patrimonio < 402.678 €)
-   *   − bonificación 99 % 11.000,02   BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']
-   *   = cuota final          111,11 €
+   *   − bonificación 99 % 15.318,89   BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']
+   *   = cuota final          154,74 €
    */
-  test('caso normal: hijo ≥21 en Madrid con vivienda habitual paga 111,11 €', async ({ page }) => {
+  test('caso normal: hijo ≥21 en Madrid con vivienda habitual paga 154,74 €', async ({ page }) => {
     await page.goto(RUTA);
 
     await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
@@ -214,13 +217,13 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
     await importe(page, CAMPO.saldos, '50000');
     await importe(page, CAMPO.viviendaHabitual, '200000');
 
-    expect(await cuota(page)).toBe('111,11 €');
+    expect(await cuota(page)).toBe('154,74 €');
 
     const panel = await textoPagina(page);
     expect(panel).toContain('257.500,00 €');   // base imponible con ajuar
     expect(panel).toContain('122.606,47 €');   // tope estatal de la reducción por vivienda
     expect(panel).toContain('118.936,66 €');   // base liquidable
-    expect(panel).toContain('11.111,13 €');    // cuota íntegra
+    expect(panel).toContain('15.473,63 €');    // cuota íntegra
   });
 
   /**
@@ -234,10 +237,10 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
    *   − parentesco         7.993,46   REDUCCIONES_PARENTESCO_IS['III']
    *   − Asturias base     50.000,00   BONIFICACIONES_CCAA_IS['asturias']…['III'].reduccionBase
    *   = base liquidable   24.406,54
-   *   cuota íntegra        2.006,61   TARIFA_ESTATAL_IS, tramo «hasta 31.956,87»:
-   *                                   611,50 + 8,50 % × (24.406,54 − 7.993,46)
-   *   × 1,5882 → 3.186,90 €   COEFICIENTES_IS['III'][0], patrimonio < 402.678 €
-   *   × 1,9059 → 3.824,40 €   COEFICIENTES_IS['III'][3], patrimonio > 4.020.770 €
+   *   cuota íntegra        2.081,95   TARIFA_ESTATAL_IS, tramo «hasta 31.955,81»:
+   *                                   2.037,26 + 10,20 % × (24.406,54 − 23.968,36)
+   *   × 1,5882 → 3.306,56 €   COEFICIENTES_IS['III'][0], patrimonio < 402.678 €
+   *   × 1,9059 → 3.968,00 €   COEFICIENTES_IS['III'][3], patrimonio > 4.020.770 €
    *
    *   Sin bonificación en cuota: en Asturias el beneficio ya se gastó en la base.
    *
@@ -245,23 +248,23 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
    * caso y anuncia «~17.200 € (21,5 %)» porque se salta los 50.000 € de reducción. Es el
    * hallazgo de contenido del acta: la app se contradice a sí misma por 5,4 veces.
    */
-  test('caso límite: Grupo III en Asturias, 3.186,90 € y 3.824,40 € según patrimonio', async ({ page }) => {
+  test('caso límite: Grupo III en Asturias, 3.306,56 € y 3.968,00 € según patrimonio', async ({ page }) => {
     await page.goto(RUTA);
 
     await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
     await page.locator('select').nth(SELECT.parentesco).selectOption('III');
     await importe(page, CAMPO.saldos, '80000');
 
-    expect(await cuota(page)).toBe('3186,90 €');
+    expect(await cuota(page)).toBe('3306,56 €');
 
     const panel = await textoPagina(page);
     expect(panel).toContain('50.000,00 €');   // la reducción en base de Asturias, que existe
     expect(panel).toContain('24.406,54 €');   // base liquidable
-    expect(panel).toContain('2006,61 €');     // cuota íntegra antes del coeficiente
+    expect(panel).toContain('2081,95 €');     // cuota íntegra antes del coeficiente
 
     // El coeficiente multiplicador del Grupo III sí crece con el patrimonio preexistente
     await page.locator('select').nth(SELECT.patrimonio).selectOption('4');
-    expect(await cuota(page)).toBe('3824,40 €');
+    expect(await cuota(page)).toBe('3968,00 €');
   });
 
   /**

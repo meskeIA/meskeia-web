@@ -1174,7 +1174,9 @@ export default function SimuladorTrasteroCompraventaPage() {
               <strong> conjuntamente con la vivienda</strong> como anejo, se aplica el tipo reducido del
               <strong> {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%</strong> (art. 91.Uno.1.7º de la Ley del IVA). Si se compra de forma
               <strong> independiente</strong> —finca registral propia, operación separada— tributa al tipo
-              general del <strong>{formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%</strong>. Es el mismo criterio que rige para las plazas de garaje.</p>
+              general del <strong>{formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%</strong>. Es el mismo criterio que rige para las plazas de garaje.
+              En <strong>Canarias, Ceuta y Melilla</strong> no rige el IVA sino el <strong>IGIC</strong> o el <strong>IPSI</strong>,
+              con sus propios tipos: la calculadora no cifra ese impuesto.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre trastero vinculado y trastero independiente?</h4>
@@ -1199,7 +1201,9 @@ export default function SimuladorTrasteroCompraventaPage() {
               se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable:
               el <strong>objetivo</strong> (basado en el valor catastral del suelo y el tiempo de tenencia) o el
               <strong> real</strong> (basado en la ganancia efectiva). Si no hay ganancia, se puede acreditar la pérdida
-              y quedar exento.</p>
+              y quedar exento. Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como
+              referencia orientativa habitual; cada ayuntamiento fija el suyo, con un <strong>máximo legal
+              del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Tienen tipos reducidos de ITP los trasteros?</h4>

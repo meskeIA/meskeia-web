@@ -492,7 +492,10 @@ test.describe('Regresión — el motor de sucesiones no pierde al nieto ni descu
     const nietoAlto = calcularSucesion({ baseImponible: 600000, ccaa: 'asturias', grupo: 'II-descendiente', edadHeredero: 40 });
     const hijoAlto = calcularSucesion({ baseImponible: 600000, ccaa: 'asturias', grupo: 'II', edadHeredero: 40 });
     expect(nietoAlto.cuotaFinal).toBe(hijoAlto.cuotaFinal);
-    expect(nietoAlto.cuotaFinal).toBe(30241.34);
+    // Base liquidable 284.043,13 € (600.000 − 15.956,87 − 300.000). Tramo que abre en
+    // 239.389,13: 40.011,04 + 25,50 % de 44.654,00 = 51.397,81 €. Antes del hallazgo 735
+    // este golden decía 30.241,34 €, que era la escala de siete tramos.
+    expect(nietoAlto.cuotaFinal).toBe(51397.81);
   });
 
   test('pero Cataluña SIGUE distinguiendo al nieto del hijo, que es para lo que existe el grupo', () => {
@@ -1068,41 +1071,50 @@ test.describe('Golden — calcularInteresCompuesto (Capa 1 · fórmula exponenci
 
 // ────────────────────────────────────────────────────────────────────────────
 // CAPA 1 — Golden tests: calcularSucesion (ISD)
-// Tarifa estatal (Ley 29/1987) + tarifa Cataluña.
-// Todos los casos verificados internamente con la misma fórmula que el código.
+// Tarifa estatal (art. 21.2 de la Ley 29/1987) + tarifa Cataluña.
+//
+// ⚠️ 11/09/2026 — ocho de estos goldens cambiaron de valor con el hallazgo 735, y conviene
+// saber por qué NO lo cazaron: se escribieron "verificados internamente con la misma fórmula
+// que el código", es decir leyendo la misma tabla que estaba mal. Un golden así no certifica
+// que el número sea el de la ley; solo congela el que salía. Es la forma exacta que ya había
+// avisado GOLDEN-AE con la reducción catalana. Los valores de abajo están recalculados contra
+// la escala del BOE, tramo por tramo; la escala en sí la vigila tests/tarifa-isd-motor.spec.ts,
+// que la compara fila a fila con el texto legal en vez de con el propio motor.
 // ────────────────────────────────────────────────────────────────────────────
 
 test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + autonómica)', () => {
 
-  test('GOLDEN-AC: Madrid, I-descendiente, 200.000 € → 99% bonif → cuotaFinal 177,52 €', () => {
+  test('GOLDEN-AC: Madrid, I-descendiente, 200.000 € → 99% bonif → cuotaFinal 282,50 €', () => {
     // Hijo hereda 200.000 € de padre. Madrid aplica 99% bonificación.
     // baseLiquidable = 200.000 − 15.956,87 (red. parentesco) = 184.043,13
-    // cuotaIntegra (tramo 4) = 17.751,99; bonif 99% → cuotaFinal = 177,52 €
+    // cuotaIntegra, tramo que abre en 159.634,83 = 23.063,25 + 21,25 % de 24.408,30 = 28.250,01
+    // bonif 99% → cuotaFinal = 282,50 €
     const res = calcularSucesion({ baseImponible: 200000, ccaa: 'madrid', grupo: 'I-descendiente' });
     expect(res.reduccionParentesco).toBeCloseTo(15956.87, 2);
     expect(res.baseLiquidable).toBeCloseTo(184043.13, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(17751.99, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(28250.01, 2);
     expect(res.coeficienteMultiplicador).toBe(1.0);
-    expect(res.cuotaTributaria).toBeCloseTo(17751.99, 2);
-    expect(res.bonificacionCcaa).toBeCloseTo(17574.47, 2);
+    expect(res.cuotaTributaria).toBeCloseTo(28250.01, 2);
+    expect(res.bonificacionCcaa).toBeCloseTo(27967.51, 2);
     expect(res.porcentajeBonificacion).toBeCloseTo(99, 1);
-    expect(res.cuotaFinal).toBeCloseTo(177.52, 2);
-    expect(res.tipoEfectivo).toBeCloseTo(0.09, 2);
+    expect(res.cuotaFinal).toBeCloseTo(282.50, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.14, 2);
     expect(res.esForal).toBe(false);
   });
 
-  test('GOLDEN-AD: Asturias, Grupo IV (extraño), 50.000 € → coef×2 → cuotaFinal 8.671,82 €', () => {
+  test('GOLDEN-AD: Asturias, Grupo IV (extraño), 50.000 € → coef×2 → cuotaFinal 9.897,86 €', () => {
     // Grupo IV (no pariente): sin reducción parentesco, coeficiente multiplicador 2,0.
-    // baseLiquidable = 50.000; cuotaIntegra (tramo 3) = 4.335,91; ×2 = 8.671,82 €
+    // baseLiquidable = 50.000; tramo que abre en 47.930,72: 4.685,10 + 12,75 % de 2.069,28
+    // = 4.948,93 de cuota íntegra; ×2 = 9.897,86 €
     const res = calcularSucesion({ baseImponible: 50000, ccaa: 'asturias', grupo: 'IV' });
     expect(res.reduccionParentesco).toBe(0);
     expect(res.baseLiquidable).toBe(50000);
-    expect(res.cuotaIntegra).toBeCloseTo(4335.91, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(4948.93, 2);
     expect(res.coeficienteMultiplicador).toBe(2.0);
-    expect(res.cuotaTributaria).toBeCloseTo(8671.82, 2);
+    expect(res.cuotaTributaria).toBeCloseTo(9897.86, 2);
     expect(res.bonificacionCcaa).toBe(0);
-    expect(res.cuotaFinal).toBeCloseTo(8671.82, 2);
-    expect(res.tipoEfectivo).toBeCloseTo(17.34, 2);
+    expect(res.cuotaFinal).toBeCloseTo(9897.86, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(19.80, 2);
   });
 
   /**
@@ -1136,17 +1148,17 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
    * por un cero que también daría una reducción desbocada. Hijo, Asturias, 500.000 € sin
    * vivienda habitual:
    *   base liquidable = 500.000 − 15.956,87 − 300.000 = 184.043,13
-   *   cuota íntegra   = 7.127,47 + (184.043,13 − 79.881,18) × 10,20 % = 17.751,99
-   *   coeficiente 1,0 y Asturias no bonifica en cuota → cuota final 17.751,99 €
+   *   cuota íntegra   = 23.063,25 + (184.043,13 − 159.634,83) × 21,25 % = 28.250,01
+   *   coeficiente 1,0 y Asturias no bonifica en cuota → cuota final 28.250,01 €
    */
-  test('GOLDEN-AD3: Asturias, Grupo II, 500.000 € → base 184.043,13 → cuotaFinal 17.751,99 €', () => {
+  test('GOLDEN-AD3: Asturias, Grupo II, 500.000 € → base 184.043,13 → cuotaFinal 28.250,01 €', () => {
     const res = calcularSucesion({ baseImponible: 500000, ccaa: 'asturias', grupo: 'II' });
     expect(res.reduccionAutonomicaBase).toBe(300000);
     expect(res.baseLiquidable).toBeCloseTo(184043.13, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(17751.99, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(28250.01, 2);
     expect(res.coeficienteMultiplicador).toBe(1.0);
     expect(res.bonificacionCcaa).toBe(0);
-    expect(res.cuotaFinal).toBeCloseTo(17751.99, 2);
+    expect(res.cuotaFinal).toBeCloseTo(28250.01, 2);
   });
 
   /**
@@ -1182,7 +1194,7 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.cuotaFinal).toBeCloseTo(14175, 2);
   });
 
-  test('GOLDEN-AF: Madrid, I-descendiente, 200.000 € + vivienda 200.000 € → cuotaFinal 54,05 €', () => {
+  test('GOLDEN-AF: Madrid, I-descendiente, 200.000 € + vivienda 200.000 € → cuotaFinal 64,54 €', () => {
     // Reducción vivienda habitual al 95%, pero tope 122.606,47 €.
     // 200.000 × 95% = 190.000 → se aplica el tope de 122.606,47 €.
     // baseLiquidable = 200.000 − 15.956,87 − 122.606,47 = 61.436,66
@@ -1193,14 +1205,15 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.reduccionVivienda).toBeCloseTo(122606.47, 2);
     expect(res.totalReducciones).toBeCloseTo(138563.34, 2);
     expect(res.baseLiquidable).toBeCloseTo(61436.66, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(5405.24, 2);
-    expect(res.cuotaTributaria).toBeCloseTo(5405.24, 2);
-    expect(res.bonificacionCcaa).toBeCloseTo(5351.19, 2);
-    expect(res.cuotaFinal).toBeCloseTo(54.05, 2);
+    // Tramo que abre en 55.918,17: 5.703,50 + 13,60 % de 5.518,49 = 6.454,01
+    expect(res.cuotaIntegra).toBeCloseTo(6454.01, 2);
+    expect(res.cuotaTributaria).toBeCloseTo(6454.01, 2);
+    expect(res.bonificacionCcaa).toBeCloseTo(6389.47, 2);
+    expect(res.cuotaFinal).toBeCloseTo(64.54, 2);
     expect(res.tipoEfectivo).toBeCloseTo(0.03, 2);
   });
 
-  test('GOLDEN-AG: Madrid, I-descendiente, 200.000 €, edad 16 → reducción menor-21 → cuotaFinal 157,17 €', () => {
+  test('GOLDEN-AG: Madrid, I-descendiente, 200.000 €, edad 16 → reducción menor-21 → cuotaFinal 240,10 €', () => {
     // Reducción por edad: (21−16) × 3.990,72 = 19.953,60 €.
     // baseLiquidable = 200.000 − 15.956,87 − 19.953,60 = 164.089,53
     const res = calcularSucesion({
@@ -1209,10 +1222,11 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.reduccionEdadMenor21).toBeCloseTo(19953.6, 2);
     expect(res.totalReducciones).toBeCloseTo(35910.47, 2);
     expect(res.baseLiquidable).toBeCloseTo(164089.53, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(15716.72, 2);
-    expect(res.bonificacionCcaa).toBeCloseTo(15559.55, 2);
-    expect(res.cuotaFinal).toBeCloseTo(157.17, 2);
-    expect(res.tipoEfectivo).toBeCloseTo(0.08, 2);
+    // Tramo que abre en 159.634,83: 23.063,25 + 21,25 % de 4.454,70 = 24.009,87
+    expect(res.cuotaIntegra).toBeCloseTo(24009.87, 2);
+    expect(res.bonificacionCcaa).toBeCloseTo(23769.77, 2);
+    expect(res.cuotaFinal).toBeCloseTo(240.10, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.12, 2);
   });
 
   /**
@@ -1231,10 +1245,11 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.reduccionVivienda).toBe(0);
     expect(res.reduccionViviendaNoAplicada).toContain('menor de');
     expect(res.baseLiquidable).toBeCloseTo(198006.54, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(19176.26, 2);
+    // Tramo que abre en 159.634,83: 23.063,25 + 21,25 % de 38.371,71 = 31.217,24
+    expect(res.cuotaIntegra).toBeCloseTo(31217.24, 2);
     expect(res.coeficienteMultiplicador).toBeCloseTo(1.5882, 4);
-    expect(res.cuotaTributaria).toBeCloseTo(30455.74, 2);
-    expect(res.cuotaFinal).toBeCloseTo(15227.87, 2);
+    expect(res.cuotaTributaria).toBeCloseTo(49579.22, 2);
+    expect(res.cuotaFinal).toBeCloseTo(24789.61, 2);
   });
 
   test('GOLDEN-AI: Madrid, Grupo III, ≥65 años y convivencia → SÍ hay reducción de vivienda (hallazgo 500)', () => {
@@ -1245,8 +1260,9 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.reduccionVivienda).toBeCloseTo(122606.47, 2);
     expect(res.reduccionViviendaNoAplicada).toBeNull();
     expect(res.baseLiquidable).toBeCloseTo(75400.07, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(6710.82, 2);
-    expect(res.cuotaFinal).toBeCloseTo(5329.06, 2);
+    // Tramo que abre en 71.893,07: 7.943,98 + 15,30 % de 3.507,00 = 8.480,55
+    expect(res.cuotaIntegra).toBeCloseTo(8480.55, 2);
+    expect(res.cuotaFinal).toBeCloseTo(6734.40, 2);
   });
 
   test('GOLDEN-AJ: Grupo III, edad ≥65 pero SIN convivencia → sin reducción, con motivo propio', () => {

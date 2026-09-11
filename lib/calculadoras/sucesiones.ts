@@ -3,7 +3,7 @@
  * Usada por: MCP server (calcular_sucesiones)
  *
  * Fuente: Ley 29/1987 ISD + normativas autonómicas 2025
- * Cubre: 17 CCAA, tarifa estatal (7 tramos), tarifa propia Cataluña,
+ * Cubre: 17 CCAA, tarifa estatal (art. 21.2 LISD, 16 tramos), tarifa propia Cataluña,
  *        coeficientes multiplicadores, reducciones y bonificaciones autonómicas.
  *
  * Nota: Solo calcula el impuesto sobre la herencia del beneficiario individual,
@@ -142,10 +142,18 @@ export interface ResultadoSucesiones {
  * Cuota íntegra de una base liquidable según una tarifa del ISD.
  *
  * Aplica la tabla tal como la publica la ley: la CUOTA ÍNTEGRA declarada para el tramo
- * anterior, más el tipo marginal sobre el resto. No es lo mismo que acumular los tramos a
- * mano, porque la columna `cuota` de la tabla oficial arrastra sus propios redondeos: a
- * partir de 31.956,87 € de base las dos lecturas divergen (+0,49 € en el tramo del 9,35 %,
- * −1,84 € en el del 10,20 %, +12,96 € en el del 21,25 %…). Manda la tabla, que es la ley.
+ * anterior, más el tipo marginal sobre el resto. Manda la tabla, que es la ley, aunque su
+ * columna `cuota` arrastre los redondeos a céntimo con los que el BOE la imprime.
+ *
+ * ⚠️ Hasta el 11/09/2026 este comentario afirmaba que las dos lecturas —la columna `cuota` y
+ * acumular los marginales a mano— divergían en euros a partir de 31.956,87 € de base
+ * (+0,49 € en el tramo del 9,35 %, −1,84 € en el del 10,20 %, +12,96 € en el del 21,25 %…).
+ * Esas divergencias no eran de la ley: salían de que `TARIFA_ESTATAL_IS` tenía entonces siete
+ * tramos con la cuota y el tipo emparejados con umbrales que no les correspondían (hallazgo
+ * 735). Con la escala del art. 21.2 bien transcrita, las dos lecturas coinciden salvo 0,0045 €
+ * en el peor tramo, que es exactamente el redondeo del BOE. La función sigue valiendo por lo
+ * mismo que antes —hay UNA sola forma de leer la tabla y todas las apps usan ésta (hallazgo
+ * 277)—, pero no por la razón que aquí estaba escrita.
  *
  * Es público desde el 24/08/2026 porque `simulador-heredar-vivienda` tenía su propia
  * versión acumulando marginales, y dos apps fiscales de meskeIA daban cuotas íntegras
@@ -475,7 +483,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     tarifaAplicada = 'Tarifa propia Cataluña (7%–32%)';
   } else {
     tarifa = TARIFA_ESTATAL_IS;
-    tarifaAplicada = 'Tarifa estatal régimen común (7,65%–25,5%)';
+    tarifaAplicada = 'Tarifa estatal régimen común, art. 21.2 LISD (7,65 %–34 %)';
   }
 
   const cuotaIntegra = r(calcularCuotaIntegraIS(baseLiquidable, tarifa));

@@ -684,3 +684,32 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
     }
   });
 });
+
+// ✅ REPARADO 11/09/2026 (medio) — contenido. EFECTO FAMILIA (pista a).
+// La FAQ visible y los cinco bloques del FAQPage afirmaban que con la renuncia a la exención
+// «la compra pasa a tributar por IVA al 21%», sin la excepción territorial que la propia
+// calculadora sí aplica: en Canarias rige el IGIC y en Ceuta y Melilla el IPSI. El JSON-LD es
+// lo que citan los asistentes de IA, así que la versión que se propagaba era la incompleta.
+// Dentro del MISMO FAQPage la excepción simétrica del ITP (la bonificación del 50 % de Ceuta
+// y Melilla) sí estaba escrita, lo que enseña que la reparación llegó a la mitad fiscal del
+// bloque y no a la del IVA.
+// Caso: Canarias · «Con renuncia a la exención IVA» · 80.000 €
+//       → la app muestra «IGIC · No calculado» y «COSTE TOTAL (PARCIAL)»
+//       → antes: 0 coincidencias de /IGIC|IPSI/ en el FAQPage y en la FAQ visible
+//       → ahora: las dos bocas recogen la excepción, y el 21 % se lee de data/fiscal.
+test('REPARADO 11/09 (contenido) — la FAQ y el FAQPage recogen que en Canarias no hay IVA que renunciar', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+
+  // El JSON-LD servido, que es lo que leen ChatGPT, Bing Copilot y Perplexity.
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(jsonLd).toMatch(/IGIC/);
+  expect(jsonLd).toMatch(/IPSI/);
+
+  // Y la FAQ visible, en la misma página.
+  const respuesta = page
+    .locator('strong', { hasText: '¿Qué es la renuncia a la exención de IVA en tierras rústicas?' })
+    .locator('xpath=following-sibling::p[1]');
+  expect(await respuesta.innerText()).toMatch(/IGIC|IPSI/);
+});

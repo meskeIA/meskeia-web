@@ -64,17 +64,50 @@ export interface BonificacionCCAA_IS {
   notas: string;
 }
 
-// ─── Tarifa estatal sucesiones (7 tramos) ────────────────────────────────────
+// ─── Tarifa estatal del ISD (art. 21.2 LISD — 16 tramos) ─────────────────────
 
-export const TARIFA_ESTATAL_IS: TramoTarifaIS[] = [
+/**
+ * La escala del art. 21.2 de la Ley 29/1987, que el Estado aplica en defecto de tarifa
+ * autonómica. Es UNA SOLA para todo el impuesto: el art. 21 no distingue entre adquisiciones
+ * mortis causa e inter vivos, así que la misma tabla liquida una herencia y una donación. Lo
+ * que sí cambia de una modalidad a otra son las reducciones del art. 20, no la tarifa.
+ *
+ * Por eso la rama de donaciones la reexporta desde aquí como `TARIFA_ESTATAL_ID` en vez de
+ * transcribirla otra vez. Estuvo transcrita dos veces hasta el 11/09/2026 y las dos copias
+ * divergieron: la de esta rama tenía SIETE tramos y un tipo máximo del 25,50 % —umbrales
+ * reales del art. 21 emparejados con la cuota y el tipo de filas que no les correspondían, de
+ * modo que la escala era internamente coherente y legalmente inexistente— e infravaloraba la
+ * cuota SIEMPRE, tanto más cuanto mayor era la herencia: 824.000 € de base liquidable en el
+ * Grupo IV salían por 278.585,05 € en vez de los 416.565,35 € que exige la ley, 137.980,30 €
+ * por debajo (hallazgo 735 del Inspector). El comentario de la copia buena llegó a afirmar
+ * que la escala de donaciones era «diferente a sucesiones», que es la creencia que sostuvo
+ * el error mientras el dato correcto estaba a un directorio de distancia.
+ *
+ * Columna `cuota`: la cuota íntegra ACUMULADA al cerrar el tramo anterior, tal como la
+ * publica el BOE con sus propios redondeos. `calcularCuotaIntegraIS` la usa tal cual en vez
+ * de acumular marginales, porque manda la tabla, que es la ley.
+ */
+export const TARIFA_ESTATAL_ISD: TramoTarifaIS[] = [
   { hasta: 7993.46,    cuota: 0,          tipo: 7.65  },
-  { hasta: 31956.87,   cuota: 611.50,     tipo: 8.50  },
-  { hasta: 79881.18,   cuota: 2648.88,    tipo: 9.35  },
-  { hasta: 239389.13,  cuota: 7127.47,    tipo: 10.20 },
-  { hasta: 398777.54,  cuota: 23409.28,   tipo: 15.30 },
-  { hasta: 797555.08,  cuota: 47798.51,   tipo: 21.25 },
-  { hasta: Infinity,   cuota: 132549.07,  tipo: 25.50 },
+  { hasta: 15980.91,   cuota: 611.50,     tipo: 8.50  },
+  { hasta: 23968.36,   cuota: 1290.43,    tipo: 9.35  },
+  { hasta: 31955.81,   cuota: 2037.26,    tipo: 10.20 },
+  { hasta: 39943.26,   cuota: 2851.98,    tipo: 11.05 },
+  { hasta: 47930.72,   cuota: 3734.59,    tipo: 11.90 },
+  { hasta: 55918.17,   cuota: 4685.10,    tipo: 12.75 },
+  { hasta: 63905.62,   cuota: 5703.50,    tipo: 13.60 },
+  { hasta: 71893.07,   cuota: 6789.79,    tipo: 14.45 },
+  { hasta: 79880.52,   cuota: 7943.98,    tipo: 15.30 },
+  { hasta: 119757.67,  cuota: 9166.06,    tipo: 16.15 },
+  { hasta: 159634.83,  cuota: 15606.22,   tipo: 18.70 },
+  { hasta: 239389.13,  cuota: 23063.25,   tipo: 21.25 },
+  { hasta: 398777.54,  cuota: 40011.04,   tipo: 25.50 },
+  { hasta: 797555.08,  cuota: 80655.08,   tipo: 29.75 },
+  { hasta: Infinity,   cuota: 199291.40,  tipo: 34.00 },
 ];
+
+/** Nombre con el que la rama de sucesiones nombra la tarifa única del art. 21.2 LISD. */
+export const TARIFA_ESTATAL_IS: TramoTarifaIS[] = TARIFA_ESTATAL_ISD;
 
 // ─── Tarifa Cataluña sucesiones (5 tramos propios) ───────────────────────────
 
