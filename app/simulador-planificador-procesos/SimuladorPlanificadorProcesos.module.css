@@ -1029,3 +1029,12 @@
 [data-theme='dark'] .practicaNeutro {
   background: rgba(255, 255, 255, 0.03);
 }
+
+/* La convención de prioridad, junto al rótulo de su columna: el motor usa «1 = la más alta»
+   y hasta el 11/09/2026 no lo decía en ninguna parte (hallazgo 758). */
+.thNota {
+  display: block;
+  font-weight: 400;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}

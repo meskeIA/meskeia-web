@@ -108,13 +108,13 @@ test.describe('Cuadro de Punnett', () => {
 
     // Recuento a mano: 1/4 = 25 %, 2/4 = 50 %, 1/4 = 25 %. Suman 100 %.
     expect(await recuento(page)).toEqual([
-      ['AA', 'Dominante (A_)', '1', '25%'],
-      ['Aa', 'Dominante (A_)', '2', '50%'],
-      ['aa', 'Recesivo (aa)', '1', '25%'],
+      ['AA', 'Dominante (A_)', '1', '25 %'],
+      ['Aa', 'Dominante (A_)', '2', '50 %'],
+      ['aa', 'Recesivo (aa)', '1', '25 %'],
     ]);
 
     await expect(page.locator('[class*="interpretacionText"]')).toContainText(
-      'El 75% de la descendencia mostrará el fenotipo dominante y el 25% el fenotipo recesivo (proporción 3:1).',
+      'El 75 % de la descendencia mostrará el fenotipo dominante y el 25 % el fenotipo recesivo (proporción 3:1).',
     );
   });
 
@@ -128,9 +128,9 @@ test.describe('Cuadro de Punnett', () => {
       ['Aa', 'Aa'],
     ]);
     expect(await proporcion(page, 0)).toBe('1 Aa');
-    expect(await recuento(page)).toEqual([['Aa', 'Dominante (A_)', '4', '100%']]);
+    expect(await recuento(page)).toEqual([['Aa', 'Dominante (A_)', '4', '100 %']]);
     await expect(page.locator('[class*="interpretacionText"]')).toContainText(
-      'El 100% de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).',
+      'El 100 % de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).',
     );
   });
 
@@ -216,33 +216,36 @@ test.describe('Cuadro de Punnett', () => {
   // ============================================================
   // TESTIGOS de los hallazgos abiertos (ver cabecera)
   // ============================================================
-  test('TESTIGO A — la columna «Proporción (%)» suma 101 % en el dihíbrido clásico', async ({
+  test('REPARADO 11/09 (751) — la columna «Proporción (%)» suma 100 % y da los valores exactos', async ({
     page,
   }) => {
     await page.getByRole('button', { name: /Dihíbrido clásico/ }).click();
     const filas = await recuento(page);
 
-    // A mano: 1/16 = 6,25 % y 2/16 = 12,5 %. La app usa Math.round y no muestra decimales,
-    // así que escribe 6 % y 13 % (Math.round(12.5) = 13, redondeo hacia arriba).
+    // A mano: 1/16 = 6,25 % y 2/16 = 12,5 %. Con Math.round y sin decimales la app escribía
+    // «6%» y «13%» —Math.round(12,5) redondea hacia arriba— y la columna sumaba 101 % en el
+    // caso de aula por excelencia de esta app, que además pide al alumno «verifica siempre el
+    // recuento: si la suma no coincide, has cometido un error».
     expect(filas.map(f => f[3])).toEqual([
-      '6%', // AABB — exacto 6,25 %
-      '13%', // AABb — exacto 12,5 %
-      '13%', // AaBB — exacto 12,5 %
-      '25%', // AaBb — exacto 25 %
-      '6%', // AAbb — exacto 6,25 %
-      '13%', // Aabb — exacto 12,5 %
-      '6%', // aaBB — exacto 6,25 %
-      '13%', // aaBb — exacto 12,5 %
-      '6%', // aabb — exacto 6,25 %
+      '6,25 %', // AABB
+      '12,5 %', // AABb
+      '12,5 %', // AaBB
+      '25 %',   // AaBb
+      '6,25 %', // AAbb
+      '12,5 %', // Aabb
+      '6,25 %', // aaBB
+      '12,5 %', // aaBb
+      '6,25 %', // aabb
     ]);
 
-    const suma = filas.reduce((acc, f) => acc + parseInt(f[3].replace('%', ''), 10), 0);
-    // Esperado: 100. Obtenido hoy: 101. Y el propio bloque educativo pide al alumno
-    // «verifica el recuento» y «la suma debe coincidir»: aquí no coincide.
-    expect(suma).toBe(101);
+    const suma = filas.reduce(
+      (acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')),
+      0,
+    );
+    expect(suma).toBeCloseTo(100, 6);
   });
 
-  test('TESTIGO B — Aa × aa se interpreta como «proporción 2:2» en vez de 1:1', async ({
+  test('REPARADO 11/09 (752) — Aa × aa se interpreta como «proporción 1:1», ya simplificada', async ({
     page,
   }) => {
     // Es uno de los cinco escenarios de un clic: «Portador × Recesivo (Aa×aa)».
@@ -251,15 +254,17 @@ test.describe('Cuadro de Punnett', () => {
     // La tarjeta de proporciones SÍ simplifica (formatRatio divide por el mcd).
     expect(await proporcion(page, 1)).toBe('1 dominante : 1 recesivo');
 
-    // La interpretación de debajo NO: imprime los conteos crudos (2 y 2). El bloque
-    // educativo de la misma página enseña «Aa × aa → 1 dom : 1 rec (1:1)» y el paso 5
-    // pide «expresa como razón simplificada».
-    await expect(page.locator('[class*="interpretacionText"]')).toContainText('(proporción 2:2)');
+    // Y la interpretación de debajo también, que antes imprimía los conteos crudos: el bloque
+    // educativo de la misma página enseña «Aa × aa → 1 dom : 1 rec (1:1)» y el paso 5 pide
+    // «expresa como razón simplificada», así que un alumno copiaba «2:2» a su examen.
+    await expect(page.locator('[class*="interpretacionText"]')).toContainText('(proporción 1:1)');
   });
 
-  test('TESTIGO C — se promete «trihíbrido (3 genes)» y solo hay dos modos', async ({ page }) => {
-    // El subtítulo del hero lo anuncia...
-    await expect(page.locator('[class*="subtitle"]').first()).toContainText('trihíbrido (3 genes)');
+  test('REPARADO 11/09 (750) — no se promete un trihíbrido que la herramienta no hace', async ({ page }) => {
+    // El subtítulo del hero anuncia exactamente lo que hay...
+    const subtitulo = page.locator('[class*="subtitle"]').first();
+    await expect(subtitulo).toContainText('monohíbrido (1 gen) y dihíbrido (2 genes)');
+    await expect(subtitulo).not.toContainText('trihíbrido');
 
     // ...y el selector de tipo de herencia solo ofrece dos opciones.
     const tipos = page.locator('[role="group"][aria-label="Tipo de herencia"] button');
@@ -275,7 +280,7 @@ test.describe('Cuadro de Punnett', () => {
     await expect(page.locator('#p2gC')).toHaveCount(0);
   });
 
-  test('TESTIGO D — un valor inválido forzado en el <select> se calcula como «aa»', async ({
+  test('REPARADO 11/09 (754) — un valor inválido forzado en el <select> no entra en el estado', async ({
     page,
   }) => {
     await page.selectOption('#p1gA', 'AA');
@@ -287,8 +292,10 @@ test.describe('Cuadro de Punnett', () => {
 
     // Vía NO alcanzable por teclado ni ratón: se escribe el valor con el setter nativo,
     // como haría una extensión o un script. El navegador rechaza el valor (el desplegable
-    // se queda en AA), pero el evento change sí llega a React con la cadena vacía y
-    // `gametosMonohibrido` cae en su `return ['a','a']` final.
+    // se queda en AA) y el evento change llega a React con la cadena vacía, que hasta el
+    // 11/09/2026 se casteaba a ciegas y hacía caer a `gametosMonohibrido` en su
+    // `return ['a','a']` final: la rejilla pasaba a calcularse con un P1 homocigoto
+    // recesivo mientras el desplegable seguía enseñando AA (hallazgo 754).
     const valorVisible = await page.evaluate(() => {
       const sel = document.querySelector<HTMLSelectElement>('#p1gA');
       if (!sel) return 'sin select';
@@ -303,12 +310,12 @@ test.describe('Cuadro de Punnett', () => {
 
     // El desplegable sigue diciendo AA...
     expect(valorVisible).toBe('AA');
-    // ...pero la rejilla ya se calcula con un P1 homocigoto recesivo: gametos a, a.
-    // Esperado: rechazo o mantener AA × AA. Obtenido: Aa en las cuatro celdas.
-    await expect(page.locator(`${CUADRO} tbody th`)).toHaveText(['a', 'a']);
+    // ...y la rejilla también: lo que no se reconoce no entra en el estado, así que se
+    // mantiene el valor anterior y lo que se ve sigue siendo lo que se calcula.
+    await expect(page.locator(`${CUADRO} tbody th`)).toHaveText(['A', 'A']);
     expect(await rejilla(page)).toEqual([
-      ['Aa', 'Aa'],
-      ['Aa', 'Aa'],
+      ['AA', 'AA'],
+      ['AA', 'AA'],
     ]);
   });
 });

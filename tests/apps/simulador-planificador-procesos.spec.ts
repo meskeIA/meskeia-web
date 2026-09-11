@@ -330,3 +330,160 @@ test.describe('simulador-planificador-procesos · el motor', () => {
     expect((await bloquesGantt(page)).length).toBeGreaterThan(0);
   });
 });
+
+// ════════════════════════════════════════════════════════════════════════════
+// REPARACIÓN 11/09/2026 — los seis hallazgos de la inspección de esta app.
+// Los casos son los del acta, resueltos a mano antes de ejecutarlos.
+// ════════════════════════════════════════════════════════════════════════════
+
+test.describe('simulador-planificador-procesos · reparación 11/09/2026', () => {
+  /**
+   * HALLAZGO 757 (alto) — el ejemplo «Inanición priority» no producía inanición NUNCA, y la app
+   * afirmaba en dos sitios que sí: la FAQ («por eso ves procesos sin ejecutar en el ejemplo de
+   * inanición») y la ficha del opositor («observa qué procesos quedan fuera»). Es estructural:
+   * con un conjunto finito de procesos y prioridades estáticas los dos bucles de simularPriority
+   * vacían siempre `restantes`, así que `resultado.inanicion` era [] y el aviso rojo no podía
+   * encenderse jamás — la app rotulaba en verde «Sin inanición».
+   *
+   * Lo que el simulador sí puede enseñar es la POSTERGACIÓN, que es el síntoma: P1, con la peor
+   * prioridad (10), llega en t=0 con una ráfaga de 6 ut y no termina hasta t=23.
+   */
+  test('757 — el ejemplo de inanición enseña la postergación, que es lo que de verdad ocurre', async ({
+    page,
+  }) => {
+    await page.goto(URL_APP);
+    await page.getByRole('button', { name: /Inanición priority/ }).click();
+
+    // Los cinco terminan: es un hecho del enunciado, no un defecto que ocultar.
+    for (const pid of ['P1', 'P2', 'P3', 'P4', 'P5']) {
+      const fila = await filaMetricas(page, pid);
+      expect(fila[4], `${pid} tiene que terminar`).not.toBe('—');
+    }
+
+    // Y el aviso habla de lo que se ve, no de procesos que queden fuera.
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Postergación:' });
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('P1');
+    await expect(aviso).toContainText('inanición');
+
+    // Los dos textos que prometían lo que no pasa
+    const cuerpo = await page.evaluate(() => {
+      const clon = document.body.cloneNode(true) as HTMLElement;
+      clon.querySelectorAll('script, style').forEach((n) => n.remove());
+      return (clon.textContent ?? '').replace(/\s+/g, ' ');
+    });
+    expect(cuerpo).not.toContain('observa qué procesos quedan fuera');
+    expect(cuerpo).not.toContain('por eso ves procesos sin ejecutar');
+    expect(cuerpo).not.toContain('Sin inanición');
+  });
+
+  /**
+   * HALLAZGO 758 (alto) — el motor usa «número menor = más prioritario» y no lo decía en ningún
+   * sitio: ni la columna, ni el aria-label, ni el texto del conmutador. Mientras, el bloque
+   * educativo avisaba de que usar la convención contraria es un error frecuente y remataba «lee
+   * siempre la convención del problema», sin decir cuál usa la app. Un alumno cuyo enunciado
+   * numere al revés obtenía el Gantt exactamente invertido, sin ningún aviso.
+   */
+  test('758 — la app declara su convención de prioridad, y es la que aplica', async ({ page }) => {
+    await page.goto(URL_APP);
+    await page.getByRole('button', { name: 'Priority Por prioridad' }).click();
+
+    // Declarada en la columna y en el nombre accesible del campo
+    await expect(page.getByRole('columnheader', { name: /Prioridad/ })).toContainText('1 = la más alta');
+    await expect(page.getByLabel(/Prioridad del proceso P1/)).toHaveAttribute(
+      'aria-label',
+      /1 es la más alta/,
+    );
+
+    // Y es la que aplica: P1 con prioridad 1 se ejecuta antes que P2 con prioridad 9
+    await ponerProceso(page, 'P1', 0, 4);
+    await ponerProceso(page, 'P2', 0, 4);
+    await page.getByLabel('Prioridad del proceso P1', { exact: false }).fill('1');
+    await page.getByLabel('Prioridad del proceso P2', { exact: false }).fill('9');
+    // Se compara el orden RELATIVO de los dos, sin depender de P3, que el enunciado por
+    // defecto trae con su propia prioridad.
+    const orden = await bloquesGantt(page);
+    expect(orden.indexOf('P1')).toBeLessThan(orden.indexOf('P2'));
+  });
+
+  /**
+   * HALLAZGO 759 (medio, cálculo) — el desempate no era el del libro. Con dos procesos igual de
+   * buenos, el `reduce` recorría el array en el orden de la TABLA y ganaba el PID más bajo
+   * aunque hubiera llegado el último; la convención de Silberschatz es que el empate lo rompe
+   * FCFS, el que lleva más tiempo esperando.
+   *
+   * A MANO — SJF con P1(llegada 5, ráfaga 4), P2(2, 4) y P3(2, 3):
+   *   t=0..2 ociosa · t=2 llegan P2 y P3, gana P3 por ráfaga menor → P3[2,5]
+   *   t=5 empatan a ráfaga 4 P1 (acaba de llegar) y P2 (espera desde t=2) → gana P2 por FCFS
+   *   P2[5,9] · P1[9,13]
+   * Antes salía P1[5,9] y P2[9,13]: las medias coinciden, pero la tabla por proceso —que es lo
+   * que se pide en el examen— salía con dos filas intercambiadas.
+   */
+  test('759 — el empate lo rompe FCFS, no el orden de la tabla', async ({ page }) => {
+    await page.goto(URL_APP);
+    await page.getByRole('button', { name: BTN_SJF }).click();
+    await ponerProceso(page, 'P1', 5, 4);
+    await ponerProceso(page, 'P2', 2, 4);
+    await ponerProceso(page, 'P3', 2, 3);
+
+    expect(await bloquesGantt(page)).toEqual(['—', 'P3', 'P2', 'P1']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '2', '4', '5', '9', '3', '7', '3']);
+    expect(await filaMetricas(page, 'P1')).toEqual(['P1', '5', '4', '9', '13', '4', '8', '4']);
+  });
+
+  /**
+   * HALLAZGO 760 (medio, cálculo) — con una ráfaga decimal, SRTF y Priority apropiativo
+   * inventaban tiempo de espera: los dos avanzan tick a tick (`restantes[id] -= 1`), así que una
+   * ráfaga de 2,5 consumía 3 ticks, el fin salía redondeado hacia arriba y `espera = turnaround
+   * − ráfaga` fabricaba medio ut de espera para un proceso que estaba solo en el sistema y había
+   * llegado en t=0. El campo aceptaba el decimal al PEGARLO, que es justo lo que hace quien
+   * copia el dato de un enunciado.
+   */
+  test('760 — la ráfaga se trabaja en unidades enteras, que es lo que el motor sabe simular', async ({
+    page,
+  }) => {
+    await page.goto(URL_APP);
+    const rafagaP1 = page.getByLabel('Ráfaga de CPU del proceso P1');
+    await rafagaP1.fill('2.5');
+    await rafagaP1.blur();
+
+    // El campo declara su paso y el valor entra redondeado: ni 2,5 en la tabla ni media
+    // unidad de espera inventada.
+    await expect(rafagaP1).toHaveAttribute('step', '1');
+    const fila = await filaMetricas(page, 'P1');
+    expect(fila[2]).toBe('3');
+    expect(fila[5]).toBe('0'); // un proceso solo, llegado en t=0, no puede esperar
+  });
+
+  /**
+   * HALLAZGO 761 (bajo) — la tabla «Métricas por proceso» y la tarjeta «Tiempo total» imprimían
+   * el número crudo de JavaScript mientras las otras cuatro tarjetas sí pasaban por formatNumber:
+   * la misma pantalla mezclaba «0,50 ut» en una tarjeta y «0.5» en la tabla que la alimenta.
+   */
+  test('761 — la tabla y el tiempo total van en formato español', async ({ page }) => {
+    await page.goto(URL_APP);
+    const tabla = await page.locator('table').filter({ hasText: 'Turnaround' }).first().innerText();
+    expect(tabla).not.toMatch(/\d+\.\d/);
+    expect(await tarjeta(page, 'Tiempo total')).toBe('18ut');
+  });
+
+  /**
+   * HALLAZGO 762 (bajo) — el máximo declarado en los campos no se aplicaba: los manejadores solo
+   * ponían suelo (`Math.max(1, …)`), así que el `max={50}` de la ráfaga era decorativo y un 999
+   * entraba en la simulación y pintaba un Gantt de ~40.000 px. La asimetría engaña, porque el
+   * mínimo sí se fuerza de verdad.
+   */
+  test('762 — el máximo declarado en la ráfaga se aplica, como ya se aplicaba el mínimo', async ({
+    page,
+  }) => {
+    await page.goto(URL_APP);
+    const rafagaP1 = page.getByLabel('Ráfaga de CPU del proceso P1');
+
+    await rafagaP1.fill('999');
+    expect((await filaMetricas(page, 'P1'))[2]).toBe('50');
+
+    // Y el suelo sigue donde estaba
+    await rafagaP1.fill('0');
+    expect((await filaMetricas(page, 'P1'))[2]).toBe('1');
+  });
+});

@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Cuadro de Punnett Online: Genética Mendeliana | meskeIA',
   description:
-    'Cuadro (tabla) de Punnett online para cruces monohíbrido, dihíbrido y trihíbrido (3 genes). Calcula proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas, y pasa de genotipo a fenotipo aplicando las leyes de Mendel.',
+    'Cuadro (tabla) de Punnett online para cruces monohíbrido (1 gen) y dihíbrido (2 genes). Calcula proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas, y pasa de genotipo a fenotipo aplicando las leyes de Mendel.',
   keywords:
-    'cuadro de Punnett, tabla de Punnett, cuadro de Punnett online, genética mendeliana, Mendel, genotipo, fenotipo, proporciones fenotípicas, cruce monohíbrido, cruce dihíbrido, trihíbrido, 3 genes, herencia, alelos, dominante, recesivo, leyes de Mendel, secundaria, preparatoria, educación media, biología',
+    'cuadro de Punnett, tabla de Punnett, cuadro de Punnett online, genética mendeliana, Mendel, genotipo, fenotipo, proporciones fenotípicas, cruce monohíbrido, cruce dihíbrido, herencia, alelos, dominante, recesivo, leyes de Mendel, secundaria, preparatoria, educación media, biología',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cuadro de Punnett Online: Genética Mendeliana | meskeIA',
     description:
-      'Tabla de Punnett online para cruces monohíbrido, dihíbrido y trihíbrido. Proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas al instante.',
+      'Tabla de Punnett online para cruces monohíbrido y dihíbrido. Proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas al instante.',
     url: 'https://meskeia.com/simulador-punnett/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Cuadro de Punnett Online — Genética Mendeliana',
   description:
-    'Cuadro (tabla) de Punnett online para cruces monohíbrido, dihíbrido y trihíbrido (3 genes). Calcula proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas, pasa de genotipo a fenotipo, visualiza los gametos y explora escenarios de las leyes de Mendel.',
+    'Cuadro (tabla) de Punnett online para cruces monohíbrido (1 gen) y dihíbrido (2 genes). Calcula proporciones fenotípicas (3:1, 9:3:3:1) y genotípicas, pasa de genotipo a fenotipo, visualiza los gametos y explora escenarios de las leyes de Mendel.',
   url: 'https://meskeia.com/simulador-punnett/',
   category: 'EducationalApplication',
   features: [
@@ -57,7 +57,6 @@ export const jsonLd = generateWebAppSchema({
     'proporciones fenotípicas',
     'cruce monohíbrido',
     'cruce dihíbrido',
-    'trihíbrido 3 genes',
     'leyes de Mendel',
   ],
 });
@@ -127,7 +126,7 @@ export const faqJsonLd = {
       name: '¿Se puede hacer un cuadro de Punnett de 3 genes (trihíbrido)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Un cruce trihíbrido AaBbCc × AaBbCc implica 3 genes: cada progenitor produce 2³ = 8 tipos de gametos, por lo que el cuadro de Punnett completo tiene 8 × 8 = 64 celdas. La proporción fenotípica resultante en la F2 es 27:9:9:9:3:3:3:1. Por su tamaño, en la práctica el trihíbrido suele resolverse por el método de la probabilidad (multiplicando las proporciones 3:1 de cada gen) en lugar de dibujar las 64 celdas a mano.',
+        text: 'Se puede, pero casi nunca se dibuja: un cruce trihíbrido AaBbCc × AaBbCc implica 3 genes, cada progenitor produce 2³ = 8 tipos de gametos y el cuadro completo tiene 8 × 8 = 64 celdas, con una proporción fenotípica en F2 de 27:9:9:9:3:3:3:1. En la práctica se resuelve por el método de la probabilidad, multiplicando las proporciones 3:1 de cada gen por separado, en lugar de las 64 celdas a mano. Esta herramienta cubre el monohíbrido (1 gen, 4 celdas) y el dihíbrido (2 genes, 16 celdas), que son los que se piden resueltos con el cuadro.',
       },
     },
     {

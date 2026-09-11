@@ -10,6 +10,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorPunnett.module.css';
 
@@ -58,9 +59,34 @@ const ESCENARIOS: Escenario[] = [
 const GENOTIPOS_A: GenotipoPar[] = ['AA', 'Aa', 'aa'];
 const GENOTIPOS_B: GenotipoParB[] = ['BB', 'Bb', 'bb'];
 
+/** Type guards de los <select>: lo que no se reconoce no entra en el estado, y así lo que se
+ *  ve y lo que se calcula no pueden separarse (hallazgo 754). */
+const esGenotipoPar = (v: string): v is GenotipoPar => GENOTIPOS_A.includes(v as GenotipoPar);
+const esGenotipoParB = (v: string): v is GenotipoParB => GENOTIPOS_B.includes(v as GenotipoParB);
+/**
+ * Porcentaje en formato español, con decimales SOLO cuando hacen falta: «25 %», «12,5 %»,
+ * «6,25 %». Con Math.round a secas, 1/16 salía «6%» y 2/16 «13%», y la columna sumaba 101 %
+ * en el dihíbrido clásico — en una página que pide al alumno verificar justamente esa suma
+ * (hallazgo 751). Y 12,5 % es un dato que hay que poder copiar al examen.
+ */
+const porcentaje = (v: number): string => {
+  const t = formatNumber(v, 2);
+  return t.includes(',') ? t.replace(/0+$/, '').replace(/,$/, '') : t;
+};
 // ============================================================
 // LÓGICA PURA (fuera del componente)
 // ============================================================
+/**
+ * Los dos gametos de un genotipo.
+ *
+ * La validación vive AHORA en la entrada, no aquí: los <select> pasaban el valor con un `as
+ * GenotipoPar` sin comprobar, y esta función terminaba devolviendo [a, a] para cualquier cosa
+ * que no fuese AA ni Aa. Un valor desconocido —el navegador rechaza la opción y el desplegable
+ * sigue enseñando «AA», pero React recibe cadena vacía— hacía que la rejilla se calculase con
+ * un progenitor homocigoto recesivo: lo que se ve y lo que se calcula dejaban de ser lo mismo,
+ * sin ningún aviso (hallazgo 754). Con `esGenotipoPar` en el onChange, lo que no se reconoce no
+ * entra en el estado y el valor anterior se mantiene, así que aquí el tipo ya está garantizado.
+ */
 function gametosMonohibrido(genotipo: GenotipoPar): [Alelo, Alelo] {
   if (genotipo === 'AA') return ['A', 'A'];
   if (genotipo === 'Aa') return ['A', 'a'];
@@ -196,11 +222,18 @@ function interpretarMonohibrido(celdas: CeldaPunnett[]): string {
   const total = celdas.length;
   const dom = celdas.filter(c => c.fenotipo === 'dominante').length;
   const rec = celdas.filter(c => c.fenotipo === 'recesivo').length;
-  const pctDom = Math.round((dom / total) * 100);
-  const pctRec = Math.round((rec / total) * 100);
-  if (dom === 0) return 'El 100% de la descendencia mostrará el fenotipo recesivo.';
-  if (rec === 0) return 'El 100% de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).';
-  return `El ${pctDom}% de la descendencia mostrará el fenotipo dominante y el ${pctRec}% el fenotipo recesivo (proporción ${dom}:${rec}).`;
+  // Mismo criterio que la tabla: sin redondear a entero, que en el dihíbrido falseaba la suma
+  const pctDom = porcentaje((dom / total) * 100);
+  const pctRec = porcentaje((rec / total) * 100);
+  if (dom === 0) return 'El 100 % de la descendencia mostrará el fenotipo recesivo.';
+  if (rec === 0) return 'El 100 % de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).';
+  // La razón se simplifica con el mismo criterio que `formatRatio` usa dos bloques más
+  // arriba: sin esto, el cruce de prueba Aa × aa imprimía «proporción 2:2» mientras la tarjeta
+  // de al lado decía «1 dominante : 1 recesivo» y el bloque educativo enseñaba 1:1. Un alumno
+  // que copiara la línea de «Resultado:» escribía 2:2 en su examen (hallazgo 752).
+  const mcdRazon = (a: number, b: number): number => (b === 0 ? a : mcdRazon(b, a % b));
+  const divisor = mcdRazon(dom, rec) || 1;
+  return `El ${pctDom} % de la descendencia mostrará el fenotipo dominante y el ${pctRec} % el fenotipo recesivo (proporción ${dom / divisor}:${rec / divisor}).`;
 }
 
 function interpretarDihibrido(celdas: CeldaPunnett[]): string {
@@ -312,7 +345,7 @@ export default function SimuladorPunnettPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}><span aria-hidden="true">🧬</span> Cuadro de Punnett online</h1>
         <p className={styles.subtitle}>
-          Tabla de Punnett para cruces monohíbrido, dihíbrido y trihíbrido (3 genes):
+          Tabla de Punnett para cruces monohíbrido (1 gen) y dihíbrido (2 genes):
           pasa de genotipo a fenotipo y obtén las proporciones fenotípicas (3:1, 9:3:3:1)
           aplicando las leyes de Mendel
         </p>
@@ -351,7 +384,7 @@ export default function SimuladorPunnettPage() {
             id="p1gA"
             className={styles.genoSelect}
             value={p1gA}
-            onChange={e => setP1gA(e.target.value as GenotipoPar)}
+            onChange={e => { if (esGenotipoPar(e.target.value)) setP1gA(e.target.value); }}
             aria-label="Genotipo gen A del progenitor 1"
           >
             {GENOTIPOS_A.map(g => (
@@ -367,7 +400,7 @@ export default function SimuladorPunnettPage() {
                 id="p1gB"
                 className={styles.genoSelect}
                 value={p1gB}
-                onChange={e => setP1gB(e.target.value as GenotipoParB)}
+                onChange={e => { if (esGenotipoParB(e.target.value)) setP1gB(e.target.value); }}
                 aria-label="Genotipo gen B del progenitor 1"
               >
                 {GENOTIPOS_B.map(g => (
@@ -387,7 +420,7 @@ export default function SimuladorPunnettPage() {
             id="p2gA"
             className={styles.genoSelect}
             value={p2gA}
-            onChange={e => setP2gA(e.target.value as GenotipoPar)}
+            onChange={e => { if (esGenotipoPar(e.target.value)) setP2gA(e.target.value); }}
             aria-label="Genotipo gen A del progenitor 2"
           >
             {GENOTIPOS_A.map(g => (
@@ -403,7 +436,7 @@ export default function SimuladorPunnettPage() {
                 id="p2gB"
                 className={styles.genoSelect}
                 value={p2gB}
-                onChange={e => setP2gB(e.target.value as GenotipoParB)}
+                onChange={e => { if (esGenotipoParB(e.target.value)) setP2gB(e.target.value); }}
                 aria-label="Genotipo gen B del progenitor 2"
               >
                 {GENOTIPOS_B.map(g => (
@@ -534,7 +567,14 @@ export default function SimuladorPunnettPage() {
                   <td><strong>{gt}</strong></td>
                   <td>{celda ? nombreFenotipo(celda.fenotipo) : '-'}</td>
                   <td>{n}</td>
-                  <td>{Math.round((n / celdas.length) * 100)}%</td>
+                  {/*
+                    Math.round sin decimales convertía 6,25 % en «6%» y 12,5 % en «13%», y la
+                    columna sumaba 101 % en el dihíbrido clásico — el caso de aula por excelencia
+                    de esta app, en una página que pide al alumno «verifica siempre el recuento:
+                    si la suma no coincide, has cometido un error» (hallazgo 751). Además 12,5 %
+                    es un dato que el alumno necesita escribir, y «13%» no lo es.
+                  */}
+                  <td>{porcentaje((n / celdas.length) * 100)} %</td>
                 </tr>
               );
             })}
@@ -674,7 +714,9 @@ export default function SimuladorPunnettPage() {
               <span className={styles.scenarioIcon} aria-hidden="true">🩸</span>
               <strong>Grupo sanguíneo ABO (codominancia)</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
-                Los alelos I<sup>A</sup> e I<sup>B</sup> son codominantes sobre i. Un cruce I<sup>A</sup>i × I<sup>B</sup>i produce
+                Los alelos I<sup>A</sup> e I<sup>B</sup> son codominantes <strong>entre sí</strong> —el
+                heterocigoto I<sup>A</sup>I<sup>B</sup> expresa los dos y da el grupo AB— y ambos son
+                simplemente dominantes sobre i. Un cruce I<sup>A</sup>i × I<sup>B</sup>i produce
                 grupos A, B, AB y O en proporción 1:1:1:1. No aplica dominancia estricta.
               </p>
             </div>

@@ -129,6 +129,45 @@ function colorParaProceso(pid: string, lista: Proceso[]): string {
   return PALETA_COLORES[idx % PALETA_COLORES.length];
 }
 
+/** Topes de los campos. Antes vivían solo en el atributo `max`, que nadie comprobaba. */
+const MAX_LLEGADA = 99;
+const MAX_RAFAGA = 50;
+const MAX_PRIORIDAD = 10;
+
+/**
+ * Acota un valor al rango declarado.
+ *
+ * Los manejadores solo ponían SUELO (`Math.max(1, …)`), así que el `max={50}` de la ráfaga era
+ * decorativo: un 999 entraba en la simulación y pintaba un Gantt de 40.000 px. La asimetría
+ * engañaba, porque el mínimo sí se fuerza de verdad y el usuario supone que el máximo también
+ * (hallazgo 762).
+ */
+function acotar(valor: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, valor));
+}
+
+/**
+ * El desempate es FCFS: entre dos procesos igual de buenos gana el que lleva más tiempo
+ * esperando, que es la convención de Silberschatz y la que se corrige en un examen.
+ *
+ * Hasta el 11/09/2026 los tres algoritmos resolvían el empate con un `reduce` que recorre el
+ * array en el orden de la TABLA, así que ganaba el PID más bajo aunque hubiera llegado el
+ * último: en SJF con P1(llegada 5, ráfaga 4), P2(2, 4) y P3(2, 3), en t=5 empataban P1 —recién
+ * llegado— y P2 —esperando desde t=2— y se ejecutaba P1. Las medias coincidían, pero la tabla
+ * por proceso, que es lo que se pide en el examen, salía con dos filas intercambiadas
+ * (hallazgo 759). El último criterio sigue siendo el orden de la tabla, para que el resultado
+ * sea determinista cuando también empatan en llegada.
+ */
+function mejorPorRafaga(a: Proceso, b: Proceso): Proceso {
+  if (b.rafaga !== a.rafaga) return b.rafaga < a.rafaga ? b : a;
+  return b.llegada < a.llegada ? b : a;
+}
+
+function mejorPorPrioridad(a: Proceso, b: Proceso): Proceso {
+  if (b.prioridad !== a.prioridad) return b.prioridad < a.prioridad ? b : a;
+  return b.llegada < a.llegada ? b : a;
+}
+
 // FCFS: ordenar por llegada, ejecutar en orden
 function simularFCFS(procesos: Proceso[]): { bloques: BloqueGantt[]; ordenInicio: Record<string, number> } {
   const orden = [...procesos].sort((a, b) => a.llegada - b.llegada);
@@ -169,7 +208,7 @@ function simularSJF(procesos: Proceso[]): { bloques: BloqueGantt[]; ordenInicio:
       t = proximo.llegada;
       continue;
     }
-    const elegido = disponibles.reduce((min, p) => (p.rafaga < min.rafaga ? p : min));
+    const elegido = disponibles.reduce(mejorPorRafaga);
     ordenInicio[elegido.id] = t;
     bloques.push({
       pid: elegido.id,
@@ -326,7 +365,7 @@ function simularPriority(procesos: Proceso[], apropiativo: boolean): { bloques: 
         t = proximo.llegada;
         continue;
       }
-      const elegido = disponibles.reduce((min, p) => (p.prioridad < min.prioridad ? p : min));
+      const elegido = disponibles.reduce(mejorPorPrioridad);
       ordenInicio[elegido.id] = t;
       bloques.push({
         pid: elegido.id,
@@ -365,7 +404,7 @@ function simularPriority(procesos: Proceso[], apropiativo: boolean): { bloques: 
       t += 1;
       continue;
     }
-    const elegido = disponibles.reduce((min, p) => (p.prioridad < min.prioridad ? p : min));
+    const elegido = disponibles.reduce(mejorPorPrioridad);
     if (ordenInicio[elegido.id] === undefined) {
       ordenInicio[elegido.id] = t;
     }
@@ -551,6 +590,23 @@ export default function SimuladorPlanificadorProcesos() {
     [procesos, algoritmo, quantum, apropiativo],
   );
 
+  /**
+   * El proceso postergado: el de prioridad más baja, si espera más de lo que dura.
+   *
+   * Es lo que sustituye al aviso «Inanición detectada», que no podía encenderse nunca con un
+   * lote finito de procesos (hallazgo 757). La condición es que la espera supere a la ráfaga,
+   * que es cuando la postergación se ve de verdad en la tabla.
+   */
+  const postergado = useMemo(() => {
+    if (algoritmo !== 'priority') return null;
+    const peorPrioridad = Math.max(...procesos.map((p) => p.prioridad));
+    const candidato = procesos.find((p) => p.prioridad === peorPrioridad);
+    if (!candidato) return null;
+    const m = resultado.metricas.find((x) => x.pid === candidato.id);
+    if (!m || m.espera <= m.rafaga) return null;
+    return { pid: m.pid, prioridad: candidato.prioridad, espera: m.espera, rafaga: m.rafaga };
+  }, [algoritmo, procesos, resultado]);
+
   // Un enunciado distinto invalida la corrección anterior: si no se descarta, la
   // pantalla seguiría marcando en verde casillas que ya no coinciden con nada.
   useEffect(() => {
@@ -723,7 +779,7 @@ export default function SimuladorPlanificadorProcesos() {
                 Apropiativo (preempt)
               </label>
               <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                Si está activo, un proceso de mayor prioridad que llega interrumpe al actual.
+                Si está activo, un proceso más prioritario —es decir, con un número MENOR— interrumpe al actual cuando llega.
               </span>
             </div>
           )}
@@ -760,7 +816,16 @@ export default function SimuladorPlanificadorProcesos() {
                   <th>PID</th>
                   <th>Llegada</th>
                   <th>Ráfaga</th>
-                  <th>Prioridad</th>
+                  {/*
+                    La convención se declara AQUÍ y no solo en el bloque educativo: el motor usa
+                    «número menor = más prioritario», y hasta el 11/09/2026 no lo decía en ningún
+                    sitio — ni la columna, ni el aria-label, ni el texto del conmutador—, mientras
+                    la propia app avisaba de que «usar mayor número = mayor prioridad cuando el
+                    enunciado dice lo contrario» es un error frecuente. Un alumno cuyo enunciado
+                    use 10 = máxima prioridad tecleaba los números tal cual y obtenía el Gantt
+                    exactamente invertido, sin ningún aviso (hallazgo 758).
+                  */}
+                  <th>Prioridad <span className={styles.thNota}>(1 = la más alta)</span></th>
                   <th>Color</th>
                   <th>&nbsp;</th>
                 </tr>
@@ -773,9 +838,9 @@ export default function SimuladorPlanificadorProcesos() {
                       <input
                         type="number"
                         min={0}
-                        max={99}
+                        max={MAX_LLEGADA}
                         value={p.llegada}
-                        onChange={(e) => actualizarProceso(idx, 'llegada', Math.max(0, Number(e.target.value) || 0))}
+                        onChange={(e) => actualizarProceso(idx, 'llegada', acotar(Number(e.target.value) || 0, 0, MAX_LLEGADA))}
                         className={styles.procesoInput}
                         aria-label={`Tiempo de llegada del proceso ${p.id}`}
                       />
@@ -784,9 +849,11 @@ export default function SimuladorPlanificadorProcesos() {
                       <input
                         type="number"
                         min={1}
-                        max={50}
+                        max={MAX_RAFAGA}
+                        step={1}
+                        title="Unidades de tiempo enteras"
                         value={p.rafaga}
-                        onChange={(e) => actualizarProceso(idx, 'rafaga', Math.max(1, Number(e.target.value) || 1))}
+                        onChange={(e) => actualizarProceso(idx, 'rafaga', acotar(Math.round(Number(e.target.value) || 1), 1, MAX_RAFAGA))}
                         className={styles.procesoInput}
                         aria-label={`Ráfaga de CPU del proceso ${p.id}`}
                       />
@@ -798,11 +865,11 @@ export default function SimuladorPlanificadorProcesos() {
                         max={10}
                         value={p.prioridad}
                         onChange={(e) =>
-                          actualizarProceso(idx, 'prioridad', Math.min(10, Math.max(1, Number(e.target.value) || 1)))
+                          actualizarProceso(idx, 'prioridad', acotar(Math.round(Number(e.target.value) || 1), 1, MAX_PRIORIDAD))
                         }
                         className={styles.procesoInput}
                         disabled={algoritmo !== 'priority'}
-                        aria-label={`Prioridad del proceso ${p.id}`}
+                        aria-label={`Prioridad del proceso ${p.id} (1 es la más alta, ${MAX_PRIORIDAD} la más baja)`}
                       />
                     </td>
                     <td>
@@ -956,24 +1023,36 @@ export default function SimuladorPlanificadorProcesos() {
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Tiempo total</span>
                 <div className={styles.metricValue}>
-                  {resultado.tiempoTotal}
+                  {formatNumber(resultado.tiempoTotal, 0)}
                   <span className={styles.metricUnit}>ut</span>
                 </div>
               </div>
             </div>
 
-            {algoritmo === 'priority' && resultado.inanicion.length > 0 ? (
-              <div className={styles.inanicionAlert} role="alert">
-                <span aria-hidden="true">⚠️</span>
+            {/*
+              Aquí había un par de avisos —«Inanición detectada» en rojo y «Sin inanición» en
+              verde— que no informaban de nada: con un conjunto FINITO de procesos y prioridades
+              ESTÁTICAS, los dos bucles de simularPriority vacían siempre `restantes`, así que
+              `resultado.inanicion` era siempre [] y el rojo no podía encenderse jamás. Mientras,
+              la FAQ prometía «por eso ves procesos sin ejecutar en el ejemplo de inanición» y la
+              ficha del opositor mandaba a «observar qué procesos quedan fuera»: no queda fuera
+              ninguno, y el alumno al que se manda a ver inanición aprende lo contrario
+              (hallazgo 757).
+              Lo que este simulador SÍ puede enseñar es la postergación, que es el síntoma: el
+              proceso menos prioritario espera un múltiplo de lo que dura. La inanición de verdad
+              aparece cuando esa espera no termina nunca porque siguen llegando procesos más
+              prioritarios, y eso es lo que el texto explica.
+            */}
+            {algoritmo === 'priority' && postergado ? (
+              <div className={styles.inanicionAlert} role="note">
+                <span aria-hidden="true">⏳</span>
                 <span>
-                  <strong>Inanición detectada:</strong> los procesos {resultado.inanicion.join(', ')} no llegaron a ejecutarse por completo. Considera añadir envejecimiento (aging) para evitar starvation.
-                </span>
-              </div>
-            ) : algoritmo === 'priority' ? (
-              <div className={styles.inanicionOk}>
-                <span aria-hidden="true">✓</span>
-                <span>
-                  <strong>Sin inanición:</strong> todos los procesos terminan dentro del horizonte simulado.
+                  <strong>Postergación:</strong> {postergado.pid}, el de prioridad más baja
+                  ({postergado.prioridad}), espera {formatNumber(postergado.espera, 0)} ut para una ráfaga
+                  de {formatNumber(postergado.rafaga, 0)} ut. En este lote termina porque los procesos son
+                  finitos; con llegadas continuas de mayor prioridad esa espera no acabaría nunca, y eso
+                  es la <strong>inanición</strong>. El remedio es el envejecimiento (aging), que este
+                  simulador no implementa a propósito.
                 </span>
               </div>
             ) : null}
@@ -1000,12 +1079,12 @@ export default function SimuladorPlanificadorProcesos() {
                       <tr key={m.pid}>
                         <td>{m.pid}</td>
                         <td>{m.llegada}</td>
-                        <td>{m.rafaga}</td>
+                        <td>{formatNumber(m.rafaga, 0)}</td>
                         <td>{m.fin > 0 ? m.inicio : '—'}</td>
                         <td>{m.fin > 0 ? m.fin : '—'}</td>
-                        <td>{m.fin > 0 ? m.espera : '—'}</td>
-                        <td>{m.fin > 0 ? m.turnaround : '—'}</td>
-                        <td>{m.fin > 0 ? m.respuesta : '—'}</td>
+                        <td>{m.fin > 0 ? formatNumber(m.espera, 0) : '—'}</td>
+                        <td>{m.fin > 0 ? formatNumber(m.turnaround, 0) : '—'}</td>
+                        <td>{m.fin > 0 ? formatNumber(m.respuesta, 0) : '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1221,7 +1300,7 @@ export default function SimuladorPlanificadorProcesos() {
               Pruebas tipo test de oposición preguntan diferencias entre apropiativo y no apropiativo, qué es el quantum y cuándo causa inanición Priority.
             </p>
             <div className={styles.escenarioTip}>
-              Practica el ejemplo &laquo;Inanición priority&raquo; y observa qué procesos quedan fuera.
+              Practica el ejemplo &laquo;Inanición priority&raquo; y mira cuánto espera el proceso de prioridad más baja frente a lo que dura su ráfaga.
             </div>
           </div>
           <div className={styles.escenarioCard}>
@@ -1281,7 +1360,7 @@ export default function SimuladorPlanificadorProcesos() {
             <p>
               Con <strong>envejecimiento (aging)</strong>: la prioridad de un proceso aumenta con el tiempo que lleva esperando. Así, tarde o temprano, hasta el de menor prioridad acaba siendo el más prioritario y entra en CPU.
             </p>
-            <p className={styles.faqTip}>Este simulador NO implementa aging — por eso ves procesos sin ejecutar en el ejemplo de inanición.</p>
+            <p className={styles.faqTip}>Este simulador NO implementa aging, y con un lote finito de procesos todos acaban terminando: lo que se ve en el ejemplo de inanición es la postergación del menos prioritario, que es su síntoma.</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Por qué SJF da el menor tiempo medio de espera?</h4>
@@ -1398,7 +1477,7 @@ export default function SimuladorPlanificadorProcesos() {
               En Round Robin, mandar el proceso recién terminado al final de la cola en vez de al recién llegado primero (depende de la convención del libro).
             </li>
             <li>
-              En Priority, usar &laquo;mayor número = mayor prioridad&raquo; cuando el enunciado dice lo contrario. Lee siempre la convención del problema.
+              En Priority, usar &laquo;mayor número = mayor prioridad&raquo; cuando el enunciado dice lo contrario. Lee siempre la convención del problema: <strong>este simulador usa 1 = la más alta</strong>, que es la de Silberschatz, así que si tu enunciado numera al revés tendrás que invertir los valores antes de teclearlos.
             </li>
             <li>
               Calcular el tiempo medio dividiendo entre el número de unidades de tiempo en lugar del número de procesos.
