@@ -472,13 +472,30 @@ export default function SimuladorLocalComercialPage() {
             </div>
           </div>
 
+          {/*
+            El aviso se pintaba con `esRenuncia` a secas: en Canarias, Ceuta y Melilla afirmaba que
+            hay un IVA que autoliquidar donde rige el IGIC o el IPSI, y quedaba contradicho por el
+            <AvisoTerritorioSinIva> de debajo, que se lee a la vez (hallazgo 727). nave-industrial
+            ya condicionaba este texto por territorio.
+          */}
           {esRenuncia && (
             <div className={styles.renunciaAviso} role="note">
-              <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
-              comprador y vendedor son empresarios o profesionales con derecho a deducción. El IVA se autoliquida
-              por <strong>inversión del sujeto pasivo</strong> (no se paga al vendedor) y es deducible si tienes
-              derecho. A cambio, la escritura tributa por AJD, que <strong>muchas CCAA aplican a un tipo
-              incrementado</strong> (a menudo 1,5%–2%) en caso de renuncia; este simulador usa el AJD general.
+              {territorioActualSinIva ? (
+                <>
+                  <strong><span aria-hidden="true">⚠️</span> Aquí no hay IVA al que renunciar:</strong> en {datosCcaaActual.nombre} rige
+                  el <strong>{territorioActualSinIva.impuesto}</strong>, no el IVA, así que ni la renuncia a la
+                  exención del art. 20.Dos LIVA ni la inversión del sujeto pasivo entran en juego. Esta
+                  calculadora no cifra ese impuesto: consulta sus tipos y su mecánica propia.
+                </>
+              ) : (
+                <>
+                  <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
+                  comprador y vendedor son empresarios o profesionales con derecho a deducción. El IVA se autoliquida
+                  por <strong>inversión del sujeto pasivo</strong> (no se paga al vendedor) y es deducible si tienes
+                  derecho. A cambio, la escritura tributa por AJD, que <strong>muchas CCAA aplican a un tipo
+                  incrementado</strong> (a menudo 1,5%–2%) en caso de renuncia; este simulador usa el AJD general.
+                </>
+              )}
             </div>
           )}
 
@@ -534,8 +551,20 @@ export default function SimuladorLocalComercialPage() {
                 <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
-                <span className={styles.infoCcaaLabel}>IVA (comercial)</span>
-                <span className={styles.infoCcaaValue}>{IVA_LOCAL_COMERCIAL}%</span>
+{/*
+                La casilla se imprimía incondicional, también en Canarias, Ceuta y Melilla, donde
+                no rige el IVA y la propia app responde «IGIC/IPSI · No calculado» dos tarjetas más
+                allá. La hermana nave-industrial ya lo condiciona así (hallazgo 725). El tipo pasa
+                además por formatTipoNominal, como el resto del panel.
+              */}
+                <span className={styles.infoCcaaLabel}>
+                  {TERRITORIOS_SIN_IVA[ccaa]
+                    ? `${TERRITORIOS_SIN_IVA[ccaa].impuesto} (obra nueva)`
+                    : 'IVA (comercial)'}
+                </span>
+                <span className={styles.infoCcaaValue}>
+                  {TERRITORIOS_SIN_IVA[ccaa] ? 'No calculado' : formatTipoNominal(IVA_LOCAL_COMERCIAL)}
+                </span>
               </div>
             </div>
             {datosCcaaActual.tramosProgresivos && (
@@ -544,9 +573,24 @@ export default function SimuladorLocalComercialPage() {
               </p>
             )}
             <p className={styles.infoCcaaNote}>
-              Los locales comerciales tributan por el <strong>tipo general</strong> de ITP, sin tipos reducidos
-              (los tipos reducidos solo aplican a la vivienda habitual).
+              Un local comercial tributa por el <strong>tipo general</strong> de ITP: los tipos reducidos por
+              perfil del comprador (jóvenes, familia numerosa, discapacidad) exigen que el inmueble sea la
+              vivienda habitual, y un local no lo es. Eso no agota los beneficios posibles — alguna comunidad
+              tiene tipos propios ligados a la ACTIVIDAD, no a la vivienda, y esta calculadora no los aplica.
             </p>
+            {/*
+              El aviso de la ficha de la comunidad, que es donde vive ese matiz. Sin él, la nota de
+              arriba descartaba de plano un tipo que la propia `data/itp-ccaa.ts` documenta: el 1 %
+              del art. 121-11 de Aragón por adquirir un inmueble para INICIAR UNA ACTIVIDAD
+              ECONÓMICA, que es justo el supuesto de quien compra un local para abrir un negocio
+              (hallazgo 726). Las hermanas garaje, trastero y estimador-compraventa-inmueble ya
+              pintan este mismo campo; esta app era la única que no.
+            */}
+            {datosCcaaActual.notas && (
+              <p className={styles.infoCcaaNote}>
+                <strong>{datosCcaaActual.nombre}:</strong> {datosCcaaActual.notas}
+              </p>
+            )}
           </div>
 
           {/* Gestoría */}

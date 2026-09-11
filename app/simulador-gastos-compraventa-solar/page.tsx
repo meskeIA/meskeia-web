@@ -31,7 +31,7 @@ import {
   TERRITORIOS_SIN_IVA,
   sumarLineasVisibles,
 } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PORCENTAJES_IVA } from '@/data/fiscal';
 
 // ===== TIPOS =====
 // Solar / terreno edificable (suelo urbano):
@@ -80,10 +80,17 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'melilla', label: 'Melilla' },
 ];
 
-// IVA solar / terreno edificable: 21%
-// Tipo de IVA de inmueble no residencial. Sale de data/fiscal para no divergir en
-// silencio cuando cambie allí (hallazgo 163 del Inspector, del clúster entero).
-const IVA_SOLAR = IVA_INMUEBLES_2025.local;
+/**
+ * IVA del solar: el tipo GENERAL del art. 90 LIVA.
+ *
+ * Sale de data/fiscal para no divergir en silencio cuando cambie allí (hallazgo 163). Y sale
+ * de `PORCENTAJES_IVA.general` y no de `IVA_INMUEBLES_2025.local` —que es el IVA del LOCAL
+ * COMERCIAL— porque un solar no es un local: hoy ambas valen 21, así que el importe en pantalla
+ * no cambia, pero dos constantes para un único dato existen precisamente para poder divergir, y
+ * el día que se mueva el tipo del local sin moverse el general el solar habría seguido al
+ * equivocado sin que ningún candado lo avisara (hallazgo 734, misma forma que el 641).
+ */
+const IVA_SOLAR = PORCENTAJES_IVA.general;
 
 export default function SimuladorSolarPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -246,9 +253,15 @@ export default function SimuladorSolarPage() {
             </div>
           </div>
 
-          {esEmpresario && (
+{/*
+            El aviso se pintaba con la sola condición `esEmpresario`, sin mirar el territorio, así
+            que en Canarias, Ceuta y Melilla salía JUNTO a <AvisoTerritorioSinIva> —que dice «no se
+            aplica el IVA»— y explicaba cómo deducir un IVA que el aviso de al lado declaraba
+            inexistente. Dos role="note" consecutivos diciendo lo contrario (hallazgo 732).
+          */}
+          {esEmpresario && !TERRITORIOS_SIN_IVA[ccaa] && (
             <div className={styles.renunciaAviso} role="note">
-              <strong><span aria-hidden="true">⚠️</span> Compra a promotor o empresa:</strong> el IVA del 21% es <strong>deducible</strong> si
+              <strong><span aria-hidden="true">⚠️</span> Compra a promotor o empresa:</strong> el IVA del {formatNumber(IVA_SOLAR, 0)}% es <strong>deducible</strong> si
               eres empresario o autónomo y afectas el solar a una actividad sujeta a IVA (se recupera en el
               modelo 303). Si eres un <strong>particular que autopromueve su vivienda</strong>, el IVA no se
               deduce y es un mayor coste de la parcela.
@@ -470,7 +483,7 @@ export default function SimuladorSolarPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Impuesto principal</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>IVA 21%</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary-texto)' }}>IVA 21%</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700 }}>ITP (tipo general)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>

@@ -6,6 +6,10 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalN
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import {
+  ESCALA_RECARGO_EXTEMPORANEO,
+  porcentajeRecargoExtemporaneo,
+} from '@/lib/calculadoras/recargoPresentacionTardia';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_SUCESIONES_META,
@@ -165,7 +169,7 @@ function aplicarBonificacion(
     return {
       bonificacion: bonif,
       porcentaje: tramoSeleccionado.porcentaje * 100,
-      detalle: `Bonificación ${(tramoSeleccionado.porcentaje * 100).toFixed(0)}% (${config.nombre})`,
+      detalle: `Bonificación ${formatNumber(tramoSeleccionado.porcentaje * 100, 0)} % (${config.nombre})`,
     };
   }
 
@@ -175,7 +179,7 @@ function aplicarBonificacion(
     return {
       bonificacion: bonif,
       porcentaje: bGrupo.porcentajeMayor * 100,
-      detalle: `Bonificación ${(bGrupo.porcentajeMayor * 100).toFixed(0)}% (base supera ${formatCurrency(bGrupo.tope)})`,
+      detalle: `Bonificación ${formatNumber(bGrupo.porcentajeMayor * 100, 0)} % (base supera ${formatCurrency(bGrupo.tope)})`,
     };
   }
 
@@ -194,12 +198,40 @@ function aplicarBonificacion(
     return {
       bonificacion: bonif,
       porcentaje: bGrupo.porcentaje * 100,
-      detalle: `Bonificación ${(bGrupo.porcentaje * 100).toFixed(1)}% (${config.nombre})`,
+      detalle: `Bonificación ${formatNumber(bGrupo.porcentaje * 100, 1)} % (${config.nombre})`,
     };
   }
 
   return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación autonómica' };
 }
+
+/**
+ * Los diez campos de importe, en UNA sola lista.
+ *
+ * El `id` es lo que permite que cada `<label>` tenga su `htmlFor` y que el control tenga
+ * nombre accesible: hasta el 11/09/2026 las etiquetas se pintaban como hermanas del control,
+ * sin asociar, y un lector de pantalla anunciaba «edición, 0,00» catorce veces seguidas sin
+ * decir de qué concepto de la masa hereditaria se trataba (hallazgo 741).
+ *
+ * La etiqueta vive aquí y no en el JSX porque el aviso de importe inválido la nombra: si cada
+ * sitio tuviera la suya, el aviso acabaría señalando un campo que en pantalla se llama de otra
+ * manera.
+ */
+const CAMPOS_BIENES = [
+  { id: 'saldos-cuentas', etiqueta: 'Saldos en cuentas bancarias', icono: '💳' },
+  { id: 'acciones-fondos', etiqueta: 'Acciones, fondos y productos financieros', icono: '📊' },
+  { id: 'vivienda-habitual', etiqueta: 'Vivienda habitual', icono: '🏠' },
+  { id: 'otros-inmuebles', etiqueta: 'Otros inmuebles', icono: '🏢' },
+  { id: 'vehiculos', etiqueta: 'Vehículos', icono: '🚗' },
+  { id: 'seguros-vida', etiqueta: 'Seguros de vida', icono: '📋' },
+  { id: 'otros-bienes', etiqueta: 'Otros bienes', icono: '📦' },
+] as const;
+
+const CAMPOS_DEUDAS = [
+  { id: 'hipotecas', etiqueta: 'Hipotecas y préstamos hipotecarios' },
+  { id: 'otros-prestamos', etiqueta: 'Otros préstamos y deudas' },
+  { id: 'gastos-sepelio', etiqueta: 'Gastos de sepelio' },
+] as const;
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
@@ -234,25 +266,63 @@ export default function EstimadorImpuestoSucesionesPage() {
 
   const ccaaInfo = useMemo(() => (ccaa ? BONIFICACIONES_CCAA_IS[ccaa] : null), [ccaa]);
 
+  /**
+   * Los diez importes, leídos de una vez: cada campo trae un número utilizable o deja su
+   * nombre en `invalidos`, y entonces la app se ABSTIENE de dar cifra.
+   *
+   * Hasta el 11/09/2026 los diez hacían `parseSpanishNumber(x) || 0`, y ese `|| 0` convertía
+   * en cero dos cosas distintas de un campo vacío:
+   *
+   *  · el NaN con el que el parser rechaza lo que no es un número (hallazgo 742). Con
+   *    «Saldos = 1.2.3» y «Vivienda = 200000» la app publicaba «Total activos 200.000,00 €»
+   *    y una cuota completa, sin ninguna marca sobre los saldos que acababa de tirar.
+   *  · el signo menos (hallazgo 740). `totalDeudas` se restaba sin mirar el signo, así que
+   *    una deuda negativa AUMENTABA la masa: 250.000 € en cuentas con «-500000» de hipoteca
+   *    daban 750.000 € de masa hereditaria y triplicaban la herencia.
+   *
+   * Un cero inventado es indistinguible de un campo vacío, y aquí la diferencia son miles de
+   * euros de cuota: o se lee el importe, o no se da número (ver `feedback_aviso_bajo_cifra_falsa`).
+   */
+  const importes = useMemo(() => {
+    const invalidos: string[] = [];
+    const leer = (etiqueta: string, texto: string): number => {
+      if (texto.trim() === '') return 0;
+      const n = parseSpanishNumber(texto);
+      if (!Number.isFinite(n) || n < 0) {
+        invalidos.push(etiqueta);
+        return 0;
+      }
+      return n;
+    };
+    const [bSaldos, bAcciones, bVivienda, bOtrosInm, bVehiculos, bSeguros, bOtros] = [
+      saldosCuentas, accionesFondos, viviendaHabitual, otrosInmuebles, vehiculos, segurosVida, otrosBienes,
+    ].map((texto, i) => leer(CAMPOS_BIENES[i].etiqueta, texto));
+    const [dHipotecas, dPrestamos, dSepelio] = [hipotecas, otrosPrestamos, gastosSepelio].map(
+      (texto, i) => leer(CAMPOS_DEUDAS[i].etiqueta, texto)
+    );
+    return {
+      invalidos,
+      bienes: { bSaldos, bAcciones, bVivienda, bOtrosInm, bVehiculos, bSeguros, bOtros },
+      deudas: { dHipotecas, dPrestamos, dSepelio },
+    };
+  }, [saldosCuentas, accionesFondos, viviendaHabitual, otrosInmuebles, vehiculos, segurosVida,
+      otrosBienes, hipotecas, otrosPrestamos, gastosSepelio]);
+
   const resultado = useMemo((): ResultadoSucesiones | null => {
     if (!ccaa || !grupo) return null;
+    // Con un solo importe ilegible no se estima: el aviso lo nombra y el panel no da cifra.
+    if (importes.invalidos.length > 0) return null;
 
     // Bienes
-    const v_cuentas = parseSpanishNumber(saldosCuentas) || 0;
-    const v_acciones = parseSpanishNumber(accionesFondos) || 0;
-    const v_vivienda = parseSpanishNumber(viviendaHabitual) || 0;
-    const v_otrosInm = parseSpanishNumber(otrosInmuebles) || 0;
-    const v_vehiculos = parseSpanishNumber(vehiculos) || 0;
-    const v_seguros = parseSpanishNumber(segurosVida) || 0;
-    const v_otros = parseSpanishNumber(otrosBienes) || 0;
+    const { bSaldos: v_cuentas, bAcciones: v_acciones, bVivienda: v_vivienda,
+            bOtrosInm: v_otrosInm, bVehiculos: v_vehiculos, bSeguros: v_seguros,
+            bOtros: v_otros } = importes.bienes;
 
     const totalActivos = v_cuentas + v_acciones + v_vivienda + v_otrosInm + v_vehiculos + v_seguros + v_otros;
     if (totalActivos <= 0) return null;
 
     // Deudas
-    const d_hipotecas = parseSpanishNumber(hipotecas) || 0;
-    const d_prestamos = parseSpanishNumber(otrosPrestamos) || 0;
-    const d_sepelio = parseSpanishNumber(gastosSepelio) || 0;
+    const { dHipotecas: d_hipotecas, dPrestamos: d_prestamos, dSepelio: d_sepelio } = importes.deudas;
     const totalDeudas = d_hipotecas + d_prestamos + d_sepelio;
 
     // Masa hereditaria
@@ -260,18 +330,31 @@ export default function EstimadorImpuestoSucesionesPage() {
     const ajuarDomestico = masaHereditaria * PORC_AJUAR_DOMESTICO_IS;
     const baseImponibleTotal = masaHereditaria + ajuarDomestico;
 
-    // Porcentaje que recibe este heredero
-    const porcHerencia = Math.min(100, Math.max(0, parseFloat(porcentajeHerencia) || 100)) / 100;
+    /**
+     * Porcentaje que recibe este heredero.
+     *
+     * ⚠️ El CERO es un valor con significado —«no recibo nada»— y aquí se convertía en el
+     * 100 %: `parseFloat(porcentajeHerencia) || 100` lo trataba como ausencia de dato porque 0
+     * es falsy. La pantalla acababa afirmando las dos cosas a la vez, «Porcentaje de herencia
+     * 0%» y justo debajo «Base ajustada 257.500,00 €», que es la herencia entera, y liquidaba
+     * sobre ella (hallazgo 743). Es el mismo defecto que el 08/09/2026 se corrigió en el campo
+     * de la edad y que sobrevivía en éste y en el del usufructuario. El 100 solo debe salir
+     * cuando NO hay porcentaje escrito.
+     */
+    const porcentajeParseado = Number.parseFloat(porcentajeHerencia);
+    const porcHerencia = Math.min(100, Math.max(0,
+      Number.isFinite(porcentajeParseado) ? porcentajeParseado : 100
+    )) / 100;
     let baseAjustada = baseImponibleTotal * porcHerencia;
 
     // Tipo de adquisición (usufructo / nuda)
+    const edadUsufParseada = Number.parseInt(edadUsufructuario, 10);
+    const edadUsuf = Number.isFinite(edadUsufParseada) ? edadUsufParseada : 70;
     let porcentajeAdquisicion = 1;
     if (tipoAdquisicion === 'usufructo') {
-      const edadUsuf = parseInt(edadUsufructuario) || 70;
       porcentajeAdquisicion = Math.max(0.10, (89 - edadUsuf) / 100);
       baseAjustada = baseImponibleTotal * porcHerencia * porcentajeAdquisicion;
     } else if (tipoAdquisicion === 'nuda') {
-      const edadUsuf = parseInt(edadUsufructuario) || 70;
       const porcUsuf = Math.max(0.10, (89 - edadUsuf) / 100);
       porcentajeAdquisicion = 1 - porcUsuf;
       baseAjustada = baseImponibleTotal * porcHerencia * porcentajeAdquisicion;
@@ -408,9 +491,8 @@ export default function EstimadorImpuestoSucesionesPage() {
       esForal,
     };
   }, [
-    ccaa, grupo, edad, convivenciaDosAnios, discapacidad, patrimonioIdx, tipoAdquisicion, edadUsufructuario, porcentajeHerencia,
-    saldosCuentas, accionesFondos, viviendaHabitual, otrosInmuebles, vehiculos, segurosVida, otrosBienes,
-    hipotecas, otrosPrestamos, gastosSepelio, ccaaInfo,
+    ccaa, grupo, edad, convivenciaDosAnios, discapacidad, patrimonioIdx, tipoAdquisicion,
+    edadUsufructuario, porcentajeHerencia, importes, ccaaInfo,
   ]);
 
   return (
@@ -418,7 +500,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚖️ Estimador del Impuesto de Sucesiones</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚖️</span> Estimador del Impuesto de Sucesiones</h1>
         <p className={styles.subtitle}>
           Oriéntate sobre el ISD en las 17 comunidades autónomas antes de hablar con tu asesor fiscal
         </p>
@@ -442,7 +524,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       />
 
       <DataReference
-        normativa={FISCAL_SUCESIONES_META.fuente}
+        normativa={`ISD ${FISCAL_SUCESIONES_META.vigencia}`}
         fuente={FISCAL_SUCESIONES_META.fuente}
         verificado={FISCAL_SUCESIONES_META.verificado}
         urlOficial={FISCAL_SUCESIONES_META.urlOficial}
@@ -450,7 +532,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
       {/* Disclaimer SIEMPRE VISIBLE */}
       <div className={styles.disclaimerCritico}>
-        <h2 className={styles.disclaimerTitulo}>⚠️ Aviso Legal Imprescindible</h2>
+        <h2 className={styles.disclaimerTitulo}><span aria-hidden="true">⚠️</span> Aviso Legal Imprescindible</h2>
         <p>
           Esta herramienta es <strong>exclusivamente orientativa</strong>. Los resultados son estimaciones
           basadas en tarifas generales y <strong>no tienen validez fiscal</strong>.
@@ -463,7 +545,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           <li><strong>Consulta siempre con un gestor o asesor fiscal antes de autoliquidar</strong></li>
         </ul>
         <p className={styles.disclaimerPlazo}>
-          📅 Plazo de autoliquidación: <strong>6 meses</strong> desde el fallecimiento (prorrogable 6 meses más)
+          <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>6 meses</strong> desde el fallecimiento (prorrogable 6 meses más)
         </p>
         <p className={styles.disclaimerResponsabilidad}>
           meskeIA no se responsabiliza de decisiones basadas en estas herramientas.
@@ -476,11 +558,22 @@ export default function EstimadorImpuestoSucesionesPage() {
 
           {/* Sección 1: CCAA y datos del heredero */}
           <div className={styles.seccion}>
-            <h2 className={styles.seccionTitulo}>👤 Datos del Heredero</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">👤</span> Datos del Heredero</h2>
 
+            {/*
+              ⚠️ La CCAA competente es la del CAUSANTE, no la del heredero (art. 32.2.c de la
+              Ley 22/2009: la de la residencia habitual del fallecido los 5 años anteriores).
+              Hasta el 11/09/2026 esta etiqueta pedía la del heredero, y la propia página lo
+              desmentía tres veces más abajo —en el paso 6 de la guía, en los «6 errores que
+              pueden costarte caro» y en el faqJsonLd—: quien hacía caso a la etiqueta cometía
+              exactamente el error del que la app le avisaba, y en el caso del acta la
+              estimación se movía 2.068,39 € sobre una herencia de 80.000 € (hallazgo 736).
+            */}
             <div className={styles.campo}>
-              <label className={styles.label}>Comunidad autónoma de residencia del heredero *</label>
-              <select className={styles.select} value={ccaa} onChange={(e) => setCcaa(e.target.value)}>
+              <label className={styles.label} htmlFor="ccaa-causante">
+                Comunidad autónoma donde residía el fallecido *
+              </label>
+              <select id="ccaa-causante" className={styles.select} value={ccaa} onChange={(e) => setCcaa(e.target.value)}>
                 <option value="">— Selecciona tu CCAA —</option>
                 <optgroup label="Régimen Común (14 CCAA)">
                   <option value="madrid">Comunidad de Madrid</option>
@@ -503,30 +596,38 @@ export default function EstimadorImpuestoSucesionesPage() {
                     comparten es tener normativa propia que se aparta del régimen común, y eso
                     es lo que aquí se le dice al usuario. */}
                 <optgroup label="Normativa propia">
-                  <option value="cataluna">Cataluña ⚠️</option>
-                  <option value="pais-vasco">País Vasco ⚠️</option>
-                  <option value="navarra">Navarra ⚠️</option>
+                  {/* Sin emoji: <option> no admite elementos hijos, así que no hay forma de
+                      ocultárselo al lector de pantalla, que lo leería como «señal de
+                      advertencia» sin decir de qué advierte. El grupo «Normativa propia» ya
+                      lo dice con palabras, y al elegirlas aparece el aviso completo. */}
+                  <option value="cataluna">Cataluña</option>
+                  <option value="pais-vasco">País Vasco</option>
+                  <option value="navarra">Navarra</option>
                 </optgroup>
               </select>
+              <span className={styles.helper}>
+                No es donde vives tú: el ISD se liquida en la comunidad donde el fallecido tuvo
+                su residencia habitual los 5 años anteriores (art. 32.2.c de la Ley 22/2009).
+              </span>
             </div>
 
             {ccaaInfo?.regimen === 'foral' && ccaa !== 'cataluna' && (
               <div className={styles.alertaForal}>
-                <strong>⚠️ Régimen Foral</strong>
+                <strong><span aria-hidden="true">⚠️</span> Régimen Foral</strong>
                 <p>{ccaaInfo.notas}</p>
               </div>
             )}
 
             {ccaaInfo && (
               <div className={styles.infoCcaa}>
-                <strong>ℹ️ {ccaaInfo.nombre}</strong>
+                <strong><span aria-hidden="true">ℹ️</span> {ccaaInfo.nombre}</strong>
                 <p>{ccaaInfo.notas}</p>
               </div>
             )}
 
             <div className={styles.campo}>
-              <label className={styles.label}>Parentesco con el fallecido *</label>
-              <select className={styles.select} value={grupo} onChange={(e) => setGrupo(e.target.value as GrupoParentesco)}>
+              <label className={styles.label} htmlFor="parentesco">Parentesco con el fallecido *</label>
+              <select id="parentesco" className={styles.select} value={grupo} onChange={(e) => setGrupo(e.target.value as GrupoParentesco)}>
                 <option value="">— Selecciona —</option>
                 <option value="I-conyuge">Cónyuge / pareja de hecho</option>
                 <option value="I-descendiente">Descendiente menor de 21 años</option>
@@ -540,8 +641,8 @@ export default function EstimadorImpuestoSucesionesPage() {
 
             {(grupo === 'I-descendiente' || grupo === 'III') && (
               <div className={styles.campo}>
-                <label className={styles.label}>Edad del heredero (años)</label>
-                <input type="number" className={styles.input} value={edad}
+                <label className={styles.label} htmlFor="edad-heredero">Edad del heredero (años)</label>
+                <input id="edad-heredero" type="number" className={styles.input} value={edad}
                   onChange={(e) => setEdad(e.target.value)} min="0" max="100" />
                 <span className={styles.helper}>
                   {grupo === 'I-descendiente'
@@ -566,8 +667,8 @@ export default function EstimadorImpuestoSucesionesPage() {
             )}
 
             <div className={styles.campo}>
-              <label className={styles.label}>Discapacidad reconocida</label>
-              <div className={styles.radioGroup}>
+              <span className={styles.label} id="etiqueta-discapacidad">Discapacidad reconocida</span>
+              <div className={styles.radioGroup} role="radiogroup" aria-labelledby="etiqueta-discapacidad">
                 {[['0','No'], ['33','33%–64%'], ['65','≥65%']].map(([v, l]) => (
                   <label key={v} className={styles.radioLabel}>
                     <input type="radio" value={v} checked={discapacidad === v}
@@ -579,8 +680,8 @@ export default function EstimadorImpuestoSucesionesPage() {
             </div>
 
             <div className={styles.campo}>
-              <label className={styles.label}>Patrimonio preexistente del heredero</label>
-              <select className={styles.select} value={patrimonioIdx} onChange={(e) => setPatrimonioIdx(e.target.value)}>
+              <label className={styles.label} htmlFor="patrimonio-preexistente">Patrimonio preexistente del heredero</label>
+              <select id="patrimonio-preexistente" className={styles.select} value={patrimonioIdx} onChange={(e) => setPatrimonioIdx(e.target.value)}>
                 <option value="1">Menos de 402.678 €</option>
                 <option value="2">402.678 € – 2.007.380 €</option>
                 <option value="3">2.007.380 € – 4.020.770 €</option>
@@ -589,10 +690,10 @@ export default function EstimadorImpuestoSucesionesPage() {
             </div>
 
             <div className={styles.campo}>
-              <label className={styles.label}>Porcentaje de la herencia que recibes</label>
+              <label className={styles.label} htmlFor="porcentaje-herencia">Porcentaje de la herencia que recibes</label>
               <div className={styles.inputConUnidad}>
-                <input type="number" className={styles.input} value={porcentajeHerencia}
-                  onChange={(e) => setPorcentajeHerencia(e.target.value)} min="1" max="100" />
+                <input id="porcentaje-herencia" type="number" className={styles.input} value={porcentajeHerencia}
+                  onChange={(e) => setPorcentajeHerencia(e.target.value)} min="0" max="100" />
                 <span className={styles.unidad}>%</span>
               </div>
               <span className={styles.helper}>100% si eres el único heredero</span>
@@ -601,8 +702,10 @@ export default function EstimadorImpuestoSucesionesPage() {
 
           {/* Sección 2: Tipo de adquisición */}
           <div className={styles.seccion}>
-            <h2 className={styles.seccionTitulo}>📋 Tipo de Adquisición</h2>
-            <div className={styles.radioGroup}>
+            <h2 className={styles.seccionTitulo} id="etiqueta-adquisicion">
+              <span aria-hidden="true">📋</span> Tipo de Adquisición
+            </h2>
+            <div className={styles.radioGroup} role="radiogroup" aria-labelledby="etiqueta-adquisicion">
               {([['plena','Plena propiedad'], ['usufructo','Usufructo'], ['nuda','Nuda propiedad']] as [TipoAdquisicion, string][]).map(([v, l]) => (
                 <label key={v} className={styles.radioLabel}>
                   <input type="radio" value={v} checked={tipoAdquisicion === v}
@@ -613,8 +716,8 @@ export default function EstimadorImpuestoSucesionesPage() {
             </div>
             {(tipoAdquisicion === 'usufructo' || tipoAdquisicion === 'nuda') && (
               <div className={styles.campo}>
-                <label className={styles.label}>Edad del usufructuario</label>
-                <input type="number" className={styles.input} value={edadUsufructuario}
+                <label className={styles.label} htmlFor="edad-usufructuario">Edad del usufructuario</label>
+                <input id="edad-usufructuario" type="number" className={styles.input} value={edadUsufructuario}
                   onChange={(e) => setEdadUsufructuario(e.target.value)} min="10" max="89" />
                 <span className={styles.helper}>Fórmula: valor usufructo = (89 – edad) / 100, mín. 10%</span>
               </div>
@@ -623,23 +726,20 @@ export default function EstimadorImpuestoSucesionesPage() {
 
           {/* Sección 3: Bienes */}
           <div className={styles.seccion}>
-            <h2 className={styles.seccionTitulo}>🏦 Bienes del Fallecido</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🏦</span> Bienes del Fallecido</h2>
             <p className={styles.seccionNota}>Introduce el valor total de todos los bienes</p>
 
-            {[
-              ['Saldos en cuentas bancarias', saldosCuentas, setSaldosCuentas, '💳'],
-              ['Acciones, fondos y productos financieros', accionesFondos, setAccionesFondos, '📊'],
-              ['Vivienda habitual', viviendaHabitual, setViviendaHabitual, '🏠'],
-              ['Otros inmuebles', otrosInmuebles, setOtrosInmuebles, '🏢'],
-              ['Vehículos', vehiculos, setVehiculos, '🚗'],
-              ['Seguros de vida', segurosVida, setSegurosVida, '📋'],
-              ['Otros bienes', otrosBienes, setOtrosBienes, '📦'],
-            ].map(([label, value, setter, icon]) => (
-              <div key={label as string} className={styles.campo}>
-                <label className={styles.label}>{icon as string} {label as string}</label>
+            {([saldosCuentas, accionesFondos, viviendaHabitual, otrosInmuebles, vehiculos, segurosVida, otrosBienes] as string[])
+              .map((value, i) => [value, [setSaldosCuentas, setAccionesFondos, setViviendaHabitual,
+                setOtrosInmuebles, setVehiculos, setSegurosVida, setOtrosBienes][i]] as const)
+              .map(([value, setter], i) => (
+              <div key={CAMPOS_BIENES[i].id} className={styles.campo}>
+                <label className={styles.label} htmlFor={CAMPOS_BIENES[i].id}>
+                  <span aria-hidden="true">{CAMPOS_BIENES[i].icono}</span> {CAMPOS_BIENES[i].etiqueta}
+                </label>
                 <div className={styles.inputConUnidad}>
-                  <input type="text" className={styles.input} value={value as string}
-                    onChange={(e) => (setter as React.Dispatch<React.SetStateAction<string>>)(e.target.value)}
+                  <input id={CAMPOS_BIENES[i].id} type="text" className={styles.input} value={value}
+                    onChange={(e) => setter(e.target.value)}
                     placeholder="0,00" inputMode="decimal" />
                   <span className={styles.unidad}>€</span>
                 </div>
@@ -649,17 +749,15 @@ export default function EstimadorImpuestoSucesionesPage() {
 
           {/* Sección 4: Deudas */}
           <div className={styles.seccion}>
-            <h2 className={styles.seccionTitulo}>💸 Deudas y Cargas</h2>
-            {[
-              ['Hipotecas y préstamos hipotecarios', hipotecas, setHipotecas],
-              ['Otros préstamos y deudas', otrosPrestamos, setOtrosPrestamos],
-              ['Gastos de sepelio', gastosSepelio, setGastosSepelio],
-            ].map(([label, value, setter]) => (
-              <div key={label as string} className={styles.campo}>
-                <label className={styles.label}>{label as string}</label>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">💸</span> Deudas y Cargas</h2>
+            {([hipotecas, otrosPrestamos, gastosSepelio] as string[])
+              .map((value, i) => [value, [setHipotecas, setOtrosPrestamos, setGastosSepelio][i]] as const)
+              .map(([value, setter], i) => (
+              <div key={CAMPOS_DEUDAS[i].id} className={styles.campo}>
+                <label className={styles.label} htmlFor={CAMPOS_DEUDAS[i].id}>{CAMPOS_DEUDAS[i].etiqueta}</label>
                 <div className={styles.inputConUnidad}>
-                  <input type="text" className={styles.input} value={value as string}
-                    onChange={(e) => (setter as React.Dispatch<React.SetStateAction<string>>)(e.target.value)}
+                  <input id={CAMPOS_DEUDAS[i].id} type="text" className={styles.input} value={value}
+                    onChange={(e) => setter(e.target.value)}
                     placeholder="0,00" inputMode="decimal" />
                   <span className={styles.unidad}>€</span>
                 </div>
@@ -670,15 +768,36 @@ export default function EstimadorImpuestoSucesionesPage() {
 
         {/* ── Panel de resultados ──────────────────────────────────── */}
         <div className={styles.resultsPanel}>
-          {!resultado ? (
+          {importes.invalidos.length > 0 ? (
+            /*
+              El aviso NOMBRA los campos, y el panel no da ninguna cifra mientras estén así.
+              Antes el importe ilegible se convertía en cero y la estimación salía igual: el
+              usuario veía una cuota completa calculada sin sus saldos bancarios, o con una
+              masa hereditaria que un signo menos había triplicado (hallazgos 740 y 742).
+            */
+            <div className={styles.placeholder} role="alert">
+              <p>
+                <span aria-hidden="true">⚠️</span>{' '}
+                {importes.invalidos.length === 1
+                  ? 'Hay un importe que no se puede leer: '
+                  : 'Hay importes que no se pueden leer: '}
+                <strong>{importes.invalidos.join(', ')}</strong>.
+              </p>
+              <p>
+                Escribe solo cifras positivas, con coma para los decimales (por ejemplo
+                «1.234,56»). No se da estimación mientras haya un importe sin leer, porque
+                tomarlo como cero cambiaría la cuota sin avisar.
+              </p>
+            </div>
+          ) : !resultado ? (
             <div className={styles.placeholder}>
-              <p>📝 Selecciona tu CCAA y parentesco, e introduce los bienes para ver la estimación</p>
+              <p><span aria-hidden="true">📝</span> Selecciona la CCAA del fallecido y el parentesco, e introduce los bienes para ver la estimación</p>
             </div>
           ) : (
             <>
               {resultado.esForal && ccaa !== 'cataluna' && (
                 <div className={styles.alertaForal}>
-                  <strong>⚠️ Estimación muy aproximada — Régimen Foral</strong>
+                  <strong><span aria-hidden="true">⚠️</span> Estimación muy aproximada — Régimen Foral</strong>
                   <p>Esta estimación usa la tarifa estatal como aproximación. El régimen foral real puede diferir significativamente. Consulta obligatoria.</p>
                 </div>
               )}
@@ -746,7 +865,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div className={styles.desglose}>
                 <h3 className={styles.desgloseTitle}>Liquidación</h3>
                 <div className={styles.linea}><span>Cuota íntegra</span><span>{formatCurrency(resultado.cuotaIntegra)}</span></div>
-                <div className={styles.linea}><span>× Coeficiente multiplicador</span><span>×{resultado.coeficienteMultiplicador.toFixed(4)}</span></div>
+                <div className={styles.linea}><span>× Coeficiente multiplicador</span><span>×{formatNumber(resultado.coeficienteMultiplicador, 4)}</span></div>
                 <div className={styles.linea}><span>Cuota tributaria</span><span>{formatCurrency(resultado.cuotaTributaria)}</span></div>
                 {resultado.bonificacionCcaa > 0 && (
                   <div className={styles.linea}>
@@ -791,21 +910,25 @@ export default function EstimadorImpuestoSucesionesPage() {
 
           <h3>Diferencias entre CCAA</h3>
           <p>
-            Madrid y Canarias tienen bonificaciones del 99% y 99,9% respectivamente para los grupos
-            de parentesco más cercanos, haciendo el impuesto prácticamente cero. Asturias mantiene
-            una bonificación menor (con reducción adicional en base), por lo que resulta la CCAA
-            con mayor recaudación efectiva del régimen común para herencias entre familiares directos.
+            Las comunidades usan dos mecanismos distintos y conviene no confundirlos. Madrid y
+            Canarias bonifican la CUOTA —el 99% y el 99,9% para los grupos más cercanos—, de modo
+            que el impuesto queda cerca de cero. Asturias no bonifica en cuota a esos grupos, pero
+            les aplica una reducción de 300.000 € en la BASE, que en herencias medianas absorbe la
+            base entera y deja también una cuota de cero: con 250.000 € heredados por un hijo, de
+            los que 200.000 € son la vivienda habitual, esta misma calculadora liquida 0,00 € en
+            Asturias y 111,11 € en Madrid. Cuál sale más barata depende del importe y del
+            parentesco, así que la comparación hay que hacerla con el caso concreto delante.
           </p>
 
           <h3>Grupos de parentesco</h3>
           <div className={styles.conceptGrid}>
             <div className={styles.conceptCard}>
               <h4>Grupo I</h4>
-              <p>Descendientes menores de 21 años y cónyuge</p>
+              <p>Descendientes y adoptados menores de 21 años</p>
             </div>
             <div className={styles.conceptCard}>
               <h4>Grupo II</h4>
-              <p>Descendientes de 21 años o más y ascendientes</p>
+              <p>Descendientes de 21 años o más, cónyuge y ascendientes</p>
             </div>
             <div className={styles.conceptCard}>
               <h4>Grupo III</h4>
@@ -860,18 +983,18 @@ export default function EstimadorImpuestoSucesionesPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Grupo I</strong><br /><small>Descendiente &lt;21 a. / cónyuge</small></td>
+                  <td><strong>Grupo I</strong><br /><small>Descendiente &lt;21 a.</small></td>
                   <td>15.956,87 € + 3.990,72 € por año &lt;21 (máx. 47.858,59 €)</td>
                   <td>1,0000 (patrimonio &lt;402.678 €)</td>
                   <td>99%–100% en Madrid, Canarias, Galicia, Andalucía</td>
                   <td>Hijo menor de 21 años hereda la vivienda familiar</td>
                 </tr>
                 <tr>
-                  <td><strong>Grupo II</strong><br /><small>Descendiente ≥21 a. / ascendiente</small></td>
+                  <td><strong>Grupo II</strong><br /><small>Descendiente ≥21 a. / cónyuge / ascendiente</small></td>
                   <td>15.956,87 €</td>
                   <td>1,0000 (patrimonio &lt;402.678 €)</td>
                   <td>99%–100% en Madrid, Canarias; 0% en Asturias</td>
-                  <td>Hijo adulto o padre hereda bienes del fallecido</td>
+                  <td>Hijo adulto, cónyuge o padre hereda bienes del fallecido</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo III</strong><br /><small>Hermanos, tíos, sobrinos</small></td>
@@ -903,7 +1026,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <div>
                   <strong>Hijo adulto hereda piso</strong>
                   <small>Madrid — Grupo II — 200.000 €</small>
@@ -926,7 +1049,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💳</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💳</span>
                 <div>
                   <strong>Sobrino hereda cuenta bancaria</strong>
                   <small>Asturias — Grupo III — 80.000 €</small>
@@ -935,21 +1058,26 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div className={styles.escenarioExample}>
                 <p>
                   Base imponible: 80.000 € + 2.400 € (ajuar) = <strong>82.400 €</strong>.
-                  Reducción por parentesco (Grupo III): 7.993,46 €. Base liquidable: 74.407 €.
-                  Cuota íntegra: ~10.860 €. Coeficiente multiplicador (Grupo III): × 1,5882 → <strong>17.237 €</strong>.
-                  Asturias no tiene bonificación en cuota para Grupo III.
+                  Reducción por parentesco (Grupo III): 7.993,46 €. Reducción propia de Asturias
+                  para el Grupo III: 50.000 € en la base. Base liquidable: 24.406,54 €.
+                  Cuota íntegra: 2.081,95 €. Coeficiente multiplicador (Grupo III): × 1,5882 → <strong>3.306,56 €</strong>.
+                  Asturias no tiene bonificación en cuota para el Grupo III: su beneficio ya se ha
+                  aplicado antes, en la base.
                 </p>
-                <p><strong>Cuota final estimada: ~17.200 €</strong> (21,5% del valor heredado)</p>
+                <p><strong>Cuota final estimada: 3.306,56 €</strong> (4,1% del valor heredado)</p>
               </div>
               <div className={styles.escenarioTip}>
-                Asturias es la CCAA del régimen común con menor bonificación para colaterales (Grupo III).
-                Un sobrino sin reducción autonómica adicional tributa aprox. al 20% sobre lo heredado, frente al 0%–1% de CCAA como Madrid o Canarias.
+                Al colateral le toca el coeficiente multiplicador de 1,5882, que encarece la cuota
+                frente a hijos y cónyuge. Lo que cambia mucho de una comunidad a otra es qué recibe
+                el Grupo III: doce comunidades del régimen común no le dan nada, Asturias le reduce
+                50.000 € de la base, Madrid y Murcia le bonifican el 50% de la cuota y Canarias el
+                99,9%. Comprueba la tuya antes de dar por hecha la cifra.
               </div>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <div>
                   <strong>Viuda hereda empresa familiar</strong>
                   <small>Cataluña — Grupo I-cónyuge — 500.000 €</small>
@@ -977,7 +1105,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👶</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👶</span>
                 <div>
                   <strong>Hijo menor con discapacidad</strong>
                   <small>País Vasco — Grupo I — 300.000 €</small>
@@ -1066,10 +1194,14 @@ export default function EstimadorImpuestoSucesionesPage() {
               <dt>¿Qué pasa si presento fuera de plazo?</dt>
               <dd>
                 Si presentas antes de que Hacienda te requiera, se aplica el recargo por extemporaneidad
-                espontánea: <strong>5% si tardas hasta 3 meses</strong>, 10% hasta 6 meses, 15% hasta
-                12 meses, y 20% a partir de 12 meses. Además se exigen intereses de demora a partir
-                del mes 12. Si Hacienda actúa primero (liquidación de oficio), se aplican sanciones
-                que pueden llegar al 150% de la deuda.
+                espontánea del art. 27.2 LGT: un <strong>{formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase, 0)}% de partida
+                más otro {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes, 0)}% por cada mes completo de retraso</strong>,
+                hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses. A partir de ahí es
+                un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses, 0)}% fijo más intereses de demora
+                (al {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.interesDemoraAnual, 2)}% anual). El recargo se reduce
+                un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago, 0)}% si se paga en período voluntario.
+                Si Hacienda actúa primero (liquidación de oficio), se aplican sanciones que pueden
+                llegar al 150% de la deuda.
               </dd>
             </div>
 
@@ -1203,7 +1335,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           <h2>6 buenas prácticas para liquidar correctamente el impuesto y aplicar los beneficios fiscales previstos por la norma</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏰</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <div>
                 <strong>Solicita la prórroga antes del mes 5</strong>
                 <p>
@@ -1214,7 +1346,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <div>
                 <strong>Valora la aceptación a beneficio de inventario</strong>
                 <p>
@@ -1225,7 +1357,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏷️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
               <div>
                 <strong>Verifica el método de valoración del inmueble</strong>
                 <p>
@@ -1237,7 +1369,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🪑</span>
+              <span className={styles.tipIcon} aria-hidden="true">🪑</span>
               <div>
                 <strong>Declara el ajuar doméstico correctamente</strong>
                 <p>
@@ -1249,7 +1381,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏠</span>
               <div>
                 <strong>Aplica la reducción por vivienda habitual</strong>
                 <p>
@@ -1264,7 +1396,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📤</span>
+              <span className={styles.tipIcon} aria-hidden="true">📤</span>
               <div>
                 <strong>Liquida aunque la cuota sea cero</strong>
                 <p>
@@ -1282,15 +1414,18 @@ export default function EstimadorImpuestoSucesionesPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h2>6 errores que pueden costarte caro</h2>
             </div>
             <ul className={styles.warningList}>
               <li>
                 <strong>No declarar en plazo.</strong> El recargo por extemporaneidad espontánea
-                va del 5% (hasta 3 meses de retraso) al 20% (más de 12 meses), más intereses de
-                demora desde el mes 12. Una cuota de 10.000 € presentada con 8 meses de retraso
-                generará un recargo de 1.500 € adicionales.
+                es del {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase, 0)}% más
+                un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes, 0)}% por mes completo de retraso,
+                y un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses, 0)}% fijo más intereses
+                pasados los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses. Una cuota de
+                10.000 € presentada con 8 meses de retraso genera{' '}
+                {formatCurrency(10000 * porcentajeRecargoExtemporaneo(8) / 100)} de recargo.
               </li>
               <li>
                 <strong>Confundir la CCAA competente.</strong> El impuesto se presenta en la CCAA

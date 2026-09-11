@@ -1443,7 +1443,9 @@ test.describe('Hallazgos 514-516 — re-inspección del 30/08/2026, reparados', 
     // El rótulo subió de `<h4>` a `<h3>` con el hallazgo 626 (09/09/2026), que enderezó el
     // esquema de encabezados de la app. Se localiza por su texto y su papel de encabezado,
     // no por el nivel: lo que este test verifica es el CONTENIDO de la lista.
-    const lista = page.getByRole('heading', { name: /Tipos reducidos en/ }).locator('xpath=..');
+    // «Beneficios fiscales en …» desde el 11/09/2026: el rótulo anterior llamaba «tipos
+    // reducidos» a lo que en Aragón son bonificaciones sobre la cuota (hallazgo 711).
+    const lista = page.getByRole('heading', { name: /Beneficios fiscales en/ }).locator('xpath=..');
     // Ya no se anuncian como «disponibles»: cada línea trae sus condiciones reales,
     // y la de Vivienda habitual es la que un garaje suelto nunca cumple.
     await expect(lista).toContainText('Vivienda habitual', { useInnerText: true });
@@ -1907,7 +1909,7 @@ test.describe('INSPECCIÓN 07/09/2026 — los tres casos, resueltos a mano antes
     const bloque = page.locator('[role="note"]', { hasText: 'Podrías pagar menos' });
     await expect(bloque).toContainText('3,00% — Familia numerosa');
     await expect(bloque).toContainText('Vivienda habitual');
-    await expect(bloque).toContainText('El cálculo usa el tipo general (8,00%)');
+    await expect(bloque).toContainText('El cálculo usa el tipo que te corresponde sin requisitos especiales (8,00% efectivo sobre el precio)');
   });
 
   /**
@@ -2325,7 +2327,7 @@ test.describe('INSPECCIÓN 10/09/2026 — los tres casos, resueltos a mano antes
     const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
     await expect(aviso).toHaveCount(1);
     const textoAviso = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
-    expect(textoAviso).toContain('El cálculo usa el tipo general (8,00%)');
+    expect(textoAviso).toContain('El cálculo usa el tipo que te corresponde sin requisitos especiales (8,00% efectivo sobre el precio)');
     expect(textoAviso).toContain('En Extremadura existe');
     expect(textoAviso).toContain('6,40% — Discapacidad (bonif. 20%)');
     expect(textoAviso).toContain('Persona con discapacidad · Vivienda habitual');
@@ -2454,7 +2456,6 @@ test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
   test('el contrafactual del ejemplo de Ana usa la escala del ahorro, no un 19 % plano', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'madrid');
     await rellenar(page, 'Precio del garaje / plaza de parking', '22000');
@@ -2471,7 +2472,11 @@ test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
     )
       .replace(/\s+/g, ' ')
       .trim();
-    expect(ejemplo).toContain('1.350 €');
+    // El literal esperaba «1.350 €» y la app escribe «1350,00 €»: formatCurrency en es-ES no
+    // agrupa los millares de un número de cuatro cifras, así que el testigo no podía volver a
+    // verde NUNCA y había dejado de vigilar la regresión — un testigo permanentemente en rojo
+    // informa lo mismo que uno permanentemente en verde (hallazgo 712).
+    expect(ejemplo).toContain('1350,00 €');
     expect(ejemplo).not.toContain('1.330 €');
   });
 
@@ -2834,8 +2839,8 @@ test.describe('Hallazgos abiertos — re-inspección del 11/09/2026', () => {
    * El importe cobrado es CORRECTO; lo que falla es la frase que lo explica, y un texto que
    * no cuadra con la cifra de al lado enseña a desconfiar del resultado bueno.
    */
-  test.fail(
-    'HALLAZGO — el aviso «Podrías pagar menos» nombra el tipo general plano en una CCAA con escala',
+  test(
+    'REPARADO 11/09 — el aviso «Podrías pagar menos» nombra el tipo EFECTIVO, el que se ha cobrado',
     async ({ page }) => {
       await page.goto(RUTA);
       await page.getByRole('button', { name: /Segunda mano/ }).click();
@@ -2867,8 +2872,8 @@ test.describe('Hallazgos abiertos — re-inspección del 11/09/2026', () => {
    * llame a la oficina liquidadora de Aragón pidiendo «el tipo reducido para jóvenes» está
    * pidiendo algo que allí no existe con ese nombre.
    */
-  test.fail(
-    'HALLAZGO — Aragón: el rótulo dice «Tipos reducidos» y la nota de al lado dice que no los hay',
+  test(
+    'REPARADO 11/09 — Aragón: el rótulo ya no llama «tipos reducidos» a lo que son bonificaciones',
     async ({ page }) => {
       await page.goto(RUTA);
       await page.getByRole('button', { name: /Segunda mano/ }).click();
@@ -2876,18 +2881,22 @@ test.describe('Hallazgos abiertos — re-inspección del 11/09/2026', () => {
       await page.selectOption('#select-perfil', 'joven');
       await rellenar(page, 'Precio del garaje / plaza de parking', '80000');
 
-      // La nota de la ficha (la que el commit de hoy reescribió) está en pantalla...
+      // La nota de la ficha está en pantalla...
       await expect(
         page.getByText('Aragón aplica bonificaciones sobre la cuota, no tipos reducidos'),
       ).toBeVisible();
 
-      // ...así que el rótulo de la lista no debería llamarlos «tipos reducidos».
+      // ...y el rótulo de la lista ya no la contradice en la misma columna y sin hacer scroll.
+      // El importe nunca estuvo mal (el 7 % es el 8 % con la bonificación del 12,5 % ya
+      // descontada); lo que fallaba era el nombre, y quien llamara a la oficina liquidadora de
+      // Aragón pediría «el tipo reducido para jóvenes», que allí no existe con ese nombre.
+      await expect(page.locator('h3', { hasText: 'Tipos reducidos en' })).toHaveCount(0);
       const rotulo = (
-        await page.locator('h3', { hasText: 'Tipos reducidos en' }).first().innerText()
+        await page.locator('h3', { hasText: 'Beneficios fiscales en' }).first().innerText()
       )
         .replace(/\s+/g, ' ')
         .trim();
-      expect(rotulo).not.toContain('Tipos reducidos en Aragón');
+      expect(rotulo).toContain('Beneficios fiscales en Aragón');
     },
   );
 });

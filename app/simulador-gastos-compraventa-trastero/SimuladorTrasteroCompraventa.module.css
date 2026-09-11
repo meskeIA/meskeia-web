@@ -176,7 +176,7 @@
 .transmisionBtn.active {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .transmisionIcon {
@@ -232,7 +232,7 @@
 
 .infoCcaaNombre {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoCcaaGrid {
@@ -255,7 +255,7 @@
 .infoCcaaValue {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoCcaaNote {
@@ -276,7 +276,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   font-weight: 500;
   transition: opacity 0.2s;
@@ -319,7 +319,7 @@
 
 .tab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tab.active {
@@ -495,7 +495,7 @@
 .casoTag {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   padding: 0.2rem 0.5rem;
   border-radius: 999px;

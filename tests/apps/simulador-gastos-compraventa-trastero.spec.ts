@@ -2718,7 +2718,7 @@ test('REPARADO 11/09 (dato) — la página dice el 25 % orientativo que aplica, 
   expect(jsonLd).toMatch(/25% como referencia orientativa/);
 });
 
-// ❌ ABIERTO 11/09/2026 (medio) — accesibilidad. EFECTO FAMILIA del hallazgo 683.
+// ✅ REPARADO 11/09/2026 (medio) — accesibilidad. EFECTO FAMILIA del hallazgo 683.
 // El azul de MARCA `--primary` (#2E86AB) se sigue usando como color de TEXTO en esta app, en
 // los mismos tres selectores que `simulador-gastos-compraventa-nave-industrial` pasó a
 // `--primary-texto` el 10/09/2026. `app/globals.css` documenta el motivo en su propia
@@ -2735,10 +2735,9 @@ test('REPARADO 11/09 (dato) — la página dice el 25 % orientativo que aplica, 
 //       → esperado ≥ 4,5:1 · obtenido 3,65:1
 // Queda FUERA .infoCcaaValue (19,2 px / peso 700): ahí 3,74:1 sí cumple, porque la WCAG
 // admite 3:1 para texto grande (≥18,66 px en negrita). No todo el azul de la página falla.
-test('ABIERTO 11/09 (accesibilidad) — el azul de marca como texto no llega a 4,5:1 en claro', async ({
+test('REPARADO 11/09 (accesibilidad) — el azul de marca ya no hace de texto: se usa --primary-texto', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await page.waitForTimeout(300);
 
@@ -2779,7 +2778,7 @@ test('ABIERTO 11/09 (accesibilidad) — el azul de marca como texto no llega a 4
   expect(await contraste('[class*="casoTag"]')).toBeGreaterThanOrEqual(4.5);
 });
 
-// ❌ ABIERTO 11/09/2026 (bajo) — dato. Las dos tablas de ITP del repositorio no dicen lo
+// ✅ REPARADO 11/09/2026 (bajo) — dato. Las dos tablas de ITP del repositorio no decían lo
 // mismo sobre el reducido de Castilla y León, y la app publica la versión sin tope.
 // `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts), que es de donde esta app saca el tipo
 // GENERAL de la comunidad, dice: «Reducido 4% (≤150.000 €) o 6% (resto) para jóvenes <36,
@@ -2795,10 +2794,9 @@ test('ABIERTO 11/09 (accesibilidad) — el azul de marca como texto no llega a 4
 //         150.000,00 €»), como ya hace la del 0,01 % dos líneas más abajo
 //       → obtenido: «4,00% — Jóvenes < 36 años · Requisitos: Menor de 36 años · Vivienda
 //         habitual», sin tope, a 200.000 € (a ese precio la propia data/fiscal dice 6 %).
-test('ABIERTO 11/09 (dato) — el reducido de Castilla y León se ofrece sin el tope de 150.000 €', async ({
+test('REPARADO 11/09 (dato) — el reducido de Castilla y León se ofrece con su tope de 150.000 €', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Segunda mano/ }).click();
   await selectCcaa(page).selectOption('castilla-leon');

@@ -100,9 +100,18 @@ const EJEMPLO_MARTA_GASTOS =
   EJEMPLO_MARTA_NOTARIA + EJEMPLO_MARTA_REGISTRO + EJEMPLO_MARTA_GESTORIA;
 /** El tipo de jóvenes y el general salen de ITP_CCAA, por el mismo motivo que el arancel. */
 const EJEMPLO_MARTA_TIPO_GENERAL = ITP_CCAA[EJEMPLO_MARTA.ccaa].tipoGeneral;
+/** Normaliza tildes para comparar nombres de tipos reducidos (ej: «Jóvenes» → «jovenes»). */
+const normalizarTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
 const EJEMPLO_MARTA_TIPO_JOVEN =
-  ITP_CCAA[EJEMPLO_MARTA.ccaa].tiposReducidos?.find((t) => t.nombre.includes('Jóvenes'))?.tipo
-  ?? EJEMPLO_MARTA_TIPO_GENERAL;
+  ITP_CCAA[EJEMPLO_MARTA.ccaa].tiposReducidos?.find(
+    // Normalizado: es la forma exacta del hallazgo 526, que obligó a exportar `normaliza` desde
+    // data/itp-ccaa.ts. Hoy acertaría igual porque Andalucía escribe «Jóvenes» con esa tilde,
+    // pero si el nombre cambiara el find daría undefined, el ejemplo caería al tipo GENERAL y la
+    // página publicaría «el tipo reducido del 7% en lugar del tipo general del 7%. Ahorra 0 €»
+    // sin que nada avisara (hallazgo 723).
+    (t) => normalizarTexto(t.nombre).includes('jovenes'),
+  )?.tipo ?? EJEMPLO_MARTA_TIPO_GENERAL;
 const EJEMPLO_MARTA_ITP = EJEMPLO_MARTA.precio * (EJEMPLO_MARTA_TIPO_JOVEN / 100);
 const EJEMPLO_MARTA_AHORRO =
   EJEMPLO_MARTA.precio * ((EJEMPLO_MARTA_TIPO_GENERAL - EJEMPLO_MARTA_TIPO_JOVEN) / 100);
@@ -111,7 +120,6 @@ const EJEMPLO_MARTA_AHORRO =
 const INMUEBLES_RESIDENCIALES: TipoInmueble[] = ['vivienda', 'garaje', 'trastero'];
 
 // Normaliza tildes para comparar nombres de tipos reducidos (ej: "Jóvenes" → "jovenes")
-const normalizarTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 interface ResultadosComprador {
   precioInmueble: number;
@@ -789,7 +797,9 @@ export default function SimuladorCompraventaPage() {
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
-                        <strong>{tr.tipo}%</strong> - {tr.nombre}
+                        {/* formatTipoNominal y no el número crudo: «3.5%» es formato US, y dos
+                            dedos más abajo la misma página ya escribía «7,00%» bien (hallazgo 721) */}
+                        <strong>{formatTipoNominal(tr.tipo)}%</strong> - {tr.nombre}
                         {tr.valorMaximo && <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>}
                       </li>
                     ))}
@@ -1028,7 +1038,15 @@ export default function SimuladorCompraventaPage() {
                   label="Años de propiedad"
                   placeholder="10"
                   helperText="Años completos desde la compra hasta ahora. Escribe 0 si vendes antes de cumplir el año: esa reventa también tributa, y con un coeficiente mayor."
-                  min={0}
+                  /*
+                    SIN min={0} a propósito (hallazgo 722). El motor rechaza por escrito el año
+                    negativo —acotarlo lo convertiría en una reventa antes del año y liquidaría un
+                    impuesto a partir de un dato imposible—, pero el blur del NumberInput reescribía
+                    el campo a «0», que desde bc437470 es un dato con significado fiscal propio: la
+                    guarda quedaba inalcanzable y la app liquidaba 1.750 € sobre un valor que el
+                    usuario nunca escribió. Sin min, el «-5» permanece en pantalla y la plusvalía
+                    sigue diciendo «Sin calcular», que es lo que corresponde.
+                  */
                   max={50}
                 />
 
@@ -1249,7 +1267,13 @@ export default function SimuladorCompraventaPage() {
                         ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
                         : resultadosVendedor.exentoIRPF
                           ? 'Mayor de 65 años + vivienda habitual'
-                          : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'
+                          : resultadosVendedor.gananciaPatrimonial < 0
+                            // No es una exención, es ausencia de ganancia — y la diferencia importa:
+                            // una pérdida se compensa en la declaración y una exención no. La tarjeta
+                            // decía «EXENTO» en verde y debajo «Tributación en base del ahorro», es
+                            // decir que está exenta y que tributa a la vez (hallazgo 724).
+                            ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
+                            : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'
                     }
                   />
 

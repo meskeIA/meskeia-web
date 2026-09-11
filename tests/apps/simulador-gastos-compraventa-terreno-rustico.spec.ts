@@ -562,7 +562,7 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
    * ITP —la bonificación del 50 % de Ceuta y Melilla— SÍ está escrita, lo que enseña que la
    * reparación llegó a la mitad fiscal del bloque y no a la del IVA.
    */
-  test('HALLAZGO 6 — la FAQ y el FAQPage prometen IVA 21 % sin decir que en Canarias, Ceuta y Melilla no rige', async ({ page }) => {
+  test('REPARADO 11/09 (728) — la FAQ y el FAQPage dicen que en Canarias, Ceuta y Melilla no rige el IVA', async ({ page }) => {
     await page.goto(RUTA);
 
     // Lo que la calculadora hace de verdad en Canarias con renuncia:
@@ -604,7 +604,7 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
    *
    * Caso: Ceuta, compra habitual, 80.000 € → ITP 2.400,00 € (3,00 %) sin explicación.
    */
-  test('HALLAZGO 7 — en Ceuta la bonificación del 50 % se aplica pero no se nombra en ningún sitio', async ({ page }) => {
+  test('REPARADO 11/09 (729) — en Ceuta la bonificación del 50 % se aplica y se nombra', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Compra habitual/ }).click();
     await page.selectOption('#select-ccaa', 'ceuta');
@@ -640,7 +640,7 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
    * Ninguno llega al umbral de texto grande (18,66px bold / 24px), así que el exigible es
    * 4,5:1 en los cuatro.
    */
-  test('HALLAZGO 8 — el azul de marca como color de texto no llega a 4,5:1 (WCAG AA)', async ({ page }) => {
+  test('REPARADO 11/09 (730) — el texto usa --primary-texto y llega a 4,5:1 (WCAG AA)', async ({ page }) => {
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'madrid');
 

@@ -198,6 +198,33 @@ export const PLUSVALIA_MUNICIPAL_META = {
 };
 
 /**
+ * Plazo de autoliquidación del ITP y AJD.
+ *
+ * ── De dónde sale (11/09/2026, hallazgo 713 del Inspector) ───────────────────
+ * Estaba escrito a mano en el bloque educativo de `simulador-gastos-compraventa-garaje`, una
+ * app de riesgo 1, sin norma citada al lado — y en la MISMA frase el recargo por presentación
+ * tardía sí venía sellado desde `ESCALA_RECARGO_EXTEMPORANEO`, con su base normativa impresa
+ * en pantalla. Un párrafo con un dato con fuente y otro sin ella, y el segundo es el que fija
+ * la fecha desde la que corre el primero. `grep "30 días hábiles" data/ lib/` devolvía cero:
+ * no había en el repositorio nada que lo respaldase ni que permitiera revisarlo el día que una
+ * comunidad fije otro plazo.
+ *
+ * ⚠️ El plazo es de gestión autonómica: hay comunidades que lo amplían (Cataluña lo tiene en
+ * un mes en varios supuestos). Por eso el dato lleva el aviso: el valor de abajo es el del
+ * Reglamento estatal, que rige en defecto de norma propia.
+ */
+export const PLAZO_ITP = {
+  dias: 30,
+  unidad: 'días hábiles',
+  baseNormativa: 'art. 102.1 del Reglamento del ITPAJD, RD 828/1995',
+  desde: 'el día en que se cause el acto o contrato',
+  aviso: 'Plazo estatal supletorio: algunas comunidades autónomas fijan el suyo. Confirma el de la tuya antes de presentar.',
+  urlReferencia: 'https://www.boe.es/buscar/act.php?id=BOE-A-1995-14257',
+  verificado: '2026-09-11',
+  vigencia: '2026',
+};
+
+/**
  * Coeficientes máximos IIVTNU por años de tenencia — 2025
  *
  * Fuente: RDL 26/2021 + actualización anual vía Ley de Presupuestos.

@@ -93,7 +93,7 @@
 .sectionTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid var(--primary);
@@ -167,7 +167,7 @@
 .transmisionBtn.active {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.08);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .transmisionBtn:focus-visible {
@@ -249,7 +249,7 @@
 .infoCcaaNombre {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoCcaaGrid {
@@ -281,7 +281,7 @@
 .infoCcaaValue {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoCcaaNote {
@@ -298,7 +298,7 @@
 
 .catastroLink {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   display: inline-flex;
   align-items: center;

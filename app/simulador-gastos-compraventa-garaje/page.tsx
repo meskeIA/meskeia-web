@@ -22,7 +22,7 @@ import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, pa
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -580,7 +580,13 @@ export default function SimuladorGarajeCompraventaPage() {
               </select>
               {perfilComprador !== 'general' && datosCcaaActual.tiposReducidos.length > 0 && (
                 <div className={styles.tiposReducidosInfo}>
-                  <h3>Tipos reducidos en {datosCcaaActual.nombre} (solo si se cumplen TODAS sus condiciones):</h3>
+                  {/*
+                    «Tipos reducidos» contradecía a la nota de la ficha de Aragón dos líneas más
+                    abajo —allí son bonificaciones sobre la CUOTA, no tipos reducidos— y quien
+                    llamara a su oficina liquidadora pediría algo que no existe con ese nombre
+                    (hallazgo 711). El rótulo nombra ahora lo que la lista contiene de verdad.
+                  */}
+                  <h3>Beneficios fiscales en {datosCcaaActual.nombre} (solo si se cumplen TODAS sus condiciones):</h3>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
@@ -746,9 +752,18 @@ export default function SimuladorGarajeCompraventaPage() {
                       <p className={styles.avisoReducidosTitulo}>
                         <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
                       </p>
+                      {/*
+                        En una comunidad con escala progresiva, decir «el cálculo usa el tipo general
+                        (8,00%)» invitaba a multiplicar el precio por ese porcentaje y salir por debajo
+                        de lo que la tarjeta de al lado acaba de cobrar: 40.000 € frente a 40.750 € en
+                        Aragón con 500.000 € (hallazgo 710). El importe era correcto; lo que fallaba
+                        era la frase que lo explica. Se nombra el tipo EFECTIVO, que es el que sale de
+                        dividir la cuota por el precio, igual que hace la tarjeta del ITP.
+                      */}
                       <p className={styles.avisoReducidosTexto}>
-                        El cálculo usa el tipo general ({formatNumber(datosCcaaActual.tipoGeneral, 2)}%) porque no
-                        podemos comprobar tu situación. En {datosCcaaActual.nombre} existe:
+                        El cálculo usa el tipo que te corresponde sin requisitos especiales
+                        ({formatNumber(resultadosComprador.porcentajeImpuesto, 2)}% efectivo sobre el precio)
+                        porque no podemos comprobar tu situación. En {datosCcaaActual.nombre} existe:
                       </p>
                       <ul className={styles.avisoReducidosLista}>
                         {resultadosComprador.tipoElegido.noComprobables.map(r => (
@@ -1139,7 +1154,8 @@ export default function SimuladorGarajeCompraventaPage() {
               <span aria-hidden="true" className={styles.tipIcon}>📅</span>
               <strong>Liquida el ITP en el plazo legal</strong>
               <p>
-                El ITP debe liquidarse en 30 días hábiles desde la firma de la escritura. Presentarlo
+                El ITP debe liquidarse en {PLAZO_ITP.dias} días hábiles desde la firma de la escritura
+                ({PLAZO_ITP.baseNormativa}). Presentarlo
                 tarde por iniciativa propia, sin requerimiento de la Administración, genera recargo
                 desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más
                 otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,

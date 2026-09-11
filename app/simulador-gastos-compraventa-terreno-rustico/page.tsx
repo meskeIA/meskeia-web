@@ -28,6 +28,8 @@ import {
   calcularRegistro,
   ENLACE_CATASTRO,
   TERRITORIOS_SIN_IVA,
+  CIUDADES_CON_BONIFICACION,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
   sumarLineasVisibles,
 } from '@/data/itp-ccaa';
 import {
@@ -173,6 +175,8 @@ export default function SimuladorTerrenoRusticoPage() {
   }, [precioVenta, ccaa, tipoOperacion, gastosGestoria]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
+  /** Ceuta y Melilla bonifican el 50 % de la cuota (art. 57 bis TRLITPAJD), y hay que decirlo. */
+  const ciudadBonificada = CIUDADES_CON_BONIFICACION.includes(ccaa);
 
   return (
     <div className={styles.container}>
@@ -301,6 +305,19 @@ export default function SimuladorTerrenoRusticoPage() {
                 <span className={styles.infoCcaaLabel}>ITP General</span>
                 <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.tipoGeneral)}%</span>
               </div>
+              {/*
+                Sin esta casilla, el recuadro anunciaba «ITP General 6%» y la tarjeta cobraba el
+                3%, sin que nada explicara el salto: la cuota era correcta y el usuario no podía
+                reconstruirla (hallazgo 729).
+              */}
+              {ciudadBonificada && (
+                <div className={styles.infoCcaaItem}>
+                  <span className={styles.infoCcaaLabel}>Bonificación en cuota</span>
+                  <span className={styles.infoCcaaValue}>
+                    −{formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}%
+                  </span>
+                </div>
+              )}
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
                 <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
@@ -375,7 +392,9 @@ export default function SimuladorTerrenoRusticoPage() {
                     ? `En ${datosCcaaActual.nombre} no rige el IVA: la operación tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     : esRenuncia
                       ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
-                      : 'Tipo general de la CCAA (posibles reducciones agrarias no incluidas)'
+                      : ciudadBonificada
+                        ? `Tipo general del ${formatTipoNominal(datosCcaaActual.tipoGeneral)}% con la bonificación del ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}% de la cuota ya aplicada (art. 57 bis TRLITPAJD). No incluye posibles reducciones agrarias`
+                        : 'Tipo general de la CCAA (posibles reducciones agrarias no incluidas)'
                 }
               />
 
@@ -471,7 +490,7 @@ export default function SimuladorTerrenoRusticoPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Impuesto general</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>ITP</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary-texto)' }}>ITP</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>IVA (empresario) o ITP (particular)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>

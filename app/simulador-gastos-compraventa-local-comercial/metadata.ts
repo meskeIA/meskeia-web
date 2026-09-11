@@ -119,7 +119,7 @@ export const faqJsonLd = {
       name: '¿Qué tipo de ITP aplica a un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) son exclusivos de la vivienda habitual. Para un local comercial siempre aplica el tipo general de la comunidad autónoma, que va del ${ITP_MIN}% al ${ITP_MAX}%: el extremo alto no es un tipo plano, sino el último tramo de las comunidades que aplican una escala progresiva por valor del inmueble. Estos tipos pueden variar, por lo que conviene consultar la normativa vigente de cada comunidad.`,
+        text: `Los tipos reducidos de ITP por perfil del comprador (jóvenes, familias numerosas, discapacidad) son exclusivos de la vivienda habitual, así que un local comercial tributa por el tipo general de su comunidad autónoma, que va del ${ITP_MIN}% al ${ITP_MAX}%. Conviene mirar además la normativa autonómica: hay comunidades con tipos propios ligados a la ACTIVIDAD y no a la vivienda —Aragón, por ejemplo, aplica el 1% (0,75% en medio rural) a la adquisición de un inmueble para iniciar una actividad económica, art. 121-11—, que esta calculadora no aplica por depender de requisitos que no pregunta. Sobre el tipo general: el extremo alto no es un tipo plano, sino el último tramo de las comunidades que aplican una escala progresiva por valor del inmueble. Estos tipos pueden variar, por lo que conviene consultar la normativa vigente de cada comunidad.`,
       },
     },
   ],

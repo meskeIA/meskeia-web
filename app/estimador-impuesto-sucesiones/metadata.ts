@@ -36,7 +36,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Estima el Impuesto de Sucesiones (ISD) en las 17 comunidades autónomas de España. Tarifa estatal, Cataluña, País Vasco y Navarra. Orientación antes de hablar con tu asesor fiscal.",
   url: "https://meskeia.com/estimador-impuesto-sucesiones/",
   category: 'FinanceApplication',
-  features: [],
+  features: [
+    'Estimación del ISD en las 17 comunidades autónomas, con sus bonificaciones propias',
+    'Tarifa estatal del art. 21.2 LISD y tarifa propia de Cataluña',
+    'Reducciones por parentesco, edad, discapacidad, seguro de vida y vivienda habitual (95%)',
+    'Coeficiente multiplicador por grupo de parentesco y patrimonio preexistente',
+    'Usufructo y nuda propiedad por la regla del 89 menos la edad',
+    'Reparto por porcentaje de herencia cuando hay varios herederos',
+    'Desglose completo: masa hereditaria, ajuar, base liquidable, cuota íntegra y cuota final',
+  ],
 });
 
 export const faqJsonLd = {
@@ -56,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga por el Impuesto de Sucesiones en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La cuota depende de cuatro factores: el valor neto heredado, el grado de parentesco, el patrimonio previo del heredero y la comunidad autónoma. La tarifa estatal oscila entre el 7,65 % para los primeros tramos y el 34 % para importes superiores a 797.555 €. Sin embargo, comunidades como Madrid o Andalucía aplican una bonificación del 99 % para cónyuge e hijos directos, reduciendo la cuota a casi cero; Cataluña o Asturias son significativamente más gravosas para los mismos casos.',
+        text: 'La cuota depende de cuatro factores: el valor neto heredado, el grado de parentesco, el patrimonio previo del heredero y la comunidad autónoma. La tarifa estatal oscila entre el 7,65 % para los primeros tramos y el 34 % para importes superiores a 797.555 €. Sobre esa cuota, cada comunidad aplica su propio beneficio, y no todas por la misma vía: Madrid o Andalucía bonifican el 99 % de la CUOTA para cónyuge e hijos, mientras Asturias actúa antes, con una reducción de 300.000 € en la BASE de esos mismos grupos. Los dos caminos pueden acabar en cero, así que cuál resulta más barata depende del importe heredado y del parentesco: conviene calcular el caso concreto en vez de guiarse por la fama de cada comunidad.',
       },
     },
     {

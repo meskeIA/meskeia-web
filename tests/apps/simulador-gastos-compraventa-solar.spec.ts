@@ -702,7 +702,7 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
    * el aviso reactivo que solo aparece al elegir esos territorios; la hermana
    * `simulador-gastos-compraventa-garaje` sí lo dice en su FAQ visible (page.tsx:1111).
    */
-  test('HALLAZGO A — la FAQ visible afirma el IVA del 21 % sin la excepción de IGIC/IPSI que sí lleva su JSON-LD', async ({ page }) => {
+  test('REPARADO 11/09 (731) — la FAQ visible ya recoge la excepción de IGIC/IPSI que su JSON-LD llevaba', async ({ page }) => {
     await page.goto(RUTA);
 
     // El JSON-LD ya lo dice: no es que el dato no esté decidido, es que no llegó a la página.
@@ -736,7 +736,7 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
    * tarjeta de resultado ya está bien desde el 26/08 («IGIC — No calculado»); lo que no se
    * condicionó fue este aviso.
    */
-  test('HALLAZGO B — en Canarias el aviso del IVA deducible convive con el aviso de que allí no hay IVA', async ({ page }) => {
+  test('REPARADO 11/09 (732) — en Canarias ya no se explica cómo deducir un IVA que no se devenga', async ({ page }) => {
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'canarias');
     await page.getByRole('button', { name: /Promotor \/ Empresa/ }).click();
@@ -762,7 +762,7 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
    * motivo escrito en el propio comentario. En oscuro NO ocurre: allí `--primary` y
    * `--primary-texto` son el mismo #3FA5D1.
    */
-  test('HALLAZGO C — el azul de marca hace de texto y no llega al 4,5:1 de WCAG AA en modo claro', async ({ page }) => {
+  test('REPARADO 11/09 (733) — el texto usa --primary-texto y llega al 4,5:1 de WCAG AA', async ({ page }) => {
     await page.goto(RUTA);
 
     const medida = await page.evaluate(() => {
@@ -812,7 +812,7 @@ test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
    * divergir. El día que se mueva el tipo del local comercial y no el general, el solar
    * seguirá al equivocado y este test se pondrá rojo enseñando por qué.
    */
-  test('HALLAZGO D (guardia) — el IVA del solar sale de la constante del LOCAL, no de la del tipo general', async () => {
+  test('REPARADO 11/09 (734) — el IVA del solar sale del tipo general del art. 90 LIVA, no de la del LOCAL', async () => {
     expect(IVA_INMUEBLES_2025.local).toBe(PORCENTAJES_IVA.general);
   });
 });

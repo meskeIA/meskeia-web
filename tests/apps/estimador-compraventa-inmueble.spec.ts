@@ -2892,7 +2892,7 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
    * Lo lee ChatGPT, Bing Copilot y Perplexity, que es justo el sitio donde una cifra a mano
    * hace más daño (es la lección del hallazgo 584).
    */
-  test('HALLAZGO — el JSON-LD publica a mano un 1 %-2 % de fedatarios que el motor desmiente', async ({
+  test('REPARADO 11/09 (718) — el JSON-LD publica la horquilla de fedatarios que da el motor', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2926,7 +2926,7 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
    *        Aragón    · perfil Joven → «3.2% - Familia numerosa en medio rural» · esperado «3,2%»
    * El de Aragón lo estrenó el commit 7a02470c de hoy: hasta ayer su lista no tenía decimales.
    */
-  test('HALLAZGO — los tipos reducidos con decimales salen con punto inglés', async ({ page }) => {
+  test('REPARADO 11/09 (721) — los tipos reducidos con decimales salen en formato español', async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio de la vivienda', '140000');
     await page.locator('#ccaa-inmueble').selectOption('andalucia');
@@ -2956,7 +2956,7 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
    *       «0% - Jóvenes < 30 años o discapacidad ≥33% (1ª vivienda)» mientras la FAQ dice que
    *       la edad tope más baja son 32 años  ·  esperado «de los 30 a los 40 años».
    */
-  test('HALLAZGO — la horquilla de edad del tipo joven ya no coincide con la tabla', async ({
+  test('REPARADO 11/09 (720) — la horquilla de edad del tipo joven se deriva de la tabla', async ({
     page,
   }) => {
     // Las edades que de verdad hay en la tabla, leídas de las condiciones de cada reducido
@@ -3000,7 +3000,7 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
    * Caso: `grep -c normalizarTexto app/estimador-compraventa-inmueble/page.tsx`
    *       · esperado ≥ 2 (declaración + uso)  ·  obtenido 1 (solo la declaración).
    */
-  test('HALLAZGO — el normalizador de tildes está declarado pero no se usa', async () => {
+  test('REPARADO 11/09 (723) — el normalizador de tildes se usa donde hace falta', async () => {
     const fuente = readFileSync(
       join(process.cwd(), 'app/estimador-compraventa-inmueble/page.tsx'),
       'utf8',
@@ -3025,7 +3025,7 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
    *       → «Pérdida patrimonial 57.500,00 €» y, debajo, «IRPF sobre ganancia: EXENTO ·
    *         Tributación en base del ahorro»  ·  esperado un texto que hable de la pérdida.
    */
-  test('HALLAZGO — en pérdida patrimonial el IRPF dice «EXENTO» y explica que tributa', async ({
+  test('REPARADO 11/09 (724) — en pérdida patrimonial el IRPF ya no dice «exento» y «tributa» a la vez', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -3060,7 +3060,7 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
    *       lugar de 11.625,00 € (7,75 % general), 7.125 € de diferencia, mientras el JSON-LD
    *       le cuenta a ChatGPT y a Bing Copilot que a los 38 años ya no le corresponde.
    */
-  test('HALLAZGO — el JSON-LD sigue diciendo «menores de 35-36 años» que la FAQ visible ya corrigió', async ({
+  test('REPARADO 11/09 (719) — el JSON-LD y la FAQ visible dicen la misma edad tope', async ({
     page,
   }) => {
     await page.goto(RUTA);

@@ -41,6 +41,21 @@ async function cuota(page: Page): Promise<string> {
 }
 
 /** Todo el texto de la página, con los espacios duros normalizados. */
+/**
+ * Todo el texto del documento, INCLUIDO el que <EducationalSection> mantiene plegado: lo
+ * oculta por CSS sin desmontarlo, así que está en el DOM pero fuera del innerText.
+ */
+async function textoCompleto(page: Page): Promise<string> {
+  // Se clona el body y se le quitan <script> y <style>: el textContent del documento incluye
+  // el payload de React, y ahi dentro aparece cualquier cadena que uno busque.
+  const t = await page.evaluate(() => {
+    const clon = document.body.cloneNode(true) as HTMLElement;
+    clon.querySelectorAll('script, style').forEach((n) => n.remove());
+    return clon.textContent ?? '';
+  });
+  return t.split(' ').join(' ').replace(/\s+/g, ' ');
+}
+
 async function textoPagina(page: Page): Promise<string> {
   return (await page.locator('body').innerText()).replace(/ /g, ' ');
 }
@@ -285,7 +300,232 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
     await page.locator('select').nth(SELECT.parentesco).selectOption('II');
     await importe(page, CAMPO.saldos, '1.2.3');
 
-    await expect(page.getByText(/Selecciona tu CCAA y parentesco/)).toBeVisible();
+    // Desde el 11/09/2026 el aviso NOMBRA el campo en vez de caer en el placeholder genérico
+    await expect(page.getByRole('alert').filter({ hasText: /no se puede/ })).toContainText('Saldos en cuentas bancarias');
     await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// REPARACIÓN 11/09/2026 — los ocho hallazgos de la inspección de esta app que no
+// eran la tarifa. Cada test reproduce el caso del acta y comprueba lo reparado.
+// ════════════════════════════════════════════════════════════════════════════
+
+test.describe('Reparación 11/09/2026 — formulario, contenido y señal estructurada', () => {
+  /**
+   * HALLAZGO 736 (alto) — el campo principal pedía «Comunidad autónoma de residencia del
+   * HEREDERO», cuando el ISD se liquida donde el CAUSANTE tuvo su residencia habitual los 5
+   * años anteriores (art. 32.2.c de la Ley 22/2009). La propia página lo decía bien tres veces
+   * más abajo, así que quien hacía caso a la etiqueta cometía el error del que la app avisaba:
+   * sobrino en Madrid con tía fallecida en Asturias, 80.000 € → 2.068,39 € de diferencia.
+   */
+  test('736 — el campo de CCAA pide la del fallecido, no la del heredero', async ({ page }) => {
+    await page.goto(RUTA);
+
+    const etiqueta = page.locator('label[for="ccaa-causante"]');
+    const texto = await etiqueta.innerText();
+    expect(texto).toMatch(/fallecido|causante/i);
+    expect(texto).not.toMatch(/heredero/i);
+
+    // Y el select está asociado a esa etiqueta, que es lo que le da nombre accesible
+    await expect(page.locator('#ccaa-causante')).toHaveCount(1);
+  });
+
+  /**
+   * HALLAZGO 741 (alto) — 14 controles sin nombre accesible: los <label> se pintaban como
+   * hermanos del control, sin htmlFor y sin id, y no lo envolvían. Un lector de pantalla
+   * anunciaba «cuadro combinado» y «edición, 0,00» sin decir de qué concepto de la masa
+   * hereditaria se trataba.
+   */
+  test('741 — ningún control del formulario se queda sin nombre accesible', async ({ page }) => {
+    await page.goto(RUTA);
+
+    const sinNombre = await page.evaluate(() => {
+      const fuera: string[] = [];
+      document.querySelectorAll('select, input').forEach((el) => {
+        const c = el as HTMLInputElement;
+        if (c.type === 'hidden') return;
+        if (c.getAttribute('aria-label') || c.getAttribute('aria-labelledby')) return;
+        if (c.id && document.querySelector('label[for="' + CSS.escape(c.id) + '"]')) return;
+        if (c.closest('label')) return;
+        fuera.push(c.tagName.toLowerCase() + '#' + (c.id || '(sin id)'));
+      });
+      return fuera;
+    });
+
+    expect(sinNombre, 'controles sin nombre accesible: ' + sinNombre.join(', ')).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO 740 (alto) — un importe NEGATIVO en las deudas no se rechazaba ni se tomaba en
+   * valor absoluto: se restaba con su signo, así que AUMENTABA la masa hereditaria. Madrid,
+   * Grupo II, 250.000 € en cuentas y «-500000» de hipoteca daban 750.000 € de masa, 772.500 €
+   * de base imponible y una cuota de 1.238,24 € sobre una herencia que nunca existió.
+   */
+  test('740 — una deuda negativa no triplica la herencia: se rechaza y se dice', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '250000');
+    await page.locator('#hipotecas').fill('-500000');
+
+    await expect(page.getByRole('alert').filter({ hasText: /no se puede/ })).toContainText('Hipotecas y préstamos hipotecarios');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+    expect(await textoPagina(page)).not.toContain('750.000,00 €');
+  });
+
+  /**
+   * HALLAZGO 742 (medio) — un importe inválido conviviendo con uno válido se descartaba en
+   * silencio: el parser devolvía NaN, el «|| 0» lo convertía en cero y la app daba una cifra
+   * completa sin ninguna marca sobre el campo que había tirado.
+   */
+  test('742 — un importe ilegible junto a uno válido no se descarta en silencio', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '1.2.3');
+    await importe(page, CAMPO.viviendaHabitual, '200000');
+
+    // Antes: «Total activos 200.000,00 €» y cuota 59,66 € sin avisar de nada.
+    await expect(page.getByRole('alert').filter({ hasText: /no se puede/ })).toContainText('Saldos en cuentas bancarias');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+    expect(await textoPagina(page)).not.toContain('200.000,00 €');
+  });
+
+  /**
+   * HALLAZGO 743 (medio) — el porcentaje de herencia 0 se convertía en 100 (el 0 es falsy), y
+   * la pantalla se contradecía: «Porcentaje de herencia 0%» encima de «Base ajustada
+   * 257.500,00 €», que es el 100 % de la herencia, con su cuota de 237,39 € debajo.
+   */
+  test('743 — el porcentaje de herencia 0 no se convierte en el 100 %', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '250000');
+    await page.locator('#porcentaje-herencia').fill('0');
+
+    // Los 257.500 € siguen viéndose como base imponible de la herencia COMPLETA, que es
+    // correcto; lo que no puede ser la herencia entera es la base ajustada de este heredero.
+    const baseAjustada = (await page.locator('text=Base ajustada').locator('..').innerText()).split(' ').join(' ');
+    expect(baseAjustada).toContain('0,00 €');
+    expect(baseAjustada).not.toContain('257.500,00 €');
+    expect(await cuota(page)).toBe('0,00 €');
+  });
+
+  /**
+   * HALLAZGO 737 (alto) — la tarjeta «Sobrino hereda cuenta bancaria — Asturias — Grupo III —
+   * 80.000 €» desarrollaba el cálculo saltándose la reducción en base de 50.000 € que la
+   * herramienta SÍ aplica: anunciaba ~17.200 € donde la app liquida 3.306,56 €, en un ejemplo
+   * que el usuario lee como confirmación del número que acaba de obtener.
+   */
+  test('737 — la tarjeta del sobrino de Asturias dice lo que la herramienta calcula', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('III');
+    await importe(page, CAMPO.saldos, '80000');
+    expect(await cuota(page)).toBe('3306,56 €');
+
+    const tarjeta = await textoCompleto(page);
+    expect(tarjeta).toContain('3.306,56 €');   // la tarjeta del bloque educativo
+    expect(tarjeta).not.toContain('17.200');
+    expect(tarjeta).toContain('50.000 € en la base');
+  });
+
+  /**
+   * HALLAZGO 738 (alto) — dos afirmaciones sobre Asturias que los propios datos desmentían, y
+   * que además eran la asimetría territorial valorativa que el CLAUDE.md prohíbe. Con la misma
+   * herencia del caso normal, Asturias sale a 0,00 € y Madrid a 154,74 €: la comunidad que el
+   * texto ponía como «la de mayor recaudación efectiva» era la más barata de las dos.
+   */
+  test('738 — el texto sobre Asturias ya no la califica ni contradice al motor', async ({ page }) => {
+    await page.goto(RUTA);
+    const texto = await textoCompleto(page);
+
+    expect(texto).not.toContain('mayor recaudación efectiva');
+    expect(texto).not.toContain('menor bonificación para colaterales');
+
+    // Y el caso que lo desmentía, calculado en la propia app: Asturias 0,00 €
+    await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '50000');
+    await importe(page, CAMPO.viviendaHabitual, '200000');
+    expect(await cuota(page)).toBe('0,00 €');
+  });
+
+  /**
+   * HALLAZGO 739 (alto) — el bloque educativo usaba la escala de recargos DEROGADA (5/10/15/20 %
+   * por tramos). El art. 27.2 LGT, en la redacción de la Ley 11/2021 vigente desde el
+   * 11/07/2021, es 1 % más 1 % por mes completo, y 15 % fijo pasados 12 meses. El ejemplo que
+   * daba la propia página —10.000 € con 8 meses de retraso— asustaba con 1.500 € cuando la ley
+   * cobra 900 €.
+   */
+  test('739 — el recargo por presentación tardía es el del art. 27.2 vigente', async ({ page }) => {
+    await page.goto(RUTA);
+    const texto = (await textoCompleto(page)).replace(/\s+/g, ' ');
+
+    // 1 % + 1 % × 8 meses = 9 % de 10.000 € = 900,00 €
+    expect(texto).toContain('900,00 €');
+    expect(texto).not.toContain('1.500 €');
+    expect(texto).not.toMatch(/5% si tardas hasta 3 meses/);
+  });
+
+  /**
+   * HALLAZGO 744 (medio) — el bloque educativo metía al cónyuge en el Grupo I y lo dejaba fuera
+   * del Grupo II, contra el art. 20.2.a LISD y contra el faqJsonLd de la propia app, que sí lo
+   * decía bien. La misma URL afirmaba las dos cosas.
+   */
+  test('744 — el cónyuge está en el Grupo II, como dice el art. 20.2.a', async ({ page }) => {
+    await page.goto(RUTA);
+    const texto = (await textoCompleto(page)).replace(/\s+/g, ' ');
+
+    expect(texto).toContain('Descendientes y adoptados menores de 21 años');
+    expect(texto).toContain('Descendientes de 21 años o más, cónyuge y ascendientes');
+  });
+
+  /**
+   * HALLAZGOS 746 y 747 (bajos) — el coeficiente multiplicador y los porcentajes de bonificación
+   * se imprimían con toFixed, es decir con punto decimal inglés, conviviendo en la misma columna
+   * con importes que sí iban en formato español; y DataReference recibía la misma cadena en
+   * «normativa» y en «fuente», así que la pintaba dos veces seguidas.
+   */
+  test('746 y 747 — formato español en el desglose y sin fuente duplicada', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('III');
+    await importe(page, CAMPO.saldos, '80000');
+
+    const panel = await textoPagina(page);
+    expect(panel).toContain('×1,5882');
+    expect(panel).not.toContain('×1.5882');
+
+    // La tarjeta de datos de referencia ya no repite la misma cadena dos veces
+    const referencia = await page.getByText('Normativa aplicada').locator('..').innerText();
+    expect(referencia).toContain('ISD 2025');
+    const vecesFuente = referencia.split('Ley 29/1987 ISD + normativas autonómicas 2025').length - 1;
+    expect(vecesFuente, 'la fuente completa se imprime UNA vez').toBe(1);
+  });
+
+  /**
+   * HALLAZGO 748 (bajo) — el WebApplication de Schema.org se publicaba con features vacío, es
+   * decir con featureList vacío, en una app cuyo canal declarado son las IAs.
+   */
+  test('748 — el WebApplication publica sus características', async ({ page }) => {
+    await page.goto(RUTA);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const nodos = bloques.flatMap((b) => {
+      const j = JSON.parse(b);
+      return (j['@graph'] ?? [j]) as Array<Record<string, unknown>>;
+    });
+    const webApp = nodos.find((n) => n['@type'] === 'WebApplication');
+
+    expect(webApp, 'hay un WebApplication en el JSON-LD').toBeTruthy();
+    const caracteristicas = webApp!.featureList as string[];
+    expect(Array.isArray(caracteristicas)).toBe(true);
+    expect(caracteristicas.length).toBeGreaterThanOrEqual(4);
   });
 });

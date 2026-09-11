@@ -400,6 +400,14 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       {
         nombre: 'Jóvenes < 36 años',
         tipo: 4,
+        /*
+          El tope estaba solo en el texto libre de `notaReducido` y en TIPOS_ITP_CCAA_2025
+          («Reducido 4% (≤150.000 €) o 6% (resto)»), así que la caja «Podrías pagar menos»
+          ofrecía el 4 % a cualquier precio, también donde la propia data/fiscal dice 6 %
+          (hallazgo 717). El cotejo del triaje comparaba los VALORES de las dos tablas —ambas
+          dicen 4— y no el tope, que no era un campo sino una frase.
+        */
+        valorMaximo: 150000,
         condiciones: ['Menor de 36 años', 'Vivienda habitual'],
       },
       {
