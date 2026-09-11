@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-09-11',
+    fichaSlug: 'itp-ccaa',
+    texto:
+      'Aragón no tiene tipos reducidos por colectivo, sino bonificaciones sobre la cuota: el 12,5% para menores de 35 años, personas con discapacidad igual o superior al 65% y mujeres víctimas de violencia de género, siempre que el inmueble no supere los 100.000 € y compatibles entre sí (art. 121-4), y el 50% para familias numerosas, que exige vender la vivienda anterior, ganar más de un 10% de superficie y no superar los 35.000 € de renta, y que sube al 60% en el medio rural (arts. 121-5 y 160-3). Sobre el tipo general del 8%, la bonificación del 12,5% deja el tipo efectivo en el 7%. El tipo general, además, es una escala de cinco tramos —8% hasta 400.000 €, 8,5%, 9%, 9,5% y 10% desde 750.000 €— y no un tipo único (art. 121-1 del texto refundido aprobado por el Decreto Legislativo 1/2005, en la redacción de la Ley 10/2015 con efectos desde el 01/01/2016; texto consolidado en BOA-d-2005-90006).',
+  },
+  {
     fecha: '2026-08-19',
     fichaSlug: 'itp-ccaa',
     texto:

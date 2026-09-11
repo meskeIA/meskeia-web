@@ -540,7 +540,7 @@ export default function SimuladorLocalComercialPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>

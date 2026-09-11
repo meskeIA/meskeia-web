@@ -1166,8 +1166,14 @@ test.describe('Hallazgos reparados — 28/08/2026', () => {
 //  - Tipo general de Aragón (8 %) y de Extremadura (8 %) → `TIPOS_ITP_CCAA_2025` en
 //    `data/fiscal/inmuebles.ts`, que `tipoGeneralDe()` lee para rellenar `ITP_CCAA`.
 //  - Escalas progresivas → `ITP_CCAA` en `data/itp-ccaa.ts`
-//    (Aragón: 8 % hasta 400.000 € y 10 % por encima · Extremadura: 8 % hasta 360.000 €,
-//     10 % hasta 600.000 € y 11 % por encima).
+//    (Aragón: escala de cinco tramos del art. 121-1 — 8 % hasta 400.000 €, 8,5 % hasta
+//     450.000 €, 9 % hasta 500.000 €, 9,5 % hasta 750.000 € y 10 % por encima ·
+//     Extremadura: 8 % hasta 360.000 €, 10 % hasta 600.000 € y 11 % por encima).
+//    ⚠️ 11/09/2026: este caso se escribió contra una escala de Aragón de DOS tramos
+//    (8 % / 10 %) que no era la de la norma — le faltaban los tres escalones intermedios.
+//    El triaje fiscal de ese día la corrigió contra el consolidado del BOE, así que las
+//    cifras de abajo bajaron de 92.000 € a 89.500 € de ITP. El caso sigue siendo válido y
+//    sigue cruzando la escala; lo que cambió es cuánto sale.
 //  - Aranceles → `ARANCELES_NOTARIO` (RD 1426/1989) y `ARANCELES_REGISTRO` (RD 1427/1989),
 //    con `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y `REGISTRO_CONCEPTOS`
 //    (presentación 6,010121 € + nota simple 3,005061 €). El 21 % de IVA va dentro.
@@ -1178,13 +1184,14 @@ test.describe('Re-inspección 02/09/2026 — tres casos nuevos', () => {
   /**
    * CASO 1 (NORMAL) — Aragón, segunda mano, 1.000.000 €, gestoría 500 €.
    *
-   * Aragón es la escala progresiva más simple del catálogo (dos tramos con el corte en
-   * 400.000 €) y no se había probado nunca. Una nave usada de un millón la cruza, así que
-   * el tipo NOMINAL de la tabla (8 %) y el que de verdad se paga dejan de coincidir.
+   * Aragón tiene la escala de cinco tramos del art. 121-1 del Decreto Legislativo 1/2005,
+   * con cuota íntegra acumulada. Una nave usada de un millón la cruza entera, así que el
+   * tipo NOMINAL de la tabla (8 %) y el que de verdad se paga dejan de coincidir.
    *
-   * A mano:
-   *   ITP = 400.000 × 8 % + 600.000 × 10 % = 32.000 + 60.000        =  92.000,00
-   *   tipo efectivo = 92.000 / 1.000.000                            =       9,20 %
+   * A mano (los cortes acumulados son los de la tabla oficial: 32.000 · 36.250 · 40.750 ·
+   * 64.500):
+   *   ITP = 64.500 + (1.000.000 − 750.000) × 10 % = 64.500 + 25.000    =  89.500,00
+   *   tipo efectivo = 89.500 / 1.000.000                               =       8,95 %
    *   AJD = 0 (segunda mano sin renuncia: no hay cuota gradual)
    *   Notaría: arancel = 558,93946 (acumulado hasta 601.012,10)
    *            + (1.000.000 − 601.012,10) × 0,0003 = 119,69637      = 678,63583
@@ -1194,11 +1201,11 @@ test.describe('Re-inspección 02/09/2026 — tres casos nuevos', () => {
    *   Registro: 306,5156935 (acumulado hasta 601.012,10)
    *            + (1.000.000 − 601.012,10) × 0,0002 = 79,79758       = 386,3132735
    *            + 9,015182 = 395,3284555 · × 1,21                    =    478,3474311
-   *   Total gastos = 92.000 + 1.437,01137 + 478,3474311 + 500       =  94.415,3588011
-   *   % sobre el precio = 94.415,3588 / 1.000.000                   =       9,4415 % → «9,44%»
-   *   Total operación                                               = 1.094.415,3588011
+   *   Total gastos = 89.500 + 1.437,01137 + 478,3474311 + 500       =  91.915,3588011
+   *   % sobre el precio = 91.915,3588 / 1.000.000                   =       9,1915 % → «9,19%»
+   *   Total operación                                               = 1.091.915,3588011
    */
-  test('CASO 1 (normal) — Aragón, segunda mano, 1.000.000 €: la escala 8/10 da un efectivo del 9,20%', async ({ page }) => {
+  test('CASO 1 (normal) — Aragón, segunda mano, 1.000.000 €: la escala de cinco tramos da un efectivo del 8,95%', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'aragon');
@@ -1206,13 +1213,15 @@ test.describe('Re-inspección 02/09/2026 — tres casos nuevos', () => {
     await rellenar(page, GESTORIA, '500');
 
     // La app anuncia la escala en el recuadro de la comunidad; el caso comprueba que la aplica.
-    await expect(page.getByText(/escala progresiva \(8% → 10%\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(8% → 8,5% → 9% → 9,5% → 10%\)/)).toBeVisible();
 
-    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (9,20%)');
-    expect(await valorTarjeta(page, 'ITP (')).toBe('92.000,00 €');
-    // El tipo plano del primer tramo habría dado 80.000 €, y el del segundo 100.000 €: ninguno.
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,95%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('89.500,00 €');
+    // El tipo plano del primer tramo habría dado 80.000 €, y el del último 100.000 €: ninguno.
     await expect(page.getByText('80.000,00 €')).toHaveCount(0);
     await expect(page.getByText('100.000,00 €')).toHaveCount(0);
+    // Y la escala de dos tramos que esta app aplicó hasta el 11/09/2026 daba 92.000 €.
+    await expect(page.getByText('92.000,00 €')).toHaveCount(0);
     // En segunda mano sin renuncia no hay cuota gradual de AJD sobre la compraventa.
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
 
@@ -1223,9 +1232,9 @@ test.describe('Re-inspección 02/09/2026 — tres casos nuevos', () => {
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('478,35 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
 
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('94.415,36 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,44%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.094.415,36 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('91.915,36 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,19%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.091.915,36 €');
   });
 
   /**

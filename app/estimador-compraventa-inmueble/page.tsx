@@ -753,7 +753,7 @@ export default function SimuladorCompraventaPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>

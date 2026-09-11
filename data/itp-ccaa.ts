@@ -147,34 +147,95 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     notas: 'Bonificación del 3,5% para colectivos vulnerables y zonas despobladas.',
   },
 
+  /**
+   * Aragón — verificado el 11/09/2026 contra el texto consolidado del BOE
+   * (`BOA-d-2005-90006`, Decreto Legislativo 1/2005, redacción de la Ley 10/2015 con
+   * efectos desde el 01/01/2016; el régimen rural, de la Ley 13/2023).
+   *
+   * ⚠️ Aragón NO tiene tipos reducidos por colectivo: tiene BONIFICACIONES EN CUOTA.
+   * Aquí se declaran como tipo efectivo porque `TipoReducido` no sabe expresar otra cosa,
+   * y eso solo es exacto mientras el requisito de valor mantenga la operación dentro del
+   * primer tramo del 8 % — que es el caso, porque el art. 121-4 exige ≤100.000 € y el
+   * primer tramo llega a 400.000 €. Si alguna vez sube ese techo por encima de 400.000 €,
+   * estos tipos efectivos dejan de valer y hay que bonificar sobre la cuota.
+   *
+   * Lo que había hasta hoy, y de dónde salía cada error (triaje fiscal del 11/09/2026):
+   *   · tramos [400.000 → 8 %, resto → 10 %]: se saltaba los tres escalones intermedios,
+   *     así que una vivienda de 500.000 € liquidaba 42.000 € en vez de 40.750 €;
+   *   · «Jóvenes < 35 años» al 6 % y «Discapacidad ≥65 %» al 6 %: el 12,5 % del art. 121-4
+   *     deja el efectivo en el 7 %, no en el 6 %. Sobre 100.000 € son 1.000 € de menos;
+   *   · «Familia numerosa (zona rural)» al 4 % con la condición «Municipio rural»: al revés.
+   *     El 50 % del art. 121-5 no pide medio rural — lo que hace el medio rural es SUBIRLO
+   *     al 60 % (art. 160-3). Y faltaban sus requisitos de verdad, que son duros;
+   *   · faltaban por completo las mujeres víctimas de violencia de género.
+   */
   'aragon': {
     nombre: 'Aragón',
     tipoGeneral: tipoGeneralDe('Aragón'),
+    // Art. 121-1: escala de cuota acumulada. Los cortes reproducen la tabla oficial —
+    // 32.000 € a los 400.000, 36.250 € a los 450.000, 40.750 € a los 500.000 y 64.500 €
+    // a los 750.000 —, que es lo que comprueba `tests/itp-aragon.spec.ts`.
     tramosProgresivos: [
       { hasta: 400000, tipo: 8 },
+      { hasta: 450000, tipo: 8.5 },
+      { hasta: 500000, tipo: 9 },
+      { hasta: 750000, tipo: 9.5 },
       { hasta: Infinity, tipo: 10 },
     ],
     tiposReducidos: [
       {
+        // Art. 121-4.a) — bonificación del 12,5 % sobre la cuota íntegra. 8 % → 7 %.
         nombre: 'Jóvenes < 35 años',
-        tipo: 6,
-        condiciones: ['Menor de 35 años', 'Vivienda habitual', 'Valor ≤ 100.000 €'],
+        tipo: 7,
+        condiciones: ['Menor de 35 años', 'Vivienda habitual', 'Valor real ≤ 100.000 €'],
         valorMaximo: 100000,
       },
       {
-        nombre: 'Familia numerosa (zona rural)',
-        tipo: 4,
-        condiciones: ['Familia numerosa', 'Municipio rural', 'Bonificación 50-60%'],
-      },
-      {
+        // Art. 121-4.b) — mismo 12,5 %.
         nombre: 'Discapacidad ≥65%',
-        tipo: 6,
-        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual', 'Valor ≤ 100.000 €'],
+        tipo: 7,
+        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual', 'Valor real ≤ 100.000 €'],
         valorMaximo: 100000,
+      },
+      {
+        // Art. 121-4.c) — mismo 12,5 %. Las tres bonificaciones son compatibles entre sí.
+        nombre: 'Víctimas de violencia de género',
+        tipo: 7,
+        condiciones: [
+          'Orden de protección en vigor o sentencia firme en los últimos 10 años',
+          'Vivienda habitual',
+          'Valor real ≤ 100.000 €',
+        ],
+        valorMaximo: 100000,
+      },
+      {
+        // Art. 121-5 — bonificación del 50 % sobre la cuota. 8 % → 4 %.
+        nombre: 'Familia numerosa',
+        tipo: 4,
+        condiciones: [
+          'Familia numerosa',
+          'Vivienda habitual',
+          'Vender la anterior vivienda habitual entre 2 años antes y 4 después',
+          'Superficie útil superior en más de un 10% a la anterior',
+          'Renta ≤ 35.000 € (+6.000 € por hijo que exceda del mínimo legal)',
+          'Incompatible con las demás bonificaciones autonómicas',
+        ],
+        rentaMaxima: 35000,
+      },
+      {
+        // Art. 160-3.1 — en medio rural esa misma bonificación sube al 60 %. 8 % → 3,2 %.
+        nombre: 'Familia numerosa en medio rural',
+        tipo: 3.2,
+        condiciones: [
+          'Los mismos requisitos del art. 121-5',
+          'Residencia habitual en asentamiento rural de rango VIII a X, el año del devengo y los cuatro siguientes',
+          'Renta ≤ 35.000 € (+6.000 € por hijo que exceda del mínimo legal)',
+        ],
+        rentaMaxima: 35000,
       },
     ],
     ajd: 1.5,
-    notas: 'Escala progresiva desde 2024. Bonificaciones en zonas rurales. ⚠️ Dato orientativo: existen bonificaciones adicionales sobre la cuota (jóvenes, discapacidad, familia numerosa) que varían según colectivo y municipio — verifica la tarifa vigente en aragon.es',
+    notas: 'Aragón aplica bonificaciones sobre la cuota, no tipos reducidos: el 12,5 % del art. 121-4 para menores de 35 años, discapacidad ≥65 % y víctimas de violencia de género (inmueble ≤100.000 €, compatibles entre sí), y el 50 % del art. 121-5 para familias numerosas, que sube al 60 % en medio rural. En una compra en proindiviso donde no todos los compradores cumplan los requisitos, la bonificación se aplica en proporción a la participación de quien sí los cumple (art. 121-4.4). ⚠️ Esta app no calcula dos casos que sí existen: el 1 % por adquirir un inmueble para iniciar una actividad económica (art. 121-11, 0,75 % en medio rural) y el 100 % en la cesión de derechos sobre VPO (art. 121-8).',
   },
 
   'asturias': {

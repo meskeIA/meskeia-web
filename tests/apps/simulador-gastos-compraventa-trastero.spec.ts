@@ -1815,14 +1815,22 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
   /**
    * CASO 18 (LÍMITE) — la FRONTERA exacta de una escala progresiva, que es donde un `<` en
    * lugar de un `<=` se lleva por delante el tramo siguiente o cobra de más. Aragón parte
-   * en 400.000 € (8 % → 10 %), así que se prueba justo encima de la raya y 50.000 € más
+   * en 400.000 € (8 % → 8,5 %), así que se prueba justo encima de la raya y 50.000 € más
    * arriba, donde el segundo tramo ya tiene que morder.
    *
-   * A 400.000 € el tipo efectivo debe seguir siendo 8,00 % clavado; a 450.000 €, 8,22 %.
+   * A 400.000 € el tipo efectivo debe seguir siendo 8,00 % clavado; a 450.000 €, 8,06 %.
    * Si la app aplicara el tipo plano del primer tramo a todo (el defecto que `importeITP`
-   * vino a cerrar), a 450.000 € cobraría 36.000 € en vez de 37.000 €.
+   * vino a cerrar), a 450.000 € cobraría 36.000 € en vez de 36.250 €.
+   *
+   * ⚠️ 11/09/2026: hasta ese día la escala de Aragón que aplicaba esta app tenía DOS tramos
+   * (8 % hasta 400.000 € y 10 % por encima) y le faltaban los tres escalones intermedios
+   * del art. 121-1. El triaje fiscal la corrigió contra el consolidado del BOE, así que el
+   * segundo tramo pasó del 10 % al 8,5 % y el caso de 450.000 € bajó de 37.000 a 36.250 €.
+   * La frontera que vigila este caso sigue siendo la misma; lo que cambió es cuánto muerde
+   * el tramo de después — y ahora la diferencia con el tipo plano es de solo 250 €, que es
+   * justamente lo que hace el caso más exigente, no menos.
    */
-  test('CASO 18 (límite) — Aragón, la raya de los 400.000 € entre el 8 % y el 10 %', async ({ page }) => {
+  test('CASO 18 (límite) — Aragón, la raya de los 400.000 € entre el 8 % y el 8,5 %', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await selectCcaa(page).selectOption('aragon');
@@ -1830,7 +1838,9 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     await rellenar(page, 'Precio del trastero', '400000');
 
     // El recuadro de la comunidad tiene que anunciar la escala que luego aplica.
-    expect(await texto(page.locator('p', { hasText: 'escala progresiva (' }).first())).toContain('8% → 10%');
+    expect(await texto(page.locator('p', { hasText: 'escala progresiva (' }).first())).toContain(
+      '8% → 8,5% → 9% → 9,5% → 10%',
+    );
 
     // ITP a 400.000 € exactos = 400.000 × 8 % = 32.000. El segundo tramo empieza DESPUÉS:
     // `calcularITPProgresivo` agota el primero (baseTramo = 400.000 − 0) y sale del bucle
@@ -1858,21 +1868,23 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,39%');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('433.579,55 €');
 
-    // Los tres reducidos de Aragón son todos de colectivo (joven, familia numerosa,
-    // discapacidad) y ninguno queda «al alcance de cualquiera», así que con perfil general
-    // no hay nada que ofrecer: la caja de oportunidades NO debe pintarse.
+    // Los cinco reducidos de Aragón son todos de colectivo (joven, discapacidad, víctimas
+    // de violencia de género, familia numerosa y familia numerosa en medio rural) y ninguno
+    // queda «al alcance de cualquiera», así que con perfil general no hay nada que ofrecer:
+    // la caja de oportunidades NO debe pintarse.
     await expect(page.locator('p', { hasText: 'Podrías pagar menos' })).toHaveCount(0);
 
     // 50.000 € por encima de la raya, el segundo tramo ya muerde:
-    //   400.000 × 8 % + 50.000 × 10 % = 32.000 + 5.000 = 37.000
-    //   tipo EFECTIVO = 37.000 / 450.000 = 8,2222 % (el nominal, 8 %, mentiría)
+    //   400.000 × 8 % + 50.000 × 8,5 % = 32.000 + 4.250 = 36.250
+    //   tipo EFECTIVO = 36.250 / 450.000 = 8,0555 % (el nominal, 8 %, mentiría)
+    //   y coincide con la cuota acumulada que la tabla del art. 121-1 fija a los 450.000 €.
     await rellenar(page, 'Precio del trastero', '450000');
-    expect(await valorTarjeta(page, 'ITP (8,22%)')).toBe('37.000,00 €');
+    expect(await valorTarjeta(page, 'ITP (8,06%)')).toBe('36.250,00 €');
     // Notaría: 483,43341 × 1,21 = 584,9544261 → medio ×1,75 = 1.023,669245675
     // Registro: 261,2120635 + 9,015182 = 270,2272455 → ×1,21 = 326,97496706
-    // Total = 37.000 + 1.023,67 + 326,97 + 300 = 38.650,64
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('38.650,64 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('488.650,64 €');
+    // Total = 36.250 + 1.023,67 + 326,97 + 300 = 37.900,64
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('37.900,64 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('487.900,64 €');
   });
 
   /**

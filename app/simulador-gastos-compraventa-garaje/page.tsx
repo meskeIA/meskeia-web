@@ -556,7 +556,7 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             {datosCcaaActual.tramosProgresivos && (
               <p className={styles.infoCcaaNote}>
-                Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+                Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
               </p>
             )}
             <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>

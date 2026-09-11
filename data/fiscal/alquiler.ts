@@ -12,19 +12,22 @@
  * - Publicado mensualmente
  * - Aplica a contratos firmados ANTES del 26 de mayo de 2023
  *
- * Versión: 1.1.1
- * Última verificación: 2026-08-12
+ * Versión: 1.1.2
+ * Última verificación: 2026-09-11
  * ⚠️ 2026-07-14: corregidos los valores de IPC de jun-2025 a feb-2026 (la serie
  *    anterior no coincidía con la oficial del INE, verificado mes a mes con varipc)
  *    y corregida la fuente del IRAV (la antigua tabla 25171 sirve hoy el IPV).
  * ⚠️ 2026-08-12: cerrado el trimestre 2026-Q2 con el IRAV de junio (2,44) e
  *    incorporado el IPC interanual de junio (3,2 %, dato definitivo del INE).
+ * ⚠️ 2026-09-11: incorporado el IPC interanual de julio (3,6 %, nota de prensa del
+ *    INE de 13/08/2026). El IRAV sigue al día: 2026-Q3 no puede cerrarse hasta que
+ *    el INE publique septiembre, en octubre.
  * ⚠️ Verificar valores con el INE antes de aplicar en un contrato real.
  */
 
 export const ALQUILER_META = {
   fuente: 'INE — Índice de Referencia de Actualización de Vivienda (IRAV) + IPC Interanual · Ley 12/2023 de Vivienda',
-  verificado: '2026-08-12',
+  verificado: '2026-09-11',
   vigencia: '2026',
   urlOficial: 'https://www.ine.es/jaxiT3/Tabla.htm?t=72975',
   nota: 'El IRAV se publica trimestralmente. Contratos anteriores al 26/05/2023 usan IPC interanual. Verificar índice vigente en el INE.',
@@ -108,6 +111,7 @@ export const IPC_INTERANUAL_POR_MES: Record<string, number> = {
   '2026-04': 3.2,
   '2026-05': 3.2,
   '2026-06': 3.2,
+  '2026-07': 3.6,
 };
 
 /** Devuelve la clave del trimestre IRAV para un mes dado (1-12) */
