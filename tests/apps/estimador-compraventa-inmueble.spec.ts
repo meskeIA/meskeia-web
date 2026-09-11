@@ -9,7 +9,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect, Page } from '@playwright/test';
-import { ITP_CCAA } from '../../data/itp-ccaa';
+import {
+  ITP_CCAA,
+  BANDA_PRECIO_VIVIENDA,
+  estimarFacturaNotarial,
+  calcularRegistro,
+  sumarLineasVisibles,
+} from '../../data/itp-ccaa';
 import {
   PLUSVALIA_MUNICIPAL_META,
   IVA_INMUEBLES_2025,
@@ -2691,4 +2697,382 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
       expect(cuerpo).toContain('entre 200 € y 400 €');
     },
   );
+});
+
+
+test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de reparación', () => {
+  /**
+   * Por qué esta tanda mira a Aragón: el commit 7a02470c del 11/09/2026 reescribió su ficha
+   * («Aragón no tiene tipos reducidos de ITP, tiene bonificaciones en cuota»). Le dio una
+   * escala de CINCO tramos con cuota acumulada donde antes había dos, y convirtió sus
+   * colectivos en tipos EFECTIVOS derivados de una bonificación sobre la cuota. Nada de eso
+   * lo vigila el build: hay que verlo en pantalla.
+   *
+   * Todas las cifras esperadas salen de `data/itp-ccaa.ts` (ITP_CCAA.aragon, que cita el
+   * Decreto Legislativo 1/2005 arts. 121-1, 121-4, 121-5 y 160-3, y los aranceles de los
+   * RD 1426/1989 y RD 1427/1989) y de `data/fiscal/inmuebles.ts`. Resueltas a mano ANTES
+   * de abrir el navegador.
+   */
+
+  /**
+   * CASO 36 (normal) — Aragón, segunda mano, vivienda de 200.000 €, perfil General.
+   *
+   * 200.000 € cae entero dentro del primer tramo de la escala (hasta 400.000 € al 8 %), así
+   * que el tipo efectivo coincide con el nominal. Ninguno de los reducidos de Aragón se
+   * puede aplicar con perfil General: los tres del art. 121-4 y los dos de familia numerosa
+   * son de colectivo, y el de víctimas de violencia de género tiene el tope de 100.000 €.
+   *   ITP       = 200.000 × 8 %                                  = 16.000,00 €
+   *   Notaría   = arancel(200.000) × 1,21 × 1,75                 =    758,98 €
+   *     arancel = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %
+   *               + 49.746,97×0,05 % = 358,43341 → ×1,21 = 433,7044 → ×1,75 = 758,9827
+   *     horquilla de FACTURA_NOTARIAL: ×1,5 = 650,56 € y ×2 = 867,41 €
+   *   Registro  = (186,2120635 + 6,010121 + 3,005061) × 1,21      =    236,22 €
+   *   Gestoría (GESTORIA_TIPICA)                                  =    300,00 €
+   *   AJD       = 0 — segunda mano, la tarjeta no se pinta
+   *   Total gastos = 16.000 + 758,98 + 236,22 + 300               = 17.295,20 €
+   *   % sobre precio = 17.295,20 / 200.000                        =      8,65 %
+   *   Coste total  = 200.000 + 17.295,20                          = 217.295,20 €
+   */
+  test('CASO 36 (normal) — Aragón, segunda mano, vivienda de 200.000 €', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('aragon');
+    await rellenar(page, 'Precio de la vivienda', '200000');
+
+    // El tipo nominal que anuncia el panel de la comunidad
+    expect(ITP_CCAA.aragon.tipoGeneral).toBe(8);
+
+    expect(await valorTarjeta(page, /^Precio del inmueble/)).toBe('200.000,00 €');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('16.000,00 €');
+    await expect(page.getByRole('heading', { name: 'ITP (8,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe('758,98 €');
+    expect(await descripcionTarjeta(page, /^Gastos de notaría/)).toContain(
+      'entre 650,56 € y 867,41 €',
+    );
+    expect(await valorTarjeta(page, /^Registro de la Propiedad/)).toBe('236,22 €');
+    expect(await valorTarjeta(page, /^Gastos de gestoría/)).toBe('300,00 €');
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('17.295,20 €');
+    expect(await descripcionTarjeta(page, /^Total gastos adicionales/)).toBe(
+      '8,65% sobre el precio',
+    );
+    expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('217.295,20 €');
+  });
+
+  /**
+   * CASO 37 (límite: la escala de CINCO tramos que estrenó el 11/09/2026) — Aragón, 500.000 €.
+   *
+   * Hasta ese día la ficha tenía dos tramos [400.000 → 8 %, resto → 10 %] y esta misma
+   * vivienda liquidaba 42.000 €. La escala real del art. 121-1 tiene tres escalones
+   * intermedios y da 1.250 € menos:
+   *   400.000 × 8 %                            = 32.000,00 €   (cuota acumulada a 400.000)
+   *    50.000 × 8,5 %                          =  4.250,00 €   (cuota acumulada a 450.000: 36.250)
+   *    50.000 × 9 %                            =  4.500,00 €   (cuota acumulada a 500.000: 40.750)
+   *   ITP                                      = 40.750,00 €
+   *   Tipo EFECTIVO = 40.750 / 500.000          =      8,15 %   (no el nominal del 8 %)
+   *   Notaría  = arancel(500.000) × 1,21 × 1,75 =  1.076,61 €
+   *     arancel = 90,15 + 108,182205 + 45,0759 + 90,15182 + 174,873485 = 508,43341
+   *               → ×1,21 = 615,2044 → ×1,75 = 1.076,6077 · horquilla 922,81 € – 1.230,41 €
+   *   Registro = (276,2120635 + 9,015182) × 1,21 =    345,12 €
+   *   Gestoría                                   =    300,00 €
+   *   Total gastos = 40.750 + 1.076,61 + 345,12 + 300 = 42.471,73 €  →  8,49 % del precio
+   *   Coste total                                = 542.471,73 €
+   *
+   * (formato es-ES: un número de cuatro cifras va SIN punto de millar — «1076,61 €»)
+   */
+  test('CASO 37 (límite) — Aragón, 500.000 €: los tres escalones intermedios de la escala', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('aragon');
+    await rellenar(page, 'Precio de la vivienda', '500000');
+
+    // La escala que la ficha declara, y que el panel de la comunidad anuncia en pantalla
+    expect(ITP_CCAA.aragon.tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 8.5, 9, 9.5, 10]);
+    await expect(page.getByText(/escala progresiva \(8% → 8,5% → 9% → 9,5% → 10%\)/)).toBeVisible();
+
+    expect(await valorTarjeta(page, /^ITP/)).toBe('40.750,00 €');
+    // El rótulo lleva el tipo EFECTIVO: con escala progresiva el nominal contradiría al importe
+    await expect(page.getByRole('heading', { name: 'ITP (8,15%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe('1076,61 €');
+    expect(await valorTarjeta(page, /^Registro de la Propiedad/)).toBe('345,12 €');
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('42.471,73 €');
+    expect(await descripcionTarjeta(page, /^Total gastos adicionales/)).toBe(
+      '8,49% sobre el precio',
+    );
+    expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('542.471,73 €');
+  });
+
+  /**
+   * CASO 38 (límite: bonificación en cuota) — Aragón, perfil Joven, dentro y fuera del tope.
+   *
+   * El art. 121-4.a) no da un tipo reducido: bonifica el 12,5 % de la CUOTA íntegra, con el
+   * inmueble a ≤100.000 €. La ficha lo declara como tipo efectivo del 7 % (8 % − 12,5 %), y
+   * eso solo es exacto mientras el tope de valor mantenga la operación dentro del primer
+   * tramo del 8 % — el tope son 100.000 € y el tramo llega a 400.000 €, así que se cumple.
+   *   a) 100.000 € (justo en el tope) → 100.000 × 7 %            =  7.000,00 €
+   *   b) 150.000 € (por encima del tope) → el reducido NO se aplica; vuelve la escala:
+   *      150.000 × 8 % (primer tramo)                            = 12.000,00 €
+   *      …y el aviso «Podrías pagar menos» tiene que nombrar el 7 % con su requisito de valor.
+   */
+  test('CASO 38 (límite) — Aragón, joven: el 7 % efectivo del art. 121-4 y su tope de 100.000 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('aragon');
+    await rellenar(page, 'Precio de la vivienda', '100000');
+    await page.locator('#perfil-comprador').selectOption('joven');
+
+    // El tipo efectivo y su tope, tal como los declara la ficha
+    const joven = ITP_CCAA.aragon.tiposReducidos.find((r) => r.nombre.includes('Jóvenes'));
+    expect(joven?.tipo).toBe(7);
+    expect(joven?.valorMaximo).toBe(100000);
+
+    expect(await valorTarjeta(page, /^ITP/)).toBe('7000,00 €');
+    await expect(page.getByRole('heading', { name: 'ITP (7,00%)' })).toBeVisible();
+
+    // Un euro por encima del tope ya no lo tiene, y la app tiene que decir que existe
+    await rellenar(page, 'Precio de la vivienda', '150000');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
+    await expect(page.getByRole('heading', { name: 'ITP (8,00%)' })).toBeVisible();
+    await expect(page.getByText('7,00% — Jóvenes < 35 años')).toBeVisible();
+  });
+
+  /**
+   * CASO 39 (debe rechazarse) — un número de años NEGATIVO no puede producir un impuesto.
+   *
+   * Desde el commit bc437470 el «0» es un dato VÁLIDO en «Años de propiedad»: es la reventa
+   * antes de cumplir el año, que tributa con el coeficiente 0,14 de COEFICIENTES_IIVTNU_2025
+   * (el tercero más alto). El propio motor lo dice por escrito: «Un año NEGATIVO no se acota
+   * a 0: se rechaza. Acotarlo lo convertiría en una reventa antes del año y liquidaría un
+   * impuesto a partir de un dato imposible».
+   *
+   * Caso: venta 250.000 € · compra 200.000 € · suelo catastral 50.000 € · «-5» años.
+   *   · Con el foco dentro, la app corta bien: «Sin calcular».
+   *   · Tras el blur, el `min={0}` del NumberInput reescribe el campo a «0» y la plusvalía
+   *     pasa a 50.000 × 0,14 × 25 % = 1.750,00 €, que es exactamente la cifra de la reventa
+   *     antes del año — a partir de un dato que el usuario nunca escribió.
+   *   Esperado: «Sin calcular» en los dos momentos  ·  Obtenido: «Sin calcular» → 1750,00 €.
+   */
+  test('CASO 39 (debe rechazarse) — «-5» años no puede convertirse en una reventa antes del año', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '200000');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+
+    const campoAnios = page.locator('input[aria-label="Años de propiedad"]');
+    await campoAnios.fill('-5');
+    // a) Mientras el campo tiene el foco, el cálculo corta: esta parte ya está bien
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+
+    // b) Y al salir del campo tiene que seguir cortando, no reescribirse a un valor con
+    //    significado fiscal propio
+    await campoAnios.blur();
+    expect(await campoAnios.inputValue()).not.toBe('0');
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 11/09/2026 (MEDIO) — el FAQPage del JSON-LD sigue diciendo a mano que
+   * notaría, registro y gestoría «rondan el 1%-2%», y el motor da entre el 0,34 % y el 1,07 %.
+   *
+   * Es un residuo del hallazgo 628: en esa MISMA frase la horquilla total se derivó del motor
+   * (HORQUILLA_GASTOS_COMPRAVENTA, hoy 3,3 %-12,6 %), pero la coletilla de las tres partidas
+   * de fedatarios se quedó tecleada. Sobre la banda que la propia app publica
+   * (BANDA_PRECIO_VIVIENDA, 100.000 €-500.000 €):
+   *   100.000 € → 599,90 + 172,56 + 300 = 1.072,46 €  →  1,07 %
+   *   200.000 € → 758,98 + 236,22 + 300 = 1.295,20 €  →  0,65 %
+   *   500.000 € → 1.076,61 + 345,12 + 300 = 1.721,73 € →  0,34 %
+   * El 2 % no se alcanza en ningún punto de la banda, y a partir de ~107.000 € ni siquiera el
+   * 1 %. La frase además no cuadra consigo misma: 4 % de ITP mínimo + 1 % son 5 %, por encima
+   * del 3,3 % que ella misma acaba de publicar como mínimo del total.
+   *
+   * Lo lee ChatGPT, Bing Copilot y Perplexity, que es justo el sitio donde una cifra a mano
+   * hace más daño (es la lección del hallazgo 584).
+   */
+  test('HALLAZGO — el JSON-LD publica a mano un 1 %-2 % de fedatarios que el motor desmiente', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+
+    // Lo que el motor cobra en los dos extremos de la banda que la app publica
+    const pctFedatarios = (precio: number) =>
+      (sumarLineasVisibles(estimarFacturaNotarial(precio).medio, calcularRegistro(precio), 300) /
+        precio) *
+      100;
+    const enElSuelo = pctFedatarios(BANDA_PRECIO_VIVIENDA.min);
+    const enElTecho = pctFedatarios(BANDA_PRECIO_VIVIENDA.max);
+    expect(enElSuelo).toBeLessThan(1.1);
+    expect(enElTecho).toBeLessThan(0.5);
+
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const juntos = bloques.join(' ');
+    expect(juntos).toContain('FAQPage');
+    expect(juntos).not.toContain('rondan el 1%-2%');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 11/09/2026 (BAJO) — el panel «Tipos reducidos disponibles» imprime el tipo
+   * con punto decimal inglés.
+   *
+   * La lista se pinta con `<strong>{tr.tipo}%</strong>`, sin pasar por `formatTipoNominal`,
+   * así que cualquier tipo con decimales sale en formato US (CLAUDE.md global §2). La misma
+   * pantalla, dos dedos más abajo, sí lo escribe bien en el aviso «Podrías pagar menos»
+   * («7,00% — Jóvenes < 35 años»), de modo que la página se contradice a sí misma.
+   *
+   * Casos: Andalucía · perfil Joven → «3.5% - Jóvenes < 35 años»   · esperado «3,5%»
+   *        Aragón    · perfil Joven → «3.2% - Familia numerosa en medio rural» · esperado «3,2%»
+   * El de Aragón lo estrenó el commit 7a02470c de hoy: hasta ayer su lista no tenía decimales.
+   */
+  test('HALLAZGO — los tipos reducidos con decimales salen con punto inglés', async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '140000');
+    await page.locator('#ccaa-inmueble').selectOption('andalucia');
+    await page.locator('#perfil-comprador').selectOption('joven');
+
+    const panel = page.locator('h4', { hasText: 'Tipos reducidos disponibles' }).locator('..');
+    const lineas = (await panel.innerText()).replace(ESPACIO_DURO, ' ');
+
+    // El dato de la ficha lleva decimales, así que hay algo que formatear
+    expect(
+      ITP_CCAA.andalucia.tiposReducidos.find((r) => r.nombre.includes('Jóvenes'))?.tipo,
+    ).toBe(3.5);
+    expect(lineas).not.toMatch(/\d+\.\d+%/);
+    expect(lineas).toContain('3,5%');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 11/09/2026 (BAJO) — la FAQ visible dice que la edad tope del tipo joven «va
+   * de los 32 a los 40 años», y la tabla de la propia app empieza en 30.
+   *
+   * Residuo de la reparación del 27/08/2026, que sustituyó el «menores de 35-36 años» por
+   * esta horquilla: el 32 era entonces el tope de Cataluña, y el Decreto-ley 5/2025 lo subió
+   * a 35 — el propio `data/itp-ccaa.ts` lo documenta («desde el 27/06/2025; antes ≤32»). Con
+   * el 32 fuera, el suelo real de la tabla es el de Baleares, «Jóvenes < 30 años».
+   *
+   * Caso: Baleares · perfil Joven · 200.000 € → el panel «Tipos reducidos disponibles» lista
+   *       «0% - Jóvenes < 30 años o discapacidad ≥33% (1ª vivienda)» mientras la FAQ dice que
+   *       la edad tope más baja son 32 años  ·  esperado «de los 30 a los 40 años».
+   */
+  test('HALLAZGO — la horquilla de edad del tipo joven ya no coincide con la tabla', async ({
+    page,
+  }) => {
+    // Las edades que de verdad hay en la tabla, leídas de las condiciones de cada reducido
+    const edades = Object.values(ITP_CCAA)
+      .flatMap((c) => c.tiposReducidos)
+      .filter((r) => /joven/i.test(r.nombre.normalize('NFD').replace(/[\u0300-\u036f]/g, '')))
+      .flatMap((r) => r.condiciones)
+      .map((c) => c.match(/^menor (?:de|o igual de) (\d+)/i)?.[1])
+      .filter((n): n is string => !!n)
+      .map(Number);
+    const menor = Math.min(...edades);
+    const mayor = Math.max(...edades);
+    expect(menor).toBe(30); // Baleares
+    expect(mayor).toBe(40); // Murcia y La Rioja
+
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '200000');
+    await page.locator('#ccaa-inmueble').selectOption('baleares');
+    await page.locator('#perfil-comprador').selectOption('joven');
+    await expect(
+      page.getByText('0% - Jóvenes < 30 años o discapacidad ≥33% (1ª vivienda)'),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const cuerpo = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
+    expect(cuerpo).toContain(`va de los ${menor} a los ${mayor} años`);
+  });
+
+  /**
+   * ⚠️ HALLAZGO 11/09/2026 (BAJO) — `normalizarTexto` se declara para comparar nombres de
+   * tipos reducidos sin tildes… y no se llama desde ningún sitio.
+   *
+   * La única comparación de ese tipo que hay en el fichero, la del ejemplo «Marta», va sin
+   * normalizar: `tiposReducidos?.find((t) => t.nombre.includes('Jóvenes'))`. Hoy acierta
+   * porque Andalucía escribe «Jóvenes < 35 años» con la misma tilde, pero es exactamente la
+   * forma del hallazgo 526 —«'jóvenes'.includes('joven')» es false— que obligó a exportar
+   * `normaliza` desde `data/itp-ccaa.ts`. Si el nombre cambiara, el `find` devolvería
+   * undefined, el ejemplo caería al tipo GENERAL y publicaría «se aplica el tipo reducido
+   * del 7% en lugar del tipo general del 7%. Ahorra 0 €», sin que nada avisara.
+   *
+   * Caso: `grep -c normalizarTexto app/estimador-compraventa-inmueble/page.tsx`
+   *       · esperado ≥ 2 (declaración + uso)  ·  obtenido 1 (solo la declaración).
+   */
+  test('HALLAZGO — el normalizador de tildes está declarado pero no se usa', async () => {
+    const fuente = readFileSync(
+      join(process.cwd(), 'app/estimador-compraventa-inmueble/page.tsx'),
+      'utf8',
+    );
+    const apariciones = fuente.match(/normalizarTexto/g)?.length ?? 0;
+    // O se usa donde hace falta, o sobra: un helper muerto es una reparación a medias
+    expect(apariciones).not.toBe(1);
+    expect(fuente).not.toContain(".nombre.includes('Jóvenes')");
+  });
+
+  /**
+   * ⚠️ HALLAZGO 11/09/2026 (BAJO) — con PÉRDIDA patrimonial la tarjeta del IRPF dice
+   * «EXENTO» y su descripción, justo debajo, «Tributación en base del ahorro».
+   *
+   * Cuando hay pérdida, `calcularGananciaInmueble` devuelve `motivoExencion: null`, y la
+   * tarjeta cae en su texto por defecto. El resultado es una tarjeta verde que afirma dos
+   * cosas incompatibles: que está exenta y que tributa. Además no es una exención: es que no
+   * hay ganancia —la tarjeta de encima ya dice «Pérdida patrimonial»—, y la diferencia
+   * importa, porque una pérdida se compensa en la declaración y una exención no.
+   *
+   * Caso: venta 250.000 € · compra 300.000 € · 10 años · suelo catastral 50.000 €
+   *       → «Pérdida patrimonial 57.500,00 €» y, debajo, «IRPF sobre ganancia: EXENTO ·
+   *         Tributación en base del ahorro»  ·  esperado un texto que hable de la pérdida.
+   */
+  test('HALLAZGO — en pérdida patrimonial el IRPF dice «EXENTO» y explica que tributa', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await rellenar(page, 'Precio de compra original', '300000');
+    await rellenar(page, 'Años de propiedad', '10');
+    await rellenar(page, 'Valor catastral del suelo', '50000');
+
+    // La pérdida es la de la fórmula del art. 35 LIRPF: 250.000 − 7.500 de comisión − 0 de
+    // plusvalía (no sujeta, sin incremento) − 300.000 de valor de adquisición = −57.500 €
+    expect(await valorTarjeta(page, /^Pérdida patrimonial/)).toBe('57.500,00 €');
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('EXENTO');
+
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).not.toBe(
+      'Tributación en base del ahorro',
+    );
+  });
+
+  /**
+   * ⚠️ HALLAZGO 11/09/2026 (MEDIO) — la reparación de la edad del tipo joven llegó a la FAQ
+   * visible y NO al JSON-LD, que es el canal que leen los asistentes de IA.
+   *
+   * El 27/08/2026 se corrigió «jóvenes (generalmente menores de 35-36 años)» en el bloque
+   * educativo porque la tabla de la app lo desmiente en dos comunidades: Murcia ≤40 (art. 8.6
+   * del Decreto Legislativo 1/2010) y La Rioja <40 (Ley 1/2025). El FAQPage del JSON-LD dice
+   * todavía, palabra por palabra, «tipos reducidos para jóvenes (menores de 35-36 años)».
+   * El test que vigila aquella reparación mira el texto VISIBLE con `getByText`, que no entra
+   * en un `<script>`: por eso el residuo no salta.
+   *
+   * Caso: Murcia · perfil Joven · vivienda de 150.000 € → la app cobra 4.500,00 € (3 %) en
+   *       lugar de 11.625,00 € (7,75 % general), 7.125 € de diferencia, mientras el JSON-LD
+   *       le cuenta a ChatGPT y a Bing Copilot que a los 38 años ya no le corresponde.
+   */
+  test('HALLAZGO — el JSON-LD sigue diciendo «menores de 35-36 años» que la FAQ visible ya corrigió', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.locator('#ccaa-inmueble').selectOption('murcia');
+    await rellenar(page, 'Precio de la vivienda', '150000');
+    await page.locator('#perfil-comprador').selectOption('joven');
+
+    // Lo que la tabla dice y la app cobra: 3 % para el joven de hasta 40 años
+    expect(ITP_CCAA.murcia.tiposReducidos.find((r) => r.nombre.includes('Jóvenes'))?.tipo).toBe(3);
+    expect(await valorTarjeta(page, /^ITP/)).toBe('4500,00 €');
+
+    // Lo que la señal estructurada le cuenta a los asistentes de IA
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(bloques.join(' ')).not.toContain('menores de 35-36 años');
+  });
 });

@@ -48,6 +48,16 @@
  *      app no puede alcanzar— y un precio de compra malformado. Al final, UN hallazgo
  *      abierto con `test.fail()`.
  *
+ *  12. RE-INSPECCIÓN 11/09/2026 — CASOS 23-25, posterior a la reparación de la reventa
+ *      antes del año (bc437470) y al triaje fiscal que reescribió la escala de Aragón
+ *      (7a02470c). Territorio y perfil nuevos otra vez —Castilla y León con perfil joven,
+ *      la comunidad del reducido del 0,01 %—, el TERCER escalón de la escala aragonesa
+ *      (500.000 € → 40.750 €) y unos años de propiedad MALFORMADOS, que es el camino que
+ *      la reparación del 10/09 estrenó. Al final, CUATRO hallazgos abiertos con
+ *      `test.fail()`: tres son EFECTO FAMILIA del commit bc437470 —las correcciones 670 y
+ *      671 se aplicaron en la hermana garaje y la 683 en nave-industrial, y ninguna llegó
+ *      aquí— y el cuarto es una divergencia entre las dos tablas de ITP del repositorio.
+ *
  *      ⚠️ El CASO 16 (02/09) se REESCRIBIÓ ese día. Verificaba el rechazo escribiendo un
  *      «0» en los años de propiedad y daba por buena la reescritura del `min={1}` a «1»:
  *      eso era cierto cuando se escribió, y desde la reparación del motor del 07/09
@@ -2286,9 +2296,9 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGO ABIERTO — re-inspección del 10/09/2026.
-// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
-// Cuando se repare, se le quita la marca y queda como regresión.
+// HALLAZGO 682 de la re-inspección del 10/09/2026 — REPARADO ese mismo día (bc437470).
+// Estaba marcado con `test.fail()`, afirmando lo que DEBERÍA pasar; al repararlo se le
+// quitó la marca y hoy sujeta la reparación.
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ❌ ABIERTO 10/09/2026 (alto) — cálculo. La reventa antes del año es INALCANZABLE, y la
@@ -2325,7 +2335,7 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
 // se confunde con el campo vacío— y el NumberInput baja a `min={0}`, así que el blur deja de
 // reescribir el 0 a «1».
 test(
-  'ABIERTO (cálculo) — la reventa antes del año liquida con el coeficiente de 1 año',
+  'REGRESIÓN 682 (cálculo) — la reventa antes del año liquida con su coeficiente (0,14)',
   async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio del trastero', '15000');
@@ -2373,3 +2383,422 @@ test(
     await expect(anios).toHaveValue('0');
   },
 );
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 11/09/2026 — CASOS 23-25.
+// La cola reabrió la app tras DOS commits que tocan lo que calcula:
+//   · bc437470 — «la reventa antes del año ya se puede liquidar, y con su coeficiente»
+//     (hallazgo 682 de esta app; el test de más arriba ya sujeta la reparación).
+//   · 7a02470c — «Aragón no tiene tipos reducidos de ITP, tiene bonificaciones en cuota»,
+//     que reescribió la escala del art. 121-1 de DOS tramos a CINCO (8 / 8,5 / 9 / 9,5 /
+//     10 %) y los tipos efectivos de las bonificaciones en cuota.
+// Territorio y perfil nuevos otra vez (Castilla y León con perfil joven, que es donde vive
+// el tipo del 0,01 % —el análogo del 0 % de Madrid que dio origen a `elegirTipoITP`—), el
+// TERCER escalón de la escala aragonesa recién corregida, al que ningún caso llegaba, y
+// unos años de propiedad MALFORMADOS, que es el camino que la reparación del 10/09 estrenó.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escalón de Aragón y unos años malformados', () => {
+  /**
+   * CASO 23 (NORMAL) — Castilla y León con perfil JOVEN, la combinación que ninguna ronda
+   * había ejercitado y que aquí importa por un motivo concreto: `ITP_CCAA['castilla-leon']`
+   * declara un reducido del **0,01 %** («Municipios poco poblados (< 36 años)»), que es el
+   * tipo más bajo de toda la tabla después del 0 % de Madrid. Es exactamente la forma del
+   * defecto que hizo nacer `elegirTipoITP` el 14/08/2026: aplicar el primer reducido que
+   * casa por nombre sin mirar sus condiciones dejaba el ITP en 0 en la comunidad que viene
+   * por defecto. Aquí se comprueba que ese 0,01 % NO se aplica —ni el 4 % de jóvenes, que
+   * exige vivienda habitual y un trastero suelto nunca lo es— y que ambos salen como
+   * OPORTUNIDAD, que es el contrato de la función («se enseña como oportunidad, nunca como
+   * cifra»).
+   */
+  test('CASO 23 (normal) — Castilla y León, segunda mano, 20.000 €, comprador joven', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('castilla-leon');
+    await selectPerfil(page).selectOption('joven');
+    await rellenar(page, 'Precio del trastero', '20000');
+
+    // ITP — `calcularITPProgresivo` sobre ITP_CCAA['castilla-leon'].tramosProgresivos
+    // (8 % hasta 250.000 €, 10 % por encima): los 20.000 € caben enteros en el primero.
+    //   20.000 × 8 % = 1.600,00 · tipo efectivo = 1.600 / 20.000 = 8,00 %
+    // El tipo general (8 %) sale de `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
+    // leído por `tipoGeneralDe('Castilla y León')`.
+    expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('1600,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (8,00%)')).toContain('Castilla y León');
+    expect(await texto(page.locator('p', { hasText: 'escala progresiva (' }).first())).toContain(
+      '8% → 10%',
+    );
+
+    // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
+    //   tramo 1 (hasta 6.010,12 €)            →                            90,15
+    //   tramo 2 (6.010,12→30.050,61, 0,45 %)  → 13.989,88 × 0,0045 =        62,95446
+    //   arancel sin IVA                       =                           153,10446
+    //   con el 21 % de IVA                    = 153,10446 × 1,21 =        185,2563966
+    // FACTURA_NOTARIAL: ×1,5 = 277,8845949 · ×2 = 370,5127932 · medio ×1,75 = 324,19869405
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('324,20 €');
+    const notaria23 = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria23).toContain('277,88 €');
+    expect(notaria23).toContain('370,51 €');
+
+    // Registro — RD 1427/1989, números 1, 2 y 4 (ARANCELES_REGISTRO + REGISTRO_CONCEPTOS):
+    //   tramo 1 (hasta 6.010,12 €)            →                            24,04
+    //   tramo 2 (6.010,12→30.050,61, 0,175 %) → 13.989,88 × 0,00175 =       24,48229
+    //   inscripción (número 2)                =                            48,52229
+    //   + asiento de presentación 6,010121 + nota simple 3,005061 =         57,537472
+    //   con el 21 % de IVA                    = 57,537472 × 1,21 =         69,62034112
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('69,62 €');
+
+    // Gestoría: la que trae el formulario por defecto.
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    // En segunda mano no hay AJD (ITP y cuota gradual de AJD son incompatibles).
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    // Total — `sumarLineasVisibles` redondea cada línea al céntimo ANTES de sumar:
+    //   1.600,00 + 324,20 + 69,62 + 300,00 = 2.293,82
+    //   % sobre el precio = 2.293,82 / 20.000 = 11,4691 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2293,82 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,47%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('22.293,82 €');
+
+    // Y lo que de verdad vigila este caso: los dos reducidos salen como OPORTUNIDAD y
+    // ninguno se ha cobrado. Con el 0,01 % aplicado, el ITP habrían sido 2,00 € en vez de
+    // 1.600,00 €; con el 4 %, 800,00 €.
+    const oportunidades = page.locator('div[class*="avisoReducidos"] li');
+    await expect(oportunidades).toHaveCount(2);
+    expect(await texto(oportunidades.nth(0))).toContain('4,00% — Jóvenes < 36 años');
+    expect(await texto(oportunidades.nth(1))).toContain(
+      '0,01% — Municipios poco poblados (< 36 años)',
+    );
+    // El de municipios poco poblados enseña además su tope de valor, que sí es comprobable.
+    expect(await texto(oportunidades.nth(1))).toContain('Valor máximo 150.000,00 €');
+  });
+
+  /**
+   * CASO 24 (LÍMITE) — el TERCER escalón de la escala de Aragón, que es el tramo al que
+   * ningún caso de este fichero llegaba: el CASO 18 se queda en la raya de los 400.000 € y
+   * 50.000 € más arriba.
+   *
+   * Importa porque esa escala se reescribió hace dos días (commit 7a02470c, triaje fiscal
+   * del 11/09/2026): tenía DOS tramos —8 % hasta 400.000 € y 10 % por encima— y el art.
+   * 121-1 tiene CINCO. Con la tabla vieja, 500.000 € liquidaban 42.000 €. El comentario de
+   * `ITP_CCAA['aragon']` fija los cortes contra la tabla oficial de cuota acumulada, y
+   * 500.000 € es uno de los cuatro que nombra: **40.750 €**.
+   */
+  test('CASO 24 (límite) — Aragón, 500.000 €: el tercer escalón del art. 121-1 (40.750 €)', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('aragon');
+    await selectPerfil(page).selectOption('general');
+    await rellenar(page, 'Precio del trastero', '500000');
+
+    // El recuadro anuncia los CINCO tramos, con la coma decimal del formato español
+    // (`formatTipoNominal`, reparado en este mismo commit para las 6 apps del clúster).
+    expect(await texto(page.locator('p', { hasText: 'escala progresiva (' }).first())).toContain(
+      '8% → 8,5% → 9% → 9,5% → 10%',
+    );
+
+    // ITP — calcularITPProgresivo sobre los cinco tramos:
+    //   400.000 × 8 %  = 32.000
+    //    50.000 × 8,5 % =  4.250   (400.000 → 450.000)
+    //    50.000 × 9 %   =  4.500   (450.000 → 500.000)
+    //                    = 40.750,00 — la cuota acumulada que la tabla del art. 121-1
+    //                      fija a los 500.000 €, y que la escala de DOS tramos daba como
+    //                      42.000 € hasta el 11/09/2026.
+    //   tipo EFECTIVO = 40.750 / 500.000 = 8,15 % (el nominal, 8 %, mentiría)
+    expect(await valorTarjeta(page, 'ITP (8,15%)')).toBe('40.750,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (8,15%)')).toContain('Aragón');
+
+    // Notaría — ARANCELES_NOTARIO hasta el quinto tramo:
+    //   90,15 + 24.040,49×0,0045 + 30.050,60×0,0015 + 90.151,82×0,001 + 349.746,97×0,0005
+    //   = 90,15 + 108,182205 + 45,0759 + 90,15182 + 174,873485 = 508,43341
+    //   con IVA = 615,2044261 · ×1,5 = 922,80663915 · ×2 = 1.230,4088522
+    //   medio ×1,75 = 1.076,607745675
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1076,61 €');
+    const notaria24 = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria24).toContain('922,81 €');
+    expect(notaria24).toContain('1230,41 €');
+
+    // Registro — ARANCELES_REGISTRO hasta el quinto tramo:
+    //   24,04 + 24.040,49×0,00175 + 30.050,60×0,00125 + 90.151,82×0,00075 + 349.746,97×0,0003
+    //   = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 104,924091 = 276,2120635
+    //   (por debajo del REGISTRO_MAXIMO de 2.181,67)
+    //   + 6,010121 + 3,005061 = 285,2272455 · con IVA = 345,1249671
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('345,12 €');
+
+    // Total = 40.750,00 + 1.076,61 + 345,12 + 300,00 = 42.471,73
+    //   % sobre el precio = 42.471,73 / 500.000 = 8,494346 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('42.471,73 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,49%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('542.471,73 €');
+
+    // Las cinco bonificaciones de Aragón exigen vivienda habitual (las tres del art. 121-4
+    // y las dos de familia numerosa), y además topan el inmueble en 100.000 €: a este
+    // precio no hay nada que ofrecer y la caja de oportunidades NO debe pintarse.
+    await expect(page.locator('p', { hasText: 'Podrías pagar menos' })).toHaveCount(0);
+  });
+
+  /**
+   * CASO 25 (DEBE RECHAZARSE) — unos años de propiedad MALFORMADOS.
+   *
+   * Es el camino que la reparación del 10/09/2026 (hallazgo 682) estrenó y que ningún caso
+   * cubría: desde entonces los años se leen del STRING con `parseSpanishNumber` en vez de
+   * con `parseInt(...) || 0`, y el `NumberInput` bajó a `min={0}` porque el **0 es ahora un
+   * dato válido** —la reventa antes del año, coeficiente 0,14—. Justamente por eso un valor
+   * ilegible no puede caer en 0: sería liquidar el tercer coeficiente más alto de
+   * `COEFICIENTES_IIVTNU_2025` a partir de algo que el usuario no ha escrito. Tampoco puede
+   * caer en el 1 que devolvería `parseFloat('1.2.3')`.
+   *
+   * `NumberInput` filtra las letras con su regex `/^-?[\d.,]*$/`, así que lo que de verdad
+   * llega al motor es un número con dos separadores mal puestos; y su `handleBlur`, que sí
+   * usa `parseFloat`, lee 1,2 —dentro de min/max— y deja el campo tal cual.
+   */
+  test('CASO 25 (debe rechazarse) — «1.2.3» no son años de propiedad: ni 0 ni 1', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del trastero', '20000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '14000');
+    await rellenar(page, 'Años de propiedad', '1.2.3');
+    await rellenar(page, 'Valor catastral del suelo', '5000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción)', '11000');
+
+    // El campo conserva lo escrito: el blur solo acota min/max.
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('1.2.3');
+
+    // La plusvalía NO se calcula, y el aviso nombra ESE campo y solo ese: los otros dos
+    // están puestos. El verbo concuerda en plural («faltan los años»), hallazgo 638.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    const metodo25 = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(metodo25).toBe('No calculada (faltan los años de propiedad)');
+
+    // Y ni rastro de las dos lecturas equivocadas:
+    //   · como 0 años → objetivo 5.000 × 0,14 × 25 % = 175,00 · real (20.000−14.000) ×
+    //     (5.000/11.000) × 25 % = 681,8181… → recomendado 175,00 €
+    //   · como 1 año  → 5.000 × 0,13 × 25 % = 162,50 €
+    const cuerpo25 = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
+    expect(cuerpo25).not.toContain('175,00 €');
+    expect(cuerpo25).not.toContain('162,50 €');
+
+    // El resto del vendedor SÍ se calcula, y con la plusvalía en 0 el IRPF sale AL ALZA,
+    // que es el sentido recuperable: art. 35 LIRPF con `calcularGananciaInmueble`.
+    //   comisión = 20.000 × 3 % (por defecto) = 600,00 · gestoría del vendedor = 0
+    //   valor de adquisición = 14.000 (sin gastos de adquisición declarados)
+    //   valor de transmisión = 20.000 − 600 − 0 = 19.400,00
+    //   ganancia = 19.400 − 14.000 = 5.400,00
+    //   IRPF (TRAMOS_GANANCIAS_PATRIMONIALES_2025, primer tramo hasta 6.000 al 19 %):
+    //        5.400 × 19 % = 1.026,00
+    //   total gastos = 0 + 600,00 + 0 + 1.026,00 = 1.626,00 · neto = 20.000 − 1.626,00
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('14.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('19.400,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('5400,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1026,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('600,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1626,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.374,00 €');
+
+    // El neto se presenta como TECHO, nombrando el concepto que falta y el campo que lo
+    // desbloquea (hallazgos 483 y 639).
+    const neto25 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(neto25).toBe('Techo: aún NO incluye la plusvalía municipal (añade los años de propiedad)');
+
+    // Y en ninguna parte de la página puede haber NaN. Mayúsculas incluidas: `getByText`
+    // no distingue y casaría con «ganancia».
+    expect(await page.locator('body').innerText()).not.toContain('NaN');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — re-inspección del 11/09/2026.
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
+// Cuando se reparen, se les quita la marca y quedan como regresión.
+//
+// Los tres primeros son EFECTO FAMILIA del commit bc437470 (10/09/2026), que reparó los 13
+// hallazgos del clúster inmobiliario: las correcciones 670 y 671 se aplicaron en
+// `simulador-gastos-compraventa-garaje` y la 683 en `simulador-gastos-compraventa-nave-industrial`,
+// y ninguna de las tres llegó a esta app, que tiene el mismo defecto en el mismo sitio.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ❌ ABIERTO 11/09/2026 (medio) — contenido. EFECTO FAMILIA del hallazgo 670.
+// La FAQ visible y los DOS bloques FAQPage de `metadata.ts` afirman sin ninguna excepción
+// territorial que un trastero nuevo paga IVA (10 % como anejo, 21 % independiente), mientras
+// la calculadora responde «IGIC — No calculado» en Canarias y «IPSI» en Ceuta y Melilla.
+// La nota de cabecera de la página SÍ lleva la excepción desde el hallazgo 527; la FAQ y el
+// JSON-LD se quedaron fuera, y el JSON-LD es justo lo que leen los asistentes de IA.
+// Caso: Canarias · Primera mano · 12.000 € → la tarjeta dice «IGIC / No calculado» y «En
+//       Canarias no rige el IVA», y dos pantallas más abajo la pregunta «¿Qué IVA paga un
+//       trastero nuevo?» responde «tributa al tipo general del 21%» sin matiz.
+//       Esperado: la misma excepción que la hermana garaje añadió el 10/09 («En Canarias,
+//       Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos»).
+//       Obtenido: ni «IGIC» ni «IPSI» aparecen en la FAQ ni en ninguno de los dos FAQPage.
+test('ABIERTO 11/09 (contenido) — la FAQ y el FAQPage afirman IVA sin la excepción de Canarias', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await selectCcaa(page).selectOption('canarias');
+  await rellenar(page, 'Precio del trastero', '12000');
+
+  // Lo que la calculadora responde de verdad (esto ya está bien y pasa):
+  expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
+  expect(await descripcionTarjeta(page, 'IGIC')).toContain('no rige el IVA');
+
+  // …y lo que la FAQ visible contesta a la misma pregunta, en la misma página.
+  const respuesta = page
+    .locator('h4', { hasText: '¿Qué IVA paga un trastero nuevo?' })
+    .locator('xpath=following-sibling::p[1]');
+  expect(await texto(respuesta)).toMatch(/IGIC|IPSI/);
+
+  // Y los dos FAQPage de metadata.ts, que es lo que citan los asistentes de IA.
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const meta = readFileSync(
+    join(process.cwd(), 'app', 'simulador-gastos-compraventa-trastero', 'metadata.ts'),
+    'utf8',
+  );
+  expect(meta).toContain('IGIC');
+});
+
+// ❌ ABIERTO 11/09/2026 (medio) — dato. EFECTO FAMILIA del hallazgo 671.
+// El ÚNICO tipo de plusvalía municipal que la página publica es el 30 % máximo legal, que
+// llega por `PLUSVALIA_MUNICIPAL_META.nota` dentro del segundo `DataReference`. El tipo que
+// el motor APLICA es el 25 % orientativo (`PLUSVALIA_MUNICIPAL_META.tipoOrientativo`, que es
+// el valor por defecto de `calcularPlusvaliaMunicipal`), y no aparece en ninguna parte: ni en
+// la página, ni en la FAQ visible, ni en los dos FAQPage. El usuario no puede reconstruir la
+// cifra que se le da, y quien la recalcule con el único tipo publicado obtendrá un 20 % más.
+// La hermana garaje lo cerró el 10/09 añadiendo «Esta calculadora aplica un tipo del 25 %
+// como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal
+// del 30 %» a la FAQ visible y a los dos FAQPage.
+// Caso: Vendedor · venta 20.000 € · compra 14.000 € · 5 años · suelo 5.000 · total 11.000
+//       → la app publica 212,50 € de plusvalía (5.000 × 0,17 × 25 %; el método real daría
+//         (20.000−14.000) × 5.000/11.000 × 25 % = 681,82 €, así que gana el objetivo)
+//       → con el 30 % que la propia página anuncia serían 255,00 €
+//       Esperado: que la página diga qué tipo aplica · obtenido: «25 %» no aparece en
+//       ninguna parte del documento, y «30%» sí.
+test('ABIERTO 11/09 (dato) — la página publica el 30 % máximo y aplica el 25 % orientativo', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await rellenar(page, 'Precio del trastero', '20000');
+  await page.getByRole('button', { name: /Vendedor/ }).click();
+  await rellenar(page, 'Precio de compra original', '14000');
+  await rellenar(page, 'Años de propiedad', '5');
+  await rellenar(page, 'Valor catastral del suelo', '5000');
+  await rellenar(page, 'Valor catastral total (suelo + construcción)', '11000');
+
+  // La cifra que el motor da, resuelta a mano (esto ya está bien y pasa):
+  //   objetivo: 5.000 × 0,17 (coeficiente de 5 años) = 850 × 25 % = 212,50
+  //   real: (20.000 − 14.000) × (5.000/11.000) × 25 % = 681,8181…
+  //   recomendado = el más favorable = 212,50 €
+  expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('212,50 €');
+  expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método objetivo');
+
+  // Con el 30 % que la página anuncia, esa misma base daría 255,00 €. El tipo aplicado
+  // tiene que estar escrito en alguna parte del documento.
+  const cuerpo = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
+  expect(cuerpo).toMatch(/25\s?%/);
+});
+
+// ❌ ABIERTO 11/09/2026 (medio) — accesibilidad. EFECTO FAMILIA del hallazgo 683.
+// El azul de MARCA `--primary` (#2E86AB) se sigue usando como color de TEXTO en esta app, en
+// los mismos tres selectores que `simulador-gastos-compraventa-nave-industrial` pasó a
+// `--primary-texto` el 10/09/2026. `app/globals.css` documenta el motivo en su propia
+// cabecera: «como TEXTO sobre fondo claro no llegan al 4,5:1 que exige WCAG 2.1 AA —el azul
+// da 4,11—», y para eso existe `--primary-texto` (#26718F, 5,47:1 sobre blanco), que en
+// oscuro resuelve al mismo #3FA5D1 que ya se usa, de modo que allí no cambia nada.
+// Caso (tema claro, medido en navegador sobre el fondo efectivo ya compuesto):
+//   · .catastroLink («🔗 Consultar valor de referencia catastral…», 16 px / peso 500)
+//       → esperado ≥ 4,5:1 · obtenido 4,11:1 (#2E86AB sobre #FFFFFF)
+//   · .infoCcaaNombre («Comunidad de Madrid», 16 px / peso 600)
+//       → esperado ≥ 4,5:1 · obtenido 3,74:1 (#2E86AB sobre #EEF5F8, la tarjeta con su
+//         rgba(46,134,171,0.08) ya compuesto)
+//   · .casoTag («Trastero con vivienda nueva», 12,8 px / peso 600)
+//       → esperado ≥ 4,5:1 · obtenido 3,65:1
+// Queda FUERA .infoCcaaValue (19,2 px / peso 700): ahí 3,74:1 sí cumple, porque la WCAG
+// admite 3:1 para texto grande (≥18,66 px en negrita). No todo el azul de la página falla.
+test('ABIERTO 11/09 (accesibilidad) — el azul de marca como texto no llega a 4,5:1 en claro', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await page.waitForTimeout(300);
+
+  const contraste = (selector: string) =>
+    page.evaluate((sel) => {
+      const canal = (c: number) => {
+        const v = c / 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      };
+      const partes = (s: string) => (s.match(/[\d.]+/g) || []).map(Number);
+      const lum = ([r, g, b]: number[]) => 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+      const mezcla = (fg: number[], bg: number[], a: number) => fg.map((c, i) => a * c + (1 - a) * bg[i]);
+
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      // Fondo EFECTIVO: compone todas las capas semitransparentes hasta la primera opaca.
+      const capas: { rgb: number[]; a: number }[] = [];
+      let n: Element | null = el;
+      while (n) {
+        const p = partes(getComputedStyle(n).backgroundColor);
+        const a = p.length === 4 ? p[3] : 1;
+        if (a > 0) capas.push({ rgb: p.slice(0, 3), a });
+        if (a === 1) break;
+        n = n.parentElement;
+      }
+      if (!capas.length || capas[capas.length - 1].a !== 1) capas.push({ rgb: [255, 255, 255], a: 1 });
+      let fondo = capas[capas.length - 1].rgb;
+      for (let i = capas.length - 2; i >= 0; i--) fondo = mezcla(capas[i].rgb, fondo, capas[i].a);
+
+      const l1 = lum(partes(getComputedStyle(el).color).slice(0, 3));
+      const l2 = lum(fondo);
+      return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
+    }, selector);
+
+  // El enlace primero: un enlace es justo el texto que hay que poder leer.
+  expect(await contraste('[class*="catastroLink"]')).toBeGreaterThanOrEqual(4.5);
+  expect(await contraste('[class*="infoCcaaNombre"]')).toBeGreaterThanOrEqual(4.5);
+  expect(await contraste('[class*="casoTag"]')).toBeGreaterThanOrEqual(4.5);
+});
+
+// ❌ ABIERTO 11/09/2026 (bajo) — dato. Las dos tablas de ITP del repositorio no dicen lo
+// mismo sobre el reducido de Castilla y León, y la app publica la versión sin tope.
+// `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts), que es de donde esta app saca el tipo
+// GENERAL de la comunidad, dice: «Reducido 4% (≤150.000 €) o 6% (resto) para jóvenes <36,
+// familia numerosa/monoparental, discapacidad ≥65%, VPO o zonas rurales». La entrada
+// equivalente de `ITP_CCAA['castilla-leon']` (data/itp-ccaa.ts) declara el 4 % SIN
+// `valorMaximo` y sin el escalón del 6 %, así que la caja «Podrías pagar menos» ofrece el
+// 4 % a cualquier precio. El cotejo del triaje del 11/09 comparaba los VALORES de las dos
+// tablas —y ahí ambas dicen 4— pero no el tope, que vive en el texto de `notaReducido`.
+// No cambia ninguna cifra cobrada: el reducido nunca se aplica en esta app (exige vivienda
+// habitual y un trastero suelto no lo es), solo se enseña como oportunidad. De ahí el «bajo».
+// Caso: Castilla y León · segunda mano · perfil joven · 200.000 €
+//       → esperado: la oportunidad del 4 % con su tope («Valor ≤ 150.000 €» / «Valor máximo
+//         150.000,00 €»), como ya hace la del 0,01 % dos líneas más abajo
+//       → obtenido: «4,00% — Jóvenes < 36 años · Requisitos: Menor de 36 años · Vivienda
+//         habitual», sin tope, a 200.000 € (a ese precio la propia data/fiscal dice 6 %).
+test('ABIERTO 11/09 (dato) — el reducido de Castilla y León se ofrece sin el tope de 150.000 €', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await selectCcaa(page).selectOption('castilla-leon');
+  await selectPerfil(page).selectOption('joven');
+  await rellenar(page, 'Precio del trastero', '200000');
+
+  // A 200.000 € el de municipios poco poblados ya ha desaparecido de la caja por su
+  // `valorMaximo` de 150.000 €: queda una sola oportunidad, la del 4 % (esto pasa).
+  const oportunidades = page.locator('div[class*="avisoReducidos"] li');
+  await expect(oportunidades).toHaveCount(1);
+  expect(await texto(oportunidades.first())).toContain('4,00% — Jóvenes < 36 años');
+
+  // Y esa, a 200.000 €, o no debería ofrecerse o debería llevar su tope escrito.
+  expect(await texto(oportunidades.first())).toContain('150.000');
+});

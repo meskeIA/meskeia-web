@@ -2575,3 +2575,319 @@ test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
     for (const texto of respuestas) expect(texto).toContain('25%');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 11/09/2026 — la cola reabrió la app tras el commit 7a02470c
+// («Aragón no tiene tipos reducidos de ITP, tiene bonificaciones en cuota»), que reescribió
+// por completo la ficha de Aragón en `data/itp-ccaa.ts`: la escala del art. 121-1 pasó de
+// DOS tramos a los CINCO reales (8 / 8,5 / 9 / 9,5 / 10 %) y los «tipos reducidos» por
+// colectivo resultaron ser bonificaciones en cuota del 12,5 % y del 50 %.
+//
+// Aragón no tenía ni un solo testigo en este fichero, así que los tres casos van sobre esa
+// comunidad y sobre la entrada del vendedor que ninguna tanda había probado:
+//   · CASO J (normal)   — Aragón · 80.000 € · perfil JOVEN: la bonificación del art. 121-4
+//                         (declarada como tipo efectivo del 7 %) exige vivienda habitual, que
+//                         un garaje suelto no es, así que se ENSEÑA y no se cobra.
+//   · CASO K (límite)   — Aragón · 500.000 €: el corte EXACTO del tercer tramo de la escala
+//                         nueva, la cifra que el propio commit nombra (40.750 €, no 42.000).
+//   · CASO L (rechazo)  — VALOR CATASTRAL DEL SUELO negativo, el único campo del vendedor sin
+//                         testigo: si se aceptara, la plusvalía saldría negativa y RESTARÍA
+//                         del total de gastos, inflando el neto que el vendedor se cree.
+//
+// De dónde sale cada cifra (ninguna de memoria):
+//   · Tipo general de Aragón → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`
+//     ({ ccaa: 'Aragón', tipo: 8 }), leído por `tipoGeneralDe()`.
+//   · Escala de cinco tramos y bonificaciones → `ITP_CCAA.aragon` en `data/itp-ccaa.ts`,
+//     verificada el 11/09/2026 contra el BOE (BOA-d-2005-90006, arts. 121-1, 121-4 y 121-5).
+//   · Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y
+//     `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, los dos con el 21 % de IVA dentro.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 €, 21 %
+//     hasta 50.000 €) y la fórmula del art. 35 LIRPF en `data/fiscal/ganancia-inmueble.ts`.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 11/09/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO J (NORMAL) — Aragón · segunda mano · 80.000 € · perfil JOVEN.
+   *
+   * ITP — `elegirTipoITP('aragon', 'joven', 80000, { viviendaHabitual: false })`:
+   *   el único candidato por nombre es «Jóvenes < 35 años» (7 %, que es el 8 % con la
+   *   bonificación del 12,5 % del art. 121-4 ya descontada). Su condición «Vivienda habitual»
+   *   NO la cumple un garaje suelto → cae en `noComprobables` y se liquida el tipo general
+   *   por la escala del art. 121-1:
+   *     tramo 1 (hasta 400.000 €, 8 %) = 80.000 × 8 % =                          6.400,000000
+   *   tipo EFECTIVO mostrado = 6.400 / 80.000 =                                       8,00 %
+   *
+   * Notaría — `calcularArancelNotarial(80000)` (RD 1426/1989, número 2):
+   *     90,15 + (30.050,61 − 6.010,12) × 0,45 % + (60.101,21 − 30.050,61) × 0,15 %
+   *          + (80.000 − 60.101,21) × 0,10 % =                                     263,306895
+   *     × 1,21 (IVA) =                                                             318,601343
+   *   `estimarFacturaNotarial`: min ×1,5 = 477,902014 · max ×2 = 637,202686
+   *                             medio ×1,75 =                                      557,552350
+   *
+   * Registro — `calcularRegistro(80000)` (RD 1427/1989, número 2 + REGISTRO_CONCEPTOS):
+   *     24,04 + 24.040,49 × 0,175 % + 30.050,60 × 0,125 % + 19.898,79 × 0,075 % = 118,598200
+   *     + 6,010121 (presentación) + 3,005061 (nota simple) =                       127,613382
+   *     × 1,21 (IVA) =                                                             154,412192
+   *
+   * Total gastos — `sumarLineasVisibles` redondea cada línea ANTES de sumar:
+   *     6.400,00 + 0 (sin AJD en segunda mano) + 557,55 + 154,41 + 300,00 =       7.411,96
+   *     % sobre el precio = 7.411,96 / 80.000 =                                      9,26 %
+   * Coste total = 80.000 + 7.411,96 =                                            87.411,96
+   */
+  test('CASO J (normal) — Aragón, 80.000 €, perfil Joven: la bonificación del 121-4 se enseña, no se cobra', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.selectOption('#select-perfil', 'joven');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '80000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    expect(await valorTarjeta(page, 'Precio del garaje')).toBe('80.000,00 €');
+    // 80.000 € no salen del primer tramo, así que el tipo efectivo coincide con el nominal.
+    expect(await tituloTarjeta(page, 'ITP (')).toBe('ITP (8,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('6400,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('557,55 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 477,90 € y 637,20 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('154,41 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7411,96 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '9,26% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('87.411,96 €');
+
+    // El 7 % se ENSEÑA como oportunidad y no se cobra: presupuestar de menos es el error caro.
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    await expect(aviso).toHaveCount(1);
+    const textoAviso = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+    expect(textoAviso).toContain('En Aragón existe');
+    expect(textoAviso).toContain('7,00% — Jóvenes < 35 años');
+    expect(textoAviso).toContain('Menor de 35 años · Vivienda habitual · Valor real ≤ 100.000 €');
+
+    // La escala que la página anuncia es la de la ficha, no una copia: si el art. 121-1 se
+    // mueve, este ancla se mueve con él (mismo criterio del hallazgo 625).
+    const escala = (ITP_CCAA.aragon.tramosProgresivos ?? [])
+      .map((t) => `${formatTipoNominal(t.tipo)}%`)
+      .join(' → ');
+    expect(escala).toBe('8% → 8,5% → 9% → 9,5% → 10%'); // los cinco tramos del art. 121-1
+    await expect(
+      page.getByText(`Esta comunidad aplica escala progresiva (${escala})`),
+    ).toBeVisible();
+  });
+
+  /**
+   * CASO K (LÍMITE) — Aragón · segunda mano · 500.000 €, el corte EXACTO del tercer tramo.
+   *
+   * Es la cifra que el commit 7a02470c nombra: con la escala de dos tramos que había hasta
+   * el 11/09/2026 se liquidaban 42.000 € (8 % plano hasta 400.000 y 10 % el resto), y la
+   * escala real del art. 121-1 da 40.750 €. Los tres primeros tramos se agotan justo aquí:
+   *     400.000 × 8 %   =                                                        32.000,00
+   *   +  50.000 × 8,5 % =                                                         4.250,00   (acumulado 36.250,00)
+   *   +  50.000 × 9 %   =                                                         4.500,00   (acumulado 40.750,00)
+   *   tipo EFECTIVO mostrado = 40.750 / 500.000 =                                    8,15 %
+   *   (los tres acumulados —32.000, 36.250 y 40.750— son los que reproduce
+   *    `tests/itp-aragon.spec.ts`, el candado del motor)
+   *
+   * Notaría — `calcularArancelNotarial(500000)`:
+   *     90,15 + 24.040,49 × 0,45 % + 30.050,60 × 0,15 % + 90.151,82 × 0,10 %
+   *          + (500.000 − 150.253,03) × 0,05 % =                                 508,433410
+   *     × 1,21 =                                                                 615,204426
+   *   min ×1,5 = 922,806639 · max ×2 = 1.230,408852 · medio ×1,75 =             1.076,607746
+   *
+   * Registro — `calcularRegistro(500000)`:
+   *     24,04 + 24.040,49 × 0,175 % + 30.050,60 × 0,125 % + 90.151,82 × 0,075 %
+   *          + (500.000 − 150.253,03) × 0,030 % =                                276,212064
+   *     + 9,015182 (presentación + nota simple) = 285,227246 × 1,21 =            345,124965
+   *     (muy por debajo de REGISTRO_MAXIMO = 2.181,67, que aquí no muerde)
+   *
+   * Total gastos = 40.750,00 + 0 + 1.076,61 + 345,12 + 300,00 =                42.471,73
+   *     % sobre el precio = 42.471,73 / 500.000 =                                   8,49 %
+   * Coste total = 500.000 + 42.471,73 =                                       542.471,73
+   */
+  test('CASO K (límite) — Aragón, 500.000 €: la escala de cinco tramos liquida 40.750 €, no 42.000 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.selectOption('#select-perfil', 'general');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '500000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    expect(await valorTarjeta(page, 'Precio del garaje')).toBe('500.000,00 €');
+    expect(await tituloTarjeta(page, 'ITP (')).toBe('ITP (8,15%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('40.750,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1076,61 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 922,81 € y 1230,41 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('345,12 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('42.471,73 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '8,49% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('542.471,73 €');
+
+    // Con perfil general y un garaje suelto no queda ningún reducido que enseñar en Aragón:
+    // los cinco de la ficha exigen vivienda habitual o renta, y ninguno es de ubicación.
+    await expect(
+      page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' }),
+    ).toHaveCount(0);
+  });
+
+  /**
+   * CASO L (DEBE RECHAZARSE) — VALOR CATASTRAL DEL SUELO negativo, con el foco dentro.
+   *
+   * Un valor catastral negativo no existe, y si se aceptara la plusvalía municipal saldría
+   * NEGATIVA (−5.000 × 0,10 × 25 % = −125 €) y `sumarLineasVisibles` la restaría del total
+   * de gastos del vendedor: el neto subiría 125 € por una partida imposible. El campo tiene
+   * `min={0}`, pero eso solo actúa al salir; mientras se teclea, quien tiene que rechazarlo
+   * es la guarda `valorSuelo > 0` del motor de la página.
+   *
+   * Entrada: Madrid · venta 40.000 € · compra 25.000 € · 8 años · comisión 3 % ·
+   *          valor catastral del suelo «-5000» (sin salir del campo) · sin catastral total.
+   *
+   * ESPERADO — el negativo se trata como dato que FALTA, no como cero ni como importe:
+   *   plusvalía            = «Sin calcular» (no «0,00 €», que se leería como «no pagas»)
+   *   comisión             = 40.000 × 3 % =                                       1.200,00
+   *   valor de adquisición = 25.000 + 0 =                                        25.000,00
+   *   valor de transmisión = 40.000 − 1.200 − 0 =                                38.800,00
+   *   ganancia             = 38.800 − 25.000 =                                   13.800,00
+   *   IRPF = 6.000 × 19 % + 7.800 × 21 % = 1.140 + 1.638 =                        2.778,00
+   *   total gastos         = 0 + 1.200 + 0 + 2.778 =                              3.978,00
+   *   neto                 = 40.000 − 3.978 =                                    36.022,00
+   *   y el neto se declara INCOMPLETO, nombrando el campo que de verdad falta.
+   */
+  test('CASO L (debe rechazarse) — un valor catastral del suelo negativo no produce plusvalía', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await rellenar(page, 'Precio del garaje / plaza de parking', '40000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original del garaje', '25000');
+    await rellenar(page, 'Años de propiedad', '8');
+    await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '3');
+
+    const suelo = page.locator('input[aria-label="Valor catastral del suelo (€)"]');
+    await suelo.fill('-5000'); // a propósito SIN blur: así lo ve quien está tecleando
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No calculada (falta el valor catastral del suelo)',
+    );
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('25.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('38.800,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('13.800,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2778,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('3978,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('36.022,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'INCOMPLETO: falta descontar la plusvalía municipal. Rellena el valor catastral del suelo para obtener el neto real.',
+    );
+    await expect(page.getByText('No definido')).toHaveCount(0);
+
+    // Al salir del campo, NumberInput lo acota al mínimo declarado (0) y sigue sin calcular:
+    // un 0 tampoco es un valor catastral, así que la partida continúa «Sin calcular».
+    await suelo.blur();
+    await expect(suelo).toHaveValue('0');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2778,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('36.022,00 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS 11/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar, así que
+// hoy fallan a propósito. Al repararlos se les quita la marca y quedan como regresión.
+//
+// Los dos son RESIDUOS DE REPARACIÓN de la misma familia: el motor sabe que hay una escala
+// progresiva y que Aragón bonifica en cuota, y el TEXTO que acompaña al resultado sigue
+// hablando de un tipo general plano y de tipos reducidos.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgos abiertos — re-inspección del 11/09/2026', () => {
+  /**
+   * ❌ ABIERTO (contenido, medio) — en una comunidad con escala progresiva, el aviso
+   * «Podrías pagar menos» afirma que el cálculo usa el TIPO GENERAL, y no es lo que la
+   * tarjeta de al lado acaba de cobrar.
+   *
+   * Aragón · 500.000 € · perfil Joven:
+   *   tarjeta  → «ITP (8,15%)» = 40.750,00 €   (la escala del art. 121-1, que la misma
+   *              pantalla anuncia dos recuadros más arriba: 8 % → 8,5 % → 9 % → 9,5 % → 10 %)
+   *   aviso    → «El cálculo usa el tipo general (8,00%)» → 500.000 × 8 % = 40.000,00 €
+   *   diferencia entre lo que el aviso dice y lo que la app cobra:                750,00 €
+   *
+   * No es exclusivo de Aragón: Cataluña · 700.000 € · Joven cobra «ITP (10,14%)» = 71.000,00 €
+   * y el mismo aviso dice «tipo general (10,00%)» (70.000,00 €). Afecta a las comunidades con
+   * escala —Aragón, Baleares, Cataluña, Valencia, Extremadura…— siempre que el precio salga
+   * del primer tramo, que es justo cuando el aviso aparece.
+   *
+   * El importe cobrado es CORRECTO; lo que falla es la frase que lo explica, y un texto que
+   * no cuadra con la cifra de al lado enseña a desconfiar del resultado bueno.
+   */
+  test.fail(
+    'HALLAZGO — el aviso «Podrías pagar menos» nombra el tipo general plano en una CCAA con escala',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: /Segunda mano/ }).click();
+      await page.selectOption('#select-ccaa', 'aragon');
+      await page.selectOption('#select-perfil', 'joven');
+      await rellenar(page, 'Precio del garaje / plaza de parking', '500000');
+
+      expect(await valorTarjeta(page, 'ITP (')).toBe('40.750,00 €');
+      const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+      const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+
+      // DEBERÍA nombrar lo que de verdad se ha aplicado: el tipo efectivo (8,15 %) o la
+      // escala. Hoy dice «El cálculo usa el tipo general (8,00%)».
+      expect(texto).not.toContain('el tipo general (8,00%)');
+    },
+  );
+
+  /**
+   * ❌ ABIERTO (contenido, bajo) — residuo del commit 7a02470c: la corrección llegó a la
+   * ficha y a su nota, pero no al rótulo con el que la app presenta esa misma lista.
+   *
+   * Aragón · segunda mano · 80.000 € · perfil Joven, en la misma columna y sin hacer scroll:
+   *   rótulo → «Tipos reducidos en Aragón (solo si se cumplen TODAS sus condiciones):»
+   *   nota   → «Aragón aplica bonificaciones sobre la cuota, NO tipos reducidos: el 12,5 %
+   *             del art. 121-4…»
+   *
+   * Las dos frases se contradicen en pantalla. El importe no cambia —el 7 % es el 8 %
+   * bonificado y solo vale por debajo de 100.000 €, dentro del primer tramo—, pero quien
+   * llame a la oficina liquidadora de Aragón pidiendo «el tipo reducido para jóvenes» está
+   * pidiendo algo que allí no existe con ese nombre.
+   */
+  test.fail(
+    'HALLAZGO — Aragón: el rótulo dice «Tipos reducidos» y la nota de al lado dice que no los hay',
+    async ({ page }) => {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: /Segunda mano/ }).click();
+      await page.selectOption('#select-ccaa', 'aragon');
+      await page.selectOption('#select-perfil', 'joven');
+      await rellenar(page, 'Precio del garaje / plaza de parking', '80000');
+
+      // La nota de la ficha (la que el commit de hoy reescribió) está en pantalla...
+      await expect(
+        page.getByText('Aragón aplica bonificaciones sobre la cuota, no tipos reducidos'),
+      ).toBeVisible();
+
+      // ...así que el rótulo de la lista no debería llamarlos «tipos reducidos».
+      const rotulo = (
+        await page.locator('h3', { hasText: 'Tipos reducidos en' }).first().innerText()
+      )
+        .replace(/\s+/g, ' ')
+        .trim();
+      expect(rotulo).not.toContain('Tipos reducidos en Aragón');
+    },
+  );
+});

@@ -49,6 +49,7 @@
  */
 import { test, expect, type Page } from '@playwright/test';
 import { IVA_INMUEBLES_2025 } from '../../data/fiscal/inmuebles';
+import { PORCENTAJES_IVA } from '../../data/fiscal/iva';
 import { RANGO_AJD } from '../../data/itp-ccaa';
 
 const RUTA = '/simulador-gastos-compraventa-solar/';
@@ -477,5 +478,341 @@ test.describe('Regresión — hallazgos reparados el 26/08/2026', () => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
     expect(faq).toContain(`sujeta a IVA al ${tipo}%`);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN del 11/09/2026 — Aragón, tras reescribirse su ficha en data/itp-ccaa.ts
+//
+// POR QUÉ VUELVE A LA COLA
+// ────────────────────────
+// `7a02470c fix(fiscal): Aragón no tiene tipos reducidos de ITP, tiene bonificaciones en
+// cuota` cambió el dato que esta app consume: la escala del art. 121-1 del Decreto
+// Legislativo 1/2005 pasó de DOS tramos declarados a los CINCO reales (8 / 8,5 / 9 / 9,5 /
+// 10 %), verificados contra el texto consolidado del BOE (BOA-d-2005-90006). Hasta ese
+// commit, un solar de 500.000 € en Aragón liquidaba 42.000 € en vez de 40.750 €.
+//
+// DE DÓNDE SALE CADA CIFRA (ninguna de memoria)
+// ────────────────────────────────────────────
+//  - Escala de Aragón → `ITP_CCAA['aragon'].tramosProgresivos` en `data/itp-ccaa.ts`, cuyos
+//    cuatro cortes de cuota acumulada (32.000 € a los 400.000 · 36.250 € a los 450.000 ·
+//    40.750 € a los 500.000 · 64.500 € a los 750.000) sella `tests/itp-aragon.spec.ts`.
+//    Por encima de 750.000 €, el exceso al 10 %: 1.000.000 € → 89.500 € (mismo fichero).
+//  - AJD de Aragón → `ITP_CCAA['aragon'].ajd = 1.5`.
+//  - IVA del solar → `IVA_INMUEBLES_2025.local = 21` (la app lo importa como `IVA_SOLAR`).
+//  - Aranceles → `ARANCELES_NOTARIO` / `FACTURA_NOTARIAL` (RD 1426/1989) y
+//    `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS` (RD 1427/1989), con el 21 % de IVA dentro.
+//  - Bonificación del 50 % de Ceuta y Melilla → art. 57 bis TRLITPAJD, en el motor.
+//
+// Los tres casos se resolvieron a mano ANTES de abrir el navegador, con un script de
+// aritmética propio que NO llama al código de la app; el desarrollo va junto a cada
+// aserción con los importes sin redondear.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 11/09/2026 — la escala de Aragón del art. 121-1', () => {
+  /**
+   * CASO 1 (NORMAL) — Aragón, vende un PARTICULAR, 500.000 €, gestoría 500 €.
+   * Es el corte que el propio commit cita como el que estaba mal.
+   *
+   * ITP por tramos (art. 121-1, cuota acumulada):
+   *   400.000 × 8 %   = 32.000
+   *    50.000 × 8,5 % =  4.250   (400.000 → 450.000)
+   *    50.000 × 9 %   =  4.500   (450.000 → 500.000)
+   *                     ───────
+   *                     40.750,00   → tipo EFECTIVO 40.750 / 500.000 = 8,15 %
+   *   (la escala de dos tramos que había antes daba 42.000 €: 1.250 € de más)
+   */
+  test('CASO 1 (normal) — Aragón, particular, 500.000 €: 40.750 € y tipo efectivo 8,15 %', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.getByRole('button', { name: /Un particular/ }).click();
+    await rellenar(page, PRECIO, '500000');
+    await rellenar(page, GESTORIA, '500');
+
+    // Los cinco escalones se anuncian con formatTipoNominal (formato español: «8,5%», no «8.5%»)
+    await expect(page.getByText(/escala progresiva \(8% → 8,5% → 9% → 9,5% → 10%\)/)).toBeVisible();
+
+    expect(await valorTarjeta(page, 'ITP (')).toBe('40.750,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,15%)');
+
+    // Vende un particular → ni IVA ni AJD.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^IVA \(/ })).toHaveCount(0);
+
+    // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO), arancel(500.000):
+    //   tramo 1                                   →                          90,150000
+    //   tramo 2 (0,45 %)  → 24.040,49 × 0,0045    =                         108,182205
+    //   tramo 3 (0,15 %)  → 30.050,60 × 0,0015    =                          45,075900
+    //   tramo 4 (0,10 %)  → 90.151,82 × 0,0010    =                          90,151820
+    //   tramo 5 (0,05 %)  → 349.746,97 × 0,0005   =                         174,873485
+    //   arancel sin IVA                           =                         508,433410
+    //   con el 21 %       = × 1,21                =                         615,204426
+    // FACTURA_NOTARIAL: ×1,5 = 922,806639 · ×2 = 1.230,408852 · medio = 1.076,607746
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1076,61 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('922,81 €');
+    expect(notaria).toContain('1230,41 €');
+
+    // Registro — RD 1427/1989, número 2 (ARANCELES_REGISTRO), arancel(500.000):
+    //   24,04 + 42,0708575 + 37,56325 + 67,613865 + 349.746,97 × 0,0003 = 104,924091
+    //   suma = 276,2120635  (muy por debajo del tope REGISTRO_MAXIMO 2.181,67)
+    //   + presentación 6,010121 + nota simple 3,005061 =            285,2272455
+    //   con el 21 %  = × 1,21                          =            345,124967
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('345,12 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
+
+    // Total gastos — `sumarLineasVisibles` redondea cada línea al céntimo ANTES de sumar:
+    //   40.750,00 + 1.076,61 + 345,12 + 500,00 = 42.671,73
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('42.671,73 €');
+    // 42.671,73 / 500.000 = 8,534346 % → «8,53%»
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,53%');
+    // Coste total = 500.000 + 42.671,73 = 542.671,73
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('542.671,73 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Aragón, vende un PARTICULAR, 1.000.000 €: se rebasa el último corte
+   * de la escala (750.000 €) y el exceso entra en el tramo MÁS ALTO, el 10 %.
+   *
+   *   64.500 (cuota acumulada a los 750.000, sellada en tests/itp-aragon.spec.ts)
+   * + 250.000 × 10 % = 25.000
+   *   ───────
+   *   89.500,00   → tipo EFECTIVO 89.500 / 1.000.000 = 8,95 %
+   *
+   * Un tipo plano del 8 % habría dado 80.000 €, y la escala de dos tramos anterior, 84.000 €.
+   */
+  test('CASO 2 (límite) — Aragón, particular, 1.000.000 €: el exceso sobre 750.000 € va al 10 %', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.getByRole('button', { name: /Un particular/ }).click();
+    await rellenar(page, PRECIO, '1000000');
+    await rellenar(page, GESTORIA, '500');
+
+    expect(await valorTarjeta(page, 'ITP (')).toBe('89.500,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,95%)');
+
+    // Notaría — arancel(1.000.000):
+    //   90,15 + 108,182205 + 45,0759 + 90,15182
+    //   + tramo 5 (150.253,03 → 601.012,10, 0,05 %) → 450.759,07 × 0,0005 = 225,379535
+    //   + tramo 6 (601.012,10 → 1.000.000, 0,03 %)  → 398.987,90 × 0,0003 = 119,696370
+    //   arancel sin IVA = 678,635830 · con IVA = 821,149354
+    //   ×1,5 = 1.231,724031 · ×2 = 1.642,298709 · medio = 1.437,011370
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1437,01 €');
+
+    // Registro — arancel(1.000.000):
+    //   24,04 + 42,0708575 + 37,56325 + 67,613865
+    //   + tramo 5 (0,030 %) → 450.759,07 × 0,0003 = 135,227721
+    //   + tramo 6 (0,020 %) → 398.987,90 × 0,0002 =  79,797580
+    //   suma = 386,3132735  (sigue bajo el tope 2.181,67)
+    //   + 9,015182 = 395,3284555 · con el 21 % = 478,347431
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('478,35 €');
+
+    // Total gastos = 89.500,00 + 1.437,01 + 478,35 + 500,00 = 91.915,36
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('91.915,36 €');
+    // 91.915,36 / 1.000.000 = 9,191536 % → «9,19%»
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,19%');
+    // Coste total = 1.000.000 + 91.915,36 = 1.091.915,36
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.091.915,36 €');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — en Aragón, que es la comunidad con escala: cero, negativo, dos
+   * separadores decimales («2,5,3») y un número malformado («1.2.3») no pueden producir
+   * ninguna cuota. `parseSpanishNumber` devuelve NaN en los dos últimos —una segunda coma
+   * o un segundo punto que no agrupa millares no es un número— y la guarda
+   * `!Number.isFinite(precio) || precio <= 0` corta antes de calcular nada.
+   */
+  test('CASO 3 (rechazo) — 0, negativo, «2,5,3» y «1.2.3» no liquidan ITP en Aragón', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.getByRole('button', { name: /Un particular/ }).click();
+
+    const campo = page.locator('input[aria-label="' + PRECIO + '"]');
+    const marcador = page.getByText('Introduce el precio del solar para ver el desglose de gastos');
+
+    for (const entrada of ['0', '-500', '2,5,3', '1.2.3', '']) {
+      await campo.fill(entrada);
+      await expect(marcador).toBeVisible();
+      await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveCount(0);
+      await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
+    }
+
+    // Y ni un centinela de formatNumber/formatCurrency ante NaN en toda la página.
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('NaN');
+    expect(cuerpo).not.toContain('No definido');
+    expect(cuerpo).not.toContain('∞');
+  });
+
+  /**
+   * COMPROBACIÓN ADICIONAL — el otro régimen en la misma comunidad con escala. Vender un
+   * promotor en Aragón no toca la escala: es IVA 21 % (IVA_INMUEBLES_2025.local) sobre el
+   * precio, más AJD al 1,5 % (`ITP_CCAA['aragon'].ajd`), y ninguna tarjeta de ITP.
+   *   IVA = 500.000 × 21 %  = 105.000,00
+   *   AJD = 500.000 × 1,5 % =   7.500,00
+   */
+  test('Aragón con promotor: IVA 21 % + AJD 1,5 %, y la escala NO interviene', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.getByRole('button', { name: /Promotor \/ Empresa/ }).click();
+    await rellenar(page, PRECIO, '500000');
+
+    expect(await rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('105.000,00 €');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (1,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('7500,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveCount(0);
+  });
+
+  /**
+   * COMPROBACIÓN ADICIONAL — Ceuta con promotor: allí no hay IVA (IPSI) y el AJD SÍ se
+   * devenga, bonificado al 50 % por el art. 57 bis.1 del TRLITPAJD.
+   *   AJD = 200.000 × 0,5 % = 1.000 · × 0,5 = 500,00 €
+   */
+  test('Ceuta con promotor: IPSI «No calculado» y AJD bonificado al 50 % (500 €)', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await page.getByRole('button', { name: /Promotor \/ Empresa/ }).click();
+    await rellenar(page, PRECIO, '200000');
+
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('500,00 €');
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL \(PARCIAL\)/ })).toHaveCount(1);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 11/09/2026.
+// Escritos afirmando lo que DEBERÍA pasar, así que HOY FALLAN a propósito; cuando se
+// reparen quedan como test de regresión, igual que los del 26/08/2026 de arriba.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
+  /**
+   * HALLAZGO A (contenido, medio) — EFECTO FAMILIA, INVERTIDO. Las cinco preguntas de la FAQ
+   * VISIBLE afirman sin excepción que la compra a promotor «tributa por IVA al 21% más AJD»,
+   * mientras la calculadora de esa misma página contesta «IGIC — No calculado» en Canarias y
+   * «IPSI — No calculado» en Ceuta y Melilla (`TERRITORIOS_SIN_IVA`, data/itp-ccaa.ts).
+   *
+   * Lo llamativo es la dirección: aquí el `metadata.ts` SÍ lleva la excepción —su FAQPage,
+   * pregunta 1, dice «En Canarias, Ceuta y Melilla no rige el IVA»— y quien se quedó atrás es
+   * el texto visible, justo al revés que en `-garaje`, `-trastero` y `estimador-compraventa-
+   * inmueble`. El texto visible de la app NO contiene «IGIC» ni «IPSI» en ninguna parte salvo
+   * el aviso reactivo que solo aparece al elegir esos territorios; la hermana
+   * `simulador-gastos-compraventa-garaje` sí lo dice en su FAQ visible (page.tsx:1111).
+   */
+  test('HALLAZGO A — la FAQ visible afirma el IVA del 21 % sin la excepción de IGIC/IPSI que sí lleva su JSON-LD', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // El JSON-LD ya lo dice: no es que el dato no esté decidido, es que no llegó a la página.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faqLd = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faqLd).toContain('IGIC');
+    expect(faqLd).toContain('IPSI');
+
+    // La FAQ visible (el bloque educativo llega plegado: se lee con textContent).
+    const faqVisible = await page.evaluate(() => {
+      const bloques: string[] = [];
+      document.querySelectorAll('section h2').forEach((h) => {
+        if (/Preguntas frecuentes/.test(h.textContent ?? '')) {
+          bloques.push((h.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim());
+        }
+      });
+      return bloques.join(' ');
+    });
+    expect(faqVisible).toContain('¿Se paga IVA o ITP al comprar un solar?');
+    expect(faqVisible).toMatch(/IGIC|IPSI/);
+  });
+
+  /**
+   * HALLAZGO B (contenido, medio) — el aviso «Compra a promotor o empresa: el IVA del 21 % es
+   * deducible…» se pinta con la sola condición `esEmpresario` (page.tsx:248), sin mirar el
+   * territorio. En Canarias, Ceuta y Melilla sale EN LA MISMA PANTALLA que
+   * `<AvisoTerritorioSinIva>`, que dice literalmente «En Canarias no se aplica el IVA».
+   *
+   * Canarias + «Promotor / Empresa» + 150.000 €: la pantalla muestra los dos `role="note"`
+   * a la vez, uno explicando cómo se deduce un IVA que el otro declara inexistente. La
+   * tarjeta de resultado ya está bien desde el 26/08 («IGIC — No calculado»); lo que no se
+   * condicionó fue este aviso.
+   */
+  test('HALLAZGO B — en Canarias el aviso del IVA deducible convive con el aviso de que allí no hay IVA', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'canarias');
+    await page.getByRole('button', { name: /Promotor \/ Empresa/ }).click();
+    await rellenar(page, PRECIO, '150000');
+
+    // Lo que ya acierta y debe seguir: la tarjeta no inventa IVA.
+    expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
+    await expect(page.getByText('no se aplica el IVA')).toBeVisible();
+
+    // Lo que falla: el aviso del 21 % deducible no debería salir donde no hay IVA.
+    await expect(page.getByText(/el IVA del 21% es/)).toHaveCount(0);
+  });
+
+  /**
+   * HALLAZGO C (accesibilidad, medio) — el azul de marca `--primary` (#2E86AB) se usa como
+   * color de TEXTO en `.sectionTitle`, `.infoCcaaNombre`, `.infoCcaaValue`, `.catastroLink` y
+   * `.transmisionBtn.active`. Medido en el navegador, en modo claro:
+   *     #2E86AB sobre #FFFFFF (blanco)            → 4,11:1
+   *     #2E86AB sobre #FAFAFA (tarjeta de CCAA)   → 3,93:1
+   *     #2E86AB sobre #EEF6F9 (botón activo)      → 3,75:1
+   * Los tres por debajo del 4,5:1 que exige WCAG 2.1 AA para texto normal. Para esto existe
+   * `--primary-texto` (#26718F, 5,47:1 sobre blanco), declarado en `app/globals.css` con ese
+   * motivo escrito en el propio comentario. En oscuro NO ocurre: allí `--primary` y
+   * `--primary-texto` son el mismo #3FA5D1.
+   */
+  test('HALLAZGO C — el azul de marca hace de texto y no llega al 4,5:1 de WCAG AA en modo claro', async ({ page }) => {
+    await page.goto(RUTA);
+
+    const medida = await page.evaluate(() => {
+      const rgb = (s: string) => (s.match(/\d+/g) ?? []).slice(0, 3).map(Number) as [number, number, number];
+      const lum = ([r, g, b]: [number, number, number]) => {
+        const f = (v: number) => (v / 255 <= 0.03928 ? v / 255 / 12.92 : Math.pow((v / 255 + 0.055) / 1.055, 2.4));
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      // Fondo efectivo: se sube por los ancestros hasta encontrar uno no transparente.
+      const fondo = (el: Element): [number, number, number] => {
+        let n: Element | null = el;
+        while (n) {
+          const c = getComputedStyle(n).backgroundColor;
+          if (c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c)) return rgb(c);
+          n = n.parentElement;
+        }
+        return [255, 255, 255];
+      };
+      const out: Record<string, number> = {};
+      for (const sel of ['[class*="infoCcaaValue"]', '[class*="infoCcaaNombre"]', '[class*="catastroLink"]', '[class*="sectionTitle"]']) {
+        const el = document.querySelector(sel);
+        if (!el) continue;
+        const [a, b] = [lum(rgb(getComputedStyle(el).color)), lum(fondo(el))].sort((x, y) => y - x);
+        out[sel] = Math.round(((a + 0.05) / (b + 0.05)) * 100) / 100;
+      }
+      return out;
+    });
+
+    // Medido hoy con este mismo cálculo: los cuatro dan 4,11:1 (el fondo efectivo que
+    // encuentra el ascenso por ancestros es el blanco de `.infoCcaaItem` / `.formPanel`).
+    // Sobre el #FAFAFA de la tarjeta de comunidad baja a 3,93:1 y en el botón activo a 3,75:1.
+    for (const [selector, contraste] of Object.entries(medida)) {
+      expect(contraste, `${selector} da ${contraste}:1`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  /**
+   * HALLAZGO D (dato, bajo) — el tipo de IVA del solar se deriva de
+   * `IVA_INMUEBLES_2025.local`, que en `data/fiscal/inmuebles.ts:91` está documentado como
+   * «IVA local comercial». Un solar no es un local: lo que le corresponde es el tipo GENERAL
+   * del art. 90 LIVA, que el repositorio ya tiene sellado aparte en `PORCENTAJES_IVA.general`
+   * (`data/fiscal/iva.ts:66`). Hoy ambos valen 21, así que el importe que sale en pantalla es
+   * el correcto y este test PASA: su valor es de guardia.
+   *
+   * El riesgo es el que documenta el hallazgo 641 citado en ese mismo fichero a propósito de
+   * `garageCon`: dos constantes para un único dato existen separadas precisamente para poder
+   * divergir. El día que se mueva el tipo del local comercial y no el general, el solar
+   * seguirá al equivocado y este test se pondrá rojo enseñando por qué.
+   */
+  test('HALLAZGO D (guardia) — el IVA del solar sale de la constante del LOCAL, no de la del tipo general', async () => {
+    expect(IVA_INMUEBLES_2025.local).toBe(PORCENTAJES_IVA.general);
   });
 });

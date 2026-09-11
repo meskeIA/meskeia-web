@@ -174,3 +174,115 @@ test.describe('Estimador ISD — que la corrección no se lleve por delante el r
     await expect(page.locator('optgroup[label="Régimen Foral"]')).toHaveCount(0);
   });
 });
+
+/**
+ * ─── Primera inspección completa de la app (11/09/2026) ───────────────────────
+ *
+ * Los tres casos de abajo son los de la inspección: uno normal, uno en el límite y uno que
+ * la app debe rechazar. Todos los importes salen de `data/fiscal/sucesiones.ts` y están
+ * resueltos a mano antes de ejecutarlos, con el tramo y la constante citados en cada paso.
+ *
+ * ⚠️ Los dos primeros dependen de `TARIFA_ESTATAL_IS`, que hoy tiene SIETE tramos y un tipo
+ * máximo del 25,50 %. La escala del art. 21 LISD tiene DIECISÉIS y llega al 34 % — está
+ * transcrita entera en `data/fiscal/donaciones.ts` como `TARIFA_ESTATAL_ID`, y el propio
+ * `faqJsonLd` de esta app la describe así («7,65 %… 34 % para importes superiores a
+ * 797.555 €»). Es el hallazgo crítico del acta. El día que se unifique la tarifa, estos dos
+ * valores cambian a 154,74 € y 3.306,56 € respectivamente: que el test se ponga rojo
+ * entonces es lo que se busca, no un fallo del test.
+ */
+test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a rechazar', () => {
+  /**
+   * CASO NORMAL — Madrid, hijo de 21 años o más (Grupo II), que hereda la vivienda habitual.
+   *
+   *   Activos            250.000,00   (50.000 en cuentas + 200.000 de vivienda habitual)
+   *   + ajuar 3 %          7.500,00   PORC_AJUAR_DOMESTICO_IS
+   *   = base imponible   257.500,00
+   *   − parentesco        15.956,87   REDUCCIONES_PARENTESCO_IS['II']
+   *   − vivienda 95 %    122.606,47   min(200.000 × 0,95 ; REDUCCION_VIVIENDA_MAX_IS)
+   *   = base liquidable  118.936,66
+   *   cuota íntegra       11.111,13   TARIFA_ESTATAL_IS, tramo «hasta 239.389,13»:
+   *                                   7.127,47 + 10,20 % × (118.936,66 − 79.881,18)
+   *   × coeficiente          1,0000   COEFICIENTES_IS['II'][0] (patrimonio < 402.678 €)
+   *   − bonificación 99 % 11.000,02   BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']
+   *   = cuota final          111,11 €
+   */
+  test('caso normal: hijo ≥21 en Madrid con vivienda habitual paga 111,11 €', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '50000');
+    await importe(page, CAMPO.viviendaHabitual, '200000');
+
+    expect(await cuota(page)).toBe('111,11 €');
+
+    const panel = await textoPagina(page);
+    expect(panel).toContain('257.500,00 €');   // base imponible con ajuar
+    expect(panel).toContain('122.606,47 €');   // tope estatal de la reducción por vivienda
+    expect(panel).toContain('118.936,66 €');   // base liquidable
+    expect(panel).toContain('11.111,13 €');    // cuota íntegra
+  });
+
+  /**
+   * CASO LÍMITE — sobrino (Grupo III) en Asturias, la única comunidad cuyo beneficio se
+   * aplica como reducción EN BASE, y con el coeficiente multiplicador que sí incrementa.
+   * Se comprueban los dos extremos de la columna de patrimonio preexistente.
+   *
+   *   Activos             80.000,00   (cuentas)
+   *   + ajuar 3 %          2.400,00
+   *   = base imponible    82.400,00
+   *   − parentesco         7.993,46   REDUCCIONES_PARENTESCO_IS['III']
+   *   − Asturias base     50.000,00   BONIFICACIONES_CCAA_IS['asturias']…['III'].reduccionBase
+   *   = base liquidable   24.406,54
+   *   cuota íntegra        2.006,61   TARIFA_ESTATAL_IS, tramo «hasta 31.956,87»:
+   *                                   611,50 + 8,50 % × (24.406,54 − 7.993,46)
+   *   × 1,5882 → 3.186,90 €   COEFICIENTES_IS['III'][0], patrimonio < 402.678 €
+   *   × 1,9059 → 3.824,40 €   COEFICIENTES_IS['III'][3], patrimonio > 4.020.770 €
+   *
+   *   Sin bonificación en cuota: en Asturias el beneficio ya se gastó en la base.
+   *
+   * ⚠️ La tarjeta «Sobrino hereda cuenta bancaria» del bloque educativo describe ESTE mismo
+   * caso y anuncia «~17.200 € (21,5 %)» porque se salta los 50.000 € de reducción. Es el
+   * hallazgo de contenido del acta: la app se contradice a sí misma por 5,4 veces.
+   */
+  test('caso límite: Grupo III en Asturias, 3.186,90 € y 3.824,40 € según patrimonio', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('III');
+    await importe(page, CAMPO.saldos, '80000');
+
+    expect(await cuota(page)).toBe('3186,90 €');
+
+    const panel = await textoPagina(page);
+    expect(panel).toContain('50.000,00 €');   // la reducción en base de Asturias, que existe
+    expect(panel).toContain('24.406,54 €');   // base liquidable
+    expect(panel).toContain('2006,61 €');     // cuota íntegra antes del coeficiente
+
+    // El coeficiente multiplicador del Grupo III sí crece con el patrimonio preexistente
+    await page.locator('select').nth(SELECT.patrimonio).selectOption('4');
+    expect(await cuota(page)).toBe('3824,40 €');
+  });
+
+  /**
+   * CASO A RECHAZAR — «1.2.3» no es un número.
+   *
+   * `parseSpanishNumber` devuelve NaN desde el 24/08/2026 (antes `parseFloat` lo leía como
+   * 1,2), el total de activos se queda en cero y la app no ofrece ninguna estimación: enseña
+   * el texto de espera en vez de una cifra inventada.
+   *
+   * ⚠️ Lo que este test NO puede afirmar, y va en el acta: si el campo inválido convive con
+   * otro válido —«1.2.3» en cuentas y 200.000 € en vivienda— la app lo cuenta como 0,00 € y
+   * liquida 59,66 € sin avisar de que ha descartado un importe.
+   */
+  test('caso a rechazar: «1.2.3» no produce estimación', async ({ page }) => {
+    await page.goto(RUTA);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '1.2.3');
+
+    await expect(page.getByText(/Selecciona tu CCAA y parentesco/)).toBeVisible();
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+  });
+});

@@ -1005,3 +1005,207 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
     expect(cuerpo).not.toMatch(/5\s*%\s*,?\s*10\s*%\s*,?\s*15\s*%\s*(y|o)\s*20\s*%/);
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 11/09/2026 — disparada por dos commits que tocaron el motor de
+// esta app sin tocar su suite:
+//
+//   · `7a02470c` reescribió la ficha de Aragón en `data/itp-ccaa.ts` contra el
+//     texto consolidado del BOE (BOA-d-2005-90006): la escala del art. 121-1
+//     pasó de DOS tramos declarados (8 % / 10 %) a los CINCO reales
+//     (8 · 8,5 · 9 · 9,5 · 10 %), y lo que la tabla llamaba «tipos reducidos»
+//     resultaron ser bonificaciones en cuota. Ninguna prueba de este fichero
+//     pisaba Aragón, así que ni la escala vieja ni la nueva tenían testigo aquí.
+//   · `bc437470` cambió en ESTE page.tsx la lectura de «Años de propiedad»
+//     (`Math.max(0, …)` fuera, `anios >= 0` dentro) y actualizó las suites de
+//     garaje, trastero, nave-industrial y el hub del clúster — pero no esta.
+//
+// Los tres casos se resolvieron a mano ANTES de abrir el navegador; el desglose
+// va comentado junto a cada aserción, con la fuente de cada cifra.
+//
+// HALLAZGOS de esta ronda, que el Inspector NO repara y por eso van sin
+// aserción (la suite sigue en verde):
+//   · [medio] El panel de la comunidad imprime «IVA (comercial) 21%» también en
+//     Canarias, Ceuta y Melilla, donde no rige el IVA (TERRITORIOS_SIN_IVA) y la
+//     propia app responde «IGIC/IPSI · No calculado» dos tarjetas más allá. La
+//     reparación 620/621 del 02/09 alcanzó a los rótulos de los botones y no a
+//     esta casilla; `nave-industrial` ya la condiciona.
+//   · [medio] La nota «Los locales comerciales tributan por el tipo general de
+//     ITP, sin tipos reducidos» y la sexta pregunta del `faqJsonLd` («siempre
+//     aplica el tipo general») son categóricas, y la ficha de Aragón recién
+//     reescrita documenta en su campo `notas` el 1 % del art. 121-11 por
+//     adquirir un inmueble para INICIAR UNA ACTIVIDAD ECONÓMICA (0,75 % en
+//     medio rural), que no exige vivienda habitual. Es el único tipo del
+//     catálogo que puede alcanzar a un local. `garaje`, `trastero` y
+//     `estimador-compraventa-inmueble` sí imprimen `datosCcaaActual.notas`.
+//   · [bajo] El aviso de la renuncia a la exención se pinta con `esRenuncia` a
+//     secas, así que en Canarias afirma «El IVA se autoliquida por inversión del
+//     sujeto pasivo» mientras el aviso de debajo dice que allí no hay IVA.
+//     `nave-industrial` condiciona ese texto por territorio.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 11/09/2026 — la escala de Aragón y el año negativo', () => {
+  test('CASO 17 (normal) — Aragón, local de 300.000 €: ITP 8 % en el primer tramo, e IVA del 21 % (no del 10 %) por no ser residencial', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#select-ccaa').selectOption('aragon');
+    await rellenar(page, 'Precio del local comercial', '300000');
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '500');
+
+    // El panel de la comunidad tiene que publicar la escala NUEVA de cinco tramos
+    // (art. 121-1, ITP_CCAA.aragon.tramosProgresivos) y en formato español: hasta el
+    // 11/09/2026 se pintaba con `${t.tipo}%`, que da «8.5%» con punto decimal, y Aragón
+    // es la primera comunidad del catálogo con tramos no enteros.
+    const panel = page.locator('text=ITP General').locator('xpath=ancestor::div[1]/ancestor::div[1]');
+    await expect(panel).toContainText('8%');     // tipoGeneral de ITP_CCAA.aragon
+    await expect(panel).toContainText('1,5%');   // AJD de ITP_CCAA.aragon
+    await expect(page.locator('p[class*="infoCcaaNote"]').first())
+      .toContainText('escala progresiva (8% → 8,5% → 9% → 9,5% → 10%)');
+
+    // ── 17a. Segunda mano: exenta de IVA (art. 20.Uno.22º LIVA) → ITP.
+    // 300.000 € cae entero en el primer tramo de la escala (hasta 400.000 al 8 %):
+    //   300.000 × 8 % = 24.000. Tipo efectivo = 8,00 %, que aquí coincide con el nominal.
+    // Un local NO puede acogerse a las bonificaciones del art. 121-4 ni del 121-5: las
+    // cinco exigen «Vivienda habitual» en sus `condiciones`.
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('24.000,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    // Notaría y registro sobre 300.000 €, ya resueltos en el CASO 8 (Andalucía):
+    //   notaría 408,43341 × 1,21 × 1,75 = 864,85775 ; registro 225,2272455 × 1,21 = 272,52497
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('864,86 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('272,52 €');
+    // Total = 24.000 + 864,86 + 272,52 + 500 = 25.637,38 → 8,5458 % de 300.000
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('25.637,38 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,55%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('325.637,38 €');
+
+    // ── 17b. Obra nueva del promotor. LA PARTICULARIDAD DEL LOCAL: no es inmueble
+    // residencial, así que el IVA es el tipo GENERAL —IVA_INMUEBLES_2025.local = 21,
+    // art. 90 LIVA— y no el 10 % del art. 91.Uno.1.7º, que solo alcanza a la vivienda y
+    // a sus anejos (IVA_INMUEBLES_2025.obraNueva / anejoVinculado, los que usan las apps
+    // hermanas de garaje y trastero). 300.000 × 21 % = 63.000, no 30.000.
+    //   AJD de ITP_CCAA.aragon = 1,5 % → 300.000 × 1,5 % = 4.500
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21,00%)');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('63.000,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (1,50%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('4500,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    // Total = 63.000 + 4.500 + 864,86 + 272,52 + 500 = 69.137,38 → 23,0458 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('69.137,38 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('23,05%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('369.137,38 €');
+
+    // ── 17c. Renuncia a la exención (art. 20.Dos LIVA): mismo tipo, mismo AJD, pero
+    // autoliquidado por el comprador. Nunca ITP a la vez.
+    await page.getByRole('button', { name: /renuncia IVA/ }).click();
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('63.000,00 €');
+    expect(await descripcionTarjeta(page, /^IVA/)).toContain('inversión del sujeto pasivo');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('4500,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+  });
+
+  test('CASO 18 (límite) — Aragón: los cinco tramos del art. 121-1 y sus cuatro cortes de cuota acumulada', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.locator('#select-ccaa').selectOption('aragon');
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await rellenar(page, 'Gastos de gestoría del comprador (€)', '500');
+
+    // Los cuatro cortes que la ficha de ITP_CCAA.aragon declara como tabla oficial, y que
+    // `tests/itp-aragon.spec.ts` comprueba sobre el motor: aquí se comprueban EN PANTALLA.
+    //   400.000 → 400.000×8 %                                        = 32.000  (8,00 % efectivo)
+    //   450.000 → 32.000 + 50.000×8,5 %                              = 36.250  (8,0556 → 8,06 %)
+    //   500.000 → 36.250 + 50.000×9 %                                = 40.750  (8,15 %)
+    //   750.000 → 40.750 + 250.000×9,5 %                             = 64.500  (8,60 %)
+    // Con la escala vieja de dos tramos, 500.000 € liquidaban 42.000 € y 750.000 €, 67.000 €.
+    for (const [precio, cuota, etiqueta] of [
+      ['400000', '32.000,00 €', 'ITP (8,00%)'],
+      ['450000', '36.250,00 €', 'ITP (8,06%)'],
+      ['500000', '40.750,00 €', 'ITP (8,15%)'],
+      ['750000', '64.500,00 €', 'ITP (8,60%)'],
+    ] as const) {
+      await rellenar(page, 'Precio del local comercial', precio);
+      expect(await valorTarjeta(page, /^ITP/)).toBe(cuota);
+      await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText(etiqueta);
+    }
+
+    // ── Y el QUINTO tramo, el del 10 %, que solo se alcanza por encima de 750.000 €:
+    //   400.000×8 % + 50.000×8,5 % + 50.000×9 % + 250.000×9,5 % + 50.000×10 %
+    //   = 32.000 + 4.250 + 4.500 + 23.750 + 5.000 = 69.500
+    // Tipo EFECTIVO = 69.500 / 800.000 = 8,6875 % → 8,69 %, que no es ninguno de los cinco
+    // nominales: por eso la etiqueta lleva dos decimales.
+    await rellenar(page, 'Precio del local comercial', '800000');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('69.500,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,69%)');
+
+    // Notaría sobre 800.000 € (ARANCELES_NOTARIO, RD 1426/1989):
+    //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 % + 450.759,07×0,05 %
+    //   + 198.987,90×0,03 % = 618,63583 ; × 1,21 de IVA = 748,54935 ; × 1,75 = 1.309,96137.
+    //   Horquilla (FACTURA_NOTARIAL 1,5–2): 1.122,82403 y 1.497,09871.
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1309,96 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('1122,82 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('1497,10 €');
+    // Registro (ARANCELES_REGISTRO, RD 1427/1989): 24,04 + 42,07086 + 37,56325 + 67,61387
+    //   + 135,22772 + 198.987,90×0,020 % (=39,79758) = 346,31327 ; + 9,015182 ; × 1,21 = 429,94743
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('429,95 €');
+    // Total = 69.500 + 1.309,96 + 429,95 + 500 = 71.739,91 → 8,9675 % de 800.000
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('71.739,91 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,97%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('871.739,91 €');
+  });
+
+  test('CASO 19 (rechazo) — un año de propiedad NEGATIVO no se acota a 0: no liquida la plusvalía de la reventa antes del año', async ({ page }) => {
+    await page.goto(RUTA);
+    await rellenar(page, 'Precio del local comercial', '400000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await rellenar(page, 'Precio de compra original', '250000');
+    await rellenar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '30000');
+    await rellenar(page, 'Valor catastral del suelo (€)', '80000');
+    await rellenar(page, 'Valor catastral total (suelo + construcción) (€)', '200000');
+    await rellenar(page, 'Comisión de la inmobiliaria (%)', '4');
+    await rellenar(page, 'Gestoría y certificados del vendedor (€)', '1500');
+
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+
+    // ── Con «−1» vivo en el campo (SIN blur, que es cuando el estado lo ve). Desde
+    // `bc437470` la guarda es `anios >= 0` en vez de `Math.max(0, …)`: acotar el negativo
+    // a 0 lo convertiría en una reventa antes del año y liquidaría 2.800 € de IIVTNU a
+    // partir de un dato imposible. Ahora se rechaza y se DICE.
+    await anios.fill('-1');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('No calculada (faltan los años de propiedad)');
+    // Y como al total le falta un impuesto, ni el total ni el neto se dan por firmes:
+    //   adquisición = 250.000 + 30.000 = 280.000
+    //   transmisión = 400.000 − 16.000 de comisión − 1.500 de gestoría − 0 = 382.500
+    //   ganancia    = 102.500 → IRPF = 6.000×19 % + 44.000×21 % + 52.500×23 %
+    //               = 1.140 + 9.240 + 12.075 = 22.455
+    //   gastos      = 0 + 16.000 + 1.500 + 22.455 = 39.955 → neto 360.045
+    await expect(page.locator('h3', { hasText: 'Total gastos de la venta' })).toHaveText('Total gastos de la venta (parcial)');
+    await expect(page.locator('h3', { hasText: 'NETO QUE RECIBES' })).toHaveText('NETO QUE RECIBES (PARCIAL)');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('102.500,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('22.455,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('39.955,00 €');
+    expect(await valorTarjeta(page, 'NETO QUE RECIBES')).toBe('360.045,00 €');
+
+    // ── Al salir del campo, el NumberInput (min = 0) lo lleva al mínimo declarado: el 0
+    // pasa a estar A LA VISTA, y entonces sí es el dato válido de la reventa antes del año
+    // (COEFICIENTES_IIVTNU_2025, fila `anios: 0`, coeficiente 0,14):
+    //   objetivo = 80.000 × 0,14 × 25 % = 2.800 ; real = 150.000 × 0,4 × 25 % = 15.000
+    //   → gana el objetivo, y esos 2.800 € minoran el valor de transmisión (CASO 14).
+    await anios.blur();
+    await expect(anios).toHaveValue('0');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2800,00 €');
+    expect(await valorTarjeta(page, 'NETO QUE RECIBES')).toBe('357.889,00 €');
+    await expect(page.locator('h3', { hasText: 'NETO QUE RECIBES' })).toHaveText('NETO QUE RECIBES');
+
+    // ── Texto: el NumberInput no admite los caracteres (regex /^-?[\d.,]*$/), el campo
+    // queda vacío y la plusvalía vuelve a «Sin calcular», no a 0,00 €.
+    await anios.fill('');
+    await anios.type('abc');
+    await expect(anios).toHaveValue('');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    await expect(page.locator('h3', { hasText: 'NETO QUE RECIBES' })).toHaveText('NETO QUE RECIBES (PARCIAL)');
+  });
+});

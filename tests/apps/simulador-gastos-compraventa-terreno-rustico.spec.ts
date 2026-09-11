@@ -411,3 +411,276 @@ test.describe('Regresión — hallazgos reparados el 26/08/2026', () => {
     expect(cuerpo).toContain(`base del ahorro, ${minimo}%-${maximo}%`);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN del 11/09/2026
+//
+// Vuelve a la cola porque cambiaron sus datos: el commit 7a02470c reescribió la ficha de
+// Aragón en `data/itp-ccaa.ts` —la escala del art. 121-1 pasó de dos tramos a los cinco
+// reales (8 · 8,5 · 9 · 9,5 · 10 %) y lo que se llamaban «tipos reducidos» por colectivo
+// resultaron ser bonificaciones en cuota—, y el bc437470 tocó el clúster de compraventa.
+// Los tres casos de abajo están resueltos a mano ANTES de ejecutar la app, con el
+// desarrollo comentado junto a cada aserción.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 11/09/2026 — la escala de Aragón del art. 121-1', () => {
+  /**
+   * CASO 1 (NORMAL) — Aragón, compra habitual, 250.000 €, gestoría 400 €.
+   * Precio dentro del PRIMER tramo de la escala: la escala existe pero todavía no parte la
+   * base, así que el tipo efectivo tiene que salir exactamente el 8 % nominal. Es la prueba
+   * de que reescribir la ficha con cinco tramos no ha movido el caso corriente.
+   */
+  test('CASO 1 (normal) — Aragón, 250.000 €: dentro del primer tramo, el efectivo es el 8 % nominal', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await rellenar(page, PRECIO, '250000');
+    await rellenar(page, GESTORIA, '400');
+
+    // ITP = 250.000 × 8 % = 20.000. El 8 % es el primer tramo de
+    // `ITP_CCAA['aragon'].tramosProgresivos` (art. 121-1, hasta 400.000 €) y coincide con el
+    // tipo general que `tipoGeneralDe('Aragón')` lee de TIPOS_ITP_CCAA_2025.
+    expect(await valorTarjeta(page, 'ITP (')).toBe('20.000,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,00%)');
+
+    // La app avisa de la escala completa, los cinco tramos de la ficha reescrita.
+    await expect(page.getByText(/escala progresiva \(8% → 8,5% → 9% → 9,5% → 10%\)/)).toBeVisible();
+
+    // Notaría — arancel(250.000) con ARANCELES_NOTARIO:
+    //   90,15 + 108,182205 + 45,0759 + 90,15182 (tramo 4 completo)
+    //   + tramo 5 (150.253,03→250.000, 0,05 %) → 99.746,97 × 0,0005 = 49,873485
+    //   arancel sin IVA = 383,43341 · con IVA (×1,21) = 463,954426
+    //   FACTURA_NOTARIAL: ×1,5 = 695,931639 · ×2 = 927,908852 · medio = 811,920246
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('811,92 €');
+
+    // Registro — arancel(250.000) con ARANCELES_REGISTRO:
+    //   24,04 + 42,0708575 + 37,56325 + 67,613865 (tramo 4 completo)
+    //   + tramo 5 (0,030 %) → 99.746,97 × 0,0003 = 29,924091
+    //   suma = 201,2120635 + presentación 6,010121 + nota simple 3,005061 = 210,2272455
+    //   con el 21 % de IVA = 254,374967
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('254,37 €');
+
+    // Total gastos = 20.000 + 811,92 + 254,37 + 400 = 21.466,29 (líneas ya redondeadas,
+    // que es lo que hace `sumarLineasVisibles`)
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.466,29 €');
+    // 21.466,29 / 250.000 = 8,5865 % → «8,59%»
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,59%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('271.466,29 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Aragón en los dos puntos que la ficha declara: el corte de 500.000 €
+   * (tres tramos) y el tramo MÁS ALTO, el 10 % a partir de 750.000 €.
+   *
+   * La cabecera de `ITP_CCAA['aragon']` publica la tabla oficial de cuota acumulada:
+   * 32.000 € a los 400.000, 36.250 € a los 450.000, 40.750 € a los 500.000 y 64.500 € a los
+   * 750.000. Los dos importes de abajo se apoyan en esos cortes, no en una memoria de tipos.
+   */
+  test('CASO 2 (límite) — Aragón, 500.000 € y 1.000.000 €: la cuota acumulada del art. 121-1', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await rellenar(page, GESTORIA, '400');
+
+    // 500.000 € → 400.000 × 8 % (32.000) + 50.000 × 8,5 % (4.250) + 50.000 × 9 % (4.500)
+    //           = 40.750 €, que es justo el corte que declara la ficha.
+    // Un tipo plano del 8 % habría dado 40.000 €: no es lo mismo.
+    await rellenar(page, PRECIO, '500000');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('40.750,00 €');
+    // Tipo EFECTIVO = 40.750 / 500.000 = 8,15 % (el recuadro sigue diciendo «ITP General 8%»,
+    // que es el nominal del primer tramo).
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,15%)');
+    // Notaría arancel(500.000) = 90,15 + 108,182205 + 45,0759 + 90,15182 + (349.746,97 ×
+    //   0,0005 = 174,873485) = 508,43341 · con IVA = 615,204426 · medio ×1,75 = 1.076,607746
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1076,61 €');
+    // Registro arancel(500.000) = 24,04 + 42,0708575 + 37,56325 + 67,613865 + (349.746,97 ×
+    //   0,0003 = 104,924091) = 276,2120635 + 9,015182 = 285,2272455 · con IVA = 345,124967
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('345,12 €');
+    // Total gastos = 40.750 + 1.076,61 + 345,12 + 400 = 42.571,73 → 8,51 % sobre el precio
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('42.571,73 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,51%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('542.571,73 €');
+
+    // 1.000.000 € → cuota acumulada a los 750.000 (64.500 €, corte declarado en la ficha)
+    //             + 250.000 × 10 % (el tramo más alto) = 25.000 → 89.500 €
+    // Tipo efectivo = 89.500 / 1.000.000 = 8,95 %.
+    await rellenar(page, PRECIO, '1000000');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('89.500,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,95%)');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — «1.2.3» no es un número.
+   * El filtro de NumberInput (/^-?[\d.,]*$/) SÍ lo deja teclear, así que la defensa está
+   * entera en `parseSpanishNumber`, que devuelve NaN ante dos separadores repetidos. Si
+   * algún día se sustituyera por un `parseFloat` casero, «1.2.3» pasaría a valer 1,2 € y la
+   * app liquidaría un ITP de 0,10 €: por eso este caso queda clavado aquí.
+   * (El caso 3 de la inspección del 26/08 cubre 0, negativo, vacío y texto puro.)
+   */
+  test('CASO 3 (rechazo) — «1.2.3» se queda en el marcador, sin cifra fantasma ni NaN', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+
+    const campo = page.locator('input[aria-label="' + PRECIO + '"]');
+    await campo.fill('1.2.3');
+
+    // El campo conserva lo tecleado: el filtro del componente no lo rechaza...
+    expect(await campo.inputValue()).toBe('1.2.3');
+    // ...pero el parser sí, y la app no calcula nada.
+    await expect(page.getByText('Introduce el precio de la finca rústica para ver el desglose de gastos')).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveCount(0);
+
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('NaN');
+    expect(cuerpo).not.toContain('No definido');
+    // Y no aparece por ningún lado el 1,2 € que devolvería un parseFloat casero.
+    expect(cuerpo).not.toContain('1,20 €');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS de la re-inspección del 11/09/2026 — fallan A PROPÓSITO.
+// Afirman lo que debería pasar; cuando se reparen quedan como test de regresión.
+// Los tres son «efecto familia»: el defecto se reparó en una hermana del clúster y no se
+// propagó a ésta.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — re-inspección 11/09/2026', () => {
+  /**
+   * HALLAZGO 6 (contenido, medio) — la FAQ visible y el FAQPage del JSON-LD afirman que con
+   * la renuncia «la operación pasa a tributar por IVA al 21%», sin la excepción territorial
+   * que la propia calculadora sí aplica: en Canarias rige el IGIC y en Ceuta y Melilla el
+   * IPSI (`TERRITORIOS_SIN_IVA` en `data/itp-ccaa.ts`), y allí la app se niega a dar cifra
+   * («IGIC · No calculado», «COSTE TOTAL (PARCIAL)»).
+   *
+   * El JSON-LD es justo lo que citan los asistentes de IA, así que la versión que se
+   * propaga es la que no tiene la excepción. Las hermanas `-garaje` y `-solar` ya llevan la
+   * mención de IGIC/IPSI en su `metadata.ts`; ésta no (se ve grepeando IGIC en los
+   * `metadata.ts` del clúster). Dentro de este mismo FAQPage la excepción simétrica del
+   * ITP —la bonificación del 50 % de Ceuta y Melilla— SÍ está escrita, lo que enseña que la
+   * reparación llegó a la mitad fiscal del bloque y no a la del IVA.
+   */
+  test('HALLAZGO 6 — la FAQ y el FAQPage prometen IVA 21 % sin decir que en Canarias, Ceuta y Melilla no rige', async ({ page }) => {
+    await page.goto(RUTA);
+
+    // Lo que la calculadora hace de verdad en Canarias con renuncia:
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await page.selectOption('#select-ccaa', 'canarias');
+    await rellenar(page, PRECIO, '80000');
+    await expect(page.locator('body')).toContainText('No calculado');
+    await expect(page.locator('body')).toContainText('PARCIAL');
+
+    // Lo que cuenta el FAQPage que leen los asistentes de IA: debería recoger la excepción.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faq).not.toBe('');
+    expect(faq).toMatch(/IGIC|IPSI/);
+
+    // Y la FAQ de la página, igual. Se lee el bloque de preguntas con `textContent` porque
+    // la sección educativa llega plegada, y acotado a ESA sección para que los dos
+    // <script type="application/ld+json"> del layout no den por buena la aserción.
+    const faqVisible = (await page
+      .locator('section', { has: page.locator('h2', { hasText: 'Preguntas frecuentes' }) })
+      .last()
+      .textContent()) ?? '';
+    expect(faqVisible).toContain('renuncia a la exención');
+    expect(faqVisible).toMatch(/IGIC|IPSI/);
+  });
+
+  /**
+   * HALLAZGO 7 (contenido, medio) — en Ceuta y Melilla la cifra es correcta pero el usuario
+   * no puede reconstruirla, y la página se contradice consigo misma: el recuadro de la
+   * ciudad anuncia «ITP General 6%», la tarjeta cobra «ITP (3,00%)» y su descripción dice
+   * «Tipo general de la CCAA (posibles reducciones agrarias no incluidas)», que es
+   * exactamente lo que NO es: es el tipo general con la bonificación del 50 % de la cuota
+   * del art. 57 bis del TRLITPAJD ya aplicada por el motor (`aplicarBonificacionCiudad`).
+   * La palabra «bonificación» no aparece en ninguna parte de la página.
+   *
+   * La hermana `simulador-gastos-compraventa-nave-industrial` se reparó nombrándola en el
+   * recuadro de la ciudad y en la descripción de la tarjeta (14 menciones de «bonific» en su
+   * page.tsx); aquí hay 0.
+   *
+   * Caso: Ceuta, compra habitual, 80.000 € → ITP 2.400,00 € (3,00 %) sin explicación.
+   */
+  test('HALLAZGO 7 — en Ceuta la bonificación del 50 % se aplica pero no se nombra en ningún sitio', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await rellenar(page, PRECIO, '80000');
+
+    // La cuota está bien: 80.000 × 6 % × 0,5 = 2.400 €.
+    expect(await valorTarjeta(page, 'ITP (')).toBe('2400,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
+
+    // Lo que falta: decir POR QUÉ son 2.400 y no 4.800, cuando el recuadro dice 6 %.
+    // Se mira lo VISIBLE (`innerText`): el FAQPage del JSON-LD sí dice «la cuota se bonifica
+    // al 50%», y leer el body con `textContent` lo daría por explicado en pantalla cuando el
+    // usuario no lo ve por ninguna parte.
+    const visible = await page.locator('body').innerText();
+    expect(visible).toMatch(/bonific/i);
+    // Y que la descripción de la tarjeta deje de llamarlo «tipo general» a secas.
+    expect(await descripcionTarjeta(page, 'ITP (')).not.toBe(
+      'Tipo general de la CCAA (posibles reducciones agrarias no incluidas)',
+    );
+  });
+
+  /**
+   * HALLAZGO 8 (accesibilidad, medio) — el azul de marca `--primary` (#2E86AB) se usa como
+   * color de TEXTO en cuatro sitios y no llega al 4,5:1 de WCAG AA. Para eso existe
+   * `--primary-texto` (#26718F, 5,47:1 sobre blanco), que la hermana
+   * `simulador-gastos-compraventa-nave-industrial` ya usa.
+   *
+   * Medido en el tema claro sobre la página servida:
+   *   .sectionTitle    #2E86AB sobre #FFFFFF · 16,8px bold → 4,11:1
+   *   .infoCcaaNombre  #2E86AB sobre #FAFAFA · 16px bold   → 3,93:1
+   *   .infoCcaaValue   #2E86AB sobre #FFFFFF · 16px bold   → 4,11:1
+   *   .catastroLink    #2E86AB sobre #FFFFFF · 13,6px      → 4,11:1
+   * Ninguno llega al umbral de texto grande (18,66px bold / 24px), así que el exigible es
+   * 4,5:1 en los cuatro.
+   */
+  test('HALLAZGO 8 — el azul de marca como color de texto no llega a 4,5:1 (WCAG AA)', async ({ page }) => {
+    await page.goto(RUTA);
+    await page.selectOption('#select-ccaa', 'madrid');
+
+    const luminancia = ([r, g, b]: number[]): number => {
+      const canal = (c: number): number => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+    };
+    const aRgb = (css: string): number[] => (css.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+
+    const selectores: [string, string][] = [
+      ['.sectionTitle', 'h2[class*="sectionTitle"]'],
+      ['.infoCcaaNombre', 'span[class*="infoCcaaNombre"]'],
+      ['.infoCcaaValue', 'span[class*="infoCcaaValue"]'],
+      ['.catastroLink', 'a[class*="catastroLink"]'],
+    ];
+
+    for (const [nombre, selector] of selectores) {
+      const elemento = page.locator(selector).first();
+      await expect(elemento).toBeVisible();
+      const { color, fondo } = await elemento.evaluate((el) => {
+        let nodo: HTMLElement | null = el as HTMLElement;
+        let fondo = 'rgb(255, 255, 255)';
+        while (nodo) {
+          const c = getComputedStyle(nodo).backgroundColor;
+          if (c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c)) {
+            fondo = c;
+            break;
+          }
+          nodo = nodo.parentElement;
+        }
+        return { color: getComputedStyle(el as HTMLElement).color, fondo };
+      });
+
+      const l1 = luminancia(aRgb(color));
+      const l2 = luminancia(aRgb(fondo));
+      const contraste = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      expect(contraste, `${nombre}: ${color} sobre ${fondo} = ${contraste.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});
