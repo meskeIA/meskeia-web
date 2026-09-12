@@ -64,11 +64,30 @@ interface DesgloseSueldo {
   pctNeto: number;
 }
 
-function calcularSueldo(brutoAnual: number): DesgloseSueldo {
-  const pagas = 14; // 12 meses + 2 extras
-  const brutoMensual = brutoAnual / pagas;
+/**
+ * Liquidaciones de cotización al año. Son DOCE, tenga la nómina 12 pagas o 14: el art. 147
+ * LGSS obliga a incluir en la base mensual «la parte proporcional de las pagas
+ * extraordinarias», de modo que las extras se prorratean dentro de los doce meses en vez de
+ * cotizar aparte. El tope máximo (5.101,20 €/mes en 2026) se aplica a esa base mensual.
+ *
+ * ⚠️ CORREGIDO EL 12/09/2026. Aquí ponía 14, y con él se dividía el bruto y se multiplicaba
+ * la cuota. Por debajo del tope da lo mismo —bruto/14 × 14 es bruto—, así que el defecto
+ * estuvo invisible; por encima, no: la app topaba la cotización en 71.416,80 € de bruto en
+ * vez de en 61.214,40 €, y cobraba hasta 663,16 €/año de más (4.642,09 € donde corresponden
+ * 3.978,94 €). Eso rebajaba además la base del IRPF, y el neto publicado salía unos 365 €
+ * por debajo del real. Era el único sitio del catálogo que dividía entre 14: las otras cinco
+ * apps de nómina y `lib/calculadoras/sueldoNeto.ts` ya usaban 12.
+ *
+ * Fuente: art. 147 LGSS + Orden PJC/297/2026 (Seguridad Social, «Bases y tipos de
+ * cotización»). Verificado en sesión el 12/09/2026.
+ */
+const LIQUIDACIONES_SS_ANUALES = 12;
 
-  // 1. Cotizaciones SS (sobre base mensual, limitada a topes)
+function calcularSueldo(brutoAnual: number): DesgloseSueldo {
+  const brutoMensual = brutoAnual / LIQUIDACIONES_SS_ANUALES;
+
+  // 1. Cotizaciones SS (sobre base mensual prorrateada, limitada a topes)
+  const pagas = LIQUIDACIONES_SS_ANUALES;
   const baseSS = Math.min(Math.max(brutoMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
   const ssContingencias = baseSS * (COTIZACIONES_SS_2026.contingenciasComunes / 100) * pagas;
   const ssDesempleo = baseSS * (COTIZACIONES_SS_2026.desempleo / 100) * pagas;
@@ -384,7 +403,7 @@ export default function VisualizadorSueldoNetoPage() {
             <p>A partir de {formatCurrency(brutoAnual)}, <strong>el IRPF ya pesa significativamente más que la SS</strong>. Tu tipo marginal es del {formatNumber(datos.desgloseTramosIRPF[datos.desgloseTramosIRPF.length - 1]?.tipo ?? 0, 0)}% — cada euro extra de subida solo te llega parcialmente.</p>
           )}
           {brutoAnual > 80000 && (
-            <p>Con {formatCurrency(brutoAnual)} de bruto, <strong>te llevas menos del {formatNumber(datos.pctNeto, 0)}% a casa</strong>. La SS está topada (base máxima {formatCurrency(BASES_SS_2026.maxima * 14)}), pero el IRPF sigue creciendo con cada tramo.</p>
+            <p>Con {formatCurrency(brutoAnual)} de bruto, <strong>te llevas menos del {formatNumber(datos.pctNeto, 0)}% a casa</strong>. La SS <strong>deja de crecer</strong> a partir de {formatCurrency(BASES_SS_2026.maxima * LIQUIDACIONES_SS_ANUALES)} de bruto anual, porque la base mensual se topa en {formatCurrency(BASES_SS_2026.maxima)}; el IRPF, en cambio, sigue creciendo con cada tramo.</p>
           )}
         </div>
 

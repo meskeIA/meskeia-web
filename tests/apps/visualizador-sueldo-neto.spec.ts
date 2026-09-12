@@ -17,18 +17,27 @@ import { test, expect, Page } from '@playwright/test';
  *
  * El caso se resolvió a mano ANTES de ejecutar la app; la aritmética va en el test.
  *
- * ⚠️ HALLAZGO COLATERAL, NO REPARADO AQUÍ — el tope de la base de cotización
- * `calcularSueldo` usa `pagas = 14` también para la Seguridad Social: base mensual = bruto/14,
- * y luego multiplica por 14. Mientras la base no llega al tope da lo mismo que dividir entre 12
- * (bruto/14 × 14 = bruto), pero POR ENCIMA del tope no: con 150.000 € de bruto la app cotiza
- * 4.642,09 €/año donde la base máxima de 5.101,20 €/mes sobre 12 liquidaciones da 3.978,94 €.
- * Son 663,15 € de más. La cotización en España se liquida mensualmente (12 veces), con las
- * pagas extras PRORRATEADAS dentro de la base mensual, y el tope se aplica a esa base.
+ * SEGUNDO DEFECTO, REPARADO EL MISMO DÍA — el tope de la base de cotización
+ * ────────────────────────────────────────────────────────────────────────
+ * `calcularSueldo` usaba `pagas = 14` también para la Seguridad Social: base mensual =
+ * bruto/14, y luego multiplicaba por 14. Mientras la base no llega al tope da lo mismo que
+ * dividir entre 12 —bruto/14 × 14 es bruto—, y por eso el defecto estuvo invisible; por
+ * ENCIMA del tope, no. La app topaba la cotización en 71.416,80 € de bruto en vez de en
+ * 61.214,40 €, y cobraba hasta 663,16 €/año de más: con 150.000 € publicaba 4.642,09 € donde
+ * el tope de 5.101,20 €/mes sobre doce liquidaciones da 3.978,94 €. Como esa SS de más
+ * rebajaba además la base del IRPF, el neto publicado salía unos 365 €/año por debajo del real.
  *
- * Es un defecto distinto —Orden de cotización y LGSS, no el art. 63 LIRPF— y queda FUERA de
- * esta reparación, que es la del mínimo personal. Se deja escrito aquí para que no se pierda,
- * y por eso el caso 3 se queda en 71.000 €: por debajo del tope, donde el neto no depende de
- * qué divisor se use y el golden se puede derivar de la ley sin arrastrar el otro problema.
+ * La norma se verificó en sesión el 12/09/2026 en la Seguridad Social («Bases y tipos de
+ * cotización», art. 147 LGSS): la base mensual incluye «la parte proporcional de las pagas
+ * extraordinarias», la liquidación es MENSUAL —doce al año— y los topes (1.424,40 € /
+ * 5.101,20 € en 2026) se aplican a esa base mensual. No hay lectura en la que dividir entre
+ * 14 sea correcto: la prorrata entra en la base tanto si las extras se pagan aparte como si no.
+ *
+ * Era el único sitio del catálogo que dividía entre 14. El barrido de los doce consumidores de
+ * `BASES_SS_2026` dejó ver que `estimador-sueldo-neto`, `simulador-desglose-nomina`,
+ * `estimador-smi`, `estimador-irpf` y `lib/calculadoras/sueldoNeto.ts` ya usaban 12, y que
+ * `bajaMedica`, `costeEmpleado` y `simulador-jubilacion-publica` reciben ya un salario mensual
+ * y no dividen nada. Un valor atípico, no una política.
  *
  * ⚠️ El bruto es un `input[type=range]` controlado por React: ni `fill()` ni asignar el valor
  * disparan su `onChange`, así que el slider se mueve con el teclado (ver `ponerBruto`).
@@ -110,29 +119,55 @@ test('CASO 2 · el tramo del 30 % aparece porque la base lleva el mínimo dentro
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 3 · 71.000 € brutos: el mínimo cae entero en el tramo del 45 %', async ({ page }) => {
-  // Es el caso donde el defecto valía su máximo: con el marginal en el 45 %, restar el mínimo
-  // de la base lo valoraba a ese tipo (5.550 × 45 % = 2.497,50 €) en vez de al 19 % de la
-  // escala (1.054,50 €). Diferencia: 1.443,00 €/año, el techo del defecto.
+test('CASO 3 · 71.000 € brutos: el mínimo cae entero en el tramo del 45 % y la base SS se topa', async ({ page }) => {
+  // Los dos defectos a la vez, que es lo que hace útil este caso.
   //
-  // SS: 71.000 / 14 = 5.071,43 €/mes, aún por debajo de la máxima → SS = 71.000 × 6,50 % = 4.615,00 €
-  // RNT = 71.000 − 4.615 − 2.000 = 64.385,00 € → reducción art. 20 = 0 €
-  //   escala(64.385) = 17.901,50 (acumulado hasta 60.000) + 4.385×45 %
-  //                  = 17.901,50 + 1.973,25 = 19.874,75 €
-  //   escala(5.550)  = 1.054,50 €
-  //   cuota íntegra  = 18.820,25 €
-  // Neto anual = 71.000 − 4.615 − 18.820,25 = 47.564,75 €
+  // Seguridad Social: 71.000 / 12 = 5.916,67 €/mes, POR ENCIMA de la máxima de 5.101,20 €,
+  // así que la base se clava en el tope → SS = 5.101,20 × 6,50 % × 12 = 3.978,936 → 3.978,94 €.
+  //   Con el divisor viejo la base era 71.000/14 = 5.071,43 €/mes, aún por debajo del tope, de
+  //   modo que ni siquiera llegaba a topar: 4.615,00 €, que son 636,06 € de más.
+  // RNT = 71.000 − 3.978,936 − 2.000 = 65.021,064 € → reducción art. 20 = 0 €
+  //   escala(65.021,06) = 17.901,50 (acumulado hasta 60.000) + 5.021,064×45 %
+  //                     = 17.901,50 + 2.259,4788 = 20.160,9788 €
+  //   escala(5.550)     = 1.054,50 €   ← y NO 5.550 × 45 % = 2.497,50 €, que es lo que valía
+  //                                      el método viejo del mínimo: 1.443,00 €/año de error
+  //   cuota íntegra     = 19.106,4788 → 19.106,48 €
+  // Neto anual = 71.000 − 3.978,936 − 19.106,4788 = 47.914,5852 → 47.914,59 €
   await ponerBruto(page, 71000);
 
   expect(await cascada(page, 'Sueldo bruto anual')).toBe('71.000,00 €');
-  expect(await cascada(page, 'Seguridad Social')).toBe('− 4615,00 €');
-  expect(await cascada(page, 'Retención IRPF')).toBe('− 18.820,25 €');
-  expect(await cascada(page, 'Tu sueldo neto anual')).toBe('47.564,75 €');
+  expect(await cascada(page, 'Seguridad Social')).toBe('− 3978,94 €');
+  expect(await cascada(page, 'Retención IRPF')).toBe('− 19.106,48 €');
+  expect(await cascada(page, 'Tu sueldo neto anual')).toBe('47.914,59 €');
 
-  // Y la nota deja a la vista la diferencia entre los dos métodos: los tramos suman 19.874,75 €
-  // y de ahí se resta 1.054,50 €, no 2.497,50 €.
+  // Y la nota deja a la vista la diferencia entre los dos métodos del mínimo: los tramos suman
+  // 20.160,98 € y de ahí se resta 1.054,50 €, no 2.497,50 €.
   const nota = page.locator('css=p:has-text("art. 63.1.2.º LIRPF")').first();
-  await expect(nota).toContainText('19.874,75');
+  await expect(nota).toContainText('20.160,98');
   await expect(nota).toContainText('1054,50');
-  await expect(nota).toContainText('18.820,25');
+  await expect(nota).toContainText('19.106,48');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('CASO 4 (límite) · 150.000 €: la SS no crece, el IRPF sí', async ({ page }) => {
+  // El invariante del tope, que es lo que el divisor 14 rompía: pasados 61.214,40 € de bruto
+  // (5.101,20 × 12) la cotización del trabajador SE CONGELA en 3.978,94 €/año, gane lo que
+  // gane. Con el divisor viejo seguía creciendo hasta 71.416,80 € y se congelaba en 4.642,09 €.
+  //
+  // RNT = 150.000 − 3.978,936 − 2.000 = 144.021,064 € → reducción art. 20 = 0 €
+  //   escala(144.021,06) = 17.901,50 + 84.021,064×45 % = 17.901,50 + 37.809,4788 = 55.710,9788 €
+  //   escala(5.550)      = 1.054,50 €  →  cuota íntegra = 54.656,4788 → 54.656,48 €
+  // Neto anual = 150.000 − 3.978,936 − 54.656,4788 = 91.364,5852 → 91.364,59 €
+  await ponerBruto(page, 150000);
+
+  expect(await cascada(page, 'Sueldo bruto anual')).toBe('150.000,00 €');
+  expect(await cascada(page, 'Seguridad Social')).toBe('− 3978,94 €');   // la misma que con 71.000 €
+  expect(await cascada(page, 'Retención IRPF')).toBe('− 54.656,48 €');
+  expect(await cascada(page, 'Tu sueldo neto anual')).toBe('91.364,59 €');
+
+  // Y el texto que acompaña a los sueldos altos nombra el tope ANUAL correcto: 61.214,40 €,
+  // no los 71.416,80 € que publicaba antes (5.101,20 × 14).
+  const insight = page.locator('css=p:has-text("deja de crecer")').first();
+  await expect(insight).toContainText('61.214,40');
+  await expect(insight).toContainText('5101,20');
 });
