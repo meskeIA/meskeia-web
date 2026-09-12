@@ -18,6 +18,23 @@ Cada caso lleva el valor esperado **escrito literal** y un comentario de dónde 
 (calculado a mano, `data/fiscal`, o la fuente oficial). Un test que se limite a
 comprobar que sale *algún* número no sirve: eso ya lo mira la Ronda cada noche.
 
+## Antes de tocar un control: `_hidratacion.ts`
+
+`page.goto()` no espera a que React haya ejecutado los chunks, solo a que se descarguen. En esa
+ventana el DOM ya obedece y el estado de React no, así que una siembra perdida deja la página
+descuadrada consigo misma y **el test pasa en verde midiendo otro escenario**. Por eso:
+
+- Mover un `<input type="range">` → **`sembrarValor`** (o `sembrarValorAcotado` cuando el
+  control capa el valor y el caso consiste justo en observar el recorte).
+- Después de un `fill()` → **`esperarValorEnReact`**.
+- Antes del primer clic de la página → **`esperarHidratacion`** con un input cualquiera de
+  testigo; un clic anterior a la hidratación también se pierde.
+
+Sembrar a mano con el setter nativo **rompe el build** (`npm run check:hidratacion`). Y hay un
+fallo que ningún testigo ve: sembrar el valor que el input YA tiene. Para encontrarlos,
+`SIEMBRA_ESTRICTA=1 npx playwright test tests/apps`; cada línea «SIEMBRA INÚTIL» es un caso que
+hay que hacer partir de otro estado.
+
     npm run test:apps
 
 Estado de qué app se ha inspeccionado y cuándo: `npm run inspector:cola -- --resumen`.

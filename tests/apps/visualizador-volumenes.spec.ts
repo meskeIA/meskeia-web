@@ -31,7 +31,8 @@
  * abiertos —esos últimos escritos contra lo que DEBERÍA ocurrir, así que hoy fallan.
  */
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 const RESULTADO = '[aria-label="Resultado del volumen"]';
 
@@ -47,10 +48,26 @@ const dibujo = (page: Page) => page.locator('svg[role="img"]');
 /** Campo de texto de una medida (el deslizador tiene otro nombre accesible). */
 const campo = (page: Page, medida: string) => page.getByLabel(`${medida}, medida exacta`);
 
+/**
+ * Selecciona una figura. Si la pedida ya es la activa —la app arranca en «Esfera»— pasa antes
+ * por otra: hacer clic en el botón que ya está pulsado no prueba nada, porque su aria-pressed
+ * valdría «true» igual aunque el clic se hubiera perdido por llegar antes de la hidratación.
+ */
 async function elegirFigura(page: Page, nombre: RegExp) {
   const boton = page.getByRole('button', { name: nombre }).first();
+  if ((await boton.getAttribute('aria-pressed')) === 'true') {
+    const otra = page.locator('[class*="figBtn"][aria-pressed="false"]').first();
+    await otra.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'false');
+  }
   await boton.click();
   await expect(boton).toHaveAttribute('aria-pressed', 'true');
+}
+
+/** Escribe una medida en el campo de texto y comprueba que llegó al estado de React. */
+async function escribir(campoLoc: Locator, valor: string): Promise<void> {
+  await campoLoc.fill(valor);
+  await esperarValorEnReact(campoLoc.page(), campoLoc, valor);
 }
 
 /** Lee un atributo numérico del SVG (r, rx…) para comprobar que el dibujo reacciona. */
@@ -60,23 +77,21 @@ async function atributoSvg(page: Page, selector: string, atributo: string): Prom
 }
 
 /**
- * Mueve el deslizador como lo haría el navegador.
- * El setter nativo RECORTA a [min, max]: eso es justo lo que mide el caso 3.
+ * Mueve el deslizador como lo haría el navegador. El setter nativo RECORTA a [min, max]: eso
+ * es justo lo que mide el caso 3, y por eso hay que decir en `esperado` dónde acaba el valor
+ * cuando no es el pedido. Los deslizadores no llevan id (`useId` los genera), así que se
+ * localizan por posición.
  */
-async function ponerDeslizador(page: Page, indice: number, valor: number) {
-  await page.locator('input[type=range]').nth(indice).evaluate((elemento, v) => {
-    const setter = Object.getOwnPropertyDescriptor(
-      window.HTMLInputElement.prototype,
-      'value',
-    )!.set!;
-    setter.call(elemento, String(v));
-    elemento.dispatchEvent(new Event('input', { bubbles: true }));
-  }, valor);
+async function ponerDeslizador(page: Page, indice: number, valor: number, esperado = valor) {
+  await sembrarValor(page, page.locator('input[type=range]').nth(indice), valor, { esperado });
 }
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/visualizador-volumenes/');
   await expect(page.locator('h1')).toContainText('Visualizador de Volúmenes 3D');
+  // El <h1> viaja en el HTML servido: un clic o un `fill()` anterior a la hidratación se
+  // perdería sin dejar rastro (ver tests/apps/_hidratacion.ts).
+  await esperarHidratacion(page, ['input[type=range]']);
 });
 
 // ============================================================
@@ -110,15 +125,15 @@ test('caso normal: cilindro r=4 h=8 → 402,1, y el dibujo cambia al subir el ra
   expect(await atributoSvg(page, 'ellipse >> nth=1', 'rx')).toBeCloseTo(41.6667, 3);
 
   // Duplicar el radio cuadruplica el volumen (402,1 × 4 = 1.608,5) y redibuja la base.
-  await campo(page, 'Radio (r)').fill('8');
+  await escribir(campo(page, 'Radio (r)'), '8');
   await expect(valorVolumen(page)).toHaveText('1608,5');
   await expect(formulaAplicada(page)).toHaveText('V = π × r² × h = π × 8² × 8');
   expect(await atributoSvg(page, 'ellipse >> nth=1', 'rx')).toBeCloseTo(52.5, 3);
 
   // Un tercio exacto con la misma base y altura.
   await elegirFigura(page, /Cono/);
-  await campo(page, 'Radio de la base (r)').fill('4');
-  await campo(page, 'Altura (h)').fill('8');
+  await escribir(campo(page, 'Radio de la base (r)'), '4');
+  await escribir(campo(page, 'Altura (h)'), '8');
   await expect(valorVolumen(page)).toHaveText('134,0');
   await expect(formulaAplicada(page)).toHaveText('V = (1/3) × π × r² × h = (1/3) × π × 4² × 8');
 });
@@ -153,7 +168,7 @@ test('caso límite: esfera r=12,5 → 8181,2 y r=120 → 7.238.229', async ({ pa
   const deslizador = page.locator('input[type=range]').first();
 
   // El campo admite coma decimal y conserva lo tecleado mientras se escribe.
-  await radio.fill('12,5');
+  await escribir(radio, '12,5');
   await expect(radio).toHaveValue('12,5');
   await expect(valorVolumen(page)).toHaveText('8181,2');
   // La fórmula muestra la medida TAL COMO entra en el cálculo, sin rellenar ni recortar
@@ -164,7 +179,7 @@ test('caso límite: esfera r=12,5 → 8181,2 y r=120 → 7.238.229', async ({ pa
   await expect(deslizador).toHaveValue('12.5');
 
   // Una medida real que no cabe en el deslizador: se calcula igual y se avisa.
-  await radio.fill('120');
+  await escribir(radio, '120');
   await expect(valorVolumen(page)).toHaveText('7.238.229');
   await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 120³');
   await expect(deslizador).toHaveValue('50');
@@ -173,7 +188,7 @@ test('caso límite: esfera r=12,5 → 8181,2 y r=120 → 7.238.229', async ({ pa
   // El dibujo responde en TODO el recorrido del deslizador, no solo al principio.
   const pixeles: number[] = [];
   for (const medida of ['1', '6', '25', '50']) {
-    await radio.fill(medida);
+    await escribir(radio, medida);
     pixeles.push(await atributoSvg(page, 'circle', 'r'));
   }
   expect(pixeles[0]).toBeCloseTo(20.4853, 3);
@@ -201,31 +216,35 @@ test('caso a rechazar: negativo, texto, vacío y cero no producen un volumen', a
   await elegirFigura(page, /Esfera/);
   const radio = campo(page, 'Radio (r)');
 
-  await radio.fill('5');
+  await escribir(radio, '5');
   await expect(valorVolumen(page)).toHaveText('523,6');
 
   for (const entradaMala of ['-5', 'abc', '', '0', '0,0', '-0,001']) {
-    await radio.fill(entradaMala);
+    await escribir(radio, entradaMala);
     // Ni resultado degenerado ni cálculo con la basura tecleada: sigue el último válido.
     await expect(valorVolumen(page)).toHaveText('523,6');
     await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 5³');
   }
 
   // Y se recupera en cuanto se vuelve a escribir una medida.
-  await radio.fill('12,5');
+  await escribir(radio, '12,5');
   await expect(valorVolumen(page)).toHaveText('8181,2');
 
   // El deslizador recorta a su rango declarado.
   const deslizador = page.locator('input[type=range]').first();
-  await ponerDeslizador(page, 0, 0);
+  await ponerDeslizador(page, 0, 0, 1);
   await expect(deslizador).toHaveValue('1');
   await expect(valorVolumen(page)).toHaveText('4,1888');
 
-  await ponerDeslizador(page, 0, -20);
+  // Volver a 10 antes del intento negativo no es adorno: sin esto el deslizador ya estaría en
+  // 1, el navegador dejaría el −20 en 1 igualmente y React descartaría el evento por
+  // duplicado, así que la comprobación pasaría sin que nada se hubiera movido.
+  await ponerDeslizador(page, 0, 10);
+  await ponerDeslizador(page, 0, -20, 1);
   await expect(deslizador).toHaveValue('1');
   await expect(valorVolumen(page)).toHaveText('4,1888');
 
-  await ponerDeslizador(page, 0, 100);
+  await ponerDeslizador(page, 0, 100, 50);
   await expect(deslizador).toHaveValue('50');
   await expect(valorVolumen(page)).toHaveText('523.599');
 
@@ -275,12 +294,12 @@ test.describe('visualizador-volumenes — regresiones del 21/08/2026', () => {
   // Las etiquetas dibujadas sobre la figura interpolaban el number crudo y salían en
   // formato inglés («r=12.5») en la misma pantalla en la que el campo escribía «12,5».
   test('las etiquetas del dibujo usan la coma decimal española', async ({ page }) => {
-    await page.locator('input[type=text]').first().fill('12,5');
+    await escribir(page.locator('input[type=text]').first(), '12,5');
     await expect(page.locator('svg text').filter({ hasText: /^r=/ })).toHaveText('r=12,5');
 
     // Y en las otras figuras, que tienen sus propias etiquetas
     await page.getByRole('button', { name: /Ortoedro|Paralelepípedo|Prisma|Cubo/ }).first().click();
-    await page.locator('input[type=text]').first().fill('2,5');
+    await escribir(page.locator('input[type=text]').first(), '2,5');
     await expect(page.locator('svg text').filter({ hasText: /^a=/ })).toHaveText('a=2,5');
   });
 
@@ -302,12 +321,12 @@ test.describe('visualizador-volumenes — regresiones del 21/08/2026', () => {
   // mientras la app seguía calculando con la última medida válida.
   test('una medida inválida se avisa en vez de ignorarse', async ({ page }) => {
     const campo = page.locator('input[type=text]').first();
-    await campo.fill('no es un número');
+    await escribir(campo, 'no es un número');
     await expect(page.getByRole('alert').filter({ hasText: 'Escribe un número' })).toBeVisible();
     await expect(campo).toHaveAttribute('aria-invalid', 'true');
 
     // Y al escribir algo válido, el aviso desaparece
-    await campo.fill('7');
+    await escribir(campo, '7');
     await expect(page.getByRole('alert').filter({ hasText: 'Escribe un número' })).toHaveCount(0);
     await expect(campo).toHaveAttribute('aria-invalid', 'false');
   });
@@ -318,13 +337,13 @@ test.describe('visualizador-volumenes — regresiones del 21/08/2026', () => {
     const limites = page.locator('[class*=sliderLimits]').first();
     const campo = page.locator('input[type=text]').first();
 
-    await campo.fill('0,5');
+    await escribir(campo, '0,5');
     await expect(limites).toContainText('fuera del deslizador');
 
-    await campo.fill('120');
+    await escribir(campo, '120');
     await expect(limites).toContainText('120 · fuera del deslizador');
 
-    await campo.fill('25');
+    await escribir(campo, '25');
     await expect(limites).not.toContainText('fuera del deslizador');
   });
 });
@@ -380,8 +399,8 @@ test.describe('en móvil (iPhone 14)', () => {
 test.describe('re-inspección 30/08/2026', () => {
   test('CASO 1 · cilindro r=12,5 h=20 → 9817,5, y los cinco valores de arranque', async ({ page }) => {
     await elegirFigura(page, /Cilindro/);
-    await campo(page, 'Radio (r)').fill('12,5');
-    await campo(page, 'Altura (h)').fill('20');
+    await escribir(campo(page, 'Radio (r)'), '12,5');
+    await escribir(campo(page, 'Altura (h)'), '20');
     // π · 12,5² · 20 = 3.125 π = 9.817,477042468103 → un decimal
     await expect(valorVolumen(page)).toHaveText('9817,5');
     await expect(formulaAplicada(page)).toHaveText('V = π × r² × h = π × 12,5² × 20');
@@ -405,26 +424,26 @@ test.describe('re-inspección 30/08/2026', () => {
 
   test('CASO 1.bis · la esfera es 2/3 del cilindro que la circunscribe', async ({ page }) => {
     await elegirFigura(page, /Cilindro/);
-    await campo(page, 'Radio (r)').fill('5');
-    await campo(page, 'Altura (h)').fill('10');
+    await escribir(campo(page, 'Radio (r)'), '5');
+    await escribir(campo(page, 'Altura (h)'), '10');
     await expect(valorVolumen(page)).toHaveText('785,4'); // π·25·10 = 785,3981634
     await elegirFigura(page, /Esfera/);
-    await campo(page, 'Radio (r)').fill('5');
+    await escribir(campo(page, 'Radio (r)'), '5');
     await expect(valorVolumen(page)).toHaveText('523,6'); // = 785,3981634 × 2/3
   });
 
   test('CASO 2 · el tope del deslizador no contamina el cálculo ni el dibujo', async ({ page }) => {
     // Cubo de 100.000 de arista: 1e15, sin ∞ ni notación científica
     await elegirFigura(page, /Ortoedro/);
-    await campo(page, 'Anchura (a)').fill('100000');
-    await campo(page, 'Profundidad (b)').fill('100000');
-    await campo(page, 'Altura (h)').fill('100000');
+    await escribir(campo(page, 'Anchura (a)'), '100000');
+    await escribir(campo(page, 'Profundidad (b)'), '100000');
+    await escribir(campo(page, 'Altura (h)'), '100000');
     await expect(valorVolumen(page)).toHaveText('1.000.000.000.000.000');
 
     // Cilindro plano y enorme: π × 100.000² × 1 = 31.415.926.535,89793
     await elegirFigura(page, /Cilindro/);
-    await campo(page, 'Radio (r)').fill('100000');
-    await campo(page, 'Altura (h)').fill('1');
+    await escribir(campo(page, 'Radio (r)'), '100000');
+    await escribir(campo(page, 'Altura (h)'), '1');
     await expect(valorVolumen(page)).toHaveText('31.415.926.536');
 
     // Y con esa proporción extrema el dibujo sigue dentro del viewBox «0 0 300 290»
@@ -444,7 +463,7 @@ test.describe('re-inspección 30/08/2026', () => {
     const aviso = page.locator('p[role="alert"]');
     await expect(valorVolumen(page)).toHaveText('523,6');
 
-    await radio.fill('12abc');
+    await escribir(radio, '12abc');
     await expect(aviso).toHaveText(
       'Escribe un número: se sigue calculando con la última medida válida.',
     );
@@ -455,7 +474,7 @@ test.describe('re-inspección 30/08/2026', () => {
     await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 5³');
 
     // Por encima del tope del campo (100.000) también se avisa
-    await radio.fill('100001');
+    await escribir(radio, '100001');
     await expect(aviso).toHaveText(
       'La medida debe estar entre 0 y 100.000: se sigue calculando con la última válida.',
     );
@@ -463,7 +482,7 @@ test.describe('re-inspección 30/08/2026', () => {
 
     // Y una medida válida limpia el aviso y mueve el resultado:
     // (4/3)·π·10³ = 4.188,790204786391 → un decimal → «4188,8»
-    await radio.fill('10');
+    await escribir(radio, '10');
     await expect(aviso).toHaveCount(0);
     await expect(valorVolumen(page)).toHaveText('4188,8');
   });
@@ -486,13 +505,13 @@ test.describe('re-inspección 30/08/2026', () => {
 // Caso: esfera r=0,01 → esperado 4,188790×10⁻⁶ (o su notación científica) · obtenido «≈0»,
 //       y con r=0,00005 la fórmula muestra «(4/3) × π × ≈0³» y el dibujo «r=≈0».
 test('518 (reparado) · un volumen diminuto ya se muestra en notación científica, no «≈0»', async ({ page }) => {
-  await campo(page, 'Radio (r)').fill('0,01');
+  await escribir(campo(page, 'Radio (r)'), '0,01');
   // (4/3)·π·0,01³ = 4,1887902047863905e-6
   await expect(valorVolumen(page)).not.toHaveText('≈0');
   await expect(valorVolumen(page)).toContainText(/[1-9]/);
 
   // Y la medida nunca puede llegar a la fórmula ni al dibujo convertida en «≈0»
-  await campo(page, 'Radio (r)').fill('0,00005');
+  await escribir(campo(page, 'Radio (r)'), '0,00005');
   await expect(formulaAplicada(page)).not.toContainText('≈0');
   await expect(dibujo(page).locator('text').first()).not.toContainText('≈0');
 });

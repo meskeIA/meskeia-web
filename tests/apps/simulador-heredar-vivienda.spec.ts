@@ -97,6 +97,12 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test, expect, Page } from '@playwright/test';
+import {
+  esperarHidratacion,
+  esperarValorEnReact,
+  leerValorEnReact,
+  sembrarValorAcotado,
+} from './_hidratacion';
 import { calcularSucesion, type GrupoParentescoIS } from '../../lib/calculadoras/sucesiones';
 import {
   BONIFICACIONES_CCAA_IS,
@@ -119,22 +125,45 @@ const RUTA = '/simulador-heredar-vivienda/';
 const ANIO = new Date().getFullYear();
 
 /**
- * Mueve un `input[type=range]` controlado por React. `fill()` no dispara el onChange
- * de React en un range, así que se usa el setter nativo + evento `input` burbujeante.
+ * Abre el simulador y espera a que la app esté VIVA. El `goto` solo garantiza que los chunks
+ * se han descargado, no que React los haya ejecutado: hasta entonces los deslizadores y las
+ * casillas están pintados pero sordos, y un movimiento se pierde dejando el DOM cambiado y el
+ * estado de React en el valor viejo — con lo que el test mediría otra herencia sin enterarse
+ * (ver tests/apps/_hidratacion.ts). En una app FISCAL eso es una cuota equivocada dada por
+ * buena, así que ninguna prueba de aquí toca nada antes de esta espera.
+ */
+async function abrir(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['#valorRef', '#edadHer']);
+}
+
+/**
+ * Mueve un `input[type=range]` controlado por React y comprueba que el ESTADO de React lo
+ * recogió. `fill()` no dispara el onChange de React en un range, así que se usa el setter
+ * nativo + evento `input` burbujeante; el testigo es el valor que el control ACEPTA, porque
+ * varios casos consisten justo en ver cómo el navegador capa un valor imposible.
+ *
+ * Si el deslizador YA está donde se le pide, pasa antes por el escalón de al lado. Cada test de
+ * aquí declara la herencia entera —valor de referencia, edad, año, catastro…— y una parte de
+ * esos valores coincide con los de fábrica (valorRef 200.000, edadHer 45, anioAdq 1995…): sin el
+ * rodeo, esos controles quedarían sin comprobar y la cuota se estaría midiendo sobre un dato
+ * que el test cree haber fijado. Detectado con `SIEMBRA_ESTRICTA=1`. El rodeo es inocuo: cada
+ * onChange escribe SOLO su propio estado, ninguno recorta a otro.
  */
 async function mover(page: Page, id: string, valor: number | string): Promise<void> {
-  await page.evaluate(
-    ([id, valor]) => {
-      const el = document.getElementById(id as string) as HTMLInputElement;
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        'value'
-      )!.set!;
-      setter.call(el, String(valor));
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-    },
-    [id, valor] as [string, number | string]
-  );
+  const sel = `#${id}`;
+  if ((await leerValorEnReact(page, sel)) === String(valor)) {
+    const { min, max, step } = await page
+      .locator(sel)
+      .evaluate((el: HTMLInputElement) => ({
+        min: Number(el.min),
+        max: Number(el.max),
+        step: Number(el.step),
+      }));
+    const n = Number(valor);
+    await sembrarValorAcotado(page, sel, n + step <= max ? n + step : Math.max(min, n - step));
+  }
+  await sembrarValorAcotado(page, sel, valor);
 }
 
 /** Texto completo de uno de los tres paneles de resultado, con espacios normalizados. */
@@ -249,7 +278,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 1 (normal) — hijo hereda 500.000 € en Asturias y vende a los 3 años: ISD + IIVTNU + IRPF', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'asturias');
@@ -338,7 +367,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 2 (límite) — La Rioja: 99 % justo por debajo del tope de 500.000 € y 98 % justo por encima', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'rioja');
@@ -404,7 +433,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 3 (rechazo) — colateral sin derecho a la reducción, plusvalía no sujeta y pérdida patrimonial', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hermano');
     await page.selectOption('#ccaaSel', 'canarias');
@@ -484,7 +513,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('GUARDA — tramo del 34 %, coeficiente 2,0000 y 0 años de tenencia (Grupo IV, 2.000.000 € en Asturias)', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'sin_parentesco');
     await page.selectOption('#ccaaSel', 'asturias');
@@ -530,7 +559,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('GUARDA — siete parentescos distintos, Cataluña separa cónyuge, hijo y nieto, y ningún botón sin type', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     // Siete opciones, ninguna repetida ni con el mismo significado. La sexta es el Grupo I
     // (descendientes menores de 21), que hasta el hallazgo 612 no era expresable; la séptima
@@ -592,7 +621,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('GUARDA — Grupo IV sin reducciones: 200.000 € tributan 63.281,70 € de ISD en régimen común', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'sin_parentesco');
     await page.selectOption('#ccaaSel', 'madrid');
@@ -658,7 +687,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 4 (normal) — el caso preconfigurado de Madrid: 64,54 € + 6750,00 € + 8948,95 € = 15.763,49 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
     await page.getByRole('button', { name: /Hijo hereda piso 200k en Madrid/ }).click();
 
     expect(await panel(page, ISD)).toContain('Comunidad de Madrid — Grupo II');
@@ -705,7 +734,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 5 (límite y rechazo) — base liquidable cero por exceso de reducciones, y basura en los deslizadores', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'madrid');
@@ -719,7 +748,12 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('0,00 €');
     expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
 
-    // Basura en tres deslizadores a la vez: texto, negativo fuera de rango y NaN literal
+    // Basura en tres deslizadores a la vez: texto, negativo fuera de rango y NaN literal.
+    // La edad se baja antes a 30 A PROPÓSITO: el navegador sanea «NaN» a la mitad del recorrido
+    // —(0+90)/2 = 45— que es justo donde arranca el deslizador, así que desde ahí el valor no se
+    // movería, React descartaría el evento y la comprobación de abajo pasaría sin haber saneado
+    // nada (ver tests/apps/_hidratacion.ts).
+    await mover(page, 'edadHer', 30);
     await mover(page, 'valorRef', 'texto');
     await mover(page, 'valorSuelo', '-99999');
     await mover(page, 'edadHer', 'NaN');
@@ -765,7 +799,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('WEB ↔ MCP (1/3) — Asturias, hijo, 250.000 € de vivienda habitual: los dos dicen 0,00 € (hallazgo 276 cerrado)', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'asturias');
@@ -817,7 +851,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('WEB ↔ MCP (2/3) — Cataluña, cónyuge, 350.000 €: la web y el MCP dicen los mismos 0,00 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
     await page.getByRole('button', { name: /Cónyuge hereda piso 350k en Cataluña/ }).click();
     await mover(page, 'aniosVenta', 0);
 
@@ -883,7 +917,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('WEB ↔ MCP (3/3) — colateral de 40 años que no convivió: la web y el MCP dicen los mismos 23.777,13 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hermano');
     await page.selectOption('#ccaaSel', 'madrid');
@@ -952,7 +986,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('GUARDA — el tramo del 30 % del IRPF entra de verdad: ganancia de 1.793.195,95 € → 519.838,79 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
     await page.getByRole('button', { name: /Hijo hereda piso 200k en Madrid/ }).click();
     await mover(page, 'valorVta', 2000000);
 
@@ -981,7 +1015,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('REGRESIÓN — el faqJsonLd sirve los cinco tramos de la base del ahorro', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     const faq = await faqServida(page);
     expect(faq).toHaveLength(5);
@@ -1012,7 +1046,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('REGRESIÓN — el faqJsonLd no atribuye la exención de IRPF a la vivienda habitual del FALLECIDO', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     const faq = await faqServida(page);
     const irpf = faq.find(q => q.name.includes('IRPF'));
@@ -1050,7 +1084,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('GUARDA — Castilla-La Mancha baja del 90 % al 80 % al pasar de 300.000 € de base liquidable', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'castilla-mancha');
@@ -1090,7 +1124,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('REGRESIÓN — la lista de CCAA que bonifican casi al 100 % sale de los datos, no de la memoria', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     const tarjeta = await page.evaluate(() => {
       const h4 = [...document.querySelectorAll('h4')].find(h =>
@@ -1151,7 +1185,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 6 (límite) — el colateral en el borde de los 65 años: 267,30 € con derecho y 13.469,33 € sin él', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hermano');
     await page.selectOption('#ccaaSel', 'madrid');
@@ -1231,7 +1265,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 7 (normal) — Baleares al 95 % y la plusvalía por el método REAL: 322,70 € + 625,00 € + 1780,98 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'baleares');
@@ -1286,7 +1320,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('CASO 8 (rechazo) — Grupo IV con la vivienda habitual marcada: se deniega, se dice, y la cuota no se mueve', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'sin_parentesco');
     await page.selectOption('#ccaaSel', 'madrid');
@@ -1324,7 +1358,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
   test('REGRESIÓN — la tarjeta educativa no se contradice sobre Aragón, y excluye a País Vasco por foral', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     const tarjeta = await page.evaluate(() => {
       const h4 = [...document.querySelectorAll('h4')].find(h =>
@@ -1367,9 +1401,14 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     const selects = page.locator('select');
     await selects.nth(0).selectOption('madrid');
     await selects.nth(1).selectOption('III');
-    await page
-      .locator('xpath=//label[contains(., "Vivienda habitual")]/following::input[1]')
-      .fill('200000');
+    const vivienda = page.locator(
+      'xpath=//label[contains(., "Vivienda habitual")]/following::input[1]',
+    );
+    await vivienda.fill('200000');
+    // Esta app es otra, y aquí no vale el `abrir()` de arriba: se comprueba que los 200.000 €
+    // llegaron al ESTADO de React. Un `fill()` anterior a la hidratación deja el campo escrito
+    // y el cálculo con el valor viejo (ver tests/apps/_hidratacion.ts).
+    await esperarValorEnReact(page, vivienda, '200000');
 
     const cuota = page.locator('xpath=//*[contains(@class,"resultsPanel")]');
     await expect(cuota).toContainText('CUOTA A INGRESAR');
@@ -1405,6 +1444,15 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
         viviendaHabitual: 200000,
       },
     });
+    // ⚠️ El servidor de desarrollo compila las rutas de API a demanda y de vez en cuando
+    // devuelve su página 404 en HTML en vez de la respuesta (medido el 12/09/2026: 1 de cada 4
+    // corridas del fichero, y también antes de tocar nada de hidratación — es el dev server, no
+    // la app). Se afirma el estado ANTES de parsear para que ese caso no se disfrace de
+    // «SyntaxError: Unexpected token '<'», que no dice nada de lo que ha pasado.
+    expect(
+      respuesta.status(),
+      'la ruta de API no llegó a servirse: next dev la compila a demanda',
+    ).toBe(200);
     const json = await respuesta.json();
 
     // El MCP, con el mismo supuesto, da 4.883,57 €: es la cifra que fija la paridad
@@ -1467,7 +1515,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
   test('CASO 1 (normal) — cónyuge en la Comunitat Valenciana: 159,20 € + 2250,00 € + 7774,07 € = 10.183,27 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'conyuge');
     await page.selectOption('#ccaaSel', 'valencia');
@@ -1551,7 +1599,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
   test('CASO 2 (límite) — Galicia: exención total con 996.436,66 € de base y 2686,11 € con 1.001.436,66 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'galicia');
@@ -1653,7 +1701,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
   test('CASO 3 (rechazo) — Cataluña no aplica la reducción estatal al hijo, y la proporción de suelo se topa en 1', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
     await page.selectOption('#ccaaSel', 'cataluna');
@@ -1764,7 +1812,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
   test(
     'REGRESIÓN — el sello de datos declara también el módulo de inmuebles (IIVTNU e IRPF)',
     async ({ page }) => {
-      await page.goto(RUTA);
+      await abrir(page);
 
       const sello = page.locator('[aria-label="Datos de referencia normativos"]');
       const texto = (await sello.first().innerText()).replace(/\s+/g, ' ');
@@ -1818,7 +1866,7 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
   test('612 — el Grupo I existe, baja la edad hasta 0 y aplica la reducción del art. 20.2.a', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
     await page.selectOption('#ccaaSel', 'madrid');
     await page.locator('#parentescoSel').selectOption({ label: 'Hijo o descendiente <21 años (Grupo I)' });
 
@@ -1847,7 +1895,7 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
   test('612 bis — el Grupo I con 21 años o más avisa, y en Cataluña se aplican SUS cuantías', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
     await page.locator('#parentescoSel').selectOption({ label: 'Hijo o descendiente <21 años (Grupo I)' });
     await page.locator('#edadHer').fill('30');
     await expect(page.getByText(/El Grupo I es solo para descendientes de menos de 21 años/)).toBeVisible();
@@ -1872,7 +1920,7 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
   test('613 — los paneles de resultado y el total se anuncian a un lector de pantalla', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
     const vivos = page.locator('[aria-live="polite"][role="status"]');
     const textos = await vivos.allInnerTexts();
     const todo = textos.join(' ');
@@ -1965,7 +2013,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   test('CASO 1 (normal) — ascendiente en Cantabria: 456,33 € + 1800,00 € + 14.461,04 € = 16.717,37 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'padre');
     await page.selectOption('#ccaaSel', 'cantabria');
@@ -2059,7 +2107,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   test('CASO 2 (límite) — el tope de 47.858,59 € del art. 20.2.a: muerde a los 13 años, no a los 14', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo_menor21');
     await page.selectOption('#ccaaSel', 'asturias');
@@ -2142,7 +2190,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   test('CASO 3 — colateral de 70 años que convivió: en Cataluña SÍ reduce, y la casilla decide', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hermano');
     await page.selectOption('#ccaaSel', 'cataluna');
@@ -2250,7 +2298,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
       },
     ];
 
-    await page.goto(RUTA);
+    await abrir(page);
     for (const c of casos) {
       await page.selectOption('#parentescoSel', c.ui.parentesco);
       await page.selectOption('#ccaaSel', c.ui.ccaa);
@@ -2307,7 +2355,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   test(
     'REGRESIÓN 657 — la cuota tributaria impresa es la cuota íntegra impresa por el coeficiente',
     async ({ page }) => {
-      await page.goto(RUTA);
+      await abrir(page);
       await page.selectOption('#parentescoSel', 'sin_parentesco');
       await page.selectOption('#ccaaSel', 'madrid');
       await mover(page, 'edadHer', 40);
@@ -2370,7 +2418,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
       { nombre: 'hijo en Castilla-La Mancha, 400.000 €', parentesco: 'hijo', ccaa: 'castilla-mancha', edad: 45, valorRef: 400000, vivienda: true, grupoCoef: 'II' },
     ];
 
-    await page.goto(RUTA);
+    await abrir(page);
     await mover(page, 'aniosVenta', 0); // aislar el ISD
 
     for (const p of perfiles) {
@@ -2431,7 +2479,7 @@ test.describe('Simulador de heredar vivienda — inspección 07/09/2026', () => 
   test(
     'HALLAZGO reparado — la FAQ del plazo compone el recargo con el art. 27.2 LGT, no con la escala derogada',
     async ({ page }) => {
-      await page.goto(RUTA);
+      await abrir(page);
 
       const faq = await page.evaluate(() => {
         const s = [...document.querySelectorAll('strong')].find(e =>
@@ -2554,7 +2602,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   test('CASO 1 (normal) — Canarias bonifica también al Grupo III: 84,86 € + 1800,00 € + 7884,18 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hermano');
     await page.selectOption('#ccaaSel', 'canarias');
@@ -2630,7 +2678,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   test('CASO 2 (límite) — el tope de 122.606,47 € del art. 20.2.c muerde entre 125.000 € y 130.000 €', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hermano');
     await page.selectOption('#ccaaSel', 'extremadura');
@@ -2700,7 +2748,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   test('CASO 3 (rechazo) — Cataluña deniega la vivienda al Grupo IV citando el art. 17 de la Ley 19/2010', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     await page.selectOption('#parentescoSel', 'sin_parentesco');
     await page.selectOption('#ccaaSel', 'cataluna');
@@ -2791,7 +2839,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
     const divergencias: string[] = [];
     let comparadas = 0;
 
-    await page.goto(RUTA);
+    await abrir(page);
     await mover(page, 'aniosVenta', 0); // aislar el ISD
 
     // ── Pasada 1: 250.000 € de vivienda habitual, heredero de 70 años que convivió
@@ -2898,7 +2946,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   test('HALLAZGO 10/09/2026 — el faqJsonLd promete 20.000 € de diferencia Madrid/Cataluña', async ({
     page,
   }) => {
-    await page.goto(RUTA);
+    await abrir(page);
 
     const respuesta =
       (await faqServida(page)).find(q => q.name.includes('Madrid y en Cataluña'))?.acceptedAnswer
@@ -2971,7 +3019,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
     expect(REDUCCIONES_PARENTESCO_IS['II']).toBe(15956.87);
     expect(REDUCCION_VIVIENDA_MAX_CATALUNA_IS).toBeGreaterThan(REDUCCION_VIVIENDA_MAX_IS);
 
-    await page.goto(RUTA);
+    await abrir(page);
     const respuesta =
       (await faqServida(page)).find(q => q.name.includes('Madrid y en Cataluña'))?.acceptedAnswer
         .text ?? '';
@@ -3013,7 +3061,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
     expect(PLUSVALIA_MUNICIPAL_META.verificado).toBe('2025-01-15');
     expect(PLUSVALIA_MUNICIPAL_META.vigencia).toBe('2025');
 
-    await page.goto(RUTA);
+    await abrir(page);
     const sellos = await page.locator('[aria-label="Datos de referencia normativos"]').allInnerTexts();
     const sello = sellos.map(s => s.replace(/\s+/g, ' ')).find(s => s.includes('IIVTNU')) ?? '';
 
@@ -3049,7 +3097,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   }) => {
     expect(REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS).toBe(5);
 
-    await page.goto(RUTA);
+    await abrir(page);
 
     // La app SÍ aplica el otro dato del mismo art. 19: el tope catalán de 500.000 €
     await page.selectOption('#parentescoSel', 'hijo');

@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion } from './_hidratacion';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-vsepr (segmento interactiva, riesgo 3, 170 usos reales · Stemum/Química)
@@ -88,18 +88,10 @@ const DESLIZADORES = ['#slider-enlaces', '#slider-libres'];
  * deslizador en su valor anterior y el test sigue adelante midiendo otra molécula.
  */
 async function ponerSlider(page: Page, id: string, valor: number): Promise<void> {
-  await page.evaluate(
-    ({ id, valor }) => {
-      const el = document.getElementById(id) as HTMLInputElement;
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        'value',
-      )!.set!;
-      setter.call(el, String(valor));
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-    },
-    { id, valor },
-  );
+  await sembrarValor(page, `#${id}`, valor);
+  // Doble testigo a propósito: `sembrarValor` mira el estado con el que React ha renderizado el
+  // INPUT, y esto mira el eco que React pinta en la ETIQUETA. Que los dos coincidan es lo que
+  // descarta que la página quede descuadrada consigo misma, que es como se vio el fallo.
   await expect(
     ecoDeSlider(page, id),
     `el deslizador #${id} no llegó a ${valor}: el evento no alcanzó al estado de React`,

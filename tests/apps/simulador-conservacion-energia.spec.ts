@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * Inspector — simulador-conservacion-energia (segmento cálculo/física, riesgo 3, 285 usos)
@@ -105,6 +106,14 @@ import { test, expect, Page } from '@playwright/test';
 
 const RUTA = '/simulador-conservacion-energia/';
 
+/** Los cuatro deslizadores, por su etiqueta accesible: el marcado no les pone id. */
+const DESLIZADORES = [
+  'input[aria-label="Altura inicial"]',
+  'input[aria-label="Masa"]',
+  'input[aria-label="Gravedad"]',
+  'input[aria-label="Coeficiente de fricción"]',
+];
+
 // ── Utilidades ───────────────────────────────────────────────────────────────────────────
 
 /** Lee de una pasada las nueve cifras del panel y los cuatro rótulos de los deslizadores. */
@@ -135,49 +144,29 @@ async function leer(page: Page): Promise<Record<string, string>> {
 }
 
 /**
- * Mueve un deslizador. Playwright no puede escribir en un input[type=range], así que se usa
- * el setter nativo + evento input, que es lo que React escucha. Devuelve lo que el control
- * ACEPTA, que no tiene por qué ser lo pedido: ahí está el caso 3.
+ * Mueve un deslizador y NO devuelve hasta comprobar que el valor llegó al ESTADO de React.
+ * Devuelve lo que el control ACEPTA, que no tiene por qué ser lo pedido: ahí está el caso 3.
  *
- * La espera del final NO es adorno: el rótulo del deslizador se pinta en el mismo render que
- * cambia el estado, pero la pelota la recoloca un useEffect que escribe en un ref y fuerza un
- * segundo render. Leer entre los dos renders devuelve el rótulo nuevo con la altura vieja.
- */
-/**
- * Mueve un deslizador y NO devuelve hasta comprobar que el valor llegó al estado de React.
+ * Playwright no puede escribir en un input[type=range], así que se usa el setter nativo + evento
+ * input, que es lo que React escucha —siempre que ya haya hidratado—. Si llega antes, el DOM
+ * cambia y el estado no, y el test sigue adelante creyendo que movió el control.
  *
- * El truco del setter nativo + dispatchEvent escribe el DOM y sí alcanza a React… siempre
- * que React ya haya hidratado. Si llega antes, el evento se pierde y en la siguiente
- * hidratación React restaura `value` desde su estado, deshaciendo el cambio SIN QUE NADA
- * FALLE: el test sigue adelante creyendo que movió el control. Es la forma que el plan de
- * reparación del Inspector documenta como «test que no llega a la app», y aquí se resuelve
- * declarando la causa —se espera a que el rótulo, que lo pinta React, refleje el valor— en
- * vez de subir un `waitForTimeout` hasta que deje de fallar.
+ * ⚠️ Hasta el 12/09/2026 esto lo «resolvía» un bucle de hasta 20 reintentos cada 100 ms que
+ * comparó siempre el DOM CONSIGO MISMO (leía `el.value` y lo cotejaba con el `el.value` que
+ * acababa de devolver la propia escritura), de modo que salía a la primera vuelta pasara lo que
+ * pasara y no comprobaba nada; y aunque hubiera mirado a React, reintentar con el MISMO valor
+ * nunca desatasca un rastreador envenenado. Ahora se espera a la hidratación antes de sembrar y
+ * el testigo es el valor con el que React ha renderizado el input (ver tests/apps/_hidratacion).
+ *
+ * El respiro del final es lo ÚNICO que se conserva de aquel bucle, porque respondía a otra cosa:
+ * el rótulo del deslizador se pinta en el mismo render que cambia el estado, pero la pelota la
+ * recoloca un `useEffect` que escribe en un ref y fuerza un SEGUNDO render. Leer entre los dos
+ * devuelve el rótulo nuevo con la altura vieja.
  */
 async function poner(page: Page, etiqueta: string, valor: number): Promise<string> {
-  const escribir = () =>
-    page.evaluate(
-      ([et, v]) => {
-        const el = document.querySelector(`input[aria-label="${et}"]`) as HTMLInputElement;
-        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!;
-        setter.call(el, String(v));
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        return el.value;
-      },
-      [etiqueta, valor] as [string, number],
-    );
-
-  let aceptado = await escribir();
-  for (let intento = 0; intento < 20; intento++) {
-    await page.waitForTimeout(100);
-    const enReact = await page.evaluate(
-      (et) => (document.querySelector(`input[aria-label="${et}"]`) as HTMLInputElement).value,
-      etiqueta,
-    );
-    if (enReact === aceptado) return aceptado;
-    aceptado = await escribir(); // React aún no había hidratado: se vuelve a intentar
-  }
-  throw new Error(`el deslizador «${etiqueta}» no aceptó ${valor}: React no llegó a hidratar`);
+  const aceptado = await sembrarValorAcotado(page, `input[aria-label="${etiqueta}"]`, valor);
+  await page.waitForTimeout(100);
+  return aceptado;
 }
 
 /** «98,24 J» → 98.24 */
@@ -207,6 +196,9 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Simulador de Conservación de la Energía');
   // La pelota ya está colocada antes de tocar nada: el panel no arranca vacío.
   await expect(page.getByText('m·g·h₀')).toBeVisible();
+  // Y el panel se pinta en el HTML servido, así que estar visible no dice que la app responda:
+  // hay que esperar a que React haya montado los deslizadores (ver tests/apps/_hidratacion.ts).
+  await esperarHidratacion(page, DESLIZADORES);
 });
 
 // ═════════════════════════════════════════════════════════════════════════════════════════
@@ -331,6 +323,10 @@ test('CASO 3 · los cuatro imposibles se rechazan y quedan en el mínimo legal',
   expect(await poner(page, 'Altura inicial', -5)).toBe('1'); // altura negativa
   expect(await poner(page, 'Masa', 0)).toBe('0.1'); // masa nula
   expect(await poner(page, 'Gravedad', 0)).toBe('1'); // g = 0 divide por m·g al dibujar
+  // Subir μ ANTES del intento negativo no es adorno: el rozamiento ya vale 0, así que el −1
+  // acabaría en 0 igualmente y React descartaría el evento por duplicado — la comprobación
+  // pasaría sin que nada se hubiera movido (ver tests/apps/_hidratacion.ts).
+  expect(await poner(page, 'Coeficiente de fricción', 0.1)).toBe('0.1');
   expect(await poner(page, 'Coeficiente de fricción', -1)).toBe('0'); // μ < 0 daría energía
 
   const l = await leer(page);
@@ -394,6 +390,9 @@ test('CASO 3 · los cuatro imposibles se rechazan y quedan en el mínimo legal',
 //       «98,00 J · sin fricción».
 test('HALLAZGO A · el tope de la pista no puede disipar 98 J «sin fricción»', async ({ page }) => {
   await page.getByRole('button', { name: /Rampa/ }).click();
+  // Se pasa por 5 m antes de fijar los 10: la altura ARRANCA en 10, y sembrar el valor que ya
+  // está no probaría que el deslizador responde (ver tests/apps/_hidratacion.ts).
+  await poner(page, 'Altura inicial', 5);
   await poner(page, 'Altura inicial', 10);
   expect((await leer(page))['Energía inicial']).toBe('98,00 J');
 

@@ -43,8 +43,12 @@
  *    `esApta` no comprueba ingresos/gastos, solo si hay parámetros físicos > 0.
  */
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 const RUTA = '/simulador-modulos-vs-directa/';
+
+/** Los tres deslizadores que existen con cualquier actividad (#veh solo lo pinta taxi). */
+const DESLIZADORES = ['#ingresos', '#gastos', '#reta'];
 
 const ED = 'Estimación Directa Simplificada';
 const MOD = 'Estimación Objetiva (Módulos)';
@@ -76,23 +80,23 @@ async function linea(page: Page, tituloH3: string, etiqueta: string): Promise<st
   return (await fila.locator('strong').innerText()).replace(/\s+/g, ' ').trim();
 }
 
-/** Mueve un input[type=range] controlado por React (fill() no dispara su onChange). */
+/**
+ * Mueve un input[type=range] controlado por React (fill() no dispara su onChange) y comprueba
+ * que el estado de React lo recogió. #veh solo existe con la actividad Taxi, pero nace
+ * hidratado porque React lo monta después: `sembrarValor` lo espera por su cuenta.
+ */
 async function mover(page: Page, id: string, valor: number): Promise<void> {
-  await page.evaluate(
-    ([id, valor]) => {
-      const el = document.getElementById(id as string) as HTMLInputElement;
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        'value'
-      )!.set!;
-      setter.call(el, String(valor));
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-    },
-    [id, valor] as [string, number]
-  );
+  await sembrarValor(page, `#${id}`, valor);
 }
 
 test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/08/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    // Ni un clic en un preset ni un movimiento de deslizador llegan a React antes de que
+    // haya hidratado: el botón está pintado pero sin manejador (ver _hidratacion.ts).
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
   /**
    * CASO 1 (NORMAL) — preset "Bar pequeño rentable": ingresos 90.000 €, gastos 25.000 €,
    * RETA 320 €/mes; bar con 1 asalariado, 1 no asalariado, 60 m², 12.000 kWh, 8 mesas.
@@ -126,7 +130,6 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
   test('CASO 1 (normal) — bar rentable: ED 22.037,00 € vs Módulos 5.276,28 €, gana módulos', async ({
     page,
   }) => {
-    await page.goto(RUTA);
     await page.getByRole('button', { name: /Aplicar caso Bar pequeño rentable/ }).click();
 
     expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('65.000,00 €');
@@ -188,10 +191,6 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
   test('CASO 2 (límite, tramo 45% IRPF) — sliders al máximo + Taxi: ED 86.147,00 € vs Módulos 7.372,90 €', async ({
     page,
   }) => {
-    await page.goto(RUTA, { waitUntil: 'networkidle' });
-    // Sin esperar a que React hidrate, el primer `mover()` justo tras `goto()` puede
-    // llegar antes de que el listener de React esté enganchado y el evento se pierde
-    // (el DOM cambia, el estado no) — visto al ejecutar este test la primera vez.
     await mover(page, 'ingresos', 200000);
     await mover(page, 'gastos', 0);
     await mover(page, 'reta', 600);
@@ -249,7 +248,6 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
   test('CASO 3 (rechazo) — "profesional puro" no apto para módulos: recomienda ED sin comparar importes', async ({
     page,
   }) => {
-    await page.goto(RUTA);
     await page.getByRole('button', { name: /Aplicar caso Profesional puro/ }).click();
 
     expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('40.000,00 €');
@@ -291,7 +289,6 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
   test('Guarda 554 — bar→taxi sin tocar sliders: taxi no hereda mesas/personal del bar', async ({
     page,
   }) => {
-    await page.goto(RUTA);
     await page.getByRole('radio', { name: /Taxi \(autotaxi\)/ }).click();
 
     expect(await panel(page, MOD)).toContain('NO es elegible para módulos');
@@ -307,7 +304,6 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
    * está anclado a normativa (módulos = fórmula didáctica, RETA = entrada libre).
    */
   test('DataReference cita la fuente de lo que realmente se calcula (IRPF)', async ({ page }) => {
-    await page.goto(RUTA);
     const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
     await expect(referencias).toHaveCount(2);
     await expect(referencias.first()).toContainText('IRPF 2025');
@@ -322,7 +318,6 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
    * de ser apta aunque antes de la reparación SÍ lo fuera (bastaba con mesas > 0).
    */
   test('Hallazgo 567 (reparado) — superar el límite de ingresos excluye de módulos aunque haya parámetros físicos', async ({ page }) => {
-    await page.goto(RUTA);
     // Segundo DataReference: cita los límites de exclusión, no el de IRPF.
     const referenciaLimites = page.locator('[aria-label="Datos de referencia normativos"]').nth(1);
     await expect(referenciaLimites).toContainText('Límites de exclusión de módulos');

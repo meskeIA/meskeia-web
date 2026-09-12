@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * Inspector — simulador-fluidos-bernoulli (segmento cálculo/física, riesgo 3, 182 usos)
@@ -174,42 +175,28 @@ const CONTROL: Record<string, string> = {
 };
 
 /**
- * Mueve un deslizador y NO devuelve hasta comprobar que el valor llegó al estado de React.
- *
- * El setter nativo + dispatchEvent alcanza a React siempre que React ya haya hidratado; si
- * llega antes, el evento se pierde y la siguiente hidratación restaura `value` desde el
- * estado, deshaciendo el cambio SIN QUE NADA FALLE. Se declara la causa y se reintenta, en
- * vez de subir el `waitForTimeout` hasta que deje de fallar.
- *
+ * Mueve un deslizador y NO devuelve hasta comprobar que el valor llegó al ESTADO de React.
  * Devuelve lo que el control ACEPTA tras sanearlo el navegador, que no tiene por qué ser lo
  * pedido: ahí está el caso 3.
+ *
+ * El setter nativo + dispatchEvent alcanza a React siempre que React ya haya hidratado; si
+ * llega antes, el evento se pierde y el DOM queda con un valor que el estado no tiene.
+ *
+ * ⚠️ Hasta el 12/09/2026 esto lo «resolvía» un bucle de hasta 20 reintentos cada 120 ms que
+ * comparaba siempre el DOM CONSIGO MISMO (leía `el.value` y lo cotejaba con el `el.value` que
+ * acababa de devolver la propia escritura), así que salía a la primera vuelta pasara lo que
+ * pasara; y aunque hubiera mirado a React, reintentar con el MISMO valor nunca desatasca un
+ * rastreador envenenado. Ahora se espera a la hidratación antes de sembrar y el testigo es el
+ * valor con el que React ha renderizado el input (ver tests/apps/_hidratacion.ts).
+ *
+ * El respiro del final es lo ÚNICO que se conserva de aquel bucle, y responde a otra cosa: la
+ * tabla y el panel los pinta React en el mismo render, pero el canvas —manómetros y partículas—
+ * lo redibuja un efecto posterior, así que leerlo inmediatamente devuelve el dibujo anterior.
  */
 async function poner(page: Page, etiqueta: string, valor: number): Promise<string> {
-  const id = CONTROL[etiqueta] ?? etiqueta;
-  const escribir = () =>
-    page.evaluate(
-      ([sel, v]) => {
-        const el = document.getElementById(sel) as HTMLInputElement;
-        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!
-          .set!;
-        setter.call(el, String(v));
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        return el.value;
-      },
-      [id, valor] as [string, number],
-    );
-
-  let aceptado = await escribir();
-  for (let intento = 0; intento < 20; intento++) {
-    await page.waitForTimeout(120);
-    const enReact = await page.evaluate(
-      (sel) => (document.getElementById(sel) as HTMLInputElement).value,
-      id,
-    );
-    if (enReact === aceptado) return aceptado;
-    aceptado = await escribir(); // React aún no había hidratado: se vuelve a intentar
-  }
-  throw new Error(`el deslizador «${etiqueta}» no aceptó ${valor}: React no llegó a hidratar`);
+  const aceptado = await sembrarValorAcotado(page, `#${CONTROL[etiqueta] ?? etiqueta}`, valor);
+  await page.waitForTimeout(120);
+  return aceptado;
 }
 
 /**
@@ -298,6 +285,11 @@ test.beforeEach(async ({ page }) => {
   );
   // La tubería ya está calculada antes de tocar nada: la tabla no arranca vacía.
   await expect(page.locator('table tbody tr').first()).toContainText('Entrada');
+  // Pero la tabla viaja en el HTML servido: que esté no dice que la app responda. Hay que
+  // esperar a que React haya montado los deslizadores (ver tests/apps/_hidratacion.ts).
+  // Solo los dos que existen con cualquier geometría: el de estrechamiento desaparece en
+  // «desnivel» y el de desnivel solo aparece en ella, y basta con uno como testigo.
+  await esperarHidratacion(page, [`#${CONTROL.Caudal}`, `#${CONTROL['Presión de entrada']}`]);
   await page.waitForTimeout(400);
 });
 
@@ -396,9 +388,15 @@ test('CASO 3 · los imposibles se rechazan y quedan en el mínimo legal, sin NaN
   // No hay ni un campo de texto: la barandilla es el min/max de cada deslizador.
   expect(await page.locator('input[type="text"], input[type="number"]').count()).toBe(0);
 
+  // Entre los dos intentos de cada deslizador se vuelve a un valor legal A PROPÓSITO: si no, el
+  // control ya estaría en su mínimo, el navegador dejaría ahí el segundo imposible igualmente y
+  // React descartaría el evento por duplicado — la comprobación pasaría sin que nada se hubiera
+  // movido (ver tests/apps/_hidratacion.ts).
   expect(await poner(page, 'Caudal', -5)).toBe('0.1'); // caudal negativo
+  expect(await poner(page, 'Caudal', 2)).toBe('2'); // de vuelta al caudal de fábrica
   expect(await poner(page, 'Caudal', 0)).toBe('0.1'); // caudal nulo → Q/A = 0, no divide mal
   expect(await poner(page, 'Ratio de estrechamiento', 0)).toBe('0.25'); // sección nula → Q/0
+  expect(await poner(page, 'Ratio de estrechamiento', 0.5)).toBe('0.5'); // el de fábrica
   expect(await poner(page, 'Ratio de estrechamiento', -1)).toBe('0.25'); // sección negativa
   // 50.325 Pa: la rejilla se construye desde 1 atm hacia abajo, de 1 kPa en 1 kPa, para que
   // 101.325 sea alcanzable (hallazgo I). El mínimo es el que resulta de esa rejilla.

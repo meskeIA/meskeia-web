@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, leerValorEnReact, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * Inspector — simulador-movimiento-circular (segmento interactiva/física, riesgo 3, 816 usos)
@@ -143,21 +144,31 @@ function unidad(page: Page, nombre: string) {
 }
 
 /**
- * Mueve un slider. Un <input type="range"> no acepta fill(), y arrastrar con el ratón no da
- * un valor exacto, así que se escribe con el setter nativo y se dispara el evento input que
- * React escucha. El navegador satura solo si el valor cae fuera de [min, max]: eso es
- * justamente lo que el CASO 3 quiere observar.
+ * Mueve un slider y comprueba que el ESTADO de React lo recogió. Un <input type="range"> no
+ * acepta fill(), y arrastrar con el ratón no da un valor exacto, así que se escribe con el
+ * setter nativo y se dispara el evento input que React escucha. El navegador satura solo si el
+ * valor cae fuera de [min, max]: eso es justamente lo que el CASO 3 quiere observar, y por eso
+ * el testigo es el valor que el control ACEPTA, no el pedido.
  */
 async function mover(page: Page, indice: number, valor: number | string): Promise<void> {
-  await page
-    .locator('input[type="range"]')
-    .nth(indice)
-    .evaluate((el, v) => {
-      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!;
-      setter.call(el, v);
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    }, String(valor));
+  await sembrarValorAcotado(page, page.locator('input[type="range"]').nth(indice), valor);
+}
+
+/**
+ * Mueve un slider ASEGURÁNDOSE de que el movimiento es real. El simulador arranca en r=2 m,
+ * ω=1 rad/s y m=1 kg, así que un escenario que pida cualquiera de esos tres valores sembraría
+ * un control que ya está donde se le pide: el estado de React ya coincide y la comprobación
+ * pasaría aunque el evento se hubiera perdido y ese control estuviera sordo. Se detectó con
+ * `SIEMBRA_ESTRICTA=1` (ver tests/apps/_hidratacion.ts); la solución es pasar antes por un
+ * extremo del recorrido, y así el valor final queda comprobado en vez de supuesto.
+ */
+async function moverDeVerdad(page: Page, indice: number, valor: number | string): Promise<void> {
+  const slider = page.locator('input[type="range"]').nth(indice);
+  if ((await leerValorEnReact(page, slider)) === String(valor)) {
+    const rango = await slider.evaluate((el: HTMLInputElement) => ({ min: el.min, max: el.max }));
+    await mover(page, indice, String(valor) === rango.min ? rango.max : rango.min);
+  }
+  await mover(page, indice, valor);
 }
 
 async function configurar(
@@ -166,9 +177,9 @@ async function configurar(
   w: number | string,
   m: number | string,
 ): Promise<void> {
-  await mover(page, RADIO, r);
-  await mover(page, OMEGA, w);
-  await mover(page, MASA, m);
+  await moverDeVerdad(page, RADIO, r);
+  await moverDeVerdad(page, OMEGA, w);
+  await moverDeVerdad(page, MASA, m);
 }
 
 /** Valor real que ha quedado en un slider tras la saturación del navegador. */
@@ -253,6 +264,9 @@ test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Simulador de Movimiento Circular');
+  // El <h1> viaja en el HTML servido: está en pantalla antes de que la app responda a nada, y
+  // el primer movimiento de slider se perdería (ver tests/apps/_hidratacion.ts).
+  await esperarHidratacion(page, ['input[type="range"]']);
 });
 
 test('la app promete lo que este fichero verifica', async ({ page }) => {

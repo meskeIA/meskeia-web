@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * Inspector — simulador-campo-electrico (segmento CÁLCULO / física)
@@ -192,21 +193,23 @@ async function clicEnLienzo(page: Page, sx: number, sy: number): Promise<void> {
   await page.mouse.click(p.x, p.y);
 }
 
-/** Escribe un valor en el slider de magnitud (un range no acepta fill()). */
+/**
+ * Escribe un valor en el slider de magnitud (un range no acepta fill()) y comprueba que el
+ * estado de React lo recogió. El navegador satura fuera de [0,1 · 10], que es justo lo que el
+ * CASO 3.bis quiere observar, así que el testigo es el valor que el control ACEPTA.
+ */
 async function ponerMagnitud(page: Page, v: number | string): Promise<void> {
-  await page.locator('#magnitud').evaluate((el: HTMLInputElement, texto: string) => {
-    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
-    if (!setter) throw new Error('No se puede escribir en el input');
-    setter.call(el, texto);
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  }, String(v));
+  await sembrarValorAcotado(page, '#magnitud', v);
 }
 
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.locator('h1')).toHaveText('Simulador de Campo Eléctrico');
   await expect(lienzo(page)).toBeVisible();
+  // Ni el <h1> ni el lienzo dicen que la app responda: los dos viajan en el HTML servido. Un
+  // arrastre, un clic en el SVG o un movimiento de slider anteriores a la hidratación se
+  // perderían sin dejar rastro (ver tests/apps/_hidratacion.ts).
+  await esperarHidratacion(page, ['#magnitud']);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -409,6 +412,10 @@ test('CASO 3.bis · sistema vacío y magnitudes fuera de rango', async ({ page }
   // nunca entra al cálculo una carga de 0 nC ni una «magnitud» negativa.
   await ponerMagnitud(page, 0);
   await expect(page.locator('#magnitud')).toHaveValue('0.1');
+  // Subir a 5 antes del intento negativo no es adorno: el slider ya estaría en 0,1, el
+  // navegador dejaría ahí el −7 igualmente y React descartaría el evento por duplicado, así que
+  // la comprobación pasaría sin que nada se hubiera movido (ver tests/apps/_hidratacion.ts).
+  await ponerMagnitud(page, 5);
   await ponerMagnitud(page, -7);
   await expect(page.locator('#magnitud')).toHaveValue('0.1');
   await ponerMagnitud(page, 999);

@@ -1,4 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-distribucion-normal (segmento cálculo, riesgo 3)
@@ -74,6 +75,11 @@ function valorZ(page: Page, cual: 'Z(a)' | 'Z(b)'): Locator {
   return tarjetaZ(page, cual).locator('[class$="__resultValue"]');
 }
 
+/** Los cuatro deslizadores, por su etiqueta accesible: el marcado no les pone id. */
+const SIGMA = 'input[aria-label="Desviación típica σ"]';
+const A = 'input[aria-label="Valor a"]';
+const DESLIZADORES = ['input[aria-label="Media μ"]', SIGMA, A, 'input[aria-label="Valor b"]'];
+
 const sigmaInput = (page: Page) => page.getByLabel('Desviación típica σ');
 const aInput = (page: Page) => page.getByLabel('Valor a');
 
@@ -81,20 +87,19 @@ const aInput = (page: Page) => page.getByLabel('Valor a');
  * Mueve un slider con el setter nativo. Un <input type="range"> no acepta fill() (lanza
  * "Malformed value: 3"), y arrastrar con el ratón no da un valor exacto — mismo patrón que
  * simulador-movimiento-circular.spec.ts. El propio navegador clampa a [min,max]: es justo lo
- * que el CASO 3 quiere observar.
+ * que el CASO 3 quiere observar, y por eso hay que decirle a `sembrarValor` en qué valor va
+ * a quedarse el estado cuando no es el pedido.
  */
-async function mover(input: Locator, valor: number | string): Promise<void> {
-  await input.evaluate((el, v) => {
-    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!;
-    setter.call(el, v);
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  }, String(valor));
+async function mover(page: Page, selector: string, valor: number | string, esperado = valor) {
+  await sembrarValor(page, selector, valor, { esperado });
 }
 
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.locator('canvas')).toBeVisible();
+  // El <canvas> lo pinta un efecto, pero los deslizadores viajan en el HTML servido: hay que
+  // esperar a que React los haya montado o el primer evento se pierde (ver _hidratacion.ts).
+  await esperarHidratacion(page, DESLIZADORES);
 });
 
 test.describe('CASO 1 (normal) — estado por defecto, N(0,1), P(−1<X<1)', () => {
@@ -113,7 +118,7 @@ test.describe('CASO 2 (límite, reparado) — σ muy pequeña con a/b heredados 
     page,
   }) => {
     // Reduce σ de 1 a su mínimo (0,1) sin tocar a (-1) ni b (1) directamente.
-    await mover(sigmaInput(page), 0.1);
+    await mover(page, SIGMA, 0.1);
 
     // REPARADO (574): el useEffect reclampa a/b al nuevo rango [-0,45, 0,45] — ya no
     // se quedan ancladas en -1/1, fuera del recorrido visible del slider.
@@ -143,10 +148,17 @@ test.describe('CASO 3 (rechazo) — σ = 0 o σ negativa nunca se aceptan', () =
   test('el slider clampa cualquier intento de σ ≤ 0 al mínimo declarado (0,1)', async ({ page }) => {
     await expect(sigmaInput(page)).toHaveAttribute('min', '0.1');
 
-    await mover(sigmaInput(page), 0);
+    // σ parte de 1: pedir 0 es un cambio real que el navegador capa a 0,1.
+    await mover(page, SIGMA, 0, 0.1);
     await expect(sigmaInput(page)).toHaveValue('0.1');
 
-    await mover(sigmaInput(page), -5);
+    // Subir a 2 ANTES del intento negativo no es adorno: sin esto σ ya valdría 0,1, el DOM la
+    // dejaría en 0,1 al capar el −5 y React descartaría el evento por duplicado, de modo que
+    // la comprobación pasaría sin que nada se hubiera movido (ver _hidratacion.ts).
+    await mover(page, SIGMA, 2);
+    await expect(sigmaInput(page)).toHaveValue('2');
+
+    await mover(page, SIGMA, -5, 0.1);
     await expect(sigmaInput(page)).toHaveValue('0.1');
 
     // Con σ=0,1 (el mínimo válido) el panel sigue dando números finitos, sin NaN ni Infinity.

@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — calculadora-masa-madre (segmento motor, riesgo 3, 232 usos reales · vertical Coquinum)
@@ -89,23 +90,37 @@ import { test, expect, Page } from '@playwright/test';
 
 const RUTA = '/calculadora-masa-madre/';
 
-/** Escribe en el campo de gramos como lo haría el usuario (React escucha el evento input). */
+const GRAMOS = '#levadura-g';
+const HIDRATACION = '#hidratacion-mm';
+
+/**
+ * Escribe en el campo de gramos como lo haría el usuario y comprueba que llegó al estado de
+ * React. `fill()` inserta el texto a través del navegador, así que —a diferencia de asignar
+ * `el.value`— sí dispara el onChange de React; lo que no salva es escribir antes de que la app
+ * hidrate, y entonces el campo muestra el texto y el resultado sigue siendo el anterior.
+ */
 async function ponerGramos(page: Page, valor: string): Promise<void> {
-  await page.locator('#levadura-g').fill(valor);
+  await page.locator(GRAMOS).fill(valor);
+  await esperarValorEnReact(page, GRAMOS, valor);
 }
 
-/** Mueve el deslizador de hidratación: un input[type=range] necesita el setter nativo. */
-async function ponerHidratacion(page: Page, valor: string): Promise<void> {
-  await page.evaluate((v) => {
-    const el = document.querySelector('#hidratacion-mm') as HTMLInputElement;
-    const setter = Object.getOwnPropertyDescriptor(
-      window.HTMLInputElement.prototype,
-      'value',
-    )!.set!;
-    setter.call(el, v);
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  }, valor);
+/**
+ * Mueve el deslizador de hidratación: un input[type=range] necesita el setter nativo.
+ * `esperado` es para los dos casos en que el navegador capa el valor pedido (0 → 50, 300 → 150).
+ */
+async function ponerHidratacion(page: Page, valor: string, esperado = valor): Promise<void> {
+  await sembrarValor(page, HIDRATACION, valor, { esperado });
+}
+
+/**
+ * Lleva el deslizador al 100 %, que es justo su valor INICIAL. Sembrar 100 a secas no probaría
+ * nada: el estado de React ya vale 100, así que el test daría verde aunque el evento se hubiera
+ * perdido y la app estuviera sorda. Pasando antes por el 50 % el movimiento es real y el 100 %
+ * con el que se calculan las cifras de abajo queda comprobado, no supuesto.
+ */
+async function ponerHidratacionAl100(page: Page): Promise<void> {
+  await ponerHidratacion(page, '50');
+  await ponerHidratacion(page, '100');
 }
 
 /** Gramos de masa madre a añadir (primera cifra grande del resultado). */
@@ -139,6 +154,8 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('🍞 Calculadora de Masa Madre');
+    // El <h1> viaja en el HTML servido: está en pantalla antes de que la app responda a nada.
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
   });
 
   test('CASO 1 (normal) · 15 g de levadura fresca al 100 % = 100 g de masa madre, −50 g harina y −50 g agua', async ({ page }) => {
@@ -146,7 +163,7 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
     // harina = round(100 × 100/200) = 50 ; agua = 100 − 50 = 50 ; 50 + 50 = 100 (la suma cuadra)
     await page.getByRole('button', { name: /Levadura fresca/ }).click();
     await ponerGramos(page, '15');
-    await ponerHidratacion(page, '100');
+    await ponerHidratacionAl100(page);
 
     expect(await masaMadre(page)).toBe('100 g');
     expect(await hidratacionAplicada(page)).toBe('100 %');
@@ -159,7 +176,7 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
     // harina TOTAL = 450 + 50 = 500 · agua TOTAL = 300 + 50 = 350 · hidratación = 350/500 = 70 %.
     await page.getByRole('button', { name: /Levadura fresca/ }).click();
     await ponerGramos(page, '15');
-    await ponerHidratacion(page, '100');
+    await ponerHidratacionAl100(page);
 
     const mm = parseInt((await masaMadre(page)).replace(/\D/g, ''), 10);
     const [hRestar, aRestar] = (await restas(page)).map(t => parseInt(t.replace(/\D/g, ''), 10));
@@ -173,7 +190,7 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
   });
 
   test('CASO 1 (normal) · los cuatro escenarios del bloque educativo coinciden con el motor al gramo', async ({ page }) => {
-    await ponerHidratacion(page, '100');
+    await ponerHidratacionAl100(page);
 
     // Baguette: 2 g de seca × 20 = 40 g de MM ; 40 × 100/200 = 20 harina ; 40 − 20 = 20 agua
     await page.getByRole('button', { name: /Levadura seca/ }).click();
@@ -230,11 +247,11 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
     await page.getByRole('button', { name: /Levadura seca/ }).click();
     await ponerGramos(page, '3');
 
-    await ponerHidratacion(page, '0');               // por debajo del mínimo → el navegador lo sube a 50
+    await ponerHidratacion(page, '0', '50');         // por debajo del mínimo → el navegador lo sube a 50
     expect(await page.locator('#hidratacion-mm').inputValue()).toBe('50');
     expect(await hidratacionAplicada(page)).toBe('50 %');
 
-    await ponerHidratacion(page, '300');             // por encima del máximo → el navegador lo baja a 150
+    await ponerHidratacion(page, '300', '150');      // por encima del máximo → el navegador lo baja a 150
     expect(await page.locator('#hidratacion-mm').inputValue()).toBe('150');
     expect(await hidratacionAplicada(page)).toBe('150 %');
 
@@ -292,7 +309,7 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
     // eso son 10.000 g de masa madre: 5.000 de harina y 5.000 de agua.
     // El formato español obligatorio (CLAUDE.md §2) pide «10.000 g», no el número crudo.
     await page.getByRole('button', { name: /Levadura seca/ }).click();
-    await ponerHidratacion(page, '100');
+    await ponerHidratacionAl100(page);
     await ponerGramos(page, '500');
     expect(await masaMadre(page)).toBe('10.000 g');
     // Sin punto en las restas, y no es un descuido: es-ES NO agrupa los millares de un número
@@ -306,7 +323,7 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
 
   test('REGRESIÓN 290 · el parseo rechaza la basura y lee bien el millar español', async ({ page }) => {
     await page.getByRole('button', { name: /Levadura seca/ }).click();
-    await ponerHidratacion(page, '100');
+    await ponerHidratacionAl100(page);
 
     // Lo que no es un número se rechaza y no produce resultado. Antes «12abc» daba 240 g,
     // «1e3» daba 20.000 g y «10.5.3» daba 210 g, porque `parseFloat` se queda con el prefijo.
@@ -332,7 +349,7 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
     // al 100 % son 0,33 g de masa madre, que redondean a 0. Presentar «Masa madre: 0 g» con
     // sus restas de «− 0 g» era dar por buena una respuesta que no lo es.
     await page.getByRole('button', { name: /Levadura fresca/ }).click();
-    await ponerHidratacion(page, '100');
+    await ponerHidratacionAl100(page);
     await ponerGramos(page, '0,05');
 
     await expect(page.locator('[class*="resultValorGrande"]')).toHaveCount(0);
@@ -401,6 +418,7 @@ test.describe('Sustitución de levadura por masa madre — lo que promete el <h1
 test.describe('RE-INSPECCIÓN 31/08/2026 — motor sin tocar, verificación independiente', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
   });
 
   test('CASO 1 (normal) · levadura instantánea, 12 g al 100 % = 240 g de masa madre, −120/−120', async ({ page }) => {
@@ -408,7 +426,7 @@ test.describe('RE-INSPECCIÓN 31/08/2026 — motor sin tocar, verificación inde
     // harina = round(240 × 100/200) = 120 ; agua = 240 − 120 = 120
     await page.getByRole('button', { name: /Levadura instantánea/ }).click();
     await ponerGramos(page, '12');
-    await ponerHidratacion(page, '100');
+    await ponerHidratacionAl100(page);
 
     expect(await masaMadre(page)).toBe('240 g');
     expect(await hidratacionAplicada(page)).toBe('100 %');

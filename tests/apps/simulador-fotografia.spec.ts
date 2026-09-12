@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-fotografia (segmento interactiva con motor de exposición)
@@ -71,17 +72,34 @@ const TOLERANCIA_OK = 0.3;
 /**
  * Mueve un deslizador. Un <input type="range"> no acepta fill(), y arrastrar con el ratón no
  * da un índice exacto, así que se escribe con el setter nativo y se dispara el evento input
- * que React escucha. El navegador satura solo fuera de [min, max]: eso es justo lo que el
- * test de saturación quiere observar.
+ * que React escucha; `sembrarValor` comprueba además que el estado de React lo recogió. El
+ * navegador satura solo fuera de [min, max]: eso es justo lo que el test de saturación quiere
+ * observar, y por eso ahí hay que decir en `esperado` el índice en que acaba el recorrido.
  */
-async function mover(page: Page, id: string, valor: number): Promise<void> {
-  await page.locator(`#${id}`).evaluate((el, v) => {
-    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!;
-    setter.call(el, v);
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  }, String(valor));
+async function mover(page: Page, id: string, valor: number, esperado = valor): Promise<void> {
+  await sembrarValor(page, `#${id}`, valor, { esperado });
 }
+
+/**
+ * Lleva un deslizador al índice pedido partiendo SIEMPRE de otro puesto. Hace falta porque los
+ * tres barridos del CASO 1 recorren el rango ENTERO, y en el puesto que coincide con la
+ * combinación de referencia `mover` no movería nada: el estado de React ya vale eso, así que el
+ * test daría verde sin haber ejercitado la compensación ni una vez. Detectado con
+ * `SIEMBRA_ESTRICTA=1` (ver tests/apps/_hidratacion.ts). En ese puesto la comprobación pasa a
+ * ser más fuerte, no más débil: salir y volver tiene que devolver la combinación de partida.
+ */
+async function moverDesdeOtroPuesto(
+  page: Page,
+  id: string,
+  idx: number,
+  referencia: number,
+): Promise<void> {
+  if (idx === referencia) await mover(page, id, idx === 0 ? 1 : idx - 1);
+  await mover(page, id, idx);
+}
+
+/** Los tres deslizadores, el testigo de que la app ya responde. */
+const DESLIZADORES = ['#iso-slider', '#ap-slider', '#sh-slider'];
 
 /** Texto del indicador de exposición, p. ej. «Exposición correcta (+0,0 EV)». */
 function exposicion(page: Page) {
@@ -144,7 +162,9 @@ async function elegirModo(page: Page, nombre: 'libre' | 'compensado'): Promise<v
 
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
-  await page.waitForSelector('#iso-slider');
+  // Que el deslizador EXISTA no basta: viaja en el HTML servido y está en pantalla antes de
+  // que React lo haya montado, así que el primer movimiento se perdería (ver _hidratacion.ts).
+  await esperarHidratacion(page, DESLIZADORES);
 });
 
 /**
@@ -186,7 +206,7 @@ test('CASO 1 · el modo compensado conserva la exposición en todo el recorrido 
   ];
   for (const [idx, dia, velEsperada, ev] of diafragmas) {
     await volverAlPuntoDePartida(page);
-    await mover(page, 'ap-slider', idx);
+    await moverDesdeOtroPuesto(page, 'ap-slider', idx, 2); // Retrato parte de f/2,8 (idx 2)
     await expect(rotulo(page, 'ap-slider')).toHaveText(dia);
     expect(await rotulo(page, 'sh-slider').textContent(), `compensar f/2,8 → ${dia}`).toBe(velEsperada);
     expect(await evDelMarcador(page), `ΔEV tras compensar ${dia}`).toBeCloseTo(ev, 3);
@@ -209,7 +229,7 @@ test('CASO 1 · el modo compensado conserva la exposición en todo el recorrido 
   ];
   for (const [idx, iso, velEsperada] of isos) {
     await volverAlPuntoDePartida(page);
-    await mover(page, 'iso-slider', idx);
+    await moverDesdeOtroPuesto(page, 'iso-slider', idx, 3); // Retrato parte de ISO 800 (idx 3)
     await expect(rotulo(page, 'iso-slider')).toHaveText(iso);
     expect(await rotulo(page, 'sh-slider').textContent(), `compensar ISO 800 → ${iso}`).toBe(velEsperada);
     await expect(exposicion(page)).toContainText('Exposición correcta');
@@ -229,7 +249,7 @@ test('CASO 1 · el modo compensado conserva la exposición en todo el recorrido 
   ];
   for (const [idx, vel, isoEsperado] of velocidades) {
     await volverAlPuntoDePartida(page);
-    await mover(page, 'sh-slider', idx);
+    await moverDesdeOtroPuesto(page, 'sh-slider', idx, 7); // Retrato parte de 1/125 s (idx 7)
     await expect(rotulo(page, 'sh-slider')).toHaveText(vel);
     expect(await rotulo(page, 'iso-slider').textContent(), `compensar 1/125 s → ${vel}`).toBe(isoEsperado);
     await expect(exposicion(page)).toContainText('Exposición correcta');
@@ -453,12 +473,18 @@ test('límites de los deslizadores y profundidad de campo (Paisaje, modo libre)'
   await expect(page.locator('[class*="exposureMarker"]')).toHaveAttribute('style', /left:\s*100%/);
 
   // (c) Saturación del rango. Por arriba (99) → idx 6/8/12; por abajo (-5) → idx 0/0/0.
-  for (const id of ['iso-slider', 'ap-slider', 'sh-slider']) await mover(page, id, 99);
+  // Se baja antes al índice 1 A PROPÓSITO: ISO y diafragma vienen ya del tope por (a) y (b), y
+  // pedir 99 desde el tope no movería nada —el navegador dejaría el valor donde está y React
+  // descartaría el evento por duplicado—, así que la comprobación pasaría sin haber saturado
+  // nada (ver tests/apps/_hidratacion.ts).
+  const TOPE: Record<string, number> = { 'iso-slider': 6, 'ap-slider': 8, 'sh-slider': 12 };
+  for (const id of Object.keys(TOPE)) await mover(page, id, 1);
+  for (const id of Object.keys(TOPE)) await mover(page, id, 99, TOPE[id]);
   await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 6400');
   await expect(rotulo(page, 'ap-slider')).toHaveText('f/22');
   await expect(rotulo(page, 'sh-slider')).toHaveText('1/4000 s');
 
-  for (const id of ['iso-slider', 'ap-slider', 'sh-slider']) await mover(page, id, -5);
+  for (const id of Object.keys(TOPE)) await mover(page, id, -5, 0);
   await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 100');
   await expect(rotulo(page, 'ap-slider')).toHaveText('f/1,4');
   await expect(rotulo(page, 'sh-slider')).toHaveText('1 s');
@@ -471,6 +497,9 @@ test('límites de los deslizadores y profundidad de campo (Paisaje, modo libre)'
   // (d) Monotonía: al cerrar el diafragma el desenfoque de fondo debe DECRECER en todo el
   //     recorrido. Que creciera al cerrar sería el fallo de signo clásico.
   const desenfoques: number[] = [];
+  // Partir del tope: el diafragma viene de idx 0 por la saturación de (c), y arrancar el
+  // barrido en 0 no movería nada en la primera vuelta.
+  await mover(page, 'ap-slider', 8);
   for (let idx = 0; idx <= 8; idx++) {
     await mover(page, 'ap-slider', idx);
     desenfoques.push(await desenfoqueFondo(page));

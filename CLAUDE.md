@@ -472,6 +472,39 @@ o en la anterior — los hay de verdad, como parsear un `dataset` que escribe la
 > habitual del catálogo: cabecera de `scripts/check-parser-numerico.mjs`. Sus casos de prueba, en
 > `scripts/pruebas/parser-numerico.tsx`.
 
+### Candado de la hidratación en los tests
+
+`npm run check:hidratacion` — lo ejecuta también `npm run build`, y **rompe el build** si un
+fichero de `tests/` escribe en un input con el setter nativo
+(`HTMLInputElement.prototype`) fuera de **`tests/apps/_hidratacion.ts`**, que es donde vive esa
+escritura con las dos esperas que la hacen válida: `sembrarValor`, `sembrarValorAcotado` (cuando
+el control capa el valor) y `esperarValorEnReact` (para los `fill()`).
+
+`page.goto()` espera al evento `load`: garantiza que los chunks se han descargado, no que React
+los haya ejecutado. Sembrar en esa ventana **cambia el DOM y no llega al estado de React**, así
+que la etiqueta, el `aria-label` y el resultado calculado se quedan en el valor viejo y el test
+pasa en verde midiendo otro escenario. Medido con la CPU al 5 %: pedir 2 enlaces en
+`simulador-vsepr` deja DOM=2 y React=4, y sigue así un segundo después de hidratar. Agravante:
+el intento perdido envenena el rastreador de valor de React, que a partir de ahí descarta por
+duplicado cualquier reintento con ese mismo valor — dos specs llevaban un bucle de 20 reintentos
+que no podía funcionar ni en teoría.
+
+⚠️ **Sin pasivo**, como `check:og-image`: barre el árbol de pruebas entero. Se drenó el
+12/09/2026 migrando los 12 specs, así que solo puede encenderlo un test nuevo. Falso positivo:
+`hidratacion-ok: <razón>` en esa línea o en la anterior — lo hay, el test que reproduce la
+carrera a propósito. **No mira los `fill()` ni los clics** anteriores a la hidratación, que
+corren el mismo riesgo: ahí no hay candado posible por la forma del código, porque un `fill()`
+es correcto o no según lo que el test haya esperado antes.
+
+⚠️ Y hay un fallo que **ningún** testigo detecta: sembrar el valor que el input YA tiene. El
+estado de React coincide desde el principio, así que el caso pasa aunque la app esté sorda.
+`SIEMBRA_ESTRICTA=1 npx playwright test tests/apps` lo audita y nombra cada una.
+
+> De qué dos specs en rojo salió y qué NO mira: cabecera de `scripts/check-hidratacion-tests.mjs`.
+> Sus casos de prueba, en `scripts/pruebas/hidratacion-tests.ts`; se le reinyectan con
+> **`npm run hidratacion:probar-candado`**. La carrera misma se reproduce en
+> `tests/hidratacion-carrera.spec.ts`, estrangulando la CPU.
+
 ### Candado de la tarjeta social
 
 `npm run check:og-image` — lo ejecuta también `npm run build`. Vigila la imagen con la que un
