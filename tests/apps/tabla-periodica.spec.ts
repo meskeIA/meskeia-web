@@ -15,6 +15,7 @@ import {
   toleranciaDe,
   unicoPorEstadoYFamilia,
 } from '../../app/tabla-periodica/casos';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — tabla-periodica (segmento interactiva, riesgo 3, 1.182 usos reales)
@@ -1022,5 +1023,307 @@ test.describe('Tabla Periódica · fichas de búsqueda', () => {
     expect(abstractos).toBeGreaterThanOrEqual(3);
     expect(aplicados).toBeGreaterThanOrEqual(3);
     expect(abstractos + aplicados).toBe(12);
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 12/09/2026 — la tarea de aula de `1d905afb`, EN EL NAVEGADOR
+//
+// La cola invalidó la inspección del 30/08 porque el commit `1d905afb` añadió las
+// «Fichas de búsqueda para clase»: 12 fichas numeradas para que un profesor pueda
+// decir «haz las fichas 3, 7 y 11». Lo de arriba (casos 1-6 y los hallazgos 528-532)
+// NO se toca: es el contrato de la app y sigue en verde.
+//
+// El hueco que cubren estos tres casos: los tests del 11/09 prueban el MOTOR de las
+// fichas importando `casos.ts` —12 ms para los 26—, pero nadie había comprobado el
+// formulario: que escribir «hierro» en la ficha 1 y pulsar «Comprobar» dé ✅, que el
+// contador suba, y que una respuesta equivocada se rechace. Un motor correcto cableado
+// a un `onChange` roto corrige bien y no aprueba a nadie, y la app carga igual de bien.
+//
+// LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+//
+//   CASO 7 — NORMAL (aula). Tres fichas de las 12, con la solución sacada de
+//     `elementos-data.ts` y del convenio de `casos.ts`, no de lo que devuelva la app:
+//
+//       ficha 1 · «un átomo tiene 26 protones» → Z = 26 es { simbolo: "Fe",
+//                 nombre: "Hierro" }. Sinónimos aceptados = símbolo y nombre
+//                 normalizados → «fe» y «hierro». Se teclea «hierro».
+//       ficha 6 · «el gas noble que cierra el período 2» → grupo 18 + período 2 es
+//                 { numero: 10, simbolo: "Ne", nombre: "Neón" }. Se teclea «neon» SIN
+//                 tilde, que es lo que se teclea de verdad: `normalizar` quita las
+//                 tildes antes de comparar, así que debe valer.
+//       ficha 8 · «a qué familia pertenece el yodo» → el yodo lleva
+//                 familia: "halogenos", y NOMBRES_FAMILIA lo presenta como «halógenos».
+//                 Se teclea «halogenos».
+//
+//     Y el contador «Has resuelto N de 12» tiene que ir a 1, 2 y 3: cuenta veredictos
+//     correctos, así que es el único testigo de que el estado de React se enteró.
+//
+//   CASO 8 — LÍMITE. El último elemento de la tabla y de su período, sintético, sin
+//     peso atómico estándar y sin radio ni electronegatividad medidos:
+//
+//       Og (118, Oganesón) · masa 294 ENTERA → la ficha escribe «[294] u», no
+//         «294,000 u» (es el convenio IUPAC para los elementos sin isótopos con
+//         abundancia natural, y es justo el hallazgo 530) · grupo 18 · período 7 ·
+//         familia "gases-nobles" → «Gases Nobles» · estado "solido" → «Sólido» ·
+//         radioAtomico null → «N/D» · electronegatividad null → «N/D» ·
+//         configuración «[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶»
+//         Se busca «oganeson» sin tilde: son 14 de 118 los nombres con tilde o eñe, y
+//         el oganesón es uno de ellos (hallazgo 528).
+//
+//     Y el límite de la ficha numérica: la ficha 4 pide la masa del cobre, que en los
+//     datos es 63.546. `comprobarRespuesta` la compara con `parseSpanishNumber`, así
+//     que «63,546» con coma española debe entrar; y la propia app declara un margen del
+//     1 % —max(0,01; 0,63546) = 0,63546—, así que «63,5» (diferencia 0,046) entra y
+//     «29», el número atómico del cobre, que es el error que la pista nombra, no.
+//
+//   CASO 9 — LO QUE DEBE RECHAZARSE. Cuatro negativas y una búsqueda sin resultados:
+//       · campo vacío        → motivo 'vacia': «Escribe una respuesta antes de
+//                              comprobar», y el contador NO sube.
+//       · ficha 1 con «Cu»   → un elemento real, pero no el de Z = 26.
+//       · ficha 4 con texto  → `parseSpanishNumber('sesenta y tres')` es NaN, y NaN no
+//                              puede colar como acierto por redondeo ni salir a pantalla.
+//       · ficha 8 con «26»   → una ficha de TEXTO nunca cae a la rama numérica: 26
+//                              tecleado donde se pide una familia es un fallo.
+//       · buscar «kriptonita» → «Mostrando 0 de 118 elementos» y ninguna celda activa.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** La tarjeta de una ficha de aula, acotada por su campo de respuesta. */
+const tarjetaFicha = (page: Page, id: number) =>
+  page.locator('article').filter({ has: page.locator(`#respuesta-ficha-${id}`) });
+
+/** Deja la app lista para que un clic o una siembra lleguen al estado de React. */
+async function abrirHidratada(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['#busqueda', '#respuesta-ficha-1']);
+}
+
+/**
+ * Responde una ficha de aula y devuelve el veredicto tal como se lee en pantalla.
+ * Con `respuesta === null` no siembra nada: es el caso del campo vacío.
+ */
+async function responderFicha(
+  page: Page,
+  id: number,
+  respuesta: string | null,
+): Promise<string> {
+  if (respuesta !== null) await sembrarValor(page, `#respuesta-ficha-${id}`, respuesta);
+  await tarjetaFicha(page, id).getByRole('button', { name: 'Comprobar' }).click();
+  const veredicto = tarjetaFicha(page, id).locator('[class*="__aulaVeredicto"]');
+  await expect(veredicto).toBeVisible();
+  return (await veredicto.innerText()).replace(/\s+/g, ' ').trim();
+}
+
+const ACIERTO = '¡Correcto! Lo has encontrado.';
+const FALLO = 'Todavía no. Vuelve a la tabla y fíjate en la pista.';
+const VACIA = 'Escribe una respuesta antes de comprobar.';
+
+/** El texto del contador de fichas resueltas, sin saltos de línea. */
+async function contadorFichas(page: Page): Promise<string> {
+  return (await page.locator('[class*="__aulaContadorTexto"]').innerText()).replace(/\s+/g, ' ');
+}
+
+test.describe('RE-INSPECCIÓN 12/09/2026 · la tarea de aula en el navegador', () => {
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 7 — NORMAL: tres fichas resueltas de verdad en el formulario
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 7 · las fichas 1, 6 y 8 aceptan la respuesta correcta y el contador sube', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+
+    // El contador arranca a cero: si ya viniera a 1, lo que mida después no probaría nada.
+    expect(await contadorFichas(page)).toBe('Has resuelto 0 de 12');
+
+    // ficha 1 · Z = 26 → Fe «Hierro» (elementos-data.ts, numero: 26). Vale el NOMBRE,
+    // no solo el símbolo: `sinonimosDe` genera los dos.
+    expect(await responderFicha(page, 1, 'hierro')).toContain(ACIERTO);
+    expect(await contadorFichas(page)).toBe('Has resuelto 1 de 12');
+
+    // ficha 6 · grupo 18 + período 2 → Ne «Neón». Se teclea SIN tilde a propósito:
+    // `normalizar` hace NFD y borra los diacríticos antes de comparar.
+    expect(await responderFicha(page, 6, 'neon')).toContain(ACIERTO);
+    expect(await contadorFichas(page)).toBe('Has resuelto 2 de 12');
+
+    // ficha 8 · el yodo lleva familia: "halogenos" → se presenta «halógenos».
+    expect(await responderFicha(page, 8, 'halogenos')).toContain(ACIERTO);
+    expect(await contadorFichas(page)).toBe('Has resuelto 3 de 12');
+
+    // Y la solución desplegada dice exactamente la respuesta canónica, no otra: es lo
+    // que un profesor lee para corregir a mano.
+    await tarjetaFicha(page, 8).getByRole('button', { name: 'Ver solución' }).click();
+    const solucion = (await page.locator('#solucion-ficha-8').innerText()).replace(/\s+/g, ' ');
+    expect(solucion).toContain('Respuesta: halógenos');
+    expect(solucion).toContain('Esa columna es la de los halógenos');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 8 — LÍMITE: el último de la tabla, y la ficha numérica en su margen
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 8 · el oganesón se encuentra sin tilde y su ficha no inventa precisión', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+
+    // «oganeson» sin tilde: uno de los 14 nombres con tilde o eñe (hallazgo 528).
+    await sembrarValor(page, '#busqueda', 'oganeson');
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible();
+    expect(
+      await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+    ).toEqual(['Oganesón (Og)']);
+
+    const og = await fichaDe(page, 'Oganesón (Og)');
+    // masa: 294 (entera, número másico del isótopo más estable) → corchetes IUPAC.
+    expect(og).toContain('Masa atómica: [294] u');
+    expect(og).not.toContain('294,000');
+    expect(og).toContain('Número atómico: 118');
+    expect(og).toContain('Grupo: 18');
+    expect(og).toContain('Período: 7');
+    expect(og).toContain('Familia: Gases Nobles');
+    // estado: "solido" — el oganesón NO es gas pese a estar en la columna de los nobles.
+    expect(og).toContain('Estado: Sólido');
+    // radioAtomico y electronegatividad son null en los datos: se dice «N/D», no un 0.
+    expect(og).toContain('Radio atómico: N/D');
+    expect(og).toContain('Electronegatividad: N/D');
+    expect(og).not.toContain('Radio atómico: 0');
+    expect(og).toContain('[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶');
+  });
+
+  test('CASO 8 bis · la ficha 4 lee la masa del cobre con coma española y dentro del 1 %', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+
+    // Cu masa: 63.546 → respuestaNumerica 63,546 · tolerancia max(0,01; 1 % ) = 0,63546.
+    expect(await responderFicha(page, 4, '63,546')).toContain(ACIERTO);
+    // «63,5» es el ejemplo que la propia app declara en su párrafo de convenio
+    // («copiar 63,5 de un recuadro que pone 63,546 es haber encontrado el dato»).
+    expect(await responderFicha(page, 4, '63,5')).toContain(ACIERTO);
+    // Y el número atómico del cobre, 29, es el error que la pista de la ficha nombra:
+    // tiene que fallar, no aprobar por estar «cerca».
+    expect(await responderFicha(page, 4, '29')).toContain(FALLO);
+    expect(await contadorFichas(page)).toBe('Has resuelto 0 de 12');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 9 — LO QUE DEBE RECHAZARSE
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 9 · vacío, respuesta plausible pero falsa, texto en ficha numérica y número en ficha de texto', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+
+    // Campo vacío: motivo 'vacia', mensaje propio, y el contador NO se mueve.
+    expect(await responderFicha(page, 2, null)).toContain(VACIA);
+    expect(await contadorFichas(page)).toBe('Has resuelto 0 de 12');
+
+    // Un elemento que existe, pero no es el de Z = 26.
+    expect(await responderFicha(page, 1, 'Cu')).toContain(FALLO);
+
+    // `parseSpanishNumber('sesenta y tres')` es NaN: ni acierto ni «NaN» en pantalla.
+    const textoEnNumerica = await responderFicha(page, 4, 'sesenta y tres');
+    expect(textoEnNumerica).toContain(FALLO);
+    expect(textoEnNumerica).not.toContain('NaN');
+
+    // Una ficha de TEXTO nunca cae a la rama numérica: «26» donde se pide una familia
+    // es un fallo, no un acierto por redondeo.
+    expect(await responderFicha(page, 8, '26')).toContain(FALLO);
+
+    expect(await contadorFichas(page)).toBe('Has resuelto 0 de 12');
+
+    // Y una búsqueda que no existe deja la tabla en cero, anunciado por el contador.
+    await sembrarValor(page, '#busqueda', 'kriptonita');
+    await expect(page.getByText('Mostrando 0 de 118 elementos')).toBeVisible();
+    await expect(page.locator(CELDA_ACTIVA)).toHaveCount(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 12/09/2026
+// Marcados con test.fail(): afirman lo que DEBERÍA pasar, así que hoy fallan a
+// propósito. Al repararse se les quita la marca y quedan como regresión.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('hallazgos abiertos · 12/09/2026', () => {
+  test('533 · la tabla comparativa del bloque educativo contradice las fichas de la app', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // Es el mismo defecto que el «radio de Cs» reparado el 23/08 —ese quedó bien: el
+    // paso 5 nombra Fr 348 pm, Cs 298 pm y He 31 pm, que son los tres valores del
+    // módulo—, pero la tabla comparativa de los grupos no se revisó y tres de sus siete
+    // filas riñen con lo que la propia app enseña al abrir una casilla:
+    //
+    //   fila                        dice        la app muestra
+    //   alcalinotérreos (Gp2)       0,9–1,3     Be 1,57 (y Mg 1,31): fuera del rango
+    //   gases nobles (Gp18)         No aplicable Kr 3,00 · Xe 2,60 · Rn 2,20
+    //   metales de transición       1,3–2,5     Au 2,54 · Y 1,22: fuera por los dos lados
+    //
+    // Un estudiante que abra el berilio lee 1,57 y cuatro pantallas más abajo lee que su
+    // familia va de 0,9 a 1,3. El berilio es la excepción clásica del grupo 2, así que
+    // el arreglo puede ser ampliar el rango o nombrar la excepción, pero no dejar las dos
+    // cifras contradiciéndose en la misma página.
+    const filas = await page
+      .locator('[class*="__comparativaTable"] tbody tr')
+      .evaluateAll((rs) => rs.map((r) => Array.from((r as HTMLTableRowElement).cells).map((c) => c.innerText.trim())));
+
+    const alcalinoterreos = filas.find((f) => f[0].includes('alcalinotérreos'));
+    const nobles = filas.find((f) => f[0].includes('Gases nobles'));
+
+    // El berilio, en su ficha: electronegatividad 1,57.
+    expect(await fichaDe(page, 'Berilio (Be)')).toContain('Electronegatividad: 1,57');
+    await cerrarFicha(page);
+    // El rango declarado tiene que cubrirlo.
+    expect(alcalinoterreos?.[2]).not.toBe('0,9–1,3 (baja)');
+
+    // El kriptón, en su ficha: electronegatividad 3,00.
+    expect(await fichaDe(page, 'Kriptón (Kr)')).toContain('Electronegatividad: 3,00');
+    await cerrarFicha(page);
+    // …así que «No aplicable» para los gases nobles es falso en esta misma app.
+    expect(nobles?.[2]).not.toBe('No aplicable');
+  });
+
+  test('534 · el origen sintético solo llega al JSON-LD, nunca a la pantalla', async ({ page }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // La reparación del hallazgo 531 hizo lo correcto —sacar «Sintético» del filtro de
+    // ESTADO, porque el origen no es un estado físico— y dejó el dato guardado aparte:
+    // `origen: 'sintetico'` está en los 24 elementos con Z ≥ 95 de elementos-data.ts.
+    // Pero ese campo no se lee en NINGÚN punto de page.tsx (solo `origenFocoRef`, que es
+    // otra cosa), así que la información desapareció de la interfaz sin sustituto:
+    //   · la ficha del americio no dice que sea artificial;
+    //   · no hay filtro, insignia ni leyenda que lo diga;
+    //   · y mientras tanto el faqJsonLd de metadata.ts SÍ lo afirma —«los del 95 al 118
+    //     son sintéticos»—, de modo que la app se lo cuenta a Google y a las IAs y no al
+    //     estudiante que la tiene delante. Medido: «sintétic» sale 3 veces en el HTML
+    //     servido (las tres dentro del JSON-LD) y 0 veces en el texto visible.
+    const am = await fichaDe(page, 'Americio (Am)');
+    expect(am).toContain('Número atómico: 95');
+    expect(am).toMatch(/sint[eé]tic/i);
+  });
+
+  test('535 · los doce botones «Comprobar» de las fichas comparten nombre accesible', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // Llegó con `1d905afb`. Las 12 tarjetas son <article> sin nombre accesible (ni
+    // aria-label ni aria-labelledby apuntando a su <h3>), y sus botones se llaman todos
+    // «Comprobar» y todos «Ver solución». Quien navega por lista de botones con un lector
+    // de pantalla —que es cómo se recorre una página de 12 formularios iguales— oye doce
+    // «Comprobar» seguidos sin saber a qué ficha pertenece cada uno (WCAG 2.4.6). Basta
+    // con aria-label="Comprobar la ficha 3" o con dar nombre al <article>.
+    const comprobar = page.getByRole('button', { name: 'Comprobar', exact: true });
+    await expect(comprobar).toHaveCount(12);
+
+    const nombres = await comprobar.evaluateAll((bs) =>
+      bs.map((b) => b.getAttribute('aria-label') ?? b.textContent?.trim() ?? ''),
+    );
+    // Doce nombres, doce nombres DISTINTOS: hoy son doce veces el mismo.
+    expect(new Set(nombres).size).toBe(12);
   });
 });

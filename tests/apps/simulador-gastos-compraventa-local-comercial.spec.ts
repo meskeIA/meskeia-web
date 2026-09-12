@@ -1,4 +1,8 @@
 import { test, expect, Page } from '@playwright/test';
+// Los casos del 12/09/2026 siembran con estos helpers: `page.goto()` espera al evento
+// `load`, que no garantiza que React haya ejecutado los chunks, y sembrar en esa ventana
+// mueve el DOM sin que el estado se entere (candado `check:hidratacion`).
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — simulador-gastos-compraventa-local-comercial (segmento fiscal, riesgo 1 CRÍTICO)
@@ -1207,5 +1211,436 @@ test.describe('Re-inspección 11/09/2026 — la escala de Aragón y el año nega
     await expect(anios).toHaveValue('');
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
     await expect(page.locator('h3', { hasText: 'NETO QUE RECIBES' })).toHaveText('NETO QUE RECIBES (PARCIAL)');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 12/09/2026 — la cola invalidó la del 11/09 porque el código y sus
+// dependencias habían cambiado (7a02470c reescribió la ficha de Aragón, bc437470 abrió la
+// reventa antes del año y 21a13c6b trajo `PLAZO_ITP` a data/fiscal y tocó `data/itp-ccaa.ts`).
+//
+// Qué se comprueba aquí, con los tres casos resueltos A MANO antes de ejecutar la app:
+//   · CASO 20 (normal)  — Galicia, tipo PLANO del 8 %, en las dos ramas (ITP y obra nueva),
+//     y la mitad del vendedor por su rama nunca probada: vender con PÉRDIDA, donde la
+//     plusvalía municipal es «No sujeta» (art. 104.5 TRLHL) y el IRPF dice «SIN CUOTA».
+//   · CASO 21 (límite)  — Melilla, el tercero de los territorios sin IVA y el que quedaba
+//     sin probar (Ceuta ya la cubre el caso 619/623): bonificación del 50 % de la cuota en
+//     ITP y en AJD (art. 57 bis TRLITPAJD) e IPSI «No calculado» en la renuncia.
+//   · CASO 22 (rechazo) — la comisión de la inmobiliaria del VENDEDOR, el único importe del
+//     panel que no se acota: texto y blur.
+//
+// De dónde sale cada cifra (ninguna de memoria):
+//   · Galicia, tipo general 8 % y AJD 1,5 % → `ITP_CCAA.galicia` de `data/itp-ccaa.ts`, cuyo
+//     `tipoGeneral` lo toma de `TIPOS_ITP_CCAA_2025` («Galicia», tipo 8) en
+//     `data/fiscal/inmuebles.ts`. Sin `tramosProgresivos`: tipo plano.
+//   · Melilla, tipo general 6 % y AJD 0,5 % → `ITP_CCAA.melilla`, con la bonificación del
+//     50 % que aplica `aplicarBonificacionCiudad` (art. 57 bis del TRLITPAJD, RDL 1/1993).
+//   · IVA del local, 21 % → `IVA_INMUEBLES_2025.local` (Ley 37/1992).
+//   · Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (horquilla ×1,5 a ×2, punto medio
+//     ×1,75) y `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, los dos con el 21 % de IVA dentro.
+//   · Plusvalía municipal → `COEFICIENTES_IIVTNU_2025` (12 años → 0,08) y el tipo orientativo
+//     del 25 % de `PLUSVALIA_MUNICIPAL_META`, vía `calcularPlusvaliaMunicipal`.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` y la fórmula del art. 35
+//     LIRPF en `data/fiscal/ganancia-inmueble.ts`.
+//
+// Sobre `PLAZO_ITP` (la pista de esta tanda): esta app NO lo necesita, y por eso no se le
+// reprocha no importarlo. Nació el 11/09 en `data/fiscal/inmuebles.ts` porque garaje tenía
+// «30 días hábiles» escritos a mano en su bloque educativo; aquí se ha buscado el plazo en
+// las 1.195 líneas de la página y en su `metadata.ts` y no se menciona en ningún sitio, así
+// que no hay dato a mano que sellar. El dato del clúster que esta app SÍ aplica sin nombrar
+// es otro, y va como hallazgo abajo: el 25 % de `PLUSVALIA_MUNICIPAL_META.tipoOrientativo`.
+//
+// Los inputs se siembran con `esperarValorEnReact` de `tests/apps/_hidratacion.ts`: el
+// `rellenar` del principio del fichero usa `fill()` a secas, que llega a React pero no espera
+// a que haya hidratado, y en esa ventana el evento se pierde y el caso mide otro escenario.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Testigo de que la app ya escucha: el input que existe en las dos pestañas. */
+const TESTIGOS_12_09 = ['input[aria-label="Precio del local comercial"]'];
+
+/**
+ * Siembra un importe y NO sigue hasta que el estado de React lo ha recogido.
+ * `blur: false` deja el valor VIVO en el campo, que es donde viven los casos de rechazo:
+ * el `min = 0` del NumberInput solo actúa al perder el foco.
+ */
+async function sembrarImporte12(
+  page: Page,
+  etiqueta: string,
+  valor: string,
+  { blur = true }: { blur?: boolean } = {},
+): Promise<void> {
+  const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+  await campo.fill(valor);
+  await esperarValorEnReact(page, campo, valor);
+  if (blur) await campo.blur();
+}
+
+test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del vendedor', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_12_09);
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 20 (NORMAL) — Galicia · 250.000 € · las dos ramas del comprador, y un
+  // vendedor que pierde dinero.
+  //
+  // COMPRADOR, segunda mano (ITP, tipo PLANO del 8 %):
+  //   ITP        = 250.000 × 8 % =                                  20.000,000000
+  //   AJD        = 0 (la transmisión sujeta a TPO no devenga la cuota gradual)
+  //   Notaría (ARANCELES_NOTARIO, RD 1426/1989):
+  //     90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 %
+  //     + 99.746,97×0,05 %                             =              383,433410
+  //     × 1,21 de IVA =                                              463,954426
+  //     horquilla FACTURA_NOTARIAL: ×1,5 = 695,931639 · ×2 = 927,908852
+  //     punto medio ×1,75 =                                          811,920246
+  //   Registro (ARANCELES_REGISTRO, RD 1427/1989):
+  //     24,04 + 24.040,49×0,175 % + 30.050,60×0,125 % + 90.151,82×0,075 %
+  //     + 99.746,97×0,030 %                            =              201,212064
+  //     + 6,010121 de presentación + 3,005061 de nota simple =        210,227246
+  //     × 1,21 de IVA =                                              254,374967
+  //   Gestoría (valor inicial del campo) =                            500,000000
+  //   Total (sumarLineasVisibles, cada línea ya redondeada al céntimo):
+  //     20.000,00 + 0 + 811,92 + 254,37 + 500 =                    21.566,290000
+  //     → 21.566,29 / 250.000 = 8,626516 % → «8,63%»
+  //   COSTE TOTAL = 250.000 + 21.566,29 =                          271.566,290000
+  //
+  // COMPRADOR, obra nueva (IVA 21 % + AJD 1,5 %):
+  //   IVA   = 250.000 × 21 % =                                       52.500,00
+  //   AJD   = 250.000 × 1,5 % =                                       3.750,00
+  //   Total = 52.500 + 3.750 + 811,92 + 254,37 + 500 =               57.816,29
+  //     → 57.816,29 / 250.000 = 23,126516 % → «23,13%»
+  //   COSTE TOTAL =                                                 307.816,29
+  //
+  // VENDEDOR (rama nueva: PÉRDIDA patrimonial y plusvalía NO SUJETA):
+  //   compra 300.000 + 25.000 de gastos · venta 250.000 · 6 años · suelo 60.000 · total
+  //   150.000 · comisión 3 % (valor inicial) · gestoría del vendedor vacía (= 0)
+  //   incremento real = 250.000 − 300.000 = −50.000 ≤ 0 → art. 104.5 TRLHL: NO SUJETA,
+  //     y `calcularPlusvaliaMunicipal` devuelve 0 con `exento: true` (no es un 0 por
+  //     falta de datos: los tres campos están rellenos, así que ni el total ni el neto
+  //     se rotulan «parcial»).
+  //   valor de adquisición = 300.000 + 25.000 =                     325.000,00
+  //   comisión = 250.000 × 3 % =                                      7.500,00
+  //   valor de transmisión = 250.000 − 7.500 − 0 =                   242.500,00
+  //   ganancia = 242.500 − 325.000 = −82.500 → PÉRDIDA de              82.500,00
+  //     → cuotaIRPF = 0 («SIN CUOTA»): una pérdida se compensa en la declaración
+  //   total gastos = 0 + 7.500 + 0 + 0 =                               7.500,00
+  //     → 7.500 / 250.000 = 3 % → «3,00%»
+  //   neto = 250.000 − 7.500 =                                       242.500,00
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 20 (normal) — Galicia, local de 250.000 €: ITP plano al 8 %, obra nueva al 21 %, y un vendedor que vende con pérdida', async ({ page }) => {
+    await page.locator('#select-ccaa').selectOption('galicia');
+    await sembrarImporte12(page, 'Precio del local comercial', '250000');
+
+    // ── Segunda mano: ITP al tipo general de Galicia, sin AJD
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('20.000,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('811,92 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('695,93 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('927,91 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('254,37 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.566,29 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,63%');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('271.566,29 €');
+
+    // ── Obra nueva del promotor: IVA del 21 % (local, no vivienda) + AJD del 1,5 %
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.locator('h3', { hasText: /^IVA/ }).first()).toHaveText('IVA (21,00%)');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('52.500,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (1,50%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('3750,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('57.816,29 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('23,13%');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('307.816,29 €');
+
+    // ── Vendedor: pérdida patrimonial y plusvalía no sujeta
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrarImporte12(page, 'Precio de compra original', '300000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '25000');
+    await sembrarImporte12(page, 'Años de propiedad', '6');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '60000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '150000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('0,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('No sujeta (sin incremento de valor)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('325.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('242.500,00 €');
+    // Una pérdida se rotula PÉRDIDA y no «exención»: se compensa en la declaración.
+    await expect(page.locator('h3', { hasText: /Pérdida patrimonial/ })).toHaveCount(1);
+    await expect(page.locator('h3', { hasText: /^Ganancia patrimonial/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('82.500,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('SIN CUOTA');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('7500,00 €');
+    // Los tres campos de la plusvalía están rellenos, así que NO son cifras parciales.
+    await expect(page.locator('h3', { hasText: /Total gastos de la venta/ })).toHaveText('Total gastos de la venta');
+    expect(await valorTarjeta(page, /Total gastos de la venta/)).toBe('7500,00 €');
+    expect(await descripcionTarjeta(page, /Total gastos de la venta/)).toContain('3,00%');
+    await expect(page.locator('h3', { hasText: /NETO QUE RECIBES/ })).toHaveText('NETO QUE RECIBES');
+    expect(await valorTarjeta(page, /NETO QUE RECIBES/)).toBe('242.500,00 €');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 21 (LÍMITE) — Melilla · 400.000 €. Dos límites a la vez: el territorio donde no
+  // rige el IVA (IPSI) y la bonificación del 50 % de la cuota del art. 57 bis TRLITPAJD,
+  // que `aplicarBonificacionCiudad` aplica en el MOTOR, no en la app.
+  //
+  //   Notaría: 90,15 + 108,182205 + 45,0759 + 90,15182 + 249.746,97×0,05 %
+  //            = 458,433410 ; × 1,21 = 554,704426
+  //            horquilla ×1,5 = 832,056639 · ×2 = 1.109,408852 · medio ×1,75 = 970,732746
+  //   Registro: 171,287973 + 249.746,97×0,030 % = 246,212064 ; + 9,015182 = 255,227246
+  //             × 1,21 = 308,824967
+  //
+  // Segunda mano (ITP):
+  //   cuota íntegra = 400.000 × 6 % = 24.000 → bonificada al 50 % =      12.000,00
+  //   tipo EFECTIVO en la etiqueta = 12.000 / 400.000 = 3 % (el nominal de la tabla, 6 %,
+  //     desmentiría al importe de al lado)
+  //   total = 12.000 + 970,73 + 308,82 + 500 =                           13.779,55
+  //     → 13.779,55 / 400.000 = 3,444888 % → «3,44%»
+  //   COSTE TOTAL =                                                     413.779,55
+  //
+  // Renuncia a la exención (art. 20.Dos LIVA) en Melilla:
+  //   allí no hay IVA al que renunciar (rige el IPSI): el impuesto principal NO se cifra,
+  //   pero la cuota gradual de AJD sí se devenga y también se bonifica (art. 57 bis.1):
+  //   AJD = 400.000 × 0,5 % = 2.000 → bonificada =                        1.000,00
+  //     tipo efectivo = 1.000 / 400.000 = 0,25 %
+  //   total PARCIAL = 0 + 1.000 + 970,73 + 308,82 + 500 =                 2.779,55
+  //     → 2.779,55 / 400.000 = 0,694888 % → «0,69%»
+  //   COSTE TOTAL (PARCIAL) = 400.000 + 2.779,55 =                      402.779,55
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 21 (límite) — Melilla: el 50 % de bonificación en la cuota del ITP y del AJD, y el IPSI que no se cifra', async ({ page }) => {
+    await page.locator('#select-ccaa').selectOption('melilla');
+    await sembrarImporte12(page, 'Precio del local comercial', '400000');
+
+    // El recuadro de la ciudad: tipo NOMINAL del 6 %, AJD del 0,5 % y, donde no rige el
+    // IVA, el impuesto que sí rige con su «No calculado» (hallazgo 725, reparado).
+    const recuadro = page.locator('#select-ccaa').locator('xpath=../..');
+    await expect(recuadro).toContainText('IPSI (obra nueva)');
+    await expect(recuadro).toContainText('No calculado');
+    await expect(recuadro).toContainText('Bonificación automática del 50% para inmuebles en Melilla');
+
+    // ── Segunda mano: la cuota llega bonificada y la pantalla lo DICE (hallazgos 619/623)
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('12.000,00 €');
+    expect(await descripcionTarjeta(page, /^ITP/)).toBe(
+      'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)',
+    );
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('970,73 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('832,06 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('1109,41 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('308,82 €');
+    await expect(page.locator('h3', { hasText: /Total gastos adicionales/ })).toHaveText('Total gastos adicionales');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('13.779,55 €');
+    expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain('3,44%');
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL/ })).toHaveText('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('413.779,55 €');
+
+    // ── Renuncia: ni IVA ni inversión del sujeto pasivo, y el aviso lo dice (hallazgo 727)
+    await page.getByRole('button', { name: /renuncia IVA/ }).click();
+    const cuerpoVisible = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
+    expect(cuerpoVisible).toContain('Aquí no hay IVA al que renunciar');
+    // Y NO el aviso de la renuncia peninsular, que aquí prometería un IVA inexistente
+    expect(cuerpoVisible).not.toContain('Renuncia a la exención de IVA (Art. 20.Dos LIVA)');
+    await expect(page.locator('h3', { hasText: /^IPSI/ }).first()).toHaveText('IPSI');
+    expect(await valorTarjeta(page, /^IPSI/)).toBe('No calculado');
+    expect(await descripcionTarjeta(page, /^IPSI/)).toContain(
+      'En Ciudad Autónoma de Melilla no rige el IVA: la renuncia a la exención tributa por el IPSI',
+    );
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1000,00 €');
+    expect(await descripcionTarjeta(page, /^AJD/)).toBe('Con la bonificación del 50 % de Ceuta y Melilla aplicada');
+    // Falta un impuesto: ni el total ni el coste se dan por firmes.
+    await expect(page.locator('h3', { hasText: /Total gastos adicionales/ })).toHaveText('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2779,55 €');
+    expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain('0,69%');
+    expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain('SIN el IPSI');
+    await expect(page.locator('h3', { hasText: /COSTE TOTAL/ })).toHaveText('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('402.779,55 €');
+    expect(await descripcionTarjeta(page, /COSTE TOTAL/)).toContain('No incluye el IPSI');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 22 (RECHAZO) — la comisión de la inmobiliaria del VENDEDOR.
+  //
+  // Escenario base (el del CASO 11, para poder comparar): venta 400.000 · compra 250.000
+  // + 30.000 de gastos · 12 años · suelo 80.000 · total 200.000 · gestoría del vendedor
+  // 1.500 · comisión 4 %.
+  //   plusvalía: objetivo = 80.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 12 años) × 25 % = 1.600
+  //              real = 150.000 × (80.000/200.000) × 25 % = 15.000 → gana el objetivo
+  //   adquisición = 280.000 · transmisión = 400.000 − 16.000 − 1.500 − 1.600 = 380.900
+  //   ganancia = 100.900 → IRPF = 6.000×19 % + 44.000×21 % + 50.900×23 % = 22.087
+  //   gastos = 1.600 + 16.000 + 1.500 + 22.087 = 41.187 → neto 358.813
+  //
+  // Con la comisión a 0 (que es donde la deja el `min = 0` del NumberInput al salir del
+  // campo, y también lo que vale un campo VACÍO vía `parseSpanishNumberOr`):
+  //   transmisión = 400.000 − 0 − 1.500 − 1.600 = 396.900 → ganancia 116.900
+  //   IRPF = 1.140 + 9.240 + 66.900×23 % (= 15.387) = 25.767
+  //   gastos = 1.600 + 0 + 1.500 + 25.767 = 28.867 → neto 371.133
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 22 (rechazo) — la comisión del vendedor: el texto no se admite y el blur la acota a 0', async ({ page }) => {
+    await sembrarImporte12(page, 'Precio del local comercial', '400000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrarImporte12(page, 'Precio de compra original', '250000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '30000');
+    await sembrarImporte12(page, 'Años de propiedad', '12');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '80000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '200000');
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '1500');
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '4');
+
+    // Referencia con el 4 %
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1600,00 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('16.000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('22.087,00 €');
+    expect(await valorTarjeta(page, /NETO QUE RECIBES/)).toBe('358.813,00 €');
+
+    const comision = page.locator('input[aria-label="Comisión de la inmobiliaria (%)"]');
+
+    // Texto: el NumberInput no admite los caracteres (regex /^-?[\d.,]*$/), el campo queda
+    // vacío y `parseSpanishNumberOr` lo lee como 0 — no como NaN propagado a la cuota.
+    await comision.fill('');
+    await esperarValorEnReact(page, comision, '');
+    await comision.type('abc');
+    await expect(comision).toHaveValue('');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('0,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('25.767,00 €');
+    expect(await valorTarjeta(page, /NETO QUE RECIBES/)).toBe('371.133,00 €');
+
+    // Negativa: al SALIR del campo, el `min = 0` del NumberInput la lleva a 0 y todo el
+    // panel vuelve a cuadrar. Lo que ocurre MIENTRAS el campo tiene el foco va abajo.
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '-4');
+    await expect(comision).toHaveValue('0');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('0,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('25.767,00 €');
+    expect(await valorTarjeta(page, /NETO QUE RECIBES/)).toBe('371.133,00 €');
+  });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // HALLAZGOS ABIERTOS del 12/09/2026, con `test.fail()`: afirman lo que DEBERÍA
+  // ocurrir, así que hoy fallan a propósito. Cuando se reparen se les quita el
+  // `test.fail()` y quedan como regresión — comprobando antes, uno a uno, que lo que
+  // afirman sigue siendo lo correcto.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /**
+   * HALLAZGO 12/09/2026 (MEDIO · cálculo) — la comisión de la inmobiliaria y la gestoría del
+   * VENDEDOR son los dos únicos importes del panel que no se acotan mientras el campo tiene
+   * el foco, y en negativo parten la pantalla en dos mitades que usan valores distintos del
+   * MISMO dato:
+   *
+   *   const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;   // sin Math.max
+   *   const gestoria    = parseSpanishNumberOr(gastosGestoriaVenta);         // sin Math.max
+   *
+   * Con «−4» vivo en el campo, sobre el escenario del CASO 22:
+   *   · la tarjeta «Comisión de la inmobiliaria» imprime −16.000,00 €: un gasto que cobra;
+   *   · el total de gastos baja de 41.187,00 € a 13.212,00 € y el neto SUBE a 386.788,00 €;
+   *   · y a la vez `calcularGananciaInmueble` sí la acota (su `positivo()` deja
+   *     `gastosTransmision` en 0 porque −16.000 + 1.500 es negativo), así que el valor de
+   *     transmisión se calcula SIN NINGÚN GASTO (398.400 €) y el IRPF sube a 26.112,00 €.
+   *
+   * De modo que la misma pantalla cobra el IRPF de una venta sin gastos y descuenta del neto
+   * un gasto negativo. La app ya resolvió esto en la mitad del comprador —`const gestoria =
+   * Math.max(0, parseSpanishNumberOr(gastosGestoria))`, con su comentario explicando que el
+   * importe negativo «se sumaba al total y su tarjeta ni se pintaba»— y en las amortizaciones
+   * del vendedor (`Math.max(0, …)`, CASO 13). Aquí falta en los dos campos que quedan.
+   *
+   * Esperado: acotado a 0, como los otros tres importes → comisión 0,00 €, IRPF 25.767,00 €
+   * y neto 371.133,00 €, que es exactamente lo que la app da en cuanto se sale del campo.
+   */
+  test.fail('HALLAZGO 12/09 (medio) — una comisión NEGATIVA no puede abaratar la venta ni encarecer el IRPF', async ({ page }) => {
+    await sembrarImporte12(page, 'Precio del local comercial', '400000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrarImporte12(page, 'Precio de compra original', '250000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '30000');
+    await sembrarImporte12(page, 'Años de propiedad', '12');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '80000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '200000');
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '1500');
+
+    // Comisión negativa VIVA en el campo (sin blur: el min = 0 solo actúa al perder el foco)
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '-4', { blur: false });
+
+    // HOY: −16.000,00 € · 26.112,00 € · 13.212,00 € · 386.788,00 €
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('0,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('396.900,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('25.767,00 €');
+    expect(await valorTarjeta(page, /Total gastos de la venta/)).toBe('28.867,00 €');
+    expect(await valorTarjeta(page, /NETO QUE RECIBES/)).toBe('371.133,00 €');
+  });
+
+  /**
+   * HALLAZGO 12/09/2026 (MEDIO · contenido) — la cuota de plusvalía municipal no se puede
+   * reconstruir desde la página, y el único porcentaje municipal que sí aparece da otra cifra.
+   *
+   * `calcularPlusvaliaMunicipal` liquida con el tipo ORIENTATIVO del 25 %
+   * (`PLUSVALIA_MUNICIPAL_META.tipoOrientativo`), no con el máximo legal. Sobre el escenario
+   * del CASO 22 eso son 80.000 × 0,08 × 25 % = 1.600,00 €, que es lo que la app cobra. Pero
+   * en las 42.000 caracteres de texto de la página —bloque educativo incluido, que se monta
+   * siempre en el DOM— el 25 % no aparece NI UNA VEZ, y el único tipo municipal escrito es
+   * «hasta el máximo legal del 30%» (nota del DataReference, de
+   * `PLUSVALIA_MUNICIPAL_META.nota`). Con ese 30 % la cuota serían 1.920,00 €: quien intente
+   * comprobar el número con lo que la propia página le da, no llega.
+   *
+   * Es el hallazgo 671 del 10/09 —«los dos FAQPage daban el máximo legal del 30 % y no el
+   * 25 % que la app aplica»— y el 729 del 11/09 —«la cuota era correcta y no se podía
+   * reconstruir»—, cuya reparación NO llegó a esta app: `simulador-gastos-compraventa-garaje`,
+   * `…-trastero` y `estimador-compraventa-inmueble` imprimen las dos cifras derivadas de la
+   * constante («aplica un tipo del 25 % como referencia orientativa habitual; cada
+   * ayuntamiento fija su propio tipo, con un máximo legal del 30 %») y esta no.
+   *
+   * Esperado: que el tipo aplicado aparezca en la página, derivado de la constante.
+   */
+  test.fail('HALLAZGO 12/09 (medio) — la página no dice el 25 % con el que liquida la plusvalía, y sí el 30 % que no aplica', async ({ page }) => {
+    await sembrarImporte12(page, 'Precio del local comercial', '400000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrarImporte12(page, 'Precio de compra original', '250000');
+    await sembrarImporte12(page, 'Años de propiedad', '12');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '80000');
+
+    // La cuota que hay que poder reconstruir: 80.000 × 0,08 × 25 %
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1600,00 €');
+
+    // `textContent` y no `innerText`: el bloque educativo se monta siempre y se oculta por
+    // CSS (así lo rastrea Googlebot), de modo que su texto también cuenta como «lo que la
+    // página dice».
+    const todo = ((await page.locator('body').textContent()) ?? '').replace(ESPACIO_DURO, ' ');
+    // El 30 % del máximo legal sí está (esto pasa hoy):
+    expect(todo).toContain('máximo legal del 30%');
+    // El 25 % con el que se ha calculado, no. El [^\d,.] evita confundirlo con un «0,25%».
+    expect(todo).toMatch(/(^|[^\d,.])25\s?%/);
+  });
+
+  /**
+   * HALLAZGO 12/09/2026 (BAJO · contenido) — la tarjeta del ITP sigue negando en seco lo que
+   * el recuadro de la misma pantalla acaba de matizar.
+   *
+   * El hallazgo 726 del 11/09 fue exactamente este texto: los textos de local comercial
+   * «descartaban de plano un tipo que la ficha de esa misma comunidad documenta — el 1 % del
+   * art. 121-11 de Aragón por adquirir un inmueble para INICIAR UNA ACTIVIDAD ECONÓMICA»,
+   * que es el supuesto de quien compra un local para abrir un negocio. La reparación llegó al
+   * párrafo del recuadro («Eso no agota los beneficios posibles — alguna comunidad tiene
+   * tipos propios ligados a la ACTIVIDAD…») y al `faqJsonLd`, pero NO a la descripción de la
+   * tarjeta del ITP, que es donde se lee la cifra: sigue diciendo «Tipo general — los locales
+   * comerciales no tienen tipos reducidos».
+   *
+   * En Aragón, por tanto, la misma pantalla afirma las dos cosas.
+   *
+   * Esperado: que la tarjeta no niegue de plano los tipos reducidos.
+   */
+  test.fail('HALLAZGO 12/09 (bajo) — en Aragón la tarjeta del ITP niega los tipos reducidos que su propia ficha documenta', async ({ page }) => {
+    await page.locator('#select-ccaa').selectOption('aragon');
+    await sembrarImporte12(page, 'Precio del local comercial', '300000');
+
+    // Escala del art. 121-1, primer tramo: 300.000 × 8 % (esto pasa hoy)
+    expect(await valorTarjeta(page, /^ITP/)).toBe('24.000,00 €');
+    // La ficha de Aragón, en el recuadro de la izquierda, documenta el 1 % del art. 121-11
+    const recuadro = page.locator('#select-ccaa').locator('xpath=../..');
+    await expect(recuadro).toContainText('art. 121-11');
+    await expect(recuadro).toContainText('iniciar una actividad económica');
+
+    // Y la tarjeta donde se lee la cuota lo niega de plano:
+    expect(await descripcionTarjeta(page, /^ITP/)).not.toContain('no tienen tipos reducidos');
   });
 });

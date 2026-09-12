@@ -71,6 +71,13 @@ import { test, expect, Page } from '@playwright/test';
 // la página, que es lo que convierte esos tests en un ancla y no en una copia (hallazgo 625).
 import { ITP_CCAA } from '../../data/itp-ccaa';
 import { formatNumber, formatTipoNominal } from '../../lib/formatters';
+// El plazo de liquidación del ITP se lee del módulo que lo sella (hallazgo 713, 11/09/2026),
+// no de un literal: es lo que permite que el testigo de la sección 15 siga valiendo el día
+// que una comunidad fije otro plazo.
+import { PLAZO_ITP } from '../../data/fiscal/inmuebles';
+// Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
+// es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 const RUTA = '/simulador-gastos-compraventa-garaje/';
 
@@ -2899,4 +2906,457 @@ test.describe('Hallazgos abiertos — re-inspección del 11/09/2026', () => {
       expect(rotulo).toContain('Beneficios fiscales en Aragón');
     },
   );
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 12/09/2026 — la cola volvió a invalidar la app porque su código y sus
+// dependencias cambiaron tras la inspección del 11/09: `bc437470` (la reventa antes del año
+// ya se puede liquidar, y con su coeficiente), `7a02470c` (Aragón no tiene tipos reducidos
+// de ITP, tiene bonificaciones en cuota — reescribió entera su ficha en `data/itp-ccaa.ts`)
+// y `21a13c6b` (32 hallazgos del 11/09, que tocaron `data/fiscal/inmuebles.ts` y
+// `data/itp-ccaa.ts`, y que trajeron `PLAZO_ITP` al módulo fiscal).
+//
+// Los tres casos de esta tanda entran por donde ninguna anterior había entrado:
+//   · CASO M — Aragón con perfil FAMILIA NUMEROSA: las dos bonificaciones del 50 % y del
+//     60 % (arts. 121-5 y 160-3), que el CASO J del 11/09 no tocó porque probó el 12,5 %
+//     de jóvenes del art. 121-4.
+//   · CASO N — Aragón en 750.000 €, el CUARTO corte de la escala del art. 121-1 (64.500 €
+//     de cuota acumulada) y el último corte finito de la tabla. El CASO K llegó al tercero.
+//   · CASO O — el PRECIO DE COMPRA ORIGINAL ilegible. El CASO 7 del 20/08 probó «1.2.3» en
+//     el precio del garaje (comprador); el campo del vendedor, que es el que alimenta el
+//     IRPF y la exención de la plusvalía, nunca se había probado con un número que el
+//     parser rechaza. Es la familia del hallazgo 740 del 11/09 en el estimador del ISD:
+//     o se lee el importe, o no se da número.
+//
+// Los inputs se siembran con `esperarValorEnReact` de `tests/apps/_hidratacion.ts`: el
+// `rellenar` de arriba usa `fill()` a secas, que llega a React pero NO espera a que haya
+// hidratado, y en esa ventana el evento se pierde y el caso mide otro escenario.
+//
+// De dónde sale CADA cifra (ninguna de memoria):
+//   · Tipo general de Aragón (8 %) → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
+//     leído por `tipoGeneralDe()`.
+//   · Escala de cinco tramos y las cinco bonificaciones → `ITP_CCAA.aragon` en
+//     `data/itp-ccaa.ts`, verificada el 11/09/2026 contra el BOE (BOA-d-2005-90006,
+//     Decreto Legislativo 1/2005, arts. 121-1, 121-4, 121-5 y 160-3).
+//   · Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75)
+//     y `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, los dos con el 21 % de IVA dentro.
+//   · Coeficientes de plusvalía → `COEFICIENTES_IIVTNU_2025` y el tipo orientativo del
+//     25 % de `PLUSVALIA_MUNICIPAL_META`, en `data/fiscal/inmuebles.ts`.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 €,
+//     21 % hasta 50.000 €) y la fórmula del art. 35 LIRPF en
+//     `data/fiscal/ganancia-inmueble.ts`.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Los inputs del panel del comprador, testigos de que la app ya escucha. */
+const TESTIGOS_COMPRADOR = ['input[aria-label="Precio del garaje / plaza de parking"]'];
+
+/**
+ * Siembra un importe y NO sigue hasta que el estado de React lo ha recogido.
+ *
+ * `fill()` escribe a través del navegador, así que sí llega a React —pero solo si la app ya
+ * ha hidratado—. `page.goto()` espera al evento `load`, que garantiza que los chunks se han
+ * descargado, no que React los haya ejecutado: sembrar en esa ventana mueve el DOM y deja el
+ * estado en el valor viejo, y el caso pasa en verde midiendo otro escenario (candado
+ * `check:hidratacion`, 12/09/2026).
+ */
+async function sembrarImporte(
+  page: Page,
+  etiqueta: string,
+  valor: string,
+  { blur = true }: { blur?: boolean } = {},
+): Promise<void> {
+  const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+  await campo.fill(valor);
+  await esperarValorEnReact(page, campo, valor);
+  if (blur) await campo.blur();
+}
+
+test.describe('RE-INSPECCIÓN 12/09/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO M (NORMAL) — Aragón · segunda mano · 90.000 € · perfil FAMILIA NUMEROSA.
+   *
+   * Ataca la otra mitad del commit 7a02470c: las bonificaciones en CUOTA de los arts. 121-5
+   * (50 %) y 160-3 (60 %), que la ficha declara como tipos efectivos del 4 % y del 3,20 %
+   * sobre el 8 % general. Antes del 11/09 la ficha traía un «Familia numerosa (zona rural)»
+   * al 4 % con la condición «Municipio rural», que era exactamente al revés: el 50 % del
+   * art. 121-5 no pide medio rural, y lo que hace el medio rural es SUBIRLO al 60 %.
+   *
+   * ITP — `elegirTipoITP('aragon', 'familia-numerosa', 90000, { viviendaHabitual: false })`:
+   *   candidatos por nombre = «Familia numerosa» (4 %) y «Familia numerosa en medio rural»
+   *   (3,20 %). Ninguno es aplicable: el primero exige «Vivienda habitual», que un garaje
+   *   suelto no cumple, y el segundo cuelga de «Los mismos requisitos del art. 121-5», que
+   *   la herramienta no puede dar por cumplidos. Los dos caen en `noComprobables` y se
+   *   liquida el tipo general por la escala del art. 121-1:
+   *     tramo 1 (hasta 400.000 €, 8 %) = 90.000 × 8 % =                      7.200,000000
+   *   tipo EFECTIVO mostrado = 7.200 / 90.000 =                                   8,00 %
+   *
+   * Notaría — `calcularArancelNotarial(90000)` (RD 1426/1989, número 2):
+   *     90,15 + (30.050,61 − 6.010,12) × 0,45 % + (60.101,21 − 30.050,61) × 0,15 %
+   *          + (90.000 − 60.101,21) × 0,10 % =                               273,306895
+   *     × 1,21 (IVA) =                                                       330,701343
+   *   `estimarFacturaNotarial`: min ×1,5 = 496,052014 · max ×2 = 661,402686
+   *                             medio ×1,75 =                                578,727350
+   *
+   * Registro — `calcularRegistro(90000)` (RD 1427/1989, número 2 + REGISTRO_CONCEPTOS):
+   *     24,04 + 24.040,49 × 0,175 % + 30.050,60 × 0,125 % + 29.898,79 × 0,075 % = 126,098200
+   *     + 6,010121 (presentación) + 3,005061 (nota simple) =                 135,113382
+   *     × 1,21 (IVA) =                                                       163,487192
+   *
+   * Total gastos — `sumarLineasVisibles` redondea cada línea ANTES de sumar:
+   *     7.200,00 + 0 (sin AJD en segunda mano) + 578,73 + 163,49 + 300,00 =  8.242,22
+   *     % sobre el precio = 8.242,22 / 90.000 =                                  9,16 %
+   * Coste total = 90.000 + 8.242,22 =                                        98.242,22
+   */
+  test('CASO M (normal) — Aragón, 90.000 €, perfil Familia numerosa: el 50 % y el 60 % del 121-5 se enseñan, no se cobran', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.selectOption('#select-perfil', 'familia-numerosa');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '90000');
+
+    expect(await valorTarjeta(page, 'Precio del garaje')).toBe('90.000,00 €');
+    // 90.000 € no salen del primer tramo, así que el efectivo coincide con el nominal.
+    expect(await tituloTarjeta(page, 'ITP (')).toBe('ITP (8,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('7200,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('578,73 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 496,05 € y 661,40 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('163,49 €');
+    // La gestoría del comprador viene a 300 € por defecto: no se siembra para no escribir el
+    // valor que el campo YA tiene, que es la siembra que no prueba nada.
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('8242,22 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '9,16% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('98.242,22 €');
+
+    // Las dos bonificaciones de familia numerosa se ENSEÑAN como oportunidad y no se cobran.
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    await expect(aviso).toHaveCount(1);
+    const textoAviso = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+    expect(textoAviso).toContain('(8,00% efectivo sobre el precio)');
+    expect(textoAviso).toContain('En Aragón existe');
+    expect(textoAviso).toContain('4,00% — Familia numerosa');
+    expect(textoAviso).toContain('3,20% — Familia numerosa en medio rural');
+    // Los requisitos DE VERDAD del art. 121-5, que la ficha vieja no traía.
+    expect(textoAviso).toContain('Vender la anterior vivienda habitual entre 2 años antes y 4 después');
+    expect(textoAviso).toContain('Renta ≤ 35.000 €');
+    // Y el medio rural aparece donde le toca —subiendo la bonificación al 60 %— y no como
+    // condición del 50 %, que es lo que decía la ficha antes del 11/09/2026.
+    expect(textoAviso).toContain('Residencia habitual en asentamiento rural de rango VIII a X');
+
+    // La escala que la página anuncia es la de la ficha, no una copia (criterio del 625).
+    const escala = (ITP_CCAA.aragon.tramosProgresivos ?? [])
+      .map((t) => `${formatTipoNominal(t.tipo)}%`)
+      .join(' → ');
+    expect(escala).toBe('8% → 8,5% → 9% → 9,5% → 10%'); // los cinco tramos del art. 121-1
+    await expect(
+      page.getByText(`Esta comunidad aplica escala progresiva (${escala})`),
+    ).toBeVisible();
+
+    // El rótulo de la lista sigue nombrando lo que la lista contiene (hallazgo 711, 11/09).
+    await expect(page.locator('h3', { hasText: 'Tipos reducidos en' })).toHaveCount(0);
+    await expect(
+      page.locator('h3', { hasText: 'Beneficios fiscales en Aragón' }),
+    ).toHaveCount(1);
+  });
+
+  /**
+   * CASO N (LÍMITE) — Aragón · segunda mano · 750.000 €, el CUARTO corte de la escala y el
+   * último corte finito del art. 121-1. El CASO K del 11/09 llegó al tercero (500.000 €).
+   *
+   * ITP — cuota acumulada del art. 121-1, con los cortes que la propia ficha documenta
+   * (32.000 a los 400.000 · 36.250 a los 450.000 · 40.750 a los 500.000 · 64.500 a los 750.000):
+   *     400.000 × 8 %   =                                                    32.000,00
+   *   +  50.000 × 8,5 % =                                                     4.250,00   (36.250,00)
+   *   +  50.000 × 9 %   =                                                     4.500,00   (40.750,00)
+   *   + 250.000 × 9,5 % =                                                    23.750,00   (64.500,00)
+   *   tipo EFECTIVO mostrado = 64.500 / 750.000 =                                8,60 %
+   *   (con el tipo general plano del 8 % saldrían 60.000 €: 4.500 € DE MENOS)
+   *
+   * Notaría — `calcularArancelNotarial(750000)`:
+   *     90,15 + 24.040,49 × 0,45 % + 30.050,60 × 0,15 % + 90.151,82 × 0,10 %
+   *          + 450.759,07 × 0,05 % + (750.000 − 601.012,10) × 0,03 % =      603,635830
+   *     × 1,21 =                                                            730,399354
+   *   min ×1,5 = 1.095,599031 · max ×2 = 1.460,798709 · medio ×1,75 =     1.278,198870
+   *
+   * Registro — `calcularRegistro(750000)`:
+   *     24,04 + 24.040,49 × 0,175 % + 30.050,60 × 0,125 % + 90.151,82 × 0,075 %
+   *          + 450.759,07 × 0,030 % + 148.987,90 × 0,020 % =               336,313274
+   *     (por debajo de REGISTRO_MAXIMO = 2.181,67, que aquí no muerde)
+   *     + 9,015182 (presentación + nota simple) = 345,328455 × 1,21 =      417,847431
+   *
+   * Total gastos = 64.500,00 + 0 + 1.278,20 + 417,85 + 300,00 =            66.496,05
+   *     % sobre el precio = 66.496,05 / 750.000 =                               8,87 %
+   * Coste total = 750.000 + 66.496,05 =                                   816.496,05
+   */
+  test('CASO N (límite) — Aragón, 750.000 €: el cuarto corte de la escala del 121-1 liquida 64.500 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.selectOption('#select-perfil', 'discapacidad');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '750000');
+
+    expect(await valorTarjeta(page, 'Precio del garaje')).toBe('750.000,00 €');
+    expect(await tituloTarjeta(page, 'ITP (')).toBe('ITP (8,60%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('64.500,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1278,20 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Factura estimada entre 1095,60 € y 1460,80 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('417,85 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('66.496,05 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '8,87% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('816.496,05 €');
+
+    // El cuarto corte es un dato de la ficha, no un literal de este test: si el art. 121-1
+    // se mueve, el ancla se mueve con él.
+    const tramos = ITP_CCAA.aragon.tramosProgresivos ?? [];
+    let acumulada = 0;
+    let anterior = 0;
+    for (const t of tramos) {
+      const corte = Math.min(750000, t.hasta);
+      if (corte <= anterior) break;
+      acumulada += (corte - anterior) * (t.tipo / 100);
+      anterior = t.hasta;
+    }
+    expect(acumulada).toBeCloseTo(64500, 2);
+  });
+
+  /**
+   * CASO O (DEBE RECHAZARSE) — el PRECIO DE COMPRA ORIGINAL con un número que el parser
+   * rechaza: «1.2.3». `parseSpanishNumber` devuelve NaN (no es un número: tres grupos con
+   * dos puntos), y el regex de `NumberInput` (/^-?[\d.,]*$/) sí lo deja entrar, así que la
+   * app lo tiene delante. Es la familia del hallazgo 740 del 11/09 en el estimador del ISD,
+   * donde un `|| 0` convertía ese NaN en un cero y la app daba una cuota completa sin marcar
+   * los importes que acababa de tirar: o se lee el importe, o no se da número.
+   *
+   * Aquí el NaN alimentaría el valor de adquisición del art. 35 LIRPF y la comprobación de
+   * no sujeción de la plusvalía (art. 104.5 TRLHL). Si colara como 0, el valor de
+   * adquisición bajaría a 0 y la ganancia sería el valor de transmisión ENTERO: 38.800 € de
+   * ganancia inventada y 7.998,00 € de IRPF (6.000 × 19 % + 32.800 × 21 %) donde no hay dato.
+   *
+   * Entrada: Madrid · venta 40.000 € · 8 años · suelo 5.000 € · catastral total 12.000 € ·
+   *          comisión 3 % (la que trae el simulador) · compra «1.2.3», sin salir del campo.
+   *
+   * ESPERADO — la app se ABSTIENE y nombra el campo, sin que el NaN llegue a pantalla:
+   *   plusvalía municipal  = «Sin calcular» (la exención del art. 104.5 necesita la compra)
+   *   comisión             = 40.000 × 3 % =                                    1.200,00
+   *   valor de adquisición · valor de transmisión · ganancia → SIN TARJETA
+   *   IRPF                 = «Sin calcular», y se avisa de que NO está en el neto
+   *   total gastos         = 0 + 1.200 + 0 + 0 =                               1.200,00
+   *   neto                 = 40.000 − 1.200 =                                 38.800,00
+   *   y el neto se declara INCOMPLETO nombrando el precio de compra original.
+   *
+   * REFERENCIA con la compra legible (25.000 €), para ver que lo que falla es el dato y no
+   * el motor: plusvalía 125,00 € (5.000 × 0,10 × 25 %, coeficiente de 8 años), transmisión
+   * 38.675,00 €, ganancia 13.675,00 €, IRPF 2.751,75 € y neto 35.923,25 €.
+   */
+  test('CASO O (debe rechazarse) — un precio de compra ilegible no se lee como cero', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Años de propiedad', '8');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
+
+    // Primero con la compra LEGIBLE, para fijar que el motor sí calcula con dato.
+    await sembrarImporte(page, 'Precio de compra original del garaje', '25000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('125,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('38.675,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('13.675,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2751,75 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('35.923,25 €');
+
+    // Y ahora el número que el parser rechaza, a propósito SIN blur: así lo ve quien teclea.
+    const compra = page.locator('input[aria-label="Precio de compra original del garaje"]');
+    await compra.fill('1.2.3');
+    await esperarValorEnReact(page, compra, '1.2.3');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No calculada (falta el precio de compra original)',
+    );
+    // Ni valor de adquisición, ni de transmisión, ni ganancia: sin dato no hay tarjeta.
+    await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Valor de transmisión' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Pérdida patrimonial' })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.',
+    );
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('38.800,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'INCOMPLETO: falta descontar la plusvalía municipal y el IRPF de la ganancia. Rellena el precio de compra original para obtener el neto real.',
+    );
+
+    // El NaN no se asoma por ninguna parte: ni «No definido» (lo que formatCurrency devuelve
+    // para NaN) ni un «NaN» crudo.
+    await expect(page.getByText('No definido')).toHaveCount(0);
+    const cuerpo = (await page.evaluate(() => document.body.textContent ?? '')).replace(
+      /\s+/g,
+      ' ',
+    );
+    expect(cuerpo).not.toContain('NaN');
+
+    // Al salir del campo, `NumberInput` no puede normalizar lo que no es un número
+    // (parseFloat('1.2.3') → 1,2, pero está dentro de [min, max] y no se reescribe), así
+    // que el texto se queda tal cual y la app sigue absteniéndose.
+    await compra.blur();
+    expect(await compra.inputValue()).toBe('1.2.3');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('38.800,00 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS 12/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar, así que
+// hoy fallan a propósito. Al repararlos se les quita la marca y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgos abiertos — re-inspección del 12/09/2026', () => {
+  /**
+   * ❌ ABIERTO (cálculo, bajo) — un año de propiedad negativo DECIMAL se acepta y liquida la
+   * plusvalía como si fuese una reventa antes del año; el entero «-1» sí se rechaza.
+   *
+   * La página declara la invariante en su propio comentario: «Un año NEGATIVO no se acota a
+   * 0: se rechaza… Acotarlo lo convertiría en una reventa antes del año y liquidaría un
+   * impuesto a partir de un dato imposible, que es justo lo que el CASO C de esta app exige
+   * que no pase». Con un decimal la guarda se cae:
+   *     Math.trunc(parseSpanishNumber('-0,5')) → -0   y   -0 >= 0 → true
+   * así que `aniosDisponibles` es true, y dentro del motor
+   * `Math.min(Math.max(-0, 0), 20)` → 0 → coeficiente 0,14 («Menos de 1 año»).
+   *
+   * Madrid · venta 30.000 € · compra 26.000 € · comisión 0 % · suelo 5.000 €:
+   *   años «-1»   → plusvalía «Sin calcular» · neto 29.240,00 € · neto INCOMPLETO  ✅
+   *   años «-0,5» → plusvalía 175,00 € · neto 29.098,25 € · neto presentado como definitivo
+   *   (idéntico a haber escrito 0, que es lo que el CASO H del 10/09 fija como el caso bueno)
+   * Igual con «-0» y «-0,9».
+   *
+   * El sentido del error es el conservador —cobra en vez de ocultar—, pero el mismo signo
+   * recibe dos tratamientos distintos y se liquida un impuesto a partir de un dato imposible.
+   */
+  test('ABIERTO 12/09 — un año de propiedad negativo decimal debería rechazarse igual que «-1»', async ({
+    page,
+  }) => {
+    test.fail(); // hoy liquida 175,00 € con el coeficiente de «Menos de 1 año»
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '26000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+
+    // El entero negativo SÍ se rechaza, y así queda fijado lo que debería pasar con los dos.
+    await anios.fill('-1');
+    await esperarValorEnReact(page, anios, '-1');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+
+    // El decimal negativo debería rechazarse igual. Hoy devuelve «175,00 €».
+    await anios.fill('-0,5');
+    await esperarValorEnReact(page, anios, '-0,5');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+  });
+
+  /**
+   * ❌ ABIERTO (contenido, medio) — el plazo de liquidación del ITP se presenta como si
+   * fuese el mismo en toda España, en una app cuyo campo principal es la comunidad autónoma.
+   *
+   * `PLAZO_ITP` llegó a `data/fiscal/inmuebles.ts` con el commit 21a13c6b (hallazgo 713,
+   * 11/09/2026) y trae un campo `aviso` escrito precisamente para esto: «Plazo estatal
+   * supletorio: algunas comunidades autónomas fijan el suyo. Confirma el de la tuya antes de
+   * presentar». El módulo lo razona en su cabecera —«El plazo es de gestión autonómica: hay
+   * comunidades que lo amplían (Cataluña lo tiene en un mes en varios supuestos)»—.
+   *
+   * La página lee `PLAZO_ITP.dias` y `PLAZO_ITP.baseNormativa` y deja el `aviso` fuera:
+   *   en pantalla → «El ITP debe liquidarse en 30 días hábiles desde la firma de la
+   *                  escritura (art. 102.1 del Reglamento del ITPAJD, RD 828/1995).»
+   *   ausente     → «Plazo estatal supletorio…» (0 apariciones en el textContent de la página)
+   *
+   * El mismo `<DataReference>` de esta página sí publica `PLUSVALIA_MUNICIPAL_META.aviso`:
+   * el patrón existe en el propio fichero, y el plazo se quedó sin él.
+   */
+  test('ABIERTO 12/09 — el plazo de 30 días hábiles sale sin el aviso de que es supletorio', async ({
+    page,
+  }) => {
+    test.fail(); // el `aviso` del módulo no llega a pantalla
+    await page.goto(RUTA);
+    const cuerpo = (await page.evaluate(() => document.body.textContent ?? '')).replace(
+      /\s+/g,
+      ' ',
+    );
+
+    // El plazo está, con su norma al lado (eso sí se reparó el 11/09).
+    expect(cuerpo).toContain(
+      `El ITP debe liquidarse en ${PLAZO_ITP.dias} ${PLAZO_ITP.unidad} desde la firma de la escritura`,
+    );
+    expect(cuerpo).toContain(PLAZO_ITP.baseNormativa);
+    // Y el aviso del módulo DEBERÍA acompañarlo, como el de la plusvalía municipal.
+    expect(cuerpo).toContain(PLAZO_ITP.aviso);
+  });
+
+  /**
+   * ❌ ABIERTO (contenido, bajo) — el aviso «Podrías pagar menos» ofrece una bonificación
+   * cuyo LÍMITE DE VALOR la app ya sabe incumplido.
+   *
+   * `elegirTipoITP` documenta que `noComprobables` son los reducidos «que exigen algo que la
+   * herramienta no pregunta». El límite de valor no es de esos: la herramienta pregunta el
+   * precio, y la propia función lo comprueba para decidir si el tipo es `aplicable`. Al no
+   * pasar ese filtro, el reducido cae igualmente en `noComprobables` y se presenta bajo un
+   * rótulo que promete una rebaja imposible.
+   *
+   * Aragón · segunda mano · 750.000 € · perfil Discapacidad:
+   *   tarjeta → «ITP (8,60%)» = 64.500,00 €
+   *   aviso   → «💡 Podrías pagar menos… En Aragón existe: 7,00% — Discapacidad ≥65% …
+   *              Valor máximo 100.000,00 €»
+   *   el precio es 7,5 veces ese máximo, así que la bonificación del art. 121-4 está
+   *   descartada por PRECIO, no por un requisito que nadie haya preguntado.
+   */
+  test('ABIERTO 12/09 — no debería ofrecerse una bonificación cuyo tope de valor el precio ya supera', async ({
+    page,
+  }) => {
+    test.fail(); // hoy la ofrece, con su «Valor máximo 100.000,00 €» al lado
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'aragon');
+    await page.selectOption('#select-perfil', 'discapacidad');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '750000');
+
+    // El tope sale de la ficha, no de un literal: art. 121-4 del Decreto Legislativo 1/2005.
+    const tope = ITP_CCAA.aragon.tiposReducidos.find((r) =>
+      /discapacidad/i.test(r.nombre),
+    )?.valorMaximo;
+    expect(tope).toBe(100000);
+    expect(750000).toBeGreaterThan(tope as number);
+
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+    expect(texto).not.toContain('Discapacidad ≥65%');
+  });
 });

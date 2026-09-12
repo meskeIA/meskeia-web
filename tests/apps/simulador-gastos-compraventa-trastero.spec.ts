@@ -58,6 +58,15 @@
  *      671 se aplicaron en la hermana garaje y la 683 en nave-industrial, y ninguna llegó
  *      aquí— y el cuarto es una divergencia entre las dos tablas de ITP del repositorio.
  *
+ *  13. RE-INSPECCIÓN 12/09/2026 — CASOS 26-28, posterior a los tres commits del 11/09 que
+ *      movieron sus datos (7a02470c, e947fa55 y 21a13c6b; el último tocó de esta app solo
+ *      el CSS y este fichero, no su `page.tsx`). Territorio y tramo nuevos otra vez: La
+ *      Rioja con familia numerosa —comunidad SIN escala progresiva, el caso simétrico— y el
+ *      QUINTO tramo de la escala aragonesa (1.000.000 € → 89.500 €), el único escalón del
+ *      art. 121-1 al que ningún caso llegaba. El tercero rechaza una COMISIÓN malformada,
+ *      que era el último campo del vendedor sin caso de basura. Al final, TRES hallazgos
+ *      abiertos con `test.fail()`. Estos casos siembran con `_hidratacion.ts`.
+ *
  *      ⚠️ El CASO 16 (02/09) se REESCRIBIÓ ese día. Verificaba el rechazo escribiendo un
  *      «0» en los años de propiedad y daba por buena la reescritura del `min={1}` a «1»:
  *      eso era cierto cuando se escribió, y desde la reparación del motor del 07/09
@@ -107,6 +116,10 @@
  * están REPARADOS, así que la marca se retiró y las aserciones sujetan la reparación.
  */
 import { test, expect, Page } from '@playwright/test';
+// Los casos añadidos el 12/09/2026 siembran con estos dos: `rellenar` usa `fill()` sin
+// esperar a que React haya montado el input, y en esa ventana el DOM cambia sin que el
+// estado de React se entere (ver la cabecera de `_hidratacion.ts`).
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 const RUTA = '/simulador-gastos-compraventa-trastero/';
 
@@ -2811,4 +2824,347 @@ test('REPARADO 11/09 (dato) — el reducido de Castilla y León se ofrece con su
 
   // Y esa, a 200.000 €, o no debería ofrecerse o debería llevar su tope escrito.
   expect(await texto(oportunidades.first())).toContain('150.000');
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 12/09/2026 — CASOS 26-28 y tres hallazgos abiertos.
+//
+// La cola invalidó la inspección del 11/09 porque el código y las dependencias de esta app
+// cambiaron ese mismo día por tres commits:
+//   · 7a02470c — el triaje fiscal reescribió entera la ficha de Aragón: el art. 121-1 es una
+//     escala de CINCO tramos con cuota acumulada, y lo que allí hay no son tipos reducidos
+//     por colectivo sino bonificaciones en cuota (art. 121-4, 121-5 y 160-3).
+//   · e947fa55 — la tarifa del ISD (que esta app no usa) y el pase FAQ ↔ FAQPage, del que
+//     aquí salieron los hallazgos 714 y 715.
+//   · 21a13c6b — los 32 hallazgos del 11/09. De esta app tocó SOLO el CSS (el azul de marca
+//     que hacía de texto) y este fichero de pruebas: su `page.tsx` no se modificó.
+//
+// Territorio y precio nuevos otra vez: La Rioja con familia numerosa —la comunidad que
+// ninguna ronda había elegido— y el QUINTO tramo de la escala aragonesa, por encima de los
+// 750.000 €, que es el único escalón del art. 121-1 al que ningún caso de este fichero
+// llegaba (el CASO 18 se queda en 400.000 y el CASO 24 en 500.000).
+//
+// Los casos se siembran con `esperarValorEnReact`: `rellenar` escribe con `fill()` y no
+// espera a la hidratación, así que sin ese testigo un caso podría pasar en verde midiendo
+// el escenario anterior.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Rellena un campo y ESPERA a que el estado de React lo recoja.
+ *
+ * `fill()` llega a React (lo escribe el navegador, no el setter nativo), pero no llega si la
+ * app todavía no ha hidratado, y entonces el test seguiría midiendo el valor anterior. Se
+ * espera antes a que ese input esté montado, porque los del vendedor no existen hasta que se
+ * pulsa su pestaña.
+ */
+async function sembrar(page: Page, etiqueta: string, valor: string): Promise<void> {
+  const selector = `input[aria-label="${etiqueta}"]`;
+  await esperarHidratacion(page, [selector]);
+  const campo = page.locator(selector);
+  await campo.fill(valor);
+  await campo.blur();
+  // El blur de `NumberInput` solo reescribe el campo cuando el número sale de [min, max];
+  // ninguno de estos casos lo hace, así que React debe quedarse con lo escrito.
+  await esperarValorEnReact(page, selector, valor);
+}
+
+test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragón y una comisión ilegible', () => {
+  /**
+   * CASO 26 (NORMAL) — La Rioja con perfil FAMILIA NUMEROSA, la comunidad que ninguna ronda
+   * había usado. Interesa por dos motivos:
+   *
+   *   · es una comunidad SIN escala progresiva (no hay `tramosProgresivos` en su ficha), de
+   *     modo que el aviso de escala NO debe pintarse — el caso simétrico del CASO 27;
+   *   · sus CINCO beneficios exigen vivienda habitual o primera vivienda, y un trastero
+   *     suelto no es ninguna de las dos, así que el 5 % de familia numerosa tiene que salir
+   *     como OPORTUNIDAD y no como cifra cobrada. Es el contrato de `elegirTipoITP` desde el
+   *     14/08/2026 («se enseña como oportunidad, nunca como cifra»), y aquí importa porque
+   *     aplicarlo habría dejado el ITP en 825,00 € en vez de 1.155,00 €.
+   */
+  test('CASO 26 (normal) — La Rioja, segunda mano, 16.500 €, familia numerosa', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('rioja');
+    await selectPerfil(page).selectOption('familia-numerosa');
+    await sembrar(page, 'Precio del trastero', '16500');
+
+    // Tipo general de La Rioja = 7 %, de `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`
+    // (leído por `tipoGeneralDe('La Rioja')`). Su ficha de `ITP_CCAA` no declara
+    // `tramosProgresivos`, así que `calcularITP` aplica el tipo plano:
+    //   16.500 × 7 % = 1.155,00 · tipo efectivo = 1.155 / 16.500 = 7,00 %
+    expect(await valorTarjeta(page, 'ITP (7,00%)')).toBe('1155,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (7,00%)')).toContain('La Rioja');
+
+    // Y por eso mismo NO puede haber aviso de escala progresiva (el CASO 27 es el simétrico).
+    await expect(page.locator('p', { hasText: 'escala progresiva (' })).toHaveCount(0);
+
+    // Notaría — RD 1426/1989, número 2 (`ARANCELES_NOTARIO`):
+    //   tramo 1 (hasta 6.010,12 €)            →                             90,15
+    //   tramo 2 (6.010,12→30.050,61, 0,45 %)  → 10.489,88 × 0,0045 =         47,20446
+    //   arancel sin IVA                       =                            137,35446
+    //   con el 21 % de IVA                    = 137,35446 × 1,21 =         166,1988966
+    // `FACTURA_NOTARIAL`: ×1,5 = 249,2983449 · ×2 = 332,3977932 · medio ×1,75 = 290,84806905
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('290,85 €');
+    const notaria26 = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria26).toContain('249,30 €');
+    expect(notaria26).toContain('332,40 €');
+
+    // Registro — RD 1427/1989, números 1, 2 y 4 (`ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`):
+    //   tramo 1 (hasta 6.010,12 €)            →                             24,04
+    //   tramo 2 (6.010,12→30.050,61, 0,175 %) → 10.489,88 × 0,00175 =        18,35729
+    //   inscripción (número 2)                =                             42,39729
+    //   + asiento de presentación 6,010121 + nota simple 3,005061 =          51,412472
+    //   con el 21 % de IVA                    = 51,412472 × 1,21 =          62,20909112
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('62,21 €');
+
+    // Gestoría: la que trae el formulario por defecto.
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    // En segunda mano no hay AJD (ITP y cuota gradual de AJD son incompatibles).
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    // Total — `sumarLineasVisibles` redondea cada línea al céntimo ANTES de sumar:
+    //   1.155,00 + 290,85 + 62,21 + 300,00 = 1.808,06
+    //   % sobre el precio = 1.808,06 / 16.500 = 10,95793939 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1808,06 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,96%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('18.308,06 €');
+
+    // El 5 % de familia numerosa sale como oportunidad y NO se ha cobrado: con él aplicado,
+    // el ITP habrían sido 16.500 × 5 % = 825,00 € en vez de 1.155,00 €. Es el único de los
+    // cinco de La Rioja que el perfil elegido puede alcanzar; los otros cuatro son de
+    // jóvenes o de VPO, y `elegirTipoITP` solo propone los que casan con el perfil.
+    const oportunidades26 = page.locator('div[class*="avisoReducidos"] li');
+    await expect(oportunidades26).toHaveCount(1);
+    expect(await texto(oportunidades26.first())).toContain('5,00% — Familia numerosa');
+    expect(await texto(oportunidades26.first())).toContain('Vivienda habitual');
+  });
+
+  /**
+   * CASO 27 (LÍMITE) — el QUINTO tramo de la escala de Aragón, el único del art. 121-1 al
+   * que ningún caso de este fichero llegaba.
+   *
+   * La escala se reescribió el 11/09/2026 (commit 7a02470c): tenía DOS tramos —8 % hasta
+   * 400.000 € y 10 % por encima— y el art. 121-1 tiene CINCO, con cuota acumulada. Los
+   * cuatro cortes que el comentario de `ITP_CCAA['aragon']` fija contra la tabla oficial son
+   * 32.000 € a los 400.000, 36.250 € a los 450.000, 40.750 € a los 500.000 y **64.500 € a
+   * los 750.000**; a partir de ahí el exceso va al 10 %, que es lo que este caso ejercita y
+   * lo que `TIPOS_ITP_CCAA_2025` publica en su nota («10 % desde 750.000 € — art. 121-1»).
+   *
+   * Con la escala VIEJA, 1.000.000 € liquidaban 32.000 + 600.000 × 10 % = 92.000 €.
+   */
+  test('CASO 27 (límite) — Aragón, 1.000.000 €: el quinto tramo del art. 121-1 (89.500 €)', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('aragon');
+    await selectPerfil(page).selectOption('general');
+    await sembrar(page, 'Precio del trastero', '1000000');
+
+    // El recuadro anuncia los CINCO tramos, con coma decimal (`formatTipoNominal`).
+    expect(await texto(page.locator('p', { hasText: 'escala progresiva (' }).first())).toContain(
+      '8% → 8,5% → 9% → 9,5% → 10%',
+    );
+
+    // ITP — `calcularITPProgresivo` sobre los cinco tramos del art. 121-1:
+    //   400.000 × 8 %   = 32.000          (0 → 400.000)
+    //    50.000 × 8,5 % =  4.250          (400.000 → 450.000) → acumulado 36.250
+    //    50.000 × 9 %   =  4.500          (450.000 → 500.000) → acumulado 40.750
+    //   250.000 × 9,5 % = 23.750          (500.000 → 750.000) → acumulado 64.500
+    //   250.000 × 10 %  = 25.000          (750.000 → 1.000.000)
+    //                   = 89.500,00 €
+    //   tipo EFECTIVO = 89.500 / 1.000.000 = 8,95 % (el nominal, 8 %, mentiría)
+    expect(await valorTarjeta(page, 'ITP (8,95%)')).toBe('89.500,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (8,95%)')).toContain('Aragón');
+
+    // Notaría — `ARANCELES_NOTARIO` hasta el SEXTO tramo, que ningún caso había alcanzado:
+    //   90,15 + 24.040,49×0,0045 + 30.050,60×0,0015 + 90.151,82×0,001
+    //        + 450.759,07×0,0005 + 398.987,90×0,0003
+    //   = 90,15 + 108,182205 + 45,0759 + 90,15182 + 225,379535 + 119,69637 = 678,63583
+    //   con IVA = 821,1493543 · ×1,5 = 1.231,72403145 · ×2 = 1.642,2987086
+    //   medio ×1,75 = 1.437,011370025
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1437,01 €');
+    const notaria27 = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria27).toContain('1231,72 €');
+    expect(notaria27).toContain('1642,30 €');
+
+    // Registro — `ARANCELES_REGISTRO` hasta su último tramo:
+    //   24,04 + 24.040,49×0,00175 + 30.050,60×0,00125 + 90.151,82×0,00075
+    //        + 450.759,07×0,0003 + 398.987,90×0,0002
+    //   = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 135,227721 + 79,79758 = 386,3132735
+    //   (por debajo del `REGISTRO_MAXIMO` de 2.181,67, que es lo que este caso comprueba)
+    //   + 6,010121 + 3,005061 = 395,3284555 · con IVA = 478,3474311655
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('478,35 €');
+
+    // Total = 89.500,00 + 1.437,01 + 478,35 + 300,00 = 91.715,36
+    //   % sobre el precio = 91.715,36 / 1.000.000 = 9,171536 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('91.715,36 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,17%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.091.715,36 €');
+
+    // Las cinco bonificaciones de Aragón topan el inmueble en 100.000 € (las tres del art.
+    // 121-4) o exigen renta y venta de la vivienda anterior (las dos de familia numerosa):
+    // a este precio no hay nada que ofrecer y la caja de oportunidades NO debe pintarse.
+    await expect(page.locator('p', { hasText: 'Podrías pagar menos' })).toHaveCount(0);
+  });
+
+  /**
+   * CASO 28 (DEBE RECHAZARSE) — una COMISIÓN inmobiliaria malformada.
+   *
+   * Es el último campo del vendedor que ninguna ronda había atacado con basura: el precio de
+   * venta (CASO 7), el de compra (CASO 22) y los años (CASO 25) ya tienen su caso, y la
+   * comisión solo se había probado en negativo y con el foco puesto (CASO 10).
+   *
+   * `NumberInput` deja pasar «1.2.3» —su regex `/^-?[\d.,]*$/` solo filtra letras— y su
+   * `handleBlur`, que usa `parseFloat`, lee 1,2: está dentro de [0, 10], así que no reescribe
+   * el campo. Lo que llega al motor es por tanto un porcentaje ilegible, y `parseSpanishNumber`
+   * lo rechaza con NaN, que es lo correcto.
+   *
+   * Este caso fija lo que debe cumplirse con CUALQUIER reparación: que el campo conserve lo
+   * escrito, que no aparezca ningún NaN y que en la página no haya rastro de las dos lecturas
+   * equivocadas posibles. Lo que la app hace HOY con ese NaN es el hallazgo abierto de abajo.
+   */
+  test('CASO 28 (debe rechazarse) — «1.2.3» no es un porcentaje de comisión', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '8000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '1.2.3');
+
+    // El campo conserva lo escrito: el blur solo acota min/max, y 1,2 cae dentro.
+    await expect(page.locator('input[aria-label="Comisión inmobiliaria (%)"]')).toHaveValue(
+      '1.2.3',
+    );
+
+    // Ni rastro de las dos lecturas equivocadas de ese texto:
+    //   · como 1,2 % (lo que devolvería el `parseFloat` del blur) → 15.000 × 1,2 % = 180,00 €
+    //   · como el 3 % que el campo traía por defecto               → 15.000 × 3 %   = 450,00 €
+    const cuerpo28 = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
+    expect(cuerpo28).not.toContain('180,00 €');
+    expect(cuerpo28).not.toContain('450,00 €');
+
+    // El precio de venta sí se lee, y la plusvalía sigue abstiéndose por sus dos campos
+    // vacíos, con el verbo en plural (hallazgo 638).
+    expect(await valorTarjeta(page, 'Precio de venta')).toBe('15.000,00 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No calculada (faltan el valor catastral del suelo y los años de propiedad)',
+    );
+
+    // Y en ninguna parte de la página puede haber NaN.
+    expect(await page.locator('body').innerText()).not.toContain('NaN');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — re-inspección del 12/09/2026.
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
+// Cuando se reparen, se les quita la marca y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ⚠️ ABIERTO 12/09/2026 (medio) — dato. EFECTO FAMILIA del hallazgo 713.
+// El plazo de autoliquidación del ITP sigue escrito a mano en el bloque educativo («30 días
+// hábiles desde la firma de la escritura») y SIN norma citada, cuando el 11/09/2026 ese dato
+// pasó a `data/fiscal/inmuebles.ts` como `PLAZO_ITP` —con su base normativa, su URL del BOE y
+// su fecha de verificación— precisamente porque estaba a mano en la app hermana garaje, que
+// ya lo deriva (`{PLAZO_ITP.dias} días hábiles … ({PLAZO_ITP.baseNormativa})`).
+// Aquí el contraste se ve dentro de la MISMA frase: el recargo por presentación tardía sí va
+// sellado desde `ESCALA_RECARGO_EXTEMPORANEO`, con su «Art. 27.2 LGT (Ley 58/2003), redacción
+// de la Ley 11/2021 (BOE-A-2021-11473)» impreso en pantalla, y el plazo del que ese recargo
+// arranca no lleva nada. Se pierde además el `aviso` del módulo: el plazo es de gestión
+// autonómica y hay comunidades que lo amplían (Cataluña lo tiene en un mes en varios
+// supuestos), así que quien lea «30 días hábiles» sin ese matiz puede presentar tarde o
+// contar con menos margen del que tiene.
+// Caso: abrir «Ver Guía Completa» → consejo «Liquida los impuestos a tiempo»
+//       → esperado: «…30 días hábiles… (art. 102.1 del Reglamento del ITPAJD, RD 828/1995)»,
+//         derivado de `PLAZO_ITP` como en garaje desde el commit 21a13c6b
+//       → obtenido: «El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de
+//         la escritura», y ni «828/1995» ni «102.1» aparecen en todo el documento.
+test('ABIERTO 12/09 (dato) — el plazo del ITP no cita su norma ni sale de data/fiscal', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+
+  // La guía viene colapsada: sin abrirla, su texto no entra en el innerText del documento.
+  await page.locator('[aria-expanded]').last().click();
+  await expect(page.locator('[aria-expanded="true"]')).toHaveCount(1);
+
+  const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+
+  // El plazo está (esto pasa): lo que falta es de dónde sale.
+  expect(cuerpo).toContain('30 días hábiles');
+
+  // La norma del plazo, literal de `PLAZO_ITP.baseNormativa` en data/fiscal/inmuebles.ts.
+  expect(cuerpo).toContain('art. 102.1 del Reglamento del ITPAJD, RD 828/1995');
+});
+
+// ⚠️ ABIERTO 12/09/2026 (medio) — operativa. Una comisión que la app NO puede leer se
+// convierte en 0 % sin decirlo, y el neto del vendedor sube.
+// `parseSpanishNumberOr(comisionInmobiliaria)` devuelve su valor por defecto —0— cuando el
+// parser rechaza el texto, así que el NaN de «1.2.3» y un campo vacío son la misma cosa para
+// el motor. Con la comisión en 0 la tarjeta «Comisión inmobiliaria» ni se pinta (su guard es
+// `> 0`), de modo que no queda en pantalla ninguna línea que explique la diferencia: el
+// usuario ve un neto y no puede saber que se ha calculado sin la comisión que él creía haber
+// escrito. Y el error va en la dirección mala: el neto sale AL ALZA y el IRPF también, porque
+// la comisión es gasto de transmisión del art. 35.1 LIRPF y al desaparecer sube la ganancia.
+// Es el defecto que el commit 21a13c6b corrigió en `estimador-impuesto-sucesiones`
+// (hallazgos 740 y 742): «o se lee el importe, o no se da número». Los campos de esta app ya
+// acotan el NEGATIVO a 0 a propósito (hallazgos 457 y 486), pero un valor ILEGIBLE no es un
+// cero: es un dato que falta, y esta app ya sabe abstenerse y nombrarlo (lo hace con la
+// plusvalía y con el IRPF).
+// Caso: precio de venta 15.000 € · precio de compra 8.000 € · comisión «1.2.3»
+//       → esperado: que la app se abstenga o nombre el campo ilegible, como hace con el
+//         valor catastral y los años («Techo: aún NO incluye…»)
+//       → obtenido: comisión 0 %, sin tarjeta de comisión, IRPF 1.350,00 € y NETO
+//         13.650,00 €. Con el 3 % que el campo traía por defecto: comisión 450,00 €,
+//         IRPF 1.255,50 € y neto 13.294,50 € — 355,50 € menos.
+test('ABIERTO 12/09 (operativa) — una comisión ilegible se lee como 0 % y no se dice', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await sembrar(page, 'Precio del trastero', '15000');
+  await page.getByRole('button', { name: /Vendedor/ }).click();
+  await sembrar(page, 'Precio de compra original', '8000');
+  await sembrar(page, 'Comisión inmobiliaria (%)', '1.2.3');
+
+  // El neto se entrega como cifra sin mencionar la comisión que no se ha podido leer.
+  // Hoy dice: «Techo: aún NO incluye la plusvalía municipal (añade el valor catastral del
+  // suelo y los años de propiedad)» — la comisión no aparece por ninguna parte.
+  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toMatch(/comisi[óo]n/i);
+});
+
+// ⚠️ ABIERTO 12/09/2026 (bajo) — contenido. La FAQ visible no importa las respuestas que
+// `metadata.ts` dice que importa, así que el mismo texto vive duplicado a mano en dos canales.
+// La cabecera de `metadata.ts` afirma de `RESPUESTA_IVA_TRASTERO_NUEVO` y
+// `RESPUESTA_PLUSVALIA_TRASTERO`: «Las importan las tres bocas que las publican: el FAQPage de
+// `generateFAQSchema`, el `faqJsonLd` de abajo y la FAQ VISIBLE de `page.tsx`». Las dos
+// primeras sí; `page.tsx` no importa ninguna de las dos y vuelve a escribir las respuestas en
+// JSX. Hoy los tres textos coinciden en sustancia —el 10 %, el 21 %, la excepción de IGIC/IPSI
+// y el 25 % orientativo están en los dos canales, que es lo que los hallazgos 714 y 715
+// pedían—, así que no hay ninguna cifra mal: lo que no está es el mecanismo que impide que
+// vuelvan a divergir, y es exactamente el mecanismo que la app hermana garaje sí tiene desde
+// el hallazgo 624 (`import { RESPUESTA_ITP_GARAJE_SEGUNDA_MANO } from './metadata'`, y un
+// único `<p>{RESPUESTA_ITP_GARAJE_SEGUNDA_MANO}</p>` en su FAQ).
+// Caso: `grep -c "RESPUESTA_" app/simulador-gastos-compraventa-trastero/page.tsx`
+//       → esperado: ≥ 2 (las dos constantes importadas y usadas, como en garaje)
+//       → obtenido: 0, mientras `metadata.ts` afirma lo contrario en su línea 21.
+test('ABIERTO 12/09 (contenido) — la FAQ visible duplica a mano las respuestas de metadata', async () => {
+  test.fail();
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const pagina = readFileSync(
+    join(process.cwd(), 'app', 'simulador-gastos-compraventa-trastero', 'page.tsx'),
+    'utf8',
+  );
+  expect(pagina).toContain("from './metadata'");
 });

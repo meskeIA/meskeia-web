@@ -18,6 +18,7 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 const RUTA = '/estimador-impuesto-sucesiones/';
 
@@ -527,5 +528,135 @@ test.describe('Reparación 11/09/2026 — formulario, contenido y señal estruct
     const caracteristicas = webApp!.featureList as string[];
     expect(Array.isArray(caracteristicas)).toBe(true);
     expect(caracteristicas.length).toBeGreaterThanOrEqual(4);
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 12/09/2026 — tres casos nuevos, resueltos a mano ANTES de
+// ejecutarlos. Ninguno repite comunidad ni grupo de los de arriba: el caso normal
+// estrena la única regla de tope de base del catálogo (La Rioja), el caso límite
+// junta el ÚLTIMO tramo del art. 21.2 LISD con el coeficiente más alto del art. 22,
+// y el caso a rechazar usa una forma de número que `parseSpanishNumber` desecha y
+// que «1.2.3» no cubre.
+//
+// Cada cifra esperada sale de `data/fiscal/sucesiones.ts`, con el tramo y la
+// constante citados en el desarrollo. La siembra pasa por `_hidratacion.ts`: el
+// resto del fichero escribe con `fill()` nada más cargar, que es la ventana en la
+// que el evento puede perderse sin que nada lo delate.
+// ════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 12/09/2026 — tarifa del art. 21, coeficiente del art. 22 y rechazo', () => {
+  /**
+   * SOLO la columna de resultados. `textoPagina` trae el body entero, y frases como
+   * «Bonificación autonómica» también viven en el bloque educativo: una comprobación
+   * NEGATIVA sobre el body no distinguiría el panel del material de apoyo.
+   */
+  const panelResultados = async (page: Page): Promise<string> =>
+    (await page.locator('[class*="resultsPanel"]').innerText()).replace(/ /g, ' ');
+
+  /**
+   * CASO NORMAL — la madre (Grupo II-ascendiente) hereda 600.000 € en cuentas en LA RIOJA,
+   * la única comunidad del catálogo cuya bonificación cambia de porcentaje al pasar un tope
+   * de base liquidable (`{ porcentaje: 0,99, tope: 500.000, porcentajeMayor: 0,98 }`).
+   *
+   *   Activos             600.000,00   (saldos en cuentas)
+   *   + ajuar 3 %          18.000,00   PORC_AJUAR_DOMESTICO_IS
+   *   = base imponible    618.000,00
+   *   − parentesco         15.956,87   REDUCCIONES_PARENTESCO_IS['II-ascendiente']
+   *   = base liquidable   602.043,13
+   *   cuota íntegra       141.126,59   TARIFA_ESTATAL_IS, tramo «hasta 797.555,08»:
+   *                                    80.655,08 + 29,75 % × (602.043,13 − 398.777,54)
+   *   × coeficiente           1,0000   COEFICIENTES_IS['II'][0] (patrimonio < 402.678 €)
+   *   − bonificación 98 %  138.304,06  602.043,13 > tope de 500.000 € → `porcentajeMayor`
+   *   = cuota final         2.822,53 €
+   */
+  test('caso normal: la madre en La Rioja pasa el tope de 500.000 € y paga 2822,53 €', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#porcentaje-herencia']);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('rioja');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II-ascendiente');
+    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.saldos), '600000');
+
+    expect(await cuota(page)).toBe('2822,53 €');
+
+    const panel = await textoPagina(page);
+    expect(panel).toContain('618.000,00 €');    // base imponible con ajuar
+    expect(panel).toContain('602.043,13 €');    // base liquidable
+    expect(panel).toContain('141.126,59 €');    // cuota íntegra, tramo del 29,75 %
+    expect(panel).toContain('138.304,06 €');    // bonificación del 98 %, no del 99 %
+    // Y el rótulo dice POR QUÉ es el 98 %: la base ha superado el tope
+    expect(panel).toContain('Bonificación 98 % (base supera 500.000,00 €)');
+  });
+
+  /**
+   * CASO LÍMITE — el extremo superior de las dos escalas a la vez: un extraño (Grupo IV) que
+   * hereda 1.000.000 € en la Comunitat Valenciana con más de 4.020.770 € de patrimonio
+   * preexistente. Cae en el ÚLTIMO tramo del art. 21.2 —el del 34 %, que es el que
+   * `e947fa55` restauró: la escala rota se quedaba en el 25,50 %— y se lleva el coeficiente
+   * más alto del art. 22, 2,4000.
+   *
+   *   Activos           1.000.000,00   (saldos en cuentas)
+   *   + ajuar 3 %          30.000,00
+   *   = base imponible  1.030.000,00
+   *   − reducciones             0,00   REDUCCIONES_PARENTESCO_IS['IV'] = 0
+   *   = base liquidable 1.030.000,00
+   *   cuota íntegra       278.322,67   TARIFA_ESTATAL_IS, tramo «Infinity»:
+   *                                    199.291,40 + 34 % × (1.030.000 − 797.555,08)
+   *   × coeficiente           2,4000   COEFICIENTES_IS['IV'][3] (patrimonio > 4.020.770 €)
+   *   = cuota tributaria  667.974,41
+   *   − bonificación            0,00   BONIFICACIONES_CCAA_IS['valencia']…['IV'] = 0 %
+   *   = cuota final       667.974,41 €  (64,85 % de la base imponible)
+   */
+  test('caso límite: Grupo IV con el tramo del 34 % y el coeficiente 2,4000 paga 667.974,41 €', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#porcentaje-herencia']);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('valencia');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('IV');
+    await page.locator('select').nth(SELECT.patrimonio).selectOption('4');
+    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.saldos), '1000000');
+
+    expect(await cuota(page)).toBe('667.974,41 €');
+
+    const panel = await textoPagina(page);
+    expect(panel).toContain('1.030.000,00 €');  // base imponible = base liquidable: sin reducciones
+    expect(panel).toContain('278.322,67 €');    // cuota íntegra del último tramo del art. 21.2
+    expect(panel).toContain('×2,4000');         // COEFICIENTES_IS['IV'][3]
+    expect(panel).toContain('Tipo efectivo: 64,85%');
+
+    // El Grupo IV no tiene bonificación en Valencia: la cuota tributaria ES la final,
+    // sin línea de bonificación por medio (se comprueba en el panel, no en el body)
+    const columna = await panelResultados(page);
+    expect(columna).not.toContain('Bonificación');
+    expect(columna.split('667.974,41 €').length - 1, 'cuota tributaria y cuota final coinciden').toBe(3);
+  });
+
+  /**
+   * CASO A RECHAZAR — «1e3» en un campo de importe.
+   *
+   * Es notación científica, no un número escrito en español, y `parseSpanishNumber` devuelve
+   * NaN. Complementa al «1.2.3» de la inspección anterior por dos motivos: cae en OTRO campo
+   * —la vivienda habitual, que además arrastra la reducción del 95 %— y es la forma que
+   * `parseFloat` sí habría leído, como 1000, sin avisar de nada (§ candado del parser).
+   *
+   * Con 50.000 € válidos al lado, la app tiene que abstenerse igual: nombrar el campo
+   * ilegible y no publicar ninguna cifra.
+   */
+  test('caso a rechazar: «1e3» en la vivienda habitual no se lee como 1000', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#porcentaje-herencia']);
+
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.viviendaHabitual), '1e3');
+    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.saldos), '50000');
+
+    await expect(page.getByRole('alert').filter({ hasText: /no se puede leer/ }))
+      .toContainText('Vivienda habitual');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+
+    // Ni siquiera el importe válido se publica: el panel entero se abstiene
+    expect(await textoPagina(page)).not.toContain('50.000,00 €');
   });
 });

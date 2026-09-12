@@ -43,6 +43,9 @@
  */
 import { test, expect, type Page } from '@playwright/test';
 import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles';
+// Añadido en la re-inspección del 12/09/2026: los casos nuevos siembran esperando a que
+// React haya montado el input, en vez de confiar en el `load` de `page.goto()`.
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 const RUTA = '/simulador-gastos-compraventa-terreno-rustico/';
 
@@ -712,4 +715,336 @@ test('REPARADO 11/09 (contenido) — la FAQ y el FAQPage recogen que en Canarias
     .locator('strong', { hasText: '¿Qué es la renuncia a la exención de IVA en tierras rústicas?' })
     .locator('xpath=following-sibling::p[1]');
   expect(await respuesta.innerText()).toMatch(/IGIC|IPSI/);
+});
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN del 12/09/2026
+//
+// Vuelve a la cola porque cambiaron sus dependencias: `7a02470c` (Aragón: bonificaciones en
+// cuota, escala del art. 121-1), `e947fa55` (la tarifa del ISD vuelve al art. 21) y
+// `21a13c6b` (32 hallazgos del 11/09, que tocó `data/fiscal/inmuebles.ts` y
+// `data/itp-ccaa.ts`). Los ocho hallazgos anteriores se verificaron uno por uno: los ocho
+// siguen reparados y sus testigos siguen en verde.
+//
+// Los tres casos están resueltos A MANO antes de ejecutar la app, con el desarrollo comentado
+// junto a cada aserción. De dónde sale cada cifra, además de lo ya citado en la cabecera:
+//   - Murcia 7,75 % → `TIPOS_ITP_CCAA_2025` (Ley 3/2025, efectos 25/07/2025). Es el único
+//     tipo general con dos decimales del catálogo y ningún caso anterior lo tocaba.
+//   - Melilla: `tipoGeneral: 6` declarado a mano en `data/itp-ccaa.ts` (no es CCAA), `ajd: 0.5`,
+//     bonificación del 50 % de la cuota y de la cuota gradual de AJD por el art. 57 bis.1 y
+//     3.a) del TRLITPAJD, que aplican `calcularITP` y `calcularAJD`, y `TERRITORIOS_SIN_IVA`
+//     (allí rige el IPSI, no el IVA).
+//
+// La siembra va por `sembrarValor` de `_hidratacion.ts`: espera a que React haya montado el
+// input y comprueba que su estado recogió el valor. La gestoría NO se siembra cuando el caso
+// usa su valor por defecto (400 €), porque sembrar lo que el campo ya tiene no prueba nada.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** Los dos campos de la app, por `aria-label`, para el helper de hidratación. */
+const CAMPO_PRECIO = `input[aria-label="${PRECIO}"]`;
+const CAMPO_GESTORIA = `input[aria-label="${GESTORIA}"]`;
+
+/** Carga la app y espera a que sus dos inputs estén hidratados (también protege los clics). */
+async function abrirHidratada(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, [CAMPO_PRECIO, CAMPO_GESTORIA]);
+}
+
+/** Las líneas del recuadro de la comunidad, normalizadas. */
+async function lineasPanelCcaa(page: Page): Promise<string[]> {
+  const textos = await page.locator('[class*="infoCcaaItem"]').allInnerTexts();
+  return textos.map((t) => t.replace(/\s+/g, ' ').trim());
+}
+
+test.describe('Re-inspección 12/09/2026 — Murcia al 7,75 % y Melilla sin IVA', () => {
+  /**
+   * CASO 1 (NORMAL) — Murcia, compra habitual, 120.000 €, gestoría 400 € (la de por defecto).
+   *
+   * Murcia es el único tipo general con dos decimales: 7,75 % desde la Ley 3/2025, sellado en
+   * `TIPOS_ITP_CCAA_2025` y leído por `tipoGeneralDe('Murcia')`. No tiene escala progresiva,
+   * así que el tipo EFECTIVO que imprime la tarjeta tiene que salir clavado al nominal, con
+   * sus dos decimales y sin redondear a 8 %.
+   */
+  test('CASO 1 (normal) — Murcia, 120.000 €: el 7,75 % de la Ley 3/2025, con sus dos decimales', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    await page.selectOption('#select-ccaa', 'murcia');
+    await sembrarValor(page, CAMPO_PRECIO, '120000');
+
+    // ITP = 120.000 × 7,75 % = 9.300. «9300,00 €» sin punto de millar: es-ES no agrupa 4 cifras.
+    expect(await valorTarjeta(page, 'ITP (')).toBe('9300,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (7,75%)');
+    // Y el recuadro de la comunidad publica el mismo nominal, sin decimales de adorno
+    // (`formatTipoNominal` da los que el número tiene: dos aquí, uno en el AJD de Melilla).
+    expect(await lineasPanelCcaa(page)).toContain('ITP General 7,75%');
+
+    // Compra habitual = exenta de IVA → no hay AJD.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    // Notaría — arancel(120.000) con ARANCELES_NOTARIO (RD 1426/1989, número 2):
+    //   tramo 1 (hasta 6.010,12)                  →                              90,15
+    //   tramo 2 (0,45 %)  → 24.040,49 × 0,0045    =                         108,182205
+    //   tramo 3 (0,15 %)  → 30.050,60 × 0,0015    =                          45,075900
+    //   tramo 4 (0,10 %)  → 59.898,79 × 0,0010    =                          59,898790
+    //   arancel sin IVA                           =                         303,306895
+    //   con el 21 %                               = × 1,21 =              367,00134295
+    //   FACTURA_NOTARIAL: ×1,5 = 550,502014 · ×2 = 734,002686 · medio = 642,25235016
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('642,25 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('550,50 €');
+    expect(notaria).toContain('734,00 €');
+
+    // Registro — arancel(120.000) con ARANCELES_REGISTRO (RD 1427/1989, número 2):
+    //   24,04 + 42,0708575 + 37,563250 + (59.898,79 × 0,00075 = 44,9240925) = 148,5982
+    //   + presentación 6,010121 + nota simple 3,005061 (REGISTRO_CONCEPTOS) = 157,613382
+    //   con el 21 % = 190,71219222
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('190,71 €');
+
+    // Gestoría: el valor por defecto de la app, sin tocar el campo.
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('400,00 €');
+
+    // Total = 9.300 + 642,25 + 190,71 + 400 = 10.532,96 (líneas ya redondeadas al céntimo,
+    // que es lo que hace `sumarLineasVisibles`). 10.532,96 / 120.000 = 8,777466 % → 8,78 %.
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.532,96 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,78%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('130.532,96 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Melilla, «Con renuncia a la exención IVA», 300.000 €, gestoría 400 €.
+   *
+   * Es el cruce de las dos excepciones territoriales a la vez, y por eso es el caso límite:
+   *   · allí NO rige el IVA (`TERRITORIOS_SIN_IVA.melilla` → IPSI), así que la app no puede
+   *     cifrar el impuesto indirecto y tiene que decirlo en vez de inventar un 21 %;
+   *   · el AJD sí se devenga, y su cuota gradual se bonifica al 50 % (art. 57 bis.1
+   *     TRLITPAJD), que `calcularAJD` aplica por el SITIO del inmueble.
+   */
+  test('CASO 2 (límite) — Melilla con renuncia, 300.000 €: IPSI sin cifra y AJD bonificado al 50 %', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await page.selectOption('#select-ccaa', 'melilla');
+    await sembrarValor(page, CAMPO_PRECIO, '300000');
+
+    // No hay IVA que liquidar: la tarjeta se rotula con el impuesto que sí rige y no da cifra.
+    expect(await rotuloTarjeta(page, /^IPSI$/)).toBe('IPSI');
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    await expect(page.locator('h3', { hasText: /IVA \(renuncia/ })).toHaveCount(0);
+    // Y se dice en palabras, con el nombre largo del impuesto (AvisoTerritorioSinIva).
+    await expect(page.getByText(/En Ciudad Autónoma de Melilla no se aplica el IVA/)).toBeVisible();
+
+    // AJD = 300.000 × 0,5 % = 1.500, bonificado al 50 % → 750,00 €.
+    // (Sin la bonificación del art. 57 bis.1 serían 1.500: no es lo mismo.)
+    expect(await valorTarjeta(page, 'AJD (')).toBe('750,00 €');
+    // El recuadro de la ciudad publica la bonificación, que es lo que permite reconstruir
+    // tanto esta cuota como la del ITP (reparación del hallazgo 729).
+    const panel = await lineasPanelCcaa(page);
+    expect(panel.some((l) => /Bonificación en cuota/.test(l) && /50%/.test(l))).toBe(true);
+
+    // Notaría — arancel(300.000): 90,15 + 108,182205 + 45,0759 + 90,15182 (tramo 4 completo)
+    //   + (149.746,97 × 0,0005 = 74,873485) = 408,43341 · con IVA = 494,2044261
+    //   ×1,5 = 741,306639 · ×2 = 988,408852 · medio = 864,85774568
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('864,86 €');
+    // Registro — arancel(300.000): 24,04 + 42,0708575 + 37,56325 + 67,613865
+    //   + (149.746,97 × 0,0003 = 44,924091) = 216,2120635 + 9,015182 = 225,2272455
+    //   con el 21 % = 272,52496706
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('272,52 €');
+
+    // Total gastos = 0 (impuesto no calculado) + 750 + 864,86 + 272,52 + 400 = 2.287,38
+    // 2.287,38 / 300.000 = 0,76246 % → 0,76 %, y se advierte de que va SIN el IPSI.
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2287,38 €');
+    const descTotal = await descripcionTarjeta(page, 'Total gastos adicionales');
+    expect(descTotal).toContain('0,76%');
+    expect(descTotal).toContain('SIN el IPSI');
+
+    // Y el total se rotula PARCIAL, porque le falta un impuesto que sí se devenga.
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('302.287,38 €');
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — «2,5,3» en el precio y «300,50,2» en la gestoría.
+   *
+   * Es el gemelo con COMAS del «1.2.3» del 11/09, y no es un caso de laboratorio: quien
+   * escribe los millares con coma («2,500,000») se queda a un dedo de teclear dos comas. En
+   * `partesNumericas` la rama de comas devuelve `null` cuando hay más de una y el cuerpo no
+   * encaja en AGRUPA_CON_COMA, así que `parseSpanishNumber` da NaN.
+   *
+   * La segunda mitad prueba el OTRO parser de la página: la gestoría pasa por
+   * `parseSpanishNumberOr`, que ante NaN cae a 0 — y 0 no pinta tarjeta, así que el total
+   * queda con tres líneas y sin ninguna cifra fantasma.
+   */
+  test('CASO 3 (rechazo) — «2,5,3» y «300,50,2»: los dos parsers caen del lado seguro', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+
+    await sembrarValor(page, CAMPO_PRECIO, '2,5,3');
+    // El campo conserva lo tecleado (el filtro /^-?[\d.,]*$/ de NumberInput no lo rechaza)...
+    expect(await page.locator(CAMPO_PRECIO).inputValue()).toBe('2,5,3');
+    // ...y la app no calcula nada: ni tarjetas ni cifra fantasma.
+    await expect(page.getByText('Introduce el precio de la finca rústica para ver el desglose de gastos')).toBeVisible();
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveCount(0);
+    let cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('NaN');
+    expect(cuerpo).not.toContain('No definido');
+    // Y no asoma el 2,50 € que devolvería un parseFloat casero sobre «2,5,3».
+    expect(cuerpo).not.toContain('2,50 €');
+
+    // Ahora un precio válido y una gestoría que tampoco es un número.
+    await sembrarValor(page, CAMPO_PRECIO, '100000');
+    await sembrarValor(page, CAMPO_GESTORIA, '300,50,2');
+
+    // ITP Madrid = 100.000 × 6 % = 6.000.
+    expect(await valorTarjeta(page, 'ITP (')).toBe('6000,00 €');
+    // Notaría — arancel(100.000): 90,15 + 108,182205 + 45,0759 + (39.898,79 × 0,001 =
+    //   39,89879) = 283,306895 · con IVA = 342,80134295 · medio ×1,75 = 599,90235016
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('599,90 €');
+    // Registro — arancel(100.000): 24,04 + 42,0708575 + 37,56325 + (39.898,79 × 0,00075 =
+    //   29,9240925) = 133,5982 + 9,015182 = 142,613382 · con el 21 % = 172,56219222
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('172,56 €');
+    // La gestoría cae a 0 y su tarjeta no se pinta (se pinta solo si el importe es > 0).
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    // Total = 6.000 + 599,90 + 172,56 = 6.772,46 · 6.772,46 / 100.000 = 6,77246 % → 6,77 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('6772,46 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,77%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('106.772,46 €');
+
+    cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('NaN');
+    expect(cuerpo).not.toContain('No definido');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS de la re-inspección del 12/09/2026 — fallan A PROPÓSITO.
+// Afirman lo que debería pasar; cuando se reparen quedan como test de regresión.
+// Los tres son «efecto familia»: el defecto se reparó en una hermana del clúster —con su
+// número de hallazgo escrito en el código— y no llegó a ésta.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — re-inspección 12/09/2026', () => {
+  /**
+   * HALLAZGO A (contenido, medio) — la tarjeta del AJD se rotula con el tipo NOMINAL de la
+   * tabla mientras el motor bonifica la cuota al 50 % en Ceuta y Melilla (art. 57 bis.1
+   * TRLITPAJD, dentro de `calcularAJD`). El resultado es un rótulo que desmiente a su propia
+   * cifra por el doble, en la misma pantalla en que el ITP de al lado sí lleva el efectivo.
+   *
+   * Es exactamente el hallazgo 447, reparado en `garaje`, `trastero`, `local-comercial` y
+   * `nave-industrial` —las cuatro titulan `AJD (ajd / precio × 100 %)` y lo dejan comentado—,
+   * y pendiente aquí y en `solar`, que siguen con `formatNumber(datosCcaaActual.ajd, 2)`.
+   *
+   * Caso: Melilla · «Con renuncia a la exención IVA» · 300.000 €
+   *       → esperado «AJD (0,25%)» = 750,00 € · obtenido «AJD (0,50%)» = 750,00 €
+   *       (750 / 300.000 = 0,25 %; el 0,5 % daría 1.500 €).
+   */
+  test('HALLAZGO A — el rótulo del AJD lleva el tipo efectivo, no el nominal sin bonificar', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await page.selectOption('#select-ccaa', 'melilla');
+    await sembrarValor(page, CAMPO_PRECIO, '300000');
+
+    // La cuota está bien; lo que miente es el rótulo.
+    expect(await valorTarjeta(page, 'AJD (')).toBe('750,00 €');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,25%)');
+  });
+
+  /**
+   * HALLAZGO B (contenido, medio) — en Canarias, Ceuta y Melilla la página sigue anunciando
+   * un IVA del 21 % en dos sitios mientras la propia calculadora se niega a cifrarlo:
+   *   · el recuadro de la comunidad imprime «IVA (renuncia) 21%» en las 19 opciones del
+   *     desplegable, también en las tres donde no existe el IVA;
+   *   · el subtítulo del botón de régimen dice «IVA 21% (ISP) + AJD» pase lo que pase.
+   * Y a la vez, dos dedos más abajo, la tarjeta dice «IGIC → No calculado» y el aviso dice
+   * «En Canarias no se aplica el IVA». Es la misma clase de contradicción que el hallazgo 729
+   * («ITP General 6%» frente a una cuota del 3 %), que aquí ya se reparó para el ITP.
+   *
+   * `nave-industrial` condiciona las dos cosas al territorio (`territorioActualSinIva`):
+   * su recuadro dice «IPSI (obra nueva) → No calculado» y su botón «Paga IPSI + AJD».
+   *
+   * Caso: Canarias · «Con renuncia a la exención IVA» · 300.000 €
+   *       → esperado: ninguna línea de la página promete un IVA del 21 % en Canarias
+   *       → obtenido: recuadro «IVA (renuncia) 21%» y botón «IVA 21% (ISP) + AJD»
+   *         junto a «IGIC / No calculado» y «COSTE TOTAL (PARCIAL)».
+   */
+  test('HALLAZGO B — en Canarias ni el recuadro ni el botón prometen un IVA del 21 %', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await page.selectOption('#select-ccaa', 'canarias');
+    await sembrarValor(page, CAMPO_PRECIO, '300000');
+
+    // Lo que la calculadora hace de verdad, y que está bien:
+    expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
+
+    // Lo que la misma pantalla sigue prometiendo:
+    const panel = await lineasPanelCcaa(page);
+    expect(panel.some((l) => /IVA \(renuncia\) 21%/.test(l))).toBe(false);
+
+    const botones = await page.locator('[class*="transmisionBtn"]').allInnerTexts();
+    expect(botones.some((b) => /IVA 21%/.test(b.replace(/\s+/g, ' ')))).toBe(false);
+  });
+
+  /**
+   * HALLAZGO C (accesibilidad, medio) — la tabla comparativa del bloque educativo colorea sus
+   * celdas con hexadecimales escritos en línea, sin token ni variante de tema, y dos de ellos
+   * no llegan al 4,5:1 de WCAG AA en el tema claro:
+   *   · `#27ae60` («No aplica», «Sí (21% + AJD)») → 2,64:1 y 2,75:1
+   *   · la cabecera blanca sobre `var(--primary)` (#2E86AB), 14,4 px bold → 4,11:1
+   * Y el color tampoco porta un dato coherente: en la fila del IVA el rojo marca «No (exento)»
+   * y en la de la plusvalía el verde marca «No aplica», de modo que el mismo color dice cosas
+   * opuestas en filas contiguas. El dato lo lleva la palabra, no el color.
+   *
+   * Es el hallazgo 648, reparado en `nave-industrial` con `.celdaSi` (#176A3A) y `.celdaNo`
+   * (#B32D1F) más sus variantes `[data-theme='dark']`, y cuya cabecera CSS documenta el mismo
+   * 2,66:1 para este verde. Aquí siguen los dos hexadecimales en línea (grep `#27ae60`).
+   *
+   * Caso: abrir «Guía fiscal para la compra de una finca rústica» y medir la celda
+   *       «No aplica» → esperado ≥ 4,5:1 · obtenido 2,64:1 (#27ae60 sobre #F5F5F5).
+   */
+  test('HALLAZGO C — la tabla comparativa del bloque educativo llega a 4,5:1 (WCAG AA)', async ({ page }) => {
+    await page.goto(RUTA);
+    // El bloque educativo llega plegado: se abre por su disclosure (aria-expanded).
+    await page.locator('button[aria-expanded]').first().click();
+
+    const luminancia = ([r, g, b]: number[]): number => {
+      const canal = (c: number): number => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+    };
+    const aRgb = (css: string): number[] => (css.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+
+    for (const texto of ['No aplica', 'Concepto']) {
+      const celda = page.locator('td, th').filter({ hasText: new RegExp(`^${texto}$`) }).first();
+      await expect(celda).toBeVisible();
+      const { color, fondo, px, negrita } = await celda.evaluate((el) => {
+        let nodo: HTMLElement | null = el as HTMLElement;
+        let fondo = 'rgb(255, 255, 255)';
+        while (nodo) {
+          const c = getComputedStyle(nodo).backgroundColor;
+          if (c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c)) {
+            fondo = c;
+            break;
+          }
+          nodo = nodo.parentElement;
+        }
+        const est = getComputedStyle(el as HTMLElement);
+        return {
+          color: est.color,
+          fondo,
+          px: parseFloat(est.fontSize),
+          negrita: Number(est.fontWeight) >= 700,
+        };
+      });
+
+      const l1 = luminancia(aRgb(color));
+      const l2 = luminancia(aRgb(fondo));
+      const contraste = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      // Umbral de texto grande: ≥24 px, o ≥18,66 px en negrita. Ninguna celda llega.
+      const umbral = px >= 24 || (negrita && px >= 18.66) ? 3 : 4.5;
+      expect(
+        contraste,
+        `«${texto}»: ${color} sobre ${fondo}, ${px}px${negrita ? ' bold' : ''} = ${contraste.toFixed(2)}:1`,
+      ).toBeGreaterThanOrEqual(umbral);
+    }
+  });
 });

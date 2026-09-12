@@ -19,6 +19,10 @@ import {
   type CasoNumerico,
   type CasoPrediccion,
 } from '../../app/simulador-equilibrio-quimico/casos';
+// Siembra con testigo de hidratación. La añade la re-inspección del 12/09/2026 (bloque final):
+// `page.goto()` espera al evento `load`, no a que React haya montado, así que escribir antes
+// mueve el DOM sin que el estado de React se entere y el caso mide otro escenario.
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-equilibrio-quimico (segmento cálculo/química, riesgo 3, 497 usos reales)
@@ -997,5 +1001,321 @@ test.describe('Simulador de Equilibrio Químico · casos para clase', () => {
     expect(abstractos).toBeGreaterThanOrEqual(4);
     expect(aplicados).toBeGreaterThanOrEqual(4);
     expect(abstractos + aplicados).toBe(12);
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN (12/09/2026) — primera tras la reparación del 23/08/2026 y tras el
+// commit 1d905afb, que añadió los 12 casos de aula asignables.
+//
+// Lo de arriba NO se toca. Aquí van tres casos nuevos —normal, límite y rechazo—
+// resueltos a mano ANTES de abrir el navegador, y los testigos de lo que sigue abierto.
+//
+// ── ESTADO DE LOS SEIS HALLAZGOS DEL 21/08 ─────────────────────────────────
+//   [1] alto/calculo   mensaje de Le Chatelier ↔ flecha .... ABIERTO en su raíz (ver [7])
+//   [2] alto/calculo   esterificación «endotérmica» con ΔH<0  REPARADO (rótulo «exotérmica»;
+//                      el campo booleano `exotermica` ya no existe: `esExotermicaDe(ΔH)`)
+//   [3] dato/medio     Kc rotuladas «a 298 K, referencia» ... REPARADO en la interfaz
+//                      («Kc de referencia (didáctica, a 298 K)»), reaparecido en el aula ([8])
+//   [4] operativa/med  temperatura sin validar .............. REPARADO en el campo, NO en el
+//                      botón «↑ Subir T» (ver CASO C)
+//   [5] operativa/bajo epsilon 1e-12 asomando como Q ........ REPARADO («∞ (un reactivo se ha
+//                      agotado)»)
+//   [6] a11y/bajo      7 emojis sin aria-hidden ............. REPARADO (los 7 lo llevan)
+//
+// ── LA ARITMÉTICA, HECHA A MANO ────────────────────────────────────────────
+//
+//   CASO A (normal) — Disociación de PCl₅ a 350 K · Kc(ref) = 0,04 · ΔH = +88 kJ/mol
+//     Equilibrio de partida desde las sugeridas [PCl₅]=1,0 · [PCl₃]=[Cl₂]=0,1.
+//     Como los tres coeficientes valen 1, sale exacto de una cuadrática:
+//       (0,1+x)² / (1−x) = 0,04  ⇒  0,01 + 0,2x + x² = 0,04 − 0,04x
+//                                ⇒  x² + 0,24x − 0,03 = 0
+//       x = (−0,24 + √(0,0576 + 0,12)) / 2 = (−0,24 + 0,4214261) / 2 = 0,0907131
+//       [PCl₅] = 1 − 0,0907131 = 0,9092869 → 0,9093 · [PCl₃] = [Cl₂] = 0,1907131 → 0,1907
+//       Q = (0,1907 · 0,1907) / 0,9093 = 0,03636649 / 0,9093 = 0,0399983 → «0,0400» = Kc ✔
+//     van ’t Hoff hasta 350 K, con R = 8,314 J/(mol·K) y ΔH = +88.000 J/mol:
+//       ln(K₂/K₁) = −(88.000/8,314) · (1/350 − 1/298)
+//                 = −10.584,5562 · (0,0028571429 − 0,0033557047)
+//                 = −10.584,5562 · (−0,0004985618) = 5,2770500
+//       K₂ = 0,04 · e^5,27705 = 0,04 · 195,79258 = 7,8317030           → «7,8317»
+//       (es el valor del caso 6 del aula, que pide 2 decimales: 7,83)
+//     Q = 0,0400 < Kc = 7,8317 ⇒ el sistema avanza HACIA PRODUCTOS (→).
+//     Nuevo equilibrio, otra vez exacto:
+//       (0,1907+ξ)² / (0,9093−ξ) = 7,831703
+//       0,03636649 + 0,3814ξ + ξ² = 7,1213675 − 7,831703ξ
+//       ξ² + 8,213103ξ − 7,0850010 = 0
+//       ξ = (−8,213103 + √(67,455079 + 28,340004)) / 2 = (−8,213103 + 9,7874963) / 2
+//         = 0,7871967
+//       [PCl₅]eq = 0,9093 − 0,7871967 = 0,1221033                       → «0,1221 mol/L»
+//       [PCl₃]eq = [Cl₂]eq = 0,1907 + 0,7871967 = 0,9778967             → «0,9779 mol/L»
+//       Control: 0,9778967² / 0,1221033 = 0,9562818 / 0,1221033 = 7,8317 = Kc ✔
+//
+//   CASO B (límite) — Proceso de contacto en el EXTREMO del rango: 2.000 K
+//     2 SO₂(g) + O₂(g) ⇌ 2 SO₃(g) · Kc(ref) = 4,32 · ΔH = −198 kJ/mol · Δn = −1
+//     Equilibrio de partida (cúbica: se resuelve numéricamente y se comprueba al revés):
+//       [SO₂] = 0,6785 · [O₂] = 0,3393 · [SO₃] = 0,8215
+//       Q = 0,8215² / (0,6785² · 0,3393) = 0,67486225 / 0,15620093 = 4,3204826
+//         → «4,3205» ≈ Kc ✔
+//     van ’t Hoff hasta 2.000 K:
+//       ln(K₂/K₁) = (198.000/8,314) · (1/2000 − 1/298) = 23.815,25 · (−0,0028557047)
+//                 = −68,00918
+//       K₂ = 4,32 · e^−68,00918 = 1,2572·10⁻²⁹. Por debajo de 0,0001, así que formatNumber
+//       lo pinta «≈0» — y esa es la lectura correcta: a 2.000 K esta reacción no existe.
+//     Q = 4,3205 ≫ Kc ⇒ ← REACTIVOS, y el SO₃ debe descomponerse ENTERO, no quedarse quieto
+//     (es la regresión reparada el 11/09: sin raíz interior el sistema va al extremo).
+//       ξ = −[SO₃]/2 + ε = −0,410749 ⇒
+//       [SO₂]eq = 0,6785 + 0,821498 = 1,499998                           → «1,5000 mol/L»
+//       [O₂]eq  = 0,3393 + 0,410749 = 0,750049                           → «0,7500 mol/L»
+//       [SO₃]eq = 0,8215 − 0,821498 = 0,000002                           → «≈0 mol/L»
+//     Y el extremo del campo: escribir 2001 debe quedarse en el máximo declarado, 2000.
+//
+//   CASO C (rechazo) — un estado FUERA del rango que la app declara suyo
+//     El campo #temperatura declara min=100 y max=2000, y el motor de los casos rechaza
+//     explícitamente cualquier T fuera de [100, 2000] («Esa temperatura está fuera del rango
+//     del simulador»). Partiendo del máximo, el botón «↑ Subir T (+50 K)» no debería poder
+//     sacar al sistema de ahí. Hoy sí puede: 2000 → 2050 → 2100.
+// ═══════════════════════════════════════════════════════════════════════════
+
+test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', () => {
+  /** Los inputs que tienen que estar montados antes de pulsar o sembrar nada. */
+  const INPUTS_TESTIGO = ['#temperatura', '#conc-N₂'];
+
+  test('CASO A (normal) — PCl₅ a 350 K: van ’t Hoff, dirección y el nuevo equilibrio entero', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /Disociación de PCl₅/).click();
+
+    // Punto de partida: la app arranca YA en equilibrio (reparación del hallazgo [1]).
+    // x = (−0,24 + √0,1776)/2 = 0,0907131 ⇒ 0,9093 / 0,1907 / 0,1907, y Q = Kc = 0,0400.
+    await expect(page.locator('#conc-PCl₅')).toHaveValue('0.9093');
+    await expect(page.locator('#conc-PCl₃')).toHaveValue('0.1907');
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0400');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('⇌ Equilibrio');
+    await expect(valorDe(page, 'Δn (gas)')).toHaveText('1');
+
+    await sembrarValor(page, '#temperatura', 350);
+
+    // ln(K₂/K₁) = −(88.000/8,314)·(1/350 − 1/298) = 5,27705 ⇒ K₂ = 0,04·e^5,27705 = 7,8317
+    await expect(valorDe(page, 'Kc (a 350 K)')).toHaveText('7,8317');
+    // La Kc didáctica de referencia NO se mueve: van ’t Hoff siempre ancla en 298 K.
+    await expect(valorDe(page, 'Kc de referencia (didáctica, a 298 K)')).toHaveText('0,0400');
+    // Q no depende de T: sigue siendo el de las mismas concentraciones.
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0400');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
+    await expect(flecha(page)).toContainText('HACIA PRODUCTOS');
+
+    // ξ² + 8,213103ξ − 7,085001 = 0 ⇒ ξ = 0,7871967
+    await expect(valorDe(page, '[PCl₅]eq')).toHaveText('0,1221 mol/L');
+    await expect(valorDe(page, '[PCl₃]eq')).toHaveText('0,9779 mol/L');
+    await expect(valorDe(page, '[Cl₂]eq')).toHaveText('0,9779 mol/L');
+  });
+
+  test('CASO A bis — el caso 6 del aula pide justo ese número y lo corrige bien', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    // 0,04 · e^5,27705 = 7,8317, redondeado a los 2 decimales que pide el enunciado.
+    const caso6 = page.locator('article').filter({ has: page.locator('#respuesta-caso-6') });
+    await caso6.getByRole('button', { name: 'Ver solución' }).click();
+    await expect(page.locator('#solucion-caso-6')).toContainText('Resultado: 7,83');
+
+    await sembrarValor(page, '#respuesta-caso-6', '7,83');
+    await caso6.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso6.locator('[role="alert"]')).toContainText('¡Correcto!');
+
+    // Y un valor que NO es la respuesta tiene que suspender: la tolerancia es
+    // max(0,01; 1 % de 7,8317) = 0,0783, así que 7,5 queda fuera.
+    await sembrarValor(page, '#respuesta-caso-6', '7,5');
+    await caso6.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso6.locator('[role="alert"]')).toContainText('Todavía no');
+  });
+
+  test('CASO B (límite) — el proceso de contacto a 2.000 K, el extremo del rango declarado', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /proceso de contacto/).click();
+
+    // Q = 0,8215² / (0,6785² · 0,3393) = 0,67486225 / 0,15620093 = 4,3205
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('4,3205');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('⇌ Equilibrio');
+
+    await sembrarValor(page, '#temperatura', 2000);
+
+    // ln(K₂/K₁) = (198.000/8,314)·(1/2000 − 1/298) = −68,00918 ⇒ Kc = 1,26·10⁻²⁹.
+    // formatNumber pinta «≈0» por debajo de 0,0001, y es la lectura correcta.
+    await expect(valorDe(page, 'Kc (a 2000 K)')).toHaveText('≈0');
+    await expect(valorDe(page, 'Kc de referencia (didáctica, a 298 K)')).toHaveText('4,3200');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
+
+    // Con Kc ≈ 0 no hay raíz interior: el sistema va AL EXTREMO y el SO₃ se descompone
+    // entero. Quedarse quieto era la regresión reparada el 11/09/2026.
+    await expect(valorDe(page, '[SO₃]eq')).toHaveText('≈0 mol/L');
+    await expect(valorDe(page, '[SO₂]eq')).toHaveText('1,5000 mol/L');
+    await expect(valorDe(page, '[O₂]eq')).toHaveText('0,7500 mol/L');
+
+    // Y el campo sí acota por arriba. Se baja antes a 1.500 a propósito: sembrar 2001 sobre
+    // un estado que YA valía 2000 no probaría el recorte, porque el estado de React
+    // coincidiría desde el principio (aviso de _hidratacion.ts).
+    await sembrarValor(page, '#temperatura', 1500);
+    await sembrarValor(page, '#temperatura', 2001, { esperado: 2000 });
+    await expect(page.locator('#temperatura')).toHaveValue('2000');
+  });
+
+  // ───────────────────────────────────────────────────────────────────────
+  // HALLAZGOS ABIERTOS de esta re-inspección. Van con `test.fail()`, igual que los
+  // seis de 2026-08-21: afirman lo que la app DEBERÍA hacer y hoy fallan a propósito,
+  // así que la suite queda verde mientras el defecto siga ahí. El día que se reparen
+  // saldrán en ROJO («expected to fail, but passed») y habrá que quitarles la marca.
+  // El Inspector no repara.
+  //
+  // Cada uno afirma UNA sola cosa que hoy es falsa; lo que va antes es contexto que ya
+  // es cierto y lo seguirá siendo tras la reparación, para que el testigo no se quede
+  // atascado en verde por un motivo distinto del que lo hizo nacer.
+  // ───────────────────────────────────────────────────────────────────────
+
+  test('CASO C (rechazo) — el botón «Subir T» saca al sistema del rango que la app declara suyo', async ({
+    page,
+  }) => {
+    test.fail();
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /proceso de contacto/).click();
+
+    // El campo declara su techo, y el motor de los casos rechaza cualquier T fuera de
+    // [100, 2000] con «Esa temperatura está fuera del rango del simulador».
+    await expect(page.locator('#temperatura')).toHaveAttribute('max', '2000');
+    await sembrarValor(page, '#temperatura', 2000);
+
+    await page.getByRole('button', { name: /Subir T/ }).click();
+    // La reparación del hallazgo [4] acotó el `onChange` del campo, pero no este botón, que
+    // hace `temperaturaK + 50` sin `Math.min`. Hoy sale 2050, y con otro clic 2100, rotulado
+    // «Kc (a 2100 K)» y anotado en el historial como si fuera un estado válido.
+    const T = Number(await page.locator('#temperatura').inputValue());
+    expect(T).toBeLessThanOrEqual(2000);
+  });
+
+  test('HALLAZGO [7] — el mensaje de Le Chatelier sigue cableado al TIPO de perturbación', async ({
+    page,
+  }) => {
+    test.fail();
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /Haber-Bosch/).click();
+
+    // La reparación del hallazgo [1] hizo que el estado de partida SEA un equilibrio, con lo
+    // que la PRIMERA perturbación siempre concuerda. Pero el mensaje sigue siendo una cadena
+    // fija por tipo de perturbación (`aplicarPerturbacion` en page.tsx), así que en cuanto hay
+    // una segunda vuelve a contradecir a la flecha y a la fila de la misma pantalla.
+    //
+    // Partida 0,5964 / 1,7893 / 1,3071 (Q = Kc = 0,5).
+    //   +0,5 NH₃ → Q = 1,8071² / (0,5964 · 1,7893³) = 3,26561 / 3,41673 = 0,9558 > Kc ⇒ ←
+    await page.getByRole('button', { name: '+ Añadir NH₃' }).click();
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,9558');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
+
+    //   +0,5 N₂  → Q = 3,26561 / (1,0964 · 5,72859) = 3,26561 / 6,28082 = 0,5199
+    //   Q/Kc = 1,0399 > 1,02, así que el sistema SIGUE retrocediendo: añadir nitrógeno no ha
+    //   bastado para devolverlo al equilibrio, y mucho menos para llevarlo a los productos.
+    await page.getByRole('button', { name: '+ Añadir N₂' }).click();
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,5199');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
+    await expect(flecha(page)).toContainText('HACIA REACTIVOS');
+
+    // El mensaje dice hoy «Añadiste N₂: … desplazándose hacia los productos (→)», con la
+    // flecha y la fila diciendo lo contrario unos centímetros más abajo.
+    await expect(mensaje(page)).toContainText('los reactivos (←)');
+  });
+
+  test('HALLAZGO [7 bis] — ida y vuelta de T: la app se declara en equilibrio y desplazada a la vez', async ({
+    page,
+  }) => {
+    test.fail();
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /proceso de contacto/).click();
+
+    // Subir T no toca las concentraciones, solo Kc. Volver a bajarla restaura la Kc de
+    // partida, así que el sistema queda EXACTAMENTE donde estaba: en equilibrio.
+    await page.getByRole('button', { name: /Subir T/ }).click();
+    await expect(page.locator('#temperatura')).toHaveValue('348');
+    await page.getByRole('button', { name: /Bajar T/ }).click();
+    await expect(page.locator('#temperatura')).toHaveValue('298');
+
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('4,3205');
+    await expect(valorDe(page, 'Kc (a 298 K)')).toHaveText('4,3200');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('⇌ Equilibrio');
+    await expect(flecha(page)).toContainText('EN EQUILIBRIO');
+
+    // Y sin embargo el mensaje afirma «Bajaste T en una reacción exotérmica (ΔH<0): el
+    // sistema libera menos calor y se desplaza hacia los productos (→). Kc aumenta.»
+    // Kc no ha aumentado —ha vuelto a su valor— y no se desplaza nada.
+    await expect(mensaje(page)).not.toContainText('hacia los productos (→)');
+  });
+
+  test('HALLAZGO [8] — el caso 6 del aula presenta una Kc didáctica como la constante a 298 K', async ({
+    page,
+  }) => {
+    test.fail();
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+
+    // La reparación del hallazgo [3] retiró de la interfaz el rótulo «Kc (a 298 K,
+    // referencia)» justo porque cuatro de las seis Kc no son las de 298 K, y la cabecera de
+    // casos.ts promete que «los enunciados de los casos no presentan estos valores como
+    // constantes medidas». El enunciado del caso 6 dice «su constante vale 0,04 a 298 K»,
+    // que es exactamente la afirmación retirada — y es el caso que un profesor asigna.
+    await expect(page.locator('body')).not.toContainText('Kc (a 298 K, referencia)');
+    await expect(page.locator('body')).toContainText('Kc de referencia (didáctica');
+
+    const caso6 = page.locator('article').filter({ has: page.locator('#respuesta-caso-6') });
+    await expect(caso6).not.toContainText('0,04 a 298 K');
+  });
+
+  test('HALLAZGO [9] — la tabla educativa clasifica la esterificación fuera del convenio de la app', async ({
+    page,
+  }) => {
+    test.fail();
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+
+    // El convenio propio de la app es «exotérmica ⟺ ΔH < 0, sin excepciones», y la tarjeta de
+    // la reacción ya lo cumple desde la reparación del hallazgo [2].
+    await expect(reaccion(page, /Esterificación/)).toContainText('exotérmica');
+    await expect(reaccion(page, /Esterificación/)).toContainText('ΔH = -3 kJ/mol');
+
+    // La columna «Tipo» de la tabla del bloque educativo, en cambio, sigue diciendo «Casi
+    // neutra» donde las otras cinco filas dicen Exotérmica o Endotérmica. Estaba nombrada en
+    // el hallazgo [2] y quedó sin tocar.
+    const fila = page.locator('tr').filter({ hasText: 'Esterificación' });
+    await expect(fila).toContainText('Exotérmica');
+  });
+
+  test('HALLAZGO [10] — la FAQ llama «líquidos puros» a la reacción cuyas 4 especies SÍ entran en Q', async ({
+    page,
+  }) => {
+    test.fail();
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+
+    // El convenio que decide la respuesta del caso 4 (Q = 1 / 0,5 = 2) es que la
+    // esterificación se trata como disolución. La FAQ la pone como ejemplo de «líquidos
+    // puros», y otra FAQ del mismo bloque explica que los líquidos puros NO aparecen en Kc:
+    // leídas juntas dan Q = 1, que es la respuesta que el caso 4 suspende.
+    const faq = page.locator('xpath=//strong[contains(., "Δn = 0")]/parent::*');
+    await expect(faq).not.toContainText('líquidos puros');
+  });
+
+  test('HALLAZGO [11] — el JSON-LD promete un gráfico de concentraciones vs tiempo que no existe', async ({
+    page,
+  }) => {
+    test.fail();
+    // El panel 4 es un gráfico de BARRAS del estado actual: no hay eje de tiempo en ninguna
+    // parte de la app, ni la palabra «tiempo» aparece en el <main>. La promesa viaja en los
+    // `features` del WebApplication, que es lo que leen Google y los asistentes.
+    //
+    // Una sola aserción, y vale para las dos reparaciones posibles: retirar la promesa del
+    // JSON-LD, o añadir de verdad la evolución temporal.
+    const prometeGraficoTemporal = (await page.content()).includes(
+      'Gráfico de concentraciones vs tiempo',
+    );
+    const hayEjeDeTiempo = /tiempo/i.test(await page.locator('main').innerText());
+    expect(prometeGraficoTemporal && !hayEjeDeTiempo).toBe(false);
   });
 });
