@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * visualizador-sonido-ondas — las cuatro secciones, servidas · 05/09/2026 (semilla S0119)
@@ -58,8 +59,18 @@ test.describe('visualizador-sonido-ondas', () => {
     }
   });
 
+  /**
+   * ⚠️ Este test aparecía en rojo de forma INTERMITENTE (1 de cada 3 corridas) hasta el
+   * 12/09/2026: el botón de 880 Hz no llegaba a existir. No era la app, era la carrera de
+   * hidratación descrita en `_hidratacion.ts` — reproducida a voluntad estrangulando la CPU
+   * (`Emulation.setCPUThrottlingRate`, factor 20), que deja el `fill` por delante de React:
+   * el DOM del deslizador se queda en 880 y el estado en 200, así que el `aria-label`, que
+   * se deriva del estado, sigue diciendo «Escuchar tono a 200 hercios».
+   * Por eso se espera a la hidratación ANTES de tocar el deslizador.
+   */
   test('la onda sigue siendo interactiva tras el cambio', async ({ page }) => {
     await page.goto(URL_APP);
+    await esperarHidratacion(page, ['input[aria-label="Frecuencia en hercios"]']);
     const slider = page.getByLabel('Frecuencia en hercios');
     await expect(slider).toHaveValue('200');
     await slider.fill('880');

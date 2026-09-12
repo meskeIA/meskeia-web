@@ -18,11 +18,11 @@ type SituacionFamiliar = 'soltero' | 'casado_un_ingreso' | 'casado_dos_ingresos'
 // Datos fiscales centralizados en data/fiscal/irpf.ts
 // FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025 importados al inicio
 
-// Función para calcular el IRPF
-function calcularIRPF(baseImponible: number, minimos: number): number {
-  const baseLiquidable = Math.max(0, baseImponible - minimos);
+// Aplica la escala del art. 63 LIRPF a un importe. No conoce mínimos ni reducciones:
+// solo recorre los tramos, para poder invocarla dos veces (ver calcularIRPF).
+function aplicarEscala(importe: number): number {
   let cuota = 0;
-  let baseRestante = baseLiquidable;
+  let baseRestante = Math.max(0, importe);
   let limiteAnterior = 0;
 
   for (const tramo of TRAMOS_IRPF_2025) {
@@ -34,6 +34,32 @@ function calcularIRPF(baseImponible: number, minimos: number): number {
   }
 
   return cuota;
+}
+
+/**
+ * Cuota íntegra del IRPF (art. 63.1.2º LIRPF).
+ *
+ * ⚠️ CORREGIDO EL 12/09/2026. Hasta esta fecha la función restaba el mínimo personal y
+ * familiar DE LA BASE antes de aplicar la escala, lo que lo valora al tipo MARGINAL del
+ * contribuyente y rebaja la cuota más cuanto más alto es el sueldo. El art. 63.1.2º dice
+ * lo contrario: el mínimo «no reduce la renta», forma parte de la base liquidable general
+ * y se grava a TIPO CERO aplicando la escala dos veces — una a la base liquidable completa
+ * y otra al mínimo — y restando la segunda cuota de la primera. Así el mínimo vale lo
+ * mismo (el 19 % de los primeros tramos) para todos los contribuyentes con las mismas
+ * circunstancias familiares, que es justamente el efecto que la norma persigue.
+ *
+ * El error subestimaba la cuota en 610,50 € con 30.000 € de bruto y en 1.054,50 € con
+ * 120.000 €. Es el mismo defecto que el commit 2b80033d (09/09/2026) reparó en seis
+ * motores de `lib/calculadoras`; esta app quedó fuera porque calcula por su cuenta.
+ *
+ * Fuente: art. 63.1.2º Ley 35/2006 (AEAT, Manual práctico Renta 2025, cap. 15).
+ */
+function calcularIRPF(baseLiquidable: number, minimoPersonalFamiliar: number): number {
+  const base = Math.max(0, baseLiquidable);
+  // El mínimo forma parte de la base «hasta el importe de esta última» (art. 56.2): con una
+  // base menor que el mínimo, la cuota es cero, nunca negativa.
+  const minimoAplicable = Math.min(Math.max(0, minimoPersonalFamiliar), base);
+  return Math.max(0, aplicarEscala(base) - aplicarEscala(minimoAplicable));
 }
 
 // Función para calcular la Seguridad Social
@@ -69,9 +95,10 @@ function calcularReduccionRNT(rnt: number): number {
   return calcularReduccionRendimientosTrabajo(rnt);
 }
 
-// Función para calcular mínimos personales
+// Mínimo personal y familiar (arts. 57 a 61 LIRPF). Ya NO recibe `situacion`: lo único que
+// dependía de ella era la reducción por tributación conjunta, que se fue a su propia función
+// por no ser un mínimo (ver calcularReduccionTributacionConjunta).
 function calcularMinimosPersonales(
-  situacion: SituacionFamiliar,
   numHijos: number,
   hijosMenores3: number
 ): number {
@@ -86,16 +113,28 @@ function calcularMinimosPersonales(
   // Adicional por hijos menores de 3 años
   minimos += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
 
-  // Reducción por tributación conjunta (art. 84.2.4º LIRPF): solo aplica cuando
-  // la unidad familiar declara conjunta, es decir, un único perceptor de ingresos
-  // (matrimonio con un solo ingreso, o unidad monoparental con hijos).
-  if (situacion === 'casado_un_ingreso') {
-    minimos += REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental;
-  } else if (situacion === 'familia_monoparental' && numHijos > 0) {
-    minimos += REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
-  }
-
   return minimos;
+}
+
+/**
+ * Reducción por tributación conjunta (art. 84.2, reglas 3ª y 4ª LIRPF): solo aplica cuando
+ * la unidad familiar declara conjunta, es decir, un único perceptor de ingresos
+ * (matrimonio con un solo ingreso, o unidad monoparental con hijos).
+ *
+ * ⚠️ Vive aparte de `calcularMinimosPersonales` desde el 12/09/2026 porque NO es un mínimo:
+ * la norma dice «la base imponible se reducirá en 3.400 euros anuales», así que se resta de
+ * la base y se valora al tipo marginal, mientras que el mínimo del art. 63.1.2º se grava a
+ * tipo cero. Sumarla al mínimo, como se hacía antes, le daba el tratamiento del otro.
+ */
+function calcularReduccionTributacionConjunta(
+  situacion: SituacionFamiliar,
+  numHijos: number
+): number {
+  if (situacion === 'casado_un_ingreso') return REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental;
+  if (situacion === 'familia_monoparental' && numHijos > 0) {
+    return REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
+  }
+  return 0;
 }
 
 // Calcular neto a partir del bruto
@@ -121,8 +160,14 @@ function calcularBrutoANeto(
   // Reducción por obtención de rendimientos del trabajo (art. 20 LIRPF)
   const reduccionRNT = calcularReduccionRNT(rnt);
   const baseImponible = Math.max(0, rnt - reduccionRNT);
-  const minimos = calcularMinimosPersonales(situacion, numHijos, hijosMenores3);
-  const cuotaIRPF = calcularIRPF(baseImponible, minimos);
+  // Base liquidable general = base imponible − reducciones de base (art. 84.2 en tributación
+  // conjunta). El mínimo personal y familiar NO se resta aquí: entra en calcularIRPF.
+  const baseLiquidable = Math.max(
+    0,
+    baseImponible - calcularReduccionTributacionConjunta(situacion, numHijos)
+  );
+  const minimos = calcularMinimosPersonales(numHijos, hijosMenores3);
+  const cuotaIRPF = calcularIRPF(baseLiquidable, minimos);
   // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
   const deduccion = calcularDeduccionRentasBajas(rnt, 0);
   const irpfAnual = Math.max(0, cuotaIRPF - deduccion);

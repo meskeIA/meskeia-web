@@ -18,7 +18,7 @@ import { test, expect, Page } from '@playwright/test';
  *   · TRAMOS_IRPF_2025            — 19/24/30/37/45/47 % (Ley 35/2006 art. 63)
  *   · MINIMOS_IRPF_2025.personal  — 5.550 € (soltero, sin hijos)
  *   · GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral — 2.000 € (art. 19.2.f)
- *   · REDUCCION_RENDIMIENTOS_TRABAJO_2025 — art. 20 LIRPF (RNT ≥ 16.825 € → 2.364 €)
+ *   · REDUCCION_RENDIMIENTOS_TRABAJO_2025 — art. 20 LIRPF (RNT ≥ 19.747,5 € → 0 €)
  *   · DEDUCCION_RENTAS_BAJAS_2025 (vía calcularDeduccionRentasBajas) — art. 80 bis
  *     (0 € cuando el RNT supera 18.276 €, como en los dos casos siguientes)
  *   · COTIZACIONES_SS_2026 — 4,70 + 1,55 + 0,10 + 0,15 = 6,50 % trabajador
@@ -30,15 +30,15 @@ import { test, expect, Page } from '@playwright/test';
  * ────────────────────────────────────────────────────────────────────────
  *   CASO 1 (normal) — 30.000 € brutos, soltero/a, 0 hijos, 12 pagas
  *       SS anual 1.950,00 € (base 2.500 €/mes, dentro de mínima-máxima)
- *       RNT 26.050 € (≥ 16.825 → reducción art.20 = 2.364 €)
- *       base liquidable 18.136 € → IRPF 3.730,14 € (tramos 19 %/24 %)
- *       neto anual 24.319,86 €
+ *       RNT 26.050 € (≥ 19.747,5 → reducción art.20 = 0 €)
+ *       base liquidable 26.050 € → IRPF 4.926,00 € (escala menos escala del mínimo)
+ *       neto anual 23.124,00 €
  *
  *   CASO 2 (límite) — 120.000 € brutos, soltero/a, 0 hijos, 12 pagas
  *       mensual 10.000 €/mes > máxima 5.101,20 €/mes → base de cotización
  *       SE CLAVA en la máxima → SS anual 3.978,94 € (no crece más con el bruto)
- *       IRPF 38.649,68 € (tramos hasta el 45 %, base liquidable 106.107,06 €)
- *       neto anual 77.371,39 €
+ *       IRPF 41.156,48 € (tramos hasta el 45 %, base liquidable 114.021,06 €)
+ *       neto anual 74.864,59 €
  *
  *   CASO 3 (reparado, hallazgo 559) — campo vacío (Calcular sin escribir nada)
  *       frente a «-5000» (negativo, control). `NumberInput` filtra bien las
@@ -59,10 +59,38 @@ import { test, expect, Page } from '@playwright/test';
  * ninguna reducción frente a «Soltero/a».
  *
  * ── Reparado 02/09/2026 (hallazgo 569) ───────────────────────────────────────
- * `data/fiscal/irpf.ts` gana `REDUCCION_TRIBUTACION_CONJUNTA_2025` (art. 84.2.4º
- * LIRPF: 3.400 €/año biparental con un solo perceptor, 2.150 €/año monoparental)
- * y `calcularMinimosPersonales` la aplica según `situacion`. El caso monoparental
- * ya sumaba 2.150 € a mano; ahora sale de la misma constante centralizada.
+ * `data/fiscal/irpf.ts` gana `REDUCCION_TRIBUTACION_CONJUNTA_2025` (art. 84.2, reglas
+ * 3ª y 4ª LIRPF: 3.400 €/año biparental con un solo perceptor, 2.150 €/año monoparental)
+ * y la app la aplica según `situacion`. El caso monoparental ya sumaba 2.150 € a mano;
+ * ahora sale de la misma constante centralizada.
+ *
+ * ── Goldens recalculados 12/09/2026 — DOS correcciones, ninguna cosmética ─────
+ * Los tres tests de importes aparecieron en rojo en la suite del 11/09. Al recalcularlos
+ * a mano contra la fuente (no contra lo que la app devuelve hoy) resultó que la primera
+ * corrección ya estaba hecha en el código y la segunda no:
+ *
+ * 1. REDUCCIÓN DEL ART. 20 — el test estaba desfasado, la app calculaba bien.
+ *    El commit 2b80033d (09/09/2026) retiró de data/fiscal la reducción residual de
+ *    2.364 € para todo RNT ≥ 16.825 €. Verificado en sesión el 12/09/2026 contra la AEAT
+ *    (Manual práctico Renta 2025, cap. 3, «Fase 3ª: determinación del rendimiento neto
+ *    reducido»): esa reducción residual NO EXISTE. La escala tiene dos tramos decrecientes
+ *    —7.302 € hasta 14.852 €, menos 1,75 hasta 17.673,52 €, menos 1,14 hasta 19.747,5 €—
+ *    y a partir de 19.747,5 € vale CERO. Los dos casos de aquí (RNT 26.050 € y 114.021 €)
+ *    están muy por encima, así que su reducción es 0 y la base sube en 2.364 €.
+ *
+ * 2. MÍNIMO PERSONAL Y FAMILIAR — aquí el defecto estaba en la APP, y se reparó.
+ *    La app restaba el mínimo DE LA BASE antes de aplicar la escala, lo que lo valora al
+ *    tipo marginal. El art. 63.1.2º LIRPF dice que el mínimo «no reduce la renta»: forma
+ *    parte de la base liquidable general y se grava a tipo cero aplicando la escala dos
+ *    veces y restando la cuota del mínimo de la cuota de la base. Subestimaba la cuota en
+ *    610,50 € (30.000 € de bruto) y 1.054,50 € (120.000 €). Es el mismo hallazgo que el
+ *    commit 2b80033d reparó en seis motores de `lib/calculadoras`; esta app quedó fuera
+ *    porque su cálculo vive en la propia página.
+ *    De paso, la reducción por tributación conjunta dejó de sumarse al mínimo: el art. 84.2
+ *    dice «la base imponible se reducirá», así que es reducción de BASE y se valora al
+ *    marginal, no a tipo cero. Sumarla al mínimo le daba el tratamiento del otro.
+ *
+ * La aritmética íntegra de cada caso, ya con las dos correcciones, va en su test.
  */
 
 const RUTA = '/estimador-sueldo-neto/';
@@ -111,15 +139,20 @@ test('CASO 1 (normal) · 30.000 € brutos, soltero/a, 0 hijos, 12 pagas', async
 
   // Tarjetas principales
   expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('30.000,00€');
-  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('24.319,86€');
+  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('23.124,00€');
   expect(await valorTarjeta(page, 'Bruto Mensual (12 pagas)')).toBe('2500,00€');
-  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('2026,66€');
+  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('1927,00€');
 
-  // IRPF — TRAMOS_IRPF_2025: 19 % hasta 12.450 € + 24 % hasta 18.136 €
-  // (base liquidable = RNT 26.050 € - reducción art.20 2.364 € - mínimo 5.550 €)
-  // 12.450 × 0,19 = 2.365,50 € · 5.686 × 0,24 = 1.364,64 € → 3.730,14 €
-  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('3730,14 €');
-  expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('12,43%');
+  // IRPF — base liquidable = RNT 26.050 € − reducción art.20 (0 €, el RNT supera los
+  // 19.747,5 € en que se agota) = 26.050 €. El mínimo personal NO se resta de la base:
+  // art. 63.1.2º, escala a la base completa menos escala al mínimo.
+  //   escala(26.050) = 12.450×19 % + 7.750×24 % + 5.850×30 %
+  //                  = 2.365,50 + 1.860,00 + 1.755,00 = 5.980,50 €
+  //   escala(5.550)  = 5.550×19 %                     = 1.054,50 €
+  //   cuota          = 5.980,50 − 1.054,50            = 4.926,00 €
+  // Deducción art. 80 bis: 0 € (el RNT de 26.050 € supera el límite de 18.276 €).
+  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('4926,00 €');
+  expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('16,42%');
 
   // Seguridad Social — COTIZACIONES_SS_2026 sobre base 2.500 €/mes (sin tope)
   expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('1410,00 €'); // 2.500×4,70%×12
@@ -128,9 +161,9 @@ test('CASO 1 (normal) · 30.000 € brutos, soltero/a, 0 hijos, 12 pagas', async
   expect(await filaDesglose(page, 'MEF - Equidad Intergeneracional (0,15%)')).toBe('45,00 €'); // 2.500×0,15%×12
   expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1950,00 €');
 
-  // Resumen — 3.730,14 + 1.950,00 = 5.680,14 € · sobre 30.000 € = 18,93 %
-  expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('5680,14 €');
-  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('18,93%');
+  // Resumen — 4.926,00 + 1.950,00 = 6.876,00 € · sobre 30.000 € = 22,92 %
+  expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('6876,00 €');
+  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('22,92%');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -139,9 +172,9 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
   expect(await hayResultados(page)).toBe(true);
 
   expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('120.000,00€');
-  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('77.371,39€');
+  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('74.864,59€');
   expect(await valorTarjeta(page, 'Bruto Mensual (12 pagas)')).toBe('10.000,00€');
-  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('6447,62€');
+  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('6238,72€');
 
   // 10.000 €/mes > BASES_SS_2026.maxima (5.101,20 €/mes) → la base de cotización
   // no sigue subiendo con el bruto: se clava en 5.101,20 €/mes.
@@ -152,15 +185,20 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
   // SS anual = 5.101,20 × 6,50% × 12 = 3.978,94 €
   expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('3978,94 €');
 
-  // IRPF: RNT 114.021,06 € (≥16.825 → reducción 2.364) → base liquidable 106.107,06 €
-  // (tras mínimo personal 5.550 €), tramos 19/24/30/37 % completos + resto al 45 %
-  // 2.365,50+1.860+4.500+9.176+20.748,18 = 38.649,68 €
-  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('38.649,68 €');
-  expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('32,21%');
+  // IRPF: RNT 114.021,06 € (muy por encima de 19.747,5 → reducción art.20 = 0) →
+  // base liquidable 114.021,06 €, con los tramos 19/24/30/37 % completos + resto al 45 %:
+  //   escala(114.021,06) = 2.365,50 + 1.860,00 + 4.500,00 + 9.176,00 + 24.309,48
+  //                      = 42.210,98 €
+  //   escala(5.550)      = 1.054,50 €   ← el mínimo, a tipo cero (art. 63.1.2º)
+  //   cuota              = 42.210,98 − 1.054,50 = 41.156,48 €
+  // Nótese que el mínimo vale aquí lo mismo que en el CASO 1 (1.054,50 €): ese es
+  // justamente el efecto que persigue el art. 63.1.2º y el que el cálculo viejo rompía.
+  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('41.156,48 €');
+  expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('34,30%');
 
-  // 38.649,68 + 3.978,94 = 42.628,61 € · sobre 120.000 € = 35,52 %
-  expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('42.628,61 €');
-  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('35,52%');
+  // 41.156,48 + 3.978,94 = 45.135,41 € · sobre 120.000 € = 37,61 %
+  expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('45.135,41 €');
+  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('37,61%');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -248,21 +286,24 @@ test('Hallazgo 561 — los 4 botones de la app llevan type="button"', async ({ p
 // ─────────────────────────────────────────────────────────────────────────────
 /**
  * Hallazgo 569 (reparado 02/09/2026) — «Casado/a (un solo ingreso)» debe aplicar
- * la reducción por tributación conjunta del art. 84.2.4º LIRPF (3.400 €/año en
- * la base imponible) frente a «Soltero/a». Con 30.000 € brutos:
- *   RNT 26.050 € - reducción art.20 (2.364 €) = base imponible 23.686 €
- *   Soltero:  base liquidable 23.686 - 5.550          = 18.136 € → IRPF 3.730,14 €
- *   Casado 1: base liquidable 23.686 - (5.550 + 3.400) = 14.736 € → IRPF 2.914,14 €
- *   (12.450 × 19 % + 2.286 × 24 % = 2.365,50 + 548,64 = 2.914,14 €)
- *   Neto casado 1 ingreso = 30.000 - 1.950 (SS) - 2.914,14 = 25.135,86 €
+ * la reducción por tributación conjunta del art. 84.2.3ª LIRPF (3.400 €/año en
+ * la base imponible) frente a «Soltero/a». Con 30.000 € brutos, y ya con los goldens
+ * recalculados el 12/09 (reducción del art. 20 = 0 y mínimo a tipo cero):
+ *   RNT 26.050 € − reducción art.20 (0 €) = base imponible 26.050 €
+ *   Soltero:  base liquidable 26.050 € → escala 5.980,50 − 1.054,50 = IRPF 4.926,00 €
+ *   Casado 1: base liquidable 26.050 − 3.400 = 22.650 € (la reducción del art. 84.2 SÍ
+ *             va contra la base) → escala 4.960,50 − 1.054,50 = IRPF 3.906,00 €
+ *             (12.450×19 % + 7.750×24 % + 2.450×30 % = 2.365,50 + 1.860 + 735)
+ *   Neto casado 1 ingreso = 30.000 − 1.950 (SS) − 3.906,00 = 24.144,00 €
+ *   Ahorro = 1.020 €, que es el 30 % (tipo marginal) de los 3.400 € de reducción.
  */
 test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF que «Soltero/a» por la reducción de tributación conjunta', async ({ page }) => {
   await page.goto(RUTA);
   await calcular(page, '30000');
   const netoSoltero = await valorTarjeta(page, 'Salario Neto Anual');
   const irpfSoltero = await filaDesglose(page, 'Retención IRPF anual');
-  expect(netoSoltero).toBe('24.319,86€');
-  expect(irpfSoltero).toBe('3730,14 €');
+  expect(netoSoltero).toBe('23.124,00€');
+  expect(irpfSoltero).toBe('4926,00 €');
 
   await limpiarFormulario(page);
   await page.locator('select').first().selectOption({ label: 'Casado/a (un solo ingreso)' });
@@ -270,8 +311,8 @@ test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF
   const netoCasadoUnIngreso = await valorTarjeta(page, 'Salario Neto Anual');
   const irpfCasadoUnIngreso = await filaDesglose(page, 'Retención IRPF anual');
 
-  // Reparado: ya NO coinciden con el soltero, y el importe es el que exige el art. 84.2.4º.
-  expect(irpfCasadoUnIngreso).toBe('2914,14 €');
-  expect(netoCasadoUnIngreso).toBe('25.135,86€');
+  // Reparado: ya NO coinciden con el soltero, y el importe es el que exige el art. 84.2.3ª.
+  expect(irpfCasadoUnIngreso).toBe('3906,00 €');
+  expect(netoCasadoUnIngreso).toBe('24.144,00€');
   expect(netoCasadoUnIngreso).not.toBe(netoSoltero);
 });

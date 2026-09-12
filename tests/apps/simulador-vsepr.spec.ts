@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * Inspector — simulador-vsepr (segmento interactiva, riesgo 3, 170 usos reales · Stemum/Química)
@@ -46,6 +47,27 @@ import { test, expect, Page } from '@playwright/test';
  * cálculo: la tabla VSEPR embebida y la asignación de vértices (pares libres en posiciones
  * ecuatoriales en bipirámide trigonal, en posiciones opuestas en octaédrica) coinciden con la
  * teoría en los ocho presets y en los tres casos aquí fijados como regresión.
+ *
+ * LA CARRERA DE HIDRATACIÓN (12/09/2026) — por qué se reparó este fichero, no la app
+ *   Los dos casos «vía deslizadores» de X≠4 aparecieron en rojo en la suite del 11/09 sin que
+ *   la app ni el spec se hubieran tocado desde agosto. Pidiendo X=2,E=2 salía AX₄E₂ y pidiendo
+ *   X=6,E=0 salía AX₄: en ambos el deslizador de ENLACES se quedaba en su valor inicial (4) y
+ *   el de pares libres sí obedecía. No era un fallo de la app: con teclado real (ArrowRight),
+ *   con `fill()` y con el propio setter sintético una vez cargada la página, los dos
+ *   deslizadores responden y la tabla VSEPR sale correcta.
+ *
+ *   El `beforeEach` solo esperaba al <h1>, que viaja en el HTML servido. Medido: en ese instante
+ *   los inputs todavía NO están hidratados (React aún no ha instalado su `_valueTracker`), así
+ *   que el primer evento sintético de cada test —siempre el de enlaces— se perdía; el segundo,
+ *   32 ms más tarde, ya llegaba. Agravante que lo volvía indepurable: el intento perdido deja el
+ *   rastreador de valor de React apuntando al valor que no llegó a aplicarse, de modo que
+ *   reintentar CON EL MISMO VALOR no lo arregla nunca (React descarta el evento por duplicado) y
+ *   solo un valor distinto desatasca. Por eso fallaba igual reintentando 20 s.
+ *
+ *   Reparación: esperar la hidratación antes de tocar nada, y que `ponerSlider` COMPRUEBE que el
+ *   estado de React recogió el valor en vez de seguir midiendo otra molécula en silencio. Al
+ *   hacerlo salió a la luz que dos casos daban verde sin mover nada, porque su combinación era
+ *   la del estado inicial (X=4,E=0); ahora los tres parten de H₂O y el movimiento es real.
  */
 
 const RUTA = '/simulador-vsepr/';
@@ -55,7 +77,16 @@ async function cargarPreset(page: Page, formula: string): Promise<void> {
   await page.getByRole('button', { name: `Cargar configuración de ${formula}` }).click();
 }
 
-/** Mueve un deslizador (range) como lo haría un usuario arrastrándolo. */
+/** El eco del valor en la etiqueta: lo pinta React desde su estado, no el DOM del propio input. */
+const ecoDeSlider = (page: Page, id: string) => page.locator(`label[for="${id}"] strong`);
+
+const DESLIZADORES = ['#slider-enlaces', '#slider-libres'];
+
+/**
+ * Mueve un deslizador (range) como lo haría un usuario arrastrándolo, y comprueba que el ESTADO
+ * de React lo ha recogido. La comprobación no es decorativa: sin ella un evento perdido deja el
+ * deslizador en su valor anterior y el test sigue adelante midiendo otra molécula.
+ */
 async function ponerSlider(page: Page, id: string, valor: number): Promise<void> {
   await page.evaluate(
     ({ id, valor }) => {
@@ -69,6 +100,10 @@ async function ponerSlider(page: Page, id: string, valor: number): Promise<void>
     },
     { id, valor },
   );
+  await expect(
+    ecoDeSlider(page, id),
+    `el deslizador #${id} no llegó a ${valor}: el evento no alcanzó al estado de React`,
+  ).toHaveText(String(valor));
 }
 
 interface ResultadoVsepr {
@@ -103,6 +138,8 @@ test.describe('Simulador VSEPR — geometría molecular contra la teoría, en la
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Simulador VSEPR — Geometría Molecular',
     );
+    // El <h1> es HTML servido: está mucho antes de que la página responda a nada.
+    await esperarHidratacion(page, DESLIZADORES);
   });
 
   test('CASO 1 (normal) · CH₄ vía preset — AX₄, tetraédrica, 109,5°, sp³', async ({ page }) => {
@@ -121,7 +158,10 @@ test.describe('Simulador VSEPR — geometría molecular contra la teoría, en la
   test('CASO 1 (normal) · X=4,E=0 vía deslizadores — mismo resultado que el preset CH₄', async ({ page }) => {
     // Verificación independiente: la misma combinación alcanzada moviendo los deslizadores a
     // mano (sin usar el atajo de preset) debe dar la tabla VSEPR idéntica.
-    await ponerSlider(page, 'slider-enlaces', 4);
+    // Se parte de H₂O (X=2,E=2) y no del estado inicial, que ya ES X=4,E=0: desde ahí el test
+    // daba verde sin haber movido nada (ver «LA CARRERA DE HIDRATACIÓN» en la cabecera).
+    await cargarPreset(page, 'H2O');
+    await ponerSlider(page, 'slider-enlaces', 4); // 4+2 = 6, dentro del tope: no recorta libres
     await ponerSlider(page, 'slider-libres', 0);
     const r = await leerResultado(page);
     expect(r).toEqual({
@@ -182,8 +222,11 @@ test.describe('Simulador VSEPR — geometría molecular contra la teoría, en la
   });
 
   test('CASO 3 (límite, máximo soportado) · X=6,E=0 vía deslizadores — mismo resultado que SF₆', async ({ page }) => {
+    // También desde H₂O: con el estado inicial (E ya vale 0) el deslizador de pares libres no
+    // llegaba a moverse y solo se estaba comprobando medio caso.
+    await cargarPreset(page, 'H2O');
+    await ponerSlider(page, 'slider-libres', 0); // primero E, para no chocar con el tope X+E ≤ 6
     await ponerSlider(page, 'slider-enlaces', 6);
-    await ponerSlider(page, 'slider-libres', 0);
     const r = await leerResultado(page);
     expect(r).toEqual({
       notacion: 'AX₆',
