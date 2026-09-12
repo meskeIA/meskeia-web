@@ -23,7 +23,7 @@ import {
   SALARIO_MEDIO_NACIONAL_2023,
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
-  TRAMOS_IRPF_2025,
+  calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   calcularDeduccionRentasBajas,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
@@ -62,19 +62,15 @@ function calcularIRPFAnual(brutoAnual: number): number {
   const reduccion = calcularReduccionRendimientosTrabajo(rnt);
 
   const baseImponible = Math.max(0, rnt - reduccion);
-  const baseLiquidable = Math.max(0, baseImponible - MINIMOS_IRPF_2025.personal);
 
-  // Cuota por tramos
-  let cuota = 0;
-  let restante = baseLiquidable;
-  let anterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    const base = Math.min(restante, tramo.hasta - anterior);
-    if (base <= 0) break;
-    cuota += base * (tramo.tipo / 100);
-    restante -= base;
-    anterior = tramo.hasta;
-  }
+  // Cuota integra: art. 63.1.2 LIRPF. El minimo personal NO reduce la base; se grava a tipo
+  // cero aplicando la escala a la base completa y restando la escala aplicada al minimo.
+  //
+  // ATENCION 12/09/2026: hasta esta fecha esta app restaba el minimo de la base antes de la
+  // escala, que lo valora al tipo marginal y subestima la cuota. Con el SMI el efecto es
+  // pequeno porque la reduccion del art. 20 deja la base casi a cero, pero el simulador
+  // tambien acepta sueldos por encima del SMI, y ahi el error llegaba a 1.443 EUR/ano.
+  const cuota = calcularCuotaIntegraGeneral(baseImponible, MINIMOS_IRPF_2025.personal);
 
   // Deducción rentas bajas (art. 80 bis)
   const deduccion = calcularDeduccionRentasBajas(rnt, 0);

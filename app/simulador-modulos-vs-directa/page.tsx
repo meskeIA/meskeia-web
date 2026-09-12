@@ -15,7 +15,8 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
-  TRAMOS_IRPF_2025,
+  cuotaEscalaGeneral,
+  calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   FISCAL_IRPF_META,
   LIMITES_EXCLUSION_MODULOS_2025,
@@ -188,20 +189,25 @@ const CASOS: CasoPreconfig[] = [
 
 // ─── Cálculos ────────────────────────────────────────────────────────────────
 
-function calcularIRPF(baseLiquidable: number): number {
-  let cuota = 0;
-  let resto = Math.max(0, baseLiquidable);
-  let limAnt = 0;
-  for (const t of TRAMOS_IRPF_2025) {
-    const limSup = t.hasta === Infinity ? Infinity : t.hasta;
-    const ancho = limSup - limAnt;
-    const aplicada = Math.min(resto, ancho);
-    if (aplicada > 0) cuota += aplicada * (t.tipo / 100);
-    resto -= aplicada;
-    limAnt = limSup;
-    if (resto <= 0) break;
-  }
-  return cuota;
+/**
+ * Cuota integra de la base liquidable general (art. 63.1.2 LIRPF): escala sobre la base
+ * completa menos escala sobre el minimo. Devuelve las dos piezas para que el desglose que
+ * se imprime en pantalla cuadre linea a linea.
+ *
+ * ATENCION 12/09/2026: hasta esta fecha la app restaba el minimo de la base y aplicaba la
+ * escala al resto, que lo valora al tipo marginal y subestima la cuota (946,50 EUR con
+ * 40.000 EUR de rendimiento neto reducido, 1.443 EUR de 70.000 en adelante). El minimo no
+ * reduce la base: se grava a tipo cero. La formula vive en data/fiscal/irpf.ts.
+ */
+function calcularIRPF(baseLiquidableGeneral: number, minimo: number): {
+  cuotaEscala: number;
+  cuotaMinimo: number;
+  irpf: number;
+} {
+  const base = Math.max(0, baseLiquidableGeneral);
+  const cuotaEscala = cuotaEscalaGeneral(base);
+  const cuotaMinimo = cuotaEscalaGeneral(Math.min(minimo, base));
+  return { cuotaEscala, cuotaMinimo, irpf: calcularCuotaIntegraGeneral(base, minimo) };
 }
 
 // Mínimo personal orientativo (sin familia)
@@ -218,8 +224,14 @@ interface ResultadoED {
   rendimientoNetoPrevio: number;
   reduccion5pc: number;
   rendimientoNetoReducido: number;
+  /** Minimo personal (art. 57 LIRPF). NO se resta de la base: se grava a tipo cero. */
   minimosPersonales: number;
+  /** Base liquidable general, CON el minimo dentro. */
   baseLiquidable: number;
+  /** Escala aplicada a la base liquidable completa. */
+  cuotaEscala: number;
+  /** Escala aplicada al minimo, que es lo que se resta de la anterior. */
+  cuotaMinimo: number;
   irpf: number;
   cuotaReta: number;
   costeAnualTotal: number;
@@ -231,8 +243,9 @@ function calcularED(d: DatosComunes): ResultadoED {
   const reduccion5pc = Math.min(rendimientoNetoPrevio * 0.05, 2000);
   const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc);
   const minimosPersonales = MINIMO_PERSONAL_ORIENTATIVO;
-  const baseLiquidable = Math.max(0, rendimientoNetoReducido - minimosPersonales);
-  const irpf = calcularIRPF(baseLiquidable);
+  // El minimo no se resta de la base: entra en calcularIRPF y se grava a tipo cero.
+  const baseLiquidable = rendimientoNetoReducido;
+  const { cuotaEscala, cuotaMinimo, irpf } = calcularIRPF(baseLiquidable, minimosPersonales);
   const cuotaReta = d.retaMensual * 12;
   const costeAnualTotal = irpf + cuotaReta;
   return {
@@ -243,6 +256,8 @@ function calcularED(d: DatosComunes): ResultadoED {
     rendimientoNetoReducido,
     minimosPersonales,
     baseLiquidable,
+    cuotaEscala,
+    cuotaMinimo,
     irpf,
     cuotaReta,
     costeAnualTotal,
@@ -283,8 +298,14 @@ interface ResultadoModulos {
   reduccion5pc: number;
   reduccionEmpleo: number;
   rendimientoNetoReducido: number;
+  /** Minimo personal (art. 57 LIRPF). NO se resta de la base: se grava a tipo cero. */
   minimosPersonales: number;
+  /** Base liquidable general, CON el minimo dentro. */
   baseLiquidable: number;
+  /** Escala aplicada a la base liquidable completa. */
+  cuotaEscala: number;
+  /** Escala aplicada al minimo, que es lo que se resta de la anterior. */
+  cuotaMinimo: number;
   irpf: number;
   cuotaReta: number;
   costeAnualTotal: number;
@@ -324,8 +345,9 @@ function calcularModulos(d: DatosComunes, m: DatosModulos): ResultadoModulos {
   const reduccionEmpleo = m.personalAsalariado * 100;
   const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc - reduccionEmpleo);
   const minimosPersonales = MINIMO_PERSONAL_ORIENTATIVO;
-  const baseLiquidable = Math.max(0, rendimientoNetoReducido - minimosPersonales);
-  const irpf = calcularIRPF(baseLiquidable);
+  // El minimo no se resta de la base: entra en calcularIRPF y se grava a tipo cero.
+  const baseLiquidable = rendimientoNetoReducido;
+  const { cuotaEscala, cuotaMinimo, irpf } = calcularIRPF(baseLiquidable, minimosPersonales);
   const cuotaReta = d.retaMensual * 12;
   const costeAnualTotal = irpf + cuotaReta;
 
@@ -336,6 +358,8 @@ function calcularModulos(d: DatosComunes, m: DatosModulos): ResultadoModulos {
     rendimientoNetoReducido,
     minimosPersonales,
     baseLiquidable,
+    cuotaEscala,
+    cuotaMinimo,
     irpf,
     cuotaReta,
     costeAnualTotal,
@@ -721,16 +745,20 @@ export default function SimuladorModulosVsDirectaPage() {
                 <span>= Rendimiento neto reducido</span>
                 <strong>{formatCurrency(resED.rendimientoNetoReducido)}</strong>
               </div>
-              <div className={styles.lineaResta}>
-                <span>− Mínimo personal (orientativo)</span>
-                <strong>−{formatCurrency(resED.minimosPersonales)}</strong>
-              </div>
               <div className={styles.lineaSubtotal}>
-                <span>= Base liquidable</span>
+                <span>= Base liquidable (el mínimo va dentro)</span>
                 <strong>{formatCurrency(resED.baseLiquidable)}</strong>
               </div>
               <div className={styles.lineaItem}>
-                <span>IRPF por tramos</span>
+                <span>Escala general sobre la base completa</span>
+                <strong>{formatCurrency(resED.cuotaEscala)}</strong>
+              </div>
+              <div className={styles.lineaResta}>
+                <span>− Escala sobre el mínimo personal ({formatCurrency(resED.minimosPersonales)}, a tipo cero)</span>
+                <strong>−{formatCurrency(resED.cuotaMinimo)}</strong>
+              </div>
+              <div className={styles.lineaItem}>
+                <span>= IRPF</span>
                 <strong>{formatCurrency(resED.irpf)}</strong>
               </div>
               <div className={styles.lineaSuma}>
@@ -773,16 +801,20 @@ export default function SimuladorModulosVsDirectaPage() {
                 <span>= Rendimiento neto reducido</span>
                 <strong>{formatCurrency(resModulos.rendimientoNetoReducido)}</strong>
               </div>
-              <div className={styles.lineaResta}>
-                <span>− Mínimo personal (orientativo)</span>
-                <strong>−{formatCurrency(resModulos.minimosPersonales)}</strong>
-              </div>
               <div className={styles.lineaSubtotal}>
-                <span>= Base liquidable</span>
+                <span>= Base liquidable (el mínimo va dentro)</span>
                 <strong>{formatCurrency(resModulos.baseLiquidable)}</strong>
               </div>
               <div className={styles.lineaItem}>
-                <span>IRPF por tramos</span>
+                <span>Escala general sobre la base completa</span>
+                <strong>{formatCurrency(resModulos.cuotaEscala)}</strong>
+              </div>
+              <div className={styles.lineaResta}>
+                <span>− Escala sobre el mínimo personal ({formatCurrency(resModulos.minimosPersonales)}, a tipo cero)</span>
+                <strong>−{formatCurrency(resModulos.cuotaMinimo)}</strong>
+              </div>
+              <div className={styles.lineaItem}>
+                <span>= IRPF</span>
                 <strong>{formatCurrency(resModulos.irpf)}</strong>
               </div>
               <div className={styles.lineaSuma}>

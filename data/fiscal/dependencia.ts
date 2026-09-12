@@ -197,7 +197,7 @@ export const DEDUCCIONES_IRPF_DISCAPACIDAD_2025 = {
     rentaMaxima: 8000, // Rentas anuales máximas del ascendiente (excluidas exentas)
     convivencia: true, // Debe convivir con el contribuyente (o dependencia)
   },
-  nota: 'Los gastos de asistencia (3.000 €) se suman al mínimo por discapacidad ante cualquiera de tres supuestos ALTERNATIVOS (basta uno): acreditar necesidad de ayuda de terceras personas, acreditar movilidad reducida, o tener un grado de discapacidad igual o superior al 65%. Con grado del 33% al 64% la acreditación es condición necesaria; con grado ≥65% el propio grado da derecho al incremento. El mínimo reduce la base liquidable, no la cuota directamente.',
+  nota: 'Los gastos de asistencia (3.000 €) se suman al mínimo por discapacidad ante cualquiera de tres supuestos ALTERNATIVOS (basta uno): acreditar necesidad de ayuda de terceras personas, acreditar movilidad reducida, o tener un grado de discapacidad igual o superior al 65%. Con grado del 33% al 64% la acreditación es condición necesaria; con grado ≥65% el propio grado da derecho al incremento. El mínimo NO reduce la base: forma parte de la base liquidable general y se grava a tipo cero (art. 63.1.2º LIRPF), aplicando la escala a la base completa y restando de la cuota la misma escala aplicada al mínimo. Por eso se valora a los tipos bajos de la escala y no al tipo marginal del contribuyente.',
 };
 
 // ─── Escala Zarit (Caregiver Burden Interview) ──────────────────────────────

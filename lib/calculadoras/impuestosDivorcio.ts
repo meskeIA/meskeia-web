@@ -36,7 +36,7 @@
  * en el schema del MCP.
  */
 import {
-  TRAMOS_IRPF_2025,
+  cuotaEscalaGeneral,
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
@@ -101,18 +101,8 @@ const REGIMENES: readonly RegimenDivorcio[] = ['gananciales', 'separacion', 'par
 /** Redondeo a céntimos. Todo lo que se publica pasa por aquí, y lo derivado se calcula sobre lo ya redondeado. */
 const r = (n: number) => Math.round(n * 100) / 100;
 
-/** Cuota íntegra de IRPF por tramos progresivos (escala general). */
-function calcularCuotaIRPF(base: number): number {
-  let cuota = 0;
-  let limiteAnterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (base <= limiteAnterior) break;
-    const tramoBase = Math.min(base, tramo.hasta) - limiteAnterior;
-    cuota += tramoBase * (tramo.tipo / 100);
-    limiteAnterior = tramo.hasta;
-  }
-  return cuota;
-}
+/** Cuota integra de IRPF por tramos progresivos (escala general). */
+const calcularCuotaIRPF = cuotaEscalaGeneral;
 
 /**
  * Base liquidable simplificada a partir de ingresos brutos del trabajo.
@@ -240,7 +230,15 @@ export function calcularImpuestosDivorcio(
       p.custodia === 'exclusiva-otro' ? 0 : p.custodia === 'compartida' ? 50 : 100;
     // Cada cifra se deriva de la anterior YA redondeada: el desglose impreso tiene que cuadrar.
     const minimoAplicable = r(minimoTotal * (porcentaje / 100));
-    const ahorroEstimado = r(minimoAplicable * 0.19); // marginal orientativo (app)
+    // Art. 63.1.2 LIRPF: el minimo NO reduce la base, se grava a tipo cero. Su ahorro es
+    // lo que la escala le aplica ENCIMA del minimo personal, no el tipo marginal de quien
+    // declara. Hasta el 12/09/2026 aqui habia un 19 % fijo: exacto hasta dos hijos (el
+    // minimo cabe entero en el primer tramo) y corto desde el tercero, donde parte cae ya
+    // al 24 % — 110 EUR menos con tres hijos y 335 EUR con cuatro.
+    const ahorroEstimado = r(
+      calcularCuotaIRPF(MINIMOS_IRPF_2025.personal + minimoAplicable)
+        - calcularCuotaIRPF(MINIMOS_IRPF_2025.personal),
+    );
     resultado.hijos = { minimoTotal, minimoAplicable, porcentaje, ahorroEstimado, custodia: p.custodia };
   }
 

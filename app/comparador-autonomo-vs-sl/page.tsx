@@ -11,7 +11,7 @@ import {
   FISCAL_IRPF_META,
   FISCAL_AUTONOMOS_META,
   FISCAL_SOCIEDADES_META,
-  TRAMOS_IRPF_2025,
+  calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   TRAMOS_RETA_2025,
   TIPO_COTIZACION_RETA,
@@ -29,19 +29,16 @@ function labelTipoIS(tipoIS: TipoISComparador): string {
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
-function calcularCuotaIRPF(baseLiquidable: number): number {
-  let cuota = 0;
-  let restante = Math.max(0, baseLiquidable);
-  let limiteAnterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    const anchura = tramo.hasta - limiteAnterior;
-    const base = Math.min(restante, anchura);
-    if (base <= 0) break;
-    cuota += base * (tramo.tipo / 100);
-    restante -= base;
-    limiteAnterior = tramo.hasta;
-  }
-  return cuota;
+/**
+ * Cuota integra de IRPF del autonomo (art. 63.1.2 LIRPF).
+ *
+ * ATENCION 12/09/2026: hasta esta fecha la app restaba el minimo personal del rendimiento
+ * neto y aplicaba la escala al resto, que lo valora al tipo marginal y subestima la cuota
+ * (565,50 EUR con 25.000 EUR de rendimiento neto, 1.443 EUR de 70.000 en adelante). El
+ * minimo no reduce la base: se grava a tipo cero. La formula vive en data/fiscal/irpf.ts.
+ */
+function calcularCuotaIRPF(baseLiquidableGeneral: number): number {
+  return calcularCuotaIntegraGeneral(baseLiquidableGeneral, MINIMOS_IRPF_2025.personal);
 }
 
 function calcularCuotaBaseAhorro(base: number): number {
@@ -86,10 +83,9 @@ function calcularAutonomo(beneficio: number, gastosDeducibles: number): Resultad
   // Rendimiento neto = beneficio - gastos deducibles - cuota SS
   const rendimientoNeto = Math.max(0, beneficio - gastosDeducibles - cuotaRetaAnual);
 
-  // IRPF: reducción mínima (mínimo personal básico)
-  const minimoPersonal = MINIMOS_IRPF_2025.personal;
-  const baseLiquidable = Math.max(0, rendimientoNeto - minimoPersonal);
-  const cuotaIRPF = calcularCuotaIRPF(baseLiquidable);
+  // IRPF: el minimo personal NO se resta de la base. Entra en calcularCuotaIRPF, que lo
+  // grava a tipo cero aplicando la escala dos veces (art. 63.1.2 LIRPF).
+  const cuotaIRPF = calcularCuotaIRPF(rendimientoNeto);
 
   const totalCargas = cuotaRetaAnual + cuotaIRPF;
   const netoAnual = beneficio - gastosDeducibles - totalCargas;
@@ -242,7 +238,7 @@ export default function ComparadorAutonomoVsSLPage() {
               Si no repartes dividendos, el beneficio queda en la sociedad (reinversión).
             </p>
           </div>
-          <button onClick={calcular} className={styles.btnCalcular}>
+          <button type="button" onClick={calcular} className={styles.btnCalcular}>
             Comparar
           </button>
         </div>

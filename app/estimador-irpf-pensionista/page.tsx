@@ -9,7 +9,8 @@ import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
-  TRAMOS_IRPF_2025,
+  cuotaEscalaGeneral,
+  calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
@@ -37,17 +38,8 @@ interface ResultadoIrpfPensionista {
 
 // ─── Lógica ───────────────────────────────────────────────────────────────────
 
-function calcularCuotaIRPF(base: number): number {
-  let cuota = 0;
-  let anterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (base <= anterior) break;
-    const enTramo = Math.min(base, tramo.hasta) - anterior;
-    cuota += enTramo * tramo.tipo / 100;
-    anterior = tramo.hasta;
-  }
-  return cuota;
-}
+/** Escala del art. 63 LIRPF. La cuota integra la pone `calcularCuotaIntegraGeneral`. */
+const calcularCuotaIRPF = cuotaEscalaGeneral;
 
 function calcularReduccionRRT(rnt: number): number {
   return calcularReduccionRendimientosTrabajo(rnt);
@@ -87,10 +79,13 @@ function estimarIrpfPensionista(
   // Base imponible
   const baseImponible = rendimientosNetosReducidos;
 
-  // Cuota íntegra sobre base - cuota sobre mínimo personal
+  // Cuota integra (art. 63.1.2 LIRPF): escala sobre la base completa menos escala sobre el
+  // minimo. Desde el 12/09/2026 la resta la hace data/fiscal/irpf.ts, que ademas acota el
+  // minimo a la base: con una pension por debajo del minimo, la escala aplicada al minimo
+  // entero devolvia mas cuota de la que hay que gravar, y solo el Math.max(0) lo tapaba.
   const cuotaBase = calcularCuotaIRPF(baseImponible);
-  const cuotaMinimo = calcularCuotaIRPF(minimoPersonal);
-  const cuotaIRPF = Math.max(0, cuotaBase - cuotaMinimo);
+  const cuotaMinimo = calcularCuotaIRPF(Math.min(minimoPersonal, baseImponible));
+  const cuotaIRPF = calcularCuotaIntegraGeneral(baseImponible, minimoPersonal);
 
   const tipoEfectivo = rendimientosIntegros > 0 ? (cuotaIRPF / rendimientosIntegros) * 100 : 0;
 

@@ -97,7 +97,7 @@ import {
   type RegimenId,
 } from '../lib/calculadoras/legitimas';
 import { calcularRetencionDividendos } from '../lib/calculadoras/retencionDividendos';
-import { TRAMOS_IRPF_2025, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025 } from '../data/fiscal/irpf';
+import { TRAMOS_IRPF_2025, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, REDUCCION_TRIBUTACION_CONJUNTA_2025, cuotaEscalaGeneral, desglosarEscalaGeneral, calcularCuotaIntegraGeneral } from '../data/fiscal/irpf';
 import { DEDUCCIONES_IRPF_DISCAPACIDAD_2025 } from '../data/fiscal/dependencia';
 import { DEDUCCION_MATERNIDAD_IRPF } from '../data/fiscal/maternidad';
 import { COEFICIENTES_IIVTNU_2025 } from '../data/fiscal/inmuebles';
@@ -2942,21 +2942,24 @@ test.describe('Motores 09/09 — mínimo por discapacidad IRPF (tool del MCP de 
     // tool del MCP y en tres FAQ de JSON-LD. Corregir el número sin corregir los textos deja
     // al LLM explicando mal la norma aunque devuelva bien la cifra.
     const r = calcularDeduccionDiscapacidadIRPF({
-      titular: 'ascendiente', grado: '65oMas', necesitaAsistencia: false, tipoMarginal: 37,
+      titular: 'ascendiente', grado: '65oMas', necesitaAsistencia: false,
     });
     expect(r.gastosAsistencia).toBe(3000);
     expect(r.totalMinimo).toBe(12000);                              // hoy: 9.000
-    expect(Math.round(r.ahorroEstimado * 100) / 100).toBe(4440);    // hoy: 3.330 → −1.110 €/año
+    // 12/09/2026: el ahorro dejó de ser `total × marginal`. Art. 63.1.2º LIRPF — el mínimo se
+    // grava a tipo cero, así que vale lo que la escala le aplica encima del mínimo personal:
+    // escala(5.550 + 12.000) − escala(5.550) = 6.900 × 19 % + 5.100 × 24 % = 2.535 €.
+    expect(Math.round(r.ahorroEstimado * 100) / 100).toBe(2535);
   });
 
   test('la rama que SÍ funciona hoy: con la casilla marcada salen los 12.000 €', () => {
     // Candado de que la reparación no rompa el camino correcto ni sume los 3.000 € dos veces.
     for (const titular of ['contribuyente', 'ascendiente', 'descendiente'] as const) {
       const r = calcularDeduccionDiscapacidadIRPF({
-        titular, grado: '65oMas', necesitaAsistencia: true, tipoMarginal: 37,
+        titular, grado: '65oMas', necesitaAsistencia: true,
       });
       expect(r.totalMinimo, titular).toBe(12000);
-      expect(Math.round(r.ahorroEstimado * 100) / 100, titular).toBe(4440);
+      expect(Math.round(r.ahorroEstimado * 100) / 100, titular).toBe(2535);
     }
   });
 
@@ -2964,37 +2967,45 @@ test.describe('Motores 09/09 — mínimo por discapacidad IRPF (tool del MCP de 
     // El otro extremo: aquí la casilla sí es condición necesaria. Si la reparación regalara
     // los 3.000 € a todo el mundo, este test lo cazaría.
     const sin = calcularDeduccionDiscapacidadIRPF({
-      titular: 'contribuyente', grado: '33a65', necesitaAsistencia: false, tipoMarginal: 24,
+      titular: 'contribuyente', grado: '33a65', necesitaAsistencia: false,
     });
     expect(sin.totalMinimo).toBe(3000);
-    expect(Math.round(sin.ahorroEstimado * 100) / 100).toBe(720);
+    // 5.550 + 3.000 = 8.550, todo dentro del primer tramo: 3.000 × 19 % = 570 €.
+    expect(Math.round(sin.ahorroEstimado * 100) / 100).toBe(570);
     const con = calcularDeduccionDiscapacidadIRPF({
-      titular: 'contribuyente', grado: '33a65', necesitaAsistencia: true, tipoMarginal: 24,
+      titular: 'contribuyente', grado: '33a65', necesitaAsistencia: true,
     });
     expect(con.totalMinimo).toBe(6000);
   });
 
-  test('CUADRE: mínimo + gastos = total, y total × marginal = ahorro (barrido de 7.218 casos)', () => {
-    // Este eje salió SANO y queda como candado: todos los importes son enteros y el ahorro no
-    // se resta de nada, así que aquí no aparece el céntimo descuadrado de sucesiones.
+  test('CUADRE: mínimo + gastos = total, y el ahorro sale de la escala (18 combinaciones)', () => {
+    // El barrido de 7.218 casos recorría el tipo marginal de 0 a 100 en pasos de 0,25. Ese eje
+    // desapareció el 12/09/2026 con el propio parámetro: el art. 63.1.2º grava el mínimo a tipo
+    // cero, de modo que el ahorro NO depende del marginal de quien declara. Lo que queda es el
+    // barrido exhaustivo de las 18 combinaciones reales, contrastado contra la escala.
+    const MINIMO_PERSONAL = 5550;
     let n = 0;
     for (const titular of ['contribuyente', 'ascendiente', 'descendiente'] as const) {
       for (const grado of ['33a65', '65oMas'] as const) {
         for (const asistencia of [false, true, undefined]) {
-          for (let tipo = 0; tipo <= 100; tipo += 0.25) {
-            const r = calcularDeduccionDiscapacidadIRPF({
-              titular, grado, necesitaAsistencia: asistencia, tipoMarginal: tipo,
-            });
-            const dos = (x: number) => Math.round(x * 100) / 100;
-            const etq = `${titular}/${grado}/${String(asistencia)}/${tipo}`;
-            expect(dos(r.minimoDiscapacidad) + dos(r.gastosAsistencia), etq).toBe(dos(r.totalMinimo));
-            expect(dos(dos(r.totalMinimo) * (r.tipoMarginal / 100)), etq).toBe(dos(r.ahorroEstimado));
-            n++;
-          }
+          const r = calcularDeduccionDiscapacidadIRPF({
+            titular, grado, necesitaAsistencia: asistencia,
+          });
+          const dos = (x: number) => Math.round(x * 100) / 100;
+          const etq = `${titular}/${grado}/${String(asistencia)}`;
+          expect(dos(r.minimoDiscapacidad) + dos(r.gastosAsistencia), etq).toBe(dos(r.totalMinimo));
+          const esperado = dos(
+            cuotaEscalaGeneral(MINIMO_PERSONAL + r.totalMinimo) - cuotaEscalaGeneral(MINIMO_PERSONAL)
+          );
+          expect(dos(r.ahorroEstimado), etq).toBe(esperado);
+          // Y el tipo efectivo nunca puede alcanzar los tipos altos de la escala: el mínimo
+          // cae siempre en los primeros tramos, esté donde esté la renta del contribuyente.
+          expect(r.tipoEfectivoAhorro, etq).toBeLessThanOrEqual(24);
+          n++;
         }
       }
     }
-    expect(n).toBeGreaterThan(7000);
+    expect(n).toBe(18);
   });
 
   test('CLAVES: ninguna de las 18 combinaciones declaradas se cae en un 0 o un undefined', () => {
@@ -3006,7 +3017,7 @@ test.describe('Motores 09/09 — mínimo por discapacidad IRPF (tool del MCP de 
       for (const grado of ['33a65', '65oMas'] as const) {
         for (const asistencia of [false, true, undefined]) {
           const r = calcularDeduccionDiscapacidadIRPF({
-            titular, grado, necesitaAsistencia: asistencia, tipoMarginal: 30,
+            titular, grado, necesitaAsistencia: asistencia,
           });
           const etq = `${titular}/${grado}/${String(asistencia)}`;
           expect(r.minimoDiscapacidad, etq).toBe(
@@ -4065,15 +4076,15 @@ test.describe('Unificación 10/09 — deducciones de IRPF por discapacidad y mat
     // ≥65 %. Esta era la regla que el motor tenía mal y la APP tenía bien: al unificar hay que
     // conservar la versión de la app, no la del motor. Son 3.000 € de mínimo.
     const sinAcreditar = calcularDeduccionDiscapacidadIRPF({
-      titular: 'ascendiente', grado: '65oMas', necesitaAsistencia: false, tipoMarginal: 37,
+      titular: 'ascendiente', grado: '65oMas', necesitaAsistencia: false,
     });
     expect(sinAcreditar.gastosAsistencia).toBe(3000);
     expect(sinAcreditar.totalMinimo).toBe(12000);
-    expect(sinAcreditar.ahorroEstimado).toBeCloseTo(4440, 2);
+    expect(sinAcreditar.ahorroEstimado).toBeCloseTo(2535, 2);
 
     // Con grado 33-64 % la acreditación SÍ es condición necesaria: ahí el incremento no procede.
     const grado33 = calcularDeduccionDiscapacidadIRPF({
-      titular: 'ascendiente', grado: '33a65', necesitaAsistencia: false, tipoMarginal: 37,
+      titular: 'ascendiente', grado: '33a65', necesitaAsistencia: false,
     });
     expect(grado33.gastosAsistencia).toBe(0);
   });
@@ -4180,5 +4191,119 @@ test.describe('Unificación 10/09 — patrimonio: el veredicto del art. 37', () 
     expect(justoDebajo.aplicaItsgf).toBe(false);
     const porEncima = calcularImpuestoPatrimonio({ ccaaId: 'madrid', otrosBienes: 3800000 });
     expect(porEncima.aplicaItsgf).toBe(true);
+  });
+});
+
+
+test.describe('Cuota íntegra general — art. 63.1.2º LIRPF (fuente única desde el 12/09/2026)', () => {
+  /**
+   * `calcularCuotaIntegraGeneral` es la ÚNICA implementación del art. 63.1.2º del proyecto
+   * desde el 12/09/2026. Antes la fórmula estaba copiada en 19 sitios y ocho de ellos la
+   * aplicaban mal: restaban el mínimo de la base antes de la escala, lo que lo valora al tipo
+   * MARGINAL en vez de a los tipos bajos, y subestimaba la cuota hasta 3.691 €/año.
+   *
+   * Norma verificada en sesión el 12/09/2026 contra la AEAT, manual de ayuda de Renta 2025,
+   * «8.4.3.1 Cuota íntegra estatal»: la escala se aplica a la base liquidable general SIN
+   * descontar el mínimo, después a la parte correspondiente al mínimo, y se resta la segunda
+   * cuota de la primera. El art. 74 hace lo mismo con la escala autonómica, de modo que el
+   * método vale igual sobre la escala combinada de `TRAMOS_IRPF_2025`.
+   *
+   * Los valores esperados están resueltos a mano desde la escala, no tomados de la función.
+   */
+
+  test('los casos resueltos a mano desde la escala', () => {
+    // escala acumulada: 12.450 → 2.365,50 · 20.200 → 4.225,50 · 35.200 → 8.725,50 · 60.000 → 17.901,50
+    const dos = (x: number) => Math.round(x * 100) / 100;
+
+    // Base 26.050 €, mínimo 5.550 € (nómina de 30.000 € brutos, soltero)
+    //   escala(26.050) = 2.365,50 + 1.860,00 + 5.850×30 % = 5.980,50
+    //   escala(5.550)  = 1.054,50  →  4.926,00
+    expect(dos(calcularCuotaIntegraGeneral(26050, 5550))).toBe(4926);
+
+    // Base 40.000 €, mínimo 10.650 € (dos hijos)
+    //   escala(40.000) = 8.725,50 + 4.800×37 % = 10.501,50
+    //   escala(10.650) = 2.023,50  →  8.478,00
+    expect(dos(calcularCuotaIntegraGeneral(40000, 10650))).toBe(8478);
+
+    // Base 70.000 €, mínimo 17.450 € (tres hijos, uno menor de 3 años)
+    //   escala(70.000) = 17.901,50 + 10.000×45 % = 22.401,50
+    //   escala(17.450) = 2.365,50 + 5.000×24 % = 3.565,50  →  18.836,00
+    expect(dos(calcularCuotaIntegraGeneral(70000, 17450))).toBe(18836);
+  });
+
+  test('el mínimo se valora SIEMPRE a los tipos bajos, nunca al marginal', () => {
+    // Es el corazón del art. 63.1.2º y lo que el método viejo rompía: dos contribuyentes con
+    // el mismo mínimo se ahorran lo MISMO, gane uno 26.000 € y el otro 200.000 €.
+    const dos = (x: number) => Math.round(x * 100) / 100;
+    const ahorro = (base: number) =>
+      dos(cuotaEscalaGeneral(base) - calcularCuotaIntegraGeneral(base, MINIMOS_IRPF_2025.personal));
+
+    const esperado = dos(MINIMOS_IRPF_2025.personal * 0.19); // 1.054,50 €
+    for (const base of [26050, 40000, 60000, 100000, 200000, 500000]) {
+      expect(ahorro(base), `base ${base}`).toBe(esperado);
+    }
+
+    // Y la diferencia con el método viejo es exactamente lo que se subestimaba. Su techo,
+    // 5.550 × (45 − 19) % = 1.443 €, se alcanza en cuanto el marginal llega al 45 %.
+    const viejo = (base: number) => cuotaEscalaGeneral(Math.max(0, base - MINIMOS_IRPF_2025.personal));
+    expect(dos(calcularCuotaIntegraGeneral(26050, 5550) - viejo(26050))).toBe(610.5);
+    expect(dos(calcularCuotaIntegraGeneral(100000, 5550) - viejo(100000))).toBe(1443);
+  });
+
+  test('el mínimo se acota a la base: la cuota nunca es negativa', () => {
+    // Art. 56.2: el mínimo forma parte de la base liquidable «hasta el importe de esta última».
+    // Sin acotarlo, escala(base) − escala(mínimo) da negativo en cuanto la renta cae por debajo
+    // del mínimo, que es lo que varios motores tapaban con un Math.max(0, …) a posteriori.
+    expect(calcularCuotaIntegraGeneral(3000, 5550)).toBe(0);
+    expect(calcularCuotaIntegraGeneral(0, 5550)).toBe(0);
+    expect(calcularCuotaIntegraGeneral(5550, 5550)).toBe(0);
+    // Y justo por encima del mínimo, la cuota es la del primer tramo sobre el exceso.
+    expect(Math.round(calcularCuotaIntegraGeneral(6550, 5550) * 100) / 100).toBe(190);
+  });
+
+  test('entradas rotas: nada de NaN ni de negativos saliendo hacia la pantalla', () => {
+    for (const base of [NaN, Infinity, -1000]) {
+      expect(Number.isFinite(calcularCuotaIntegraGeneral(base, 5550)), String(base)).toBe(true);
+      expect(calcularCuotaIntegraGeneral(base, 5550), String(base)).toBeGreaterThanOrEqual(0);
+    }
+    for (const minimo of [NaN, Infinity, -1000]) {
+      const c = calcularCuotaIntegraGeneral(26050, minimo);
+      expect(Number.isFinite(c), String(minimo)).toBe(true);
+      expect(c, String(minimo)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  test('el desglose por tramos suma la cuota de la PRIMERA aplicación de la escala', () => {
+    // Lo que se imprime en pantalla es el desglose de la escala sobre la base entera, así que
+    // suma más que la cuota íntegra. Si algún día sumase la cuota íntegra sería porque el
+    // mínimo volvió a restarse de la base antes de desglosar.
+    const { cuota, tramos } = desglosarEscalaGeneral(26050);
+    const suma = tramos.reduce((s, t) => s + t.cuota, 0);
+    expect(Math.round(suma * 100) / 100).toBe(Math.round(cuota * 100) / 100);
+    expect(Math.round(cuota * 100) / 100).toBe(5980.5);
+    expect(tramos).toHaveLength(3);
+    expect(tramos[2]).toMatchObject({ desde: 20200, hasta: 35200, tipo: 30, base: 5850 });
+    // La base de cada tramo suma la base entera, mínimo incluido.
+    expect(tramos.reduce((s, t) => s + t.base, 0)).toBe(26050);
+  });
+
+  test('la reducción por tributación conjunta NO es un mínimo y no se calcula como tal', () => {
+    // Art. 84.2 reglas 3ª y 4ª: «la base imponible se reducirá». Va contra la BASE, así que se
+    // valora al tipo marginal — justo lo contrario que el mínimo. Con una base de 40.075 € el
+    // marginal es el 37 %, así que los 3.400 € valen 1.258 €; si se tratara como un mínimo
+    // valdrían 3.400 × 19 % = 646 €. Mezclarlas da uno u otro número, pero nunca el correcto.
+    const dos = (x: number) => Math.round(x * 100) / 100;
+    const base = 40075;
+    const min = MINIMOS_IRPF_2025.personal;
+    const red = REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental;
+
+    const sinConjunta = calcularCuotaIntegraGeneral(base, min);
+    const conConjunta = calcularCuotaIntegraGeneral(base - red, min);
+    expect(dos(sinConjunta - conConjunta)).toBe(dos(red * 0.37));
+
+    // Y el error de sumarla al mínimo, que es lo que hacían `estimador-irpf` y
+    // `estimador-sueldo-neto` con los 2.150 € de la unidad monoparental.
+    const comoSiFueraMinimo = calcularCuotaIntegraGeneral(base, min + red);
+    expect(dos(comoSiFueraMinimo - conConjunta)).toBe(dos(red * 0.37 - red * 0.19));
   });
 });

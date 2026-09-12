@@ -925,9 +925,12 @@ export default function SimuladorMitoTramoSuperiorPage() {
                 suele citar el marginal pensando en el medio.
               </li>
               <li>
-                <strong>Ignorar que los mínimos personales y familiares reducen base.</strong> Los 5.550 €
-                de mínimo personal (más adicionales por hijos, cónyuge, ascendientes) se restan antes de
-                aplicar tramos. Reducen aún más la cuota real.
+                <strong>Creer que los mínimos personales y familiares se restan de la base.</strong> No
+                se restan: los 5.550 € del mínimo personal (más los adicionales por hijos, cónyuge o
+                ascendientes) forman parte de la base liquidable y se gravan a <strong>tipo cero</strong>,
+                aplicando la escala dos veces y restando (art. 63.1.2.º LIRPF). La diferencia no es
+                cosmética: así el mínimo vale lo mismo para todo el mundo —el 19 % de los primeros
+                tramos— en vez de valer más cuanto mayor es la renta.
               </li>
               <li>
                 <strong>No contar la cotización a la Seguridad Social.</strong> La SS son ~6,4% sobre el

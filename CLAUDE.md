@@ -422,6 +422,31 @@ fichero ya arrastraba se cuenta y se nombra, pero no detiene nada. Falso positiv
 > Qué demuestra cada regla por la forma del código, de qué caso salió y por qué tres solo avisan:
 > cabecera de `scripts/check-a11y-jsx.mjs`. Sus casos de prueba, en `scripts/pruebas/a11y-regla5.tsx`.
 
+### Candado del mínimo personal del IRPF
+
+`npm run check:minimo-irpf` — lo ejecuta también `npm run build`, y **rompe el build** si en un
+fichero que calcula IRPF aparece una resta cuyo sustraendo es un mínimo (`- MINIMOS_IRPF_2025.x`,
+`- minimoPersonal`, `- MINIMO_PERSONAL`).
+
+El art. 63.1.2.º LIRPF dice que el mínimo personal y familiar **no reduce la renta**: forma parte
+de la base liquidable general y se grava a TIPO CERO, aplicando la escala DOS VECES —a la base
+completa y al mínimo— y restando la segunda cuota de la primera. Restarlo de la base lo valora al
+tipo MARGINAL y subestima la cuota: hasta **1.443 €/año** solo con el mínimo personal
+(5.550 × (45 − 19) %), y **3.691 €/año** con 70.000 € de base y tres hijos.
+
+La fórmula canónica es **`calcularCuotaIntegraGeneral`** de `@/data/fiscal`, junto a
+`cuotaEscalaGeneral` y `desglosarEscalaGeneral` (esta última para los desgloses en pantalla, que
+son los de la PRIMERA aplicación de la escala y por eso suman más que la cuota).
+
+⚠️ **Sin pasivo**, como `check:og-image`: barre el árbol entero, no solo lo que el commit añade.
+Se drenó el 12/09/2026 migrando los 19 consumidores, así que solo puede encenderlo código nuevo.
+Falso positivo: `minimo-ok: <razón>` en esa línea o en la anterior. La reducción por tributación
+conjunta del art. 84.2 (3.400 / 2.150 €) **sí** se resta de la base y no lo dispara.
+
+> De qué tres reparaciones del mismo defecto en cuatro días salió, y qué NO mira:
+> cabecera de `scripts/check-minimo-irpf.mjs`. Sus casos de prueba, en
+> `scripts/pruebas/minimo-irpf.tsx`; se le reinyectan con **`npm run minimo:probar-candado`**.
+
 ### Candado del parser numérico
 
 `npm run check:parser` — lo ejecuta también `npm run build`, y **rompe el build** si el commit

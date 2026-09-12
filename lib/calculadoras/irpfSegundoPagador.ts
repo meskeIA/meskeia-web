@@ -47,7 +47,7 @@
 // importa igualmente: una copia que hoy coincide es una copia que mañana diverge.
 
 import {
-  TRAMOS_IRPF_2025,
+  calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   OBLIGACION_DECLARAR_2025,
@@ -129,24 +129,10 @@ function estimarCuotaIRPF(rendimientosBrutos: number): number {
   // Mínimo personal (soltero orientativo)
   const minimoPersonal = MINIMOS_IRPF_2025.personal;
 
-  // ⚠️ 09/09/2026: el mínimo personal y familiar NO se resta de la base. El art. 63.1.2º
-  // LIRPF manda aplicar la escala a la base liquidable completa y minorar la cuota «en el
-  // importe derivado de aplicar a la parte de la base liquidable general correspondiente al
-  // mínimo personal y familiar esta misma escala» (AEAT, Manual Renta 2025). Restarlo de la
-  // base lo valora al tipo MARGINAL y subestima la cuota — hasta 1.443 € en rentas altas.
-  // `devolucionIRPF.ts` y `dividendoEmpresarial.ts` ya lo hacían así; estos motores no.
-  const escala = (base: number): number => {
-    let cuota = 0;
-    let baseAnterior = 0;
-    for (const tramo of TRAMOS_IRPF_2025) {
-      if (base <= baseAnterior) break;
-      cuota += (Math.min(base, tramo.hasta) - baseAnterior) * tramo.tipo / 100;
-      baseAnterior = tramo.hasta;
-    }
-    return cuota;
-  };
-
-  const cuota = Math.max(0, escala(rendimientoNeto) - escala(Math.min(minimoPersonal, rendimientoNeto)));
+  // Art. 63.1.2 LIRPF: el minimo NO se resta de la base, se grava a tipo cero aplicando la
+  // escala dos veces. Reparado a mano el 09/09/2026; desde el 12/09/2026 la formula la pone
+  // data/fiscal/irpf.ts y deja de estar copiada aqui.
+  const cuota = calcularCuotaIntegraGeneral(rendimientoNeto, minimoPersonal);
   return Math.round(cuota * 100) / 100;
 }
 

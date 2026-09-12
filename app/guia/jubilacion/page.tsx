@@ -122,7 +122,7 @@ const faqData = [
   },
   {
     question: '¿La pensión paga IRPF?',
-    answer: 'Sí, tributa como rendimiento del trabajo. Los jubilados tienen reducciones específicas y mínimos personales por edad (65 y 75 años) que reducen la base imponible.',
+    answer: 'Sí, tributa como rendimiento del trabajo. Los jubilados tienen la reducción por rendimientos del trabajo, que sí reduce la base, y mínimos personales incrementados por edad (65 y 75 años), que no la reducen: se gravan a tipo cero por la vía del artículo 63.1.2º de la Ley del IRPF.',
   },
   {
     question: '¿Qué pasa si mi pensión es muy baja?',

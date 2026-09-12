@@ -15,7 +15,8 @@
  */
 
 import {
-  TRAMOS_IRPF_2025,
+  cuotaEscalaGeneral,
+  calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   FISCAL_IRPF_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
@@ -123,18 +124,7 @@ export interface ResultadoDevolucionIRPF {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function calcularCuotaTarifahGeneral(base: number): number {
-  if (base <= 0) return 0;
-  let cuota = 0;
-  let anterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (base <= anterior) break;
-    const baseTramo = Math.min(base, tramo.hasta) - anterior;
-    cuota += baseTramo * (tramo.tipo / 100);
-    anterior = tramo.hasta;
-  }
-  return cuota;
-}
+const calcularCuotaTarifahGeneral = cuotaEscalaGeneral;
 
 // Tramos tarifa del ahorro 2025
 // ⚠️ 09/09/2026: esta escala ERA una copia local con el último tramo al 28 %, el valor de
@@ -215,9 +205,11 @@ export function calcularDevolucionIRPF(p: ParametrosDevolucionIRPF): ResultadoDe
   const baseLiquidableGeneral = r(Math.max(0, baseImponibleGeneral));
 
   // ── Cuota íntegra
-  const cuotaBaseGeneral = calcularCuotaTarifahGeneral(baseLiquidableGeneral);
-  const cuotaMinimoGeneral = calcularCuotaTarifahGeneral(Math.min(minimoPersonalFamiliar, baseLiquidableGeneral));
-  const cuotaIntegraGeneral = r(Math.max(0, cuotaBaseGeneral - cuotaMinimoGeneral));
+  // Art. 63.1.2 LIRPF. Reparado a mano el 09/09/2026; desde el 12/09/2026 la formula la pone
+  // data/fiscal/irpf.ts y deja de estar copiada aqui.
+  const cuotaIntegraGeneral = r(
+    calcularCuotaIntegraGeneral(baseLiquidableGeneral, minimoPersonalFamiliar),
+  );
 
   const cuotaIntegraAhorro = r(calcularCuotaTarifaAhorro(baseImponibleAhorro));
   const cuotaIntegra = r(cuotaIntegraGeneral + cuotaIntegraAhorro);

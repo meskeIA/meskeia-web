@@ -54,7 +54,7 @@ export const faqJsonLd = {
       name: '¿Qué es el mínimo por discapacidad en el IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El mínimo por discapacidad es una cantidad que se resta de la base imponible del IRPF para reconocer los gastos adicionales que conlleva la discapacidad. En 2025, el mínimo general es de 3.000 € anuales para discapacidades del 33 % al 64 %, y de 9.000 € para discapacidades del 65 % o superior. A eso se suma un complemento de 3.000 € por gastos de asistencia ante cualquiera de tres supuestos alternativos: acreditar ayuda de terceras personas, acreditar movilidad reducida, o tener un grado igual o superior al 65 %. Con un grado del 65 % o más el complemento se aplica por el propio grado, sin acreditar nada más.',
+        text: 'El mínimo por discapacidad es una cantidad que el IRPF deja sin gravar para reconocer los gastos adicionales que conlleva la discapacidad. No se resta de la base imponible: forma parte de la base liquidable general y se grava a tipo cero (art. 63.1.2º LIRPF), aplicando la escala a la base completa y restando de la cuota la misma escala aplicada al mínimo, de modo que se valora a los tipos bajos de la escala y no al tipo marginal de quien declara. En 2025, el mínimo general es de 3.000 € anuales para discapacidades del 33 % al 64 %, y de 9.000 € para discapacidades del 65 % o superior. A eso se suma un complemento de 3.000 € por gastos de asistencia ante cualquiera de tres supuestos alternativos: acreditar ayuda de terceras personas, acreditar movilidad reducida, o tener un grado igual o superior al 65 %. Con un grado del 65 % o más el complemento se aplica por el propio grado, sin acreditar nada más.',
       },
     },
     {

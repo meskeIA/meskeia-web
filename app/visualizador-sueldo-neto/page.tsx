@@ -16,7 +16,9 @@ import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
-  TRAMOS_IRPF_2025,
+  desglosarEscalaGeneral,
+  cuotaEscalaGeneral,
+  calcularCuotaIntegraGeneral,
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
   MINIMOS_IRPF_2025,
@@ -42,6 +44,14 @@ interface DesgloseSueldo {
   totalSS: number;
   // IRPF
   baseImponible: number;
+  /** Mínimo personal (art. 57 LIRPF). NO reduce la base: se grava a tipo cero. */
+  minimoPersonal: number;
+  /** Escala aplicada a la base liquidable entera (primera aplicación, art. 63.1.2.º). */
+  cuotaEscalaIRPF: number;
+  /** Escala aplicada al mínimo (segunda aplicación), que se resta de la anterior. */
+  cuotaMinimoIRPF: number;
+  /** Cuota íntegra = cuotaEscalaIRPF − cuotaMinimoIRPF. */
+  cuotaIntegraIRPF: number;
   retencionIRPF: number;
   tipoEfectivoIRPF: number;
   desgloseTramosIRPF: { tramo: string; base: number; tipo: number; cuota: number }[];
@@ -74,35 +84,30 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
 
   const baseImponible = Math.max(0, rendimientoNeto - reduccion);
 
-  // Mínimo personal
+  // Minimo personal. NO reduce la base (art. 63.1.2 LIRPF): la base liquidable general lo
+  // lleva dentro y se grava a tipo cero restando de la cuota la escala aplicada a el.
+  //
+  // ATENCION 12/09/2026: hasta esta fecha esta app restaba el minimo de la base antes de
+  // aplicar la escala, que lo valora al tipo marginal y subestima la cuota: 610,50 EUR con
+  // 30.000 EUR de bruto y 1.443 EUR de 80.000 en adelante.
   const minimoPersonal = MINIMOS_IRPF_2025.personal;
 
-  // 3. IRPF por tramos
-  const baseGravable = Math.max(0, baseImponible - minimoPersonal);
-  const desgloseTramosIRPF: { tramo: string; base: number; tipo: number; cuota: number }[] = [];
-  let restante = baseGravable;
-  let prevLimite = 0;
+  // 3. IRPF por tramos, sobre la base liquidable ENTERA
+  const baseGravable = Math.max(0, baseImponible);
+  const { cuota: cuotaEscalaIRPF, tramos } = desglosarEscalaGeneral(baseGravable);
 
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (restante <= 0) break;
-    const anchoTramo = tramo.hasta === Infinity ? restante : tramo.hasta - prevLimite;
-    const baseTramo = Math.min(restante, anchoTramo);
-    const cuotaTramo = baseTramo * (tramo.tipo / 100);
+  const desgloseTramosIRPF = tramos.map((t) => ({
+    tramo: t.hasta === null
+      ? `Más de ${formatCurrency(t.desde)}`
+      : `${formatCurrency(t.desde)} → ${formatCurrency(t.hasta)}`,
+    base: t.base,
+    tipo: t.tipo,
+    cuota: t.cuota,
+  }));
 
-    desgloseTramosIRPF.push({
-      tramo: tramo.hasta === Infinity
-        ? `Más de ${formatCurrency(prevLimite)}`
-        : `${formatCurrency(prevLimite)} → ${formatCurrency(tramo.hasta)}`,
-      base: baseTramo,
-      tipo: tramo.tipo,
-      cuota: cuotaTramo,
-    });
-
-    restante -= baseTramo;
-    prevLimite = tramo.hasta === Infinity ? prevLimite : tramo.hasta;
-  }
-
-  const cuotaIntegraIRPF = desgloseTramosIRPF.reduce((s, t) => s + t.cuota, 0);
+  // Segunda aplicacion de la escala: la cuota del minimo, que se resta de la anterior.
+  const cuotaMinimoIRPF = cuotaEscalaGeneral(Math.min(minimoPersonal, baseGravable));
+  const cuotaIntegraIRPF = calcularCuotaIntegraGeneral(baseGravable, minimoPersonal);
 
   // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
   const deduccionRentasBajas = calcularDeduccionRentasBajas(rendimientoNeto, 0);
@@ -121,7 +126,8 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
   return {
     brutoAnual, brutoMensual,
     ssContingencias, ssDesempleo, ssFormacion, ssMEI, totalSS,
-    baseImponible, retencionIRPF, tipoEfectivoIRPF, desgloseTramosIRPF,
+    baseImponible, minimoPersonal, cuotaEscalaIRPF, cuotaMinimoIRPF, cuotaIntegraIRPF,
+    retencionIRPF, tipoEfectivoIRPF, desgloseTramosIRPF,
     netoAnual, netoMensual,
     pctSS, pctIRPF, pctNeto,
   };
@@ -321,6 +327,14 @@ export default function VisualizadorSueldoNetoPage() {
                   </div>
                 </div>
               ))}
+              <p className={styles.desgloseTramNota}>
+                Los tramos se aplican a la base <strong>entera</strong> y suman{' '}
+                {formatCurrency(datos.cuotaEscalaIRPF)}. De ahí se resta la misma escala aplicada
+                al mínimo personal de {formatCurrency(datos.minimoPersonal)} —
+                {formatCurrency(datos.cuotaMinimoIRPF)}—, que es la forma en que la ley lo grava
+                a tipo cero (art. 63.1.2.º LIRPF). Cuota íntegra:{' '}
+                {formatCurrency(datos.cuotaIntegraIRPF)}.
+              </p>
             </div>
           )}
 

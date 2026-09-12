@@ -15,7 +15,8 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
-  TRAMOS_IRPF_2025,
+  desglosarEscalaGeneral,
+  cuotaEscalaGeneral,
   MINIMOS_IRPF_2025,
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
@@ -68,38 +69,42 @@ function calcularMinimoPersonalFamiliar(situacion: SituacionFamiliar): number {
   return minimo;
 }
 
-function calcularCuotaIRPF(baseLiquidable: number): {
+/**
+ * Cuota integra de la base liquidable general (art. 63.1.2 LIRPF), con el desglose por
+ * tramos que la app imprime en pantalla.
+ *
+ * La escala se aplica DOS veces: a la base liquidable completa y a la parte que
+ * corresponde al minimo personal y familiar; la segunda cuota se resta de la primera. El
+ * desglose por tramos es el de la PRIMERA aplicacion, que es la que la ley describe.
+ *
+ * ATENCION 12/09/2026: hasta esta fecha la app restaba el minimo de la base antes de la
+ * escala, que lo valora al tipo marginal y subestima la cuota: 610,50 EUR con 30.000 EUR
+ * de bruto y soltero, 1.917 EUR con 60.000 EUR y dos hijos.
+ */
+function calcularCuotaIRPF(baseLiquidableGeneral: number, minimo: number): {
   cuota: number;
+  cuotaEscala: number;
+  cuotaMinimo: number;
   desglose: DesgloseTramoIRPF[];
 } {
-  let cuota = 0;
-  let baseRestante = Math.max(0, baseLiquidable);
-  let limiteAnterior = 0;
-  const desglose: DesgloseTramoIRPF[] = [];
+  const base = Math.max(0, baseLiquidableGeneral);
+  const { cuota: cuotaEscala, tramos } = desglosarEscalaGeneral(base);
+  const cuotaMinimo = cuotaEscalaGeneral(Math.min(Math.max(0, minimo), base));
 
-  for (const tramo of TRAMOS_IRPF_2025) {
-    const tramoDe = limiteAnterior;
-    const tramoHasta = tramo.hasta === Infinity ? null : tramo.hasta;
-    const anchuraTramo = tramo.hasta - limiteAnterior;
-    const baseTramo = Math.min(baseRestante, anchuraTramo);
+  const desglose: DesgloseTramoIRPF[] = tramos.map((t) => ({
+    desde: t.desde,
+    hasta: t.hasta,
+    tipo: t.tipo,
+    baseAplicada: t.base,
+    cuota: t.cuota,
+  }));
 
-    if (baseTramo > 0) {
-      const cuotaTramo = baseTramo * (tramo.tipo / 100);
-      cuota += cuotaTramo;
-      desglose.push({
-        desde: tramoDe,
-        hasta: tramoHasta,
-        tipo: tramo.tipo,
-        baseAplicada: baseTramo,
-        cuota: cuotaTramo,
-      });
-      baseRestante -= baseTramo;
-    }
-    limiteAnterior = tramo.hasta;
-    if (baseRestante <= 0) break;
-  }
-
-  return { cuota, desglose };
+  return {
+    cuota: Math.max(0, cuotaEscala - cuotaMinimo),
+    cuotaEscala,
+    cuotaMinimo,
+    desglose,
+  };
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -145,13 +150,18 @@ export default function SimuladorDesgloseNominaPage() {
     const reduccion = brutoVal > 0 ? calcularReduccionRRT(rnt) : 0;
     const baseImponible = Math.max(0, rnt - reduccion);
 
-    // 4) Mínimos personales y familiares
+    // 4) Minimos personales y familiares. NO reducen la base (art. 63.1.2 LIRPF): la base
+    //    liquidable general los lleva dentro y se gravan a tipo cero dentro de la cuota.
     const minimoPersonal = calcularMinimoPersonalFamiliar(situacion);
-    const baseLiquidable = Math.max(0, baseImponible - minimoPersonal);
+    const baseLiquidable = baseImponible;
 
     // 5) IRPF
-    const { cuota: cuotaIntegra, desglose: desgloseTramos } =
-      calcularCuotaIRPF(baseLiquidable);
+    const {
+      cuota: cuotaIntegra,
+      cuotaEscala,
+      cuotaMinimo,
+      desglose: desgloseTramos,
+    } = calcularCuotaIRPF(baseLiquidable, minimoPersonal);
 
     // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
     const deduccionRentasBajas = calcularDeduccionRentasBajas(rnt, 0);
@@ -247,19 +257,33 @@ export default function SimuladorDesgloseNominaPage() {
     });
 
     pasos.push({
-      etiqueta: `− Mínimo personal y familiar (${formatCurrency(minimoPersonal)})`,
-      importe: baseLiquidable,
-      tipo: 'reduccion',
-      delta: minimoPersonal,
-      detalle: 'Renta exenta según tu situación familiar',
-    });
-
-    pasos.push({
       etiqueta: '= Base Liquidable',
       importe: baseLiquidable,
       tipo: 'intermedio',
-      detalle: 'Base sobre la que se aplican los tramos del IRPF',
+      detalle:
+        `Base sobre la que se aplican los tramos del IRPF. El mínimo personal y familiar ` +
+        `(${formatCurrency(minimoPersonal)}) NO se resta de aquí: va dentro de esta base y ` +
+        `se grava a tipo cero restando su cuota más abajo (art. 63.1.2.º LIRPF)`,
     });
+
+    if (modoIRPF === 'auto') {
+      pasos.push({
+        etiqueta: 'Escala general aplicada a la base completa',
+        importe: cuotaEscala,
+        tipo: 'intermedio',
+        detalle: 'Primera aplicación de la escala: los tramos sobre la base liquidable entera',
+      });
+
+      pasos.push({
+        etiqueta: `− Escala aplicada al mínimo (${formatCurrency(minimoPersonal)})`,
+        importe: cuotaIntegra,
+        tipo: 'reduccion',
+        delta: cuotaMinimo,
+        detalle:
+          'Segunda aplicación de la escala, esta vez solo al mínimo. Su cuota se resta de la ' +
+          'anterior: así el mínimo tributa a los tipos bajos de la escala y no al tuyo',
+      });
+    }
 
     pasos.push({
       etiqueta: `− Cuota IRPF (${formatNumber(pctIRPF, 2)} % del bruto)`,
@@ -308,6 +332,9 @@ export default function SimuladorDesgloseNominaPage() {
       baseImponible,
       minimoPersonal,
       baseLiquidable,
+      cuotaEscala,
+      cuotaMinimo,
+      cuotaIntegra,
       cuotaAuto,
       desgloseTramos,
       irpfRetenido,
@@ -667,6 +694,11 @@ export default function SimuladorDesgloseNominaPage() {
             <p className={styles.tramosNota}>
               El IRPF es <strong>progresivo por tramos</strong>: cada porción de tu base
               liquidable tributa al tipo del tramo en que cae, no al tipo más alto sobre el total.
+              Estos tramos se aplican a la base <strong>entera</strong>, con el mínimo personal y
+              familiar dentro, y suman {formatCurrency(calculo.cuotaEscala)}. De ahí se resta la
+              misma escala aplicada al mínimo ({formatCurrency(calculo.cuotaMinimo)}), que es la
+              forma en que la ley lo grava a tipo cero (art. 63.1.2.º LIRPF), y queda una cuota
+              de {formatCurrency(calculo.cuotaIntegra)}.
             </p>
           </section>
         )}

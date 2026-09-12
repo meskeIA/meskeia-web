@@ -194,7 +194,11 @@ export default function IrpfTramosMinimosPage() {
             <h2 className={styles.sectionTitle}>Mínimos personales y familiares 2025</h2>
             <p className={styles.sectionIntro}>
               Es la parte de la renta que no tributa, por destinarse a las necesidades básicas del
-              contribuyente y su familia. Reduce la base sobre la que se calcula el impuesto.
+              contribuyente y su familia. <strong>No reduce la base</strong>: forma parte de la base
+              liquidable general y se grava a <strong>tipo cero</strong> (art. 63.1.2.º LIRPF),
+              aplicando la escala de arriba a la base completa y restando de la cuota esa misma escala
+              aplicada al mínimo. Por eso el mínimo vale lo mismo para todo el mundo con las mismas
+              circunstancias familiares —los tipos bajos de la escala— y no más cuanto mayor es la renta.
             </p>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>

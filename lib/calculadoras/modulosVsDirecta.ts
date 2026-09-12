@@ -12,7 +12,7 @@
  * importes reales de la Orden HFP anual. Sirven para entender la lógica de decisión,
  * no como cálculo definitivo del régimen.
  */
-import { TRAMOS_IRPF_2025, MINIMOS_IRPF_2025 } from '@/data/fiscal/irpf';
+import { MINIMOS_IRPF_2025, calcularCuotaIntegraGeneral } from '@/data/fiscal/irpf';
 
 export type ActividadModulos = 'bar' | 'comercio_menor' | 'transporte' | 'peluqueria' | 'taxi';
 
@@ -36,7 +36,9 @@ export interface ResultadoRegimenED {
   rendimientoNetoPrevio: number;
   reduccion5pc: number;
   rendimientoNetoReducido: number;
+  /** Mínimo personal del art. 57 LIRPF. NO se resta de la base: se grava a tipo cero. */
   minimosPersonales: number;
+  /** Base liquidable general, CON el mínimo dentro (art. 63.1.2º). */
   baseLiquidable: number;
   irpf: number;
   cuotaReta: number;
@@ -48,7 +50,9 @@ export interface ResultadoRegimenModulos {
   reduccion5pc: number;
   reduccionEmpleo: number;
   rendimientoNetoReducido: number;
+  /** Mínimo personal del art. 57 LIRPF. NO se resta de la base: se grava a tipo cero. */
   minimosPersonales: number;
+  /** Base liquidable general, CON el mínimo dentro (art. 63.1.2º). */
   baseLiquidable: number;
   irpf: number;
   cuotaReta: number;
@@ -68,17 +72,16 @@ export interface ResultadoModulosVsDirecta {
 /** Mínimo personal orientativo (coincide con la constante de la app). */
 const MINIMO_PERSONAL = MINIMOS_IRPF_2025.personal;
 
-/** Cuota íntegra de IRPF por tramos progresivos. */
-function calcularIRPF(baseLiquidable: number): number {
-  let cuota = 0;
-  let limiteAnterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (baseLiquidable <= limiteAnterior) break;
-    const tramoBase = Math.min(baseLiquidable, tramo.hasta) - limiteAnterior;
-    cuota += tramoBase * (tramo.tipo / 100);
-    limiteAnterior = tramo.hasta;
-  }
-  return cuota;
+/**
+ * Cuota íntegra de IRPF (art. 63.1.2º LIRPF).
+ *
+ * ⚠️ Hasta el 12/09/2026 este motor restaba el mínimo personal de la base y aplicaba la
+ * escala al resto, que lo valora al tipo marginal: subestimaba la cuota hasta 1.443 €/año
+ * (946,50 € con 40.000 € de rendimiento neto). El mínimo no reduce la base; se grava a tipo
+ * cero aplicando la escala dos veces. La fórmula vive en `calcularCuotaIntegraGeneral`.
+ */
+function calcularIRPF(baseLiquidableGeneral: number): number {
+  return calcularCuotaIntegraGeneral(baseLiquidableGeneral, MINIMO_PERSONAL);
 }
 
 /** Rendimiento neto por módulos con coeficientes didácticos por actividad. */
@@ -109,7 +112,9 @@ function calcularED(ingresos: number, gastos: number, retaMensual: number): Resu
   const rendimientoNetoPrevio = Math.max(0, ingresos - gastos);
   const reduccion5pc = Math.min(rendimientoNetoPrevio * 0.05, 2000);
   const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc);
-  const baseLiquidable = Math.max(0, rendimientoNetoReducido - MINIMO_PERSONAL);
+  // El mínimo NO se resta aquí: la base liquidable general lo lleva dentro y calcularIRPF
+  // lo grava a tipo cero por la vía del art. 63.1.2º.
+  const baseLiquidable = rendimientoNetoReducido;
   const irpf = calcularIRPF(baseLiquidable);
   const cuotaReta = retaMensual * 12;
   return {
@@ -141,7 +146,9 @@ function calcularModulos(p: ParametrosModulosVsDirecta): ResultadoRegimenModulos
   const reduccion5pc = Math.min(rendimientoNetoPrevio * 0.05, 2000);
   const reduccionEmpleo = asal * 100;
   const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc - reduccionEmpleo);
-  const baseLiquidable = Math.max(0, rendimientoNetoReducido - MINIMO_PERSONAL);
+  // El mínimo NO se resta aquí: la base liquidable general lo lleva dentro y calcularIRPF
+  // lo grava a tipo cero por la vía del art. 63.1.2º.
+  const baseLiquidable = rendimientoNetoReducido;
   const irpf = calcularIRPF(baseLiquidable);
   const cuotaReta = p.retaMensual * 12;
   return {

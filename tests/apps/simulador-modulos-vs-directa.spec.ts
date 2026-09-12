@@ -55,6 +55,18 @@ async function panel(page: Page, tituloH3: string): Promise<string> {
   return (await contenedor.innerText()).replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * Igual que `linea`, pero localizando por el PRINCIPIO de la etiqueta. Hace falta para la
+ * línea de la escala aplicada al mínimo, cuyo rótulo lleva el importe del mínimo interpolado.
+ */
+async function lineaQueEmpiezaPor(page: Page, tituloH3: string, prefijo: string): Promise<string> {
+  const contenedor = page.locator('h3', { hasText: tituloH3 }).first().locator('xpath=..');
+  const fila = contenedor
+    .locator('div', { has: page.locator(`span:text-matches("^${prefijo}")`) })
+    .last();
+  return (await fila.locator('strong').innerText()).replace(/\s+/g, ' ').trim();
+}
+
 /** Valor (el <strong>) de una línea concreta dentro de una columna. */
 async function linea(page: Page, tituloH3: string, etiqueta: string): Promise<string> {
   const contenedor = page.locator('h3', { hasText: tituloH3 }).first().locator('xpath=..');
@@ -88,40 +100,52 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
    * ED (ancla: TRAMOS_IRPF_2025 + MINIMOS_IRPF_2025.personal):
    *   Rendimiento neto previo = 90.000 − 25.000 = 65.000
    *   − Reducción 5% (tope 2.000)                 = −2.000  → reducido 63.000
-   *   − Mínimo personal 5.550                      → base liquidable 57.450
-   *   IRPF: 12.450×19% + 7.750×24% + 15.000×30% + 22.250×37%
-   *       = 2.365,50 + 1.860,00 + 4.500,00 + 8.232,50 = 16.958,00
-   *   + RETA 320×12 = 3.840,00  →  Coste ED = 20.798,00 €
+   *   Base liquidable = 63.000, CON el mínimo dentro (art. 63.1.2º: el mínimo NO se resta)
+   *   escala(63.000) = 2.365,50+1.860,00+4.500,00+9.176,00 + 3.000×45%
+   *                  = 17.901,50 + 1.350,00 = 19.251,50
+   *   escala(5.550)  = 1.054,50   →   IRPF = 18.197,00
+   *   + RETA 320×12 = 3.840,00  →  Coste ED = 22.037,00 €
    *
    * Módulos (fórmula propia de la app, NO oficial — ver cabecera):
    *   Rendimiento previo = 1.500×8 + 800×1 + 6×60 + 0,05×12.000 = 12.000+800+360+600 = 13.760
    *   − Reducción 5% (tope 2.000) = −688,00  · − incentivo empleo (1×100) = −100,00
-   *   Reducido = 12.972  · − Mínimo personal 5.550 → base liquidable 7.422
-   *   IRPF (solo primer tramo, 7.422 < 12.450) = 7.422 × 19% = 1.410,18
-   *   + RETA 3.840,00  →  Coste Módulos = 5.250,18 €
+   *   Reducido = 12.972 = base liquidable, con el mínimo dentro
+   *   escala(12.972) = 12.450×19% + 522×24% = 2.365,50 + 125,28 = 2.490,78
+   *   escala(5.550)  = 1.054,50   →   IRPF = 1.436,28
+   *   + RETA 3.840,00  →  Coste Módulos = 5.276,28 €
    *
-   * Diferencia = 20.798,00 − 5.250,18 = 15.547,82 → módulos gana ("MENOS con módulos").
+   * Diferencia = 22.037,00 − 5.276,28 = 16.760,72 → módulos gana ("MENOS con módulos").
+   *
+   * ⚠️ GOLDENS RECALCULADOS EL 12/09/2026. Los anteriores estaban derivados del método
+   * DEFECTUOSO (restar el mínimo de la base antes de la escala) y por eso cuadraban con la
+   * app: los dos estaban mal a la vez. Se han vuelto a resolver a mano desde el art. 63.1.2º
+   * LIRPF, verificado en sesión contra la AEAT (manual de ayuda de Renta 2025, «8.4.3.1
+   * Cuota íntegra estatal»). En la columna de ED el IRPF sube 1.239,00 € y en la de módulos
+   * 26,10 €; en el CASO 2 la de módulos no se mueve, y el porqué se explica allí.
    */
-  test('CASO 1 (normal) — bar rentable: ED 20.798,00 € vs Módulos 5.250,18 €, gana módulos', async ({
+  test('CASO 1 (normal) — bar rentable: ED 22.037,00 € vs Módulos 5.276,28 €, gana módulos', async ({
     page,
   }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Aplicar caso Bar pequeño rentable/ }).click();
 
     expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('65.000,00 €');
-    expect(await linea(page, ED, '= Base liquidable')).toBe('57.450,00 €');
-    expect(await linea(page, ED, 'IRPF por tramos')).toBe('16.958,00 €');
-    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('20.798,00 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('63.000,00 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('19.251,50 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−1054,50 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('18.197,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('22.037,00 €');
 
     expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('13.760,00 €');
-    expect(await linea(page, MOD, '= Base liquidable')).toBe('7422,00 €');
-    expect(await linea(page, MOD, 'IRPF por tramos')).toBe('1410,18 €');
-    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('5250,18 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('12.972,00 €');
+    expect(await linea(page, MOD, 'Escala general sobre la base completa')).toBe('2490,78 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('1436,28 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('5276,28 €');
     // Con mesas > 0, la app declara la actividad apta para módulos (sin aviso de exclusión)
     expect(await panel(page, MOD)).not.toContain('NO es elegible');
 
     const estado = await page.locator('[role="status"]').innerText();
-    expect(estado.replace(/\s+/g, ' ')).toContain('15.547,82 € MENOS con módulos');
+    expect(estado.replace(/\s+/g, ' ')).toContain('16.760,72 € MENOS con módulos');
     expect(await page.locator('body').innerText()).toMatch(
       /te conviene más: Estimación Objetiva \(Módulos\)/
     );
@@ -137,22 +161,31 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
    * ED (ancla: TRAMOS_IRPF_2025):
    *   Rendimiento neto previo = 200.000 − 0 = 200.000
    *   − Reducción 5% (tope 2.000, porque 200.000×5%=10.000 > tope) → reducido 198.000
-   *   − Mínimo personal 5.550 → base liquidable 192.450
-   *   IRPF: 12.450×19% + 7.750×24% + 15.000×30% + 24.800×37% + 132.450×45%
-   *       = 2.365,50+1.860,00+4.500,00+9.176,00+59.602,50 = 77.504,00
-   *   + RETA 600×12 = 7.200,00 → Coste ED = 84.704,00 €
+   *   Base liquidable = 198.000, CON el mínimo dentro
+   *   escala(198.000) = 17.901,50 (acumulado hasta 60.000) + 138.000×45%
+   *                   = 17.901,50 + 62.100,00 = 80.001,50
+   *   escala(5.550)   = 1.054,50   →   IRPF = 78.947,00
+   *   + RETA 600×12 = 7.200,00 → Coste ED = 86.147,00 €
+   *
+   *   El mínimo cae aquí ENTERO en el tramo del 45 %, así que este es el caso donde el
+   *   método viejo más subestimaba: 5.550 × (45 − 19) % = 1.443,00 €/año, su techo.
    *
    * Módulos (taxi, fórmula propia — ver cabecera): 6.800 × vehículo(1) = 6.800
    *   − Reducción 5% (min(340,2000)) = −340,00 · − incentivo empleo (taxi no expone
-   *   personal asalariado → 0) = −0,00 → reducido 6.460 → − mínimo 5.550 → base 910
-   *   IRPF (910 < 12.450, tramo 19%) = 910 × 19% = 172,90
+   *   personal asalariado → 0) = −0,00 → reducido 6.460 = base liquidable
+   *   escala(6.460) = 6.460 × 19% = 1.227,40 · escala(5.550) = 1.054,50 → IRPF = 172,90
    *   + RETA 7.200,00 → Coste Módulos = 7.372,90 €
    *
-   * Diferencia = 84.704,00 − 7.372,90 = 77.331,10 → módulos gana con muchísimo margen,
+   *   Esta columna NO cambia con la reparación, y eso se comprueba a propósito: base y
+   *   mínimo caen los dos dentro del primer tramo, donde escala(B) − escala(m) y
+   *   escala(B − m) valen exactamente lo mismo. Los dos métodos solo divergen cuando la
+   *   base cruza de tramo — que es justo lo que ocurre en la columna de al lado.
+   *
+   * Diferencia = 86.147,00 − 7.372,90 = 78.774,10 → módulos gana con muchísimo margen,
    * porque el rendimiento estimado de un taxi (6.800 €) es minúsculo frente al beneficio
    * real de 200.000 € que tributa por tramos hasta el 45%.
    */
-  test('CASO 2 (límite, tramo 45% IRPF) — sliders al máximo + Taxi: ED 84.704,00 € vs Módulos 7.372,90 €', async ({
+  test('CASO 2 (límite, tramo 45% IRPF) — sliders al máximo + Taxi: ED 86.147,00 € vs Módulos 7.372,90 €', async ({
     page,
   }) => {
     await page.goto(RUTA, { waitUntil: 'networkidle' });
@@ -166,19 +199,22 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
     await mover(page, 'veh', 1);
 
     expect(await linea(page, ED, '= Rendimiento neto reducido')).toBe('198.000,00 €');
-    expect(await linea(page, ED, '= Base liquidable')).toBe('192.450,00 €');
-    // Tramo 45% ejercitado: sin él (parando en 37%) el IRPF sería 17.901,50 €, no 77.504,00 €
-    expect(await linea(page, ED, 'IRPF por tramos')).toBe('77.504,00 €');
-    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('84.704,00 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('198.000,00 €');
+    // Tramo 45% ejercitado: sin él (parando en 37%) la escala daría 17.901,50 €, no 80.001,50 €
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('80.001,50 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−1054,50 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('78.947,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('86.147,00 €');
 
     expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('6800,00 €');
-    expect(await linea(page, MOD, '= Base liquidable')).toBe('910,00 €');
-    expect(await linea(page, MOD, 'IRPF por tramos')).toBe('172,90 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('6460,00 €');
+    expect(await linea(page, MOD, 'Escala general sobre la base completa')).toBe('1227,40 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('172,90 €');
     expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('7372,90 €');
     expect(await panel(page, MOD)).not.toContain('NO es elegible');
 
     const estado = await page.locator('[role="status"]').innerText();
-    expect(estado.replace(/\s+/g, ' ')).toContain('77.331,10 € MENOS con módulos');
+    expect(estado.replace(/\s+/g, ' ')).toContain('78.774,10 € MENOS con módulos');
     expect(await page.locator('body').innerText()).toMatch(
       /te conviene más: Estimación Objetiva \(Módulos\)/
     );
@@ -196,14 +232,17 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
    * la caja de diferencia NO anuncia un ahorro con un régimen que el propio cálculo excluye.
    *
    * ED (ancla: TRAMOS_IRPF_2025): ingresos 50.000, gastos 8.000 → rendimiento 42.000
-   *   − Reducción 5% (tope 2.000) = −2.000 → reducido 40.000 → − mínimo 5.550 → base 34.450
-   *   IRPF: 12.450×19% + 7.750×24% + 14.250×30% = 2.365,50+1.860,00+4.275,00 = 8.500,50
-   *   + RETA 300×12 = 3.600,00 → Coste ED = 12.100,50 €
+   *   − Reducción 5% (tope 2.000) = −2.000 → reducido 40.000 = base liquidable
+   *   escala(40.000) = 8.725,50 (acumulado hasta 35.200) + 4.800×37% = 8.725,50 + 1.776,00
+   *                  = 10.501,50 · escala(5.550) = 1.054,50 → IRPF = 9.447,00
+   *   + RETA 300×12 = 3.600,00 → Coste ED = 13.047,00 €
    *
    * Módulos (comercio_menor, personalAsalariado=0, personalNoAsalariado=1, superficie=0):
    *   Rendimiento previo = 4.500×1 + 1.000×0 + 8×0 = 4.500
    *   − Reducción 5% (min(225,2000)) = −225,00 · − incentivo empleo (0×100) = 0,00
-   *   Reducido = 4.275 · − Mínimo personal 5.550 → base liquidable max(0, −1.275) = 0,00
+   *   Reducido = 4.275 = base liquidable, que es MENOR que el mínimo de 5.550 €
+   *   Art. 56.2: el mínimo se aplica «hasta el importe de esta última», así que se acota a
+   *   la base y la cuota es cero, nunca negativa: escala(4.275) − escala(4.275) = 0,00 €
    *   IRPF = 0,00 · + RETA 3.600,00 → Coste Módulos = 3.600,00 € (cifra que la app YA NO
    *   anuncia como ahorro, porque `esApta` es false)
    */
@@ -213,13 +252,17 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Aplicar caso Profesional puro/ }).click();
 
-    expect(await linea(page, ED, '= Base liquidable')).toBe('34.450,00 €');
-    expect(await linea(page, ED, 'IRPF por tramos')).toBe('8500,50 €');
-    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('12.100,50 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('40.000,00 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('10.501,50 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('9447,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('13.047,00 €');
 
     expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('4500,00 €');
-    expect(await linea(page, MOD, '= Base liquidable')).toBe('0,00 €');
-    expect(await linea(page, MOD, 'IRPF por tramos')).toBe('0,00 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('4275,00 €');
+    // La base no llega al mínimo: la escala aplicada al mínimo se acota a ella y la cuota es 0.
+    expect(await linea(page, MOD, 'Escala general sobre la base completa')).toBe('812,25 €');
+    expect(await lineaQueEmpiezaPor(page, MOD, '− Escala sobre el mínimo personal')).toBe('−812,25 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('0,00 €');
     expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3600,00 €');
 
     // La app avisa de que la actividad no es elegible para módulos...

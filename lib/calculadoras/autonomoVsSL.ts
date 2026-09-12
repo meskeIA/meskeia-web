@@ -9,7 +9,7 @@
  */
 
 import {
-  TRAMOS_IRPF_2025,
+  calcularCuotaIntegraGeneral,
   TRAMOS_RETA_2025,
   TIPO_COTIZACION_RETA,
   MINIMOS_IRPF_2025,
@@ -66,18 +66,6 @@ export interface ResultadoComparacion {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function calcularCuotaIRPF(baseLiquidable: number): number {
-  let cuota = 0;
-  let baseAnterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (baseLiquidable <= baseAnterior) break;
-    const baseEnTramo = Math.min(baseLiquidable, tramo.hasta) - baseAnterior;
-    cuota += baseEnTramo * (tramo.tipo / 100);
-    baseAnterior = tramo.hasta;
-  }
-  return cuota;
-}
-
 function calcularCuotaAhorro(base: number): number {
   let cuota = 0;
   let baseAnterior = 0;
@@ -125,16 +113,12 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
   // Rendimiento neto tras SS (base IRPF autónomo)
   const baseIRPFAutonomo = Math.max(0, rendimientoNetoAutonomo - cuotaRetaAnual);
 
-  // IRPF: la cuota se minora con la escala aplicada al mínimo personal
-  // ⚠️ 09/09/2026: art. 63.1.2º LIRPF — la escala se aplica a la base completa y la cuota se
-  // minora con la escala aplicada AL MÍNIMO, en vez de restar el mínimo de la base (que lo
-  // valora al marginal y subestima la cuota). Ver la nota extensa en lib/calculadoras/irpf.ts.
+  // IRPF: art. 63.1.2 LIRPF. Reparado a mano el 09/09/2026; desde el 12/09/2026 la formula
+  // ya no se reescribe aqui, la pone data/fiscal/irpf.ts.
   const baseLiquidableAutonomo = Math.max(0, baseIRPFAutonomo);
-  const cuotaIRPFAutonomo = r(Math.max(
-    0,
-    calcularCuotaIRPF(baseLiquidableAutonomo)
-      - calcularCuotaIRPF(Math.min(MINIMOS_IRPF_2025.personal, baseLiquidableAutonomo)),
-  ));
+  const cuotaIRPFAutonomo = r(
+    calcularCuotaIntegraGeneral(baseLiquidableAutonomo, MINIMOS_IRPF_2025.personal),
+  );
 
   const totalCargasAutonomo = r(cuotaRetaAnual + cuotaIRPFAutonomo);
   const netoAutonomo = r(Math.max(0, p.beneficioAnual - gastosDeducibles - totalCargasAutonomo));
@@ -202,10 +186,7 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
     const rnA = Math.max(0, b - gd);
     const cuotaR = calcularCuotaRetaAnual(rnA / 12);
     const baseA = Math.max(0, rnA - cuotaR);
-    const cargaA = cuotaR + Math.max(
-      0,
-      calcularCuotaIRPF(baseA) - calcularCuotaIRPF(Math.min(MINIMOS_IRPF_2025.personal, baseA)),
-    );
+    const cargaA = cuotaR + calcularCuotaIntegraGeneral(baseA, MINIMOS_IRPF_2025.personal);
     const benefS = Math.max(0, b - gd);
     const cuotaISU = calcularCuotaIS(benefS, p.tipoIS);
     const cuotaAS = AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual * 12;

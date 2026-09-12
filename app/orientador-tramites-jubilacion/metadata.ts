@@ -89,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Cómo tributa la pensión en el IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las pensiones públicas tributan como rendimientos del trabajo en el IRPF, pero existen un mínimo personal incrementado a partir de los 65 y los 75 años, y la reducción general por rendimientos del trabajo, que reducen la base imponible. El Estimador IRPF Pensionista de meskeIA calcula de forma orientativa la retención y el IRPF anual aproximado a partir de tu pensión y tu edad.',
+        text: 'Las pensiones públicas tributan como rendimientos del trabajo en el IRPF, pero existen un mínimo personal incrementado a partir de los 65 y los 75 años y la reducción general por rendimientos del trabajo. La reducción sí baja la base imponible; el mínimo no, se grava a tipo cero por la vía del artículo 63.1.2º de la Ley del IRPF, de modo que vale lo mismo cualquiera que sea la pensión. El Estimador IRPF Pensionista de meskeIA calcula de forma orientativa la retención y el IRPF anual aproximado a partir de tu pensión y tu edad.',
       },
     },
     {

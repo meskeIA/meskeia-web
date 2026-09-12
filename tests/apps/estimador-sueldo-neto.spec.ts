@@ -83,9 +83,15 @@ import { test, expect, Page } from '@playwright/test';
  *    tipo marginal. El art. 63.1.2º LIRPF dice que el mínimo «no reduce la renta»: forma
  *    parte de la base liquidable general y se grava a tipo cero aplicando la escala dos
  *    veces y restando la cuota del mínimo de la cuota de la base. Subestimaba la cuota en
- *    610,50 € (30.000 € de bruto) y 1.054,50 € (120.000 €). Es el mismo hallazgo que el
- *    commit 2b80033d reparó en seis motores de `lib/calculadoras`; esta app quedó fuera
- *    porque su cálculo vive en la propia página.
+ *    610,50 € (30.000 € de bruto). Es el mismo hallazgo que el commit 2b80033d reparó en
+ *    seis motores de `lib/calculadoras`; esta app quedó fuera porque su cálculo vive en la
+ *    propia página.
+ *
+ *    ⚠️ Corregido el 12/09/2026 lo que esta misma cabecera decía del caso de 120.000 €: el
+ *    error NO eran 1.054,50 € sino 1.443,00 €. Los 1.054,50 € son la cuota del propio mínimo
+ *    (5.550 × 19 %), no lo que se dejaba de cobrar. El error es 5.550 × (marginal − 19 %), y
+ *    con el marginal en el 45 % da 1.443,00 €: es el TECHO del defecto, y se alcanza ya con
+ *    80.000 € de bruto. Medido con la escala en la mano, no con la app.
  *    De paso, la reducción por tributación conjunta dejó de sumarse al mínimo: el art. 84.2
  *    dice «la base imponible se reducirá», así que es reducción de BASE y se valora al
  *    marginal, no a tipo cero. Sumarla al mínimo le daba el tratamiento del otro.

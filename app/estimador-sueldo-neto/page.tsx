@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularReduccionRendimientosTrabajo, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularReduccionRendimientosTrabajo, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -17,24 +17,6 @@ type SituacionFamiliar = 'soltero' | 'casado_un_ingreso' | 'casado_dos_ingresos'
 
 // Datos fiscales centralizados en data/fiscal/irpf.ts
 // FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025 importados al inicio
-
-// Aplica la escala del art. 63 LIRPF a un importe. No conoce mínimos ni reducciones:
-// solo recorre los tramos, para poder invocarla dos veces (ver calcularIRPF).
-function aplicarEscala(importe: number): number {
-  let cuota = 0;
-  let baseRestante = Math.max(0, importe);
-  let limiteAnterior = 0;
-
-  for (const tramo of TRAMOS_IRPF_2025) {
-    const baseTramo = Math.min(baseRestante, tramo.hasta - limiteAnterior);
-    if (baseTramo <= 0) break;
-    cuota += baseTramo * (tramo.tipo / 100);
-    baseRestante -= baseTramo;
-    limiteAnterior = tramo.hasta;
-  }
-
-  return cuota;
-}
 
 /**
  * Cuota íntegra del IRPF (art. 63.1.2º LIRPF).
@@ -48,18 +30,19 @@ function aplicarEscala(importe: number): number {
  * mismo (el 19 % de los primeros tramos) para todos los contribuyentes con las mismas
  * circunstancias familiares, que es justamente el efecto que la norma persigue.
  *
- * El error subestimaba la cuota en 610,50 € con 30.000 € de bruto y en 1.054,50 € con
- * 120.000 €. Es el mismo defecto que el commit 2b80033d (09/09/2026) reparó en seis
- * motores de `lib/calculadoras`; esta app quedó fuera porque calcula por su cuenta.
+ * El error subestimaba la cuota en 610,50 € con 30.000 € de bruto. Con 120.000 € eran
+ * 1.443 € y no los 1.054,50 € que dijo el parte original, que confundió el error con la
+ * cuota del propio mínimo: 1.443 € es el techo del defecto (5.550 × (45 − 19) %) y se
+ * alcanza ya con 80.000 € de bruto. Medido el 12/09/2026.
+ *
+ * Es el mismo defecto que el commit 2b80033d (09/09/2026) reparó en seis motores de
+ * `lib/calculadoras`; esta app quedó fuera porque calculaba por su cuenta. Desde el
+ * 12/09/2026 la fórmula tampoco vive aquí: la pone `calcularCuotaIntegraGeneral`.
  *
  * Fuente: art. 63.1.2º Ley 35/2006 (AEAT, Manual práctico Renta 2025, cap. 15).
  */
 function calcularIRPF(baseLiquidable: number, minimoPersonalFamiliar: number): number {
-  const base = Math.max(0, baseLiquidable);
-  // El mínimo forma parte de la base «hasta el importe de esta última» (art. 56.2): con una
-  // base menor que el mínimo, la cuota es cero, nunca negativa.
-  const minimoAplicable = Math.min(Math.max(0, minimoPersonalFamiliar), base);
-  return Math.max(0, aplicarEscala(base) - aplicarEscala(minimoAplicable));
+  return calcularCuotaIntegraGeneral(baseLiquidable, minimoPersonalFamiliar);
 }
 
 // Función para calcular la Seguridad Social

@@ -208,8 +208,10 @@ export default function PrestacionesDependenciaPage() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Deducciones de IRPF por discapacidad</h2>
             <p className={styles.sectionIntro}>
-              El mínimo por discapacidad reduce la base imponible del IRPF (no la cuota directamente),
-              y se acumula con el mínimo por gastos de asistencia ante cualquiera de tres supuestos
+              El mínimo por discapacidad no reduce la base imponible: forma parte de la base
+              liquidable general y se grava a <strong>tipo cero</strong> (art. 63.1.2.º LIRPF), de
+              modo que se valora a los tipos bajos de la escala y no al tipo marginal de quien
+              declara. Se acumula con el mínimo por gastos de asistencia ante cualquiera de tres supuestos
               alternativos: acreditar ayuda de terceras personas, acreditar movilidad reducida, o tener
               un grado igual o superior al 65 %, que da derecho por sí solo sin acreditar nada más.
             </p>

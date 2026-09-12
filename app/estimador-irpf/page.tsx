@@ -9,7 +9,9 @@ import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
-  TRAMOS_IRPF_2025,
+  desglosarEscalaGeneral,
+  cuotaEscalaGeneral,
+  REDUCCION_TRIBUTACION_CONJUNTA_2025,
   MINIMOS_IRPF_2025,
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
@@ -33,33 +35,35 @@ interface DesgloseTramo {
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
-function calcularCuotaIRPF(baseLiquidable: number): { cuota: number; desglose: DesgloseTramo[] } {
-  let cuota = 0;
-  let baseRestante = Math.max(0, baseLiquidable);
-  let limiteAnterior = 0;
-  const desglose: DesgloseTramo[] = [];
+/**
+ * Cuota integra de la base liquidable general (art. 63.1.2 LIRPF) con su desglose por tramos.
+ *
+ * La escala se aplica dos veces: a la base liquidable entera y al minimo personal y
+ * familiar; la segunda cuota se resta de la primera. El desglose por tramos es el de la
+ * PRIMERA aplicacion, que es la que describe la ley.
+ *
+ * ATENCION 12/09/2026: hasta esta fecha esta app restaba los minimos de la base antes de
+ * aplicar la escala, que los valora al tipo marginal y subestima la cuota. Con minimos
+ * familiares grandes el error es muy alto: 1.507,50 EUR con 40.000 EUR de base y dos hijos,
+ * 3.691 EUR con 70.000 EUR y tres hijos.
+ */
+function calcularCuotaIRPF(
+  baseLiquidableGeneral: number,
+  minimo: number
+): { cuota: number; cuotaEscala: number; cuotaMinimo: number; desglose: DesgloseTramo[] } {
+  const base = Math.max(0, baseLiquidableGeneral);
+  const { cuota: cuotaEscala, tramos } = desglosarEscalaGeneral(base);
+  const cuotaMinimo = cuotaEscalaGeneral(Math.min(Math.max(0, minimo), base));
 
-  for (let i = 0; i < TRAMOS_IRPF_2025.length; i++) {
-    const tramo = TRAMOS_IRPF_2025[i];
-    const tramoDe = limiteAnterior;
-    const tramoHasta = tramo.hasta === Infinity ? null : tramo.hasta;
-    const anchuraTramo = tramo.hasta - limiteAnterior;
-    const baseTramo = Math.min(baseRestante, anchuraTramo);
+  const desglose: DesgloseTramo[] = tramos.map((t) => ({
+    desde: t.desde,
+    hasta: t.hasta,
+    tipo: t.tipo,
+    baseAplicada: t.base,
+    cuota: t.cuota,
+  }));
 
-    if (baseTramo <= 0) {
-      desglose.push({ desde: tramoDe, hasta: tramoHasta, tipo: tramo.tipo, baseAplicada: 0, cuota: 0 });
-      limiteAnterior = tramo.hasta;
-      continue;
-    }
-
-    const cuotaTramo = baseTramo * (tramo.tipo / 100);
-    cuota += cuotaTramo;
-    desglose.push({ desde: tramoDe, hasta: tramoHasta, tipo: tramo.tipo, baseAplicada: baseTramo, cuota: cuotaTramo });
-    baseRestante -= baseTramo;
-    limiteAnterior = tramo.hasta;
-  }
-
-  return { cuota, desglose };
+  return { cuota: Math.max(0, cuotaEscala - cuotaMinimo), cuotaEscala, cuotaMinimo, desglose };
 }
 
 function calcularMinimos(situacion: SituacionFamiliar, numHijos: number, hijosMenores3: number): number {
@@ -71,9 +75,24 @@ function calcularMinimos(situacion: SituacionFamiliar, numHijos: number, hijosMe
   if (numHijos >= 4) minimos += MINIMOS_IRPF_2025.hijo_4_mas * (numHijos - 3);
   minimos += Math.min(hijosMenores3, numHijos) * MINIMOS_IRPF_2025.hijo_menor_3;
 
-  if (situacion === 'familia_monoparental' && numHijos > 0) minimos += 2150;
-
   return minimos;
+}
+
+/**
+ * Reduccion por tributacion conjunta (art. 84.2, reglas 3 y 4 LIRPF).
+ *
+ * ATENCION 12/09/2026: los 2.150 EUR de la unidad monoparental estaban SUMADOS a los minimos
+ * dentro de calcularMinimos, y los 3.400 EUR del matrimonio con un solo ingreso no se
+ * aplicaban en absoluto. No es un minimo: la norma dice «la base imponible se reducira», asi
+ * que va contra la base y se valora al tipo marginal, mientras que el minimo del art. 63.1.2
+ * se grava a tipo cero. Sumarla al minimo le daba el tratamiento del otro.
+ */
+function calcularReduccionTributacionConjunta(situacion: SituacionFamiliar, numHijos: number): number {
+  if (situacion === 'casado_un_ingreso') return REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental;
+  if (situacion === 'familia_monoparental' && numHijos > 0) {
+    return REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
+  }
+  return 0;
 }
 
 function calcularSSLaboralAnual(brutoAnual: number): number {
@@ -106,7 +125,10 @@ export default function EstimadorIRPFPage() {
     ssAnual: number;
     baseImponibleGeneral: number;
     minimosPersonalesFamiliares: number;
+    reduccionConjunta: number;
     baseLiquidable: number;
+    cuotaEscala: number;
+    cuotaMinimo: number;
     cuotaIntegra: number;
     desgloseTramos: DesgloseTramo[];
     deduccionRentasBajas: number;
@@ -140,14 +162,20 @@ export default function EstimadorIRPFPage() {
     // Base imponible general = RNTR + capital mobiliario
     const baseImponibleGeneral = Math.max(0, rnt - reduccionTrabajo) + capital;
 
-    // Mínimos
+    // Minimos del art. 57 a 61: NO reducen la base, entran en la cuota a tipo cero.
     const minimosPersonalesFamiliares = calcularMinimos(situacion, hijos, hijosM3);
 
-    // Base liquidable
-    const baseLiquidable = Math.max(0, baseImponibleGeneral - minimosPersonalesFamiliares);
+    // Base liquidable general = base imponible menos las reducciones de BASE (art. 84.2).
+    const reduccionConjunta = calcularReduccionTributacionConjunta(situacion, hijos);
+    const baseLiquidable = Math.max(0, baseImponibleGeneral - reduccionConjunta);
 
     // Cuota íntegra
-    const { cuota: cuotaIntegra, desglose: desgloseTramos } = calcularCuotaIRPF(baseLiquidable);
+    const {
+      cuota: cuotaIntegra,
+      cuotaEscala,
+      cuotaMinimo,
+      desglose: desgloseTramos,
+    } = calcularCuotaIRPF(baseLiquidable, minimosPersonalesFamiliares);
 
     // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
     const deduccionRentasBajas = esTrabajador && bruto > 0
@@ -169,7 +197,10 @@ export default function EstimadorIRPFPage() {
       ssAnual,
       baseImponibleGeneral,
       minimosPersonalesFamiliares,
+      reduccionConjunta,
       baseLiquidable,
+      cuotaEscala,
+      cuotaMinimo,
       cuotaIntegra,
       desgloseTramos,
       deduccionRentasBajas,
@@ -368,7 +399,7 @@ export default function EstimadorIRPFPage() {
                   unit="€"
                   variant="success"
                   icon="👨‍👩‍👧"
-                  description="Reduce la base liquidable"
+                  description="No reducen la base: se gravan a tipo cero (art. 63.1.2.º)"
                 />
               </div>
 
@@ -399,6 +430,22 @@ export default function EstimadorIRPFPage() {
                       ))}
                   </tbody>
                 </table>
+                <p className={styles.tramosNota}>
+                  Los tramos se aplican a la base liquidable <strong>entera</strong> y suman{' '}
+                  {formatCurrency(resultado.cuotaEscala)}. De ahí se resta la misma escala
+                  aplicada al mínimo personal y familiar (
+                  {formatCurrency(resultado.minimosPersonalesFamiliares)} →{' '}
+                  {formatCurrency(resultado.cuotaMinimo)}), que es la forma en que la ley lo
+                  grava a tipo cero (art. 63.1.2.º LIRPF). Cuota íntegra:{' '}
+                  {formatCurrency(resultado.cuotaIntegra)}.
+                  {resultado.reduccionConjunta > 0 && (
+                    <>
+                      {' '}Antes de todo eso se restó de la base la reducción por tributación
+                      conjunta de {formatCurrency(resultado.reduccionConjunta)} (art. 84.2
+                      LIRPF), que esa sí reduce la base.
+                    </>
+                  )}
+                </p>
               </div>
             </>
           ) : (
@@ -596,7 +643,7 @@ export default function EstimadorIRPFPage() {
                 <p><strong>Tipo efectivo:</strong> ~13,6 %</p>
               </div>
               <div className={styles.escenarioTip}>
-                El mínimo familiar por los 2 hijos ahorra ~1.600–1.800 € de cuota respecto a no tenerlos. Si ambos cónyuges trabajan y declaran individualmente, suele ser más ventajoso que la conjunta.
+                El mínimo familiar por los 2 hijos (2.400 € + 2.700 €) ahorra 969 € de cuota respecto a no tenerlos: el mínimo no reduce la base, se le aplica la escala desde cero, así que esos 5.100 € se valoran al 19 % y no a tu tipo marginal. Si ambos cónyuges trabajan y declaran individualmente, suele ser más ventajoso que la conjunta.
               </div>
             </div>
 
@@ -683,7 +730,7 @@ export default function EstimadorIRPFPage() {
             <div className={styles.faqItem}>
               <h4>¿Puedo presentar declaración conjunta con mi cónyuge?</h4>
               <p>
-                Sí, los matrimonios pueden optar por la <strong>tributación conjunta</strong>, que aplica una reducción especial de <strong>3.400 € sobre la base imponible</strong> (5.000 € en monoparentales). Sin embargo, la conjunta casi nunca conviene cuando los dos trabajan con ingresos similares, porque la escala de IRPF es progresiva y se aplica sobre la suma de ambas rentas. Conviene compararla con la individual antes de confirmar el borrador.
+                Sí, los matrimonios pueden optar por la <strong>tributación conjunta</strong>, que aplica una reducción especial de <strong>{formatCurrency(REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental)} sobre la base imponible</strong> ({formatCurrency(REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental)} en unidades monoparentales, art. 84.2 reglas 3.ª y 4.ª LIRPF). A diferencia de los mínimos personales y familiares, esta sí reduce la base, de modo que se valora a tu tipo marginal. Sin embargo, la conjunta casi nunca conviene cuando los dos trabajan con ingresos similares, porque la escala de IRPF es progresiva y se aplica sobre la suma de ambas rentas. Conviene compararla con la individual antes de confirmar el borrador.
               </p>
             </div>
 

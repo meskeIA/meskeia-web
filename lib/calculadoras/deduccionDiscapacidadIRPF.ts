@@ -10,13 +10,22 @@
  * el 09/09/2026 se encontró aquí condicionado a `necesitaAsistencia` un incremento que el art. 60
  * concede también por grado ≥65 %, con la app haciéndolo bien. Eran 3.000 € de mínimo.
  *
- * El mínimo reduce la base liquidable, no la cuota. El "ahorro" es una estimación
- * aplicando un tipo marginal plano (puede repartirse entre dos tramos en la realidad).
+ * ATENCION 12/09/2026: el minimo NO reduce la base liquidable, y de ahi salia el defecto
+ * que este fichero arrastraba. El art. 63.1.2 LIRPF dice que el minimo «no reduce la renta»:
+ * forma parte de la base liquidable general y se grava a TIPO CERO aplicando la escala dos
+ * veces y restando. La consecuencia practica es que el ahorro NO depende del tipo marginal
+ * del contribuyente: el minimo se valora a los tipos BAJOS de la escala, siempre.
+ *
+ * Hasta esa fecha el ahorro se calculaba como `totalMinimo x tipoMarginal`, con el marginal
+ * elegido por quien preguntaba. Con el minimo maximo de 12.000 EUR y un marginal del 45 %
+ * publicaba 5.400 EUR de ahorro donde la ley da 2.535 EUR: mas del doble. El parametro
+ * `tipoMarginal` desaparecio con el defecto, porque no interviene en el resultado.
  */
 import {
   DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
   FISCAL_DEPENDENCIA_META,
 } from '@/data/fiscal/dependencia';
+import { MINIMOS_IRPF_2025, cuotaEscalaGeneral } from '@/data/fiscal/irpf';
 
 export type TitularDiscapacidad = 'contribuyente' | 'ascendiente' | 'descendiente';
 export type GradoDiscapacidad = '33a65' | '65oMas';
@@ -30,16 +39,21 @@ export interface ParametrosDeduccionDiscapacidad {
    * asistencia: con grado ≥65 % el incremento se aplica igual sin marcarla.
    */
   necesitaAsistencia?: boolean;
-  /** Tipo marginal de IRPF (%) para estimar el ahorro. */
-  tipoMarginal: number;
 }
 
 export interface ResultadoDeduccionDiscapacidad {
   minimoDiscapacidad: number;
   gastosAsistencia: number;
   totalMinimo: number;
-  tipoMarginal: number;
+  /**
+   * Ahorro en cuota (EUR) por el art. 63.1.2 LIRPF: lo que la escala aplica al minimo por
+   * discapacidad ENCIMA del minimo personal. Es una cota INFERIOR: quien tenga ademas
+   * minimos por descendientes o ascendientes los apila debajo y empuja este tramo hacia
+   * arriba, con lo que ahorra algo mas.
+   */
   ahorroEstimado: number;
+  /** Tipo al que acaba valorandose el minimo (%): ahorroEstimado / totalMinimo. */
+  tipoEfectivoAhorro: number;
   fuente: string;
   verificado: string;
 }
@@ -47,13 +61,6 @@ export interface ResultadoDeduccionDiscapacidad {
 export function calcularDeduccionDiscapacidadIRPF(
   p: ParametrosDeduccionDiscapacidad
 ): ResultadoDeduccionDiscapacidad {
-  if (!Number.isFinite(p.tipoMarginal) || p.tipoMarginal < 0 || p.tipoMarginal > 100) {
-    throw new Error('El tipo marginal debe estar entre 0 y 100.');
-  }
-  // `-0 < 0` es false, así que el cero negativo atraviesa la guarda y arrastra su signo
-  // hasta el ahorro (12.000 × -0 = -0), que se imprimía como «-0,00 €». Se normaliza.
-  const tipoMarginal = Object.is(p.tipoMarginal, -0) ? 0 : p.tipoMarginal;
-
   // El contribuyente usa sus propios importes; ascendiente/descendiente usan los familiares.
   const datos =
     p.titular === 'contribuyente'
@@ -80,14 +87,21 @@ export function calcularDeduccionDiscapacidadIRPF(
     : 0;
 
   const totalMinimo = minimoDiscapacidad + gastosAsistencia;
-  const ahorroEstimado = totalMinimo * (tipoMarginal / 100);
+
+  // Art. 63.1.2 LIRPF: el minimo se grava a tipo cero, asi que lo que ahorra el minimo por
+  // discapacidad es lo que la escala le aplica encima del minimo personal ya existente.
+  const base = MINIMOS_IRPF_2025.personal;
+  const ahorroEstimado =
+    Math.round((cuotaEscalaGeneral(base + totalMinimo) - cuotaEscalaGeneral(base)) * 100) / 100;
+  const tipoEfectivoAhorro =
+    totalMinimo > 0 ? Math.round((ahorroEstimado / totalMinimo) * 10000) / 100 : 0;
 
   return {
     minimoDiscapacidad,
     gastosAsistencia,
     totalMinimo,
-    tipoMarginal,
     ahorroEstimado,
+    tipoEfectivoAhorro,
     fuente: FISCAL_DEPENDENCIA_META.fuente,
     verificado: FISCAL_DEPENDENCIA_META.verificado,
   };

@@ -204,6 +204,14 @@
   margin: 0 0 var(--spacing-md);
 }
 
+/* Nota del art. 63.1.2.º: por qué los tramos suman más que la cuota íntegra */
+.tramosNota {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: var(--spacing-md) 0 0;
+}
+
 .tramosTable { width: 100%; border-collapse: collapse; }
 
 .tramosTable th,

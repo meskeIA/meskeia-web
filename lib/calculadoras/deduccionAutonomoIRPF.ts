@@ -59,7 +59,7 @@
  * Encadenable con: calcular_modelo_130, calcular_cuota_autonomo, calcular_irpf
  */
 
-import { TRAMOS_IRPF_2025, MINIMOS_IRPF_2025, FISCAL_IRPF_META } from '@/data/fiscal';
+import { TRAMOS_IRPF_2025, cuotaEscalaGeneral, MINIMOS_IRPF_2025, FISCAL_IRPF_META } from '@/data/fiscal';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 
@@ -173,16 +173,8 @@ const fmt = (n: number) =>
  * dejaba cientos de euros menos. Recitado por un LLM, eso hacía aparentar que
  * «deducir 1 € más» ahorraba 622 € en el borde de los 12.450 €.
  */
-function cuotaEscalaGeneral(base: number): number {
-  if (base <= 0) return 0;
-  let cuota = 0;
-  let anterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (base <= anterior) break;
-    cuota += (Math.min(base, tramo.hasta) - anterior) * (tramo.tipo / 100);
-    anterior = tramo.hasta;
-  }
-  return r(cuota);
+function cuotaEscala(base: number): number {
+  return r(cuotaEscalaGeneral(base));
 }
 
 /** Tipo marginal de la escala importada (el del último euro de la base). */
@@ -471,7 +463,7 @@ export function calcularDeduccionAutonomoIRPF(p: ParametrosDeduccionAutonomoIRPF
   // Lo que SÍ se importa de `@/data/fiscal` es la escala: la copia local que había
   // aquí ya no existe.
   const tipoIRPFEstimado = tipoMarginalEscala(rendimientoNetoActividad);
-  const cuotaIRPFEstimada = cuotaEscalaGeneral(rendimientoNetoActividad);
+  const cuotaIRPFEstimada = cuotaEscala(rendimientoNetoActividad);
   const tipoEfectivoEstimado = rendimientoNetoActividad > 0
     ? r(cuotaIRPFEstimada / rendimientoNetoActividad * 100)
     : 0;
@@ -479,7 +471,7 @@ export function calcularDeduccionAutonomoIRPF(p: ParametrosDeduccionAutonomoIRPF
   // Efecto del mínimo personal por el método del art. 63.1.2º LIRPF: la escala se
   // aplica a la base completa y la cuota se minora en la escala aplicada al mínimo.
   const minimoPersonal = MINIMOS_IRPF_2025.personal;
-  const cuotaDelMinimoPersonal = cuotaEscalaGeneral(Math.min(minimoPersonal, rendimientoNetoActividad));
+  const cuotaDelMinimoPersonal = cuotaEscala(Math.min(minimoPersonal, rendimientoNetoActividad));
 
   advertencias.push(`Gastos de difícil justificación: solo aplicable en estimación directa SIMPLIFICADA. El ${PCT_DIFICIL_JUSTIFICACION_EDS}% del rendimiento neto previo, con un máximo de ${LIMITE_DIFICIL_JUSTIFICACION.toLocaleString('es-ES')} €/año (art. 30.2.4 RIRPF).`);
   advertencias.push('El vehículo de uso mixto (laboral y personal) NO es deducible en estimación directa salvo que se acredite uso exclusivo para la actividad (muy restrictivo según AEAT). Para agentes comerciales y transporte: posible 100%.');

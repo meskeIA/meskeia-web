@@ -16,6 +16,7 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
   TRAMOS_IRPF_2025,
+  cuotaEscalaGeneral,
   FISCAL_PLAN_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
@@ -39,24 +40,15 @@ interface ResultadoEscenario {
 
 // ─── Lógica IRPF ──────────────────────────────────────────────────────────────
 
-/** Calcula la cuota IRPF sobre una base liquidable según los tramos 2025 */
-function calcularCuotaIRPF(baseLiquidable: number): number {
-  let cuota = 0;
-  let baseRestante = Math.max(0, baseLiquidable);
-  let limiteAnterior = 0;
-  for (const tramo of TRAMOS_IRPF_2025) {
-    const limiteSuperior = tramo.hasta === Infinity ? baseLiquidable + 1000 : tramo.hasta;
-    const anchoTramo = limiteSuperior - limiteAnterior;
-    const baseAplicada = Math.min(baseRestante, anchoTramo);
-    if (baseAplicada > 0) {
-      cuota += baseAplicada * (tramo.tipo / 100);
-      baseRestante -= baseAplicada;
-    }
-    limiteAnterior = limiteSuperior;
-    if (baseRestante <= 0) break;
-  }
-  return cuota;
-}
+/**
+ * Escala del art. 63 LIRPF sobre una base liquidable.
+ *
+ * Aqui NO interviene el minimo personal y familiar, y es correcto que no intervenga: todo lo
+ * que esta app publica son DIFERENCIAS marginales —lo que cambia la cuota al aportar o al
+ * rescatar—, y el minimo se cancela al restar dos cuotas de la misma persona. Para una cuota
+ * integra completa, la fuente unica es `calcularCuotaIntegraGeneral` de data/fiscal/irpf.ts.
+ */
+const calcularCuotaIRPF = cuotaEscalaGeneral;
 
 /** Tipo marginal IRPF para una base liquidable concreta */
 function tipoMarginal(baseLiquidable: number): number {
@@ -82,13 +74,11 @@ function calcularBaseLiquidable(salarioBruto: number): number {
   // Reducción art. 20 (rendimientos del trabajo)
   const reduccion = calcularReduccionRendimientosTrabajo(rnt);
 
-  // Base imponible aproximada
-  const baseImponible = Math.max(0, rnt - reduccion);
-  // Mínimo personal (5.550 €) — la base liquidable se calcula como base imponible
-  // pero los mínimos se aplican como un "tramo cero"; aquí simplificamos
-  // devolviendo la base imponible (que es la cifra que se compara con tramos
-  // descontando el mínimo en el cálculo real).
-  return baseImponible;
+  // Base imponible aproximada. El mínimo personal NO se resta: el art. 63.1.2.º LIRPF lo grava
+  // a tipo cero dentro de la cuota, no reduciendo la base, así que la base liquidable general
+  // lo lleva dentro. Para las diferencias marginales que calcula esta app es además
+  // indiferente, porque el mínimo se cancela al restar dos cuotas del mismo contribuyente.
+  return Math.max(0, rnt - reduccion);
 }
 
 /** Capital acumulado tras N años aportando aporteAnual con rentabilidad anual rentab (%) */

@@ -247,6 +247,16 @@
   margin-bottom: var(--spacing-sm);
 }
 
+/* Nota del art. 63.1.2.º: por qué los tramos suman más que la cuota final */
+.desgloseTramNota {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: var(--spacing-sm) 0 0;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+}
+
 .tramoItem {
   display: flex;
   align-items: center;

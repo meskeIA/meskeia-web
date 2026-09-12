@@ -2854,32 +2854,31 @@ function crearServidorDelegum(): McpServer {
     'descendiente a cargo: 3.000 € (grado 33%-64%) o 9.000 € (≥65%), más 3.000 € adicionales por gastos de asistencia. ' +
     'Ese incremento procede ante CUALQUIERA de tres supuestos ALTERNATIVOS (basta uno): acreditar ayuda de terceras ' +
     'personas, acreditar movilidad reducida, o tener un grado igual o superior al 65% —con grado ≥65% se aplica ' +
-    'siempre, sin acreditar nada más—. Estima el ahorro aplicando el tipo marginal. El mínimo reduce la base ' +
-    'liquidable, no la cuota directamente.',
+    'siempre, sin acreditar nada más—. El mínimo NO reduce la base liquidable: se grava a tipo cero (art. 63.1.2º ' +
+    'LIRPF), de modo que el ahorro NO depende del tipo marginal del contribuyente y se valora a los tipos bajos ' +
+    'de la escala.',
     {
       titular: z.enum(['contribuyente', 'ascendiente', 'descendiente']).optional().describe('Quién tiene la discapacidad. Por defecto "contribuyente".'),
       grado: z.enum(['33a65', '65oMas']).optional().describe('Grado de discapacidad: "33a65" (entre 33% y 64%) o "65oMas" (65% o más). Por defecto "33a65".'),
       necesita_asistencia: z.boolean().optional().describe('¿Acredita necesidad de ayuda de terceras personas o movilidad reducida? (añade 3.000 €). Por defecto false. Irrelevante con grado "65oMas": ahí los 3.000 € se aplican por el propio grado aunque este parámetro sea false.'),
-      tipo_marginal: z.number().min(0).max(100).optional().describe('Tipo marginal de IRPF para estimar el ahorro (%). Valores habituales: 19, 24, 30, 37, 45, 47. Por defecto 24.'),
     },
     { title: 'Calcula el mínimo por discapacidad en el IRPF', readOnlyHint: true },
-    async ({ titular, grado, necesita_asistencia, tipo_marginal }, extra) => {
+    async ({ titular, grado, necesita_asistencia }, extra) => {
       await registrarUsoDelegum('calcular_deduccion_discapacidad', getCaller(extra));
       try {
         const r = calcularDeduccionDiscapacidadIRPF({
           titular: (titular ?? 'contribuyente') as TitularDiscapacidad,
           grado: (grado ?? '33a65') as GradoDiscapacidad,
           necesitaAsistencia: necesita_asistencia,
-          tipoMarginal: tipo_marginal ?? 24,
         });
         const lineas = [
           `♿ **Mínimo por discapacidad (IRPF)**`,
           `📦 Mínimo por discapacidad: ${fmt(r.minimoDiscapacidad)} €`,
           r.gastosAsistencia > 0 ? `➕ Gastos de asistencia: ${fmt(r.gastosAsistencia)} €` : '',
-          `🔢 **Reducción total de la base liquidable: ${fmt(r.totalMinimo)} €**`,
-          `💶 Ahorro fiscal estimado (al ${pct(r.tipoMarginal)}%): **${fmt(r.ahorroEstimado)} €**`,
+          `🔢 **Mínimo total por discapacidad: ${fmt(r.totalMinimo)} €**`,
+          `💶 Ahorro estimado en cuota: **${fmt(r.ahorroEstimado)} €** (el mínimo acaba valorado al ${pct(r.tipoEfectivoAhorro)}%)`,
           '',
-          `ℹ️ El mínimo reduce la base liquidable, no la cuota. El ahorro real depende de tu tipo marginal exacto y puede repartirse entre dos tramos.`,
+          `ℹ️ El mínimo NO reduce la base: forma parte de la base liquidable general y se grava a tipo cero (art. 63.1.2º LIRPF), aplicando la escala a la base completa y restando la escala aplicada al mínimo. Por eso el ahorro NO depende de tu tipo marginal. Es una cota INFERIOR: si además tienes mínimos por descendientes o ascendientes, estos se apilan debajo y el de discapacidad cae en tramos algo más altos.`,
           `📚 ${r.fuente} · verificado ${r.verificado}`,
         ].filter(l => l !== '');
         return conAviso(lineas.join('\n'), AVISO_FISCAL);

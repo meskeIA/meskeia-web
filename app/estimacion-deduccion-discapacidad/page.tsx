@@ -17,7 +17,6 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
   FISCAL_DEPENDENCIA_META,
-  TRAMOS_IRPF_2025,
 } from '@/data/fiscal';
 
 import {
@@ -38,30 +37,24 @@ import {
 // motor y bien en esta página: quien preguntaba por un LLM perdía 3.000 € de mínimo que la web
 // sí reconocía. Se reparó el 09/09 en los dos sitios; ahora ya solo hay uno que reparar.
 
-// ─── Tipos marginales disponibles ─────────────────────────────────────────────
-
-const TIPOS_MARGINALES = TRAMOS_IRPF_2025.map((t) => t.tipo);
-
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function EstimacionDeduccionDiscapacidadPage() {
   const [titular, setTitular] = useState<TitularDiscapacidad>('contribuyente');
   const [grado, setGrado] = useState<GradoDiscapacidad>('33a65');
   const [necesitaAsistencia, setNecesitaAsistencia] = useState(false);
-  const [tipoMarginal, setTipoMarginal] = useState(24);
   const [resultado, setResultado] = useState<ResultadoDeduccionDiscapacidad | null>(null);
 
   const calcular = useCallback(() => {
     setResultado(
-      calcularDeduccionDiscapacidadIRPF({ titular, grado, necesitaAsistencia, tipoMarginal })
+      calcularDeduccionDiscapacidadIRPF({ titular, grado, necesitaAsistencia })
     );
-  }, [titular, grado, necesitaAsistencia, tipoMarginal]);
+  }, [titular, grado, necesitaAsistencia]);
 
   const limpiar = useCallback(() => {
     setTitular('contribuyente');
     setGrado('33a65');
     setNecesitaAsistencia(false);
-    setTipoMarginal(24);
     setResultado(null);
   }, []);
 
@@ -211,33 +204,6 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             </p>
           </div>
 
-          {/* Tipo marginal */}
-          <div className={styles.formGroup}>
-            <label className={styles.label} htmlFor="tipoMarginal">
-              Tipo marginal IRPF aproximado
-            </label>
-            <select
-              id="tipoMarginal"
-              className={styles.select}
-              value={tipoMarginal}
-              onChange={(e) => setTipoMarginal(Number(e.target.value))}
-            >
-              {TIPOS_MARGINALES.map((tipo) => (
-                <option key={tipo} value={tipo}>
-                  {formatNumber(tipo, 0)}% {tipo === 19 ? '(hasta 12.450 €)' :
-                    tipo === 24 ? '(12.450 – 20.200 €)' :
-                    tipo === 30 ? '(20.200 – 35.200 €)' :
-                    tipo === 37 ? '(35.200 – 60.000 €)' :
-                    tipo === 45 ? '(60.000 – 300.000 €)' :
-                    '(más de 300.000 €)'}
-                </option>
-              ))}
-            </select>
-            <p className={styles.helpText}>
-              Si no conoces tu tipo marginal, selecciona el tramo que corresponda a tu base imponible anual.
-            </p>
-          </div>
-
           {/* Botones */}
           <div className={styles.buttonGroup}>
             <button
@@ -286,8 +252,8 @@ export default function EstimacionDeduccionDiscapacidadPage() {
                   <span className={styles.resultValue}>{formatCurrency(resultado.totalMinimo)}</span>
                 </div>
                 <div className={styles.resultItem}>
-                  <span className={styles.resultLabel}>Tipo marginal aplicado</span>
-                  <span className={styles.resultValue}>{formatNumber(resultado.tipoMarginal, 0)}%</span>
+                  <span className={styles.resultLabel}>Tipo al que se valora el mínimo</span>
+                  <span className={styles.resultValue}>{formatNumber(resultado.tipoEfectivoAhorro, 2)} %</span>
                 </div>
               </div>
 
@@ -300,9 +266,13 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <div className={styles.resultNote} role="note">
                 <span aria-hidden="true">💡</span>
                 <p>
-                  El mínimo por discapacidad <strong>reduce la base liquidable</strong>, no la cuota directamente.
-                  El ahorro real depende de la situación personal completa (otros mínimos, deducciones
-                  autonómicas, reducciones aplicables, etc.).
+                  El mínimo por discapacidad <strong>no reduce la base liquidable</strong>: forma parte de
+                  ella y se grava a <strong>tipo cero</strong>, aplicando la escala a la base completa y
+                  restando de la cuota la misma escala aplicada al mínimo (art. 63.1.2.º LIRPF). Por eso el
+                  ahorro <strong>no depende de tu tipo marginal</strong>: el mínimo se valora siempre a los
+                  tipos bajos de la escala. Esta cifra es una <strong>cota inferior</strong>: si además
+                  tienes mínimos por descendientes o ascendientes, estos se apilan debajo y el de
+                  discapacidad cae en tramos algo más altos.
                 </p>
               </div>
             </>
@@ -315,11 +285,13 @@ export default function EstimacionDeduccionDiscapacidadPage() {
         {/* Conceptos clave */}
         <h3>¿Cómo funcionan los mínimos por discapacidad en IRPF?</h3>
         <p>
-          Los mínimos personales y familiares por discapacidad son cantidades que se restan
-          de la base liquidable del IRPF antes de calcular la cuota. No son una deducción directa
-          sobre lo que pagas, sino una reducción de la base sobre la que se aplican los tipos
-          impositivos. En la práctica, el ahorro real es el mínimo multiplicado por tu tipo
-          marginal.
+          Los mínimos personales y familiares por discapacidad <strong>no se restan de la base</strong>:
+          forman parte de la base liquidable general y la ley los grava a <strong>tipo cero</strong>.
+          Lo consigue aplicando la escala dos veces —a la base liquidable completa y a la parte
+          que corresponde al mínimo— y restando la segunda cuota de la primera (art. 63.1.2.º LIRPF).
+          La consecuencia es la que la norma persigue: el mínimo vale <strong>lo mismo para todo el
+          mundo</strong> con las mismas circunstancias familiares, porque se valora a los tipos bajos
+          de la escala y no al tipo marginal de quien declara.
         </p>
         <p>
           El certificado de discapacidad debe estar emitido por el organismo competente de tu
@@ -330,10 +302,11 @@ export default function EstimacionDeduccionDiscapacidadPage() {
         <h3>Diferencia entre &quot;deducción&quot; y &quot;mínimo personal&quot;</h3>
         <p>
           Es habitual confundir ambos conceptos. Una <strong>deducción</strong> se resta directamente
-          de la cuota del IRPF (euro por euro). Un <strong>mínimo personal o familiar</strong> se
-          resta de la base imponible, por lo que su efecto depende del tipo marginal. Un mínimo
-          de {formatCurrency(3000)} no ahorra {formatCurrency(3000)}, sino {formatCurrency(3000)} × tipo marginal
-          (por ejemplo, al 24% ahorrarías {formatCurrency(720)}).
+          de la cuota del IRPF (euro por euro). Un <strong>mínimo personal o familiar</strong> no resta
+          ni de la cuota ni de la base: se grava a tipo cero por la vía del art. 63.1.2.º, de modo que
+          ahorra lo que la escala le aplicaría en los tramos donde cae, que son los bajos. Un mínimo
+          de {formatCurrency(3000)} encima del mínimo personal no ahorra {formatCurrency(3000)}, sino
+          {formatCurrency(570)} — el 19 %, tanto si ganas 20.000 € como si ganas 200.000 €.
         </p>
 
         <h3>Requisitos para ascendientes y descendientes</h3>
@@ -415,9 +388,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <h4>Trabajador con discapacidad del 40%</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>Salario bruto: {formatCurrency(28000)}/año. Tipo marginal: 30%.</p>
+              <p>Salario bruto: {formatCurrency(28000)}/año.</p>
               <p>Mínimo: {formatCurrency(3000)}. Sin asistencia de terceros.</p>
-              <p><strong>Ahorro: {formatCurrency(900)}/año</strong></p>
+              <p><strong>Ahorro: {formatCurrency(570)}/año</strong> (el mínimo cae entero en el tramo del 19 %)</p>
             </div>
             <div className={styles.escenarioTip}>
               Revisa si tu CCAA tiene deducciones autonómicas adicionales por discapacidad.
@@ -430,9 +403,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <h4>Madre con discapacidad del 70% que convive contigo</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>Tu base imponible: {formatCurrency(40000)}. Tipo marginal: 37%.</p>
+              <p>Tu base imponible: {formatCurrency(40000)}.</p>
               <p>Mínimo: {formatCurrency(9000)} + {formatCurrency(3000)} asistencia = {formatCurrency(12000)}.</p>
-              <p><strong>Ahorro: {formatCurrency(4440)}/año</strong></p>
+              <p><strong>Ahorro: {formatCurrency(2535)}/año</strong> (parte al 19 % y parte al 24 %, no a tu marginal)</p>
             </div>
             <div className={styles.escenarioTip}>
               Recuerda: la madre debe tener rentas propias ≤ {formatCurrency(8000)}/año.
@@ -445,9 +418,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <h4>Hija con discapacidad del 50% y movilidad reducida</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>Tu base imponible: {formatCurrency(22000)}. Tipo marginal: 30%.</p>
+              <p>Tu base imponible: {formatCurrency(22000)}.</p>
               <p>Mínimo: {formatCurrency(3000)} + {formatCurrency(3000)} asistencia = {formatCurrency(6000)}.</p>
-              <p><strong>Ahorro: {formatCurrency(1800)}/año</strong></p>
+              <p><strong>Ahorro: {formatCurrency(1140)}/año</strong> (el mínimo cae entero en el tramo del 19 %)</p>
             </div>
             <div className={styles.escenarioTip}>
               Si ambos padres declaran, el mínimo se reparte al 50% cada uno.
@@ -460,9 +433,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <h4>Contribuyente con discapacidad ≥ 65%</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>Base imponible: {formatCurrency(50000)}. Tipo marginal: 37%.</p>
+              <p>Base imponible: {formatCurrency(50000)}.</p>
               <p>Mínimo: {formatCurrency(9000)} + {formatCurrency(3000)} asistencia = {formatCurrency(12000)}.</p>
-              <p><strong>Ahorro: {formatCurrency(4440)}/año</strong></p>
+              <p><strong>Ahorro: {formatCurrency(2535)}/año</strong> — el mismo que con 40.000 € de base: el mínimo no se valora a tu marginal</p>
             </div>
             <div className={styles.escenarioTip}>
               Los {formatCurrency(3000)} de asistencia salen aquí del propio grado ≥ 65 %: no hace falta
@@ -550,10 +523,12 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">👥</span>
-            <h4>Acuerda con tu pareja el reparto</h4>
+            <h4>El reparto entre progenitores no se elige</h4>
             <p>
-              Si ambos tenéis derecho al mínimo por un hijo con discapacidad, se reparte
-              al 50%. A veces conviene que lo aplique quien tenga mayor tipo marginal.
+              Si ambos tenéis derecho al mínimo por un hijo con discapacidad, el art. 61.1.ª LIRPF
+              obliga a prorratearlo <strong>por partes iguales</strong>: no es una opción que se
+              negocie. Y tampoco habría nada que optimizar, porque el mínimo se grava a tipo cero
+              y su valor no depende del tipo marginal de ninguno de los dos.
             </p>
           </div>
           <div className={styles.tipCard}>
@@ -583,8 +558,10 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               por discapacidad que varían según la CCAA.
             </li>
             <li>
-              <strong>Tipo marginal fijo:</strong> en la realidad, el mínimo puede abarcar
-              dos tramos de IRPF, alterando ligeramente el ahorro efectivo.
+              <strong>Cota inferior:</strong> el ahorro se calcula apilando este mínimo sobre el
+              mínimo personal de {formatCurrency(5550)}. Si además tienes mínimos por descendientes
+              o ascendientes, estos se apilan debajo y el de discapacidad cae en tramos algo más
+              altos, con lo que ahorrarías un poco más.
             </li>
             <li>
               <strong>No sustituye al asesor fiscal:</strong> ante situaciones complejas

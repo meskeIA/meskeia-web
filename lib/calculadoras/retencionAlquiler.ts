@@ -13,6 +13,7 @@
 
 import {
   TRAMOS_IRPF_2025,
+  cuotaEscalaGeneral,
   FISCAL_IRPF_META,
 } from '@/data/fiscal';
 
@@ -85,16 +86,13 @@ export interface ResultadoRetencionAlquiler {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function tarifaProgresiva(importe: number): number {
-  let cuota = 0;
-  let prev = 0;
-  for (const t of TRAMOS_IRPF_2025) {
-    if (importe <= prev) break;
-    cuota += (Math.min(importe, t.hasta) - prev) * (t.tipo / 100);
-    prev = t.hasta;
-  }
-  return cuota;
-}
+/**
+ * Escala general. Aqui NO interviene el minimo personal y familiar, y es correcto que no
+ * intervenga: lo que se calcula es el impacto MARGINAL del alquiler sobre unos ingresos que
+ * ya existen —tarifa(otros + alquiler) − tarifa(otros)—, y el minimo se cancela al restar.
+ * Ver `calcularCuotaIntegraGeneral` en data/fiscal/irpf.ts para la cuota integra completa.
+ */
+const tarifaProgresiva = cuotaEscalaGeneral;
 
 function calcularCuotaIRPF(base: number, otrosIngresos: number): { cuota: number; tipoMarginal: number } {
   // Impacto marginal: tarifa(total) - tarifa(otros ingresos sin alquiler)

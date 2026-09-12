@@ -69,15 +69,132 @@ export const MINIMOS_IRPF_2025 = {
   discapacidad_65_mas: 9000,
 };
 
-// Reducción por tributación conjunta (art. 84.2.4º LIRPF): se resta de la base
-// imponible general antes de aplicar la tarifa, igual que los mínimos personales.
-// Solo aplica si la unidad familiar opta por declarar conjunta (un cónyuge sin
-// ingresos, o unidad monoparental); con dos ingresos separados no hay tributación
-// conjunta y por tanto no procede.
+/**
+ * Reducción por tributación conjunta (art. 84.2, reglas 3ª y 4ª LIRPF). Solo aplica si la
+ * unidad familiar opta por declarar conjunta (un cónyuge sin ingresos, o unidad
+ * monoparental); con dos ingresos separados no hay tributación conjunta y no procede.
+ *
+ * ⚠️ **NO es un mínimo, y no se calcula como un mínimo.** La ley dice «la base imponible se
+ * reducirá en 3.400 euros anuales»: va contra la base y por tanto se valora al tipo
+ * MARGINAL del contribuyente. Los mínimos del art. 57 a 61, en cambio, NO reducen la renta
+ * —se gravan a tipo cero por la vía del art. 63.1.2º— y se valoran a los tipos BAJOS de la
+ * escala. Mezclarlas en un mismo sumando da un resultado incorrecto para las dos.
+ *
+ * Hasta el 12/09/2026 el comentario de aquí decía «igual que los mínimos personales», que
+ * era exactamente la confusión que el art. 63.1.2º deshace. Ver `calcularCuotaIntegraGeneral`.
+ *
+ * Fuente: AEAT, Manual práctico Renta 2025, «Reducción por tributación conjunta»
+ * (arts. 82.1, 82.2 y 84.2.3º y 4º LIRPF). Verificado en sesión el 12/09/2026.
+ */
 export const REDUCCION_TRIBUTACION_CONJUNTA_2025 = {
   biparental:   3400, // matrimonio con un solo perceptor de ingresos
   monoparental: 2150, // un progenitor + hijos (art. 82.1.2ª LIRPF)
 };
+
+// ─── Cuota íntegra general: la escala y el art. 63.1.2º ──────────────────────
+
+/** Un tramo tal y como se aplicó a una base concreta. Lo consumen los desgloses en pantalla. */
+export interface TramoAplicadoIRPF {
+  /** Límite inferior del tramo (€). */
+  desde: number;
+  /** Límite superior del tramo (€), o `null` en el tramo abierto. */
+  hasta: number | null;
+  /** Tipo del tramo (%). */
+  tipo: number;
+  /** Parte de la base que cayó en este tramo (€). */
+  base: number;
+  /** Cuota aportada por este tramo (€). */
+  cuota: number;
+}
+
+/**
+ * Aplica una escala progresiva a una base y devuelve además el desglose tramo a tramo.
+ *
+ * Solo modela la escala. Quien calcule una cuota íntegra real debe usar
+ * `calcularCuotaIntegraGeneral`, que es la que aplica el art. 63.1.2º.
+ */
+export function desglosarEscalaGeneral(
+  base: number,
+  escala: TramoIRPF[] = TRAMOS_IRPF_2025,
+): { cuota: number; tramos: TramoAplicadoIRPF[] } {
+  const tramos: TramoAplicadoIRPF[] = [];
+  if (!Number.isFinite(base) || base <= 0) return { cuota: 0, tramos };
+
+  let cuota = 0;
+  let anterior = 0;
+  for (const tramo of escala) {
+    if (base <= anterior) break;
+    const baseEnTramo = Math.min(base, tramo.hasta) - anterior;
+    const cuotaTramo = baseEnTramo * (tramo.tipo / 100);
+    cuota += cuotaTramo;
+    tramos.push({
+      desde: anterior,
+      hasta: tramo.hasta === Infinity ? null : tramo.hasta,
+      tipo: tramo.tipo,
+      base: baseEnTramo,
+      cuota: cuotaTramo,
+    });
+    anterior = tramo.hasta;
+  }
+  return { cuota, tramos };
+}
+
+/** Cuota que resulta de aplicar la escala progresiva a una base. Sin desglose. */
+export function cuotaEscalaGeneral(
+  base: number,
+  escala: TramoIRPF[] = TRAMOS_IRPF_2025,
+): number {
+  return desglosarEscalaGeneral(base, escala).cuota;
+}
+
+/**
+ * **Fuente ÚNICA de la cuota íntegra de la base liquidable general (art. 63.1.2º LIRPF).**
+ *
+ * El mínimo personal y familiar **NO reduce la renta**: forma parte de la base liquidable
+ * general y se grava a TIPO CERO. La ley lo consigue aplicando la escala DOS VECES —a la
+ * base liquidable general completa y a la parte que corresponde al mínimo— y restando la
+ * segunda cuota de la primera. La AEAT lo enuncia así en el manual de ayuda de Renta 2025:
+ *
+ *   1. «A la base liquidable general (sin descontar el importe del mínimo personal y
+ *      familiar) se le aplicarán los tipos correspondientes a la escala general del impuesto.»
+ *   2. «Se aplicará la misma escala a la parte de base liquidable general correspondiente al
+ *      mínimo personal y familiar.»
+ *   3. «Se restará a la cuota resultante del apartado 1 la cuota resultante del apartado 2.»
+ *
+ * Lo mismo hace el art. 74 con la escala autonómica, así que el método vale igual sobre la
+ * escala combinada (estatal + autonómico medio) que es la que lleva `TRAMOS_IRPF_2025`.
+ *
+ * ⚠️ **Por qué importa, y no es un tecnicismo.** Restar el mínimo de la base antes de aplicar
+ * la escala —`escala(base − mínimo)`— lo valora al tipo MARGINAL del contribuyente en vez de a
+ * los tipos bajos de la escala, y **subestima la cuota**. Con el mínimo personal de 5.550 € el
+ * error crece con la renta hasta un tope de **1.443 €/año** (5.550 × (45 − 19) %): 610,50 € con
+ * 30.000 € de bruto, 951,75 € con 45.000 €, 1.443 € de 80.000 € en adelante. Con mínimos
+ * familiares grandes llega mucho más lejos: 3.691 €/año con 70.000 € de base y tres hijos.
+ *
+ * Existe para que la fórmula no se reescriba en cada motor y cada app. El 09/09/2026 se
+ * reparó el mismo defecto a mano en seis motores de `lib/calculadoras` (commit 2b80033d) y
+ * el 11/09/2026 en `estimador-sueldo-neto` (4ba094cd); las dos veces quedaron fuera los
+ * consumidores que nadie había mirado, porque la fórmula estaba copiada en 19 sitios.
+ * **No reimplementar: importar.** El candado `npm run check:minimo-irpf` rompe el build si
+ * vuelve a aparecer una resta del mínimo contra la base.
+ *
+ * @param baseLiquidableGeneral Base liquidable general, **con el mínimo dentro** (€).
+ * @param minimoPersonalYFamiliar Suma de los mínimos de los arts. 57 a 61 (€).
+ *   La reducción por tributación conjunta del art. 84.2 NO va aquí: esa sí reduce la base.
+ */
+export function calcularCuotaIntegraGeneral(
+  baseLiquidableGeneral: number,
+  minimoPersonalYFamiliar: number,
+  escala: TramoIRPF[] = TRAMOS_IRPF_2025,
+): number {
+  const base = Number.isFinite(baseLiquidableGeneral) ? Math.max(0, baseLiquidableGeneral) : 0;
+  // El mínimo no puede exceder la base: la parte que no cabe en ella no llega a gravarse, y
+  // sin este tope la resta daría una cuota negativa en rentas por debajo del mínimo.
+  const minimo = Number.isFinite(minimoPersonalYFamiliar)
+    ? Math.min(Math.max(0, minimoPersonalYFamiliar), base)
+    : 0;
+  return Math.max(0, cuotaEscalaGeneral(base, escala) - cuotaEscalaGeneral(minimo, escala));
+}
 
 // ─── Seguridad Social cuenta ajena ──────────────────────────────────────────
 

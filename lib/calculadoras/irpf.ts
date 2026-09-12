@@ -11,6 +11,7 @@
 
 import {
   TRAMOS_IRPF_2025,
+  calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
@@ -181,17 +182,15 @@ export function calcularIRPF(p: ParametrosIRPF): ResultadoIRPF {
   // menos. Lo destapó que dos tools del mismo MCP discreparan 255 €/año en el mismo caso.
   const baseLiquidableGeneral = baseImponibleGeneral;
 
-  // Cuota íntegra general = escala(base liquidable) − escala(mínimo personal y familiar).
-  // El mínimo se acota a la base: no puede minorar más de lo que hay que gravar.
-  const { cuota: cuotaGeneralBruta, desglose: desgloseGeneral } = calcularCuotaTramos(
+  // Cuota integra general = escala(base liquidable) - escala(minimo personal y familiar).
+  // Desde el 12/09/2026 esa resta la hace `calcularCuotaIntegraGeneral` y ya no se
+  // reescribe aqui; `calcularCuotaTramos` se conserva solo para el DESGLOSE que se imprime,
+  // que es el de la primera aplicacion de la escala (a la base entera).
+  const { desglose: desgloseGeneral } = calcularCuotaTramos(
     baseLiquidableGeneral,
     TRAMOS_IRPF_2025,
   );
-  const { cuota: cuotaDelMinimo } = calcularCuotaTramos(
-    Math.min(minimoPersonalFamiliar, baseLiquidableGeneral),
-    TRAMOS_IRPF_2025,
-  );
-  const cuotaGeneral = Math.max(0, cuotaGeneralBruta - cuotaDelMinimo);
+  const cuotaGeneral = calcularCuotaIntegraGeneral(baseLiquidableGeneral, minimoPersonalFamiliar);
 
   // Cuota íntegra ahorro
   const { cuota: cuotaAhorro, desglose: desgloseAhorro } = calcularCuotaTramos(

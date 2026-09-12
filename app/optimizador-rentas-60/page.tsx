@@ -13,6 +13,8 @@ import {
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   calcularReduccionRendimientosTrabajo,
+  cuotaEscalaGeneral,
+  calcularCuotaIntegraGeneral,
 } from '@/data/fiscal/irpf';
 import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal/inmuebles';
 import { FISCAL_IRPF_META } from '@/data/fiscal';
@@ -92,8 +94,12 @@ interface ResultadoIRPF {
   baseAhorro: number;
 
   // Cuotas
+  /** Escala aplicada a la base liquidable general entera (primera aplicación). */
+  cuotaEscalaGeneralCompleta: number;
+  /** Cuota íntegra general = escala(base) − escala(mínimo). */
   cuotaGeneral: number;
-  cuotaMinimo: number; // cuota del mínimo personal (deducción)
+  /** Escala aplicada al mínimo personal (segunda aplicación), que se resta de la primera. */
+  cuotaMinimo: number;
   cuotaAhorro: number;
   cuotaTotal: number;
 
@@ -130,17 +136,24 @@ function calcularIRPF(fuentes: Fuentes): ResultadoIRPF | null {
   // ── Bases imponibles ────────────────────────────────────────────────────────
   const baseGeneralBruta = rndNetoCuadrado + alquilerLiquidable;
   const minimoPersonal = getMinimoPersonal(edad);
-  const baseGeneralLiquidable = Math.max(0, baseGeneralBruta - minimoPersonal);
+  // El minimo NO reduce la base (art. 63.1.2 LIRPF): la base liquidable general lo lleva
+  // dentro y se grava a tipo cero restando de la cuota la escala aplicada a el.
+  //
+  // ATENCION 12/09/2026: hasta esta fecha esta app hacia las dos cosas a medias. Restaba el
+  // minimo de la base Y calculaba aparte `cuotaMinimo`, pero nunca la restaba: la variable
+  // quedaba muerta y la cuota salia por el metodo malo, que valora el minimo al tipo
+  // marginal. Con 45.000 EUR de base y 67 anos subestimaba el IRPF en 1.206 EUR/ano.
+  const baseGeneralLiquidable = baseGeneralBruta;
   const baseAhorro = capitalMobiliario;
 
   // ── Cuotas ──────────────────────────────────────────────────────────────────
-  const cuotaGeneral = calcularCuota(baseGeneralLiquidable, TRAMOS_IRPF_2025);
-  const cuotaMinimo = calcularCuota(minimoPersonal, TRAMOS_IRPF_2025); // El mínimo personal reduce la cuota
+  // Primera aplicacion de la escala: a la base entera. Segunda: al minimo. Se restan.
+  const cuotaEscalaGeneralCompleta = cuotaEscalaGeneral(baseGeneralLiquidable);
+  const cuotaMinimo = cuotaEscalaGeneral(Math.min(minimoPersonal, baseGeneralLiquidable));
+  const cuotaGeneral = calcularCuotaIntegraGeneral(baseGeneralLiquidable, minimoPersonal);
   const cuotaAhorro = calcularCuota(baseAhorro, TRAMOS_GANANCIAS_PATRIMONIALES_2025);
 
-  // La cuota íntegra = cuota(base) - cuota(mínimo)
-  // Para simplificar orientativamente: cuota total = cuota(base liquidable) + cuota ahorro
-  const cuotaTotal = Math.max(0, cuotaGeneral) + cuotaAhorro;
+  const cuotaTotal = cuotaGeneral + cuotaAhorro;
 
   // ── Análisis de optimización ────────────────────────────────────────────────
   const ingresosBrutos = totalTrabajo + capitalMobiliario + alquilerNetoBruto;
@@ -192,6 +205,7 @@ function calcularIRPF(fuentes: Fuentes): ResultadoIRPF | null {
     minimoPersonal,
     baseGeneralLiquidable,
     baseAhorro,
+    cuotaEscalaGeneralCompleta,
     cuotaGeneral,
     cuotaMinimo,
     cuotaAhorro,
@@ -413,16 +427,12 @@ export default function OptimizadorRentas60() {
                   </>
                 )}
                 <div className={`${styles.desgloseItem} ${styles.desgloseTotal}`}>
-                  <span>Base general bruta</span>
-                  <strong>{formatCurrency(resultado.baseGeneralBruta)}</strong>
-                </div>
-                <div className={styles.desgloseItem}>
-                  <span>− Mínimo personal (edad {resultado.edad}+)</span>
-                  <span className={styles.descuento}>−{formatCurrency(resultado.minimoPersonal)}</span>
-                </div>
-                <div className={`${styles.desgloseItem} ${styles.desgloseTotal}`}>
                   <span>Base general liquidable</span>
                   <strong>{formatCurrency(resultado.baseGeneralLiquidable)}</strong>
+                </div>
+                <div className={styles.desgloseItem}>
+                  <span>Mínimo personal (edad {resultado.edad}+), dentro de esa base</span>
+                  <strong>{formatCurrency(resultado.minimoPersonal)}</strong>
                 </div>
                 {resultado.capitalMobiliario > 0 && (
                   <div className={`${styles.desgloseItem} ${styles.desgloseAhorro}`}>
@@ -435,6 +445,14 @@ export default function OptimizadorRentas60() {
               {/* Desglose cuotas */}
               <div className={styles.desgloseSection}>
                 <div className={styles.desgloseTitle}><span aria-hidden="true">💶</span> Desglose de cuotas</div>
+                <div className={styles.desgloseItem}>
+                  <span>Escala sobre la base general completa</span>
+                  <strong>{formatCurrency(resultado.cuotaEscalaGeneralCompleta)}</strong>
+                </div>
+                <div className={styles.desgloseItem}>
+                  <span>− Escala sobre el mínimo personal (tipo cero, art. 63.1.2.º)</span>
+                  <span className={styles.descuento}>−{formatCurrency(resultado.cuotaMinimo)}</span>
+                </div>
                 <div className={styles.desgloseItem}>
                   <span>Cuota base general</span>
                   <strong>{formatCurrency(resultado.cuotaGeneral)}</strong>

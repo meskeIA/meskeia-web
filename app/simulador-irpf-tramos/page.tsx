@@ -645,7 +645,7 @@ export default function SimuladorIrpfTramosPage() {
           <div className={styles.escenarioCard}>
             <h4>Familia con un solo ingreso (45.000 €, 2 hijos)</h4>
             <p>
-              La base liquidable real es menor: el mínimo personal (5.550 €) y los mínimos por hijos (2.400 + 2.700 = 5.100 €) reducen la base. Tributación efectiva muy inferior a la del soltero por los mismos ingresos.
+              La base liquidable es la misma que la del soltero, pero la cuota es menor: el mínimo personal (5.550 €) y los mínimos por hijos (2.400 + 2.700 = 5.100 €) no se restan de la base, se gravan a tipo cero (art. 63.1.2.º LIRPF). En la práctica, esos 10.650 € se valoran al 19 % —2.023,50 € menos de cuota—, y no al tipo marginal.
             </p>
           </div>
         </div>
