@@ -1,5 +1,6 @@
 import { test, expect, devices, type Browser, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { esperarHidratacion } from './_hidratacion';
 // El CSV que descarga la app se lee con el MISMO parser que usaría una hoja de cálculo
 // (papaparse, RFC 4180, ya dependencia del proyecto) y no con un split casero: la diferencia
 // entre los dos es justo uno de los hallazgos de la 3.ª pasada.
@@ -1304,7 +1305,21 @@ test('CASO 8 (límite) — con la calibración en su tope: 117,0 dB(A) y un tech
   await page.goto(RUTA);
 
   const mas = page.getByRole('button', { name: /Aumentar la calibración/i });
+  /**
+   * ⚠️ 13/09/2026 — los dos clics salían antes de que el 118 del localStorage llegara al
+   * estado de React, así que se aplicaban sobre CALIBRACION_DEFECTO (90) y la calibración
+   * acababa en 92, no en 120. Un clic anterior a la hidratación se pierde igual que una
+   * siembra, y aquí ni siquiera se perdía: llegaba al estado equivocado.
+   *
+   * Se espera al input de calibración (que React monta con su rastreador de valor) y, sobre
+   * todo, a que el valor SEMBRADO esté en pantalla. Si algún día no llegara, el test fallará
+   * diciendo que esperaba 118 en vez de dejar un 92 sin explicación al final.
+   */
+  await esperarHidratacion(page, ['#calibracion']);
+  await expect(page.locator('[class*="calibracionValor"]')).toContainText('118 dB');
+
   await mas.click();
+  await expect(page.locator('[class*="calibracionValor"]')).toContainText('119 dB');
   await mas.click();
   await expect(page.locator('[class*="calibracionValor"]')).toContainText('120 dB');
   await expect(mas, 'en el tope no se puede seguir subiendo').toBeDisabled();

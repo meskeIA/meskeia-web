@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * calculadora-estadistica — el botón «Guardar en Historial» ya guarda de verdad (semilla S0117)
@@ -41,6 +42,14 @@ async function sembrarAlmacen(page: Page, valor: string) {
   await page.waitForFunction((k) => window.localStorage.getItem(k) !== null, CLAVE);
   await page.evaluate(([k, v]) => window.localStorage.setItem(k, v), [CLAVE, valor] as const);
   await page.reload();
+  /**
+   * ⚠️ 13/09/2026 — la espera de arriba cubría la carrera ANTES de sembrar, pero no la de
+   * DESPUÉS: tras recargar, la app vuelve a montar y a leer el almacén, y el test comprobaba
+   * el DOM con los 5 s de auto-retry de `toHaveCount` como único margen. En la suite completa,
+   * con la máquina cargada, no bastaban: «una entrada válida mezclada con basura sí se
+   * recupera» recibía 0 en vez de 1. En aislado pasaba siempre.
+   */
+  await esperarHidratacion(page, ['textarea']);
 }
 
 async function leerAlmacen(page: Page): Promise<unknown[]> {

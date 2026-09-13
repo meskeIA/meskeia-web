@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * Inspector — calculadora-notas (segmento interactiva, riesgo 3, 459 usos reales)
@@ -107,6 +108,17 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Calculadora de Notas: Media Ponderada y Promedio Ponderado',
   );
+  /**
+   * ⚠️ 13/09/2026 — esperar al <h1> NO es esperar a que la app escuche: ese encabezado viaja
+   * en el HTML servido, así que está en pantalla mucho antes de que React haya montado nada.
+   * En la suite completa, con la máquina cargada, el último `fill()` del CASO 1 se perdía y
+   * la media salía 6,00 en vez de 7,25 — el test medía una asignatura menos. En aislado
+   * pasaba siempre, que es lo que hace tan caro verlo.
+   *
+   * `esperarHidratacion` sondea el rastreador de valor que React instala en cada input
+   * controlado: es exactamente la precondición que el test necesita.
+   */
+  await esperarHidratacion(page, ['input[placeholder="0-10"]', 'input[placeholder="ECTS"]']);
 });
 
 test.describe('Media ponderada — lo que promete el <h1>', () => {
