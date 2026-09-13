@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
 import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 
@@ -39,7 +40,7 @@ export const RESPUESTA_PLUSVALIA_TRASTERO = `Sí. La plusvalía municipal (Impue
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Trastero - ITP y Costes | meskeIA',
   description: 'Calcula los gastos de compra y venta de un trastero en España: ITP por comunidad autónoma, notaría, registro y plusvalía municipal. Incluye trastero vinculado y trastero independiente. Gratis.',
-  keywords: 'simulador gastos compraventa trastero, gastos compra trastero, ITP trastero, impuestos trastero españa, comprar trastero gastos, calculadora trastero',
+  keywords: 'simulador gastos compraventa trastero, gastos compra trastero, ITP trastero, impuestos trastero españa, comprar trastero gastos, calculadora trastero, escriturar trastero, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -113,6 +114,14 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: preguntaEscriturar(CASOS_ESCRITURAR.trastero.inmueble),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: respuestaEscriturar(CASOS_ESCRITURAR.trastero),
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Qué IVA paga un trastero nuevo?',

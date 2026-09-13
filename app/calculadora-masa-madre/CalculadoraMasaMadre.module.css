@@ -118,7 +118,9 @@
 /* Inputs */
 .inputGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* auto-fit y no dos columnas fijas: desde el 13/09/2026 hay un tercer campo (la
+     temperatura de la cocina) y con una rejilla de 2 quedaba solo en su fila. */
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
 }

@@ -9,6 +9,9 @@ import {
   RANGO_ITP,
   calcularRegistro,
   estimarFacturaNotarial,
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
@@ -84,7 +87,7 @@ const masCaras = CLAVES.slice()
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Nave Industrial - IVA, ITP y Costes | meskeIA',
   description: `Calcula los gastos de compra de una nave industrial en España: IVA ${IVA_INMUEBLES_2025.local}%, ITP por comunidad autónoma, AJD, notaría y registro. Para empresas y autónomos. Gratis y sin registro.`,
-  keywords: 'simulador gastos compra nave industrial, gastos compraventa nave industrial, IVA nave industrial, ITP nave industrial, comprar nave impuestos, calculadora nave industrial españa',
+  keywords: 'simulador gastos compra nave industrial, gastos compraventa nave industrial, IVA nave industrial, ITP nave industrial, comprar nave impuestos, calculadora nave industrial españa, escriturar nave, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -130,6 +133,14 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: preguntaEscriturar(CASOS_ESCRITURAR.nave.inmueble),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: respuestaEscriturar(CASOS_ESCRITURAR.nave),
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Qué impuesto paga la compra de una nave industrial?',

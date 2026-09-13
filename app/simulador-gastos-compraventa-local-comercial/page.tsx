@@ -40,6 +40,9 @@ import {
   CIUDADES_CON_BONIFICACION,
   RANGO_AJD,
   sumarLineasVisibles,
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -1083,6 +1086,14 @@ export default function SimuladorLocalComercialPage() {
         <section style={{ marginTop: '2rem' }}>
           <h2>Preguntas frecuentes — Compra de local comercial</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Primera de la lista a propósito: «escriturar» es como se teclea la pregunta,
+                y hasta el 13/09/2026 el verbo no aparecía en ninguna de las seis apps. */}
+            <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
+              <strong>{preguntaEscriturar(CASOS_ESCRITURAR.local.inmueble)}</strong>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
+                {respuestaEscriturar(CASOS_ESCRITURAR.local)}
+              </p>
+            </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Se paga IVA o ITP al comprar un local comercial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>

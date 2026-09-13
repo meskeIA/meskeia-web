@@ -15,8 +15,15 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   calcularSustitucionMasaMadre,
+  FERMENTACION_MM_REF,
   type TipoLevaduraOrigen,
 } from '@/lib/calculadoras/cocina';
+import {
+  ajustarRangoFermentacion,
+  formatearTiempo,
+  TEMP_MODELO_MAX,
+  TEMP_MODELO_MIN,
+} from '@/lib/calculadoras/fermentacionTemperatura';
 
 const TIPOS: { id: TipoLevaduraOrigen; label: string; emoji: string; descripcion: string }[] = [
   { id: 'fresca',      label: 'Levadura fresca',      emoji: '🧊', descripcion: 'Bloques refrigerados, textura húmeda' },
@@ -28,6 +35,10 @@ export default function CalculadoraMasaMadrePage() {
   const [tipoLevadura, setTipoLevadura] = useState<TipoLevaduraOrigen>('fresca');
   const [levaduraG, setLevaduraG] = useState<string>('10');
   const [hidratacion, setHidratacion] = useState<number>(100);
+  // Arranca en la temperatura de referencia de la horquilla: mientras nadie diga a qué
+  // temperatura tiene la cocina, el ajuste debe ser neutro y mostrar el mismo 4-6 h que
+  // declara la receta, no adivinar una cocina que no sabemos cómo está.
+  const [tempMasa, setTempMasa] = useState<string>(String(FERMENTACION_MM_REF.tempRefC));
 
   const resultado = useCallback(() => {
     // `parseSpanishNumber`, el parser canónico del proyecto, no `parseFloat`: aquel colaba
@@ -40,6 +51,27 @@ export default function CalculadoraMasaMadrePage() {
   }, [tipoLevadura, levaduraG, hidratacion]);
 
   const res = resultado();
+
+  /**
+   * La horquilla de fermentación a la temperatura que haya dicho el usuario.
+   *
+   * Hasta el 13/09/2026 esta app imprimía un «4–6 h» FIJO mientras su propio texto repetía
+   * ocho veces que el tiempo lo manda la temperatura: era un número que no dependía de la
+   * única variable que la app declaraba decisiva. El ajuste (Q10 ≈ 2) ya estaba escrito y
+   * probado en el motor de `fermentacion-temperatura`, una app con 4 usos en 30 días frente
+   * a los 103 de esta: la capacidad se trae a la puerta por la que entra la gente.
+   *
+   * `null` cuando la temperatura no es un número o cae fuera del rango del modelo. Ahí se
+   * dice que no se puede estimar y NO se da cifra, que es lo contrario de estirar el Q10
+   * hasta producir un número de aspecto convincente.
+   */
+  const tempC = parseSpanishNumber(tempMasa);
+  const rango = ajustarRangoFermentacion(
+    FERMENTACION_MM_REF.horasMin,
+    FERMENTACION_MM_REF.horasMax,
+    FERMENTACION_MM_REF.tempRefC,
+    tempC,
+  );
 
   /**
    * Cierto cuando la cantidad es positiva pero tan pequeña que la conversión se redondea a
@@ -138,6 +170,29 @@ export default function CalculadoraMasaMadrePage() {
               La mayoría de masas madre caseras son al 100% (partes iguales de harina y agua)
             </div>
           </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.inputLabel} htmlFor="temp-masa">
+              Temperatura de tu cocina o masa
+            </label>
+            <div className={styles.inputWrapper}>
+              <input
+                id="temp-masa"
+                type="text"
+                inputMode="decimal"
+                className={styles.inputField}
+                value={tempMasa}
+                onChange={e => setTempMasa(e.target.value)}
+                placeholder="24"
+                aria-describedby="temp-hint"
+              />
+              <span className={styles.inputSuffix}>°C</span>
+            </div>
+            <div id="temp-hint" className={styles.inputHint}>
+              La horquilla de abajo está medida a {FERMENTACION_MM_REF.tempRefC} °C: en una
+              cocina más fría la masa tarda más y en una más cálida, menos
+            </div>
+          </div>
         </div>
 
         {cantidadNoConvertible && (
@@ -180,7 +235,27 @@ export default function CalculadoraMasaMadrePage() {
 
             <div className={styles.tiempoBox}>
               <span className={styles.tiempoIcon} aria-hidden="true">⏱️</span>
-              <strong>Fermentación:</strong> {res.tiempo_fermentacion}
+              {rango ? (
+                <>
+                  <strong>Fermentación en bloque a {formatNumber(tempC, 0)} °C:</strong>{' '}
+                  {formatearTiempo(rango.horasMin)} – {formatearTiempo(rango.horasMax)}
+                  {rango.factor !== 1 && (
+                    <> (×{formatNumber(rango.factor, 2)} sobre las{' '}
+                    {FERMENTACION_MM_REF.horasMin}–{FERMENTACION_MM_REF.horasMax} h de
+                    referencia a {FERMENTACION_MM_REF.tempRefC} °C)</>
+                  )}
+                  . Después, 1–2 h en frío. Es una estimación con masa madre activa: guíate
+                  por el volumen de la masa, no solo por el reloj.
+                </>
+              ) : (
+                <>
+                  <strong>Fermentación:</strong> no se puede estimar el tiempo a esa
+                  temperatura. La regla que usa esta calculadora (la actividad de la levadura
+                  se duplica por cada +10 °C) solo vale entre {TEMP_MODELO_MIN} y{' '}
+                  {TEMP_MODELO_MAX} °C: por debajo el fermento queda casi parado y por encima
+                  se estresa y aparecen sabores ácidos.
+                </>
+              )}
             </div>
           </div>
         )}

@@ -41,6 +41,9 @@ import {
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
   sumarLineasVisibles,
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import { RESPUESTA_ITP_GARAJE_SEGUNDA_MANO } from './metadata';
@@ -1106,6 +1109,12 @@ export default function SimuladorGarajeCompraventaPage() {
         <section className={styles.eduSection}>
           <h2>Preguntas frecuentes sobre compraventa de garaje</h2>
           <div className={styles.faqList}>
+            {/* Primera de la lista a propósito: «escriturar» es como se teclea la pregunta,
+                y hasta el 13/09/2026 el verbo no aparecía en ninguna de las seis apps. */}
+            <div className={styles.faqItem}>
+              <h3>{preguntaEscriturar(CASOS_ESCRITURAR.garaje.inmueble)}</h3>
+              <p>{respuestaEscriturar(CASOS_ESCRITURAR.garaje)}</p>
+            </div>
             <div className={styles.faqItem}>
               <h3>¿Se puede comprar un garaje sin ser propietario de una vivienda?</h3>
               <p>Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.</p>

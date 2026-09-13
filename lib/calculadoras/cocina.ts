@@ -261,6 +261,20 @@ export function calcularHidratacionPan(
 
 export type TipoLevaduraOrigen = 'fresca' | 'seca' | 'instantanea';
 
+/**
+ * La horquilla de fermentación en bloque de una masa madre activa, CON la temperatura a la
+ * que está medida.
+ *
+ * Ese último dato faltaba: hasta el 13/09/2026 el motor devolvía «4–6h a temperatura
+ * ambiente», y «ambiente» no es un número, así que nadie —ni la app, ni la Action de
+ * ChatGPT, ni quien leyera la frase— podía ajustar la horquilla a su cocina. Los 24 °C son
+ * el punto que el propio catálogo declara ideal en TEMPERATURAS_REFERENCIA.
+ *
+ * El «+1–2 h en frío» de la segunda fase NO entra aquí: ocurre en la nevera, a una
+ * temperatura que no es la del bloque, y aplicarle el mismo ajuste sería mezclar dos fases.
+ */
+export const FERMENTACION_MM_REF = { horasMin: 4, horasMax: 6, tempRefC: 24 } as const;
+
 export interface ResultadoSustitucionMasaMadre {
   levadura_original_tipo: TipoLevaduraOrigen;
   levadura_original_g: number;
@@ -328,7 +342,7 @@ export function calcularSustitucionMasaMadre(
     // Formato español: separador de millar y ESPACIO antes de la unidad. Escribía «50g»
     // pegado mientras las dos fichas visibles de la app sí ponen «- 50 g» (hallazgo 289).
     nota: `Resta ${formatNumber(harina_en_mm_g, 0)} g de harina y ${formatNumber(agua_en_mm_g, 0)} g de agua de tu receta original para compensar lo que aporta la masa madre.`,
-    tiempo_fermentacion: 'Con masa madre activa: 4–6h en bloque a temperatura ambiente + 1–2h en frío. Ajusta según la actividad de tu fermento.',
+    tiempo_fermentacion: `Con masa madre activa: ${FERMENTACION_MM_REF.horasMin}–${FERMENTACION_MM_REF.horasMax} h en bloque a ${FERMENTACION_MM_REF.tempRefC} °C + 1–2 h en frío. Ese tiempo se estira si tu cocina está más fría y se acorta si está más caliente. Ajusta según la actividad de tu fermento.`,
   };
 }
 

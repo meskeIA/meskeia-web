@@ -64,3 +64,54 @@ export const TEMPERATURAS_REFERENCIA: NotaTemperatura[] = [
 ];
 
 export const TEMP_OPTIMA = 24;
+
+// ─── Rango de fermentación ajustado por temperatura ───────────────────────────
+//
+// Las recetas no dan un tiempo exacto sino una horquilla («4–6 h»), y esa horquilla
+// también se estira con el frío y se encoge con el calor: ajustar solo uno de los dos
+// extremos daría un rango que no existe en ninguna cocina.
+//
+// Añadido el 13/09/2026 para que `calculadora-masa-madre` —103 usos/30 d, la app que más
+// se usa de Coquinum— dejara de dar un rango FIJO de 4-6 h mientras su propio texto repite
+// ocho veces que el tiempo lo manda la temperatura. La capacidad vive aquí, con el Q10 ya
+// probado, y no en una app aparte: `fermentacion-temperatura` hacía 4 usos en 30 días.
+
+/** Límites entre los que la regla Q10 ≈ 2 es una aproximación razonable en panadería. */
+export const TEMP_MODELO_MIN = 4;
+export const TEMP_MODELO_MAX = 32;
+
+export interface RangoFermentacion {
+  horasMin: number;
+  horasMax: number;
+  factor: number;
+  masRapido: boolean;
+}
+
+/**
+ * Ajusta una horquilla de fermentación conocida a otra temperatura de masa.
+ *
+ * Devuelve `null` —y no una cifra— cuando la temperatura cae fuera del rango en el que el
+ * modelo vale: por debajo de 4 °C la levadura queda casi parada y por encima de 32 °C se
+ * estresa y aparecen sabores ácidos, así que en ambos extremos el Q10 extrapolaría un
+ * número de aspecto convincente que no describe lo que pasa en la masa.
+ */
+export function ajustarRangoFermentacion(
+  horasMinRef: number,
+  horasMaxRef: number,
+  tempRefC: number,
+  tempActualC: number,
+): RangoFermentacion | null {
+  if (!Number.isFinite(tempActualC)) return null;
+  if (tempActualC < TEMP_MODELO_MIN || tempActualC > TEMP_MODELO_MAX) return null;
+
+  const min = ajustarFermentacion(horasMinRef, tempRefC, tempActualC);
+  const max = ajustarFermentacion(horasMaxRef, tempRefC, tempActualC);
+  if (!min || !max) return null;
+
+  return {
+    horasMin: min.tiempoHoras,
+    horasMax: max.tiempoHoras,
+    factor: min.factor,
+    masRapido: min.masRapido,
+  };
+}

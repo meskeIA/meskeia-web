@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
-import { RANGO_ITP, RANGO_AJD } from '@/data/itp-ccaa';
+import { RANGO_ITP, RANGO_AJD, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
@@ -23,7 +23,7 @@ export const RESPUESTA_ITP_GARAJE_SEGUNDA_MANO = `El garaje tributa por el Impue
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Garaje - Calcular ITP y Costes | meskeIA',
   description: 'Calcula los gastos de compra y venta de un garaje o plaza de parking en España. ITP por comunidad autónoma, notaría, registro y plusvalía municipal. Gratis y sin registro.',
-  keywords: 'simulador gastos compra venta garaje, gastos compraventa garaje, ITP garaje, comprar garaje impuestos, plaza parking gastos, calculadora garaje españa',
+  keywords: 'simulador gastos compra venta garaje, gastos compraventa garaje, ITP garaje, comprar garaje impuestos, plaza parking gastos, calculadora garaje españa, escriturar garaje, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -101,6 +101,14 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: preguntaEscriturar(CASOS_ESCRITURAR.garaje.inmueble),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: respuestaEscriturar(CASOS_ESCRITURAR.garaje),
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Se puede comprar un garaje sin ser propietario de una vivienda?',

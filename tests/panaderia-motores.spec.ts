@@ -25,8 +25,10 @@ import {
 } from '../lib/calculadoras/cocina';
 import {
   ajustarFermentacion,
+  ajustarRangoFermentacion,
   formatearTiempo,
 } from '../lib/calculadoras/fermentacionTemperatura';
+import { FERMENTACION_MM_REF } from '../lib/calculadoras/cocina';
 
 test.describe('DDT — temperatura del agua de amasado', () => {
   test('A MANO: 24 °C de objetivo, cocina y harina a 22 °C, sin amasadora → agua a 28 °C', () => {
@@ -283,5 +285,67 @@ test.describe('Porcentaje del panadero — prefermentos', () => {
     const r = calcularBakersPercentage(0, [{ nombre: 'Agua', gramos: 100 }]);
     expect(r.hidratacion_pct).toBe(0);
     expect(r.ingredientes[0].porcentajePanadero).toBe(0);
+  });
+});
+
+test.describe('Fermentación — la HORQUILLA de masa madre ajustada a la cocina', () => {
+  // Añadido el 13/09/2026, cuando `calculadora-masa-madre` dejó de imprimir un «4–6 h» fijo.
+  // Los esperados salen de aplicar el Q10 a MANO a los dos extremos:
+  //   tiempo = horas × 2^((24 − T) / 10),  redondeado a dos decimales por el motor.
+  const { horasMin, horasMax, tempRefC } = FERMENTACION_MM_REF;
+
+  test('A MANO: una cocina a 20 °C estira la horquilla de 4–6 h a 5,28–7,92 h', () => {
+    // 2^((24 − 20) / 10) = 2^0,4 = 1,3195…  →  4 × 1,3195 = 5,28   ·   6 × 1,3195 = 7,92
+    const r = ajustarRangoFermentacion(horasMin, horasMax, tempRefC, 20);
+    expect(r).not.toBeNull();
+    expect(r!.horasMin).toBe(5.28);
+    expect(r!.horasMax).toBe(7.92);
+    expect(r!.factor).toBe(1.32);
+    expect(r!.masRapido).toBe(false);
+    expect(formatearTiempo(r!.horasMin)).toBe('5 h 17 min');
+    expect(formatearTiempo(r!.horasMax)).toBe('7 h 55 min');
+  });
+
+  test('A MANO: una cocina a 28 °C la encoge a 3,03–4,55 h', () => {
+    // 2^((24 − 28) / 10) = 2^−0,4 = 0,7579…  →  4 × 0,7579 = 3,03   ·   6 × 0,7579 = 4,55
+    const r = ajustarRangoFermentacion(horasMin, horasMax, tempRefC, 28);
+    expect(r!.horasMin).toBe(3.03);
+    expect(r!.horasMax).toBe(4.55);
+    expect(r!.masRapido).toBe(true);
+    expect(formatearTiempo(r!.horasMin)).toBe('3 h 2 min');
+    expect(formatearTiempo(r!.horasMax)).toBe('4 h 33 min');
+  });
+
+  test('NEUTRO: a la temperatura de referencia sale la horquilla de la receta, sin desviarla', () => {
+    const r = ajustarRangoFermentacion(horasMin, horasMax, tempRefC, tempRefC);
+    expect(r!.horasMin).toBe(horasMin);
+    expect(r!.horasMax).toBe(horasMax);
+    expect(r!.factor).toBe(1);
+  });
+
+  test('LOS DOS EXTREMOS se mueven: ajustar solo uno daría un rango que no existe', () => {
+    const r = ajustarRangoFermentacion(horasMin, horasMax, tempRefC, 18)!;
+    expect(r.horasMin).toBeGreaterThan(horasMin);
+    expect(r.horasMax).toBeGreaterThan(horasMax);
+    // Y la horquilla sigue siendo una horquilla, no se cruza ni se colapsa.
+    expect(r.horasMax).toBeGreaterThan(r.horasMin);
+  });
+
+  test('FUERA DEL MODELO no se da cifra: por debajo de 4 °C y por encima de 32 °C, null', () => {
+    // El Q10 extrapolaría un número convincente donde la levadura ya no se comporta así:
+    // a 2 °C queda casi parada y a 40 °C se estresa. Un null obliga a la app a decirlo.
+    expect(ajustarRangoFermentacion(horasMin, horasMax, tempRefC, 2)).toBeNull();
+    expect(ajustarRangoFermentacion(horasMin, horasMax, tempRefC, 40)).toBeNull();
+    expect(ajustarRangoFermentacion(horasMin, horasMax, tempRefC, NaN)).toBeNull();
+    // Los bordes SÍ valen: el rango es cerrado.
+    expect(ajustarRangoFermentacion(horasMin, horasMax, tempRefC, 4)).not.toBeNull();
+    expect(ajustarRangoFermentacion(horasMin, horasMax, tempRefC, 32)).not.toBeNull();
+  });
+
+  test('LA REFERENCIA lleva su temperatura: sin ella nadie puede ajustar la horquilla', () => {
+    // El defecto que originó todo esto: el motor decía «4–6 h a temperatura ambiente», y
+    // «ambiente» no es un número.
+    expect(tempRefC).toBe(24);
+    expect(horasMin).toBeLessThan(horasMax);
   });
 });

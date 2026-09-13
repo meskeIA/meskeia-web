@@ -92,6 +92,7 @@ const RUTA = '/calculadora-masa-madre/';
 
 const GRAMOS = '#levadura-g';
 const HIDRATACION = '#hidratacion-mm';
+const TEMPERATURA = '#temp-masa';
 
 /**
  * Escribe en el campo de gramos como lo haría el usuario y comprueba que llegó al estado de
@@ -454,5 +455,99 @@ test.describe('RE-INSPECCIÓN 31/08/2026 — motor sin tocar, verificación inde
     expect(await estado(page)).toBe(
       'Introduce los gramos de levadura de tu receta original para ver el resultado.',
     );
+  });
+});
+
+/**
+ * El bloque del tiempo de fermentación, tal y como lo lee alguien en pantalla.
+ */
+async function textoFermentacion(page: Page): Promise<string> {
+  return (await page.locator('[class*="tiempoBox"]').innerText())
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Escribe una temperatura y espera a que React la haya recogido. */
+async function ponerTemperatura(page: Page, valor: string): Promise<void> {
+  await page.locator(TEMPERATURA).fill(valor);
+  await esperarValorEnReact(page, TEMPERATURA, valor);
+}
+
+test.describe('S0139 · el tiempo de fermentación deja de ser un número fijo', () => {
+  /**
+   * Hasta el 13/09/2026 esta app imprimía «4–6h en bloque a temperatura ambiente» pasara lo que
+   * pasara, mientras su propio texto repetía ocho veces que el tiempo lo manda la temperatura.
+   * Era un aviso bajo cifra falsa: se advertía de que el número dependía de algo que el número
+   * no miraba. Los esperados salen del Q10 a mano, igual que en tests/panaderia-motores.spec.ts:
+   *   tiempo = horas × 2^((24 − T) / 10)
+   */
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('🍞 Calculadora de Masa Madre');
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION, TEMPERATURA]);
+  });
+
+  test('CASO 1 (normal) · una cocina a 20 °C estira la horquilla a 5 h 17 min – 7 h 55 min', async ({ page }) => {
+    // 2^0,4 = 1,3195…  →  4 × 1,3195 = 5,28 h = 5 h 17 min  ·  6 × 1,3195 = 7,92 h = 7 h 55 min
+    await ponerTemperatura(page, '20');
+    const texto = await textoFermentacion(page);
+    expect(texto).toContain('5 h 17 min');
+    expect(texto).toContain('7 h 55 min');
+    expect(texto).toContain('20 °C');
+    // Y deja ver de dónde sale, que es lo que permite a quien lee no creerse la cifra a ciegas.
+    expect(texto).toContain('×1,32');
+  });
+
+  test('CASO 1 (normal) · una cocina a 28 °C la encoge a 3 h 2 min – 4 h 33 min', async ({ page }) => {
+    // 2^−0,4 = 0,7579…  →  4 × 0,7579 = 3,03 h = 3 h 2 min  ·  6 × 0,7579 = 4,55 h = 4 h 33 min
+    await ponerTemperatura(page, '28');
+    const texto = await textoFermentacion(page);
+    expect(texto).toContain('3 h 2 min');
+    expect(texto).toContain('4 h 33 min');
+  });
+
+  test('EL DEFECTO DE ORIGEN · dos temperaturas distintas NO pueden dar el mismo texto', async ({ page }) => {
+    // Este es el caso que la app suspendía antes del cambio: el bloque era una constante.
+    await ponerTemperatura(page, '18');
+    const frio = await textoFermentacion(page);
+    await ponerTemperatura(page, '30');
+    const calor = await textoFermentacion(page);
+    expect(frio).not.toBe(calor);
+  });
+
+  test('CASO 2 (límite) · a 24 °C, la referencia, el ajuste es neutro y no inventa desviación', async ({ page }) => {
+    // Se parte de OTRO valor: sembrar el 24 inicial no probaría nada (la app podría estar sorda).
+    await ponerTemperatura(page, '20');
+    await ponerTemperatura(page, '24');
+    const texto = await textoFermentacion(page);
+    expect(texto).toContain('4 h');
+    expect(texto).toContain('6 h');
+    // Sin factor: a la temperatura de referencia no hay nada que corregir.
+    expect(texto).not.toContain('×');
+  });
+
+  test('CASO 3 (rechazo) · fuera del rango del modelo se DICE, y no se da ninguna cifra', async ({ page }) => {
+    for (const fuera of ['2', '40', 'abc', '']) {
+      await page.locator(TEMPERATURA).fill(fuera);
+      await esperarValorEnReact(page, TEMPERATURA, fuera);
+      const texto = await textoFermentacion(page);
+      expect(texto, `temperatura "${fuera}"`).toContain('no se puede estimar');
+      // Y no queda ninguna horquilla en pantalla que alguien pueda tomar por buena.
+      expect(texto, `temperatura "${fuera}"`).not.toMatch(/\d+ h \d+ min/);
+    }
+  });
+
+  test('LOS BORDES del modelo sí calculan: 4 °C y 32 °C están dentro', async ({ page }) => {
+    await ponerTemperatura(page, '4');
+    expect(await textoFermentacion(page)).not.toContain('no se puede estimar');
+    await ponerTemperatura(page, '32');
+    expect(await textoFermentacion(page)).not.toContain('no se puede estimar');
+  });
+
+  test('EL PARSER es el canónico: «24,5» se lee como 24,5 y no como basura', async ({ page }) => {
+    await ponerTemperatura(page, '24,5');
+    const texto = await textoFermentacion(page);
+    expect(texto).not.toContain('no se puede estimar');
+    expect(texto).toContain('24 °C');
   });
 });

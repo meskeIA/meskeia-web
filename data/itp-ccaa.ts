@@ -31,6 +31,7 @@
 // ===== TIPOS =====
 
 import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025 } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
 
 /**
  * El tipo general de cada comunidad se LEE de `data/fiscal`; aquí no se escribe.
@@ -1509,3 +1510,76 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
 
 // Enlace para consultar valor de referencia catastral
 export const ENLACE_CATASTRO = 'https://www1.sedecatastro.gob.es/Accesos/SECAccvrc.aspx';
+
+// ─── «Escriturar»: la palabra con la que se pregunta de verdad ────────────────
+//
+// En GSC (90 d a 13/09/2026) la consulta «cuanto cuesta escriturar una plaza de garaje»
+// aterrizaba en `simulador-gastos-compraventa-garaje` en la POSICIÓN 14,4, mientras esa misma
+// app estaba en 1,9-2,5 para «simulador gastos compra venta garaje»; la misma pregunta sobre
+// trastero caía en la 5,3. El motivo estaba en el texto: el verbo «escriturar» no aparecía ni
+// una vez en las seis apps del clúster ni en sus keywords, aunque es exactamente lo que
+// calculan. No es la palanca del título —esa mueve el CTR de una app ya bien posicionada—,
+// sino cobertura de vocabulario: la página no contenía el término con el que se pregunta.
+//
+// La respuesta se compone AQUÍ, con las mismas funciones que alimentan las tarjetas, para que
+// la FAQ visible y el FAQPage del JSON-LD no puedan divergir (es el hallazgo 624, que salió de
+// tener la misma respuesta escrita dos veces en dos ficheros).
+
+export interface CasoEscriturar {
+  /** Cómo se nombra el inmueble en la frase: «una plaza de garaje», «un trastero»… */
+  inmueble: string;
+  /** Importe de referencia sobre el que se dan las cifras del ejemplo. */
+  valorReferencia: number;
+}
+
+/**
+ * Qué cuesta escriturar, distinguiendo las dos cosas que la palabra mezcla.
+ *
+ * En sentido estricto, escriturar es otorgar la escritura pública ante notario; en el uso
+ * corriente, la pregunta abarca todo lo que hay que pagar para que la compra quede inscrita a
+ * nombre del comprador. La respuesta da las dos, porque contestar solo la primera dejaría
+ * fuera el grueso del desembolso —el impuesto— y contestar solo la segunda daría una cifra que
+ * no es la del notario.
+ */
+export function respuestaEscriturar({ inmueble, valorReferencia }: CasoEscriturar): string {
+  const notaria = estimarFacturaNotarial(valorReferencia);
+  const registro = calcularRegistro(valorReferencia);
+  const euros = (n: number) => formatNumber(n, 0);
+
+  return (
+    `Escriturar, en sentido estricto, es firmar la compraventa ante notario, y esa factura ` +
+    `depende del precio: para ${inmueble} de ${euros(valorReferencia)} € salen unos ` +
+    `${euros(notaria.min)}-${euros(notaria.max)} € de notaría, según el arancel del ` +
+    `RD 1426/1989 y la extensión de la escritura. A eso hay que sumarle la inscripción en el ` +
+    `Registro de la Propiedad (unos ${euros(registro)} € para ese mismo importe) y, sobre ` +
+    `todo, el impuesto de la transmisión, que es la partida más grande: el ITP, del ` +
+    `${formatNumber(RANGO_ITP.min, 0)}% al ${formatNumber(RANGO_ITP.max, 0)}% según la ` +
+    `comunidad autónoma, o IVA más AJD cuando la operación tributa por IVA —esta página ` +
+    `explica más abajo cuál de los dos toca en este caso—. Si además se encarga la gestión a ` +
+    `una gestoría, súmale su minuta. El simulador de arriba lo calcula para tu precio y tu ` +
+    `comunidad.`
+  );
+}
+
+/**
+ * El caso de cada una de las seis apps del clúster, en un solo sitio.
+ *
+ * El importe de referencia no sale de la nada: es el que cada app ya usaba en sus propios
+ * ejemplos cuando lo tenía (garaje 25.000 €, trastero 8.000 €, nave 105.000 €). Para las tres
+ * que no publicaban ninguno se ha elegido un valor corriente de su mercado, y la frase lo
+ * declara siempre en voz alta —«para un local comercial de 120.000 €»— en lugar de dar una
+ * cifra suelta que el lector pudiera tomar por el precio de escriturar cualquier cosa.
+ */
+export const CASOS_ESCRITURAR = {
+  garaje:   { inmueble: 'una plaza de garaje', valorReferencia: 25_000 },
+  trastero: { inmueble: 'un trastero',         valorReferencia: 8_000 },
+  local:    { inmueble: 'un local comercial',  valorReferencia: 120_000 },
+  nave:     { inmueble: 'una nave industrial', valorReferencia: 105_000 },
+  solar:    { inmueble: 'un solar',            valorReferencia: 60_000 },
+  rustica:  { inmueble: 'una finca rústica',   valorReferencia: 30_000 },
+} as const satisfies Record<string, CasoEscriturar>;
+
+/** La pregunta, tal y como se teclea, para la FAQ visible y para el FAQPage. */
+export function preguntaEscriturar(inmueble: string): string {
+  return `¿Cuánto cuesta escriturar ${inmueble}?`;
+}

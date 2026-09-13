@@ -40,6 +40,9 @@ import {
   TERRITORIOS_SIN_IVA,
   normaliza,
   sumarLineasVisibles,
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
 } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
@@ -1168,6 +1171,12 @@ export default function SimuladorTrasteroCompraventaPage() {
         <section className={styles.eduSection}>
           <h2>Preguntas frecuentes sobre el trastero</h2>
           <div className={styles.faqList}>
+            {/* Primera de la lista a propósito: «escriturar» es como se teclea la pregunta,
+                y hasta el 13/09/2026 el verbo no aparecía en ninguna de las seis apps. */}
+            <div className={styles.faqItem}>
+              <h4>{preguntaEscriturar(CASOS_ESCRITURAR.trastero.inmueble)}</h4>
+              <p>{respuestaEscriturar(CASOS_ESCRITURAR.trastero)}</p>
+            </div>
             <div className={styles.faqItem}>
               <h4>¿Qué IVA paga un trastero nuevo?</h4>
               <p>Depende de si se compra con la vivienda o por separado. Si el promotor lo transmite

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { RANGO_AJD } from '@/data/itp-ccaa';
+import { RANGO_AJD, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
 /** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
@@ -9,7 +9,7 @@ const pct = (n: number) => `${String(n).replace('.', ',')}%`;
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Solar / Terreno Edificable - IVA o ITP | meskeIA',
   description: 'Calcula los gastos de compra de un solar o terreno edificable en España: IVA 21% + AJD si vende un promotor, ITP por comunidad autónoma si vende un particular, notaría, registro y plusvalía municipal del vendedor. Gratis y sin registro.',
-  keywords: 'simulador gastos compra solar, gastos compraventa terreno edificable, iva solar, itp solar, comprar parcela urbana impuestos, comprar terreno para construir impuestos, calculadora solar españa, autopromotor terreno',
+  keywords: 'simulador gastos compra solar, gastos compraventa terreno edificable, iva solar, itp solar, comprar parcela urbana impuestos, comprar terreno para construir impuestos, calculadora solar españa, autopromotor terreno, escriturar solar, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -54,6 +54,14 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: preguntaEscriturar(CASOS_ESCRITURAR.solar.inmueble),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: respuestaEscriturar(CASOS_ESCRITURAR.solar),
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Se paga IVA o ITP al comprar un solar?',

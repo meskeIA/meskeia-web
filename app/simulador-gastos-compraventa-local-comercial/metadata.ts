@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { RANGO_AJD, RANGO_ITP } from '@/data/itp-ccaa';
+import { RANGO_AJD, RANGO_ITP, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
@@ -25,7 +25,7 @@ const AHORRO_MAX = formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANAN
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Local Comercial - IVA, ITP, Plusvalía e IRPF | meskeIA',
   description: `Calcula los gastos de compra y venta de un local comercial en España. Si compras: IVA ${IVA_INMUEBLES_2025.local}% en obra nueva, ITP en segunda mano, renuncia a la exención de IVA (inversión del sujeto pasivo), AJD, notaría y registro. Si vendes: plusvalía municipal, IRPF de la ganancia y neto que recibes. Gratis y sin registro.`,
-  keywords: 'simulador gastos compra local comercial, simulador gastos venta local comercial, calculadora gastos venta local comercial, gastos compraventa local, IVA local comercial, ITP local comercial, renuncia exencion IVA local, inversion sujeto pasivo local, plusvalia venta local comercial, irpf venta local, calculadora local comercial españa',
+  keywords: 'simulador gastos compra local comercial, simulador gastos venta local comercial, calculadora gastos venta local comercial, gastos compraventa local, IVA local comercial, ITP local comercial, renuncia exencion IVA local, inversion sujeto pasivo local, plusvalia venta local comercial, irpf venta local, calculadora local comercial españa, escriturar local, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -74,6 +74,14 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: preguntaEscriturar(CASOS_ESCRITURAR.local.inmueble),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: respuestaEscriturar(CASOS_ESCRITURAR.local),
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Qué impuesto se paga al comprar un local comercial?',

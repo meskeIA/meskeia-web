@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { RANGO_ITP } from '@/data/itp-ccaa';
+import { RANGO_ITP, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
 /** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
@@ -9,7 +9,7 @@ const pct = (n: number) => `${String(n).replace('.', ',')}%`;
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Finca Rústica - ITP, Notaría y Registro | meskeIA',
   description: 'Calcula los gastos de compra de una finca o terreno rústico en España: ITP por comunidad autónoma, notaría y registro. Sin plusvalía municipal (suelo rústico) y con opción de renuncia a la exención de IVA entre profesionales. Gratis y sin registro.',
-  keywords: 'simulador gastos compra finca rustica, gastos compraventa terreno rustico, itp finca rustica, comprar terreno agricola impuestos, impuestos finca rustica, calculadora finca rustica españa, renuncia exencion iva terreno',
+  keywords: 'simulador gastos compra finca rustica, gastos compraventa terreno rustico, itp finca rustica, comprar terreno agricola impuestos, impuestos finca rustica, calculadora finca rustica españa, renuncia exencion iva terreno, escriturar finca rustica, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -54,6 +54,14 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: preguntaEscriturar(CASOS_ESCRITURAR.rustica.inmueble),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: respuestaEscriturar(CASOS_ESCRITURAR.rustica),
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Qué impuesto se paga al comprar una finca rústica?',

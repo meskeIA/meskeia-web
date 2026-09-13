@@ -30,6 +30,9 @@ import {
   RANGO_AJD,
   TERRITORIOS_SIN_IVA,
   sumarLineasVisibles,
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PORCENTAJES_IVA } from '@/data/fiscal';
 
@@ -545,6 +548,14 @@ export default function SimuladorSolarPage() {
         <section style={{ marginTop: '2rem' }}>
           <h2>Preguntas frecuentes — Compra de solar</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Primera de la lista a propósito: «escriturar» es como se teclea la pregunta,
+                y hasta el 13/09/2026 el verbo no aparecía en ninguna de las seis apps. */}
+            <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
+              <strong>{preguntaEscriturar(CASOS_ESCRITURAR.solar.inmueble)}</strong>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
+                {respuestaEscriturar(CASOS_ESCRITURAR.solar)}
+              </p>
+            </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Se paga IVA o ITP al comprar un solar?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
