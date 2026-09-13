@@ -86,6 +86,11 @@ scripts/detectar-eventos-aula.mjs
 # Lógica compartida por digest-diario y detectar-eventos-aula (firma de reparto por IP):
 # va con ellos, no al repo público. Al quedar ignorada, backup-critico.mjs sí la respalda.
 scripts/lib/
+# Sus casos de prueba IMPORTAN scripts/lib/, así que siguen a lo que prueban: versionarlos
+# dejaría en el repo un `node scripts/pruebas/...` que en un clon limpio no puede arrancar.
+# El resto de scripts/pruebas/ sí va al repo: no importa nada ignorado. Uso:
+#   node scripts/pruebas/firma-sin-ip.mjs
+scripts/pruebas/firma-sin-ip.mjs
 
 # Detector foso-IA (analisis interno)
 scripts/detectar-foso-ia.mjs
