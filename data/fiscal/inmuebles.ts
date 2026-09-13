@@ -106,6 +106,28 @@ export interface TramoGananciasPatrimoniales {
  * estos tramos, SEA CUAL SEA el plazo de tenencia: la distinción corto/largo
  * plazo (base general si < 1 año) desapareció en 2015 (Ley 26/2014).
  */
+/**
+ * Sello PROPIO de la escala del ahorro, separado de FISCAL_INMUEBLES_META.
+ *
+ * ⚠  Existe porque el sello del módulo entero mide otra cosa: su `verificado` subió
+ * cuatro veces entre enero y junio de 2026 (2025-01-15 → 2026-06-12 → 06-13 → 06-17) en
+ * commits que solo revisaban TIPOS_ITP_CCAA_2025, un tributo que las apps de la escala del
+ * ahorro ni siquiera calculan; y su `fuente` nombra cuatro normas, tres de las cuales no
+ * tienen nada que ver con la ganancia patrimonial. Una app que rotulaba «IRPF de la venta»
+ * enseñaba así una fecha ganada revisando el ITP (hallazgo 781 del Inspector).
+ *
+ * La fecha es la de la revisión del 2026-08-12, que verificó uno a uno contra el texto
+ * consolidado del BOE los artículos que sostienen el IRPF —el art. 66 incluido, que es
+ * este— y así lo dejó escrito en la cabecera de data/fiscal/irpf.ts.
+ */
+export const GANANCIAS_PATRIMONIALES_META = {
+  fuente: 'Ley 35/2006 del IRPF, art. 66 (escala de la base del ahorro), redacción de la Ley 7/2024 con efectos 1/1/2025',
+  verificado: '2026-08-12',
+  vigencia: '2026',
+  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
+  nota: 'Toda ganancia patrimonial por transmisión tributa con esta escala, sea cual sea el plazo de tenencia: la distinción corto/largo plazo desapareció en 2015 (Ley 26/2014).',
+};
+
 export const TRAMOS_GANANCIAS_PATRIMONIALES_2025: TramoGananciasPatrimoniales[] = [
   { hasta: 6000,     tipo: 19 },
   { hasta: 50000,    tipo: 21 },

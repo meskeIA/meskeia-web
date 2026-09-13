@@ -25,6 +25,7 @@ import {
   COEFICIENTES_CATALUNA_IS,
   COEFICIENTES_IIVTNU_2025,
   REDUCCION_VIVIENDA_PORC_IS,
+  PORC_AJUAR_DOMESTICO_IS,
   REDUCCION_VIVIENDA_MAX_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
@@ -35,7 +36,8 @@ import {
   desglosarCuotaBaseAhorro,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
-  FISCAL_INMUEBLES_META,
+  GANANCIAS_PATRIMONIALES_META,
+  PLAZO_ISD,
 } from '@/data/fiscal';
 
 /**
@@ -67,6 +69,8 @@ import styles from './SimuladorHeredarVivienda.module.css';
  * los dos regímenes.
  */
 const PORC_REDUCCION_VIVIENDA = formatNumber(REDUCCION_VIVIENDA_PORC_IS * 100, 0);
+/** 3 % del art. 15 LISD, para el rótulo del ajuar. */
+const PORC_AJUAR = formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0);
 
 /**
  * El coeficiente multiplicador del Grupo IV con el patrimonio preexistente más bajo, que es
@@ -80,6 +84,10 @@ const COEF_GRUPO_IV_MIN = COEFICIENTES_IS['IV'][0];
 type Parentesco = 'conyuge' | 'hijo_menor21' | 'hijo' | 'nieto' | 'padre' | 'hermano' | 'sin_parentesco';
 
 interface ResultadoISD {
+  /** Valor declarado de la vivienda, ANTES de sumarle el ajuar. */
+  caudalRelicto: number;
+  /** Ajuar doméstico del art. 15 LISD: 3 % del caudal, presunción destruible con prueba. */
+  ajuarDomestico: number;
   baseImponible: number;
   reduccionParentesco: number;
   reduccionVivienda: number;
@@ -109,6 +117,8 @@ interface ResultadoPlusvalia {
 
 interface ResultadoIRPF {
   valorAdquisicionFiscal: number;
+  /** Precio de venta MENOS la plusvalía municipal de esa venta (art. 35.2 LIRPF). */
+  valorTransmision: number;
   ganancia: number;
   cuota: number;
   desglose: Array<{ desde: number; hasta: number; tipo: number; aplicado: number; cuota: number }>;
@@ -356,7 +366,24 @@ function calcularISD(
   // en ninguna de las 17: sin colapsarlo, el nieto perdería el 99 % de bonificación.
   const bonifGrupo = ccaaInfo?.bonificaciones[reducKey === 'II-descendiente' ? 'II' : reducKey];
 
-  const baseImponible = valorReferencia;
+  /**
+   * Ajuar doméstico (art. 15 LISD): se presume en el 3 % del caudal relicto salvo prueba en
+   * contrario, y forma parte de la masa hereditaria — no es un gasto ni una reducción.
+   *
+   * ⚠  Hasta el 13/09/2026 no entraba en la base ni se mencionaba en ninguna parte de la
+   * página, mientras la app hermana `estimador-impuesto-sucesiones` y el motor compartido
+   * `calcularSucesion` (tools del MCP) sí lo sumaban: la MISMA herencia tenía dos respuestas
+   * en meskeIA según por dónde se preguntara (hallazgo 780 del Inspector). En un Grupo IV de
+   * 1.500.000 € sin bonificación, la diferencia son 30.600 € de cuota.
+   *
+   * La presunción se destruye con prueba, así que el panel lo dice en su línea propia en vez
+   * de esconderlo dentro de la base. No se le aplica la minoración del art. 15 in fine (3 %
+   * del valor catastral de la vivienda habitual del causante, que corresponde al cónyuge
+   * superviviente): esta app no modela ese supuesto, y aplicarla a un hijo sería inventarlo.
+   */
+  const caudalRelicto = valorReferencia;
+  const ajuarDomestico = redondearCentimos(caudalRelicto * PORC_AJUAR_DOMESTICO_IS);
+  const baseImponible = redondearCentimos(caudalRelicto + ajuarDomestico);
 
   // Reducción por parentesco
   const reducciones = esCataluna ? REDUCCIONES_PARENTESCO_CATALUNA_IS : REDUCCIONES_PARENTESCO_IS;
@@ -474,6 +501,8 @@ function calcularISD(
   const cuotaFinal = redondearCentimos(Math.max(0, cuotaTributaria - bonificacion));
 
   return {
+    caudalRelicto,
+    ajuarDomestico,
     baseImponible,
     reduccionParentesco,
     reduccionVivienda,
@@ -558,15 +587,28 @@ function calcularIRPFGanancia(
   valorReferenciaISD: number,
   cuotaISD: number,
   cuotaIIVTNU: number,
-  valorVenta: number
+  valorVenta: number,
+  cuotaIIVTNUVenta: number
 ): ResultadoIRPF {
-  // Valor adquisición fiscal: el valor declarado en ISD + impuestos pagados
+  // Valor adquisición fiscal: el valor declarado en ISD + impuestos pagados (art. 36 LIRPF
+  // remitiendo al 35.1: importe real + gastos y tributos inherentes a la adquisición).
   const valorAdquisicionFiscal = valorReferenciaISD + cuotaISD + cuotaIIVTNU;
-  const ganancia = valorVenta - valorAdquisicionFiscal;
+  /**
+   * Valor de TRANSMISIÓN (art. 35.2 LIRPF): del importe real se deducen «los gastos y
+   * tributos inherentes a la transmisión… satisfechos por el transmitente», y la plusvalía
+   * municipal de la venta lo es — la paga el vendedor.
+   *
+   * ⚠  13/09/2026: la app no liquidaba esa segunda plusvalía (hallazgo 779), así que
+   * tampoco podía descontarla aquí. Al añadirla, el TOTAL no es una suma simple: el mismo
+   * impuesto que sube el total por un lado baja el IRPF por el otro.
+   */
+  const valorTransmision = valorVenta - cuotaIIVTNUVenta;
+  const ganancia = valorTransmision - valorAdquisicionFiscal;
 
   if (ganancia <= 0) {
     return {
       valorAdquisicionFiscal,
+      valorTransmision,
       ganancia,
       cuota: 0,
       desglose: [],
@@ -590,6 +632,7 @@ function calcularIRPFGanancia(
 
   return {
     valorAdquisicionFiscal,
+    valorTransmision,
     ganancia,
     cuota,
     desglose,
@@ -658,15 +701,84 @@ export default function SimuladorHeredarViviendaPage() {
     [valorCatastralSuelo, valorAdquisicion, valorReferencia, aniosTenenciaCausante, valorCatastralTotal]
   );
 
+  /**
+   * Plusvalía municipal de la SEGUNDA transmisión (hallazgo 779).
+   *
+   * El IIVTNU se devenga en CADA transmisión, y en la venta lo paga el vendedor — que aquí
+   * es el heredero. Lo dice el módulo del que esta misma página lee los coeficientes
+   * (PLUSVALIA_MUNICIPAL_META.quien) y lo dice su propia tabla del bloque educativo, pero el
+   * TOTAL sumaba tres conceptos donde la operación simulada tiene cuatro.
+   *
+   * Los datos ya estaban en pantalla: el periodo de tenencia del heredero son los años hasta
+   * la venta, el valor catastral del suelo no cambia al heredar y el incremento de esta
+   * segunda transmisión es precio de venta − valor declarado en el ISD.
+   */
+  const plusvaliaVenta = useMemo(
+    () =>
+      aniosHastaVenta > 0 && valorVenta > 0
+        ? calcularPlusvaliaMunicipal(
+            valorCatastralSuelo,
+            valorReferencia,
+            valorVenta,
+            aniosHastaVenta,
+            valorCatastralTotal
+          )
+        : null,
+    [aniosHastaVenta, valorVenta, valorCatastralSuelo, valorReferencia, valorCatastralTotal]
+  );
+
   const irpf = useMemo(
     () =>
       aniosHastaVenta > 0
-        ? calcularIRPFGanancia(valorReferencia, isd.cuotaFinal, plusvalia.cuotaFinal, valorVenta)
+        ? calcularIRPFGanancia(
+            valorReferencia,
+            isd.cuotaFinal,
+            plusvalia.cuotaFinal,
+            valorVenta,
+            plusvaliaVenta?.cuotaFinal ?? 0
+          )
         : null,
-    [aniosHastaVenta, valorReferencia, isd.cuotaFinal, plusvalia.cuotaFinal, valorVenta]
+    [aniosHastaVenta, valorReferencia, isd.cuotaFinal, plusvalia.cuotaFinal, valorVenta, plusvaliaVenta]
   );
 
-  const totalImpuestos = isd.cuotaFinal + plusvalia.cuotaFinal + (irpf?.cuota ?? 0);
+  /**
+   * Pérdida de la reducción por vivienda habitual al vender dentro del plazo de
+   * mantenimiento (hallazgo 778).
+   *
+   * El art. 20.2.c LISD condiciona la reducción a mantener la adquisición diez años (cinco
+   * en Cataluña, art. 19 Ley 19/2010). Vender antes obliga a regularizar: se ingresa la parte
+   * del impuesto que se dejó de pagar, más intereses de demora. La app tenía el dato de
+   * entrada, conocía la regla y la enunciaba — pero dentro del bloque educativo colapsado,
+   * mientras el TOTAL sumaba a la vez una reducción y la venta que la anula.
+   *
+   * ⚠  Solo están modelados los plazos estatal y catalán, que son los que data/fiscal trae
+   * sellados. Otras comunidades tienen el suyo propio, y eso se dice en el aviso en vez de
+   * aplicar un plazo inventado.
+   */
+  const aniosMantenimiento =
+    ccaa === 'cataluna'
+      ? REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS
+      : REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS;
+
+  const isdSinReduccionVivienda = useMemo(
+    () => calcularISD(valorReferencia, parentesco, ccaa, false, edad, convivioDosAnios),
+    [valorReferencia, parentesco, ccaa, edad, convivioDosAnios]
+  );
+
+  const ventaDentroDePlazo =
+    isd.reduccionVivienda > 0 && aniosHastaVenta > 0 && aniosHastaVenta < aniosMantenimiento;
+
+  /** Lo que hay que devolver (sin intereses, que dependen de la fecha real de cada pago). */
+  const regularizacionVivienda = ventaDentroDePlazo
+    ? redondearCentimos(Math.max(0, isdSinReduccionVivienda.cuotaFinal - isd.cuotaFinal))
+    : 0;
+
+  const totalImpuestos =
+    isd.cuotaFinal +
+    regularizacionVivienda +
+    plusvalia.cuotaFinal +
+    (plusvaliaVenta?.cuotaFinal ?? 0) +
+    (irpf?.cuota ?? 0);
   const porcSobreVenta = valorVenta > 0 ? (totalImpuestos / valorVenta) * 100 : 0;
 
   // Los tres avisos de coherencia entre parentesco y edad (hallazgo 612)
@@ -719,11 +831,18 @@ export default function SimuladorHeredarViviendaPage() {
         urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
         nota={PLUSVALIA_MUNICIPAL_META.aviso}
       />
+      {/* Y el tercero tampoco puede llevar el sello del módulo entero: FISCAL_INMUEBLES_META
+          se re-selló cuatro veces entre enero y junio de 2026 en commits que solo tocaban los
+          tipos del ITP —tributo que esta app no calcula—, así que el rótulo «IRPF de la
+          venta» enseñaba una fecha ganada revisando otra cosa, y su `fuente` nombraba cuatro
+          normas de las que tres no venían al caso (hallazgo 781). La escala del ahorro tiene
+          desde hoy sello propio, como ya lo tenía el IIVTNU en el mismo fichero. */}
       <DataReference
         normativa="IRPF de la venta"
-        fuente={FISCAL_INMUEBLES_META.fuente}
-        verificado={FISCAL_INMUEBLES_META.verificado}
-        urlOficial={FISCAL_INMUEBLES_META.urlOficialIRPF}
+        fuente={GANANCIAS_PATRIMONIALES_META.fuente}
+        verificado={GANANCIAS_PATRIMONIALES_META.verificado}
+        urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
+        nota={GANANCIAS_PATRIMONIALES_META.nota}
       />
 
       <LegalNotice />
@@ -1060,7 +1179,15 @@ export default function SimuladorHeredarViviendaPage() {
             </p>
 
             <div className={styles.panelLine}>
-              <span>Base imponible (valor referencia)</span>
+              <span>Valor de referencia de la vivienda</span>
+              <strong>{formatCurrency(isd.caudalRelicto)}</strong>
+            </div>
+            <div className={styles.panelLine}>
+              <span>+ Ajuar doméstico ({PORC_AJUAR} % del caudal, art. 15 LISD)</span>
+              <strong>+{formatCurrency(isd.ajuarDomestico)}</strong>
+            </div>
+            <div className={styles.panelLine}>
+              <span>= Base imponible</span>
               <strong>{formatCurrency(isd.baseImponible)}</strong>
             </div>
             <div className={styles.panelLine}>
@@ -1109,11 +1236,27 @@ export default function SimuladorHeredarViviendaPage() {
               <span>Cuota ISD final</span>
               <strong>{formatCurrency(isd.cuotaFinal)}</strong>
             </div>
+
+            {/* El aviso va JUNTO A LA CIFRA, no dentro del bloque educativo colapsado: la
+                misma pantalla sumaba una reducción y la venta que la anula (hallazgo 778). */}
+            {ventaDentroDePlazo && (
+              <div className={styles.avisoMantenimiento}>
+                <span aria-hidden="true">⚠️</span> <strong>Pierdes la reducción por vivienda
+                habitual:</strong> vendes a los {aniosHastaVenta} años y el art. 20.2.c LISD exige
+                mantenerla {aniosMantenimiento}
+                {ccaa === 'cataluna' ? ' (art. 19 de la Ley 19/2010 de Cataluña)' : ''}. Hay que
+                presentar una autoliquidación complementaria e ingresar los{' '}
+                <strong>{formatCurrency(regularizacionVivienda)}</strong> que la reducción ahorró,
+                más intereses de demora (que dependen de las fechas reales y no se calculan aquí).
+                El plazo es de {PLAZO_ISD.mesesPresentacion} meses desde la venta.
+                {ccaa !== 'cataluna' && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}
+              </div>
+            )}
           </div>
 
           {/* Panel 2: Plusvalía */}
           <div className={styles.panelPlusvalia}>
-            <h3 className={styles.panelHeaderTitle}>2. Plusvalía municipal</h3>
+            <h3 className={styles.panelHeaderTitle}>2. Plusvalía municipal (herencia)</h3>
             <p className={styles.panelHeaderSub}>
               IIVTNU — {plusvalia.aniosTenencia} años de tenencia
             </p>
@@ -1182,6 +1325,21 @@ export default function SimuladorHeredarViviendaPage() {
                   <span>Valor de venta</span>
                   <strong>{formatCurrency(valorVenta)}</strong>
                 </div>
+                {plusvaliaVenta && (
+                  <>
+                    <div className={styles.panelLine}>
+                      <span>
+                        − Plusvalía municipal de la venta ({plusvaliaVenta.aniosTenencia} años,
+                        coef. {formatNumber(plusvaliaVenta.coeficiente, 2)})
+                      </span>
+                      <strong>−{formatCurrency(plusvaliaVenta.cuotaFinal)}</strong>
+                    </div>
+                    <div className={styles.panelLine}>
+                      <span>= Valor de transmisión**</span>
+                      <strong>{formatCurrency(irpf.valorTransmision)}</strong>
+                    </div>
+                  </>
+                )}
                 <div className={styles.panelLine}>
                   <span>{irpf.esPerdida ? 'Pérdida patrimonial' : 'Ganancia patrimonial'}</span>
                   <strong>
@@ -1202,6 +1360,13 @@ export default function SimuladorHeredarViviendaPage() {
                 <p className={styles.footnote}>
                   * Valor referencia ISD + cuota ISD + cuota plusvalía pagadas.
                 </p>
+                {plusvaliaVenta && (
+                  <p className={styles.footnote}>
+                    ** Precio menos los tributos inherentes a la transmisión satisfechos por el
+                    vendedor (art. 35.2 LIRPF): la plusvalía municipal que se devenga en esta
+                    segunda transmisión, y que pagas tú.
+                  </p>
+                )}
               </>
             )}
           </div>
@@ -1217,10 +1382,22 @@ export default function SimuladorHeredarViviendaPage() {
               <span>ISD</span>
               <strong>{formatCurrency(isd.cuotaFinal)}</strong>
             </div>
+            {regularizacionVivienda > 0 && (
+              <div className={styles.bloqueCard}>
+                <span>+ ISD regularizado (venta antes de {aniosMantenimiento} años)</span>
+                <strong>{formatCurrency(regularizacionVivienda)}</strong>
+              </div>
+            )}
             <div className={styles.bloqueCard}>
-              <span>+ Plusvalía municipal</span>
+              <span>+ Plusvalía municipal (herencia)</span>
               <strong>{formatCurrency(plusvalia.cuotaFinal)}</strong>
             </div>
+            {plusvaliaVenta && (
+              <div className={styles.bloqueCard}>
+                <span>+ Plusvalía municipal (venta)</span>
+                <strong>{formatCurrency(plusvaliaVenta.cuotaFinal)}</strong>
+              </div>
+            )}
             <div className={styles.bloqueCard}>
               <span>+ IRPF venta</span>
               <strong>{formatCurrency(irpf?.cuota ?? 0)}</strong>
@@ -1230,6 +1407,14 @@ export default function SimuladorHeredarViviendaPage() {
               <strong>{formatCurrency(totalImpuestos)}</strong>
             </div>
           </div>
+          {plusvaliaVenta && (
+            <p className={styles.bloqueNota}>
+              El IIVTNU se devenga en <strong>cada</strong> transmisión y en la venta lo paga el
+              vendedor, que aquí eres tú: son {aniosHastaVenta} años de tenencia sobre el mismo
+              valor catastral del suelo. Esa cuota se descuenta además del valor de transmisión
+              en el IRPF (art. 35.2 LIRPF), así que el total no sube en su importe entero.
+            </p>
+          )}
           {aniosHastaVenta > 0 && valorVenta > 0 && (
             <p className={styles.bloquePorc}>
               Representa el <strong>{formatNumber(porcSobreVenta, 2)}%</strong> del valor de venta
@@ -1257,13 +1442,13 @@ export default function SimuladorHeredarViviendaPage() {
             <tbody>
               <tr>
                 <td><strong>ISD</strong> (Sucesiones)</td>
-                <td>Plazo 6 meses tras fallecimiento (prorrogable a 1 año)</td>
+                <td>Plazo {PLAZO_ISD.mesesPresentacion} meses tras el fallecimiento (prorrogable otros {PLAZO_ISD.mesesProrroga})</td>
                 <td>Sobre valor de referencia, con tarifa estatal o autonómica + bonificación CCAA</td>
                 <td>Heredero (cada uno por su parte)</td>
               </tr>
               <tr>
                 <td><strong>Plusvalía municipal (IIVTNU)</strong></td>
-                <td>Plazo 6 meses tras fallecimiento</td>
+                <td>Plazo {PLAZO_ISD.mesesPresentacion} meses tras el fallecimiento</td>
                 <td>Método objetivo (valor catastral suelo × coef.) o método real (ganancia real prorrateada al suelo). Se elige el menor.</td>
                 <td>Heredero. Paga al Ayuntamiento.</td>
               </tr>
@@ -1277,7 +1462,7 @@ export default function SimuladorHeredarViviendaPage() {
           </table>
         </div>
         <p className={styles.tableNote}>
-          La secuencia es siempre: ISD + plusvalía al heredar (mismo plazo de 6 meses), e IRPF
+          La secuencia es siempre: ISD + plusvalía al heredar (mismo plazo de {PLAZO_ISD.mesesPresentacion} meses), e IRPF
           solo si después decides vender. Si conservas la vivienda como tuya, no hay IRPF.
         </p>
 
@@ -1342,8 +1527,10 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.faqItem}>
             <strong>¿Cuál es el plazo para liquidar el ISD?</strong>
             <p>
-              6 meses desde el fallecimiento. Se puede pedir prórroga de otros 6 meses dentro de los
-              5 primeros meses. Si superas el plazo sin liquidar, el recargo se debe desde el primer
+              {PLAZO_ISD.mesesPresentacion} meses desde el fallecimiento ({PLAZO_ISD.norma}). Se puede pedir
+              una prórroga de otros {PLAZO_ISD.mesesProrroga} meses dentro de los{' '}
+              {PLAZO_ISD.mesesParaPedirProrroga} primeros, pero no sale gratis: devenga intereses de
+              demora desde que vencen los {PLAZO_ISD.mesesPresentacion} meses hasta que presentas. Si superas el plazo sin liquidar, el recargo se debe desde el primer
               día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más otro{' '}
               {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso, y el{' '}
               {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez
@@ -1423,11 +1610,11 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.step}>
             <span className={styles.stepNumber}>3</span>
             <div className={styles.stepContent}>
-              <strong>Liquidar ISD y plusvalía municipal (6 meses)</strong>
+              <strong>Liquidar ISD y plusvalía municipal ({PLAZO_ISD.mesesPresentacion} meses)</strong>
               <p>
                 ISD: ante la Hacienda autonómica de la CCAA donde residía el fallecido. Plusvalía
                 municipal: ante el Ayuntamiento donde está el inmueble. Si necesitas más tiempo,
-                pide prórroga antes de los 5 meses.
+                pide prórroga antes de los {PLAZO_ISD.mesesParaPedirProrroga} meses (con intereses de demora).
               </p>
             </div>
           </div>
@@ -1461,7 +1648,7 @@ export default function SimuladorHeredarViviendaPage() {
             <span className={styles.tipIcon} aria-hidden="true">📅</span>
             <div>
               <strong>No esperes al último mes</strong>
-              <p>El plazo de ISD es de 6 meses. Empieza con el inventario en cuanto tengas el certificado de últimas voluntades.</p>
+              <p>El plazo de ISD es de {PLAZO_ISD.mesesPresentacion} meses. Empieza con el inventario en cuanto tengas el certificado de últimas voluntades.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
@@ -1510,7 +1697,7 @@ export default function SimuladorHeredarViviendaPage() {
             <li>Confundir el valor catastral (más bajo) con el valor de referencia (base ISD desde 2022).</li>
             <li>No declarar la herencia pensando que "como no hay dinero líquido, no pasa nada": el plazo corre y los recargos llegan automáticamente.</li>
             <li>Renunciar a favor de otra persona: tributa como donación + ISD (doble coste).</li>
-            <li>Olvidar la plusvalía municipal: es un impuesto distinto del ISD que también vence a los 6 meses.</li>
+            <li>Olvidar la plusvalía municipal: es un impuesto distinto del ISD que también vence a los {PLAZO_ISD.mesesPresentacion} meses.</li>
             <li>Vender antes del plazo de mantenimiento cuando se aplicó la reducción de vivienda habitual: pierdes la reducción retroactivamente. Son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años con la norma estatal y {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} en Cataluña.</li>
             <li>Calcular la ganancia patrimonial al vender sin sumar ISD ni plusvalía pagados al valor de adquisición fiscal: pagas IRPF de más.</li>
           </ul>

@@ -10,6 +10,7 @@ import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_INMUEBLES_META,
+  GANANCIAS_PATRIMONIALES_META,
   calcularCuotaBaseAhorro,
 } from '@/data/fiscal';
 
@@ -175,11 +176,16 @@ export default function EstimadorPlusvalidasIRPFPage() {
 
       <DisclaimerCard variant="financial" severity="critical" />
 
+      {/* El sello es el de la escala del ahorro, no el del módulo entero: la fecha de
+          FISCAL_INMUEBLES_META la mueven los commits del ITP, tributo que esta app no
+          calcula, y su `fuente` nombra cuatro normas de las que tres no vienen al caso
+          (hallazgo 781, destapado en simulador-heredar-vivienda). */}
       <DataReference
-        normativa={FISCAL_INMUEBLES_META.fuente}
-        fuente={FISCAL_INMUEBLES_META.fuente}
-        verificado={FISCAL_INMUEBLES_META.verificado}
-        urlOficial={FISCAL_INMUEBLES_META.urlOficialIRPF}
+        normativa="IRPF — ganancias patrimoniales"
+        fuente={GANANCIAS_PATRIMONIALES_META.fuente}
+        verificado={GANANCIAS_PATRIMONIALES_META.verificado}
+        urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
+        nota={GANANCIAS_PATRIMONIALES_META.nota}
       />
 
       <div className={styles.mainContent}>
@@ -508,8 +514,8 @@ export default function EstimadorPlusvalidasIRPFPage() {
         <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento fiscal</h3>
         <p>
           Este estimador proporciona una <strong>estimación orientativa</strong> basada en{' '}
-          <a href={FISCAL_INMUEBLES_META.urlOficialIRPF} target="_blank" rel="noopener noreferrer">
-            {FISCAL_INMUEBLES_META.fuente}
+          <a href={GANANCIAS_PATRIMONIALES_META.urlOficial} target="_blank" rel="noopener noreferrer">
+            {GANANCIAS_PATRIMONIALES_META.fuente}
           </a>. El cálculo real puede variar por:
         </p>
         <ul>
@@ -527,7 +533,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
           </a>.
         </p>
         <p className={styles.disclaimerFecha}>
-          Datos verificados: {FISCAL_INMUEBLES_META.verificado} | Vigencia: {FISCAL_INMUEBLES_META.vigencia}
+          Datos verificados: {GANANCIAS_PATRIMONIALES_META.verificado} | Vigencia: {GANANCIAS_PATRIMONIALES_META.vigencia}
         </p>
       </div>
 

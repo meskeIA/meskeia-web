@@ -48,6 +48,11 @@ import { calcularFiniquito } from '../lib/calculadoras/finiquito';
 import { calcularIndemnizacionDespido } from '../lib/calculadoras/indemnizacionDespido';
 import { calcularSueldoNeto } from '../lib/calculadoras/sueldoNeto';
 import { calcularCuotaAutonomo } from '../lib/calculadoras/cuotaAutonomo';
+import { compararModulosVsDirecta } from '../lib/calculadoras/modulosVsDirecta';
+import {
+  GASTOS_DIFICIL_JUSTIFICACION_EDS,
+  reduccionGastosDificilJustificacion,
+} from '../data/fiscal/estimacion-directa';
 import { calcularIRPF } from '../lib/calculadoras/irpf';
 import { compararAutonomoVsSL } from '../lib/calculadoras/autonomoVsSL';
 import { calcularCompraventa } from '../lib/calculadoras/compraventa';
@@ -2834,14 +2839,20 @@ test.describe('Motores 09/09 — deducción de autónomo IRPF (solo la lee /api/
       gastosAsesoria: 900,
       otrosGastos: 1100,
     });
-    // A mano: gastos 6.200 → previo 38.800 → difícil min(7 % × 38.800; 2.000) = 2.000
-    //         → actividad 36.800 → tramo `hasta: 60000` → 37 %
-    expect(res.rendimientoNetoActividad).toBe(36800);
+    // A mano: gastos 6.200 → previo 38.800 → difícil min(5 % × 38.800; 2.000) = 1.940
+    //         → actividad 36.860 → tramo `hasta: 60000` → 37 %
+    //
+    // ⚠  13/09/2026: hasta hoy la cifra era 36.800 € porque el motor aplicaba un 7 % que solo
+    // rigió en 2023 (hallazgo 811 del Inspector). El porcentaje sale ahora de
+    // data/fiscal/estimacion-directa.ts, verificado contra el Manual práctico de Renta 2025
+    // de la AEAT. Lo que este test vigila —que la cuota se calcule TRAMO A TRAMO y no con el
+    // tipo marginal sobre todo el rendimiento— no cambia.
+    expect(res.rendimientoNetoActividad).toBe(36860);
     expect(res.tipoIRPFEstimado).toBe(37);
-    // 12.450×19 % + 7.750×24 % + 15.000×30 % + 1.600×37 % = 9.317,50 €
-    // Hoy devuelve 36.800 × 37 % = 13.616,00 € → +4.298,50 € (+46,1 %), y es cota INFERIOR:
-    // tampoco resta el mínimo personal de MINIMOS_IRPF_2025.
-    expect(res.cuotaIRPFEstimada).toBe(cuotaProgresivaIRPF(36800));
+    // 12.450×19 % + 7.750×24 % + 15.000×30 % + 1.660×37 % = 9.339,70 €
+    // Con el tipo marginal aplicado a todo saldrían 36.860 × 37 % = 13.638,20 €, y sería cota
+    // INFERIOR: tampoco restaba el mínimo personal de MINIMOS_IRPF_2025.
+    expect(res.cuotaIRPFEstimada).toBe(cuotaProgresivaIRPF(36860));
   });
 
   test('ALTO: ganar 1 € más nunca puede dejar menos neto (los 5 bordes de la escala)', () => {
@@ -4305,5 +4316,116 @@ test.describe('Cuota íntegra general — art. 63.1.2º LIRPF (fuente única des
     // `estimador-sueldo-neto` con los 2.150 € de la unidad monoparental.
     const comoSiFueraMinimo = calcularCuotaIntegraGeneral(base, min + red);
     expect(dos(comoSiFueraMinimo - conConjunta)).toBe(dos(red * 0.37 - red * 0.19));
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// modulosVsDirecta — el motor que sirve a la tool comparar_modulos_vs_directa
+// del MCP de Delegum Y, desde el 13/09/2026, a la propia app.
+//
+// Origen: hallazgos 808 y 809 del Inspector (tanda del 12/09/2026). El motor era una
+// RÉPLICA de la lógica inline de la app, y las dos copias envejecieron por su lado: las
+// reparaciones del 31/08 (no recomendar un régimen inaccesible) y del 02/09 (límites de
+// exclusión por volumen) se aplicaron solo a la copia de la app. Por el MCP se imprimía
+// «⚠️ probablemente NO sea elegible para módulos» y dos líneas después «✅ Sale más
+// barato: Estimación Objetiva (Módulos)».
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('modulosVsDirecta — elegibilidad antes que importe', () => {
+  test('ALTO [808]: un profesional puro NO recibe la recomendación de módulos', () => {
+    // Preset «Profesional puro» de la app: sin superficie, sin mesas, sin vehículo y sin
+    // asalariados, solo el titular. La fórmula didáctica le da un rendimiento por módulos
+    // de 4.500 € (muy inferior a sus 42.000 € reales), así que POR IMPORTE módulos ganaba
+    // por 9.447 €/año. Pero no puede acogerse.
+    const r = compararModulosVsDirecta({
+      ingresos: 50000,
+      gastos: 8000,
+      retaMensual: 300,
+      actividad: 'comercio_menor',
+      personalNoAsalariado: 1,
+    });
+    expect(r.modulos.esApta).toBe(false);
+    expect(r.modulos.motivoNoApta).toBe('sin_parametros');
+    expect(r.regimenRecomendado).toBe('Estimación Directa Simplificada');
+    expect(r.ganaED).toBe(true);
+    // Y el importe de módulos seguía siendo el barato: la recomendación NO puede salir de ahí.
+    expect(r.modulos.costeAnualTotal).toBeLessThan(r.estimacionDirecta.costeAnualTotal);
+  });
+
+  test('ALTO [809]: superar los límites de exclusión excluye, aunque la actividad encaje', () => {
+    // Bar con todos los parámetros físicos en regla, pero 300.000 € de ingresos: por encima
+    // de los 250.000 € del art. 31 LIRPF. Antes salía esApta=true, sin aviso, recomendando
+    // módulos con una diferencia de 113.510,72 €/año.
+    const r = compararModulosVsDirecta({
+      ingresos: 300000,
+      gastos: 20000,
+      retaMensual: 320,
+      actividad: 'bar',
+      mesas: 8,
+      personalAsalariado: 1,
+      personalNoAsalariado: 1,
+      superficie: 60,
+      kwh: 12000,
+    });
+    expect(r.modulos.esApta).toBe(false);
+    expect(r.modulos.motivoNoApta).toBe('supera_limites');
+    expect(r.regimenRecomendado).toBe('Estimación Directa Simplificada');
+  });
+
+  test('[809] el umbral de compras excluye igual que el de ingresos', () => {
+    const base = {
+      ingresos: 240000,
+      retaMensual: 320,
+      actividad: 'bar' as const,
+      mesas: 8,
+      personalAsalariado: 1,
+      superficie: 60,
+      kwh: 12000,
+    };
+    // Justo en el límite: dentro. Un euro por encima: fuera. Los dos ejes, uno a uno.
+    expect(compararModulosVsDirecta({ ...base, gastos: 250000 }).modulos.esApta).toBe(true);
+    expect(compararModulosVsDirecta({ ...base, gastos: 250001 }).modulos.motivoNoApta).toBe('supera_limites');
+    expect(compararModulosVsDirecta({ ...base, ingresos: 250000, gastos: 1000 }).modulos.esApta).toBe(true);
+    expect(compararModulosVsDirecta({ ...base, ingresos: 250001, gastos: 1000 }).modulos.motivoNoApta).toBe('supera_limites');
+  });
+
+  test('[808] cuando módulos SÍ es apta, la recomendación vuelve a salir del importe', () => {
+    // Candado por el otro lado: que la guarda de elegibilidad no se coma la comparación.
+    const r = compararModulosVsDirecta({
+      ingresos: 90000,
+      gastos: 25000,
+      retaMensual: 320,
+      actividad: 'bar',
+      mesas: 8,
+      personalAsalariado: 1,
+      personalNoAsalariado: 1,
+      superficie: 60,
+      kwh: 12000,
+    });
+    expect(r.modulos.esApta).toBe(true);
+    expect(r.modulos.motivoNoApta).toBe(null);
+    expect(r.regimenRecomendado).toBe(
+      r.estimacionDirecta.costeAnualTotal < r.modulos.costeAnualTotal
+        ? 'Estimación Directa Simplificada'
+        : 'Estimación Objetiva (Módulos)'
+    );
+  });
+
+  test('[811] la reducción del art. 30.2.ª RIRPF es la de data/fiscal, no un 5 ni un 7 tecleados', () => {
+    // Los dos motores que aplican el MISMO concepto tienen que dar el MISMO importe.
+    // Hasta el 13/09/2026, deduccionAutonomoIRPF.ts usaba el 7 % transitorio de 2023.
+    const previo = 38800;
+    expect(reduccionGastosDificilJustificacion(previo)).toBe(1940);
+    expect(GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje).toBe(5);
+
+    // Y el tope corta donde dice el Reglamento, no antes ni después.
+    expect(reduccionGastosDificilJustificacion(40000)).toBe(2000);
+    expect(reduccionGastosDificilJustificacion(39999)).toBeLessThan(2000);
+    expect(reduccionGastosDificilJustificacion(0)).toBe(0);
+    expect(reduccionGastosDificilJustificacion(-5000)).toBe(0);
+
+    const r = compararModulosVsDirecta({
+      ingresos: 50000, gastos: 11200, retaMensual: 300, actividad: 'comercio_menor', superficie: 80,
+    });
+    expect(r.estimacionDirecta.reduccion5pc).toBe(1940);
   });
 });

@@ -862,7 +862,10 @@ const DEFINICIONES: readonly Definicion[] = [
     tipo: 'numerico',
     titulo: 'La constante cambia con la temperatura',
     enunciado:
-      'La disociación del pentacloruro de fósforo es endotérmica (ΔH = +88 kJ/mol) y su constante vale 0,04 a 298 K. Calcula cuánto vale a 350 K usando la ecuación de van ’t Hoff. Redondea a dos decimales.',
+      'La disociación del pentacloruro de fósforo es endotérmica (ΔH = +88 kJ/mol). El simulador '
+      + 'parte de una Kc didáctica de 0,04 en su temperatura de referencia (298 K) — no es una '
+      + 'constante medida. Calcula cuánto valdría a 350 K con la ecuación de van ’t Hoff. '
+      + 'Redondea a dos decimales.',
     categoria: 'abstracto',
     datos: { magnitud: 'Kc-a-temperatura', reaccionId: 'pcl5', temperaturaFinalK: 350 },
     etiquetaRespuesta: 'Valor de Kc a 350 K',

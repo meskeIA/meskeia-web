@@ -419,6 +419,37 @@
   font-weight: 700;
 }
 
+/* Nota al pie del bloque total: explica por qué la plusvalía de la venta no sube el total
+   en su importe entero (art. 35.2 LIRPF). Vive sobre el mismo fondo oscuro que .bloquePorc. */
+.bloqueNota {
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0.7rem 0 0;
+}
+
+.bloqueNota strong {
+  color: white;
+  font-weight: 700;
+}
+
+/* Aviso de pérdida de la reducción por vivienda habitual (hallazgo 778). Va dentro del
+   panel del ISD, junto a la cifra que deja de ser válida. */
+.avisoMantenimiento {
+  margin-top: 0.8rem;
+  padding: 0.75rem 0.9rem;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: #78350f;
+}
+
+.avisoMantenimiento strong {
+  color: #92400e;
+}
+
 /* EducationalSection v2.0 */
 .tableWrapper {
   overflow-x: auto;
@@ -777,4 +808,13 @@
   .bloqueGrid {
     grid-template-columns: 1fr;
   }
+}
+
+[data-theme='dark'] .avisoMantenimiento {
+  background: #2d1b00;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .avisoMantenimiento strong {
+  color: #fcd34d;
 }

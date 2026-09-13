@@ -117,6 +117,7 @@ import {
   type PosHipotecaDivorcio,
 } from '@/lib/calculadoras/impuestosDivorcio';
 import { compararModulosVsDirecta, type ActividadModulos } from '@/lib/calculadoras/modulosVsDirecta';
+import { LIMITES_EXCLUSION_MODULOS_2025, ORDEN_MODULOS_VIGENTE } from '@/data/fiscal/modulos-irpf';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que las apps web y el MCP meskeIA.
@@ -3008,6 +3009,18 @@ function crearServidorDelegum(): McpServer {
           vehiculo: a.vehiculos,
         });
         const dif = Math.abs(r.diferencia);
+        // El veredicto se toma de esApta ANTES que de los importes: hasta el 13/09/2026 esta
+        // respuesta imprimía el aviso de no elegibilidad y dos líneas más abajo recomendaba
+        // ese mismo régimen (hallazgos 808 y 809 del Inspector).
+        const avisoNoApta =
+          r.modulos.motivoNoApta === 'supera_limites'
+            ? `  ⚠️ Con ${fmt(a.ingresos_anuales)} € de ingresos y ${fmt(a.gastos_anuales)} € de compras quedas EXCLUIDO de módulos: los límites son ${fmt(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} € de ingresos y ${fmt(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)} € de compras de bienes y servicios (año anterior).`
+            : r.modulos.motivoNoApta === 'sin_parametros'
+            ? '  ⚠️ Con estos parámetros tu actividad probablemente NO sea elegible para módulos (las profesiones liberales nunca pueden acogerse).'
+            : '';
+        const veredicto = r.modulos.esApta
+          ? `✅ **Sale más barato: ${r.regimenRecomendado}** (diferencia ${fmt(dif)} €/año)`
+          : `✅ **Única opción viable: ${r.regimenRecomendado}** — la comparativa de importes no aplica porque con estos datos no puedes acogerte a módulos.`;
         const lineas = [
           `📊 **Módulos vs Estimación Directa** (coste anual = IRPF + cuota RETA)`,
           '',
@@ -3015,11 +3028,11 @@ function crearServidorDelegum(): McpServer {
           `  • Rendimiento neto: ${fmt(r.estimacionDirecta.rendimientoNetoReducido)} € · IRPF: ${fmt(r.estimacionDirecta.irpf)} € · RETA: ${fmt(r.estimacionDirecta.cuotaReta)} €`,
           `🅱️ **Estimación Objetiva (Módulos): ${fmt(r.modulos.costeAnualTotal)} €/año**`,
           `  • Rendimiento por módulos: ${fmt(r.modulos.rendimientoNetoPrevio)} € · IRPF: ${fmt(r.modulos.irpf)} € · RETA: ${fmt(r.modulos.cuotaReta)} €`,
-          !r.modulos.esApta ? '  ⚠️ Con estos parámetros tu actividad probablemente NO sea elegible para módulos.' : '',
+          avisoNoApta,
           '',
-          `✅ **Sale más barato: ${r.regimenRecomendado}** (diferencia ${fmt(dif)} €/año)`,
+          veredicto,
           '',
-          `📝 Los coeficientes de módulos usados aquí son orientativos/didácticos; los reales los fija la Orden HFP anual. Verifica con un asesor antes de elegir régimen.`,
+          `📝 Los coeficientes de módulos usados aquí son orientativos/didácticos; los reales los fija la ${ORDEN_MODULOS_VIGENTE.referencia} (${ORDEN_MODULOS_VIGENTE.boe}), que desarrolla el método para ${ORDEN_MODULOS_VIGENTE.ejercicio}. Verifica con un asesor antes de elegir régimen.`,
         ].filter(l => l !== '');
         return conAviso(lineas.join('\n'), AVISO_FISCAL);
       } catch (err) {

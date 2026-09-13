@@ -15,14 +15,15 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
-  cuotaEscalaGeneral,
-  calcularCuotaIntegraGeneral,
-  MINIMOS_IRPF_2025,
   FISCAL_IRPF_META,
   LIMITES_EXCLUSION_MODULOS_2025,
   FISCAL_MODULOS_IRPF_META,
+  ORDEN_MODULOS_VIGENTE,
+  GASTOS_DIFICIL_JUSTIFICACION_EDS,
   TRAMOS_RETA_2025,
 } from '@/data/fiscal';
+import { compararModulosVsDirecta } from '@/lib/calculadoras/modulosVsDirecta';
+import { calcularCuotaAutonomo } from '@/lib/calculadoras/cuotaAutonomo';
 import styles from './SimuladorModulosVsDirecta.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -189,182 +190,62 @@ const CASOS: CasoPreconfig[] = [
 
 // ─── Cálculos ────────────────────────────────────────────────────────────────
 
-/**
- * Cuota integra de la base liquidable general (art. 63.1.2 LIRPF): escala sobre la base
- * completa menos escala sobre el minimo. Devuelve las dos piezas para que el desglose que
- * se imprime en pantalla cuadre linea a linea.
- *
- * ATENCION 12/09/2026: hasta esta fecha la app restaba el minimo de la base y aplicaba la
- * escala al resto, que lo valora al tipo marginal y subestima la cuota (946,50 EUR con
- * 40.000 EUR de rendimiento neto reducido, 1.443 EUR de 70.000 en adelante). El minimo no
- * reduce la base: se grava a tipo cero. La formula vive en data/fiscal/irpf.ts.
- */
-function calcularIRPF(baseLiquidableGeneral: number, minimo: number): {
-  cuotaEscala: number;
-  cuotaMinimo: number;
-  irpf: number;
-} {
-  const base = Math.max(0, baseLiquidableGeneral);
-  const cuotaEscala = cuotaEscalaGeneral(base);
-  const cuotaMinimo = cuotaEscalaGeneral(Math.min(minimo, base));
-  return { cuotaEscala, cuotaMinimo, irpf: calcularCuotaIntegraGeneral(base, minimo) };
-}
+// La fórmula NO vive aquí: la página consume lib/calculadoras/modulosVsDirecta.ts, que es
+// el mismo motor que sirve a la tool comparar_modulos_vs_directa del MCP de Delegum.
+//
+// ⚠️ 13/09/2026 — hasta hoy esta página mantenía su propia copia inline del mismo cálculo,
+// y las dos divergieron (hallazgos 808 y 809 del Inspector): la reparación del 31/08 (no
+// recomendar módulos a quien no es apto) y la del 02/09 (límites de exclusión por volumen)
+// se aplicaron solo a esta copia, así que por el MCP se seguía recomendando el régimen que
+// la misma respuesta acababa de declarar inaccesible.
 
-// Mínimo personal orientativo (sin familia)
-const MINIMO_PERSONAL_ORIENTATIVO = MINIMOS_IRPF_2025.personal;
-
-// Rango real de cuota RETA mensual (tabla de tramos por rendimiento neto), para que
-// el slider de cuota libre no ofrezca un recorrido menor que el de la tabla oficial.
+// Rango real de cuota RETA mensual (tabla de tramos por rendimiento neto).
 const RETA_CUOTA_MIN = Math.min(...TRAMOS_RETA_2025.map(t => t.cuotaMinima));
 const RETA_CUOTA_MAX = Math.max(...TRAMOS_RETA_2025.map(t => t.cuotaMaxima));
 
-interface ResultadoED {
-  ingresos: number;
-  gastos: number;
-  rendimientoNetoPrevio: number;
-  reduccion5pc: number;
-  rendimientoNetoReducido: number;
-  /** Minimo personal (art. 57 LIRPF). NO se resta de la base: se grava a tipo cero. */
-  minimosPersonales: number;
-  /** Base liquidable general, CON el minimo dentro. */
-  baseLiquidable: number;
-  /** Escala aplicada a la base liquidable completa. */
-  cuotaEscala: number;
-  /** Escala aplicada al minimo, que es lo que se resta de la anterior. */
-  cuotaMinimo: number;
-  irpf: number;
-  cuotaReta: number;
-  costeAnualTotal: number;
+// Extremos del deslizador, redondeados HACIA DENTRO del rango de la tabla.
+// ⚠️ Hasta el 13/09/2026 se redondeaban hacia fuera (Math.floor del mínimo y Math.ceil del
+// máximo a la decena), así que el suelo alcanzable era 200 € — por debajo de la cuota
+// mínima más baja de la tabla, que es exactamente lo que el rótulo dice que no puede pasar
+// (hallazgo 814).
+const RETA_SLIDER_MIN = Math.ceil(RETA_CUOTA_MIN);
+const RETA_SLIDER_MAX = Math.floor(RETA_CUOTA_MAX);
+
+interface CoherenciaReta {
+  /** Tramo de TRAMOS_RETA_2025 al que lleva el rendimiento calculado. */
+  tramo: number;
+  /** Cuota mensual mínima de ese tramo, en €. */
+  cuotaMinimaTramo: number;
+  /** Rendimiento neto mensual con el que se ha buscado el tramo, en €. */
+  rendimientoMensual: number;
+  /** Cuánto queda por debajo del mínimo el coste anual publicado, en €. */
+  deficitAnual: number;
 }
 
-function calcularED(d: DatosComunes): ResultadoED {
-  const rendimientoNetoPrevio = Math.max(0, d.ingresos - d.gastos);
-  // Reducción 5% gastos difícil justificación, tope 2.000 €
-  const reduccion5pc = Math.min(rendimientoNetoPrevio * 0.05, 2000);
-  const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc);
-  const minimosPersonales = MINIMO_PERSONAL_ORIENTATIVO;
-  // El minimo no se resta de la base: entra en calcularIRPF y se grava a tipo cero.
-  const baseLiquidable = rendimientoNetoReducido;
-  const { cuotaEscala, cuotaMinimo, irpf } = calcularIRPF(baseLiquidable, minimosPersonales);
-  const cuotaReta = d.retaMensual * 12;
-  const costeAnualTotal = irpf + cuotaReta;
+/**
+ * Contrasta la cuota RETA introducida con el tramo que le toca por rendimiento neto.
+ *
+ * El rendimiento neto del art. 308.1 LGSS —el que encabeza TRAMOS_RETA_2025— es
+ * «ingresos − gastos deducibles − cuota SS», así que la cuota que el usuario teclea
+ * determina el tramo al que él mismo pertenece. Por debajo de la cuota mínima de ese tramo,
+ * el «coste fiscal anual total» que la app publica queda por debajo del mínimo legalmente
+ * posible (hallazgo 812): con el estado de fábrica, 1.904,16 €/año por debajo.
+ *
+ * Se AVISA, no se corrige: la app no sabe si hay tarifa plana, pluriactividad, base
+ * elegida por encima de la mínima o un alta a mitad de año.
+ *
+ * @returns null cuando la cuota es coherente con el tramo (o no hay rendimiento positivo).
+ */
+function contrastarCuotaReta(d: DatosComunes): CoherenciaReta | null {
+  const rendimientoMensual = (Math.max(0, d.ingresos - d.gastos) - d.retaMensual * 12) / 12;
+  if (rendimientoMensual <= 0) return null;
+  const { tramo, cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimientoMensual });
+  if (d.retaMensual >= cuotaEfectiva) return null;
   return {
-    ingresos: d.ingresos,
-    gastos: d.gastos,
-    rendimientoNetoPrevio,
-    reduccion5pc,
-    rendimientoNetoReducido,
-    minimosPersonales,
-    baseLiquidable,
-    cuotaEscala,
-    cuotaMinimo,
-    irpf,
-    cuotaReta,
-    costeAnualTotal,
-  };
-}
-
-// Fórmulas didácticas orientativas por actividad (NO son los módulos reales)
-function calcularRendimientoModulos(m: DatosModulos): number {
-  switch (m.actividad) {
-    case 'bar':
-      return (
-        1500 * m.mesas +
-        800 * m.personalAsalariado +
-        6 * m.superficie +
-        0.05 * m.kwh
-      );
-    case 'comercio_menor':
-      return (
-        4500 * m.personalNoAsalariado +
-        1000 * m.personalAsalariado +
-        8 * m.superficie
-      );
-    case 'transporte':
-      return 12000 * m.vehiculo;
-    case 'peluqueria':
-      return (
-        5500 * m.personalAsalariado +
-        2000 * m.personalNoAsalariado +
-        7 * m.superficie
-      );
-    case 'taxi':
-      return 6800 * m.vehiculo;
-  }
-}
-
-interface ResultadoModulos {
-  rendimientoNetoPrevio: number;
-  reduccion5pc: number;
-  reduccionEmpleo: number;
-  rendimientoNetoReducido: number;
-  /** Minimo personal (art. 57 LIRPF). NO se resta de la base: se grava a tipo cero. */
-  minimosPersonales: number;
-  /** Base liquidable general, CON el minimo dentro. */
-  baseLiquidable: number;
-  /** Escala aplicada a la base liquidable completa. */
-  cuotaEscala: number;
-  /** Escala aplicada al minimo, que es lo que se resta de la anterior. */
-  cuotaMinimo: number;
-  irpf: number;
-  cuotaReta: number;
-  costeAnualTotal: number;
-  esApta: boolean;
-  motivoNoApta: 'sin_parametros' | 'supera_limites' | null;
-}
-
-function calcularModulos(d: DatosComunes, m: DatosModulos): ResultadoModulos {
-  // Profesionales puros NO pueden acogerse — caso didáctico
-  // Aquí asumimos que si no hay parámetros físicos relevantes, la actividad NO es apta
-  const tieneParametros =
-    m.mesas > 0 ||
-    m.superficie > 0 ||
-    m.vehiculo > 0 ||
-    m.personalAsalariado > 0 ||
-    (m.actividad !== 'transporte' && m.actividad !== 'taxi' && m.personalNoAsalariado > 0 && m.superficie > 0);
-
-  // Límites cuantitativos excluyentes (LIMITES_EXCLUSION_MODULOS_2025): superar
-  // ingresos o compras de bienes y servicios (aquí, "gastos" como proxy) excluye
-  // del régimen aunque la actividad física encaje. El umbral de facturación a
-  // empresas no se comprueba: la app no recoge ese dato.
-  const dentroDeLimites =
-    d.ingresos <= LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades &&
-    d.gastos <= LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios;
-
-  const esApta = tieneParametros && dentroDeLimites;
-  const motivoNoApta: 'sin_parametros' | 'supera_limites' | null = esApta
-    ? null
-    : !dentroDeLimites
-    ? 'supera_limites'
-    : 'sin_parametros';
-
-  const rendimientoNetoPrevio = calcularRendimientoModulos(m);
-  // Reducción 5% (sí aplicable también)
-  const reduccion5pc = Math.min(rendimientoNetoPrevio * 0.05, 2000);
-  // Reducción incentivos al empleo (simplificado: 100 € por persona asalariada)
-  const reduccionEmpleo = m.personalAsalariado * 100;
-  const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc - reduccionEmpleo);
-  const minimosPersonales = MINIMO_PERSONAL_ORIENTATIVO;
-  // El minimo no se resta de la base: entra en calcularIRPF y se grava a tipo cero.
-  const baseLiquidable = rendimientoNetoReducido;
-  const { cuotaEscala, cuotaMinimo, irpf } = calcularIRPF(baseLiquidable, minimosPersonales);
-  const cuotaReta = d.retaMensual * 12;
-  const costeAnualTotal = irpf + cuotaReta;
-
-  return {
-    rendimientoNetoPrevio,
-    reduccion5pc,
-    reduccionEmpleo,
-    rendimientoNetoReducido,
-    minimosPersonales,
-    baseLiquidable,
-    cuotaEscala,
-    cuotaMinimo,
-    irpf,
-    cuotaReta,
-    costeAnualTotal,
-    esApta,
-    motivoNoApta,
+    tramo,
+    cuotaMinimaTramo: cuotaEfectiva,
+    rendimientoMensual,
+    deficitAnual: (cuotaEfectiva - d.retaMensual) * 12,
   };
 }
 
@@ -392,12 +273,19 @@ export default function SimuladorModulosVsDirectaPage() {
     [modulos.actividad]
   );
 
-  const resED = useMemo(() => calcularED(comunes), [comunes]);
-  const resModulos = useMemo(() => calcularModulos(comunes, modulos), [comunes, modulos]);
+  const comparativa = useMemo(
+    () => compararModulosVsDirecta({ ...comunes, ...modulos }),
+    [comunes, modulos]
+  );
+  const resED = comparativa.estimacionDirecta;
+  const resModulos = comparativa.modulos;
+  const diferencia = comparativa.diferencia;
+  // El motor ya devuelve ganaED = true cuando módulos no es apta: ahí no hay comparación
+  // de importes que valga.
+  const ganaED = comparativa.ganaED;
 
-  const diferencia = resED.costeAnualTotal - resModulos.costeAnualTotal;
-  // Si módulos no es apta, la única opción real es ED — no se compara por importe.
-  const ganaED = !resModulos.esApta || resED.costeAnualTotal < resModulos.costeAnualTotal;
+  // Coherencia de la cuota RETA tecleada con el tramo que le toca por rendimiento.
+  const coherenciaReta = useMemo(() => contrastarCuotaReta(comunes), [comunes]);
 
   const aplicarCaso = useCallback((caso: CasoPreconfig) => {
     setComunes(caso.comunes);
@@ -530,23 +418,36 @@ export default function SimuladorModulosVsDirectaPage() {
             <input
               id="reta"
               type="range"
-              min={Math.floor(RETA_CUOTA_MIN / 10) * 10}
-              max={Math.ceil(RETA_CUOTA_MAX / 10) * 10}
-              step={10}
+              min={RETA_SLIDER_MIN}
+              max={RETA_SLIDER_MAX}
+              step={1}
               value={comunes.retaMensual}
               onChange={e => setComunes({ ...comunes, retaMensual: Number(e.target.value) })}
               className={styles.slider}
             />
             <div className={styles.sliderRange}>
-              <span>{formatCurrency(Math.floor(RETA_CUOTA_MIN / 10) * 10)}</span>
-              <span>{formatCurrency(Math.ceil(RETA_CUOTA_MAX / 10) * 10)}</span>
+              <span>{formatCurrency(RETA_SLIDER_MIN)}</span>
+              <span>{formatCurrency(RETA_SLIDER_MAX)}</span>
             </div>
             <p className={styles.sliderHint}>
               Cuota mensual del RETA según tu base de cotización elegida. El recorrido del
-              slider ({formatCurrency(RETA_CUOTA_MIN)} a {formatCurrency(RETA_CUOTA_MAX)}) es
-              el rango real de la tabla de tramos por rendimiento neto — introduce tu cuota
-              exacta si ya la conoces.
+              deslizador ({formatCurrency(RETA_SLIDER_MIN)} a {formatCurrency(RETA_SLIDER_MAX)})
+              se queda DENTRO del rango real de la tabla de tramos por rendimiento neto
+              ({formatCurrency(RETA_CUOTA_MIN)} a {formatCurrency(RETA_CUOTA_MAX)}) — introduce
+              tu cuota exacta si ya la conoces.
             </p>
+            {coherenciaReta && (
+              <p className={styles.avisoReta} aria-live="polite">
+                <span aria-hidden="true">⚠️</span> Con {formatCurrency(comunes.ingresos)} de
+                ingresos y {formatCurrency(comunes.gastos)} de gastos, tu rendimiento neto sale a{' '}
+                {formatCurrency(coherenciaReta.rendimientoMensual)}/mes, que es el tramo{' '}
+                {coherenciaReta.tramo} de la tabla del RETA: la cuota mínima de ese tramo es{' '}
+                <strong>{formatCurrency(coherenciaReta.cuotaMinimaTramo)}/mes</strong>. Con{' '}
+                {formatCurrency(comunes.retaMensual)} el coste anual que ves más abajo queda{' '}
+                {formatCurrency(coherenciaReta.deficitAnual)} por debajo del mínimo posible, salvo
+                que tengas tarifa plana, pluriactividad o un alta a mitad de año.
+              </p>
+            )}
           </div>
         </div>
 
@@ -556,7 +457,9 @@ export default function SimuladorModulosVsDirectaPage() {
 
           <p className={styles.avisoElegibilidad}>
             <span aria-hidden="true">⚠️</span> Solo determinadas actividades pueden acogerse a módulos: hostelería, comercio menor,
-            transporte, peluquería, taxi y otras listadas en la <strong>Orden HFP/X/2024</strong>.
+            transporte, peluquería, taxi y otras listadas en la{' '}
+            <strong>{ORDEN_MODULOS_VIGENTE.referencia}</strong> ({ORDEN_MODULOS_VIGENTE.boe}),
+            que desarrolla el método para {ORDEN_MODULOS_VIGENTE.ejercicio}.
             Las profesiones liberales <strong>NO</strong> pueden tributar por módulos. Verifica con
             tu asesor fiscal si tu actividad es elegible.
           </p>
@@ -738,7 +641,7 @@ export default function SimuladorModulosVsDirectaPage() {
                 <strong>{formatCurrency(resED.rendimientoNetoPrevio)}</strong>
               </div>
               <div className={styles.lineaResta}>
-                <span>− Reducción 5% (máx. 2.000 €)</span>
+                <span>− Reducción {GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}% (máx. {formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)})</span>
                 <strong>−{formatCurrency(resED.reduccion5pc)}</strong>
               </div>
               <div className={styles.lineaSubtotal}>
@@ -790,7 +693,7 @@ export default function SimuladorModulosVsDirectaPage() {
                 <strong>{formatCurrency(resModulos.rendimientoNetoPrevio)}</strong>
               </div>
               <div className={styles.lineaResta}>
-                <span>− Reducción 5% (máx. 2.000 €)</span>
+                <span>− Reducción {GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}% (máx. {formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)})</span>
                 <strong>−{formatCurrency(resModulos.reduccion5pc)}</strong>
               </div>
               <div className={styles.lineaResta}>
@@ -861,7 +764,7 @@ export default function SimuladorModulosVsDirectaPage() {
             </p>
             <p className={styles.recomendacionAviso}>
               <span aria-hidden="true">⚠️</span> <strong>Importante:</strong> Módulos solo es elegible para tu actividad si está
-              listada en la Orden HFP/X/2024. <strong>Verifica con tu asesor fiscal</strong> antes
+              listada en la {ORDEN_MODULOS_VIGENTE.referencia}. <strong>Verifica con tu asesor fiscal</strong> antes
               de cambiar de régimen.
             </p>
           </div>
@@ -981,7 +884,7 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.faqItem}>
             <strong>¿Qué actividades pueden acogerse a módulos?</strong>
             <p>
-              Solo las recogidas en la <em>Orden HFP/X/2024</em> (anual): hostelería con servicio
+              Solo las recogidas en la <em>{ORDEN_MODULOS_VIGENTE.referencia}</em>, de {ORDEN_MODULOS_VIGENTE.fecha} ({ORDEN_MODULOS_VIGENTE.boe}), que es la del ejercicio {ORDEN_MODULOS_VIGENTE.ejercicio} y se renueva cada año: hostelería con servicio
               de mesa, comercio menor, transporte de mercancías, taxi, peluquerías, talleres
               mecánicos, actividades agrícolas y ganaderas, etc. Las profesiones liberales y la
               mayoría de servicios B2B están excluidas.
@@ -1059,7 +962,7 @@ export default function SimuladorModulosVsDirectaPage() {
               <strong>Calcula el rendimiento por módulos</strong>
               <p>
                 Según los parámetros oficiales de tu actividad (mesas, m², personal asalariado y no
-                asalariado, kWh, vehículos…). Aplicas las reducciones (5%, incentivos al empleo,
+                asalariado, kWh, vehículos…). Aplicas las reducciones ({GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}%, incentivos al empleo,
                 minoración por inversión).
               </p>
             </div>

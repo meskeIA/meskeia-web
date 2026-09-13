@@ -269,12 +269,14 @@ test('CASO 2 (límite) — con Δn = 0 la presión no mueve absolutamente nada',
   await expect(page.locator('#conc-CO₂')).toHaveValue('1.0365');
   await expect(page.locator('#conc-H₂')).toHaveValue('1.0365');
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
-  await expect(mensaje(page)).toContainText('Comprimir no afecta porque Δn = 0');
+  await expect(mensaje(page)).toContainText('Δn = 0 (igual número de moles de gas a cada lado)');
+  await expect(mensaje(page)).toContainText('la presión no mueve el equilibrio');
 
   await page.getByRole('button', { name: /Expandir/ }).click();
   await expect(page.locator('#conc-CO')).toHaveValue('0.4635');
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
-  await expect(mensaje(page)).toContainText('Expandir no afecta porque Δn = 0');
+  await expect(mensaje(page)).toContainText('Expandiste el sistema, pero Δn = 0');
+  await expect(mensaje(page)).toContainText('la presión no mueve el equilibrio');
 
   // La esterificación es el otro Δn = 0 (líquida entera): comprimir tampoco puede tocarla.
   await reaccion(page, /Esterificación/).click();
@@ -321,7 +323,7 @@ test('CASO 2 bis (límite) — la ecuación de van t Hoff mueve Kc bien en exo y
   await expect(page.locator('#temperatura')).toHaveValue('348');
   await expect(valorDe(page, 'Kc (a 348 K)')).toHaveText('0,0024');
   await expect(valorDe(page, 'Kc de referencia (didáctica, a 298 K)')).toHaveText('0,5000');
-  await expect(mensaje(page)).toContainText('Kc disminuye');
+  await expect(mensaje(page)).toContainText('subir T hace DISMINUIR Kc');
   // Q sigue en 0,0093 y ahora Q > Kc ⇒ el sistema retrocede
   await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('← Reactivos');
 
@@ -330,7 +332,7 @@ test('CASO 2 bis (límite) — la ecuación de van t Hoff mueve Kc bien en exo y
   await reaccion(page, /Disociación de PCl₅/).click();
   await page.getByRole('button', { name: /Subir T/ }).click();
   await expect(valorDe(page, 'Kc (a 348 K)')).toHaveText('6,5823');
-  await expect(mensaje(page)).toContainText('Kc aumenta');
+  await expect(mensaje(page)).toContainText('subir T hace AUMENTAR Kc');
   await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
 });
 
@@ -340,7 +342,7 @@ test('el catalizador no toca ni el equilibrio ni Kc', async ({ page }) => {
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,5001');
   await expect(valorDe(page, 'Kc (a 298 K)')).toHaveText('0,5000');
   await expect(valorDe(page, '[NH₃]eq')).toHaveText('1,3071 mol/L');
-  await expect(mensaje(page)).toContainText('NO desplaza el equilibrio ni cambia Kc');
+  await expect(mensaje(page)).toContainText('no desplaza el equilibrio ni cambia Kc');
 });
 
 test('CASO 3 (rechazo) — negativo, vacío y texto no producen NaN ni resultado imposible', async ({ page }) => {
@@ -443,7 +445,7 @@ test('HALLAZGO [2] — la esterificación va marcada endotérmica teniendo ΔH =
   // Con ΔH < 0 la reacción es exotérmica: el rótulo de la tarjeta y el mensaje deben decirlo,
   // en vez de anunciar una subida de Kc que el panel de al lado desmiente.
   expect(rotulo).toContain('exotérmica');
-  expect(texto).toContain('Kc disminuye');
+  expect(texto).toContain('subir T hace DISMINUIR Kc');
 });
 
 test('HALLAZGO [3] — cuatro de las seis Kc no son las de 298 K que la app dice', async ({ page }) => {
@@ -1165,21 +1167,21 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
   });
 
   // ───────────────────────────────────────────────────────────────────────
-  // HALLAZGOS ABIERTOS de esta re-inspección. Van con `test.fail()`, igual que los
-  // seis de 2026-08-21: afirman lo que la app DEBERÍA hacer y hoy fallan a propósito,
-  // así que la suite queda verde mientras el defecto siga ahí. El día que se reparen
-  // saldrán en ROJO («expected to fail, but passed») y habrá que quitarles la marca.
-  // El Inspector no repara.
+  // GUARDAS de la REPARACIÓN del 13/09/2026 — los seis hallazgos de esta re-inspección
+  // (788 a 793) están cerrados y sus testigos se quedan como candados: nacieron con
+  // `test.fail()` y hoy afirman lo que la app tiene que seguir haciendo.
   //
-  // Cada uno afirma UNA sola cosa que hoy es falsa; lo que va antes es contexto que ya
-  // es cierto y lo seguirá siendo tras la reparación, para que el testigo no se quede
-  // atascado en verde por un motivo distinto del que lo hizo nacer.
+  // El de más fondo es el [788]: el mensaje «Le Chatelier dice» ya no lleva la dirección
+  // cableada al TIPO de perturbación. La consecuencia se compone en el render desde
+  // `direccion` —la misma fuente que pinta la flecha y la fila «Dirección de
+  // desplazamiento»—, así que por construcción no pueden volver a discrepar. Lo único que
+  // el estado recuerda del clic es QUÉ se hizo, y el efecto sobre Kc, que sí depende solo
+  // del tipo (van 't Hoff) y es correcto siempre.
   // ───────────────────────────────────────────────────────────────────────
 
-  test('CASO C (rechazo) — el botón «Subir T» saca al sistema del rango que la app declara suyo', async ({
+  test('[789] el botón «Subir T» ya no saca al sistema del rango que la app declara suyo', async ({
     page,
   }) => {
-    test.fail();
     await esperarHidratacion(page, INPUTS_TESTIGO);
     await reaccion(page, /proceso de contacto/).click();
 
@@ -1196,10 +1198,9 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
     expect(T).toBeLessThanOrEqual(2000);
   });
 
-  test('HALLAZGO [7] — el mensaje de Le Chatelier sigue cableado al TIPO de perturbación', async ({
+  test('[788] el mensaje de Le Chatelier lee el estado real, no el tipo de perturbación', async ({
     page,
   }) => {
-    test.fail();
     await esperarHidratacion(page, INPUTS_TESTIGO);
     await reaccion(page, /Haber-Bosch/).click();
 
@@ -1227,10 +1228,9 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
     await expect(mensaje(page)).toContainText('los reactivos (←)');
   });
 
-  test('HALLAZGO [7 bis] — ida y vuelta de T: la app se declara en equilibrio y desplazada a la vez', async ({
+  test('[788] ida y vuelta de T: el mensaje y la flecha dicen lo mismo', async ({
     page,
   }) => {
-    test.fail();
     await esperarHidratacion(page, INPUTS_TESTIGO);
     await reaccion(page, /proceso de contacto/).click();
 
@@ -1252,10 +1252,9 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
     await expect(mensaje(page)).not.toContainText('hacia los productos (→)');
   });
 
-  test('HALLAZGO [8] — el caso 6 del aula presenta una Kc didáctica como la constante a 298 K', async ({
+  test('[790] el caso 6 del aula no presenta su Kc didáctica como una constante medida', async ({
     page,
   }) => {
-    test.fail();
     await esperarHidratacion(page, INPUTS_TESTIGO);
 
     // La reparación del hallazgo [3] retiró de la interfaz el rótulo «Kc (a 298 K,
@@ -1270,10 +1269,9 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
     await expect(caso6).not.toContainText('0,04 a 298 K');
   });
 
-  test('HALLAZGO [9] — la tabla educativa clasifica la esterificación fuera del convenio de la app', async ({
+  test('[791] la tabla educativa clasifica la esterificación con el convenio de la app', async ({
     page,
   }) => {
-    test.fail();
     await esperarHidratacion(page, INPUTS_TESTIGO);
 
     // El convenio propio de la app es «exotérmica ⟺ ΔH < 0, sin excepciones», y la tarjeta de
@@ -1288,10 +1286,9 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
     await expect(fila).toContainText('Exotérmica');
   });
 
-  test('HALLAZGO [10] — la FAQ llama «líquidos puros» a la reacción cuyas 4 especies SÍ entran en Q', async ({
+  test('[792] la FAQ ya no llama «líquidos puros» a la reacción cuyas 4 especies SÍ entran en Q', async ({
     page,
   }) => {
-    test.fail();
     await esperarHidratacion(page, INPUTS_TESTIGO);
 
     // El convenio que decide la respuesta del caso 4 (Q = 1 / 0,5 = 2) es que la
@@ -1299,13 +1296,18 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
     // puros», y otra FAQ del mismo bloque explica que los líquidos puros NO aparecen en Kc:
     // leídas juntas dan Q = 1, que es la respuesta que el caso 4 suspende.
     const faq = page.locator('xpath=//strong[contains(., "Δn = 0")]/parent::*');
-    await expect(faq).not.toContainText('líquidos puros');
+    const texto = (await faq.innerText()).replace(/\s+/g, ' ');
+    // La aserción NO puede ser «que no aparezca la expresión»: la reparación buena la usa
+    // para NEGARLA («no son líquidos puros»), y prohibir la cadena obligaría a quitar justo
+    // la aclaración que deshace la confusión. Lo que se protege es que no se la presente
+    // como EJEMPLO de líquidos puros, y que quede dicho que sus especies sí cuentan.
+    expect(texto).not.toMatch(/esterificación \(líquidos puros\)/i);
+    expect(texto).toMatch(/sus cuatro especies sí entran en Kc/i);
   });
 
-  test('HALLAZGO [11] — el JSON-LD promete un gráfico de concentraciones vs tiempo que no existe', async ({
+  test('[793] el JSON-LD solo declara rasgos que la app tiene', async ({
     page,
   }) => {
-    test.fail();
     // El panel 4 es un gráfico de BARRAS del estado actual: no hay eje de tiempo en ninguna
     // parte de la app, ni la palabra «tiempo» aparece en el <main>. La promesa viaja en los
     // `features` del WebApplication, que es lo que leen Google y los asistentes.

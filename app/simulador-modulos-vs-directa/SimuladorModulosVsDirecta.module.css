@@ -185,6 +185,23 @@
   color: #92400e;
 }
 
+/* Aviso de coherencia de la cuota RETA con el tramo por rendimiento (hallazgo 812).
+   Va junto al deslizador, no en el panel de resultados: corrige la ENTRADA. */
+.avisoReta {
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  padding: 0.75rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #78350f;
+  margin: 0.6rem 0 0;
+}
+
+.avisoReta strong {
+  color: #92400e;
+}
+
 /* Selector de actividad */
 .actividadSelector {
   display: grid;
@@ -701,6 +718,15 @@
 }
 
 [data-theme='dark'] .avisoElegibilidad strong {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .avisoReta {
+  background: #2d1b00;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .avisoReta strong {
   color: #fcd34d;
 }
 

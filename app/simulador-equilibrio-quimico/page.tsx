@@ -76,7 +76,26 @@ export default function SimuladorEquilibrioQuimicoPage() {
   >({});
   const [veredictos, setVeredictos] = useState<Record<number, Comprobacion>>({});
   const [solucionesAbiertas, setSolucionesAbiertas] = useState<Record<number, boolean>>({});
-  const [mensaje, setMensaje] = useState<string>('Selecciona una reacción y aplica una perturbación para ver Le Chatelier en acción.');
+  /**
+   * Lo que el usuario acaba de HACER, no lo que pasa después.
+   *
+   * ⚠️ 13/09/2026 — hasta hoy aquí se guardaba la frase entera, con su «se desplaza hacia
+   * los productos (→)» cableado al TIPO de perturbación (hallazgo 788 del Inspector). Esa
+   * predicción solo vale si el sistema estaba EN equilibrio antes de tocarlo, y desde la
+   * SEGUNDA perturbación ya no lo está: el mensaje contradecía a la flecha y a la fila
+   * «Dirección de desplazamiento» de la misma pantalla, que leen Q frente a Kc y aciertan.
+   * Dos clics bastaban, por dos caminos distintos (encadenar concentraciones, o subir y
+   * volver a bajar la temperatura). La reparación del 21/08 no tocó esta raíz: lo que hizo
+   * fue que el estado de partida SEA un equilibrio, de modo que la PRIMERA siempre concuerda.
+   *
+   * Ahora la consecuencia se compone en el render desde `direccion`, que es exactamente la
+   * misma fuente que pinta la flecha: no pueden volver a decir cosas distintas.
+   */
+  const [accion, setAccion] = useState<string>(
+    'Selecciona una reacción y aplica una perturbación para ver Le Chatelier en acción.',
+  );
+  /** Efecto sobre Kc, que SÍ depende solo del tipo (van 't Hoff), no del estado. */
+  const [notaKc, setNotaKc] = useState<string>('');
 
   const casosResueltos = useMemo(
     () => Object.values(veredictos).filter((v) => v.correcto).length,
@@ -118,7 +137,8 @@ export default function SimuladorEquilibrioQuimicoPage() {
     setConcentraciones(equilibrioDePartida(nueva));
     setTemperaturaK(298);
     setHistorialPerturbaciones([]);
-    setMensaje(`Reacción cargada: ${nueva.nombre}. Pulsa una perturbación para experimentar.`);
+    setAccion(`Reacción cargada: ${nueva.nombre}. Pulsa una perturbación para experimentar.`);
+    setNotaKc('');
   }, []);
 
   /**
@@ -176,9 +196,8 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, especie, cantidad, descripcion: `Añadido ${formatNumber(cantidad, 2)} mol/L de ${especie}` },
       ]);
-      setMensaje(
-        `Añadiste ${especie}: el sistema se opone al cambio consumiendo parte de ${especie} y desplazándose hacia los productos (→).`,
-      );
+      setAccion(`Añadiste ${formatNumber(cantidad, 2)} mol/L de ${especie} (un reactivo).`);
+      setNotaKc('');
       return;
     }
     if (tipo === 'quitar-reactivo' && especie) {
@@ -190,9 +209,8 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, especie, cantidad, descripcion: `Retirado ${formatNumber(cantidad, 2)} mol/L de ${especie}` },
       ]);
-      setMensaje(
-        `Retiraste ${especie}: el sistema se opone al cambio formando más ${especie} y desplazándose hacia los reactivos (←).`,
-      );
+      setAccion(`Retiraste ${formatNumber(cantidad, 2)} mol/L de ${especie} (un reactivo).`);
+      setNotaKc('');
       return;
     }
     if (tipo === 'anadir-producto' && especie) {
@@ -201,9 +219,8 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, especie, cantidad, descripcion: `Añadido ${formatNumber(cantidad, 2)} mol/L de ${especie}` },
       ]);
-      setMensaje(
-        `Añadiste ${especie}: el sistema se opone al cambio consumiendo parte de ${especie} y desplazándose hacia los reactivos (←).`,
-      );
+      setAccion(`Añadiste ${formatNumber(cantidad, 2)} mol/L de ${especie} (un producto).`);
+      setNotaKc('');
       return;
     }
     if (tipo === 'quitar-producto' && especie) {
@@ -215,52 +232,49 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, especie, cantidad, descripcion: `Retirado ${formatNumber(cantidad, 2)} mol/L de ${especie}` },
       ]);
-      setMensaje(
-        `Retiraste ${especie}: el sistema se opone al cambio formando más ${especie} y desplazándose hacia los productos (→).`,
-      );
+      setAccion(`Retiraste ${formatNumber(cantidad, 2)} mol/L de ${especie} (un producto).`);
+      setNotaKc('');
       return;
     }
     if (tipo === 'subir-temperatura') {
-      const Tnueva = temperaturaK + dT;
+      // ⚠️ 13/09/2026 — el botón subía sin tope (hallazgo 789): el campo publica max=2000,
+      // el motor de los casos rechaza cualquier T fuera de [T_MIN_K, T_MAX_K] con «Esa
+      // temperatura está fuera del rango del simulador», y este botón dejaba el panel
+      // rotulando «Kc (a 2100 K)». Las dos mitades de la app no coincidían en qué es una
+      // temperatura válida. El de bajar ya acotaba con Math.max.
+      const Tnueva = Math.min(temperaturaK + dT, T_MAX_K);
       setTemperaturaK(Tnueva);
       setHistorialPerturbaciones((h) => [
         ...h,
         { tipo, descripcion: `Temperatura subida +${dT} K (ahora ${Tnueva} K)` },
       ]);
-      if (esExotermica) {
-        setMensaje(
-          `Subiste T en una reacción exotérmica (ΔH<0): el sistema absorbe el calor extra desplazándose hacia los reactivos (←). Kc disminuye.`,
-        );
-      } else {
-        setMensaje(
-          `Subiste T en una reacción endotérmica (ΔH>0): el sistema absorbe el calor extra desplazándose hacia los productos (→). Kc aumenta.`,
-        );
-      }
+      setAccion(`Subiste la temperatura ${dT} K (ahora ${Tnueva} K).`);
+      setNotaKc(
+        esExotermica
+          ? 'En una reacción exotérmica (ΔH<0), subir T hace DISMINUIR Kc (van \'t Hoff).'
+          : 'En una reacción endotérmica (ΔH>0), subir T hace AUMENTAR Kc (van \'t Hoff).',
+      );
       return;
     }
     if (tipo === 'bajar-temperatura') {
-      const Tnueva = Math.max(temperaturaK - dT, 100);
+      const Tnueva = Math.max(temperaturaK - dT, T_MIN_K);
       setTemperaturaK(Tnueva);
       setHistorialPerturbaciones((h) => [
         ...h,
         { tipo, descripcion: `Temperatura bajada −${dT} K (ahora ${Tnueva} K)` },
       ]);
-      if (esExotermica) {
-        setMensaje(
-          `Bajaste T en una reacción exotérmica (ΔH<0): el sistema libera menos calor y se desplaza hacia los productos (→). Kc aumenta.`,
-        );
-      } else {
-        setMensaje(
-          `Bajaste T en una reacción endotérmica (ΔH>0): el sistema libera el déficit de calor desplazándose hacia los reactivos (←). Kc disminuye.`,
-        );
-      }
+      setAccion(`Bajaste la temperatura ${dT} K (ahora ${Tnueva} K).`);
+      setNotaKc(
+        esExotermica
+          ? 'En una reacción exotérmica (ΔH<0), bajar T hace AUMENTAR Kc (van \'t Hoff).'
+          : 'En una reacción endotérmica (ΔH>0), bajar T hace DISMINUIR Kc (van \'t Hoff).',
+      );
       return;
     }
     if (tipo === 'comprimir') {
       if (dN === 0) {
-        setMensaje(
-          `Comprimir no afecta porque Δn = 0 (igual número de moles de gas a cada lado). Kc y la posición no cambian.`,
-        );
+        setAccion('Comprimiste el sistema, pero Δn = 0 (igual número de moles de gas a cada lado).');
+        setNotaKc('Con Δn = 0 la presión no mueve el equilibrio: Kc y la posición no cambian.');
         setHistorialPerturbaciones((h) => [
           ...h,
           { tipo, descripcion: `Compresión (sin efecto, Δn=0)` },
@@ -279,22 +293,16 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, descripcion: `Compresión ×${factorP} (volumen reducido a la mitad)` },
       ]);
-      if (dN < 0) {
-        setMensaje(
-          `Comprimiste el sistema (Δn=${dN}<0): se desplaza hacia el lado con menos moles de gas, los productos (→).`,
-        );
-      } else {
-        setMensaje(
-          `Comprimiste el sistema (Δn=${dN}>0): se desplaza hacia el lado con menos moles de gas, los reactivos (←).`,
-        );
-      }
+      setAccion(
+        `Comprimiste el sistema a la mitad de volumen (Δn = ${formatNumber(dN, 0)}): las concentraciones de los gases se duplican.`,
+      );
+      setNotaKc('Kc no cambia con la presión: lo que cambia es Q, porque cambian las concentraciones.');
       return;
     }
     if (tipo === 'expandir') {
       if (dN === 0) {
-        setMensaje(
-          `Expandir no afecta porque Δn = 0. Kc y la posición no cambian.`,
-        );
+        setAccion('Expandiste el sistema, pero Δn = 0 (igual número de moles de gas a cada lado).');
+        setNotaKc('Con Δn = 0 la presión no mueve el equilibrio: Kc y la posición no cambian.');
         setHistorialPerturbaciones((h) => [
           ...h,
           { tipo, descripcion: `Expansión (sin efecto, Δn=0)` },
@@ -312,15 +320,10 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, descripcion: `Expansión ×${factorP} (volumen duplicado)` },
       ]);
-      if (dN < 0) {
-        setMensaje(
-          `Expandiste el sistema (Δn=${dN}<0): se desplaza hacia el lado con más moles de gas, los reactivos (←).`,
-        );
-      } else {
-        setMensaje(
-          `Expandiste el sistema (Δn=${dN}>0): se desplaza hacia el lado con más moles de gas, los productos (→).`,
-        );
-      }
+      setAccion(
+        `Expandiste el sistema al doble de volumen (Δn = ${formatNumber(dN, 0)}): las concentraciones de los gases se reducen a la mitad.`,
+      );
+      setNotaKc('Kc no cambia con la presión: lo que cambia es Q, porque cambian las concentraciones.');
       return;
     }
     if (tipo === 'catalizador') {
@@ -328,8 +331,9 @@ export default function SimuladorEquilibrioQuimicoPage() {
         ...h,
         { tipo, descripcion: 'Añadido catalizador' },
       ]);
-      setMensaje(
-        `Añadiste un catalizador: solo acelera la llegada al equilibrio en ambos sentidos por igual. NO desplaza el equilibrio ni cambia Kc.`,
+      setAccion('Añadiste un catalizador.');
+      setNotaKc(
+        'Un catalizador acelera por igual los dos sentidos: no desplaza el equilibrio ni cambia Kc.',
       );
       return;
     }
@@ -337,14 +341,16 @@ export default function SimuladorEquilibrioQuimicoPage() {
 
   const aplicarEquilibrioPredicho = () => {
     setConcentraciones({ ...equilibrioPredicho });
-    setMensaje('Aplicado el nuevo equilibrio: Q ≈ Kc. El sistema está estabilizado.');
+    setAccion('Aplicaste el nuevo equilibrio.');
+    setNotaKc('');
   };
 
   const reiniciar = () => {
     setConcentraciones(equilibrioDePartida(reaccion));
     setTemperaturaK(298);
     setHistorialPerturbaciones([]);
-    setMensaje('Estado inicial restaurado.');
+    setAccion('Estado inicial restaurado.');
+    setNotaKc('');
   };
 
   // ============================================================
@@ -427,8 +433,8 @@ export default function SimuladorEquilibrioQuimicoPage() {
               <input
                 id="temperatura"
                 type="number"
-                min={100}
-                max={2000}
+                min={T_MIN_K}
+                max={T_MAX_K}
                 step={10}
                 value={temperaturaK}
                 onChange={(ev) => {
@@ -639,8 +645,18 @@ export default function SimuladorEquilibrioQuimicoPage() {
             </button>
           </div>
 
+          {/* La consecuencia sale de `direccion`, que es lo mismo que pinta la flecha y la
+              fila «Dirección de desplazamiento»: por construcción no pueden discrepar
+              (hallazgo 788). Lo único que se recuerda del clic es qué se hizo. */}
           <div className={styles.mensajePedagogico} role="status">
-            <strong>Le Chatelier dice:</strong> {mensaje}
+            <strong>Le Chatelier dice:</strong> {accion}{' '}
+            {direccion === 'derecha' &&
+              `Ahora Q = ${formatNumber(Q, 4)} está por DEBAJO de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema avanza hacia los productos (→) hasta recuperar el equilibrio.`}
+            {direccion === 'izquierda' &&
+              `Ahora Q = ${formatNumber(Q, 4)} está por ENCIMA de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema retrocede hacia los reactivos (←) hasta recuperar el equilibrio.`}
+            {direccion === 'equilibrio' &&
+              `Q = ${formatNumber(Q, 4)} y Kc = ${formatNumber(KcEfectiva, 4)} coinciden: el sistema está en equilibrio y no se mueve.`}
+            {notaKc && <> {notaKc}</>}
           </div>
 
           {historialPerturbaciones.length > 0 && (
@@ -881,7 +897,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
                   <td>Esterificación</td>
                   <td>Ácido + alcohol ⇌ éster + H₂O</td>
                   <td>4,0</td>
-                  <td>Casi neutra</td>
+                  <td>Exotérmica</td>
                   <td>0</td>
                   <td>Aromas, disolventes</td>
                 </tr>
@@ -977,7 +993,9 @@ export default function SimuladorEquilibrioQuimicoPage() {
               <p>
                 Nada: si el número de moles de gas es igual a ambos lados, comprimir o expandir
                 multiplica todas las concentraciones por el mismo factor y Q sigue igual a Kc.
-                Ejemplos del simulador: water-gas shift y esterificación (líquidos puros).
+                Ejemplos del simulador: water-gas shift y esterificación. Ojo con la segunda:
+                al ser TODA líquida se trata como una disolución, así que sus cuatro especies sí
+                entran en Kc — no son «líquidos puros» en el sentido de la pregunta de más abajo.
               </p>
             </div>
             <div className={styles.faqItem}>

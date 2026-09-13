@@ -196,6 +196,15 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Consumido por**: `simulador-modulos-vs-directa` (hallazgo 567 del Inspector, reparado 02/09/2026: antes los umbrales estaban repetidos a mano en tres sitios del JSX sin aplicarse al cálculo de elegibilidad).
 - **Verificado**: 2026-09-02.
 
+#### `estimacion-directa.ts` — Estimación directa simplificada del IRPF (provisiones y gastos de difícil justificación)
+- **Contiene**: `GASTOS_DIFICIL_JUSTIFICACION_EDS` (5 % del rendimiento neto positivo, tope 2.000 €/año), `LIMITE_CIFRA_NEGOCIO_EDS` (600.000 € del art. 28 RIRPF) y la función `reduccionGastosDificilJustificacion`, que aplica el porcentaje y lo topa.
+- **Normativa**: art. 30 del Reglamento del IRPF (RD 439/2007), leído en el Manual práctico de Renta de la AEAT.
+- **Vigilar**: cualquier LPGE o RDL que vuelva a elevar el porcentaje con efectos de un solo ejercicio, que es exactamente lo que pasó en 2023.
+- **Cadencia**: anual (ene), a la vez que el resto del IRPF.
+- **Alerta metodológica**: ⚠️ **el porcentaje ya ha sido temporal una vez y por eso existe este módulo.** La Ley 31/2022 (PGE 2023) lo subió del 5 % al 7 % solo para el ejercicio 2023 y no se prorrogó; el repositorio se quedó con las dos cifras a la vez —el 7 % en `deduccionAutonomoIRPF.ts` y el 5 % en otras cuatro piezas, todas citando el mismo artículo— hasta el 13/09/2026 (hallazgo 811 del Inspector). Una subida transitoria es el caso normal aquí, no la excepción: al re-sellar, comprobar SIEMPRE a qué ejercicio se refiere la cifra que se lee.
+- **Consumido por**: `lib/calculadoras/modulosVsDirecta.ts` (app `simulador-modulos-vs-directa` + tool `comparar_modulos_vs_directa` del MCP de Delegum) y `lib/calculadoras/deduccionAutonomoIRPF.ts` (tool de gastos deducibles). La prosa de `selector-regimen-fiscal-autonomo`, `checklist-cambio-regimen-autonomo` y `visualizador-estructura-costes-autonomo` cita el 5 % a mano y aún no lo importa.
+- **Verificado**: 2026-09-13.
+
 #### `pensiones.ts` — Jubilación, viudedad, mínimos, brecha de género, reclamación previa (5 bloques con META)
 - **Contiene**: edad ordinaria (tabla progresiva 2024-2027+), años mínimos, % por años cotizados, límites máx/mín del ejercicio, base reguladora, **sistema dual DT 40ª LGSS** (RDL 2/2023: elección 25/29 años en despliegue), coeficientes de anticipada, límites plan de pensiones, jubilación parcial, viudedad, complemento a mínimos, complemento brecha género (art. 60 LGSS + RDL 3/2026 + doctrina STJUE C-623/23) y el trámite de **reclamación previa** ante el INSS (`RECLAMACION_PREVIA_SS`, art. 71 LRJS).
 - **Normativa**: LGSS (RDL 8/2015) + Ley 21/2021 + RDL 2/2023 + RDL 16/2025. El bloque de reclamación previa NO sale de ahí: Ley 36/2011 (LRJS) + art. 30.2 Ley 39/2015, con sello aparte.

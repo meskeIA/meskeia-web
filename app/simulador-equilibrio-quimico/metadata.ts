@@ -40,7 +40,7 @@ export const jsonLd = generateWebAppSchema({
     'Aplicación interactiva del Principio de Le Chatelier',
     'Perturbaciones: añadir/quitar especies, ΔT, ΔP, catalizador',
     'Cálculo del cociente Q y comparación con Kc',
-    'Gráfico de concentraciones vs tiempo',
+    'Gráfico de barras de las concentraciones del estado actual',
     'Predicción visual del desplazamiento',
     'En español',
   ],

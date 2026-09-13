@@ -193,6 +193,37 @@ export const REDUCCION_DISCAPACIDAD_33_IS = 47858.59;    // Grado 33%–64%
 export const REDUCCION_DISCAPACIDAD_65_IS = 150253.03;   // Grado ≥65%
 export const PORC_AJUAR_DOMESTICO_IS = 0.03;             // 3% de la masa hereditaria
 
+/**
+ * Plazo de presentación y prórroga del ISD en adquisiciones por causa de muerte.
+ *
+ * Arts. 67.1.a) y 68 del Reglamento del ISD (RD 1629/1991). Verificado el 13/09/2026
+ * contra el BOE y la sede de la AEAT (modelo 650, «Plazos de presentación»).
+ *
+ * ⚠  Existe porque el plazo iba tecleado y SIN norma citada en cuatro sitios de
+ * `simulador-heredar-vivienda` y doce de `estimador-impuesto-sucesiones` (hallazgos 782 y
+ * 801 del Inspector), en frases que sí citaban la norma del recargo de al lado. Es el mismo
+ * caso que PLAZO_ITP, creado el 11/09/2026 para el tributo vecino.
+ *
+ * ⚠  La prórroga NO es gratis: devenga intereses de demora desde que vence el plazo de
+ * seis meses hasta la presentación (art. 68.3 RISD). Decir «prórroga de otros 6 meses» sin
+ * más hace pensar lo contrario, y la misma URL de `estimador-impuesto-sucesiones` afirmaba
+ * las dos cosas a la vez (hallazgo 795).
+ */
+export const PLAZO_ISD = {
+  /** Meses desde el fallecimiento para presentar la autoliquidación (art. 67.1.a). */
+  mesesPresentacion: 6,
+  /** Meses de la prórroga, única y por un plazo igual al de presentación (art. 68.1). */
+  mesesProrroga: 6,
+  /** La prórroga se pide dentro de los cinco primeros meses (art. 68.1). */
+  mesesParaPedirProrroga: 5,
+  /** La prórroga devenga intereses de demora (art. 68.3). */
+  prorrogaDevengaIntereses: true,
+  norma: 'arts. 67.1.a) y 68 del Reglamento del ISD (RD 1629/1991)',
+  urlOficial:
+    'https://sede.agenciatributaria.gob.es/Sede/no-residentes/impuesto-sobre-sucesiones-donaciones/adquisiciones-mortis-causa-modelo-650/plazos-presentacion.html',
+  verificado: '2026-09-13',
+};
+
 // ─── Reducciones especiales de Cataluña (Ley 19/2010) ────────────────────────
 //
 // Mismas figuras que las estatales de arriba, con importes propios. Se listan aparte porque

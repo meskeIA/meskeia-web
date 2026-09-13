@@ -24,6 +24,28 @@ export const FISCAL_MODULOS_IRPF_META = {
   nota: 'Límites cuantitativos vigentes desde 2016 y prorrogados sin cambios ejercicio a ejercicio (la Orden HAC/1425/2025 los mantiene para 2026). Se excluye del régimen si se supera CUALQUIERA de los tres.',
 };
 
+/**
+ * Orden anual que desarrolla el método de estimación objetiva y publica el listado de
+ * actividades que pueden acogerse a módulos, con sus signos, índices y módulos.
+ *
+ * ⚠️ Existe porque hasta el 13/09/2026 tres avisos visibles de
+ * `simulador-modulos-vs-directa` citaban un comodín sin sustituir, «Orden HFP/X/2024»,
+ * que no es una referencia localizable (hallazgo 810 del Inspector), y el faqJsonLd de
+ * la misma app citaba una cuarta cosa. La cita se deriva de aquí, no se teclea.
+ *
+ * Verificado 2026-09-13 contra el BOE: la Orden HAC/1425/2025, de 9 de diciembre,
+ * mantiene para 2026 la estructura y los importes de la Orden HAC/1347/2024 (ejercicio
+ * 2025) y fija una reducción general del 5 % sobre el rendimiento neto de módulos.
+ */
+export const ORDEN_MODULOS_VIGENTE = {
+  referencia: 'Orden HAC/1425/2025',
+  fecha: '9 de diciembre de 2025',
+  ejercicio: 2026,
+  boe: 'BOE-A-2025-25272',
+  url: 'https://www.boe.es/buscar/act.php?id=BOE-A-2025-25272',
+  anterior: 'Orden HAC/1347/2024 (ejercicio 2025)',
+};
+
 export const LIMITES_EXCLUSION_MODULOS_2025 = {
   // Volumen de rendimientos íntegros del conjunto de actividades (año anterior)
   ingresosConjuntoActividades: 250000,

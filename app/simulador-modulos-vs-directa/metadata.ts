@@ -39,7 +39,7 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo IRPF + RETA orientativo',
     '4 casos preconfigurados (bar rentable, bar con pérdidas, comercio, profesional)',
     'Aviso sobre actividades elegibles a módulos',
-    'IRPF calculado según los tramos de la LPGE 2025; módulos con fórmula didáctica simplificada, no los coeficientes oficiales de la Orden HFP',
+    'IRPF calculado con la escala general del art. 63 de la Ley 35/2006 del IRPF; módulos con fórmula didáctica simplificada, no los coeficientes oficiales de la Orden anual de módulos',
     'Solo orientativo — no sustituye al asesor fiscal',
     'En español',
   ],
@@ -63,7 +63,7 @@ export const faqJsonLd = {
       name: '¿Qué actividades pueden acogerse al régimen de módulos en 2025?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2025 pueden usar módulos las actividades recogidas en la Orden HFP/1359/2023 (actualizada anualmente por Hacienda), entre ellas restaurantes y bares, comercio minorista de determinados sectores, transporte de viajeros y mercancías, peluquerías y servicios similares. Quedan excluidas si el volumen de ingresos supera 250.000 € anuales, si la facturación a otros empresarios y profesionales supera 125.000 € anuales, o si las compras en bienes y servicios superan 250.000 €.',
+        text: 'Pueden usar módulos las actividades recogidas en la Orden anual de estimación objetiva — para 2026, la Orden HAC/1425/2025, de 9 de diciembre (BOE-A-2025-25272), que mantiene el listado y los importes de la Orden HAC/1347/2024 del ejercicio anterior, entre ellas restaurantes y bares, comercio minorista de determinados sectores, transporte de viajeros y mercancías, peluquerías y servicios similares. Quedan excluidas si el volumen de ingresos supera 250.000 € anuales, si la facturación a otros empresarios y profesionales supera 125.000 € anuales, o si las compras en bienes y servicios superan 250.000 €.',
       },
     },
     {
@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿El simulador de módulos vs estimación directa reemplaza al asesor fiscal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. El simulador calcula el IRPF de ambos regímenes con los tramos oficiales de la LPGE 2025, pero el rendimiento de módulos usa una fórmula didáctica simplificada por actividad, no los coeficientes reales que publica la Orden HFP anual. Sirve para entender la lógica de la comparación, no para presentar una declaración. La decisión final debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.',
+        text: 'No. El simulador calcula el IRPF de ambos regímenes con la escala general del art. 63 de la Ley 35/2006 del IRPF, pero el rendimiento de módulos usa una fórmula didáctica simplificada por actividad, no los coeficientes reales que publica la Orden anual de módulos (para 2026, la Orden HAC/1425/2025). Sirve para entender la lógica de la comparación, no para presentar una declaración. La decisión final debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.',
       },
     },
   ],

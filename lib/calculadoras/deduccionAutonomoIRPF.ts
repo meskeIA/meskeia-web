@@ -27,8 +27,10 @@
  *    - Afectación parcial del inmueble: porcentaje de la superficie
  *
  * C) GASTOS DE DIFÍCIL JUSTIFICACIÓN — EDS (art. 30.2.4 RIRPF)
- *    - 7% del rendimiento neto previo (máximo 2.000 €/año) — solo EDS
- *    - Sustituyó la deducción del 5% hasta 2023; subió a 7% desde 2023
+ *    - 5% del rendimiento neto previo positivo (máximo 2.000 €/año) — solo EDS
+ *    - El 7% rigió SOLO en el ejercicio 2023 (DA 53ª LIRPF, Ley 31/2022) y no se prorrogó;
+ *      desde 2024 vuelve a ser el 5% del art. 30 RIRPF. El porcentaje y el tope los pone
+ *      data/fiscal/estimacion-directa.ts
  *
  * D) DIETAS Y GASTOS DE MANUTENCIÓN (art. 30.2.6 LIRPF)
  *    - El autónomo puede deducir sus propias dietas si:
@@ -60,12 +62,22 @@
  */
 
 import { TRAMOS_IRPF_2025, cuotaEscalaGeneral, MINIMOS_IRPF_2025, FISCAL_IRPF_META } from '@/data/fiscal';
+import {
+  GASTOS_DIFICIL_JUSTIFICACION_EDS,
+  reduccionGastosDificilJustificacion,
+} from '@/data/fiscal/estimacion-directa';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 
 const PCT_SUMINISTROS_DEDUCIBLE = 30;        // % sobre la parte proporcional
-const PCT_DIFICIL_JUSTIFICACION_EDS = 7;     // % rendimiento neto previo (EDS)
-const LIMITE_DIFICIL_JUSTIFICACION = 2000;   // € máximo anual
+// Provisiones y gastos de difícil justificación de la EDS (art. 30.2.ª RIRPF).
+// ⚠  13/09/2026 — hasta hoy este motor aplicaba un 7 % al mismo concepto que el resto del
+// repositorio cifraba en el 5 %, citando ambos el mismo artículo (hallazgo 811 del
+// Inspector). El 7 % fue el porcentaje TRANSITORIO de 2023 y no se prorrogó: el Manual
+// práctico de Renta 2025 de la AEAT mantiene el 5 %. Ahora sale de data/fiscal, que es lo
+// único que el Vigía Normativo puede re-sellar.
+const PCT_DIFICIL_JUSTIFICACION_EDS = GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje;
+const LIMITE_DIFICIL_JUSTIFICACION = GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual;
 const DIETA_MAX_ESPANIA_SIN_PERNOCTAR = 26.67; // €/día (art. 9 RIRPF)
 const DIETA_MAX_ESPANIA_PERNOCTANDO = 53.34;
 const DIETA_MAX_EXTRANJERO_SIN_PERNOCTAR = 48.08;
@@ -435,10 +447,7 @@ export function calcularDeduccionAutonomoIRPF(p: ParametrosDeduccionAutonomoIRPF
   // Deducción gastos difícil justificación (solo EDS)
   let deduccionDificilJustificacion = 0;
   if (p.modalidadEstimacion === 'simplificada' && rendimientoNetoPrevio > 0) {
-    deduccionDificilJustificacion = r(Math.min(
-      rendimientoNetoPrevio * PCT_DIFICIL_JUSTIFICACION_EDS / 100,
-      LIMITE_DIFICIL_JUSTIFICACION
-    ));
+    deduccionDificilJustificacion = r(reduccionGastosDificilJustificacion(rendimientoNetoPrevio));
   }
 
   const rendimientoNetoActividad = r(rendimientoNetoPrevio - deduccionDificilJustificacion);
@@ -473,7 +482,7 @@ export function calcularDeduccionAutonomoIRPF(p: ParametrosDeduccionAutonomoIRPF
   const minimoPersonal = MINIMOS_IRPF_2025.personal;
   const cuotaDelMinimoPersonal = cuotaEscala(Math.min(minimoPersonal, rendimientoNetoActividad));
 
-  advertencias.push(`Gastos de difícil justificación: solo aplicable en estimación directa SIMPLIFICADA. El ${PCT_DIFICIL_JUSTIFICACION_EDS}% del rendimiento neto previo, con un máximo de ${LIMITE_DIFICIL_JUSTIFICACION.toLocaleString('es-ES')} €/año (art. 30.2.4 RIRPF).`);
+  advertencias.push(`Gastos de difícil justificación: solo aplicable en estimación directa SIMPLIFICADA. El ${PCT_DIFICIL_JUSTIFICACION_EDS}% del rendimiento neto previo, con un máximo de ${LIMITE_DIFICIL_JUSTIFICACION.toLocaleString('es-ES')} €/año (${GASTOS_DIFICIL_JUSTIFICACION_EDS.norma}).`);
   advertencias.push('El vehículo de uso mixto (laboral y personal) NO es deducible en estimación directa salvo que se acredite uso exclusivo para la actividad (muy restrictivo según AEAT). Para agentes comerciales y transporte: posible 100%.');
   advertencias.push(
     `La cuota se obtiene aplicando la escala general TRAMO A TRAMO (art. 63 LIRPF): el ${tipoIRPFEstimado} % ` +

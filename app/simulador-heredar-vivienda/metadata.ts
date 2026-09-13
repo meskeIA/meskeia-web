@@ -55,6 +55,10 @@ const isdDe = (ccaa: string, viviendaHabitual: boolean) =>
     grupo: 'II',
     edadHeredero: EJEMPLO_COMPARATIVA.edad,
     ...(viviendaHabitual ? { viviendaHabitual: EJEMPLO_COMPARATIVA.valor } : {}),
+    // Como la página desde el 13/09/2026: el ajuar del art. 15 LISD entra en la base. Sin
+    // esto, el faqJsonLd publicaría una diferencia que el simulador no sabe reproducir — que
+    // es la forma exacta del hallazgo 275, y lo que este canal ya arrastró una vez.
+    incluyeAjuar: true,
   }).cuotaFinal;
 const DIFERENCIA_MADRID_CATALUNA = Math.round(
   Math.abs(isdDe('cataluna', false) - isdDe('madrid', false)),
@@ -129,7 +133,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos hay que pagar al heredar una vivienda en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Al heredar una vivienda en España se pagan hasta tres impuestos: el Impuesto de Sucesiones y Donaciones (ISD), la plusvalía municipal (IIVTNU) y, si se vende posteriormente, el IRPF por la ganancia patrimonial. El ISD varía mucho según la comunidad autónoma y el grado de parentesco; algunas CCAA como Madrid o Extremadura aplican bonificaciones del 99% para familiares directos.',
+        text: `Al heredar una vivienda en España se pagan hasta tres impuestos: el Impuesto de Sucesiones y Donaciones (ISD), la plusvalía municipal (IIVTNU) y, si se vende posteriormente, el IRPF por la ganancia patrimonial. El ISD varía mucho según la comunidad autónoma y el grado de parentesco; algunas CCAA como Madrid o Extremadura aplican bonificaciones del ${BONIFICACION_MADRID_PCT}% para familiares directos.`,
       },
     },
     {
@@ -137,7 +141,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la plusvalía municipal al heredar una vivienda?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La plusvalía municipal (IIVTNU) grava el incremento del valor del terreno urbano desde la última transmisión. Desde 2021 el contribuyente puede elegir entre el método objetivo (valor catastral × coeficiente × tipo) y el método real (diferencia entre valores de adquisición y transmisión × % del terreno). El ayuntamiento aplica el que resulte menor. Si no hay incremento real, se puede impugnar la liquidación.',
+        text: 'La plusvalía municipal (IIVTNU) grava el incremento del valor del terreno urbano desde la última transmisión. Desde 2021 el contribuyente puede elegir entre el método objetivo (valor catastral × coeficiente × tipo) y el método real (diferencia entre valores de adquisición y transmisión × % del terreno). El ayuntamiento aplica el que resulte menor. Si no hay incremento real de valor, el impuesto NO se devenga (art. 104.5 TRLHL, redacción del RDL 26/2021): es un supuesto de no sujeción que se declara aportando las escrituras de adquisición y transmisión, sin necesidad de impugnar liquidación alguna.',
       },
     },
     {

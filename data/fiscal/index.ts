@@ -13,6 +13,7 @@
 
 export * from './autonomos';
 export * from './irpf';
+export * from './estimacion-directa';
 export * from './sociedades';
 export * from './calendario';
 export * from './amortizacion';

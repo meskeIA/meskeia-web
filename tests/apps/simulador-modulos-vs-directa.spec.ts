@@ -448,7 +448,12 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 12/0
    *   escala(248.000) = 17.901,50 + (248.000 − 60.000) × 45 % = 17.901,50 + 84.600,00
    *                   = 102.501,50
    *   escala(5.550)   = 1.054,50   →   IRPF = 101.447,00
-   *   + RETA 200 × 12 = 2.400,00 → Coste ED = 103.847,00 €
+   *   + RETA 206 × 12 = 2.472,00 → Coste ED = 103.919,00 €
+   *
+   *   ⚠  13/09/2026: el deslizador venía de 200 €, que era un suelo IMPOSIBLE — por debajo
+   *   de la cuota mínima más baja de TRAMOS_RETA_2025 (205,88 €). Reparado el hallazgo 814,
+   *   el suelo es 206 € y los dos costes suben los mismos 72 €/año; la DIFERENCIA entre
+   *   regímenes no se mueve, porque la cuota RETA se suma igual en las dos columnas.
    *
    *   Aquí el mínimo cae ENTERO en el tramo del 45 %, así que es el techo del error del
    *   método viejo: escala(248.000 − 5.550) = 17.901,50 + 182.450 × 45 % = 100.004,00,
@@ -459,28 +464,28 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 12/0
    *                      = 10.600
    *   − 5 % (530,00) − incentivo empleo (100) → reducido 9.970 = base liquidable
    *   escala(9.970) = 9.970 × 19 % = 1.894,30 · escala(5.550) = 1.054,50 → IRPF = 839,80
-   *   + RETA 2.400,00 → Coste Módulos = 3.239,80 €
+   *   + RETA 2.472,00 → Coste Módulos = 3.311,80 €
    *
-   * Diferencia = 103.847,00 − 3.239,80 = 100.607,20 €.
+   * Diferencia = 103.919,00 − 3.311,80 = 100.607,20 €.
    */
   test('CASO B (límite) — ingresos EXACTAMENTE en el umbral de 250.000 €: sigue apto, y a 251.000 € queda excluido', async ({
     page,
   }) => {
     await deslizar(page, 'ingresos', 250000);
     await deslizar(page, 'gastos', 0);
-    await deslizar(page, 'reta', 200);
+    await deslizar(page, 'reta', 206);
 
     expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('248.000,00 €');
     expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('102.501,50 €');
     expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−1054,50 €');
     // 101.447,00 y NO 100.004,00: 1.443,00 € es el techo del error de restar el mínimo.
     expect(await linea(page, ED, '= IRPF')).toBe('101.447,00 €');
-    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('103.847,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('103.919,00 €');
 
     expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('10.600,00 €');
     expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('9970,00 €');
     expect(await linea(page, MOD, '= IRPF')).toBe('839,80 €');
-    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3239,80 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3311,80 €');
 
     // En el umbral clavado NO hay exclusión: el límite es «supera», no «alcanza».
     expect(await panel(page, MOD)).not.toContain('superan los límites de exclusión');
@@ -535,5 +540,80 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 12/0
     const cuerpo = await page.locator('body').innerText();
     expect(cuerpo).toMatch(/te conviene más: Estimación Directa Simplificada/);
     expect(cuerpo).not.toMatch(/te conviene más: Estimación Objetiva \(Módulos\)/);
+  });
+});
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * REPARACIÓN del 13/09/2026 — hallazgos 810, 812 y 814 de la tanda del 12/09.
+ *
+ * Los tres son de lo que la página PUBLICA junto a la cifra, no de la cifra:
+ *  · 810 — la Orden que decide quién puede acogerse a módulos se citaba con un comodín
+ *    sin sustituir («Orden HFP/X/2024») en tres sitios, mientras el DataReference de dos
+ *    centímetros más arriba citaba otra cosa. Ahora sale de ORDEN_MODULOS_VIGENTE.
+ *  · 812 — la cuota RETA es entrada libre y nadie la contrastaba con el tramo que le toca
+ *    por rendimiento, así que el coste anual publicado podía quedar por debajo del mínimo
+ *    legalmente posible sin decirlo.
+ *  · 814 — el rótulo del deslizador prometía un recorrido (205,88 € a 1.606,88 €) que no
+ *    era el suyo: los extremos se redondeaban a la decena HACIA FUERA (200 y 1.610).
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+test.describe('Simulador Módulos vs Estimación Directa — reparación 13/09/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  test('[810] la Orden de módulos se cita con su referencia real, y en ningún sitio queda el comodín', async ({
+    page,
+  }) => {
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).not.toContain('HFP/X/2024');
+    // La misma referencia que el sello DataReference de la propia página.
+    expect(cuerpo).toContain('Orden HAC/1425/2025');
+    expect(cuerpo).toContain('BOE-A-2025-25272');
+    // Los dos avisos visibles (panel de módulos y caja de recomendación) la llevan.
+    const avisos = await page.locator('body').innerText();
+    expect((avisos.match(/Orden HAC\/1425\/2025/g) ?? []).length).toBeGreaterThanOrEqual(2);
+  });
+
+  test('[814] el deslizador de la cuota RETA no baja del suelo de la tabla de tramos', async ({
+    page,
+  }) => {
+    const reta = page.locator('#reta');
+    // TRAMOS_RETA_2025: cuota mínima más baja 205,88 € · más alta 1.606,88 €.
+    // Los extremos se redondean HACIA DENTRO, así que ningún valor alcanzable queda fuera.
+    expect(Number(await reta.getAttribute('min'))).toBe(206);
+    expect(Number(await reta.getAttribute('max'))).toBe(1606);
+    expect(Number(await reta.getAttribute('min'))).toBeGreaterThanOrEqual(205.88);
+    expect(Number(await reta.getAttribute('max'))).toBeLessThanOrEqual(1606.88);
+
+    // Y el rótulo ya no promete el rango de la tabla como si fuera el del control.
+    const hint = await page
+      .locator('label[for="reta"]')
+      .locator('xpath=..')
+      .innerText();
+    const hintNorm = hint.replace(/\s+/g, ' ');
+    expect(hintNorm).toContain('206,00 €');
+    expect(hintNorm).toContain('1606,00 €');
+    expect(hintNorm).toContain('205,88 €');
+  });
+
+  test('[812] una cuota RETA imposible con ese rendimiento se avisa, y una posible no', async ({
+    page,
+  }) => {
+    // Estado de fábrica: 70.000 − 25.000 = 45.000 de rendimiento previo. Con 320 €/mes de
+    // cuota, el rendimiento neto del art. 308.1 LGSS es (45.000 − 3.840)/12 = 3.430,00 €/mes,
+    // que cae en el tramo 12 (3.190-3.620 €), cuya cuota mínima es 478,68 €/mes. Faltan
+    // (478,68 − 320) × 12 = 1.904,16 €/año.
+    const aviso = page.locator('[aria-live="polite"]').filter({ hasText: 'tramo' });
+    await expect(aviso).toContainText('478,68');
+    await expect(aviso).toContainText('tramo 12');
+    await expect(aviso).toContainText('1904,16');
+
+    // Con 479 €/mes el punto es consistente: el rendimiento baja a 3.271,00 €/mes, sigue en
+    // el tramo 12 y su cuota mínima es la misma. El aviso desaparece.
+    await mover(page, 'reta', 479);
+    await expect(aviso).toHaveCount(0);
   });
 });
