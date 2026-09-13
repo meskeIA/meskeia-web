@@ -6494,23 +6494,29 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // dentro de su propia página, así que enlazar aquí a esas tres sería mandar al lector a repetir
   // lo que acaba de hacer. Las versiones completas siguen enlazadas EN CONTEXTO, dentro de cada
   // bloque, para el caso avanzado (prefermento, tabla de temperaturas de referencia).
+  'calculadora-receta-pan': [
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Afina la fórmula que acabas de obtener, o normaliza una tuya' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Pasa una receta con levadura a masa madre, o al revés' },
+    { url: '/guia-harinas/', icon: '🌾', name: 'Guía de Harinas', description: 'Qué fuerza tiene cada harina y para qué sirve' },
+    { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'A qué temperatura poner el agua para clavar la fermentación' },
+  ],
   'calculadora-porcentaje-panadero': [
+    { url: '/calculadora-receta-pan/', icon: '🍞', name: 'Calculadora de Pan Casero', description: 'Si aún no tienes fórmula: dile la harina y el pan, y sale sola' },
     { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura comercial a masa madre con ajuste de receta' },
     { url: '/calculadora-masa-pizza/', icon: '🍕', name: 'Masa de Pizza', description: 'El mismo sistema aplicado a bolas: napolitana, romana o focaccia' },
     { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos', description: 'Pasa una receta en tazas al peso que exige el porcentaje del panadero' },
-    { url: '/ajuste-recetas-altitud/', icon: '⛰️', name: 'Recetas por Altitud', description: 'Corrige levadura, líquido y horno cuando cocinas en altura' },
   ],
   'calculadora-hidratacion-pan': [
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Expresa cada ingrediente como % del peso de harina' },
     { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura a fermento natural con ajuste de agua' },
     { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'La temperatura del agua afecta la hidratación percibida' },
-    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta todos los ingredientes al número de panes que quieres' },
+    { url: '/calculadora-receta-pan/', icon: '🍞', name: 'Calculadora de Pan Casero', description: 'La hidratación que le toca a tu pan según tipo y harina' },
   ],
   'calculadora-masa-madre': [
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Entiende la receta original en formato profesional' },
     { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Ajusta la hidratación total tras añadir la masa madre' },
     { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'Controla la fermentación con la temperatura del agua' },
-    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Escala toda la receta de pan, incluida la masa madre' },
+    { url: '/calculadora-receta-pan/', icon: '🍞', name: 'Calculadora de Pan Casero', description: 'La receta entera con masa madre, desde los gramos de harina' },
   ],
   'calculadora-temperatura-masa': [
     { url: '/fermentacion-temperatura/', icon: '⏳', name: 'Fermentación por Temperatura', description: 'Cuánto tarda el levado a la temperatura de tu masa' },
@@ -6750,7 +6756,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Formula tu pan con la harina elegida' },
     { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Ajusta el agua a tu harina' },
     { url: '/guia-tipos-pan/', icon: '🍞', name: 'Tipos de Pan', description: 'Panes del mundo y sus masas' },
-    { url: '/guia-tipos-pasta/', icon: '🍝', name: 'Tipos de Pasta', description: 'La sémola y la pasta' },
+    { url: '/calculadora-receta-pan/', icon: '🍞', name: 'Calculadora de Pan Casero', description: 'Cuánta agua pide esta harina en tu pan, en gramos' },
   ],
   'guia-tipos-sal': [
     { url: '/calculadora-salmuera/', icon: '🧂', name: 'Salmuera (Brining)', description: 'Sal y agua para carnes jugosas' },

@@ -125,6 +125,13 @@ export type CoquinumApp = {
 export const COQUINUM_APPS: CoquinumApp[] = [
   // Panadería y repostería (el foso técnico)
   {
+    slug: 'calculadora-receta-pan',
+    icon: '🍞',
+    titulo: 'Calculadora de pan casero',
+    desc: 'Los gramos de cada ingrediente a partir de la harina que vas a pesar, el pan que quieres y el fermento que tengas.',
+    categoria: 'panaderia-reposteria',
+  },
+  {
     slug: 'calculadora-porcentaje-panadero',
     icon: '🥖',
     titulo: 'Porcentaje del panadero',

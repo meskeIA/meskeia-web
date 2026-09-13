@@ -1225,6 +1225,7 @@ export const implementedAppsUrls = [
   "/visualizador-tipos-activos/",         // 6 clases de activos, matriz correlación 6×6, 4 carteras tipo
   "/developers/",                         // Guía integración servidor MCP: 160+ calculadoras vía protocolo MCP, snippets Claude Desktop/Cursor/Windsurf
   // ── Cocina Técnica (Tanda 3 MCP — 2026-05-20):
+  "/calculadora-receta-pan/",             // De los gramos de harina a la fórmula completa: tipo de pan, tipo de harina y fermento
   "/calculadora-porcentaje-panadero/",    // Baker's percentage: porcentaje de cada ingrediente sobre el peso de harina
   "/calculadora-hidratacion-pan/",        // Hidratación de masa bidireccional: %→agua o agua→%
   "/calculadora-masa-madre/",             // Sustitución levadura comercial por masa madre con ajuste harina/agua

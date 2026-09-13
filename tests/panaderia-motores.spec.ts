@@ -29,6 +29,12 @@ import {
   formatearTiempo,
 } from '../lib/calculadoras/fermentacionTemperatura';
 import { FERMENTACION_MM_REF } from '../lib/calculadoras/cocina';
+import {
+  calcularRecetaPan,
+  TIPOS_PAN,
+  RITMO_POR_ID,
+  type EntradaRecetaPan,
+} from '../lib/calculadoras/recetaPan';
 
 test.describe('DDT — temperatura del agua de amasado', () => {
   test('A MANO: 24 °C de objetivo, cocina y harina a 22 °C, sin amasadora → agua a 28 °C', () => {
@@ -347,5 +353,220 @@ test.describe('Fermentación — la HORQUILLA de masa madre ajustada a la cocina
     // «ambiente» no es un número.
     expect(tempRefC).toBe(24);
     expect(horasMin).toBeLessThan(horasMax);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Receta de pan: de la harina que se pesa a la fórmula completa
+//
+// Es el camino INVERSO al del porcentaje del panadero, y por eso necesita sus propios
+// casos: aquí la fórmula no la trae el usuario, la deduce el motor. Si se equivoca, el
+// pan sale mal y nadie puede detectarlo leyendo la pantalla, porque no hay ningún número
+// de entrada contra el que contrastar.
+//
+// Los valores esperados están calculados a mano con las reglas declaradas en el módulo:
+//   · harina total = harina pesada / (1 − harina prefermentada), solo con masa madre
+//   · agua = harina total × hidratación − el agua que ya traen leche, huevo, extras y fermento
+//   · levadura seca = harina prefermentada / 10   (la equivalencia 1:20 de la app hermana)
+
+test.describe('Receta de pan — el camino de la harina a la fórmula', () => {
+  const base: EntradaRecetaPan = {
+    harinaPesada_g: 1000,
+    tipoPan: 'hogaza',
+    harinaPrincipal: 'panificable',
+    proporcionPrincipal: 100,
+    fermento: 'seca',
+    ritmo: 'normal',
+    hidratacionMasaMadre: 100,
+    extras: [],
+  };
+
+  test('A MANO: 1 kg de harina, hogaza rústica, levadura seca y ritmo de tarde', () => {
+    // harina total = 1.000 (sin masa madre no hay harina escondida)
+    // harina prefermentada = 7 % → 70 g  →  levadura seca = 70/10 = 7 g
+    // agua = 1.000 × 72 % = 720 g · sal = 2 % = 20 g
+    // masa = 1.000 + 720 + 7 + 20 = 1.747 g  →  2 piezas de 874 g
+    const r = calcularRecetaPan(base)!;
+    expect(r.harinaTotal_g).toBe(1000);
+    expect(r.hidratacion_pct).toBe(72);
+
+    const agua = r.ingredientes.find((i) => i.nombre === 'Agua')!;
+    const sal = r.ingredientes.find((i) => i.nombre === 'Sal')!;
+    const levadura = r.ingredientes.find((i) => i.nombre.startsWith('Levadura'))!;
+    expect(agua.gramos).toBe(720);
+    expect(sal.gramos).toBe(20);
+    expect(levadura.gramos).toBe(7);
+
+    expect(r.pesoMasa_g).toBe(1747);
+    expect(r.piezas.cantidad).toBe(2);
+  });
+
+  test('A MANO: con masa madre, la harina que se PESA sigue siendo la que pidió el usuario', () => {
+    // Es la trampa del cálculo: la masa madre mete harina de más, así que la fórmula se
+    // calcula sobre 518,1 g aunque el usuario solo pese 500.
+    // harina total = 500 / (1 − 0,035) = 518,13 · prefermentada = 18,13
+    // masa madre al 100 % = 18,13 + 18,13 = 36,3 g
+    // agua = 518,13 × 72 % − 18,13 = 354,9 g
+    const r = calcularRecetaPan({ ...base, harinaPesada_g: 500, fermento: 'masa_madre', ritmo: 'lento' })!;
+    expect(r.harinaTotal_g).toBe(518);
+    expect(r.fermento.gramos).toBe(36);
+    expect(r.fermento.harinaEnFermento_g).toBe(18);
+
+    // La suma de las harinas de la lista es EXACTAMENTE lo que el usuario dijo que pesaría.
+    const harinaAPesar = r.harinas.reduce((s, h) => s + h.gramos, 0);
+    expect(harinaAPesar).toBe(500);
+
+    const agua = r.ingredientes.find((i) => i.nombre === 'Agua')!;
+    expect(agua.gramos).toBe(355);
+    // Y la hidratación prometida se cumple contando el agua que va dentro del fermento.
+    expect(r.hidratacion_pct).toBe(72);
+  });
+
+  test('EL HALLAZGO 288 NO VUELVE: cambiar la hidratación del fermento no cambia la fermentación', () => {
+    // Lo que gobierna el ritmo es la harina prefermentada, no los gramos de masa madre. Si
+    // se anclara en los gramos, dos panaderos con la misma receta y fermentos de distinta
+    // hidratación fermentarían distinto creyendo hacer lo mismo.
+    const alCien = calcularRecetaPan({ ...base, fermento: 'masa_madre', hidratacionMasaMadre: 100 })!;
+    const alCincuenta = calcularRecetaPan({ ...base, fermento: 'masa_madre', hidratacionMasaMadre: 50 })!;
+
+    expect(alCincuenta.fermento.harinaPrefermentada_g).toBe(alCien.fermento.harinaPrefermentada_g);
+    // Los gramos de masa madre SÍ cambian, que es justo lo que debe pasar: es la misma
+    // harina con menos agua alrededor.
+    expect(alCincuenta.fermento.gramos).toBeLessThan(alCien.fermento.gramos);
+    // Y la hidratación final de la masa no se mueve: el agua que el fermento deja de traer
+    // se compensa en el agua que se añade.
+    expect(alCincuenta.hidratacion_pct).toBe(alCien.hidratacion_pct);
+  });
+
+  test('LA HARINA CORRIGE EL AGUA, y en proporción a la mezcla', () => {
+    // Espelta entera: 72 − 4 = 68 %. Media espelta: 72 − 2 = 70 %.
+    const todaEspelta = calcularRecetaPan({ ...base, harinaPrincipal: 'espelta', proporcionPrincipal: 100 })!;
+    const mediaEspelta = calcularRecetaPan({ ...base, harinaPrincipal: 'espelta', proporcionPrincipal: 50 })!;
+    const centeno = calcularRecetaPan({ ...base, harinaPrincipal: 'centeno', proporcionPrincipal: 100 })!;
+
+    expect(todaEspelta.hidratacionBase_pct).toBe(68);
+    expect(mediaEspelta.hidratacionBase_pct).toBe(70);
+    expect(centeno.hidratacionBase_pct).toBe(80); // 72 + 8
+
+    // Y la mezcla reparte la harina en dos filas que suman el total.
+    expect(mediaEspelta.harinas).toHaveLength(2);
+    expect(mediaEspelta.harinas.reduce((s, h) => s + h.gramos, 0)).toBe(1000);
+  });
+
+  test('PASARSE DE PROPORCIÓN AVISA, no se calla ni se bloquea', () => {
+    // El aviso es la parte útil: el número sale igual, pero con espelta al 100 % el pan sube
+    // menos y conviene saberlo ANTES de amasar, no después de hornear.
+    const espelta100 = calcularRecetaPan({ ...base, harinaPrincipal: 'espelta', proporcionPrincipal: 100 })!;
+    const espelta50 = calcularRecetaPan({ ...base, harinaPrincipal: 'espelta', proporcionPrincipal: 50 })!;
+    expect(espelta100.avisos.some((a) => /espelta/i.test(a))).toBe(true);
+    expect(espelta50.avisos.some((a) => /espelta/i.test(a))).toBe(false);
+
+    const centeno = calcularRecetaPan({ ...base, harinaPrincipal: 'centeno', proporcionPrincipal: 100 })!;
+    expect(centeno.avisos.some((a) => /centeno/i.test(a))).toBe(true);
+  });
+
+  test('CON MASA MADRE NO HAY PAN EN DOS HORAS: se recalcula y se dice', () => {
+    // Subir la dosis no compensa: la masa madre tiene menos levaduras por gramo y compite
+    // con las bacterias lácticas. Dar una cifra para «lo antes posible» sería mentir.
+    const r = calcularRecetaPan({ ...base, fermento: 'masa_madre', ritmo: 'rapido' })!;
+    expect(r.avisos[0]).toMatch(/masa madre/i);
+    expect(r.tiempo).toBe(RITMO_POR_ID.normal.tiempoMasaMadre);
+
+    // Con levadura, en cambio, el ritmo rápido existe y lleva más dosis que el lento.
+    const rapido = calcularRecetaPan({ ...base, ritmo: 'rapido' })!;
+    const lento = calcularRecetaPan({ ...base, ritmo: 'lento' })!;
+    const dosis = (r2: ReturnType<typeof calcularRecetaPan>) =>
+      r2!.ingredientes.find((i) => i.nombre.startsWith('Levadura'))!.gramos;
+    expect(dosis(rapido)).toBeGreaterThan(dosis(lento));
+  });
+
+  test('LA LEVADURA FRESCA ES EL TRIPLE DE LA SECA', () => {
+    const seca = calcularRecetaPan(base)!;
+    const fresca = calcularRecetaPan({ ...base, fermento: 'fresca' })!;
+    const g = (r: ReturnType<typeof calcularRecetaPan>) =>
+      r!.ingredientes.find((i) => i.nombre.startsWith('Levadura'))!.gramos;
+    expect(g(fresca)).toBeCloseTo(g(seca) * 3, 1);
+  });
+
+  test('EL AGUA DE LA LECHE Y DEL HUEVO SE DESCUENTA: el brioche no se ahoga', () => {
+    // Sin descontarla, un pan dulce con 15 % de leche y 25 % de huevo saldría con un 87 %
+    // de líquido real donde la fórmula prometía 55 %, y la masa sería incontrolable.
+    const r = calcularRecetaPan({ ...base, tipoPan: 'dulce' })!;
+    const agua = r.ingredientes.find((i) => i.nombre === 'Agua')!;
+    // 55 − 15×0,87 − 25×0,75 = 23,2 % → 232 g
+    expect(agua.gramos).toBe(232);
+    // Y el líquido total sigue siendo el 55 % prometido.
+    expect(r.hidratacion_pct).toBe(55);
+  });
+
+  test('EL AGUA DEL REMOJO NO ES HIDRATACIÓN DE LA MASA', () => {
+    // Es la regla que ninguna calculadora de pan aplica: las semillas se remojan aparte, y
+    // esa agua no moja la harina. Contarla como hidratación daría una masa seca.
+    const r = calcularRecetaPan({ ...base, extras: [{ id: 'semillas', porcentaje: 10 }] })!;
+    expect(r.aguaRemojo_g).toBe(100); // 10 % de 1.000 g, remojo 1:1
+    expect(r.hidratacion_pct).toBe(72); // intacta
+    expect(r.avisos.some((a) => /remojan aparte/i.test(a))).toBe(true);
+  });
+
+  test('LA MIEL SÍ CAMBIA LA FÓRMULA: trae agua dentro y es azúcar', () => {
+    const sinMiel = calcularRecetaPan(base)!;
+    const conMiel = calcularRecetaPan({ ...base, extras: [{ id: 'miel', porcentaje: 10 }] })!;
+    const agua = (r: ReturnType<typeof calcularRecetaPan>) =>
+      r!.ingredientes.find((i) => i.nombre === 'Agua')!.gramos;
+
+    // 10 % de miel sobre 1.000 g = 100 g, de los que 18 g son agua: el agua añadida baja.
+    expect(agua(conMiel)).toBe(agua(sinMiel) - 18);
+    // Y la hidratación final NO se mueve, porque esa agua sigue estando en la masa.
+    expect(conMiel.hidratacion_pct).toBe(sinMiel.hidratacion_pct);
+
+    // El azúcar de esos 100 g de miel son 82 g = 8,2 % de la harina: por DEBAJO del umbral,
+    // así que no avisa. Al 15 % de miel son 12,3 % y entonces sí.
+    expect(conMiel.avisos.some((a) => /azúcar/i.test(a))).toBe(false);
+    const muchaMiel = calcularRecetaPan({ ...base, extras: [{ id: 'miel', porcentaje: 15 }] })!;
+    expect(muchaMiel.avisos.some((a) => /azúcar/i.test(a))).toBe(true);
+  });
+
+  test('LOS FRUTOS SECOS NO TOCAN NADA, y pasado el 30 % se avisa', () => {
+    const r = calcularRecetaPan({ ...base, extras: [{ id: 'nueces', porcentaje: 15 }] })!;
+    expect(r.hidratacion_pct).toBe(72);
+    expect(r.aguaRemojo_g).toBe(0);
+    expect(r.extras[0].gramos).toBe(150);
+    expect(r.avisos.some((a) => /inclusiones sólidas/i.test(a))).toBe(false);
+
+    const cargado = calcularRecetaPan({
+      ...base,
+      extras: [{ id: 'nueces', porcentaje: 20 }, { id: 'pasas', porcentaje: 20 }],
+    })!;
+    expect(cargado.avisos.some((a) => /inclusiones sólidas/i.test(a))).toBe(true);
+  });
+
+  test('DEMASIADO LÍQUIDO NO DA UN AGUA NEGATIVA: se corta y se dice', () => {
+    // Sin la guarda saldría un «Agua: −120 g» perfectamente formateado, que es la peor
+    // forma de estar mal: parece un resultado.
+    const r = calcularRecetaPan({ ...base, extras: [{ id: 'leche', porcentaje: 90 }] })!;
+    expect(r.ingredientes.find((i) => i.nombre === 'Agua')).toBeUndefined();
+    expect(r.avisos.some((a) => /más agua de la que este pan admite/i.test(a))).toBe(true);
+  });
+
+  test('INVARIANTE: la masa pesa lo que suman sus ingredientes, en los 7 panes', () => {
+    for (const tipo of TIPOS_PAN) {
+      for (const fermento of ['seca', 'fresca', 'masa_madre'] as const) {
+        const r = calcularRecetaPan({ ...base, tipoPan: tipo.id, fermento })!;
+        const suma =
+          r.harinas.reduce((s, h) => s + h.gramos, 0) +
+          r.ingredientes.reduce((s, i) => s + i.gramos, 0) +
+          r.extras.reduce((s, e) => s + e.gramos, 0);
+        // Tolerancia de 2 g por los redondeos de cada fila: la lista es para pesar en
+        // cocina, no para cuadrar una contabilidad.
+        expect(Math.abs(suma - r.pesoMasa_g)).toBeLessThanOrEqual(2);
+        expect(r.piezas.cantidad).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  test('ENTRADA INÚTIL, RESULTADO NULO: sin harina no hay receta', () => {
+    expect(calcularRecetaPan({ ...base, harinaPesada_g: 0 })).toBeNull();
+    expect(calcularRecetaPan({ ...base, harinaPesada_g: -500 })).toBeNull();
+    expect(calcularRecetaPan({ ...base, harinaPesada_g: NaN })).toBeNull();
   });
 });

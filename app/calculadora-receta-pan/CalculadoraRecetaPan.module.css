@@ -1,0 +1,950 @@
+/* Calculadora de pan casero
+ *
+ * No se redefine aquí la paleta de marca (--primary, --hero-bg…): bajo coquinum.com el
+ * recoloreado `[data-brand='coquinum']` vive en <html>, y una variable fijada en un
+ * descendiente vence sobre la de <html>. Diez apps de este mismo portal se vieron azules
+ * por ese motivo hasta que se les quitaron las definiciones locales.
+ */
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── Hero ── */
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.55;
+}
+
+.mainContent {
+  margin-bottom: 30px;
+}
+
+/* ── Paneles de pasos ── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 26px;
+  margin-top: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.seccionTitulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+}
+
+.pasoNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.opcional {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.ayuda {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: 12px;
+}
+
+.campo {
+  margin-top: 20px;
+}
+
+.etiqueta {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+/* ── Paso 1: harina ── */
+.harinaFila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.inputWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.inputGrande {
+  width: 180px;
+  padding: 14px 46px 14px 16px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-input, var(--bg-card));
+  border: 2px solid var(--border);
+  border-radius: 12px;
+}
+
+.inputGrande:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+.unidad {
+  position: absolute;
+  right: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.rapidos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 9px 16px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.chipActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Paso 2: tipos de pan ── */
+.panesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.panBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px;
+  text-align: left;
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.panBtn:hover {
+  border-color: var(--primary);
+}
+
+.panBtnActivo {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.panBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.panEmoji {
+  font-size: 1.5rem;
+}
+
+.panNombre {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.panAlias {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Paso 3: harina ── */
+.select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-input, var(--bg-card));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.slider,
+.sliderPequeno {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.sliderPequeno {
+  max-width: 260px;
+}
+
+.slider:focus-visible,
+.sliderPequeno:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.valorSlider {
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Paso 4: fermento y ritmo ── */
+.fermentosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.fermentoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 12px;
+  text-align: center;
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.fermentoBtn:hover {
+  border-color: var(--primary);
+}
+
+.fermentoBtnActivo {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.fermentoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.fermentoEmoji {
+  font-size: 1.7rem;
+}
+
+.fermentoNombre {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fermentoPie {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.ritmosFila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.ritmoBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 13px 14px;
+  text-align: left;
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ritmoBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+.ritmoBtnActivo {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.ritmoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ritmoBtnVetado {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ritmoNombre {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ritmoPie {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Paso 5: extras ── */
+.desplegable {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: transparent;
+  border: 1px dashed var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.desplegable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: white;
+  font-size: 0.8rem;
+}
+
+.extrasPanel {
+  margin-top: 18px;
+}
+
+.familiaBloque {
+  margin-top: 22px;
+}
+
+.familiaTitulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.extrasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.extraItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.extraBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  text-align: left;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.extraBtn:hover {
+  border-color: var(--primary);
+}
+
+.extraBtnActivo {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  font-weight: 600;
+}
+
+.extraBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.extraEmoji {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.extraControl {
+  padding: 0 4px 8px;
+}
+
+.extraPctEtiqueta {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.extraNota {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+/* ── Resultado ── */
+.resultado {
+  margin-top: 28px;
+  padding: 28px;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.resultadoTitulo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.resumenFila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.resumenDato {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.resumenValor {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.resumenEtiqueta {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.listaCompra {
+  margin-bottom: 22px;
+}
+
+.listaTitulo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.tablaIngredientes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tablaCaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.tablaIngredientes th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border);
+}
+
+.tablaIngredientes td {
+  padding: 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.colNum {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.filaNota {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.aguaRemojo {
+  margin-top: 14px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--secondary) 12%, transparent);
+  border-radius: 10px;
+}
+
+.tiempoBloque {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+.tiempoIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.tiempoTitulo {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.tiempoTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.avisos {
+  padding: 16px 18px;
+  background: #fff8e6;
+  border: 1px solid #f0c674;
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+.avisosTitulo {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #7a5c00;
+  margin-bottom: 10px;
+}
+
+.avisosLista {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #5c4600;
+}
+
+.consejo {
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: 10px;
+}
+
+.notaFormula {
+  margin-top: 14px;
+  font-size: 0.87rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.sinResultado {
+  margin-top: 24px;
+  padding: 28px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+}
+
+/* ── Bloque educativo ── */
+.educationalContent {
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.educationalContent h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 32px 0 14px;
+}
+
+.educationalContent h3 {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.educationalContent p {
+  margin-bottom: 14px;
+  color: var(--text-secondary);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.comparativaTable {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.comparativaTable caption {
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-bottom: 8px;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparativaTable th {
+  font-weight: 600;
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.comparativaTable td {
+  color: var(--text-secondary);
+}
+
+.escenariosGrid,
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.escenarioCard,
+.tipCard {
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.escenarioCard p,
+.tipCard p {
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.tipIcon {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+}
+
+.stepContent p {
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.faqItem {
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.faqItem p {
+  font-size: 0.92rem;
+  margin-bottom: 0;
+}
+
+.faqTip {
+  margin-top: 10px !important;
+  padding: 10px 12px;
+  font-size: 0.87rem !important;
+  background: color-mix(in srgb, var(--secondary) 12%, transparent);
+  border-radius: 8px;
+  color: var(--text-primary) !important;
+}
+
+.warningBox {
+  padding: 20px;
+  background: #fff8e6;
+  border: 1px solid #f0c674;
+  border-radius: 12px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #7a5c00;
+  font-size: 1.02rem;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #5c4600;
+}
+
+/* ── Modo oscuro ── */
+[data-theme='dark'] .inputGrande,
+[data-theme='dark'] .select {
+  background: var(--bg-secondary, #1e2530);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisos,
+[data-theme='dark'] .warningBox {
+  background: rgba(240, 198, 116, 0.12);
+  border-color: rgba(240, 198, 116, 0.4);
+}
+
+[data-theme='dark'] .avisosTitulo,
+[data-theme='dark'] .warningHeader {
+  color: #f0c674;
+}
+
+[data-theme='dark'] .avisosLista,
+[data-theme='dark'] .warningList {
+  color: #e8d6ad;
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .tipCard,
+[data-theme='dark'] .faqItem {
+  background: var(--bg-secondary, #1e2530);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .hero {
+    padding: 30px 20px;
+    margin-top: 70px;
+  }
+
+  .title {
+    font-size: 1.65rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .panel,
+  .resultado {
+    padding: 20px;
+  }
+
+  .panesGrid,
+  .fermentosGrid,
+  .ritmosFila,
+  .extrasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .inputGrande {
+    width: 100%;
+  }
+
+  .harinaFila {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tablaIngredientes {
+    font-size: 0.88rem;
+  }
+
+  .tablaIngredientes th,
+  .tablaIngredientes td {
+    padding: 9px 8px;
+  }
+
+  .resumenValor {
+    font-size: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .panBtn,
+  .fermentoBtn,
+  .ritmoBtn,
+  .extraBtn {
+    transition: none;
+  }
+}
