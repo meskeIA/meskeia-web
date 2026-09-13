@@ -2936,7 +2936,7 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
     await page.locator('#ccaa-inmueble').selectOption('andalucia');
     await page.locator('#perfil-comprador').selectOption('joven');
 
-    const panel = page.locator('h4', { hasText: 'Tipos reducidos disponibles' }).locator('..');
+    const panel = page.locator('h4', { hasText: 'Beneficios fiscales en' }).locator('..');
     const lineas = (await panel.innerText()).replace(ESPACIO_DURO, ' ');
 
     // El dato de la ficha lleva decimales, así que hay algo que formatear
@@ -3389,7 +3389,6 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
   test('HALLAZGO — «usa el tipo general» no puede aparecer cuando se ha aplicado un reducido', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await page.locator('#ccaa-inmueble').selectOption('castilla-leon');
     await sembrar(page, 'Precio de la vivienda', '140000');
@@ -3421,7 +3420,6 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
   test('HALLAZGO — el rótulo del panel contradice a la nota de la ficha de Aragón', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await page.locator('#ccaa-inmueble').selectOption('aragon');
     await sembrar(page, 'Precio de la vivienda', '200000');
@@ -3460,7 +3458,6 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
   test('HALLAZGO (dato) — el plazo del ITP debe salir de PLAZO_ITP, con su norma', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
 
@@ -3493,7 +3490,6 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
   test('HALLAZGO (dato) — el IVA del terreno debe salir del tipo general, no del local', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await page.getByRole('button', { name: /Terreno/ }).click();
     await page.getByRole('button', { name: /Primera mano/ }).click();
@@ -3529,12 +3525,14 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
   test('HALLAZGO — el límite de valor no se puede imprimir tres veces en la misma línea', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await page.locator('#ccaa-inmueble').selectOption('andalucia');
     await sembrar(page, 'Precio de la vivienda', '140000');
-    await page.locator('#perfil-comprador').selectOption('joven');
-
+    // ⚠️ 13/09/2026: con el perfil JOVEN este caso ya no existe. La reparación del hallazgo
+    // 767 dejó en el aviso solo las rebajas REALES sobre el tipo aplicado, y a un joven
+    // andaluz se le cobra el 3,50 %, así que el 6,00 % de vivienda habitual —que era la
+    // línea con el tope repetido— desapareció de la lista, que es justo lo que aquel
+    // hallazgo pedía. Con el perfil general sí se ofrece, porque 6,00 < 7,00.
     const linea = await page
       .locator('div[class*="avisoReducidos"]')
       .first()

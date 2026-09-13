@@ -1,6 +1,7 @@
 'use client';
 // @disclaimer: fiscal-critical
 
+import { RESPUESTA_IVA_TRASTERO_NUEVO, RESPUESTA_PLUSVALIA_TRASTERO } from './metadata';
 import { useState, useMemo } from 'react';
 import styles from './SimuladorTrasteroCompraventa.module.css';
 import {
@@ -22,7 +23,7 @@ import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, pa
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
-import { IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { PLAZO_ITP, IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -42,8 +43,7 @@ import {
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
-  respuestaEscriturar,
-} from '@/data/itp-ccaa';
+  respuestaEscriturar, superaElTope } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
@@ -102,6 +102,8 @@ interface ResultadosVendedor {
   /** Falso cuando faltan años de propiedad o valor catastral del suelo: entonces la
    *  plusvalía no es 0 €, es desconocida, y el neto que se muestra es un techo. */
   plusvaliaCalculada: boolean;
+  /** false cuando el texto del campo de comisión no es un número (hallazgo 773). */
+  comisionLegible: boolean;
   /** Los campos concretos que faltan para calcularla, para nombrarlos en el aviso */
   camposQueFaltan: string[];
   comisionInmobiliaria: number;
@@ -331,8 +333,18 @@ export default function SimuladorTrasteroCompraventaPage() {
     // app). Acotarlo lo convertiría en una reventa antes del año y liquidaría un impuesto a
     // partir de un dato imposible.
     const aniosTexto = aniosPropiedad.trim();
-    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
-    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
+    /**
+     * ⚠️ 13/09/2026 — la guarda era `Math.trunc(parseSpanishNumber(texto)) >= 0`, y
+     * `Math.trunc(-0,5)` devuelve **-0**, con `-0 >= 0` igual a `true`: el entero «-1» se
+     * rechazaba pero el decimal «-0,5» se aceptaba y liquidaba la plusvalía con el
+     * coeficiente de «menos de 1 año» (0,14), presentando el neto como definitivo a partir
+     * de un dato imposible. El mismo signo recibía dos tratamientos distintos (hallazgo 764).
+     * Se decide sobre el valor SIN truncar, y `Object.is` es lo único que distingue -0 de 0.
+     */
+    const aniosBruto = aniosTexto === '' ? NaN : parseSpanishNumber(aniosTexto);
+    const aniosNegativo = aniosBruto < 0 || Object.is(aniosBruto, -0);
+    const anios = Math.trunc(aniosBruto);
+    const aniosDisponibles = Number.isFinite(anios) && !aniosNegativo;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
@@ -342,6 +354,20 @@ export default function SimuladorTrasteroCompraventaPage() {
     // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (guard > 0),
     // así que el neto del vendedor subía por encima del propio precio de venta sin ninguna
     // línea que lo explicara (hallazgo 486, mismo defecto que el 457 ya acotó en el comprador).
+    /**
+     * ⚠️ 13/09/2026 — `parseSpanishNumberOr` devuelve su valor por defecto (0) cuando el
+     * parser RECHAZA el texto, así que el NaN de «1.2.3» y un campo vacío eran la misma cosa
+     * para el motor; y con la comisión en 0 su tarjeta ni se pinta (su guard es > 0), de modo
+     * que no quedaba en pantalla ninguna línea que explicara la diferencia. El error iba
+     * además en la dirección mala: la comisión es gasto de transmisión del art. 35.1 LIRPF,
+     * así que al desaparecer subían la ganancia, el IRPF y el neto (hallazgo 773).
+     *
+     * Un valor ILEGIBLE no es un cero: es un dato que falta, y esta app ya sabe abstenerse y
+     * nombrarlo (lo hace con la plusvalía y con el IRPF). El negativo sí se acota a 0 a
+     * propósito, que es otra cosa y viene de los hallazgos 457 y 486.
+     */
+    const comisionTexto = comisionInmobiliaria.trim();
+    const comisionLegible = comisionTexto === '' || Number.isFinite(parseSpanishNumber(comisionTexto));
     const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
@@ -409,6 +435,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       metodoPlusvalia,
       exentoPlusvalia,
       plusvaliaCalculada,
+      comisionLegible,
       /** Los campos concretos que faltan, para que el aviso del neto no los adivine */
       camposQueFaltan: faltan,
       comisionInmobiliaria: comision,
@@ -797,6 +824,11 @@ export default function SimuladorTrasteroCompraventaPage() {
                             <br />
                             Requisitos: {r.condiciones.join(' · ')}
                             {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
+                            {/* El tope de valor SÍ se comprueba, así que la línea no puede
+                                ofrecerse como rebaja al alcance cuando el precio la descarta
+                                (hallazgo 765). Se enseña igualmente porque dice a partir de qué
+                                precio existiría, que es lo que los hallazgos 721 y 741 exigen. */}
+                            {superaElTope(r, resultadosComprador.precioInmueble) ? ' · ⚠️ tu precio supera ese límite: no podrías acogerte' : ''}
                           </li>
                         ))}
                       </ul>
@@ -1028,6 +1060,13 @@ export default function SimuladorTrasteroCompraventaPage() {
                           conceptos.push('el IRPF de la ganancia');
                           pedir('el precio de compra original');
                         }
+                        // Una comisión que no se puede leer NO es un 0 %: es un dato que falta,
+                        // y su ausencia sube el neto Y el IRPF, porque es gasto de transmisión
+                        // del art. 35.1 LIRPF (hallazgo 773).
+                        if (!resultadosVendedor.comisionLegible) {
+                          conceptos.push('la comisión inmobiliaria');
+                          pedir('un porcentaje de comisión legible');
+                        }
                         return conceptos.length === 0
                           ? 'Lo que realmente recibes tras los gastos'
                           : `Techo: aún NO incluye ${conceptos.join(' ni ')} (añade ${enumerarCampos(campos)})`;
@@ -1179,13 +1218,11 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué IVA paga un trastero nuevo?</h4>
-              <p>Depende de si se compra con la vivienda o por separado. Si el promotor lo transmite
-              <strong> conjuntamente con la vivienda</strong> como anejo, se aplica el tipo reducido del
-              <strong> {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%</strong> (art. 91.Uno.1.7º de la Ley del IVA). Si se compra de forma
-              <strong> independiente</strong> —finca registral propia, operación separada— tributa al tipo
-              general del <strong>{formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%</strong>. Es el mismo criterio que rige para las plazas de garaje.
-              En <strong>Canarias, Ceuta y Melilla</strong> no rige el IVA sino el <strong>IGIC</strong> o el <strong>IPSI</strong>,
-              con sus propios tipos: la calculadora no cifra ese impuesto.</p>
+              {/* Texto compartido con las dos bocas del JSON-LD: una sola constante para que la
+                  respuesta visible y la estructurada no puedan volver a divergir. La cabecera de
+                  metadata.ts ya afirmaba que esta FAQ la importaba, y no era cierto (hallazgo
+                  774; es el mecanismo que la hermana garaje tiene desde el 624). */}
+              <p>{RESPUESTA_IVA_TRASTERO_NUEVO}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre trastero vinculado y trastero independiente?</h4>
@@ -1206,13 +1243,8 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Se paga plusvalía municipal al vender un trastero?</h4>
-              <p>Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana)
-              se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable:
-              el <strong>objetivo</strong> (basado en el valor catastral del suelo y el tiempo de tenencia) o el
-              <strong> real</strong> (basado en la ganancia efectiva). Si no hay ganancia, se puede acreditar la pérdida
-              y quedar exento. Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como
-              referencia orientativa habitual; cada ayuntamiento fija el suyo, con un <strong>máximo legal
-              del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.</p>
+              {/* Misma constante que el FAQPage y el faqJsonLd (hallazgo 774). */}
+              <p>{RESPUESTA_PLUSVALIA_TRASTERO}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Tienen tipos reducidos de ITP los trasteros?</h4>
@@ -1245,7 +1277,8 @@ export default function SimuladorTrasteroCompraventaPage() {
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Liquida los impuestos a tiempo</strong>
               <p>
-                El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de la escritura.
+                El ITP o el IVA+AJD debe liquidarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la
+                firma de la escritura ({PLAZO_ITP.baseNormativa}). <strong>{PLAZO_ITP.aviso}</strong>
                 Presentarlo tarde por iniciativa propia, sin requerimiento de la Administración, genera
                 recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida
                 más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,

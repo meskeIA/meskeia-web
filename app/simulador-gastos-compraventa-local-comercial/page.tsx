@@ -270,15 +270,35 @@ export default function SimuladorLocalComercialPage() {
     // de serlo en cuanto el 0 pasó a ser un dato válido (10/09/2026, al propagar esta misma
     // reparación a garaje, trastero y al hub del clúster, donde sus tests sí lo exigían).
     const aniosTexto = aniosPropiedad.trim();
-    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
-    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
+    /**
+     * ⚠️ 13/09/2026 — la guarda era `Math.trunc(parseSpanishNumber(texto)) >= 0`, y
+     * `Math.trunc(-0,5)` devuelve **-0**, con `-0 >= 0` igual a `true`: el entero «-1» se
+     * rechazaba pero el decimal «-0,5» se aceptaba y liquidaba la plusvalía con el
+     * coeficiente de «menos de 1 año» (0,14), presentando el neto como definitivo a partir
+     * de un dato imposible. El mismo signo recibía dos tratamientos distintos (hallazgo 764).
+     * Se decide sobre el valor SIN truncar, y `Object.is` es lo único que distingue -0 de 0.
+     */
+    const aniosBruto = aniosTexto === '' ? NaN : parseSpanishNumber(aniosTexto);
+    const aniosNegativo = aniosBruto < 0 || Object.is(aniosBruto, -0);
+    const anios = Math.trunc(aniosBruto);
+    const aniosDisponibles = Number.isFinite(anios) && !aniosNegativo;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
-    const comisionPct = parseSpanishNumberOr(comisionInmobiliaria) / 100;
-    const gestoria = parseSpanishNumberOr(gastosGestoriaVenta);
+    /**
+      * ⚠️ 13/09/2026 — estos dos eran los ÚNICOS importes del panel sin acotar mientras el
+      * campo tiene el foco, y en negativo la pantalla se partía en dos mitades que usaban
+      * valores distintos del mismo dato: el «Total gastos» y el «NETO QUE RECIBES»
+      * descontaban un gasto negativo (el neto SUBÍA), mientras `calcularGananciaInmueble` sí
+      * lo acota y dejaba `gastosTransmision` en 0, así que el IRPF salía de una venta SIN
+      * NINGÚN gasto. La misma pantalla cobraba el IRPF de una venta sin gastos y descontaba
+      * del neto un gasto que cobraba (hallazgo 785). Al salir del campo, el min=0 del
+      * NumberInput lo dejaba en 0 y todo volvía a cuadrar: el defecto vivía en esa ventana.
+      */
+    const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
+    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
 
     // Plusvalía municipal (IIVTNU): el local está en suelo urbano, sí tributa
@@ -309,13 +329,24 @@ export default function SimuladorLocalComercialPage() {
       });
       plusvalia = resultadoPlusvalia.recomendado;
       exentoPlusvalia = resultadoPlusvalia.exento;
+      /**
+       * ⚠️ 13/09/2026 — la cuota no se podía reconstruir con lo que la página decía: se
+       * liquida con el tipo ORIENTATIVO del 25 %, ese 25 % no aparecía en ningún sitio del
+       * DOM, y el único porcentaje municipal escrito era el «máximo legal del 30 %» de la
+       * nota del sello — con el que sale otra cifra (hallazgo 786). Las tres hermanas
+       * (garaje, trastero y el hub) ya imprimían las dos, derivadas de la constante.
+       */
+      const tipoMunicipal = `tipo municipal orientativo del ${formatNumber(
+        PLUSVALIA_MUNICIPAL_META.tipoOrientativo,
+        0
+      )} %`;
       metodoPlusvalia = resultadoPlusvalia.exento
         ? 'No sujeta (sin incremento de valor)'
         : !resultadoPlusvalia.metodoRealDisponible
-          ? 'Método objetivo (falta el valor catastral total para comparar)'
+          ? `Método objetivo, ${tipoMunicipal} (falta el valor catastral total para comparar)`
           : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
-            ? 'Método real (más favorable)'
-            : 'Método objetivo (más favorable)';
+            ? `Método real (más favorable), ${tipoMunicipal}`
+            : `Método objetivo (más favorable), ${tipoMunicipal}`;
     }
 
     // Si el local estuvo afecto a actividad, la amortización deducida MINORA el valor de
@@ -676,7 +707,7 @@ export default function SimuladorLocalComercialPage() {
                         ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
                         : resultadosComprador.bonificado
                           ? 'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)'
-                          : 'Tipo general — los locales comerciales no tienen tipos reducidos'
+                          : 'Tipo general — los locales no tienen los reducidos de vivienda, pero alguna comunidad sí tiene tipos ligados a la ACTIVIDAD'
                 }
               />
 

@@ -43,8 +43,7 @@ import {
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
-  respuestaEscriturar,
-} from '@/data/itp-ccaa';
+  respuestaEscriturar, superaElTope } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import { RESPUESTA_ITP_GARAJE_SEGUNDA_MANO } from './metadata';
 
@@ -289,8 +288,18 @@ export default function SimuladorGarajeCompraventaPage() {
     // convertiría en una reventa antes del año y liquidaría un impuesto a partir de un dato
     // imposible, que es justo lo que el CASO C de esta app exige que no pase.
     const aniosTexto = aniosPropiedad.trim();
-    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
-    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
+    /**
+     * ⚠️ 13/09/2026 — la guarda era `Math.trunc(parseSpanishNumber(texto)) >= 0`, y
+     * `Math.trunc(-0,5)` devuelve **-0**, con `-0 >= 0` igual a `true`: el entero «-1» se
+     * rechazaba pero el decimal «-0,5» se aceptaba y liquidaba la plusvalía con el
+     * coeficiente de «menos de 1 año» (0,14), presentando el neto como definitivo a partir
+     * de un dato imposible. El mismo signo recibía dos tratamientos distintos (hallazgo 764).
+     * Se decide sobre el valor SIN truncar, y `Object.is` es lo único que distingue -0 de 0.
+     */
+    const aniosBruto = aniosTexto === '' ? NaN : parseSpanishNumber(aniosTexto);
+    const aniosNegativo = aniosBruto < 0 || Object.is(aniosBruto, -0);
+    const anios = Math.trunc(aniosBruto);
+    const aniosDisponibles = Number.isFinite(anios) && !aniosNegativo;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
@@ -775,6 +784,11 @@ export default function SimuladorGarajeCompraventaPage() {
                             <br />
                             Requisitos: {r.condiciones.join(' · ')}
                             {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
+                            {/* El tope de valor SÍ se comprueba, así que la línea no puede
+                                ofrecerse como rebaja al alcance cuando el precio la descarta
+                                (hallazgo 765). Se enseña igualmente porque dice a partir de qué
+                                precio existiría, que es lo que los hallazgos 721 y 741 exigen. */}
+                            {superaElTope(r, resultadosComprador.precioGaraje) ? ' · ⚠️ tu precio supera ese límite: no podrías acogerte' : ''}
                           </li>
                         ))}
                       </ul>
@@ -1163,8 +1177,8 @@ export default function SimuladorGarajeCompraventaPage() {
               <span aria-hidden="true" className={styles.tipIcon}>📅</span>
               <strong>Liquida el ITP en el plazo legal</strong>
               <p>
-                El ITP debe liquidarse en {PLAZO_ITP.dias} días hábiles desde la firma de la escritura
-                ({PLAZO_ITP.baseNormativa}). Presentarlo
+                El ITP debe liquidarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la firma de la escritura
+                ({PLAZO_ITP.baseNormativa}). <strong>{PLAZO_ITP.aviso}</strong> Presentarlo
                 tarde por iniciativa propia, sin requerimiento de la Administración, genera recargo
                 desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más
                 otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,

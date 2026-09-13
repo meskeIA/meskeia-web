@@ -372,3 +372,33 @@
   border-color: #f59e0b;
   color: #e0c070;
 }
+
+/* ===== TABLA COMPARATIVA RÚSTICA vs SOLAR (bloque educativo) =====
+
+   Las celdas que contestan la pregunta que la tabla existe para contestar iban pintadas con
+   `#27ae60` y `#c0392b` en línea, sin token ni variante de tema: el verde da 2,64:1 sobre el
+   #F5F5F5 de `EducationalSection`, muy por debajo del 4,5:1 de la WCAG 2.1 AA a 14,4 px en
+   negrita (hallazgo 804). Los pares son los mismos que ya usa la hermana nave-industrial
+   (hallazgo 648), medidos contra los DOS fondos que la tabla llega a tener en cada tema —el
+   de la sección y el de las filas alternas, que es `--bg-primary`:
+     · claro:  #176A3A → 6,10:1 y 6,37:1 · #B32D1F → 5,82:1 y 6,07:1
+     · oscuro: #6FDC9C → 6,92:1 y 10,27:1 · #FF9A8C → 5,72:1 y 8,50:1
+
+   El color NO es el único portador del dato —la celda dice «Sí …» o «No …» en palabras— y
+   marca la RESPUESTA, no si conviene: antes el verde señalaba «No aplica» en una fila y el
+   rojo «No (exento)» en la de arriba. */
+.celdaSi {
+  color: #176A3A;
+}
+
+.celdaNo {
+  color: #B32D1F;
+}
+
+[data-theme='dark'] .celdaSi {
+  color: #6FDC9C;
+}
+
+[data-theme='dark'] .celdaNo {
+  color: #FF9A8C;
+}

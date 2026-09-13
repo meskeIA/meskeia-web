@@ -2237,7 +2237,10 @@ test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
       return Array.from(faq.querySelectorAll('h3, h4, h5, h6')).map((h) => h.tagName);
     });
 
-    expect(niveles.length).toBe(5);
+    // ⚠️ 13/09/2026: el número de preguntas NO es la invariante y envejecía sola —el commit
+    // d2df9760 añadió la sexta («escriturar») y dejó este test en rojo sin que nada hubiera
+    // regresado—. Lo que el hallazgo 626 protege es que ninguna salte de nivel.
+    expect(niveles.length).toBeGreaterThanOrEqual(5);
     expect(Array.from(new Set(niveles))).toEqual(['H3']);
   });
 });
@@ -3260,7 +3263,6 @@ test.describe('Hallazgos abiertos — re-inspección del 12/09/2026', () => {
   test('ABIERTO 12/09 — un año de propiedad negativo decimal debería rechazarse igual que «-1»', async ({
     page,
   }) => {
-    test.fail(); // hoy liquida 175,00 € con el coeficiente de «Menos de 1 año»
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await page.selectOption('#select-ccaa', 'madrid');
@@ -3304,7 +3306,6 @@ test.describe('Hallazgos abiertos — re-inspección del 12/09/2026', () => {
   test('ABIERTO 12/09 — el plazo de 30 días hábiles sale sin el aviso de que es supletorio', async ({
     page,
   }) => {
-    test.fail(); // el `aviso` del módulo no llega a pantalla
     await page.goto(RUTA);
     const cuerpo = (await page.evaluate(() => document.body.textContent ?? '')).replace(
       /\s+/g,
@@ -3337,10 +3338,22 @@ test.describe('Hallazgos abiertos — re-inspección del 12/09/2026', () => {
    *   el precio es 7,5 veces ese máximo, así que la bonificación del art. 121-4 está
    *   descartada por PRECIO, no por un requisito que nadie haya preguntado.
    */
-  test('ABIERTO 12/09 — no debería ofrecerse una bonificación cuyo tope de valor el precio ya supera', async ({
+  /**
+   * [765] REPARADO 13/09/2026 — con una salvedad que el acta ya preveía.
+   *
+   * El «esperado» del acta ofrecía dos salidas: que no se ofrezca, «o que el aviso diga que el
+   * precio la descarta». Retirarlo de la lista era la primera, y choca de frente con lo que las
+   * reparaciones de los hallazgos 721 y 741 dejaron exigido en el spec del hub: «el reducido
+   * perdido se enseña como oportunidad, CON el tope que lo dejó fuera» (CASO 41, Castilla y
+   * León). Las dos cosas no caben, y la que informa sin engañar es la segunda: el dato dice a
+   * partir de qué precio existiría la rebaja, y la línea dice que con este precio no.
+   *
+   * Así que el test comprueba lo que de verdad protege: que la línea NO se presente como una
+   * rebaja al alcance sin decir que el precio la descarta.
+   */
+  test('[765] una bonificación cuyo tope el precio ya supera se marca como descartada', async ({
     page,
   }) => {
-    test.fail(); // hoy la ofrece, con su «Valor máximo 100.000,00 €» al lado
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
@@ -3357,6 +3370,11 @@ test.describe('Hallazgos abiertos — re-inspección del 12/09/2026', () => {
 
     const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
     const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
-    expect(texto).not.toContain('Discapacidad ≥65%');
+    // Sigue apareciendo —dice a partir de qué precio existiría— pero con el precio descartándola
+    const linea = page
+      .locator('[role="note"] li')
+      .filter({ hasText: 'Discapacidad ≥65%' });
+    await expect(linea).toContainText('tu precio supera ese límite');
+    expect(texto).toContain('Valor máximo 100.000,00');
   });
 });

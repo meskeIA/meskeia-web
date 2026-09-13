@@ -3129,7 +3129,6 @@ test('ABIERTO 12/09 (dato) — el plazo del ITP no cita su norma ni sale de data
 test('ABIERTO 12/09 (operativa) — una comisión ilegible se lee como 0 % y no se dice', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   await sembrar(page, 'Precio del trastero', '15000');
@@ -3159,7 +3158,6 @@ test('ABIERTO 12/09 (operativa) — una comisión ilegible se lee como 0 % y no 
 //       → esperado: ≥ 2 (las dos constantes importadas y usadas, como en garaje)
 //       → obtenido: 0, mientras `metadata.ts` afirma lo contrario en su línea 21.
 test('ABIERTO 12/09 (contenido) — la FAQ visible duplica a mano las respuestas de metadata', async () => {
-  test.fail();
   const { readFileSync } = await import('node:fs');
   const { join } = await import('node:path');
   const pagina = readFileSync(

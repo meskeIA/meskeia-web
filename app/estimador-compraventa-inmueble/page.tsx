@@ -7,7 +7,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -27,8 +27,7 @@ import {
   horquillaFedatarios,
   horquillaEdadJoven,
   TERRITORIOS_SIN_IVA,
-  sumarLineasVisibles,
-} from '@/data/itp-ccaa';
+  sumarLineasVisibles, superaElTope } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import { HORQUILLA_GASTOS_COMPRAVENTA, GESTORIA_TIPICA, HORQUILLA_GESTORIA } from './metadata';
 
@@ -337,7 +336,9 @@ export default function SimuladorCompraventaPage() {
           ? IVA_INMUEBLES_2025.obraNueva
           : esResidencial
             ? IVA_INMUEBLES_2025.anejoVinculado
-            : IVA_INMUEBLES_2025.local;
+            // El suelo edificable va al tipo GENERAL del art. 90 LIVA, no al del LOCAL
+            // comercial: hoy los dos valen 21, pero son datos distintos (hallazgo 770).
+            : PORCENTAJES_IVA.general;
         impuesto = precio * (porcentaje / 100);
       }
     } else {
@@ -419,8 +420,18 @@ export default function SimuladorCompraventaPage() {
     // Un año NEGATIVO no se acota a 0: se rechaza. Acotarlo lo convertiría en una reventa
     // antes del año y liquidaría un impuesto a partir de un dato imposible.
     const aniosTexto = aniosPropiedad.trim();
-    const anios = aniosTexto === '' ? NaN : Math.trunc(parseSpanishNumber(aniosTexto));
-    const aniosDisponibles = Number.isFinite(anios) && anios >= 0;
+    /**
+     * ⚠️ 13/09/2026 — la guarda era `Math.trunc(parseSpanishNumber(texto)) >= 0`, y
+     * `Math.trunc(-0,5)` devuelve **-0**, con `-0 >= 0` igual a `true`: el entero «-1» se
+     * rechazaba pero el decimal «-0,5» se aceptaba y liquidaba la plusvalía con el
+     * coeficiente de «menos de 1 año» (0,14), presentando el neto como definitivo a partir
+     * de un dato imposible. El mismo signo recibía dos tratamientos distintos (hallazgo 764).
+     * Se decide sobre el valor SIN truncar, y `Object.is` es lo único que distingue -0 de 0.
+     */
+    const aniosBruto = aniosTexto === '' ? NaN : parseSpanishNumber(aniosTexto);
+    const aniosNegativo = aniosBruto < 0 || Object.is(aniosBruto, -0);
+    const anios = Math.trunc(aniosBruto);
+    const aniosDisponibles = Number.isFinite(anios) && !aniosNegativo;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
@@ -793,7 +804,12 @@ export default function SimuladorCompraventaPage() {
               </select>
               {perfilComprador !== 'general' && datosCcaaActual.tiposReducidos.length > 0 && (
                 <div className={styles.tiposReducidosInfo}>
-                  <h4>Tipos reducidos disponibles en {datosCcaaActual.nombre}:</h4>
+                  {/* «Beneficios fiscales» y no «tipos reducidos»: desde 7a02470c, Aragón
+                      no tiene tipos reducidos sino bonificaciones sobre la cuota, y su propia
+                      nota —impresa unos centímetros más arriba— lo dice. Quien llamara a la
+                      oficina liquidadora pedía algo que allí no existe con ese nombre
+                      (hallazgo 769; ya reparado así en la hermana garaje el 11/09). */}
+                  <h4>Beneficios fiscales en {datosCcaaActual.nombre}, solo si se cumplen TODAS sus condiciones:</h4>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
@@ -974,19 +990,53 @@ export default function SimuladorCompraventaPage() {
                       <p className={styles.avisoReducidosTitulo}>
                         <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
                       </p>
+                      {/* ⚠️ 13/09/2026 — este texto era fijo y decía «usa el tipo general»
+                          también cuando se había aplicado un REDUCIDO, así que el lector tenía
+                          delante dos frases incompatibles sobre el mismo importe (hallazgo 768).
+                          Ahora nombra el tipo que de verdad se ha cobrado. */}
                       <p className={styles.avisoReducidosTexto}>
-                        El cálculo usa el tipo general porque no podemos comprobar tu situación.
-                        En {datosCcaaActual.nombre} existe:
+                        {resultadosComprador.tipoElegido.esReducido ? (
+                          <>
+                            El cálculo aplica el{' '}
+                            <strong>{formatNumber(resultadosComprador.tipoElegido.tipo, 2)}%</strong>
+                            {resultadosComprador.tipoElegido.nombre
+                              ? ` (${resultadosComprador.tipoElegido.nombre})`
+                              : ''}
+                            . En {datosCcaaActual.nombre} hay además tipos más bajos que dependen
+                            de requisitos que no preguntamos:
+                          </>
+                        ) : (
+                          <>
+                            El cálculo usa el tipo general porque no podemos comprobar tu situación.
+                            En {datosCcaaActual.nombre} existe:
+                          </>
+                        )}
                       </p>
                       <ul className={styles.avisoReducidosLista}>
-                        {resultadosComprador.tipoElegido.noComprobables.map(r => (
-                          <li key={r.nombre}>
-                            <strong>{formatNumber(r.tipo, 2)}% — {r.nombre}</strong>
-                            <br />
-                            Requisitos: {r.condiciones.join(' · ')}
-                            {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
-                          </li>
-                        ))}
+                        {/* El límite de valor va UNA vez: cuando ya viaja en el nombre o en las
+                            condiciones —lo normal en la tabla— repetirlo detrás formateado lo
+                            escribía tres veces del mismo número (hallazgo 771). */}
+                        {resultadosComprador.tipoElegido.noComprobables.map(r => {
+                          /** «≤150.000€», «≤ 150.000 €» y «150.000,00 €» son el mismo número. */
+                          const diceElTope = (texto: string) =>
+                            !!r.valorMaximo && texto.replace(/[.\s]/g, '').includes(String(r.valorMaximo));
+                          const topeEnNombre = diceElTope(r.nombre);
+                          // Si el nombre ya lo lleva, la condición que solo repite ese mismo tope
+                          // sobra: es la segunda de las tres escrituras del hallazgo 771.
+                          const condiciones = r.condiciones.filter(
+                            c => !(topeEnNombre && diceElTope(c) && /valor/i.test(c))
+                          );
+                          const topeYaDicho = !r.valorMaximo || topeEnNombre || condiciones.some(diceElTope);
+                          return (
+                            <li key={r.nombre}>
+                              <strong>{formatNumber(r.tipo, 2)}% — {r.nombre}</strong>
+                              <br />
+                              Requisitos: {condiciones.join(' · ')}
+                              {topeYaDicho ? '' : ` · Valor máximo ${formatCurrency(r.valorMaximo ?? 0)}`}
+                              {superaElTope(r, resultadosComprador.precioInmueble) ? ' · ⚠️ tu precio supera ese límite: no podrías acogerte' : ''}
+                            </li>
+                          );
+                        })}
                       </ul>
                       <p className={styles.avisoReducidosTexto}>
                         Comprueba los requisitos con la oficina liquidadora de tu comunidad antes de contar con la rebaja: la mayoría exigen que sea tu vivienda habitual, y algunos añaden límites de renta, superficie o municipio.
@@ -1451,12 +1501,13 @@ export default function SimuladorCompraventaPage() {
             </div>
           </div>
 
-          <h2>Tipos reducidos de ITP</h2>
+          <h2>Beneficios fiscales del ITP</h2>
           <p className={styles.introParagraph}>
-            Muchas comunidades ofrecen tipos reducidos para determinados colectivos:
+            Muchas comunidades rebajan el ITP a determinados colectivos, unas con tipos reducidos y
+            otras con bonificaciones sobre la cuota (Aragón, por ejemplo, solo con lo segundo):
           </p>
           <ul className={styles.listaReducidos}>
-            <li><strong>Jóvenes</strong> (cada comunidad fija su propia edad tope, y no coinciden: el panel «Tipos reducidos disponibles» de arriba muestra la de la comunidad elegida)</li>
+            <li><strong>Jóvenes</strong> (cada comunidad fija su propia edad tope, y no coinciden: el panel de beneficios fiscales de arriba muestra la de la comunidad elegida)</li>
             <li><strong>Familias numerosas</strong></li>
             <li><strong>Personas con discapacidad</strong> (≥33% o ≥65%)</li>
             <li><strong>VPO</strong> (Vivienda de Protección Oficial)</li>
@@ -1632,7 +1683,7 @@ export default function SimuladorCompraventaPage() {
               <p>Muchas comunidades aplican tipos reducidos para jóvenes, familias numerosas,
               personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos
               (edad, ingresos, valor máximo del inmueble) varían por comunidad: la edad tope del tipo joven
-              va de los {EDAD_JOVEN.min} a los {EDAD_JOVEN.max} años según dónde compres, y el panel «Tipos reducidos disponibles» de la
+              va de los {EDAD_JOVEN.min} a los {EDAD_JOVEN.max} años según dónde compres, y el panel de beneficios fiscales de la
               calculadora muestra la que aplica en cada caso. Consulta la normativa de tu CC.AA.</p>
             </div>
             <div className={styles.faqItem}>
@@ -1686,7 +1737,8 @@ export default function SimuladorCompraventaPage() {
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
                 <strong>Liquida los impuestos en el plazo establecido</strong>
-                <p>El ITP o IVA+AJD debe liquidarse en un plazo de 30 días hábiles desde la firma.
+                <p>El ITP o IVA+AJD debe liquidarse en un plazo de {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde
+                la firma ({PLAZO_ITP.baseNormativa}). {PLAZO_ITP.aviso}
                 El incumplimiento genera un recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}%
                 de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
                 y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez transcurridos
@@ -1724,7 +1776,8 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Planifica los plazos fiscales</strong>
-              <p>Liquida los impuestos en los 30 días hábiles legales. Un retraso, aunque sea breve,
+              <p>Liquida los impuestos en los {PLAZO_ITP.dias} {PLAZO_ITP.unidad} legales
+              ({PLAZO_ITP.baseNormativa}); {PLAZO_ITP.aviso.charAt(0).toLowerCase() + PLAZO_ITP.aviso.slice(1)} Un retraso, aunque sea breve,
               genera recargos automáticos. Tenlo agendado desde el día de la firma.</p>
             </div>
             <div className={styles.tipCard}>
@@ -1763,7 +1816,7 @@ export default function SimuladorCompraventaPage() {
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
-            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en 30 días hábiles desde la escritura. Pasado ese plazo hay recargo automático
+            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la escritura ({PLAZO_ITP.baseNormativa}), y hay comunidades que fijan el suyo propio. Pasado ese plazo hay recargo automático
             desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
             y del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses.</li>
           </ul>

@@ -961,7 +961,15 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
     expect(faq).not.toBe('');
     // RANGO_ITP.min = 4 (País Vasco) y RANGO_ITP.max = 13 (tramo alto de las escalas
     // progresivas): las DOS preguntas que hablan de ITP tienen que decir lo mismo.
-    expect(faq.match(/del 4% al 13%/g)?.length).toBe(2);
+    // ⚠️ 13/09/2026: el NÚMERO de preguntas que citan el rango no es la invariante y envejece
+    // con cada pregunta nueva —el commit d2df9760 añadió la de «escriturar», que también lo
+    // deriva, y dejó este test en rojo sin que nada hubiera regresado—. Lo que el hallazgo 665
+    // protege es que TODAS las que lo citen digan lo mismo, derivado de la tabla.
+    const citasDeITP = (faq.match(/tipo general de (?:la|su) comunidad[^.]*?del \d+% al \d+%/g) ?? [])
+      .map((frase) => frase.match(/del \d+% al \d+%/)?.[0]);
+    expect(citasDeITP.length).toBeGreaterThanOrEqual(2);
+    expect(new Set(citasDeITP).size).toBe(1);
+    expect(citasDeITP[0]).toBe('del 4% al 13%');
     // Y lo que estaba escrito a mano ya no aparece.
     expect(faq).not.toContain('10%-11%');
     expect(faq).not.toContain('Comunidad Valenciana');
@@ -1549,7 +1557,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
    * Esperado: acotado a 0, como los otros tres importes → comisión 0,00 €, IRPF 25.767,00 €
    * y neto 371.133,00 €, que es exactamente lo que la app da en cuanto se sale del campo.
    */
-  test.fail('HALLAZGO 12/09 (medio) — una comisión NEGATIVA no puede abaratar la venta ni encarecer el IRPF', async ({ page }) => {
+  test('[785] una comisión NEGATIVA no abarata la venta ni encarece el IRPF, ni siquiera con el foco dentro', async ({ page }) => {
     await sembrarImporte12(page, 'Precio del local comercial', '400000');
     await page.getByRole('button', { name: /Vendedor/ }).click();
     await sembrarImporte12(page, 'Precio de compra original', '250000');
@@ -1592,7 +1600,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
    *
    * Esperado: que el tipo aplicado aparezca en la página, derivado de la constante.
    */
-  test.fail('HALLAZGO 12/09 (medio) — la página no dice el 25 % con el que liquida la plusvalía, y sí el 30 % que no aplica', async ({ page }) => {
+  test('[786] la página nombra el tipo municipal con el que liquida la plusvalía', async ({ page }) => {
     await sembrarImporte12(page, 'Precio del local comercial', '400000');
     await page.getByRole('button', { name: /Vendedor/ }).click();
     await sembrarImporte12(page, 'Precio de compra original', '250000');
@@ -1629,7 +1637,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
    *
    * Esperado: que la tarjeta no niegue de plano los tipos reducidos.
    */
-  test.fail('HALLAZGO 12/09 (bajo) — en Aragón la tarjeta del ITP niega los tipos reducidos que su propia ficha documenta', async ({ page }) => {
+  test('[787] en Aragón la tarjeta del ITP no niega los tipos ligados a la actividad que su ficha documenta', async ({ page }) => {
     await page.locator('#select-ccaa').selectOption('aragon');
     await sembrarImporte12(page, 'Precio del local comercial', '300000');
 

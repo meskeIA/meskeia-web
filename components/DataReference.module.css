@@ -37,7 +37,12 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #2e86ab;
+  /* ⚠️ 13/09/2026 — era el azul de marca #2E86AB, que sobre el #F0F7FB de este bloque da
+     3,79:1, por debajo del 4,5:1 de la WCAG 2.1 AA (hallazgo 807). El token
+     `--primary-texto` (#26718F) es el mismo azul oscurecido para uso como TEXTO y da 5,29:1
+     sobre ese fondo. El 11/09 se reparó así en el CSS de una app; el componente compartido
+     —que llevan todas las apps de riesgo 1— se había quedado fuera. */
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .titulo {
@@ -80,7 +85,12 @@
 /* Enlace fuente oficial */
 
 .enlace {
-  color: #2e86ab;
+  /* ⚠️ 13/09/2026 — era el azul de marca #2E86AB, que sobre el #F0F7FB de este bloque da
+     3,79:1, por debajo del 4,5:1 de la WCAG 2.1 AA (hallazgo 807). El token
+     `--primary-texto` (#26718F) es el mismo azul oscurecido para uso como TEXTO y da 5,29:1
+     sobre ese fondo. El 11/09 se reparó así en el CSS de una app; el componente compartido
+     —que llevan todas las apps de riesgo 1— se había quedado fuera. */
+  color: var(--primary-texto);
   text-decoration: underline;
   font-weight: 600;
   transition: color 0.2s ease;

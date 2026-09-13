@@ -38,8 +38,7 @@ import {
 import {
   IVA_INMUEBLES_2025,
   FISCAL_INMUEBLES_META,
-  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
-} from '@/data/fiscal';
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025, PORCENTAJES_IVA } from '@/data/fiscal';
 
 // ===== TIPOS =====
 // Terreno rústico no edificable: exento de IVA → ITP (regla general).
@@ -89,7 +88,17 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
 
 // Tipo de IVA de inmueble no residencial. Sale de data/fiscal para no divergir en
 // silencio cuando cambie allí (hallazgo 163 del Inspector, del clúster entero).
-const IVA_RENUNCIA = IVA_INMUEBLES_2025.local;
+/**
+ * IVA del terreno: el tipo GENERAL del art. 90 LIVA.
+ *
+ * ⚠️ 13/09/2026 — se leía de `IVA_INMUEBLES_2025.local`, que data/fiscal documenta como «IVA
+ * local comercial», y un terreno no es un local (hallazgo 805 del Inspector). Hoy ambas valen
+ * 21, así que ninguna cifra cambia: existen separadas precisamente para poder divergir, y el
+ * día que se mueva el tipo del local sin moverse el general esta app seguiría al equivocado
+ * sin que ningún candado lo avisara. Es la reparación que el 11/09 sí llegó a la hermana
+ * `simulador-gastos-compraventa-solar`.
+ */
+const IVA_RENUNCIA = PORCENTAJES_IVA.general;
 
 // Extremos de la base del ahorro del IRPF. Derivados de data/fiscal para que el bloque
 // educativo no pueda contradecir a la escala el día que ésta se mueva (hallazgo 371).
@@ -180,6 +189,8 @@ export default function SimuladorTerrenoRusticoPage() {
   const datosCcaaActual = ITP_CCAA[ccaa];
   /** Ceuta y Melilla bonifican el 50 % de la cuota (art. 57 bis TRLITPAJD), y hay que decirlo. */
   const ciudadBonificada = CIUDADES_CON_BONIFICACION.includes(ccaa);
+  /** Canarias, Ceuta y Melilla: allí no rige el IVA, sino el IGIC o el IPSI. */
+  const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
 
   return (
     <div className={styles.container}>
@@ -252,7 +263,13 @@ export default function SimuladorTerrenoRusticoPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
                 <span>Con renuncia a la exención IVA</span>
-                <span className={styles.transmisionSub}>IVA 21% (ISP) + AJD</span>
+                {/* El subtítulo no puede prometer un IVA que allí no se liquida, ni escribir
+                    su tipo a mano teniéndolo en data/fiscal (hallazgos 803 y 806). */}
+                <span className={styles.transmisionSub}>
+                  {territorioActualSinIva
+                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
+                    : `IVA ${formatNumber(IVA_RENUNCIA, 0)}% (ISP) + AJD`}
+                </span>
               </button>
             </div>
           </div>
@@ -326,8 +343,12 @@ export default function SimuladorTerrenoRusticoPage() {
                 <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
-                <span className={styles.infoCcaaLabel}>IVA (renuncia)</span>
-                <span className={styles.infoCcaaValue}>{IVA_RENUNCIA}%</span>
+                <span className={styles.infoCcaaLabel}>
+                  {territorioActualSinIva ? `${territorioActualSinIva.impuesto} (renuncia)` : 'IVA (renuncia)'}
+                </span>
+                <span className={styles.infoCcaaValue}>
+                  {territorioActualSinIva ? 'No calculado' : `${formatNumber(IVA_RENUNCIA, 0)}%`}
+                </span>
               </div>
             </div>
             {datosCcaaActual.tramosProgresivos && (
@@ -403,7 +424,17 @@ export default function SimuladorTerrenoRusticoPage() {
 
               {resultadosComprador.ajd > 0 && (
                 <ResultCard
-                  title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                  // Tipo EFECTIVO, no el nominal de la tabla: en Ceuta y Melilla la cuota
+                  // gradual se bonifica al 50 % (art. 57 bis.1 TRLITPAJD) y el nominal
+                  // desmentía por el doble al importe de al lado, mientras la tarjeta del ITP
+                  // de la misma pantalla sí llevaba el efectivo (hallazgo 802; reparado así en
+                  // garaje, trastero, local-comercial y nave-industrial por el 447).
+                  title={`AJD (${formatNumber(
+                    resultadosComprador.precioInmueble > 0
+                      ? (resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100
+                      : datosCcaaActual.ajd,
+                    2
+                  )}%)`}
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
@@ -484,7 +515,9 @@ export default function SimuladorTerrenoRusticoPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ background: 'var(--primary)', color: '#fff' }}>
+                {/* El azul de marca con texto blanco da 4,11:1 a este tamaño; --hero-bg
+                    (#1a5278), que es el azul marino de la misma paleta, da 8,59:1 (hallazgo 804). */}
+                <tr style={{ background: 'var(--hero-bg)', color: '#fff' }}>
                   <th style={{ padding: '10px', textAlign: 'left' }}>Concepto</th>
                   <th style={{ padding: '10px', textAlign: 'center' }}>Finca rústica</th>
                   <th style={{ padding: '10px', textAlign: 'center' }}>Solar edificable</th>
@@ -498,13 +531,16 @@ export default function SimuladorTerrenoRusticoPage() {
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>¿Sujeto a IVA por empresario?</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0', color: '#c0392b' }}>No (exento)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0', color: '#27ae60' }}>Sí (21% + AJD)</td>
+                  <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>No (exento)</td>
+                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (21% + AJD)</td>
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Plusvalía municipal</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#27ae60', fontWeight: 700 }}>No aplica</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#c0392b' }}>Sí (suelo urbano)</td>
+                  {/* El color marca la RESPUESTA, no si conviene: hasta el 13/09/2026 el verde
+                      señalaba «No aplica» en esta fila y el rojo «No (exento)» en la de arriba, de
+                      modo que el mismo color decía cosas opuestas en filas contiguas (hallazgo 804). */}
+                  <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700 }}>No aplica</td>
+                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (suelo urbano)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px' }}>Renuncia a la exención de IVA</td>

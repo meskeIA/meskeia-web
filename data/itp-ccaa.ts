@@ -920,6 +920,30 @@ const CONDICIONES_DE_UBICACION = [
  * 526, Inspector 30/08/2026): con la tilde sin normalizar, el tipo reducido de Galicia para
  * jóvenes no se encontraba y el ejemplo publicaba un 0% que no es el 3% real.
  */
+/**
+ * Deja en la lista de oportunidades solo las que de verdad bajan del tipo que se cobra.
+ *
+ * ⚠️ 13/09/2026 — `alAlcanceDeCualquiera` se filtra contra el tipo GENERAL, no contra el que
+ * se acaba aplicando, así que cuando un reducido SÍ se aplicaba la lista conservaba tipos por
+ * encima de él: en Andalucía, con el perfil Joven y 140.000 €, la app cobraba el 3,50 % y
+ * ofrecía como rebaja un 6,00 % —3.500 € MÁS— y un 3,50 % que no ahorra nada (hallazgo 767
+ * del Inspector). El pie del aviso invita a llamar a la oficina liquidadora, así que el error
+ * no se quedaba en la pantalla.
+ */
+/**
+ * ¿El precio introducido deja fuera a este reducido por su propio tope de valor?
+ *
+ * Un tope de VALOR sí se pregunta —es el precio que el usuario teclea— y `elegirTipoITP` ya lo
+ * comprueba para decidir si el tipo es aplicable. El reducido sigue apareciendo en
+ * `noComprobables` porque informa, pero la app tiene que decir que el precio lo descarta en vez
+ * de ofrecerlo como una rebaja al alcance (hallazgo 765 del Inspector).
+ */
+export const superaElTope = (r: TipoReducido, precio: number): boolean =>
+  !!r.valorMaximo && precio > r.valorMaximo;
+
+const soloRebajas = (lista: TipoReducido[], tipoAplicado: number): TipoReducido[] =>
+  lista.filter(r => r.tipo < tipoAplicado);
+
 export const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export function elegirTipoITP(
@@ -1024,16 +1048,27 @@ export function elegirTipoITP(
       : base;
   }
 
-  const aplicables = candidatos.filter(
-    r => (!r.valorMaximo || precio <= r.valorMaximo) && r.condiciones.every(cubierta)
-  );
+  const dentroDelTope = (r: TipoReducido) => !r.valorMaximo || precio <= r.valorMaximo;
+  const aplicables = candidatos.filter(r => dentroDelTope(r) && r.condiciones.every(cubierta));
+  /**
+   * Lo que se enseña como oportunidad.
+   *
+   * ⚠️ Incluye los que el PRECIO descarta por su tope de valor, a propósito: las reparaciones
+   * de los hallazgos 721 y 741 dejaron exigido que el reducido perdido se siga enseñando con
+   * el tope que lo dejó fuera, porque dice a partir de qué precio existiría la rebaja. Lo que
+   * no puede hacerse —y es el hallazgo 765— es presentarlos bajo un rótulo que promete una
+   * rebaja aritméticamente imposible sin decir cuáles lo son: para eso está `superaElTope`,
+   * que las apps usan al pintar cada línea.
+   */
   const noComprobables = [
     ...candidatos.filter(r => !aplicables.includes(r)),
     ...alAlcanceDeCualquiera.filter(r => !candidatos.includes(r)),
   ];
 
   if (!aplicables.length) {
-    return porUbicacion ? { ...porUbicacion, noComprobables } : { ...general, noComprobables };
+    return porUbicacion
+      ? { ...porUbicacion, noComprobables: soloRebajas(noComprobables, porUbicacion.tipo) }
+      : { ...general, noComprobables: soloRebajas(noComprobables, general.tipo) };
   }
 
   // Entre los que sí se pueden aplicar, el más favorable al comprador
@@ -1042,7 +1077,7 @@ export function elegirTipoITP(
   // Y si la bonificación por ubicación es aún mejor, manda esa: son acumulables en el
   // sentido de que el comprador puede acogerse a la que más le convenga, no a las dos.
   if (porUbicacion && porUbicacion.tipo < mejor.tipo) {
-    return { ...porUbicacion, noComprobables };
+    return { ...porUbicacion, noComprobables: soloRebajas(noComprobables, porUbicacion.tipo) };
   }
 
   return {
@@ -1050,7 +1085,9 @@ export function elegirTipoITP(
     esReducido: true,
     nombre: mejor.nombre,
     condiciones: mejor.condiciones,
-    noComprobables,
+    // Contra el tipo que se cobra, no contra el general: es la salida por la que se colaba
+    // el 6 % ofrecido como rebaja de un 3,50 % ya aplicado (hallazgo 767).
+    noComprobables: soloRebajas(noComprobables, mejor.tipo),
   };
 }
 
