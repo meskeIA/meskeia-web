@@ -1248,7 +1248,6 @@ test.describe('hallazgos abiertos · 12/09/2026', () => {
   test('533 · la tabla comparativa del bloque educativo contradice las fichas de la app', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // Es el mismo defecto que el «radio de Cs» reparado el 23/08 —ese quedó bien: el
@@ -1286,7 +1285,6 @@ test.describe('hallazgos abiertos · 12/09/2026', () => {
   });
 
   test('534 · el origen sintético solo llega al JSON-LD, nunca a la pantalla', async ({ page }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // La reparación del hallazgo 531 hizo lo correcto —sacar «Sintético» del filtro de
@@ -1308,7 +1306,6 @@ test.describe('hallazgos abiertos · 12/09/2026', () => {
   test('535 · los doce botones «Comprobar» de las fichas comparten nombre accesible', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // Llegó con `1d905afb`. Las 12 tarjetas son <article> sin nombre accesible (ni
@@ -1317,7 +1314,11 @@ test.describe('hallazgos abiertos · 12/09/2026', () => {
     // de pantalla —que es cómo se recorre una página de 12 formularios iguales— oye doce
     // «Comprobar» seguidos sin saber a qué ficha pertenece cada uno (WCAG 2.4.6). Basta
     // con aria-label="Comprobar la ficha 3" o con dar nombre al <article>.
-    const comprobar = page.getByRole('button', { name: 'Comprobar', exact: true });
+    // ⚠️ 13/09/2026: el locator era { name: 'Comprobar', exact: true }, y tras la reparación
+    // ya no casa con ninguno — que es justo la señal de que los doce dejaron de llamarse igual.
+    // Se busca por el principio del nombre, que sigue siendo el texto visible del botón
+    // (WCAG 2.5.3: el nombre accesible empieza por lo que se lee en pantalla).
+    const comprobar = page.getByRole('button', { name: /^Comprobar/ });
     await expect(comprobar).toHaveCount(12);
 
     const nombres = await comprobar.evaluateAll((bs) =>

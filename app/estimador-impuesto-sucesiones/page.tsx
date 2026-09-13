@@ -24,6 +24,12 @@ import {
   REDUCCION_EDAD_MENOR_21_CATALUNA_IS,
   REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS,
   REDUCCION_SEGURO_VIDA_MAX_IS,
+  PLAZO_ISD,
+  REDUCCION_VIVIENDA_MAX_IS,
+  REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
+  REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS,
+  REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
+  REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
   REDUCCION_DISCAPACIDAD_33_IS,
   REDUCCION_DISCAPACIDAD_65_IS,
   PORC_AJUAR_DOMESTICO_IS,
@@ -33,6 +39,7 @@ import {
 } from '@/data/fiscal';
 import {
   evaluarReduccionVivienda,
+  calcularSucesion,
   porcentajeBonificacionPonderada,
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
 } from '@/lib/calculadoras/sucesiones';
@@ -78,6 +85,8 @@ interface ResultadoSucesiones {
   cuotaFinal: number;
   // Meta
   tipoEfectivo: number;
+  /** El porcentaje de herencia REALMENTE aplicado, ya capado entre 0 y 1 (hallazgo 798). */
+  porcentajeHerenciaAplicado: number;
   ccaaNombre: string;
   esForal: boolean;
 }
@@ -234,6 +243,30 @@ const CAMPOS_DEUDAS = [
 ] as const;
 
 // ─── Componente ───────────────────────────────────────────────────────────────
+
+/**
+ * El ejemplo de la tarjeta «Hijo adulto hereda piso», resuelto por el MOTOR.
+ *
+ * ⚠️ 13/09/2026 — iba escrito a mano con la tarifa DEROGADA de siete tramos y se quedaba
+ * 1.200 € por debajo de lo que liquida la propia herramienta con esos mismos datos: «cuota
+ * íntegra ~6.100 €» y «cuota final ~61 €» frente a 7.300,03 € y 73,00 € (hallazgo 794). Su
+ * aritmética era internamente coherente, así que nada la delataba salvo ejecutar la app — y
+ * el usuario lee estas tarjetas como confirmación del número que acaba de obtener. Es el
+ * gemelo del hallazgo 737, que el 11/09 sí recalculó la tarjeta del sobrino de Asturias.
+ *
+ * Derivarlo, y no corregir el número, es lo que impide que vuelva a separarse.
+ */
+const EJEMPLO_MADRID = calcularSucesion({
+  baseImponible: 200000,
+  ccaa: 'madrid',
+  grupo: 'II',
+  edadHeredero: 45,
+  viviendaHabitual: 200000,
+  incluyeAjuar: true,
+});
+
+/** Importe en euros para la prosa: mismo formato que el resto de la página. */
+const euros = (n: number) => formatCurrency(n);
 
 export default function EstimadorImpuestoSucesionesPage() {
   // Bienes del fallecido
@@ -405,8 +438,20 @@ export default function EstimadorImpuestoSucesionesPage() {
     // 3. Reducción por seguro de vida (solo para cónyuge, descendientes, ascendientes)
     const gruposConSeguro = ['I-conyuge', 'I-descendiente', 'II', 'II-descendiente', 'II-ascendiente'];
     if (gruposConSeguro.includes(grupo) && v_seguros > 0) {
-      const reduccionSeguro = Math.min(v_seguros, REDUCCION_SEGURO_VIDA_MAX_IS);
-      reducciones.push({ concepto: 'Seguro de vida', importe: reduccionSeguro });
+      /**
+       * ⚠️ 13/09/2026 — se tomaba el capital ENTERO del seguro aunque el heredero solo
+       * percibiera una parte, mientras la reducción de vivienda habitual del bloque de
+       * abajo sí se prorratea (`v_vivienda * porcHerencia`). Un heredero del 50 % se
+       * llevaba la reducción completa, es decir, una reducción mayor que el importe por el
+       * que la propia app le hace tributar: siempre INFRAVALORA la cuota, con techo en el
+       * tope de 9.195,49 € de base (hallazgo 796 del Inspector). Solo se veía en las
+       * comunidades sin bonificación del 99 % en cuota, que en las demás lo aplana.
+       */
+      const segurosDelHeredero = v_seguros * porcHerencia;
+      const reduccionSeguro = Math.min(segurosDelHeredero, REDUCCION_SEGURO_VIDA_MAX_IS);
+      if (reduccionSeguro > 0) {
+        reducciones.push({ concepto: 'Seguro de vida', importe: reduccionSeguro });
+      }
     }
 
     // 4. Reducción vivienda habitual — evaluarReduccionVivienda es la fuente única de esta
@@ -465,7 +510,10 @@ export default function EstimadorImpuestoSucesionesPage() {
     );
 
     const cuotaFinal = Math.max(0, cuotaTributaria - bonificacion);
-    const tipoEfectivo = baseImponibleTotal > 0 ? (cuotaFinal / baseAjustada) * 100 : 0;
+    // ⚠️ 13/09/2026 — la guarda miraba `baseImponibleTotal` y la división usaba
+    // `baseAjustada`, que con el 0 % de herencia vale cero: 0/0 = NaN, y `formatNumber`
+    // lo imprime como «No definido» (hallazgo 797, residuo de la reparación del 743).
+    const tipoEfectivo = baseAjustada > 0 ? (cuotaFinal / baseAjustada) * 100 : 0;
 
     return {
       totalActivos,
@@ -487,6 +535,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       detalleBonificacion: detalle,
       cuotaFinal,
       tipoEfectivo,
+      porcentajeHerenciaAplicado: porcHerencia,
       ccaaNombre: ccaaInfo?.nombre ?? '',
       esForal,
     };
@@ -545,7 +594,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           <li><strong>Consulta siempre con un gestor o asesor fiscal antes de autoliquidar</strong></li>
         </ul>
         <p className={styles.disclaimerPlazo}>
-          <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>6 meses</strong> desde el fallecimiento (prorrogable 6 meses más)
+          <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong> desde el fallecimiento ({PLAZO_ISD.norma}), prorrogable {PLAZO_ISD.mesesProrroga} meses más con intereses de demora
         </p>
         <p className={styles.disclaimerResponsabilidad}>
           meskeIA no se responsabiliza de decisiones basadas en estas herramientas.
@@ -830,7 +879,16 @@ export default function EstimadorImpuestoSucesionesPage() {
               {(tipoAdquisicion !== 'plena' || parseFloat(porcentajeHerencia) !== 100) && (
                 <div className={styles.desglose}>
                   <h3 className={styles.desgloseTitle}>Adquisición del Heredero</h3>
-                  <div className={styles.linea}><span>Porcentaje de herencia</span><span>{porcentajeHerencia}%</span></div>
+                  {/* El que se ENSEÑA tiene que ser el que se USA: el cálculo lo capa con
+                      Math.min(100, …) y la pantalla lo imprimía crudo, así que con «150» la app
+                      afirmaba un porcentaje y liquidaba otro (hallazgo 798). */}
+                  <div className={styles.linea}>
+                    <span>Porcentaje de herencia</span>
+                    <span>
+                      {formatNumber(resultado.porcentajeHerenciaAplicado * 100, 2)}%
+                      {Number.parseFloat(porcentajeHerencia) > 100 ? ' (capado al 100 %)' : ''}
+                    </span>
+                  </div>
                   {tipoAdquisicion !== 'plena' && (
                     <div className={styles.linea}>
                       <span>Tipo adquisición ({tipoAdquisicion})</span>
@@ -953,11 +1011,11 @@ export default function EstimadorImpuestoSucesionesPage() {
           <h3>Plazos importantes</h3>
           <div className={styles.plazosGrid}>
             <div className={styles.plazoCard}>
-              <span className={styles.plazoNum}>6 meses</span>
+              <span className={styles.plazoNum}>{PLAZO_ISD.mesesPresentacion} meses</span>
               <span>Para autoliquidar desde el fallecimiento</span>
             </div>
             <div className={styles.plazoCard}>
-              <span className={styles.plazoNum}>+6 meses</span>
+              <span className={styles.plazoNum}>+{PLAZO_ISD.mesesProrroga} meses</span>
               <span>Prórroga solicitando antes de los primeros 5 meses</span>
             </div>
           </div>
@@ -984,22 +1042,22 @@ export default function EstimadorImpuestoSucesionesPage() {
               <tbody>
                 <tr>
                   <td><strong>Grupo I</strong><br /><small>Descendiente &lt;21 a.</small></td>
-                  <td>15.956,87 € + 3.990,72 € por año &lt;21 (máx. 47.858,59 €)</td>
+                  <td>{euros(REDUCCIONES_PARENTESCO_IS['I-descendiente'])} + {euros(REDUCCION_EDAD_MENOR_21_IS)} por año &lt;21 (máx. {euros(REDUCCION_EDAD_MENOR_21_MAX_IS)})</td>
                   <td>1,0000 (patrimonio &lt;402.678 €)</td>
                   <td>99%–100% en Madrid, Canarias, Galicia, Andalucía</td>
                   <td>Hijo menor de 21 años hereda la vivienda familiar</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo II</strong><br /><small>Descendiente ≥21 a. / cónyuge / ascendiente</small></td>
-                  <td>15.956,87 €</td>
+                  <td>{euros(REDUCCIONES_PARENTESCO_IS['II'])}</td>
                   <td>1,0000 (patrimonio &lt;402.678 €)</td>
                   <td>99%–100% en Madrid, Canarias; 0% en Asturias</td>
                   <td>Hijo adulto, cónyuge o padre hereda bienes del fallecido</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo III</strong><br /><small>Hermanos, tíos, sobrinos</small></td>
-                  <td>7.993,46 €</td>
-                  <td>1,5882 (patrimonio &lt;402.678 €)</td>
+                  <td>{euros(REDUCCIONES_PARENTESCO_IS['III'])}</td>
+                  <td>{formatNumber(COEFICIENTES_IS['III'][0], 4)} (patrimonio &lt;402.678 €)</td>
                   <td>Escasa o nula en la mayoría de CCAA</td>
                   <td>Sobrino hereda de tía sin hijos</td>
                 </tr>
@@ -1034,13 +1092,19 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p>
-                  Base imponible: 200.000 € (piso) + 6.000 € (ajuar 3%) = <strong>206.000 €</strong>.
-                  Reducción por parentesco: 15.956,87 €. Reducción vivienda habitual (95%):
-                  mín(190.000 × 0,95; 122.606 €) = <strong>122.606 €</strong>.
-                  Base liquidable: 67.437 €. Cuota íntegra (tarifa estatal): ~6.100 €.
-                  Bonificación Madrid (99%): –6.039 €.
+                  Base imponible: {euros(200000)} (piso) +{' '}
+                  {euros(EJEMPLO_MADRID.ajuarDomestico)} (ajuar{' '}
+                  {formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} %) ={' '}
+                  <strong>{euros(EJEMPLO_MADRID.baseImponibleConAjuar)}</strong>.
+                  Reducción por parentesco: {euros(REDUCCIONES_PARENTESCO_IS['II'])}. Reducción vivienda
+                  habitual (95%): mín(190.000 × 0,95; {euros(REDUCCION_VIVIENDA_MAX_IS)}) ={' '}
+                  <strong>{euros(REDUCCION_VIVIENDA_MAX_IS)}</strong>.
+                  Base liquidable: {euros(EJEMPLO_MADRID.baseLiquidable)}. Cuota íntegra (tarifa
+                  estatal): {euros(EJEMPLO_MADRID.cuotaIntegra)}. Bonificación Madrid{' '}
+                  ({formatNumber(EJEMPLO_MADRID.porcentajeBonificacion, 0)} %):{' '}
+                  –{euros(EJEMPLO_MADRID.bonificacionCcaa)}.
                 </p>
-                <p><strong>Cuota final estimada: ~61 €</strong></p>
+                <p><strong>Cuota final estimada: {euros(EJEMPLO_MADRID.cuotaFinal)}</strong></p>
               </div>
               <div className={styles.escenarioTip}>
                 Madrid tiene bonificación del 99% para Grupos I y II. Un hijo paga prácticamente cero.
@@ -1058,7 +1122,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div className={styles.escenarioExample}>
                 <p>
                   Base imponible: 80.000 € + 2.400 € (ajuar) = <strong>82.400 €</strong>.
-                  Reducción por parentesco (Grupo III): 7.993,46 €. Reducción propia de Asturias
+                  Reducción por parentesco (Grupo III): {euros(REDUCCIONES_PARENTESCO_IS['III'])}. Reducción propia de Asturias
                   para el Grupo III: 50.000 € en la base. Base liquidable: 24.406,54 €.
                   Cuota íntegra: 2.081,95 €. Coeficiente multiplicador (Grupo III): × 1,5882 → <strong>3.306,56 €</strong>.
                   Asturias no tiene bonificación en cuota para el Grupo III: su beneficio ya se ha
@@ -1122,7 +1186,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
               <div className={styles.escenarioTip}>
                 País Vasco, Navarra y Cataluña tienen sus propias reducciones por discapacidad,
-                a menudo más generosas que la estatal (47.858,59 € al 65%).
+                a menudo más generosas que la estatal ({euros(REDUCCION_DISCAPACIDAD_33_IS)} al 65%).
               </div>
             </div>
           </div>
@@ -1138,7 +1202,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 En la práctica, casi nunca. Madrid aplica una bonificación del 99% para los Grupos I y II
                 (cónyuge, descendientes, ascendientes). Canarias aplica el 99,9% para los mismos grupos.
                 La cuota resultante es de céntimos. Sin embargo, <strong>sí estás obligado a autoliquidar
-                aunque la cuota sea cero</strong>, presentando el modelo 650 en el plazo de 6 meses.
+                aunque la cuota sea cero</strong>, presentando el modelo 650 en el plazo de {PLAZO_ISD.mesesPresentacion} meses.
                 <div className={styles.faqTip}>Presentar aunque la cuota sea 0 evita sanciones por extemporaneidad.</div>
               </dd>
             </div>
@@ -1150,7 +1214,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 (desde 2022, conforme a la Ley 11/2021). Si ese valor no existe o el contribuyente lo
                 impugna, se usa el valor de mercado. Si declaras por debajo del valor de referencia,
                 Hacienda puede iniciar una comprobación de valores y girar una liquidación complementaria
-                con intereses de demora (actualmente al 4,0625% anual).
+                con intereses de demora (actualmente al{' '}
+                {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.interesDemoraAnual, 2)}% anual).
               </dd>
             </div>
 
@@ -1182,8 +1247,8 @@ export default function EstimadorImpuestoSucesionesPage() {
               <dt>¿Cómo afecta la discapacidad a las reducciones?</dt>
               <dd>
                 La normativa estatal establece dos tramos: discapacidad entre el 33% y el 64%
-                da derecho a una reducción adicional de <strong>47.858,59 €</strong>; discapacidad
-                del 65% o superior da derecho a <strong>150.253,03 €</strong>. Estas reducciones
+                da derecho a una reducción adicional de <strong>{euros(REDUCCION_DISCAPACIDAD_33_IS)}</strong>;
+                discapacidad del 65% o superior da derecho a <strong>{euros(REDUCCION_DISCAPACIDAD_65_IS)}</strong>. Estas reducciones
                 se suman a las de parentesco. Algunas CCAA (Andalucía, Valencia, Cataluña) amplían
                 estos importes. El grado de discapacidad debe estar reconocido oficialmente antes
                 del devengo del impuesto.
@@ -1222,7 +1287,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 Son mecanismos distintos que actúan en fases diferentes del cálculo:
                 <ul>
                   <li><strong>Reducción</strong>: Resta de la base imponible antes de aplicar la tarifa.
-                  Ejemplo: reducción por parentesco de 15.956,87 € en Grupo II.</li>
+                  Ejemplo: reducción por parentesco de {euros(REDUCCIONES_PARENTESCO_IS['II'])} en Grupo II.</li>
                   <li><strong>Bonificación</strong>: Porcentaje que se aplica sobre la cuota tributaria
                   ya calculada. Ejemplo: Madrid bonifica el 99% de la cuota para Grupo II.</li>
                 </ul>
@@ -1239,7 +1304,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           <h2>Guía paso a paso: del fallecimiento al pago del impuesto</h2>
           <p>
             Desde el fallecimiento hasta la inscripción de los bienes, el proceso tiene 7 etapas
-            claramente definidas. El plazo para liquidar el impuesto es de <strong>6 meses</strong>,
+            claramente definidas. El plazo para liquidar el impuesto es de <strong>{PLAZO_ISD.mesesPresentacion} meses</strong>,
             pero la tramitación completa puede llevar 1–2 años.
           </p>
           <ol className={styles.stepGuide}>
@@ -1308,8 +1373,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <strong>Autoliquidar con el modelo 650 en la CCAA competente</strong>
                 <p>
                   La CCAA competente es donde residía el causante (fallecido) de forma habitual
-                  durante los 5 años anteriores al fallecimiento. Plazo: <strong>6 meses</strong>
-                  desde el fallecimiento. Se puede solicitar prórroga de 6 meses adicionales
+                  durante los 5 años anteriores al fallecimiento. Plazo: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong>
+                  desde el fallecimiento. Se puede solicitar prórroga de {PLAZO_ISD.mesesProrroga} meses adicionales
                   antes de que expiren los primeros 5 meses. El modelo 650 se presenta online
                   en el portal tributario de la CCAA correspondiente.
                 </p>
@@ -1339,9 +1404,11 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div>
                 <strong>Solicita la prórroga antes del mes 5</strong>
                 <p>
-                  Si no tienes tiempo de tramitar la herencia en 6 meses, solicita la prórroga
-                  antes de que expiren los primeros 5 meses. La prórroga es de 6 meses adicionales
-                  y no genera intereses ni recargo si se solicita en plazo.
+                  Si no tienes tiempo de tramitar la herencia en {PLAZO_ISD.mesesPresentacion} meses, solicita la prórroga
+                  antes de que expiren los primeros {PLAZO_ISD.mesesParaPedirProrroga} meses. La prórroga es de {PLAZO_ISD.mesesProrroga} meses adicionales y
+                  evita el recargo por presentación extemporánea, pero <strong>no es gratis</strong>:
+                  devenga intereses de demora desde que vencen los {PLAZO_ISD.mesesPresentacion} meses hasta que presentas
+                  ({PLAZO_ISD.norma}).
                 </p>
               </div>
             </div>
@@ -1386,7 +1453,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <strong>Aplica la reducción por vivienda habitual</strong>
                 <p>
                   Si heredas la vivienda habitual del causante, aplica la reducción del 95%
-                  sobre su valor (con el límite estatal de 122.606,47 € por heredero). Cónyuge,
+                  sobre su valor (con el límite estatal de {euros(REDUCCION_VIVIENDA_MAX_IS)} por heredero). Cónyuge,
                   descendientes y ascendientes pueden aplicarla. En Cataluña el límite es muy
                   superior —500.000 € sobre el valor conjunto de la vivienda, con un mínimo de
                   180.000 € por heredero tras el prorrateo—, y por eso allí esta reducción suele
@@ -1435,7 +1502,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 los recargos correspondientes.
               </li>
               <li>
-                <strong>No solicitar prórroga en tiempo.</strong> La prórroga de 6 meses solo puede
+                <strong>No solicitar prórroga en tiempo.</strong> La prórroga de {PLAZO_ISD.mesesProrroga} meses solo puede
                 pedirse antes de que expiren los primeros 5 meses. Si esperas al mes 6, ya no es
                 posible: el plazo ha vencido y cualquier presentación fuera de plazo genera recargo.
               </li>
@@ -1454,7 +1521,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <strong>Olvidar los seguros de vida.</strong> Los seguros de vida contratados por
                 el causante con beneficiarios nominados no forman parte de la herencia civil, pero
                 <em>sí tributan por ISD</em> por su normativa específica. El beneficiario debe
-                declararlos en el modelo 650 dentro del mismo plazo de 6 meses, con independencia
+                declararlos en el modelo 650 dentro del mismo plazo de {PLAZO_ISD.mesesPresentacion} meses, con independencia
                 de la herencia. La reducción estatal máxima es de 9.195,49 € para cónyuge,
                 descendientes y ascendientes.
               </li>

@@ -19,6 +19,8 @@
 
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const RUTA = '/estimador-impuesto-sucesiones/';
 
@@ -660,3 +662,136 @@ test.describe('Re-inspección 12/09/2026 — tarifa del art. 21, coeficiente del
     expect(await textoPagina(page)).not.toContain('50.000,00 €');
   });
 });
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * GUARDAS de la REPARACIÓN del 13/09/2026 — los ocho hallazgos de la tanda del
+ * 12/09 (794 a 801). La tanda 3 de la ronda 8 los cerró; esto es lo que tiene
+ * que seguir siendo cierto.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+test.describe('Estimador ISD — reparación 13/09/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[inputmode="decimal"]']);
+  });
+
+  /**
+   * [796] La reducción por seguro de vida se prorratea por el porcentaje de herencia, igual
+   * que la de vivienda habitual del mismo bloque.
+   *
+   * Asturias · hijo ≥21 · 1.000.000 € en cuentas · 10.000 € de seguros · 50 % de la herencia.
+   * Este heredero percibe 5.000 € del seguro, así que su reducción son 5.000 €, no 9.195,49 €:
+   *   base con ajuar 1.030.000 × 50 % = 515.000 … más el ajuar del seguro → 520.150,00
+   *   − 15.956,87 (parentesco II) − 5.000 (seguro) − 300.000 (Asturias) = 199.193,13
+   *   tarifa estatal, tramo «hasta 239.389,13»:
+   *     23.063,25 + 21,25 % × (199.193,13 − 159.634,83) = 31.469,39
+   *
+   * Solo se ve en las comunidades SIN bonificación del 99 % en cuota: en las demás, el 99 %
+   * aplana la diferencia y el defecto quedaba invisible.
+   */
+  test('[796] el seguro de vida se prorratea por el porcentaje de herencia', async ({ page }) => {
+    await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '1000000');
+
+    await page.locator('#seguros-vida').fill('10000');
+    await page.locator('#porcentaje-herencia').fill('50');
+
+    const desglose = await textoCompleto(page);
+    // Su mitad del capital, no el tope entero
+    expect(desglose).toContain('5000,00');
+    expect(desglose).not.toContain('9195,49');
+  });
+
+  /**
+   * [797] Con el 0 % de herencia no hay base sobre la que calcular un tipo efectivo: la
+   * guarda miraba `baseImponibleTotal` y la división usaba `baseAjustada`, así que salía
+   * 0/0 = NaN y `formatNumber` lo imprimía como «No definido».
+   */
+  test('[797] el tipo efectivo sin base es 0,00 %, no «No definido»', async ({ page }) => {
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '250000');
+    await page.locator('#porcentaje-herencia').fill('0');
+
+    const texto = await textoPagina(page);
+    expect(texto).not.toContain('No definido');
+    expect(texto).toContain('Tipo efectivo: 0,00%');
+  });
+
+  /**
+   * [798] Por el otro extremo del mismo `Math.min(100, Math.max(0, …))`: un porcentaje mayor
+   * que 100 se capaba en el cálculo y se imprimía crudo, así que la app afirmaba un
+   * porcentaje y liquidaba otro.
+   */
+  test('[798] un porcentaje mayor que 100 se enseña capado al 100 %', async ({ page }) => {
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.saldos, '250000');
+    await page.locator('#porcentaje-herencia').fill('150');
+
+    const texto = await textoCompleto(page);
+    expect(texto).toContain('100,00%');
+    expect(texto).toContain('capado al 100');
+    expect(texto).not.toMatch(/Porcentaje de herencia\s*150%/);
+  });
+
+  /**
+   * [794] La tarjeta del bloque educativo sale del MOTOR, no de una tarifa derogada: decía
+   * «cuota íntegra ~6.100 €» y «cuota final ~61 €» donde la propia herramienta liquida
+   * 7.300,03 € y 73,00 € con esos mismos datos.
+   */
+  test('[794] la tarjeta de Madrid dice lo que la herramienta calcula', async ({ page }) => {
+    const educativo = await textoCompleto(page);
+    expect(educativo).not.toContain('~6.100');
+    expect(educativo).not.toContain('~61 €');
+    expect(educativo).toContain('7300,03');
+    expect(educativo).toContain('73,00');
+
+    // Y la herramienta, con esos mismos datos, da esa cifra
+    await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await importe(page, CAMPO.viviendaHabitual, '200000');
+    expect(await cuota(page)).toContain('73,00');
+  });
+
+  /**
+   * [795] Las dos bocas dicen lo mismo sobre los intereses de la prórroga, y dicen lo que
+   * dice el art. 68.3 del Reglamento: que los devenga. La contradicción vivía entre el
+   * faqJsonLd —que es lo que citan ChatGPT, Bing Copilot y Perplexity— y la tarjeta visible.
+   */
+  test('[795] la prórroga devenga intereses en las dos bocas', async ({ page }) => {
+    const visible = await textoCompleto(page);
+    expect(visible).not.toMatch(/no genera intereses/i);
+    expect(visible).toMatch(/devenga intereses de demora/i);
+
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faq).toContain('intereses de demora');
+  });
+
+  /**
+   * [799] [800] [801] Los datos normativos de la prosa salen de data/fiscal, no del teclado.
+   */
+  test('[799] [800] [801] la prosa deriva sus cifras de data/fiscal', async ({ page }) => {
+    const fuente = readFileSync(
+      join(process.cwd(), 'app/estimador-impuesto-sucesiones/page.tsx'),
+      'utf8',
+    );
+    // [801] el plazo, con su norma citada
+    expect(fuente).toContain('PLAZO_ISD.mesesPresentacion');
+    expect(fuente).toContain('PLAZO_ISD.norma');
+    // [799] el interés de demora, de la escala de recargos y no a mano
+    expect(fuente).not.toContain('4,0625%');
+    // [800] las cifras del ISD que el fichero YA importaba y escribía a mano
+    for (const literal of ['122.606,47 €', '47.858,59 €', '150.253,03 €', '15.956,87 €', '7.993,46 €']) {
+      expect(fuente, `sigue tecleado: ${literal}`).not.toContain(`>${literal}<`);
+    }
+
+    // Y en pantalla, el plazo va acompañado de su norma
+    const texto = await textoCompleto(page);
+    expect(texto).toContain('RD 1629/1991');
+  });
+});
+

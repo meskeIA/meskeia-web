@@ -959,7 +959,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📅</span>
               <h4>Solicita la prórroga del IS antes del mes 5</h4>
-              <p>Si no puedes liquidar el Impuesto de Sucesiones en 6 meses (por inventario incompleto, desacuerdos entre herederos o trámites pendientes), presenta la solicitud de prórroga antes de que se cumplan 5 meses desde el fallecimiento. Obtienes 6 meses adicionales sin recargo ni intereses de demora. Pasado el mes 5, la prórroga ya no es posible.</p>
+              <p>Si no puedes liquidar el Impuesto de Sucesiones en 6 meses (por inventario incompleto, desacuerdos entre herederos o trámites pendientes), presenta la solicitud de prórroga antes de que se cumplan 5 meses desde el fallecimiento. Obtienes 6 meses adicionales sin el recargo por presentación extemporánea, pero CON intereses de demora desde que vencen los seis primeros (art. 68.3 del Reglamento del ISD). Pasado el mes 5, la prórroga ya no es posible.</p>
             </div>
 
             <div className={styles.tipCard}>

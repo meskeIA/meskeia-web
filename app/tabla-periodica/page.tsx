@@ -460,6 +460,18 @@ export default function TablaPerodicaPage() {
                   <strong>Estado:</strong>
                   <span>{ESTADOS[elementoSeleccionado.estado] || elementoSeleccionado.estado}</span>
                 </div>
+                {/* ⚠️ 13/09/2026 — el dato llevaba dormido en 24 de los 118 elementos: la
+                    reparación del hallazgo 531 sacó «Sintético» del filtro de ESTADO (correcto,
+                    el origen no es un estado físico) y lo guardó aparte como `origen`, pero no
+                    lo leía nadie. La app se lo contaba al faqJsonLd —y con él a Google y a las
+                    IAs— y no a quien la tiene delante, así que un estudiante no podía distinguir
+                    el americio del plutonio (hallazgo 776). */}
+                {elementoSeleccionado.origen === 'sintetico' && (
+                  <div className={styles.propiedad}>
+                    <strong>Origen:</strong>
+                    <span>Sintético (no existe en la naturaleza: se obtiene en reactor o acelerador)</span>
+                  </div>
+                )}
                 <div className={styles.propiedad}>
                   <strong>Radio atómico:</strong>
                   <span>{elementoSeleccionado.radioAtomico ? `${elementoSeleccionado.radioAtomico} pm` : 'N/D'}</span>
@@ -569,9 +581,14 @@ export default function TablaPerodicaPage() {
                 </div>
 
                 <div className={styles.aulaAcciones}>
+                  {/* El nombre accesible lleva el número de ficha: quien recorre la página
+                      por lista de botones oía doce «Comprobar» seguidos sin saber a cuál de las
+                      doce fichas pertenecía cada uno, en una sección que se asigna precisamente
+                      por número — «haz las fichas 3, 7 y 11» (hallazgo 777, WCAG 2.4.6). */}
                   <button
                     type="button"
                     className={styles.aulaBtnPrimario}
+                    aria-label={`Comprobar la ficha ${ficha.id}: ${ficha.titulo}`}
                     onClick={() => comprobarFicha(ficha.id)}
                   >
                     Comprobar
@@ -581,6 +598,7 @@ export default function TablaPerodicaPage() {
                     className={styles.aulaBtnSecundario}
                     aria-expanded={abierta}
                     aria-controls={`solucion-ficha-${ficha.id}`}
+                    aria-label={`${abierta ? 'Ocultar' : 'Ver'} solución de la ficha ${ficha.id}: ${ficha.titulo}`}
                     onClick={() => alternarSolucion(ficha.id)}
                   >
                     {abierta ? 'Ocultar solución' : 'Ver solución'}
@@ -765,7 +783,10 @@ export default function TablaPerodicaPage() {
                 <tr>
                   <td><strong>Metales alcalinotérreos (Gp2)</strong></td>
                   <td>Más duros que Gp1, 2 e⁻ de valencia</td>
-                  <td>0,9–1,3 (baja)</td>
+                  {/* Hasta el 13/09/2026 decía «0,9–1,3», y dejaba fuera al berilio (1,57 en
+                      su ficha) y al magnesio (1,31): la tabla contradecía a la casilla que el
+                      alumno acaba de abrir (hallazgo 775). */}
+                  <td>0,9–1,57 (baja, salvo el Be)</td>
                   <td>Sólido</td>
                   <td>Alta; menos que Gp1</td>
                   <td>Construcción (Ca en cemento), huesos (Ca), pirotecnia (Mg, Ba)</td>
@@ -783,7 +804,9 @@ export default function TablaPerodicaPage() {
                 <tr>
                   <td><strong>Gases nobles (Gp18)</strong></td>
                   <td>Capa completa, monoatómicos, inertes</td>
-                  <td>No aplicable</td>
+                  {/* «No aplicable» era cierto de los tres primeros, no del grupo: kriptón,
+                      xenón y radón tienen electronegatividad en sus propias fichas (hallazgo 775). */}
+                  <td>Sin valor en He, Ne y Ar · 2,2–3,0 en Kr, Xe y Rn</td>
                   <td>Gas</td>
                   <td>Prácticamente nula</td>
                   <td>Iluminación (Ne, Ar), globos/dirigibles (He), láseres (Kr, Xe)</td>
@@ -792,7 +815,9 @@ export default function TablaPerodicaPage() {
                 <tr>
                   <td><strong>Metales de transición (Gp3-12)</strong></td>
                   <td>Orbitales d parcialmente llenos, varios estados de oxidación</td>
-                  <td>1,3–2,5 (variable)</td>
+                  {/* El rango dejaba fuera al itrio (1,22) y al oro (2,54), los dos con ficha
+                      propia en esta misma app (hallazgo 775). */}
+                  <td>1,22–2,54 (variable)</td>
                   <td>Sólido (excepto Hg, líquido)</td>
                   <td>Variable; forman complejos de coordinación</td>
                   <td>Acero (Fe), cables (Cu), joyería (Au, Ag), catalizadores (Pt, Ni)</td>
