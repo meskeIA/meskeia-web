@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularBreakEven } from '@/lib/calculadoras/breakEven';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -126,6 +127,6 @@ async function registrarLlamadaChatGPT(costosFijos: number, precioVenta: number)
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['break-even', timestamp, 'chatgpt', JSON.stringify({ costosFijos, precioVenta })],
+    args: ['break-even', timestamp, 'chatgpt', JSON.stringify({ costosFijos, precioVenta, ...(await datosLlamanteGpt()) })],
   });
 }

@@ -29,6 +29,7 @@ import type {
 } from '@/lib/calculadoras/retencionDividendos';
 import { FISCAL_IRPF_META } from '@/data/fiscal';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -161,6 +162,6 @@ async function registrarLlamadaChatGPT(dividendoBruto: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['retencion-dividendos', timestamp, 'chatgpt', JSON.stringify({ dividendoBruto })],
+    args: ['retencion-dividendos', timestamp, 'chatgpt', JSON.stringify({ dividendoBruto, ...(await datosLlamanteGpt()) })],
   });
 }

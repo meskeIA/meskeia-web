@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularPlanPensiones } from '@/lib/calculadoras/planPensiones';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -110,6 +111,6 @@ async function registrarLlamadaChatGPT(rendimientosNetos: number, aportacionIndi
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['plan-pensiones', timestamp, 'chatgpt', JSON.stringify({ rendimientosNetos, aportacionIndividual })],
+    args: ['plan-pensiones', timestamp, 'chatgpt', JSON.stringify({ rendimientosNetos, aportacionIndividual, ...(await datosLlamanteGpt()) })],
   });
 }

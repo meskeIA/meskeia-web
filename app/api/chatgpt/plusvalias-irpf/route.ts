@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularPlusvaliasIRPF } from '@/lib/calculadoras/plusvaliasIRPF';
 import type { TipoActivo } from '@/lib/calculadoras/plusvaliasIRPF';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -126,6 +127,6 @@ async function registrarLlamadaChatGPT(precioVenta: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['plusvalias-irpf', timestamp, 'chatgpt', JSON.stringify({ precioVenta })],
+    args: ['plusvalias-irpf', timestamp, 'chatgpt', JSON.stringify({ precioVenta, ...(await datosLlamanteGpt()) })],
   });
 }

@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularModelo130 } from '@/lib/calculadoras/modelo130';
 import type { TrimestreModelo130 } from '@/lib/calculadoras/modelo130';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -116,6 +117,6 @@ async function registrarLlamadaChatGPT(trimestre: string, ingresosAcumulados: nu
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['modelo130', timestamp, 'chatgpt', JSON.stringify({ trimestre, ingresosAcumulados })],
+    args: ['modelo130', timestamp, 'chatgpt', JSON.stringify({ trimestre, ingresosAcumulados, ...(await datosLlamanteGpt()) })],
   });
 }

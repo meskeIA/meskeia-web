@@ -17,6 +17,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularIRPFSegundoPagador } from '@/lib/calculadoras/irpfSegundoPagador';
 import type { PagadorInfo } from '@/lib/calculadoras/irpfSegundoPagador';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -118,6 +119,6 @@ async function registrarLlamadaChatGPT(numPagadores: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['irpf-segundo-pagador', timestamp, 'chatgpt', JSON.stringify({ numPagadores })],
+    args: ['irpf-segundo-pagador', timestamp, 'chatgpt', JSON.stringify({ numPagadores, ...(await datosLlamanteGpt()) })],
   });
 }

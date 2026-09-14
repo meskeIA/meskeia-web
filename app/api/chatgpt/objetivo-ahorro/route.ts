@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularObjetivoAhorro } from '@/lib/calculadoras/objetivoAhorro';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -109,6 +110,6 @@ async function registrarLlamadaChatGPT(objetivoEuros: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['objetivo-ahorro', timestamp, 'chatgpt', JSON.stringify({ objetivoEuros })],
+    args: ['objetivo-ahorro', timestamp, 'chatgpt', JSON.stringify({ objetivoEuros, ...(await datosLlamanteGpt()) })],
   });
 }

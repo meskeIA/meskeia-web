@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -110,6 +111,6 @@ async function registrarLlamadaChatGPT(edadActual: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['brecha-jubilacion', timestamp, 'chatgpt', JSON.stringify({ edadActual })],
+    args: ['brecha-jubilacion', timestamp, 'chatgpt', JSON.stringify({ edadActual, ...(await datosLlamanteGpt()) })],
   });
 }

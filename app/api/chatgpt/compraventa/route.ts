@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularCompraventa } from '@/lib/calculadoras/compraventa';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 const ALLOWED_ORIGINS = ['https://chat.openai.com', 'https://chatgpt.com'];
 
@@ -59,7 +60,7 @@ async function registrarLlamadaChatGPT(): Promise<void> {
     hour: '2-digit', minute: '2-digit', second: '2-digit',
   });
   await client.execute({
-    sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo) VALUES (?, ?, ?)`,
-    args: ['gastos-compraventa', timestamp, 'chatgpt'],
+    sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
+    args: ['gastos-compraventa', timestamp, 'chatgpt', JSON.stringify(await datosLlamanteGpt())],
   });
 }

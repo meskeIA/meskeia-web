@@ -14,6 +14,7 @@ import { calcularDeduccionAutonomoIRPF } from '@/lib/calculadoras/deduccionAuton
 import type { ModalidadEstimacion } from '@/lib/calculadoras/deduccionAutonomoIRPF';
 import { FISCAL_IRPF_META } from '@/data/fiscal';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -141,7 +142,7 @@ async function registrarLlamadaChatGPT(
       'gastos-deducibles',
       timestamp,
       'chatgpt',
-      JSON.stringify({ ingresosBrutos, modalidadEstimacion }),
+      JSON.stringify({ ingresosBrutos, modalidadEstimacion, ...(await datosLlamanteGpt()) }),
     ],
   });
 }

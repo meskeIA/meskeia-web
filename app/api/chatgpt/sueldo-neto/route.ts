@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularSueldoNeto } from '@/lib/calculadoras/sueldoNeto';
 import type { SituacionFamiliar } from '@/lib/calculadoras/sueldoNeto';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -108,7 +109,7 @@ async function registrarLlamadaChatGPT(
       'sueldo-neto',
       timestamp,
       'chatgpt',
-      JSON.stringify({ brutoAnual, situacion }),
+      JSON.stringify({ brutoAnual, situacion, ...(await datosLlamanteGpt()) }),
     ],
   });
 }

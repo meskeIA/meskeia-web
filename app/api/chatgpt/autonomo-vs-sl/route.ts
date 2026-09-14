@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { compararAutonomoVsSL } from '@/lib/calculadoras/autonomoVsSL';
 import type { TipoIS } from '@/lib/calculadoras/autonomoVsSL';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -85,6 +86,6 @@ async function registrarLlamadaChatGPT(beneficioAnual: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['autonomo-vs-sl', timestamp, 'chatgpt', JSON.stringify({ beneficioAnual })],
+    args: ['autonomo-vs-sl', timestamp, 'chatgpt', JSON.stringify({ beneficioAnual, ...(await datosLlamanteGpt()) })],
   });
 }

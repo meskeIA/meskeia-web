@@ -32,7 +32,16 @@ function clasificarIA(modo, datosAd) {
     const ua = (datosAd && typeof datosAd.uaCliente === 'string') ? datosAd.uaCliente : '';
     return MCP_CLIENTES_IA.test(ua) ? 'mcp' : null;
   }
-  if (modo === 'chatgpt') return 'chatgpt';
+  if (modo === 'chatgpt') {
+    // Llamada de un GPT a su Action (app/api/chatgpt/*). Se le exige la MISMA lista blanca
+    // que al MCP desde el 14/09/2026: el endpoint es público y el CORS no protege una
+    // llamada de servidor a servidor, así que sin UA atribuible no se puede afirmar que
+    // haya una IA al otro lado. Hasta esa fecha ninguna route capturaba el user-agent, de
+    // modo que todo lo histórico cae aquí y cuenta 0 — irrecuperable, como los 68 registros
+    // MCP sin uaCliente. Motivo completo en scripts/digest-diario.mjs (const FOSO).
+    const ua = (datosAd && typeof datosAd.uaCliente === 'string') ? datosAd.uaCliente : '';
+    return MCP_CLIENTES_IA.test(ua) ? 'chatgpt' : null;
+  }
   if (modo === 'referral-ia') {
     const ref = (datosAd && datosAd.referrer_ia) || null;
     if (ref === 'chatgpt.com') return 'chatgpt';

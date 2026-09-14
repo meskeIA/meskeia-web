@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -141,6 +142,6 @@ async function registrarLlamada(kmAnuales: number, tipo: string): Promise<void> 
   });
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['coste-combustible', timestamp, 'chatgpt', JSON.stringify({ kmAnuales, tipo })],
+    args: ['coste-combustible', timestamp, 'chatgpt', JSON.stringify({ kmAnuales, tipo, ...(await datosLlamanteGpt()) })],
   });
 }

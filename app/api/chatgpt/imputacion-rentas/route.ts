@@ -15,6 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularImputacionRentasInmuebles } from '@/lib/calculadoras/imputacionRentasInmuebles';
 import type { InmuebleImputacion, SituacionCatastralIRI } from '@/lib/calculadoras/imputacionRentasInmuebles';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -133,6 +134,6 @@ async function registrarLlamadaChatGPT(numInmuebles: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['imputacion-rentas', timestamp, 'chatgpt', JSON.stringify({ numInmuebles })],
+    args: ['imputacion-rentas', timestamp, 'chatgpt', JSON.stringify({ numInmuebles, ...(await datosLlamanteGpt()) })],
   });
 }

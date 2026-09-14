@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularIVA } from '@/lib/calculadoras/iva';
 import type { TipoIVA, ModoIVA } from '@/lib/calculadoras/iva';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -105,6 +106,6 @@ async function registrarLlamadaChatGPT(importe: number, tipoIVA: number): Promis
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['iva-factura', timestamp, 'chatgpt', JSON.stringify({ importe, tipoIVA })],
+    args: ['iva-factura', timestamp, 'chatgpt', JSON.stringify({ importe, tipoIVA, ...(await datosLlamanteGpt()) })],
   });
 }

@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularHorasEfectivas } from '@/lib/calculadoras/horasEfectivas';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -95,6 +96,6 @@ async function registrarLlamadaChatGPT(facturacionAnual: number): Promise<void> 
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['horas-facturables', timestamp, 'chatgpt', JSON.stringify({ facturacionAnual })],
+    args: ['horas-facturables', timestamp, 'chatgpt', JSON.stringify({ facturacionAnual, ...(await datosLlamanteGpt()) })],
   });
 }

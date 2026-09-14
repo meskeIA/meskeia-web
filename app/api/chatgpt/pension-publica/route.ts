@@ -15,6 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -96,6 +97,6 @@ async function registrarLlamadaChatGPT(anosCotizados: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['pension-publica', timestamp, 'chatgpt', JSON.stringify({ anosCotizados })],
+    args: ['pension-publica', timestamp, 'chatgpt', JSON.stringify({ anosCotizados, ...(await datosLlamanteGpt()) })],
   });
 }

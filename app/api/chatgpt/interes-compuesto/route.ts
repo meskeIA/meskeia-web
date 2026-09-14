@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularInteresCompuesto } from '@/lib/calculadoras/interesCompuesto';
 import type { FrecuenciaCapitalizacion } from '@/lib/calculadoras/interesCompuesto';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -109,6 +110,6 @@ async function registrarLlamadaChatGPT(capitalInicial: number, anos: number): Pr
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['interes-compuesto', timestamp, 'chatgpt', JSON.stringify({ capitalInicial, anos })],
+    args: ['interes-compuesto', timestamp, 'chatgpt', JSON.stringify({ capitalInicial, anos, ...(await datosLlamanteGpt()) })],
   });
 }

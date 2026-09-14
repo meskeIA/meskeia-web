@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularJubilacionAnticipada } from '@/lib/calculadoras/jubilacionAnticipada';
 import type { TipoJubilacionAnticipada } from '@/lib/calculadoras/jubilacionAnticipada';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -111,6 +112,6 @@ async function registrarLlamadaChatGPT(mesesAnticipacion: number, tipo: string):
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['jubilacion-anticipada', timestamp, 'chatgpt', JSON.stringify({ mesesAnticipacion, tipo })],
+    args: ['jubilacion-anticipada', timestamp, 'chatgpt', JSON.stringify({ mesesAnticipacion, tipo, ...(await datosLlamanteGpt()) })],
   });
 }

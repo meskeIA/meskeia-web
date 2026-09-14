@@ -193,7 +193,13 @@ function clasificarOrigenReal(
   if (navegador && CRAWLERS_UA.test(navegador)) return 'bot';
   // Solo cuenta como canal IA si el cliente dice quién es (ver MCP_CLIENTES_IA).
   if (modo === 'mcp') return mcpEsClienteIdentificado(datosAd) ? 'mcp' : 'bot';
-  if (modo === 'chatgpt') return 'chatgpt'; // modo espurio legacy → IA ChatGPT
+  // NO es un modo «legacy», como decía este comentario: lo escriben hoy las 48 API routes de
+  // `app/api/chatgpt/*` cada vez que un GPT llama a su Action (55 veces solo en septiembre de
+  // 2026). Se le exige la misma lista blanca que al MCP desde el 14/09/2026 — el endpoint es
+  // público y el CORS no protege una llamada de servidor a servidor. Lo anterior a esa fecha
+  // no capturaba user-agent y por tanto no se puede atribuir: cuenta como 'bot', igual que el
+  // MCP sin identificar. Motivo completo en scripts/digest-diario.mjs (const FOSO).
+  if (modo === 'chatgpt') return mcpEsClienteIdentificado(datosAd) ? 'chatgpt' : 'bot';
   if (modo === 'referral-ia') {
     const ref = (datosAd?.referrer_ia as string) || null;
     if (ref === 'chatgpt.com') return 'chatgpt';

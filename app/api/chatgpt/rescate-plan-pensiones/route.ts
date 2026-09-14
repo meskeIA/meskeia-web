@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularRescatePlanPensiones } from '@/lib/calculadoras/rescatePlanPensiones';
 import type { FormaRescate, ContingenciaRescate } from '@/lib/calculadoras/rescatePlanPensiones';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -120,6 +121,6 @@ async function registrarLlamadaChatGPT(totalAcumulado: number, formaRescate: str
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['rescate-plan-pensiones', timestamp, 'chatgpt', JSON.stringify({ totalAcumulado, formaRescate })],
+    args: ['rescate-plan-pensiones', timestamp, 'chatgpt', JSON.stringify({ totalAcumulado, formaRescate, ...(await datosLlamanteGpt()) })],
   });
 }

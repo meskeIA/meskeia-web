@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularCosteEmpleado } from '@/lib/calculadoras/costeEmpleado';
 import type { TipoContrato, SectorActividad } from '@/lib/calculadoras/costeEmpleado';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -87,6 +88,6 @@ async function registrarLlamadaChatGPT(salarioBrutoAnual: number): Promise<void>
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['coste-empleado', timestamp, 'chatgpt', JSON.stringify({ salarioBrutoAnual })],
+    args: ['coste-empleado', timestamp, 'chatgpt', JSON.stringify({ salarioBrutoAnual, ...(await datosLlamanteGpt()) })],
   });
 }

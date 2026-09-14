@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularTarifaFreelance } from '@/lib/calculadoras/tarifaFreelance';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -100,6 +101,6 @@ async function registrarLlamadaChatGPT(ingresoNetoMensual: number): Promise<void
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['tarifa-freelance', timestamp, 'chatgpt', JSON.stringify({ ingresoNetoMensual })],
+    args: ['tarifa-freelance', timestamp, 'chatgpt', JSON.stringify({ ingresoNetoMensual, ...(await datosLlamanteGpt()) })],
   });
 }

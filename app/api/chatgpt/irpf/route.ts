@@ -15,6 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularIRPF } from '@/lib/calculadoras/irpf';
 import type { SituacionFamiliarIRPF } from '@/lib/calculadoras/irpf';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -99,6 +100,6 @@ async function registrarLlamadaChatGPT(rendimientosTrabajo: number): Promise<voi
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['irpf', timestamp, 'chatgpt', JSON.stringify({ rendimientosTrabajo })],
+    args: ['irpf', timestamp, 'chatgpt', JSON.stringify({ rendimientosTrabajo, ...(await datosLlamanteGpt()) })],
   });
 }

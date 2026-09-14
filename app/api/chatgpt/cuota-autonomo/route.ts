@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularCuotaAutonomo } from '@/lib/calculadoras/cuotaAutonomo';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -99,7 +100,7 @@ async function registrarLlamadaChatGPT(
       'cuota-autonomo',
       timestamp,
       'chatgpt',
-      JSON.stringify({ rendimientoNetoMensual, esNuevoAutonomo }),
+      JSON.stringify({ rendimientoNetoMensual, esNuevoAutonomo, ...(await datosLlamanteGpt()) }),
     ],
   });
 }

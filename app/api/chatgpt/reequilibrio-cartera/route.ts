@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularReequilibrioCartera } from '@/lib/calculadoras/reequilibrioCartera';
 import type { ActivoCartera, EstrategiaReequilibrio } from '@/lib/calculadoras/reequilibrioCartera';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -127,6 +128,6 @@ async function registrarLlamadaChatGPT(numActivos: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['reequilibrio-cartera', timestamp, 'chatgpt', JSON.stringify({ numActivos })],
+    args: ['reequilibrio-cartera', timestamp, 'chatgpt', JSON.stringify({ numActivos, ...(await datosLlamanteGpt()) })],
   });
 }

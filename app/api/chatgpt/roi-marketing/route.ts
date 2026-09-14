@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calcularROIMarketing } from '@/lib/calculadoras/roiMarketing';
 import type { CanalMarketing } from '@/lib/calculadoras/roiMarketing';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
+import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 
 export const runtime = 'nodejs';
 
@@ -123,6 +124,6 @@ async function registrarLlamadaChatGPT(numCanales: number): Promise<void> {
 
   await client.execute({
     sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo, datos_adicionales) VALUES (?, ?, ?, ?)`,
-    args: ['roi-marketing', timestamp, 'chatgpt', JSON.stringify({ numCanales })],
+    args: ['roi-marketing', timestamp, 'chatgpt', JSON.stringify({ numCanales, ...(await datosLlamanteGpt()) })],
   });
 }
