@@ -463,3 +463,302 @@ test.describe('Simulador de genética — regresiones de los hallazgos reparados
     await expect(genotiposDeCelda(page)).toHaveText(['XD XD', 'XD Y', 'XD Xd', 'Xd Y']);
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (añadido el 14/09/2026) — va DETRÁS del acta del Inspector a propósito:
+ * el acta de arriba es el contrato de la app y no se toca.
+ *
+ * Estas pruebas NO abren el navegador: importan `casos.ts` y comprueban la genética a pelo.
+ * El build compila la página sin mirar si un cruce está bien resuelto, así que esto es lo
+ * único que impide que la app corrija mal a un alumno.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO — a mano desde las leyes de Mendel, NUNCA copiado de
+ * lo que devuelve la app (si se copiara, el test bendeciría cualquier error del motor):
+ *
+ *   1  Aa × Aa → verdes (aa)            1 de 4 casillas          = 25 %
+ *   2  Aa × Aa → genotipo Aa            2 de 4 (Aa y aA)         = 50 %
+ *   3  AA × aa → amarillas              4 de 4, toda la F1 es Aa = 100 %
+ *   4  Aa × aa → verdes                 2 de 4                   = 50 %
+ *   5  Tt × Tt → enanas de 240          1/4 × 240                = 60 plantas
+ *   6  AaRr × AaRr → amarilla y lisa    9 de 16                  = 56,25 %
+ *   7  AaRr × AaRr → verde y rugosa     1 de 16                  = 6,25 %
+ *   8  AaRr × AaRr → amar. rugosa/320   3/16 × 320               = 60 semillas
+ *   9  Rr × Rr → rosas (incompleta)     2 de 4; aquí es 1:2:1    = 50 %
+ *  10  RR × rr → rosas                  4 de 4, toda la F1 es Rr = 100 %
+ *  11  Xd Y × XD Xd → hijas daltónicas  1 de 4 (Xd Xd)           = 25 %
+ *  12  XD Y × Xd Xd → hijos daltónicos  2 de 4 (Xd Y)            = 50 %
+ *
+ * Los del 6 al 8 son el 9:3:3:1 clásico; el 9 y el 10 son el contraejemplo de dominancia
+ * incompleta, donde el heterocigoto NO se parece al dominante.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  toleranciaDe,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-genetica/casos';
+
+/** Resueltos a mano arriba. Si el motor discrepa, manda esta tabla hasta demostrar lo contrario. */
+const A_MANO: Readonly<Record<number, number>> = {
+  1: 25,
+  2: 50,
+  3: 100,
+  4: 50,
+  5: 60,
+  6: 56.25,
+  7: 6.25,
+  8: 60,
+  9: 50,
+  10: 100,
+  11: 25,
+  12: 50,
+};
+
+test.describe('simulador-genetica · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    // Es lo único que hace que «resuelve los casos 3, 7 y 11» funcione como consigna.
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    // Caza a quien edite un enunciado y olvide actualizar la solución.
+    for (const caso of CASOS) {
+      const recalculado = resolverCaso(caso.datos);
+      expect(recalculado.ok, `caso ${caso.id}: ${recalculado.error ?? ''}`).toBe(true);
+      expect(Math.round(recalculado.valor * 100) / 100, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta no vacía, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThan(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    // El 91,4 % de este canal es de fuera de España: un enunciado anclado excluye a la mayoría.
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|Ciudad de México|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    // Reproducible por semilla…
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    // …y la respuesta sale del MISMO resolverCaso que los fijos, no de otra cuenta.
+    expect(Math.round(resolverCaso(a.datos).valor * 100) / 100).toBe(a.respuesta);
+
+    // La variedad se comprueba a propósito: la primera versión era reproducible y aun así
+    // devolvía SIEMPRE el mismo ejercicio (xorshift32 sembrado con enteros pequeños daba
+    // el índice 0 una y otra vez). Reproducible no implica variado.
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(m.respuesta).toBeGreaterThan(0); // preguntar por un fenotipo que el cruce no da no enseña nada
+    }
+  });
+
+  test('7 · el convenio de la app queda fijado: proporciones sobre el TOTAL y sexo en el fenotipo', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO[caso.id]);
+    }
+
+    // (b) Ligado al X: el sexo forma parte de la clave del fenotipo. «Daltónico» a secas no
+    // existe —son dos casillas distintas—, y pedirlo debe fallar limpio, no lanzar.
+    const sinSexo = resolverCaso({
+      tipo: 'ligado-sexo',
+      organismo: 'humanos',
+      rasgo: 'daltonismo',
+      padre: 'Xd Y',
+      madre: 'XD Xd',
+      busca: { clase: 'fenotipo', clave: 'Daltónico', magnitud: 'porcentaje' },
+    });
+    expect(sinSexo.ok).toBe(false);
+    expect(sinSexo.error).toContain('Daltónico (♀)');
+
+    // (c) Y el total de ese cruce reparte 25 % a cada una de las cuatro casillas.
+    const conSexo = (clave: string) =>
+      resolverCaso({
+        tipo: 'ligado-sexo',
+        organismo: 'humanos',
+        rasgo: 'daltonismo',
+        padre: 'Xd Y',
+        madre: 'XD Xd',
+        busca: { clase: 'fenotipo', clave, magnitud: 'porcentaje' },
+      }).valor;
+    expect(conSexo('Daltónico (♀)')).toBe(25);
+    expect(conSexo('Daltónico (♂)')).toBe(25);
+    expect(conSexo('Visión normal (♀)')).toBe(25);
+    expect(conSexo('Visión normal (♂)')).toBe(25);
+
+    // (d) Dominancia incompleta: el heterocigoto tiene fenotipo propio, así que Rr × Rr es
+    // 1:2:1 y NO 3:1. Es el contraejemplo que distingue los dos modos de herencia.
+    const rosa = resolverCaso(CASOS[8].datos).valor;
+    expect(rosa).toBe(50);
+    const rojo = resolverCaso({
+      tipo: 'monohibrido',
+      organismo: 'flores',
+      rasgo: 'color-flor',
+      padre: 'Rr',
+      madre: 'Rr',
+      busca: { clase: 'fenotipo', clave: 'Rojo', magnitud: 'porcentaje' },
+    }).valor;
+    expect(rojo).toBe(25); // con dominancia COMPLETA habrían sido 75
+
+    // (e) Genotipo ≠ fenotipo en el mismo cruce: 75 % amarillas pero solo 50 % Aa.
+    const fenotipo = resolverCaso({
+      tipo: 'monohibrido',
+      organismo: 'guisantes',
+      rasgo: 'color-semilla',
+      padre: 'Aa',
+      madre: 'Aa',
+      busca: { clase: 'fenotipo', clave: 'Amarillo', magnitud: 'porcentaje' },
+    }).valor;
+    expect(fenotipo).toBe(75);
+    expect(CASOS[1].respuesta).toBe(50);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    // Un throw dentro del render tumbaría la app entera; aquí todo sale como veredicto.
+    expect(comprobarRespuesta(25, 25).correcto).toBe(true);
+    expect(comprobarRespuesta(25.2, 25).correcto).toBe(true); // dentro del 1 %
+    expect(comprobarRespuesta(30, 25).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 25).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 25).motivo).toContain('número');
+
+    // La tolerancia nunca baja de 0,01, para que el 6,25 del caso 7 no se corrija a ciegas.
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(6.25)).toBe(0.0625);
+    expect(toleranciaDe(100)).toBe(1);
+
+    // Y un cruce que no produce el fenotipo pedido informa de lo que sí produce.
+    const imposible = resolverCaso({
+      tipo: 'monohibrido',
+      organismo: 'guisantes',
+      rasgo: 'color-semilla',
+      padre: 'AA',
+      madre: 'AA',
+      busca: { clase: 'fenotipo', clave: 'Verde', magnitud: 'porcentaje' },
+    });
+    expect(imposible.ok).toBe(false);
+    expect(imposible.error).toContain('Amarillo');
+
+    // Un organismo inexistente tampoco lanza.
+    const inventado = resolverCaso({
+      tipo: 'monohibrido',
+      organismo: 'unicornios',
+      rasgo: 'color-cuerno',
+      padre: 'Aa',
+      madre: 'Aa',
+      busca: { clase: 'fenotipo', clave: 'Dorado', magnitud: 'porcentaje' },
+    });
+    expect(inventado.ok).toBe(false);
+    expect(Number.isNaN(inventado.valor)).toBe(true);
+  });
+});
+
+/* ───────────────────────────────────────────────────────────────────────────────────────
+ * La sección en el NAVEGADOR. Lo de arriba prueba la genética; esto prueba que la sección
+ * existe, corrige de verdad y no rompe la app (PASO 4.bis de /nueva-app-meskeia: tiene
+ * estado interactivo, así que no basta con que compile).
+ * ─────────────────────────────────────────────────────────────────────────────────────── */
+
+test.describe('simulador-genetica · la sección de casos en el navegador', () => {
+  const CAMPO = '#casos-respuesta';
+  /** La app ya tenía su propio role="alert" (el aviso del tamaño de población), así que el
+   *  veredicto se localiza ACOTADO a la sección de casos y no por rol a secas. */
+  const veredicto = (page: Page) => page.locator('[class*="casoVeredicto"]');
+
+  test('corrige bien la respuesta correcta y la equivocada', async ({ page }) => {
+    await page.goto(RUTA);
+    // Sin esta espera el fill escribiría en el DOM sin llegar al estado de React, y el test
+    // pasaría midiendo otro escenario (ver tests/apps/_hidratacion.ts).
+    await esperarHidratacion(page, [CAMPO]);
+
+    await expect(page.getByRole('heading', { name: /Casos para clase/ })).toBeVisible();
+
+    // Caso 1: Aa × Aa → 25 % de semillas verdes.
+    await page.getByRole('button', { name: /^Caso 1:/ }).click();
+    await page.locator(CAMPO).fill('25');
+    await esperarValorEnReact(page, CAMPO, '25');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+
+    // Y la equivocada no cuela.
+    await page.locator(CAMPO).fill('75'); // 75 es el % de AMARILLAS, el error clásico
+    await esperarValorEnReact(page, CAMPO, '75');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('No es correcto');
+  });
+
+  test('admite la coma decimal española y rechaza lo que no es un número', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    // Caso 6: dihíbrido 9/16 = 56,25 %. Con coma, que es como lo escribe el alumno.
+    await page.getByRole('button', { name: /^Caso 6:/ }).click();
+    await page.locator(CAMPO).fill('56,25');
+    await esperarValorEnReact(page, CAMPO, '56,25');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+
+    // Y una entrada que no es número pide un número, sin pintar «NaN» en ninguna parte.
+    await page.locator(CAMPO).fill('no sé');
+    await esperarValorEnReact(page, CAMPO, 'no sé');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('Escribe un número');
+    await expect(page.locator('body')).not.toContainText('NaN');
+  });
+
+  test('la solución se despliega y el caso elegido se anuncia', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    const caso3 = page.getByRole('button', { name: /^Caso 3:/ });
+    await caso3.click();
+    await expect(caso3).toHaveAttribute('aria-pressed', 'true');
+
+    const verSolucion = page.getByRole('button', { name: /Ver solución/ });
+    await expect(verSolucion).toHaveAttribute('aria-expanded', 'false');
+    await verSolucion.click();
+    await expect(page.getByRole('button', { name: /Ocultar solución/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    // Caso 3: AA × aa, toda la F1 es amarilla.
+    await expect(page.locator('[class*="casoSolucion"]')).toContainText('100');
+  });
+
+  test('el simulador de arriba sigue funcionando con la sección añadida', async ({ page }) => {
+    // La regresión que importa: añadir una sección no puede haber roto la app.
+    await page.goto(RUTA);
+    await expect(genotiposDeCelda(page)).toHaveText(['AA', 'Aa', 'Aa', 'aa']);
+  });
+});

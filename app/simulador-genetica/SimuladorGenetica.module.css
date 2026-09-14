@@ -1341,3 +1341,277 @@
     font-size: 0.85rem;
   }
 }
+
+/* ─────────────────────────── Casos para clase ───────────────────────────
+   La tarea asignable. Colores de marca por variables, y cada bloque con su
+   variante bajo [data-theme='dark'], como el resto del fichero. */
+
+.casosSection {
+  max-width: 900px;
+  margin: var(--spacing-xl) auto;
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-md);
+}
+
+.casosHeader {
+  margin-bottom: var(--spacing-lg);
+}
+
+.casosTitulo {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.casosIntro {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.casosNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+}
+
+.casoBoton {
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.casoBoton:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.casoBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoBotonActivo,
+.casoBotonActivo:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.casoBotonPractica {
+  min-width: auto;
+  margin-left: auto;
+}
+
+.casoCuerpo {
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+}
+
+.casoTitulo {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.1rem;
+  color: var(--secondary);
+}
+
+.casoEnunciado {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.casoRespuesta {
+  margin-bottom: var(--spacing-md);
+}
+
+.casoLabel {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.casoFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.casoInput {
+  flex: 1 1 160px;
+  min-height: 44px;
+  padding: var(--spacing-sm);
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.casoInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.casoComprobar {
+  min-height: 44px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.casoComprobar:hover {
+  background: var(--hero-bg);
+}
+
+.casoComprobar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoVeredicto {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.casoOk {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.casoKo {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.casoAyudas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.casoAyudaBoton {
+  min-height: 44px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.casoAyudaBoton:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.casoAyudaBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoPista {
+  margin: var(--spacing-md) 0 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card);
+  border-left: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.casoSolucion {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.casoPasos {
+  margin: 0 0 var(--spacing-md);
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.casoResultado {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+[data-theme='dark'] .casoBoton {
+  background: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .casoBotonActivo,
+[data-theme='dark'] .casoBotonActivo:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .casoCuerpo {
+  background: #111827;
+}
+
+[data-theme='dark'] .casoInput {
+  background: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .casoOk {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+[data-theme='dark'] .casoKo {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+[data-theme='dark'] .casoPista,
+[data-theme='dark'] .casoSolucion {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+@media (max-width: 640px) {
+  .casosSection {
+    padding: var(--spacing-md);
+  }
+
+  .casoCuerpo {
+    padding: var(--spacing-md);
+  }
+
+  .casoBotonPractica {
+    margin-left: 0;
+  }
+}

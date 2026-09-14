@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './SimuladorGenetica.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import CasosAula from './components/CasosAula';
 import {
   useGeneticSimulation,
   PunnettSquare,
@@ -467,6 +468,10 @@ export default function SimuladorGeneticaPage() {
           )}
         </div>
       </div>
+
+      {/* Casos para clase — la tarea asignable. Va FUERA de EducationalSection a propósito:
+          dentro quedaría plegada y el profesor no la vería al mirar la app. */}
+      <CasosAula />
 
       {/* Sección Educativa */}
       <EducationalSection
