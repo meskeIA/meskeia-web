@@ -150,7 +150,13 @@ for (const f of ficheros) {
     avisos.push(`type ausente o no estándar: ${f}`);
   }
 
-  for (const m of raw.matchAll(/\[\[([^\]]+)\]\]/g)) {
+  // Los wikilinks se buscan FUERA del código. `[[ ]]` es sintaxis de bash, y una ficha que
+  // cite un cambio del changelog sobre ella la escribe entre backticks: el candado la leía
+  // como un wikilink de destino vacío y cantaba "Wikilink roto → [[]]" sin que hubiera nada
+  // roto (14/09/2026, reference_revision_mensual_claude_code). Un error que no existe acaba
+  // enseñando a ignorar el candado, que es justo lo que no puede pasar con un validador.
+  const sinCodigo = raw.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+  for (const m of sinCodigo.matchAll(/\[\[([^\]]+)\]\]/g)) {
     const destino = m[1].trim();
     if (destino === slug) errores.push(`Autorreferencia [[${destino}]] en ${f}`);
     else if (!slugs.has(destino)) errores.push(`Wikilink roto: ${f} → [[${destino}]]`);
