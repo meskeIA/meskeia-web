@@ -4,6 +4,13 @@ import { SECCIONES_IAE, IAE_EXENCION, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from
 import { formatNumber } from '@/lib/formatters';
 
 /**
+ * Fecha ISO del módulo a formato español, sin pasar por `new Date`: la cadena '2026-01-01'
+ * se interpreta como medianoche UTC y en un huso negativo el día que sale es el anterior.
+ * El build de Vercel corre en UTC, pero el dato no puede depender de dónde se compile.
+ */
+const formatearFecha = (iso: string) => iso.split('-').reverse().join('/');
+
+/**
  * La norma que aprueba las Tarifas del IAE, DERIVADA de `FISCAL_CNAE_IAE_META.iae.fuente`
  * en vez de transcrita.
  *
@@ -123,7 +130,10 @@ export const faqJsonLd = {
       name: '¿Desde cuándo se aplica la CNAE-2025 y a qué equivale mi código CNAE-2009?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La CNAE-2025 fue aprobada por el Real Decreto 10/2025 y sustituye a la CNAE-2009 desde enero de 2026. Los códigos antiguos de cuatro dígitos siguen apareciendo en documentos anteriores; la tabla de correspondencia oficial del INE permite saber a qué clase o clases de la CNAE-2025 equivalen. En muchos casos la equivalencia es uno a uno, pero algunas clases antiguas se han dividido entre varias nuevas y hay que leer los literales para elegir.',
+        // La norma y la fecha de entrada en vigor salen de CNAE_VIGENCIA, como ya salían en
+        // jsonLd.description: aquí iban tecleadas y coincidían con el módulo por casualidad,
+        // no por construcción (hallazgo 843, residuo simétrico del 681).
+        text: `La ${CNAE_VIGENCIA.vigente} fue aprobada por el ${CNAE_VIGENCIA.normaVigente} y sustituye a la ${CNAE_VIGENCIA.anterior} desde el ${formatearFecha(CNAE_VIGENCIA.desde)}. Los códigos antiguos de cuatro dígitos siguen apareciendo en documentos anteriores; la tabla de correspondencia oficial del INE permite saber a qué clase o clases de la ${CNAE_VIGENCIA.vigente} equivalen. En muchos casos la equivalencia es uno a uno, pero algunas clases antiguas se han dividido entre varias nuevas y hay que leer los literales para elegir.`,
       },
     },
     {

@@ -148,9 +148,36 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
           ? getSexLinkedGenotypes(trait, 'male')[0]
           : getPossibleGenotypes(trait)[1];
 
+        /**
+         * Un rasgo ligado al X no puede quedarse dentro de un cruce DIHÍBRIDO.
+         *
+         * ⚠️ 14/09/2026 (hallazgo 824) — este setter cambiaba el rasgo y dejaba `crossType`
+         * y `selectedTrait2` como estaban, así que `performCrossing` entraba por la rama
+         * dihíbrida con un genotipo 'XD Y' que `generateDihybridGametes` parte por
+         * caracteres sueltos: salía un cuadro 4x4 entero de genotipos inexistentes
+         * («XX DD», «YX Dl»...), fenotipo «Desconocido / Desconocido» al 100 % y un ratio
+         * de seis términos. Y sin vuelta atrás evidente, porque al pasar el rasgo a ligado
+         * al sexo desaparece el conmutador Monohíbrido/Dihíbrido (`canDoDihybrid` es
+         * falso). El mismo reajuste que ya hacía `setSelectedOrganism`.
+         *
+         * Se anula también el segundo rasgo cuando el elegido ES ese segundo rasgo: un
+         * dihíbrido de un carácter consigo mismo es la misma incoherencia por otra puerta.
+         */
+        const ligadoAlSexo = trait.inheritanceMode === 'sex-linked';
+        const chocaConElSegundo = prev.selectedTrait2?.id === trait.id;
+        const deshacerDihibrido = ligadoAlSexo || chocaConElSegundo;
+
         return {
           ...prev,
           selectedTrait1: trait,
+          ...(deshacerDihibrido
+            ? {
+                selectedTrait2: null,
+                crossType: 'monohybrid' as CrossType,
+                parent1Genotype2: '',
+                parent2Genotype2: '',
+              }
+            : {}),
           parent1Genotype: defaultGenotype,
           parent2Genotype: trait.inheritanceMode === 'sex-linked'
             ? getSexLinkedGenotypes(trait, 'female')[1]
@@ -219,29 +246,39 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
     });
   }, []);
 
-  // Setters de genotipos
+  /**
+   * Setters de genotipos.
+   *
+   * ⚠️ 14/09/2026 (hallazgo 825) — invalidan también el ÁRBOL GENEALÓGICO. `generatePedigree`
+   * solo se llamaba al pulsar la pestaña y solo si `pedigreeChart` era null, y ningún setter
+   * de genotipo lo anulaba: el árbol se quedaba mostrando el cruce anterior —con hijos que el
+   * cruce actual ya no puede producir, un «aa» con los padres en AA × Aa— mientras el cuadro
+   * de Punnett y el selector de al lado ya decían otra cosa. Quien regenera el árbol cuando
+   * hace falta es el efecto de `page.tsx`, para que anularlo no deje el panel colgado en
+   * «Generando árbol genealógico...» (hallazgo 826).
+   */
   const setParent1Genotype = useCallback((genotype: string) => {
-    setState((prev) => ({ ...prev, parent1Genotype: genotype, crossResult: null }));
+    setState((prev) => ({ ...prev, parent1Genotype: genotype, crossResult: null, pedigreeChart: null }));
   }, []);
 
   const setParent2Genotype = useCallback((genotype: string) => {
-    setState((prev) => ({ ...prev, parent2Genotype: genotype, crossResult: null }));
+    setState((prev) => ({ ...prev, parent2Genotype: genotype, crossResult: null, pedigreeChart: null }));
   }, []);
 
   const setParent1Genotype2 = useCallback((genotype: string) => {
-    setState((prev) => ({ ...prev, parent1Genotype2: genotype, crossResult: null }));
+    setState((prev) => ({ ...prev, parent1Genotype2: genotype, crossResult: null, pedigreeChart: null }));
   }, []);
 
   const setParent2Genotype2 = useCallback((genotype: string) => {
-    setState((prev) => ({ ...prev, parent2Genotype2: genotype, crossResult: null }));
+    setState((prev) => ({ ...prev, parent2Genotype2: genotype, crossResult: null, pedigreeChart: null }));
   }, []);
 
   const setParent1Sex = useCallback((sex: Sex) => {
-    setState((prev) => ({ ...prev, parent1Sex: sex }));
+    setState((prev) => ({ ...prev, parent1Sex: sex, pedigreeChart: null }));
   }, []);
 
   const setParent2Sex = useCallback((sex: Sex) => {
-    setState((prev) => ({ ...prev, parent2Sex: sex }));
+    setState((prev) => ({ ...prev, parent2Sex: sex, pedigreeChart: null }));
   }, []);
 
   // Realizar cruce

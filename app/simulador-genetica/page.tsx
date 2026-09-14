@@ -77,6 +77,20 @@ export default function SimuladorGeneticaPage() {
     performCrossing,
   ]);
 
+  /**
+   * Rehacer el árbol genealógico cuando está a la vista y se ha quedado sin contenido.
+   *
+   * ⚠️ 14/09/2026 (hallazgo 826) — el árbol solo se generaba al PULSAR la pestaña, así que
+   * cambiar de característica estando dentro dejaba el panel colgado para siempre en
+   * «Generando árbol genealógico...», un texto que además mentía: no había nada generándose,
+   * y había que salir a otra pestaña y volver para recuperarlo. Ahora que los setters de
+   * genotipo también lo invalidan (hallazgo 825), esa espera falsa aparecería en cada cambio
+   * de progenitor: el árbol se rehace solo en cuanto hay un cruce del que derivarlo.
+   */
+  useEffect(() => {
+    if (activeTab === 'pedigree' && !pedigreeChart && punnettResult) generatePedigree();
+  }, [activeTab, pedigreeChart, punnettResult, generatePedigree]);
+
   // Obtener fenotipos para preview
   const getPhentypeForGenotype = (genotype: string, sex: 'male' | 'female') => {
     const trait = selectedTrait1;
@@ -693,7 +707,7 @@ export default function SimuladorGeneticaPage() {
                 <code>
                   {`Mujer portadora (X^R X^r) × hombre daltónico (X^r Y)
 → ¿Probabilidad de hija daltónica?
-→ Respuesta: 25% (1 de cada 4 hijos)`}
+→ Respuesta: 25% del total (1 de cada 4 descendientes)`}
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -752,11 +766,22 @@ Cruce Aa × Aa → 75% liso, 25% rizado
               </div>
               <div className={styles.escenarioExample}>
                 <p>Cálculo de riesgo hereditario:</p>
+                {/*
+                  Las proporciones van SOBRE EL TOTAL DE LA DESCENDENCIA, que es como cuenta
+                  la herramienta y como lo dice cada enunciado de los casos de aula.
+
+                  ⚠️ 14/09/2026 (hallazgo 829) — esta tarjeta contaba sobre los VARONES
+                  («50% hijos varones daltónicos») mientras la app imprime 25 % en
+                  Estadísticas, y el mismo bloque usaba los dos convenios a la vez: la
+                  primera tarjeta sí contaba sobre el total. Es justo la ambigüedad que
+                  `casos.ts` documenta y resuelve; el bloque educativo se quedó fuera de esa
+                  alineación. Se dice la base de cada porcentaje en vez de dejarla suponer.
+                */}
                 <code>
                   {`Abuelo daltónico → hija portadora (no afectada)
-Hija portadora × marido sano:
-→ 50% hijos varones daltónicos
-→ 50% hijas portadoras`}
+Hija portadora (XD Xd) × marido sano (XD Y):
+→ 25% del total: varones daltónicos (la mitad de los varones)
+→ 25% del total: hijas portadoras (la mitad de las hijas)`}
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -961,8 +986,14 @@ Hija portadora × marido sano:
               <div className={styles.stepContent}>
                 <h4>Construye el cuadro de Punnett</h4>
                 <p>
-                  Coloca los gametos del progenitor 1 en las filas y los del progenitor 2
-                  en las columnas. En monohíbrido, cada progenitor Aa produce 2 tipos de
+                  {/*
+                    Los ejes, como los dibuja la app: `PunnettSquare` pone `gametes1` en las
+                    COLUMNAS y `gametes2` en las filas. La guía los describía al revés y
+                    remataba con «el simulador hace esto automáticamente», que era
+                    precisamente lo que no hacía (hallazgo 831).
+                  */}
+                  Coloca los gametos del progenitor 1 en las columnas y los del progenitor 2
+                  en las filas. En monohíbrido, cada progenitor Aa produce 2 tipos de
                   gametos (A y a). En dihíbrido AaBb produce 4 (AB, Ab, aB, ab). El simulador
                   hace esto automáticamente en la pestaña Punnett.
                 </p>

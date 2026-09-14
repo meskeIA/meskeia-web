@@ -138,8 +138,14 @@ export default function PopulationSimulator({
                 χ² = {formatNumber(simulation.chiSquare ?? 0, 3)}
               </div>
               <div className={styles.chiSquareInterpretation}>
-                <strong>p {chiSquareResult.pValue}</strong>
-                <br />
+                {/* Con 0 grados de libertad no hay p-valor que dar: la interpretación lo
+                    explica sola y anteponerle una «p» diría justo lo contrario (hallazgo 832). */}
+                {chiSquareResult.pValue !== 'no procede' && (
+                  <>
+                    <strong>p {chiSquareResult.pValue}</strong>
+                    <br />
+                  </>
+                )}
                 {chiSquareResult.interpretation}
               </div>
             </div>

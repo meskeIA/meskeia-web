@@ -55,6 +55,7 @@ import {
   generateSexLinkedPunnett,
 } from './components/genetics';
 import type { Trait, PunnettResult } from './components/types';
+import { formatNumber } from '@/lib';
 
 /** Qué se pregunta: una clave del cuadro, y en qué unidad se responde. */
 export interface Busca {
@@ -211,10 +212,10 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
   if (busca.magnitud === 'individuos') {
     pasos.push(
       `Proporción esperada: ${aciertos}/${casillas}. Sobre ${busca.poblacion} individuos: ` +
-        `${aciertos}/${casillas} × ${busca.poblacion} = ${redondear(valor)}.`
+        `${aciertos}/${casillas} × ${busca.poblacion} = ${numero(valor)}.`
     );
   } else {
-    pasos.push(`Proporción: ${aciertos}/${casillas} = ${redondear(valor)} %.`);
+    pasos.push(`Proporción: ${aciertos}/${casillas} = ${numero(valor)} %.`);
   }
 
   return { ok: true, valor, pasos };
@@ -223,6 +224,18 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 /** Redondeo a 2 decimales, que es la precisión máxima que piden los enunciados. */
 function redondear(v: number): number {
   return Math.round(v * 100) / 100;
+}
+
+/**
+ * El mismo número, ya escrito PARA LEERSE: con coma decimal y sin decimales de relleno.
+ *
+ * ⚠️ 14/09/2026 (hallazgo 828) — `redondear` devuelve un number y las plantillas lo
+ * interpolaban directamente, así que salía el separador estadounidense: «Proporción: 9/16 =
+ * 56.25 %» justo encima de «Respuesta: 56,25», que sí pasa por `formatNumber`. La misma
+ * pantalla mezclaba los dos formatos.
+ */
+function numero(v: number): string {
+  return Number.isInteger(v) ? formatNumber(v, 0) : formatNumber(v, 2);
 }
 
 /** Tolerancia al corregir: el MAYOR entre 0,01 y el 1 % del valor esperado. */
@@ -260,7 +273,7 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${redondear(diferencia)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

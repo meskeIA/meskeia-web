@@ -1,5 +1,17 @@
 import { Trait, PopulationSimulation, PunnettResult } from '../types';
 import { determinePhenotype } from './crosses';
+import { formatNumber } from '@/lib';
+
+/**
+ * El p-valor, con el separador decimal español.
+ *
+ * ⚠️ 14/09/2026 (hallazgo 828) — los cuatro umbrales iban como cadenas fijas con punto
+ * ('> 0.5', '> 0.1', '> 0.05', '< 0.05') en una pantalla donde el cuadro de Punnett y el
+ * panel de población sí pasan por `formatNumber`: la misma vista mezclaba los dos formatos.
+ * Construirlo aquí impide que el siguiente umbral vuelva a escribirse a mano.
+ */
+const pTexto = (signo: '>' | '<', umbral: number): string =>
+  `${signo} ${formatNumber(umbral, umbral < 0.1 ? 2 : 1)}`;
 
 // Simular una población de N individuos basada en las probabilidades del Punnett
 export function simulatePopulation(
@@ -125,6 +137,26 @@ export function interpretChiSquare(
     5: 11.070,
   };
 
+  /**
+   * Con UNA sola categoría no hay test que hacer.
+   *
+   * ⚠️ 14/09/2026 (hallazgo 832) — un cruce que produce un único fenotipo (AA × aa: toda la
+   * F1 es Aa) deja 0 grados de libertad. El estadístico no puede valer entonces otra cosa
+   * que 0, porque observado y esperado coinciden por construcción, y `criticalValues[0]` no
+   * existe, así que caía al valor de 1 g.l. (3,841) y la app presentaba «χ² = 0,000 · p >
+   * 0,5 · Ajuste excelente a las proporciones esperadas», idéntico en todas las corridas,
+   * como si fuera evidencia de ajuste. El bloque educativo promete que «el test chi-cuadrado
+   * verifica si los resultados son estadísticamente esperables», y ahí no verificaba nada.
+   */
+  if (degreesOfFreedom < 1) {
+    return {
+      interpretation:
+        'El cruce produce un solo fenotipo, así que no hay grados de libertad: no hay proporciones que contrastar y el test no procede.',
+      isSignificant: false,
+      pValue: 'no procede',
+    };
+  }
+
   const critical = criticalValues[degreesOfFreedom] || 3.841;
   const isSignificant = chiSquare > critical;
 
@@ -133,16 +165,16 @@ export function interpretChiSquare(
 
   if (chiSquare < 0.5) {
     interpretation = 'Ajuste excelente a las proporciones esperadas';
-    pValue = '> 0.5';
+    pValue = pTexto('>', 0.5);
   } else if (chiSquare < critical * 0.5) {
     interpretation = 'Buen ajuste a las proporciones mendelianas';
-    pValue = '> 0.1';
+    pValue = pTexto('>', 0.1);
   } else if (!isSignificant) {
     interpretation = 'Ajuste aceptable, diferencias por azar';
-    pValue = '> 0.05';
+    pValue = pTexto('>', 0.05);
   } else {
     interpretation = 'Diferencia significativa con lo esperado';
-    pValue = '< 0.05';
+    pValue = pTexto('<', 0.05);
   }
 
   return {

@@ -102,15 +102,43 @@ const EJEMPLO_MARTA_TIPO_GENERAL = ITP_CCAA[EJEMPLO_MARTA.ccaa].tipoGeneral;
 /** Normaliza tildes para comparar nombres de tipos reducidos (ej: «Jóvenes» → «jovenes»). */
 const normalizarTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
+/**
+ * La ficha ENTERA del reducido de jóvenes, no solo su tipo.
+ *
+ * El ejemplo derivaba el tipo, el importe y los gastos, pero tecleaba a mano los dos
+ * requisitos que lo condicionan —la edad y el tope de valor— estando los dos en esta misma
+ * entrada de la tabla (hallazgo 837, la familia de los 581, 584, 629 y 719/720).
+ */
+const EJEMPLO_MARTA_REDUCIDO_JOVEN = ITP_CCAA[EJEMPLO_MARTA.ccaa].tiposReducidos?.find(
+  // Normalizado: es la forma exacta del hallazgo 526, que obligó a exportar `normaliza` desde
+  // data/itp-ccaa.ts. Hoy acertaría igual porque Andalucía escribe «Jóvenes» con esa tilde,
+  // pero si el nombre cambiara el find daría undefined, el ejemplo caería al tipo GENERAL y la
+  // página publicaría «el tipo reducido del 7% en lugar del tipo general del 7%. Ahorra 0 €»
+  // sin que nada avisara (hallazgo 723).
+  (t) => normalizarTexto(t.nombre).includes('jovenes'),
+);
+/**
+ * El reducido se elegía por NOMBRE sin comprobar su `valorMaximo`: si Andalucía bajara el
+ * tope por debajo de los 140.000 € del ejemplo, la página seguiría publicando «se aplica el
+ * tipo reducido del 3,5 %» para una compra que ya no podría acogerse, con el tope viejo
+ * escrito al lado. Se comprueba con la misma función que usa el motor.
+ */
+const EJEMPLO_MARTA_JOVEN_APLICA =
+  !!EJEMPLO_MARTA_REDUCIDO_JOVEN && !superaElTope(EJEMPLO_MARTA_REDUCIDO_JOVEN, EJEMPLO_MARTA.precio);
 const EJEMPLO_MARTA_TIPO_JOVEN =
-  ITP_CCAA[EJEMPLO_MARTA.ccaa].tiposReducidos?.find(
-    // Normalizado: es la forma exacta del hallazgo 526, que obligó a exportar `normaliza` desde
-    // data/itp-ccaa.ts. Hoy acertaría igual porque Andalucía escribe «Jóvenes» con esa tilde,
-    // pero si el nombre cambiara el find daría undefined, el ejemplo caería al tipo GENERAL y la
-    // página publicaría «el tipo reducido del 7% en lugar del tipo general del 7%. Ahorra 0 €»
-    // sin que nada avisara (hallazgo 723).
-    (t) => normalizarTexto(t.nombre).includes('jovenes'),
-  )?.tipo ?? EJEMPLO_MARTA_TIPO_GENERAL;
+  EJEMPLO_MARTA_JOVEN_APLICA && EJEMPLO_MARTA_REDUCIDO_JOVEN
+    ? EJEMPLO_MARTA_REDUCIDO_JOVEN.tipo
+    : EJEMPLO_MARTA_TIPO_GENERAL;
+/** Tope de valor de la ficha, para enunciar el requisito sin teclearlo. */
+const EJEMPLO_MARTA_TOPE = EJEMPLO_MARTA_REDUCIDO_JOVEN?.valorMaximo ?? null;
+/** Edad tope, leída de la condición de la misma ficha («Menor de 35 años» → 35). */
+const EJEMPLO_MARTA_EDAD_TOPE = Number(
+  EJEMPLO_MARTA_REDUCIDO_JOVEN?.condiciones
+    .map((c) => c.match(/(\d{2})\s*a[nñ]os/i)?.[1])
+    .find(Boolean) ?? 0,
+);
+/** Marta cabe holgadamente bajo ese tope, como hasta ahora (29 con el tope en 35). */
+const EJEMPLO_MARTA_EDAD = EJEMPLO_MARTA_EDAD_TOPE > 6 ? EJEMPLO_MARTA_EDAD_TOPE - 6 : EJEMPLO_MARTA_EDAD_TOPE;
 const EJEMPLO_MARTA_ITP = EJEMPLO_MARTA.precio * (EJEMPLO_MARTA_TIPO_JOVEN / 100);
 const EJEMPLO_MARTA_AHORRO =
   EJEMPLO_MARTA.precio * ((EJEMPLO_MARTA_TIPO_GENERAL - EJEMPLO_MARTA_TIPO_JOVEN) / 100);
@@ -311,6 +339,18 @@ export default function SimuladorCompraventaPage() {
 
     // Determinar si es inmueble residencial (para IVA y tipos reducidos)
     const esResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
+    /**
+     * ¿La operación PUEDE ser la vivienda habitual del comprador?
+     *
+     * No es lo mismo que `esResidencial`: un garaje o un trastero SUELTOS son residenciales
+     * a efectos del IVA del anejo vinculado (art. 91.Uno.1.7.º LIVA) y no son vivienda
+     * habitual NUNCA. Mezclar las dos preguntas en la misma variable dejaba entrar a los dos
+     * anejos en los tipos reducidos de ITP reservados a la vivienda habitual y la cuota
+     * salía a la mitad (hallazgo 833: garaje en Andalucía con perfil Joven, 4.900 € en vez
+     * de 9.800 €). Es lo que ya pasan las dos apps hermanas —`simulador-gastos-compraventa-
+     * garaje` y `-trastero`— con el comentario «un garaje suelto NO lo es nunca».
+     */
+    const puedeSerViviendaHabitual = tipoInmueble === 'vivienda';
 
     const territorioSinIva = TERRITORIOS_SIN_IVA[ccaa];
 
@@ -348,8 +388,9 @@ export default function SimuladorCompraventaPage() {
       // Los tipos reducidos exigen condiciones que hay que comprobar una a una: antes se
       // aplicaba el primero que casara por nombre mirando solo su valorMaximo, y en Madrid
       // eso daba un ITP del 0 % por un tipo reservado a municipios de menos de 2.500
-      // habitantes que la app no pregunta. `viviendaHabitual` solo se da por cierta en
-      // inmuebles residenciales; en local, nave o terreno esa condición no se cumple.
+      // habitantes que la app no pregunta. `viviendaHabitual` solo se da por cierta cuando
+      // el inmueble es una VIVIENDA; en garaje, trastero, local, nave o terreno esa
+      // condición no se cumple nunca (ver `puedeSerViviendaHabitual` arriba).
       //
       // Y al motor NO se le pasa un perfil que el usuario no puede ver ni cambiar: el
       // selector de perfil solo se pinta con inmueble residencial (`esInmuebleResidencial`),
@@ -362,7 +403,7 @@ export default function SimuladorCompraventaPage() {
       // justo la que alimenta ese aviso: el filtro tiene que estar aquí.
       const perfilEfectivo: PerfilComprador = esResidencial ? perfilComprador : 'general';
       const elegido = elegirTipoITP(ccaa, perfilEfectivo, precio, {
-        viviendaHabitual: esResidencial,
+        viviendaHabitual: puedeSerViviendaHabitual,
       });
       tipoElegido = elegido;
       impuesto = importeITP(precio, ccaa, elegido);
@@ -1450,7 +1491,7 @@ export default function SimuladorCompraventaPage() {
               <h4><span aria-hidden="true">🆕</span> Primera mano → IVA + AJD</h4>
               <p>
                 Las viviendas nuevas (primera transmisión del promotor) pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</strong>.
-                Los locales comerciales, naves industriales y terrenos pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.local, 0)}%</strong>.
+                Los locales comerciales y las naves industriales pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.local, 0)}%</strong>, y el suelo edificable, el tipo general del <strong>{formatNumber(PORCENTAJES_IVA.general, 0)}%</strong> (art. 90 LIVA), que es el que aplica la calculadora de arriba.
               </p>
               <p>
                 Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados), que va del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral.
@@ -1547,7 +1588,7 @@ export default function SimuladorCompraventaPage() {
               <tbody>
                 <tr>
                   <td>IVA</td>
-                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% ({formatNumber(IVA_INMUEBLES_2025.local, 0)}% locales/terrenos)</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% ({formatNumber(IVA_INMUEBLES_2025.local, 0)}% locales y naves · {formatNumber(PORCENTAJES_IVA.general, 0)}% terrenos)</td>
                   <td>No aplica</td>
                   <td>Comprador</td>
                 </tr>
@@ -1601,12 +1642,17 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji} aria-hidden="true">🏠</span>
                 <span className={styles.casoTag}>Comprador primera vivienda</span>
               </div>
-              <p>Marta, 29 años, compra su primera vivienda habitual de segunda mano en {ITP_CCAA[EJEMPLO_MARTA.ccaa].nombre} por
-              {' '}{eurosEnteros(EJEMPLO_MARTA.precio)}. Al ser menor de 35 años y no superar los 150.000 €, se aplica el tipo
+              <p>Marta, {EJEMPLO_MARTA_EDAD} años, compra su primera vivienda habitual de segunda mano en {ITP_CCAA[EJEMPLO_MARTA.ccaa].nombre} por
+              {' '}{eurosEnteros(EJEMPLO_MARTA.precio)}. {EJEMPLO_MARTA_JOVEN_APLICA
+                ? <>Al ser menor de {EJEMPLO_MARTA_EDAD_TOPE} años{EJEMPLO_MARTA_TOPE ? <> y no superar los {eurosEnteros(EJEMPLO_MARTA_TOPE)}</> : null}, se aplica el tipo
               reducido de ITP del {formatTipoNominal(EJEMPLO_MARTA_TIPO_JOVEN)}% ({eurosEnteros(EJEMPLO_MARTA_ITP)}) en lugar del tipo general
-              del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%. Además paga
+              del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%.</>
+                : <>Aunque es menor de {EJEMPLO_MARTA_EDAD_TOPE} años, su compra supera el tope de {EJEMPLO_MARTA_TOPE ? eurosEnteros(EJEMPLO_MARTA_TOPE) : 'valor'} del tipo
+              reducido, así que paga el tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}% ({eurosEnteros(EJEMPLO_MARTA_ITP)}).</>} Además paga
               unos {eurosEnteros(EJEMPLO_MARTA_GASTOS)} en notaría ({eurosEnteros(EJEMPLO_MARTA_NOTARIA)}), registro ({eurosEnteros(EJEMPLO_MARTA_REGISTRO)}) y gestoría ({eurosEnteros(EJEMPLO_MARTA_GESTORIA)}).</p>
-              <div className={styles.casoResultado}>Ahorra {eurosEnteros(EJEMPLO_MARTA_AHORRO)} frente al tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%</div>
+              <div className={styles.casoResultado}>{EJEMPLO_MARTA_JOVEN_APLICA
+                ? <>Ahorra {eurosEnteros(EJEMPLO_MARTA_AHORRO)} frente al tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%</>
+                : <>Sin ahorro: el tipo reducido de jóvenes no alcanza a este precio</>}</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>

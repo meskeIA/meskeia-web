@@ -256,17 +256,90 @@ const CAMPOS_DEUDAS = [
  *
  * Derivarlo, y no corregir el número, es lo que impide que vuelva a separarse.
  */
+/**
+ * El piso del ejemplo, declarado UNA vez: es a la vez la base imponible y la vivienda
+ * habitual que se reduce, y el desarrollo que se enseña al usuario partía de otra cifra
+ * —190.000 €— que no aparece en ningún otro sitio de la tarjeta (hallazgo 820). El
+ * resultado no cambiaba, porque los dos productos superan el tope estatal, pero la
+ * aritmética que se enseña tiene que ser la del ejemplo.
+ */
+const EJEMPLO_MADRID_PISO = 200000;
 const EJEMPLO_MADRID = calcularSucesion({
-  baseImponible: 200000,
+  baseImponible: EJEMPLO_MADRID_PISO,
   ccaa: 'madrid',
   grupo: 'II',
   edadHeredero: 45,
-  viviendaHabitual: 200000,
+  viviendaHabitual: EJEMPLO_MADRID_PISO,
+  incluyeAjuar: true,
+});
+
+/**
+ * La tarjeta de la viuda catalana, por el mismo motivo y con el mismo remedio.
+ *
+ * ⚠️ 14/09/2026 (hallazgo 815) — anunciaba «base liquidable 400.000 € y cuota 57.000 €» y a
+ * continuación llamaba a esa cifra «el techo, no la factura». Con esos mismos datos la
+ * herramienta liquida 606,00 €: el número escrito a mano se saltaba el ajuar del 3 % que la
+ * app siempre añade (base 515.000 €, liquidable 415.000 €) y, sobre todo, la bonificación
+ * del 99 % del cónyuge catalán (art. 58 bis.1 de la Ley 19/2010) que la ficha de Cataluña
+ * anuncia dos bloques más arriba en esta misma página. El usuario lee estas tarjetas como
+ * confirmación del número que acaba de obtener, y aquí era 94 veces mayor.
+ */
+const EJEMPLO_CATALUNA = calcularSucesion({
+  baseImponible: 500000,
+  ccaa: 'cataluna',
+  grupo: 'I-conyuge',
+  edadHeredero: 60,
+  incluyeAjuar: true,
+});
+
+/**
+ * La comparativa Asturias/Madrid del bloque «Diferencias entre CCAA», por el mismo motivo.
+ *
+ * ⚠️ 14/09/2026 (hallazgo 816) — el párrafo invoca a la herramienta como testigo («esta misma
+ * calculadora liquida...») y la herramienta lo desmentía: decía 111,11 € en Madrid y la app
+ * daba 154,74 €, un 39 % por encima, que es además el valor que fija el test de regresión
+ * desde el 11/09/2026. Un texto que cita a la calculadora tiene que EJECUTARLA.
+ */
+const COMPARATIVA_CCAA = { baseImponible: 250000, viviendaHabitual: 200000 } as const;
+const EJEMPLO_ASTURIAS = calcularSucesion({
+  baseImponible: COMPARATIVA_CCAA.baseImponible,
+  ccaa: 'asturias',
+  grupo: 'II',
+  edadHeredero: 45,
+  viviendaHabitual: COMPARATIVA_CCAA.viviendaHabitual,
+  incluyeAjuar: true,
+});
+const EJEMPLO_MADRID_COMPARATIVA = calcularSucesion({
+  baseImponible: COMPARATIVA_CCAA.baseImponible,
+  ccaa: 'madrid',
+  grupo: 'II',
+  edadHeredero: 45,
+  viviendaHabitual: COMPARATIVA_CCAA.viviendaHabitual,
   incluyeAjuar: true,
 });
 
 /** Importe en euros para la prosa: mismo formato que el resto de la página. */
 const euros = (n: number) => formatCurrency(n);
+
+/**
+ * Lo que ahorra una REDUCCIÓN, que por definición depende del tramo en que caiga.
+ *
+ * ⚠️ 14/09/2026 (hallazgo 821) — dos textos cifraban esa horquilla «dependiendo del tramo» y
+ * ninguno usaba los tramos: «una reducción de 15.956 € ahorra entre ~1.200 € y ~3.700 €»
+ * (el techo real son 5.425,34 €, al 34 %) y «un ajuar de 12.000 € supone ~600-2.000 €»
+ * (918-4.080 €). El 3.700 no corresponde a ningún tipo de la escala vigente ni de la
+ * derogada de siete tramos: era residuo de la tarifa que se reparó el 11/09. Si la frase
+ * invoca la escala, la escala tiene que ser la que salga.
+ */
+const horquillaAhorro = (importe: number) => ({
+  min: importe * (TARIFA_ESTATAL_IS[0].tipo / 100),
+  max: importe * (TARIFA_ESTATAL_IS[TARIFA_ESTATAL_IS.length - 1].tipo / 100),
+});
+const AHORRO_REDUCCION_PARENTESCO = horquillaAhorro(REDUCCIONES_PARENTESCO_IS['II']);
+/** Ajuar presunto de la herencia de ejemplo del bloque de consejos. */
+const EJEMPLO_AJUAR_HERENCIA = 400000;
+const EJEMPLO_AJUAR_PRESUNTO = EJEMPLO_AJUAR_HERENCIA * PORC_AJUAR_DOMESTICO_IS;
+const AHORRO_AJUAR = horquillaAhorro(EJEMPLO_AJUAR_PRESUNTO);
 
 export default function EstimadorImpuestoSucesionesPage() {
   // Bienes del fallecido
@@ -579,25 +652,28 @@ export default function EstimadorImpuestoSucesionesPage() {
         urlOficial={FISCAL_SUCESIONES_META.urlOficial}
       />
 
-      {/* Disclaimer SIEMPRE VISIBLE */}
+      {/*
+        Qué NO entra en la estimación, SIEMPRE VISIBLE y sin repetir el DisclaimerCard.
+
+        ⚠️ 14/09/2026 (hallazgo 819) — este bloque y el DisclaimerCard obligatorio de arriba
+        sumaban 1.394 px de avisos consecutivos que decían sustancialmente lo mismo: los dos
+        abrían con «exclusivamente orientativa» y cerraban con «meskeIA no se responsabiliza».
+        Con ellos, el primer control de la app quedaba a 2.504 px en 390x844 —casi tres
+        pantallas de advertencias antes del primer desplegable— y la estancia media era de 21
+        segundos. La duplicación era de la app, no de la política de riesgo 1, que exige UN
+        disclaimer: el obligatorio se queda íntegro y arriba, y aquí solo permanece lo que no
+        está en ninguna otra parte, que son los límites concretos de ESTE cálculo.
+      */}
       <div className={styles.disclaimerCritico}>
-        <h2 className={styles.disclaimerTitulo}><span aria-hidden="true">⚠️</span> Aviso Legal Imprescindible</h2>
-        <p>
-          Esta herramienta es <strong>exclusivamente orientativa</strong>. Los resultados son estimaciones
-          basadas en tarifas generales y <strong>no tienen validez fiscal</strong>.
-        </p>
+        <h2 className={styles.disclaimerTitulo}><span aria-hidden="true">⚠️</span> Qué no incluye esta estimación</h2>
         <ul>
           <li>El ISD contempla decenas de supuestos especiales no incluidos aquí</li>
           <li>Empresas familiares, explotaciones agrarias y otros bienes tienen reducciones especiales</li>
           <li>Las bonificaciones autonómicas pueden tener requisitos formales adicionales</li>
-          <li>El ajuar doméstico (3%) puede impugnarse con prueba en contrario</li>
-          <li><strong>Consulta siempre con un gestor o asesor fiscal antes de autoliquidar</strong></li>
+          <li>El ajuar doméstico ({formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} %) puede impugnarse con prueba en contrario</li>
         </ul>
         <p className={styles.disclaimerPlazo}>
-          <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong> desde el fallecimiento ({PLAZO_ISD.norma}), prorrogable {PLAZO_ISD.mesesProrroga} meses más con intereses de demora
-        </p>
-        <p className={styles.disclaimerResponsabilidad}>
-          meskeIA no se responsabiliza de decisiones basadas en estas herramientas.
+          <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong> desde el fallecimiento ({PLAZO_ISD.norma}), prorrogable {PLAZO_ISD.mesesProrroga} meses más con intereses de demora, y la prórroga se pide dentro de los {PLAZO_ISD.mesesParaPedirProrroga} primeros
         </p>
       </div>
 
@@ -971,10 +1047,12 @@ export default function EstimadorImpuestoSucesionesPage() {
             Las comunidades usan dos mecanismos distintos y conviene no confundirlos. Madrid y
             Canarias bonifican la CUOTA —el 99% y el 99,9% para los grupos más cercanos—, de modo
             que el impuesto queda cerca de cero. Asturias no bonifica en cuota a esos grupos, pero
-            les aplica una reducción de 300.000 € en la BASE, que en herencias medianas absorbe la
-            base entera y deja también una cuota de cero: con 250.000 € heredados por un hijo, de
-            los que 200.000 € son la vivienda habitual, esta misma calculadora liquida 0,00 € en
-            Asturias y 111,11 € en Madrid. Cuál sale más barata depende del importe y del
+            les aplica una reducción de {euros(EJEMPLO_ASTURIAS.reduccionAutonomicaBase)} en la
+            BASE, que en herencias medianas absorbe la base entera y deja también una cuota de
+            cero: con {euros(COMPARATIVA_CCAA.baseImponible)} heredados por un hijo, de
+            los que {euros(COMPARATIVA_CCAA.viviendaHabitual)} son la vivienda habitual, esta misma
+            calculadora liquida {euros(EJEMPLO_ASTURIAS.cuotaFinal)} en
+            Asturias y {euros(EJEMPLO_MADRID_COMPARATIVA.cuotaFinal)} en Madrid. Cuál sale más barata depende del importe y del
             parentesco, así que la comparación hay que hacerla con el caso concreto delante.
           </p>
 
@@ -1001,9 +1079,14 @@ export default function EstimadorImpuestoSucesionesPage() {
           <h3>Normativa propia: Cataluña, País Vasco y Navarra</h3>
           <p>
             Cataluña <strong>no es territorio foral</strong> —los forales son País Vasco y Navarra—,
-            pero sí tiene su propia ley del impuesto (Ley 19/2010): tarifa entre el 7% y el 32% y
-            reducciones distintas de las estatales, entre ellas 100.000 € para el cónyuge y para el
-            hijo, 50.000 € para el resto de descendientes y 30.000 € para los ascendientes. País Vasco
+            pero sí tiene su propia ley del impuesto (Ley 19/2010): tarifa entre
+            el {formatNumber(TARIFA_CATALUNA_IS[0].tipo, 0)}% y
+            el {formatNumber(TARIFA_CATALUNA_IS[TARIFA_CATALUNA_IS.length - 1].tipo, 0)}% y
+            reducciones distintas de las estatales, entre
+            ellas {euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['I-conyuge'])} para el cónyuge y para el
+            hijo, {euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['II-descendiente'])} para el resto de
+            descendientes y {euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['II-ascendiente'])} para los
+            ascendientes. País Vasco
             (tres Haciendas Forales diferentes) y Navarra tienen sistemas muy favorables para
             familiares directos, con reducciones cercanas al 100%.
           </p>
@@ -1092,12 +1175,12 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p>
-                  Base imponible: {euros(200000)} (piso) +{' '}
+                  Base imponible: {euros(EJEMPLO_MADRID_PISO)} (piso) +{' '}
                   {euros(EJEMPLO_MADRID.ajuarDomestico)} (ajuar{' '}
                   {formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} %) ={' '}
                   <strong>{euros(EJEMPLO_MADRID.baseImponibleConAjuar)}</strong>.
                   Reducción por parentesco: {euros(REDUCCIONES_PARENTESCO_IS['II'])}. Reducción vivienda
-                  habitual (95%): mín(190.000 × 0,95; {euros(REDUCCION_VIVIENDA_MAX_IS)}) ={' '}
+                  habitual (95%): mín({euros(EJEMPLO_MADRID_PISO)} × 0,95; {euros(REDUCCION_VIVIENDA_MAX_IS)}) ={' '}
                   <strong>{euros(REDUCCION_VIVIENDA_MAX_IS)}</strong>.
                   Base liquidable: {euros(EJEMPLO_MADRID.baseLiquidable)}. Cuota íntegra (tarifa
                   estatal): {euros(EJEMPLO_MADRID.cuotaIntegra)}. Bonificación Madrid{' '}
@@ -1149,10 +1232,22 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p>
-                  Cataluña aplica tarifa propia (7%–32%) y coeficientes propios.
-                  Sin más reducciones que la de parentesco del cónyuge (100.000 € en Cataluña),
-                  la base liquidable es de 400.000 € y la cuota, de 57.000 €.
-                  Coeficiente cónyuge catalán: 1,0000.
+                  Cataluña aplica tarifa propia ({formatNumber(TARIFA_CATALUNA_IS[0].tipo, 0)}%–
+                  {formatNumber(TARIFA_CATALUNA_IS[TARIFA_CATALUNA_IS.length - 1].tipo, 0)}%) y
+                  coeficientes propios. Con el ajuar del{' '}
+                  {formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} % la base imponible sube a{' '}
+                  {euros(EJEMPLO_CATALUNA.baseImponibleConAjuar)} y, sin más reducciones que la de
+                  parentesco del cónyuge ({euros(EJEMPLO_CATALUNA.reduccionParentesco)} en Cataluña),
+                  la base liquidable queda en {euros(EJEMPLO_CATALUNA.baseLiquidable)} y la cuota
+                  íntegra en {euros(EJEMPLO_CATALUNA.cuotaIntegra)}. Coeficiente cónyuge catalán:{' '}
+                  {formatNumber(EJEMPLO_CATALUNA.coeficienteMultiplicador, 4)}.
+                </p>
+                <p>
+                  Sobre esa cuota se aplica la bonificación del cónyuge
+                  ({formatNumber(EJEMPLO_CATALUNA.porcentajeBonificacion, 0)} %, art. 58 bis.1 de la
+                  Ley 19/2010), así que la <strong>cuota final estimada es
+                  de {euros(EJEMPLO_CATALUNA.cuotaFinal)}</strong> — que es lo que liquida la
+                  calculadora de arriba con estos mismos datos.
                 </p>
                 <p>
                   <strong>La reducción del 95% por empresa familiar</strong> (art. 20.2.c de la
@@ -1291,7 +1386,10 @@ export default function EstimadorImpuestoSucesionesPage() {
                   <li><strong>Bonificación</strong>: Porcentaje que se aplica sobre la cuota tributaria
                   ya calculada. Ejemplo: Madrid bonifica el 99% de la cuota para Grupo II.</li>
                 </ul>
-                Una reducción de 15.956 € ahorra entre ~1.200 € y ~3.700 € dependiendo del tramo.
+                Una reducción de {euros(REDUCCIONES_PARENTESCO_IS['II'])} ahorra
+                entre {euros(AHORRO_REDUCCION_PARENTESCO.min)} y {euros(AHORRO_REDUCCION_PARENTESCO.max)} según
+                el tramo en que caiga (del {formatNumber(TARIFA_ESTATAL_IS[0].tipo, 2)} % al{' '}
+                {formatNumber(TARIFA_ESTATAL_IS[TARIFA_ESTATAL_IS.length - 1].tipo, 2)} % de la escala estatal).
                 Una bonificación del 99% sobre una cuota de 10.000 € ahorra 9.900 €.
                 <div className={styles.faqTip}>Las bonificaciones autonómicas son en general mucho más potentes que las reducciones estatales.</div>
               </dd>
@@ -1440,10 +1538,13 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div>
                 <strong>Declara el ajuar doméstico correctamente</strong>
                 <p>
-                  Hacienda presume el 3% del valor de la masa hereditaria neta como ajuar doméstico.
+                  Hacienda presume el {formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} % del valor de
+                  la masa hereditaria neta como ajuar doméstico.
                   Si los muebles, ropa y enseres valen menos, puedes impugnar esta presunción
-                  aportando inventario valorado. En una herencia de 400.000 €, el ajuar presunto
-                  es de 12.000 €, lo que supone ~600–2.000 € adicionales de impuesto.
+                  aportando inventario valorado. En una herencia de {euros(EJEMPLO_AJUAR_HERENCIA)}, el
+                  ajuar presunto es de {euros(EJEMPLO_AJUAR_PRESUNTO)}, lo que
+                  supone entre {euros(AHORRO_AJUAR.min)} y {euros(AHORRO_AJUAR.max)} adicionales de
+                  impuesto según el tramo.
                 </p>
               </div>
             </div>
@@ -1455,10 +1556,12 @@ export default function EstimadorImpuestoSucesionesPage() {
                   Si heredas la vivienda habitual del causante, aplica la reducción del 95%
                   sobre su valor (con el límite estatal de {euros(REDUCCION_VIVIENDA_MAX_IS)} por heredero). Cónyuge,
                   descendientes y ascendientes pueden aplicarla. En Cataluña el límite es muy
-                  superior —500.000 € sobre el valor conjunto de la vivienda, con un mínimo de
-                  180.000 € por heredero tras el prorrateo—, y por eso allí esta reducción suele
-                  decidir el resultado. Requisito: mantener la vivienda 10 años (5 en Cataluña,
-                  o 3 en algunas CCAA).
+                  superior —{euros(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)} sobre el valor conjunto de
+                  la vivienda, con un mínimo de {euros(REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS)} por
+                  heredero tras el prorrateo—, y por eso allí esta reducción suele
+                  decidir el resultado. Requisito: mantener la
+                  vivienda {formatNumber(REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS, 0)} años
+                  ({formatNumber(REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS, 0)} en Cataluña).
                 </p>
               </div>
             </div>
@@ -1522,7 +1625,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 el causante con beneficiarios nominados no forman parte de la herencia civil, pero
                 <em>sí tributan por ISD</em> por su normativa específica. El beneficiario debe
                 declararlos en el modelo 650 dentro del mismo plazo de {PLAZO_ISD.mesesPresentacion} meses, con independencia
-                de la herencia. La reducción estatal máxima es de 9.195,49 € para cónyuge,
+                de la herencia. La reducción estatal máxima es
+                de {euros(REDUCCION_SEGURO_VIDA_MAX_IS)} para cónyuge,
                 descendientes y ascendientes.
               </li>
             </ul>

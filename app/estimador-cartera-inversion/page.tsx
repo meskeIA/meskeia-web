@@ -774,7 +774,7 @@ export default function SimuladorCarteraPage() {
                     <strong>Rango probable:</strong> En el 80% de los casos, terminarás entre {formatCurrency(resultado.percentil10[resultado.percentil10.length - 1])} y {formatCurrency(resultado.percentil90[resultado.percentil90.length - 1])}
                   </li>
                   <li>
-                    <strong>Sharpe Ratio:</strong> {metricas.sharpeRatio >= 0.5 ? 'Buena relación rentabilidad/riesgo' : 'Relación rentabilidad/riesgo mejorable'} ({metricas.sharpeRatio >= 0.5 ? '> 0.5 es aceptable' : '< 0.5 es bajo'})
+                    <strong>Sharpe Ratio:</strong> {metricas.sharpeRatio >= 0.5 ? 'Buena relación rentabilidad/riesgo' : 'Relación rentabilidad/riesgo mejorable'} ({metricas.sharpeRatio >= 0.5 ? '> 0,5 es aceptable' : '< 0,5 es bajo'})
                   </li>
                   <li>
                     <strong>Objetivo:</strong> Tienes un {formatNumber(metricas.probabilidadObjetivo, 0)}% de probabilidad de alcanzar {formatCurrency(objetivo)}

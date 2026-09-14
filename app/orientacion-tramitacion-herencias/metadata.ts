@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { PLAZO_ISD } from '@/data/fiscal';
 
 export const metadata: Metadata = {
   title: 'Orientación para Tramitar una Herencia - Checklist y Plazos | meskeIA',
@@ -48,7 +49,13 @@ export const faqJsonLd = {
       name: '¿Qué plazo hay para tramitar una herencia en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El plazo más crítico es el del Impuesto de Sucesiones: 6 meses desde la fecha del fallecimiento. Se puede solicitar una prórroga de otros 6 meses antes de que venza el plazo inicial, aunque con intereses de demora. Para la aceptación de la herencia no existe un plazo legal obligatorio, pero conviene actuar en ese período para evitar problemas con los bienes y las deudas del fallecido.',
+        // ⚠️ Mismo defecto que el hallazgo 817 en `estimador-impuesto-sucesiones`, hallado al
+        // grepear las hermanas: la prórroga se pide dentro de los CINCO primeros meses (art.
+        // 68.1 RISD), no «antes de que venza el plazo inicial». El cuerpo visible de esta
+        // misma app lo dice bien tres veces —«antes del mes 5», «Pasado el mes 5 ya no es
+        // posible»— y solo su JSON-LD, que es lo que citan ChatGPT, Bing Copilot y
+        // Perplexity sin el disclaimer al lado, daba un mes de más.
+        text: `El plazo más crítico es el del Impuesto de Sucesiones: ${PLAZO_ISD.mesesPresentacion} meses desde la fecha del fallecimiento. Se puede solicitar una prórroga de otros ${PLAZO_ISD.mesesProrroga} meses, pero hay que pedirla dentro de los ${PLAZO_ISD.mesesParaPedirProrroga} primeros meses y devenga intereses de demora. Para la aceptación de la herencia no existe un plazo legal obligatorio, pero conviene actuar en ese período para evitar problemas con los bienes y las deudas del fallecido.`,
       },
     },
     {

@@ -1033,7 +1033,21 @@ export function elegirTipoITP(
     return false;
   };
 
-  // Candidatos: los que encajan con el perfil por nombre (mismo criterio de antes)
+  /**
+   * Candidatos: los que encajan con el perfil por nombre (mismo criterio de antes).
+   *
+   * ⚠️ 14/09/2026 — aquí NO se filtran los que exigen vivienda habitual, aunque
+   * `alAlcanceDeCualquiera` sí lo haga unas líneas más arriba, y la asimetría es deliberada.
+   * Al reparar el hallazgo 834 se probó a extender el filtro también a esta rama y tumbó 15
+   * casos de `simulador-gastos-compraventa-garaje` y `-trastero` que exigen lo contrario:
+   * que el reducido de familia numerosa o de jóvenes SE ENSEÑE con su requisito impreso al
+   * lado. No es un descuido de esas apps —es que un garaje o un trastero comprados COMO
+   * ANEJO de la vivienda habitual sí pueden acogerse al tipo de esta en muchas comunidades,
+   * así que para el comprador de un anejo la oportunidad existe—, y el aviso lo dice sin
+   * ambigüedad: enseña la condición y añade que el cálculo usa el tipo sin requisitos
+   * especiales. Lo que el 834 sí prohíbe es ofrecerlo cuando NADIE ha declarado un perfil,
+   * y de eso se encarga `alAlcanceDeCualquiera`.
+   */
   const candidatos = datos.tiposReducidos.filter(r => {
     const n = normaliza(r.nombre);
     if (perfil === 'joven') return n.includes('joven');

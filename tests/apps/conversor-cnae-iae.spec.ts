@@ -344,12 +344,12 @@ test('REGRESIÓN — la app niega la conversión CNAE→IAE en la página, en el
   // DataReference con las dos fuentes normativas y su fecha de verificación, que NO es
   // `meta.generado` del catálogo sino `FISCAL_CNAE_IAE_META.verificado`, sellado a mano
   // (así desde el hallazgo 588, para que meskeIA y la ficha de Delegum no muestren dos
-  // fechas del mismo catálogo). Se reselló el 08/09/2026 al sacar los sinónimos de
-  // lavandería y de motos del primer destino de su correspondencia (hallazgos 631-632):
-  // regenerar ES verificar.
+  // fechas del mismo catálogo). Se reselló el 14/09/2026 al mover el alquiler de vivienda
+  // de hostelería a 68.20 y el comercio electrónico fuera de la intermediación (hallazgos
+  // 838-842); antes, el 08/09/2026, por lavandería y motos (631-632): regenerar ES verificar.
   await expect(page.getByText('RD 10/2025', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('RD Legislativo 1175/1990', { exact: false }).first()).toBeVisible();
-  await expect(page.getByText('08/09/2026', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('14/09/2026', { exact: false }).first()).toBeVisible();
 
   // El FAQPage del JSON-LD dice lo mismo que la página: sin él, las IAs citarían la
   // app como si fuese un conversor.
@@ -2049,7 +2049,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
   test('ALTO — «casero» y «arrendador» deben llevar a 68.20, la clase que se llama «Alquiler de bienes inmobiliarios»', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['6820'] = ['55.90', '68.20']: la clase 6820 de la CNAE-2009, que se
@@ -2079,7 +2078,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
   test('MEDIO — «tienda online» no puede tener como única puerta la clase de INTERMEDIACIÓN', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // Once términos de comercio electrónico («tienda online», «tienda virtual», «vender por
@@ -2103,7 +2101,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
   test('BAJO — «servicios auxiliares» no puede encabezarse con la intermediación del comercio al por menor', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // El mismo término genérico está pegado a once clases cuyo literal es «servicios de
@@ -2123,7 +2120,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
   test('BAJO — «transporte de mercancías» no puede devolver la clase de manipulación', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['4941'] = ['49.41', '52.24']: la clase 4941 de la CNAE-2009 se reparte
@@ -2142,7 +2138,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
   });
 
   test('BAJO — «niñera» y «canguro» no son «Educación preprimaria»', async ({ page }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['8891'] = ['85.10', '88.91']: la clase 8891 de la CNAE-2009, «cuidado
@@ -2159,7 +2154,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
   });
 
   test('BAJO — la norma de la CNAE del FAQPage debe salir de CNAE_VIGENCIA, como ya sale la del IAE', async () => {
-    test.fail();
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const fuente = readFileSync(

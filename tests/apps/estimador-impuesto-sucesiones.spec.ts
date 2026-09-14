@@ -698,7 +698,15 @@ test.describe('Estimador ISD — reparación 13/09/2026', () => {
     await page.locator('#seguros-vida').fill('10000');
     await page.locator('#porcentaje-herencia').fill('50');
 
-    const desglose = await textoCompleto(page);
+    // ⚠️ Acotado al PANEL DE RESULTADOS el 14/09/2026. Miraba el texto de la página entera y
+    // pasaba por casualidad: el tope estatal iba tecleado en el bloque educativo como
+    // «9.195,49 €» y el test lo buscaba sin el punto de millar. Al derivarlo de
+    // REDUCCION_SEGURO_VIDA_MAX_IS (hallazgo 818), `formatCurrency` lo escribe «9195,49 €»
+    // —en español un número de cuatro cifras no lleva separador de millar— y el caso saltaba
+    // por una mención legítima: el bloque educativo SÍ tiene que nombrar el tope de la ley.
+    // Lo que este caso vigila es el DESGLOSE, que es donde el tope no puede sustituir a la
+    // parte prorrateada.
+    const desglose = await page.locator('[class*="resultsPanel"], [class*="desglose"]').first().innerText();
     // Su mitad del capital, no el tope entero
     expect(desglose).toContain('5000,00');
     expect(desglose).not.toContain('9195,49');

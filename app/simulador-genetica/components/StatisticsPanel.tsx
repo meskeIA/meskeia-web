@@ -9,16 +9,33 @@ interface StatisticsPanelProps {
 }
 
 export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
-  // Calcular ratios simplificados
+  /**
+   * Ratio simplificado, EN EL MISMO ORDEN QUE LAS BARRAS Y CON SU ETIQUETA.
+   *
+   * ⚠️ 14/09/2026 (hallazgo 827) — las barras se pintan ordenadas de mayor a menor y esta
+   * línea se armaba en el orden en que el motor descubrió los genotipos (`Object.values`, no
+   * la lista ya ordenada). Como el ratio no llevaba etiquetas, el único orden que el lector
+   * podía suponer era el de las barras de encima, y no coincidía: con el cruce por defecto
+   * (Aa × Aa) las barras decían «Aa 50 % · AA 25 % · aa 25 %» y debajo se leía «Ratio:
+   * 1:2:1», con el primer 1 cayendo sobre la barra de Aa, que vale 2.
+   *
+   * Ordenarlo como las barras alinea las dos lecturas, pero rompe la forma en que el ratio
+   * se enseña: «1:2:1» pasaría a «2:1:1» y «9:3:3:1» a «9:3:3:1» solo por casualidad. Esas
+   * cifras SON las leyes de Mendel y hay que poder reconocerlas de un vistazo. Lo que
+   * sobraba no era el orden del motor —que es el canónico, AA, Aa, aa— sino que los números
+   * fueran anónimos: con la leyenda detrás, el ratio se lee sin mirar las barras y ya no
+   * importa que estas vayan de mayor a menor, que es como se leen mejor. Afectaba también
+   * al dihíbrido con progenitor homocigoto.
+   */
   const calculateSimplifiedRatio = (ratios: Record<string, number>): string => {
-    const values = Object.values(ratios);
-    if (values.length === 0) return '';
+    const entradas = Object.entries(ratios).filter(([, v]) => v > 0);
+    if (entradas.length === 0) return '';
 
-    // Encontrar el mínimo común denominador
-    const minValue = Math.min(...values.filter((v) => v > 0));
-    const simplified = values.map((v) => Math.round(v / minValue));
-
-    return simplified.join(':');
+    // Mínimo común denominador, en el orden del motor, que es el canónico
+    const minValue = Math.min(...entradas.map(([, v]) => v));
+    const numeros = entradas.map(([, v]) => Math.round(v / minValue)).join(':');
+    const leyenda = entradas.map(([clave]) => clave).join(' · ');
+    return `${numeros} (${leyenda})`;
   };
 
   const genotypeRatioStr = calculateSimplifiedRatio(punnett.genotypeRatios);

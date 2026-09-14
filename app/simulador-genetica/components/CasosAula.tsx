@@ -165,9 +165,24 @@ export default function CasosAula() {
                 <li key={i}>{p}</li>
               ))}
             </ol>
+            {/*
+              El «%» se recorta del rótulo para no repetirlo, pero tiene que volver JUNTO AL
+              NÚMERO, que es donde se lee.
+
+              ⚠️ 14/09/2026 (hallazgo 830) — con la etiqueta «% de semillas verdes» la línea
+              salía «Respuesta: 25 de semillas verdes», que se lee como 25 semillas y no como
+              el 25 % que es. `casos.ts` ya construye un `respuestaTexto` correcto («25 % de
+              semillas verdes») y la vista no lo usaba, lo que indica que el recorte no era
+              intencionado. Solo afectaba a los casos con magnitud porcentaje; los de
+              individuos (casos 5 y 8) salían bien.
+            */}
             <p className={styles.casoResultado}>
-              Respuesta: <strong>{esperado.toLocaleString('es-ES', { maximumFractionDigits: 2 })}</strong>{' '}
-              {etiqueta.replace(/^%\s*/, '').trim() ? etiqueta.replace(/^%\s*/, '') : ''}
+              Respuesta:{' '}
+              <strong>
+                {esperado.toLocaleString('es-ES', { maximumFractionDigits: 2 })}
+                {/^%\s*/.test(etiqueta) ? ' %' : ''}
+              </strong>{' '}
+              {etiqueta.replace(/^%\s*/, '')}
             </p>
           </div>
         )}

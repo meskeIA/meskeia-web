@@ -3800,10 +3800,16 @@ test.describe('Inspector 14/09/2026 — anejos residenciales y segunda boca del 
       join(process.cwd(), 'app/estimador-compraventa-inmueble/page.tsx'),
       'utf8',
     );
+    // ⚠️ Se mide por FRAGMENTO, no por línea (14/09/2026). La reparación deja la fila de la
+    // tabla comparativa nombrando los dos tipos en la misma línea —«21% locales y naves ·
+    // 21% terrenos», cada uno con su constante—, que es exactamente lo que había que
+    // conseguir, y un filtro por línea lo leía como el defecto. Lo que no puede ocurrir es
+    // que el tipo del LOCAL sea el que acompaña a la palabra «terreno».
     const mezclan = fuente
       .split('\n')
-      .filter((l) => /terreno/i.test(l) && l.includes('IVA_INMUEBLES_2025.local'));
-    expect(mezclan, 'ninguna línea debe atribuir al terreno el IVA del local').toEqual([]);
+      .flatMap((l) => l.split('·'))
+      .filter((trozo) => /terreno/i.test(trozo) && trozo.includes('IVA_INMUEBLES_2025.local'));
+    expect(mezclan, 'ningún fragmento debe atribuir al terreno el IVA del local').toEqual([]);
   });
 
   /**

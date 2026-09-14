@@ -214,15 +214,24 @@
     "venta ambulante"
   ],
   "47.12": [
+    "amazon fba",
+    "dropshipping",
+    "e-commerce",
+    "ecommerce",
     "mercadillo artesanía",
     "mercadillo de ropa",
     "puesto de feria",
     "puesto de ropa",
     "rastrillo",
     "rastro",
+    "shopify",
     "stand en ferias",
+    "tienda online",
+    "tienda virtual",
+    "vender por internet",
     "venta ambulante",
-    "venta ambulante de ropa"
+    "venta ambulante de ropa",
+    "venta online"
   ],
   "47.21": [
     "frutería",
@@ -383,20 +392,7 @@
     "tienda de motos"
   ],
   "47.91": [
-    "amazon fba",
-    "dropshipping",
-    "e-commerce",
-    "ecommerce",
-    "marketplace",
-    "servicios auxiliares",
-    "shopify",
-    "tienda online",
-    "tienda virtual",
-    "vender por internet",
-    "venta online"
-  ],
-  "47.92": [
-    "servicios auxiliares"
+    "marketplace"
   ],
   "49.31": [
     "autobús",
@@ -440,9 +436,6 @@
     "traslados",
     "vaciado de pisos"
   ],
-  "52.24": [
-    "transporte de mercancías"
-  ],
   "52.32": [
     "paquetes turísticos",
     "travel planner",
@@ -456,9 +449,6 @@
     "repartidor",
     "reparto de paquetes",
     "rider"
-  ],
-  "53.30": [
-    "servicios auxiliares"
   ],
   "55.10": [
     "alojamiento",
@@ -476,12 +466,6 @@
     "apartamento turístico",
     "casa rural",
     "vivienda de uso turístico"
-  ],
-  "55.90": [
-    "alquilar pisos",
-    "arrendador",
-    "casero",
-    "rentista inmobiliario"
   ],
   "56.11": [
     "bar restaurante",
@@ -551,9 +535,6 @@
     "monetizar una web",
     "web de contenidos"
   ],
-  "61.20": [
-    "servicios auxiliares"
-  ],
   "62.10": [
     "apps móviles",
     "backend",
@@ -613,8 +594,14 @@
     "vender seguros"
   ],
   "68.20": [
+    "alquilar pisos",
     "alquiler de locales",
-    "poner en alquiler"
+    "alquiler de pisos",
+    "alquiler de viviendas",
+    "arrendador",
+    "casero",
+    "poner en alquiler",
+    "rentista inmobiliario"
   ],
   "68.31": [
     "API",
@@ -777,12 +764,6 @@
     "rent a car",
     "renting"
   ],
-  "77.51": [
-    "servicios auxiliares"
-  ],
-  "77.52": [
-    "servicios auxiliares"
-  ],
   "79.11": [
     "agencia de viajes",
     "agente de viajes",
@@ -833,8 +814,7 @@
     "wedding planner"
   ],
   "82.40": [
-    "apoyo a empresas",
-    "servicios auxiliares"
+    "apoyo a empresas"
   ],
   "82.99": [
     "apoyo a empresas",
@@ -843,12 +823,10 @@
     "trámites"
   ],
   "85.10": [
-    "canguro",
     "centro infantil",
     "escuela infantil",
     "guardería",
-    "ludoteca",
-    "niñera"
+    "ludoteca"
   ],
   "85.33": [
     "academia de FP",
@@ -897,9 +875,6 @@
     "repaso escolar",
     "tutor"
   ],
-  "85.61": [
-    "servicios auxiliares"
-  ],
   "86.21": [
     "consulta médica",
     "doctora",
@@ -939,9 +914,6 @@
   "86.96": [
     "osteópata"
   ],
-  "86.97": [
-    "servicios auxiliares"
-  ],
   "86.99": [
     "logopeda",
     "nutricionista",
@@ -949,11 +921,10 @@
     "terapeuta",
     "óptico"
   ],
-  "87.91": [
-    "servicios auxiliares"
-  ],
   "88.91": [
-    "cuidado de niños"
+    "canguro",
+    "cuidado de niños",
+    "niñera"
   ],
   "90.11": [
     "escritor"
@@ -1058,9 +1029,6 @@
   "96.22": [
     "centro de belleza",
     "salón de belleza"
-  ],
-  "96.40": [
-    "servicios auxiliares"
   ],
   "96.99": [
     "acompañamiento",

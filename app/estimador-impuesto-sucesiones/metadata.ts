@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { PLAZO_ISD } from '@/data/fiscal';
 
 export const metadata: Metadata = {
   title: 'Estimador del Impuesto de Sucesiones 2025 | meskeIA',
@@ -80,7 +81,14 @@ export const faqJsonLd = {
       name: '¿Cuándo hay que pagar el Impuesto de Sucesiones y en qué plazo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El plazo general para presentar y liquidar el impuesto es de 6 meses desde el fallecimiento. Puede solicitarse una prórroga de otros 6 meses antes de que venza el primer plazo, aunque en ese caso se aplican intereses de demora por los meses adicionales. Pasado el plazo sin presentar la declaración, la Administración puede iniciar un expediente sancionador además de liquidar recargos e intereses.',
+        // ⚠️ El plazo para PEDIR la prórroga no es el mismo que el de presentación: son los
+        // cinco primeros meses (art. 68.1 RISD), no los seis. Esta respuesta decía «antes de
+        // que venza el primer plazo» mientras la página visible decía bien «antes de que
+        // expiren los primeros 5 meses» tres veces, incluida su lista de errores caros («Si
+        // esperas al mes 6, ya no es posible»). Quien siguiera la versión del JSON-LD perdía
+        // la prórroga y entraba en recargo (hallazgo 817, la forma exacta del 795). Las dos
+        // bocas leen ya la misma constante sellada.
+        text: `El plazo general para presentar y liquidar el impuesto es de ${PLAZO_ISD.mesesPresentacion} meses desde el fallecimiento. Puede solicitarse una prórroga de otros ${PLAZO_ISD.mesesProrroga} meses, pero hay que pedirla dentro de los ${PLAZO_ISD.mesesParaPedirProrroga} primeros meses: pasado ese momento ya no es posible. La prórroga devenga intereses de demora por los meses adicionales. Pasado el plazo sin presentar la declaración, la Administración puede iniciar un expediente sancionador además de liquidar recargos e intereses (${PLAZO_ISD.norma}).`,
       },
     },
     {
