@@ -108,6 +108,8 @@ scripts/semilla-diaria.mjs
 semillas/
 
 scripts/medir-cohorte-foso.mjs
+# Caracterizacion del foso IA (analisis interno, consulta el dump de Turso)
+scripts/caracterizar-foso.mjs
 
 # Lente de pais sobre GSC (S0088): consulta la propiedad privada de Search Console
 scripts/gsc-latam.mjs
