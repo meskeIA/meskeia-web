@@ -304,6 +304,50 @@
   color: var(--secondary);
 }
 
+/* Equivalencia entre levaduras — el segundo camino de esta página (14/09/2026). */
+.equivalenciaLevaduras {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.equivalenciaTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--secondary);
+  margin-bottom: 0.6rem;
+}
+
+.equivalenciaFrase {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.equivalenciaLista {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+.equivalenciaNota {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .equivalenciaLevaduras {
+  background: #2a2a2a;
+}
+
 .notaBox {
   background: var(--bg-card);
   border-left: 4px solid var(--primary);

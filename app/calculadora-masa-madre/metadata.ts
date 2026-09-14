@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Sustitución de Levadura por Masa Madre | meskeIA',
-  description: 'Calcula cuánta masa madre necesitas para sustituir levadura fresca, seca o instantánea en cualquier receta. Ajuste automático de harina y agua.',
-  keywords: 'masa madre, levadura, sustitución, calculadora pan, hidratación masa madre, pan artesano, fermentación',
+  title: 'Masa Madre y Equivalencias de Levadura: fresca, seca e instantánea | meskeIA',
+  description: 'Convierte entre levadura fresca, seca e instantánea, o sustitúyelas por masa madre. Te damos los gramos exactos y el ajuste de harina y agua de la receta.',
+  keywords: 'levadura fresca a seca, equivalencia levadura fresca seca, cuantos gramos de levadura seca son 25 de fresca, levadura seca a fresca, masa madre, sustitución levadura por masa madre, cuantos gramos de masa madre por kilo de harina, levadura instantánea equivalencia, calculadora pan, hidratación masa madre',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Sustitución de Levadura por Masa Madre',
-    description: 'Convierte cualquier receta de levadura comercial a masa madre con ajuste automático de harina y agua.',
+    title: 'Masa Madre y Equivalencias de Levadura',
+    description: 'Pasa de levadura fresca a seca, o de cualquiera de ellas a masa madre, con los gramos y el ajuste de la receta.',
     url: 'https://meskeia.com/calculadora-masa-madre/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora de Sustitución de Levadura por Masa Madre',
-    description: 'Convierte cualquier receta de levadura comercial a masa madre con ajuste automático de harina y agua.',
+    title: 'Masa Madre y Equivalencias de Levadura',
+    description: 'Pasa de levadura fresca a seca, o de cualquiera de ellas a masa madre, con los gramos y el ajuste de la receta.',
     images: ['https://meskeia.com/coquinum/og-image.png'],
   },
   other: {
@@ -37,10 +37,11 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Calculadora de Sustitución de Levadura por Masa Madre',
-  description: 'Calcula cuánta masa madre necesitas para sustituir levadura fresca, seca o instantánea en cualquier receta de pan, con ajuste automático de harina y agua.',
+  name: 'Masa Madre y Equivalencias de Levadura',
+  description: 'Convierte entre levadura fresca, seca e instantánea con la equivalencia 1:3, y calcula cuánta masa madre necesitas para sustituir cualquiera de ellas en una receta de pan, con el ajuste de harina y agua que eso obliga a hacer.',
   url: 'https://meskeia.com/calculadora-masa-madre/',
   features: [
+    'Equivalencia entre levadura fresca, seca e instantánea, en gramos',
     'Conversión de levadura fresca, seca e instantánea a masa madre',
     'Ajuste automático de harina y agua por hidratación de la masa madre',
     'Compatible con cualquier hidratación de masa madre (50–150%)',
@@ -52,6 +53,22 @@ export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿A cuánta levadura seca equivalen 20 gramos de levadura fresca?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A 6,7 gramos, porque hace falta el triple de levadura fresca que de seca: se divide entre tres. La operación vale para cualquier cantidad, así que 25 g de fresca son 8,3 g de seca y 15 g de fresca son 5 g de seca. Al revés se multiplica por tres: un sobre de 7 g de levadura seca equivale a 21 g de levadura fresca.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿La levadura instantánea y la seca se usan en la misma cantidad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, se dosifican igual: donde una receta pide 7 g de levadura seca puedes poner 7 g de instantánea. Lo que cambia es cómo se incorporan. La seca conviene hidratarla antes en un poco de líquido templado, mientras que la instantánea se mezcla directamente con la harina. Las dos son el triple de concentradas que la levadura fresca.',
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Cuánta masa madre se necesita para sustituir levadura fresca?',

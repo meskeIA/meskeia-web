@@ -4,7 +4,8 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
 /**
  * Inspector — calculadora-masa-madre (segmento motor, riesgo 3, 232 usos reales · vertical Coquinum)
  *
- * Primera inspección: 25/08/2026. La app promete en su <h1> «Calculadora de Masa Madre» y en su
+ * Primera inspección: 25/08/2026. La app promete en su <h1> «Masa madre y equivalencias de
+ * levadura» —así desde el 14/09/2026, al exponerse la conversión entre levaduras— y en su
  * subtítulo «Sustituye la levadura comercial por masa madre en cualquier receta con ajuste
  * automático de harina y agua». La metadata repite «ajuste automático de harina y agua». Hay,
  * por tanto, verdad comprobable con lápiz: la dosis de fermento y el descuento de harina y agua.
@@ -154,7 +155,7 @@ async function estado(page: Page): Promise<string> {
 test.describe('Sustitución de levadura por masa madre — lo que promete el <h1>', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('🍞 Calculadora de Masa Madre');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('🍞 Masa madre y equivalencias de levadura');
     // El <h1> viaja en el HTML servido: está en pantalla antes de que la app responda a nada.
     await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
   });
@@ -483,7 +484,7 @@ test.describe('S0139 · el tiempo de fermentación deja de ser un número fijo',
    */
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('🍞 Calculadora de Masa Madre');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('🍞 Masa madre y equivalencias de levadura');
     await esperarHidratacion(page, [GRAMOS, HIDRATACION, TEMPERATURA]);
   });
 
@@ -549,5 +550,56 @@ test.describe('S0139 · el tiempo de fermentación deja de ser un número fijo',
     const texto = await textoFermentacion(page);
     expect(texto).not.toContain('no se puede estimar');
     expect(texto).toContain('24 °C');
+  });
+});
+
+/**
+ * La equivalencia ENTRE LEVADURAS, expuesta el 14/09/2026.
+ *
+ * Hasta ese día la app llevaba la regla escrita en un recuadro («1 g seca ≈ 3 g fresca») y
+ * pedía aplicarla a mano: quien entraba con 20 g de levadura fresca obtenía masa madre, nunca
+ * los 6,7 g de seca. Era lo que traía a esta página 465 impresiones en 90 días con cero clics.
+ * Estos casos verifican que ahora sale CALCULADO y con la cifra correcta en pantalla, que es
+ * distinto de que el motor la devuelva bien —eso ya lo cubre `panaderia-motores.spec.ts`—.
+ */
+test.describe('Equivalencia entre levaduras — el segundo camino de la página', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [GRAMOS]);
+  });
+
+  const bloque = (page: Page) =>
+    page.locator('li').filter({ hasText: /levadura (seca|fresca|instantánea)$|levadura (seca|fresca|instantánea) \(/ });
+
+  test('LA CONSULTA QUE MÁS GENTE TRAE: 20 g de fresca salen como 6,7 g de seca', async ({ page }) => {
+    // Se parte de 10 g, así que 20 es un valor distinto del que ya tiene el campo.
+    await ponerGramos(page, '20');
+    const texto = await page.locator('section, div').filter({ hasText: /equivalen a:/ }).last().innerText();
+    expect(texto).toContain('20 g de levadura fresca');
+    expect(texto).toContain('6,7 g');
+    // Y la instantánea se dosifica como la seca, no como la fresca: la misma cifra.
+    expect((texto.match(/6,7 g/g) ?? []).length).toBe(2);
+  });
+
+  test('EL SENTIDO SE INVIERTE al cambiar el tipo: 7 g de seca son 21 g de fresca', async ({ page }) => {
+    await page.getByRole('button', { name: /Levadura seca/ }).click();
+    await ponerGramos(page, '7');
+    const texto = await page.locator('section, div').filter({ hasText: /equivalen a:/ }).last().innerText();
+    expect(texto).toContain('21 g');
+    // Y ya no se ofrece convertir la seca a seca: eso no es una equivalencia, es la entrada.
+    expect(texto).not.toMatch(/7 g<\/strong> de\s*levadura seca/);
+  });
+
+  test('LAS CIFRAS VAN EN FORMATO ESPAÑOL: coma decimal, no punto', async ({ page }) => {
+    await ponerGramos(page, '25');
+    const texto = await page.locator('section, div').filter({ hasText: /equivalen a:/ }).last().innerText();
+    expect(texto).toContain('8,3 g'); // 25 / 3
+    expect(texto).not.toContain('8.3');
+  });
+
+  test('SIN CANTIDAD NO HAY EQUIVALENCIA: no se enseña un 0 g que parezca un resultado', async ({ page }) => {
+    await page.locator(GRAMOS).fill('');
+    await expect(page.getByText(/Introduce los gramos de levadura/)).toBeVisible();
+    await expect(page.getByText(/equivalen a:/)).toHaveCount(0);
   });
 });

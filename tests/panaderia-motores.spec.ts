@@ -21,6 +21,7 @@ import {
   calcularBakersPercentage,
   calcularBakersPercentageDesdePeso,
   calcularDDT,
+  calcularSustitucionMasaMadre,
   descomponerPrefermento,
 } from '../lib/calculadoras/cocina';
 import {
@@ -568,5 +569,81 @@ test.describe('Receta de pan — el camino de la harina a la fórmula', () => {
     expect(calcularRecetaPan({ ...base, harinaPesada_g: 0 })).toBeNull();
     expect(calcularRecetaPan({ ...base, harinaPesada_g: -500 })).toBeNull();
     expect(calcularRecetaPan({ ...base, harinaPesada_g: NaN })).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Conversión ENTRE LEVADURAS — la que el motor hacía sin publicar
+//
+// Por qué se expuso (14/09/2026): «20 gramos de levadura fresca a seca» y sus variantes
+// traían 465 impresiones en 90 días a /calculadora-masa-madre/ en posición 9,5-10,2 y CERO
+// clics. La equivalencia estaba en la app, pero escrita como texto para leer: pedir 20 g de
+// fresca devolvía masa madre, nunca los 6,7 g de seca que la consulta pedía.
+//
+// El ancla es la que ya declaraba el motor y repite `recetaPan.ts`: 1 g de seca = 1 g de
+// instantánea = 3 g de fresca = 20 g de masa madre al 100 %.
+
+test.describe('Equivalencia entre levaduras — fresca, seca e instantánea', () => {
+  test('A MANO: 20 g de levadura fresca son 6,7 g de seca', () => {
+    // 20 / 3 = 6,666… → 6,7 g. Es LA consulta: 69 impresiones ella sola.
+    const r = calcularSustitucionMasaMadre('fresca', 20);
+    expect(r.levadura_seca_equivalente_g).toBe(6.7);
+    // Y la vuelta da los 20 EXACTOS, no 20,1: la fresca se deriva del valor sin redondear
+    // (6,666… × 3), no del 6,7 que se publica. Encadenar los dos redondeos desplazaría la
+    // cifra en cada conversión.
+    expect(r.levadura_fresca_equivalente_g).toBe(20);
+  });
+
+  test('A MANO: 7 g de levadura seca —el sobre— son 21 g de fresca', () => {
+    const r = calcularSustitucionMasaMadre('seca', 7);
+    expect(r.levadura_seca_equivalente_g).toBe(7);
+    expect(r.levadura_fresca_equivalente_g).toBe(21);
+  });
+
+  test('A MANO: 25 g de fresca son 8,3 g de seca', () => {
+    // 25 / 3 = 8,333… → 8,3. La segunda consulta por volumen (52 impresiones).
+    expect(calcularSustitucionMasaMadre('fresca', 25).levadura_seca_equivalente_g).toBe(8.3);
+  });
+
+  test('LA INSTANTÁNEA SE DOSIFICA COMO LA SECA, no como la fresca', () => {
+    // Cambia cómo se incorpora (directa a la harina), no cuánta hace falta. Confundirlas
+    // triplicaría la dosis, que es el error caro de los dos posibles.
+    const seca = calcularSustitucionMasaMadre('seca', 10);
+    const instantanea = calcularSustitucionMasaMadre('instantanea', 10);
+    expect(instantanea.levadura_seca_equivalente_g).toBe(seca.levadura_seca_equivalente_g);
+    expect(instantanea.masa_madre_g).toBe(seca.masa_madre_g);
+  });
+
+  test('IDA Y VUELTA: convertir a seca y volver a fresca devuelve el punto de partida', () => {
+    for (const g of [3, 7, 10, 15, 20, 25, 42, 50]) {
+      const aSeca = calcularSustitucionMasaMadre('fresca', g).levadura_seca_equivalente_g;
+      const vuelta = calcularSustitucionMasaMadre('seca', aSeca).levadura_fresca_equivalente_g;
+      // Tolerancia de 0,15 g: al partir del valor YA publicado (6,7 y no 6,666…) la vuelta
+      // arrastra el redondeo de la ida, así que 20 → 6,7 → 20,1 es correcto y no un fallo.
+      expect(Math.abs(vuelta - g)).toBeLessThanOrEqual(0.15);
+    }
+  });
+
+  test('COHERENCIA con la dosis de masa madre: 20 g por cada gramo de seca', () => {
+    // Si alguien tocara el factor de una y no de la otra, la pantalla publicaría dos
+    // equivalencias que no cuadran entre sí.
+    const r = calcularSustitucionMasaMadre('fresca', 30); // → 10 g de seca
+    expect(r.levadura_seca_equivalente_g).toBe(10);
+    expect(r.masa_madre_g).toBe(200); // 10 × 20
+  });
+
+  test('COHERENCIA con recetaPan: las dos apps convierten igual', () => {
+    // La calculadora de pan casero deriva su levadura de la misma equivalencia 1:3. Dos apps
+    // del mismo portal no pueden dar dosis distintas para el mismo pan.
+    const base: EntradaRecetaPan = {
+      harinaPesada_g: 1000, tipoPan: 'hogaza', harinaPrincipal: 'panificable',
+      proporcionPrincipal: 100, fermento: 'seca', ritmo: 'normal',
+      hidratacionMasaMadre: 100, extras: [],
+    };
+    const conSeca = calcularRecetaPan(base)!.ingredientes.find((i) => i.nombre.startsWith('Levadura'))!;
+    const conFresca = calcularRecetaPan({ ...base, fermento: 'fresca' })!.ingredientes.find((i) => i.nombre.startsWith('Levadura'))!;
+
+    const equivalencia = calcularSustitucionMasaMadre('seca', conSeca.gramos);
+    expect(Math.abs(equivalencia.levadura_fresca_equivalente_g - conFresca.gramos)).toBeLessThanOrEqual(0.2);
   });
 });

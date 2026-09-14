@@ -148,8 +148,8 @@ export const COQUINUM_APPS: CoquinumApp[] = [
   {
     slug: 'calculadora-masa-madre',
     icon: '🫙',
-    titulo: 'Masa madre',
-    desc: 'Sustituye levadura comercial por masa madre ajustando harina y agua del refresco para que cuadre la fórmula.',
+    titulo: 'Masa madre y equivalencias',
+    desc: 'Pasa de levadura fresca a seca, o sustituye cualquiera de ellas por masa madre, con el ajuste de harina y agua.',
     categoria: 'panaderia-reposteria',
   },
   {

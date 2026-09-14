@@ -31,6 +31,23 @@ const TIPOS: { id: TipoLevaduraOrigen; label: string; emoji: string; descripcion
   { id: 'instantanea', label: 'Levadura instantánea',  emoji: '⚡', descripcion: 'Mezcla directa, sin activación' },
 ];
 
+/** El nombre del tipo dentro de una frase, en minúscula y sin repetir la palabra «levadura». */
+const ETIQUETA_LEVADURA: Record<TipoLevaduraOrigen, string> = {
+  fresca: 'fresca',
+  seca: 'seca',
+  instantanea: 'instantánea',
+};
+
+/**
+ * Gramos con decimal SOLO si lo tiene: «6,7 g» pero «21 g», no «21,0 g».
+ *
+ * Forzar el decimal daba cifras que nadie escribe en una receta, y además hacía ruido justo
+ * donde importa —quien busca la equivalencia quiere leer el número de un vistazo—. Lo destapó
+ * el test de la equivalencia antes de desplegarla.
+ */
+const gramosLegibles = (g: number): string =>
+  formatNumber(g, Number.isInteger(g) ? 0 : 1);
+
 export default function CalculadoraMasaMadrePage() {
   const [tipoLevadura, setTipoLevadura] = useState<TipoLevaduraOrigen>('fresca');
   const [levaduraG, setLevaduraG] = useState<string>('10');
@@ -89,9 +106,10 @@ export default function CalculadoraMasaMadrePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}><span aria-hidden="true">🍞</span> Calculadora de Masa Madre</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🍞</span> Masa madre y equivalencias de levadura</h1>
         <p className={styles.subtitle}>
-          Sustituye la levadura comercial por masa madre en cualquier receta con ajuste automático de harina y agua
+          Pasa de levadura fresca a seca, o sustituye cualquiera de las dos por masa madre, con
+          los gramos exactos y el ajuste de harina y agua que eso obliga a hacer en la receta
         </p>
       </header>
 
@@ -227,6 +245,41 @@ export default function CalculadoraMasaMadrePage() {
                 <span className={styles.ajusteLabel}>Agua a restar</span>
                 <span className={styles.ajusteValor}>− {formatNumber(res.agua_restar_g, 0)} g</span>
               </div>
+            </div>
+
+            {/* La conversión ENTRE LEVADURAS, que el motor ya hacía como paso intermedio y la
+                app solo enseñaba como regla escrita más arriba. Se calcula desde el
+                14/09/2026: era la pregunta que más gente traía a esta página —«20 gramos de
+                levadura fresca a seca» y variantes, 465 impresiones en 90 días y cero clics—
+                y la app la respondía con una tabla que había que aplicar a mano. */}
+            <div className={styles.equivalenciaLevaduras}>
+              <h2 className={styles.equivalenciaTitulo}>
+                Y si prefieres cambiar de levadura en vez de pasar a masa madre
+              </h2>
+              <p className={styles.equivalenciaFrase}>
+                Tus <strong>{gramosLegibles(res.levadura_original_g)} g
+                de levadura {ETIQUETA_LEVADURA[res.levadura_original_tipo]}</strong> equivalen a:
+              </p>
+              <ul className={styles.equivalenciaLista}>
+                {res.levadura_original_tipo !== 'fresca' && (
+                  <li>
+                    <strong>{gramosLegibles(res.levadura_fresca_equivalente_g)} g</strong> de
+                    levadura fresca <span className={styles.equivalenciaNota}>(el taco refrigerado; se desmenuza en el líquido)</span>
+                  </li>
+                )}
+                {res.levadura_original_tipo !== 'seca' && (
+                  <li>
+                    <strong>{gramosLegibles(res.levadura_seca_equivalente_g)} g</strong> de
+                    levadura seca <span className={styles.equivalenciaNota}>(un sobre son unos 7 g; se hidrata antes de usarla)</span>
+                  </li>
+                )}
+                {res.levadura_original_tipo !== 'instantanea' && (
+                  <li>
+                    <strong>{gramosLegibles(res.levadura_seca_equivalente_g)} g</strong> de
+                    levadura instantánea <span className={styles.equivalenciaNota}>(la misma dosis que la seca; va directa a la harina)</span>
+                  </li>
+                )}
+              </ul>
             </div>
 
             <div className={styles.notaBox}>

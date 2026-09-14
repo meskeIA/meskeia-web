@@ -6496,19 +6496,19 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // bloque, para el caso avanzado (prefermento, tabla de temperaturas de referencia).
   'calculadora-receta-pan': [
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Afina la fórmula que acabas de obtener, o normaliza una tuya' },
-    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Pasa una receta con levadura a masa madre, o al revés' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Masa Madre y Equivalencias', description: 'Pasa de fresca a seca, o de cualquiera de ellas a masa madre' },
     { url: '/guia-harinas/', icon: '🌾', name: 'Guía de Harinas', description: 'Qué fuerza tiene cada harina y para qué sirve' },
     { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'A qué temperatura poner el agua para clavar la fermentación' },
   ],
   'calculadora-porcentaje-panadero': [
     { url: '/calculadora-receta-pan/', icon: '🍞', name: 'Calculadora de Pan Casero', description: 'Si aún no tienes fórmula: dile la harina y el pan, y sale sola' },
-    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura comercial a masa madre con ajuste de receta' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Masa Madre y Equivalencias', description: 'Equivalencia entre levaduras, y de cualquiera de ellas a masa madre' },
     { url: '/calculadora-masa-pizza/', icon: '🍕', name: 'Masa de Pizza', description: 'El mismo sistema aplicado a bolas: napolitana, romana o focaccia' },
     { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos', description: 'Pasa una receta en tazas al peso que exige el porcentaje del panadero' },
   ],
   'calculadora-hidratacion-pan': [
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Expresa cada ingrediente como % del peso de harina' },
-    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura a fermento natural con ajuste de agua' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Masa Madre y Equivalencias', description: 'Fresca a seca, o a fermento natural, con el ajuste de agua' },
     { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'La temperatura del agua afecta la hidratación percibida' },
     { url: '/calculadora-receta-pan/', icon: '🍞', name: 'Calculadora de Pan Casero', description: 'La hidratación que le toca a tu pan según tipo y harina' },
   ],
@@ -6522,7 +6522,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/fermentacion-temperatura/', icon: '⏳', name: 'Fermentación por Temperatura', description: 'Cuánto tarda el levado a la temperatura de tu masa' },
     { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'La temperatura afecta cómo se integra el agua en la masa' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema profesional para formular cualquier receta de pan' },
-    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'El preferment a temperatura correcta mejora la fermentación' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Masa Madre y Equivalencias', description: 'Cuánta masa madre, o cuánta levadura de cada tipo, pide tu receta' },
   ],
   'calculadora-puntos-azucar': [
     { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones exactas según tipo de chocolate y textura' },

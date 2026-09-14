@@ -278,6 +278,18 @@ export const FERMENTACION_MM_REF = { horasMin: 4, horasMax: 6, tempRefC: 24 } as
 export interface ResultadoSustitucionMasaMadre {
   levadura_original_tipo: TipoLevaduraOrigen;
   levadura_original_g: number;
+  /**
+   * La conversión ENTRE LEVADURAS, que el motor ya hacía como paso intermedio y no publicaba.
+   *
+   * Se expone desde el 14/09/2026 porque era la pregunta que más gente traía sin que nada la
+   * respondiera: «20 gramos de levadura fresca a seca» y sus variantes sumaban 465 impresiones
+   * en 90 días sobre esta misma página —posición 9,5-10,2— y CERO clics, porque la equivalencia
+   * estaba escrita en la app como texto para leer y no como resultado calculado.
+   *
+   * La instantánea va con la seca: se dosifican igual, cambia cómo se incorporan.
+   */
+  levadura_seca_equivalente_g: number;
+  levadura_fresca_equivalente_g: number;
   masa_madre_g: number;
   harina_adicional_g: number;
   agua_adicional_g: number;
@@ -329,9 +341,15 @@ export function calcularSustitucionMasaMadre(
   const harina_en_mm_g = Math.round(masa_madre_g * 100 / (100 + hidratacion_mm_pct));
   const agua_en_mm_g   = masa_madre_g - harina_en_mm_g;
 
+  // La conversión entre levaduras se redondea a un decimal: son cantidades pequeñas y un
+  // entero convertiría los 6,7 g de un sobre en 7, que es otra dosis.
+  const redondearGramos = (g: number) => Math.round(g * 10) / 10;
+
   return {
     levadura_original_tipo: tipo_levadura,
     levadura_original_g: levadura_g,
+    levadura_seca_equivalente_g: redondearGramos(levadura_seca_equivalente_g),
+    levadura_fresca_equivalente_g: redondearGramos(levadura_seca_equivalente_g * 3),
     masa_madre_g,
     hidratacion_mm_pct,
     harina_restar_g: harina_en_mm_g,
