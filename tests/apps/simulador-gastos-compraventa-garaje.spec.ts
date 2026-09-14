@@ -74,7 +74,11 @@ import { formatNumber, formatTipoNominal } from '../../lib/formatters';
 // El plazo de liquidación del ITP se lee del módulo que lo sella (hallazgo 713, 11/09/2026),
 // no de un literal: es lo que permite que el testigo de la sección 15 siga valiendo el día
 // que una comunidad fije otro plazo.
-import { PLAZO_ITP } from '../../data/fiscal/inmuebles';
+import {
+  PLAZO_ITP,
+  COEFICIENTES_IIVTNU_2025,
+  PLUSVALIA_MUNICIPAL_META,
+} from '../../data/fiscal/inmuebles';
 // Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
 // es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
@@ -3376,5 +3380,287 @@ test.describe('Hallazgos abiertos — re-inspección del 12/09/2026', () => {
       .filter({ hasText: 'Discapacidad ≥65%' });
     await expect(linea).toContainText('tu precio supera ese límite');
     expect(texto).toContain('Valor máximo 100.000,00');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 16. RE-INSPECCIÓN 14/09/2026 — tres casos nuevos, resueltos a mano ANTES de ejecutar.
+//
+// La cola la reabrió por dependencia de módulos compartidos. Los tres hallazgos del
+// 12/09 (764 · año negativo decimal, 765 · tope de valor superado, 766 · aviso del plazo
+// supletorio del ITP) se han vuelto a ejecutar y PASAN: están reparados.
+//
+// Las tres zonas elegidas no las había tocado ninguna tanda anterior:
+//   · CANTABRIA — el 9 % general más alto sin escala progresiva, y la única comunidad cuyo
+//     aviso «Podrías pagar menos» sale con el perfil GENERAL por un reducido que no es de
+//     colectivo ni de ubicación («Municipios despoblados», 4 %).
+//   · La FRONTERA EXACTA de la ganancia patrimonial: vender por lo mismo que se compró.
+//   · El camino que la reparación del 764 dejó fuera: el BLUR del campo de años.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · Tipo general de Cantabria → `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts), leído
+//     por `tipoGeneralDe()` y expuesto como `ITP_CCAA.cantabria.tipoGeneral` = 9.
+//   · Reducidos de Cantabria y su AJD → `ITP_CCAA.cantabria` (data/itp-ccaa.ts).
+//   · Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75)
+//     y `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, los dos con el 21 % de IVA dentro.
+//   · Coeficientes de plusvalía → `COEFICIENTES_IIVTNU_2025` y el tipo orientativo del 25 %
+//     de `PLUSVALIA_MUNICIPAL_META`, ambos en data/fiscal/inmuebles.ts.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 €) y la
+//     fórmula del art. 35 LIRPF en `data/fiscal/ganancia-inmueble.ts`.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('RE-INSPECCIÓN 14/09/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO P (NORMAL) — Cantabria · segunda mano · 35.000 € · perfil GENERAL · gestoría 300 €
+   * (la que trae la app). Cantabria no tiene escala progresiva, así que el tipo efectivo
+   * tiene que coincidir con el nominal, y es el 9 % más alto de los tipos generales planos.
+   *
+   * ITP = 35.000 × 9 % =                                                        3.150,00
+   *
+   * Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
+   *   tramo 1 (hasta 6.010,12 €)              →                                    90,15
+   *   tramo 2 (6.010,12→30.050,61, 0,45 %)    → 24.040,49 × 0,0045 =              108,182205
+   *   tramo 3 (30.050,61→35.000, 0,15 %)      →  4.949,39 × 0,0015 =                7,424085
+   *   arancel sin IVA                         =                                  205,75629
+   *   con el 21 % de IVA                      = 205,75629 × 1,21 =               248,9651109
+   * FACTURA_NOTARIAL (números 4, 6 y 7 aparte): ×1,5 = 373,44766635 · ×2 = 497,9302218
+   *   punto medio, que es lo que suma la app  =                                  435,688944
+   *
+   * Registro — RD 1427/1989, números 1, 2 y 4 (ARANCELES_REGISTRO + REGISTRO_CONCEPTOS):
+   *   tramo 1 (hasta 6.010,12 €)              →                                    24,04
+   *   tramo 2 (6.010,12→30.050,61, 0,175 %)   → 24.040,49 × 0,00175 =              42,0708575
+   *   tramo 3 (30.050,61→35.000, 0,125 %)     →  4.949,39 × 0,00125 =               6,1867375
+   *   inscripción (número 2)                  =                                    72,297595
+   *   + asiento de presentación + nota simple →  6,010121 + 3,005061 =              9,015182
+   *   con el 21 % de IVA                      = 81,312777 × 1,21 =                 98,38846
+   *
+   * Total gastos (sumando las líneas YA redondeadas, que es como se ven):
+   *   3.150,00 + 435,69 + 98,39 + 300,00 =                                       3.984,08
+   *   % sobre el precio = 3.984,08 / 35.000 =                                       11,38 %
+   * Coste total = 35.000 + 3.984,08 =                                            38.984,08
+   *
+   * Y el aviso de oportunidades: en Cantabria el único reducido que sobrevive al filtro con
+   * perfil General es «Municipios despoblados» (4 %), porque no exige vivienda habitual —que
+   * un garaje suelto nunca es— ni pertenecer a ningún colectivo.
+   */
+  test('CASO P (normal) — Cantabria, segunda mano, 35.000 €, perfil General: el 9 % plano y el aviso del 4 % rural', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'cantabria');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '35000');
+
+    // El 9 % no se teclea: sale de la ficha, que a su vez lo lee de data/fiscal.
+    expect(ITP_CCAA.cantabria.tipoGeneral).toBe(9);
+    expect(ITP_CCAA.cantabria.tramosProgresivos).toBeUndefined();
+    expect(await valorTarjeta(page, 'ITP (9,00%)')).toBe('3150,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('435,69 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('373,45 €');
+    expect(notaria).toContain('497,93 €');
+
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('98,39 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    // En segunda mano no hay AJD: ITP e IVA/AJD son incompatibles en la misma operación.
+    await expect(page.locator('#panel-comprador h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3984,08 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,38%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('38.984,08 €');
+
+    // La ficha de la comunidad publica el mismo tipo que se ha cobrado, y su AJD nominal.
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('9,00%');
+    expect(await valorPanelCcaa(page, 'AJD')).toBe(
+      `${formatTipoNominal(ITP_CCAA.cantabria.ajd)}%`,
+    );
+
+    // El aviso de oportunidades nombra el único reducido que el garaje podría alcanzar.
+    const rural = ITP_CCAA.cantabria.tiposReducidos.find((r) =>
+      /despoblad/i.test(r.nombre),
+    );
+    expect(rural?.tipo).toBe(4);
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+    expect(texto).toContain(`${formatNumber(rural!.tipo, 2)}% — ${rural!.nombre}`);
+    expect(texto).toContain('9,00% efectivo sobre el precio');
+    // No tiene tope de valor, así que el precio no puede descartarlo.
+    expect(texto).not.toContain('tu precio supera ese límite');
+  });
+
+  /**
+   * CASO Q (LÍMITE) — la frontera exacta entre ganancia y pérdida: vender por lo MISMO que
+   * se compró. Ningún caso anterior la había pisado (el CASO 6 del 27/08 vende por debajo).
+   *
+   * Madrid · venta 30.000 € · compra 30.000 € · comisión 0 % · gestoría de venta 0 ·
+   * sin gastos de adquisición · 10 años · suelo 5.000 € · catastral total 12.000 €.
+   *
+   * Plusvalía municipal (art. 104.5 TRLHL): incremento real = 30.000 − 30.000 = 0, y la no
+   * sujeción se declara con `incrementoReal <= 0` → EXENTO, 0,00 €, sin entrar a comparar
+   * métodos. Los dos métodos existirían (hay suelo, años y catastral total), así que lo que
+   * se comprueba aquí es que el 0 gana a los dos.
+   *
+   * Ganancia patrimonial (art. 35 LIRPF, `calcularGananciaInmueble`):
+   *   valor de adquisición = 30.000 + 0 =                                       30.000,00
+   *   valor de transmisión = 30.000 − 0 − 0 =                                   30.000,00
+   *   ganancia             =                                                         0,00
+   *   → sin cuota: la escala del ahorro se aplica sobre base positiva.
+   *   total gastos vendedor = 0,00 · neto = 30.000 − 0 =                        30.000,00
+   *
+   * Y el neto NO puede salir marcado como incompleto: aquí no falta ningún dato.
+   */
+  test('CASO Q (límite) — venta al mismo precio que la compra: plusvalía no sujeta y ganancia exacta de 0', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '30000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await sembrarImporte(page, 'Años de propiedad', '10');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
+
+    // Sin incremento de valor no hay hecho imponible, aunque el método objetivo daría cifra:
+    // 5.000 × 0,08 (10 años) × 25 % = 100,00 €, que NO se cobra.
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.08);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No sujeta (sin incremento de valor)',
+    );
+
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('30.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('30.000,00 €');
+
+    // Ganancia 0 → ninguna cuota del ahorro.
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('SIN CUOTA');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('0,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('30.000,00 €');
+    // Están los tres datos, así que el neto es definitivo y no puede declararse incompleto.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras gastos e impuestos',
+    );
+  });
+
+  /**
+   * CASO R (DEBE RECHAZARSE) — unos años de propiedad NEGATIVOS, saliendo del campo.
+   *
+   * ❌ ABIERTO 14/09/2026 (cálculo, medio) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   *
+   * La página declara la invariante en su propio comentario: «Un año NEGATIVO no se acota a
+   * 0: se rechaza… Acotarlo lo convertiría en una reventa antes del año y liquidaría un
+   * impuesto a partir de un dato imposible, que es justo lo que el CASO C de esta app exige
+   * que no pase». El motor la cumple — y el hallazgo 764 (decimal negativo) está reparado —,
+   * pero solo MIENTRAS EL CAMPO CONSERVA EL FOCO.
+   *
+   * Al salir del campo, `NumberInput.handleBlur` acota contra su `min`, y ese `min` bajó a 0
+   * el 10/09 al reparar el hallazgo 668 (el 0 explícito es un dato válido: la reventa antes
+   * del año). Así que «-3» se reescribe a «0», que ya no es negativo, y la plusvalía se
+   * liquida con el coeficiente más alto de la parte baja de la tabla.
+   *
+   * Madrid · venta 30.000 € · compra 26.000 € · comisión 0 % · suelo 5.000 € · sin catastral
+   * total · años «-3»:
+   *   con el foco dentro (correcto)  → «Sin calcular» · neto 29.240,00 € marcado INCOMPLETO
+   *   al salir del campo             → el campo pasa a «0» y
+   *     plusvalía objetivo  = 5.000 × 0,14 × 25 % =                                 175,00
+   *     valor transmisión   = 30.000 − 175 =                                     29.825,00
+   *     ganancia            = 29.825 − 26.000 =                                   3.825,00
+   *     IRPF                = 3.825 × 19 % =                                        726,75
+   *     neto                = 30.000 − 901,75 =                                  29.098,25
+   *   presentado como «Lo que realmente recibes tras gastos e impuestos», es decir, como
+   *   definitivo, a partir de un dato imposible.
+   *
+   * Es exactamente el desenlace que el acta del 12/09 describe para «-0,5», por otra puerta:
+   * la del blur, que es la que recorre cualquiera que pase al campo siguiente.
+   */
+  test('CASO R (debe rechazarse) — unos años de propiedad negativos tampoco pueden liquidar plusvalía al salir del campo', async ({
+    page,
+  }) => {
+    test.fail();
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '26000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+
+    // 1) Con el foco dentro, la app cumple lo que promete: el dato imposible se rechaza.
+    await sembrarImporte(page, 'Años de propiedad', '-3', { blur: false });
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.240,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+
+    // 2) Al salir del campo, el NumberInput lo acota a su min (0) y deja de ser negativo.
+    await anios.blur();
+    await esperarValorEnReact(page, anios, '0');
+
+    // El coeficiente con el que se acabaría liquidando, leído de data/fiscal y no tecleado.
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.14);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    // DEBERÍA seguir rechazándose. Hoy devuelve «175,00 €» y un neto de 29.098,25 €
+    // presentado como definitivo.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 17. HALLAZGOS ABIERTOS 14/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar, así
+// que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como regresión.
+// El primero es el CASO R de arriba; aquí va el segundo.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgos abiertos — re-inspección del 14/09/2026', () => {
+  /**
+   * ❌ ABIERTO (contenido, bajo) — con la ganancia patrimonial EXACTAMENTE en cero, la app
+   * rotula una «Pérdida patrimonial» de 0,00 € y ofrece compensarla en la declaración.
+   *
+   * El motor decide con `esPerdida = ganancia <= 0` (data/fiscal/ganancia-inmueble.ts), y ese
+   * `<=` es correcto para lo que allí se usa —no hay cuota que calcular—, pero la app lo
+   * traslada tal cual al rótulo y al texto de la tarjeta:
+   *
+   *   Madrid · venta 30.000 € · compra 30.000 € · comisión 0 % · 10 años · suelo 5.000 €:
+   *     tarjeta → «Pérdida patrimonial — 0,00 €»
+   *     texto   → «Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se
+   *                puede compensar en la declaración»
+   *
+   * Las dos frases son falsas en ese punto: no se vende por debajo, se vende EXACTAMENTE por
+   * el valor de adquisición, y no hay ninguna pérdida que compensar en la base del ahorro.
+   * La cifra es 0,00 €, así que el importe no engaña a nadie; lo que engaña es el consejo
+   * fiscal que la acompaña, en una app de riesgo 1.
+   *
+   * Lo correcto sería no pintar ninguna de las dos tarjetas (ni ganancia ni pérdida) cuando
+   * la ganancia es cero, que es justo lo que ya hace la de ganancia (`> 0`).
+   */
+  test('con ganancia exactamente cero no se ofrece compensar una pérdida que no existe', async ({
+    page,
+  }) => {
+    test.fail();
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '30000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await sembrarImporte(page, 'Años de propiedad', '10');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+
+    // La ganancia es cero: los dos valores del art. 35 LIRPF coinciden.
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('30.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('30.000,00 €');
+
+    // DEBERÍA no haber tarjeta de pérdida. Hoy sale con 0,00 € y el consejo de compensarla.
+    await expect(
+      page.locator('#panel-vendedor h3', { hasText: 'Pérdida patrimonial' }),
+    ).toHaveCount(0);
   });
 });

@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/fiscal/cnae-iae';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Buscador de códigos CNAE-2025 y epígrafes del IAE
@@ -41,6 +42,14 @@ import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/f
  *     abiertos del 10/09/2026», con `test.fail()`. Dos de ellos son residuos de las
  *     reparaciones anteriores: el mismo reparto de sinónimos del 423/633 sobreviviendo en
  *     la familia 90.1x, y la norma del IAE del 636 escrita todavía a mano en `metadata.ts`.
+ *   · RE-inspección  14/09/2026 → la batería entera (59) pasa en verde antes de tocar nada,
+ *     así que los 5 hallazgos del 10/09 siguen cerrados. Tres casos nuevos en «re-inspección
+ *     del 14/09/2026», resueltos a mano sobre el catálogo sellado antes de abrir el
+ *     navegador, y 6 hallazgos en «hallazgos abiertos del 14/09/2026», con `test.fail()`.
+ *     Cinco de los seis vuelven a ser el mecanismo del 423 —el término coloquial se queda
+ *     en UN destino de la correspondencia oficial sin mirar cuál lo describe— en familias
+ *     que el CANDADO no alcanza a ver, y el sexto es el residuo simétrico del 681: la norma
+ *     de la CNAE transcrita a mano en el FAQPage del mismo `metadata.ts`.
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -1888,5 +1897,285 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 10/09/2026', () => {
     // El valor esperado no se transcribe: se le pregunta al módulo.
     expect(FISCAL_CNAE_IAE_META.iae.fuente).toContain('RD Legislativo 1175/1990');
     expect(fuente).not.toContain('RD Legislativo 1175/1990');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 14/09/2026 — tres casos nuevos, resueltos a mano ANTES del navegador
+//
+// La «verdad» de esta app es documental, no aritmética: cada valor esperado sale del
+// catálogo sellado del repositorio (`public/datos/cnae-iae-catalogo.json`, generado por
+// `scripts/generar-catalogos-cnae-iae.mjs` desde el RD 10/2025 del INE y el texto
+// consolidado del RD Legislativo 1175/1990 en el BOE) o de `data/fiscal/cnae-iae.ts`.
+// Ninguno se transcribe de memoria ni de lo que devuelve la pantalla.
+//
+// A diferencia de los bloques anteriores, estos tres siembran la consulta comprobando que
+// el ESTADO de React la recogió (`esperarValorEnReact`): un `fill()` anterior a la
+// hidratación mueve el DOM sin que la app se entere, y el caso mediría otra búsqueda.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Abre la página y espera a que React haya montado el buscador, no solo a que se vea. */
+async function abrirHidratado(page: Page) {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['#buscador-cnae']);
+}
+
+async function buscarCnaeVerificado(page: Page, consulta: string) {
+  await page.getByRole('tab', { name: 'CNAE-2025' }).click();
+  await page.locator('#buscador-cnae').fill(consulta);
+  await esperarValorEnReact(page, '#buscador-cnae', consulta);
+}
+
+async function buscarIaeVerificado(page: Page, consulta: string) {
+  await page.getByRole('tab', { name: 'Epígrafes del IAE' }).click();
+  await page.locator('#buscador-iae').fill(consulta);
+  await esperarValorEnReact(page, '#buscador-iae', consulta);
+}
+
+test.describe('Buscador CNAE-IAE — re-inspección del 14/09/2026', () => {
+  test('CASO 1 (normal) — «veterinario» en los dos catálogos, y la sección del IAE decide la retención', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── Resuelto a mano sobre el catálogo sellado ──────────────────────────
+    // CNAE-2025: la división 75 entera se llama «Actividades veterinarias» y cuelga de la
+    // sección N; solo tiene el grupo 75.0 y la clase 75.00, con el mismo literal. Ninguna
+    // otra entrada del catálogo lleva «veterinario» en su texto (los títulos dicen
+    // «veterinarias»), así que la única puerta es el término coloquial de 75.00 y el
+    // resultado tiene que ser UNO.
+    await buscarCnaeVerificado(page, 'veterinario');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page).first()).toContainText('75.00');
+    await expect(fichas(page).first()).toContainText('Actividades veterinarias');
+    await expect(fichas(page).first()).toContainText('División 75');
+    await expect(fichas(page).first()).toContainText('Grupo 75.0');
+
+    // IAE: la misma profesión está en DOS secciones de las Tarifas, y esa es justamente la
+    // distinción que la app promete hacer visible («la distinción con más efecto práctico
+    // sobre tus facturas»). Con «veterinario» casan exactamente dos entradas del catálogo:
+    //   · Sección 2ª, grupo 013 «Veterinarios» — ejercicio profesional, RETIENE.
+    //   · Sección 1ª, agrupación 94 «Sanidad y servicios veterinarios» — empresarial, no
+    //     retiene (la clínica es su grupo 945, que ya no lleva «veterinario» sino
+    //     «veterinarias» y por eso no entra en esta consulta).
+    // El orden lo fija la relevancia: las dos llevan el término en el título, y desempata
+    // el tipo de entrada (grupo antes que agrupación).
+    await buscarIaeVerificado(page, 'veterinario');
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    await expect(fichas(page).nth(0)).toContainText('013');
+    await expect(fichas(page).nth(0)).toContainText('Veterinarios');
+    await expect(fichas(page).nth(0)).toContainText('Sección 2ª');
+    await expect(fichas(page).nth(0)).toContainText(SECCION_2.retencion);
+    await expect(fichas(page).nth(1)).toContainText('Sanidad y servicios veterinarios');
+    await expect(fichas(page).nth(1)).toContainText('Sección 1ª');
+    await expect(fichas(page).nth(1)).toContainText(SECCION_1.retencion);
+  });
+
+  test('CASO 2 (límite) — «85.41» con punto: el número es hoy otra actividad y su equivalencia es 85.33', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── Resuelto a mano sobre el catálogo sellado ──────────────────────────
+    // 8541 es uno de los 26 códigos en los que la homónima vigente NO figura entre sus
+    // propias equivalencias, que son los que obligan a distinguir las dos ramas del aviso:
+    //   · correspondencia['8541'] = ['85.33']  → la actividad de ayer es hoy 85.33
+    //     «Educación postsecundaria no terciaria».
+    //   · 85.41 existe hoy y es «Educación universitaria», OTRA actividad.
+    //   · correspondenciaInversa['8541'] = ['85.43'] → el 85.41 de hoy procede de 8543,
+    //     no de 8541, y la propia ficha lo declara.
+    // Distinto del 4781 del CASO 2 del 10/09 en que aquí la equivalencia es única, así que
+    // el resultado tiene que ser EXACTAMENTE 2: la homónima vigente (relevancia 0, por
+    // código exacto) y la clase equivalente.
+    await buscarCnaeVerificado(page, '85.41');
+    await expect(avisoAntiguo(page)).toHaveCount(1);
+    await expect(avisoAntiguo(page)).toContainText(CNAE_VIGENCIA.anterior);
+    await expect(avisoAntiguo(page)).toContainText('Ojo');
+    await expect(avisoAntiguo(page)).toContainText('85.41 Educación universitaria');
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    await expect(fichas(page).nth(0)).toContainText('85.41');
+    await expect(fichas(page).nth(0)).toContainText('Educación universitaria');
+    await expect(fichas(page).nth(0)).toContainText('En la CNAE-2009 esto correspondía a 8543.');
+    await expect(fichas(page).nth(1)).toContainText('85.33');
+    await expect(fichas(page).nth(1)).toContainText('Educación postsecundaria no terciaria');
+  });
+
+  test('CASO 3 (debe rechazarse) — «62.99» y «945.3» no existen, y la app no aproxima', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // 62.99 es la errata verosímil de la familia informática: el grupo 62.9 se agota en la
+    // clase 62.90. Y «6299» tampoco es clave de la tabla de correspondencia, así que en una
+    // app de nivel 1 crítico lo que hay que comprobar es que NO salga el aviso de código
+    // antiguo: inventar una equivalencia es peor que no dar ninguna.
+    await buscarCnaeVerificado(page, '62.99');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+
+    // 945.3: el grupo 945 «Consultas y clínicas veterinarias» de la Sección 1ª existe (es el
+    // del CASO 1) pero las Tarifas no le cuelgan ningún epígrafe, así que «945.3» es un
+    // código verosímil e inexistente. Nada en el catálogo empieza por 9453.
+    await buscarIaeVerificado(page, '945.3');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 14/09/2026 — escritos con `test.fail()`: afirman lo que DEBERÍA
+// ocurrir y hoy no ocurre. Al repararlos se les quita la marca sin tocar ningún valor
+// esperado, y pasan a sujetar la reparación como regresión.
+//
+// Cinco de los seis son el MECANISMO del hallazgo 423 en familias nuevas: cuando una clase
+// de la CNAE-2009 se reparte en varias de la CNAE-2025, los términos coloquiales se
+// quedaron en UN destino sin mirar cuál de ellos describe la actividad. Su CANDADO no los
+// ve, y en dos de los casos se puede decir por qué:
+//   · exige que el título del HERMANO lleve el término entero, y «casero» o «niñera» no
+//     aparecen en ningún título oficial (los títulos dicen «Alquiler de bienes
+//     inmobiliarios» y «cuidado diurno de niños»);
+//   · y descarta el término en cuanto comparte UNA raíz con el título de su propia clase,
+//     que es lo que salva a «transporte de mercancías» dentro de «Manipulación de
+//     mercancías».
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
+  test('ALTO — «casero» y «arrendador» deben llevar a 68.20, la clase que se llama «Alquiler de bienes inmobiliarios»', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['6820'] = ['55.90', '68.20']: la clase 6820 de la CNAE-2009, que se
+    // llamaba «Alquiler de bienes inmobiliarios por cuenta propia», se reparte hoy en dos,
+    // y una de ellas conserva ese literal exacto (68.20, sección M ACTIVIDADES
+    // INMOBILIARIAS). Los cuatro términos del casero —«alquilar pisos», «arrendador»,
+    // «casero», «rentista inmobiliario»— se quedaron en el PRIMER destino, 55.90 «Otros
+    // servicios de alojamiento», que está en la sección I HOSTELERÍA y recoge residencias y
+    // alojamientos colectivos, no el alquiler de vivienda.
+    //
+    // Consecuencia medida: «casero» devuelve UN resultado y es hostelería; 68.20 solo se
+    // alcanza tecleando «alquiler de locales» o «poner en alquiler», y «alquiler de pisos»
+    // o «alquiler de viviendas» devuelven CERO resultados.
+    //
+    // La prueba de que la actividad es la del alquiler está en el otro catálogo de la
+    // propia app: el epígrafe 861.1 de la Sección 1ª se llama «Alquiler de viviendas».
+    await buscarCnaeVerificado(page, 'casero');
+    await expect(fichas(page).first()).toContainText('68.20');
+    await expect(fichas(page).first()).toContainText(
+      'Alquiler de bienes inmobiliarios por cuenta propia',
+    );
+
+    await buscarCnaeVerificado(page, 'arrendador');
+    await expect(fichas(page).first()).toContainText('68.20');
+  });
+
+  test('MEDIO — «tienda online» no puede tener como única puerta la clase de INTERMEDIACIÓN', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // Once términos de comercio electrónico («tienda online», «tienda virtual», «vender por
+    // internet», «venta online», «shopify», «amazon fba», «e-commerce», «ecommerce»,
+    // «dropshipping», «marketplace», «servicios auxiliares») cuelgan solo de 47.91
+    // «Actividades de servicios de intermediación para el comercio al por menor NO
+    // ESPECIALIZADO». Quien vende su propio producto por internet no intermedia para nadie.
+    //
+    // Lo dice la tabla oficial del INE que la app ya sirve: correspondencia['4791'] —la
+    // clase 4791 de la CNAE-2009 era «Comercio al por menor por correspondencia o
+    // Internet»— reparte en 32 clases, y 30 de ellas son comercio al por menor POR PRODUCTO
+    // (47.11 a 47.79). Es decir: la CNAE-2025 clasifica la tienda online por lo que vende,
+    // y reserva 47.91/47.92 a quien presta el servicio de intermediación.
+    //
+    // Hoy «tienda online» devuelve UN resultado y es la clase de intermediación, sin ninguna
+    // pista de que el encaje depende del producto.
+    await buscarCnaeVerificado(page, 'tienda online');
+    await expect(fichas(page).first()).not.toContainText('47.91');
+  });
+
+  test('BAJO — «servicios auxiliares» no puede encabezarse con la intermediación del comercio al por menor', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // El mismo término genérico está pegado a once clases cuyo literal es «servicios de
+    // intermediación» (47.91, 47.92, 53.30, 61.20, 77.51, 77.52, 82.40, 85.61, 86.97,
+    // 87.91, 96.40), que son plataformas que ponen en contacto a terceros. «Servicios
+    // auxiliares» es, literalmente, el nombre de la sección O de la CNAE-2025
+    // («ACTIVIDADES ADMINISTRATIVAS Y SERVICIOS AUXILIARES») y de su división 82.
+    //
+    // Medido: 13 resultados encabezados por 47.91 y 47.92 —intermediación para el comercio
+    // al por menor— porque, empatados en relevancia, el desempate es el código. La clase
+    // que sí lleva «auxiliares» en su título, 82.10 «Actividades administrativas y
+    // auxiliares de oficina», sale la séptima.
+    await buscarCnaeVerificado(page, 'servicios auxiliares');
+    await expect(fichas(page).filter({ hasText: '47.91' })).toHaveCount(0);
+  });
+
+  test('BAJO — «transporte de mercancías» no puede devolver la clase de manipulación', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['4941'] = ['49.41', '52.24']: la clase 4941 de la CNAE-2009 se reparte
+    // entre el transporte por carretera y la manipulación de mercancías (carga, descarga y
+    // estiba). El término se quedó en LOS DOS, y 52.24 «Manipulación de mercancías» no
+    // transporta nada: sin ese sinónimo no aparecería en esta búsqueda, porque su título no
+    // lleva «transporte».
+    //
+    // Es el mismo defecto que el hallazgo 680 («servicios profesionales varios» ofreciendo
+    // la clase de seguridad): el primer resultado es correcto y el sobrante desinforma.
+    // Las otras cuatro entradas con «transporte de mercancías» en el título —49.20
+    // ferrocarril, 49.41 carretera, 50.40 vías navegables, 52.31 intermediación— sí lo
+    // llevan en su literal oficial y no están en discusión.
+    await buscarCnaeVerificado(page, 'transporte de mercancías');
+    await expect(fichas(page).filter({ hasText: '52.24' })).toHaveCount(0);
+  });
+
+  test('BAJO — «niñera» y «canguro» no son «Educación preprimaria»', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['8891'] = ['85.10', '88.91']: la clase 8891 de la CNAE-2009, «cuidado
+    // diurno de niños», se reparte entre la escuela infantil (85.10 «Educación
+    // preprimaria», sección Q EDUCACIÓN) y 88.91 «Actividades de cuidado diurno de niños».
+    // El reparto se hizo a medias: «cuidado de niños» sí está en 88.91, pero «canguro» y
+    // «niñera» se quedaron en la clase de EDUCACIÓN junto a «guardería», «escuela infantil»
+    // y «centro infantil», que ahí sí encajan.
+    //
+    // Hoy «niñera» devuelve un único resultado, «85.10 Educación preprimaria», y 88.91 no
+    // tiene ninguna puerta coloquial que lleve a ella.
+    await buscarCnaeVerificado(page, 'niñera');
+    await expect(fichas(page).first()).toContainText('88.91');
+  });
+
+  test('BAJO — la norma de la CNAE del FAQPage debe salir de CNAE_VIGENCIA, como ya sale la del IAE', async () => {
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(
+      join(process.cwd(), 'app', 'conversor-cnae-iae', 'metadata.ts'),
+      'utf8',
+    );
+
+    // Residuo simétrico del hallazgo 681, en el mismo fichero y en la misma boca. Tras
+    // aquella reparación, `jsonLd.description` deriva las DOS normas (NORMA_IAE y
+    // CNAE_VIGENCIA.normaVigente) y el FAQPage deriva la del IAE, la retención y el umbral
+    // de exención… pero su segunda respuesta sigue tecleando «Real Decreto 10/2025» y
+    // «enero de 2026» a mano. Coinciden con el módulo por casualidad, no por construcción,
+    // y es el texto que citan Bing Copilot, ChatGPT y Perplexity sin el disclaimer al lado.
+    //
+    // El valor esperado no se transcribe: se le pregunta al módulo.
+    expect(CNAE_VIGENCIA.normaVigente).toContain('10/2025');
+    expect(fuente).not.toMatch(/Real Decreto 10\/2025/);
   });
 });

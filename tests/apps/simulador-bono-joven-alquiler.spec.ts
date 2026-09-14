@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { BONO_ALQUILER_JOVEN_2026 } from '../../data/fiscal/vivienda-joven';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-bono-joven-alquiler (segmento fiscal, RIESGO 1 CRÍTICO)
@@ -850,5 +851,278 @@ test.describe('Hallazgos abiertos — 10/09/2026', () => {
     expect(panel[0]).toContain('200,00 €');
     // 200,00 × 48 = 9.600 → «9600,00 €» (es-ES no agrupa cuatro cifras). Hoy sale 9599,90 €.
     expect(panel[2]).toContain('9600,00 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 14/09/2026 (segmento fiscal, RIESGO 1 CRÍTICO) — la 8.ª
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Primero se ejecutó entera la batería anterior: **26/26 en verde**, así que los once
+// hallazgos de las tres pasadas previas (596-599, 642-645 y 686-688) siguen cerrados.
+// Comprobado además a mano en el navegador lo que el acta del 10/09 daba por reparado:
+//
+//   · 686 (ALTO) — la incompatibilidad del art. 136 llega al VEREDICTO: es el quinto
+//     requisito de la checklist, va marcado IMPRESCINDIBLE, y su explicación imprime
+//     «INCOMPATIBLE» derivándolo de `compatibleConOtrasAyudasAlquiler`. La página lo dice
+//     ya FUERA de la guía colapsada (comprobado sobre el `innerText` del body sin abrir
+//     `<EducationalSection>`). Lo fija como caso el CASO 12 de esta tanda.
+//   · 688 (BAJO) — la ayuda mensual y el acumulado se multiplican: 300 €/mes de habitación
+//     dan 180,00 € y 8.640,00 € (180 × 48), y 333,33 € dan 200,00 € y 9600,00 €.
+//   · 687 (MEDIO) — el `faqJsonLd` servido ya no afirma nada sobre el IRPF: ni «ganancia
+//     patrimonial» ni «tributa» aparecen en el HTML servido (0 apariciones).
+//
+// AUDITORÍA DE LOS CASOS PREVIOS: se revisó uno por uno que lo que cada test afirma siga
+// siendo lo que la app DEBE hacer. Ninguno fija como contrato un comportamiento defectuoso;
+// no se ha modificado ninguno.
+//
+// De dónde sale cada cifra esperada: `data/fiscal/vivienda-joven.ts`, sellado contra el BOE
+// (RD 326/2026, BOE-A-2026-8872) el 23/08/2026. Ninguna de memoria.
+//
+// CASOS NUEVOS (resueltos a mano ANTES de abrir el navegador)
+// ───────────────────────────────────────────────────────────
+//   CASO 10 (normal) — HABITACIÓN en municipio ordinario · 300 €/mes
+//       tope de renta  300 ≤ 600 (rentaMaximaMensual.habitacion, art. 133.1.e) → dentro
+//       60 % de 300 = 180 < 200 (ayudaMaximaMensual.habitacion, art. 137)
+//       ayuda          mín(200; 180) = 180,00 €   ← manda el PORCENTAJE
+//       pago real      300 − 180 = 120,00 €
+//       4 años         180 × 48 (plazo.totalMaximoMeses, art. 134) = 8.640 → «8640,00 €»
+//       veredicto      APTO citando 180,00 €/mes, y CON la nota «Límite: 60% de la renta»
+//       Es el hueco que quedaba en la habitación: el 60 % mordiendo en municipio ORDINARIO
+//       (el CASO 2 lo cubría solo en municipio pequeño, donde el tope de renta ya es otro).
+//
+//   CASO 11 (límite) — HABITACIÓN en municipio ordinario · 600 €/mes CLAVADOS
+//       600 = rentaMaximaMensual.habitacion (art. 133.1.e). Sin cubrir hasta hoy: los casos
+//       previos probaban 500 (por debajo) y 900 (por encima), nunca el borde inclusive.
+//       tope de renta  600 ≤ 600 → dentro, sin aviso
+//       60 % de 600 = 360 > 200 → ayuda = mín(200; 360) = 200,00 €
+//       pago real      600 − 200 = 400,00 €
+//       4 años         200 × 48 = 9.600 → «9600,00 €»
+//       nota del 60 %  NO (el porcentaje no rebaja la cuantía)
+//       veredicto      APTO · y con 601 € → NO APTO (tope 600,00 €, introducido 601,00 €)
+//
+//   CASO 12 (rechazo) — VIVIENDA · 700 €/mes · «No» a la incompatibilidad del art. 136
+//       700 ≤ 1.000 (art. 133.1.e): la renta NO es el problema, y de ser apto la ayuda
+//       sería mín(300; 60 % de 700 = 420) = 300,00 €/mes.
+//       Quien ya cobra otra ayuda al pago del alquiler queda excluido por el art. 136
+//       (`compatibleConOtrasAyudasAlquiler = false`): NO APTO, sin panel de ahorro y sin
+//       que aparezca en pantalla la cifra de 300,00 € que no va a cobrar.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Abre la ruta y espera a que React haya montado el input: antes de eso, un clic se pierde */
+async function abrirHidratado(page: Page) {
+  await abrir(page);
+  await esperarHidratacion(page, ['#alquiler']);
+}
+
+test.describe('Inspección 14/09/2026 — casos nuevos', () => {
+  test('CASO 10 (normal): habitación a 300 €/mes en municipio ordinario → el 60 % manda (180,00 €)', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    // 300 ≤ 600 = rentaMaximaMensual.habitacion (art. 133.1.e)
+    await sembrarValor(page, '#alquiler', '300');
+    await marcarTodosLosRequisitos(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+
+    const panel = await panelDeAhorro(page);
+    // mín(200 € de ayudaMaximaMensual.habitacion; 60 % de 300 = 180 €) = 180 €
+    expect(panel[0]).toContain('180,00 €');
+    // 300 − 180
+    expect(panel[1]).toContain('120,00 €');
+    // 180 × 48 meses (plazo.totalMaximoMeses, art. 134) — es-ES no agrupa cuatro cifras
+    expect(panel[2]).toContain('8640,00 €');
+
+    // El porcentaje rebaja la cuantía del art. 137: hay que decirlo
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(1);
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('¡Cumples todos los requisitos!');
+    // La tarjeta anuncia lo que este caso cobra, no los 200 € del tope de la habitación
+    expect(resultado).toContain('180,00 €/mes');
+    expect(resultado).not.toContain('200,00 €');
+  });
+
+  test('CASO 11 (límite): 600 €/mes clavados es el último alquiler de habitación con derecho a ayuda (art. 133.1.e, inclusive)', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    // 600 € = rentaMaximaMensual.habitacion (art. 133.1.e), tope INCLUSIVE
+    await sembrarValor(page, '#alquiler', '600');
+    await marcarTodosLosRequisitos(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+
+    const panel = await panelDeAhorro(page);
+    // 60 % de 600 = 360 > 200 → manda la cuantía fija del art. 137
+    expect(panel[0]).toContain('200,00 €');
+    // 600 − 200
+    expect(panel[1]).toContain('400,00 €');
+    // 200 × 48 — es-ES no agrupa cuatro cifras
+    expect(panel[2]).toContain('9600,00 €');
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(0);
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('¡Cumples todos los requisitos!');
+
+    // Un euro por encima del tope de la habitación cae al otro lado
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    await sembrarValor(page, '#alquiler', '601');
+    await marcarTodosLosRequisitos(page);
+
+    const aviso = norm(await page.locator('[class*="avisoRenta"]').first().innerText());
+    expect(aviso).toContain('Para una habitación el tope es 600,00 €/mes');
+    expect(aviso).toContain('601,00 €/mes');
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+  });
+
+  test('CASO 12 (rechazo): cobrar otra ayuda al alquiler excluye por el art. 136, aunque la renta esté dentro del tope', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 700 ≤ 1.000 = rentaMaximaMensual.vivienda: la renta no es el motivo del rechazo
+    await sembrarValor(page, '#alquiler', '700');
+    // Índice 4 = «No cobras ninguna otra ayuda al pago del alquiler» (art. 136), bloqueante
+    await marcarTodosLosRequisitos(page, { indice: 4, valor: 'No' });
+
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(rechazo).toContain('Existe al menos un requisito imprescindible que no cumples');
+    // Ni la cifra que NO va a cobrar: mín(300; 60 % de 700 = 420) = 300 €/mes
+    expect(rechazo).not.toContain('300,00 €');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+
+    // Y la regla se lee en pantalla sin desplegar la guía educativa
+    const visible = norm(await page.locator('body').innerText());
+    expect(visible).toContain('art. 136');
+    expect(visible).toContain('INCOMPATIBLE');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 14/09/2026 — marcados `test.fail()`
+// con lo que la app DEBERÍA hacer, igual que se hizo con 642-645 y 686-688. Al
+// repararlos se les quita la marca y quedan como guardián de regresión.
+//
+// Los cuatro son de la misma familia, la que esta app ya conoce: el texto que
+// acompaña al veredicto afirma más de lo que el veredicto sostiene.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 14/09/2026', () => {
+  // H4 (MEDIO) — El requisito del contrato es una EXIGENCIA del RD según la propia app, y
+  // el veredicto lo trata como un adorno.
+  //
+  // La tarjeta dice «El contrato debe estar formalizado por escrito y depositada la fianza»
+  // y la FAQ de la página se lo atribuye al Real Decreto sin matices: «el RD 326/2026 no
+  // fija a nivel estatal ninguna condición sobre el propietario: SOLO EXIGE que el contrato
+  // de arrendamiento esté formalizado por escrito y con la fianza depositada (art. 133.1.e)».
+  // Pero en `REQUISITOS` va con `bloqueante: false`, sin el distintivo IMPRESCINDIBLE, así
+  // que quien responde «No» —y la pregunta ya contempla el futuro: «está registrado (o lo
+  // estará)»— recibe «⚠️ Cumples los requisitos básicos · Cumples los requisitos
+  // obligatorios, aunque algunos aspectos adicionales (contrato registrado, documentación
+  // completa...) pueden condicionar la aprobación final», con el panel de ahorro entero
+  // pintado: 300,00 €/mes y 14.400,00 € en 4 años.
+  //
+  // Es la forma exacta del hallazgo 686 (art. 136), reparado el 10/09: una condición que el
+  // RD impone se cuenta en la prosa y no llega al veredicto. Y el sentido del error es el
+  // malo para un dictamen de elegibilidad: se le dice a quien no cumple que sí cumple.
+  //
+  // La invariante admite las dos reparaciones posibles: o el requisito pasa a bloqueante
+  // (como el del art. 136), o la tarjeta y la FAQ dejan de presentarlo como exigencia
+  // estatal y lo describen como lo que entonces sería —un trámite que concreta cada CA—.
+  test('H4 — o el contrato del art. 133.1.e condiciona el veredicto, o la app deja de llamarlo exigencia', async ({ page }) => {
+    test.fail(); // ABIERTO: hoy la app hace las dos cosas a la vez
+    await abrirHidratado(page);
+
+    // ¿La app lo presenta como una exigencia del Real Decreto?
+    const tarjetas = page.locator('[class*="checkCard"]');
+    const contrato = norm(await tarjetas.nth(5).innerText());
+    expect(contrato).toContain('contrato de arrendamiento'); // la tarjeta esperada
+    const loPresentaComoExigencia = /debe estar formalizado por escrito/i.test(contrato);
+
+    // ¿Y qué hace el veredicto cuando se responde que NO lo está ni lo estará?
+    await sembrarValor(page, '#alquiler', '700'); // 700 ≤ 1.000: la renta no es el problema
+    await marcarTodosLosRequisitos(page, { indice: 5, valor: 'No' });
+    const veredicto = norm(await page.locator('[role="status"]').first().innerText());
+    const afirmaQueCumple = /Cumples los requisitos obligatorios/.test(veredicto);
+
+    // No pueden ser las dos cosas a la vez
+    expect(loPresentaComoExigencia && afirmaQueCumple).toBe(false);
+  });
+
+  // H5 (BAJO) — El `faqJsonLd` teclea a mano dos umbrales que el módulo sella y que el
+  // propio fichero ya sabe importar.
+  //
+  // `metadata.ts` importa `UMBRAL_IPREM_VIVIENDA_JOVEN` y deriva de él `general` (5), pero
+  // la respuesta de ingresos escribe «5,5 veces con el 33% o más, 6 veces con el 65% o más»
+  // como texto literal, teniendo `discapacidad33` y `discapacidad65` a una propiedad de
+  // distancia. La página visible SÍ los deriva (la tarjeta de la checklist imprime «5,5» y
+  // «6» desde el módulo), así que si el RD moviera cualquiera de los dos, la página y el
+  // FAQPage dirían cosas distintas — y el que se quedaría mintiendo es el canal que leen
+  // ChatGPT, Perplexity y Bing Copilot sin nada al lado que lo contradiga.
+  //
+  // Es el patrón de los hallazgos 489, 645 y 687, que esta app ya ha reparado tres veces en
+  // otros sitios: la cifra correcta hoy pero desanclada del módulo. Mismo caso con el plazo:
+  // «(2 años renovables por otros 2)» está tecleado junto a un `DURACION_TOTAL_ANIOS` que sí
+  // sale de `plazo.totalMaximoMeses`.
+  test('H5 — los umbrales por discapacidad del FAQPage deberían salir del módulo, como los de la página', async () => {
+    test.fail(); // ABIERTO: hoy 5,5 y 6 están tecleados en metadata.ts
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(
+      join(process.cwd(), 'app', 'simulador-bono-joven-alquiler', 'metadata.ts'),
+      'utf8',
+    );
+    // 5,5 = UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33 · 6 = .discapacidad65 (art. 133.1.d)
+    expect(fuente).not.toContain('5,5 veces con el 33%');
+    expect(fuente).not.toContain('6 veces con el 65%');
+    // 2 + 2 = plazo.inicialMeses / 12 y plazo.prorrogaMaximaMeses / 12 (art. 134)
+    expect(fuente).not.toContain('(2 años renovables por otros 2)');
+  });
+
+  // H6 (BAJO) — «Cumples los requisitos obligatorios» con la renta sin comprobar.
+  //
+  // Con los 7 requisitos a «Sí» y el campo de renta vacío, el veredicto dice literalmente
+  // «Cumples los requisitos obligatorios, aunque algunos aspectos adicionales (...) pueden
+  // condicionar la aprobación final. Falta comprobar la renta: introdúcela aquí arriba para
+  // verificarla contra el tope del art. 133.1.e». Las dos frases se contradicen dentro del
+  // mismo párrafo: el tope de renta no es un «aspecto adicional» sino una condición
+  // obligatoria del RD —la propia app rechaza de plano a quien la supera, antes incluso de
+  // mirar la checklist—, así que mientras no se conozca no se puede afirmar que se cumplen
+  // los requisitos obligatorios. El sentido del error vuelve a ser el optimista.
+  test('H6 — sin renta tecleada el veredicto no debería afirmar que se cumplen los requisitos obligatorios', async ({ page }) => {
+    test.fail(); // ABIERTO: hoy afirma el cumplimiento y a la vez pide la renta
+    await abrirHidratado(page);
+    await marcarTodosLosRequisitos(page); // los 7 a «Sí», sin tocar la renta
+
+    const veredicto = norm(await page.locator('[role="status"]').first().innerText());
+    // Que reconozca que falta la renta está bien; afirmar a la vez el cumplimiento, no
+    expect(veredicto).toContain('Falta comprobar la renta');
+    expect(veredicto).not.toContain('Cumples los requisitos obligatorios');
+  });
+
+  // H7 (BAJO) — El rechazo nombra una sola causa cuando hay dos.
+  //
+  // Con 1.500 €/mes de vivienda (> 1.000 del art. 133.1.e) Y la edad respondida «No», el
+  // veredicto atribuye el rechazo únicamente a la renta: «La renta que has introducido
+  // (1500,00 €/mes) supera el máximo de 1000,00 €/mes que da derecho a esta ayuda». Del
+  // requisito imprescindible que también falla no dice nada, porque la rama de la renta
+  // sustituye al mensaje genérico en lugar de sumarse a él. Quien lo lea concluirá que
+  // mudándose a un piso más barato tendría derecho, cuando la edad lo excluye igual.
+  // El sentido del error no es el veredicto —que es correcto— sino la acción que induce.
+  test('H7 — cuando fallan la renta Y un requisito imprescindible, el rechazo debería nombrar los dos', async ({ page }) => {
+    test.fail(); // ABIERTO: hoy el mensaje de la renta sustituye al genérico
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 1.500 > 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e)
+    await sembrarValor(page, '#alquiler', '1500');
+    // Índice 0 = «Tienes entre 18 y 35 años (inclusive)» (art. 133.1.b), bloqueante
+    await marcarTodosLosRequisitos(page, { indice: 0, valor: 'No' });
+
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(rechazo).toContain('1000,00 €/mes'); // la causa que sí nombra
+    expect(rechazo).toMatch(/imprescindible/i); // la que se calla
   });
 });

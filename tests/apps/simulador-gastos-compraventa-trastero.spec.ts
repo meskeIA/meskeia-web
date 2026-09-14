@@ -67,6 +67,15 @@
  *      que era el último campo del vendedor sin caso de basura. Al final, TRES hallazgos
  *      abiertos con `test.fail()`. Estos casos siembran con `_hidratacion.ts`.
  *
+ *  14. RE-INSPECCIÓN 14/09/2026 — CASOS 29-31, posterior a la reparación de esos tres
+ *      (713 el plazo del ITP, 773 la comisión ilegible y 774 la FAQ duplicada a mano),
+ *      que hoy quedan como regresión. Comunidad y perfil nuevos —Extremadura, la última
+ *      con escala progresiva sin usar, con perfil DISCAPACIDAD— y las dos zonas que
+ *      nueve rondas no habían tocado: qué hace un dato imposible al SALIR del campo
+ *      (todos los casos anteriores lo probaban con el foco puesto) y qué rotula la app
+ *      cuando la ganancia patrimonial es EXACTAMENTE 0. Al final, TRES hallazgos
+ *      abiertos con `test.fail()`.
+ *
  *      ⚠️ El CASO 16 (02/09) se REESCRIBIÓ ese día. Verificaba el rechazo escribiendo un
  *      «0» en los años de propiedad y daba por buena la reescritura del `min={1}` a «1»:
  *      eso era cierto cuando se escribió, y desde la reparación del motor del 07/09
@@ -3063,9 +3072,9 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 12/09/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Cuando se reparen, se les quita la marca y quedan como regresión.
+// REGRESIÓN — los TRES hallazgos de la re-inspección del 12/09/2026 (713, 773 y 774),
+// REPARADOS el 13/09/2026 y verificados el 14/09: se les retiró el `test.fail()` y hoy
+// sujetan la reparación. Los comentarios de cada uno describen el defecto de origen.
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ⚠️ ABIERTO 12/09/2026 (medio) — dato. EFECTO FAMILIA del hallazgo 713.
@@ -3086,10 +3095,9 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
 //         derivado de `PLAZO_ITP` como en garaje desde el commit 21a13c6b
 //       → obtenido: «El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de
 //         la escritura», y ni «828/1995» ni «102.1» aparecen en todo el documento.
-test('ABIERTO 12/09 (dato) — el plazo del ITP no cita su norma ni sale de data/fiscal', async ({
+test('REGRESIÓN 713 (dato) — el plazo del ITP cita su norma y sale de data/fiscal', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
 
@@ -3126,7 +3134,7 @@ test('ABIERTO 12/09 (dato) — el plazo del ITP no cita su norma ni sale de data
 //       → obtenido: comisión 0 %, sin tarjeta de comisión, IRPF 1.350,00 € y NETO
 //         13.650,00 €. Con el 3 % que el campo traía por defecto: comisión 450,00 €,
 //         IRPF 1.255,50 € y neto 13.294,50 € — 355,50 € menos.
-test('ABIERTO 12/09 (operativa) — una comisión ilegible se lee como 0 % y no se dice', async ({
+test('REGRESIÓN 773 (operativa) — una comisión ilegible se nombra en vez de leerse como 0 %', async ({
   page,
 }) => {
   await page.goto(RUTA);
@@ -3157,7 +3165,7 @@ test('ABIERTO 12/09 (operativa) — una comisión ilegible se lee como 0 % y no 
 // Caso: `grep -c "RESPUESTA_" app/simulador-gastos-compraventa-trastero/page.tsx`
 //       → esperado: ≥ 2 (las dos constantes importadas y usadas, como en garaje)
 //       → obtenido: 0, mientras `metadata.ts` afirma lo contrario en su línea 21.
-test('ABIERTO 12/09 (contenido) — la FAQ visible duplica a mano las respuestas de metadata', async () => {
+test('REGRESIÓN 774 (contenido) — la FAQ visible importa las respuestas de metadata', async () => {
   const { readFileSync } = await import('node:fs');
   const { join } = await import('node:path');
   const pagina = readFileSync(
@@ -3165,4 +3173,309 @@ test('ABIERTO 12/09 (contenido) — la FAQ visible duplica a mano las respuestas
     'utf8',
   );
   expect(pagina).toContain("from './metadata'");
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia exactamente 0 y unos años
+// negativos que SALEN del campo.
+//
+// La décima pasada por esta app, y la primera posterior a la reparación de los tres
+// hallazgos del 12/09 (774 la FAQ duplicada a mano, 713 el plazo del ITP sin norma y 773
+// la comisión ilegible leída como 0 %). Los tres se verifican arriba, ya sin `test.fail()`.
+//
+// Territorio nuevo otra vez —Extremadura, la última comunidad con escala progresiva que
+// ninguna ronda había elegido, con el perfil DISCAPACIDAD que solo se había probado en el
+// País Vasco— y, sobre todo, DOS sitios que las nueve rondas anteriores dejaron sin tocar:
+//
+//   · qué pasa con un valor imposible cuando el usuario SALE del campo. El CASO 19 (07/09)
+//     y el CASO 10 (30/08) prueban los negativos «sin blur», con el foco todavía puesto, y
+//     lo dicen en un comentario: «el min del NumberInput aún no ha corregido el valor». La
+//     otra mitad del camino —la que recorre cualquiera que pulse Tab— no se había mirado.
+//   · qué rotula la app cuando la ganancia patrimonial es EXACTAMENTE 0. Hay casos de
+//     ganancia (4, 8, 19…) y de pérdida (5), y ninguno en la raya que los separa.
+//
+// Los casos siembran con `sembrar`, que espera al estado de React.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** La descripción de la tarjeta de ganancia/pérdida, o '' si esa tarjeta no se pinta. */
+async function descripcionPatrimonial(page: Page): Promise<string> {
+  const titulo = page.locator('h3', { hasText: /patrimonial/ });
+  if ((await titulo.count()) === 0) return '';
+  return descripcionTarjeta(page, /patrimonial/);
+}
+
+test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el blur de un dato imposible', () => {
+  /**
+   * CASO 29 (NORMAL) — Extremadura, segunda mano, 45.000 €, perfil DISCAPACIDAD.
+   *
+   * Comunidad nueva: es la única con escala progresiva (8/10/11 %, `ITP_CCAA.extremadura`)
+   * que ninguna de las nueve rondas anteriores había elegido. El perfil de discapacidad
+   * interesa porque su reducido del 6,4 % exige «Vivienda habitual», y un trastero suelto
+   * nunca lo es: tiene que salir como OPORTUNIDAD en el aviso y no como cifra cobrada
+   * (contrato de `elegirTipoITP` desde el 14/08/2026).
+   */
+  test('CASO 29 (normal) — Extremadura, segunda mano, 45.000 €, comprador con discapacidad', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('extremadura');
+    await selectPerfil(page).selectOption('discapacidad');
+    await sembrar(page, 'Precio del trastero', '45000');
+
+    // ITP — escala progresiva de Extremadura en `ITP_CCAA` (8 % hasta 360.000 · 10 % hasta
+    // 600.000 · 11 % el resto), aplicada por `calcularITPProgresivo`. 45.000 cabe entero en
+    // el primer tramo: 45.000 × 8 % = 3.600,00. Tipo EFECTIVO = 3.600 / 45.000 = 8,00 %.
+    expect(await valorTarjeta(page, /^ITP/)).toBe('3600,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+
+    // El aviso de escala tiene que pintarse, con los tres tipos de la ficha.
+    await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toContainText(
+      '(8% → 10% → 11%)',
+    );
+
+    // Segunda mano: no hay AJD.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    // Notaría — arancel del RD 1426/1989 nº 2 (`ARANCELES_NOTARIO`) sobre 45.000:
+    //   90,15 + (30.050,61 − 6.010,12) × 0,45 % + (45.000 − 30.050,61) × 0,15 %
+    //   = 90,15 + 108,182205 + 22,424085 = 220,75629 · con IVA ×1,21 = 267,1151109
+    //   factura = ×1,5 → 400,67266635 · ×2 → 534,2302218 · medio = 467,451444075
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('467,45 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 400,67 € y 534,23 €',
+    );
+
+    // Registro — arancel del RD 1427/1989 nº 2 (`ARANCELES_REGISTRO`) sobre 45.000:
+    //   24,04 + 24.040,49 × 0,175 % + 14.949,39 × 0,125 % = 84,797595
+    //   + presentación 6,010121 + nota simple 3,005061 = 93,812777 · ×1,21 = 113,51345717
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('113,51 €');
+
+    // Total = 3.600 + 467,45 + 113,51 + 300 (gestoría por defecto) = 4.480,96
+    //   porcentaje = 4.480,96 / 45.000 = 9,9577 % → 9,96 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('4480,96 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '9,96% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('49.480,96 €');
+
+    // El 6,4 % de discapacidad NO se cobra —exige vivienda habitual— y se ofrece como
+    // oportunidad, con sus condiciones a la vista.
+    const avisoReducidos = page.locator('[role="note"]', { hasText: /Podrías pagar menos/ });
+    await expect(avisoReducidos).toHaveCount(1);
+    await expect(avisoReducidos).toContainText('6,40% — Discapacidad (bonif. 20%)');
+    await expect(avisoReducidos).toContainText('Vivienda habitual');
+  });
+
+  /**
+   * CASO 30 (LÍMITE) — la ganancia patrimonial EXACTAMENTE 0: la raya entre ganancia y
+   * pérdida, que ningún caso de este fichero pisaba.
+   *
+   * Los números están elegidos para que el valor de transmisión caiga clavado sobre el de
+   * adquisición CON todo calculado —plusvalía incluida—, que es el escenario en el que la
+   * app no puede escudarse en un «Techo»:
+   *   plusvalía objetivo = 4.000 × 0,17 (coef. de 5 años, `COEFICIENTES_IIVTNU_2025`)
+   *                        × 25 % (`PLUSVALIA_MUNICIPAL_META.tipoOrientativo`) = 170,00
+   *   método real = (20.000 − 17.830) × (4.000 / 9.000) × 25 % = 241,11 → gana el objetivo
+   *   comisión = 20.000 × 10 % = 2.000,00
+   *   valor de transmisión = 20.000 − 2.000 − 170 = 17.830,00  (art. 35.1 LIRPF)
+   *   valor de adquisición = 17.830 + 0 = 17.830,00
+   *   ganancia = 17.830 − 17.830 = 0,00 exacto · IRPF = 0
+   *   total gastos = 170 + 2.000 = 2.170,00 · neto = 20.000 − 2.170 = 17.830,00
+   */
+  test('CASO 30 (límite) — ganancia patrimonial exactamente 0 con todo calculado', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '20000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '17830');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '4000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '10');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('170,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (más favorable)',
+    );
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('17.830,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('17.830,00 €');
+
+    // No hay cuota, y eso sí está bien dicho: `calcularCuotaBaseAhorro(0)` es 0.
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('SIN CUOTA');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('2000,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2170,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.830,00 €');
+    // Todo está calculado, así que el neto NO es un techo.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras los gastos',
+    );
+    // Y la cifra de la tarjeta patrimonial es la correcta: cero.
+    expect(await valorTarjeta(page, /patrimonial/)).toBe('0,00 €');
+  });
+
+  /**
+   * CASO 31 (DEBE RECHAZARSE) — unos años de propiedad NEGATIVOS, con el foco todavía
+   * puesto. Repite el contrato del CASO 19 con otros números porque es la mitad que hoy
+   * funciona, y es el contraste que hace medible el hallazgo abierto de más abajo: el
+   * MISMO dato, después de salir del campo, sí se liquida.
+   */
+  test('CASO 31 (debe rechazarse) — unos años negativos no son un año de tenencia', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '30000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '18000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
+    await sembrar(page, 'Valor catastral del suelo', '6000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '15000');
+
+    // Sin blur: el `min={0}` de NumberInput aún no ha reescrito el campo.
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+    await anios.fill('-4');
+    await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '-4');
+
+    // Ni con el coeficiente de 1 año (0,13) ni con el de «menos de 1 año» (0,14): un año
+    // negativo se RECHAZA, y el neto se entrega como techo nombrando lo que falta.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain(
+      'los años de propiedad',
+    );
+    // Lo que no depende de los años sí se calcula (art. 35 LIRPF):
+    //   valor de adquisición = 18.000 + 1.000 = 19.000
+    //   comisión = 30.000 × 3 % (por defecto) = 900 · plusvalía 0 porque falta
+    //   valor de transmisión = 30.000 − 900 = 29.100 · ganancia = 10.100
+    //   IRPF = 6.000 × 19 % + 4.100 × 21 % = 1.140 + 861 = 2.001
+    //   total gastos = 900 + 2.001 = 2.901 · neto = 30.000 − 2.901 = 27.099
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('19.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('10.100,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2001,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.099,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — re-inspección del 14/09/2026.
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
+// Cuando se reparen, se les quita la marca y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ⚠️ ABIERTO 14/09/2026 (medio) — operativa. El `blur` convierte un dato IMPOSIBLE en un
+// escenario fiscal distinto y perfectamente válido, y lo liquida.
+// `page.tsx` documenta el contrato en su `useMemo`: «Un año NEGATIVO no se acota a 0: se
+// rechaza […] Acotarlo lo convertiría en una reventa antes del año y liquidaría un impuesto a
+// partir de un dato imposible». El `useMemo` cumple — el CASO 31 lo comprueba— pero el campo
+// lleva `min={0}`, y el `handleBlur` de `NumberInput` reescribe a «0» todo lo que baje del
+// mínimo. Y «0» no es un valor neutro aquí: desde el RDL 26/2021 es la reventa antes de
+// cumplir el año, que tributa con el coeficiente 0,14 de `COEFICIENTES_IIVTNU_2025` —el
+// tercero más alto de la tabla— y que el propio `helperText` del campo invita a escribir.
+// Al salir del campo la app liquida:
+//   plusvalía objetivo = 6.000 × 0,14 × 25 % = 210,00
+//   valor de transmisión = 30.000 − 900 (comisión 3 %) − 210 = 28.890
+//   ganancia = 28.890 − 19.000 = 9.890 · IRPF = 6.000 × 19 % + 3.890 × 21 % = 1.956,90
+//   neto = 30.000 − (210 + 900 + 1.956,90) = 26.933,10
+// y lo presenta como DEFINITIVO: el «Techo» del CASO 31 desaparece y el neto pasa a decir
+// «Lo que realmente recibes tras los gastos». Nada en pantalla dice que el −4 se convirtió en
+// otra cosa. Es la mitad del hallazgo 764 que quedó viva: allí se cerró el −0,5 con el foco
+// puesto, y el mismo signo sigue teniendo dos tratamientos según se mire antes o después de
+// salir del campo. Afecta igual a los demás campos con `min={0}`, pero en ninguno el valor
+// acotado significa un escenario fiscal distinto: solo en los años.
+// Caso: 30.000 / 18.000 / gastos 1.000 / suelo 6.000 de 15.000 / años «−4» + Tab
+//       → esperado: «SIN CALCULAR» y neto como techo, igual que con el foco puesto
+//       → obtenido: plusvalía 210,00 €, IRPF 1.956,90 €, neto 26.933,10 € y
+//         «Lo que realmente recibes tras los gastos»
+test('ABIERTO 14/09 (operativa) — al salir del campo, unos años negativos se liquidan como reventa antes del año', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await sembrar(page, 'Precio del trastero', '30000');
+  await page.getByRole('button', { name: /Vendedor/ }).click();
+  await sembrar(page, 'Precio de compra original', '18000');
+  await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
+  await sembrar(page, 'Valor catastral del suelo', '6000');
+  await sembrar(page, 'Valor catastral total (suelo + construcción)', '15000');
+
+  const anios = page.locator('input[aria-label="Años de propiedad"]');
+  await anios.fill('-4');
+  await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '-4');
+  await anios.blur();
+  // El blur reescribe el campo a «0» (esto pasa hoy y es lo que se quiere observar).
+  await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '0');
+
+  // La aserción de FONDO va primero: dentro de un `test.fail()` basta con que el test falle
+  // en ALGÚN punto, así que una aserción posterior podría tapar a esta.
+  expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+});
+
+// ⚠️ ABIERTO 14/09/2026 (medio) — contenido. Lo que la app ROTULA cuando la ganancia
+// patrimonial es exactamente 0.
+// `calcularGananciaInmueble` marca `esPerdida = ganancia <= 0`, de modo que el cero exacto
+// entra por la rama de la pérdida: la app pinta «Pérdida patrimonial 0,00 €» con la
+// descripción «Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede
+// compensar en la declaración». Las dos mitades son falsas —no se vende por debajo del valor
+// de adquisición, se vende exactamente por él, y no hay ninguna pérdida que compensar—, y la
+// segunda invita a una casilla de la declaración que ese caso no genera. La cifra, 0,00 €,
+// sí es correcta: lo que falla es el rótulo. Es el mismo criterio que el hallazgo 483 fijó
+// para el IRPF («ese 0 no es una exención, es un dato que falta»), aplicado al otro cero de
+// la misma pantalla.
+// Caso: 20.000 / 17.830 / 5 años / suelo 4.000 de 9.000 / comisión 10 % (CASO 30)
+//       → esperado: un rótulo que no afirme una venta por debajo del coste ni una pérdida
+//         compensable — «Ganancia patrimonial 0,00 €» o equivalente
+//       → obtenido: «Pérdida patrimonial 0,00 €» + «Vendes por debajo del valor de
+//         adquisición: no hay IRPF y la pérdida se puede compensar en la declaración»
+test('ABIERTO 14/09 (contenido) — una ganancia de 0 se rotula como venta por debajo del coste', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await sembrar(page, 'Precio del trastero', '20000');
+  await page.getByRole('button', { name: /Vendedor/ }).click();
+  await sembrar(page, 'Precio de compra original', '17830');
+  await sembrar(page, 'Años de propiedad', '5');
+  await sembrar(page, 'Valor catastral del suelo', '4000');
+  await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+  await sembrar(page, 'Comisión inmobiliaria (%)', '10');
+
+  expect(await descripcionPatrimonial(page)).not.toContain('por debajo');
+});
+
+// ⚠️ ABIERTO 14/09/2026 (bajo) — contenido. La página publica DOS bloques FAQPage.
+// `metadata.ts` exporta `jsonLd = combineSchemas(webAppSchema, faqSchema)` —donde `faqSchema`
+// ya es un FAQPage de cinco preguntas— y además un `faqJsonLd` de seis, y el `layout.tsx`
+// inyecta los dos. Servido: dos nodos `"@type":"FAQPage"` para una sola URL, con cinco
+// preguntas repetidas palabra por palabra. Las hermanas `local-comercial` y `nave-industrial`
+// sirven UNO (su `jsonLd` es solo el `generateWebAppSchema`); `trastero` y `garaje`, dos.
+// Lo que lo convierte en hallazgo y no en redundancia inocua es que tres de esas cinco
+// respuestas están escritas DOS VECES a mano en el mismo fichero —solo las dos que el
+// hallazgo 774 centralizó viajan en constante— y una de ellas YA ha divergido: la de los
+// tipos reducidos dice «algunas CCAA pueden extenderlos» en `faqSchema` (metadata.ts:106) y
+// «algunas comunidades autónomas pueden extenderlos» en `faqJsonLd` (metadata.ts:162). Es
+// exactamente el mecanismo que el 774 cerró para las otras dos, y este es el canal que citan
+// los asistentes de IA sin el disclaimer al lado.
+// Caso: contar los nodos FAQPage servidos en /simulador-gastos-compraventa-trastero/
+//       → esperado: 1 (como en local-comercial y en nave-industrial)
+//       → obtenido: 2, con las cinco preguntas de `faqSchema` repetidas en `faqJsonLd`.
+test('ABIERTO 14/09 (contenido) — la página sirve dos FAQPage para una sola URL', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faqPages = bloques.flatMap((bloque) => {
+    const json = JSON.parse(bloque) as Record<string, unknown>;
+    const nodos = (Array.isArray(json) ? json : (json['@graph'] ?? [json])) as {
+      '@type'?: string;
+    }[];
+    return nodos.filter((n) => n['@type'] === 'FAQPage');
+  });
+  expect(faqPages).toHaveLength(1);
 });

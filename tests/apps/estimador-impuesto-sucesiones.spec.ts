@@ -795,3 +795,158 @@ test.describe('Estimador ISD — reparación 13/09/2026', () => {
   });
 });
 
+
+// ════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 14/09/2026 — tres casos nuevos, resueltos a mano ANTES de
+// ejecutarlos, y ninguno repite comunidad ni grupo de los anteriores:
+//
+//   · el NORMAL estrena Canarias, la bonificación más alta del régimen común
+//     (99,9 %), sobre el tramo del 25,50 % del art. 21.2;
+//   · el LÍMITE estrena el acantilado de Aragón —la única comunidad cuyo
+//     beneficio es todo o nada al pasar un límite de base liquidable— con la
+//     base justo por debajo y justo por encima de los 3.000.000 €;
+//   · el de RECHAZO estrena el importe NEGATIVO en un campo de BIENES (los
+//     anteriores lo probaban en una DEUDA y con «1.2.3» / «1e3»).
+//
+// Cada cifra esperada sale de `data/fiscal/sucesiones.ts`, con el tramo y la
+// constante citados en el desarrollo. La siembra pasa por `_hidratacion.ts`.
+// ════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 14/09/2026 — Canarias, el acantilado de Aragón y el importe negativo', () => {
+  /** SOLO la columna de resultados: frases como «Bonificación» viven también en la guía. */
+  const panelResultados = async (page: Page): Promise<string> =>
+    (await page.locator('[class*="resultsPanel"]').innerText()).replace(/\u00a0/g, ' ');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#porcentaje-herencia']);
+  });
+
+  /**
+   * CASO NORMAL — hijo de 21 o más (Grupo II) que hereda 300.000 € en cuentas en CANARIAS,
+   * la bonificación más generosa del régimen común: 99,9 % (`BONIFICACIONES_CCAA_IS`).
+   * La base cae en el tramo del 25,50 % del art. 21.2, que es el penúltimo.
+   *
+   *   Activos            300.000,00   (saldos en cuentas)
+   *   + ajuar 3 %          9.000,00   PORC_AJUAR_DOMESTICO_IS
+   *   = base imponible   309.000,00
+   *   − parentesco        15.956,87   REDUCCIONES_PARENTESCO_IS['II']
+   *   = base liquidable  293.043,13
+   *   cuota íntegra       53.692,81   TARIFA_ESTATAL_IS, tramo «hasta 398.777,54»:
+   *                                   40.011,04 + 25,50 % × (293.043,13 − 239.389,13)
+   *   × coeficiente          1,0000   COEFICIENTES_IS['II'][0] (patrimonio < 402.678 €)
+   *   − bonificación 99,9 % 53.639,12 BONIFICACIONES_CCAA_IS['canarias']…['II'] = 0,999
+   *   = cuota final           53,69 €  (tipo efectivo 0,02 %)
+   */
+  test('caso normal: hijo ≥21 en Canarias con 300.000 € paga 53,69 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('canarias');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '300000');
+
+    expect(await cuota(page)).toBe('53,69 €');
+
+    const panel = await panelResultados(page);
+    expect(panel).toContain('9000,00 €');        // ajuar del 3 %
+    expect(panel).toContain('309.000,00 €');     // base imponible
+    expect(panel).toContain('15.956,87 €');      // reducción del art. 20.2.a
+    expect(panel).toContain('293.043,13 €');     // base liquidable
+    expect(panel).toContain('53.692,81 €');      // cuota íntegra, tramo del 25,50 %
+    expect(panel).toContain('53.639,12 €');      // bonificación del 99,9 %
+    expect(panel).toContain('Bonificación 99,9 % (Canarias)');
+    expect(panel).toContain('Tipo efectivo: 0,02%');
+  });
+
+  /**
+   * CASO LÍMITE — el acantilado de ARAGÓN. Su beneficio es
+   * `{ porcentaje: 1,00, limite: 3.000.000 }`: exención TOTAL mientras la base liquidable no
+   * pase de 3.000.000 €, y NADA en cuanto la pasa. No es una escala que decrece: es todo o
+   * nada, así que 100.000 € más de herencia convierten una cuota de cero en casi un millón.
+   *
+   *   (a) Activos        2.900.000,00 → base imponible 2.987.000,00
+   *       − parentesco      15.956,87   REDUCCIONES_PARENTESCO_IS['II']
+   *       = base liquidable 2.971.043,13 ≤ 3.000.000 → bonificación del 100 %
+   *       cuota íntegra    938.277,34   TARIFA_ESTATAL_IS, tramo «Infinity»:
+   *                                     199.291,40 + 34 % × (2.971.043,13 − 797.555,08)
+   *       = cuota final          0,00 €
+   *
+   *   (b) Activos        3.000.000,00 → base imponible 3.090.000,00
+   *       = base liquidable 3.074.043,13 > 3.000.000 → SIN bonificación
+   *       cuota íntegra    973.297,34   199.291,40 + 34 % × (3.074.043,13 − 797.555,08)
+   *       = cuota final    973.297,34 €  (tipo efectivo 31,50 %)
+   */
+  test('caso límite: en Aragón 100.000 € más de herencia pasan de 0,00 € a 973.297,34 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('aragon');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '2900000');
+
+    expect(await cuota(page)).toBe('0,00 €');
+    const bajoElLimite = await panelResultados(page);
+    expect(bajoElLimite).toContain('2.971.043,13 €');   // base liquidable, aún bajo el tope
+    expect(bajoElLimite).toContain('938.277,34 €');     // cuota íntegra del último tramo
+    expect(bajoElLimite).toContain('Bonificación 100,0 % (Aragón)');
+
+    // Un euro por encima del límite no rebaja la bonificación: la suprime entera
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '3000000');
+
+    expect(await cuota(page)).toBe('973.297,34 €');
+    const sobreElLimite = await panelResultados(page);
+    expect(sobreElLimite).toContain('3.074.043,13 €');  // base liquidable, ya sobre el tope
+    expect(sobreElLimite).toContain('973.297,34 €');    // cuota íntegra = cuota final
+    expect(sobreElLimite).toContain('Tipo efectivo: 31,50%');
+    expect(sobreElLimite, 'sin bonificación al pasar el límite').not.toContain('Bonificación');
+  });
+
+  /**
+   * CASO A RECHAZAR — un importe NEGATIVO en un campo de BIENES.
+   *
+   * El caso del 11/09 (hallazgo 740) probó el signo menos en una DEUDA, donde restaba con su
+   * signo y AUMENTABA la masa. En un bien la aritmética es la contraria —la encogería— y el
+   * campo es otro, así que es una rama distinta de la misma guarda: `leer()` rechaza todo
+   * `n < 0`, nombre el campo que sea.
+   *
+   * La app tiene que nombrar el campo y ABSTENERSE de dar cifra, no tomarlo como cero.
+   */
+  test('caso a rechazar: un importe negativo en un bien no se toma como cero', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#acciones-fondos'), '-50000');
+
+    await expect(page.getByRole('alert').filter({ hasText: /no se puede leer/ }))
+      .toContainText('Acciones, fondos y productos financieros');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+  });
+
+  /**
+   * CONTRASTE del acta del 14/09/2026 — lo que la HERRAMIENTA calcula para el caso de la
+   * tarjeta «Viuda hereda empresa familiar» (Cataluña · cónyuge · 500.000 €).
+   *
+   *   Activos           500.000,00   + ajuar 15.000,00 = base imponible 515.000,00
+   *   − parentesco      100.000,00   REDUCCIONES_PARENTESCO_CATALUNA_IS['I-conyuge']
+   *   = base liquidable 415.000,00
+   *   cuota íntegra      60.600,00   TARIFA_CATALUNA_IS, tramo «hasta 800.000»:
+   *                                  57.000 + 24 % × (415.000 − 400.000)
+   *   × 1,0000 (COEFICIENTES_CATALUNA_IS['I'][0])
+   *   − bonificación 99 % 59.994,00  BONIF_CONYUGE_CATALUNA_IS, art. 58 bis.1
+   *   = cuota final         606,00 €
+   *
+   * ⚠️ La tarjeta del bloque educativo anuncia «la cuota, de 57.000 €» y la llama «el techo»:
+   * se salta el ajuar del 3 % y, sobre todo, la bonificación del 99 % del cónyuge catalán que
+   * la propia ficha de Cataluña anuncia dos bloques más arriba. Es el hallazgo de contenido
+   * del acta —mismo patrón que los hallazgos 737 y 794—, y este test fija el lado que sí es
+   * correcto: el de la herramienta.
+   */
+  test('contraste: el cónyuge catalán con 500.000 € paga 606,00 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('cataluna');
+    await page.locator('#parentesco').selectOption('I-conyuge');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '500000');
+
+    expect(await cuota(page)).toBe('606,00 €');
+
+    const panel = await panelResultados(page);
+    expect(panel).toContain('515.000,00 €');   // base imponible CON el ajuar del 3 %
+    expect(panel).toContain('100.000,00 €');   // reducción del cónyuge, art. 2 Ley 19/2010
+    expect(panel).toContain('415.000,00 €');   // base liquidable
+    expect(panel).toContain('60.600,00 €');    // cuota íntegra, tarifa propia de Cataluña
+    expect(panel).toContain('59.994,00 €');    // bonificación del 99 %, art. 58 bis.1
+  });
+});

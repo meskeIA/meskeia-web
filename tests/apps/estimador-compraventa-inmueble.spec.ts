@@ -3542,3 +3542,301 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
     expect((linea.match(/150\.000/g) ?? []).length).toBe(1);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inspector 14/09/2026 — re-inspección: los ANEJOS residenciales y la segunda boca
+// del JSON-LD
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// Por qué esta tanda mira aquí: once re-inspecciones han recorrido la vivienda —Madrid,
+// Cataluña, Baleares, Aragón, Castilla y León, Valencia, Murcia, La Rioja, Ceuta,
+// Melilla, Canarias, Galicia, Cantabria, Extremadura y el País Vasco— y las ramas de
+// local, nave y terreno. Lo que ninguna había pisado es el camino de SEGUNDA MANO de los
+// dos anejos (garaje y trastero) con un perfil de comprador elegido, que es justo donde
+// `esResidencial` hace dos trabajos distintos a la vez, y la escala progresiva de
+// Asturias, la única de las siete que no tenía caso.
+//
+// De dónde sale cada cifra esperada: `data/itp-ccaa.ts` (ITP_CCAA['asturias'], escala
+// 8 %/9 %/10 %; ITP_CCAA['andalucia'], tipo general 7 % y reducido «Jóvenes < 35 años»
+// del 3,5 % con la condición «Vivienda habitual»; ARANCELES_NOTARIO y ARANCELES_REGISTRO,
+// RD 1426/1989 y RD 1427/1989) y `data/fiscal/inmuebles.ts`
+// (TRAMOS_GANANCIAS_PATRIMONIALES_2025: 19 % hasta 6.000 € · 21 % hasta 50.000 € · 23 %
+// hasta 200.000 €). Los aranceles de 140.000 € coinciden con los ya verificados en el
+// CASO B y en el CASO 40 de este mismo fichero.
+//
+// Los tres casos van resueltos A MANO antes de abrir el navegador; el desarrollo va
+// comentado junto a cada aserción.
+
+test.describe('Inspector 14/09/2026 — anejos residenciales y segunda boca del JSON-LD', () => {
+  /** Espera a que React monte y siembra comprobando que el estado lo recogió. */
+  async function sembrar14(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  async function abrir14(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    // Un input de la página como testigo: un clic anterior a la hidratación también se pierde
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+  }
+
+  /**
+   * CASO 43 (normal) — Asturias, segunda mano, vivienda de 250.000 €, perfil general.
+   *
+   * Asturias era la única de las siete comunidades con escala progresiva sin caso en este
+   * fichero. 250.000 € cae ENTERO dentro del primer tramo, así que la cuota coincide con el
+   * tipo plano y sirve de control del tramo bajo de la escala.
+   *   ITP       = 250.000 × 8 %   (ITP_CCAA['asturias'].tramosProgresivos:
+   *               8 % hasta 300.000 · 9 % hasta 500.000 · 10 % resto)   =  20.000,00 €
+   *   Notaría   = arancel(250.000) × 1,21 × 1,75                        =     811,92 €
+   *     arancel = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 %
+   *               + 90.151,82×0,10 % + 99.746,97×0,05 %
+   *               = 383,433410 → ×1,21 = 463,954426 → ×1,75 = 811,920245
+   *   Registro  = (201,212064 + 6,010121 + 3,005061) × 1,21             =     254,37 €
+   *   Gestoría (GESTORIA_TIPICA, valor por defecto del campo)            =     300,00 €
+   *   AJD       = 0 — segunda mano: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
+   *   Total gastos = 20.000 + 811,92 + 254,37 + 300                     =  21.366,29 €
+   *   % sobre precio = 21.366,29 / 250.000                               =       8,55 %
+   *   Coste total = 250.000 + 21.366,29                                  = 271.366,29 €
+   */
+  test('CASO 43 (normal) — Asturias, segunda mano, vivienda de 250.000 €', async ({ page }) => {
+    await abrir14(page);
+    await page.locator('#ccaa-inmueble').selectOption('asturias');
+    await sembrar14(page, 'Precio de la vivienda', '250000');
+
+    await expect(page.getByRole('heading', { name: 'ITP (8,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('20.000,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('811,92 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('254,37 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.366,29 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,55% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('271.366,29 €');
+
+    // Y que la escala que la app anuncia es la de la tabla, no otra
+    const tramos = (ITP_CCAA['asturias'].tramosProgresivos ?? []).map((t) => `${t.tipo}%`);
+    await expect(page.locator('p[class*="infoCcaaNote"]').first()).toContainText(tramos.join(' → '));
+  });
+
+  /**
+   * ⚠️ HALLAZGO 14/09/2026 (ALTO, cálculo) — un GARAJE o un TRASTERO sueltos reciben los
+   * tipos reducidos de ITP reservados a la VIVIENDA HABITUAL, y la cuota sale a la MITAD.
+   *
+   * `esResidencial` (INMUEBLES_RESIDENCIALES = vivienda, garaje, trastero) se usa para dos
+   * cosas distintas en la misma línea: decidir el tipo de IVA del anejo —donde sí agrupa
+   * bien— y responder a `elegirTipoITP` si la operación puede ser vivienda habitual, donde
+   * NO: un garaje suelto no lo es nunca. El contrato de `elegirTipoITP` lo dice por escrito
+   * («`false` en garaje, trastero, local, nave y terreno») y las dos apps hermanas lo pasan
+   * así (`simulador-gastos-compraventa-garaje` y `-trastero`, ambas con el comentario «un
+   * garaje suelto NO lo es nunca»). Aquí llega `true`.
+   *
+   * Es la misma familia del hallazgo 627, que el 07/09 cerró la puerta a local, nave y
+   * terreno forzando el perfil a «general»; los dos anejos se quedaron dentro porque para
+   * ellos `esResidencial` vale `true`.
+   *
+   * Caso: Garaje/Parking · segunda mano · Andalucía · perfil Joven · 140.000 €
+   *   esperado: ITP al tipo general del 7 % = 9.800,00 € — el reducido «Jóvenes < 35 años»
+   *     del 3,5 % exige «Vivienda habitual» (ITP_CCAA['andalucia']), condición que un garaje
+   *     suelto no cumple. Es lo que cobra la app hermana para esa misma operación.
+   *   obtenido: «ITP (3,50%) — 4900,00 €». Infravalora el impuesto en 4.900 €, la mitad, y
+   *     en la dirección que el propio motor documenta como no recuperable.
+   */
+  test('HALLAZGO 14/09 — un garaje suelto no puede cobrar el tipo reducido de VIVIENDA HABITUAL', async ({
+    page,
+  }) => {
+    await abrir14(page);
+    await page.getByRole('button', { name: /Garaje\/Parking/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('andalucia');
+    await sembrar14(page, 'Precio del inmueble', '140000');
+    await page.locator('#perfil-comprador').selectOption('joven');
+
+    // El reducido que se cuela exige vivienda habitual: está en la tabla, no en la memoria
+    const joven = ITP_CCAA['andalucia'].tiposReducidos.find((t) => /j[oó]venes/i.test(t.nombre));
+    expect(joven?.condiciones).toContain('Vivienda habitual');
+
+    //   ITP       = 140.000 × 7 % (tipo general de Andalucía)     =  9.800,00 €
+    //   Notaría   = arancel(140.000) × 1,21 × 1,75                =    684,60 €
+    //   Registro  = (163,598193 + 6,010121 + 3,005061) × 1,21     =    208,86 €
+    //   Gestoría                                                   =    300,00 €
+    //   Total gastos = 9.800 + 684,60 + 208,86 + 300              = 10.993,46 €
+    //   Coste total  = 140.000 + 10.993,46                        = 150.993,46 €
+    await expect(page.getByRole('heading', { name: 'ITP (7,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('9800,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.993,46 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('150.993,46 €');
+  });
+
+  /**
+   * El mismo defecto por su otra salida: con perfil GENERAL, el aviso «Podrías pagar menos»
+   * le ofrece a un garaje un tipo cuyo requisito impreso al lado es «Vivienda habitual».
+   *
+   * Caso: Garaje/Parking · segunda mano · Madrid · perfil General · 140.000 €
+   *   esperado: ningún tipo con el requisito «Vivienda habitual» (Madrid solo tiene ese, el
+   *     del 5,40 %, al alcance de cualquiera, así que el aviso no debería aparecer).
+   *   obtenido: «5,40% — Vivienda habitual (bonif. 10%) · Requisitos: Vivienda habitual ·
+   *     Valor ≤ 250.000 €» — la rebaja que se ofrece es aritméticamente imposible para un
+   *     garaje, y el pie del aviso invita a llamar a la oficina liquidadora.
+   *
+   * Es literalmente el hallazgo H1 del 07/09 («un local comercial no puede recibir la oferta
+   * de un tipo de VIVIENDA HABITUAL»), que se reparó para local, nave y terreno y no para
+   * los dos anejos.
+   */
+  test('HALLAZGO 14/09 — a un garaje no se le ofrece una rebaja que exige vivienda habitual', async ({
+    page,
+  }) => {
+    await abrir14(page);
+    await page.getByRole('button', { name: /Garaje\/Parking/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    await sembrar14(page, 'Precio del inmueble', '140000');
+
+    const aviso = page.locator('div[class*="avisoReducidos"]');
+    if (await aviso.count()) {
+      expect(await aviso.first().innerText()).not.toContain('Vivienda habitual');
+    }
+  });
+
+  /**
+   * CASO 44 (debe rechazarse) — la exención por reinversión NO puede sobrevivir a que la
+   * vivienda deje de ser la habitual.
+   *
+   * El art. 38 LIRPF la reserva a quien transmite su vivienda habitual, y la casilla de
+   * reinversión solo se pinta mientras «Es mi vivienda habitual» está marcada — pero su
+   * ESTADO sobrevive al desmarcado (es el patrón del hallazgo 627, aquí por el lado del
+   * vendedor). Este caso comprueba que el cálculo sí se entera y vuelve a cobrar el IRPF
+   * entero, aunque la casilla marcada ya no esté a la vista para desmarcarla.
+   *
+   * Venta 300.000 € · compra 200.000 € · comisión 3 % (valor por defecto) · sin plusvalía
+   * municipal (faltan sus datos, así que queda «Sin calcular» y fuera del neto).
+   *   valor de transmisión = 300.000 − 9.000                         = 291.000,00 €
+   *   ganancia             = 291.000 − 200.000                       =  91.000,00 €
+   *   con vivienda habitual y 300.000 € reinvertidos: importe obtenido 291.000 €,
+   *     proporción reinvertida = mín(1; 300.000/291.000) = 1 → EXENTO, neto 291.000,00 €
+   *   al desmarcar la vivienda habitual (TRAMOS_GANANCIAS_PATRIMONIALES_2025):
+   *     6.000 × 19 %  =  1.140,00
+   *    44.000 × 21 %  =  9.240,00
+   *    41.000 × 23 %  =  9.430,00
+   *     IRPF          = 19.810,00 €
+   *   total gastos = 9.000 + 19.810                                  =  28.810,00 €
+   *   neto         = 300.000 − 28.810                                = 271.190,00 €
+   */
+  test('CASO 44 (debe rechazarse) — la reinversión no exime una vivienda que ya no es la habitual', async ({
+    page,
+  }) => {
+    await abrir14(page);
+    await sembrar14(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar14(page, 'Precio de compra original', '200000');
+    await page.getByText('Voy a reinvertir en otra vivienda habitual').click();
+    await sembrar14(page, 'Importe que reinviertes en la nueva vivienda', '300000');
+
+    // Punto de partida: con vivienda habitual, la reinversión total sí exime
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('91.000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('291.000,00 €');
+
+    // Y al dejar de ser la vivienda habitual, el art. 38 LIRPF ya no ampara nada
+    await page.getByText('Es mi vivienda habitual').click();
+    await expect(page.getByRole('heading', { name: 'IRPF sobre ganancia' })).toBeVisible();
+    await expect
+      .poll(async () => valorTarjeta(page, 'IRPF sobre ganancia'))
+      .toBe('19.810,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('28.810,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('271.190,00 €');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 14/09/2026 (MEDIO, contenido) — el FAQPage que leen los asistentes de IA
+   * publica una TERCERA exención del IRPF que no existe, y contradice al otro FAQPage de
+   * la misma página.
+   *
+   * `metadata.ts` inyecta dos bloques: el de `jsonLd` dice «Existen dos exenciones
+   * importantes en el IRPF […]: la reinversión […] y la de los mayores de 65 años», que es
+   * lo que aplica el motor (`data/fiscal/ganancia-inmueble.ts`, arts. 38 y 33.4.b LIRPF) y
+   * lo que dice el bloque educativo visible. El de `faqJsonLd` añade «vivienda habitual con
+   * hipoteca…», que no es ninguna exención —el principal pendiente solo minora el importe
+   * obtenido a efectos del art. 41 RIRPF— y remata con puntos suspensivos que sugieren más.
+   *
+   * Caso: `curl /estimador-compraventa-inmueble/` → respuesta a «¿Qué impuestos paga el
+   * vendedor al vender un inmueble?»
+   *   esperado: las DOS exenciones que el motor aplica.
+   *   obtenido: «reinversión en vivienda habitual, mayores de 65 años, vivienda habitual
+   *     con hipoteca…». Es la boca que se cita sin el disclaimer al lado.
+   */
+  test('HALLAZGO 14/09 — el FAQPage no puede inventar una tercera exención del IRPF', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    const jsonLd = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).join(' ');
+
+    expect(jsonLd).toContain('mayores de 65 años');
+    expect(jsonLd).toContain('reinversión');
+    expect(jsonLd).not.toContain('vivienda habitual con hipoteca');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 14/09/2026 (BAJO, dato) — residuo de la reparación del 12/09: el CÁLCULO del
+   * terreno ya lee el tipo general del art. 90 LIVA, pero el bloque educativo sigue
+   * atribuyendo a los terrenos el IVA del LOCAL comercial, en dos sitios.
+   *
+   * `page.tsx:1453` («Los locales comerciales, naves industriales y terrenos pagan IVA al
+   * {IVA_INMUEBLES_2025.local}%») y `page.tsx:1550` (fila IVA de la tabla comparativa,
+   * «{obraNueva}% ({local}% locales/terrenos)»). Hoy las dos constantes valen 21, así que
+   * ninguna cifra está mal; existen separadas para poder divergir, y el día que lo hagan el
+   * texto dirá una cosa y la calculadora cobrará otra en la misma página.
+   *
+   * Caso: Ver guía educativa → tarjeta «Primera mano → IVA + AJD»
+   *   esperado: el suelo edificable citado con PORCENTAJES_IVA.general.
+   *   obtenido: agrupado con el local comercial bajo IVA_INMUEBLES_2025.local.
+   */
+  test('HALLAZGO 14/09 (dato) — el bloque educativo atribuye al terreno el IVA del local', async () => {
+    // Hoy coinciden: por eso no hay ninguna cifra mal en pantalla
+    expect(PORCENTAJES_IVA.general).toBe(IVA_INMUEBLES_2025.local);
+
+    const fuente = readFileSync(
+      join(process.cwd(), 'app/estimador-compraventa-inmueble/page.tsx'),
+      'utf8',
+    );
+    const mezclan = fuente
+      .split('\n')
+      .filter((l) => /terreno/i.test(l) && l.includes('IVA_INMUEBLES_2025.local'));
+    expect(mezclan, 'ninguna línea debe atribuir al terreno el IVA del local').toEqual([]);
+  });
+
+  /**
+   * ⚠️ HALLAZGO 14/09/2026 (BAJO, dato) — el ejemplo de «Marta» deriva del motor el tipo y
+   * el importe, pero teclea a mano el TOPE de valor y la EDAD que lo condicionan.
+   *
+   * `page.tsx:1605`: «Al ser menor de 35 años y no superar los 150.000 €». Los dos datos
+   * están en la tabla —`ITP_CCAA['andalucia']`, reducido «Jóvenes < 35 años», con
+   * `valorMaximo: 150000` y la condición «Menor de 35 años»— y el párrafo ya llama a esa
+   * misma entrada para el tipo. Es la familia de los hallazgos 581, 584, 629 y 719/720,
+   * reparados uno a uno en esta app.
+   *
+   * Agravante: `EJEMPLO_MARTA_TIPO_JOVEN` elige el reducido POR NOMBRE y no comprueba su
+   * `valorMaximo`, así que si Andalucía bajara el tope por debajo de los 140.000 € del
+   * ejemplo, la página seguiría publicando «se aplica el tipo reducido del 3,5 %» para una
+   * compra que ya no podría acogerse, con el tope viejo escrito al lado.
+   *
+   * Caso: Ver guía educativa → tarjeta «Comprador primera vivienda»
+   *   esperado: tope y edad derivados de la ficha de la comunidad.
+   *   obtenido: «no superar los 150.000 €» y «menor de 35 años» literales.
+   */
+  test('HALLAZGO 14/09 (dato) — el ejemplo de Marta teclea el tope y la edad del reducido', async () => {
+    const joven = ITP_CCAA['andalucia'].tiposReducidos.find((t) => /j[oó]venes/i.test(t.nombre));
+    expect(joven?.valorMaximo).toBe(150000);
+    expect(joven?.condiciones).toContain('Menor de 35 años');
+
+    const fuente = readFileSync(
+      join(process.cwd(), 'app/estimador-compraventa-inmueble/page.tsx'),
+      'utf8',
+    );
+    const tecleados = fuente
+      .split('\n')
+      .filter((l) => /no superar los 150\.000 €|Al ser menor de 35 años/.test(l));
+    expect(tecleados, 'el tope y la edad del reducido no pueden ir tecleados').toEqual([]);
+  });
+});

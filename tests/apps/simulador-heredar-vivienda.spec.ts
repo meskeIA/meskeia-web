@@ -132,7 +132,13 @@ import {
   leerValorEnReact,
   sembrarValorAcotado,
 } from './_hidratacion';
-import { calcularSucesion, type GrupoParentescoIS } from '../../lib/calculadoras/sucesiones';
+import {
+  calcularSucesion,
+  // Añadido el 14/09/2026: la edad mínima del colateral del art. 20.2.c, para comprobar que
+  // la cifra que lee el usuario sale de la misma constante que decide la reducción
+  EDAD_MIN_COLATERAL_VIVIENDA_IS,
+  type GrupoParentescoIS,
+} from '../../lib/calculadoras/sucesiones';
 import {
   BONIFICACIONES_CCAA_IS,
   REDUCCIONES_PARENTESCO_IS,
@@ -3779,5 +3785,673 @@ test.describe('Simulador de heredar vivienda — re-inspección 12/09/2026', () 
     );
     expect(meta).not.toContain('bonificaciones del 99%');
     expect(meta).toContain('${BONIFICACION_MADRID_PCT}% para familiares directos');
+  });
+});
+
+/**
+ * ─── Re-inspección del 14/09/2026 (la 9ª) ────────────────────────────────────
+ *
+ * Los siete hallazgos del 12/09 se dan por CERRADOS y quedan cercados por los tests
+ * [778]-[784] de arriba; esta tanda los re-ejercita de paso y añade tres casos nuevos más
+ * ocho hallazgos abiertos.
+ *
+ * Los tres casos, resueltos A MANO antes de abrir el navegador (la aritmética completa va
+ * en el comentario de cada uno), y ninguna cifra esperada de memoria: todas salen de
+ * `data/fiscal/sucesiones.ts`, `data/fiscal/inmuebles.ts` o de la norma que esos módulos
+ * citan.
+ *
+ *   · CASO 1 (normal)  — hijo, Madrid, vivienda habitual de 300.000 € y venta a los 12
+ *     años, o sea FUERA del plazo de mantenimiento: la cadena entera sin regularización.
+ *   · CASO 2 (límite)  — la FRONTERA EXACTA del plazo del art. 20.2.c: la misma herencia
+ *     de Asturias vendida a los 9 años (dentro) y a los 10 (justo fuera).
+ *   · CASO 3 (rechazo) — Grupo IV con la casilla de vivienda habitual marcada y venta a
+ *     los 2 años: se rechaza la reducción, se rechaza la regularización (no hay reducción
+ *     que perder) y se rechaza el IRPF (pérdida patrimonial).
+ *
+ * ⚠️ HALLAZGOS ABIERTOS de esta tanda, cada uno con su `test.fail()`:
+ *   [H1] el «ISD regularizado» se cobra en el total y NO entra en el valor de adquisición
+ *        fiscal del IRPF, pese a que la nota al pie promete «cuota ISD … pagadas».
+ *   [H2] el `faqJsonLd` publica una ganancia patrimonial (venta − valor declarado) que el
+ *        motor no calcula, y que es justo el error que la propia página lista como
+ *        «error frecuente a evitar».
+ *   [H3] la casilla de vivienda habitual anuncia el tope ESTATAL también en Cataluña,
+ *        donde la app aplica el del art. 17 de la Ley 19/2010.
+ *   [H4] el aviso de mantenimiento escribe «mantenerla 10» sin la unidad.
+ *   [H5] el plazo de la complementaria se cuenta «desde la venta» con la constante cuyo
+ *        dies a quo es el FALLECIMIENTO.
+ *   [H6] el plazo del IIVTNU se sirve desde `PLAZO_ISD`, que es de otro tributo.
+ *   [H7] los 65 años del colateral van tecleados mientras su constante queda importada y
+ *        sin usar.
+ *   [H8] el panel llama «Exenta» a lo que el `faqJsonLd` declara supuesto de NO SUJECIÓN.
+ */
+test.describe('Simulador de heredar vivienda — re-inspección 14/09/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — hijo de 50 años, Comunidad de Madrid, vivienda habitual del padre
+   * valorada en 300.000 €, comprada hace 25 años por 100.000 €, catastral del suelo
+   * 90.000 € sobre un catastral total de 150.000 €, y venta a los 12 años por 380.000 €.
+   *
+   * Se elige 12 años a propósito: por encima de los
+   * REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS = 10 del art. 20.2.c, para que la cadena se
+   * mida SIN la regularización del hallazgo 778 y quede separada del CASO 2.
+   *
+   * ISD:
+   *   Caudal relicto                                              300.000,00
+   *   + Ajuar art. 15 LISD  PORC_AJUAR_DOMESTICO_IS = 3 %          +9.000,00
+   *   = Base imponible                                            309.000,00
+   *   − Parentesco      REDUCCIONES_PARENTESCO_IS['II']           −15.956,87
+   *   − Vivienda        mín(300.000 × 0,95; 122.606,47)          −122.606,47
+   *   = Base liquidable                                           170.436,66
+   *   Cuota íntegra por la COLUMNA `cuota` de TARIFA_ESTATAL_IS (tramo hasta 239.389,13):
+   *        23.063,25 + (170.436,66 − 159.634,83) × 21,25 %
+   *      = 23.063,25 + 2.295,388875 = 25.358,638875 → «25.358,64 €»
+   *   × COEFICIENTES_IS['II'][0] = 1,0000 → cuota tributaria 25.358,64
+   *   − Bonificación Madrid 99 % = 25.105,0536 → 25.105,05 (se redondea ANTES de restar)
+   *   = Cuota ISD final 253,59 €
+   *
+   * Plusvalía municipal de la HERENCIA (tipo orientativo del módulo, 25 %):
+   *   25 años de tenencia → topados en 20 → COEFICIENTES_IIVTNU_2025[20] = 0,45
+   *   Objetivo = 90.000 × 0,45 × 0,25 = 10.125,00
+   *   Real     = (300.000 − 100.000) × (90.000 / 150.000) × 0,25 = 30.000,00
+   *   Menor (RDL 26/2021) → 10.125,00 €
+   *
+   * Plusvalía municipal de la VENTA (hallazgo 779): 12 años → coeficiente 0,08
+   *   Objetivo = 90.000 × 0,08 × 0,25 = 1.800,00 · Real = 80.000 × 0,6 × 0,25 = 12.000,00
+   *   Menor → 1.800,00 €
+   *
+   * IRPF:
+   *   Valor de adquisición fiscal = 300.000 + 253,59 + 10.125,00 = 310.378,59
+   *   Valor de transmisión (art. 35.2 LIRPF) = 380.000 − 1.800 = 378.200,00
+   *   Ganancia = 67.821,41
+   *        6.000,00 × 19 % =  1.140,00
+   *       44.000,00 × 21 % =  9.240,00
+   *       17.821,41 × 23 % =  4.098,9243
+   *                           ──────────
+   *                            14.478,9243 → «14.478,92 €»
+   *
+   * TOTAL = 253,59 + 10.125,00 + 1.800,00 + 14.478,9243 = 26.657,5143 → «26.657,51 €»
+   * Porcentaje sobre la venta = 26.657,5143 / 380.000 × 100 = 7,0151 → «7,02%»
+   */
+  test('CASO 1 (normal) — hijo, Madrid, 300.000 € de vivienda habitual y venta a los 12 años', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'madrid');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'anioAdq', ANIO - 25);
+    await mover(page, 'valorAdq', 100000);
+    await mover(page, 'valorRef', 300000);
+    await mover(page, 'valorSuelo', 90000);
+    await mover(page, 'valorCatastralTotal', 150000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 12);
+    await mover(page, 'valorVta', 380000);
+
+    // ── ISD ──────────────────────────────────────────────────────────────────
+    expect(await linea(page, ISD, '+ Ajuar doméstico (3 % del caudal, art. 15 LISD)')).toBe(
+      '+9000,00 €'
+    );
+    expect(await linea(page, ISD, '= Base imponible')).toBe('309.000,00 €');
+    // REDUCCIONES_PARENTESCO_IS['II'] = 15.956,87 €
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−15.956,87 €');
+    // Topada en REDUCCION_VIVIENDA_MAX_IS = 122.606,47 € (300.000 × 0,95 lo supera)
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−122.606,47 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('170.436,66 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('25.358,64 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo II)')).toBe('×1,0000');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('25.358,64 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('253,59 €');
+
+    // 12 ≥ 10: el art. 20.2.c queda cumplido y NO hay complementaria
+    expect(await panel(page, ISD)).not.toContain('Pierdes la reducción');
+
+    // ── Plusvalía municipal de la herencia ───────────────────────────────────
+    expect(await panel(page, IIVTNU)).toContain('20 años de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente 20 años')).toBe('0,45');
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('10.125,00 €');
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('30.000,00 €');
+    expect(await linea(page, IIVTNU, 'Método elegido')).toBe('Objetivo (menor)');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('10.125,00 €');
+
+    // ── IRPF ─────────────────────────────────────────────────────────────────
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('310.378,59 €');
+    expect(await linea(page, IRPF, '= Valor de transmisión**')).toBe('378.200,00 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('67.821,41 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('14.478,92 €');
+
+    // ── Total ────────────────────────────────────────────────────────────────
+    const total = await bloqueTotal(page);
+    expect(total).toContain('+ Plusvalía municipal (venta) 1800,00 €');
+    expect(total).toContain('= TOTAL 26.657,51 €');
+    expect(total).toContain('7,02%');
+    // Nunca formato US: el punto es el millar y la coma el decimal
+    expect(total).not.toMatch(/26,657\.51/);
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — la FRONTERA EXACTA del plazo de mantenimiento del art. 20.2.c LISD.
+   *
+   * La condición de la app es `aniosHastaVenta < REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS`,
+   * así que el borde está entre el año 9 (dentro, hay complementaria) y el 10 (cumplido, no
+   * la hay). Se cerca por los dos lados con la MISMA herencia, para que lo único que cambie
+   * sea el deslizador de años.
+   *
+   * Hijo de 50 años, Asturias —la única CCAA cuyo beneficio vive en la BASE—, vivienda
+   * habitual de 450.000 € comprada hace 18 años por 180.000 €, catastral del suelo 90.000 €
+   * sobre 225.000 € de catastral total, venta por 550.000 €.
+   *
+   * ISD (idéntico en los dos lados del borde: la venta no cambia la liquidación inicial):
+   *   Base imponible 450.000 × 1,03                                463.500,00
+   *   − Parentesco   REDUCCIONES_PARENTESCO_IS['II']               −15.956,87
+   *   − Vivienda     mín(450.000 × 0,95; 122.606,47)              −122.606,47
+   *   − Autonómica   asturias…['II'].reduccionBase                −300.000,00
+   *   = Base liquidable                                             24.936,66
+   *   Cuota íntegra (tramo hasta 31.955,81): 2.037,26 + (24.936,66 − 23.968,36) × 10,20 %
+   *                 = 2.037,26 + 98,7666 = 2.136,0266 → «2136,03 €»
+   *   × 1,0000 y Asturias no bonifica en cuota → Cuota ISD final 2.136,03 €
+   *
+   * Y lo que habría que ingresar si se pierde la reducción (isdSinReduccionVivienda):
+   *   Base liquidable 463.500 − 15.956,87 − 300.000 = 147.543,13
+   *   Cuota íntegra (tramo hasta 159.634,83): 15.606,22 + 27.785,46 × 18,70 % = 20.802,10102
+   *   Regularización = 20.802,10 − 2.136,03 = 18.666,07 €
+   *
+   * Plusvalía de la HERENCIA: 18 años → coeficiente 0,26
+   *   Objetivo = 90.000 × 0,26 × 0,25 = 5.850,00 · Real = 270.000 × 0,4 × 0,25 = 27.000,00
+   *   Menor → 5.850,00 €
+   *
+   * (a) VENTA A LOS 9 AÑOS — dentro del plazo:
+   *   Plusvalía de la venta: coeficiente 0,09 → objetivo 90.000 × 0,09 × 0,25 = 2.025,00
+   *                          (real = 100.000 × 0,4 × 0,25 = 10.000) → 2.025,00 €
+   *   Valor de adquisición fiscal = 450.000 + 2.136,03 + 5.850,00 = 457.986,03
+   *   Valor de transmisión = 550.000 − 2.025 = 547.975,00 · Ganancia = 89.988,97
+   *   IRPF = 1.140,00 + 9.240,00 + 39.988,97 × 23 % = 19.577,4631 → «19.577,46 €»
+   *   TOTAL = 2.136,03 + 18.666,07 + 5.850,00 + 2.025,00 + 19.577,4631 = 48.254,5631
+   *
+   * (b) VENTA A LOS 10 AÑOS — justo en el borde, plazo CUMPLIDO:
+   *   Plusvalía de la venta: coeficiente 0,08 → 90.000 × 0,08 × 0,25 = 1.800,00 €
+   *   Valor de transmisión = 548.200,00 · Ganancia = 90.213,97
+   *   IRPF = 1.140,00 + 9.240,00 + 40.213,97 × 23 % = 19.629,2131 → «19.629,21 €»
+   *   TOTAL = 2.136,03 + 5.850,00 + 1.800,00 + 19.629,2131 = 29.415,2431
+   */
+  test('CASO 2 (límite) — la frontera del plazo del art. 20.2.c: 9 años dentro, 10 fuera', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'asturias');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'anioAdq', ANIO - 18);
+    await mover(page, 'valorAdq', 180000);
+    await mover(page, 'valorRef', 450000);
+    await mover(page, 'valorSuelo', 90000);
+    await mover(page, 'valorCatastralTotal', 225000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 9);
+    await mover(page, 'valorVta', 550000);
+
+    // ── (a) a los 9 años: dentro del plazo ───────────────────────────────────
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('24.936,66 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('2136,03 €');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('5850,00 €');
+
+    const avisoDentro = await panel(page, ISD);
+    expect(avisoDentro).toContain('Pierdes la reducción por vivienda habitual');
+    expect(avisoDentro).toContain('vendes a los 9 años');
+    // Lo que hay que ingresar en la complementaria, resuelto arriba a mano
+    expect(avisoDentro).toContain('18.666,07 €');
+
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('457.986,03 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('89.988,97 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('19.577,46 €');
+
+    const totalDentro = await bloqueTotal(page);
+    expect(totalDentro).toContain(
+      `+ ISD regularizado (venta antes de ${REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años) 18.666,07 €`
+    );
+    expect(totalDentro).toContain('= TOTAL 48.254,56 €');
+
+    // ── (b) el mismo caso a los 10 años: el borde exacto, plazo cumplido ──────
+    await mover(page, 'aniosVenta', 10);
+
+    // La liquidación inicial no se mueve: lo que desaparece es la complementaria
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('2136,03 €');
+    expect(await panel(page, ISD)).not.toContain('Pierdes la reducción');
+
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('90.213,97 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('19.629,21 €');
+
+    const totalFuera = await bloqueTotal(page);
+    expect(totalFuera).not.toContain('ISD regularizado');
+    expect(totalFuera).toContain('= TOTAL 29.415,24 €');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — tres negativas encadenadas en la misma pantalla.
+   *
+   * Grupo IV (sin parentesco) de 50 años, Madrid, con la casilla de vivienda habitual
+   * MARCADA, valor de referencia 250.000 €, comprada hace 5 años por 200.000 €, catastral
+   * del suelo 60.000 € sobre 120.000 €, y venta a los 2 años por 260.000 €.
+   *
+   *   1. La reducción del art. 20.2.c se DENIEGA y se dice por qué: `evaluarReduccionVivienda`
+   *      excluye al Grupo IV («el art. 20.2.c LISD no la contempla»).
+   *   2. Como no hay reducción, tampoco puede haber complementaria: el aviso de
+   *      mantenimiento NO debe salir pese a vender a los 2 años, que están dentro del plazo.
+   *   3. El IRPF se rechaza por PÉRDIDA patrimonial: la cuota de ISD del Grupo IV es tan
+   *      alta que el valor de adquisición fiscal supera al de transmisión.
+   *
+   * ISD:
+   *   Base imponible 250.000 × 1,03                                257.500,00
+   *   − Parentesco   REDUCCIONES_PARENTESCO_IS['IV'] = 0                 0,00
+   *   − Vivienda     denegada                                           0,00
+   *   = Base liquidable                                           257.500,00
+   *   Cuota íntegra (tramo hasta 398.777,54): 40.011,04 + (257.500 − 239.389,13) × 25,50 %
+   *                 = 40.011,04 + 4.618,27185 = 44.629,31185 → «44.629,31 €»
+   *   × COEFICIENTES_IS['IV'][0] = 2,0000 → 89.258,62
+   *   Madrid no bonifica al Grupo IV (porcentaje 0) → Cuota ISD final 89.258,62 €
+   *
+   * Plusvalía de la HERENCIA: 5 años → coeficiente 0,17
+   *   Objetivo = 60.000 × 0,17 × 0,25 = 2.550,00 · Real = 50.000 × 0,5 × 0,25 = 6.250,00
+   *   Menor → 2.550,00 € (objetivo)
+   *
+   * Plusvalía de la VENTA: 2 años → coeficiente 0,15
+   *   Objetivo = 60.000 × 0,15 × 0,25 = 2.250,00 · Real = 10.000 × 0,5 × 0,25 = 1.250,00
+   *   Menor → 1.250,00 € (aquí gana el método REAL, al revés que en los otros dos casos)
+   *
+   * IRPF:
+   *   Valor de adquisición fiscal = 250.000 + 89.258,62 + 2.550,00 = 341.808,62
+   *   Valor de transmisión = 260.000 − 1.250 = 258.750,00
+   *   Ganancia = −83.058,62 → pérdida patrimonial, cuota 0,00 €
+   *
+   * TOTAL = 89.258,62 + 2.550,00 + 1.250,00 + 0 = 93.058,62 € (35,79 % de la venta)
+   */
+  test('CASO 3 (rechazo) — Grupo IV: vivienda denegada, sin complementaria y con pérdida', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'sin_parentesco');
+    await page.selectOption('#ccaaSel', 'madrid');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'anioAdq', ANIO - 5);
+    await mover(page, 'valorAdq', 200000);
+    await mover(page, 'valorRef', 250000);
+    await mover(page, 'valorSuelo', 60000);
+    await mover(page, 'valorCatastralTotal', 120000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 2);
+    await mover(page, 'valorVta', 260000);
+
+    // 1. La reducción se deniega, y se dice por qué (no se calla ni se aplica a medias)
+    const panelISD = await panel(page, ISD);
+    expect(panelISD).toContain(
+      'No aplicable: sin parentesco: el art. 20.2.c LISD no la contempla'
+    );
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('257.500,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('44.629,31 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo IV)')).toBe('×2,0000');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('89.258,62 €');
+
+    // 2. Vender a los 2 años NO dispara la complementaria: no hay reducción que perder
+    expect(panelISD).not.toContain('Pierdes la reducción');
+
+    // 3. El IRPF se rechaza por pérdida patrimonial
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('341.808,62 €');
+    expect(await linea(page, IRPF, 'Pérdida patrimonial')).toBe('−83.058,62 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('0,00 €');
+
+    const total = await bloqueTotal(page);
+    expect(total).not.toContain('ISD regularizado');
+    // En la venta gana el método REAL (1.250 €), no el objetivo (2.250 €)
+    expect(total).toContain('+ Plusvalía municipal (venta) 1250,00 €');
+    expect(total).toContain('= TOTAL 93.058,62 €');
+    expect(total).toContain('35,79%');
+  });
+
+  /**
+   * [H1] MEDIO — el «ISD regularizado» se cobra en el total y NO engorda el valor de
+   * adquisición fiscal del IRPF.
+   *
+   * Cuando la venta cae dentro del plazo de mantenimiento, la app añade al total una línea
+   * «+ ISD regularizado» —el ISD que hay que ingresar en la complementaria— y a la vez
+   * calcula el valor de adquisición fiscal con la cuota de ISD INICIAL solamente:
+   *
+   *     const valorAdquisicionFiscal = valorReferenciaISD + cuotaISD + cuotaIIVTNU;
+   *
+   * donde `cuotaISD` es `isd.cuotaFinal` y no `isd.cuotaFinal + regularizacionVivienda`.
+   *
+   * El art. 36 LIRPF remite al 35.1, que manda sumar al importe real «los gastos y tributos
+   * inherentes a la adquisición … satisfechos por el adquirente»; y lo que se satisface por
+   * la adquisición, en este escenario, es el ISD ENTERO — que es precisamente la cifra que
+   * la app acaba de escribir en el bloque total. La página además se contradice consigo
+   * misma por dos sitios: la nota al pie del panel del IRPF dice «* Valor referencia ISD +
+   * cuota ISD + cuota plusvalía pagadas», y su propia lista de errores frecuentes advierte
+   * de «calcular la ganancia patrimonial al vender sin sumar ISD ni plusvalía pagados al
+   * valor de adquisición fiscal: pagas IRPF de más».
+   *
+   * Caso (el del CASO 2a, con la aritmética ya desarrollada allí):
+   *   ISD inicial 2.136,03 € + ISD regularizado 18.666,07 € = 20.802,10 € de ISD pagado.
+   *   Valor de adquisición fiscal esperado = 450.000 + 20.802,10 + 5.850,00 = 476.652,10 €
+   *   Ganancia = 547.975,00 − 476.652,10 = 71.322,90 €
+   *   IRPF = 1.140,00 + 9.240,00 + 21.322,90 × 23 % = 15.284,267 → 15.284,27 €
+   *   TOTAL = 2.136,03 + 18.666,07 + 5.850,00 + 2.025,00 + 15.284,267 = 43.961,367 €
+   *
+   *   La app da 457.986,03 € de valor de adquisición, 19.577,46 € de IRPF y 48.254,56 € de
+   *   total: 4.293,19 € de más, un 9,8 % del coste que anuncia.
+   */
+  test.fail(
+    '[H1] el ISD regularizado se cobra en el total y no entra en el valor de adquisición del IRPF',
+    async ({ page }) => {
+      await abrir(page);
+
+      await page.selectOption('#parentescoSel', 'hijo');
+      await page.selectOption('#ccaaSel', 'asturias');
+      await mover(page, 'edadHer', 50);
+      await mover(page, 'anioAdq', ANIO - 18);
+      await mover(page, 'valorAdq', 180000);
+      await mover(page, 'valorRef', 450000);
+      await mover(page, 'valorSuelo', 90000);
+      await mover(page, 'valorCatastralTotal', 225000);
+      await casilla(page, 'viviendaHabitual', true);
+      await mover(page, 'aniosVenta', 9);
+      await mover(page, 'valorVta', 550000);
+
+      // El ISD que la propia página dice que hay que pagar, leído de la pantalla
+      const isdInicial = importe(await linea(page, ISD, 'Cuota ISD final'));
+      const total = await bloqueTotal(page);
+      // El importe va detrás del rótulo «+ ISD regularizado (venta antes de 10 años)», que
+      // lleva dentro un número: el patrón exige coma decimal y dos cifras para no picar en él.
+      const regularizado = importe(
+        total.match(/ISD regularizado[^€]*?([\d.]+,\d{2}) €/)?.[1] ?? '0'
+      );
+      const iivtnuHerencia = importe(await linea(page, IIVTNU, 'Cuota plusvalía municipal'));
+      expect(isdInicial + regularizado).toBeCloseTo(20802.1, 2);
+
+      // Y el valor de adquisición fiscal que la app usa para el IRPF
+      const valorAdquisicion = importe(await linea(page, IRPF, 'Valor adquisición fiscal*'));
+      expect(
+        valorAdquisicion,
+        'el valor de adquisición debe incluir TODO el ISD satisfecho (art. 35.1.b LIRPF)'
+      ).toBeCloseTo(450000 + isdInicial + regularizado + iivtnuHerencia, 2);
+
+      expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('71.322,90 €');
+      expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('15.284,27 €');
+      expect(await bloqueTotal(page)).toContain('= TOTAL 43.961,37 €');
+    }
+  );
+
+  /**
+   * [H2] MEDIO — el `faqJsonLd` publica una ganancia patrimonial que el motor no calcula.
+   *
+   * La tercera pregunta —la que leen Bing Copilot, ChatGPT, Perplexity y Gemini sin el
+   * disclaimer al lado— dice: «La ganancia patrimonial se calcula como la diferencia entre
+   * el precio de venta y el valor declarado en la herencia (que actúa como precio de
+   * adquisición)».
+   *
+   * La app no hace eso: suma al valor declarado el ISD y la plusvalía municipal pagados al
+   * heredar (art. 35.1.b LIRPF) y resta del precio la plusvalía municipal de la venta
+   * (art. 35.2 LIRPF). Es la misma página la que lo explica, dos veces, en el bloque
+   * educativo: el paso 5 de la cronología y la tarjeta «Suma los impuestos pagados al valor
+   * de adquisición». Y su lista de errores frecuentes llama «error a evitar» exactamente a
+   * lo que la FAQ publica.
+   *
+   * Caso (el del CASO 1): la fórmula de la FAQ da 380.000 − 300.000 = 80.000 € de ganancia
+   * y la app calcula 67.821,41 €. Al 23 % marginal son 2.801,68 € de IRPF de diferencia.
+   */
+  test.fail('[H2] el faqJsonLd publica una ganancia que el motor no calcula', async ({ page }) => {
+    await abrir(page);
+
+    const respuesta =
+      (await faqServida(page)).find(q => q.name.includes('IRPF se paga al vender'))?.acceptedAnswer
+        .text ?? '';
+    expect(respuesta, 'la FAQ debe existir').not.toBe('');
+
+    // El valor de adquisición del art. 36 LIRPF no es el valor declarado a secas
+    expect(
+      respuesta,
+      'la FAQ tiene que decir que al valor declarado se le suman los tributos satisfechos'
+    ).toMatch(/ISD pagad|impuestos pagados|tributos inherentes/i);
+
+    // Y el de transmisión tampoco es el precio a secas (hallazgo 779, ya reparado en la app)
+    expect(respuesta).toMatch(/plusvalía municipal de la venta|art\. 35\.2/i);
+
+    // Lo que de verdad calcula la app con ese mismo supuesto
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'madrid');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'anioAdq', ANIO - 25);
+    await mover(page, 'valorAdq', 100000);
+    await mover(page, 'valorRef', 300000);
+    await mover(page, 'valorSuelo', 90000);
+    await mover(page, 'valorCatastralTotal', 150000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 12);
+    await mover(page, 'valorVta', 380000);
+    expect(importe(await linea(page, IRPF, 'Ganancia patrimonial'))).toBeCloseTo(67821.41, 2);
+  });
+
+  /**
+   * [H3] MEDIO — la casilla de vivienda habitual anuncia el tope ESTATAL también en
+   * Cataluña, donde la app aplica el del art. 17 de la Ley 19/2010.
+   *
+   * La etiqueta se escribe sin mirar la comunidad:
+   *
+   *     (reducción {PORC_REDUCCION_VIVIENDA}% ISD hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)})
+   *
+   * y lo mismo la tarjeta «Aprovecha la reducción de vivienda habitual» de buenas prácticas.
+   * `REDUCCION_VIVIENDA_MAX_CATALUNA_IS` = 500.000 € está sellada en `data/fiscal` desde el
+   * 08/09/2026 y `metadata.ts` ya la importa para el faqJsonLd; `page.tsx` no la importa.
+   *
+   * Es la forma exacta del hallazgo 696 —el plazo de mantenimiento que no conocía los 5 años
+   * de Cataluña— reaparecida sobre el TOPE en vez de sobre el plazo.
+   *
+   * Caso: Cataluña, hijo de 50 años, vivienda habitual de 400.000 €.
+   *   La app aplica mín(400.000 × 0,95; 500.000) = 380.000,00 € y deja la base liquidable en
+   *   0,00 €, mientras la etiqueta de la casilla que acaba de marcarse promete «hasta
+   *   122.606,47 €» — tres veces menos de lo que la propia app está aplicando.
+   */
+  test.fail('[H3] en Cataluña la casilla anuncia el tope estatal y la app aplica el catalán', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'valorRef', 400000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 0);
+
+    // Lo que la app APLICA: el tope catalán del art. 17 de la Ley 19/2010
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−380.000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('0,00 €');
+
+    // Lo que la etiqueta de esa misma casilla ANUNCIA
+    const etiqueta = (await page.locator('label:has(#viviendaHabitual)').innerText()).replace(
+      /\s+/g,
+      ' '
+    );
+    const topeCatalan = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2 }).format(
+      REDUCCION_VIVIENDA_MAX_CATALUNA_IS
+    );
+    expect(etiqueta, 'la etiqueta debe anunciar el tope que la app va a aplicar').toContain(
+      topeCatalan
+    );
+  });
+
+  /**
+   * [H4] BAJO — el aviso de mantenimiento escribe el plazo sin unidad.
+   *
+   * El JSX es `exige mantenerla {aniosMantenimiento}` y la línea siguiente abre con el
+   * paréntesis de Cataluña, así que en régimen común sale literalmente «el art. 20.2.c LISD
+   * exige mantenerla 10. Hay que presentar…». Un plazo sin unidad en una app de riesgo 1 no
+   * es un detalle tipográfico: «10» puede leerse como meses tan fácilmente como años, y el
+   * aviso va justo encima de una cifra que hay que ingresar.
+   *
+   * Caso: el estado de fábrica de la app (hijo, Madrid, vivienda habitual, venta a los 5
+   * años) ya lo enseña, y se ve en el HTML servido sin necesidad de tocar nada.
+   */
+  test.fail('[H4] el aviso de mantenimiento escribe el plazo sin la unidad', async ({ page }) => {
+    await abrir(page);
+
+    // Estado de fábrica: vivienda habitual marcada y venta a los 5 años
+    const aviso = await panel(page, ISD);
+    expect(aviso).toContain('Pierdes la reducción por vivienda habitual');
+    expect(aviso).toContain(
+      `exige mantenerla ${REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años`
+    );
+  });
+
+  /**
+   * [H5] MEDIO — el plazo de la complementaria se cuenta «desde la venta» con la constante
+   * cuyo dies a quo es el FALLECIMIENTO.
+   *
+   * El aviso cierra con `El plazo es de {PLAZO_ISD.mesesPresentacion} meses desde la venta.`
+   * y `PLAZO_ISD.mesesPresentacion` está sellado en `data/fiscal/sucesiones.ts` como
+   * «Meses desde el fallecimiento para presentar la autoliquidación (art. 67.1.a)». El
+   * art. 67.1.a del RD 1629/1991 dice, literalmente, «seis meses, contados desde el día del
+   * fallecimiento del causante»: no habla de la pérdida sobrevenida de una reducción ni de
+   * ningún plazo que arranque en la venta.
+   *
+   * O sea, la app publica una fecha límite que la constante de la que la lee no respalda, y
+   * lo hace en el mismo aviso donde SÍ cita bien la norma de la reducción. Es el hallazgo
+   * 782 —el plazo que iba a mano y sin norma— repetido al revés: ahora hay constante, pero
+   * se le pide algo que no dice.
+   */
+  test.fail('[H5] el plazo de la complementaria se cuenta desde la venta con la constante del fallecimiento', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    expect(await panel(page, ISD)).toContain('Pierdes la reducción por vivienda habitual');
+    expect(
+      await panel(page, ISD),
+      `PLAZO_ISD.mesesPresentacion (${PLAZO_ISD.mesesPresentacion}) cuenta desde el fallecimiento, no desde la venta`
+    ).not.toContain(`${PLAZO_ISD.mesesPresentacion} meses desde la venta`);
+
+    // Y el JSX que lo escribe, para que la regresión se vea sin navegador
+    const jsx = readFileSync(
+      resolve(__dirname, '..', '..', 'app', 'simulador-heredar-vivienda', 'page.tsx'),
+      'utf8'
+    );
+    expect(jsx).not.toMatch(/\{PLAZO_ISD\.mesesPresentacion\} meses desde la venta/);
+  });
+
+  /**
+   * [H6] BAJO — el plazo del IIVTNU se sirve desde `PLAZO_ISD`, que es de otro tributo.
+   *
+   * La fila «Plusvalía municipal (IIVTNU)» de la tabla «Los tres impuestos en cadena» y el
+   * último punto de «Errores frecuentes» escriben los dos
+   * `{PLAZO_ISD.mesesPresentacion} meses`, con la constante del Impuesto de Sucesiones.
+   * El plazo del IIVTNU lo fija el art. 110.2.b del TRLHL (RDL 2/2004) y tiene además una
+   * prórroga distinta —hasta un año a solicitud del sujeto pasivo, no los seis meses del
+   * art. 68 RISD—, así que el día que uno de los dos se mueva, la app moverá el otro sin
+   * que nadie se entere. `grep -rn "PLAZO_IIVTNU" data/` no devuelve nada.
+   *
+   * Es el caso de PLAZO_ITP (hallazgo 713) y el de PLAZO_ISD (hallazgo 782) por tercera vez:
+   * un dato normativo que se enseña sin una fuente propia que revisar.
+   */
+  test.fail('[H6] el plazo del IIVTNU no tiene constante propia y se toma de PLAZO_ISD', async () => {
+    const inmuebles = readFileSync(
+      resolve(__dirname, '..', '..', 'data', 'fiscal', 'inmuebles.ts'),
+      'utf8'
+    );
+    expect(
+      inmuebles,
+      'el plazo del IIVTNU (art. 110.2.b TRLHL) necesita su propio dato sellado'
+    ).toMatch(/export const PLAZO_IIVTNU/);
+  });
+
+  /**
+   * [H7] BAJO — los 65 años del colateral van tecleados y su constante queda importada sin
+   * usar.
+   *
+   * `page.tsx` importa `EDAD_MIN_COLATERAL_VIVIENDA_IS` y lo reexpone en la línea
+   *
+   *     const EDAD_MIN_COLATERAL_VIVIENDA = EDAD_MIN_COLATERAL_VIVIENDA_IS;
+   *
+   * …que no se usa en ninguna parte: es la única aparición del identificador en las 1.716
+   * líneas del fichero. Mientras tanto el 65 va escrito a mano en los dos sitios donde lo
+   * lee el usuario —la etiqueta de la casilla de convivencia, que es el control que gobierna
+   * el requisito, y la pregunta «¿Cómo afecta que fuera la vivienda habitual del
+   * fallecido?»—. Quien decide de verdad es `evaluarReduccionVivienda`, que sí lee la
+   * constante y con ella redacta el rechazo.
+   *
+   * Caso: hermano de 64 años, Madrid, vivienda habitual de 300.000 € y convivencia marcada.
+   *   La app deniega con «No aplicable: pariente colateral menor de 65 años» (texto DERIVADO
+   *   de la constante) mientras la casilla de al lado promete el requisito con un 65
+   *   tecleado. Hoy coinciden; el día que la constante cambie, no.
+   */
+  test.fail('[H7] los 65 años del colateral van a mano y la constante queda sin usar', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'hermano');
+    await page.selectOption('#ccaaSel', 'madrid');
+    await mover(page, 'valorRef', 300000);
+    await casilla(page, 'viviendaHabitual', true);
+    await casilla(page, 'convivencia', true);
+    await mover(page, 'aniosVenta', 0);
+    await mover(page, 'edadHer', EDAD_MIN_COLATERAL_VIVIENDA_IS - 1);
+
+    // El rechazo SÍ sale de la constante
+    expect(await panel(page, ISD)).toContain(
+      `pariente colateral menor de ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años`
+    );
+    // Y un año más tarde la reducción entra
+    await mover(page, 'edadHer', EDAD_MIN_COLATERAL_VIVIENDA_IS);
+    // Topada en REDUCCION_VIVIENDA_MAX_IS = 122.606,47 € (300.000 × 0,95 lo supera)
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−122.606,47 €');
+
+    // Pero el número que lee el usuario va tecleado, y la constante local está muerta
+    const jsx = readFileSync(
+      resolve(__dirname, '..', '..', 'app', 'simulador-heredar-vivienda', 'page.tsx'),
+      'utf8'
+    );
+    const usos = (jsx.match(/\bEDAD_MIN_COLATERAL_VIVIENDA\b/g) ?? []).length;
+    expect(usos, 'la constante local solo aparece en su propia declaración').toBeGreaterThan(1);
+    expect(jsx).not.toContain('tener 65 años o más');
+  });
+
+  /**
+   * [H8] BAJO — el panel llama «Exenta» a lo que el `faqJsonLd` declara supuesto de NO
+   * SUJECIÓN.
+   *
+   * La segunda pregunta del faqJsonLd, reparada el 12/09/2026 (hallazgo 783), insiste en la
+   * distinción: «el impuesto NO se devenga (art. 104.5 TRLHL …): es un supuesto de no
+   * sujeción». El panel de la plusvalía, para ese mismo escenario, rotula «Exenta (sin
+   * ganancia)» y «Exenta», y la pregunta del bloque educativo se titula «¿La plusvalía
+   * municipal está exenta si hay pérdida?».
+   *
+   * No es sinónimo y la propia FAQ se toma la molestia de decirlo: una exención se reconoce
+   * sobre un hecho imponible realizado, y la no sujeción significa que no hay hecho imponible
+   * que declarar más allá de aportar las escrituras. La reparación llegó al canal que leen
+   * los asistentes de IA y no a la pantalla.
+   *
+   * Caso: adquisición 400.000 €, valor de referencia 300.000 € → «Método elegido: Exenta».
+   *
+   * ⚠️ Al repararlo hay que mover también la aserción del test [783], que hoy congela
+   * `.toBe('Exenta')` — y es lo que ha permitido que la divergencia sobreviva a la propia
+   * reparación que la creó.
+   */
+  test.fail('[H8] el panel dice «Exenta» donde el faqJsonLd declara no sujeción', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    const respuesta =
+      (await faqServida(page)).find(q => q.name.includes('plusvalía municipal al heredar'))
+        ?.acceptedAnswer.text ?? '';
+    expect(respuesta).toContain('no sujeción');
+
+    await mover(page, 'valorAdq', 400000);
+    await mover(page, 'valorRef', 300000);
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('0,00 €');
+    expect(
+      await linea(page, IIVTNU, 'Método elegido'),
+      'la pantalla tiene que decir lo mismo que el canal estructurado'
+    ).toMatch(/no sujet/i);
   });
 });

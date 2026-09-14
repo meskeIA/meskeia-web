@@ -1328,3 +1328,371 @@ test.describe('hallazgos abiertos · 12/09/2026', () => {
     expect(new Set(nombres).size).toBe(12);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 14/09/2026 — tres casos nuevos, resueltos a mano ANTES de abrir
+// el navegador. La verdad de esta app es DOCUMENTAL: los valores esperados salen
+// de `app/tabla-periodica/elementos-data.ts`, que declara su fuente en cabecera
+// (IUPAC/CIAAW 2021, https://iupac.qmul.ac.uk/AtWt/, verificado 2026-08-23), y de
+// la definición de la tabla periódica. Ninguno está copiado de lo que devuelve la app.
+//
+// Los tres hallazgos del 13/09 (775 tabla comparativa · 776 origen sintético ·
+// 777 doce «Comprobar» iguales) se comprobaron reparados antes de escribir esto:
+// la fila Gp2 dice ya «0,9–1,57», la ficha del americio dice «Origen: Sintético» y
+// los doce botones tienen doce nombres accesibles distintos. Sus tests siguen arriba.
+//
+//   CASO 13 — NORMAL. El COBALTO, elegido a propósito: es la casilla que discrimina
+//     la afirmación «El Grupo 8 IUPAC incluye Fe, Co, Ni» del bloque educativo.
+//     Resuelto a mano desde elementos-data.ts (numero: 27):
+//       Z = 27 · masa 58,933 u · grupo 9 · período 4 · metales-transicion ·
+//       estado sólido · χ 1,88 · radio 152 pm · [Ar] 3d⁷ 4s²
+//     Y las TRES vías que un estudiante usa para llegar a él, que es lo que promete
+//     el placeholder («Nombre, símbolo o número...») y el jsonLd («Búsqueda por
+//     nombre, símbolo o número atómico»):
+//       · «cobalto» → 1 (ningún otro de los 118 nombres contiene esa cadena)
+//       · «27»      → 1 (ningún Z de 1 a 118 lleva «27» como subcadena, salvo el 27)
+//       · «Co»      → 6, y no es un fallo: la comparación es por SUBCADENA y también
+//                     mira el nombre, así que entran Cobalto (símbolo), Cobre,
+//                     Arsénico, Circonio, Copernicio y Moscovio (nombre). Se cuentan
+//                     a mano sobre el módulo: co-balto, co-bre, arséni-co, cir-co-nio,
+//                     coperni-cio, mos-co-vio.
+//
+//   CASO 14 — LÍMITE. La FRONTERA natural/sintético, que es donde la clasificación
+//     de esta app se juega el dato que el 13/09 volvió a la pantalla (hallazgo 776).
+//     elementos-data.ts declara `origen: 'sintetico'` SOLO en los 24 elementos con
+//     Z ≥ 95, y su comentario lo razona: los seis naturales-radiactivos (Tc, Pm, At,
+//     Fr, Np, Pu) no lo llevan. El faqJsonLd de metadata.ts dice lo mismo: «los
+//     elementos del 1 al 94 se encuentran en la naturaleza; los del 95 al 118 son
+//     sintéticos». Tres fichas consecutivas, resueltas a mano:
+//       Np (93) · [237] u · actínido · sólido · χ 1,36 · 221 pm · SIN fila «Origen»
+//       Pu (94) · [244] u · actínido · sólido · χ 1,28 · 243 pm · SIN fila «Origen»
+//       Am (95) · [243] u · actínido · sólido · χ 1,30 · 244 pm · CON «Origen: Sintético»
+//     Nota de lectura, no defecto: la masa del americio (243) es MENOR que la del
+//     plutonio (244) pese a tener un protón más. No hay peso atómico estándar para
+//     ninguno de los dos —de ahí los corchetes—, y lo que se muestra es el número
+//     másico del isótopo más estable de cada uno, que no tiene por qué crecer con Z.
+//
+//   CASO 15 — LO QUE DEBE RECHAZARSE. Dos búsquedas imposibles y tres fórmulas:
+//       · «119» → 0 resultados. Es el primer elemento NO confirmado: la tabla llega
+//         a 118, y ningún Z de 1 a 118 contiene «119» como subcadena.
+//       · «Xx» → 0 resultados. No es el símbolo de ningún elemento.
+//       · «NACL» → el error del estudiante que escribe en mayúsculas. El parser lee
+//         /^([A-Z][a-z]?)/, así que ve N, luego A: «A» no es un símbolo → tiene que
+//         nombrarlo, no sumar el sodio y el cloro por su cuenta ni devolver 14,007.
+//       · «h2o» → todo en minúsculas: ningún símbolo empieza así, y el parser no
+//         puede adivinar. Rechazo con mensaje, no un total.
+//       · «Nx2O» → símbolo inventado de dos letras dentro de una fórmula plausible.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── CASO 13 — NORMAL: el cobalto por las tres vías del buscador ───────────────
+test.describe('CASO 13 · normal: el cobalto, buscado por nombre, símbolo y número', () => {
+  test('las tres vías del buscador llegan al cobalto y su ficha da los valores del módulo', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+
+    // Vía 1 — por NOMBRE. Solo «Cobalto» contiene la cadena «cobalto».
+    await sembrarValor(page, '#busqueda', 'cobalto');
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible();
+    expect(
+      await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+    ).toEqual(['Cobalto (Co)']);
+
+    // Vía 2 — por NÚMERO ATÓMICO. «27» no es subcadena de ningún otro Z de 1 a 118.
+    await sembrarValor(page, '#busqueda', '27');
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible();
+    expect(
+      await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+    ).toEqual(['Cobalto (Co)']);
+
+    // Vía 3 — por SÍMBOLO. La comparación es por subcadena y también mira el nombre,
+    // así que «Co» devuelve SEIS: el cobalto por su símbolo y otros cinco por llevar
+    // «co» dentro del nombre. El cobalto tiene que salir el primero, que es el orden
+    // del módulo (por número atómico creciente).
+    await sembrarValor(page, '#busqueda', 'Co');
+    await expect(page.getByText('Mostrando 6 de 118 elementos')).toBeVisible();
+    expect(
+      await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
+    ).toEqual([
+      'Cobalto (Co)', 'Cobre (Cu)', 'Arsénico (As)',
+      'Circonio (Zr)', 'Copernicio (Cn)', 'Moscovio (Mc)',
+    ]);
+
+    // Y en mayúsculas también, que es como se teclea la mitad de las veces.
+    await sembrarValor(page, '#busqueda', 'COBALTO');
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible();
+
+    // La ficha, contra elementos-data.ts { numero: 27, simbolo: "Co", ... }.
+    await sembrarValor(page, '#busqueda', '');
+    const co = await fichaDe(page, 'Cobalto (Co)');
+    expect(co).toContain('Número atómico: 27');
+    expect(co).toContain('Masa atómica: 58,933 u');
+    expect(co).toContain('Grupo: 9');       // grupo 9, NO 8: el grupo 8 es Fe-Ru-Os
+    expect(co).toContain('Período: 4');
+    expect(co).toContain('Familia: Metales de Transición');
+    expect(co).toContain('Estado: Sólido');
+    expect(co).toContain('Radio atómico: 152 pm');
+    expect(co).toContain('Electronegatividad: 1,88');
+    expect(co).toContain('[Ar] 3d⁷ 4s²');
+    // Es natural, así que NO puede llevar la fila de origen que estrena el hallazgo 776.
+    expect(co).not.toContain('Origen:');
+    await cerrarFicha(page);
+
+    // El mismo dato, dentro de la calculadora. CoCl₂ (cloruro de cobalto II, el papel
+    // indicador de humedad que pasa de azul a rosa):
+    //   58,933 + 2 × 35,45 = 58,933 + 70,90 = 129,833 g/mol
+    expect(await masaMolarDe(page, 'CoCl2')).toContain('129,8330 g/mol');
+  });
+});
+
+// ── CASO 14 — LÍMITE: la frontera natural / sintético ─────────────────────────
+test.describe('CASO 14 · límite: dónde deja la app de considerar natural un elemento', () => {
+  test('Np (93) y Pu (94) no llevan origen, y el americio (95) sí', async ({ page }) => {
+    await abrirHidratada(page);
+
+    // Neptunio, Z = 93. Radiactivo natural en trazas: el módulo NO le pone `origen`.
+    const np = await fichaDe(page, 'Neptunio (Np)');
+    expect(np).toContain('Número atómico: 93');
+    expect(np).toContain('Masa atómica: [237] u');   // sin peso atómico estándar → corchetes
+    expect(np).toContain('Familia: Actínidos');
+    expect(np).toContain('Estado: Sólido');           // hallazgo 531: el estado no es el origen
+    expect(np).toContain('Electronegatividad: 1,36');
+    expect(np).not.toContain('Origen:');
+    await cerrarFicha(page);
+
+    // Plutonio, Z = 94. El último que el propio faqJsonLd cuenta como natural.
+    const pu = await fichaDe(page, 'Plutonio (Pu)');
+    expect(pu).toContain('Número atómico: 94');
+    expect(pu).toContain('Masa atómica: [244] u');
+    expect(pu).toContain('Radio atómico: 243 pm');
+    expect(pu).toContain('Electronegatividad: 1,28');
+    expect(pu).toContain('[Rn] 5f⁶ 7s²');
+    expect(pu).not.toContain('Origen:');
+    await cerrarFicha(page);
+
+    // Americio, Z = 95. El PRIMERO con `origen: 'sintetico'` — la frontera exacta, y
+    // la distinción que el hallazgo 776 devolvió a la pantalla: «un estudiante no podía
+    // distinguir el americio del plutonio».
+    const am = await fichaDe(page, 'Americio (Am)');
+    expect(am).toContain('Número atómico: 95');
+    expect(am).toContain('Masa atómica: [243] u');
+    expect(am).toContain('Origen: Sintético');
+    expect(am).toContain('se obtiene en reactor o acelerador');
+    expect(am).toContain('Electronegatividad: 1,30');
+    expect(am).toContain('[Rn] 5f⁷ 7s²');
+    await cerrarFicha(page);
+
+    // La frontera es 95, no 93: exactamente 24 fichas llevan la fila de origen, y las
+    // 94 primeras no. Se comprueba sobre los dos vecinos, que es donde se ve.
+    // Y los tres siguen contando como sólidos en el filtro de estado (hallazgo 531),
+    // porque el origen no es un estado físico.
+    await page.selectOption('#filtroEstado', 'solido');
+    for (const titulo of ['Neptunio (Np)', 'Plutonio (Pu)', 'Americio (Am)']) {
+      await expect(page.locator(`[title="${titulo}"]`)).not.toHaveClass(/__filtrado/);
+    }
+  });
+});
+
+// ── CASO 15 — RECHAZO: lo que no existe no puede devolver un número ───────────
+test.describe('CASO 15 · rechazo: el elemento 119 y tres fórmulas imposibles', () => {
+  test('una búsqueda imposible deja 0 celdas activas y la calculadora nombra lo que no entiende', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+
+    // «119» — el primer elemento NO confirmado (la IUPAC llega al 118). Ningún Z de
+    // 1 a 118 lo contiene como subcadena, así que la única respuesta posible es 0.
+    await sembrarValor(page, '#busqueda', '119');
+    await expect(page.getByText('Mostrando 0 de 118 elementos')).toBeVisible();
+    await expect(page.locator(CELDA_ACTIVA)).toHaveCount(0);
+    // Y ninguna de las 118 celdas queda clicable: no se puede abrir una ficha por
+    // error desde un resultado vacío.
+    expect(
+      await page.locator(CELDA).evaluateAll((ns) => ns.filter((n) => !(n as HTMLButtonElement).disabled).length),
+    ).toBe(0);
+
+    // «Xx» — no es el símbolo de ningún elemento ni parte de ningún nombre.
+    await sembrarValor(page, '#busqueda', 'Xx');
+    await expect(page.getByText('Mostrando 0 de 118 elementos')).toBeVisible();
+    await expect(page.locator(CELDA_ACTIVA)).toHaveCount(0);
+    await sembrarValor(page, '#busqueda', '');
+
+    const formula = page.locator('input[placeholder^="Ej:"]');
+    const error = page.locator('[class*="__errorMasa"]');
+
+    // «NACL» — todo en mayúsculas. El parser lee /^([A-Z][a-z]?)/: ve «N» (nitrógeno)
+    // y después «A», que no es ningún símbolo. Tiene que DECIRLO, no quedarse con el
+    // nitrógeno y devolver 14,007 g/mol, que es la forma silenciosa de equivocarse.
+    await formula.fill('NACL');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(error).toContainText('Elemento "A" no reconocido');
+    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+
+    // «h2o» — todo en minúsculas. Ningún símbolo químico empieza por minúscula.
+    await formula.fill('h2o');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(error).toContainText('No entiendo');
+    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+
+    // «Nx2O» — un símbolo inventado de dos letras dentro de una fórmula plausible.
+    await formula.fill('Nx2O');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(error).toContainText('Elemento "Nx" no reconocido');
+    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+
+    // Y en cuanto la fórmula es válida vuelve a calcular: N₂O = 2 × 14,007 + 15,999
+    // = 44,013 g/mol. Un rechazo no puede dejar la calculadora atascada.
+    expect(await masaMolarDe(page, 'N2O')).toContain('44,0130 g/mol');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 14/09/2026
+// Marcados con test.fail(): afirman lo que DEBERÍA pasar, así que hoy fallan a
+// propósito. Al repararse se les quita la marca y quedan como regresión.
+//
+// Los cinco son de CONTENIDO del bloque educativo, y cuatro tienen la misma forma
+// que el hallazgo 775 reparado ayer: un texto que riñe con la ficha que el propio
+// estudiante acaba de abrir. La reparación del 13/09 arregló las tres filas de la
+// TABLA COMPARATIVA que se le señalaron; no se barrieron las otras cinco secciones
+// del bloque, y ahí siguen.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('hallazgos abiertos · 14/09/2026', () => {
+  test('778 · «Confusiones frecuentes» asigna al grupo 8 tres elementos que la app pone en 8, 9 y 10', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // La sección se titula «Confusiones frecuentes en la tabla periódica» y su cuarta
+    // viñeta enseña justo la confusión que dice evitar:
+    //   «Grupos 1-18 vs sistema A/B antiguo: El Grupo 8 IUPAC incluye Fe, Co, Ni.
+    //    El Grupo VIII antiguo agrupaba nueve elementos en una sola columna:
+    //    Fe-Co-Ni, Ru-Rh-Pd y Os-Ir-Pt.»
+    // La frase se contradice a sí misma —Fe-Co-Ni es precisamente la agrupación
+    // ANTIGUA que la segunda mitad describe— y contradice a las fichas de esta app.
+    // En la numeración IUPAC 1-18, los grupos son COLUMNAS: el 8 es Fe-Ru-Os.
+    const co = await fichaDe(page, 'Cobalto (Co)');
+    expect(co).toContain('Grupo: 9');
+    await cerrarFicha(page);
+    const ni = await fichaDe(page, 'Níquel (Ni)');
+    expect(ni).toContain('Grupo: 10');
+    await cerrarFicha(page);
+    // Y los que SÍ comparten el grupo 8 con el hierro, en esta misma app:
+    for (const [titulo, grupo] of [
+      ['Hierro (Fe)', 'Grupo: 8'],
+      ['Rutenio (Ru)', 'Grupo: 8'],
+      ['Osmio (Os)', 'Grupo: 8'],
+    ] as const) {
+      expect(await fichaDe(page, titulo)).toContain(grupo);
+      await cerrarFicha(page);
+    }
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('body')).not.toContainText('El Grupo 8 IUPAC incluye Fe, Co, Ni');
+  });
+
+  test('779 · el escenario del físico nuclear borra la frontera natural/sintético que la app acaba de recuperar', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // El escenario «Físico nuclear» afirma: «Elementos con Z>92 son sintéticos
+    // (transuránidos), todos radiactivos». Pero el módulo de datos decidió lo
+    // contrario y lo dejó escrito: los seis naturales-radiactivos (Tc, Pm, At, Fr,
+    // Np, Pu) NO llevan `origen: 'sintetico'`, que empieza en Z = 95. Y el faqJsonLd
+    // de esta misma app dice «los elementos del 1 al 94 se encuentran en la
+    // naturaleza; los del 95 al 118 son sintéticos».
+    // Resultado para quien la usa: el 13/09 se le devolvió a la ficha la distinción
+    // entre el plutonio y el americio (hallazgo 776), y cuatro pantallas más abajo el
+    // texto se la vuelve a quitar. Además mezcla dos cosas distintas: «transuránido»
+    // (Z > 92) es un hecho de posición, «sintético» es un hecho de procedencia.
+    const pu = await fichaDe(page, 'Plutonio (Pu)');
+    expect(pu).toContain('Número atómico: 94');
+    expect(pu).not.toContain('Origen:');      // la app NO lo llama sintético
+    await cerrarFicha(page);
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('body')).not.toContainText('Elementos con Z>92 son sintéticos');
+  });
+
+  test('780 · la fila de alcalinotérreos, reparada ayer, sigue dejando fuera al bario', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // El hallazgo 775 subió el techo de la fila Gp2 de «0,9–1,3» a «0,9–1,57» para
+    // que cupiera el berilio (1,57). El SUELO se quedó en 0,9 y el bario, que esta
+    // misma app muestra con 0,89, sigue una centésima por debajo del rango que se le
+    // declara a su propia familia. Es la misma comprobación de ayer aplicada al otro
+    // extremo: el rango tiene que cubrir a los SEIS alcalinotérreos de la tabla
+    // (Be 1,57 · Mg 1,31 · Ca 1,00 · Sr 0,95 · Ba 0,89 · Ra 0,90).
+    const ba = await fichaDe(page, 'Bario (Ba)');
+    expect(ba).toContain('Familia: Metales Alcalinotérreos');
+    expect(ba).toContain('Electronegatividad: 0,89');
+    await cerrarFicha(page);
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const filas = await page
+      .locator('[class*="__comparativaTable"] tbody tr')
+      .evaluateAll((rs) =>
+        rs.map((r) => Array.from((r as HTMLTableRowElement).cells).map((c) => c.innerText.trim())),
+      );
+    const celda = filas.find((f) => f[0].includes('alcalinotérreos'))?.[2] ?? '';
+    const declarados = (celda.match(/\d+,\d+|\d+/g) ?? []).map((n) => Number(n.replace(',', '.')));
+    expect(declarados.length).toBeGreaterThan(0);
+    // El menor número declarado en la celda es el suelo del rango: tiene que llegar
+    // al bario, o el rango no describe a la familia que dice describir.
+    expect(Math.min(...declarados)).toBeLessThanOrEqual(0.89);
+
+    // Mismo defecto, misma tabla, otra fila: la de gases nobles declara «Estado a
+    // 25°C: Gas» y el oganesón, que esta app clasifica como gas noble, tiene «Estado:
+    // Sólido» en su ficha. Se deja anotado aquí, no como aserción: a diferencia de la
+    // electronegatividad del bario, el estado del oganesón es una predicción y la
+    // celda describe al grupo, no a cada uno de sus siete miembros.
+  });
+
+  test('781 · la guía de 7 pasos manda el helio al bloque p, y su propia ficha dice 1s²', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // El paso 2 («Determinar el bloque») es una regla de deducción sin excepciones:
+    //   «Grupos 1-2: bloque s. Grupos 3-12: bloque d. Grupos 13-18: bloque p.
+    //    Lantánidos/Actínidos: bloque f.»
+    // Aplicada al helio —grupo 18 en esta misma app— da «bloque p», y la ficha del
+    // helio que el estudiante tiene a dos clics dice «1s²»: no hay ningún electrón p.
+    // El helio es la excepción clásica de esa regla, y la app ya nombra la simétrica
+    // (el hidrógeno en el grupo 1) en sus «Confusiones frecuentes»; a esta le falta.
+    const he = await fichaDe(page, 'Helio (He)');
+    expect(he).toContain('Grupo: 18');
+    expect(he).toContain('1s²');
+    await cerrarFicha(page);
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const paso2 = page.locator('[class*="__stepItem"]').filter({ hasText: 'Determinar el bloque' });
+    await expect(paso2).toContainText('bloque p');
+    // Si se enuncia la regla, hay que nombrar al helio, que es el único elemento al
+    // que le falla dentro de esta tabla.
+    await expect(paso2).toContainText(/helio|\bHe\b/);
+  });
+
+  test('782 · la ficha del neptunio escribe «transurámico»', async ({ page }) => {
+    test.fail();
+    await abrirHidratada(page);
+
+    // Errata en el `datoCurioso` del neptunio, dentro de elementos-data.ts: «Primer
+    // elemento transurámico descubierto». Es «transuránico» (más allá del uranio), y
+    // es además el término que el propio bloque educativo usa bien tres secciones más
+    // abajo («transuránidos»). Una tabla de consulta que se proyecta en clase no puede
+    // enseñar mal la palabra técnica que está definiendo. Es la única vez que aparece
+    // en los 118 datos curiosos, así que no hay más que un sitio que corregir.
+    const np = await fichaDe(page, 'Neptunio (Np)');
+    expect(np).toContain('Primer elemento');
+    expect(np).not.toContain('transurámico');
+    expect(np).toContain('transuránico');
+  });
+});
