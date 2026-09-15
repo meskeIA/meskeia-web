@@ -33,6 +33,31 @@
  * hay rozamiento, y se dice en pantalla para que el rebote no parezca un fallo.
  */
 
+// ─── Las tres fórmulas de la energía ─────────────────────────────────────────
+//
+// Viven aquí, y no sueltas dentro de cada función, porque `casos.ts` corrige con ellas los
+// doce problemas de la sección «Casos para clase». Si la simulación calculara la energía de
+// una manera y los casos de otra, la app podría suspender una respuesta que ella misma
+// acaba de imprimir en su panel.
+
+/** La gravedad que usa la app por defecto. Los enunciados de los casos la declaran siempre. */
+export const G_POR_DEFECTO = 9.8;
+
+/** Energía potencial gravitatoria: E_p = m·g·h, con h medida desde el suelo de la pista. */
+export function energiaPotencial(masa: number, g: number, altura: number): number {
+  return masa * g * altura;
+}
+
+/** Energía cinética: E_c = ½·m·v². Solo depende del MÓDULO de la velocidad. */
+export function energiaCinetica(masa: number, velocidad: number): number {
+  return 0.5 * masa * velocidad * velocidad;
+}
+
+/** Módulo de la velocidad que corresponde a una energía cinética dada. */
+export function velocidadDesdeEnergiaCinetica(masa: number, eC: number): number {
+  return masa > 0 && eC > 0 ? Math.sqrt((2 * eC) / masa) : 0;
+}
+
 // ─── Pistas ───────────────────────────────────────────────────────────────────
 
 export type TrackId = 'rampa' | 'valle' | 'montana_rusa' | 'looping_suave';
@@ -215,7 +240,7 @@ export function crearEstado(track: TrackDef, altura: number, p: Parametros): Est
   return {
     x,
     v: 0,
-    energiaInicial: p.masa * p.g * track.y(x),
+    energiaInicial: energiaPotencial(p.masa, p.g, track.y(x)),
     eDisipada: 0,
     haRebotado: false,
   };
@@ -269,7 +294,7 @@ export function paso(estado: EstadoFisico, track: TrackDef, p: Parametros, dt: n
 
   // La energía mecánica disponible manda sobre el módulo de la velocidad.
   const eMecDisponible = s.energiaInicial - s.eDisipada;
-  const eP = masa * g * track.y(s.x);
+  const eP = energiaPotencial(masa, g, track.y(s.x));
   const eC = eMecDisponible - eP;
 
   if (eC <= 0) {
@@ -277,16 +302,16 @@ export function paso(estado: EstadoFisico, track: TrackDef, p: Parametros, dt: n
     // invierte el sentido, que es lo que hace una pelota al quedarse sin carrerilla.
     s.x = xPrevio;
     s.v = -Math.sign(s.v || 1) * 0;
-    const eCPrevio = eMecDisponible - masa * g * track.y(xPrevio);
-    if (eCPrevio > 0) s.v = -Math.sign(vTentativa || 1) * Math.sqrt((2 * eCPrevio) / masa);
+    const eCPrevio = eMecDisponible - energiaPotencial(masa, g, track.y(xPrevio));
+    if (eCPrevio > 0) s.v = -Math.sign(vTentativa || 1) * velocidadDesdeEnergiaCinetica(masa, eCPrevio);
   } else {
-    s.v = Math.sign(s.v || 1) * Math.sqrt((2 * eC) / masa);
+    s.v = Math.sign(s.v || 1) * velocidadDesdeEnergiaCinetica(masa, eC);
   }
 
   // Rozamiento fuerte y pelota casi parada en terreno llano: se detiene del todo, y la
   // energía que le quedaba se contabiliza como disipada en vez de evaporarse.
   if (mu > 0 && Math.abs(s.v) < 1e-3 && Math.abs(yp) < 1e-3) {
-    s.eDisipada = s.energiaInicial - masa * g * track.y(s.x);
+    s.eDisipada = s.energiaInicial - energiaPotencial(masa, g, track.y(s.x));
     s.v = 0;
   }
 }
@@ -306,8 +331,8 @@ export interface Lectura {
 
 export function leer(estado: EstadoFisico, track: TrackDef, p: Parametros): Lectura {
   const y = track.y(estado.x);
-  const eP = p.masa * p.g * y;
-  const eC = 0.5 * p.masa * estado.v * estado.v;
+  const eP = energiaPotencial(p.masa, p.g, y);
+  const eC = energiaCinetica(p.masa, estado.v);
   return {
     x: estado.x,
     y,

@@ -648,3 +648,257 @@ test('544 — notación consistente: a_t en toda la app, nunca «at» sin subín
   expect(cuerpo).toContain('a_t');
   expect(cuerpo).not.toMatch(/\(at\)|\bat\s*=/);
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (14/09/2026) — la tarea asignable de esta app.
+ *
+ * Por qué existe: el detector de eventos-aula le cuenta a `simulador-movimiento-circular`
+ * CINCO aulas, el 24 % de su tráfico de vida (347 de 1.464 visitas), tres de ellas en la
+ * misma semana y todas latinoamericanas. Física era la disciplina que más aula recibe y la
+ * única grande sin un solo caso asignable: matemáticas tenía siete apps, química dos y
+ * biología una.
+ *
+ * DÓNDE VIVE EL CÁLCULO
+ *   app/simulador-movimiento-circular/casos.ts   ← las cinco fórmulas Y los doce casos
+ *   app/simulador-movimiento-circular/page.tsx   ← importa esas fórmulas: no tiene copia propia
+ *
+ * LAS DOCE RESPUESTAS, RESUELTAS A MANO ANTES DE ESCRIBIR EL MÓDULO
+ * (convenio de la app: ω en rad/s · v = ω·r · a_c = ω²·r · F_c = m·a_c · T = 2π/ω · f = ω/2π)
+ *
+ *    1 · r=2, ω=3            → v   = 3·2 = 6 m/s
+ *    2 · r=0,5, ω=4          → a_c = 4²·0,5 = 8 m/s²
+ *    3 · r=1,5, ω=2, m=0,2   → a_c = 4·1,5 = 6 ; F_c = 0,2·6 = 1,2 N
+ *    4 · ω=2                 → T   = 2π/2 = π = 3,1415926… → 3,14 s
+ *    5 · T=4                 → ω   = 2π/4 = 1,5707963… → 1,57 rad/s
+ *    6 · 6 vueltas / 60 s    → f   = 6/60 = 0,1 Hz
+ *    7 · f=0,5, r=3          → ω = 2π·0,5 = π ; v = 3π = 9,4247779… → 9,42 m/s
+ *    8 · v=6, r=3            → ω = 6/3 = 2 ; a_c = 4·3 = 12 m/s²
+ *    9 · r=2, ω=2            → a_c = 4·2 = 8 m/s²  (con ω=1 eran 2: el cuadrado lo cuadruplica)
+ *   10 · v=4, r=2, m=0,5     → ω = 2 ; a_c = 4·2 = 8 ; F_c = 0,5·8 = 4 N
+ *   11 · 45 vueltas / 60 s   → f = 0,75 ; ω = 2π·0,75 = 4,7123889… → 4,71 rad/s
+ *   12 · T=0,5, r=0,4        → ω = 2π/0,5 = 12,566370… ; v = 5,0265482… → 5,03 m/s
+ *
+ * Ninguno está copiado de lo que devuelve la app: si el módulo discrepa de esta tabla, manda
+ * la tabla hasta demostrar lo contrario.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  toleranciaDe,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  omegaDe,
+  velocidadLineal,
+  aceleracionCentripeta,
+  fuerzaCentripeta,
+  periodoDe,
+  frecuenciaDe,
+} from '../../app/simulador-movimiento-circular/casos';
+
+const A_MANO: Readonly<Record<number, number>> = {
+  1: 6,
+  2: 8,
+  3: 1.2,
+  4: 3.14,
+  5: 1.57,
+  6: 0.1,
+  7: 9.42,
+  8: 12,
+  9: 8,
+  10: 4,
+  11: 4.71,
+  12: 5.03,
+};
+
+test.describe('simulador-movimiento-circular · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    // Es lo único que hace que «resuelve los casos 3, 7 y 11» funcione como consigna.
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    // Caza a quien edite un enunciado y olvide actualizar la solución.
+    for (const caso of CASOS) {
+      const recalculado = resolverCaso(caso.datos);
+      expect(recalculado.ok, `caso ${caso.id}: ${recalculado.error ?? ''}`).toBe(true);
+      expect(Math.round(recalculado.valor * 100) / 100, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta no vacía, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThan(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      // La solución en pantalla lleva la unidad pegada al número, no media etiqueta suelta.
+      expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(
+        caso.etiquetaRespuesta.slice(caso.etiquetaRespuesta.indexOf(' en ') + 4),
+      );
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    // Los nueve eventos de aula de física son latinoamericanos: CO, MX, NI, AR, GT y EC.
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    // La respuesta sale del MISMO resolverCaso que los fijos, no de otra cuenta.
+    expect(Math.round(resolverCaso(a.datos).valor * 100) / 100).toBe(a.respuesta);
+
+    // Variedad: la primera versión de `simulador-genetica` era reproducible y aun así daba
+    // SIEMPRE el mismo ejercicio. Reproducible no implica variado, y con una sola semilla
+    // no se ve nada.
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(m.respuesta).toBeGreaterThan(0);
+    }
+  });
+
+  test('7 · el convenio de la app queda fijado: ω en rad/s y a_c con ω al CUADRADO', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO[caso.id]);
+    }
+
+    // (b) Las cinco fórmulas del panel, con números exactos.
+    expect(velocidadLineal(3, 2)).toBe(6);
+    expect(aceleracionCentripeta(4, 0.5)).toBe(8);
+    expect(fuerzaCentripeta(0.2, 2, 1.5)).toBeCloseTo(1.2, 10);
+    expect(periodoDe(2)).toBeCloseTo(Math.PI, 12);
+    expect(frecuenciaDe(2 * Math.PI)).toBeCloseTo(1, 12);
+
+    // (c) EL error clásico del tema: 45 vueltas por minuto NO son 45 rad/s, sino 4,71.
+    const omegaTocadiscos = omegaDe({ via: 'vueltas', vueltas: 45, segundos: 60 }, 0.15);
+    expect(omegaTocadiscos).toBeCloseTo(4.712389, 5);
+    expect(omegaTocadiscos).not.toBeCloseTo(45, 0);
+
+    // (d) a_c va con ω al CUADRADO: doblar ω la multiplica por cuatro, no por dos.
+    expect(aceleracionCentripeta(1, 2)).toBe(2);
+    expect(aceleracionCentripeta(2, 2)).toBe(8);
+
+    // (e) Y el convenio sale de las MISMAS funciones que usa el panel de la app: v = ω·r
+    // recuperado desde un caso que entra por velocidad lineal.
+    expect(omegaDe({ via: 'velocidad', velocidad: 6 }, 3)).toBe(2);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    expect(comprobarRespuesta(6, 6).correcto).toBe(true);
+    expect(comprobarRespuesta(6.05, 6).correcto).toBe(true); // dentro del 1 %
+    expect(comprobarRespuesta(8, 6).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 6).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 6).motivo).toContain('número');
+
+    // La tolerancia nunca baja de 0,01, para que el 0,1 del caso 6 no se corrija a ciegas.
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(0.1)).toBe(0.01);
+    expect(toleranciaDe(100)).toBe(1);
+
+    // ω = 0 no produce «∞» en pantalla: se rechaza con un error legible.
+    const parado = resolverCaso({ radio: 2, entrada: { via: 'omega', omega: 0 }, magnitud: 'periodo' });
+    expect(parado.ok).toBe(false);
+    expect(Number.isNaN(parado.valor)).toBe(true);
+
+    // Un radio imposible tampoco lanza.
+    const sinRadio = resolverCaso({ radio: 0, entrada: { via: 'omega', omega: 3 }, magnitud: 'velocidad' });
+    expect(sinRadio.ok).toBe(false);
+    expect(sinRadio.error).toContain('radio');
+
+    // Y pedir la fuerza sin dar la masa se responde, no se revienta.
+    const sinMasa = resolverCaso({ radio: 2, entrada: { via: 'omega', omega: 3 }, magnitud: 'fuerza' });
+    expect(sinMasa.ok).toBe(false);
+    expect(sinMasa.error).toContain('masa');
+  });
+});
+
+/* ───────────────────────────────────────────────────────────────────────────────────────
+ * La sección en el NAVEGADOR. Lo de arriba prueba la física; esto prueba que la sección
+ * existe, corrige de verdad y no rompe el simulador (PASO 4.bis de /nueva-app-meskeia).
+ * ─────────────────────────────────────────────────────────────────────────────────────── */
+
+test.describe('simulador-movimiento-circular · la sección de casos en el navegador', () => {
+  const CAMPO = '#casos-respuesta';
+  /** Acotado a la sección: la app puede tener otros avisos con role="alert". */
+  const veredicto = (page: Page) => page.locator('[class*="casoVeredicto"]');
+
+  test('corrige bien la respuesta correcta y la equivocada', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    // Caso 1: r = 2 m, ω = 3 rad/s → v = 6 m/s.
+    await page.fill(CAMPO, '6');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('Correcto');
+
+    await page.fill(CAMPO, '4');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('No es correcto');
+  });
+
+  test('admite la coma decimal española y rechaza lo que no es un número', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    // Caso 4: T = 2π/2 = 3,14 s. Con coma, que es como se escribe aquí.
+    await page.getByRole('button', { name: 'Caso 4:' }).click();
+    await page.fill(CAMPO, '3,14');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('Correcto');
+
+    // Y nunca «NaN» en pantalla.
+    await page.fill(CAMPO, 'tres coma catorce');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('Escribe un número');
+    await expect(veredicto(page)).not.toContainText('NaN');
+  });
+
+  test('la solución se despliega con su unidad y el caso elegido se anuncia', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    await page.getByRole('button', { name: 'Caso 11:' }).click();
+    await expect(page.getByRole('button', { name: 'Caso 11:' })).toHaveAttribute('aria-pressed', 'true');
+
+    const verSolucion = page.getByRole('button', { name: /Ver solución/ });
+    await expect(verSolucion).toHaveAttribute('aria-expanded', 'false');
+    await verSolucion.click();
+    await expect(page.locator('[class*="casoSolucion"]')).toContainText('4,71 rad/s');
+  });
+
+  test('el simulador de arriba sigue funcionando con la sección añadida', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    // Las seis tarjetas del panel usan ahora las funciones de casos.ts: con los valores por
+    // defecto (r = 2 m, ω = 2 rad/s, m = 1 kg) v = 4 m/s y a_c = 8 m/s².
+    const cuerpo = (await page.locator('body').textContent()) ?? '';
+    expect(cuerpo).toContain('Casos para clase');
+    await expect(page.locator('canvas')).toBeVisible();
+  });
+});

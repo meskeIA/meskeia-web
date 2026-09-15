@@ -518,3 +518,269 @@ test('HALLAZGO F · ni se anuncia un control inexistente ni 159 km/h es la veloc
   // velocidad terminal REAL, que ninguna fórmula de la página calcula.
   expect(cuerpo).toContain('que ninguna fórmula de esta página calcula');
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (14/09/2026) — la tarea asignable de esta app.
+ *
+ * Por qué existe: el detector de eventos-aula le cuenta TRES aulas, el 19 % de su tráfico de
+ * vida (80 de 414 visitas), en dos países distintos. Física era la disciplina que más aula
+ * recibe del catálogo y la única grande sin un solo caso asignable.
+ *
+ * DÓNDE VIVE EL CÁLCULO
+ *   app/simulador-conservacion-energia/motor.ts   ← E_p, E_c y v, compartidas con la simulación
+ *   app/simulador-conservacion-energia/casos.ts   ← los doce casos, que importan esas tres
+ *
+ * EL CONVENIO, que es lo que puede hacer «fallar» un caso bien resuelto:
+ *   · g = 9,8 m/s² — el valor por defecto de la app. No 9,81 ni 10. Todos los enunciados lo dicen.
+ *   · La altura se mide desde el SUELO de la pista (y = 0), origen de la energía potencial.
+ *   · La energía disipada es el TRABAJO del rozamiento (µ·m·g·d acumulado), no la resta de
+ *     dos energías medidas: es la corrección de los hallazgos 357 y 360 del Inspector.
+ *
+ * LAS DOCE RESPUESTAS, RESUELTAS A MANO ANTES DE ESCRIBIR EL MÓDULO
+ *
+ *    1 · m=2, h=5             → E_p = 2·9,8·5 = 98 J
+ *    2 · m=0,5, v=4           → E_c = 0,5·0,5·16 = 4 J
+ *    3 · m=2, h₀=5 → suelo    → E_c = 98 J ; v = √(2·98/2) = √98 = 9,8994949… → 9,9 m/s
+ *    4 · m=3, h₀=10, parado   → E_m = 3·9,8·10 + 0 = 294 J
+ *    5 · m=0,2, 2 m → 0,5 m   → E_c = 0,2·9,8·1,5 = 2,94 J   (la altura PERDIDA, no los 2 m)
+ *    6 · mismo caso           → v = √(2·2,94/0,2) = √29,4 = 5,4221766… → 5,42 m/s
+ *    7 · v=7 al llegar abajo  → h = v²/(2g) = 49/19,6 = 2,5 m   (la masa se simplifica)
+ *    8 · m=4, h₀=3, 20 J roz. → E_c = 4·9,8·3 − 20 = 117,6 − 20 = 97,6 J
+ *    9 · mismo caso           → v = √(2·97,6/4) = √48,8 = 6,9856997… → 6,99 m/s
+ *   10 · µ=0,2, m=5, d=3      → W = 0,2·5·9,8·3 = 29,4 J
+ *   11 · m=1, h₀=4, 9,8 J roz.→ h = (39,2 − 9,8)/(1·9,8) = 29,4/9,8 = 3 m
+ *   12 · m=2, 6 m → 2 m       → E_c = 2·9,8·4 = 78,4 J
+ *
+ * Ninguno está copiado de lo que devuelve la app: si el módulo discrepa de esta tabla, manda
+ * la tabla hasta demostrar lo contrario.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+import {
+  CASOS,
+  TOTAL_CASOS,
+  G_POR_DEFECTO,
+  resolverCaso,
+  toleranciaDe,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-conservacion-energia/casos';
+
+const A_MANO: Readonly<Record<number, number>> = {
+  1: 98,
+  2: 4,
+  3: 9.9,
+  4: 294,
+  5: 2.94,
+  6: 5.42,
+  7: 2.5,
+  8: 97.6,
+  9: 6.99,
+  10: 29.4,
+  11: 3,
+  12: 78.4,
+};
+
+test.describe('simulador-conservacion-energia · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    // Es lo único que hace que «resuelve los casos 3, 7 y 11» funcione como consigna.
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    // Caza a quien edite un enunciado y olvide actualizar la solución.
+    for (const caso of CASOS) {
+      const recalculado = resolverCaso(caso.datos);
+      expect(recalculado.ok, `caso ${caso.id}: ${recalculado.error ?? ''}`).toBe(true);
+      expect(Math.round(recalculado.valor * 100) / 100, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta no vacía, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThan(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      // La solución en pantalla lleva la unidad pegada al número, no media etiqueta suelta.
+      expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(
+        caso.etiquetaRespuesta.slice(caso.etiquetaRespuesta.indexOf(' en ') + 4),
+      );
+      // Y todo caso cuya respuesta DEPENDA de la gravedad declara su valor en el enunciado,
+      // que es el convenio capaz de hacer «fallar» un caso bien resuelto. La dependencia no
+      // se supone leyendo el texto: se comprueba recalculando con otra g y viendo si cambia.
+      // (El caso 2 es E_c = ½·m·v² y no usa g en absoluto: exigirle el dato sería ruido.)
+      const conOtraGravedad = resolverCaso({ ...caso.datos, g: 10 });
+      const dependeDeG = conOtraGravedad.ok && conOtraGravedad.valor !== resolverCaso(caso.datos).valor;
+      if (dependeDeG) {
+        expect(caso.enunciado, `caso ${caso.id} usa g y no dice cuál`).toContain('9,8');
+      }
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    // Los nueve eventos de aula de física son latinoamericanos: CO, MX, NI, AR, GT y EC.
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    // La respuesta sale del MISMO resolverCaso que los fijos, no de otra cuenta.
+    expect(Math.round(resolverCaso(a.datos).valor * 100) / 100).toBe(a.respuesta);
+
+    // Variedad: la primera versión de `simulador-genetica` era reproducible y aun así daba
+    // SIEMPRE el mismo ejercicio. Con una sola semilla eso no se ve.
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(m.respuesta).toBeGreaterThan(0);
+    }
+  });
+
+  test('7 · el convenio queda fijado: g = 9,8 y la disipación es TRABAJO, no una resta', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO[caso.id]);
+    }
+
+    // (b) g = 9,8, que es lo que trae el deslizador de la app. Con 9,81 o con 10 el caso 1
+    // daría 98,1 o 100 y un alumno con la cuenta bien hecha vería «No es correcto».
+    expect(G_POR_DEFECTO).toBe(9.8);
+    expect(resolverCaso({ magnitud: 'energiaPotencial', masa: 2, altura: 5 }).valor).toBeCloseTo(98, 10);
+
+    // (c) La energía cinética a media caída usa la altura PERDIDA, no la de partida: es el
+    // error más común del tema y el caso 5 lo ataca de frente.
+    const aMediaCaida = resolverCaso({ magnitud: 'energiaCinetica', masa: 0.2, alturaInicial: 2, altura: 0.5 });
+    expect(aMediaCaida.valor).toBeCloseTo(2.94, 10);
+    expect(aMediaCaida.valor).not.toBeCloseTo(3.92, 2); // lo que saldría usando los 2 m enteros
+
+    // (d) La altura de suelta NO depende de la masa: aparece en los dos lados y se simplifica.
+    const ligero = resolverCaso({ magnitud: 'alturaDeSuelta', velocidad: 7, masa: 0.1 });
+    const pesado = resolverCaso({ magnitud: 'alturaDeSuelta', velocidad: 7, masa: 900 });
+    expect(ligero.valor).toBe(pesado.valor);
+    expect(ligero.valor).toBeCloseTo(2.5, 10);
+
+    // (e) El trabajo del rozamiento es µ·m·g·d, y con µ = 0 es exactamente 0 —no «0,00
+    // redondeado»—, que es la promesa central de la app cuando no hay fricción.
+    expect(resolverCaso({ magnitud: 'trabajoRozamiento', masa: 5, mu: 0.2, distancia: 3 }).valor).toBeCloseTo(29.4, 10);
+    expect(resolverCaso({ magnitud: 'trabajoRozamiento', masa: 5, mu: 0, distancia: 3 }).valor).toBe(0);
+
+    // (f) Sin rozamiento la pelota vuelve exactamente a su altura de partida, y ni un
+    // milímetro más: es lo que la FAQ de la app declara imposible.
+    const sinRozamiento = resolverCaso({ magnitud: 'alturaFinal', masa: 1, alturaInicial: 4, disipada: 0 });
+    expect(sinRozamiento.valor).toBeCloseTo(4, 10);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    expect(comprobarRespuesta(98, 98).correcto).toBe(true);
+    expect(comprobarRespuesta(98.5, 98).correcto).toBe(true); // dentro del 1 %
+    expect(comprobarRespuesta(120, 98).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 98).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 98).motivo).toContain('número');
+
+    // La tolerancia nunca baja de 0,01.
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(2.94)).toBeCloseTo(0.0294, 10);
+    expect(toleranciaDe(98)).toBeCloseTo(0.98, 10);
+
+    // Pedir energía en un punto MÁS ALTO que el de partida no lanza: informa de que no hay
+    // energía para llegar, que es justo lo que la física dice.
+    const imposible = resolverCaso({ magnitud: 'energiaCinetica', masa: 1, alturaInicial: 2, altura: 5 });
+    expect(imposible.ok).toBe(false);
+    expect(imposible.error).toContain('energía suficiente');
+
+    // Un rozamiento que se lleve más de lo que había tampoco lanza.
+    const excesivo = resolverCaso({ magnitud: 'alturaFinal', masa: 1, alturaInicial: 1, disipada: 500 });
+    expect(excesivo.ok).toBe(false);
+    expect(Number.isNaN(excesivo.valor)).toBe(true);
+
+    // Y faltar un dato se responde con un mensaje, no con una excepción.
+    const sinMasa = resolverCaso({ magnitud: 'energiaPotencial', altura: 5 });
+    expect(sinMasa.ok).toBe(false);
+    expect(sinMasa.error).toContain('masa');
+  });
+});
+
+/* ───────────────────────────────────────────────────────────────────────────────────────
+ * La sección en el NAVEGADOR. Lo de arriba prueba la física; esto prueba que la sección
+ * existe, corrige de verdad y no rompe el simulador (PASO 4.bis de /nueva-app-meskeia).
+ * ─────────────────────────────────────────────────────────────────────────────────────── */
+
+test.describe('simulador-conservacion-energia · la sección de casos en el navegador', () => {
+  const CAMPO = '#casos-respuesta';
+  /** Acotado a la sección: la app tiene otros avisos que podrían ser role="alert". */
+  const veredicto = (page: Page) => page.locator('[class*="casoVeredicto"]');
+
+  test('corrige bien la respuesta correcta y la equivocada', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    // Caso 1: m = 2 kg a 5 m con g = 9,8 → E_p = 98 J.
+    await page.fill(CAMPO, '98');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('Correcto');
+
+    await page.fill(CAMPO, '100');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('No es correcto');
+  });
+
+  test('admite la coma decimal española y rechaza lo que no es un número', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    // Caso 5: E_c = 2,94 J. Con coma, que es como se escribe aquí.
+    await page.getByRole('button', { name: 'Caso 5:' }).click();
+    await page.fill(CAMPO, '2,94');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('Correcto');
+
+    // Y nunca «NaN» en pantalla.
+    await page.fill(CAMPO, 'dos con noventa');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toContainText('Escribe un número');
+    await expect(veredicto(page)).not.toContainText('NaN');
+  });
+
+  test('la solución se despliega con su unidad y el caso elegido se anuncia', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    await page.getByRole('button', { name: 'Caso 11:' }).click();
+    await expect(page.getByRole('button', { name: 'Caso 11:' })).toHaveAttribute('aria-pressed', 'true');
+
+    const verSolucion = page.getByRole('button', { name: /Ver solución/ });
+    await expect(verSolucion).toHaveAttribute('aria-expanded', 'false');
+    await verSolucion.click();
+    await expect(page.locator('[class*="casoSolucion"]')).toContainText('3 metros');
+  });
+
+  test('el simulador de arriba sigue funcionando con la sección añadida', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    const cuerpo = (await page.locator('body').textContent()) ?? '';
+    expect(cuerpo).toContain('Casos para clase');
+    await expect(page.locator('canvas').first()).toBeVisible();
+  });
+});

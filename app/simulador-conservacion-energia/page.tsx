@@ -5,9 +5,11 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorConservacionEnergia.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import CasosAula from './CasosAula';
 import {
   TRACKS,
   TRACK_IDS,
+  G_POR_DEFECTO,
   crearEstado,
   leer as leerEstado,
   paso as pasoFisico,
@@ -38,7 +40,7 @@ function fmt(n: number, decimales = 2): string {
 export default function SimuladorConservacionEnergiaPage() {
   const [trackId, setTrackId] = useState<TrackId>('valle');
   const [masa, setMasa] = useState(1);
-  const [g, setG] = useState(9.8);
+  const [g, setG] = useState(G_POR_DEFECTO);
   const [mu, setMu] = useState(0); // coeficiente fricción cinética
   const [altInicial, setAltInicial] = useState(10);
   const [running, setRunning] = useState(false);
@@ -47,7 +49,7 @@ export default function SimuladorConservacionEnergiaPage() {
   // cero, el HTML servido enseñaba «Altura h 0,00 m» y «Energía inicial 0,00 J» hasta que
   // React hidrataba: la pelota estaba ya dibujada en el canvas y el panel decía otra cosa.
   const partida = useMemo(() => {
-    const parametros = { masa: 1, g: 9.8, mu: 0 };
+    const parametros = { masa: 1, g: G_POR_DEFECTO, mu: 0 };
     const estado = crearEstado(TRACKS.valle, 10, parametros);
     return { estado, lectura: { ...leerEstado(estado, TRACKS.valle, parametros), tiempo: 0 } };
   // El estado inicial es fijo por definición: no depende de nada que pueda cambiar después.
@@ -552,6 +554,9 @@ export default function SimuladorConservacionEnergiaPage() {
           </div>
         </div>
       </div>
+
+      {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}
+      <CasosAula />
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0

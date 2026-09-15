@@ -13,6 +13,14 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorMovimientoCircular.module.css';
+import CasosAula from './CasosAula';
+import {
+  velocidadLineal,
+  aceleracionCentripeta,
+  fuerzaCentripeta,
+  periodoDe,
+  frecuenciaDe,
+} from './casos';
 
 type Modo = 'mcu' | 'mcnu';
 
@@ -101,13 +109,17 @@ export default function SimuladorMovimientoCircularPage() {
     setOmegaAnimada(omega);
   }, [omega, modo]);
 
-  // Magnitudes derivadas (mostradas en panel)
+  // Magnitudes derivadas (mostradas en panel).
+  //
+  // Las cinco fórmulas viven en `./casos.ts` y NO se escriben aquí: la sección «Casos para
+  // clase» corrige con ellas, así que si el panel usara una copia propia la app podría
+  // suspender una respuesta que ella misma acaba de imprimir en pantalla.
   const omegaVal = modo === 'mcnu' ? omegaAnimada : omega;
-  const v = omegaVal * radio;
-  const ac = omegaVal * omegaVal * radio;
-  const fc = masa * ac;
-  const T = omegaVal > 0 ? (2 * Math.PI) / omegaVal : Infinity;
-  const freq = omegaVal > 0 ? omegaVal / (2 * Math.PI) : 0;
+  const v = velocidadLineal(omegaVal, radio);
+  const ac = aceleracionCentripeta(omegaVal, radio);
+  const fc = fuerzaCentripeta(masa, omegaVal, radio);
+  const T = periodoDe(omegaVal);
+  const freq = frecuenciaDe(omegaVal);
 
   // Función de dibujo
   const dibujar = useCallback(
@@ -204,7 +216,7 @@ export default function SimuladorMovimientoCircularPage() {
       // Vector velocidad tangencial (perpendicular al radio, sentido antihorario = convención positiva)
       if (omegaActual > 0.01) {
         const velScale = 18; // px por unidad de v
-        const vMag = omegaActual * radio;
+        const vMag = velocidadLineal(omegaActual, radio);
         const vLen = Math.min(vMag * velScale, maxPx * 0.5);
         // Dirección tangencial: perpendicular al radio hacia la izq del movimiento antihorario
         const tx = -Math.sin(theta);
@@ -222,7 +234,7 @@ export default function SimuladorMovimientoCircularPage() {
       // Vector aceleración centrípeta (apuntando hacia el centro)
       if (omegaActual > 0.01) {
         const acScale = 18;
-        const acMag = omegaActual * omegaActual * radio;
+        const acMag = aceleracionCentripeta(omegaActual, radio);
         const acLen = Math.min(acMag * acScale, maxPx * 0.45);
         // Dirección: del punto al centro
         const dx = cx - px;
@@ -503,6 +515,9 @@ export default function SimuladorMovimientoCircularPage() {
           Partícula
         </span>
       </div>
+
+      {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}
+      <CasosAula />
 
       {/* BLOQUE EDUCATIVO v2.0 */}
       <EducationalSection
