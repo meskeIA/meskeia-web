@@ -14,13 +14,16 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   determinizar,
   minimizar,
+  generarPasosValidacion,
+  validarRapido,
   type AutomataMotor,
   type ResultadoDeterminizacion,
   type ResultadoMinimizacion,
+  type TipoAuto,
 } from './motor-conversiones';
 import styles from './SimuladorAutomatasFinitos.module.css';
+import CasosAula from './CasosAula';
 
-type TipoAuto = 'dfa' | 'nfa';
 type ModoEditor =
   | 'add-state'
   | 'add-transition'
@@ -44,15 +47,6 @@ interface Transicion {
   to: string;
   simbolo: string;
 }
-
-interface PasoValidacion {
-  posicion: number;
-  simbolo: string;
-  estadosActivos: string[];
-  descripcion: string;
-}
-
-type ResultadoValidacion = 'aceptada' | 'rechazada' | 'sin-transicion' | 'pendiente';
 
 interface EjemploAutomata {
   titulo: string;
@@ -151,130 +145,6 @@ const ESTADOS_INICIALES: Estado[] = [
 const TRANSICIONES_INICIALES: Transicion[] = [
   { id: 't1', from: 'q0', to: 'q1', simbolo: 'a' },
 ];
-
-// Calcula la épsilon-clausura de un conjunto de estados
-function epsilonClausura(
-  estadosIds: string[],
-  transiciones: Transicion[],
-): string[] {
-  const visitados = new Set<string>(estadosIds);
-  const cola: string[] = [...estadosIds];
-  while (cola.length > 0) {
-    const actual = cola.shift() as string;
-    for (const t of transiciones) {
-      if (t.from === actual && t.simbolo === 'ε' && !visitados.has(t.to)) {
-        visitados.add(t.to);
-        cola.push(t.to);
-      }
-    }
-  }
-  return [...visitados];
-}
-
-// Genera los pasos de validación para una cadena
-function generarPasosValidacion(
-  cadena: string,
-  tipo: TipoAuto,
-  estados: Estado[],
-  transiciones: Transicion[],
-): { pasos: PasoValidacion[]; resultado: ResultadoValidacion } {
-  const inicial = estados.find((e) => e.esInicial);
-  if (!inicial) {
-    return {
-      pasos: [
-        {
-          posicion: -1,
-          simbolo: '',
-          estadosActivos: [],
-          descripcion: 'No hay estado inicial definido',
-        },
-      ],
-      resultado: 'rechazada',
-    };
-  }
-
-  const pasos: PasoValidacion[] = [];
-  let activos: string[];
-
-  if (tipo === 'nfa') {
-    activos = epsilonClausura([inicial.id], transiciones);
-  } else {
-    activos = [inicial.id];
-  }
-
-  pasos.push({
-    posicion: 0,
-    simbolo: '',
-    estadosActivos: [...activos],
-    descripcion: `Estado(s) inicial(es): ${activos.join(', ')}`,
-  });
-
-  for (let i = 0; i < cadena.length; i++) {
-    const simbolo = cadena[i];
-    let siguientes: string[] = [];
-
-    if (tipo === 'dfa') {
-      const t = transiciones.find(
-        (tr) => tr.from === activos[0] && tr.simbolo === simbolo,
-      );
-      if (!t) {
-        pasos.push({
-          posicion: i + 1,
-          simbolo,
-          estadosActivos: [],
-          descripcion: `Sin transición desde ${activos[0]} con "${simbolo}"`,
-        });
-        return { pasos, resultado: 'sin-transicion' };
-      }
-      siguientes = [t.to];
-    } else {
-      const conjunto = new Set<string>();
-      for (const id of activos) {
-        for (const t of transiciones) {
-          if (t.from === id && t.simbolo === simbolo) {
-            conjunto.add(t.to);
-          }
-        }
-      }
-      siguientes = epsilonClausura([...conjunto], transiciones);
-    }
-
-    if (siguientes.length === 0) {
-      pasos.push({
-        posicion: i + 1,
-        simbolo,
-        estadosActivos: [],
-        descripcion: `Sin transición disponible con "${simbolo}"`,
-      });
-      return { pasos, resultado: 'sin-transicion' };
-    }
-
-    activos = siguientes;
-    pasos.push({
-      posicion: i + 1,
-      simbolo,
-      estadosActivos: [...activos],
-      descripcion: `Lee "${simbolo}" → ${activos.join(', ')}`,
-    });
-  }
-
-  // ¿Algún estado activo es final?
-  const finales = new Set(estados.filter((e) => e.esFinal).map((e) => e.id));
-  const aceptada = activos.some((id) => finales.has(id));
-
-  return { pasos, resultado: aceptada ? 'aceptada' : 'rechazada' };
-}
-
-// Validación rápida (solo resultado)
-function validarRapido(
-  cadena: string,
-  tipo: TipoAuto,
-  estados: Estado[],
-  transiciones: Transicion[],
-): ResultadoValidacion {
-  const { resultado } = generarPasosValidacion(cadena, tipo, estados, transiciones);
-  return resultado;
-}
 
 // Calcula el path SVG para una transición (incluye autobucles)
 function calcularPathTransicion(
@@ -1362,6 +1232,9 @@ export default function SimuladorAutomatasFinitos() {
           </div>
         </div>
       </main>
+
+      {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}
+      <CasosAula />
 
       <EducationalSection
         title="Guía de Autómatas Finitos"

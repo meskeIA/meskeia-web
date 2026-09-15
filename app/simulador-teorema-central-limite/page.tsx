@@ -5,6 +5,11 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTeoremaCentralLimite.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import CasosAula from './CasosAula';
+// μ y σ de cada población NO se escriben aquí: vienen de `./casos.ts`, que es también donde se
+// corrigen los casos para clase. Una sola fuente, de modo que el panel de este simulador y la
+// corrección del alumno no puedan divergir ([[feedback_motor_calculo_aparte_y_probado]]).
+import { POBLACIONES } from './casos';
 
 // ============================================
 // TIPOS
@@ -77,8 +82,8 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     icono: '▭',
     meta: 'μ = 5 · σ ≈ 2,89',
     descripcion: 'Cada valor entre 0 y 10 es igualmente probable. Forma plana, totalmente NO normal.',
-    mu: 5,
-    sigma: Math.sqrt(100 / 12), // ≈ 2.887
+    mu: POBLACIONES.uniforme.mu,
+    sigma: POBLACIONES.uniforme.sigma, // ≈ 2,887
     xMin: -1,
     xMax: 11,
     sample: sampleUniforme,
@@ -91,8 +96,8 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     icono: '📉',
     meta: 'μ = 1 · σ = 1',
     descripcion: 'Tiempos de espera: muchos valores pequeños y una cola larga hacia la derecha. Muy asimétrica.',
-    mu: 1,
-    sigma: 1,
+    mu: POBLACIONES.exponencial.mu,
+    sigma: POBLACIONES.exponencial.sigma,
     xMin: 0,
     xMax: 6,
     sample: sampleExponencial,
@@ -105,8 +110,8 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     icono: '🪙',
     meta: 'μ = 0,5 · σ = 0,5',
     descripcion: 'Solo dos valores posibles: 0 o 1, cada uno con probabilidad 0,5. Discreta.',
-    mu: 0.5,
-    sigma: 0.5,
+    mu: POBLACIONES.bernoulli_05.mu,
+    sigma: POBLACIONES.bernoulli_05.sigma,
     xMin: -0.3,
     xMax: 1.3,
     sample: () => sampleBernoulli(0.5),
@@ -124,8 +129,8 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     icono: '🎯',
     meta: 'μ = 0,9 · σ = 0,3',
     descripcion: 'Bernoulli muy asimétrica: 90% sale 1, 10% sale 0. La normal tarda más en aparecer aquí.',
-    mu: 0.9,
-    sigma: Math.sqrt(0.09),
+    mu: POBLACIONES.bernoulli_09.mu,
+    sigma: POBLACIONES.bernoulli_09.sigma,
     xMin: -0.3,
     xMax: 1.3,
     sample: () => sampleBernoulli(0.9),
@@ -142,8 +147,8 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     icono: '🐫',
     meta: 'μ = 0 · σ ≈ 2,09',
     descripcion: 'Dos campanas: una en −2 y otra en +2. Histograma con doble joroba, claramente NO normal.',
-    mu: 0,
-    sigma: Math.sqrt(4 + 0.36), // mezcla 50/50 N(-2,0.6) y N(2,0.6) → var = 0.6² + (2)² = 4.36
+    mu: POBLACIONES.bimodal.mu,
+    sigma: POBLACIONES.bimodal.sigma, // mezcla 50/50 N(-2;0,6) y N(2;0,6) → var = 0,6² + 2² = 4,36
     xMin: -5,
     xMax: 5,
     sample: sampleBimodal,
@@ -732,6 +737,9 @@ export default function SimuladorTeoremaCentralLimitePage() {
           </div>
         )}
       </div>
+
+      {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}
+      <CasosAula />
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0

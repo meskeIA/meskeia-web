@@ -13,17 +13,27 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorArbolesBstAvl.module.css';
+import CasosAula from './CasosAula';
+// La lógica del árbol vive en `./motor.ts` y NO se reescribe aquí: `casos.ts` corrige la
+// sección «Casos para clase» ejecutando ESTE mismo motor, así que el panel y la corrección
+// no pueden divergir.
+import {
+  altura,
+  bfs,
+  contarNodos,
+  eliminarAVLConLog,
+  eliminarBST,
+  factorBalance,
+  inorden,
+  insertarAVLConLog,
+  insertarBST,
+  postorden,
+  preorden,
+  type EstadoNodo,
+  type NodoArbol,
+} from './motor';
 
 type TipoArbol = 'bst' | 'avl';
-type EstadoNodo = 'normal' | 'camino' | 'nuevo' | 'desbalanceado' | 'eliminado' | 'encontrado';
-
-interface NodoArbol {
-  valor: number;
-  izq: NodoArbol | null;
-  der: NodoArbol | null;
-  altura: number;
-  estado?: EstadoNodo;
-}
 
 interface NodoPosicionado {
   valor: number;
@@ -96,174 +106,11 @@ const PRESETS: PresetArbol[] = [
 ];
 
 // ============================================================
-//  LÓGICA DEL ÁRBOL (BST + AVL)
+//  BÚSQUEDA Y DIBUJO DEL ÁRBOL
+//  La lógica del árbol (inserción, borrado, rotaciones y recorridos) se movió el
+//  15/09/2026 a `./motor.ts`, que es el módulo con el que `casos.ts` corrige los casos
+//  para clase. Aquí solo queda lo que es puramente de esta vista.
 // ============================================================
-
-function altura(n: NodoArbol | null): number {
-  return n ? n.altura : 0;
-}
-
-function actualizarAltura(n: NodoArbol): void {
-  n.altura = 1 + Math.max(altura(n.izq), altura(n.der));
-}
-
-function factorBalance(n: NodoArbol | null): number {
-  if (!n) return 0;
-  return altura(n.izq) - altura(n.der);
-}
-
-function rotarDerecha(y: NodoArbol): NodoArbol {
-  const x = y.izq;
-  if (!x) return y;
-  const T2 = x.der;
-  x.der = y;
-  y.izq = T2;
-  actualizarAltura(y);
-  actualizarAltura(x);
-  return x;
-}
-
-function rotarIzquierda(x: NodoArbol): NodoArbol {
-  const y = x.der;
-  if (!y) return x;
-  const T2 = y.izq;
-  y.izq = x;
-  x.der = T2;
-  actualizarAltura(x);
-  actualizarAltura(y);
-  return y;
-}
-
-function insertarBST(nodo: NodoArbol | null, valor: number): NodoArbol {
-  if (!nodo) {
-    return { valor, izq: null, der: null, altura: 1 };
-  }
-  if (valor < nodo.valor) {
-    nodo.izq = insertarBST(nodo.izq, valor);
-  } else if (valor > nodo.valor) {
-    nodo.der = insertarBST(nodo.der, valor);
-  }
-  actualizarAltura(nodo);
-  return nodo;
-}
-
-interface ResultadoAVL {
-  raiz: NodoArbol;
-  rotaciones: string[];
-}
-
-function insertarAVLConLog(
-  nodo: NodoArbol | null,
-  valor: number,
-  log: string[]
-): NodoArbol {
-  if (!nodo) {
-    return { valor, izq: null, der: null, altura: 1 };
-  }
-  if (valor < nodo.valor) {
-    nodo.izq = insertarAVLConLog(nodo.izq, valor, log);
-  } else if (valor > nodo.valor) {
-    nodo.der = insertarAVLConLog(nodo.der, valor, log);
-  } else {
-    return nodo; // duplicado: ignorar
-  }
-
-  actualizarAltura(nodo);
-  const fb = factorBalance(nodo);
-
-  // LL: izquierda-izquierda
-  if (fb > 1 && nodo.izq && valor < nodo.izq.valor) {
-    log.push(`Rotación LL en nodo ${nodo.valor} (insertando ${valor})`);
-    return rotarDerecha(nodo);
-  }
-  // RR: derecha-derecha
-  if (fb < -1 && nodo.der && valor > nodo.der.valor) {
-    log.push(`Rotación RR en nodo ${nodo.valor} (insertando ${valor})`);
-    return rotarIzquierda(nodo);
-  }
-  // LR: izquierda-derecha
-  if (fb > 1 && nodo.izq && valor > nodo.izq.valor) {
-    log.push(`Rotación LR en nodo ${nodo.valor} (insertando ${valor})`);
-    nodo.izq = rotarIzquierda(nodo.izq);
-    return rotarDerecha(nodo);
-  }
-  // RL: derecha-izquierda
-  if (fb < -1 && nodo.der && valor < nodo.der.valor) {
-    log.push(`Rotación RL en nodo ${nodo.valor} (insertando ${valor})`);
-    nodo.der = rotarDerecha(nodo.der);
-    return rotarIzquierda(nodo);
-  }
-  return nodo;
-}
-
-function minNodo(n: NodoArbol): NodoArbol {
-  let actual = n;
-  while (actual.izq) actual = actual.izq;
-  return actual;
-}
-
-function eliminarBST(nodo: NodoArbol | null, valor: number): NodoArbol | null {
-  if (!nodo) return null;
-  if (valor < nodo.valor) {
-    nodo.izq = eliminarBST(nodo.izq, valor);
-  } else if (valor > nodo.valor) {
-    nodo.der = eliminarBST(nodo.der, valor);
-  } else {
-    if (!nodo.izq) return nodo.der;
-    if (!nodo.der) return nodo.izq;
-    const sucesor = minNodo(nodo.der);
-    nodo.valor = sucesor.valor;
-    nodo.der = eliminarBST(nodo.der, sucesor.valor);
-  }
-  actualizarAltura(nodo);
-  return nodo;
-}
-
-function rebalancearAVL(nodo: NodoArbol, log: string[]): NodoArbol {
-  actualizarAltura(nodo);
-  const fb = factorBalance(nodo);
-
-  if (fb > 1 && factorBalance(nodo.izq) >= 0) {
-    log.push(`Rotación LL en nodo ${nodo.valor} (tras borrado)`);
-    return rotarDerecha(nodo);
-  }
-  if (fb > 1 && factorBalance(nodo.izq) < 0 && nodo.izq) {
-    log.push(`Rotación LR en nodo ${nodo.valor} (tras borrado)`);
-    nodo.izq = rotarIzquierda(nodo.izq);
-    return rotarDerecha(nodo);
-  }
-  if (fb < -1 && factorBalance(nodo.der) <= 0) {
-    log.push(`Rotación RR en nodo ${nodo.valor} (tras borrado)`);
-    return rotarIzquierda(nodo);
-  }
-  if (fb < -1 && factorBalance(nodo.der) > 0 && nodo.der) {
-    log.push(`Rotación RL en nodo ${nodo.valor} (tras borrado)`);
-    nodo.der = rotarDerecha(nodo.der);
-    return rotarIzquierda(nodo);
-  }
-  return nodo;
-}
-
-function eliminarAVLConLog(
-  nodo: NodoArbol | null,
-  valor: number,
-  log: string[]
-): NodoArbol | null {
-  if (!nodo) return null;
-  if (valor < nodo.valor) {
-    nodo.izq = eliminarAVLConLog(nodo.izq, valor, log);
-  } else if (valor > nodo.valor) {
-    nodo.der = eliminarAVLConLog(nodo.der, valor, log);
-  } else {
-    if (!nodo.izq || !nodo.der) {
-      return nodo.izq ?? nodo.der;
-    }
-    const sucesor = minNodo(nodo.der);
-    nodo.valor = sucesor.valor;
-    nodo.der = eliminarAVLConLog(nodo.der, sucesor.valor, log);
-  }
-  return rebalancearAVL(nodo, log);
-}
 
 function buscarCamino(nodo: NodoArbol | null, valor: number): number[] {
   const camino: number[] = [];
@@ -283,50 +130,6 @@ function existe(nodo: NodoArbol | null, valor: number): boolean {
     actual = valor < actual.valor ? actual.izq : actual.der;
   }
   return false;
-}
-
-// Recorridos
-function inorden(nodo: NodoArbol | null, acc: number[]): number[] {
-  if (!nodo) return acc;
-  inorden(nodo.izq, acc);
-  acc.push(nodo.valor);
-  inorden(nodo.der, acc);
-  return acc;
-}
-
-function preorden(nodo: NodoArbol | null, acc: number[]): number[] {
-  if (!nodo) return acc;
-  acc.push(nodo.valor);
-  preorden(nodo.izq, acc);
-  preorden(nodo.der, acc);
-  return acc;
-}
-
-function postorden(nodo: NodoArbol | null, acc: number[]): number[] {
-  if (!nodo) return acc;
-  postorden(nodo.izq, acc);
-  postorden(nodo.der, acc);
-  acc.push(nodo.valor);
-  return acc;
-}
-
-function bfs(nodo: NodoArbol | null): number[] {
-  if (!nodo) return [];
-  const cola: NodoArbol[] = [nodo];
-  const res: number[] = [];
-  while (cola.length > 0) {
-    const actual = cola.shift();
-    if (!actual) break;
-    res.push(actual.valor);
-    if (actual.izq) cola.push(actual.izq);
-    if (actual.der) cola.push(actual.der);
-  }
-  return res;
-}
-
-function contarNodos(nodo: NodoArbol | null): number {
-  if (!nodo) return 0;
-  return 1 + contarNodos(nodo.izq) + contarNodos(nodo.der);
 }
 
 // Layout: posicionar nodos en SVG
@@ -1034,6 +837,9 @@ export default function SimuladorArbolesBstAvl() {
           </div>
         )}
       </main>
+
+      {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}
+      <CasosAula />
 
       <EducationalSection
         title="Guía de Árboles BST y AVL"

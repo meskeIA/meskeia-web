@@ -367,3 +367,136 @@ export function minimizar(automata: AutomataMotor): ResultadoMinimizacion {
     fusionados,
   };
 }
+
+// ─────────────────────────────────────────────────────────────
+// Recorrido de una cadena (simulación)
+//
+// Estaba duplicado: `page.tsx` tenía su propia copia de `epsilonClausura` y aquí había
+// otra, así que la app podía recorrer una cadena con un convenio y los casos de clase
+// corregirla con otro. Se subió aquí el 15/09/2026 para que haya UNA sola simulación:
+// la vista, el lote de cadenas y la corrección de los casos llaman a estas mismas
+// funciones. Si divergieran, la app suspendería una respuesta que ella misma produce.
+// ─────────────────────────────────────────────────────────────
+
+/** Cómo se recorre la cadena: un AFD sigue UNA rama, un AFND sigue todas a la vez. */
+export type TipoAuto = 'dfa' | 'nfa';
+
+/** Una fotografía del recorrido tras leer un símbolo. La vista la pinta paso a paso. */
+export interface PasoValidacion {
+  posicion: number;
+  simbolo: string;
+  estadosActivos: string[];
+  descripcion: string;
+}
+
+export type ResultadoValidacion = 'aceptada' | 'rechazada' | 'sin-transicion' | 'pendiente';
+
+/**
+ * Recorre la cadena y devuelve el rastro completo más el veredicto.
+ *
+ * Nunca lanza: sin estado inicial devuelve un paso que lo dice y 'rechazada', porque un
+ * `throw` en pleno render tumbaría la app entera.
+ */
+export function generarPasosValidacion(
+  cadena: string,
+  tipo: TipoAuto,
+  estados: EstadoMotor[],
+  transiciones: TransicionMotor[],
+): { pasos: PasoValidacion[]; resultado: ResultadoValidacion } {
+  const inicial = estados.find((e) => e.esInicial);
+  if (!inicial) {
+    return {
+      pasos: [
+        {
+          posicion: -1,
+          simbolo: '',
+          estadosActivos: [],
+          descripcion: 'No hay estado inicial definido',
+        },
+      ],
+      resultado: 'rechazada',
+    };
+  }
+
+  const pasos: PasoValidacion[] = [];
+  let activos: string[];
+
+  if (tipo === 'nfa') {
+    activos = epsilonClausura([inicial.id], transiciones);
+  } else {
+    activos = [inicial.id];
+  }
+
+  pasos.push({
+    posicion: 0,
+    simbolo: '',
+    estadosActivos: [...activos],
+    descripcion: `Estado(s) inicial(es): ${activos.join(', ')}`,
+  });
+
+  for (let i = 0; i < cadena.length; i++) {
+    const simbolo = cadena[i];
+    let siguientes: string[] = [];
+
+    if (tipo === 'dfa') {
+      const t = transiciones.find(
+        (tr) => tr.from === activos[0] && tr.simbolo === simbolo,
+      );
+      if (!t) {
+        pasos.push({
+          posicion: i + 1,
+          simbolo,
+          estadosActivos: [],
+          descripcion: `Sin transición desde ${activos[0]} con "${simbolo}"`,
+        });
+        return { pasos, resultado: 'sin-transicion' };
+      }
+      siguientes = [t.to];
+    } else {
+      const conjunto = new Set<string>();
+      for (const id of activos) {
+        for (const t of transiciones) {
+          if (t.from === id && t.simbolo === simbolo) {
+            conjunto.add(t.to);
+          }
+        }
+      }
+      siguientes = epsilonClausura([...conjunto], transiciones);
+    }
+
+    if (siguientes.length === 0) {
+      pasos.push({
+        posicion: i + 1,
+        simbolo,
+        estadosActivos: [],
+        descripcion: `Sin transición disponible con "${simbolo}"`,
+      });
+      return { pasos, resultado: 'sin-transicion' };
+    }
+
+    activos = siguientes;
+    pasos.push({
+      posicion: i + 1,
+      simbolo,
+      estadosActivos: [...activos],
+      descripcion: `Lee "${simbolo}" → ${activos.join(', ')}`,
+    });
+  }
+
+  // ¿Algún estado activo es final?
+  const finales = new Set(estados.filter((e) => e.esFinal).map((e) => e.id));
+  const aceptada = activos.some((id) => finales.has(id));
+
+  return { pasos, resultado: aceptada ? 'aceptada' : 'rechazada' };
+}
+
+/** Solo el veredicto, sin el rastro. Lo usan el lote de cadenas y los casos de clase. */
+export function validarRapido(
+  cadena: string,
+  tipo: TipoAuto,
+  estados: EstadoMotor[],
+  transiciones: TransicionMotor[],
+): ResultadoValidacion {
+  const { resultado } = generarPasosValidacion(cadena, tipo, estados, transiciones);
+  return resultado;
+}
