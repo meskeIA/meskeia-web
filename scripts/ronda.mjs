@@ -5,7 +5,8 @@
  * Ejecutar:  npm run ronda                  (las 1.172 URLs anunciadas, build local)
  *            npm run ronda -- --produccion  (contra meskeia.com — la pasada nocturna)
  *            npm run ronda -- --url /cronometro/,/golden-hour/
- *            npm run ronda -- --autocomprobar
+ *            npm run ronda -- --autocomprobar     (solo el control, sin barrer)
+ *            npm run ronda -- --romper-control    (ensayo: el control DEBE fallar)
  *            npm run ronda -- --limite 40 --concurrencia 8 --filtro visualizador
  *
  * QUÉ HACE — y qué NO
@@ -35,6 +36,21 @@
  *
  * IMPORTANTE: la ronda BLOQUEA las llamadas a /api/analytics/* — un barrido de
  * 1.172 páginas metería un día entero de visitas falsas en Turso.
+ *
+ * EL CONTROL PREVIO (2026-09-15)
+ * ──────────────────────────────
+ * Antes de tocar el catálogo, cada ronda completa barre tres URLs de control: la home,
+ * que debe salir sana, y dos rutas inventadas, que deben salir rotas. Si el detector no
+ * distingue una de otra, se aborta el barrido: un «0 con error» producido por un detector
+ * ciego es peor que no tener ronda, porque además tranquiliza.
+ *
+ * Esto vivía en un flag manual (`--autocomprobar`) al que llamaba un aviso de `ronda:hoy`
+ * tras 15 actas limpias seguidas. El aviso se retiró porque contaba el eje equivocado:
+ * la racha de «0 nuevas» mide que el catálogo está quieto —que es lo esperable—, no que
+ * la ronda siga mirando. Y contaba sin poder saber que la verificación ya se había hecho,
+ * así que reaparecía cada mañana: un aviso que sale siempre deja de informar. El control
+ * cuesta unos segundos sobre los ~473 del barrido, así que se hace siempre y el «0 con
+ * error» sale sellado en vez de salir a crédito.
  */
 
 import { chromium } from 'playwright';
@@ -60,11 +76,26 @@ const FILTRO = valorDe('filtro', '');
 /** URLs sueltas separadas por coma — para revisar una app concreta o para autocomprobar */
 const URLS_SUELTAS = valorDe('url', '');
 /**
- * Prueba de control. Mete a propósito dos URLs que DEBEN fallar. Si la ronda las
- * da por buenas, la ronda está rota y su "0 errores" no vale nada — que es
- * justamente lo que pasa cuando un indicador lleva semanas diciendo lo mismo.
+ * Prueba de control a secas, sin barrer el catálogo. La ronda completa la ejecuta ya
+ * por su cuenta cada noche; esto sirve para comprobarla a mano tras tocar el script.
  */
 const AUTOCOMPROBAR = args.includes('--autocomprobar');
+/**
+ * Ensayo del control: cambia las dos rutas rotas por dos SANAS, de modo que el control
+ * no pueda cazar nada y TIENE que fallar. Es la reinyección del caso de origen —un
+ * detector ciego— y comprueba que la ronda aborta de verdad en vez de seguir adelante y
+ * estampar un sello que no se ha ganado. Escribe el acta con prefijo `ensayo-` para no
+ * pisar la del día.
+ */
+const ENSAYO_CONTROL = args.includes('--romper-control');
+/**
+ * Las tres URLs del control: la home, que debe salir SANA, y dos rutas inventadas, que
+ * deben salir ROTAS. La home no está en `implemented-apps.ts`, así que aquí se revisa
+ * además por primera vez — no es trabajo duplicado.
+ */
+const URLS_CONTROL = ENSAYO_CONTROL
+  ? ['/estimador-inflacion/', '/conversor-pesetas-euros/']     // sanas: el control debe fallar
+  : ['/ruta-que-no-existe-prueba-de-ronda/', '/otra-ruta-inventada/'];
 /**
  * Contra qué se mide. Por defecto el build local, para poder comprobar un arreglo
  * antes de desplegarlo. La pasada automática de cada noche usa `--produccion`: lo que
@@ -135,7 +166,7 @@ function normalizarUrl(s) {
 
 function leerCatalogo() {
   if (URLS_SUELTAS) return URLS_SUELTAS.split(',').map(normalizarUrl).filter(u => u !== '/');
-  if (AUTOCOMPROBAR) return ['/', '/ruta-que-no-existe-prueba-de-ronda/', '/otra-ruta-inventada/'];
+  if (AUTOCOMPROBAR) return [];   // el control corre aparte, antes del catálogo
   const txt = fs.readFileSync(path.join(RAIZ, 'data', 'implemented-apps.ts'), 'utf8');
   const urls = (txt.match(/"\/[^"]*\/"/g) || []).map(s => s.slice(1, -1));
   const unicas = [...new Set(urls)];
@@ -254,6 +285,69 @@ async function barrer(ctx, urls, tituloHome, alAvanzar) {
   return res;
 }
 
+// ─── Prueba de control ────────────────────────────────────────────────────────
+
+/**
+ * ¿Sigue este detector distinguiendo una página sana de una rota? Se responde con las
+ * MISMAS funciones que barren el catálogo —`revisar()` sobre las tres URLs de control—,
+ * porque un control que use otro camino no prueba el camino que importa.
+ */
+async function pruebaDeControl(ctx, tituloHome) {
+  const res = await barrer(ctx, ['/', ...URLS_CONTROL], tituloHome, () => { });
+  const home = res.find(r => r.url === '/');
+  const falsas = res.filter(r => r.url !== '/');
+  const homeSana = Boolean(home) && !home.errores.length;
+  const cazadas = falsas.filter(r => r.errores.length);
+  return {
+    vale: homeSana && cazadas.length === falsas.length,
+    homeSana,
+    homeErrores: home ? home.errores : ['sin resultado'],
+    cazadas: cazadas.length,
+    total: falsas.length,
+    detalle: falsas.map(r => ({ url: r.url, errores: r.errores })),
+  };
+}
+
+function imprimirControl(c) {
+  console.log(`\n${'─'.repeat(64)}`);
+  console.log('PRUEBA DE CONTROL');
+  console.log(`  home (debe estar sana):      ${c.homeSana ? 'OK' : 'FALLA → ' + c.homeErrores.join(', ')}`);
+  console.log(`  rutas inventadas detectadas: ${c.cazadas}/${c.total}`);
+  for (const r of c.detalle) console.log(`    ${r.url} → ${r.errores.join(', ') || 'NO DETECTADA'}`);
+  console.log(`\n  ${c.vale
+    ? 'La ronda distingue una página sana de una rota.'
+    : 'LA RONDA NO SIRVE: revisar antes de fiarse de ningún "0 errores".'}`);
+}
+
+/**
+ * Acta del día en que el control falla. Se escribe con el nombre normal a propósito: si
+ * no existiera acta, `ronda:hoy` diría «la Ronda no ha corrido», que es un diagnóstico
+ * distinto y llevaría a mirar la tarea programada en vez del detector. Lo que NO se toca
+ * es la línea de base, para que la ronda siguiente compare contra el último día bueno.
+ */
+function escribirActaControlFallido(c, fecha) {
+  fs.mkdirSync(DIR_INFORMES, { recursive: true });
+  const L = [];
+  L.push(`# Ronda del ${fecha}`);
+  L.push('');
+  L.push('⚠ **CONTROL FALLIDO — la ronda no ha llegado a barrer el catálogo.**');
+  L.push('');
+  L.push('La prueba de control previa dice que este detector ya no distingue una página sana');
+  L.push('de una rota, así que cualquier «0 con error» de hoy no valdría nada. El barrido se ha');
+  L.push('abortado a propósito y la línea de base NO se ha tocado.');
+  L.push('');
+  L.push(`- home (debe estar sana): ${c.homeSana ? 'OK' : 'FALLA → ' + c.homeErrores.join(', ')}`);
+  L.push(`- rutas inventadas cazadas: ${c.cazadas}/${c.total}`);
+  for (const r of c.detalle) L.push(`  - ${r.url} → ${r.errores.join(', ') || '**NO DETECTADA**'}`);
+  L.push('');
+  L.push('Revisar `scripts/ronda.mjs` antes de fiarse de la próxima ronda.');
+  L.push('');
+  const sufijo = PRODUCCION ? '-produccion' : '';
+  const nombre = `${ENSAYO_CONTROL ? 'ensayo-' : ''}ronda${sufijo}-${fecha}.md`;
+  fs.writeFileSync(path.join(DIR_INFORMES, nombre), L.join('\n'), 'utf8');
+  return nombre;
+}
+
 // ─── Informe ──────────────────────────────────────────────────────────────────
 
 function comparar(actual, anterior) {
@@ -267,7 +361,7 @@ function comparar(actual, anterior) {
   };
 }
 
-function escribirInforme(res, dif, segundos, fecha) {
+function escribirInforme(res, dif, segundos, fecha, control) {
   fs.mkdirSync(DIR_INFORMES, { recursive: true });
   const conError = res.filter(r => r.errores.length);
   const conAviso = res.filter(r => !r.errores.length && r.avisos.length);
@@ -277,6 +371,11 @@ function escribirInforme(res, dif, segundos, fecha) {
   L.push('');
   L.push(`${res.length} URLs revisadas en ${segundos} s · **${conError.length} con error** · ${conAviso.length} con aviso`);
   L.push('');
+  // El sello: sin él, la cifra de arriba es una afirmación sin respaldo
+  if (control) {
+    L.push(`Control previo: home sana · ${control.cazadas}/${control.total} rutas rotas cazadas.`);
+    L.push('');
+  }
   if (dif) {
     L.push(`Frente a la ronda anterior: ${dif.nuevas.length} nuevas · ${dif.resueltas.length} resueltas · ${dif.persistentes.length} persistentes`);
     if (dif.nuevas.length) {
@@ -313,9 +412,10 @@ function escribirInforme(res, dif, segundos, fecha) {
   // Local y producción llevan estado separado: mezclarlos haría que un arreglo aún
   // sin desplegar apareciese como "resuelto" en la ronda de producción.
   const sufijo = PRODUCCION ? '-produccion' : '';
-  const nombre = ES_PARCIAL ? `parcial${sufijo}-${fecha}.md` : `ronda${sufijo}-${fecha}.md`;
+  const prefijo = ENSAYO_CONTROL ? 'ensayo-' : '';
+  const nombre = ES_PARCIAL ? `${prefijo}parcial${sufijo}-${fecha}.md` : `${prefijo}ronda${sufijo}-${fecha}.md`;
   fs.writeFileSync(path.join(DIR_INFORMES, nombre), L.join('\n'), 'utf8');
-  if (ES_PARCIAL) return { conError, conAviso, nombre };
+  if (ES_PARCIAL || ENSAYO_CONTROL) return { conError, conAviso, nombre };
 
   const estado = {
     fecha,
@@ -323,6 +423,7 @@ function escribirInforme(res, dif, segundos, fecha) {
     errores: conError.length,
     avisos: conAviso.length,
     segundos,
+    control: control ? { cazadas: control.cazadas, total: control.total } : null,
     conIncidencia: res.filter(r => r.errores.length || r.avisos.length).map(r => r.url),
     detalle: res.filter(r => r.errores.length || r.avisos.length)
       .map(r => ({ url: r.url, errores: r.errores, avisos: r.avisos })),
@@ -336,7 +437,9 @@ function escribirInforme(res, dif, segundos, fecha) {
 const t0 = Date.now();
 let urls = leerCatalogo();
 if (LIMITE > 0) urls = urls.slice(0, LIMITE);
-console.log(`\nRonda de ${urls.length} URLs · ${CONCURRENCIA} en paralelo\n`);
+console.log(AUTOCOMPROBAR
+  ? `\nPrueba de control (${URLS_CONTROL.length + 1} URLs), sin barrer el catálogo\n`
+  : `\nRonda de ${urls.length} URLs · ${CONCURRENCIA} en paralelo\n`);
 
 const proc = await asegurarServidor();
 const navegador = await chromium.launch({ headless: true });
@@ -356,6 +459,33 @@ const paginaHome = await ctx.newPage();
 await paginaHome.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
 const tituloHome = await paginaHome.title();
 await paginaHome.close();
+
+/**
+ * El control va ANTES del barrido, no después: si el detector está ciego, barrer 1.183
+ * URLs solo sirve para producir un «0 con error» falso y escribirlo como línea de base.
+ * Las pasadas parciales no lo ejecutan — no pisan nada y quien las lanza está mirando.
+ */
+const fechaHoy = new Date().toISOString().slice(0, 10);
+let control = null;
+if (AUTOCOMPROBAR || !ES_PARCIAL) {
+  control = await pruebaDeControl(ctx, tituloHome);
+  if (AUTOCOMPROBAR) {
+    await navegador.close();
+    if (proc) proc.kill();
+    imprimirControl(control);
+    process.exit(control.vale ? 0 : 1);
+  }
+  if (!control.vale) {
+    await navegador.close();
+    if (proc) proc.kill();
+    imprimirControl(control);
+    const acta = escribirActaControlFallido(control, fechaHoy);
+    console.log(`\n  Barrido ABORTADO: no se toca la línea de base.`);
+    console.log(`  Acta: _private/rondas/${acta}`);
+    process.exit(1);
+  }
+  console.log(`  control: home sana · ${control.cazadas}/${control.total} rutas rotas cazadas\n`);
+}
 
 let ultimoAviso = 0;
 const primera = await barrer(ctx, urls, tituloHome, n => {
@@ -380,31 +510,18 @@ if (proc) proc.kill();
 
 const segundos = Math.round((Date.now() - t0) / 1000);
 
-if (AUTOCOMPROBAR) {
-  const home = res.find(r => r.url === '/');
-  const falsas = res.filter(r => r.url !== '/');
-  const detectadas = falsas.filter(r => r.errores.length).length;
-  console.log(`\n${'─'.repeat(64)}`);
-  console.log('PRUEBA DE CONTROL');
-  console.log(`  home (debe estar sana):     ${home && !home.errores.length ? 'OK' : 'FALLA → ' + (home ? home.errores.join(', ') : 'sin resultado')}`);
-  console.log(`  rutas inventadas detectadas: ${detectadas}/${falsas.length}`);
-  for (const r of falsas) console.log(`    ${r.url} → ${r.errores.join(', ') || 'NO DETECTADA'}`);
-  const vale = home && !home.errores.length && detectadas === falsas.length;
-  console.log(`\n  ${vale ? 'La ronda distingue una página sana de una rota.' : 'LA RONDA NO SIRVE: revisar antes de fiarse de ningún "0 errores".'}`);
-  process.exit(vale ? 0 : 1);
-}
-
-const fecha = new Date().toISOString().slice(0, 10);
+const fecha = fechaHoy;
 let anterior = null;
 // Una pasada parcial no se compara con la ronda completa: los "resueltos" serían falsos
 if (!ES_PARCIAL) {
   try { anterior = JSON.parse(fs.readFileSync(FICHERO_ESTADO(), 'utf8')); } catch { }
 }
 const dif = comparar(res, anterior);
-const { conError, conAviso, nombre } = escribirInforme(res, dif, segundos, fecha);
+const { conError, conAviso, nombre } = escribirInforme(res, dif, segundos, fecha, control);
 
 console.log(`\n${'─'.repeat(64)}`);
 console.log(`${ES_PARCIAL ? 'Pasada parcial' : 'Ronda completa'}: ${res.length} URLs en ${segundos} s`);
+if (control) console.log(`Control previo: home sana · ${control.cazadas}/${control.total} rutas rotas cazadas`);
 console.log(`Errores: ${conError.length} · Avisos: ${conAviso.length}`);
 if (dif) console.log(`Nuevas: ${dif.nuevas.length} · Resueltas: ${dif.resueltas.length} · Persistentes: ${dif.persistentes.length}`);
 if (ES_PARCIAL) console.log('(parcial: no toca la línea de base de la ronda completa)');

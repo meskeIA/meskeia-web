@@ -54,9 +54,29 @@ if (dias >= 1) {
   console.log(`   Comprobar con /log, o lanzarla a mano: npm run ronda -- --produccion\n`);
 }
 
+/**
+ * El acta de un día en que el control previo falló no trae cifras, y las que trajera no
+ * valdrían: la Ronda aborta antes de barrer. Este aviso sí informa porque no sale nunca —
+ * al revés que el contador de racha que ocupaba este sitio hasta el 15/09/2026, que
+ * medía la quietud del catálogo y acababa repitiéndose cada mañana.
+ */
+if (/^⚠ \*\*CONTROL FALLIDO/m.test(txt)) {
+  console.log(`\n⚠  CONTROL FALLIDO: la Ronda no distingue una página sana de una rota.`);
+  for (const l of txt.split('\n')) {
+    if (/^- (home|rutas inventadas)/.test(l) || /^ {2}- /.test(l)) console.log(`   ${l.trim()}`);
+  }
+  console.log(`\n   No hay barrido de hoy y la línea de base no se ha tocado, a propósito.`);
+  console.log(`   Revisar scripts/ronda.mjs: npm run ronda -- --autocomprobar\n`);
+  process.exit(1);
+}
+
 if (cabecera.length) {
   console.log(`   ${cabecera[0]} URLs · ${cabecera[2]} con error · ${cabecera[3]} con aviso`);
 }
+// El sello del control: sin él, ese "N con error" es una afirmación sin respaldo
+const sello = (txt.match(/^Control previo: (.+)$/m) || [])[1];
+if (sello) console.log(`   control previo: ${sello.replace(/\.$/, '')}`);
+else if (cabecera.length) console.log(`   ⚠ acta sin sello de control (¿ronda anterior al 15/09/2026?)`);
 if (comparacion.length) {
   console.log(`   ${comparacion[0]} nuevas · ${comparacion[1]} resueltas · ${comparacion[2]} persistentes`);
 }
@@ -136,25 +156,4 @@ if (persistentes.length) {
   }
 }
 
-/**
- * Contador de veredicto repetido, impreso y no confiado a la memoria de nadie.
- * "Sin novedades" es la respuesta correcta casi todos los días, y precisamente por eso
- * deja de informar: a partir de cierto punto es indistinguible de una Ronda que mira mal.
- * El umbral es alto (15 días) porque aquí lo esperable ES la racha, al revés que en un
- * semáforo; lo que la rompe es cualquier cambio del catálogo, y se despliega casi a diario.
- */
-let racha = 0;
-for (let i = actas.length - 1; i >= 0; i--) {
-  const t = fs.readFileSync(path.join(DIR, actas[i]), 'utf8');
-  const m = t.match(/^Frente a la ronda anterior: (\d+) nuevas/m);
-  if (!m) break;              // la primera acta no compara con nada
-  if (m[1] === '0') racha++; else break;
-}
-if (racha >= 15) {
-  console.log(`\n⚠  ${racha} rondas seguidas sin una sola novedad, habiendo desplegado en ese tiempo.`);
-  console.log(`   La lectura por defecto ya no es que el catálogo esté sano, sino que la Ronda`);
-  console.log(`   ha dejado de mirar. Comprobarlo: npm run ronda -- --autocomprobar`);
-} else if (racha > 1) {
-  console.log(`   (${racha} rondas seguidas sin novedades)`);
-}
 console.log('');
