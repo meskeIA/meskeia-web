@@ -54,7 +54,8 @@
     "inspector:hallazgos": "node scripts/inspector/cerrar.mjs",
     "inspector:probar-contador": "node scripts/inspector/probar-contador.mjs",
     "check:tipos": "node scripts/check-tipos.mjs",
-    "cuadrante": "node scripts/cuadrante-catalogo.mjs"
+    "cuadrante": "node scripts/cuadrante-catalogo.mjs",
+    "analisis:geografia": "node scripts/analisis-geografia-serie.mjs"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
