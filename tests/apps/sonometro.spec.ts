@@ -119,6 +119,15 @@ declare global {
  * como si fuera de la app y nunca se cerraría). El contexto se reanuda dentro del propio
  * getUserMedia, que la app llama desde el clic, para heredar el gesto del usuario: arrancado
  * fuera de él quedaría suspendido y entregaría silencio.
+ *
+ * ⚠️ 15/09/2026 — la reanudación se PIDE dentro del gesto pero NO se espera indefinidamente.
+ * Con `await ctx.resume()` a secas, este caso fallaba 1 de cada 5 veces incluso ejecutando el
+ * spec solo: cuando el `resume()` se queda pendiente —pestaña recién abierta, activación de
+ * usuario aún sin registrar—, `getUserMedia` no resuelve NUNCA, la app no llega a `isActive`
+ * y la lectura se queda en «--» hasta agotar los 15 segundos de espera. El stream se devuelve
+ * igual pasado un segundo y el audio empieza a fluir en cuanto el contexto reanuda; quien se
+ * encarga de no medir antes de tiempo es `esperarMedicionEnMarcha`, que mira el estado REAL
+ * del medio y no el DOM.
  */
 async function micrófonoSintético(page: Page, frecuencia: number, amplitud: number): Promise<void> {
   await page.addInitScript(
@@ -138,7 +147,9 @@ async function micrófonoSintético(page: Page, frecuencia: number, amplitud: nu
           oscilador.connect(ganancia).connect(destino);
           oscilador.start();
         }
-        await ctx.resume();
+        // Se pide dentro del gesto (hereda la activación) y se le da un segundo: si no
+        // completa, el stream se entrega igual en vez de dejar colgado a getUserMedia.
+        await Promise.race([ctx.resume(), new Promise((listo) => setTimeout(listo, 1000))]);
         return (destino as MediaStreamAudioDestinationNode).stream;
       };
     },
@@ -228,7 +239,17 @@ async function esperarMedicionEnMarcha(page: Page): Promise<void> {
     .toBe(true);
 }
 
-/** Mide una senoide en una pestaña limpia y devuelve lo que muestra la app. */
+/**
+ * Mide una senoide en una pestaña limpia y devuelve lo que muestra la app.
+ *
+ * ⚠️ 15/09/2026 — espera el ESTADO REAL DEL MEDIO antes de leer el DOM, que es lo que ya
+ * hacía el caso principal y no hacía esta función. La asimetría era el flaky: aquí se
+ * esperaba solo a que la lectura dejara de ser «--», así que cualquier tropiezo del arranque
+ * se manifestaba como un timeout de 15 s sin decir por qué, en vez de como lo que era —el
+ * micrófono simulado todavía no entregaba audio—. El comentario de `esperarMedicionEnMarcha`
+ * ya lo advertía («hasta que el contexto corre no hay medición»); faltaba aplicarlo a las
+ * pestañas secundarias. Instrumentar DESPUÉS del micrófono sintético, nunca antes.
+ */
 async function medirTono(
   browser: Browser,
   frecuencia: number,
@@ -237,8 +258,10 @@ async function medirTono(
   const contexto = await browser.newContext({ permissions: ['microphone'] });
   const pagina = await contexto.newPage();
   await micrófonoSintético(pagina, frecuencia, amplitud);
+  await instrumentar(pagina);
   await pagina.goto(RUTA);
   await pagina.getByRole('button', { name: /Iniciar medición/i }).click();
+  await esperarMedicionEnMarcha(pagina);
   await esperarLectura(pagina);
   await pagina.waitForTimeout(1500); // que se asiente: el nivel es constante, no hace falta más
   const db = await lecturaNumero(pagina);
@@ -693,8 +716,11 @@ test('HALLAZGO 279 — la aguja apunta al color de la banda que la app declara, 
   const alta = await contexto.newPage();
   await alta.addInitScript(() => window.localStorage.setItem('sonometro-calibracion', '120'));
   await micrófonoSintético(alta, 1000, 0.5);
+  await instrumentar(alta); // siempre DESPUÉS del micrófono sintético
   await alta.goto(RUTA);
   await alta.getByRole('button', { name: /Iniciar medición/i }).click();
+  // El estado real del medio antes que el DOM, igual que en `medirTono` (15/09/2026).
+  await esperarMedicionEnMarcha(alta);
   await esperarLectura(alta);
   await alta.waitForTimeout(1500);
 
@@ -810,6 +836,12 @@ test('CASO 4 (límite) — 2,0 s no entra en el registro y 3,3 s sí, con la dur
     const contexto = await browser.newContext({ permissions: ['microphone'] });
     const pagina = await contexto.newPage();
     await micrófonoSintético(pagina, 1000, 0.05);
+    // ⚠️ Aquí NO se añade `esperarMedicionEnMarcha` a propósito (15/09/2026): este caso
+    // compara la duración anotada con la pulsación real y solo admite medio segundo de
+    // desfase, así que cualquier espera extra entre el clic y el «Detener» estrecha ese
+    // margen. El cuelgue que provocaba el flaky se reparó en la RAÍZ —el `resume()` del
+    // micrófono sintético ya no puede dejar a `getUserMedia` sin resolver—, y esa reparación
+    // cubre también a esta pestaña sin tocarle el reloj.
     await pagina.goto(RUTA);
 
     const inicioReloj = Date.now();
