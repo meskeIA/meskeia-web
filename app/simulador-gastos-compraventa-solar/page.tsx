@@ -587,7 +587,7 @@ export default function SimuladorSolarPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Sí, pero la paga el vendedor, no el comprador. Al ser suelo de naturaleza urbana, la transmisión
                 genera plusvalía municipal (IIVTNU) sobre el incremento de valor del terreno. Si no hubo
-                incremento real, puede acreditarse la exención con las escrituras.
+                incremento real, la transmisión NO está sujeta (art. 104.5 TRLRHL): se acredita con las escrituras.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>

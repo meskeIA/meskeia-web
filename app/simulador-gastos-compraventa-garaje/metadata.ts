@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 import { RANGO_ITP, RANGO_AJD, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
@@ -65,37 +65,19 @@ const webAppSchema = generateWebAppSchema({
   keywords: ['gastos garaje', 'ITP garaje', 'compraventa garaje', 'plaza parking impuestos', 'España'],
 });
 
-const faqSchema = generateFAQSchema({
-  url: 'https://meskeia.com/simulador-gastos-compraventa-garaje/',
-  mainEntity: [
-    {
-      question: '¿Se puede comprar un garaje sin ser propietario de una vivienda?',
-      answer: 'Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.',
-    },
-    {
-      question: '¿Qué ITP paga un garaje de segunda mano?',
-      answer: RESPUESTA_ITP_GARAJE_SEGUNDA_MANO,
-    },
-    {
-      question: '¿Garaje nuevo o de segunda mano: qué impuesto se paga?',
-      answer: `Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del ${formatNumber(RANGO_AJD.min, 0)}% al ${formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del ${IVA_INMUEBLES_2025.anejoVinculado}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del ${IVA_INMUEBLES_2025.garaje}% si se adquiere de forma independiente o en un edificio de uso no residencial. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.`,
-    },
-    {
-      question: '¿El vendedor de un garaje paga plusvalía municipal?',
-      // El tipo que la calculadora APLICA (el orientativo del 25 %) se publicó en la FAQ
-      // visible al reparar el hallazgo 516 y no llegó a ninguno de los dos FAQPage: uno
-      // nombraba solo el 30 %, el máximo legal, así que un asistente de IA respondía con el
-      // tipo que la app NO usa, un 20 % por encima (hallazgo 671).
-      answer: `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`,
-    },
-    {
-      question: '¿Existen tipos reducidos de ITP para garajes?',
-      answer: 'Casi todos exigen que el inmueble sea la vivienda habitual del comprador, además del requisito personal (edad, familia numerosa, discapacidad). Un garaje suelto nunca es vivienda habitual, así que el tipo reducido NO aplica aunque el comprador cumpla el resto de condiciones: solo tributa como vivienda habitual cuando se adquiere vinculado a ella, en el mismo acto y edificio. Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.',
-    },
-  ],
-});
 
-export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+/**
+ * UN solo FAQPage por URL.
+ *
+ * ⚠️ 15/09/2026 (hallazgo 846) — la página servía DOS: este jsonLd combinaba el WebApplication
+ * con un FAQPage de cinco preguntas y el layout inyectaba además el faqJsonLd de abajo, que
+ * las repite todas y añade una sexta. Tres de aquellas cinco respuestas estaban escritas dos
+ * veces A MANO en este mismo fichero —solo las que centralizó el hallazgo 774 viajaban en
+ * constante— y una ya había divergido («algunas CCAA» frente a «algunas comunidades
+ * autónomas»). Las hermanas local-comercial y nave-industrial sirven uno solo, y es el canal
+ * que citan los asistentes de IA sin el disclaimer al lado.
+ */
+export const jsonLd = webAppSchema;
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',

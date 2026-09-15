@@ -734,7 +734,7 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Sí. La plusvalía municipal (IIVTNU) se aplica al incremento del valor del suelo durante el
                 tiempo de propiedad, independientemente de si el inmueble es residencial o industrial.
-                Si no hay ganancia real en el valor del terreno, puede acreditarse la exención.
+                Si no hay incremento real en el valor del terreno se produce un supuesto de no sujeción, no una exención (art. 104.5 TRLRHL, redacción del RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo y acreditarlo con las escrituras de compra y venta.
               </p>
             </div>
           </div>

@@ -107,6 +107,8 @@ interface ResultadosVendedor {
   valorTransmision: number;
   gananciaPatrimonial: number;
   esPerdida: boolean;
+  /** Ni ganancia ni pérdida: se vende exactamente por el valor de adquisición. */
+  sinGananciaNiPerdida: boolean;
   irpfGanancia: number;
   /** false mientras falte el precio de compra: entonces el 0 no es una exención */
   irpfCalculado: boolean;
@@ -382,6 +384,7 @@ export default function SimuladorGarajeCompraventaPage() {
       valorTransmision: g.valorTransmision,
       gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
       esPerdida: hayDatosGanancia && g.esPerdida,
+      sinGananciaNiPerdida: hayDatosGanancia && g.sinGananciaNiPerdida,
       irpfGanancia: irpf,
       irpfCalculado: hayDatosGanancia,
     };
@@ -836,6 +839,11 @@ export default function SimuladorGarajeCompraventaPage() {
                   label="Años de propiedad"
                   placeholder="8"
                   helperText="Años completos desde la compra hasta la venta actual. Escribe 0 si vendes antes de cumplir el año: esa reventa también tributa, y con un coeficiente mayor."
+                  // El blur NO acota este campo: su min es 0 y el 0 SIGNIFICA la reventa antes del
+                  // año (coeficiente 0,14), así que reescribir un valor imposible al mínimo lo convertía
+                  // en un supuesto fiscal válido y caro, y la app lo liquidaba como definitivo
+                  // (hallazgos 822 y 844). Quien decide sobre un año negativo es la guarda de la app.
+                  acotarAlSalir={false}
                   min={0}
                   max={50}
                 />
@@ -921,7 +929,21 @@ export default function SimuladorGarajeCompraventaPage() {
                       />
                     </>
                   )}
-                  {resultadosVendedor.esPerdida ? (
+                  {resultadosVendedor.sinGananciaNiPerdida ? (
+                    /*
+                      Ni ganancia ni pérdida: se vende EXACTAMENTE por el valor de adquisición.
+                      Antes caía por la rama de la pérdida —`esPerdida` es `ganancia <= 0`— y la
+                      app afirmaba dos cosas falsas a la vez: que se vendía por debajo del coste y
+                      que había una pérdida compensable en la declaración (hallazgos 823 y 845).
+                    */
+                    <ResultCard
+                      title="Sin ganancia ni pérdida"
+                      value={formatCurrency(0)}
+                      variant="default"
+                      icon="⚖️"
+                      description="Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar"
+                    />
+                  ) : resultadosVendedor.esPerdida ? (
                     <ResultCard
                       title="Pérdida patrimonial"
                       value={formatCurrency(Math.abs(resultadosVendedor.gananciaPatrimonial))}

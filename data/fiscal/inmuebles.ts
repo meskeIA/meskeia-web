@@ -247,6 +247,43 @@ export const PLAZO_ITP = {
 };
 
 /**
+ * Plazos de declaración del IIVTNU (plusvalía municipal).
+ *
+ * ── De dónde sale (15/09/2026, hallazgo 864 del Inspector) ───────────────────
+ * `simulador-heredar-vivienda` servía el plazo del IIVTNU desde `PLAZO_ISD.mesesPresentacion`
+ * —la constante de OTRO tributo, cuyo dies a quo es el fallecimiento— porque no había ninguna
+ * propia: `grep -rn PLAZO_IIVTNU data/` no devolvía nada. Coinciden hoy en seis meses, así que
+ * ninguna cifra estaba mal, pero el día que uno de los dos se moviera la app habría movido el
+ * otro sin que nadie se enterase. Es el caso de `PLAZO_ITP` (hallazgo 713) y el de `PLAZO_ISD`
+ * (hallazgo 782) por tercera vez.
+ *
+ * ⚠️ LA PRÓRROGA NO ES LA DEL ISD, y esa confusión ya estaba publicada: el mismo día,
+ * `orientacion-tramitacion-herencias` afirmaba «A diferencia del IS, no admite prórroga»
+ * mientras `estimador-plusvalia-municipal` ofrecía «otros 6 meses ante el Ayuntamiento». El
+ * art. 110.2.b) da SEIS MESES PRORROGABLES HASTA UN AÑO a solicitud del sujeto pasivo: no es
+ * la prórroga del art. 68 RISD (que hay que pedir dentro de los cinco primeros meses y devenga
+ * intereses), sino un plazo distinto de un tributo distinto que se liquida además ante otra
+ * administración. Verificado en sesión el 15/09/2026 contra el texto consolidado del BOE
+ * (API de legislación consolidada, bloque a110): el artículo conserva su redacción original de
+ * 2004 y el RDL 26/2021 no lo modificó.
+ */
+export const PLAZO_IIVTNU = {
+  /** Art. 110.2.a): transmisiones entre vivos (compraventa, donación). */
+  diasHabilesInterVivos: 30,
+  /** Art. 110.2.b): transmisiones por causa de muerte. */
+  mesesMortisCausa: 6,
+  /** Art. 110.2.b): «prorrogables hasta un año a solicitud del sujeto pasivo». */
+  admiteProrrogaMortisCausa: true,
+  mesesMaximoConProrroga: 12,
+  baseNormativa: 'art. 110.2 del TRLRHL (RD Legislativo 2/2004)',
+  desde: 'la fecha del devengo del impuesto',
+  aviso: 'Se declara ante el Ayuntamiento donde esté el inmueble, no ante la comunidad autónoma. Cada ordenanza fija su forma de gestión (declaración o autoliquidación).',
+  urlReferencia: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-4214#a110',
+  verificado: '2026-09-15',
+  vigencia: '2026',
+};
+
+/**
  * Coeficientes máximos IIVTNU por años de tenencia — 2025
  *
  * Fuente: RDL 26/2021 + actualización anual vía Ley de Presupuestos.

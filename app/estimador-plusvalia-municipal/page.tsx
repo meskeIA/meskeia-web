@@ -20,6 +20,7 @@ import {
   COEFICIENTES_IIVTNU_2025,
   PLUSVALIA_MUNICIPAL_META,
   FISCAL_INMUEBLES_META,
+  PLAZO_IIVTNU,
 } from '@/data/fiscal';
 
 interface ResultadoMetodo {
@@ -573,11 +574,18 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Heredero recibe un piso con valor catastral <strong>80.000 €</strong>; suelo: <strong>48.000 €</strong> (60%).
-                Plazo para liquidar: <strong>6 meses</strong> desde el fallecimiento.
+                Plazo para liquidar: <strong>{PLAZO_IIVTNU.mesesMortisCausa} meses</strong> desde el fallecimiento.
               </p>
               <ul>
                 <li>El heredero es siempre el sujeto pasivo, aunque no haya vendido nada.</li>
-                <li>Puede solicitar prórroga de otros 6 meses al Ayuntamiento antes de que venza el plazo inicial.</li>
+                {/*
+                  El plazo y su prórroga salen del módulo sellado desde el 15/09/2026: el
+                  {' '}{PLAZO_IIVTNU.baseNormativa} los da «prorrogables hasta un año a solicitud del
+                  sujeto pasivo», que es lo que ya decía esta app —y lo que `orientacion-tramitacion-
+                  herencias` negaba en la misma fecha—. Se enuncia como lo hace la ley, por el TOPE,
+                  y no como «otros 6 meses».
+                */}
+                <li>Puede solicitar prórroga al Ayuntamiento, hasta un máximo de {PLAZO_IIVTNU.mesesMaximoConProrroga} meses en total ({PLAZO_IIVTNU.baseNormativa}).</li>
                 <li>El IS (Impuesto de Sucesiones) y el IIVTNU tienen plazos independientes pero coincidentes: tramítalos juntos.</li>
               </ul>
               <p className={styles.escenarioTip}>

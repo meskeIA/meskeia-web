@@ -27,6 +27,7 @@ import {
   REDUCCION_VIVIENDA_PORC_IS,
   PORC_AJUAR_DOMESTICO_IS,
   REDUCCION_VIVIENDA_MAX_IS,
+  REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
   REDUCCION_EDAD_MENOR_21_IS,
@@ -38,6 +39,7 @@ import {
   PLUSVALIA_MUNICIPAL_META,
   GANANCIAS_PATRIMONIALES_META,
   PLAZO_ISD,
+  PLAZO_IIVTNU,
 } from '@/data/fiscal';
 
 /**
@@ -727,20 +729,6 @@ export default function SimuladorHeredarViviendaPage() {
     [aniosHastaVenta, valorVenta, valorCatastralSuelo, valorReferencia, valorCatastralTotal]
   );
 
-  const irpf = useMemo(
-    () =>
-      aniosHastaVenta > 0
-        ? calcularIRPFGanancia(
-            valorReferencia,
-            isd.cuotaFinal,
-            plusvalia.cuotaFinal,
-            valorVenta,
-            plusvaliaVenta?.cuotaFinal ?? 0
-          )
-        : null,
-    [aniosHastaVenta, valorReferencia, isd.cuotaFinal, plusvalia.cuotaFinal, valorVenta, plusvaliaVenta]
-  );
-
   /**
    * Pérdida de la reducción por vivienda habitual al vender dentro del plazo de
    * mantenimiento (hallazgo 778).
@@ -760,6 +748,16 @@ export default function SimuladorHeredarViviendaPage() {
       ? REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS
       : REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS;
 
+  /**
+   * El tope de la reducción por vivienda habitual, EN LA COMUNIDAD ELEGIDA.
+   *
+   * Mismo criterio con el que `evaluarReduccionVivienda` (lib/calculadoras/sucesiones.ts)
+   * decide el límite que aplica, para que la etiqueta no pueda volver a prometer otro
+   * distinto del que se está usando (hallazgo 861).
+   */
+  const topeReduccionVivienda =
+    ccaa === 'cataluna' ? REDUCCION_VIVIENDA_MAX_CATALUNA_IS : REDUCCION_VIVIENDA_MAX_IS;
+
   const isdSinReduccionVivienda = useMemo(
     () => calcularISD(valorReferencia, parentesco, ccaa, false, edad, convivioDosAnios),
     [valorReferencia, parentesco, ccaa, edad, convivioDosAnios]
@@ -772,6 +770,43 @@ export default function SimuladorHeredarViviendaPage() {
   const regularizacionVivienda = ventaDentroDePlazo
     ? redondearCentimos(Math.max(0, isdSinReduccionVivienda.cuotaFinal - isd.cuotaFinal))
     : 0;
+
+  /**
+   * El IRPF de la venta, con el ISD **REGULARIZADO** dentro del valor de adquisición.
+   *
+   * ⚠️ 15/09/2026 (hallazgo 859) — este bloque vivía más arriba, antes de que existiera
+   * `regularizacionVivienda`, así que recibía solo `isd.cuotaFinal`: cuando la venta cae
+   * dentro del plazo de mantenimiento, la app cobraba la cuota de la complementaria en el
+   * TOTAL y no la sumaba al coste de adquisición. El art. 36 LIRPF remite al 35.1.b, que
+   * suma al importe real los tributos inherentes a la adquisición satisfechos por el
+   * adquirente, y ese es el ISD entero — el que la propia app acaba de escribir dos líneas
+   * antes. La página se contradecía dos veces: la nota al pie del panel dice «Valor
+   * referencia ISD + cuota ISD + cuota plusvalía pagadas», y su lista de errores frecuentes
+   * advierte de «calcular la ganancia sin sumar ISD ni plusvalía pagados: pagas IRPF de
+   * más». En el caso del acta eran 4.293,19 € de IRPF de más, un 9,8 % del coste anunciado.
+   * Por eso se calcula aquí abajo: el orden de las declaraciones ERA el defecto.
+   */
+  const irpf = useMemo(
+    () =>
+      aniosHastaVenta > 0
+        ? calcularIRPFGanancia(
+            valorReferencia,
+            isd.cuotaFinal + regularizacionVivienda,
+            plusvalia.cuotaFinal,
+            valorVenta,
+            plusvaliaVenta?.cuotaFinal ?? 0
+          )
+        : null,
+    [
+      aniosHastaVenta,
+      valorReferencia,
+      isd.cuotaFinal,
+      regularizacionVivienda,
+      plusvalia.cuotaFinal,
+      valorVenta,
+      plusvaliaVenta,
+    ]
+  );
 
   const totalImpuestos =
     isd.cuotaFinal +
@@ -1085,13 +1120,22 @@ export default function SimuladorHeredarViviendaPage() {
               />
               <span>
                 Era vivienda habitual del fallecido{' '}
-                <span className={styles.muted}>(reducción {PORC_REDUCCION_VIVIENDA}% ISD hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)})</span>
+                {/*
+                  ⚠️ 15/09/2026 (hallazgo 861) — el tope se escribía sin mirar la comunidad, así
+                  que en Cataluña la etiqueta anunciaba el estatal (122.606,47 €) mientras la app
+                  aplicaba el del art. 17 de la Ley 19/2010 (500.000 €): con una vivienda de
+                  400.000 € reducía 380.000 € y el rótulo de al lado prometía tres veces menos.
+                  Es la forma exacta del hallazgo 696 —el plazo de mantenimiento que no conocía
+                  los cinco años catalanes— reaparecida sobre el TOPE en vez de sobre el plazo.
+                */}
+                <span className={styles.muted}>(reducción {PORC_REDUCCION_VIVIENDA}% ISD hasta {formatCurrency(topeReduccionVivienda)})</span>
               </span>
             </label>
           </div>
 
           {/* El colateral (Grupo III) solo tiene derecho a la reducción si además es mayor
-              de 65 años y convivió con el causante los dos años anteriores (art. 20.2.c LISD) */}
+              de EDAD_MIN_COLATERAL_VIVIENDA años y convivió con el causante los dos años anteriores
+                  (art. 20.2.c LISD) */}
           {viviendaHabitual && grupoParentesco === 'III' && (
             <div className={styles.toggleGroup}>
               <label className={styles.toggleLabel}>
@@ -1105,7 +1149,7 @@ export default function SimuladorHeredarViviendaPage() {
                 <span>
                   Convivió con el fallecido los 2 años anteriores{' '}
                   <span className={styles.muted}>
-                    (requisito del colateral, junto con tener 65 años o más)
+                    (requisito del colateral, junto con tener {EDAD_MIN_COLATERAL_VIVIENDA} años o más)
                   </span>
                 </span>
               </label>
@@ -1241,14 +1285,34 @@ export default function SimuladorHeredarViviendaPage() {
                 misma pantalla sumaba una reducción y la venta que la anula (hallazgo 778). */}
             {ventaDentroDePlazo && (
               <div className={styles.avisoMantenimiento}>
+                {/*
+                  ⚠️ 15/09/2026 — dos reparaciones en este aviso:
+
+                  · 863: el plazo salía SIN UNIDAD («exige mantenerla 10.»), porque el paréntesis
+                    condicional de Cataluña se comía el sustantivo. En una app de riesgo 1 un «10»
+                    suelto se lee como meses tan fácilmente como años, y va justo encima de una
+                    cifra que hay que ingresar. De paso, la atribución: los 5 años catalanes son
+                    del art. 19 de la Ley 19/2010, no del art. 20.2.c LISD, que da 10.
+
+                  · 862: cerraba con «El plazo es de {PLAZO_ISD.mesesPresentacion} meses desde la
+                    venta», leyendo una constante cuyo dies a quo es el FALLECIMIENTO («seis meses
+                    contados desde el día del fallecimiento del causante», art. 67.1.a RISD). Esa
+                    norma no habla de la pérdida sobrevenida de una reducción, así que la app
+                    publicaba una fecha límite que su propia fuente no respalda. No hay en
+                    data/fiscal ningún plazo sellado para la complementaria —lo fija la normativa
+                    de cada comunidad—, así que se dice eso en vez de dar un número: o se cita la
+                    norma, o no se da la cifra.
+                */}
                 <span aria-hidden="true">⚠️</span> <strong>Pierdes la reducción por vivienda
-                habitual:</strong> vendes a los {aniosHastaVenta} años y el art. 20.2.c LISD exige
-                mantenerla {aniosMantenimiento}
-                {ccaa === 'cataluna' ? ' (art. 19 de la Ley 19/2010 de Cataluña)' : ''}. Hay que
+                habitual:</strong> vendes a los {aniosHastaVenta} años y{' '}
+                {ccaa === 'cataluna'
+                  ? `el art. 19 de la Ley 19/2010 de Cataluña exige mantenerla ${aniosMantenimiento} años`
+                  : `el art. 20.2.c LISD exige mantenerla ${aniosMantenimiento} años`}. Hay que
                 presentar una autoliquidación complementaria e ingresar los{' '}
                 <strong>{formatCurrency(regularizacionVivienda)}</strong> que la reducción ahorró,
                 más intereses de demora (que dependen de las fechas reales y no se calculan aquí).
-                El plazo es de {PLAZO_ISD.mesesPresentacion} meses desde la venta.
+                El plazo para presentarla lo fija la normativa de tu comunidad autónoma: compruébalo
+                antes de que corran más intereses.
                 {ccaa !== 'cataluna' && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}
               </div>
             )}
@@ -1281,7 +1345,14 @@ export default function SimuladorHeredarViviendaPage() {
               <span>Método real (suelo)</span>
               <strong>
                 {plusvalia.metodoElegido === 'exenta'
-                  ? 'Exenta (sin ganancia)'
+                  /*
+                    'No sujeta' y no 'Exenta': el art. 104.5 TRLRHL lo articula como supuesto de
+                    NO SUJECIÓN —el impuesto no llega a devengarse— y no como exención del art.
+                    105, que presupone un hecho imponible realizado. El faqJsonLd de esta misma
+                    página se toma la molestia de decirlo desde la reparación del hallazgo 783, y
+                    el panel seguía diciendo lo contrario (hallazgo 866).
+                  */
+                  ? 'No sujeta (sin incremento)'
                   : formatCurrency(plusvalia.metodoReal)}
               </strong>
             </div>
@@ -1289,7 +1360,7 @@ export default function SimuladorHeredarViviendaPage() {
               <span>Método elegido</span>
               <strong>
                 {plusvalia.metodoElegido === 'exenta'
-                  ? 'Exenta'
+                  ? 'No sujeta'
                   : plusvalia.metodoElegido === 'objetivo'
                   ? 'Objetivo (menor)'
                   : 'Real (menor)'}
@@ -1340,12 +1411,27 @@ export default function SimuladorHeredarViviendaPage() {
                     </div>
                   </>
                 )}
+                {/*
+                  El cero no es una pérdida: se vende exactamente por el valor de adquisición
+                  fiscal. `esPerdida` es `ganancia <= 0` —correcto para decidir que no hay
+                  cuota— y rotularlo con él ponía «Pérdida patrimonial −0,00 €». Mismo criterio
+                  con el que se repararon los hallazgos 823 y 845 en las apps de compraventa.
+                  Medio céntimo es lo que la pantalla redondea a 0,00 €.
+                */}
                 <div className={styles.panelLine}>
-                  <span>{irpf.esPerdida ? 'Pérdida patrimonial' : 'Ganancia patrimonial'}</span>
+                  <span>
+                    {Math.abs(irpf.ganancia) < 0.005
+                      ? 'Sin ganancia ni pérdida'
+                      : irpf.esPerdida
+                        ? 'Pérdida patrimonial'
+                        : 'Ganancia patrimonial'}
+                  </span>
                   <strong>
-                    {irpf.esPerdida
-                      ? `−${formatCurrency(Math.abs(irpf.ganancia))}`
-                      : formatCurrency(irpf.ganancia)}
+                    {Math.abs(irpf.ganancia) < 0.005
+                      ? formatCurrency(0)
+                      : irpf.esPerdida
+                        ? `−${formatCurrency(Math.abs(irpf.ganancia))}`
+                        : formatCurrency(irpf.ganancia)}
                   </strong>
                 </div>
                 {!irpf.esPerdida && (
@@ -1448,7 +1534,14 @@ export default function SimuladorHeredarViviendaPage() {
               </tr>
               <tr>
                 <td><strong>Plusvalía municipal (IIVTNU)</strong></td>
-                <td>Plazo {PLAZO_ISD.mesesPresentacion} meses tras el fallecimiento</td>
+                {/*
+                  El plazo del IIVTNU sale ya de SU norma (art. 110.2.b TRLRHL), no de la
+                  constante del ISD: coinciden hoy en seis meses, pero son tributos distintos
+                  ante administraciones distintas y con prórrogas distintas — la del IIVTNU
+                  llega «hasta un año» y no tiene el corte de los cinco primeros meses del
+                  art. 68 RISD (hallazgo 864).
+                */}
+                <td>Plazo {PLAZO_IIVTNU.mesesMortisCausa} meses tras el fallecimiento (prorrogable hasta {PLAZO_IIVTNU.mesesMaximoConProrroga} a solicitud)</td>
                 <td>Método objetivo (valor catastral suelo × coef.) o método real (ganancia real prorrateada al suelo). Se elige el menor.</td>
                 <td>Heredero. Paga al Ayuntamiento.</td>
               </tr>
@@ -1549,11 +1642,12 @@ export default function SimuladorHeredarViviendaPage() {
             </p>
           </div>
           <div className={styles.faqItem}>
-            <strong>¿La plusvalía municipal está exenta si hay pérdida?</strong>
+            <strong>¿La plusvalía municipal se paga si hay pérdida?</strong>
             <p>
-              Sí, desde el RDL 26/2021. Si demuestras que no ha habido incremento real del valor
-              del terreno entre la fecha de adquisición original y la transmisión, no se devenga
-              el impuesto. Hay que aportar prueba (escrituras de compra y herencia). El método
+              No, desde el RDL 26/2021. Si demuestras que no ha habido incremento real del valor
+              del terreno entre la fecha de adquisición original y la transmisión, la transmisión
+              NO está sujeta al impuesto (art. 104.5 TRLRHL): no es una exención, es que el hecho
+              imponible no llega a producirse. Hay que aportar prueba (escrituras de compra y herencia). El método
               real también permite elegir la base más baja entre el método objetivo y el real.
             </p>
           </div>
@@ -1574,7 +1668,7 @@ export default function SimuladorHeredarViviendaPage() {
             <strong>¿Cómo afecta que fuera la vivienda habitual del fallecido?</strong>
             <p>
               Hay reducción del {PORC_REDUCCION_VIVIENDA}% en la base imponible del ISD para cónyuge, descendientes,
-              ascendientes o un colateral mayor de 65 años que conviviera con el fallecido los
+              ascendientes o un colateral de {EDAD_MIN_COLATERAL_VIVIENDA} años o más que conviviera con el fallecido los
               últimos 2 años. El tope estatal es {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}/heredero (cada CCAA puede mejorarlo).
               Requisito: mantener la vivienda al menos {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años
               (art. 20.2.c LISD). Algunas CCAA piden menos: en Cataluña son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} años
@@ -1697,7 +1791,7 @@ export default function SimuladorHeredarViviendaPage() {
             <li>Confundir el valor catastral (más bajo) con el valor de referencia (base ISD desde 2022).</li>
             <li>No declarar la herencia pensando que "como no hay dinero líquido, no pasa nada": el plazo corre y los recargos llegan automáticamente.</li>
             <li>Renunciar a favor de otra persona: tributa como donación + ISD (doble coste).</li>
-            <li>Olvidar la plusvalía municipal: es un impuesto distinto del ISD que también vence a los {PLAZO_ISD.mesesPresentacion} meses.</li>
+            <li>Olvidar la plusvalía municipal: es un impuesto distinto del ISD, ante el Ayuntamiento, que también vence a los {PLAZO_IIVTNU.mesesMortisCausa} meses ({PLAZO_IIVTNU.baseNormativa}).</li>
             <li>Vender antes del plazo de mantenimiento cuando se aplicó la reducción de vivienda habitual: pierdes la reducción retroactivamente. Son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años con la norma estatal y {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} en Cataluña.</li>
             <li>Calcular la ganancia patrimonial al vender sin sumar ISD ni plusvalía pagados al valor de adquisición fiscal: pagas IRPF de más.</li>
           </ul>

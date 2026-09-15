@@ -3102,10 +3102,14 @@ test('REGRESIÓN 713 (dato) — el plazo del ITP cita su norma y sale de data/fi
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
 
   // La guía viene colapsada: sin abrirla, su texto no entra en el innerText del documento.
-  await page.locator('[aria-expanded]').last().click();
-  await expect(page.locator('[aria-expanded="true"]')).toHaveCount(1);
-
-  const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+  //
+  // ⚠️ 15/09/2026 — se lee del DOM con `textContent` en vez de abrir el desplegable. El
+  // montaje anterior pulsaba el ÚLTIMO `[aria-expanded]` de la página y exigía que quedase
+  // exactamente uno abierto: pasaba aislado y fallaba en la suite completa, donde el orden de
+  // render deja otro elemento colapsable el último. El contenido está en el DOM aunque esté
+  // plegado —es lo que ya hace el spec de nave-industrial—, así que no hace falta abrir nada
+  // para comprobar de dónde sale el dato, que es lo único que este caso vigila.
+  const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
 
   // El plazo está (esto pasa): lo que falta es de dónde sale.
   expect(cuerpo).toContain('30 días hábiles');
@@ -3313,8 +3317,13 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
       'Lo que realmente recibes tras los gastos',
     );
-    // Y la cifra de la tarjeta patrimonial es la correcta: cero.
-    expect(await valorTarjeta(page, /patrimonial/)).toBe('0,00 €');
+    // Y la tarjeta del cero ya no se llama «Pérdida patrimonial» ni aconseja compensarla:
+    // se vende EXACTAMENTE por el valor de adquisición, que no es ni ganancia ni pérdida
+    // (hallazgo 845; el motor lo distingue con `sinGananciaNiPerdida`).
+    expect(await valorTarjeta(page, 'Sin ganancia ni pérdida')).toBe('0,00 €');
+    expect(await descripcionTarjeta(page, 'Sin ganancia ni pérdida')).toContain(
+      'exactamente por el valor de adquisición',
+    );
   });
 
   /**
@@ -3390,10 +3399,9 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
 //       → esperado: «SIN CALCULAR» y neto como techo, igual que con el foco puesto
 //       → obtenido: plusvalía 210,00 €, IRPF 1.956,90 €, neto 26.933,10 € y
 //         «Lo que realmente recibes tras los gastos»
-test('ABIERTO 14/09 (operativa) — al salir del campo, unos años negativos se liquidan como reventa antes del año', async ({
+test('REPARADO 15/09 (operativa) — al salir del campo, unos años negativos siguen sin liquidarse', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   await sembrar(page, 'Precio del trastero', '30000');
@@ -3407,12 +3415,15 @@ test('ABIERTO 14/09 (operativa) — al salir del campo, unos años negativos se 
   await anios.fill('-4');
   await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '-4');
   await anios.blur();
-  // El blur reescribe el campo a «0» (esto pasa hoy y es lo que se quiere observar).
-  await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '0');
+  // ✅ El blur YA NO reescribe el campo a «0» (hallazgo 844): `acotarAlSalir={false}`. El 0
+  // no era neutro aquí —es la reventa antes de cumplir el año, coeficiente 0,14—, así que
+  // acotar convertía un dato imposible en un supuesto fiscal válido y lo liquidaba como
+  // definitivo, justo lo que el useMemo de la página declara que no debe pasar.
+  await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '-4');
 
-  // La aserción de FONDO va primero: dentro de un `test.fail()` basta con que el test falle
-  // en ALGÚN punto, así que una aserción posterior podría tapar a esta.
   expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+  // Y el neto sigue siendo un TECHO, no lo que se recibe: igual que con el foco dentro.
+  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
 });
 
 // ⚠️ ABIERTO 14/09/2026 (medio) — contenido. Lo que la app ROTULA cuando la ganancia
@@ -3434,7 +3445,6 @@ test('ABIERTO 14/09 (operativa) — al salir del campo, unos años negativos se 
 test('ABIERTO 14/09 (contenido) — una ganancia de 0 se rotula como venta por debajo del coste', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   await sembrar(page, 'Precio del trastero', '20000');
@@ -3467,7 +3477,6 @@ test('ABIERTO 14/09 (contenido) — una ganancia de 0 se rotula como venta por d
 test('ABIERTO 14/09 (contenido) — la página sirve dos FAQPage para una sola URL', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
   const faqPages = bloques.flatMap((bloque) => {

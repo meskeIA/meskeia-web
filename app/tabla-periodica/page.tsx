@@ -786,7 +786,13 @@ export default function TablaPerodicaPage() {
                   {/* Hasta el 13/09/2026 decía «0,9–1,3», y dejaba fuera al berilio (1,57 en
                       su ficha) y al magnesio (1,31): la tabla contradecía a la casilla que el
                       alumno acaba de abrir (hallazgo 775). */}
-                  <td>0,9–1,57 (baja, salvo el Be)</td>
+                  {/*
+                    El suelo es el del BARIO (0,89), no 0,90: la reparación del 13/09 subió el
+                    techo para que cupiera el berilio y dejó fuera al otro extremo de la misma
+                    familia (hallazgo 849). Los seis, según las fichas de esta app: Be 1,57 ·
+                    Mg 1,31 · Ca 1,00 · Sr 0,95 · Ba 0,89 · Ra 0,90.
+                  */}
+                  <td>0,89–1,57 (baja, salvo el Be)</td>
                   <td>Sólido</td>
                   <td>Alta; menos que Gp1</td>
                   <td>Construcción (Ca en cemento), huesos (Ca), pirotecnia (Mg, Ba)</td>
@@ -899,7 +905,17 @@ export default function TablaPerodicaPage() {
                 <h3>Físico nuclear</h3>
               </div>
               <p className={styles.escenarioDesc}>
-                Uranio-235 (Z=92): fisión nuclear libera 202 MeV/átomo. 1kg U-235 = energía equivalente a 3.000 toneladas de carbón. Elementos con Z&gt;92 son sintéticos (transuránidos), todos radiactivos.
+                {/*
+                  ⚠️ 15/09/2026 (hallazgo 848) — decía «Elementos con Z>92 son sintéticos
+                  (transuránidos)», y eso borraba la distinción que la reparación del 13/09
+                  (hallazgo 776) acababa de devolver a la pantalla: `elementos-data.ts` marca
+                  origen 'sintetico' solo desde Z=95, y el faqJsonLd de esta misma app dice que
+                  «los elementos del 1 al 94 se encuentran en la naturaleza». Además mezclaba dos
+                  cosas distintas: transuránido (Z>92) es un hecho de POSICIÓN y sintético uno de
+                  PROCEDENCIA. El neptunio (93) y el plutonio (94) son transuránidos y aparecen en
+                  la naturaleza en trazas.
+                */}
+                Uranio-235 (Z=92): fisión nuclear libera 202 MeV/átomo. 1kg U-235 = energía equivalente a 3.000 toneladas de carbón. Los elementos con Z&gt;92 son <strong>transuránidos</strong> y todos son radiactivos, pero eso no los hace sintéticos: el neptunio (93) y el plutonio (94) aparecen en trazas en la naturaleza, y es a partir del americio (Z=95) cuando solo se obtienen artificialmente.
               </p>
               <div className={styles.escenarioTip}>
                 <strong>Tip:</strong> Los isótopos de un mismo elemento tienen propiedades químicas casi idénticas (mismo número de electrones) pero masas y estabilidades nucleares muy distintas.
@@ -994,7 +1010,13 @@ export default function TablaPerodicaPage() {
               <div className={styles.stepContent}>
                 <h3>Determinar el bloque</h3>
                 <p>
-                  Grupos 1-2: bloque s (1-2 e⁻ de valencia). Grupos 3-12: bloque d (metales de transición). Grupos 13-18: bloque p. Lantánidos/Actínidos: bloque f.
+                  {/*
+                    La regla se enunciaba sin excepciones y el helio la rompe: esta app lo coloca
+                    en el grupo 18 y su ficha dice «1s2», sin ningún electrón p (hallazgo 850). Es
+                    la excepción clásica, y la app ya nombra la simétrica —el hidrógeno en el grupo
+                    1— en sus «Confusiones frecuentes».
+                  */}
+                  Grupos 1-2: bloque s (1-2 e⁻ de valencia). Grupos 3-12: bloque d (metales de transición). Grupos 13-18: bloque p. Lantánidos/Actínidos: bloque f. <strong>Excepción</strong>: el helio está en el grupo 18 pero es del bloque s (1s²), igual que el hidrógeno está en el grupo 1 sin ser un metal alcalino.
                 </p>
               </div>
             </div>
@@ -1114,7 +1136,15 @@ export default function TablaPerodicaPage() {
               <strong>Masa atómica ≠ número atómico</strong>: Z=número de protones (define el elemento). A=protones+neutrones (varía en isótopos). La masa atómica de la tabla es el promedio de isótopos naturales.
             </li>
             <li>
-              <strong>Grupos 1-18 vs sistema A/B antiguo</strong>: El Grupo 8 IUPAC incluye Fe, Co, Ni. El Grupo VIII antiguo agrupaba nueve elementos en una sola columna: Fe-Co-Ni, Ru-Rh-Pd y Os-Ir-Pt. Verifica siempre qué sistema usa tu tabla.
+              {/*
+                ⚠️ 15/09/2026 (hallazgo 847) — esta viñeta enseñaba la confusión que dice evitar:
+                afirmaba que el grupo 8 IUPAC incluye Fe, Co y Ni, que es justo la agrupación del
+                Grupo VIII ANTIGUO. En la numeración 1-18 los grupos son COLUMNAS, así que el 8 es
+                Fe-Ru-Os, que es lo que dicen las fichas de esta misma app (Co «Grupo: 9», Ni
+                «Grupo: 10»). Un estudiante abría el cobalto y leía dos pantallas más abajo que
+                estaba en el 8.
+              */}
+              <strong>Grupos 1-18 vs sistema A/B antiguo</strong>: En la numeración IUPAC cada grupo es una columna, así que el Grupo 8 lo forman Fe-Ru-Os, y el cobalto y el níquel caen en el 9 y el 10. El Grupo VIII antiguo era distinto: agrupaba nueve elementos en una sola columna (Fe-Co-Ni, Ru-Rh-Pd y Os-Ir-Pt). Verifica siempre qué sistema usa tu tabla.
             </li>
             <li>
               <strong>Electrones de valencia en bloque d</strong>: Los metales de transición tienen 1-2 electrones en 4s pero también usan los 3d. Fe puede ser Fe²⁺ (pierde 4s²) o Fe³⁺ (pierde 4s² + 1 de 3d).

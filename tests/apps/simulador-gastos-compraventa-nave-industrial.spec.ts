@@ -2841,7 +2841,7 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
    * Y no es un adorno: el color es lo que distingue al botón elegido de los otros dos, así
    * que es justo el texto que dice cuál de las tres tributaciones se está simulando.
    */
-  test.fail('HALLAZGO 1 — el rótulo del botón de transmisión activo no llega a 4,5:1 en tema claro', async ({ page }) => {
+  test('HALLAZGO 1 — el rótulo del botón de transmisión activo no llega a 4,5:1 en tema claro', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
 
@@ -2871,7 +2871,7 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
    * Va aparte del hallazgo 1 porque son dos reglas distintas del CSS module y cada una se
    * repara sola; juntas drenan lo que queda del 683 en esta app.
    */
-  test.fail('HALLAZGO 2 — el título de la herramienta no llega a 4,5:1 en tema claro', async ({ page }) => {
+  test('HALLAZGO 2 — el título de la herramienta no llega a 4,5:1 en tema claro', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
 
@@ -2900,7 +2900,7 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
    * Efecto familia: `local-comercial` y `solar` repiten la misma palabra. Los dos, al menos,
    * añaden «con las escrituras»; la nave se queda sin esa pista.
    */
-  test.fail('HALLAZGO 3 — la FAQ de la plusvalía dice «exención» donde el RDL 26/2021 dice «no sujeción»', async ({ page }) => {
+  test('HALLAZGO 3 — la FAQ de la plusvalía dice «exención» donde el RDL 26/2021 dice «no sujeción»', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado: `textContent`, no `innerText`.
     const guia = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');

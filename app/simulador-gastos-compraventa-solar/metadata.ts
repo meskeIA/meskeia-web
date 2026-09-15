@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Hay plusvalía municipal al vender un solar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El solar es suelo de naturaleza urbana, por lo que su transmisión genera plusvalía municipal (IIVTNU) para el vendedor, calculada sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, puede acreditarse la exención con las escrituras de compra y venta.',
+        text: 'Sí. El solar es suelo de naturaleza urbana, por lo que su transmisión genera plusvalía municipal (IIVTNU) para el vendedor, calculada sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta.',
       },
     },
     {

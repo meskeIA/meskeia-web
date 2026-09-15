@@ -96,11 +96,22 @@ const REQUISITOS: Requisito[] = [
     explicacion: `El art. 136 del RD 326/2026 declara el Bono Joven ${BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler ? 'compatible' : 'INCOMPATIBLE'} con cualquier otra ayuda al pago del alquiler o de la cesión de uso de la vivienda, venga del Estado, de tu Comunidad Autónoma o de tu ayuntamiento. Si ya cobras una, no puedes solicitar este bono mientras la percibas.`,
     bloqueante: true,
   },
+  /**
+   * ⚠️ 15/09/2026 (hallazgo 852) — pasa a BLOQUEANTE. El art. 133.1.e del RD lo exige, y así
+   * lo cuentan la tarjeta («debe estar formalizado por escrito y depositada la fianza») y el
+   * faqJsonLd («el RD no fija ninguna condición sobre el propietario: SOLO EXIGE que el
+   * contrato esté formalizado por escrito y con la fianza depositada»), pero en el veredicto
+   * iba con `bloqueante: false` y sin distintivo IMPRESCINDIBLE: a quien respondía «No» se le
+   * decía «Cumples los requisitos obligatorios» y se le pintaba el panel entero con su ayuda
+   * mensual. Es la forma exacta del hallazgo 686 (art. 136), reparado el 10/09, y el sentido
+   * del error vuelve a ser el malo para un dictamen de elegibilidad. La pregunta ya contempla
+   * el futuro («o lo estará»), así que un «No» significa que no lo estará.
+   */
   {
     id: 'contrato',
     pregunta: 'El contrato de arrendamiento está registrado (o lo estará)',
-    explicacion: 'El contrato debe estar formalizado por escrito y depositada la fianza. Las CA pueden pedir su depósito oficial.',
-    bloqueante: false,
+    explicacion: 'El art. 133.1.e del RD 326/2026 exige que el contrato esté formalizado por escrito y la fianza depositada. Las CA pueden pedir además su depósito oficial.',
+    bloqueante: true,
   },
   // El requisito de renta NO se pregunta: la app tiene el importe tecleado y el límite del
   // RD, así que lo comprueba ella (art. 133.1.e). Preguntarlo era pedirle al usuario que
@@ -441,16 +452,34 @@ export default function SimuladorBonoJovenAlquilerPage() {
           {resultado === 'casi' && (
             <div className={`${styles.resultadoCard} ${styles['resultado-casi']}`} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.resultadoIcon} aria-hidden="true">⚠️</div>
-              <h3 className={styles.resultadoTitulo}>Cumples los requisitos básicos</h3>
+              {/*
+                ⚠️ 15/09/2026 (hallazgo 853) — el párrafo afirmaba «Cumples los requisitos
+                obligatorios» y dos frases después reconocía que faltaba la renta, que es una
+                condición OBLIGATORIA del art. 133.1.e —por la que esta misma app rechaza de
+                plano, antes incluso de mirar la checklist— y no un «aspecto adicional». Las dos
+                frases se contradecían dentro del mismo párrafo y el sentido del error era el
+                optimista. Ahora el veredicto solo afirma el cumplimiento cuando la renta está
+                comprobada; mientras falte, dice qué falta.
+              */}
+              <h3 className={styles.resultadoTitulo}>
+                {rentaDentroDelLimite === true ? 'Cumples los requisitos básicos' : 'Falta un dato para poder juzgarlo'}
+              </h3>
               <p className={styles.resultadoTexto}>
-                Cumples los requisitos obligatorios, aunque algunos aspectos adicionales (contrato registrado,
-                documentación completa, disponibilidad de fondos en tu CA) pueden condicionar la aprobación final.{' '}
-                {alquilerInvalido ? (
-                  <>La renta que has introducido no es válida: corrígela aquí arriba para poder comprobarla contra el tope del art. 133.1.e.</>
-                ) : rentaDentroDelLimite === true ? (
-                  <>La renta ya está comprobada aquí arriba contra el tope del art. 133.1.e.</>
+                {rentaDentroDelLimite === true ? (
+                  <>
+                    Cumples los requisitos obligatorios que se pueden comprobar aquí, incluida la renta,
+                    aunque algunos aspectos adicionales (documentación completa, disponibilidad de fondos
+                    en tu CA) pueden condicionar la aprobación final.
+                  </>
                 ) : (
-                  <>Falta comprobar la renta: introdúcela aquí arriba para verificarla contra el tope del art. 133.1.e.</>
+                  <>
+                    De momento no fallas ninguno de los requisitos que has respondido, pero todavía no se
+                    puede decir que cumplas los obligatorios: falta la renta, que el art. 133.1.e impone
+                    igual que los demás.{' '}
+                    {alquilerInvalido
+                      ? 'La que has introducido no es válida: corrígela aquí arriba.'
+                      : 'Introdúcela aquí arriba para comprobarla contra su tope.'}
+                  </>
                 )}{' '}
                 Consulta con tu Comunidad Autónoma.
               </p>
@@ -467,15 +496,27 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <div className={`${styles.resultadoCard} ${styles['resultado-no-apto']}`} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.resultadoIcon} aria-hidden="true">❌</div>
               <h3 className={styles.resultadoTitulo}>No cumples los requisitos obligatorios</h3>
+              {/*
+                ⚠️ 15/09/2026 (hallazgo 854) — las dos causas SE SUMAN, no se sustituyen. La rama
+                de la renta reemplazaba al mensaje genérico, así que quien fallaba a la vez por
+                renta y por un requisito imprescindible leía solo lo primero y concluía que
+                mudándose a un piso más barato tendría derecho, cuando el otro requisito lo
+                excluye igual. El veredicto era correcto; lo que inducía a error era la acción
+                que sugería.
+              */}
               <p className={styles.resultadoTexto}>
-                {rentaDentroDelLimite === false ? (
+                {rentaDentroDelLimite === false && (
                   <>
                     La renta que has introducido ({formatCurrency(alquilerNum)}/mes) supera el máximo
-                    de {formatCurrency(rentaMaxima)}/mes que da derecho a esta ayuda.
+                    de {formatCurrency(rentaMaxima)}/mes que da derecho a esta ayuda.{' '}
                   </>
-                ) : (
-                  <>Existe al menos un requisito imprescindible que no cumples.</>
-                )}{' '}
+                )}
+                {REQUISITOS.filter((r) => r.bloqueante).some((r) => estados[r.id] === 'no') && (
+                  <>
+                    {rentaDentroDelLimite === false ? 'Y además, hay' : 'Hay'} al menos un requisito
+                    imprescindible que no cumples, así que una renta más baja no bastaría por sí sola.{' '}
+                  </>
+                )}
                 El Bono Joven al Alquiler no estaría disponible para tu situación actual.
                 Consulta otras ayudas al alquiler disponibles en tu Comunidad Autónoma.
               </p>

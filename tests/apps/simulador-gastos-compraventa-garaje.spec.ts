@@ -1712,33 +1712,31 @@ test.describe('INSPECCIÓN 02/09/2026 — los tres casos, resueltos a mano antes
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
     await expect(page.getByText('No definido')).toHaveCount(0);
 
-    // (b) Al salir del campo, el mínimo declarado y su coeficiente.
+    // (b) Al salir del campo NO pasa nada: el dato imposible sigue ahí y sigue sin liquidarse.
     //
-    // Desde el 10/09/2026 (hallazgo 668) ese mínimo es 0 y no 1: el 0 es un dato VÁLIDO —la
-    // reventa antes de cumplir el año, que desde el RDL 26/2021 tributa con el coeficiente
-    // más alto de la tabla— y lo que impide calcular es el campo vacío. Así que el blur
-    // acota el −3 a «0» y liquida la reventa antes del año, que es lo que el campo ENSEÑA:
-    //   plusvalía objetiva = 4.000 × 0,14 × 25 % =                                 140,00
-    //   (la real sería (30.000 − 20.000) × 4.000/12.000 × 25 % = 833,33 → gana la objetiva)
-    //   transmisión = 30.000 − 900 de comisión − 140 =                          28.960,00
-    //   ganancia = 28.960 − 20.000 =                                             8.960,00
-    //   IRPF = 6.000×19 % + 2.960×21 % = 1.140 + 621,60 =                        1.761,60
-    //   total gastos = 140 + 900 + 1.761,60 =                                    2.801,60
-    //   neto = 30.000 − 2.801,60 =                                              27.198,40
+    // ⚠️ REESCRITO el 15/09/2026 (hallazgo 822). Este bloque afirmaba lo contrario —«el blur
+    // acota el −3 a "0" y liquida la reventa antes del año»— y con ello consagraba el defecto:
+    // `NumberInput.handleBlur` reescribía el negativo al `min` declarado, que desde el hallazgo
+    // 668 es 0, y el 0 no es neutro aquí, es la reventa antes de cumplir el año con el tercer
+    // coeficiente más alto de COEFICIENTES_IIVTNU_2025 (0,14). Un dato imposible se convertía
+    // así, solo por pasar al campo siguiente, en un supuesto fiscal válido y caro, y el
+    // resultado se presentaba como DEFINITIVO: 140,00 € de plusvalía y un neto de 27.198,40 €
+    // marcado «Lo que realmente recibes». Con el foco dentro la app sí lo rechazaba, de modo
+    // que el mismo −3 tenía dos tratamientos según cuándo se mirase.
     //
-    // Lo que este caso vigila sigue intacto: con el dato imposible EN el campo no se liquida
-    // nada (parte a), y lo que se liquida después se corresponde con lo que el campo muestra.
+    // La reparación está en el control (`acotarAlSalir={false}`), no en el motor: quien decide
+    // sobre un año negativo es la guarda de la app, que ya sabía hacerlo bien.
     await anios.blur();
-    await expect(anios).toHaveValue('0');
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('140,00 €');
-    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
-      'Método objetivo (más favorable)',
+    await expect(anios).toHaveValue('-3');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain(
+      'los años de propiedad',
     );
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('28.960,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('8960,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1761,60 €');
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2801,60 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.198,40 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('9100,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1791,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2691,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.309,00 €');
   });
 });
 
@@ -2130,9 +2128,11 @@ test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
     // Y lo que se ve es LITERALMENTE la misma cadena que publica el FAQPage, no una parecida:
     // es lo que la reparación garantiza al componer las dos desde una sola constante, y lo
     // único que impide que dentro de tres meses vuelvan a divergir sin que nadie lo note.
-    // Hay DOS bloques: `jsonLd` (un `@graph` con WebApplication + FAQPage) y `faqJsonLd`
-    // (un FAQPage suelto). La pregunta aparece en los dos, y las dos copias tienen que
-    // coincidir con lo que se lee en pantalla.
+    // ⚠️ 15/09/2026 (hallazgo 846): ahora hay UN solo FAQPage por URL. Antes eran dos —el
+    // `jsonLd` combinaba WebApplication + FAQPage y el layout inyectaba además `faqJsonLd`,
+    // que repetía las mismas cinco preguntas—, y tres de esas respuestas estaban escritas dos
+    // veces a mano en el mismo fichero: una ya había divergido. Lo que este caso vigila sigue
+    // siendo lo mismo, que lo publicado sea LITERALMENTE lo que se lee en pantalla.
     interface Pregunta {
       name?: string;
       acceptedAnswer?: { text?: string };
@@ -2154,7 +2154,7 @@ test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
         }
       }
     }
-    expect(respuestas.length).toBe(2);
+    expect(respuestas.length).toBe(1);
     for (const respuesta of respuestas) {
       expect(visible).toBe(respuesta);
     }
@@ -2572,7 +2572,7 @@ test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
       .trim();
     expect(faqVisible).toContain('25%');
 
-    // Y los dos FAQPage del JSON-LD deberían decir lo mismo
+    // Y el FAQPage del JSON-LD dice lo mismo (desde el hallazgo 846 es UNO solo por URL)
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const respuestas: string[] = [];
     for (const bruto of bloques) {
@@ -2590,7 +2590,7 @@ test.describe('Hallazgos abiertos — re-inspección del 10/09/2026', () => {
         if (q) respuestas.push(q.acceptedAnswer.text);
       }
     }
-    expect(respuestas.length).toBe(2);
+    expect(respuestas.length).toBe(1);
     for (const texto of respuestas) expect(texto).toContain('25%');
   });
 });
@@ -3579,7 +3579,6 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — los tres casos, resueltos a mano an
   test('CASO R (debe rechazarse) — unos años de propiedad negativos tampoco pueden liquidar plusvalía al salir del campo', async ({
     page,
   }) => {
-    test.fail();
 
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
@@ -3598,17 +3597,26 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — los tres casos, resueltos a mano an
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.240,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
 
-    // 2) Al salir del campo, el NumberInput lo acota a su min (0) y deja de ser negativo.
+    // 2) Al salir del campo NO se acota: el dato imposible sigue siendo imposible.
+    //
+    // ✅ REPARADO el 15/09/2026 (hallazgo 822) — el `NumberInput` reescribía el −3 a su `min`,
+    // que desde el hallazgo 668 es 0, y el 0 no es neutro: es la reventa antes de cumplir el
+    // año, con el tercer coeficiente más alto de la tabla. El campo lleva ahora
+    // `acotarAlSalir={false}`, así que quien decide sobre un año negativo sigue siendo la
+    // guarda de la app, tanto con el foco dentro como fuera.
     await anios.blur();
-    await esperarValorEnReact(page, anios, '0');
+    await esperarValorEnReact(page, anios, '-3');
 
-    // El coeficiente con el que se acabaría liquidando, leído de data/fiscal y no tecleado.
+    // El coeficiente con el que se liquidaba antes de la reparación, leído de data/fiscal:
+    // es lo que convertía un dato imposible en un supuesto fiscal caro.
     expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.14);
     expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
 
-    // DEBERÍA seguir rechazándose. Hoy devuelve «175,00 €» y un neto de 29.098,25 €
-    // presentado como definitivo.
+    // Sigue sin liquidarse, y el neto sigue marcado como incompleto: exactamente lo mismo
+    // que con el foco dentro. Antes: «175,00 €» y 29.098,25 € presentados como definitivos.
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.240,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
   });
 });
 
@@ -3642,7 +3650,6 @@ test.describe('Hallazgos abiertos — re-inspección del 14/09/2026', () => {
   test('con ganancia exactamente cero no se ofrece compensar una pérdida que no existe', async ({
     page,
   }) => {
-    test.fail();
 
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);

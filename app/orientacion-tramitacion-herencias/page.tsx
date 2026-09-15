@@ -6,6 +6,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Disc
 import Link from 'next/link';
 import { getRelatedApps } from '@/data/app-relations';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
+import { PLAZO_ISD, PLAZO_IIVTNU } from '@/data/fiscal';
 
 // ===== TIPOS =====
 interface Respuestas {
@@ -1017,7 +1018,17 @@ export default function OrientacionTramitacionHerenciasPage() {
               </li>
               <li>
                 <strong>Ignorar el Impuesto Municipal de Plusvalía en inmuebles urbanos.</strong>{' '}
-                El IIVTNU tiene el mismo plazo que el IS (6 meses) pero se liquida en el Ayuntamiento donde esté ubicado el inmueble. A diferencia del IS, no admite prórroga. Si hay varios inmuebles en distintos municipios, deberás liquidarlo en cada Ayuntamiento correspondiente.
+                {/*
+                  ⚠️ 15/09/2026 — decía «A diferencia del IS, no admite prórroga», y es al revés:
+                  el art. 110.2.b) TRLRHL da «seis meses prorrogables hasta un año a solicitud del
+                  sujeto pasivo». La afirmación contradecía además a `estimador-plusvalia-municipal`,
+                  que sí la ofrece. Lo que de verdad distingue a las dos prórrogas es OTRA cosa, y es
+                  la que se explica ahora: la del ISD hay que pedirla dentro de los cinco primeros
+                  meses (art. 68.1 RISD) y esta no tiene ese corte, pero se pide en cada Ayuntamiento.
+                  Verificado contra el texto consolidado del BOE el 15/09/2026; el dato vive sellado
+                  en PLAZO_IIVTNU (data/fiscal/inmuebles.ts).
+                */}
+                El IIVTNU tiene el mismo plazo que el IS ({PLAZO_IIVTNU.mesesMortisCausa} meses) pero se liquida en el Ayuntamiento donde esté ubicado el inmueble. También admite prórroga: el {PLAZO_IIVTNU.baseNormativa} la concede «hasta un año» a solicitud del sujeto pasivo, sin el corte de los {PLAZO_ISD.mesesParaPedirProrroga} primeros meses que impone la del Impuesto de Sucesiones — pero hay que pedirla al Ayuntamiento, no a la comunidad autónoma. Si hay varios inmuebles en distintos municipios, deberás liquidarlo en cada Ayuntamiento correspondiente.
               </li>
               <li>
                 <strong>Firmar documentos sin leerlos o basándose en acuerdos verbales.</strong>{' '}

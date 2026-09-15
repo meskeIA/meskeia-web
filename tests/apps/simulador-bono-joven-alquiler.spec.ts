@@ -491,7 +491,7 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
     expect(await panelDeAhorro(page)).toHaveLength(0);
     const resultado = norm(await page.locator('[role="status"]').first().innerText());
     expect(resultado).toContain('No cumples los requisitos obligatorios');
-    expect(resultado).toContain('Existe al menos un requisito imprescindible que no cumples');
+    expect(resultado).toContain('al menos un requisito imprescindible que no cumples');
   });
 });
 
@@ -988,7 +988,7 @@ test.describe('Inspección 14/09/2026 — casos nuevos', () => {
 
     const rechazo = norm(await page.locator('[role="status"]').first().innerText());
     expect(rechazo).toContain('No cumples los requisitos obligatorios');
-    expect(rechazo).toContain('Existe al menos un requisito imprescindible que no cumples');
+    expect(rechazo).toContain('al menos un requisito imprescindible que no cumples');
     // Ni la cifra que NO va a cobrar: mín(300; 60 % de 700 = 420) = 300 €/mes
     expect(rechazo).not.toContain('300,00 €');
     expect(await panelDeAhorro(page)).toHaveLength(0);
@@ -1032,7 +1032,6 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
   // (como el del art. 136), o la tarjeta y la FAQ dejan de presentarlo como exigencia
   // estatal y lo describen como lo que entonces sería —un trámite que concreta cada CA—.
   test('H4 — o el contrato del art. 133.1.e condiciona el veredicto, o la app deja de llamarlo exigencia', async ({ page }) => {
-    test.fail(); // ABIERTO: hoy la app hace las dos cosas a la vez
     await abrirHidratado(page);
 
     // ¿La app lo presenta como una exigencia del Real Decreto?
@@ -1067,7 +1066,6 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
   // «(2 años renovables por otros 2)» está tecleado junto a un `DURACION_TOTAL_ANIOS` que sí
   // sale de `plazo.totalMaximoMeses`.
   test('H5 — los umbrales por discapacidad del FAQPage deberían salir del módulo, como los de la página', async () => {
-    test.fail(); // ABIERTO: hoy 5,5 y 6 están tecleados en metadata.ts
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const fuente = readFileSync(
@@ -1092,13 +1090,16 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
   // mirar la checklist—, así que mientras no se conozca no se puede afirmar que se cumplen
   // los requisitos obligatorios. El sentido del error vuelve a ser el optimista.
   test('H6 — sin renta tecleada el veredicto no debería afirmar que se cumplen los requisitos obligatorios', async ({ page }) => {
-    test.fail(); // ABIERTO: hoy afirma el cumplimiento y a la vez pide la renta
     await abrirHidratado(page);
     await marcarTodosLosRequisitos(page); // los 7 a «Sí», sin tocar la renta
 
     const veredicto = norm(await page.locator('[role="status"]').first().innerText());
-    // Que reconozca que falta la renta está bien; afirmar a la vez el cumplimiento, no
-    expect(veredicto).toContain('Falta comprobar la renta');
+    // Que reconozca que falta la renta está bien; afirmar a la vez el cumplimiento, no.
+    // ⚠️ La redacción se rehízo al reparar (15/09/2026): en vez de añadir «Falta comprobar la
+    // renta» detrás de una afirmación que la contradecía, el veredicto entero cambia mientras
+    // la renta no está, y el titular deja de decir «Cumples». Lo que este caso fija es eso: que
+    // nombre lo que falta y NO afirme el cumplimiento, no la frase concreta.
+    expect(veredicto).toMatch(/falta la renta|Falta comprobar la renta/i);
     expect(veredicto).not.toContain('Cumples los requisitos obligatorios');
   });
 
@@ -1112,7 +1113,6 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
   // mudándose a un piso más barato tendría derecho, cuando la edad lo excluye igual.
   // El sentido del error no es el veredicto —que es correcto— sino la acción que induce.
   test('H7 — cuando fallan la renta Y un requisito imprescindible, el rechazo debería nombrar los dos', async ({ page }) => {
-    test.fail(); // ABIERTO: hoy el mensaje de la renta sustituye al genérico
     await abrirHidratado(page);
     await page.getByRole('button', { name: /Vivienda completa/ }).click();
     // 1.500 > 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e)

@@ -1561,7 +1561,6 @@ test.describe('hallazgos abiertos · 14/09/2026', () => {
   test('778 · «Confusiones frecuentes» asigna al grupo 8 tres elementos que la app pone en 8, 9 y 10', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // La sección se titula «Confusiones frecuentes en la tabla periódica» y su cuarta
@@ -1595,7 +1594,6 @@ test.describe('hallazgos abiertos · 14/09/2026', () => {
   test('779 · el escenario del físico nuclear borra la frontera natural/sintético que la app acaba de recuperar', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // El escenario «Físico nuclear» afirma: «Elementos con Z>92 son sintéticos
@@ -1620,7 +1618,6 @@ test.describe('hallazgos abiertos · 14/09/2026', () => {
   test('780 · la fila de alcalinotérreos, reparada ayer, sigue dejando fuera al bario', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // El hallazgo 775 subió el techo de la fila Gp2 de «0,9–1,3» a «0,9–1,57» para
@@ -1657,7 +1654,6 @@ test.describe('hallazgos abiertos · 14/09/2026', () => {
   test('781 · la guía de 7 pasos manda el helio al bloque p, y su propia ficha dice 1s²', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // El paso 2 («Determinar el bloque») es una regla de deducción sin excepciones:
@@ -1681,7 +1677,6 @@ test.describe('hallazgos abiertos · 14/09/2026', () => {
   });
 
   test('782 · la ficha del neptunio escribe «transurámico»', async ({ page }) => {
-    test.fail();
     await abrirHidratada(page);
 
     // Errata en el `datoCurioso` del neptunio, dentro de elementos-data.ts: «Primer

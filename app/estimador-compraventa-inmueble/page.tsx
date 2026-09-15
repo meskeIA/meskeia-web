@@ -188,6 +188,10 @@ interface ResultadosVendedor {
   valorTransmision: number;
   gananciaPatrimonial: number;
   esPerdida: boolean;
+
+  /** Ni ganancia ni pérdida: se vende exactamente por el valor de adquisición. */
+
+  sinGananciaNiPerdida: boolean;
   baseImponibleIRPF: number;
   irpfGanancia: number;
   /** false mientras falte el precio de compra: entonces el 0 no es una exención */
@@ -569,6 +573,8 @@ export default function SimuladorCompraventaPage() {
       valorTransmision: g.valorTransmision,
       gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
       esPerdida: hayDatosGanancia && g.esPerdida,
+
+      sinGananciaNiPerdida: hayDatosGanancia && g.sinGananciaNiPerdida,
       baseImponibleIRPF: hayDatosGanancia ? g.baseImponible : 0,
       irpfGanancia: irpf,
       irpfCalculado: hayDatosGanancia,
@@ -1312,7 +1318,21 @@ export default function SimuladorCompraventaPage() {
                     />
                   )}
 
-                  {resultadosVendedor.esPerdida ? (
+                  {resultadosVendedor.sinGananciaNiPerdida ? (
+                    /*
+                      Ni ganancia ni pérdida: se vende EXACTAMENTE por el valor de adquisición.
+                      Antes caía por la rama de la pérdida —`esPerdida` es `ganancia <= 0`— y la
+                      app afirmaba dos cosas falsas a la vez: que se vendía por debajo del coste y
+                      que había una pérdida compensable en la declaración (hallazgos 823 y 845).
+                    */
+                    <ResultCard
+                      title="Sin ganancia ni pérdida"
+                      value={formatCurrency(0)}
+                      variant="default"
+                      icon="⚖️"
+                      description="Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar"
+                    />
+                  ) : resultadosVendedor.esPerdida ? (
                     <ResultCard
                       title="Pérdida patrimonial"
                       value={formatCurrency(Math.abs(resultadosVendedor.gananciaPatrimonial))}

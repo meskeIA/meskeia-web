@@ -85,6 +85,8 @@ interface ResultadosVendedor {
   amortizacionesRestadas: number;
   gananciaPatrimonial: number;
   esPerdida: boolean;
+  /** Ni ganancia ni pérdida: se vende exactamente por el valor de adquisición. */
+  sinGananciaNiPerdida: boolean;
   irpfGanancia: number;
   totalGastos: number;
   netoVendedor: number;
@@ -383,6 +385,7 @@ export default function SimuladorLocalComercialPage() {
       amortizacionesRestadas: amortizaciones,
       gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
       esPerdida: hayDatosGanancia && g.esPerdida,
+      sinGananciaNiPerdida: hayDatosGanancia && g.sinGananciaNiPerdida,
       irpfGanancia: irpf,
       totalGastos,
       netoVendedor: precioV - totalGastos,
@@ -953,7 +956,21 @@ export default function SimuladorLocalComercialPage() {
                     </>
                   )}
 
-                  {resultadosVendedor.esPerdida ? (
+                  {resultadosVendedor.sinGananciaNiPerdida ? (
+                    /*
+                      Ni ganancia ni pérdida: se vende EXACTAMENTE por el valor de adquisición.
+                      Antes caía por la rama de la pérdida —`esPerdida` es `ganancia <= 0`— y la
+                      app afirmaba dos cosas falsas a la vez: que se vendía por debajo del coste y
+                      que había una pérdida compensable en la declaración (hallazgos 823 y 845).
+                    */
+                    <ResultCard
+                      title="Sin ganancia ni pérdida"
+                      value={formatCurrency(0)}
+                      variant="default"
+                      icon="⚖️"
+                      description="Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar"
+                    />
+                  ) : resultadosVendedor.esPerdida ? (
                     <ResultCard
                       title="Pérdida patrimonial"
                       value={formatCurrency(Math.abs(resultadosVendedor.gananciaPatrimonial))}
@@ -1166,7 +1183,7 @@ export default function SimuladorLocalComercialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Sí. La plusvalía municipal (IIVTNU) grava el incremento de valor del suelo durante el tiempo de
                 propiedad, sea el inmueble residencial o comercial. Si no ha habido incremento real del valor
-                del terreno, puede acreditarse la exención con las escrituras de compra y venta.
+                del terreno, la transmisión NO está sujeta (art. 104.5 TRLRHL): se acredita con las escrituras de compra y venta.
               </p>
             </div>
           </div>

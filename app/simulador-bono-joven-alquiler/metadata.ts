@@ -18,6 +18,20 @@ const DURACION_TOTAL_ANIOS = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 1
 const EDAD_MIN = BONO_ALQUILER_JOVEN_2026.edad.minima;
 const EDAD_MAX = BONO_ALQUILER_JOVEN_2026.edad.maxima;
 const UMBRAL_IPREM_GENERAL = formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0);
+/**
+ * Los otros dos umbrales y los dos tramos del plazo, DERIVADOS igual que el general.
+ *
+ * ⚠️ 15/09/2026 (hallazgo 855) — iban tecleados a mano en el FAQPage teniendo el módulo
+ * importado y sus propiedades a un punto de distancia, mientras la página visible SÍ los
+ * derivaba. Si el RD moviera cualquiera de los dos, la página y el canal que leen ChatGPT,
+ * Perplexity y Bing Copilot dirían cosas distintas, y el que quedaría mintiendo es el que
+ * no lleva el disclaimer al lado. Es la forma de los hallazgos 489, 645 y 687, ya reparada
+ * tres veces en esta misma app: los valores de hoy son correctos, es un latente.
+ */
+const UMBRAL_IPREM_33 = formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1);
+const UMBRAL_IPREM_65 = formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0);
+const PLAZO_INICIAL_ANIOS = BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12;
+const PLAZO_PRORROGA_ANIOS = BONO_ALQUILER_JOVEN_2026.plazo.prorrogaMaximaMeses / 12;
 
 export const metadata: Metadata = {
   title: 'Simulador Bono Joven Alquiler — Comprueba tu Elegibilidad | meskeIA',
@@ -85,7 +99,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Bono Joven Alquiler 2026 y cuánto dinero da?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El Bono Joven Alquiler es una ayuda directa del Plan Estatal de Vivienda 2026-2030 (Real Decreto 326/2026) para jóvenes de ${EDAD_MIN} a ${EDAD_MAX} años. La cuantía máxima es de ${AYUDA_VIVIENDA}/mes para vivienda completa o ${AYUDA_HABITACION}/mes para habitación en piso compartido, durante hasta ${DURACION_TOTAL_ANIOS} años (2 años renovables por otros 2). El importe no puede superar el ${LIMITE_PORC}% de la renta mensual.`,
+        text: `El Bono Joven Alquiler es una ayuda directa del Plan Estatal de Vivienda 2026-2030 (Real Decreto 326/2026) para jóvenes de ${EDAD_MIN} a ${EDAD_MAX} años. La cuantía máxima es de ${AYUDA_VIVIENDA}/mes para vivienda completa o ${AYUDA_HABITACION}/mes para habitación en piso compartido, durante hasta ${DURACION_TOTAL_ANIOS} años (${PLAZO_INICIAL_ANIOS} años renovables por otros ${PLAZO_PRORROGA_ANIOS}). El importe no puede superar el ${LIMITE_PORC}% de la renta mensual.`,
       },
     },
     {
@@ -93,7 +107,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los requisitos de ingresos para pedir el Bono Alquiler Joven 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El RD 326/2026 (art. 133.1.d) fija el umbral en ${UMBRAL_IPREM_GENERAL} veces el IPREM de ingresos anuales, que sube con discapacidad reconocida (5,5 veces con el 33% o más, 6 veces con el 65% o más). Cada Comunidad Autónoma concreta el cómputo exacto en su propia convocatoria. Es imprescindible consultar la convocatoria de la comunidad autónoma donde se ubica la vivienda alquilada para conocer el detalle aplicable.`,
+        text: `El RD 326/2026 (art. 133.1.d) fija el umbral en ${UMBRAL_IPREM_GENERAL} veces el IPREM de ingresos anuales, que sube con discapacidad reconocida (${UMBRAL_IPREM_33} veces con el 33% o más, ${UMBRAL_IPREM_65} veces con el 65% o más). Cada Comunidad Autónoma concreta el cómputo exacto en su propia convocatoria. Es imprescindible consultar la convocatoria de la comunidad autónoma donde se ubica la vivienda alquilada para conocer el detalle aplicable.`,
       },
     },
     {

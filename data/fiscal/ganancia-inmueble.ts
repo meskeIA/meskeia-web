@@ -81,7 +81,28 @@ export interface ResultadoGananciaInmueble {
   valorTransmision: number;
   /** Ganancia (positiva) o pérdida (negativa) patrimonial */
   ganancia: number;
+  /**
+   * No hay cuota que calcular. Incluye el cero, y por eso NO basta para rotular: para eso
+   * está `sinGananciaNiPerdida`.
+   */
   esPerdida: boolean;
+  /**
+   * Se vende EXACTAMENTE por el valor de adquisición: ni ganancia ni pérdida.
+   *
+   * ── De dónde sale (15/09/2026, hallazgos 823 y 845 del Inspector) ───────────
+   * `esPerdida = ganancia <= 0` es correcto donde se usa —con cero tampoco hay cuota—, pero
+   * las apps lo trasladaban tal cual al rótulo y pintaban «Pérdida patrimonial 0,00 €» con
+   * el texto «Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede
+   * compensar en la declaración». Las dos mitades son falsas en ese punto: no se vende por
+   * debajo, se vende exactamente por él, y no hay ninguna pérdida que compensar, así que la
+   * frase manda a una casilla de la declaración que ese caso no genera. El importe no
+   * engañaba; engañaba el consejo fiscal, en apps de riesgo 1.
+   *
+   * Se compara contra medio céntimo y no contra 0 exacto porque la ganancia sale de restas
+   * en coma flotante: 20.000 − 17.830 puede dar 3,6e-12, que el usuario ve como 0,00 €. El
+   * criterio es lo que la pantalla muestra.
+   */
+  sinGananciaNiPerdida: boolean;
   /** Parte exenta por transmisión de vivienda habitual por mayor de 65 años */
   exentaPorEdad: number;
   /** Parte exenta por reinversión en vivienda habitual */
@@ -119,6 +140,8 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
 
   const ganancia = valorTransmision - valorAdquisicion;
   const esPerdida = ganancia <= 0;
+  /** Medio céntimo: es lo que la pantalla redondea a «0,00 €». Ver la cabecera del campo. */
+  const sinGananciaNiPerdida = Math.abs(ganancia) < 0.005;
 
   // Una pérdida patrimonial no genera cuota (se compensa en la declaración, fuera del alcance)
   if (esPerdida) {
@@ -127,6 +150,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
       valorTransmision,
       ganancia,
       esPerdida: true,
+      sinGananciaNiPerdida,
       exentaPorEdad: 0,
       exentaPorReinversion: 0,
       proporcionReinvertida: 0,
@@ -145,6 +169,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
       valorTransmision,
       ganancia,
       esPerdida: false,
+      sinGananciaNiPerdida: false,
       exentaPorEdad: ganancia,
       exentaPorReinversion: 0,
       proporcionReinvertida: 0,
@@ -180,6 +205,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
     valorTransmision,
     ganancia,
     esPerdida: false,
+    sinGananciaNiPerdida: false,
     exentaPorEdad: 0,
     exentaPorReinversion,
     proporcionReinvertida,

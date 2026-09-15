@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
-import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 
 /** Los tipos de IVA se LEEN de data/fiscal, no se teclean: el mismo dato estaba escrito a
@@ -82,33 +82,19 @@ const webAppSchema = generateWebAppSchema({
   keywords: ['gastos trastero', 'ITP trastero', 'compraventa trastero', 'España'],
 });
 
-const faqSchema = generateFAQSchema({
-  url: 'https://meskeia.com/simulador-gastos-compraventa-trastero/',
-  mainEntity: [
-    {
-      question: '¿Qué IVA paga un trastero nuevo?',
-      answer: RESPUESTA_IVA_TRASTERO_NUEVO,
-    },
-    {
-      question: '¿Qué diferencia hay entre trastero vinculado y trastero independiente?',
-      answer: `El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al ${IVA_ANEJO}% como anejo y el independiente al ${IVA_GENERAL}%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.`,
-    },
-    {
-      question: '¿Se puede comprar un trastero sin comprar también la vivienda?',
-      answer: 'Sí. Si el trastero tiene finca registral propia (trastero independiente), se puede comprar y vender de forma autónoma sin necesidad de adquirir la vivienda a la que originalmente estuvo vinculado. Esta es una operación habitual, especialmente en comunidades de propietarios donde el trastero sale a la venta de forma separada.',
-    },
-    {
-      question: '¿Se paga plusvalía municipal al vender un trastero?',
-      answer: RESPUESTA_PLUSVALIA_TRASTERO,
-    },
-    {
-      question: '¿Tienen tipos reducidos de ITP los trasteros?',
-      answer: 'Depende de cada comunidad autónoma. La mayoría de los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) se diseñaron para vivienda habitual. No obstante, como el trastero vinculado se considera anejo residencial, algunas CCAA pueden extenderlos. En el caso del trastero independiente, el tratamiento es menos claro y varía según la normativa autonómica. Verifica los requisitos específicos de tu comunidad antes de la compra.',
-    },
-  ],
-});
 
-export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+/**
+ * UN solo FAQPage por URL.
+ *
+ * ⚠️ 15/09/2026 (hallazgo 846) — la página servía DOS: este jsonLd combinaba el WebApplication
+ * con un FAQPage de cinco preguntas y el layout inyectaba además el faqJsonLd de abajo, que
+ * las repite todas y añade una sexta. Tres de aquellas cinco respuestas estaban escritas dos
+ * veces A MANO en este mismo fichero —solo las que centralizó el hallazgo 774 viajaban en
+ * constante— y una ya había divergido («algunas CCAA» frente a «algunas comunidades
+ * autónomas»). Las hermanas local-comercial y nave-industrial sirven uno solo, y es el canal
+ * que citan los asistentes de IA sin el disclaimer al lado.
+ */
+export const jsonLd = webAppSchema;
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
