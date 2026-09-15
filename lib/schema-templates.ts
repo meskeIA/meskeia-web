@@ -6,8 +6,6 @@
  * export const jsonLd = generateWebAppSchema({ ... });
  */
 
-import { WithContext, WebApplication, SoftwareApplication, FAQPage, HowTo } from 'schema-dts';
-
 // ============================================================================
 // TIPOS DE CONFIGURACIÓN
 // ============================================================================
@@ -18,6 +16,31 @@ import { WithContext, WebApplication, SoftwareApplication, FAQPage, HowTo } from
  * `unknown` obliga a comprobar antes de usar el valor, cosa que `any` no hacía.
  */
 export type SchemaObject = Record<string, unknown>;
+
+/**
+ * Tipos de las entidades Schema.org que devuelven los templates de abajo.
+ *
+ * Llevan el nombre de `schema-dts`, pero NO vienen de ahí. Hasta el 15/09/2026
+ * los importaba de ese paquete, que **nunca estuvo instalado ni en
+ * `package.json`**: los declaraba un `declare module 'schema-dts'` en
+ * `lib/schema-dts.d.ts` (commit `784aae06`, 06/02/2026). Nada fallaba —el import
+ * era solo de tipos, así que `check:tipos` daba 0 errores porque el módulo
+ * estaba declarado y el build lo borraba—, pero el nombre prometía el tipado
+ * estricto de Schema.org y detrás solo había `Record<string, unknown>`. Y si
+ * `schema-dts` hubiera entrado algún día como dependencia transitiva, aquella
+ * declaración global le habría hecho sombra en silencio.
+ *
+ * Se declaran aquí con su forma real en vez de instalar `schema-dts`, que es un
+ * paquete de tipos generado de TODO Schema.org: este proyecto ya arrastra
+ * `ignoreBuildErrors: true` porque el type-check de +1.100 apps agota los 8 GB
+ * de Vercel. Lo que de verdad valida el JSON-LD es `validateSchema()` —al final
+ * de este fichero— y comprobar el HTML generado tras el build.
+ */
+export type WithContext<T> = T & { '@context': string };
+export type WebApplication = SchemaObject;
+export type SoftwareApplication = SchemaObject;
+export type FAQPage = SchemaObject;
+export type HowTo = SchemaObject;
 
 export interface BaseAppConfig {
   name: string;
