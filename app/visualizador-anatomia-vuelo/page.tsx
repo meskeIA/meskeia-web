@@ -156,6 +156,7 @@ function SeccionFases() {
     {
       icono: '🔍',
       nombre: 'Revision preflight',
+      altitudPerfil: 0,
       altitud: '0 m',
       velocidad: '0 km/h',
       duracion: '30-45 min',
@@ -165,6 +166,7 @@ function SeccionFases() {
     {
       icono: '🛞',
       nombre: 'Rodaje (Taxi)',
+      altitudPerfil: 0,
       altitud: '0 m',
       velocidad: '20-30 km/h',
       duracion: '5-20 min',
@@ -174,6 +176,7 @@ function SeccionFases() {
     {
       icono: '🛫',
       nombre: 'Despegue',
+      altitudPerfil: 2,
       altitud: '0 → 300 m',
       velocidad: '250-280 km/h',
       descripcion: 'Motores a maxima potencia. Tres velocidades criticas: V1 (decision: ya no se puede abortar), VR (rotacion: se levanta el morro) y V2 (velocidad de seguridad con un motor parado).',
@@ -183,6 +186,7 @@ function SeccionFases() {
     {
       icono: '📐',
       nombre: 'Ascenso',
+      altitudPerfil: 50,
       altitud: '300 → 11.000 m',
       velocidad: '450-600 km/h',
       duracion: '15-25 min',
@@ -192,6 +196,7 @@ function SeccionFases() {
     {
       icono: '✈️',
       nombre: 'Crucero',
+      altitudPerfil: 100,
       altitud: '10.000-12.000 m',
       velocidad: '~900 km/h',
       duracion: 'La mayor parte',
@@ -201,6 +206,7 @@ function SeccionFases() {
     {
       icono: '📉',
       nombre: 'Descenso',
+      altitudPerfil: 50,
       altitud: '11.000 → 900 m',
       velocidad: '400-600 km/h',
       duracion: '20-30 min',
@@ -210,6 +216,7 @@ function SeccionFases() {
     {
       icono: '🛬',
       nombre: 'Aterrizaje',
+      altitudPerfil: 0,
       altitud: '900 → 0 m',
       velocidad: '250 → 0 km/h',
       duracion: '5-8 min',
@@ -218,13 +225,16 @@ function SeccionFases() {
     },
   ];
 
-  // Posiciones relativas de altitud para el perfil visual
-  const altitudes = [0, 0, 2, 50, 100, 50, 0];
+  // La posición de cada punto del perfil visual viaja DENTRO de su fase (`altitudPerfil`), no
+  // en una lista paralela: mientras fueron dos literales de 7 que había que mantener a la vez,
+  // añadir una fase sin añadir su altitud dejaba el gráfico leyendo `fases[i]` fuera de rango.
+  // Es la misma forma que tumbó a simulador-kmeans el 15/09/2026 (a59ba434), aquí todavía sana.
+  const ultimaFase = fases.length - 1;
 
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>Un vuelo comercial tiene <strong>7 fases diferenciadas</strong>. Cada una con sus propias velocidades, procedimientos y sensaciones para el pasajero.</p>
+        <p>Un vuelo comercial tiene <strong>{fases.length} fases diferenciadas</strong>. Cada una con sus propias velocidades, procedimientos y sensaciones para el pasajero.</p>
       </div>
 
       {/* Perfil de altitud visual */}
@@ -232,18 +242,18 @@ function SeccionFases() {
         <h3 className={styles.perfilAltTitulo}>Perfil de altitud</h3>
         <div className={styles.altitudGrafico}>
           <div className={styles.altitudLinea}>
-            {altitudes.map((alt, i) => (
+            {fases.map((fase, i) => (
               <div
                 key={i}
                 className={`${styles.altitudPunto} ${faseActiva === i ? styles.altitudPuntoActivo : ''}`}
-                style={{ bottom: `${alt}%`, left: `${(i / (altitudes.length - 1)) * 100}%` }}
+                style={{ bottom: `${fase.altitudPerfil}%`, left: `${(i / ultimaFase) * 100}%` }}
                 onClick={() => setFaseActiva(faseActiva === i ? null : i)}
                 role="button"
                 tabIndex={0}
-                aria-label={`Fase ${i + 1}: ${fases[i].nombre}`}
+                aria-label={`Fase ${i + 1}: ${fase.nombre}`}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setFaseActiva(faseActiva === i ? null : i); }}
               >
-                <span className={styles.altitudIcono} aria-hidden="true">{fases[i].icono}</span>
+                <span className={styles.altitudIcono} aria-hidden="true">{fase.icono}</span>
               </div>
             ))}
             {/* Linea SVG del perfil */}
@@ -252,12 +262,12 @@ function SeccionFases() {
                 fill="none"
                 stroke="var(--primary)"
                 strokeWidth="3"
-                points={altitudes.map((alt, i) => `${(i / (altitudes.length - 1)) * 600},${200 - alt * 2}`).join(' ')}
+                points={fases.map((f, i) => `${(i / ultimaFase) * 600},${200 - f.altitudPerfil * 2}`).join(' ')}
               />
               <polyline
                 fill="url(#altGrad)"
                 stroke="none"
-                points={`0,200 ${altitudes.map((alt, i) => `${(i / (altitudes.length - 1)) * 600},${200 - alt * 2}`).join(' ')} 600,200`}
+                points={`0,200 ${fases.map((f, i) => `${(i / ultimaFase) * 600},${200 - f.altitudPerfil * 2}`).join(' ')} 600,200`}
               />
               <defs>
                 <linearGradient id="altGrad" x1="0" y1="0" x2="0" y2="1">
