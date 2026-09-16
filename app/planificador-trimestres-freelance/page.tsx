@@ -233,7 +233,7 @@ export default function PlanificadorTrimestresFreelancePage() {
 
         {/* Hero */}
         <header className={styles.hero}>
-          <h1 className={styles.title}>📅 Planificador Trimestral Freelance</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📅</span> Planificador Trimestral Freelance</h1>
           <p className={styles.subtitle}>
             Planifica tus 4 trimestres: ingresos, gastos, modelos fiscales y meses críticos
           </p>
