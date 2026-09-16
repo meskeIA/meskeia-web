@@ -101,6 +101,19 @@ const NOMBRES_PAIS: Record<string, string> = {
 // Clave con la que se guarda el acceso en el navegador del propietario
 const STORAGE_KEY = 'meskeia_analytics_key';
 
+// Cortes de instrumentación que afectan a la COBERTURA del dato de duración. Mientras el corte
+// siga cayendo dentro de la ventana de 30 días que pinta el cuadro de duraciones, ese cuadro
+// mezcla dos formas de medir y hay que decirlo donde se lee, no solo en el digest.
+//
+// Va condicionado a la fecha en vez de ser un texto fijo a propósito: un aviso que no sabe
+// apagarse acaba describiendo algo que dejó de ser verdad, y nadie lo retira porque nadie
+// recuerda que está ahí. Es el mismo criterio que `CORTES_PERMANENCIA` en el digest.
+const CORTE_COBERTURA = { fecha: '2026-09-16', dias: 30 };
+const corteDentroDeVentana = ({ fecha, dias }: { fecha: string; dias: number }) => {
+  const transcurridos = (Date.now() - Date.parse(`${fecha}T00:00:00Z`)) / 86_400_000;
+  return transcurridos >= 0 && transcurridos <= dias;
+};
+
 /**
  * Puerta de entrada al dashboard. Pide la clave de acceso una sola vez por
  * navegador; se guarda en localStorage y viaja en cada petición tRPC como
@@ -1251,11 +1264,27 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 </strong>{' '}
                 con duración registrada ≥ 30s
               </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
                 Cobertura del dato: <strong>{String(distribucionQuery.data.cobertura).replace('.', ',')}%</strong> de
                 las visitas tiene duración registrada. «Sin registro» mezcla salidas de menos de 2 segundos con
                 visitas cuyo evento de salida no llegó, así que los porcentajes se leen junto a esta cobertura.
               </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+                Lo que <strong>no</strong> hay que hacer es releer el porcentaje sobre la base medible (dividirlo
+                entre esta cobertura): sobreestima. Medido el 16/09/2026 imputando a cada visita sin dato el hueco
+                real hasta la visita siguiente de su sesión, dos tercios de ellas duraron de verdad menos de
+                30 segundos, así que descartarlas infla el numerador. La estimación honesta queda a mitad de camino
+                entre las dos cifras.
+              </p>
+              {corteDentroDeVentana(CORTE_COBERTURA) && (
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+                  <span aria-hidden="true">⚠️</span> <strong>Corte de instrumentación del 16/09/2026</strong>, dentro
+                  de esta ventana: hasta esa fecha, salir de una app por un enlace interno no registraba duración
+                  —la navegación del catálogo es client-side y no dispara los eventos de salida—. Reparado, así que
+                  la cobertura sube y con ella el porcentaje de ≥ 30 s: parte de la mejora que se vea aquí es
+                  instrumentación, no producto. Este aviso se apaga solo cuando el corte salga de los 30 días.
+                </p>
+              )}
 
               {/* Barras horizontales por bucket */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
