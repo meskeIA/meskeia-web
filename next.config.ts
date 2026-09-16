@@ -92,6 +92,18 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
 
   // ============================================================================
+  // ORÍGENES PERMITIDOS EN DESARROLLO — solo afecta a `next dev`
+  // ============================================================================
+  // `tests/analytics-duracion-spa.spec.ts` tiene que servir el sitio bajo el host real
+  // (`meskeia.com`, mapeado al puerto local con --host-resolver-rules) porque
+  // AnalyticsTracker se apaga solo si el hostname no está en HOSTS_PRODUCCION. Sin esta
+  // entrada, Next bloquea los recursos de `/_next/` pedidos desde ese host, el bundle de
+  // cliente no llega y NADA se hidrata: el test veía la página servida y ni un solo
+  // registro, que parece exactamente lo mismo que el defecto que vigila. En producción
+  // esta opción no interviene.
+  allowedDevOrigins: ['meskeia.com'],
+
+  // ============================================================================
   // IMÁGENES - Sin optimización por ahora (puede habilitarse en Vercel)
   // ============================================================================
   images: {

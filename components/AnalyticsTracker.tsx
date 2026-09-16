@@ -279,31 +279,53 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     // Añadir listener de visibilidad (CRÍTICO para móviles)
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Listener de beforeunload (fallback para escritorio). La línea «isActive = false»
-    // no es cosmética: al cerrar pestaña en escritorio se disparan beforeunload Y pagehide,
-    // y sin ella la duración se enviaba DOS veces por salida. Medido en Vercel el
-    // 19/08/2026: 30K llamadas a /duration frente a 16K de /track en 30 días.
-    window.addEventListener('beforeunload', () => {
+    // Salida de la página. La línea «isActive = false» no es cosmética: al cerrar
+    // pestaña en escritorio se disparan beforeunload Y pagehide, y sin ella la duración
+    // se enviaba DOS veces por salida. Medido en Vercel el 19/08/2026: 30K llamadas a
+    // /duration frente a 16K de /track en 30 días.
+    //   · beforeunload → fallback para escritorio.
+    //   · pagehide     → alternativa para iOS, donde beforeunload no siempre llega. En
+    //     escritorio suele dispararse DESPUÉS: el isActive ya lo ha apagado.
+    // Tiene que ser una función CON NOMBRE para poder retirarla en el cleanup (ver abajo).
+    const handleSalida = () => {
       if (isActive) {
         registerDuration();
         isActive = false;
       }
-    });
+    };
+    window.addEventListener('beforeunload', handleSalida);
+    window.addEventListener('pagehide', handleSalida);
 
-    // Listener de pagehide (alternativa para iOS, donde beforeunload no siempre llega).
-    // En escritorio suele dispararse DESPUÉS de beforeunload: el isActive de arriba ya
-    // lo ha apagado, así que aquí no se reenvía.
-    window.addEventListener('pagehide', () => {
-      if (isActive) {
-        registerDuration();
-        isActive = false;
-      }
-    });
-
-    // Cleanup
+    // Cleanup. Hace DOS cosas que antes no hacía, y las dos son el mismo defecto visto
+    // por sus dos caras (medido el 16/09/2026 sobre el dump, hito `analytics-sesion-dedicada`):
+    //
+    // 1. ENVIAR LA DURACIÓN AL DESMONTAR. La navegación del catálogo es client-side
+    //    (RelatedApps y el buscador de la home usan <Link> de Next), y un <Link> NO dispara
+    //    beforeunload ni pagehide: React desmonta este componente y monta el de la app
+    //    destino sin que la página se descargue. Así que al salir de una app por un enlace
+    //    interno la duración no se enviaba NUNCA. Aquí es el único sitio donde queda ocasión
+    //    de mandarla. Medido, aislando estancias reales >= 30 s para que la comparación no
+    //    dependa de que un tipo de salto sea más rápido: 17,9 % sin dato cuando el salto
+    //    siguiente era carga completa, frente al 46,4 % cuando era un <Link>.
+    //
+    // 2. RETIRAR beforeunload/pagehide. Decía aquí que no hacía falta «ya que el componente
+    //    se desmonta al salir», y es justo al revés: el componente se desmonta, pero los
+    //    listeners viven en `window` y sobreviven a la navegación client-side, cada uno con
+    //    su closure (su `finalAppName`, su `sessionStartTime` y su `isActive` en true, que
+    //    nunca llegó a apagarse). Al cerrar la pestaña se disparaban TODOS los acumulados y
+    //    cada app visitada recibía el tiempo transcurrido desde que se montó — es decir, casi
+    //    la sesión entera. Firma en los datos: duración mayor que el hueco real hasta la
+    //    visita siguiente en un 11,6 % de los saltos por carga completa, frente al 27,8 %
+    //    de los saltos por <Link>.
+    //
+    // Las dos correcciones van juntas a propósito: arreglar solo (1) dejaría la duración
+    // enviada dos veces —aquí y en el listener colgado—, y la segunda pisaría a la primera,
+    // porque el UPDATE de /api/analytics/duration apunta al id mayor de (sesion, app).
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      // No es necesario remover beforeunload/pagehide ya que el componente se desmonta al salir
+      window.removeEventListener('beforeunload', handleSalida);
+      window.removeEventListener('pagehide', handleSalida);
+      handleSalida();
     };
   }, [finalAppName, extraSerializado]);
 
