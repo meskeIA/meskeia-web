@@ -41,8 +41,17 @@ async function entrada() {
 const datos = await entrada();
 
 // ── Guardia: estos hooks solo tienen sentido dentro de meskeia-web ───────────
-const dondeEstamos = path.resolve(datos.cwd || process.cwd());
-const dentro = dondeEstamos === RAIZ || dondeEstamos.startsWith(`${RAIZ}${path.sep}`);
+//
+// Se miran TRES señales, no una: el `cwd` del evento, el proyecto que declara Claude Code y el
+// directorio del proceso. Con solo el `cwd` el Cuadre se apagaba solo —y en silencio— en cuanto
+// la sesión se movía a otra carpeta, que es justo lo que pasó el 16/09/2026 al entrar en
+// `~/.claude` a tocar la configuración: los hooks dejaron de registrar nada sin decir palabra.
+// Un verificador que se desactiva sin avisar es peor que no tenerlo, porque su silencio se lee
+// como «todo bien».
+const señales = [datos.cwd, process.env.CLAUDE_PROJECT_DIR, process.cwd()]
+  .filter(Boolean)
+  .map((p) => path.resolve(p));
+const dentro = señales.some((p) => p === RAIZ || p.startsWith(`${RAIZ}${path.sep}`));
 
 // ── PreToolUse · la puerta de once caracteres ────────────────────────────────
 //

@@ -11,7 +11,7 @@
  * Ejecutar después de clonar el repositorio en una máquina nueva.
  */
 
-import { writeFileSync, chmodSync, existsSync, mkdirSync } from 'node:fs';
+import { writeFileSync, readFileSync, chmodSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const RAIZ = process.cwd();
@@ -24,7 +24,8 @@ const HOOKS = {
 # Generado por scripts/install-hooks.mjs · reinstalar con: npm run hooks:install
 #
 # Bloquea el commit si detecta credenciales o rutas privadas en los cambios
-# preparados. Para saltarlo puntualmente: git commit --no-verify
+# preparados. Saltarse este hook está PROHIBIDO y lo rechaza un hook PreToolUse de
+# Claude Code: desarmaría las tres comprobaciones a la vez.
 
 git -c core.quotepath=false diff --cached --unified=0 --no-color --no-renames --diff-filter=ACM |
   node scripts/check-secrets.mjs || exit 1
@@ -66,7 +67,7 @@ if echo "$ARCHIVOS" | grep -qE '^(data/fiscal/|lib/calculadoras/|lib/numeroALetr
     echo "✖ [goldens] Los tests de cálculo no pasan con estos cambios."
     echo "  Si el motor es ahora correcto, actualiza el golden y verifica la cifra"
     echo "  contra data/fiscal/ — nunca copiando lo que devuelve el motor."
-    echo "  Salto puntual: git commit --no-verify"
+    echo "  No hay salto: corrige el golden o la cifra."
     exit 1
   fi
 fi
@@ -85,6 +86,36 @@ for (const [nombre, contenido] of Object.entries(HOOKS)) {
   writeFileSync(destino, contenido, { encoding: 'utf8' });
   chmodSync(destino, 0o755);
   console.log(`✓ Hook instalado: .git/hooks/${nombre}`);
+}
+
+// ── Los hooks de Claude Code, que son la otra mitad del Cuadre ───────────────
+//
+// El hook de git bloquea, pero quien recoge QUÉ se pidió —literal, sin pasar por el modelo— son
+// los hooks de Claude Code. Viven en `~/.claude/settings.json`, que no se versiona, así que en
+// una máquina nueva hay que declararlos a mano. Este script no los escribe: solo dice si están,
+// porque ese fichero es del usuario y tocarlo sin avisar sería exactamente la clase de sorpresa
+// que el Cuadre existe para contar.
+
+const EVENTOS_CUADRE = ['SessionStart', 'UserPromptSubmit', 'SessionEnd', 'PreToolUse'];
+const AJUSTES_CLAUDE = join(process.env.USERPROFILE || process.env.HOME || '', '.claude', 'settings.json');
+
+try {
+  const ajustes = JSON.parse(readFileSync(AJUSTES_CLAUDE, 'utf8'));
+  const faltan = EVENTOS_CUADRE.filter(
+    (evt) =>
+      !(ajustes.hooks?.[evt] || []).some((grupo) =>
+        (grupo.hooks || []).some((h) => JSON.stringify(h).includes('cuadre-hook.mjs')),
+      ),
+  );
+  if (faltan.length === 0) {
+    console.log('✓ Hooks de Claude Code del Cuadre: los cuatro declarados.');
+  } else {
+    console.log(`\n⚠ Al Cuadre le faltan hooks de Claude Code: ${faltan.join(', ')}`);
+    console.log('  Sin ellos bloquea igual, pero no sabe qué se pidió. Declararlos en');
+    console.log(`  ${AJUSTES_CLAUDE} apuntando a scripts/cuadre-hook.mjs (ver skill /cuadre).`);
+  }
+} catch {
+  console.log('\n⚠ No se ha podido leer ~/.claude/settings.json: no sé si los hooks del Cuadre están.');
 }
 
 console.log('\nComprobación rápida:  npm run check:secrets');

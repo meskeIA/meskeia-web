@@ -418,9 +418,30 @@ function autoverificarOMorir() {
   return false;
 }
 
+/**
+ * Avisa si los eventos de Claude Code no están llegando.
+ *
+ * Sin ellos el Cuadre sigue contando —el `pre-commit` es un hook de git y no depende de la
+ * sesión— pero se queda CIEGO de la mitad izquierda: no sabe qué se pidió ni dónde empezó la
+ * sesión, y compara contra HEAD en vez de contra el punto de partida. El 16/09/2026 se probó a
+ * declarar los hooks en `.claude/settings.json` del proyecto y no llegaron a cargar: no falló
+ * nada, simplemente dejaron de registrarse las peticiones. Esto es lo que impide que esa avería
+ * vuelva a pasar desapercibida.
+ */
+function avisarSiNoLleganLosEventos(sesion) {
+  if (sesion?.base) return;
+  console.log('');
+  console.log('⚠ CUADRE a medias — no llegan los eventos de Claude Code, así que no sabe qué se pidió.');
+  console.log('  Sigue contando lo que se toca, pero compara contra HEAD, no contra el inicio de la sesión.');
+  console.log('  Revisa los cuatro hooks (SessionStart, UserPromptSubmit, SessionEnd, PreToolUse) en');
+  console.log('  ~/.claude/settings.json — se comprueban con: npm run hooks:install');
+  console.log('');
+}
+
 function modoPreCommit() {
   if (!autoverificarOMorir()) return 1;
   const sesion = sesionActual();
+  avisarSiNoLleganLosEventos(sesion);
   const base = sesion?.base && gitSilencioso('cat-file', '-e', `${sesion.base}^{commit}`) !== null ? sesion.base : 'HEAD';
   const peticiones = sesion?.peticiones || [];
   const autorizados = new Set(sesion?.autorizados || []);
