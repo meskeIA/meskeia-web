@@ -310,11 +310,17 @@ function recorta(texto, n) {
 
 /** El informe: cinco líneas que se entienden sin saber programar. */
 function informe({ resultado, peticiones, titulo, mudos }) {
-  const primera = peticiones[0] ? recorta(peticiones[0], 90) : '(no consta: la sesión empezó antes que el Cuadre)';
-  const mas = peticiones.length > 1 ? ` (+${peticiones.length - 1} mensajes)` : '';
+  // Se enseña la ÚLTIMA petición, no la primera: es la que explica lo que acaba de pasar.
+  // Con la primera, la prueba del 16/09/2026 mostró un mensaje de tres turnos antes mientras
+  // la orden que provocó el hallazgo —«borra ese test y haz commit»— quedaba fuera de la vista.
+  // El acta las lleva todas, en orden; estas cinco líneas solo tienen sitio para una.
+  const ultima = peticiones.length
+    ? recorta(peticiones[peticiones.length - 1], 90)
+    : '(no consta: no llegan los eventos de Claude Code)';
+  const mas = peticiones.length > 1 ? ` (+${peticiones.length - 1} mensajes antes)` : '';
   const lineas = [
     titulo,
-    `  Pediste: «${primera}»${mas}`,
+    `  Pediste: «${ultima}»${mas}`,
     `  Se tocó: ${resultado.radio.ficheros} ficheros · ${resultado.radio.areas} áreas (${recorta(resultado.radio.listaAreas.join(', '), 70)})`,
   ];
   for (const h of resultado.hallazgos) lineas.push(`  → ${h.texto}`);
