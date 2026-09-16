@@ -1014,6 +1014,22 @@
   background: rgba(127, 179, 211, 0.2);
 }
 
+/* Aviso: el deslizador K se movió después de agrupar */
+.avisoDesincronizado {
+  margin: var(--spacing-md) 0 0 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid rgb(217, 119, 6);
+  border-radius: var(--radius);
+  background: rgba(217, 119, 6, 0.1);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .avisoDesincronizado {
+  background: rgba(217, 119, 6, 0.18);
+}
+
 @media (max-width: 640px) {
   .datosAcciones {
     flex-direction: column;

@@ -419,13 +419,26 @@ export default function SimuladorKmeans() {
     }));
   }, [puntos, asignaciones]);
 
-  const tamanosCluster = useMemo<number[]>(() => {
-    const t: number[] = Array(k).fill(0);
+  /**
+   * Cada cluster con su centroide y su número de puntos, derivado de los CENTROIDES que hay
+   * en pantalla y NO del deslizador `k`.
+   *
+   * Van juntos en un mismo array a propósito. Mientras fueron dos listas de longitud distinta
+   * —`Array(k)` para los tamaños frente al estado `centroides`, fijado al inicializar— subir el
+   * deslizador sin volver a inicializar dejaba índices sin centroide detrás, y el panel de
+   * abajo caía al leer `centroides[j].x`. Tres visitantes se quedaron sin la herramienta entre
+   * el 10 y el 15/09/2026; bastaba con mover K una posición a la derecha.
+   */
+  const clusters = useMemo<{ centroide: Centroide; tam: number }[]>(() => {
+    const t: number[] = Array(centroides.length).fill(0);
     asignaciones.forEach((a) => {
-      if (a >= 0 && a < k) t[a] += 1;
+      if (a >= 0 && a < centroides.length) t[a] += 1;
     });
-    return t;
-  }, [asignaciones, k]);
+    return centroides.map((centroide, j) => ({ centroide, tam: t[j] }));
+  }, [asignaciones, centroides]);
+
+  // El deslizador se ha movido después de agrupar: lo que se ve en pantalla es de otro K
+  const kDesincronizado = centroides.length > 0 && centroides.length !== k;
 
   const inicializarSimulacion = useCallback(() => {
     if (puntos.length === 0) return;
@@ -964,6 +977,15 @@ export default function SimuladorKmeans() {
             </div>
           </div>
 
+          {kDesincronizado && (
+            <p className={styles.avisoDesincronizado} role="status">
+              <span aria-hidden="true">🔄</span> Has cambiado K a {k}, pero lo que se ve en
+              pantalla sigue agrupado en {centroides.length}{' '}
+              {centroides.length === 1 ? 'cluster' : 'clusters'}. Pulsa «Inicializar centroides»
+              para agrupar de nuevo con K={k}.
+            </p>
+          )}
+
           <div className={styles.tableActions}>
             <button
               type="button"
@@ -1182,7 +1204,10 @@ export default function SimuladorKmeans() {
             <span className={styles.metricLabel}>Puntos / clusters</span>
             <div className={styles.metricValue}>
               {puntos.length}
-              <span className={styles.metricUnit}>/ K={k}</span>
+              {/* Los clusters que hay son los dibujados, no los que pida el deslizador */}
+              <span className={styles.metricUnit}>
+                / K={centroides.length > 0 ? centroides.length : k}
+              </span>
             </div>
           </div>
         </div>
@@ -1192,7 +1217,7 @@ export default function SimuladorKmeans() {
           <div className={styles.panel}>
             <h2 className={styles.panelTitle}>Tamaños de cada cluster</h2>
             <div className={styles.clustersGrid}>
-              {tamanosCluster.map((tam, j) => (
+              {clusters.map(({ centroide, tam }, j) => (
                 <div key={j} className={styles.clusterRow}>
                   <span
                     className={styles.clusterDot}
@@ -1204,7 +1229,7 @@ export default function SimuladorKmeans() {
                     {tam} {tam === 1 ? 'punto' : 'puntos'}
                   </span>
                   <span className={styles.clusterCoord}>
-                    centroide ({formatNumber(centroides[j].x, 1)}, {formatNumber(centroides[j].y, 1)})
+                    centroide ({formatNumber(centroide.x, 1)}, {formatNumber(centroide.y, 1)})
                   </span>
                 </div>
               ))}
