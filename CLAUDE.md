@@ -372,17 +372,60 @@ Criterio de uso, ubicación de cada pieza y plantilla de router: skill **`/trpc-
 
 ## Seguridad y Calidad del Código
 
-### Guardián de secretos (hook pre-commit)
+### Lo que vigila el `pre-commit`
 
-Un hook `pre-commit` bloquea el commit si detecta credenciales o rutas privadas
-(`_private/`, `_backups/`, `.credentials/`, `scratch/`, `digests/`) en las líneas añadidas.
+Tres cosas, en este orden: **secretos**, **el Cuadre** y, solo si el commit toca datos o motores
+de cálculo, los **goldens** (`test:calc`, ~5 s).
 
-- `npm run check:secrets` — analiza lo que hay en staging (lo que ejecuta el hook)
-- `npm run audit:secrets` — auditoría de todo el repositorio
-- Falso positivo: añadir `pragma: allowlist-secret` en la línea · escape puntual: `git commit --no-verify`
+**Guardián de secretos** — bloquea si detecta credenciales o rutas privadas (`_private/`,
+`_backups/`, `.credentials/`, `scratch/`, `digests/`) en las líneas añadidas.
+`npm run check:secrets` analiza lo que hay en staging (lo que ejecuta el hook) ·
+`npm run audit:secrets`, el repositorio entero · falso positivo: `pragma: allowlist-secret` en
+la línea.
+
+⚠️ **`git commit --no-verify` está PROHIBIDO** y lo rechaza un hook `PreToolUse`. Desarma los
+tres a la vez, y el único candado que bloquea no puede ser puenteable con once caracteres por
+quien escribe los commits. Cuando el Cuadre bloquea con razón, la salida es dejar la razón
+escrita: `CUADRE_OK="por qué es correcto" git commit -m "…"`.
 
 > ⚠️ **Tras clonar el repositorio en otra máquina: `npm run hooks:install`.**
 > `.git/hooks/` no se versiona, así que el hook no viaja y la protección desaparece sin avisar.
+
+### El Cuadre: lo que se tocó frente a lo que se pidió
+
+`npm run cuadre` (y el `pre-commit`, que es donde **bloquea**) — cuenta y compara; no opina.
+Cubre la clase de fallo que los otros candados no pueden ver: **se coló algo que nadie pidió**.
+
+Los 17 candados comprueban propiedades POSITIVAS enumeradas de antemano —«esto debe estar, y
+está»—; ninguno mira un borrado (`grep diff-filter=D scripts/check-*.mjs` devuelve 0). El caso
+que mejor lo enseña es `check:csp`: exige que todo dominio cargado esté PERMITIDO, que es
+coherencia, no novedad — añadir la llamada y el permiso a la vez le cuadra.
+
+**Nueve reglas**: test borrado · fichero nuevo en la raíz · candado fuera de la cadena del build ·
+`@ts-ignore`/`eslint-disable`/`allowlist-secret` añadido a código que ya existía · paquete nuevo
+(subir versión no cuenta) · dominio nuevo en la CSP · `DisclaimerCard`/`LegalNotice`/
+`DataReference`/`RegionBadge`/`Footer`/`RelatedApps`/`ShareCard`/`role="alert"`/`aria-live` que
+cae a CERO en un fichero de `app/` o `components/` · registro del catálogo que encoge · fichero
+escrito fuera del ámbito declarado (el repositorio y los `additionalDirectories` de `settings.json`).
+
+**Todas comparan CONJUNTOS antes/después, nunca líneas del diff.** Medido el 15/09/2026: leyendo
+líneas habría bloqueado 21 de 100 commits, porque un reformateo produce las mismas líneas que un
+borrado. Comparando conjuntos, **8 de 400** — y de los 400, los **40 que crearon apps no disparan
+ninguna**: estas reglas miran lo que desaparece, y nacer no es una sorpresa.
+
+⚠️ **El radio del cambio NO dispara** (mediana 4 áreas, p95 10, y los que pasan de 12 son lotes
+legítimos: contado, un cambio desbocado y una reparación en lote son el mismo número). Precio
+aceptado: 40 ficheros tocados sin borrar nada pasan en silencio. El radio se imprime en el acta.
+
+Lo disparan los hooks, no Claude: `SessionStart` anota la base, `UserPromptSubmit` guarda la
+petición **literal**, el `pre-commit` bloquea y `SessionEnd` reconcilia. Siempre que habla sale un
+**toast de Windows** —también al autorizar—, porque un aviso impreso en la salida de una
+herramienta lo lee el auditado.
+
+> Las 9 reglas con sus precedentes, cómo se desencalla un commit bloqueado y los dos límites del
+> diseño: skill **`/cuadre`**. Sus cinco trampas: **`npm run cuadre:probar-candado`** — la quinta
+> reinyecta 400 commits reales y exige silencio en todos menos 10, porque un detector que gritara
+> «sorpresa» en todo pasaría las otras cuatro con matrícula de honor.
 
 ### Backups y recuperación de Turso
 

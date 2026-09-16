@@ -29,6 +29,22 @@ const HOOKS = {
 git -c core.quotepath=false diff --cached --unified=0 --no-color --no-renames --diff-filter=ACM |
   node scripts/check-secrets.mjs || exit 1
 
+# ── El Cuadre: lo que se tocó frente a lo que se pidió ────────────────────────
+#
+# Cuenta y compara; no opina. Calla salvo que aparezca algo que nadie encargó: un test
+# borrado, una dependencia nueva, un candado desenganchado del build, un disclaimer caído.
+# Va aquí y no en \`npm run build\` porque necesita saber DÓNDE empezó la sesión, y porque
+# este es el momento que importa: el commit que acaba en producción.
+#
+# Medido sobre los 400 commits anteriores a su creación: habla en 8. Si un día habla mucho
+# más, la prueba dirá qué regla se ha vuelto habladora:  npm run cuadre:probar-candado
+#
+# Si bloquea y la sorpresa es correcta, se autoriza dejando la razón escrita —nunca con
+# --no-verify, que desarmaría también las dos comprobaciones de arriba y de abajo:
+#     CUADRE_OK="por qué es correcto" git commit -m "…"
+
+node scripts/cuadre.mjs --pre-commit || exit 1
+
 # ── Goldens de cálculo, solo cuando el commit toca lo que los alimenta ────────
 #
 # De dónde sale (2026-08-13): el commit d67fbef8 subió las pensiones mínimas de

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "cuadre": "node scripts/cuadre.mjs --sesion",
+    "cuadre:simular": "node scripts/cuadre.mjs --simular",
+    "cuadre:probar-candado": "node scripts/pruebas/probar-cuadre.mjs",
     "predev": "npx kill-port 3050 || exit 0",
     "dev": "next dev -p 3050",
     "prestart": "npx kill-port 3050 || exit 0",
