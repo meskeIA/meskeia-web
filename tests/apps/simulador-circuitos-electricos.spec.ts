@@ -18,8 +18,9 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *     · calcSerie    Req = ΣR · I = V/Req · V_i = I·R_i · P_i = I²·R_i
  *     · calcParalelo 1/Req = Σ(1/R) · I_i = V/R_i · P_i = V²/R_i
  *     · calcPotencia P = V·I  ·  kWh = (P/1000)·horas·días  ·  coste = kWh·tarifa
- *   El parseo de TODA entrada es `parseFloat(s.replace(',', '.'))` — 14 usos, los que señala
- *   `npm run check:parser`. De ahí sale el hallazgo del CASO 1.
+ *   El parseo de TODA entrada era casero —el que persigue `npm run check:parser`, 14 usos— y
+ *   de ahí salió el hallazgo del CASO 1. Desde la reparación del 16/09/2026 es
+ *   `parseSpanishNumber` de `@/lib` en los 14 sitios.
  *
  * ⚠️ OJO AL FORMATEADOR, no es un fallo: `formatNumber(4700, 3)` devuelve «4700,000», SIN punto
  * de millar. Es correcto en es-ES — el separador de grupo no se usa con cuatro dígitos (ICU
@@ -56,7 +57,16 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *       R = V/I = 12/0 = ∞. No hay respuesta física: la app tiene que rechazarlo con un mensaje
  *       VISIBLE y no enseñar ningún resultado. Ni «∞ Ω», ni «No definido», ni un bloque vacío.
  *
- * ── HALLAZGO 1 (alto, cálculo) — EL CASO 1 ESTÁ EN ROJO A PROPÓSITO ──────────
+ * ── LOS CINCO HALLAZGOS, REPARADOS EL 16/09/2026 ─────────────────────────────
+ * Los CASOS 1 a 3 son los de la inspección; los CASOS 4 a 7 se añadieron con la reparación,
+ * uno por hallazgo, para que ninguno pueda volver sin que este fichero se ponga en rojo:
+ *   868 alto   · separador de millar leído como decimal      → CASO 1 parte B
+ *   869 medio  · terna V·I·R incompatible presentada como real → CASO 4
+ *   871 medio  · conmutadores sin aria-pressed, botones sin type → CASO 6
+ *   870 bajo   · campos de consumo sin validar                 → CASO 5
+ *   872 bajo   · tensión del nodo impresa en crudo             → CASO 7
+ *
+ * ── HALLAZGO 1 (alto, cálculo) — EL CASO 1 PARTE B NACIÓ EN ROJO ─────────────
  * Escribir «1.000» en un campo de resistencia hace que la app calcule con 1 Ω, no con 1000, y
  * no avisa de nada: el campo sigue mostrando «1.000». Medido el 16/09/2026 con el navegador en
  * es-ES, tecleando como un usuario:
@@ -69,8 +79,8 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  * a la respuesta buena: hay que fijarse en la coma para ver que no lo es. La tabla por
  * componente sí lo delata —el campo dice «1.000» y su celda R dice «1,00»—, pero hay que
  * mirarla. Variante peor: «1.234,56» llega al estado como «1.23456».
- * Este test se deja apuntando al comportamiento CORRECTO para que sirva de red a la reparación:
- * cuando los 14 `parseFloat(...replace(',', '.'))` pasen a `parseSpanishNumber`, se pondrá verde.
+ * El test se escribió apuntando al comportamiento CORRECTO para servir de red a la reparación,
+ * y en verde desde que los 14 parseos caseros pasaron al parser canónico del proyecto.
  *
  * Lo que NO es un hallazgo, medido y descartado: «12abc» en un campo de resistencia. El
  * `type="number"` del navegador se come las letras y el estado queda en «12», así que la app
@@ -192,5 +202,161 @@ test.describe('simulador-circuitos-electricos', () => {
     // Y no puede haber resultado detrás: ni «∞», ni «No definido», ni un bloque a medias.
     await expect(page.locator('div[role="status"]')).toBeEmpty();
     await expect(page.getByText('Resultado', { exact: true })).toHaveCount(0);
+  });
+
+  /**
+   * CASO 4 (hallazgo 869) — la pestaña Potencia deduce el valor que FALTA, así que con los tres
+   * rellenos no se ejecutaba ninguna rama del despeje: P salía de V×I y la R se reimprimía tal
+   * como se tecleó, sin comprobar que cumpliera la ley de Ohm. La ficha quedaba contradiciendo
+   * su propio encabezado, «P = V × I = V²/R = I²×R», que con esa terna da tres potencias:
+   *     V×I   = 230 × 10   = 2300 W   ← la única que se enseñaba
+   *     V²/R  = 52900 / 5  = 10580 W
+   *     I²×R  = 100 × 5    = 500 W
+   * No hay circuito que produzca 230 V con 10 A a través de 5 Ω: la ley de Ohm exige 50 V.
+   */
+  test('CASO 4 · rechazo: V, I y R juntos que no cumplen la ley de Ohm', async ({ page }) => {
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    // Los seis campos de la pestaña, en el orden en que se presentan: V, I, R, horas, días, tarifa.
+    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+    await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
+
+    await sembrarValor(page, campo(0), '230');
+    await sembrarValor(page, campo(1), '10');
+    await sembrarValor(page, campo(2), '5');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+
+    // El aviso nombra la cifra que sí cumpliría la ley: I × R = 10 × 5 = 50 V.
+    const aviso = page.locator('main [role="alert"]');
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('50,0000 V');
+    await expect(aviso).toContainText('230,0000 V');
+    // Y no se enseña nada detrás: una terna imposible no puede producir una ficha de resultados.
+    await expect(page.locator('div[role="status"]')).toBeEmpty();
+
+    // La MISMA terna, ya coherente (230 = 10 × 23), sí tiene que calcular: el aviso es para lo
+    // que no puede existir, no para todo lo que traiga los tres campos. P = 230 × 10 = 2300 W.
+    await sembrarValor(page, campo(2), '23');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(page.locator('main [role="alert"]')).toHaveCount(0);
+    await expect(valorDe(page, 'Potencia (P)')).toHaveText('2300,00 W');
+    await expect(valorDe(page, 'Resistencia (R)')).toHaveText('23,0000 Ω');
+  });
+
+  /**
+   * CASO 5 (hallazgo 870) — V, I y R se validaban con rigor, pero los tres campos que producen
+   * la cifra DESTACADA del panel (horas, días y tarifa) no se miraban: vacíos llegaban como NaN
+   * hasta imprimirse «No definido», sin mensaje y sin decir cuál faltaba, al lado de una P y una
+   * R correctas. Fallaba de forma visible, pero dejaba al usuario sin saber qué corregir.
+   */
+  test('CASO 5 · rechazo: sin horas de uso no se puede dar consumo ni coste', async ({ page }) => {
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+    await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
+
+    // V e I bastan para la parte eléctrica (R se deduce: 230/10 = 23 Ω), así que el único
+    // impedimento para el bloque energético es el campo de horas, que arranca en «1».
+    await sembrarValor(page, campo(0), '230');
+    await sembrarValor(page, campo(1), '10');
+    await sembrarValor(page, campo(3), ''); // Horas de uso diario, vaciado
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+
+    const aviso = page.locator('main [role="alert"]');
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('horas de uso diario');
+    // Nada de una ficha a medias con «No definido» en las dos líneas que el usuario venía a ver.
+    await expect(page.locator('div[role="status"]')).toBeEmpty();
+
+    // Con las horas puestas, el bloque completo: P = 230 × 10 = 2300 W → 2,3 kW.
+    // kWh = 2,3 × 4 h × 30 días = 276 kWh · coste = 276 × 0,18 €/kWh = 49,68 €.
+    await sembrarValor(page, campo(3), '4');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(page.locator('main [role="alert"]')).toHaveCount(0);
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('276,0000 kWh');
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('49,6800 €');
+  });
+
+  /**
+   * CASO 6 (hallazgo 871) — cuál de las cuatro calculadoras estaba en pantalla, y qué magnitud
+   * se iba a despejar, lo transmitía SOLO una clase CSS: los 7 conmutadores salían con
+   * aria-pressed nulo y sin la alternativa exenta (role="tab" + aria-selected), de modo que un
+   * lector de pantalla no podía saber dónde estaba. Y 10 botones no declaraban type.
+   */
+  test('CASO 6 · los conmutadores declaran su estado y ningún botón puede enviar un formulario', async ({ page }) => {
+    const PESTANAS = ['Ley de Ohm', 'Serie', 'Paralelo', 'Potencia'];
+    const boton = (nombre: string) => page.getByRole('button', { name: nombre, exact: true });
+
+    // Al cargar, la pestaña activa es «Ley de Ohm» y es la única pulsada.
+    for (const n of PESTANAS) {
+      await expect(boton(n)).toHaveAttribute('aria-pressed', n === 'Ley de Ohm' ? 'true' : 'false');
+    }
+
+    // Los tres selectores de incógnita, igual: arranca en Tensión (V).
+    const INCOGNITAS = ['Calcular Tensión (V)', 'Calcular Corriente (I)', 'Calcular Resistencia (R)'];
+    for (const n of INCOGNITAS) {
+      await expect(boton(n)).toHaveAttribute('aria-pressed', n === 'Calcular Tensión (V)' ? 'true' : 'false');
+    }
+    await boton('Calcular Resistencia (R)').click();
+    for (const n of INCOGNITAS) {
+      await expect(boton(n)).toHaveAttribute('aria-pressed', n === 'Calcular Resistencia (R)' ? 'true' : 'false');
+    }
+
+    // Y el estado viaja al cambiar de pestaña, que es lo que el lector de pantalla necesita oír.
+    await boton('Serie').click();
+    for (const n of PESTANAS) {
+      await expect(boton(n)).toHaveAttribute('aria-pressed', n === 'Serie' ? 'true' : 'false');
+    }
+
+    // type="button" en todos los botones de la herramienta (CLAUDE.md global §5): sin él, un
+    // botón dentro de un <form> envía el formulario al pulsarlo.
+    for (const n of [...PESTANAS, 'Reducir', 'Aumentar', 'Calcular circuito']) {
+      await expect(boton(n).first()).toHaveAttribute('type', 'button');
+    }
+    await boton('Ley de Ohm').click();
+    for (const n of [...INCOGNITAS, 'Calcular']) {
+      await expect(boton(n)).toHaveAttribute('type', 'button');
+    }
+
+    // Y el que NO debe llevarlo: «Calcular» es una acción, no un conmutador. Un aria-pressed
+    // ahí anuncia un estado que no existe, y es una regresión, no una mejora (CLAUDE.md §5).
+    await expect(boton('Calcular')).not.toHaveAttribute('aria-pressed', /.*/);
+  });
+
+  /**
+   * CASO 7 (hallazgo 872) — la columna «V (V)» de la tabla por componente imprimía el estado
+   * crudo del input en vez de pasarlo por el formateador, como sí hacen sus cuatro vecinas. Y
+   * como el input normaliza el decimal a punto, una tensión con decimales salía en formato US
+   * dentro de una tabla española (CLAUDE.md global §2).
+   *
+   * Los números, resueltos a mano — 3 × 100 Ω a 12,5 V:
+   *   1/Req = 3/100 = 0,03      → Req = 100/3 = 33,333… Ω  → 33,3333
+   *   I rama = 12,5/100 = 0,125 A                          → 0,1250
+   *   I total = 3 × 0,125 = 0,375 A                        → 0,3750
+   *   P rama = V²/R = 156,25/100 = 1,5625 W                → 1,5625
+   *   P total = V²/Req = 156,25 / 33,333… = 4,6875 W       → 4,6875  (3 × 1,5625 ✔)
+   */
+  test('CASO 7 · la tensión del nodo se imprime en formato español, como sus celdas vecinas', async ({ page }) => {
+    await page.getByRole('button', { name: 'Paralelo', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+
+    for (let i = 0; i < 3; i++) await sembrarValor(page, resistencia(page, i), '100');
+    // Lo que el campo contiene tras teclear «12,5» con el navegador en es-ES: el input
+    // normaliza el decimal a punto, y es justo esa cadena la que se imprimía en crudo.
+    await sembrarValor(page, page.locator('input[placeholder="voltios"]'), '12.5');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('33,3333 Ω');
+    await expect(valorDe(page, 'Corriente total (fuente)')).toHaveText('0,3750 A');
+    await expect(valorDe(page, 'Potencia total disipada')).toHaveText('4,6875 W');
+
+    await expect(filas(page)).toHaveCount(3);
+    for (let i = 0; i < 3; i++) {
+      // La celda de tensión, con coma decimal y los mismos 4 decimales que sus vecinas.
+      await expect(filas(page).nth(i)).toContainText('12,5000');
+      await expect(filas(page).nth(i)).toContainText('100,00');  // R
+      await expect(filas(page).nth(i)).toContainText('0,1250');  // I de rama
+      await expect(filas(page).nth(i)).toContainText('1,5625');  // P de rama
+    }
+    // Y no puede quedar rastro del punto decimal en ninguna fila de la tabla.
+    await expect(filas(page).nth(0)).not.toContainText('12.5');
   });
 });

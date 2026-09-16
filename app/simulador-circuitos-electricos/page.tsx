@@ -11,7 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorCircuitosElectricos.module.css';
 
 type Tab = 'ohm' | 'serie' | 'paralelo' | 'potencia';
@@ -25,6 +25,9 @@ interface ResultadoOhm {
 
 interface ResultadoSerie {
   Req: number;
+  V: number;
+  /** Las resistencias YA parseadas con las que se calculó, para que la tabla no relea los inputs (hallazgo 872) */
+  resistencias: number[];
   I: number;
   tensiones: number[];
   potencias: number[];
@@ -33,6 +36,8 @@ interface ResultadoSerie {
 
 interface ResultadoParalelo {
   Req: number;
+  V: number;
+  resistencias: number[];
   Itotal: number;
   corrientes: number[];
   potencias: number[];
@@ -49,6 +54,13 @@ interface ResultadoPotencia {
 }
 
 const MAX_R = 6;
+
+/**
+ * Margen relativo con el que se acepta que V, I y R tecleados A LA VEZ cumplan V = I × R.
+ * Un 1 % deja pasar los redondeos normales de un enunciado (dos o tres cifras significativas)
+ * y caza las ternas que no describen ningún circuito posible (hallazgo 869).
+ */
+const TOLERANCIA_OHM = 0.01;
 
 export default function SimuladorCircuitosElectricos() {
   const [tab, setTab] = useState<Tab>('ohm');
@@ -87,8 +99,8 @@ export default function SimuladorCircuitosElectricos() {
   function calcOhm() {
     setErrorOhm('');
     setResOhm(null);
-    const a = parseFloat(ohmA.replace(',', '.'));
-    const b = parseFloat(ohmB.replace(',', '.'));
+    const a = parseSpanishNumber(ohmA);
+    const b = parseSpanishNumber(ohmB);
     if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) {
       setErrorOhm('Introduce dos valores positivos.');
       return;
@@ -107,49 +119,67 @@ export default function SimuladorCircuitosElectricos() {
   function calcSerie() {
     setErrorSerie('');
     setResSerie(null);
-    const V = parseFloat(vSerie.replace(',', '.'));
+    const V = parseSpanishNumber(vSerie);
     if (isNaN(V) || V <= 0) { setErrorSerie('Tensión de fuente inválida.'); return; }
-    const rs = rsSerie.slice(0, numSerie).map(s => parseFloat(s.replace(',', '.')));
+    const rs = rsSerie.slice(0, numSerie).map(parseSpanishNumber);
     if (rs.some(r => isNaN(r) || r <= 0)) { setErrorSerie('Todas las resistencias deben ser valores positivos.'); return; }
     const Req = rs.reduce((a, r) => a + r, 0);
     const I = V / Req;
     const tensiones = rs.map(r => I * r);
     const potencias = rs.map(r => I * I * r);
-    setResSerie({ Req, I, tensiones, potencias, potenciaTotal: I * I * Req });
+    setResSerie({ Req, V, resistencias: rs, I, tensiones, potencias, potenciaTotal: I * I * Req });
   }
 
   function calcParalelo() {
     setErrorPar('');
     setResPar(null);
-    const V = parseFloat(vPar.replace(',', '.'));
+    const V = parseSpanishNumber(vPar);
     if (isNaN(V) || V <= 0) { setErrorPar('Tensión de fuente inválida.'); return; }
-    const rs = rsPar.slice(0, numPar).map(s => parseFloat(s.replace(',', '.')));
+    const rs = rsPar.slice(0, numPar).map(parseSpanishNumber);
     if (rs.some(r => isNaN(r) || r <= 0)) { setErrorPar('Todas las resistencias deben ser valores positivos.'); return; }
     const invReq = rs.reduce((a, r) => a + 1 / r, 0);
     const Req = 1 / invReq;
     const corrientes = rs.map(r => V / r);
     const Itotal = corrientes.reduce((a, i) => a + i, 0);
     const potencias = rs.map(r => V * V / r);
-    setResPar({ Req, Itotal, corrientes, potencias, potenciaTotal: V * V / Req });
+    setResPar({ Req, V, resistencias: rs, Itotal, corrientes, potencias, potenciaTotal: V * V / Req });
   }
 
   function calcPotencia() {
     setErrorPot('');
     setResPot(null);
-    const V = parseFloat(potV.replace(',', '.'));
-    const I = parseFloat(potI.replace(',', '.'));
-    const R = parseFloat(potR.replace(',', '.'));
-    const horas = parseFloat(potHoras.replace(',', '.'));
-    const dias = parseFloat(potDias.replace(',', '.'));
-    const tarifa = parseFloat(potTarifa.replace(',', '.'));
+    const V = parseSpanishNumber(potV);
+    const I = parseSpanishNumber(potI);
+    const R = parseSpanishNumber(potR);
+    const horas = parseSpanishNumber(potHoras);
+    const dias = parseSpanishNumber(potDias);
+    const tarifa = parseSpanishNumber(potTarifa);
     const validos = [V, I, R].filter(v => !isNaN(v) && v > 0);
     if (validos.length < 2) { setErrorPot('Introduce al menos dos de los tres valores (V, I, R).'); return; }
+    // Con los tres rellenos ninguna rama del despeje se ejecuta, así que hasta ahora la ficha
+    // podía enseñar una terna que no cumple la ley de Ohm como si fuera un circuito real: las
+    // tres fórmulas del encabezado (V×I, V²/R, I²×R) daban tres potencias distintas. No se
+    // recalcula ninguno, porque no hay forma de saber cuál de los tres está mal (hallazgo 869).
+    if (validos.length === 3 && Math.abs(V - I * R) > TOLERANCIA_OHM * I * R) {
+      setErrorPot(
+        `Los tres valores no pueden darse a la vez: la ley de Ohm exige V = I × R = ${formatNumber(I * R, 4)} V, ` +
+        `no ${formatNumber(V, 4)} V. Corrige uno o deja vacío el que quieras que se calcule.`
+      );
+      return;
+    }
     let fV = V, fI = I, fR = R;
     if (isNaN(fV) || fV <= 0) fV = fI * fR;
     else if (isNaN(fI) || fI <= 0) fI = fV / fR;
     else if (isNaN(fR) || fR <= 0) fR = fV / fI;
     const P = fV * fI;
     if (!isFinite(P) || P <= 0) { setErrorPot('No se puede calcular la potencia con esos valores.'); return; }
+    // El bloque de consumo y coste es la cifra DESTACADA del panel, y sus tres campos no se
+    // validaban: vacíos se propagaban como NaN hasta imprimirse «No definido» sin decir cuál
+    // faltaba, al lado de una P y una R correctas (hallazgo 870). El cero sí se admite —una
+    // tarifa de 0 €/kWh es autoconsumo, y 0 horas da 0 kWh, que no es una cifra falsa.
+    if (isNaN(horas) || horas < 0) { setErrorPot('Indica las horas de uso diario (un número de 0 o más).'); return; }
+    if (isNaN(dias) || dias < 0) { setErrorPot('Indica los días del periodo (un número de 0 o más).'); return; }
+    if (isNaN(tarifa) || tarifa < 0) { setErrorPot('Indica la tarifa eléctrica en €/kWh (un número de 0 o más).'); return; }
     const energiaKwh = (P / 1000) * horas * dias;
     const costeEuros = energiaKwh * tarifa;
     setResPot({ P, V: fV, I: fI, R: fR, energiaKwh, costeEuros });
@@ -195,6 +225,10 @@ export default function SimuladorCircuitosElectricos() {
           {(['ohm', 'serie', 'paralelo', 'potencia'] as Tab[]).map(t => (
             <button
               key={t}
+              type="button"
+              // Cuál de las cuatro calculadoras está en pantalla lo decía solo una clase CSS,
+              // invisible para un lector de pantalla (hallazgo 871)
+              aria-pressed={tab === t}
               className={`${styles.tabBtn} ${tab === t ? styles.tabActive : ''}`}
               onClick={() => setTab(t)}
             >
@@ -215,6 +249,8 @@ export default function SimuladorCircuitosElectricos() {
                 {(['V', 'I', 'R'] as Incognita[]).map(u => (
                   <button
                     key={u}
+                    type="button"
+                    aria-pressed={incognita === u}
                     className={`${styles.unknownBtn} ${incognita === u ? styles.unknownActive : ''}`}
                     onClick={() => { setIncognita(u); setResOhm(null); setErrorOhm(''); }}
                   >
@@ -247,7 +283,7 @@ export default function SimuladorCircuitosElectricos() {
                 </div>
               </div>
               {errorOhm && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorOhm}</p>}
-              <button className={styles.calcBtn} onClick={calcOhm}>Calcular</button>
+              <button type="button" className={styles.calcBtn} onClick={calcOhm}>Calcular</button>
 
               <div role="status" aria-live="polite">
               {resOhm && (
@@ -292,9 +328,9 @@ export default function SimuladorCircuitosElectricos() {
               </p>
               <div className={styles.countControl}>
                 <label>Número de resistencias:</label>
-                <button className={styles.countBtn} onClick={() => setNumSerie(n => Math.max(2, n - 1))} aria-label="Reducir">−</button>
+                <button type="button" className={styles.countBtn} onClick={() => setNumSerie(n => Math.max(2, n - 1))} aria-label="Reducir">−</button>
                 <span className={styles.countValue}>{numSerie}</span>
-                <button className={styles.countBtn} onClick={() => setNumSerie(n => Math.min(MAX_R, n + 1))} aria-label="Aumentar">+</button>
+                <button type="button" className={styles.countBtn} onClick={() => setNumSerie(n => Math.min(MAX_R, n + 1))} aria-label="Aumentar">+</button>
               </div>
               <div className={styles.resistoresGrid}>
                 {Array.from({ length: numSerie }, (_, i) => (
@@ -325,7 +361,7 @@ export default function SimuladorCircuitosElectricos() {
                 />
               </div>
               {errorSerie && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorSerie}</p>}
-              <button className={styles.calcBtn} onClick={calcSerie}>Calcular circuito</button>
+              <button type="button" className={styles.calcBtn} onClick={calcSerie}>Calcular circuito</button>
 
               <div role="status" aria-live="polite">
               {resSerie && (
@@ -356,10 +392,10 @@ export default function SimuladorCircuitosElectricos() {
                       </tr>
                     </thead>
                     <tbody>
-                      {rsSerie.slice(0, numSerie).map((r, i) => (
+                      {resSerie.resistencias.map((r, i) => (
                         <tr key={i}>
                           <td>R{i + 1}</td>
-                          <td>{formatNumber(parseFloat(r.replace(',', '.')), 2)}</td>
+                          <td>{formatNumber(r, 2)}</td>
                           <td>{formatNumber(resSerie.tensiones[i], 4)} V</td>
                           <td>{formatNumber(resSerie.I, 4)}</td>
                           <td>{formatNumber(resSerie.potencias[i], 4)}</td>
@@ -385,9 +421,9 @@ export default function SimuladorCircuitosElectricos() {
               </p>
               <div className={styles.countControl}>
                 <label>Número de resistencias:</label>
-                <button className={styles.countBtn} onClick={() => setNumPar(n => Math.max(2, n - 1))} aria-label="Reducir">−</button>
+                <button type="button" className={styles.countBtn} onClick={() => setNumPar(n => Math.max(2, n - 1))} aria-label="Reducir">−</button>
                 <span className={styles.countValue}>{numPar}</span>
-                <button className={styles.countBtn} onClick={() => setNumPar(n => Math.min(MAX_R, n + 1))} aria-label="Aumentar">+</button>
+                <button type="button" className={styles.countBtn} onClick={() => setNumPar(n => Math.min(MAX_R, n + 1))} aria-label="Aumentar">+</button>
               </div>
               <div className={styles.resistoresGrid}>
                 {Array.from({ length: numPar }, (_, i) => (
@@ -418,7 +454,7 @@ export default function SimuladorCircuitosElectricos() {
                 />
               </div>
               {errorPar && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorPar}</p>}
-              <button className={styles.calcBtn} onClick={calcParalelo}>Calcular circuito</button>
+              <button type="button" className={styles.calcBtn} onClick={calcParalelo}>Calcular circuito</button>
 
               <div role="status" aria-live="polite">
               {resPar && (
@@ -449,11 +485,13 @@ export default function SimuladorCircuitosElectricos() {
                       </tr>
                     </thead>
                     <tbody>
-                      {rsPar.slice(0, numPar).map((r, i) => (
+                      {resPar.resistencias.map((r, i) => (
                         <tr key={i}>
                           <td>R{i + 1}</td>
-                          <td>{formatNumber(parseFloat(r.replace(',', '.')), 2)}</td>
-                          <td>{vPar}</td>
+                          <td>{formatNumber(r, 2)}</td>
+                          {/* La tensión del nodo, formateada como sus celdas vecinas y no en crudo
+                              desde el input, que la sacaba con punto decimal (hallazgo 872) */}
+                          <td>{formatNumber(resPar.V, 4)}</td>
                           <td>{formatNumber(resPar.corrientes[i], 4)}</td>
                           <td>{formatNumber(resPar.potencias[i], 4)}</td>
                         </tr>
@@ -505,7 +543,7 @@ export default function SimuladorCircuitosElectricos() {
                 </div>
               </div>
               {errorPot && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorPot}</p>}
-              <button className={styles.calcBtn} onClick={calcPotencia}>Calcular</button>
+              <button type="button" className={styles.calcBtn} onClick={calcPotencia}>Calcular</button>
 
               <div role="status" aria-live="polite">
               {resPot && (
