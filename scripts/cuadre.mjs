@@ -55,7 +55,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync, spawn } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { contar, autoverificar } from './cuadre-motor.mjs';
 
@@ -289,15 +289,28 @@ function escriturasFuera(rutaTranscript) {
 // Salida: acta, toast e informe de cinco líneas
 // ---------------------------------------------------------------------------
 
+/**
+ * El aviso que no viaja por el canal auditado.
+ *
+ * Se espera a que PowerShell TERMINE, y no es un detalle: la primera versión lo lanzaba
+ * `detached` con `unref()` y salía al instante, así que el proceso —y todo su árbol— se
+ * desmontaba en el segundo largo que BurntToast tarda en arrancar y emitir. Resultado el
+ * 16/09/2026: el candado bloqueaba, escribía el acta, decía «toast enviado»… y en la pantalla
+ * no aparecía nada. El canal entero era decorativo y ninguna prueba automática podía verlo,
+ * porque desde dentro todo devolvía éxito.
+ *
+ * Esperar cuesta uno o dos segundos, y solo se paga cuando el Cuadre habla —una vez cada
+ * cincuenta commits—. Un aviso que no llega no vale nada, y aquí es la única pieza que no pasa
+ * por quien está siendo auditado.
+ */
 function toast(mensaje) {
   if (!fs.existsSync(TOAST)) return;
   try {
-    const hijo = spawn(
+    spawnSync(
       'powershell',
       ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', TOAST, '-Message', mensaje.slice(0, 180)],
-      { detached: true, stdio: 'ignore', windowsHide: true },
+      { stdio: 'ignore', windowsHide: true, timeout: 20000 },
     );
-    hijo.unref();
   } catch {
     /* que no falle un commit porque no haya podido salir una notificación */
   }
@@ -465,12 +478,19 @@ function modoPreCommit() {
   });
 
   const nuevos = resultado.hallazgos.filter((h) => !autorizados.has(h.huella));
+  const repetidos = resultado.hallazgos.filter((h) => autorizados.has(h.huella));
   const reg = registro();
 
   if (nuevos.length === 0) {
     reg.commitsMudos += 1;
     escribirJson(REGISTRO, reg);
-    return 0; // el silencio es el estado normal
+    // Autorizado no es lo mismo que invisible. El visto bueno evita que el mismo hecho
+    // bloquee dos veces —sin eso, un lote de 40 ficheros bloquearía en bucle— pero el hecho
+    // se sigue nombrando en cada commit que lo lleve encima. Lo descubrió la prueba del
+    // 16/09/2026: autorizado un borrado de test, el segundo intento pasó en SILENCIO ABSOLUTO,
+    // que es exactamente lo que este candado existe para que no ocurra.
+    for (const h of repetidos) console.log(`· Cuadre: ${h.texto} — ya autorizado en esta sesión`);
+    return 0; // el silencio es el estado normal cuando no queda nada que contar
   }
 
   const razon = process.env.CUADRE_OK;
