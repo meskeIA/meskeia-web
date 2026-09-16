@@ -113,3 +113,12 @@ scripts/caracterizar-foso.mjs
 
 # Lente de pais sobre GSC (S0088): consulta la propiedad privada de Search Console
 scripts/gsc-latam.mjs
+
+# Skills de Claude Code del proyecto (16/09/2026)
+# Las propias de meskeIA se mudaron aquí desde ~/.claude/skills para dejar de cargarse —y de
+# pagar contexto— en XFinanzas, Genealogía y markets. NO se versionan: DIEZ de ellas citan
+# rutas privadas (_private/, digests/, semillas/, cruce-seo/) y este repositorio es PÚBLICO.
+# Las dos excepciones ya están commiteadas y no contienen nada privado.
+.claude/skills/*
+!.claude/skills/cuadre/
+!.claude/skills/trpc-meskeia/

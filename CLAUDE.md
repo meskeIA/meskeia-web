@@ -755,6 +755,30 @@ arriba, en «Registro de una app en un portal vertical».
 
 ## Herramientas de Desarrollo
 
+### Dónde vive una skill (16/09/2026)
+
+**Una skill de meskeIA se crea en `.claude/skills/` del proyecto**, no en `~/.claude/skills/`.
+Allí solo quedan las cuatro transversales —`/agenda`, `/log`, `/markets`, `/correo`—, que sirven
+también a los programas del PC.
+
+El motivo es medible: la descripción de cada skill se carga en **todas** las sesiones de **todos**
+los proyectos, y las 14 de meskeIA sumaban ~6 KB que pagaban XFinanzas, Genealogía y markets sin
+usarlos nunca. Es la misma razón por la que el CLAUDE.md global no duplica los estándares de
+meskeIA y por la que `/meskeia-dev-stack` se retiró el 10/09/2026.
+
+⚠️ **No se versionan**: 10 de las 14 citan rutas privadas (`_private/`, `digests/`, `semillas/`)
+y este repositorio es **público**. `.gitignore` las excluye salvo `cuadre` y `trpc-meskeia`, que
+no contienen nada privado. Consecuencia asumida: no viajan a otra máquina — igual que antes, que
+tampoco viajaban al no versionarse `~/.claude/`.
+
+⚠️ **CRLF rompe el frontmatter en silencio**: la skill se carga igual, pero su `description:` no
+se lee y el modelo ve el título `# H1` en su lugar. `semilla-diaria` llevaba así desde su
+creación y nadie lo notó. Guardar siempre en LF.
+
+> Los punteros `skill:<nombre>` de la Agenda se resuelven en los DOS directorios desde el
+> 16/09/2026 (`agenda-hoy.mjs`). Antes solo miraba el global y daba por muerta cualquier skill
+> mudada — que es como se descubrió esto.
+
 Los comandos disponibles se ven con `/help`; las revisiones de código van por el `/code-review` integrado. Los plugins `code-review`, `audit`, `analyze-codebase`, `bug-detective`, `debugger` y `accessibility-expert` de `cc-marketplace` **se retiraron el 11/08/2026**: cero usos desde junio, y el primero además duplicaba el comando integrado.
 
 **Testing de frontend interactivo**: sin MCP — verificado el 01/09/2026 que no hay ninguno
