@@ -18,7 +18,7 @@ import {
   AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
+import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr, registrarEventoInteraccion } from '@/lib';
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
@@ -665,7 +665,13 @@ export default function SimuladorGarajeCompraventaPage() {
               aria-controls="panel-vendedor"
               aria-selected={pestanaActiva === 'vendedor'}
               className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
-              onClick={() => setPestanaActiva('vendedor')}
+              onClick={() => {
+                setPestanaActiva('vendedor');
+                // Medición abierta el 17/09/2026 para decidir si la pestaña Vendedor se replica
+                // en solar y terreno rústico, que hoy solo sirven al comprador. Se emite una vez
+                // por carga; el denominador es el uso normal de esta app. Ver lib/trackingEvento.ts.
+                registrarEventoInteraccion('pestana-vendedor', 'simulador-gastos-compraventa-garaje');
+              }}
             >
               Vendedor
             </button>

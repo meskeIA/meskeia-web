@@ -47,4 +47,5 @@ export {
 } from './parsearSerieNumerica';
 
 export { withFrom } from './trackingFrom';
+export { registrarEventoInteraccion } from './trackingEvento';
 export { URL_PRIVACIDAD, URL_TERMINOS } from './urls-legales';

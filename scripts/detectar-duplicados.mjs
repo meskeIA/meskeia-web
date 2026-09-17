@@ -234,8 +234,14 @@ casi siempre funciones distintas, no un duplicado real.
 // -------------------------------------------------------------------------------------------------
 // 7. Programa
 // -------------------------------------------------------------------------------------------------
+// Este fichero es a la vez CLI y módulo: /semilla-diaria importa `calcularGrupos` para marcar en
+// su sección 4 las apps top que son estrella de un grupo a POTENCIAR (17/09/2026). Por eso todo
+// lo que imprime o termina el proceso vive bajo ES_CLI, y el estado de abajo —que es el análisis
+// léxico y no depende de los argumentos— se calcula siempre.
+const ES_CLI = !!process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
 const flags = parseArgs();
-if (flags.help) { ayuda(); process.exit(0); }
+if (ES_CLI && flags.help) { ayuda(); process.exit(0); }
 
 const apps = parsearApps();
 const tfs = apps.map(docTF);
@@ -243,7 +249,7 @@ const { idf, df, N } = calcularIDF(tfs);
 const idfMax = Math.log((N + 1) / 1) + 1;
 const vecs = tfs.map((tf) => vector(tf, idf, idfMax));
 
-console.log(`\n=== detectar-duplicados · ${apps.length} apps · similitud léxica (TF-IDF) ===`);
+if (ES_CLI) console.log(`\n=== detectar-duplicados · ${apps.length} apps · similitud léxica (TF-IDF) ===`);
 
 // --- 7a. Consulta / slug: vecinos de un vector ---------------------------------------------------
 function mostrarVecinos(refTf, refVec, refIdx, refLabel) {
@@ -412,12 +418,21 @@ function mediana(nums) {
 
 const MAX_MIEMBROS = 15;
 
-function mostrarClusters() {
-  const top = flags.top || 20;
-  const umbral = flags.umbral ?? 0.32;
-  const minUsos = Number.isFinite(flags.minUsos) ? flags.minUsos : 50;
-
-  const trafico = usos30dPorApp();
+/**
+ * Agrupa el catálogo y emite el veredicto de cada grupo, SIN imprimir nada.
+ *
+ * Se separó de `mostrarClusters` el 17/09/2026 para que /semilla-diaria pueda marcar en su
+ * sección 4 las apps top que son estrella de un grupo a POTENCIAR: la herramienta existía desde
+ * el 24/08 y hacía bien su trabajo, pero había que acordarse de ejecutarla, que es el mismo hueco
+ * que tenían %aula y el país del aula antes de volverse columnas del briefing.
+ *
+ * @param usoPorSlug  Map slug→usos30d ya calculado por quien llama. Si no se pasa, se lee el dump
+ *                    (el briefing ya lo tiene cargado y releerlo cuesta varios segundos).
+ * @returns { filas, trafico } · cada fila: { ms: índices ordenados por uso, usos, total,
+ *          pctEstrella, veredicto }. `ms[0]` es la estrella del grupo.
+ */
+export function calcularGrupos({ umbral = 0.32, minUsos = 50, usoPorSlug = null } = {}) {
+  const trafico = usoPorSlug ? { mapa: usoPorSlug, dump: null, anchor: null } : usos30dPorApp();
   const uso = (i) => (trafico ? trafico.mapa.get(apps[i].slug) || 0 : 0);
   const ady = adyacencia(umbral);
 
@@ -456,6 +471,18 @@ function mostrarClusters() {
     return { ms, usos, total, pctEstrella, veredicto };
   });
   filas.sort((a, b) => b.total - a.total || b.ms.length - a.ms.length);
+  return { filas, trafico };
+}
+
+/** El slug de cada app, por índice: quien importa `calcularGrupos` recibe índices, no slugs. */
+export const slugsCatalogo = () => apps.map((a) => a.slug);
+
+function mostrarClusters() {
+  const top = flags.top || 20;
+  const umbral = flags.umbral ?? 0.32;
+  const minUsos = Number.isFinite(flags.minUsos) ? flags.minUsos : 50;
+
+  const { filas, trafico } = calcularGrupos({ umbral, minUsos });
 
   console.log(`\nClústeres temáticos ≥ ${pct(umbral)}` +
     (trafico ? ` · uso 30 d de ${trafico.dump}` : ' · SIN DUMP: agrupa, pero no juzga'));
@@ -483,8 +510,10 @@ function mostrarClusters() {
   console.log('       antes de contarla como muerta (feedback_no_medir_antes_de_madurar).');
 }
 
-// --- 7c. Enrutado --------------------------------------------------------------------------------
-if (flags.pares) {
+// --- 7c. Enrutado (solo como CLI: al importarse, este fichero no imprime nada) --------------------
+if (!ES_CLI) {
+  // importado como módulo
+} else if (flags.pares) {
   mostrarPares();
 } else if (flags.clusters) {
   mostrarClusters();
@@ -505,4 +534,4 @@ if (flags.pares) {
   ayuda();
 }
 
-console.log('');
+if (ES_CLI) console.log('');
