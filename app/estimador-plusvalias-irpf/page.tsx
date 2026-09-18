@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './EstimadorPlusvalias.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
@@ -174,6 +174,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
       <RegionBadge variant="es-only" />
 
 
+      <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />
 
       {/* El sello es el de la escala del ahorro, no el del módulo entero: la fecha de

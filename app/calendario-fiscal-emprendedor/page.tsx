@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalendarioFiscal.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -596,6 +596,7 @@ export default function CalendarioFiscalPage() {
       <RegionBadge variant="es-only" />
 
 
+      <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Selector de tipo */}

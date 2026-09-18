@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './EstimadorRiesgoOsteoporosis.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
@@ -126,6 +126,7 @@ export default function EstimadorRiesgoOsteoporosis() {
         <p className={styles.subtitle}>Test de factores de riesgo validados (FRAX/IOF) · Orientación preventiva</p>
       </header>
 
+      <LegalNotice />
       <DisclaimerCard variant="medical"
         severity="critical">
         <span>

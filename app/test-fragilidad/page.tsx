@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './TestFragilidad.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
@@ -149,6 +149,7 @@ export default function TestFragilidad() {
         <p className={styles.subtitle}>Escala FRAIL · 5 ítems validados · Orientación preventiva para mayores</p>
       </header>
 
+      <LegalNotice />
       <DisclaimerCard variant="medical"
         severity="critical">
         <span>

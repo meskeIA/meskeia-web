@@ -283,14 +283,17 @@ test('HALLAZGO — con CERO respuestas emite «Sin fragilidad detectada» sin av
   await expect(veredicto(page)).not.toContainText('Sin fragilidad detectada');
 });
 
-test('HALLAZGO — no hay LegalNotice ni una sola línea sobre qué pasa con las respuestas de salud', async ({
+test('CASO 9 — la app monta su aviso legal, como las otras 20 apps `app/test-*`', async ({
   page,
 }) => {
-  test.fail();
   // `LegalNotice` es uno de los cinco componentes obligatorios en TODA app (CLAUDE.md), y
   // _private/DISCLAIMER-POLICY.md lo repite: «LegalNotice sigue siendo obligatorio en todas
-  // las apps». Esta es la ÚNICA de las 21 apps `app/test-*` que no lo monta, y justo la que
+  // las apps». Esta era la ÚNICA de las 21 apps `app/test-*` que no lo montaba, y justo la que
   // recoge datos de categoría especial del RGPD: cinco preguntas sobre la salud del usuario.
+  //
+  // REPARADO el 18/09/2026 en el mismo commit que crea `scripts/check-legal-notice.mjs`, que
+  // desde entonces rompe el build si una app nace sin aviso legal. El test deja de ser un
+  // hallazgo abierto y pasa a ser la regresión que impide que vuelva a caerse.
   //
   // ⚠️ La asercion se ancla a «Términos de Uso», que es la marca INEQUÍVOCA de LegalNotice:
   // el Footer no lo lleva, y el pie de DisclaimerCard solo lo monta con showTermsLink, que

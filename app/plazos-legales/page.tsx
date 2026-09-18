@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './PlazosLegales.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   PLAZOS_LEGALES,
@@ -49,6 +49,7 @@ export default function PlazosLegalesPage() {
         </p>
       </header>
 
+      <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Buscador */}

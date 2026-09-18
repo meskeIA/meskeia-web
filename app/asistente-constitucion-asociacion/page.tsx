@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './AsistenteConstitucionAsociacion.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatDate } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -742,6 +742,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         </p>
       </header>
 
+      <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Progress Bar */}

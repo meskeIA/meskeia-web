@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import styles from './AdaptacionHogar.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -129,6 +129,7 @@ export default function AdaptacionHogar() {
         <p className={styles.subtitle}>Checklist de accesibilidad para mayores y personas con discapacidad · Costes orientativos y ayudas públicas</p>
       </header>
 
+      <LegalNotice />
       <DisclaimerCard variant="general"
         severity="critical">
         <span>
