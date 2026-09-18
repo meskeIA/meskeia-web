@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 
 // Tipos de fuente disponibles
 type TipoFuente = 'sistema' | 'lexend' | 'mono';
@@ -37,6 +38,8 @@ const PREFERENCIAS_DEFAULT: Preferencias = {
   colorFondo: '#FEFDF6',
 };
 
+const CLAVE_PREFS = 'adaptador-dislexia-prefs';
+
 const COLORES_FONDO = [
   { id: 'blanco', color: '#FFFFFF', nombre: 'Blanco' },
   { id: 'crema', color: '#FEFDF6', nombre: 'Crema' },
@@ -44,6 +47,47 @@ const COLORES_FONDO = [
   { id: 'verde', color: '#F0F7F0', nombre: 'Verde pálido' },
   { id: 'gris', color: '#F5F5F5', nombre: 'Gris suave' },
 ];
+
+/**
+ * Convierte lo que haya en localStorage en unas Preferencias utilizables.
+ *
+ * Antes era `JSON.parse(guardadas) as Preferencias`, un cast sin comprobar: el try/catch
+ * cubría el parseo pero no la FORMA de lo parseado, así que `{"tamano":22}` pasaba el filtro
+ * y `prefs.interlineado.toFixed(1)` reventaba fuera del try — la app entera caía a la pantalla
+ * de error de meskeIA y, al recargar, el usuario se encontraba TODOS sus ajustes de fábrica,
+ * porque el primer render había alcanzado a sobrescribir la clave (hallazgo 877). El vector
+ * realista no es un usuario trasteando: es cambiar la forma de `Preferencias` en una versión
+ * futura y que todo el que vuelva se coma la pantalla de error una vez.
+ *
+ * Cada campo se valida por separado y lo que no encaje cae a su valor de fábrica, que es lo
+ * que el try/catch ya prometía hacer.
+ */
+function sanearPreferencias(bruto: unknown): Preferencias {
+  if (typeof bruto !== 'object' || bruto === null || Array.isArray(bruto)) {
+    return PREFERENCIAS_DEFAULT;
+  }
+  const p = bruto as Record<string, unknown>;
+  const numero = (valor: unknown, min: number, max: number, pordefecto: number): number =>
+    typeof valor === 'number' && Number.isFinite(valor)
+      ? Math.min(max, Math.max(min, valor))
+      : pordefecto;
+
+  const fuentes: TipoFuente[] = ['sistema', 'lexend', 'mono'];
+  return {
+    fuente: fuentes.includes(p.fuente as TipoFuente)
+      ? (p.fuente as TipoFuente)
+      : PREFERENCIAS_DEFAULT.fuente,
+    tamano: numero(p.tamano, 14, 36, PREFERENCIAS_DEFAULT.tamano),
+    espaciadoLetras: numero(p.espaciadoLetras, 0, 0.3, PREFERENCIAS_DEFAULT.espaciadoLetras),
+    espaciadoPalabras: numero(p.espaciadoPalabras, 0, 0.5, PREFERENCIAS_DEFAULT.espaciadoPalabras),
+    interlineado: numero(p.interlineado, 1.2, 3, PREFERENCIAS_DEFAULT.interlineado),
+    anchoColumna: numero(p.anchoColumna, 40, 100, PREFERENCIAS_DEFAULT.anchoColumna),
+    colorFondo:
+      typeof p.colorFondo === 'string' && COLORES_FONDO.some(c => c.color === p.colorFondo)
+        ? p.colorFondo
+        : PREFERENCIAS_DEFAULT.colorFondo,
+  };
+}
 
 const TEXTO_EJEMPLO = `La dislexia es una dificultad específica del aprendizaje que afecta a la lectura y la escritura. Las personas con dislexia pueden tener dificultades para reconocer palabras, deletrear correctamente y leer con fluidez.
 
@@ -56,23 +100,42 @@ export default function AdaptadorDislexiaPage() {
   const [prefs, setPrefs] = useState<Preferencias>(PREFERENCIAS_DEFAULT);
   const [copiado, setCopiado] = useState(false);
   const [fonteCargada, setFonteCargada] = useState(false);
+  /** ¿Se ha leído ya lo guardado? Hasta entonces no se escribe nada (hallazgo 932). */
+  const [cargadas, setCargadas] = useState(false);
 
-  // Cargar preferencias guardadas
+  /**
+   * ── Por qué el guardado espera a la carga (hallazgo 932) ──
+   *
+   * Los dos efectos van sobre la misma clave y el de guardado no sabía si el de carga había
+   * terminado. Secuencia instrumentada con el tamaño sembrado a 32: LEE 32 —el setPrefs queda
+   * ENCOLADO— → ESCRIBE 20, porque el de guardado corre con el estado todavía de fábrica y
+   * PISA la clave → al volver a montar, LEE 20, que es lo que se acaba de pisar. No es solo
+   * que la preferencia no se aplique: se BORRA del almacenamiento, justo lo contrario de lo
+   * que promete el subtítulo de la app.
+   *
+   * En producción, con un solo montaje, se salvaba por los pelos: el re-render con lo leído
+   * dispara un segundo guardado que repara el primero. Bastaba con que el componente se
+   * montara dos veces para perderlo todo.
+   *
+   * `cargadas` es un ESTADO y no un ref a propósito: se actualiza en el mismo lote que
+   * `setPrefs`, así que cuando el efecto de guardado se desbloquea ya tiene delante las
+   * preferencias leídas. Con un ref, el desbloqueo llegaría un ciclo antes que el valor.
+   */
   useEffect(() => {
     try {
-      const guardadas = localStorage.getItem('adaptador-dislexia-prefs');
-      if (guardadas) {
-        setPrefs(JSON.parse(guardadas) as Preferencias);
-      }
+      const guardadas = localStorage.getItem(CLAVE_PREFS);
+      if (guardadas) setPrefs(sanearPreferencias(JSON.parse(guardadas)));
     } catch { /* ignorar errores de localStorage */ }
+    setCargadas(true);
   }, []);
 
   // Guardar preferencias automáticamente
   useEffect(() => {
+    if (!cargadas) return;
     try {
-      localStorage.setItem('adaptador-dislexia-prefs', JSON.stringify(prefs));
+      localStorage.setItem(CLAVE_PREFS, JSON.stringify(prefs));
     } catch { /* ignorar errores de localStorage */ }
-  }, [prefs]);
+  }, [prefs, cargadas]);
 
   // Cargar Lexend desde Google Fonts
   useEffect(() => {
@@ -116,6 +179,11 @@ export default function AdaptadorDislexiaPage() {
         return 'Arial, Helvetica, sans-serif';
     }
   };
+
+  const nombreFuente =
+    prefs.fuente === 'lexend' ? 'Lexend Deca' : prefs.fuente === 'mono' ? 'Courier New' : 'Arial';
+  const nombreColorFondo =
+    COLORES_FONDO.find(c => c.color === prefs.colorFondo)?.nombre ?? 'personalizado';
 
   const estilosVista: React.CSSProperties = {
     fontFamily: getFuenteFamily(),
@@ -217,6 +285,7 @@ export default function AdaptadorDislexiaPage() {
               value={prefs.espaciadoLetras}
               onChange={e => actualizarPref('espaciadoLetras', Number(e.target.value))}
               className={styles.slider}
+              aria-valuetext={`${Math.round(prefs.espaciadoLetras * 100)} %`}
             />
             <div className={styles.sliderLabels}>
               <span>Normal</span>
@@ -238,6 +307,7 @@ export default function AdaptadorDislexiaPage() {
               value={prefs.espaciadoPalabras}
               onChange={e => actualizarPref('espaciadoPalabras', Number(e.target.value))}
               className={styles.slider}
+              aria-valuetext={`${Math.round(prefs.espaciadoPalabras * 100)} %`}
             />
             <div className={styles.sliderLabels}>
               <span>Normal</span>
@@ -248,7 +318,7 @@ export default function AdaptadorDislexiaPage() {
           {/* Interlineado */}
           <div className={styles.controlGroup}>
             <label className={styles.controlLabel} htmlFor="slider-lineas">
-              Interlineado: <strong>{prefs.interlineado.toFixed(1)}</strong>
+              Interlineado: <strong>{formatNumber(prefs.interlineado, 1)}</strong>
             </label>
             <input
               id="slider-lineas"
@@ -259,6 +329,7 @@ export default function AdaptadorDislexiaPage() {
               value={prefs.interlineado}
               onChange={e => actualizarPref('interlineado', Number(e.target.value))}
               className={styles.slider}
+              aria-valuetext={`interlineado ${formatNumber(prefs.interlineado, 1)}`}
             />
             <div className={styles.sliderLabels}>
               <span>Normal</span>
@@ -271,15 +342,21 @@ export default function AdaptadorDislexiaPage() {
             <label className={styles.controlLabel} htmlFor="slider-ancho">
               Ancho columna: <strong>{prefs.anchoColumna}%</strong>
             </label>
+            {/*
+              step 1 y no 5: con step=5 desde min=40, el 68 por defecto NO caía en la rejilla
+              del control y el navegador subía el pomo a 70, mientras la etiqueta decía 68 % y
+              el texto se maquetaba al 68 %. Un lector de pantalla anunciaba 70 (hallazgo 881).
+            */}
             <input
               id="slider-ancho"
               type="range"
               min={40}
               max={100}
-              step={5}
+              step={1}
               value={prefs.anchoColumna}
               onChange={e => actualizarPref('anchoColumna', Number(e.target.value))}
               className={styles.slider}
+              aria-valuetext={`${prefs.anchoColumna} % del ancho`}
             />
             <div className={styles.sliderLabels}>
               <span>Estrecho</span>
@@ -316,12 +393,12 @@ export default function AdaptadorDislexiaPage() {
               onClick={resetear}
               aria-label="Restablecer ajustes por defecto"
             >
-              🔄 Restablecer
+              <span aria-hidden="true">🔄</span> Restablecer
             </button>
           </div>
 
           <p className={styles.guardadoMsg} aria-live="polite">
-            ✅ Ajustes guardados automáticamente
+            <span aria-hidden="true">✅</span> Ajustes guardados automáticamente
           </p>
         </aside>
 
@@ -356,14 +433,30 @@ export default function AdaptadorDislexiaPage() {
                 {copiado ? '✅ Copiado' : '📋 Copiar texto'}
               </button>
             </div>
+            {/*
+              Un resumen de los ajustes SÍ es una región viva razonable: cambia poco, dice lo
+              que acaba de pasar y se lee en dos segundos. La vista previa, no.
+            */}
+            <p className={styles.resumenAjustes} role="status" aria-live="polite" aria-atomic="true">
+              {nombreFuente} · {prefs.tamano} px · interlineado {formatNumber(prefs.interlineado, 1)} ·
+              {' '}letras {Math.round(prefs.espaciadoLetras * 100)} % · palabras{' '}
+              {Math.round(prefs.espaciadoPalabras * 100)} % · ancho {prefs.anchoColumna} % ·
+              {' '}fondo {nombreColorFondo}
+            </p>
             <div className={styles.vistaContenedor}>
+              {/*
+                SIN aria-live ni aria-atomic (hallazgo 879). Los llevaba sobre el bloque que
+                contiene TODO el texto adaptado, y marcado además como atómico: cada letra
+                tecleada, y cada paso de cualquier deslizador, reanunciaba el documento entero
+                —567 caracteres con el ejemplo de fábrica, 29.699 con un texto pegado—, lo que
+                deja el área de texto inservible con lector de pantalla. Lo que cambia y merece
+                anunciarse son los AJUSTES, y para eso está el resumen de aquí arriba.
+              */}
               <div
                 className={styles.textoAdaptado}
                 style={estilosVista}
                 role="region"
                 aria-label="Texto con formato aplicado"
-                aria-live="polite"
-                aria-atomic="true"
               >
                 {texto
                   ? texto.split('\n').map((linea, i) =>
@@ -393,8 +486,14 @@ export default function AdaptadorDislexiaPage() {
           <h2>¿Por qué ayudan los ajustes visuales?</h2>
           <ul>
             <li>
-              <strong>Fuente Lexend</strong>: Diseñada específicamente para mejorar la legibilidad.
-              Cada letra tiene características únicas que reducen las confusiones entre letras similares (b/d, p/q).
+              <strong>Fuente Lexend</strong>: diseñada para la velocidad lectora, sobre todo por su
+              espaciado holgado y sus formas abiertas. Conviene saber qué NO hace: sus letras
+              especulares siguen siendo casi simétricas —la «d» de Lexend Deca es el espejo de la
+              «b» en un 89 %, medido superponiendo los glifos reales—, así que no es la fuente que
+              busca quien confunde b/d o p/q. Para eso están las que rompen esa simetría a
+              propósito, como OpenDyslexic o Dyslexie, que engrosan la base de las letras. Y la
+              evidencia sobre si las fuentes «para dislexia» mejoran la lectura es <em>mixta</em>:
+              lo que sí tiene respaldo constante es el espaciado, que puedes ajustar aquí abajo.
             </li>
             <li>
               <strong>Tamaño grande</strong>: Los textos más grandes son más fáciles de rastrear
@@ -421,7 +520,7 @@ export default function AdaptadorDislexiaPage() {
           <h2>Consejos de uso</h2>
           <ul>
             <li>Empieza por el fondo <strong>Crema</strong> y la fuente <strong>Lexend</strong>: suelen funcionar bien para la mayoría</li>
-            <li>Aumenta el interlineado hasta 2.0–2.5 si el texto parece comprimido</li>
+            <li>Aumenta el interlineado hasta 2,0–2,5 si el texto parece comprimido</li>
             <li>Reduce el ancho de columna al 50–60% para párrafos largos</li>
             <li>Tus ajustes se guardan automáticamente para la próxima visita</li>
             <li>Complementa con la función de lectura en voz alta de tu dispositivo o navegador</li>
@@ -438,22 +537,31 @@ export default function AdaptadorDislexiaPage() {
                 <tr>
                   <th>Criterio</th>
                   <th>Arial / Sistema</th>
-                  <th>Lexend ⭐</th>
+                  <th>Lexend</th>
                   <th>Monoespaciada</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Legibilidad general</td>
+                  <td>
+                    Legibilidad general
+                    <br /><small>Impresión subjetiva, no una medida: la evidencia comparativa entre fuentes es mixta</small>
+                  </td>
                   <td>Buena</td>
-                  <td className={styles.celdaDestacada}>Excelente</td>
+                  <td className={styles.celdaDestacada}>Buena, con espaciado más holgado</td>
                   <td>Media</td>
                 </tr>
                 <tr>
-                  <td>Distinción b/d/p/q</td>
-                  <td>Media</td>
-                  <td className={styles.celdaDestacada}>Alta</td>
-                  <td>Alta</td>
+                  <td>
+                    Distinción b/d/p/q
+                    <br /><small>
+                      Coincidencia de la «d» con la «b» reflejada, superponiendo los glifos
+                      reales: cuanto más alta, más se parecen y más fácil es confundirlas
+                    </small>
+                  </td>
+                  <td>98 % · muy simétricas</td>
+                  <td className={styles.celdaDestacada}>89 % · muy simétricas</td>
+                  <td>97 % · muy simétricas</td>
                 </tr>
                 <tr>
                   <td>Fatiga visual</td>
@@ -470,8 +578,18 @@ export default function AdaptadorDislexiaPage() {
                 <tr>
                   <td>Recomendada para</td>
                   <td>Uso general</td>
-                  <td className={styles.celdaDestacada}>Dislexia, lectura prolongada</td>
+                  <td className={styles.celdaDestacada}>Lectura prolongada</td>
                   <td>Código, listas cortas</td>
+                </tr>
+                <tr>
+                  <td colSpan={4}>
+                    <small>
+                      Ninguna fuente es «la fuente para la dislexia»: lo que funciona se prueba
+                      persona a persona, y por eso esta página deja cambiarlas y medir con tu
+                      propio texto. Lo que sí sostiene la investigación es el efecto del
+                      espaciado entre letras y palabras, que es independiente de la fuente.
+                    </small>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -580,7 +698,7 @@ export default function AdaptadorDislexiaPage() {
               <span className={styles.stepNumber}>5</span>
               <div>
                 <strong>Abre el interlineado</strong>
-                <p>Sube hasta 2.0 o 2.2. Esto separa las líneas y evita que el ojo se &quot;pierda&quot; al saltar de una línea a la siguiente.</p>
+                <p>Sube hasta 2,0 o 2,2. Esto separa las líneas y evita que el ojo se &quot;pierda&quot; al saltar de una línea a la siguiente.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -634,7 +752,7 @@ export default function AdaptadorDislexiaPage() {
         {/* WARNING BOX */}
         <section className={styles.guiaSeccion}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Errores comunes que reducen la efectividad</h3>
+            <h3><span aria-hidden="true">⚠️</span> Errores comunes que reducen la efectividad</h3>
             <ul>
               <li><strong>Tamaño muy grande sin reducir el ancho de columna:</strong> con letras de 28px o más y columna al 100%, las líneas quedan demasiado largas y el efecto positivo desaparece.</li>
               <li><strong>Usar fondo blanco puro si hay fotosensibilidad:</strong> el blanco puro (#FFFFFF) genera más contraste del necesario. El fondo crema o azul pálido suelen ser más cómodos.</li>

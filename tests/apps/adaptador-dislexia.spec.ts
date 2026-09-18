@@ -55,9 +55,10 @@ import {
  *   medido en cada uno. Ninguna afirmación de este fichero depende de en cuál se ejecute:
  *   las que valen para los dos entornos están escritas para fallar en los dos.
  *
- * HALLAZGOS ABIERTOS: los tests marcados con `test.fail()` afirman lo que la app debería
- * hacer y hoy fallan a propósito. El día que se reparen pasarán a ROJO («expected to fail,
- * but passed») y habrá que quitarles la marca, no rebajar lo que afirman.
+ * LOS 9 HALLAZGOS del 18/09/2026 se repararon ese mismo día y sus casos, marcados aquí como
+ * REGRESIÓN, pasaron de `test.fail()` a candado. Cada uno conserva escrito lo que la app hacía
+ * antes y con qué medida se demostró: es lo que permite saber, si alguno se vuelve a poner
+ * rojo, si lo que ha cambiado es la app o la afirmación.
  */
 
 /** Lo que la app guarda en `localStorage`, con los campos que miran estos casos. */
@@ -164,10 +165,9 @@ test.describe('en escritorio', () => {
     await expect(texto).toHaveCSS('font-family', '"Lexend Deca", Arial, sans-serif');
   });
 
-  test('HALLAZGO — el deslizador de ancho arranca en 70 mientras la etiqueta y el texto dicen 68 %', async ({
+  test('REGRESIÓN — el deslizador de ancho arranca en 70 mientras la etiqueta y el texto dicen 68 %', async ({
     page,
   }) => {
-    test.fail();
     // `anchoColumna` por defecto es 68, pero el control es min=40 step=5: 68 no cae en la
     // rejilla y el navegador lo sube a 70. La etiqueta sigue diciendo 68 % y el texto se
     // maqueta al 68 %, así que el pomo —y el valor que anuncia un lector de pantalla— dicen
@@ -177,8 +177,7 @@ test.describe('en escritorio', () => {
     await expect(vistaPrevia(page)).toHaveCSS('max-width', '68%');
   });
 
-  test('HALLAZGO — el interlineado se escribe con punto decimal, no con coma', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN — el interlineado se escribe con punto decimal, no con coma', async ({ page }) => {
     // CLAUDE.md §2: formato español obligatorio, y `toFixed()` prohibido para presentar
     // cifras. `prefs.interlineado.toFixed(1)` imprime «1.9» (page.tsx, etiqueta del control).
     await expect(etiqueta(page, 'slider-lineas')).toHaveText('Interlineado: 1,9');
@@ -220,7 +219,7 @@ test.describe('en móvil (Pixel 7)', () => {
     await expect(texto).toHaveCSS('word-spacing', '18px'); // 0,5 em × 36 px
     await expect(texto).toHaveCSS('line-height', '108px'); // 3,0 × 36 px
     await expect(texto).toHaveCSS('max-width', '100%');
-    await expect(etiqueta(page, 'slider-lineas')).toHaveText('Interlineado: 3.0');
+    await expect(etiqueta(page, 'slider-lineas')).toHaveText('Interlineado: 3,0');
   });
 
   test('CASO 2.bis — con todo al mínimo el texto sigue siendo legible y no hay valores basura', async ({
@@ -256,10 +255,9 @@ test.describe('en móvil (Pixel 7)', () => {
     await expect(vistaPrevia(page)).toHaveCSS('font-size', '36px');
   });
 
-  test('HALLAZGO — al subir el tamaño al máximo, el panel de ajustes se sale de la pantalla', async ({
+  test('REGRESIÓN — al subir el tamaño al máximo, el panel de ajustes se sale de la pantalla', async ({
     page,
   }) => {
-    test.fail();
     // El ancho mínimo del bloque de texto (su palabra más larga) estira la única columna del
     // grid en móvil, y con ella el panel de ajustes. Medido en producción con tamaño = 36:
     // el panel acaba en 454 px sobre un viewport de 412. Como `html, body` llevan
@@ -273,10 +271,9 @@ test.describe('en móvil (Pixel 7)', () => {
     expect(derecha).toBeLessThanOrEqual(viewport);
   });
 
-  test('HALLAZGO — pegar un texto con una palabra larga expulsa los controles fuera de la pantalla', async ({
+  test('REGRESIÓN — pegar un texto con una palabra larga expulsa los controles fuera de la pantalla', async ({
     page,
   }) => {
-    test.fail();
     // Sin tocar ningún ajuste: basta con pegar un texto que contenga un enlace o un correo
     // largo, que es justo lo que la app invita a pegar («un artículo, apuntes del colegio,
     // un correo de trabajo»). Medido en producción con este mismo correo de 83 caracteres:
@@ -326,7 +323,7 @@ test.describe('robustez del texto', () => {
 
     await expect(vistaPrevia(page)).toContainText('Lorem ipsum dolor sit amet');
     await expect(vistaPrevia(page)).toHaveCSS('line-height', '48px'); // 2,4 × 20 px
-    await expect(etiqueta(page, 'slider-lineas')).toHaveText('Interlineado: 2.4');
+    await expect(etiqueta(page, 'slider-lineas')).toHaveText('Interlineado: 2,4');
   });
 });
 
@@ -367,10 +364,9 @@ test.describe('arranque y persistencia', () => {
     await expect.poll(async () => (await leerGuardado(page))?.espaciadoPalabras).toBe(0.45);
   });
 
-  test('HALLAZGO — el efecto que GUARDA pisa las preferencias antes de que el que las LEE llegue a aplicarlas', async ({
+  test('REGRESIÓN — el efecto que GUARDA pisa las preferencias antes de que el que las LEE llegue a aplicarlas', async ({
     page,
   }) => {
-    test.fail();
     // Dos efectos sobre la misma clave y sin coordinación: uno carga (page.tsx:61) y otro
     // guarda en cada cambio de `prefs` (page.tsx:71). Secuencia MEDIDA instrumentando
     // `localStorage` con `next dev` —el número es el campo `tamano`—:
@@ -403,8 +399,7 @@ test.describe('arranque y persistencia', () => {
     expect((await leerGuardado(page))?.tamano).toBe(32);
   });
 
-  test('HALLAZGO — lo ajustado en esta visita NO se encuentra en la siguiente', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN — lo ajustado en esta visita NO se encuentra en la siguiente', async ({ page }) => {
     // La otra cara de la misma carrera, y la que rompe la promesa que la app hace en su
     // propio subtítulo («Tus preferencias se guardan automáticamente») y en su FAQ
     // («encontrarás la configuración tal como la dejaste»): el ajuste SÍ llega a escribirse
@@ -422,10 +417,9 @@ test.describe('arranque y persistencia', () => {
     await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 34px');
   });
 
-  test('HALLAZGO — una preferencia guardada incompleta se descarta entera (y en producción tira la app a la pantalla de error)', async ({
+  test('REGRESIÓN — una preferencia guardada incompleta se descarta entera (y en producción tira la app a la pantalla de error)', async ({
     page,
   }) => {
-    test.fail();
     // `JSON.parse(guardadas) as Preferencias` (page.tsx:65) es un cast SIN comprobar: el
     // try/catch cubre el parseo, no la forma de lo parseado. Lo que pasa después depende
     // del entorno, pero el usuario pierde su ajuste en los dos:
@@ -471,10 +465,9 @@ test.describe('accesibilidad', () => {
     await expect(page.getByRole('button', { name: 'Crema' })).toHaveAttribute('aria-pressed', 'true');
   });
 
-  test('HALLAZGO — cuatro de los cinco deslizadores anuncian un número que no es el de su etiqueta', async ({
+  test('REGRESIÓN — cuatro de los cinco deslizadores anuncian un número que no es el de su etiqueta', async ({
     page,
   }) => {
-    test.fail();
     // Solo `slider-tamano` lleva `aria-valuetext`. En los otros cuatro, un lector de pantalla
     // lee el `value` crudo: «0,05» donde la etiqueta visible dice «5 %», y «0,15» donde dice
     // «15 %». La app se dirige a quien tiene dificultades de lectura, así que la versión
@@ -483,10 +476,9 @@ test.describe('accesibilidad', () => {
     await expect(page.locator('#slider-palabras')).toHaveAttribute('aria-valuetext', /15/);
   });
 
-  test('HALLAZGO — la vista previa entera es una región viva y atómica: se relee sola a cada tecla', async ({
+  test('REGRESIÓN — la vista previa entera es una región viva y atómica: se relee sola a cada tecla', async ({
     page,
   }) => {
-    test.fail();
     // `aria-live="polite"` + `aria-atomic="true"` sobre el bloque que contiene TODO el texto
     // adaptado (567 caracteres ya en el ejemplo de fábrica) hace que cada pulsación en el
     // área de texto y cada paso de un deslizador vuelvan a anunciar el texto completo.

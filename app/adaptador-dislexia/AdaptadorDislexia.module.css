@@ -75,6 +75,22 @@
   align-items: start;
 }
 
+/*
+  min-width: 0 en los dos hijos del grid, que es la reparacion del hallazgo 876.
+
+  Un item de grid tiene min-width: auto por defecto, o sea que NUNCA se encoge por debajo del
+  ancho de su contenido indivisible. La palabra mas larga del texto adaptado —un correo, una
+  URL— fijaba asi el ancho de la columna, y en movil, con una sola columna, arrastraba consigo
+  al panel de ajustes: medido en un Pixel 7 de 412 px, el panel terminaba en 995 px y los
+  botones de fondo «Azul palido» y «Gris suave» quedaban enteros fuera de la pantalla. Y no
+  habia forma de llegar a ellos, porque html y body llevan overflow-x: hidden en globals.css.
+  El overflow-x: auto de .vistaContenedor tampoco llegaba a activarse: la caja crecia en vez
+  de desbordar.
+*/
+.layout > * {
+  min-width: 0;
+}
+
 /* ============================================
    PANEL DE CONTROLES
    ============================================ */
@@ -378,6 +394,14 @@
   outline-offset: 3px;
 }
 
+/* Resumen hablado de los ajustes: sustituye al aria-live que estaba sobre todo el texto */
+.resumenAjustes {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .vistaContenedor {
   border: 2px dashed var(--border);
   border-radius: var(--radius);
@@ -393,6 +417,14 @@
   border-radius: var(--radius);
   transition: all 0.3s ease;
   color: #1A1A1A; /* siempre oscuro para legibilidad sobre fondos claros */
+  /*
+    Una palabra mas larga que la columna se parte en vez de desbordarla. `anywhere` y no
+    `break-word` porque solo la primera hace que el ancho MINIMO de la caja deje de contar
+    la palabra entera, que es lo que estiraba el grid. El precio es que un correo largo se
+    parte por donde toque; la alternativa era que el panel de ajustes se saliera de la
+    pantalla, y esta es una app que se usa sobre todo en el movil.
+  */
+  overflow-wrap: anywhere;
 }
 
 .textoAdaptado p {
