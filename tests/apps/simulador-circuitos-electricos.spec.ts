@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-circuitos-electricos (segmento cálculo, riesgo 3, 223 usos reales · Stemum)
@@ -85,6 +85,50 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  * Lo que NO es un hallazgo, medido y descartado: «12abc» en un campo de resistencia. El
  * `type="number"` del navegador se come las letras y el estado queda en «12», así que la app
  * nunca llega a ver basura por esa vía. El agujero es el separador de millar, no el texto.
+ *
+ * ── RE-INSPECCIÓN 18/09/2026 — los cinco cerrados, y el 868 destapó otro ─────
+ * Comprobados uno a uno en producción con el navegador en es-ES y TECLEANDO con el teclado,
+ * no sembrando el valor, que es como entra el dato de verdad:
+ *   868 ✔ «1.000 + 2.200 + 1.500» a 12 V da Req = 4700,000 Ω (antes, 4,700 Ω)
+ *   869 ✔ 230 V / 10 A / 5 Ω se rechaza nombrando los 50 V que sí cumplirían la ley de Ohm
+ *   870 ✔ horas, días y tarifa vacíos se rechazan uno a uno y con su nombre
+ *   871 ✔ los 7 conmutadores llevan aria-pressed, y type="button" los 10 botones
+ *   872 ✔ la columna «V (V)» del paralelo imprime «12,5000», como sus cuatro vecinas
+ * Y no aparece «NaN» ni «No definido» en ningún escenario probado (campos vacíos, ceros,
+ * negativos): las cuatro funciones validan el NaN que `parseSpanishNumber` devuelve donde
+ * `parseFloat` daba un número, que era el riesgo de la sustitución.
+ *
+ * ── HALLAZGO NUEVO (alto, cálculo) — el mismo factor 1000, ahora al revés ────
+ * El parser canónico está pensado para TEXTO LIBRE, y estos 14 campos son `type="number"`:
+ * el navegador NORMALIZA lo tecleado al formato flotante de HTML antes de que la app lo vea.
+ * Medido en Chromium es-ES tecleando con el teclado:
+ *     «1.000» → value «1.000»  ·  «1,000» → value «1.000»
+ *     «0,145» → value «0.145»  ·  «12,5»  → value «12.5»
+ * O sea: aquí el punto es SIEMPRE el decimal —la coma ni llega a la app—, y
+ * `parseSpanishNumber` lee «0.145» como millar español (su AGRUPA_CON_PUNTO exige grupos de
+ * exactamente tres cifras) y devuelve 145. Toda cifra con TRES decimales sale ×1000:
+ *     Ley de Ohm · I = 0,020 A (los 20 mA del LED que propone su propia FAQ) y R = 150 Ω
+ *         esperado  V = 3,0000 V · P = 0,0600 W
+ *         obtenido  V = 3000,0000 V · I = 20,0000 A · P = 60.000,0000 W      → CASO 8
+ *     Potencia · 2300 W durante 4 h × 30 días con tarifa 0,145 €/kWh
+ *         esperado  40,0200 €      obtenido  40.020,0000 €                   → CASO 9
+ *     Ley de Ohm · un shunt de 0,100 Ω con 2 A → esperado 0,2000 V, obtenido 200,0000 V
+ * La app discrepa hasta de su propio control: con «1,000» tecleado, `valueAsNumber` vale 1 y
+ * la flecha de subir del campo lo deja en «2», mientras el cálculo usa 1000.
+ *
+ * ⚠️ Con `type="number"`, el CASO 1 parte B y el CASO 8 no pueden estar verdes a la vez: el
+ * navegador entrega «1.000» y «0.020», dos cadenas de la misma forma, y ninguna heurística
+ * distingue lo que el usuario quiso porque la coma que lo decía se perdió antes. La salida es
+ * que el campo deje de normalizar —`type="text"` con `inputMode="decimal"`—: entonces el
+ * parser recibe «1.000» y «0,020» tal como se escribieron y no tiene nada que adivinar.
+ *
+ * ── HALLAZGO NUEVO (medio, cálculo) — el 869, con un cero por medio ──────────
+ * La comprobación de coherencia solo corre cuando los TRES valores son > 0 (`validos.length
+ * === 3`), así que la terna 230 V / 0 A / 5 Ω —igual de imposible: 230 ≠ 0 × 5— no se
+ * rechaza. El 0 tecleado se descarta en silencio y el panel presenta I = 46,0000 A y
+ * P = 10.580,00 W mientras el campo de la pantalla sigue diciendo 0. La pestaña Ley de Ohm sí
+ * rechaza I = 0 («Introduce dos valores positivos»), de modo que la misma entrada recibe dos
+ * respuestas distintas según la pestaña.                                      → CASO 10
  */
 
 const RUTA = '/simulador-circuitos-electricos/';
@@ -102,6 +146,23 @@ const valorDe = (page: Page, etiqueta: string): Locator =>
 
 /** Las filas de la tabla por componente (dentro del bloque de resultados, no la del bloque educativo). */
 const filas = (page: Page): Locator => page.locator('div[role="status"] table tbody tr');
+
+/**
+ * Escribe en un campo con el TECLADO, como el usuario. No es lo mismo que sembrar el valor:
+ * un `<input type="number">` normaliza lo que se teclea antes de que la app lo vea (en es-ES
+ * «0,020» queda como «0.020»), y esa normalización es justo el objeto de los CASOS 8 y 9.
+ *
+ * El testigo de hidratación es que el estado de React haya recogido lo que el DOM muestra —la
+ * divergencia que vigila `esperarValorEnReact`—, y no una cadena fija: así el caso sigue
+ * valiendo el día que el campo deje de normalizar, que es la reparación que pide el CASO 8.
+ */
+async function teclearComoUsuario(page: Page, campo: Locator, texto: string): Promise<void> {
+  await campo.click();
+  await campo.press('Control+a');
+  await campo.press('Delete');
+  if (texto !== '') await campo.pressSequentially(texto, { delay: 20 });
+  await esperarValorEnReact(page, campo, await campo.inputValue());
+}
 
 test.describe('simulador-circuitos-electricos', () => {
   test.beforeEach(async ({ page }) => {
@@ -358,5 +419,122 @@ test.describe('simulador-circuitos-electricos', () => {
     }
     // Y no puede quedar rastro del punto decimal en ninguna fila de la tabla.
     await expect(filas(page).nth(0)).not.toContainText('12.5');
+  });
+
+  /**
+   * CASO 8 (hallazgo nuevo del 18/09/2026, alto) — 0,020 A y 0,02 A son la MISMA corriente, y
+   * la app tiene que devolver lo mismo con las dos. El cero final no es un capricho: es como se
+   * copia «20 mA» de una hoja de características, y son los 20 mA del LED que propone la propia
+   * FAQ de la app («V_LED ≈ 2 V, I_LED ≈ 20 mA. Con 5 V: R = (5−2)/0,02 = 150 Ω»).
+   *
+   * Resuelto a mano — I = 0,02 A a través de R = 150 Ω:
+   *     V = I · R = 0,02 × 150 = 3 V exactos              → 3,0000 V
+   *     I en miliamperios = 0,02 × 1000 = 20 mA           → 0,0200 A — 20,00 mA
+   *     P = V · I = 3 × 0,02 = 0,06 W                     → 0,0600 W
+   * Obtenido hoy con «0,020»: V = 3000,0000 V, I = 20,0000 A, P = 60.000,0000 W. El campo es
+   * `type="number"` y deja «0.020», que `parseSpanishNumber` lee como millar español → 20 A.
+   */
+  test('CASO 8 · 0,020 A es la misma corriente que 0,02 A', async ({ page }) => {
+    // Marcado como fallo esperado: hallazgo 873 · el separador decimal de tres cifras se lee como millar. Cuando se
+    // repare, Playwright avisara con «Expected to fail, but passed» y se retira esta linea.
+    test.fail();
+    // La pestaña arranca en «Calcular Tensión (V)», que es lo que hace falta: se dan I y R.
+    const corriente = page.locator('input[placeholder="0"]').nth(0);
+    const resistencia150 = page.locator('input[placeholder="0"]').nth(1);
+    const calcular = page.getByRole('button', { name: 'Calcular', exact: true });
+
+    await teclearComoUsuario(page, corriente, '0,02');
+    await teclearComoUsuario(page, resistencia150, '150');
+    await calcular.click();
+    await expect(valorDe(page, 'Tensión (V)')).toHaveText('3,0000 V');
+    await expect(valorDe(page, 'Corriente (I)')).toHaveText('0,0200 A — 20,00 mA');
+    await expect(valorDe(page, 'Potencia disipada (P)')).toHaveText('0,0600 W');
+
+    // Cambiar de incógnita y volver BORRA el resultado (setResOhm(null)) sin tocar los campos:
+    // sin esto, la segunda mitad esperaría los mismos números y daría verde leyendo la ficha
+    // anterior aunque el botón no hubiera calculado nada.
+    await page.getByRole('button', { name: 'Calcular Corriente (I)', exact: true }).click();
+    await page.getByRole('button', { name: 'Calcular Tensión (V)', exact: true }).click();
+    await expect(page.locator('div[role="status"]')).toBeEmpty();
+
+    // La misma corriente, escrita con el cero final. Tiene que dar EXACTAMENTE lo mismo.
+    await teclearComoUsuario(page, corriente, '0,020');
+    await calcular.click();
+    await expect(valorDe(page, 'Tensión (V)')).toHaveText('3,0000 V');
+    await expect(valorDe(page, 'Corriente (I)')).toHaveText('0,0200 A — 20,00 mA');
+    await expect(valorDe(page, 'Potencia disipada (P)')).toHaveText('0,0600 W');
+  });
+
+  /**
+   * CASO 9 (hallazgo nuevo del 18/09/2026, alto) — la misma trampa sobre la cifra DESTACADA del
+   * panel de consumo. Las tarifas eléctricas se publican con tres decimales muy a menudo
+   * (0,145 €/kWh), y ahí el factor 1000 no se nota mirando: «40.020,0000 €» se parece a
+   * «40,0200 €» igual que «4,700 Ω» se parecía a 4700 Ω en el hallazgo 868.
+   *
+   * Resuelto a mano — 230 V × 10 A durante 4 h/día y 30 días:
+   *     P    = 230 × 10 = 2300 W = 2,3 kW
+   *     kWh  = 2,3 × 4 × 30 = 276 kWh                     → 276,0000 kWh
+   *     con tarifa 0,15  €/kWh → 276 × 0,15  = 41,40 €    → 41,4000 €   (control, en verde)
+   *     con tarifa 0,145 €/kWh → 276 × 0,145 = 40,02 €    → 40,0200 €
+   * Obtenido hoy con 0,145: «40.020,0000 €» — el campo deja «0.145» y el parser lee 145 €/kWh.
+   */
+  test('CASO 9 · una tarifa de tres decimales no puede multiplicar el coste por mil', async ({ page }) => {
+    // Marcado como fallo esperado: hallazgo 873 · mismo defecto en la cifra destacada del panel de consumo. Cuando se
+    // repare, Playwright avisara con «Expected to fail, but passed» y se retira esta linea.
+    test.fail();
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
+    // Los seis campos de la pestaña, en orden: V, I, R, horas, días, tarifa.
+    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+    const calcular = page.getByRole('button', { name: 'Calcular', exact: true });
+
+    await teclearComoUsuario(page, campo(0), '230');
+    await teclearComoUsuario(page, campo(1), '10');
+    await teclearComoUsuario(page, campo(3), '4');    // horas de uso diario (arranca en 1)
+    await teclearComoUsuario(page, campo(5), '0,15'); // tarifa de control: dos decimales
+    await calcular.click();
+    await expect(valorDe(page, 'Potencia (P)')).toHaveText('2300,00 W');
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('276,0000 kWh');
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('41,4000 €');
+
+    // Y la misma factura con la tarifa escrita con tres decimales: 276 × 0,145 = 40,02 €.
+    // Los dos esperados son distintos a propósito, así que una ficha que no se refrescara
+    // dejaría el caso en rojo en vez de colarse.
+    await teclearComoUsuario(page, campo(5), '0,145');
+    await calcular.click();
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('276,0000 kWh');
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('40,0200 €');
+  });
+
+  /**
+   * CASO 10 (hallazgo nuevo del 18/09/2026, medio) — lo que quedó del hallazgo 869. La terna se
+   * comprueba solo cuando los tres valores son > 0, así que 230 V con 0 A a través de 5 Ω pasa
+   * sin decir nada: es tan imposible como la del CASO 4 (230 ≠ 0 × 5), pero el 0 se descarta en
+   * silencio y la ficha enseña I = 46,0000 A —la que sale de despejar 230/5— junto a un campo
+   * que en pantalla sigue diciendo 0, y P = 10.580,00 W.
+   *
+   * La misma entrada recibe hoy dos respuestas distintas según la pestaña: la Ley de Ohm con
+   * I = 0 la rechaza («Introduce dos valores positivos», CASO 3) y esta la calcula.
+   */
+  test('CASO 10 · rechazo: V, I y R juntos siguen siendo imposibles cuando la I tecleada es 0', async ({ page }) => {
+    // Marcado como fallo esperado: hallazgo 874 · la coherencia de la terna solo se comprueba con los tres > 0. Cuando se
+    // repare, Playwright avisara con «Expected to fail, but passed» y se retira esta linea.
+    test.fail();
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
+    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+
+    await teclearComoUsuario(page, campo(0), '230');
+    await teclearComoUsuario(page, campo(1), '0');
+    await teclearComoUsuario(page, campo(2), '5');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+
+    // Un aviso VISIBLE, como en el CASO 4 y como en el CASO 3: lo que no puede existir no
+    // produce ficha. Obtenido hoy: ninguna alerta y un panel completo.
+    const aviso = page.locator('main [role="alert"]');
+    await expect(aviso).toBeVisible();
+    await expect(page.locator('div[role="status"]')).toBeEmpty();
+    // Y en particular, no puede enseñarse una corriente que el usuario no ha escrito.
+    await expect(page.getByText('46,0000 A')).toHaveCount(0);
   });
 });

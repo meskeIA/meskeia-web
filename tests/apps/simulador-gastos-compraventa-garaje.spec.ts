@@ -69,7 +69,7 @@
 import { test, expect, Page } from '@playwright/test';
 // Los tipos esperados de la sección 12 NO se teclean: se leen de la misma ficha que compone
 // la página, que es lo que convierte esos tests en un ancla y no en una copia (hallazgo 625).
-import { ITP_CCAA } from '../../data/itp-ccaa';
+import { ITP_CCAA, TERRITORIOS_SIN_IVA } from '../../data/itp-ccaa';
 import { formatNumber, formatTipoNominal } from '../../lib/formatters';
 // El plazo de liquidación del ITP se lee del módulo que lo sella (hallazgo 713, 11/09/2026),
 // no de un literal: es lo que permite que el testigo de la sección 15 siga valiendo el día
@@ -78,6 +78,7 @@ import {
   PLAZO_ITP,
   COEFICIENTES_IIVTNU_2025,
   PLUSVALIA_MUNICIPAL_META,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
 } from '../../data/fiscal/inmuebles';
 // Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
 // es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
@@ -3669,5 +3670,328 @@ test.describe('Hallazgos abiertos — re-inspección del 14/09/2026', () => {
     await expect(
       page.locator('#panel-vendedor h3', { hasText: 'Pérdida patrimonial' }),
     ).toHaveCount(0);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 18. RE-INSPECCIÓN 18/09/2026 — la cola reabrió la app porque tres commits la tocaron
+// después del 14/09: `f1204b68` (comentario de la asimetría de `elegirTipoITP`, que nombra
+// a esta app), `35353415` (sinGananciaNiPerdida, `acotarAlSalir={false}` y UN solo FAQPage)
+// y `55e9997d` (la pestaña Vendedor emite un evento de medición).
+//
+// Las reparaciones de los dos hallazgos abiertos del 14/09 se han vuelto a ejecutar CONTRA
+// PRODUCCIÓN y están cerradas: el CASO R de la sección 16 ya no lleva `test.fail()` y la
+// tarjeta «Sin ganancia ni pérdida» de la sección 17 tampoco.
+//
+// Las tres zonas de esta tanda no las había tocado ninguna anterior:
+//   · ASTURIAS — nunca probada. Escala progresiva (8/9/10 %) recorrida en su PRIMER tramo,
+//     donde el tipo efectivo tiene que coincidir con el nominal, y el perfil FAMILIA
+//     NUMEROSA, que deja DOS oportunidades en el aviso en vez de una.
+//   · MELILLA — nunca probada (solo Ceuta). Es el cruce de los dos regímenes especiales a
+//     la vez: territorio SIN IVA (IPSI, art. 3.Dos LIVA) y bonificación del 50 % de la
+//     cuota gradual de AJD del art. 57 bis.1 TRLITPAJD.
+//   · El PAR CATASTRAL IMPOSIBLE del vendedor: un valor del suelo MAYOR que el valor
+//     catastral total, que por definición lo incluye.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · Tipo general de Asturias → `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts), leído por
+//     `tipoGeneralDe()` y expuesto como `ITP_CCAA.asturias.tipoGeneral` = 8.
+//   · Escala progresiva, reducidos y AJD → `ITP_CCAA.asturias` y `ITP_CCAA.melilla`.
+//   · Territorio sin IVA → `TERRITORIOS_SIN_IVA` (data/itp-ccaa.ts): Melilla → IPSI.
+//   · Bonificación del 50 % de la cuota → `BONIFICACION_CUOTA_CEUTA_MELILLA` aplicada por
+//     `calcularAJD` (art. 57 bis.1 TRLITPAJD, verificado contra el BOE el 23/08/2026).
+//   · Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y
+//     `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, los dos con el 21 % de IVA dentro.
+//   · Coeficientes de plusvalía → `COEFICIENTES_IIVTNU_2025` y el tipo orientativo del 25 %
+//     de `PLUSVALIA_MUNICIPAL_META`.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 €).
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('RE-INSPECCIÓN 18/09/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO S (NORMAL) — Asturias · segunda mano · 45.000 € · perfil FAMILIA NUMEROSA ·
+   * gestoría 300 € (la que trae la app).
+   *
+   * ITP — `elegirTipoITP('asturias', 'familia-numerosa', 45000, { viviendaHabitual: false })`:
+   *   candidatos por nombre = «Familia numerosa» (4 %) y «Familia monoparental» (4 %).
+   *   Ninguno aplicable: el primero exige «Vivienda habitual», que un garaje suelto no cumple,
+   *   y el segundo exige además ser familia MONOPARENTAL, que el perfil declarado no cubre.
+   *   → tipo general, sometido a la escala progresiva de Asturias. 45.000 € cae entero en el
+   *   primer tramo (hasta 300.000 €, 8 %), así que el efectivo coincide con el nominal:
+   *     ITP = 45.000 × 8 % =                                                       3.600,00
+   *
+   * Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
+   *   tramo 1 (hasta 6.010,12 €)              →                                       90,15
+   *   tramo 2 (6.010,12→30.050,61, 0,45 %)    → 24.040,49 × 0,0045 =                 108,182205
+   *   tramo 3 (30.050,61→45.000, 0,15 %)      → 14.949,39 × 0,0015 =                  22,424085
+   *   arancel sin IVA                         =                                      220,75629
+   *   con el 21 % de IVA                      = 220,75629 × 1,21 =                   267,1151109
+   * FACTURA_NOTARIAL (números 4, 6 y 7 aparte): ×1,5 = 400,67266635 · ×2 = 534,2302218
+   *   punto medio, que es lo que suma la app  =                                      467,451444075
+   *
+   * Registro — RD 1427/1989, números 1, 2 y 4:
+   *   tramo 1 (hasta 6.010,12 €)              →                                       24,04
+   *   tramo 2 (6.010,12→30.050,61, 0,175 %)   → 24.040,49 × 0,00175 =                 42,0708575
+   *   tramo 3 (30.050,61→45.000, 0,125 %)     → 14.949,39 × 0,00125 =                 18,6867375
+   *   inscripción (número 2)                  =                                       84,797595
+   *   + asiento de presentación + nota simple →  6,010121 + 3,005061 =                 9,015182
+   *   con el 21 % de IVA                      = 93,812777 × 1,21 =                    113,51345717
+   *
+   * Total gastos (sumando las líneas YA redondeadas, que es como se ven):
+   *   3.600,00 + 467,45 + 113,51 + 300,00 =                                        4.480,96
+   *   % sobre el precio = 4.480,96 / 45.000 =                                          9,96 %
+   * Coste total = 45.000 + 4.480,96 =                                             49.480,96
+   */
+  test('CASO S (normal) — Asturias, 45.000 €, familia numerosa: el primer tramo de la escala y DOS oportunidades', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'asturias');
+    await page.selectOption('#select-perfil', 'familia-numerosa');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '45000');
+
+    // El 8 % no se teclea: sale de la ficha, que a su vez lo lee de data/fiscal.
+    expect(ITP_CCAA.asturias.tipoGeneral).toBe(8);
+    expect(ITP_CCAA.asturias.tramosProgresivos?.[0]).toEqual({ hasta: 300000, tipo: 8 });
+    // 45.000 € no sale del primer tramo, así que el efectivo = el nominal.
+    expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('3600,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('467,45 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('400,67 €');
+    expect(notaria).toContain('534,23 €');
+
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('113,51 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    // En segunda mano no hay AJD: ITP e IVA/AJD no coexisten en la misma operación.
+    await expect(page.locator('#panel-comprador h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('4480,96 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,96%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('49.480,96 €');
+
+    // La ficha de la comunidad publica el mismo tipo que se ha cobrado y anuncia su escala.
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('8,00%');
+    expect(await valorPanelCcaa(page, 'AJD')).toBe(
+      `${formatTipoNominal(ITP_CCAA.asturias.ajd)}%`,
+    );
+
+    // El aviso enseña las DOS oportunidades del 4 %, con su requisito impreso al lado y sin
+    // marcarlas como descartadas: 45.000 € está muy por debajo del tope de 150.000 €.
+    const familiares = ITP_CCAA.asturias.tiposReducidos.filter((r) => /familia/i.test(r.nombre));
+    expect(familiares).toHaveLength(2);
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+    for (const r of familiares) {
+      expect(texto).toContain(`${formatNumber(r.tipo, 2)}% — ${r.nombre}`);
+    }
+    expect(texto).toContain('8,00% efectivo sobre el precio');
+    expect(texto).not.toContain('tu precio supera ese límite');
+  });
+
+  /**
+   * CASO T (LÍMITE · RÉGIMEN ESPECIAL) — Melilla · PRIMERA mano · 28.000 € · gestoría 300 €.
+   *
+   * Es el único punto del catálogo donde coinciden los dos regímenes especiales de esta app:
+   *   · Territorio SIN IVA: allí no se devenga IVA sino IPSI, así que el impuesto NO se
+   *     calcula y el simulador lo dice en vez de inventar una cifra (`TERRITORIOS_SIN_IVA`).
+   *   · Bonificación del 50 % de la CUOTA GRADUAL de AJD del art. 57 bis.1 TRLITPAJD, que
+   *     `calcularAJD` aplica sola porque se cumple por el SITIO del inmueble.
+   * Y el selector «vinculado / independiente» tiene que desaparecer: sin IVA, la elección no
+   * cambia nada (hallazgo 475).
+   *
+   * AJD  = 28.000 × 0,5 % = 140,00 → bonificado al 50 % =                              70,00
+   *   tipo EFECTIVO que se rotula = 70 / 28.000 =                                        0,25 %
+   *
+   * Notaría — ARANCELES_NOTARIO:
+   *   tramo 1 (hasta 6.010,12 €)              →                                        90,15
+   *   tramo 2 (6.010,12→28.000, 0,45 %)       → 21.989,88 × 0,0045 =                   98,95446
+   *   arancel sin IVA                         =                                       189,10446
+   *   con el 21 % de IVA                      = 189,10446 × 1,21 =                     228,8163966
+   * FACTURA_NOTARIAL: ×1,5 = 343,2245949 · ×2 = 457,6327932 · medio =                  400,42869405
+   *
+   * Registro — ARANCELES_REGISTRO + REGISTRO_CONCEPTOS:
+   *   tramo 1 (hasta 6.010,12 €)              →                                        24,04
+   *   tramo 2 (6.010,12→28.000, 0,175 %)      → 21.989,88 × 0,00175 =                  38,48229
+   *   inscripción                             =                                        62,52229
+   *   + presentación + nota simple            =                                         9,015182
+   *   con el 21 % de IVA                      = 71,537472 × 1,21 =                      86,56034112
+   *
+   * Total gastos PARCIAL (sin el IPSI, que no se calcula):
+   *   0 + 70,00 + 400,43 + 86,56 + 300,00 =                                            856,99
+   *   % sobre el precio = 856,99 / 28.000 =                                              3,06 %
+   * Coste total PARCIAL = 28.000 + 856,99 =                                          28.856,99
+   */
+  test('CASO T (límite) — Melilla en primera mano: IPSI sin cifra y AJD con el 50 % del art. 57 bis', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'melilla');
+    await page.locator('button', { hasText: 'Primera mano (obra nueva)' }).first().click();
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '28000');
+
+    // El impuesto de la primera transmisión NO es el IVA: el nombre sale de data/itp-ccaa.
+    expect(TERRITORIOS_SIN_IVA.melilla?.impuesto).toBe('IPSI');
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(await descripcionTarjeta(page, 'IPSI')).toBe(
+      'En Ciudad Autónoma de Melilla no rige el IVA: la compra de obra nueva tributa por el IPSI, que este simulador no calcula',
+    );
+    // Sin IVA, el selector vinculado/independiente no decide nada y no se enseña.
+    await expect(page.locator('button', { hasText: 'Vinculado a vivienda' })).toHaveCount(0);
+
+    // AJD con la bonificación del 50 %: el nominal de la ficha es 0,5 % y se cobra 0,25 %.
+    expect(ITP_CCAA.melilla.ajd).toBe(0.5);
+    expect(await valorTarjeta(page, 'AJD (0,25%)')).toBe('70,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('400,43 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('343,22 €');
+    expect(notaria).toContain('457,63 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('86,56 €');
+
+    // Los dos totales se declaran PARCIALES, porque falta el impuesto más grande.
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('856,99 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales (parcial)')).toBe(
+      '3,06% sobre el precio — SIN el IPSI, que no está incluido',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('28.856,99 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
+      'No incluye el IPSI: el coste real será mayor',
+    );
+  });
+
+  /**
+   * CASO U (DEBE RECHAZARSE) — un par catastral IMPOSIBLE: valor del suelo MAYOR que el
+   * valor catastral TOTAL, que por definición lo incluye (suelo + construcción).
+   *
+   * ❌ ABIERTO 18/09/2026 (cálculo, medio) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   *
+   * `calcularPlusvaliaMunicipal` reparte el incremento real en la proporción catastral
+   * suelo/total del art. 107.5 TRLHL, y esa proporción la acota con `Math.min(1, ...)`. El
+   * tope no es neutro: significa que el motor SE DA CUENTA de que el par es imposible y, en
+   * vez de decirlo, lo convierte en el caso «todo suelo, nada de construcción» y liquida.
+   * La app ya sabe negarse cuando no puede comparar —sin el catastral total rotula «Método
+   * objetivo (falta el valor catastral total para comparar)»—, y un total imposible no es un
+   * total utilizable.
+   *
+   * Madrid · venta 30.000 € · compra 28.000 € · comisión 0 % · 20 años · suelo 8.000 € ·
+   * catastral total 5.000 €:
+   *   coeficiente de 20 años (COEFICIENTES_IIVTNU_2025) =                               0,45
+   *   método objetivo  = 8.000 × 0,45 × 25 % =                                        900,00
+   *   proporción del suelo = min(1; 8.000/5.000) =                                       1,00  ← imposible
+   *   método real      = (30.000 − 28.000) × 1,00 × 25 % =                            500,00
+   *   recomendado      = min(900; 500) =                                              500,00
+   *   → «Método real (más favorable)», 400 € por DEBAJO de lo que la app cobraría si se
+   *     negara a comparar, y el neto presentado como definitivo:
+   *       valor de transmisión = 30.000 − 500 =                                     29.500,00
+   *       ganancia             = 29.500 − 28.000 =                                   1.500,00
+   *       IRPF                 = 1.500 × 19 % =                                         285,00
+   *       neto                 = 30.000 − 785,00 =                                  29.215,00
+   *     rotulado «Lo que realmente recibes tras gastos e impuestos».
+   *
+   * Y no es un dato exótico: los dos campos son consecutivos, salen del MISMO recibo del IBI
+   * y el error natural es intercambiarlos. Con el par al derecho (suelo 5.000, total 8.000) la
+   * app liquida 312,50 €, así que el mismo despiste mueve la cifra en los dos sentidos.
+   */
+  test.fail('CASO U (debe rechazarse) — un valor del suelo mayor que el catastral total no puede liquidar por el método real', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '28000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await sembrarImporte(page, 'Años de propiedad', '20');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '8000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '5000');
+
+    // Los dos datos con los que se compone el método objetivo, leídos de data/fiscal.
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.45);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo).toBe(19);
+
+    // DEBERÍA no elegir un método que necesita una proporción que este par no permite
+    // calcular. Hoy rotula «Método real (más favorable)» con la proporción acotada a 1.
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toBe(
+      'Método real (más favorable)',
+    );
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 19. HALLAZGOS ABIERTOS 18/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar, así
+// que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como regresión.
+// El primero es el CASO U de arriba; aquí va el segundo.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgos abiertos — re-inspección del 18/09/2026', () => {
+  /**
+   * ❌ ABIERTO (contenido, bajo) — la app llama EXENCIÓN a lo que el art. 104.5 TRLRHL
+   * articula como supuesto de NO SUJECIÓN, y se contradice consigo misma en la misma tarjeta.
+   *
+   * Es el hallazgo 858 del Inspector, reparado el 15/09/2026 (commit 35353415) en las cuatro
+   * apps que repetían la palabra y en el panel de `simulador-heredar-vivienda` (866, «llamaba
+   * Exenta a lo que su propio JSON-LD declara no sujeta»). A esta se le pasó, y es la más
+   * usada del clúster.
+   *
+   * Dos sitios, con el mismo caso:
+   *   1. La TARJETA. Madrid · venta 20.000 € · compra 25.000 € · 10 años · suelo 5.000 €:
+   *        valor    → «EXENTO»
+   *        texto    → «No sujeta (sin incremento de valor)»
+   *      La cifra y su explicación dicen dos cosas distintas del mismo hecho. No son
+   *      sinónimos: la exención presupone un hecho imponible realizado, y aquí el impuesto
+   *      no llega a devengarse.
+   *   2. La FAQ VISIBLE y el FAQPage del JSON-LD, que sirven la misma frase: «Si vende por
+   *      menos de lo que compró, puede quedar exento acreditando la pérdida». El JSON-LD va
+   *      en el HTML servido, que es el canal que citan los asistentes de IA sin el
+   *      disclaimer al lado — el mismo motivo por el que el 846 se reparó aquí el 15/09.
+   *
+   * La redacción correcta ya existe en la hermana `nave-industrial`, reparada ese día: «se
+   * produce un supuesto de no sujeción, no una exención (art. 104.5 TRLRHL, redacción del
+   * RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo».
+   */
+  test.fail('la tarjeta de la plusvalía no puede rotular «EXENTO» lo que su propio texto declara no sujeto', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '20000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '25000');
+    await sembrarImporte(page, 'Años de propiedad', '10');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+
+    // Se vende por debajo de lo que se compró: no hay incremento de valor y el hecho
+    // imponible del art. 104.1 TRLRHL no llega a realizarse.
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No sujeta (sin incremento de valor)',
+    );
+
+    // DEBERÍA decir lo mismo que su texto. Hoy dice «EXENTO».
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).not.toBe('EXENTO');
+  });
+
+  /**
+   * ❌ ABIERTO (contenido, bajo) — la otra boca del mismo hallazgo 858: la FAQ visible y el
+   * FAQPage repiten «puede quedar exento acreditando la pérdida». Ver el bloque de arriba.
+   */
+  test.fail('la FAQ de la plusvalía tampoco puede prometer una exención donde hay no sujeción', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+
+    const respuesta = await page
+      .locator('h3', { hasText: '¿El vendedor de un garaje paga plusvalía municipal?' })
+      .first()
+      .locator('xpath=following-sibling::p[1]')
+      .innerText();
+
+    // DEBERÍA hablar de no sujeción, como ya hace `nave-industrial` desde el 15/09/2026.
+    expect(respuesta.replace(/\s+/g, ' ')).not.toContain('puede quedar exento');
   });
 });
