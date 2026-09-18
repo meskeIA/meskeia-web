@@ -698,33 +698,41 @@ Cada regla se escribió para su caso; el parecido superficial con el caso siguie
 
 ### Proceso
 
-> Política vigente (2026-07-16): commit + push + deploy automático en el mismo flujo.
-> No agrupar pushes salvo petición expresa del usuario.
+> **Política vigente (18/09/2026): se repara en el momento, se PUSHEA en lote.** Cada corrección
+> lleva su commit atómico cuando se hace; el envío se agrupa en 2-3 pushes al día con la skill
+> **`/push`**, que es donde vive el procedimiento completo. **No se difiere ninguna reparación**:
+> lo único que espera es la subida.
 
 ```bash
-# 1. Verificar build (timeout 10 min / 600000ms)
-npm run build
-
-# 2. Commit — staging selectivo, NUNCA git add . ni git add -A
+# Durante la sesión — staging selectivo, NUNCA git add . ni git add -A
 git add app/ components/ data/ lib/ public/ types/ server/ templates/
 git commit -m "feat: descripción del cambio"
 
-# 3. Si el commit ha tocado app/: refrescar app-dates.json ANTES del push
-node scripts/generate-app-dates.mjs
-git add data/app-dates.json
-git commit --amend --no-edit      # aún sin pushear: enmendar es seguro
-
-# 4. Push (Vercel despliega automáticamente)
-git push origin main
+# Al cerrar el lote (build local + app-dates + push + verificación del deploy)
+/push
 ```
 
-### ⚠️ El paso 3 no es opcional (y es fácil de olvidar)
+**Por qué el lote**: el build es el **65 %** de la factura y sale a **0,073 $ por deploy**; un
+push con 12 commits construye **una** vez. A 210 commits/mes son ~15,3 $; a 2-3 pushes/día,
+4,4-6,6 $ sobre un crédito Pro de 20 $. Reactiva la norma del 26/06-16/07/2026, cuya condición
+de reactivación —«>8-10 pushes/día sostenidos»— se cumplió. El historial no cambia: los commits
+siguen siendo atómicos y `git revert <sha>` de una corrección suelta sigue valiendo.
+
+**Sale con push propio, sin esperar al lote**: lo que hay que verificar EN PRODUCCIÓN (service
+workers, cabeceras, redirects, CSP) y **una regresión introducida hoy**. El criterio es
+*exposición nueva frente a exposición antigua*: lo que llevaba meses mal —los hallazgos del
+Inspector, típicamente— va al lote. Lo gitignored (`_private/`, `digests/`, las skills,
+`scripts/digest-diario.mjs`) no cuesta ningún deploy: ahí no hay nada que agrupar.
+
+### ⚠️ app-dates.json lo refresca `/push`, y no es opcional
 
 `data/app-dates.json` alimenta el `lastModified` del sitemap, y su generador deduce la
-fecha de cada app del `git log` de `app/<slug>/`. Como el build del paso 1 se ejecuta
-**antes de que el commit exista**, el JSON que genera no puede contener ese cambio: sin
-el paso 3, el `lastmod` va siempre un commit por detrás y hay que corregirlo después con
-un commit extra (ocurrió en `9472e33a` y `83227161` antes de documentarse esto).
+fecha de cada app del `git log` de `app/<slug>/`. Como el build se ejecuta **antes de que el
+commit exista**, el JSON que genera no puede contener ese cambio: sin refrescarlo, el `lastmod`
+va siempre un commit por detrás y hay que corregirlo después con un commit extra (ocurrió en
+`9472e33a` y `83227161` antes de documentarse esto). Con el lote se hace **una vez al día**, en
+**commit propio y no con `--amend`** — enmendar modificaría el último commit, que puede ser de
+otra conversación.
 
 El fichero **se commitea a propósito**: en Vercel el clon es shallow y `git log` daría
 fechas falsas para todo el catálogo, así que allí el build solo lee este JSON.
