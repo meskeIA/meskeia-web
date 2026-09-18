@@ -683,7 +683,10 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
     // incremento real = 8.000 − 12.000 = −4.000 ≤ 0 → `exento` en calcularPlusvaliaMunicipal.
     // No puede salir la cuota objetiva (5.000 × 0,08 × 25 % = 100,00 €): sin incremento de
     // valor el impuesto no se devenga, y el rótulo tiene que decirlo con palabras.
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('EXENTO');
+    // «NO SUJETA» desde el 18/09/2026 (hallazgo 901): el art. 104.5 TRLRHL articula un
+    // supuesto de NO SUJECIÓN, no una exención, y la propia tarjeta ya lo decía así en su
+    // descripción mientras el valor decía «EXENTO».
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('No sujeta');
 
     // valor de transmisión = 8.000 − 240 (comisión 3 %) = 7.760 · valor de adquisición = 12.000

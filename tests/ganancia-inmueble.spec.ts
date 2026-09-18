@@ -236,7 +236,19 @@ test.describe('Plusvalía municipal (IIVTNU)', () => {
     expect(p.recomendado).toBe(0);
   });
 
-  test('la proporción de suelo nunca supera 1 aunque los datos sean incoherentes', () => {
+  /**
+   * ⚠️ Este caso afirmaba lo CONTRARIO hasta el 18/09/2026, y estaba en verde: «la proporción
+   * de suelo nunca supera 1 aunque los datos sean incoherentes», con el método real liquidando
+   * 25.000 € sobre un par imposible. O sea que el test consagraba el defecto que el Inspector
+   * encontró como hallazgo 900 — el acotado con Math.min era la prueba de que el código SE
+   * DABA CUENTA de que los datos no podían ser, y en vez de decirlo liquidaba.
+   *
+   * El valor catastral total incluye el suelo por definición, así que un suelo mayor que el
+   * total no describe ningún inmueble: es el despiste de intercambiar dos campos que salen
+   * consecutivos del mismo recibo del IBI. Lo correcto es no usar un método que necesita una
+   * proporción que ese par no permite calcular, igual que ya se hacía cuando falta el total.
+   */
+  test('un par catastral imposible NO se liquida por el método real', () => {
     const p = calcularPlusvaliaMunicipal({
       valorCatastralSuelo: 200000,
       valorCatastralTotal: 100000, // suelo > total: dato imposible
@@ -245,8 +257,26 @@ test.describe('Plusvalía municipal (IIVTNU)', () => {
       precioVenta: 200000,
       tipoMaximo: 25,
     });
-    // Como mucho, todo el incremento es suelo: 100.000 × 25 % = 25.000
-    expect(r2(p.metodoReal)).toBe(25000);
+    expect(p.parCatastralImposible).toBe(true);
+    expect(p.metodoRealDisponible).toBe(false);
+    // Y se liquida por el objetivo, que solo necesita el suelo: 200.000 × 0,16 × 25 % = 8.000
+    expect(r2(p.recomendado)).toBe(r2(p.metodoObjetivo));
+  });
+
+  test('el mismo par AL DERECHO sí usa el método real', () => {
+    // Suelo 100.000 y total 200.000: proporción 0,5 y real = 100.000 × 0,5 × 25 % = 12.500 €.
+    // El rechazo de arriba no puede llevarse por delante el caso legítimo.
+    const p = calcularPlusvaliaMunicipal({
+      valorCatastralSuelo: 100000,
+      valorCatastralTotal: 200000,
+      aniosPropiedad: 5,
+      precioCompra: 100000,
+      precioVenta: 200000,
+      tipoMaximo: 25,
+    });
+    expect(p.parCatastralImposible).toBe(false);
+    expect(p.metodoRealDisponible).toBe(true);
+    expect(r2(p.metodoReal)).toBe(12500);
   });
 });
 

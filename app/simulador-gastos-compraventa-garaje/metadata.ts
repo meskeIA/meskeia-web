@@ -120,7 +120,7 @@ export const faqJsonLd = {
       name: '¿El vendedor de un garaje paga plusvalía municipal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; el tipo lo fija cada ayuntamiento hasta el máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`,
+        text: `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró no hay exención sino un supuesto de no sujeción (art. 104.5 TRLRHL, redacción del RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo y acreditar la pérdida con las escrituras de compra y venta. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; el tipo lo fija cada ayuntamiento hasta el máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`,
       },
     },
     {

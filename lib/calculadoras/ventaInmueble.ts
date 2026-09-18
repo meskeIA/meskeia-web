@@ -145,7 +145,18 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
     // Método real (art. 107.5 TRLHL): incremento BRUTO de la operación repartido en la
     // proporción CATASTRAL suelo/total. Sin el valor catastral total no es calculable:
     // antes se usaba un 60 % fijo inventado, que daba un resultado sin respaldo normativo.
-    const metodoRealDisponible = valorCatastralTotal > 0;
+    //
+    // Y tampoco es calculable con un par IMPOSIBLE. El valor catastral total incluye el suelo
+    // por definición, así que un suelo mayor que el total no describe ningún inmueble: es el
+    // despiste de intercambiar los dos campos, que salen consecutivos del MISMO recibo del
+    // IBI. El `Math.min(1, …)` de abajo se daba cuenta —acotaba la proporción al 100 %— y en
+    // vez de decirlo lo convertía en el caso «todo suelo, nada de construcción» y liquidaba:
+    // con suelo 8.000 y total 5.000 publicaba 500,00 € de plusvalía por el método real y un
+    // «IMPORTE NETO VENDEDOR» rotulado «lo que realmente recibes», sin un aviso (hallazgo 900).
+    // La salida correcta ya estaba escrita para el caso gemelo: cuando falta el total, se
+    // renuncia a comparar y se dice. Un total imposible no es un total utilizable.
+    const parCatastralImposible = valorCatastralTotal > 0 && valorCatastralSuelo > valorCatastralTotal;
+    const metodoRealDisponible = valorCatastralTotal > 0 && !parCatastralImposible;
     const plusvaliaReal = metodoRealDisponible
       ? r(Math.max(0, incrementoBruto * Math.min(1, valorCatastralSuelo / valorCatastralTotal)) * (tipoMunicipal / 100))
       : Infinity;
@@ -161,7 +172,9 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
       plusvaliaMunicipal = plusvaliaObjetivo;
       metodoPlusvalia = metodoRealDisponible
         ? `Método objetivo (más favorable): ${r(plusvaliaObjetivo)} €`
-        : `Método objetivo: ${r(plusvaliaObjetivo)} € (sin valor catastral total no puede compararse con el método real)`;
+        : parCatastralImposible
+          ? `Método objetivo: ${r(plusvaliaObjetivo)} € (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI, porque con esos valores el método real no puede calcularse)`
+          : `Método objetivo: ${r(plusvaliaObjetivo)} € (sin valor catastral total no puede compararse con el método real)`;
     }
   }
 

@@ -408,11 +408,13 @@ export default function SimuladorTrasteroCompraventaPage() {
       exentoPlusvalia = resultadoPlusvalia.exento;
       metodoPlusvalia = resultadoPlusvalia.exento
         ? 'No sujeta (sin incremento de valor)'
-        : !resultadoPlusvalia.metodoRealDisponible
-          ? 'Método objetivo (falta el valor catastral total para comparar)'
-          : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
-            ? 'Método real (más favorable)'
-            : 'Método objetivo (más favorable)';
+        : resultadoPlusvalia.parCatastralImposible
+          ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
+          : !resultadoPlusvalia.metodoRealDisponible
+            ? 'Método objetivo (falta el valor catastral total para comparar)'
+            : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+              ? 'Método real (más favorable)'
+              : 'Método objetivo (más favorable)';
     }
 
     // Ganancia patrimonial e IRPF con el motor único del art. 35 LIRPF: los impuestos
@@ -940,7 +942,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                     title="Plusvalía municipal"
                     value={
                       resultadosVendedor.exentoPlusvalia
-                        ? 'EXENTO'
+                        // «NO SUJETA» y no «EXENTO»: el art. 104.5 TRLRHL (RDL 26/2021)
+                        // articula un supuesto de NO SUJECIÓN. Hallazgo 901, del garaje.
+                        ? 'NO SUJETA'
                         : resultadosVendedor.plusvaliaCalculada
                           ? formatCurrency(resultadosVendedor.plusvaliaMunicipal)
                           : 'SIN CALCULAR'

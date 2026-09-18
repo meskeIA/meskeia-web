@@ -189,7 +189,10 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // STC 182/2021). El método objetivo habría dado 50.000 × 0,08 (COEFICIENTES_IIVTNU_2025,
     // 10 años) × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.000 €, y la app debe
     // avisar de la no sujeción en vez de cobrarlos.
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('EXENTO');
+    // «NO SUJETA» desde el 18/09/2026 (hallazgo 901): el art. 104.5 TRLRHL articula un
+    // supuesto de NO SUJECIÓN, no una exención, y la propia tarjeta ya lo decía así en su
+    // descripción mientras el valor decía «EXENTO».
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('No sujeta (sin incremento de valor)');
 
     // Art. 35 LIRPF (calcularGananciaInmueble, data/fiscal/ganancia-inmueble.ts):
@@ -3042,7 +3045,10 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
     // La pérdida es la de la fórmula del art. 35 LIRPF: 250.000 − 7.500 de comisión − 0 de
     // plusvalía (no sujeta, sin incremento) − 300.000 de valor de adquisición = −57.500 €
     expect(await valorTarjeta(page, /^Pérdida patrimonial/)).toBe('57.500,00 €');
-    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('EXENTO');
+    // «NO SUJETA» desde el 18/09/2026 (hallazgo 901): el art. 104.5 TRLRHL articula un
+    // supuesto de NO SUJECIÓN, no una exención, y la propia tarjeta ya lo decía así en su
+    // descripción mientras el valor decía «EXENTO».
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('NO SUJETA');
 
     expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).not.toBe(
       'Tributación en base del ahorro',

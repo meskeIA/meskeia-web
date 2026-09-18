@@ -1505,6 +1505,8 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   metodoObjetivo: number;
   metodoReal: number;
   metodoRealDisponible: boolean;
+  /** El suelo declarado supera al valor catastral total, que por definición lo incluye. */
+  parCatastralImposible: boolean;
   recomendado: number;
   exento: boolean;
 } {
@@ -1537,7 +1539,19 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
 
   // Método real (art. 107.5 TRLHL): el incremento se reparte en la proporción catastral
   // suelo/total. Solo es calculable si conocemos el valor catastral total.
-  const metodoRealDisponible = !!valorCatastralTotal && valorCatastralTotal > 0 && valorCatastralSuelo > 0;
+  //
+  // Y tampoco con un par IMPOSIBLE: el valor catastral total incluye el suelo por definición,
+  // así que un suelo mayor que el total no describe ningún inmueble — es el despiste de
+  // intercambiar dos campos que salen consecutivos del mismo recibo del IBI. El Math.min de
+  // abajo se daba cuenta y, en vez de decirlo, lo convertía en «todo suelo, nada de
+  // construcción» y liquidaba: con suelo 8.000 y total 5.000 salían 500,00 € por el método
+  // real, rotulados «más favorable», frente a los 900,00 € del objetivo (hallazgo 900 del
+  // Inspector, 18/09/2026). Con el par AL DERECHO el mismo caso da 312,50 €, así que el
+  // despiste movía la cifra en los dos sentidos.
+  const parCatastralImposible =
+    !!valorCatastralTotal && valorCatastralTotal > 0 && valorCatastralSuelo > valorCatastralTotal;
+  const metodoRealDisponible =
+    !!valorCatastralTotal && valorCatastralTotal > 0 && valorCatastralSuelo > 0 && !parCatastralImposible;
   const proporcionSuelo = metodoRealDisponible
     ? Math.min(1, valorCatastralSuelo / (valorCatastralTotal as number))
     : 0;
@@ -1554,6 +1568,7 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
     metodoObjetivo,
     metodoReal,
     metodoRealDisponible,
+    parCatastralImposible,
     recomendado,
     exento,
   };

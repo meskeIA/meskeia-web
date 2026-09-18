@@ -341,11 +341,13 @@ export default function SimuladorGarajeCompraventaPage() {
       exentoPlusvalia = resultadoPlusvalia.exento;
       metodoPlusvalia = resultadoPlusvalia.exento
         ? 'No sujeta (sin incremento de valor)'
-        : !resultadoPlusvalia.metodoRealDisponible
-          ? 'Método objetivo (falta el valor catastral total para comparar)'
-          : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
-            ? 'Método real (más favorable)'
-            : 'Método objetivo (más favorable)';
+        : resultadoPlusvalia.parCatastralImposible
+          ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
+          : !resultadoPlusvalia.metodoRealDisponible
+            ? 'Método objetivo (falta el valor catastral total para comparar)'
+            : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+              ? 'Método real (más favorable)'
+              : 'Método objetivo (más favorable)';
     }
 
     // Ganancia patrimonial e IRPF (garaje: sin exención por vivienda habitual ni edad).
@@ -904,7 +906,11 @@ export default function SimuladorGarajeCompraventaPage() {
                       !resultadosVendedor.plusvaliaCalculada
                         ? 'Sin calcular'
                         : resultadosVendedor.exentoPlusvalia
-                          ? 'EXENTO'
+                          // «NO SUJETA» y no «EXENTO»: no son sinónimos y la propia tarjeta lo
+                          // decía bien dos líneas más abajo. La exención presupone un hecho
+                          // imponible realizado; el art. 104.5 TRLRHL articula NO SUJECIÓN, o
+                          // sea que el impuesto no llega a devengarse (hallazgo 901).
+                          ? 'NO SUJETA'
                           : formatCurrency(resultadosVendedor.plusvaliaMunicipal)
                     }
                     variant={
@@ -1178,7 +1184,7 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿El vendedor de un garaje paga plusvalía municipal?</h3>
-              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida. Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.</p>
+              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró no hay exención sino un supuesto de <strong>no sujeción</strong> (art. 104.5 TRLRHL, redacción del RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo y acreditar la pérdida con las escrituras de compra y venta. Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Existen tipos reducidos de ITP para garajes?</h3>

@@ -344,7 +344,9 @@ export default function SimuladorLocalComercialPage() {
       )} %`;
       metodoPlusvalia = resultadoPlusvalia.exento
         ? 'No sujeta (sin incremento de valor)'
-        : !resultadoPlusvalia.metodoRealDisponible
+        : resultadoPlusvalia.parCatastralImposible
+          ? `Método objetivo, ${tipoMunicipal} (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)`
+          : !resultadoPlusvalia.metodoRealDisponible
           ? `Método objetivo, ${tipoMunicipal} (falta el valor catastral total para comparar)`
           : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
             ? `Método real (más favorable), ${tipoMunicipal}`

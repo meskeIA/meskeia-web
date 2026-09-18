@@ -664,7 +664,10 @@ test.describe('MITAD B — casos nuevos de la re-inspección (27/08/2026)', () =
     await rellenar(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
     await rellenar(page, 'Comisión inmobiliaria del vendedor (%)', '3');
 
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('EXENTO');
+    // «NO SUJETA» desde el 18/09/2026 (hallazgo 901): el art. 104.5 TRLRHL articula un
+    // supuesto de NO SUJECIÓN, no una exención, y la propia tarjeta ya lo decía así en su
+    // descripción mientras el valor decía «EXENTO».
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
       'No sujeta (sin incremento de valor)',
     );
@@ -1702,7 +1705,7 @@ test.describe('INSPECCIÓN 02/09/2026 — los tres casos, resueltos a mano antes
 
     // (a) Con el foco dentro: ni una cifra de plusvalía, y el 0 no se disfraza de exención
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).not.toBe('EXENTO');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).not.toBe('NO SUJETA');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain(
       'los años de propiedad',
     );
@@ -3528,7 +3531,10 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — los tres casos, resueltos a mano an
     // Sin incremento de valor no hay hecho imponible, aunque el método objetivo daría cifra:
     // 5.000 × 0,08 (10 años) × 25 % = 100,00 €, que NO se cobra.
     expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.08);
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('EXENTO');
+    // «NO SUJETA» desde el 18/09/2026 (hallazgo 901): el art. 104.5 TRLRHL articula un
+    // supuesto de NO SUJECIÓN, no una exención, y la propia tarjeta ya lo decía así en su
+    // descripción mientras el valor decía «EXENTO».
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
       'No sujeta (sin incremento de valor)',
     );
@@ -3895,7 +3901,7 @@ test.describe('RE-INSPECCIÓN 18/09/2026 — los tres casos, resueltos a mano an
    * y el error natural es intercambiarlos. Con el par al derecho (suelo 5.000, total 8.000) la
    * app liquida 312,50 €, así que el mismo despiste mueve la cifra en los dos sentidos.
    */
-  test.fail('CASO U (debe rechazarse) — un valor del suelo mayor que el catastral total no puede liquidar por el método real', async ({
+  test('CASO U (rechazo) — un valor del suelo mayor que el catastral total no liquida por el método real', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -3914,11 +3920,17 @@ test.describe('RE-INSPECCIÓN 18/09/2026 — los tres casos, resueltos a mano an
     expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
     expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo).toBe(19);
 
-    // DEBERÍA no elegir un método que necesita una proporción que este par no permite
-    // calcular. Hoy rotula «Método real (más favorable)» con la proporción acotada a 1.
-    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toBe(
-      'Método real (más favorable)',
-    );
+    // Ya no elige un método que necesita una proporción que este par no permite calcular.
+    // Antes rotulaba «Método real (más favorable)» con la proporción acotada a 1 por el
+    // Math.min del motor: o sea que el código SE DABA CUENTA de que el par era imposible y,
+    // en vez de decirlo, lo trataba como «todo suelo, nada de construcción» y liquidaba.
+    const descripcion = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(descripcion).not.toBe('Método real (más favorable)');
+    // Y el aviso nombra la causa, para que el usuario pueda corregir: los dos campos salen
+    // consecutivos del mismo recibo del IBI y el error natural es intercambiarlos.
+    expect(descripcion).toContain('no puede superar al total');
+    // El objetivo sí es calculable con el suelo solo: 8.000 × 0,45 × 25 % = 900,00 €.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('900,00 €');
   });
 });
 
@@ -3927,7 +3939,7 @@ test.describe('RE-INSPECCIÓN 18/09/2026 — los tres casos, resueltos a mano an
 // que hoy fallan a propósito. Al repararlos se les quita la marca y quedan como regresión.
 // El primero es el CASO U de arriba; aquí va el segundo.
 // ═════════════════════════════════════════════════════════════════════════════
-test.describe('Hallazgos abiertos — re-inspección del 18/09/2026', () => {
+test.describe('Los 3 hallazgos de la re-inspección del 18/09/2026, reparados el mismo día', () => {
   /**
    * ❌ ABIERTO (contenido, bajo) — la app llama EXENCIÓN a lo que el art. 104.5 TRLRHL
    * articula como supuesto de NO SUJECIÓN, y se contradice consigo misma en la misma tarjeta.
@@ -3953,7 +3965,7 @@ test.describe('Hallazgos abiertos — re-inspección del 18/09/2026', () => {
    * produce un supuesto de no sujeción, no una exención (art. 104.5 TRLRHL, redacción del
    * RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo».
    */
-  test.fail('la tarjeta de la plusvalía no puede rotular «EXENTO» lo que su propio texto declara no sujeto', async ({
+  test('901 · la tarjeta de la plusvalía no rotula «EXENTO» lo que su propio texto declara no sujeto', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -3971,15 +3983,15 @@ test.describe('Hallazgos abiertos — re-inspección del 18/09/2026', () => {
       'No sujeta (sin incremento de valor)',
     );
 
-    // DEBERÍA decir lo mismo que su texto. Hoy dice «EXENTO».
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).not.toBe('EXENTO');
+    // Dice lo mismo que su texto. Antes: «EXENTO».
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
   });
 
   /**
    * ❌ ABIERTO (contenido, bajo) — la otra boca del mismo hallazgo 858: la FAQ visible y el
    * FAQPage repiten «puede quedar exento acreditando la pérdida». Ver el bloque de arriba.
    */
-  test.fail('la FAQ de la plusvalía tampoco puede prometer una exención donde hay no sujeción', async ({
+  test('902 · la FAQ de la plusvalía tampoco promete una exención donde hay no sujeción', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -3991,7 +4003,17 @@ test.describe('Hallazgos abiertos — re-inspección del 18/09/2026', () => {
       .locator('xpath=following-sibling::p[1]')
       .innerText();
 
-    // DEBERÍA hablar de no sujeción, como ya hace `nave-industrial` desde el 15/09/2026.
-    expect(respuesta.replace(/\s+/g, ' ')).not.toContain('puede quedar exento');
+    // Habla de no sujeción, como `nave-industrial` desde el 15/09/2026.
+    const limpia = respuesta.replace(/\s+/g, ' ');
+    expect(limpia).not.toContain('puede quedar exento');
+    expect(limpia).toContain('no sujeción');
+    expect(limpia).toContain('104.5 TRLRHL');
+
+    // Y el FAQPage servido, que es el canal que citan los asistentes de IA sin el disclaimer
+    // al lado: llevaba la misma frase escrita a mano por segunda vez, en metadata.ts.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faq).not.toContain('puede quedar exento');
+    expect(faq).toContain('no sujeción');
   });
 });

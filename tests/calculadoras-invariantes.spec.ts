@@ -602,6 +602,59 @@ test.describe('Invariantes de composición — consulta_venta_vivienda', () => {
     expect(exento.exentoIRPF).toBe(true);
     expect(exento.irpfGanancia).toBe(0);
   });
+
+  /**
+   * HALLAZGO 900 (Inspector, 18/09/2026) — un par catastral ARITMÉTICAMENTE IMPOSIBLE.
+   *
+   * El valor catastral total incluye el suelo por definición, así que un suelo mayor que el
+   * total no describe ningún inmueble: es el despiste de intercambiar dos campos que salen
+   * consecutivos del mismo recibo del IBI. El motor acotaba la proporción del art. 107.5
+   * TRLHL con Math.min(1, suelo/total) —o sea que SE DABA CUENTA— y en vez de decirlo lo
+   * convertía en el caso «todo suelo, nada de construcción» y liquidaba por el método real.
+   *
+   * Resuelto a mano con el caso del acta: venta 30.000, compra 28.000, 20 años, suelo 8.000,
+   * total 5.000, tipo municipal 25 %.
+   *   · Método objetivo: 8.000 × 0,45 (coeficiente de 20 años) × 25 % = 900,00 €
+   *   · Método real con la proporción acotada a 1: 2.000 × 1 × 25 % = 500,00 € ← lo que salía
+   * El motor elegía el real por ser menor, y publicaba un neto rotulado «lo que realmente
+   * recibes» en una app de riesgo 1.
+   */
+  test('RECHAZO [900]: con el suelo por encima del catastral total, el método real no se usa', () => {
+    const imposible = calcularVentaInmueble({
+      precioVenta: 30000, precioCompra: 28000, aniosTenencia: 20,
+      valorCatastralSuelo: 8000, valorCatastralTotal: 5000, tipoMunicipalIIVTNU: 25,
+      comisionInmobiliaria: 0,
+    });
+    expect(imposible.plusvaliaMunicipal).toBeCloseTo(900, 2);
+    expect(imposible.metodoPlusvalia).toContain('Método objetivo');
+    expect(imposible.metodoPlusvalia).toContain('no puede superar al total');
+    expect(imposible.metodoPlusvalia).not.toContain('Método real');
+  });
+
+  test('SANO [900]: el mismo par AL DERECHO sigue eligiendo el método real', () => {
+    // Suelo 5.000 y total 8.000: la proporción es 0,625 y el real da
+    // 2.000 × 0,625 × 25 % = 312,50 €, por debajo de los 900 € del objetivo. El rechazo de
+    // arriba no puede llevarse por delante el caso legítimo.
+    const correcto = calcularVentaInmueble({
+      precioVenta: 30000, precioCompra: 28000, aniosTenencia: 20,
+      valorCatastralSuelo: 5000, valorCatastralTotal: 8000, tipoMunicipalIIVTNU: 25,
+      comisionInmobiliaria: 0,
+    });
+    expect(correcto.plusvaliaMunicipal).toBeCloseTo(312.5, 2);
+    expect(correcto.metodoPlusvalia).toContain('Método real');
+  });
+
+  test('SANO [900]: suelo y total IGUALES son posibles (solar sin construcción)', () => {
+    // El caso frontera no puede caer del lado del rechazo: un solar sin edificar tiene todo
+    // el valor catastral en el suelo, y ahí la proporción vale exactamente 1.
+    const solar = calcularVentaInmueble({
+      precioVenta: 30000, precioCompra: 28000, aniosTenencia: 20,
+      valorCatastralSuelo: 5000, valorCatastralTotal: 5000, tipoMunicipalIIVTNU: 25,
+      comisionInmobiliaria: 0,
+    });
+    expect(solar.metodoPlusvalia).not.toContain('no puede superar al total');
+    expect(solar.plusvaliaMunicipal).toBeCloseTo(500, 2); // 2.000 × 1 × 25 %
+  });
 });
 
 // ────────────────────────────────────────────────────────────────────────────
