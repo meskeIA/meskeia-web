@@ -17,11 +17,18 @@
  * descartó (o va sin build local delante y pierde la red que hace seguro el lote, o lo lleva y
  * choca con «un solo build a la vez» en cuanto hay dos conversaciones abiertas).
  *
- * ⚠️ Calla cuando no hay nada que decir, y el toast tiene umbral. Salta en cada SessionEnd, y
- * con varias conversaciones al día un aviso por sesión sería ruido: un aviso que sale siempre
- * deja de informar (memoria: feedback_semaforo_color_que_informa). Por eso el texto sale desde
- * el primer commit pendiente —es barato— y la notificación de Windows solo con >=8 commits o
- * más de 12 h sin subir.
+ * ⚠️ NO está enganchado a ningún hook, y es deliberado (18/09/2026). Se evaluó ponerlo en
+ * `SessionEnd` y lo descartó el usuario con el argumento correcto: hace 5-7 sesiones al día y
+ * ya tiene el hábito de pushear al cerrar la jornada, así que el aviso saldría 5-7 veces
+ * diarias diciendo lo que él ya sabe. **Un aviso que sale siempre deja de informar**
+ * (memoria: feedback_semaforo_color_que_informa) — el mismo motivo por el que el semáforo de la
+ * sección 9 del digest dejó de decir nada tras 21 lecturas iguales.
+ *
+ * Se invoca a mano cuando se quiera saber qué hay sin subir. El paso 1 de `/push` ya hace esta
+ * misma comprobación con más detalle, así que en el flujo normal no hace falta.
+ *
+ * Calla cuando no hay nada que decir, y el toast tiene su propio umbral (>=8 commits o más de
+ * 12 h), por si algún día se decide colgarlo de un ritual que corra UNA vez al día.
  *
  * Nunca falla hacia fuera: cualquier error sale en silencio con código 0. Un hook de cierre no
  * puede estropear el cierre de una sesión.
