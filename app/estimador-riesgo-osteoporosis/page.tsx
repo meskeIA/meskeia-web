@@ -99,6 +99,7 @@ function calcularRiesgo(respuestasPositivas: Set<string>): Resultado {
 export default function EstimadorRiesgoOsteoporosis() {
   const [respuestas, setRespuestas] = useState<Set<string>>(new Set());
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [confirmadoSinFactores, setConfirmadoSinFactores] = useState(false);
 
   function toggleRespuesta(id: string) {
     setRespuestas(prev => {
@@ -110,7 +111,24 @@ export default function EstimadorRiesgoOsteoporosis() {
     setResultado(null);
   }
 
+  /**
+   * Con CERO factores marcados no se emite veredicto a la primera.
+   *
+   * Es el hallazgo 895 que el Inspector encontró en `test-fragilidad` el 18/09/2026, y que
+   * estaba aquí igual: una sola casilla por factor no distingue «no me aplica ninguno» de
+   * «todavía no he contestado», así que entrar y pulsar el botón devolvía «🟢 Riesgo bajo ·
+   * No acumulas factores de riesgo significativos» sobre un cuestionario en blanco. Allí se
+   * reparó con dos radios por ítem; aquí los factores son 12 y marcar doce «No» sería peor
+   * remedio que la enfermedad, así que se pide confirmar: el aviso explica el caso y el
+   * segundo clic sí emite el resultado, que es lo que separa el silencio de la respuesta.
+   */
   function evaluar() {
+    if (respuestas.size === 0 && !confirmadoSinFactores) {
+      setConfirmadoSinFactores(true);
+      setResultado(null);
+      return;
+    }
+    setConfirmadoSinFactores(false);
     setResultado(calcularRiesgo(respuestas));
   }
 
@@ -151,11 +169,21 @@ export default function EstimadorRiesgoOsteoporosis() {
               className={styles.preguntaItem}
               onClick={() => toggleRespuesta(pregunta.id)}
             >
+              {/*
+                stopPropagation, o pulsar EXACTAMENTE sobre la casilla no la marca: el
+                onChange del input la conmuta y el clic sigue burbujeando hasta el onClick de
+                la fila, que la vuelve a conmutar. Se queda como estaba. Descubierto el
+                18/09/2026 al escribir el test de la reparación hermana, con Playwright
+                diciéndolo con todas las letras: «Clicking the checkbox did not change its
+                state». Solo funcionaba pulsando el texto, porque ahí no hay onChange que
+                sumar. `test-fragilidad` sí llevaba esta guarda.
+              */}
               <input
                 type="checkbox"
                 className={styles.checkOsteo}
                 checked={respuestas.has(pregunta.id)}
                 onChange={() => toggleRespuesta(pregunta.id)}
+                onClick={e => e.stopPropagation()}
                 aria-label={pregunta.texto}
               />
               <label className={styles.preguntaTexto}>
@@ -168,6 +196,14 @@ export default function EstimadorRiesgoOsteoporosis() {
           <button type="button" className={styles.btn} onClick={evaluar} aria-label="Evaluar riesgo de osteoporosis">
             Evaluar mi riesgo
           </button>
+
+          {confirmadoSinFactores && (
+            <p className={styles.avisoSinFactores} role="alert" aria-live="polite">
+              No has marcado ningún factor de riesgo. Si es que ninguno te aplica, vuelve a
+              pulsar «Evaluar mi riesgo» para ver la orientación; si aún no has contestado,
+              repasa antes la lista.
+            </p>
+          )}
 
           <p className={styles.contadorRespuestas}>
             {contadorSi === 0 ? 'Ningún factor marcado' : `${contadorSi} factor${contadorSi > 1 ? 'es' : ''} marcado${contadorSi > 1 ? 's' : ''}`}

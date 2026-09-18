@@ -38,8 +38,19 @@ export const jsonLd = generateWebAppSchema({
   name: "Test de Fragilidad (Escala FRAIL)",
   description: "Test validado de 5 preguntas basado en la escala FRAIL para detectar fragilidad en personas mayores. Orientación preventiva sobre riesgo de caídas, dependencia y pérdida de autonomía.",
   url: "https://meskeia.com/test-fragilidad/",
-  category: 'FinanceApplication',
-  features: [],
+  // Era 'FinanceApplication' con featureList vacía: un test de salud geriátrica clasificado
+  // como aplicación financiera es lo que se servía a Google y a las IAs para entender la página.
+  category: 'EducationalApplication',
+  features: [
+    'Escala FRAIL de cribado de fragilidad, con sus 5 ítems: fatiga, resistencia, ambulación, enfermedades y pérdida de peso',
+    'Cada ítem se responde Sí o No, y sin las cinco respuestas no se emite ningún resultado',
+    'Puntuación de 0 a 5 con los tres niveles del instrumento: robusto (0), pre-frágil (1-2) y frágil (3-5)',
+    'Recuento del ítem de enfermedades acotado a la lista cerrada de la escala, no a cualquier comorbilidad',
+    'Recomendaciones de actuación distintas para cada nivel, con la salvedad junto al resultado',
+    'Referencia bibliográfica del instrumento con su DOI y fecha de verificación',
+    'Bloque educativo sobre fragilidad, criterios de Fried y prevención de la dependencia',
+    'Funciona sin registro y sin enviar ninguna respuesta a ningún servidor',
+  ],
 });
 
 export const faqJsonLd = {

@@ -129,6 +129,24 @@
 .btn:hover { opacity: 0.9; }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
+/* «No has marcado ningún factor»: el aviso que separa «ninguno me aplica» de «no he
+   contestado», porque una sola casilla por factor no puede distinguirlos. */
+.avisoSinFactores {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.08);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisoSinFactores {
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.12);
+}
+
 .contadorRespuestas {
   text-align: center;
   font-size: 0.85rem;

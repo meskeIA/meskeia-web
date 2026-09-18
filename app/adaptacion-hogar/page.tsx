@@ -152,11 +152,14 @@ export default function AdaptacionHogar() {
                   className={styles.checkItem}
                   onClick={() => toggleItem(item.id)}
                 >
+                  {/* stopPropagation: sin esto, pulsar la casilla la conmuta dos veces
+                      —su onChange y el onClick de la fila— y se queda como estaba. */}
                   <input
                     type="checkbox"
                     className={styles.checkboxInput}
                     checked={seleccionados.has(item.id)}
                     onChange={() => toggleItem(item.id)}
+                    onClick={e => e.stopPropagation()}
                     aria-label={item.nombre}
                   />
                   <label className={styles.checklistLabel}>

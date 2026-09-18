@@ -3,12 +3,52 @@
 import { useState } from 'react';
 import styles from './TestFragilidad.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import DataReference from '@/components/DataReference';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 
 // Escala FRAIL: 5 ítems validados internacionalmente (Morley JE et al., 2012)
 // F-atigue, R-esistance, A-mbulation, I-llnesses, L-oss of weight
+
+/**
+ * Referencia de la escala. Se publica en la página con DataReference: una app que se presenta
+ * como «test validado» y emite un juicio de salud tiene que dejar comprobar de dónde sale.
+ * La cita se verificó el 18/09/2026 contra el registro del editor (Springer).
+ */
+export const FRAIL_META = {
+  fuente: 'Morley JE, Malmstrom TK, Miller DK. «A simple frailty questionnaire (FRAIL) predicts outcomes in middle aged African Americans». J Nutr Health Aging. 2012;16(7):601-608',
+  verificado: '2026-09-18',
+  urlOficial: 'https://doi.org/10.1007/s12603-012-0084-2',
+  nota: 'Escala de CRIBADO, no de diagnóstico: orienta sobre la conveniencia de una valoración, no la sustituye. La enumeración exacta del ítem de enfermedades procede de las fichas clínicas que publican la escala; no ha podido contrastarse con el texto original, que está tras muro de pago, y por eso se declara aquí en vez de darse por cerrada.',
+};
+
+/**
+ * El ítem «Illnesses» se cuenta sobre una lista CERRADA, no sobre cualquier comorbilidad.
+ *
+ * Es el hallazgo 893: la app preguntaba «¿Tiene 5 o más enfermedades crónicas?» con una lista
+ * abierta de ejemplos que además añadía osteoporosis, demencia y depresión —que no están en la
+ * del instrumento— y omitía infarto, angina y asma. Medido: alguien con cinco crónicas ajenas
+ * a la escala (hipotiroidismo, glaucoma, migraña, reflujo, osteoporosis) salía «Frágil — Riesgo
+ * alto» cuando le corresponde «Pre-frágil».
+ *
+ * ⚠️ Esta lista se toma de las fichas clínicas que publican la escala. El artículo original
+ * está tras muro de pago y no se ha podido contrastar contra él, así que el límite se dice en
+ * la propia página (ver FRAIL_META.nota) en vez de presentarse como cerrado.
+ */
+const ENFERMEDADES_FRAIL = [
+  'hipertensión',
+  'diabetes',
+  'cáncer (salvo un cáncer de piel menor)',
+  'enfermedad pulmonar crónica',
+  'infarto de miocardio',
+  'insuficiencia cardíaca',
+  'angina de pecho',
+  'asma',
+  'artritis',
+  'ictus',
+  'enfermedad renal',
+];
 
 interface ItemFRAIL {
   id: string;
@@ -44,8 +84,8 @@ const ITEMS_FRAIL: ItemFRAIL[] = [
     id: 'enfermedades',
     letra: 'I',
     titulo: 'Enfermedades',
-    pregunta: '¿Tiene 5 o más enfermedades crónicas diagnosticadas por un médico?',
-    ayuda: 'Ejemplos: diabetes, hipertensión, artrosis, EPOC, insuficiencia cardíaca, osteoporosis, demencia, depresión, enfermedad renal crónica, ictus, cáncer…',
+    pregunta: '¿Le ha diagnosticado un médico 5 o más de estas enfermedades crónicas?',
+    ayuda: `El recuento es solo sobre esta lista: ${ENFERMEDADES_FRAIL.join(', ')}. Ninguna otra enfermedad cuenta para este ítem, por crónica que sea.`,
   },
   {
     id: 'peso',
@@ -58,6 +98,19 @@ const ITEMS_FRAIL: ItemFRAIL[] = [
 
 type NivelFragilidad = 'robusto' | 'prefragil' | 'fragil';
 
+/**
+ * Cada ítem se responde Sí o No, y «sin responder» es un tercer estado distinto de los dos.
+ *
+ * Antes había una sola casilla por ítem, así que marcada era «Sí» y sin marcar valía a la vez
+ * «No» y «todavía no he contestado». Consecuencia (hallazgo 895): entrar y pulsar «Evaluar
+ * fragilidad» sin tocar nada devolvía «Robusto — Sin fragilidad detectada · 0/5» y las cinco
+ * filas en «No». En una app de salud eso es afirmar un resultado que nadie ha declarado, y la
+ * propia página prometía otra cosa dos veces: «Responde Sí o No» —y el No no existía como
+ * control— y «Responde las 5 preguntas […] y pulsa Evaluar».
+ */
+type Respuesta = 'si' | 'no';
+type Respuestas = Partial<Record<string, Respuesta>>;
+
 interface Resultado {
   puntuacion: number;
   nivel: NivelFragilidad;
@@ -69,8 +122,10 @@ interface Resultado {
 
 // ─── Lógica ───────────────────────────────────────────────────────────────────
 
-function calcularFragilidad(positivos: Set<string>): Resultado {
-  const puntuacion = positivos.size; // 1 punto por ítem positivo (máx 5)
+function calcularFragilidad(respuestas: Respuestas): Resultado {
+  // 1 punto por ítem respondido «Sí» (máx 5). Un ítem sin responder no puntúa, y por eso el
+  // botón de evaluar no deja llegar aquí hasta que están los cinco.
+  const puntuacion = ITEMS_FRAIL.filter(item => respuestas[item.id] === 'si').length;
 
   let nivel: NivelFragilidad;
   let titulo: string;
@@ -122,20 +177,32 @@ function calcularFragilidad(positivos: Set<string>): Resultado {
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function TestFragilidad() {
-  const [respuestas, setRespuestas] = useState<Set<string>>(new Set());
+  const [respuestas, setRespuestas] = useState<Respuestas>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
 
-  function toggleItem(id: string) {
-    setRespuestas(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const sinResponder = ITEMS_FRAIL.filter(item => respuestas[item.id] === undefined);
+  const contestadas = ITEMS_FRAIL.length - sinResponder.length;
+
+  function responder(id: string, valor: Respuesta) {
+    setRespuestas(prev => ({ ...prev, [id]: valor }));
     setResultado(null);
+    setAviso(null);
   }
 
   function evaluar() {
+    if (sinResponder.length > 0) {
+      // No se emite veredicto con el cuestionario a medias: se dice qué falta y se deja el
+      // resultado anterior fuera de pantalla, para que no se lea como si fuera el de ahora.
+      setResultado(null);
+      setAviso(
+        sinResponder.length === ITEMS_FRAIL.length
+          ? 'Todavía no has respondido ninguna pregunta. Contesta Sí o No a las cinco para obtener el resultado.'
+          : `Faltan ${sinResponder.length} de 5 preguntas por responder: ${sinResponder.map(i => i.titulo).join(', ')}.`,
+      );
+      return;
+    }
+    setAviso(null);
     setResultado(calcularFragilidad(respuestas));
   }
 
@@ -150,15 +217,29 @@ export default function TestFragilidad() {
       </header>
 
       <LegalNotice />
+      {/*
+        Los children SUSTITUYEN al texto estándar que el componente monta para
+        variant="medical" + severity="critical", así que el texto propio tiene que traer las
+        piezas que fija _private/DISCLAIMER-POLICY.md §4 para el Nivel 1 CRÍTICO médico —y no
+        las traía (hallazgo 896): faltaban las tres, incluido el bloque de emergencias.
+      */}
       <DisclaimerCard variant="medical"
         severity="critical">
         <span>
-          Este test es <strong>SOLO orientativo</strong> basado en la escala FRAIL (Morley et al., 2012), validada internacionalmente para la detección precoz de fragilidad.
-          <br /><strong>No sustituye</strong> a una Valoración Geriátrica Integral realizada por un profesional sanitario.
-          <br /><strong>Consulta siempre con tu médico</strong> si tienes dudas sobre tu estado de salud o capacidad funcional.
-          <br /><em>meskeIA no se responsabiliza de decisiones de salud basadas en este test orientativo.</em>
+          Esta herramienta tiene <strong>carácter exclusivamente orientativo</strong> y no constituye diagnóstico médico, prescripción ni consejo sanitario. Es un <strong>cribado</strong> de 5 preguntas basado en la escala FRAIL (Morley et al., 2012): señala la conveniencia de una valoración, no la sustituye.
+          <br /><strong>Cualquier decisión relacionada con tu salud debe tomarse siempre bajo la supervisión de un médico o profesional sanitario cualificado.</strong> En particular, este test <strong>no sustituye</strong> a una Valoración Geriátrica Integral.
+          <br /><strong>TÚ ERES RESPONSABLE</strong> de consultar con un profesional antes de actuar sobre esta información. meskeIA no ejerce actividades sanitarias reguladas y no se responsabiliza de las consecuencias derivadas del uso de esta herramienta.
+          <br /><strong>EMERGENCIAS MÉDICAS:</strong> en caso de síntomas graves, contacta inmediatamente con los servicios de emergencia (112 en España).
         </span>
       </DisclaimerCard>
+
+      <DataReference
+        normativa="Escala FRAIL (Morley et al., 2012)"
+        fuente={FRAIL_META.fuente}
+        verificado={FRAIL_META.verificado}
+        urlOficial={FRAIL_META.urlOficial}
+        nota={FRAIL_META.nota}
+      />
 
       <div className={styles.mainContent}>
         {/* Cuestionario */}
@@ -169,26 +250,39 @@ export default function TestFragilidad() {
           </p>
 
           {ITEMS_FRAIL.map(item => (
-            <div
+            <fieldset
               key={item.id}
-              className={`${styles.itemCard} ${respuestas.has(item.id) ? styles.itemActivo : ''}`}
-              onClick={() => toggleItem(item.id)}
+              className={`${styles.itemCard} ${respuestas[item.id] === 'si' ? styles.itemActivo : ''}`}
             >
-              <div className={styles.itemHeader}>
+              <legend className={styles.itemHeader}>
                 <span className={styles.itemLetra} aria-hidden="true">{item.letra}</span>
                 <span className={styles.itemTitulo}>{item.titulo}</span>
-                <input
-                  type="checkbox"
-                  className={styles.checkFrail}
-                  checked={respuestas.has(item.id)}
-                  onChange={() => toggleItem(item.id)}
-                  aria-label={item.pregunta}
-                  onClick={e => e.stopPropagation()}
-                />
-              </div>
+              </legend>
               <p className={styles.itemPregunta}>{item.pregunta}</p>
               <p className={styles.itemAyuda}>{item.ayuda}</p>
-            </div>
+              {/* Dos radios nativos: «sin responder» es no tener ninguno marcado, y eso el
+                  botón de evaluar sí lo distingue de un «No». */}
+              <div className={styles.respuestaFila}>
+                {([
+                  { valor: 'si', etiqueta: 'Sí' },
+                  { valor: 'no', etiqueta: 'No' },
+                ] as { valor: Respuesta; etiqueta: string }[]).map(opcion => (
+                  <label
+                    key={opcion.valor}
+                    className={`${styles.respuestaOpcion} ${respuestas[item.id] === opcion.valor ? styles.respuestaElegida : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name={`frail-${item.id}`}
+                      value={opcion.valor}
+                      checked={respuestas[item.id] === opcion.valor}
+                      onChange={() => responder(item.id, opcion.valor)}
+                    />
+                    <span>{opcion.etiqueta}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           ))}
 
           <button
@@ -200,10 +294,16 @@ export default function TestFragilidad() {
             Evaluar fragilidad
           </button>
 
+          {aviso && (
+            <p className={styles.avisoIncompleto} role="alert" aria-live="polite">
+              {aviso}
+            </p>
+          )}
+
           <p className={styles.contadorItems}>
-            {respuestas.size === 0
-              ? 'Ningún ítem marcado como Sí'
-              : `${respuestas.size} de 5 ítems marcados como Sí`}
+            {contestadas === ITEMS_FRAIL.length
+              ? `Las 5 preguntas respondidas · ${ITEMS_FRAIL.filter(i => respuestas[i.id] === 'si').length} con «Sí»`
+              : `${contestadas} de 5 preguntas respondidas`}
           </p>
         </div>
 
@@ -224,6 +324,14 @@ export default function TestFragilidad() {
                 <span className={styles.nivelIcono} aria-hidden="true">{resultado.icono}</span>
                 <div className={styles.nivelTitulo}>{resultado.titulo}</div>
                 <div className={styles.nivelDescripcion}>{resultado.descripcion}</div>
+                {/* La salvedad va DENTRO de la caja del veredicto y no solo en el aviso de
+                    arriba: este bloque es el que se lee al final, se captura y se le enseña a
+                    un familiar, y allí la etiqueta viajaba sola (hallazgo 897). */}
+                <p className={styles.nivelSalvedad}>
+                  Resultado orientativo de un cribado de 5 preguntas. <strong>No es un
+                  diagnóstico</strong> y no sustituye a una Valoración Geriátrica Integral
+                  hecha por un profesional sanitario.
+                </p>
               </div>
 
               <div className={styles.puntuacionRow}>
@@ -233,10 +341,10 @@ export default function TestFragilidad() {
 
               <div className={styles.itemsMarcados}>
                 {ITEMS_FRAIL.map(item => (
-                  <div key={item.id} className={`${styles.resumenItem} ${respuestas.has(item.id) ? styles.resumenSi : styles.resumenNo}`}>
-                    <span className={styles.resumenLetra}>{item.letra}</span>
+                  <div key={item.id} className={`${styles.resumenItem} ${respuestas[item.id] === 'si' ? styles.resumenSi : styles.resumenNo}`}>
+                    <span className={styles.resumenLetra} aria-hidden="true">{item.letra}</span>
                     <span className={styles.resumenTitulo}>{item.titulo}</span>
-                    <span className={styles.resumenValor}>{respuestas.has(item.id) ? 'Sí' : 'No'}</span>
+                    <span className={styles.resumenValor}>{respuestas[item.id] === 'si' ? 'Sí' : 'No'}</span>
                   </div>
                 ))}
               </div>
@@ -318,7 +426,7 @@ export default function TestFragilidad() {
           </div>
           <p>72 años, camina 30 min diarios, sin limitaciones funcionales, bien nutrida. La prevención es la estrategia: mantener hábitos y vigilancia periódica.</p>
           <div className={styles.escenarioExample}>Objetivo: mantener robustez con ejercicio, socialización y dieta mediterránea</div>
-          <div className={styles.escenarioTip}>💡 El test FRAIL anual permite detectar transición a pre-fragilidad cuando aún es reversible.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El test FRAIL anual permite detectar transición a pre-fragilidad cuando aún es reversible.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -327,7 +435,7 @@ export default function TestFragilidad() {
           </div>
           <p>75 años, refiere cansancio frecuente y ha bajado 4 kg en el último año. Pre-fragilidad: estado reversible con intervención adecuada. Ventana de oportunidad.</p>
           <div className={styles.escenarioExample}>Intervención: programa ejercicio supervisado + valoración nutricional + revisión medicación</div>
-          <div className={styles.escenarioTip}>💡 La pre-fragilidad tiene alta reversibilidad. Intervenir ahora evita la progresión a fragilidad establecida.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La pre-fragilidad tiene alta reversibilidad. Intervenir ahora evita la progresión a fragilidad establecida.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -336,7 +444,7 @@ export default function TestFragilidad() {
           </div>
           <p>80 años, múltiples caídas, pérdida de fuerza muscular significativa, cansancio severo. Necesita valoración geriátrica integral y plan de cuidados multidisciplinar.</p>
           <div className={styles.escenarioExample}>Plan: fisioterapia + adaptación hogar + revisión polifarmacia + soporte nutricional</div>
-          <div className={styles.escenarioTip}>💡 El geriatra puede solicitar Valoración Geriátrica Integral (VGI) para un plan de cuidados personalizado.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El geriatra puede solicitar Valoración Geriátrica Integral (VGI) para un plan de cuidados personalizado.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -345,7 +453,7 @@ export default function TestFragilidad() {
           </div>
           <p>Una hospitalización puede precipitar fragilidad en una persona que antes era robusta. El test post-hospitalización orienta la recuperación funcional necesaria.</p>
           <div className={styles.escenarioExample}>Post-caída o post-infección: re-evaluación FRAIL a las 4-6 semanas para ajustar el plan</div>
-          <div className={styles.escenarioTip}>💡 El síndrome post-UCI es especialmente frecuente en mayores y requiere rehabilitación precoz.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El síndrome post-UCI es especialmente frecuente en mayores y requiere rehabilitación precoz.</div>
         </div>
       </div>
 
@@ -383,7 +491,7 @@ export default function TestFragilidad() {
         <div className={styles.faqItem}>
           <strong>¿Puede una persona frágil mejorar con tratamiento?</strong>
           <p>Sí, aunque la mejora es más lenta que en pre-fragilidad. Con ejercicio adaptado, soporte nutricional, revisión de medicación y apoyo social, es posible recuperar funcionalidad.</p>
-          <div className={styles.faqTip}>💡 La motivación del paciente es clave. Los programas de ejercicio grupal en mayores tienen mejor adherencia que los individuales.</div>
+          <div className={styles.faqTip}><span aria-hidden="true">💡</span> La motivación del paciente es clave. Los programas de ejercicio grupal en mayores tienen mejor adherencia que los individuales.</div>
         </div>
       </div>
 
@@ -394,7 +502,7 @@ export default function TestFragilidad() {
           <div className={styles.stepNumber}>1</div>
           <div className={styles.stepContent}>
             <strong>Realiza el test FRAIL y anota el resultado</strong>
-            <p>Los 5 ítems (Fatigue, Resistance, Aerobic, Illnesses, Loss of weight) dan una puntuación de 0-5. Guarda la fecha para comparar en futuras evaluaciones.</p>
+            <p>Los 5 ítems (Fatigue, Resistance, Ambulation, Illnesses, Loss of weight) dan una puntuación de 0-5. Guarda la fecha para comparar en futuras evaluaciones.</p>
           </div>
         </div>
         <div className={styles.step}>
@@ -477,7 +585,7 @@ export default function TestFragilidad() {
         <ul className={styles.warningList}>
           <li><strong>Confundir fragilidad con vejez normal</strong>: La fragilidad no es inevitable. Aceptarla como &quot;cosas de la edad&quot; impide intervenir cuando aún es reversible.</li>
           <li><strong>Reducir la actividad por miedo a caídas</strong>: El sedentarismo agrava la fragilidad. El miedo a caer lleva a reducir la actividad, lo que a su vez debilita más la musculatura y el equilibrio.</li>
-          <li><strong>No informar al médico de la pérdida de peso no intencionada</strong>: Perder más de 4,5 kg sin proponérselo es una señal de alarma que requiere evaluación médica urgente.</li>
+          <li><strong>No informar al médico de la pérdida de peso no intencionada</strong>: perder más del 5 % del peso en un año sin proponérselo —unos 3,5 kg en una persona de 70— es el umbral que usa este test y una señal que conviene consultar. Los criterios de Fried, que son otra escala, fijan el suyo en 4,5 kg (10 libras) con independencia del peso de partida: si has visto esa cifra en otro sitio, viene de ahí.</li>
           <li><strong>Ignorar el estado nutricional</strong>: Muchas personas mayores frágiles están desnutridas sin saberlo. Una dieta monótona o escasa en proteínas contribuye directamente a la pérdida muscular.</li>
           <li><strong>No revisar la medicación periódicamente</strong>: Algunos fármacos prescritos hace años pueden ser contraproducentes en la actualidad. La revisión anual de la medicación es fundamental.</li>
           <li><strong>Esperar a la hospitalización para actuar</strong>: La fragilidad multiplica el riesgo de complicaciones graves tras una hospitalización. Intervenir antes reduce drásticamente ese riesgo.</li>

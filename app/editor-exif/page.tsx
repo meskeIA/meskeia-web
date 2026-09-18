@@ -657,10 +657,14 @@ export default function EditorExifPage() {
                           onClick={() => toggleCategory(category.id)}
                         >
                           <div className={styles.categoryTitle}>
+                            {/* stopPropagation: sin esto, pulsar la casilla la conmuta
+                                dos veces —su onChange y el onClick de la cabecera— y se queda
+                                como estaba. */}
                             <input
                               type="checkbox"
                               checked={selectedCategories.has(category.id)}
                               onChange={() => toggleCategory(category.id)}
+                              onClick={e => e.stopPropagation()}
                               className={styles.categoryCheckbox}
                             />
                             <span className={styles.categoryIcon} aria-hidden="true">{category.icon}</span>

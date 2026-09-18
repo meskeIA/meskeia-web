@@ -83,18 +83,15 @@
 
 /* ─── Items FRAIL ───────────────────────────────────────── */
 
+/* Es un <fieldset> desde que cada item se responde Si o No con dos radios: ya no se pulsa la
+   tarjeta entera, asi que no lleva cursor de mano ni hover de elemento clicable. */
 .itemCard {
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 0.9rem 1rem;
   margin-bottom: 0.65rem;
-  cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
-}
-
-.itemCard:hover {
-  border-color: var(--primary);
-  background: rgba(46, 134, 171, 0.03);
+  min-width: 0;
 }
 
 .itemActivo {
@@ -134,12 +131,65 @@
   flex: 1;
 }
 
-.checkFrail {
-  width: 18px;
-  height: 18px;
+/* Si / No de cada item */
+.respuestaFila {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.respuestaOpcion {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
   cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.respuestaOpcion:hover {
+  border-color: var(--primary);
+}
+
+.respuestaOpcion input {
   accent-color: var(--primary);
-  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.respuestaOpcion:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.respuestaElegida {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .respuestaElegida {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+/* «Faltan 2 de 5 preguntas por responder» */
+.avisoIncompleto {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.08);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisoIncompleto {
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.12);
 }
 
 .itemPregunta {
@@ -223,6 +273,15 @@
 .nivelIcono { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
 .nivelTitulo { font-size: 1.2rem; font-weight: 700; }
 .nivelDescripcion { font-size: 0.88rem; opacity: 0.9; margin-top: 0.35rem; }
+/* La salvedad viaja con el veredicto: es el bloque que se captura y se enseña. */
+.nivelSalvedad {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin: 0.7rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid currentColor;
+  opacity: 0.85;
+}
 
 .puntuacionRow {
   display: flex;
