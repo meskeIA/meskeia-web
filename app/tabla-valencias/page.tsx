@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import DataReference from '@/components/DataReference';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -593,6 +594,16 @@ const NOMBRES_COMUNES: Record<string, string> = {
 /** Elementos que, combinados con hidrógeno, se escriben delante de él */
 const NO_METALES_HIDRURO = ['B', 'C', 'Si', 'N', 'P', 'As', 'Sb'];
 
+/**
+ * No metales con nomenclatura tradicional: su óxido es un ANHÍDRIDO, no un óxido, y de ahí
+ * salen los oxácidos («anhídrido sulfúrico» SO₃ → «ácido sulfúrico» H₂SO₄). Son los mismos 13
+ * elementos cuyas fichas llevan raíz tradicional sin ser metales.
+ */
+const NO_METALES_TRADICIONALES = ['B', 'C', 'Si', 'N', 'P', 'As', 'Sb', 'S', 'Se', 'Te', 'Cl', 'Br', 'I'];
+
+/** Grupo 18. Apenas forman compuestos, y los conocidos son casi todos con flúor y oxígeno. */
+const GASES_NOBLES = ['He', 'Ne', 'Ar', 'Kr', 'Xe', 'Rn'];
+
 /** Máximo común divisor (para simplificar los subíndices) */
 function mcd(a: number, b: number): number {
   return b === 0 ? a : mcd(b, a % b);
@@ -683,16 +694,39 @@ function formularBinario(
     ? `hidruro de ${negativo.nombre.toLowerCase()}`
     : `${raiz} de ${positivo.nombre.toLowerCase()}${necesitaRomano ? `(${romano})` : ''}`;
 
-  // ── Nomenclatura tradicional ──────────────────────────────────────
+  /*
+    ── Nomenclatura tradicional, y por qué el óxido de un no metal es un ANHÍDRIDO ──
+
+    La tradicional reserva «óxido X-oso/-ico» para los metales y llama «anhídrido X-oso/-ico»
+    al óxido de un no metal, porque es el que da un ácido al reaccionar con agua. La app decía
+    «óxido» en los dos casos y la palabra «anhídrido» no aparecía ni una sola vez en la página
+    (hallazgo 928).
+
+    En el nitrógeno eso no era una forma anticuada sino una COLISIÓN: «óxido nítrico» es el
+    nombre consolidado del monóxido de nitrógeno, NO, y «óxido nitroso» el del N₂O, el gas de
+    la risa. Un estudiante que formulara «óxido nítrico» con esta página escribía N₂O₅.
+  */
   const adjetivo = positivo.tradicional?.[estadoPos];
+  const esAnhidrido = negativo.simbolo === 'O' && NO_METALES_TRADICIONALES.includes(positivo.simbolo);
+  const raizTradicional = esAnhidrido ? 'anhídrido' : raiz;
   const tradicional = excepcionHidruro
     ? `hidruro de ${negativo.nombre.toLowerCase()}`
     : adjetivo
-      ? `${raiz} ${adjetivo}`
+      ? `${raizTradicional} ${adjetivo}`
       : `${raiz} de ${positivo.nombre.toLowerCase()}`;
 
   let advertencia: string | undefined;
-  if (positivo.simbolo === 'Hg' && estadoPos === 1) {
+  /*
+    El formulador solo comprobaba los signos y el máximo común divisor, así que devolvía
+    Kr₃N₂, XeCl₈ o AuN con la misma cara con la que devuelve Fe₂O₃ (hallazgo 929). Con los
+    gases nobles la regla sí es enunciable y la propia FAQ de esta página la enuncia —«solo
+    con flúor y oxígeno: XeF₂, XeF₄, XeO₃, XeO₄»—, así que aquí se avisa. Para el resto no hay
+    tabla posible de lo que existe, y de eso avisa la nota al pie del formulador.
+  */
+  if (GASES_NOBLES.includes(positivo.simbolo) && !['F', 'O'].includes(negativo.simbolo)) {
+    advertencia =
+      `Los gases nobles apenas forman compuestos, y los que se conocen son casi siempre con flúor y oxígeno (XeF₂, XeF₄, XeO₃, XeO₄, KrF₂). ${formulaTexto} cumple la regla del intercambio de valencias, pero no es un compuesto conocido.`;
+  } else if (positivo.simbolo === 'Hg' && estadoPos === 1) {
     advertencia =
       'El mercurio(I) existe como ion diatómico Hg₂²⁺: la fórmula real se escribe con Hg₂ (por ejemplo, Hg₂Cl₂).';
   } else if (excepcionHidruro) {
@@ -808,6 +842,23 @@ export default function TablaValenciasPage() {
       </header>
 
       <LegalNotice />
+
+      {/*
+        Trazabilidad de los datos (hallazgo 931). Las 51 fichas, sus estados de oxidación, los
+        ejemplos y los 20 iones poliatómicos se presentaban sin fuente, sin edición de
+        referencia y sin fecha: el único rastro era un comentario del código que el visitante
+        no ve. Los datos estaban BIEN —se comprobaron elemento a elemento—, pero sin declarar
+        contra qué no hay forma de contrastar las decisiones legítimas pero opinables, como
+        omitir el Fe(VI) o dar el +3 del bromo por poco frecuente. En material de apoyo de un
+        portal educativo, saber de dónde sale un dato es parte de lo que se enseña.
+      */}
+      <DataReference
+        normativa="Estados de oxidación y nomenclatura"
+        fuente="IUPAC, Nomenclature of Inorganic Chemistry (Red Book, 2005) · CRC Handbook of Chemistry and Physics"
+        verificado="2026-09-18"
+        urlOficial="https://iupac.org/what-we-do/books/redbook/"
+        nota="Los estados que se listan son los que estas fuentes recogen como habituales; los marcados «poco frecuente» existen pero rara vez se piden en secundaria. La nomenclatura tradicional no es IUPAC: se mantiene porque sigue viva en el aula y en la industria, y aquí aparece siempre junto a la sistemática y a la de Stock."
+      />
 
       {/* ═══════════ ACLARACIÓN VALENCIA vs Nº OXIDACIÓN ═══════════ */}
       <div className={styles.aclaracionBox}>
@@ -965,13 +1016,23 @@ export default function TablaValenciasPage() {
                   {el.tradicional && Object.keys(el.tradicional).length > 0 && (
                     <>
                       <h3 className={styles.detalleTitulo}>Nombre tradicional según el estado</h3>
+                      {/*
+                        Los ejemplos se eligen según el elemento SEA O NO metal (hallazgo 930).
+                        La plantilla fija «óxido X y cloruro X» funciona con los metales —óxido
+                        férrico, cloruro férrico— y produce disparates con los no metales: la
+                        ficha del cloro llegaba a ofrecer «cloruro hipocloroso», un cloruro de sí
+                        mismo. Afectaba a las 13 fichas de no metal con nomenclatura tradicional.
+                        Un no metal forma anhídridos y, con agua, oxácidos: esos son sus ejemplos.
+                      */}
                       <ul className={styles.detalleTradicional}>
                         {Object.entries(el.tradicional).map(([valor, adjetivo]) => (
                           <li key={valor}>
                             <span className={styles.chipMini}>{formatearEstado(Number(valor))}</span>
                             <span>
-                              <strong>{adjetivo}</strong> — por ejemplo, óxido {adjetivo} y cloruro{' '}
-                              {adjetivo}
+                              <strong>{adjetivo}</strong> — por ejemplo,{' '}
+                              {NO_METALES_TRADICIONALES.includes(el.simbolo)
+                                ? `anhídrido ${adjetivo} y ácido ${adjetivo}`
+                                : `óxido ${adjetivo} y cloruro ${adjetivo}`}
                             </span>
                           </li>
                         ))}
@@ -1151,14 +1212,14 @@ export default function TablaValenciasPage() {
                 <td>C: +2</td>
                 <td>monóxido de carbono</td>
                 <td>óxido de carbono(II)</td>
-                <td>óxido carbonoso</td>
+                <td>anhídrido carbonoso</td>
               </tr>
               <tr>
                 <td><strong>CO₂</strong></td>
                 <td>C: +4</td>
                 <td>dióxido de carbono</td>
                 <td>óxido de carbono(IV)</td>
-                <td>óxido carbónico</td>
+                <td>anhídrido carbónico</td>
               </tr>
               <tr>
                 <td><strong>FeO</strong></td>
@@ -1179,28 +1240,28 @@ export default function TablaValenciasPage() {
                 <td>S: +4</td>
                 <td>dióxido de azufre</td>
                 <td>óxido de azufre(IV)</td>
-                <td>óxido sulfuroso</td>
+                <td>anhídrido sulfuroso</td>
               </tr>
               <tr>
                 <td><strong>SO₃</strong></td>
                 <td>S: +6</td>
                 <td>trióxido de azufre</td>
                 <td>óxido de azufre(VI)</td>
-                <td>óxido sulfúrico</td>
+                <td>anhídrido sulfúrico</td>
               </tr>
               <tr>
                 <td><strong>Cl₂O</strong></td>
                 <td>Cl: +1</td>
                 <td>monóxido de dicloro</td>
                 <td>óxido de cloro(I)</td>
-                <td>óxido hipocloroso</td>
+                <td>anhídrido hipocloroso</td>
               </tr>
               <tr>
                 <td><strong>Cl₂O₇</strong></td>
                 <td>Cl: +7</td>
                 <td>heptaóxido de dicloro</td>
                 <td>óxido de cloro(VII)</td>
-                <td>óxido perclórico</td>
+                <td>anhídrido perclórico</td>
               </tr>
               <tr>
                 <td><strong>CuCl</strong></td>

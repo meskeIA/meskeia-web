@@ -57,9 +57,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * mayúsculas, y avisa cuando no encuentra; el formulador cruza y simplifica bien, excluye
  * el −1 del oxígeno para no inventar peróxidos, y avisa del Hg₂²⁺ y de los hidruros BH₃/NH₃.
  *
- * HALLAZGOS ABIERTOS — al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que hoy
- * fallan a propósito; cuando se reparen se les quita el `test.fail()` y quedan como candado
- * de regresión. Están en el acta del Inspector.
+ * LOS 4 HALLAZGOS del 18/09/2026, al final, ya como candados de regresión: se repararon ese
+ * mismo día. Conservan escrito lo que la app decía antes, que es lo que permite saber, si
+ * alguno se pone rojo, si lo que ha cambiado es la app o la afirmación. (Nota histórica: eran
+ * tres tests para cuatro hallazgos; el de trazabilidad no tenía caso y ahora lo tiene.)
  */
 
 const BUSCADOR = '#buscador-elemento';
@@ -308,13 +309,9 @@ test('elegir el mismo elemento en los dos lados se rechaza con un mensaje', asyn
 // HALLAZGOS ABIERTOS (18/09/2026)
 // ═══════════════════════════════════════════════════════════════════════════
 
-test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
-  // Los tres usan test.fail(): afirman lo que DEBERÍA pasar y hoy no pasa. El día que se
-  // reparen saldrán en rojo («expected to fail, but passed») y habrá que quitarles la marca,
-  // no reescribir el valor esperado.
-
-  test.fail(
-    'HALLAZGO 1 · el N₂O₅ debe nombrarse «anhídrido nítrico», no «óxido nítrico»',
+test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
+  test(
+    '928 · el N₂O₅ se nombra «anhídrido nítrico», no «óxido nítrico»',
     async ({ page }) => {
       await page.selectOption('#elemento-positivo', 'N');
 
@@ -329,8 +326,8 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
     },
   );
 
-  test.fail(
-    'HALLAZGO 2 · Kr(+2) + N(−3) debe avisar de que ese compuesto no existe',
+  test(
+    '929 · Kr(+2) + N(−3) avisa de que ese compuesto no existe',
     async ({ page }) => {
       await page.selectOption('#elemento-positivo', 'Kr');
       await page.selectOption('#elemento-negativo', 'N');
@@ -345,8 +342,8 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
     },
   );
 
-  test.fail(
-    'HALLAZGO 3 · la ficha del cloro no debe proponer «cloruro hipocloroso»',
+  test(
+    '930 · la ficha del cloro ya no propone «cloruro hipocloroso»',
     async ({ page }) => {
       await buscar(page, 'cloro');
       const cabecera = page.locator(`${LISTA} article button[aria-expanded]`).first();
@@ -359,6 +356,38 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
       // de sí mismo. Salen los cuatro: cloruro hipocloroso, cloroso, clórico y perclórico, y
       // lo mismo en azufre («cloruro sulfúrico»), nitrógeno, fósforo, yodo y bromo.
       await expect(fichas(page).first()).not.toContainText('cloruro hipocloroso');
+      // Y lo que sí corresponde a un no metal: su anhídrido y su oxácido.
+      await expect(fichas(page).first()).toContainText('anhídrido hipocloroso');
+      await expect(fichas(page).first()).toContainText('ácido hipocloroso');
     },
   );
+
+  test('931 · los datos declaran de dónde salen', async ({ page }) => {
+    // Las 51 fichas, los estados de oxidación, los ejemplos y los 20 iones poliatómicos se
+    // presentaban sin fuente, sin edición de referencia y sin fecha de revisión: el único
+    // rastro estaba en un comentario del código, que el visitante no ve. Los datos eran
+    // CORRECTOS —comprobados elemento a elemento contra IUPAC Red Book 2005 y CRC Handbook—,
+    // así que esto era una brecha de trazabilidad y no un error: sin declarar la fuente, las
+    // decisiones legítimas pero opinables (omitir Fe(VI), dar el +3 del bromo por poco
+    // frecuente) no se pueden contrastar contra nada.
+    const referencia = page.locator('[class*="dataReference"]');
+    await expect(referencia).toContainText('IUPAC');
+    await expect(referencia).toContainText('Red Book');
+    await expect(referencia).toContainText('CRC Handbook');
+  });
+
+  test('928.bis · el azufre y el cloro también son anhídridos en la tabla comparativa', async ({
+    page,
+  }) => {
+    // La tabla de las tres nomenclaturas arrastraba el mismo criterio que el formulador:
+    // «óxido sulfúrico» para el SO₃ y «óxido perclórico» para el Cl₂O₇.
+    // Dos tablas de la página contienen «SO₃» (esta y la de iones poliatómicos), así que se
+    // acota por la región que la envuelve, que sí tiene nombre accesible propio.
+    const comparativa = page
+      .getByRole('region', { name: /Las tres nomenclaturas/ })
+      .getByRole('table');
+    await expect(comparativa).toContainText('anhídrido sulfúrico');
+    await expect(comparativa).toContainText('anhídrido perclórico');
+    await expect(comparativa).not.toContainText('óxido sulfúrico');
+  });
 });
