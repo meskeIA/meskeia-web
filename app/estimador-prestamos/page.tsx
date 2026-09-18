@@ -543,7 +543,7 @@ export default function SimuladorPrestamosPage() {
               <label htmlFor="plazoInput">Plazo (meses)</label>
               <input
                 id="plazoInput"
-                type="number"
+                type="text"
                 inputMode="numeric"
                 value={plazoMeses}
                 onChange={(e) => setPlazoMeses(e.target.value)}
@@ -769,7 +769,7 @@ export default function SimuladorPrestamosPage() {
                 <label htmlFor="p1plazo">Plazo (meses)</label>
                 <input
                   id="p1plazo"
-                  type="number"
+                  type="text"
                   inputMode="numeric"
                   value={prestamo1.plazoMeses}
                   onChange={(e) => setPrestamo1({ ...prestamo1, plazoMeses: e.target.value })}
@@ -812,7 +812,7 @@ export default function SimuladorPrestamosPage() {
                 <label htmlFor="p2plazo">Plazo (meses)</label>
                 <input
                   id="p2plazo"
-                  type="number"
+                  type="text"
                   inputMode="numeric"
                   value={prestamo2.plazoMeses}
                   onChange={(e) => setPrestamo2({ ...prestamo2, plazoMeses: e.target.value })}
@@ -855,7 +855,7 @@ export default function SimuladorPrestamosPage() {
                 <label htmlFor="p3plazo">Plazo (meses)</label>
                 <input
                   id="p3plazo"
-                  type="number"
+                  type="text"
                   inputMode="numeric"
                   value={prestamo3.plazoMeses}
                   onChange={(e) => setPrestamo3({ ...prestamo3, plazoMeses: e.target.value })}

@@ -642,15 +642,28 @@ export default function GeneradorTonosPage() {
       {/* Panel principal */}
       <div className={styles.mainPanel}>
         <div className={styles.frecuenciaDisplay}>
-          {/* step="any": con el step implícito de 1, el navegador marcaba como inválido el
-              261,63 del preset «Do (C4)» que la propia app escribe en este campo. */}
+          {/*
+            type="text" + inputMode="decimal", NO type="number": en un campo numérico el
+            navegador entrega el valor ya normalizado al flotante de HTML, así que «261,63»
+            llega como «261.63» y, con tres decimales, parseSpanishNumber lee ese punto como
+            millar español y devuelve mil veces más. Es el hallazgo 873 del Inspector, medido
+            en simulador-circuitos-electricos. Aquí el campo lo lee ese mismo parser, así que
+            tenía el defecto igual: teclear «440,000» habría pedido 440.000 Hz.
+            El step="any" que había existía porque, con el step implícito de 1, el navegador
+            marcaba como inválido el 261,63 del preset «Do (C4)» que la propia app escribe
+            en este campo. Sin type="number" el problema ya no existe.
+          */}
           <input
-            type="number"
-            min="20"
-            max="20000"
-            step="any"
+            type="text"
+            inputMode="decimal"
             value={frecuenciaTexto}
             onChange={(e) => {
+              // El campo ya no es type="number", así que el navegador no filtra nada: lo que
+              // se teclea entra tal cual. Se admite solo lo que puede formar parte de un
+              // número, que es el mismo filtro que aplica components/NumberInput.tsx, el
+              // control canónico del catálogo. Sin esto, «12abc» se quedaba escrito en
+              // pantalla hasta que el usuario saliera del campo.
+              if (!/^-?[\d.,]*$/.test(e.target.value)) return;
               setFrecuenciaTexto(e.target.value);
               // Solo se emite cuando lo escrito ya es una frecuencia válida; mientras tanto
               // el oscilador se queda en la última buena y el usuario termina de teclear.

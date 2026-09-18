@@ -258,11 +258,42 @@ test.describe('simulador-circuitos-electricos', () => {
     // #__next-route-announcer__, y sin acotar el localizador resuelve a dos elementos.
     const aviso = page.locator('main [role="alert"]');
     await expect(aviso).toBeVisible();
-    await expect(aviso).toHaveText('Introduce dos valores positivos.');
+    // Desde la reparación del 874 el aviso NOMBRA el campo y la razón, en vez de soltar un
+    // «Introduce dos valores positivos» que valía igual para los dos campos y para tres causas
+    // distintas (vacío, no numérico y no positivo).
+    await expect(aviso).toHaveText('Corriente I (A): tiene que ser mayor que cero.');
 
     // Y no puede haber resultado detrás: ni «∞», ni «No definido», ni un bloque a medias.
     await expect(page.locator('div[role="status"]')).toBeEmpty();
     await expect(page.getByText('Resultado', { exact: true })).toHaveCount(0);
+  });
+
+  /**
+   * CASO 3.bis (hallazgo 875, bajo) — el mensaje tiene que nombrar la causa REAL.
+   *
+   * `parseSpanishNumber` rechaza la notación científica a propósito (está documentado en
+   * lib/formatters.ts: «1e3» valía 1000 con parseFloat y colaba importes plausibles pero
+   * equivocados). La app, en cambio, lo comunicaba como «Todas las resistencias deben ser
+   * valores positivos», así que el usuario veía rechazado un valor que su propio campo daba
+   * por bueno —el navegador considera «1e3» un número válido y cumplía el min=0— y con una
+   * explicación que no le decía qué corregir.
+   */
+  test('CASO 3.bis · rechazo: la notación científica se rechaza diciendo que es eso', async ({ page }) => {
+    await page.getByRole('button', { name: 'Paralelo', exact: true }).click();
+    // En esta pestaña los campos de resistencia llevan «Ω» de placeholder, no «0».
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+
+    const resistencias = page.locator('input[placeholder="Ω"]');
+    await sembrarValor(page, page.locator('input[placeholder="voltios"]'), '12');
+    await sembrarValor(page, resistencias.nth(0), '1e3');
+    await sembrarValor(page, resistencias.nth(1), '100');
+    // En serie y paralelo el botón se llama «Calcular circuito», no «Calcular».
+    await page.getByRole('button', { name: 'Calcular circuito', exact: true }).click();
+
+    const aviso = page.locator('main [role="alert"]');
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('notación científica');
+    await expect(aviso).toContainText('1000 en vez de 1e3');
   });
 
   /**
@@ -278,7 +309,9 @@ test.describe('simulador-circuitos-electricos', () => {
   test('CASO 4 · rechazo: V, I y R juntos que no cumplen la ley de Ohm', async ({ page }) => {
     await page.getByRole('button', { name: 'Potencia', exact: true }).click();
     // Los seis campos de la pestaña, en el orden en que se presentan: V, I, R, horas, días, tarifa.
-    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+    // Desde la reparación del 873 los campos son type="text" + inputMode="decimal": en un
+    // campo numérico el navegador normaliza «0,145» a «0.145» antes de que la app lo vea.
+    const campo = (i: number) => page.locator('input[inputMode="decimal"]').nth(i);
     await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
 
     await sembrarValor(page, campo(0), '230');
@@ -311,7 +344,9 @@ test.describe('simulador-circuitos-electricos', () => {
    */
   test('CASO 5 · rechazo: sin horas de uso no se puede dar consumo ni coste', async ({ page }) => {
     await page.getByRole('button', { name: 'Potencia', exact: true }).click();
-    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+    // Desde la reparación del 873 los campos son type="text" + inputMode="decimal": en un
+    // campo numérico el navegador normaliza «0,145» a «0.145» antes de que la app lo vea.
+    const campo = (i: number) => page.locator('input[inputMode="decimal"]').nth(i);
     await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
 
     // V e I bastan para la parte eléctrica (R se deduce: 230/10 = 23 Ω), así que el único
@@ -435,9 +470,6 @@ test.describe('simulador-circuitos-electricos', () => {
    * `type="number"` y deja «0.020», que `parseSpanishNumber` lee como millar español → 20 A.
    */
   test('CASO 8 · 0,020 A es la misma corriente que 0,02 A', async ({ page }) => {
-    // Marcado como fallo esperado: hallazgo 873 · el separador decimal de tres cifras se lee como millar. Cuando se
-    // repare, Playwright avisara con «Expected to fail, but passed» y se retira esta linea.
-    test.fail();
     // La pestaña arranca en «Calcular Tensión (V)», que es lo que hace falta: se dan I y R.
     const corriente = page.locator('input[placeholder="0"]').nth(0);
     const resistencia150 = page.locator('input[placeholder="0"]').nth(1);
@@ -479,13 +511,12 @@ test.describe('simulador-circuitos-electricos', () => {
    * Obtenido hoy con 0,145: «40.020,0000 €» — el campo deja «0.145» y el parser lee 145 €/kWh.
    */
   test('CASO 9 · una tarifa de tres decimales no puede multiplicar el coste por mil', async ({ page }) => {
-    // Marcado como fallo esperado: hallazgo 873 · mismo defecto en la cifra destacada del panel de consumo. Cuando se
-    // repare, Playwright avisara con «Expected to fail, but passed» y se retira esta linea.
-    test.fail();
     await page.getByRole('button', { name: 'Potencia', exact: true }).click();
     await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
     // Los seis campos de la pestaña, en orden: V, I, R, horas, días, tarifa.
-    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+    // Desde la reparación del 873 los campos son type="text" + inputMode="decimal": en un
+    // campo numérico el navegador normaliza «0,145» a «0.145» antes de que la app lo vea.
+    const campo = (i: number) => page.locator('input[inputMode="decimal"]').nth(i);
     const calcular = page.getByRole('button', { name: 'Calcular', exact: true });
 
     await teclearComoUsuario(page, campo(0), '230');
@@ -517,12 +548,11 @@ test.describe('simulador-circuitos-electricos', () => {
    * I = 0 la rechaza («Introduce dos valores positivos», CASO 3) y esta la calcula.
    */
   test('CASO 10 · rechazo: V, I y R juntos siguen siendo imposibles cuando la I tecleada es 0', async ({ page }) => {
-    // Marcado como fallo esperado: hallazgo 874 · la coherencia de la terna solo se comprueba con los tres > 0. Cuando se
-    // repare, Playwright avisara con «Expected to fail, but passed» y se retira esta linea.
-    test.fail();
     await page.getByRole('button', { name: 'Potencia', exact: true }).click();
     await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
-    const campo = (i: number) => page.locator('input[type="number"]').nth(i);
+    // Desde la reparación del 873 los campos son type="text" + inputMode="decimal": en un
+    // campo numérico el navegador normaliza «0,145» a «0.145» antes de que la app lo vea.
+    const campo = (i: number) => page.locator('input[inputMode="decimal"]').nth(i);
 
     await teclearComoUsuario(page, campo(0), '230');
     await teclearComoUsuario(page, campo(1), '0');

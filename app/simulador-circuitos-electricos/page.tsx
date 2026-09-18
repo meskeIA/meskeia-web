@@ -96,15 +96,42 @@ export default function SimuladorCircuitosElectricos() {
   const [resPot, setResPot] = useState<ResultadoPotencia | null>(null);
   const [errorPot, setErrorPot] = useState('');
 
+/**
+ * Por qué no vale un solo mensaje para todo (hallazgos 874 y 875).
+ *
+ * `parseSpanishNumber` devuelve NaN tanto para lo que no es un número como para la notación
+ * científica, que rechaza a propósito. La app lo comunicaba todo como «deben ser valores
+ * positivos», así que quien escribía «1e3» —que su propio campo daba por válido, porque el
+ * navegador lo considera un número y cumple el min=0— veía rechazado un valor correcto con
+ * una explicación que no le decía qué corregir.
+ *
+ * Y un 0 TECLEADO se descartaba en silencio como si el campo estuviera vacío: en la pestaña
+ * de Potencia, V = 230, I = 0, R = 5 se «completaba» sola a I = 46 A y publicaba consumo y
+ * coste, con el campo de I mostrando todavía 0. La misma entrada recibía dos respuestas
+ * distintas según la pestaña, porque la Ley de Ohm sí la rechazaba.
+ */
+function motivoDeRechazo(etiqueta: string, texto: string): string | null {
+  if (texto.trim() === '') return null; // vacío es «no lo sé», y eso cada pestaña lo trata a su modo
+  const valor = parseSpanishNumber(texto);
+  if (!Number.isFinite(valor)) {
+    return /e/i.test(texto)
+      ? `${etiqueta}: la notación científica («${texto.trim()}») no se admite aquí. Escribe el número completo, por ejemplo 1000 en vez de 1e3.`
+      : `${etiqueta}: «${texto.trim()}» no es un número.`;
+  }
+  if (valor <= 0) return `${etiqueta}: tiene que ser mayor que cero.`;
+  return null;
+}
+
   function calcOhm() {
     setErrorOhm('');
     setResOhm(null);
+    const motivoOhm =
+      motivoDeRechazo(labels[incognita].a, ohmA) ??
+      motivoDeRechazo(labels[incognita].b, ohmB) ??
+      (ohmA.trim() === '' || ohmB.trim() === '' ? 'Introduce dos valores positivos.' : null);
+    if (motivoOhm) { setErrorOhm(motivoOhm); return; }
     const a = parseSpanishNumber(ohmA);
     const b = parseSpanishNumber(ohmB);
-    if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) {
-      setErrorOhm('Introduce dos valores positivos.');
-      return;
-    }
     let V: number, I: number, R: number;
     if (incognita === 'V') { I = a; R = b; V = I * R; }
     else if (incognita === 'I') { V = a; R = b; I = V / R; }
@@ -121,8 +148,12 @@ export default function SimuladorCircuitosElectricos() {
     setResSerie(null);
     const V = parseSpanishNumber(vSerie);
     if (isNaN(V) || V <= 0) { setErrorSerie('Tensión de fuente inválida.'); return; }
+    const motivoSerie = rsSerie
+      .slice(0, numSerie)
+      .map((texto, i) => motivoDeRechazo(`R${i + 1}`, texto) ?? (texto.trim() === '' ? `R${i + 1}: falta el valor.` : null))
+      .find(Boolean);
+    if (motivoSerie) { setErrorSerie(motivoSerie); return; }
     const rs = rsSerie.slice(0, numSerie).map(parseSpanishNumber);
-    if (rs.some(r => isNaN(r) || r <= 0)) { setErrorSerie('Todas las resistencias deben ser valores positivos.'); return; }
     const Req = rs.reduce((a, r) => a + r, 0);
     const I = V / Req;
     const tensiones = rs.map(r => I * r);
@@ -135,8 +166,12 @@ export default function SimuladorCircuitosElectricos() {
     setResPar(null);
     const V = parseSpanishNumber(vPar);
     if (isNaN(V) || V <= 0) { setErrorPar('Tensión de fuente inválida.'); return; }
+    const motivoPar = rsPar
+      .slice(0, numPar)
+      .map((texto, i) => motivoDeRechazo(`R${i + 1}`, texto) ?? (texto.trim() === '' ? `R${i + 1}: falta el valor.` : null))
+      .find(Boolean);
+    if (motivoPar) { setErrorPar(motivoPar); return; }
     const rs = rsPar.slice(0, numPar).map(parseSpanishNumber);
-    if (rs.some(r => isNaN(r) || r <= 0)) { setErrorPar('Todas las resistencias deben ser valores positivos.'); return; }
     const invReq = rs.reduce((a, r) => a + 1 / r, 0);
     const Req = 1 / invReq;
     const corrientes = rs.map(r => V / r);
@@ -154,6 +189,19 @@ export default function SimuladorCircuitosElectricos() {
     const horas = parseSpanishNumber(potHoras);
     const dias = parseSpanishNumber(potDias);
     const tarifa = parseSpanishNumber(potTarifa);
+    // Primero, lo ESCRITO que no puede ser: un 0 en cualquiera de los tres no es «no lo sé».
+    const motivoPot = ([
+      ['Tensión (V)', potV],
+      ['Corriente (I)', potI],
+      ['Resistencia (R)', potR],
+      ['Horas al día', potHoras],
+      ['Días', potDias],
+      ['Tarifa', potTarifa],
+    ] as [string, string][])
+      .map(([etiqueta, texto]) => motivoDeRechazo(etiqueta, texto))
+      .find(Boolean);
+    if (motivoPot) { setErrorPot(motivoPot); return; }
+
     const validos = [V, I, R].filter(v => !isNaN(v) && v > 0);
     if (validos.length < 2) { setErrorPot('Introduce al menos dos de los tres valores (V, I, R).'); return; }
     // Con los tres rellenos ninguna rama del despeje se ejecuta, así que hasta ahora la ficha
@@ -262,7 +310,7 @@ export default function SimuladorCircuitosElectricos() {
                 <div className={styles.inputGroup}>
                   <label>{labels[incognita].a}</label>
                   <input
-                    type="number"
+                    type="text"
                     inputMode="decimal"
                     min="0"
                     value={ohmA}
@@ -273,7 +321,7 @@ export default function SimuladorCircuitosElectricos() {
                 <div className={styles.inputGroup}>
                   <label>{labels[incognita].b}</label>
                   <input
-                    type="number"
+                    type="text"
                     inputMode="decimal"
                     min="0"
                     value={ohmB}
@@ -337,7 +385,7 @@ export default function SimuladorCircuitosElectricos() {
                   <div key={i} className={styles.resistorCard}>
                     <span className={styles.resistorLabel}>R{i + 1}</span>
                     <input
-                      type="number"
+                      type="text"
                       inputMode="decimal"
                       min="0"
                       className={styles.resistorInput}
@@ -352,7 +400,7 @@ export default function SimuladorCircuitosElectricos() {
               <div className={styles.inputGroup} style={{ maxWidth: '220px', marginBottom: '1rem' }}>
                 <label>Tensión de fuente (V)</label>
                 <input
-                  type="number"
+                  type="text"
                   inputMode="decimal"
                   min="0"
                   value={vSerie}
@@ -430,7 +478,7 @@ export default function SimuladorCircuitosElectricos() {
                   <div key={i} className={styles.resistorCard}>
                     <span className={styles.resistorLabel}>R{i + 1}</span>
                     <input
-                      type="number"
+                      type="text"
                       inputMode="decimal"
                       min="0"
                       className={styles.resistorInput}
@@ -445,7 +493,7 @@ export default function SimuladorCircuitosElectricos() {
               <div className={styles.inputGroup} style={{ maxWidth: '220px', marginBottom: '1rem' }}>
                 <label>Tensión de fuente (V)</label>
                 <input
-                  type="number"
+                  type="text"
                   inputMode="decimal"
                   min="0"
                   value={vPar}
@@ -517,29 +565,29 @@ export default function SimuladorCircuitosElectricos() {
               <div className={styles.inputGrid}>
                 <div className={styles.inputGroup}>
                   <label>Tensión V (voltios)</label>
-                  <input type="number" inputMode="decimal" min="0" value={potV} onChange={e => setPotV(e.target.value)} placeholder="opcional si tienes I y R" />
+                  <input type="text" inputMode="decimal" min="0" value={potV} onChange={e => setPotV(e.target.value)} placeholder="opcional si tienes I y R" />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Corriente I (amperios)</label>
-                  <input type="number" inputMode="decimal" min="0" value={potI} onChange={e => setPotI(e.target.value)} placeholder="opcional si tienes V y R" />
+                  <input type="text" inputMode="decimal" min="0" value={potI} onChange={e => setPotI(e.target.value)} placeholder="opcional si tienes V y R" />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Resistencia R (ohmios)</label>
-                  <input type="number" inputMode="decimal" min="0" value={potR} onChange={e => setPotR(e.target.value)} placeholder="opcional si tienes V e I" />
+                  <input type="text" inputMode="decimal" min="0" value={potR} onChange={e => setPotR(e.target.value)} placeholder="opcional si tienes V e I" />
                 </div>
               </div>
               <div className={styles.inputGrid}>
                 <div className={styles.inputGroup}>
                   <label>Horas de uso diario</label>
-                  <input type="number" inputMode="decimal" min="0" value={potHoras} onChange={e => setPotHoras(e.target.value)} />
+                  <input type="text" inputMode="decimal" min="0" value={potHoras} onChange={e => setPotHoras(e.target.value)} />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Días del periodo</label>
-                  <input type="number" inputMode="decimal" min="1" value={potDias} onChange={e => setPotDias(e.target.value)} />
+                  <input type="text" inputMode="decimal" min="1" value={potDias} onChange={e => setPotDias(e.target.value)} />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Tarifa eléctrica (€/kWh)</label>
-                  <input type="number" inputMode="decimal" min="0" value={potTarifa} onChange={e => setPotTarifa(e.target.value)} />
+                  <input type="text" inputMode="decimal" min="0" value={potTarifa} onChange={e => setPotTarifa(e.target.value)} />
                 </div>
               </div>
               {errorPot && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorPot}</p>}

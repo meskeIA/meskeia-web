@@ -318,7 +318,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <span aria-hidden="true">€</span>
             <input
               id="alquiler"
-              type="number"
+              type="text"
               inputMode="decimal"
               min={0}
               step={10}

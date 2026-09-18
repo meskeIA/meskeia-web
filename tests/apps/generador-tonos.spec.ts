@@ -679,13 +679,18 @@ test('CASO 6 — ninguna entrada inválida saca al oscilador del rango 20–20.0
     await expect(campoFrecuencia(page), `«${escrito}» al salir del campo`).toHaveValue(esperado);
   };
 
-  // Notación exponencial: `parseInt('1e4')` se queda con el 1 y descarta el resto, así que
-  // 1e4 NO son 10.000 Hz. Lo importante es que acabe dentro del rango y no en NaN.
-  await tras('1e4', '20');
+  // Notación exponencial: ya no se puede ni escribir. El filtro del onChange —el mismo de
+  // components/NumberInput.tsx— rechaza la «e», así que el campo conserva el valor anterior
+  // en vez de aceptarla y acotarla después. Antes llegaba a entrar porque el navegador la
+  // daba por válida en un type="number", y `parseInt('1e4')` se quedaba con el 1.
+  await tras('1e4', '440');
   // Campo vacío: `parseInt('') || FREC_MIN` → suelo prometido.
   await tras('', '20');
-  // Cifras y letras mezcladas: el <input type="number"> descarta las letras al teclearlas,
-  // así que queda «12», y al salir se acota al suelo. Lo que no puede salir es «12abc» ni NaN.
+  // Cifras y letras mezcladas. Desde la reparación del hallazgo 873 el campo es type="text"
+  // —en un campo numérico el navegador normalizaba «440,000» a «440.000» y parseSpanishNumber
+  // lo leía como millar—, así que quien filtra ya no es el navegador sino el onChange, con la
+  // misma regla que components/NumberInput.tsx: solo dígitos, coma, punto y signo. El
+  // resultado visible es el mismo que antes, «12», y al salir se acota al suelo.
   await campoFrecuencia(page).click();
   await campoFrecuencia(page).press('Control+a');
   await campoFrecuencia(page).pressSequentially('12abc', { delay: 30 });
