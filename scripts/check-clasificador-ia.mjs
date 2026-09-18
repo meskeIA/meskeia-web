@@ -79,13 +79,22 @@ const ESCAPE = /clasificador-ia-ok:/;
 const FUENTE = 'lib/analytics-rollup.ts';
 
 /**
- * Consumidores del criterio. `opcional` = puede no existir en el árbol (gitignored).
- * Añadir una copia nueva = añadir su entrada aquí.
+ * Consumidores del criterio. Añadir una copia nueva = añadir su entrada aquí.
+ *
+ * ⚠️ `soloLocal` = el fichero está **gitignored**, así que NO existe en el clon de Vercel ni en
+ * una máquina recién clonada. Ahí se omite con un aviso; en local, donde sí está, se verifica.
+ *
+ * Esta marca no es cosmética: la primera versión de este candado daba `digest-diario.mjs` por
+ * versionado, y el despliegue del 18/09/2026 **falló en Vercel** con «el fichero no existe»
+ * —commit 75a49542, el que introdujo el candado—. El error de fondo no fue la marca mal puesta
+ * sino haberla SUPUESTO: la lista de qué está versionado se le pregunta a git, no a la memoria.
+ * Por eso la prueba nº 7 del probador reconstruye ahora el árbol real con `git ls-files` en vez
+ * de retirar a mano el fichero que yo creía que era el único ausente.
  */
 const CONSUMIDORES = [
-  { ruta: 'scripts/digest-diario.mjs', opcional: false },
-  { ruta: 'scripts/analizar-ia-paginas.mjs', opcional: false },
-  { ruta: 'scripts/cruce-seo.mjs', opcional: true },
+  { ruta: 'scripts/digest-diario.mjs', soloLocal: true },
+  { ruta: 'scripts/analizar-ia-paginas.mjs', soloLocal: false },
+  { ruta: 'scripts/cruce-seo.mjs', soloLocal: true },
 ];
 
 /**
@@ -206,11 +215,16 @@ if (uaFuente.size === 0) {
 
 const listaFuente = [...uaFuente].sort();
 
-for (const { ruta, opcional } of CONSUMIDORES) {
+for (const { ruta, soloLocal } of CONSUMIDORES) {
   const abs = path.join(RAIZ, ruta);
   if (!existsSync(abs)) {
-    if (opcional) { avisos.push(`${ruta} no está en el árbol (es gitignored) — no verificado`); continue; }
-    fallos.push({ ruta, que: 'el fichero no existe', detalle: 'si se ha movido, actualizar CONSUMIDORES' });
+    if (soloLocal) { avisos.push(`${ruta} no está en el árbol (es gitignored) — no verificado`); continue; }
+    fallos.push({
+      ruta,
+      que: 'el fichero no existe',
+      detalle: `si se ha movido o renombrado, actualizar CONSUMIDORES; si se ha vuelto gitignored,
+     marcarlo \`soloLocal: true\` — pero COMPROBÁNDOLO con \`git ls-files\`, no de memoria.`,
+    });
     continue;
   }
 

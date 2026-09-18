@@ -173,15 +173,26 @@ if (hayCruce) {
   anotar('escape: cruce-seo.mjs no está en este árbol', true, 'omitido');
 }
 
-// ── 7. Sin cruce-seo.mjs (el árbol de Vercel y de un clon nuevo) ──────────────
+// ── 7. EL ÁRBOL REAL DE VERCEL: solo lo que git tiene versionado ──────────────
+//
+// Se le pregunta a git cuáles de los cuatro viajan en el clon, en vez de retirar a mano el que
+// uno CREA que falta. La primera versión de esta prueba quitaba solo `cruce-seo.mjs`, daba verde,
+// y el despliegue falló igualmente: `digest-diario.mjs` también está gitignored y el candado lo
+// exigía. La prueba compartía la suposición equivocada del candado, así que no podía cazarla.
 {
   const raiz = montar();
-  fs.rmSync(path.join(raiz, 'scripts/cruce-seo.mjs'), { force: true });
+  const versionados = new Set(
+    FICHEROS.filter((f) => spawnSync('git', ['ls-files', '--error-unmatch', f],
+      { cwd: RAIZ, encoding: 'utf8' }).status === 0)
+  );
+  const omitidos = FICHEROS.filter((f) => !versionados.has(f));
+  for (const f of omitidos) fs.rmSync(path.join(raiz, f), { force: true });
+
   const { codigo, salida } = candado(raiz);
   anotar(
-    'sin cruce-seo.mjs (gitignored: así es el árbol en Vercel) → PASA con aviso',
-    codigo === 0 && /no está en el árbol/.test(salida),
-    `código ${codigo}`
+    `el árbol REAL de Vercel (${versionados.size} de ${FICHEROS.length} versionados) → PASA con aviso`,
+    codigo === 0 && (omitidos.length === 0 || /no está en el árbol/.test(salida)),
+    omitidos.length ? `ausentes: ${omitidos.join(', ')} · código ${codigo}` : `código ${codigo}`
   );
   fs.rmSync(raiz, { recursive: true, force: true });
 }
