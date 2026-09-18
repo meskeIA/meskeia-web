@@ -34,6 +34,36 @@ consumidores a la vez. Se descubrió por casualidad al abrir el generador.
 La defensa no es el build —que no ve nada de esto— sino contar lo que sale: un parser que
 devuelve 0 items donde había 133 no está «vacío», está roto.
 
+## Un regex sobre código fuente cruza comentarios, y `[\s\S]*?` no se detiene donde crees
+
+Lo de arriba es el parser que se queda **mudo**. Éste es el simétrico y más difícil de ver: el
+parser que se vuelve **demasiado hablador** y nadie lo nota, porque entrega datos en vez de cero.
+
+`scripts/seo-latam/detectar-candidatas-latam.mjs` extraía los H1 de un `page.tsx` con
+`/<h1[^>]*>([\s\S]*?)<\/h1>/g`. En `app/generador-tonos/page.tsx` la **línea 27 cita `<h1>` dentro
+de un comentario** («el rango audible que la app promete en su `<h1>`, su title y jsonLd.features»),
+y el `*?`, que es perezoso pero no mágico, corrió desde ahí hasta el `</h1>` REAL de la línea 634:
+**607 líneas de código fuente** metidas en lo que el script llama «señal fuerte de SEO».
+
+El efecto no fue un error, fue una **conclusión falsa con datos detrás**: la app salió como
+candidata a dualidad LATAM por «movil», «portatil» y «eso», términos que no están en su title ni
+en su H1 ni en sus keywords — «móvil o de portátil» estaba en un comentario técnico sobre altavoces
+y «eso» en un «así que esos puntos». Descubrirlo costó cruzar 90 días de consultas de GSC para
+comprobar que ninguna de las 297 que recibe esa app menciona un dispositivo. Detectado el
+18/09/2026, en el ciclo SEO mensual.
+
+**Al escribir un parser sobre `app/**/*.tsx`:**
+
+1. **Retirar los comentarios antes de buscar etiquetas** (`.replace(/\/\*[\s\S]*?\*\//g, ' ')`).
+   Este repositorio comenta mucho y cita JSX en los comentarios a propósito, así que la colisión
+   no es rara: es lo normal.
+2. **Acotar la captura** (`[\s\S]{0,300}?` en vez de `[\s\S]*?`). Un H1 real cabe de sobra; si la
+   captura necesita cientos de líneas, el regex ya se perdió.
+3. La defensa de la sección anterior —contar lo que sale— **aquí no sirve**: el contador daba 17
+   candidatas en vez de 14, y 17 no parece un número roto. Lo que delata a este parser es **mirar
+   lo que extrae**, no cuánto. Si un extractor de titulares devuelve algo con `const` y `;`
+   dentro, no está extrayendo titulares.
+
 ## `data/cnae-sinonimos.json` no lo lee la app: lee su catálogo YA GENERADO
 
 `conversor-cnae-iae` no importa `data/cnae-sinonimos.json` en tiempo de ejecución: lee

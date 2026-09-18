@@ -74,7 +74,17 @@ function extraerSenalFuerte(metaTxt, pageTxt) {
   if (kwStr) partes.push(kwStr[2]);
   const kwArr = metaTxt.match(/keywords\s*:\s*\[([\s\S]*?)\]/);
   if (kwArr) partes.push(kwArr[1]);
-  for (const m of pageTxt.matchAll(/<h1[^>]*>([\s\S]*?)<\/h1>/g)) partes.push(m[1]);
+  // ⚠️ Los comentarios se retiran ANTES de buscar el H1, y el contenido se acota a 300
+  // caracteres. Sin las dos cosas el regex desborda: `generador-tonos` cita `<h1>` dentro de un
+  // comentario de su linea 27 («el rango que la app promete en su <h1>»), y el `*?` corria hasta
+  // el `</h1>` REAL de la linea 634, metiendo 607 lineas de codigo fuente en la senal fuerte. Con
+  // eso cualquier palabra del cuerpo pasaba por senal: en el ciclo SEO del 18/09/2026 esa app
+  // salio como candidata por «movil» y «portatil» (que estan en un comentario tecnico sobre
+  // altavoces) y por «eso» (de «asi que esos puntos»), y hubo que cruzar 90 dias de consultas de
+  // GSC para descubrir que ninguna de las 297 que recibe menciona un dispositivo. Un H1 real cabe
+  // en 300 caracteres; 607 lineas, no.
+  const pageSinComentarios = pageTxt.replace(/\/\*[\s\S]*?\*\//g, ' ');
+  for (const m of pageSinComentarios.matchAll(/<h1[^>]*>([\s\S]{0,300}?)<\/h1>/g)) partes.push(m[1]);
   return partes.join(' \n ');
 }
 
