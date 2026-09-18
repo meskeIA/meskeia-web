@@ -28,12 +28,17 @@ import { test, expect } from '@playwright/test';
 
 const URL_APP = '/simulador-automatas-finitos/';
 
+// ⚠️ Nombre COMPLETO y exacto, no /Determinizar/ a secas: la app ganó después botones
+// de casos de aula («Caso 7: Determinizar un AFND que busca «01»», «Caso 8:
+// Determinizar con transiciones vacías»), y con la regex suelta el localizador pasó a
+// resolver a tres elementos. Los cuatro casos de este fichero cayeron por eso el
+// 18/09/2026, sin que la app tuviera nada roto.
 test.describe('simulador-automatas-finitos · conversiones', () => {
   test('determinizar el NFA «Contiene 01» da los cuatro conjuntos calculados a mano', async ({ page }) => {
     await page.goto(URL_APP);
     await page.getByRole('button', { name: /Contiene "01"/ }).click();
 
-    await page.getByRole('button', { name: /Determinizar/ }).click();
+    await page.getByRole('button', { name: 'Determinizar (AFND → AFD)', exact: true }).click();
 
     // La tabla de subconjuntos aparece con las filas del algoritmo
     await expect(page.getByRole('heading', { name: 'Tabla de subconjuntos' })).toBeVisible();
@@ -52,7 +57,7 @@ test.describe('simulador-automatas-finitos · conversiones', () => {
     await page.goto(URL_APP);
     await page.getByRole('button', { name: /Contiene "01"/ }).click();
 
-    await page.getByRole('button', { name: /Minimizar/ }).click();
+    await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
     const alerta = page.getByRole('alert').first();
     await expect(alerta).toContainText('AFND');
     await expect(alerta).toContainText('Determinízalo');
@@ -63,7 +68,7 @@ test.describe('simulador-automatas-finitos · conversiones', () => {
     // «DFA — Pares de 0»: dos estados distinguibles, no hay nada que fusionar
     await page.getByRole('button', { name: /Pares de 0/ }).click();
 
-    await page.getByRole('button', { name: /Minimizar/ }).click();
+    await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Refinamiento de particiones' })).toBeVisible();
     await expect(page.getByText(/ya era mínimo/)).toBeVisible();
   });
@@ -71,7 +76,7 @@ test.describe('simulador-automatas-finitos · conversiones', () => {
   test('editar el autómata retira el resultado anterior', async ({ page }) => {
     await page.goto(URL_APP);
     await page.getByRole('button', { name: /Pares de 0/ }).click();
-    await page.getByRole('button', { name: /Minimizar/ }).click();
+    await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Refinamiento de particiones' })).toBeVisible();
 
     // Cargar otro ejemplo cambia el autómata: la partición de antes ya no describe nada
