@@ -396,7 +396,7 @@ escrita: `CUADRE_OK="por qué es correcto" git commit -m "…"`.
 `npm run cuadre` (y el `pre-commit`, que es donde **bloquea**) — cuenta y compara; no opina.
 Cubre la clase de fallo que los otros candados no pueden ver: **se coló algo que nadie pidió**.
 
-Los 17 candados comprueban propiedades POSITIVAS enumeradas de antemano —«esto debe estar, y
+Los 18 candados comprueban propiedades POSITIVAS enumeradas de antemano —«esto debe estar, y
 está»—; ninguno mira un borrado (`grep diff-filter=D scripts/check-*.mjs` devuelve 0). El caso
 que mejor lo enseña es `check:csp`: exige que todo dominio cargado esté PERMITIDO, que es
 coherencia, no novedad — añadir la llamada y el permiso a la vez le cuadra.
