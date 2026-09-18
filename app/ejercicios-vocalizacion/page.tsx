@@ -157,11 +157,18 @@ export default function EjerciciosVocalizacionPage() {
       setMicActivo(true);
       leerVolumen();
     } catch (err) {
+      // El tipo de fallo va en `name` («NotFoundError»), no en `message`, que es el texto
+      // del navegador en inglés («Requested device not found»). Ramificar sobre el mensaje
+      // dejaba la rama muerta y soltaba ese inglés en una app en castellano — es el
+      // hallazgo 914 del Inspector en `luxometro`, y aquí estaba copiado igual (18/09/2026).
+      const nombre = err instanceof Error ? err.name : '';
       const msg = err instanceof Error ? err.message : 'Error desconocido';
-      if (msg.includes('Permission') || msg.includes('NotAllowed')) {
+      if (nombre === 'NotAllowedError' || nombre === 'SecurityError' || msg.includes('Permission')) {
         setErrorMic('Permiso de micrófono denegado. Actívalo en la configuración del navegador.');
-      } else if (msg.includes('NotFound')) {
+      } else if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') {
         setErrorMic('No se encontró un micrófono en tu dispositivo.');
+      } else if (nombre === 'NotReadableError') {
+        setErrorMic('El micrófono está ocupado por otra aplicación. Ciérrala y vuelve a intentarlo.');
       } else {
         setErrorMic(`No se pudo acceder al micrófono: ${msg}`);
       }

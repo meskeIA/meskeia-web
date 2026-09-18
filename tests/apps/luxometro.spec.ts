@@ -27,28 +27,38 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *
  * DÓNDE VIVE EL CÁLCULO — no hay motor aparte. `calculateLuxFromCamera()` en
  * app/luxometro/page.tsx pinta el fotograma en un canvas de 64×48, promedia la luma BT.709 de
- * los 3.072 píxeles normalizada a 0-1 y hace:
+ * los 3.072 píxeles normalizada a 0-1 y hacía:
  *
  *     estimatedLux = round( avgLuminance ** 2.2 * 100000 * calibrationFactor )
  *
- * El 100000 no sale de ninguna parte: el propio comentario del código dice «Esta es una
+ * El 100000 no salía de ninguna parte: el propio comentario del código decía «Esta es una
  * aproximación - los valores reales dependen de la cámara». La cifra es una función PURA del
  * brillo de los píxeles, que es justo lo que la exposición automática de cualquier cámara
  * normaliza hacia el gris medio sea cual sea la iluminancia real de la escena. De ahí el
- * HALLAZGO 1.
+ * hallazgo 908, y de ahí la reparación.
+ *
+ * ── LO QUE PUBLICA DESDE EL 18/09/2026 ──
+ *
+ * La misma expresión se guarda ahora como SEÑAL cruda, sin unidad, y la pantalla decide qué
+ * enseñar con ella:
+ *     · sin calibrar → nivel relativo = round( (señal/100000)^(1/2,2) · 100 ), que es el brillo
+ *       medio del fotograma en tanto por ciento, y NADA en lux;
+ *     · calibrado    → lux = round( señal × factor ), con factor = referencia / señal medida.
+ * Y con los lux se apagan o encienden las tres cosas que derivaban de ellos: el rótulo de
+ * escena, la escala de referencia y las recomendaciones de exposición.
  *
  * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
  *
  *   Con un flujo de color uniforme (r=g=b=v) la luma BT.709 vale (0,2126+0,7152+0,0722)·v/255
- *   = v/255 exactamente, así que avgLuminance = v/255 y la cifra sale cerrada:
+ *   = v/255 exactamente, así que avgLuminance = v/255 y las dos cifras salen cerradas:
  *
- *     v=0    → L=0            → 0^2,2      · 100000 = 0        → «0» · Noche sin luna
- *     v=128  → L=0,501960784  → 0,2195194  · 100000 = 21.952   → «21.952» · Sombra exterior
- *     v=192  → L=0,752941176  → 0,5356447  · 100000 = 53.564   → «53.564» · Luz solar directa
- *     v=255  → L=1            → 1          · 100000 = 100.000  → «100.000» · Sol intenso
+ *     v=0    → señal 0        → nivel 0    · lux calibrado a 500: 0
+ *     v=128  → señal 21.952   → nivel 50   · lux calibrado a 500: 500 (es la referencia)
+ *     v=192  → señal 53.564   → nivel 75   · lux con ese mismo factor: 53.564/21.952·500 = 1220
+ *     v=255  → señal 100.000  → nivel 100
  *
- *   Los rótulos salen de LUX_REFERENCES: [0,1) Noche sin luna, [10000,25000) Sombra exterior,
- *   [50000,100000) Luz solar directa, [100000,150000) Sol intenso.
+ *   Los rótulos salen de LUX_REFERENCES y solo aparecen calibrados: [200,500) Interior normal,
+ *   [500,1000) Oficina bien iluminada, [1000,5000) Día muy nublado.
  *
  *   CASO 1 (normal, en móvil) — cámara concedida con el dispositivo falso de Chromium.
  *       El medio tiene que arrancar DE VERDAD: readyState ≥ 2 y videoWidth > 0. Un <video> en
@@ -60,12 +70,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       fotograma), así que queda como fragilidad anotada, no como hallazgo.
  *
  *   CASO 2 (límite) — detener la medición. La cámara SÍ se libera (srcObject a null, las
- *       pistas paradas). Lo que no se limpia es la cifra: ver HALLAZGO 2.
+ *       pistas paradas). Lo que no se limpiaba ni se marcaba era la cifra: ver el 910.
  *
  *   CASO 3 (rechazo) — permiso denegado y navegador sin cámara. Chrome lanza, medido el
  *       18/09/2026, `NotAllowedError | Permission denied` y `NotFoundError | Requested device
  *       not found`. La app degrada con aviso y sin pantalla de error, pero el segundo mensaje
- *       sale en inglés: ver HALLAZGO 3.
+ *       salía en inglés: ver el 914.
  *
  * LO QUE ESTÁ SANO (verificado en producción el 18/09/2026): el medio arranca y el bucle de
  * medición corre (readyState 4, videoWidth 640, la cifra se refresca); la aritmética es
@@ -75,9 +85,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * cámara tumban la app a la pantalla de error; y el vídeo no se envía a ningún sitio (todo el
  * proceso es un drawImage local, como promete el bloque de privacidad).
  *
- * HALLAZGOS ABIERTOS — al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que hoy
- * fallan a propósito; cuando se reparen se les quita el `test.fail()` y quedan como candado de
- * regresión. Están en el acta del Inspector.
+ * LOS 7 HALLAZGOS, al final, ya como candados de regresión. Dos se repararon de otra forma que
+ * la que proponía el acta, y el razonamiento está escrito en cada uno: el 910 marca la lectura
+ * como caducada en vez de borrarla, y el 908 no añade un aviso junto a la cifra sino que RETIRA
+ * la cifra —un aviso debajo de un número utilizable no es una salvaguarda, es una nota al pie.
  */
 
 /**
@@ -110,7 +121,8 @@ const VALOR = '[class*="luxValue"]';
 const REFERENCIA = '[class*="refLabel"]';
 const INSIGNIA = '[class*="methodBadge"]';
 const AVISO = '[class*="errorMessage"]';
-const CALIBRACION = 'input[type="number"]';
+const CALIBRACION = '#lux-referencia';
+const UNIDAD = '[class*="luxUnit"]';
 
 /** Texto de un nodo, con el espacio duro de Intl normalizado. */
 async function texto(loc: Locator): Promise<string> {
@@ -255,46 +267,47 @@ test.describe('El medio arranca de verdad', () => {
   });
 });
 
-test.describe('La conversión de píxeles a lux es fiel al código', () => {
-  // Los cuatro valores salen de round((v/255)^2,2 · 100000), resuelto a mano en la cabecera.
-  // No prueban que la cifra sea FÍSICAMENTE cierta —no lo es, HALLAZGO 1—: prueban que la app
-  // hace exactamente lo que su fórmula dice, que es lo que este test tiene que fijar.
-  test('CASO 1.bis · gris medio (128) → 21.952 lux · Sombra exterior', async ({ page }) => {
+test.describe('Sin calibrar: nivel relativo, y ninguna cifra en lux', () => {
+  // Desde la reparación del 18/09/2026 el bucle guarda la SEÑAL cruda —la misma de antes,
+  // round((v/255)^2,2 · 100000)— y la pantalla publica su raíz 2,2 llevada a 0-100, que es el
+  // brillo medio del fotograma en tanto por ciento. La cifra en lux solo aparece calibrada.
+  // Estos casos no prueban que el nivel sea físicamente nada: prueban que la app hace lo que
+  // su fórmula dice y que NO rotula como iluminancia lo que no lo es.
+  test('CASO 1.bis · gris medio (128) → nivel 50, sin lux ni rótulo de escena', async ({ page }) => {
     await camaraDeLuminancia(page, 'rgb(128,128,128)');
     await abrirYMedir(page);
-    await expect(page.locator(VALOR)).toHaveText('21.952');
-    await expect(page.locator(REFERENCIA)).toHaveText('Sombra exterior');
-    // Y de ahí salen las recomendaciones fotográficas, que es donde la cifra se vuelve consejo.
-    await expect(page.locator('[class*="recValue"]').first()).toHaveText('100');
+
+    // señal = round(0,50196^2,2 · 100000) = 21.952 → nivel = round(0,21952^(1/2,2) · 100) = 50
+    await expect(page.locator(VALOR)).toHaveText('50');
+    await expect(page.locator(UNIDAD)).toContainText('nivel relativo');
+    // Lo que antes salía aquí: «21.952 lux · Sombra exterior» y un consejo de sunny 16, para
+    // una escena que es exactamente donde la exposición automática deja CUALQUIER habitación.
+    await expect(page.locator(VALOR)).not.toHaveText('21.952');
+    await expect(page.locator(REFERENCIA)).toHaveCount(0);
+    await expect(page.locator('[class*="photoPanel"]')).toHaveCount(0);
   });
 
-  test('CASO 1.bis · negro (0) → 0 lux · Noche sin luna', async ({ page }) => {
+  test('CASO 1.bis · negro (0) → nivel 0 · blanco (255) → nivel 100', async ({ page }) => {
     await camaraDeLuminancia(page, 'rgb(0,0,0)');
     await abrirYMedir(page);
     await expect(page.locator(VALOR)).toHaveText('0');
-    await expect(page.locator(REFERENCIA)).toHaveText('Noche sin luna');
-  });
 
-  test('CASO 1.bis · blanco (255) → 100.000 lux · Sol intenso', async ({ page }) => {
-    await camaraDeLuminancia(page, 'rgb(255,255,255)');
-    await abrirYMedir(page);
-    await expect(page.locator(VALOR)).toHaveText('100.000');
-    await expect(page.locator(REFERENCIA)).toHaveText('Sol intenso');
+    await page.evaluate(() => window.__pintarCamara?.('rgb(255,255,255)'));
+    await expect(page.locator(VALOR)).toHaveText('100');
   });
 
   test('CASO 1.ter · la lectura sigue al brillo del fotograma, no a la escena', async ({
     page,
   }) => {
-    // El mismo flujo, sin tocar nada más que el color: de 192 a 128 la cifra tiene que caer de
-    // 53.564 a 21.952. Es la demostración de que lo que mide es el píxel.
+    // El mismo flujo, sin tocar nada más que el color: de 192 a 128 el nivel cae de 75 a 50.
+    // Es la demostración de que lo que mide es el píxel — y la razón de que no pueda llamarse
+    // lux mientras la cámara siga compensando la exposición por su cuenta.
     await camaraDeLuminancia(page, 'rgb(192,192,192)');
     await abrirYMedir(page);
-    await expect(page.locator(VALOR)).toHaveText('53.564');
-    await expect(page.locator(REFERENCIA)).toHaveText('Luz solar directa');
+    await expect(page.locator(VALOR)).toHaveText('75');
 
     await page.evaluate(() => window.__pintarCamara?.('rgb(128,128,128)'));
-    await expect(page.locator(VALOR)).toHaveText('21.952');
-    await expect(page.locator(REFERENCIA)).toHaveText('Sombra exterior');
+    await expect(page.locator(VALOR)).toHaveText('50');
   });
 });
 
@@ -302,7 +315,7 @@ test.describe('CASO 2 · detener la medición', () => {
   test('la cámara se libera de verdad', async ({ page }) => {
     await camaraDeLuminancia(page, 'rgb(192,192,192)');
     await abrirYMedir(page);
-    await expect(page.locator(VALOR)).toHaveText('53.564');
+    await expect(page.locator(VALOR)).toHaveText('75');
 
     await detener(page).click();
     await expect(iniciar(page)).toBeVisible();
@@ -353,67 +366,42 @@ test.describe('CASO 3 · la app degrada, no se cae', () => {
   });
 });
 
-test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
-  // Los seis usan test.fail(): afirman lo que DEBERÍA pasar y hoy no pasa.
-
-  test.fail(
-    'HALLAZGO 1 · la cifra en lux debe decir, junto a ella, que no es una medida de iluminancia',
-    async ({ page }) => {
-      // Un gris medio uniforme es EXACTAMENTE donde la exposición automática deja cualquier
-      // escena, esté la habitación a 50 lux o la calle a 80.000. La app lo convierte en
-      // «21.952 lux · Sombra exterior» y en «ISO 100 · f/8-f/16 · 1/1000-1/4000 · usa la regla
-      // sunny 16» — un consejo 8-9 pasos por debajo de lo que pide una habitación en penumbra.
-      // Toda la cautela de la página habla del «sensor de luz ambiente», que nunca se usa, y
-      // vive colapsada en el bloque educativo. Junto a la cifra no hay nada.
-      await camaraDeLuminancia(page, 'rgb(128,128,128)');
-      await abrirYMedir(page);
-      await expect(page.locator(VALOR)).toHaveText('21.952');
-
-      const panel = page.locator('[class*="meterPanel"]');
-      await expect(panel).toContainText(/exposici[óo]n autom[áa]tica|no es una medida|estimaci[óo]n relativa/i);
-    },
-  );
-
-  test.fail('HALLAZGO 2 · al detener, la cifra no puede quedarse como si midiera', async ({
+test.describe('Los 7 hallazgos del 18/09/2026, reparados el mismo día', () => {
+  test('908 · la cifra que se publica sin calibrar no se presenta como una medida', async ({
     page,
   }) => {
-    // Tras «Detener» la cámara se suelta pero el panel sigue enseñando 53.564 lux, el rótulo
-    // «Luz solar directa» y las tres tarjetas de ISO/apertura/velocidad, indefinidamente y sin
-    // ninguna marca de que la medición terminó. Medido: seguía ahí 5 s después.
-    await camaraDeLuminancia(page, 'rgb(192,192,192)');
-    await abrirYMedir(page);
-    await expect(page.locator(VALOR)).toHaveText('53.564');
-
-    await detener(page).click();
-    await expect(iniciar(page)).toBeVisible();
-    await page.waitForTimeout(1000);
-
-    await expect(page.locator(VALOR)).toHaveText('---');
-    await expect(page.locator('[class*="photoPanel"]')).toHaveCount(0);
-  });
-
-  test.fail('HALLAZGO 3 · «sin cámara» debe avisar en castellano', async ({ page }) => {
-    // El código ramifica con `errorMessage.includes('NotFound')`, pero eso es el `name` de la
-    // excepción, no su `message`: Chrome pone «Requested device not found». La rama está
-    // muerta y el usuario recibe el texto del navegador en inglés.
-    await camaraQueFalla(page, 'NotFoundError', 'Requested device not found');
-    await page.goto('/luxometro/');
-    await esperarBotonVivo(page, iniciar(page));
-    await iniciar(page).click();
-
-    await expect(page.locator(AVISO)).toContainText('No se encontró ninguna cámara.');
-  });
-
-  test.fail('HALLAZGO 4 · calibrar tiene que cambiar la cifra, no solo poner la insignia', async ({
-    page,
-  }) => {
-    // `calculateLuxFromCamera` es un useCallback con dependencia [calibrationFactor] y se
-    // reprograma a sí mismo con requestAnimationFrame: el bucle en marcha sigue llamando al
-    // cierre viejo para siempre. Calibrar pinta «Calibrado» y no toca la lectura hasta que se
-    // para y se vuelve a arrancar. Medido: 21.952 antes, 21.952 después, 500 tras reiniciar.
+    // Un gris medio uniforme es EXACTAMENTE donde la exposición automática deja cualquier
+    // escena, esté la habitación a 50 lux o la calle a 80.000. La app lo convertía en
+    // «21.952 lux · Sombra exterior» y en «ISO 100 · f/8-f/16 · usa la regla sunny 16», un
+    // consejo 8-9 pasos por debajo de lo que pide una habitación en penumbra. Toda la cautela
+    // de la página hablaba del «sensor de luz ambiente», que nunca llega a usarse, y vivía
+    // colapsada en el bloque educativo; junto a la cifra no había nada.
+    //
+    // La reparación aplica la regla del catálogo: un aviso debajo de una cifra utilizable no
+    // es una salvaguarda, es una nota al pie de un número falso. O se calcula, o no se da.
     await camaraDeLuminancia(page, 'rgb(128,128,128)');
     await abrirYMedir(page);
-    await expect(page.locator(VALOR)).toHaveText('21.952');
+
+    await expect(page.locator(VALOR)).toHaveText('50');
+    await expect(page.locator(UNIDAD)).not.toContainText(/^lux$/);
+    // Y el aviso vive JUNTO al medidor, no colapsado, nombrando la causa real.
+    const panel = page.locator('[class*="meterPanel"]');
+    await expect(panel).toContainText(/exposici[óo]n/i);
+    await expect(panel).toContainText(/no una medida en lux/i);
+  });
+
+  test('909 · calibrar cambia la cifra del bucle en marcha, no solo la insignia', async ({
+    page,
+  }) => {
+    // `calculateLuxFromCamera` era un useCallback con dependencia [calibrationFactor] que se
+    // reprogramaba con requestAnimationFrame: el bucle vivo seguía llamando al cierre viejo
+    // para siempre, así que calibrar pintaba «Calibrado» y no tocaba la lectura hasta parar y
+    // volver a arrancar. Medido entonces: 21.952 antes, 21.952 después, 500 tras reiniciar.
+    // Ahora el bucle no lee el factor —guarda la señal cruda— y la calibración se aplica al
+    // pintar, de modo que el cierre obsoleto ya no puede quedarse con un valor viejo.
+    await camaraDeLuminancia(page, 'rgb(128,128,128)');
+    await abrirYMedir(page);
+    await expect(page.locator(VALOR)).toHaveText('50');
 
     await page.getByTitle('Calibrar').click();
     // El panel de calibración monta el único input de la app: aquí sí vale el helper canónico,
@@ -425,22 +413,110 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
 
     await expect(page.locator(INSIGNIA)).toContainText('Calibrado');
     await expect(page.locator(VALOR)).toHaveText('500');
+    await expect(page.locator(UNIDAD)).toHaveText('lux');
+
+    // Y la escala queda anclada: al subir el brillo del fotograma, el lux escala con la señal.
+    // 53.564 / 21.952 × 500 = 1.220 lux. Si el bucle volviera a ignorar el factor, aquí
+    // saldría otra vez un número sin calibrar.
+    await page.evaluate(() => window.__pintarCamara?.('rgb(192,192,192)'));
+    // Ojo: es-ES no agrupa los millares hasta las cinco cifras, así que son «1220» y no «1.220».
+    await expect(page.locator(VALOR)).toHaveText('1220');
   });
 
-  test.fail('HALLAZGO 5 · la guía describe un método que la app no usa', async ({ page }) => {
-    // El paso 2 dice «El sensor suele estar en el frontal del dispositivo (junto a la cámara
-    // frontal). Orienta la pantalla hacia la fuente de luz que quieres medir». El código pide
-    // `facingMode: 'environment'`, la cámara TRASERA: siguiendo la guía se apunta justo al
-    // lado contrario de lo que se quiere medir.
-    await page.goto('/luxometro/');
-    const paso2 = page.locator('[class*="stepContent"]').filter({ hasText: 'Coloca el dispositivo' });
-    await expect(paso2).not.toContainText('Orienta la pantalla hacia la fuente de luz');
-  });
-
-  test.fail('HALLAZGO 6 · el aviso de error tiene que anunciarse a un lector de pantalla', async ({
+  test('909.bis · calibrado aparecen el rótulo de escena y las recomendaciones', async ({
     page,
   }) => {
-    // El aviso aparece en un <div> sin role ni aria-live (CLAUDE.md global §5 pide
+    // Los dos salen de los lux, así que sin calibrar no se muestran. Con la escala anclada a
+    // 500 lux, la referencia es «Interior normal» (200-500) y no «Sombra exterior».
+    await camaraDeLuminancia(page, 'rgb(128,128,128)');
+    await abrirYMedir(page);
+    await expect(page.locator('[class*="photoPanel"]')).toHaveCount(0);
+
+    await page.getByTitle('Calibrar').click();
+    await esperarHidratacion(page, [CALIBRACION]);
+    await page.locator(CALIBRACION).fill('300');
+    await esperarValorEnReact(page, CALIBRACION, '300');
+    await page.getByRole('button', { name: 'Calibrar', exact: true }).click();
+
+    await expect(page.locator(VALOR)).toHaveText('300');
+    await expect(page.locator(REFERENCIA)).toHaveText('Interior normal');
+    await expect(page.locator('[class*="photoPanel"]')).toBeVisible();
+  });
+
+  test('909.ter · quitar la calibración devuelve el nivel relativo, no un lux a factor 1', async ({
+    page,
+  }) => {
+    await camaraDeLuminancia(page, 'rgb(128,128,128)');
+    await abrirYMedir(page);
+    await page.getByTitle('Calibrar').click();
+    await esperarHidratacion(page, [CALIBRACION]);
+    await page.locator(CALIBRACION).fill('500');
+    await esperarValorEnReact(page, CALIBRACION, '500');
+    await page.getByRole('button', { name: 'Calibrar', exact: true }).click();
+    await expect(page.locator(VALOR)).toHaveText('500');
+
+    await page.getByTitle('Calibrar').click();
+    await page.getByRole('button', { name: /Quitar la calibración/ }).click();
+
+    await expect(page.locator(VALOR)).toHaveText('50');
+    await expect(page.locator(UNIDAD)).toContainText('nivel relativo');
+  });
+
+  test('910 · al detener, la lectura se marca como caducada', async ({ page }) => {
+    // Tras «Detener» la cámara se soltaba pero el panel seguía enseñando la cifra, el rótulo y
+    // las tarjetas de exposición indefinidamente y sin ninguna marca de que aquello había
+    // terminado; medido, seguía ahí 5 s después. El acta admitía dos salidas —limpiar o marcar
+    // la lectura— y se eligió marcarla: quien acaba de medir suele querer anotar el valor, y
+    // borrarlo al parar obliga a volver a encender la cámara para leer lo que ya había leído.
+    await camaraDeLuminancia(page, 'rgb(192,192,192)');
+    await abrirYMedir(page);
+    await expect(page.locator(VALOR)).toHaveText('75');
+
+    await detener(page).click();
+    await expect(iniciar(page)).toBeVisible();
+    await page.waitForTimeout(1000);
+
+    await expect(page.locator('[class*="avisoMedidor"]')).toContainText('Medición detenida');
+  });
+
+  test('911 · los umbrales normativos salen de data/ y llevan su fuente', async ({ page }) => {
+    // Estaban escritos a mano en el JSX, sin edición ni fecha, y uno mal atribuido: la app daba
+    // 100 lx como mínimo del RD 486/1997 para «zonas de paso», cuando el RD fija 25 lx de uso
+    // ocasional y 50 lx de uso habitual para vías de circulación. Y ponía 300 lx en salas de
+    // reunión, que en la UNE-EN 12464-1 son 500.
+    await page.goto('/luxometro/');
+
+    // El DataReference, que es lo que hace comprobable la cifra, y va tras el disclaimer.
+    const referencia = page.locator('[class*="dataReference"]');
+    await expect(referencia).toContainText('486/1997');
+
+    await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+    const tablas = page.locator('[class*="comparativaTable"]');
+    const rd = tablas.filter({ hasText: 'Vías de circulación de uso habitual' });
+    await expect(rd).toContainText('25 lx');
+    await expect(rd).toContainText('50 lx');
+
+    const une = tablas.filter({ hasText: 'Salas de reuniones' });
+    await expect(une).toContainText('500 lx');
+  });
+
+  test('912 · la guía describe el método que la app ejecuta de verdad', async ({ page }) => {
+    // El paso 2 decía «El sensor suele estar en el frontal del dispositivo. Orienta la pantalla
+    // hacia la fuente de luz que quieres medir», mientras el código pide facingMode
+    // 'environment', la cámara TRASERA: siguiendo la guía se apunta justo al lado contrario.
+    await page.goto('/luxometro/');
+    await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+
+    const paso2 = page.locator('[class*="stepContent"]').filter({ hasText: 'Apunta la cámara trasera' });
+    await expect(paso2).toBeVisible();
+    await expect(paso2).toContainText('no la pantalla');
+
+    const guia = page.locator('[class*="stepGuide"]');
+    await expect(guia).not.toContainText('Orienta la pantalla hacia la fuente de luz');
+  });
+
+  test('913 · el aviso de error se anuncia a un lector de pantalla', async ({ page }) => {
+    // El aviso aparecía en un <div> sin role ni aria-live (CLAUDE.md global §5 pide
     // role="alert" aria-live="polite"). Quien no ve la pantalla pulsa «Iniciar Medición» y no
     // se entera de que la cámara falló: no hay cifra, no hay sonido, no hay anuncio.
     await camaraQueFalla(page, 'NotAllowedError', 'Permission denied');
@@ -450,5 +526,35 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
 
     await expect(page.locator(AVISO)).toBeVisible();
     await expect(page.locator(AVISO)).toHaveAttribute('role', 'alert');
+    // Y la cifra vive en una región viva, para que el cambio de lectura llegue a anunciarse.
+    await expect(page.locator('[class*="luxDisplay"]')).toHaveAttribute('aria-live', 'polite');
+  });
+
+  test('914 · «sin cámara» avisa en castellano, no con el texto crudo del navegador', async ({
+    page,
+  }) => {
+    // El código ramificaba con `errorMessage.includes('NotFound')`, pero eso es el `name` de la
+    // excepción, no su `message`: Chrome pone «Requested device not found». La rama estaba
+    // muerta y el usuario recibía el inglés del navegador dentro de una app en castellano.
+    await camaraQueFalla(page, 'NotFoundError', 'Requested device not found');
+    await page.goto('/luxometro/');
+    await esperarBotonVivo(page, iniciar(page));
+    await iniciar(page).click();
+
+    await expect(page.locator(AVISO)).toContainText('No se encontró ninguna cámara');
+    await expect(page.locator(AVISO)).not.toContainText('Requested device not found');
+  });
+
+  test('914.bis · la cámara ocupada por otra app también se dice en castellano', async ({
+    page,
+  }) => {
+    // Misma familia: NotReadableError es el caso corriente de tener la cámara abierta en otra
+    // pestaña o en la app de cámara del móvil, y caía igualmente al texto en inglés.
+    await camaraQueFalla(page, 'NotReadableError', 'Could not start video source');
+    await page.goto('/luxometro/');
+    await esperarBotonVivo(page, iniciar(page));
+    await iniciar(page).click();
+
+    await expect(page.locator(AVISO)).toContainText('ocupada por otra aplicación');
   });
 });

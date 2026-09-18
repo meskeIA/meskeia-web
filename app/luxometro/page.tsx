@@ -4,7 +4,14 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './Luxometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import DataReference from '@/components/DataReference';
+import {
+  ILUMINACION_RD486_META,
+  ILUMINACION_EN12464_META,
+  NIVELES_MINIMOS_RD486,
+  NIVELES_RECOMENDADOS_EN12464,
+} from '@/data/iluminacion-normativa';
 
 // Escalas de referencia de lux
 const LUX_REFERENCES = [
@@ -94,13 +101,33 @@ export default function LuxometroPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const animationRef = useRef<number | null>(null);
 
-  const [lux, setLux] = useState<number | null>(null);
+  /**
+   * ── Por qué aquí ya no hay un estado `lux` (reparado el 18/09/2026) ──
+   *
+   * El bucle de la cámara mide la luminancia media del fotograma y la elevaba a 2,2 × 100.000
+   * para publicar una cifra en lux. Esa cifra NO era una medida de iluminancia: con la
+   * exposición y la ganancia automáticas, el sensor lleva cualquier escena al gris medio, así
+   * que un gris 128/255 daba «21.952 lux · Sombra exterior» tanto en una habitación en
+   * penumbra como en la calle. Toda la cautela de la página hablaba además del sensor de luz
+   * ambiente, que no llega a usarse nunca.
+   *
+   * Ahora se guarda la SEÑAL cruda (adimensional) y la unidad la pone la calibración:
+   *   · sin calibrar → se publica un nivel relativo 0-100 y ninguna cifra en lux;
+   *   · calibrado    → lux = señal × factor, anclado a la referencia que dio el usuario.
+   *
+   * De paso desaparece el fallo de la calibración (hallazgo 909): el bucle ya no lee el
+   * factor, así que el cierre viejo que requestAnimationFrame seguía llamando no puede
+   * quedarse con un valor obsoleto. El factor se aplica al pintar, no al medir.
+   */
+  const [senal, setSenal] = useState<number | null>(null);
   const [isActive, setIsActive] = useState(false);
+  const [lecturaCaducada, setLecturaCaducada] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [method, setMethod] = useState<'sensor' | 'camera' | null>(null);
   const [history, setHistory] = useState<number[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [calibrationFactor, setCalibrationFactor] = useState(1);
+  /** Lux por unidad de señal. `null` = sin calibrar, y entonces no se publica ningún lux. */
+  const [calibracion, setCalibracion] = useState<number | null>(null);
   const [showCalibration, setShowCalibration] = useState(false);
   const [knownLux, setKnownLux] = useState('');
 
@@ -111,8 +138,11 @@ export default function LuxometroPage() {
         // @ts-expect-error - AmbientLightSensor no está en tipos estándar
         const sensor = new AmbientLightSensor();
         sensor.addEventListener('reading', () => {
-          const luxValue = Math.round(sensor.illuminance * calibrationFactor);
-          setLux(luxValue);
+          // Este sensor SÍ entrega lux de verdad, así que su señal es directamente el lux
+          // y su factor de calibración es 1 mientras nadie lo cambie.
+          const luxValue = Math.round(sensor.illuminance);
+          setSenal(luxValue);
+          setLecturaCaducada(false);
           setHistory(prev => [...prev.slice(-59), luxValue]);
         });
         sensor.addEventListener('error', () => {
@@ -121,6 +151,7 @@ export default function LuxometroPage() {
         });
         sensor.start();
         setMethod('sensor');
+        setCalibracion(prev => prev ?? 1);
         setIsActive(true);
         setError(null);
         return true;
@@ -129,7 +160,7 @@ export default function LuxometroPage() {
       }
     }
     return false;
-  }, [calibrationFactor]);
+  }, []);
 
   // Calcular luminosidad desde imagen de cámara
   const calculateLuxFromCamera = useCallback(() => {
@@ -159,18 +190,18 @@ export default function LuxometroPage() {
     }
     const avgLuminance = totalLuminance / (data.length / 4);
 
-    // Convertir luminancia (0-1) a lux aproximado
-    // Esta es una aproximación - los valores reales dependen de la cámara
-    // Rango aproximado: 0.001 lux (muy oscuro) a 100000 lux (sol directo)
-    const estimatedLux = Math.round(
-      Math.pow(avgLuminance, 2.2) * 100000 * calibrationFactor
-    );
+    // Señal cruda: la luminancia media del fotograma linealizada (gamma 2,2) y llevada a una
+    // escala manejable. NO es iluminancia y no lleva unidad — la unidad la pone la
+    // calibración. Sin factor, este número solo sirve para comparar dos escenas medidas
+    // seguidas y sin mover el encuadre, porque la exposición automática se reajusta sola.
+    const senalCruda = Math.round(Math.pow(avgLuminance, 2.2) * 100000);
 
-    setLux(Math.max(0, estimatedLux));
-    setHistory(prev => [...prev.slice(-59), estimatedLux]);
+    setSenal(Math.max(0, senalCruda));
+    setLecturaCaducada(false);
+    setHistory(prev => [...prev.slice(-59), senalCruda]);
 
     animationRef.current = requestAnimationFrame(calculateLuxFromCamera);
-  }, [calibrationFactor]);
+  }, []);
 
   // Iniciar método de cámara
   const startCameraMethod = useCallback(async () => {
@@ -197,13 +228,20 @@ export default function LuxometroPage() {
         };
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      if (errorMessage.includes('Permission denied') || errorMessage.includes('NotAllowed')) {
+      // El navegador pone el tipo de fallo en `name` («NotAllowedError», «NotFoundError») y en
+      // `message` un texto suyo en inglés («Requested device not found»). Buscar «NotFound» en
+      // el MENSAJE dejaba esa rama muerta y el usuario recibía el inglés crudo del navegador
+      // dentro de una app en castellano (hallazgo 914).
+      const nombre = err instanceof Error ? err.name : '';
+      const detalle = err instanceof Error ? err.message : 'Error desconocido';
+      if (nombre === 'NotAllowedError' || nombre === 'SecurityError' || detalle.includes('Permission denied')) {
         setError('Permiso denegado. Permite el acceso a la cámara para medir la luz.');
-      } else if (errorMessage.includes('NotFound')) {
-        setError('No se encontró ninguna cámara.');
+      } else if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') {
+        setError('No se encontró ninguna cámara en este dispositivo.');
+      } else if (nombre === 'NotReadableError') {
+        setError('La cámara está ocupada por otra aplicación. Ciérrala y vuelve a intentarlo.');
       } else {
-        setError(`Error al acceder a la cámara: ${errorMessage}`);
+        setError(`Error al acceder a la cámara: ${detalle}`);
       }
     }
   }, [calculateLuxFromCamera]);
@@ -236,22 +274,31 @@ export default function LuxometroPage() {
 
     setIsActive(false);
     setMethod(null);
+    // La cámara ya está apagada: lo que queda en pantalla es de otro momento y de otro sitio,
+    // y sin esto se quedaba ahí con aspecto de lectura viva (hallazgo 910).
+    setLecturaCaducada(true);
   }, []);
 
-  // Calibrar con valor conocido
+  /**
+   * Calibra: el usuario dice cuántos lux hay de verdad y eso fija la escala.
+   *
+   * Se guarda «lux por unidad de señal», no un multiplicador sobre la cifra anterior, así que
+   * calibrar dos veces seguidas no acumula error. Antes tampoco llegaba a aplicarse: el bucle
+   * de medición seguía usando el factor viejo hasta que se paraba y se arrancaba de nuevo,
+   * mientras la insignia ya decía «Calibrado».
+   */
   const calibrate = useCallback(() => {
-    const known = parseFloat(knownLux);
-    if (known > 0 && lux && lux > 0) {
-      const newFactor = known / (lux / calibrationFactor);
-      setCalibrationFactor(newFactor);
+    const known = parseSpanishNumber(knownLux);
+    if (Number.isFinite(known) && known > 0 && senal !== null && senal > 0) {
+      setCalibracion(known / senal);
       setShowCalibration(false);
       setKnownLux('');
     }
-  }, [knownLux, lux, calibrationFactor]);
+  }, [knownLux, senal]);
 
-  // Resetear calibración
+  // Volver a «sin calibrar»: se retira la cifra en lux, no se pone el factor a 1
   const resetCalibration = () => {
-    setCalibrationFactor(1);
+    setCalibracion(null);
   };
 
   // Limpiar al desmontar
@@ -266,6 +313,20 @@ export default function LuxometroPage() {
     };
   }, []);
 
+  /**
+   * Lux SOLO si hay calibración. Sin ella no hay unidad que publicar, y todo lo que se
+   * deriva de los lux —el rótulo de escena, la escala de referencia y las recomendaciones
+   * de exposición— se apaga con la misma condición: nacían de una cifra que no medía nada.
+   */
+  const lux = calibracion !== null && senal !== null ? Math.round(senal * calibracion) : null;
+  /** Nivel relativo 0-100 de lo que ve la cámara. No es iluminancia y no se rotula como tal. */
+  const nivelRelativo = senal !== null ? Math.min(100, Math.round(Math.pow(senal / 100000, 1 / 2.2) * 100)) : null;
+  /** El historial guarda señales crudas: se publican en la misma unidad que el medidor. */
+  const enUnidad = (valorSenal: number): number =>
+    calibracion !== null
+      ? Math.round(valorSenal * calibracion)
+      : Math.min(100, Math.round(Math.pow(Math.max(0, valorSenal) / 100000, 1 / 2.2) * 100));
+  const unidadHistorial = calibracion !== null ? 'lux' : 'nivel relativo';
   const currentRef = lux !== null ? getCurrentReference(lux) : null;
   const photoRec = lux !== null ? getPhotoRecommendations(lux) : null;
 
@@ -286,7 +347,7 @@ export default function LuxometroPage() {
         <span className={styles.heroIcon} aria-hidden="true">💡</span>
         <h1 className={styles.title}>Luxómetro / Fotómetro</h1>
         <p className={styles.subtitle}>
-          Mide la intensidad de luz en lux con tu móvil (celular) usando el sensor del dispositivo. Ideal para fotógrafos: obtén recomendaciones de exposición según la iluminación.
+          Estima la luz de una escena con la cámara trasera de tu móvil (celular). Da un nivel relativo, y lux si lo calibras con un luxómetro de referencia. Para fotografía, orienta la exposición; no sustituye a un aparato calibrado.
         </p>
       </header>
 
@@ -303,33 +364,72 @@ export default function LuxometroPage() {
                 background: currentRef ? `linear-gradient(135deg, ${currentRef.color}22, ${currentRef.color}44)` : undefined
               }}
             >
-              {lux !== null && (
+              {senal !== null && (
                 <div
                   className={styles.meterFill}
                   style={{
-                    width: `${getMeterPercentage(lux)}%`,
+                    width: `${lux !== null ? getMeterPercentage(lux) : (nivelRelativo ?? 0)}%`,
                     background: currentRef?.color || 'var(--primary)'
                   }}
                 />
               )}
             </div>
 
-            {/* Valor principal */}
-            <div className={styles.luxDisplay}>
+            {/* Valor principal: lux solo si el usuario ha calibrado; si no, nivel relativo */}
+            <div className={styles.luxDisplay} role="status" aria-live="polite" aria-atomic="true">
               <span className={styles.luxValue}>
-                {lux !== null ? formatNumber(lux, 0) : '---'}
+                {lux !== null
+                  ? formatNumber(lux, 0)
+                  : nivelRelativo !== null
+                    ? formatNumber(nivelRelativo, 0)
+                    : '---'}
               </span>
-              <span className={styles.luxUnit}>lux</span>
+              <span className={styles.luxUnit}>
+                {lux !== null ? 'lux' : nivelRelativo !== null ? '/ 100 (nivel relativo)' : 'lux'}
+              </span>
             </div>
 
             {/* Referencia actual */}
             {currentRef && lux !== null && (
               <div className={styles.referenceDisplay}>
-                <span className={styles.refIcon}>{currentRef.icon}</span>
+                <span className={styles.refIcon} aria-hidden="true">{currentRef.icon}</span>
                 <span className={styles.refLabel}>{currentRef.label}</span>
               </div>
             )}
+
+            {lecturaCaducada && senal !== null && (
+              <p className={styles.avisoMedidor} role="status">
+                Medición detenida: esta lectura es de hace un momento y la cámara ya está apagada.
+              </p>
+            )}
           </div>
+
+          {/*
+            El aviso que faltaba, y va AQUÍ y no colapsado en el bloque educativo: la cifra no
+            se sostiene sola. Lo que la anula es justo que sea función del brillo del píxel —la
+            exposición automática lleva cualquier escena al gris medio, esté la habitación a
+            50 lux o la calle a 80.000—, y eso no se arregla con un margen de error.
+          */}
+          {senal !== null && lux === null && (
+            <div className={styles.avisoEscala} role="note">
+              <strong><span aria-hidden="true">📐</span> Esto es un nivel relativo, no una medida en lux.</strong>{' '}
+              La cámara ajusta sola la exposición y la ganancia, así que el brillo del fotograma
+              no dice cuánta luz hay: dice cuánta luz ve la cámara <em>después</em> de
+              compensarla. Para obtener lux hay que anclar la escala con el botón{' '}
+              <span aria-hidden="true">⚙️</span> <strong>Calibrar</strong>, dando el valor de un
+              luxómetro de referencia en esta misma escena.
+            </div>
+          )}
+
+          {lux !== null && method === 'camera' && (
+            <div className={styles.avisoEscala} role="note">
+              <strong><span aria-hidden="true">⚠️</span> Calibrado para esta escena.</strong>{' '}
+              La calibración ancla la escala en las condiciones en que se hizo. Si cambias de
+              habitación, de encuadre o de distancia, la cámara vuelve a reajustar su exposición
+              y hay que calibrar otra vez. No sustituye a un luxómetro: para acreditar el
+              cumplimiento de una norma hace falta un aparato con certificado de trazabilidad.
+            </div>
+          )}
 
           {/* Video oculto para cámara */}
           <video
@@ -342,8 +442,10 @@ export default function LuxometroPage() {
           <canvas ref={canvasRef} style={{ display: 'none' }} />
 
           {/* Error */}
+          {/* role=alert: quien no ve la pantalla pulsa «Iniciar» y sin esto no se entera de
+              que la cámara falló — no hay cifra, no hay sonido y el mensaje no se lee. */}
           {error && (
-            <div className={styles.errorMessage}>
+            <div className={styles.errorMessage} role="alert" aria-live="polite">
               <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
@@ -364,6 +466,7 @@ export default function LuxometroPage() {
                   onClick={() => setShowHistory(!showHistory)}
                   className={`${styles.btnIcon} ${showHistory ? styles.active : ''}`}
                   title="Ver historial"
+                  aria-label="Ver el historial de lecturas"
                   aria-pressed={showHistory}
                 >
                   📊
@@ -373,6 +476,7 @@ export default function LuxometroPage() {
                   onClick={() => setShowCalibration(!showCalibration)}
                   className={`${styles.btnIcon} ${showCalibration ? styles.active : ''}`}
                   title="Calibrar"
+                  aria-label="Abrir la calibración"
                   aria-pressed={showCalibration}
                 >
                   ⚙️
@@ -384,8 +488,12 @@ export default function LuxometroPage() {
           {/* Método activo */}
           {isActive && method && (
             <div className={styles.methodBadge}>
-              {method === 'sensor' ? '📱 Sensor de luz' : '📷 Cámara'}
-              {calibrationFactor !== 1 && (
+              {method === 'sensor' ? (
+                <><span aria-hidden="true">📱</span> Sensor de luz</>
+              ) : (
+                <><span aria-hidden="true">📷</span> Cámara trasera</>
+              )}
+              {calibracion !== null && method === 'camera' && (
                 <span className={styles.calibratedBadge}>Calibrado</span>
               )}
             </div>
@@ -395,22 +503,32 @@ export default function LuxometroPage() {
           {showCalibration && isActive && (
             <div className={styles.calibrationPanel}>
               <h3>Calibración</h3>
-              <p>Si tienes un luxómetro de referencia, introduce el valor real para calibrar:</p>
+              <p>
+                Es lo que convierte el nivel relativo en lux. Apunta la cámara a donde tengas un
+                luxómetro de referencia midiendo, escribe su valor y pulsa Calibrar:
+              </p>
+              <label className={styles.calibrationLabel} htmlFor="lux-referencia">
+                Valor real en lux, medido con un luxómetro
+              </label>
               <div className={styles.calibrationRow}>
+                {/* type="text" + inputMode, no type="number": en un campo numérico el navegador
+                    normaliza «1,5» a «1.5» y parseSpanishNumber lee el punto como millar. */}
                 <input
-                  type="number"
+                  id="lux-referencia"
+                  type="text"
+                  inputMode="decimal"
                   value={knownLux}
                   onChange={(e) => setKnownLux(e.target.value)}
-                  placeholder="Valor real en lux"
+                  placeholder="Por ejemplo, 500"
                   className={styles.calibrationInput}
                 />
                 <button type="button" onClick={calibrate} className={styles.btnSmall}>
                   Calibrar
                 </button>
               </div>
-              {calibrationFactor !== 1 && (
+              {calibracion !== null && (
                 <button type="button" onClick={resetCalibration} className={styles.btnSmallDanger}>
-                  Resetear calibración
+                  Quitar la calibración (vuelve al nivel relativo)
                 </button>
               )}
             </div>
@@ -419,21 +537,21 @@ export default function LuxometroPage() {
           {/* Historial mini */}
           {showHistory && history.length > 0 && (
             <div className={styles.historyPanel}>
-              <h3>Historial (últimos 60 segundos)</h3>
+              <h3>Historial (últimos 60 segundos) · {unidadHistorial}</h3>
               <div className={styles.historyChart}>
                 {history.map((val, idx) => (
                   <div
                     key={idx}
                     className={styles.historyBar}
-                    style={{ height: `${getMeterPercentage(val)}%` }}
-                    title={`${formatNumber(val, 0)} lux`}
+                    style={{ height: `${getMeterPercentage(enUnidad(val))}%` }}
+                    title={`${formatNumber(enUnidad(val), 0)} ${unidadHistorial}`}
                   />
                 ))}
               </div>
               <div className={styles.historyStats}>
-                <span>Mín: {formatNumber(Math.min(...history), 0)}</span>
-                <span>Máx: {formatNumber(Math.max(...history), 0)}</span>
-                <span>Media: {formatNumber(history.reduce((a, b) => a + b, 0) / history.length, 0)}</span>
+                <span>Mín: {formatNumber(enUnidad(Math.min(...history)), 0)}</span>
+                <span>Máx: {formatNumber(enUnidad(Math.max(...history)), 0)}</span>
+                <span>Media: {formatNumber(enUnidad(history.reduce((a, b) => a + b, 0) / history.length), 0)}</span>
               </div>
             </div>
           )}
@@ -491,7 +609,7 @@ export default function LuxometroPage() {
 
       {/* Aviso de privacidad */}
       <div className={styles.privacyInfo}>
-        <h3>🔒 Tu privacidad es importante</h3>
+        <h3><span aria-hidden="true">🔒</span> Tu privacidad es importante</h3>
         <ul>
           <li>✓ El video de la cámara NO se envía a ningún servidor</li>
           <li>✓ Todo el procesamiento ocurre en tu dispositivo</li>
@@ -507,7 +625,15 @@ export default function LuxometroPage() {
         collapsible={true}
       />
 
-      
+      <DataReference
+        normativa="Niveles de iluminación en lugares de trabajo"
+        fuente={`${ILUMINACION_RD486_META.fuente} · ${ILUMINACION_EN12464_META.fuente}`}
+        verificado={ILUMINACION_RD486_META.verificado}
+        urlOficial={ILUMINACION_RD486_META.urlOficial}
+        nota={ILUMINACION_RD486_META.nota}
+      />
+
+
 
       {/* Contenido educativo */}
       <EducationalSection
@@ -588,30 +714,88 @@ export default function LuxometroPage() {
           </table>
         </div>
 
+        {/* Niveles normativos — salen de data/iluminacion-normativa.ts, no del JSX */}
+        <h3>Cuánta luz exige la norma en un lugar de trabajo</h3>
+        <p>
+          El <strong>RD 486/1997</strong> es el mínimo legal en España y la{' '}
+          <strong>UNE-EN 12464-1</strong> una recomendación técnica bastante más alta. Estar por
+          debajo de la segunda no significa incumplir la primera.
+        </p>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <caption className={styles.tableCaption}>
+              Mínimos legales del RD 486/1997 (Anexo IV) — se duplican si hay riesgo de caídas o
+              choques, si un error visual puede ser peligroso o si el contraste con el fondo es muy débil
+            </caption>
+            <thead>
+              <tr>
+                <th>Zona o tarea</th>
+                <th>Mínimo (lx)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {NIVELES_MINIMOS_RD486.map(nivel => (
+                <tr key={nivel.zona}>
+                  <td>
+                    <strong>{nivel.zona}</strong>
+                    {nivel.nota && <><br /><small>{nivel.nota}</small></>}
+                  </td>
+                  <td>{formatNumber(nivel.lux, 0)} lx</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <caption className={styles.tableCaption}>
+              Iluminancia mantenida recomendada por la UNE-EN 12464-1 ({ILUMINACION_EN12464_META.vigencia})
+              para los puestos de oficina más habituales
+            </caption>
+            <thead>
+              <tr>
+                <th>Puesto o actividad</th>
+                <th>Recomendado (lx)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {NIVELES_RECOMENDADOS_EN12464.map(nivel => (
+                <tr key={nivel.zona}>
+                  <td>
+                    <strong>{nivel.zona}</strong>
+                    {nivel.nota && <><br /><small>{nivel.nota}</small></>}
+                  </td>
+                  <td>{formatNumber(nivel.lux, 0)} lx</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>📸 Fotografía en exteriores</h3>
+            <h3><span aria-hidden="true">📸</span> Fotografía en exteriores</h3>
             <p>Mide la luz antes de configurar tu cámara. El luxómetro te da el EV (Exposure Value) que necesitas, ahorrando disparos de prueba. Especialmente útil al cambiar de sombra a sol directo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏠 Diseño de interiores</h3>
-            <p>Verifica que el nivel de iluminación cumple los estándares de bienestar visual. La normativa europea (EN 12464-1) establece mínimos por actividad: 500 lx para oficinas, 300 lx para salas de reunión.</p>
+            <h3><span aria-hidden="true">🏠</span> Diseño de interiores</h3>
+            <p>Compara el reparto de luz entre zonas de una misma estancia. La norma técnica EN 12464-1 recomienda por actividad: {formatNumber(NIVELES_RECOMENDADOS_EN12464[3].lux, 0)} lx para escritura y pantalla, los mismos {formatNumber(NIVELES_RECOMENDADOS_EN12464[4].lux, 0)} lx en salas de reuniones, {formatNumber(NIVELES_RECOMENDADOS_EN12464[2].lux, 0)} lx en un mostrador de recepción y {formatNumber(NIVELES_RECOMENDADOS_EN12464[0].lux, 0)} lx en archivo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>💻 Ergonomía en el trabajo</h3>
-            <p>Niveles de luz inadecuados causan fatiga visual, dolores de cabeza y reducen la productividad. Mide tu puesto de trabajo y compara con los 500 lx recomendados por el INSST (España).</p>
+            <h3><span aria-hidden="true">💻</span> Ergonomía en el trabajo</h3>
+            <p>Un puesto mal iluminado cansa la vista. El mínimo <em>legal</em> del RD 486/1997 para una tarea con exigencias visuales altas son {formatNumber(NIVELES_MINIMOS_RD486[2].lux, 0)} lx, y la recomendación técnica para escritura y pantalla coincide en {formatNumber(NIVELES_RECOMENDADOS_EN12464[3].lux, 0)} lx. Para afirmar si tu mesa llega hace falta una medida en lux, o sea, calibrar esta app contra un luxómetro o usar directamente el luxómetro.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🌱 Cultivo de plantas de interior</h3>
+            <h3><span aria-hidden="true">🌱</span> Cultivo de plantas de interior</h3>
             <p>Las plantas necesitan distintos niveles de luz: suculentas (10.000+ lx), plantas de sombra (500-2.000 lx), hierbas aromáticas (5.000-10.000 lx). Verifica si tu ventana da suficiente luz natural.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎬 Producción audiovisual</h3>
+            <h3><span aria-hidden="true">🎬</span> Producción audiovisual</h3>
             <p>Antes de iluminar un set, mide la luz ambiente. Conocer el nivel base te ayuda a decidir cuánta iluminación artificial añadir y dónde colocar los focos para conseguir la exposición objetivo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔬 Experimento educativo</h3>
+            <h3><span aria-hidden="true">🔬</span> Experimento educativo</h3>
             <p>Compara cómo varía la iluminancia a distintas distancias de una bombilla (ley del cuadrado inverso: duplicar la distancia divide la iluminación por 4). Ideal para clases de física óptica.</p>
           </div>
         </div>
@@ -636,7 +820,7 @@ export default function LuxometroPage() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Cuántos lux necesito en mi oficina según la normativa española?</h3>
-            <p>El Real Decreto 486/1997 y la norma UNE-EN 12464-1 establecen: zonas de paso 100 lx, trabajos de oficina general 500 lx, trabajo con pantallas 500 lx (con control de deslumbramiento), planos de dibujo técnico 750 lx. El INSST recomienda medir con el luxómetro a la altura del plano de trabajo.</p>
+            <p>Hay que separar dos cosas que se citan juntas y no son lo mismo. El <strong>RD 486/1997</strong> fija los <strong>mínimos legales</strong>, y son bajos: {formatNumber(NIVELES_MINIMOS_RD486[6].lux, 0)} lx para vías de circulación de uso ocasional, {formatNumber(NIVELES_MINIMOS_RD486[7].lux, 0)} lx si el paso es habitual, {formatNumber(NIVELES_MINIMOS_RD486[5].lux, 0)} lx en locales de uso habitual y {formatNumber(NIVELES_MINIMOS_RD486[2].lux, 0)} lx en tareas con exigencias visuales altas. Y el propio anexo obliga a <strong>duplicarlos</strong> cuando hay riesgo de caídas o choques, cuando un error visual puede ser peligroso, o cuando el contraste con el fondo es muy débil. La <strong>UNE-EN 12464-1</strong> es norma técnica de buena práctica, no obligación en sí misma, y ahí sí aparecen los {formatNumber(NIVELES_RECOMENDADOS_EN12464[3].lux, 0)} lx de escritura, lectura y pantalla o los {formatNumber(NIVELES_RECOMENDADOS_EN12464[5].lux, 0)} lx del dibujo técnico. El INSST recomienda medir a la altura del plano de trabajo, con un luxómetro.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿La luz artificial afecta igual que la natural al bienestar?</h3>
@@ -658,28 +842,28 @@ export default function LuxometroPage() {
             <div className={styles.stepNumber}>1</div>
             <div className={styles.stepContent}>
               <h3>Abre el luxómetro en tu móvil o celular</h3>
-              <p>El sensor de luz ambiente debe estar disponible en tu dispositivo (móvil o celular). El navegador puede pedir permiso para acceder al sensor. Concédelo.</p>
+              <p>El navegador pedirá permiso para usar la <strong>cámara</strong>. La app intenta primero el sensor de luz ambiente, pero hoy ningún navegador de uso común lo expone —en Chrome está tras un flag y en Safari y Firefox no existe—, así que en la práctica siempre mide con la cámara. La insignia bajo el medidor dice cuál está usando.</p>
             </div>
           </div>
           <div className={styles.step}>
             <div className={styles.stepNumber}>2</div>
             <div className={styles.stepContent}>
-              <h3>Coloca el dispositivo en el punto de medición</h3>
-              <p>El sensor suele estar en el frontal del dispositivo (junto a la cámara frontal). Orienta la pantalla hacia la fuente de luz que quieres medir.</p>
+              <h3>Apunta la cámara trasera a la superficie que quieres evaluar</h3>
+              <p>Mide la cámara de atrás, no la pantalla: si orientas la pantalla hacia la luz, la cámara que mide queda mirando justo al lado contrario. Para un puesto de trabajo, encuadra la mesa desde donde estaría la cabeza; llena el encuadre con la superficie, sin ventanas ni lámparas dentro del cuadro.</p>
             </div>
           </div>
           <div className={styles.step}>
             <div className={styles.stepNumber}>3</div>
             <div className={styles.stepContent}>
-              <h3>Lee el valor en lux</h3>
-              <p>Espera 2-3 segundos a que el sensor se estabilice. Anota el valor. Para mayor precisión, toma varias lecturas y calcula la media.</p>
+              <h3>Espera a que la exposición se estabilice y lee</h3>
+              <p>Dale 2-3 segundos: la cámara ajusta sola la exposición y la ganancia al cambiar de encuadre, y ese reajuste es justo lo que hace que el número se mueva. Sin calibrar verás un nivel relativo de 0 a 100, útil para comparar dos puntos de la misma habitación seguidos.</p>
             </div>
           </div>
           <div className={styles.step}>
             <div className={styles.stepNumber}>4</div>
             <div className={styles.stepContent}>
-              <h3>Consulta la tabla de referencia</h3>
-              <p>Compara el valor medido con la tabla de entornos (oficina, exterior nublado, sol directo...) para interpretar qué tipo de iluminación tienes.</p>
+              <h3>Calibra si necesitas lux</h3>
+              <p>Con el botón <span aria-hidden="true">⚙️</span> introduce lo que marque un luxómetro de referencia en esa misma escena. A partir de ahí la app publica lux y aparecen la escala de entornos y las recomendaciones de exposición, que salen de esa cifra. Sin calibrar no se muestran, porque serían un número sin unidad disfrazado de medida.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -699,8 +883,8 @@ export default function LuxometroPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>7</div>
             <div className={styles.stepContent}>
-              <h3>Verifica el bienestar visual en interiores</h3>
-              <p>Si mides tu puesto de trabajo o aula, compara con los mínimos normativos (500 lx para oficina). Si hay menos luz, considera añadir iluminación suplementaria.</p>
+              <h3>Para juzgar un puesto de trabajo, hace falta un luxómetro de verdad</h3>
+              <p>Los mínimos legales son del RD 486/1997 y las recomendaciones técnicas de la UNE-EN 12464-1 (las tienes más abajo). Comparar con ellos exige una medida en lux, y esta app solo la da calibrada contra otro aparato. Sin esa referencia sirve para detectar que un rincón está claramente peor que otro, no para afirmar que se cumple o se incumple la norma: eso pide un luxómetro con certificado de trazabilidad.</p>
             </div>
           </div>
         </div>
@@ -708,38 +892,39 @@ export default function LuxometroPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>📍 Mide en el plano de trabajo</h3>
+            <h3><span aria-hidden="true">📍</span> Mide en el plano de trabajo</h3>
             <p>Para evaluar iluminación de oficina, mide a la altura de la superficie de trabajo (70-75 cm del suelo), no en el suelo ni en el techo.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⏱️ Espera la estabilización</h3>
+            <h3><span aria-hidden="true">⏱️</span> Espera la estabilización</h3>
             <p>Los sensores de luz ambiente tienen un tiempo de respuesta. Espera 2-3 segundos tras cambiar de posición para que el valor se estabilice antes de leerlo.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🌡️ Nota la temperatura de color</h3>
+            <h3><span aria-hidden="true">🌡️</span> Nota la temperatura de color</h3>
             <p>Lux mide cantidad, no calidad. Dos fuentes con los mismos lux pueden dar sensaciones muy diferentes si una es cálida (2.700K) y otra fría (6.500K).</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📷 Usa el EV como punto de partida</h3>
+            <h3><span aria-hidden="true">📷</span> Usa el EV como punto de partida</h3>
             <p>El EV calculado da la exposición &quot;técnicamente correcta&quot;. En fotografía creativa, sobreexponer o subexponer 1-2 EV es una decisión artística válida.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔄 Mide en varios puntos</h3>
+            <h3><span aria-hidden="true">🔄</span> Mide en varios puntos</h3>
             <p>La iluminación varía dentro de una misma habitación. Toma mediciones en varios puntos para obtener un mapa de la distribución lumínica del espacio.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🌿 Cuida las plantas con datos</h3>
+            <h3><span aria-hidden="true">🌿</span> Cuida las plantas con datos</h3>
             <p>Si tus plantas no florecen o tienen hojas amarillas, puede ser falta de luz. Mide en el punto donde están y compara con sus necesidades específicas.</p>
           </div>
         </div>
 
         {/* Aviso importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Limitaciones del sensor del navegador</h3>
+          <h3><span aria-hidden="true">⚠️</span> Qué mide de verdad esta página, y qué no</h3>
           <ul className={styles.warningList}>
-            <li>El sensor de luz ambiente del dispositivo no está calibrado para uso profesional. Los valores son orientativos.</li>
-            <li>Para mediciones con validez legal (certificación de puestos de trabajo, cumplimiento normativo UNE-EN 12464) se requiere un luxómetro calibrado con certificado de trazabilidad.</li>
-            <li>La disponibilidad del sensor varía según dispositivo y navegador. No todos los dispositivos exponen este sensor al navegador.</li>
+            <li><strong>Mide con la cámara, no con el sensor de luz ambiente.</strong> La API <code>AmbientLightSensor</code> está tras un flag en Chrome y no existe en Safari ni en Firefox, así que el camino que se ejecuta es siempre el de la cámara trasera. La insignia bajo el medidor lo dice en cada arranque.</li>
+            <li><strong>La cámara compensa sola la luz.</strong> Exposición y ganancia automáticas llevan cualquier escena al gris medio: un brillo de fotograma parecido puede corresponder a una habitación en penumbra o a la calle. Por eso, sin calibrar, esta página publica un nivel relativo de 0 a 100 y ninguna cifra en lux.</li>
+            <li><strong>Calibrar ancla la escala, y solo para esa escena.</strong> Si cambias de sitio, de encuadre o de distancia, la cámara vuelve a reajustarse y la calibración deja de valer.</li>
+            <li><strong>No sirve para acreditar el cumplimiento de una norma.</strong> Certificar un puesto de trabajo exige un luxómetro con certificado de trazabilidad, y eso no lo sustituye ninguna app.</li>
             <li>Las configuraciones fotográficas sugeridas son puntos de partida basados en la ley de exposición; las condiciones reales pueden requerir ajustes.</li>
           </ul>
         </div>
@@ -754,28 +939,28 @@ export default function LuxometroPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🌙 Luz muy baja (&lt;50 lux)</h4>
+              <h4><span aria-hidden="true">🌙</span> Luz muy baja (&lt;50 lux)</h4>
               <p>
                 Noches, interiores muy oscuros. Requiere ISO alto, aperturas grandes
                 y velocidades lentas. Considera usar trípode.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💡 Luz interior (50-500 lux)</h4>
+              <h4><span aria-hidden="true">💡</span> Luz interior (50-500 lux)</h4>
               <p>
                 Hogares, oficinas con luz artificial. Configuración intermedia.
                 Ideal para retratos con luz suave y difusa.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>☁️ Exterior nublado (1.000-10.000 lux)</h4>
+              <h4><span aria-hidden="true">☁️</span> Exterior nublado (1.000-10.000 lux)</h4>
               <p>
                 Luz natural difusa, excelente para fotografía. Sombras suaves,
                 colores naturales. ISO 100-400 funciona bien.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>☀️ Sol directo (50.000+ lux)</h4>
+              <h4><span aria-hidden="true">☀️</span> Sol directo (50.000+ lux)</h4>
               <p>
                 Máxima intensidad. Usa la regla Sunny 16: a ISO 100, f/16 y
                 velocidad 1/100s. Considera filtros ND.
@@ -823,23 +1008,23 @@ export default function LuxometroPage() {
           </p>
           <div className={styles.sunny16Table}>
             <div className={styles.sunny16Row}>
-              <span>☀️ Sol directo</span>
+              <span><span aria-hidden="true">☀️</span> Sol directo</span>
               <span>f/16</span>
             </div>
             <div className={styles.sunny16Row}>
-              <span>⛅ Sol con nubes ligeras</span>
+              <span><span aria-hidden="true">⛅</span> Sol con nubes ligeras</span>
               <span>f/11</span>
             </div>
             <div className={styles.sunny16Row}>
-              <span>🌥️ Nublado brillante</span>
+              <span><span aria-hidden="true">🌥️</span> Nublado brillante</span>
               <span>f/8</span>
             </div>
             <div className={styles.sunny16Row}>
-              <span>☁️ Nublado</span>
+              <span><span aria-hidden="true">☁️</span> Nublado</span>
               <span>f/5.6</span>
             </div>
             <div className={styles.sunny16Row}>
-              <span>🌧️ Muy nublado / sombra</span>
+              <span><span aria-hidden="true">🌧️</span> Muy nublado / sombra</span>
               <span>f/4</span>
             </div>
           </div>

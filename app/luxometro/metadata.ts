@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Luxómetro Online - Mide la Intensidad de Luz con tu Móvil o Celular | meskeIA',
-  description: 'Mide la intensidad de luz en lux con tu móvil o celular usando el sensor del dispositivo. Ideal para fotógrafos: incluye recomendaciones de ISO, apertura y velocidad según la iluminación.',
+  description: 'Estima la luz de una escena con la cámara trasera de tu móvil o celular: nivel relativo, y lux si lo calibras con un luxómetro de referencia. Para fotógrafos, con recomendaciones de ISO, apertura y velocidad.',
   keywords: 'luxometro, luxometro celular, fotometro, medir luz, intensidad luminosa, lux, luxometro movil, fotografia, exposicion, iso, apertura, velocidad obturacion, iluminacion',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Luxómetro / Fotómetro",
-  description: "Mide la intensidad de luz en lux con tu dispositivo. Ideal para fotógrafos: incluye recomendaciones de ISO, apertura y velocidad según la iluminación.",
+  description: "Estima la luz de una escena con la cámara de tu dispositivo. Publica un nivel relativo y, una vez calibrada con un luxómetro de referencia, la lectura en lux. Para fotógrafos, con recomendaciones de ISO, apertura y velocidad.",
   url: "https://meskeia.com/luxometro/",
   category: 'UtilityApplication',
   features: [],
@@ -54,7 +54,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Cómo funciona un luxómetro online?',
-      acceptedAnswer: { '@type': 'Answer', text: 'El luxómetro online utiliza el sensor de luz del propio dispositivo (cámara o sensor de luz ambiente) para estimar la iluminancia. El navegador accede a la cámara y analiza el brillo medio de los fotogramas para convertirlo en una estimación en lux. La precisión es orientativa y puede variar según el dispositivo, pero resulta suficiente para detectar cambios significativos de iluminación.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Analiza el brillo medio de los fotogramas de la cámara. Eso tiene un límite que conviene conocer: la cámara ajusta sola la exposición y la ganancia, así que lleva cualquier escena hacia el gris medio y el brillo del fotograma no basta para deducir cuánta luz hay. Por eso, sin calibrar, una medición honesta solo puede dar un nivel relativo; para obtener lux hay que anclar la escala con el valor de un luxómetro de referencia medido en esa misma escena. La API de sensor de luz ambiente daría la iluminancia directamente, pero ningún navegador de uso común la expone hoy.' },
     },
     {
       '@type': 'Question',
@@ -69,7 +69,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Es fiable un luxómetro de móvil o celular frente a uno profesional?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Un luxómetro de móvil o celular ofrece mediciones orientativas, no de laboratorio. Los sensores de los smartphones no están calibrados para medición científica precisa, por lo que el margen de error puede ser del 20-40% respecto a un luxómetro profesional calibrado. Para usos cotidianos (fotografía amateur, revisión de iluminación de oficina o plantas) la precisión es más que suficiente; para mediciones normativas o industriales es preferible usar un fotómetro certificado.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'No es el mismo instrumento. Un luxómetro tiene un fotodiodo con respuesta espectral corregida y ganancia fija; un móvil mide con una cámara que reajusta la exposición sola, y ese reajuste es justo lo que impide deducir la iluminancia del brillo de la imagen. Calibrado contra una referencia y sin mover el encuadre sirve para comparar puntos de una misma estancia; para acreditar el cumplimiento de una norma de iluminación en un puesto de trabajo hace falta un aparato con certificado de trazabilidad.' },
     },
   ],
 };
