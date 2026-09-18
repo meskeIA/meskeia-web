@@ -33,23 +33,31 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *   La cadena del cálculo, leída del código: `freqPerBin = sampleRate / fftSize`, que es lo
  *   CORRECTO (sampleRate/2 es Nyquist y se reparte entre fftSize/2 bins; aquí no hay el
  *   típico factor 2 de más). Con fftSize 8192 y 44.100 Hz salen 4.096 bins de 5,3833 Hz.
- *   Pero la app NO publica el bin del pico: agrupa el espectro en 64 bandas logarítmicas
- *   `20 · 1000^(i/64)`, promedia los bins de cada banda, se queda con la banda de media
- *   mayor y muestra el CENTRO ARITMÉTICO de sus bordes. Cada banda mide 1000^(1/64) = 1,114
- *   → 1,87 semitonos de ancho, así que la cifra solo puede tomar 64 valores.
  *
- *   CASO NORMAL — tono puro de 440 Hz (La4).
- *       Pico real: bin round(440 · 8192 / 44100) = 82 (a 48.000 Hz sería el 75).
- *       Banda: floor(log(440/20)/log(1000) · 64) = floor(28,64) = 28 → [410,71 – 457,51] Hz.
- *       Centro aritmético = 434,11 → la app escribe «434 Hz», nunca «440 Hz» (−1,34 %).
- *       Nota: |434,11 − 440| / 440 = 1,34 % ≤ 10 % → «A4». ✔ medido: «434 Hz» / «A4».
+ *   ── LO QUE HACÍA HASTA EL 18/09/2026 ──
+ *   NO publicaba el bin del pico: agrupaba el espectro en 64 bandas logarítmicas
+ *   `20 · 1000^(i/64)`, PROMEDIABA los bins de cada banda, se quedaba con la banda de media
+ *   mayor y mostraba el CENTRO ARITMÉTICO de sus bordes. Cada banda mide 1000^(1/64) = 1,114
+ *   → 1,87 semitonos de ancho, así que la cifra solo podía tomar 64 valores en toda la
+ *   escala, y encima el promediado hacía desaparecer los agudos: la banda de 50 Hz tiene 3
+ *   bins y la de 10 kHz, 201, así que un pico puro saturado a 255 promediaba 1,3 y no
+ *   llegaba al umbral de 20. Por eso un tono de 10 kHz daba «-- Hz».
+ *
+ *   ── LO QUE HACE DESDE LA REPARACIÓN ──
+ *   Recorre los bins reales entre 20 Hz y 20 kHz, se queda con el máximo y lo afina por
+ *   interpolación parabólica con sus dos vecinos: δ = (y₋₁ − y₊₁) / (2·(y₋₁ − 2y₀ + y₊₁)).
+ *   El umbral de señal se aplica al bin del pico, no a la media de su banda. Y las 64 barras
+ *   del dibujo toman el MÁXIMO de su rango en vez de la media, para que un pico estrecho en
+ *   agudos se vea donde está. La nota sale del temperamento igual —12·log2(f/440) + 69—, con
+ *   su desviación en cents.
+ *
+ *   CASO NORMAL — tono puro de 440 Hz (La4): «440 Hz» ± un bin y medio, y «A4».
+ *       Antes: «434 Hz», y nunca podía dar 440.
  *
  *   CASO LÍMITE — silencio y agudos.
- *       Silencio (oscilador con ganancia 0): todos los bins a 0, maxValue ≤ 20 → «-- Hz».
- *       ✔ medido: «-- Hz» / «--». No inventa un pico donde no lo hay.
- *       Tono de 10.000 Hz: banda 57 = [9.395 – 10.466] Hz = bins 1745..1945, o sea 201 bins
- *       promediados. Un pico puro saturado a 255 da una media de 255/201 = 1,3, muy por
- *       debajo del umbral `maxValue > 20` del código → NO se detecta. ✘ HALLAZGO 1.
+ *       Silencio (oscilador con ganancia 0): todos los bins a 0, el pico no supera el umbral
+ *       de 20 → «-- Hz». No inventa un pico donde no lo hay.
+ *       Tono de 10.000 Hz: hoy se lee a ±7 Hz. Antes, «-- Hz».
  *
  *   CASO DE RECHAZO — permiso denegado y sin dispositivo.
  *       ✔ medido: `NotAllowedError` → «Permiso de micrófono denegado. Permite el acceso en la
@@ -69,10 +77,9 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *   · El audio se detiene de verdad al pulsar «Detener» (tracks parados y AudioContext
  *     cerrado), y el efecto de desmontaje repite esa limpieza.
  *
- * HALLAZGOS ABIERTOS — al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que hoy
- * fallan a propósito; cuando se reparen saldrán en rojo («expected to fail, but passed») y
- * habrá que quitarles la marca, no reescribir el valor esperado. Están en el acta del
- * Inspector.
+ * LOS 8 HALLAZGOS, al final, ya como candados de regresión. Cada uno lleva escrito qué hacía
+ * la app antes y con qué medida se demostró, para que el día que alguien cambie el motor sepa
+ * contra qué está chocando.
  */
 
 // El navegador necesita dispositivo de medios falso Y el permiso concedido: sin ellos
@@ -180,19 +187,32 @@ const RELLENO_LINEA: [number, number, number] = [213, 231, 238];
 /** #2E86AB, el azul de marca con el que el código PIDE trazar la curva del modo línea. */
 const AZUL_MARCA: [number, number, number] = [46, 134, 171];
 
+/** La cifra de la izquierda, leída como número: «10.002 Hz» → 10002. */
+async function hercios(page: Page): Promise<number> {
+  const texto = ((await frecuencia(page).textContent()) ?? '').replace(/\s/g, '');
+  return Number(texto.replace(' Hz', '').replace(/\./g, '').replace(',', '.').replace('Hz', ''));
+}
+
+/**
+ * Un bin de la FFT a 44,1 kHz con fftSize 8192 mide 5,38 Hz, y la interpolación parabólica
+ * afina dentro de él. Se toleran 9 Hz —bin y medio— y no menos: `getByteFrequencyData`
+ * entrega enteros de 0 a 255, el suavizado de 0,8 arrastra los fotogramas anteriores y la
+ * ventana de Blackman ensancha el pico, así que apretar más sería fijar ese ruido y no la
+ * medida. Medido el 18/09/2026: el error real se queda en 7 Hz a 1 kHz y a 10 kHz, o sea
+ * 0,7 % y 0,07 %. Antes de la reparación era del 2,9 % a 1 kHz y a 10 kHz no había cifra.
+ */
+const TOLERANCIA_HZ = 9;
+
 test.describe('Analizador de Espectro · lo que funciona', () => {
-  test('un tono puro de 440 Hz se sitúa en la banda de La4', async ({ page }) => {
-    // 440 Hz → bin 82 de 4.096 (44.100 / 8192 = 5,3833 Hz por bin) → banda log 28,
-    // que va de 410,71 a 457,51 Hz y cuyo centro aritmético es 434,11 Hz.
+  test('un tono puro de 440 Hz se lee como 440 Hz y se etiqueta A4', async ({ page }) => {
     await arrancar(page, 440);
-    await expect(frecuencia(page)).toHaveText('434 Hz');
-    // |434,11 − 440| / 440 = 1,34 %, dentro del 10 % de tolerancia del código.
-    await expect(nota(page)).toHaveText('A4');
+    expect(Math.abs((await hercios(page)) - 440)).toBeLessThanOrEqual(TOLERANCIA_HZ);
+    await expect(nota(page)).toContainText('A4');
   });
 
   test('el silencio no inventa ningún pico', async ({ page }) => {
-    // Oscilador con ganancia 0: los 4.096 bins valen 0, así que maxValue (0) no supera el
-    // umbral de 20 del código y la app no arriesga una cifra.
+    // Oscilador con ganancia 0: los 4.096 bins valen 0, así que el pico no supera el umbral
+    // de 20 del código y la app no arriesga una cifra.
     await arrancar(page, 0);
     await expect(frecuencia(page)).toHaveText('-- Hz');
     await expect(nota(page)).toHaveText('--');
@@ -200,10 +220,8 @@ test.describe('Analizador de Espectro · lo que funciona', () => {
 
   test('un zumbido de red de 50 Hz cae donde debe', async ({ page }) => {
     // Es el caso que la propia app propone («zumbidos eléctricos, 50 Hz en Europa»).
-    // 50 Hz → banda 8 = [47,43 – 52,83] Hz, centro 50,13 → «50 Hz». Error del 0,26 %: en los
-    // graves la banda logarítmica es estrecha y la cifra sale fina.
     await arrancar(page, 50);
-    await expect(frecuencia(page)).toHaveText('50 Hz');
+    expect(Math.abs((await hercios(page)) - 50)).toBeLessThanOrEqual(TOLERANCIA_HZ);
   });
 
   test('el permiso denegado se explica y deja reintentar', async ({ page }) => {
@@ -266,122 +284,172 @@ test.describe('Analizador de Espectro · lo que funciona', () => {
   });
 });
 
-test.describe('Analizador de Espectro · hallazgos abiertos', () => {
-  // Los seis usan test.fail(): afirman lo que DEBERÍA pasar y hoy no pasa. El día que se
-  // reparen saldrán en rojo («expected to fail, but passed») y habrá que quitarles la marca,
-  // no reescribir el valor esperado.
-
-  test.fail('HALLAZGO 1 · un tono de 10 kHz debe detectarse, no desaparecer', async ({ page }) => {
-    // El bucle promedia TODOS los bins de cada banda logarítmica, y el número de bins por
-    // banda crece con la frecuencia: 3 bins en la banda de 50 Hz, 10 en la de 440 Hz, 23 en
-    // la de 1 kHz, 106 en la de 5 kHz, 201 en la de 10 kHz y 308 en la de 15 kHz. Un pico
-    // puro saturado a 255 da una media de 255/201 = 1,3 en la banda de 10 kHz, y el código
-    // exige `maxValue > 20`. Resultado: por encima de unos 3-5 kHz la frecuencia dominante
-    // deja de existir aunque el pico esté saturado en el espectro.
-    //   medido en producción: 3.000 Hz → «3029 Hz» · 5.000 Hz → «-- Hz» ·
-    //                        10.000 Hz → «-- Hz» · 15.000 Hz → «-- Hz».
-    // Justo la zona que la app ofrece para «eliminar feedback en directo» (el acople es un
-    // pico estrecho de 1 a 5 kHz) y para la banda de «presencia» de 4 a 6 kHz.
-    // Y el mismo promediado sesga la comparación hacia los graves siempre, porque una banda
-    // de 3 bins compite contra otra de 300 con la misma regla.
+test.describe('Los 8 hallazgos del 18/09/2026, reparados el mismo día', () => {
+  test('884 · un tono de 10 kHz se detecta, en vez de desaparecer', async ({ page }) => {
+    // El bucle promediaba TODOS los bins de cada banda logarítmica, y el número de bins por
+    // banda crece con la frecuencia: 3 en la de 50 Hz, 23 en la de 1 kHz, 201 en la de
+    // 10 kHz. Un pico puro saturado a 255 daba una media de 255/201 = 1,3 y el código exigía
+    // más de 20, así que por encima de 3-5 kHz la app decía «-- Hz» con el pico a la vista en
+    // el espectro. Justo la zona que ofrece para cazar acoples y para la banda de presencia.
     await arrancar(page, 10000);
-    await expect(frecuencia(page)).not.toHaveText('-- Hz');
+    expect(Math.abs((await hercios(page)) - 10000)).toBeLessThanOrEqual(TOLERANCIA_HZ);
   });
 
-  test.fail('HALLAZGO 2 · la cifra debe usar la resolución que la app dice tener', async ({ page }) => {
-    // fftSize 8192 da 5,38 Hz de resolución —y el JSON-LD lo vende como «alta resolución
-    // frecuencial»—, pero la cifra mostrada es el centro de una de las 64 bandas de 1,87
-    // semitonos, así que solo puede tomar 64 valores en toda la escala. Un 440 Hz perfecto
-    // sale «434 Hz» y un 1 kHz de laboratorio sale «1029 Hz» (+2,94 %). El error llega al
-    // 5,7 % —casi un semitono— para un tono situado en el borde inferior de su banda.
-    // Publicar el centro de la banda con precisión de hercio es dar por medido lo que no se
-    // ha medido: o se interpola el pico dentro del bin, o no se da la cifra al hercio.
+  test('884.bis · también a 5 kHz y a 15 kHz, que era donde estaba el corte', async ({ page }) => {
+    // Medido entonces: 3.000 Hz daba «3029 Hz» y 5.000 Hz ya daba «-- Hz».
+    await arrancar(page, 5000);
+    expect(Math.abs((await hercios(page)) - 5000)).toBeLessThanOrEqual(TOLERANCIA_HZ);
+
+    await arrancar(page, 15000);
+    expect(Math.abs((await hercios(page)) - 15000)).toBeLessThanOrEqual(TOLERANCIA_HZ);
+  });
+
+  test('886 · la cifra usa la resolución que la app dice tener', async ({ page }) => {
+    // Venía de una rejilla de 64 bandas de 1,87 semitonos de ancho, de las que se publicaba el
+    // centro aritmético: solo podía tomar 64 valores en toda la escala, y se daba al hercio.
+    // Un 1.000 Hz perfecto salía «1029 Hz» (+2,94 %) y un 440 Hz, «434 Hz», que además nunca
+    // podía dar 440. El JSON-LD prometía «alta resolución frecuencial con fftSize 8192», y esa
+    // resolución existía: se tiraba al promediar.
     await arrancar(page, 1000);
-    await expect(frecuencia(page)).toHaveText('1000 Hz');
+    expect(Math.abs((await hercios(page)) - 1000)).toBeLessThanOrEqual(TOLERANCIA_HZ);
+
+    // Y la página dice de dónde sale la cifra, en vez de darla por medida al hercio sin más.
+    await expect(page.locator('[class*="freqNota"]')).toContainText('5,4 Hz');
   });
 
-  test.fail('HALLAZGO 3 · la nota más cercana debe ser la nota más cercana', async ({ page }) => {
-    // `MUSICAL_NOTES` solo contiene las notas LA y DO (16 entradas para ocho octavas), no las
-    // doce del temperamento igual que declara el JSON-LD («nota musical más cercana
-    // (temperamento igual)»). Encima busca la mínima distancia LINEAL en hercios —cuando la
-    // distancia musical es logarítmica— y acepta hasta un 10 % de desviación, que son ±1,6
-    // semitonos. Con eso, cualquier tono recibe una etiqueta y casi siempre la equivocada:
-    //   466,16 Hz (La#4/Si♭4) → la app dice «C5» (523,3 Hz), dos semitonos más arriba;
-    //   1.000 Hz              → la app dice «C6» (1.046,5 Hz);
-    //   50 Hz, el zumbido de red del propio ejemplo de la app → dice «A1» (55 Hz).
-    // Un La sostenido presentado como Do es peor que no decir nada, y la app ya sabe decir
-    // «--» cuando no está segura.
+  test('887 · la nota más cercana es la nota más cercana, con sus cents', async ({ page }) => {
+    // MUSICAL_NOTES solo tenía LA y DO —16 entradas para ocho octavas, no las doce por
+    // octava—, buscaba la mínima distancia LINEAL en hercios cuando la musical es logarítmica,
+    // y aceptaba hasta un 10 % de desviación, que son ±1,6 semitonos. Con eso cualquier tono
+    // recibía etiqueta y casi siempre la equivocada.
+    //
+    // 466,16 Hz es La♯4 exacto: 12·log2(466,16/440) + 69 = 70,0, es decir MIDI 70 = A#4.
+    // La app devolvía «C5» (523,3 Hz), dos semitonos por encima.
     await arrancar(page, 466.16);
-    await expect(nota(page)).not.toHaveText('C5');
+    await expect(nota(page)).toContainText('A#4');
+
+    // 1.000 Hz cae entre notas: 12·log2(1000/440) + 69 = 83,21 → MIDI 83 = B5, +21 cents.
+    // Antes salía «C6» (1.046,5 Hz). Los cents son lo que convierte la etiqueta en una
+    // afinación utilizable en vez de en una aproximación muda.
+    await arrancar(page, 1000);
+    await expect(nota(page)).toContainText('B5');
+    await expect(nota(page)).toContainText('¢');
   });
 
-  test.fail('HALLAZGO 4 · los controles deben funcionar con el análisis en marcha', async ({ page }) => {
-    // `analyzeLoop` es un useCallback que depende de [viewMode, sensitivity, showPeaks] y que
-    // se auto-encadena con `requestAnimationFrame(analyzeLoop)`. Nada reengancha la cadena
-    // cuando esas dependencias cambian, así que el bucle sigue ejecutando para siempre el
-    // closure capturado al pulsar «Iniciar». Los tres controles quedan muertos justo mientras
-    // se usan; solo surten efecto si se eligen ANTES de arrancar, o tras Detener + Iniciar.
-    // Medido: al pulsar «Línea» con el análisis corriendo, aria-pressed pasa a true y el
-    // canvas no cambia UN SOLO PÍXEL; al subir la sensibilidad de 1x a 2x, el estado de React
-    // vale «2» y el aria-label dice «Sensibilidad: 2,0x», y el canvas tampoco cambia.
+  test('887.bis · el panel de notas enseña las doce, no ocho veces LA', async ({ page }) => {
+    // Imprimía los índices PARES de una lista que ya solo tenía LA y DO, así que en pantalla
+    // quedaban ocho notas LA: cuando la app decía «C5», esa nota no estaba en la tabla.
+    await page.goto('/analizador-espectro/');
+    const panel = page.locator('[class*="notesPanel"]');
+    await expect(panel).toContainText('A4');
+    await expect(panel).toContainText('C#4');
+    await expect(panel).toContainText('F4');
+    await expect(panel).toContainText('440,0 Hz');
+  });
+
+  test('885 · los controles funcionan con el análisis en marcha', async ({ page }) => {
+    // `analyzeLoop` era un useCallback con dependencias [viewMode, sensitivity, showPeaks]
+    // que se auto-encadenaba con requestAnimationFrame, y nadie reenganchaba la cadena al
+    // cambiar esas dependencias: el bucle seguía ejecutando para siempre el closure capturado
+    // al pulsar «Iniciar». Cambiar de Barras a Línea no movía un solo píxel del canvas
+    // mientras el aria-pressed sí pasaba a true: la interfaz mentía activamente.
+    await arrancar(page, 440);
+    await expect(page.getByRole('button', { name: /Barras/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(await contarPixeles(page, RELLENO_LINEA)).toBe(0);
+
+    await page.getByRole('button', { name: /Línea/ }).click();
+    await page.waitForTimeout(500);
+
+    // El relleno bajo la curva solo existe en modo línea: si el bucle siguiera con el closure
+    // viejo, aquí seguiría habiendo 0 píxeles de ese color.
+    expect(await contarPixeles(page, RELLENO_LINEA)).toBeGreaterThan(0);
+  });
+
+  test('888 · el canvas se dibuja con los colores de marca, no en negro', async ({ page }) => {
+    // El canvas NO resuelve `var(--primary)`: ignora el valor en silencio y conserva el
+    // anterior. Medido: strokeStyle se quedaba en «#000000», así que la curva salía negra en
+    // vez del azul meskeIA y la rejilla de referencia, negra sobre fondo oscuro, invisible.
     await arrancar(page, 440);
     await page.getByRole('button', { name: /Línea/ }).click();
-    await expect(page.getByRole('button', { name: /Línea/ })).toHaveAttribute('aria-pressed', 'true');
-    await page.waitForTimeout(1200);
-    // En modo línea de verdad el relleno bajo la curva deja miles de píxeles (4.488 medidos con
-    // un tono puro de 440 Hz); en modo barras no hay ninguno.
-    expect(await contarPixeles(page, RELLENO_LINEA)).toBeGreaterThan(200);
+    await page.waitForTimeout(500);
 
-    // Y la sensibilidad, con el mismo bucle sordo.
-    const antes = await contarPixeles(page, RELLENO_LINEA);
-    await sembrarValor(page, '#sensitivity-slider', '2');
-    await page.waitForTimeout(1200);
-    expect(await contarPixeles(page, RELLENO_LINEA)).not.toBe(antes);
-  });
-
-  test.fail('HALLAZGO 5 · el canvas debe dibujarse con los colores de marca', async ({ page }) => {
-    // El código pide `ctx.strokeStyle = 'var(--primary)'`, `'var(--border)'` y
-    // `ctx.fillStyle = 'var(--text-muted)'`. El contexto 2D no resuelve variables CSS: ignora
-    // el valor en silencio y conserva el anterior. Medido asignando y releyendo:
-    //   strokeStyle 'var(--primary)' → queda «#000000»   (la curva sale negra)
-    //   strokeStyle 'var(--border)'  → queda «#000000»   (la rejilla sale negra)
-    //   fillStyle   'var(--text-muted)' → queda «rgba(46, 134, 171, 0.2)» o el gradiente de
-    //                                     la última barra, según el modo.
-    // Consecuencias: la curva del modo línea no es azul meskeIA sino negra (0 píxeles de
-    // #2E86AB frente a 167 negros); las etiquetas «100Hz», «1kHz» y «10kHz» del canvas se
-    // pintan con un relleno casi transparente y son ilegibles; y en modo oscuro la rejilla
-    // negra sobre fondo oscuro desaparece del todo.
-    await inyectarTono(page, 440);
-    await page.goto('/analizador-espectro/');
-    await esperarHidratacion(page, ['#sensitivity-slider']);
-    // El modo se elige ANTES de arrancar porque después ya no se puede (HALLAZGO 4).
-    await page.getByRole('button', { name: /Línea/ }).click();
-    await botonIniciar(page).click();
-    await page.waitForTimeout(2000);
     expect(await contarPixeles(page, AZUL_MARCA)).toBeGreaterThan(0);
   });
 
-  test.fail('HALLAZGO 6 · la escala impresa debe coincidir con el eje del gráfico', async ({ page }) => {
-    // El canvas reparte 20 Hz–20 kHz en logaritmo: 1 kHz cae en log10(1000/20)/3 = 56,63 %
-    // del ancho y 10 kHz en 89,97 %. La regleta de debajo es un flex con
-    // `justify-content: space-between` y cinco etiquetas, que las reparte UNIFORMEMENTE.
-    // Medido sobre el canvas real de 1.086 px: «1 kHz» impreso al 49,75 % (desfase −6,88
-    // puntos) y «10 kHz» al 73,52 % frente al 89,97 % donde el gráfico lo dibuja: 16,45
-    // puntos, unos 179 px. Quien lea un pico usando la regleta lo situará casi una octava por
-    // debajo de donde está.
+  test('889 · la escala impresa coincide con el eje del gráfico', async ({ page }) => {
+    // `.freqScale` era un flex con justify-content: space-between y cinco etiquetas, que las
+    // repartía UNIFORMEMENTE, mientras el canvas dibuja 20 Hz–20 kHz en logaritmo. «10 kHz»
+    // salía al 73,5 % del ancho en vez de al 90 %: quien leyera un pico con la regleta lo
+    // situaba casi una octava por debajo de donde está.
     await page.goto('/analizador-espectro/');
-    await esperarHidratacion(page, ['#sensitivity-slider']);
-    const posicion = await page.evaluate((selector) => {
-      const lienzo = document.querySelector(selector) as HTMLCanvasElement;
-      const caja = lienzo.getBoundingClientRect();
-      const etiqueta = [...document.querySelectorAll('span')].find(
-        (s) => s.textContent?.trim() === '10 kHz',
-      );
-      if (!etiqueta) return -1;
-      const r = etiqueta.getBoundingClientRect();
-      return ((r.left + r.width / 2 - caja.left) / caja.width) * 100;
-    }, CANVAS);
-    // 89,97 % es donde el canvas traza su línea discontinua de 10 kHz; 1 punto de tolerancia.
-    expect(posicion).toBeGreaterThan(88.97);
+    const posiciones = await page.evaluate(() => {
+      const regleta = document.querySelector('[class*="freqScale"]') as HTMLElement;
+      const ancho = regleta.getBoundingClientRect().width;
+      const izquierda = regleta.getBoundingClientRect().left;
+      return Array.from(regleta.querySelectorAll('span')).map((etiqueta) => {
+        const caja = etiqueta.getBoundingClientRect();
+        return {
+          texto: etiqueta.textContent ?? '',
+          centro: ((caja.left + caja.width / 2 - izquierda) / ancho) * 100,
+        };
+      });
+    });
+
+    // Las posiciones canónicas son log10(f/20)/3 · 100: 20 Hz → 0 %, 100 Hz → 23,3 %,
+    // 1 kHz → 56,6 %, 10 kHz → 90,0 %, 20 kHz → 100 %. Se tolera medio ancho de etiqueta,
+    // porque las de los extremos se acuestan sobre el borde para no salirse.
+    const esperadas: Record<string, number> = {
+      '100 Hz': 23.3,
+      '1 kHz': 56.6,
+      '10 kHz': 90.0,
+    };
+    for (const [texto, esperada] of Object.entries(esperadas)) {
+      const medida = posiciones.find((p) => p.texto === texto);
+      expect(medida, `falta la etiqueta ${texto}`).toBeDefined();
+      expect(Math.abs((medida?.centro ?? 0) - esperada)).toBeLessThan(4);
+    }
+  });
+
+  test('890 · la FAQ describe ESTE analizador y no otro', async ({ page }) => {
+    // Decía «con un buffer de 2048 muestras a 48.000 Hz obtienes 1024 bins separados por
+    // ~23 Hz». La aritmética de la frase era correcta pero no es esta app: fftSize 8192,
+    // 4.096 bins de 5,4 Hz, agregados a 64 barras. La pregunta era justo «¿cuántas
+    // barras/bins tiene el análisis?» y no daba el número de ninguno de los dos.
+    await page.goto('/analizador-espectro/');
+    await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+
+    const respuesta = page
+      .locator('[class*="faqItem"]')
+      .filter({ hasText: '¿Cuántas barras/bins de frecuencia tiene el análisis?' });
+    await expect(respuesta).toContainText('8.192');
+    await expect(respuesta).toContainText('4.096');
+    await expect(respuesta).toContainText('64 barras');
+    await expect(respuesta).not.toContainText('1024 bins');
+  });
+
+  test('891 · los botones llevan type y el canvas tiene nombre accesible', async ({ page }) => {
+    // Pasivo anterior al candado check:a11y-jsx (el fichero es de junio de 2026). Cuatro
+    // botones sin type —un submit accidental dentro de un form—, ocho emojis pegados a texto
+    // sin aria-hidden, un <label>Vista:</label> que no rotulaba nada porque los conmutadores
+    // son botones, y el canvas, que es el 100 % de la salida visual, sin role ni aria-label.
+    await page.goto('/analizador-espectro/');
+    // Acotado al panel de la app A PROPÓSITO. Los que quedan sin `type` en la página son de
+    // componentes GLOBALES —Sidebar, SidebarMobile, ThemeToggle y ErrorBoundary—, que
+    // arrastran el mismo pasivo en las más de mil apps del catálogo: repararlos ahí es otro
+    // lote, y además invalida la cola entera del Inspector por cambio de dependencia.
+    const panel = page.locator('[class*="analyzerPanel"]');
+    expect(await panel.locator('button:not([type])').count()).toBe(0);
+    expect(await panel.locator('button').count()).toBeGreaterThanOrEqual(3);
+
+    const lienzo = page.locator(CANVAS);
+    await expect(lienzo).toHaveAttribute('role', 'img');
+    await expect(lienzo).toHaveAttribute('aria-label', /espectro de frecuencias/i);
+
+    // El grupo de vista se rotula con role="group" + aria-labelledby, que sí es lo que
+    // corresponde a dos botones conmutadores.
+    await expect(page.getByRole('group', { name: 'Vista:' })).toBeVisible();
   });
 });

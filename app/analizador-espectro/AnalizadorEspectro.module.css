@@ -103,13 +103,51 @@
 }
 
 /* Frequency Scale */
+/* La regleta ya no reparte las etiquetas a partes iguales: cada una se posiciona en su
+   sitio logarítmico, el mismo que usa el canvas para dibujar. */
 .freqScale {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  position: relative;
+  height: 1.1rem;
   color: var(--text-muted);
   font-size: 0.75rem;
   margin-bottom: var(--spacing-lg);
+}
+
+.freqTick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Los extremos se acuestan sobre el borde para no salirse del contenedor. */
+.freqTick:first-child { transform: none; }
+.freqTick:last-child { transform: translateX(-100%); }
+
+/* Desviación en cents junto a la nota */
+.noteCents {
+  margin-left: 0.4rem;
+  font-size: 0.7em;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* De dónde sale la cifra: resolución de la FFT y referencia de afinación */
+.freqNota {
+  margin: 0.6rem auto 0;
+  max-width: 44rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Encabezado de la tabla de notas */
+.notesIntro {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
 /* Dominant Frequency Display */

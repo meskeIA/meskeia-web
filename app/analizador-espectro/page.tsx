@@ -18,25 +18,46 @@ const FREQUENCY_BANDS = [
   { label: 'Aire', range: '12-20 kHz', color: '#8b5cf6' },
 ];
 
-// Notas musicales para referencia
-const MUSICAL_NOTES = [
-  { note: 'A0', freq: 27.5 },
-  { note: 'C1', freq: 32.7 },
-  { note: 'A1', freq: 55 },
-  { note: 'C2', freq: 65.4 },
-  { note: 'A2', freq: 110 },
-  { note: 'C3', freq: 130.8 },
-  { note: 'A3', freq: 220 },
-  { note: 'C4', freq: 261.6 }, // Do central
-  { note: 'A4', freq: 440 }, // La de referencia
-  { note: 'C5', freq: 523.3 },
-  { note: 'A5', freq: 880 },
-  { note: 'C6', freq: 1046.5 },
-  { note: 'A6', freq: 1760 },
-  { note: 'C7', freq: 2093 },
-  { note: 'A7', freq: 3520 },
-  { note: 'C8', freq: 4186 },
-];
+/**
+ * Las doce notas del temperamento igual, en el orden en que salen del cálculo.
+ *
+ * Antes había una lista de 16 entradas que solo contenía LA y DO —dos notas por octava, no
+ * doce—, se buscaba la mínima distancia LINEAL en hercios cuando la distancia musical es
+ * logarítmica, y se aceptaba hasta un 10 % de desviación, que son ±1,6 semitonos. Con eso
+ * cualquier tono recibía etiqueta y casi siempre la equivocada: 466,16 Hz (La♯4) salía «C5»,
+ * dos semitonos por encima (hallazgo 887).
+ */
+const NOMBRES_NOTAS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+/** La de referencia: A4 = 440 Hz, que es el índice MIDI 69. */
+const LA4_HZ = 440;
+const LA4_MIDI = 69;
+
+/**
+ * Nota más cercana a una frecuencia, con su desviación en cents.
+ *
+ * El temperamento igual reparte la octava en doce semitonos iguales EN LOGARITMO, así que
+ * la distancia en semitonos hasta el La de referencia es 12·log2(f/440) y la nota es ese
+ * número redondeado. La desviación que queda son los cents (un semitono = 100 cents), y
+ * por construcción nunca pasa de ±50.
+ */
+function notaDeFrecuencia(freq: number): { nombre: string; cents: number } | null {
+  if (!Number.isFinite(freq) || freq < 20 || freq > 20000) return null;
+  const semitonosExactos = 12 * Math.log2(freq / LA4_HZ) + LA4_MIDI;
+  const midi = Math.round(semitonosExactos);
+  const cents = Math.round((semitonosExactos - midi) * 100);
+  // MIDI 12 es C0; por debajo de eso no hay nombre de nota que dar.
+  if (midi < 12) return null;
+  return {
+    nombre: `${NOMBRES_NOTAS[midi % 12]}${Math.floor(midi / 12) - 1}`,
+    cents,
+  };
+}
+
+/** La frecuencia de una nota MIDI, para la tabla de referencia de la página. */
+function frecuenciaDeMidi(midi: number): number {
+  return LA4_HZ * Math.pow(2, (midi - LA4_MIDI) / 12);
+}
 
 export default function AnalizadorEspectroPage() {
   const [isActive, setIsActive] = useState(false);
@@ -44,6 +65,8 @@ export default function AnalizadorEspectroPage() {
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied'>('prompt');
   const [dominantFreq, setDominantFreq] = useState<number>(0);
   const [dominantNote, setDominantNote] = useState<string>('--');
+  /** Desviación respecto a la nota, en cents. `null` cuando no hay nota que afinar. */
+  const [dominantCents, setDominantCents] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'bars' | 'line'>('bars');
   const [sensitivity, setSensitivity] = useState<number>(1);
   const [showPeaks, setShowPeaks] = useState(true);
@@ -63,27 +86,20 @@ export default function AnalizadorEspectroPage() {
     };
   }, []);
 
-  // Encontrar la nota musical más cercana
-  const findClosestNote = useCallback((freq: number): string => {
-    if (freq < 20 || freq > 20000) return '--';
-
-    let closestNote = MUSICAL_NOTES[0];
-    let minDiff = Math.abs(freq - closestNote.freq);
-
-    for (const note of MUSICAL_NOTES) {
-      const diff = Math.abs(freq - note.freq);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestNote = note;
-      }
-    }
-
-    // Solo mostrar si está razonablemente cerca
-    const percentDiff = minDiff / closestNote.freq;
-    if (percentDiff > 0.1) return '--';
-
-    return closestNote.note;
-  }, []);
+  /**
+   * Los tres controles de visualización, en refs además de en estado.
+   *
+   * `analyzeLoop` se auto-encadena con requestAnimationFrame, y como era un useCallback con
+   * dependencias [viewMode, sensitivity, showPeaks] el bucle en marcha seguía ejecutando para
+   * siempre el closure capturado al pulsar «Iniciar»: cambiar de Barras a Línea o mover la
+   * sensibilidad no hacía NADA mientras se analizaba, que es justo cuando se usan, y la
+   * interfaz mentía porque el aria-pressed sí cambiaba (hallazgo 885). Leyéndolos de un ref,
+   * el bucle ve siempre el valor de ahora y no hay que reengancharlo.
+   */
+  const opcionesRef = useRef({ viewMode, sensitivity, showPeaks });
+  useEffect(() => {
+    opcionesRef.current = { viewMode, sensitivity, showPeaks };
+  }, [viewMode, sensitivity, showPeaks]);
 
   // Obtener color basado en frecuencia
   const getFrequencyColor = useCallback((freq: number): string => {
@@ -106,13 +122,29 @@ export default function AnalizadorEspectroPage() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Las opciones se leen del ref, no del closure: ver el comentario de `opcionesRef`.
+    const { viewMode, sensitivity, showPeaks } = opcionesRef.current;
+
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     analyser.getByteFrequencyData(dataArray);
 
+    /**
+     * El canvas NO resuelve `var(--loquesea)`: ignora el valor en silencio y conserva el
+     * anterior. Medido en producción: `ctx.strokeStyle = 'var(--primary)'` se quedaba en
+     * «#000000», así que la curva del modo línea salía negra en vez del azul meskeIA y la
+     * rejilla de referencia salía negra sobre fondo oscuro, invisible (hallazgo 888).
+     */
+    const estilos = getComputedStyle(document.documentElement);
+    const token = (nombre: string, respaldo: string): string =>
+      estilos.getPropertyValue(nombre).trim() || respaldo;
+    const colorFondo = token('--bg-card', '#ffffff');
+    const colorPrimario = token('--primary', '#2E86AB');
+    const colorBorde = token('--border', '#d1d5db');
+    const colorTextoTenue = token('--text-muted', '#6b7280');
+
     // Limpiar canvas
-    ctx.fillStyle = getComputedStyle(document.documentElement)
-      .getPropertyValue('--bg-card').trim() || '#ffffff';
+    ctx.fillStyle = colorFondo;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const barCount = 64; // Número de barras a mostrar
@@ -125,37 +157,79 @@ export default function AnalizadorEspectroPage() {
       peakDecayRef.current = new Array(barCount).fill(0);
     }
 
-    // Encontrar frecuencia dominante
-    let maxValue = 0;
-    let maxIndex = 0;
-
     // Calcular valores para cada barra (agrupando frecuencias)
     const sampleRate = audioContextRef.current?.sampleRate || 44100;
     const freqPerBin = sampleRate / (analyser.fftSize);
 
+    /**
+     * ── La frecuencia dominante se busca en los BINS, no en las 64 barras ──
+     *
+     * Antes se tomaba la barra con mayor media y se publicaba el centro de su banda. Dos
+     * consecuencias, las dos medidas:
+     *   · Por encima de 3-5 kHz dejaba de detectar nada aunque el pico estuviera saturado
+     *     (hallazgo 884): las bandas son logarítmicas y el número de bins por banda crece con
+     *     la frecuencia —3 bins a 50 Hz, 23 a 1 kHz, 201 a 10 kHz—, así que un pico puro a 255
+     *     promediaba 255/201 = 1,3 y no llegaba al umbral de 20. El mismo promediado sesgaba
+     *     siempre hacia los graves, porque una banda de 3 bins competía contra otra de 300.
+     *   · La cifra solo podía tomar 64 valores en toda la escala y se publicaba al hercio
+     *     (hallazgo 886): un 1.000 Hz perfecto salía «1029 Hz» y un 440 Hz, «434 Hz».
+     *
+     * Ahora se recorren los bins reales (5,4 Hz a 44,1 kHz con fftSize 8192) y se afina el
+     * máximo con una interpolación parabólica sobre sus dos vecinos, que es lo estándar para
+     * un pico de FFT: la parábola que pasa por los tres puntos tiene su vértice en
+     * δ = (y₋₁ − y₊₁) / (2·(y₋₁ − 2y₀ + y₊₁)), y ese δ es la fracción de bin que hay que sumar.
+     */
+    let maxBin = 0;
+    let maxBinValue = 0;
+    const binMinimo = Math.max(1, Math.floor(20 / freqPerBin));
+    const binMaximo = Math.min(bufferLength - 2, Math.floor(20000 / freqPerBin));
+    for (let bin = binMinimo; bin <= binMaximo; bin++) {
+      if (dataArray[bin] > maxBinValue) {
+        maxBinValue = dataArray[bin];
+        maxBin = bin;
+      }
+    }
+    let binAfinado = maxBin;
+    if (maxBin > 0 && maxBin < bufferLength - 1) {
+      const izq = dataArray[maxBin - 1];
+      const der = dataArray[maxBin + 1];
+      const denominador = izq - 2 * maxBinValue + der;
+      if (denominador !== 0) {
+        const delta = (izq - der) / (2 * denominador);
+        if (Math.abs(delta) <= 0.5) binAfinado = maxBin + delta;
+      }
+    }
+    const freqDominante = binAfinado * freqPerBin;
+
+    /**
+     * La altura de cada banda es el MÁXIMO de sus bins, no la media.
+     *
+     * Las bandas son logarítmicas, así que la de 50 Hz tiene 3 bins y la de 10 kHz, 201.
+     * Promediando, un pico estrecho en agudos se reparte entre cientos de bins y desaparece
+     * del dibujo mientras un ruido ancho en graves se ve entero: el espectro salía sesgado
+     * hacia la izquierda siempre. Con el máximo, un pico se ve donde está, que es lo que un
+     * analizador tiene que enseñar — y es la zona que esta app ofrece para cazar acoples,
+     * que son picos estrechos de 1 a 5 kHz.
+     */
+    const alturas: number[] = new Array(barCount);
     for (let i = 0; i < barCount; i++) {
-      // Mapear logarítmicamente para mejor visualización
       const lowFreq = 20 * Math.pow(1000, i / barCount);
       const highFreq = 20 * Math.pow(1000, (i + 1) / barCount);
 
       const lowBin = Math.floor(lowFreq / freqPerBin);
       const highBin = Math.min(Math.ceil(highFreq / freqPerBin), bufferLength - 1);
 
-      // Promediar los valores en este rango
-      let sum = 0;
-      let count = 0;
+      let pico = 0;
       for (let j = lowBin; j <= highBin; j++) {
-        sum += dataArray[j];
-        count++;
+        if (dataArray[j] > pico) pico = dataArray[j];
       }
-      const avgValue = count > 0 ? (sum / count) * sensitivity : 0;
-      const barHeight = Math.min(avgValue * heightScale, canvas.height);
+      alturas[i] = Math.min(pico * sensitivity * heightScale, canvas.height);
+    }
 
-      // Actualizar frecuencia dominante
-      if (avgValue > maxValue) {
-        maxValue = avgValue;
-        maxIndex = i;
-      }
+    for (let i = 0; i < barCount; i++) {
+      const lowFreq = 20 * Math.pow(1000, i / barCount);
+      const highFreq = 20 * Math.pow(1000, (i + 1) / barCount);
+      const barHeight = alturas[i];
 
       // Actualizar peaks
       if (barHeight > peaksRef.current[i]) {
@@ -201,27 +275,14 @@ export default function AnalizadorEspectroPage() {
     // Modo línea
     if (viewMode === 'line') {
       ctx.beginPath();
-      ctx.strokeStyle = 'var(--primary)';
+      ctx.strokeStyle = colorPrimario;
       ctx.lineWidth = 2;
 
+      // Las mismas alturas que las barras: antes se recalculaban aquí, con el riesgo de que
+      // los dos modos acabaran enseñando cosas distintas del mismo espectro.
       for (let i = 0; i < barCount; i++) {
-        const lowFreq = 20 * Math.pow(1000, i / barCount);
-        const highFreq = 20 * Math.pow(1000, (i + 1) / barCount);
-
-        const lowBin = Math.floor(lowFreq / freqPerBin);
-        const highBin = Math.min(Math.ceil(highFreq / freqPerBin), bufferLength - 1);
-
-        let sum = 0;
-        let count = 0;
-        for (let j = lowBin; j <= highBin; j++) {
-          sum += dataArray[j];
-          count++;
-        }
-        const avgValue = count > 0 ? (sum / count) * sensitivity : 0;
-        const barHeight = Math.min(avgValue * heightScale, canvas.height);
-
         const x = i * barWidth + barWidth / 2;
-        const y = canvas.height - barHeight;
+        const y = canvas.height - alturas[i];
 
         if (i === 0) {
           ctx.moveTo(x, y);
@@ -240,7 +301,7 @@ export default function AnalizadorEspectroPage() {
     }
 
     // Dibujar líneas de frecuencia de referencia
-    ctx.strokeStyle = 'var(--border)';
+    ctx.strokeStyle = colorBorde;
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
 
@@ -253,27 +314,28 @@ export default function AnalizadorEspectroPage() {
       ctx.stroke();
 
       // Etiqueta
-      ctx.fillStyle = 'var(--text-muted)';
+      ctx.fillStyle = colorTextoTenue;
       ctx.font = '10px sans-serif';
       ctx.fillText(freq >= 1000 ? `${freq/1000}kHz` : `${freq}Hz`, x + 2, 12);
     });
     ctx.setLineDash([]);
 
-    // Actualizar frecuencia dominante
-    const dominantLowFreq = 20 * Math.pow(1000, maxIndex / barCount);
-    const dominantHighFreq = 20 * Math.pow(1000, (maxIndex + 1) / barCount);
-    const freqCenter = (dominantLowFreq + dominantHighFreq) / 2;
-
-    if (maxValue > 20) { // Solo si hay señal significativa
-      setDominantFreq(freqCenter);
-      setDominantNote(findClosestNote(freqCenter));
+    // Actualizar frecuencia dominante. El umbral se aplica al BIN del pico, no a la media de
+    // su banda: un pico puro de 10 kHz vale 255 en su bin y 1,3 en la media de la banda, y ese
+    // 1,3 era lo que antes se comparaba contra el 20 exigido.
+    if (maxBinValue > 20) {
+      setDominantFreq(freqDominante);
+      const nota = notaDeFrecuencia(freqDominante);
+      setDominantNote(nota ? nota.nombre : '--');
+      setDominantCents(nota ? nota.cents : null);
     } else {
       setDominantFreq(0);
       setDominantNote('--');
+      setDominantCents(null);
     }
 
     animationRef.current = requestAnimationFrame(analyzeLoop);
-  }, [viewMode, sensitivity, showPeaks, getFrequencyColor, findClosestNote]);
+  }, [getFrequencyColor]);
 
   // Iniciar análisis
   const startAnalyzing = async () => {
@@ -369,7 +431,7 @@ export default function AnalizadorEspectroPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📊</span>
+        <span className={styles.heroIcon} aria-hidden="true">📊</span>
         <h1 className={styles.title}>Analizador de Espectro</h1>
         <p className={styles.subtitle}>
           Visualiza las frecuencias de audio en tiempo real.
@@ -384,11 +446,16 @@ export default function AnalizadorEspectroPage() {
         <div className={styles.analyzerPanel}>
           {/* Canvas de visualización */}
           <div className={styles.canvasContainer}>
-            <canvas ref={canvasRef} className={styles.spectrumCanvas} />
+            <canvas
+              ref={canvasRef}
+              className={styles.spectrumCanvas}
+              role="img"
+              aria-label="Espectro de frecuencias de 20 Hz a 20 kHz en escala logarítmica. La lectura numérica va debajo, en «Frecuencia dominante»."
+            />
 
             {!isActive && (
               <div className={styles.canvasOverlay}>
-                <span className={styles.overlayIcon}>🎤</span>
+                <span className={styles.overlayIcon} aria-hidden="true">🎤</span>
                 <span className={styles.overlayText}>
                   Pulsa &quot;Iniciar análisis&quot; para comenzar
                 </span>
@@ -396,13 +463,24 @@ export default function AnalizadorEspectroPage() {
             )}
           </div>
 
-          {/* Escala de frecuencias */}
-          <div className={styles.freqScale}>
-            <span>20 Hz</span>
-            <span>100 Hz</span>
-            <span>1 kHz</span>
-            <span>10 kHz</span>
-            <span>20 kHz</span>
+          {/*
+            Escala de frecuencias. Iba en un flex con space-between, que reparte las cinco
+            etiquetas UNIFORMEMENTE, mientras el canvas dibuja de 20 Hz a 20 kHz en LOGARITMO:
+            «10 kHz» aparecía al 73,5 % del ancho cuando su sitio es el 90 %, así que quien
+            leyera un pico con la regleta lo situaba casi una octava por debajo (hallazgo 889).
+            Ahora cada etiqueta se coloca en su posición real, la misma fórmula que usa el
+            canvas: log10(f/20) / log10(1000).
+          */}
+          <div className={styles.freqScale} aria-hidden="true">
+            {[20, 100, 1000, 10000, 20000].map(freq => (
+              <span
+                key={freq}
+                className={styles.freqTick}
+                style={{ left: `${(Math.log10(freq / 20) / 3) * 100}%` }}
+              >
+                {freq >= 1000 ? `${freq / 1000} kHz` : `${freq} Hz`}
+              </span>
+            ))}
           </div>
 
           {/* Información de frecuencia dominante */}
@@ -419,21 +497,33 @@ export default function AnalizadorEspectroPage() {
                 <span className={styles.noteLabel}>Nota más cercana</span>
                 <span className={styles.noteValue}>
                   {dominantNote}
+                  {dominantCents !== null && dominantNote !== '--' && (
+                    <span className={styles.noteCents}>
+                      {dominantCents >= 0 ? '+' : '−'}{formatNumber(Math.abs(dominantCents), 0)} ¢
+                    </span>
+                  )}
                 </span>
               </div>
             </div>
+          )}
+          {isActive && (
+            <p className={styles.freqNota}>
+              La frecuencia sale del pico de la FFT (8.192 muestras: {formatNumber(44100 / 8192, 1)} Hz
+              por bin a 44,1 kHz), afinado por interpolación entre bins vecinos. Los cents son la
+              desviación respecto a la nota del temperamento igual, con A4 = 440 Hz.
+            </p>
           )}
           </div>
 
           {/* Controles */}
           <div className={styles.controls}>
             {!isActive ? (
-              <button onClick={startAnalyzing} className={styles.btnStart}>
-                🎤 Iniciar análisis
+              <button type="button" onClick={startAnalyzing} className={styles.btnStart}>
+                <span aria-hidden="true">🎤</span> Iniciar análisis
               </button>
             ) : (
-              <button onClick={stopAnalyzing} className={styles.btnStop}>
-                ⏹️ Detener
+              <button type="button" onClick={stopAnalyzing} className={styles.btnStop}>
+                <span aria-hidden="true">⏹️</span> Detener
               </button>
             )}
           </div>
@@ -441,21 +531,23 @@ export default function AnalizadorEspectroPage() {
           {/* Opciones de visualización */}
           <div className={styles.options}>
             <div className={styles.optionGroup}>
-              <label className={styles.optionLabel}>Vista:</label>
-              <div className={styles.toggleButtons}>
+              <span className={styles.optionLabel} id="vista-label">Vista:</span>
+              <div className={styles.toggleButtons} role="group" aria-labelledby="vista-label">
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${viewMode === 'bars' ? styles.active : ''}`}
                   onClick={() => setViewMode('bars')}
                   aria-pressed={viewMode === 'bars'}
                 >
-                  📊 Barras
+                  <span aria-hidden="true">📊</span> Barras
                 </button>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${viewMode === 'line' ? styles.active : ''}`}
                   onClick={() => setViewMode('line')}
                   aria-pressed={viewMode === 'line'}
                 >
-                  📈 Línea
+                  <span aria-hidden="true">📈</span> Línea
                 </button>
               </div>
             </div>
@@ -492,14 +584,14 @@ export default function AnalizadorEspectroPage() {
           {/* Error */}
           {error && (
             <div className={styles.errorMessage} role="alert">
-              ⚠️ {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
 
           {/* Mensaje de permiso */}
           {permissionState === 'prompt' && !isActive && !error && (
             <div className={styles.infoMessage}>
-              💡 Se solicitará permiso para acceder al micrófono
+              <span aria-hidden="true">💡</span> Se solicitará permiso para acceder al micrófono
             </div>
           )}
         </div>
@@ -507,7 +599,7 @@ export default function AnalizadorEspectroPage() {
         {/* Leyenda de frecuencias */}
         <div className={styles.legendPanel}>
           <h2 className={styles.sectionTitle}>
-            <span>🎵</span> Bandas de frecuencia
+            <span aria-hidden="true">🎵</span> Bandas de frecuencia
           </h2>
           <div className={styles.legendGrid}>
             {FREQUENCY_BANDS.map((band, index) => (
@@ -525,16 +617,28 @@ export default function AnalizadorEspectroPage() {
           </div>
         </div>
 
-        {/* Notas musicales de referencia */}
+        {/*
+          Notas musicales de referencia. Antes imprimía los índices PARES de una lista que ya
+          solo tenía LA y DO, así que en pantalla quedaban ocho notas LA: cuando la app decía
+          «C5», el usuario no encontraba esa nota en la tabla de la propia página. Ahora sale
+          la octava entera del La de referencia, calculada con el temperamento igual, que es
+          el mismo cálculo que etiqueta la lectura.
+        */}
         <div className={styles.notesPanel}>
           <h2 className={styles.sectionTitle}>
-            <span>🎹</span> Frecuencias de notas musicales
+            <span aria-hidden="true">🎹</span> Frecuencias de notas musicales
           </h2>
+          <p className={styles.notesIntro}>
+            Cuarta octava del temperamento igual, con A4 = {formatNumber(LA4_HZ, 0)} Hz.
+            Cada semitono multiplica la frecuencia por 2^(1/12) = 1,0595, y subir una octava la duplica.
+          </p>
           <div className={styles.notesGrid}>
-            {MUSICAL_NOTES.filter((_, i) => i % 2 === 0).map((note, index) => (
-              <div key={index} className={styles.noteItem}>
-                <span className={styles.noteName}>{note.note}</span>
-                <span className={styles.noteFreq}>{formatNumber(note.freq, 1)} Hz</span>
+            {Array.from({ length: 13 }, (_, i) => LA4_MIDI - 9 + i).map(midi => (
+              <div key={midi} className={styles.noteItem}>
+                <span className={styles.noteName}>
+                  {NOMBRES_NOTAS[midi % 12]}{Math.floor(midi / 12) - 1}
+                </span>
+                <span className={styles.noteFreq}>{formatNumber(frecuenciaDeMidi(midi), 1)} Hz</span>
               </div>
             ))}
           </div>
@@ -625,27 +729,27 @@ export default function AnalizadorEspectroPage() {
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🎤 Eliminar feedback en directo</h3>
+            <h3><span aria-hidden="true">🎤</span> Eliminar feedback en directo</h3>
             <p>Identifica visualmente qué frecuencia genera el pitido de retroalimentación (feedback) antes de que escale. Suele aparecer como un pico estrecho y muy alto en el espectro.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎛️ Ecualizar una mezcla</h3>
+            <h3><span aria-hidden="true">🎛️</span> Ecualizar una mezcla</h3>
             <p>Analiza si graves y bajos están saturados (exceso de energía en 60-250 Hz) o si falta presencia (2-6 kHz). El espectro te da una referencia visual objetiva para tus decisiones de EQ.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏛️ Analizar acústica de salas</h3>
+            <h3><span aria-hidden="true">🏛️</span> Analizar acústica de salas</h3>
             <p>Reproduce un tono de barrido o ruido rosa y analiza el espectro. Las resonancias de la sala aparecen como picos: revelan frecuencias problemáticas que necesitan tratamiento acústico.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎓 Física del sonido (educación)</h3>
+            <h3><span aria-hidden="true">🎓</span> Física del sonido (educación)</h3>
             <p>Visualiza en tiempo real los armónicos de instrumentos: toca una nota en guitarra y observa la frecuencia fundamental más todos sus armónicos (múltiplos) apareciendo en el espectro.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔍 Detectar ruidos no deseados</h3>
+            <h3><span aria-hidden="true">🔍</span> Detectar ruidos no deseados</h3>
             <p>Identifica zumbidos eléctricos (50 Hz en Europa, 60 Hz en América), ruido de ventiladores, interferencias de WiFi o cualquier frecuencia parasita en una grabación o entorno.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎸 Comparar timbres de instrumentos</h3>
+            <h3><span aria-hidden="true">🎸</span> Comparar timbres de instrumentos</h3>
             <p>Toca la misma nota en guitarra acústica, eléctrica y piano. Observa cómo cada instrumento tiene una &quot;huella espectral&quot; diferente: diferente distribución de armónicos.</p>
           </div>
         </div>
@@ -662,7 +766,7 @@ export default function AnalizadorEspectroPage() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Cuántas barras/bins de frecuencia tiene el análisis?</h3>
-            <p>Depende del tamaño del buffer FFT. Con un buffer de 2048 muestras a 48.000 Hz, obtienes 1024 bins separados por ~23 Hz. Buffers mayores dan mejor resolución frecuencial pero mayor latencia. La Web Audio API usa típicamente 2048 o 4096 muestras.</p>
+            <p>Son dos números distintos y conviene no confundirlos. Esta app analiza con un buffer FFT de <strong>8.192 muestras</strong>, que da <strong>4.096 bins</strong> separados por 5,4 Hz a 44,1 kHz de frecuencia de muestreo (o 5,9 Hz a 48 kHz): esa es la resolución con la que se localiza el pico y se publica la frecuencia dominante. Lo que se DIBUJA son <strong>64 barras</strong> repartidas en logaritmo entre 20 Hz y 20 kHz, porque 4.096 barras no caben en una pantalla ni se leerían; cada barra toma el valor de su bin más alto, para que un pico estrecho en agudos no se diluya entre los cientos de bins que caen en su banda. Un buffer mayor da más resolución frecuencial a costa de más latencia.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Qué diferencia hay entre un analizador de espectro y un osciloscopio?</h3>
@@ -742,34 +846,34 @@ export default function AnalizadorEspectroPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🎯 Busca un espectro &quot;plano&quot;</h3>
+            <h3><span aria-hidden="true">🎯</span> Busca un espectro &quot;plano&quot;</h3>
             <p>Una mezcla bien balanceada tiene energía distribuida de forma relativamente uniforme, sin picos pronunciados ni valles profundos en ninguna banda.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>👂 Confía más en tu oído que en el gráfico</h3>
+            <h3><span aria-hidden="true">👂</span> Confía más en tu oído que en el gráfico</h3>
             <p>El espectro es una herramienta visual de apoyo, no el árbitro final. Si algo suena bien, está bien aunque el gráfico no sea &quot;perfecto&quot;.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔇 Analiza en silencio primero</h3>
+            <h3><span aria-hidden="true">🔇</span> Analiza en silencio primero</h3>
             <p>Inicia el analizador con silencio para ver el ruido de fondo de tu entorno. Así puedes identificar qué frecuencias son ruido ambiental antes de analizar tu fuente.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📊 Usa ruido rosa para calibrar</h3>
+            <h3><span aria-hidden="true">📊</span> Usa ruido rosa para calibrar</h3>
             <p>Reproduce ruido rosa cerca del micrófono. En una sala ideal debe aparecer como línea descendente. Las desviaciones revelan resonancias y problemas acústicos del espacio.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎚️ Compara antes y después del EQ</h3>
+            <h3><span aria-hidden="true">🎚️</span> Compara antes y después del EQ</h3>
             <p>Analiza el espectro antes de ecualizar, anota mentalmente los picos problemáticos, aplica el EQ y compara de nuevo. El analizador confirma si tus ajustes tuvieron el efecto esperado.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔊 Pon el micrófono cerca de la fuente</h3>
+            <h3><span aria-hidden="true">🔊</span> Pon el micrófono cerca de la fuente</h3>
             <p>Para analizar un instrumento específico, el micrófono del dispositivo debe estar cerca de la fuente. A mayor distancia, capta más ambiente y el espectro refleja la sala, no el instrumento.</p>
           </div>
         </div>
 
         {/* Aviso importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Uso orientativo, no profesional</h3>
+          <h3><span aria-hidden="true">⚠️</span> Uso orientativo, no profesional</h3>
           <ul className={styles.warningList}>
             <li>El analizador usa el micrófono del dispositivo, que tiene su propia respuesta en frecuencia no calibrada. Los resultados son orientativos, no mediciones de laboratorio.</li>
             <li>Para mediciones acústicas profesionales (homologación de salas, certificación de equipos, estudios de ruido laboral) se requieren micrófonos calibrados y software específico.</li>
@@ -788,7 +892,7 @@ export default function AnalizadorEspectroPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔬 Transformada de Fourier (FFT)</h4>
+              <h4><span aria-hidden="true">🔬</span> Transformada de Fourier (FFT)</h4>
               <p>
                 La FFT (Fast Fourier Transform) es el algoritmo matemático que descompone
                 una señal de audio en sus frecuencias componentes. Es la base de todos
@@ -796,7 +900,7 @@ export default function AnalizadorEspectroPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📏 Escala logarítmica</h4>
+              <h4><span aria-hidden="true">📏</span> Escala logarítmica</h4>
               <p>
                 Las frecuencias se muestran en escala logarítmica porque así percibe
                 el oído humano. Cada octava (doble de frecuencia) ocupa el mismo espacio
@@ -810,7 +914,7 @@ export default function AnalizadorEspectroPage() {
           <h2>Aplicaciones del análisis de espectro</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🎸 Para músicos</h4>
+              <h4><span aria-hidden="true">🎸</span> Para músicos</h4>
               <ul>
                 <li>Identificar frecuencias de notas</li>
                 <li>Detectar armónicos de instrumentos</li>
@@ -819,7 +923,7 @@ export default function AnalizadorEspectroPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎛️ Para técnicos de sonido</h4>
+              <h4><span aria-hidden="true">🎛️</span> Para técnicos de sonido</h4>
               <ul>
                 <li>Detectar retroalimentación (feedback)</li>
                 <li>Ecualizar mezclas</li>
@@ -828,7 +932,7 @@ export default function AnalizadorEspectroPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔊 Para acústica</h4>
+              <h4><span aria-hidden="true">🔊</span> Para acústica</h4>
               <ul>
                 <li>Analizar respuesta de salas</li>
                 <li>Medir reverberación</li>
@@ -837,7 +941,7 @@ export default function AnalizadorEspectroPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎓 Para educación</h4>
+              <h4><span aria-hidden="true">🎓</span> Para educación</h4>
               <ul>
                 <li>Visualizar ondas sonoras</li>
                 <li>Entender armónicos</li>
@@ -852,14 +956,14 @@ export default function AnalizadorEspectroPage() {
           <h2>Características del sonido</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🎵 Frecuencia fundamental</h4>
+              <h4><span aria-hidden="true">🎵</span> Frecuencia fundamental</h4>
               <p>
                 Es la frecuencia más baja y prominente de un sonido, determina la &quot;nota&quot; que percibimos.
                 Por ejemplo, el La de referencia es 440 Hz.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>✨ Armónicos</h4>
+              <h4><span aria-hidden="true">✨</span> Armónicos</h4>
               <p>
                 Son frecuencias múltiplos de la fundamental. Dan el &quot;timbre&quot; característico
                 a cada instrumento o voz. Por eso un piano y una guitarra tocando la misma nota suenan diferente.
