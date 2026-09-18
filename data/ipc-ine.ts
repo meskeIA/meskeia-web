@@ -21,7 +21,35 @@ export const IPC_DATA: Record<number, number> = {
   2011: 121.57, 2012: 124.52, 2013: 124.72, 2014: 124.50, 2015: 123.87,
   2016: 123.47, 2017: 125.94, 2018: 128.11, 2019: 129.02, 2020: 128.61,
   2021: 132.63, 2022: 143.55, 2023: 148.40, 2024: 152.50,
-  2025: 155.00, // Valor estimado — actualizar cuando el INE publique el IPC real de 2025
+  2025: 155.00, // PROVISIONAL — ver IPC_ULTIMO_ANIO_PROVISIONAL
+};
+
+/**
+ * El último año de la serie es una ESTIMACIÓN, no el índice publicado por el INE.
+ *
+ * El INE publica el índice medio anual en enero del año siguiente, así que el de 2025 existe
+ * desde enero de 2026 y este 155,00 lleva desde entonces sin sustituirse. No es inocuo: 155,00
+ * implica una variación 2024→2025 del +1,64 %, y la inflación media que el INE dio para 2025
+ * fue del 2,7 %, que sobre el 152,50 de 2024 sale en torno a 156,6. O sea que la app viene
+ * quedándose corta alrededor de un punto porcentual, y lo atribuía al «IPC del INE» sin matiz
+ * ninguno (hallazgo 916 del Inspector, 18/09/2026).
+ *
+ * Mientras el dato no se sustituya contra la fuente —eso es trabajo del triaje, con la serie
+ * del INE delante y no con una tasa citada de segunda mano—, lo que SÍ se puede hacer es que
+ * la app deje de presentarlo como dato firme. Esta bandera es lo que leen las pantallas para
+ * decirlo.
+ *
+ * ⚠️ Al actualizarlo, ojo con la BASE: el IPC base 2021 termina en diciembre de 2025 y desde
+ * enero de 2026 el INE publica en base 2025, así que continuar la serie exige enlazar las dos
+ * bases, no añadir el número nuevo debajo.
+ */
+export const IPC_ULTIMO_ANIO_PROVISIONAL = true;
+
+export const IPC_META = {
+  fuente: 'INE · Índice de Precios de Consumo, serie histórica del índice general (base 2021)',
+  verificado: '2026-09-18',
+  urlOficial: 'https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736176802&menu=ultiDatos&idp=1254735976607',
+  nota: 'El índice de 2025 es una estimación propia pendiente de sustituir por el valor publicado: el INE cifró la inflación media de 2025 en el 2,7 %, y el valor que usa la app supone un 1,64 %, así que los importes actualizados a 2025 se quedan algo cortos. La conversión peseta-euro (166,386) no se ve afectada: es un tipo legal exacto del Reglamento (CE) 2866/98.',
 };
 
 export const IPC_YEARS = Object.keys(IPC_DATA).map(Number).sort((a, b) => a - b);

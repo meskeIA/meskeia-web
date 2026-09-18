@@ -58,8 +58,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * LOS CUATRO SE CUMPLEN EN PRODUCCIÓN (18/09/2026). El motor está sano: tipo correcto,
  * redondeo al céntimo, sin tipo inverso, parser canónico y rechazo limpio.
  *
- * HALLAZGOS ABIERTOS — al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que
- * hoy fallan a propósito; cuando se reparen se les quita el `test.fail()` y quedan como
+ * LOS 4 HALLAZGOS del 18/09/2026, al final, ya como candados de regresión: se repararon ese
+ * mismo día. El de fondo —que el índice de 2025 es una estimación propia y no el dato
+ * publicado— se reparó DICIÉNDOLO, no cambiando el número: sustituirlo exige la serie del INE
+ * delante, y eso es trabajo del triaje. Se quedan como
  * candado de regresión.
  *   1. La tabla del bloque educativo dice «100.000 ptas de 1985 = unos 1.470 € de poder
  *      adquisitivo hoy» y el motor de la propia app devuelve 2.070,61 € para esa misma
@@ -224,12 +226,8 @@ test.describe('Valor real hoy (IPC del INE, base 2021 = 100)', () => {
   });
 });
 
-test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
-  // Los tres usan test.fail(): afirman lo que DEBERÍA pasar y hoy no pasa. El día que se
-  // reparen saldrán en rojo («expected to fail, but passed») y habrá que quitarles la
-  // marca, no reescribir el valor esperado.
-
-  test.fail('HALLAZGO 1 · la tabla educativa debe decir lo mismo que el motor', async ({ page }) => {
+test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
+  test('915 · la tabla educativa dice lo mismo que el motor', async ({ page }) => {
     // La fila «Ejemplo» de la tabla comparativa dice «100.000 ptas de 1985 = unos 1.470 €
     // de poder adquisitivo hoy». El propio motor de la app devuelve 2.070,61 € para esa
     // entrada exacta (comprobado arriba, CASO 4). 1.470 € exigiría un IPC de hoy de 110,04
@@ -239,7 +237,7 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
     await expect(filaEjemplo).toContainText('2.070,61');
   });
 
-  test.fail('HALLAZGO 2 · la app debe decir de cuándo es y de dónde sale el último IPC', async ({ page }) => {
+  test('916 y 917 · la app dice de cuándo es y de dónde sale el IPC, y que el último año es provisional', async ({ page }) => {
     // data/ipc-ine.ts marca el IPC de 2025 con «Valor estimado — actualizar cuando el INE
     // publique el IPC real de 2025». El índice medio anual lo publica el INE en enero del
     // año siguiente, y el módulo sigue con la estimación mientras la app atribuye el
@@ -247,9 +245,19 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
     // <DataReference> tras el <DisclaimerCard> en toda app apoyada en datos con fecha de
     // caducidad, y esta página no tiene ninguno.
     await expect(page.getByText(/Última verificación/i).first()).toBeVisible();
+
+    // Y lo que hacía falta además del sello: que el índice de 2025 NO se presente como dato
+    // firme del INE. Sigue siendo una estimación —el INE dio una inflación media del 2,7 %
+    // para 2025 y el valor que usa la app supone un 1,64 %—, así que se dice en la página en
+    // vez de atribuirlo al instituto sin matiz. Sustituir el número contra la serie oficial es
+    // trabajo del triaje fiscal, con la fuente delante; lo que no podía seguir es que la app
+    // lo llamara dato del INE.
+    const referencia = page.locator('[class*="dataReference"]');
+    await expect(referencia).toContainText('INE');
+    await expect(referencia).toContainText(/estimación|provisional/i);
   });
 
-  test.fail('HALLAZGO 3 · el aviso de entrada inválida debe ser anunciable', async ({ page }) => {
+  test('918 · el aviso de entrada inválida es anunciable', async ({ page }) => {
     // Al escribir algo que no es un número el resultado DESAPARECE y aparece un <p> suelto.
     // Sin role="status"/"alert" ni aria-live, un lector de pantalla no anuncia ni la
     // desaparición ni el aviso: el usuario se queda esperando un resultado que ya no está.

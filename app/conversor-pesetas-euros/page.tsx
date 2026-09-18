@@ -6,10 +6,11 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import RegionBadge from '@/components/RegionBadge';
+import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { IPC_DATA, IPC_MAX_YEAR, TASA_FIJA_PESETA_EURO } from '@/data/ipc-ine';
+import { IPC_DATA, IPC_MAX_YEAR, IPC_META, TASA_FIJA_PESETA_EURO } from '@/data/ipc-ine';
 
 // La peseta circuló hasta el 28/02/2002; los años seleccionables para "valor real
 // hoy" son los que tienen IPC y son anteriores a la desaparición física de la moneda.
@@ -197,7 +198,7 @@ export default function ConversorPesetasEurosPage() {
                 </div>
               </>
             ) : (
-              <div className={styles.placeholder}>
+              <div className={styles.placeholder} role="status" aria-live="polite">
                 <div className={styles.placeholderIcon} aria-hidden="true">🪙</div>
                 <p>Introduce una cantidad válida para ver el resultado</p>
               </div>
@@ -296,7 +297,7 @@ export default function ConversorPesetasEurosPage() {
                 </div>
               </>
             ) : (
-              <div className={styles.placeholder}>
+              <div className={styles.placeholder} role="status" aria-live="polite">
                 <div className={styles.placeholderIcon} aria-hidden="true">📈</div>
                 <p>Introduce una cantidad válida para ver el resultado</p>
               </div>
@@ -323,6 +324,20 @@ export default function ConversorPesetasEurosPage() {
         severity="high"
         context="conversor-pesetas-euros"
         collapsible={false}
+      />
+
+      {/*
+        El modo «Valor real hoy» se apoya en una serie con caducidad anual, así que el
+        CLAUDE.md pide DataReference — y aquí hace falta por partida doble, porque el último
+        año de esa serie es una estimación propia y la pantalla lo atribuía al «IPC del INE»
+        sin matiz (hallazgos 916 y 917).
+      */}
+      <DataReference
+        normativa="IPC del INE (base 2021) y tipo fijo peseta-euro"
+        fuente={IPC_META.fuente}
+        verificado={IPC_META.verificado}
+        urlOficial={IPC_META.urlOficial}
+        nota={IPC_META.nota}
       />
 
       <EducationalSection
@@ -373,7 +388,7 @@ export default function ConversorPesetasEurosPage() {
                 <tr>
                   <td><strong>Ejemplo</strong></td>
                   <td>100.000 ptas = 601,01 €, sea del año que sea</td>
-                  <td>100.000 ptas de 1985 = unos 1.470 € de poder adquisitivo hoy</td>
+                  <td>100.000 ptas de 1985 = 2.070,61 € de poder adquisitivo hoy</td>
                 </tr>
               </tbody>
             </table>
