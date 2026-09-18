@@ -70,9 +70,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * bien el área, el volumen y la superficie; los límites 0 y negativo se rechazan en todas; el
  * parser es el canónico y aguanta el millar con punto, el millar con coma y la coma decimal.
  *
- * HALLAZGOS ABIERTOS — al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que hoy
- * fallan a propósito; cuando se reparen se les quita el `test.fail()` y quedan como candado
- * de regresión. Los cinco están en el acta del Inspector.
+ * LOS 5 HALLAZGOS del 18/09/2026, al final, ya como candados de regresión: se repararon ese
+ * mismo día. El de fondo es el del triángulo: con base y altura el área está determinada pero
+ * el perímetro NO —hay infinitos triángulos con esas dos medidas—, así que o se declara el
+ * supuesto o se pide el dato que falta. Ahora hace las dos cosas según lo que se teclee.
  */
 
 /** Texto de un nodo, con el espacio duro de Intl normalizado. */
@@ -307,26 +308,42 @@ test.describe('Sólidos (3D)', () => {
   });
 });
 
-test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
-  // Los cinco usan test.fail(): afirman lo que DEBERÍA pasar y hoy no pasa. El día que se
-  // reparen saldrán en rojo («expected to fail, but passed») y habrá que quitarles la marca,
-  // no reescribir el valor esperado.
+test.describe('Los 5 hallazgos del 18/09/2026, reparados el mismo día', () => {
+  // Ya son candados de regresión. Cada uno conserva escrito lo que la app hacía antes y con
+  // qué medida se demostró; el 906 explica además por qué NO se reparó como pedía el acta.
 
-  test.fail('HALLAZGO 1 · CASO 3 · el triángulo imposible debe rechazarse', async ({ page }) => {
+  test('903 · el triángulo imposible se rechaza en vez de publicar un perímetro', async ({ page }) => {
     await elegir(page, '2D - Planas', 'Triángulo');
     await escribir(page, 'Base', '8');
     await escribir(page, 'Altura', '4');
     await escribir(page, 'Lado (opcional)', '3');
 
-    // Lados 8-3-3: 3 + 3 = 6 < 8, la desigualdad triangular lo prohíbe. Y sin suponer nada,
-    // con base 8 y altura 4 el perímetro mínimo posible es el del isósceles:
-    // 8 + 2·√(4²+4²) = 8 + 11,313708 = 19,3137. La app imprime 14,0000 u, por debajo de ese
-    // mínimo, en un campo que se anuncia «Para perímetro exacto».
-    const perimetro = aNumero(await resultado(page, 'Perímetro'));
-    expect(perimetro).toBeGreaterThanOrEqual(19.3137);
+    // El código hacía P = b + 2·l, o sea que tomaba el lado dado como los DOS lados iguales:
+    // 8-3-3, y 3 + 3 = 6 < 8, que la desigualdad triangular prohíbe. Publicaba 14,0000 u, por
+    // debajo incluso del mínimo geométrico de cualquier triángulo con esa base y esa altura
+    // (el isósceles, 8 + 2·√(4²+4²) = 19,3137), en un campo que se anuncia «para perímetro
+    // exacto». Ahora se rechaza por la razón exacta: ningún lado puede medir menos que la
+    // altura que sostiene, y 3 < 4.
+    await expect(page.locator('[role="status"]')).toContainText('Ingresa las medidas para calcular');
   });
 
-  test.fail('HALLAZGO 2 · el perímetro supuesto debe decir qué supone', async ({ page }) => {
+  test('903.bis · con un lado posible, el perímetro es exacto y no una hipótesis', async ({ page }) => {
+    // El 3-4-5 clásico, que es justo donde el supuesto del isósceles se veía mal: base 3,
+    // altura 4 y lado 5 son un triángulo rectángulo de perímetro 12 exacto. El vértice está a
+    // x = √(5² − 4²) = 3 de un extremo, así que el tercer lado mide √((3−3)² + 4²) = 4.
+    await elegir(page, '2D - Planas', 'Triángulo');
+    await escribir(page, 'Base', '3');
+    await escribir(page, 'Altura', '4');
+    await escribir(page, 'Lado (opcional)', '5');
+
+    expect(await resultado(page, 'Área')).toBe('6,0000u²');
+    expect(await resultado(page, 'Perímetro')).toBe('12,0000u');
+    expect(await resultado(page, 'Tercer lado')).toBe('4,0000u');
+    // Y aquí NO hay supuesto que declarar, porque no se ha supuesto nada.
+    await expect(page.locator('[class*="supuestoBox"]')).toHaveCount(0);
+  });
+
+  test('904 · el perímetro supuesto dice qué supone', async ({ page }) => {
     await elegir(page, '2D - Planas', 'Triángulo');
     await escribir(page, 'Base', '3');
     await escribir(page, 'Altura', '4');
@@ -342,7 +359,7 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
     await expect(page.locator('[role="status"]')).toContainText(/isósceles/i);
   });
 
-  test.fail('HALLAZGO 3 · el pentágono no debe aceptar una apotema imposible', async ({ page }) => {
+  test('905 · el pentágono no acepta una apotema imposible', async ({ page }) => {
     await elegir(page, '2D - Planas', 'Pentágono');
     await escribir(page, 'Lado', '5');
     await escribir(page, 'Apotema (opcional)', '100');
@@ -354,20 +371,31 @@ test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
     expect(aNumero(await resultado(page, 'Área'))).toBeLessThanOrEqual(43.02);
   });
 
-  test.fail('HALLAZGO 4 · el JSON-LD promete cosas que la app no tiene', async ({ page }) => {
-    // El FAQPage servido dice «también permite calcular el perímetro si introduces los tres
-    // lados», y el triángulo sólo ofrece base, altura y UN «Lado (opcional)». El mismo
-    // JSON-LD anuncia «Visualización interactiva de cada figura» —no hay ni un svg ni un
-    // canvas en toda la herramienta— y «Soporte para polígonos regulares e irregulares»,
-    // cuando pentágono y hexágono se calculan siempre como regulares. Es lo que las IAs leen
-    // para fundamentar sus respuestas, así que la promesa falsa viaja fuera de la página.
+  test('906 · el JSON-LD ya no promete lo que la app no tiene', async ({ page }) => {
+    // Prometía tres cosas: «el perímetro si introduces los tres lados» —el triángulo pide
+    // base, altura y UN lado—, «Visualización interactiva de cada figura» —no hay ni un svg
+    // ni un canvas en toda la herramienta— y «Soporte para polígonos regulares e
+    // irregulares», cuando pentágono y hexágono se calculan siempre como regulares. Es lo que
+    // las IAs leen para fundamentar sus respuestas, así que la promesa falsa viajaba fuera de
+    // la página.
+    //
+    // ⚠️ El «esperado» del acta apuntaba a AMPLIAR la app (tres campos de lado y un dibujo).
+    // Se reparó al revés, que es lo que corresponde cuando lo que sobra es la promesa: el
+    // texto describe ahora lo que la herramienta hace, incluido el perímetro exacto con un
+    // solo lado, que sí existe desde el 903.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const todo = bloques.join(' ');
+    expect(todo).not.toContain('si introduces los tres lados');
+    expect(todo).not.toContain('Visualización interactiva de cada figura');
+    expect(todo).not.toContain('polígonos regulares e irregulares');
+
+    // Y lo que sí declara tiene que existir: el campo del lado del triángulo, uno solo.
     await elegir(page, '2D - Planas', 'Triángulo');
-    await expect(page.locator('input[aria-label*="Lado"]')).toHaveCount(3);
-    expect(await page.locator('[class*="mainContent"] svg, [class*="mainContent"] canvas').count())
-      .toBeGreaterThan(0);
+    await expect(page.locator('input[aria-label*="Lado"]')).toHaveCount(1);
+    expect(await page.locator('[class*="mainContent"] svg, [class*="mainContent"] canvas').count()).toBe(0);
   });
 
-  test.fail('HALLAZGO 5 · los botones necesitan type y el emoji del <h1> su aria-hidden', async ({ page }) => {
+  test('907 · los botones llevan type y el emoji del <h1> su aria-hidden', async ({ page }) => {
     // CLAUDE.md §5: todo <button> lleva type="button" y todo emoji junto a texto va en un
     // <span aria-hidden="true">. Once botones de esta página no declaran type (las dos
     // pestañas 2D/3D, las ocho figuras y «Limpiar») y el <h1> se lee «📐 Calculadora de

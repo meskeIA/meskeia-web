@@ -75,19 +75,58 @@ export default function CalculadoraGeometriaPage() {
         case 'triangulo': {
           const b = parseSpanishNumber(base);
           const h = parseSpanishNumber(altura);
-          const l = parseSpanishNumber(lado); // lado conocido si hay
+          const l = parseSpanishNumber(lado); // uno de los dos lados, si se conoce
           if (!b || !h || b <= 0 || h <= 0) return null;
 
           const area = (b * h) / 2;
-          // Asumimos triángulo isósceles si solo tenemos base y altura
-          const ladoCalc = l || Math.sqrt(Math.pow(b / 2, 2) + h * h);
-          const perimetro = l ? b + 2 * l : b + 2 * ladoCalc;
+          const ladoIsosceles = Math.sqrt(Math.pow(b / 2, 2) + h * h);
 
+          /*
+            ── Por qué el lado tecleado ya no se duplica (hallazgos 903 y 904) ──
+
+            El código hacía P = b + 2·l, o sea que trataba el lado dado como los DOS lados
+            iguales de un isósceles. Con base 8 y lado 3 eso publicaba un perímetro de 14 u
+            para un triángulo que no existe: 3 + 3 = 6 < 8, la desigualdad triangular no se
+            cumple. Y con base 8 y altura 4, el perímetro MÍNIMO de cualquier triángulo posible
+            es el del isósceles, 19,3137 u, así que aquellos 14 u estaban por debajo del mínimo
+            geométrico bajo cualquier interpretación.
+
+            Pero el campo promete «para perímetro exacto», y puede cumplirlo: con la base, la
+            altura y UN lado, el triángulo queda determinado. El vértice está a altura h y a
+            distancia l de un extremo de la base, así que su proyección sobre la base es
+            x = √(l² − h²), y el tercer lado es √((b − x)² + h²). Eso sí es un perímetro exacto
+            y no una hipótesis.
+
+            El único caso imposible es l < h: ningún lado puede ser más corto que la altura que
+            sostiene. Ahí se rechaza, como ya se rechazaba un lado ≤ 0.
+          */
+          if (l && l > 0) {
+            if (l < h) return null; // un lado más corto que la altura no cierra ningún triángulo
+            const x = Math.sqrt(l * l - h * h);
+            const tercerLado = Math.sqrt(Math.pow(b - x, 2) + h * h);
+            return {
+              area,
+              perimetro: b + l + tercerLado,
+              tercerLado,
+              formula: 'Área = (b×h)/2 · tercer lado = √((b − √(l²−h²))² + h²)',
+              supuesto: null,
+            };
+          }
+
+          /*
+            Sin el tercer dato, el área SÍ está determinada pero el perímetro NO: hay infinitos
+            triángulos con la misma base y la misma altura. Se publica el del isósceles, que es
+            además el más corto de todos, y se DICE — antes salía con cuatro decimales en una
+            tarjeta del mismo rango que el área, sin una palabra del supuesto, mientras la caja
+            de fórmulas solo enseñaba «Área = (b×h)/2».
+          */
           return {
             area,
-            perimetro,
-            hipotenusa: ladoCalc,
-            formula: 'Área = (b×h)/2'
+            perimetro: b + 2 * ladoIsosceles,
+            hipotenusa: ladoIsosceles,
+            formula: 'Área = (b×h)/2',
+            supuesto:
+              'El perímetro supone un triángulo ISÓSCELES: con solo la base y la altura hay infinitos triángulos posibles, y este es el de perímetro más corto. Escribe uno de los lados para obtener el perímetro exacto.',
           };
         }
         case 'circulo': {
@@ -106,13 +145,17 @@ export default function CalculadoraGeometriaPage() {
           const h = parseSpanishNumber(altura);
           if (!B || !b || !h || B <= 0 || b <= 0 || h <= 0) return null;
           const area = ((B + b) * h) / 2;
-          // Perímetro aproximado asumiendo lados iguales
+          // Mismo caso que el triángulo: con las dos bases y la altura, el área está
+          // determinada y el perímetro no. Se publica el del trapecio ISÓSCELES y se dice;
+          // el rectángulo de esas mismas medidas, por ejemplo, mide más.
           const ladoLateral = Math.sqrt(Math.pow((B - b) / 2, 2) + h * h);
           return {
             area,
             perimetro: B + b + 2 * ladoLateral,
             ladoLateral,
-            formula: 'Área = ((B+b)×h)/2'
+            formula: 'Área = ((B+b)×h)/2',
+            supuesto:
+              'El perímetro supone un trapecio ISÓSCELES (los dos lados laterales iguales). Con otras formas de la misma área el perímetro cambia: un trapecio rectángulo de 10, 6 y 4, por ejemplo, mide 25,6569 u en vez de 24,9443 u.',
           };
         }
         case 'rombo': {
@@ -132,15 +175,29 @@ export default function CalculadoraGeometriaPage() {
           const l = parseSpanishNumber(lado);
           const ap = parseSpanishNumber(apotema);
           if (!l || l <= 0) return null;
-          // Si no hay apotema, calcular para pentágono regular
-          const apotemaCalc = ap || (l / (2 * Math.tan(PI / 5)));
+          /*
+            En un pentágono REGULAR la apotema no es un dato libre: la fija el lado, con
+            a = l / (2·tan 36°). La app aplicaba A = (P×a)/2 con la apotema tecleada sin
+            comprobar que fuera la del polígono elegido, así que un lado 5 con apotema 100
+            —que exigiría unos 126 lados— publicaba 1.250 u² en vez de 43,0119, veintinueve
+            veces más, y presentaba esa apotema como dato válido (hallazgo 905).
+
+            Ahora la apotema tecleada solo sirve para AVISAR de que no encaja; el cálculo usa
+            siempre la del pentágono regular, que es la figura que el usuario ha elegido.
+          */
+          const apotemaRegular = l / (2 * Math.tan(PI / 5));
+          const apotemaIncoherente = Boolean(ap && ap > 0 && Math.abs(ap - apotemaRegular) / apotemaRegular > 0.01);
+          const apotemaCalc = apotemaRegular;
           const perimetro = 5 * l;
           const area = (perimetro * apotemaCalc) / 2;
           return {
             area,
             perimetro,
             apotema: apotemaCalc,
-            formula: 'Área = (P×a)/2, P = 5l'
+            formula: 'Área = (P×a)/2, P = 5l, a = l/(2·tan 36°)',
+            supuesto: apotemaIncoherente
+              ? `En un pentágono regular la apotema la fija el lado: con lado ${formatNumber(l, 4)} solo puede valer ${formatNumber(apotemaRegular, 4)}. La apotema que has escrito corresponde a otro polígono, así que no se ha usado.`
+              : null,
           };
         }
         case 'hexagono': {
@@ -356,7 +413,7 @@ export default function CalculadoraGeometriaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📐 Calculadora de Geometría</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📐</span> Calculadora de Geometría</h1>
         <p className={styles.subtitle}>
           Calcula áreas, perímetros, volúmenes y superficies de figuras geométricas
         </p>
@@ -368,6 +425,7 @@ export default function CalculadoraGeometriaPage() {
         <div className={styles.configPanel}>
           <div className={styles.dimensionTabs}>
             <button
+              type="button"
               className={`${styles.dimTab} ${dimension === '2D' ? styles.dimActivo : ''}`}
               aria-pressed={dimension === '2D'}
               onClick={() => { setDimension('2D'); limpiar(); }}
@@ -375,6 +433,7 @@ export default function CalculadoraGeometriaPage() {
               2D - Planas
             </button>
             <button
+              type="button"
               className={`${styles.dimTab} ${dimension === '3D' ? styles.dimActivo : ''}`}
               aria-pressed={dimension === '3D'}
               onClick={() => { setDimension('3D'); limpiar(); }}
@@ -391,6 +450,7 @@ export default function CalculadoraGeometriaPage() {
             {dimension === '2D'
               ? figuras2D.map((f) => (
                   <button
+                    type="button"
                     key={f.id}
                     className={`${styles.figuraBtn} ${figura2D === f.id ? styles.figuraActiva : ''}`}
                     aria-pressed={figura2D === f.id}
@@ -402,6 +462,7 @@ export default function CalculadoraGeometriaPage() {
                 ))
               : figuras3D.map((f) => (
                   <button
+                    type="button"
                     key={f.id}
                     className={`${styles.figuraBtn} ${figura3D === f.id ? styles.figuraActiva : ''}`}
                     aria-pressed={figura3D === f.id}
@@ -418,7 +479,7 @@ export default function CalculadoraGeometriaPage() {
             {dimension === '2D' ? renderInputs2D() : renderInputs3D()}
           </div>
 
-          <button onClick={limpiar} className={styles.btnLimpiar}>
+          <button type="button" onClick={limpiar} className={styles.btnLimpiar}>
             Limpiar
           </button>
         </div>
@@ -486,6 +547,15 @@ export default function CalculadoraGeometriaPage() {
                         icon="📏"
                       />
                     )}
+                    {resultados.tercerLado !== undefined && (
+                      <ResultCard
+                        title="Tercer lado"
+                        value={formatNumber(resultados.tercerLado, 4)}
+                        unit="u"
+                        variant="default"
+                        icon="📏"
+                      />
+                    )}
                   </>
                 ) : (
                   <>
@@ -543,6 +613,12 @@ export default function CalculadoraGeometriaPage() {
                 )}
               </div>
 
+              {resultados.supuesto && (
+                <p className={styles.supuestoBox} role="note">
+                  <span aria-hidden="true">ℹ️</span> {resultados.supuesto}
+                </p>
+              )}
+
               <div className={styles.formulaBox}>
                 <h3>Fórmulas aplicadas</h3>
                 <p className={styles.formula}>{resultados.formula}</p>
@@ -558,7 +634,7 @@ export default function CalculadoraGeometriaPage() {
       >
         {/* SECCIÓN 1: Tabla Comparativa 2D vs 3D */}
         <section className={styles.guideSection}>
-          <h2>📊 Figuras 2D vs 3D: Comparación Completa</h2>
+          <h2><span aria-hidden="true">📊</span> Figuras 2D vs 3D: Comparación Completa</h2>
           <p className={styles.introParagraph}>
             Comprende las diferencias fundamentales entre figuras planas (2D) y sólidos (3D),
             sus propiedades, fórmulas clave y aplicaciones prácticas en matemáticas y ciencias.
@@ -647,7 +723,7 @@ export default function CalculadoraGeometriaPage() {
 
         {/* SECCIÓN 2: Casos de Uso (Estudiantes) */}
         <section className={styles.guideSection}>
-          <h2>👥 ¿Quién Usa Esta Calculadora?</h2>
+          <h2><span aria-hidden="true">👥</span> ¿Quién Usa Esta Calculadora?</h2>
           <p className={styles.introParagraph}>
             Casos reales de estudiantes de diferentes niveles académicos que utilizan la calculadora
             de geometría para resolver problemas, verificar resultados y comprender conceptos.
@@ -655,7 +731,7 @@ export default function CalculadoraGeometriaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📐 Marta - Estudiante de Arquitectura</h4>
+              <h4><span aria-hidden="true">📐</span> Marta - Estudiante de Arquitectura</h4>
               <p>
                 <strong>Situación:</strong> Diseño de proyecto de vivienda unifamiliar.
               </p>
@@ -670,7 +746,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔬 David - Ingeniería Industrial (Universidad)</h4>
+              <h4><span aria-hidden="true">🔬</span> David - Ingeniería Industrial (Universidad)</h4>
               <p>
                 <strong>Situación:</strong> Ejercicios de resistencia de materiales y cálculo de volúmenes.
               </p>
@@ -685,7 +761,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📚 Laura - Secundaria, Matemáticas</h4>
+              <h4><span aria-hidden="true">📚</span> Laura - Secundaria, Matemáticas</h4>
               <p>
                 <strong>Situación:</strong> Deberes de geometría sobre áreas y perímetros.
               </p>
@@ -700,7 +776,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>👨‍🏫 Profesor Andrés - Preparatoria (Matemáticas)</h4>
+              <h4><span aria-hidden="true">👨‍🏫</span> Profesor Andrés - Preparatoria (Matemáticas)</h4>
               <p>
                 <strong>Situación:</strong> Creación de exámenes y ejercicios de geometría.
               </p>
@@ -718,7 +794,7 @@ export default function CalculadoraGeometriaPage() {
 
         {/* SECCIÓN 3: FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes de Estudiantes</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes de Estudiantes</h2>
 
           <div className={styles.faqItem}>
             <h4 className={styles.faqQuestion}>¿Cómo memorizo todas estas fórmulas para el examen?</h4>
@@ -831,7 +907,7 @@ export default function CalculadoraGeometriaPage() {
 
         {/* SECCIÓN 4: Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>🎯 Guía Paso a Paso: Resolver Problemas de Geometría</h2>
+          <h2><span aria-hidden="true">🎯</span> Guía Paso a Paso: Resolver Problemas de Geometría</h2>
           <p className={styles.introParagraph}>
             Metodología sistemática para abordar cualquier problema de geometría sin perderte.
             Especialmente útil en exámenes bajo presión.
@@ -920,11 +996,11 @@ export default function CalculadoraGeometriaPage() {
 
         {/* SECCIÓN 5: Tips de Estudio */}
         <section className={styles.guideSection}>
-          <h2>💡 Tips de Estudio para Dominar Geometría</h2>
+          <h2><span aria-hidden="true">💡</span> Tips de Estudio para Dominar Geometría</h2>
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📌 1. Crea tu Formulario Visual</h4>
+              <h4><span aria-hidden="true">📌</span> 1. Crea tu Formulario Visual</h4>
               <p>
                 Dibuja en una hoja TODAS las figuras (2D y 3D) con sus fórmulas al lado.
                 Usa colores: azul para 2D, rojo para 3D. Pon ejemplos numéricos debajo de cada fórmula.
@@ -933,7 +1009,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔄 2. Practica con Figuras Compuestas</h4>
+              <h4><span aria-hidden="true">🔄</span> 2. Practica con Figuras Compuestas</h4>
               <p>
                 Los problemas reales combinan figuras (ej: área de una casa = rectángulo + triángulo).
                 Descompón figuras complejas en formas básicas, calcula cada una, y SUMA/RESTA áreas.
@@ -942,7 +1018,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📐 3. Aprende Patrones, No Solo Fórmulas</h4>
+              <h4><span aria-hidden="true">📐</span> 3. Aprende Patrones, No Solo Fórmulas</h4>
               <p>
                 <strong>Patrón círculos:</strong> Área = πr², Perímetro = 2πr (siempre el doble del radio).
                 <strong>Patrón prismas:</strong> Volumen = Área_base × altura (funciona para cilindro, prisma rectangular, etc.).
@@ -951,7 +1027,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎮 4. Usa Problemas de la Vida Real</h4>
+              <h4><span aria-hidden="true">🎮</span> 4. Usa Problemas de la Vida Real</h4>
               <p>
                 Calcula el área de tu habitación (rectángulo), el volumen de una lata de refresco (cilindro),
                 o el perímetro de una cancha de fútbol. Medir cosas reales hace la geometría más memorable
@@ -960,7 +1036,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>⏱️ 5. Cronometra tus Ejercicios</h4>
+              <h4><span aria-hidden="true">⏱️</span> 5. Cronometra tus Ejercicios</h4>
               <p>
                 En exámenes, el tiempo es limitado. Practica resolver 5 problemas tipo en 30 minutos.
                 Identifica qué tipo de ejercicio te lleva más tiempo (ej: polígonos irregulares) y practica
@@ -969,7 +1045,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🤝 6. Explica las Fórmulas a Alguien</h4>
+              <h4><span aria-hidden="true">🤝</span> 6. Explica las Fórmulas a Alguien</h4>
               <p>
                 La mejor forma de confirmar que entiendes es ENSEÑAR. Explica a un compañero por qué
                 el área del círculo es πr² (relación entre radio y circunferencia). Si puedes explicarlo
@@ -982,7 +1058,7 @@ export default function CalculadoraGeometriaPage() {
         {/* SECCIÓN 6: Warning Box - Errores Comunes */}
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Errores Comunes que Debes Evitar</h3>
+            <h3><span aria-hidden="true">⚠️</span> Errores Comunes que Debes Evitar</h3>
             <p className={styles.warningIntro}>
               Estos son los fallos más frecuentes que cometen estudiantes en exámenes de geometría.
               Revisar esta lista antes de entregar puede salvarte puntos valiosos.
@@ -990,7 +1066,7 @@ export default function CalculadoraGeometriaPage() {
 
             <div className={styles.contentGrid}>
               <div className={styles.warningCard}>
-                <h4>❌ Confundir Perímetro con Área</h4>
+                <h4><span aria-hidden="true">❌</span> Confundir Perímetro con Área</h4>
                 <p>
                   <strong>Error típico:</strong> Usar la fórmula del área cuando piden perímetro (o viceversa).
                 </p>
@@ -1001,7 +1077,7 @@ export default function CalculadoraGeometriaPage() {
               </div>
 
               <div className={styles.warningCard}>
-                <h4>❌ Olvidar Elevar al Cuadrado/Cubo</h4>
+                <h4><span aria-hidden="true">❌</span> Olvidar Elevar al Cuadrado/Cubo</h4>
                 <p>
                   <strong>Error típico:</strong> Área del cuadrado = 4 × l (incorrecto). Lo correcto es l².
                   Volumen del cubo = 3 × l (incorrecto). Lo correcto es l³.
@@ -1013,7 +1089,7 @@ export default function CalculadoraGeometriaPage() {
               </div>
 
               <div className={styles.warningCard}>
-                <h4>❌ Mezclar Unidades sin Convertir</h4>
+                <h4><span aria-hidden="true">❌</span> Mezclar Unidades sin Convertir</h4>
                 <p>
                   <strong>Error típico:</strong> Base = 2 m, altura = 50 cm → Área = 2 × 50 = 100 (INCORRECTO).
                 </p>
@@ -1024,7 +1100,7 @@ export default function CalculadoraGeometriaPage() {
               </div>
 
               <div className={styles.warningCard}>
-                <h4>❌ Usar π = 3 (Aproximación Demasiado Burda)</h4>
+                <h4><span aria-hidden="true">❌</span> Usar π = 3 (Aproximación Demasiado Burda)</h4>
                 <p>
                   <strong>Error típico:</strong> Calcular π como 3 da resultados imprecisos que pueden ser marcados como incorrectos.
                 </p>
@@ -1035,7 +1111,7 @@ export default function CalculadoraGeometriaPage() {
               </div>
 
               <div className={styles.warningCard}>
-                <h4>❌ Confundir Radio con Diámetro</h4>
+                <h4><span aria-hidden="true">❌</span> Confundir Radio con Diámetro</h4>
                 <p>
                   <strong>Error típico:</strong> El problema dice "círculo de 10 cm de diámetro" y usas r = 10 (INCORRECTO).
                   El radio es la MITAD del diámetro.
@@ -1047,7 +1123,7 @@ export default function CalculadoraGeometriaPage() {
               </div>
 
               <div className={styles.warningCard}>
-                <h4>❌ No Leer Bien el Enunciado</h4>
+                <h4><span aria-hidden="true">❌</span> No Leer Bien el Enunciado</h4>
                 <p>
                   <strong>Error típico:</strong> El problema pide "superficie a pintar" (solo paredes, sin techo/suelo)
                   y calculas superficie TOTAL del cubo.
@@ -1059,7 +1135,7 @@ export default function CalculadoraGeometriaPage() {
               </div>
 
               <div className={styles.warningCard}>
-                <h4>❌ Aplicar Fórmula Incorrecta por Prisa</h4>
+                <h4><span aria-hidden="true">❌</span> Aplicar Fórmula Incorrecta por Prisa</h4>
                 <p>
                   <strong>Error típico:</strong> Calcular el área de un triángulo con b × h (sin dividir entre 2).
                   O volumen de cono como πr²h (sin el 1/3).
@@ -1071,7 +1147,7 @@ export default function CalculadoraGeometriaPage() {
               </div>
 
               <div className={styles.warningCard}>
-                <h4>❌ Redondear Demasiado Pronto</h4>
+                <h4><span aria-hidden="true">❌</span> Redondear Demasiado Pronto</h4>
                 <p>
                   <strong>Error típico:</strong> Calcular √2 = 1,4 y usar ese valor en pasos siguientes (pierde precisión).
                 </p>

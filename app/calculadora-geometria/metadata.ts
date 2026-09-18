@@ -36,16 +36,18 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Calculadora de Geometría',
-  description: 'Calculadora de geometría online: áreas, perímetros y volúmenes de figuras 2D y 3D. Triángulos, círculos, polígonos regulares, esferas, cilindros, conos y prismas con visualización interactiva.',
+  description: 'Calculadora de geometría online: áreas, perímetros y volúmenes de figuras 2D y 3D. Triángulos, círculos, polígonos regulares, esferas, cilindros, conos y prismas, con la fórmula aplicada a la vista y el supuesto declarado cuando los datos no determinan el perímetro.',
   url: 'https://meskeia.com/calculadora-geometria/',
   category: 'EducationalApplication',
   features: [
-    'Áreas y perímetros de figuras 2D (triángulo, círculo, polígonos)',
-    'Volúmenes y áreas superficiales de figuras 3D',
-    'Visualización interactiva de cada figura',
-    'Fórmulas explicadas paso a paso',
-    'Soporte para polígonos regulares e irregulares',
-    'En español',
+    'Áreas y perímetros de 8 figuras planas: cuadrado, rectángulo, triángulo, círculo, trapecio, rombo, pentágono y hexágono',
+    'Volúmenes y áreas superficiales de 6 sólidos: cubo, prisma, cilindro, esfera, cono y pirámide',
+    'Perímetro exacto del triángulo cuando se conoce uno de sus lados, con el tercero calculado',
+    'Declara el supuesto cuando los datos no determinan el perímetro (triángulo y trapecio isósceles)',
+    'Comprueba que la apotema tecleada sea la que corresponde al polígono regular elegido',
+    'Fórmula aplicada visible junto a cada resultado',
+    'Resultados con cuatro decimales en formato español',
+    'En español y sin registro',
   ],
   keywords: ['geometría', 'área', 'perímetro', 'volumen', 'figuras geométricas', 'estudiantes'],
 });
@@ -67,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el área de un triángulo con esta herramienta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Selecciona "Triángulo" e introduce la base y la altura perpendicular. La calculadora aplica la fórmula A = (base × altura) / 2 y muestra el resultado con la fórmula visible. También permite calcular el perímetro si introduces los tres lados.',
+        text: 'Selecciona "Triángulo" e introduce la base y la altura perpendicular. La calculadora aplica la fórmula A = (base × altura) / 2 y muestra el resultado con la fórmula visible. Con el área basta, pero para el perímetro hace falta un dato más: con solo la base y la altura hay infinitos triángulos posibles, así que la calculadora da el del isósceles —el más corto— y lo advierte. Si escribes además uno de los lados, calcula el tercero y el perímetro pasa a ser exacto.',
       },
     },
     {
