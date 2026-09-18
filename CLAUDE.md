@@ -465,6 +465,29 @@ fichero ya arrastraba se cuenta y se nombra, pero no detiene nada. Falso positiv
 > Qué demuestra cada regla por la forma del código, de qué caso salió y por qué tres solo avisan:
 > cabecera de `scripts/check-a11y-jsx.mjs`. Sus casos de prueba, en `scripts/pruebas/a11y-regla5.tsx`.
 
+### Candado del aviso legal
+
+`npm run check:legal` — lo ejecuta también `npm run build`, y **rompe el build** si una app de
+`implementedAppsUrls` no monta `<LegalNotice />`. Exige además las dos cosas que impiden que eso
+se cumpla solo en apariencia: que el componente se **monte** y no solo se importe (un import
+huérfano deja la página igual de desnuda), y que **no viva dentro de `<EducationalSection>`**, que
+nace colapsada — es la prohibición expresa de más arriba: un aviso legal no es maquetación.
+
+Salió del Inspector el 18/09/2026: `test-fragilidad` (escala FRAIL, riesgo 1) era la **única de
+las 21 apps `app/test-*`** sin aviso legal, y justo la que pregunta cinco cosas sobre la salud de
+quien la usa. El barrido encontró otras seis, tres de riesgo 1. **El Cuadre no podía verlo**: su
+regla de `LegalNotice` salta cuando el componente cae a CERO comparando antes y después, así que
+cubre la desaparición y es ciega a la ausencia de origen — «nacer no es una sorpresa».
+
+⚠️ **Sin pasivo**: las siete se repararon en el mismo commit que lo creó, así que solo puede
+encenderlo una app nueva. Falso positivo: `legal-ok: <razón>` en el `page.tsx` de la app, y **la
+razón es obligatoria** — la marca a secas también rompe el build.
+
+> Las tres veces que este candado se equivocó antes de estar bien —un comentario que nombraba
+> `<EducationalSection>`, una regex con acentos graves y el `\s*` del escape comiéndose el salto
+> de línea— están en `scripts/pruebas/probar-check-legal-notice.mjs` como casos que exigen que
+> **calle**. Se le reinyectan los 8 con **`npm run legal:probar-candado`**.
+
 ### Candado del mínimo personal del IRPF
 
 `npm run check:minimo-irpf` — lo ejecuta también `npm run build`, y **rompe el build** si en un
