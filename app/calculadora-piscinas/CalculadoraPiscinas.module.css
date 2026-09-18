@@ -274,6 +274,22 @@
   line-height: 1.5;
 }
 
+/* Aviso de por qué no se ha podido calcular (sustituye al resultado, no se suma a él) */
+.errorBox {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  border-radius: var(--radius);
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .errorBox {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
 .tipBox {
   background: rgba(72, 169, 166, 0.1);
   border: 1px solid rgba(72, 169, 166, 0.3);

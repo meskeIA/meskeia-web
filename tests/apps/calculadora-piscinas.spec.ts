@@ -4,6 +4,7 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 /**
  * Inspector — calculadora-piscinas (segmento CÁLCULO, riesgo 2, 58 usos/90 d)
  * Primera inspección: 18/09/2026. Banco de pruebas: producción.
+ * Reparación de los 9 hallazgos: 18/09/2026, misma fecha.
  *
  * QUÉ PROMETE LA APP
  *   · <h1> «Calculadora de Piscinas, Albercas y Piletas» y subtítulo «Volumen y dosis de
@@ -11,56 +12,72 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     un volumen geométrico y una DOSIFICACIÓN DE PRODUCTO QUÍMICO. La segunda es la de
  *     riesgo, y por eso aquí se contrasta cifra a cifra contra lo que la propia página
  *     afirma en su guía, en sus escenarios resueltos y en su FAQPage.
- *   · metadata.ts / FAQPage (servido, comprobado abajo): «largo × ancho × profundidad
- *     media», «1 m³ = 1.000 litros», «(prof. mínima + prof. máxima) / 2», pH 7,2–7,6,
- *     alguicida «0,5-1 L por cada 50 m³» de choque y «0,1-0,2 L por cada 50 m³» de
- *     mantenimiento, sal «3-5 g/L», cloro «150-300 g ... diariamente» en 50 m³.
  *
  * DÓNDE VIVE EL CÁLCULO — no hay motor aparte: `calcularVolumen` y `calcularDosis`, dos
  * funciones puras al principio de app/calculadora-piscinas/page.tsx.
- *   · La entrada la lee `parseNum` = parseSpanishNumber() de @/lib — el parser CANÓNICO,
- *     no el parseFloat(x.replace(',', '.')) que el catálogo arrastra. Los CASOS 1.bis y
- *     1.ter son justo los dos que ese defecto y su reverso romperían.
+ *   · La entrada la lee parseSpanishNumber() de @/lib — el parser CANÓNICO, no el
+ *     parseFloat(x.replace(',', '.')) que el catálogo arrastra. Los CASOS 1.bis y 1.ter
+ *     son justo los dos que ese defecto y su reverso romperían.
  *   · Los cuatro campos son type="text" + inputMode="decimal", así que el navegador NO
  *     normaliza lo tecleado: «1,500» llega a la app tal cual y vale 1,5. (En un
  *     type="number" el navegador lo convertiría a «1.500» y el parser lo leería como
  *     millar español: 1.500 m de profundidad. Aquí no ocurre.)
  *
- * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * ── CÓMO SE DOSIFICA DESDE LA REPARACIÓN DEL 18/09/2026 ──
  *
- *   CASO 1 (normal) — rectangular 10 × 5 × 1,5 m
- *       V = 10 × 5 × 1,5 = 75 m³ exactos = 75.000 litros.
- *       Dosis derivadas (los coeficientes están escritos en calcularDosis, y cada uno se
- *       redondea hacia arriba con Math.ceil):
- *         cloro granulado   2 g/m³ → 150 g  ·  choque 10 g/m³ → 750 g
- *         cloro líquido    15 mL/m³ → 1125 mL ·  choque 60 mL/m³ → 4500 mL
- *         pH+ 15 g/m³ → 1125 g  ·  pH− 12 g/m³ → 900 g
- *         alguicida 20 mL/m³ → 1500 mL · choque 100 mL/m³ → 7500 mL   ← véase HALLAZGO 1
- *         sal 6 kg/m³ → 450 kg · reposición 20 % → 90 kg
- *       La sal SÍ cuadra en unidades: 6 kg/m³ = 6 kg por 1.000 L = 6 g/L, que es lo que
- *       la tarjeta promete, y coincide con el escenario de la propia app («40 × 6 = 240 kg»).
+ * El cloro se dosifica por CLORO LIBRE objetivo en ppm (= mg/L), no por gramos de producto
+ * sin procedencia: 1 ppm en 1 m³ son 1.000 L × 1 mg/L = 1 g de cloro activo, y el producto
+ * necesario es ese gramo dividido por su riqueza. Constantes declaradas en page.tsx:
+ *     PPM_CHOQUE = 10 · PPM_MANTENIMIENTO_SEMANA = 7 (repone ~1 ppm/día)
+ *     RIQUEZA_GRANULADO = 0,65 · RIQUEZA_LIQUIDO_G_ML = 0,156 (13 % p/p × 1,2 kg/L)
+ *     SAL_G_L = 5 · ALGUICIDA 10 mL/m³ de choque y 2 mL/m³ preventivo
+ *     MAX_DIMENSION_M = 100 · MAX_PROFUNDIDAD_M = 5
  *
- *   CASO 2 (las otras dos formas, con valor cerrado)
- *       Circular Ø 6 m (radio 3) y 1,2 m: V = π · 3² · 1,2 = 33,92920065… m³ → «33,9 m³»
- *       y 33.929 litros.
- *       Ovalada 10 × 5 × 1,5: V = π · 5 · 2,5 · 1,5 = 58,90486225… m³ → «58,9 m³» y
- *       58.905 litros (área de elipse, no el 0,89 aproximado que usan otras calculadoras).
+ * Esto es lo que se reparó, y por qué el «esperado» no siempre es el que escribió el acta:
  *
- *   CASO 3 (límite y rechazo) — lo que NO puede ser una piscina
- *       −10 × −5 × 1,5: el producto de dos negativos es positivo, así que la guarda
- *       `vol <= 0` no lo ve y la app da 75 m³ y 750 g de cloro de choque para una piscina
- *       de lados negativos. Y una profundidad de «1.500» (millar español legítimo para el
- *       parser) da 75.000 m³ y 450.000 kg de sal sin un solo aviso. Lo esperado en ambos
- *       casos es un rechazo. → HALLAZGO 2.
- *       Con una entrada que no es número («abc») o con un volumen negativo, la app hace
- *       `return` sin tocar el estado: no borra el resultado anterior ni avisa. → HALLAZGO 3.
+ *   · ALGUICIDA (hallazgo 919, alto) — el código multiplicaba por 100 y 20 mL/m³, DIEZ
+ *     VECES lo que la propia app documenta en tres sitios que coincidían entre sí. Aquí el
+ *     acta y la reparación coinciden: 10 y 2 mL/m³.
  *
- * EL VOLUMEN ESTÁ SANO (18/09/2026): las tres formas, el parser y el litro cuadran. Lo que
- * no cuadra es la DOSIFICACIÓN, y la propia página lo dice en tres sitios distintos.
+ *   · CLORO (hallazgo 923) — el acta pedía «una sola cifra» y su test exigía ≥150 g en
+ *     50 m³, deducido del FAQPage («150-300 g diariamente»). Pero ninguna de las tres
+ *     cifras que la página publicaba tenía procedencia: eran tres números sueltos. La
+ *     reparación no elige entre ellos, sino que los DERIVA de los ppm, que es lo único
+ *     comprobable con una división; el FAQPage y la guía se reescribieron sobre esa base.
+ *     50 m³ pasan de 100 g a 539 g semanales, así que el umbral del acta se cumple, pero
+ *     por la razón correcta y no por haber programado hacia su aserción.
  *
- * HALLAZGOS ABIERTOS — al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que
- * hoy fallan a propósito; cuando se reparen se les quita el `test.fail()` y quedan como
- * candado de regresión.
+ *   · pH 8 (hallazgo 926) — el acta esperaba el «20 %» del FAQPage frente al «3 %» de la
+ *     guía. Ninguno de los dos es el número: la curva de disociación del ácido hipocloroso
+ *     (pKa 7,54 a 25 °C) da 100/(1+10^(pH−7,54)) = 25,7 % a pH 8 y 68,6 % a pH 7,2. La
+ *     página dice ahora 26 %, 47 % (pH 7,6) y 69 %, y cita de dónde sale.
+ *
+ *   · SAL (hallazgo 922) — dosificaba 6 g/L con el FAQPage anunciando «3-5 g/L». Se
+ *     dosifica a 5 g/L, centro del rango 4-6 g/L que declaran los electrolizadores
+ *     domésticos, y la tarjeta remite al manual del clorador, que es quien lo fija.
+ *
+ *   · DISCLAIMER (hallazgo 924) — el acta proponía la variante `technical`, cuyo texto
+ *     estándar dice «dirigida a profesionales del dominio que conocen sus limitaciones»:
+ *     falso en una app doméstica. Se monta `general` con severidad alta y texto propio
+ *     sobre productos químicos, que es el riesgo que esta app sí tiene.
+ *
+ * LOS CASOS, RESUELTOS A MANO
+ *
+ *   CASO 1 (normal) — rectangular 10 × 5 × 1,5 m = 75 m³ exactos = 75.000 litros.
+ *       cloro granulado   ceil(75×7/0,65) = 808 g  ·  choque ceil(75×10/0,65) = 1154 g
+ *       cloro líquido     ceil(75×7/0,156) = 3366 mL ·  choque ceil(75×10/0,156) = 4808 mL
+ *       pH+ 15 g/m³ → 1125 g  ·  pH− 12 g/m³ → 900 g
+ *       alguicida 2 mL/m³ → 150 mL · choque 10 mL/m³ → 750 mL
+ *       sal 5 kg/m³ → 375 kg · reposición 20 % → 75 kg
+ *       (1 m³ a 1 g/L es 1 kg, así que kg de sal = m³ × g/L.)
+ *
+ *   CASO 2 (las otras dos formas) — circular Ø 6 m y 1,2 m: π · 3² · 1,2 = 33,92920065… m³
+ *       → «33,9 m³» y 33.929 litros. Ovalada 10 × 5 × 1,5: π · 5 · 2,5 · 1,5 = 58,90486… m³
+ *       → «58,9 m³» y 58.905 litros (área de elipse, no el 0,89 aproximado de otras).
+ *
+ *   CASO 3 (rechazo) — lo que NO puede ser una piscina: lados negativos, medidas por
+ *       encima del tope y texto que no es número. Los tres salen con aviso en role="alert"
+ *       y RETIRAN el resultado anterior.
  */
 
 /** El volumen que la app muestra: «75,0 m³ (75.000 litros)». */
@@ -69,6 +86,9 @@ const volumen = (page: Page) => page.locator('[class*="volumenValue"]');
 /** Una dosis concreta: tarjeta (0 cloro, 1 pH, 2 alguicida, 3 sal) y posición dentro. */
 const dosis = (page: Page, tarjeta: number, fila: number) =>
   page.locator('[class*="productoCard"]').nth(tarjeta).locator('[class*="dosisValue"]').nth(fila);
+
+/** El aviso de por qué no se ha podido calcular. */
+const aviso = (page: Page) => page.locator('[class*="errorBox"]');
 
 /** El botón que dispara el cálculo (la app NO calcula al teclear). */
 const botonCalcular = (page: Page) =>
@@ -107,19 +127,18 @@ test.describe('Volumen (la primera promesa del h1)', () => {
     // 10 × 5 × 1,5 = 75 m³ · 1 m³ = 1.000 L → 75.000 litros (lo dice el propio FAQPage).
     await expect(volumen(page)).toHaveText('75,0 m³ (75.000 litros)');
 
-    // Cloro granulado: 2 g/m³ mantenimiento y 10 g/m³ choque (los coeficientes de
-    // calcularDosis, y el choque coincide con el paso 4 de la guía: «10 g/m³»).
-    await expect(dosis(page, 0, 0)).toHaveText('150 g');   // 75 × 2
-    await expect(dosis(page, 0, 1)).toHaveText('750 g');   // 75 × 10
-    // Cloro líquido: 15 y 60 mL/m³.
-    await expect(dosis(page, 0, 2)).toHaveText('1125 mL'); // 75 × 15
-    await expect(dosis(page, 0, 3)).toHaveText('4500 mL'); // 75 × 60
-    // Corrector de pH: 15 y 12 g/m³ por cada ~0,2 unidades.
+    // Cloro granulado al 65 %: 7 ppm/semana y 10 ppm de choque, divididos por la riqueza.
+    await expect(dosis(page, 0, 0)).toHaveText('808 g');   // ceil(75 × 7 / 0,65)
+    await expect(dosis(page, 0, 1)).toHaveText('1154 g');  // ceil(75 × 10 / 0,65)
+    // Cloro líquido al 13 % (0,156 g de cloro activo por mL): los MISMOS ppm.
+    await expect(dosis(page, 0, 2)).toHaveText('3366 mL'); // ceil(75 × 7 / 0,156)
+    await expect(dosis(page, 0, 3)).toHaveText('4808 mL'); // ceil(75 × 10 / 0,156)
+    // Corrector de pH: 15 y 12 g/m³ por cada ~0,2 unidades (no los tocó la reparación).
     await expect(dosis(page, 1, 0)).toHaveText('1125 g');  // 75 × 15
     await expect(dosis(page, 1, 1)).toHaveText('900 g');   // 75 × 12
-    // Sal: 6 kg/m³ = 6 g/L, el objetivo que la tarjeta declara. 75 × 6 = 450 kg.
-    await expect(dosis(page, 3, 0)).toHaveText('450 kg');
-    await expect(dosis(page, 3, 1)).toHaveText('90 kg');   // ceil(450 × 0,2)
+    // Sal: 5 kg/m³ = 5 g/L. 75 × 5 = 375 kg, y la reposición anual es el 20 %.
+    await expect(dosis(page, 3, 0)).toHaveText('375 kg');
+    await expect(dosis(page, 3, 1)).toHaveText('75 kg');   // ceil(375 × 0,2)
   });
 
   test('CASO 1.bis · una profundidad tecleada «1,500» son 1,5 m, no 1.500', async ({ page }) => {
@@ -136,13 +155,20 @@ test.describe('Volumen (la primera promesa del h1)', () => {
   });
 
   test('CASO 1.ter · lee el separador de millar español en vez de comérselo', async ({ page }) => {
+    // Hasta la reparación esto se comprobaba en el volumen: «1.000» de largo daba 7.500 m³
+    // y con parseFloat(x.replace(',', '.')) habría dado 7,5 m³, mil veces menos. Ahora
+    // 1.000 m es una medida imposible y la app la rechaza, así que la prueba de que el
+    // parser LEE el millar está en el aviso: nombra 1.000,0 m. Si se comiera el punto, el
+    // largo valdría 1 m, sería plausible y no habría aviso ninguno.
     await teclear(page, '#largo', '1.000');
     await teclear(page, '#ancho', '5');
     await botonCalcular(page).click();
 
-    // 1.000 × 5 × 1,5 = 7.500 m³. Con parseFloat(x.replace(',', '.')) el largo habría
-    // valido 1 m y el resultado habría sido 7,5 m³ — mil veces menos, sin ningún aviso.
-    await expect(volumen(page)).toHaveText('7500,0 m³ (7.500.000 litros)');
+    // Ojo al formato: es-ES NO agrupa los millares hasta las cinco cifras, así que
+    // formatNumber(1000, 1) es «1000,0» y no «1.000,0». Es el mismo detalle que mantuvo
+    // oculto durante meses el fallo del parser en estimador-compraventa-inmueble.
+    await expect(aviso(page)).toContainText('1000,0 m');
+    await expect(volumen(page)).toHaveCount(0);
   });
 
   test('CASO 2 · circular Ø 6 m y 1,2 m de fondo son 33,9 m³', async ({ page }) => {
@@ -153,9 +179,9 @@ test.describe('Volumen (la primera promesa del h1)', () => {
 
     // π · (6/2)² · 1,2 = π · 9 · 1,2 = 33,92920065… m³ → «33,9 m³» y 33.929 litros.
     await expect(volumen(page)).toHaveText('33,9 m³ (33.929 litros)');
-    // Y las dosis se derivan de ESE volumen: ceil(33,9292 × 2) = 68 g de mantenimiento.
-    await expect(dosis(page, 0, 0)).toHaveText('68 g');
-    await expect(dosis(page, 3, 0)).toHaveText('204 kg'); // ceil(33,9292 × 6)
+    // Y las dosis se derivan de ESE volumen, sin redondear antes de multiplicar.
+    await expect(dosis(page, 0, 0)).toHaveText('366 g');  // ceil(33,9292 × 7 / 0,65)
+    await expect(dosis(page, 3, 0)).toHaveText('170 kg'); // ceil(33,9292 × 5)
   });
 
   test('CASO 2.bis · ovalada 10 × 5 × 1,5 usa el área de elipse, no una aproximación', async ({ page }) => {
@@ -181,123 +207,177 @@ test.describe('Volumen (la primera promesa del h1)', () => {
   });
 });
 
-test.describe('HALLAZGOS ABIERTOS (18/09/2026)', () => {
-  // Los siete usan test.fail(): afirman lo que DEBERÍA pasar y hoy no pasa. El día que se
-  // reparen saldrán en rojo («expected to fail, but passed») y habrá que quitarles la
-  // marca, no reescribir el valor esperado.
-
-  test.fail('HALLAZGO 1 · la dosis de alguicida debe ser la que la propia app enseña', async ({ page }) => {
-    // calcularDosis usa 20 mL/m³ preventivo y 100 mL/m³ de choque. La MISMA página dice
-    // tres veces otra cosa, y las tres coinciden entre sí:
-    //   · paso 5 de la guía: «dosis de choque de alguicida (100 mL/10 m³)» y «dosis
-    //     semanales de 20 mL/10 m³» → 10 y 2 mL/m³;
-    //   · escenario «Agua verde», piscina de 40 m³: «Alguicida de choque: 400 mL»
-    //     (= 10 mL/m³; la calculadora da 4.000 mL para esa misma piscina);
-    //   · FAQPage servido: choque «0,5-1 L por cada 50 m³» y mantenimiento «0,1-0,2 L por
-    //     cada 50 m³» → 10-20 y 2-4 mL/m³.
-    // La calculadora multiplica por DIEZ la dosis de su propia documentación. En 75 m³ eso
-    // son 7,5 litros de alguicida en vez de 750 mL: espuma persistente y, con los
-    // alguicidas de amonio cuaternario, irritación de ojos y piel.
+test.describe('Dosificación y rechazos (los 9 hallazgos del 18/09/2026, ya reparados)', () => {
+  test('919 · la dosis de alguicida es la que la propia app enseña, no diez veces más', async ({ page }) => {
+    // calcularDosis usaba 20 mL/m³ preventivo y 100 mL/m³ de choque. La MISMA página decía
+    // tres veces otra cosa, y las tres coincidían entre sí:
+    //   · paso 5 de la guía: «100 mL/10 m³» de choque y «20 mL/10 m³» semanales → 10 y 2;
+    //   · escenario «Agua verde», 40 m³: «Alguicida de choque: 400 mL» → 10 mL/m³;
+    //   · FAQPage: choque «1 L por cada 100 m³» y preventivo «0,2 L por cada 100 m³».
+    // Eran 7,5 litros de alguicida en una piscina familiar en vez de 750 mL: espuma
+    // persistente y, con los alguicidas de amonio cuaternario, irritación de ojos y piel.
     await teclear(page, '#largo', '10');
     await teclear(page, '#ancho', '5');
     await botonCalcular(page).click();
     await expect(volumen(page)).toHaveText('75,0 m³ (75.000 litros)');
 
-    await expect(dosis(page, 2, 1)).toHaveText('750 mL');  // 75 m³ a 100 mL/10 m³
-    await expect(dosis(page, 2, 0)).toHaveText('150 mL');  // 75 m³ a 20 mL/10 m³
+    await expect(dosis(page, 2, 1)).toHaveText('750 mL');  // 75 m³ a 10 mL/m³
+    await expect(dosis(page, 2, 0)).toHaveText('150 mL');  // 75 m³ a 2 mL/m³
   });
 
-  test.fail('HALLAZGO 2 · debe rechazar lo que no puede ser una piscina', async ({ page }) => {
-    // (a) Lados negativos. La única guarda es `vol <= 0`, y el producto de DOS negativos
-    // es positivo: −10 × −5 × 1,5 = 75 y la app dosifica 750 g de cloro de choque para
-    // una piscina imposible. Lo correcto es rechazar la dimensión, no el producto.
+  test('920 · rechaza los lados negativos, que el producto volvía positivos', async ({ page }) => {
+    // La única guarda era `vol <= 0`, y el producto de DOS negativos es positivo: −10 × −5
+    // × 1,5 = 75 y la app dosificaba 750 g de cloro de choque para una piscina imposible.
+    // Se valida cada dimensión, no el producto.
     await teclear(page, '#largo', '-10');
     await teclear(page, '#ancho', '-5');
     await botonCalcular(page).click();
-    await expect(volumen(page)).toHaveCount(0);
 
-    // (b) Sin control de plausibilidad tampoco por arriba: una profundidad de «1.500»
-    // —millar español legítimo para parseSpanishNumber, y la forma en que un usuario de
-    // México o Argentina puede escribir 1,5— da 75.000 m³ y 450.000 kg de sal en silencio.
+    await expect(volumen(page)).toHaveCount(0);
+    await expect(aviso(page)).toContainText('mayor que cero');
+  });
+
+  test('925 · rechaza por arriba lo que no puede ser una piscina', async ({ page }) => {
+    // Una profundidad de «1.500» —millar español legítimo para parseSpanishNumber, y la
+    // forma en que se escribe 1,5 en buena parte de Latinoamérica, donde esta app se
+    // presenta como «alberca» y «pileta»— daba 75.000 m³ y 450.000 kg de sal en silencio.
     await teclear(page, '#largo', '10');
     await teclear(page, '#ancho', '5');
     await teclear(page, '#prof', '1.500');
     await botonCalcular(page).click();
-    await expect(volumen(page)).not.toHaveText('75.000,0 m³ (75.000.000 litros)');
+
+    await expect(volumen(page)).toHaveCount(0);
+    // Y el aviso dice qué hacer, porque el tecleo más probable detrás de esto es un decimal
+    // a la americana: el punto está ahí para separar 1 de 5, no para agrupar millares.
+    await expect(aviso(page)).toContainText('usa la coma');
   });
 
-  test.fail('HALLAZGO 3 · un recálculo inválido debe retirar el resultado, no dejarlo en pantalla', async ({ page }) => {
+  test('921 · un recálculo inválido retira el resultado en vez de dejarlo en pantalla', async ({ page }) => {
     await teclear(page, '#largo', '10');
     await teclear(page, '#ancho', '5');
     await botonCalcular(page).click();
     await expect(volumen(page)).toHaveText('75,0 m³ (75.000 litros)');
 
-    // Ahora el largo deja de ser un número. `calcular` hace `return` sin tocar el estado:
-    // no borra el volumen, no borra las dosis y no muestra ningún aviso. El usuario se
-    // queda mirando «75,0 m³ · 750 g de cloro de choque» con unos datos que ya no son
-    // esos, y el botón parece no responder. Lo mismo pasa con un volumen negativo
-    // (largo −10, ancho 5) y con los campos vacíos al entrar.
+    // Ahora el largo deja de ser un número. Antes `calcular` hacía `return` sin tocar el
+    // estado: no borraba el volumen, no borraba las dosis y no mostraba ningún aviso. El
+    // usuario se quedaba leyendo «75,0 m³ · 750 g de cloro de choque» con otros datos en
+    // los campos, y el botón parecía no responder.
     await teclear(page, '#largo', 'abc');
     await botonCalcular(page).click();
+
     await expect(volumen(page)).toHaveCount(0);
+    await expect(dosis(page, 0, 0)).toHaveCount(0);
+    await expect(aviso(page)).toContainText('escribe un número');
   });
 
-  test.fail('HALLAZGO 4 · la sal que dosifica debe caber en el rango que su FAQ declara', async ({ page }) => {
-    // La tarjeta de la app dice «Nivel objetivo: 5 – 7 g/L» y dosifica a 6 g/L
-    // (6 kg/m³ → 450 kg en 75 m³). El FAQPage de la MISMA página, el que leen Bing
-    // Copilot, ChatGPT y Perplexity, dice «La concentración de sal recomendada es de
-    // 3-5 g/L». Con 4 g/L —el centro de ese rango— una piscina de 75 m³ pediría 300 kg,
-    // no 450: 150 kg de sal de más, y por encima del rango de trabajo de buena parte de
-    // los electrolizadores, que obliga a diluir vaciando y rellenando.
+  test('921.bis · con los campos vacíos dice qué falta, en vez de no hacer nada', async ({ page }) => {
+    // Primera visita: pulsar «Calcular» sin escribir nada no hacía absolutamente nada.
+    await botonCalcular(page).click();
+    await expect(aviso(page)).toContainText('Faltan medidas');
+    await expect(aviso(page)).toContainText('largo');
+  });
+
+  test('el aviso de rechazo es anunciable por un lector de pantalla', async ({ page }) => {
+    // Un aviso que sustituye al resultado y no se anuncia deja a quien no ve la pantalla
+    // creyendo que el botón está roto.
+    await teclear(page, '#largo', '-10');
+    await botonCalcular(page).click();
+    await expect(aviso(page)).toHaveAttribute('role', 'alert');
+  });
+
+  test('922 · la sal que dosifica cabe en el rango que su propio FAQPage declara', async ({ page }) => {
+    // La tarjeta decía «Nivel objetivo: 5 – 7 g/L» y dosificaba 6 g/L; el FAQPage de la
+    // MISMA página —el que leen Bing Copilot, ChatGPT y Perplexity— decía «3-5 g/L». El
+    // valor usado quedaba fuera del rango que la página anunciaba. Ahora dosifica 5 g/L y
+    // publica 4-6 g/L, y este test comprueba que sigue cabiendo: es la relación entre las
+    // dos cifras lo que se vigila, no un número suelto.
+    await teclear(page, '#largo', '10');
+    await teclear(page, '#ancho', '5');
+    await botonCalcular(page).click();
+    await expect(volumen(page)).toHaveText('75,0 m³ (75.000 litros)');
+
+    const kg = Number((await dosis(page, 3, 0).innerText()).replace(/[^\d]/g, ''));
+    const gramosPorLitro = kg / 75; // kg totales / m³ = g/L
+
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
     const rango = faq.match(/recomendada es de (\d+)-(\d+) g\/L/);
     expect(rango).not.toBeNull();
-    expect(Number(rango?.[1])).toBeLessThanOrEqual(6);
-    expect(Number(rango?.[2])).toBeGreaterThanOrEqual(6);
+    expect(gramosPorLitro).toBeGreaterThanOrEqual(Number(rango?.[1]));
+    expect(gramosPorLitro).toBeLessThanOrEqual(Number(rango?.[2]));
   });
 
-  test.fail('HALLAZGO 5 · la dosis de cloro y la que el FAQ declara deben ser la misma', async ({ page }) => {
-    // calcularDosis usa 2 g/m³ a la SEMANA. El FAQPage servido dice, para ese mismo
-    // volumen de referencia: «En una piscina de 50 m³, eso equivale a añadir
-    // aproximadamente 150-300 g de cloro granulado al 70 % DIARIAMENTE». Entre las dos
-    // cifras hay un factor de 10 a 20 (100 g/semana frente a 1.050-2.100 g/semana), y el
-    // FAQPage es justamente lo que Bing Copilot, ChatGPT y Perplexity leen para responder.
-    // El escenario «fiesta» de la propia guía añade una tercera cifra: «+90 g (media dosis
-    // extra)» en 30 m³, cuando la dosis ENTERA de mantenimiento para 30 m³ son 60 g.
+  test('923 · la dosis de cloro y los ppm que la página declara son la misma cosa', async ({ page }) => {
+    // La página publicaba TRES cifras de mantenimiento incompatibles: la calculadora 2 g/m³
+    // semanales, el FAQPage «150-300 g diariamente» en 50 m³ y el escenario de fiesta una
+    // dosis entera de 180 g en 30 m³. Ninguna tenía procedencia. Ahora la dosis se deriva
+    // de los ppm declarados en la propia tarjeta, así que este test la RECALCULA desde el
+    // texto que el usuario lee, en vez de fijar un número que envejecería solo.
     await teclear(page, '#largo', '10');
     await teclear(page, '#ancho', '5');
     await teclear(page, '#prof', '1');
     await botonCalcular(page).click();
     await expect(volumen(page)).toHaveText('50,0 m³ (50.000 litros)');
 
-    // Hoy da «100 g». Sea cual sea la cifra buena, la app no puede sostener las dos.
+    const tarjetaCloro = page.locator('[class*="productoCard"]').first();
+    const leyenda = await tarjetaCloro.innerText();
+    const ppmChoque = Number(leyenda.match(/cloro libre a (\d+) ppm/)?.[1]);
+    const ppmSemana = Number(leyenda.match(/repone (\d+) ppm/)?.[1]);
+    expect(ppmChoque).toBe(10);
+    expect(ppmSemana).toBe(7);
+
+    // 1 ppm en 1 m³ = 1 g de cloro activo; el granulado es del 65 %, así que el producto
+    // es ppm × m³ / 0,65, redondeado hacia arriba.
     const mantenimiento = Number((await dosis(page, 0, 0).innerText()).replace(/[^\d]/g, ''));
-    expect(mantenimiento).toBeGreaterThanOrEqual(150);
+    const choque = Number((await dosis(page, 0, 1).innerText()).replace(/[^\d]/g, ''));
+    expect(mantenimiento).toBe(Math.ceil((50 * ppmSemana) / 0.65)); // 539 g
+    expect(choque).toBe(Math.ceil((50 * ppmChoque) / 0.65));        // 770 g
+
+    // Y el FAQPage cita ese mismo 539, no otra cifra suya.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faq).toContain(`${mantenimiento} g de granulado a la semana`);
   });
 
-  test.fail('HALLAZGO 6 · la eficacia del cloro a pH 8 debe ser una sola cifra', async ({ page }) => {
-    // El bloque educativo afirma «A pH 8,0, el cloro solo tiene un 3% de eficacia. A pH
-    // 7,2, tiene un 73%». El FAQPage de la misma página dice «a pH 8 solo el 20 % del
-    // cloro añadido es activo». La curva de disociación del ácido hipocloroso da ~22 % a
-    // pH 8 y ~66-73 % a pH 7,2: el 73 % encaja y el 3 % no. Un 3 % invita a corregir el pH
-    // con prisa y a sobredosificar cloro «porque no hace nada».
+  test('926 · la eficacia del cloro por pH sale de la curva, y es una sola cifra', async ({ page }) => {
+    // El bloque educativo afirmaba «A pH 8,0, el cloro solo tiene un 3% de eficacia. A pH
+    // 7,2, tiene un 73%», y el FAQPage «a pH 8 solo el 20 % del cloro añadido es activo».
+    // El acta pedía quedarse con el 20 %; no es el número. La fracción de ácido
+    // hipocloroso, que es la forma que desinfecta, es 100/(1+10^(pH−pKa)) con pKa 7,54 a
+    // 25 °C: 68,6 % a pH 7,2, 46,6 % a pH 7,6 y 25,7 % a pH 8,0. Un «3 %» empuja a
+    // sobredosificar cloro «porque no hace nada».
     // El botón de la sección educativa lleva aria-label, así que su nombre accesible es
     // «Ver guía educativa», no el «⬇️ Ver Guía Completa» que se lee en pantalla.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const consejo = page.locator('[class*="tipCard"]').filter({ hasText: 'Ajusta el pH siempre antes del cloro' });
-    await expect(consejo).toContainText('20%');
+    await expect(consejo).toContainText('26%');
+    await expect(consejo).toContainText('69%');
+    await expect(consejo).not.toContainText('3% de eficacia');
+
+    // Y el FAQPage servido dice lo mismo que la guía, que es donde estaba la contradicción.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    expect(faq).toContain('a pH 8,0 solo un 26 %');
   });
 
-  test.fail('HALLAZGO 7 · el disclaimer debe hablar del riesgo real de esta app', async ({ page }) => {
-    // La app monta <DisclaimerCard variant="financial" severity="critical">, así que su
-    // aviso legal se titula «Información Importante sobre Herramientas Financieras» y
-    // remite a un «asesor fiscal, gestor, abogado o entidad financiera regulada». Aquí no
-    // se decide ninguna inversión: se decide cuántos gramos de hipoclorito echar a un agua
-    // donde se bañan niños. La variante que corresponde es `technical`. (La app sí tiene
-    // arriba un warningBox propio con role="alert" que advierte de los químicos, pero el
-    // aviso legal formal apunta a otro riesgo.)
-    const aviso = page.locator('[class*="disclaimerCard"]').first();
-    await expect(aviso).toContainText(/químic|producto|seguridad/i);
+  test('924 · el aviso legal habla del riesgo real de esta app', async ({ page }) => {
+    // Montaba <DisclaimerCard variant="financial" severity="critical">, así que se titulaba
+    // «Información Importante sobre Herramientas Financieras» y remitía a un «asesor
+    // fiscal, gestor, abogado o entidad financiera regulada». Aquí no se decide ninguna
+    // inversión: se decide cuántos gramos de hipoclorito echar a un agua donde se bañan
+    // niños. Es el antipatrón 10 del CLAUDE.md, disclaimer incoherente con el riesgo real.
+    const avisoLegal = page.locator('[class*="disclaimerCard"]').first();
+    await expect(avisoLegal).toContainText(/químic/i);
+    await expect(avisoLegal).toContainText(/etiqueta del fabricante/i);
+    await expect(avisoLegal).not.toContainText(/asesor fiscal|entidad financiera/i);
+  });
+
+  test('927 · los emojis decorativos no se leen en voz alta', async ({ page }) => {
+    // Pasivo anterior al candado check:a11y-jsx, que solo juzga las líneas que un commit
+    // añade. Eran 13 incumplimientos de la regla unívoca, empezando por el <h1>. El emoji
+    // sigue viéndose (textContent lo lleva); lo que cambia es el NOMBRE ACCESIBLE, que ya
+    // no empieza por «piscina» dicho en voz alta antes del título.
+    const titulo = page.getByRole('heading', { level: 1 });
+    await expect(titulo).toHaveAccessibleName('Calculadora de Piscinas, Albercas y Piletas');
   });
 });
