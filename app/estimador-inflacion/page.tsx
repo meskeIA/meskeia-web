@@ -6,10 +6,11 @@ import styles from './EstimadorInflacion.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { IPC_DATA, IPC_YEARS as YEARS } from '@/data/ipc-ine';
+import { IPC_DATA, IPC_META, IPC_YEARS as YEARS } from '@/data/ipc-ine';
 
 type ModoApp = 'calculadora' | 'comparador';
 
@@ -688,6 +689,20 @@ export default function CalculadoraInflacionPage() {
         context="estimador-inflacion"
         collapsible={false}
       />
+
+      {/*
+        La serie del IPC caduca cada enero, cuando el INE cierra el año anterior, así que el
+        CLAUDE.md pide DataReference. El conversor de pesetas, que comparte este mismo módulo,
+        ya lo llevaba desde el 18/09/2026; aquí faltaba.
+      */}
+      <DataReference
+        normativa="IPC del INE (base 2025)"
+        fuente={IPC_META.fuente}
+        verificado={IPC_META.verificado}
+        urlOficial={IPC_META.urlOficial}
+        nota={IPC_META.nota}
+      />
+
 {/* Contenido educativo */}
       <EducationalSection
         title="¿Quieres entender mejor la inflación?"
@@ -819,8 +834,8 @@ export default function CalculadoraInflacionPage() {
                 <h3>Compra de vivienda como inversión</h3>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Ejemplo:</strong> Piso comprado en 2010 por 180.000 €. Precio actual (2025): ~240.000 €. Inflación acumulada 2010-2025: ~28%.</p>
-                <code>Revalorización nominal: +33% | Revalorización real: ~+4%</code>
+                <p><strong>Ejemplo:</strong> Piso comprado en 2010 por 180.000 €. Precio actual (2025): ~240.000 €. Inflación acumulada 2010-2025: ~35%.</p>
+                <code>Revalorización nominal: +33% | Revalorización real: ~−1%</code>
               </div>
               <p className={styles.escenarioTip}><strong>Impacto:</strong> El ladrillo se percibe como protección contra la inflación, pero hay que descontar la inflación acumulada para ver la ganancia real. Además, los gastos de mantenimiento, comunidad e IBI reducen aún más la rentabilidad neta real.</p>
             </div>

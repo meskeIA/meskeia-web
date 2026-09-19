@@ -328,12 +328,14 @@ export default function ConversorPesetasEurosPage() {
 
       {/*
         El modo «Valor real hoy» se apoya en una serie con caducidad anual, así que el
-        CLAUDE.md pide DataReference — y aquí hace falta por partida doble, porque el último
-        año de esa serie es una estimación propia y la pantalla lo atribuía al «IPC del INE»
-        sin matiz (hallazgos 916 y 917).
+        CLAUDE.md pide DataReference. Nació además de un hallazgo: el último año de la serie
+        era una estimación propia que la pantalla atribuía al «IPC del INE» sin matiz
+        (hallazgos 916 y 917). Desde el 19/09/2026 ya no hay estimación —la serie entera se
+        regeneró contra la fuente y pasó a base 2025—, pero la referencia se queda: la
+        caducidad anual no ha desaparecido.
       */}
       <DataReference
-        normativa="IPC del INE (base 2021) y tipo fijo peseta-euro"
+        normativa="IPC del INE (base 2025) y tipo fijo peseta-euro"
         fuente={IPC_META.fuente}
         verificado={IPC_META.verificado}
         urlOficial={IPC_META.urlOficial}
@@ -388,7 +390,7 @@ export default function ConversorPesetasEurosPage() {
                 <tr>
                   <td><strong>Ejemplo</strong></td>
                   <td>100.000 ptas = 601,01 €, sea del año que sea</td>
-                  <td>100.000 ptas de 1985 = 2.070,61 € de poder adquisitivo hoy</td>
+                  <td>100.000 ptas de 1985 = 2.151,17 € de poder adquisitivo hoy</td>
                 </tr>
               </tbody>
             </table>

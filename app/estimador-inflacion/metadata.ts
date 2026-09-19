@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Cuánto ha subido el precio de vida en España desde los años 80 o 90?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Según los datos históricos del IPC del INE, los precios en España se han multiplicado aproximadamente por 4 desde 1985 y por 2,5 desde 1995. Esto significa que algo que costaba 100 € en 1985 cuesta hoy en torno a 400 €. La inflación acumulada fue especialmente intensa en los años 70-80 (llegó al 25% anual) y mucho más moderada desde la entrada en el euro.',
+        text: 'Según los datos históricos del IPC del INE, los precios en España se han multiplicado por 3,6 desde 1985 y por 2 desde 1995. Esto significa que algo que costaba 100 € en 1985 cuesta hoy en torno a 358 €. La inflación acumulada fue especialmente intensa en los años 70-80 (llegó al 25% anual) y mucho más moderada desde la entrada en el euro.',
       },
     },
     {

@@ -47,13 +47,20 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *
  *   CASO 4 (la segunda promesa: poder adquisitivo) — 100.000 ptas de 1985
  *       euros de la época = 100.000 ÷ 166,386 = 601,012104… → 601,01 €
- *       IPC 1985 = 44,99 e IPC 2025 = 155,00 (serie del INE en data/ipc-ine.ts)
- *       valor hoy = 601,012104 × (155,00 ÷ 44,99) = 601,012104 × 3,44521005 = 2.070,6129…
- *                 → 2.070,61 €
- *       inflación acumulada = (155,00 − 44,99) ÷ 44,99 × 100 = 244,521…% → +244,5 %
+ *       IPC 1985 = 27,9389 e IPC 2025 = 100 (data/ipc-ine.ts, base 2025 = 100)
+ *       valor hoy = 601,012104 × (100 ÷ 27,9389) = 601,012104 × 3,57923898 = 2.151,1712…
+ *                 → 2.151,17 €
+ *       inflación acumulada = (100 − 27,9389) ÷ 27,9389 × 100 = 257,920…% → +257,9 %
  *       años transcurridos = 2025 − 1985 = 40
- *       Y 1.000.000 ptas de 1975 (IPC 10,80): 6.010,121044 × (155,00 ÷ 10,80) = 86.256,37 €,
- *       inflación (155,00 − 10,80) ÷ 10,80 × 100 = 1.335,185…% → +1335,2 %, 50 años.
+ *       Y 1.000.000 ptas de 1975 (IPC 6,6913): 6.010,121044 × (100 ÷ 6,6913) = 89.819,93 €,
+ *       inflación (100 − 6,6913) ÷ 6,6913 × 100 = 1.394,464…% → +1394,5 %, 50 años.
+ *
+ *       ⚠️ ESTAS CIFRAS CAMBIARON EL 19/09/2026 y no porque la app calcule distinto: la serie
+ *       del IPC se regeneró contra la fuente. La anterior no estaba en ninguna base publicada
+ *       por el INE y traía tres eslabones mal empalmados —2001, 2013 y un 2025 estimado—, que
+ *       dejaban cualquier peseta anterior a 2001 un 3,9 % por debajo de su valor real. Los de
+ *       arriba son los valores con la serie corregida; con la vieja salían 2.070,61 € y
+ *       86.256,37 €.
  *
  * LOS CUATRO SE CUMPLEN EN PRODUCCIÓN (18/09/2026). El motor está sano: tipo correcto,
  * redondeo al céntimo, sin tipo inverso, parser canónico y rechazo limpio.
@@ -71,6 +78,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *      resultado al «IPC del INE» sin decir que su último eslabón es una estimación.
  *      Tampoco hay <DataReference> tras el <DisclaimerCard>, que el CLAUDE.md exige para
  *      toda app apoyada en datos con fecha de caducidad.
+ *      CERRADO el 19/09/2026: ya no hay estimación que advertir. El 18/09 se reparó
+ *      diciéndolo, porque sustituir el número exigía la serie del INE delante; hecho eso,
+ *      el aviso sobra y lo que se comprueba abajo es el sello de procedencia, que sigue
+ *      siendo obligatorio mientras el dato caduque cada enero.
  *   3. El aviso de entrada inválida no vive en ninguna región anunciable: un lector de
  *      pantalla no se entera de que el resultado ha desaparecido.
  */
@@ -172,7 +183,7 @@ test.describe('Conversión oficial (Reglamento CE 2866/98: 166,386 ptas/€)', (
   });
 });
 
-test.describe('Valor real hoy (IPC del INE, base 2021 = 100)', () => {
+test.describe('Valor real hoy (IPC del INE, base 2025 = 100)', () => {
   test('CASO 4 · aplica la fórmula que la propia app declara', async ({ page }) => {
     await irAValorRealHoy(page);
 
@@ -181,24 +192,24 @@ test.describe('Valor real hoy (IPC del INE, base 2021 = 100)', () => {
     await escribir(page, '#cantidad-historica', '1.000.000');
     await selectorDeAño(page).selectOption('1975');
 
-    // 1.000.000 ÷ 166,386 = 6.010,121044 → × (155,00 ÷ 10,80) = 86.256,37 €
-    // inflación = (155,00 − 10,80) ÷ 10,80 × 100 = 1.335,185…% · años = 2025 − 1975 = 50
-    expect(await texto(valorPrincipal(page))).toBe('86.256,37 €');
+    // 1.000.000 ÷ 166,386 = 6.010,121044 → × (100 ÷ 6,6913) = 89.819,93 €
+    // inflación = (100 − 6,6913) ÷ 6,6913 × 100 = 1.394,464…% · años = 2025 − 1975 = 50
+    expect(await texto(valorPrincipal(page))).toBe('89.819,93 €');
     expect(await texto(etiquetaPrincipal(page))).toBe('1.000.000 pesetas de 1975 equivalen hoy a:');
     const tarjetas1975 = page.locator('[class*="statCard"]');
     expect(await texto(tarjetas1975.nth(0))).toContain('6010,12 €');
-    expect(await texto(tarjetas1975.nth(1))).toContain('+1335,2%');
+    expect(await texto(tarjetas1975.nth(1))).toContain('+1394,5%');
     expect(await texto(tarjetas1975.nth(2))).toContain('50');
 
     // Y ahora el caso de referencia, moviendo los dos controles otra vez.
     await escribir(page, '#cantidad-historica', '100000');
     await selectorDeAño(page).selectOption('1985');
 
-    // 100.000 ÷ 166,386 = 601,012104 → × (155,00 ÷ 44,99) = 2.070,6129… → 2.070,61 €
-    expect(await texto(valorPrincipal(page))).toBe('2070,61 €');
+    // 100.000 ÷ 166,386 = 601,012104 → × (100 ÷ 27,9389) = 2.151,1712… → 2.151,17 €
+    expect(await texto(valorPrincipal(page))).toBe('2151,17 €');
     const tarjetas1985 = page.locator('[class*="statCard"]');
     expect(await texto(tarjetas1985.nth(0))).toContain('601,01 €'); // conversión sin inflación
-    expect(await texto(tarjetas1985.nth(1))).toContain('+244,5%');  // (155−44,99)/44,99
+    expect(await texto(tarjetas1985.nth(1))).toContain('+257,9%');  // (100−27,9389)/27,9389
     expect(await texto(tarjetas1985.nth(2))).toContain('40');       // 2025 − 1985
   });
 
@@ -228,16 +239,17 @@ test.describe('Valor real hoy (IPC del INE, base 2021 = 100)', () => {
 
 test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
   test('915 · la tabla educativa dice lo mismo que el motor', async ({ page }) => {
-    // La fila «Ejemplo» de la tabla comparativa dice «100.000 ptas de 1985 = unos 1.470 €
-    // de poder adquisitivo hoy». El propio motor de la app devuelve 2.070,61 € para esa
-    // entrada exacta (comprobado arriba, CASO 4). 1.470 € exigiría un IPC de hoy de 110,04
-    // —el de 2006-2007— en vez del 155,00 que la app usa de verdad. Un usuario que se quede con
-    // la tabla se lleva una cifra un 29 % más baja que la que la calculadora le daría.
+    // La fila «Ejemplo» de la tabla comparativa decía «100.000 ptas de 1985 = unos 1.470 €
+    // de poder adquisitivo hoy», mientras el motor devolvía 2.070,61 € para esa entrada
+    // exacta: una cifra un 29 % más baja para quien se quedara con la tabla. Lo que este
+    // candado vigila no es un número concreto sino que la tabla y el motor digan lo mismo,
+    // así que al regenerarse la serie el 19/09/2026 se mueven los dos a la vez: hoy son
+    // 2.151,17 € (CASO 4).
     const filaEjemplo = page.locator('table tbody tr').filter({ hasText: 'Ejemplo' });
-    await expect(filaEjemplo).toContainText('2.070,61');
+    await expect(filaEjemplo).toContainText('2.151,17');
   });
 
-  test('916 y 917 · la app dice de cuándo es y de dónde sale el IPC, y que el último año es provisional', async ({ page }) => {
+  test('916 y 917 · la app dice de dónde sale el IPC, de cuándo es y en qué base está', async ({ page }) => {
     // data/ipc-ine.ts marca el IPC de 2025 con «Valor estimado — actualizar cuando el INE
     // publique el IPC real de 2025». El índice medio anual lo publica el INE en enero del
     // año siguiente, y el módulo sigue con la estimación mientras la app atribuye el
@@ -246,15 +258,15 @@ test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
     // caducidad, y esta página no tiene ninguno.
     await expect(page.getByText(/Última verificación/i).first()).toBeVisible();
 
-    // Y lo que hacía falta además del sello: que el índice de 2025 NO se presente como dato
-    // firme del INE. Sigue siendo una estimación —el INE dio una inflación media del 2,7 %
-    // para 2025 y el valor que usa la app supone un 1,64 %—, así que se dice en la página en
-    // vez de atribuirlo al instituto sin matiz. Sustituir el número contra la serie oficial es
-    // trabajo del triaje fiscal, con la fuente delante; lo que no podía seguir es que la app
-    // lo llamara dato del INE.
+    // El 18/09 hizo falta además advertir de que el índice de 2025 era una estimación propia
+    // y no el dato publicado. El 19/09/2026 esa advertencia desapareció porque desapareció su
+    // motivo: la serie se regeneró contra la fuente y ya no hay ningún año estimado. Lo que
+    // queda vigilado es el sello de procedencia —de dónde sale el dato y de cuándo es—, que el
+    // CLAUDE.md exige mientras la serie caduque cada enero, y que la base declarada sea la que
+    // el módulo usa de verdad: 2025, no la 2021 que el INE cerró en diciembre de 2025.
     const referencia = page.locator('[class*="dataReference"]');
     await expect(referencia).toContainText('INE');
-    await expect(referencia).toContainText(/estimación|provisional/i);
+    await expect(referencia).toContainText('base 2025');
   });
 
   test('918 · el aviso de entrada inválida es anunciable', async ({ page }) => {
