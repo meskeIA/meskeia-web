@@ -55,3 +55,31 @@ export, leer `scripts/CLAUDE.md`.
 
 Antes de escribir a mano un tipo, coeficiente, tramo o plazo legal, mirar si ya está en
 `data/fiscal/` — la regla completa, con el porqué, está en el `CLAUDE.md` de la raíz.
+
+## Una serie histórica se actualiza cotejando los COCIENTES, no añadiendo el año nuevo
+
+Vale para toda serie de años encadenados (`ipc-ine.ts`, `fiscal/esperanza-vida.ts`...). Lo que
+las apps usan de una serie así no es ningún valor suelto: es la **relación entre dos años**. Por
+eso un empalme mal hecho en mitad de la serie no se ve en ninguna pantalla, no rompe ningún
+candado y sobrevive a cualquier revisión que solo mire el último dato.
+
+Al tocar una, dos comprobaciones que cuestan minutos:
+
+1. **El año que da nombre a la base tiene que valer 100.** Si la serie dice «base 2021» y su 2021
+   no es 100, la escala no es la que declara, así que no se puede cotejar número a número con la
+   fuente y nadie lo habría notado.
+2. **Variación año a año contra la fuente, la serie entera.** No el último valor: la lista
+   completa de cocientes. Los años que se salgan por más de lo que explica el redondeo son
+   empalmes rotos.
+
+⚠️ **Si la fuente no publica índices de los años antiguos, publica TASAS, y encadenarlas hacia
+atrás arrastra su redondeo.** Hay que anclar el nivel con algo que no encadene — para el INE, el
+Actualizador de Rentas (`ine.es/varipc/`), que da la variación acumulada entre dos fechas de una
+sola vez.
+
+**De dónde sale**: 19/09/2026, `ipc-ine.ts`. La Agenda solo pedía sustituir un 2025 que nació
+estimado; el cotejo completo destapó **2001 y 2013 mal empalmados** y una escala que no era
+ninguna base del INE. Los tres defectos iban en el mismo sentido y se acumulaban: cualquier
+peseta anterior a 2001 salía un 3,9 % por debajo de su valor real, en dos apps a la vez, desde
+que el módulo se creó. El procedimiento concreto, con la llamada a la API y la validación,
+está en la cabecera del módulo.
