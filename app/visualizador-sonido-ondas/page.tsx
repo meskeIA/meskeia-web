@@ -13,6 +13,11 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import CasosAula from './CasosAula';
+// La longitud de onda y el periodo NO se calculan aquí: vienen del mismo módulo con el que se
+// corrigen los casos para clase, para que la app no pueda suspender una respuesta que ella
+// misma acaba de enseñar. Las dos tablas de datos físicos viven allí por la misma razón.
+import { VELOCIDADES, EXPOSICION, longitudDeOnda, periodoDe } from './casos';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -52,20 +57,6 @@ const PROPIEDADES_ONDA: PropiedadOnda[] = [
   { nombre: 'Amplitud', icono: '📏', descripcion: 'Desplazamiento máximo desde la posición de equilibrio.', detalle: 'Mayor amplitud = sonido más fuerte' },
   { nombre: 'Longitud de onda', icono: '📐', descripcion: 'Distancia entre dos puntos equivalentes consecutivos (cresta a cresta).', detalle: 'λ = v / f (velocidad / frecuencia)' },
   { nombre: 'Período', icono: '⏱️', descripcion: 'Tiempo que tarda en completarse un ciclo. Es la inversa de la frecuencia.', detalle: 'T = 1 / f' },
-];
-
-interface VelocidadSonido {
-  medio: string;
-  velocidad: number;
-  unidad: string;
-}
-
-const VELOCIDADES: VelocidadSonido[] = [
-  { medio: 'Aire (20 °C)', velocidad: 343, unidad: 'm/s' },
-  { medio: 'Agua', velocidad: 1480, unidad: 'm/s' },
-  { medio: 'Madera', velocidad: 3300, unidad: 'm/s' },
-  { medio: 'Acero', velocidad: 5100, unidad: 'm/s' },
-  { medio: 'Diamante', velocidad: 12000, unidad: 'm/s' },
 ];
 
 // ─── Datos sección 2 ───
@@ -144,24 +135,6 @@ const NIVELES_DB: NivelDb[] = [
   { db: 120, nombre: 'Sirena ambulancia', icono: '🚑', desc: 'Dolor inmediato', zona: 'dolor' },
   { db: 130, nombre: 'Umbral del dolor', icono: '⚠️', desc: 'Daño instantáneo', zona: 'dolor' },
   { db: 180, nombre: 'Despegue de cohete', icono: '🚀', desc: 'Destrucción auditiva', zona: 'dolor' },
-];
-
-interface ExposicionSegura {
-  db: number;
-  tiempo: string;
-  pctBarra: number;
-  color: string;
-}
-
-const EXPOSICION: ExposicionSegura[] = [
-  { db: 85, tiempo: '8 horas', pctBarra: 100, color: '#27ae60' },
-  { db: 88, tiempo: '4 horas', pctBarra: 80, color: '#2ecc71' },
-  { db: 91, tiempo: '2 horas', pctBarra: 60, color: '#f1c40f' },
-  { db: 94, tiempo: '1 hora', pctBarra: 45, color: '#e67e22' },
-  { db: 97, tiempo: '30 min', pctBarra: 30, color: '#e74c3c' },
-  { db: 100, tiempo: '15 min', pctBarra: 18, color: '#c0392b' },
-  { db: 110, tiempo: '< 2 min', pctBarra: 8, color: '#8e44ad' },
-  { db: 120, tiempo: '0 seg', pctBarra: 2, color: '#6c3483' },
 ];
 
 // ─── Datos sección 4 ───
@@ -304,9 +277,9 @@ export default function SonidoOndasPage() {
     return () => { stopTone(); };
   }, []);
 
-  // Cálculos derivados
-  const longitudOnda = 343 / frecuencia;
-  const periodo = 1 / frecuencia;
+  // Cálculos derivados — las dos fórmulas vienen de `./casos.ts`, no se escriben aquí
+  const longitudOnda = longitudDeOnda(frecuencia);
+  const periodo = periodoDe(frecuencia);
 
   // SVG onda principal
   const SVG_W = 800;
@@ -873,6 +846,9 @@ export default function SonidoOndasPage() {
         <section id="frecuencia" className={styles.seccion}>{renderFrecuencia()}</section>
         <section id="decibelios" className={styles.seccion}>{renderDecibelios()}</section>
         <section id="timbre" className={styles.seccion}>{renderTimbre()}</section>
+
+        {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}
+        <CasosAula />
 
         {/* Contenido educativo */}
         <EducationalSection
