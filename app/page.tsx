@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Sidebar, SidebarMobile, DailyApps, MeskeiaLogo } from '@/components';
-import SearchBar from '@/components/SearchBar';
+import AsistenteChat from '@/components/AsistenteChat';
 import HomeFooter from '@/components/home/HomeFooter';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import VerticalesPortales from '@/components/home/VerticalesPortales';
@@ -83,7 +83,7 @@ export default function Home() {
 
         <div className={styles.searchSection}>
           <div className={styles.searchWrapper}>
-            <SearchBar large />
+            <AsistenteChat />
           </div>
         </div>
 

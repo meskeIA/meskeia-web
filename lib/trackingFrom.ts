@@ -30,7 +30,9 @@
  *   - related-{slug}     → componente RelatedApps (ya añadido en RelatedApps.tsx)
  *   - home-daily         → cards "Apps del día" en /
  *   - home-related-suite → cards de la suite destacada en /
- *   - search             → resultados del SearchBar
+ *   - home-search        → resultados del buscador de la portada (AsistenteChat)
+ *   - search             → RETIRADO el 19/09/2026 con el buscador modal Ctrl+K;
+ *                          no reutilizar el nombre, la serie histórica es suya
  *   - catalog            → /apps catálogo principal
  *   - catalog-guides     → /apps pestaña Guías
  *   - sidebar-recent     → "Apps visitadas" del sidebar

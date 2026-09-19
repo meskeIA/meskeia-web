@@ -608,7 +608,7 @@ test.describe('hallazgos reparados · 30/08/2026', () => {
     // Afecta a los 14 nombres con tilde o eñe: Hidrógeno, Nitrógeno, Oxígeno, Flúor, Neón,
     // Fósforo, Argón, Níquel, Arsénico, Kriptón, Estaño, Xenón, Radón y Oganesón — entre
     // ellos cuatro de los elementos más buscados por un estudiante.
-    // La receta ya existe en el propio repositorio: components/SearchBar.tsx normaliza con
+    // La receta ya existe en el propio repositorio: app/apps/page.tsx normaliza con
     // .normalize('NFD').replace(/[̀-ͯ]/g, '') antes de comparar.
     for (const [sinTilde, esperado] of [
       ['oxigeno', 'Oxígeno (O)'],

@@ -255,3 +255,17 @@
 [data-theme='dark'] .appCard:hover {
   background: rgba(46, 134, 171, 0.1);
 }
+
+/* ===== ACCESIBILIDAD - solo para lectores de pantalla =====
+   Venía de SearchBar.module.css, retirado con el buscador modal el 19/09/2026. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
