@@ -62,6 +62,7 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'residencia-vs-cuidado-en-casa',
   'selector-plan-pensiones',
   'selector-regimen-fiscal-autonomo',
+  'selector-smartphone',
   'simulador-bono-joven-alquiler',
   'simulador-colchon-emergencia-freelance',
   'simulador-desglose-nomina',
