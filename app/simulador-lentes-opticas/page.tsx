@@ -47,7 +47,10 @@ export default function SimuladorLentesOpticasPage() {
     const denom = 1 / f - 1 / sObj;
     if (Math.abs(denom) < 1e-9) {
       // Imagen al infinito
-      return { sImg: Infinity, hImg: Infinity, M: Infinity, valido: false };
+      // NaN, no Infinity: el límite de M = −s'/s al acercarse desde s > f es −∞ y desde
+      // s < f es +∞, así que no hay un signo que escribir. Y `valido: false` ya dice que
+      // no hay imagen; lo que no debe haber es una cifra con signo que parezca calculada.
+      return { sImg: NaN, hImg: NaN, M: NaN, valido: false };
     }
     const sImg = 1 / denom;
     const M = -sImg / sObj; // negativo = invertida
@@ -108,7 +111,7 @@ export default function SimuladorLentesOpticasPage() {
     const colorImgReal = '#48A9A6';
     const colorImgVirtual = '#A82E68';
     const colorRayo1 = '#E07A1F'; // paralelo
-    const colorRayo2 = '#7C3AED'; // centro
+    const colorRayo2 = '#2E7D32'; // centro — verde: el #7C3AED anterior está prohibido
     const colorRayo3 = '#0EA5E9'; // por foco
     const colorFoco = '#A82E68';
 
@@ -278,9 +281,10 @@ export default function SimuladorLentesOpticasPage() {
       // Continúa hasta xMax
       const yEnd = m * (xMax - 0) + hObj;
       dibujarRayo(0, hObj, xMax, yEnd, colorRayo1);
-      // Extensión virtual hacia atrás (línea discontinua leve)
-      const yBack = m * (xMin - 0) + hObj;
-      dibujarRayo(0, hObj, xMin, yBack, colorRayo1, true, 0.25);
+      // Extensión virtual hacia atrás (línea discontinua leve). Cuando la imagen es
+      // virtual se corta justo en ella, que es donde la construcción se cierra.
+      const xBack = valido && isFinite(sImg) && sImg < 0 ? sImg : xMin;
+      dibujarRayo(0, hObj, xBack, m * xBack + hObj, colorRayo1, true, 0.35);
     } else {
       // Divergente: el rayo refractado parece venir de F = (-fAbs, 0)
       // Pasa por (0, hObj). Pendiente: m = (hObj - 0) / (0 - (-fAbs)) = hObj / fAbs
@@ -299,6 +303,14 @@ export default function SimuladorLentesOpticasPage() {
       const m = -hObj / sObj;
       const yEnd = m * (xMax - 0) + 0; // pasa por (0, 0)
       dibujarRayo(-sObj, hObj, xMax, yEnd, colorRayo2);
+      // Con imagen VIRTUAL la imagen queda a la izquierda, y en el caso de la lupa
+      // (convergente con el objeto dentro del foco) incluso más a la izquierda que el
+      // propio objeto: sin esta prolongación el rayo no llegaba a ella y la construcción
+      // no se cerraba, pese a que la tarjeta de descripción promete que los tres rayos
+      // se cruzan exactamente en la imagen (hallazgo 962).
+      if (valido && isFinite(sImg) && sImg < 0) {
+        dibujarRayo(-sObj, hObj, sImg, m * sImg, colorRayo2, true, 0.35);
+      }
     }
 
     // RAYO 3: pasa por F (convergente, izquierda) o se dirige hacia F' (divergente, derecha)
@@ -315,6 +327,11 @@ export default function SimuladorLentesOpticasPage() {
         dibujarRayo(-sObj, hObj, 0, yLente, colorRayo3);
         // Tras la lente, sale paralelo al eje a la altura yLente hasta xMax
         dibujarRayo(0, yLente, xMax, yLente, colorRayo3);
+        // Y su prolongación hacia atrás, que es la que corta a las otras dos en la imagen
+        // virtual cuando el objeto está dentro del foco.
+        if (valido && isFinite(sImg) && sImg < 0) {
+          dibujarRayo(0, yLente, sImg, yLente, colorRayo3, true, 0.35);
+        }
       }
     } else {
       // Divergente: rayo dirigido hacia F' = (+fAbs, 0). Tras la lente, sale paralelo al eje.
@@ -393,7 +410,7 @@ export default function SimuladorLentesOpticasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔍 Simulador de Lentes Ópticas</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔍</span> Simulador de Lentes Ópticas</h1>
         <p className={styles.subtitle}>
           Mueve el objeto y mira en directo cómo los <strong>3 rayos principales</strong> atraviesan
           la lente y forman la imagen. Convergente o divergente, real o virtual.
@@ -405,15 +422,17 @@ export default function SimuladorLentesOpticasPage() {
       {/* TIPO DE LENTE */}
       <div className={styles.lensTypeSelector}>
         <button
+          type="button"
           className={`${styles.lensBtn} ${tipo === 'convergente' ? styles.lensBtnActive : ''}`}
           onClick={() => setTipo('convergente')}
           aria-pressed={tipo === 'convergente'}
         >
-          <span className={styles.lensIcon}>🔍</span>
+          <span className={styles.lensIcon} aria-hidden="true">🔍</span>
           <span className={styles.lensName}>Convergente (biconvexa)</span>
           <span className={styles.lensDesc}>f &gt; 0 — concentra los rayos paralelos en F&apos;</span>
         </button>
         <button
+          type="button"
           className={`${styles.lensBtn} ${tipo === 'divergente' ? styles.lensBtnActive : ''}`}
           onClick={() => setTipo('divergente')}
           aria-pressed={tipo === 'divergente'}
@@ -497,7 +516,7 @@ export default function SimuladorLentesOpticasPage() {
               Rayo 1: paralelo → F&apos;
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#7C3AED' }} />
+              <span className={styles.legendDot} style={{ background: '#2E7D32' }} />
               Rayo 2: por el centro
             </span>
             <span className={styles.legendItem}>
@@ -528,19 +547,31 @@ export default function SimuladorLentesOpticasPage() {
             <span className={styles.resultValue}>{fmt(sObj, 2)} cm</span>
             <span className={styles.resultRange}>medida desde la lente</span>
           </div>
+          {/* Con el objeto EN el foco los rayos salen paralelos y no hay imagen: no se
+              puede decir si es real o virtual, ni derecha o invertida, porque no existe.
+              La rama de infinito devolvía M = +Infinity escrito a mano, y de ahí salían
+              los rótulos «derecha (real)» justo donde no hay nada (hallazgo 961). */}
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Distancia imagen (s&apos;)</span>
-            <span className={styles.resultValue}>{fmtSigned(sImg, 2)} cm</span>
-            <span className={styles.resultRange}>{sImg > 0 ? '→ derecha (real)' : sImg < 0 ? '← izquierda (virtual)' : '∞'}</span>
+            <span className={styles.resultValue}>{valido ? `${fmtSigned(sImg, 2)} cm` : '—'}</span>
+            <span className={styles.resultRange}>
+              {!valido
+                ? 'no se forma imagen'
+                : sImg > 0
+                  ? '→ derecha (real)'
+                  : '← izquierda (virtual)'}
+            </span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Aumento (M = −s&apos;/s)</span>
-            <span className={styles.resultValue}>{fmtSigned(M, 3)}</span>
-            <span className={styles.resultRange}>{M < 0 ? 'invertida' : M > 0 ? 'derecha' : '—'}</span>
+            <span className={styles.resultValue}>{valido ? fmtSigned(M, 3) : '—'}</span>
+            <span className={styles.resultRange}>
+              {!valido ? 'sin imagen que medir' : M < 0 ? 'invertida' : 'derecha'}
+            </span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Altura imagen (h&apos;)</span>
-            <span className={styles.resultValue}>{fmtSigned(hImg, 2)} cm</span>
+            <span className={styles.resultValue}>{valido ? `${fmtSigned(hImg, 2)} cm` : '—'}</span>
             <span className={styles.resultRange}>= M · h</span>
           </div>
           <div className={styles.resultCard}>
@@ -686,31 +717,31 @@ export default function SimuladorLentesOpticasPage() {
             <div className={styles.faqItem}>
               <h4>¿Diferencia entre imagen real e imagen virtual?</h4>
               <p><strong>Real</strong>: los rayos refractados se cruzan físicamente (puede recogerse en una pantalla o sensor). Aparece al otro lado de la lente. <strong>Virtual</strong>: los rayos refractados divergen, pero sus prolongaciones hacia atrás se cruzan. NO puede proyectarse, solo verse a través de la lente. Las lupas y los espejos planos forman imágenes virtuales.</p>
-              <p className={styles.faqTip}>💡 Si pones un papel donde &quot;está&quot; la imagen virtual, no aparecerá nada en el papel: la luz no llega ahí.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si pones un papel donde &quot;está&quot; la imagen virtual, no aparecerá nada en el papel: la luz no llega ahí.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué al mirar por una lupa la imagen está derecha y aumentada?</h4>
               <p>Porque al colocar el objeto <em>dentro de la distancia focal</em> (s &lt; f) de una lente convergente, la imagen es <strong>virtual, derecha y mayor</strong>. Si la alejas más de f, la imagen se vuelve real e invertida (lo verías al revés).</p>
-              <p className={styles.faqTip}>💡 En el simulador, con una convergente, baja s por debajo de f y verás cómo la imagen pasa a ser virtual y derecha (color rosa, línea discontinua).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, con una convergente, baja s por debajo de f y verás cómo la imagen pasa a ser virtual y derecha (color rosa, línea discontinua).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué las gafas para miopía son divergentes?</h4>
               <p>Un miope tiene el ojo &quot;demasiado largo&quot;: el cristalino enfoca <em>antes</em> de la retina. Una lente divergente añade un &quot;empuje&quot; que aleja la imagen virtual del cristalino, restaurando el enfoque correcto. Por eso las gafas de miope tienen potencia negativa (dioptrías negativas).</p>
-              <p className={styles.faqTip}>💡 Para hipermetropía (ojo demasiado corto) se usan lentes convergentes (dioptrías positivas).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Para hipermetropía (ojo demasiado corto) se usan lentes convergentes (dioptrías positivas).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué son las dioptrías?</h4>
               <p>Una <strong>dioptría (D)</strong> es la potencia de una lente con f = 1 m: P = 1/f (con f en metros). Una lente de +2 D tiene f = 0,5 m = 50 cm. Las gafas suelen ir entre −10 D (miopía severa) y +10 D (hipermetropía severa).</p>
-              <p className={styles.faqTip}>💡 La potencia es <em>aditiva</em> en lentes delgadas en contacto: dos lentes de +1 D y +2 D juntas equivalen a +3 D.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La potencia es <em>aditiva</em> en lentes delgadas en contacto: dos lentes de +1 D y +2 D juntas equivalen a +3 D.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué la imagen del proyector se ve invertida?</h4>
-              <p>Porque el objeto (la pantalla LCD del proyector) está más cerca que 2f de la lente, así que la imagen sobre la pared es real, invertida y aumentada. Por eso los proyectores tienen un &quot;modo invertir&quot; o se montan colgando del techo: para que la imagen llegue derecha al espectador.</p>
-              <p className={styles.faqTip}>💡 Lo mismo ocurre en el ojo: la retina recibe la imagen invertida, y el cerebro la &quot;corrige&quot; en el procesamiento visual.</p>
+              <p>Porque el objeto (la pantalla LCD del proyector) está ENTRE f y 2f de la lente, así que la imagen sobre la pared es real, invertida y aumentada. Decir solo «más cerca que 2f» incluiría también s &lt; f, que da imagen virtual y derecha, como recoge la tabla de esta misma página. Por eso los proyectores tienen un &quot;modo invertir&quot; o se montan colgando del techo: para que la imagen llegue derecha al espectador.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Lo mismo ocurre en el ojo: la retina recibe la imagen invertida, y el cerebro la &quot;corrige&quot; en el procesamiento visual.</p>
             </div>
           </div>
         </section>
