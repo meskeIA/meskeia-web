@@ -63,7 +63,7 @@ export const faqJsonLd = {
       name: '¿Qué son los decibelios y a partir de qué nivel es peligroso el sonido?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El decibelio (dB) es la unidad que mide la intensidad o presión de un sonido. La escala es logarítmica: 20 dB equivalen a un susurro, 60 dB a una conversación normal y 85 dB al ruido de tráfico intenso. La exposición prolongada a sonidos superiores a 85 dB puede causar daño auditivo permanente. Un concierto de rock puede superar los 110 dB, nivel en el que el daño puede producirse en menos de dos minutos de exposición continuada.',
+        text: 'El decibelio (dB) es la unidad que mide la intensidad o presión de un sonido. La escala es logarítmica: 30 dB equivalen a un susurro, 60 dB a una conversación normal y 85 dB al ruido de un restaurante ruidoso. La exposición prolongada a sonidos superiores a 85 dB puede causar daño auditivo permanente. Un concierto de rock puede superar los 110 dB, nivel en el que el daño puede producirse en menos de dos minutos de exposición continuada.',
       },
     },
     {

@@ -118,6 +118,7 @@ import {
   CASOS,
   TOTAL_CASOS,
   EXPOSICION,
+  anchoBarraExposicion,
   VELOCIDAD_AIRE,
   comprobarRespuesta,
   generarEjercicioAleatorio,
@@ -543,5 +544,60 @@ test.describe('visualizador-sonido-ondas · el panel de onda (Inspector 20/09/20
     await esperarValorEnReact(page, '#casos-respuesta', '0,5');
     await comprobar.click();
     await expect(seccion.getByRole('alert')).toContainText('¡Correcto!');
+  });
+});
+
+// ── Reparaciones del 20/09/2026 ───────────────────────────────────────────────
+
+test.describe('visualizador-sonido-ondas · lo reparado el 20/09/2026', () => {
+  test('la barra de exposición es proporcional al tiempo que rotula', () => {
+    // Antes cada fila traía un porcentaje escrito a mano (100, 80, 60, 45…) que no era ni
+    // lineal ni logarítmico: la gráfica contradecía al subtítulo «cada +3 dB reduce el tiempo
+    // a la mitad» y la fila de 0 minutos pintaba barra.
+    const porDb = (db: number) => EXPOSICION.find((e) => e.db === db)!;
+    expect(anchoBarraExposicion(porDb(85).minutos)).toBe(100); // 480 min = la referencia
+    expect(anchoBarraExposicion(porDb(88).minutos)).toBe(50); // 240 min: la mitad, +3 dB
+    expect(anchoBarraExposicion(porDb(91).minutos)).toBe(25); // 120 min: la mitad otra vez
+    expect(anchoBarraExposicion(porDb(94).minutos)).toBe(12.5);
+    // Cada escalón de +3 dB parte por dos el ancho, que es lo que la sección enseña.
+    for (const [a, b] of [[85, 88], [88, 91], [91, 94], [94, 97]] as const) {
+      expect(anchoBarraExposicion(porDb(b).minutos) * 2).toBeCloseTo(
+        anchoBarraExposicion(porDb(a).minutos),
+        6,
+      );
+    }
+    // Y con cero minutos no hay barra que pintar.
+    expect(anchoBarraExposicion(porDb(120).minutos)).toBe(0);
+  });
+
+  test('el ejercicio de práctica trae pista, y es la del mecanismo que toca', () => {
+    // El botón «Ver pista» era un botón muerto en modo práctica: cambiaba de rótulo y de
+    // aria-expanded y no aparecía nada, porque el ejercicio generado no traía pista.
+    for (let semilla = 0; semilla < 20; semilla++) {
+      const ej = generarEjercicioAleatorio(semilla);
+      expect(ej.pista.length, `semilla ${semilla}`).toBeGreaterThan(10);
+      const delMismoMecanismo = CASOS.find((c) => c.datos.entrada.via === ej.datos.entrada.via);
+      expect(ej.pista, `semilla ${semilla}`).toBe(delMismoMecanismo?.pista);
+    }
+  });
+
+  test('la tarjeta de resonancia ya no usa Tacoma Narrows como ejemplo', async ({ page }) => {
+    // Es el contraejemplo canónico: fue flameo aeroelástico, no resonancia. Billah y Scanlan
+    // (Am. J. Phys. 59(2), 1991) escribieron su artículo contra esa frase de los libros.
+    await page.goto(URL_APP);
+    const tarjeta = page.locator('div', { hasText: 'Resonancia' }).last();
+    await expect(tarjeta).not.toContainText('colapsó porque el viento generó vibraciones');
+    // Si se menciona, es para decir lo que NO es.
+    const texto = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    if (texto.includes('Tacoma')) {
+      expect(texto).toContain('NO es un caso de resonancia');
+    }
+  });
+
+  test('el mismo referente sonoro no recibe dos niveles distintos', async ({ page }) => {
+    await page.goto(URL_APP);
+    const texto = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    // El dato destacado decía que 85 dB es «un tráfico denso», y la tabla de al lado, 80.
+    expect(texto).not.toContain('Es el volumen de un tráfico denso o un restaurante ruidoso');
   });
 });

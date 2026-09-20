@@ -33,6 +33,7 @@ export default function CasosAula() {
   const esperado = practica ? practica.respuesta : caso.respuesta;
   const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
   const pasos = practica ? practica.pasos : caso.pasos;
+  const pista = practica ? practica.pista : caso.pista;
   // El caso 12 responde en milímetros con dos decimales; el resto también. Se mantiene en 2
   // para que la solución no enseñe más precisión de la que se le pide al alumno.
   const decimales = 2;
@@ -164,7 +165,7 @@ export default function CasosAula() {
           </button>
         </div>
 
-        {verPista && !practica && <p className={styles.casoPista}>{caso.pista}</p>}
+        {verPista && pista && <p className={styles.casoPista}>{pista}</p>}
 
         {verSolucion && (
           <div className={styles.casoSolucion}>

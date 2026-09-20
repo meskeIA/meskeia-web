@@ -17,7 +17,11 @@ import CasosAula from './CasosAula';
 // La longitud de onda y el periodo NO se calculan aquí: vienen del mismo módulo con el que se
 // corrigen los casos para clase, para que la app no pueda suspender una respuesta que ella
 // misma acaba de enseñar. Las dos tablas de datos físicos viven allí por la misma razón.
-import { VELOCIDADES, EXPOSICION, longitudDeOnda, periodoDe } from './casos';
+import { VELOCIDADES, EXPOSICION, anchoBarraExposicion, longitudDeOnda, periodoDe } from './casos';
+
+/** Extremos del deslizador de frecuencia. Los rótulos salen de aquí, no escritos a mano. */
+const FREQ_MIN = 20;
+const FREQ_MAX = 2000;
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -196,7 +200,17 @@ function generarPathOnda(
 // ─────────────────────────────────────────────
 
 let audioCtx: AudioContext | null = null;
-let currentOscillator: OscillatorNode | null = null;
+/**
+ * TODOS los osciladores que están sonando ahora mismo, no solo el último.
+ *
+ * ── De dónde sale (Inspector, 20/09/2026) ──
+ * Antes había un único `currentOscillator`, y solo `playTone` lo asignaba:
+ * `playToneWithHarmonics` crea SEIS osciladores y los dejaba fuera de alcance, así que
+ * `stopTone` no podía pararlos. Los timbres se acumulaban hasta agotar su parada programada
+ * (2 s) y la sección cuyo propósito es COMPARAR timbres acababa sonando dos a la vez: medidos
+ * 12 osciladores simultáneos tras dos clics seguidos en «Escuchar Piano».
+ */
+let osciladoresActivos: OscillatorNode[] = [];
 let currentGain: GainNode | null = null;
 
 function getAudioContext(): AudioContext {
@@ -224,7 +238,7 @@ function playTone(frequency: number, duration: number = 1.5, type: OscillatorTyp
   osc.start();
   osc.stop(ctx.currentTime + duration);
 
-  currentOscillator = osc;
+  osciladoresActivos = [osc];
   currentGain = gain;
 }
 
@@ -239,6 +253,7 @@ function playToneWithHarmonics(frequency: number, harmonics: number[], duration:
 
   const maxAmp = harmonics.reduce((s, v) => s + v / 100, 0);
 
+  osciladoresActivos = [];
   harmonics.forEach((amp, i) => {
     if (amp === 0) return;
     const osc = ctx.createOscillator();
@@ -250,16 +265,21 @@ function playToneWithHarmonics(frequency: number, harmonics: number[], duration:
     gain.connect(masterGain);
     osc.start();
     osc.stop(ctx.currentTime + duration);
+    osciladoresActivos.push(osc);
   });
 
   currentGain = masterGain;
 }
 
 function stopTone() {
-  try {
-    currentOscillator?.stop();
-  } catch { /* already stopped */ }
-  currentOscillator = null;
+  for (const osc of osciladoresActivos) {
+    try {
+      osc.stop();
+    } catch {
+      /* ya estaba parado: su `stop(t)` programado pudo vencer antes */
+    }
+  }
+  osciladoresActivos = [];
   currentGain = null;
 }
 
@@ -340,16 +360,18 @@ export default function SonidoOndasPage() {
             </label>
             <input
               type="range"
-              min="20"
-              max="2000"
+              min={FREQ_MIN}
+              max={FREQ_MAX}
               value={frecuencia}
               onChange={e => setFrecuencia(Number(e.target.value))}
               className={styles.sliderInput}
               aria-label="Frecuencia en hercios"
             />
             <div className={styles.sliderRange}>
-              <span>20 Hz</span>
-              <span>2.000 Hz</span>
+              <span>{formatNumber(FREQ_MIN, 0)} Hz</span>
+              {/* Del mismo formateador que la lectura del valor: escrito a mano decía
+                  «2.000» donde la lectura ponía «2000», en el mismo control. */}
+              <span>{formatNumber(FREQ_MAX, 0)} Hz</span>
             </div>
           </div>
           <div className={styles.sliderGroup}>
@@ -497,7 +519,15 @@ export default function SonidoOndasPage() {
                 style={{ cursor: 'pointer' }}
                 role="button"
                 tabIndex={0}
-                onKeyDown={e => e.key === 'Enter' && playTone(n.freq, 1.0)}
+                onKeyDown={e => {
+                  // Un role="button" tiene que responder a Enter Y a la barra espaciadora.
+                  // Solo atendía Enter, y el espacio además desplazaba la página: era la
+                  // única forma de oír las diez notas con el teclado (Inspector 20/09/2026).
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    playTone(n.freq, 1.0);
+                  }
+                }}
                 aria-label={`Escuchar ${n.nota} a ${formatNumber(n.freq, 2)} hercios`}
               >
                 <span className={styles.notaNombre}>{n.nota}</span>
@@ -643,7 +673,7 @@ export default function SonidoOndasPage() {
                 <div className={styles.exposicionBarContainer}>
                   <div
                     className={styles.exposicionBar}
-                    style={{ width: `${e.pctBarra}%`, background: e.color }}
+                    style={{ width: `${anchoBarraExposicion(e.minutos)}%`, background: e.color }}
                   />
                 </div>
                 <span className={styles.exposicionTiempo}>{e.tiempo}</span>
@@ -673,7 +703,7 @@ export default function SonidoOndasPage() {
             <span className={styles.datoUnidad}> dB</span>
           </div>
           <p className={styles.datoTexto}>
-            Umbral de riesgo auditivo. Por encima de 85 dB, la exposición prolongada causa daño permanente. Es el volumen de un tráfico denso o un restaurante ruidoso.
+            Umbral de riesgo auditivo. Por encima de 85 dB, la exposición prolongada causa daño permanente. Es el volumen de un restaurante ruidoso; el tráfico denso de la tabla de arriba, con sus 80 dB, se queda algo por debajo.
           </p>
         </div>
       </>
@@ -775,7 +805,11 @@ export default function SonidoOndasPage() {
           </h3>
           <p className={styles.fenomenoDesc}>
             Cuando una fuerza externa vibra a la frecuencia natural de un objeto, la amplitud se amplifica enormemente.
-            El puente de Tacoma Narrows (1940) colapsó porque el viento generó vibraciones que coincidieron con su frecuencia natural.
+            Un cantante puede romper una copa si sostiene la nota de su frecuencia natural: la copa absorbe
+            energía en cada ciclo hasta que el vidrio no aguanta. Es el mismo principio por el que una radio
+            sintoniza una emisora y no las demás. (El puente de Tacoma Narrows, que se cita mucho aquí, NO es
+            un caso de resonancia: fue flameo aeroelástico, una oscilación que la propia estructura alimenta
+            de un viento estacionario, sin ninguna fuerza periódica externa que la empuje.)
             Una copa de cristal se rompe cuando una voz alcanza exactamente su frecuencia de resonancia (~550 Hz).
           </p>
         </div>

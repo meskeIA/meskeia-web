@@ -58,7 +58,6 @@ export interface ExposicionSegura {
   db: number;
   tiempo: string;
   minutos: number;
-  pctBarra: number;
   color: string;
 }
 
@@ -71,15 +70,37 @@ export interface ExposicionSegura {
  * precisamente por eso, porque un «menos de» no tiene respuesta única.
  */
 export const EXPOSICION: readonly ExposicionSegura[] = [
-  { db: 85, tiempo: '8 horas', minutos: 480, pctBarra: 100, color: '#27ae60' },
-  { db: 88, tiempo: '4 horas', minutos: 240, pctBarra: 80, color: '#2ecc71' },
-  { db: 91, tiempo: '2 horas', minutos: 120, pctBarra: 60, color: '#f1c40f' },
-  { db: 94, tiempo: '1 hora', minutos: 60, pctBarra: 45, color: '#e67e22' },
-  { db: 97, tiempo: '30 min', minutos: 30, pctBarra: 30, color: '#e74c3c' },
-  { db: 100, tiempo: '15 min', minutos: 15, pctBarra: 18, color: '#c0392b' },
-  { db: 110, tiempo: '< 2 min', minutos: 2, pctBarra: 8, color: '#8e44ad' },
-  { db: 120, tiempo: '0 seg', minutos: 0, pctBarra: 2, color: '#6c3483' },
+  { db: 85, tiempo: '8 horas', minutos: 480, color: '#27ae60' },
+  { db: 88, tiempo: '4 horas', minutos: 240, color: '#2ecc71' },
+  { db: 91, tiempo: '2 horas', minutos: 120, color: '#f1c40f' },
+  { db: 94, tiempo: '1 hora', minutos: 60, color: '#e67e22' },
+  { db: 97, tiempo: '30 min', minutos: 30, color: '#e74c3c' },
+  { db: 100, tiempo: '15 min', minutos: 15, color: '#c0392b' },
+  { db: 110, tiempo: '< 2 min', minutos: 2, color: '#8e44ad' },
+  { db: 120, tiempo: '0 seg', minutos: 0, color: '#6c3483' },
 ];
+
+/** Minutos de la primera fila: la barra al 100 %. */
+const MINUTOS_MAXIMOS = EXPOSICION[0].minutos;
+
+/**
+ * Ancho de la barra, en porcentaje, PROPORCIONAL al tiempo que rotula.
+ *
+ * ── De dónde sale (Inspector, 20/09/2026) ──
+ * Antes cada fila traía un `pctBarra` escrito a mano (100, 80, 60, 45, 30, 18, 8, 2) que no
+ * era ni lineal ni logarítmico respecto a los minutos: la gráfica contradecía al subtítulo
+ * que tiene encima, «cada +3 dB reduce el tiempo a la mitad», porque los tres primeros
+ * escalones bajaban un 20-25 % en vez de a la mitad. Y la fila de 0 minutos pintaba barra.
+ *
+ * Al ser proporcional, las barras de arriba se ven cortísimas — y ESO es justo lo que la
+ * sección enseña: a 100 dB queda un 3 % del tiempo que hay a 85 dB. El mínimo de 0,6 % es
+ * para que una fila con tiempo distinto de cero no desaparezca del todo; con cero minutos,
+ * la barra es cero.
+ */
+export function anchoBarraExposicion(minutos: number): number {
+  if (minutos <= 0) return 0;
+  return Math.max(0.6, (minutos / MINUTOS_MAXIMOS) * 100);
+}
 
 /* ─────────────────────────── Las fórmulas (compartidas con page.tsx) ─────────────────────────── */
 
@@ -570,6 +591,14 @@ export interface Ejercicio {
   respuesta: number;
   etiquetaRespuesta: string;
   pasos: string[];
+  /**
+   * La misma pista que el caso fijo que comparte mecanismo.
+   *
+   * Hasta el 20/09/2026 el ejercicio generado no traía ninguna, y por eso la vista suprimía
+   * la pista en modo práctica: el botón «Ver pista» cambiaba de rótulo y de `aria-expanded`
+   * y no aparecía nada debajo. Un botón muerto es peor que un botón ausente.
+   */
+  pista: string;
 }
 
 /**
@@ -643,5 +672,8 @@ export function generarEjercicioAleatorio(semilla = Date.now()): Ejercicio {
     respuesta: r.ok ? redondear(r.valor, decimales) : NaN,
     etiquetaRespuesta,
     pasos: r.pasos,
+    // La pista del primer caso fijo con el mismo mecanismo: así la ayuda siempre habla de la
+    // fórmula que toca, y no hay un segundo juego de textos que pueda divergir.
+    pista: CASOS.find((c) => c.datos.entrada.via === via)?.pista ?? '',
   };
 }
