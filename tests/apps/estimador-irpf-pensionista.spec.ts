@@ -1,8 +1,9 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * estimador-irpf-pensionista — candado del método del art. 63.1.2.º LIRPF
- * Escrita el 12/09/2026.
+ * Escrita el 12/09/2026. Ampliada el 20/09/2026 por el Inspector (casos 4 a 6).
  *
  * QUÉ VIGILA
  * ──────────
@@ -20,14 +21,40 @@ import { test, expect, Page } from '@playwright/test';
  * DE DÓNDE SALE CADA CIFRA — de la norma, NO de lo que devuelve la app
  * ───────────────────────────────────────────────────────────────────
  *   · escala art. 63: 12.450 @19 % · 20.200 @24 % · 35.200 @30 % …
+ *     (`TRAMOS_IRPF_2025` de `data/fiscal/irpf.ts`)
  *   · mínimo del contribuyente, art. 57: 5.550 € · 6.700 € desde 65 años · 8.100 € desde 75
- *   · gastos art. 19.2.f: 2.000 €
+ *     (`MINIMOS_IRPF_2025.personal` / `.personal_65` / `.personal_75`)
+ *   · gastos art. 19.2.f: 2.000 € (`GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral`)
  *   · reducción art. 20 (redacción RDL 4/2024): 7.302 € hasta 14.852 € de RNT; entre 14.852 y
  *     17.673,52 €, 7.302 − 1,75 × (RNT − 14.852); entre 17.673,52 y 19.747,5 €,
  *     2.364,34 − 1,14 × (RNT − 17.673,52); desde 19.747,5 €, cero.
+ *     (`REDUCCION_RENDIMIENTOS_TRABAJO_2025` / `calcularReduccionRendimientosTrabajo`)
+ *
+ * LO QUE ESTE SPEC **NO** CUBRE — hallazgos abiertos del Inspector (20/09/2026)
+ * ───────────────────────────────────────────────────────────────────────────
+ * Aquí no hay caso que los fije porque el Inspector no repara y un test no debe consagrar el
+ * defecto. Quedan nombrados para quien los repare:
+ *   1. El millar español se lee como decimal. La app parsea con
+ *      `parseFloat(x.replace(',', '.'))` en vez de `parseSpanishNumber` de `@/lib`: un rescate
+ *      escrito «30.000» se computa como 30 € y el campo NO se reescribe, así que nada avisa.
+ *   2. La reducción del art. 20 se aplica aunque el contribuyente declare rentas distintas de
+ *      las del trabajo por encima de los 6.500 € que exige la norma — condición que
+ *      `data/fiscal/irpf.ts` advierte expresamente que NO modela.
+ *   3. La guarda «entre 100 y 10.000 €» de `calcular()` no llega a rechazar nada: el control
+ *      acota el valor al límite al perder el foco, y el foco se pierde al pulsar el botón.
+ *      Detalle y casos, al final del CASO 6.
  */
 
 const RUTA = '/estimador-irpf-pensionista/';
+
+/** Los tres campos numéricos. Sin ellos hidratados, escribir no llegaría al estado de React. */
+const CAMPOS = [
+  'input[aria-label="Pensión mensual bruta (€/mes)"]',
+  'input[aria-label="Rescate de plan de pensiones este año (€)"]',
+  'input[aria-label="Otros ingresos anuales sujetos a IRPF (€/año)"]',
+] as const;
+
+const SEL_PENSION = CAMPOS[0];
 
 const ESPACIO_DURO = new RegExp(String.fromCharCode(160), 'g');
 const limpiar = (s: string) => s.replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
@@ -41,12 +68,16 @@ async function fila(page: Page, etiqueta: string): Promise<string> {
 async function estimar(page: Page, pension: string, edad: string): Promise<void> {
   await page.locator('#tramoEdad').selectOption(edad);
   await page.getByLabel('Pensión mensual bruta (€/mes)').fill(pension);
+  // `fill()` llega a React por el navegador, pero no si la app aún no responde: sin este
+  // testigo el test seguiría adelante midiendo la pensión anterior.
+  await esperarValorEnReact(page, SEL_PENSION, pension);
   await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
 }
 
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Estimador IRPF Pensionista');
+  await esperarHidratacion(page, CAMPOS);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -107,4 +138,108 @@ test('CASO 3 · el mínimo por edad mueve la cuota, y lo hace al 19 %', async ({
 
   const num = (s: string) => Number(s.replace(' €', '').replace(/\./g, '').replace(',', '.'));
   expect(num(con67) - num(con76)).toBeCloseTo(266, 2);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Casos 4 a 6 — Inspector, 20/09/2026. Resueltos a mano ANTES de abrir la app, con la escala
+// y los mínimos leídos de `data/fiscal/irpf.ts`.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('CASO 4 (normal) · 1.400 €/mes, 68 años — la cadena completa art. 19 → art. 20 → art. 63.1.2.º', async ({ page }) => {
+  // Pensión de jubilación en 14 pagas (12 mensualidades + 2 extraordinarias).
+  //
+  //   Rendimientos íntegros    1.400 × 14                      = 19.600,00 €
+  //   − gastos art. 19.2.f                                     =  2.000,00 €
+  //   Rendimiento neto del trabajo (RNT)                       = 17.600,00 €
+  //   − reducción art. 20 (RNT entre 14.852 y 17.673,52 → primer tramo decreciente):
+  //       7.302 − 1,75 × (17.600 − 14.852) = 7.302 − 4.809,00  =  2.493,00 €
+  //   Base imponible (CON el mínimo dentro, art. 63.1.2.º)     = 15.107,00 €
+  //   Mínimo del contribuyente de 65 a 74 años (art. 57.2)     =  6.700,00 €
+  //
+  //   escala(15.107,00) = 12.450×19 % + 2.657,00×24 % = 2.365,50 + 637,68 = 3.003,18 €
+  //   escala(6.700,00)  = 6.700×19 %                                      = 1.273,00 €
+  //   cuota íntegra     = 3.003,18 − 1.273,00                             = 1.730,18 €
+  //
+  //   Tipo efectivo = 1.730,18 / 19.600 = 8,8274… % → 8,8 %
+  //   Pensión neta  = 1.400 − 1.730,18/14 = 1.400 − 123,5843 = 1.276,42 €/mes
+  //
+  // Si el mínimo se restara de la base —el defecto que vigila `npm run check:minimo-irpf`—
+  // saldría escala(15.107 − 6.700) = escala(8.407) = 1.597,33 €, o sea 132,85 € menos.
+  await estimar(page, '1400', '65_74');
+
+  expect(await fila(page, 'Rendimientos íntegros totales (anuales)')).toBe('19.600,00 €');
+  expect(await fila(page, 'Gastos deducibles generales')).toBe('-2000,00 €');
+  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-2493,00 €');
+  expect(await fila(page, 'Base imponible estimada')).toBe('15.107,00 €');
+  expect(await fila(page, 'Mínimo personal (edad)')).toBe('6700,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1730,18 €');
+  expect(await fila(page, 'Tipo efectivo estimado')).toBe('8,8%');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1276,42 €/mes');
+});
+
+test('CASO 5 (borde) · 75 años: la base cae EXACTAMENTE en el mínimo de 8.100 €', async ({ page }) => {
+  // El punto en que un pensionista de 75 años empieza a pagar. No se elige por tanteo: se
+  // despeja de la propia norma.
+  //
+  // Con RNT entre 14.852 y 17.673,52 la base vale RNT − [7.302 − 1,75 × (RNT − 14.852)],
+  // es decir 2,75 × RNT − 33.293. Igualada al mínimo del art. 57.2 para 75 años o más
+  // (8.100 €): RNT = 15.052,00 €, o sea 17.052,00 € íntegros = 1.218,00 €/mes en 14 pagas.
+  //
+  //   Rendimientos íntegros    1.218 × 14                      = 17.052,00 €
+  //   − gastos art. 19.2.f                                     =  2.000,00 €
+  //   RNT                                                      = 15.052,00 €
+  //   − reducción art. 20: 7.302 − 1,75 × (15.052 − 14.852) = 7.302 − 350,00 = 6.952,00 €
+  //   Base imponible                                           =  8.100,00 €
+  //   Mínimo 75+ (art. 57.2)                                   =  8.100,00 €
+  //   cuota = escala(8.100) − escala(8.100) = 0,00 € exactos → la pensión sale íntegra.
+  await estimar(page, '1218', '75_mas');
+
+  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-6952,00 €');
+  expect(await fila(page, 'Base imponible estimada')).toBe('8100,00 €');
+  expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,00 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1218,00 €/mes');
+
+  // Un euro más al mes y la cuota deja de ser cero, al 19 % del primer tramo:
+  //   1.219 × 14 = 17.066 → RNT 15.066 → reducción 7.302 − 1,75 × 214 = 6.927,50 €
+  //   base 8.138,50 € → cuota (8.138,50 − 8.100) × 19 % = 38,50 × 0,19 = 7,315 → 7,32 €
+  // Se comprueba que el borde es ese y no otro: si la app acotara mal el mínimo, o si lo
+  // restara de la base, este euro no produciría exactamente 7,32 €.
+  await estimar(page, '1219', '75_mas');
+  expect(await fila(page, 'Base imponible estimada')).toBe('8138,50 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('7,32 €');
+});
+
+test('CASO 6 (rechazo) · sin pensión no se estima nada: aviso y ningún número', async ({ page }) => {
+  // Una app fiscal no puede inventarse una cifra cuando falta el dato: o calcula, o no da
+  // número. Aquí se comprueban las dos mitades — que avisa, y que NO publica resultado.
+  const aviso = page.locator('[role="alert"]').filter({ hasText: 'Introduce tu pensión mensual bruta' });
+  const cuotaEnPantalla = page.locator('css=span:text-is("Cuota IRPF estimada anual")');
+
+  await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
+
+  await expect(aviso).toBeVisible();
+  await expect(aviso).toHaveAttribute('aria-live', 'polite');
+
+  // El bloque de resultados sigue sin montarse: no hay ninguna cuota en pantalla.
+  await expect(page.getByText('Introduce tus datos y pulsa el botón')).toBeVisible();
+  expect(await cuotaEnPantalla.count()).toBe(0);
+
+  // Las letras no llegan siquiera al campo: el control solo admite /^-?[\d.,]*$/, así que
+  // teclear «abc» lo deja vacío y se vuelve a rechazar igual.
+  await page.locator(SEL_PENSION).pressSequentially('abc');
+  await esperarValorEnReact(page, SEL_PENSION, '');
+  await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
+  await expect(aviso).toBeVisible();
+  expect(await cuotaEnPantalla.count()).toBe(0);
+
+  // ⚠️ El campo vacío es el ÚNICO rechazo que esta app llega a ejecutar, y el test no
+  // puede fijar más. `NumberInput` acota el valor a [min, max] al perder el foco, y el
+  // foco se pierde justo al pulsar el botón, así que la guarda «entre 100 y 10.000 €» de
+  // `calcular()` recibe siempre un valor ya dentro del rango y nunca rechaza nada:
+  //   «12» → el campo pasa a 100 y se publica «Pensión neta mensual estimada 100,00 €/mes»
+  //   «-500» → idéntico, 100,00 €/mes
+  //   «99999» → el campo pasa a 10.000 y se publica una cuota de 51.728,50 €
+  // Medido el 20/09/2026 por el Inspector. Queda nombrado, no fijado: fijarlo consagraría
+  // el defecto.
 });

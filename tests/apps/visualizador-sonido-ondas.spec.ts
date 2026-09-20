@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { esperarHidratacion } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * visualizador-sonido-ondas — las cuatro secciones, servidas · 05/09/2026 (semilla S0119)
@@ -15,6 +15,11 @@ import { esperarHidratacion } from './_hidratacion';
  */
 
 const URL_APP = '/visualizador-sonido-ondas/';
+
+// Sin usuario delante el AudioContext puede quedarse «suspended», y entonces el oscilador
+// se crea, arranca y no suena nada. Va al nivel del fichero: Playwright rechaza un
+// test.use({ launchOptions }) dentro de un describe, porque obliga a un worker nuevo.
+test.use({ launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] } });
 
 const SECCIONES = [
   { ancla: 'anatomia', titulo: 'Anatomía de una onda sonora' },
@@ -302,5 +307,241 @@ test.describe('visualizador-sonido-ondas · los casos, en la página', () => {
     await verSolucion.click();
     // 73,01 dB, no 140: es el error que este caso existe para corregir.
     await expect(seccion.getByText(/Respuesta:\s*73,01/)).toBeVisible();
+  });
+});
+
+/**
+ * ════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR · 20/09/2026 — el panel de onda: λ, T y el tono que SALE de verdad
+ * ════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * Lo de arriba protege el contenido servido y la aritmética de los casos para clase. Lo que
+ * no comprobaba nadie es la promesa central de la sección «Anatomía de onda»: las dos cifras
+ * que la app pinta DENTRO del SVG mientras se mueve el deslizador, y que el botón «Escuchar»
+ * emita el tono que anuncia. Que el SVG ondule no prueba que λ valga lo que dice, y que el
+ * botón exista no prueba que suene.
+ *
+ * QUÉ PROMETE LA APP (de aquí salen los valores esperados)
+ *   - <h1> «Sonido y Ondas» · subtítulo «Frecuencia, amplitud, decibelios y armónicos».
+ *   - Tarjeta «Longitud de onda»: λ = v / f  ·  tarjeta «Período»: T = 1 / f.
+ *   - Dato destacado y tabla de medios: v = 343 m/s en el aire a 20 °C (VELOCIDAD_AIRE).
+ *   - Deslizador de frecuencia acotado a [20, 2.000] Hz, con los dos extremos rotulados.
+ *
+ * LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR LA APP (v = 343 m/s)
+ *   normal   440 Hz   λ = 343/440  = 0,779545… m → «0,78 m»   T = 1/440 = 2,27272… ms → «2,27 ms»
+ *   límite 2.000 Hz   λ = 343/2000 = 0,1715 m    → «0,17 m»   T = 0,0005 s = 500 μs  → «500,0 μs»
+ *   límite    20 Hz   λ = 343/20   = 17,15 m     → «17,15 m»  T = 0,05 s   = 50 ms   → «50,00 ms»
+ *   rechazo  «abc», «1e0», «0,5,1» en la casilla de los casos → veredicto con mensaje propio.
+ *   Ninguno está copiado de la pantalla: salen de la fórmula que la propia app enseña.
+ *
+ * EL TONO SE MIRA EN LA WEB AUDIO API, NO EN EL DOM
+ * Se envuelve `createOscillator` para registrar con qué frecuencia se llama a
+ * `setValueAtTime`, en qué estado queda el AudioContext al arrancar, y —enganchando un
+ * AnalyserNode al propio oscilador, ANTES de la ganancia de la app— qué espectro sale.
+ * ⚠️ Un OscillatorNode recién creado ya vale 440 Hz por defecto, así que a 440 Hz el
+ * `frequency.value` no discrimina nada: por eso el caso normal exige además la llamada
+ * REGISTRADA, y el caso límite repite la medida a 2.000 Hz, que el valor por defecto no
+ * puede fingir.
+ */
+
+/** Lo que el instrumentador deja en `window` por cada oscilador que la app crea. */
+interface RegistroOnda {
+  frecuenciasAplicadas: number[];
+  iniciado: boolean;
+  estadoCtxAlArrancar: AudioContextState | null;
+}
+
+/** Lectura del espectro REAL que emite el último oscilador creado. */
+interface PicoEmitido {
+  hz: number;
+  anchoBin: number;
+  db: number;
+}
+
+interface VentanaInstrumentada {
+  __ondas: RegistroOnda[];
+  __analizador: AnalyserNode | null;
+  __pico: () => PicoEmitido | null;
+}
+
+/** Se inyecta con `addInitScript`, ANTES de cargar la página: la app usa ya las envueltas. */
+function INSTRUMENTAR_AUDIO(): void {
+  const w = window as unknown as VentanaInstrumentada;
+  w.__ondas = [];
+  w.__analizador = null;
+
+  const crearOsc = AudioContext.prototype.createOscillator;
+  AudioContext.prototype.createOscillator = function (this: AudioContext): OscillatorNode {
+    const osc = crearOsc.call(this);
+    const registro: RegistroOnda = {
+      frecuenciasAplicadas: [],
+      iniciado: false,
+      estadoCtxAlArrancar: null,
+    };
+    w.__ondas.push(registro);
+
+    // 8.192 puntos a 48 kHz: bins de 5,86 Hz y una ventana de 0,17 s, que se llena mucho
+    // antes de que termine el tono de 1,5 s y sobra para separar 440 de 2.000 Hz.
+    const analizador = this.createAnalyser();
+    analizador.fftSize = 8192;
+    analizador.smoothingTimeConstant = 0;
+    // Enganchado al oscilador y no a la salida: la rampa de volumen de la app no puede
+    // falsear la medida, y la amplitud del deslizador tampoco.
+    osc.connect(analizador);
+    w.__analizador = analizador;
+
+    const parametro = osc.frequency;
+    const fijar = parametro.setValueAtTime.bind(parametro);
+    parametro.setValueAtTime = (valor: number, cuando: number): AudioParam => {
+      registro.frecuenciasAplicadas.push(valor);
+      return fijar(valor, cuando);
+    };
+
+    const arrancar = osc.start.bind(osc);
+    osc.start = (cuando?: number): void => {
+      registro.iniciado = true;
+      registro.estadoCtxAlArrancar = osc.context.state;
+      arrancar(cuando);
+    };
+    return osc;
+  };
+
+  w.__pico = (): PicoEmitido | null => {
+    const analizador = w.__analizador;
+    if (!analizador) return null;
+    const datos = new Float32Array(analizador.frequencyBinCount);
+    analizador.getFloatFrequencyData(datos);
+    const anchoBin = analizador.context.sampleRate / analizador.fftSize;
+    let picoDb = -Infinity;
+    let picoIdx = -1;
+    // Se empieza en 1: el bin 0 es la componente continua, que no es ningún tono.
+    for (let i = 1; i < datos.length; i++) {
+      if (datos[i] > picoDb) {
+        picoDb = datos[i];
+        picoIdx = i;
+      }
+    }
+    return { hz: picoIdx * anchoBin, anchoBin, db: picoDb };
+  };
+}
+
+test.describe('visualizador-sonido-ondas · el panel de onda (Inspector 20/09/2026)', () => {
+  const SEL_FRECUENCIA = 'input[aria-label="Frecuencia en hercios"]';
+  const SVG_ONDA = 'svg[aria-label^="Onda sinusoidal"]';
+
+  test('caso normal · 440 Hz: λ = 0,78 m, T = 2,27 ms y el tono sale a 440 Hz', async ({ page }) => {
+    await page.addInitScript(INSTRUMENTAR_AUDIO);
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, [SEL_FRECUENCIA]);
+
+    // El deslizador arranca en 200 Hz, así que pedir 440 MUEVE el estado de verdad: una
+    // siembra que coincidiera con el valor inicial daría verde aunque el evento se perdiera.
+    const aceptado = await sembrarValorAcotado(page, SEL_FRECUENCIA, 440);
+    expect(aceptado).toBe('440');
+
+    const panel = page.locator(`${SVG_ONDA} text`);
+    // λ = 343/440 = 0,779545… m, a dos decimales.
+    await expect(panel.nth(0)).toHaveText('λ = 0,78 m');
+    // T = 1/440 = 0,00227272… s = 2,27272… ms. Por encima de 1 ms la app rotula en ms.
+    await expect(panel.nth(1)).toHaveText('T = 2,27 ms');
+    await expect(page.locator(SVG_ONDA)).toHaveAttribute(
+      'aria-label',
+      'Onda sinusoidal a 440 Hz con amplitud 70%',
+    );
+
+    const boton = page.getByRole('button', { name: 'Escuchar tono a 440 hercios' });
+    await expect(boton).toBeVisible();
+    await boton.click();
+
+    const registros = async (): Promise<RegistroOnda[]> =>
+      page.evaluate(() => (window as unknown as VentanaInstrumentada).__ondas);
+    await expect.poll(async () => (await registros()).length).toBe(1);
+
+    const [registro] = await registros();
+    // La app PIDE 440 Hz: sin esta llamada, un oscilador recién creado ya valdría 440 y la
+    // comprobación del espectro pasaría sin que la app hubiera hecho nada.
+    expect(registro.frecuenciasAplicadas).toEqual([440]);
+    expect(registro.iniciado).toBe(true);
+    expect(registro.estadoCtxAlArrancar).toBe('running');
+
+    // Y el tono que SALE: el pico del espectro cae dentro del bin de 440 Hz (medido
+    // 439,45 Hz, que es el centro del bin 75 con anchura de 5,86 Hz).
+    await expect
+      .poll(
+        async () => {
+          const pico = await page.evaluate(() =>
+            (window as unknown as VentanaInstrumentada).__pico(),
+          );
+          return pico ? Math.abs(pico.hz - 440) <= pico.anchoBin : Number.NaN;
+        },
+        { intervals: [150, 150, 200, 250], timeout: 4000 },
+      )
+      .toBe(true);
+  });
+
+  test('caso límite · los dos extremos del deslizador, y el tono los sigue', async ({ page }) => {
+    await page.addInitScript(INSTRUMENTAR_AUDIO);
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, [SEL_FRECUENCIA]);
+
+    // Extremo superior: se piden 5.000 Hz, fuera del rango declarado [20, 2.000].
+    const tope = await sembrarValorAcotado(page, SEL_FRECUENCIA, 5000);
+    expect(tope).toBe('2000');
+
+    const panel = page.locator(`${SVG_ONDA} text`);
+    // λ = 343/2000 = 0,1715 m → 0,17 m a dos decimales.
+    await expect(panel.nth(0)).toHaveText('λ = 0,17 m');
+    // T = 1/2000 = 0,0005 s: por debajo de 1 ms la app cambia de unidad a microsegundos.
+    await expect(panel.nth(1)).toHaveText('T = 500,0 μs');
+
+    // El tono emitido es el del extremo. Aquí la medida SÍ discrimina por sí sola: 2.000 Hz
+    // no es el valor por defecto de un OscillatorNode, que son 440.
+    await page.getByRole('button', { name: 'Escuchar tono a 2000 hercios' }).click();
+    await expect
+      .poll(
+        async () => {
+          const pico = await page.evaluate(() =>
+            (window as unknown as VentanaInstrumentada).__pico(),
+          );
+          return pico ? Math.abs(pico.hz - 2000) <= pico.anchoBin : Number.NaN;
+        },
+        { intervals: [150, 150, 200, 250], timeout: 4000 },
+      )
+      .toBe(true);
+
+    // Extremo inferior: se piden 0 Hz y el control sube al mínimo declarado, 20 Hz. Con
+    // f = 0 no habría onda (λ y T serían infinitos), y la app no llega nunca a ese estado.
+    const suelo = await sembrarValorAcotado(page, SEL_FRECUENCIA, 0);
+    expect(suelo).toBe('20');
+    // λ = 343/20 = 17,15 m · T = 1/20 = 0,05 s = 50 ms.
+    await expect(panel.nth(0)).toHaveText('λ = 17,15 m');
+    await expect(panel.nth(1)).toHaveText('T = 50,00 ms');
+  });
+
+  test('caso de rechazo · lo que no es un número se rechaza con un mensaje legible', async ({ page }) => {
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+
+    const seccion = page.locator('#casos-aula');
+    const casilla = seccion.locator('#casos-respuesta');
+    const comprobar = seccion.getByRole('button', { name: 'Comprobar' });
+
+    // `parseSpanishNumber` devuelve NaN con las tres, y ese NaN no puede llegar a pantalla:
+    // «1e0» es notación científica y «0,5,1» tiene dos comas decimales.
+    for (const entrada of ['abc', '1e0', '0,5,1']) {
+      await casilla.fill(entrada);
+      // `fill()` sí llega a React, pero no si la app aún no ha hidratado: el testigo es el
+      // estado, no el DOM.
+      await esperarValorEnReact(page, '#casos-respuesta', entrada);
+      await comprobar.click();
+      await expect(seccion.getByRole('alert')).toContainText('Escribe un número');
+      await expect(seccion.getByRole('alert')).not.toContainText('NaN');
+    }
+
+    // Y la respuesta buena del caso 1 se acepta: λ = 343/686 = 0,5 m exactos.
+    await casilla.fill('0,5');
+    await esperarValorEnReact(page, '#casos-respuesta', '0,5');
+    await comprobar.click();
+    await expect(seccion.getByRole('alert')).toContainText('¡Correcto!');
   });
 });
