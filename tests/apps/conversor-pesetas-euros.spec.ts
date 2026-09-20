@@ -2,8 +2,8 @@ import { test, expect, Locator, Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
- * Inspector — conversor-pesetas-euros (segmento CÁLCULO, riesgo 2, 93 usos/90 d)
- * Primera inspección: 18/09/2026. Banco de pruebas: producción.
+ * Inspector — conversor-pesetas-euros (segmento CÁLCULO, riesgo 2, 122 usos/90 d)
+ * Primera inspección: 18/09/2026 · RE-INSPECCIÓN: 20/09/2026 (invalidada por cambio de datos).
  *
  * QUÉ PROMETE LA APP
  *   · <h1> «Conversor de Pesetas a Euros» y subtítulo «Convierte al tipo oficial y descubre
@@ -20,6 +20,22 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   · La entrada la lee parseSpanishNumber() de @/lib — el parser canónico, NO el
  *     parseFloat(x.replace(',', '.')) que el catálogo arrastra. Por eso el primer caso de
  *     abajo es justo el que ese defecto rompería.
+ *
+ * ── POR QUÉ SE RE-INSPECCIONA (20/09/2026) ───────────────────────────────────
+ * La cola la marcó INVALIDADA: el 19/09/2026 se regeneró entera data/ipc-ine.ts (commit
+ * 90404672) y con ella cambian todas las cifras del segundo modo. La serie nueva se ha
+ * cotejado CONTRA LA FUENTE VIVA, no contra la memoria, descargando el INE en sesión:
+ *
+ *   · 2002-2025 — tabla 24077 (`DATOS_TABLA/24077?nult=800`, 296 índices mensuales,
+ *     que empiezan en 2002 pese al título de la tabla). La media aritmética de los 12
+ *     meses de cada año reproduce IPC_DATA con una desviación máxima del 0,0001 %.
+ *   · 1961-2001 — reconstruidos dividiendo cada mes de 2002 por su tasa de variación
+ *     anual de la tabla 76134, hacia atrás año a año, tal como documenta el módulo. La
+ *     serie así rehecha reproduce IPC_DATA con una desviación máxima del 0,0022 %
+ *     (peor año, 1961), que es el redondeo a cuatro decimales del propio fichero.
+ *
+ * O sea: el dato no es de segunda mano y la serie es fiel a su fuente. La escala es la
+ * base 2025 = 100 que el INE publica desde enero de 2026.
  *
  * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
  *
@@ -60,35 +76,54 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       por el INE y traía tres eslabones mal empalmados —2001, 2013 y un 2025 estimado—, que
  *       dejaban cualquier peseta anterior a 2001 un 3,9 % por debajo de su valor real. Los de
  *       arriba son los valores con la serie corregida; con la vieja salían 2.070,61 € y
- *       86.256,37 €.
+ *       86.256,37 €. Verificados contra el INE en la re-inspección del 20/09/2026.
  *
- * LOS CUATRO SE CUMPLEN EN PRODUCCIÓN (18/09/2026). El motor está sano: tipo correcto,
- * redondeo al céntimo, sin tipo inverso, parser canónico y rechazo limpio.
+ *   CASO 5 (el parser, que es lo que más se teclea aquí) — «1.500» y «1500,50»
+ *       «1.500» es millar español → 1500 ptas ÷ 166,386 = 9,015181… → 9,02 €
+ *       «1500,50» es decimal español → 1500,5 ÷ 166,386 = 9,018186… → 9,02 €
+ *       Los dos dan el mismo céntimo, y eso es correcto: media peseta son 0,003 €. Lo que
+ *       el caso descarta es la lectura CRUZADA, que sí se nota: con parseFloat a secas
+ *       «1.500» valdría 1,5 (→ 0,01 €) y con replace(',', '.') «1500,50» sería 1500,5 pero
+ *       «1.500» seguiría siendo 1,5. Mil veces menos, sin ningún aviso.
+ *
+ * LOS CINCO SE CUMPLEN EN LOCAL (20/09/2026), comparados uno a uno con el cálculo a mano.
+ * El motor está sano: tipo correcto, redondeo al céntimo, sin tipo inverso, parser canónico,
+ * rechazo limpio y la serie del IPC fiel a la fuente.
+ *
+ * ── HALLAZGOS ABIERTOS de la re-inspección (20/09/2026) — NO se asertan aquí ──
+ * El Inspector no repara, y un test que fijara la conducta defectuosa la volvería norma.
+ * Quedan descritos para quien los repare:
+ *
+ *   A. La ETIQUETA redondea la cantidad a cero decimales mientras el cálculo usa el valor
+ *      completo, así que la pantalla se contradice consigo misma. Con «1499,60» en modo
+ *      «Conversión oficial» sale «1500 pesetas equivalen a: 9,01 €», y 1.500 pesetas son
+ *      9,02 €. La CIFRA es correcta (1.499,60 ÷ 166,386 = 9,0128 → 9,01 €); lo que miente
+ *      es el rótulo. Sale de `formatNumber(resultadoDirecta.cantidad, 0)`.
+ *
+ *   B. El botón «⇄» —único camino a la dirección euros → pesetas, que es la mitad de lo que
+ *      prometen el <h1> y los `features` del jsonLd— no tiene `aria-label`: su nombre
+ *      accesible es el propio glifo. Medido con el árbol de accesibilidad de Chromium, el
+ *      `title` queda SUPERSEDED y baja a descripción, porque el contenido del botón gana.
+ *      El CLAUDE.md §5 pide `aria-label` justo en este caso (botón cuyo único contenido es
+ *      un signo). El candado `check:a11y-jsx` no lo ve: «⇄» (U+21C4) no está en su rango
+ *      de emojis.
+ *
+ *   C. El FAQPage del jsonLd dice que la fórmula usa «el IPC del año actual», y el motor usa
+ *      la media anual del último año CERRADO. A 20/09/2026 eso son dos cosas distintas: el
+ *      INE ya publica hasta agosto de 2026 (índice 104,638 en base 2025), así que 100.000
+ *      ptas de 1985 darían 2.250,94 € con el último dato publicado y la app da 2.151,17 €,
+ *      un 4,64 % menos. En PANTALLA está bien dicho —el subtexto reza «en poder adquisitivo
+ *      de 2025» y el FAQ visible habla del «año más reciente disponible»—; lo que promete de
+ *      más es el dato estructurado, que es justo la señal que leen las IAs.
  *
  * LOS 4 HALLAZGOS del 18/09/2026, al final, ya como candados de regresión: se repararon ese
- * mismo día. El de fondo —que el índice de 2025 es una estimación propia y no el dato
- * publicado— se reparó DICIÉNDOLO, no cambiando el número: sustituirlo exige la serie del INE
- * delante, y eso es trabajo del triaje. Se quedan como
- * candado de regresión.
- *   1. La tabla del bloque educativo dice «100.000 ptas de 1985 = unos 1.470 € de poder
- *      adquisitivo hoy» y el motor de la propia app devuelve 2.070,61 € para esa misma
- *      entrada. 1.470 € exigiría un IPC de hoy de 110,04 —el de 2006-2007—, no el de 2025.
- *   2. El IPC de 2025 (155,00) está marcado en data/ipc-ine.ts como «Valor estimado —
- *      actualizar cuando el INE publique el IPC real de 2025», y la app atribuye el
- *      resultado al «IPC del INE» sin decir que su último eslabón es una estimación.
- *      Tampoco hay <DataReference> tras el <DisclaimerCard>, que el CLAUDE.md exige para
- *      toda app apoyada en datos con fecha de caducidad.
- *      CERRADO el 19/09/2026: ya no hay estimación que advertir. El 18/09 se reparó
- *      diciéndolo, porque sustituir el número exigía la serie del INE delante; hecho eso,
- *      el aviso sobra y lo que se comprueba abajo es el sello de procedencia, que sigue
- *      siendo obligatorio mientras el dato caduque cada enero.
- *   3. El aviso de entrada inválida no vive en ninguna región anunciable: un lector de
- *      pantalla no se entera de que el resultado ha desaparecido.
+ * mismo día. El de fondo —que el índice de 2025 era una estimación propia y no el dato
+ * publicado— se cerró el 19/09/2026 regenerando la serie entera contra el INE.
  */
 
 /** El € que escribe Intl va precedido de un espacio DURO (U+00A0). Lo normalizamos. */
 async function texto(loc: Locator): Promise<string> {
-  return ((await loc.textContent()) ?? '').replace(/\u00A0/g, ' ').trim();
+  return ((await loc.textContent()) ?? '').replace(/ /g, ' ').trim();
 }
 
 const valorPrincipal = (page: Page) => page.locator('[class*="resultValue"]').first();
@@ -137,6 +172,29 @@ test.describe('Conversión oficial (Reglamento CE 2866/98: 166,386 ptas/€)', (
     expect(await texto(valorPrincipal(page))).toBe('6010,12 €');
   });
 
+  test('CASO 5 · el punto de millar y la coma decimal, leídos cada uno como toca', async ({ page }) => {
+    // Este es el caso que rompería un parseo casero, y el que más se teclea en esta app:
+    // las cantidades en pesetas se escriben con punto de millar por costumbre.
+
+    // «1.500» = mil quinientas pesetas → 1500 ÷ 166,386 = 9,015181… → 9,02 €.
+    // Con parseFloat a secas valdría 1,5 y saldría 0,01 €: mil veces menos.
+    await escribir(page, '#cantidad-directa', '1.500');
+    expect(await texto(valorPrincipal(page))).toBe('9,02 €');
+
+    // «1500,50» = mil quinientas pesetas con cincuenta céntimos → 1500,5 ÷ 166,386
+    // = 9,018186… → 9,02 €. Coincide con el anterior porque media peseta son 0,003 €,
+    // y eso es lo correcto: lo que este caso descarta es que la coma se lea como millar.
+    await escribir(page, '#cantidad-directa', '1500,50');
+    expect(await texto(valorPrincipal(page))).toBe('9,02 €');
+
+    // La prueba de que NO son el mismo número: 1.499,60 ÷ 166,386 = 9,012777… → 9,01 €,
+    // un céntimo por debajo. Si la coma se estuviera ignorando, aquí saldría 9,02 €.
+    // ⚠️ La etiqueta de esta pantalla dice hoy «1500 pesetas» (hallazgo A del encabezado):
+    //    se comprueba la CIFRA, que es la correcta, no el rótulo, que está abierto.
+    await escribir(page, '#cantidad-directa', '1499,60');
+    expect(await texto(valorPrincipal(page))).toBe('9,01 €');
+  });
+
   test('CASO 2 · el cero da resultado, no aviso', async ({ page }) => {
     await escribir(page, '#cantidad-directa', '0');
     // 0 ÷ 166,386 = 0. El cero es una cantidad válida: debe salir el importe, no el aviso.
@@ -159,6 +217,12 @@ test.describe('Conversión oficial (Reglamento CE 2866/98: 166,386 ptas/€)', (
     await escribir(page, '#cantidad-directa', '12abc');
     await expect(valorPrincipal(page)).toHaveCount(0);
     expect(await texto(aviso(page))).toBe('Introduce una cantidad válida para ver el resultado');
+
+    // «1e3» valía 1000 y «1.2.3» valía 1,2 con parseFloat: importes plausibles y falsos.
+    await escribir(page, '#cantidad-directa', '1e3');
+    await expect(valorPrincipal(page)).toHaveCount(0);
+    await escribir(page, '#cantidad-directa', '1.2.3');
+    await expect(valorPrincipal(page)).toHaveCount(0);
   });
 
   test('CASO 1.ter · el sentido inverso multiplica por el mismo tipo, sin tipo inverso', async ({ page }) => {
@@ -213,9 +277,33 @@ test.describe('Valor real hoy (IPC del INE, base 2025 = 100)', () => {
     expect(await texto(tarjetas1985.nth(2))).toContain('40');       // 2025 − 1985
   });
 
+  test('CASO 4.bis · los dos extremos de la serie, que son los que delatan un eslabón mal empalmado', async ({ page }) => {
+    await irAValorRealHoy(page);
+
+    // 1961 es el año más antiguo del IPC del INE y el que acumula todo el encadenado hacia
+    // atrás: si algún empalme de la serie se rompiera, aquí se vería multiplicado.
+    // IPC 1961 = 2,1228 → 601,012104 × (100 ÷ 2,1228) = 28.312,2340… → 28.312,23 €
+    // inflación = (100 − 2,1228) ÷ 2,1228 × 100 = 4.610,78…% · años = 2025 − 1961 = 64
+    await selectorDeAño(page).selectOption('1961');
+    expect(await texto(valorPrincipal(page))).toBe('28.312,23 €');
+    const extremoViejo = page.locator('[class*="statCard"]');
+    expect(await texto(extremoViejo.nth(1))).toContain('+4610,8%');
+    expect(await texto(extremoViejo.nth(2))).toContain('64');
+
+    // 2001 es el último año seleccionable y el eslabón que estaba mal antes del 19/09/2026.
+    // IPC 2001 = 57,9905 → 601,012104 × (100 ÷ 57,9905) = 1.036,3975… → 1.036,40 €
+    // inflación = (100 − 57,9905) ÷ 57,9905 × 100 = 72,44…% · años = 24
+    await selectorDeAño(page).selectOption('2001');
+    expect(await texto(valorPrincipal(page))).toBe('1036,40 €');
+    const extremoNuevo = page.locator('[class*="statCard"]');
+    expect(await texto(extremoNuevo.nth(1))).toContain('+72,4%');
+    expect(await texto(extremoNuevo.nth(2))).toContain('24');
+  });
+
   test('el año más reciente del cálculo se dice en pantalla', async ({ page }) => {
     await irAValorRealHoy(page);
     // La app no promete «hoy» a secas: dice de qué año es el poder adquisitivo que usa.
+    // Es lo que salva el hallazgo C del encabezado en la pantalla, aunque no en el jsonLd.
     expect(await texto(page.locator('[class*="resultSubtext"]').first()))
       .toBe('en poder adquisitivo de 2025');
   });
@@ -245,25 +333,25 @@ test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
     // candado vigila no es un número concreto sino que la tabla y el motor digan lo mismo,
     // así que al regenerarse la serie el 19/09/2026 se mueven los dos a la vez: hoy son
     // 2.151,17 € (CASO 4).
+    // ⚠️ Esa cifra sigue ESCRITA A MANO en el JSX aunque el componente ya importa IPC_DATA
+    //    y TASA_FIJA_PESETA_EURO: volverá a desfasarse en enero, cuando el INE cierre 2026.
     const filaEjemplo = page.locator('table tbody tr').filter({ hasText: 'Ejemplo' });
     await expect(filaEjemplo).toContainText('2.151,17');
   });
 
   test('916 y 917 · la app dice de dónde sale el IPC, de cuándo es y en qué base está', async ({ page }) => {
-    // data/ipc-ine.ts marca el IPC de 2025 con «Valor estimado — actualizar cuando el INE
-    // publique el IPC real de 2025». El índice medio anual lo publica el INE en enero del
-    // año siguiente, y el módulo sigue con la estimación mientras la app atribuye el
-    // resultado al «IPC del INE» sin ningún matiz. El CLAUDE.md exige además un
-    // <DataReference> tras el <DisclaimerCard> en toda app apoyada en datos con fecha de
-    // caducidad, y esta página no tiene ninguno.
+    // data/ipc-ine.ts marcaba el IPC de 2025 con «Valor estimado — actualizar cuando el INE
+    // publique el IPC real de 2025», y la app atribuía el resultado al «IPC del INE» sin
+    // ningún matiz. El CLAUDE.md exige además un <DataReference> tras el <DisclaimerCard>
+    // en toda app apoyada en datos con fecha de caducidad, y la página no tenía ninguno.
     await expect(page.getByText(/Última verificación/i).first()).toBeVisible();
 
-    // El 18/09 hizo falta además advertir de que el índice de 2025 era una estimación propia
-    // y no el dato publicado. El 19/09/2026 esa advertencia desapareció porque desapareció su
-    // motivo: la serie se regeneró contra la fuente y ya no hay ningún año estimado. Lo que
-    // queda vigilado es el sello de procedencia —de dónde sale el dato y de cuándo es—, que el
-    // CLAUDE.md exige mientras la serie caduque cada enero, y que la base declarada sea la que
-    // el módulo usa de verdad: 2025, no la 2021 que el INE cerró en diciembre de 2025.
+    // El 18/09 hizo falta advertir de que el índice de 2025 era una estimación propia. El
+    // 19/09/2026 esa advertencia desapareció porque desapareció su motivo: la serie se
+    // regeneró contra la fuente y ya no hay ningún año estimado. Lo que queda vigilado es el
+    // sello de procedencia —de dónde sale el dato y de cuándo es—, que el CLAUDE.md exige
+    // mientras la serie caduque cada enero, y que la base declarada sea la que el módulo usa
+    // de verdad: 2025, no la 2021 que el INE cerró en diciembre de 2025.
     const referencia = page.locator('[class*="dataReference"]');
     await expect(referencia).toContainText('INE');
     await expect(referencia).toContainText('base 2025');
