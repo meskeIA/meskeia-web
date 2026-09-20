@@ -38,40 +38,28 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       G no es dígito de base 16 (0-9, A-F): hay que rechazarlo y NO emitir cifra.
  *       Variante: «2» en binario.
  *
- * HALLAZGOS ABIERTOS, escritos como TESTIGO (documentan lo que la app hace HOY; si se
- * reparan, estos bloques fallarán y habrá que invertirlos). NO se corrigen desde el test:
+ * LOS SEIS HALLAZGOS, REPARADOS EL 20/09/2026. Los bloques de abajo eran TESTIGO —fijaban
+ * lo que la app hacía mal— y se han invertido: ahora exigen el comportamiento correcto. El
+ * cálculo vive desde entonces en `app/calculadora-sistemas-numericos/motor.ts`, con sus
+ * casos unitarios en `tests/sistemas-numericos-motor.spec.ts`.
  *
- *   1. (crítico) El ancho de 32 BITS devuelve 0 en TODAS las operaciones. La máscara se
- *      calcula con `(1 << bits) - 1` y en JavaScript el contador de desplazamiento va módulo
- *      32, así que `1 << 32` vale 1 y la máscara sale 0: los dos operandos se enmascaran a
- *      cero antes de operar. 42 + 15 → 0; 240 OR 15 → 0; NOT 0 → 0 (debería ser 4.294.967.295).
- *      La explicación delata el estropicio, porque imprime «0 + 0 = 0 (módulo 4294967296)».
- *      Con 4, 8 y 16 bits todo cuadra.
+ *   1. (crítico) El ancho de 32 BITS devolvía 0 en TODAS las operaciones: la máscara
+ *      `(1 << 32) - 1` vale 0 en JavaScript, porque el contador de desplazamiento va módulo
+ *      32, y enmascaraba los dos operandos a cero antes de operar. El motor usa BigInt.
  *
- *   2. (alto) Un desplazamiento igual al ancho del registro NO vacía el registro. El código
- *      hace `bLimited % bits`, de modo que con 8 bits un «<< 8» se convierte en «<< 0» y
- *      devuelve el operando intacto. En un registro de 8 bits, 1 << 8 es 0. Y la explicación
- *      escribe «00000001 << 8 = 00000001», que es justo lo contrario de lo que enseña el
- *      propio bloque educativo de la página («los bits extras se descartan»).
+ *   2. (alto) Un desplazamiento igual al ancho del registro no lo vaciaba: el contador se
+ *      reducía con `b % bits`, así que «<< 8» sobre 8 bits se convertía en «<< 0».
  *
- *   3. (medio) El paso a paso NO existe para la base de entrada DECIMAL, que es la que viene
- *      por defecto. `generateSteps()` se invoca siempre con base de destino 10, así que las
- *      divisiones sucesivas son código muerto: con 25 en decimal, «Ver proceso paso a paso»
- *      despliega UNA línea, «Valor original en decimal: 25». Es el caso exacto que el
- *      faqJsonLd promete resuelto con sus cinco divisiones.
+ *   3. (medio) El paso a paso no existía para la base DECIMAL, la de por defecto:
+ *      `generateSteps()` se llamaba siempre con destino 10 y las divisiones sucesivas eran
+ *      código muerto, justo el proceso que el faqJsonLd promete resuelto para el 25.
  *
- *   4. (medio) «Número demasiado grande» NO retira el resultado anterior: el `return` del
- *      efecto deja `result` como estaba. Con 42 en pantalla y luego 99999999999999999999,
- *      el error convive con las cuatro tarjetas del 42, que ya no corresponden a lo escrito.
+ *   4. (medio) «Número demasiado grande» no retiraba el resultado anterior.
  *
- *   5. (medio) Un operando inválido en el panel de operaciones falla EN SILENCIO: la tarjeta
- *      de resultado desaparece y no se escribe ningún mensaje. El panel de conversión, en la
- *      misma página, sí avisa.
+ *   5. (medio) Un operando inválido en el panel de operaciones fallaba en silencio.
  *
- *   6. (bajo, accesibilidad) Los tres <input> no tienen id, ni aria-label, ni <label> asociada
- *      (los <label> no llevan htmlFor): `input.labels` está vacío en los tres. Y el mensaje de
- *      error no lleva role="alert" ni vive bajo ningún aria-live, así que el rechazo no se
- *      anuncia.
+ *   6. (bajo, accesibilidad) Los tres <input> no tenían id, ni aria-label, ni <label>
+ *      asociada, y el mensaje de error no se anunciaba.
  */
 
 const RUTA = '/calculadora-sistemas-numericos/';
@@ -211,26 +199,35 @@ test('CASO 2.a (rechazo por precisión) — un bit más, 2⁵³, se rechaza en v
   await expect(errorConversion(page)).toHaveText('Número demasiado grande');
 });
 
-test('HALLAZGO 1 (TESTIGO, crítico) — con 32 bits toda operación devuelve 0', async ({ page }) => {
+test('HALLAZGO 1 (crítico, reparado) — con 32 bits la suma da 57, no 0', async ({ page }) => {
   await operar(page, { bits: '32 bits', op: 'suma', a: '42', b: '15' });
 
   // A MANO: 42 + 15 = 57, que cabe de sobra en 32 bits (máximo 4.294.967.295).
-  //   decimal 57 · hex 39 · binario 0000 0000 0000 0000 0000 0000 0011 1001
-  // HOY la app devuelve 0, porque `(1 << 32) - 1` vale 0 en JavaScript y esa máscara
-  // pone a cero los dos operandos antes de sumarlos.
-  await expect(filaOperacion(page, 'Decimal:')).toHaveText('0'); // debería ser 57
-  await expect(filaOperacion(page, 'Hexadecimal:')).toHaveText('0'); // debería ser 39
+  //   decimal 57 · hex 39 (3×16 + 9) · binario 0000 0000 0000 0000 0000 0000 0011 1001
+  await expect(filaOperacion(page, 'Decimal:')).toHaveText('57');
+  await expect(filaOperacion(page, 'Hexadecimal:')).toHaveText('39');
+  await expect(filaOperacion(page, 'Binario:')).toHaveText('0000 0000 0000 0000 0000 0000 0011 1001');
   await expect(tarjetaOperacion(page).locator('[class*="opExplanation"]')).toHaveText(
-    '0 + 0 = 0 (módulo 4294967296)', // los operandos ya llegan enmascarados a cero
+    '42 + 15 = 57', // y la explicación ya no habla de operandos enmascarados a cero
   );
 });
 
-test('HALLAZGO 1 (TESTIGO, crítico) — con 32 bits ni siquiera NOT 0 da 4.294.967.295', async ({
-  page,
-}) => {
+test('HALLAZGO 1 (crítico, reparado) — con 32 bits NOT 0 da 4.294.967.295', async ({ page }) => {
+  // A mano: NOT 0 en 32 bits = 2³² − 1 = 4.294.967.295 (0xFFFFFFFF).
   await operar(page, { bits: '32 bits', op: 'not', a: '0' });
-  // A mano: NOT 0 en 32 bits = 4.294.967.295 (0xFFFFFFFF). Hoy: 0.
-  await expect(filaOperacion(page, 'Decimal:')).toHaveText('0');
+  await expect(filaOperacion(page, 'Decimal:')).toHaveText('4294967295');
+  await expect(filaOperacion(page, 'Hexadecimal:')).toHaveText('FFFFFFFF');
+});
+
+test('HALLAZGO 1 (crítico, reparado) — el bit 31 no se vuelve negativo', async ({ page }) => {
+  // 1 << 31 = 2.147.483.648. Con enteros de 32 bits CON signo saldría −2.147.483.648:
+  // es la trampa que hacía falta esquivar, y por eso el motor opera con BigInt.
+  await operar(page, { bits: '32 bits', op: 'shl', a: '1', b: '31' });
+  await expect(filaOperacion(page, 'Decimal:')).toHaveText('2147483648');
+
+  // 240 OR 15 = 255 (1111 0000 | 0000 1111), también con el ancho grande.
+  await operar(page, { bits: '32 bits', op: 'or', a: '240', b: '15' });
+  await expect(filaOperacion(page, 'Decimal:')).toHaveText('255');
 });
 
 test('con 8 y 16 bits las mismas operaciones sí cuadran: 42 + 15 = 57', async ({ page }) => {
@@ -260,24 +257,23 @@ test('el desbordamiento de 8 bits y el complemento a 2 sí son correctos', async
   await expect(filaOperacion(page, 'Hexadecimal:')).toHaveText('88');
 });
 
-test('HALLAZGO 2 (TESTIGO, alto) — desplazar 8 posiciones en un registro de 8 bits no lo vacía', async ({
+test('HALLAZGO 2 (alto, reparado) — desplazar 8 posiciones en un registro de 8 bits lo vacía', async ({
   page,
 }) => {
-  // Control: 1 << 3 en 8 bits = 00001000 = 8. Esto sí está bien.
+  // Control: 1 << 3 en 8 bits = 00001000 = 8.
   await operar(page, { bits: '8 bits', op: 'shl', a: '1', b: '3' });
   await expect(filaOperacion(page, 'Decimal:')).toHaveText('8');
 
   // A MANO: 1 << 8 en un registro de 8 bits = 0 (el único bit se sale del registro).
-  // HOY devuelve 1, porque el código desplaza `b % bits` = 8 % 8 = 0 posiciones.
   await operar(page, { bits: '8 bits', op: 'shl', a: '1', b: '8' });
-  await expect(filaOperacion(page, 'Decimal:')).toHaveText('1'); // debería ser 0
-  await expect(tarjetaOperacion(page).locator('[class*="opExplanation"]')).toHaveText(
-    '00000001 << 8 = 00000001', // y lo escribe como si desplazar 8 no hiciera nada
+  await expect(filaOperacion(page, 'Decimal:')).toHaveText('0');
+  await expect(tarjetaOperacion(page).locator('[class*="opExplanation"]')).toContainText(
+    '00000001 << 8 = 00000000',
   );
 
-  // Mismo defecto a la derecha: 128 >> 8 en 8 bits = 0. Hoy: 128.
+  // Simétrico a la derecha: 128 >> 8 en 8 bits = 0.
   await operar(page, { bits: '8 bits', op: 'shr', a: '128', b: '8' });
-  await expect(filaOperacion(page, 'Decimal:')).toHaveText('128'); // debería ser 0
+  await expect(filaOperacion(page, 'Decimal:')).toHaveText('0');
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -306,27 +302,40 @@ test('CASO 3 (variante) — «2» no es un dígito binario, ni «8» uno octal',
 // Los demás hallazgos abiertos, como TESTIGO
 // ──────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO 3 (TESTIGO, medio) — en decimal el «paso a paso» es una sola línea', async ({
+test('HALLAZGO 3 (medio, reparado) — en decimal salen las cinco divisiones sucesivas', async ({
   page,
 }) => {
   await convertir(page, 'DEC', '25');
   await page.locator(`${CONV} [class*="stepsToggle"]`).click();
 
-  const pasos = page.locator(`${CONV} [class*="stepsContent"] [class*="step"]`);
-  // El faqJsonLd promete las cinco divisiones de 25 (25÷2=12 r1, 12÷2=6 r0, …).
-  // HOY solo sale el enunciado, porque generateSteps() se llama siempre con destino 10.
-  await expect(pasos).toHaveCount(1);
-  await expect(pasos.first()).toHaveText('Valor original en decimal: 25');
+  const contenido = page.locator(`${CONV} [class*="stepsContent"]`);
+  // Las cinco divisiones que el propio faqJsonLd da por resueltas para el 25.
+  await expect(contenido).toContainText('25 ÷ 2 = 12, resto = 1');
+  await expect(contenido).toContainText('12 ÷ 2 = 6, resto = 0');
+  await expect(contenido).toContainText('6 ÷ 2 = 3, resto = 0');
+  await expect(contenido).toContainText('3 ÷ 2 = 1, resto = 1');
+  await expect(contenido).toContainText('1 ÷ 2 = 0, resto = 1');
+  await expect(contenido).toContainText('Leyendo los restos de abajo a arriba: 11001');
 
-  // Y en binario sí hay pasos, pero solo los de la vuelta a decimal: ocho líneas,
-  // ninguna de ellas una división sucesiva.
-  await convertir(page, 'BIN', '11001');
-  await expect(pasos).toHaveCount(8);
-  await expect(pasos.nth(7)).toHaveText('Suma total = 25');
-  await expect(page.locator(`${CONV} [class*="stepsContent"]`)).not.toContainText('÷');
+  // Y octal y hexadecimal, agrupando los bits: 011 001 → 31₈ · 0001 1001 → 19₁₆.
+  await expect(contenido).toContainText('31 en octal');
+  await expect(contenido).toContainText('19 en hexadecimal');
 });
 
-test('HALLAZGO 4 (TESTIGO, medio) — «demasiado grande» convive con el resultado anterior', async ({
+test('HALLAZGO 3 (medio, reparado) — desde binario se explica el valor posicional', async ({
+  page,
+}) => {
+  await convertir(page, 'BIN', '11001');
+  await page.locator(`${CONV} [class*="stepsToggle"]`).click();
+
+  const contenido = page.locator(`${CONV} [class*="stepsContent"]`);
+  await expect(contenido).toContainText('1 × 2^0 = 1 × 1 = 1');
+  await expect(contenido).toContainText('Suma total = 25');
+  // Ya está en binario: no tiene sentido dividirlo sucesivamente entre 2.
+  await expect(contenido).not.toContainText('÷ 2');
+});
+
+test('HALLAZGO 4 (medio, reparado) — «demasiado grande» retira el resultado anterior', async ({
   page,
 }) => {
   await convertir(page, 'DEC', '42');
@@ -335,47 +344,51 @@ test('HALLAZGO 4 (TESTIGO, medio) — «demasiado grande» convive con el result
   await convertir(page, 'DEC', '99999999999999999999'); // 10²⁰, muy por encima de 2⁵³
   await expect(errorConversion(page)).toHaveText('Número demasiado grande');
 
-  // Deberían haber desaparecido: el efecto hace `return` sin limpiar el resultado, así que
-  // el usuario ve un error y, debajo, las cuatro conversiones del 42 que ya no ha escrito.
-  await expect(page.locator(`${CONV} [class*="resultCard"]`)).toHaveCount(4);
-  await expect(tarjeta(page, 'Decimal (Base 10)')).toHaveText('42');
+  // No puede quedar en pantalla la conversión de un valor que ya no está escrito.
+  await expect(page.locator(`${CONV} [class*="resultCard"]`)).toHaveCount(0);
 });
 
-test('HALLAZGO 5 (TESTIGO, medio) — un operando inválido no dice nada', async ({ page }) => {
+test('HALLAZGO 5 (medio, reparado) — un operando inválido se rechaza con mensaje', async ({
+  page,
+}) => {
   await operar(page, { base: 'BIN', bits: '8 bits', op: 'suma', a: '1010', b: '1' });
   await expect(filaOperacion(page, 'Decimal:')).toHaveText('11'); // 1010₂ + 1₂ = 10 + 1
 
-  // «2» no es binario: la tarjeta desaparece y no se escribe ningún mensaje, al contrario
-  // que en el panel de conversión de la misma página.
+  // «2» no es binario: se dice por qué, igual que hace el panel de conversión de al lado.
   await operar(page, { base: 'BIN', bits: '8 bits', op: 'suma', a: '1010', b: '2' });
   await expect(tarjetaOperacion(page)).toHaveCount(0);
-  await expect(page.locator(`${OPS} [class*="errorMsg"]`)).toHaveCount(0);
+  const aviso = page.locator(`${OPS} [role="alert"]`);
+  await expect(aviso).toHaveCount(1);
+  await expect(aviso).toContainText('operando B');
 });
 
-test('HALLAZGO 6 (TESTIGO, bajo) — los tres campos no tienen etiqueta asociada', async ({
+test('HALLAZGO 6 (bajo, reparado) — los tres campos tienen etiqueta asociada', async ({
   page,
 }) => {
-  const sinEtiqueta = await page.evaluate(() =>
+  const campos = await page.evaluate(() =>
     [...document.querySelectorAll<HTMLInputElement>('input[type="text"]')].map((i) => ({
       marcador: i.placeholder,
       etiquetas: i.labels ? i.labels.length : 0,
-      aria: i.getAttribute('aria-label'),
       id: i.id,
     })),
   );
-  expect(sinEtiqueta).toHaveLength(3);
-  for (const campo of sinEtiqueta) {
-    expect(campo.etiquetas).toBe(0); // los <label> de la app no llevan htmlFor
-    expect(campo.aria).toBeNull();
-    expect(campo.id).toBe('');
+  expect(campos).toHaveLength(3);
+  for (const campo of campos) {
+    expect(campo.etiquetas).toBeGreaterThan(0);
+    expect(campo.id).not.toBe('');
   }
 
-  // Y el rechazo tampoco se anuncia: el mensaje no es un role="alert" ni vive bajo aria-live.
+  // Y el rechazo se anuncia: el mensaje es un role="alert".
   await convertir(page, 'HEX', 'G');
-  const anuncio = await errorConversion(page).evaluate((el) => ({
-    role: el.getAttribute('role'),
-    bajoAriaLive: Boolean(el.closest('[aria-live]')),
-  }));
-  expect(anuncio.role).toBeNull();
-  expect(anuncio.bajoAriaLive).toBe(false);
+  await expect(errorConversion(page)).toHaveAttribute('role', 'alert');
+});
+
+test('HALLAZGO 6 (bajo, reparado) — los botones de copiar tienen nombre accesible', async ({
+  page,
+}) => {
+  await convertir(page, 'DEC', '42');
+  // Eran cuatro botones cuyo único contenido era el emoji 📋, con title pero sin aria-label.
+  for (const base of ['binario', 'octal', 'decimal', 'hexadecimal']) {
+    await expect(page.getByRole('button', { name: `Copiar el valor en ${base}` })).toHaveCount(1);
+  }
 });
