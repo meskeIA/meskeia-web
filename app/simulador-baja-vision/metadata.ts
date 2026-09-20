@@ -40,7 +40,7 @@ export const jsonLd = generateWebAppSchema({
   url: "https://meskeia.com/simulador-baja-vision/",
   category: 'UtilityApplication',
   features: [
-    'Simula 9 condiciones: cataratas, miopía severa, glaucoma, degeneración macular y 4 tipos de daltonismo',
+    'Simula 8 condiciones sobre una interfaz de ejemplo: cataratas, miopía severa, glaucoma, degeneración macular, baja visión general y tres tipos de daltonismo (protanopia, deuteranopia y tritanopia), más la visión normal como referencia',
     'Control de intensidad de simulación del 10 % al 100 % para condiciones con gradación',
     'Filtros SVG de matrices de color clínicamente basados para daltonismo',
     'Vista de demostración interactiva con UI real para evaluar legibilidad',
@@ -90,7 +90,7 @@ export const faqJsonLd = {
       name: '¿Qué condiciones visuales simula esta herramienta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La herramienta simula las condiciones visuales más prevalentes: cataratas (desenfoque y pérdida de contraste), miopía severa (visión borrosa a distancia), glaucoma (pérdida del campo periférico con visión en túnel), degeneración macular (mancha central que dificulta la lectura), y algunas formas de daltonismo (protanopia, deuteranopia). Cada simulación refleja los efectos típicos de cada condición para facilitar la empatía con los usuarios afectados.',
+        text: 'La herramienta simula las condiciones visuales más prevalentes: cataratas (desenfoque y pérdida de contraste), miopía severa (visión borrosa a distancia), glaucoma (pérdida del campo periférico con visión en túnel), degeneración macular (mancha central que dificulta la lectura), baja visión general, y los tres tipos de daltonismo dicromático (protanopia, deuteranopia y tritanopia). Cada simulación refleja los efectos típicos de cada condición para facilitar la empatía con los usuarios afectados.',
       },
     },
   ],

@@ -69,7 +69,7 @@ const CONDICIONES: Condicion[] = [
     nombre: 'Miopía severa',
     icono: '🔍',
     descripcion: 'Dificultad para ver de lejos con claridad. A corta distancia puede ser aceptable.',
-    prevalencia: '~30% de la población (algún grado)',
+    prevalencia: '~4% de la población (miopía alta; Holden et al., Ophthalmology 2016)',
     impactoUX: [
       'Elementos lejanos/pequeños borrosos',
       'Necesita acercarse a la pantalla',
@@ -116,7 +116,7 @@ const CONDICIONES: Condicion[] = [
     nombre: 'Baja visión general',
     icono: '😶‍🌫️',
     descripcion: 'Reducción significativa de agudeza visual no corregible con gafas ni cirugía.',
-    prevalencia: '~2,2% de la población mundial',
+    prevalencia: '~2,8% de la población con baja visión moderada o grave (OMS, 2019)',
     impactoUX: [
       'Necesita texto muy grande (16px mínimo)',
       'Alto contraste imprescindible',
@@ -196,10 +196,18 @@ export default function SimuladorBajaVision() {
 
   return (
     <div className={styles.container}>
-      {/* SVG filters for color blindness */}
+      {/* Filtros SVG de daltonismo.
+          `colorInterpolationFilters="sRGB"` NO es decorativo: sin él la especificación SVG
+          manda operar en linearRGB, así que el navegador lineariza, multiplica y vuelve a
+          comprimir, y lo pintado deja de ser lo que calcula la matriz escrita aquí abajo.
+          Estas matrices son las de la literatura de accesibilidad web, pensadas para
+          multiplicarse contra valores sRGB de 8 bits. Medido con la píldora roja #dc2626 en
+          protanopia: la matriz dice rgb(141,140,38) y en linearRGB salía rgb(172,171,38),
+          que cambia el contraste con su texto blanco de 3,55:1 a 2,44:1 — justo la métrica
+          que la app enseña tres secciones más abajo (hallazgo 953). */}
       <svg className={styles.svgFiltros} aria-hidden="true" focusable="false">
         <defs>
-          <filter id="protanopia">
+          <filter id="protanopia" colorInterpolationFilters="sRGB">
             <feColorMatrix
               type="matrix"
               values="0.567 0.433 0     0 0
@@ -208,7 +216,7 @@ export default function SimuladorBajaVision() {
                       0     0     0     1 0"
             />
           </filter>
-          <filter id="deuteranopia">
+          <filter id="deuteranopia" colorInterpolationFilters="sRGB">
             <feColorMatrix
               type="matrix"
               values="0.625 0.375 0   0 0
@@ -217,7 +225,7 @@ export default function SimuladorBajaVision() {
                       0     0     0   1 0"
             />
           </filter>
-          <filter id="tritanopia">
+          <filter id="tritanopia" colorInterpolationFilters="sRGB">
             <feColorMatrix
               type="matrix"
               values="0.95 0.05  0       0 0
@@ -306,7 +314,11 @@ export default function SimuladorBajaVision() {
         {/* Vista de demostración */}
         <section className={styles.demoSeccion}>
           <h2 className={styles.sectionTitle}>Vista simulada</h2>
-          <p className={styles.demoSubtitulo} role="status" aria-live="polite">
+          {/* Sin aria-live: interpola el valor del deslizador, así que arrastrarlo disparaba
+              un anuncio por paso, encima del que ya emite el propio control de rango y del
+              aria-label del input. Lo que necesita anunciarse es el cambio de CONDICIÓN, y
+              de eso se ocupa la ficha de arriba, que sí es role="status" (hallazgo 959). */}
+          <p className={styles.demoSubtitulo}>
             Así verías esta interfaz de ejemplo con <strong>{condicion.nombre.toLowerCase()}</strong>
             {condicion.tieneIntensidad ? ` (intensidad ${intensidad}%)` : ''}:
           </p>
@@ -321,7 +333,16 @@ export default function SimuladorBajaVision() {
               />
             )}
 
-            <div className={styles.demoContenido} style={obtenerEstilo()}>
+            {/* La maqueta es decorativa: sus enlaces no llevan a ninguna parte, su botón es
+                inerte y sus cifras («Retención 4.750 €») son inventadas. Sin `inert` sus 7
+                elementos capturaban el foco del teclado y un lector leía ese contenido
+                falso como si fuera de la página (hallazgo 958). */}
+            <div
+              className={styles.demoContenido}
+              style={obtenerEstilo()}
+              aria-hidden="true"
+              inert
+            >
               {/* Simulación de interfaz */}
               <nav className={styles.demoNav}>
                 <span className={styles.demoLogo}>meskeIA</span>
@@ -387,6 +408,17 @@ export default function SimuladorBajaVision() {
           </div>
         </section>
 
+        {/* El alcance de la herramienta se dice a la vista, no dentro de la guía colapsada.
+            Era lo ÚNICO que situaba a una app que nombra cinco enfermedades oculares con su
+            prevalencia, y vivía tras dos pliegues: la <EducationalSection> cerrada y, dentro,
+            un <details> también cerrado. El CLAUDE.md lo prohíbe expresamente (hallazgo 956). */}
+        <p className={styles.alcance}>
+          <span aria-hidden="true">ℹ️</span> Esto es una <strong>aproximación visual para
+          diseñadores</strong>: las condiciones reales son más complejas y varían mucho de una
+          persona a otra. No uses este simulador para fines diagnósticos ni para estimar la
+          visión de nadie en concreto.
+        </p>
+
         {/* Comparativa rápida */}
         <section className={styles.warningBox}>
           <h3><span aria-hidden="true">💡</span> Claves para diseñar con accesibilidad visual</h3>
@@ -424,7 +456,7 @@ export default function SimuladorBajaVision() {
                   </tr>
                   <tr>
                     <td>Miopía severa</td>
-                    <td>30% algún grado</td>
+                    <td>4% (miopía alta)</td>
                     <td>Borrosidad a distancia</td>
                     <td>Texto grande, interlineado amplio</td>
                   </tr>

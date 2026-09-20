@@ -590,9 +590,11 @@
     grid-template-columns: 1fr;
   }
 
-  .tabla th:nth-child(4),
-  .tabla td:nth-child(4) {
-    display: none;
+  /* La cuarta columna, «Solución en diseño», es justo lo que un diseñador viene a buscar:
+     ocultarla en móvil dejaba la tabla sin su columna accionable. El contenedor ya tiene
+     overflow-x: auto, así que la alternativa disponible era desplazarla (hallazgo 960). */
+  .tabla {
+    min-width: 34rem;
   }
 }
 
@@ -601,4 +603,23 @@
   .slider {
     transition: none;
   }
+}
+
+/* Aviso de alcance de la herramienta: visible sin abrir nada */
+.alcance {
+  margin: var(--spacing-md, 1rem) 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--accent, #7FB3D3);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #eef6fb;
+  color: #1a3a4d;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .alcance {
+  border-color: #2E86AB;
+  background: #10242e;
+  color: #cfe4ef;
 }

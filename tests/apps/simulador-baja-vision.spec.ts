@@ -162,33 +162,30 @@ test.describe('Caso 1 · dato: las cifras publicadas', () => {
       await expect(page.locator('[class*="infoPrevalencia"]')).toHaveText(prevalencia);
     }
 
-    // ⚠️ HALLAZGO (dato) — la OMS cuenta 2.200 MILLONES DE PERSONAS con deficiencia visual
-    // (≈28 % de la población), y el FAQPage de esta misma app da 217 millones con baja
-    // visión moderada o grave (2,8 %). El «2,2 % de la población mundial» no sale de
-    // ninguna de las dos. Se fija el texto actual para que una corrección se note aquí.
+    // El «~2,2 % de la población mundial» no salía de ninguna fuente: la OMS cuenta 2.200
+    // MILLONES DE PERSONAS con deficiencia visual (≈28 %), y el FAQPage de esta misma app
+    // da 217 millones con baja visión moderada o grave, que sobre 7.700 millones es el
+    // 2,8 %. Parecía «2,2 mil millones» con la unidad cambiada (hallazgo 954).
     await elegirCondicion(page, 'Baja visión general');
-    await expect(page.locator('[class*="infoPrevalencia"]')).toHaveText(
-      '~2,2% de la población mundial',
-    );
+    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText('2,8%');
+    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText('OMS');
 
-    // ⚠️ HALLAZGO (dato) — el 30 % es la miopía de cualquier grado (Holden 2016: 28,3 %);
-    // la miopía alta, que es la que el botón llama «severa», está en el 4,0 %.
+    // El 30 % era la miopía de CUALQUIER grado (Holden 2016: 28,3 %); la miopía alta, que
+    // es la que el botón llama «severa», está en el 4,0 % (hallazgo 955).
     await elegirCondicion(page, 'Miopía severa');
-    await expect(page.locator('[class*="infoPrevalencia"]')).toHaveText(
-      '~30% de la población (algún grado)',
-    );
-    await expect(page.locator('[class*="tabla"] tbody tr').nth(1)).toContainText('30% algún grado');
+    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText('4%');
+    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText('Holden');
+    await expect(page.locator('[class*="tabla"] tbody tr').nth(1)).toContainText('4% (miopía alta)');
   });
 
   test('son 9 condiciones, de las cuales 3 son daltonismos', async ({ page }) => {
     await abrir(page);
 
-    // ⚠️ HALLAZGO (dato) — el jsonLd de metadata.ts anuncia «9 condiciones: cataratas,
-    // miopía severa, glaucoma, degeneración macular y 4 TIPOS DE DALTONISMO», y el FAQPage
-    // remata con «algunas formas de daltonismo (protanopia, deuteranopia)». Ni son 4 ni
-    // son 2: son 3. Y de los 9 botones uno es «Visión normal», que es la referencia sin
-    // condición, mientras que «Baja visión general» —la que da nombre a la app— no aparece
-    // en esa enumeración. Estas cifras son las que alimentan el grounding de las IAs.
+    // El jsonLd anunciaba «9 condiciones … y 4 TIPOS DE DALTONISMO» y el FAQPage remataba
+    // con «algunas formas de daltonismo (protanopia, deuteranopia)». Ni son 4 ni son 2:
+    // son 3. Y de los 9 botones uno es «Visión normal», que es la referencia sin condición,
+    // mientras que «Baja visión general» —la que da nombre a la app— no aparecía en esa
+    // enumeración. Son las cifras que alimentan el grounding de las IAs (hallazgo 957).
     await expect(page.locator('[class*="condicionesGrid"] button')).toHaveCount(9);
     for (const daltonismo of ['Protanopia (rojo)', 'Deuteranopia (verde)', 'Tritanopia (azul)']) {
       await expect(botonCondicion(page, daltonismo)).toBeVisible();
@@ -212,36 +209,26 @@ test.describe('Caso 1 · dato: las cifras publicadas', () => {
     }
   });
 
-  test('el único aviso de «no es diagnóstico» nace invisible, doblemente plegado', async ({
-    page,
-  }) => {
+  test('el aviso de «no es diagnóstico» se ve sin abrir nada', async ({ page }) => {
     await abrir(page);
 
-    // ⚠️ HALLAZGO (contenido) — CLAUDE.md prohíbe expresamente esconder una advertencia de
-    // responsabilidad dentro de <EducationalSection>: «es responsabilidad jurídica, no
-    // maquetación». La frase «No uses este simulador para fines diagnósticos» está en el
-    // DOM (bien para el buscador), pero de origen queda tras DOS pliegues: la sección
-    // educativa arranca con aria-expanded=false y su contenido va a display:none, y dentro
-    // hay además un <details> cerrado. La app no monta DisclaimerCard (lleva
-    // `// @disclaimer: exempt`), así que esa frase es lo ÚNICO que acota el alcance de una
-    // herramienta que nombra cinco enfermedades oculares con su prevalencia.
-    const aviso = page.getByText('No uses este simulador para fines diagnósticos');
-    await expect(aviso).toHaveCount(1); // está en el DOM
-    await expect(aviso).not.toBeVisible(); // pero no se ve
+    // El CLAUDE.md prohíbe expresamente esconder una advertencia de responsabilidad dentro
+    // de <EducationalSection>: «es responsabilidad jurídica, no maquetación». La app no
+    // monta DisclaimerCard (lleva `// @disclaimer: exempt`, defendible por sus suites), así
+    // que esta frase es lo ÚNICO que acota el alcance de una herramienta que nombra cinco
+    // enfermedades oculares con su prevalencia — y nacía tras DOS pliegues: la sección
+    // educativa cerrada y, dentro, un <details> también cerrado (hallazgo 956).
+    const aviso = page.getByText('No uses este simulador para fines diagnósticos').first();
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('aproximación visual para diseñadores');
 
+    // Y sigue estando antes de que nadie despliegue la guía educativa.
     await expect(page.getByRole('button', { name: /guía educativa/i })).toHaveAttribute(
       'aria-expanded',
       'false',
     );
-    expect(
-      await page.evaluate(() =>
-        [...document.querySelectorAll('details')].some((d) =>
-          d.textContent?.includes('No uses este simulador para fines diagnósticos') ? d.open : false,
-        ),
-      ),
-    ).toBe(false);
 
-    // Lo que sí se ve de entrada es el aviso legal, que es obligatorio y está.
+    // El aviso legal, que es obligatorio, también se ve de entrada.
     await expect(page.getByRole('link', { name: /Términos de Uso/ })).toBeVisible();
   });
 });
@@ -308,7 +295,7 @@ test.describe('Caso 2 · operativa: los extremos de la simulación', () => {
     await expect(page.locator('[class*="overlayMacular"]')).toHaveCount(1);
   });
 
-  test('los tres daltonismos pintan un color distinto del que dicen sus matrices', async ({
+  test('los tres daltonismos pintan lo que dicen sus matrices', async ({
     page,
   }) => {
     await abrir(page);
@@ -318,24 +305,23 @@ test.describe('Caso 2 · operativa: los extremos de la simulación', () => {
     await elegirCondicion(page, 'Visión normal');
     expect(await colorPintado(page, pildoraRoja)).toBe('220,38,38');
 
-    // ⚠️ HALLAZGO (cálculo) — ninguno de los tres <filter> declara
-    // `color-interpolation-filters="sRGB"`, así que el navegador aplica sus matrices en el
-    // linearRGB que manda la especificación SVG por defecto. Resultado: lo pintado no es lo
-    // que la matriz del page.tsx calcula. Sobre rgb(220,38,38), hecho a mano:
+    // Ninguno de los tres <filter> declaraba `color-interpolation-filters="sRGB"`, así que
+    // el navegador aplicaba sus matrices en el linearRGB que manda la especificación SVG
+    // por defecto —lineariza, multiplica y vuelve a comprimir— y lo pintado no era lo que
+    // la matriz del page.tsx calcula. Sobre rgb(220,38,38), hecho a mano:
     //
-    //   condición      matriz en sRGB (lo que dice)   linearRGB (lo que se pinta)
+    //   condición      matriz en sRGB (lo correcto)   linearRGB (lo que se pintaba)
     //   protanopia     rgb(141, 140, 38)              rgb(172, 171, 38)
     //   deuteranopia   rgb(152, 165, 38)              rgb(180, 189, 38)
     //   tritanopia     rgb(211,  38, 38)              rgb(215,  38, 38)
     //
-    // Se fija lo MEDIDO. El día que se añada el atributo, estos tres valores pasarán a los
-    // de la columna de la izquierda y este test lo dirá.
-    const medido: ReadonlyArray<readonly [string, string, string]> = [
-      ['Protanopia (rojo)', '172,171,38', 'la matriz dice 141,140,38'],
-      ['Deuteranopia (verde)', '180,189,38', 'la matriz dice 152,165,38'],
-      ['Tritanopia (azul)', '215,38,38', 'la matriz dice 211,38,38'],
+    // Con el atributo puesto, se pinta la columna de la izquierda (hallazgo 953).
+    const esperado: ReadonlyArray<readonly [string, string]> = [
+      ['Protanopia (rojo)', '141,140,38'],
+      ['Deuteranopia (verde)', '152,165,38'],
+      ['Tritanopia (azul)', '211,38,38'],
     ];
-    for (const [condicion, pintado] of medido) {
+    for (const [condicion, pintado] of esperado) {
       await elegirCondicion(page, condicion);
       expect(await colorPintado(page, pildoraRoja)).toBe(pintado);
     }
@@ -350,7 +336,7 @@ test.describe('Caso 2 · operativa: los extremos de la simulación', () => {
           (f) => f.id + '=' + (f.getAttribute('color-interpolation-filters') ?? 'AUSENTE'),
         ),
       ),
-    ).toEqual(['protanopia=AUSENTE', 'deuteranopia=AUSENTE', 'tritanopia=AUSENTE']);
+    ).toEqual(['protanopia=sRGB', 'deuteranopia=sRGB', 'tritanopia=sRGB']);
   });
 });
 
@@ -432,10 +418,9 @@ test.describe('Caso 3 · rechazo en móvil (Pixel 7)', () => {
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBe(412); // sin scroll horizontal
 
-    // ⚠️ HALLAZGO (contenido) — por debajo de 640 px el CSS oculta la cuarta columna de la
-    // tabla comparativa, «Solución en diseño», que es justo la accionable para un
-    // diseñador. Y no hace falta: el contenedor ya tiene `overflow-x: auto`, así que la
-    // alternativa era desplazarla, no borrarla.
+    // Por debajo de 640 px el CSS ocultaba la cuarta columna, «Solución en diseño», que es
+    // justo la accionable para un diseñador. Y no hacía falta: el contenedor ya tiene
+    // `overflow-x: auto`, así que la alternativa disponible era desplazarla (hallazgo 960).
     await page.getByRole('button', { name: /guía educativa/i }).click();
     const columnas = await page.evaluate(() =>
       [...document.querySelectorAll('[class*="tabla"] thead th')].map((t) => ({
@@ -449,6 +434,51 @@ test.describe('Caso 3 · rechazo en móvil (Pixel 7)', () => {
       'Principal dificultad',
       'Solución en diseño',
     ]);
-    expect(columnas[3].display).toBe('none');
+    expect(columnas[3].display).not.toBe('none');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Los dos hallazgos de accesibilidad, ya reparados
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Accesibilidad de la vista simulada', () => {
+  test('la maqueta decorativa no captura el foco ni se lee', async ({ page }) => {
+    await abrir(page);
+
+    // Sus enlaces no llevan a ninguna parte, su botón es inerte y sus cifras («Retención
+    // 4.750 €») son inventadas: 7 elementos tabulables que llevaban al usuario de teclado
+    // por una navegación que no existe (hallazgo 958).
+    const maqueta = page.locator('[class*="demoContenido"]').first();
+    await expect(maqueta).toHaveAttribute('aria-hidden', 'true');
+    expect(await maqueta.evaluate((el) => el.hasAttribute('inert'))).toBe(true);
+
+    const tabulables = await maqueta.evaluate(
+      (el) => el.querySelectorAll('a, button, input, select, textarea').length,
+    );
+    expect(tabulables).toBeGreaterThan(0); // los elementos siguen ahí, para que se vean
+    // pero ninguno recibe el foco, porque el contenedor es inert
+    const recibenFoco = await maqueta.evaluate((el) => {
+      const candidatos = [...el.querySelectorAll<HTMLElement>('a, button, input')];
+      return candidatos.filter((c) => {
+        c.focus();
+        return document.activeElement === c;
+      }).length;
+    });
+    expect(recibenFoco).toBe(0);
+  });
+
+  test('el subtítulo no anuncia cada paso del deslizador', async ({ page }) => {
+    await abrir(page);
+    await elegirCondicion(page, 'Cataratas');
+
+    // Interpolaba el valor del deslizador dentro de un role="status" aria-live, así que
+    // arrastrarlo disparaba un anuncio por paso, encima del que ya emite el propio control
+    // de rango y del aria-label del input: tres fuentes diciendo lo mismo (hallazgo 959).
+    const subtitulo = page.locator('[class*="demoSubtitulo"]').first();
+    await expect(subtitulo).not.toHaveAttribute('aria-live', /.*/);
+    await expect(subtitulo).not.toHaveAttribute('role', /.*/);
+
+    // Y el cambio de CONDICIÓN, que es lo que sí necesita anunciarse, sigue en un status.
+    await expect(page.locator('[class*="infoCondicion"]')).toHaveAttribute('role', 'status');
   });
 });
