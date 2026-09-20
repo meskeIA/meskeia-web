@@ -151,14 +151,28 @@ test.describe('Simulador de Árbol B', () => {
     ]);
     // Solo la primera fue una división DE LA RAÍZ, y por eso el árbol tiene 2 niveles y no 3.
     expect(historial.filter((l) => l.startsWith('La raíz se divide'))).toHaveLength(1);
-    // ⚠️ Al insertar el 30 el mensaje de estado dijo «Se produjeron 2 operación(es) de
-    // división» habiendo habido UNA sola: cuenta como división aparte la línea «La raíz se
-    // divide», que describe esa misma partición. Registrado como hallazgo del Inspector del
-    // 20/09/2026. Aquí se afirma el historial, que es la cuenta verdadera y lo seguirá
-    // siendo tras la reparación; el mensaje del 50 (sin división de raíz) sí es correcto.
+    // El mensaje de estado cuenta divisiones REALES, no líneas del historial. Hasta el
+    // 20/09/2026 usaba `log.length`, y una división de la raíz escribe dos líneas para la
+    // misma partición: insertar el 30 anunciaba «2 operación(es)» habiendo habido UNA.
     await expect(mensajeEstado(page)).toContainText(
       'Insertada la clave 50. Se produjeron 1 operación(es) de división.',
     );
+  });
+
+  test('el recuento de divisiones no cuenta dos veces la que parte la raíz', async ({ page }) => {
+    // El caso exacto del hallazgo del Inspector (20/09/2026). Orden 3, insertar 10, 20 y 30:
+    // la hoja-raíz [10 20 30] desborda y se parte en [10] y [30] promoviendo el 20. Es UNA
+    // partición, y el historial la describe con dos líneas porque además sube un nivel.
+    for (const clave of [10, 20, 30]) await insertarClave(page, clave);
+
+    await expect(mensajeEstado(page)).toContainText(
+      'Insertada la clave 30. Se produjeron 1 operación(es) de división.',
+    );
+
+    const historial = await leerHistorial(page);
+    expect(historial.filter((l) => l.startsWith('División:'))).toHaveLength(1);
+    // La línea informativa de la raíz sigue en el historial: es cierta y explica la altura.
+    expect(historial.filter((l) => l.startsWith('La raíz se divide'))).toHaveLength(1);
   });
 
   test('caso límite: el borrado por debajo del mínimo fuerza primero fusión y luego préstamo', async ({

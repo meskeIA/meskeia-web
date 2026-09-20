@@ -145,9 +145,30 @@ function dividir(nodo: NodoB, log: string[]): ResultadoDivision {
   nodo.claves = nodo.claves.slice(0, mid);
   nodo.hijos = nodo.hoja ? [] : nodo.hijos.slice(0, mid + 1);
 
-  log.push(`División: la clave ${medianaPromovida} sube al nodo padre`);
+  log.push(`${PREFIJO_DIVISION} la clave ${medianaPromovida} sube al nodo padre`);
   return { medianaPromovida, nuevoHermano };
 }
+
+/** Prefijo de las líneas del historial que SON una división de nodo. */
+const PREFIJO_DIVISION = 'División:';
+
+/**
+ * Cuenta las divisiones REALES del historial.
+ *
+ * ── De dónde sale (Inspector, 20/09/2026) ──
+ * Antes se usaba `log.length`, y una división de la raíz escribe DOS líneas: la de `dividir()`
+ * («la clave X sube al nodo padre») y la de `insertar()` («el árbol gana un nivel de altura»),
+ * que describen la MISMA partición. Así, insertar 10, 20 y 30 en orden 3 anunciaba «2
+ * operaciones de división» cuando hubo una, y los cuatro ejemplos preconfigurados anunciaban
+ * 2, 7, 8 y 3 donde hubo 1, 5, 6 y 2. El árbol siempre salía bien y el historial decía la
+ * verdad: lo único que mentía era la cifra destacada, que es justo el número que la guía
+ * «Cómo insertar a mano» pide seguir para practicar.
+ *
+ * La línea de la raíz se conserva —es cierta y explica el cambio de altura—, pero no se cuenta
+ * aparte.
+ */
+const contarDivisiones = (log: string[]): number =>
+  log.filter((linea) => linea.startsWith(PREFIJO_DIVISION)).length;
 
 // Inserción recursiva bottom-up. Devuelve datos de división si el nodo desborda.
 function insertarRec(
@@ -421,7 +442,7 @@ export default function SimuladorArbolesB() {
       setResaltado({ clave: entero, tipo: 'nuevo' });
       setMensaje(
         log.length > 0
-          ? `Insertada la clave ${entero}. Se produjeron ${log.length} operación(es) de división.`
+          ? `Insertada la clave ${entero}. Se produjeron ${contarDivisiones(log)} operación(es) de división.`
           : `Insertada la clave ${entero} sin divisiones.`
       );
       const t = setTimeout(() => setResaltado(null), velocidad * 3);
@@ -546,7 +567,7 @@ export default function SimuladorArbolesB() {
     setLogOps((prev) => [...prev, `Insertar varios (${insertados})`, ...log]);
     setCaminoSet(new Set());
     setResaltado(null);
-    setMensaje(`Insertadas ${insertados} de ${numeros.length} claves. Divisiones: ${log.length}.`);
+    setMensaje(`Insertadas ${insertados} de ${numeros.length} claves. Divisiones: ${contarDivisiones(log)}.`);
     setValoresMultiples('');
   }, [valoresMultiples, raiz, orden]);
 
@@ -568,7 +589,7 @@ export default function SimuladorArbolesB() {
     setLogOps((prev) => [...prev, `Aleatorios (${generados.size})`, ...log]);
     setCaminoSet(new Set());
     setResaltado(null);
-    setMensaje(`Insertadas ${generados.size} claves aleatorias. Divisiones: ${log.length}.`);
+    setMensaje(`Insertadas ${generados.size} claves aleatorias. Divisiones: ${contarDivisiones(log)}.`);
   }, [raiz, orden]);
 
   const handlePreset = useCallback(
@@ -582,7 +603,7 @@ export default function SimuladorArbolesB() {
       setCaminoSet(new Set());
       setResaltado(null);
       setMensaje(
-        `Cargado el ejemplo "${preset.titulo}" en orden ${ordenObjetivo}. Claves: ${insertados}. Divisiones: ${log.length}.`
+        `Cargado el ejemplo "${preset.titulo}" en orden ${ordenObjetivo}. Claves: ${insertados}. Divisiones: ${contarDivisiones(log)}.`
       );
     },
     [orden, construirDesde, limpiarTimeouts]
@@ -607,7 +628,7 @@ export default function SimuladorArbolesB() {
         setRaiz(arbol);
         setLogOps([`Reconstruido en orden ${nuevoOrden}`, ...log]);
         setMensaje(
-          `Cambiado a orden ${nuevoOrden}. Árbol reconstruido con ${valores.length} claves y ${log.length} división(es).`
+          `Cambiado a orden ${nuevoOrden}. Árbol reconstruido con ${valores.length} claves y ${contarDivisiones(log)} división(es).`
         );
       } else {
         setMensaje(`Cambiado a orden ${nuevoOrden}.`);
