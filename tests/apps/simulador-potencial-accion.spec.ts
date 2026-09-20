@@ -21,15 +21,23 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   V_m máximo de un pulso de duración D:   V = −70 + I·(1 − e^(−D/τ))
  *   Latencia hasta cruzar el umbral U:      t = τ·ln( I / (I − (U + 70)) )
  *
- * ⚠️ OJO al mantenerlo: el consejo del propio bloque educativo («prueba intensidad = 14
- * (subumbral) y luego 16: verás un cambio brusco de NADA a PA completo») NO reproduce con los
- * valores de fábrica — ver el caso límite, donde queda fijado el comportamiento real.
+ * REPARADO EL 20/09/2026. El modelo vive en `app/simulador-potencial-accion/motor.ts`, con
+ * sus casos en `tests/potencial-accion-motor.spec.ts`. Lo que cambió:
+ *   · El pulso de fábrica pasa de 2 a 5 ms. Con 2 ms y τ = 5 ms NINGUNA intensidad del
+ *     deslizador (máx. 40) podía cruzar el umbral —harían falta 45,5 u.a.—, así que el
+ *     consejo del bloque educativo («prueba 14 y luego 16») no reproducía. Ahora el consejo
+ *     dice 23 y 24, que es donde cae el umbral con el pulso de 5 ms.
+ *   · La tarjeta de despolarización anuncia lo que el pulso ALCANZA, no la asíntota.
+ *   · El PA arranca en el umbral cruzado, no en un −55 mV cableado.
+ *   · El refractario RELATIVO existe: el umbral queda elevado al terminar el PA y decae, así
+ *     que la frecuencia de disparo ya depende de la intensidad.
+ *   · El veredicto y el panel de resultados viven en regiones aria-live.
  */
 
-const INTENSIDAD = 'input[aria-label="Intensidad del estímulo"]';
-const UMBRAL = 'input[aria-label="Umbral"]';
-const DURACION = 'input[aria-label="Duración del estímulo"]';
-const INTERVALO = 'input[aria-label="Intervalo entre pulsos"]';
+const INTENSIDAD = '#estimulo-intensidad';
+const UMBRAL = '#estimulo-umbral';
+const DURACION = '#estimulo-duracion';
+const INTERVALO = '#estimulo-intervalo';
 
 /** El valor grande de una tarjeta de resultado, localizada por su rótulo. */
 function tarjeta(page: Page, rotulo: string) {
@@ -168,11 +176,11 @@ test('caso límite: con pulso de 5 ms, I=23 no dispara y I=24 sí — y el PA mi
   await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('35,0 mV');
   await expect(tarjeta(page, 'Latencia')).toHaveText('2,30 ms');
 
-  // ⚠️ El otro lado del límite, el que el bloque educativo cuenta mal: con la duración de
-  // fábrica (2,0 ms) el pulso solo alcanza −70 + I·(1 − e^(−2/5)) = −70 + 0,33·I, así que
-  // I = 16 se queda en −64,7 mV y NO dispara, pese a que la FAQ de la app invita a probar
-  // «14 y luego 16» para ver «un cambio brusco de NADA a PA completo». Ni siquiera el máximo
-  // del deslizador (40 u.a. → −56,7 mV) dispara con ese pulso: harían falta 45,1 u.a.
+  // El otro lado del límite: con un pulso CORTO de 2 ms la membrana solo alcanza
+  // −70 + I·(1 − e^(−2/5)) = −70 + 0,33·I, así que I = 16 se queda en −64,7 mV y ni el
+  // máximo del deslizador (40 u.a. → −56,7 mV) dispara: harían falta 45,5 u.a. Eso es
+  // correcto —τ manda—, y por eso el pulso de fábrica es de 5 ms y el consejo del bloque
+  // educativo habla de 23 y 24: antes eran 2 ms y «14 y luego 16», que no reproducía.
   await sembrarValor(page, DURACION, 2);
   await sembrarValor(page, INTENSIDAD, 16);
   await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-64,7 mV');
@@ -189,20 +197,28 @@ test('caso límite: el periodo refractario impide un PA por pulso cuando los est
   await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
   await sembrarValor(page, INTERVALO, 5);
 
-  // A mano: el primer PA arranca en 5 + 5·ln(40/25) = 7,35 ms y la plantilla del PA ocupa 8 ms
+  // A mano: el primer PA arranca en 5 + 5·ln(40/25) = 7,35 ms y la plantilla ocupa 8 ms
   // (1 de despolarización + 2 de repolarización + 5 de recuperación), durante los cuales el
-  // estímulo no cuenta. Entre 5 y 50 ms llegan NUEVE pulsos de 2,5 ms, pero solo caben CUATRO
-  // PAs: el 2.º no puede llegar hasta 21,2 ms (la membrana sale del refractario a 15,4 ms y
-  // necesita rehacer la rampa a trozos, porque cada pulso se corta a los 2,5 ms).
-  // Intervalo entre los dos primeros = 21,2 − 7,3 = 13,9 ms → 1000/13,9 = 72 Hz.
-  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('4');
-  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('72 Hz');
+  // estímulo no cuenta en absoluto: es el refractario ABSOLUTO. Después viene el RELATIVO,
+  // con el umbral elevado 15 mV que decae en 6 ms, así que el segundo PA se retrasa hasta
+  // 21,3 ms. Intervalo = 21,3 − 7,3 = 14,0 ms → 1000/14,0 = 71 Hz.
+  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('3');
+  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('71 Hz');
 
-  // Con estímulo continuo al máximo (pulso de 5 ms cada 5 ms) la frecuencia no puede pasar de
-  // 1000/(8 + 2,35) = 96,6 Hz: el refractario, no el estímulo, pone el techo.
+  // Con estímulo continuo (pulso de 5 ms cada 5 ms) el tren se aprieta: 7,3 · 18,5 · 29,7 ·
+  // 40,9 ms, o sea 11,2 ms entre PAs → 89 Hz.
   await sembrarValor(page, DURACION, 5);
-  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('5');
-  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('95 Hz');
+  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('4');
+  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('89 Hz');
+
+  // Y el refractario RELATIVO se nota en que la frecuencia depende de la intensidad: antes
+  // se topaba, porque los 8 ms de plantilla eran refractario absoluto puro y ninguna
+  // intensidad los acortaba.
+  await sembrarValor(page, INTENSIDAD, 24);
+  const conMenosFuerza = Number(
+    (await tarjeta(page, 'Nº potenciales de acción').textContent())?.trim(),
+  );
+  expect(conMenosFuerza).toBeLessThan(4);
 });
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -240,4 +256,39 @@ test('caso a rechazar: intensidad 0 deja la membrana en reposo, y lo que se sale
   expect(await sembrarValorAcotado(page, INTENSIDAD, -5)).toBe('0');
   await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-70,0 mV');
   await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Los hallazgos 979, 980, 981 y 983, ya reparados
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+test('hallazgo 979: la despolarización anunciada es la que el pulso alcanza', async ({ page }) => {
+  await sembrarValor(page, DURACION, 2);
+  await sembrarValor(page, INTENSIDAD, 40);
+
+  // Anunciaba «+40 mV · ≈ −30 mV (V_target)» mientras la tarjeta de al lado decía que el
+  // máximo alcanzado era −56,7 mV y el veredicto «Subumbral»: tres cifras incompatibles
+  // en el mismo panel. −30 mV es la asíntota tras ≥5τ = 25 ms, y el pulso dura 2.
+  const despolarizacion = tarjeta(page, 'Despolarización del pulso');
+  await expect(despolarizacion).toHaveText('-56,8 mV');
+  await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-56,7 mV');
+  await expect(page.locator('body')).not.toContainText('V_target');
+});
+
+test('hallazgo 983: el veredicto se anuncia a un lector de pantalla', async ({ page }) => {
+  await expect(barraEstado(page)).toHaveAttribute('role', 'status');
+  await expect(barraEstado(page)).toHaveAttribute('aria-live', 'polite');
+
+  // Y los cuatro deslizadores tienen etiqueta asociada, no solo un aria-label sin valor.
+  for (const selector of [INTENSIDAD, UMBRAL, DURACION]) {
+    const etiquetas = await page.locator(selector).evaluate((el: HTMLInputElement) => el.labels?.length ?? 0);
+    expect(etiquetas).toBeGreaterThan(0);
+  }
+});
+
+test('hallazgo 981: el nodo sinoauricular dispara ~70 por minuto, no ~70 Hz', async ({ page }) => {
+  await page.getByText('Aprende cómo dispara una neurona').first().click();
+  const educativo = page.locator('body');
+  await expect(educativo).toContainText('~70 por minuto');
+  await expect(educativo).not.toContainText('~70 Hz');
 });

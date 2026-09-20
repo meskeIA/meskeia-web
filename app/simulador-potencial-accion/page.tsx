@@ -6,19 +6,18 @@ import styles from './SimuladorPotencialAccion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
-// ============================================
-// TIPOS
-// ============================================
-type ModoEstimulo = 'unico' | 'sostenido';
-
-// ============================================
-// CONSTANTES
-// ============================================
-const V_REPOSO = -70; // mV
-const V_PEAK = 35; // mV (pico aproximado)
-const V_HYPER = -85; // mV (hiperpolarización)
-const T_TOTAL = 50; // ms — ventana visible
-const DT = 0.1; // ms — paso de simulación
+import {
+  simular,
+  despolarizacionAlcanzable,
+  intensidadUmbral,
+  V_REPOSO,
+  V_PICO,
+  V_HIPER,
+  T_TOTAL,
+  TAU,
+  type ModoEstimulo,
+  type Muestra,
+} from './motor';
 
 // ============================================
 // UTILIDADES
@@ -28,129 +27,17 @@ function fmt(n: number, decimales = 1): string {
   return n.toFixed(decimales).replace('.', ',');
 }
 
-interface SamplePoint {
-  t: number;
-  v: number;
-  estimulo: number;
-}
-
-interface PASpike {
-  inicio: number; // tiempo de inicio del PA
-  pico: number;   // tiempo del pico
-}
-
-// ============================================
-// SIMULACIÓN SIMPLIFICADA DEL PA
-// ============================================
-// Modelo conceptual basado en Hodgkin-Huxley pero simplificado:
-// - Reposo a -70 mV (canales K abiertos por filtración)
-// - Si V > umbral: dispara potencial de acción con forma fija
-// - Periodo refractario absoluto durante pico (no se puede disparar)
-// - Periodo refractario relativo durante hiperpolarización (umbral más alto)
-// ============================================
-
-function formaPA(tDesdePico: number): number {
-  // Forma estándar del PA en mV (perfil canónico ~3 ms desde umbral hasta pico)
-  // tDesdePico: tiempo desde inicio del PA en ms
-  if (tDesdePico < 0) return V_REPOSO;
-  if (tDesdePico < 1.0) {
-    // Despolarización rápida (1 ms): de -55 a +35
-    const u = tDesdePico / 1.0;
-    return -55 + (V_PEAK - (-55)) * u;
-  }
-  if (tDesdePico < 3.0) {
-    // Repolarización (2 ms): de +35 a -75
-    const u = (tDesdePico - 1.0) / 2.0;
-    return V_PEAK + (V_HYPER - V_PEAK) * u;
-  }
-  if (tDesdePico < 8.0) {
-    // Hiperpolarización + recuperación (5 ms): de -85 a -70
-    const u = (tDesdePico - 3.0) / 5.0;
-    return V_HYPER + (V_REPOSO - V_HYPER) * u;
-  }
-  return V_REPOSO;
-}
-
-interface SimulacionResultado {
-  trayectoria: SamplePoint[];
-  spikes: PASpike[];
-  estimuloMaxAplicado: number;
-  alturaMaxAlcanzada: number;
-}
-
-function simular(
-  intensidad: number,
-  duracionEstimulo: number,
-  inicioEstimulo: number,
-  umbral: number,
-  modo: ModoEstimulo,
-  intervaloSostenido: number
-): SimulacionResultado {
-  const trayectoria: SamplePoint[] = [];
-  const spikes: PASpike[] = [];
-  const N = Math.floor(T_TOTAL / DT);
-
-  let v = V_REPOSO;
-  let inPA: { inicio: number; pico: number } | null = null;
-  let estimuloMaxAplicado = 0;
-
-  for (let i = 0; i <= N; i++) {
-    const t = i * DT;
-
-    // Determinar si hay estímulo en este instante
-    let estimuloActual = 0;
-    if (modo === 'unico') {
-      if (t >= inicioEstimulo && t < inicioEstimulo + duracionEstimulo) {
-        estimuloActual = intensidad;
-      }
-    } else {
-      // sostenido: pulsos cada intervaloSostenido ms
-      const dt_estim = (t - inicioEstimulo) % intervaloSostenido;
-      if (t >= inicioEstimulo && dt_estim < duracionEstimulo) {
-        estimuloActual = intensidad;
-      }
-    }
-
-    estimuloMaxAplicado = Math.max(estimuloMaxAplicado, estimuloActual);
-
-    // Si está en medio de un PA, seguir la forma canónica
-    if (inPA) {
-      const tDesde = t - inPA.inicio;
-      v = formaPA(tDesde);
-      if (tDesde > 8.0) {
-        inPA = null;
-      }
-    } else {
-      // Comportamiento subumbral: el potencial sube por estímulo, decae al reposo
-      // V_target = V_REPOSO + intensidad·factor (relación lineal en subumbral)
-      const tau = 5.0; // ms — constante de tiempo de la membrana
-      const v_target = V_REPOSO + estimuloActual * 1.0; // 1 mV por unidad de intensidad
-      v = v + (v_target - v) * (DT / tau);
-
-      // ¿Cruza el umbral?
-      if (v > umbral) {
-        // Disparar PA
-        inPA = { inicio: t, pico: t + 1.0 };
-        spikes.push({ inicio: t, pico: t + 1.0 });
-        v = -55; // V_threshold
-      }
-    }
-
-    trayectoria.push({ t, v, estimulo: estimuloActual });
-  }
-
-  const alturaMaxAlcanzada = Math.max(...trayectoria.map(p => p.v));
-
-  return { trayectoria, spikes, estimuloMaxAplicado, alturaMaxAlcanzada };
-}
-
 // ============================================
 // COMPONENTE
 // ============================================
 export default function SimuladorPotencialAccionPage() {
   const [modo, setModo] = useState<ModoEstimulo>('unico');
   const [intensidad, setIntensidad] = useState(20); // unidades arbitrarias 0-30
-  const [duracion, setDuracion] = useState(2); // ms
+  // 5 ms, no 2: con τ = 5 ms un pulso de 2 ms solo recorre el 33 % del camino, así que con
+  // la configuración de fábrica la neurona NO PODÍA disparar con ninguna intensidad del
+  // deslizador (harían falta 45,5 u.a. y acaba en 40). Con 5 ms el umbral cae en 23,7 u.a.,
+  // dentro del rango, y el experimento del todo o nada reproduce (hallazgo 978).
+  const [duracion, setDuracion] = useState(5); // ms
   const [umbral, setUmbral] = useState(-55); // mV
   const [intervaloSostenido, setIntervaloSostenido] = useState(10); // ms (frecuencia ≈ 100 Hz)
   const inicioEstimulo = 5; // ms (fijo)
@@ -158,7 +45,15 @@ export default function SimuladorPotencialAccionPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const sim = useMemo(
-    () => simular(intensidad, duracion, inicioEstimulo, umbral, modo, intervaloSostenido),
+    () =>
+      simular({
+        intensidad,
+        duracionEstimulo: duracion,
+        inicioEstimulo,
+        umbral,
+        modo,
+        intervaloSostenido,
+      }),
     [intensidad, duracion, umbral, modo, intervaloSostenido]
   );
 
@@ -334,7 +229,7 @@ export default function SimuladorPotencialAccionPage() {
     for (const spike of sim.spikes) {
       ctx.fillStyle = '#48A9A6';
       ctx.beginPath();
-      ctx.arc(xToPx(spike.pico), yToPx(V_PEAK), 5, 0, 2 * Math.PI);
+      ctx.arc(xToPx(spike.pico), yToPx(V_PICO), 5, 0, 2 * Math.PI);
       ctx.fill();
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 1.5;
@@ -370,7 +265,10 @@ export default function SimuladorPotencialAccionPage() {
 
       <div className={styles.mainContent}>
         <p className={styles.descriptionCard}>
-          Modelo simplificado de Hodgkin-Huxley: el potencial de membrana parte del reposo (−70 mV).
+          Modelo de integrador con fuga y umbral: el potencial de membrana parte del reposo (−70 mV)
+          y carga hacia el valor del estímulo con una constante de tiempo de 5 ms. No es
+          Hodgkin-Huxley —aquí no hay conductancias ni compuertas m, h y n—, pero reproduce
+          la ley del todo o nada, el umbral y los dos períodos refractarios.
           Un estímulo despolariza la neurona; si supera el umbral (típicamente −55 mV), se dispara un
           <strong> potencial de acción</strong> con la forma canónica (despolarización rápida →
           repolarización → hiperpolarización). Si NO supera el umbral, solo hay respuesta pasiva (vuelve al reposo).
@@ -402,7 +300,7 @@ export default function SimuladorPotencialAccionPage() {
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label className={styles.controlLabel} htmlFor="estimulo-intensidad">
                 Intensidad del estímulo (<strong>{fmt(intensidad, 0)} u.a.</strong>)
               </label>
               <input
@@ -413,11 +311,12 @@ export default function SimuladorPotencialAccionPage() {
                 value={intensidad}
                 onChange={e => setIntensidad(parseFloat(e.target.value))}
                 className={styles.slider}
-                aria-label="Intensidad del estímulo"
+                id="estimulo-intensidad"
+                aria-label={`Intensidad del estímulo: ${fmt(intensidad, 0)} unidades arbitrarias`}
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label className={styles.controlLabel} htmlFor="estimulo-umbral">
                 Umbral de disparo (<strong>{umbral} mV</strong>)
               </label>
               <input
@@ -428,14 +327,15 @@ export default function SimuladorPotencialAccionPage() {
                 value={umbral}
                 onChange={e => setUmbral(parseFloat(e.target.value))}
                 className={styles.slider}
-                aria-label="Umbral"
+                id="estimulo-umbral"
+                aria-label={`Umbral de disparo: ${umbral} milivoltios`}
               />
             </div>
           </div>
 
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label className={styles.controlLabel} htmlFor="estimulo-duracion">
                 Duración del pulso (<strong>{fmt(duracion, 1)} ms</strong>)
               </label>
               <input
@@ -446,12 +346,13 @@ export default function SimuladorPotencialAccionPage() {
                 value={duracion}
                 onChange={e => setDuracion(parseFloat(e.target.value))}
                 className={styles.slider}
-                aria-label="Duración del estímulo"
+                id="estimulo-duracion"
+                aria-label={`Duración del pulso: ${fmt(duracion, 1)} milisegundos`}
               />
             </div>
             {modo === 'sostenido' && (
               <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>
+                <label className={styles.controlLabel} htmlFor="estimulo-intervalo">
                   Intervalo entre pulsos (<strong>{fmt(intervaloSostenido, 1)} ms</strong>)
                 </label>
                 <input
@@ -462,7 +363,8 @@ export default function SimuladorPotencialAccionPage() {
                   value={intervaloSostenido}
                   onChange={e => setIntervaloSostenido(parseFloat(e.target.value))}
                   className={styles.slider}
-                  aria-label="Intervalo entre pulsos"
+                  id="estimulo-intervalo"
+                aria-label={`Intervalo entre pulsos: ${fmt(intervaloSostenido, 1)} milisegundos`}
                 />
               </div>
             )}
@@ -493,14 +395,20 @@ export default function SimuladorPotencialAccionPage() {
         </div>
 
         {/* STATUS */}
-        <div className={`${styles.statusBar} ${disparo ? styles.statusFire : styles.statusNoFire}`}>
+        {/* role="status": toda la interacción son deslizadores, así que quien navegue con
+            lector oía el valor del control pero nunca el resultado (hallazgo 983). */}
+        <div
+          role="status"
+          aria-live="polite"
+          className={`${styles.statusBar} ${disparo ? styles.statusFire : styles.statusNoFire}`}
+        >
           {disparo
             ? <><span aria-hidden="true">✅</span>{` La neurona DISPARA. ${numSpikes} potencial${numSpikes > 1 ? 'es' : ''} de acción registrado${numSpikes > 1 ? 's' : ''}.`}</>
             : <><span aria-hidden="true">❌</span>{' Estímulo SUBUMBRAL: la neurona no dispara, vuelve al reposo.'}</>}
         </div>
 
         {/* RESULTADOS */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="region" aria-label="Resultados de la simulación" aria-live="polite">
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>¿Disparó?</span>
             <span className={styles.resultValue} style={{ color: disparo ? '#48A9A6' : '#A82E68' }}>
@@ -533,9 +441,17 @@ export default function SimuladorPotencialAccionPage() {
             <span className={styles.resultRange}>{disparo ? 'pico del PA' : 'subumbral'}</span>
           </div>
           <div className={styles.resultCard}>
-            <span className={styles.resultLabel}>Despolarización por estímulo</span>
-            <span className={styles.resultValue}>+{fmt(intensidad, 0)} mV</span>
-            <span className={styles.resultRange}>≈ {V_REPOSO + intensidad} mV (V_target)</span>
+            <span className={styles.resultLabel}>Despolarización del pulso</span>
+            {/* V_reposo + I es la ASÍNTOTA tras ≥5τ = 25 ms de estímulo sostenido, y el
+                pulso más largo que admite el control dura 5 ms: anunciarla contradecía a
+                las dos tarjetas vecinas del mismo panel (hallazgo 979). */}
+            <span className={styles.resultValue}>
+              {fmt(despolarizacionAlcanzable(intensidad, duracion), 1)} mV
+            </span>
+            <span className={styles.resultRange}>
+              hasta donde llega este pulso · {fmt(intensidadUmbral(umbral, duracion), 1)} u.a.
+              harían falta para cruzar el umbral
+            </span>
           </div>
         </div>
       </div>
@@ -646,7 +562,8 @@ export default function SimuladorPotencialAccionPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">❤️</span>
               <strong>Ritmo cardíaco</strong>
-              <p>Las células del nodo SA disparan PAs espontáneos a ~70 Hz. Marcapasos artificiales reproducen estos pulsos cuando el SA falla. El ECG es el promedio de millones de PAs cardíacos.</p>
+              <p>Las células del nodo SA disparan PAs espontáneos a ~70 por minuto (≈1,2 Hz), que es el
+                ritmo cardíaco en reposo. Marcapasos artificiales reproducen estos pulsos cuando el SA falla. El ECG es el promedio de millones de PAs cardíacos.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🦂</span>
@@ -662,7 +579,7 @@ export default function SimuladorPotencialAccionPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué significa la ley del &quot;todo o nada&quot;?</h4>
               <p>Si el estímulo NO alcanza el umbral, no hay PA: solo respuesta pasiva que decae rápido. Si SÍ lo alcanza (o lo supera), el PA es <strong>siempre del mismo tamaño</strong> e idéntica forma. Aumentar la intensidad NO produce un PA &quot;más grande&quot;; produce más PAs por segundo (codificación por frecuencia).</p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, prueba intensidad = 14 (subumbral) y luego 16: verás un cambio brusco de NADA a PA completo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, con el pulso de 5 ms que viene de fábrica, prueba intensidad = 23 (subumbral) y luego 24: verás un cambio brusco de NADA a PA completo, con el mismo pico de +35 mV. Si acortas el pulso hace falta más intensidad, porque la membrana carga con τ = 5 ms y no llega a su asíntota.</p>
             </div>
 
             <div className={styles.faqItem}>

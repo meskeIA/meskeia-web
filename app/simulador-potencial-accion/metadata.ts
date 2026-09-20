@@ -36,13 +36,13 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador del Potencial de Acción Neuronal',
-  description: 'Simulador interactivo del potencial de acción de una neurona basado en una versión simplificada del modelo de Hodgkin-Huxley. Visualiza la evolución del potencial de membrana V_m a lo largo del tiempo: potencial de reposo, respuesta subumbral o supraumbral, despolarización rápida (canales Na⁺), repolarización (canales K⁺), hiperpolarización post-disparo y periodo refractario. Permite ajustar la intensidad y duración del estímulo, el umbral y las conductancias relativas. Demuestra la ley del &quot;todo o nada&quot; y por qué un estímulo subumbral no produce disparo. Ideal para EBAU de Biología, Bachillerato y fisiología universitaria.',
+  description: 'Simulador interactivo del potencial de acción de una neurona con un modelo de integrador con fuga y umbral. Visualiza la evolución del potencial de membrana V_m a lo largo del tiempo: potencial de reposo, respuesta subumbral o supraumbral, despolarización rápida (canales Na⁺), repolarización (canales K⁺), hiperpolarización post-disparo y periodo refractario. Permite ajustar la intensidad y la duración del estímulo, el umbral de disparo y el intervalo entre pulsos. Demuestra la ley del &quot;todo o nada&quot; y por qué un estímulo subumbral no produce disparo. Ideal para EBAU de Biología, Bachillerato y fisiología universitaria.',
   url: 'https://meskeia.com/simulador-potencial-accion/',
   category: 'EducationalApplication',
   features: [
     'Animación V_m(t) en tiempo real con las 5 fases del potencial de acción',
     'Estímulo de intensidad y duración configurables',
-    'Umbral y conductancias relativas ajustables',
+    'Umbral de disparo ajustable, de −65 a −40 mV',
     'Ley del "todo o nada" demostrada visualmente',
     'Estímulo sostenido: produce trenes de PA con frecuencia variable',
     'Detección de periodos refractarios absoluto y relativo',
@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve este simulador en Bachillerato y preparatoria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El simulador permite visualizar interactivamente las 5 fases del potencial de acción ajustando la intensidad y duración del estímulo, el umbral y las conductancias. Esto ayuda a comprender conceptos del temario de Biología de 2.º de Bachillerato (España) y de preparatoria en Latinoamérica: la ley del "todo o nada", los periodos refractarios y los canales iónicos. Es especialmente útil para preparar la EBAU/PAES y exámenes universitarios de fisiología.',
+        text: 'El simulador permite visualizar interactivamente las 5 fases del potencial de acción ajustando la intensidad y la duración del estímulo y el umbral de disparo. Esto ayuda a comprender conceptos del temario de Biología de 2.º de Bachillerato (España) y de preparatoria en Latinoamérica: la ley del "todo o nada", los periodos refractarios y los canales iónicos. Es especialmente útil para preparar la EBAU/PAES y exámenes universitarios de fisiología.',
       },
     },
     {
