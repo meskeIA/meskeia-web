@@ -519,3 +519,22 @@
   .progresoRelleno { transition: none; }
   .btnStart, .opcionBtn, .btnSiguiente, .btnAnterior, .btnRepetir { transition: none; }
 }
+
+/* Aviso de cómo ha pesado el presupuesto en la recomendación */
+.avisoPresupuesto {
+  margin: 0 0 var(--spacing-lg, 1.5rem);
+  padding: 0.85rem 1rem;
+  border: 1px solid #f59e0b;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoPresupuesto {
+  border-color: #b45309;
+  background: #3a2a08;
+  color: #fde68a;
+}

@@ -3,9 +3,17 @@
 import React, { useState } from 'react';
 import styles from './SelectorSmartphone.module.css';
 import {
+  calcularResultado,
+  ORDEN_GAMAS,
+  type GamaKey,
+  type Resultado,
+  type SistemaOS,
+} from './motor';
+import {
   MeskeiaLogo,
   Footer,
   LegalNotice,
+  RegionBadge,
   RelatedApps,
   EducationalSection,
   ShareCard,
@@ -17,8 +25,6 @@ import { getRelatedApps } from '@/data/app-relations';
 // Tipos
 // ─────────────────────────────────────────────
 
-type SistemaOS = 'ios' | 'android';
-type GamaKey = 'basica' | 'media' | 'alta' | 'pro';
 
 interface Opcion {
   valor: string;
@@ -41,13 +47,6 @@ interface GamaInfo {
   descripcion: string;
 }
 
-interface Resultado {
-  os: SistemaOS;
-  gama: GamaKey;
-  razones: string[];
-  consejos: string[];
-  caracteristicas: string[];
-}
 
 // ─────────────────────────────────────────────
 // Datos de gamas
@@ -66,7 +65,7 @@ const GAMAS: Record<GamaKey, GamaInfo> = {
     icon: '📲',
     precioOrientativo: '250 – 500 €',
     descripcion:
-      'El punto dulce del mercado. Buena cámara, autonomía sólida y rendimiento fluido para la mayoría de usuarios. La mejor relación calidad-precio en 2025.',
+      'El punto dulce del mercado. Buena cámara, autonomía sólida y rendimiento fluido para la mayoría de usuarios. La mejor relación calidad-precio del catálogo actual.',
   },
   alta: {
     nombre: 'Gama alta',
@@ -210,171 +209,6 @@ const PREGUNTAS: Pregunta[] = [
 ];
 
 // ─────────────────────────────────────────────
-// Lógica de recomendación
-// ─────────────────────────────────────────────
-
-function calcularResultado(respuestas: Record<number, string>): Resultado {
-  let puntosiOS = 0;
-  let puntosGamaAlta = 0;
-  const razones: string[] = [];
-  const consejos: string[] = [];
-  const caracteristicas: string[] = [];
-
-  // ─ Sistema operativo ─
-  if (respuestas[4] === 'si_muchos') { puntosiOS += 3; }
-  if (respuestas[4] === 'si_alguno') { puntosiOS += 1; }
-  if (respuestas[5] === 'mac') { puntosiOS += 2; }
-  if (respuestas[5] === 'windows') { puntosiOS -= 1; }
-
-  // ─ Gama ─
-  if (respuestas[1] === 'foto') { puntosGamaAlta += 2; }
-  if (respuestas[1] === 'trabajo') { puntosGamaAlta += 1; }
-  if (respuestas[2] === 'intenso') { puntosGamaAlta += 2; }
-  if (respuestas[2] === 'medio') { puntosGamaAlta += 1; }
-  if (respuestas[3] === 'extremo') { puntosGamaAlta += 2; }
-  if (respuestas[3] === 'mucho') { puntosGamaAlta += 1; }
-  if (respuestas[6] === 'camara') { puntosGamaAlta += 2; }
-  if (respuestas[6] === 'rendimiento') { puntosGamaAlta += 1; }
-  if (respuestas[7] === 'largo') { puntosGamaAlta += 2; }
-  if (respuestas[9] === 'alto') { puntosGamaAlta += 2; }
-  if (respuestas[9] === 'premium') { puntosGamaAlta += 4; }
-  if (respuestas[9] === 'bajo') { puntosGamaAlta -= 3; }
-
-  // ─ Determinar OS ─
-  const os: SistemaOS = puntosiOS >= 3 ? 'ios' : 'android';
-
-  // ─ Determinar gama ─
-  let gama: GamaKey;
-  if (puntosGamaAlta >= 7) {
-    gama = 'pro';
-  } else if (puntosGamaAlta >= 4) {
-    gama = 'alta';
-  } else if (puntosGamaAlta >= 1) {
-    gama = 'media';
-  } else {
-    gama = 'basica';
-  }
-
-  // Ajuste por presupuesto (primario)
-  if (respuestas[9] === 'bajo') { gama = 'basica'; }
-  if (respuestas[9] === 'premium' && gama !== 'pro') { gama = 'pro'; }
-
-  // ─ Razones ─
-  if (os === 'ios') {
-    razones.push('Tienes otros dispositivos Apple: el ecosistema integrado (AirDrop, iMessage, Handoff) te aporta valor real.');
-    razones.push('iOS recibe actualizaciones durante 6-7 años, lo que protege tu inversión a largo plazo.');
-  } else {
-    razones.push('Android ofrece más variedad de modelos, marcas y precios que se adaptan a cualquier necesidad.');
-    razones.push('Mayor libertad de personalización y compatibilidad con ecosistemas no Apple (Google, Microsoft…).');
-  }
-
-  if (gama === 'pro') {
-    razones.push('Tu perfil de uso intenso o de fotografía avanzada justifica la inversión en un flagship.');
-    razones.push('Los móviles pro reciben soporte extendido (7 años en algunos fabricantes), amortizando el coste.');
-  } else if (gama === 'alta') {
-    razones.push('La gama alta te ofrece cámaras con teleobjetivo, pantallas de 120 Hz y rendimiento sólido sin llegar al precio máximo.');
-  } else if (gama === 'media') {
-    razones.push('La gama media actual es notable: procesadores rápidos, cámaras decentes y autonomía de todo el día.');
-  } else {
-    razones.push('Para un uso básico, la gama de entrada cubre perfectamente llamadas, mensajería y navegación.');
-  }
-
-  if (respuestas[7] === 'largo') {
-    razones.push('Buscar modelos con varios años de actualizaciones garantizadas prolonga la vida útil del dispositivo.');
-  }
-
-  // ─ Consejos ─
-  if (respuestas[10] === 'si' || respuestas[10] === 'quizas') {
-    consejos.push('💡 Un dispositivo reacondicionado certificado puede ahorrarte un 30-40 % con garantía incluida; comprueba el estado de la batería antes de comprar.');
-  }
-  if (respuestas[7] === 'largo') {
-    consejos.push('📅 Comprueba en la ficha técnica exacta cuántos años de actualizaciones de SO garantiza el fabricante, no solo parches de seguridad.');
-  }
-  if (respuestas[8] === 'resistente') {
-    consejos.push('💧 Verifica que el modelo elegido tenga certificación IP67 o IP68 antes de comprarlo.');
-  }
-  if (respuestas[9] === 'medio' || respuestas[9] === 'bajo') {
-    consejos.push('🛒 Los mejores precios suelen aparecer tras el lanzamiento de la generación siguiente del modelo que te interesa.');
-  }
-  if (respuestas[6] === 'camara') {
-    consejos.push('📷 El tamaño del sensor y la apertura importan más que los megapíxeles; busca comparativas de fotografía independientes.');
-  }
-  consejos.push('🔋 Comprueba siempre la capacidad de batería (mAh) y si admite carga rápida — muchos modelos de gama media superan a los flagship en autonomía.');
-
-  // ─ Características a buscar ─
-
-  // Actualizaciones (siempre, umbral según duración esperada)
-  if (respuestas[7] === 'largo') {
-    caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 5 años desde la compra');
-  } else if (gama === 'pro' || gama === 'alta') {
-    caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 4 años');
-  } else {
-    caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 3 años');
-  }
-
-  // Batería según intensidad de uso y prioridad declarada
-  if (respuestas[3] === 'extremo' || respuestas[6] === 'bateria') {
-    caracteristicas.push('🔋 Batería ≥ 5.000 mAh con carga rápida ≥ 45 W');
-  } else if (respuestas[3] === 'mucho') {
-    caracteristicas.push('🔋 Batería ≥ 4.500 mAh con carga rápida ≥ 30 W');
-  } else {
-    caracteristicas.push('🔋 Batería ≥ 4.000 mAh (suficiente para un día completo de uso moderado)');
-  }
-
-  // Cámara según prioridad declarada y uso principal
-  if (respuestas[1] === 'foto' || respuestas[6] === 'camara') {
-    if (gama === 'pro') {
-      caracteristicas.push('📷 Sistema de triple cámara con teleobjetivo óptico (≥ 3×) y sensor principal de gran formato (≥ 1/1,3\'\')');
-    } else if (gama === 'alta') {
-      caracteristicas.push('📷 Doble o triple cámara con teleobjetivo óptico y modo noche avanzado');
-    } else {
-      caracteristicas.push('📷 Cámara principal con apertura ≤ f/1,9 y modo noche incluido');
-    }
-  }
-
-  // Procesador y pantalla según gaming o rendimiento
-  if (respuestas[2] === 'intenso' || respuestas[6] === 'rendimiento') {
-    caracteristicas.push('⚡ Procesador de gama alta de la generación más reciente disponible');
-    caracteristicas.push('🖥️ Pantalla con tasa de refresco ≥ 120 Hz');
-    if (gama === 'pro' || gama === 'alta') {
-      caracteristicas.push('💾 RAM ≥ 8 GB');
-    }
-  } else if (respuestas[2] === 'medio') {
-    caracteristicas.push('⚡ Procesador de gama media-alta con pantalla a ≥ 90 Hz');
-  }
-
-  // Diseño y resistencia
-  if (respuestas[8] === 'resistente') {
-    caracteristicas.push('💧 Certificación de resistencia al agua y polvo: IP67 como mínimo, IP68 preferible');
-  }
-  if (respuestas[8] === 'pequeno') {
-    caracteristicas.push('📐 Formato compacto: pantalla ≤ 6,2\'\' (evita las variantes "Plus", "XL" o "Ultra")');
-  }
-  if (respuestas[8] === 'grande') {
-    caracteristicas.push('📐 Pantalla ≥ 6,5\'\' con tecnología AMOLED o equivalente');
-  }
-
-  // NFC a partir de gama media
-  if (gama !== 'basica') {
-    caracteristicas.push('📡 NFC para pagos sin contacto (verifica disponibilidad en tu región)');
-  }
-
-  // Almacenamiento según gama
-  if (gama === 'pro' || gama === 'alta') {
-    caracteristicas.push('💾 Almacenamiento interno ≥ 256 GB (o ≥ 128 GB con ranura microSD)');
-  } else {
-    caracteristicas.push('💾 Almacenamiento interno ≥ 128 GB');
-  }
-
-  // 5G a partir de gama media
-  if (gama !== 'basica') {
-    caracteristicas.push('📶 Conectividad 5G');
-  }
-
-  return { os, gama, razones, consejos, caracteristicas };
-}
-
-// ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
 
@@ -441,8 +275,13 @@ export default function SelectorSmartphone() {
         </header>
       )}
 
+      {/* Las cuatro horquillas de precio y la pregunta de presupuesto están en euros, y el
+          bloque educativo cita normativa y campañas de compra de la UE: la metodología es
+          universal pero los datos de referencia no (hallazgo 949). */}
+      <RegionBadge variant="es-data" />
+
       <LegalNotice />
-      <DisclaimerCard variant="technical" severity="medium" />
+      <DisclaimerCard variant="general" severity="medium" />
 
       {/* ── PANTALLA INTRO ── */}
       {pantalla === 'intro' && (
@@ -485,10 +324,14 @@ export default function SelectorSmartphone() {
             <div
               className={styles.progresoBar}
               role="progressbar"
+              // Lo anunciado y lo pintado van sobre la misma escala: preguntas RESPONDIDAS.
+              // aria-valuenow era el número de pregunta (paso + 1) mientras el relleno es
+              // paso / total, así que iban desfasados un paso entero (hallazgo 951).
               aria-label={`Pregunta ${paso + 1} de ${totalPreguntas}`}
-              aria-valuenow={paso + 1}
-              aria-valuemin={1}
+              aria-valuenow={paso}
+              aria-valuemin={0}
               aria-valuemax={totalPreguntas}
+              aria-valuetext={`Pregunta ${paso + 1} de ${totalPreguntas}`}
             >
               <div className={styles.progresoRelleno} data-progreso={progreso} style={{ width: `${progreso}%` }} />
             </div>
@@ -505,7 +348,11 @@ export default function SelectorSmartphone() {
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => seleccionarOpcion(op.valor)}
-                  aria-pressed={respuestas[preguntaActual.id] === op.valor ? true : false}
+                  // role="radio" + aria-checked, no aria-pressed: la semántica real es la
+                  // elección ÚNICA entre cuatro, no un conmutador. El contenedor declaraba
+                  // radiogroup y no había un solo radio dentro (hallazgo 950).
+                  role="radio"
+                  aria-checked={respuestas[preguntaActual.id] === op.valor}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>
@@ -561,6 +408,27 @@ export default function SelectorSmartphone() {
             </div>
           </div>
 
+          {/* El presupuesto declarado, dicho a la cara. La pantalla de resultado no lo
+              mencionaba ni una vez, y podía proponer una gama entre dos y seis veces más
+              cara que la elegida (hallazgo 943). */}
+          {resultado.recortadaPorPresupuesto && (
+            <p className={styles.avisoPresupuesto} role="note">
+              <span aria-hidden="true">💶</span> Tu uso apuntaba a la{' '}
+              <strong>{GAMAS[resultado.gamaPorPerfil].nombre.toLowerCase()}</strong>{' '}
+              ({GAMAS[resultado.gamaPorPerfil].precioOrientativo}), pero la recomendación se
+              ajusta al presupuesto que has declarado. Lo que sigue es lo mejor que cabe en tu
+              tramo.
+            </p>
+          )}
+          {resultado.ampliadaPorPresupuesto && (
+            <p className={styles.avisoPresupuesto} role="note">
+              <span aria-hidden="true">💶</span> Con tu uso declarado bastaría la{' '}
+              <strong>{GAMAS[resultado.gamaPorPerfil].nombre.toLowerCase()}</strong>{' '}
+              ({GAMAS[resultado.gamaPorPerfil].precioOrientativo}): el salto responde a tu
+              presupuesto, no a una necesidad técnica.
+            </p>
+          )}
+
           {/* Por qué esta recomendación */}
           <div className={styles.razonesSection}>
             <p className={styles.razonesTitulo}>Por qué esta recomendación</p>
@@ -598,7 +466,7 @@ export default function SelectorSmartphone() {
 
           {/* Sección educativa */}
           <EducationalSection
-            title="Guía completa: cómo elegir smartphone en 2025"
+            title="Guía completa: cómo elegir smartphone"
             subtitle="iOS vs Android, gamas, qué mirar y cuándo comprar"
             defaultOpen={false}
           >
@@ -648,15 +516,18 @@ export default function SelectorSmartphone() {
 
             <h3>Cuándo y dónde comprar</h3>
             <div className={styles.warningBox}>
-              <strong>Mejores momentos para comprar:</strong> el precio de los smartphones baja considerablemente en el
-              Black Friday (noviembre), Amazon Prime Day (julio) y cuando se lanza la generación siguiente del modelo
-              que te interesa. Comprar el modelo del año anterior tras el lanzamiento del nuevo puede suponer un ahorro
-              del 20-30%.
+              <strong>Mejores momentos para comprar:</strong> el precio de los smartphones baja considerablemente en las
+              campañas de descuentos de cada país (el Black Friday de noviembre y el Prime Day de julio están
+              extendidos en buena parte del mundo hispanohablante, y en México se suma el Buen Fin) y, sobre todo,
+              cuando se lanza la generación siguiente del modelo que te interesa. Comprar el modelo del año anterior
+              tras el lanzamiento del nuevo puede suponer un ahorro del 20-30%.
             </div>
             <p>
-              Los canales más habituales en España son Amazon, El Corte Inglés, MediaMarkt y las tiendas oficiales de cada
-              marca. Para segunda mano certificada, Back Market y Amazon Renewed ofrecen garantía de 12 meses y
-              devolución en los mismos plazos que un producto nuevo.
+              Los canales más habituales son las tiendas oficiales de cada marca, las grandes superficies de
+              electrónica y los mercados en línea; en España se añaden El Corte Inglés y MediaMarkt, y en Latinoamérica
+              cadenas como Falabella, Liverpool o Mercado Libre. Para segunda mano certificada, plataformas como Back
+              Market o Amazon Renewed dan garantía propia: comprueba cuántos meses cubre en tu país, porque el mínimo
+              legal cambia de uno a otro.
             </p>
           </EducationalSection>
         </div>

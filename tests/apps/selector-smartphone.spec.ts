@@ -142,21 +142,23 @@ test('caso coherente: quien solo quiere llamar y que dure la batería recibe gam
   expect(texto).not.toContain('Procesador de gama alta'); // no juega: no debe pedirlo, y no lo pide
 
   // Y la razón que imprime SÍ describe lo que el usuario contestó.
-  expect(texto).toContain('Para un uso básico, la gama de entrada cubre perfectamente');
+  expect(texto).toContain('Tu uso declarado —llamadas, mensajería y navegación— se cubre sin problema');
+  // Sin conflicto entre uso y presupuesto, no se inventa ningún aviso de recorte.
+  expect(texto).not.toContain('pero la recomendación se ajusta al presupuesto');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 2. CASO CONTRADICTORIO (presupuesto mínimo) — el tope actúa, pero en silencio
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('caso contradictorio: con 250 € y exigencias máximas la app recorta sin decirlo y justifica con un perfil que no se declaró', async ({ page }) => {
-  // Calculado a mano: foto +2, gaming intenso +2, >7 h +2, cámara +2, 4 años o más +2,
-  // «Hasta 250 €» −3  →  7 puntos = «pro», y el ajuste final lo derriba a «básica».
+test('caso contradictorio: con 250 € y exigencias máximas la app recorta Y LO DICE', async ({
+  page,
+}) => {
+  // Calculado a mano: foto +2, gaming intenso +2, >7 h +2, cámara +2, 4 años o más +2 =
+  // 10 puntos = «pro» por perfil, y el tope del tramo «Hasta 250 €» lo baja a «básica».
   //
-  // LO QUE DEBERÍA PASAR: decir que no hay opción que cumpla todo, o priorizar explicando
-  // que el presupuesto manda sobre cámara y potencia.
-  // LO QUE PASA: recorta a gama básica, no menciona el conflicto, y la razón que imprime
-  // («uso básico») contradice punto por punto lo que el usuario acaba de responder.
+  // Antes recortaba igual pero sin mencionar el conflicto, y la razón que imprimía («uso
+  // básico») contradecía punto por punto lo que el usuario acababa de responder.
   await abrirTest(page);
   await responder(page, EXIGENTE_SIN_DINERO);
   const texto = await leerResultado(page);
@@ -164,53 +166,43 @@ test('caso contradictorio: con 250 € y exigencias máximas la app recorta sin 
   expect(texto).toContain('Gama básica');
   expect(texto).toContain('100 – 250 €');
 
-  // ⚠️ Razón falsa: el usuario declaró fotografía, gaming intenso y más de 7 h al día.
-  //    Al repararse, esta frase debe desaparecer de este caso y fallará aquí.
-  expect(texto).toContain('Para un uso básico, la gama de entrada cubre perfectamente llamadas, mensajería y navegación');
+  // La razón ya no atribuye un perfil que no se declaró, y el recorte se explica.
+  expect(texto).not.toContain('Para un uso básico, la gama de entrada cubre perfectamente');
+  expect(texto).toMatch(/presupuesto/i);
+  expect(texto).toContain('hasta 250 €');
 
-  // ⚠️ Pliego incompatible con la propia gama recomendada: un procesador de gama alta de
-  //    última generación y una pantalla de 120 Hz no caben en 100 – 250 €.
-  expect(texto).toContain('Procesador de gama alta de la generación más reciente disponible');
-  expect(texto).toContain('Pantalla con tasa de refresco ≥ 120 Hz');
-  expect(texto).toContain('Actualizaciones del sistema operativo garantizadas: mínimo 5 años');
+  // El pliego cuadra con la gama: nada que no quepa en 100 – 250 €.
+  expect(texto).not.toContain('Procesador de gama alta de la generación más reciente disponible');
+  expect(texto).not.toContain('Pantalla con tasa de refresco ≥ 120 Hz');
+  expect(texto).not.toContain('mínimo 5 años');
 
-  // ⚠️ Y al revés: 5G y NFC están condicionados a `gama !== 'basica'`, así que desaparecen
-  //    justo en el perfil de gaming intenso con más de 7 h diarias.
-  expect(texto).not.toContain('Conectividad 5G');
-  expect(texto).not.toContain('NFC para pagos sin contacto');
-
-  // ⚠️ En ninguna parte de la pantalla se avisa de que las exigencias se han descartado.
-  //    Al repararse aparecerá un aviso y esta comprobación fallará.
-  expect(texto).not.toMatch(/no (hay|existe|es posible)|incompatible|no caben|hemos priorizado|prevalece/i);
+  // Y no se le quita lo que sí necesita: estaban condicionados a `gama !== 'basica'`, así
+  // que desaparecían justo en el perfil de gaming intenso con más de 7 h diarias.
+  expect(texto).toContain('5G');
+  expect(texto).toContain('NFC para pagos sin contacto');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 3. CASO LÍMITE (presupuesto medio) — el tope no existe y la app se desborda
+// 3. CASO LÍMITE (presupuesto medio) — el tope existe en los cuatro tramos
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('caso límite: con un presupuesto de 250 – 500 € la app recomienda una gama de 900 – 1.500+ € sin avisar', async ({ page }) => {
-  // Mismo perfil exigente que el caso 2, cambiando SOLO el tramo de presupuesto al
-  // intermedio. Calculado a mano: 2+2+2+2+2+0 = 10 puntos → «pro». El ajuste final solo
-  // contempla «Hasta 250 €» y «Más de 900 €», así que aquí no interviene nadie.
-  //
-  // LO QUE DEBERÍA PASAR: acotar la gama al tramo declarado, o decir expresamente que
-  // cumplir esas exigencias cuesta más de lo que el usuario ha dicho que puede gastar.
-  // LO QUE PASA: recomienda «Gama pro / flagship — 900 – 1.500+ €», entre dos y seis veces
-  // el presupuesto declarado, sin una sola línea sobre el desfase.
+test('caso límite: con un presupuesto de 250 – 500 € la recomendación se queda en ese tramo', async ({
+  page,
+}) => {
+  // Mismo perfil exigente que el caso 2, cambiando SOLO el tramo al intermedio: 10 puntos
+  // → «pro» por perfil. El ajuste solo contemplaba «Hasta 250 €» y «Más de 900 €», así que
+  // aquí no intervenía nadie y se recomendaba «Gama pro / flagship — 900 – 1.500+ €»,
+  // entre dos y seis veces el presupuesto declarado, sin una línea sobre el desfase.
   await abrirTest(page);
   await responder(page, EXIGENTE_PRESUPUESTO_MEDIO);
   const texto = await leerResultado(page);
 
-  expect(texto).toContain('Gama pro / flagship');
-  expect(texto).toContain('900 – 1.500+ €');
-  expect(texto).not.toContain('250 – 500 €'); // el tramo que el usuario eligió no se menciona
-  // ⚠️ La palabra «presupuesto» no llega a aparecer en la pantalla de resultado: nada
-  //    relaciona la gama propuesta con el tramo que el usuario declaró. Al repararse,
-  //    aparecerá ese aviso y esta comprobación fallará.
-  expect(texto).not.toMatch(/presupuesto|excede|no cabe en/i);
-
-  // El mismo desbordamiento con el tramo «500 – 900 €» sería idéntico: ese tramo suma +2,
-  // de modo que aún es más fácil llegar a «pro» por encima de lo declarado.
+  expect(texto).toContain('Gama media');
+  expect(texto).toContain('250 – 500 €');
+  expect(texto).not.toContain('Gama pro / flagship');
+  // Y el desfase se nombra, con la gama que pedía el uso.
+  expect(texto).toMatch(/presupuesto/i);
+  expect(texto).toContain('900 – 1.500+ €'); // la que pedía el perfil, citada en el aviso
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -233,7 +225,11 @@ test('caso de estabilidad: el mismo perfil repite resultado, pero una sola respu
   await siguiente.click();
   await page.locator('[role="radiogroup"] button', { hasText: 'No juego o muy poco' }).first().click();
   await anterior.click();
-  await expect(page.locator('[role="radiogroup"] button[aria-pressed="true"]')).toHaveText(/Uso básico/);
+  // Los botones son role="radio" con aria-checked: la elección es ÚNICA entre cuatro, no
+  // un conmutador, y el contenedor declaraba radiogroup sin un solo radio dentro.
+  await expect(page.locator('[role="radiogroup"] [role="radio"][aria-checked="true"]')).toHaveText(
+    /Uso básico/,
+  );
 
   // 4.c — El mismo perfil, dos veces seguidas, da exactamente el mismo resultado.
   await page.goto('/selector-smartphone/');
@@ -257,11 +253,10 @@ test('caso de estabilidad: el mismo perfil repite resultado, pero una sola respu
   // de «Hasta 250 €» a «Más de 900 €». Todo lo demás sigue diciendo uso básico, sin juegos,
   // menos de dos horas al día.
   //
-  // LO QUE DEBERÍA PASAR: subir un escalón, o a lo sumo dos, y justificarlo por el
-  // presupuesto — que es lo único que ha cambiado.
-  // LO QUE PASA: salta de «Gama básica (100 – 250 €)» a «Gama pro / flagship
-  // (900 – 1.500+ €)», los cuatro escalones de la escala, y además inventa el motivo: la
-  // razón se genera a partir de la gama de salida, no de las respuestas.
+  // Sigue subiendo a flagship —el usuario ha dicho que quiere gastar eso— pero ahora lo
+  // justifica por el presupuesto, que es lo único que ha cambiado, y dice expresamente que
+  // su uso se cubriría con menos. Antes inventaba el motivo, porque la razón se generaba a
+  // partir de la gama de salida y no de las respuestas.
   await page.getByRole('button', { name: 'Repetir el test' }).click();
   await page.getByRole('button', { name: /Empezar el test/ }).click();
   await page.getByText('Pregunta 1 de 10').first().waitFor();
@@ -271,7 +266,84 @@ test('caso de estabilidad: el mismo perfil repite resultado, pero una sola respu
   expect(tercera).toContain('Gama pro / flagship');
   expect(tercera).toContain('900 – 1.500+ €');
 
-  // ⚠️ Perfil inventado: este usuario respondió «Uso básico», «No juego o muy poco» y
-  //    «Menos de 2 horas». Al repararse, esta frase no debe salir y fallará aquí.
-  expect(tercera).toContain('Tu perfil de uso intenso o de fotografía avanzada justifica la inversión en un flagship');
+  // Este usuario respondió «Uso básico», «No juego o muy poco» y «Menos de 2 horas»: no se
+  // le puede atribuir un perfil intenso.
+  expect(tercera).not.toContain('Tu perfil de uso intenso o de fotografía avanzada');
+  expect(tercera).toMatch(/presupuesto/i);
+  expect(tercera).toContain('no te dejaría corto');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. Los hallazgos de forma: accesibilidad, ámbito y promesas del metadata
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('la barra de progreso anuncia lo mismo que pinta', async ({ page }) => {
+  await abrirTest(page);
+
+  // aria-valuenow era el número de pregunta (paso + 1) mientras el relleno visible es
+  // paso / total: las dos lecturas iban desfasadas un paso entero (hallazgo 951).
+  const barra = page.locator('[role="progressbar"]');
+  const relleno = page.locator('[class*="progresoRelleno"]');
+
+  const leer = async () => ({
+    anunciado: Number(await barra.getAttribute('aria-valuenow')),
+    maximo: Number(await barra.getAttribute('aria-valuemax')),
+    pintado: Number(await relleno.getAttribute('data-progreso')),
+  });
+
+  const inicio = await leer();
+  expect(inicio.anunciado / inicio.maximo).toBeCloseTo(inicio.pintado / 100, 6);
+  // Y el texto para lectores sigue diciendo en qué pregunta se está.
+  await expect(barra).toHaveAttribute('aria-valuetext', 'Pregunta 1 de 10');
+
+  await page.locator('[role="radio"]').first().click();
+  await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+  const segunda = await leer();
+  expect(segunda.anunciado / segunda.maximo).toBeCloseTo(segunda.pintado / 100, 6);
+  expect(segunda.anunciado).toBeGreaterThan(inicio.anunciado);
+});
+
+test('el grupo de opciones tiene radios de verdad dentro', async ({ page }) => {
+  await abrirTest(page);
+
+  // Declaraba role="radiogroup" y ninguno de sus hijos era un radio: eran <button> con
+  // aria-pressed, que comunica un conmutador allí donde la semántica es elección única
+  // entre cuatro (hallazgo 950).
+  const grupo = page.locator('[role="radiogroup"]').first();
+  await expect(grupo.locator('[role="radio"]')).toHaveCount(4);
+  await expect(grupo.locator('[aria-pressed]')).toHaveCount(0);
+
+  await grupo.locator('[role="radio"]').first().click();
+  await expect(grupo.locator('[role="radio"][aria-checked="true"]')).toHaveCount(1);
+});
+
+test('el ámbito geográfico se declara, y el aviso se dirige al público general', async ({
+  page,
+}) => {
+  await page.goto('/selector-smartphone/');
+  await esperarHidratacionBotones(page);
+
+  // Las cuatro horquillas están en euros y el bloque educativo cita campañas y normativa
+  // de la UE, en una app NO fiscal que no montaba RegionBadge (hallazgo 949).
+  await expect(page.getByText(/Datos de referencia: España/)).toBeVisible();
+
+  // El aviso usaba variant="technical", cuyo texto declara un público que no es el de un
+  // test de consumo sobre qué móvil comprar (hallazgo 952).
+  const cuerpo = await page.locator('body').innerText();
+  expect(cuerpo).not.toContain('dirigida a profesionales del dominio');
+  expect(cuerpo).toContain('tiene carácter orientativo');
+});
+
+test('el HTML servido no promete modelos concretos que la app no da', async ({ page }) => {
+  // «Modelos de referencia actualizados» seguía en la meta description, en openGraph, en
+  // la description del schema y como feature, mientras el FAQPage de la misma página lo
+  // desmentía. Es lo que ven Google, Bing y los modelos que leen el JSON-LD (hallazgo 946).
+  const respuesta = await page.request.get('/selector-smartphone/');
+  const html = await respuesta.text();
+  expect(html).not.toContain('Modelos de referencia');
+
+  // Y las horquillas del FAQPage son las mismas que la app muestra en pantalla (947).
+  expect(html).toContain('250-500 €');
+  expect(html).toContain('500-900 €');
+  expect(html).not.toContain('250-600 €');
 });

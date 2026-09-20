@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Selector de Smartphone — ¿Qué móvil o celular me conviene? | meskeIA',
   description:
-    'Test de 10 preguntas para saber qué smartphone (móvil o celular) te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica. Modelos de referencia actualizados.',
+    'Test de 10 preguntas para saber qué smartphone (móvil o celular) te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica, con las características técnicas que buscar en cada caso.',
   keywords: [
     'qué móvil comprar',
     'qué celular comprar',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     'test móvil ideal',
     'iOS o Android',
     'gama alta o media',
-    'mejor smartphone 2025',
+    'qué smartphone comprar',
     'qué teléfono comprar',
     'cuál es el mejor móvil para mí',
     'cuál es el mejor celular para mí',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
           'Test de 10 preguntas sobre uso y prioridades',
           'Recomendación de sistema operativo (iOS / Android)',
           'Recomendación de gama (básica, media, alta, pro)',
-          'Modelos de referencia actualizados por perfil',
+          'Pliego de características técnicas a buscar, ajustado a tu perfil y a tu presupuesto',
           'Consejos sobre cuándo comprar y dónde',
           '100% en el navegador, sin registro ni instalación',
           'Gratuito y sin publicidad',
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Smartphone",
-  description: "Test de 10 preguntas para saber qué smartphone (móvil o celular) te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica. Modelos de referencia actualizados.",
+  description: "Test de 10 preguntas para saber qué smartphone (móvil o celular) te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica, con las características técnicas que buscar en cada caso.",
   url: "https://meskeia.com/selector-smartphone/",
   category: 'UtilityApplication',
   features: [],
@@ -91,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Qué gama de smartphone me conviene según mi presupuesto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La gama básica (hasta ~250 €) cubre llamadas, mensajería y redes sociales, pero puede quedarse corta para juegos exigentes o fotografía avanzada. La gama media (250-600 €) ofrece la mejor relación calidad-precio para la mayoría de usuarios. La gama alta (600 €+) añade mejoras en cámara, pantalla y rendimiento que solo se notan en usos intensivos o profesionales.',
+        text: 'La gama básica (hasta ~250 €) cubre llamadas, mensajería y redes sociales, pero puede quedarse corta para juegos exigentes o fotografía avanzada. La gama media (250-500 €) ofrece la mejor relación calidad-precio para la mayoría de usuarios. La gama alta (500-900 €) añade mejoras en cámara, pantalla y rendimiento que solo se notan en usos intensivos, y la gama pro o flagship (900 € en adelante) lleva al máximo zoom óptico, pantalla y años de actualizaciones.',
       },
     },
     {
