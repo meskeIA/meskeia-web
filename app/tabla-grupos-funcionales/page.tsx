@@ -17,12 +17,43 @@ import { getRelatedApps } from '@/data/app-relations';
    Utilidades
 ──────────────────────────────────────────────────────────────── */
 
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
+/** Normaliza texto para buscar sin acentos, sin mayúsculas y con los subíndices en ASCII. */
 function normalizar(texto: string): string {
   return texto
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[₀-₉]/g, (d) => String(d.charCodeAt(0) - 0x2080))
+    .replace(/[²³¹]/g, (d) => ({ '²': '2', '³': '3', '¹': '1' })[d] ?? d);
+}
+
+/**
+ * ¿Coincide este grupo con lo que se ha tecleado?
+ *
+ * Nombre, fórmula, sufijo, prefijo y ejemplo se buscan por SUBCADENA: son campos cortos y
+ * específicos, donde una coincidencia parcial siempre es informativa. Las palabras clave,
+ * en cambio, se buscan por PREFIJO DE PALABRA, porque buscar subcadenas dentro de ellas
+ * cuela resultados que nadie pidió: la fórmula general del alcano, «CnH2n+2», contiene la
+ * subcadena «nh2», así que teclear NH2 devolvía alcano, alqueno y alquino por delante de la
+ * amina, justo lo contrario de lo que promete el texto de ayuda (hallazgo 991).
+ */
+function coincideConLaBusqueda(
+  grupo: Pick<
+    GrupoFuncional,
+    'nombre' | 'formula' | 'sufijo' | 'prefijo' | 'ejemploNombre' | 'ejemploFormula' | 'busqueda'
+  >,
+  termino: string,
+): boolean {
+  if (termino === '') return true;
+
+  const cabecera = normalizar(
+    `${grupo.nombre} ${grupo.formula} ${grupo.sufijo} ${grupo.prefijo} ${grupo.ejemploNombre} ${grupo.ejemploFormula}`,
+  );
+  if (cabecera.includes(termino)) return true;
+
+  return normalizar(grupo.busqueda)
+    .split(/[^a-z0-9+]+/)
+    .some((palabra) => palabra !== '' && palabra.startsWith(termino));
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -903,7 +934,7 @@ const GRUPOS: GrupoFuncional[] = [
     descripcionDiagrama: 'Dos oxígenos enlazados entre sí, cada uno unido a un resto orgánico.',
     comoSeNombra: [
       'Reconoce el enlace O–O, muy débil y fácil de romper en dos radicales.',
-      'Nomenclatura funcional: peróxido de dimetilo (o de dibenzoílo, si los restos son bencílicos).',
+      'Nomenclatura funcional: peróxido de dimetilo (o de dibenzoílo, si los restos son benzoílo, C₆H₅–CO–; con restos bencilo, C₆H₅–CH₂–, sería peróxido de dibencilo).',
       'Como sustituyente se usa el prefijo peroxi-: (metilperoxi)etano.',
       'Si un extremo lleva hidrógeno es un hidroperóxido: CH₃–O–OH es metanoperoxol.',
     ],
@@ -1583,10 +1614,7 @@ export default function TablaGruposFuncionalesPage() {
       const coincideCategoria =
         categoriaActiva === 'todas' || grupo.categoria === categoriaActiva;
       if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(
-        `${grupo.nombre} ${grupo.formula} ${grupo.sufijo} ${grupo.prefijo} ${grupo.ejemploNombre} ${grupo.ejemploFormula} ${grupo.busqueda}`,
-      ).includes(termino);
+      return coincideConLaBusqueda(grupo, termino);
     });
 
     if (orden === 'categoria') return filtrados;

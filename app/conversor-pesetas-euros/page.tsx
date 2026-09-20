@@ -22,6 +22,17 @@ const AÑOS_PESETA = Object.keys(IPC_DATA)
 type ModoApp = 'directa' | 'historico';
 type Direccion = 'ptasAEuros' | 'eurosAPtas';
 
+/**
+ * Decimales con los que rotular una cantidad de pesetas.
+ *
+ * La etiqueta redondeaba SIEMPRE a cero decimales mientras el cálculo usaba el valor
+ * completo, así que la pantalla podía contradecirse: con 1.499,60 ptas anunciaba «1500
+ * pesetas equivalen a: 9,01 €», y 1.500 pesetas son 9,02 € (hallazgo 940).
+ */
+function decimalesDe(cantidad: number): number {
+  return Number.isInteger(cantidad) ? 0 : 2;
+}
+
 export default function ConversorPesetasEurosPage() {
   const [modo, setModo] = useState<ModoApp>('directa');
 
@@ -141,8 +152,9 @@ export default function ConversorPesetasEurosPage() {
                 onClick={intercambiarDireccion}
                 className={styles.swapButton}
                 title="Cambiar dirección de la conversión"
+                aria-label="Cambiar dirección de la conversión"
               >
-                ⇄
+                <span aria-hidden="true">⇄</span>
               </button>
               <div className={styles.inputGroup}>
                 <span className={styles.label}>
@@ -174,7 +186,7 @@ export default function ConversorPesetasEurosPage() {
                 <div className={styles.mainResult}>
                   <div className={styles.resultLabel}>
                     {direccion === 'ptasAEuros'
-                      ? `${formatNumber(resultadoDirecta.cantidad, 0)} pesetas equivalen a:`
+                      ? `${formatNumber(resultadoDirecta.cantidad, decimalesDe(resultadoDirecta.cantidad))} pesetas equivalen a:`
                       : `${formatCurrency(resultadoDirecta.cantidad)} equivalen a:`}
                   </div>
                   <div className={styles.resultValue}>
@@ -254,7 +266,7 @@ export default function ConversorPesetasEurosPage() {
               <>
                 <div className={styles.mainResult}>
                   <div className={styles.resultLabel}>
-                    {formatNumber(resultadoHistorico.cantidad, 0)} pesetas de {añoReferencia} equivalen hoy a:
+                    {formatNumber(resultadoHistorico.cantidad, decimalesDe(resultadoHistorico.cantidad))} pesetas de {añoReferencia} equivalen hoy a:
                   </div>
                   <div className={styles.resultValue}>
                     {formatCurrency(resultadoHistorico.valorHoy)}
@@ -287,7 +299,7 @@ export default function ConversorPesetasEurosPage() {
                 <div className={styles.interpretation}>
                   <h3><span aria-hidden="true">💡</span> Interpretación</h3>
                   <p>
-                    Al cambio oficial, {formatNumber(resultadoHistorico.cantidad, 0)} pesetas de{' '}
+                    Al cambio oficial, {formatNumber(resultadoHistorico.cantidad, decimalesDe(resultadoHistorico.cantidad))} pesetas de{' '}
                     {añoReferencia} son <strong>{formatCurrency(resultadoHistorico.eurosÉpoca)}</strong>.
                     Pero para tener el mismo poder adquisitivo hoy necesitarías{' '}
                     <strong>{formatCurrency(resultadoHistorico.valorHoy)}</strong>: la diferencia es el

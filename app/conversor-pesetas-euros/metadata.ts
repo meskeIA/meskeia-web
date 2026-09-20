@@ -89,7 +89,7 @@ export const faqJsonLd = {
       name: '¿De dónde salen los datos para calcular el valor real hoy?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'De la misma serie histórica del Índice de Precios al Consumo (IPC) del INE que usa el Estimador de Inflación de meskeIA, disponible desde 1961. La fórmula es: valor hoy = (pesetas ÷ 166,386) × (IPC del año actual ÷ IPC del año de referencia).',
+        text: 'De la misma serie histórica del Índice de Precios al Consumo (IPC) del INE que usa el Estimador de Inflación de meskeIA, disponible desde 1961. La fórmula es: valor hoy = (pesetas ÷ 166,386) × (IPC del último año cerrado ÷ IPC del año de referencia). Se usa el último año cerrado y no el corriente porque el índice del año en curso todavía no tiene media anual publicada.',
       },
     },
   ],

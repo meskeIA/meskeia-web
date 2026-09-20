@@ -370,3 +370,29 @@ test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
     expect(anunciable).toBe(true);
   });
 });
+
+/* ── Los tres hallazgos del Inspector del 20/09/2026, ya reparados ───────────── */
+
+test('la etiqueta del resultado nombra la cantidad tecleada, no una redondeada', async ({
+  page,
+}) => {
+  // Redondeaba a cero decimales mientras el cálculo usaba el valor completo: con 1.499,60
+  // anunciaba «1500 pesetas equivalen a: 9,01 €», y 1.500 pesetas son 9,02 € (hallazgo 940).
+  await escribir(page, '#cantidad-directa', '1499,60');
+
+  const etiqueta = etiquetaPrincipal(page);
+  // Sin punto de millar porque son cuatro cifras: es la regla de la RAE y así lo hace
+  // Intl con es-ES. Desde cinco cifras sí agrupa.
+  await expect(etiqueta).toContainText('1499,60 pesetas');
+  await expect(etiqueta).not.toContainText('1500 pesetas');
+  // 1.499,60 ÷ 166,386 = 9,0128… → 9,01 €
+  await expect(valorPrincipal(page)).toContainText('9,01');
+});
+
+test('el botón de invertir la conversión tiene nombre accesible', async ({ page }) => {
+  // Es el ÚNICO camino a euros → pesetas, o sea la mitad de lo que promete el <h1>, y su
+  // nombre accesible era el propio glifo «⇄» (hallazgo 941).
+  await expect(
+    page.getByRole('button', { name: 'Cambiar dirección de la conversión' }),
+  ).toHaveCount(1);
+});

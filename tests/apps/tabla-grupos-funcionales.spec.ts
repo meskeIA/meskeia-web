@@ -187,6 +187,37 @@ test('CASO 2 · buscador: normaliza mayúsculas y acentos, y busca por sufijo y 
   expect(await idsVisibles(page)).toEqual(['acido-carboxilico']);
   await buscar(page, 'mercaptano');
   expect(await idsVisibles(page)).toEqual(['tiol']);
+  await buscar(page, 'CHO');
+  expect(await idsVisibles(page)).toEqual(['aldehido']);
+});
+
+test('CASO 2.bis · «NH2» devuelve el grupo amino, no los hidrocarburos', async ({ page }) => {
+  // El texto de ayuda promete literalmente «NH2 la amina». Con búsqueda por subcadena se
+  // colaban Alcano, Alqueno y Alquino por delante, porque sus fórmulas generales
+  // —CnH2n+2, CnH2n, CnH2n−2— contienen «nh2» (hallazgo 991).
+  await buscar(page, 'NH2');
+  const ids = await idsVisibles(page);
+  expect(ids).toContain('amina-primaria');
+  expect(ids).not.toContain('alcano');
+  expect(ids).not.toContain('alqueno');
+  expect(ids).not.toContain('alquino');
+  // La amida es legítima: lleva –CONH₂.
+  expect(ids.every((id) => id.includes('amina') || id.includes('amida'))).toBe(true);
+
+  // Y la fórmula general se sigue encontrando si es ELLA lo que se busca.
+  await buscar(page, 'CnH2n');
+  expect(await idsVisibles(page)).toContain('alcano');
+});
+
+test('la ficha del peróxido no confunde bencilo con benzoílo', async ({ page }) => {
+  // El peróxido de dibenzoílo es (C₆H₅–CO–O–)₂, con restos benzoílo (acilo). Con restos
+  // bencilo (C₆H₅–CH₂–) sería peróxido de dibencilo, y la propia app define «bencil-» bien
+  // en la fila del areno (hallazgo 990).
+  await buscar(page, 'peroxido');
+  await page.locator('li button[aria-controls="detalle-peroxido"]').first().click();
+  const ficha = page.locator('#detalle-peroxido');
+  await expect(ficha).toContainText('si los restos son benzoílo');
+  await expect(ficha).not.toContainText('dibenzoílo, si los restos son bencílicos');
 });
 
 test('CASO 3 · rechazo y filtro: estado vacío explícito y combinación con el buscador', async ({
