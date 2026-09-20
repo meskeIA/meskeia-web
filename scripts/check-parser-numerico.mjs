@@ -91,6 +91,24 @@ const PATRONES = [
   },
 ];
 
+/**
+ * La misma conversión, pero GUARDADA EN UNA VARIABLE para parsearla en la línea siguiente.
+ *
+ * ── De dónde sale (20/09/2026) ──
+ * Este candado exigía las dos piezas en la MISMA línea, y así se le escapó
+ * `components/NumberInput.tsx` —que importan 63 apps— porque escribe
+ * `const normalized = value.replace(',', '.');` y `parseFloat(normalized)` en dos líneas
+ * seguidas. Era el uso con MÁS alcance del catálogo y el candado lo daba por limpio. Lo
+ * destapó el Inspector en `estimador-irpf-pensionista`: «1.400» de pensión se leía 1,4,
+ * caía bajo el mínimo y el blur reescribía el campo a 100 €.
+ *
+ * Se sigue el NOMBRE de la variable y no la mera cercanía, porque «hay un replace cerca de
+ * un Number» caza código correcto (caso 9 de las pruebas).
+ */
+const ASIGNA_LA_CONVERSION = /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/;
+/** Hasta dónde vale la pista. Lo bastante para el patrón real, no tanto como para inventar. */
+const VENTANA_CONVERSION = 5;
+
 const ESCAPE = /parser-ok:/;
 
 const relevante = (f) =>
@@ -165,16 +183,45 @@ for (const rel of objetivos()) {
   const barrido = TODO || SUELTOS.length > 0;
   const tocadas = barrido ? null : lineasTocadas(rel);
 
+  /** Variables que acaban de recibir un número convertido a mano: nombre → línea (0-based). */
+  const convertidas = new Map();
+
   lineas.forEach((texto, i) => {
-    // Las dos piezas tienen que estar en la línea: el parseo y la conversión de la coma.
-    // Por separado no dicen nada — `Number(x)` a secas es correcto y `.replace` también.
-    if (!REPLACE_DE_LA_COMA.test(texto)) return;
+    // Apuntar la conversión que se guarda en una variable, para la forma partida en dos.
+    if (REPLACE_DE_LA_COMA.test(texto)) {
+      const asignacion = texto.match(ASIGNA_LA_CONVERSION);
+      if (asignacion) convertidas.set(asignacion[1], i);
+    }
+
     const patron = PATRONES.find((p) => p.re.test(texto));
     if (!patron) return;
-    if (ESCAPE.test(texto) || (i > 0 && ESCAPE.test(lineas[i - 1]))) return;
+
+    // Forma 1: el parseo y la conversión, en la misma línea. Por separado no dicen nada
+    // — `Number(x)` a secas es correcto y `.replace` también.
+    let origen = REPLACE_DE_LA_COMA.test(texto) ? i : null;
+
+    // Forma 2: el parseo recibe una variable que se convirtió unas líneas antes.
+    if (origen === null) {
+      for (const [nombre, linea] of convertidas) {
+        if (i <= linea || i - linea > VENTANA_CONVERSION) continue;
+        const recibeLaVariable = new RegExp(
+          String.raw`(?:parseFloat|Number)\s*\(\s*` + nombre + String.raw`\b`,
+        );
+        if (recibeLaVariable.test(texto)) {
+          origen = linea;
+          break;
+        }
+      }
+    }
+    if (origen === null) return;
+
+    // El escape vale en la línea del parseo, en la anterior, y en la de la conversión.
+    if (ESCAPE.test(texto) || (i > 0 && ESCAPE.test(lineas[i - 1])) || ESCAPE.test(lineas[origen]))
+      return;
 
     const n = i + 1;
-    const caso = { rel, n, queja: patron.queja, texto: texto.trim().slice(0, 90) };
+    const queja = origen === i ? patron.queja : `${patron.queja}, convertido en L${origen + 1}`;
+    const caso = { rel, n, queja, texto: texto.trim().slice(0, 90) };
     // En un barrido nada rompe. Fuera del barrido, `tocadas === null` es fichero sin seguir:
     // todo lo suyo es nuevo.
     const esDelCommit = barrido ? false : tocadas === null || tocadas.has(n);

@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useId } from 'react';
+import { parseSpanishNumber } from '@/lib';
 import styles from './NumberInput.module.css';
 
 interface NumberInputProps {
@@ -77,9 +78,21 @@ export default function NumberInput({
   const handleBlur = () => {
     // Al perder foco, normalizar el formato
     if (value && value.trim() !== '') {
-      // Convertir coma a punto para validación
-      const normalized = value.replace(',', '.');
-      const num = parseFloat(normalized);
+      /**
+       * parser-ok: la línea de abajo cita la forma VIEJA para explicarla, no la ejecuta
+       * El parser canónico, NO un `parseFloat(value.replace(',', '.'))`.
+       *
+       * ── De dónde sale (20/09/2026, Inspector en `estimador-irpf-pensionista`) ──
+       * Aquel `replace` leía el separador de MILLAR español como coma decimal, así que
+       * «1.400» valía 1,4. Como eso cae por debajo de cualquier `min` razonable, el blur
+       * reescribía el campo al mínimo: teclear una pensión de 1.400 € y pasar al campo
+       * siguiente la convertía en 100 €, y la app publicaba la cuota de esos 100 € sin
+       * una palabra. El placeholder del propio campo enseñaba «Ej: 1.400».
+       *
+       * Con `parseSpanishNumber` el millar se lee bien, y lo que no es un número devuelve
+       * NaN —igual que antes— así que el `!isNaN` de abajo sigue siendo la guarda.
+       */
+      const num = parseSpanishNumber(value);
 
       // Validar min/max — salvo que quien usa el control haya dicho que no acote: ver
       // `acotarAlSalir`, que existe porque reescribir al límite puede cambiar el SIGNIFICADO
