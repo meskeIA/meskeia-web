@@ -6,6 +6,9 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *
  * Primera inspección: 20/09/2026 (Opus 5), contra producción y contra el código del repositorio,
  * que el deploy de las 11:25 deja idénticos.
+ * REPARACIÓN: 20/09/2026 — los siete hallazgos del acta, corregidos en
+ * `app/simulador-oferta-demanda/`. Los bloques que eran TESTIGO (afirmaban lo que la app hacía
+ * MAL) se han invertido: ahora exigen el valor bueno, el que el acta daba como «esperado».
  *
  * QUÉ PROMETE
  *   <h1> «Simulador de Oferta y Demanda» y subtítulo: mover los desplazadores de demanda (renta,
@@ -16,10 +19,10 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *       Q_d = a − b·P   ·   Q_o = c + d·P   ·   P* = (a − c)/(b + d)   ·   Q* = a − b·P*
  *
  * DÓNDE VIVE EL CÁLCULO
- *   app/simulador-oferta-demanda/page.tsx, líneas 51-92. No hay motor aparte ni importa nada de
- *   data/fiscal ni de lib/: `calcularCurvas`, `calcularEquilibrio` y `calcularExcedente` viven en
- *   el propio componente, con b = 2 y d = 1,5 FIJAS y las bases a = 100, c = −20. Cada punto de
- *   deslizador mueve la demanda 4 unidades y la oferta 3:
+ *   app/simulador-oferta-demanda/page.tsx. No hay motor aparte ni importa nada de data/fiscal:
+ *   `calcularCurvas`, `calcularEquilibrio`, `areaBajoDemanda`, `areaBajoOferta` y
+ *   `calcularExcedente` viven en el propio componente, con b = 2 y d = 1,5 FIJAS y las bases
+ *   a = 100, c = −20. Cada punto de deslizador mueve la demanda 4 unidades y la oferta 3:
  *       a = 100 + 4·(renta + sustitutivos + preferencias)      (renta, sustitutivos, preferencias ∈ [−5, 5])
  *       c = −20 + 3·(−costes + tecnología + productores)       (costes, tecnología, productores ∈ [−5, 5])
  *
@@ -38,39 +41,38 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *     costes −5, tecnología +5, productores +5 → c = −20 + 3·15 = +25 (hay oferta ya a precio 0)
  *     P* = (100 − 25)/3,5 = 150/7 = 21,428… → 21,4 ; Q* = 400/7 = 57,142… → 57,1
  *     EC = ½·(50 − 150/7)·(400/7) = 40000/49 = 816,326… → 816,3
- *     EP esperado = área entre P* y la curva de oferta, ésta truncada en P = 0 (nadie produce a
- *       precio negativo): P*·Q* − área bajo la oferta = 1224,49 − 344,39 = 880,1
- *       (y si en vez de truncarla se prolonga la recta hasta −16,7 €, saldría 1088,4:
- *        ninguna de las dos lecturas da lo que publica la app)
+ *     EP = área entre P* y la curva de oferta, ésta truncada en P = 0 (nadie produce a precio
+ *       negativo): P*·Q* − área bajo la oferta = 60000/49 − 16875/49 = 43125/49 = 880,1
+ *       (si en vez de truncarla se prolongase la recta hasta −16,7 € saldría 1088,4, y el
+ *        triángulo desde P = 0 que publicaba la app daba 612,2: ninguno es el excedente)
  *
  *   CASO 3 (debe rechazarse) — modo «precio máximo» con P_max = −10 €
- *     El campo declara min=0 y un precio negativo no existe; `checkValidity()` del propio
- *     navegador devuelve false. Esperado: rechazo, o al menos aviso y ninguna cifra publicada.
+ *     El campo declara min=0 y un precio negativo no existe en el modelo. Esperado: rechazo o
+ *     acotado. La app lo ACOTA a 0 y calcula ese escenario, que sí existe.
  *
- * RESULTADO: el CASO 1 salió exacto en los cinco indicadores, y del CASO 2 solo el excedente del
- * productor se desvía. Lo demás son los hallazgos de abajo. Los `expect` comparan la CADENA que
- * la app pinta (un decimal, coma española), no un número con tolerancia: las cifras de arriba son
- * fracciones exactas, así que el primer decimal discrimina sin margen que elegir.
+ * LOS SIETE HALLAZGOS, Y DÓNDE SE COMPRUEBA QUE SIGUEN REPARADOS
+ *   A. [alto] Excedente del productor que ignoraba el rectángulo de las unidades ofrecidas a
+ *      precio cero (c > 0) → test «HALLAZGO A». Ahora EP = P*·Q* − área bajo la oferta.
+ *   B. [alto] Con control de precios, EC/EP/bienestar eran los del libre mercado → test
+ *      «HALLAZGO B». Ahora se calculan sobre la cantidad del lado corto y al precio fijado.
+ *   C. [medio] Un techo por encima del equilibrio publicaba una escasez inexistente y con el
+ *      signo cambiado → test «HALLAZGO C». Ahora la cifra es 0,0 u. y el aviso sigue saliendo.
+ *   D. [medio] El campo de precio aceptaba negativos → test «CASO 3». Ahora se acota a [0, 60].
+ *   E. [bajo] El equilibrio se salía del lienzo sin decirlo (Q_MAX fijo en 80) → test
+ *      «HALLAZGO D». Ahora los dos ejes se adaptan (siempre ≥ 80 × 60).
+ *   F. [bajo] `fmt()` era un toFixed() con la coma cambiada a mano → ahora usa `formatNumber`
+ *      de `@/lib`. ⚠️ OJO A LAS CADENAS ESPERADAS: es-ES con `useGrouping:'auto'` NO agrupa los
+ *      millares de un número de CUATRO cifras («1696,4», no «1.696,4») y sí los de cinco o más.
+ *      Está documentado y asumido en todo el catálogo (ver la nota de formato en
+ *      `estimador-costes-divorcio.spec.ts` y `estimador-costas-judiciales.spec.ts`), y en esta
+ *      app el máximo alcanzable con los deslizadores es 3.796,4 €, así que ninguna cifra llega
+ *      a cinco dígitos. Si algún día se decide agrupar siempre, se decide en `lib/formatters.ts`
+ *      para las 1.100 apps a la vez, no aquí.
+ *   G. [bajo] Los tres botones del selector de modo sin `type` → test «HALLAZGO F».
  *
- * HALLAZGOS ABIERTOS, escritos como TESTIGO (documentan lo que la app hace HOY; cuando se
- * reparen, estos bloques fallarán y habrá que invertirlos). NO se corrigen desde el test:
- *   A. El excedente del productor se calcula como un triángulo desde P = 0 en cuanto la curva de
- *      oferta corta el eje de cantidades en positivo (c > 0, es decir −costes + tecnología +
- *      productores ≥ 7). Con la oferta al máximo publica 612,2 € en vez de 880,1 €, un 30 % menos,
- *      y el canvas ni siquiera sombrea ese excedente (su dibujo exige −c/d ≥ 0): el gráfico calla
- *      y el panel da cifra.
- *   B. Con el control de precios ACTIVO, el excedente del consumidor, el del productor y el
- *      bienestar total siguen siendo los del libre mercado. El canvas sí retira las dos áreas
- *      (solo las sombrea en modo libre), de modo que gráfico y panel se contradicen; y el propio
- *      FAQ de la app enseña que «el bienestar total (EC + EP) siempre es menor con control de
- *      precios», que es justo lo que el panel no muestra.
- *   C. Un techo POR ENCIMA del equilibrio no ata, así que el mercado se vacía en P* y la escasez
- *      es 0; la app publica igualmente «Escasez 55,0 u.». Sale el aviso, pero la cifra se queda.
- *   D. El punto de equilibrio desaparece del gráfico sin avisar cuando Q* supera el ancho
- *      dibujado (Q_MAX = 80), cosa que ocurre dentro del propio recorrido de los deslizadores.
- *   E. Formato español: las cifras de cuatro dígitos salen sin separador de miles («1428,6 €»),
- *      porque `fmt()` es un toFixed() con la coma cambiada a mano en vez de `formatNumber`.
- *   F. Los tres botones del selector de modo no llevan `type="button"`.
+ * Los `expect` comparan la CADENA que la app pinta (un decimal, coma española), no un número con
+ * tolerancia: las cifras de arriba son fracciones exactas, así que el primer decimal discrimina
+ * sin margen que elegir.
  */
 
 const RUTA = '/simulador-oferta-demanda/';
@@ -149,60 +151,66 @@ test.describe('simulador-oferta-demanda', () => {
     await expect(resultado(page, 'Precio de equilibrio')).toHaveText('21,4 €');
     await expect(resultado(page, 'Cantidad de equilibrio')).toHaveText('57,1 u.');
     await expect(resultado(page, 'Excedente consumidor')).toHaveText('816,3 €');
-    // El excedente del productor de este mismo escenario está en el testigo del HALLAZGO A.
+    // El excedente del productor de este mismo escenario es el del HALLAZGO A, aquí abajo.
   });
 
-  test('CASO 3 · rechazo — HALLAZGO testigo: un precio máximo negativo se acepta sin decir nada', async ({
+  test('CASO 3 · rechazo — un precio máximo negativo se acota a 0 en vez de calcularse', async ({
     page,
   }) => {
     await abrirPrecioMaximo(page);
-    await sembrarValor(page, '#precioFijado', -10); // parte de 25, así que es un movimiento real
+    // Parte de 25 y el campo lo ACOTA: React se queda en 0, no en −10.
+    await sembrarValor(page, '#precioFijado', -10, { esperado: 0 });
 
-    // Esperado: rechazo. El campo declara min=0 y el navegador ya lo da por inválido.
+    // El campo ya no publica un precio que no existe, y deja de ser inválido para el navegador.
+    await expect(page.locator('#precioFijado')).toHaveValue('0');
     const campo = page.locator('#precioFijado');
-    expect(await campo.evaluate((el) => (el as HTMLInputElement).checkValidity())).toBe(false);
-    // Obtenido: se calcula igual. Qd = 100 − 2·(−10) = 120 ; Qo = máx(0, −20 − 15) = 0 → 120,0 u.
-    await expect(resultado(page, 'Escasez')).toHaveText('120,0 u.');
-    // Y ni un aviso: el único que tiene la app solo salta si P_max ≥ P*. Se busca por su TEXTO
-    // porque en la página hay además un [role="alert"] vacío que no es de esta app.
-    await expect(page.getByText(/P_max debe ser/)).toHaveCount(0);
+    expect(await campo.evaluate((el) => (el as HTMLInputElement).checkValidity())).toBe(true);
+
+    // Lo que queda es un techo de 0 €, que sí existe y sí ata (P* = 34,3): Qd = 100 − 0 = 100 ;
+    // Qo = máx(0, −20 + 0) = 0 → escasez 100,0 u. y nada que negociar, luego EC = EP = 0.
+    await expect(resultado(page, 'Escasez')).toHaveText('100,0 u.');
+    await expect(resultado(page, 'Cantidad negociada')).toHaveText('0,0 u.');
+    await expect(resultado(page, 'Excedente consumidor')).toHaveText('0,0 €');
+    await expect(resultado(page, 'Excedente productor')).toHaveText('0,0 €');
   });
 
-  test('HALLAZGO A testigo — el excedente del productor se queda corto cuando hay oferta a precio cero', async ({
+  test('HALLAZGO A — el excedente del productor incluye el rectángulo de las unidades ofrecidas a precio cero', async ({
     page,
   }) => {
     await sembrarValor(page, deslizador(page, COSTES), -5);
     await sembrarValor(page, deslizador(page, TECNOLOGIA), 5);
     await sembrarValor(page, deslizador(page, PRODUCTORES), 5);
 
-    // Esperado 880,1 € (área entre P* = 21,4 y la oferta truncada en P = 0; cabecera, CASO 2).
-    // Obtenido: ½·P*·Q* = 30000/49 = 612,2 €, el triángulo que sale de tratar el intercepto
-    // negativo de la oferta como si fuera cero.
-    await expect(resultado(page, 'Excedente productor')).toHaveText('612,2 €');
-    // Arrastra al bienestar total: 1696,4 € reales frente a los 1428,6 € publicados. Y de paso
-    // enseña el HALLAZGO E: cuatro dígitos sin el punto de los millares (debería ser «1.428,6 €»).
-    await expect(resultado(page, 'Bienestar total')).toHaveText('1428,6 €');
+    // c = +25: la oferta corta el eje de cantidades en positivo, así que las 25 primeras
+    // unidades ya se ofrecen a precio 0 y el excedente NO es el triángulo desde P = 0 (612,2 €,
+    // lo que publicaba antes), sino P*·Q* − área bajo la oferta = 43125/49 (cabecera, CASO 2).
+    await expect(resultado(page, 'Excedente productor')).toHaveText('880,1 €');
+    // Y arrastra al bienestar total: 816,3 + 880,1 = 1696,4 € (publicaba 1428,6 €).
+    // Cuatro cifras sin punto de millar: es lo que da es-ES, ver nota F de la cabecera.
+    await expect(resultado(page, 'Bienestar total')).toHaveText('1696,4 €');
   });
 
-  test('HALLAZGO B testigo — bajo un techo vinculante el panel sigue publicando el bienestar del libre mercado', async ({
+  test('HALLAZGO B — bajo un techo vinculante el panel publica el bienestar del mercado controlado', async ({
     page,
   }) => {
     await abrirPrecioMaximo(page);
     await sembrarValor(page, '#precioFijado', 20); // parte de 25; P* = 34,3, así que el techo ATA
 
-    // Esto sí es correcto: Qd = 100 − 40 = 60 ; Qo = −20 + 30 = 10 → escasez 50 u.
+    // Qd = 100 − 40 = 60 ; Qo = −20 + 30 = 10 → escasez 50 u., y se negocian las 10 del lado corto.
     await expect(resultado(page, 'Escasez')).toHaveText('50,0 u.');
+    await expect(resultado(page, 'Cantidad negociada')).toHaveText('10,0 u.');
 
-    // Esto no: con la cantidad racionada en 10 u. y precio 20 €, el excedente del consumidor es
-    // 475 − 200 = 275,0 €, el del productor 200 − 166,67 = 33,3 €, y el bienestar total 308,3 €
-    // (267,9 € menos que en libre mercado: la pérdida irrecuperable que el propio FAQ explica).
-    // La app publica los tres valores del libre mercado, sin enterarse del control.
-    await expect(resultado(page, 'Excedente consumidor')).toHaveText('246,9 €');
-    await expect(resultado(page, 'Excedente productor')).toHaveText('329,3 €');
-    await expect(resultado(page, 'Bienestar total')).toHaveText('576,2 €');
+    // Con 10 u. a 20 €: EC = ∫₀¹⁰ (100 − q)/2 dq − 200 = 475 − 200 = 275,0 €
+    //                  EP = 200 − ∫₀¹⁰ (q + 20)/1,5 dq = 200 − 166,67 = 33,3 €
+    // Bienestar 308,3 €, es decir 267,9 € menos que los 576,2 € del libre mercado: la pérdida
+    // irrecuperable de eficiencia que el propio FAQ de la app explica.
+    await expect(resultado(page, 'Excedente consumidor')).toHaveText('275,0 €');
+    await expect(resultado(page, 'Excedente productor')).toHaveText('33,3 €');
+    await expect(resultado(page, 'Bienestar total')).toHaveText('308,3 €');
+    await expect(resultado(page, 'Pérdida irrecuperable')).toHaveText('267,9 €');
   });
 
-  test('HALLAZGO C testigo — un techo por encima del equilibrio publica una escasez que no existe', async ({
+  test('HALLAZGO C — un techo por encima del equilibrio no ata: la escasez es 0, no una cifra con el signo cambiado', async ({
     page,
   }) => {
     await abrirPrecioMaximo(page);
@@ -210,12 +218,17 @@ test.describe('simulador-oferta-demanda', () => {
 
     // El aviso sale...
     await expect(page.getByText(/P_max debe ser menor que P\*/)).toBeVisible();
-    // ...pero la cifra se publica igual. Esperado 0,0 u. (el mercado se vacía en P* = 34,3);
-    // obtenido |Qd − Qo| evaluado en 50 €: |0 − 55| = 55,0 u.
-    await expect(resultado(page, 'Escasez')).toHaveText('55,0 u.');
+    // ...y ahora la cifra que lo acompaña es la buena: el mercado se vacía en P* = 34,3 y no hay
+    // escasez ninguna. Antes publicaba |Qd − Qo| evaluado en 50 €: |0 − 55| = 55,0 u., que
+    // además es exceso de OFERTA, no escasez.
+    await expect(resultado(page, 'Escasez')).toHaveText('0,0 u.');
+    // Y el panel sigue siendo el del libre mercado, porque el control no cambia nada.
+    await expect(resultado(page, 'Bienestar total')).toHaveText('576,2 €');
+    // Sin control efectivo no hay cantidad racionada ni pérdida que enseñar.
+    await expect(page.locator('[class*="resultCard"]').filter({ hasText: 'Cantidad negociada' })).toHaveCount(0);
   });
 
-  test('HALLAZGO D testigo — con los seis deslizadores al extremo, E* se sale del gráfico sin avisar', async ({
+  test('HALLAZGO D — con los seis deslizadores al extremo, el eje se adapta y E* sigue dibujado', async ({
     page,
   }) => {
     expect(await pixelesEquilibrio(page)).toBeGreaterThan(20); // en el estado inicial sí se dibuja
@@ -225,23 +238,24 @@ test.describe('simulador-oferta-demanda', () => {
     }
 
     // a = 160, c = 25 → P* = 135/3,5 = 38,571… y Q* = 160 − 2·P* = 82,857…, por encima del
-    // Q_MAX = 80 que dibuja el canvas: el panel anuncia un equilibrio que el gráfico no enseña.
+    // Q_MAX = 80 que dibujaba antes el canvas. Ahora la escala sube al múltiplo de 10 siguiente
+    // (100 u.) y el punto que el panel anuncia se puede localizar en la gráfica.
     await expect(resultado(page, 'Cantidad de equilibrio')).toHaveText('82,9 u.');
     await expect(resultado(page, 'Precio de equilibrio')).toHaveText('38,6 €');
     await page.waitForTimeout(300); // el canvas se repinta en un efecto, tras el render
-    expect(await pixelesEquilibrio(page)).toBe(0);
+    expect(await pixelesEquilibrio(page)).toBeGreaterThan(20);
   });
 
-  test('HALLAZGO F testigo — los tres botones del selector de modo no declaran type="button"', async ({
+  test('HALLAZGO F — los tres botones del selector de modo declaran type="button"', async ({
     page,
   }) => {
     const modos = page.locator('[class*="modeBtn"]');
     await expect(modos).toHaveCount(3);
     for (let i = 0; i < 3; i++) {
-      // aria-pressed sí está (el selector anuncia cuál está activo); lo que falta es el type,
-      // así que los tres quedan como submit por defecto.
+      // aria-pressed anuncia cuál está activo; el type evita que sean submit por defecto
+      // (regla §5 del CLAUDE.md global).
       expect(await modos.nth(i).getAttribute('aria-pressed')).not.toBeNull();
-      expect(await modos.nth(i).getAttribute('type')).toBeNull();
+      expect(await modos.nth(i).getAttribute('type')).toBe('button');
     }
   });
 

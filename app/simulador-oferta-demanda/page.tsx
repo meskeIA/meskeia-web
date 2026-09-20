@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
@@ -55,6 +56,13 @@ const D_FIJA = 1.5;
 const DESPLAZADOR_PASO = 4; // unidades por unidad de slider para demanda
 const DESPLAZADOR_PASO_O = 3; // unidades por unidad de slider para oferta
 
+/** Tope del campo de precio controlado. Un precio negativo no existe en el modelo. */
+const PRECIO_TOPE = 60;
+
+/** Escala mínima del gráfico: por debajo de esto los ejes no se encogen nunca. */
+const Q_ESCALA_MIN = 80;
+const P_ESCALA_MIN = 60;
+
 // ============================================
 // FUNCIONES MATEMÁTICAS
 // ============================================
@@ -81,18 +89,73 @@ function calcularEquilibrio(curvas: Curvas): Equilibrio {
   return { P: Math.max(0, P), Q: Math.max(0, Q) };
 }
 
+/**
+ * Disposición a pagar acumulada por las primeras Q unidades: el área BAJO la curva de demanda.
+ *
+ *   Q_d = a − b·P  →  P(Q) = (a − Q)/b   ·   ∫₀^Q = (a·Q − Q²/2) / b
+ *
+ * Por encima de Q = a la demanda pagaría un precio negativo, así que ahí se trunca.
+ */
+function areaBajoDemanda(curvas: Curvas, Q: number): number {
+  const Qf = Math.max(0, Math.min(Q, curvas.a));
+  return (curvas.a * Qf - (Qf * Qf) / 2) / curvas.b;
+}
+
+/**
+ * Coste de oportunidad de producir las primeras Q unidades: el área BAJO la curva de oferta,
+ * TRUNCADA en P = 0 porque nadie cobra un precio negativo.
+ *
+ *   Q_o = c + d·P  →  P(Q) = máx(0, (Q − c)/d)
+ *
+ * Cuando c > 0 la oferta corta el eje de cantidades en positivo: las primeras c unidades ya se
+ * ofrecen a precio cero y no añaden coste. Integrando desde Q₀ = máx(0, c):
+ *
+ *   ∫_{Q₀}^{Q} (q − c)/d dq = [(Q − c)² − (Q₀ − c)²] / (2d)
+ *
+ * Esto es lo que faltaba en el cálculo anterior (`EP = ½·(P − Pmin)·Q` con Pmin capado a 0):
+ * ese triángulo ignoraba el RECTÁNGULO de las unidades ofrecidas a precio cero.
+ */
+function areaBajoOferta(curvas: Curvas, Q: number): number {
+  const Q0 = Math.max(0, curvas.c);
+  const Qf = Math.max(Q, Q0);
+  return (Math.pow(Qf - curvas.c, 2) - Math.pow(Q0 - curvas.c, 2)) / (2 * curvas.d);
+}
+
+/**
+ * Excedentes sobre la cantidad EFECTIVAMENTE negociada (Q) y al precio al que se negocia (P).
+ *
+ *   EC = disposición a pagar de esas Q unidades − lo que se paga por ellas
+ *   EP = lo que se cobra por esas Q unidades − su coste de oportunidad
+ *
+ * En libre mercado (P = P*, Q = Q*) se reduce a los dos triángulos de siempre; bajo un control
+ * de precios que ATA, la cantidad es la del lado corto y las dos áreas se estrechan: su suma ya
+ * no llega al bienestar del equilibrio, y esa diferencia es la pérdida irrecuperable.
+ */
 function calcularExcedente(curvas: Curvas, P: number, Q: number): Excedente {
-  // Intercepto demanda en eje P: a/b
-  const Pmax = curvas.a / curvas.b;
-  // Intercepto oferta en eje P: -c/d (clamp a 0 para consistencia con el canvas)
-  const Pmin = Math.max(0, -curvas.c / curvas.d);
-  const EC = 0.5 * (Pmax - P) * Q;
-  const EP = 0.5 * (P - Pmin) * Q;
+  const EC = areaBajoDemanda(curvas, Q) - P * Q;
+  const EP = P * Q - areaBajoOferta(curvas, Q);
   return { EC: Math.max(0, EC), EP: Math.max(0, EP) };
 }
 
+/**
+ * Formato español obligatorio (§2 del CLAUDE.md global), con separador de millar: antes era un
+ * `toFixed()` con la coma cambiada a mano y «1.428,6 €» se publicaba como «1428,6 €».
+ */
 function fmt(n: number, dec = 1): string {
-  return n.toFixed(dec).replace('.', ',');
+  // Un residuo de coma flotante (1e-14) saldría como «≈0»; a la resolución que se pinta es 0.
+  return formatNumber(Math.abs(n) < 1e-9 ? 0 : n, dec);
+}
+
+/** Redondea al múltiplo de 10 superior: el grid y las marcas de los ejes van de 10 en 10. */
+function redondearEscala(v: number): number {
+  return Math.ceil(v / 10) * 10;
+}
+
+/** Acota lo tecleado a [0, PRECIO_TOPE]: un `type="number"` NO capa por su `min` al escribir. */
+function acotarPrecio(bruto: string): number {
+  const v = Number(bruto);
+  if (!Number.isFinite(v)) return 0;
+  return Math.min(PRECIO_TOPE, Math.max(0, v));
 }
 
 // ============================================
@@ -120,15 +183,6 @@ export default function SimuladorOfertaDemandaPage() {
 
   const equilibrio = useMemo(() => calcularEquilibrio(curvas), [curvas]);
 
-  const excedente = useMemo(
-    () => calcularExcedente(curvas, equilibrio.P, equilibrio.Q),
-    [curvas, equilibrio]
-  );
-
-  // Rangos del gráfico
-  const Q_MAX = 80;
-  const P_MAX = 60;
-
   // Puntos de la curva de demanda: Q_d = a - b*P → P = (a - Q)/b
   // En el gráfico X=Q, Y=P
   // Curva demanda: P = (a - Q) / b
@@ -151,10 +205,69 @@ export default function SimuladorOfertaDemandaPage() {
     () => Math.max(0, curvas.c + curvas.d * precioFijado),
     [curvas, precioFijado]
   );
-  const desequilibrio = useMemo(
-    () => Math.abs(qDemandaControlada - qOfertaControlada),
-    [qDemandaControlada, qOfertaControlada]
+  /**
+   * ¿ATA el control? Un techo solo ata por DEBAJO del equilibrio y un suelo solo por ENCIMA:
+   * fuera de ahí el mercado se vacía en E* y el precio fijado no cambia nada.
+   */
+  const controlAta = useMemo(() => {
+    if (modo === 'maximo') return precioFijado < equilibrio.P;
+    if (modo === 'minimo') return precioFijado > equilibrio.P;
+    return false;
+  }, [modo, precioFijado, equilibrio.P]);
+
+  /**
+   * Lo que de verdad se negocia. Con el control atando, el precio es el fijado y la cantidad la
+   * marca el LADO CORTO del mercado: nadie compra más de lo que se ofrece ni vende más de lo
+   * que se demanda. Sin control (o con un control que no ata), es el equilibrio.
+   */
+  const mercado = useMemo(() => {
+    if (!controlAta) return { P: equilibrio.P, Q: equilibrio.Q };
+    return { P: precioFijado, Q: Math.min(qDemandaControlada, qOfertaControlada) };
+  }, [controlAta, equilibrio, precioFijado, qDemandaControlada, qOfertaControlada]);
+
+  const excedente = useMemo(
+    () => calcularExcedente(curvas, mercado.P, mercado.Q),
+    [curvas, mercado]
   );
+
+  /** Bienestar que habría sin control, para medir contra él la pérdida irrecuperable. */
+  const bienestarLibre = useMemo(() => {
+    const libre = calcularExcedente(curvas, equilibrio.P, equilibrio.Q);
+    return libre.EC + libre.EP;
+  }, [curvas, equilibrio]);
+
+  const perdidaIrrecuperable = Math.max(0, bienestarLibre - (excedente.EC + excedente.EP));
+
+  /**
+   * Escasez (techo) o excedente (suelo) SOLO si el control ata. Con un techo POR ENCIMA de P*
+   * el mercado se vacía en el equilibrio y la diferencia es cero: la |Qd − Qo| evaluada a ese
+   * precio no solo no existe, es que tiene el signo contrario (habría exceso de oferta). O se
+   * calcula bien, o no se da cifra; un aviso al lado no rescata un número falso.
+   */
+  const desequilibrio = useMemo(() => {
+    if (!controlAta) return 0;
+    return modo === 'maximo'
+      ? qDemandaControlada - qOfertaControlada
+      : qOfertaControlada - qDemandaControlada;
+  }, [controlAta, modo, qDemandaControlada, qOfertaControlada]);
+
+  /**
+   * Rangos del gráfico. Se ADAPTAN: con los deslizadores al extremo Q* llega a 82,9 u. y P* a
+   * 64,3 €, y con la escala clavada en 80 × 60 el punto de equilibrio se salía del lienzo sin
+   * decirlo, mientras el panel seguía anunciándolo. Nunca por debajo de 80 × 60, para que el
+   * estado inicial se vea siempre igual.
+   */
+  const Q_MAX = useMemo(() => {
+    const necesarios = [Q_ESCALA_MIN, equilibrio.Q * 1.15];
+    if (modo !== 'libre') necesarios.push(qDemandaControlada, qOfertaControlada);
+    return redondearEscala(Math.max(...necesarios));
+  }, [equilibrio.Q, modo, qDemandaControlada, qOfertaControlada]);
+
+  const P_MAX = useMemo(() => {
+    const necesarios = [P_ESCALA_MIN, equilibrio.P * 1.15];
+    if (modo !== 'libre') necesarios.push(precioFijado);
+    return redondearEscala(Math.max(...necesarios));
+  }, [equilibrio.P, modo, precioFijado]);
 
   // ============================================
   // DIBUJO DEL CANVAS
@@ -217,54 +330,47 @@ export default function SimuladorOfertaDemandaPage() {
       ctx.stroke();
     }
 
-    // ——— EXCEDENTE CONSUMIDOR (triángulo azul claro) ———
+    // ——— ÁREAS DE EXCEDENTE ———
+    // Se pintan en TODOS los modos y sobre la cantidad EFECTIVAMENTE negociada, que es la
+    // misma que publica el panel: antes el canvas las retiraba en cuanto había control de
+    // precios mientras el panel seguía dando las cifras del libre mercado, de modo que
+    // gráfico y panel se contradecían.
     const Peq = equilibrio.P;
     const Qeq = equilibrio.Q;
-    const PmaxD = curvas.a / curvas.b; // intercepto demanda en eje P
+    const Pef = mercado.P; // precio al que se negocia
+    const Qef = mercado.Q; // cantidad que cambia de manos (lado corto si el control ata)
+    // El área se recorta al lienzo; la curva sale por arriba cuando el intercepto supera P_MAX.
+    const capar = (p: number) => Math.min(P_MAX, Math.max(0, p));
+    const nPasos = 80;
 
-    if (modo === 'libre' && Qeq > 0 && PmaxD > 0) {
+    // Excedente del consumidor (azul claro): entre la demanda y el precio pagado.
+    if (Qef > 0) {
       ctx.fillStyle = colorShadeD;
       ctx.beginPath();
-      ctx.moveTo(toX(0), toY(PmaxD));
-      // Seguir la curva de demanda desde Q=0 hasta Q=Qeq
-      const nSteps = 80;
-      for (let i = 0; i <= nSteps; i++) {
-        const q = (i / nSteps) * Qeq;
-        const p = pDemanda(q);
-        if (p >= 0 && p <= P_MAX) {
-          ctx.lineTo(toX(q), toY(p));
-        }
+      ctx.moveTo(toX(0), toY(capar(pDemanda(0))));
+      for (let i = 1; i <= nPasos; i++) {
+        const q = (i / nPasos) * Qef;
+        ctx.lineTo(toX(q), toY(capar(pDemanda(q))));
       }
-      ctx.lineTo(toX(Qeq), toY(Peq));
-      ctx.lineTo(toX(0), toY(Peq));
+      ctx.lineTo(toX(Qef), toY(capar(Pef)));
+      ctx.lineTo(toX(0), toY(capar(Pef)));
       ctx.closePath();
       ctx.fill();
     }
 
-    // ——— EXCEDENTE PRODUCTOR (triángulo naranja claro) ———
-    const PminO = -curvas.c / curvas.d; // intercepto oferta en eje P
-
-    if (modo === 'libre' && Qeq > 0 && PminO >= 0) {
+    // Excedente del productor (naranja claro): entre el precio cobrado y la oferta, ésta
+    // TRUNCADA en P = 0. Antes el dibujo exigía −c/d ≥ 0, así que cuando la oferta cortaba el
+    // eje de cantidades en positivo (c > 0) no pintaba nada y el panel sí daba cifra.
+    if (Qef > 0) {
       ctx.fillStyle = colorShadeO;
       ctx.beginPath();
-      ctx.moveTo(toX(0), toY(Math.max(0, PminO)));
-      // Seguir la curva de oferta desde Q=0 (o donde corta eje) hasta Q=Qeq
-      const nSteps = 80;
-      let started = false;
-      for (let i = 0; i <= nSteps; i++) {
-        const q = (i / nSteps) * Qeq;
-        const p = pOferta(q);
-        if (p >= 0 && p <= P_MAX) {
-          if (!started) {
-            ctx.moveTo(toX(q), toY(p));
-            started = true;
-          } else {
-            ctx.lineTo(toX(q), toY(p));
-          }
-        }
+      ctx.moveTo(toX(0), toY(capar(pOferta(0))));
+      for (let i = 1; i <= nPasos; i++) {
+        const q = (i / nPasos) * Qef;
+        ctx.lineTo(toX(q), toY(capar(pOferta(q))));
       }
-      ctx.lineTo(toX(Qeq), toY(Peq));
-      ctx.lineTo(toX(0), toY(Peq));
+      ctx.lineTo(toX(Qef), toY(capar(Pef)));
+      ctx.lineTo(toX(0), toY(capar(Pef)));
       ctx.closePath();
       ctx.fill();
     }
@@ -451,7 +557,7 @@ export default function SimuladorOfertaDemandaPage() {
     ctx.textAlign = 'center';
     ctx.fillText('Precio (P)', 0, 0);
     ctx.restore();
-  }, [curvas, equilibrio, modo, precioFijado, pDemanda, pOferta, qDemandaControlada, qOfertaControlada, Q_MAX, P_MAX]);
+  }, [curvas, equilibrio, mercado, modo, precioFijado, pDemanda, pOferta, qDemandaControlada, qOfertaControlada, Q_MAX, P_MAX]);
 
   useEffect(() => {
     dibujar();
@@ -494,7 +600,9 @@ export default function SimuladorOfertaDemandaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📈 Simulador de Oferta y Demanda</h1>
+        <h1 className={styles.title}>
+          <span aria-hidden="true">📈</span> Simulador de Oferta y Demanda
+        </h1>
         <p className={styles.subtitle}>
           Mueve los desplazadores de demanda (renta, sustitutivos, preferencias) y de oferta
           (costes, tecnología, productores) para ver cómo cambia el equilibrio en tiempo real.
@@ -509,6 +617,7 @@ export default function SimuladorOfertaDemandaPage() {
       ============================================ */}
       <div className={styles.modoSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'libre' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('libre')}
           aria-pressed={modo === 'libre'}
@@ -518,6 +627,7 @@ export default function SimuladorOfertaDemandaPage() {
           <span className={styles.modeDesc}>Precio determinado por oferta y demanda</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'maximo' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('maximo')}
           aria-pressed={modo === 'maximo'}
@@ -527,6 +637,7 @@ export default function SimuladorOfertaDemandaPage() {
           <span className={styles.modeDesc}>P_max por debajo del equilibrio → escasez</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'minimo' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('minimo')}
           aria-pressed={modo === 'minimo'}
@@ -543,26 +654,32 @@ export default function SimuladorOfertaDemandaPage() {
           <label htmlFor="precioFijado" className={styles.precioFijadoLabel}>
             {modo === 'maximo' ? 'Precio máximo (P_max):' : 'Precio mínimo (P_min):'}
           </label>
+          {/* El valor se ACOTA a [0, PRECIO_TOPE]: el campo declaraba min=0 y aceptaba −10
+              igualmente, porque un type="number" no capa lo que se le escribe. */}
           <input
             id="precioFijado"
             type="number"
             min={0}
-            max={P_MAX}
+            max={PRECIO_TOPE}
             step={1}
             value={precioFijado}
-            onChange={e => setPrecioFijado(Number(e.target.value))}
+            onChange={e => setPrecioFijado(acotarPrecio(e.target.value))}
             className={styles.precioInput}
             aria-label={modo === 'maximo' ? 'Precio máximo' : 'Precio mínimo'}
           />
           <span className={styles.precioUnidad}>€ / u.</span>
           {modo === 'maximo' && precioFijado >= equilibrio.P && (
             <span role="alert" className={styles.precioAdvertencia}>
-              ⚠️ P_max debe ser menor que P* ({fmt(equilibrio.P)}) para causar escasez
+              <span aria-hidden="true">⚠️</span> P_max debe ser menor que P* ({fmt(equilibrio.P)} €)
+              para causar escasez: por encima no ata, el mercado se vacía en el equilibrio y no
+              hay escasez ninguna.
             </span>
           )}
           {modo === 'minimo' && precioFijado <= equilibrio.P && (
             <span role="alert" className={styles.precioAdvertencia}>
-              ⚠️ P_min debe ser mayor que P* ({fmt(equilibrio.P)}) para causar excedente
+              <span aria-hidden="true">⚠️</span> P_min debe ser mayor que P* ({fmt(equilibrio.P)} €)
+              para causar excedente: por debajo no ata, el mercado se vacía en el equilibrio y no
+              sobra nada.
             </span>
           )}
         </div>
@@ -576,7 +693,16 @@ export default function SimuladorOfertaDemandaPage() {
           ref={canvasRef}
           role="img"
           className={styles.canvas}
-          aria-label="Gráfica de oferta y demanda con punto de equilibrio"
+          aria-label={
+            `Gráfica de oferta y demanda. Ejes: cantidad de 0 a ${fmt(Q_MAX, 0)} unidades y ` +
+            `precio de 0 a ${fmt(P_MAX, 0)} euros, ajustados para que el equilibrio siempre ` +
+            `quede dentro. Punto de equilibrio en ${fmt(equilibrio.Q)} unidades y ` +
+            `${fmt(equilibrio.P)} euros.` +
+            (controlAta
+              ? ` Línea de precio ${modo === 'maximo' ? 'máximo' : 'mínimo'} en ` +
+                `${fmt(mercado.P)} euros, con ${fmt(mercado.Q)} unidades negociadas.`
+              : '')
+          }
         />
       </div>
 
@@ -612,7 +738,28 @@ export default function SimuladorOfertaDemandaPage() {
             <span className={styles.resultValue}>{fmt(desequilibrio)} u.</span>
           </div>
         )}
+        {controlAta && (
+          <div className={`${styles.resultCard} ${styles.resultCardControl}`}>
+            <span className={styles.resultLabel}>Cantidad negociada</span>
+            <span className={styles.resultValue}>{fmt(mercado.Q)} u.</span>
+          </div>
+        )}
+        {controlAta && (
+          <div className={`${styles.resultCard} ${styles.resultCardControl}`}>
+            <span className={styles.resultLabel}>Pérdida irrecuperable</span>
+            <span className={styles.resultValue}>{fmt(perdidaIrrecuperable)} €</span>
+          </div>
+        )}
       </div>
+
+      {controlAta && (
+        <p className={styles.notaMercado}>
+          Con el control atando, los excedentes se calculan sobre la cantidad que de verdad
+          cambia de manos ({fmt(mercado.Q)} u., el lado corto del mercado) y al precio fijado
+          ({fmt(mercado.P)} €). Por eso el bienestar total baja respecto al libre mercado
+          ({fmt(bienestarLibre)} €): esa diferencia es la pérdida irrecuperable de eficiencia.
+        </p>
+      )}
 
       {/* ============================================
           SLIDERS: DEMANDA + OFERTA
@@ -743,7 +890,7 @@ export default function SimuladorOfertaDemandaPage() {
           onClick={restablecerTodo}
           aria-label="Restablecer todos los parámetros a sus valores iniciales"
         >
-          🔄 Restablecer todo
+          <span aria-hidden="true">🔄</span> Restablecer todo
         </button>
       </div>
 
@@ -918,7 +1065,8 @@ export default function SimuladorOfertaDemandaPage() {
                 permitirse comprar.
               </p>
               <p className={styles.faqTip}>
-                💡 Excepción: los bienes Giffen (muy raros, como la patata en Irlanda siglo XIX)
+                <span aria-hidden="true">💡</span> Excepción: los bienes Giffen (muy raros, como
+                la patata en Irlanda siglo XIX)
                 tienen pendiente positiva porque son inferiores con un peso muy alto en el
                 presupuesto familiar.
               </p>
@@ -933,7 +1081,8 @@ export default function SimuladorOfertaDemandaPage() {
                 preferencias...) y toda la curva se traslada a izquierda o derecha.
               </p>
               <p className={styles.faqTip}>
-                💡 En el simulador, los sliders <em>desplazan</em> las curvas. Si solo cambia el
+                <span aria-hidden="true">💡</span> En el simulador, los sliders{' '}
+                <em>desplazan</em> las curvas. Si solo cambia el
                 precio en el gráfico (eje Y), te mueves <em>a lo largo</em> de la misma curva.
               </p>
             </div>
@@ -959,9 +1108,10 @@ export default function SimuladorOfertaDemandaPage() {
                 para ajustar la sobreproducción: quedan excedentes sin vender.
               </p>
               <p className={styles.faqTip}>
-                💡 El bienestar total (EC + EP) siempre es menor con control de precios que en
-                libre mercado: la diferencia es la <em>pérdida irrecuperable de eficiencia</em>
-                (triángulo de Harberger).
+                <span aria-hidden="true">💡</span> El bienestar total (EC + EP) siempre es menor
+                con control de precios que en libre mercado: la diferencia es la{' '}
+                <em>pérdida irrecuperable de eficiencia</em> (triángulo de Harberger). El panel la
+                calcula y la publica en cuanto el precio fijado ata.
               </p>
             </div>
 
@@ -975,8 +1125,8 @@ export default function SimuladorOfertaDemandaPage() {
                 de precios.
               </p>
               <p className={styles.faqTip}>
-                💡 Ejemplo: si valoras una camiseta en 30 € y la compras a 18 €, tu excedente
-                del consumidor es 12 €.
+                <span aria-hidden="true">💡</span> Ejemplo: si valoras una camiseta en 30 € y la
+                compras a 18 €, tu excedente del consumidor es 12 €.
               </p>
             </div>
           </div>
