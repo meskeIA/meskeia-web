@@ -3,8 +3,7 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /* ══════════════════════════════════════════════════════════════════════════════════════════
  * Inspector — calculadora-pintura (segmento interactiva, riesgo 2, 47 usos, 43 s de estancia)
- * Inspección del 20/09/2026 (Opus 5), contra producción y contra el código del repositorio,
- * que el deploy de las 11:25 deja idénticos.
+ * Inspección del 20/09/2026 (Opus 5) · REPARACIÓN del 20/09/2026, en este mismo fichero.
  *
  * QUÉ PROMETE
  *   <h1> «Calculadora de Pintura» y subtítulo: «Calcula cuántos litros necesitas según
@@ -14,15 +13,15 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *   ventanas: pueden representar el 10–15 % de la superficie total de la pared».
  *
  * DÓNDE VIVE EL CÁLCULO
- *   Todo en la propia vista, `calcular()` de app/calculadora-pintura/page.tsx. No hay motor
- *   aparte ni módulo de datos: los cuatro rendimientos son un objeto literal del fichero.
- *     m² (modo habitación) = 2 × (largo + ancho) × alto          ← perímetro × altura
- *     m² (modo directo)    = parseFloat(x.replace(',', '.')) || 0
- *     si m² ≤ 0 → return, sin tocar nada y sin decir nada
- *     litros = m² × capas / rendimiento     lisa 12 · gotelé 8 · rugosa 7 · porosa 6 (m²/L)
+ *   Todo en la propia vista, `calcular()` de app/calculadora-pintura/page.tsx. Los rendimientos
+ *   por soporte son un objeto del fichero, ahora con rango declarado y editables en pantalla.
+ *     m² (modo habitación) = 2 × (largo + ancho) × alto  + techo opcional − huecos
+ *     m² (modo directo)    = parseSpanishNumber(entrada)      ← entiende «1.500» y rechaza «12abc»
+ *     entrada imposible → mensaje en role="alert" y el panel se vacía
+ *     litros = m² × capas / rendimiento     lisa 10-12 · gotelé 7-8 · rugosa 6-7 · porosa 5-6
  *     litros mostrados = ceil(litros × 10) / 10        ← redondeo AL ALZA a la décima
  *     botes de 4 L = ceil(litros/4)   ·   botes de 15 L = ceil(litros/15)   ← también al alza
- *     coste = litros × precio por litro
+ *     coste = litros DEL ENVASE × precio por litro     ← lo que se paga, no los litros sueltos
  *
  * LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
  *
@@ -32,52 +31,50 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *     litros      = 35 × 2 / 12 = 5,8333… → al alza a la décima → 5,9 L
  *     botes 4 L   = ⌈5,9 / 4⌉ = ⌈1,475⌉ = 2 botes  (8 L: cubre los 5,9 con margen)
  *     botes 15 L  = ⌈5,9 / 15⌉ = 1 bote
- *     coste       = 5,9 × 8 €/L = 47,20 €
+ *     coste       = 8 L comprados × 8 €/L = 64,00 €   ← los 2 botes, no los 5,9 L sueltos
  *
  *   CASO 2 (límite) — la fachada de 1.500 m² a UNA sola mano, y el extremo contrario
  *     litros     = 1500 × 1 / 12 = 125,0 L exactos
  *     botes 4 L  = ⌈125 / 4⌉ = ⌈31,25⌉ = 32 botes   ·   botes 15 L = ⌈8,333⌉ = 9 botes
- *     coste      = 125 × 8 = 1.000,00 €
+ *     coste      = 32 × 4 L × 8 €/L = 1.024,00 €  (con envase de 15 L serían 135 L = 1.080,00 €)
  *     Por abajo: 0,5 m² × 1 / 12 = 0,0417 L → 0,1 L y 1 bote. Lo que importa aquí es que
  *     NINGUNO de los tres redondeos vaya a la baja: quedarse corto a mitad de pared es el
  *     defecto con consecuencia real de esta app, y no lo tiene.
  *
  *   CASO 3 (debe rechazarse) — medida negativa, texto y campo vacío
  *     Una pared no mide −5 m² ni «abc» m². Esperado: mensaje de error y NINGUNA cifra
- *     publicada. Obtenido: silencio absoluto y el resultado ANTERIOR intacto en pantalla
- *     (ver los testigos). Y en modo habitación un largo negativo ni siquiera llega a esa
- *     puerta: 2 × (−1 + 5) × 2,5 = 20 m² positivos, que la app calcula tan ricamente.
+ *     publicada. Y en modo habitación, un largo negativo se rechaza POR SÍ MISMO: sumar
+ *     primero el perímetro dejaba que −1 y 5 se compensaran en 20 m² «válidos».
  *
- * RESULTADO. La aritmética prometida —perímetro × altura, × manos, ÷ rendimiento— sale
- * EXACTA en los tres casos, y los tres redondeos van al alza, que es lo que debe ocurrir en
- * una calculadora de obra. Lo que falla está alrededor de la cuenta: cómo se leen los números
- * que entran, qué se hace con los imposibles, de dónde salen los rendimientos y qué se valora
- * en el coste. Va todo abajo, como testigos.
- *
- * HALLAZGOS (20/09/2026) — el detalle, en cada testigo
- *   1. ALTO   · «1.500» m² se lee como 1,5 m²: parseFloat(x.replace(',', '.')) no entiende el
- *               separador de millar español que el propio proyecto exige (CLAUDE.md §2).
- *   2. MEDIO  · texto, vacío, negativo y cero no se rechazan: Calcular no hace NADA y deja en
- *               pantalla la cifra anterior, que ya no corresponde a lo que se ve en el campo.
- *   3. MEDIO  · «12abc» entra como 12 m² sin avisar (parseFloat se queda con el prefijo).
- *   4. MEDIO  · largo negativo aceptado en modo habitación: −1 y 5 dan 20 m² «válidos».
- *   5. MEDIO  · la FAQ promete «+20 % a 40 %» para el gotelé y el paso 2 «hasta el doble»; el
- *               motor aplica exactamente +50 % (12 → 8 m²/L). Tres cifras, ninguna coincide.
- *   6. MEDIO  · los cuatro rendimientos están escritos a mano sin fuente ni fecha, y «lisa 12»
- *               es el extremo OPTIMISTA de la propia tabla de la app (plástica mate 10–12).
- *   7. MEDIO  · el «Coste estimado» valora litros sueltos, no los botes que la app manda
- *               comprar en la línea de encima.
- *   8. MEDIO  · modo habitación sin campo de huecos ni de techo, y la cifra se rotula
- *               «Superficie total» — el mismo error que el recuadro de la app llama frecuente.
- *   9. BAJO   · el JSON-LD anuncia una «sugerencia de litros con margen del 10 %» que la app
- *               no calcula: solo hay un consejo de texto.
- *  10. BAJO   · los cuatro botones de la app sin type="button" (CLAUDE.md §5).
+ * LOS 10 HALLAZGOS DEL 20/09/2026, Y CÓMO SE REPARARON
+ *   1. ALTO   · «1.500» valía 1,5 m². Ahora se parsea con `parseSpanishNumber`.
+ *   2. MEDIO  · texto, vacío, negativo y cero no se rechazaban y quedaba en pantalla la cifra
+ *               anterior. Ahora hay role="alert" y el panel se vacía; y si se cambian los
+ *               datos sin recalcular, el resultado se marca como caducado.
+ *   3. MEDIO  · «12abc» entraba como 12 m². Ahora es NaN y se rechaza.
+ *   4. MEDIO  · largo negativo aceptado. Ahora se valida CADA medida, no el perímetro sumado.
+ *   5. MEDIO  · la FAQ prometía «+20 % a 40 %» y el paso 2 «hasta el doble» para el gotelé,
+ *               mientras el motor aplica +50 %. Los textos dicen ya lo que el motor hace.
+ *   6. MEDIO  · rendimientos sin fuente. Ahora se declara el rango de cada soporte, hay
+ *               <DataReference> y el rendimiento es un campo editable.
+ *   7. MEDIO  · el coste valoraba litros sueltos. Ahora valora los envases que se compran.
+ *   8. MEDIO  · modo habitación sin huecos ni techo. Ahora tiene los dos campos.
+ *   9. BAJO   · el JSON-LD anunciaba la cifra con 10 % de margen y no existía. Ahora se calcula.
+ *  10. BAJO   · los cuatro botones sin type="button" (CLAUDE.md §5). Ya lo llevan.
  * ══════════════════════════════════════════════════════════════════════════════════════════ */
 
 const RUTA = '/calculadora-pintura/';
 
 /** El panel de resultados, que es el único role="status" de la página. */
 const panel = (page: Page) => page.locator('[role="status"]');
+
+/** El mensaje de entrada rechazada. */
+/**
+ * El aviso de la PROPIA app. Next monta siempre su anunciador de rutas
+ * (`#__next-route-announcer__`), que también declara role="alert", así que un
+ * `[role="alert"]` a secas resuelve a dos elementos y rompe el modo estricto.
+ */
+const aviso = (page: Page) => page.locator('[role="alert"]:not(#__next-route-announcer__)');
 
 /** La cifra grande de litros, con su rótulo. */
 const litros = (page: Page) => panel(page).getByText('de pintura necesarios').locator('..');
@@ -132,8 +129,9 @@ test.describe('CASO 1 en móvil (Pixel 7) — el dormitorio de 4 × 3 × 2,5 m',
     await sembrarValor(page, '#anchoInput', '3');
     // El campo nace con «2.5»: se siembra con la coma española, que también es entrada válida.
     await sembrarValor(page, '#altoInput', '2,5');
-    // Las 2 manos y los 8 €/L son los valores por defecto: sembrarlos no probaría nada.
+    // Las 2 manos, los 12 m²/L y los 8 €/L son los valores por defecto: sembrarlos no probaría nada.
     await expect(page.locator('#numCapasSelect')).toHaveValue('2');
+    await expect(page.locator('#rendimientoInput')).toHaveValue('12');
     await expect(page.locator('#precioLitroInput')).toHaveValue('8');
     await calcular(page);
 
@@ -144,13 +142,15 @@ test.describe('CASO 1 en móvil (Pixel 7) — el dormitorio de 4 × 3 × 2,5 m',
     // ⌈5,9/4⌉ = 2 botes (8 L) y ⌈5,9/15⌉ = 1 bote: el envase INMEDIATAMENTE SUPERIOR en ambos.
     await expect(fila(page, 'Botes de 4L')).toContainText('2 botes');
     await expect(fila(page, 'Botes de 15L')).toContainText('1 bote');
-    // 5,9 L × 8 €/L = 47,20 €
-    await expect(fila(page, 'Coste estimado')).toContainText('47,20 €');
+    // El coste es el de los 2 botes de 4 L —8 L cerrados— a 8 €/L, no el de los 5,9 L sueltos.
+    await expect(fila(page, 'Coste estimado')).toContainText(/64,00\s*€/);
+    await expect(fila(page, 'Coste estimado')).not.toContainText('47,20');
   });
 
   test('CASO 1 · en 412 px la página no desborda a lo ancho', async ({ page }) => {
     await sembrarValor(page, '#largoInput', '4');
     await sembrarValor(page, '#anchoInput', '3');
+    await sembrarValor(page, '#huecosInput', '3,3');
     await calcular(page);
     const ancho = await page.evaluate(() => ({
       scroll: document.documentElement.scrollWidth,
@@ -180,7 +180,9 @@ test.describe('CASO 2 (límite) — la fachada de 1.500 m² a una sola mano, y l
     await expect(fila(page, 'Botes de 4L')).toContainText('32 botes');
     // ⌈125/15⌉ = ⌈8,333⌉ = 9 botes.
     await expect(fila(page, 'Botes de 15L')).toContainText('9 botes');
-    await expect(fila(page, 'Coste estimado')).toContainText('1000,00 €');
+    // 32 × 4 = 128 L comprados × 8 €/L. Con el envase grande serían 135 L, o sea 1.080 €:
+    // el coste que se publica es el de la compra con menos sobrante.
+    await expect(fila(page, 'Coste estimado')).toContainText(/1\.?024,00\s*€/);
   });
 
   test('CASO 2 · por abajo, 0,5 m² siguen siendo 0,1 L y un bote, nunca cero', async ({ page }) => {
@@ -208,32 +210,31 @@ test.describe('CASO 2 (límite) — la fachada de 1.500 m² a una sola mano, y l
   });
 });
 
-/* ── HALLAZGOS ABIERTOS, escritos como TESTIGO ─────────────────────────────────────────────
- * Documentan lo que la app hace HOY. Cuando se reparen, estos bloques fallarán y habrá que
- * invertirlos. NO se corrigen desde el test: el Inspector no repara.
+/* ── LOS 10 HALLAZGOS, ya reparados, escritos como REGRESIÓN ───────────────────────────────
+ * Cada bloque era un TESTIGO de lo que la app hacía mal el 20/09/2026 y ahora exige el
+ * comportamiento correcto, con la cifra vieja nombrada para que se vea qué cambió.
  * ─────────────────────────────────────────────────────────────────────────────────────────*/
-test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
-  test('TESTIGO 1 · «1.500» m² se calculan como 1,5 m²: el millar español se pierde', async ({
-    page,
-  }) => {
+test.describe('REPARACIÓN de los hallazgos del 20/09/2026', () => {
+  test('1 · «1.500» m² son mil quinientos: el millar español entra bien', async ({ page }) => {
     await abrir(page);
     // Es la escritura que el propio CLAUDE.md §2 declara obligatoria para las cifras, y la que
-    // sale sola al teclear una fachada. parseFloat('1.500') = 1,5 y nadie lo dice.
+    // sale sola al teclear una fachada. Antes: parseFloat('1.500') = 1,5 y nadie lo decía.
     await sembrarValor(page, '#metrosCuadradosInput', '1.500');
     await calcular(page);
 
-    // Esperado: 1500 × 2 / 12 = 250,0 L y 63 botes de 4 L. Obtenido, mil veces menos:
-    await expect(fila(page, 'Superficie total')).toContainText('1,5 m²');
-    await expect(litros(page)).toContainText('0,3 L'); // 1,5 × 2 / 12 = 0,25 → 0,3
-    await expect(fila(page, 'Botes de 4L')).toContainText('1 bote');
+    // 1500 × 2 / 12 = 250,0 L y ⌈250/4⌉ = 63 botes de 4 L.
+    await expect(fila(page, 'Superficie total')).toContainText('1500,0 m²');
+    await expect(litros(page)).toContainText('250,0 L');
+    await expect(fila(page, 'Botes de 4L')).toContainText('63 botes');
 
-    // Y con el decimal español detrás, lo mismo: '1.234,56' → parseFloat('1.234.56') = 1,234.
+    // Y con el decimal español detrás: «1.234,56» son mil doscientos treinta y cuatro con 56.
     await sembrarValor(page, '#metrosCuadradosInput', '1.234,56');
     await calcular(page);
-    await expect(fila(page, 'Superficie total')).toContainText('1,2 m²');
+    await expect(fila(page, 'Superficie total')).toContainText('1234,6 m²');
+    await expect(litros(page)).toContainText('205,8 L'); // 1234,56 × 2 / 12 = 205,76 → 205,8
 
-    // Lo que SÍ funciona, y por eso el defecto pasa desapercibido: sin separador de millar
-    // la cifra entra bien, con punto o con coma decimal.
+    // Lo que ya funcionaba antes sigue funcionando: sin separador de millar, con punto o con
+    // coma decimal.
     for (const escritura of ['1500', '2.5', '2,5']) {
       await sembrarValor(page, '#metrosCuadradosInput', escritura);
       await calcular(page);
@@ -243,56 +244,60 @@ test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
     }
   });
 
-  test('TESTIGO 2 · texto, vacío, negativo y cero no se rechazan: sigue en pantalla la cifra anterior', async ({
-    page,
-  }) => {
+  test('2 · texto, vacío, negativo y cero se rechazan y el panel se vacía', async ({ page }) => {
     await abrir(page);
-    await sembrarValor(page, '#metrosCuadradosInput', '45');
-    await calcular(page);
-    await expect(litros(page)).toContainText('7,5 L'); // 45 × 2 / 12
 
-    // `if (m2Total <= 0) return;` — sin estado de error, sin mensaje y sin borrar lo anterior.
-    // El usuario ve «abc» en el campo y «7,5 L» de respuesta, que son de otra pared.
     for (const entrada of ['abc', '-5', '0', '']) {
+      // Se parte siempre de un cálculo válido en pantalla, que es lo que antes se quedaba
+      // publicado bajo una entrada nueva: el usuario veía «abc» en el campo y 7,5 L debajo.
+      await sembrarValor(page, '#metrosCuadradosInput', '45');
+      await calcular(page);
+      await expect(litros(page)).toContainText('7,5 L'); // 45 × 2 / 12
+
       await sembrarValor(page, '#metrosCuadradosInput', entrada);
       await calcular(page);
-      await expect(litros(page)).toContainText('7,5 L');
-      await expect(fila(page, 'Superficie total')).toContainText('45,0 m²');
-      // Y en todo el panel no hay una palabra sobre que la entrada no valga.
-      await expect(panel(page)).not.toContainText(/no vál|inválid|revisa|corrige/i);
+
+      // Se dice en voz alta que no vale, y la cifra anterior desaparece.
+      await expect(aviso(page)).toBeVisible();
+      await expect(aviso(page)).toContainText(/Revisa/i);
+      await expect(panel(page)).not.toContainText('7,5 L');
+      await expect(panel(page)).toContainText('Introduce los datos para calcular');
     }
   });
 
-  test('TESTIGO 3 · «12abc» entra como 12 m²: parseFloat se queda con el prefijo', async ({
-    page,
-  }) => {
+  test('3 · «12abc» no es un número y se rechaza', async ({ page }) => {
     await abrir(page);
     await sembrarValor(page, '#metrosCuadradosInput', '12abc');
     await calcular(page);
-    // Esperado: rechazo. Obtenido: 12 m² y una cifra de compra con toda naturalidad.
-    await expect(fila(page, 'Superficie total')).toContainText('12,0 m²');
-    await expect(litros(page)).toContainText('2,0 L'); // 12 × 2 / 12
+    // Antes: parseFloat se quedaba con el prefijo y publicaba «12,0 m²» y 2,0 L.
+    await expect(aviso(page)).toContainText(/Revisa/i);
+    await expect(panel(page)).not.toContainText('m²');
+    await expect(panel(page)).toContainText('Introduce los datos para calcular');
   });
 
-  test('TESTIGO 4 · un largo NEGATIVO da una superficie positiva y se calcula', async ({
+  test('4 · un largo NEGATIVO se rechaza por sí mismo, sin esperar al perímetro', async ({
     page,
   }) => {
     await abrirModoHabitacion(page);
-    // 2 × (−1 + 5) × 2,5 = 20 m². La suma del perímetro tapa el signo: la guarda `m² ≤ 0` no
-    // llega a enterarse, así que una medida imposible se convierte en un supuesto válido.
+    // Antes: 2 × (−1 + 5) × 2,5 = 20 m². La suma del perímetro tapaba el signo y una medida
+    // imposible se convertía en un supuesto válido de 3,4 L y 27,20 €.
     await sembrarValor(page, '#largoInput', '-1');
     await sembrarValor(page, '#anchoInput', '5');
     await sembrarValor(page, '#altoInput', '2,5');
     await calcular(page);
 
-    await expect(fila(page, 'Superficie total')).toContainText('20,0 m²');
-    await expect(litros(page)).toContainText('3,4 L'); // 20 × 2 / 12 = 3,333… → 3,4
-    await expect(fila(page, 'Coste estimado')).toContainText('27,20 €');
+    await expect(aviso(page)).toContainText(/largo/i);
+    await expect(panel(page)).not.toContainText('20,0 m²');
+    await expect(panel(page)).toContainText('Introduce los datos para calcular');
+
+    // Corregida la medida, la misma habitación sí calcula: 2 × (1 + 5) × 2,5 = 30 m².
+    await sembrarValor(page, '#largoInput', '1');
+    await calcular(page);
+    await expect(fila(page, 'Superficie total')).toContainText('30,0 m²');
+    await expect(aviso(page)).toHaveCount(0);
   });
 
-  test('TESTIGO 5 · el gotelé cuesta +50 %, no el «20 % a 40 %» que promete la FAQ', async ({
-    page,
-  }) => {
+  test('5 · el gotelé cuesta +50 % y el texto de la app dice eso mismo', async ({ page }) => {
     await abrir(page);
     await sembrarValor(page, '#metrosCuadradosInput', '45');
 
@@ -306,101 +311,127 @@ test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
     await expect(litros(page)).toContainText('11,3 L'); // 45 × 2 / 8 = 11,25 → 11,3
     const conGotele = aLitros(await litros(page).innerText());
 
-    // El motor aplica 12/8 = 1,5 exacto. La FAQ dice «entre un 20% y 40%» y el paso 2 de la
-    // guía dice «hasta el doble». Una décima de tolerancia basta y sobra para discriminar
-    // entre 1,4 (el techo prometido), 1,5 (lo que hace) y 2,0 (lo que anuncia el paso 2).
+    // El motor aplica 12/8 = 1,5 exacto, que es lo que ahora prometen la FAQ y la guía.
     expect(conGotele / conLisa).toBeCloseTo(1.5, 1);
-    expect(conGotele / conLisa).toBeGreaterThan(1.4);
 
-    // Y «hasta el doble» es en realidad lo que hace la superficie POROSA: 12 → 6.
+    // «Hasta el doble» es lo que hace la superficie POROSA: 12 → 6.
     await page.locator('#tipoSuperficieSelect').selectOption('porosa');
     await calcular(page);
     await expect(litros(page)).toContainText('15,0 L'); // 45 × 2 / 6 = exactamente el doble
+
+    // Y el bloque educativo ya no da tres cifras distintas para el mismo factor.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const cuerpo = page.locator('body');
+    await expect(cuerpo).toContainText('50% más');
+    await expect(cuerpo).not.toContainText('entre un 20% y 40%');
+    await expect(cuerpo).not.toContainText('hasta el doble de pintura que una lisa');
   });
 
-  test('TESTIGO 6 · los rendimientos son cuatro números sin fuente, y el de la pared lisa es el extremo optimista', async ({
+  test('6 · los rendimientos declaran su rango, su origen y se pueden cambiar', async ({
     page,
   }) => {
     await abrir(page);
-    // Los cuatro valores se publican en el propio selector, que es lo bueno que tiene...
+    // El selector publica el RANGO de cada soporte, no un único número optimista.
     const opciones = await page.locator('#tipoSuperficieSelect option').allInnerTexts();
     expect(opciones).toEqual([
-      'Pared lisa, yeso o pladur (~12 m²/L)',
-      'Gotelé o textura media (~8 m²/L)',
-      'Ladrillo visto o estuco (~7 m²/L)',
-      'Hormigón o superficie muy absorbente (~6 m²/L)',
+      'Pared lisa, yeso o pladur (10–12 m²/L)',
+      'Gotelé o textura media (7–8 m²/L)',
+      'Ladrillo visto o estuco (6–7 m²/L)',
+      'Hormigón o superficie muy absorbente (5–6 m²/L)',
     ]);
-    // ...pero en ninguna parte de la página se dice de DÓNDE salen ni a qué fecha responden.
-    await expect(page.locator('body')).not.toContainText(/Fuente:|según la norma|ficha técnica/i);
 
-    // Y 12 m²/L es el techo de la propia tabla de la app para una plástica mate (10–12 m²/L).
-    // Con el suelo de esa misma tabla, los 35 m² a dos manos serían 35×2/10 = 7,0 L en vez de
-    // 5,9 L: más de un cuarto de bote de diferencia, y no hay forma de introducirlo porque el
-    // tipo de PINTURA no es un campo de la calculadora.
+    // Y la página dice de dónde salen y a qué fecha responden (<DataReference>).
+    const cuerpo = page.locator('body');
+    await expect(cuerpo).toContainText('Datos de referencia');
+    await expect(cuerpo).toContainText('Normativa aplicada:');
+    await expect(cuerpo).toContainText('Última verificación:');
+    await expect(cuerpo).toContainText('ficha técnica');
+
+    // 12 m²/L es el extremo favorable del rango, así que el panel publica también los litros
+    // del extremo bajo: 35 × 2 / 10 = 7,0 L frente a los 5,9 L de la cuenta principal.
     await sembrarValor(page, '#metrosCuadradosInput', '35');
     await calcular(page);
     await expect(litros(page)).toContainText('5,9 L');
+    await expect(fila(page, 'Rendimiento aplicado')).toContainText('12,0 m²/L');
+    await expect(fila(page, 'Si la pintura rinde menos')).toContainText('7,0 L');
+
+    // Y el rendimiento es un campo: el de la ficha técnica del bote manda sobre el supuesto.
     const etiquetas = await page.locator('label').allInnerTexts();
-    expect(etiquetas.join(' | ')).not.toMatch(/tipo de pintura|acabado|mate|satinad/i);
+    expect(etiquetas).toContain('Rendimiento de la pintura (m²/L)');
+    await sembrarValor(page, '#rendimientoInput', '10');
+    await calcular(page);
+    await expect(litros(page)).toContainText('7,0 L');
   });
 
-  test('TESTIGO 7 · el «Coste estimado» valora litros sueltos, no los botes que manda comprar', async ({
-    page,
-  }) => {
+  test('7 · el «Coste estimado» valora los botes que hay que comprar', async ({ page }) => {
     await abrir(page);
     await sembrarValor(page, '#metrosCuadradosInput', '35');
     await calcular(page);
 
-    // La app dice, en el mismo panel y a dos líneas de distancia: «2 botes de 4L» y «47,20 €».
-    // Los 2 botes son 8 L, que a 8 €/L son 64,00 €: el presupuesto se queda un 26 % corto,
-    // porque la pintura no se vende por litros sueltos. Y eso antes del 10 % extra que la
-    // propia app aconseja comprar justo debajo.
+    // 2 botes de 4 L son 8 L cerrados: a 8 €/L, 64,00 €. Antes se publicaban 47,20 € (5,9 × 8),
+    // un 26 % por debajo de lo que se va a pagar, con «2 botes» dos líneas más arriba.
     await expect(fila(page, 'Botes de 4L')).toContainText('2 botes');
-    await expect(fila(page, 'Coste estimado')).toContainText('47,20 €'); // 5,9 × 8
-    await expect(fila(page, 'Coste estimado')).not.toContainText('64,00 €');
+    await expect(fila(page, 'Coste estimado')).toContainText(/64,00\s*€/);
+    await expect(fila(page, 'Coste estimado')).not.toContainText('47,20');
+    // Y se dice sobre qué envase se ha valorado, porque el de 15 L costaría 120,00 €.
+    await expect(fila(page, 'Coste estimado')).toContainText('2 botes de 4 L');
+    await expect(fila(page, 'Botes de 15L')).toContainText(/120,00\s*€/);
   });
 
-  test('TESTIGO 8 · en modo habitación no hay huecos ni techo, y la cifra se llama «Superficie total»', async ({
+  test('8 · el modo habitación descuenta huecos e incluye el techo si se le pide', async ({
     page,
   }) => {
     await abrirModoHabitacion(page);
-    // Los campos son exactamente seis, y ninguno pregunta por una puerta, una ventana ni el techo.
+    // Los campos del modo habitación, con los dos que faltaban.
     const etiquetas = await page.locator('label').allInnerTexts();
     expect(etiquetas).toEqual([
       'Largo (m)',
       'Ancho (m)',
       'Alto (m)',
+      'Puertas y ventanas a descontar (m²)',
+      'Incluir el techo (largo × ancho)',
       'Número de capas',
       'Tipo de superficie',
+      'Rendimiento de la pintura (m²/L)',
       'Precio por litro (opcional)',
     ]);
 
     await sembrarValor(page, '#largoInput', '4');
     await sembrarValor(page, '#anchoInput', '3');
     await calcular(page);
-    // 35,0 m² son solo las cuatro paredes: el techo (4 × 3 = 12 m²) no está, y con una puerta
-    // de 1,8 m² y una ventana de 1,5 —las medidas que da la propia FAQ de la app— la pared
-    // real serían 31,7 m² y 5,3 L, no 5,9. El rótulo, aun así, dice «Superficie total».
     await expect(fila(page, 'Superficie total')).toContainText('35,0 m²');
-    // El consejo que sí aparece manda hacer a mano lo que la herramienta no ofrece.
-    await expect(panel(page)).toContainText('Resta puertas y ventanas si no las vas a pintar');
+
+    // Una puerta de 1,8 m² y una ventana de 1,5 —las medidas que da la propia FAQ de la app—
+    // son 3,3 m² menos: 31,7 m² y 5,3 L (31,7 × 2 / 12 = 5,2833… → 5,3).
+    await sembrarValor(page, '#huecosInput', '3,3');
+    await calcular(page);
+    await expect(fila(page, 'Superficie total')).toContainText('31,7 m²');
+    await expect(litros(page)).toContainText('5,3 L');
+
+    // Y el techo (4 × 3 = 12 m²) entra cuando se marca: 31,7 + 12 = 43,7 m² → 7,3 L.
+    await page.locator('#techoInput').check();
+    await calcular(page);
+    await expect(fila(page, 'Superficie total')).toContainText('43,7 m²');
+    await expect(litros(page)).toContainText('7,3 L');
+    // El rótulo «Superficie total» ya no promete lo que no hacía: el desglose lo explica.
+    await expect(fila(page, 'Superficie total')).toContainText('techo');
+    await expect(fila(page, 'Superficie total')).toContainText('huecos');
   });
 
-  test('TESTIGO 9 · no hay ninguna cifra con el 10 % de margen que anuncia el JSON-LD', async ({
+  test('9 · la cifra con el 10 % de margen que anuncia el JSON-LD existe en pantalla', async ({
     page,
   }) => {
     await abrir(page);
     await sembrarValor(page, '#metrosCuadradosInput', '35');
     await calcular(page);
 
-    // metadata.ts enumera entre las características «Sugerencia de litros a comprar con margen
-    // del 10% para repasos». En pantalla solo hay un consejo de texto: el 10 % de 5,9 L serían
-    // 6,5 L, y esa cifra no se calcula en ninguna parte.
-    await expect(panel(page)).toContainText('Compra un 10% extra para retoques y reserva');
-    await expect(panel(page)).not.toContainText('6,5 L');
+    // metadata.ts enumera entre las características la «sugerencia de litros a comprar con
+    // margen del 10% para repasos»: 5,9 × 1,10 = 6,49 → 6,5 L, y ahora se calcula.
+    await expect(panel(page)).toContainText('6,5 L');
+    await expect(panel(page)).toContainText('10 % de reserva');
   });
 
-  test('TESTIGO 10 · el resultado no caduca al cambiar la superficie, y los botones no llevan type', async ({
+  test('10 · el resultado caduca al cambiar la superficie, y los botones llevan type', async ({
     page,
   }) => {
     await abrir(page);
@@ -408,19 +439,19 @@ test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
     await calcular(page);
     await expect(litros(page)).toContainText('7,5 L');
 
-    // Se corrige la medición a 90 m²: la respuesta correcta pasa a 15,0 L y la pantalla sigue
-    // publicando 7,5 L sin ninguna marca de que ya no vale.
+    // Se corrige la medición a 90 m²: la cifra en pantalla ya no corresponde, y se dice.
     await sembrarValor(page, '#metrosCuadradosInput', '90');
-    await expect(litros(page)).toContainText('7,5 L');
-    await expect(fila(page, 'Superficie total')).toContainText('45,0 m²');
-    await expect(page.locator('body')).not.toContainText(/recalcul|obsolet|desactualiz/i);
+    await expect(panel(page)).toContainText(/recalcul/i);
+    await calcular(page);
+    await expect(litros(page)).toContainText('15,0 L'); // 90 × 2 / 12
+    await expect(panel(page)).not.toContainText(/recalcul/i);
 
-    // CLAUDE.md §5: todo <button> lleva type="button". Los cuatro de la app, no.
+    // CLAUDE.md §5: todo <button> lleva type="button". Los cuatro de la app, también.
     for (const nombre of ['Por m² directos', 'Por habitación', 'Calcular', 'Limpiar']) {
       const boton = page.getByRole('button', { name: nombre });
-      expect(await boton.getAttribute('type'), `botón «${nombre}»`).toBeNull();
+      expect(await boton.getAttribute('type'), `botón «${nombre}»`).toBe('button');
     }
-    // Los dos del selector de modo sí declaran su estado, que es lo que pide la misma regla.
+    // Los dos del selector de modo siguen declarando su estado, que pide la misma regla.
     await expect(page.getByRole('button', { name: 'Por m² directos' })).toHaveAttribute(
       'aria-pressed',
       'true',

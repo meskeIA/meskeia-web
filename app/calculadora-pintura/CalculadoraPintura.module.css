@@ -217,7 +217,9 @@
 .detalleItem {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
   padding: 12px 15px;
   background: var(--bg-primary);
   border-radius: 8px;
@@ -232,6 +234,17 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
+  text-align: right;
+  min-width: 0;
+}
+
+/* Segunda línea de una fila: el desglose que explica de dónde sale la cifra */
+.detalleNota {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
 }
 
 /* Consejos */
@@ -597,4 +610,89 @@
   .btnSecondary {
     flex: none;
   }
+
+  .detalleValor {
+    text-align: left;
+  }
+}
+
+/* ===== Entradas auxiliares ===== */
+
+/* Pista bajo un campo: qué se espera ahí y de dónde sale el valor por defecto */
+.hint {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex: none;
+}
+
+.checkboxGroup label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+/* ===== Aviso de entrada rechazada ===== */
+.errorMsg {
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid var(--error);
+  color: var(--error);
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/* ===== Resultado ===== */
+
+/* La cifra que de verdad se compra: la exacta más el 10 % de reserva */
+.resultadoMargen {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.resultadoMargen strong {
+  color: var(--text-primary);
+}
+
+/* El resultado ya no corresponde a lo que hay en los campos */
+.avisoCaducado {
+  background: rgba(255, 152, 0, 0.12);
+  border: 1px solid var(--warning);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.contenidoCaducado {
+  opacity: 0.55;
+}
+
+/* Nota al pie de la tabla de rendimientos */
+.tableNota {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
 }

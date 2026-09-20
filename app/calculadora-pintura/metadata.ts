@@ -41,10 +41,12 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
       "Dos modos: por metros cuadrados directos o por dimensiones de habitación (largo × ancho × alto)",
-      "4 tipos de superficie con rendimiento diferenciado: lisa (12 m²/L), gotelé (8), rugosa (7) y porosa (6)",
+      "Descuento de puertas y ventanas y casilla para incluir el techo en el modo por habitación",
+      "4 tipos de superficie con su rango de rendimiento: lisa (10–12 m²/L), gotelé (7–8), rugosa (6–7) y porosa (5–6)",
+      "Rendimiento editable en m²/L para introducir el de la ficha técnica de tu pintura",
       "Selector de número de capas (1, 2 o 3) con ajuste automático de la cantidad",
-      "Campo opcional de precio por litro para calcular el coste total del proyecto",
-      "Sugerencia de litros a comprar con margen del 10% para repasos",
+      "Campo opcional de precio por litro, con el coste calculado sobre los botes cerrados que hay que comprar",
+      "Cifra de litros a comprar con margen del 10% para repasos, calculada en pantalla",
       "Gratuito, sin registro ni instalación",
   ],
 });
