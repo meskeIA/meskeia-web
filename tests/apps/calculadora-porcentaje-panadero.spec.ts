@@ -271,6 +271,8 @@ test.describe('Inspector 20/09/2026 — la aritmética del porcentaje del panade
     page,
   }) => {
     await page.getByRole('button', { name: 'Por peso final de masa' }).click();
+    // El cambio de modo convierte la receta que hubiera (desde el 20/09/2026 ya no la borra),
+    // así que el peso final llega en 1.673 g; aquí se fija el del caso.
     await sembrarValor(page, '#harina', '1200'); // aquí el campo es el PESO FINAL de masa
     await sembrarValor(page, valorDeFila(page, 0), '100'); // Agua — hidratación extrema
     await sembrarValor(page, valorDeFila(page, 1), '2,2'); // Sal
@@ -312,36 +314,47 @@ test.describe('Inspector 20/09/2026 — la aritmética del porcentaje del panade
   });
 });
 
-/* ── HALLAZGOS ABIERTOS, escritos como TESTIGO ─────────────────────────────────────────────
- * Documentan lo que la app hace HOY. Cuando se reparen, estos bloques fallarán y habrá que
- * invertirlos. NO se corrigen desde el test: el Inspector no repara.
+/* ── LOS NUEVE HALLAZGOS, YA REPARADOS (20/09/2026) ────────────────────────────────────────
+ * Estos bloques nacieron como TESTIGOS: documentaban lo que la app hacía mal y por eso
+ * afirmaban lo contrario de lo que se lee ahora. Al repararse, cada uno se ha invertido para
+ * exigir el comportamiento bueno, con el caso y la cuenta a mano intactos — que es lo que
+ * convierte un testigo en una prueba de regresión.
  * ─────────────────────────────────────────────────────────────────────────────────────────*/
-test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
+test.describe('Reparación del 20/09/2026 — la vista ya no publica lo que no puede sostener', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#harina']);
   });
 
-  test('TESTIGO · el resultado se queda obsoleto sin decirlo al cambiar un ingrediente', async ({
+  test('El resultado SIGUE al formulario: subir el agua recalcula sin volver a pulsar', async ({
     page,
   }) => {
     await sembrarValor(page, '#harina', '1200');
     await sembrarValor(page, valorDeFila(page, 0), '840');
     await calcular(page);
     await expect(page.getByRole('note')).toContainText('70,0 %'); // 840/1200
+    // 2.063 g = 1.200 harina + 840 agua + 20 sal + 3 levadura (los dos últimos, por defecto).
+    await expect(pesoTotalAnunciado(page)).toContainText('2063 g');
 
-    // Ahora el panadero sube el agua a 1.080 g: la hidratación real pasa a 90,0 % y la masa
-    // a 2.316 g. Sin volver a pulsar «Calcular», la pantalla sigue publicando lo anterior.
+    // El panadero sube el agua a 1.080 g. SIN volver a pulsar «Calcular», la pantalla pasa a
+    // 1080/1200 = 90,0 % y a 1.200 + 1.080 + 20 + 3 = 2.303 g: nunca hay una cifra vieja con
+    // aspecto de fresca, que era el fallo que más tiempo costaba (790 s de estancia media).
     await sembrarValor(page, valorDeFila(page, 0), '1080');
-    await expect(page.getByRole('note')).toContainText('70,0 %'); // ← debería avisar de que ya no vale
-    // 2.063 g = 1.200 harina + 840 agua + 20 sal + 3 levadura: aquí NO se siembran sal ni
-    // levadura, que se quedan en los valores por defecto del formulario.
-    await expect(pesoTotalAnunciado(page)).toContainText('2063 g'); // ← lo correcto sería 2.303 g
-    // Y no hay ninguna marca de resultado caducado en toda la página.
-    await expect(page.getByText(/recalcul|obsolet|desactualiz/i)).toHaveCount(0);
+    await expect(page.getByRole('note')).toContainText('90,0 %');
+    await expect(pesoTotalAnunciado(page)).toContainText('2303 g');
+
+    // Y cuando lo escrito NO se puede calcular, el resultado que queda en pantalla se marca
+    // como lo que es —el de los valores anteriores— en vez de seguir callado.
+    await sembrarValor(page, '#harina', '0');
+    await expect(
+      page.locator('[role="status"]').filter({ hasText: /desactualizado/i }),
+    ).toHaveCount(1);
+    await expect(avisoDeLaApp(page)).toContainText('Introduce un peso de harina válido');
   });
 
-  test('TESTIGO · cambiar de modo borra la receta tecleada, sin confirmación', async ({ page }) => {
+  test('Cambiar de modo CONVIERTE la receta, y la vuelta devuelve los mismos gramos', async ({
+    page,
+  }) => {
     await sembrarValor(page, '#harina', '1200');
     await sembrarValor(page, valorDeFila(page, 0), '840');
     await page.getByRole('button', { name: '+ Añadir ingrediente' }).click();
@@ -351,14 +364,32 @@ test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
 
     await page.getByRole('button', { name: 'Por peso final de masa' }).click();
 
-    // La fila añadida desaparece y las tres que quedan vuelven a los valores de ejemplo,
-    // aunque la app acababa de calcular los porcentajes con los que podría haberlas rellenado.
-    await expect(page.getByRole('listitem')).toHaveCount(3);
-    await expect(page.locator('#harina')).toHaveValue('1000');
-    await expect(valorDeFila(page, 0)).toHaveValue('65');
+    // No se pierde ninguna fila, y los gramos pasan a porcentajes sobre la harina:
+    //   masa = 1.200 + 840 + 20 + 3 + 50 = 2.113 g
+    //   agua 840/1200 = 70 %  ·  sal 20/1200 = 1,67 %  ·  levadura 3/1200 = 0,25 %
+    //   aceite 50/1200 = 4,17 %
+    await expect(page.getByRole('listitem')).toHaveCount(4);
+    await expect(page.locator('#harina')).toHaveValue('2113');
+    await expect(valorDeFila(page, 0)).toHaveValue('70');
+    await expect(valorDeFila(page, 1)).toHaveValue('1,67');
+    await expect(valorDeFila(page, 2)).toHaveValue('0,25');
+    await expect(valorDeFila(page, 3)).toHaveValue('4,17');
+    await expect(nombreDeFila(page, 3)).toHaveValue('Aceite de oliva');
+    await expect(
+      page.locator('[role="status"]').filter({ hasText: /convertida/i }),
+    ).toHaveCount(1);
+
+    // Y a la vuelta se recupera la receta de partida, gramo a gramo: Σ % = 76,09 →
+    // harina = 2113 / 1,7609 = 1.199,95 → 1.200 g, y de ahí 840 / 20 / 3 / 50.
+    await page.getByRole('button', { name: 'Por gramos' }).click();
+    await expect(page.locator('#harina')).toHaveValue('1200');
+    await expect(valorDeFila(page, 0)).toHaveValue('840');
+    await expect(valorDeFila(page, 1)).toHaveValue('20');
+    await expect(valorDeFila(page, 2)).toHaveValue('3');
+    await expect(valorDeFila(page, 3)).toHaveValue('50');
   });
 
-  test('TESTIGO · con la fórmula imposible sigue publicando agua NEGATIVA en la balanza', async ({
+  test('Con la fórmula imposible NO se publica agua negativa: se suprime la fila', async ({
     page,
   }) => {
     // Modo inverso: se declara un 20 % de agua total, pero un 60 % de masa madre al 100 %
@@ -366,6 +397,9 @@ test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
     // A mano: harina 1000/1,22 = 820 g · agua 164 g · masa madre 492 g = 246 harina + 246 agua
     //         → agua a pesar = 164 − 246 = −82 g   ·   −82 / (820 − 246) = −14,3 %
     await page.getByRole('button', { name: 'Por peso final de masa' }).click();
+    // Cambiar de modo ya no borra: convierte la receta por defecto (1.000 + 650 + 20 + 3 g),
+    // así que el peso final llega convertido en 1.673 g y aquí se fija el del caso.
+    await sembrarValor(page, '#harina', '1000');
     await sembrarValor(page, valorDeFila(page, 0), '20'); // Agua, en %
     await sembrarValor(page, nombreDeFila(page, 2), 'Masa madre'); // se marca sola como prefermento
     await sembrarValor(page, valorDeFila(page, 2), '60');
@@ -373,31 +407,44 @@ test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
 
     // El aviso está, y es correcto...
     await expect(avisoDeLaApp(page)).toContainText('no queda nada que pesar aparte');
-    // ...pero debajo la lista de la balanza sigue mandando pesar −82 g de agua, y la nota
-    // remata con una hidratación negativa. Lo correcto sería suprimir esas dos cifras.
+    // ...y debajo ya no hay ninguna cifra negativa: ni la fila de agua de la balanza ni la
+    // nota de hidratación, porque una cantidad negativa no es una cantidad. Lo que sí queda
+    // es lo que sí se puede pesar: 820 − 246 = 574 g de harina y los 492 g de masa madre.
     const balanza = page.getByRole('region', { name: 'Lo que se pesa en la balanza' });
-    await expect(balanza.getByRole('row', { name: /Agua/ })).toContainText('-82 g');
-    await expect(page.getByRole('note')).toContainText('-14,3 %');
+    // El emoji de cada fila va con aria-hidden, así que el nombre accesible es «Agua …»; la
+    // fila del prefermento dice «246 g agua» en minúscula y no la pesca esta expresión.
+    await expect(balanza.getByRole('row', { name: /Agua/ })).toHaveCount(0);
+    await expect(balanza.getByText(/-\d/)).toHaveCount(0);
+    await expect(balanza.getByRole('row', { name: /Harina/ })).toContainText('574 g');
+    await expect(balanza.getByRole('row', { name: /Masa madre/ })).toContainText(
+      '246 g harina + 246 g agua',
+    );
+    await expect(page.getByRole('note')).toHaveCount(0);
   });
 
-  test('TESTIGO · el levado se extrapola fuera del rango en el que el propio motor dice que vale', async ({
-    page,
-  }) => {
+  test('El levado NO se extrapola fuera de 4-32 °C, y se explica por qué', async ({ page }) => {
     await page.getByRole('button', { name: /Cuánto va a tardar en fermentar/ }).click();
-    // 2 h pensadas para 24 °C, levando a 45 °C: factor 2^((24−45)/10) = 0,23 → 28 min.
-    // La cuenta es la del Q10, pero a 45 °C la levadura no fermenta más rápido: se muere.
-    // ajustarRangoFermentacion, en el MISMO fichero del motor, se niega a extrapolar fuera de
-    // TEMP_MODELO_MIN = 4 y TEMP_MODELO_MAX = 32 por esta razón exacta; esta vista no lo usa.
+    // 2 h pensadas para 24 °C, levando a 45 °C: el Q10 daría factor 0,23 → 28 min, pero a
+    // 45 °C la levadura no fermenta más rápido: se muere. El motor devuelve null y la vista
+    // lo DICE, que es lo que distingue una negativa de un hueco vacío por un fallo.
     await sembrarValor(page, '#ferm-temp-real', '45');
-    await expect(page.locator('#paso-fermentacion')).toContainText('28 min');
-    await expect(page.locator('#paso-fermentacion')).toContainText('0,23');
+    const paso = page.locator('#paso-fermentacion');
+    await expect(paso).toContainText('Aquí no se puede estimar');
+    await expect(paso).toContainText('4 y 32 °C');
+    await expect(paso).toContainText('se estresa');
+    await expect(paso).not.toContainText('28 min');
 
     // Y por el otro extremo: a −18 °C la masa está congelada, no levando en 36 h 46 min.
     await sembrarValor(page, '#ferm-temp-real', '-18');
-    await expect(page.locator('#paso-fermentacion')).toContainText('36 h 46 min');
+    await expect(paso).toContainText('casi parada');
+    await expect(paso).not.toContainText('36 h 46 min');
+
+    // Dentro del rango la cifra sigue saliendo: 2 h a 22 °C pensadas para 24 °C → ×1,15.
+    await sembrarValor(page, '#ferm-temp-real', '22');
+    await expect(paso).toContainText('2 h 18 min');
   });
 
-  test('TESTIGO · un ingrediente con peso pero sin nombre se descuenta en silencio', async ({
+  test('Un ingrediente con peso pero SIN NOMBRE se rechaza, como el mismo hueco en la harina', async ({
     page,
   }) => {
     await sembrarValor(page, '#harina', '1200');
@@ -406,10 +453,77 @@ test.describe('TESTIGOS de los hallazgos del 20/09/2026', () => {
     await sembrarValor(page, valorDeFila(page, 3), '100'); // 100 g de algo, sin nombre
     await calcular(page);
 
-    // Los 100 g no entran en el peso de la masa (2.063 en vez de 2.163) y no se avisa de que
-    // se han descartado, mientras que el mismo hueco en el campo de harina SÍ se rechaza.
-    // 2.063 g = 1.200 harina + 840 agua + 20 sal + 3 levadura (los dos últimos, por defecto).
-    await expect(pesoTotalAnunciado(page)).toContainText('2063 g');
-    await expect(avisoDeLaApp(page)).toHaveCount(0);
+    // Ni se descuentan en silencio ni se cuelan: se dice que falta el nombre y no se publica
+    // ninguna tabla, igual que cuando el hueco está en el campo de harina.
+    await expect(avisoDeLaApp(page)).toContainText('sin nombre');
+    await expect(
+      page.getByRole('region', { name: 'Tabla de porcentajes del panadero' }),
+    ).toHaveCount(0);
+
+    // Y en cuanto tiene nombre, los 100 g entran: 1.200 + 840 + 20 + 3 + 100 = 2.163 g.
+    await sembrarValor(page, nombreDeFila(page, 3), 'Aceite');
+    await expect(pesoTotalAnunciado(page)).toContainText('2163 g');
+  });
+
+  test('Un peso ILEGIBLE se rechaza en vez de convertirse en 0 g', async ({ page }) => {
+    // La harina se queda en los 1.000 g por defecto: sembrar el valor que el campo YA tiene
+    // es justo lo que ningún testigo puede detectar (ver la cabecera de _hidratacion.ts).
+    await sembrarValor(page, valorDeFila(page, 0), 'setecientos');
+    await calcular(page);
+
+    // Antes salía «Agua 0 g · 0,0 %», hidratación «—» y peso total 1.030 g sin un solo aviso,
+    // mientras el mismo texto en el campo de harina sí se rechazaba.
+    await expect(avisoDeLaApp(page)).toContainText('no es un número');
+    await expect(
+      page.getByRole('region', { name: 'Tabla de porcentajes del panadero' }),
+    ).toHaveCount(0);
+  });
+
+  test('El DDT no publica un agua que no se puede verter', async ({ page }) => {
+    await page.getByRole('button', { name: /A qué temperatura pongo el agua/ }).click();
+    const paso = page.locator('#paso-ddt');
+    // Caso normal: objetivo 24 °C, cocina 22 °C, harina a temperatura de cocina, a mano →
+    // 24 × 3 − 22 − 22 − 0 = 28,0 °C. La cifra sale, porque existe.
+    await expect(paso).toContainText('28,0 °C');
+
+    // Caso imposible: cocina a 35 °C y Thermomix (+12) → 24 × 3 − 35 − 35 − 12 = −10 °C.
+    // No hay agua líquida a −10 °C: no se publica la cifra, se dice que no se puede.
+    await sembrarValor(page, '#ddt-ambiente', '35');
+    await page.locator('#ddt-amasado').selectOption('thermomix');
+    await expect(paso).toContainText('no se puede conseguir');
+    await expect(paso).toContainText('hielo');
+    await expect(paso).not.toContainText('-10,0 °C');
+    await expect(paso).not.toContainText('−10,0 °C');
+  });
+
+  test('Con gramos decimales las filas SUMAN el total anunciado', async ({ page }) => {
+    // 1.000,4 + 700,4 + 20,4 + 10,4 = 1.731,6 g → el total redondea a 1.732 y los dos gramos
+    // que faltan se reparten entre las filas. Antes cada fila redondeaba por su cuenta y la
+    // tabla sumaba 1.730 bajo un total de 1.732: dos gramos que no estaban en ninguna parte.
+    await sembrarValor(page, '#harina', '1000,4');
+    await sembrarValor(page, valorDeFila(page, 0), '700,4');
+    await sembrarValor(page, valorDeFila(page, 1), '20,4');
+    await sembrarValor(page, valorDeFila(page, 2), '10,4');
+    await calcular(page);
+
+    await expect(pesoTotalAnunciado(page)).toContainText('1732 g');
+    expect(await sumarGramosMostrados(page)).toBe(1732);
+  });
+
+  test('Las hidrataciones del JSON-LD son las MISMAS que las de la tabla visible', async ({
+    page,
+  }) => {
+    // El FAQPage es lo que consumen Bing Copilot, ChatGPT y Perplexity para fundamentar sus
+    // respuestas: si contradice a la tabla, la app responde una cosa al lector y otra a la IA.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find(b => b.includes('FAQPage')) ?? '';
+    expect(faq).not.toBe('');
+
+    for (const rango of ['60–65%', '65–68%', '75–80%']) {
+      expect(faq).toContain(rango); // los de la tabla de la página
+    }
+    for (const viejo of ['65–70%', '68–75%', '80–90%']) {
+      expect(faq).not.toContain(viejo); // los que contradecían a la tabla
+    }
   });
 });

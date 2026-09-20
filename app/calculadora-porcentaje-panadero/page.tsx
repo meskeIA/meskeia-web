@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, type KeyboardEvent } from 'react';
 import styles from './CalculadoraPorcentajePanadero.module.css';
 import {
   MeskeiaLogo,
@@ -17,12 +17,16 @@ import {
   calcularBakersPercentage,
   calcularBakersPercentageDesdePeso,
   calcularDDT,
+  type IngredienteBaker,
   type ResultadoBakersPercentage,
   type TipoAmasadora,
 } from '@/lib/calculadoras/cocina';
 import {
   ajustarFermentacion,
+  dentroDelModelo,
   formatearTiempo,
+  TEMP_MODELO_MAX,
+  TEMP_MODELO_MIN,
 } from '@/lib/calculadoras/fermentacionTemperatura';
 
 interface OtroIngrediente {
@@ -64,13 +68,11 @@ const INGREDIENTES_POR_GRAMOS: OtroIngrediente[] = [
   nuevoIngrediente(3, 'Levadura', '3'),
 ];
 
-// Modo 'porcentaje': se parte de los porcentajes de la fórmula y de un peso final de masa
-// (un molde, una bandeja) y se obtienen los gramos — el camino inverso al de arriba.
-const INGREDIENTES_POR_PORCENTAJE: OtroIngrediente[] = [
-  nuevoIngrediente(1, 'Agua', '65'),
-  nuevoIngrediente(2, 'Sal', '2'),
-  nuevoIngrediente(3, 'Levadura', '0,3'),
-];
+// El modo 'porcentaje' hace el camino inverso: se parte de los porcentajes de la fórmula y de
+// un peso final de masa (un molde, una bandeja) y se obtienen los gramos. No tiene lista de
+// ejemplo propia porque ya no hace falta: al cambiar de modo se CONVIERTE la receta que haya
+// en pantalla, y convertir la de arriba da exactamente 65 % de agua, 2 % de sal y 0,3 % de
+// levadura, que es la que estaba escrita a mano aquí.
 
 // Los dos pasos que vienen justo después de tener la fórmula: a qué temperatura poner el agua
 // y cuánto va a tardar en fermentar hoy. El cálculo NO se reimplementa aquí: son los mismos
@@ -90,6 +92,224 @@ function leerNumero(valor: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+// El mismo criterio de «esto es agua» que usa el motor (cocina.ts), para que la tabla no
+// vuelva a listar aparte una fila que el cálculo ya ha contado como agua.
+const ES_AGUA = /agua|water|h2o/i;
+
+// Los campos del formulario se rellenan sin separador de millar («2113», no «2.113»): es lo
+// que se teclearía a mano, y así no hay que fiarse de cómo se lee un punto suelto.
+const gramosACampo = (gramos: number): string => String(Math.round(gramos));
+
+// Un porcentaje para un campo del formulario: «70», «1,8», «0,25». Coma decimal y sin ceros
+// de adorno. Dos decimales, no uno: la levadura de una receta corriente está en 0,25 % y
+// redondearla a 0,3 % devolvería a la masa un tercio más de levadura al convertir de vuelta.
+const pctACampo = (pct: number): string => {
+  const r = Math.round(pct * 100) / 100;
+  if (Number.isInteger(r)) return String(r);
+  // El segundo decimal solo se escribe si dice algo: 1,8 no se convierte en «1,80».
+  const bastaUnDecimal = Math.abs(r * 10 - Math.round(r * 10)) < 1e-9;
+  return formatNumber(r, bastaUnDecimal ? 1 : 2);
+};
+
+/**
+ * Reparte el redondeo a gramos enteros para que las filas SUMEN el total anunciado.
+ *
+ * Redondear cada fila por su cuenta y el total aparte es lo que dejaba una tabla que no
+ * cuadraba consigo misma: con 1.000,4 + 700,4 + 20,4 + 10,4 g el total salía «1732» mientras
+ * las filas sumaban 1.730 (Inspector, 20/09/2026). Se reparte por resto mayor —el gramo de más
+ * va a las filas cuya parte decimal está más cerca de subir—, que es el único reparto en el que
+ * ninguna fila se aleja más de 1 g de su valor exacto y la suma da el total exacto.
+ */
+function repartirGramos(valores: number[], total_g: number): number[] {
+  const enteros = valores.map(v => Math.floor(v));
+  let sobrante = Math.round(total_g) - enteros.reduce((s, v) => s + v, 0);
+  if (sobrante === 0 || enteros.length === 0) return enteros;
+
+  const porRestoMayor = valores
+    .map((v, i) => ({ i, resto: v - Math.floor(v) }))
+    .sort((a, b) => b.resto - a.resto);
+  // Si el total redondea por debajo de la suma de los suelos (no ocurre con estas tablas, pero
+  // el reparto no puede depender de eso), el gramo se quita por el extremo contrario.
+  const paso = sobrante > 0 ? 1 : -1;
+  const orden = paso > 0 ? porRestoMayor : [...porRestoMayor].reverse();
+
+  for (let k = 0; sobrante !== 0; k++) {
+    enteros[orden[k % orden.length].i] += paso;
+    sobrante -= paso;
+  }
+  return enteros;
+}
+
+/**
+ * Lo que la app calcularía AHORA MISMO con lo que hay escrito en el formulario, o el motivo
+ * por el que no se puede. Es una función pura y fuera del componente a propósito: así el
+ * panel de resultados puede seguir al formulario sin que haya dos caminos de cálculo
+ * distintos —el del botón y el automático— que puedan divergir.
+ */
+type Preparado =
+  | { ok: true; resultado: ResultadoBakersPercentage; objetivo: number | null; ids: number[] }
+  | { ok: false; error: string };
+
+function prepararCalculo(
+  modo: ModoCalculo,
+  harinaStr: string,
+  otros: OtroIngrediente[],
+  porcioStr: string,
+): Preparado {
+  const valorPrincipal = parseSpanishNumber(harinaStr);
+  if (!(valorPrincipal > 0)) {
+    return {
+      ok: false,
+      error:
+        modo === 'gramos'
+          ? 'Introduce un peso de harina válido (mayor que 0).'
+          : 'Introduce un peso final de masa válido (mayor que 0).',
+    };
+  }
+
+  // Qué se pide en cada modo, para que el mensaje nombre lo que el usuario está viendo.
+  const magnitud = modo === 'gramos' ? 'peso' : 'porcentaje';
+
+  const ids: number[] = [];
+  const entradas: { nombre: string; valor: number; prefermentoHidratacion_pct?: number }[] = [];
+
+  for (const i of otros) {
+    const nombre = i.nombre.trim();
+    const texto = i.valor.trim();
+    // Fila recién añadida y todavía vacía: no es un ingrediente, no es un error.
+    if (nombre === '' && texto === '') continue;
+    // Un peso sin nombre se descartaba EN SILENCIO y el total salía más bajo sin decirlo,
+    // mientras el mismo hueco en el campo de harina sí se rechazaba (Inspector, 20/09/2026).
+    if (nombre === '') {
+      return {
+        ok: false,
+        error: `Hay un ingrediente con ${magnitud} (${texto}) pero sin nombre: ponle nombre o borra la fila.`,
+      };
+    }
+    // Un nombre sin cifra no aporta masa: no cambia ningún resultado y no se cuenta.
+    if (texto === '') continue;
+
+    const valor = parseSpanishNumber(texto);
+    // `parseSpanishNumber` devuelve NaN con lo que no es un número, y colapsarlo a 0 convertía
+    // «setecientos» en «0 g» sin avisar. La validación tiene que ser la misma que en la harina.
+    if (!Number.isFinite(valor)) {
+      return { ok: false, error: `El ${magnitud} de «${nombre}» no es un número: «${texto}».` };
+    }
+    if (valor < 0) {
+      return { ok: false, error: `El ${magnitud} de «${nombre}» no puede ser negativo.` };
+    }
+
+    // Un prefermento sin hidratación legible se trata al 100 %, que es su valor por defecto y
+    // el que se muestra en el campo: nunca se cuela como ingrediente plano.
+    const hidratacion = i.esPrefermento ? (leerNumero(i.hidratacionPref) ?? 100) : undefined;
+    ids.push(i.id);
+    entradas.push({
+      nombre,
+      valor,
+      prefermentoHidratacion_pct:
+        hidratacion !== undefined && hidratacion >= 0 ? hidratacion : undefined,
+    });
+  }
+
+  if (entradas.length === 0) {
+    return {
+      ok: false,
+      error:
+        modo === 'gramos'
+          ? 'Añade al menos un ingrediente además de la harina.'
+          : 'Añade al menos un ingrediente con su porcentaje.',
+    };
+  }
+
+  const porcion = porcioStr.trim() ? parseSpanishNumber(porcioStr) : undefined;
+  const pesoPorcionValido = porcion && porcion > 0 ? porcion : undefined;
+
+  if (modo === 'gramos') {
+    return {
+      ok: true,
+      objetivo: null,
+      ids,
+      resultado: calcularBakersPercentage(
+        valorPrincipal,
+        entradas.map(i => ({
+          nombre: i.nombre,
+          gramos: i.valor,
+          prefermentoHidratacion_pct: i.prefermentoHidratacion_pct,
+        })),
+        pesoPorcionValido,
+      ),
+    };
+  }
+
+  return {
+    ok: true,
+    objetivo: valorPrincipal,
+    ids,
+    resultado: calcularBakersPercentageDesdePeso(
+      valorPrincipal,
+      entradas.map(i => ({
+        nombre: i.nombre,
+        porcentaje: i.valor,
+        prefermentoHidratacion_pct: i.prefermentoHidratacion_pct,
+      })),
+      pesoPorcionValido,
+    ),
+  };
+}
+
+/**
+ * Pasa la receta de un modo al otro EN VEZ DE BORRARLA.
+ *
+ * Los dos modos describen la misma masa por caminos inversos, así que la receta que se acaba
+ * de calcular contiene ya todo lo que el otro modo necesita: el peso final de la masa y el
+ * porcentaje de cada fila en un sentido, la harina que se pesa y los gramos en el otro.
+ * Borrarla obligaba a teclearla dos veces para ver la misma receta de las dos maneras.
+ *
+ * El agua del prefermento va a la PRIMERA fila de agua al pasar a porcentajes, y se descuenta
+ * de ella al volver: en el modo inverso el agua declarada es la de la fórmula total (incluida
+ * la que viene dentro del prefermento) y en el modo gramos es solo la que se pesa aparte.
+ */
+function convertirReceta(
+  aModo: ModoCalculo,
+  r: ResultadoBakersPercentage,
+  filas: OtroIngrediente[],
+  ids: number[],
+): { principal: string; filas: OtroIngrediente[] } | null {
+  // Una fórmula imposible (el prefermento aporta más agua o más harina de la declarada) no se
+  // puede convertir a gramos que alguien pueda pesar: no se inventa una receta que no existe.
+  if (r.harinaAnadida_g < 0 || r.aguaAnadida_g < 0) return null;
+
+  const porId = new Map<number, IngredienteBaker>();
+  ids.forEach((id, idx) => {
+    const ing = r.ingredientes[idx];
+    if (ing) porId.set(id, ing);
+  });
+
+  const aguaDePrefermentos = r.prefermentos.reduce((s, p) => s + p.agua_g, 0);
+  const idPrimeraAgua = filas.find(
+    f => !f.esPrefermento && porId.has(f.id) && ES_AGUA.test(f.nombre),
+  )?.id;
+
+  const convertidas = filas.map(f => {
+    const ing = porId.get(f.id);
+    if (!ing) return f; // fila vacía: nada que convertir
+    const esPrimeraAgua = f.id === idPrimeraAgua;
+
+    if (aModo === 'porcentaje') {
+      const gramos = ing.gramos + (esPrimeraAgua ? aguaDePrefermentos : 0);
+      const pct = r.harina_g > 0 ? (gramos / r.harina_g) * 100 : ing.porcentajePanadero;
+      return { ...f, valor: pctACampo(pct) };
+    }
+    const gramos = ing.gramos - (esPrimeraAgua ? aguaDePrefermentos : 0);
+    return { ...f, valor: gramosACampo(Math.max(0, gramos)) };
+  });
+
+  return {
+    principal: gramosACampo(aModo === 'porcentaje' ? r.pesoMasa_g : r.harinaAnadida_g),
+    filas: convertidas,
+  };
+}
+
 export default function CalculadoraPorcentajePanaderoPage() {
   const [modo, setModo] = useState<ModoCalculo>('gramos');
   const [harinaStr, setHarinaStr] = useState('1000');
@@ -97,19 +317,63 @@ export default function CalculadoraPorcentajePanaderoPage() {
   const [porcioStr, setPorcioStr] = useState('');
   const [resultado, setResultado] = useState<ResultadoBakersPercentage | null>(null);
   const [objetivoCalculado, setObjetivoCalculado] = useState<number | null>(null);
-  const [error, setError] = useState('');
   const [nextId, setNextId] = useState(10);
+  // Desde el primer «Calcular», el panel de la derecha sigue al formulario. Antes solo se
+  // movía al pulsar el botón, así que subir el agua de 840 a 1.080 g dejaba en pantalla la
+  // hidratación vieja con aspecto de recién calculada (Inspector, 20/09/2026).
+  const [vivo, setVivo] = useState(false);
+  const [avisoModo, setAvisoModo] = useState('');
+
+  // Lo que saldría con lo que hay escrito AHORA, o por qué no se puede calcular.
+  const intento = useMemo(
+    () => prepararCalculo(modo, harinaStr, otros, porcioStr),
+    [modo, harinaStr, otros, porcioStr],
+  );
+
+  useEffect(() => {
+    if (!vivo || !intento.ok) return;
+    setResultado(intento.resultado);
+    setObjetivoCalculado(intento.objetivo);
+  }, [vivo, intento]);
+
+  // El aviso del formulario solo aparece después de haber pedido el cálculo una vez: mientras
+  // se teclea por primera vez no se regaña a nadie.
+  const error = vivo && !intento.ok ? intento.error : '';
+
+  // Lo que hay publicado ya no corresponde a lo que está escrito, y con estos valores no se
+  // puede recalcular: se dice, en vez de dejar una tabla muda que parece fresca.
+  const resultadoCaducado = resultado !== null && !intento.ok;
 
   const cambiarModo = useCallback((nuevoModo: ModoCalculo) => {
     if (nuevoModo === modo) return;
+    // Convertir, no borrar: los dos modos son caminos inversos de la misma receta.
+    const convertida = intento.ok
+      ? convertirReceta(nuevoModo, intento.resultado, otros, intento.ids)
+      : null;
+
     setModo(nuevoModo);
-    setHarinaStr('1000');
-    setOtros(nuevoModo === 'gramos' ? INGREDIENTES_POR_GRAMOS : INGREDIENTES_POR_PORCENTAJE);
-    setPorcioStr('');
-    setResultado(null);
-    setObjetivoCalculado(null);
-    setError('');
-  }, [modo]);
+    if (convertida) {
+      setHarinaStr(convertida.principal);
+      setOtros(convertida.filas);
+      setAvisoModo(
+        nuevoModo === 'porcentaje'
+          ? 'Receta convertida: los gramos pasan a porcentajes sobre la harina, y arriba va ahora el peso final de la masa.'
+          : 'Receta convertida: los porcentajes pasan a gramos, y arriba va ahora la harina que se pesa.',
+      );
+    } else {
+      // Sin un cálculo válido no hay nada que convertir, pero tampoco se tira lo tecleado.
+      setAvisoModo(
+        nuevoModo === 'porcentaje'
+          ? 'Se conservan los ingredientes, pero no había un cálculo válido que convertir: las cifras de las filas se leen ahora como porcentajes.'
+          : 'Se conservan los ingredientes, pero no había un cálculo válido que convertir: las cifras de las filas se leen ahora como gramos.',
+      );
+    }
+  }, [modo, intento, otros]);
+
+  const cambiarHarina = useCallback((valor: string) => {
+    setHarinaStr(valor);
+    setAvisoModo('');
+  }, []);
 
   // ── Paso 2: temperatura del agua de amasado (DDT) ──
   const [ddtAbierto, setDdtAbierto] = useState(false);
@@ -153,6 +417,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
 
   const actualizarIngrediente = useCallback(
     (id: number, campo: 'nombre' | 'valor', valor: string) => {
+      setAvisoModo('');
       setOtros(prev =>
         prev.map(i => {
           if (i.id !== id) return i;
@@ -183,75 +448,23 @@ export default function CalculadoraPorcentajePanaderoPage() {
   }, []);
 
   const calcular = useCallback(() => {
-    setError('');
-    const valorPrincipal = parseSpanishNumber(harinaStr);
-    if (!valorPrincipal || valorPrincipal <= 0) {
-      setError(
-        modo === 'gramos'
-          ? 'Introduce un peso de harina válido (mayor que 0).'
-          : 'Introduce un peso final de masa válido (mayor que 0).',
-      );
-      return;
+    // A partir de aquí el panel queda enganchado al formulario; el botón sigue estando para
+    // pedir el primer cálculo y para que Intro tenga algo que hacer.
+    setVivo(true);
+    if (intento.ok) {
+      setResultado(intento.resultado);
+      setObjetivoCalculado(intento.objetivo);
     }
+  }, [intento]);
 
-    const otrosValidos = otros
-      .filter(i => i.nombre.trim() !== '' && i.valor.trim() !== '')
-      .map(i => {
-        const valor = parseSpanishNumber(i.valor);
-        // Un prefermento sin hidratación legible se trata al 100 %, que es su valor por
-        // defecto y el que se muestra en el campo: nunca se cuela como ingrediente plano.
-        const hidratacion = i.esPrefermento
-          ? (leerNumero(i.hidratacionPref) ?? 100)
-          : undefined;
-        return {
-          nombre: i.nombre.trim(),
-          valor: valor > 0 ? valor : 0,
-          prefermentoHidratacion_pct: hidratacion !== undefined && hidratacion >= 0
-            ? hidratacion
-            : undefined,
-        };
-      });
-
-    if (otrosValidos.length === 0) {
-      setError(
-        modo === 'gramos'
-          ? 'Añade al menos un ingrediente además de la harina.'
-          : 'Añade al menos un ingrediente con su porcentaje.',
-      );
-      return;
-    }
-
-    const porcion = porcioStr.trim() ? parseSpanishNumber(porcioStr) : undefined;
-    const pesoPorcionValido = porcion && porcion > 0 ? porcion : undefined;
-
-    if (modo === 'gramos') {
-      setObjetivoCalculado(null);
-      setResultado(
-        calcularBakersPercentage(
-          valorPrincipal,
-          otrosValidos.map(i => ({
-            nombre: i.nombre,
-            gramos: i.valor,
-            prefermentoHidratacion_pct: i.prefermentoHidratacion_pct,
-          })),
-          pesoPorcionValido,
-        ),
-      );
-    } else {
-      setObjetivoCalculado(valorPrincipal);
-      setResultado(
-        calcularBakersPercentageDesdePeso(
-          valorPrincipal,
-          otrosValidos.map(i => ({
-            nombre: i.nombre,
-            porcentaje: i.valor,
-            prefermentoHidratacion_pct: i.prefermentoHidratacion_pct,
-          })),
-          pesoPorcionValido,
-        ),
-      );
-    }
-  }, [harinaStr, otros, porcioStr, modo]);
+  const alPulsarIntro = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      calcular();
+    },
+    [calcular],
+  );
 
   const hayPrefermentos = (resultado?.prefermentos.length ?? 0) > 0;
 
@@ -261,10 +474,80 @@ export default function CalculadoraPorcentajePanaderoPage() {
 
   // La cifra que salía antes de contar el prefermento. Se enseña al lado de la buena porque
   // es la que el usuario ha visto en todas partes, y sin el contraste no sabría cuál creer.
+  // Devuelve null —y entonces no se enseña nada— cuando no hay una cifra que enseñar: con la
+  // fórmula imposible salía un «−14,3 %» bajo el aviso de que no queda agua que pesar.
   const hidratacionSinContarPrefermento = useMemo(() => {
-    if (!resultado || !hayPrefermentos || resultado.harinaAnadida_g <= 0) return 0;
+    if (!resultado || !hayPrefermentos) return null;
+    if (resultado.harinaAnadida_g <= 0 || resultado.aguaAnadida_g < 0) return null;
     return Math.round((resultado.aguaAnadida_g / resultado.harinaAnadida_g) * 1000) / 10;
   }, [resultado, hayPrefermentos]);
+
+  // ── Las dos tablas, con el redondeo repartido ──
+  // Cada fila se redondeaba a gramos enteros por su cuenta y el total aparte, así que con
+  // gramos decimales la tabla no sumaba lo que ella misma anunciaba. Las filas se preparan
+  // aquí, con sus gramos exactos, y `repartirGramos` cuadra la columna con el total.
+
+  const ingredientesFormula = useMemo(
+    () =>
+      (resultado?.ingredientes ?? []).filter(
+        ing =>
+          !hayPrefermentos
+          || (ing.prefermentoHidratacion_pct === undefined && !ES_AGUA.test(ing.nombre)),
+      ),
+    [resultado, hayPrefermentos],
+  );
+
+  // Con prefermento el agua se consolida en una fila propia (la de la jarra más la que ya
+  // viene mezclada dentro), así que esa fila ocupa el hueco 1 de la columna de gramos.
+  const hayFilaAguaTotal = hayPrefermentos && (resultado?.agua_g ?? 0) > 0;
+
+  const gramosFormula = useMemo(() => {
+    if (!resultado) return [];
+    const valores = [resultado.harina_g];
+    if (hayFilaAguaTotal) valores.push(resultado.agua_g);
+    valores.push(...ingredientesFormula.map(i => i.gramos));
+    return repartirGramos(valores, resultado.pesoMasa_g);
+  }, [resultado, hayFilaAguaTotal, ingredientesFormula]);
+
+  const ingredientesBalanza = useMemo(
+    () =>
+      (resultado?.ingredientes ?? []).filter(
+        ing => ing.prefermentoHidratacion_pct === undefined && !ES_AGUA.test(ing.nombre),
+      ),
+    [resultado],
+  );
+
+  const hayFilaAguaBalanza = (resultado?.agua_g ?? 0) > 0;
+
+  const gramosBalanza = useMemo(() => {
+    if (!resultado) return [];
+    const valores = [resultado.harinaAnadida_g];
+    if (hayFilaAguaBalanza) valores.push(resultado.aguaAnadida_g);
+    valores.push(...ingredientesBalanza.map(i => i.gramos));
+    valores.push(...resultado.prefermentos.map(p => p.gramos));
+    return repartirGramos(valores, resultado.pesoMasa_g);
+  }, [resultado, hayFilaAguaBalanza, ingredientesBalanza]);
+
+  const baseFormula = hayFilaAguaTotal ? 2 : 1;
+  const baseBalanza = hayFilaAguaBalanza ? 2 : 1;
+  const basePrefermentos = baseBalanza + ingredientesBalanza.length;
+
+  // ── Paso 2: lo que el DDT no puede prometer ──
+  // Por debajo de 0 °C el agua es hielo y por encima de 100 °C es vapor: no hay nada que
+  // verter, así que no se publica la cifra (antes salía «Pon el agua a −10,0 °C» en grande).
+  const aguaVertible =
+    resultadoDDT !== null
+    && resultadoDDT.temperatura_agua_c >= 0
+    && resultadoDDT.temperatura_agua_c <= 100;
+
+  // ── Paso 3: fuera del rango del modelo no hay cifra, pero sí explicación ──
+  const fermFueraDeRango = useMemo(() => {
+    const horas = leerNumero(fermHoras);
+    const tempReceta = leerNumero(fermTempReceta);
+    const tempReal = leerNumero(fermTempReal);
+    if (horas === null || horas <= 0 || tempReceta === null || tempReal === null) return false;
+    return !dentroDelModelo(tempReal) || !dentroDelModelo(tempReceta);
+  }, [fermHoras, fermTempReceta, fermTempReal]);
 
   return (
     <div className={styles.container}>
@@ -305,6 +588,14 @@ export default function CalculadoraPorcentajePanaderoPage() {
             </button>
           </div>
 
+          {/* Cambiar de modo CONVIERTE la receta en vez de borrarla, y se dice que ha pasado:
+              si no, las mismas cifras en otra unidad parecerían un fallo. */}
+          {avisoModo && (
+            <p className={styles.avisoModo} role="status">
+              <span aria-hidden="true">🔁</span> {avisoModo}
+            </p>
+          )}
+
           {/* Harina (modo gramos) o peso final de masa objetivo (modo porcentaje) */}
           <div className={styles.harinaRow}>
             <div className={styles.harinaLabel}>
@@ -320,7 +611,8 @@ export default function CalculadoraPorcentajePanaderoPage() {
                 inputMode="decimal"
                 className={styles.inputField}
                 value={harinaStr}
-                onChange={e => setHarinaStr(e.target.value)}
+                onChange={e => cambiarHarina(e.target.value)}
+                onKeyDown={alPulsarIntro}
                 placeholder="1000"
                 aria-label={
                   modo === 'gramos'
@@ -367,6 +659,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                       className={styles.inputField}
                       value={ing.valor}
                       onChange={e => actualizarIngrediente(ing.id, 'valor', e.target.value)}
+                      onKeyDown={alPulsarIntro}
                       placeholder="0"
                       aria-label={
                         modo === 'gramos'
@@ -441,6 +734,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                 className={styles.inputField}
                 value={porcioStr}
                 onChange={e => setPorcioStr(e.target.value)}
+                onKeyDown={alPulsarIntro}
                 placeholder="—"
                 aria-label="Peso por porción en gramos"
               />
@@ -467,6 +761,17 @@ export default function CalculadoraPorcentajePanaderoPage() {
             <p className={styles.emptyState}>
               Introduce los ingredientes y pulsa <strong>Calcular</strong> para ver los porcentajes del panadero.
             </p>
+          )}
+
+          {/* Con el panel enganchado al formulario esto solo aparece cuando lo escrito no se
+              puede calcular: la tabla de abajo es entonces la de los valores anteriores, y
+              callarlo es lo que hacía leer como fresco un resultado que ya no valía. */}
+          {resultadoCaducado && (
+            <div className={styles.avisoCaducado} role="status">
+              <span aria-hidden="true">⚠️</span> Resultado <strong>desactualizado</strong>: es el
+              de los valores anteriores. {intento.ok ? '' : intento.error} Se recalcula solo en
+              cuanto los ingredientes vuelvan a ser válidos.
+            </div>
           )}
 
           {resultado && (
@@ -518,6 +823,8 @@ export default function CalculadoraPorcentajePanaderoPage() {
                   {resultado.aguaAnadida_g < 0 ? 'agua' : 'harina'} de la que declara la fórmula
                   total, así que no queda nada que pesar aparte. Sube el porcentaje de{' '}
                   {resultado.aguaAnadida_g < 0 ? 'agua' : 'harina'} o baja el del prefermento.
+                  Por eso abajo no aparece esa fila: no hay ninguna cantidad que se pueda pesar,
+                  y una cifra negativa no es una cantidad.
                 </div>
               )}
 
@@ -540,37 +847,34 @@ export default function CalculadoraPorcentajePanaderoPage() {
                       <td>
                         <span aria-hidden="true">🌾</span> Harina{hayPrefermentos ? ' (total)' : ''}
                       </td>
-                      <td>{formatNumber(resultado.harina_g, 0)} g</td>
+                      <td>{formatNumber(gramosFormula[0] ?? 0, 0)} g</td>
                       <td className={styles.pct}>100,0 %</td>
                     </tr>
 
                     {/* Con prefermento el agua se consolida: la de la jarra más la que ya
                         viene mezclada dentro. Es la única cifra que responde de verdad
                         «¿qué hidratación tiene esta masa?». */}
-                    {hayPrefermentos && resultado.agua_g > 0 && (
+                    {hayFilaAguaTotal && (
                       <tr className={styles.rowAgua}>
                         <td><span aria-hidden="true">💧</span> Agua (total)</td>
-                        <td>{formatNumber(resultado.agua_g, 0)} g</td>
+                        <td>{formatNumber(gramosFormula[1] ?? 0, 0)} g</td>
                         <td className={styles.pct}>{formatNumber(resultado.hidratacion_pct, 1)} %</td>
                       </tr>
                     )}
 
-                    {resultado.ingredientes
-                      .filter(ing => !hayPrefermentos
-                        || (ing.prefermentoHidratacion_pct === undefined && !/agua/i.test(ing.nombre)))
-                      .map((ing, idx) => {
-                        const esAgua = /agua/i.test(ing.nombre);
-                        return (
-                          <tr
-                            key={idx}
-                            className={esAgua ? styles.rowAgua : styles.rowNormal}
-                          >
-                            <td><span aria-hidden="true">{esAgua ? '💧' : '•'}</span> {ing.nombre}</td>
-                            <td>{formatNumber(ing.gramos, 0)} g</td>
-                            <td className={styles.pct}>{formatNumber(ing.porcentajePanadero, 1)} %</td>
-                          </tr>
-                        );
-                      })}
+                    {ingredientesFormula.map((ing, idx) => {
+                      const esAgua = ES_AGUA.test(ing.nombre);
+                      return (
+                        <tr
+                          key={idx}
+                          className={esAgua ? styles.rowAgua : styles.rowNormal}
+                        >
+                          <td><span aria-hidden="true">{esAgua ? '💧' : '•'}</span> {ing.nombre}</td>
+                          <td>{formatNumber(gramosFormula[baseFormula + idx] ?? 0, 0)} g</td>
+                          <td className={styles.pct}>{formatNumber(ing.porcentajePanadero, 1)} %</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -591,27 +895,30 @@ export default function CalculadoraPorcentajePanaderoPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className={styles.rowHarina}>
-                        <td><span aria-hidden="true">🌾</span> Harina</td>
-                        <td>{formatNumber(resultado.harinaAnadida_g, 0)} g</td>
-                        <td className={styles.aporta}>—</td>
-                      </tr>
-                      {resultado.agua_g > 0 && (
-                        <tr className={styles.rowAgua}>
-                          <td><span aria-hidden="true">💧</span> Agua</td>
-                          <td>{formatNumber(resultado.aguaAnadida_g, 0)} g</td>
+                      {/* Una cantidad negativa no es una cantidad: la fila se suprime y de
+                          explicarlo se encarga el aviso de arriba. Mandar pesar «−82 g de
+                          agua» era la cifra falsa bajo el aviso (Inspector, 20/09/2026). */}
+                      {resultado.harinaAnadida_g >= 0 && (
+                        <tr className={styles.rowHarina}>
+                          <td><span aria-hidden="true">🌾</span> Harina</td>
+                          <td>{formatNumber(gramosBalanza[0] ?? 0, 0)} g</td>
                           <td className={styles.aporta}>—</td>
                         </tr>
                       )}
-                      {resultado.ingredientes
-                        .filter(ing => ing.prefermentoHidratacion_pct === undefined && !/agua/i.test(ing.nombre))
-                        .map((ing, idx) => (
-                          <tr key={idx} className={styles.rowNormal}>
-                            <td><span aria-hidden="true">•</span> {ing.nombre}</td>
-                            <td>{formatNumber(ing.gramos, 0)} g</td>
-                            <td className={styles.aporta}>—</td>
-                          </tr>
-                        ))}
+                      {hayFilaAguaBalanza && resultado.aguaAnadida_g >= 0 && (
+                        <tr className={styles.rowAgua}>
+                          <td><span aria-hidden="true">💧</span> Agua</td>
+                          <td>{formatNumber(gramosBalanza[1] ?? 0, 0)} g</td>
+                          <td className={styles.aporta}>—</td>
+                        </tr>
+                      )}
+                      {ingredientesBalanza.map((ing, idx) => (
+                        <tr key={idx} className={styles.rowNormal}>
+                          <td><span aria-hidden="true">•</span> {ing.nombre}</td>
+                          <td>{formatNumber(gramosBalanza[baseBalanza + idx] ?? 0, 0)} g</td>
+                          <td className={styles.aporta}>—</td>
+                        </tr>
+                      ))}
                       {resultado.prefermentos.map((p, idx) => (
                         <tr key={`pref-${idx}`} className={styles.rowPrefermento}>
                           <td>
@@ -620,7 +927,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                               {formatNumber(p.hidratacion_pct, 0)} % hidr.
                             </span>
                           </td>
-                          <td>{formatNumber(p.gramos, 0)} g</td>
+                          <td>{formatNumber(gramosBalanza[basePrefermentos + idx] ?? 0, 0)} g</td>
                           <td className={styles.aporta}>
                             {formatNumber(p.harina_g, 0)} g harina + {formatNumber(p.agua_g, 0)} g agua
                           </td>
@@ -631,7 +938,9 @@ export default function CalculadoraPorcentajePanaderoPage() {
                 </div>
               )}
 
-              {resultado.hidratacion_pct > 0 && (
+              {/* Con la fórmula imposible no hay masa que describir: esta nota habla de «la
+                  hidratación real de ESTA masa», y esa masa no se puede amasar. */}
+              {!formulaImposible && resultado.hidratacion_pct > 0 && (
                 <div className={styles.hidratacionNote} role="note">
                   <span aria-hidden="true">💧</span> La hidratación{hayPrefermentos ? ' real' : ''} de
                   esta masa es <strong>{formatNumber(resultado.hidratacion_pct, 1)} %</strong>
@@ -639,7 +948,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                   {resultado.hidratacion_pct >= 60 && resultado.hidratacion_pct < 70 && ' — hidratación estándar, equilibrada'}
                   {resultado.hidratacion_pct >= 70 && resultado.hidratacion_pct < 80 && ' — hidratación alta, miga abierta'}
                   {resultado.hidratacion_pct >= 80 && ' — hidratación muy alta, técnica avanzada'}
-                  {hayPrefermentos && (
+                  {hayPrefermentos && hidratacionSinContarPrefermento !== null && (
                     <>
                       {' '}Contando la harina y el agua que trae dentro el prefermento: sin
                       contarlas saldría{' '}
@@ -769,7 +1078,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                 </select>
               </div>
 
-              {resultadoDDT ? (
+              {resultadoDDT && aguaVertible && (
                 <div className={styles.pasoResultado}>
                   <span className={styles.pasoResultadoLabel}>Pon el agua a</span>
                   <span className={styles.pasoResultadoValor}>
@@ -782,7 +1091,31 @@ export default function CalculadoraPorcentajePanaderoPage() {
                     </p>
                   )}
                 </div>
-              ) : (
+              )}
+
+              {/* No hay agua que verter por debajo de 0 °C ni por encima de 100 °C: la
+                  combinación es inalcanzable y se dice, en vez de publicar en grande una
+                  temperatura imposible con la explicación en letra pequeña debajo. */}
+              {resultadoDDT && !aguaVertible && (
+                <div className={styles.pasoResultado}>
+                  <span className={styles.pasoResultadoLabel}>Esa combinación no se puede conseguir</span>
+                  <p className={styles.pasoResultadoNota} role="status">
+                    Con esa cocina, esa harina y ese amasado, el agua tendría que estar{' '}
+                    {resultadoDDT.temperatura_agua_c < 0
+                      ? 'por debajo de 0 °C, es decir, hielo: no hay agua líquida que baje la masa hasta ahí'
+                      : 'por encima de 100 °C, es decir, vapor: no hay agua líquida que suba la masa hasta ahí'}
+                    . No se da una cifra porque no existe.
+                  </p>
+                  <p className={styles.warningBox}>
+                    <span aria-hidden="true">💡</span>{' '}
+                    {resultadoDDT.temperatura_agua_c < 0
+                      ? 'Enfría la harina, amasa de una forma que caliente menos o sube la temperatura objetivo de la masa.'
+                      : 'Calienta la harina o baja la temperatura objetivo de la masa: el agua sola no llega.'}
+                  </p>
+                </div>
+              )}
+
+              {!resultadoDDT && (
                 <p className={styles.emptyState}>
                   Completa las temperaturas para ver el agua que necesitas.
                 </p>
@@ -887,6 +1220,25 @@ export default function CalculadoraPorcentajePanaderoPage() {
                   <p className={styles.warningBox}>
                     <span aria-hidden="true">⚠️</span> Es una estimación: el punto de la masa lo marca
                     su volumen y su tacto, no el reloj. Úsala para saber cuándo empezar a mirarla.
+                  </p>
+                </div>
+              ) : fermFueraDeRango ? (
+                /* El motor se niega a extrapolar fuera de 4-32 °C, y aquí se explica por qué:
+                   un hueco vacío se lee como un fallo de la app, no como una negativa. */
+                <div className={styles.pasoResultado}>
+                  <span className={styles.pasoResultadoLabel}>Aquí no se puede estimar</span>
+                  <p className={styles.pasoResultadoNota} role="status">
+                    La regla del Q10 solo describe lo que pasa en la masa entre{' '}
+                    <strong>{TEMP_MODELO_MIN} y {TEMP_MODELO_MAX} °C</strong>. Por encima de{' '}
+                    {TEMP_MODELO_MAX} °C la levadura se estresa y acaba muriendo —no fermenta el
+                    doble de rápido—, y por debajo de {TEMP_MODELO_MIN} °C queda casi parada.
+                    Fuera de ese rango la cuenta seguiría dando un número de aspecto convincente,
+                    así que no se da ninguno.
+                  </p>
+                  <p className={styles.warningBox}>
+                    <span aria-hidden="true">🌡️</span> Para un retardo en nevera, cuenta {TEMP_MODELO_MIN} °C;
+                    para una cámara cálida, {TEMP_MODELO_MAX} °C. Son los dos extremos en los que
+                    la estimación todavía significa algo.
                   </p>
                 </div>
               ) : (

@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la hidratación habitual en las recetas de pan?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La hidratación varía según el tipo de pan. Un pan de molde estándar ronda el 65–70%, una baguette francesa el 68–75%, una ciabatta o pan rústico el 80–90%, y panes muy abiertos de masa madre pueden superar el 90%. Para principiantes se recomienda empezar entre el 65% y el 70%, ya que masas más húmedas son más difíciles de manejar.',
+        text: 'La hidratación varía según el tipo de pan. Un bagel o un pretzel van al 50–55%, un pan de molde clásico al 60–65%, una baguette al 65–68%, una chapata o pan de campo al 70–75%, una ciabatta al 75–80% y una focaccia o un pan de cristal al 80–100%. Para empezar, entre el 65% y el 70% es lo más manejable: cuanta más agua lleva la masa, más pegajosa es de trabajar.',
       },
     },
     {

@@ -383,6 +383,36 @@
   color: #fca5a5;
 }
 
+/* Aviso de conversión al cambiar de modo (la receta se conserva, y se dice) */
+.avisoModo {
+  margin: -0.3rem 0 var(--spacing-md);
+  padding: 0.55rem 0.7rem;
+  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Resultado que ya no corresponde a lo escrito arriba */
+.avisoCaducado {
+  padding: 0.75rem var(--spacing-md);
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius);
+  color: #92400e;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md);
+}
+
+[data-theme='dark'] .avisoCaducado {
+  background: #2d2000;
+  border-color: #92400e;
+  color: #fcd34d;
+}
+
 /* Botón calcular */
 .btnPrimary {
   width: 100%;
