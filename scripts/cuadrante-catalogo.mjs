@@ -185,7 +185,11 @@ async function tursoVisitas() {
     SELECT aplicacion,
            COUNT(*) AS visitas,
            SUM(CASE WHEN es_recurrente = 1 THEN 1 ELSE 0 END) AS recurrentes,
-           COUNT(DISTINCT sesion_id) AS sesiones,
+           -- COALESCE porque 'chatgpt' y 'mcp' registran con sesion_id NULL y COUNT(DISTINCT)
+           -- los ignora: sin él, una app servida por el canal IA declara muchas menos sesiones
+           -- de las que tuvo. Aquí solo se IMPRIME (no clasifica), pero el número lo lee alguien.
+           -- Misma causa que la nota de semilla-diaria.mjs (S0153 del 20/09/2026).
+           COUNT(DISTINCT COALESCE(sesion_id, 'sin-sesion:' || id)) AS sesiones,
            SUM(CASE WHEN created_at >= datetime('now', '-30 days') THEN 1 ELSE 0 END) AS visitas30,
            MIN(created_at) AS primera
     FROM uso_aplicaciones
