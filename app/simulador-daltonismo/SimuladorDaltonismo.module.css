@@ -366,6 +366,33 @@
   margin-top: var(--spacing-xs);
 }
 
+/* Aviso de alcance — visible sin desplegar nada (Inspector 20/09/2026).
+   No es decoración: es lo único que acota qué NO hace esta herramienta, y estaba
+   dentro del bloque educativo, que nace colapsado. */
+.avisoAlcance {
+  max-width: 900px;
+  margin: 1rem auto 0;
+  padding: 0.85rem 1.1rem;
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  background: rgba(46, 134, 171, 0.07);
+  color: var(--texto, inherit);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .avisoAlcance {
+  background: rgba(46, 134, 171, 0.16);
+  border-left-color: var(--secondary);
+}
+
+/* Pie de fuente de un dato publicado */
+.fuenteDato {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
 /* Dark mode */
 [data-theme='dark'] .dropZone:hover,
 [data-theme='dark'] .dropZoneActive {

@@ -13,7 +13,7 @@ import { defineConfig } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
-  testMatch: /(calculadoras-invariantes|ganancia-inmueble|coordenadas|numero-a-letras|panaderia-motores|costas-judiciales-motor|recargo-extemporaneo-motor|conservacion-energia-motor|division-celular-motor|quiz-tabla-periodica-banco|kmeans-parseo-motor|antiprimos-motor|serie-numerica-motor|automatas-motor|monticulo-motor|normalizacion-motor|automata-pila-motor|tarifa-isd-motor|sistemas-numericos-motor|proyectiles-motor|mas-resorte-motor|pendulo-motor|potencial-accion-motor|selector-smartphone-motor)\.spec\.ts/,
+  testMatch: /(calculadoras-invariantes|ganancia-inmueble|coordenadas|numero-a-letras|panaderia-motores|costas-judiciales-motor|recargo-extemporaneo-motor|conservacion-energia-motor|division-celular-motor|quiz-tabla-periodica-banco|kmeans-parseo-motor|antiprimos-motor|serie-numerica-motor|automatas-motor|monticulo-motor|normalizacion-motor|automata-pila-motor|tarifa-isd-motor|sistemas-numericos-motor|proyectiles-motor|mas-resorte-motor|pendulo-motor|potencial-accion-motor|selector-smartphone-motor|daltonismo-motor)\.spec\.ts/,
   fullyParallel: false,
   workers: 1,
   reporter: 'list',

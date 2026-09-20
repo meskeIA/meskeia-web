@@ -41,6 +41,11 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   (1999) para RGB lineal: recomponiendo esa cadena (RGB→LMS de Smith-Pokorny, proyección
  *   dicromática, vuelta) sale [0,112 0,888 0] para protanopia, no [0,567 0,433 0].
  *
+ *   ⚠️ ACTUALIZADO el 20/09/2026 (tarde): las matrices pasaron a ser las de Machado et al.
+ *   (2009), que operan en RGB LINEAL, así que estos filtros ya NO declaran
+ *   `color-interpolation-filters` — el defecto de SVG es justo el espacio que hacen falta.
+ *   Lo de abajo describe la situación anterior, con las matrices HCIRN/Wickline.
+ *
  *   Pero un <filter> de SVG sin `color-interpolation-filters="sRGB"` opera, POR DEFECTO DE
  *   LA ESPECIFICACIÓN, en linearRGB: el navegador lineariza, multiplica y vuelve a
  *   comprimir. Sobre la píldora roja de la maqueta (#dc2626 = 220,38,38):
@@ -305,21 +310,24 @@ test.describe('Caso 2 · operativa: los extremos de la simulación', () => {
     await elegirCondicion(page, 'Visión normal');
     expect(await colorPintado(page, pildoraRoja)).toBe('220,38,38');
 
-    // Ninguno de los tres <filter> declaraba `color-interpolation-filters="sRGB"`, así que
-    // el navegador aplicaba sus matrices en el linearRGB que manda la especificación SVG
-    // por defecto —lineariza, multiplica y vuelve a comprimir— y lo pintado no era lo que
-    // la matriz del page.tsx calcula. Sobre rgb(220,38,38), hecho a mano:
+    // Las matrices salen de `@/lib/calculadoras/daltonismo` —Machado et al. (2009)— y se
+    // aplican en RGB LINEAL, que es donde el modelo está definido y lo que la especificación
+    // SVG usa por defecto: por eso estos tres <filter> NO declaran
+    // `color-interpolation-filters`, y ponerles "sRGB" sería el fallo.
     //
-    //   condición      matriz en sRGB (lo correcto)   linearRGB (lo que se pintaba)
-    //   protanopia     rgb(141, 140, 38)              rgb(172, 171, 38)
-    //   deuteranopia   rgb(152, 165, 38)              rgb(180, 189, 38)
-    //   tritanopia     rgb(211,  38, 38)              rgb(215,  38, 38)
+    // Los tres valores coinciden con `simularColor([220, 38, 38], …)` del motor, que está
+    // probado aparte en tests/daltonismo-motor.spec.ts con casos resueltos a mano.
     //
-    // Con el atributo puesto, se pinta la columna de la izquierda (hallazgo 953).
+    // Historia de esta línea (20/09/2026): aquí hubo antes otras matrices, el juego
+    // HCIRN/Wickline, que daban rgb(141,140,38) en sRGB y rgb(172,171,38) en lineal. Aquella
+    // mañana se eligió sRGB para que lo pintado coincidiera con la matriz escrita al lado; por
+    // la tarde, el Inspector encontró que la app hermana usaba esas MISMAS cifras en lineal
+    // —de modo que las dos pintaban distinto— y, sobre todo, que aquel juego es INVERTIBLE:
+    // no puede fundir dos colores en uno, así que nunca enseñaba una confusión cromática.
     const esperado: ReadonlyArray<readonly [string, string]> = [
-      ['Protanopia (rojo)', '141,140,38'],
-      ['Deuteranopia (verde)', '152,165,38'],
-      ['Tritanopia (azul)', '211,38,38'],
+      ['Protanopia (rojo)', '99,89,35'],
+      ['Deuteranopia (verde)', '143,128,27'],
+      ['Tritanopia (azul)', '243,0,42'],
     ];
     for (const [condicion, pintado] of esperado) {
       await elegirCondicion(page, condicion);
@@ -336,7 +344,10 @@ test.describe('Caso 2 · operativa: los extremos de la simulación', () => {
           (f) => f.id + '=' + (f.getAttribute('color-interpolation-filters') ?? 'AUSENTE'),
         ),
       ),
-    ).toEqual(['protanopia=sRGB', 'deuteranopia=sRGB', 'tritanopia=sRGB']);
+      // AUSENTE es lo correcto: sin el atributo, SVG usa linearRGB, que es donde opera
+      // Machado. Declarar "sRGB" multiplicaría la matriz contra la señal con gamma y el
+      // resultado dejaría de ser el del modelo.
+    ).toEqual(['protanopia=AUSENTE', 'deuteranopia=AUSENTE', 'tritanopia=AUSENTE']);
   });
 });
 

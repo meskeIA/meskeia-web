@@ -5,16 +5,16 @@ import { useState, useEffect, useRef, useCallback, DragEvent, ChangeEvent } from
 import styles from './SimuladorDaltonismo.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  MATRICES_CVD,
+  CVD_META,
+  srgbALineal,
+  linealASrgb,
+  type TipoCVD,
+} from '@/lib/calculadoras/daltonismo';
 
-type TipoDaltonismo =
-  | 'normal'
-  | 'protanopia'
-  | 'protanomaly'
-  | 'deuteranopia'
-  | 'deuteranomaly'
-  | 'tritanopia'
-  | 'tritanomaly'
-  | 'achromatopsia';
+/** Las ocho vistas las define el motor compartido: aquí no se redefinen. */
+type TipoDaltonismo = TipoCVD;
 
 interface InfoTipo {
   id: TipoDaltonismo;
@@ -83,81 +83,34 @@ const TIPOS: InfoTipo[] = [
   },
 ];
 
-// Matrices Machado et al. (2009) — transformación RGB para cada tipo
-const MATRICES: Record<TipoDaltonismo, number[][]> = {
-  normal: [
-    [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1],
-  ],
-  protanopia: [
-    [0.567, 0.433, 0],
-    [0.558, 0.442, 0],
-    [0, 0.242, 0.758],
-  ],
-  protanomaly: [
-    [0.817, 0.183, 0],
-    [0.333, 0.667, 0],
-    [0, 0.125, 0.875],
-  ],
-  deuteranopia: [
-    [0.625, 0.375, 0],
-    [0.7, 0.3, 0],
-    [0, 0.3, 0.7],
-  ],
-  deuteranomaly: [
-    [0.8, 0.2, 0],
-    [0.258, 0.742, 0],
-    [0, 0.142, 0.858],
-  ],
-  tritanopia: [
-    [0.95, 0.05, 0],
-    [0, 0.433, 0.567],
-    [0, 0.475, 0.525],
-  ],
-  tritanomaly: [
-    [0.967, 0.033, 0],
-    [0, 0.733, 0.267],
-    [0, 0.183, 0.817],
-  ],
-  achromatopsia: [
-    [0.299, 0.587, 0.114],
-    [0.299, 0.587, 0.114],
-    [0.299, 0.587, 0.114],
-  ],
-};
+/**
+ * Las matrices viven en `@/lib/calculadoras/daltonismo`, compartidas con
+ * `simulador-baja-vision`.
+ *
+ * Hasta el 20/09/2026 estaban aquí, duplicadas literalmente en la otra app y mal
+ * atribuidas: se decía que eran las de Machado et al. (2009) y eran el juego HCIRN/Wickline
+ * de los filtros SVG de accesibilidad, que es INVERTIBLE y por tanto no puede fundir dos
+ * colores en uno — justo lo que esta app existe para enseñar.
+ */
+const MATRICES = MATRICES_CVD;
 
 const TAMANO_MAX = 720;
 
-function clamp255(v: number): number {
-  if (v < 0) return 0;
-  if (v > 255) return 255;
-  return Math.round(v);
-}
+// La linealización (sRGB ↔ luz) vive en el motor: `srgbALineal` / `linealASrgb`,
+// que ya acotan y redondean el canal — por eso aquí sobra el `clamp255` que había.
+// Machado se multiplica contra luz LINEAL, no contra los 0-255 de sRGB.
 
-// Las matrices de Machado et al. (2009) operan sobre RGB lineal, no sRGB.
-// Hay que linearizar antes de aplicar la matriz y comprimir después.
-function srgbToLinear(c: number): number {
-  const s = c / 255;
-  return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-}
-
-function linearToSrgb(c: number): number {
-  const s = c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
-  return clamp255(s * 255);
-}
-
-function aplicarMatriz(src: ImageData, m: number[][]): ImageData {
+function aplicarMatriz(src: ImageData, m: readonly (readonly number[])[]): ImageData {
   const dst = new ImageData(src.width, src.height);
   const sd = src.data;
   const dd = dst.data;
   for (let i = 0; i < sd.length; i += 4) {
-    const r = srgbToLinear(sd[i]);
-    const g = srgbToLinear(sd[i + 1]);
-    const b = srgbToLinear(sd[i + 2]);
-    dd[i]     = linearToSrgb(r * m[0][0] + g * m[0][1] + b * m[0][2]);
-    dd[i + 1] = linearToSrgb(r * m[1][0] + g * m[1][1] + b * m[1][2]);
-    dd[i + 2] = linearToSrgb(r * m[2][0] + g * m[2][1] + b * m[2][2]);
+    const r = srgbALineal(sd[i]);
+    const g = srgbALineal(sd[i + 1]);
+    const b = srgbALineal(sd[i + 2]);
+    dd[i]     = linealASrgb(r * m[0][0] + g * m[0][1] + b * m[0][2]);
+    dd[i + 1] = linealASrgb(r * m[1][0] + g * m[1][1] + b * m[1][2]);
+    dd[i + 2] = linealASrgb(r * m[2][0] + g * m[2][1] + b * m[2][2]);
     dd[i + 3] = sd[i + 3];
   }
   return dst;
@@ -358,7 +311,9 @@ export default function SimuladorDaltonismoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🌈 Simulador de Daltonismo</h1>
+        <h1 className={styles.title}>
+          <span aria-hidden="true">🌈</span> Simulador de Daltonismo
+        </h1>
         <p className={styles.subtitle}>
           Visualiza cómo perciben tus diseños las personas con daltonismo. Sube una imagen o usa la paleta de prueba y verás
           al instante 8 simulaciones generadas con matrices oficiales. Todo el procesamiento ocurre en tu navegador.
@@ -366,6 +321,17 @@ export default function SimuladorDaltonismoPage() {
       </header>
 
       <LegalNotice />
+
+      {/* Qué NO es esta herramienta, sin tener que abrir nada. Hasta el 20/09/2026 esto solo
+          existía dentro de <EducationalSection>, que nace colapsada: la app lleva
+          `@disclaimer: exempt` en la línea 2, así que era el único texto que acotaba su
+          alcance y no se leía sin desplegar. */}
+      <p className={styles.avisoAlcance}>
+        <span aria-hidden="true">👁️</span> Esto es una <strong>herramienta de diseño</strong>, no una prueba
+        diagnóstica. El daltonismo se diagnostica con tests específicos (Ishihara, Farnsworth-Munsell)
+        realizados por un profesional de la salud visual. La simulación modela la percepción en la retina, no
+        la adaptación aprendida por el cerebro.
+      </p>
 
       <div
         className={`${styles.dropZone} ${dragActive ? styles.dropZoneActive : ''}`}
@@ -390,7 +356,7 @@ export default function SimuladorDaltonismoPage() {
               fileInputRef.current?.click();
             }}
           >
-            📁 Subir imagen
+            <span aria-hidden="true">📁</span> Subir imagen
           </button>
           <button
             type="button"
@@ -400,7 +366,7 @@ export default function SimuladorDaltonismoPage() {
               cargarImagenDemo();
             }}
           >
-            🔄 Usar imagen demo
+            <span aria-hidden="true">🔄</span> Usar imagen demo
           </button>
         </div>
         <input
@@ -447,7 +413,7 @@ export default function SimuladorDaltonismoPage() {
                   onClick={() => descargar(tipo.id)}
                   aria-label={`Descargar simulación ${tipo.nombre}`}
                 >
-                  ⬇ Descargar
+                  <span aria-hidden="true">⬇</span> Descargar
                 </button>
               </div>
             </article>
@@ -461,11 +427,18 @@ export default function SimuladorDaltonismoPage() {
       >
         <section className={styles.guideSection}>
           <p>
-            El daltonismo (más correctamente, <strong>deficiencia de visión cromática</strong>) afecta aproximadamente al
-            8% de los hombres y al 0,5% de las mujeres de origen europeo. No es ceguera al color: es una percepción
-            distinta debido a que uno de los tres tipos de conos retinianos (L para rojo, M para verde, S para azul)
-            funciona de forma diferente o está ausente. Como diseñador o desarrollador, conviene comprobar que tu
-            interfaz comunica la información también sin depender exclusivamente del color.
+            El daltonismo (más correctamente, <strong>deficiencia de visión cromática</strong>) rojo-verde afecta a
+            cerca del 8% de los hombres y al 0,4% de las mujeres de ascendencia europea, según la revisión de encuestas
+            poblacionales de Birch (2012). La prevalencia <strong>no es la misma en todo el mundo</strong>: en hombres
+            de ascendencia china y japonesa esa misma revisión la sitúa entre el 4% y el 6,5%. No es ceguera al color:
+            es una percepción distinta debido a que uno de los tres tipos de conos retinianos (L para rojo, M para
+            verde, S para azul) funciona de forma diferente o está ausente. Como diseñador o desarrollador, conviene
+            comprobar que tu interfaz comunica la información también sin depender exclusivamente del color.
+          </p>
+          <p className={styles.fuenteDato}>
+            Fuente de las cifras de prevalencia: Birch, J. (2012), «Worldwide prevalence of red-green color
+            deficiency», <em>Journal of the Optical Society of America A</em> 29(3), 313-320. Los porcentajes por tipo
+            de las tarjetas de arriba son desgloses aproximados y pueden no sumar exactamente el total.
           </p>
 
           <h3>Tipos de daltonismo en una tabla</h3>
@@ -525,7 +498,7 @@ export default function SimuladorDaltonismoPage() {
           </div>
           <div className={styles.faqItem}>
             <h4>¿Las matrices que usas son las correctas?</h4>
-            <p>Sí. Son las matrices publicadas en Machado, Oliveira & Fernandes (2009), &ldquo;A Physiologically-based Model for Simulation of Color Vision Deficiency&rdquo;, IEEE TVCG. Es el estándar de facto en herramientas de accesibilidad como Sim Daltonism o Color Oracle.</p>
+            <p>Sí. Son las matrices publicadas en Machado, Oliveira &amp; Fernandes (2009), &ldquo;A Physiologically-based Model for Simulation of Color Vision Deficiency&rdquo;, IEEE TVCG. Es el estándar de facto en herramientas de accesibilidad como Sim Daltonism o Color Oracle. Dos precisiones que conviene conocer: las tres formas <strong>anómalas</strong> se simulan con severidad 0,6 —una alteración moderada—, porque a severidad 1 serían indistinguibles de la dicromacia correspondiente; y el ajuste del modelo para la <strong>tritanopia</strong> es el menos fiable de los tres, al ser la deficiencia más rara y con menos datos experimentales.</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Esta herramienta sirve para diagnóstico?</h4>
@@ -572,11 +545,18 @@ export default function SimuladorDaltonismoPage() {
 
           <h3>Sobre las matrices y los algoritmos</h3>
           <p>
-            La simulación se basa en transformaciones lineales del espacio RGB sRGB mediante matrices 3×3. Cada matriz
-            reproduce cómo cambiaría la señal en la retina al carecer (dicromacia) o tener alterado (anomalía) uno de
-            los conos. Esto da una imagen perceptualmente cercana, aunque no idéntica, a lo que vería una persona con
-            esa deficiencia. Las matrices están publicadas en Machado, Oliveira &amp; Fernandes (2009) y son las más
-            citadas en herramientas de accesibilidad.
+            La simulación se basa en transformaciones lineales mediante matrices 3×3. Cada matriz reproduce cómo
+            cambiaría la señal en la retina al carecer (dicromacia) o tener alterado (anomalía) uno de los conos. Se
+            multiplican contra <strong>RGB lineal</strong>, no contra los valores de 0 a 255 que guarda la imagen: hay
+            que deshacer antes la curva gamma del sRGB y volver a aplicarla después, porque el modelo está definido
+            sobre luz y no sobre la señal codificada. Esto da una imagen perceptualmente cercana, aunque no idéntica, a
+            lo que vería una persona con esa deficiencia. Las matrices están publicadas en Machado, Oliveira &amp;
+            Fernandes (2009) y son las más citadas en herramientas de accesibilidad; en esta app se leen del mismo
+            módulo que usa el simulador de baja visión, para que las dos no puedan divergir.{' '}
+            <a href={CVD_META.urlOficial} target="_blank" rel="noopener noreferrer">
+              Tabla original de los autores
+            </a>{' '}
+            ({CVD_META.publicacion}). Datos verificados el {CVD_META.verificado.split('-').reverse().join('/')}.
           </p>
         </section>
       </EducationalSection>

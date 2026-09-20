@@ -9,6 +9,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
+import { matrizParaFeColorMatrix } from '@/lib/calculadoras/daltonismo';
 
 type CondicionId =
   | 'normal'
@@ -196,43 +197,29 @@ export default function SimuladorBajaVision() {
 
   return (
     <div className={styles.container}>
-      {/* Filtros SVG de daltonismo.
-          `colorInterpolationFilters="sRGB"` NO es decorativo: sin él la especificación SVG
-          manda operar en linearRGB, así que el navegador lineariza, multiplica y vuelve a
-          comprimir, y lo pintado deja de ser lo que calcula la matriz escrita aquí abajo.
-          Estas matrices son las de la literatura de accesibilidad web, pensadas para
-          multiplicarse contra valores sRGB de 8 bits. Medido con la píldora roja #dc2626 en
-          protanopia: la matriz dice rgb(141,140,38) y en linearRGB salía rgb(172,171,38),
-          que cambia el contraste con su texto blanco de 3,55:1 a 2,44:1 — justo la métrica
-          que la app enseña tres secciones más abajo (hallazgo 953). */}
+      {/* Filtros SVG de daltonismo — las matrices salen de `@/lib/calculadoras/daltonismo`,
+          el mismo módulo que usa `simulador-daltonismo`.
+
+          ⚠️ Estos tres filtros NO declaran `colorInterpolationFilters`, y es deliberado: la
+          especificación SVG usa linearRGB por defecto, que es exactamente donde opera el
+          modelo de Machado et al. (2009). Declarar "sRGB" aquí haría que la matriz se
+          multiplicase contra la señal con gamma y el resultado dejaría de ser el del modelo.
+
+          Hasta el 20/09/2026 había aquí otras matrices —el juego HCIRN/Wickline de los
+          filtros de accesibilidad web—, duplicadas literalmente en la app hermana y
+          aplicadas allí en otro espacio, así que las dos pintaban colores distintos para la
+          misma condición. Aquel juego es además INVERTIBLE: no puede fundir dos colores en
+          uno, de modo que una confusión cromática real no llegaba a verse nunca. */}
       <svg className={styles.svgFiltros} aria-hidden="true" focusable="false">
         <defs>
-          <filter id="protanopia" colorInterpolationFilters="sRGB">
-            <feColorMatrix
-              type="matrix"
-              values="0.567 0.433 0     0 0
-                      0.558 0.442 0     0 0
-                      0     0.242 0.758 0 0
-                      0     0     0     1 0"
-            />
+          <filter id="protanopia">
+            <feColorMatrix type="matrix" values={matrizParaFeColorMatrix('protanopia')} />
           </filter>
-          <filter id="deuteranopia" colorInterpolationFilters="sRGB">
-            <feColorMatrix
-              type="matrix"
-              values="0.625 0.375 0   0 0
-                      0.7   0.3   0   0 0
-                      0     0.3   0.7 0 0
-                      0     0     0   1 0"
-            />
+          <filter id="deuteranopia">
+            <feColorMatrix type="matrix" values={matrizParaFeColorMatrix('deuteranopia')} />
           </filter>
-          <filter id="tritanopia" colorInterpolationFilters="sRGB">
-            <feColorMatrix
-              type="matrix"
-              values="0.95 0.05  0       0 0
-                      0    0.433 0.567   0 0
-                      0    0.475 0.525   0 0
-                      0    0     0       1 0"
-            />
+          <filter id="tritanopia">
+            <feColorMatrix type="matrix" values={matrizParaFeColorMatrix('tritanopia')} />
           </filter>
         </defs>
       </svg>

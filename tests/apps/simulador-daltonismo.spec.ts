@@ -267,29 +267,27 @@ const separacion = (a: Color, b: Color): number => Math.max(...a.map((v, i) => M
 // ── CASOS 1 y 2 · escritorio ─────────────────────────────────────────────────
 
 test.describe('simulador-daltonismo', () => {
-  test('CASO 1 · #FF0000 en protanopia — la matriz aplicada no es la de Machado que se declara', async ({
+  test('CASO 1 · #FF0000 en protanopia — se aplica la matriz de Machado que la app declara', async ({
     page,
   }) => {
     await subirImagenDePrueba(page);
 
     const protanopia = await colorPintado(page, 'Protanopia', ROJO);
 
-    // TESTIGO del hallazgo A. Lo que sale hoy: matriz HCIRN/Wickline [0.567 0.433 0 / …]
-    // linealizada → 0,567 y 0,558 en luz lineal → 198 y 197 al volver a sRGB.
-    expect(protanopia).toEqual([198, 197, 0]);
-
-    // Lo CORRECTO según lo que la app promete siete veces: Machado et al. (2009), severidad 1,0,
-    // fila 1 [0.152286 1.052583 −0.204868] sobre R=1 → 0,152286 → 109; fila 2 → 0,114503 → 95.
-    // Cuando se repare, este expect pasa a ser el de arriba y el testigo se retira.
+    // Machado et al. (2009), severidad 1,0, fila 1 [0.152286 1.052583 −0.204868] sobre R=1 en luz
+    // LINEAL → 0,152286 → 109; fila 2 → 0,114503 → 95; fila 3 sale negativa y se acota a 0.
+    // Reparado el 20/09/2026: antes salía rgb(198,197,0), el juego HCIRN/Wickline que la app
+    // decía no usar.
     const MACHADO_2009_PROTANOPIA_ROJO: Color = [109, 95, 0];
-    expect(separacion(protanopia, MACHADO_2009_PROTANOPIA_ROJO)).toBe(102);
+    expect(protanopia).toEqual(MACHADO_2009_PROTANOPIA_ROJO);
 
     // Y el efecto sale INVERTIDO respecto a lo que la propia tarjeta de protanopia afirma.
     await expect(
       page.locator('article', { hasText: 'Protanopia' }).first(),
     ).toContainText('El rojo se percibe muy oscuro o negro');
-    // Luminancia relativa WCAG: #FF0000 vale 0,2126; rgb(198,197,0) vale 0,5194 (2,44× MÁS claro);
-    // el rgb(109,95,0) de Machado vale 0,1144 (0,54×, que sí es «más oscuro»).
+    // Luminancia relativa WCAG: #FF0000 vale 0,2126 y el rgb(109,95,0) de Machado vale 0,1144
+    // (0,54×), que SÍ es «más oscuro». Con las matrices viejas salía 0,5194: 2,44× más CLARO,
+    // justo lo contrario de lo que la tarjeta promete.
     const luminancia = (c: Color): number => {
       const lin = c.map((v) => {
         const s = v / 255;
@@ -297,10 +295,10 @@ test.describe('simulador-daltonismo', () => {
       });
       return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
     };
-    expect(luminancia(protanopia)).toBeGreaterThan(luminancia([255, 0, 0]));
+    expect(luminancia(protanopia)).toBeLessThan(luminancia([255, 0, 0]));
   });
 
-  test('CASO 2 · #00FF00 en deuteranopia — sale un gris rosado donde el modelo da amarillo', async ({
+  test('CASO 2 · #00FF00 en deuteranopia — el verde puro sale AMARILLO, no un gris rosado', async ({
     page,
   }) => {
     await subirImagenDePrueba(page);
@@ -308,20 +306,19 @@ test.describe('simulador-daltonismo', () => {
     const deuteranopia = await colorPintado(page, 'Deuteranopia', VERDE);
     const protanopia = await colorPintado(page, 'Protanopia', VERDE);
 
-    // TESTIGO del hallazgo A. Matriz del código en lineal: G=1 → 0,375 / 0,300 / 0,300.
-    expect(deuteranopia).toEqual([165, 149, 149]);
-    expect(protanopia).toEqual([176, 177, 135]);
-
     // Machado (2009) deuteranopia sobre G=1: fila 1 → 0,860646 → 239; fila 2 → 0,672501 → 214;
-    // fila 3 → 0,042940 → 58. Es decir un AMARILLO saturado, que es como se describe siempre la
-    // apariencia del verde puro para un deuteránope. Protanopia daría rgb(255,229,0).
+    // fila 3 → 0,042940 → 58. Un AMARILLO saturado, que es como se describe siempre la
+    // apariencia del verde puro para un deuteránope.
     const MACHADO_2009_DEUTERANOPIA_VERDE: Color = [239, 214, 58];
-    expect(separacion(deuteranopia, MACHADO_2009_DEUTERANOPIA_VERDE)).toBe(91);
+    expect(deuteranopia).toEqual(MACHADO_2009_DEUTERANOPIA_VERDE);
+    // Protanopia sobre el mismo verde: 1,052583 se acota a 255; 0,786281 → 229; −0,048116 → 0.
+    expect(protanopia).toEqual([255, 229, 0]);
 
-    // El error no es de nivel sino de TONO: lo pintado tiene R > G = B, o sea un gris rosado con
-    // un 6 % de saturación, mientras el modelo da un amarillo al 76 %.
-    expect(deuteranopia[0]).toBeGreaterThan(deuteranopia[1]);
-    expect(deuteranopia[1]).toBe(deuteranopia[2]);
+    // Es amarillo de verdad, no un gris: R y G altos y muy por encima de B. Antes de repararlo
+    // salía rgb(165,149,149), un gris rosado con un 6 % de saturación.
+    expect(deuteranopia[0]).toBeGreaterThan(200);
+    expect(deuteranopia[1]).toBeGreaterThan(200);
+    expect(deuteranopia[2]).toBeLessThan(100);
 
     // Coherencia entre tipos: protanopia y deuteranopia NO pueden coincidir. Aquí sí se cumple.
     expect(separacion(protanopia, deuteranopia)).toBeGreaterThan(2);
@@ -360,45 +357,41 @@ test.describe('simulador-daltonismo · móvil', () => {
       expect(gris[1]).toBe(gris[2]);
     }
 
-    // TESTIGO del hallazgo C: el nivel de ese gris no es de ningún convenio. Para #FF0000 la app
-    // da 149 porque aplica los coeficientes de luma Rec.601 (0,299/0,587/0,114), que están
-    // definidos sobre señal CON GAMMA, a luz LINEAL. Ese convenio daría 76; la luminancia
-    // Rec.709 sobre lineal (0,2126/0,7152/0,0722) daría 127.
-    expect(await colorPintado(page, 'Acromatopsia', ROJO)).toEqual([149, 149, 149]);
+    // Y su NIVEL es el de un convenio declarado: luminancia relativa Rec.709 (0,2126/0,7152/
+    // 0,0722) sobre luz lineal, que para #FF0000 da 0,2126 → 127. Antes salía 149, que no era
+    // ninguno de los dos convenios: aplicaba la luma Rec.601, definida sobre señal CON GAMMA,
+    // a luz lineal (reparado el 20/09/2026).
+    expect(await colorPintado(page, 'Acromatopsia', ROJO)).toEqual([127, 127, 127]);
 
-    // TESTIGO del hallazgo B — el par de confusión protán.
+    // EL CASO QUE ESTA APP EXISTE PARA ENSEÑAR — el par de confusión protán.
     // #006808 (verde oscuro) y #F80800 (rojo vivo) están separados 248 niveles para quien ve los
     // tres conos, y Machado (2009) los funde en el MISMO rgb(106,93,0): un protánope no los
-    // distingue. Es el caso que esta app existe para enseñar.
+    // distingue. Solo puede ocurrir porque la matriz de protanopia es SINGULAR (determinante ~0)
+    // y colapsa el espacio de 3 dimensiones a 2. Con las matrices viejas, invertibles, salían
+    // rgb(69,70,53) y rgb(193,192,2) — 124 niveles de separación, es decir, la app le decía al
+    // diseñador que se distinguen de sobra.
     const a = await colorPintado(page, 'Protanopia', CONFUSION_A);
     const b = await colorPintado(page, 'Protanopia', CONFUSION_B);
-    expect(a).toEqual([69, 70, 53]);
-    expect(b).toEqual([193, 192, 2]);
-    // Lo que se le enseña hoy al diseñador: que se distinguen de sobra. Exactamente al revés.
-    expect(separacion(a, b)).toBe(124);
-    // Cuando se repare a Machado, los dos valdrán rgb(106,93,0) y esta separación será 0:
-    //   expect(separacion(a, b)).toBeLessThanOrEqual(2);
+    expect(a).toEqual([106, 93, 0]);
+    expect(b).toEqual([106, 93, 0]);
+    expect(separacion(a, b)).toBe(0);
 
-    // La deuteranopia los separa aún más (155 niveles), y su matriz tiene determinante −0,0525:
-    // ninguna de las dos dicromacias puede fundir nunca dos colores en uno.
+    // La deuteranopia también es singular, así que también acerca ese par (antes los separaba
+    // 155 niveles). No tiene por qué fundirlos exactamente: la línea de confusión es la protán.
     const da = await colorPintado(page, 'Deuteranopia', CONFUSION_A);
     const db = await colorPintado(page, 'Deuteranopia', CONFUSION_B);
-    expect(separacion(da, db)).toBe(155);
+    expect(separacion(da, db)).toBeLessThan(155);
   });
 
-  test('CASO 3.bis · en Pixel 7 — el único aviso de alcance nace colapsado', async ({ page }) => {
+  test('CASO 3.bis · en Pixel 7 — el aviso de alcance se lee SIN desplegar nada', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[type="file"]']);
 
-    // TESTIGO del hallazgo D. «¿Esta herramienta sirve para diagnóstico? No. El daltonismo se
-    // diagnostica con tests específicos (Ishihara, Farnsworth-Munsell)…» es lo único que acota
-    // qué NO es esta app, y vive dentro de <EducationalSection>, que nace colapsada.
-    const aviso = page.locator('h4', { hasText: '¿Esta herramienta sirve para diagnóstico?' });
-    await expect(aviso).toHaveCount(1); // está en el DOM (se monta siempre, por SEO)
-    expect(await aviso.boundingBox()).toBeNull(); // …pero mide 0×0: no se ve
-
-    // Se ve solo tras pulsar el desplegable.
-    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    // Hasta el 20/09/2026 lo único que acotaba qué NO es esta app vivía dentro de
+    // <EducationalSection>, que nace colapsada — la prohibición expresa del CLAUDE.md. Ahora hay
+    // un aviso propio bajo el hero, visible al llegar y sin abrir nada.
+    const aviso = page.getByText(/no una prueba diagnóstica/i);
     await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('Ishihara');
   });
 });
