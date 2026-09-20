@@ -269,8 +269,13 @@ export const GASTOS_DEDUCIBLES_TRABAJO_2025 = {
  * 19.747,5 el segundo da exactamente 0.
  *
  * ⚠️ La reducción exige además NO tener rentas distintas de las del trabajo superiores a
- * 6.500 € (excluidas las exentas). Esa condición no la modela este módulo: quien la
- * necesite debe comprobarla antes de llamar a `calcularReduccionRendimientosTrabajo`.
+ * 6.500 € (excluidas las exentas). Esa condición no la modela este módulo —el importe se
+ * publica en `limiteOtrasRentas` para que quien la necesite la compruebe antes de llamar a
+ * `calcularReduccionRendimientosTrabajo`—. El 20/09/2026 dejó de estar solo en este
+ * comentario: `estimador-irpf-pensionista` lo necesitaba y, al no haber constante, había
+ * tomado prestado el umbral homónimo de `DEDUCCION_RENTAS_BAJAS_2025` (art. 80 bis). Son
+ * DOS artículos distintos que hoy coinciden en 6.500 €: si uno se moviera y el otro no, el
+ * préstamo publicaría la cifra equivocada sin que nada avisara.
  *
  * Fuente: AEAT, Manual práctico Renta 2025, capítulo 3 — art. 20 Ley 35/2006 en la
  * redacción dada por el RDL 4/2024.
@@ -284,6 +289,7 @@ export const REDUCCION_RENDIMIENTOS_TRABAJO_2025 = {
   reduccion2:                 0,     // €/año por encima de limite2 — NO hay residual
   factorTramo1:            1.75,     // Pendiente entre limite1 y limiteIntermedio
   factorTramo2:            1.14,     // Pendiente entre limiteIntermedio y limite2
+  limiteOtrasRentas:       6500,     // art. 20.2: con más rentas ajenas al trabajo, NO hay reducción
 };
 
 /**

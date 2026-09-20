@@ -173,6 +173,22 @@
   font-size: 0.9rem;
 }
 
+/* Matiz que acompaña a una cifra del resultado y explica por qué es esa y no otra. */
+.resultNota {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--primary);
+  background: var(--bg-secondary);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .resultNota {
+  background: #1e293b;
+}
+
 /* === SECCIONES PROFESIONALES v2.0 === */
 
 .tableWrapper {

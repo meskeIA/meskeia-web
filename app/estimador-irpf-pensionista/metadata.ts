@@ -1,5 +1,25 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { formatCurrency } from '@/lib/formatters';
+import {
+  MINIMOS_IRPF_2025,
+  GASTOS_DEDUCIBLES_TRABAJO_2025,
+  REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  DEDUCCION_RENTAS_BAJAS_2025,
+  OBLIGACION_DECLARAR_2025,
+  cuotaEscalaGeneral,
+} from '@/data/fiscal';
+
+/**
+ * El FAQPage se sirve a Bing Copilot, ChatGPT, Perplexity y Gemini para grounding, así que sus
+ * cifras son tan publicables como las de la pantalla. Hasta el 20/09/2026 iban escritas a mano
+ * y llevaban la redacción del art. 20 DEROGADA por el RDL 4/2024 —6.498 / 13.115 / 16.825 y una
+ * «reducción mínima de 2.364 €» que `data/fiscal` declara inexistente— más un mínimo por edad de
+ * 75 años cifrado en 1.215 € de cuota cuando la escala vigente da 1.539 €. Ahora salen todas de
+ * `@/data/fiscal`: si la norma cambia allí, este texto cambia con ella.
+ */
+const LIMITE_OTRAS_RENTAS_ART_20 = DEDUCCION_RENTAS_BAJAS_2025.limiteOtrasRentas;
+const VALOR_MINIMO_75 = cuotaEscalaGeneral(MINIMOS_IRPF_2025.personal_75);
 
 export const metadata: Metadata = {
   title: 'Estimador IRPF Pensionista 2026 - Cuánto pagas de renta | meskeIA',
@@ -51,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Cuánto IRPF paga un pensionista en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende del importe de la pensión. Las pensiones tributan como rendimientos del trabajo y se les aplica la escala general del IRPF. En 2026 existe una reducción por rendimientos del trabajo para rendimientos netos inferiores a 16.825 € anuales (reducción máxima de 6.498 € para rentas ≤13.115 €), y también se aplica el mínimo personal de 5.550 € (6.700 € a partir de 65 años y 8.100 € a partir de 75 años). Con la pensión mínima de jubilación (~9.000 €/año) la cuota suele ser cero o muy reducida.',
+        text: `Depende del importe de la pensión. Las pensiones tributan como rendimientos del trabajo y se les aplica la escala general del IRPF. Primero se restan los gastos deducibles del art. 19.2.f (${formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)}) y después la reducción del art. 20, que vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} mientras el rendimiento neto del trabajo no pase de ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} y se agota en ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}. El mínimo personal es de ${formatCurrency(MINIMOS_IRPF_2025.personal)} (${formatCurrency(MINIMOS_IRPF_2025.personal_65)} a partir de 65 años y ${formatCurrency(MINIMOS_IRPF_2025.personal_75)} a partir de 75) y no se resta de la base: se grava a tipo cero aplicando la escala dos veces, como manda el art. 63.1.2.º LIRPF. Con una pensión mínima de jubilación la cuota suele ser cero.`,
       },
     },
     {
@@ -59,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Qué es la reducción por rendimientos del trabajo para pensionistas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es una minoración en la base imponible del IRPF que beneficia a trabajadores y pensionistas con ingresos del trabajo relativamente bajos. En 2026, si los rendimientos netos del trabajo no superan 13.115 € anuales la reducción máxima es de 6.498 €; se reduce progresivamente hasta los 16.825 €, donde la reducción mínima es de 2.364 €. Esto puede traducirse en una cuota de IRPF cero o muy baja para pensiones modestas.',
+        text: `Es una minoración del rendimiento neto del trabajo (art. 20 LIRPF) que beneficia a trabajadores y pensionistas con ingresos del trabajo bajos. Vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} mientras el rendimiento neto no pase de ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)}; después decrece en dos tramos y desde ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)} vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion2)}: se agota del todo y no deja ningún importe residual. Exige además no tener rentas distintas de las del trabajo superiores a ${formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)}, así que un pensionista con alquileres por encima de esa cifra no la aplica.`,
       },
     },
     {
@@ -67,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Tiene que hacer la declaración de la renta un jubilado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No siempre. En 2026, un pensionista con un único pagador (la Seguridad Social) y pensión inferior a 22.000 € brutos anuales no está obligado a declarar, aunque puede hacerlo voluntariamente si espera devolución. Si percibe pensión de más de un pagador (por ejemplo, también de una mutualidad), el límite baja a 15.000 €.',
+        text: `No siempre. Un pensionista con un único pagador (la Seguridad Social) y rendimientos del trabajo por debajo de ${formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.unPagador)} brutos anuales no está obligado a declarar, aunque puede hacerlo voluntariamente si espera devolución. Si percibe pensión de más de un pagador (por ejemplo, también de una mutualidad) y el segundo supera ${formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}, el límite baja a ${formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)}.`,
       },
     },
     {
@@ -83,7 +103,7 @@ export const faqJsonLd = {
       name: '¿El mínimo personal por edad reduce el IRPF del pensionista?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El mínimo personal exento es de 5.550 € anuales con carácter general, pero sube a 6.700 € para mayores de 65 años y a 8.100 € para mayores de 75 años. Este importe se aplica al tipo más bajo de la escala, lo que equivale en la práctica a un descuento en la cuota íntegra de hasta 1.215 € para mayores de 75 años.',
+        text: `Sí. El mínimo personal es de ${formatCurrency(MINIMOS_IRPF_2025.personal)} anuales con carácter general, sube a ${formatCurrency(MINIMOS_IRPF_2025.personal_65)} desde los 65 años y a ${formatCurrency(MINIMOS_IRPF_2025.personal_75)} desde los 75. No reduce la renta: forma parte de la base liquidable y se grava a tipo cero aplicando la escala dos veces —a la base completa y al mínimo— y restando la segunda cuota de la primera (art. 63.1.2.º LIRPF). Como el mínimo cae en el primer tramo de la escala, al 19 %, para un pensionista de 75 años o más equivale a ${formatCurrency(VALOR_MINIMO_75)} de cuota íntegra anulada.`,
       },
     },
   ],
