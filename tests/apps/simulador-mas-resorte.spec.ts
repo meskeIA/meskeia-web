@@ -34,30 +34,32 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *       γ > γ_c (SOBREAMORT.)  → ω₀² − β² < 0, dos exponenciales reales, tampoco oscila.
  *   Esto no es una sutileza de examen: es lo que la PROPIA app enseña en «Errores frecuentes»
  *   («la frecuencia de oscilación es ω_d = √(ω₀² − (γ/2m)²), NO ω₀»), en el PASO 4 y en su FAQ
- *   («γ > γ_c: sobreamortiguado, vuelve lentamente SIN oscilar»). Su motor hace justo lo
- *   contrario: `calcPosicion` es `A·cos(ω₀·t)·exp(−γt/2m)`, con ω₀ en el coseno.
+ *   («γ > γ_c: sobreamortiguado, vuelve lentamente SIN oscilar»). Su motor hacía justo lo
+ *   contrario —`calcPosicion` era `A·cos(ω₀·t)·exp(−γt/2m)`, con ω₀ en el coseno— hasta la
+ *   reparación del 20/09/2026, que lo mudó a `app/simulador-mas-resorte/motor.ts` con los
+ *   tres regímenes y sus casos unitarios en `tests/mas-resorte-motor.spec.ts`.
  *
  *   Números de contraste calculados a mano:
  *     · m=1, k=10, γ=2  → γ_c = 6,324555, subcrítico. β = 1, ω_d = √(10−1) = 3,000000 rad/s
  *       EXACTO → T_d = 2π/3 = 2,094395 s, frente a los 1,986918 s que la app publica y anima
  *       (−5,13 %).
  *     · m=1, k=1, A=1, γ=2 → γ_c = 2√1 = 2,000000: amortiguamiento CRÍTICO exacto.
- *       Real: x(t) = (1+t)·e^(−t).  x(1,5708 s) = 0,534440 m · x(3,1416 s) = 0,178995 m,
- *       siempre positiva. La app: x(t) = cos(t)·e^(−t), que cruza a negativo en t = π/2 y
- *       baja hasta −0,067 m (mínimo en t = 3π/4 = 2,356 s).
+ *       Real: x(t) = (1+t)·e^(−t).  x(π/2) = 0,534416 m · x(π) = 0,178974 m, siempre
+ *       positiva. La app daba x(t) = cos(t)·e^(−t), que cruzaba a negativo en t = π/2 y
+ *       bajaba hasta −0,067 m (mínimo en t = 3π/4 = 2,356 s).
  *     · m=0,1, k=1, γ=2 → γ_c = 0,632456: γ es 3,16 veces el crítico, sobreamortiguado puro.
- *       ω₀² − β² = 10 − 100 = −90 → ω_d sería √(−90). La app publica T = 1,987 s.
- *     · ENERGÍA: el modelo de la app implica v(0) = −β·A ≠ 0 (deriva el coseno amortiguado),
- *       así que con m=1, k=1, A=1, γ=2 arranca con E(0) = ½kA² + ½m(βA)² = 0,5 + 0,5 =
+ *       ω₀² − β² = 10 − 100 = −90 → ω_d no existe. La app publicaba T = 1,987 s.
+ *     · ENERGÍA: el modelo viejo implicaba v(0) = −β·A ≠ 0 (derivaba el coseno amortiguado),
+ *       así que con m=1, k=1, A=1, γ=2 arrancaba con E(0) = ½kA² + ½m(βA)² = 0,5 + 0,5 =
  *       1,000000 J, el DOBLE de la ½kA² = 0,500 J que la propia app publica como energía
  *       total. Un oscilador amortiguado solo puede PERDER energía.
  *
  * LO QUE ESTOS TRES CASOS FIJAN
  *   1) normal (γ = 0): el núcleo no amortiguado es exacto — cifras, energía y ritmo de la
  *      animación coinciden entre sí y con la fórmula. Esto debe seguir así.
- *   2) límite (γ = γ_c y γ > γ_c, más un subcrítico): cuatro comprobaciones que hoy
- *      documentan el defecto. Si algún día se repara el motor, FALLARÁN — es su razón de ser,
- *      y cada una lleva escrito al lado el número correcto.
+ *   2) límite (γ = γ_c y γ > γ_c, más un subcrítico): cinco comprobaciones que documentaban
+ *      el defecto y que se invirtieron al repararlo. Ahora exigen el número correcto, que ya
+ *      estaba escrito al lado de cada una.
  *   3) rechazo (masa 0, k negativa, amplitud negativa): los deslizadores capan al mínimo y
  *      no sale ni un NaN ni un infinito.
  */
@@ -225,38 +227,35 @@ test.describe('Caso 2 — límite: γ en el crítico γ_c = 2√(k·m) y más al
     await sembrarValor(page, '#slider-gamma', 2); // arranca en 0
   }
 
-  test('⚠️ con γ = γ_c la masa CRUZA el equilibrio, y el crítico por definición no lo cruza', async ({
-    page,
-  }) => {
+  test('con γ = γ_c la masa NO cruza el equilibrio', async ({ page }) => {
     test.setTimeout(45000);
 
     await ponerCritico(page);
     await expect.poll(() => leerFila(page, 'ω₀')).toBe('1,000 rad/s'); // √(1/1)
+    await expect.poll(() => leerFila(page, 'Régimen')).toBe('Amortiguamiento crítico');
     await page.getByRole('button', { name: 'Reiniciar simulación' }).click();
 
     const muestras = await muestrear(page, 5000, ['Posición x']);
     const minimo = Math.min(...muestras.map((m) => m[1]).filter((n) => isFinite(n)));
 
     // VERDAD FÍSICA: en el crítico x(t) = A(1+βt)e^(−βt) = (1+t)e^(−t) ≥ 0 SIEMPRE.
-    //   x(1,5708 s) = 0,534440 m   ·   x(3,1416 s) = 0,178995 m   ·   mínimo = 0.
-    // LO QUE HACE LA APP: x(t) = cos(t)·e^(−t) → cruza a negativo en t = π/2 = 1,571 s y
-    //   toca el mínimo −0,067 m en t = 3π/4 = 2,356 s. Medido: −0,067 m.
-    // Cuando se repare el motor esta línea fallará: el mínimo pasará a ser 0.
-    expect(minimo).toBeLessThan(-0.01);
+    //   x(π/2) = 0,534416 m · x(π) = 0,178974 m · mínimo = 0.
+    // Antes el motor usaba x(t) = cos(t)·e^(−t), que cruzaba a negativo en t = π/2 y tocaba
+    // −0,067 m en t = 3π/4. Una décima de milímetro de margen para el redondeo de pantalla.
+    expect(minimo).toBeGreaterThanOrEqual(-0.0005);
   });
 
-  test('⚠️ con γ = γ_c publica un período finito de 6,283 s para algo que no oscila', async ({
-    page,
-  }) => {
+  test('con γ = γ_c no se publica ningún período: el sistema no oscila', async ({ page }) => {
     await ponerCritico(page);
 
     // ω₀ = 1 rad/s, pero β = γ/2m = 1 → ω_d = √(1 − 1) = 0: NO hay período.
-    // La app publica T = 2π/ω₀ = 6,283185 s y f = 0,159155 Hz como si no hubiera γ.
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('6,283 s');
-    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('0,159 Hz');
+    // La app publicaba T = 2π/ω₀ = 6,283 s y f = 0,159 Hz como si no hubiera γ.
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('no oscila');
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('no oscila');
+    await expect.poll(() => leerFila(page, 'ω amortiguada')).toBe('no oscila');
   });
 
-  test('⚠️ sobreamortiguado (γ = 3,16·γ_c) y sigue publicando T = 1,987 s', async ({ page }) => {
+  test('sobreamortiguado (γ = 3,16·γ_c): tampoco hay período', async ({ page }) => {
     await sembrarValor(page, '#slider-k', 1);
     await sembrarValor(page, '#slider-gamma', 2);
     await sembrarValor(page, '#slider-masa', 0.1); // arranca en 1,0
@@ -265,11 +264,12 @@ test.describe('Caso 2 — límite: γ en el crítico γ_c = 2√(k·m) y más al
     // β = γ/2m = 10 s⁻¹ y ω₀ = √(1/0,1) = 3,162278 rad/s → ω₀² − β² = −90: ω_d ni existe.
     // La FAQ de la propia app dice que aquí «vuelve lentamente sin oscilar».
     await expect.poll(() => leerFila(page, 'ω₀')).toBe('3,162 rad/s');
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('1,987 s');
-    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('0,503 Hz');
+    await expect.poll(() => leerFila(page, 'Régimen')).toBe('Sobreamortiguado');
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('no oscila');
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('no oscila');
   });
 
-  test('⚠️ subcrítico: anima a ω₀ y no a ω_d — 1,99 s donde tocan 2,094 s', async ({ page }) => {
+  test('subcrítico: anima a ω_d y no a ω₀ — 2,094 s, no 1,987 s', async ({ page }) => {
     test.setTimeout(45000);
 
     await sembrarValor(page, '#slider-k', 10);
@@ -279,17 +279,19 @@ test.describe('Caso 2 — límite: γ en el crítico γ_c = 2√(k·m) y más al
     // m=1, k=10, γ=2 → γ_c = 2√10 = 6,324555: subcrítico de verdad, aquí SÍ oscila.
     //   β = γ/2m = 1 ;  ω_d = √(ω₀² − β²) = √(10 − 1) = 3,000000 rad/s EXACTO
     //   T_d = 2π/3 = 2,094395 s      ← lo correcto
-    //   T₀  = 2π/√10 = 1,986918 s    ← lo que publica y anima la app (−5,13 %)
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('1,987 s');
+    //   T₀  = 2π/√10 = 1,986918 s    ← lo que publicaba y animaba la app (−5,13 %)
+    await expect.poll(() => leerFila(page, 'Régimen')).toBe('Subamortiguado');
+    await expect.poll(() => leerFila(page, 'ω amortiguada')).toBe('3,000 rad/s');
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,094 s');
     await page.getByRole('button', { name: 'Reiniciar simulación' }).click();
 
     const animado = await medirPeriodoAnimado(page, 4500);
-    // La banda excluye 2,0944 s por un margen amplio. Medido: 1,98 s.
-    expect(animado).toBeGreaterThan(1.85);
-    expect(animado).toBeLessThan(2.03);
+    // La banda excluye 1,9869 s por un margen amplio: lo que se mide es el nuevo ritmo.
+    expect(animado).toBeGreaterThan(2.04);
+    expect(animado).toBeLessThan(2.15);
   });
 
-  test('⚠️ la energía total se DUPLICA en el primer frame y supera ½kA²', async ({ page }) => {
+  test('la energía arranca en ½kA² y nunca la supera', async ({ page }) => {
     await ponerCritico(page); // m=1, k=1, A=1, γ=2 → ½kA² = 0,500 J
 
     await page.getByRole('button', { name: 'Pausar simulación' }).click();
@@ -304,17 +306,14 @@ test.describe('Caso 2 — límite: γ en el crítico γ_c = 2√(k·m) y más al
     const vMax = Math.max(...muestras.map((m) => Math.abs(m[1])).filter((n) => isFinite(n)));
     const eMax = Math.max(...muestras.map((m) => m[2]).filter((n) => isFinite(n)));
 
-    // El coseno amortiguado derivado da v(0) = −β·A = −1,000000 m/s, no 0, así que la
-    // energía de partida es ½kA² + ½m(βA)² = 0,5 + 0,5 = 1,000000 J: el DOBLE de la
-    // «E_total = ½·k·A²» que la propia caja de fórmulas publica. Un oscilador amortiguado
-    // solo puede PERDER energía, nunca ganarla. Medido: v = −1,000 m/s y E = 1,000 J en el
-    // segundo frame tras reanudar.
-    expect(vMax).toBeGreaterThan(0.8);
-    expect(eMax).toBeGreaterThan(0.6); // ½kA² = 0,500 J es el techo físico
+    // Derivar A·cos(ω₀t)·e^(−βt) daba v(0) = −β·A = −1,000 m/s, o sea energía cinética que
+    // nadie puso: ½kA² + ½m(βA)² = 1,000 J, el DOBLE del techo que la propia caja de
+    // fórmulas publica. Con x(t) = A(1+βt)e^(−βt) la masa sale en reposo y solo pierde.
+    expect(vMax).toBeLessThan(0.4); // el máximo teórico de |v| es A·β/e = 0,368 m/s
+    expect(eMax).toBeLessThanOrEqual(0.501); // ½kA² = 0,500 J es el techo físico
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 test.describe('Caso 3 — rechazo: masa 0, constante negativa, amplitud negativa', () => {
   test('los deslizadores capan al mínimo y la física sigue siendo la de esos mínimos', async ({
     page,
@@ -372,9 +371,8 @@ test.describe('Caso 3 — rechazo: masa 0, constante negativa, amplitud negativa
     }
 
     // En t = 0 y en pausa, E = ½·k·A² = ½·1·0,05² = 0,00125 J → con 3 decimales, «0,001 J».
-    // ⚠️ Con la animación CORRIENDO esta cifra no se sostiene, y no por el reloj: el motor
-    // arranca con v(0) = −βA en vez de 0 cuando γ > 0, así que la E total publicada supera la
-    // ½kA² que la propia app declara. Está levantada como hallazgo aparte de esta inspección.
+    // Y ya se sostiene también con la animación corriendo: el motor arranca en reposo en el
+    // extremo, así que la energía solo puede bajar desde ese techo.
     expect(aNumero(await leerFila(page, 'Total E'))).toBeLessThan(0.002);
   });
 });

@@ -13,6 +13,14 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorMasResorte.module.css';
+import {
+  describirOscilador,
+  calcularEstado,
+  energiaInicial,
+  marcasDeTiempo,
+  type Regimen,
+} from './motor';
+
 
 // ─── Constantes de renderizado ───────────────────────────────────────────────
 const CANVAS_W = 260;
@@ -20,26 +28,6 @@ const CANVAS_H = 420;
 const GRAFICA_W = 500;
 const GRAFICA_H = 160;
 const HISTORIAL_MAX = 300;
-
-// ─── Helpers físicos ─────────────────────────────────────────────────────────
-
-function calcOmega0(k: number, m: number): number {
-  return Math.sqrt(k / Math.max(m, 0.001));
-}
-
-function calcPosicion(A: number, omega0: number, gamma: number, m: number, t: number): number {
-  // x(t) = A · cos(ω₀·t) · e^(−γ·t / (2·m))
-  return A * Math.cos(omega0 * t) * Math.exp((-gamma * t) / (2 * Math.max(m, 0.001)));
-}
-
-function calcVelocidad(A: number, omega0: number, gamma: number, m: number, t: number): number {
-  // v(t) = dx/dt  (derivada analítica)
-  const mSafe = Math.max(m, 0.001);
-  const decay = Math.exp((-gamma * t) / (2 * mSafe));
-  const cosWt = Math.cos(omega0 * t);
-  const sinWt = Math.sin(omega0 * t);
-  return A * decay * (-omega0 * sinWt - (gamma / (2 * mSafe)) * cosWt);
-}
 
 // ─── Dibujo del resorte ──────────────────────────────────────────────────────
 
@@ -73,8 +61,13 @@ function dibujarResorte(
 
 interface ValoresFisicos {
   omega0: number;
-  T: number;
-  f: number;
+  /** ω_d = √(ω₀² − β²). null cuando el sistema no oscila (crítico o sobreamortiguado). */
+  omegaD: number | null;
+  /** T = 2π/ω_d, con la misma condición: en crítico y sobreamortiguado NO hay período. */
+  T: number | null;
+  f: number | null;
+  regimen: Regimen;
+  gammaCritico: number;
   x: number;
   v: number;
   a: number;
@@ -83,6 +76,13 @@ interface ValoresFisicos {
   Et: number;
   Emax: number;
 }
+
+/** Cómo se rotula cada régimen en la tarjeta que lo anuncia. */
+const NOMBRE_REGIMEN: Record<Regimen, string> = {
+  subamortiguado: 'Subamortiguado',
+  critico: 'Amortiguamiento crítico',
+  sobreamortiguado: 'Sobreamortiguado',
+};
 
 // ─── Componente principal ────────────────────────────────────────────────────
 
@@ -97,7 +97,9 @@ export default function SimuladorMasResortePage() {
   const tiempoRef = useRef<number>(0);
   const prevTimestampRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
-  const historicoRef = useRef<number[]>([]);
+  // Cada muestra lleva su instante: el eje horizontal de la gráfica avanzaba por FRAMES,
+  // así que su escala temporal dependía de los fps de la máquina (hallazgo 970).
+  const historicoRef = useRef<{ t: number; x: number }[]>([]);
 
   // Canvas refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -108,17 +110,23 @@ export default function SimuladorMasResortePage() {
   const runningRef = useRef(true);
 
   // Valores visibles (actualizados desde el RAF para mostrar en UI)
-  const [valores, setValores] = useState<ValoresFisicos>({
-    omega0: calcOmega0(20, 1.0),
-    T: (2 * Math.PI) / calcOmega0(20, 1.0),
-    f: calcOmega0(20, 1.0) / (2 * Math.PI),
-    x: 0.3,
-    v: 0,
-    a: -(20 / 1.0) * 0.3,
-    Ek: 0,
-    Ep: 0.5 * 20 * 0.3 * 0.3,
-    Et: 0.5 * 20 * 0.3 * 0.3,
-    Emax: 0.5 * 20 * 0.3 * 0.3,
+  const [valores, setValores] = useState<ValoresFisicos>(() => {
+    const o = describirOscilador(20, 1.0, 0);
+    return {
+      omega0: o.omega0,
+      omegaD: o.omegaD,
+      T: o.periodo,
+      f: o.frecuencia,
+      regimen: o.regimen,
+      gammaCritico: o.gammaCritico,
+      x: 0.3,
+      v: 0,
+      a: -(20 / 1.0) * 0.3,
+      Ek: 0,
+      Ep: energiaInicial(0.3, 20),
+      Et: energiaInicial(0.3, 20),
+      Emax: energiaInicial(0.3, 20),
+    };
   });
 
   // Sincronizar runningRef con el state
@@ -140,21 +148,12 @@ export default function SimuladorMasResortePage() {
       tiempoRef.current += dt;
 
       const t = tiempoRef.current;
-      const omega0 = calcOmega0(constK, masa);
-      const T = (2 * Math.PI) / omega0;
-      const f = 1 / T;
+      const oscilador = describirOscilador(constK, masa, gamma);
+      const { x, v, a, Ek, Ep, Et } = calcularEstado(amplitud, constK, masa, gamma, t);
+      const Emax = energiaInicial(amplitud, constK);
 
-      const x = calcPosicion(amplitud, omega0, gamma, masa, t);
-      const v = calcVelocidad(amplitud, omega0, gamma, masa, t);
-      const a = (-constK * x - gamma * v) / Math.max(masa, 0.001);
-
-      const Ek = 0.5 * masa * v * v;
-      const Ep = 0.5 * constK * x * x;
-      const Et = Ek + Ep;
-      const Emax = 0.5 * constK * amplitud * amplitud;
-
-      // Actualizar historial
-      historicoRef.current.push(x);
+      // Actualizar historial, con el instante de cada muestra
+      historicoRef.current.push({ t, x });
       if (historicoRef.current.length > HISTORIAL_MAX) {
         historicoRef.current = historicoRef.current.slice(-HISTORIAL_MAX);
       }
@@ -268,25 +267,46 @@ export default function SimuladorMasResortePage() {
           ctx2.stroke();
           ctx2.setLineDash([]);
 
-          // Traza x(t)
+          // Traza x(t), con el eje horizontal en SEGUNDOS: antes avanzaba por frames, así
+          // que la escala temporal del dibujo dependía de los fps de la máquina y no se
+          // podía medir en él el período que la propia app manda medir (hallazgo 970).
+          const tFin = historial.length ? historial[historial.length - 1].t : 0;
+          const tIni = historial.length ? historial[0].t : 0;
+          const ventana = Math.max(tFin - tIni, 0.5);
+          const pxPorSegundo = GRAFICA_W / ventana;
+
           if (historial.length >= 2) {
-            const stepX = GRAFICA_W / (HISTORIAL_MAX - 1);
             ctx2.strokeStyle = '#2E86AB';
             ctx2.lineWidth = 2;
             ctx2.beginPath();
-            historial.forEach((val, idx) => {
-              const px = idx * stepX;
-              const py = midY - val * escalaY;
+            historial.forEach((muestra, idx) => {
+              const px = (muestra.t - tIni) * pxPorSegundo;
+              const py = midY - muestra.x * escalaY;
               if (idx === 0) ctx2.moveTo(px, py);
               else ctx2.lineTo(px, py);
             });
             ctx2.stroke();
           }
 
-          // Etiquetas eje
+          // Marcas de tiempo, cada segundo entero de la ventana visible
           ctx2.fillStyle = '#9ca3af';
-          ctx2.font = '11px system-ui, sans-serif';
+          ctx2.strokeStyle = '#d1d5db';
+          ctx2.lineWidth = 1;
+          ctx2.font = '10px system-ui, sans-serif';
+          ctx2.textAlign = 'center';
+          ctx2.textBaseline = 'bottom';
+          for (const marca of marcasDeTiempo(tIni, tFin)) {
+            const px = (marca - tIni) * pxPorSegundo;
+            ctx2.beginPath();
+            ctx2.moveTo(px, midY - 4);
+            ctx2.lineTo(px, midY + 4);
+            ctx2.stroke();
+            ctx2.fillText(`${formatNumber(marca, 0)} s`, px, GRAFICA_H - 2);
+          }
+
+          // Etiquetas eje
           ctx2.textAlign = 'left';
+          ctx2.font = '11px system-ui, sans-serif';
           ctx2.textBaseline = 'top';
           ctx2.fillText(`+${formatNumber(amplitud, 2)}m`, 4, margenV - 2);
           ctx2.textBaseline = 'bottom';
@@ -298,7 +318,21 @@ export default function SimuladorMasResortePage() {
       }
 
       // Actualizar valores en UI (cada frame)
-      setValores({ omega0, T, f, x, v, a, Ek, Ep, Et, Emax: Math.max(Emax, 0.0001) });
+      setValores({
+        omega0: oscilador.omega0,
+        omegaD: oscilador.omegaD,
+        T: oscilador.periodo,
+        f: oscilador.frecuencia,
+        regimen: oscilador.regimen,
+        gammaCritico: oscilador.gammaCritico,
+        x,
+        v,
+        a,
+        Ek,
+        Ep,
+        Et,
+        Emax: Math.max(Emax, 0.0001),
+      });
 
       rafRef.current = requestAnimationFrame(animar);
     },
@@ -331,23 +365,26 @@ export default function SimuladorMasResortePage() {
     historicoRef.current = [];
     // Si estaba en pausa, forzar un frame inicial
     if (!runningRef.current) {
-      const omega0 = calcOmega0(constK, masa);
-      const x0 = amplitud;
-      const Emax = 0.5 * constK * amplitud * amplitud;
+      const o = describirOscilador(constK, masa, gamma);
+      const estado = calcularEstado(amplitud, constK, masa, gamma, 0);
+      const Emax = energiaInicial(amplitud, constK);
       setValores({
-        omega0,
-        T: (2 * Math.PI) / omega0,
-        f: omega0 / (2 * Math.PI),
-        x: x0,
-        v: 0,
-        a: (-constK * x0) / Math.max(masa, 0.001),
-        Ek: 0,
-        Ep: Emax,
-        Et: Emax,
+        omega0: o.omega0,
+        omegaD: o.omegaD,
+        T: o.periodo,
+        f: o.frecuencia,
+        regimen: o.regimen,
+        gammaCritico: o.gammaCritico,
+        x: estado.x,
+        v: estado.v,
+        a: estado.a,
+        Ek: estado.Ek,
+        Ep: estado.Ep,
+        Et: estado.Et,
         Emax,
       });
     }
-  }, [constK, masa, amplitud]);
+  }, [constK, masa, amplitud, gamma]);
 
   // Reiniciar cuando cambian los parámetros
   useEffect(() => {
@@ -435,7 +472,10 @@ export default function SimuladorMasResortePage() {
           <div className={styles.sliderGroup}>
             <label className={styles.sliderLabel} htmlFor="slider-gamma">
               Amortiguamiento γ
-              <span className={styles.sliderValue}>{formatNumber(gamma, 1)}</span>
+              {/* El γ del motor se usa como γ/(2m) y se compara con γ_c = 2√(k·m): es el
+                  coeficiente viscoso en N·s/m, como declara el propio JSON-LD de la app.
+                  Salía como un número desnudo (hallazgo 969). */}
+              <span className={styles.sliderValue}>{formatNumber(gamma, 1)} N·s/m</span>
             </label>
             <input
               id="slider-gamma"
@@ -446,9 +486,15 @@ export default function SimuladorMasResortePage() {
               value={gamma}
               className={styles.slider}
               onChange={(e) => setGamma(parseFloat(e.target.value))}
-              aria-label={`Amortiguamiento: ${formatNumber(gamma, 1)}`}
+              aria-label={`Amortiguamiento: ${formatNumber(gamma, 1)} newton segundo por metro`}
             />
-            <span className={styles.sliderHint}>0 = sin fricción · 2 = muy amortiguado</span>
+            {/* La pista decía «2 = muy amortiguado», que solo es cierto en una esquina del
+                espacio de parámetros: con los valores por defecto γ_c = 8,94 N·s/m y el tope
+                del deslizador se queda en el 22 % del crítico. Ahora la pista SE CALCULA. */}
+            <span className={styles.sliderHint}>
+              0 = sin fricción · γ_c = {formatNumber(valores.gammaCritico, 2)} N·s/m (crítico) ·
+              ahora {formatNumber(valores.gammaCritico > 0 ? (gamma / valores.gammaCritico) * 100 : 0, 0)} % del crítico
+            </span>
           </div>
         </div>
 
@@ -533,12 +579,28 @@ export default function SimuladorMasResortePage() {
             <span className={styles.valueNum}>{formatNumber(valores.omega0, 3)} rad/s</span>
           </div>
           <div className={styles.valueCard}>
+            <span className={styles.valueName}>ω amortiguada</span>
+            <span className={styles.valueNum}>
+              {valores.omegaD !== null ? `${formatNumber(valores.omegaD, 3)} rad/s` : 'no oscila'}
+            </span>
+          </div>
+          <div className={styles.valueCard}>
             <span className={styles.valueName}>Período T</span>
-            <span className={styles.valueNum}>{formatNumber(valores.T, 3)} s</span>
+            {/* Sin oscilación no hay período que publicar: en crítico y sobreamortiguado
+                el sistema vuelve al equilibrio sin cruzarlo ni una vez. */}
+            <span className={styles.valueNum}>
+              {valores.T !== null ? `${formatNumber(valores.T, 3)} s` : 'no oscila'}
+            </span>
           </div>
           <div className={styles.valueCard}>
             <span className={styles.valueName}>Frecuencia f</span>
-            <span className={styles.valueNum}>{formatNumber(valores.f, 3)} Hz</span>
+            <span className={styles.valueNum}>
+              {valores.f !== null ? `${formatNumber(valores.f, 3)} Hz` : 'no oscila'}
+            </span>
+          </div>
+          <div className={styles.valueCard}>
+            <span className={styles.valueName}>Régimen</span>
+            <span className={styles.valueNum}>{NOMBRE_REGIMEN[valores.regimen]}</span>
           </div>
           <div className={styles.valueCard}>
             <span className={styles.valueName}>Posición x</span>
