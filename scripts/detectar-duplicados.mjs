@@ -55,7 +55,10 @@ function parsearApps() {
   for (const b of bloques) {
     const url = b.match(/url:\s*"([^"]+)"/)?.[1];
     if (!url) continue;
-    const name = b.match(/name:\s*"([^"]+)"/)?.[1] || url;
+    // Las dos comillas — ver la nota gemela en semilla-diaria.mjs (S0154, 20/09/2026). Aquí
+    // importa más: el `name` alimenta la agrupación por tokens, así que una entrada leída como
+    // ruta se agrupa por su slug y puede cambiar el veredicto POTENCIAR-vs-ampliar del clúster.
+    const name = (b.match(/name:\s*"([^"]+)"/) || b.match(/name:\s*'([^']+)'/))?.[1] || url;
     const description = b.match(/description:\s*"((?:[^"\\]|\\.)*)"/)?.[1] || '';
     const kwRaw = b.match(/keywords:\s*\[([^\]]*)\]/)?.[1] || '';
     const keywords = [...kwRaw.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
