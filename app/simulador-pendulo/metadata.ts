@@ -38,7 +38,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el período de un péndulo simple?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para ángulos pequeños (menores de ~15°), el período se calcula con la fórmula T = 2π√(L/g), donde L es la longitud del hilo en metros y g la aceleración gravitacional (9,8 m/s² en la Tierra). Para ángulos mayores, la aproximación lineal no es válida y el simulador utiliza integración numérica para obtener el período real, que resulta mayor que el estimado por la fórmula.',
+        text: 'Para ángulos pequeños (menores de ~15°), el período se calcula con la fórmula T = 2π√(L/g), donde L es la longitud del hilo en metros y g la aceleración gravitacional (9,8 m/s² en la Tierra). Para ángulos mayores, la aproximación lineal no es válida y el simulador calcula el período real con la integral elíptica K(sen(θ₀/2)) —T = 4√(L/g)·K— y lo publica en la caja de resultados, junto a la desviación frente a la fórmula lineal: con θ₀ = 90° el período real es un 18 % mayor.',
       },
     },
     {

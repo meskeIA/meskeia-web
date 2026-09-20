@@ -13,8 +13,14 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorPendulo.module.css';
-
-type Modelo = 'pequeno' | 'numerico';
+import {
+  calcularDerivados,
+  pasoEulerNumerico,
+  thetaPequenosAngulos,
+  validarGravedad,
+  type EstadoPendulo,
+  type Modelo,
+} from './motor';
 
 interface PenduloEstado {
   // Parámetros
@@ -23,19 +29,6 @@ interface PenduloEstado {
   theta0Deg: number; // ángulo inicial en grados
   g: number; // gravedad (m/s^2)
   damping: number; // coeficiente de amortiguación
-}
-
-interface PendulumState {
-  theta: number; // rad
-  omega: number; // rad/s
-}
-
-interface DerivadosFisicos {
-  T: number; // periodo (s)
-  f: number; // frecuencia (Hz)
-  omega0: number; // frecuencia angular (rad/s)
-  correccionGrandes: number; // factor 1 + theta^2/16
-  Tcorregido: number;
 }
 
 const PRESETS_GRAVEDAD: Array<{ id: string; nombre: string; g: number }> = [
@@ -47,55 +40,21 @@ const PRESETS_GRAVEDAD: Array<{ id: string; nombre: string; g: number }> = [
 
 const HISTORIAL_MAX = 240; // ~ 4 segundos a 60fps
 
-function calcularDerivados(L: number, g: number, theta0Rad: number): DerivadosFisicos {
-  const omega0 = Math.sqrt(g / Math.max(L, 0.0001));
-  const T = (2 * Math.PI) / omega0;
-  const f = 1 / T;
-  const correccion = 1 + (theta0Rad * theta0Rad) / 16;
-  return {
-    T,
-    f,
-    omega0,
-    correccionGrandes: correccion,
-    Tcorregido: T * correccion,
-  };
-}
-
-function pasoEulerNumerico(
-  state: PendulumState,
-  L: number,
-  g: number,
-  damping: number,
-  dt: number,
-): PendulumState {
-  // Ecuación: d²θ/dt² + (γ/m·L²)·dθ/dt + (g/L)·sin(θ) = 0
-  // Aproximamos γ/m·L² simplemente como `damping` (coef. efectivo).
-  const alpha = -(g / Math.max(L, 0.0001)) * Math.sin(state.theta) - damping * state.omega;
-  const newOmega = state.omega + alpha * dt;
-  const newTheta = state.theta + newOmega * dt;
-  return { theta: newTheta, omega: newOmega };
-}
-
-function thetaPequenosAngulos(
-  theta0Rad: number,
-  omega0: number,
-  damping: number,
-  t: number,
-): { theta: number; omega: number } {
-  // Solución cerrada con amortiguamiento exponencial: θ(t)=θ0·e^(-γt/2)·cos(ω·t)
-  const env = Math.exp((-damping * t) / 2);
-  const theta = theta0Rad * env * Math.cos(omega0 * t);
-  const omega =
-    theta0Rad * env * (-omega0 * Math.sin(omega0 * t) - (damping / 2) * Math.cos(omega0 * t));
-  return { theta, omega };
-}
-
 export default function SimuladorPenduloPage() {
   // Parámetros principales
   const [L, setL] = useState(1.0);
   const [m, setM] = useState(1.0);
   const [theta0Deg, setTheta0Deg] = useState(20);
-  const [g, setG] = useState(9.81);
+  /**
+   * El TEXTO del campo de gravedad va aparte del número. El onChange era
+   * `parseFloat(e.target.value) || 9.81`, así que un 0 —falsy— se convertía en la gravedad
+   * de la Tierra EN SILENCIO y la etiqueta la mostraba como si la hubiera tecleado el
+   * usuario (hallazgo 975).
+   */
+  const [gTexto, setGTexto] = useState('9.81');
+  const g = gTexto.trim() === '' ? NaN : parseFloat(gTexto);
+  const avisoGravedad = validarGravedad(g);
+  const setG = (valor: number) => setGTexto(String(valor));
   const [damping, setDamping] = useState(0.05);
   const [modelo, setModelo] = useState<Modelo>('numerico');
 
@@ -106,11 +65,11 @@ export default function SimuladorPenduloPage() {
   // Animación
   const [running, setRunning] = useState(true);
   const [tiempo, setTiempo] = useState(0);
-  const [estado1, setEstado1] = useState<PendulumState>({
+  const [estado1, setEstado1] = useState<EstadoPendulo>({
     theta: (theta0Deg * Math.PI) / 180,
     omega: 0,
   });
-  const [estado2, setEstado2] = useState<PendulumState>({
+  const [estado2, setEstado2] = useState<EstadoPendulo>({
     theta: (theta0Deg * Math.PI) / 180,
     omega: 0,
   });
@@ -122,8 +81,17 @@ export default function SimuladorPenduloPage() {
 
   const theta0Rad = useMemo(() => (theta0Deg * Math.PI) / 180, [theta0Deg]);
 
-  const derivados1 = useMemo(() => calcularDerivados(L, g, theta0Rad), [L, g, theta0Rad]);
-  const derivados2 = useMemo(() => calcularDerivados(L2, g, theta0Rad), [L2, g, theta0Rad]);
+  // La pestaña activa decide la cifra: el modelo numérico integra la ecuación completa, así
+  // que su período es el real. Antes «Período T» salía siempre de 2π√(L/g) sin mirar el
+  // modelo, y la misma pantalla enseñaba un número mientras balanceaba a otro ritmo.
+  const derivados1 = useMemo(
+    () => calcularDerivados(L, g, theta0Rad, modelo),
+    [L, g, theta0Rad, modelo],
+  );
+  const derivados2 = useMemo(
+    () => calcularDerivados(L2, g, theta0Rad, modelo),
+    [L2, g, theta0Rad, modelo],
+  );
 
   // Reiniciar el sistema (se llama explícitamente al cambiar parámetros)
   const reiniciar = useCallback(() => {
@@ -149,6 +117,11 @@ export default function SimuladorPenduloPage() {
       }
       return;
     }
+
+    // Con una gravedad no calculable no hay nada que animar: el integrador daría NaN y el
+    // péndulo se iría en fuga mientras las barras de energía siguen dando julios sobre un
+    // sistema sin sentido físico (hallazgo 976).
+    if (avisoGravedad) return;
 
     const tick = (now: number) => {
       if (lastFrameRef.current === 0) {
@@ -176,12 +149,10 @@ export default function SimuladorPenduloPage() {
         });
       }
 
-      // Historial para mini-chart (cada frame, recortado)
-      setHistorial1((prev) => {
-        const nuevo = [...prev, 0];
-        // El valor real se actualiza en el siguiente set basado en estado1.theta
-        return nuevo.length > HISTORIAL_MAX ? nuevo.slice(-HISTORIAL_MAX) : nuevo;
-      });
+      // El historial lo alimentan los efectos de abajo, con el θ que acaba de calcularse.
+      // Aquí se empujaba además un 0 por frame «a la espera del valor real», que nunca lo
+      // sustituía: la gráfica θ(t) salía como un peine que tocaba el eje frame sí frame no,
+      // con la mitad de sus puntos en θ = 0 (hallazgo 974).
 
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -193,7 +164,7 @@ export default function SimuladorPenduloPage() {
         rafRef.current = null;
       }
     };
-  }, [running, modelo, L, L2, g, damping, theta0Rad, derivados1.omega0, derivados2.omega0]);
+  }, [running, modelo, L, L2, g, damping, theta0Rad, derivados1.omega0, derivados2.omega0, avisoGravedad]);
 
   // Mantener el historial sincronizado con estado1/estado2 (se actualiza tras cada paso)
   useEffect(() => {
@@ -221,7 +192,9 @@ export default function SimuladorPenduloPage() {
   }, [L, m, g, estado1.theta, estado1.omega, theta0Rad]);
 
   const showCorreccion = Math.abs(theta0Deg) > 15;
-  const correccionPct = (derivados1.correccionGrandes - 1) * 100;
+  // Antes era (1 + θ₀²/16 − 1)·100, el primer término de la serie de Bernoulli, que a 90°
+  // daba +15,42 % donde tocan +18,03 % (hallazgo 973).
+  const correccionPct = derivados1.desviacion * 100;
 
   // Selección de preset gravedad
   const presetActual = PRESETS_GRAVEDAD.find((p) => Math.abs(p.g - g) < 0.001)?.id ?? 'custom';
@@ -236,7 +209,7 @@ export default function SimuladorPenduloPage() {
   const escalaAdaptada = Math.min(escala, (svgHeight - pivotY - 30) / Math.max(Lmax, 0.5));
 
   function renderPendulum(
-    state: PendulumState,
+    state: EstadoPendulo,
     longitud: number,
     masaRel: number,
     color: string,
@@ -399,7 +372,9 @@ export default function SimuladorPenduloPage() {
               <div className={styles.inputGroup}>
                 <label htmlFor="grav">
                   Gravedad g
-                  <span className={styles.valueBadge}>{formatNumber(g, 2)} m/s²</span>
+                  <span className={styles.valueBadge}>
+                    {Number.isFinite(g) ? `${formatNumber(g, 2)} m/s²` : '—'}
+                  </span>
                 </label>
                 <input
                   id="grav"
@@ -408,9 +383,16 @@ export default function SimuladorPenduloPage() {
                   min={0.1}
                   max={50}
                   step={0.01}
-                  value={g}
-                  onChange={(e) => setG(parseFloat(e.target.value) || 9.81)}
+                  value={gTexto}
+                  onChange={(e) => setGTexto(e.target.value)}
+                  aria-invalid={avisoGravedad ? true : undefined}
+                  aria-describedby={avisoGravedad ? 'aviso-gravedad' : undefined}
                 />
+                {avisoGravedad && (
+                  <div id="aviso-gravedad" role="alert" className={styles.warningInline}>
+                    <span aria-hidden="true">⚠️</span> {avisoGravedad}
+                  </div>
+                )}
                 <div className={styles.gravityPresets}>
                   {PRESETS_GRAVEDAD.map((p) => (
                     <button
@@ -534,10 +516,22 @@ export default function SimuladorPenduloPage() {
             )}
 
             <div className={styles.formulaBox}>
-              <p className={styles.formulaTex}>T = 2π · √(L / g)</p>
-              <p className={styles.formulaCaption}>
-                Período en la aproximación de pequeños ángulos
-              </p>
+              {modelo === 'numerico' ? (
+                <>
+                  <p className={styles.formulaTex}>T = 4 · √(L / g) · K(sen(θ₀/2))</p>
+                  <p className={styles.formulaCaption}>
+                    Período exacto para cualquier amplitud, con K la integral elíptica
+                    completa de primera especie. Con θ₀ → 0 tiende a 2π√(L/g).
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className={styles.formulaTex}>T = 2π · √(L / g)</p>
+                  <p className={styles.formulaCaption}>
+                    Período en la aproximación de pequeños ángulos
+                  </p>
+                </>
+              )}
             </div>
 
             <div className={styles.resultBlock}>
@@ -571,11 +565,14 @@ export default function SimuladorPenduloPage() {
             </div>
 
             {showCorreccion && (
-              <div className={styles.warningInline}>
+              // role="alert": es lo único que sostiene la validez de la cifra principal, y
+              // aparece y desaparece según el ángulo (hallazgo 977).
+              <div className={styles.warningInline} role="alert">
                 <span aria-hidden="true">⚠️</span> θ₀ = {formatNumber(theta0Deg, 0)}° está fuera de la aproximación de pequeños
-                ángulos. El periodo real difiere por un factor 1 + θ²/16, es decir un{' '}
-                <strong>+{formatNumber(correccionPct, 2)}%</strong>. Período corregido aproximado:{' '}
-                <strong>{formatNumber(derivados1.Tcorregido, 3)} s</strong>.
+                ángulos. El período real, calculado con la integral elíptica K(sen(θ₀/2)), es
+                un <strong>+{formatNumber(correccionPct, 2)}%</strong> mayor:{' '}
+                <strong>{formatNumber(derivados1.Treal, 3)} s</strong> frente a los{' '}
+                {formatNumber(derivados1.T0, 3)} s de la fórmula lineal.
               </div>
             )}
 

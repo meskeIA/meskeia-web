@@ -27,15 +27,24 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *       θ₀ = 10°  → T = 2,0099 s   (+0,19 %)
  *       θ₀ = 60°  → T = 2,1529 s   (+7,32 %)
  *       θ₀ = 90°  → T = 2,3678 s   (+18,03 %)   ← 90° es el MÁXIMO del propio deslizador
- *   Y la app se queda en el primer término de la serie (1 + θ₀²/16), que a 90° da
+ *   La app se quedaba en el primer término de la serie (1 + θ₀²/16), que a 90° da
  *   +15,42 % → 2,315 s: 53 ms por debajo del valor real.
+ *
+ * REPARADO EL 20/09/2026. El cálculo vive en `app/simulador-pendulo/motor.ts`, que resuelve
+ * K por la media aritmético-geométrica, con sus casos en `tests/pendulo-motor.spec.ts`. Los
+ * bloques de abajo eran TESTIGO y se han invertido:
+ *   · «Período T» sale ahora del MODELO ELEGIDO: con «Modelo numérico» es el exacto de esa
+ *     amplitud, y con «Aproximación pequeños ángulos», el lineal. Antes era siempre el
+ *     lineal, así que la pantalla enseñaba un número y balanceaba el péndulo a otro ritmo.
+ *   · El aviso de grandes ángulos da la desviación exacta y se anuncia con role="alert".
+ *   · Una gravedad nula, negativa o ausente se rechaza con motivo y detiene la animación.
+ *   · La gráfica θ(t) ya no apila dos puntos por frame, uno de ellos en cero.
  *
  * LO QUE ESTOS TRES CASOS FIJAN
  *   1) normal (θ₀ = 10°, dentro de la hipótesis): las cuatro cifras deben salir exactas.
- *   2) límite (θ₀ = 90°, fuera de la hipótesis): la cifra grande NO cambia ni de pestaña
- *      ni de ángulo, y la propia animación de la app oscila a otro ritmo. El test mide
- *      las dos cosas para que una reparación futura lo note.
- *   3) rechazo (g = 0 y g < 0): qué hace la app con una gravedad imposible.
+ *   2) límite (θ₀ = 90°, fuera de la hipótesis): la cifra cambia con la pestaña y con el
+ *      ángulo, y la animación va al ritmo de la cifra que se publica.
+ *   3) rechazo (g = 0 y g < 0): la app lo dice y no calcula.
  */
 
 /** El valor de una fila de resultados, localizada por su etiqueta (las clases van con hash). */
@@ -110,9 +119,11 @@ test.describe('Caso 1 — normal: L = 1,00 m, g = 9,81 m/s², θ₀ = 10°', () 
     // El deslizador arranca en 20°: moverlo a 10° lo mete DENTRO de la hipótesis.
     await sembrarValor(page, '#ang', 10);
 
-    // T = 2π·√(1,00/9,81) = 2,006067 s
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
-    // f = 1/T = 0,498488 Hz
+    // Con la pestaña por defecto («Modelo numérico»), la cifra es el período REAL de esa
+    // amplitud: T = 4·√(1,00/9,81)·K(sen 5°) = 2,009905 s. La fórmula lineal daría
+    // 2π·√(1,00/9,81) = 2,006067 s: a 10° la diferencia es de 4 ms (+0,19 %).
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,010 s');
+    // f = 1/T = 0,497536 Hz
     await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('0,498 Hz');
     // ω₀ = √(9,81/1,00) = 3,132092 rad/s
     await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('3,132 rad/s');
@@ -123,75 +134,80 @@ test.describe('Caso 1 — normal: L = 1,00 m, g = 9,81 m/s², θ₀ = 10°', () 
 
   test('la masa no entra en el período (sí en la energía)', async ({ page }) => {
     await sembrarValor(page, '#ang', 10);
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,010 s');
 
     // d²θ/dt² = −(g/L)·sen θ no contiene m: subir la masa de 1 a 7 kg no puede mover T.
     await sembrarValor(page, '#masa', 7);
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,010 s');
     await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('3,132 rad/s');
   });
 
-  test('la gravedad sí entra: con la Luna (1,62 m/s²) el período es 4,937 s', async ({ page }) => {
-    // T = 2π·√(1,00/1,62) = 4,936553 s  →  «4,937 s». Es el número que la propia FAQ
-    // de la app anuncia («≈ 4,93 s»), así que aquí se comprueba que coinciden.
+  test('la gravedad sí entra: con la Luna el período se alarga', async ({ page }) => {
     await page.getByRole('button', { name: /Luna/ }).click();
+
+    // Con el ángulo por defecto (20°) y el modelo numérico: T = 4·√(1,00/1,62)·K(sen 10°)
+    // = 4,974378 s → «4,974 s».
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('4,974 s');
+
+    // Y la fórmula lineal da los 4,936553 s que la propia FAQ de la app anuncia
+    // («≈ 4,93 s»), que es lo que esa aproximación promete.
+    await page.getByRole('button', { name: /Aproximación pequeños ángulos/ }).click();
     await expect.poll(() => leerFila(page, 'Período T')).toBe('4,937 s');
   });
 });
 
 test.describe('Caso 2 — límite: θ₀ = 90°, el máximo del deslizador', () => {
-  test('el período mostrado no cambia con el ángulo ni con la pestaña de modelo', async ({
-    page,
-  }) => {
+  test('el período mostrado depende del ángulo y de la pestaña de modelo', async ({ page }) => {
     await sembrarValor(page, '#ang', 90);
 
-    // Verdad física: T(90°) = 2,006067 · (2/π)·K(sen 45°) = 2,3678 s.
-    // Lo que la app muestra es el de pequeñas oscilaciones, 2,006 s (−15,3 %).
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
-
-    // Y la pestaña «Modelo numérico (cualquier ángulo)» —activa por defecto— no mueve
-    // esa cifra: las dos pestañas dan exactamente el mismo número.
+    // Verdad física: T(90°) = 4·√(L/g)·K(sen 45°) = 2,3678 s. La app publicaba 2,006 s,
+    // el de pequeñas oscilaciones, con las DOS pestañas y a cualquier ángulo.
     await expect(page.getByRole('button', { name: /Modelo numérico/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,368 s');
+
+    // La pestaña lineal publica el suyo, que es lo que esa aproximación promete.
     await page.getByRole('button', { name: /Aproximación pequeños ángulos/ }).click();
     await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
     await page.getByRole('button', { name: /Modelo numérico/ }).click();
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,368 s');
+  });
+
+  test('con ángulos pequeños las dos pestañas convergen', async ({ page }) => {
+    await sembrarValor(page, '#ang', 5);
+    // T_real(5°) = 2,00702 s y T₀ = 2,00607 s: con tres decimales, «2,007» y «2,006».
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,007 s');
+    await page.getByRole('button', { name: /Aproximación pequeños ángulos/ }).click();
     await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
   });
 
-  test('el aviso de grandes ángulos sale junto a la cifra, y se queda corto', async ({ page }) => {
+  test('el aviso de grandes ángulos da la desviación real y se anuncia', async ({ page }) => {
     await sembrarValor(page, '#ang', 90);
 
     const aviso = page.getByText(/está fuera de la aproximación de pequeños ángulos/);
     await expect(aviso).toBeVisible();
+    // Es lo único que sostiene la validez de la cifra principal: debe anunciarse.
+    await expect(aviso).toHaveAttribute('role', 'alert');
 
-    // La app corrige con el PRIMER término de la serie: 1 + θ₀²/16 con θ₀ = π/2 rad
-    //   (π/2)² / 16 = 2,467401/16 = 0,154213  →  +15,42 %  →  2,006067·1,154213 = 2,315 s
-    await expect(aviso).toContainText('+15,42%');
-    await expect(aviso).toContainText('2,315 s');
-
-    // La serie completa da +18,03 % → 2,3678 s. El aviso se queda 53 ms (2,2 %) por debajo.
-    // Si algún día se añaden los términos siguientes, estas dos líneas fallarán: es su
-    // razón de ser. El valor correcto a 90° es «2,368 s» y la corrección «+18,03%».
+    // La app corregía con el PRIMER término de la serie de Bernoulli: 1 + θ₀²/16 con
+    // θ₀ = π/2 rad da +15,42 % → 2,315 s. La verdad exacta es +18,03 % → 2,368 s.
+    await expect(aviso).toContainText('+18,03%');
+    await expect(aviso).toContainText('2,368 s');
+    await expect(aviso).not.toContainText('+15,42%');
   });
 
-  test('a 60° la corrección ofrecida también se queda por debajo del valor real', async ({
-    page,
-  }) => {
+  test('a 60° la desviación también es la exacta', async ({ page }) => {
     await sembrarValor(page, '#ang', 60);
 
     const aviso = page.getByText(/está fuera de la aproximación de pequeños ángulos/);
-    // θ₀ = π/3 = 1,047198 rad → θ₀²/16 = 0,068539 → +6,85 % → 2,144 s
-    await expect(aviso).toContainText('+6,85%');
-    await expect(aviso).toContainText('2,144 s');
-    // Verdad exacta: 2,006067·(2/π)·K(sen 30°) = 2,1529 s (+7,32 %).
+    // θ₀ = π/3 → la serie truncada daba +6,85 % y 2,144 s; la exacta, +7,32 % y 2,153 s.
+    await expect(aviso).toContainText('+7,32%');
+    await expect(aviso).toContainText('2,153 s');
   });
 
-  test('la animación numérica oscila a 2,368 s mientras la cifra dice 2,006 s', async ({
-    page,
-  }) => {
+  test('la animación numérica va al mismo ritmo que la cifra que publica', async ({ page }) => {
     test.setTimeout(45000); // hay que dejar oscilar el péndulo unos segundos
 
     await sembrarValor(page, '#damp', 0); // sin fricción: el período no deriva
@@ -199,21 +215,17 @@ test.describe('Caso 2 — límite: θ₀ = 90°, el máximo del deslizador', () 
     await page.getByRole('button', { name: /Modelo numérico/ }).click();
     await page.getByRole('button', { name: /Reiniciar/ }).click();
 
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,368 s');
 
-    // El integrador de la app (Euler-Cromer, dt de un frame) sí resuelve el péndulo
-    // NO lineal, así que su período animado es el exacto: 2,3678 s. Medido: 2,369 s.
+    // El integrador (Euler-Cromer, dt de un frame) resuelve el péndulo NO lineal, así que
+    // su período animado es el exacto: 2,3678 s. Antes la pantalla enseñaba 2,006 s y
+    // movía el péndulo a 2,368 s.
     const animado = await medirPeriodoAnimado(page, 7000);
     expect(animado).toBeGreaterThan(2.3);
     expect(animado).toBeLessThan(2.45);
-
-    // Es decir: la misma pantalla enseña 2,006 s y mueve el péndulo a 2,368 s.
-    expect(animado).toBeGreaterThan(2.2); // > 2,006 s + margen: no son el mismo número
   });
 
-  test('bajo «pequeños ángulos» la animación sí va al ritmo de la cifra mostrada', async ({
-    page,
-  }) => {
+  test('bajo «pequeños ángulos» la animación va al ritmo de SU cifra', async ({ page }) => {
     test.setTimeout(45000);
 
     await sembrarValor(page, '#damp', 0);
@@ -223,6 +235,7 @@ test.describe('Caso 2 — límite: θ₀ = 90°, el máximo del deslizador', () 
 
     // Esta pestaña usa la solución cerrada θ(t) = θ₀·cos(ω₀t): período 2,006 s aunque
     // la amplitud sea de 90°, que es justo lo que la aproximación NO puede sostener.
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
     const animado = await medirPeriodoAnimado(page, 7000);
     expect(animado).toBeGreaterThan(1.95);
     expect(animado).toBeLessThan(2.06);
@@ -230,39 +243,52 @@ test.describe('Caso 2 — límite: θ₀ = 90°, el máximo del deslizador', () 
 });
 
 test.describe('Caso 3 — a rechazar: gravedad cero o negativa', () => {
-  test('g = 0 se sustituye por 9,81 sin decirlo', async ({ page }) => {
+  test('g = 0 se rechaza con motivo, en vez de sustituirse por 9,81', async ({ page }) => {
     // Primero se mueve a un valor distinto del inicial, para que la prueba no dé verde
-    // sin haber cambiado nada: g = 2,00 m/s² → T = 2π·√(1/2) = 4,442883 s.
+    // sin haber cambiado nada: g = 2,00 m/s² con θ₀ = 20° (el de partida) →
+    // T = 4·√(1/2)·K(sen 10°) = 4,477020 s. (La fórmula lineal daría 4,442883 s.)
     await page.locator('#grav').fill('2');
     await esperarValorEnReact(page, '#grav', '2');
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('4,443 s');
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('4,477 s');
 
-    // Ahora la entrada imposible. Esperado: rechazo explícito («la gravedad no puede ser
-    // cero») o al menos un aviso. Obtenido: el campo salta a 9,81 y el período vuelve al
-    // de la Tierra, sin un solo mensaje — el usuario cree haber simulado gravedad nula.
+    // El onChange era `parseFloat(e.target.value) || 9.81`, y el 0 es falsy: el campo
+    // saltaba a 9,81 sin un solo mensaje y el usuario creía haber simulado gravedad nula.
     await page.locator('#grav').fill('0');
-    await esperarValorEnReact(page, '#grav', '9.81');
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,006 s');
+    await esperarValorEnReact(page, '#grav', '0');
+    await expect(page.locator('#grav')).toHaveValue('0');
 
-    // La etiqueta del propio control acaba mostrando «9,81 m/s²», como si el usuario
-    // lo hubiera tecleado él. Y en toda la herramienta no queda rastro de por qué.
-    await expect(page.locator('label[for="grav"]')).toContainText('9,81 m/s²');
-    const textoHerramienta = (await page.locator('main').innerText()).toLowerCase();
-    expect(textoHerramienta).not.toContain('no puede ser');
-    expect(textoHerramienta).not.toContain('no válid');
-    expect(textoHerramienta).not.toContain('gravedad nula');
+    const aviso = page.locator('#aviso-gravedad');
+    await expect(aviso).toHaveAttribute('role', 'alert');
+    await expect(aviso).toContainText('no oscila');
   });
 
-  test('g negativa no se rechaza: las tres cifras quedan en «No definido»', async ({ page }) => {
+  test('el campo se puede vaciar para teclear otra gravedad', async ({ page }) => {
+    await page.locator('#grav').fill('');
+    await expect(page.locator('#grav')).toHaveValue('');
+    await expect(page.locator('#aviso-gravedad')).toContainText('gravedad');
+
+    // Y se sigue pudiendo escribir: la Luna, 1,62 m/s² con θ₀ = 20° → 4,974378 s
+    await page.locator('#grav').fill('1.62');
+    await esperarValorEnReact(page, '#grav', '1.62');
+    await expect(page.locator('#aviso-gravedad')).toHaveCount(0);
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('4,974 s');
+  });
+
+  test('g negativa se rechaza y la animación se detiene', async ({ page }) => {
     await page.locator('#grav').fill('-5');
     await esperarValorEnReact(page, '#grav', '-5');
 
-    // ω₀ = √(−5/1) = NaN, y formatNumber lo imprime como «No definido» conservando la
-    // unidad. No se muestra ningún número falso, pero tampoco se explica nada ni se
-    // detiene la animación, que se va en fuga (θ crece sin límite).
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('No definido s');
-    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('No definido Hz');
-    await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('No definido rad/s');
+    // Antes: ω₀ = √(−5/1) = NaN, las tres cifras en «No definido» sin explicar nada, y la
+    // animación en marcha con el péndulo en fuga (θ crecía sin límite).
+    const aviso = page.locator('#aviso-gravedad');
+    await expect(aviso).toHaveAttribute('role', 'alert');
+    await expect(aviso).toContainText('negativa');
+
+    // El péndulo se queda quieto: dos lecturas del ángulo separadas en el tiempo coinciden.
+    const angulo = () => leerFila(page, 'θ actual');
+    const primera = await angulo();
+    await page.waitForTimeout(1200);
+    expect(await angulo()).toBe(primera);
   });
 
   test('la longitud no puede ser cero: el deslizador la capa en su mínimo de 0,10 m', async ({
@@ -272,8 +298,35 @@ test.describe('Caso 3 — a rechazar: gravedad cero o negativa', () => {
     // antes de que React lo vea, así que el caso imposible nunca llega al cálculo.
     await sembrarValor(page, '#long', 0, { esperado: '0.1' });
 
-    // T = 2π·√(0,10/9,81) = 0,634371 s · ω₀ = √98,1 = 9,904544 rad/s
-    await expect.poll(() => leerFila(page, 'Período T')).toBe('0,634 s');
+    // Con θ₀ = 20° y el modelo numérico: T = 4·√(0,10/9,81)·K(sen 10°) = 0,639236 s.
+    // (La fórmula lineal daría 2π·√(0,10/9,81) = 0,634371 s.) ω₀ = √98,1 = 9,904544 rad/s
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('0,639 s');
     await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('9,905 rad/s');
+  });
+});
+
+test.describe('La gráfica θ(t) dibuja una sinusoide, no un peine', () => {
+  test('menos de uno de cada diez puntos está sobre el eje', async ({ page }) => {
+    test.setTimeout(45000);
+
+    await sembrarValor(page, '#damp', 0);
+    await sembrarValor(page, '#ang', 60);
+    await page.getByRole('button', { name: /Reiniciar/ }).click();
+    await page.waitForTimeout(3000); // dejar que se llene el historial
+
+    const puntos = await page.evaluate(() => {
+      const poli = document.querySelector('polyline[points]');
+      return poli?.getAttribute('points')?.trim().split(/\s+/) ?? [];
+    });
+
+    expect(puntos.length).toBeGreaterThan(60);
+
+    // El bucle de animación empujaba un 0 por frame «a la espera del valor real», y un
+    // efecto aparte empujaba el bueno: se apilaban DOS puntos por frame y la mitad exacta
+    // caía sobre θ = 0, o sea sobre la línea media del lienzo (y = 65,0 con esta altura).
+    const alturas = puntos.map((p) => Number(p.split(',')[1]));
+    const media = (Math.min(...alturas) + Math.max(...alturas)) / 2;
+    const sobreElEje = alturas.filter((y) => Math.abs(y - media) < 0.5).length;
+    expect(sobreElEje / alturas.length).toBeLessThan(0.1);
   });
 });
