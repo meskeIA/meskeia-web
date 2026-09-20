@@ -61,14 +61,21 @@ import {
  *       «Con resistencia del aire» sigue siendo el caso ideal (40,73 m, la diferencia es el
  *       sesgo del integrador). Se fija también ese estado intermedio.
  *
- * LO QUE ESTOS CASOS DEJARON AL DESCUBIERTO
- *   · Vaciar el campo de gravedad CUELGA la pestaña (Number('') === 0 → T = ∞ → bucle
- *     infinito). Crítico y trivial de provocar. Último bloque de este fichero.
- *   · Una gravedad negativa produce alcance y tiempo de vuelo NEGATIVOS sin un solo aviso.
- *   · La caja de fórmulas llama «modelo lineal» a un rozamiento que el código implementa
+ * LO QUE ESTOS CASOS DEJARON AL DESCUBIERTO, REPARADO EL 20/09/2026
+ *   Los bloques de abajo eran TESTIGO —fijaban lo que la app hacía mal— y se han invertido.
+ *   El cálculo vive desde entonces en `app/simulador-proyectiles/motor.ts`, con sus casos
+ *   unitarios en `tests/proyectiles-motor.spec.ts`.
+ *   · Vaciar el campo de gravedad COLGABA la pestaña (Number('') === 0 → T = ∞ → bucle
+ *     infinito). El texto del campo se guarda ahora aparte del número, el motor valida y
+ *     además acota el muestreo pase lo que pase.
+ *   · Una gravedad negativa producía alcance y tiempo de vuelo NEGATIVOS sin un solo aviso.
+ *   · El modo «Con resistencia del aire» se activaba con k = 0, así que anunciaba rozamiento
+ *     y entregaba el caso ideal. Arranca en k = 0,01.
+ *   · La caja de fórmulas llamaba «modelo lineal» a un rozamiento que el código implementa
  *     cuadrático (−k·|v|·v⃗), contradiciendo a la propia FAQ de la app.
- *   · Añadir dos veces el mismo lanzamiento a la comparativa da dos tarjetas con el mismo
- *     id, y borrar una borra las dos.
+ *   · Añadir dos veces el mismo lanzamiento a la comparativa daba dos tarjetas con el mismo
+ *     id, y borrar una borraba las dos.
+ *   · En el tiro vertical el alcance salía «≈0 m» por el 6,1·10⁻¹⁷ de cos(π/2).
  */
 
 /** El valor de una fila de resultados, localizada por su etiqueta (las clases van con hash). */
@@ -182,11 +189,11 @@ test.describe('Caso 2 — límite: los ángulos extremos y la velocidad mínima'
     await sembrarValor(page, '#v0', 20);
     await sembrarValor(page, '#angulo', 90);
 
-    // El alcance de un tiro vertical es CERO exacto. La app calcula x = v₀·cos(90°)·T y
-    // cos(π/2) en coma flotante vale 6,1·10⁻¹⁷, así que le sale 1,2·10⁻¹⁵ m; formatNumber
-    // no imprime «0,00» sino su marca de infinitésimo. Es el único caso de esta app donde
-    // se ve el artefacto numérico, y queda fijado aquí para que una reparación lo note.
-    await expect.poll(() => alcance(page)).toBe('≈0 m');
+    // El alcance de un tiro vertical es CERO exacto. cos(π/2) en coma flotante vale
+    // 6,1·10⁻¹⁷, así que el alcance salía 1,2·10⁻¹⁵ m y formatNumber lo rotulaba «≈0 m»,
+    // sugiriendo una imprecisión física que no existe: el motor lleva a cero los
+    // infinitésimos de las componentes antes de multiplicar por el tiempo.
+    await expect.poll(() => alcance(page)).toBe('0,00 m');
     // H = v₀²/(2g) = 400/19,62 = 20,387360 m · T = 2·v₀/g = 40/9,81 = 4,077472 s
     await expect.poll(() => alturaMax(page)).toBe('20,39 m');
     await expect.poll(() => tiempoVuelo(page)).toBe('4,08 s');
@@ -233,59 +240,46 @@ test.describe('Caso 2 — límite: los ángulos extremos y la velocidad mínima'
 });
 
 test.describe('Caso 3 — a rechazar: gravedades imposibles en el único campo libre', () => {
-  test('g negativa da alcance y tiempo de vuelo NEGATIVOS, sin un solo aviso', async ({
+  test('g negativa se rechaza con aviso, en vez de publicar cifras negativas', async ({
     page,
   }) => {
     await sembrarValor(page, '#v0', 20);
     await expect.poll(() => alcance(page)).toBe('40,77 m');
 
-    // El campo de gravedad declara min = 0,1, pero un <input type="number"> no acota nada:
-    // el navegador se limita a marcar validity.rangeUnderflow, que la app no consulta.
+    // El campo declara min = 0,1, pero un <input type="number"> no acota nada: el navegador
+    // se limita a marcar validity.rangeUnderflow. Quien valida es el motor.
     await page.locator('#gravedad').fill('-9.81');
     await esperarValorEnReact(page, '#gravedad', '-9.81');
-    expect(await page.locator('#gravedad').evaluate((el: HTMLInputElement) => el.validity.rangeUnderflow)).toBe(true);
 
-    // Esperado: rechazo explícito, o al menos ninguna cifra. Obtenido: T = (v₀ᵧ + |v₀ᵧ|)/g
-    // con g < 0 sale NEGATIVO, y el alcance con él. La app publica un tiempo de vuelo de
-    // −2,88 segundos y un alcance de −40,77 metros como si fueran resultados.
-    await expect.poll(() => tiempoVuelo(page)).toBe('-2,88 s');
-    await expect.poll(() => alcance(page)).toBe('-40,77 m');
-    // (el ámbito es <main>: el indicador de desarrollo de Next monta su propio role="alert"
-    // dentro de un shadow root y no tiene nada que ver con la app)
-    await expect(page.locator('main [role="alert"]')).toHaveCount(0);
-
-    const texto = (await page.locator('main').innerText()).toLowerCase();
-    expect(texto).not.toContain('no válid');
-    expect(texto).not.toContain('no puede ser');
+    // Antes salían «−40,77 m» y «−2,88 s» como si fueran resultados. Ahora no hay cifras.
+    const aviso = page.locator('main [role="alert"]');
+    await expect(aviso).toHaveCount(1);
+    await expect(aviso).toContainText('gravedad');
+    await expect.poll(() => alcance(page)).toBe('');
+    await expect.poll(() => tiempoVuelo(page)).toBe('');
   });
 
-  test('vaciar el campo de gravedad CUELGA la pestaña (bucle infinito)', async ({ page }) => {
-    // Es el gesto de cualquiera que quiera teclear otra gravedad: clic en el campo,
-    // seleccionar todo, borrar. En ese instante e.target.value vale '' y Number('') es 0,
-    // así que el cálculo hace:
-    //     T     = (v₀ᵧ + √(v₀ᵧ²)) / 0        = Infinity
-    //     pasos = max(80, ceil(Infinity/0,01)) = Infinity
-    //     dt    = Infinity / Infinity          = NaN
-    // y entra en `for (let i = 0; i <= Infinity; i++)` empujando puntos NaN a un array.
-    // El hilo de render no vuelve nunca y la memoria sube sin techo: solo se sale matando
-    // la pestaña. Se sondea con presupuesto acotado y se cierra la página en el acto, para
-    // no dejar el bucle corriendo durante el resto de la suite.
-    const respuesta = await Promise.race([
-      (async () => {
-        await page.locator('#gravedad').press('Control+a');
-        await page.locator('#gravedad').press('Backspace');
-        await page.evaluate(() => document.querySelector('#gravedad') !== null);
-        return 'la página sigue respondiendo';
-      })().catch(() => 'la página sigue respondiendo'),
-      new Promise<string>((r) => setTimeout(() => r('congelada'), 2500)),
-    ]);
+  test('vaciar el campo de gravedad ya no cuelga la pestaña', async ({ page }) => {
+    // El gesto de cualquiera que quiera teclear otra gravedad: clic, Ctrl+A, Backspace.
+    // Number('') es 0, y con g = 0 el tiempo de vuelo era Infinity, los pasos también y
+    // dtMuestreo NaN: el bucle de muestreo no terminaba nunca. Ahora el campo vacío es un
+    // estado legítimo —el texto se guarda aparte del número— y el motor lo rechaza.
+    await page.locator('#gravedad').press('Control+a');
+    await page.locator('#gravedad').press('Backspace');
+    await expect(page.locator('#gravedad')).toHaveValue('');
 
-    // Esperado de una app sana: seguir respondiendo (con la gravedad rechazada o repuesta).
-    // Obtenido hoy: ni un evaluate trivial vuelve. Cuando esto se repare, este test pasará
-    // a rojo — y esa es exactamente la señal que se busca.
-    expect(respuesta).toBe('congelada');
+    // La prueba de que el hilo de render sigue vivo: un evaluate trivial vuelve, y el
+    // aviso está en pantalla.
+    expect(await page.evaluate(() => document.querySelector('#gravedad') !== null)).toBe(true);
+    await expect(page.locator('main [role="alert"]')).toContainText('gravedad');
 
-    await page.close();
+    // Y se puede seguir tecleando: 1.62 (la Luna) devuelve las cifras.
+    await page.locator('#gravedad').fill('1.62');
+    await esperarValorEnReact(page, '#gravedad', '1.62');
+    await sembrarValor(page, '#v0', 20);
+    // R = v₀²/g = 400/1,62 = 246,91 m
+    await expect.poll(() => alcance(page)).toBe('246,91 m');
+    await expect(page.locator('main [role="alert"]')).toHaveCount(0);
   });
 });
 
@@ -338,21 +332,35 @@ test.describe('Trampa (a) — altura inicial: el alcance ya no es v₀²·sen(2�
 });
 
 test.describe('Trampa (b) — la resistencia del aire no es un rótulo', () => {
-  test('con k = 0,05 el alcance cae de 40,77 m a 17,33 m', async ({ page }) => {
+  test('activarla ya recorta el alcance: 31,26 m frente a los 40,77 ideales', async ({
+    page,
+  }) => {
     await sembrarValor(page, '#v0', 20);
     await expect.poll(() => alcance(page)).toBe('40,77 m');
 
     await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
 
-    // ⚠️ k arranca en 0, así que lo que se ve nada más pulsar sigue siendo el caso ideal:
-    // la app cambia de rama e integra con Euler semi-implícito (dt = 0,01 s), cuyo sesgo
-    // −½·g·dt·t recorta 4,5 cm del alcance y 7 cm de la altura. 40,73 m frente a 40,77 m.
-    await esperarValorEnReact(page, '#resistencia', '0');
+    // k arrancaba en 0, así que el modo anunciaba rozamiento y entregaba el caso ideal
+    // (40,73 m, la diferencia era solo el sesgo del integrador) hasta que el usuario
+    // reparaba en el deslizador. Ahora arranca en 0,01 y se nota de inmediato.
+    await esperarValorEnReact(page, '#resistencia', '0.01');
+    await expect.poll(() => alcance(page)).toBe('31,26 m');
+    await expect.poll(() => alturaMax(page)).toBe('8,70 m');
+    await expect.poll(() => tiempoVuelo(page)).toBe('2,67 s');
+  });
+
+  test('el deslizador recorre el rango completo, de k = 0 a k = 0,05', async ({ page }) => {
+    await sembrarValor(page, '#v0', 20);
+    await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
+
+    // Con k = 0 la rama numérica reproduce el caso ideal salvo el sesgo del integrador
+    // (Euler semi-implícito, dt = 0,01 s): −½·g·dt·t recorta 4,5 cm del alcance.
+    await sembrarValor(page, '#resistencia', 0);
     await expect.poll(() => alcance(page)).toBe('40,73 m');
     await expect.poll(() => alturaMax(page)).toBe('10,12 m');
 
-    // Con k = 0,05 la diferencia ya es imposible de fingir: a = −g·ĵ − k·|v|·v⃗ integrada
-    // desde (14,142136 , 14,142136) m/s da, paso a paso, R = 17,326 m en T = 2,18 s.
+    // Con k = 0,05 la diferencia es imposible de fingir: a = −g·ĵ − k·|v|·v⃗ integrada
+    // desde (14,142136 , 14,142136) m/s da R = 17,33 m en T = 2,18 s.
     await sembrarValor(page, '#resistencia', 0.05);
     await expect.poll(() => alcance(page)).toBe('17,33 m');
     await expect.poll(() => alturaMax(page)).toBe('5,93 m');
@@ -366,35 +374,31 @@ test.describe('Trampa (b) — la resistencia del aire no es un rótulo', () => {
     await expect.poll(() => tiempoVuelo(page)).toBe('2,50 s');
   });
 
-  test('pero la caja de fórmulas llama «lineal» a un rozamiento cuadrático', async ({ page }) => {
+  test('y la caja de fórmulas ya llama cuadrático al rozamiento que integra', async ({ page }) => {
     await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
 
     // El código hace ax = −k·|v|·vx y ay = −g − k·|v|·vy: el módulo de la fuerza va con
-    // |v|², que es rozamiento CUADRÁTICO (régimen turbulento, Re alto). La propia FAQ de
-    // la app lo dice bien («proporcional al cuadrado de la velocidad»), y la etiqueta del
-    // deslizador también («Modelo F = −k·v·v⃗»). Solo la caja de fórmulas lo contradice.
+    // |v|², que es rozamiento CUADRÁTICO (régimen turbulento, Re alto). La FAQ de la app
+    // ya lo decía bien; era la caja de fórmulas la que lo contradecía con «modelo lineal».
     await expect(page.locator('main')).toContainText(
-      '# Con resistencia del aire (modelo lineal): F = −k · v · v⃗',
+      '# Con resistencia del aire (modelo cuadrático): F = −k · |v| · v⃗',
     );
   });
 });
 
-test.describe('Comparativa — dos lanzamientos idénticos comparten id', () => {
-  test('añadir el mismo lanzamiento dos veces y borrar uno los borra LOS DOS', async ({
-    page,
-  }) => {
+test.describe('Comparativa — cada lanzamiento guardado tiene identidad propia', () => {
+  test('borrar uno de dos lanzamientos idénticos deja el otro', async ({ page }) => {
     const tarjetas = page.locator('[class*="lanzamientoCard"]');
 
-    // Sin tocar ningún parámetro entre las dos pulsaciones, `lanzamientoActual` es el mismo
-    // objeto y `anadirComparativa` lo copia con su id intacto: dos entradas, un solo id.
+    // Antes `anadirComparativa` copiaba `lanzamientoActual` con su id intacto: sin tocar
+    // ningún parámetro entre las dos pulsaciones salían dos tarjetas con la misma clave,
+    // y como `eliminarComparativa` filtra por id, la × de una se llevaba la otra.
     await page.getByRole('button', { name: /Añadir a comparativa/ }).click();
     await expect(tarjetas).toHaveCount(1);
     await page.getByRole('button', { name: /Añadir a comparativa/ }).click();
     await expect(tarjetas).toHaveCount(2);
 
-    // `eliminarComparativa` filtra por id, así que la × de una se lleva la otra por delante.
-    // Esperado: queda 1. Obtenido: quedan 0.
     await page.locator('button[aria-label="Eliminar lanzamiento"]').first().click();
-    await expect(tarjetas).toHaveCount(0);
+    await expect(tarjetas).toHaveCount(1);
   });
 });

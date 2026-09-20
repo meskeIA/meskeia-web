@@ -581,7 +581,26 @@
   font-weight: 700;
 }
 
+/* Aviso de parámetros no calculables (gravedad vacía, cero o negativa) */
+.avisoParametros {
+  margin-bottom: var(--spacing-md, 1rem);
+  padding: 0.75rem 1rem;
+  border: 1px solid #f59e0b;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 /* Dark mode */
+[data-theme='dark'] .avisoParametros {
+  border-color: #b45309;
+  background: #3a2a08;
+  color: #fde68a;
+}
+
 [data-theme='dark'] .panel {
   border-color: #374151;
 }

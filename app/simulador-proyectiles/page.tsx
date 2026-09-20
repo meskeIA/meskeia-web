@@ -14,151 +14,16 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorProyectiles.module.css';
 
-// ============================================================================
-// Tipos
-// ============================================================================
-
-interface Punto {
-  x: number;
-  y: number;
-  t: number;
-  vx: number;
-  vy: number;
-}
-
-interface Lanzamiento {
-  id: string;
-  v0: number;
-  angulo: number;
-  altura: number;
-  gravedad: number;
-  resistencia: number;
-  conResistencia: boolean;
-  trayectoria: Punto[];
-  alcance: number;
-  alturaMax: number;
-  tiempoVuelo: number;
-  vImpacto: number;
-  color: string;
-}
-
-interface ParametrosSimulacion {
-  v0: number;
-  angulo: number;
-  altura: number;
-  gravedad: number;
-  resistencia: number;
-  conResistencia: boolean;
-}
-
-// ============================================================================
-// Constantes
-// ============================================================================
-
-const GRAVEDADES_PRESET: Record<string, number> = {
-  Tierra: 9.81,
-  Luna: 1.62,
-  Marte: 3.71,
-  Júpiter: 24.79,
-};
-
-const COLORES_LANZAMIENTOS: string[] = ['#2E86AB', '#48A9A6', '#F39C12'];
-
-const DT = 0.01; // paso temporal para integración numérica (s)
-const T_MAX = 200; // tope de seguridad para integración
-
-// ============================================================================
-// Cálculo de trayectoria
-// ============================================================================
-
-function calcularTrayectoria(p: ParametrosSimulacion): Lanzamiento {
-  const anguloRad = (p.angulo * Math.PI) / 180;
-  const v0x = p.v0 * Math.cos(anguloRad);
-  const v0y = p.v0 * Math.sin(anguloRad);
-  const trayectoria: Punto[] = [];
-
-  let x = 0;
-  let y = p.altura;
-  let vx = v0x;
-  let vy = v0y;
-  let t = 0;
-  let alturaMax = p.altura;
-
-  if (!p.conResistencia) {
-    // Solución analítica: muestreamos puntos
-    // Tiempo de vuelo: y(t) = h + v0y*t - 0.5*g*t² = 0
-    const discriminante = v0y * v0y + 2 * p.gravedad * p.altura;
-    const tVuelo = (v0y + Math.sqrt(discriminante)) / p.gravedad;
-    const pasos = Math.max(80, Math.ceil(tVuelo / DT));
-    const dtMuestreo = tVuelo / pasos;
-
-    for (let i = 0; i <= pasos; i++) {
-      const ti = i * dtMuestreo;
-      const xi = v0x * ti;
-      const yi = p.altura + v0y * ti - 0.5 * p.gravedad * ti * ti;
-      const vxi = v0x;
-      const vyi = v0y - p.gravedad * ti;
-      trayectoria.push({ x: xi, y: Math.max(0, yi), t: ti, vx: vxi, vy: vyi });
-      if (yi > alturaMax) alturaMax = yi;
-    }
-
-    const ultimo = trayectoria[trayectoria.length - 1];
-    const vImpacto = Math.sqrt(ultimo.vx * ultimo.vx + ultimo.vy * ultimo.vy);
-    return {
-      id: `${Date.now()}-${Math.random()}`,
-      v0: p.v0,
-      angulo: p.angulo,
-      altura: p.altura,
-      gravedad: p.gravedad,
-      resistencia: p.resistencia,
-      conResistencia: false,
-      trayectoria,
-      alcance: ultimo.x,
-      alturaMax,
-      tiempoVuelo: tVuelo,
-      vImpacto,
-      color: '#2E86AB',
-    };
-  }
-
-  // Integración numérica (Euler) con resistencia del aire
-  // Modelo simplificado: F_resistencia = -k * v (proporcional a velocidad)
-  const k = p.resistencia;
-  trayectoria.push({ x, y, t, vx, vy });
-
-  while (y >= 0 && t < T_MAX) {
-    const v = Math.sqrt(vx * vx + vy * vy);
-    const ax = -k * v * vx;
-    const ay = -p.gravedad - k * v * vy;
-    vx += ax * DT;
-    vy += ay * DT;
-    x += vx * DT;
-    y += vy * DT;
-    t += DT;
-    if (y > alturaMax) alturaMax = y;
-    trayectoria.push({ x, y: Math.max(0, y), t, vx, vy });
-    if (y < 0) break;
-  }
-
-  const ultimo = trayectoria[trayectoria.length - 1];
-  const vImpacto = Math.sqrt(ultimo.vx * ultimo.vx + ultimo.vy * ultimo.vy);
-
-  return {
-    id: `${Date.now()}-${Math.random()}`,
-    v0: p.v0,
-    angulo: p.angulo,
-    altura: p.altura,
-    gravedad: p.gravedad,
-    resistencia: p.resistencia,
-    conResistencia: true,
-    trayectoria,
-    alcance: ultimo.x,
-    alturaMax,
-    tiempoVuelo: t,
-    vImpacto,
-    color: '#2E86AB',
-  };
-}
+import {
+  calcularTrayectoria,
+  nuevoId,
+  validarParametros,
+  COLORES_LANZAMIENTOS,
+  GRAVEDADES_PRESET,
+  RESISTENCIA_POR_DEFECTO,
+  type Lanzamiento,
+  type Punto,
+} from './motor';
 
 // ============================================================================
 // Componente principal
@@ -169,10 +34,18 @@ export default function SimuladorProyectiles() {
   const [v0, setV0] = useState<number>(50);
   const [angulo, setAngulo] = useState<number>(45);
   const [altura, setAltura] = useState<number>(0);
-  const [gravedad, setGravedad] = useState<number>(9.81);
+  /**
+   * El TEXTO del campo de gravedad se guarda aparte del número que se calcula. Es la única
+   * forma de que borrar el campo para teclear otro valor —clic, Ctrl+A, Backspace— sea un
+   * gesto normal: mientras el campo está vacío no hay número, y la app lo dice en vez de
+   * intentar calcular con g = 0, que era lo que colgaba la pestaña (hallazgo 984).
+   */
+  const [gravedadTexto, setGravedadTexto] = useState<string>('9.81');
+  const gravedad = gravedadTexto.trim() === '' ? NaN : Number(gravedadTexto);
   const [gravedadPreset, setGravedadPreset] = useState<string>('Tierra');
   const [resistencia, setResistencia] = useState<number>(0);
   const [conResistencia, setConResistencia] = useState<boolean>(false);
+  const [avisoParametros, setAvisoParametros] = useState<string>('');
 
   // Lanzamiento actual + comparativos
   const [lanzamientoActual, setLanzamientoActual] = useState<Lanzamiento | null>(null);
@@ -184,9 +57,11 @@ export default function SimuladorProyectiles() {
   const animRef = useRef<number | null>(null);
   const animStartRef = useRef<number>(0);
 
-  // Calcular lanzamiento al cambiar parámetros
+  // Calcular lanzamiento al cambiar parámetros.
+  // Si los parámetros no son calculables se retira la trayectoria y se dice por qué: un
+  // resultado que ya no corresponde a lo que hay en los controles es peor que ninguno.
   useEffect(() => {
-    const nuevo = calcularTrayectoria({
+    const resultado = calcularTrayectoria({
       v0,
       angulo,
       altura,
@@ -194,20 +69,28 @@ export default function SimuladorProyectiles() {
       resistencia,
       conResistencia,
     });
-    setLanzamientoActual(nuevo);
+
+    if (!resultado.ok) {
+      setAvisoParametros(resultado.error);
+      setLanzamientoActual(null);
+      return;
+    }
+
+    setAvisoParametros('');
+    setLanzamientoActual(resultado.lanzamiento);
   }, [v0, angulo, altura, gravedad, resistencia, conResistencia]);
 
   // Cambiar preset de gravedad
   const seleccionarPreset = useCallback((preset: string) => {
     setGravedadPreset(preset);
     if (preset !== 'Custom') {
-      setGravedad(GRAVEDADES_PRESET[preset]);
+      setGravedadTexto(String(GRAVEDADES_PRESET[preset]));
     }
   }, []);
 
   // Cambio manual de gravedad → modo custom
-  const cambiarGravedadCustom = useCallback((valor: number) => {
-    setGravedad(valor);
+  const cambiarGravedadCustom = useCallback((texto: string) => {
+    setGravedadTexto(texto);
     setGravedadPreset('Custom');
   }, []);
 
@@ -244,9 +127,11 @@ export default function SimuladorProyectiles() {
   const anadirComparativa = useCallback(() => {
     if (!lanzamientoActual || lanzamientosComparados.length >= 3) return;
     const color = COLORES_LANZAMIENTOS[lanzamientosComparados.length];
+    // Con `id` heredado, dos pulsaciones seguidas sin tocar nada producían dos tarjetas
+    // con la misma clave, y la × de una se llevaba la otra por delante (hallazgo 986).
     setLanzamientosComparados([
       ...lanzamientosComparados,
-      { ...lanzamientoActual, color },
+      { ...lanzamientoActual, id: nuevoId(), color },
     ]);
   }, [lanzamientoActual, lanzamientosComparados]);
 
@@ -398,7 +283,7 @@ export default function SimuladorProyectiles() {
               <label htmlFor="gravedad">
                 <span>Gravedad g</span>
                 <span className={styles.sliderValue}>
-                  {formatNumber(gravedad, 2)} m/s²
+                  {Number.isFinite(gravedad) ? `${formatNumber(gravedad, 2)} m/s²` : '—'}
                 </span>
               </label>
               <input
@@ -407,8 +292,10 @@ export default function SimuladorProyectiles() {
                 min={0.1}
                 max={50}
                 step={0.01}
-                value={gravedad}
-                onChange={(e) => cambiarGravedadCustom(Number(e.target.value))}
+                value={gravedadTexto}
+                onChange={(e) => cambiarGravedadCustom(e.target.value)}
+                aria-invalid={avisoParametros ? true : undefined}
+                aria-describedby={avisoParametros ? 'aviso-parametros' : undefined}
               />
               <div className={styles.gravityPresets}>
                 {Object.keys(GRAVEDADES_PRESET).map((preset) => (
@@ -454,7 +341,12 @@ export default function SimuladorProyectiles() {
               className={`${styles.modeBtn} ${
                 conResistencia ? styles.modeActive : ''
               }`}
-              onClick={() => setConResistencia(true)}
+              onClick={() => {
+                setConResistencia(true);
+                // Con k = 0 el modo anunciaba rozamiento y entregaba el caso ideal
+                // hasta que el usuario reparaba en el deslizador (hallazgo 987).
+                if (resistencia === 0) setResistencia(RESISTENCIA_POR_DEFECTO);
+              }}
               aria-pressed={conResistencia}
             >
               Con resistencia del aire
@@ -479,8 +371,18 @@ export default function SimuladorProyectiles() {
                 onChange={(e) => setResistencia(Number(e.target.value))}
               />
               <span className={styles.unitLabel}>
-                0 (sin resistencia) a 0,05 (muy alta). Modelo F = −k·v·v⃗
+                0 (sin resistencia) a 0,05 (muy alta). Modelo cuadrático, F = −k·|v|·v⃗
               </span>
+            </div>
+          )}
+
+          {avisoParametros && (
+            <div
+              id="aviso-parametros"
+              role="alert"
+              className={styles.avisoParametros}
+            >
+              {avisoParametros}
             </div>
           )}
 
@@ -489,7 +391,7 @@ export default function SimuladorProyectiles() {
               type="button"
               className={styles.calcBtn}
               onClick={lanzar}
-              disabled={animando}
+              disabled={animando || !lanzamientoActual}
             >
               {animando ? 'Lanzando…' : 'Lanzar proyectil'}
             </button>
@@ -497,7 +399,7 @@ export default function SimuladorProyectiles() {
               type="button"
               className={styles.secondaryBtn}
               onClick={anadirComparativa}
-              disabled={lanzamientosComparados.length >= 3}
+              disabled={lanzamientosComparados.length >= 3 || !lanzamientoActual}
             >
               Añadir a comparativa ({lanzamientosComparados.length}/3)
             </button>
@@ -698,7 +600,7 @@ export default function SimuladorProyectiles() {
               <div>vy(t) = v₀ · sen(θ) − g · t</div>
               <div>Alcance (h₀=0): R = v₀² · sen(2θ) / g</div>
               <div>Altura máx (h₀=0): h = v₀² · sen²(θ) / (2g)</div>
-              <div>{'# Con resistencia del aire (modelo lineal): F = −k · v · v⃗'}</div>
+              <div>{'# Con resistencia del aire (modelo cuadrático): F = −k · |v| · v⃗'}</div>
             </div>
           </section>
         )}
