@@ -27,6 +27,7 @@ import {
 import {
   ajustarFermentacion,
   ajustarRangoFermentacion,
+  dentroDelModelo,
   formatearTiempo,
 } from '../lib/calculadoras/fermentacionTemperatura';
 import { FERMENTACION_MM_REF } from '../lib/calculadoras/cocina';
@@ -80,9 +81,25 @@ test.describe('DDT — temperatura del agua de amasado', () => {
 
 test.describe('Fermentación — el mismo pan a otra temperatura', () => {
   test('A MANO: +10 °C sobre la receta reduce el tiempo a la mitad', () => {
-    const r = ajustarFermentacion(4, 24, 34);
+    // 22 → 32 °C, no 24 → 34: desde el 20/09/2026 el motor no da cifra fuera de 4-32 °C,
+    // y la regla del Q10 se demuestra igual con un salto de 10 °C dentro del modelo.
+    const r = ajustarFermentacion(4, 22, 32);
     expect(r?.tiempoHoras).toBe(2);
     expect(r?.masRapido).toBe(true);
+  });
+
+  test('fuera de 4-32 °C no devuelve cifra: el Q10 ahí ya no describe la masa', () => {
+    // El guardián estaba solo en `ajustarRangoFermentacion`, así que llamar a la primitiva
+    // lo eludía: a 45 °C se publicaban «28 min» cuando lo que pasa es que la levadura muere,
+    // y a −18 °C «36 h 46 min» para una masa congelada (Inspector, 20/09/2026).
+    expect(ajustarFermentacion(2, 24, 45)).toBeNull();
+    expect(ajustarFermentacion(2, 24, -18)).toBeNull();
+    expect(dentroDelModelo(45)).toBe(false);
+    expect(dentroDelModelo(-18)).toBe(false);
+    // Los dos extremos SÍ valen: el rango es cerrado.
+    expect(dentroDelModelo(4)).toBe(true);
+    expect(dentroDelModelo(32)).toBe(true);
+    expect(ajustarFermentacion(2, 24, 32)).not.toBeNull();
   });
 
   test('A MANO: −10 °C sobre la receta lo duplica', () => {

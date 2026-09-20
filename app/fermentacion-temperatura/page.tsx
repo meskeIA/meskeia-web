@@ -14,17 +14,24 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import {
   ajustarFermentacion,
+  dentroDelModelo,
   formatearTiempo,
   TEMPERATURAS_REFERENCIA,
+  TEMP_MODELO_MIN,
+  TEMP_MODELO_MAX,
 } from '@/lib/calculadoras/fermentacionTemperatura';
-import { formatNumber } from '@/lib/formatters';
+import { formatNumber, parseSpanishNumber } from '@/lib/formatters';
 
 export default function FermentacionTemperaturaPage() {
   const [tiempoRef, setTiempoRef] = useState('3');
   const [tempRef, setTempRef] = useState('24');
   const [tempActual, setTempActual] = useState('20');
 
-  const num = (v: string) => parseFloat(v.replace(',', '.')) || 0;
+  /** El parser canónico: entiende el millar español y devuelve NaN para lo que no es número. */
+  const num = (v: string) => {
+    const n = parseSpanishNumber(v);
+    return Number.isFinite(n) ? n : 0;
+  };
 
   const resultado = useMemo(
     () => ajustarFermentacion(num(tiempoRef), num(tempRef), num(tempActual)),
@@ -78,6 +85,13 @@ export default function FermentacionTemperaturaPage() {
                 {' '}(×{formatNumber(resultado.factor, 2)})
               </span>
             </div>
+          ) : !dentroDelModelo(num(tempActual)) || !dentroDelModelo(num(tempRef)) ? (
+            <p className={styles.placeholder} role="status" aria-live="polite">
+              Fuera de {TEMP_MODELO_MIN}–{TEMP_MODELO_MAX} °C no damos una cifra: la regla del Q10 seguiría
+              dando un número de aspecto convincente, pero ya no describe lo que le pasa a la masa. Por debajo
+              de {TEMP_MODELO_MIN} °C la levadura queda casi parada, y por encima de {TEMP_MODELO_MAX} °C se
+              estresa, aparecen sabores ácidos y acaba muriendo.
+            </p>
           ) : (
             <p className={styles.placeholder}>Introduce un tiempo de receta válido.</p>
           )}

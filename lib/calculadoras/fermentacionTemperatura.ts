@@ -27,6 +27,18 @@ export function ajustarFermentacion(
   tempActualC: number,
 ): ResultadoFermentacion | null {
   if (!(tiempoRefHoras > 0)) return null;
+  /**
+   * Fuera del rango del modelo no se devuelve cifra, igual que en `ajustarRangoFermentacion`.
+   *
+   * ── De dónde sale (Inspector, 20/09/2026) ──
+   * El guardián existía SOLO en la variante de horquilla, así que bastaba con llamar a esta
+   * primitiva para saltárselo — y eso hacían dos de los tres consumidores. A 45 °C
+   * (una cámara de fermentación, o el horno con la luz encendida) se publicaban «28 min»
+   * con toda naturalidad, cuando lo que ocurre ahí es que la levadura se muere; a −18 °C,
+   * «36 h 46 min» para una masa congelada. Un guardián que el consumidor puede eludir no es
+   * un guardián: por eso ahora vive en el motor y no en quien lo llama.
+   */
+  if (!dentroDelModelo(tempActualC) || !dentroDelModelo(tempRefC)) return null;
   // Más caliente que la referencia → fermenta más rápido → menos tiempo.
   const factor = Math.pow(Q10, (tempRefC - tempActualC) / 10);
   return {
@@ -79,6 +91,15 @@ export const TEMP_OPTIMA = 24;
 /** Límites entre los que la regla Q10 ≈ 2 es una aproximación razonable en panadería. */
 export const TEMP_MODELO_MIN = 4;
 export const TEMP_MODELO_MAX = 32;
+
+/**
+ * ¿Está esa temperatura dentro del rango en el que el modelo describe algo real?
+ *
+ * Se exporta para que la app pueda EXPLICAR por qué no hay cifra, en vez de limitarse a no
+ * enseñar nada: un resultado que desaparece sin decir por qué se lee como un fallo.
+ */
+export const dentroDelModelo = (tempC: number): boolean =>
+  Number.isFinite(tempC) && tempC >= TEMP_MODELO_MIN && tempC <= TEMP_MODELO_MAX;
 
 export interface RangoFermentacion {
   horasMin: number;
