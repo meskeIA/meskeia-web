@@ -9,7 +9,7 @@ import CasosAula from './CasosAula';
 // μ y σ de cada población NO se escriben aquí: vienen de `./casos.ts`, que es también donde se
 // corrigen los casos para clase. Una sola fuente, de modo que el panel de este simulador y la
 // corrección del alumno no puedan divergir ([[feedback_motor_calculo_aparte_y_probado]]).
-import { POBLACIONES } from './casos';
+import { POBLACIONES, N_DISPONIBLES } from './casos';
 
 // ============================================
 // TIPOS
@@ -163,8 +163,10 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
 
 const DIST_IDS: DistId[] = ['uniforme', 'exponencial', 'bernoulli_05', 'bernoulli_09', 'bimodal'];
 
-// Tamaños muestrales y números de muestras disponibles
-const N_VALORES = [1, 2, 5, 10, 30, 100];
+// Tamaños muestrales y números de muestras disponibles.
+// La lista de tamaños es la de `casos.ts`: si la vista tuviera la suya, los «Casos para
+// clase» podrían volver a pedir un n que el simulador no ofrece (Inspector, 20/09/2026).
+const N_VALORES = N_DISPONIBLES;
 const NUM_MUESTRAS_VALORES = [100, 500, 1000, 5000];
 
 // ============================================
@@ -444,11 +446,21 @@ export default function SimuladorTeoremaCentralLimitePage() {
 
     ctx.clearRect(0, 0, W, H);
 
-    // Rango del eje X: dependerá de mu y σ/√n
-    // Centrar en mu, ancho 4*σ/√n a cada lado, salvo n=1 que usa todo el rango original
-    const halfWidth = n === 1 ? (dist.xMax - dist.xMin) / 2 : Math.max(4 * sigmaTeorico, 0.2);
-    const xMin = dist.mu - halfWidth;
-    const xMax = dist.mu + halfWidth;
+    /**
+     * Rango del eje X.
+     *
+     * Con n > 1 se centra en mu con 4 σ/√n a cada lado, que es donde cae la campana.
+     *
+     * Con n = 1 la distribución de medias ES la población, así que el eje tiene que ser su
+     * SOPORTE declarado [xMin, xMax] y no «mu ± (xMax − xMin)/2»: eso solo coincide cuando mu
+     * es el punto medio del soporte. Con la moneda sesgada (mu = 0,9, punto medio 0,5) el eje
+     * arrancaba en 0,10 y la barra del 0 —el 10 % de la masa— se quedaba fuera del dibujo,
+     * justo en el caso que la app usa para enseñar que con n = 1 no hay campana todavía; con
+     * la exponencial, un tercio del panel caía en x < 0, donde no puede haber valores.
+     * (Inspector, 20/09/2026.)
+     */
+    const xMin = n === 1 ? dist.xMin : dist.mu - Math.max(4 * sigmaTeorico, 0.2);
+    const xMax = n === 1 ? dist.xMax : dist.mu + Math.max(4 * sigmaTeorico, 0.2);
 
     // Construir histograma
     const NUM_BINS = 40;
@@ -732,8 +744,9 @@ export default function SimuladorTeoremaCentralLimitePage() {
         </div>
 
         {medias.length >= numMuestras && numMuestras > 0 && (
-          <div className={styles.statusBar}>
-            ✅ Simulación completa con n = {n}. Cuanto mayor es n, más se parecen los estadísticos a los teóricos.
+          <div className={styles.statusBar} role="status" aria-live="polite">
+            <span aria-hidden="true">✅</span> Simulación completa con n = {n}. Cuanto mayor es n, más se
+            parecen los estadísticos a los teóricos.
           </div>
         )}
       </div>
@@ -767,8 +780,11 @@ export default function SimuladorTeoremaCentralLimitePage() {
           </ul>
           <p>
             En este simulador puedes verificarlo en directo: prueba la <em>exponencial</em> (muy asimétrica)
-            con n = 1 y verás la cola larga típica; sube a n = 30 y la distribución de medias se vuelve
-            indistinguible de una normal centrada en 1.
+            con n = 1 y verás la cola larga típica; sube a n = 30 y la campana ya está centrada en 1 y es
+            mucho más simétrica, aunque <strong>todavía no del todo</strong>: la asimetría teórica a ese
+            tamaño es 2/√30 ≈ 0,37, y en el panel la verás rondar ese valor. Con poblaciones tan
+            asimétricas como ésta, la regla de «n = 30 basta» se queda corta y hace falta subir bastante
+            más, como explica la pregunta sobre el tamaño en la sección de dudas.
           </p>
         </section>
 
@@ -861,31 +877,31 @@ export default function SimuladorTeoremaCentralLimitePage() {
             <div className={styles.faqItem}>
               <h4>¿Qué tamaño muestral n hace falta?</h4>
               <p>La regla práctica es <strong>n ≥ 30</strong>. Pero depende de cuán asimétrica sea la población original: si es casi simétrica, con n = 5 ya basta; si es muy sesgada (Bernoulli con p = 0,99 o exponencial), puede hacer falta n = 100 o más.</p>
-              <p className={styles.faqTip}>💡 En el simulador, prueba la Bernoulli (p=0,9) con n = 5 (asimétrico) y luego con n = 100 (casi normal). Verás la diferencia.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, prueba la Bernoulli (p=0,9) con n = 5 (asimétrico) y luego con n = 100 (casi normal). Verás la diferencia.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿El TCL convierte una variable en normal?</h4>
               <p>NO. El TCL no toca la distribución original: una exponencial sigue siendo exponencial. Lo que se vuelve normal es la <strong>distribución de las medias muestrales</strong> X̄, calculadas sobre muchas muestras.</p>
-              <p className={styles.faqTip}>💡 En el simulador, mira los dos paneles: arriba la población (que no cambia), abajo la distribución de medias (que sí evoluciona con n).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, mira los dos paneles: arriba la población (que no cambia), abajo la distribución de medias (que sí evoluciona con n).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Y si la población no tiene varianza finita?</h4>
               <p>Entonces el TCL clásico <strong>NO se cumple</strong>. La distribución de Cauchy es el ejemplo: por mucho que aumentes n, la media muestral sigue distribución Cauchy, no normal. Por suerte, casi todas las variables &quot;reales&quot; tienen varianza finita.</p>
-              <p className={styles.faqTip}>💡 Eventos extremos (terremotos, virales, ingresos top 1 %) tienen colas tan pesadas que el TCL puede tardar mucho en aplicarse o no hacerlo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Eventos extremos (terremotos, virales, ingresos top 1 %) tienen colas tan pesadas que el TCL puede tardar mucho en aplicarse o no hacerlo.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Diferencia entre TCL y Ley de los Grandes Números?</h4>
               <p>La <strong>LGN</strong> dice que X̄ converge a μ (la media muestral se acerca a la poblacional). El <strong>TCL</strong> es más fino: dice <em>cómo</em> se acerca, con qué forma de distribución y a qué velocidad (σ/√n). Sin el TCL no podríamos calcular intervalos de confianza ni p-valores.</p>
-              <p className={styles.faqTip}>💡 LGN responde &quot;¿a dónde va X̄?&quot;. TCL responde &quot;¿cómo se distribuye X̄ alrededor de ahí?&quot;.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> LGN responde &quot;¿a dónde va X̄?&quot;. TCL responde &quot;¿cómo se distribuye X̄ alrededor de ahí?&quot;.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Vale para sumas además de medias?</h4>
               <p>Sí. Si la media converge a N(μ, σ/√n), la suma converge a N(n·μ, σ·√n). De hecho, fue así como se demostró históricamente. La regla general: cualquier <strong>combinación lineal de muchas variables independientes</strong> tiende a la normal.</p>
-              <p className={styles.faqTip}>💡 Por eso la distribución binomial B(n, p) se aproxima por una N(np, √(np(1−p))) cuando n es grande: una binomial es la suma de n Bernoulli.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Por eso la distribución binomial B(n, p) se aproxima por una N(np, √(np(1−p))) cuando n es grande: una binomial es la suma de n Bernoulli.</p>
             </div>
           </div>
         </section>

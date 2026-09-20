@@ -379,7 +379,34 @@ test.describe('casos.ts — coherencia con la vista', () => {
   });
 
   test('N_DISPONIBLES coincide con los tamaños del deslizador', () => {
-    expect([...N_DISPONIBLES]).toEqual([1, 2, 5, 10, 30, 100]);
+    // El 4 y el 25 entraron el 20/09/2026: los casos 2 y 5 los piden por su nombre y no
+    // existían en el simulador, así que su cierre («compruébalo en el simulador de arriba»)
+    // mandaba hacer algo imposible.
+    expect([...N_DISPONIBLES]).toEqual([1, 2, 4, 5, 10, 25, 30, 100]);
+  });
+
+  test('todo n que pida un caso o un ejercicio EXISTE en el simulador', () => {
+    // La propiedad general de la que aquel hallazgo era un caso particular. Cubre los 12
+    // casos fijos y los ejercicios generados, que antes salían de una lista de pares escrita
+    // a mano donde solo 1 de los 6 era reproducible.
+    const disponibles = new Set(N_DISPONIBLES);
+    for (const caso of CASOS) {
+      for (const clave of ['n', 'n1', 'n2'] as const) {
+        const valor = (caso.datos as Record<string, unknown>)[clave];
+        if (typeof valor === 'number') {
+          expect(disponibles.has(valor), `caso ${caso.id} pide n = ${valor}`).toBe(true);
+        }
+      }
+    }
+    // En los ejercicios generados se comprueba lo que el alumno LEE: todo «n = X» del
+    // enunciado tiene que ser un tamaño que el simulador ofrezca.
+    for (let semilla = 0; semilla < 40; semilla++) {
+      const ej = generarEjercicioAleatorio(semilla);
+      for (const m of ej.enunciado.matchAll(/n\s*=\s*(\d+)/g)) {
+        const valor = Number(m[1]);
+        expect(disponibles.has(valor), `semilla ${semilla} pide n = ${valor}`).toBe(true);
+      }
+    }
   });
 
   test('las leyes son coherentes entre sí en toda la rejilla', () => {

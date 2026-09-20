@@ -114,7 +114,25 @@ export const POBLACIONES: Record<PoblacionId, Poblacion> = {
 };
 
 /** Los tamaños muestrales que ofrece el deslizador de la app. El caso 8 depende de esta lista. */
-export const N_DISPONIBLES: readonly number[] = [1, 2, 5, 10, 30, 100];
+/**
+ * Tamaños muestrales que ofrece el simulador. Es la lista CANÓNICA: la vista la importa de
+ * aquí en vez de tener la suya.
+ *
+ * El 4 y el 25 se añadieron el 20/09/2026 porque los casos 2 y 5 los piden expresamente
+ * («pasa de n = 1 a n = 4», «de n = 1 a n = 25») y cerraban invitando a comprobarlo en el
+ * simulador de arriba, donde no existían: el alumno recibía una instrucción que no podía
+ * ejecutar. Son además los dos que mejor enseñan la raíz, porque dan factores exactos
+ * (√4 = 2 y √25 = 5).
+ */
+export const N_DISPONIBLES: readonly number[] = [1, 2, 4, 5, 10, 25, 30, 100];
+
+/**
+ * La misma lista, escrita para leerla dentro de un enunciado.
+ *
+ * El caso 8 la enumeraba a mano y se quedó desfasada al añadir el 4 y el 25 (20/09/2026):
+ * el alumno leía una lista y veía otra en los botones.
+ */
+const LISTA_N_LEGIBLE = `${N_DISPONIBLES.slice(0, -1).join(', ')} y ${N_DISPONIBLES[N_DISPONIBLES.length - 1]}`;
 
 /* ─────────────────────────── Las leyes del TCL ─────────────────────────── */
 
@@ -585,7 +603,7 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     titulo: 'Cuando n = 30 no basta',
     categoria: 'aplicado',
     enunciado:
-      'Mides una magnitud cuyos valores se reparten de forma uniforme entre 0 y 10, y necesitas que el error típico de la media no supere 0,5 unidades. De los tamaños que ofrece el deslizador (1, 2, 5, 10, 30 y 100), ¿cuál es el MENOR que lo consigue?',
+      `Mides una magnitud cuyos valores se reparten de forma uniforme entre 0 y 10, y necesitas que el error típico de la media no supere 0,5 unidades. De los tamaños que ofrece el deslizador (${LISTA_N_LEGIBLE}), ¿cuál es el MENOR que lo consigue?`,
     datos: { tipo: 'umbral-n', poblacion: 'uniforme', umbral: 0.5 },
     etiquetaRespuesta: 'Tu predicción sobre el menor n válido',
     opciones: [
@@ -741,14 +759,19 @@ function splitmix32(semilla: number): () => number {
 }
 
 const POBLACIONES_PRACTICA: PoblacionId[] = ['uniforme', 'exponencial', 'bernoulli_05', 'bernoulli_09', 'bimodal'];
-const PARES_N: Array<[number, number]> = [
-  [1, 4],
-  [1, 100],
-  [2, 8],
-  [5, 20],
-  [1, 25],
-  [10, 40],
-];
+/**
+ * Pares (n pequeño, n grande) para los ejercicios de práctica.
+ *
+ * Se DERIVAN de `N_DISPONIBLES` en vez de escribirse a mano: hasta el 20/09/2026 la lista
+ * incluía 8, 20, 40 y 4, ninguno de los cuales existía en el simulador, así que de los seis
+ * pares solo uno era reproducible. Se piden saltos de al menos 4× para que el efecto de la
+ * raíz se vea de verdad en el histograma.
+ */
+const PARES_N: Array<[number, number]> = N_DISPONIBLES.flatMap((n1, i) =>
+  N_DISPONIBLES.slice(i + 1)
+    .filter((n2) => n2 >= n1 * 4)
+    .map((n2) => [n1, n2] as [number, number]),
+);
 
 /**
  * Un ejercicio de práctica, reproducible por semilla.
