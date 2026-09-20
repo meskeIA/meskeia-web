@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+// La cifra de variedades sale del catálogo, nunca escrita a mano: el <h1>, el bloque educativo y
+// esta metadata anunciaban «30» mientras el array llevaba tres fichas repetidas (Inspector, 20/09/2026).
+import { TOTAL_VARIEDADES } from './arroces';
 
 export const metadata: Metadata = {
-  title: 'Tipos de Arroz del Mundo: 30 Variedades Explicadas (Guía) | meskeIA',
-  description:
-    'Guía de referencia de 30 variedades de arroz: basmati, jazmín, bomba, arborio, sushi y más. Tipo de grano, origen, cocción y uso ideal.',
+  title: `Tipos de Arroz del Mundo: ${TOTAL_VARIEDADES} Variedades Explicadas (Guía) | meskeIA`,
+  description: `Guía de referencia de ${TOTAL_VARIEDADES} variedades de arroz: basmati, jazmín, bomba, arborio, sushi y más. Tipo de grano, origen, cocción y uso ideal.`,
   keywords: [
     'tipos de arroz',
     'variedades arroz',
@@ -15,9 +17,8 @@ export const metadata: Metadata = {
     'arroz paella',
   ],
   openGraph: {
-    title: 'Tipos de Arroz del Mundo: 30 Variedades Explicadas (Guía) | meskeIA',
-    description:
-      'Guía de referencia de 30 variedades de arroz del mundo: tipo de grano, origen, tiempo de cocción, proporción de agua y uso culinario ideal.',
+    title: `Tipos de Arroz del Mundo: ${TOTAL_VARIEDADES} Variedades Explicadas (Guía) | meskeIA`,
+    description: `Guía de referencia de ${TOTAL_VARIEDADES} variedades de arroz del mundo: tipo de grano, origen, tiempo de cocción, proporción de agua y uso culinario ideal.`,
     type: 'website',
     url: 'https://meskeia.com/guia-tipos-arroz/',
     locale: 'es_ES',
@@ -31,9 +32,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tipos de Arroz del Mundo: 30 Variedades Explicadas',
-    description:
-      'Aprende a elegir el arroz correcto para cada plato: 30 variedades del mundo, su origen, características y uso ideal.',
+    title: `Tipos de Arroz del Mundo: ${TOTAL_VARIEDADES} Variedades Explicadas`,
+    description: `Aprende a elegir el arroz correcto para cada plato: ${TOTAL_VARIEDADES} variedades del mundo, su origen, características y uso ideal.`,
     images: ['https://meskeia.com/coquinum/og-image.png']
   },
   alternates: {
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Guía de Tipos de Arroz",
-  description: "Guía de referencia de 30 variedades de arroz: basmati, jazmín, bomba, arborio, sushi y más. Tipo de grano, origen, cocción y uso ideal.",
+  description: `Guía de referencia de ${TOTAL_VARIEDADES} variedades de arroz: basmati, jazmín, bomba, arborio, sushi y más. Tipo de grano, origen, cocción y uso ideal.`,
   url: "https://meskeia.com/guia-tipos-arroz/",
   category: 'EducationalApplication',
   features: [],

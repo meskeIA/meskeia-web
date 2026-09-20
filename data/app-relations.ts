@@ -6087,10 +6087,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-cortes-carne/', icon: '🥩', name: 'Guía de Cortes de Carne', description: '45 cortes de carne: terneza, cocción, temperatura y consejos' },
     { url: '/guia-varietales-vino/', icon: '🍷', name: 'Guía de Varietales de Vino', description: '45 varietales: cuerpo, taninos, acidez, temperatura y maridaje. Incluye Malbec, Torrontés, Carménère y generosos' },
     { url: '/guia-tipos-pasta/', icon: '🍝', name: 'Guía de Tipos de Pasta', description: '40 pastas italianas: forma, región, cocción y salsa ideal' },
-    { url: '/guia-tipos-arroz/', icon: '🍚', name: 'Guía de Tipos de Arroz', description: '30 variedades de arroz: grano, almidón, región y uso culinario' },
+    { url: '/guia-tipos-arroz/', icon: '🍚', name: 'Guía de Tipos de Arroz', description: '27 variedades de arroz: grano, almidón, región y uso culinario' },
   ],
   'guia-tipos-pasta': [
-    { url: '/guia-tipos-arroz/', icon: '🍚', name: 'Guía de Tipos de Arroz', description: '30 variedades de arroz: grano, almidón, región y uso culinario' },
+    { url: '/guia-tipos-arroz/', icon: '🍚', name: 'Guía de Tipos de Arroz', description: '27 variedades de arroz: grano, almidón, región y uso culinario' },
     { url: '/guia-tipos-pan/', icon: '🍞', name: 'Guía de Tipos de Pan', description: '35 panes del mundo: harina, fermentación, textura y acompañamientos' },
     { url: '/guia-varietales-vino/', icon: '🍷', name: 'Guía de Varietales de Vino', description: '45 varietales: cuerpo, taninos, acidez, temperatura y maridaje. Incluye Malbec, Torrontés, Carménère y generosos' },
     { url: '/guia-vinagres-mundo/', icon: '🧪', name: 'Guía de Vinagres del Mundo', description: '25 vinagres: origen, acidez, intensidad y maridaje' },

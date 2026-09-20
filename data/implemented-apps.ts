@@ -1108,7 +1108,7 @@ export const implementedAppsUrls = [
   "/que-cerveza-elegir/",                          // Asistente situacional para elegir cerveza: comida, regalo, bar, ocasión, explorar
   "/guia-tipos-pan/",                              // Directorio 35 tipos de pan del mundo: harina, fermentación, textura, acompañamientos y curiosidades
   "/guia-tipos-pasta/",                            // Directorio 40 tipos de pasta italianos: forma, región, tiempo de cocción y salsa ideal
-  "/guia-tipos-arroz/",                            // Directorio 30 variedades de arroz del mundo: tipo de grano, almidón, región y uso culinario
+  "/guia-tipos-arroz/",                            // Directorio 27 variedades de arroz del mundo: tipo de grano, almidón, región y uso culinario
   "/guia-vinagres-mundo/",                         // Directorio 25 vinagres del mundo: origen, acidez, intensidad y maridaje
   "/guia-frutas-exoticas/",                        // Directorio 40 frutas exóticas: origen, sabor, temporada, nombre científico y cómo consumirlas
   "/guia-frutos-secos/",                           // Directorio 30 frutos secos y semillas: categoría, perfil nutricional, calorías y usos

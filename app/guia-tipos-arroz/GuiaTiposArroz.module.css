@@ -37,6 +37,21 @@
   display: block;
 }
 
+/* Nota de método: la proporción de agua no significa nada sin decir cómo se cuece. */
+.notaMetodo {
+  /* Los mismos márgenes laterales que .controlsWrapper, sin salirse en pantalla estrecha. */
+  max-width: min(1200px, calc(100% - 3rem));
+  margin: 1.5rem auto 0;
+  padding: 0.9rem 1.1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-left: 4px solid var(--secondary);
+  border-radius: 10px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
 /* ============= Controles ============= */
 
 .controlsWrapper {
@@ -377,6 +392,13 @@
   margin: 1.75rem 0 0.85rem;
 }
 
+.eduNota {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
 .tablaWrapper {
   overflow-x: auto;
   margin: 1rem 0;
@@ -551,9 +573,19 @@
 
 [data-theme='dark'] .counter,
 [data-theme='dark'] .card,
-[data-theme='dark'] .emptyState {
+[data-theme='dark'] .emptyState,
+[data-theme='dark'] .notaMetodo {
   background: #2A2A2A;
   border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .notaMetodo {
+  border-left-color: var(--secondary);
+  color: #C9C9C9;
+}
+
+[data-theme='dark'] .eduNota {
+  color: #C9C9C9;
 }
 
 [data-theme='dark'] .cardHeader {
@@ -627,6 +659,10 @@
   .controlsWrapper,
   .cardsGrid {
     padding: 0 1rem;
+  }
+
+  .notaMetodo {
+    max-width: min(1200px, calc(100% - 2rem));
   }
 
   .cardsGrid {

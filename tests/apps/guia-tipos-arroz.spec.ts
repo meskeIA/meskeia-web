@@ -4,84 +4,67 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 /**
  * Inspector — guia-tipos-arroz (segmento interactiva, riesgo 2, 48 usos, 76 s de estancia)
  *
- * Primera inspección: 20/09/2026 (Opus 5), contra producción y contra el código del repositorio,
- * que el deploy de las 11:25 deja idénticos.
+ * Primera inspección: 20/09/2026 (Opus 5), contra producción y contra el código del repositorio.
+ * Reparación de los 10 hallazgos: 20/09/2026. Los bloques que antes documentaban el defecto como
+ * TESTIGO están ahora invertidos: afirman el comportamiento correcto, y si alguien reintroduce
+ * cualquiera de los diez, este spec se pone en rojo.
  *
  * QUÉ PROMETE
- *   <h1> «Guía de Tipos de Arroz del Mundo» y subtítulo: «30 variedades de arroz: tipo de grano,
- *   origen, tiempo de cocción, proporción de agua y uso culinario ideal». La metadata repite la
- *   cifra («30 Variedades Explicadas») y el bloque educativo publica una tabla comparativa de 6
- *   variedades con su proporción de agua. No calcula nada: no hay conversión tazas↔gramos ni
- *   raciones, así que la verdad comprobable es (a) que los filtros devuelvan EXACTAMENTE su
- *   conjunto, (b) que la proporción y el tiempo de cada ficha no se contradigan entre sí ni con
- *   la tabla educativa, y (c) el contenido.
+ *   <h1> «Guía de Tipos de Arroz del Mundo» y subtítulo: «N variedades de arroz: tipo de grano,
+ *   origen, tiempo de cocción, proporción de agua y uso culinario ideal». No calcula nada: no hay
+ *   conversión tazas↔gramos ni raciones, así que la verdad comprobable es (a) que los filtros
+ *   devuelvan EXACTAMENTE su conjunto, (b) que la proporción y el tiempo de cada ficha no se
+ *   contradigan entre sí ni con la tabla educativa, y (c) el contenido.
  *
  * DÓNDE VIVEN LOS DATOS
- *   app/guia-tipos-arroz/page.tsx — array `arroces` (líneas 49-665, 30 entradas literales, sin
- *   importar nada de data/), filtrado en `arrocesFiltrados` (línea 692: cuatro igualdades exactas
- *   más un `includes` sobre la concatenación en minúsculas de nombre, nombreOriginal, origen,
- *   descripción, platos y características). Los conjuntos de abajo se calcularon leyendo ese
- *   array ANTES de abrir el navegador.
+ *   app/guia-tipos-arroz/arroces.ts — array `arroces` (27 entradas literales tras fusionar las
+ *   tres variedades que estaban repetidas), más `TOTAL_VARIEDADES` y las listas de opciones de
+ *   los filtros, DERIVADAS del array. El filtrado vive en `arrocesFiltrados` (page.tsx): cuatro
+ *   igualdades exactas más un `includes` sobre la concatenación normalizada —minúsculas y SIN
+ *   diacríticos— de nombre, nombreOriginal, origen, descripción, platos y características.
+ *   Los conjuntos de abajo se calcularon leyendo ese array, no observando la pantalla.
  *
- * LOS CONJUNTOS ESPERADOS, CONTADOS A MANO SOBRE EL ARRAY
- *   Grano Corto ................ 11  (de 30: Largo 7, Medio 9, Corto 11, Glutinoso 2, Salvaje 1)
- *   Corto + Mediterráneo ........ 7  (las 11 de arriba menos sushi, Koshihikari, Ponni y la
- *                                    californiana «Arroz Bomba sushi americano»)
+ * LOS CONJUNTOS ESPERADOS, CONTADOS SOBRE EL ARRAY (27 fichas)
+ *   Grano Corto ................. 9  (de 27: Largo 7, Medio 8, Corto 9, Glutinoso 2, Salvaje 1)
+ *   Corto + Mediterráneo ........ 7  (las 9 de arriba menos el arroz de sushi japonés y el Ponni)
  *   Uso = Paella ................ 3  (Bomba, Senia, Bahía — y ninguno más: ni Arborio ni Calrose)
- *   Uso Risotto + Almidón «Muy alto» ... 2  (Arborio y Carnaroli; Vialone Nano, «aborio Italiano»
- *                                    y Padano son Risotto pero almidón «Alto»)
- *   Región = Europa ............. 0  ← ninguna de las 30 lleva región 'Europa' (HALLAZGO D)
+ *   Uso Risotto + Almidón «Muy alto» ... 2  (Arborio y Carnaroli; Vialone Nano, Roma y Padano son
+ *                                    Risotto pero almidón «Alto»)
+ *   Región = Mediterráneo ....... 9  (y «Europa» ya NO es una opción: no la lleva ninguna ficha)
  *
- * PROPORCIONES Y TIEMPOS CONTRASTADOS (3 variedades, ficha ↔ tabla educativa de la propia app,
- * que es la ÚNICA referencia interna que publica; fuente externa no hay ninguna — HALLAZGO G)
- *   Basmati ......... ficha 1:1.5 · 15-18 min   ↔ tabla 1:1.5      ✔ cuadran
- *   Arroz Bomba ..... ficha 1:2.5-3 · 16-18 min ↔ tabla 1:2.5-3    ✔ cuadran
- *   Arroz de sushi .. ficha 1:1.2 · 20-25 min   ↔ tabla 1:1.2      ✔ cuadran
- *   Las tres son plausibles para el método que cada una supone (olla tapada por absorción para
- *   basmati y sushi, paella para el bomba), pero NINGUNA ficha dice de qué método habla: la
- *   página no contiene ni una vez las palabras «fuente» ni «método» (verificado en el test).
+ * PROPORCIONES, TIEMPOS Y MÉTODOS (ficha ↔ tabla educativa de la propia app)
+ *   Basmati ......... 1:1.5      · 15-18 min   · absorción en olla tapada
+ *   Arroz Bomba ..... 1:2.5-3    · 16-18 min   · paella, evaporación en recipiente ancho
+ *   Sushi japonés ... 1:1.2      · 20-25 min   · absorción en olla tapada, con reposo
+ *   Carnaroli ....... 1:3 aprox. · 16-18 min   · risotto, caldo añadido en cazos
+ *   Cada ficha declara ahora a QUÉ método corresponde su proporción, que es lo que hace que
+ *   1:2.5-3 y 1:2 no se contradigan: son dos formas distintas de cocer.
  *
- * HALLAZGOS ABIERTOS, escritos como TESTIGO (documentan lo que la app hace HOY; cuando se
- * reparen, estos bloques fallarán y habrá que invertirlos). NO se corrigen desde el test:
- *   A. La MISMA variedad está dos veces con proporciones distintas: «Arroz rojo de Camarga»
- *      (línea 137, «Riz rouge de Camargue», 1:2) y «Arroz Camargue rojo» (línea 544, «Riz Rouge
- *      IGP», 1:2.5). Mismo origen, mismo tiempo (30-40 min), misma región y mismos usos. Buscar
- *      «camarga» devuelve las dos y el lector no tiene forma de saber cuál creer.
- *   B. El buscador no normaliza acentos: «jazmin» devuelve 0 y pinta «No se encontraron arroces»
- *      —una negación FALSA— mientras «jazmín» devuelve 2. La propia metadata de la app usa la
- *      forma sin tilde en sus keywords («basmati jazmin bomba»).
- *   C. Las «30 variedades» del <h1> están infladas por duplicados: Camarga×2 (A), el arroz de
- *      sushi japonés×2 («Arroz de sushi», cuyo nombreOriginal ya es «Sushi-meshi / Koshihikari»,
- *      y «Arroz japonés Koshihikari», ambos 1:1.2 y 20-25 min) y el arroz de sushi californiano×2
- *      («Arroz Calrose», grano Medio 1:1.5, y «Arroz Bomba sushi americano», grano Corto 1:1.2,
- *      los dos de California y los dos diciendo ser el 90 % del sushi de EE.UU.). Variedades
- *      distintas de verdad hay 27, y una de ellas se llama «Bomba» sin serlo.
- *   D. El desplegable Región ofrece «Europa», que no puede devolver nada: las 10 fichas europeas
- *      (España, Italia, Francia) están clasificadas como «Mediterráneo». REGIONES es una
- *      constante escrita a mano (línea 671) en vez de derivarse del array.
- *   E. Dos rankings mundiales falsos y uno ambiguo, en las curiosidades: Tailandia «primer
- *      exportador mundial de arroz» (lo es India desde 2012, ~20 Mt frente a ~7-8 Mt),
- *      «EE.UU. es el quinto productor mundial» (produce ~7-8 Mt y ronda el puesto 12; quinto es
- *      como EXPORTADOR) y «India produce el 70% mundial» bajo la ficha de Basmati, que leído
- *      como producción de arroz es falso (India ~25 %): el 70 % es su cuota de basmati.
- *   F. «La Camarga es el límite norte mundial del cultivo del arroz» es falso y además lo
- *      desmiente otra ficha de la propia app: la llanura del Po (~45° N) está al NORTE de la
- *      Camarga (~43,5° N), y hay arroz en Hokkaido y en Heilongjiang aún más arriba.
- *   G. Ni una fuente ni un método de cocción declarados, pese a que la proporción de agua es la
- *      promesa del <h1>. Tampoco cifras populares atribuidas: «más antioxidantes que los
- *      arándanos», «4x más fibra y 3x más vitamina B1», «50 €/kg», «1.500 hectáreas».
- *   H. Asimetría territorial valorativa (antipatrón 6 del CLAUDE.md): el Calrose es «más
- *      asequible que el sushi rice auténtico», es decir, el californiano no es «auténtico».
- *   I. El contador de resultados no es región viva: al filtrar cambia de «30 de 30» a «11 de 30»
- *      sin anunciarlo, y el estado vacío tampoco lleva role="status".
+ * LOS DIEZ HALLAZGOS, Y LO QUE AQUÍ SE EXIGE DE CADA UNO
+ *   A. Variedades duplicadas con datos contradictorios → una ficha por variedad. Buscar «camarga»
+ *      devuelve UNA, y lo mismo «california» y «koshihikari». Además la nomenclatura: ya no hay
+ *      ningún «Bomba» californiano, ni «aborio» mal escrito, ni una variedad española mezclada
+ *      con una marca registrada de Texas.
+ *   B. El buscador normaliza acentos: «jazmin», «jazmín» y «JAZMIN» devuelven las MISMAS fichas.
+ *   C. La cifra sale del array: el <h1>, el contador y el bloque educativo dicen los mismos 27.
+ *   D. Ningún desplegable ofrece una opción que no pueda devolver nada (se recorren TODAS).
+ *   E, F. Los rankings mundiales falsos y el «límite norte mundial» ya no están, y lo que los
+ *      sustituye se comprueba por su texto, no por su ausencia.
+ *   G. Método declarado en cada ficha y en la tabla, y la página dice de dónde salen las cifras.
+ *   H. Cifras populares sin fuente retiradas.
+ *   I. «Más asequible que el sushi rice auténtico» → formulación neutra.
+ *   J. El contador es región viva (role=status + aria-live), y el estado vacío también.
  *
- * LO QUE SÍ ESTÁ BIEN, y por eso se fija aquí: el contexto colonial del arroz Carolina está
+ * LO QUE SÍ ESTABA BIEN, y por eso se fija aquí: el contexto colonial del arroz Carolina está
  * escrito y nombrado (trabajo forzado de personas esclavizadas de la Costa del Arroz africana),
  * que es justo el antipatrón 8 del CLAUDE.md; y los cuatro filtros devuelven conjuntos exactos.
  */
 
 const RUTA = '/guia-tipos-arroz/';
 const BUSCADOR = 'input[aria-label="Buscar arroz"]';
+
+/** Las 27 del array, tras fusionar los tres duplicados. */
+const TOTAL = 27;
 
 async function abrir(page: Page): Promise<void> {
   await page.goto(RUTA);
@@ -92,7 +75,7 @@ async function abrir(page: Page): Promise<void> {
 /** Los nombres de las fichas que se están mostrando, en el orden del array. */
 const fichas = (page: Page) => page.locator('article h2');
 
-/** El párrafo «Mostrando N de 30 variedades de arroz». */
+/** El párrafo «Mostrando N de 27 variedades de arroz». */
 const contador = (page: Page) => page.locator('p').filter({ hasText: /^Mostrando/ }).first();
 
 /** La tarjeta de una variedad concreta, por su título exacto. */
@@ -103,6 +86,12 @@ const ficha = (page: Page, nombre: string) =>
 async function buscar(page: Page, texto: string): Promise<void> {
   await page.getByLabel('Buscar arroz').fill(texto);
   await esperarValorEnReact(page, BUSCADOR, texto);
+}
+
+/** Los valores que ofrece un desplegable, sin la opción vacía («Todos» / «Todas»). */
+async function opcionesDe(page: Page, etiqueta: string): Promise<string[]> {
+  const textos = await page.getByLabel(etiqueta).locator('option').allTextContents();
+  return textos.map((t) => t.trim()).filter((t) => t !== 'Todos' && t !== 'Todas');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -125,33 +114,37 @@ test.describe('en móvil (Pixel 7): los filtros y el buscador devuelven lo que p
     expect(page.viewportSize()).toEqual({ width: 412, height: 839 }); // devices['Pixel 7']
   });
 
-  test('CASO 1 — «Corto» devuelve las 11 de grano corto y ninguna más; combinar y limpiar cuadran', async ({
+  test('CASO 1 — «Corto» devuelve las 9 de grano corto y ninguna más; combinar y limpiar cuadran', async ({
     page,
   }) => {
-    await expect(contador(page)).toContainText('Mostrando 30 de 30 variedades de arroz');
-    await expect(fichas(page)).toHaveCount(30);
+    await expect(contador(page)).toContainText(`Mostrando ${TOTAL} de ${TOTAL} variedades de arroz`);
+    await expect(fichas(page)).toHaveCount(TOTAL);
 
-    // Las 11 entradas con tipoGrano 'Corto' del array, en su orden (líneas 49-665).
+    // La cifra del encabezado sale del array (hallazgo C): promete lo mismo que el contador.
+    // Antes prometía «30 variedades» con tres fichas repetidas dentro.
+    await expect(
+      page.getByText(new RegExp(`^${TOTAL} variedades de arroz:`)).first(),
+    ).toBeVisible();
+    await expect(page.getByText('30 variedades')).toHaveCount(0);
+
+    // Las 9 entradas con tipoGrano 'Corto' del array, en su orden.
     await page.getByLabel('Tipo de grano').selectOption('Corto');
     await expect(fichas(page)).toHaveText([
-      'Arroz de sushi',
+      'Arroz de sushi japonés',
       'Arroz Bomba',
       'Arroz Senia',
       'Arroz Bahía',
       'Arborio',
       'Carnaroli',
       'Vialone Nano',
-      'Arroz aborio Italiano',
-      'Arroz japonés Koshihikari',
+      'Arroz Roma',
       'Arroz Ponni',
-      'Arroz Bomba sushi americano',
     ]);
-    await expect(contador(page)).toContainText('Mostrando 11 de 30');
-    // Y lo que la insignia de cada tarjeta declara coincide con el filtro pedido: 11 «Grano corto».
-    await expect(page.getByText('Grano corto', { exact: true })).toHaveCount(11);
+    await expect(contador(page)).toContainText(`Mostrando 9 de ${TOTAL}`);
+    // Y lo que la insignia de cada tarjeta declara coincide con el filtro pedido: 9 «Grano corto».
+    await expect(page.getByText('Grano corto', { exact: true })).toHaveCount(9);
 
-    // ESTADO COMBINADO: de esas 11, las 7 del Mediterráneo (fuera sushi, Koshihikari, Ponni y la
-    // californiana «Arroz Bomba sushi americano»).
+    // ESTADO COMBINADO: de esas 9, las 7 del Mediterráneo (fuera el sushi japonés y el Ponni).
     await page.getByLabel('Región').selectOption('Mediterráneo');
     await expect(fichas(page)).toHaveText([
       'Arroz Bomba',
@@ -160,9 +153,9 @@ test.describe('en móvil (Pixel 7): los filtros y el buscador devuelven lo que p
       'Arborio',
       'Carnaroli',
       'Vialone Nano',
-      'Arroz aborio Italiano',
+      'Arroz Roma',
     ]);
-    await expect(contador(page)).toContainText('Mostrando 7 de 30');
+    await expect(contador(page)).toContainText(`Mostrando 7 de ${TOTAL}`);
 
     // VOLVER ATRÁS: el botón de limpiar es de acción, no de estado, así que NO debe llevar
     // aria-pressed (un aria-pressed aquí sería una regresión, CLAUDE.md global §5).
@@ -170,7 +163,7 @@ test.describe('en móvil (Pixel 7): los filtros y el buscador devuelven lo que p
     await expect(limpiar).toHaveAttribute('type', 'button');
     expect(await limpiar.getAttribute('aria-pressed')).toBeNull();
     await limpiar.click();
-    await expect(fichas(page)).toHaveCount(30);
+    await expect(fichas(page)).toHaveCount(TOTAL);
     await expect(page.getByLabel('Tipo de grano')).toHaveValue('');
     await expect(page.getByLabel('Región')).toHaveValue('');
     await expect(limpiar).toHaveCount(0); // el botón se retira cuando no queda filtro
@@ -189,85 +182,148 @@ test.describe('en móvil (Pixel 7): los filtros y el buscador devuelven lo que p
     await buscar(page, 'zzz');
     await expect(fichas(page)).toHaveCount(0);
     await expect(page.getByText('No se encontraron arroces')).toBeVisible();
-    await expect(contador(page)).toContainText('Mostrando 0 de 30');
+    await expect(contador(page)).toContainText(`Mostrando 0 de ${TOTAL}`);
 
-    // TESTIGO (hallazgo B) — el buscador no normaliza acentos: «jazmin» niega en falso.
+    // REPARADO (hallazgo B) — el buscador normaliza los diacríticos en los DOS lados: con tilde,
+    // sin ella y en mayúsculas se obtiene exactamente lo mismo. Ya no hay negación falsa.
+    const conJazmin = ['Jazmín / Tailandés', 'Arroz Jasmin tailandés americano'];
     await buscar(page, 'jazmín');
-    await expect(fichas(page)).toHaveText(['Jazmín / Tailandés', 'Arroz Jasmin tailandés americano']);
+    await expect(fichas(page)).toHaveText(conJazmin);
     await buscar(page, 'jazmin');
-    await expect(fichas(page)).toHaveCount(0);
-    await expect(page.getByText('No se encontraron arroces')).toBeVisible();
+    await expect(fichas(page)).toHaveText(conJazmin);
+    await buscar(page, 'JAZMIN');
+    await expect(fichas(page)).toHaveText(conJazmin);
+    await expect(page.getByText('No se encontraron arroces')).toHaveCount(0);
 
-    // TESTIGO (hallazgo D) — «Europa» es una opción que no puede devolver nada.
+    // REPARADO (hallazgo J) — el contador es región viva y se anuncia al cambiar el filtrado.
     await buscar(page, '');
-    await page.getByLabel('Región').selectOption('Europa');
-    await expect(contador(page)).toContainText('Mostrando 0 de 30');
-    await expect(page.getByText('No se encontraron arroces')).toBeVisible();
-    // Mientras que las 10 fichas europeas sí salen bajo «Mediterráneo».
+    await expect(contador(page)).toHaveAttribute('role', 'status');
+    await expect(contador(page)).toHaveAttribute('aria-live', 'polite');
     await page.getByLabel('Región').selectOption('Mediterráneo');
-    await expect(fichas(page)).toHaveCount(10);
+    await expect(contador(page)).toContainText(`Mostrando 9 de ${TOTAL}`);
+    // Y el estado vacío también se anuncia, en vez de aparecer en silencio.
+    await buscar(page, 'zzz');
+    await expect(page.locator('[role="status"]').filter({ hasText: 'No se encontraron arroces' })).toHaveCount(1);
+  });
 
-    // TESTIGO (hallazgo I) — al cambiar de 10 a 30 resultados nadie lo anuncia.
-    expect(await contador(page).getAttribute('aria-live')).toBeNull();
-    expect(await contador(page).getAttribute('role')).toBeNull();
-    await expect(page.locator('[role="status"]')).toHaveCount(0);
+  test('CASO 1.bis — ningún desplegable ofrece una opción que no pueda devolver nada', async ({
+    page,
+  }) => {
+    // REPARADO (hallazgo D). El desplegable Región ofrecía «Europa» y ninguna ficha la llevaba:
+    // las europeas están clasificadas como «Mediterráneo». Las listas se derivan ahora del array.
+    expect(await opcionesDe(page, 'Región')).toEqual([
+      'Asia',
+      'Mediterráneo',
+      'América',
+      'África',
+    ]);
+
+    // Y la propiedad general, que es la que impide que vuelva a pasar en cualquiera de los cuatro:
+    // toda opción ofrecida devuelve al menos una ficha.
+    for (const etiqueta of ['Tipo de grano', 'Nivel de almidón', 'Región', 'Uso culinario']) {
+      const opciones = await opcionesDe(page, etiqueta);
+      expect(opciones.length).toBeGreaterThan(0);
+
+      for (const opcion of opciones) {
+        await page.getByLabel(etiqueta).selectOption(opcion);
+        await expect(
+          contador(page),
+          `«${etiqueta} = ${opcion}» no devuelve ninguna ficha`,
+        ).not.toContainText(`Mostrando 0 de ${TOTAL}`);
+        await expect(fichas(page)).not.toHaveCount(0);
+      }
+
+      await page.getByLabel(etiqueta).selectOption('');
+    }
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CASO 2 — proporciones y tiempos: ficha ↔ tabla educativa, y la variedad duplicada
+// CASO 2 — proporciones, tiempos y método: ficha ↔ tabla educativa, sin duplicados
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('las proporciones y los tiempos que publica', () => {
   test.beforeEach(async ({ page }) => {
     await abrir(page);
   });
 
-  test('CASO 2 — basmati, bomba y sushi cuadran con la tabla educativa; la Camarga se contradice', async ({
+  test('CASO 2 — basmati, bomba y sushi cuadran con la tabla educativa; cada variedad sale UNA vez', async ({
     page,
   }) => {
-    // Las tres fichas, con el par (proporción, tiempo) que declara cada una.
+    // Las tres fichas, con el trío (proporción, tiempo, método) que declara cada una.
     await expect(ficha(page, 'Basmati')).toContainText('1:1.5');
     await expect(ficha(page, 'Basmati')).toContainText('15-18 min');
+    await expect(ficha(page, 'Basmati')).toContainText('Absorción en olla tapada');
     await expect(ficha(page, 'Arroz Bomba')).toContainText('1:2.5-3');
     await expect(ficha(page, 'Arroz Bomba')).toContainText('16-18 min');
-    await expect(ficha(page, 'Arroz de sushi')).toContainText('1:1.2');
-    await expect(ficha(page, 'Arroz de sushi')).toContainText('20-25 min (con reposo)');
+    await expect(ficha(page, 'Arroz Bomba')).toContainText(
+      'Paella: evaporación en recipiente ancho',
+    );
+    await expect(ficha(page, 'Arroz de sushi japonés')).toContainText('1:1.2');
+    await expect(ficha(page, 'Arroz de sushi japonés')).toContainText('20-25 min (con reposo)');
+    await expect(ficha(page, 'Arroz de sushi japonés')).toContainText(
+      'Absorción en olla tapada, con reposo',
+    );
 
-    // La tabla comparativa del bloque educativo es la única referencia interna de la app:
-    // debe decir lo MISMO que las fichas para esas tres variedades.
+    // La tabla comparativa del bloque educativo debe decir lo MISMO que las fichas, método incluido.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const tabla = page.getByRole('table');
+    await expect(tabla.getByRole('columnheader', { name: 'Método' })).toBeVisible();
     await expect(tabla.getByRole('row').filter({ hasText: 'Basmati' })).toContainText('1:1.5');
+    await expect(tabla.getByRole('row').filter({ hasText: 'Basmati' })).toContainText(
+      'Absorción en olla tapada',
+    );
     await expect(tabla.getByRole('row').filter({ hasText: 'Bomba' })).toContainText('1:2.5-3');
+    await expect(tabla.getByRole('row').filter({ hasText: 'Bomba' })).toContainText(
+      'Paella: evaporación en recipiente ancho',
+    );
     await expect(
       tabla.getByRole('row').filter({ hasText: 'Sushi (Koshihikari)' }),
     ).toContainText('1:1.2');
+    await expect(tabla.getByRole('row').filter({ hasText: 'Carnaroli' })).toContainText(
+      '1:3 aprox., en cazos',
+    );
 
-    // TESTIGO (hallazgo A) — la misma variedad, dos veces y con proporciones distintas.
+    // REPARADO (hallazgo A) — la Camarga es UNA ficha con UNA proporción, no dos que se
+    // contradicen. Antes salían «Arroz rojo de Camarga» (1:2) y «Arroz Camargue rojo» (1:2.5).
     await buscar(page, 'camarga');
-    await expect(fichas(page)).toHaveText(['Arroz rojo de Camarga', 'Arroz Camargue rojo']);
-    await expect(ficha(page, 'Arroz rojo de Camarga')).toContainText('Riz rouge de Camargue');
-    await expect(ficha(page, 'Arroz rojo de Camarga')).toContainText('1:2');
-    await expect(ficha(page, 'Arroz Camargue rojo')).toContainText('Riz Rouge IGP');
-    await expect(ficha(page, 'Arroz Camargue rojo')).toContainText('1:2.5');
-    // Las dos dicen el mismo origen y el mismo tiempo: no son dos arroces, es uno repetido.
-    await expect(ficha(page, 'Arroz rojo de Camarga')).toContainText('Camarga (Francia)');
-    await expect(ficha(page, 'Arroz Camargue rojo')).toContainText('Camarga (Francia)');
+    await expect(fichas(page)).toHaveText(['Arroz rojo de Camarga']);
+    await expect(ficha(page, 'Arroz rojo de Camarga')).toContainText('1:2.5');
     await expect(ficha(page, 'Arroz rojo de Camarga')).toContainText('30-40 min');
-    await expect(ficha(page, 'Arroz Camargue rojo')).toContainText('30-40 min');
+    await expect(page.getByText('Arroz Camargue rojo')).toHaveCount(0);
 
-    // TESTIGO (hallazgo C) — el arroz de sushi californiano también está dos veces, con grano y
-    // proporción distintos, y las dos fichas se atribuyen el 90 % del sushi de EE.UU.
+    // REPARADO (hallazgo A) — el arroz de sushi californiano también era dos fichas, con grano y
+    // proporción distintos, las dos atribuyéndose el 90 % del sushi de EE.UU. Ahora es una.
     await buscar(page, 'california');
-    await expect(ficha(page, 'Arroz Calrose')).toContainText('1:1.5');
+    await expect(fichas(page)).toHaveText(['Arroz Calrose']);
     await expect(ficha(page, 'Arroz Calrose')).toContainText('Grano medio');
-    await expect(ficha(page, 'Arroz Bomba sushi americano')).toContainText('1:1.2');
-    await expect(ficha(page, 'Arroz Bomba sushi americano')).toContainText('Grano corto');
+    await expect(ficha(page, 'Arroz Calrose')).toContainText(
+      '1:1.2 para sushi · 1:1.5 como guarnición',
+    );
 
-    // TESTIGO (hallazgo G) — ni fuente ni método de cocción en toda la página, con la guía
-    // educativa ya desplegada (el contenido está siempre en el DOM, así que esto lo cubre).
-    await expect(page.getByText(/fuente/i)).toHaveCount(0);
-    await expect(page.getByText(/m[ée]todo/i)).toHaveCount(0);
+    // Y el arroz japonés, que estaba como «Arroz de sushi» y otra vez como «Arroz japonés
+    // Koshihikari», con los mismos 1:1.2 y 20-25 min.
+    await buscar(page, 'koshihikari');
+    await expect(fichas(page)).toHaveText(['Arroz de sushi japonés']);
+
+    // NOMENCLATURA (hallazgo A) — buscar «bomba» ya no devuelve un arroz californiano junto al
+    // que tiene D.O. Valencia: las tres que salen lo mencionan porque se comparan con él.
+    await buscar(page, 'bomba');
+    await expect(fichas(page)).toHaveText(['Arroz Bomba', 'Arroz Senia', 'Arroz Bahía']);
+    await expect(page.getByText('Arroz Bomba sushi americano')).toHaveCount(0);
+    // «Arroz aborio Italiano» era la variedad Roma con Arborio mal escrito.
+    await buscar(page, '');
+    await expect(page.getByText('Arroz aborio Italiano')).toHaveCount(0);
+    await expect(ficha(page, 'Arroz Roma')).toContainText('Roma');
+    // «Arroz Bahia / Mahatma» mezclaba una variedad española con una marca registrada de Texas:
+    // la marca se conserva donde se pueda encontrar, pero ya no da nombre a la variedad.
+    await expect(page.getByText('Arroz Bahia / Mahatma')).toHaveCount(0);
+    await expect(ficha(page, 'Arroz largo de Texas')).toContainText('marca Mahatma');
+    await expect(ficha(page, 'Arroz Bahía')).toContainText('Sevilla/Valencia');
+
+    // REPARADO (hallazgo G) — la página dice ahora a qué método corresponde cada proporción y de
+    // dónde salen las cifras. Antes las palabras «método» y «fuente» no aparecían ni una vez.
+    await expect(page.getByText(/cada ficha indica el método de cocción/i).first()).toBeVisible();
+    await expect(page.getByText(/no de una fuente normativa/i).first()).toBeVisible();
   });
 });
 
@@ -279,7 +335,7 @@ test.describe('el contenido frente a los antipatrones editoriales del proyecto',
     await abrir(page);
   });
 
-  test('CASO 3 — el contexto colonial del Carolina está escrito; los rankings mundiales no cuadran', async ({
+  test('CASO 3 — el contexto colonial del Carolina está escrito; los rankings mundiales cuadran', async ({
     page,
   }) => {
     // BIEN (antipatrón 8, contexto colonial omitido): la ficha del Carolina lo nombra sin
@@ -289,38 +345,56 @@ test.describe('el contenido frente a los antipatrones editoriales del proyecto',
     await expect(carolina).toContainText('Costa del Arroz africana');
     await expect(carolina).toContainText('Su trabajo forzado fue el motor del sistema rizícola sureño');
 
-    // TESTIGO (hallazgo H, antipatrón 6) — «auténtico» reservado al japonés.
+    // REPARADO (hallazgo I, antipatrón 6) — el arroz californiano ya no queda calificado como no
+    // «auténtico»: la diferencia de origen es un hecho, «auténtico» era un juicio.
+    await expect(page.getByText(/aut[ée]ntic/i)).toHaveCount(0);
     await expect(ficha(page, 'Arroz Calrose')).toContainText(
-      'Más asequible que el sushi rice auténtico',
+      'más asequible que el arroz de sushi importado de Japón',
+    );
+    // Y el Carnaroli deja de ser «la única opción» para la alta cocina.
+    await expect(page.getByText(/[úu]nica opci[óo]n/i)).toHaveCount(0);
+    await expect(ficha(page, 'Carnaroli')).toContainText(
+      'Muchas cocinas italianas lo prefieren al Arborio',
     );
 
-    // TESTIGO (hallazgo E) — dos rankings mundiales falsos y uno ambiguo.
+    // REPARADO (hallazgo E) — los dos rankings mundiales falsos y el ambiguo.
     // India es el primer exportador mundial de arroz desde 2012 (~20 Mt; Tailandia ~7-8 Mt).
+    await expect(page.getByText('siendo el primer exportador mundial de arroz')).toHaveCount(0);
     await expect(ficha(page, 'Jazmín / Tailandés')).toContainText(
-      'siendo el primer exportador mundial de arroz',
+      'India la superó como mayor exportador mundial de arroz a partir de 2012',
     );
     // EE.UU. produce ~7-8 Mt y ronda el puesto 12 mundial; quinto lo es como EXPORTADOR.
+    await expect(page.getByText('EE.UU. es el quinto productor mundial')).toHaveCount(0);
     await expect(ficha(page, 'Arroz blanco largo')).toContainText(
-      'EE.UU. es el quinto productor mundial',
+      'lejos de los grandes productores asiáticos',
     );
-    // Bajo la ficha de Basmati, «el 70% mundial» se lee como producción de arroz (India ~25 %).
-    await expect(ficha(page, 'Basmati')).toContainText('India produce el 70% mundial');
+    // El 70 % es la cuota de India en el comercio de BASMATI, no en la producción de arroz.
+    await expect(page.getByText('India produce el 70% mundial')).toHaveCount(0);
+    await expect(ficha(page, 'Basmati')).toContainText('comercio mundial de basmati');
 
-    // TESTIGO (hallazgo F) — la app se desmiente a sí misma: el Po (~45° N) está al norte de la
-    // Camarga (~43,5° N), y las dos fichas conviven en la misma página.
+    // REPARADO (hallazgo F) — la app ya no se desmiente a sí misma: la llanura del Po (~45° N)
+    // está al norte de la Camarga (~43,5° N), así que el «límite norte mundial» era falso.
+    await expect(page.getByText(/l[íi]mite norte mundial/i)).toHaveCount(0);
     await expect(ficha(page, 'Arroz rojo de Camarga')).toContainText(
-      'La Camarga es el límite norte mundial del cultivo del arroz',
+      'prácticamente la única zona arrocera de Francia',
     );
     await expect(ficha(page, 'Arroz Padano')).toContainText(
       'La llanura del Po es la mayor zona arrocera de Europa',
     );
 
-    // TESTIGO (hallazgo G) — cifras populares redondas sin atribuir a nadie.
-    await expect(ficha(page, 'Arroz negro / Forbidden rice')).toContainText('más que los arándanos');
-    await expect(ficha(page, 'Arroz integral / Brown rice')).toContainText(
-      'Tiene 4x más fibra y 3x más vitamina B1 que el arroz blanco',
+    // REPARADO (hallazgo H) — cifras populares redondas sin atribuir a nadie, retiradas. Lo que
+    // queda dice lo mismo sin inventarse una magnitud.
+    await expect(page.getByText(/ar[áa]ndanos/i)).toHaveCount(0);
+    await expect(ficha(page, 'Arroz negro / Forbidden rice')).toContainText(
+      'los mismos pigmentos que dan color a moras y frutos rojos',
     );
-    await expect(ficha(page, 'Arroz de sushi')).toContainText('puede costar 50€/kg en Japón');
-    await expect(ficha(page, 'Arroz Bomba')).toContainText('Solo se cultivan 1.500 hectáreas');
+    await expect(page.getByText('4x más fibra')).toHaveCount(0);
+    await expect(ficha(page, 'Arroz integral / Brown rice')).toContainText(
+      'más fibra, vitaminas del grupo B y minerales que el blanco refinado',
+    );
+    await expect(page.getByText(/50\s*€\/kg/)).toHaveCount(0);
+    await expect(page.getByText('1.500 hectáreas')).toHaveCount(0);
+    await expect(ficha(page, 'Arroz Bomba')).toContainText('Su rendimiento por hectárea es bajo');
+    await expect(page.getByText('el arroz más exportado de España')).toHaveCount(0);
   });
 });
