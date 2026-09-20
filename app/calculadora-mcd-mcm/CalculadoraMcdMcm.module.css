@@ -70,11 +70,36 @@
   font-size: 1.2rem;
 }
 
+/* Las reglas de entrada, visibles ANTES de calcular y no solo al fallar */
+.inputHint {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: var(--focus); /* tinte de marca, ya definido en claro y en oscuro */
+  border-left: 3px solid var(--primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-lg);
+}
+
 .inputList {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
+}
+
+/* Cada campo con su etiqueta propia: el placeholder desaparece al escribir */
+.inputField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.inputLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .inputRow {

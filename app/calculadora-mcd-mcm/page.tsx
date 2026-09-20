@@ -7,66 +7,113 @@ import { MeskeiaLogo, Footer, ResultCard, RelatedApps, LegalNotice, ShareCard, E
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
+const CERO = BigInt(0);
+const MAXIMO_SEGURO = BigInt(Number.MAX_SAFE_INTEGER);
+
+/**
+ * Tope de cada entrada, declarado en pantalla encima de los campos.
+ *
+ * Lo fija la factorización, que es división de prueba hasta la raíz: con el tope en un
+ * billón (10^12) son ~500.000 divisiones por número, milésimas de segundo. Sin tope y sin
+ * corte en la raíz, un primo de 9 cifras congelaba la interfaz 7 s y uno de 12 no devolvía
+ * la pestaña (hallazgo 2 del Inspector, 20/09/2026).
+ */
+const MAXIMO = 1000000000000;
+
 interface Resultado {
-  mcd: number;
-  mcm: number;
+  mcd: bigint;
+  mcm: bigint;
   factoresMcd: Map<number, number>;
   factoresMcm: Map<number, number>;
   numeros: number[];
+  /** La descomposición de cada número, calculada UNA vez (antes se repetía tres veces). */
+  factorizaciones: Map<number, number>[];
 }
 
-// Calcular MCD de dos números usando algoritmo de Euclides
-function mcdDos(a: number, b: number): number {
-  a = Math.abs(a);
-  b = Math.abs(b);
-  while (b !== 0) {
-    const temp = b;
-    b = a % b;
-    a = temp;
+/** MCD de dos enteros por el algoritmo de Euclides. En BigInt: nunca pasa por el producto. */
+function mcdDos(a: bigint, b: bigint): bigint {
+  let x = a < CERO ? -a : a;
+  let y = b < CERO ? -b : b;
+  while (y !== CERO) {
+    const resto = x % y;
+    x = y;
+    y = resto;
   }
-  return a;
+  return x;
 }
 
-// Calcular MCM de dos números
-function mcmDos(a: number, b: number): number {
-  return Math.abs(a * b) / mcdDos(a, b);
+/**
+ * MCM de dos enteros SIN pasar por el producto.
+ *
+ * `Math.abs(a * b) / mcd` desbordaba el entero seguro (2^53) mucho antes que el propio MCM:
+ * con 123.456.789 y 987.654.321 devolvía 13.548.070.123.626.140, que no es múltiplo de
+ * ninguna de las dos entradas, y contradecía al paso a paso que la propia app imprime
+ * (hallazgo 1). Dividiendo ANTES de multiplicar —y en BigInt, que no tiene tope— el
+ * resultado es exacto por grande que sea.
+ */
+function mcmDos(a: bigint, b: bigint): bigint {
+  if (a === CERO || b === CERO) return CERO;
+  const producto = (a / mcdDos(a, b)) * b;
+  return producto < CERO ? -producto : producto;
 }
 
-// Calcular MCD de array de números
-function mcdArray(nums: number[]): number {
+function mcdArray(nums: bigint[]): bigint {
   return nums.reduce((acc, num) => mcdDos(acc, num));
 }
 
-// Calcular MCM de array de números
-function mcmArray(nums: number[]): number {
+function mcmArray(nums: bigint[]): bigint {
   return nums.reduce((acc, num) => mcmDos(acc, num));
 }
 
-// Factorizar un número
+/**
+ * Entero en formato español (1.234.567).
+ *
+ * Hasta 2^53 lo hace `formatNumber`, el formateador canónico. Por encima NO se puede pasar
+ * por `Number`, que es exactamente la pérdida de cifras que aquí se está reparando: los
+ * millares se agrupan sobre la representación decimal exacta del BigInt.
+ */
+function formatEntero(valor: bigint): string {
+  if (valor <= MAXIMO_SEGURO) return formatNumber(Number(valor), 0);
+  return valor.toString().replace(/\B(?=(\d{3})+$)/g, '.');
+}
+
+/**
+ * Descomposición en factores primos por división de prueba, cortando en la raíz cuadrada.
+ *
+ * Lo que queda por encima de √n solo puede ser primo, así que se anota como último factor
+ * en vez de seguir dividiendo hasta él: para 999.999.937 son ~15.800 divisiones en lugar de
+ * 999.999.936.
+ */
 function factorizar(n: number): Map<number, number> {
   const factores = new Map<number, number>();
+  const anotar = (primo: number) => factores.set(primo, (factores.get(primo) || 0) + 1);
   let num = Math.abs(n);
-  let divisor = 2;
 
-  while (num > 1) {
+  while (num > 1 && num % 2 === 0) {
+    anotar(2);
+    num = num / 2;
+  }
+  for (let divisor = 3; divisor * divisor <= num; divisor += 2) {
     while (num % divisor === 0) {
-      factores.set(divisor, (factores.get(divisor) || 0) + 1);
+      anotar(divisor);
       num = num / divisor;
     }
-    divisor++;
   }
+  if (num > 1) anotar(num); // el resto, por encima de la raíz, es primo
 
   return factores;
 }
 
-// Obtener factores comunes (para MCD)
-function factoresMcd(numeros: number[]): Map<number, number> {
-  const todosFactores = numeros.map(n => factorizar(n));
+/**
+ * Factores comunes con el MENOR exponente (el MCD).
+ * Recibe las descomposiciones YA calculadas: antes las pedía por su cuenta.
+ */
+function factoresComunes(todosFactores: Map<number, number>[]): Map<number, number> {
   const resultado = new Map<number, number>();
 
   if (todosFactores.length === 0) return resultado;
 
-  // Obtener todos los primos del primer número
+  // Todos los primos del primer número
   const primerFactores = todosFactores[0];
 
   primerFactores.forEach((exp, primo) => {
@@ -88,9 +135,8 @@ function factoresMcd(numeros: number[]): Map<number, number> {
   return resultado;
 }
 
-// Obtener todos los factores (para MCM)
-function factoresMcm(numeros: number[]): Map<number, number> {
-  const todosFactores = numeros.map(n => factorizar(n));
+/** Todos los factores con el MAYOR exponente (el MCM), sobre descomposiciones ya calculadas. */
+function factoresTodos(todosFactores: Map<number, number>[]): Map<number, number> {
   const resultado = new Map<number, number>();
 
   todosFactores.forEach(factores => {
@@ -131,13 +177,18 @@ export default function CalculadoraMcdMcmPage() {
     setError('');
     setResultado(null);
 
-    // Parsear y validar números
+    // Parsear y validar números: enteros positivos y dentro del tope que se anuncia
+    // encima de los campos (el 0 queda fuera porque el MCM con 0 no está definido)
     const numeros: number[] = [];
     for (const input of inputs) {
       if (input.trim() === '') continue;
       const num = parseSpanishNumber(input);
       if (isNaN(num) || num <= 0 || !Number.isInteger(num)) {
         setError('Todos los valores deben ser números enteros positivos');
+        return;
+      }
+      if (num > MAXIMO) {
+        setError(`Cada número debe ser como mucho ${formatNumber(MAXIMO, 0)}`);
         return;
       }
       numeros.push(num);
@@ -148,15 +199,17 @@ export default function CalculadoraMcdMcmPage() {
       return;
     }
 
-    const mcd = mcdArray(numeros);
-    const mcm = mcmArray(numeros);
+    // Una sola factorización por número: antes se hacía tres veces (MCD, MCM y render)
+    const factorizaciones = numeros.map(n => factorizar(n));
+    const enteros = numeros.map(n => BigInt(n));
 
     setResultado({
-      mcd,
-      mcm,
-      factoresMcd: factoresMcd(numeros),
-      factoresMcm: factoresMcm(numeros),
+      mcd: mcdArray(enteros),
+      mcm: mcmArray(enteros),
+      factoresMcd: factoresComunes(factorizaciones),
+      factoresMcm: factoresTodos(factorizaciones),
       numeros,
+      factorizaciones,
     });
   };
 
@@ -198,26 +251,40 @@ export default function CalculadoraMcdMcmPage() {
         <div className={styles.inputPanel}>
           <h2>Introduce los números</h2>
 
+          <p className={styles.inputHint} id="reglas-entrada">
+            <span aria-hidden="true">ℹ️</span> Solo <strong>números enteros positivos</strong>,
+            sin decimales, de 1 a {formatNumber(MAXIMO, 0)}. El <strong>0 no se admite</strong>:
+            su MCM con cualquier número no está definido, porque el único múltiplo común sería 0.
+          </p>
+
           <div className={styles.inputList}>
             {inputs.map((input, index) => (
-              <div key={index} className={styles.inputRow}>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => handleInputChange(index, e.target.value)}
-                  placeholder={`Número ${index + 1}`}
-                  className={styles.numberInput}
-                />
-                {inputs.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => removeInput(index)}
-                    className={styles.removeBtn}
-                    title="Eliminar"
-                  >
-                    ×
-                  </button>
-                )}
+              <div key={index} className={styles.inputField}>
+                <label htmlFor={`numero-${index + 1}`} className={styles.inputLabel}>
+                  Número {index + 1}
+                </label>
+                <div className={styles.inputRow}>
+                  <input
+                    id={`numero-${index + 1}`}
+                    type="text"
+                    value={input}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    placeholder={`Número ${index + 1}`}
+                    className={styles.numberInput}
+                    aria-describedby="reglas-entrada"
+                  />
+                  {inputs.length > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => removeInput(index)}
+                      className={styles.removeBtn}
+                      aria-label={`Eliminar el número ${index + 1}`}
+                      title="Eliminar"
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -228,7 +295,11 @@ export default function CalculadoraMcdMcmPage() {
             </button>
           )}
 
-          {error && <div className={styles.errorMsg}>{error}</div>}
+          {error && (
+            <div className={styles.errorMsg} role="alert" aria-live="polite">
+              {error}
+            </div>
+          )}
 
           <div className={styles.buttonGroup}>
             <button type="button" onClick={calcular} className={styles.btnPrimary}>
@@ -245,7 +316,7 @@ export default function CalculadoraMcdMcmPage() {
             <>
               <ResultCard
                 title="MCD (Máximo Común Divisor)"
-                value={formatNumber(resultado.mcd, 0)}
+                value={formatEntero(resultado.mcd)}
                 variant="highlight"
                 icon="🔢"
                 description="El mayor número que divide a todos"
@@ -253,7 +324,7 @@ export default function CalculadoraMcdMcmPage() {
 
               <ResultCard
                 title="MCM (Mínimo Común Múltiplo)"
-                value={formatNumber(resultado.mcm, 0)}
+                value={formatEntero(resultado.mcm)}
                 variant="info"
                 icon="✖️"
                 description="El menor múltiplo común a todos"
@@ -266,20 +337,22 @@ export default function CalculadoraMcdMcmPage() {
                   {resultado.numeros.map((num, i) => (
                     <div key={i} className={styles.factorRow}>
                       <span className={styles.numLabel}>{formatNumber(num, 0)} =</span>
-                      <span className={styles.factors}>{formatFactores(factorizar(num))}</span>
+                      <span className={styles.factors}>
+                        {formatFactores(resultado.factorizaciones[i])}
+                      </span>
                     </div>
                   ))}
                 </div>
 
                 <div className={styles.methodBox}>
                   <div className={styles.methodItem}>
-                    <strong>MCD = {formatNumber(resultado.mcd, 0)}</strong>
+                    <strong>MCD = {formatEntero(resultado.mcd)}</strong>
                     <p>Factores comunes con menor exponente:</p>
                     <code>{formatFactores(resultado.factoresMcd) || '1'}</code>
                   </div>
 
                   <div className={styles.methodItem}>
-                    <strong>MCM = {formatNumber(resultado.mcm, 0)}</strong>
+                    <strong>MCM = {formatEntero(resultado.mcm)}</strong>
                     <p>Todos los factores con mayor exponente:</p>
                     <code>{formatFactores(resultado.factoresMcm)}</code>
                   </div>
@@ -361,7 +434,7 @@ export default function CalculadoraMcdMcmPage() {
         <section>
           <h4>Curiosidades y propiedades</h4>
           <ul>
-            <li>MCD(a, 0) = a (cualquier número divide a 0)</li>
+            <li>MCD(a, 0) = a (cualquier número divide a 0). Esta calculadora, en cambio, pide enteros positivos y no admite el 0, porque el otro resultado que da —el MCM— no está definido con 0: su único múltiplo común sería 0.</li>
             <li>MCD(a, a) = a</li>
             <li>Si a divide a b, entonces MCD(a, b) = a y MCM(a, b) = b</li>
             <li>El algoritmo de Euclides tiene complejidad O(log min(a,b)) — extremadamente eficiente incluso con números muy grandes</li>
