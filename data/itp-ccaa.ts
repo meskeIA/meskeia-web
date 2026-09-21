@@ -946,6 +946,23 @@ const soloRebajas = (lista: TipoReducido[], tipoAplicado: number): TipoReducido[
 
 export const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
+/**
+ * ¿Este tipo reducido exige que el inmueble sea la vivienda habitual del comprador?
+ *
+ * Mira el NOMBRE además del array `condiciones`, y ese «además» es el hallazgo 1154/1155 del
+ * Inspector (21/09/2026): de los 76 tipos reducidos del catálogo, Castilla-La Mancha es el
+ * ÚNICO que declara el requisito con otras palabras —'Primera vivienda'— mientras su nombre
+ * sí dice «Vivienda habitual (primera compra)». Mirando solo las condiciones, el filtro no lo
+ * veía y las siete apps del clúster de compraventa ofrecían un 6 % «Vivienda habitual» a un
+ * garaje o un trastero SUELTOS, tres puntos por debajo del 9 % que se les cobra y bajo un
+ * rótulo que promete pagar menos. Las otras dos entradas que llevan el requisito solo en el
+ * nombre («VPO primera vivienda» de Valencia y La Rioja) ya quedaban fuera por DE_COLECTIVO.
+ */
+const PIDE_VIVIENDA_HABITUAL = /vivienda habitual|primera vivienda/;
+const exigeViviendaHabitual = (r: TipoReducido): boolean =>
+  PIDE_VIVIENDA_HABITUAL.test(normaliza(r.nombre)) ||
+  r.condiciones.some(c => PIDE_VIVIENDA_HABITUAL.test(normaliza(c)));
+
 export function elegirTipoITP(
   ccaa: ComunidadAutonoma,
   perfil: PerfilComprador,
@@ -1000,7 +1017,7 @@ export function elegirTipoITP(
       r.tipo < (porUbicacion?.tipo ?? datos.tipoGeneral) &&
       // Un reducido que exige vivienda habitual esta DESCARTADO, no «sin comprobar»,
       // cuando la app ya sabe que no lo es (un garaje o un trastero sueltos nunca lo son).
-      !(!viviendaHabitual && r.condiciones.some(c => /vivienda habitual/i.test(c)))
+      !(!viviendaHabitual && exigeViviendaHabitual(r))
   );
 
   if (perfil === 'general') {

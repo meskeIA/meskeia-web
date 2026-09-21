@@ -4218,10 +4218,12 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — los tres casos, resueltos a mano an
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// 21. HALLAZGO ABIERTO 21/09/2026 — con `test.fail()`: afirma lo que DEBERÍA pasar, así que
-// hoy falla a propósito. Al repararlo se le quita la marca y queda como regresión.
+// 21. REGRESIÓN — hallazgo 1154 del 21/09/2026, REPARADO el 21/09. Se escribió con
+// `test.fail()` afirmando lo que DEBERÍA pasar; al repararlo se le quitó la marca sin
+// tocar ninguna aserción, así que lo que hoy pasa en verde es exactamente lo que ayer
+// fallaba en rojo.
 // ═════════════════════════════════════════════════════════════════════════════
-test.describe('Hallazgo abierto — re-inspección del 21/09/2026', () => {
+test.describe('Regresión — hallazgo 1154 de la re-inspección del 21/09/2026', () => {
   /**
    * ❌ ABIERTO (contenido, bajo) — en Castilla-La Mancha el aviso «Podrías pagar menos»
    * ofrece un tipo reducido que se LLAMA «Vivienda habitual (primera compra)» en una página
@@ -4247,8 +4249,13 @@ test.describe('Hallazgo abierto — re-inspección del 21/09/2026', () => {
    * Carlos y en la FAQ: no prometer un reducido que el motor descarta. Las otras tres líneas
    * de la lista (zonas de despoblación, 5/4/3 %) sí son alcanzables por un garaje y tienen
    * que seguir mostrándose.
+   *
+   * ✅ REPARADO el 21/09/2026 en `data/itp-ccaa.ts`: el filtro pasó a mirar el NOMBRE además
+   * del array `condiciones` (`exigeViviendaHabitual`), y reconoce «primera vivienda» como la
+   * otra forma de escribir el requisito. Barridos los 76 tipos reducidos del catálogo, era el
+   * único que se colaba: las otras dos entradas con el requisito solo en el nombre («VPO
+   * primera vivienda» de Valencia y La Rioja) ya quedaban fuera por `DE_COLECTIVO`.
    */
-  test.fail();
   test('el aviso de Castilla-La Mancha no ofrece un reducido de vivienda habitual', async ({
     page,
   }) => {
