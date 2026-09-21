@@ -391,3 +391,31 @@ test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
     await expect(comparativa).not.toContainText('óxido sulfúrico');
   });
 });
+
+test.describe('La tabla declara hasta dónde llega (21/09/2026)', () => {
+  // El title prometía «Todos los Elementos» y la tabla trae 51 de los 118. Salió del barrido
+  // de la palanca «promesa incumplida», no del Inspector: el Inspector mira lo que la app
+  // calcula por dentro, y esto vivía en el <title> que se sirve en el buscador.
+  test('el título ya no promete todos los elementos', async ({ page }) => {
+    await expect(page).not.toHaveTitle(/Todos los Elementos/i);
+    await expect(page).toHaveTitle(/Tabla de Valencias/);
+  });
+
+  test('el alcance está escrito en la página, antes de que nadie busque en vano', async ({
+    page,
+  }) => {
+    const alcance = page.getByText(/No incluye lantánidos, actínidos ni transuránicos/);
+    await expect(alcance).toBeVisible();
+    await expect(alcance).toContainText('51 elementos');
+  });
+
+  test('buscar un elemento ausente explica que no está, en vez de sugerir una errata', async ({
+    page,
+  }) => {
+    await buscar(page, 'titanio');
+    const sinResultados = page.getByText(/No hay ningún elemento que coincida/);
+    await expect(sinResultados).toBeVisible();
+    await expect(sinResultados).toContainText('no está en');
+    await expect(sinResultados).toContainText('esta tabla');
+  });
+});

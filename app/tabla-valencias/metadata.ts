@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Tabla de Valencias y Números de Oxidación — Todos los Elementos | meskeIA',
+  title: 'Tabla de Valencias y Números de Oxidación de los Elementos | meskeIA',
   description: 'Tabla de valencias y números de oxidación de los elementos químicos, con buscador, ejemplos de compuestos, iones poliatómicos, las tres nomenclaturas IUPAC y formulador de compuestos binarios.',
   keywords: 'tabla de valencias, valencias, numeros de oxidacion, numero de oxidacion, valencias quimica, tabla de valencias quimica, nomenclatura inorganica, nomenclatura quimica, formular compuestos, formulacion inorganica, nomenclatura stock, nomenclatura sistematica, nomenclatura tradicional, iones poliatomicos, oxidos, hidruros, sales binarias, quimica secundaria, bachillerato, preparatoria, educacion media',
   authors: [{ name: 'meskeIA' }],
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Tabla de Valencias y Números de Oxidación | meskeIA',
-    description: 'Consulta en segundos con qué números de oxidación actúa cada elemento, con ejemplos reales, las tres nomenclaturas IUPAC y un formulador de compuestos binarios.',
+    description: 'Consulta en segundos con qué números de oxidación actúa cada uno de los 51 elementos que se formulan en el aula, con ejemplos reales, las tres nomenclaturas IUPAC y un formulador de compuestos binarios.',
     url: 'https://meskeia.com/tabla-valencias/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Tabla de Valencias y Números de Oxidación | meskeIA',
-    description: 'Busca cualquier elemento y consulta sus números de oxidación con ejemplos de compuestos reales.',
+    description: 'Busca un elemento y consulta sus números de oxidación con ejemplos de compuestos reales.',
     images: ['https://meskeia.com/stemum/og-image.png'],
   },
   other: {

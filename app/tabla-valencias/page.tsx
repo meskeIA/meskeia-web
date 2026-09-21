@@ -835,7 +835,7 @@ export default function TablaValenciasPage() {
           <span aria-hidden="true">⚗️</span> Tabla de Valencias y Números de Oxidación
         </h1>
         <p className={styles.subtitle}>
-          Busca cualquier elemento y consulta al instante con qué números de oxidación actúa,
+          Busca un elemento y consulta al instante con qué números de oxidación actúa,
           con ejemplos de compuestos reales, iones poliatómicos, las tres nomenclaturas y un
           formulador de compuestos binarios.
         </p>
@@ -926,6 +926,18 @@ export default function TablaValenciasPage() {
             : `${elementosFiltrados.length} de ${ELEMENTOS.length} elementos`}
         </p>
 
+        {/*
+          Alcance declarado (21/09/2026). Hasta hoy el título de la página prometía «todos los
+          elementos» y la tabla trae 51 de los 118: los que se formulan en el aula. Nadie ve el
+          hueco hasta que busca un elemento que no está, y entonces no sabe si se ha equivocado
+          al escribir o si la tabla no lo tiene. Decirlo antes cuesta una línea.
+        */}
+        <p className={styles.alcance}>
+          Están los {ELEMENTOS.length} elementos que se formulan en secundaria y bachillerato: los
+          grupos principales completos y los metales de transición de uso corriente. No incluye
+          lantánidos, actínidos ni transuránicos, que no intervienen en la formulación del aula.
+        </p>
+
         <div className={styles.leyendaChips}>
           <span className={`${styles.chip} ${styles.chipComun}`}>+3</span>
           <span className={styles.leyendaTexto}>estado más frecuente del elemento</span>
@@ -939,7 +951,9 @@ export default function TablaValenciasPage() {
         {elementosFiltrados.length === 0 && (
           <p className={styles.sinResultados}>
             No hay ningún elemento que coincida con «{busqueda}». Prueba con el símbolo (Fe), el
-            nombre (hierro) o el nombre tradicional (férrico).
+            nombre (hierro) o el nombre tradicional (férrico). Si buscas un lantánido, un actínido
+            o un metal de transición poco habitual (titanio, wolframio, molibdeno…), no está en
+            esta tabla: recoge los {ELEMENTOS.length} elementos que se formulan en el aula.
           </p>
         )}
 

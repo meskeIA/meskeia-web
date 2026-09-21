@@ -178,6 +178,19 @@
   color: var(--text-muted);
 }
 
+/*
+  Alcance de la tabla: qué elementos están y cuáles no. Va justo debajo del contador y en
+  el mismo registro visual que él —secundario, sin recuadro— porque es una aclaración de
+  lectura, no un aviso: quien busca hierro no necesita leerla, y quien busca titanio sí.
+*/
+.alcance {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  max-width: 62ch;
+}
+
 .leyendaChips {
   display: flex;
   flex-wrap: wrap;
