@@ -2306,9 +2306,10 @@ test.describe('Buscador CNAE-IAE — re-inspección del 21/09/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 21/09/2026 — escritos con `test.fail()`: afirman lo que DEBERÍA
-// ocurrir y hoy no ocurre. Al repararlos se les quita la marca sin tocar ningún valor
-// esperado, y pasan a sujetar la reparación como regresión.
+// REGRESIÓN — los SEIS hallazgos del 21/09/2026 (1162 a 1167), REPARADOS el 21/09 moviendo
+// los 21 términos a la clase que los nombra en `data/cnae-sinonimos.json`. Se escribieron con
+// `test.fail()` afirmando lo que DEBERÍA ocurrir; al repararlos se les quitó la marca sin
+// tocar ningún valor esperado, y hoy sujetan la reparación.
 //
 // Los SEIS son el mecanismo del hallazgo 423 una vez más: cuando una clase de la CNAE-2009
 // se reparte en varias de la CNAE-2025, los términos coloquiales se quedaron en UN destino
@@ -2321,11 +2322,10 @@ test.describe('Buscador CNAE-IAE — re-inspección del 21/09/2026', () => {
 // Ninguno de los seis se solapa con el terreno ya barrido el 14/09 (alojamiento, comercio
 // electrónico, intermediación, manipulación de mercancías y cuidado de niños).
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos abiertos del 21/09/2026', () => {
+test.describe('Buscador CNAE-IAE — regresión de los hallazgos 1162-1167 del 21/09/2026', () => {
   test('MEDIO — «esteticista» y «depilación» deben llevar a 96.22, la clase que se llama «cuidados de belleza»', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['9602'] = ['96.21', '96.22']: la clase 9602 de la CNAE-2009
@@ -2352,7 +2352,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 21/09/2026', () => {
   test('MEDIO — «sastre» y «modista» no confeccionan género de PUNTO: su clase es 14.21', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['1413'] = ['14.10', '14.21'] (y ['1419'] reparte en 14.10, 14.21, 14.22
@@ -2377,7 +2376,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 21/09/2026', () => {
   test('MEDIO — «decorador de interiores» no es pintura de edificios: su clase es 74.13', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // «decorador de interiores» cuelga de 43.34 «Pintura y acristalamiento», Sección F
@@ -2399,7 +2397,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 21/09/2026', () => {
   test('BAJO — «paquetes turísticos» y «travel planner» no son intermediación de TRANSPORTE', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['7911'] = ['52.32', '55.40', '77.51', '79.11']: la clase 7911 de la
@@ -2421,7 +2418,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 21/09/2026', () => {
   });
 
   test('BAJO — «lámparas» y «menaje» los nombra 47.55, no la ferretería', async ({ page }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['4759'] = ['47.52', '47.55', '47.69', '47.92']: 47.52 y 47.55 son
@@ -2444,7 +2440,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 21/09/2026', () => {
   test('BAJO — un puesto de mercadillo DE ROPA es comercio especializado: 47.71', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // correspondencia['4782'] = ['47.12', '47.51', '47.71', '47.72', '47.79']: la clase 4782

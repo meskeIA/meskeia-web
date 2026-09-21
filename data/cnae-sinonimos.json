@@ -60,17 +60,17 @@
   ],
   "14.10": [
     "confección",
+    "ropa"
+  ],
+  "14.21": [
+    "confección",
     "coser",
     "costurera",
     "diseño de moda",
     "marca de ropa propia",
     "modista",
-    "ropa",
     "sastre",
     "taller de costura"
-  ],
-  "14.21": [
-    "confección"
   ],
   "18.12": [
     "copistería",
@@ -182,7 +182,6 @@
   ],
   "43.34": [
     "cristalero",
-    "decorador de interiores",
     "empapelar",
     "pintar pisos",
     "pintor",
@@ -219,9 +218,7 @@
     "e-commerce",
     "ecommerce",
     "mercadillo artesanía",
-    "mercadillo de ropa",
     "puesto de feria",
-    "puesto de ropa",
     "rastrillo",
     "rastro",
     "shopify",
@@ -230,7 +227,6 @@
     "tienda virtual",
     "vender por internet",
     "venta ambulante",
-    "venta ambulante de ropa",
     "venta online"
   ],
   "47.21": [
@@ -289,9 +285,7 @@
     "droguería de pinturas",
     "ferretería",
     "herramientas",
-    "lámparas",
     "materiales de construcción",
-    "menaje",
     "pinturas",
     "tienda de bricolaje"
   ],
@@ -304,6 +298,8 @@
   ],
   "47.55": [
     "iluminación",
+    "lámparas",
+    "menaje",
     "mueblería",
     "tienda de muebles"
   ],
@@ -326,11 +322,14 @@
   ],
   "47.71": [
     "boutique",
+    "mercadillo de ropa",
     "moda",
     "multimarca",
+    "puesto de ropa",
     "ropa infantil",
     "tienda de ropa",
-    "vender ropa"
+    "vender ropa",
+    "venta ambulante de ropa"
   ],
   "47.72": [
     "artículos de viaje",
@@ -437,8 +436,6 @@
     "vaciado de pisos"
   ],
   "52.32": [
-    "paquetes turísticos",
-    "travel planner",
     "vender vuelos"
   ],
   "53.20": [
@@ -709,6 +706,7 @@
     "maquetación"
   ],
   "74.13": [
+    "decorador de interiores",
     "interiorismo"
   ],
   "74.20": [
@@ -767,6 +765,8 @@
   "79.11": [
     "agencia de viajes",
     "agente de viajes",
+    "paquetes turísticos",
+    "travel planner",
     "viajes"
   ],
   "81.21": [
@@ -1017,18 +1017,18 @@
   "96.21": [
     "barbero",
     "barbería",
-    "depilación",
-    "esteticista",
-    "estética",
-    "manicura",
-    "maquilladora",
     "peluquero",
-    "peluquería",
-    "uñas"
+    "peluquería"
   ],
   "96.22": [
     "centro de belleza",
-    "salón de belleza"
+    "depilación",
+    "estética",
+    "esteticista",
+    "manicura",
+    "maquilladora",
+    "salón de belleza",
+    "uñas"
   ],
   "96.99": [
     "acompañamiento",
