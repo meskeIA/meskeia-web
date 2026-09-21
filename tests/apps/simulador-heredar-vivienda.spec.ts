@@ -4882,10 +4882,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
    * presentar una autoliquidación complementaria e ingresar los 0,00 € … más intereses de
    * demora». Idéntico en Galicia y en Asturias.
    */
-  test('[21-A] el aviso de complementaria salta con una regularización de 0,00 €', async ({
+  test('[21-A] REPARADO 1178 — sin importe que regularizar, el aviso no exige una complementaria', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     await page.selectOption('#parentescoSel', 'hijo');
@@ -4914,7 +4913,8 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
   });
 
   /**
-   * ❌ ABIERTO 21/09/2026 (contenido, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   * ✅ REPARADO el 21/09/2026 — se escribió con `test.fail()` afirmando lo que DEBERÍA
+   * pasar, y al repararlo se le quitó la marca sin tocar ninguna aserción.
    *
    * [21-B] La tarjeta «Aprovecha la reducción de vivienda habitual» de Buenas prácticas
    * sigue anunciando el tope ESTATAL a secas: «la reducción del 95% (hasta 122.606,47 €)».
@@ -4929,10 +4929,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
    * educativo y no puede depender del selector, pero sí puede no prometer como universal un
    * tope que en Cataluña es cuatro veces mayor.
    */
-  test('[21-B] la tarjeta de buenas prácticas anuncia el tope estatal como si fuera el único', async ({
+  test('[21-B] REPARADO 1179 — la tarjeta de buenas prácticas rotula el tope como estatal', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     const tarjeta = await page.evaluate(() => {
@@ -4953,7 +4952,8 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
   });
 
   /**
-   * ❌ ABIERTO 21/09/2026 (contenido, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   * ✅ REPARADO el 21/09/2026 — se escribió con `test.fail()` afirmando lo que DEBERÍA
+   * pasar, y al repararlo se le quitó la marca sin tocar ninguna aserción.
    *
    * [21-C] La fila del IRPF de la tabla «Los tres impuestos en cadena» publica la fórmula
    * «(Valor venta − valor adquisición fiscal) × tramos», que es exactamente la que el
@@ -4969,10 +4969,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
    * 646.598,80) y la fórmula de la tabla daría 53.401,20 € (700.000 − 646.598,80), que al
    * 21 % marginal son 1.076,02 € de IRPF de diferencia.
    */
-  test('[21-C] la tabla educativa describe una ganancia sin descontar el IIVTNU de la venta', async ({
+  test('[21-C] REPARADO 1180 — la tabla educativa describe la ganancia que el motor calcula', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
     const filaIRPF = await page.evaluate(() => {
@@ -4991,7 +4990,8 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
   });
 
   /**
-   * ❌ ABIERTO 21/09/2026 (contenido, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   * ✅ REPARADO el 21/09/2026 — se escribió con `test.fail()` afirmando lo que DEBERÍA
+   * pasar, y al repararlo se le quitó la marca sin tocar ninguna aserción.
    *
    * [21-D] Las dos prórrogas de la tabla «Los tres impuestos en cadena» van SIN unidad, y
    * las dos construcciones no significan lo mismo:
@@ -5007,8 +5007,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
    * Es el hallazgo 863 —el plazo escrito sin la unidad— reaparecido en la tabla educativa
    * después de repararse en el aviso del panel, y sobre plazos que también hay que cumplir.
    */
-  test('[21-D] las prórrogas de la tabla educativa van sin unidad', async ({ page }) => {
-    test.fail();
+  test('[21-D] REPARADO 1181 — las dos prórrogas de la tabla llevan unidad y dicen de qué tipo son', async ({ page }) => {
     await abrir(page);
 
     const tabla = await page.evaluate(() => {

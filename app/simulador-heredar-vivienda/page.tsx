@@ -1307,12 +1307,37 @@ export default function SimuladorHeredarViviendaPage() {
                 habitual:</strong> vendes a los {aniosHastaVenta} años y{' '}
                 {ccaa === 'cataluna'
                   ? `el art. 19 de la Ley 19/2010 de Cataluña exige mantenerla ${aniosMantenimiento} años`
-                  : `el art. 20.2.c LISD exige mantenerla ${aniosMantenimiento} años`}. Hay que
-                presentar una autoliquidación complementaria e ingresar los{' '}
-                <strong>{formatCurrency(regularizacionVivienda)}</strong> que la reducción ahorró,
-                más intereses de demora (que dependen de las fechas reales y no se calculan aquí).
-                El plazo para presentarla lo fija la normativa de tu comunidad autónoma: compruébalo
-                antes de que corran más intereses.
+                  : `el art. 20.2.c LISD exige mantenerla ${aniosMantenimiento} años`}.{' '}
+                {/*
+                  ⚠️ 21/09/2026 (hallazgo 1178) — este aviso exigía «presentar una autoliquidación
+                  complementaria e ingresar los 0,00 € … más intereses de demora» en las
+                  comunidades cuyo beneficio llega DESPUÉS de la reducción (Andalucía y Galicia,
+                  exención total bajo 1.000.000 € de base liquidable; Asturias, 300.000 € de
+                  reducción en base): allí quitar la reducción de vivienda no mueve la cuota y los
+                  dos escenarios dan 0,00 €. El bloque total ya lo sabía y no pintaba la línea «+
+                  ISD regularizado», así que la pantalla se contradecía. El incumplimiento del
+                  requisito es cierto y se sigue diciendo; lo que desaparece es la orden de
+                  ingresar una cifra que no existe. Es la reparación del 778 pasada de frenada.
+                */}
+                {regularizacionVivienda > 0 ? (
+                  <>
+                    Hay que presentar una autoliquidación complementaria e ingresar los{' '}
+                    <strong>{formatCurrency(regularizacionVivienda)}</strong> que la reducción ahorró,
+                    más intereses de demora (que dependen de las fechas reales y no se calculan aquí).
+                    El plazo para presentarla lo fija la normativa de tu comunidad autónoma: compruébalo
+                    antes de que corran más intereses.
+                  </>
+                ) : (
+                  <>
+                    Con estos datos, <strong>quitar la reducción no cambia la cuota</strong>: los
+                    beneficios de {CCAA_LIST.find(c => c.id === ccaa)?.label ?? 'tu comunidad'} llegan
+                    después de ella y el ISD sale igual a{' '}
+                    <strong>{formatCurrency(isd.cuotaFinal)}</strong> con reducción y sin ella, así
+                    que no hay importe que devolver. Aun así, el incumplimiento del plazo de
+                    mantenimiento se comunica a la administración de tu comunidad autónoma, que es
+                    quien fija cómo y cuándo.
+                  </>
+                )}
                 {ccaa !== 'cataluna' && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}
               </div>
             )}
@@ -1528,7 +1553,7 @@ export default function SimuladorHeredarViviendaPage() {
             <tbody>
               <tr>
                 <td><strong>ISD</strong> (Sucesiones)</td>
-                <td>Plazo {PLAZO_ISD.mesesPresentacion} meses tras el fallecimiento (prorrogable otros {PLAZO_ISD.mesesProrroga})</td>
+                <td>Plazo {PLAZO_ISD.mesesPresentacion} meses tras el fallecimiento (prorrogable otros {PLAZO_ISD.mesesProrroga} meses, art. 68 RISD)</td>
                 <td>Sobre valor de referencia, con tarifa estatal o autonómica + bonificación CCAA</td>
                 <td>Heredero (cada uno por su parte)</td>
               </tr>
@@ -1541,14 +1566,20 @@ export default function SimuladorHeredarViviendaPage() {
                   llega «hasta un año» y no tiene el corte de los cinco primeros meses del
                   art. 68 RISD (hallazgo 864).
                 */}
-                <td>Plazo {PLAZO_IIVTNU.mesesMortisCausa} meses tras el fallecimiento (prorrogable hasta {PLAZO_IIVTNU.mesesMaximoConProrroga} a solicitud)</td>
+                <td>Plazo {PLAZO_IIVTNU.mesesMortisCausa} meses tras el fallecimiento (prorrogable hasta {PLAZO_IIVTNU.mesesMaximoConProrroga} meses en TOTAL a solicitud, art. 110.2.b TRLRHL)</td>
                 <td>Método objetivo (valor catastral suelo × coef.) o método real (ganancia real prorrateada al suelo). Se elige el menor.</td>
                 <td>Heredero. Paga al Ayuntamiento.</td>
               </tr>
               <tr>
                 <td><strong>IRPF</strong> (ganancia patrimonial)</td>
                 <td>Año siguiente a la venta (campaña Renta)</td>
-                <td>(Valor venta − valor adquisición fiscal) × tramos {TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}%. Valor adquisición fiscal incluye los impuestos pagados al heredar.</td>
+                {/* La fórmula tiene que ser la que el motor ejecuta: desde el hallazgo 779 la
+                    app resta del precio la plusvalía municipal de la VENTA (art. 35.2 LIRPF)
+                    antes de comparar, y lo pinta en dos líneas del panel. Esta fila se quedó en
+                    la versión anterior —la misma que el hallazgo 862 retiró del faqJsonLd—, y
+                    sobre el CASO 1 daba 53.401,20 € de ganancia donde la app calcula 48.601,20 €
+                    (hallazgo 1180). */}
+                <td>(Valor de transmisión − valor adquisición fiscal) × tramos {TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}%. El valor de transmisión es el precio de venta menos la plusvalía municipal de la venta (art. 35.2 LIRPF), y el valor de adquisición fiscal incluye los impuestos pagados al heredar.</td>
                 <td>El que vende (heredero, si vendes)</td>
               </tr>
             </tbody>
@@ -1729,8 +1760,10 @@ export default function SimuladorHeredarViviendaPage() {
               <p>
                 En la declaración de la Renta del año siguiente a la venta. Valor de adquisición =
                 valor declarado en ISD + ISD pagado + plusvalía municipal pagada + gastos
-                inherentes. Valor de transmisión = precio de venta − gastos asociados (notaría,
-                gestoría, comisión inmobiliaria si la pagas).
+                inherentes. Valor de transmisión = precio de venta − la plusvalía municipal de la
+                venta (art. 35.2 LIRPF), que es lo único que esta calculadora descuenta, y −
+                los demás gastos que soportes al vender (notaría, gestoría o comisión
+                inmobiliaria), que no se modelan aquí.
               </p>
             </div>
           </div>
@@ -1763,7 +1796,11 @@ export default function SimuladorHeredarViviendaPage() {
             <span className={styles.tipIcon} aria-hidden="true">💰</span>
             <div>
               <strong>Aprovecha la reducción de vivienda habitual</strong>
-              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del {PORC_REDUCCION_VIVIENDA}% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}) puede ser decisiva.</p>
+              {/* «Estatal», como ya dice su vecina de la FAQ: la tarjeta es texto fijo del
+                  bloque educativo y no puede seguir al selector, pero sí dejar de prometer
+                  como universal un tope que en Cataluña es cuatro veces mayor (hallazgo 1179,
+                  la mitad del 861 que quedó sin reparar). */}
+              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del {PORC_REDUCCION_VIVIENDA}% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)} por heredero según el tope estatal, que cada comunidad autónoma puede mejorar: en Cataluña son {formatCurrency(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)}) puede ser decisiva.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
