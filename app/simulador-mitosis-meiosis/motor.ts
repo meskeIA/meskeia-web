@@ -314,3 +314,125 @@ export function recuentoTotal(fase: FaseConfig): number {
   }
   return fase.celulas * fase.cromosomasPorCelula;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Magnitudes que los casos de aula necesitan y el dibujo no (21/09/2026)
+//
+// Todo lo de aquí abajo es AÑADIDO: no cambia ni una línea de lo anterior, y las funciones
+// que ya existían siguen devolviendo exactamente lo mismo. Vive en el motor —y no dentro de
+// `casos.ts`— por la misma razón que el resto del fichero: si los casos contaran con un
+// convenio y la app con otro, la app acabaría suspendiendo una respuesta que ella misma
+// produce.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * 2n del organismo modelo sobre el que están escritas las fases de arriba: la mitosis lleva
+ * 4 cromosomas por célula y la meiosis II lleva 2 (n). `escalarFase` lo usa como base para
+ * construir la misma fase en un organismo con otro 2n.
+ */
+export const DOS_N_MODELO: number = FASES_MITOSIS[0].cromosomasPorCelula;
+
+/**
+ * La MISMA fase, pero en un organismo con otro 2n.
+ *
+ * Las fases del simulador traen `cromosomasPorCelula` fijo (el organismo modelo, 2n=4), así
+ * que un caso que hable de 2n=46 necesita una copia escalada. Se escala por proporción, que
+ * es lo que conserva la relación entre las fases: la meiosis II lleva la mitad que la
+ * meiosis I en el modelo, y sigue llevándola después de escalar.
+ *
+ * Devuelve `null` —nunca lanza— si el 2n no es un entero par ≥ 2, o si la fase resultante
+ * saldría con un número no entero de cromosomas.
+ */
+export function escalarFase(fase: FaseConfig, dosN: number): FaseConfig | null {
+  if (!Number.isInteger(dosN) || dosN < 2 || dosN % 2 !== 0) return null;
+  const factor = dosN / DOS_N_MODELO;
+  const cromosomas = fase.cromosomasPorCelula * factor;
+  if (!Number.isInteger(cromosomas) || cromosomas < 1) return null;
+  return { ...fase, cromosomasPorCelula: cromosomas };
+}
+
+/**
+ * Cuántas CROMÁTIDAS tiene cada cromosoma en la fase `indice` de la secuencia `fases`.
+ *
+ * ── Por qué hace falta la secuencia entera y no basta la fase ───────────────────
+ * Una `FaseConfig` suelta no sabe si la duplicación ya ocurrió: la citocinesis de la mitosis
+ * y la telofase II de la meiosis no declaran ninguna separación, y sin embargo sus
+ * cromosomas tienen UNA sola cromátida porque las hermanas se separaron un par de fases
+ * antes. Lo que decide es la POSICIÓN en la secuencia, así que se deriva recorriéndola:
+ *
+ *   · El ADN se duplica una sola vez, en la interfase. Desde la profase, 2 cromátidas.
+ *   · En cuanto una fase separa CROMÁTIDAS HERMANAS, cada cromátida pasa a ser un cromosoma
+ *     independiente de una sola cromátida, y así sigue hasta el final de la secuencia.
+ *   · Separar HOMÓLOGOS no toca las cromátidas: tras la anafase I los cromosomas siguen
+ *     teniendo dos, y por eso hace falta la meiosis II.
+ *
+ * ── La interfase devuelve NaN a propósito ───────────────────────────────────────
+ * No es un fallo: la interfase ABARCA la duplicación (empieza con 1 cromátida por cromosoma
+ * y termina con 2), así que no tiene un valor único y darle uno sería elegir por el alumno.
+ * Ningún caso de aula pregunta por ella.
+ */
+export function cromatidasPorCromosoma(fases: readonly FaseConfig[], indice: number): number {
+  if (!Number.isInteger(indice) || indice < 0 || indice >= fases.length) return NaN;
+  if (indice === 0) return NaN; // interfase: indefinido, ver arriba
+  for (let j = 1; j <= indice; j++) {
+    const f = fases[j];
+    const hayPolos = f.disposicion === 'separando' || f.disposicion === 'polos';
+    if (hayPolos && f.separacion === 'hermanas') return 1;
+  }
+  return 2;
+}
+
+/**
+ * Cromosomas que hay DENTRO de una célula en esta fase.
+ *
+ * Durante la anafase y la telofase la célula aún no se ha partido, así que los dos polos
+ * siguen dentro de ella y hay el DOBLE de los que recibe cada polo. Es la distinción que más
+ * se falla: `cromosomasPorPolo` responde «por polo» y esto responde «en la célula».
+ *
+ * Se cumple, por construcción, que `recuentoTotal(f) === f.celulas * cromosomasEnLaCelula(f)`.
+ */
+export function cromosomasEnLaCelula(fase: FaseConfig): number {
+  if (fase.disposicion === 'separando' || fase.disposicion === 'polos') {
+    return cromosomasPorPolo(fase) * 2;
+  }
+  return fase.cromosomasPorCelula;
+}
+
+/**
+ * Gametos genéticamente distintos que puede producir un organismo 2n SOLO por el reparto al
+ * azar de los pares de homólogos en la metafase I (2^n, con n = 2n/2).
+ *
+ * Es una cota por lo bajo de la variabilidad real: no cuenta el crossing-over, que multiplica
+ * las combinaciones posibles. Devuelve NaN si el 2n no es un entero par ≥ 2 o si el resultado
+ * se sale del rango de enteros exactos de JavaScript (2n > 106), en vez de devolver un número
+ * grande y redondeado que parecería exacto.
+ */
+export function gametosDistintosPorReparto(dosN: number): number {
+  if (!Number.isInteger(dosN) || dosN < 2 || dosN % 2 !== 0) return NaN;
+  const total = Math.pow(2, dosN / 2);
+  return Number.isSafeInteger(total) ? total : NaN;
+}
+
+/**
+ * Cromosomas de un polo cuando la separación FALLA: `paresFallidos` elementos que debían
+ * repartirse uno a cada lado se van juntos hacia el mismo polo (no disyunción).
+ *
+ * Sirve para las dos anafases donde ocurre: en la anafase I lo que no se separa es un par de
+ * homólogos; en la anafase II, las dos cromátidas hermanas de un cromosoma. En ambos casos el
+ * polo que los recibe de más suma `paresFallidos` y el otro los pierde, así que un gameto
+ * sale con n+1 y otro con n−1.
+ *
+ * Devuelve NaN —nunca lanza— si la fase no tiene polos, si `paresFallidos` no es un entero
+ * positivo o si el polo quedaría con un número negativo de cromosomas.
+ */
+export function cromosomasPorPoloConNoDisyuncion(
+  fase: FaseConfig,
+  paresFallidos: number,
+  recibeDeMas: boolean
+): number {
+  const base = cromosomasPorPolo(fase);
+  if (base === 0) return NaN;
+  if (!Number.isInteger(paresFallidos) || paresFallidos < 1) return NaN;
+  const resultado = recibeDeMas ? base + paresFallidos : base - paresFallidos;
+  return resultado >= 0 ? resultado : NaN;
+}

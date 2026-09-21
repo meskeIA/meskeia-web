@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { parseSpanishNumber } from '@/lib';
 import {
   cromosomasPorPolo,
   FASES_MEIOSIS,
@@ -18,6 +19,14 @@ import {
   parDelCromosoma,
   type FaseConfig,
 } from './motor';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  textoRespuesta,
+  type Ejercicio,
+} from './casos';
 import styles from './SimuladorMitosisMeiosis.module.css';
 
 // ============================================================
@@ -641,6 +650,10 @@ export default function SimuladorMitosisMeiosis() {
         </div>
       </main>
 
+      {/* Casos para clase — la tarea asignable. Va FUERA de EducationalSection a propósito:
+          dentro nacería colapsada y el alumno no la vería. */}
+      <SeccionCasosAula />
+
       {/* Sección educativa v2.0 */}
       <EducationalSection
         title="Aprende sobre la División Celular"
@@ -940,5 +953,183 @@ export default function SimuladorMitosisMeiosis() {
       <ShareCard appName="simulador-mitosis-meiosis" />
       <Footer appName="simulador-mitosis-meiosis" />
     </div>
+  );
+}
+
+// ============================================================
+// CASOS PARA CLASE — la tarea asignable (skill /casos-aula-meskeia)
+//
+// Aquí no se cuenta NADA: todo el recuento lo hace `./casos.ts`, que a su vez llama al mismo
+// `./motor.ts` con el que se dibuja el simulador de arriba. Este componente solo pinta y
+// corrige llamando a `comprobarRespuesta`.
+// ============================================================
+function SeccionCasosAula() {
+  const [indice, setIndice] = useState<number>(0);
+  const [practica, setPractica] = useState<Ejercicio | null>(null);
+  const [respuesta, setRespuesta] = useState<string>('');
+  const [veredicto, setVeredicto] = useState<{ correcto: boolean; motivo: string } | null>(null);
+  const [verPista, setVerPista] = useState<boolean>(false);
+  const [verSolucion, setVerSolucion] = useState<boolean>(false);
+
+  const caso = CASOS[indice];
+  const enunciado = practica ? practica.enunciado : caso.enunciado;
+  const esperado = practica ? practica.respuesta : caso.respuesta;
+  const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
+  const pasos = practica ? practica.pasos : caso.pasos;
+
+  /** Al cambiar de caso se limpia todo: si no, el veredicto del anterior se queda pegado. */
+  const limpiar = () => {
+    setRespuesta('');
+    setVeredicto(null);
+    setVerPista(false);
+    setVerSolucion(false);
+  };
+
+  const irACaso = (i: number) => {
+    setIndice(i);
+    setPractica(null);
+    limpiar();
+  };
+
+  const nuevaPractica = () => {
+    setPractica(generarEjercicioAleatorio());
+    limpiar();
+  };
+
+  const comprobar = () => {
+    // parseSpanishNumber admite «24» y «24,0»; devuelve NaN con cualquier otra cosa, y de ese
+    // NaN se encarga comprobarRespuesta con un mensaje propio: nunca sale «NaN» en pantalla.
+    const valor = parseSpanishNumber(respuesta);
+    const r = comprobarRespuesta(valor, esperado);
+    setVeredicto({ correcto: r.correcto, motivo: r.motivo });
+  };
+
+  return (
+    <section className={styles.casosSection} aria-labelledby="casos-aula-titulo">
+      <div className={styles.casosHeader}>
+        <h2 className={styles.casosTitulo} id="casos-aula-titulo">
+          <span aria-hidden="true">📝</span> Casos para clase
+        </h2>
+        <p className={styles.casosIntro}>
+          {TOTAL_CASOS} recuentos con solución, siempre los mismos y en el mismo orden: un
+          profesor puede decir «entra y resuelve los casos 3, 7 y 11» y corregir sin ambigüedad.
+          Cada enunciado dice qué división, qué fase, cuál es el 2n del organismo y si se piden{' '}
+          <strong>cromosomas</strong> o <strong>cromátidas</strong>, porque un cromosoma con dos
+          cromátidas hermanas sigue siendo <strong>un</strong> cromosoma.
+        </p>
+      </div>
+
+      <div className={styles.casosNav} role="group" aria-label="Elegir caso">
+        {CASOS.map((c, i) => (
+          <button
+            key={c.id}
+            type="button"
+            className={`${styles.casoBoton} ${
+              !practica && i === indice ? styles.casoBotonActivo : ''
+            }`}
+            aria-pressed={!practica && i === indice}
+            aria-label={`Caso ${c.id}: ${c.titulo}`}
+            onClick={() => irACaso(i)}
+          >
+            {c.id}
+          </button>
+        ))}
+        <button
+          type="button"
+          className={`${styles.casoBoton} ${styles.casoBotonPractica} ${
+            practica ? styles.casoBotonActivo : ''
+          }`}
+          aria-pressed={practica !== null}
+          onClick={nuevaPractica}
+        >
+          <span aria-hidden="true">🎲</span> Practicar
+        </button>
+      </div>
+
+      <div className={styles.casoCuerpo}>
+        <h3 className={styles.casoTitulo}>
+          {practica ? 'Ejercicio de práctica' : `Caso ${caso.id} · ${caso.titulo}`}
+        </h3>
+        <p className={styles.casoEnunciado}>{enunciado}</p>
+
+        <div className={styles.casoRespuesta}>
+          <label className={styles.casoLabel} htmlFor="casos-aula-respuesta">
+            {etiqueta}
+          </label>
+          <div className={styles.casoFila}>
+            <input
+              id="casos-aula-respuesta"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              className={styles.casoInput}
+              value={respuesta}
+              placeholder="Tu respuesta"
+              onChange={(e) => {
+                setRespuesta(e.target.value);
+                setVeredicto(null);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') comprobar();
+              }}
+            />
+            <button type="button" className={styles.casoComprobar} onClick={comprobar}>
+              Comprobar
+            </button>
+          </div>
+        </div>
+
+        {veredicto && (
+          <div
+            role="alert"
+            aria-live="polite"
+            className={`${styles.casoVeredicto} ${
+              veredicto.correcto ? styles.casoOk : styles.casoKo
+            }`}
+          >
+            <span aria-hidden="true">{veredicto.correcto ? '✅' : '❌'}</span> {veredicto.motivo}
+          </div>
+        )}
+
+        <div className={styles.casoAyudas}>
+          {!practica && (
+            <button
+              type="button"
+              className={styles.casoAyudaBoton}
+              aria-expanded={verPista}
+              onClick={() => setVerPista(!verPista)}
+            >
+              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+            </button>
+          )}
+          <button
+            type="button"
+            className={styles.casoAyudaBoton}
+            aria-expanded={verSolucion}
+            onClick={() => setVerSolucion(!verSolucion)}
+          >
+            <span aria-hidden="true">🔑</span>{' '}
+            {verSolucion ? 'Ocultar solución' : 'Ver solución paso a paso'}
+          </button>
+        </div>
+
+        {verPista && !practica && <p className={styles.casoPista}>{caso.pista}</p>}
+
+        {verSolucion && (
+          <div className={styles.casoSolucion}>
+            <ol className={styles.casoPasos}>
+              {pasos.map((p, i) => (
+                <li key={i}>{p}</li>
+              ))}
+            </ol>
+            {/* La unidad la pone `textoRespuesta`: un número suelto junto a media etiqueta se
+                lee mal, y aquí la etiqueta es justo lo que distingue cromosomas de cromátidas. */}
+            <p className={styles.casoResultado}>
+              Respuesta: <strong>{textoRespuesta(esperado, etiqueta)}</strong>
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

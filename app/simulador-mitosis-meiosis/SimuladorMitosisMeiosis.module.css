@@ -719,3 +719,335 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   CASOS PARA CLASE
+   La tarea asignable (skill /casos-aula-meskeia). Mismo aspecto que en el resto de apps que
+   la llevan, para que un profesor reconozca la sección sin tener que leerla.
+   ============================================================ */
+
+.casosSection {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+.casosHeader {
+  margin-bottom: 1.5rem;
+}
+
+.casosTitulo {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary, #2e86ab);
+}
+
+.casosIntro {
+  margin: 0;
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.casosNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.casoBoton {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  background: var(--bg-primary, #fafafa);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.casoBoton:hover {
+  border-color: var(--primary, #2e86ab);
+  color: var(--primary, #2e86ab);
+}
+
+.casoBoton:focus-visible {
+  outline: 2px solid var(--primary, #2e86ab);
+  outline-offset: 2px;
+}
+
+.casoBotonActivo,
+.casoBotonActivo:hover {
+  background: var(--primary, #2e86ab);
+  border-color: var(--primary, #2e86ab);
+  color: #ffffff;
+}
+
+.casoBotonPractica {
+  min-width: auto;
+  margin-left: auto;
+  padding: 0.4rem 1rem;
+}
+
+.casoCuerpo {
+  padding: 1.25rem;
+  background: var(--bg-primary, #fafafa);
+  border-radius: 8px;
+}
+
+.casoTitulo {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--secondary, #48a9a6);
+}
+
+.casoEnunciado {
+  margin: 0 0 1.25rem;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.7;
+}
+
+.casoRespuesta {
+  margin-bottom: 1rem;
+}
+
+.casoLabel {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+}
+
+.casoFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.casoInput {
+  flex: 1 1 160px;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  color: var(--text-primary, #1a1a1a);
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 8px;
+}
+
+.casoInput:focus-visible {
+  outline: 2px solid var(--primary, #2e86ab);
+  outline-offset: 1px;
+}
+
+.casoComprobar {
+  min-height: 44px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--primary, #2e86ab);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.casoComprobar:hover {
+  background: var(--hero-bg, #1a5278);
+}
+
+.casoComprobar:focus-visible {
+  outline: 2px solid var(--primary, #2e86ab);
+  outline-offset: 2px;
+}
+
+.casoVeredicto {
+  margin-bottom: 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.casoOk {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.casoKo {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.casoAyudas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.casoAyudaBoton {
+  min-height: 44px;
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  color: var(--primary, #2e86ab);
+  background: transparent;
+  border: 1px solid var(--primary, #2e86ab);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.casoAyudaBoton:hover {
+  background: var(--primary, #2e86ab);
+  color: #ffffff;
+}
+
+.casoAyudaBoton:focus-visible {
+  outline: 2px solid var(--primary, #2e86ab);
+  outline-offset: 2px;
+}
+
+.casoPista {
+  margin: 1rem 0 0;
+  padding: 0.6rem 1rem;
+  background: var(--bg-card, #ffffff);
+  border-left: 3px solid var(--secondary, #48a9a6);
+  border-radius: 8px;
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+}
+
+.casoSolucion {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 8px;
+}
+
+.casoPasos {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.8;
+}
+
+.casoResultado {
+  margin: 0;
+  color: var(--text-primary, #1a1a1a);
+  font-size: 1.05rem;
+}
+
+/* ---- Modo oscuro ---- */
+[data-theme='dark'] .casosSection {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme='dark'] .casosIntro {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .casosIntro strong {
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .casoBoton {
+  background: #111827;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .casoBoton:hover {
+  border-color: var(--accent, #7fb3d3);
+  color: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .casoBotonActivo,
+[data-theme='dark'] .casoBotonActivo:hover {
+  background: var(--primary, #2e86ab);
+  border-color: var(--primary, #2e86ab);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .casoCuerpo {
+  background: #111827;
+}
+
+[data-theme='dark'] .casoTitulo {
+  color: var(--secondary, #48a9a6);
+}
+
+[data-theme='dark'] .casoEnunciado {
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .casoLabel {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .casoInput {
+  background: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .casoAyudaBoton {
+  color: var(--accent, #7fb3d3);
+  border-color: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .casoAyudaBoton:hover {
+  background: var(--accent, #7fb3d3);
+  color: #111827;
+}
+
+[data-theme='dark'] .casoOk {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+[data-theme='dark'] .casoKo {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+[data-theme='dark'] .casoPista,
+[data-theme='dark'] .casoSolucion {
+  background: #1f2937;
+  border-color: #374151;
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .casoPasos {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .casoResultado {
+  color: #e5e7eb;
+}
+
+@media (max-width: 640px) {
+  .casosSection {
+    margin: 1.5rem 1rem;
+    padding: 1rem;
+  }
+
+  .casoCuerpo {
+    padding: 1rem;
+  }
+
+  .casoBotonPractica {
+    margin-left: 0;
+  }
+}
