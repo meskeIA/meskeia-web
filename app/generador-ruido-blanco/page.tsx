@@ -120,13 +120,39 @@ function rellenarRuido(datos: Float32Array, tipo: TipoRuido): void {
   }
 }
 
-/** Aplica un fundido cruzado circular para que el bucle no chasquee al empalmar. */
-function suavizarBucle(datos: Float32Array): void {
-  const f = Math.min(MUESTRAS_CROSSFADE, Math.floor(datos.length / 8));
+/**
+ * Cierra el bucle con un fundido cruzado de POTENCIA CONSTANTE y devuelve el tramo que de
+ * verdad se puede repetir: las `f` últimas muestras se funden sobre las `f` primeras y
+ * luego se descartan, de modo que la última muestra del buffer y la primera son
+ * consecutivas en el ruido original.
+ *
+ * ⚠️ 2026-09-21 (hallazgo 1086 del Inspector). La versión anterior mezclaba con pesos
+ *    lineales (t y 1−t) dos tramos INDEPENDIENTES del mismo ruido, cuyas potencias se
+ *    suman como t²+(1−t)²: en el centro del fundido eso vale 0,5, o sea −3 dB. Medido:
+ *    un bache de −2,7 dB que, con loop sobre un buffer de 8 s, se repetía CADA OCHO
+ *    SEGUNDOS toda la sesión —una modulación periódica de 0,125 Hz en una herramienta
+ *    cuyo propio texto avisa de que «los ambientes con vaivén marcado atraen la atención»—.
+ *    Y tampoco lograba lo que prometía su comentario: como se conservaban las muestras
+ *    finales sin tocar, la discontinuidad del empalme no desaparecía, solo se movía.
+ *    Con pesos sen y cos la suma de cuadrados es 1 para todo t, que es la condición de
+ *    potencia constante.
+ */
+function suavizarBucle(datos: Float32Array, f: number): Float32Array<ArrayBuffer> {
+  const util = datos.length - f;
+  const salida = new Float32Array(new ArrayBuffer(util * Float32Array.BYTES_PER_ELEMENT));
   for (let i = 0; i < f; i++) {
     const t = i / f;
-    datos[i] = datos[i] * t + datos[datos.length - f + i] * (1 - t);
+    const entrada = Math.sin((t * Math.PI) / 2);
+    const cola = Math.cos((t * Math.PI) / 2);
+    salida[i] = datos[i] * entrada + datos[util + i] * cola;
   }
+  salida.set(datos.subarray(f, util), f);
+  return salida;
+}
+
+/** Muestras de fundido que se usan para un buffer de `muestras` de largo. */
+function muestrasDeFundido(muestras: number): number {
+  return Math.min(MUESTRAS_CROSSFADE, Math.floor(muestras / 8));
 }
 
 /** Convierte la posición del control de tono (0-100) en frecuencia de corte, en escala logarítmica. */
@@ -161,6 +187,8 @@ export default function GeneradorRuidoBlancoPage() {
   const lfoGananciaRef = useRef<GainNode | null>(null);
   const buffersRef = useRef<Map<TipoRuido, AudioBuffer>>(new Map());
   const cuentaAtrasRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** Espejo de `restante` para leerlo sin meterlo en las dependencias de `reproducir`. */
+  const restanteRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !('AudioContext' in window)) setSoportado(false);
@@ -177,13 +205,18 @@ export default function GeneradorRuidoBlancoPage() {
     if (cacheado) return cacheado;
 
     const muestras = Math.floor(ctx.sampleRate * DURACION_BUFFER);
-    const buffer = ctx.createBuffer(2, muestras, ctx.sampleRate);
+    const f = muestrasDeFundido(muestras);
     // Dos canales generados por separado: decorrelacionados, el resultado suena más envolvente
+    const canales: Float32Array<ArrayBuffer>[] = [];
     for (let canal = 0; canal < 2; canal++) {
-      const datos = buffer.getChannelData(canal);
+      const datos = new Float32Array(muestras);
       rellenarRuido(datos, cual);
-      suavizarBucle(datos);
+      canales.push(suavizarBucle(datos, f));
     }
+    // El buffer se queda con `muestras − f`: es el tramo cuyo final empalma de verdad con
+    // su principio, sin salto y sin bache de nivel.
+    const buffer = ctx.createBuffer(2, muestras - f, ctx.sampleRate);
+    for (let canal = 0; canal < 2; canal++) buffer.copyToChannel(canales[canal], canal);
     buffersRef.current.set(cual, buffer);
     return buffer;
   }, []);
@@ -193,6 +226,7 @@ export default function GeneradorRuidoBlancoPage() {
       clearInterval(cuentaAtrasRef.current);
       cuentaAtrasRef.current = null;
     }
+    restanteRef.current = null;
     setRestante(null);
   }, []);
 
@@ -250,13 +284,23 @@ export default function GeneradorRuidoBlancoPage() {
   );
 
   /** Monta la cadena fuente → filtro de tono → ganancia → salida, con el LFO del ambiente si lo hay. */
-  const reproducir = useCallback(() => {
+  /**
+   * @param conservarCuentaAtras Rehacer la cadena de audio SIN tocar el temporizador.
+   *
+   * ⚠️ 2026-09-21 (hallazgo 1085 del Inspector): cambiar de tipo de ruido o de ambiente
+   *    mientras sonaba volvía a llamar aquí, y esto paraba la cuenta atrás y montaba otra
+   *    desde `minutos · 60`. Quien probaba otro timbre a mitad de sesión se llevaba quince
+   *    minutos más sin enterarse, y alternando no llegaba a apagarse nunca. Es el caso de
+   *    uso central de una app que se vende para dormir y cuya guía termina en «programa el
+   *    apagado con fundido».
+   */
+  const reproducir = useCallback((conservarCuentaAtras = false) => {
     const ctx = obtenerContexto();
     if (ctx.state === 'suspended') void ctx.resume();
 
     detenerNodos();
-    // Sin esto, cambiar de tipo con el temporizador en marcha dejaría vivo el intervalo anterior
-    pararCuentaAtras();
+    // Sin esto, arrancar con el temporizador en marcha dejaría vivo el intervalo anterior
+    if (!conservarCuentaAtras) pararCuentaAtras();
 
     const preset = AMBIENTES.find((a) => a.id === ambiente)!;
     const tipoEfectivo = ambiente === 'ninguno' ? tipo : preset.base;
@@ -298,9 +342,24 @@ export default function GeneradorRuidoBlancoPage() {
     gananciaRef.current = ganancia;
     setReproduciendo(true);
 
+    // Si se está rehaciendo la cadena con la cuenta atrás en marcha y ya se había entrado
+    // en la ventana de fundido, el nodo nuevo tiene que seguir bajando: si no, el cambio de
+    // timbre resucitaría el volumen a mitad del apagado.
+    if (conservarCuentaAtras) {
+      const quedan = restanteRef.current;
+      if (quedan !== null && fundido > 0 && quedan <= fundido) {
+        const t = ctx.currentTime;
+        ganancia.gain.cancelScheduledValues(t);
+        ganancia.gain.setValueAtTime(volumen, t);
+        ganancia.gain.linearRampToValueAtTime(0.0001, t + quedan);
+      }
+      return;
+    }
+
     // Temporizador de apagado: cuenta atrás visible y fundido final
     if (minutos > 0) {
       const totalSeg = minutos * 60;
+      restanteRef.current = totalSeg;
       setRestante(totalSeg);
       const inicio = Date.now();
       cuentaAtrasRef.current = setInterval(() => {
@@ -309,6 +368,7 @@ export default function GeneradorRuidoBlancoPage() {
         if (quedan <= 0) {
           detener(Math.max(fundido, 0.5));
         } else {
+          restanteRef.current = quedan;
           setRestante(quedan);
           // El fundido arranca antes del final para llegar a cero justo al cumplirse el tiempo
           if (fundido > 0 && quedan === fundido && gananciaRef.current && ctxRef.current) {
@@ -359,7 +419,8 @@ export default function GeneradorRuidoBlancoPage() {
   };
 
   useEffect(() => {
-    if (reproduciendo) reproducir();
+    // `true`: se rehace la cadena de audio y se DEJA correr el temporizador.
+    if (reproduciendo) reproducir(true);
     // Solo debe reaccionar al cambio de fuente sonora, no a cada recreación de reproducir()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo, ambiente]);
@@ -423,7 +484,7 @@ export default function GeneradorRuidoBlancoPage() {
               {ambiente === 'ninguno' ? `Ruido ${ruidoActual.nombre.toLowerCase()}` : ambienteActual.nombre}
             </p>
             <p className={styles.estadoDetalle}>
-              {ruidoActual.pendiente} · corte a {formatNumber(Math.round(frecuenciaCorte))} Hz
+              {ruidoActual.pendiente} · corte a {formatNumber(Math.round(frecuenciaCorte), 0)} Hz
             </p>
           </div>
         </div>
@@ -436,14 +497,18 @@ export default function GeneradorRuidoBlancoPage() {
             aria-pressed={reproduciendo}
             disabled={!soportado}
           >
-            {reproduciendo ? '⏹️ Detener' : '▶️ Reproducir'}
+            {/* ⚠️ 2026-09-21 (hallazgo 1088): el emoji viajaba dentro de la cadena, así que
+                formaba parte del nombre accesible y el lector anunciaba «▶️ Reproducir».
+                El candado check:a11y-jsx no puede verlo: no es texto JSX. */}
+            <span aria-hidden="true">{reproduciendo ? '⏹️' : '▶️'}</span>{' '}
+            {reproduciendo ? 'Detener' : 'Reproducir'}
           </button>
         </div>
 
         {restante !== null && (
           <p className={styles.cuentaAtras} role="status" aria-live="polite">
             <span aria-hidden="true">⏱️</span> Se apagará en {formatearTiempo(restante)}
-            {fundido > 0 && ` · fundido de ${formatNumber(fundido)} s`}
+            {fundido > 0 && ` · fundido de ${formatNumber(fundido, 0)} s`}
           </p>
         )}
 
@@ -459,7 +524,7 @@ export default function GeneradorRuidoBlancoPage() {
             className={styles.volumenSlider}
             aria-label="Volumen"
           />
-          <span className={styles.volumenValor}>{formatNumber(Math.round(volumen * 100))} %</span>
+          <span className={styles.volumenValor}>{formatNumber(Math.round(volumen * 100), 0)} %</span>
         </div>
       </div>
 
@@ -507,7 +572,7 @@ export default function GeneradorRuidoBlancoPage() {
         </div>
         <p className={styles.ayuda}>
           {ambiente === 'ninguno'
-            ? `Filtro paso bajo a ${formatNumber(Math.round(frecuenciaCorte))} Hz: cuanto más a la izquierda, menos agudos y menos fatiga en sesiones largas.`
+            ? `Filtro paso bajo a ${formatNumber(Math.round(frecuenciaCorte), 0)} Hz: cuanto más a la izquierda, menos agudos y menos fatiga en sesiones largas.`
             : 'El tono lo fija el ambiente seleccionado. Elige «Sin ambiente» para ajustarlo a mano.'}
         </p>
       </section>
@@ -556,7 +621,7 @@ export default function GeneradorRuidoBlancoPage() {
               onClick={() => setMinutos(m)}
               aria-pressed={minutos === m}
             >
-              {formatNumber(m)} min
+              {formatNumber(m, 0)} min
             </button>
           ))}
         </div>
@@ -572,7 +637,7 @@ export default function GeneradorRuidoBlancoPage() {
                 onClick={() => setFundido(f)}
                 aria-pressed={fundido === f}
               >
-                {f === 0 ? 'Sin fundido' : `${formatNumber(f)} s`}
+                {f === 0 ? 'Sin fundido' : `${formatNumber(f, 0)} s`}
               </button>
             ))}
           </div>
@@ -617,9 +682,11 @@ export default function GeneradorRuidoBlancoPage() {
           </p>
           <p>
             Esta herramienta <strong>sintetiza el ruido en tu dispositivo</strong> en lugar de reproducir una grabación: genera
-            muestras aleatorias y les aplica el filtrado propio de cada pendiente. Por eso no hay descarga previa ni un bucle
-            reconocible que delate su repetición, y por eso los ambientes de lluvia u oleaje no son sonidos grabados, sino el
-            mismo ruido pasado por un filtro y una modulación lenta.
+            muestras aleatorias y les aplica el filtrado propio de cada pendiente. Por eso no hay descarga previa y funciona
+            sin conexión, y por eso los ambientes de lluvia u oleaje no son sonidos grabados, sino el mismo ruido pasado por
+            un filtro y una modulación lenta. Lo que suena es un fragmento de ocho segundos que se repite, cerrado con un
+            fundido cruzado de potencia constante para que el empalme no se note: en un ruido sin estructura, un bucle bien
+            cerrado es indistinguible de una señal infinita.
           </p>
 
           <div className={styles.eduTablaWrapper}>

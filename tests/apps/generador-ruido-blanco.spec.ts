@@ -65,7 +65,7 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *
  * ORDEN DEL FICHERO
  *   1. CASOS 1-3: pasan, y son la red de regresión.
- *   2. HALLAZGOS ABIERTOS (21/09/2026): van con `test.fail()`, la convención de estos
+ *   2. HALLAZGOS REPARADOS (21/09/2026): iban con `test.fail()`, la convención de estos
  *      ficheros. Afirman lo que la app DEBERÍA hacer, así que hoy fallan a propósito; el día
  *      que se reparen, Playwright avisará de que hay que quitarles la marca.
  *
@@ -573,16 +573,14 @@ test.describe('CASO 3 · móvil (Pixel 7)', () => {
 });
 
 // ════════════════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (Inspector, 21/09/2026)
-// Afirman lo que la app DEBERÍA hacer. Hoy fallan a propósito: van con `test.fail()`, así que
-// Playwright avisará el día que se reparen y haya que quitarles la marca.
+// HALLAZGOS REPARADOS (Inspector, 21/09/2026 — reparados el mismo día)
+// Afirman lo que la app hace desde la reparación. Hasta entonces iban con `test.fail()`.
 // ════════════════════════════════════════════════════════════════════════════════════════
 
-test.describe('hallazgos abiertos', () => {
-  test('HALLAZGO 1 · cambiar de tipo de ruido NO debería reiniciar el temporizador de apagado', async ({
+test.describe('hallazgos reparados', () => {
+  test('1085 · cambiar de tipo de ruido no reinicia el temporizador de apagado', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(90_000);
     await abrir(page);
 
@@ -612,10 +610,9 @@ test.describe('hallazgos abiertos', () => {
     ).toBeLessThanOrEqual(antes);
   });
 
-  test('HALLAZGO 2 · el empalme del bucle NO debería dejar un bache de nivel cada 8 segundos', async ({
+  test('1086 · el empalme del bucle no deja un bache de nivel', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(90_000);
     await abrir(page);
 
@@ -627,35 +624,37 @@ test.describe('hallazgos abiertos', () => {
       () => (window as unknown as VentanaRuido).__empalme() as Empalme,
     );
 
-    // El bucle son 8 s y va con `loop = true`, así que lo que pase en el empalme se repite
-    // cada 8 s durante toda la sesión.
-    expect(empalme.duracionSeg).toBeCloseTo(8, 3);
+    // El bucle dura ocho segundos MENOS las muestras de fundido, que ahora se descartan
+    // para que el final empalme de verdad con el principio: a 48 kHz son 4.096 muestras,
+    // 85 ms. Va con `loop = true`, así que lo que pase en el empalme se repite sin parar.
+    expect(empalme.duracionSeg).toBeGreaterThan(7.8);
+    expect(empalme.duracionSeg).toBeLessThanOrEqual(8);
     // La ventana de control confirma que la medida tiene el cero donde debe.
     expect(Math.abs(empalme.controlDb), 'la referencia de la medida está a 0 dB').toBeLessThan(
       0.6,
     );
-    // `suavizarBucle` suma dos tramos INDEPENDIENTES del ruido con pesos t y 1−t, así que la
-    // potencia cae a t² + (1−t)²: −2,66 dB de media en la ventana [1024, 3072). Medido en tres
-    // cargas distintas sobre ruido blanco: −2,72, −2,69 y −2,80 dB, 93 ms cada 8 s. Un fundido
-    // cruzado de potencia constante —y recortando el buffer a n−4.096 para que el empalme sea
-    // continuo de verdad— dejaría esto por debajo de medio decibelio.
+    // Antes `suavizarBucle` sumaba dos tramos INDEPENDIENTES del ruido con pesos t y 1−t,
+    // de modo que la potencia caía a t² + (1−t)²: −2,66 dB de media en la ventana
+    // [1024, 3072), medidos −2,72 / −2,69 / −2,80 en tres cargas, 93 ms CADA OCHO SEGUNDOS
+    // durante toda la sesión. Con pesos sen y cos la suma de cuadrados vale 1 para todo t,
+    // que es la condición de potencia constante, y descartando la cola el empalme deja de
+    // ser una discontinuidad movida de sitio.
     expect(
       Math.abs(empalme.caidaDb),
       `el centro del fundido cruzado cae ${empalme.caidaDb.toFixed(2)} dB respecto al resto ` +
-        `del bucle, y la app afirma que «no hay un bucle reconocible que delate su repetición»`,
+        `del bucle: con un fundido de potencia constante no debería pasar de medio decibelio`,
     ).toBeLessThan(0.5);
   });
 
-  test('HALLAZGO 3 · las cifras enteras NO deberían imprimirse con dos decimales', async ({
+  test('1087 · las cifras enteras no se imprimen con dos decimales', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
-    // `formatNumber(x)` sin segundo argumento fija DOS decimales, y aquí se le pasan enteros
-    // —varios ya redondeados con `Math.round()`—: minutos, segundos de fundido, porcentaje de
-    // volumen y hercios de corte. Lo correcto es `formatNumber(x, 0)`. Es el mismo defecto que
-    // motivó `formatTipoNominal` en lib/formatters.ts (hallazgo 331 del Inspector).
+    // `formatNumber(x)` sin segundo argumento fija DOS decimales, y aquí se le pasaban
+    // enteros —varios ya redondeados con `Math.round()`—: minutos, segundos de fundido,
+    // porcentaje de volumen y hercios de corte. Es el mismo defecto que motivó
+    // `formatTipoNominal` en lib/formatters.ts (hallazgo 331 del Inspector).
     await expect(
       page.locator('input[aria-label="Volumen"]').locator('xpath=following-sibling::span[1]'),
       'el volumen por defecto es el 25 %',
@@ -664,17 +663,19 @@ test.describe('hallazgos abiertos', () => {
     await expect(lineaEstado(page)).toContainText('5306 Hz');
   });
 
-  test('HALLAZGO 4 · el emoji del botón principal NO debería entrar en su nombre accesible', async ({
+  test('1088 · el emoji del botón principal no entra en su nombre accesible', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
 
-    // page.tsx L439: `{reproduciendo ? '⏹️ Detener' : '▶️ Reproducir'}`. Al viajar dentro de
-    // una cadena de JavaScript y no como texto JSX, el candado `check:a11y-jsx` no lo ve, pero
-    // el lector de pantalla sí: anuncia «▶️ Reproducir». La regla 3 del CLAUDE.md global §5
-    // pide `<span aria-hidden="true">` para todo emoji junto a texto.
-    const nombre = await botonPlay(page).evaluate((el) => (el as HTMLElement).innerText);
-    expect(nombre.trim()).toBe('Reproducir');
+    // El emoji viajaba dentro de una cadena de JavaScript y no como texto JSX, así que el
+    // candado `check:a11y-jsx` no podía verlo, pero el lector de pantalla sí: anunciaba
+    // «▶️ Reproducir». La regla 3 del CLAUDE.md global §5 pide `<span aria-hidden="true">`
+    // para todo emoji junto a texto.
+    // Se mide el NOMBRE ACCESIBLE, no `innerText`: este último no respeta aria-hidden,
+    // así que seguiría leyendo el emoji aunque el lector de pantalla ya no lo anuncie.
+    await expect(botonPlay(page)).toHaveAccessibleName('Reproducir');
+    await botonPlay(page).click();
+    await expect(botonPlay(page)).toHaveAccessibleName('Detener');
   });
 });

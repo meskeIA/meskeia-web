@@ -77,7 +77,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona un generador de ruido blanco online?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Esta herramienta no reproduce un archivo de audio grabado: sintetiza el ruido en tu propio dispositivo con la API Web Audio, generando muestras aleatorias y filtrándolas para conseguir cada pendiente espectral. Por eso no hay descarga previa, no se repite un bucle reconocible y funciona sin conexión una vez cargada la página.',
+        text: 'Esta herramienta no reproduce un archivo de audio grabado: sintetiza el ruido en tu propio dispositivo con la API Web Audio, generando muestras aleatorias y filtrándolas para conseguir cada pendiente espectral. Por eso no hay descarga previa y funciona sin conexión una vez cargada la página. Lo que se reproduce es un fragmento de ocho segundos en bucle, cerrado con un fundido cruzado de potencia constante para que el empalme no se note: en un ruido sin estructura tonal, un bucle bien cerrado no se distingue de una señal continua.',
       },
     },
     {
