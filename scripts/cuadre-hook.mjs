@@ -48,10 +48,23 @@ const datos = await entrada();
 // `~/.claude` a tocar la configuración: los hooks dejaron de registrar nada sin decir palabra.
 // Un verificador que se desactiva sin avisar es peor que no tenerlo, porque su silencio se lee
 // como «todo bien».
+//
+// Y la comparación es INSENSIBLE a mayúsculas en Windows, por la segunda cara del mismo fallo.
+// El 21/09/2026 el `cwd` del evento llegó como `c:\Users\jaceb\meskeia-web` mientras `RAIZ` se
+// resuelve como `C:\…`: esa señal daba `false`, y el Cuadre siguió vivo solo porque
+// `process.cwd()` viene normalizado a mayúscula por Node. Es decir, las tres señales protegían
+// de que la sesión se MUEVA, pero ninguna de que la letra de unidad venga en otra caja — si las
+// tres hubieran llegado en minúscula, el Cuadre se habría apagado entero y en silencio, que es
+// el escenario que este comentario describe como peor que no tenerlo.
+const mismoArbol = (p) => {
+  const a = process.platform === 'win32' ? p.toLowerCase() : p;
+  const b = process.platform === 'win32' ? RAIZ.toLowerCase() : RAIZ;
+  return a === b || a.startsWith(`${b}${path.sep}`);
+};
 const señales = [datos.cwd, process.env.CLAUDE_PROJECT_DIR, process.cwd()]
   .filter(Boolean)
   .map((p) => path.resolve(p));
-const dentro = señales.some((p) => p === RAIZ || p.startsWith(`${RAIZ}${path.sep}`));
+const dentro = señales.some(mismoArbol);
 
 // ── PreToolUse · la puerta de once caracteres ────────────────────────────────
 //
@@ -165,11 +178,35 @@ if (evento === 'peticion') {
 // ── SessionEnd · contar al cerrar, sin bloquear ──────────────────────────────
 if (evento === 'cierre') {
   const { spawnSync } = await import('node:child_process');
-  spawnSync(process.execPath, [path.join(RAIZ, 'scripts', 'cuadre.mjs'), '--cierre'], {
+  const r = spawnSync(process.execPath, [path.join(RAIZ, 'scripts', 'cuadre.mjs'), '--cierre'], {
     cwd: RAIZ,
     stdio: 'ignore',
     timeout: 25000,
   });
+
+  // Deja constancia de que el cierre CORRIÓ, y con qué salida.
+  //
+  // Sin esto, `stdio: 'ignore'` hace que un cierre que cuadra y un cierre que nunca se ejecutó se
+  // parezcan exactamente: nada, en ningún sitio. Comprobado el 21/09/2026 — de 26 ficheros de
+  // sesión acumulados, ninguno permitía distinguir las dos cosas, y las únicas actas del día
+  // resultaron ser de `pre-commit`, no de este camino. Es la misma trampa que el proyecto ya
+  // tiene escrita para los semáforos: un indicador que calla siempre deja de informar. Aquí el
+  // silencio es correcto de cara al usuario (no hay nada que decirle), pero tiene que dejar
+  // huella para quien luego pregunte si el hook sigue vivo.
+  try {
+    const ruta = ficheroSesion(datos.session_id);
+    const estado = leer(ruta);
+    if (estado) {
+      estado.cierre = {
+        fecha: new Date().toISOString(),
+        salida: r.status,
+        error: r.error ? String(r.error.message) : null,
+      };
+      escribir(ruta, estado);
+    }
+  } catch {
+    /* que un fallo anotando el cierre no impida cerrar la sesión */
+  }
   process.exit(0);
 }
 

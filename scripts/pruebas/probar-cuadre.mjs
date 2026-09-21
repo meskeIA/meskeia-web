@@ -26,7 +26,7 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { contar, REGLAS_QUE_BLOQUEAN } from '../cuadre-motor.mjs';
+import { contar, REGLAS_QUE_BLOQUEAN, dentroDe } from '../cuadre-motor.mjs';
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const UMBRAL_ESPECIFICIDAD = 10;
@@ -148,6 +148,48 @@ if (marcador) {
 {
   const r = cuadrar({ ficheros: [], ficherosFuera: ['C:/Users/jaceb/.claude/settings.json'] });
   anotar('4.quater · salta al escribir fuera de meskeia-web', reglasDe(r).includes('fuera-del-repositorio'), reglasDe(r).join(', '));
+}
+
+// 4.quinquies · La caja de la letra de unidad NO decide si algo está fuera.
+//
+// El caso real, del 21/09/2026: el harness emitió las rutas del transcript como
+// `c:\Users\jaceb\meskeia-web\…` mientras `RAIZ` se resuelve como `C:\…`, y las DIEZ escrituras
+// de un commit legítimo salieron como «fuera del ámbito declarado». El commit hubo que
+// autorizarlo a mano con CUADRE_OK. Las cuatro actas del 16/09 tienen cero de estas líneas y
+// las dos del 21/09 tienen diez cada una.
+//
+// ⚠️ La trampa 4.quater NO podía cazarlo: recibe `ficherosFuera` ya calculado, así que da por
+// buena justo la parte que estaba rota. Esta ejercita la comparación misma.
+{
+  const DENTRO_MINUSCULA = [
+    'c:\\Users\\jaceb\\meskeia-web\\app\\conjugador-verbos\\page.tsx',
+    'c:\\Users\\jaceb\\meskeia-web\\scripts\\gsc-promesa.mjs',
+    'c:\\Users\\jaceb\\meskeia-web\\tests\\apps\\tabla-valencias.spec.ts',
+  ];
+  const raiz = path.join(RAIZ);
+  const todasDentro = DENTRO_MINUSCULA.every((r) => dentroDe(path.resolve(r), raiz));
+  anotar(
+    '4.quinquies · una ruta de DENTRO en minúscula NO se marca fuera',
+    todasDentro,
+    `${DENTRO_MINUSCULA.filter((r) => !dentroDe(path.resolve(r), raiz)).length} falsos positivos`,
+  );
+
+  // Y la simétrica: que no se haya vuelto ciego de tanto normalizar.
+  const fuera = ['C:\\Users\\jaceb\\Documents\\otro-sitio\\x.ts', 'c:\\Windows\\System32\\drivers\\etc\\hosts'];
+  anotar(
+    '4.quinquies · lo que SÍ está fuera se sigue viendo fuera',
+    fuera.every((r) => !dentroDe(path.resolve(r), raiz)),
+    fuera.filter((r) => dentroDe(path.resolve(r), raiz)).join(', '),
+  );
+
+  // Y que esta trampa NO es vacua: con `insensible: false` se reproduce el comportamiento viejo
+  // y el caso vuelve a fallar. Un caso que pasa con el código roto y con el arreglado no prueba
+  // nada; esta línea es la que le da valor a las dos de arriba.
+  anotar(
+    '4.quinquies · la trampa caza el fallo (no pasa con el código viejo)',
+    DENTRO_MINUSCULA.every((r) => dentroDe(path.resolve(r), raiz, { insensible: false }) === false),
+    'si esto falla, el caso ya no distingue el bug y hay que rehacerlo',
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

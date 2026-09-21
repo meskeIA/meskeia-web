@@ -127,6 +127,34 @@ function entradasDeRegistro(texto) {
 }
 
 /** El área a la que pertenece un fichero: una app es un área; si no, su carpeta de primer nivel. */
+/**
+ * ¿Cuelga `abs` de `base`? Se normalizan las dos cosas que en Windows hacen que la misma ruta
+ * se escriba de formas distintas: la CAJA (NTFS no distingue mayúsculas) y el SEPARADOR.
+ *
+ * Medido el 21/09/2026: el harness emitió las rutas del transcript como
+ * `c:\Users\jaceb\meskeia-web\…` mientras `RAIZ` se resuelve como `C:\Users\…`, así que un
+ * `startsWith` a secas daba falso y las DIEZ escrituras de un commit legítimo salieron marcadas
+ * «fuera del ámbito declarado». Hubo que autorizar el commit a mano con `CUADRE_OK`, que es
+ * exactamente como mueren los candados: no se desactivan, se vuelven ruido y alguien deja de
+ * leerlos. Las cuatro actas del 16/09 tienen CERO de estas líneas y las dos del 21/09 tienen
+ * DIEZ cada una — el mismo día en que el harness avisó de que el directorio de trabajo pasaba
+ * de `c:` a `C:`.
+ *
+ * ⚠️ Esta es la segunda cara del fallo del 16/09/2026, cuando el Cuadre se apagó en silencio al
+ * moverse la sesión de carpeta. Entonces se reparó el síntoma —mirar tres señales en vez de
+ * una— y no esto: tres señales protegen de que la sesión SE MUEVA, ninguna de que la letra de
+ * unidad venga en otra caja.
+ */
+export function dentroDe(abs, base, { insensible = process.platform === 'win32' } = {}) {
+  const norm = (p) => {
+    const s = String(p).replace(/\\/g, '/').replace(/\/+$/, '');
+    return insensible ? s.toLowerCase() : s;
+  };
+  const a = norm(abs);
+  const b = norm(base);
+  return a === b || a.startsWith(`${b}/`);
+}
+
 export function areaDe(ruta) {
   const app = ruta.match(/^app\/([^/]+)\//);
   if (app) return `app:${app[1]}`;

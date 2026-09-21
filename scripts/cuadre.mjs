@@ -57,7 +57,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { contar, autoverificar } from './cuadre-motor.mjs';
+import { contar, autoverificar, dentroDe } from './cuadre-motor.mjs';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIR_ESTADO = path.join(RAIZ, 'scratch', 'cuadre');
@@ -277,7 +277,7 @@ function escriturasFuera(rutaTranscript) {
       const destino = b.input?.file_path || b.input?.notebook_path;
       if (!destino) continue;
       const abs = path.resolve(destino);
-      const declarado = ambito.some((d) => abs === d || abs.startsWith(`${d}${path.sep}`));
+      const declarado = ambito.some((d) => dentroDe(abs, d));
       const esTemporal = /[\\/]Temp[\\/]claude[\\/]/i.test(abs);
       if (!declarado && !esTemporal) fuera.add(abs.replace(/\\/g, '/'));
     }
