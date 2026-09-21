@@ -53,6 +53,7 @@
 import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
+  COMPLEMENTO_MATERNIDAD_DEROGADO,
 } from '@/data/fiscal';
 import { formatFechaLarga } from '@/lib/formatters';
 
@@ -258,7 +259,7 @@ export function calcularComplementoBrechaGenero(
   if (fecha === 'antes_2021') {
     return noProcede(
       `La pensión se causó antes del ${FECHA_MINIMA_HECHO_CAUSANTE}, fecha de entrada en vigor del complemento por brecha de género (RDL 3/2021). Para hechos causantes anteriores se aplicaba el antiguo complemento de maternidad, con reglas distintas.`,
-      'Si entonces percibías o se te denegó el antiguo complemento de maternidad, consulta a un profesional: la doctrina TJUE 2019 (caso WA) también afectó a aquel régimen.',
+      `Si entonces percibías o se te denegó el antiguo complemento de maternidad, consulta a un profesional: la ${COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso} también afectó a aquel régimen.`,
     );
   }
   if (fecha === 'sin_iniciar') {
@@ -298,7 +299,7 @@ export function calcularComplementoBrechaGenero(
         ? `Tras la STJUE de ${DOCTRINA.stjue.fecha} (${DOCTRINA.stjue.asunto}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. El complemento debe reconocerse en las mismas condiciones que a las mujeres.`
         : 'Se cumplen los requisitos básicos del art. 60 LGSS, así que conviene revisar el motivo de la resolución denegatoria: de él depende si cabe reclamar o si hay algo que subsanar.')
     : (p.sexo === 'hombre'
-        ? 'Tras la doctrina TJUE/TS 2025, los hombres tienen derecho al complemento en las mismas condiciones que las mujeres. Se cumplen los requisitos básicos del art. 60 LGSS.'
+        ? `Tras la STJUE de ${DOCTRINA.stjue.fecha} (${DOCTRINA.stjue.asunto}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los hombres tienen derecho al complemento en las mismas condiciones que las mujeres. Se cumplen los requisitos básicos del art. 60 LGSS.`
         : 'Se cumplen los requisitos básicos del art. 60 LGSS para el reconocimiento del complemento.');
 
   const pasoSiguiente = esReclamacion

@@ -73,6 +73,17 @@ type FechaCausante = 'antes_2021' | 'desde_2021' | 'sin_iniciar';
 
 interface Resultado {
   procede: boolean;
+  /**
+   * true cuando NO se ha podido evaluar (el campo de hijos no trae un número válido).
+   *
+   * No es lo mismo que `procede: false`, y hasta el 21/09/2026 la pantalla los decía con el
+   * mismo titular: «No procede ahora / Revisa el motivo abajo», letra por letra igual al
+   * rechazo real por el requisito 3 del art. 60 LGSS. En esta app el titular ES el producto
+   * —responde «¿te corresponde?»—, así que se le contestaba que no a quien ni siquiera se
+   * había llegado a evaluar, y el coste del malentendido en una app de riesgo 1 es dejar de
+   * pedir un complemento que corresponde (hallazgo 1171).
+   */
+  sinCalcular?: boolean;
   hijosComputables: number;
   importeMensual: number;
   importeAnual: number;
@@ -153,9 +164,13 @@ function evaluar(
         'complemento por brecha de género. Para hechos causantes anteriores se aplicaba el antiguo ' +
         'complemento de maternidad, con reglas distintas.',
       esReclamacion: false,
+      // La cita del régimen derogado sale del módulo, como ya sale dos veces más abajo en esta
+      // misma página: aquí iba tecleada y DEGRADADA —sin fecha y sin número de asunto— justo
+      // donde se manda consultar a un profesional, que es cuando hace falta la cita completa
+      // (hallazgo 1172).
       pasoSiguiente:
         'Si entonces percibías o se te denegó el antiguo complemento de maternidad, consulta a un ' +
-        'profesional: la doctrina TJUE 2019 (caso WA) también afectó a aquel régimen.',
+        `profesional: la ${MATERNIDAD.doctrinaAcceso} también afectó a aquel régimen.`,
     };
   }
   if (fecha === 'sin_iniciar') {
@@ -245,7 +260,10 @@ function evaluar(
     importeAnual,
     motivo:
       genero === 'hombre'
-        ? 'Tras la doctrina TJUE 2025 y TS 2025, los hombres tienen derecho al complemento en las ' +
+        // Misma cita que la rama de reclamación de arriba, que sí interpola el sello: dos ramas
+        // del mismo motor, una leyendo el módulo y la otra escribiendo el año (hallazgo 1173).
+        ? `Tras la STJUE de ${DOCTRINA.stjue.fecha} (${DOCTRINA.stjue.asunto}) y la doctrina del ` +
+          `Tribunal Supremo (${DOCTRINA.ts.fecha}), los hombres tienen derecho al complemento en las ` +
           'mismas condiciones que las mujeres. Cumples los requisitos básicos del art. 60 LGSS.'
         : 'Cumples los requisitos básicos del art. 60 LGSS para reconocimiento automático del ' +
           'complemento (mujer con pensión contributiva e hijos computables).',
@@ -296,6 +314,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
       if (!hijosEsValido) {
         return {
           procede: false,
+          sinCalcular: true,
           hijosComputables: 0,
           importeMensual: 0,
           importeAnual: 0,
@@ -577,21 +596,37 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             </p>
           ) : (
             <div className={styles.resultados}>
-              <div className={resultado.procede ? styles.resultHeroPositivo : styles.resultHeroNegativo}>
+              {/* Tres titulares, no dos: procede, no procede y SIN CALCULAR. El tercero es el
+                  hallazgo 1171 — una entrada que no se puede evaluar recibía el mismo titular,
+                  el mismo icono y el mismo estilo que una denegación del derecho, y solo el
+                  párrafo «¿Por qué?», en cuerpo menor, los distinguía. */}
+              <div
+                className={
+                  resultado.procede
+                    ? styles.resultHeroPositivo
+                    : resultado.sinCalcular
+                      ? styles.resultHeroSinCalcular
+                      : styles.resultHeroNegativo
+                }
+              >
                 <div className={styles.resultIcon} aria-hidden="true">
-                  {resultado.procede ? (resultado.esReclamacion ? '🔄' : '✅') : 'ℹ️'}
+                  {resultado.procede ? (resultado.esReclamacion ? '🔄' : '✅') : resultado.sinCalcular ? '✏️' : 'ℹ️'}
                 </div>
                 <div className={styles.resultImporte}>
                   {resultado.procede
                     ? `+${formatCurrency(resultado.importeMensual)}/mes`
-                    : 'No procede ahora'}
+                    : resultado.sinCalcular
+                      ? 'Sin calcular'
+                      : 'No procede ahora'}
                 </div>
                 <p className={styles.resultLabel}>
                   {resultado.procede
                     ? resultado.esReclamacion
                       ? 'Posible reclamación retroactiva'
                       : 'Cumples los requisitos básicos'
-                    : 'Revisa el motivo abajo'}
+                    : resultado.sinCalcular
+                      ? 'Falta un dato: esto NO es una respuesta sobre tu derecho'
+                      : 'Revisa el motivo abajo'}
                 </p>
               </div>
 
@@ -662,6 +697,20 @@ export default function VerificadorComplementoBrechaGeneroPage() {
 
           {/* ─── 1. Tabla comparativa ─── */}
           <h2>Comparativa: antiguo complemento de maternidad vs. complemento actual</h2>
+          {/* La columna del régimen derogado publica sus cifras (5 %, 10 %, 15 %) sin decir de
+              qué redacción salen: `.norma` y `.vigenteHasta` existían en el módulo y no tenían
+              ningún consumidor en todo el catálogo, mientras el rótulo tecleaba «hasta
+              feb-2021». Los tres sellos declarados de la página cubren el art. 60 vigente, los
+              plazos de la LRJS y el límite de pensiones: ninguno ampara la redacción anterior.
+              No hace falta un cuarto DataReference —es una norma derogada, sin caducidad ni
+              vigilancia—, sino que la tabla cite su norma como el resto de la página cita el
+              art. 60.4 LGSS o la STS 748/2023 (hallazgo 1174, residuo del 652). */}
+          <p className={styles.tableNote}>
+            Las cifras de la columna del régimen derogado son las del{' '}
+            <strong>{MATERNIDAD.norma}</strong>, vigente hasta el{' '}
+            {formatFechaLarga(MATERNIDAD.vigenteHasta)}. Quien lo tuviera reconocido lo conserva
+            (DT 33.ª LGSS), y por eso sigue aquí.
+          </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>

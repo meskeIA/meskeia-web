@@ -1936,7 +1936,8 @@ test.describe('Re-inspección 21/09/2026', () => {
    *   · campo VACÍO (o «2.5») no es una entrada: `hijosEsValido` es falso y el `useMemo`
    *     corta antes de llamar a `evaluar()`. No se ha evaluado NADA sobre el derecho.
    *
-   * ⚠️ HALLAZGO VIVO 21/09/2026 — MEDIO (operativa). El titular del panel es el MISMO en
+   * ✅ HALLAZGO 1171 del 21/09/2026 — MEDIO (operativa), REPARADO el 21/09. El titular del
+   * panel era el MISMO en
    * los dos: «No procede ahora», con el mismo icono ℹ️, el mismo estilo negativo y la
    * misma etiqueta «Revisa el motivo abajo». Solo el párrafo «¿Por qué?», en cuerpo
    * menor, distingue «El complemento exige al menos un hijo o hija» de «Falta el número
@@ -1955,10 +1956,9 @@ test.describe('Re-inspección 21/09/2026', () => {
    * Esperado: con el campo ilegible, el titular NO puede ser el del veredicto de fondo.
    * Obtenido el 21/09/2026: «No procede ahora» en los dos.
    */
-  test('caso 2 (21/09, límite): «0 hijos» y «campo vacío» dan el mismo titular', async ({
+  test('caso 2 (21/09, límite) REPARADO 1171: «0 hijos» y «campo vacío» ya no dan el mismo titular', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO VIVO — ver el comentario de arriba
 
     // 2a — «0»: entrada válida, denegación DE FONDO por el requisito 3 del art. 60
     await responderYVerificar(page, {
@@ -2069,10 +2069,9 @@ test.describe('Re-inspección 21/09/2026', () => {
    * Esperado: los veredictos citan la doctrina del módulo, como ya hace la prosa.
    * Obtenido el 21/09/2026: (a) «la doctrina TJUE 2019 (caso WA)» · (b) «TJUE 2025 y TS 2025».
    */
-  test('doctrina (21/09): los veredictos citan la jurisprudencia tecleada, no la del módulo', async ({
+  test('doctrina (21/09) REPARADO 1172 y 1173: los veredictos citan la jurisprudencia del módulo', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO VIVO — ver el comentario de arriba
 
     // (a) Rama anterior al corte del 4-feb-2021
     await responderYVerificar(page, {
@@ -2121,5 +2120,36 @@ test.describe('Re-inspección 21/09/2026', () => {
     expect(reclamacion).toContain(stjue.fecha); // '15 de mayo de 2025'
     expect(reclamacion).toContain(stjue.asunto); // 'C-623/23'
     expect(reclamacion).toContain(ts.fecha); // '9 de julio de 2025'
+  });
+  /**
+   * ✅ HALLAZGO 1174 del 21/09/2026 — BAJO (dato), REPARADO el 21/09. Residuo del 652.
+   *
+   * La tabla comparativa publicaba las cifras del complemento de maternidad DEROGADO
+   * —5 %, 10 %, 15 %; «2 o más hijos»; «15 % (4 o más hijos)»— sin nombrar en ningún sitio
+   * la redacción de la que salen. `COMPLEMENTO_MATERNIDAD_DEROGADO.norma` y `.vigenteHasta`
+   * existían en el módulo y no tenían NINGÚN consumidor en todo el catálogo, mientras el
+   * rótulo de la columna tecleaba «hasta feb-2021». Los tres sellos declarados de la página
+   * cubren el art. 60 en su redacción vigente, los plazos de la LRJS y el límite de
+   * pensiones: ninguno ampara la redacción anterior.
+   *
+   * No se pide un cuarto DataReference —el módulo es una norma derogada, sin fecha de
+   * caducidad ni vigilancia—, sino que la tabla cite `.norma` como el resto de la página
+   * cita el art. 60.4 LGSS o la STS 748/2023.
+   */
+  test('norma derogada (21/09) REPARADO 1174: la tabla cita la redacción de la que salen sus cifras', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await abrirGuia(page);
+    const guia = normalizar(await page.locator('body').innerText());
+
+    // Las cifras del régimen derogado siguen ahí, derivadas del módulo (hallazgo 607)
+    for (const tramo of COMPLEMENTO_MATERNIDAD_DEROGADO.escala) {
+      expect(guia).toContain(`${tramo.porcentaje}%`);
+    }
+    // …y ahora dicen de dónde salen
+    expect(guia, 'la tabla no cita la norma del régimen derogado').toContain(
+      COMPLEMENTO_MATERNIDAD_DEROGADO.norma,
+    );
   });
 });

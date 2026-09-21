@@ -175,11 +175,26 @@
   gap: var(--spacing-md);
 }
 
-.resultHeroPositivo, .resultHeroNegativo {
+.resultHeroPositivo, .resultHeroNegativo, .resultHeroSinCalcular {
   border-radius: var(--radius-large);
   padding: 1.5rem;
   text-align: center;
 }
+
+/*
+  El tercer estado: la entrada que NO se ha podido evaluar. Llevaba el mismo estilo que la
+  denegación del derecho, y en esta app el titular ES el producto (hallazgo 1171). Se separa
+  con el borde discontinuo y el amarillo de aviso —«falta algo por rellenar»— en vez del gris
+  del veredicto negativo, que es una respuesta cerrada.
+*/
+.resultHeroSinCalcular {
+  background: var(--bg-primary);
+  border: 2px dashed var(--warning);
+  color: var(--text-primary);
+}
+
+.resultHeroSinCalcular .resultImporte { font-size: 1.4rem; }
+.resultHeroSinCalcular .resultLabel { font-weight: 600; }
 
 .resultHeroPositivo {
   background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
@@ -304,6 +319,13 @@
   border-radius: var(--radius);
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   margin-bottom: 1.5rem;
+}
+
+/* Pie de la tabla comparativa: de qué redacción salen las cifras del régimen derogado. */
+.tableNote {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
 }
 
 .comparativaTable {
