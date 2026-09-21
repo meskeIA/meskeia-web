@@ -12,6 +12,24 @@ Servidor de desarrollo y producción en el **puerto 3050** (`npm run dev` / `npm
 
 ---
 
+## ⚠️ Los CLAUDE.md de carpeta NO se cargan solos: hay que leerlos
+
+Medido el 20 y el 21/09/2026 (dos sesiones, siete pruebas): **ninguno de los siete llega al
+contexto** — ni con `Read`, ni con `Edit`, ni con `Grep`. Son 26,8 KB de trampas ya pagadas que
+solo se leen si esta tabla lo manda, y se leen **antes de la primera escritura** en ese árbol:
+
+| Antes de tocar… | Lee | Trampa que cubre |
+|---|---|---|
+| `data/*.ts` | `data/CLAUDE.md` | Cambiar el formato deja parsers mudos · una serie histórica se coteja por COCIENTES, no añadiendo el año |
+| `scripts/*.mjs` | `scripts/CLAUDE.md` | Los parsers leen `data/` con regex: 0 items sin dar error, o 607 líneas de comentario dentro de un `<h1>` |
+| Analytics, rollup o dashboard | `app/api/analytics/CLAUDE.md` | `timestamp` es TEXT español · cuatro cortes de instrumentación que parecen producto |
+| `types/` o un `useMemo` con `switch` | `types/CLAUDE.md` | La unión discriminada no discrimina: sale `undefined` en pantalla y compila |
+| Una app imprimible | `styles/CLAUDE.md` | La base de impresión NO vale para una tabla de lectura |
+| `app/delegum/` | `app/delegum/CLAUDE.md` | Barra final en la URL del MCP · los CTA necesitan `?from=delegum` |
+| `data/historias/` | `data/historias/CLAUDE.md` | Catálogo CERRADO (09/05/2026) · cuatro reglas de UX intocables |
+
+---
+
 ## Identidad visual meskeIA (OBLIGATORIO)
 
 Ya implementada en `app/globals.css` — **no duplicar la definición**, solo usar las variables.
@@ -93,7 +111,7 @@ Cuando los datos no existan aún, **crear el módulo correspondiente** en `data/
 
 Cronologías históricas: cada historia = `data/historias/[slug].ts` + registro en `data/historias/index.ts`. **Catálogo cerrado desde el 2026-05-09.**
 
-El detalle completo (workflow con agentes en paralelo, las 4 reglas de UX que NO se modifican, estructura de `HistoriaData` y las 6 restricciones críticas) vive en **`data/historias/CLAUDE.md`**, que se carga solo al trabajar bajo ese directorio.
+El detalle completo (workflow con agentes en paralelo, las 4 reglas de UX que NO se modifican, estructura de `HistoriaData` y las 6 restricciones críticas) vive en **`data/historias/CLAUDE.md`**, que **hay que abrir a mano**: no se carga solo (ver la tabla del principio).
 
 ---
 
@@ -174,7 +192,11 @@ Cada vertical tiene **un solo sitio** donde se registra, además de los tres de 
 
 En Stemum y Coquinum el orden dentro de la sección **es** el orden de la parrilla. En Cronicum cada cronología va en **exactamente una** puerta.
 
-> **Histórico (2026-07-28)**: las parrillas eran arrays `APPS` hardcodeados en cada `app/{stemum,coquinum}/[seccion]/page.tsx`, así que registrar una app pedía DOS listas (TRES en Coquinum, con `COQUINUM_APP_INFO`). Consecuencias reales: `simulador-logica-secuencial` y `ajustar-ecuaciones-quimicas` quedaron contadas en el hero de Stemum pero **sin tarjeta que las enlazase y sin dar ningún error**; en Coquinum 21 títulos y 17 iconos habían divergido, y la misma app se presentaba distinta en la parrilla y en el pie. Ahora las parrillas se derivan de `appsDeDisciplina()` / `appsDeCategoria()`, y `COQUINUM_APP_INFO` del catálogo.
+> **Histórico (2026-07-28)**: las parrillas eran arrays `APPS` hardcodeados en cada
+> `app/{stemum,coquinum}/[seccion]/page.tsx`, así que registrar una app pedía DOS listas (TRES en
+> Coquinum). Dejó `simulador-logica-secuencial` y `ajustar-ecuaciones-quimicas` contadas en el hero
+> de Stemum **sin tarjeta que las enlazase y sin dar ningún error**, y en Coquinum 21 títulos y 17
+> iconos divergidos. Ahora se derivan de `appsDeDisciplina()` / `appsDeCategoria()`.
 
 **Candado**: `npm run check:verticales` — lo ejecuta también `npm run build`, y **rompe el build** si falla. Verifica, en los tres portales: que cada slug tenga su carpeta en `app/`, esté en `implemented-apps.ts` y en `applications.ts`, que la disciplina/categoría exista, que ninguna parrilla vuelva a listar apps a mano, y que ninguna cronología se quede sin puerta (ni aparezca en dos, ni una puerta apunte a una cronología inexistente).
 
@@ -228,78 +250,62 @@ meskeIA sirve a todo el público hispanohablante (España + Latam = ~50% del tr�
 **Apps con datos de referencia España pero metodología universal** (intereses, finanzas genéricas con ejemplos en €): usar `<RegionBadge variant="es-data" />`.
 
 **Reglas técnicas adicionales**:
-- Parser numérico: usar `parseSpanishNumber`, que admite `1,234.56` y `1.234,56` — cuando
-  aparecen los dos separadores, **el último es el decimal**. Con uno solo la ambigüedad es
-  irreducible (`1.234`) y gana el español. Rechaza con `NaN` lo que no es un número
-  (`12abc`, `1e3`, `1.2.3`), así que no hace falta validar antes de llamarlo.
-  > Hasta el 24/08/2026 esta línea prometía los dos formatos y **el código no los admitía**:
-  > `1,234.56` salía 1,23456. Lo destapó el Inspector en `conversor-numeros-letras`, que
-  > repetía la promesa sobre el campo con el que se rellenan pagarés.
-- Moneda: si no es contable-España, considerar dejar el símbolo configurable o usar genérico
-- En bloques educativos, citar normativa España solo cuando sea relevante; preferir ejemplos universales
+- Parser: `parseSpanishNumber` (`@/lib`). Con los **dos** separadores manda el último; con uno solo
+  la ambigüedad es irreducible y gana el español (`1.234` = mil). Devuelve `NaN` en lo que no es un
+  número (`12abc`, `1e3`), así que no hace falta validar antes de llamarlo. ⚠️ Hasta el 24/08/2026
+  esta línea prometía ambos formatos y el código NO los admitía: `1,234.56` salía 1,23456.
+- Moneda: si no es contable-España, símbolo configurable o genérico.
+- En bloques educativos, normativa España solo cuando sea relevante; preferir ejemplos universales.
 
 ### 1.quater Cifras del catálogo (OBLIGATORIO desde 2026-05-06)
 
-Las cifras del catálogo (número de apps, visualizadores, cursos, etc.) **solo aparecen vía variable** importada desde `@/data/implemented-apps` (`TOTAL_IMPLEMENTED_APPS`). **PROHIBIDO hardcodear números** de apps en textos UI/SEO/JSON-LD.
+Las cifras del catálogo **solo aparecen vía variable** importada de `@/data/implemented-apps`
+(`TOTAL_IMPLEMENTED_APPS`). **PROHIBIDO hardcodear números** de apps en UI, SEO o JSON-LD: el
+catálogo pasó de 84 a 824 en pocos meses y todo número escrito a mano queda obsoleto sin avisar
+(ya ocurrió en `FAQ.tsx` y en el JSON-LD de `app/layout.tsx`).
 
-**Por qué**: El proyecto crece rápido (84 → 220 → 824 en pocos meses) y los números hardcoded quedan obsoletos sin aviso. Históricamente ha pasado en `FAQ.tsx`, `app/layout.tsx` (JSON-LD) y otros sitios. Cualquier cifra hardcoded es deuda técnica garantizada.
+- Si la UI **necesita** la cifra → `` `${TOTAL_IMPLEMENTED_APPS} aplicaciones…` ``
+- Si **no** la necesita → eliminarla, no dejar un número que envejecerá. La FAQ "¿son gratuitas?"
+  no necesita decir "todas las 84 apps". En JSON-LD, la `description` mejor sin cifra.
 
-**Regla operativa**:
-- Si una pieza de UI **necesita** la cifra para su mensaje → importar `TOTAL_IMPLEMENTED_APPS` y usar template literal: `` `${TOTAL_IMPLEMENTED_APPS} aplicaciones...` ``
-- Si una pieza **no la necesita** → eliminarla en lugar de dejar un número que envejecerá. Ejemplo: la FAQ "¿son realmente gratuitas?" no necesita decir "todas las 84 apps", basta con "todas las aplicaciones".
-- En JSON-LD/Schema.org: la `description` no requiere cifra, mejor omitirla.
-
-**Auditoría manual periódica**: `grep -rE "\b[0-9]{2,4}\b\s+aplicaciones?" --include="*.tsx" --include="*.ts" --include="*.md"` para detectar regresiones.
+Auditoría: `grep -rE "\b[0-9]{2,4}\b\s+aplicaciones?" --include="*.tsx" --include="*.ts" --include="*.md"`
 
 ### 1.ter JSON-LD / Structured Data (OBLIGATORIO desde 2026-05-06)
 
-Toda app nueva DEBE incluir Schema.org JSON-LD para que Google y las IAs (ChatGPT, Perplexity, Gemini) reconozcan correctamente el contenido. Habilita rich snippets en SERP.
+Toda app nueva DEBE incluir Schema.org JSON-LD. **Está automatizado en el template**
+(`templates/app-base/`): `metadata.template.ts` exporta `jsonLd` (WebApplication) y `faqJsonLd`
+(FAQPage), y `layout.template.ts` inyecta ambos `<script type="application/ld+json">`.
 
-**Está automatizado en el template** (`templates/app-base/`):
-- `metadata.template.ts` exporta `jsonLd` (WebApplication) Y `faqJsonLd` (FAQPage)
-- `layout.template.ts` inyecta ambos `<script type="application/ld+json">` antes del `{children}`
+**Solo hay que rellenarlo bien**: `name` descriptivo · `description` de 1-2 frases · `url` absoluta
+con barra final · `category` (`EducationalApplication`, `FinanceApplication`, `UtilityApplication`
+o `BusinessApplication`) · `features` con 4-8 características reales · **`faqJsonLd` con 5 preguntas**
+que un usuario escribiría de verdad, respuestas de 2-4 frases con datos concretos, sin mencionar
+"meskeIA", variadas (qué es, cómo funciona, para quién, diferencia con alternativas, dato clave).
 
-**Solo hay que** rellenar correctamente al crear la app:
-- `name`: nombre claro y descriptivo
-- `description`: 1-2 frases sobre qué hace y para quién
-- `url`: URL absoluta completa con barra final (`https://meskeia.com/[slug]/`)
-- `category`: una de `EducationalApplication`, `FinanceApplication`, `UtilityApplication` o `BusinessApplication`
-- `features`: 4-8 características reales de la app
-- **`faqJsonLd`**: 5 preguntas reales que un usuario escribiría en Bing/Google/ChatGPT con respuestas de 2-4 frases y datos concretos. Sin mencionar "meskeIA". Variadas: qué es, cómo funciona, para quién, diferencia con alternativas, dato clave.
+⚠️ **FAQPage es obligatorio desde 2026-05-30** aunque Google lo deprecara para rich snippets: Bing
+Copilot, ChatGPT, Perplexity y Gemini SÍ lo usan para grounding. Es la señal estructurada más
+directa para aparecer en respuestas de IAs.
 
-**Por qué FAQPage es obligatorio desde 2026-05-30**: Google deprecó FAQPage para rich snippets pero Bing Copilot, ChatGPT, Perplexity y Gemini SÍ usan FAQPage para grounding queries. Es la señal estructurada más directa para aparecer en respuestas de IAs. La campaña masiva de retrofit cubrió 826/842 apps existentes — las nuevas deben incluirlo desde el origen.
-
-**Verificación**: tras el build, comprobar que `.next/server/app/[slug].html` contiene `"@type":"WebApplication"` Y `"@type":"FAQPage"`.
-
-**Apps existentes sin JSON-LD/FAQPage**: usar `node scripts/faq-progress.mjs` para identificar. Solo hacer retrofit si la app tiene tráfico relevante.
+**Verificación**: tras el build, que `.next/server/app/[slug].html` contenga `"@type":"WebApplication"`
+Y `"@type":"FAQPage"`. Para localizar apps viejas sin ello: `node scripts/faq-progress.mjs` (solo
+merece retrofit si la app tiene tráfico relevante).
 
 ### 1.quinquies Neutralidad editorial (OBLIGATORIO desde 2026-05-12)
 
-Tras revisión global de 189 apps en 2026-05-12 (~400 correcciones aplicadas en historia, salud, finanzas, reflexión, legal-fiscal y gastronomía), estos son los **antipatrones editoriales** más frecuentes. Al generar o modificar apps, evítalos desde el origen:
+Antipatrones detectados al revisar 189 apps (~400 correcciones en historia, salud, finanzas,
+reflexión, legal-fiscal y gastronomía). No son checklist sino señales de alerta: si alguna aplica
+a lo que estás escribiendo, formúlalo neutro desde el inicio — es más fácil que corregirlo después.
 
-1. **Cifras populares sin fuente verificable**. Ej: "10.000 pasos", "regla del 4%", "70% impostor", "33% Universidad de Wisconsin", "una copa al día es saludable". Si citas una cifra, atribuye fuente y año concretos; sospecha de las cifras redondas que circulan en blogs.
-
-2. **Asunción de privilegio en el destinatario**. Ej: "ahorra el 20%", "fondo de 6 meses", "bloquea 2h semanales", "compra de gama media", "delega tareas". Pregúntate si el consejo excluye implícitamente a parte del público (rentas justas, jornadas no flexibles, sin patrimonio, sin equipo).
-
-3. **"Demostró/documentó"** para marcos académicos discutidos (Kahneman, Janis, Csikszentmihalyi). Usa "propuso", "identificó", "popularizó". Los marcos son herramientas, no leyes.
-
-4. **Lenguaje moralizador sobre elecciones legítimas**. Ej: "alimentos prohibidos", "carga del cuidador", "Optimismo Ciego", "deuda buena/mala", "vivir despacio = acto de resistencia". Evita adjetivos valorativos cuando hay opciones legítimas distintas.
-
-5. **Bias EEUU/anglosajón sin matiz**. Ej: Ramsey, Cal Newport, FIRE, Trinity Study, S&P 500 como referencia universal, "regla 100-edad". Reconoce el origen cultural del marco; diversifica fuentes y referencias para el público hispanohablante.
-
-6. **Asimetría territorial valorativa**. Ej: "Madrid favorable / Asturias onerosa" (ISD), "la auténtica / la versión americana", "vinos europeos clásicos / alternativas del Nuevo Mundo". Las diferencias geográficas son hechos; no las califiques como mejor/peor.
-
-7. **"Optimizar X"** en títulos fiscales. Sustituye por "cumplimentar correctamente", "calcular con precisión", "aplicar las deducciones aplicables".
-
-8. **Contexto colonial/histórico omitido** cuando es relevante (especias, ron caribeño, arroz Carolina, esclavitud en plantaciones). Una línea de contexto evita el tono romántico/folklórico; no se trata de convertir cada guía en libro de historia.
-
-9. **Glamourización del alcohol como saludable** ("paradoja francesa", "vino cardioprotector", "una copa al día"). Refutado por WHO 2023; el alcohol es carcinógeno Grupo 1 IARC. Si aparece como dato histórico, matizar inmediatamente.
-
-10. **Disclaimer incoherente con el riesgo real**. Ej: melatonina con `severity="low"` (es medicamento >1,9mg en España); guía de cócteles sin DisclaimerCard de alcohol cuando vino y cerveza sí lo tienen. Antes de decidir severity, releer `_private/DISCLAIMER-POLICY.md`.
-
-**Cómo usarlo**: autocontrol al generar contenido. No es checklist obligatorio sino señales de alerta. Si algún antipatrón aplica al texto que estás escribiendo, formúlalo de forma neutra desde el inicio — es más fácil que corregirlo después.
-
-**Revisión anual recomendada**: auditoría completa de neutralidad cada ~12 meses (similar a la de 2026-05-12) para detectar regresiones a medida que se añaden apps nuevas. Documento de referencia: este apartado del CLAUDE.md.
+1. **Cifras populares sin fuente** ("10.000 pasos", "regla del 4%", "una copa al día es saludable") → atribuye fuente y año; sospecha de las cifras redondas que circulan en blogs.
+2. **Asunción de privilegio** ("ahorra el 20%", "fondo de 6 meses", "delega tareas") → ¿excluye a rentas justas, jornadas no flexibles, sin patrimonio, sin equipo?
+3. **"Demostró/documentó"** para marcos discutidos (Kahneman, Janis, Csikszentmihalyi) → "propuso", "identificó", "popularizó". Son herramientas, no leyes.
+4. **Moralizar elecciones legítimas** ("alimentos prohibidos", "deuda buena/mala", "carga del cuidador") → sin adjetivos valorativos donde hay opciones legítimas distintas.
+5. **Bias EEUU/anglosajón sin matiz** (Ramsey, Cal Newport, FIRE, Trinity Study, S&P 500, "regla 100-edad") → reconoce el origen cultural del marco y diversifica referencias.
+6. **Asimetría territorial valorativa** ("Madrid favorable / Asturias onerosa", "la auténtica / la americana") → las diferencias geográficas son hechos, no notas.
+7. **"Optimizar X"** en títulos fiscales → "cumplimentar correctamente", "calcular con precisión", "aplicar las deducciones aplicables".
+8. **Contexto colonial omitido** cuando es relevante (especias, ron caribeño, arroz Carolina) → una línea evita el tono romántico/folklórico, sin convertirlo en libro de historia.
+9. **Alcohol como saludable** ("paradoja francesa", "vino cardioprotector") → refutado por WHO 2023; carcinógeno Grupo 1 IARC. Como dato histórico, matizar en el acto.
+10. **Disclaimer incoherente con el riesgo** (melatonina con `severity="low"`, que es medicamento >1,9 mg en España; cócteles sin disclaimer de alcohol) → releer `_private/DISCLAIMER-POLICY.md` antes de decidir severity.
 
 ### 2. Ciclo de creación de nueva app (2 fases obligatorias)
 
@@ -335,15 +341,12 @@ Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
 ```
 ## REGLAS CRÍTICAS PARA ESTE AGENTE
 - ✅ Crea SOLO los 3 archivos de tu app (metadata.ts, page.tsx, .module.css)
-- ✅ Puedes ejecutar `npm run check:tipos` UNA SOLA VEZ para verificar
-- ❌ PROHIBIDO: ejecutar `npm run build` (conflicto de lock entre agentes)
-- ❌ PROHIBIDO: modificar archivos compartidos (applications.ts, implemented-apps.ts, app-relations.ts)
-- ❌ PROHIBIDO: ejecutar `npm run check:tipos` más de una vez
-- ❌ PROHIBIDO: reintentar comandos fallidos en bucle (sleep + retry)
-- ❌ PROHIBIDO: ejecutar comandos en background (run_in_background)
-- ⚠️ TERMINAR INMEDIATAMENTE después de crear los archivos y verificar TS una vez
-- ⚠️ Si tsc falla, reportar el error y TERMINAR — no reintentar
+- ✅ `npm run check:tipos` UNA SOLA VEZ. Si falla, reporta el error y TERMINA — no reintentes
+- ❌ PROHIBIDO: `npm run build` (lock entre agentes) · modificar compartidos (applications.ts,
+  implemented-apps.ts, app-relations.ts) · reintentar en bucle (sleep + retry) · run_in_background
+- ⚠️ TERMINAR INMEDIATAMENTE tras crear los ficheros y verificar TS una vez
 - ⚠️ No usar JSX.Element ni React.JSX.Element como tipo de retorno (causa error TS)
+
 ```
 
 **Fase secuencial DESPUÉS (registros + build):**

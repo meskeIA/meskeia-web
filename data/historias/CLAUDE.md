@@ -1,6 +1,6 @@
 # Template visualizador-historia/[slug]
 
-> Salió del CLAUDE.md raíz el 11/08/2026 (`/doctor`, check 4): son 56 líneas que solo importan al tocar cronologías, y el catálogo está cerrado desde el 2026-05-09. Este fichero se carga automáticamente al trabajar bajo `data/historias/`.
+> Salió del CLAUDE.md raíz el 11/08/2026 (`/doctor`, check 4): son 56 líneas que solo importan al tocar cronologías, y el catálogo está cerrado desde el 2026-05-09. ⚠️ **Este fichero NO se carga solo** (medido 20-21/09/2026): hay que abrirlo a mano, y el CLAUDE.md raíz dice cuándo.
 
 Ruta dinámica para cronologías históricas. Cada historia = un archivo `data/historias/[slug].ts` + registro en `data/historias/index.ts`.
 

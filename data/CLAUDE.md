@@ -2,7 +2,7 @@
 
 > Bajado del índice de memoria el 28/08/2026 (fase 2 de la recomposición de `MEMORY.md`): son
 > avisos que solo importan al tocar `data/`, y en el índice ocupaban sitio todos los días.
-> Este fichero se carga automáticamente al trabajar bajo `data/`. Fichas completas en la
+> ⚠️ **Este fichero NO se carga solo** (medido 20-21/09/2026): hay que abrirlo a mano, y el CLAUDE.md raíz dice cuándo. Fichas completas en la
 > memoria del proyecto: `project_stemum`, `reference_generador_posts_x`.
 
 ## Una app puede estar registrada en TRES capas distintas

@@ -2,7 +2,7 @@
 
 > Bajado del índice de memoria el 28/08/2026 (fase 2 de la recomposición de `MEMORY.md`): siete
 > entradas que solo importan al tocar Analytics y que ocupaban sitio en el índice todos los días.
-> Este fichero se carga automáticamente al trabajar bajo `app/api/analytics/`. Las fichas
+> ⚠️ **Este fichero NO se carga solo** (medido 20-21/09/2026): hay que abrirlo a mano, y el CLAUDE.md raíz dice cuándo. Las fichas
 > completas siguen en la memoria del proyecto y se citan en cada apartado.
 
 ## Qué es Analytics aquí (definición aprobada el 20/08/2026)
