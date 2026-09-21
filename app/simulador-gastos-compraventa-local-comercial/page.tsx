@@ -88,6 +88,13 @@ interface ResultadosVendedor {
   /** Ni ganancia ni pérdida: se vende exactamente por el valor de adquisición. */
   sinGananciaNiPerdida: boolean;
   irpfGanancia: number;
+  /**
+   * false mientras falte el precio de compra original: entonces el 0 del IRPF no es una
+   * exención, es un impuesto que no se ha podido calcular (hallazgo 1159, ALTO). Es el mismo
+   * campo con el que garaje, trastero y estimador-compraventa-inmueble cierran el «efecto
+   * familia del 483».
+   */
+  irpfCalculado: boolean;
   totalGastos: number;
   netoVendedor: number;
 }
@@ -389,6 +396,7 @@ export default function SimuladorLocalComercialPage() {
       esPerdida: hayDatosGanancia && g.esPerdida,
       sinGananciaNiPerdida: hayDatosGanancia && g.sinGananciaNiPerdida,
       irpfGanancia: irpf,
+      irpfCalculado: hayDatosGanancia,
       totalGastos,
       netoVendedor: precioV - totalGastos,
     };
@@ -404,6 +412,29 @@ export default function SimuladorLocalComercialPage() {
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
+
+  /**
+   * Lo que el neto NO descuenta por falta de datos. Solo se miraba la plusvalía, así que con
+   * el precio de compra en blanco el aviso nombraba «la plusvalía municipal» y callaba justo
+   * el otro impuesto que faltaba, el IRPF, mientras la tarjeta de al lado lo daba por
+   * liquidado en verde (hallazgo 1159). Es el mecanismo que garaje y trastero ya usaban.
+   */
+  const faltanEnElNeto = resultadosVendedor
+    ? [
+        resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
+        resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+      ].filter((x): x is string => x !== null)
+    : [];
+
+  /** Los campos concretos que hay que rellenar, sin repetir el precio de compra original. */
+  const camposPendientes = resultadosVendedor
+    ? Array.from(
+        new Set([
+          ...resultadosVendedor.camposQueFaltan,
+          ...(resultadosVendedor.irpfCalculado ? [] : ['el precio de compra original']),
+        ])
+      )
+    : [];
 
   return (
     <div className={styles.container}>
@@ -602,7 +633,10 @@ export default function SimuladorLocalComercialPage() {
                     : 'IVA (comercial)'}
                 </span>
                 <span className={styles.infoCcaaValue}>
-                  {TERRITORIOS_SIN_IVA[ccaa] ? 'No calculado' : formatTipoNominal(IVA_LOCAL_COMERCIAL)}
+                  {/* El sufijo «%» se quedó fuera del ternario al condicionar la línea por
+                      territorio, y la casilla publicaba un «21» desnudo entre dos porcentajes
+                      —«ITP General 9%» y «AJD 1,5%»— desde el 11/09 (hallazgo 1161). */}
+                  {TERRITORIOS_SIN_IVA[ccaa] ? 'No calculado' : `${formatTipoNominal(IVA_LOCAL_COMERCIAL)}%`}
                 </span>
               </div>
             </div>
@@ -858,8 +892,16 @@ export default function SimuladorLocalComercialPage() {
                   onChange={setAniosPropiedad}
                   label="Años de propiedad"
                   placeholder="10"
-                  helperText="Años completos desde la compra (máximo 20 para la plusvalía municipal)"
+                  helperText="Años completos desde la compra (máximo 20 para la plusvalía municipal). Escribe 0 si revendes antes de cumplir el año: esa reventa también tributa, y con un coeficiente mayor."
                   min={0}
+                  // El blur NO acota este campo: su min es 0 y el 0 SIGNIFICA la reventa antes
+                  // del año (coeficiente 0,14, el tercero más alto de la tabla), así que
+                  // reescribir al mínimo un valor imposible lo convertía en un supuesto fiscal
+                  // válido y caro —2.800 € de IIVTNU a partir del «−1» que la propia app
+                  // acababa de rechazar— y el neto se presentaba como definitivo (hallazgo
+                  // 1160; es el 822/844 que garaje y trastero repararon así el 15/09). Quien
+                  // decide sobre un año negativo es la guarda `aniosNegativo` del useMemo.
+                  acotarAlSalir={false}
                 />
 
                 <NumberInput
@@ -981,21 +1023,44 @@ export default function SimuladorLocalComercialPage() {
                       description="Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede compensar en la declaración"
                     />
                   ) : (
-                    <ResultCard
-                      title="Ganancia patrimonial"
-                      value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
-                      variant="default"
-                      icon="📈"
-                      description="Valor de transmisión menos valor de adquisición"
-                    />
+                    /* Sin el precio de compra original no hay ganancia que enseñar: la que
+                       salía era un «0,00 €» que no es cero, es desconocido (hallazgo 1159). */
+                    resultadosVendedor.gananciaPatrimonial > 0 && (
+                      <ResultCard
+                        title="Ganancia patrimonial"
+                        value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
+                        variant="default"
+                        icon="📈"
+                        description="Valor de transmisión menos valor de adquisición"
+                      />
+                    )
                   )}
 
                   <ResultCard
                     title="IRPF sobre la ganancia"
-                    value={resultadosVendedor.irpfGanancia > 0 ? formatCurrency(resultadosVendedor.irpfGanancia) : 'SIN CUOTA'}
-                    variant={resultadosVendedor.irpfGanancia > 0 ? 'warning' : 'success'}
+                    // «Sin calcular» en gris, y no «SIN CUOTA» en verde, cuando falta el precio
+                    // de compra: ese 0 no es una exención, es un dato que falta. Es el efecto
+                    // familia del 483 que garaje, trastero y el hub ya cerraban (hallazgo 1159).
+                    value={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Sin calcular'
+                        : resultadosVendedor.irpfGanancia > 0
+                          ? formatCurrency(resultadosVendedor.irpfGanancia)
+                          : 'SIN CUOTA'
+                    }
+                    variant={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'default'
+                        : resultadosVendedor.irpfGanancia > 0
+                          ? 'warning'
+                          : 'success'
+                    }
                     icon="🧾"
-                    description={`Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`}
+                    description={
+                      !resultadosVendedor.irpfCalculado
+                        ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                        : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`
+                    }
                   />
 
                   <ResultCard
@@ -1008,14 +1073,14 @@ export default function SimuladorLocalComercialPage() {
                   <div className={styles.separador} />
 
                   <ResultCard
-                    title={resultadosVendedor.plusvaliaCalculada ? 'Total gastos de la venta' : 'Total gastos de la venta (parcial)'}
+                    title={faltanEnElNeto.length === 0 ? 'Total gastos de la venta' : 'Total gastos de la venta (parcial)'}
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="info"
                     icon="➖"
                     description={
-                      resultadosVendedor.plusvaliaCalculada
+                      faltanEnElNeto.length === 0
                         ? `${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta`
-                        : `${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta — SIN la plusvalía municipal, que no está incluida`
+                        : `${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta — SIN ${enumerarEnEspanol(faltanEnElNeto)}, que no se ${faltanEnElNeto.length > 1 ? 'incluyen' : 'incluye'}`
                     }
                   />
 
@@ -1023,14 +1088,14 @@ export default function SimuladorLocalComercialPage() {
                       impuesto, igual que el panel del comprador rotula «COSTE TOTAL
                       (PARCIAL)» donde no calcula el IGIC/IPSI (hallazgo 666). */}
                   <ResultCard
-                    title={resultadosVendedor.plusvaliaCalculada ? 'NETO QUE RECIBES' : 'NETO QUE RECIBES (PARCIAL)'}
+                    title={faltanEnElNeto.length === 0 ? 'NETO QUE RECIBES' : 'NETO QUE RECIBES (PARCIAL)'}
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
                     description={
-                      resultadosVendedor.plusvaliaCalculada
+                      faltanEnElNeto.length === 0
                         ? 'Precio de venta menos impuestos, comisión y gestoría'
-                        : `No descuenta la plusvalía municipal: el neto real será menor. Rellena ${enumerarEnEspanol(resultadosVendedor.camposQueFaltan)} para obtenerlo.`
+                        : `No descuenta ${enumerarEnEspanol(faltanEnElNeto)}: el neto real será menor. Rellena ${enumerarEnEspanol(camposPendientes)} para obtenerlo.`
                     }
                   />
 

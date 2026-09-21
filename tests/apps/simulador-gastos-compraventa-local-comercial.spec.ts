@@ -1950,9 +1950,10 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Valencia, la ganancia en cero y el 
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // HALLAZGOS VIVOS del 21/09/2026, con `test.fail()`: afirman lo que DEBERÍA ocurrir, así
-  // que hoy fallan a propósito y el fichero sigue en verde. Al repararlos se les quita la
-  // marca y quedan como regresión.
+  // REGRESIÓN — los tres hallazgos del 21/09/2026 (1159, 1160 y 1161), REPARADOS el 21/09.
+  // Se escribieron con `test.fail()` afirmando lo que DEBERÍA ocurrir; al repararlos se les
+  // quitó la marca sin tocar ninguna aserción, así que lo que hoy pasa en verde es
+  // exactamente lo que ayer fallaba en rojo.
   //
   // Los tres fallan con aserciones NO reintentadas (leen innerText / inputValue y comparan),
   // para que el fallo sea inmediato: un `expect(...).toHaveText()` que agota el timeout
@@ -1983,7 +1984,6 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Valencia, la ganancia en cero y el 
    * el foco dentro.
    */
   test('[H-21/09-a] el blur no convierte un año NEGATIVO en la reventa antes del año', async ({ page }) => {
-    test.fail();
     await sembrarImporte12(page, 'Precio del local comercial', '400000');
     await page.getByRole('button', { name: /Vendedor/ }).click();
     await sembrarImporte12(page, 'Precio de compra original', '250000');
@@ -2035,7 +2035,6 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Valencia, la ganancia en cero y el 
    * Esperado: que el cero que viene de un dato que falta no se presente como una exención.
    */
   test('[H-21/09-b] sin precio de compra, el IRPF dice «Sin calcular» y no «SIN CUOTA» en verde', async ({ page }) => {
-    test.fail();
     await sembrarImporte12(page, 'Precio del local comercial', '300000');
     await page.getByRole('button', { name: /Vendedor/ }).click();
 
@@ -2064,7 +2063,6 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Valencia, la ganancia en cero y el 
    * Esperado: el mismo formato que sus dos vecinas de fila.
    */
   test('[H-21/09-c] la casilla del IVA del recuadro de la comunidad lleva el símbolo de porcentaje', async ({ page }) => {
-    test.fail();
     await page.locator('#select-ccaa').selectOption('valencia');
 
     const casilla = page
