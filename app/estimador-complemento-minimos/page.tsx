@@ -6,7 +6,7 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard, DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import { PENSIONES_MINIMAS_2026, COMPLEMENTO_MINIMOS_LIMITES_2026, FISCAL_PENSIONES_META } from '@/data/fiscal';
 import type { PensionMinimaEntry } from '@/data/fiscal/pensiones';
@@ -23,6 +23,12 @@ interface Resultado {
   elegible: boolean;
   motivoNoElegible?: string;
   entry: PensionMinimaEntry;
+  /** Límite de ingresos que se ha aplicado de verdad, para poder rotularlo sin adivinar */
+  limiteIngresos: number;
+  /** Si el límite aplicado es el de «con cónyuge a cargo» */
+  conConyugeACargo: boolean;
+  /** El complemento sale de la regla diferencial del art. 9.2, no del mínimo íntegro */
+  complementoDiferencial: boolean;
 }
 
 // ─── Opciones de subtipo por tipo ─────────────────────────────────────────────
@@ -51,6 +57,13 @@ const SUBTIPOS: Record<TipoPension, { value: string; label: string }[]> = {
 
 // ─── Lógica ───────────────────────────────────────────────────────────────────
 
+/**
+ * Las cuantías de PENSIONES_MINIMAS_2026 son mensuales porque el Anexo I del RD 241/2026
+ * da importes ANUALES y el módulo los divide entre 14. Para aplicar la regla del art. 9.2,
+ * que compara magnitudes anuales, hay que volver a multiplicar por las mismas 14.
+ */
+const PAGAS = 14;
+
 function calcular(
   tipo: TipoPension,
   subtipo: string,
@@ -61,39 +74,68 @@ function calcular(
   const entry = PENSIONES_MINIMAS_2026.find(e => e.tipo === tipo && e.subtipo === subtipo);
   if (!entry) return null;
 
-  // Para viudedad solo se usa unipersonal
-  const campo: SituacionFamiliar = tipo === 'viudedad' ? 'unipersonal' : situacion;
-  const pensionMinima = entry[campo];
+  // ⚠️ 2026-09-21 (hallazgo 1101): la situación familiar se leía de un estado INVISIBLE.
+  //    En viudedad el selector ni se muestra, pero `situacion` conservaba lo pulsado antes
+  //    y el LÍMITE seguía saliendo de ahí, así que quien pasara por «Con cónyuge a cargo»
+  //    arrastraba el límite de 11.013 € a una pensión que no admite cónyuge a cargo. El
+  //    mínimo sí se forzaba a unipersonal; el límite, no. Ahora la situación EFECTIVA se
+  //    calcula una vez y manda sobre las dos cosas y sobre el rótulo.
+  const situacionEfectiva: SituacionFamiliar = tipo === 'viudedad' ? 'unipersonal' : situacion;
+  const pensionMinima = entry[situacionEfectiva];
 
   if (pensionMinima <= 0) return null;
 
-  // Elegibilidad por ingresos
-  const limiteIngresos = situacion === 'conConyuge'
+  const conConyugeACargo = situacionEfectiva === 'conConyuge';
+  const limiteIngresos = conConyugeACargo
     ? COMPLEMENTO_MINIMOS_LIMITES_2026.conConyuge
     : COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge;
 
-  if (ingresosAnuales > limiteIngresos) {
+  // ⚠️ 2026-09-21 (hallazgo 1103): aquí se cortaba a cero de golpe en cuanto las rentas
+  //    pasaban del límite, y un euro de más costaba el complemento entero. El art. 9.2 del
+  //    RD 241/2026 no funciona así: cuando la suma de rentas y pensión queda por debajo de
+  //    la suma del límite y la cuantía mínima anual, se reconoce un complemento igual a esa
+  //    diferencia, repartido entre las mensualidades. El corte existe, pero está más arriba
+  //    y la caída es progresiva.
+  const minimaAnual = pensionMinima * PAGAS;
+  const pensionAnual = pensionActual * PAGAS;
+
+  const complementoIntegroAnual = Math.max(0, minimaAnual - pensionAnual);
+  const complementoDiferencialAnual = Math.max(
+    0,
+    (limiteIngresos + minimaAnual) - (ingresosAnuales + pensionAnual),
+  );
+
+  const superaLimite = ingresosAnuales > limiteIngresos;
+  const complementoAnual = superaLimite
+    ? Math.min(complementoIntegroAnual, complementoDiferencialAnual)
+    : complementoIntegroAnual;
+  const complemento = complementoAnual / PAGAS;
+
+  const base = {
+    pensionMinima,
+    entry,
+    limiteIngresos,
+    conConyugeACargo,
+    complementoDiferencial: superaLimite && complemento > 0,
+  };
+
+  if (complemento <= 0) {
     return {
-      pensionMinima,
+      ...base,
       complemento: 0,
       pensionFinal: pensionActual,
       elegible: false,
-      motivoNoElegible: `Tus ingresos anuales (${formatCurrency(ingresosAnuales).replace('€', '').trim()} €) superan el límite de ${formatCurrency(limiteIngresos)} para acceder al complemento.`,
-      entry,
+      motivoNoElegible: superaLimite
+        ? `Tus ingresos anuales (${formatCurrency(ingresosAnuales)}) superan el límite de ${formatCurrency(limiteIngresos)} en más de lo que te faltaba para llegar al mínimo, así que no queda complemento que reconocer.`
+        : 'Tu pensión actual ya iguala o supera el mínimo garantizado para tu situación.',
     };
   }
 
-  const complemento = Math.max(0, pensionMinima - pensionActual);
-
   return {
-    pensionMinima,
+    ...base,
     complemento,
     pensionFinal: pensionActual + complemento,
-    elegible: complemento > 0,
-    motivoNoElegible: complemento === 0
-      ? 'Tu pensión actual ya iguala o supera el mínimo garantizado para tu situación.'
-      : undefined,
-    entry,
+    elegible: true,
   };
 }
 
@@ -106,16 +148,42 @@ export default function EstimadorComplementoMinimosPage() {
   const [pensionActual, setPensionActual] = useState('');
   const [ingresosAnuales, setIngresosAnuales] = useState('');
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [error, setError] = useState('');
 
   const handleTipoChange = (nuevoTipo: TipoPension) => {
     setTipo(nuevoTipo);
     setSubtipo(SUBTIPOS[nuevoTipo][0].value);
     setResultado(null);
+    setError('');
   };
 
   const handleEstimar = () => {
-    const pension = parseFloat(pensionActual.replace(/\./g, '').replace(',', '.')) || 0;
-    const ingresos = parseFloat(ingresosAnuales.replace(/\./g, '').replace(',', '.')) || 0;
+    setError('');
+    // ⚠️ 2026-09-21 (hallazgos 1105-1107): el `|| 0` de `parseFloat` convertía un campo
+    //    VACÍO en una pensión de 0 € y devolvía en verde el mínimo íntegro, una cifra
+    //    rotunda nacida de cero información. Y «1100abc» entraba como 1.100 sin avisar.
+    //    `parseSpanishNumber` devuelve NaN en lo que no es un número, así que basta con
+    //    no taparlo.
+    const pension = parseSpanishNumber(pensionActual);
+    const ingresos = ingresosAnuales.trim() === '' ? NaN : parseSpanishNumber(ingresosAnuales);
+
+    if (Number.isNaN(pension)) {
+      setError('Introduce tu pensión mensual bruta actual. Si aún no cobras pensión, esta herramienta no puede estimar nada.');
+      setResultado(null); return;
+    }
+    if (pension < 0) {
+      setError('La pensión no puede ser negativa.');
+      setResultado(null); return;
+    }
+    if (Number.isNaN(ingresos)) {
+      setError('Introduce tus otros ingresos anuales. Si no tienes ninguno, escribe 0: es el dato que decide si te corresponde el complemento.');
+      setResultado(null); return;
+    }
+    if (ingresos < 0) {
+      setError('Los ingresos no pueden ser negativos.');
+      setResultado(null); return;
+    }
+
     setResultado(calcular(tipo, subtipo, situacion, pension, ingresos));
   };
 
@@ -150,8 +218,8 @@ export default function EstimadorComplementoMinimosPage() {
             <h2 className={styles.cardTitle}>Tu situación</h2>
 
             {/* Tipo de pensión */}
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Tipo de pensión</label>
+            <fieldset className={styles.formGroup}>
+              <legend className={styles.label}>Tipo de pensión</legend>
               <div className={styles.optionGrid}>
                 {([
                   { id: 'jubilacion' as const, icon: '🌅', label: 'Jubilación' },
@@ -169,7 +237,7 @@ export default function EstimadorComplementoMinimosPage() {
                   </button>
                 ))}
               </div>
-            </div>
+            </fieldset>
 
             {/* Subtipo */}
             <div className={styles.formGroup}>
@@ -190,8 +258,8 @@ export default function EstimadorComplementoMinimosPage() {
 
             {/* Situación familiar (solo si no es viudedad) */}
             {tipo !== 'viudedad' && (
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Situación familiar</label>
+              <fieldset className={styles.formGroup}>
+                <legend className={styles.label}>Situación familiar</legend>
                 <div className={styles.optionGrid}>
                   {([
                     { id: 'conConyuge' as const, label: 'Con cónyuge a cargo' },
@@ -210,9 +278,12 @@ export default function EstimadorComplementoMinimosPage() {
                   ))}
                 </div>
                 <p className={styles.hint}>
-                  &laquo;A cargo&raquo; = el cónyuge depende económicamente de ti (ingresos anuales &lt; 8.614 €)
+                  &laquo;A cargo&raquo; = convives con tu cónyuge y depende económicamente de ti. El
+                  art. 10.1.b) del RD 241/2026 lo fija en que la suma de vuestros rendimientos
+                  anuales —los de los dos, excluida tu pensión— no llegue a{' '}
+                  {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.conConyuge)}.
                 </p>
-              </div>
+              </fieldset>
             )}
 
             {/* Pensión actual */}
@@ -245,13 +316,19 @@ export default function EstimadorComplementoMinimosPage() {
               <p className={styles.hint}>Rentas de capital, alquileres, etc. (excluida tu pensión). Si no tienes, pon 0.</p>
             </div>
 
+            {error && (
+              <div role="alert" aria-live="assertive" className={styles.avisoError}>
+                <span aria-hidden="true">⚠️</span> {error}
+              </div>
+            )}
+
             <button type="button" className={styles.btn} onClick={handleEstimar}>
               Estimar complemento
             </button>
           </div>
 
           {/* ── Panel derecho: resultados ── */}
-          <div className={styles.card}>
+          <div className={styles.card} role="status" aria-live="polite">
             <h2 className={styles.cardTitle}>Resultado</h2>
 
             {!resultado ? (
@@ -286,7 +363,7 @@ export default function EstimadorComplementoMinimosPage() {
                   </div>
                   <div className={styles.desgloseItem}>
                     <span>Tu pensión actual</span>
-                    <strong>{formatCurrency(parseFloat(pensionActual.replace(/\./g, '').replace(',', '.')) || 0)}/mes</strong>
+                    <strong>{formatCurrency(resultado.pensionFinal - resultado.complemento)}/mes</strong>
                   </div>
                   <div className={styles.desgloseItem}>
                     <span>Complemento a mínimos</span>
@@ -318,10 +395,16 @@ export default function EstimadorComplementoMinimosPage() {
                   <span aria-hidden="true">💡</span>
                   <p>
                     <strong>Límite de ingresos 2026:</strong>{' '}
-                    {situacion === 'conConyuge'
-                      ? `${formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.conConyuge)}/año (con cónyuge a cargo)`
-                      : `${formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}/año (sin cónyuge a cargo)`
-                    }
+                    {formatCurrency(resultado.limiteIngresos)}/año{' '}
+                    ({resultado.conConyugeACargo ? 'con cónyuge a cargo' : 'sin cónyuge a cargo'})
+                    {resultado.complementoDiferencial && (
+                      <>
+                        {' · '}Tus ingresos lo superan, pero no tanto como para perder el
+                        complemento entero: el art. 9.2 del RD 241/2026 reconoce la diferencia
+                        entre lo que sumas (rentas + pensión) y la suma del límite más la
+                        cuantía mínima anual.
+                      </>
+                    )}
                   </p>
                 </div>
               </div>

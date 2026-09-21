@@ -78,6 +78,15 @@
 
 .formGroup { margin-bottom: var(--spacing-md); }
 
+/* Los dos grupos de botones son <fieldset>: sin el reset, el navegador les pinta su
+   propio borde y su propio padding y rompen la rejilla del formulario. */
+fieldset.formGroup {
+  border: 0;
+  padding: 0;
+  margin-inline: 0;
+  min-inline-size: 0;
+}
+
 .label {
   display: block;
   font-size: 0.9rem;
@@ -450,4 +459,26 @@
   .comparativaTable { font-size: 0.8rem; }
   .comparativaTable th, .comparativaTable td { padding: 0.5rem 0.6rem; }
   .step { gap: 0.75rem; }
+}
+
+/* ─── Aviso de datos incompletos o inválidos ──────────── */
+
+.avisoError {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: var(--spacing-sm) 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius);
+  border: 1.5px solid #e57373;
+  background: #fdecea;
+  color: #8e2a20;
+  font-size: 0.87rem;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .avisoError {
+  border-color: #b3564c;
+  background: rgba(229, 115, 115, 0.12);
+  color: #f2b8b2;
 }

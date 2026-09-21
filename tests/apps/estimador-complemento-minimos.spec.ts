@@ -20,7 +20,7 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *     `conConyuge` (cónyuge a cargo), `sinConyuge` (cónyuge NO a cargo) y `unipersonal`.
  *   · `COMPLEMENTO_MINIMOS_LIMITES_2026` — arts. 9.2 y 10.1.b) del mismo RD:
  *     sinConyuge = 9.442 €/año · conConyuge = 11.013 €/año.
- *   · `FISCAL_PENSIONES_META.verificado` = '2026-08-12' → la app debe imprimir 12/08/2026.
+ *   · `FISCAL_PENSIONES_META.verificado` = '2026-09-21' → la app debe imprimir 21/09/2026.
  *
  * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
  *
@@ -40,14 +40,13 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *       Mínimo = MINIMOS_VIUDEDAD_2026.entre60y64 = 12.262,60 / 14 = 875,90 €/mes.
  *       · Ingresos 9.442 € (JUSTO en el límite, no lo supera) → complemento 875,90 − 600,00
  *         = 275,90 €/mes. Negárselo aquí sería negarlo a quien sí le corresponde.
- *       · Ingresos 9.443 € (un euro por encima) → ya no puede reconocerse el complemento
- *         ÍNTEGRO. Lo que hoy hace la app es dejarlo en 0,00 €/mes, un acantilado de
- *         3.862,60 €/año por un euro de renta; la regla diferencial del art. 59.2 LGSS
- *         —LGSS que es la primera fuente que cita FISCAL_PENSIONES_META— daría en cambio
- *         unos 275,83 €/mes. Por eso el test NO fija aquí un importe: exige que el
- *         complemento ya no sea el íntegro y que la app nombre el límite de 9.442 €.
- *         Así sigue valiendo si algún día se implementa el art. 59.2, y sigue cazando lo
- *         que sí es inaceptable: seguir pagando 275,90 € por encima del umbral.
+ *       · Ingresos 9.443 € (un euro por encima) → ya no se debe el complemento ÍNTEGRO,
+ *         pero tampoco cero: el art. 9.2 del RD 241/2026 reconoce la diferencia entre
+ *         (rentas + pensión) y (límite + mínima anual):
+ *             (9.442 + 12.262,60) − (9.443 + 8.400) = 3.861,60 €/año = 275,83 €/mes.
+ *         Hasta el 21/09/2026 la app cortaba a cero de golpe (hallazgo 1103): un euro de
+ *         renta costaba 3.862,60 €/año. El complemento llega a cero de verdad en
+ *         13.304,60 € de rentas, que es 9.442 + lo que faltaba para el mínimo.
  *
  *   CASO 3 — SIN COMPLEMENTO (la pensión ya supera el mínimo)
  *       Jubilación ≥ 65 · «Cónyuge NO a cargo» · pensión 900,00 €/mes · otros ingresos 0.
@@ -145,9 +144,68 @@ test.describe('Estimador de Complemento a Mínimos', () => {
     expect(fuera).toContain('9442,00 €');
     // El mínimo aplicable no cambia por los ingresos: sigue siendo el de su clase de pensión.
     expect(importe(fuera, 'Pensión mínima garantizada')).toBeCloseTo(875.9, 2);
-    // Lo inaceptable es seguir reconociendo el complemento ÍNTEGRO por encima del umbral.
-    expect(importe(fuera, 'Complemento a mínimos')).toBeLessThan(275.9);
-    expect(importe(fuera, 'Complemento a mínimos')).toBeGreaterThanOrEqual(0);
+    // Hallazgo 1103 · regla diferencial del art. 9.2 RD 241/2026, no un acantilado:
+    // (9.442 + 12.262,60) − (9.443 + 8.400) = 3.861,60 €/año ÷ 14 = 275,83 €/mes.
+    expect(importe(fuera, 'Complemento a mínimos')).toBeCloseTo(275.83, 2);
+    expect(fuera).toContain('art. 9.2');
+
+    // Y llega a cero donde tiene que llegar: 9.442 + 3.862,60 = 13.304,60 € de rentas.
+    await sembrarValor(page, '#ingresosAnuales', '13305');
+    await estimar(page);
+    const agotado = await textoResultado(page);
+    expect(importe(agotado, 'Complemento a mínimos')).toBeCloseTo(0, 2);
+    expect(agotado).toContain('Sin complemento');
+  });
+
+  test('CASO 4 — hallazgo 1101: el límite no puede venir de un selector que ya no está en pantalla', async ({ page }) => {
+    await abrir(page);
+
+    // Se pulsa «Con cónyuge a cargo» y DESPUÉS se cambia a Viudedad, donde ese selector
+    // desaparece. El estado seguía vivo y arrastraba el límite de 11.013 € a una pensión
+    // que no admite cónyuge a cargo.
+    await page.getByRole('button', { name: 'Con cónyuge a cargo', exact: true }).click();
+    await page.getByRole('button', { name: /Viudedad/ }).click();
+    await page.selectOption('#subtipo', '60_a_64');
+    await sembrarValor(page, '#pensionActual', '600');
+    await sembrarValor(page, '#ingresosAnuales', '10500');
+    await estimar(page);
+
+    const texto = await textoResultado(page);
+    // El límite que se aplica es el de SIN cónyuge a cargo, y el rótulo lo dice.
+    expect(texto).toContain('9442,00 €/año (sin cónyuge a cargo)');
+    expect(texto).not.toContain('(con cónyuge a cargo)');
+    // Con el límite correcto: (9.442 + 12.262,60) − (10.500 + 8.400) = 2.804,60 €/año.
+    // Con el de 11.013 € las rentas no lo superaban y salía el íntegro, 275,90 €/mes.
+    expect(importe(texto, 'Complemento a mínimos')).toBeCloseTo(200.33, 2);
+  });
+
+  test('CASO 5 — hallazgos 1105-1107: sin datos no hay cifra, y la basura no pasa por número', async ({ page }) => {
+    await abrir(page);
+
+    // Formulario VACÍO: antes devolvía en verde el mínimo íntegro, porque `parseFloat('')`
+    // caía en `|| 0` y una pensión no introducida se trataba como una pensión de 0 €.
+    await page.getByRole('button', { name: 'Estimar complemento' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'Introduce tu pensión' })).toHaveCount(1);
+    await expect(panelResultado(page)).not.toContainText('Desglose');
+    await expect(panelResultado(page)).not.toContainText('+936,20');
+
+    // Con pensión pero sin ingresos: el dato que decide la elegibilidad tampoco se supone.
+    await sembrarValor(page, '#pensionActual', '750');
+    await page.getByRole('button', { name: 'Estimar complemento' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'otros ingresos anuales' })).toHaveCount(1);
+    await expect(panelResultado(page)).not.toContainText('Desglose');
+
+    // «1100abc» entraba como 1.100 €: `parseSpanishNumber` devuelve NaN y ya no se tapa.
+    await sembrarValor(page, '#pensionActual', '1100abc');
+    await sembrarValor(page, '#ingresosAnuales', '0');
+    await page.getByRole('button', { name: 'Estimar complemento' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'Introduce tu pensión' })).toHaveCount(1);
+
+    // Y una pensión negativa producía un complemento MAYOR que el propio mínimo.
+    await sembrarValor(page, '#pensionActual', '-500');
+    await page.getByRole('button', { name: 'Estimar complemento' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'no puede ser negativa' })).toHaveCount(1);
+    await expect(panelResultado(page)).not.toContainText('+1436,20');
   });
 
   test('CASO 3 — jubilación ≥ 65 con cónyuge NO a cargo y pensión de 900 €: sin complemento', async ({ page }) => {
@@ -186,10 +244,22 @@ test.describe('Estimador de Complemento a Mínimos', () => {
     // DataReference con el sello de FISCAL_PENSIONES_META ('2026-08-12' → 12/08/2026).
     const dataRef = page.locator('[aria-label="Datos de referencia normativos"]');
     await expect(dataRef).toContainText('RD 241/2026');
-    await expect(dataRef).toContainText('12/08/2026');
+    await expect(dataRef).toContainText('21/09/2026');
 
     // El año que anuncia la app es el del módulo que usa.
     await expect(page.locator('h1')).toHaveText('Estimador de Complemento a Mínimos');
     await expect(page.locator('body')).toContainText('Seguridad Social (2026)');
+
+    // Hallazgo 1108 · el resultado aparece en una región en vivo: antes el panel se
+    // sustituía en silencio y un lector de pantalla no se enteraba de que había resultado.
+    await expect(panelResultado(page)).toHaveAttribute('aria-live', 'polite');
+    // …y los dos grupos de botones son fieldset/legend, no un <label> huérfano.
+    await expect(page.getByRole('group', { name: 'Tipo de pensión' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Situación familiar' })).toBeVisible();
+
+    // Hallazgo 1104 · el umbral de «cónyuge a cargo» es el del art. 10.1.b) del RD
+    // 241/2026 (11.013 €), no los 8.614 € que el propio módulo declara erróneos.
+    await expect(page.locator('body')).toContainText('11.013,00 €');
+    await expect(page.locator('body')).not.toContainText('8.614');
   });
 });
