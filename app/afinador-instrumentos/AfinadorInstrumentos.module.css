@@ -810,3 +810,135 @@
     padding: 0.5rem 0.6rem;
   }
 }
+
+/* ==========================================================================
+   Familias de instrumento, transposición y tabla de referencias (21/09/2026)
+   ========================================================================== */
+
+.familiaBloque {
+  margin-bottom: 18px;
+}
+
+.familiaTitulo {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.instrumentoAviso {
+  margin: 4px 0 16px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Lo que suena frente a lo que el instrumentista lee en su partitura */
+.transposicionAviso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  background: rgba(46, 134, 171, 0.08);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.transposicionSuena,
+.transposicionLee {
+  color: var(--text-primary);
+}
+
+.transposicionLee strong {
+  color: var(--primary);
+  font-size: 1.15rem;
+}
+
+.transposicionFlecha {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.referenciasTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.referenciasCaption {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.referenciasTable th {
+  background: #2E86AB;
+  color: white;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.referenciasTable td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--text-primary);
+}
+
+.referenciasTable tr:last-child td {
+  border-bottom: none;
+}
+
+[data-theme='dark'] .transposicionAviso {
+  background: rgba(46, 134, 171, 0.18);
+  border-color: var(--accent);
+}
+
+[data-theme='dark'] .transposicionLee strong,
+[data-theme='dark'] .transposicionFlecha {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .referenciasTable th {
+  background: #1a5278;
+}
+
+[data-theme='dark'] .referenciasTable td {
+  border-bottom-color: #333;
+}
+
+@media (max-width: 600px) {
+  .transposicionAviso {
+    font-size: 0.88rem;
+    gap: 6px;
+  }
+
+  .referenciasTable th,
+  .referenciasTable td {
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+.parrafoEducativo {
+  margin: 0.8rem 0 1.2rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.parrafoEducativo strong {
+  color: var(--text-primary);
+}

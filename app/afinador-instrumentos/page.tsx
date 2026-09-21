@@ -5,73 +5,28 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AfinadorInstrumentos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
+import {
+  AFINACIONES,
+  NOTAS_ES,
+  NOTAS_EN,
+  frecuenciaDeNota,
+  notaMasCercana,
+  notaEscritaDesdeReal,
+  nombreNota,
+  type FamiliaInstrumento,
+} from '@/lib/calculadoras/afinacionInstrumentos';
 
-// Notas y frecuencias (A4 = 440Hz)
-const NOTAS = ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si'];
-const NOTAS_EN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+// Las afinaciones, la transposición de los instrumentos que no suenan donde leen y la
+// conversión nota↔frecuencia viven en el motor, probado aparte: un signo al revés en la
+// transposición da una nota igual de plausible en pantalla y no se ve sin un instrumento
+// delante. Aquí solo queda la captura de audio, que sí necesita navegador.
 
-interface AfinacionInstrumento {
-  nombre: string;
-  cuerdas: { nota: string; octava: number; frecuencia: number }[];
-}
-
-const INSTRUMENTOS: AfinacionInstrumento[] = [
-  {
-    nombre: 'Guitarra estándar',
-    cuerdas: [
-      { nota: 'Mi', octava: 4, frecuencia: 329.63 },
-      { nota: 'Si', octava: 3, frecuencia: 246.94 },
-      { nota: 'Sol', octava: 3, frecuencia: 196.00 },
-      { nota: 'Re', octava: 3, frecuencia: 146.83 },
-      { nota: 'La', octava: 2, frecuencia: 110.00 },
-      { nota: 'Mi', octava: 2, frecuencia: 82.41 },
-    ]
-  },
-  {
-    nombre: 'Bajo 4 cuerdas',
-    cuerdas: [
-      { nota: 'Sol', octava: 2, frecuencia: 98.00 },
-      { nota: 'Re', octava: 2, frecuencia: 73.42 },
-      { nota: 'La', octava: 1, frecuencia: 55.00 },
-      { nota: 'Mi', octava: 1, frecuencia: 41.20 },
-    ]
-  },
-  {
-    nombre: 'Ukelele estándar',
-    cuerdas: [
-      { nota: 'La', octava: 4, frecuencia: 440.00 },
-      { nota: 'Mi', octava: 4, frecuencia: 329.63 },
-      { nota: 'Do', octava: 4, frecuencia: 261.63 },
-      { nota: 'Sol', octava: 4, frecuencia: 392.00 },
-    ]
-  },
-  {
-    nombre: 'Violín',
-    cuerdas: [
-      { nota: 'Mi', octava: 5, frecuencia: 659.26 },
-      { nota: 'La', octava: 4, frecuencia: 440.00 },
-      { nota: 'Re', octava: 4, frecuencia: 293.66 },
-      { nota: 'Sol', octava: 3, frecuencia: 196.00 },
-    ]
-  },
+const FAMILIAS: { id: FamiliaInstrumento; titulo: string; icono: string }[] = [
+  { id: 'cuerda', titulo: 'Cuerda', icono: '🎸' },
+  { id: 'viento', titulo: 'Viento', icono: '🎺' },
+  { id: 'tecla', titulo: 'Tecla', icono: '🎹' },
 ];
-
-// Función para obtener la frecuencia de una nota
-function getFrecuenciaNota(nota: number, octava: number, a4: number = 440): number {
-  return a4 * Math.pow(2, (nota - 9 + (octava - 4) * 12) / 12);
-}
-
-// Función para obtener la nota más cercana a una frecuencia
-function getNotaMasCercana(frecuencia: number, a4: number = 440): { nota: number; octava: number; cents: number; frecuenciaExacta: number } {
-  const semitonosDesdeA4 = 12 * Math.log2(frecuencia / a4);
-  const semitonoRedondeado = Math.round(semitonosDesdeA4);
-  const nota = ((semitonoRedondeado % 12) + 12 + 9) % 12; // +9 para empezar en Do
-  const octava = Math.floor((semitonoRedondeado + 9) / 12) + 4;
-  const frecuenciaExacta = getFrecuenciaNota(nota, octava, a4);
-  const cents = Math.round(1200 * Math.log2(frecuencia / frecuenciaExacta));
-
-  return { nota, octava, cents, frecuenciaExacta };
-}
 
 // Algoritmo de autocorrelación para detectar pitch
 function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
@@ -123,7 +78,7 @@ export default function AfinadorInstrumentosPage() {
   const [escuchando, setEscuchando] = useState(false);
   const [frecuenciaDetectada, setFrecuenciaDetectada] = useState<number | null>(null);
   const [notaActual, setNotaActual] = useState<{ nota: number; octava: number; cents: number } | null>(null);
-  const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState(0);
+  const [instrumentoId, setInstrumentoId] = useState(AFINACIONES[0].id);
   const [a4Referencia, setA4Referencia] = useState(440);
   const [permisoMicrofono, setPermisoMicrofono] = useState<'granted' | 'denied' | 'prompt'>('prompt');
 
@@ -139,9 +94,11 @@ export default function AfinadorInstrumentosPage() {
     analyserRef.current.getFloatTimeDomainData(bufferRef.current as Float32Array<ArrayBuffer>);
     const frecuencia = autoCorrelate(bufferRef.current, audioContextRef.current!.sampleRate);
 
-    if (frecuencia > 0 && frecuencia < 2000) {
+    // Hasta 2.500 Hz: el registro agudo de la flauta (Do7 = 2.093 Hz) y las teclas altas
+    // del piano se salian del limite anterior de 2.000 Hz y la pantalla se quedaba muda.
+    if (frecuencia > 0 && frecuencia < 2500) {
       setFrecuenciaDetectada(frecuencia);
-      const info = getNotaMasCercana(frecuencia, a4Referencia);
+      const info = notaMasCercana(frecuencia, a4Referencia);
       setNotaActual(info);
     } else {
       setFrecuenciaDetectada(null);
@@ -203,7 +160,14 @@ export default function AfinadorInstrumentosPage() {
   };
 
   const estado = getEstadoAfinacion();
-  const instrumento = INSTRUMENTOS[instrumentoSeleccionado];
+  const instrumento = AFINACIONES.find((a) => a.id === instrumentoId) ?? AFINACIONES[0];
+  const transpone = instrumento.transposicion !== 0;
+  // Lo que el instrumentista LEE cuando suena la nota detectada: una trompeta en si bemol
+  // que toca su Do escrito hace sonar un Si bemol, y sin esta linea el afinador le contesta
+  // con una nota que no es la que tiene delante en la partitura.
+  const notaEscrita = notaActual && transpone
+    ? notaEscritaDesdeReal({ nota: notaActual.nota, octava: notaActual.octava }, instrumento.transposicion)
+    : null;
 
   return (
     <div className={styles.container}>
@@ -212,7 +176,8 @@ export default function AfinadorInstrumentosPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Afinador de Instrumentos</h1>
         <p className={styles.subtitle}>
-          Afinador cromático con detección automática
+          Afinador cromático de cuerda, viento y tecla. Con los instrumentos transpositores
+          te dice también qué nota estás leyendo tú
         </p>
       </header>
 
@@ -224,7 +189,7 @@ export default function AfinadorInstrumentosPage() {
         <div className={`${styles.notaDisplay} ${estado ? styles[estado] : ''}`}>
           {notaActual ? (
             <>
-              <span className={styles.notaNombre}>{NOTAS[notaActual.nota]}</span>
+              <span className={styles.notaNombre}>{NOTAS_ES[notaActual.nota]}</span>
               <span className={styles.notaOctava}>{notaActual.octava}</span>
               <span className={styles.notaEn}>({NOTAS_EN[notaActual.nota]})</span>
             </>
@@ -232,6 +197,28 @@ export default function AfinadorInstrumentosPage() {
             <span className={styles.notaVacia}>--</span>
           )}
         </div>
+
+        {/* Traducción para instrumentos transpositores */}
+        {transpone && (
+          <div className={styles.transposicionAviso} role="status" aria-live="polite">
+            {notaEscrita ? (
+              <>
+                <span className={styles.transposicionSuena}>
+                  Suena <strong>{nombreNota({ nota: notaActual!.nota, octava: notaActual!.octava })}</strong> real
+                </span>
+                <span className={styles.transposicionFlecha} aria-hidden="true">→</span>
+                <span className={styles.transposicionLee}>
+                  tú lees <strong>{nombreNota(notaEscrita)}</strong>
+                </span>
+              </>
+            ) : (
+              <span className={styles.transposicionSuena}>
+                {instrumento.nombre}: lo que suena va {Math.abs(instrumento.transposicion)} semitonos
+                por debajo de lo que lees
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Indicador de cents */}
         <div className={styles.centsContainer}>
@@ -264,7 +251,7 @@ export default function AfinadorInstrumentosPage() {
         <div className={styles.frecuenciaInfo}>
           <span className={styles.frecuenciaLabel}>Frecuencia:</span>
           <span className={styles.frecuenciaValor}>
-            {frecuenciaDetectada ? `${frecuenciaDetectada.toFixed(1)} Hz` : '-- Hz'}
+            {frecuenciaDetectada ? `${formatNumber(frecuenciaDetectada, 1)} Hz` : '-- Hz'}
           </span>
         </div>
 
@@ -299,30 +286,72 @@ export default function AfinadorInstrumentosPage() {
       {/* Selección de instrumento */}
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Instrumento</h3>
-        <div className={styles.instrumentosGrid}>
-          {INSTRUMENTOS.map((inst, idx) => (
-            <button
-              key={inst.nombre}
-              type="button"
-              className={`${styles.instrumentoBtn} ${instrumentoSeleccionado === idx ? styles.instrumentoActivo : ''}`}
-              onClick={() => setInstrumentoSeleccionado(idx)}
-              aria-pressed={instrumentoSeleccionado === idx}
-            >
-              {inst.nombre}
-            </button>
-          ))}
-        </div>
-
-        {/* Cuerdas del instrumento */}
-        <div className={styles.cuerdasGrid}>
-          {instrumento.cuerdas.map((cuerda, idx) => (
-            <div key={idx} className={styles.cuerdaItem}>
-              <span className={styles.cuerdaNumero}>{idx + 1}</span>
-              <span className={styles.cuerdaNota}>{cuerda.nota}{cuerda.octava}</span>
-              <span className={styles.cuerdaFrec}>{cuerda.frecuencia.toFixed(1)} Hz</span>
+        {FAMILIAS.map((familia) => (
+          <div key={familia.id} className={styles.familiaBloque}>
+            <h4 className={styles.familiaTitulo}>
+              <span aria-hidden="true">{familia.icono}</span> {familia.titulo}
+            </h4>
+            <div className={styles.instrumentosGrid}>
+              {AFINACIONES.filter((a) => a.familia === familia.id).map((inst) => (
+                <button
+                  key={inst.id}
+                  type="button"
+                  className={`${styles.instrumentoBtn} ${instrumentoId === inst.id ? styles.instrumentoActivo : ''}`}
+                  onClick={() => setInstrumentoId(inst.id)}
+                  aria-pressed={instrumentoId === inst.id}
+                >
+                  {inst.nombre}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+
+        {instrumento.aviso && <p className={styles.instrumentoAviso}>{instrumento.aviso}</p>}
+
+        {/* Cuerdas al aire: las frecuencias salen del La4 elegido, no de una tabla fija */}
+        {instrumento.cuerdas && (
+          <div className={styles.cuerdasGrid}>
+            {instrumento.cuerdas.map((cuerda, idx) => (
+              <div key={`${cuerda.nota}-${cuerda.octava}-${idx}`} className={styles.cuerdaItem}>
+                <span className={styles.cuerdaNumero}>{idx + 1}</span>
+                <span className={styles.cuerdaNota}>{nombreNota(cuerda)}</span>
+                <span className={styles.cuerdaFrec}>
+                  {formatNumber(frecuenciaDeNota(cuerda.nota, cuerda.octava, a4Referencia), 1)} Hz
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Notas de afinación de un viento o una tecla, con su equivalente escrito */}
+        {instrumento.referencias && (
+          <div className={styles.tableWrapper}>
+            <table className={styles.referenciasTable}>
+              <caption className={styles.referenciasCaption}>
+                {transpone
+                  ? 'Notas de afinación habituales: lo que suena y lo que tú lees para darlo'
+                  : 'Notas de afinación habituales'}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Suena (real)</th>
+                  {transpone && <th scope="col">Tú lees</th>}
+                  <th scope="col">Frecuencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {instrumento.referencias.map((ref) => (
+                  <tr key={`${ref.nota}-${ref.octava}`}>
+                    <td><strong>{nombreNota(ref)}</strong></td>
+                    {transpone && <td>{nombreNota(notaEscritaDesdeReal(ref, instrumento.transposicion))}</td>}
+                    <td>{formatNumber(frecuenciaDeNota(ref.nota, ref.octava, a4Referencia), 1)} Hz</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Referencia A4 */}
@@ -420,6 +449,34 @@ export default function AfinadorInstrumentosPage() {
                 <td>El Si0 puede ser difícil de detectar por el micrófono</td>
               </tr>
               <tr>
+                <td><strong>Viola</strong></td>
+                <td>Do3, Sol3, Re4, La4</td>
+                <td>131 – 440 Hz</td>
+                <td><span aria-hidden="true">⭐⭐⭐</span> Alta</td>
+                <td>Una quinta por debajo del violín: no la afines de oído con él</td>
+              </tr>
+              <tr>
+                <td><strong>Bandurria</strong></td>
+                <td>Sol#3, Do#4, Fa#4, Si4, Mi5, La5</td>
+                <td>208 – 880 Hz</td>
+                <td><span aria-hidden="true">⭐⭐⭐</span> Alta</td>
+                <td>Seis órdenes dobles: afina cada par al unísono exacto</td>
+              </tr>
+              <tr>
+                <td><strong>Laúd español</strong></td>
+                <td>Sol#2, Do#3, Fa#3, Si3, Mi4, La4</td>
+                <td>104 – 440 Hz</td>
+                <td><span aria-hidden="true">⭐⭐⭐</span> Alta</td>
+                <td>Igual que la bandurria, una octava por debajo</td>
+              </tr>
+              <tr>
+                <td><strong>Vihuela mexicana</strong></td>
+                <td>La3, Re4, Sol4, Si3, Mi4</td>
+                <td>220 – 392 Hz</td>
+                <td><span aria-hidden="true">⭐⭐</span> Media</td>
+                <td>Reentrante: la 3ª (Sol4) es la más aguda de las cinco</td>
+              </tr>
+              <tr>
                 <td><strong>Banjo 5 cuerdas</strong></td>
                 <td>Sol4, Re3, Sol3, Si3, Re4</td>
                 <td>196 – 392 Hz</td>
@@ -430,11 +487,92 @@ export default function AfinadorInstrumentosPage() {
           </table>
         </div>
 
+        {/* Instrumentos transpositores */}
+        <h3 className={styles.sectionTitle}>
+          <span aria-hidden="true">🎺</span> Por qué el afinador te dice otra nota (instrumentos transpositores)
+        </h3>
+        <p className={styles.parrafoEducativo}>
+          Un afinador cromático nombra la nota que <strong>suena</strong>. En trompeta, clarinete o
+          saxo, la nota que suena no es la que está escrita en tu papel: son instrumentos
+          transpositores. Si tocas tu <strong>Do</strong> con una trompeta en si bemol, el aire hace
+          sonar un <strong>Si bemol</strong> real, y eso es exactamente lo que el afinador escribe en
+          pantalla. No está equivocado ni tú tampoco: selecciona tu instrumento arriba y el
+          afinador añade debajo la nota que tú estás leyendo.
+        </p>
+        <div className={styles.tableWrapper}>
+          <table className={styles.comparativaTable}>
+            <thead>
+              <tr>
+                <th>Instrumento</th>
+                <th>Afinación</th>
+                <th>Lo que suena</th>
+                <th>Tocas tu…</th>
+                <th>…y suena</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Trompeta</strong></td>
+                <td>Si bemol</td>
+                <td>Un tono por debajo (2 semitonos)</td>
+                <td>Do4</td>
+                <td>Si bemol 3 — 233,1 Hz</td>
+              </tr>
+              <tr>
+                <td><strong>Clarinete</strong></td>
+                <td>Si bemol</td>
+                <td>Un tono por debajo (2 semitonos)</td>
+                <td>Do4</td>
+                <td>Si bemol 3 — 233,1 Hz</td>
+              </tr>
+              <tr>
+                <td><strong>Saxo alto</strong></td>
+                <td>Mi bemol</td>
+                <td>Una sexta mayor por debajo (9 semitonos)</td>
+                <td>Sol4</td>
+                <td>Si bemol 3 — 233,1 Hz</td>
+              </tr>
+              <tr>
+                <td><strong>Saxo tenor</strong></td>
+                <td>Si bemol</td>
+                <td>Una novena mayor por debajo (14 semitonos)</td>
+                <td>Do5</td>
+                <td>Si bemol 3 — 233,1 Hz</td>
+              </tr>
+              <tr>
+                <td><strong>Flauta travesera</strong></td>
+                <td>Do</td>
+                <td>Tal como se escribe</td>
+                <td>La4</td>
+                <td>La4 — 440,0 Hz</td>
+              </tr>
+              <tr>
+                <td><strong>Trombón</strong></td>
+                <td>Do</td>
+                <td>Tal como se escribe (clave de fa)</td>
+                <td>Si bemol 2</td>
+                <td>Si bemol 2 — 116,5 Hz</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className={styles.parrafoEducativo}>
+          Por eso, cuando en una banda se dice «afinamos al si bemol», cada instrumento toca una
+          nota escrita distinta y todos hacen sonar la misma: el si bemol de concierto. La columna
+          «Tocas tu…» de la tabla es justo esa traducción.
+        </p>
+
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <h3>🎸 Principiante con guitarra</h3>
             <p>Selecciona &quot;Guitarra estándar&quot; para ver las 6 notas y frecuencias exactas. Toca cuerda por cuerda y observa el indicador: verde = afinado, rojo = ajusta la clavija.</p>
+          </div>
+          <div className={styles.escenarioCard}>
+            <h3><span aria-hidden="true">🎺</span> Viento en la banda</h3>
+            <p>Selecciona trompeta, clarinete o saxo y toca tu nota de afinación. El afinador te
+            dice la nota real que sale del instrumento y, debajo, la que tú estás leyendo: así
+            sabes si el problema es la embocadura o la posición de la bomba.</p>
           </div>
           <div className={styles.escenarioCard}>
             <h3>🎵 Músico en ensayo</h3>
