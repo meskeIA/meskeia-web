@@ -351,6 +351,21 @@
   border-collapse: collapse;
 }
 
+/*
+  Aviso de uso bajo los tiempos que existen pero apenas se usan (pretérito anterior,
+  futuro de subjuntivo). Sin esta línea, «hubo cantado» y «había cantado» se presentan
+  al estudiante como igual de corrientes, que es justo lo que no son. El color y el
+  tamaño la ponen por debajo del paradigma: es contexto, no una forma más.
+*/
+.tiempoNota {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  border-top: 1px dashed var(--border);
+  padding-top: var(--spacing-sm);
+}
+
 .conjugationTable tr {
   border-bottom: 1px solid var(--border);
 }

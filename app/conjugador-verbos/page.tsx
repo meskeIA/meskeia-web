@@ -13,14 +13,15 @@ import {
   obtenerVerbosIrregulares,
   PRONOMBRES,
   TIEMPOS,
-  ConjugacionCompleta,
+  NOTAS_TIEMPO,
+  ConjugacionConCompuestos,
 } from './motorConjugacion';
 
 type ModoVista = 'indicativo' | 'subjuntivo' | 'imperativo';
 
 export default function ConjugadorVerbosPage() {
   const [busqueda, setBusqueda] = useState('');
-  const [conjugacion, setConjugacion] = useState<ConjugacionCompleta | null>(null);
+  const [conjugacion, setConjugacion] = useState<ConjugacionConCompuestos | null>(null);
   const [sugerencias, setSugerencias] = useState<string[]>([]);
   const [modoVista, setModoVista] = useState<ModoVista>('indicativo');
   const [error, setError] = useState('');
@@ -218,6 +219,9 @@ export default function ConjugadorVerbosPage() {
                         ))}
                       </tbody>
                     </table>
+                    {NOTAS_TIEMPO.indicativo[tiempo] && (
+                      <p className={styles.tiempoNota}>{NOTAS_TIEMPO.indicativo[tiempo]}</p>
+                    )}
                   </div>
                 ))}
               </>
@@ -240,6 +244,9 @@ export default function ConjugadorVerbosPage() {
                         ))}
                       </tbody>
                     </table>
+                    {NOTAS_TIEMPO.subjuntivo[tiempo] && (
+                      <p className={styles.tiempoNota}>{NOTAS_TIEMPO.subjuntivo[tiempo]}</p>
+                    )}
                   </div>
                 ))}
               </>
@@ -287,7 +294,7 @@ export default function ConjugadorVerbosPage() {
         <div className={styles.irregularSection}>
           <h2 className={styles.sectionTitle}><span aria-hidden="true">📚</span> Verbos irregulares disponibles</h2>
           <p className={styles.sectionSubtitle}>
-            Más de 60 verbos irregulares con conjugación completa verificada
+            {obtenerVerbosIrregulares().length} verbos irregulares con conjugación verificada; los regulares se conjugan solos
           </p>
           <div className={styles.irregularGrid}>
             {obtenerVerbosIrregulares().map((verbo) => (
@@ -357,14 +364,14 @@ export default function ConjugadorVerbosPage() {
                   <td><strong>Indicativo</strong></td>
                   <td>Expresar hechos, acciones reales y certezas</td>
                   <td><em>Yo como, comí, comeré</em></td>
-                  <td>Presente, pretérito perfecto, indefinido, imperfecto, futuro, condicional</td>
+                  <td>Diez: cinco simples (presente, imperfecto, indefinido, futuro, condicional) y sus cinco compuestos</td>
                   <td>Enuncia realidades objetivas</td>
                 </tr>
                 <tr>
                   <td><strong>Subjuntivo</strong></td>
                   <td>Deseos, dudas, hipótesis, emociones, posibilidades</td>
                   <td><em>Quiero que comas, ojalá comiera</em></td>
-                  <td>Presente subjuntivo, imperfecto subjuntivo</td>
+                  <td>Seis: presente, imperfecto y futuro, cada uno con su compuesto</td>
                   <td>Casi siempre aparece en cláusula subordinada con &quot;que&quot;</td>
                 </tr>
                 <tr>
@@ -617,7 +624,7 @@ export default function ConjugadorVerbosPage() {
               <div className={styles.tipItem}>El gerundio siempre termina en -ando (1ª conj.) o -iendo (2ª y 3ª).</div>
               <div className={styles.tipItem}>El futuro y el condicional de verbos regulares comparten la misma raíz (el infinitivo completo).</div>
               <div className={styles.tipItem}>Los verbos reflexivos llevan pronombres: me, te, se, nos, os, se — antes del verbo conjugado.</div>
-              <div className={styles.tipItem}>Practica los tiempos compuestos: haber + participio (he comido, había hecho, habrá visto).</div>
+              <div className={styles.tipItem}>Los tiempos compuestos son siempre haber + participio, y el participio no cambia nunca: «las cartas que he escrito», no «escritas».</div>
             </div>
             <div className={styles.errorsColumn}>
               <div className={styles.errorsHeader}>✗ Errores comunes</div>

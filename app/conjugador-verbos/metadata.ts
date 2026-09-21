@@ -36,7 +36,16 @@ export const jsonLd = generateWebAppSchema({
   description: "Conjugador completo de verbos en español. Todos los tiempos verbales: indicativo, subjuntivo, imperativo. Incluye verbos irregulares. Gratis y sin registro.",
   url: "https://meskeia.com/conjugador-verbos/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Los 17 tiempos verbales de la RAE: 10 de indicativo, 6 de subjuntivo y el imperativo',
+    'Tiempos compuestos completos, con el participio irregular de cada verbo (he dicho, hubiera vuelto)',
+    'Futuro de subjuntivo, simple y compuesto (fuere, hubiere cantado), marcado como arcaico',
+    'Pretérito anterior con su nota de uso: cuándo aparece y por qué casi no se ve',
+    'Más de 70 verbos irregulares con conjugación verificada, y conjugación automática de los regulares',
+    'Buscador con sugerencias a partir de dos letras',
+    'Gerundio y participio de cada verbo',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+  ],
 });
 
 export const faqJsonLd = {
@@ -46,7 +55,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Cuántos tiempos verbales tiene el español?',
-      acceptedAnswer: { '@type': 'Answer', text: 'El español cuenta con 17 tiempos verbales simples y 17 compuestos reconocidos por la RAE, distribuidos en tres modos: indicativo (10 tiempos simples), subjuntivo (6 tiempos) e imperativo (1 tiempo). Entre los más usados están el presente, el pretérito indefinido, el imperfecto, el futuro simple y el condicional. El español también dispone de tiempos compuestos formados con el auxiliar "haber" (he comido, había llegado, habrá terminado).' },
+      acceptedAnswer: { '@type': 'Answer', text: 'El español tiene 17 tiempos verbales según la RAE, repartidos en tres modos: indicativo (10), subjuntivo (6) e imperativo (1). De esos 17, nueve son simples y ocho son compuestos, formados siempre con el auxiliar "haber" más el participio (he comido, había llegado, habré terminado). El indicativo empareja cada tiempo simple con su compuesto: presente y pretérito perfecto compuesto, imperfecto y pluscuamperfecto, indefinido y pretérito anterior, futuro simple y futuro perfecto, condicional simple y condicional perfecto.' },
     },
     {
       '@type': 'Question',
