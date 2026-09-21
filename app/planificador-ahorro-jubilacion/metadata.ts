@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Cuántos años hay que cotizar para recibir el 100% de la pensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para percibir el 100% de la base reguladora se necesitan actualmente 36 años y 9 meses cotizados (36,75 años), un periodo transitorio fijado por la Ley 21/2021 que aumenta progresivamente cada año. Con menos años cotizados se aplican porcentajes reductores: entre 15 y 36 años, la pensión oscila entre el 50% y el 99,2%. El mínimo para acceder a la jubilación ordinaria es 15 años cotizados, de los cuales 2 deben estar en los últimos 15 años.',
+        text: 'Para percibir el 100% de la base reguladora se necesitan en 2026 un total de 36 años y 6 meses cotizados (36,5 años), un periodo transitorio fijado por la Ley 21/2021 que aumenta escalón a escalón hasta los 37 años de 2027. Con menos años cotizados se aplican porcentajes reductores: entre 15 y 36 años, la pensión oscila entre el 50% y el 98,86%. El mínimo para acceder a la jubilación ordinaria es 15 años cotizados, de los cuales 2 deben estar en los últimos 15 años.',
       },
     },
     {

@@ -568,7 +568,7 @@ export default function VisualizadorSistemaPensiones() {
             </li>
             <li>
               <strong>Porcentaje aplicable</strong>: mínimo 15 años cotizados para acceder (50%).
-              Se necesitan 36 años y 9 meses cotizados para cobrar el 100% (en 2026; alcanzará los 37 años en 2027).
+              Se necesitan 36 años y 6 meses cotizados para cobrar el 100% (en 2026; alcanzará los 37 años en 2027).
             </li>
             <li>
               <strong>Edad de jubilación</strong>: en 2026, con 66 años y 10 meses (o 65 si se acreditan 38 años y 3 meses).

@@ -13,14 +13,14 @@ import {
   NumberInput,
   ShareCard, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { calcularPorcentajePension } from '@/lib/calculadoras/pensionPublica';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_PENSIONES_META,
   TABLA_EDAD_JUBILACION,
   getEdadJubilacion,
   COTIZACION_MINIMA,
-  TRAMOS_PORCENTAJE_PENSION_2025,
   LIMITES_PENSION_2025,
   BASE_REGULADORA,
   BASES_SS_2026,
@@ -31,6 +31,7 @@ import {
   REQUISITOS_ANTICIPADA_VOLUNTARIA,
   REQUISITOS_JUBILACION_PARCIAL,
   JUBILACION_PARCIAL_META,
+  COMPLEMENTO_MINIMOS_LIMITES_2026,
   edadMinimaJubilacionParcial,
   getCoeficienteAnticipada,
 } from '@/data/fiscal';
@@ -53,7 +54,8 @@ interface ResultadoFormula {
   baseReguladora: number;
   pensionBrutaMensual: number;
   pensionBrutaAnual: number;
-  limitada: boolean;
+  /** La cuantía llegaba por encima del tope máximo de pensión y se ha recortado */
+  topeAplicado: boolean;
 }
 
 interface ResultadoPension {
@@ -63,9 +65,12 @@ interface ResultadoPension {
   diferenciaMensual: number;
   porcentajeAplicable: number;
   edadOrdinaria: string;
-  mesesParaCien: number;
+  /** Meses que aún faltan para llegar al 100 % (0 si ya se alcanzó) */
+  mesesQueFaltanParaCien: number;
   porcentajeSobreMaxima: number;
   pensionMensualFinal: number;
+  /** La pensión estimada queda por debajo de la mínima de referencia */
+  bajoMinimo: boolean;
 }
 
 type TipoAnticipada = 'voluntaria' | 'involuntaria';
@@ -149,69 +154,73 @@ function calcularEdadJubilacion(anioNacimiento: number, anosCotizados: number): 
 // LÓGICA: PENSIÓN
 // ──────────────────────────────────────────────────────────────────────────────
 
-function calcularPorcentajePension(mesesCotizados: number): number {
-  if (mesesCotizados < COTIZACION_MINIMA.mesesMinimosAcceso) return 0;
-  let porcentaje = 50;
-  for (const tramo of TRAMOS_PORCENTAJE_PENSION_2025) {
-    if (mesesCotizados <= tramo.mesesDesde) break;
-    const mesesEnTramo = Math.min(mesesCotizados, tramo.mesesHasta) - tramo.mesesDesde;
-    if (mesesEnTramo > 0) porcentaje += mesesEnTramo * tramo.incrementoPorMes;
-  }
-  return Math.min(100, porcentaje);
-}
-
-function calcularEdadOrdinaria(mesesCotizados: number): string {
-  const datos2026 = getEdadJubilacion(2026);
-  const cotMinMeses = datos2026.cotizacionPara65.anios * 12 + datos2026.cotizacionPara65.meses;
+/**
+ * Edad ordinaria que corresponde al AÑO en que esta persona se jubila, no a 2026.
+ * Antes tomaba `getEdadJubilacion(2026)` fijo, así que a quien se jubila en 2030 le
+ * anunciaba el escalón de 2026 (hallazgo 1097 del Inspector).
+ */
+function calcularEdadOrdinaria(mesesCotizados: number, anioJubilacion: number): string {
+  const datos = getEdadJubilacion(anioJubilacion);
+  const cotMinMeses = datos.cotizacionPara65.anios * 12 + datos.cotizacionPara65.meses;
   if (mesesCotizados >= cotMinMeses) return '65 años';
-  const e = datos2026.edadSinCotizacion;
+  const e = datos.edadSinCotizacion;
   return e.meses > 0 ? `${e.anios} años y ${e.meses} meses` : `${e.anios} años`;
 }
 
-function aplicarLimites(pensionBruta: number): { pension: number; limitada: boolean } {
-  const pension = Math.max(
-    LIMITES_PENSION_2025.minimaSinConyuge,
-    Math.min(LIMITES_PENSION_2025.maximaMensual, pensionBruta)
-  );
-  return { pension, limitada: pension !== pensionBruta };
+/**
+ * Único límite incondicional: el TOPE MÁXIMO de pensión (art. 57 LGSS).
+ *
+ * ⚠️ 2026-09-21 (hallazgo 1089): aquí había además un suelo que elevaba al mínimo
+ *    cualquier pensión menor. El complemento a mínimos no es automático —exige rentas
+ *    bajo COMPLEMENTO_MINIMOS_LIMITES_2026 y tiene tres cuantías según con quién se
+ *    conviva, nada de lo cual pregunta esta app—, de modo que ese suelo publicaba una
+ *    pensión POR ENCIMA de su propia base reguladora. Y se deshacía en el paso siguiente:
+ *    la reducción por anticipada se aplicaba sobre la cuantía ya elevada y volvía a dejarla
+ *    por debajo del mínimo que se acababa de «garantizar» (hallazgo 1094). Lo que procede
+ *    es no tocar la cuantía y AVISAR de que puede haber derecho a complemento.
+ */
+function aplicarTopeMaximo(pensionBruta: number): { pension: number; topeAplicado: boolean } {
+  const pension = Math.min(LIMITES_PENSION_2025.maximaMensual, pensionBruta);
+  return { pension, topeAplicado: pension !== pensionBruta };
 }
 
-function estimarPension(baseMensualMedia: number, anosCotizados: number): ResultadoPension {
+function estimarPension(baseMensualMedia: number, anosCotizados: number, anioJubilacion: number): ResultadoPension {
   const mesesCotizados = Math.round(anosCotizados * 12);
+  // El porcentaje sale del motor compartido: tenerlo aquí duplicado es lo que permitió
+  // que la app y el MCP dieran porcentajes distintos para el mismo perfil (hallazgo 1093).
   const porcentajeAplicable = calcularPorcentajePension(mesesCotizados);
 
   const brClasica = baseMensualMedia * BASE_REGULADORA.factor;
-  const pensionClasica = brClasica * (porcentajeAplicable / 100);
-  const limClasica = aplicarLimites(pensionClasica);
+  const topeClasica = aplicarTopeMaximo(brClasica * (porcentajeAplicable / 100));
 
-  const dualParams = getSistemaDualParams(2026);
+  const dualParams = getSistemaDualParams(anioJubilacion);
   const brDual = baseMensualMedia * (dualParams.basesSeleccionadas / dualParams.divisor);
-  const pensionDual = brDual * (porcentajeAplicable / 100);
-  const limDual = aplicarLimites(pensionDual);
+  const topeDual = aplicarTopeMaximo(brDual * (porcentajeAplicable / 100));
 
-  const mejorEsClasica = limClasica.pension >= limDual.pension;
-  const pensionFinal = mejorEsClasica ? limClasica.pension : limDual.pension;
+  const mejorEsClasica = topeClasica.pension >= topeDual.pension;
+  const pensionFinal = mejorEsClasica ? topeClasica.pension : topeDual.pension;
 
   return {
     clasica: {
       baseReguladora: brClasica,
-      pensionBrutaMensual: limClasica.pension,
-      pensionBrutaAnual: limClasica.pension * 14,
-      limitada: limClasica.limitada,
+      pensionBrutaMensual: topeClasica.pension,
+      pensionBrutaAnual: topeClasica.pension * 14,
+      topeAplicado: topeClasica.topeAplicado,
     },
     dual: {
       baseReguladora: brDual,
-      pensionBrutaMensual: limDual.pension,
-      pensionBrutaAnual: limDual.pension * 14,
-      limitada: limDual.limitada,
+      pensionBrutaMensual: topeDual.pension,
+      pensionBrutaAnual: topeDual.pension * 14,
+      topeAplicado: topeDual.topeAplicado,
     },
     formulaAplicada: mejorEsClasica ? 'clasica' : 'dual',
-    diferenciaMensual: Math.abs(limClasica.pension - limDual.pension),
+    diferenciaMensual: Math.abs(topeClasica.pension - topeDual.pension),
     porcentajeAplicable,
-    edadOrdinaria: calcularEdadOrdinaria(mesesCotizados),
-    mesesParaCien: COTIZACION_MINIMA.mesesParaCien,
+    edadOrdinaria: calcularEdadOrdinaria(mesesCotizados, anioJubilacion),
+    mesesQueFaltanParaCien: Math.max(0, COTIZACION_MINIMA.mesesParaCien - mesesCotizados),
     porcentajeSobreMaxima: (pensionFinal / LIMITES_PENSION_2025.maximaMensual) * 100,
     pensionMensualFinal: pensionFinal,
+    bajoMinimo: pensionFinal < LIMITES_PENSION_2025.minimaSinConyuge,
   };
 }
 
@@ -269,6 +278,15 @@ function orientarAnticipada(
 // ──────────────────────────────────────────────────────────────────────────────
 // LÓGICA: JUBILACIÓN PARCIAL
 // ──────────────────────────────────────────────────────────────────────────────
+
+/** Pasa un número de meses a texto «3 años y 2 meses» */
+function mesesATexto(meses: number): string {
+  const anios = Math.floor(meses / 12);
+  const resto = meses % 12;
+  if (anios === 0) return `${resto} ${resto === 1 ? 'mes' : 'meses'}`;
+  if (resto === 0) return `${anios} ${anios === 1 ? 'año' : 'años'}`;
+  return `${anios} ${anios === 1 ? 'año' : 'años'} y ${resto} ${resto === 1 ? 'mes' : 'meses'}`;
+}
 
 /** Pasa una edad en años decimales a texto «63 años y 10 meses» */
 function edadATexto(edadDecimal: number): string {
@@ -347,6 +365,14 @@ export default function SimuladorJubilacionPublicaPage() {
   const [showParcial, setShowParcial] = useState(false);
   const [reduccionJornada, setReduccionJornada] = useState('50');
   const [salarioBruto, setSalarioBruto] = useState('');
+  /**
+   * La parcial se acredita HOY, no al final de la carrera. El campo principal pide los años
+   * cotizados «estimados al jubilarte» (incluye los que faltan), y compararlos con la edad
+   * actual daba por cumplido hoy un requisito futuro y rebajaba la edad mínima exigida en
+   * casi dos años (hallazgo 1095 del Inspector). De ahí este campo aparte.
+   */
+  const [anosCotizadosHoy, setAnosCotizadosHoy] = useState('');
+  const [errorParcial, setErrorParcial] = useState('');
   const [resultadoParcial, setResultadoParcial] = useState<ResultadoParcial | null>(null);
 
   const edadTexto = (anios: number, meses: number) =>
@@ -354,15 +380,22 @@ export default function SimuladorJubilacionPublicaPage() {
 
   // Años cotizados como número (reutilizado)
   const anosCotizadosNum = useMemo(() => {
-    return parseFloat(anosCotizados?.replace(',', '.') || '0');
+    const n = parseSpanishNumber(anosCotizados ?? '');
+    return Number.isNaN(n) ? 0 : n;
   }, [anosCotizados]);
+
+  // Salario bruto como número (reutilizado en la comparativa de la jubilación parcial)
+  const salarioBrutoNum = useMemo(() => {
+    const n = parseSpanishNumber(salarioBruto ?? '');
+    return Number.isNaN(n) ? 0 : n;
+  }, [salarioBruto]);
 
   // ── Cálculo principal ──
   function calcular() {
     setError('');
     const anio = parseInt(anioNacimiento);
-    const anos = parseFloat(anosCotizados.replace(',', '.'));
-    const base = parseFloat(baseMensual.replace(',', '.'));
+    const anos = parseSpanishNumber(anosCotizados);
+    const base = parseSpanishNumber(baseMensual);
 
     if (!anio || anio < 1940 || anio > 2000) {
       setError('Selecciona tu año de nacimiento.'); return;
@@ -370,15 +403,16 @@ export default function SimuladorJubilacionPublicaPage() {
     if (isNaN(anos) || anos < 1 || anos > 50) {
       setError('Introduce los años cotizados (entre 1 y 50).'); return;
     }
-    if (isNaN(base) || base < 100 || base > 20000) {
-      setError('Introduce una base de cotización válida (entre 100 y 20.000 €).'); return;
+    if (isNaN(base) || base < 100 || base > BASES_SS_2026.maxima) {
+      setError(`Introduce una base de cotización válida (entre 100 € y ${formatCurrency(BASES_SS_2026.maxima)}, que es la base máxima de cotización de ${FISCAL_PENSIONES_META.vigencia}).`); return;
     }
     if (anos < COTIZACION_MINIMA.anosMinimosAcceso) {
       setError(`Se necesitan al menos ${COTIZACION_MINIMA.anosMinimosAcceso} años cotizados para acceder a pensión.`); return;
     }
 
-    setResultadoEdad(calcularEdadJubilacion(anio, anos));
-    setResultadoPension(estimarPension(base, anos));
+    const edad = calcularEdadJubilacion(anio, anos);
+    setResultadoEdad(edad);
+    setResultadoPension(estimarPension(base, anos, edad.anioJubilacion));
     setCalculado(true);
 
     // Resetear secciones opcionales
@@ -400,15 +434,29 @@ export default function SimuladorJubilacionPublicaPage() {
   // ── Cálculo parcial ──
   function calcularParcial() {
     if (!resultadoPension) return;
+    setErrorParcial('');
     const anio = parseInt(anioNacimiento);
     const anioEvaluacion = new Date().getFullYear();
     const edadActual = anioEvaluacion - anio;
-    const reduccion = parseFloat(reduccionJornada.replace(',', '.'));
-    const salario = parseFloat(salarioBruto.replace(',', '.'));
-    if (isNaN(reduccion) || isNaN(salario) || salario <= 0) return;
+    const reduccion = parseSpanishNumber(reduccionJornada);
+    const salario = parseSpanishNumber(salarioBruto);
+    const cotizadosHoy = parseSpanishNumber(anosCotizadosHoy);
+
+    if (isNaN(reduccion)) {
+      setErrorParcial('Introduce el porcentaje de reducción de jornada.'); return;
+    }
+    if (isNaN(salario) || salario <= 0) {
+      setErrorParcial('Introduce tu salario bruto mensual actual.'); return;
+    }
+    if (isNaN(cotizadosHoy) || cotizadosHoy < 0 || cotizadosHoy > 50) {
+      setErrorParcial('Introduce los años que tienes cotizados HOY (entre 0 y 50): la jubilación parcial se acredita con lo cotizado en el momento de pedirla, no con lo que sumarás hasta jubilarte.'); return;
+    }
+    if (cotizadosHoy > anosCotizadosNum) {
+      setErrorParcial(`No puedes tener hoy más años cotizados (${formatNumber(cotizadosHoy, 0)}) que al jubilarte (${formatNumber(anosCotizadosNum, 0)}). Revisa los dos campos.`); return;
+    }
 
     setResultadoParcial(
-      orientarParcial(edadActual, anosCotizadosNum, reduccion, salario, resultadoPension.pensionMensualFinal, anioEvaluacion)
+      orientarParcial(edadActual, cotizadosHoy, reduccion, salario, resultadoPension.pensionMensualFinal, anioEvaluacion)
     );
   }
 
@@ -488,12 +536,12 @@ export default function SimuladorJubilacionPublicaPage() {
             placeholder="Ej: 2.500"
             helperText="Aproximación de tu salario bruto mensual medio de los últimos 25 años."
             min={100}
-            max={20000}
+            max={BASES_SS_2026.maxima}
           />
 
           {error && (
             <div role="alert" aria-live="polite" className={styles.errorMsg}>
-              ⚠️ {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
 
@@ -502,7 +550,7 @@ export default function SimuladorJubilacionPublicaPage() {
           </button>
 
           <div className={styles.infoSS}>
-            💡 Para mayor precisión, usa el <strong>simulador oficial</strong> de la SS con tu historial real de cotización.
+            <span aria-hidden="true">💡</span> Para mayor precisión, usa el <strong>simulador oficial</strong> de la SS con tu historial real de cotización.
           </div>
         </div>
 
@@ -551,9 +599,7 @@ export default function SimuladorJubilacionPublicaPage() {
 
             <div className={styles.resultados}>
               <div className={`${styles.resultItem} ${styles.resultItemHighlight}`}>
-                <span className={styles.resultLabel}>
-                  Pensión mensual ({resultadoPension.formulaAplicada === 'dual' ? 'sistema ampliado' : 'sistema clásico'})
-                </span>
+                <span className={styles.resultLabel}>Pensión mensual estimada (bruta)</span>
                 <span className={styles.resultValueBig}>
                   {formatCurrency(resultadoPension.pensionMensualFinal)}
                 </span>
@@ -567,32 +613,41 @@ export default function SimuladorJubilacionPublicaPage() {
               </div>
 
               <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Fórmula clásica (25 años / 350)</span>
+                <span className={styles.resultLabel}>Base reguladora (25 años / 350)</span>
                 <span className={styles.resultValue}>
-                  BR {formatCurrency(resultadoPension.clasica.baseReguladora)} → {formatCurrency(resultadoPension.clasica.pensionBrutaMensual)}/mes
+                  {formatCurrency(resultadoPension.clasica.baseReguladora)}/mes
                 </span>
               </div>
-
-              <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Fórmula ampliada 2026 (sistema dual)</span>
-                <span className={styles.resultValue}>
-                  BR {formatCurrency(resultadoPension.dual.baseReguladora)} → {formatCurrency(resultadoPension.dual.pensionBrutaMensual)}/mes
-                </span>
-              </div>
-
-              {resultadoPension.diferenciaMensual > 0 && (
-                <div className={styles.resultItem}>
-                  <span className={styles.resultLabel}>Diferencia entre fórmulas</span>
-                  <span className={styles.resultNote}>
-                    {formatCurrency(resultadoPension.diferenciaMensual)}/mes a favor de la {resultadoPension.formulaAplicada === 'dual' ? 'ampliada' : 'clásica'}. La SS aplica automáticamente la más favorable.
-                  </span>
-                </div>
-              )}
 
               <div className={styles.resultItem}>
                 <span className={styles.resultLabel}>Porcentaje por años cotizados</span>
                 <span className={styles.resultValue}>{formatNumber(resultadoPension.porcentajeAplicable, 2)}%</span>
               </div>
+
+              <div className={styles.resultItem}>
+                <span className={styles.resultLabel}>Edad ordinaria de jubilación</span>
+                <span className={styles.resultValue}>{resultadoPension.edadOrdinaria}</span>
+              </div>
+
+              {resultadoPension.mesesQueFaltanParaCien > 0 && (
+                <div className={styles.resultItem}>
+                  <span className={styles.resultLabel}>Para llegar al 100 %</span>
+                  <span className={styles.resultValue}>
+                    {mesesATexto(resultadoPension.mesesQueFaltanParaCien)} más de cotización
+                    {' '}({formatNumber(COTIZACION_MINIMA.anosParaCien, 1)} años en total)
+                  </span>
+                </div>
+              )}
+
+              {resultadoPension.clasica.topeAplicado && (
+                <div className={styles.resultItem}>
+                  <span className={styles.resultLabel}>Tope máximo aplicado</span>
+                  <span className={styles.resultNote}>
+                    El cálculo supera la pensión máxima ({formatCurrency(LIMITES_PENSION_2025.maximaMensual)}/mes)
+                    y se ha recortado a ese tope, que es el que fija la ley.
+                  </span>
+                </div>
+              )}
 
               <div className={styles.barraProgreso}>
                 <div className={styles.barraLabel}>
@@ -611,6 +666,37 @@ export default function SimuladorJubilacionPublicaPage() {
                 </div>
               </div>
             </div>
+
+            {resultadoPension.bajoMinimo && (
+              <div className={styles.warningBox} role="note">
+                <div className={styles.warningHeader}>
+                  <span className={styles.warningIcon} aria-hidden="true">ℹ️</span>
+                  <strong>Tu estimación queda por debajo de la pensión mínima</strong>
+                </div>
+                <p>
+                  La cuantía calculada ({formatCurrency(resultadoPension.pensionMensualFinal)}/mes) no llega a la
+                  pensión mínima de referencia ({formatCurrency(LIMITES_PENSION_2025.minimaSinConyuge)}/mes, sin cónyuge a cargo).
+                  Eso <strong>no</strong> significa que vayas a cobrar automáticamente el mínimo: el complemento a
+                  mínimos depende de tus rentas y de con quién convivas, y esta herramienta no pregunta ninguna de
+                  las dos cosas. En {FISCAL_PENSIONES_META.vigencia} se exige no superar{' '}
+                  {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}/año de rentas distintas de la
+                  pensión ({formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.conConyuge)}/año con cónyuge a cargo),
+                  y la cuantía garantizada cambia según el caso:{' '}
+                  {formatCurrency(LIMITES_PENSION_2025.minimaSinConyuge)} con cónyuge no a cargo,{' '}
+                  {formatCurrency(LIMITES_PENSION_2025.minimaSolo)} en unidad unipersonal y{' '}
+                  {formatCurrency(LIMITES_PENSION_2025.minimaConConyuge)} con cónyuge a cargo.
+                </p>
+              </div>
+            )}
+
+            <p className={styles.hint}>
+              Desde 2026 la Seguridad Social calcula la pensión con dos fórmulas —la clásica de 25 años y la
+              ampliada, que descarta los peores meses de un periodo más largo— y aplica de oficio la más
+              favorable. Esta estimación parte de una <strong>única base media</strong>, y con una sola base
+              las dos fórmulas dan prácticamente el mismo resultado: la diferencia real depende de cómo de
+              desiguales sean tus bases y de las lagunas de tu carrera, que solo se ven en tu historial
+              completo. Para saber cuál te conviene, usa el simulador oficial de la SS.
+            </p>
           </div>
         )}
 
@@ -670,11 +756,11 @@ export default function SimuladorJubilacionPublicaPage() {
                   <div className={styles.resultados} style={{ marginTop: '1.5rem' }}>
                     {resultadoAnticipada.posible ? (
                       <div className={styles.statusOk} role="status">
-                        ✅ En principio, podrías jubilarte anticipadamente
+                        <span aria-hidden="true">✅</span> En principio, podrías jubilarte anticipadamente
                       </div>
                     ) : (
                       <div className={styles.statusNok} role="alert">
-                        ❌ No cumples los requisitos
+                        <span aria-hidden="true">❌</span> No cumples los requisitos
                         <br /><small className={styles.smallNormal}>{resultadoAnticipada.motivoImpedimento}</small>
                       </div>
                     )}
@@ -764,6 +850,22 @@ export default function SimuladorJubilacionPublicaPage() {
                   max={50000}
                 />
 
+                <NumberInput
+                  value={anosCotizadosHoy}
+                  onChange={setAnosCotizadosHoy}
+                  label="Años cotizados acreditados HOY"
+                  placeholder="Ej: 34"
+                  helperText={`La parcial se concede con lo que ya tienes cotizado al pedirla, no con lo que sumarás hasta jubilarte: por eso este campo es distinto del de arriba. Se exigen ${req.anosCotizadosMinimos} años.`}
+                  min={0}
+                  max={50}
+                />
+
+                {errorParcial && (
+                  <div role="alert" aria-live="polite" className={styles.errorMsg}>
+                    <span aria-hidden="true">⚠️</span> {errorParcial}
+                  </div>
+                )}
+
                 <button type="button" className={styles.btn} onClick={calcularParcial} aria-label="Calcular jubilación parcial">
                   Calcular parcial
                 </button>
@@ -772,11 +874,11 @@ export default function SimuladorJubilacionPublicaPage() {
                   <div className={styles.resultados} style={{ marginTop: '1.5rem' }}>
                     {resultadoParcial.posible ? (
                       <div className={styles.statusOk} role="status">
-                        ✅ En principio, podrías acogerte a la jubilación parcial
+                        <span aria-hidden="true">✅</span> En principio, podrías acogerte a la jubilación parcial
                       </div>
                     ) : (
                       <div className={styles.statusNok} role="alert">
-                        ❌ No cumples los requisitos
+                        <span aria-hidden="true">❌</span> No cumples los requisitos
                         <br /><small className={styles.smallNormal}>{resultadoParcial.motivoImpedimento}</small>
                       </div>
                     )}
@@ -792,7 +894,7 @@ export default function SimuladorJubilacionPublicaPage() {
                         {resultadoParcial.cumpleReduccion ? '✓' : '✗'} Jornada ({req.reduccionJornadaMin}%–{req.reduccionJornadaMax}%)
                       </div>
                       <div className={`${styles.requisitoItem} ${styles.requisitoOk}`}>
-                        ℹ Contrato de relevo (empleador)
+                        <span aria-hidden="true">ℹ</span> Contrato de relevo (empleador)
                       </div>
                     </div>
 
@@ -818,7 +920,7 @@ export default function SimuladorJubilacionPublicaPage() {
                         <div className={styles.comparativaGrid}>
                           <div className={styles.comparativaItem}>
                             <div className={styles.comparativaLabel}>Solo trabajar</div>
-                            <div className={styles.comparativaValue}>{formatCurrency(parseFloat(salarioBruto.replace(',', '.')) || 0)}</div>
+                            <div className={styles.comparativaValue}>{formatCurrency(salarioBrutoNum)}</div>
                           </div>
                           <div className={`${styles.comparativaItem} ${styles.comparativaHighlight}`}>
                             <div className={styles.comparativaLabel}>Jubilación parcial</div>
@@ -830,7 +932,7 @@ export default function SimuladorJubilacionPublicaPage() {
                           </div>
                           <div className={styles.comparativaItem}>
                             <div className={styles.comparativaLabel}>Diferencia vs trabajar</div>
-                            <div className={styles.comparativaValue}>{formatCurrency(resultadoParcial.ingresosTotalesMensual - (parseFloat(salarioBruto.replace(',', '.')) || 0))}</div>
+                            <div className={styles.comparativaValue}>{formatCurrency(resultadoParcial.ingresosTotalesMensual - salarioBrutoNum)}</div>
                           </div>
                         </div>
                       </>
@@ -883,16 +985,16 @@ export default function SimuladorJubilacionPublicaPage() {
                 <span className={styles.escenarioIcon} aria-hidden="true">👩‍💼</span>
                 <strong>Empleada con carrera completa</strong>
               </div>
-              <p className={styles.escenarioExample}>Ana, 62 años, 38 años cotizados, base 2.200 €/mes.</p>
-              <p className={styles.escenarioTip}>Con 38 años al 100%, cobra 2.200 €/mes. Puede jubilarse a los 65 con pensión íntegra.</p>
+              <p className={styles.escenarioExample}>Ana, 62 años, 38 años cotizados al jubilarse, base media 2.200 €/mes.</p>
+              <p className={styles.escenarioTip}>Llega al 100 %, pero eso es el 100 % de la <strong>base reguladora</strong>, no del sueldo: 2.200 × 300/350 = 1.885,71 €/mes. Y 38 años no bastan para jubilarse a los 65 a partir de 2027, que pide 38 años y 6 meses: su edad ordinaria es 67.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">👨‍🔧</span>
                 <strong>Autónomo con carrera irregular</strong>
               </div>
-              <p className={styles.escenarioExample}>Carlos, 64 años, 28 años cotizados. Bases bajas al principio.</p>
-              <p className={styles.escenarioTip}>Con 28 años obtiene el 88,75%. Cotizar 2 años más sube al 96,75%.</p>
+              <p className={styles.escenarioExample}>Carlos, 64 años, 28 años cotizados, base media 1.200 €/mes.</p>
+              <p className={styles.escenarioTip}>Con 28 años le corresponde el 80,62 % (1.028,57 × 80,62 % = 829,23 €/mes). Cotizar 2 años más lo sube al 85,18 %, unos 47 € al mes de por vida.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -900,15 +1002,15 @@ export default function SimuladorJubilacionPublicaPage() {
                 <strong>Trabajador que quiere anticipar</strong>
               </div>
               <p className={styles.escenarioExample}>Pedro, 63 años, 36 cotizados. Quiere jubilarse 2 años antes.</p>
-              <p className={styles.escenarioTip}>Puede anticipar voluntariamente (tiene 35+). Reducción ~6-7% permanente sobre su pensión.</p>
+              <p className={styles.escenarioTip}>Puede anticipar voluntariamente (supera los 35 años), pero la reducción no es pequeña: con menos de 38 años y 6 meses cotizados son 2,00 % por trimestre, y 2 años son 8 trimestres → <strong>16,00 % permanente</strong>.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <strong>Persona que prefiere transición gradual</strong>
               </div>
-              <p className={styles.escenarioExample}>María, 62 años, 35 cotizados. Quiere reducir jornada al 50%.</p>
-              <p className={styles.escenarioTip}>Jubilación parcial: cobra 50% pensión + 50% salario. Sigue cotizando al 100%.</p>
+              <p className={styles.escenarioExample}>María, 62 años, 35 cotizados hoy. Quiere reducir jornada al 50 %.</p>
+              <p className={styles.escenarioTip}>Todavía no puede: la parcial exige estar como máximo a 3 años de la edad ordinaria, y sin los 38 años y 3 meses acreditados la suya es 66 años y 10 meses, así que el mínimo son 63 años y 10 meses. Cuando llegue, cobrará el 50 % de su pensión más el 50 % de su salario.</p>
             </div>
           </div>
 
@@ -917,11 +1019,11 @@ export default function SimuladorJubilacionPublicaPage() {
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
               <strong>¿Cuántos años hay que cotizar para cobrar el 100%?</strong>
-              <p>En 2026 se necesitan 36 años y 9 meses cotizados para alcanzar el 100% de la base reguladora. Este requisito ha aumentado progresivamente en los últimos años según la Ley 27/2011 y la Ley 21/2021.</p>
+              <p>En 2026 se necesitan 36 años y 6 meses cotizados para alcanzar el 100% de la base reguladora. Los primeros 15 años dan el 50%; cada uno de los 49 meses siguientes suma un 0,21% y los 209 posteriores, un 0,19%. Este requisito ha ido subiendo escalón a escalón y en 2027 será de 37 años.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué es el sistema dual de pensiones 2026?</strong>
-              <p>Desde enero de 2026, la SS calcula tu pensión con dos fórmulas (clásica de 25 años y ampliada) y aplica automáticamente la más favorable. Beneficia especialmente a trabajadores con lagunas o salarios variables.</p>
+              <p>Desde enero de 2026, la SS calcula tu pensión con dos fórmulas —la clásica (media de las últimas 300 bases dividida entre 350) y la ampliada (las 302 mejores bases de 304 meses, divididas entre 352,33)— y aplica de oficio la más favorable. La ampliada gana cuando hay lagunas o bases muy desiguales, porque puede descartar los peores meses. Esta herramienta parte de una única base media, así que no puede distinguirlas: para saber cuál te conviene hace falta tu historial mes a mes, que es lo que usa el simulador oficial.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Puedo jubilarme antes de la edad ordinaria?</strong>
@@ -929,11 +1031,11 @@ export default function SimuladorJubilacionPublicaPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿La reducción por anticipada es permanente?</strong>
-              <p>Sí, se mantiene toda la vida. Un -10% de reducción se aplica durante toda la jubilación. El punto de equilibrio suele estar entre 10-15 años.</p>
+              <p>Sí, se mantiene toda la vida. Anticipar 2 años de forma voluntaria son 8 trimestres, entre el 13,04% y el 16,00% según los años cotizados: el coeficiente más duro (2,00% por trimestre) le toca precisamente a quien menos ha cotizado. El punto de equilibrio suele estar entre 10 y 15 años.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué es la jubilación parcial?</strong>
-              <p>Permite reducir la jornada entre 25% y 75% a partir de los 60 años, combinando salario y pensión parcial. Requiere contrato de relevo y acuerdo con el empleador.</p>
+              <p>Permite reducir la jornada entre el 25% y el 75% combinando salario y pensión parcial. No hay una edad fija: desde el RDL 11/2024 (efectos del 1 de abril de 2025) puede anticiparse como máximo 3 años sobre la edad ordinaria, así que en 2026 son 62 años con la cotización suficiente acreditada, o 63 años y 10 meses sin ella. Requiere 33 años cotizados, contrato de relevo y acuerdo con el empleador.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Puedo trabajar y cobrar pensión a la vez?</strong>
@@ -942,7 +1044,7 @@ export default function SimuladorJubilacionPublicaPage() {
             <li className={styles.faqItem}>
               <strong>¿Cómo consulto mis años cotizados?</strong>
               <p>En la Sede Electrónica de la Seguridad Social (importass.seg-social.es) puedes descargar tu informe de vida laboral.</p>
-              <p className={styles.faqTip}>💡 Verifica la vida laboral antes de hacer planes — puede haber sorpresas.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Verifica la vida laboral antes de hacer planes — puede haber sorpresas.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cuándo será definitiva la edad de 67 años?</strong>
@@ -1011,7 +1113,7 @@ export default function SimuladorJubilacionPublicaPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipCardIcon} aria-hidden="true">⚖️</span>
               <strong>Evalúa el break-even</strong>
-              <p>Si anticipas 2 años, necesitas ~15-20 años para compensar la reducción.</p>
+              <p>Anticipar 2 años cuesta entre un 13% y un 16% de por vida: recuperar lo adelantado lleva del orden de 15 a 20 años.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipCardIcon} aria-hidden="true">🔍</span>
@@ -1036,7 +1138,7 @@ export default function SimuladorJubilacionPublicaPage() {
               <li><strong>Confundir años cotizados con años trabajados:</strong> El paro sin prestación no cotiza y genera lagunas.</li>
               <li><strong>Calcular sobre sueldo bruto:</strong> Horas extra y complementos no siempre cotizan igual que el salario base.</li>
               <li><strong>Ignorar el impacto del IRPF:</strong> Las pensiones tributan como rendimientos del trabajo (retenciones del 8-15%).</li>
-              <li><strong>No considerar la pensión mínima:</strong> Si tu pensión calculada queda por debajo del mínimo, se complementa automáticamente.</li>
+              <li><strong>Dar por hecho el complemento a mínimos:</strong> quedar por debajo de la pensión mínima no lo concede solo. Hay que no superar unos límites de renta y la cuantía cambia según con quién convivas.</li>
               <li><strong>No agotar desempleo antes de anticipar:</strong> A veces es más rentable cobrar el desempleo completo primero.</li>
             </ul>
           </div>

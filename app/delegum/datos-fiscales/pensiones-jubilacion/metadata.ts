@@ -116,7 +116,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el porcentaje de la pensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Con 15 años cotizados se aplica el 50% de la base reguladora. A partir de ahí cada mes adicional suma un porcentaje (0,21% por mes hasta los ~23 años y 0,19% después), hasta llegar al 100% con unos 36 años y 9 meses cotizados. Si se cobra antes de la edad ordinaria (jubilación anticipada) se aplican coeficientes reductores.',
+        text: 'Con 15 años cotizados se aplica el 50% de la base reguladora. A partir de ahí cada mes adicional suma un porcentaje (0,21% en los 49 meses siguientes y 0,19% en los 209 posteriores), hasta llegar al 100% a los 36 años y 6 meses cotizados en 2026. Si se cobra antes de la edad ordinaria (jubilación anticipada) se aplican coeficientes reductores.',
       },
     },
     {

@@ -56,11 +56,15 @@ export interface ResultadoPensionPublica {
   formulaAplicada: 'clasica' | 'dual';
   /** Años cotizados introducidos */
   anosCotizados: number;
-  /** Indica si se aplica pensión mínima (base calculada inferior al mínimo) */
+  /**
+   * La pensión calculada queda POR DEBAJO de la mínima de referencia. NO significa que
+   * se eleve automáticamente: el complemento a mínimos exige no superar unos límites de
+   * renta y su cuantía depende de la situación familiar (COMPLEMENTO_MINIMOS_LIMITES_2026).
+   */
   aplicaMinimo: boolean;
   /** Indica si se aplica pensión máxima (base calculada superior al máximo) */
   aplicaMaximo: boolean;
-  /** Pensión mínima garantizada 2026 (referencia, sin cónyuge a cargo) */
+  /** Pensión mínima de referencia 2026 (sin cónyuge a cargo), a título informativo */
   pensionMinimaRef: number;
   /** Pensión máxima SS 2026 */
   pensionMaxima: number;
@@ -76,7 +80,15 @@ export interface ResultadoPensionPublica {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function calcularPorcentajePension(mesesCotizados: number): number {
+/**
+ * Porcentaje de la base reguladora que corresponde a `mesesCotizados`, según la escala
+ * de la DT 9.ª LGSS (TRAMOS_PORCENTAJE_PENSION_2025).
+ *
+ * Se exporta desde el 21/09/2026 (hallazgo 1093 del Inspector) porque
+ * `simulador-jubilacion-publica` mantenía su propia copia y esa copia contaba un mes
+ * corto en cada tramo: el mismo perfil obtenía aquí y allí porcentajes distintos.
+ */
+export function calcularPorcentajePension(mesesCotizados: number): number {
   if (mesesCotizados < COTIZACION_MINIMA.mesesMinimosAcceso) return 0;
 
   let porcentaje = 0;
@@ -125,10 +137,13 @@ export function calcularPensionPublica(p: ParametrosPensionPublica): ResultadoPe
   const pensionMinima = LIMITES_PENSION_2025.minimaSinConyuge; // referencia sin cónyuge a cargo
   const pensionMaxima = LIMITES_PENSION_2025.maximaMensual;
 
-  const aplicarLimites = (bruta: number): number => {
-    if (mesesCotizados < COTIZACION_MINIMA.mesesMinimosAcceso) return bruta;
-    return Math.min(pensionMaxima, Math.max(pensionMinima, bruta));
-  };
+  // ⚠️ 2026-09-21 (hallazgo 1089 del Inspector): aquí se elevaba al mínimo CUALQUIER
+  //    pensión menor, sin condición alguna. El complemento a mínimos no es automático —
+  //    exige rentas por debajo de COMPLEMENTO_MINIMOS_LIMITES_2026 y tiene tres cuantías
+  //    según la situación familiar, nada de lo cual se pregunta aquí—, así que elevar de
+  //    oficio publicaba una pensión POR ENCIMA de su propia base reguladora. Solo se
+  //    aplica el tope máximo, que ese sí es incondicional (art. 57 LGSS).
+  const aplicarLimites = (bruta: number): number => Math.min(pensionMaxima, bruta);
 
   const pensionClasicaMensual = r(aplicarLimites(pensionClasicaSinLimites));
   const pensionDualMensual = r(aplicarLimites(pensionDualSinLimites));

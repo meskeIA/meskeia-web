@@ -147,8 +147,8 @@ export default function PensionesJubilacionPage() {
             <p className={styles.sectionIntro}>
               Hacen falta al menos {COTIZACION_MINIMA.anosMinimosAcceso} años cotizados para tener
               derecho a pensión. El porcentaje sobre la base reguladora crece con los años cotizados
-              hasta alcanzar el 100% con unos {Math.floor(COTIZACION_MINIMA.anosParaCien)} años y 9
-              meses.
+              hasta alcanzar el 100% a los {Math.floor(COTIZACION_MINIMA.anosParaCien)} años y{' '}
+              {Math.round((COTIZACION_MINIMA.anosParaCien % 1) * 12)} meses.
             </p>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
@@ -164,15 +164,15 @@ export default function PensionesJubilacionPage() {
                     <td className={styles.numCol}><span className={styles.tipoTag}>50%</span></td>
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>Cada mes adicional (hasta ~23 años)</th>
+                    <th scope="row" className={styles.rowHead}>Cada uno de los 49 meses siguientes (hasta ~19 años)</th>
                     <td className={styles.numCol}>+ {pctTxt(INCREMENTO_INTERMEDIO)}</td>
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>Cada mes adicional (a partir de ~23 años)</th>
+                    <th scope="row" className={styles.rowHead}>Cada uno de los 209 meses posteriores</th>
                     <td className={styles.numCol}>+ {pctTxt(INCREMENTO_FINAL)}</td>
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>~36 años y 9 meses</th>
+                    <th scope="row" className={styles.rowHead}>36 años y 6 meses</th>
                     <td className={styles.numCol}><span className={styles.tipoTag}>100%</span></td>
                   </tr>
                 </tbody>

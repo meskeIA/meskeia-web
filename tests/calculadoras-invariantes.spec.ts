@@ -2071,40 +2071,68 @@ test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
 
 test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)', () => {
 
-  test('GOLDEN-BM: base 2.800 €, 30 años cotizados (360 meses) → 86,12%, pensión 2.066,90 €/mes (sistema dual), sin límites', () => {
+  test('GOLDEN-BM: base 2.800 €, 30 años cotizados (360 meses) → 85,18%, pensión 2.044,34 €/mes (sistema dual), sin límites', () => {
     // BR clásica = 2.800 × 300/350 = 2.400 €. BR dual (2026) = 2.800 × 302/352,33 ≈ 2.400,02 €.
-    // % pensión: tramo 277-9999 → 70,16 + (360-277+1)×0,19 = 70,16 + 84×0,19 = 86,12%.
-    // Pensión clásica = 2.400 × 86,12% = 2.066,88 €. Pensión dual = 2.400,02 × 86,12% ≈ 2.066,90 €.
+    // % pensión (escala 2026, DT 9.ª LGSS): 50 + 49×0,21 + (360−229)×0,19
+    //                                      = 50 + 10,29 + 131×0,19 = 85,18%.
+    // Pensión clásica = 2.400 × 85,18% = 2.044,32 €. Pensión dual = 2.400,02 × 85,18% ≈ 2.044,34 €.
     // El sistema dual (DT 40.a LGSS, vigente desde 2026) es marginalmente más favorable → se aplica de oficio.
-    // Ambas dentro de [888,70 ; 3.359,60], no se aplican límites.
+    // Ambas por encima de 888,70 y por debajo de 3.359,60: no se aplica ningún límite.
     const p = calcularPensionPublica({ baseCotizacionMensual: 2800, anosCotizados: 30, edadActual: 55 });
     expect(p.baseReguladoraClasica).toBeCloseTo(2400, 2);
     expect(p.baseReguladoraDual).toBeCloseTo(2400.02, 2);
     expect(p.formulaAplicada).toBe('dual');
     expect(p.baseReguladora).toBeCloseTo(2400.02, 2);
-    expect(p.porcentajePension).toBeCloseTo(86.12, 2);
-    expect(p.pensionClasicaMensual).toBeCloseTo(2066.88, 2);
-    expect(p.pensionDualMensual).toBeCloseTo(2066.90, 2);
-    expect(p.pensionBrutaSinLimites).toBeCloseTo(2066.90, 2);
-    expect(p.pensionBrutaMensual).toBeCloseTo(2066.90, 2);
-    expect(p.pensionBrutaAnual).toBeCloseTo(28936.60, 2);
+    expect(p.porcentajePension).toBeCloseTo(85.18, 2);
+    expect(p.pensionClasicaMensual).toBeCloseTo(2044.32, 2);
+    expect(p.pensionDualMensual).toBeCloseTo(2044.34, 2);
+    expect(p.pensionBrutaSinLimites).toBeCloseTo(2044.34, 2);
+    expect(p.pensionBrutaMensual).toBeCloseTo(2044.34, 2);
+    expect(p.pensionBrutaAnual).toBeCloseTo(28620.76, 2);
     expect(p.aplicaMinimo).toBe(false);
     expect(p.aplicaMaximo).toBe(false);
-    expect(p.mesesParaCien).toBe(81);
+    // COTIZACION_MINIMA.mesesParaCien (438) − 360 = 78
+    expect(p.mesesParaCien).toBe(78);
   });
 
-  test('GOLDEN-BN: base mínima 1.184,40 €, 15 años cotizados (180 meses, mínimo de acceso) → se aplica pensión mínima 888,70 €/mes', () => {
+  test('GOLDEN-BN: base mínima 1.184,40 €, 15 años cotizados (180 meses) → 507,61 €/mes, que NO se eleva al mínimo', () => {
     // BR = 1.184,40 × 300/350 = 1.015,20 €. % pensión = 50% (180 meses, primer tramo).
-    // Pensión sin límites = 1.015,20 × 50% = 507,60 € < 888,70 € (mínima sin cónyuge) → se aplica el mínimo.
+    // Pensión = 1.015,21 × 50% = 507,61 €, por debajo de la mínima de referencia (888,70 €).
+    //
+    // ⚠️ Hasta el 21/09/2026 este golden esperaba 888,70 €: el motor elevaba al mínimo
+    //    cualquier pensión menor. El complemento a mínimos NO es automático (exige rentas
+    //    bajo COMPLEMENTO_MINIMOS_LIMITES_2026 y tiene tres cuantías según la situación
+    //    familiar), así que elevar de oficio publicaba una pensión por encima de su propia
+    //    base reguladora. `aplicaMinimo` sigue avisando de que se está por debajo.
     const p = calcularPensionPublica({ baseCotizacionMensual: 1184.40, anosCotizados: 15, edadActual: 65 });
-    expect(p.baseReguladora).toBeCloseTo(1015.20, 2);
+    expect(p.baseReguladoraClasica).toBeCloseTo(1015.20, 2);
+    // Sin el suelo, la fórmula ampliada de 2026 (302/352,33) gana por un céntimo y es la
+    // que se aplica: antes las dos se elevaban a 888,70 y el empate lo rompía la clásica.
+    expect(p.baseReguladoraDual).toBeCloseTo(1015.21, 2);
+    expect(p.baseReguladora).toBeCloseTo(1015.21, 2);
     expect(p.porcentajePension).toBeCloseTo(50, 2);
-    expect(p.pensionBrutaSinLimites).toBeCloseTo(507.60, 2);
+    expect(p.pensionBrutaSinLimites).toBeCloseTo(507.61, 2);
     expect(p.aplicaMinimo).toBe(true);
     expect(p.aplicaMaximo).toBe(false);
-    expect(p.pensionBrutaMensual).toBeCloseTo(888.70, 2);
-    expect(p.pensionBrutaAnual).toBeCloseTo(12441.80, 2);
-    expect(p.mesesParaCien).toBe(261);
+    expect(p.pensionBrutaMensual).toBeCloseTo(507.61, 2);
+    expect(p.pensionBrutaAnual).toBeCloseTo(7106.54, 2);
+    // COTIZACION_MINIMA.mesesParaCien (438) − 180 = 258
+    expect(p.mesesParaCien).toBe(258);
+  });
+
+  test('GOLDEN-BN2: el 100 % cae exactamente en el mes 438 y el tope máximo sí es incondicional', () => {
+    // La escala está construida para llevar del 50 % al 100 %: 49 × 0,21 + 209 × 0,19 = 50,00.
+    // Si algún tramo se mueve, esta pareja de asserts lo delata por los dos lados.
+    const justoAntes = calcularPensionPublica({ baseCotizacionMensual: 2000, anosCotizados: 437 / 12 });
+    expect(justoAntes.porcentajePension).toBeCloseTo(99.81, 2);
+    const justo = calcularPensionPublica({ baseCotizacionMensual: 2000, anosCotizados: 438 / 12 });
+    expect(justo.porcentajePension).toBeCloseTo(100, 2);
+    expect(justo.mesesParaCien).toBe(0);
+
+    // Tope máximo: 6.000 × 300/350 × 100 % = 5.142,86 € > 3.359,60 €.
+    const topada = calcularPensionPublica({ baseCotizacionMensual: 6000, anosCotizados: 40 });
+    expect(topada.aplicaMaximo).toBe(true);
+    expect(topada.pensionBrutaMensual).toBeCloseTo(3359.60, 2);
   });
 
 });

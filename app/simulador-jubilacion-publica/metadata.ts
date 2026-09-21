@@ -44,7 +44,7 @@ export const jsonLd = generateWebAppSchema({
     'Análisis de jubilación anticipada (voluntaria e involuntaria)',
     'Orientación sobre jubilación parcial con contrato de relevo',
     'Tabla progresiva de edad de jubilación 2024-2027',
-    'Comparativa fórmula clásica vs ampliada (sistema dual)',
+    'Aviso de tope máximo de pensión y de complemento a mínimos',
   ],
 });
 
@@ -65,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la pensión pública de jubilación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pensión se calcula dividiendo la base reguladora (promedio de las bases de cotización de los últimos 25 años, con correctores de inflación) entre el número de meses del período de cálculo, y aplicando un porcentaje según los años cotizados. Con el sistema dual 2026, puedes elegir entre la fórmula clásica (últimos 25 años) y la ampliada (toda la vida laboral con descarte de los peores años), aplicándose la más favorable.',
+        text: 'La pensión se calcula aplicando a la base reguladora un porcentaje que depende de los años cotizados: el 50% con los 15 años mínimos, más un 0,21% por cada uno de los 49 meses siguientes y un 0,19% por cada uno de los 209 posteriores, hasta el 100% a los 36 años y 6 meses en 2026. La base reguladora clásica es la suma de las últimas 300 bases de cotización dividida entre 350. Desde 2026 convive con la fórmula ampliada (las 302 mejores bases de un periodo de 304 meses, divididas entre 352,33) y la Seguridad Social aplica de oficio la más favorable, sin que haya que elegir.',
       },
     },
     {
@@ -73,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se reduce la pensión por jubilarse antes de tiempo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La jubilación anticipada voluntaria aplica coeficientes reductores permanentes sobre la pensión. Si te jubilas 2 años antes, la reducción es de entre el 13% y el 14% dependiendo de los años cotizados. Cuanto menos se haya cotizado y más se anticipe la jubilación, mayor es la penalización. La jubilación anticipada involuntaria (por despido colectivo, enfermedad, etc.) aplica coeficientes algo menos penalizadores.',
+        text: 'La jubilación anticipada voluntaria aplica coeficientes reductores permanentes sobre la pensión. Jubilarse 2 años antes son 8 trimestres, y la reducción va del 13,04% al 16,00% según los años cotizados: el 16% le corresponde a quien tiene menos de 38 años y 6 meses cotizados, es decir, a quien menos ha cotizado. La jubilación anticipada involuntaria (despido colectivo, cierre de empresa, etc.) permite anticipar hasta 4 años y aplica coeficientes algo menos penalizadores, del 1,50% al 1,875% por trimestre.',
       },
     },
     {
@@ -81,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Qué es la jubilación parcial y quién puede solicitarla?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La jubilación parcial permite reducir la jornada laboral (entre un 25% y un 50%) y cobrar simultáneamente una parte proporcional de la pensión, siempre que la empresa contrate a un trabajador sustituto mediante un contrato de relevo. Para solicitarla se requieren al menos 33 años cotizados (en algunos casos 25), tener al menos 60 años (con coeficientes reductores si es antes de la ordinaria) y un acuerdo con la empresa.',
+        text: 'La jubilación parcial permite reducir la jornada laboral entre un 25% y un 75% y cobrar simultáneamente la parte proporcional de la pensión, siempre que la empresa contrate a un trabajador sustituto mediante un contrato de relevo. Desde el RDL 11/2024, con efectos del 1 de abril de 2025, no hay una edad fija: puede anticiparse como máximo 3 años sobre la edad ordinaria que corresponda, de modo que en 2026 son 62 años con la cotización suficiente acreditada o 63 años y 10 meses sin ella. Se exigen además 33 años cotizados (25 con discapacidad igual o superior al 33%), 6 años de antigüedad en la empresa y acuerdo con ella.',
       },
     },
     {
@@ -89,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la pensión máxima de jubilación en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pensión máxima de jubilación de la Seguridad Social en 2026 es de 3.359,60 € al mes (en 14 pagas), que se revisa anualmente según el IPC. Esta cifra actúa como techo independientemente de la base reguladora calculada. La pensión mínima garantizada para un pensionista con cónyuge a cargo es de 1.256,60 € mensuales en 2026.',
+        text: 'La pensión máxima de jubilación de la Seguridad Social en 2026 es de 3.359,60 € al mes (en 14 pagas), que se revisa anualmente según el IPC. Esta cifra actúa como techo independientemente de la base reguladora calculada. Por abajo existen cuantías mínimas —1.256,60 € al mes con cónyuge a cargo, 936,20 € en unidad unipersonal y 888,70 € con cónyuge no a cargo—, pero no se aplican solas: el complemento a mínimos exige que las rentas anuales distintas de la pensión no superen 9.442 €, u 11.013 € contando al cónyuge a cargo.',
       },
     },
   ],

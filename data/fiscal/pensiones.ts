@@ -14,8 +14,8 @@
 import { SMI_2026 } from './smi';
 
 export const FISCAL_PENSIONES_META = {
-  fuente: 'LGSS (RDL 8/2015) + Ley 21/2021 de Reforma de Pensiones + RD 241/2026 (revalorización y cuantías mínimas 2026)',
-  verificado: '2026-08-12',
+  fuente: 'LGSS (RDL 8/2015), arts. 209-210 y DT 9.ª + Ley 21/2021 de Reforma de Pensiones + RD 241/2026 (revalorización y cuantías mínimas 2026)',
+  verificado: '2026-09-21',
   vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas',
   nota: 'Las cifras son orientativas. La SS calcula la pensión real a partir de tu historial completo de cotización. Consulta tu vida laboral en la Sede Electrónica de la SS.',
@@ -62,18 +62,27 @@ export const EDAD_JUBILACION_2025 = {
 export const COTIZACION_MINIMA = {
   anosMinimosAcceso: 15,       // Años mínimos para tener pensión
   mesesMinimosAcceso: 180,
-  anosParaCien: 36.75,         // Años para alcanzar el 100% en 2025 (transitorio)
-  mesesParaCien: 441,          // 36 años y 9 meses (transitorio 2025)
+  anosParaCien: 36.5,          // Años para alcanzar el 100% en 2026 (transitorio)
+  mesesParaCien: 438,          // 180 + 49 + 209 = 438 meses (36 años y 6 meses)
 };
 
 // ─── Porcentaje de pensión según años cotizados ────────────────────────────
 
 /**
- * Sistema de tramos para calcular el % de pensión (Ley 21/2021, transitorio 2025)
+ * Sistema de tramos para calcular el % de pensión (DT 9.ª LGSS, escala de 2026)
  * - Primeros 15 años (180 meses): 50%
- * - Meses 181 a 276 (hasta ~23 años): +0.21% por mes adicional
- * - Meses 277 en adelante (hasta cap): +0.19% por mes adicional
- * - Máximo: 100%
+ * - Meses ADICIONALES 1 a 49 (meses absolutos 181-229): +0,21% cada uno = 10,29
+ * - Los 209 meses siguientes (meses absolutos 230-438): +0,19% cada uno = 39,71
+ * - Máximo: 100%, que se alcanza exactamente en el mes 438 (36 años y 6 meses)
+ *
+ * ⚠️ 2026-09-21 (hallazgo 1093 del Inspector): el tramo del 0,21% llegaba hasta el mes
+ *    276 —96 meses adicionales en vez de 49—, lo que inflaba el porcentaje de TODA
+ *    carrera de entre 15 y 36,5 años cotizados y situaba el 100% en un sitio distinto
+ *    al que anunciaba COTIZACION_MINIMA.mesesParaCien. La escala real se verificó en la
+ *    Seguridad Social («un 0,21% por cada mes adicional de cotización, entre los meses 1
+ *    y 49, y un 0,19% los que rebasen el mes 49»). La comprobación que delata un tramo
+ *    mal puesto es que los dos incrementos sumen EXACTAMENTE 50 puntos, porque la escala
+ *    está construida para llevar del 50% al 100%: 49 × 0,21 + 209 × 0,19 = 10,29 + 39,71.
  */
 export interface TramosPorcentajePension {
   mesesDesde: number;
@@ -83,9 +92,9 @@ export interface TramosPorcentajePension {
 }
 
 export const TRAMOS_PORCENTAJE_PENSION_2025: TramosPorcentajePension[] = [
-  { mesesDesde: 180, mesesHasta: 180,  porcentajeBase: 50,    incrementoPorMes: 0 },
-  { mesesDesde: 181, mesesHasta: 276,  porcentajeBase: 50,    incrementoPorMes: 0.21 },
-  { mesesDesde: 277, mesesHasta: 9999, porcentajeBase: 70.16, incrementoPorMes: 0.19 },
+  { mesesDesde: 180, mesesHasta: 180, porcentajeBase: 50,    incrementoPorMes: 0 },
+  { mesesDesde: 181, mesesHasta: 229, porcentajeBase: 50,    incrementoPorMes: 0.21 },
+  { mesesDesde: 230, mesesHasta: 438, porcentajeBase: 60.29, incrementoPorMes: 0.19 },
 ];
 
 // ─── Límites de pensión 2026 (euros/mes, 14 pagas) ───────────────────────────
