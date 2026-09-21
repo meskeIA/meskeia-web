@@ -601,6 +601,19 @@ const NO_METALES_HIDRURO = ['B', 'C', 'Si', 'N', 'P', 'As', 'Sb'];
  */
 const NO_METALES_TRADICIONALES = ['B', 'C', 'Si', 'N', 'P', 'As', 'Sb', 'S', 'Se', 'Te', 'Cl', 'Br', 'I'];
 
+/**
+ * Pares «elemento + estado» cuyo anhídrido no da un oxácido que exista.
+ *
+ * ⚠️ 2026-09-21 (hallazgo 1066 del Inspector): el ejemplo tradicional se generaba con una
+ *    plantilla fija «anhídrido X y ácido X», que acierta en 12 de los 13 no metales y falla
+ *    en el carbono con +2: el anhídrido carbonoso es el CO, pero el ácido carbonoso (H₂CO₂)
+ *    que la plantilla deriva no es una sustancia. El CO es un óxido neutro: no reacciona con
+ *    agua para dar un ácido, que es justo lo que define a un anhídrido.
+ */
+const SIN_OXACIDO: Record<string, true> = {
+  'C2': true,
+};
+
 /** Grupo 18. Apenas forman compuestos, y los conocidos son casi todos con flúor y oxígeno. */
 const GASES_NOBLES = ['He', 'Ne', 'Ar', 'Kr', 'Xe', 'Rn'];
 
@@ -721,7 +734,13 @@ function formularBinario(
     Kr₃N₂, XeCl₈ o AuN con la misma cara con la que devuelve Fe₂O₃ (hallazgo 929). Con los
     gases nobles la regla sí es enunciable y la propia FAQ de esta página la enuncia —«solo
     con flúor y oxígeno: XeF₂, XeF₄, XeO₃, XeO₄»—, así que aquí se avisa. Para el resto no hay
-    tabla posible de lo que existe, y de eso avisa la nota al pie del formulador.
+    tabla posible de lo que existe.
+
+    ⚠️ 2026-09-21 (hallazgo 1064): este comentario afirmaba que «de eso avisa la nota al pie
+    del formulador», y comprobado en navegador la nota al pie hablaba solo de peróxidos,
+    compuestos ternarios y sales de oxoácidos: el control compensatorio que esta decisión
+    daba por existente NO estaba en la página, de modo que Au₃N o Ag₄C salían con la misma
+    cara que Fe₂O₃. Ahora la nota dice expresamente que esto formula y no predice.
   */
   if (GASES_NOBLES.includes(positivo.simbolo) && !['F', 'O'].includes(negativo.simbolo)) {
     advertencia =
@@ -934,8 +953,9 @@ export default function TablaValenciasPage() {
         */}
         <p className={styles.alcance}>
           Están los {ELEMENTOS.length} elementos que se formulan en secundaria y bachillerato: los
-          grupos principales completos y los metales de transición de uso corriente. No incluye
-          lantánidos, actínidos ni transuránicos, que no intervienen en la formulación del aula.
+          grupos principales y los metales de transición de uso corriente. No incluye lantánidos,
+          actínidos ni transuránicos, y de los grupos principales faltan los cinco radiactivos
+          que no se formulan en el aula: polonio, astato, radón, francio y radio.
         </p>
 
         <div className={styles.leyendaChips}>
@@ -951,9 +971,10 @@ export default function TablaValenciasPage() {
         {elementosFiltrados.length === 0 && (
           <p className={styles.sinResultados}>
             No hay ningún elemento que coincida con «{busqueda}». Prueba con el símbolo (Fe), el
-            nombre (hierro) o el nombre tradicional (férrico). Si buscas un lantánido, un actínido
-            o un metal de transición poco habitual (titanio, wolframio, molibdeno…), no está en
-            esta tabla: recoge los {ELEMENTOS.length} elementos que se formulan en el aula.
+            nombre (hierro) o el nombre tradicional (férrico). Si buscas un lantánido, un actínido,
+            un metal de transición poco habitual (titanio, wolframio, molibdeno…) o uno de los
+            cinco radiactivos de los grupos principales (polonio, astato, radón, francio, radio),
+            no está en esta tabla: recoge los {ELEMENTOS.length} elementos que se formulan en el aula.
           </p>
         )}
 
@@ -1037,6 +1058,12 @@ export default function TablaValenciasPage() {
                         ficha del cloro llegaba a ofrecer «cloruro hipocloroso», un cloruro de sí
                         mismo. Afectaba a las 13 fichas de no metal con nomenclatura tradicional.
                         Un no metal forma anhídridos y, con agua, oxácidos: esos son sus ejemplos.
+
+                        ⚠️ 2026-09-21 (hallazgo 1064 del Inspector): sustituir una plantilla fija
+                        por otra acertaba en 12 de los 13, y fallaba en el carbono con +2: el
+                        anhídrido carbonoso sí es el CO en tradicional, pero el ácido carbonoso
+                        (H₂CO₂) que la plantilla deriva no es una sustancia que exista. De ahí
+                        SIN_OXACIDO: donde el anhídrido no da ácido, se ofrece solo el anhídrido.
                       */}
                       <ul className={styles.detalleTradicional}>
                         {Object.entries(el.tradicional).map(([valor, adjetivo]) => (
@@ -1044,9 +1071,11 @@ export default function TablaValenciasPage() {
                             <span className={styles.chipMini}>{formatearEstado(Number(valor))}</span>
                             <span>
                               <strong>{adjetivo}</strong> — por ejemplo,{' '}
-                              {NO_METALES_TRADICIONALES.includes(el.simbolo)
-                                ? `anhídrido ${adjetivo} y ácido ${adjetivo}`
-                                : `óxido ${adjetivo} y cloruro ${adjetivo}`}
+                              {!NO_METALES_TRADICIONALES.includes(el.simbolo)
+                                ? `óxido ${adjetivo} y cloruro ${adjetivo}`
+                                : SIN_OXACIDO[`${el.simbolo}${valor}`]
+                                  ? `anhídrido ${adjetivo} (el ácido correspondiente no existe)`
+                                  : `anhídrido ${adjetivo} y ácido ${adjetivo}`}
                             </span>
                           </li>
                         ))}
@@ -1192,6 +1221,14 @@ export default function TablaValenciasPage() {
           </p>
         )}
 
+        <p className={styles.notaFormulador}>
+          <span aria-hidden="true">ℹ️</span> <strong>Esto formula, no predice.</strong> El
+          intercambio de valencias dice cómo SE ESCRIBIRÍA un compuesto de esos dos elementos,
+          no si ese compuesto existe: con algunas combinaciones devuelve una fórmula
+          impecable de una sustancia que nadie ha preparado. Cuando la regla es enunciable
+          —los gases nobles, el mercurio(I)— lo avisa; fuera de esos casos, comprueba el
+          compuesto antes de darlo por bueno.
+        </p>
         <p className={styles.notaFormulador}>
           <span aria-hidden="true">ℹ️</span> Los peróxidos (H₂O₂, Na₂O₂) no aparecen aquí: el grupo
           O₂²⁻ es una unidad y sus subíndices no se simplifican, así que no siguen la regla del

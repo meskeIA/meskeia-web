@@ -100,8 +100,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *         formulador lo devuelve sin pestañear. Sí rechaza, en cambio, el mismo elemento en
  *         los dos lados (S/S), que es la comprobación que sí tiene.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que DEBERÍA pasar y
- * hoy fallan a propósito. El día que se reparen, se les quita la línea `test.fail()` y
+ * HALLAZGOS REPARADOS el 21/09/2026: al final. Iban marcados con `test.fail()` —afirmaban lo
+ * que DEBERÍA pasar y fallaban a propósito— y ahora son tests normales, porque
  * quedan como candado de regresión.
  */
 
@@ -554,36 +554,41 @@ test.describe('La tabla declara hasta dónde llega (21/09/2026)', () => {
 // HALLAZGOS ABIERTOS (21/09/2026) — con test.fail(): afirman lo que DEBERÍA pasar
 // ═══════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos del 21/09/2026', () => {
-  test('932 · Au(+3) + N(−3) devuelve AuN sin avisar de que no existe', async ({ page }) => {
-    test.fail();
-
+test.describe('Los 3 hallazgos del 21/09/2026, reparados el mismo día', () => {
+  test('1064 · el formulador declara que formula y no predice, y AuN queda cubierto', async ({ page }) => {
     // Au(+3) + N(−3) → mcd(3,3)=3 → subíndices 1 y 1 → AuN. El nitruro de oro no es un
-    // compuesto químico conocido, y el formulador lo devuelve como «mononitruro de oro /
-    // nitruro de oro(III) / nitruro áurico», sin ninguna señal.
+    // compuesto químico conocido, y el formulador lo devolvía como «mononitruro de oro /
+    // nitruro de oro(III) / nitruro áurico», sin ninguna señal. Mismo mecanismo en
+    // Au(+1)+N(−3) → Au₃N y Ag(+1)+C(−4) → Ag₄C (el carburo de plata real es el
+    // acetiluro Ag₂C₂).
     //
-    // Es el TERCER caso literal del hallazgo 929 del 18/09 —los otros dos eran Kr₃N₂ y
-    // XeCl₈—, y la reparación solo cubrió los gases nobles. El comentario del código lo
-    // asume y dice que «de eso avisa la nota al pie del formulador»; comprobado en el
-    // navegador el 21/09/2026, la nota al pie habla de peróxidos, compuestos ternarios y
-    // sales de oxoácidos, y NO dice en ningún momento que el intercambio de valencias pueda
-    // producir compuestos que no existan. El aviso que la reparación da por existente no
-    // está en la página.
+    // POR QUÉ LA REPARACIÓN NO ES UN ⚠️ EN ESTE RESULTADO
+    // El comentario del código decía que «de eso avisa la nota al pie del formulador», y
+    // comprobado el 21/09/2026 la nota hablaba solo de peróxidos, ternarios y sales de
+    // oxoácidos: el control compensatorio que esa decisión daba por existente NO estaba en
+    // la página. Lo que faltaba era el control, y es el control lo que se ha puesto.
     //
-    // Mismo mecanismo, otros dos ejemplos comprobados hoy: Au(+1)+N(−3) → Au₃N y
-    // Ag(+1)+C(−4) → Ag₄C (el carburo de plata real es el acetiluro Ag₂C₂), los dos mudos.
+    // Marcar cada combinación inexistente exigiría una tabla enumerable de los compuestos
+    // que existen, que no hay; y un ⚠️ que saliera en casi todas las combinaciones dejaría
+    // de informar, que es justo el modo de fallo que este proyecto tiene escrito («un color
+    // que sale siempre deja de informar»). Lo que sí se puede afirmar sin excepciones es
+    // que la regla del intercambio dice cómo se ESCRIBIRÍA un compuesto, no si existe. Eso
+    // es lo que la nota al pie dice ahora, de forma permanente y junto al formulador.
     await page.selectOption('#elemento-positivo', 'Au');
     await page.selectOption('#elemento-negativo', 'N');
-
     await expect(formula(page)).toHaveText('AuN');
-    // Lo que debería ocurrir: o el resultado lleva su aviso, como con los gases nobles…
+
+    const nota = page.getByText(/Esto formula, no predice/);
+    await expect(nota).toHaveCount(1);
+    await expect(nota.locator('xpath=..')).toContainText('no si ese compuesto existe');
+    // Y sigue distinguiendo: donde la regla SÍ es enunciable, el aviso es del resultado.
+    await page.selectOption('#elemento-positivo', 'Kr');
     await expect(resultado(page)).toContainText('⚠️');
   });
 
-  test('933 · el párrafo de alcance promete «los grupos principales completos» y faltan cinco', async ({
+  test('1065 · el alcance nombra los cinco radiactivos que faltan, y el buscador también', async ({
     page,
   }) => {
-    test.fail();
 
     // El párrafo dice: «Están los 51 elementos que se formulan en secundaria y bachillerato:
     // los grupos principales COMPLETOS y los metales de transición de uso corriente. No
@@ -603,14 +608,16 @@ test.describe('Hallazgos abiertos del 21/09/2026', () => {
     await buscar(page, 'radón');
     await expect(fichas(page)).toHaveCount(0);
     const sinResultados = page.getByText(/No hay ningún elemento que coincida/);
-    // Lo que debería ocurrir: que el mensaje cubra también por qué NO está el radón.
-    await expect(sinResultados).toContainText(/radiactiv|gas noble pesado|Rn/);
+    // El mensaje cubre ahora por qué NO está el radón, y el párrafo de alcance ya no
+    // promete «los grupos principales completos».
+    await expect(sinResultados).toContainText(/radiactiv/);
+    await expect(sinResultados).toContainText('radón');
+    await expect(page.locator('body')).not.toContainText('grupos principales completos');
   });
 
-  test('934 · la ficha del carbono ofrece «ácido carbonoso», que no es una sustancia real', async ({
+  test('1066 · la ficha del carbono ya no ofrece «ácido carbonoso», que no existe', async ({
     page,
   }) => {
-    test.fail();
 
     // Residuo de la reparación del hallazgo 930: la plantilla fija «óxido X y cloruro X» se
     // cambió por otra plantilla fija, «anhídrido X y ácido X», para los 13 no metales con raíz
@@ -622,7 +629,11 @@ test.describe('Hallazgos abiertos del 21/09/2026', () => {
     // él no es una sustancia que exista. Es el mismo defecto del 930 —un ejemplo generado por
     // plantilla sin comprobar que el compuesto existe— reducido a un único caso.
     const ficha = await abrirFicha(page, 'carbono');
+    // El +4 sí tiene oxácido real y se ofrece entero…
     await expect(ficha).toContainText('carbónico — por ejemplo, anhídrido carbónico y ácido carbónico');
-    await expect(ficha).not.toContainText('ácido carbonoso');
+    // …y el +2 se queda en el anhídrido, que es lo único que existe: el CO es un óxido
+    // neutro y no reacciona con agua para dar un ácido.
+    await expect(ficha).toContainText('anhídrido carbonoso (el ácido correspondiente no existe)');
+    await expect(ficha).not.toContainText('y ácido carbonoso');
   });
 });
