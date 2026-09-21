@@ -253,12 +253,12 @@ const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; 
   garaje: [{
     url: '/simulador-gastos-compraventa-garaje/',
     nombre: 'Simulador de gastos de compraventa de garaje',
-    matiz: 'en obra nueva distingue el garaje transmitido con la vivienda (IVA 10%, hasta 2 plazas) del garaje independiente (IVA 21%). Aquí se aplica siempre el 10%.',
+    matiz: `en obra nueva distingue el garaje transmitido con la vivienda (IVA ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%, hasta 2 plazas) del garaje independiente (IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}%). Aquí se aplica siempre el ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%.`,
   }],
   trastero: [{
     url: '/simulador-gastos-compraventa-trastero/',
     nombre: 'Simulador de gastos de compraventa de trastero',
-    matiz: 'en obra nueva distingue el trastero transmitido con la vivienda (IVA 10%) del trastero independiente (IVA 21%). Aquí se aplica siempre el 10%.',
+    matiz: `en obra nueva distingue el trastero transmitido con la vivienda (IVA ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%) del trastero independiente (IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}%). Aquí se aplica siempre el ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%.`,
   }],
   local: [{
     url: '/simulador-gastos-compraventa-local-comercial/',
@@ -279,7 +279,7 @@ const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; 
     {
       url: '/simulador-gastos-compraventa-solar/',
       nombre: 'Simulador de gastos de compra de solar',
-      matiz: 'en el suelo edificable el impuesto depende de quién vende: IVA 21% + AJD si vende un promotor o empresario, ITP si vende un particular.',
+      matiz: `en el suelo edificable el impuesto depende de quién vende: IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}% + AJD si vende un promotor o empresario, ITP si vende un particular.`,
     },
   ],
 };
@@ -1883,7 +1883,7 @@ export default function SimuladorCompraventaPage() {
             <strong>Errores comunes al calcular los gastos de compraventa</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al 21%, que a menudo se olvida en el presupuesto inicial.</li>
+            <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al {formatNumber(PORCENTAJES_IVA.general, 0)}%, que a menudo se olvida en el presupuesto inicial.</li>
             <li><strong>Ignorar el valor de referencia catastral:</strong> Si supera el precio escriturado, Hacienda aplicará ITP sobre ese valor mayor y podrás recibir una comprobación de valores.</li>
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>

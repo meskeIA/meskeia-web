@@ -4021,16 +4021,17 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
   });
 
   /**
-   * ⚠️ HALLAZGO 21/09/2026 (MEDIO, contenido) — RESIDUO del hallazgo MEDIO del 14/09: a un
-   * garaje o un trastero SUELTOS se les sigue ofreciendo un tipo llamado «Vivienda habitual».
+   * ✅ HALLAZGO 1155 del 21/09/2026 (MEDIO, contenido), REPARADO el 21/09 — era el RESIDUO
+   * del hallazgo MEDIO del 14/09: a un garaje o un trastero SUELTOS se les seguía ofreciendo
+   * un tipo llamado «Vivienda habitual».
    *
-   * La reparación del 14/09 descarta de `alAlcanceDeCualquiera` los reducidos que exigen
-   * vivienda habitual, pero mira SOLO el array `condiciones`:
+   * La reparación del 14/09 descartaba de `alAlcanceDeCualquiera` los reducidos que exigen
+   * vivienda habitual, pero miraba SOLO el array `condiciones`:
    *     !(!viviendaHabitual && r.condiciones.some(c => /vivienda habitual/i.test(c)))
    * y en Castilla-La Mancha ese requisito viaja en el NOMBRE — «Vivienda habitual (primera
    * compra)», 6 % — mientras sus condiciones dicen «Primera vivienda · Valor ≤ 180.000 € ·
-   * Hipoteca > 50% del valor». Ninguna casa con el patrón, así que el filtro no lo ve y el
-   * aviso se lo ofrece a un garaje suelto, que no puede ser ni la vivienda habitual ni la
+   * Hipoteca > 50% del valor». Ninguna casaba con el patrón, así que el filtro no lo veía y
+   * el aviso se lo ofrecía a un garaje suelto, que no puede ser ni la vivienda habitual ni la
    * «primera vivienda» de nadie. Es la ÚNICA entrada de la tabla en ese caso (barrido de las
    * 19 comunidades: las otras dos con el requisito solo en el nombre, «VPO primera vivienda»
    * de Valencia y La Rioja, son de colectivo y ya quedan fuera por `DE_COLECTIVO`).
@@ -4038,16 +4039,18 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
    * Caso: Garaje/Parking · segunda mano · Castilla-La Mancha · perfil General · 140.000 €
    *   esperado: ningún tipo que exija ser la vivienda habitual (quedarían los tres de zona
    *     despoblada, que dependen del municipio y no de quién compra).
-   *   obtenido: «6,00% — Vivienda habitual (primera compra) · Requisitos: Primera vivienda ·
-   *     Valor ≤ 180.000 € · Hipoteca > 50% del valor», bajo el rótulo «Podrías pagar menos»
-   *     y con el pie que invita a llamar a la oficina liquidadora.
+   *   obtenido (21/09, antes de reparar): «6,00% — Vivienda habitual (primera compra) ·
+   *     Requisitos: Primera vivienda · Valor ≤ 180.000 € · Hipoteca > 50% del valor», bajo el
+   *     rótulo «Podrías pagar menos» y con el pie que invita a llamar a la oficina liquidadora.
    */
-  test('HALLAZGO 21/09 — a un garaje no se le ofrece un reducido cuyo requisito va en el NOMBRE', async ({
+  test('REGRESIÓN 1155 — a un garaje no se le ofrece un reducido cuyo requisito va en el NOMBRE', async ({
     page,
   }) => {
-    // Hallazgo ABIERTO: el testigo debe fallar mientras el defecto siga vivo.
-    test.fail();
-    // El requisito está en el nombre y no en las condiciones: de ahí el hueco
+    // ✅ REPARADO el 21/09/2026 en `data/itp-ccaa.ts`: `exigeViviendaHabitual` mira el NOMBRE
+    // además del array `condiciones`, y reconoce «primera vivienda» como la otra forma de
+    // escribir el requisito. La ficha sigue declarándolo en el nombre —no se tocó el dato,
+    // que es correcto— y lo que cambió es el filtro que lo lee.
+    // El requisito está en el nombre y no en las condiciones: de ahí venía el hueco
     const clm = ITP_CCAA['castilla-mancha'].tiposReducidos.find((t) =>
       /vivienda habitual/i.test(t.nombre),
     );
@@ -4071,8 +4074,8 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
   });
 
   /**
-   * ⚠️ HALLAZGO 21/09/2026 (BAJO, dato) — cuatro tipos de IVA tecleados a mano en una página
-   * que importa las constantes de las que salen.
+   * ✅ HALLAZGO 1156 del 21/09/2026 (BAJO, dato), REPARADO el 21/09 — eran cuatro tipos de
+   * IVA tecleados a mano en una página que importa las constantes de las que salen.
    *
    * Es la familia de los hallazgos 581, 584, 629, 674 y 770, reparados uno a uno aquí: la
    * calculadora ya deriva su IVA de `IVA_INMUEBLES_2025` y `PORCENTAJES_IVA`, y el bloque
@@ -4091,10 +4094,10 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
    * de los avisos que derivan a las calculadoras especializadas, que son justo las que sí
    * distinguen el anejo del independiente.
    */
-  test('HALLAZGO 21/09 (dato) — los tipos de IVA de la prosa van tecleados, no derivados', async () => {
-    // Hallazgo ABIERTO: el testigo debe fallar mientras el defecto siga vivo.
-    test.fail();
-    // Hoy coinciden: por eso no hay ninguna cifra mal
+  test('REGRESIÓN 1156 — los tipos de IVA de la prosa salen de data/fiscal, no tecleados', async () => {
+    // ✅ REPARADO el 21/09/2026: los cuatro literales pasaron a interpolar
+    // `IVA_INMUEBLES_2025.anejoVinculado` y `PORCENTAJES_IVA.general`.
+    // Coinciden con lo que había escrito: por eso no había ninguna cifra mal en pantalla
     expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(10);
     expect(PORCENTAJES_IVA.general).toBe(21);
 
