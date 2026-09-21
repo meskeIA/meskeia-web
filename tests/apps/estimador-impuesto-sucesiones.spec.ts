@@ -433,9 +433,18 @@ test.describe('Reparación 11/09/2026 — formulario, contenido y señal estruct
     expect(await cuota(page)).toBe('3306,56 €');
 
     const tarjeta = await textoCompleto(page);
-    expect(tarjeta).toContain('3.306,56 €');   // la tarjeta del bloque educativo
+    /*
+      ⚠️ 21/09/2026 — esta aserción pedía «3.306,56 €», CON punto de millar, y el panel de
+      resultados imprime «3306,56 €», que es lo que da `formatCurrency`: en es-ES un número de
+      cuatro cifras enteras no lleva separador de millar. Las dos grafías convivían en la misma
+      página para la misma operación, y los propios tests encerraban una en cada aserción
+      (hallazgo 1153). Al derivar la tarjeta del motor (hallazgo 1152) la escribe
+      `formatCurrency`, así que la grafía es Única y el test exige la del panel.
+    */
+    expect(tarjeta).toContain('3306,56 €');   // la tarjeta del bloque educativo
+    expect(tarjeta).not.toContain('3.306,56 €');
     expect(tarjeta).not.toContain('17.200');
-    expect(tarjeta).toContain('50.000 € en la base');
+    expect(tarjeta).toContain('50.000,00 € en la base');
   });
 
   /**
@@ -1191,6 +1200,54 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
       expect(usos, `${constante} se importa pero no se usa`).toBeGreaterThanOrEqual(2);
     }
   });
+
+  /**
+   * [1152 y 1153] La tarjeta del sobrino asturiano, la ÚLTIMA de las cuatro del bloque
+   * educativo que seguía con su aritmética tecleada a mano: los 2.400 € de ajuar, los
+   * 50.000 € de Asturias, los 24.406,54 € de base liquidable, los 2.081,95 € de cuota
+   * íntegra, el 1,5882 y los 3.306,56 € finales. Solo la reducción de parentesco se
+   * derivaba. Las cifras eran correctas —verificadas contra la herramienta—, y por eso el
+   * testigo no es el VALOR sino la PROCEDENCIA: que la tarjeta salga del mismo
+   * `calcularSucesion` que el panel, como ya salen la de Madrid (794), la de la viuda
+   * catalana (815) y la comparativa de CCAA (816).
+   *
+   * El 1153 es la mitad visible del mismo defecto: escrita a mano, la tarjeta ponía punto
+   * de millar donde el panel no lo pone, y anunciaba «4,1 % del valor heredado» dividiendo
+   * entre los 80.000 € de la cuenta mientras el panel divide entre la base CON ajuar y da
+   * 4,01 %. Derivada, las dos cifras salen del mismo sitio.
+   */
+  test('1152 y 1153 — la tarjeta del sobrino se deriva del motor y usa las cifras del panel', async ({
+    page,
+  }) => {
+    const fuente = readFileSync(
+      join(process.cwd(), 'app/estimador-impuesto-sucesiones/page.tsx'),
+      'utf8',
+    );
+    // La tarjeta la escribe el motor, no la memoria: ninguna de sus seis cifras va tecleada.
+    // Solo lo que llega al usuario: los comentarios del codigo quedan fuera, igual que en el
+    // testigo del hallazgo 1156 en estimador-compraventa-inmueble.
+    const jsx = fuente
+      .split('\n')
+      .map((linea) => linea.trim())
+      .filter((linea) => !/^(\/\/|\*|\/\*)/.test(linea))
+      .join('\n');
+    for (const tecleada of ['24.406,54', '2.081,95', '3.306,56', '1,5882', '4,1%']) {
+      expect(jsx, `sigue tecleada en el JSX: ${tecleada}`).not.toContain(tecleada);
+    }
+    expect(fuente).toContain('EJEMPLO_SOBRINO = calcularSucesion');
+
+    // Y lo que la tarjeta publica es lo que la herramienta liquida con esos mismos datos.
+    await page.goto(RUTA);
+    await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
+    await page.locator('select').nth(SELECT.parentesco).selectOption('III');
+    await importe(page, CAMPO.saldos, '80000');
+    expect(await cuota(page)).toBe('3306,56 €');
+
+    const texto = await textoCompleto(page);
+    // Un solo tipo efectivo para la misma operación, con el denominador del motor
+    expect(texto).toContain('4,01');
+    expect(texto).not.toContain('4,1% del valor heredado');
+  });
 });
 
 /**
@@ -1257,14 +1314,23 @@ test.describe('Estimador ISD — lo que hay por delante del primer control en 39
     expect(medidas.anchoScroll).toBe(390);
 
     /*
-      TECHO, no objetivo. 2.308 px medidos el 21/09/2026 frente a los 2.504 px que el acta
-      del 14/09 dio por reparados: el margen deja pasar el estado actual y bloquea cualquier
-      bloque nuevo que devuelva la app a donde estaba. El hallazgo sigue abierto en el acta.
+      TECHO, bajado a la medida real tras REPARAR el hallazgo 1151 el 21/09/2026: los avisos
+      pasaron debajo de la herramienta —posición 6 de la estructura estándar— y el primer
+      control subió de 2.308 px a 862 px. El margen que queda absorbe las diferencias de
+      renderizado de la banda «Descubre Delegum», no es un colchón para volver a meter
+      bloques por encima del formulario.
     */
     expect(
       medidas.primerControl,
       'algo ha vuelto a crecer por encima del formulario',
-    ).toBeLessThan(2500);
-    expect(medidas.primerImporte).toBeLessThan(3300);
+    ).toBeLessThan(900);
+    expect(medidas.primerImporte).toBeLessThan(1700);
+    /*
+      Lo que el acta del 1151 pedía: algo accionable en la 1.ª o la 2.ª pantalla. El select de
+      la CCAA cae a 862 px —18 px dentro de la segunda— y su encabezado «Datos del Heredero»
+      queda ya en la primera. Lo que hay por delante es el hero, el LegalNotice y la banda
+      «Descubre Delegum», que son componentes compartidos de todo el catálogo.
+    */
+    expect(medidas.primerControl, 'el primer control cae en la 2.ª pantalla').toBeLessThan(844 * 2);
   });
 });

@@ -318,6 +318,30 @@ const EJEMPLO_MADRID_COMPARATIVA = calcularSucesion({
   incluyeAjuar: true,
 });
 
+/**
+ * La tarjeta del sobrino asturiano, que era la última de las cuatro con la aritmética
+ * TECLEADA A MANO.
+ *
+ * ⚠️ 21/09/2026 (hallazgos 1152 y 1153) — escribía a mano los 2.400 € de ajuar, los 50.000 €
+ * de la reducción de Asturias, los 24.406,54 € de base liquidable, los 2.081,95 € de cuota
+ * íntegra, el coeficiente 1,5882 y los 3.306,56 € de cuota final; solo la reducción de
+ * parentesco se derivaba. Las cifras eran correctas —verificadas contra la herramienta—,
+ * pero es exactamente la forma que ya se separó dos veces en este mismo fichero (hallazgos
+ * 794, 815 y 816), y los 50.000 € y el 1,5882 están sellados en `BONIFICACIONES_CCAA_IS` y
+ * `COEFICIENTES_IS`. Al derivarla desaparece además la segunda mitad del defecto: la tarjeta
+ * escribía «2.081,95 €» y «3.306,56 €» con punto de millar y el panel de resultados, para
+ * esos mismos datos, «2081,95 €» y «3306,56 €», que es lo que da `formatCurrency` (en es-ES
+ * un número de cuatro cifras enteras no lleva separador de millar).
+ */
+const EJEMPLO_SOBRINO_CUENTA = 80000;
+const EJEMPLO_SOBRINO = calcularSucesion({
+  baseImponible: EJEMPLO_SOBRINO_CUENTA,
+  ccaa: 'asturias',
+  grupo: 'III',
+  edadHeredero: 45,
+  incluyeAjuar: true,
+});
+
 /** Importe en euros para la prosa: mismo formato que el resto de la página. */
 const euros = (n: number) => formatCurrency(n);
 
@@ -638,44 +662,6 @@ export default function EstimadorImpuestoSucesionesPage() {
 
 
       <LegalNotice />
-
-      <DisclaimerCard
-        variant="financial"
-        severity="critical"
-        collapsible={false}
-      />
-
-      <DataReference
-        normativa={`ISD ${FISCAL_SUCESIONES_META.vigencia}`}
-        fuente={FISCAL_SUCESIONES_META.fuente}
-        verificado={FISCAL_SUCESIONES_META.verificado}
-        urlOficial={FISCAL_SUCESIONES_META.urlOficial}
-      />
-
-      {/*
-        Qué NO entra en la estimación, SIEMPRE VISIBLE y sin repetir el DisclaimerCard.
-
-        ⚠️ 14/09/2026 (hallazgo 819) — este bloque y el DisclaimerCard obligatorio de arriba
-        sumaban 1.394 px de avisos consecutivos que decían sustancialmente lo mismo: los dos
-        abrían con «exclusivamente orientativa» y cerraban con «meskeIA no se responsabiliza».
-        Con ellos, el primer control de la app quedaba a 2.504 px en 390x844 —casi tres
-        pantallas de advertencias antes del primer desplegable— y la estancia media era de 21
-        segundos. La duplicación era de la app, no de la política de riesgo 1, que exige UN
-        disclaimer: el obligatorio se queda íntegro y arriba, y aquí solo permanece lo que no
-        está en ninguna otra parte, que son los límites concretos de ESTE cálculo.
-      */}
-      <div className={styles.disclaimerCritico}>
-        <h2 className={styles.disclaimerTitulo}><span aria-hidden="true">⚠️</span> Qué no incluye esta estimación</h2>
-        <ul>
-          <li>El ISD contempla decenas de supuestos especiales no incluidos aquí</li>
-          <li>Empresas familiares, explotaciones agrarias y otros bienes tienen reducciones especiales</li>
-          <li>Las bonificaciones autonómicas pueden tener requisitos formales adicionales</li>
-          <li>El ajuar doméstico ({formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} %) puede impugnarse con prueba en contrario</li>
-        </ul>
-        <p className={styles.disclaimerPlazo}>
-          <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong> desde el fallecimiento ({PLAZO_ISD.norma}), prorrogable {PLAZO_ISD.mesesProrroga} meses más con intereses de demora, y la prórroga se pide dentro de los {PLAZO_ISD.mesesParaPedirProrroga} primeros
-        </p>
-      </div>
 
       <div className={styles.mainContent}>
         {/* ── Panel de inputs ─────────────────────────────────────── */}
@@ -1017,6 +1003,60 @@ export default function EstimadorImpuestoSucesionesPage() {
         </div>
       </div>
 
+      {/*
+        Los avisos van DEBAJO de la herramienta, que es la posición 6 de la estructura
+        estándar del proyecto (logo, hero, LegalNotice, herramienta, RESULTADOS,
+        DisclaimerCard). Estaban encima, y el hallazgo 1151 midió lo que eso costaba en
+        390x844, el viewport de la mitad del tráfico: el primer control caía a 2.308 px
+        —2,73 pantallas— y la segunda pantalla entera no contenía ni un encabezado, ni un
+        control, ni un botón: solo la cola del DisclaimerCard y el DataReference. La
+        reparación del 14/09 había quitado 196 px de 2.504, un 7,8 %, y el resultado que
+        motivaba el hallazgo no se movió.
+
+        No se toca NADA del contenido: el DisclaimerCard sigue íntegro y sin colapsar, como
+        exige la política de riesgo 1, el DataReference sigue inmediatamente detrás de él y
+        el bloque de límites de ESTE cálculo sigue siempre visible. Lo único que cambia es
+        que ahora se leen junto a la cifra a la que se refieren.
+      */}
+      <DisclaimerCard
+        variant="financial"
+        severity="critical"
+        collapsible={false}
+      />
+
+      <DataReference
+        normativa={`ISD ${FISCAL_SUCESIONES_META.vigencia}`}
+        fuente={FISCAL_SUCESIONES_META.fuente}
+        verificado={FISCAL_SUCESIONES_META.verificado}
+        urlOficial={FISCAL_SUCESIONES_META.urlOficial}
+      />
+
+      {/*
+        Qué NO entra en la estimación, SIEMPRE VISIBLE y sin repetir el DisclaimerCard.
+
+        ⚠️ 14/09/2026 (hallazgo 819) — este bloque y el DisclaimerCard obligatorio de arriba
+        sumaban 1.394 px de avisos consecutivos que decían sustancialmente lo mismo: los dos
+        abrían con «exclusivamente orientativa» y cerraban con «meskeIA no se responsabiliza».
+        Con ellos, el primer control de la app quedaba a 2.504 px en 390x844 —casi tres
+        pantallas de advertencias antes del primer desplegable— y la estancia media era de 21
+        segundos. La duplicación era de la app, no de la política de riesgo 1, que exige UN
+        disclaimer: el obligatorio se queda íntegro y arriba, y aquí solo permanece lo que no
+        está en ninguna otra parte, que son los límites concretos de ESTE cálculo.
+      */}
+      <div className={styles.disclaimerCritico}>
+        <h2 className={styles.disclaimerTitulo}><span aria-hidden="true">⚠️</span> Qué no incluye esta estimación</h2>
+        <ul>
+          <li>El ISD contempla decenas de supuestos especiales no incluidos aquí</li>
+          <li>Empresas familiares, explotaciones agrarias y otros bienes tienen reducciones especiales</li>
+          <li>Las bonificaciones autonómicas pueden tener requisitos formales adicionales</li>
+          <li>El ajuar doméstico ({formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} %) puede impugnarse con prueba en contrario</li>
+        </ul>
+        <p className={styles.disclaimerPlazo}>
+          <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong> desde el fallecimiento ({PLAZO_ISD.norma}), prorrogable {PLAZO_ISD.mesesProrroga} meses más con intereses de demora, y la prórroga se pide dentro de los {PLAZO_ISD.mesesParaPedirProrroga} primeros
+        </p>
+      </div>
+
+
       {/* Contenido educativo */}
       <EducationalSection
         title="¿Quieres entender el Impuesto de Sucesiones?"
@@ -1204,17 +1244,22 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p>
-                  Base imponible: 80.000 € + 2.400 € (ajuar) = <strong>82.400 €</strong>.
-                  Reducción por parentesco (Grupo III): {euros(REDUCCIONES_PARENTESCO_IS['III'])}. Reducción propia de Asturias
-                  para el Grupo III: 50.000 € en la base. Base liquidable: 24.406,54 €.
-                  Cuota íntegra: 2.081,95 €. Coeficiente multiplicador (Grupo III): × 1,5882 → <strong>3.306,56 €</strong>.
+                  Base imponible: {euros(EJEMPLO_SOBRINO_CUENTA)} + {euros(EJEMPLO_SOBRINO.ajuarDomestico)} (ajuar) ={' '}
+                  <strong>{euros(EJEMPLO_SOBRINO.baseImponibleConAjuar)}</strong>.
+                  Reducción por parentesco (Grupo III): {euros(EJEMPLO_SOBRINO.reduccionParentesco)}. Reducción propia de Asturias
+                  para el Grupo III: {euros(EJEMPLO_SOBRINO.reduccionAutonomicaBase)} en la base. Base liquidable: {euros(EJEMPLO_SOBRINO.baseLiquidable)}.
+                  Cuota íntegra: {euros(EJEMPLO_SOBRINO.cuotaIntegra)}. Coeficiente multiplicador (Grupo III): ×{formatNumber(EJEMPLO_SOBRINO.coeficienteMultiplicador, 4)} → <strong>{euros(EJEMPLO_SOBRINO.cuotaFinal)}</strong>.
                   Asturias no tiene bonificación en cuota para el Grupo III: su beneficio ya se ha
                   aplicado antes, en la base.
                 </p>
-                <p><strong>Cuota final estimada: 3.306,56 €</strong> (4,1% del valor heredado)</p>
+                {/* El tipo efectivo sale del motor, que lo calcula sobre la base CON ajuar,
+                    que es lo que se grava. La tarjeta lo dividía entre los 80.000 € de la
+                    cuenta y publicaba «4,1 %» donde el panel imprimía «4,01 %»: dos
+                    denominadores para la misma operación (hallazgo 1152). */}
+                <p><strong>Cuota final estimada: {euros(EJEMPLO_SOBRINO.cuotaFinal)}</strong> ({formatNumber(EJEMPLO_SOBRINO.tipoEfectivo, 2)} % de la base con ajuar)</p>
               </div>
               <div className={styles.escenarioTip}>
-                Al colateral le toca el coeficiente multiplicador de 1,5882, que encarece la cuota
+                Al colateral le toca el coeficiente multiplicador de {formatNumber(EJEMPLO_SOBRINO.coeficienteMultiplicador, 4)}, que encarece la cuota
                 frente a hijos y cónyuge. Lo que cambia mucho de una comunidad a otra es qué recibe
                 el Grupo III: doce comunidades del régimen común no le dan nada, Asturias le reduce
                 50.000 € de la base, Madrid y Murcia le bonifican el 50% de la cuota y Canarias el
@@ -1331,10 +1376,10 @@ export default function EstimadorImpuestoSucesionesPage() {
               <dd>
                 Es un factor que incrementa la cuota íntegra según el grupo de parentesco y el
                 patrimonio preexistente del heredero. Un hijo con menos de 402.678 € de patrimonio
-                usa el coeficiente 1,0000 (sin incremento). Un sobrino (Grupo III) con el mismo
-                patrimonio usa 1,5882, por lo que paga un 58,82% más que la cuota íntegra base.
-                Con patrimonio preexistente superior a 4.020.770 €, el coeficiente llega a 2,4 en
-                el Grupo IV.
+                usa el coeficiente {formatNumber(COEFICIENTES_IS['II'][0], 4)} (sin incremento). Un sobrino (Grupo III) con el mismo
+                patrimonio usa {formatNumber(COEFICIENTES_IS['III'][0], 4)}, por lo que paga un {formatNumber((COEFICIENTES_IS['III'][0] - 1) * 100, 2)} % más que la cuota íntegra base.
+                Con patrimonio preexistente superior a 4.020.770 €, el coeficiente llega a{' '}
+                {formatNumber(COEFICIENTES_IS['IV'][COEFICIENTES_IS['IV'].length - 1], 1)} en el Grupo IV.
               </dd>
             </div>
 
