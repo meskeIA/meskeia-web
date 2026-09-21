@@ -46,8 +46,9 @@ import { test, expect, Page } from '@playwright/test';
  *     del volumen celular») sin dejar rastro de la fotosíntesis. Los objetivos táctiles de los
  *     orgánulos etiquetados deben llegar al mínimo de 24×24 px CSS (WCAG 2.5.8 AA); el dibujo
  *     se capa a 320 px en móvil, así que el más pequeño (ribosomas, 8% × 8%) sale a 25,6 px y
- *     entra justo. En cambio «Pared celular» ocupa el 100% × 100% con z-index 0 y queda tapada
- *     por la vacuola (z-index 2) en todo su centro: predicho a mano y confirmado en navegador.
+ *     entra justo. «Pared celular», «Membrana plasmática» y «Citoplasma» ya no son botones del
+ *     dibujo —apilados con z-index no se podían pulsar donde uno los ve— sino una fila propia
+ *     de 44 px de alto bajo él, que es donde el CASO 3 los busca desde el 21/09/2026.
  *
  * Los tres casos se ejecutaron contra http://localhost:3050/visualizador-celula/ con Playwright
  * vía node_modules/playwright (no MCP) y coincidieron con la resolución a mano.
@@ -58,6 +59,15 @@ const RUTA = '/visualizador-celula/';
 /** Botón de un orgánulo del dibujo: su aria-label es «<nombre>: toca para ver función». */
 function organulo(page: Page, nombre: string) {
   return page.getByRole('button', { name: `${nombre}: toca para ver función` });
+}
+
+/**
+ * Botón de una estructura envolvente (membrana, pared, citoplasma). Desde el 21/09/2026
+ * viven en su propia fila bajo el dibujo, con su nombre como único texto: como botones
+ * apilados en el dibujo no se podían pulsar donde uno los ve (hallazgos 1067 y 1073).
+ */
+function envolvente(page: Page, nombre: string) {
+  return page.locator('[class*="envolventeBtn"]').filter({ hasText: nombre }).first();
 }
 
 /** Contenedor del panel de información (los hijos comparten prefijo de clase: el primero es él). */
@@ -136,6 +146,11 @@ async function inventarioDelDibujo(page: Page): Promise<string[]> {
     const etiqueta = (await b.getAttribute('aria-label')) ?? '';
     nombres.push(etiqueta.replace(': toca para ver función', ''));
   }
+  // Los envolventes ya no son botones del dibujo, pero siguen siendo orgánulos de la
+  // sección: el inventario de lo que la app OFRECE tiene que contarlos.
+  for (const b of await page.locator('[class*="envolventeBtn"]').all()) {
+    nombres.push((await b.innerText()).trim());
+  }
   return nombres;
 }
 
@@ -152,9 +167,12 @@ test('CASO 2: exclusivos vegetales y animales repartidos según la biología', a
 
   await abrirSeccion(page, 'Célula Vegetal');
   const vegetal = await inventarioDelDibujo(page);
+  // Los dos envolventes van al final: desde el 21/09/2026 se listan en su propia fila,
+  // detrás del dibujo, y el inventario los recoge después.
   expect(vegetal).toEqual([
-    'Pared celular', 'Núcleo', 'Cloroplastos', 'Vacuola central', 'Mitocondria',
-    'Aparato de Golgi', 'Retículo Endoplasmático', 'Ribosomas', 'Membrana plasmática',
+    'Núcleo', 'Cloroplastos', 'Vacuola central', 'Mitocondria',
+    'Aparato de Golgi', 'Retículo Endoplasmático', 'Ribosomas',
+    'Pared celular', 'Membrana plasmática',
   ]);
 
   // Pared celular, cloroplastos y vacuola central son exclusivos de la célula VEGETAL.
@@ -253,27 +271,49 @@ test.describe('Móvil (Pixel 7)', () => {
       expect(caja!.height, `alto táctil de ${nombre}`).toBeGreaterThanOrEqual(24);
     }
 
-    // HALLAZGO del Inspector (21/09/2026), documentado aquí para que se note al repararlo:
-    // «Pared celular» es un botón del 100% × 100% con z-index 0, tapado en todo su centro por
-    // la vacuola (z-index 2). Tocar el centro del botón selecciona la VACUOLA, no la pared.
-    // Cuando se repare (p. ej. dándole un objetivo propio), este aserto pasará a rojo: hay que
-    // invertirlo entonces, no relajarlo.
-    // Se deja el cloroplasto seleccionado: si el activo fuese la vacuola, tocar su área la
-    // deseleccionaría (toggle) y el panel se cerraría, escondiendo a quién pertenece el punto.
+    // Hallazgo 1067 · REPARADO. «Pared celular» era un botón del 100 % × 100 % con z-index 0,
+    // tapado en todo su centro por la vacuola: tocar su centro seleccionaba la VACUOLA, y la
+    // única zona viva era un anillo de ~9,6 px pegado al borde. Ahora se pulsa desde su
+    // propia fila, y ahí sí responde donde uno la ve.
+    // Se deja el cloroplasto seleccionado antes de tocar, para que el cambio sea visible.
     await organulo(page, 'Cloroplastos').tap();
     await expect(tituloPanel(page)).toHaveText('Cloroplastos');
 
-    const pared = organulo(page, 'Pared celular');
+    const pared = envolvente(page, 'Pared celular');
     await pared.scrollIntoViewIfNeeded();
     const cajaPared = await pared.boundingBox();
-    await page.touchscreen.tap(cajaPared!.x + cajaPared!.width / 2, cajaPared!.y + cajaPared!.height / 2);
-    await expect(tituloPanel(page)).toHaveText('Vacuola central');
-    await expect(pared).toHaveAttribute('aria-pressed', 'false');
+    expect(cajaPared, 'caja de Pared celular').not.toBeNull();
+    // WCAG 2.5.8 (AA), que el anillo de 9,6 px incumplía por los dos lados.
+    expect(cajaPared!.width).toBeGreaterThanOrEqual(24);
+    expect(cajaPared!.height).toBeGreaterThanOrEqual(24);
 
-    // Su contenido sí está y sí es alcanzable con teclado: la pared es de celulosa.
-    await pared.focus();
-    await page.keyboard.press('Enter');
+    await page.touchscreen.tap(cajaPared!.x + cajaPared!.width / 2, cajaPared!.y + cajaPared!.height / 2);
     await expect(tituloPanel(page)).toHaveText('Pared celular');
     await expect(panelInfo(page)).toContainText('celulosa');
+    await expect(pared).toHaveAttribute('aria-pressed', 'true');
+
+    // Y sigue siendo alcanzable con teclado.
+    await envolvente(page, 'Membrana plasmática').focus();
+    await page.keyboard.press('Enter');
+    await expect(tituloPanel(page)).toHaveText('Membrana plasmática');
+  });
+
+  test('CASO 4: el citoplasma ya no es una mancha anónima que se contradice con su ficha', async ({ page }) => {
+    test.setTimeout(90_000);
+    await irAlVisualizador(page);
+
+    // Hallazgo 1073 · se dibujaba como una mancha gris de 48×32 px abajo a la izquierda, sin
+    // etiqueta visible, y al tocarla salía una ficha que decía «ocupa todo el interior
+    // celular»: el usuario veía una contradicción entre lo que tocó y lo que leyó.
+    const citoplasma = envolvente(page, 'Citoplasma');
+    await expect(citoplasma).toBeVisible();
+    await citoplasma.tap();
+    await expect(tituloPanel(page)).toHaveText('Citoplasma');
+    await expect(panelInfo(page)).toContainText('Ocupa todo el interior celular');
+
+    // Ya no hay ningún botón del dibujo sin texto visible.
+    for (const b of await page.getByRole('button', { name: /: toca para ver función$/ }).all()) {
+      expect((await b.innerText()).trim(), 'botón del dibujo sin etiqueta visible').not.toBe('');
+    }
   });
 });

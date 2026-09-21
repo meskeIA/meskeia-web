@@ -49,6 +49,20 @@ interface Organulo {
   width: string;
   height: string;
   borderRadius: string;
+  /**
+   * Envuelve a toda la célula (membrana, pared) o llena su interior (citoplasma).
+   *
+   * ⚠️ 2026-09-21 (hallazgos 1067 y 1073 del Inspector): estos cuatro eran botones como
+   *    los demás, apilados con z-index sobre el mismo dibujo, y el resultado era que no se
+   *    podían pulsar donde uno los ve. «Pared celular» —el orgánulo vegetal más
+   *    emblemático— ocupaba el 100 % del dibujo con z-index 0, así que la vacuola central
+   *    le tapaba el centro y la membrana el resto: la única zona viva era un anillo de unos
+   *    9,6 px pegado al borde, muy por debajo del mínimo de 24 px de la WCAG 2.5.8. Y el
+   *    citoplasma se dibujaba como una mancha anónima de 48×32 px cuya propia ficha decía
+   *    «ocupa todo el interior celular».
+   *    Ahora se pintan como forma (sin ser botones) y se pulsan desde su propia fila.
+   */
+  envolvente?: boolean;
 }
 
 const ORGANULOS_ANIMAL: Organulo[] = [
@@ -109,6 +123,7 @@ const ORGANULOS_ANIMAL: Organulo[] = [
     top: '25%', left: '30%', width: '8%', height: '8%', borderRadius: '2px',
   },
   {
+    envolvente: true,
     id: 'membrana', nombre: 'Membrana plasmática', color: '#1ABC9C',
     funcion: 'Barrera selectiva: controla qué entra y sale de la célula. Formada por una bicapa de fosfolípidos.',
     tamano: '~7-8 nm de grosor',
@@ -116,6 +131,7 @@ const ORGANULOS_ANIMAL: Organulo[] = [
     top: '0%', left: '0%', width: '100%', height: '100%', borderRadius: '50% 48% 52% 46% / 50% 52% 48% 50%',
   },
   {
+    envolvente: true,
     id: 'citoplasma', nombre: 'Citoplasma', color: '#95A5A6',
     funcion: 'Medio gelatinoso que llena la célula. Contiene agua, sales, enzimas y moléculas orgánicas. Soporte para los orgánulos.',
     tamano: 'Ocupa todo el interior celular',
@@ -126,6 +142,7 @@ const ORGANULOS_ANIMAL: Organulo[] = [
 
 const ORGANULOS_VEGETAL: Organulo[] = [
   {
+    envolvente: true,
     id: 'pared', nombre: 'Pared celular', color: '#8D6E63',
     funcion: 'Estructura rígida de celulosa que rodea la membrana. Da forma fija, soporte mecánico y protección contra presión osmótica.',
     tamano: '~0,1-10 μm de grosor',
@@ -182,6 +199,7 @@ const ORGANULOS_VEGETAL: Organulo[] = [
     top: '78%', left: '30%', width: '8%', height: '8%', borderRadius: '50%',
   },
   {
+    envolvente: true,
     id: 'membrana-v', nombre: 'Membrana plasmática', color: '#1ABC9C',
     funcion: 'Igual que en la animal: bicapa de fosfolípidos que controla el transporte de sustancias.',
     tamano: '~7-8 nm',
@@ -228,8 +246,8 @@ interface DatoFascinante {
 
 const DATOS_FASCINANTES: DatoFascinante[] = [
   { icono: '🔬', titulo: '37,2 billones de células', detalle: 'Tu cuerpo tiene aproximadamente 37,2 billones de células trabajando en equipo. Más que estrellas en la Vía Láctea.' },
-  { icono: '⚡', titulo: '~36 ATP por glucosa', detalle: 'Una sola mitocondria puede producir unas 36 moléculas de ATP (energía) por cada molécula de glucosa procesada.' },
-  { icono: '🧬', titulo: 'ADN de 2 metros', detalle: 'El ADN de una sola célula humana, estirado, mediría unos 2 metros. Si juntaras el ADN de todas tus células, llegaría al Sol y volvería unas 600 veces.' },
+  { icono: '⚡', titulo: '~30-32 ATP por glucosa', detalle: 'Oxidar una molécula de glucosa rinde unas 30-32 moléculas de ATP. El trabajo es de la CÉLULA entera, no solo de la mitocondria: la glucólisis ocurre en el citosol y aporta 2 ATP, y el resto sale de la mitocondria. El 36-38 de los manuales antiguos no descontaba el coste de meter el NADH y los protones.' },
+  { icono: '🧬', titulo: 'ADN de 2 metros', detalle: 'El ADN de una sola célula humana, estirado, mediría unos 2 metros. Juntando el de tus 37,2 billones de células salen unos 74 mil millones de kilómetros: el Sol está a 150 millones, así que daría para ir y volver unas 250 veces.' },
   { icono: '🔄', titulo: '330.000 millones/día mueren', detalle: 'Cada día mueren aproximadamente 330.000 millones de células en tu cuerpo y se reemplazan por nuevas. Te renuevas constantemente.' },
   { icono: '🥚', titulo: 'La más grande: huevo de avestruz', detalle: 'La célula más grande del mundo es el huevo de avestruz, con unos 15 cm de diámetro. Es una única célula gigante.' },
   { icono: '🦠', titulo: 'La más pequeña: Mycoplasma', detalle: 'Mycoplasma genitalium mide solo ~0,2 μm. Caben millones en la punta de un alfiler. Es la bacteria más pequeña conocida.' },
@@ -269,7 +287,27 @@ function SeccionCelulaAnimal() {
       <div className={styles.celulaContainer}>
         <h3 className={styles.celulaLabel}>Toca un orgánulo para explorar</h3>
         <div className={styles.celulaVisual}>
-          {ORGANULOS_ANIMAL.map(o => (
+          {/* Los envolventes se pintan como FORMA, no como botón: apilados con z-index
+              sobre el mismo dibujo no se podían pulsar donde uno los ve. Se seleccionan
+              desde la fila de abajo (hallazgos 1067 y 1073). */}
+          {ORGANULOS_ANIMAL.filter(o => o.envolvente).map(o => (
+            <div
+              key={o.id}
+              aria-hidden="true"
+              className={`${styles.organuloForma} ${organuloActivo === o.id ? styles.organuloFormaActiva : ''}`}
+              style={{
+                top: o.top,
+                left: o.left,
+                width: o.width,
+                height: o.height,
+                borderRadius: o.borderRadius,
+                backgroundColor: organuloActivo === o.id ? o.color : `${o.color}33`,
+                borderColor: o.color,
+                zIndex: o.id === 'membrana' ? 0 : 1,
+              }}
+            />
+          ))}
+          {ORGANULOS_ANIMAL.filter(o => !o.envolvente).map(o => (
             <button
               key={o.id}
               type="button"
@@ -282,17 +320,34 @@ function SeccionCelulaAnimal() {
                 borderRadius: o.borderRadius,
                 backgroundColor: organuloActivo === o.id ? o.color : `${o.color}33`,
                 borderColor: o.color,
-                zIndex: o.id === 'membrana' ? 0 : o.id === 'citoplasma' ? 1 : 2,
+                zIndex: 5,
               }}
               onClick={() => setOrganuloActivo(organuloActivo === o.id ? null : o.id)}
               aria-pressed={organuloActivo === o.id}
               aria-label={`${o.nombre}: toca para ver función`}
             >
-              {o.id !== 'membrana' && o.id !== 'citoplasma' && (
-                <span className={styles.organuloNombre}>{o.nombre}</span>
-              )}
+              <span className={styles.organuloNombre}>{o.nombre}</span>
             </button>
           ))}
+        </div>
+
+        <div className={styles.envolventes}>
+          <h4 className={styles.envolventesTitulo}>Estructuras que envuelven o llenan la célula</h4>
+          <div className={styles.envolventesFila}>
+            {ORGANULOS_ANIMAL.filter(o => o.envolvente).map(o => (
+              <button
+                key={o.id}
+                type="button"
+                className={`${styles.envolventeBtn} ${organuloActivo === o.id ? styles.envolventeBtnActivo : ''}`}
+                style={{ borderColor: o.color, backgroundColor: organuloActivo === o.id ? `${o.color}33` : undefined }}
+                onClick={() => setOrganuloActivo(organuloActivo === o.id ? null : o.id)}
+                aria-pressed={organuloActivo === o.id}
+              >
+                <span className={styles.envolventePunto} style={{ backgroundColor: o.color }} aria-hidden="true" />
+                {o.nombre}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -329,13 +384,33 @@ function SeccionCelulaVegetal() {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>La célula vegetal tiene todo lo de la animal y más: <strong>pared celular</strong>, <strong>cloroplastos</strong> y una <strong>vacuola central</strong> enorme. Toca cada orgánulo.</p>
+        <p>La célula vegetal comparte casi todo con la animal y suma tres estructuras propias: <strong>pared celular</strong>, <strong>cloroplastos</strong> y una <strong>vacuola central</strong> enorme. A cambio le faltan dos que sí tiene la animal, <strong>centriolos</strong> y <strong>lisosomas</strong>, como se ve en la comparativa. Toca cada orgánulo.</p>
       </div>
 
       <div className={styles.celulaContainer}>
         <h3 className={styles.celulaLabel}>Toca un orgánulo para explorar</h3>
         <div className={`${styles.celulaVisual} ${styles.celulaVegetal}`}>
-          {ORGANULOS_VEGETAL.map(o => (
+          {/* Los envolventes se pintan como FORMA, no como botón: apilados con z-index
+              sobre el mismo dibujo no se podían pulsar donde uno los ve. Se seleccionan
+              desde la fila de abajo (hallazgos 1067 y 1073). */}
+          {ORGANULOS_VEGETAL.filter(o => o.envolvente).map(o => (
+            <div
+              key={o.id}
+              aria-hidden="true"
+              className={`${styles.organuloForma} ${organuloActivo === o.id ? styles.organuloFormaActiva : ''}`}
+              style={{
+                top: o.top,
+                left: o.left,
+                width: o.width,
+                height: o.height,
+                borderRadius: o.borderRadius,
+                backgroundColor: organuloActivo === o.id ? o.color : `${o.color}33`,
+                borderColor: o.color,
+                zIndex: o.id === 'pared' ? 0 : 1,
+              }}
+            />
+          ))}
+          {ORGANULOS_VEGETAL.filter(o => !o.envolvente).map(o => (
             <button
               key={o.id}
               type="button"
@@ -348,17 +423,34 @@ function SeccionCelulaVegetal() {
                 borderRadius: o.borderRadius,
                 backgroundColor: organuloActivo === o.id ? o.color : `${o.color}33`,
                 borderColor: o.color,
-                zIndex: o.id === 'pared' ? 0 : o.id === 'membrana-v' ? 1 : o.id === 'vacuola' ? 2 : 3,
+                zIndex: 5,
               }}
               onClick={() => setOrganuloActivo(organuloActivo === o.id ? null : o.id)}
               aria-pressed={organuloActivo === o.id}
               aria-label={`${o.nombre}: toca para ver función`}
             >
-              {o.id !== 'pared' && o.id !== 'membrana-v' && (
-                <span className={styles.organuloNombre}>{o.nombre}</span>
-              )}
+              <span className={styles.organuloNombre}>{o.nombre}</span>
             </button>
           ))}
+        </div>
+
+        <div className={styles.envolventes}>
+          <h4 className={styles.envolventesTitulo}>Estructuras que envuelven o llenan la célula</h4>
+          <div className={styles.envolventesFila}>
+            {ORGANULOS_VEGETAL.filter(o => o.envolvente).map(o => (
+              <button
+                key={o.id}
+                type="button"
+                className={`${styles.envolventeBtn} ${organuloActivo === o.id ? styles.envolventeBtnActivo : ''}`}
+                style={{ borderColor: o.color, backgroundColor: organuloActivo === o.id ? `${o.color}33` : undefined }}
+                onClick={() => setOrganuloActivo(organuloActivo === o.id ? null : o.id)}
+                aria-pressed={organuloActivo === o.id}
+              >
+                <span className={styles.envolventePunto} style={{ backgroundColor: o.color }} aria-hidden="true" />
+                {o.nombre}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -431,7 +523,7 @@ function SeccionComparativa() {
           </div>
           <div className={styles.vennInterseccion}>
             <span className={styles.vennLabel}>Ambas</span>
-            <span className={styles.vennItems}>Núcleo, Mitocondrias<br />Ribosomas, RE<br />Golgi, Membrana</span>
+            <span className={styles.vennItems}>Núcleo, Mitocondrias<br />Ribosomas, RE, Golgi<br />Membrana, Citoplasma</span>
           </div>
           <div className={styles.vennCirculo} style={{ right: '10%' }}>
             <span className={styles.vennLabel}>Solo Vegetal</span>
@@ -563,7 +655,10 @@ export default function VisualizadorCelulaPage() {
           <p>
             Hay dos procesos principales: la <strong>mitosis</strong> (división para crecimiento y reparación, produce 2 células
             idénticas) y la <strong>meiosis</strong> (división para reproducción sexual, produce 4 células con la mitad
-            de cromosomas). Una célula humana típica se divide cada 24 horas aproximadamente.
+            de cromosomas). Las 24 horas que suelen citarse son la duración del ciclo de una célula que
+            SÍ prolifera, no la frecuencia de la célula típica: la mayoría de las células diferenciadas
+            están paradas en G0 y no vuelven a dividirse —neuronas, células del músculo cardíaco, las
+            del cristalino—, mientras que el epitelio del intestino se renueva en días.
           </p>
 
           <h3>¿Por qué las células vegetales son cuadradas y las animales redondas?</h3>

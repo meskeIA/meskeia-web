@@ -44,6 +44,55 @@
 .organuloNombre { font-size: 0.6rem; font-weight: 700; color: var(--text-primary); text-align: center; line-height: 1.2; pointer-events: none; text-shadow: 0 0 4px var(--bg-card), 0 0 4px var(--bg-card); }
 [data-theme='dark'] .organuloNombre { text-shadow: 0 0 4px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.8); }
 
+/* Envolventes: se pintan como FORMA (no son botones) y se seleccionan desde su fila.
+   Ver el comentario de `envolvente` en page.tsx: como botones apilados con z-index
+   sobre el mismo dibujo, no se podían pulsar donde uno los ve. */
+.organuloForma {
+  position: absolute;
+  border: 2px solid;
+  box-sizing: border-box;
+  pointer-events: none;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.organuloFormaActiva { box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.4); }
+
+.envolventes { margin-top: var(--spacing-md); }
+.envolventesTitulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+.envolventesFila { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+
+.envolventeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  /* 44 px de alto: por encima del mínimo de 24 px de la WCAG 2.5.8 que el anillo
+     de 9,6 px del borde incumplía. */
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid;
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.envolventeBtn:hover { transform: translateY(-1px); }
+.envolventeBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.envolventeBtnActivo { box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.35); }
+
+.envolventePunto {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 /* Panel de info */
 .infoPanel { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid; border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: slideIn 0.25s ease-out; }
 @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
