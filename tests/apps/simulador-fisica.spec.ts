@@ -3,7 +3,7 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
 
 /**
  * Inspector — simulador-fisica (segmento INTERACTIVA/MOTOR, RIESGO 3)
- * Inspeccionada el 21/09/2026. NO reparada: el acta recoge los hallazgos.
+ * Inspeccionada el 21/09/2026 · REPARADA el mismo día (hallazgos 1109-1114).
  *
  * Qué promete la app
  * ──────────────────
@@ -152,5 +152,84 @@ test.describe('simulador-fisica · tiro parabólico', () => {
     // Y nada de «NaN» en el marcador, que es donde asomaría un parseo roto.
     const marcador = await page.locator('span:text-is("Alcance")').locator('xpath=../..').innerText();
     expect(marcador).not.toContain('NaN');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Los hallazgos reparados el 21/09/2026
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('simulador-fisica · reparaciones del 21/09/2026', () => {
+  test('hallazgo 1109 · en PAUSA, período y velocidad siguen a los deslizadores', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="range"]']);
+    await page.getByRole('button', { name: /Ondas/ }).click();
+    await expect(page.getByRole('heading', { name: /Ondas/, level: 2 })).toBeVisible();
+
+    // La página nace PAUSADA, que es donde estaba el defecto: el período y la velocidad
+    // vivían en estado y solo se reescribían al resetear o mientras la animación corría,
+    // así que el marcador quedaba descuadrado consigo mismo —«Frecuencia 2,00 Hz» junto a
+    // «Período 1,00 s»— mientras el canvas ya dibujaba la longitud de onda nueva.
+    await sembrarValorAcotado(page, page.getByLabel('Frecuencia', { exact: true }), 2);
+    await sembrarValorAcotado(page, page.getByLabel('Longitud de onda (λ)'), 400);
+
+    // T = 1/f = 0,50 s  ·  v = λ·f = 400 × 2 = 800 px/s. Antes: 1,00 s y 200 px/s.
+    expect(await leerMarcador(page, 'Período')).toBeCloseTo(0.5, 2);
+    expect(await leerMarcador(page, 'Velocidad')).toBeCloseTo(800, 0);
+    // Y la frecuencia que la tarjeta contigua enseña es la misma que manda en T = 1/f.
+    expect(await leerMarcador(page, 'Frecuencia')).toBeCloseTo(2, 2);
+  });
+
+  test('hallazgo 1110 · al impactar, tiempo y velocidad se recortan como la posición', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="range"]']);
+    // La Caída Libre es el simulador por defecto: altura y masa son los dos primeros.
+    await sembrarValorAcotado(page, page.getByLabel('Altura inicial'), 20);
+    await sembrarValorAcotado(page, page.getByLabel('Masa del objeto'), 1);
+
+    // Energía ANTES de soltar: m·g·h = 1 × 9,81 × 20 = 196,2 → «196 J».
+    const energiaInicial = await leerMarcador(page, 'Energía');
+    expect(energiaInicial).toBeCloseTo(196, 0);
+
+    await page.getByRole('button', { name: 'Iniciar simulación', exact: true }).click();
+
+    // t = √(2h/g) = 2,0193 s → «2,02 s» · v = g·t = 19,809 → «19,81 m/s».
+    // Antes se recortaba la POSICIÓN pero no el tiempo ni la velocidad del mismo
+    // fotograma, así que salían 2,03 s y 19,95 m/s y la energía SUBÍA a 199 J en una
+    // simulación que la tabla educativa marca «sin rozamiento → conserva energía».
+    await expect
+      .poll(async () => leerMarcador(page, 'Tiempo'), { timeout: 30_000 })
+      .toBeCloseTo(2.02, 2);
+    expect(await leerMarcador(page, 'Velocidad')).toBeCloseTo(19.81, 2);
+    // La energía final no puede pasar de la inicial: es el testigo de la conservación.
+    expect(await leerMarcador(page, 'Energía')).toBeLessThanOrEqual(energiaInicial);
+  });
+
+  test('hallazgos 1111-1113 · los deslizadores tienen nombre, las pestañas estado y los valores formato español', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="range"]']);
+
+    // 1111 · el árbol de accesibilidad daba «slider "100"» y «slider "1"» a secas: con
+    // lector de pantalla no había forma de saber qué se estaba cambiando.
+    await expect(page.getByLabel('Altura inicial')).toHaveAttribute('type', 'range');
+    await expect(page.getByLabel('Masa del objeto')).toHaveAttribute('type', 'range');
+    for (const s of await page.locator('input[type="range"]').all()) {
+      expect(await s.getAttribute('aria-label'), 'deslizador sin nombre accesible').toBeTruthy();
+    }
+
+    // 1112 · las cinco pestañas llevan el estado de la app y solo lo marcaban por color.
+    const activa = page.getByRole('button', { name: /Caída Libre/ });
+    await expect(activa).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /Péndulo/ })).toHaveAttribute('aria-pressed', 'false');
+
+    // 1113 · formato español: la etiqueta imprimía el número crudo de JavaScript, con
+    // PUNTO decimal, a dos centímetros de un marcador que ya escribía «100,0m».
+    await sembrarValorAcotado(page, page.getByLabel('Masa del objeto'), 0.5);
+    await expect(valorDeControl(page, 'Masa del objeto')).toHaveText('0,5 kg');
+    await expect(page.locator('body')).not.toContainText('0.5 kg');
+    await expect(page.locator('body')).not.toContainText('2.5m');
   });
 });

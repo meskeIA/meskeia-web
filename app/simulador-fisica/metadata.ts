@@ -40,6 +40,12 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/simulador-fisica/',
   category: 'EducationalApplication',
   features: [
+    'Cinco simuladores en un mismo lienzo: caída libre, péndulo simple, proyectil, ondas y resorte',
+    'Parámetros ajustables en tiempo real con deslizadores (altura, masa, ángulo, constante del resorte, frecuencia)',
+    'Marcador numérico con tiempo, velocidad, posición y energía mientras la simulación corre',
+    'Caída libre con y sin resistencia del aire, para comparar el modelo ideal con el real',
+    'Ondas viajeras, estacionarias e interferencia de dos fuentes',
+    'Ejemplos preparados (manzana, paracaidista, tiro libre) para partir de un caso concreto',
   ],
 });
 

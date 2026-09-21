@@ -4,6 +4,14 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import styles from '../SimuladorFisica.module.css';
 import { formatNumber } from '@/lib';
 
+/**
+ * Formato español para los valores del panel de parámetros: sin decimales cuando el
+ * número es entero, con uno cuando no. Las etiquetas imprimían el número crudo de
+ * JavaScript —«0.5 kg», «2.5 m»— a dos centímetros de un marcador que sí usaba
+ * `formatNumber` y escribía «100,0m» (hallazgo 1113 del Inspector).
+ */
+const fmt = (v: number): string => formatNumber(v, Number.isInteger(v) ? 0 : 1);
+
 interface ProyectilProps {
   isPlaying: boolean;
   onReset: () => void;
@@ -440,9 +448,10 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Velocidad inicial
-            <span className={styles.controlValue}>{params.velocidadInicial} m/s</span>
+            <span className={styles.controlValue}>{fmt(params.velocidadInicial)} m/s</span>
           </label>
           <input
+            aria-label="Velocidad inicial"
             type="range"
             min="5"
             max="100"
@@ -455,9 +464,10 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Ángulo de lanzamiento
-            <span className={styles.controlValue}>{params.angulo}°</span>
+            <span className={styles.controlValue}>{fmt(params.angulo)}°</span>
           </label>
           <input
+            aria-label="Ángulo de lanzamiento"
             type="range"
             min="5"
             max="85"
@@ -470,9 +480,10 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Altura inicial
-            <span className={styles.controlValue}>{params.alturaInicial} m</span>
+            <span className={styles.controlValue}>{fmt(params.alturaInicial)} m</span>
           </label>
           <input
+            aria-label="Altura inicial"
             type="range"
             min="0"
             max="50"
@@ -506,28 +517,32 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
           <h4 className={styles.presetsTitle}>Ejemplos</h4>
           <div className={styles.presetsList}>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, velocidadInicial: 20, angulo: 45, alturaInicial: 0 })}
             >
-              ⚽ Pelota de fútbol
+              <span aria-hidden="true">⚽</span> Pelota de fútbol
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, velocidadInicial: 50, angulo: 30, alturaInicial: 0 })}
             >
-              🏌️ Golpe de golf
+              <span aria-hidden="true">🏌️</span> Golpe de golf
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, velocidadInicial: 15, angulo: 60, alturaInicial: 20 })}
             >
-              🏀 Tiro libre
+              <span aria-hidden="true">🏀</span> Tiro libre
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, velocidadInicial: 80, angulo: 45, alturaInicial: 0 })}
             >
-              💣 Cañón (alcance máx)
+              <span aria-hidden="true">💣</span> Cañón (alcance máx)
             </button>
           </div>
         </div>

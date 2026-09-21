@@ -4,6 +4,14 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import styles from '../SimuladorFisica.module.css';
 import { formatNumber } from '@/lib';
 
+/**
+ * Formato español para los valores del panel de parámetros: sin decimales cuando el
+ * número es entero, con uno cuando no. Las etiquetas imprimían el número crudo de
+ * JavaScript —«0.5 kg», «2.5 m»— a dos centímetros de un marcador que sí usaba
+ * `formatNumber` y escribía «100,0m» (hallazgo 1113 del Inspector).
+ */
+const fmt = (v: number): string => formatNumber(v, Number.isInteger(v) ? 0 : 1);
+
 interface PenduloSimpleProps {
   isPlaying: boolean;
   onReset: () => void;
@@ -344,9 +352,10 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Longitud
-            <span className={styles.controlValue}>{params.longitud} m</span>
+            <span className={styles.controlValue}>{fmt(params.longitud)} m</span>
           </label>
           <input
+            aria-label="Longitud"
             type="range"
             min="0.5"
             max="5"
@@ -360,9 +369,10 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Ángulo inicial
-            <span className={styles.controlValue}>{params.anguloInicial}°</span>
+            <span className={styles.controlValue}>{fmt(params.anguloInicial)}°</span>
           </label>
           <input
+            aria-label="Ángulo inicial"
             type="range"
             min="5"
             max="85"
@@ -375,9 +385,10 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Masa
-            <span className={styles.controlValue}>{params.masa} kg</span>
+            <span className={styles.controlValue}>{fmt(params.masa)} kg</span>
           </label>
           <input
+            aria-label="Masa"
             type="range"
             min="0.5"
             max="5"
@@ -391,9 +402,10 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Amortiguamiento
-            <span className={styles.controlValue}>{params.amortiguamiento}</span>
+            <span className={styles.controlValue}>{fmt(params.amortiguamiento)}</span>
           </label>
           <input
+            aria-label="Amortiguamiento"
             type="range"
             min="0"
             max="1"
@@ -418,22 +430,25 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
           <h4 className={styles.presetsTitle}>Ejemplos</h4>
           <div className={styles.presetsList}>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, longitud: 1, anguloInicial: 15 })}
             >
-              🕐 Reloj (1m, 15°)
+              <span aria-hidden="true">🕐</span> Reloj (1m, 15°)
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, longitud: 2.5, anguloInicial: 45 })}
             >
-              🎢 Columpio (2.5m, 45°)
+              <span aria-hidden="true">🎢</span> Columpio (2,5 m, 45°)
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, longitud: 0.5, anguloInicial: 30, amortiguamiento: 0.5 })}
             >
-              🔔 Campana amortiguada
+              <span aria-hidden="true">🔔</span> Campana amortiguada
             </button>
           </div>
         </div>

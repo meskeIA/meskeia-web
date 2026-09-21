@@ -1,8 +1,16 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import styles from '../SimuladorFisica.module.css';
 import { formatNumber } from '@/lib';
+
+/**
+ * Formato español para los valores del panel de parámetros: sin decimales cuando el
+ * número es entero, con uno cuando no. Las etiquetas imprimían el número crudo de
+ * JavaScript —«0.5 kg», «2.5 m»— a dos centímetros de un marcador que sí usaba
+ * `formatNumber` y escribía «100,0m» (hallazgo 1113 del Inspector).
+ */
+const fmt = (v: number): string => formatNumber(v, Number.isInteger(v) ? 0 : 1);
 
 interface OndasProps {
   isPlaying: boolean;
@@ -37,27 +45,30 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
     frecuencia2: 1.5,
   });
 
-  const [estado, setEstado] = useState({
-    tiempo: 0,
-    velocidad: 0,
-    periodo: 0,
-  });
+  const [estado, setEstado] = useState({ tiempo: 0 });
 
-  // Calcular velocidad de onda
-  const calcularVelocidad = useCallback(() => {
-    return params.frecuencia * params.longitudOnda;
-  }, [params.frecuencia, params.longitudOnda]);
+  /**
+   * ⚠️ 2026-09-21 (hallazgo 1109 del Inspector): la velocidad y el período vivían en
+   *    `estado` y solo se reescribían al resetear o mientras la animación corría. Con la
+   *    simulación PAUSADA —que es el estado en que nace la página— mover la frecuencia o
+   *    la longitud de onda dejaba el marcador descuadrado consigo mismo: «Frecuencia
+   *    2,00 Hz» junto a «Período 1,00 s», cuando T = 1/f es la fórmula que la propia tabla
+   *    educativa publica, y una velocidad que contradecía el v = λ·f que la app destaca
+   *    como ecuación principal. El canvas, mientras tanto, ya dibujaba la longitud nueva.
+   *    Son funciones puras de `params`: derivarlas hace imposible el descuadre.
+   */
+  const velocidad = useMemo(
+    () => params.frecuencia * params.longitudOnda,
+    [params.frecuencia, params.longitudOnda],
+  );
+  const periodo = useMemo(() => 1 / params.frecuencia, [params.frecuencia]);
 
   // Resetear simulación
   const resetSimulacion = useCallback(() => {
     startTimeRef.current = 0;
-    setEstado({
-      tiempo: 0,
-      velocidad: calcularVelocidad(),
-      periodo: 1 / params.frecuencia,
-    });
+    setEstado({ tiempo: 0 });
     onReset();
-  }, [calcularVelocidad, params.frecuencia, onReset]);
+  }, [onReset]);
 
   // Función de onda
   const calcularY = useCallback((x: number, t: number, params: Params): number => {
@@ -339,12 +350,7 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
 
       if (isPlaying) {
         t = (timestamp - startTimeRef.current) / 1000;
-        setEstado(prev => ({
-          ...prev,
-          tiempo: t,
-          velocidad: calcularVelocidad(),
-          periodo: 1 / params.frecuencia,
-        }));
+        setEstado({ tiempo: t });
       }
 
       dibujar(ctx, rect.width, rect.height, t);
@@ -358,7 +364,7 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
       cancelAnimationFrame(animationRef.current);
       window.removeEventListener('resize', resize);
     };
-  }, [isPlaying, calcularVelocidad, params.frecuencia, dibujar]);
+  }, [isPlaying, dibujar]);
 
   // Resetear cuando cambian parámetros clave
   useEffect(() => {
@@ -384,11 +390,11 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
         </div>
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Período</span>
-          <span className={styles.infoValue}>{formatNumber(estado.periodo, 2)}<span className={styles.infoUnit}>s</span></span>
+          <span className={styles.infoValue}>{formatNumber(periodo, 2)}<span className={styles.infoUnit}>s</span></span>
         </div>
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Velocidad</span>
-          <span className={styles.infoValue}>{formatNumber(estado.velocidad, 0)}<span className={styles.infoUnit}>px/s</span></span>
+          <span className={styles.infoValue}>{formatNumber(velocidad, 0)}<span className={styles.infoUnit}>px/s</span></span>
         </div>
       </div>
 
@@ -400,22 +406,28 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
           <label className={styles.controlLabel}>Tipo de onda</label>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button
+              type="button"
               className={`${styles.presetBtn} ${params.tipo === 'viajera' ? styles.active : ''}`}
               onClick={() => setParams({ ...params, tipo: 'viajera' })}
+              aria-pressed={params.tipo === 'viajera'}
               style={params.tipo === 'viajera' ? { borderColor: 'var(--primary)', color: 'var(--primary)' } : {}}
             >
               Viajera
             </button>
             <button
+              type="button"
               className={`${styles.presetBtn} ${params.tipo === 'estacionaria' ? styles.active : ''}`}
               onClick={() => setParams({ ...params, tipo: 'estacionaria' })}
+              aria-pressed={params.tipo === 'estacionaria'}
               style={params.tipo === 'estacionaria' ? { borderColor: 'var(--primary)', color: 'var(--primary)' } : {}}
             >
               Estacionaria
             </button>
             <button
+              type="button"
               className={`${styles.presetBtn} ${params.tipo === 'interferencia' ? styles.active : ''}`}
               onClick={() => setParams({ ...params, tipo: 'interferencia' })}
+              aria-pressed={params.tipo === 'interferencia'}
               style={params.tipo === 'interferencia' ? { borderColor: 'var(--primary)', color: 'var(--primary)' } : {}}
             >
               Interferencia
@@ -426,9 +438,10 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Amplitud
-            <span className={styles.controlValue}>{params.amplitud} px</span>
+            <span className={styles.controlValue}>{fmt(params.amplitud)} px</span>
           </label>
           <input
+            aria-label="Amplitud"
             type="range"
             min="10"
             max="100"
@@ -441,9 +454,10 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Frecuencia
-            <span className={styles.controlValue}>{params.frecuencia} Hz</span>
+            <span className={styles.controlValue}>{fmt(params.frecuencia)} Hz</span>
           </label>
           <input
+            aria-label="Frecuencia"
             type="range"
             min="0.1"
             max="3"
@@ -457,9 +471,10 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Longitud de onda (λ)
-            <span className={styles.controlValue}>{params.longitudOnda} px</span>
+            <span className={styles.controlValue}>{fmt(params.longitudOnda)} px</span>
           </label>
           <input
+            aria-label="Longitud de onda (λ)"
             type="range"
             min="50"
             max="400"
@@ -475,9 +490,10 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
             <div className={styles.controlGroup}>
               <label className={styles.controlLabel}>
                 Amplitud onda 2
-                <span className={styles.controlValue}>{params.amplitud2} px</span>
+                <span className={styles.controlValue}>{fmt(params.amplitud2)} px</span>
               </label>
               <input
+                aria-label="Amplitud onda 2"
                 type="range"
                 min="10"
                 max="100"
@@ -490,9 +506,10 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
             <div className={styles.controlGroup}>
               <label className={styles.controlLabel}>
                 Frecuencia onda 2
-                <span className={styles.controlValue}>{params.frecuencia2} Hz</span>
+                <span className={styles.controlValue}>{fmt(params.frecuencia2)} Hz</span>
               </label>
               <input
+                aria-label="Frecuencia onda 2"
                 type="range"
                 min="0.1"
                 max="3"

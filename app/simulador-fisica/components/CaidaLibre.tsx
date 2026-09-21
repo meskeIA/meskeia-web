@@ -4,6 +4,14 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import styles from '../SimuladorFisica.module.css';
 import { formatNumber } from '@/lib';
 
+/**
+ * Formato español para los valores del panel de parámetros: sin decimales cuando el
+ * número es entero, con uno cuando no. Las etiquetas imprimían el número crudo de
+ * JavaScript —«0.5 kg», «2.5 m»— a dos centímetros de un marcador que sí usaba
+ * `formatNumber` y escribía «100,0m» (hallazgo 1113 del Inspector).
+ */
+const fmt = (v: number): string => formatNumber(v, Number.isInteger(v) ? 0 : 1);
+
 interface CaidaLibreProps {
   isPlaying: boolean;
   onReset: () => void;
@@ -51,19 +59,36 @@ export default function CaidaLibre({ isPlaying, onReset }: CaidaLibreProps) {
     onReset();
   }, [params.masa, params.altura, onReset]);
 
-  // Física de caída libre
+  /**
+   * Física de caída libre. Devuelve también el tiempo EFECTIVO, recortado al instante del
+   * impacto.
+   *
+   * ⚠️ 2026-09-21 (hallazgo 1110 del Inspector): se recortaba la POSICIÓN con
+   *    `Math.min(y, altura)` pero ni el tiempo ni la velocidad del mismo fotograma, así
+   *    que la lectura final se pasaba del valor teórico en hasta g·dt —0,16 m/s a 60 fps—
+   *    y dependía de la tasa de refresco de la máquina. Se veía en que la «Energía» SUBÍA
+   *    por encima de su valor inicial en una simulación que la tabla educativa marca «sin
+   *    rozamiento → conserva energía», y en que un alumno que comparase con v = √(2gh)
+   *    —uso que la propia app propone en «Verifica cálculos de examen»— leía otro número.
+   *    Desde 20 m: 2,03 s y 19,95 m/s en vez de los 2,02 s y 19,81 m/s exactos.
+   */
   const calcularPosicion = useCallback((t: number) => {
     if (params.resistenciaAire) {
       // Con resistencia del aire (simplificado)
       const vTerminal = Math.sqrt((2 * params.masa * G) / (1.225 * params.coeficienteArrastre * 0.1));
-      const y = (vTerminal * vTerminal / G) * Math.log(Math.cosh(G * t / vTerminal));
-      const v = vTerminal * Math.tanh(G * t / vTerminal);
-      return { y: Math.min(y, params.altura), v };
+      // y(t) = (vₜ²/g)·ln(cosh(g·t/vₜ)) = h  ⇒  t = (vₜ/g)·arccosh(e^(g·h/vₜ²))
+      const tImpacto = (vTerminal / G) * Math.acosh(Math.exp((G * params.altura) / (vTerminal * vTerminal)));
+      const tEfectivo = Math.min(t, tImpacto);
+      const y = (vTerminal * vTerminal / G) * Math.log(Math.cosh(G * tEfectivo / vTerminal));
+      const v = vTerminal * Math.tanh(G * tEfectivo / vTerminal);
+      return { y: Math.min(y, params.altura), v, t: tEfectivo, tImpacto };
     } else {
-      // Sin resistencia del aire
-      const y = 0.5 * G * t * t;
-      const v = G * t;
-      return { y: Math.min(y, params.altura), v };
+      // Sin resistencia del aire: h = ½·g·t² ⇒ t = √(2h/g)
+      const tImpacto = Math.sqrt((2 * params.altura) / G);
+      const tEfectivo = Math.min(t, tImpacto);
+      const y = 0.5 * G * tEfectivo * tEfectivo;
+      const v = G * tEfectivo;
+      return { y: Math.min(y, params.altura), v, t: tEfectivo, tImpacto };
     }
   }, [params]);
 
@@ -202,10 +227,12 @@ export default function CaidaLibre({ isPlaying, onReset }: CaidaLibreProps) {
       const rect = canvas.getBoundingClientRect();
 
       if (isPlaying && !estado.haTerminado) {
-        const t = (timestamp - startTimeRef.current) / 1000;
-        const { y, v } = calcularPosicion(t);
+        const transcurrido = (timestamp - startTimeRef.current) / 1000;
+        // `t` viene ya recortado al instante del impacto, igual que `y` y `v`: las tres
+        // magnitudes del último fotograma describen el MISMO instante.
+        const { y, v, t, tImpacto } = calcularPosicion(transcurrido);
 
-        const haTerminado = y >= params.altura;
+        const haTerminado = transcurrido >= tImpacto;
         const energiaCinetica = 0.5 * params.masa * v * v;
         const energiaPotencial = params.masa * G * (params.altura - y);
 
@@ -270,9 +297,10 @@ export default function CaidaLibre({ isPlaying, onReset }: CaidaLibreProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Altura inicial
-            <span className={styles.controlValue}>{params.altura} m</span>
+            <span className={styles.controlValue}>{fmt(params.altura)} m</span>
           </label>
           <input
+            aria-label="Altura inicial"
             type="range"
             min="10"
             max="500"
@@ -285,9 +313,10 @@ export default function CaidaLibre({ isPlaying, onReset }: CaidaLibreProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Masa del objeto
-            <span className={styles.controlValue}>{params.masa} kg</span>
+            <span className={styles.controlValue}>{fmt(params.masa)} kg</span>
           </label>
           <input
+            aria-label="Masa del objeto"
             type="range"
             min="0.5"
             max="10"
@@ -312,9 +341,10 @@ export default function CaidaLibre({ isPlaying, onReset }: CaidaLibreProps) {
           <div className={styles.controlGroup}>
             <label className={styles.controlLabel}>
               Coef. arrastre
-              <span className={styles.controlValue}>{params.coeficienteArrastre}</span>
+              <span className={styles.controlValue}>{fmt(params.coeficienteArrastre)}</span>
             </label>
             <input
+              aria-label="Coeficiente de arrastre"
               type="range"
               min="0.1"
               max="1.5"
@@ -330,22 +360,25 @@ export default function CaidaLibre({ isPlaying, onReset }: CaidaLibreProps) {
           <h4 className={styles.presetsTitle}>Ejemplos</h4>
           <div className={styles.presetsList}>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, altura: 10, masa: 0.5 })}
             >
-              🍎 Manzana (10m)
+              <span aria-hidden="true">🍎</span> Manzana (10m)
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, altura: 100, masa: 1 })}
             >
-              📦 Caja (100m)
+              <span aria-hidden="true">📦</span> Caja (100m)
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, altura: 400, masa: 5, resistenciaAire: true })}
             >
-              🪂 Paracaidista (400m)
+              <span aria-hidden="true">🪂</span> Paracaidista (400m)
             </button>
           </div>
         </div>

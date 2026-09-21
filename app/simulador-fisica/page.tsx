@@ -99,7 +99,7 @@ export default function SimuladorFisicaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔬 Simulador de Física</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔬</span> Simulador de Física</h1>
         <p className={styles.subtitle}>
           Experimenta con física en tiempo real: caída libre, péndulos, proyectiles, ondas y resortes
         </p>
@@ -114,10 +114,12 @@ export default function SimuladorFisicaPage() {
         {SIMULADORES.map((sim) => (
           <button
             key={sim.id}
+            type="button"
             className={`${styles.simBtn} ${simuladorActivo === sim.id ? styles.active : ''}`}
             onClick={() => handleSimuladorChange(sim.id)}
+            aria-pressed={simuladorActivo === sim.id}
           >
-            <span className={styles.simIcon}>{sim.icono}</span>
+            <span className={styles.simIcon} aria-hidden="true">{sim.icono}</span>
             <span className={styles.simName}>{sim.nombre}</span>
           </button>
         ))}
@@ -134,6 +136,7 @@ export default function SimuladorFisicaPage() {
             <div className={styles.canvasControls}>
               {!isPlaying ? (
                 <button
+                  type="button"
                   className={styles.controlBtn}
                   onClick={handlePlay}
                   title="Iniciar"
@@ -143,6 +146,7 @@ export default function SimuladorFisicaPage() {
                 </button>
               ) : (
                 <button
+                  type="button"
                   className={`${styles.controlBtn} ${styles.active}`}
                   onClick={handlePause}
                   title="Pausar"
@@ -152,6 +156,7 @@ export default function SimuladorFisicaPage() {
                 </button>
               )}
               <button
+                type="button"
                 className={styles.controlBtn}
                 onClick={handleReset}
                 title="Reiniciar"
@@ -227,13 +232,13 @@ export default function SimuladorFisicaPage() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Caída Libre</td><td>y = ½·g·t²</td><td>Aceleración g = 9,81 m/s²</td><td>No oscila</td><td>✅ Sin rozamiento</td></tr>
-              <tr><td>Péndulo Simple</td><td>T = 2π√(L/g)</td><td>Longitud L, gravedad g</td><td>T independiente de masa</td><td>✅ Sin amortiguamiento</td></tr>
-              <tr><td>Tiro Parabólico</td><td>x = v₀·cos(α)·t</td><td>Ángulo α, velocidad v₀</td><td>Máx. alcance a 45°</td><td>✅ Sin resistencia aire</td></tr>
-              <tr><td>Ondas Mecánicas</td><td>v = λ·f</td><td>Amplitud, frecuencia, λ</td><td>T = 1/f</td><td>✅ Medio sin pérdidas</td></tr>
-              <tr><td>Resorte (MAS)</td><td>T = 2π√(m/k)</td><td>Masa m, constante k</td><td>T independiente de amplitud</td><td>✅ Sin fricción</td></tr>
-              <tr><td>Velocidad terminal</td><td>v_t = √(2mg/ρCdA)</td><td>Masa, densidad del fluido</td><td>Estado estacionario</td><td>❌ Con rozamiento</td></tr>
-              <tr><td>Ondas estacionarias</td><td>λₙ = 2L/n</td><td>Longitud, armónicos</td><td>fₙ = n·f₁</td><td>✅ Nodos fijos</td></tr>
+              <tr><td>Caída Libre</td><td>y = ½·g·t²</td><td>Aceleración g = 9,81 m/s²</td><td>No oscila</td><td><span aria-hidden="true">✅</span> Sin rozamiento</td></tr>
+              <tr><td>Péndulo Simple</td><td>T = 2π√(L/g)</td><td>Longitud L, gravedad g</td><td>T independiente de masa</td><td><span aria-hidden="true">✅</span> Sin amortiguamiento</td></tr>
+              <tr><td>Tiro Parabólico</td><td>x = v₀·cos(α)·t</td><td>Ángulo α, velocidad v₀</td><td>Máx. alcance a 45°</td><td><span aria-hidden="true">✅</span> Sin resistencia aire</td></tr>
+              <tr><td>Ondas Mecánicas</td><td>v = λ·f</td><td>Amplitud, frecuencia, λ</td><td>T = 1/f</td><td><span aria-hidden="true">✅</span> Medio sin pérdidas</td></tr>
+              <tr><td>Resorte (MAS)</td><td>T = 2π√(m/k)</td><td>Masa m, constante k</td><td>T independiente de amplitud</td><td><span aria-hidden="true">✅</span> Sin fricción</td></tr>
+              <tr><td>Velocidad terminal</td><td>v_t = √(2mg/ρCdA)</td><td>Masa, densidad del fluido</td><td>Estado estacionario</td><td><span aria-hidden="true">❌</span> Con rozamiento</td></tr>
+              <tr><td>Ondas estacionarias</td><td>λₙ = 2L/n</td><td>Longitud, armónicos</td><td>fₙ = n·f₁</td><td><span aria-hidden="true">✅</span> Nodos fijos</td></tr>
               <tr><td>Energía cinética</td><td>Ek = ½·m·v²</td><td>Masa m, velocidad v</td><td>Instantánea</td><td>↔️ Se transforma</td></tr>
             </tbody>
           </table>
@@ -242,27 +247,27 @@ export default function SimuladorFisicaPage() {
         {/* Sección 2: Casos de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🏫 Clases de Física en secundaria y preparatoria</h3>
+            <h3><span aria-hidden="true">🏫</span> Clases de Física en secundaria y preparatoria</h3>
             <p>Visualiza caída libre, péndulos y tiro parabólico en tiempo real para reforzar los conceptos teóricos con experimentación interactiva.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎯 Verificar el ángulo de 45°</h3>
+            <h3><span aria-hidden="true">🎯</span> Verificar el ángulo de 45°</h3>
             <p>Comprueba experimentalmente que el ángulo de 45° maximiza el alcance de un proyectil cuando no hay resistencia del aire.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>⚙️ Ingeniería de sistemas oscilantes</h3>
+            <h3><span aria-hidden="true">⚙️</span> Ingeniería de sistemas oscilantes</h3>
             <p>Estudia cómo varía el período de un resorte o péndulo al cambiar masa y constante elástica. Base para el diseño de amortiguadores.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎵 Física acústica y ondas</h3>
+            <h3><span aria-hidden="true">🎵</span> Física acústica y ondas</h3>
             <p>Analiza ondas estacionarias para entender la formación de armónicos en instrumentos musicales de cuerda y viento.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📐 Preparación de exámenes universitarios</h3>
+            <h3><span aria-hidden="true">📐</span> Preparación de exámenes universitarios</h3>
             <p>Practica con los 5 simuladores para afianzar los conceptos de mecánica clásica antes de exámenes de Física I y II.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔬 Comprobación de fórmulas</h3>
+            <h3><span aria-hidden="true">🔬</span> Comprobación de fórmulas</h3>
             <p>Verifica rápidamente resultados de problemas calculados a mano: introduce los mismos valores y observa si la simulación coincide.</p>
           </div>
         </div>
@@ -323,14 +328,14 @@ export default function SimuladorFisicaPage() {
             <div className={styles.stepNumber}>3</div>
             <div className={styles.stepContent}>
               <h3>Inicia la simulación</h3>
-              <p>Pulsa ▶️ para arrancar. Observa el movimiento, los vectores y los indicadores de energía en tiempo real.</p>
+              <p>Pulsa el botón <strong>Iniciar simulación</strong> (<span aria-hidden="true">▶️</span>) para arrancar. Observa el movimiento, los vectores y los indicadores de energía en tiempo real.</p>
             </div>
           </div>
           <div className={styles.step}>
             <div className={styles.stepNumber}>4</div>
             <div className={styles.stepContent}>
               <h3>Pausa y analiza</h3>
-              <p>Usa ⏸️ para detener la simulación en un instante concreto y observar los valores de posición, velocidad y energía.</p>
+              <p>Usa <strong>Pausar simulación</strong> (<span aria-hidden="true">⏸️</span>) para detener la simulación en un instante concreto y observar los valores de posición, velocidad y energía.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -344,7 +349,7 @@ export default function SimuladorFisicaPage() {
             <div className={styles.stepNumber}>6</div>
             <div className={styles.stepContent}>
               <h3>Reinicia y varía parámetros</h3>
-              <p>Usa 🔄 para reiniciar. En el proyectil, prueba diferentes ángulos; en el péndulo, cambia la longitud mental y observa el cambio de período.</p>
+              <p>Usa <span aria-hidden="true">🔄</span> para reiniciar. En el proyectil, prueba diferentes ángulos; en el péndulo, cambia la longitud mental y observa el cambio de período.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -359,34 +364,34 @@ export default function SimuladorFisicaPage() {
         {/* Sección 5: Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>💡 Empieza por Caída Libre</h3>
+            <h3><span aria-hidden="true">💡</span> Empieza por Caída Libre</h3>
             <p>Es el simulador más sencillo. Domina la caída libre antes de pasar al tiro parabólico, que la combina con movimiento horizontal.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⚡ Observa el intercambio de energías</h3>
+            <h3><span aria-hidden="true">⚡</span> Observa el intercambio de energías</h3>
             <p>En el péndulo y el resorte, presta atención a cómo la energía cinética y potencial se transforman continuamente sin perderse.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎯 Prueba el ángulo de 45°</h3>
+            <h3><span aria-hidden="true">🎯</span> Prueba el ángulo de 45°</h3>
             <p>En el proyectil, observa que 45° maximiza el alcance. Compara con 30° y 60° para visualizar la simetría de la función seno.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔊 Conecta ondas con música</h3>
+            <h3><span aria-hidden="true">🔊</span> Conecta ondas con música</h3>
             <p>Las ondas estacionarias son la base física de los instrumentos musicales. Los nodos corresponden a puntos fijos de la cuerda.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📐 Verifica cálculos de examen</h3>
+            <h3><span aria-hidden="true">📐</span> Verifica cálculos de examen</h3>
             <p>Usa el simulador como verificador: introduce los datos del problema y comprueba si el comportamiento coincide con tu solución.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔄 Reinicia entre pruebas</h3>
+            <h3><span aria-hidden="true">🔄</span> Reinicia entre pruebas</h3>
             <p>Siempre reinicia la simulación antes de cambiar de escenario para evitar confusiones entre estados intermedios de la animación.</p>
           </div>
         </div>
 
         {/* Sección 6: Warning Box */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Modelos idealizados</h3>
+          <h3><span aria-hidden="true">⚠️</span> Modelos idealizados</h3>
           <ul className={styles.warningList}>
             <li>Las simulaciones usan modelos idealizados: sin fricción, gravedad constante y sin pérdidas de energía.</li>
             <li>En la realidad, el rozamiento, la resistencia del aire y el amortiguamiento modifican el comportamiento.</li>

@@ -4,6 +4,14 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import styles from '../SimuladorFisica.module.css';
 import { formatNumber } from '@/lib';
 
+/**
+ * Formato español para los valores del panel de parámetros: sin decimales cuando el
+ * número es entero, con uno cuando no. Las etiquetas imprimían el número crudo de
+ * JavaScript —«0.5 kg», «2.5 m»— a dos centímetros de un marcador que sí usaba
+ * `formatNumber` y escribía «100,0m» (hallazgo 1113 del Inspector).
+ */
+const fmt = (v: number): string => formatNumber(v, Number.isInteger(v) ? 0 : 1);
+
 interface ResorteProps {
   isPlaying: boolean;
   onReset: () => void;
@@ -491,9 +499,10 @@ export default function Resorte({ isPlaying, onReset }: ResorteProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Masa
-            <span className={styles.controlValue}>{params.masa} kg</span>
+            <span className={styles.controlValue}>{fmt(params.masa)} kg</span>
           </label>
           <input
+            aria-label="Masa"
             type="range"
             min="0.5"
             max="5"
@@ -507,9 +516,10 @@ export default function Resorte({ isPlaying, onReset }: ResorteProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Constante k
-            <span className={styles.controlValue}>{params.constanteK} N/m</span>
+            <span className={styles.controlValue}>{fmt(params.constanteK)} N/m</span>
           </label>
           <input
+            aria-label="Constante k"
             type="range"
             min="1"
             max="50"
@@ -522,9 +532,10 @@ export default function Resorte({ isPlaying, onReset }: ResorteProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Amplitud
-            <span className={styles.controlValue}>{params.amplitud} cm</span>
+            <span className={styles.controlValue}>{fmt(params.amplitud)} cm</span>
           </label>
           <input
+            aria-label="Amplitud"
             type="range"
             min="20"
             max="120"
@@ -538,9 +549,10 @@ export default function Resorte({ isPlaying, onReset }: ResorteProps) {
         <div className={styles.controlGroup}>
           <label className={styles.controlLabel}>
             Amortiguamiento
-            <span className={styles.controlValue}>{params.amortiguamiento}</span>
+            <span className={styles.controlValue}>{fmt(params.amortiguamiento)}</span>
           </label>
           <input
+            aria-label="Amortiguamiento"
             type="range"
             min="0"
             max="2"
@@ -565,22 +577,25 @@ export default function Resorte({ isPlaying, onReset }: ResorteProps) {
           <h4 className={styles.presetsTitle}>Ejemplos</h4>
           <div className={styles.presetsList}>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, masa: 1, constanteK: 10, amplitud: 50 })}
             >
-              🔧 Resorte suave
+              <span aria-hidden="true">🔧</span> Resorte suave
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, masa: 2, constanteK: 40, amplitud: 80 })}
             >
-              🏋️ Resorte rígido
+              <span aria-hidden="true">🏋️</span> Resorte rígido
             </button>
             <button
+              type="button"
               className={styles.presetBtn}
               onClick={() => setParams({ ...params, masa: 1, constanteK: 20, amortiguamiento: 0.5 })}
             >
-              🛑 Con amortiguamiento
+              <span aria-hidden="true">🛑</span> Con amortiguamiento
             </button>
           </div>
         </div>
