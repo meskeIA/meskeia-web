@@ -37,6 +37,15 @@
  *    negativo que sobrevive al blur—, la comprobación de las dos pistas de efecto familia de
  *    `garaje`/`trastero` (ninguna aplica: esta app no tiene parte de vendedor) y 3 hallazgos
  *    nuevos al final, con `test.fail()`.
+ *  · 21/09/2026 — RE-INSPECCIÓN, la 8ª. El fichero entero pasó en verde ANTES de tocar nada
+ *    (70/70), así que todo lo reparado desde el 23/08 sigue cerrado. Los 3 hallazgos del
+ *    14/09 se reprodujeron MIDIENDO en el navegador: `.transmisionBtn.active` pasó de
+ *    3,74:1 a 4,97:1 en claro (4,58:1 en oscuro, intacto), `.sectionTitle` de 4,11:1 a
+ *    5,47:1 (4,93:1 en oscuro) y la FAQ de la plusvalía ya dice «no sujeción». Sus tests
+ *    pierden el nombre de «hallazgo» y pasan al bloque de REGRESIÓN. Tres casos nuevos
+ *    —Cantabria 480.000 €, Navarra con renuncia en 150.253,03 € exactos y tres millares mal
+ *    escritos—, el corte de Aragón en 450.000 €, y 3 hallazgos nuevos al final con
+ *    `test.fail()`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -2823,7 +2832,17 @@ test.describe('Re-inspección 14/09/2026 — tres casos nuevos', () => {
   });
 });
 
-test.describe('Hallazgos abiertos — 14/09/2026', () => {
+// ═══════════════════════════════════════════════════════════════════════════════
+// Los tres hallazgos del 14/09/2026 se repararon el mismo día y el 21/09/2026 se
+// reprodujeron uno a uno MIDIENDO en el navegador, con el tema esperado estable:
+//   · botón activo  3,74:1 → 4,97:1 en claro  (oscuro 4,58:1, que no se tocó)
+//   · .sectionTitle 4,11:1 → 5,47:1 en claro  (oscuro 4,93:1)
+//   · la FAQ de la plusvalía dice «no sujeción», no «exención»
+// Los tests conservan su redacción —afirman lo que DEBE ocurrir— y ahora sujetan la
+// reparación en vez de denunciar el defecto.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — hallazgos del 14/09/2026, reparados', () => {
   /**
    * HALLAZGO 1 (accesibilidad, medio) — el botón de transmisión ACTIVO pinta su rótulo con
    * `var(--primary)` y se queda en 3,74:1 en tema claro.
@@ -2841,7 +2860,7 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
    * Y no es un adorno: el color es lo que distingue al botón elegido de los otros dos, así
    * que es justo el texto que dice cuál de las tres tributaciones se está simulando.
    */
-  test('HALLAZGO 1 — el rótulo del botón de transmisión activo no llega a 4,5:1 en tema claro', async ({ page }) => {
+  test('REPARADO 14/09-1 — el rótulo del botón de transmisión activo llega a 4,5:1 en los dos temas', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
 
@@ -2855,8 +2874,29 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
     const activo = await esperarEstable(() =>
       peorContrasteDe(page, '[class*="transmisionBtn"][class*="active"] span:not([class*="transmisionIcon"])'),
     );
-    // Hoy: 3,74:1 en «Segunda mano».
-    expect(activo.ratio, `botón activo: «${activo.texto}»`).toBeGreaterThanOrEqual(4.5);
+    // Medido el 21/09/2026: 4,97:1 en «Segunda mano», rgb(38,113,143) sobre rgb(238,245,248).
+    expect(activo.ratio, `botón activo (claro): «${activo.texto}»`).toBeGreaterThanOrEqual(4.5);
+
+    // Y lo que la reparación NO podía romper: los botones que NO están elegidos. Si el
+    // arreglo hubiese tocado `.transmisionBtn` en vez de `.transmisionBtn.active`, los dos
+    // no elegidos habrían pasado del negro del texto normal a un azul más flojo sin que
+    // ninguna aserción del 14/09 lo notara. Medido: 16,67:1 el rótulo y 5,5:1 el subtítulo.
+    const inactivo = await esperarEstable(() =>
+      peorContrasteDe(page, '[class*="transmisionBtn"]:not([class*="active"]) span:not([class*="transmisionIcon"])'),
+    );
+    expect(inactivo.ratio, `botón NO activo (claro): «${inactivo.texto}»`).toBeGreaterThanOrEqual(4.5);
+
+    // TEMA OSCURO — la regla `[data-theme='dark'] .transmisionBtn.active` no se tocó, así
+    // que aquí se comprueba que sigue donde estaba (4,58:1) y que no ha caído de rebote.
+    await activarTemaOscuro(page);
+    const activoOscuro = await esperarEstable(() =>
+      peorContrasteDe(page, '[class*="transmisionBtn"][class*="active"] span:not([class*="transmisionIcon"])'),
+    );
+    expect(activoOscuro.ratio, `botón activo (oscuro): «${activoOscuro.texto}»`).toBeGreaterThanOrEqual(4.5);
+    const inactivoOscuro = await esperarEstable(() =>
+      peorContrasteDe(page, '[class*="transmisionBtn"]:not([class*="active"]) span:not([class*="transmisionIcon"])'),
+    );
+    expect(inactivoOscuro.ratio, `botón NO activo (oscuro): «${inactivoOscuro.texto}»`).toBeGreaterThanOrEqual(4.5);
   });
 
   /**
@@ -2871,13 +2911,20 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
    * Va aparte del hallazgo 1 porque son dos reglas distintas del CSS module y cada una se
    * repara sola; juntas drenan lo que queda del 683 en esta app.
    */
-  test('HALLAZGO 2 — el título de la herramienta no llega a 4,5:1 en tema claro', async ({ page }) => {
+  test('REPARADO 14/09-2 — el título de la herramienta llega a 4,5:1 en los dos temas', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
 
     const titulo = await esperarEstable(() => peorContrasteDe(page, '[class*="sectionTitle"]'));
-    // Hoy: 4,11:1 en «📋 Datos de la operación», rgb(46,134,171) sobre rgb(255,255,255).
-    expect(titulo.ratio, `título de sección: «${titulo.texto}»`).toBeGreaterThanOrEqual(4.5);
+    // Medido el 21/09/2026: 5,47:1, rgb(38,113,143) sobre rgb(255,255,255).
+    expect(titulo.ratio, `título de sección (claro): «${titulo.texto}»`).toBeGreaterThanOrEqual(4.5);
+
+    // `--primary-texto` resuelve a OTRO color en oscuro (#3FA5D1), así que el tema contrario
+    // no se hereda: hay que medirlo. Medido el 21/09/2026: 4,93:1 sobre rgb(45,45,45), el
+    // mismo valor que antes de la reparación, porque en oscuro no cambió nada.
+    await activarTemaOscuro(page);
+    const tituloOscuro = await esperarEstable(() => peorContrasteDe(page, '[class*="sectionTitle"]'));
+    expect(tituloOscuro.ratio, `título de sección (oscuro): «${tituloOscuro.texto}»`).toBeGreaterThanOrEqual(4.5);
   });
 
   /**
@@ -2900,14 +2947,497 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
    * Efecto familia: `local-comercial` y `solar` repiten la misma palabra. Los dos, al menos,
    * añaden «con las escrituras»; la nave se queda sin esa pista.
    */
-  test('HALLAZGO 3 — la FAQ de la plusvalía dice «exención» donde el RDL 26/2021 dice «no sujeción»', async ({ page }) => {
+  test('REPARADO 14/09-3 — la FAQ de la plusvalía dice «no sujeción», como el RDL 26/2021', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado: `textContent`, no `innerText`.
     const guia = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
     expect(guia).toContain('¿Hay plusvalía municipal al vender una nave industrial?');
 
-    // Hoy: «Si no hay ganancia real en el valor del terreno, puede acreditarse la exención.»
+    // Hasta el 14/09 decía: «Si no hay ganancia real en el valor del terreno, puede
+    // acreditarse la exención.»
     expect(guia).not.toContain('puede acreditarse la exención');
     expect(guia).toMatch(/no sujeción|no está sujeta|no se produce la sujeción/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 21/09/2026 — la octava
+//
+// Antes de escribir nada se ejecutó el fichero entero: 70/70 en verde y ningún `test.fail()`
+// pendiente, así que las tres reparaciones del 14/09 —las dos de contraste y la «exención»
+// de la plusvalía— siguen cerradas y no hay regresiones que arrastrar.
+//
+// LAS DOS PISTAS DE EFECTO FAMILIA DE ESTA TANDA **no aplican aquí**, y no por estar
+// reparadas sino porque el defecto no tiene dónde ocurrir:
+//   1. «IRPF afirmado sin poder calcularse» (el `irpfCalculado` que `garaje`, `trastero` y
+//      `estimador-compraventa-inmueble` ya tienen, y que a `local-comercial` le falta): esta
+//      app NO tiene pestaña de vendedor. No calcula ganancia patrimonial, no pide precio de
+//      compra original y su único resultado es el coste de adquisición del COMPRADOR.
+//   2. «Años de propiedad negativos reescritos al `min` por `NumberInput.handleBlur`»: aquí
+//      no existe ese campo. Los dos únicos `NumberInput` son el precio y la gestoría, ambos
+//      con `min={0}`, y en los dos el 0 SÍ es neutro — el precio cae por el guard
+//      `precio <= 0 → null` y la gestoría por `Math.max(0, …)`. Por eso esta app no necesita
+//      `acotarAlSalir={false}`, que es la reparación que hoy solo llevan `garaje`, `trastero`
+//      y `estimador-irpf-pensionista`.
+// Las dos se comprueban abajo, en «efecto familia», para que si algún día se le añade la
+// parte de vendedor el test lo cace en vez de callar.
+//
+// De dónde sale CADA cifra esperada de esta tanda (ninguna de memoria):
+//  - Tipo general de Cantabria (9 %) y de Navarra (6 %) → `TIPOS_ITP_CCAA_2025` en
+//    `data/fiscal/inmuebles.ts`, que `tipoGeneralDe()` lee para rellenar
+//    `ITP_CCAA[x].tipoGeneral`. Son dos de las cinco comunidades que ninguna de las siete
+//    vueltas anteriores había pisado (quedan Andalucía, Castilla-La Mancha y La Rioja).
+//  - AJD de Navarra (0,5 %) y de Cantabria (1,5 %) → `ITP_CCAA[x].ajd` en `data/itp-ccaa.ts`.
+//    El 0,5 % navarro es el más bajo de la tabla que no es cero, y el sitio exacto donde un
+//    motor que cayese al `TIPOS_AJD_2025.general` (1,5 %) de `data/fiscal` se delataría.
+//  - Escala de Aragón (8 % hasta 400.000 · 8,5 % hasta 450.000 · 9 % hasta 500.000 · 9,5 %
+//    hasta 750.000 · 10 % después) → `ITP_CCAA['aragon'].tramosProgresivos`. El tramo del
+//    8,5 % es el MÁS ESTRECHO de toda la tabla (50.000 € de ancho) y ninguna vuelta anterior
+//    había probado su corte: el 02/09 se probó Aragón a 1.000.000 €, que los cruza todos.
+//  - IVA de la nave en la renuncia → `IVA_INMUEBLES_2025.local = 21` en `data/fiscal`.
+//  - Aranceles → `ARANCELES_NOTARIO` (RD 1426/1989, número 2) y `ARANCELES_REGISTRO`
+//    (RD 1427/1989, número 2), con `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y
+//    `REGISTRO_CONCEPTOS` (presentación 6,010121 € + nota simple 3,005061 €). El 21 % de IVA
+//    sobre honorarios va dentro de las dos funciones.
+//  - El parser que rechaza los millares mal escritos → `partesNumericas` en
+//    `lib/formatters.ts`, que es lo que `parseSpanishNumber` usa por debajo.
+//
+// Los tres casos se resolvieron a mano ANTES de abrir el navegador; el desarrollo va
+// comentado junto a cada aserción, con los importes sin redondear.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 21/09/2026 — tres casos nuevos', () => {
+  /**
+   * CASO 1 (NORMAL) — Cantabria, segunda mano, 480.000 €, gestoría 500 €.
+   *
+   * Comunidad de tipo PLANO que ninguna vuelta anterior había pisado, y con el tipo general
+   * más alto de las planas (9 %, empatada con Castilla-La Mancha). Sirve para comprobar que
+   * un 9 % plano da exactamente el 9,00 % efectivo —sin escala que lo rebaje— y que el
+   * recuadro de la comunidad anuncia los mismos tipos que la tarjeta cobra.
+   *
+   * A mano:
+   *   ITP = 480.000 × 9 % (ITP_CCAA['cantabria'].tipoGeneral)          =  43.200,00
+   *   tipo efectivo = 43.200 / 480.000                                 =       9,00 % → «9,00%»
+   *   AJD = 0 (segunda mano sin renuncia: no hay cuota gradual)
+   *   Notaría — RD 1426/1989, número 2:
+   *     tramo 1 (hasta 6.010,12)                                       →      90,15
+   *     tramo 2 (0,45 %) → 24.040,49 × 0,0045                          = 108,182205
+   *     tramo 3 (0,15 %) → 30.050,60 × 0,0015                          =  45,075900
+   *     tramo 4 (0,10 %) → 90.151,82 × 0,0010                          =  90,151820
+   *     tramo 5 (0,05 %) → (480.000 − 150.253,03) × 0,0005             = 164,873485
+   *     arancel sin IVA                                                = 498,433410
+   *     × 1,21                                                         = 603,104426
+   *     ×1,5 = 904,656639 · ×2 = 1.206,208852 · medio ×1,75            = 1.055,432746
+   *   Registro — RD 1427/1989, número 2:
+   *     24,04 + 42,0708575 + 37,56325 + 67,613865
+   *          + (480.000 − 150.253,03) × 0,0003 = 98,924091             = 270,212064
+   *     + presentación 6,010121 + nota simple 3,005061                 = 279,227246
+   *     × 1,21                                                         = 337,864967
+   *   Total gastos (sumando las líneas YA redondeadas al céntimo, que es como se ven):
+   *     43.200,00 + 1.055,43 + 337,86 + 500                            =  45.093,29
+   *   % sobre el precio = 45.093,29 / 480.000                          =   9,3944354 % → «9,39%»
+   *   Coste total = 480.000 + 45.093,29                                = 525.093,29
+   */
+  test('CASO 1 (normal) — Cantabria, segunda mano, 480.000 €: el 9 % plano da el 9,00 % efectivo', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'cantabria');
+    await sembrar(page, PRECIO, '480000');
+
+    expect(ITP_CCAA['cantabria'].tipoGeneral).toBe(9);
+    expect(ITP_CCAA['cantabria'].tramosProgresivos).toBeUndefined();
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (9,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('43.200,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (')).toContain('no tienen tipos reducidos');
+
+    // Sin escala, el recuadro de la comunidad NO puede anunciar tramos. Se acota a la nota
+    // del recuadro: «escala progresiva» a secas casa también con el párrafo de
+    // `FISCAL_INMUEBLES_META` que DataReference imprime arriba, y rompe el modo estricto.
+    await expect(page.getByText(/Esta CCAA aplica escala progresiva/)).toHaveCount(0);
+    const recuadro = (await page.locator('[class*="infoCcaa"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(recuadro).toContain('Cantabria');
+    expect(recuadro).toContain('9%');
+    expect(recuadro).toContain('1,5%');   // el AJD nominal de la tabla, que aquí no se cobra
+
+    // Segunda mano sin renuncia: no hay cuota gradual de AJD, así que su tarjeta no existe.
+    await expect(page.locator('h3', { hasText: /^AJD \(/ })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1055,43 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('904,66 €');
+    expect(notaria).toContain('1206,21 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('337,86 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('45.093,29 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,39%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('525.093,29 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Navarra, 2ª mano CON RENUNCIA a la exención, 150.253,03 € EXACTOS.
+   *
+   * Tres límites en una sola pantalla:
+   *   · 150.253,03 € es la frontera que COMPARTEN los dos aranceles: el notarial pasa ahí del
+   *     0,10 % al 0,05 % y el registral del 0,075 % al 0,030 %. En ese punto exacto la suma
+   *     de los tramos anteriores tiene que dar la cuota fija que el propio tramo siguiente
+   *     declara como `base` — 333,56 € en notaría y 171,29 € en registro—, así que el caso
+   *     comprueba la tabla contra sí misma.
+   *   · La renuncia a la exención (art. 20.Dos LIVA) es la rama que sustituye ITP por
+   *     IVA + AJD, y es el caso frecuente en naves entre empresarios.
+   *   · El AJD navarro (0,5 %) es el más bajo de la tabla que no es cero. Si el motor cayese
+   *     al `TIPOS_AJD_2025.general` de `data/fiscal` (1,5 %) cobraría 2.253,80 € en vez de
+   *     751,27 €, y eso es lo que el caso discrimina.
+   *
+   * A mano:
+   *   IVA = 150.253,03 × 21 % (IVA_INMUEBLES_2025.local)               =  31.553,1363 → 31.553,14
+   *   AJD = 150.253,03 × 0,5 % (ITP_CCAA['navarra'].ajd)               =     751,26515 →    751,27
+   *   ITP = 0 — con renuncia NO se paga (el 6 % navarro habría dado 9.015,18 €)
+   *   Notaría: 90,15 + 108,182205 + 45,0759 + 90,15182                 = 333,559925
+   *            (= la `base` del tramo siguiente, 333,56 €)
+   *            × 1,21 = 403,607509 · ×1,5 = 605,411264 · ×2 = 807,215019
+   *            medio ×1,75                                             = 706,313141
+   *   Registro: 24,04 + 42,0708575 + 37,56325 + 67,613865              = 171,287973
+   *            (= la `base` del tramo siguiente, 171,29 €)
+   *            + 9,015182 = 180,303155 · × 1,21                        = 218,166817
+   *   Total gastos = 31.553,14 + 751,27 + 706,31 + 218,17 + 500        =  33.728,89
+   *   % sobre el precio = 33.728,89 / 150.253,03                       =  22,448059 % → «22,45%»
+   *   Coste total = 150.253,03 + 33.728,89                             = 183.981,92
+   */
+  test('CASO 2 (límite) — Navarra, 2ª mano con renuncia, 150.253,03 € exactos: IVA 21 % + AJD 0,5 % y ningún ITP', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'navarra');
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    // El precio se teclea en formato español, que es como lo escribiría quien lo copia de
+    // la escritura.
+    await sembrar(page, PRECIO, '150253,03');
+
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('150.253,03 €');
+
+    // El impuesto es IVA con inversión del sujeto pasivo, no ITP.
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+    expect(await rotuloTarjeta(page, /^IVA \(renuncia/)).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (renuncia')).toBe('31.553,14 €');
+    expect(await descripcionTarjeta(page, 'IVA (renuncia')).toContain('inversión del sujeto pasivo');
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveCount(0);
+    // El ITP navarro sobre este precio habría sido 9.015,18 €: no puede estar en pantalla.
+    expect(ITP_CCAA['navarra'].tipoGeneral).toBe(6);
+    await expect(page.getByText('9015,18 €')).toHaveCount(0);
+
+    // El AJD sale de la tabla de la comunidad (0,5 %), no del 1,5 % «general» de data/fiscal.
+    expect(ITP_CCAA['navarra'].ajd).toBe(0.5);
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('751,27 €');
+    await expect(page.getByText('2253,80 €')).toHaveCount(0);
+
+    // El corte exacto de los dos aranceles.
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('706,31 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('605,41 €');
+    expect(notaria).toContain('807,22 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('218,17 €');
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('33.728,89 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('22,45%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('183.981,92 €');
+
+    // El aviso de la renuncia advierte de lo único que la app NO ajusta: el tipo incrementado
+    // de AJD que varias comunidades aplican en este supuesto.
+    const aviso = (await page.locator('[class*="avisoRenuncia"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(aviso).toContain('inversión del sujeto pasivo');
+    expect(aviso).toContain('tipo incrementado');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — tres millares MAL ESCRITOS, con el foco dentro y saliendo con Tab.
+   *
+   * Es el caso que el 14/09 no cubría: allí se probó el número NEGATIVO, que sí es un número.
+   * Aquí lo que se teclea no lo es, y por tres caminos distintos de `partesNumericas`:
+   *   · «1.50.000»    → dos puntos y no agrupa de tres en tres → `null`
+   *   · «450,000,00»  → dos comas y el último grupo tiene dos cifras → `null`
+   *   · «2,5,3»       → dos comas sin agrupación posible → `null`
+   * Los tres devuelven NaN, así que el guard `!Number.isFinite(precio)` los descarta. Lo que
+   * importa es lo que pasa DESPUÉS del blur: `handleBlur` solo reescribe al `min` cuando
+   * `parseSpanishNumber` devuelve un número, de modo que un texto que no lo es se queda tal
+   * cual y NO se convierte en un 0. Si algún día se volviera al `parseFloat(x.replace(',','.'))`
+   * de antes, «1.50.000» valdría 1,5 y la app liquidaría el arancel mínimo sobre un precio de
+   * un euro y medio que el usuario nunca escribió.
+   *
+   * Esperado en los DOS momentos y para los tres: ninguna tarjeta de resultado, el marcador de
+   * espera en pantalla, ni un «NaN» ni un solo «€» en el panel, y el campo intacto.
+   */
+  test('CASO 3 (rechazo) — un millar mal escrito no calcula, y el blur no lo convierte en un número', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'rioja');
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+
+    const campo = page.locator(`input[aria-label="${PRECIO}"]`);
+    const panel = page.locator('[class*="resultados"]').first();
+
+    for (const malo of ['1.50.000', '450,000,00', '2,5,3']) {
+      await sembrar(page, PRECIO, malo);
+
+      // (1) Con el foco fuera todavía: nada que calcular.
+      await expect(panel).toContainText('Introduce el precio de la nave industrial');
+      await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
+      await expect(page.locator('h3', { hasText: /^IVA \(/ })).toHaveCount(0);
+      expect(await panel.innerText(), `panel con «${malo}»`).not.toMatch(/NaN|€/);
+
+      // (2) Entrar y salir del campo: el texto se queda como se escribió.
+      await campo.click();
+      await page.keyboard.press('Tab');
+      await esperarValorEnReact(page, campo, malo);
+      await expect(panel).toContainText('Introduce el precio de la nave industrial');
+      await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
+      expect(await panel.innerText(), `panel tras el blur con «${malo}»`).not.toMatch(/NaN|€/);
+    }
+
+    // Y el contraste del caso: el mismo número BIEN escrito sí calcula, de las dos formas
+    // que el parser admite. La Rioja en obra nueva paga IVA 21 % + AJD 1 %.
+    expect(ITP_CCAA['rioja'].ajd).toBe(1);
+    for (const bueno of ['150000', '150.000']) {
+      await sembrar(page, PRECIO, bueno);
+      expect(await valorTarjeta(page, 'Precio de la nave industrial'), `precio «${bueno}»`).toBe('150.000,00 €');
+      // 150.000 × 21 % = 31.500 · 150.000 × 1 % = 1.500
+      expect(await valorTarjeta(page, 'IVA (')).toBe('31.500,00 €');
+      expect(await valorTarjeta(page, 'AJD (')).toBe('1500,00 €');
+    }
+  });
+
+  /**
+   * LÍMITE EXTRA — Aragón, segunda mano, 450.000 € EXACTOS.
+   *
+   * El tramo del 8,5 % de `ITP_CCAA['aragon'].tramosProgresivos` es el MÁS ESTRECHO de toda
+   * la tabla: 50.000 € de ancho, entre 400.000 y 450.000. Ninguna vuelta anterior había
+   * probado ese corte — el 02/09 se probó Aragón a 1.000.000 €, que los cruza todos y por
+   * tanto no discrimina dónde empieza y acaba cada uno. Aquí se comprueba el corte y sus dos
+   * vecinos, que es lo que distingue un tramo bien cerrado de uno que se come al siguiente.
+   *
+   * A mano:
+   *   449.000 → 400.000 × 8 % + 49.000 × 8,5 % = 32.000 + 4.165       =  36.165,00 (8,0546 % → «8,05%»)
+   *   450.000 → 400.000 × 8 % + 50.000 × 8,5 % = 32.000 + 4.250       =  36.250,00 (8,0556 % → «8,06%»)
+   *   451.000 → 36.250 + 1.000 × 9 % = 36.250 + 90                    =  36.340,00 (8,0577 % → «8,06%»)
+   *   Un 8 % plano daría 36.000 y un 9 % plano 40.500: ninguno de los dos.
+   *   Notaría: 333,559925 + (450.000 − 150.253,03) × 0,0005 = 149,873485
+   *            = 483,43341 × 1,21 = 584,954426 · medio ×1,75          = 1.023,670246
+   *   Registro: 171,287973 + (450.000 − 150.253,03) × 0,0003 = 89,924091
+   *            = 261,212064 + 9,015182 = 270,227246 × 1,21            =   326,974667
+   *   Total gastos = 36.250 + 1.023,67 + 326,97 + 500                 =  38.100,64
+   *   % sobre el precio = 38.100,64 / 450.000                         =   8,466809 % → «8,47%»
+   *   Coste total = 450.000 + 38.100,64                               = 488.100,64
+   */
+  test('LÍMITE — Aragón, 450.000 € exactos: el tramo más estrecho de la tabla (8,5 %) se cierra donde debe', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'aragon');
+
+    expect(ITP_CCAA['aragon'].tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 8.5, 9, 9.5, 10]);
+    expect(ITP_CCAA['aragon'].tramosProgresivos?.[1].hasta).toBe(450000);
+    await expect(page.getByText(/escala progresiva \(8% → 8,5% → 9% → 9,5% → 10%\)/)).toBeVisible();
+
+    await sembrar(page, PRECIO, '449000');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('36.165,00 €');
+    await sembrar(page, PRECIO, '450000');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('36.250,00 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,06%)');
+    await sembrar(page, PRECIO, '451000');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('36.340,00 €');
+
+    // Ninguno de los dos tipos planos vecinos, en el corte exacto.
+    await sembrar(page, PRECIO, '450000');
+    await expect(page.getByText('36.000,00 €')).toHaveCount(0);
+    await expect(page.getByText('40.500,00 €')).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1023,67 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('326,97 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('38.100,64 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,47%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('488.100,64 €');
+  });
+
+  /**
+   * EFECTO FAMILIA (las dos pistas del 21/09) — ninguna tiene dónde ocurrir en esta app.
+   *
+   * 1. `local-comercial` pinta «Ganancia patrimonial 0,00 €» y un «IRPF — SIN CUOTA» en
+   *    tarjeta VERDE cuando solo se conoce el precio de venta, en vez de un «Sin calcular»
+   *    en gris; `garaje`, `trastero` y `estimador-compraventa-inmueble` lo cierran con un
+   *    campo `irpfCalculado`. Aquí no hay ni pestaña de vendedor ni motor de ganancia.
+   * 2. `NumberInput.handleBlur` reescribe al `min` un valor fuera de rango, y en «Años de
+   *    propiedad» ese `min` es 0, que NO es neutro: es la reventa antes del año. La
+   *    reparación (`acotarAlSalir={false}`) no hace falta aquí porque ese campo no existe y
+   *    porque en los dos que sí existen el 0 no calcula nada.
+   *
+   * Se comprueba por la FUENTE y por la pantalla, para que añadir la parte de vendedor sin
+   * repasar esto rompa el test en vez de pasar en silencio.
+   */
+  test('efecto familia — ni IRPF de vendedor ni años de propiedad: las dos pistas del 21/09 no tienen dónde ocurrir', async ({ page }) => {
+    const fuente = await leerFuente();
+    // 1 — nada de la parte de vendedor.
+    expect(fuente).not.toContain('ResultadosVendedor');
+    expect(fuente).not.toContain('irpfCalculado');
+    expect(fuente).not.toContain('gananciaPatrimonial');
+    expect(fuente).not.toContain('SIN CUOTA');
+    // 2 — ningún campo cuyo `min` signifique algo distinto de «ningún dato».
+    expect(fuente).not.toContain('Años de propiedad');
+    expect(fuente).not.toContain('acotarAlSalir');
+    // Los dos únicos NumberInput de la app, los dos con min={0}.
+    expect(fuente.match(/<NumberInput/g)).toHaveLength(2);
+    expect(fuente.match(/min=\{0\}/g)).toHaveLength(2);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await sembrar(page, PRECIO, '480000');
+    const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(cuerpo).not.toContain('Ganancia patrimonial');
+    expect(cuerpo).not.toContain('SIN CUOTA');
+    expect(cuerpo).not.toContain('Años de propiedad');
+    // La app promete el coste del COMPRADOR y nada más: ese es su contrato.
+    expect(cuerpo).toContain('COSTE TOTAL DE ADQUISICIÓN');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — 21/09/2026
+//
+// Escritos con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan y, cuando se
+// reparen, el `test.fail()` se quita y el test se queda como regresión.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 21/09/2026', () => {
+  /**
+   * HALLAZGO 1 (accesibilidad, medio) — la CABECERA de la tabla comparativa es texto blanco
+   * sobre `var(--primary)`, y falla en LOS DOS temas.
+   *
+   * Es lo que quedó de la misma tabla tras dos vueltas de reparación: el 09/09 se arreglaron
+   * sus celdas de respuesta (hallazgo 648, `.celdaSi` / `.celdaNo`) y el 10/09 la celda de la
+   * cifra (hallazgo 684, `.celdaCifra`). Las tres veces se midió el TEXTO de las celdas; la
+   * fila `<thead>` nunca se midió porque su color no está en el texto sino en el FONDO:
+   *   `<tr style={{ background: 'var(--primary)', color: '#fff' }}>`
+   * Medido el 21/09/2026 con el tema estable:
+   *   · claro:  #fff sobre rgb(46,134,171)  → 4,11:1
+   *   · oscuro: #fff sobre rgb(63,165,209)  → 2,79:1
+   * Con 14,4 px y el peso 700 que el navegador da a un `<th>` no es «texto grande» —la WCAG
+   * 2.1 pide ≥18,66 px en negrita—, así que el umbral son 4,5:1 en ambos. En oscuro ni
+   * siquiera llegaría al 3:1 del texto grande.
+   *
+   * Y no es adorno: son los rótulos «Concepto», «Nave industrial» y «Vivienda», es decir, lo
+   * único que dice cuál de las dos columnas es la nave. Sin ellos la tabla no se puede leer.
+   *
+   * Efecto familia: el mismo `<tr style={{ background: 'var(--primary)', color: '#fff' }}>`
+   * está escrito en línea, no en el módulo CSS, así que no lo alcanza ningún token.
+   */
+  test('HALLAZGO 1 — la cabecera de la tabla comparativa no llega a 4,5:1 en ningún tema', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    // El bloque educativo nace plegado: se despliega para medir lo que el usuario ve.
+    await page.getByRole('button', { name: /Ver guía educativa/i }).first().click();
+    await expect(page.locator('table').first()).toBeVisible();
+
+    const cabecera = async () => peorContrasteDe(page, 'table thead th');
+
+    const claro = await esperarEstable(cabecera);
+    // Hoy: 4,11:1 en «Concepto», rgb(255,255,255) sobre rgb(46,134,171).
+    expect(claro.ratio, `cabecera en claro: «${claro.texto}»`).toBeGreaterThanOrEqual(4.5);
+
+    await activarTemaOscuro(page);
+    const oscuro = await esperarEstable(cabecera);
+    // Hoy: 2,79:1, rgb(255,255,255) sobre rgb(63,165,209).
+    expect(oscuro.ratio, `cabecera en oscuro: «${oscuro.texto}»`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * HALLAZGO 2 (contenido, medio) — el consejo «Guarda todos los justificantes» manda sumar
+   * las facturas de IVA al valor de adquisición, justo en la app cuyo público lo DEDUCE.
+   *
+   * En «Consejos para compradores de naves industriales»:
+   *   «Conserva facturas de ITP/IVA, notaría, registro y reformas. Al vender, estos gastos
+   *    incrementan el valor de adquisición y reducen la ganancia patrimonial o el beneficio
+   *    en el Impuesto de Sociedades.»
+   *
+   * Un IVA DEDUCIDO no es un coste: se recupera. El art. 35.1.b) LIRPF admite en el valor de
+   * adquisición los «gastos y tributos inherentes a la adquisición… satisfechos por el
+   * adquirente», y el PGC (norma de registro 2ª) excluye del precio de adquisición los
+   * impuestos indirectos «cuando sean recuperables de la Hacienda Pública», que es lo que
+   * decide el beneficio en el Impuesto de Sociedades que la misma frase menciona. Sumarlo dos
+   * veces —deducirlo en el 303 y volver a restarlo de la ganancia— INFRAVALORA la ganancia.
+   *
+   * La contradicción está dentro del mismo bloque educativo: dos secciones más arriba, la
+   * tarjeta «IVA deducible: cuándo y cómo» dice que «el IVA se recupera en la declaración
+   * trimestral, reduciendo el coste real de adquisición». Las dos frases no pueden ser
+   * ciertas a la vez para el mismo comprador, y la app declara su público en el aviso de
+   * cabecera: «Si eres empresa o autónomo».
+   *
+   * No es efecto familia: `trastero` da el mismo consejo SIN el IVA («la escritura, el ITP
+   * pagado y los gastos de notaría»), y en `estimador-compraventa-inmueble` es vivienda,
+   * donde el IVA no se deduce. La nave es justo donde sí se deduce, y es la que lo lista.
+   *
+   * El test acepta las dos reparaciones posibles: quitar el IVA de la lista, o añadir la
+   * salvedad del IVA deducido a la frase.
+   */
+  test('HALLAZGO 2 — el consejo de los justificantes suma al valor de adquisición un IVA que la propia app deduce', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    // El bloque educativo vive en el DOM aunque esté plegado: `textContent`.
+    const tarjeta = await page.evaluate(() => {
+      const fuerte = Array.from(document.querySelectorAll('strong')).find(
+        (s) => (s.textContent ?? '').includes('Guarda todos los justificantes'),
+      );
+      return (fuerte?.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    });
+    expect(tarjeta, 'la tarjeta del consejo existe').toContain('incrementan el valor de adquisición');
+
+    const listaElIva = /Conserva facturas de [^.]*IVA/i.test(tarjeta);
+    const llevaSalvedad = /deducid|recuperab|no te lo hayas/i.test(tarjeta);
+    // Hoy: listaElIva = true y llevaSalvedad = false.
+    expect(
+      !listaElIva || llevaSalvedad,
+      `consejo sin salvedad del IVA deducido: «${tarjeta.slice(0, 180)}»`,
+    ).toBe(true);
+  });
+
+  /**
+   * HALLAZGO 3 (contenido, bajo) — el aviso permanente de cabecera promete un IVA deducible
+   * también en Canarias, Ceuta y Melilla, donde la propia app dice que no hay IVA.
+   *
+   * `styles.ivaAviso` es texto FIJO: «Si eres empresa o autónomo: el IVA soportado en la
+   * compra de una nave industrial puede ser deducible si tu actividad está sujeta a IVA».
+   * Con Canarias elegida, esa frase queda en pantalla a la vez que:
+   *   · el recuadro de la comunidad: «⚠️ En Canarias no se aplica el IVA… tributa por el IGIC»
+   *   · la tarjeta del impuesto: «IGIC — No calculado»
+   *   · el total: «COSTE TOTAL (PARCIAL) — No incluye el IGIC»
+   *
+   * Es exactamente la forma del hallazgo 647, reparado el 09/09 en los DOS avisos que cuelgan
+   * del selector de transmisión: eran texto fijo que explicaba un IVA que la tarjeta de al
+   * lado negaba en la misma pantalla. Aquel arreglo los hizo mirar `TERRITORIOS_SIN_IVA`, y
+   * este tercer aviso —que está más arriba y es el primero que se lee— se quedó fuera.
+   *
+   * La hermana `simulador-gastos-compraventa-solar` ya enseña cómo se resuelve: su `ivaAviso`
+   * dice «En Canarias, Ceuta y Melilla no rige el IVA: allí la operación va por IGIC o IPSI,
+   * que esta calculadora no cifra». `local-comercial` arrastra el mismo defecto que la nave.
+   */
+  test('HALLAZGO 3 — el aviso de IVA deducible sigue prometiendo IVA en Canarias, Ceuta y Melilla', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await sembrar(page, PRECIO, '500000');
+
+    for (const territorio of ['canarias', 'ceuta', 'melilla']) {
+      await page.selectOption('#select-ccaa', territorio);
+
+      // La app YA dice en esa misma pantalla que allí no hay IVA.
+      const recuadro = (await page.locator('[class*="infoCcaa"]').first().innerText()).replace(/\s+/g, ' ');
+      expect(recuadro, `recuadro de ${territorio}`).toMatch(/no se aplica el IVA/);
+
+      // Y el aviso de cabecera tiene que decir lo mismo, en vez de contradecirlo.
+      const aviso = (await page.locator('[class*="ivaAviso"]').first().innerText()).replace(/\s+/g, ' ');
+      expect(aviso, `aviso de cabecera con ${territorio}: «${aviso}»`).toMatch(
+        /IGIC|IPSI|no rige el IVA|no se aplica el IVA|resto de España/,
+      );
+    }
   });
 });

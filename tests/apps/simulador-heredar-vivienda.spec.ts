@@ -19,27 +19,37 @@
  *     deslizadores, el tramo del 30 % del IRPF, el escalonado de Castilla-La Mancha y —lo
  *     importante— si la web y el MCP siguen dando el MISMO número para la misma herencia.
  *
- * ⚠️ HALLAZGOS ABIERTOS (van con `test.fail()`, la convención de estos ficheros):
- *   · La reducción por vivienda habitual del art. 20.2.c LISD volvió a separar la web del
- *     motor compartido, ahora por dos sitios distintos: Cataluña y el colateral del Grupo
- *     III. Es el mismo defecto del hallazgo 276 —la misma herencia con dos respuestas—
- *     reaparecido al revés: entonces el que iba por detrás era el motor compartido en
- *     Asturias, y ahora es el motor compartido en la reducción de vivienda, porque la
- *     reparación del hallazgo 204 aterrizó SOLO en `page.tsx`.
- *   · El `faqJsonLd` de `metadata.ts` (que es lo que leen Bing Copilot, ChatGPT y
- *     Perplexity) describe una escala del ahorro sin los dos tramos superiores y una
- *     exención de IRPF que la app no aplica ni `data/fiscal` reconoce en esos términos.
- *   · La tarjeta educativa «Hijo hereda piso vivienda habitual del padre» lista
- *     Castilla-La Mancha entre las CCAA donde «el ISD se reduce a casi cero».
+ * ✅ Los tres hallazgos que esta cabecera daba por ABIERTOS —la regla del art. 20.2.c
+ * separada entre la web y el motor, la escala del ahorro incompleta en el `faqJsonLd` y
+ * Castilla-La Mancha en la lista de CCAA «a casi cero»— se repararon entre el 27/08 y el
+ * 10/09/2026 y tienen abajo su test de REGRESIÓN sin `test.fail()`. La cabecera se quedó
+ * anunciándolos hasta el 21/09/2026: corregido entonces, porque una lista de hallazgos
+ * abiertos que no lo están es exactamente el defecto del hallazgo 867 en otra forma.
+ *
+ * ⚠️ HALLAZGOS ABIERTOS HOY (21/09/2026), todos con `test.fail()` al final del fichero:
+ *   · [21-A] el aviso de la complementaria salta aunque la regularización sea de 0,00 €.
+ *   · [21-B] la tarjeta «Aprovecha la reducción de vivienda habitual» anuncia el tope
+ *     estatal sin decir que lo es — la mitad sin reparar del hallazgo 861.
+ *   · [21-C] la fila del IRPF de la tabla educativa describe la ganancia sin descontar el
+ *     IIVTNU de la venta — la fórmula que el hallazgo 862 retiró del `faqJsonLd`.
+ *   · [21-D] las dos prórrogas de esa misma tabla van sin unidad, y «otros 6» (adicional)
+ *     y «hasta 12» (total) no significan lo mismo.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria: todas de `data/fiscal/`):
  *
  *  ISD — `data/fiscal/sucesiones.ts` (FISCAL_SUCESIONES_META: Ley 29/1987 ISD +
  *  normativas autonómicas 2025, verificado 2025-01-01):
  *    - `REDUCCIONES_PARENTESCO_IS['II']` = 15.956,87 € · `['III']` = 7.993,46 € · `['IV']` = 0 €
- *    - `REDUCCIONES_PARENTESCO_CATALUNA_IS['I-conyuge']` = 100.000 € · `['II']` = 50.000 €
- *      (la clave `II` es «hijo/nieto ≥21» en todo el repositorio: así la describen las tools
- *       del MCP Delegum y `lib/calculadoras/sucesiones.ts`; `I-descendiente` es el menor de 21)
+ *    - `REDUCCIONES_PARENTESCO_CATALUNA_IS['I-conyuge']` = 100.000 € · `['II']` = 100.000 €
+ *      (hijo o hija ≥21) · `['II-descendiente']` = 50.000 € (nieto y demás descendientes
+ *      ≥21) · `['II-ascendiente']` = 30.000 € · `['III']` = 8.000 €. `I-descendiente` es el
+ *      menor de 21.
+ *      ⚠️ Corregido el 21/09/2026: esta línea seguía diciendo `['II']` = 50.000 € y que la
+ *      clave valía para «hijo/nieto» indistintamente. Son las cuantías ANTERIORES al
+ *      08/09/2026 (f6c0650a), el commit que separó al nieto del hijo tras contrastar con la
+ *      Agència Tributària — el mismo dato mal escrito que costó 23.000 € de diferencia.
+ *    - `REDUCCION_VIVIENDA_MAX_CATALUNA_IS` = 500.000 € (art. 17 Ley 19/2010) y
+ *      `REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS` = 5 (art. 19)
  *    - `REDUCCION_VIVIENDA_PORC_IS` = 0,95 · `REDUCCION_VIVIENDA_MAX_IS` = 122.606,47 €
  *    - `TARIFA_ESTATAL_IS`, la escala del art. 21.2 LISD: 16 tramos del 7,65 % al 34 %,
  *      que entra a partir de 797.555,08 € de base liquidable. Hasta el 11/09/2026 eran
@@ -157,6 +167,9 @@ import {
   // Añadidos el 13/09/2026 por las guardas de la reparación (hallazgos 781 y 782)
   GANANCIAS_PATRIMONIALES_META,
   PLAZO_ISD,
+  // Añadido el 21/09/2026: el plazo del IIVTNU ya tiene constante propia (hallazgo 864), y
+  // la tabla educativa que lo enseña es la que se audita al final del fichero
+  PLAZO_IIVTNU,
 } from '../../data/fiscal';
 import {
   ESCALA_RECARGO_EXTEMPORANEO,
@@ -4009,12 +4022,20 @@ test.describe('Simulador de heredar vivienda — re-inspección 14/09/2026', () 
    *   Menor → 5.850,00 €
    *
    * (a) VENTA A LOS 9 AÑOS — dentro del plazo:
+   *   ⚠️ DERIVACIÓN REHECHA el 21/09/2026. Es el hallazgo 867 otra vez, y justo en el caso
+   *   que la reparación del 859 movió: aquel commit rehízo OCHO derivaciones a mano y esta
+   *   se quedó fuera, describiendo el valor de adquisición SIN el ISD regularizado —los
+   *   457.986,03 € de antes de la reparación— mientras las aserciones de abajo ya exigían
+   *   los 476.652,10 € de después. Un golden cuya aritmética documentada no lo reproduce no
+   *   se puede re-verificar leyéndolo.
+   *
    *   Plusvalía de la venta: coeficiente 0,09 → objetivo 90.000 × 0,09 × 0,25 = 2.025,00
    *                          (real = 100.000 × 0,4 × 0,25 = 10.000) → 2.025,00 €
-   *   Valor de adquisición fiscal = 450.000 + 2.136,03 + 5.850,00 = 457.986,03
-   *   Valor de transmisión = 550.000 − 2.025 = 547.975,00 · Ganancia = 89.988,97
-   *   IRPF = 1.140,00 + 9.240,00 + 39.988,97 × 23 % = 19.577,4631 → «19.577,46 €»
-   *   TOTAL = 2.136,03 + 18.666,07 + 5.850,00 + 2.025,00 + 19.577,4631 = 48.254,5631
+   *   ISD efectivamente pagado = 2.136,03 + 18.666,07 (complementaria) = 20.802,10
+   *   Valor de adquisición fiscal = 450.000 + 20.802,10 + 5.850,00 = 476.652,10
+   *   Valor de transmisión = 550.000 − 2.025 = 547.975,00 · Ganancia = 71.322,90
+   *   IRPF = 1.140,00 + 9.240,00 + 21.322,90 × 23 % = 15.284,267 → «15.284,27 €»
+   *   TOTAL = 2.136,03 + 18.666,07 + 5.850,00 + 2.025,00 + 15.284,267 = 43.961,367
    *
    * (b) VENTA A LOS 10 AÑOS — justo en el borde, plazo CUMPLIDO:
    *   Plusvalía de la venta: coeficiente 0,08 → 90.000 × 0,08 × 0,25 = 1.800,00 €
@@ -4185,8 +4206,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 14/09/2026', () 
    *   IRPF = 1.140,00 + 9.240,00 + 21.322,90 × 23 % = 15.284,267 → 15.284,27 €
    *   TOTAL = 2.136,03 + 18.666,07 + 5.850,00 + 2.025,00 + 15.284,267 = 43.961,367 €
    *
-   *   La app da 457.986,03 € de valor de adquisición, 19.577,46 € de IRPF y 48.254,56 € de
-   *   total: 4.293,19 € de más, un 9,8 % del coste que anuncia.
+   *   Antes de la reparación (15/09/2026) la app daba 457.986,03 € de valor de adquisición,
+   *   19.577,46 € de IRPF y 48.254,56 € de total: 4.293,19 € de más, un 9,8 % del coste que
+   *   anunciaba. El test de abajo exige ya los cuatro valores buenos.
    */
   test(
     '[H1] el ISD regularizado se cobra en el total y no entra en el valor de adquisición del IRPF',
@@ -4501,5 +4523,510 @@ test.describe('Simulador de heredar vivienda — re-inspección 14/09/2026', () 
       await linea(page, IIVTNU, 'Método elegido'),
       'la pantalla tiene que decir lo mismo que el canal estructurado'
     ).toMatch(/no sujet/i);
+  });
+});
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN del 21/09/2026 — verificar que los NUEVE hallazgos del 14/09 (859,
+ * 861-866 y los dos del propio fichero de tests) cerraron, y que ninguno se pasó de
+ * frenada al lado contrario.
+ * ═══════════════════════════════════════════════════════════════════════════════
+ *
+ * Los tres casos de abajo están puestos en CATALUÑA a propósito: allí se cruzan a la vez
+ * las tres piezas que el 14/09 estaban rotas —el tope del art. 17 de la Ley 19/2010, el
+ * plazo de mantenimiento de 5 años de su art. 19 y la regularización que entra en el valor
+ * de adquisición del IRPF— y es el régimen donde la app no puede caer de pie por casualidad:
+ * tarifa propia, reducciones propias y bonificación por escala ponderada.
+ *
+ * Toda la aritmética viene de `data/fiscal` y de la Ley 19/2010 que ese módulo cita; ni una
+ * cifra de memoria. Resuelta a mano ANTES de abrir el navegador, y las tres cuadran al
+ * céntimo con lo que la app imprime.
+ *
+ * HALLAZGOS ABIERTOS de esta pasada: los cuatro `test.fail()` del final. Afirman lo que
+ * DEBERÍA ocurrir, así que hoy fallan a propósito; al repararlos se les quita la marca y
+ * quedan como regresión, igual que se hizo con los de las pasadas anteriores.
+ */
+test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — la cadena entera en CATALUÑA, con venta DENTRO del plazo de
+   * mantenimiento. Es el caso que cierra a la vez el 859, el 861, el 863 y el 864.
+   *
+   * Hijo de 50 años (Grupo II, `reducKey` 'II'), Cataluña, vivienda habitual del padre
+   * valorada en 600.000 €, comprada hace 14 años por 200.000 €, catastral del suelo
+   * 120.000 € sobre 300.000 € de catastral total, y venta a los 3 años por 700.000 €.
+   *
+   * ISD (Cataluña: tarifa, reducciones y coeficientes propios):
+   *   Masa hereditaria                                                600.000,00
+   *   + Ajuar  PORC_AJUAR_DOMESTICO_IS = 3 % (art. 15 LISD)           +18.000,00
+   *   = Base imponible                                                618.000,00
+   *   − Parentesco  REDUCCIONES_PARENTESCO_CATALUNA_IS['II']         −100.000,00
+   *   − Vivienda    mín(600.000 × 0,95 ; 500.000) — art. 17 Ley      −500.000,00
+   *                 19/2010, REDUCCION_VIVIENDA_MAX_CATALUNA_IS
+   *   = Base liquidable                                                18.000,00
+   *   Cuota íntegra por TARIFA_CATALUNA_IS (primer tramo, hasta 50.000 al 7 %):
+   *        0 + 18.000 × 7 % = 1.260,00 → «1260,00 €»
+   *   × COEFICIENTES_CATALUNA_IS['II'][0] = 1,0000 → cuota tributaria 1.260,00
+   *   − Bonificación del art. 58 bis: escala PONDERADA del Grupo II sobre la base
+   *     IMPONIBLE (618.000), con los marginales de ESCALA_BONIF_CATALUNA_GRUPO_II_IS:
+   *        100.000 × 60 % + 100.000 × 55 % + 100.000 × 50 % + 200.000 × 45 %
+   *      + 118.000 × 40 % = 302.200 → 302.200 / 618.000 = 48,8997 % → «48,9%»
+   *     1.260,00 × 0,488996… = 616,1359… → se redondea ANTES de restar → 616,14
+   *   = Cuota ISD final 643,86 €
+   *
+   * ISD REGULARIZADO — se vende a los 3 años y el art. 19 de la Ley 19/2010 exige mantener
+   * REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS = 5:
+   *   Base liquidable sin la reducción de vivienda = 618.000 − 100.000 = 518.000,00
+   *   Cuota íntegra (tramo hasta 800.000): 57.000 + (518.000 − 400.000) × 24 % = 85.320,00
+   *   − Bonificación ponderada (el mismo 48,8997 % : la base IMPONIBLE no cambia)
+   *        85.320,00 × 0,488996… = 41.721,2038… → 41.721,20
+   *   = 43.598,80 · Regularización = 43.598,80 − 643,86 = 42.954,94 €
+   *
+   * Plusvalía municipal, tipo ORIENTATIVO del módulo (PLUSVALIA_MUNICIPAL_META, 25 %):
+   *   HERENCIA — 14 años de tenencia del causante → COEFICIENTES_IIVTNU_2025[14] = 0,10
+   *     Objetivo = 120.000 × 0,10 × 0,25 = 3.000,00
+   *     Real     = (600.000 − 200.000) × (120.000 / 300.000) × 0,25 = 40.000,00
+   *     Menor (RDL 26/2021) → 3.000,00 €
+   *   VENTA — 3 años → coeficiente 0,16
+   *     Objetivo = 120.000 × 0,16 × 0,25 = 4.800,00
+   *     Real     = (700.000 − 600.000) × 0,4 × 0,25 = 10.000,00 → menor 4.800,00 €
+   *
+   * IRPF de la venta:
+   *   Valor de adquisición fiscal = 600.000 + (643,86 + 42.954,94) + 3.000 = 646.598,80
+   *     — el ISD que se suma es el EFECTIVAMENTE pagado, complementaria incluida
+   *       (art. 36 LIRPF, que remite al 35.1.b). Es la reparación del hallazgo 859, aquí
+   *       medida en una comunidad distinta de la del acta.
+   *   Valor de transmisión (art. 35.2 LIRPF) = 700.000 − 4.800 = 695.200,00
+   *   Ganancia = 48.601,20
+   *        6.000,00 × 19 % = 1.140,00
+   *       42.601,20 × 21 % = 8.946,252
+   *                          ─────────
+   *                           10.086,252 → «10.086,25 €»
+   *
+   * TOTAL = 643,86 + 42.954,94 + 3.000,00 + 4.800,00 + 10.086,252 = 61.485,052
+   * Porcentaje sobre la venta = 61.485,052 / 700.000 × 100 = 8,7836 → «8,78%»
+   */
+  test('CASO 1 (normal) — Cataluña, hijo, 600.000 € de vivienda habitual y venta a los 3 años', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'anioAdq', ANIO - 14);
+    await mover(page, 'valorAdq', 200000);
+    await mover(page, 'valorRef', 600000);
+    await mover(page, 'valorSuelo', 120000);
+    await mover(page, 'valorCatastralTotal', 300000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 3);
+    await mover(page, 'valorVta', 700000);
+
+    // ── 861: la etiqueta anuncia el tope que la app VA A APLICAR, no el estatal ──────
+    const etiqueta = (await page.locator('label:has(#viviendaHabitual)').innerText()).replace(
+      /\s+/g,
+      ' '
+    );
+    expect(etiqueta).toContain(
+      new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2 }).format(
+        REDUCCION_VIVIENDA_MAX_CATALUNA_IS
+      )
+    );
+
+    // ── ISD ──────────────────────────────────────────────────────────────────────────
+    expect(await linea(page, ISD, '+ Ajuar doméstico (3 % del caudal, art. 15 LISD)')).toBe(
+      '+18.000,00 €'
+    );
+    expect(await linea(page, ISD, '= Base imponible')).toBe('618.000,00 €');
+    // REDUCCIONES_PARENTESCO_CATALUNA_IS['II'] = 100.000 € (art. 2 Ley 19/2010)
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−100.000,00 €');
+    // Topada en REDUCCION_VIVIENDA_MAX_CATALUNA_IS = 500.000 € (art. 17 Ley 19/2010)
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−500.000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('18.000,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('1260,00 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo II)')).toBe('×1,0000');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('1260,00 €');
+    expect(await panel(page, ISD)).toContain('− Bonificación CCAA (48,9%) −616,14 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('643,86 €');
+
+    // ── 863 y 865: el aviso cita la norma catalana, con la unidad del plazo, y NO pone
+    //     fecha límite a la complementaria (PLAZO_ISD cuenta desde el FALLECIMIENTO) ───
+    const aviso = await panel(page, ISD);
+    expect(aviso).toContain(
+      `el art. 19 de la Ley 19/2010 de Cataluña exige mantenerla ${REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} años`
+    );
+    expect(aviso).toContain('42.954,94 €');
+    expect(aviso).not.toContain(`${PLAZO_ISD.mesesPresentacion} meses desde la venta`);
+    // Y la coletilla de «otras comunidades» NO se imprime cuando la comunidad elegida ES
+    // la que tiene plazo propio: sería contarle al usuario catalán que mire otra norma.
+    expect(aviso).not.toContain('Otras comunidades fijan plazos de mantenimiento propios');
+
+    // ── Plusvalía municipal de la herencia ───────────────────────────────────────────
+    expect(await panel(page, IIVTNU)).toContain('14 años de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente 14 años')).toBe('0,10');
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('3000,00 €');
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('40.000,00 €');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('3000,00 €');
+
+    // ── IRPF: el 859, medido fuera de la comunidad del acta ──────────────────────────
+    expect(
+      await linea(page, IRPF, 'Valor adquisición fiscal*'),
+      'el ISD de la complementaria es tributo inherente a la adquisición (art. 35.1.b LIRPF)'
+    ).toBe('646.598,80 €');
+    expect(await panel(page, IRPF)).toContain('−4800,00 €');
+    expect(await linea(page, IRPF, '= Valor de transmisión**')).toBe('695.200,00 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('48.601,20 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('10.086,25 €');
+
+    // ── Total ────────────────────────────────────────────────────────────────────────
+    const total = await bloqueTotal(page);
+    expect(total).toContain(
+      `+ ISD regularizado (venta antes de ${REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} años) 42.954,94 €`
+    );
+    expect(total).toContain('+ Plusvalía municipal (venta) 4800,00 €');
+    expect(total).toContain('= TOTAL 61.485,05 €');
+    expect(total).toContain('8,78%');
+    // Nunca formato US: el punto es el millar y la coma el decimal
+    expect(total).not.toMatch(/61,485\.05/);
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — el canto EXACTO del tope catalán de la reducción por vivienda
+   * habitual: REDUCCION_VIVIENDA_MAX_CATALUNA_IS = 500.000 € (art. 17 de la Ley 19/2010).
+   *
+   * El tope muerde cuando 95 % del valor supera los 500.000 €, o sea a partir de
+   * 526.315,79 €. El deslizador va de 5.000 en 5.000, así que el borde se cerca por los dos
+   * lados con la MISMA herencia: 525.000 € (95 % = 498.750 €, por debajo) y 530.000 €
+   * (95 % = 503.500 €, topado). Es el mismo canto del CASO 2 del 10/09 —que cercaba el tope
+   * ESTATAL entre 125.000 € y 130.000 €— trasladado al régimen donde el 14/09 la etiqueta
+   * prometía un tope y la app aplicaba otro (hallazgo 861).
+   *
+   * Se elige ASCENDIENTE (Grupo II, `reducKey` 'II-ascendiente', 30.000 € en Cataluña)
+   * porque con los 100.000 € del hijo la base liquidable se va a cero por los dos lados y el
+   * borde dejaría de verse en la cuota. Edad 70 y venta a 0 años, para aislar el ISD.
+   *
+   * (a) 525.000 € — SIN tope:
+   *     Base imponible 525.000 × 1,03                                540.750,00
+   *     − Parentesco REDUCCIONES_PARENTESCO_CATALUNA_IS['II-ascendiente']  −30.000,00
+   *     − Vivienda   525.000 × 0,95 = 498.750 (< 500.000)           −498.750,00
+   *     = Base liquidable                                             12.000,00
+   *     Cuota íntegra (primer tramo de TARIFA_CATALUNA_IS, 7 %) = 840,00 · × 1,0000
+   *     Bonificación ponderada del Grupo II sobre 540.750:
+   *        60.000 + 55.000 + 50.000 + 90.000 + 40.750 × 40 % = 271.300
+   *        271.300 / 540.750 = 50,1711 % → «50,2%» · 840,00 × 0,501710… = 421,4368 → 421,44
+   *     = Cuota ISD final 418,56 €
+   *
+   * (b) 530.000 € — TOPADO:
+   *     Base imponible 530.000 × 1,03                                545.900,00
+   *     − Parentesco                                                 −30.000,00
+   *     − Vivienda   mín(503.500 ; 500.000)                         −500.000,00
+   *     = Base liquidable                                             15.900,00
+   *     Cuota íntegra = 15.900 × 7 % = 1.113,00 · × 1,0000
+   *     Bonificación ponderada sobre 545.900:
+   *        60.000 + 55.000 + 50.000 + 90.000 + 45.900 × 40 % = 273.360
+   *        273.360 / 545.900 = 50,0751 % → «50,1%» · 1.113,00 × 0,500751… = 557,3358 → 557,34
+   *     = Cuota ISD final 555,66 €
+   *
+   * El testigo del canto: 5.000 € más de valor solo añaden 1.250 € de reducción (498.750 →
+   * 500.000) en vez de los 4.750 € que daría el 95 % sin tope.
+   */
+  test('CASO 2 (límite) — el tope catalán de 500.000 € del art. 17, por los dos lados', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'padre');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    await mover(page, 'edadHer', 70);
+    await mover(page, 'anioAdq', ANIO - 20);
+    await mover(page, 'valorAdq', 200000);
+    await mover(page, 'valorRef', 525000);
+    await mover(page, 'valorSuelo', 100000);
+    await mover(page, 'valorCatastralTotal', 250000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 0);
+
+    // ── (a) justo por debajo del tope: reduce el 95 % entero ─────────────────────────
+    expect(await linea(page, ISD, '= Base imponible')).toBe('540.750,00 €');
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−30.000,00 €');
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−498.750,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('12.000,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('840,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('418,56 €');
+
+    // ── (b) 5.000 € más: el tope del art. 17 muerde ──────────────────────────────────
+    await mover(page, 'valorRef', 530000);
+    expect(await linea(page, ISD, '= Base imponible')).toBe('545.900,00 €');
+    expect(
+      await linea(page, ISD, '− Reducción vivienda habitual (95%)'),
+      'el 95 % de 530.000 son 503.500 €, y el art. 17 de la Ley 19/2010 lo capa en 500.000 €'
+    ).toBe('−500.000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('15.900,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('1113,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('555,66 €');
+
+    // Y la etiqueta sigue anunciando el tope catalán, no el estatal (hallazgo 861)
+    const etiqueta = (await page.locator('label:has(#viviendaHabitual)').innerText()).replace(
+      /\s+/g,
+      ' '
+    );
+    expect(etiqueta).toContain('500.000,00');
+    expect(etiqueta).not.toContain(
+      new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2 }).format(REDUCCION_VIVIENDA_MAX_IS)
+    );
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — tres negativas encadenadas, y ninguna se cuela como resultado.
+   *
+   * Hermano (Grupo III) de 70 años en Cataluña que NO convivió con el causante, con la
+   * casilla de vivienda habitual MARCADA, valor de referencia 300.000 €, comprada por el
+   * causante hace 10 años por 350.000 € (más cara que el valor de referencia), y venta a
+   * los 2 años por 280.000 €.
+   *
+   *   1. La reducción del art. 17 de la Ley 19/2010 se DENIEGA por falta de convivencia y
+   *      se dice por qué, aunque la edad (70 ≥ EDAD_MIN_COLATERAL_VIVIENDA_IS) sí cumple.
+   *   2. Sin reducción no puede haber complementaria: el aviso de mantenimiento NO sale,
+   *      pese a que 2 < 5 años.
+   *   3. Las DOS plusvalías municipales son de NO SUJECIÓN (art. 104.5 TRLRHL): no hay
+   *      incremento ni en la herencia (300.000 < 350.000) ni en la venta (280.000 <
+   *      300.000). La pantalla tiene que decir «no sujeta», no «exenta» (hallazgo 866).
+   *   4. El IRPF se rechaza por pérdida patrimonial.
+   *
+   * ISD (Cataluña, Grupo III — fuera del art. 58 bis, así que NO hay bonificación):
+   *   Base imponible 300.000 × 1,03                                  309.000,00
+   *   − Parentesco  REDUCCIONES_PARENTESCO_CATALUNA_IS['III']         −8.000,00
+   *   − Vivienda    denegada                                               0,00
+   *   = Base liquidable                                              301.000,00
+   *   Cuota íntegra por TARIFA_CATALUNA_IS (tramo hasta 400.000, arranca en 150.000):
+   *        14.500 + (301.000 − 150.000) × 17 % = 14.500 + 25.670 = 40.170,00
+   *   × COEFICIENTES_CATALUNA_IS['III'][0] = 1,5882 → 63.797,994 → «63.797,99 €»
+   *   Sin bonificación → Cuota ISD final 63.797,99 €
+   *
+   * IRPF: valor de adquisición fiscal = 300.000 + 63.797,99 + 0 = 363.797,99
+   *       valor de transmisión = 280.000 − 0 = 280.000 · Ganancia = −83.797,99 → cuota 0
+   *
+   * TOTAL = 63.797,99 € · 63.797,99 / 280.000 × 100 = 22,7850 → «22,78%»
+   */
+  test('CASO 3 (rechazo) — colateral catalán sin convivencia, IIVTNU no sujeto y pérdida', async ({
+    page,
+  }) => {
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'hermano');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    await mover(page, 'edadHer', 70);
+    await mover(page, 'anioAdq', ANIO - 10);
+    await mover(page, 'valorAdq', 350000);
+    await mover(page, 'valorRef', 300000);
+    await mover(page, 'valorSuelo', 90000);
+    await mover(page, 'valorCatastralTotal', 180000);
+    await casilla(page, 'viviendaHabitual', true);
+    await casilla(page, 'convivencia', false);
+    await mover(page, 'aniosVenta', 2);
+    await mover(page, 'valorVta', 280000);
+
+    // 1. Se deniega y se dice por qué — con 70 años la edad NO es el motivo
+    const panelISD = await panel(page, ISD);
+    expect(panelISD).toContain(
+      'No aplicable: pariente colateral que no convivió los 2 años anteriores'
+    );
+    expect(panelISD).not.toContain(`menor de ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años`);
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('301.000,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('40.170,00 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,5882');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('63.797,99 €');
+
+    // 2. Vender a los 2 años NO dispara la complementaria: no hay reducción que perder
+    expect(panelISD).not.toContain('Pierdes la reducción');
+
+    // 3. No sujeción, no exención (art. 104.5 TRLRHL) — hallazgo 866
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('No sujeta (sin incremento)');
+    expect(await linea(page, IIVTNU, 'Método elegido')).toMatch(/no sujet/i);
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('0,00 €');
+    expect(await panel(page, IIVTNU)).not.toContain('Exenta');
+
+    // 4. Pérdida patrimonial: no hay cuota de IRPF
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('363.797,99 €');
+    expect(await linea(page, IRPF, 'Pérdida patrimonial')).toBe('−83.797,99 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('0,00 €');
+
+    const total = await bloqueTotal(page);
+    expect(total).not.toContain('ISD regularizado');
+    expect(total).toContain('= TOTAL 63.797,99 €');
+    expect(total).toContain('22,78%');
+  });
+
+  /**
+   * ❌ ABIERTO 21/09/2026 (operativa, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   *
+   * [21-A] El aviso de la complementaria salta aunque la reducción NO haya ahorrado nada,
+   * y entonces manda ingresar 0,00 € «más intereses de demora».
+   *
+   * La condición del aviso es `isd.reduccionVivienda > 0`, no `regularizacionVivienda > 0`.
+   * En las comunidades cuyo beneficio llega DESPUÉS de la reducción —Andalucía y Galicia,
+   * con exención total por debajo de 1.000.000 € de base liquidable; Asturias, con sus
+   * 300.000 € de reducción en base— quitar la reducción de vivienda no mueve la cuota: los
+   * dos escenarios dan 0,00 €. El propio bloque total lo sabe y NO pinta la línea «+ ISD
+   * regularizado» (va condicionada a `regularizacionVivienda > 0`), así que la pantalla se
+   * contradice consigo misma: arriba un aviso en rojo que exige una autoliquidación
+   * complementaria y abajo ningún importe que ingresar.
+   *
+   * Es la reparación del hallazgo 778 pasada de frenada al lado contrario: aquella añadió
+   * el aviso porque la app sumaba a la vez una reducción y la venta que la anula, y ahora
+   * avisa también cuando no hay nada que devolver.
+   *
+   * Caso medido: hijo de 50 años, Andalucía, 200.000 € de vivienda habitual, venta a los 3
+   * años → «Cuota ISD final 0,00 €», el total sin línea de regularizado, y aun así «Hay que
+   * presentar una autoliquidación complementaria e ingresar los 0,00 € … más intereses de
+   * demora». Idéntico en Galicia y en Asturias.
+   */
+  test('[21-A] el aviso de complementaria salta con una regularización de 0,00 €', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'andalucia');
+    await mover(page, 'edadHer', 50);
+    await mover(page, 'anioAdq', ANIO - 10);
+    await mover(page, 'valorAdq', 100000);
+    await mover(page, 'valorRef', 200000);
+    await mover(page, 'valorSuelo', 50000);
+    await mover(page, 'valorCatastralTotal', 100000);
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'aniosVenta', 3);
+    await mover(page, 'valorVta', 250000);
+
+    // La reducción se aplica, pero la exención de Andalucía deja la cuota en cero con y sin
+    // ella, así que no hay nada que regularizar — y el bloque total ya lo refleja
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (95%)')).toBe('−122.606,47 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
+    expect(await bloqueTotal(page)).not.toContain('ISD regularizado');
+
+    // Lo que el panel NO debería decir cuando no hay nada que ingresar
+    expect(
+      await panel(page, ISD),
+      'sin importe que regularizar, el aviso no puede exigir una complementaria'
+    ).not.toContain('Hay que presentar una autoliquidación complementaria');
+  });
+
+  /**
+   * ❌ ABIERTO 21/09/2026 (contenido, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   *
+   * [21-B] La tarjeta «Aprovecha la reducción de vivienda habitual» de Buenas prácticas
+   * sigue anunciando el tope ESTATAL a secas: «la reducción del 95% (hasta 122.606,47 €)».
+   *
+   * Es la mitad sin reparar del hallazgo 861, que nombraba expresamente las dos superficies
+   * —la etiqueta de la casilla y esta tarjeta—. La etiqueta se arregló el 15/09/2026
+   * (`topeReduccionVivienda`, que mira la comunidad) y la tarjeta se quedó con
+   * `REDUCCION_VIVIENDA_MAX_IS` escrito sin adjetivo, a seis líneas de la pregunta de la FAQ
+   * que sí dice «El tope estatal es …/heredero (cada CCAA puede mejorarlo)».
+   *
+   * Basta con que diga «estatal», como su vecina: la tarjeta es texto fijo del bloque
+   * educativo y no puede depender del selector, pero sí puede no prometer como universal un
+   * tope que en Cataluña es cuatro veces mayor.
+   */
+  test('[21-B] la tarjeta de buenas prácticas anuncia el tope estatal como si fuera el único', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    const tarjeta = await page.evaluate(() => {
+      const s = [...document.querySelectorAll('strong')].find(e =>
+        (e.textContent ?? '').includes('Aprovecha la reducción de vivienda habitual')
+      );
+      return (s?.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    });
+    expect(tarjeta, 'la tarjeta de buenas prácticas debe existir').not.toBe('');
+    expect(tarjeta).toContain(
+      new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2 }).format(REDUCCION_VIVIENDA_MAX_IS)
+    );
+
+    expect(
+      tarjeta,
+      'un tope que no vale en todas las CCAA tiene que salir rotulado como estatal'
+    ).toMatch(/estatal|cada CCAA|Cataluña/);
+  });
+
+  /**
+   * ❌ ABIERTO 21/09/2026 (contenido, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   *
+   * [21-C] La fila del IRPF de la tabla «Los tres impuestos en cadena» publica la fórmula
+   * «(Valor venta − valor adquisición fiscal) × tramos», que es exactamente la que el
+   * hallazgo 862 (reparado el 15/09) retiró del `faqJsonLd` por describir una ganancia que
+   * el motor no calcula.
+   *
+   * Desde el hallazgo 779 la app resta del precio la plusvalía municipal de la VENTA
+   * (art. 35.2 LIRPF) antes de comparar: su propio panel lo pinta en dos líneas, «− Plusvalía
+   * municipal de la venta» y «= Valor de transmisión**», con la nota al pie que cita el
+   * artículo. La tabla educativa se quedó en la versión anterior.
+   *
+   * Medido sobre el CASO 1 de arriba: la app calcula 48.601,20 € de ganancia (695.200,00 −
+   * 646.598,80) y la fórmula de la tabla daría 53.401,20 € (700.000 − 646.598,80), que al
+   * 21 % marginal son 1.076,02 € de IRPF de diferencia.
+   */
+  test('[21-C] la tabla educativa describe una ganancia sin descontar el IIVTNU de la venta', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+
+    const filaIRPF = await page.evaluate(() => {
+      const tr = [...document.querySelectorAll('tr')].find(f =>
+        (f.querySelector('td')?.textContent ?? '').includes('IRPF')
+      );
+      return (tr?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    });
+    expect(filaIRPF, 'la fila del IRPF debe existir').not.toBe('');
+    expect(filaIRPF).toContain('valor adquisición fiscal');
+
+    expect(
+      filaIRPF,
+      'la app resta del precio la plusvalía municipal de la venta (art. 35.2 LIRPF): la fila tiene que decirlo'
+    ).toMatch(/valor de transmisión|35\.2|plusvalía municipal de la venta/i);
+  });
+
+  /**
+   * ❌ ABIERTO 21/09/2026 (contenido, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   *
+   * [21-D] Las dos prórrogas de la tabla «Los tres impuestos en cadena» van SIN unidad, y
+   * las dos construcciones no significan lo mismo:
+   *
+   *     ISD    → «Plazo 6 meses tras el fallecimiento (prorrogable otros 6)»
+   *     IIVTNU → «Plazo 6 meses tras el fallecimiento (prorrogable hasta 12 a solicitud)»
+   *
+   * El «otros 6» del ISD es ADICIONAL (art. 68 RISD: otros seis meses) y el «hasta 12» del
+   * IIVTNU es el TOTAL (art. 110.2.b TRLRHL: «seis meses prorrogables hasta un año»), que es
+   * lo que `PLAZO_IIVTNU.mesesMaximoConProrroga` guarda. Sumados como si fueran del mismo
+   * tipo salen 18 meses para el IIVTNU.
+   *
+   * Es el hallazgo 863 —el plazo escrito sin la unidad— reaparecido en la tabla educativa
+   * después de repararse en el aviso del panel, y sobre plazos que también hay que cumplir.
+   */
+  test('[21-D] las prórrogas de la tabla educativa van sin unidad', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+
+    const tabla = await page.evaluate(() => {
+      const t = [...document.querySelectorAll('table')].find(x =>
+        (x.textContent ?? '').includes('Plusvalía municipal (IIVTNU)')
+      );
+      return (t?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    });
+    expect(tabla, 'la tabla de los tres impuestos debe existir').not.toBe('');
+    expect(tabla).toContain(`Plazo ${PLAZO_ISD.mesesPresentacion} meses tras el fallecimiento`);
+
+    expect(
+      tabla,
+      'una prórroga sin unidad se lee tan fácil en meses como en años, y las dos filas usan la misma forma para cosas distintas'
+    ).toMatch(
+      new RegExp(
+        `prorrogable otros ${PLAZO_ISD.mesesProrroga} meses[\\s\\S]*prorrogable hasta ${PLAZO_IIVTNU.mesesMaximoConProrroga} meses`
+      )
+    );
   });
 });

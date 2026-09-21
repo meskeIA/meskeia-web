@@ -1678,8 +1678,10 @@ test.describe('Inspección 07/09/2026', () => {
       expect(sellos).toContain(enEspanol(RECLAMACION_PREVIA_SS_META.verificado)); // 05/09/2026
 
       // Y cada uno de los otros dos módulos conserva el suyo, sin contagiarse las fechas:
-      // el complemento (13/05/2026) y las cuantías de pensión (12/08/2026), de donde sale
-      // el límite máximo de pensiones públicas que la guía publica.
+      // el complemento y las cuantías de pensión, de donde sale el límite máximo de
+      // pensiones públicas que la guía publica. Las fechas se leen de cada _META y no se
+      // teclean aquí: `FISCAL_PENSIONES_META.verificado` se mueve en cada triaje fiscal
+      // (era 12/08/2026 al crearse esta regresión, 21/09/2026 al re-inspeccionar).
       expect(sellos).toContain(enEspanol(COMPLEMENTO_BRECHA_GENERO_META.verificado));
       expect(sellos).toContain(enEspanol(FISCAL_PENSIONES_META.verificado));
       expect(sellos).toContain('Ley 39/2015');
@@ -1846,4 +1848,278 @@ test.describe('Inspección 07/09/2026', () => {
       expect(bloque).toMatch(/no fija ninguna edad/);
     },
   );
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 21/09/2026 — segmento FISCAL, riesgo 1 CRÍTICO
+//
+// Los CUATRO hallazgos del 07/09 se reprodujeron uno a uno en el navegador ANTES de
+// escribir nada aquí, y CIERRAN los cuatro:
+//
+//   · 652 — la página declara los TRES sellos, cada uno con SU fecha: complemento
+//     (13/05/2026), reclamación previa «Art. 71 LRJS + art. 30.2 Ley 39/2015»
+//     (05/09/2026) y límite máximo de pensiones (la de FISCAL_PENSIONES_META, que
+//     el 21/09/2026 se re-verificó). Los tres van arriba, fuera de la guía colapsada.
+//   · 653 — el motor del MCP lee `COMPLEMENTO_BRECHA_GENERO_META.doctrina`, y la
+//     regresión que lo sujeta mira el fichero por separado en vez de concatenarlos.
+//   · 654 — TODO veredicto dice «los 4 requisitos clave del art. 60 LGSS», y ese 4 es
+//     `REQUISITOS_ART60.length`: una entrada por familia de rama de denegación
+//     (pensión elegible · corte temporal · hijos computables · concurrencia). El
+//     número que la app anuncia es el número que comprueba.
+//   · 655 — el titular de la FAQ enuncia la regla («nació con vida y falleció
+//     después») y no el umbral de 16 años que no está en el art. 60.1 LGSS.
+//
+// Debajo van TRES casos nuevos resueltos a mano contra el módulo sellado antes de abrir
+// el navegador, y DOS hallazgos vivos marcados con `test.fail()`.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 21/09/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — hombre · incapacidad permanente · 1 hijo.
+   *
+   * Combinación que ningún test del fichero recorre: el mínimo exacto de la norma
+   * («al menos un hijo o hija») sobre una pensión de IP y con sexo masculino, que es la
+   * rama general de `evaluar` para hombre SIN denegación propia.
+   *
+   * Resuelto a mano con COMPLEMENTO_BRECHA_GENERO_2026 antes de ejecutar la app:
+   *   P1 incapacidad permanente ∈ pensionesElegibles   → no cae en ninguna exclusión
+   *   P2 «El 4-feb-2021 o después» ≥ fechaMinimaHechoCausante ('2021-02-04')
+   *   P3 1 hijo → hijosComputables = mín(1, maxHijos 4) = 1  ← el «≥ 1» del art. 60
+   *   P6 sin denegación propia                          → NO es reclamación
+   *
+   *   mensual = 1 × cuantiaPorHijoMensual 36,90 = 36,90 €     ← esperado literal
+   *   anual   = 36,90 × pagasAnuales 14         = 516,60 €    ← esperado literal
+   *
+   * OBTENIDO en navegador el 21/09/2026: exactamente eso.
+   */
+  test('caso 1 (21/09): hombre, incapacidad permanente y 1 hijo → 36,90 €/mes y 516,60 €/año', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 1,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+
+    const { cuantiaPorHijoMensual, maxHijos, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
+    // Las cifras se recalculan desde el módulo: si se revaloriza, el test cae aquí y hay
+    // que volver a derivarlas, no «ajustarlas» a lo que muestre la app.
+    expect(cuantiaPorHijoMensual).toBe(36.9);
+    expect(1 * cuantiaPorHijoMensual * pagasAnuales).toBeCloseTo(516.6, 2);
+
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+36,90 €/mes');
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).toContain(`Hijos computables 1 (máx. ${maxHijos})`);
+    expect(resultado).toContain('Cuantía por hijo 36,90 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 516,60 €/año');
+    // Un hijo basta: la regla de 2 o más era la del complemento DEROGADO, no esta
+    expect(resultado).not.toContain('No procede ahora');
+    // Y sin denegación propia no se invita a impugnar nada
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+    // El recuento del aviso es el de REQUISITOS_ART60, no un número tecleado (654)
+    expect(resultado).toContain(`${NUM_REQUISITOS_ART60} requisitos clave`);
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — el canto entre «0 hijos» y «no hay nada que calcular».
+   *
+   * Los umbrales numéricos (1 hijo, 4 hijos, el corte del 4-feb-2021, el tope 20 del
+   * campo) ya están probados arriba. El que faltaba es el borde entre dos estados que
+   * la app presenta IGUAL y que significan cosas distintas:
+   *
+   *   · «0» es una entrada VÁLIDA. El verificador la evalúa y la deniega por el
+   *     requisito 3 del art. 60 («al menos un hijo o hija nacido con vida»). Es un
+   *     veredicto sobre el derecho, y es correcto.
+   *   · campo VACÍO (o «2.5») no es una entrada: `hijosEsValido` es falso y el `useMemo`
+   *     corta antes de llamar a `evaluar()`. No se ha evaluado NADA sobre el derecho.
+   *
+   * ⚠️ HALLAZGO VIVO 21/09/2026 — MEDIO (operativa). El titular del panel es el MISMO en
+   * los dos: «No procede ahora», con el mismo icono ℹ️, el mismo estilo negativo y la
+   * misma etiqueta «Revisa el motivo abajo». Solo el párrafo «¿Por qué?», en cuerpo
+   * menor, distingue «El complemento exige al menos un hijo o hija» de «Falta el número
+   * de hijos, así que no hay nada que calcular todavía».
+   *
+   * En esta app el titular ES el producto: responde «¿te corresponde?». Decir «No
+   * procede ahora» sin haber evaluado nada es contestar que no a quien quizá sí, y el
+   * coste del malentendido en riesgo 1 es dejar de pedir un complemento que corresponde.
+   * La reparación del hallazgo 608 arregló la REDACCIÓN del motivo (las comillas vacías);
+   * el titular no se tocó, y es el que se lee primero.
+   *
+   * Es la forma local del patrón «un resultado que no se puede calcular se presenta como
+   * un veredicto en vez de como “sin calcular”». No hay cifra falsa —el importe no sale—,
+   * así que no llega a la clase del aviso bajo cifra falsa: lo que falla es el encuadre.
+   *
+   * Esperado: con el campo ilegible, el titular NO puede ser el del veredicto de fondo.
+   * Obtenido el 21/09/2026: «No procede ahora» en los dos.
+   */
+  test('caso 2 (21/09, límite): «0 hijos» y «campo vacío» dan el mismo titular', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO VIVO — ver el comentario de arriba
+
+    // 2a — «0»: entrada válida, denegación DE FONDO por el requisito 3 del art. 60
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 0,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const conCero = await textoResultado(page);
+    expect(conCero).toContain('No procede ahora');
+    expect(conCero).toContain('al menos un hijo');
+    expect(conCero).not.toContain('Desglose económico');
+
+    // 2b — campo VACÍO: no hay nada que evaluar. Se vacía y se comprueba que el vaciado
+    // llegó al ESTADO de React (aria-invalid lo deriva), no solo al DOM.
+    await page.locator('#hijos').fill('');
+    await expect(page.locator('#hijos')).toHaveAttribute('aria-invalid', 'true');
+    await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+    const sinDato = await textoResultado(page);
+
+    // Esto la app YA lo dice bien, y es la parte honesta del panel (hallazgo 608)
+    expect(sinDato).toContain('no hay nada que calcular todavía');
+    expect(sinDato).not.toContain('al menos un hijo'); // no se ha llegado a evaluar
+    // …pero el titular es el del veredicto de fondo, y ahí está el hallazgo:
+    expect.soft(sinDato, 'el titular no distingue «sin calcular» de «no procede»').not.toContain(
+      'No procede ahora',
+    );
+
+    // Lo mismo con un texto que el campo admite y el verificador rechaza
+    await page.locator('#hijos').fill('2.5');
+    await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+    const ilegible = await textoResultado(page);
+    expect(ilegible).toContain('«2.5» no es un número entero de hijos');
+    expect.soft(ilegible, 'idem con una entrada ilegible').not.toContain('No procede ahora');
+  });
+
+  /**
+   * CASO 3 (FUERA DE ÁMBITO) — «Ninguna aún», el único valor de la P1 que ningún test
+   * del fichero había ejercitado, CRUZADO con una denegación propia.
+   *
+   * Resuelto a mano: en `evaluar()` la rama `tipo === 'ninguna'` va la SEGUNDA, muy por
+   * delante de `denegacionPropia`. Quien aún no tiene pensión causada no tiene derecho
+   * que reclamar —el art. 60 reconoce el complemento SOBRE una pensión ya causada—, así
+   * que el veredicto tiene que ser un fuera de ámbito limpio:
+   *   → «No procede ahora», sin desglose, sin 3 × 36,90 = 110,70 €/mes y sin mandar a
+   *     nadie a impugnar nada.
+   *
+   * Es el mismo orden de precedencia que ya se probó en la jubilación parcial (caso 5),
+   * comprobado ahora sobre la rama que faltaba.
+   *
+   * OBTENIDO el 21/09/2026: exactamente eso, y el paso siguiente remite a revisar el
+   * derecho cuando se solicite la pensión.
+   */
+  test('caso 3 (21/09, fuera de ámbito): «Ninguna aún» con denegación propia → nada que reclamar', async ({
+    page,
+  }) => {
+    await responderYVerificar(page, {
+      pension: 'Ninguna aún',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 3,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+      denegacionPropia: true,
+    });
+
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('únicamente sobre una pensión ya causada');
+    // Lo que NO puede salir: ni importe ni invitación a impugnar
+    expect(resultado).not.toContain('110,70'); // 3 × cuantiaPorHijoMensual 36,90
+    expect(resultado).not.toContain('Desglose económico');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+    expect(resultado).not.toContain('C-623/23');
+    // Y el paso siguiente es una cita futura, no una vía de recurso
+    expect(resultado).toContain('recuerda revisar este derecho');
+  });
+
+  /**
+   * ⚠️ HALLAZGO VIVO 21/09/2026 — BAJO (dato). La jurisprudencia se LEE del módulo en la
+   * prosa de la guía y se TECLEA en los veredictos, que son lo que el usuario lee.
+   *
+   * Es el patrón de los hallazgos 606, 607 y 653 —el dato sube a `data/fiscal`, la página
+   * lo consume en unos sitios y se queda una copia en otros—, en dos puntos que la
+   * reparación del 09/09 no alcanzó:
+   *
+   *   (a) Rama `antes_2021` (P2 = «Antes del 4-feb-2021»). El paso siguiente dice «la
+   *       doctrina TJUE 2019 (caso WA)», tecleado en `page.tsx`, mientras
+   *       `COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso` —«STJUE de 12 de diciembre de
+   *       2019 (C-450/18, caso WA)»— ya se lee DOS veces en esa misma página (la fila
+   *       «Acceso de hombres» de la tabla comparativa y la tarjeta «Pensión anterior a
+   *       feb-2021»). La copia del veredicto va además degradada: sin fecha y sin el
+   *       número de asunto, que es justo lo que necesita quien acaba de leer «consulta a
+   *       un profesional». El mismo literal está tecleado en el motor del MCP
+   *       (`lib/calculadoras/complementoBrechaGenero.ts`), que no importa ese módulo.
+   *
+   *   (b) Rama general de hombre SIN denegación propia — el camino más transitado de los
+   *       dos que tiene un hombre. Dice «Tras la doctrina TJUE 2025 y TS 2025», con los
+   *       años tecleados, mientras la rama de reclamación inmediatamente siguiente
+   *       interpola `META.doctrina` entera: «Tras la STJUE de 15 de mayo de 2025
+   *       (C-623/23) y la doctrina del Tribunal Supremo (9 de julio de 2025)». Dos ramas
+   *       de la MISMA función, una leyendo el sello y la otra escribiendo el año.
+   *
+   * Hoy las dos copias coinciden con el módulo, así que no hay error visible: lo que
+   * falla es que la próxima resolución que matice la doctrina se corregirá en
+   * `data/fiscal` y estos dos veredictos seguirán diciendo lo anterior.
+   *
+   * Esperado: los veredictos citan la doctrina del módulo, como ya hace la prosa.
+   * Obtenido el 21/09/2026: (a) «la doctrina TJUE 2019 (caso WA)» · (b) «TJUE 2025 y TS 2025».
+   */
+  test('doctrina (21/09): los veredictos citan la jurisprudencia tecleada, no la del módulo', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO VIVO — ver el comentario de arriba
+
+    // (a) Rama anterior al corte del 4-feb-2021
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'Antes del 4-feb-2021',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const anterior = await textoResultado(page);
+    // Esto ya lo dice bien: el régimen que se aplicaba entonces, nombrado
+    expect(anterior).toContain('antiguo complemento de maternidad');
+    // Y la doctrina que abrió aquel régimen a los hombres tiene que salir del módulo,
+    // como ya sale en la tabla comparativa y en la tarjeta de la guía.
+    expect
+      .soft(anterior, 'el veredicto teclea la doctrina del régimen derogado')
+      .toContain(COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso);
+
+    // (b) Rama general de hombre, sin denegación propia
+    const { stjue, ts } = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const general = await textoResultado(page);
+    expect(general).toContain('+73,80 €/mes'); // 2 × cuantiaPorHijoMensual 36,90
+    expect(general).toContain('los hombres tienen derecho al complemento en las mismas');
+    expect
+      .soft(general, 'la rama general teclea los años en vez de leer META.doctrina')
+      .toContain(stjue.fecha);
+
+    // Contraste: la rama de RECLAMACIÓN, del mismo sexo y el mismo supuesto, sí las lee.
+    // Es lo que hace visible que el defecto está en la rama, no en el módulo.
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+      denegacionPropia: true,
+    });
+    const reclamacion = await textoResultado(page);
+    expect(reclamacion).toContain(stjue.fecha); // '15 de mayo de 2025'
+    expect(reclamacion).toContain(stjue.asunto); // 'C-623/23'
+    expect(reclamacion).toContain(ts.fecha); // '9 de julio de 2025'
+  });
 });

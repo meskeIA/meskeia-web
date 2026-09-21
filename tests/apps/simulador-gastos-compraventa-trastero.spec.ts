@@ -76,6 +76,16 @@
  *      cuando la ganancia patrimonial es EXACTAMENTE 0. Al final, TRES hallazgos
  *      abiertos con `test.fail()`.
  *
+ *  15. RE-INSPECCIÓN 21/09/2026 — CASOS 32-34, posterior a la reparación de esos tres
+ *      (822/844 el blur que convertía un año imposible en la reventa antes del año,
+ *      823/845 la ganancia cero rotulada como pérdida compensable y 846 el segundo
+ *      FAQPage), que hoy quedan como regresión verificada. Comunidad nueva —Asturias, la
+ *      última con escala progresiva sin usar— y las dos zonas que la reparación del 15/09
+ *      deja expuestas: el 0 LEGÍTIMO en los años de propiedad (la reventa dentro del
+ *      mismo año, que la guarda del negativo NO puede bloquear) y el par catastral
+ *      IMPOSIBLE, el único campo del vendedor sin caso de rechazo. Al final, DOS
+ *      hallazgos abiertos con `test.fail()`.
+ *
  *      ⚠️ El CASO 16 (02/09) se REESCRIBIÓ ese día. Verificaba el rechazo escribiendo un
  *      «0» en los años de propiedad y daba por buena la reescritura del `min={1}` a «1»:
  *      eso era cierto cuando se escribió, y desde la reparación del motor del 07/09
@@ -3373,9 +3383,10 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 14/09/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Cuando se reparen, se les quita la marca y quedan como regresión.
+// HALLAZGOS DEL 14/09/2026 — REPARADOS el 15/09 y verificados el 21/09/2026.
+// Nacieron con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlos se les quitó la
+// marca y hoy sujetan la reparación. Los comentarios conservan el caso de origen entero:
+// la descripción de un defecto reparado es lo único que impide reintroducirlo.
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ⚠️ ABIERTO 14/09/2026 (medio) — operativa. El `blur` convierte un dato IMPOSIBLE en un
@@ -3445,7 +3456,7 @@ test('REPARADO 15/09 (operativa) — al salir del campo, unos años negativos si
 //         compensable — «Ganancia patrimonial 0,00 €» o equivalente
 //       → obtenido: «Pérdida patrimonial 0,00 €» + «Vendes por debajo del valor de
 //         adquisición: no hay IRPF y la pérdida se puede compensar en la declaración»
-test('ABIERTO 14/09 (contenido) — una ganancia de 0 se rotula como venta por debajo del coste', async ({
+test('REPARADO 15/09 (contenido) — una ganancia de 0 ya no se rotula como venta por debajo del coste', async ({
   page,
 }) => {
   await page.goto(RUTA);
@@ -3477,7 +3488,7 @@ test('ABIERTO 14/09 (contenido) — una ganancia de 0 se rotula como venta por d
 // Caso: contar los nodos FAQPage servidos en /simulador-gastos-compraventa-trastero/
 //       → esperado: 1 (como en local-comercial y en nave-industrial)
 //       → obtenido: 2, con las cinco preguntas de `faqSchema` repetidas en `faqJsonLd`.
-test('ABIERTO 14/09 (contenido) — la página sirve dos FAQPage para una sola URL', async ({
+test('REPARADO 15/09 (contenido) — la página sirve UN solo FAQPage para una sola URL', async ({
   page,
 }) => {
   await page.goto(RUTA);
@@ -3490,4 +3501,292 @@ test('ABIERTO 14/09 (contenido) — la página sirve dos FAQPage para una sola U
     return nodos.filter((n) => n['@type'] === 'FAQPage');
   });
   expect(faqPages).toHaveLength(1);
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del mismo año y un par
+// catastral imposible.
+//
+// La cola la reabrió tras la reparación del 15/09 (hallazgos 822/844 el blur, 823/845 la
+// ganancia cero y 846 el FAQPage duplicado), que los tres tests de arriba dejan sujeta.
+// Los casos de hoy van a las tres zonas que esa reparación deja expuestas:
+//
+//   · CASO 32 — Asturias, la ÚLTIMA comunidad con escala progresiva que ninguna de las
+//     doce rondas anteriores había elegido, con perfil general.
+//   · CASO 33 — la CONTRAPARTIDA de la reparación del blur: el 0 en «Años de propiedad»
+//     es un dato VÁLIDO (la reventa antes de cumplir el año, coeficiente 0,14 de
+//     COEFICIENTES_IIVTNU_2025). Si la guarda del negativo se hubiera pasado de frenada,
+//     aquí se vería: el 0 tiene que liquidar y el neto tiene que ser DEFINITIVO, no un
+//     techo. Ninguna ronda lo había probado en esta app por el camino del vendedor
+//     completo, y era alcanzable solo desde la reparación del 07/09 (hallazgo 666).
+//   · CASO 34 — el par catastral IMPOSIBLE (suelo por encima del total, que por
+//     definición lo incluye): el único campo del vendedor sin caso de rechazo en este
+//     fichero, y la rama `parCatastralImposible` que el hallazgo 900 añadió al motor.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del año y un par catastral imposible', () => {
+  /**
+   * CASO 32 (NORMAL) — Asturias, segunda mano, 28.000 €, comprador GENERAL.
+   *
+   * Comunidad nueva: su escala progresiva (8/9/10 %, `ITP_CCAA.asturias.tramosProgresivos`)
+   * era la única sin usar. El perfil general interesa aquí porque sus TRES tipos reducidos
+   * —jóvenes, familia numerosa y familia monoparental, todos al 4 %— exigen «Vivienda
+   * habitual» Y son de colectivo, de modo que `elegirTipoITP` no puede ni aplicarlos ni
+   * ofrecerlos: el aviso «Podrías pagar menos» NO debe pintarse. Es el caso simétrico del
+   * CASO 29, donde sí sale.
+   *
+   * Resuelto a mano ANTES de ejecutar la app:
+   *   ITP — 28.000 cabe entero en el primer tramo (8 % hasta 300.000):
+   *     28.000 × 8 % = 2.240,00 · tipo EFECTIVO = 2.240 / 28.000 = 8,00 %
+   *   Notaría — RD 1426/1989 nº 2 (`ARANCELES_NOTARIO`) sobre 28.000:
+   *     90,15 + (28.000 − 6.010,12) × 0,45 % = 90,15 + 98,95446 = 189,10446
+   *     con IVA ×1,21 = 228,8163966 · factura ×1,5 = 343,2245949 · ×2 = 457,6327932
+   *     medio = 400,42869405 → 400,43
+   *   Registro — RD 1427/1989 nº 2 (`ARANCELES_REGISTRO`) sobre 28.000:
+   *     24,04 + (28.000 − 6.010,12) × 0,175 % = 24,04 + 38,48229 = 62,52229
+   *     + presentación 6,010121 + nota simple 3,005061 = 71,537472 · ×1,21 = 86,56034112
+   *   Total = 2.240 + 400,43 + 86,56 + 300 (gestoría por defecto) = 3.026,99
+   *     porcentaje = 3.026,99 / 28.000 = 10,8107 % → 10,81 %
+   *   Coste total = 28.000 + 3.026,99 = 31.026,99
+   */
+  test('CASO 32 (normal) — Asturias, segunda mano, 28.000 €, comprador general', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('asturias');
+    await sembrar(page, 'Precio del trastero', '28000');
+
+    expect(await valorTarjeta(page, /^ITP/)).toBe('2240,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toContainText(
+      '(8% → 9% → 10%)',
+    );
+
+    // Segunda mano: no hay AJD (el 1,2 % de la ficha de Asturias es de primera mano).
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('400,43 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 343,22 € y 457,63 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('86,56 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3026,99 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '10,81% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('31.026,99 €');
+
+    // Los tres reducidos de Asturias exigen vivienda habitual Y son de colectivo: ni se
+    // aplican ni se ofrecen. Ofrecerlos sería prometer una rebaja imposible para un
+    // trastero suelto (contrato de `elegirTipoITP`, 14/08/2026).
+    await expect(page.locator('[role="note"]', { hasText: /Podrías pagar menos/ })).toHaveCount(
+      0,
+    );
+  });
+
+  /**
+   * CASO 33 (LÍMITE) — 0 AÑOS de propiedad: la reventa dentro del mismo año.
+   *
+   * Es la contrapartida de la reparación del 15/09. Aquella acotó el `blur` para que un año
+   * NEGATIVO no se convirtiera en un 0 —que es un supuesto fiscal válido y caro—, y el modo
+   * de pasarse de frenada sería rechazar también el 0 legítimo. Aquí tiene que liquidar: el
+   * RDL 26/2021 sujeta la transmisión anterior al año, y `COEFICIENTES_IIVTNU_2025` le da
+   * fila propia («Menos de 1 año», 0,14, el tercer coeficiente más alto de la tabla). Se
+   * escribe con `fill()` + `blur()` a propósito, que es donde vivía el defecto.
+   *
+   * Resuelto a mano ANTES de ejecutar la app (20.000 / 16.000 / 0 años / suelo 5.000 de
+   * 12.000 / comisión 3 % por defecto / sin gastos de adquisición ni gestoría de venta):
+   *   plusvalía objetivo = 5.000 × 0,14 × 25 % (`PLUSVALIA_MUNICIPAL_META.tipoOrientativo`)
+   *                      = 175,00
+   *   plusvalía real     = (20.000 − 16.000) × (5.000 / 12.000) × 25 % = 416,666…
+   *                      → gana el OBJETIVO, que es el menor (art. 107.4 y 107.5 TRLHL)
+   *   comisión           = 20.000 × 3 % = 600,00
+   *   valor transmisión  = 20.000 − 600 − 175 = 19.225,00   (art. 35.1 LIRPF)
+   *   valor adquisición  = 16.000,00
+   *   ganancia           = 3.225,00 · IRPF = 3.225 × 19 % = 612,75 (primer tramo del ahorro)
+   *   total gastos       = 175 + 600 + 612,75 = 1.387,75 · neto = 20.000 − 1.387,75 = 18.612,25
+   */
+  test('CASO 33 (límite) — 0 años de propiedad: la reventa dentro del año sí se liquida', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '20000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '16000');
+    await sembrar(page, 'Valor catastral del suelo', '5000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '12000');
+
+    const anios = page.locator('input[aria-label="Años de propiedad"]');
+    await anios.fill('0');
+    await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '0');
+    await anios.blur();
+    // El 0 sobrevive al blur igual que el −4 del test de arriba: `acotarAlSalir={false}` no
+    // reescribe NADA, ni por abajo ni por arriba. Si algún día volviera a acotar, aquí no se
+    // notaría (0 ya es el mínimo), y por eso este test comprueba el RESULTADO y no el campo.
+    await esperarValorEnReact(page, 'input[aria-label="Años de propiedad"]', '0');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('175,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (más favorable)',
+    );
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('16.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('19.225,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('3225,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('612,75 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('600,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1387,75 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.612,25 €');
+    // La aserción que de verdad separa este caso del −4: con 0 años NO falta ningún dato,
+    // así que el neto es definitivo y no un techo.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras los gastos',
+    );
+  });
+
+  /**
+   * CASO 34 (DEBE RECHAZARSE) — un par catastral IMPOSIBLE: el suelo por encima del total.
+   *
+   * El valor catastral total incluye el suelo por definición, así que 12.000 de suelo dentro
+   * de 9.000 totales no describe ningún inmueble: es el despiste de intercambiar dos campos
+   * que salen consecutivos del mismo recibo del IBI. Lo que NO puede pasar es que el método
+   * real se calcule igual dando el suelo por el 100 % del inmueble y se rotule «más
+   * favorable» (rama `parCatastralImposible` del motor, hallazgo 900). El objetivo sí es
+   * calculable —solo necesita el suelo— y se aplica, nombrando el par imposible.
+   *
+   * Resuelto a mano ANTES de ejecutar la app (20.000 / 16.000 / 5 años / suelo 12.000 de
+   * 9.000 / comisión 3 % por defecto):
+   *   plusvalía objetivo = 12.000 × 0,17 (coef. de 5 años) × 25 % = 510,00
+   *   método real        — NO disponible: el par es imposible
+   *   valor transmisión  = 20.000 − 600 − 510 = 18.890,00 · adquisición = 16.000,00
+   *   ganancia           = 2.890,00 · IRPF = 2.890 × 19 % = 549,10
+   *   total gastos       = 510 + 600 + 549,10 = 1.659,10 · neto = 20.000 − 1.659,10 = 18.340,90
+   */
+  test('CASO 34 (debe rechazarse) — el suelo no puede superar al valor catastral total', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '20000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '16000');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '12000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('510,00 €');
+    const metodo = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(metodo).toContain('el valor catastral del suelo no puede superar al total');
+    // Y sobre todo: NO se presenta un método real como «más favorable» a partir del par
+    // imposible, que es lo que el `Math.min(1, suelo/total)` hacía antes del hallazgo 900.
+    expect(metodo).not.toContain('Método real');
+
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('2890,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('549,10 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1659,10 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.340,90 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — re-inspección del 21/09/2026.
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
+// Cuando se reparen, se les quita la marca y quedan como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ⚠️ ABIERTO 21/09/2026 (medio) — operativa. La mitad del hallazgo 773 que quedó viva.
+// Aquel cerró la COMISIÓN: «Un valor ILEGIBLE no es un cero: es un dato que falta, y esta app
+// ya sabe abstenerse y nombrarlo». La reparación añadió `comisionLegible` y solo a ese campo.
+// Los otros dos campos del vendedor siguen leyéndose con `parseSpanishNumberOr`, que devuelve
+// su 0 por defecto cuando el parser RECHAZA el texto, de modo que un dato ilegible y un campo
+// vacío son la misma cosa para el motor y nada en pantalla lo dice:
+//   · «Impuestos y gastos que pagaste al comprarlo» — su propio helperText dice que SUMAN al
+//     valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF). Al desaparecer, el IRPF
+//     sube. Y la tarjeta «Valor de adquisición» sigue describiéndose como «Precio de compra +
+//     impuestos y gastos de aquella compra», que en ese momento es falso.
+//   · «Gestoría y certificados del vendedor (€)» — gasto de transmisión del mismo artículo:
+//     al desaparecer suben la ganancia, el IRPF y el neto a la vez.
+// No hace falta teclear basura para llegar: «2.000.50» —el millar y el decimal a la
+// estadounidense, un copiar y pegar corriente— es NaN para `parseSpanishNumber` (lo es por
+// diseño desde el 24/08/2026) y entra por este camino.
+// Caso: 20.000 / 16.000 / 5 años / suelo 5.000 de 12.000 / gastos de adquisición «2.000.50»
+//       → esperado: el neto marcado como TECHO nombrando el dato ilegible, igual que hace la
+//         app con la comisión desde el hallazgo 773
+//       → obtenido: valor de adquisición 16.000,00 €, ganancia 3.187,50 €, IRPF 605,63 €
+//         (frente a los 130,53 € que salen leyendo 2.000,50) y el neto presentado como
+//         «Lo que realmente recibes tras los gastos»
+test('ABIERTO 21/09 (operativa) — unos gastos de adquisición ilegibles se leen como 0 € sin decirlo', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await sembrar(page, 'Precio del trastero', '20000');
+  await page.getByRole('button', { name: /Vendedor/ }).click();
+  await sembrar(page, 'Precio de compra original', '16000');
+  await sembrar(page, 'Años de propiedad', '5');
+  await sembrar(page, 'Valor catastral del suelo', '5000');
+  await sembrar(page, 'Valor catastral total (suelo + construcción)', '12000');
+
+  const gastos = page.locator('input[aria-label="Impuestos y gastos que pagaste al comprarlo"]');
+  await gastos.fill('2.000.50');
+  await esperarValorEnReact(
+    page,
+    'input[aria-label="Impuestos y gastos que pagaste al comprarlo"]',
+    '2.000.50',
+  );
+  await gastos.blur();
+
+  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
+});
+
+// ⚠️ ABIERTO 21/09/2026 (bajo) — contenido. La FAQ visible y el FAQPage servido siguen
+// escritos DOS VECES a mano en tres de sus seis respuestas, y dos ya han divergido.
+// El hallazgo 774 centralizó en constantes las respuestas del IVA y de la plusvalía
+// («¿Qué IVA paga un trastero nuevo?» y «¿Se paga plusvalía municipal…?») precisamente para
+// que la respuesta visible y la estructurada no pudieran divergir, y el 846 citó esa
+// divergencia como la razón para dejar UN solo FAQPage. Las otras tres —vinculado vs
+// independiente, comprar sin la vivienda y tipos reducidos— se quedaron duplicadas: el texto
+// vive a la vez en `page.tsx` (JSX, con sus `<strong>`) y en `faqJsonLd` de `metadata.ts`.
+// Las dos divergencias de hoy son de redacción, no de fondo —«como anejo» frente a «como
+// anejo de la vivienda», y «algunas CCAA» frente a «algunas comunidades autónomas»—, así que
+// no engañan a nadie; lo que demuestran es que el mecanismo sigue abierto, y este es el canal
+// que citan los asistentes de IA sin el disclaimer al lado. (De paso, «CCAA» es de las
+// abreviaturas España-only que el CLAUDE.md pide evitar.)
+// Caso: comparar cada respuesta visible con la del FAQPage servido
+//       → esperado: las 6 iguales, como ya lo son las 3 que viajan en constante
+//       → obtenido: 4 iguales y 2 distintas
+test('ABIERTO 21/09 (contenido) — tres respuestas de la FAQ siguen escritas dos veces a mano', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faqPage = bloques
+    .map((b) => JSON.parse(b) as Record<string, unknown>)
+    .find((j) => j['@type'] === 'FAQPage') as
+    | { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }
+    | undefined;
+  expect(faqPage).toBeDefined();
+
+  const divergentes: string[] = [];
+  for (const item of await page.locator('[class*="faqItem"]').all()) {
+    const pregunta = (await item.locator('h4').innerText()).replace(/\s+/g, ' ').trim();
+    const visible = (await item.locator('p').innerText())
+      .replace(ESPACIO_DURO, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const nodo = faqPage!.mainEntity.find(
+      (q) => q.name.replace(/\s+/g, ' ').trim() === pregunta,
+    );
+    const estructurada = (nodo?.acceptedAnswer.text ?? '(sin nodo)')
+      .replace(ESPACIO_DURO, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (visible !== estructurada) divergentes.push(pregunta);
+  }
+  expect(divergentes).toEqual([]);
 });

@@ -958,3 +958,313 @@ test.describe('Re-inspección 14/09/2026 — Canarias, el acantilado de Aragón 
     expect(panel).toContain('59.994,00 €');    // bonificación del 99 %, art. 58 bis.1
   });
 });
+
+// ════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 21/09/2026 — tres casos nuevos, resueltos a mano ANTES de
+// ejecutarlos, y ninguno repite comunidad ni rama de bonificación de los
+// anteriores:
+//
+//   · el NORMAL estrena BALEARES, la única comunidad del catálogo cuyo Grupo II
+//     bonifica al 95 % (no al 99 % ni al 99,9 %), así que es la única donde la
+//     cuota que sobrevive a la bonificación tiene cuatro cifras y un error en el
+//     porcentaje se ve a simple vista;
+//   · el LÍMITE estrena la rama `exencion` de `aplicarBonificacion` —Andalucía y
+//     Galicia, exención TOTAL si la base liquidable no llega al millón—, que
+//     ninguna corrida anterior había ejecutado, con la base a un lado y a otro
+//     de los 1.000.000 €;
+//   · el de RECHAZO estrena la forma «cifra + palabra» («300.000 aprox») en el
+//     campo de Otros inmuebles. Los casos anteriores probaron «1.2.3» (dos
+//     puntos), «1e3» (exponente) y el signo menos; éste es el que `parseFloat`
+//     habría leído como 300 —mil veces menos— sin avisar de nada.
+//
+// Cada cifra esperada sale de `data/fiscal/sucesiones.ts`, con el tramo y la
+// constante citados en el desarrollo. La siembra pasa por `_hidratacion.ts`.
+// ════════════════════════════════════════════════════════════════════════════
+
+test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de Andalucía y el importe con palabra', () => {
+  /** SOLO la columna de resultados: «Bonificación» y los importes viven también en la guía. */
+  const panelResultados = async (page: Page): Promise<string> =>
+    (await page.locator('[class*="resultsPanel"]').innerText()).replace(/ /g, ' ');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#otros-inmuebles']);
+  });
+
+  /**
+   * CASO NORMAL — hijo de 21 o más (Grupo II) que hereda 400.000 € en cuentas en las ISLAS
+   * BALEARES. Es la única comunidad cuyo Grupo II se bonifica al 95 %
+   * (`BONIFICACIONES_CCAA_IS['baleares'].bonificaciones['II'].porcentaje = 0.95`), frente al
+   * 99 % de su propio Grupo I: si la app colapsara los dos grupos, la cuota bajaría a la
+   * quinta parte y seguiría pareciendo plausible.
+   *
+   *   Activos            400.000,00   (saldos en cuentas)
+   *   + ajuar 3 %          12.000,00   PORC_AJUAR_DOMESTICO_IS
+   *   = base imponible   412.000,00
+   *   − parentesco         15.956,87   REDUCCIONES_PARENTESCO_IS['II'] (art. 20.2.a LISD)
+   *   = base liquidable  396.043,13
+   *   cuota íntegra       79.957,81    TARIFA_ESTATAL_IS, tramo «hasta 398.777,54»:
+   *                                    40.011,04 + 25,50 % × (396.043,13 − 239.389,13)
+   *   × coeficiente           1,0000   COEFICIENTES_IS['II'][0] (patrimonio < 402.678 €)
+   *   − bonificación 95 %  75.959,92
+   *   = cuota final        3997,89 €   (tipo efectivo 0,97 %)
+   */
+  test('caso normal: hijo ≥21 en Baleares con 400.000 € paga 3997,89 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('baleares');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '400000');
+
+    expect(await cuota(page)).toBe('3997,89 €');
+
+    const panel = await panelResultados(page);
+    expect(panel).toContain('12.000,00 €');    // ajuar del 3 %
+    expect(panel).toContain('412.000,00 €');   // base imponible
+    expect(panel).toContain('15.956,87 €');    // reducción del art. 20.2.a
+    expect(panel).toContain('396.043,13 €');   // base liquidable
+    expect(panel).toContain('79.957,81 €');    // cuota íntegra, tramo del 25,50 %
+    expect(panel).toContain('75.959,92 €');    // bonificación del 95 %
+    // El rótulo tiene que decir 95, no 99: es la diferencia entre 3997,89 € y 799,58 €
+    expect(panel).toContain('Bonificación 95,0 % (Islas Baleares)');
+    expect(panel).toContain('Tipo efectivo: 0,97%');
+  });
+
+  /**
+   * CASO LÍMITE — el millón de ANDALUCÍA, que es la rama `exencion` de `aplicarBonificacion`
+   * y no la había ejecutado ninguna corrida anterior: `{ porcentaje: 0.99, exencion: 1000000 }`
+   * exime la cuota ENTERA mientras la base liquidable no llegue a 1.000.000 €, y por encima
+   * deja el 99 % de siempre. No es una escala: es un escalón, y lo cruza el ajuar del 3 %
+   * tanto como la herencia.
+   *
+   *   (a) Activos          985.000,00 → + ajuar 29.550,00 = base imponible 1.014.550,00
+   *       − parentesco      15.956,87   REDUCCIONES_PARENTESCO_IS['II']
+   *       = base liquidable 998.593,13 < 1.000.000 → EXENCIÓN TOTAL
+   *       cuota íntegra     267.644,34  TARIFA_ESTATAL_IS, tramo «Infinity»:
+   *                                     199.291,40 + 34 % × (998.593,13 − 797.555,08)
+   *       = cuota final           0,00 €
+   *
+   *   (b) Activos          990.000,00 → + ajuar 29.700,00 = base imponible 1.019.700,00
+   *       = base liquidable 1.003.743,13 ≥ 1.000.000 → sin exención, bonificación del 99 %
+   *       cuota íntegra     269.395,34  199.291,40 + 34 % × (1.003.743,13 − 797.555,08)
+   *       − bonificación    266.701,38
+   *       = cuota final        2693,95 €  (tipo efectivo 0,26 %)
+   *
+   * 5.000 € más de herencia convierten una cuota de cero en 2.693,95 €.
+   */
+  test('caso límite: en Andalucía 5.000 € más de herencia pasan de 0,00 € a 2693,95 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('andalucia');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '985000');
+
+    expect(await cuota(page)).toBe('0,00 €');
+    const bajoElMillon = await panelResultados(page);
+    expect(bajoElMillon).toContain('998.593,13 €');   // base liquidable, aún bajo el millón
+    expect(bajoElMillon).toContain('267.644,34 €');   // cuota íntegra del último tramo
+    // El rótulo dice POR QUÉ es cero: no es que no haya cuota, es que está exenta
+    expect(bajoElMillon).toContain('Exención total (base < 1.000.000,00 €)');
+
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '990000');
+
+    expect(await cuota(page)).toBe('2693,95 €');
+    const sobreElMillon = await panelResultados(page);
+    expect(sobreElMillon).toContain('1.003.743,13 €');  // base liquidable, ya sobre el millón
+    expect(sobreElMillon).toContain('269.395,34 €');    // cuota íntegra
+    expect(sobreElMillon).toContain('266.701,38 €');    // bonificación del 99 %
+    expect(sobreElMillon).toContain('Bonificación 99,0 % (Andalucía)');
+    expect(sobreElMillon, 'ya no hay exención al llegar al millón').not.toContain('Exención total');
+  });
+
+  /**
+   * CASO A RECHAZAR — «300.000 aprox» en Otros inmuebles, con 100.000 € válidos al lado.
+   *
+   * Es lo que escribe quien no sabe aún cuánto vale el piso, y es la forma más peligrosa de
+   * las cuatro probadas: `partesNumericas` la desecha por la letra, pero `parseFloat` la
+   * habría leído como **300** —el piso valdría trescientos euros— y el `|| 0` de antes del
+   * 11/09/2026 la habría tomado como cero. En los dos casos sin decir nada.
+   *
+   * La app tiene que NOMBRAR el campo y abstenerse: ni siquiera publica el importe válido.
+   */
+  test('caso a rechazar: «300.000 aprox» no se lee como 300 ni como cero', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('baleares');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#otros-inmuebles'), '300.000 aprox');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+
+    // Acotado al aviso de la app: `getByRole('alert')` casa también con el anunciador de
+    // rutas de Next (#__next-route-announcer__) y rompería el modo estricto.
+    await expect(page.getByRole('alert').filter({ hasText: /no se puede leer/ }))
+      .toContainText('Otros inmuebles');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+
+    // Y el panel no publica NADA: ni el importe válido ni una masa hereditaria parcial
+    const panel = await panelResultados(page);
+    expect(panel).not.toContain('100.000,00');
+    expect(panel).not.toContain('300,00');
+  });
+
+  /**
+   * CONTRASTE de las dos reparaciones del 14/09/2026 (hallazgos 815 y 816). Las dos
+   * consistieron en DERIVAR del motor un número que iba escrito a mano, y las dos podían
+   * haber introducido el defecto simétrico: que la tarjeta pase a decir lo que calcula
+   * `calcularSucesion` y la HERRAMIENTA —que tiene su propia aritmética, ver la cabecera de
+   * este fichero— siga diciendo otra cosa. Aquí se comprueban las dos bocas a la vez.
+   */
+  test('815 y 816 — la tarjeta de la viuda y la comparativa de CCAA dicen lo que la herramienta liquida', async ({ page }) => {
+    const educativo = await textoCompleto(page);
+
+    // [815] La viuda catalana: ni «57.000 €» de cuota ni «400.000 €» de base liquidable
+    expect(educativo).toContain('606,00 €');
+    expect(educativo).toContain('515.000,00 €');   // base imponible CON el ajuar del 3 %
+    expect(educativo).toContain('415.000,00 €');   // base liquidable
+    expect(educativo).not.toMatch(/la cuota, de 57\.000/);
+
+    // [816] La comparativa Asturias/Madrid: 0,00 € y 154,74 €, no «0,00 € y 111,11 €»
+    expect(educativo).toContain('liquida 0,00 € en Asturias y 154,74 € en Madrid');
+    expect(educativo).not.toContain('111,11');
+
+    // La herramienta, con los datos de la tarjeta de la viuda
+    await page.locator('#ccaa-causante').selectOption('cataluna');
+    await page.locator('#parentesco').selectOption('I-conyuge');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '500000');
+    expect(await cuota(page)).toBe('606,00 €');
+
+    // Y con los de la comparativa: 250.000 €, de los que 200.000 € son la vivienda habitual
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#vivienda-habitual']);
+    await page.locator('#ccaa-causante').selectOption('asturias');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#vivienda-habitual'), '200000');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '50000');
+    expect(await cuota(page)).toBe('0,00 €');
+
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    expect(await cuota(page)).toBe('154,74 €');
+  });
+
+  /**
+   * [817] El plazo de la PRÓRROGA en el faqJsonLd, que es lo que citan ChatGPT, Bing Copilot
+   * y Perplexity. Decía «antes de que venza el primer plazo» —los seis meses— cuando el art.
+   * 68.1 RISD da CINCO, y quien siguiera esa versión perdía la prórroga y entraba en recargo.
+   * Las dos bocas leen ya `PLAZO_ISD`, así que basta con que digan el mismo número.
+   */
+  test('817 — el faqJsonLd y la página visible dan el mismo plazo de prórroga', async ({ page }) => {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    const json = JSON.parse(faq) as {
+      mainEntity: Array<{ name: string; acceptedAnswer: { text: string } }>;
+    };
+    const plazo = json.mainEntity.find((q) => /plazo/i.test(q.name));
+    expect(plazo, 'el FAQPage tiene la pregunta del plazo').toBeTruthy();
+
+    const respuesta = plazo!.acceptedAnswer.text;
+    expect(respuesta).toContain('6 meses desde el fallecimiento');
+    expect(respuesta).toContain('dentro de los 5 primeros meses');
+    expect(respuesta).toContain('RD 1629/1991');
+    expect(respuesta, 'la prórroga NO es gratis (art. 68.3)').toContain('intereses de demora');
+
+    // Y la página visible dice lo mismo, no otra cosa
+    const visible = await textoCompleto(page);
+    expect(visible).toContain('los primeros 5 meses');
+    expect(visible).not.toMatch(/prórroga[^.]{0,80}antes de que venza el (primer )?plazo/i);
+  });
+
+  /**
+   * [818] Los cuatro datos normativos que el 14/09/2026 se importaban sin usar mientras sus
+   * cifras iban tecleadas en la prosa. Se comprueba sobre la FUENTE, porque en pantalla los
+   * dos caminos dan el mismo texto: lo que distingue a uno del otro es si el número puede
+   * separarse del módulo sellado sin que nada lo delate.
+   */
+  test('818 — los datos normativos de la prosa siguen derivándose de data/fiscal', async () => {
+    const fuente = readFileSync(
+      join(process.cwd(), 'app/estimador-impuesto-sucesiones/page.tsx'),
+      'utf8',
+    );
+    for (const constante of [
+      'REDUCCION_VIVIENDA_MAX_IS',
+      'REDUCCION_VIVIENDA_MAX_CATALUNA_IS',
+      'REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS',
+      'REDUCCION_SEGURO_VIDA_MAX_IS',
+      'REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS',
+      'REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS',
+    ]) {
+      // Importada Y usada: dos apariciones como mínimo, la del import y la del uso.
+      const usos = fuente.split(constante).length - 1;
+      expect(usos, `${constante} se importa pero no se usa`).toBeGreaterThanOrEqual(2);
+    }
+  });
+});
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * OPERATIVA EN MÓVIL — 390x844, el viewport de la mitad del tráfico.
+ *
+ * ⚠️ Esto NO es un test de maquetación: es el testigo del hallazgo 819, que el
+ * 14/09/2026 se dio por reparado y NO lo está. Medido el 21/09/2026:
+ *
+ *     h1 ................................  144 px
+ *     LegalNotice .......................  524 px
+ *     banda «Descubre Delegum» ..........  590 px  (142 px de alto)
+ *     DisclaimerCard ....................  756 px  (725 px de alto)
+ *     DataReference ..................... 1513 px  (167 px de alto)
+ *     «Qué no incluye esta estimación» .. 1704 px  (473 px de alto)
+ *     PRIMER CONTROL (select de CCAA) ... 2308 px  ← 2,73 pantallas
+ *     primer campo de importe ........... 3030 px  ← 3,59 pantallas
+ *     panel de resultados ............... 3884 px  ← 4,60 pantallas
+ *
+ * La reparación quitó 196 px de los 2.504 px que medía el acta anterior (un
+ * 7,8 %) y el primer control sigue cayendo en la TERCERA pantalla, que es
+ * exactamente lo que el hallazgo describía. La segunda pantalla entera
+ * (844–1688 px) no contiene ni un encabezado, ni un control, ni un botón.
+ *
+ * Lo que este bloque fija es el TECHO: que no se vuelva a los 2.504 px de
+ * antes. Cuando el hallazgo se repare de verdad, el margen se baja aquí.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+test.describe('Estimador ISD — lo que hay por delante del primer control en 390x844', () => {
+  // Enumerado en vez de `...devices['Pixel 7']`: un `devices` dentro de un describe
+  // forzaría un worker nuevo, y estas cinco opciones no.
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('el primer control no baja de donde ya estaba, y no hay scroll horizontal', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas']);
+
+    const medidas = await page.evaluate(() => {
+      const arriba = (sel: string): number => {
+        const el = document.querySelector(sel);
+        if (!el) return -1;
+        return Math.round(el.getBoundingClientRect().top + window.scrollY);
+      };
+      return {
+        h1: arriba('h1'),
+        primerControl: arriba('#ccaa-causante'),
+        primerImporte: arriba('#saldos-cuentas'),
+        anchoScroll: document.documentElement.scrollWidth,
+      };
+    });
+
+    // El h1 sí está en la primera pantalla (144 px medidos)
+    expect(medidas.h1).toBeGreaterThan(0);
+    expect(medidas.h1).toBeLessThan(400);
+
+    // Sin desbordamiento lateral: el CLAUDE.md global exige 16 px de margen y 0 scroll
+    expect(medidas.anchoScroll).toBe(390);
+
+    /*
+      TECHO, no objetivo. 2.308 px medidos el 21/09/2026 frente a los 2.504 px que el acta
+      del 14/09 dio por reparados: el margen deja pasar el estado actual y bloquea cualquier
+      bloque nuevo que devuelva la app a donde estaba. El hallazgo sigue abierto en el acta.
+    */
+    expect(
+      medidas.primerControl,
+      'algo ha vuelto a crecer por encima del formulario',
+    ).toBeLessThan(2500);
+    expect(medidas.primerImporte).toBeLessThan(3300);
+  });
+});

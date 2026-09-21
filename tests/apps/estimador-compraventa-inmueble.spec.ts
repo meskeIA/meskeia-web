@@ -3852,3 +3852,263 @@ test.describe('Inspector 14/09/2026 — anejos residenciales y segunda boca del 
     expect(tecleados, 'el tope y la edad del reducido no pueden ir tecleados').toEqual([]);
   });
 });
+
+test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y el hueco del nombre', () => {
+  /** Espera a que React monte y siembra comprobando que el estado lo recogió. */
+  async function sembrar21(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  async function abrir21(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    // Un input de la página como testigo: un clic anterior a la hidratación también se pierde
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+  }
+
+  /**
+   * CASO 45 (normal) — Castilla-La Mancha, segunda mano, vivienda de 160.000 €, perfil general.
+   *
+   * Era, con Navarra, una de las dos únicas comunidades sin ningún caso en este fichero. No
+   * tiene escala progresiva, así que sirve de control del camino plano con tipo general alto.
+   *   ITP       = 160.000 × 9 %  (ITP_CCAA['castilla-mancha'].tipoGeneral, que se lee de
+   *               TIPOS_ITP_CCAA_2025 en data/fiscal/inmuebles.ts)          =  14.400,00 €
+   *   Notaría   = arancel(160.000) × 1,21 × 1,75                            =     716,63 €
+   *     arancel = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 %
+   *               + 90.151,82×0,10 % + 9.746,97×0,05 %  = 338,43341
+   *               → ×1,21 = 409,504426 → ×1,75 = 716,632746
+   *   Registro  = (174,212064 + 6,010121 + 3,005061) × 1,21                 =     221,70 €
+   *   Gestoría (GESTORIA_TIPICA, valor por defecto del campo)                =     300,00 €
+   *   AJD       = 0 — segunda mano: TPO y AJD son incompatibles (art. 31.2 TRLITPAJD)
+   *   Total gastos = 14.400 + 716,63 + 221,70 + 300                         =  15.638,33 €
+   *   % sobre precio = 15.638,33 / 160.000                                   =       9,77 %
+   *   Coste total  = 160.000 + 15.638,33                                     = 175.638,33 €
+   */
+  test('CASO 45 (normal) — Castilla-La Mancha, segunda mano, vivienda de 160.000 €', async ({
+    page,
+  }) => {
+    await abrir21(page);
+    await page.locator('#ccaa-inmueble').selectOption('castilla-mancha');
+    await sembrar21(page, 'Precio de la vivienda', '160000');
+
+    expect(ITP_CCAA['castilla-mancha'].tipoGeneral).toBe(9);
+    await expect(page.getByRole('heading', { name: 'ITP (9,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('14.400,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('716,63 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('221,70 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('15.638,33 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,77% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('175.638,33 €');
+  });
+
+  /**
+   * CASO 46 (límite) — Andalucía, perfil Joven, EXACTAMENTE 150.000 €: el canto del tope.
+   *
+   * Vigila la regresión del hallazgo ALTO del 14/09 POR LOS DOS LADOS, que es lo que un
+   * arreglo de este tipo puede romper: que el anejo suelto deje de cobrar el tipo de vivienda
+   * habitual, y que la vivienda que SÍ cumple los requisitos lo siga cobrando. El precio se
+   * pone en el borde (`precio <= valorMaximo` en `elegirTipoITP` y `superaElTope`) para que
+   * el mismo caso mida también que el tope se compara con «≤» y no con «<».
+   *
+   * Ficha: ITP_CCAA['andalucia'] — tipo general 7 %; reducido «Jóvenes < 35 años» al 3,5 %,
+   * `valorMaximo` 150.000 € y condiciones «Menor de 35 años · Vivienda habitual · Valor ≤
+   * 150.000 €». Un trastero SUELTO no es vivienda habitual nunca —el contrato de
+   * `elegirTipoITP` lo dice por escrito— así que para él solo cabe el tipo general.
+   *
+   *   VIVIENDA  ITP = 150.000 × 3,5 %                                  =   5.250,00 €
+   *   TRASTERO  ITP = 150.000 × 7 %                                    =  10.500,00 €
+   *   Notaría   = arancel(150.000) × 1,21 × 1,75                        =     705,78 €
+   *     arancel = 90,15 + 108,182205 + 45,0759 + 89.898,79×0,10 %
+   *             = 333,306895 → ×1,21 = 403,301343 → ×1,75 = 705,777350
+   *   Registro  = (171,098200 + 6,010121 + 3,005061) × 1,21             =     217,94 €
+   *   Gestoría                                                           =     300,00 €
+   *   Total gastos vivienda = 5.250 + 705,78 + 217,94 + 300             =   6.473,72 €  (4,32 %)
+   *   Total gastos trastero = 10.500 + 705,78 + 217,94 + 300            =  11.723,72 €
+   *   Coste total vivienda  = 156.473,72 €   ·   trastero = 161.723,72 €
+   */
+  test('CASO 46 (límite) — Andalucía, joven, 150.000 € justo en el tope: la vivienda sí y el trastero no', async ({
+    page,
+  }) => {
+    const joven = ITP_CCAA['andalucia'].tiposReducidos.find((t) => /j[oó]venes/i.test(t.nombre));
+    expect(joven?.tipo).toBe(3.5);
+    expect(joven?.valorMaximo).toBe(150000);
+    expect(joven?.condiciones).toContain('Vivienda habitual');
+
+    await abrir21(page);
+    await page.locator('#ccaa-inmueble').selectOption('andalucia');
+    await sembrar21(page, 'Precio de la vivienda', '150000');
+    await page.locator('#perfil-comprador').selectOption('joven');
+
+    // La vivienda que cumple los requisitos SIGUE recibiendo el reducido, con el precio
+    // justo en el tope: la reparación del 14/09 no podía pasarse de frenada.
+    await expect(page.getByRole('heading', { name: 'ITP (3,50%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('5250,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('705,78 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('217,94 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('6473,72 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('4,32% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('156.473,72 €');
+
+    // Y el MISMO perfil, el mismo precio y la misma comunidad sobre un TRASTERO suelto
+    // vuelven al tipo general: el doble de cuota, que es la dirección correcta.
+    await page.getByRole('button', { name: /Trastero/ }).click();
+    await expect(page.getByRole('heading', { name: 'ITP (7,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('10.500,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('11.723,72 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('161.723,72 €');
+  });
+
+  /**
+   * CASO 47 (debe rechazarse) — «-0,5» años de tenencia: el −0 de `Math.trunc`.
+   *
+   * Es el hallazgo 764 por su rincón exacto, y no lo cubre el CASO 39, que prueba el entero
+   * «-5»: `Math.trunc(-0,5)` devuelve **-0**, y `-0 >= 0` es `true`, así que la guarda
+   * escrita sobre el valor truncado dejaba pasar el decimal negativo y liquidaba la
+   * plusvalía con el coeficiente de «Menos de 1 año» (0,14) a partir de un dato imposible.
+   * El campo NO lleva `min`, así que el blur no lo reescribe y el «-0,5» permanece a la
+   * vista (hallazgo 722): la app tiene que decir «Sin calcular», no inventar un supuesto.
+   *
+   * Venta 250.000 € · compra 180.000 € · suelo catastral 60.000 € · comisión 3 % (defecto).
+   *   RECHAZADO («-0,5» años): plusvalía «Sin calcular» y fuera del neto.
+   *     ganancia = (250.000 − 7.500) − 180.000                    =  62.500,00 €
+   *     IRPF (TRAMOS_GANANCIAS_PATRIMONIALES_2025):
+   *        6.000 × 19 % = 1.140 · 44.000 × 21 % = 9.240 · 12.500 × 23 % = 2.875
+   *        IRPF                                                    =  13.255,00 €
+   *     total gastos = 7.500 + 13.255                              =  20.755,00 €
+   *     neto         = 250.000 − 20.755                            = 229.245,00 €
+   *   CONTROL (8 años, dato válido): coeficiente 0,10 de COEFICIENTES_IIVTNU_2025 y
+   *     PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25 %).
+   *     plusvalía = 60.000 × 0,10 × 25 %                           =   1.500,00 €
+   *     ganancia  = (250.000 − 7.500 − 1.500) − 180.000            =  61.000,00 €
+   *     IRPF      = 1.140 + 9.240 + 11.000 × 23 % (2.530)          =  12.910,00 €
+   *     total gastos = 1.500 + 7.500 + 12.910                      =  21.910,00 €
+   *     neto         = 250.000 − 21.910                            = 228.090,00 €
+   */
+  test('CASO 47 (debe rechazarse) — «-0,5» años de tenencia no puede liquidar plusvalía', async ({
+    page,
+  }) => {
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.14);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 8)?.coeficiente).toBe(0.1);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await abrir21(page);
+    await sembrar21(page, 'Precio de la vivienda', '250000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar21(page, 'Precio de compra original', '180000');
+    await sembrar21(page, 'Valor catastral del suelo', '60000');
+    await sembrar21(page, 'Años de propiedad', '-0,5');
+
+    // El dato imposible se queda a la vista, sin reescribirse a 0 (que SÍ es un supuesto)
+    expect(await page.locator('input[aria-label="Años de propiedad"]').inputValue()).toBe('-0,5');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('20.755,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('229.245,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
+      'INCOMPLETO: falta descontar la plusvalía municipal',
+    );
+
+    // CONTROL: con un dato válido sí liquida, así que el rechazo de arriba no es parálisis
+    await sembrar21(page, 'Años de propiedad', '8');
+    await expect.poll(async () => valorTarjeta(page, 'Plusvalía municipal')).toBe('1500,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (falta el valor catastral total para comparar)',
+    );
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('21.910,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.090,00 €');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 21/09/2026 (MEDIO, contenido) — RESIDUO del hallazgo MEDIO del 14/09: a un
+   * garaje o un trastero SUELTOS se les sigue ofreciendo un tipo llamado «Vivienda habitual».
+   *
+   * La reparación del 14/09 descarta de `alAlcanceDeCualquiera` los reducidos que exigen
+   * vivienda habitual, pero mira SOLO el array `condiciones`:
+   *     !(!viviendaHabitual && r.condiciones.some(c => /vivienda habitual/i.test(c)))
+   * y en Castilla-La Mancha ese requisito viaja en el NOMBRE — «Vivienda habitual (primera
+   * compra)», 6 % — mientras sus condiciones dicen «Primera vivienda · Valor ≤ 180.000 € ·
+   * Hipoteca > 50% del valor». Ninguna casa con el patrón, así que el filtro no lo ve y el
+   * aviso se lo ofrece a un garaje suelto, que no puede ser ni la vivienda habitual ni la
+   * «primera vivienda» de nadie. Es la ÚNICA entrada de la tabla en ese caso (barrido de las
+   * 19 comunidades: las otras dos con el requisito solo en el nombre, «VPO primera vivienda»
+   * de Valencia y La Rioja, son de colectivo y ya quedan fuera por `DE_COLECTIVO`).
+   *
+   * Caso: Garaje/Parking · segunda mano · Castilla-La Mancha · perfil General · 140.000 €
+   *   esperado: ningún tipo que exija ser la vivienda habitual (quedarían los tres de zona
+   *     despoblada, que dependen del municipio y no de quién compra).
+   *   obtenido: «6,00% — Vivienda habitual (primera compra) · Requisitos: Primera vivienda ·
+   *     Valor ≤ 180.000 € · Hipoteca > 50% del valor», bajo el rótulo «Podrías pagar menos»
+   *     y con el pie que invita a llamar a la oficina liquidadora.
+   */
+  test('HALLAZGO 21/09 — a un garaje no se le ofrece un reducido cuyo requisito va en el NOMBRE', async ({
+    page,
+  }) => {
+    // Hallazgo ABIERTO: el testigo debe fallar mientras el defecto siga vivo.
+    test.fail();
+    // El requisito está en el nombre y no en las condiciones: de ahí el hueco
+    const clm = ITP_CCAA['castilla-mancha'].tiposReducidos.find((t) =>
+      /vivienda habitual/i.test(t.nombre),
+    );
+    expect(clm?.tipo).toBe(6);
+    expect(clm?.condiciones.some((c) => /vivienda habitual/i.test(c))).toBe(false);
+
+    await abrir21(page);
+    await page.getByRole('button', { name: /Garaje\/Parking/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('castilla-mancha');
+    await sembrar21(page, 'Precio del inmueble', '140000');
+
+    // La CUOTA sí es correcta desde el 14/09: tipo general, sin reducido de vivienda
+    await expect(page.getByRole('heading', { name: 'ITP (9,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('12.600,00 €');
+
+    // Lo que falla es el aviso: ofrece una rebaja que un garaje suelto no puede pedir
+    const aviso = page.locator('div[class*="avisoReducidos"]');
+    if (await aviso.count()) {
+      expect(await aviso.first().innerText()).not.toContain('Vivienda habitual');
+    }
+  });
+
+  /**
+   * ⚠️ HALLAZGO 21/09/2026 (BAJO, dato) — cuatro tipos de IVA tecleados a mano en una página
+   * que importa las constantes de las que salen.
+   *
+   * Es la familia de los hallazgos 581, 584, 629, 674 y 770, reparados uno a uno aquí: la
+   * calculadora ya deriva su IVA de `IVA_INMUEBLES_2025` y `PORCENTAJES_IVA`, y el bloque
+   * educativo también desde el 14/09 — pero quedan cuatro literales:
+   *   · `DERIVACIONES.garaje[0].matiz`   «(IVA 10%, hasta 2 plazas)» y «(IVA 21%)»
+   *        → IVA_INMUEBLES_2025.anejoVinculado y PORCENTAJES_IVA.general
+   *   · `DERIVACIONES.trastero[0].matiz` «(IVA 10%)» y «(IVA 21%)»  → las mismas dos
+   *   · `DERIVACIONES.terreno[1].matiz`  «IVA 21% + AJD»  → PORCENTAJES_IVA.general
+   *   · «Errores comunes»: «Los honorarios de notaría y registro llevan IVA al 21%»
+   *        → PORCENTAJES_IVA.general, que es el tipo que `calcularNotario` y
+   *          `calcularRegistro` aplican con su «× 1,21»
+   *
+   * Hoy los cuatro coinciden con sus constantes, así que no hay ninguna cifra mal en
+   * pantalla: lo que falta es el vínculo, exactamente como en el hallazgo 629 («hoy coincide,
+   * y lo que faltaba era el vínculo»). Los tres textos con «IVA 10%» / «IVA 21%» viven dentro
+   * de los avisos que derivan a las calculadoras especializadas, que son justo las que sí
+   * distinguen el anejo del independiente.
+   */
+  test('HALLAZGO 21/09 (dato) — los tipos de IVA de la prosa van tecleados, no derivados', async () => {
+    // Hallazgo ABIERTO: el testigo debe fallar mientras el defecto siga vivo.
+    test.fail();
+    // Hoy coinciden: por eso no hay ninguna cifra mal
+    expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(10);
+    expect(PORCENTAJES_IVA.general).toBe(21);
+
+    const fuente = readFileSync(
+      join(process.cwd(), 'app/estimador-compraventa-inmueble/page.tsx'),
+      'utf8',
+    );
+    // Solo lo que llega al usuario: los comentarios del código quedan fuera
+    const tecleados = fuente
+      .split('\n')
+      .map((linea, i) => ({ n: i + 1, linea: linea.trim() }))
+      .filter(({ linea }) => !/^(\/\/|\*|\/\*)/.test(linea))
+      .filter(({ linea }) => /IVA (al )?\d{1,2}\s?%/.test(linea))
+      .map(({ n, linea }) => `${n}: ${linea}`);
+    expect(tecleados, 'los tipos de IVA salen de data/fiscal, no de la memoria').toEqual([]);
+  });
+});

@@ -50,6 +50,18 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     en UN destino de la correspondencia oficial sin mirar cuál lo describe— en familias
  *     que el CANDADO no alcanza a ver, y el sexto es el residuo simétrico del 681: la norma
  *     de la CNAE transcrita a mano en el FAQPage del mismo `metadata.ts`.
+ *   · RE-inspección  21/09/2026 → los SEIS hallazgos del 14/09 se verifican CERRADOS uno a
+ *     uno en el navegador antes de escribir nada: «casero», «arrendador», «alquilar pisos» y
+ *     «rentista inmobiliario» dan 68.20; «tienda online» y «shopify» ya no dan la clase de
+ *     intermediación; «servicios auxiliares» encabeza con 82.10; «transporte de mercancías»
+ *     no ofrece 52.24; «niñera» y «canguro» dan 88.91; y `metadata.ts` ya no teclea la norma
+ *     de la CNAE. Su bloque pasa de «hallazgos abiertos» a «reparados». Tres casos nuevos en
+ *     «re-inspección del 21/09/2026» y 6 hallazgos en «hallazgos abiertos del 21/09/2026»,
+ *     con `test.fail()`. Los seis son OTRA VEZ el mecanismo del 423 en familias que el
+ *     CANDADO no alcanza a ver, esta vez fuera del terreno ya barrido: belleza (96.21 frente
+ *     a 96.22), confección (14.10 frente a 14.21), decoración de interiores (43.34 frente a
+ *     74.13), viajes (52.32 frente a 79.11/79.12), menaje e iluminación (47.52 frente a
+ *     47.55) y los puestos de mercadillo de ropa (47.12 frente a 47.71).
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -2030,9 +2042,11 @@ test.describe('Buscador CNAE-IAE — re-inspección del 14/09/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 14/09/2026 — escritos con `test.fail()`: afirman lo que DEBERÍA
-// ocurrir y hoy no ocurre. Al repararlos se les quita la marca sin tocar ningún valor
-// esperado, y pasan a sujetar la reparación como regresión.
+// REGRESIÓN — hallazgos del 14/09/2026, REPARADOS. Se escribieron con `test.fail()`
+// afirmando lo que DEBERÍA ocurrir; al repararlos se les quitó la marca sin tocar ningún
+// valor esperado. Desde la re-inspección del 21/09/2026 sujetan la reparación: los seis se
+// volvieron a comprobar uno a uno en el navegador, y los cuatro términos del casero son el
+// candado del único ALTO de aquella tanda.
 //
 // Cinco de los seis son el MECANISMO del hallazgo 423 en familias nuevas: cuando una clase
 // de la CNAE-2009 se reparte en varias de la CNAE-2025, los términos coloquiales se
@@ -2045,7 +2059,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 14/09/2026', () => {
 //     que es lo que salva a «transporte de mercancías» dentro de «Manipulación de
 //     mercancías».
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
+test.describe('Buscador CNAE-IAE — hallazgos del 14/09/2026, reparados', () => {
   test('ALTO — «casero» y «arrendador» deben llevar a 68.20, la clase que se llama «Alquiler de bienes inmobiliarios»', async ({
     page,
   }) => {
@@ -2171,5 +2185,281 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 14/09/2026', () => {
     // El valor esperado no se transcribe: se le pregunta al módulo.
     expect(CNAE_VIGENCIA.normaVigente).toContain('10/2025');
     expect(fuente).not.toMatch(/Real Decreto 10\/2025/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 21/09/2026 — tres casos nuevos, resueltos a mano ANTES del navegador
+//
+// Mismo método que el 14/09: cada valor esperado sale del catálogo sellado
+// (`public/datos/cnae-iae-catalogo.json`, `meta.generado` = 2026-09-14) o de
+// `data/fiscal/cnae-iae.ts`, y la consulta se siembra comprobando que llegó al ESTADO de
+// React. Los tres se eligieron en familias que ningún bloque anterior había tocado, y los
+// tres se resolvieron sobre el catálogo antes de abrir el navegador.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — re-inspección del 21/09/2026', () => {
+  test('CASO 1 (normal) — «fontanero» cae en la clase cuyo literal ES «Fontanería», y su epígrafe del IAE no retiene', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── Resuelto a mano sobre el catálogo sellado ──────────────────────────
+    // CNAE-2025: la única entrada cuyo texto de búsqueda contiene «fontanero» es la clase
+    // 43.22, y el término no necesita al diccionario para justificarse porque el LITERAL
+    // oficial de la clase empieza por la palabra: «Fontanería, instalación de sistemas de
+    // calefacción y aire acondicionado». Su camino es Sección F CONSTRUCCIÓN → División 43
+    // «Actividades de construcción especializada» → Grupo 43.2 «Instalaciones eléctricas, de
+    // fontanería y otras instalaciones en obras de construcción». Ninguna otra clase, grupo
+    // o división lleva «fontanero», así que el resultado tiene que ser UNO.
+    await buscarCnaeVerificado(page, 'fontanero');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page)).toHaveCount(1);
+    await expect(fichas(page).first()).toContainText('43.22');
+    await expect(fichas(page).first()).toContainText(
+      'Fontanería, instalación de sistemas de calefacción y aire acondicionado',
+    );
+    await expect(fichas(page).first()).toContainText('Sección F');
+    await expect(fichas(page).first()).toContainText('CONSTRUCCIÓN');
+    await expect(fichas(page).first()).toContainText('División 43');
+    await expect(fichas(page).first()).toContainText('Grupo 43.2');
+
+    // IAE: la misma actividad está en la Sección 1ª, División 5 CONSTRUCCIÓN, Agrupación 50,
+    // Grupo 504 «Instalaciones y montajes», epígrafe 504.2 «Instalaciones de fontanería».
+    // Es el único del catálogo con esa palabra, y por ser empresarial NO retiene: el texto
+    // no se transcribe, se le pregunta a SECCIONES_IAE.
+    await buscarIaeVerificado(page, 'fontanería');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page).first()).toContainText('504.2');
+    await expect(fichas(page).first()).toContainText('Instalaciones de fontanería');
+    await expect(fichas(page).first()).toContainText('Sección 1ª');
+    await expect(fichas(page).first()).toContainText('Grupo 504');
+    await expect(fichas(page).first()).toContainText(SECCION_1.retencion);
+  });
+
+  test('CASO 2 (límite) — «pintor» es dos oficios distintos, y en el IAE uno de ellos retiene', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── Resuelto a mano sobre el catálogo sellado ──────────────────────────
+    // «pintor» es ambiguo de verdad, no por descuido del diccionario: el que pinta paredes y
+    // el que pinta cuadros son actividades distintas y el término cuelga —bien— de las DOS
+    // clases. Con «pintor» casan exactamente dos entradas (ningún título oficial lleva la
+    // palabra; «Fabricación de pinturas» no contiene «pintor»):
+    //   · 43.34 «Pintura y acristalamiento», Sección F CONSTRUCCIÓN, Grupo 43.3 «Acabado de
+    //     edificios».
+    //   · 90.12 «Actividades de creación de artes visuales», Sección S ACTIVIDADES
+    //     ARTÍSTICAS, DEPORTIVAS Y DE ENTRETENIMIENTO, Grupo 90.1.
+    // Las dos son clases y las dos entran por palabra completa en un sinónimo, así que
+    // empatan en relevancia y desempata el código: 43.34 antes que 90.12.
+    await buscarCnaeVerificado(page, 'pintor');
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    await expect(fichas(page)).toHaveCount(2);
+    await expect(fichas(page).nth(0)).toContainText('43.34');
+    await expect(fichas(page).nth(0)).toContainText('Pintura y acristalamiento');
+    await expect(fichas(page).nth(0)).toContainText('Sección F');
+    await expect(fichas(page).nth(1)).toContainText('90.12');
+    await expect(fichas(page).nth(1)).toContainText('Actividades de creación de artes visuales');
+    await expect(fichas(page).nth(1)).toContainText('Sección S');
+
+    // Y aquí está lo que esta app existe para enseñar: en las Tarifas del IAE el pintor
+    // ARTISTA no es empresario. El único resultado con «pintor» es el grupo 861 de la
+    // SECCIÓN 2ª —«Pintores, Escultores, Ceramistas, Artesanos, Grabadores, Artistas
+    // Falleros y artistas similares»—, que sí retiene IRPF en factura. El pintor de brocha
+    // gorda está en la Sección 1ª y no aparece en esta consulta porque su epígrafe dice
+    // «Pintura», no «Pintores».
+    await buscarIaeVerificado(page, 'pintor');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page).first()).toContainText('861');
+    await expect(fichas(page).first()).toContainText('Sección 2ª');
+    await expect(fichas(page).first()).toContainText(SECCION_2.retencion);
+  });
+
+  test('CASO 3 (debe rechazarse) — «96.24» y «972.3» son verosímiles y no existen en ninguno de los dos catálogos', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // El grupo 96.2 «Peluquería, tratamientos de belleza, spas y actividades similares» se
+    // agota en 96.21, 96.22 y 96.23: «96.24» es la errata natural de quien va contando. Y
+    // «9624» tampoco es clave de la tabla de correspondencia del INE, así que en una app de
+    // nivel 1 crítico hay que comprobar además que NO se emita el aviso de código antiguo:
+    // inventar una equivalencia es peor que no dar ninguna.
+    await buscarCnaeVerificado(page, '96.24');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+
+    // En el IAE, el grupo 972 «Salones de peluquería e institutos de belleza» solo tiene los
+    // epígrafes 972.1 y 972.2, así que «972.3» es igual de verosímil e igual de inexistente.
+    // Nada en el catálogo empieza por 9723.
+    await buscarIaeVerificado(page, '972.3');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 21/09/2026 — escritos con `test.fail()`: afirman lo que DEBERÍA
+// ocurrir y hoy no ocurre. Al repararlos se les quita la marca sin tocar ningún valor
+// esperado, y pasan a sujetar la reparación como regresión.
+//
+// Los SEIS son el mecanismo del hallazgo 423 una vez más: cuando una clase de la CNAE-2009
+// se reparte en varias de la CNAE-2025, los términos coloquiales se quedaron en UN destino
+// sin mirar cuál de ellos describe la actividad. El CANDADO sigue sin poder verlos, y por la
+// razón ya escrita en el bloque del 14/09: exige que el título del HERMANO lleve el término
+// ENTERO, y «esteticista», «sastre», «lámparas» o «mercadillo de ropa» no aparecen en ningún
+// literal oficial —los literales dicen «cuidados de belleza», «prendas de vestir exteriores»,
+// «aparatos de iluminación» y «prendas de vestir».
+//
+// Ninguno de los seis se solapa con el terreno ya barrido el 14/09 (alojamiento, comercio
+// electrónico, intermediación, manipulación de mercancías y cuidado de niños).
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 21/09/2026', () => {
+  test('MEDIO — «esteticista» y «depilación» deben llevar a 96.22, la clase que se llama «cuidados de belleza»', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['9602'] = ['96.21', '96.22']: la clase 9602 de la CNAE-2009
+    // —«Peluquería y otros tratamientos de belleza»— se reparte hoy en dos, y el grupo 96.2
+    // se llama «Peluquería, tratamientos de belleza, spas y actividades similares». Seis
+    // términos del salón de belleza —«depilación», «esteticista», «estética», «manicura»,
+    // «maquilladora», «uñas»— se quedaron en el PRIMER destino, 96.21 «Peluquerías y
+    // barberías». La otra, 96.22 «Actividades de cuidados de belleza y otras actividades de
+    // tratamiento de belleza», solo tiene dos puertas coloquiales («centro de belleza» y
+    // «salón de belleza») y ninguna es la palabra del oficio.
+    //
+    // La prueba de que son actividades distintas está en el otro catálogo de la propia app:
+    // las Tarifas separan el epígrafe 972.1 «Servicios de peluquería de señora y caballero»
+    // del 972.2 «Salones e institutos de belleza y gabinetes de estética», y además colocan
+    // «Maquilladores y Esteticistas» en el grupo 887 de la SECCIÓN 2ª, que retiene IRPF.
+    await buscarCnaeVerificado(page, 'esteticista');
+    await expect(fichas(page).first()).toContainText('96.22');
+    await expect(fichas(page).first()).toContainText('cuidados de belleza');
+
+    await buscarCnaeVerificado(page, 'depilación');
+    await expect(fichas(page).first()).toContainText('96.22');
+  });
+
+  test('MEDIO — «sastre» y «modista» no confeccionan género de PUNTO: su clase es 14.21', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['1413'] = ['14.10', '14.21'] (y ['1419'] reparte en 14.10, 14.21, 14.22
+    // y 14.29). Los nueve términos del oficio —«confección», «coser», «costurera», «diseño de
+    // moda», «marca de ropa propia», «modista», «ropa», «sastre», «taller de costura»— se
+    // quedaron en 14.10, cuyo literal oficial es «Confección de prendas de vestir DE PUNTO»,
+    // es decir, género de punto. Un sastre o una modista confeccionan prendas exteriores, que
+    // es exactamente el literal de la hermana: 14.21 «Confección de prendas de vestir
+    // exteriores», que hoy solo tiene el término genérico «confección».
+    //
+    // No se pide mover «confección» ni «ropa» (los dos están bien donde están, y «ropa» ya
+    // figura en la lista de ADMITIDOS del CANDADO): se pide que las dos palabras que nombran
+    // el oficio lleguen a la clase que describe lo que ese oficio hace.
+    await buscarCnaeVerificado(page, 'sastre');
+    await expect(fichas(page).first()).toContainText('14.21');
+    await expect(fichas(page).first()).toContainText('prendas de vestir exteriores');
+
+    await buscarCnaeVerificado(page, 'modista');
+    await expect(fichas(page).first()).toContainText('14.21');
+  });
+
+  test('MEDIO — «decorador de interiores» no es pintura de edificios: su clase es 74.13', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // «decorador de interiores» cuelga de 43.34 «Pintura y acristalamiento», Sección F
+    // CONSTRUCCIÓN, Grupo 43.3 «Acabado de edificios». La clase que lleva la actividad en su
+    // literal existe y está en OTRA sección: 74.13 «Actividades de diseño de interiores»,
+    // Sección N ACTIVIDADES PROFESIONALES, CIENTÍFICAS Y TÉCNICAS, cuya única puerta
+    // coloquial es «interiorismo» — de modo que quien se describe con la palabra corriente
+    // nunca llega a ella.
+    //
+    // Y el salto de sección no es cosmético: en las Tarifas del IAE que la propia app sirve,
+    // «Decoradores-Diseñadores de interiores» es el grupo 432 de la SECCIÓN 2ª, dentro de la
+    // agrupación 43 «Delineantes y decoradores» — actividad profesional, con retención de
+    // IRPF en factura, no actividad empresarial de construcción.
+    await buscarCnaeVerificado(page, 'decorador de interiores');
+    await expect(fichas(page).first()).toContainText('74.13');
+    await expect(fichas(page).first()).toContainText('Actividades de diseño de interiores');
+  });
+
+  test('BAJO — «paquetes turísticos» y «travel planner» no son intermediación de TRANSPORTE', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['7911'] = ['52.32', '55.40', '77.51', '79.11']: la clase 7911 de la
+    // CNAE-2009, «Actividades de las agencias de viajes», se reparte hoy en cuatro, y los
+    // tres términos del diccionario —«paquetes turísticos», «travel planner», «vender
+    // vuelos»— se quedaron en el primero, 52.32 «Actividades de intermediación para el
+    // transporte de pasajeros» (Sección H TRANSPORTE Y ALMACENAMIENTO).
+    //
+    // «vender vuelos» SÍ es intermediación de transporte y no está en discusión. Un paquete
+    // turístico, en cambio, es el producto de 79.12 «Actividades de los operadores
+    // turísticos» —que no tiene ningún término coloquial— o lo vende 79.11 «Actividades de
+    // las agencias de viajes»; ninguna de las dos se alcanza escribiendo «paquetes
+    // turísticos», y las dos están en la Sección O, no en la H.
+    await buscarCnaeVerificado(page, 'paquetes turísticos');
+    await expect(fichas(page).first()).toContainText(/79\.1[12]/);
+
+    await buscarCnaeVerificado(page, 'travel planner');
+    await expect(fichas(page).first()).toContainText(/79\.1[12]/);
+  });
+
+  test('BAJO — «lámparas» y «menaje» los nombra 47.55, no la ferretería', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['4759'] = ['47.52', '47.55', '47.69', '47.92']: 47.52 y 47.55 son
+    // hermanas. «lámparas» y «menaje» cuelgan de 47.52 «Comercio al por menor de ferretería,
+    // materiales de construcción, pinturas y vidrio», que no los nombra, mientras la hermana
+    // se llama literalmente «Comercio al por menor de muebles, APARATOS DE ILUMINACIÓN,
+    // VAJILLA Y OTROS ARTÍCULOS DE USO DOMÉSTICO» y ya tiene «iluminación» entre sus
+    // términos: buscar «iluminación» lleva a 47.55 y buscar «lámparas» lleva a la ferretería.
+    //
+    // Es el reparto por producto que el propio diccionario ya hace bien en la alimentación
+    // («puesto de fruta» → 47.21, «vender carne» → 47.22), y el criterio que la propia app
+    // imprime en su bloque educativo: «Prioriza la clase específica».
+    await buscarCnaeVerificado(page, 'lámparas');
+    await expect(fichas(page).first()).toContainText('47.55');
+
+    await buscarCnaeVerificado(page, 'menaje');
+    await expect(fichas(page).first()).toContainText('47.55');
+  });
+
+  test('BAJO — un puesto de mercadillo DE ROPA es comercio especializado: 47.71', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // correspondencia['4782'] = ['47.12', '47.51', '47.71', '47.72', '47.79']: la clase 4782
+    // de la CNAE-2009 —«Comercio al por menor de productos textiles, prendas de vestir y
+    // calzado en puestos de venta y mercadillos»— se reparte hoy por PRODUCTO, y los tres
+    // términos que dicen «de ropa» («mercadillo de ropa», «puesto de ropa», «venta ambulante
+    // de ropa») se quedaron en el primer destino: 47.12 «Otro comercio al por menor NO
+    // ESPECIALIZADO». La clase que nombra el producto es 47.71 «Comercio al por menor de
+    // prendas de vestir».
+    //
+    // El diccionario ya lo hace al revés en la alimentación, donde «puesto de fruta» va a
+    // 47.21 y no a la clase no especializada; y la app dice en su bloque de buenas prácticas
+    // que «las clases residuales existen para lo que no encaja en ningún sitio».
+    await buscarCnaeVerificado(page, 'mercadillo de ropa');
+    await expect(fichas(page).first()).toContainText('47.71');
+    await expect(fichas(page).first()).toContainText('prendas de vestir');
   });
 });

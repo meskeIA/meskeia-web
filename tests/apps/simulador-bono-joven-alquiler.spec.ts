@@ -15,8 +15,12 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *      09/09/2026. Se escribieron con `test.fail()` afirmando lo que DEBERÍA pasar; al
  *      repararlos se les quitó la marca y quedan como regresión.
  *   5. CASOS 7-9 — los casos nuevos de la re-inspección del 10/09/2026.
- *   6. HALLAZGOS ABIERTOS 10/09 — H1, H2 y H3, todavía marcados `test.fail()` con lo que la
- *      app DEBERÍA hacer. Al repararlos se les quita la marca, como se hizo con 642-645.
+ *   6. REGRESIÓN 10/09 — los tres hallazgos de esa pasada (686-688), reparados ese mismo día.
+ *   7. CASOS 10-12 y REGRESIÓN 14/09 — la re-inspección del 14/09/2026 y sus cuatro hallazgos
+ *      (852-855), reparados el 15/09/2026.
+ *   8. CASOS 13-15 — los casos nuevos de la re-inspección del 21/09/2026.
+ *   9. HALLAZGOS ABIERTOS 21/09 — H8, H9 y H10, marcados `test.fail()` con lo que la app
+ *      DEBERÍA hacer. Al repararlos se les quita la marca, como se hizo con los anteriores.
  *
  * Qué promete la app
  * ──────────────────
@@ -96,7 +100,7 @@ async function abrir(page: Page) {
 async function marcarTodosLosRequisitos(page: Page, salvo?: { indice: number; valor: 'No' }) {
   const grupos = page.getByRole('group');
   const total = await grupos.count();
-  expect(total).toBe(7); // 5 bloqueantes + 2 condicionantes
+  expect(total).toBe(7); // 6 bloqueantes + 1 condicionante (el del contrato ascendió con el 852)
   for (let i = 0; i < total; i++) {
     const valor = salvo && salvo.indice === i ? salvo.valor : 'Sí';
     await grupos.nth(i).getByRole('button', { name: valor, exact: true }).click();
@@ -768,12 +772,13 @@ test.describe('Inspección 10/09/2026 — casos nuevos', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 10/09/2026 — marcados `test.fail()`
-// con lo que la app DEBERÍA hacer, igual que se hizo con 642-645. Al repararlos se
-// les quita la marca y quedan como guardián de regresión.
+// REGRESIÓN — los tres hallazgos de la re-inspección del 10/09/2026 (686-688),
+// REPARADOS ese mismo día. Se escribieron con `test.fail()` afirmando lo que DEBERÍA
+// pasar, igual que se hizo con 642-645; hecha la reparación se les quitó la marca y
+// quedan como guardián.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 10/09/2026', () => {
+test.describe('Regresión — hallazgos del 10/09/2026 (686-688), reparados el 10/09/2026', () => {
   // H1 (ALTO) — La incompatibilidad del art. 136 no llega nunca al veredicto.
   // `BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler = false` está sellado en
   // el módulo y NO lo lee nadie en todo el repositorio (grep: solo su definición). La regla
@@ -1001,15 +1006,16 @@ test.describe('Inspección 14/09/2026 — casos nuevos', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 14/09/2026 — marcados `test.fail()`
-// con lo que la app DEBERÍA hacer, igual que se hizo con 642-645 y 686-688. Al
-// repararlos se les quita la marca y quedan como guardián de regresión.
+// REGRESIÓN — los cuatro hallazgos de la re-inspección del 14/09/2026 (852-855),
+// REPARADOS el 15/09/2026. Se escribieron con `test.fail()` afirmando lo que DEBERÍA
+// pasar, igual que se hizo con 642-645 y 686-688; hecha la reparación se les quitó la
+// marca y quedan como guardián.
 //
-// Los cuatro son de la misma familia, la que esta app ya conoce: el texto que
+// Los cuatro eran de la misma familia, la que esta app ya conoce: el texto que
 // acompaña al veredicto afirma más de lo que el veredicto sostiene.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 14/09/2026', () => {
+test.describe('Regresión — hallazgos del 14/09/2026 (852-855), reparados el 15/09/2026', () => {
   // H4 (MEDIO) — El requisito del contrato es una EXIGENCIA del RD según la propia app, y
   // el veredicto lo trata como un adorno.
   //
@@ -1124,5 +1130,278 @@ test.describe('Hallazgos abiertos — 14/09/2026', () => {
     expect(rechazo).toContain('No cumples los requisitos obligatorios');
     expect(rechazo).toContain('1000,00 €/mes'); // la causa que sí nombra
     expect(rechazo).toMatch(/imprescindible/i); // la que se calla
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 21/09/2026 (segmento fiscal, RIESGO 1 CRÍTICO) — la 9.ª
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Objeto de esta pasada: el VEREDICTO de elegibilidad, que es donde caían los cuatro
+// hallazgos del 14/09 (852-855), reparados el 15/09. Se comprobó uno por uno en el
+// navegador que siguen cerrados Y que la reparación no ha introducido el defecto
+// simétrico — que es el riesgo propio de este tipo de arreglo: quien endurece un
+// dictamen para dejar de aprobar de más puede pasar a rechazar o a avisar de más.
+//
+//   · 852 (MEDIO) — el contrato del art. 133.1.e es BLOQUEANTE: lleva el distintivo
+//     IMPRESCINDIBLE y respondido «No» da «❌ No cumples los requisitos obligatorios»
+//     sin panel de ahorro. Lo fija el CASO 14.
+//   · 853 (BAJO) — con los 7 requisitos a «Sí» y la renta sin teclear, el titular ya
+//     no dice «Cumples»: dice «Falta un dato para poder juzgarlo» y nombra la renta
+//     como condición del art. 133.1.e. Comprobado; lo guarda el caso H6 de arriba.
+//   · 854 (BAJO) — con renta fuera de tope Y un imprescindible a «No», el rechazo
+//     nombra las DOS causas («Y además, hay al menos un requisito imprescindible»).
+//     Lo fija el CASO 15, con otro requisito y otro tope que el caso H7.
+//   · 855 (BAJO) — el `faqJsonLd` deriva ya los dos umbrales por discapacidad y los
+//     dos tramos del plazo del módulo. Comprobado en el HTML servido: «5,5 veces con
+//     el 33 %», «6 veces con el 65 %» y «2 años renovables por otros 2» siguen siendo
+//     los valores correctos, y ahora salen de `UMBRAL_IPREM_VIVIENDA_JOVEN` y de
+//     `plazo.*`. Lo guarda el caso H5 de arriba, que mira la FUENTE (es un latente:
+//     desde la página servida las dos versiones se leen igual).
+//
+// AUDITORÍA DE LOS CASOS PREVIOS: revisados uno por uno. Ninguno fija como contrato un
+// comportamiento hoy defectuoso; todas sus cifras siguen ancladas en `data/fiscal`. Lo
+// único que se ha tocado son dos rótulos de sección que habían quedado mintiendo
+// («Hallazgos abiertos» sobre hallazgos ya reparados) y un comentario que contaba 5
+// bloqueantes cuando son 6 desde que el 852 ascendió el del contrato.
+//
+// De dónde sale cada cifra esperada: `data/fiscal/vivienda-joven.ts`, sellado contra el
+// BOE (RD 326/2026, BOE-A-2026-8872) el 23/08/2026. Ninguna de memoria.
+//
+// CASOS NUEVOS (resueltos a mano ANTES de abrir el navegador)
+// ───────────────────────────────────────────────────────────
+//   CASO 13 (normal) — VIVIENDA en municipio ordinario · 800 €/mes · los 7 a «Sí»
+//       tope de renta  800 ≤ 1.000 (rentaMaximaMensual.vivienda, art. 133.1.e) → dentro
+//       60 % de 800 = 480 > 300 (ayudaMaximaMensual.vivienda, art. 137)
+//       ayuda          mín(300; 480) = 300,00 €   ← manda la cuantía fija
+//       pago real      800 − 300 = 500,00 €
+//       4 años         300 × 48 (plazo.totalMaximoMeses, art. 134) = 14.400,00 €
+//       nota del 60 %  NO (el porcentaje no rebaja la cuantía)
+//       veredicto      APTO citando 300,00 €/mes
+//       800 € es además la renta del escenario «Trabajador de 32 años» del bloque
+//       educativo: con la MISMA entrada, prosa y motor tienen que decir lo mismo
+//       (300 €/mes, el 37,5 % de la renta, 500 €/mes de pago real). Es el cruce que
+//       pedía el hallazgo 645, ahora comprobado contra el simulador y no solo contra
+//       el código.
+//
+//   CASO 14 (límite) — VIVIENDA · 1.000,00 € CLAVADOS + contrato (art. 133.1.e) a «No»
+//       1.000 = rentaMaximaMensual.vivienda: el canto es INCLUSIVE (`<=` en el código),
+//       así que la renta NO es causa de rechazo.
+//       contrato «No» → bloqueante desde el 852 → NO APTO, sin panel y sin aviso de renta
+//       Lo que este caso vigila es el simétrico del 854: si el rechazo nombrara la renta
+//       —o dijera «Y además»— estaría inventando una causa en el canto exacto del tope.
+//       Control: el mismo 1.000 con los 7 a «Sí» → APTO · 300,00 € · 700,00 € · 14.400,00 €
+//
+//   CASO 15 (rechazo, DOS causas) — HABITACIÓN en municipio ≤ 10.000 hab. · 400 €/mes
+//                                   + «No» a la incompatibilidad del art. 136 (índice 4)
+//       tope de renta  400 > 250 (rentaMaximaMensual.municipioPequeno.habitacion) → fuera
+//       y además       el art. 136 excluye por sí solo
+//       El rechazo tiene que nombrar LAS DOS causas, con el tope de la habitación en
+//       municipio pequeño (250,00 €), no el de la vivienda ni el de la habitación
+//       ordinaria. Sin panel de ahorro.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspección 21/09/2026 — casos nuevos', () => {
+  test('CASO 13 (normal): vivienda a 800 €/mes → 300,00 € de ayuda, y la prosa del bloque educativo dice lo mismo que el motor', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 800 ≤ 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e)
+    await sembrarValor(page, '#alquiler', '800');
+    await marcarTodosLosRequisitos(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+
+    const panel = await panelDeAhorro(page);
+    // mín(300 € de ayudaMaximaMensual.vivienda; 60 % de 800 = 480 €) = 300 €
+    expect(panel[0]).toContain('300,00 €');
+    // 800 − 300
+    expect(panel[1]).toContain('500,00 €');
+    // 300 × 48 meses (plazo.totalMaximoMeses, art. 134)
+    expect(panel[2]).toContain('14.400,00 €');
+
+    // El 60 % de 800 (480 €) queda por encima de la cuantía: el límite no muerde
+    await expect(page.getByText('Límite: 60% de la renta')).toHaveCount(0);
+
+    const resultado = norm(await page.locator('[role="status"]').first().innerText());
+    expect(resultado).toContain('¡Cumples todos los requisitos!');
+    expect(resultado).toContain('300,00 €/mes');
+
+    // Misma entrada, otro canal: el escenario del bloque educativo. 300/800 = 37,5 %
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const escenario = norm(await page.getByText(/Trabajador de 32 años/).locator('xpath=..').innerText());
+    expect(escenario).toContain('Alquiler de 800 €/mes');
+    expect(escenario).toContain('300 €/mes');
+    expect(escenario).toContain('el 37,5% de la renta');
+    expect(escenario).toContain('Paga 500 €/mes');
+  });
+
+  test('CASO 14 (límite): con 1.000,00 € clavados el rechazo por el contrato del art. 133.1.e no puede atribuir nada a la renta', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 1.000 € = rentaMaximaMensual.vivienda (art. 133.1.e), tope INCLUSIVE
+    await sembrarValor(page, '#alquiler', '1000');
+    // Índice 5 = «El contrato de arrendamiento está registrado (o lo estará)», bloqueante
+    // desde la reparación del hallazgo 852 (15/09/2026)
+    await marcarTodosLosRequisitos(page, { indice: 5, valor: 'No' });
+
+    // El canto es inclusive: ni aviso de renta ni panel de ahorro
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(rechazo).toContain('al menos un requisito imprescindible que no cumples');
+    // Simétrico del 854: la renta está DENTRO, así que no puede figurar como causa
+    expect(rechazo).not.toContain('supera el máximo');
+    expect(rechazo).not.toContain('Y además');
+    expect(rechazo).not.toContain('1000,00 €/mes');
+
+    // Control: ese mismo importe con todo a «Sí» sí da derecho a la ayuda
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await sembrarValor(page, '#alquiler', '1000');
+    await marcarTodosLosRequisitos(page);
+    const panel = await panelDeAhorro(page);
+    // 60 % de 1.000 = 600 > 300 → manda la cuantía fija del art. 137
+    expect(panel[0]).toContain('300,00 €');
+    // 1.000 − 300
+    expect(panel[1]).toContain('700,00 €');
+    // 300 × 48
+    expect(panel[2]).toContain('14.400,00 €');
+    const apto = norm(await page.locator('[role="status"]').first().innerText());
+    expect(apto).toContain('¡Cumples todos los requisitos!');
+  });
+
+  test('CASO 15 (rechazo): 400 €/mes por una habitación en municipio pequeño Y otra ayuda al alquiler → el rechazo nombra las DOS causas', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    await page.getByRole('button', { name: /El municipio tiene 10\.000 habitantes o menos/ }).click();
+    // 250 € = rentaMaximaMensual.municipioPequeno.habitacion (art. 133.1.e); 400 lo supera
+    await sembrarValor(page, '#alquiler', '400');
+    // Índice 4 = «No cobras ninguna otra ayuda al pago del alquiler» (art. 136), bloqueante
+    await marcarTodosLosRequisitos(page, { indice: 4, valor: 'No' });
+
+    const aviso = norm(await page.locator('[class*="avisoRenta"]').first().innerText());
+    expect(aviso).toContain('Para una habitación en un municipio de 10.000 habitantes o menos el tope es 250,00 €/mes');
+    expect(aviso).toContain('400,00 €/mes');
+
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    // Causa 1 — el art. 133.1.e, con el tope del municipio pequeño y no otro
+    expect(rechazo).toContain('400,00 €/mes');
+    expect(rechazo).toContain('250,00 €/mes');
+    // Causa 2 — el art. 136, SUMADA a la anterior (hallazgo 854)
+    expect(rechazo).toContain('Y además, hay al menos un requisito imprescindible');
+
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 21/09/2026 — marcados `test.fail()`
+// con lo que la app DEBERÍA hacer, igual que se hizo con 642-645, 686-688 y 852-855.
+// Al repararlos se les quita la marca y quedan como guardián de regresión.
+//
+// Los tres son de la misma familia: la reparación del 15/09 endureció el dictamen y el
+// texto que lo acompaña no se ajustó en el sentido contrario.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — 21/09/2026', () => {
+  // H8 (MEDIO) — la pregunta que ahora BLOQUEA no es la del artículo que ella misma cita.
+  //
+  // Al reparar el 852 el requisito del contrato pasó a `bloqueante: true` con distintivo
+  // IMPRESCINDIBLE, pero su PREGUNTA se quedó como estaba: «El contrato de arrendamiento
+  // está registrado (o lo estará)». Y su propia explicación dice otra cosa: «El art. 133.1.e
+  // del RD 326/2026 exige que el contrato esté formalizado por escrito y la fianza
+  // depositada. Las CA pueden pedir ADEMÁS su depósito oficial». Es decir, la app describe
+  // el registro/depósito oficial como un añadido autonómico y a la vez bloquea con él un
+  // dictamen estatal.
+  //
+  // Consecuencia: quien tiene su contrato por escrito y la fianza depositada —o sea, quien
+  // SÍ cumple el art. 133.1.e— pero no lo tiene «registrado» ni lo va a estar, responde «No»
+  // con toda honestidad y recibe «❌ No cumples los requisitos obligatorios», sin panel y
+  // sin matiz. Es el defecto simétrico del 852: aquel aprobaba de más, este rechaza de más,
+  // y en un dictamen de elegibilidad los dos sentidos del error importan.
+  //
+  // La invariante admite las tres reparaciones posibles: alinear la pregunta con el artículo
+  // (preguntar por el contrato escrito y la fianza depositada), devolver el requisito a no
+  // bloqueante, o dejar de presentar el registro como un añadido de las CA.
+  test('H8 — el requisito que bloquea por el art. 133.1.e debería preguntar por lo que ese artículo exige', async ({ page }) => {
+    test.fail(); // hallazgo VIVO 21/09/2026: la pregunta bloqueante va del registro, no del art. 133.1.e
+    await abrirHidratado(page);
+    const tarjeta = page.locator('[class*="checkCard"]').nth(5);
+    const pregunta = norm(await tarjeta.locator('[class*="checkPregunta"]').innerText());
+    const explicacion = norm(await tarjeta.locator('[class*="checkExplicacion"]').innerText());
+
+    // ¿La pregunta que decide el veredicto va del registro y no de lo que exige el artículo?
+    const preguntaPorElRegistro = /registrad/i.test(pregunta) && !/(escrito|fianza)/i.test(pregunta);
+    // ¿Y la propia app llama a eso un añadido de las comunidades autónomas?
+    const esAnadidoAutonomico = /Las CA pueden pedir además/i.test(explicacion);
+    // ¿Y aun así bloquea?
+    const bloquea = (await tarjeta.getByText('IMPRESCINDIBLE').count()) > 0;
+
+    // Las tres cosas a la vez no pueden ser: se rechaza de plano a quien cumple el RD
+    expect(preguntaPorElRegistro && esAnadidoAutonomico && bloquea).toBe(false);
+  });
+
+  // H9 (BAJO) — «una renta más baja no bastaría por sí sola» también cuando la renta está
+  // dentro del tope, o cuando no se ha tecleado ninguna.
+  //
+  // La reparación del 854 hizo que las dos causas se SUMEN en vez de sustituirse, y para
+  // ello añadió al párrafo del requisito imprescindible la coletilla «así que una renta más
+  // baja no bastaría por sí sola». Esa coletilla solo tiene sentido en el caso doble, pero
+  // se imprime SIEMPRE que falla un bloqueante:
+  //
+  //   · con 600 €/mes (600 ≤ 1.000, la renta es correcta) y la edad a «No» →
+  //     «Hay al menos un requisito imprescindible que no cumples, así que una renta más baja
+  //      no bastaría por sí sola.»
+  //   · con el campo de renta VACÍO y la edad a «No» → exactamente el mismo texto, hablando
+  //     de rebajar una renta que el usuario no ha llegado a introducir.
+  //
+  // Induce a creer que la renta forma parte del problema cuando no lo es: es el error del
+  // 854 al revés (aquel callaba una causa, este insinúa una que no existe), y el sentido es
+  // el mismo que la app quiere evitar — que el lector deduzca una acción equivocada.
+  test('H9 — con la renta dentro del tope el rechazo no debería especular con una renta más baja', async ({ page }) => {
+    test.fail(); // hallazgo VIVO 21/09/2026: la coletilla del 854 se imprime también sin segunda causa
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 600 ≤ 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e): la renta NO es el problema
+    await sembrarValor(page, '#alquiler', '600');
+    // Índice 0 = «Tienes entre 18 y 35 años (inclusive)» (art. 133.1.b), bloqueante
+    await marcarTodosLosRequisitos(page, { indice: 0, valor: 'No' });
+
+    const rechazo = norm(await page.locator('[role="status"]').first().innerText());
+    expect(rechazo).toContain('al menos un requisito imprescindible que no cumples');
+    // La coletilla del 854 pertenece al caso de DOS causas, no a este
+    expect(rechazo).not.toContain('una renta más baja no bastaría por sí sola');
+  });
+
+  // H10 (BAJO) — una renta ilegible es, para el motor, un campo vacío, y nada lo dice.
+  //
+  // `alquilerNum = Math.max(0, parseSpanishNumberOr(alquilMensual))`: `parseSpanishNumberOr`
+  // devuelve 0 en todo lo que `parseSpanishNumber` RECHAZA («mil euros», «1e3», «12abc»), así
+  // que un texto ilegible y un campo vacío son la misma cosa. El guardián de negativos —que
+  // sí existe, porque `alquilerCrudo < 0` se comprueba aparte— marca `aria-invalid` y explica
+  // el problema; el ilegible no marca nada.
+  //
+  // Lo importante está bien: el veredicto NO se presenta como firme, dice «Falta un dato para
+  // poder juzgarlo» (reparación del 853). Lo que falla es lo que pide a continuación —
+  // «Introdúcela aquí arriba para comprobarla contra su tope»— a alguien que la ve escrita en
+  // el campo: no sabrá que lo que tecleó no vale, y la asimetría con el negativo es del propio
+  // código, no de la norma.
+  test('H10 — una renta que el parser rechaza debería señalarse, no confundirse con el campo vacío', async ({ page }) => {
+    test.fail(); // hallazgo VIVO 21/09/2026: `parseSpanishNumberOr` convierte lo ilegible en 0 sin avisar
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // `parseSpanishNumber('mil euros')` = NaN → `parseSpanishNumberOr` lo convierte en 0
+    await sembrarValor(page, '#alquiler', 'mil euros');
+    await marcarTodosLosRequisitos(page);
+
+    const marcadoInvalido = (await page.locator('#alquiler').getAttribute('aria-invalid')) === 'true';
+    const veredicto = norm(await page.locator('[role="status"]').first().innerText());
+    const pideQueLaIntroduzca = /Introdúcela aquí arriba/.test(veredicto);
+
+    // O se dice que lo tecleado no vale, o no se le pide introducir lo que ya introdujo
+    expect(marcadoInvalido || !pideQueLaIntroduzca).toBe(true);
   });
 });

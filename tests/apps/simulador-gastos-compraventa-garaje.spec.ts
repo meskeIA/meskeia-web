@@ -4017,3 +4017,253 @@ test.describe('Los 3 hallazgos de la re-inspección del 18/09/2026, reparados el
     expect(faq).toContain('no sujeción');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 20. RE-INSPECCIÓN 21/09/2026 — la cola reabrió la app para verificar que las TRES
+// reparaciones del 18/09 (hallazgos 900, 901 y 902) funcionan de verdad y que la nueva
+// validación del par catastral no rechaza ahora casos legítimos.
+//
+// Las tres zonas de esta tanda:
+//   · CASTILLA-LA MANCHA — nunca probada. Tipo general PLANO (9 %, sin escala progresiva) y,
+//     sobre todo, la única ficha del catálogo cuyo reducido se LLAMA «Vivienda habitual» pero
+//     no lo declara entre sus `condiciones`.
+//   · SUELO = TOTAL exactamente — el borde de la validación del hallazgo 900. Es un par
+//     LEGÍTIMO (la propia `DatosPlusvalia` lo documenta: «para suelo sin construcción coincide
+//     con el valor del suelo») y la reparación NO debe rechazarlo.
+//   · SUELO = TOTAL + 1.000 — el mismo caso con un solo campo movido, para que la diferencia
+//     entre aceptar y rechazar quede atribuida a ese campo y a ningún otro.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · Tipo general de Castilla-La Mancha → `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts),
+//     leído por `tipoGeneralDe()` y expuesto como `ITP_CCAA['castilla-mancha'].tipoGeneral` = 9.
+//   · Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,5 a ×2, punto medio ×1,75) y
+//     `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, los dos con el 21 % de IVA dentro.
+//   · Coeficiente de «Menos de 1 año» → `COEFICIENTES_IIVTNU_2025` (0,14) y el tipo
+//     orientativo del 25 % de `PLUSVALIA_MUNICIPAL_META`.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 €).
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('RE-INSPECCIÓN 21/09/2026 — los tres casos, resueltos a mano antes de ejecutar', () => {
+  /**
+   * CASO V (NORMAL) — Castilla-La Mancha · segunda mano · 22.000 € · perfil GENERAL ·
+   * gestoría 300 € (la que trae la app).
+   *
+   * Es la compraventa corriente de una plaza de garaje, en una comunidad que ninguna
+   * inspección anterior había tocado y cuyo tipo general es PLANO: sin escala progresiva, el
+   * tipo efectivo que rotula la tarjeta tiene que coincidir con el nominal de la ficha.
+   *
+   * ITP — `elegirTipoITP('castilla-mancha', 'general', 22000, { viviendaHabitual: false })`:
+   *   no hay bonificación por ubicación, así que se cobra el tipo general.
+   *     ITP = 22.000 × 9 % =                                                       1.980,00
+   *
+   * Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
+   *   tramo 1 (hasta 6.010,12 €)              →                                       90,15
+   *   tramo 2 (6.010,12→22.000, 0,45 %)       → 15.989,88 × 0,0045 =                  71,95446
+   *   arancel sin IVA                         =                                      162,10446
+   *   con el 21 % de IVA                      = 162,10446 × 1,21 =                   196,1463966
+   * FACTURA_NOTARIAL: ×1,5 = 294,2195949 · ×2 = 392,2927932
+   *   punto medio, que es lo que suma la app  =                                      343,25619405
+   *
+   * Registro — RD 1427/1989, números 1, 2 y 4:
+   *   tramo 1 (hasta 6.010,12 €)              →                                       24,04
+   *   tramo 2 (6.010,12→22.000, 0,175 %)      → 15.989,88 × 0,00175 =                 27,98229
+   *   inscripción (número 2)                  =                                       52,02229
+   *   + asiento de presentación + nota simple →  6,010121 + 3,005061 =                 9,015182
+   *   con el 21 % de IVA                      = 61,037472 × 1,21 =                     73,85534112
+   *
+   * Total gastos (sumando las líneas YA redondeadas, que es como se ven):
+   *   1.980,00 + 343,26 + 73,86 + 300,00 =                                          2.697,12
+   *   % sobre el precio = 2.697,12 / 22.000 =                                          12,26 %
+   * Coste total = 22.000 + 2.697,12 =                                              24.697,12
+   */
+  test('CASO V (normal) — Castilla-La Mancha, 22.000 €, perfil general: tipo plano del 9 %', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'castilla-mancha');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '22000');
+
+    // El 9 % no se teclea: sale de la ficha, que a su vez lo lee de data/fiscal.
+    expect(ITP_CCAA['castilla-mancha'].tipoGeneral).toBe(9);
+    // Sin escala progresiva, el tipo EFECTIVO que rotula la tarjeta es el nominal.
+    expect(ITP_CCAA['castilla-mancha'].tramosProgresivos).toBeUndefined();
+    expect(await valorTarjeta(page, 'ITP (9,00%)')).toBe('1980,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('343,26 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('294,22 €');
+    expect(notaria).toContain('392,29 €');
+
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('73,86 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+
+    // En segunda mano no hay AJD: ITP e IVA/AJD no coexisten en la misma operación.
+    await expect(page.locator('#panel-comprador h3', { hasText: 'AJD' })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2697,12 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,26%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('24.697,12 €');
+
+    // La ficha de la comunidad publica el mismo tipo que se ha cobrado.
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('9,00%');
+  });
+
+  /**
+   * CASO W (LÍMITE) — el borde exacto de la validación del hallazgo 900: valor del suelo
+   * IGUAL al valor catastral total, cruzado con la venta EL MISMO AÑO de la compra.
+   *
+   * Los dos extremos a la vez, y los dos legítimos:
+   *   · suelo = total describe un inmueble sin construcción que compute (la propia
+   *     `DatosPlusvalia` lo dice: «para suelo sin construcción, coincide con el valor del
+   *     suelo»). La reparación del 900 rechaza el suelo MAYOR que el total, no el igual, y
+   *     este caso es el que comprueba que no se ha pasado de frenada.
+   *   · 0 años de propiedad NO es el campo vacío: es la reventa antes de cumplir el año, que
+   *     desde el RDL 26/2021 sí tributa, y con el coeficiente de 0,14 (hallazgo 668).
+   *
+   * Madrid (por defecto) · venta 30.000 € · compra 29.000 € · comisión 0 % · 0 años ·
+   * suelo 9.000 € · catastral total 9.000 €:
+   *   coeficiente de «Menos de 1 año» (COEFICIENTES_IIVTNU_2025) =                     0,14
+   *   método objetivo  = 9.000 × 0,14 × 25 % =                                       315,00
+   *   proporción del suelo = 9.000 / 9.000 =                                           1,00
+   *   método real      = (30.000 − 29.000) × 1,00 × 25 % =                           250,00
+   *   recomendado      = min(315; 250) =                        250,00  → «Método real (más favorable)»
+   *
+   *   valor de adquisición = 29.000 + 0 =                                         29.000,00
+   *   valor de transmisión = 30.000 − 0 − 250 =                                   29.750,00
+   *   ganancia             = 29.750 − 29.000 =                                       750,00
+   *   IRPF (primer tramo del ahorro, 19 %) = 750 × 19 % =                            142,50
+   *   total gastos vendedor = 250,00 + 0 + 0 + 142,50 =                              392,50
+   *   neto                  = 30.000 − 392,50 =                                   29.607,50
+   */
+  test('CASO W (límite) — suelo IGUAL al catastral total sí liquida por el método real', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '29000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await sembrarImporte(page, 'Años de propiedad', '0');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '9000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '9000');
+
+    // Los datos con los que se compone el método objetivo, leídos de data/fiscal.
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.14);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo).toBe(19);
+
+    // El par IGUAL no se rechaza: el método real se calcula con proporción 1 y gana.
+    const descripcion = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(descripcion).toBe('Método real (más favorable)');
+    // Y no aparece el aviso del par imposible, que es lo que este caso vigila.
+    expect(descripcion).not.toContain('no puede superar al total');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('250,00 €');
+
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('29.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('29.750,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('750,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('142,50 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('392,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.607,50 €');
+  });
+
+  /**
+   * CASO X (DEBE RECHAZARSE) — el GEMELO del CASO W con un solo campo movido: el suelo pasa
+   * de 9.000 a 10.000 € y el total se queda en 9.000 €. Así la diferencia entre aceptar y
+   * rechazar queda atribuida a ese campo y a ningún otro.
+   *
+   * Es el mismo defecto que cerró el CASO U (hallazgo 900, 18/09/2026), pero en un par donde
+   * el método real sería el más barato por poco: sin la validación la app cobraría los
+   * 250,00 € del CASO W a partir de una proporción que este par no permite calcular.
+   *
+   * Madrid · venta 30.000 € · compra 29.000 € · comisión 0 % · 0 años ·
+   * suelo 10.000 € · catastral total 9.000 €:
+   *   método objetivo  = 10.000 × 0,14 × 25 % =                                      350,00
+   *   proporción del suelo → NO se calcula: el suelo no puede superar al total
+   *   recomendado      = el objetivo, que es el conservador =                        350,00
+   *
+   *   valor de transmisión = 30.000 − 0 − 350 =                                   29.650,00
+   *   ganancia             = 29.650 − 29.000 =                                       650,00
+   *   IRPF                 = 650 × 19 % =                                            123,50
+   *   total gastos vendedor = 350,00 + 123,50 =                                      473,50
+   *   neto                  = 30.000 − 473,50 =                                   29.526,50
+   */
+  test('CASO X (rechazo) — el mismo par con el suelo por encima del total no usa el método real', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '29000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '0');
+    await sembrarImporte(page, 'Años de propiedad', '0');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '10000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '9000');
+
+    const descripcion = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(descripcion).not.toBe('Método real (más favorable)');
+    // El aviso nombra la causa: los dos campos salen consecutivos del mismo recibo del IBI.
+    expect(descripcion).toContain('no puede superar al total');
+    // Se liquida por el objetivo, que sí es calculable con el suelo solo.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('350,00 €');
+
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('29.650,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('650,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('123,50 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('473,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.526,50 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 21. HALLAZGO ABIERTO 21/09/2026 — con `test.fail()`: afirma lo que DEBERÍA pasar, así que
+// hoy falla a propósito. Al repararlo se le quita la marca y queda como regresión.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgo abierto — re-inspección del 21/09/2026', () => {
+  /**
+   * ❌ ABIERTO (contenido, bajo) — en Castilla-La Mancha el aviso «Podrías pagar menos»
+   * ofrece un tipo reducido que se LLAMA «Vivienda habitual (primera compra)» en una página
+   * cuyo motor ya sabe que el inmueble no es vivienda habitual.
+   *
+   * `elegirTipoITP` DESCARTA —no «deja sin comprobar»— los reducidos que exigen vivienda
+   * habitual cuando la app llama con `viviendaHabitual: false`, que es lo que esta hace
+   * siempre porque un garaje suelto nunca lo es. Pero el filtro mira el array `condiciones`:
+   *   !(!viviendaHabitual && r.condiciones.some(c => /vivienda habitual/i.test(c)))
+   * y la ficha de Castilla-La Mancha es la ÚNICA del catálogo que declara esa condición con
+   * otras palabras — `condiciones: ['Primera vivienda', 'Valor ≤ 180.000 €', 'Hipoteca > 50%
+   * del valor']` — mientras su `nombre` sí dice «Vivienda habitual». Las otras nueve fichas
+   * con un reducido de vivienda habitual la escriben literal y quedan descartadas.
+   *
+   * Resultado, con 22.000 € en Castilla-La Mancha: la primera línea de la lista es
+   * «6,00% — Vivienda habitual (primera compra)», tres puntos por debajo del 9 % que se
+   * cobra, sobre un inmueble que no puede acogerse. El pie del aviso trae una advertencia
+   * genérica («un garaje comprado por separado no es vivienda habitual, así que los tipos que
+   * EXIGEN esa condición no suelen aplicarse»), pero los requisitos impresos en esa misma
+   * línea no nombran la vivienda habitual, así que la advertencia no la señala.
+   *
+   * Es el mismo defecto de los hallazgos 514 y 624, que la app ya reparó en el ejemplo de
+   * Carlos y en la FAQ: no prometer un reducido que el motor descarta. Las otras tres líneas
+   * de la lista (zonas de despoblación, 5/4/3 %) sí son alcanzables por un garaje y tienen
+   * que seguir mostrándose.
+   */
+  test.fail();
+  test('el aviso de Castilla-La Mancha no ofrece un reducido de vivienda habitual', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'castilla-mancha');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '22000');
+
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+
+    // Las oportunidades que SÍ puede cumplir un garaje se siguen enseñando.
+    expect(texto).toContain('5,00% — Zona despoblación nivel 1');
+
+    // La que exige vivienda habitual, no. Hoy sale «6,00% — Vivienda habitual (primera compra)».
+    expect(texto).not.toContain('Vivienda habitual');
+  });
+});
