@@ -3697,7 +3697,8 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del añ
 // Cuando se reparen, se les quita la marca y quedan como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ⚠️ ABIERTO 21/09/2026 (medio) — operativa. La mitad del hallazgo 773 que quedó viva.
+// ✅ HALLAZGO 1157 del 21/09/2026 (medio) — operativa, REPARADO el 21/09. Era la mitad del
+// hallazgo 773 que quedó viva.
 // Aquel cerró la COMISIÓN: «Un valor ILEGIBLE no es un cero: es un dato que falta, y esta app
 // ya sabe abstenerse y nombrarlo». La reparación añadió `comisionLegible` y solo a ese campo.
 // Los otros dos campos del vendedor siguen leyéndose con `parseSpanishNumberOr`, que devuelve
@@ -3718,10 +3719,9 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del añ
 //       → obtenido: valor de adquisición 16.000,00 €, ganancia 3.187,50 €, IRPF 605,63 €
 //         (frente a los 130,53 € que salen leyendo 2.000,50) y el neto presentado como
 //         «Lo que realmente recibes tras los gastos»
-test('ABIERTO 21/09 (operativa) — unos gastos de adquisición ilegibles se leen como 0 € sin decirlo', async ({
+test('REGRESIÓN 1157 (operativa) — unos gastos de adquisición ilegibles se nombran en vez de leerse como 0 €', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   await sembrar(page, 'Precio del trastero', '20000');
@@ -3743,7 +3743,8 @@ test('ABIERTO 21/09 (operativa) — unos gastos de adquisición ilegibles se lee
   expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
 });
 
-// ⚠️ ABIERTO 21/09/2026 (bajo) — contenido. La FAQ visible y el FAQPage servido siguen
+// ✅ HALLAZGO 1158 del 21/09/2026 (bajo) — contenido, REPARADO el 21/09. La FAQ visible y el
+// FAQPage servido estaban
 // escritos DOS VECES a mano en tres de sus seis respuestas, y dos ya han divergido.
 // El hallazgo 774 centralizó en constantes las respuestas del IVA y de la plusvalía
 // («¿Qué IVA paga un trastero nuevo?» y «¿Se paga plusvalía municipal…?») precisamente para
@@ -3759,10 +3760,9 @@ test('ABIERTO 21/09 (operativa) — unos gastos de adquisición ilegibles se lee
 // Caso: comparar cada respuesta visible con la del FAQPage servido
 //       → esperado: las 6 iguales, como ya lo son las 3 que viajan en constante
 //       → obtenido: 4 iguales y 2 distintas
-test('ABIERTO 21/09 (contenido) — tres respuestas de la FAQ siguen escritas dos veces a mano', async ({
+test('REGRESIÓN 1158 (contenido) — las seis respuestas de la FAQ visible y del FAQPage son la misma', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
   const faqPage = bloques

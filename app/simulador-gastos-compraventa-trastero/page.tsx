@@ -1,7 +1,13 @@
 'use client';
 // @disclaimer: fiscal-critical
 
-import { RESPUESTA_IVA_TRASTERO_NUEVO, RESPUESTA_PLUSVALIA_TRASTERO } from './metadata';
+import {
+  RESPUESTA_IVA_TRASTERO_NUEVO,
+  RESPUESTA_PLUSVALIA_TRASTERO,
+  RESPUESTA_VINCULADO_VS_INDEPENDIENTE,
+  RESPUESTA_COMPRAR_SIN_VIVIENDA,
+  RESPUESTA_TIPOS_REDUCIDOS_TRASTERO,
+} from './metadata';
 import { useState, useMemo } from 'react';
 import styles from './SimuladorTrasteroCompraventa.module.css';
 import {
@@ -104,6 +110,10 @@ interface ResultadosVendedor {
   plusvaliaCalculada: boolean;
   /** false cuando el texto del campo de comisión no es un número (hallazgo 773). */
   comisionLegible: boolean;
+  /** false cuando «Impuestos y gastos que pagaste al comprarlo» no es un número (1157). */
+  gastosAdquisicionLegible: boolean;
+  /** false cuando «Gestoría y certificados del vendedor» no es un número (1157). */
+  gestoriaLegible: boolean;
   /** Los campos concretos que faltan para calcularla, para nombrarlos en el aviso */
   camposQueFaltan: string[];
   comisionInmobiliaria: number;
@@ -368,8 +378,20 @@ export default function SimuladorTrasteroCompraventaPage() {
      * nombrarlo (lo hace con la plusvalía y con el IRPF). El negativo sí se acota a 0 a
      * propósito, que es otra cosa y viene de los hallazgos 457 y 486.
      */
+    /**
+     * ⚠️ 21/09/2026 — aquella reparación añadió `comisionLegible` SOLO a la comisión, y los
+     * otros dos importes del vendedor se quedaron con el mismo defecto (hallazgo 1157): los
+     * dos son partidas del art. 35.1 LIRPF, así que al leerse como 0 suben la ganancia y el
+     * IRPF —los gastos de aquella compra— o el neto —la gestoría de esta venta—. No hace
+     * falta teclear basura para llegar: «2.000.50», el millar y el decimal a la
+     * estadounidense, es NaN por diseño desde el 24/08/2026.
+     */
+    const esLegible = (texto: string) =>
+      texto.trim() === '' || Number.isFinite(parseSpanishNumber(texto));
     const comisionTexto = comisionInmobiliaria.trim();
-    const comisionLegible = comisionTexto === '' || Number.isFinite(parseSpanishNumber(comisionTexto));
+    const comisionLegible = esLegible(comisionTexto);
+    const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
+    const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
@@ -440,6 +462,8 @@ export default function SimuladorTrasteroCompraventaPage() {
       exentoPlusvalia,
       plusvaliaCalculada,
       comisionLegible,
+      gastosAdquisicionLegible,
+      gestoriaLegible,
       /** Los campos concretos que faltan, para que el aviso del neto no los adivine */
       camposQueFaltan: faltan,
       comisionInmobiliaria: comision,
@@ -961,7 +985,14 @@ export default function SimuladorTrasteroCompraventaPage() {
                         value={formatCurrency(resultadosVendedor.valorAdquisicion)}
                         variant="default"
                         icon="📥"
-                        description="Precio de compra + impuestos y gastos de aquella compra"
+                        // Con los gastos de aquella compra ilegibles, la descripción de siempre
+                        // afirma que están sumados cuando el motor los ha tomado como 0, que es
+                        // el agravante que el acta del 1157 señala.
+                        description={
+                          resultadosVendedor.gastosAdquisicionLegible
+                            ? 'Precio de compra + impuestos y gastos de aquella compra'
+                            : 'Solo el precio de compra: los impuestos y gastos de aquella compra no se han podido leer'
+                        }
                       />
                       <ResultCard
                         title="Valor de transmisión"
@@ -1092,6 +1123,17 @@ export default function SimuladorTrasteroCompraventaPage() {
                         if (!resultadosVendedor.comisionLegible) {
                           conceptos.push('la comisión inmobiliaria');
                           pedir('un porcentaje de comisión legible');
+                        }
+                        // Los otros dos importes del vendedor tienen el mismo hueco, y en la
+                        // misma dirección: un gasto que no se lee desaparece del cálculo y
+                        // deja la cifra por encima de la real (hallazgo 1157).
+                        if (!resultadosVendedor.gastosAdquisicionLegible) {
+                          conceptos.push('los impuestos y gastos de aquella compra');
+                          pedir('un importe legible en los gastos de la compra');
+                        }
+                        if (!resultadosVendedor.gestoriaLegible) {
+                          conceptos.push('la gestoría de la venta');
+                          pedir('un importe de gestoría legible');
                         }
                         return conceptos.length === 0
                           ? 'Lo que realmente recibes tras los gastos'
@@ -1252,20 +1294,14 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre trastero vinculado y trastero independiente?</h4>
-              <p>El <strong>trastero vinculado</strong> forma parte de la misma finca registral que la vivienda y se vende
-              junto a ella como anejo. El <strong>trastero independiente</strong> tiene su propia referencia catastral
-              y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva:
-              el vinculado paga <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%</strong> como anejo de la vivienda y el independiente al
-              <strong> {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%</strong>. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los
-              tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual.
-              Consulta siempre con un asesor fiscal antes de la operación.</p>
+              {/* Las tres respuestas que quedaban duplicadas a mano pasan a la misma constante
+                  que publica el FAQPage, que es lo que el hallazgo 774 hizo con las otras dos y
+                  lo que el 1158 pedía cerrar: dos de las tres ya habían divergido. */}
+              <p>{RESPUESTA_VINCULADO_VS_INDEPENDIENTE}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Se puede comprar un trastero sin comprar también la vivienda?</h4>
-              <p>Sí. Si el trastero tiene finca registral propia (trastero independiente), se puede comprar y vender
-              de forma autónoma sin necesidad de adquirir la vivienda a la que originalmente estuvo vinculado.
-              Esta es una operación habitual, especialmente en comunidades de propietarios donde el trastero
-              sale a la venta de forma separada.</p>
+              <p>{RESPUESTA_COMPRAR_SIN_VIVIENDA}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Se paga plusvalía municipal al vender un trastero?</h4>
@@ -1274,11 +1310,7 @@ export default function SimuladorTrasteroCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Tienen tipos reducidos de ITP los trasteros?</h4>
-              <p>Depende de cada comunidad autónoma. La mayoría de los tipos reducidos de ITP (jóvenes, familias
-              numerosas, discapacidad) se diseñaron para vivienda habitual. No obstante, como el trastero vinculado
-              se considera anejo residencial, algunas CCAA pueden extenderlos. En el caso del trastero independiente,
-              el tratamiento es menos claro y varía según la normativa autonómica. Verifica los requisitos específicos
-              de tu comunidad antes de la compra.</p>
+              <p>{RESPUESTA_TIPOS_REDUCIDOS_TRASTERO}</p>
             </div>
           </div>
         </section>

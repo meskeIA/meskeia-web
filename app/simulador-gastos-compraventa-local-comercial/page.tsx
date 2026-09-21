@@ -95,6 +95,10 @@ interface ResultadosVendedor {
    * familia del 483».
    */
   irpfCalculado: boolean;
+  /** false cuando el texto del campo no es un número: ese 0 tampoco es un cero (1157). */
+  comisionLegible: boolean;
+  gestoriaLegible: boolean;
+  gastosAdquisicionLegible: boolean;
   totalGastos: number;
   netoVendedor: number;
 }
@@ -306,6 +310,19 @@ export default function SimuladorLocalComercialPage() {
       * del neto un gasto que cobraba (hallazgo 785). Al salir del campo, el min=0 del
       * NumberInput lo dejaba en 0 y todo volvía a cuadrar: el defecto vivía en esa ventana.
       */
+    /**
+     * Un valor ILEGIBLE no es un cero: es un dato que falta. `parseSpanishNumberOr` devuelve
+     * su 0 por defecto cuando el parser RECHAZA el texto, así que el NaN de «2.000.50» —el
+     * millar y el decimal a la estadounidense— y un campo vacío eran indistinguibles para el
+     * motor. Los tres son partidas del art. 35.1 LIRPF: al desaparecer suben el neto, la
+     * ganancia y el IRPF. Salió del hallazgo 773 en trastero y el 1157 encontró allí los dos
+     * campos que aquella reparación no cubrió; aquí faltaban los tres.
+     */
+    const esLegible = (texto: string) =>
+      texto.trim() === '' || Number.isFinite(parseSpanishNumber(texto));
+    const comisionLegible = esLegible(comisionInmobiliaria);
+    const gestoriaLegible = esLegible(gastosGestoriaVenta);
+    const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
     const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
@@ -397,6 +414,9 @@ export default function SimuladorLocalComercialPage() {
       sinGananciaNiPerdida: hayDatosGanancia && g.sinGananciaNiPerdida,
       irpfGanancia: irpf,
       irpfCalculado: hayDatosGanancia,
+      comisionLegible,
+      gestoriaLegible,
+      gastosAdquisicionLegible,
       totalGastos,
       netoVendedor: precioV - totalGastos,
     };
@@ -423,6 +443,13 @@ export default function SimuladorLocalComercialPage() {
     ? [
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
         resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+        // Un importe que no se puede leer se toma como 0 y deja la cifra por encima de la
+        // real, sin ninguna línea que lo explique (hallazgo 1157, visto en trastero).
+        resultadosVendedor.comisionLegible ? null : 'la comisión inmobiliaria',
+        resultadosVendedor.gestoriaLegible ? null : 'la gestoría de la venta',
+        resultadosVendedor.gastosAdquisicionLegible
+          ? null
+          : 'los impuestos y gastos de aquella compra',
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -432,6 +459,11 @@ export default function SimuladorLocalComercialPage() {
         new Set([
           ...resultadosVendedor.camposQueFaltan,
           ...(resultadosVendedor.irpfCalculado ? [] : ['el precio de compra original']),
+          ...(resultadosVendedor.comisionLegible ? [] : ['un porcentaje de comisión legible']),
+          ...(resultadosVendedor.gestoriaLegible ? [] : ['un importe de gestoría legible']),
+          ...(resultadosVendedor.gastosAdquisicionLegible
+            ? []
+            : ['un importe legible en los gastos de la compra']),
         ])
       )
     : [];
