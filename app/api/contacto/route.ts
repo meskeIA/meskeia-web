@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
         mensaje.trim(),
         '',
         '---',
-        'Formulario de contacto anónimo de meskeIA',
-        'No se han recopilado datos personales del remitente.',
+        'Formulario anónimo: no se solicita nombre ni correo.',
+        'Si el remitente ha incluido algún dato en el texto, lo ha hecho por decisión propia.',
       ].join('\n'),
     });
 
