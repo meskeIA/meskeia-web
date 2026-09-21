@@ -258,6 +258,15 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Alerta metodológica**: precedente reciente = RDL 17/2026 (creó el Grado III+, detectado por el vigía en su primera pasada, 13/07/2026). La reforma en tramitación puede cambiar grados, catálogo y copago → alerta máxima cuando se publique en BOE.
 - **Verificado**: 2026-07-14 · vigencia 2025-2026.
 
+#### `empleados-hogar.ts` — Sistema Especial para Empleados de Hogar
+- **Contiene**: tipo de cotización por contingencias comunes 2026 (28,30 %, del que 23,60 % va a cargo del empleador y 4,70 % al empleado), la jornada ordinaria máxima en cómputo mensual (173,33 h) y el suelo de coste para quien contrata.
+- **Normativa**: Orden PJC/297/2026, art. 15 + RD 1620/2011 (relación laboral especial) + RDL 16/2022 (desempleo y FOGASA desde 01/10/2022).
+- **Vigilar**: la **Orden de cotización anual**, que se publica en marzo-abril y fija los tipos del ejercicio; también el SMI del servicio del hogar, que vive en `smi.ts` y es el otro factor del suelo.
+- **Cadencia**: anual, al publicarse la Orden de cotización.
+- **Alerta metodológica**: el módulo **NO cubre** AT/EP, desempleo, FOGASA ni las reducciones de la aportación empresarial, y lo declara en su cabecera: lo que calcula es un SUELO, no el coste final. Si algún día se añadieran esos tipos, la cifra dejaría de ser un suelo y habría que revisar los textos de las apps que la usan, que hoy dicen expresamente «el coste real es algo mayor».
+- **Nació el 21/09/2026** al reparar el hallazgo 1115 del Inspector: `residencia-vs-cuidado-en-casa` daba al cuidador interno un importe plano por debajo del SMI mensual y lo coronaba como la opción más barata.
+- **Verificado**: 2026-09-21 · vigencia 2026.
+
 ### 3.3 Cadencia anual — bloque CCAA (leyes de medidas, dic-ene y sorpresas a mitad de año)
 
 > Los tres módulos siguientes dependen de la normativa de **17 CCAA**. Sus leyes de medidas fiscales
