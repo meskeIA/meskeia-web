@@ -1,10 +1,35 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import styles from './SimuladorTrigonometriaCirculoUnitario.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { parseSpanishNumber } from '@/lib';
+// La aritmética de esta página vive en `casos.ts`, fuera de la vista: el build compila el
+// JSX sin comprobar si la trigonometría está bien. Las siete funciones de conversión,
+// redondeo, signo, cuadrante y tangente estaban aquí dentro y se mudaron allí SIN
+// cambiarlas, para que los casos de aula corrijan con exactamente la misma cuenta que
+// muestra el panel de valores: con dos copias, la app podría suspender una respuesta que
+// ella misma produce. La cabecera de `casos.ts` deja el convenio por escrito.
+import {
+  CASOS,
+  TOTAL_CASOS,
+  calcularTangente,
+  comprobarRespuesta,
+  conUnidad,
+  formatearNumero,
+  formatearRespuesta,
+  generarEjercicioAleatorio,
+  gradosARadianes,
+  obtenerCuadrante,
+  radianesAGrados,
+  redondear,
+  signoDe,
+  textoVeredicto,
+  type Comprobacion,
+  type EjercicioAleatorio,
+} from './casos';
 
 // ============================================
 // CONSTANTES
@@ -30,67 +55,6 @@ const TAU = 2 * Math.PI;
  */
 const ANGULO_MIN = -360;
 const ANGULO_MAX = 720;
-
-function gradosARadianes(grados: number): number {
-  return (grados * Math.PI) / 180;
-}
-
-function radianesAGrados(radianes: number): number {
-  // Sin redondear: 1 rad son 57,2958°, y quedarse en 57° cambia el seno de 0,8415 a 0,8387.
-  // El ángulo interno de la app está en grados, así que este es el único punto donde la
-  // conversión puede perder precisión.
-  return (radianes * 180) / Math.PI;
-}
-
-/**
- * Redondea a la precisión que la app muestra y mata el residuo de coma flotante.
- *
- * `Math.cos(270°)` no da 0 sino −1,84·10⁻¹⁶, y `Math.sin(360°)` da −2,45·10⁻¹⁶. Esos
- * residuos son CERO a cuatro decimales, pero conservan el signo: el panel escribía
- * «−0,0000» donde la tabla del propio bloque educativo dice «270 · cos 0» (hallazgo 350), y
- * el panel de signos los calificaba de negativos (hallazgo 351). Sumar 0 normaliza el −0 de
- * JavaScript, que es lo único que distingue «−0,0000» de «0,0000».
- */
-function redondear(n: number, decimales = 4): number {
-  const factor = Math.pow(10, decimales);
-  return Math.round(n * factor) / factor + 0;
-}
-
-function formatearNumero(n: number, decimales = 4): string {
-  return redondear(n, decimales).toFixed(decimales).replace('.', ',');
-}
-
-/**
- * Signo de una razón trigonométrica A LA PRECISIÓN QUE SE MUESTRA.
- *
- * Cero no es positivo ni negativo, y hay cinco ángulos notables donde una de las razones
- * vale cero exacto. Decidirlo con `valor >= 0` sobre el residuo de coma flotante daba tres
- * respuestas distintas para el mismo 0: «−» en cos 270 y en sen 360, «+» en 0, 90 y 180
- * (hallazgo 351). La app ya sabe que esos ángulos son especiales — su indicador de Cuadrante
- * los rotula «—» — así que aquí se dice lo mismo: cero, sin signo.
- */
-function signoDe(valor: number): { texto: string; clase: 'pos' | 'neg' | 'cero' } {
-  const v = redondear(valor);
-  if (v === 0) return { texto: '0 · sin signo', clase: 'cero' };
-  return v > 0 ? { texto: '+ (positivo)', clase: 'pos' } : { texto: '− (negativo)', clase: 'neg' };
-}
-
-function obtenerCuadrante(angulo: number): string {
-  const a = ((angulo % 360) + 360) % 360;
-  if (a === 0 || a === 90 || a === 180 || a === 270 || a === 360) return '—';
-  if (a < 90) return 'I';
-  if (a < 180) return 'II';
-  if (a < 270) return 'III';
-  return 'IV';
-}
-
-function calcularTangente(angulo: number): string {
-  const rad = gradosARadianes(angulo);
-  const cosVal = Math.cos(rad);
-  if (Math.abs(cosVal) < 1e-10) return '∞';
-  const tanVal = Math.tan(rad);
-  return formatearNumero(tanVal);
-}
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -434,6 +398,101 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   const fraccionRad = fracciones[Math.round(angulo)] ?? `${anguloEnRadianes} rad`;
 
   // ============================================
+  // CASOS DE AULA
+  // Los enunciados, la corrección y los pasos salen de `casos.ts`; aquí solo se
+  // guarda lo que la persona escribe y qué tiene abierto.
+  // ============================================
+
+  const [pestanaAula, setPestanaAula] = useState<'casos' | 'practica'>('casos');
+  const [casoActivoId, setCasoActivoId] = useState(1);
+  const [respuestasCasos, setRespuestasCasos] = useState<Record<number, string>>({});
+  const [veredictosCasos, setVeredictosCasos] = useState<Record<number, Comprobacion>>({});
+  const [pistaAbierta, setPistaAbierta] = useState(false);
+  const [solucionAbierta, setSolucionAbierta] = useState(false);
+
+  const [ejercicio, setEjercicio] = useState<EjercicioAleatorio | null>(null);
+  const [semillaTexto, setSemillaTexto] = useState('');
+  const [avisoSemilla, setAvisoSemilla] = useState('');
+  const [respuestaPractica, setRespuestaPractica] = useState('');
+  const [veredictoPractica, setVeredictoPractica] = useState<Comprobacion | null>(null);
+  const [pistaPracticaAbierta, setPistaPracticaAbierta] = useState(false);
+  const [solucionPracticaAbierta, setSolucionPracticaAbierta] = useState(false);
+
+  const casoActivo = CASOS.find(c => c.id === casoActivoId) ?? CASOS[0];
+  const casosAcertados = useMemo(
+    () => Object.values(veredictosCasos).filter(v => v.correcto).length,
+    [veredictosCasos],
+  );
+  const veredictoCasoActivo = veredictosCasos[casoActivo.id];
+
+  const elegirCaso = (id: number) => {
+    setCasoActivoId(id);
+    setPistaAbierta(false);
+    setSolucionAbierta(false);
+  };
+
+  /**
+   * Corrige lo escrito. `parseSpanishNumber` devuelve NaN con lo que no es un número
+   * («no sé», «√3/2», una casilla vacía), y ese NaN NO llega a la pantalla: la
+   * comprobación lo marca como `no-numerico` y el veredicto lo dice con sus palabras.
+   */
+  const comprobarCasoActivo = () => {
+    const valor = parseSpanishNumber(respuestasCasos[casoActivo.id] ?? '');
+    setVeredictosCasos(previos => ({
+      ...previos,
+      [casoActivo.id]: comprobarRespuesta(valor, casoActivo.respuesta),
+    }));
+  };
+
+  const reiniciarCasos = () => {
+    setRespuestasCasos({});
+    setVeredictosCasos({});
+    setPistaAbierta(false);
+    setSolucionAbierta(false);
+  };
+
+  /** Lleva el círculo de arriba al ángulo del caso, para comprobarlo en el dibujo. */
+  const verEnElCirculo = (grados: number) => {
+    if (!Number.isFinite(grados)) return;
+    setAnimando(false);
+    setAvisoAngulo('');
+    setAngulo(Math.min(ANGULO_MAX, Math.max(ANGULO_MIN, redondear(grados))));
+  };
+
+  const limpiarPractica = (generado: EjercicioAleatorio) => {
+    setEjercicio(generado);
+    setRespuestaPractica('');
+    setVeredictoPractica(null);
+    setPistaPracticaAbierta(false);
+    setSolucionPracticaAbierta(false);
+  };
+
+  // Nunca durante el render: sin semilla, el ejercicio sale del reloj y el servidor y el
+  // navegador generarían enunciados distintos.
+  const nuevoEjercicio = () => {
+    setAvisoSemilla('');
+    setSemillaTexto('');
+    limpiarPractica(generarEjercicioAleatorio());
+  };
+
+  const ejercicioDeSemilla = () => {
+    const semilla = parseSpanishNumber(semillaTexto);
+    if (!Number.isFinite(semilla)) {
+      setAvisoSemilla('Escribe un número entero como semilla, por ejemplo 4021.');
+      return;
+    }
+    setAvisoSemilla('');
+    limpiarPractica(generarEjercicioAleatorio(semilla));
+  };
+
+  const comprobarPractica = () => {
+    if (ejercicio === null) return;
+    setVeredictoPractica(
+      comprobarRespuesta(parseSpanishNumber(respuestaPractica), ejercicio.respuesta),
+    );
+  };
+
+  // ============================================
   // RENDER
   // ============================================
 
@@ -667,6 +726,364 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           </div>
         )}
       </div>
+
+      {/* ============================================
+          CASOS DE AULA — 12 casos numerados y asignables
+          ============================================ */}
+      <section className={styles.aulaSection} aria-labelledby="titulo-aula">
+        <h2 id="titulo-aula" className={styles.aulaTitulo}>
+          <span aria-hidden="true">📝</span> Casos para clase
+        </h2>
+        <p className={styles.aulaIntro}>
+          Son {TOTAL_CASOS} casos fijos y numerados: el caso 3 es idéntico para cualquiera que abra
+          esta página, hoy y dentro de un año. Así, un encargo del tipo «resuelve los casos 3, 7 y
+          11» significa lo mismo para toda la clase. Todos los ángulos van en grados, y cada caso
+          puede llevarse al círculo de arriba con un botón para comprobarlo en el dibujo.
+        </p>
+
+        <div className={styles.aulaTabs} role="tablist" aria-label="Modo de trabajo">
+          <button
+            type="button"
+            role="tab"
+            id="pestana-casos"
+            aria-selected={pestanaAula === 'casos'}
+            aria-controls="panel-casos"
+            className={`${styles.aulaTab} ${pestanaAula === 'casos' ? styles.aulaTabActiva : ''}`}
+            onClick={() => setPestanaAula('casos')}
+          >
+            Los {TOTAL_CASOS} casos
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="pestana-practica"
+            aria-selected={pestanaAula === 'practica'}
+            aria-controls="panel-practica"
+            className={`${styles.aulaTab} ${pestanaAula === 'practica' ? styles.aulaTabActiva : ''}`}
+            onClick={() => setPestanaAula('practica')}
+          >
+            Práctica sin final
+          </button>
+        </div>
+
+        {/* ---- PANEL 1: los casos numerados ---- */}
+        <div
+          id="panel-casos"
+          role="tabpanel"
+          aria-labelledby="pestana-casos"
+          hidden={pestanaAula !== 'casos'}
+        >
+          <div className={styles.aulaContador}>
+            <p className={styles.aulaContadorTexto} aria-live="polite">
+              Has acertado <strong>{casosAcertados}</strong> de {TOTAL_CASOS}
+            </p>
+            <div
+              className={styles.aulaBarra}
+              role="progressbar"
+              aria-valuenow={casosAcertados}
+              aria-valuemin={0}
+              aria-valuemax={TOTAL_CASOS}
+              aria-label="Casos acertados"
+            >
+              <div
+                className={styles.aulaBarraRelleno}
+                style={{ width: `${(casosAcertados / TOTAL_CASOS) * 100}%` }}
+              />
+            </div>
+            <button type="button" className={styles.aulaBtnSecundario} onClick={reiniciarCasos}>
+              Empezar de nuevo
+            </button>
+          </div>
+
+          <div className={styles.aulaSelector} role="group" aria-label="Elegir caso">
+            {CASOS.map(caso => {
+              const veredicto = veredictosCasos[caso.id];
+              const acertado = veredicto !== undefined && veredicto.correcto;
+              return (
+                <button
+                  key={caso.id}
+                  type="button"
+                  className={`${styles.aulaNumero} ${caso.id === casoActivoId ? styles.aulaNumeroActivo : ''} ${acertado ? styles.aulaNumeroOk : ''}`}
+                  aria-pressed={caso.id === casoActivoId}
+                  aria-label={`Caso ${caso.id}: ${caso.titulo}${acertado ? ' — acertado' : ''}`}
+                  onClick={() => elegirCaso(caso.id)}
+                >
+                  {caso.id}
+                </button>
+              );
+            })}
+          </div>
+
+          <article className={styles.aulaTarjeta}>
+            <div className={styles.aulaTarjetaCabecera}>
+              <span className={styles.aulaTarjetaNumero}>{casoActivo.id}</span>
+              <h3 className={styles.aulaTarjetaTitulo}>{casoActivo.titulo}</h3>
+              <span className={styles.aulaEtiqueta}>
+                {casoActivo.categoria === 'abstracto' ? 'Cálculo directo' : 'Situación real'}
+              </span>
+            </div>
+
+            <p className={styles.aulaEnunciado}>{casoActivo.enunciado}</p>
+
+            <div className={styles.aulaCampo}>
+              <label
+                className={styles.aulaCampoEtiqueta}
+                htmlFor={`respuesta-caso-${casoActivo.id}`}
+              >
+                Tu respuesta ({casoActivo.etiquetaRespuesta})
+                {casoActivo.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+              </label>
+              <input
+                id={`respuesta-caso-${casoActivo.id}`}
+                className={styles.aulaInput}
+                type="text"
+                // `text` y no `decimal`: hay respuestas negativas y el teclado decimal de
+                // iOS no ofrece el signo menos.
+                inputMode="text"
+                autoComplete="off"
+                placeholder="Escribe solo el número"
+                value={respuestasCasos[casoActivo.id] ?? ''}
+                onChange={e =>
+                  setRespuestasCasos(previas => ({ ...previas, [casoActivo.id]: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className={styles.aulaAcciones}>
+              <button
+                type="button"
+                className={styles.aulaBtnPrimario}
+                onClick={comprobarCasoActivo}
+              >
+                Comprobar
+              </button>
+              <button
+                type="button"
+                className={styles.aulaBtnSecundario}
+                aria-expanded={pistaAbierta}
+                aria-controls={`pista-caso-${casoActivo.id}`}
+                onClick={() => setPistaAbierta(!pistaAbierta)}
+              >
+                {pistaAbierta ? 'Ocultar pista' : 'Ver pista'}
+              </button>
+              <button
+                type="button"
+                className={styles.aulaBtnSecundario}
+                aria-expanded={solucionAbierta}
+                aria-controls={`solucion-caso-${casoActivo.id}`}
+                onClick={() => setSolucionAbierta(!solucionAbierta)}
+              >
+                {solucionAbierta ? 'Ocultar solución' : 'Ver solución'}
+              </button>
+              <button
+                type="button"
+                className={styles.aulaBtnFantasma}
+                onClick={() => verEnElCirculo(casoActivo.datos.angulo)}
+              >
+                Ver {formatearRespuesta(casoActivo.datos.angulo, 2)}° en el círculo
+              </button>
+            </div>
+
+            {veredictoCasoActivo !== undefined && (
+              <p
+                className={`${styles.aulaVeredicto} ${veredictoCasoActivo.correcto ? styles.aulaVeredictoOk : styles.aulaVeredictoKo}`}
+                role="alert"
+                aria-live="polite"
+              >
+                <span aria-hidden="true">{veredictoCasoActivo.correcto ? '✅' : '❌'}</span>{' '}
+                {textoVeredicto(
+                  veredictoCasoActivo,
+                  casoActivo.respuestaTexto,
+                  casoActivo.etiquetaRespuesta,
+                )}
+              </p>
+            )}
+
+            <div id={`pista-caso-${casoActivo.id}`} hidden={!pistaAbierta}>
+              <p className={styles.aulaPista}>
+                <span aria-hidden="true">💡</span> {casoActivo.pista}
+              </p>
+            </div>
+
+            <div id={`solucion-caso-${casoActivo.id}`} hidden={!solucionAbierta}>
+              <div className={styles.aulaSolucion}>
+                <ol className={styles.aulaPasos}>
+                  {casoActivo.pasos.map((paso, indice) => (
+                    <li key={indice} className={styles.aulaPaso}>
+                      {paso}
+                    </li>
+                  ))}
+                </ol>
+                <p className={styles.aulaResultado}>
+                  Resultado:{' '}
+                  <strong>
+                    {conUnidad(casoActivo.respuestaTexto, casoActivo.etiquetaRespuesta)}
+                  </strong>
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        {/* ---- PANEL 2: práctica aleatoria reproducible ---- */}
+        <div
+          id="panel-practica"
+          role="tabpanel"
+          aria-labelledby="pestana-practica"
+          hidden={pestanaAula !== 'practica'}
+        >
+          <p className={styles.aulaIntro}>
+            Cuando los {TOTAL_CASOS} casos se queden cortos, aquí sale uno nuevo cada vez, con la
+            solución explicada igual que los demás. Cada ejercicio lleva una <strong>semilla</strong>:
+            escribiendo el mismo número sale exactamente el mismo ejercicio, así que también se
+            puede dictar en clase.
+          </p>
+
+          <div className={styles.aulaAcciones}>
+            <button type="button" className={styles.aulaBtnPrimario} onClick={nuevoEjercicio}>
+              <span aria-hidden="true">🎲</span> Ejercicio nuevo
+            </button>
+            <div className={styles.aulaSemillaCampo}>
+              <label className={styles.aulaCampoEtiqueta} htmlFor="semilla-practica">
+                O una semilla concreta
+              </label>
+              <div className={styles.aulaSemillaFila}>
+                <input
+                  id="semilla-practica"
+                  className={styles.aulaInputCorto}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  placeholder="4021"
+                  value={semillaTexto}
+                  onChange={e => setSemillaTexto(e.target.value)}
+                  aria-describedby={avisoSemilla ? 'aviso-semilla' : undefined}
+                />
+                <button
+                  type="button"
+                  className={styles.aulaBtnSecundario}
+                  onClick={ejercicioDeSemilla}
+                >
+                  Generar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {avisoSemilla !== '' && (
+            <p
+              className={`${styles.aulaVeredicto} ${styles.aulaVeredictoKo}`}
+              id="aviso-semilla"
+              role="alert"
+              aria-live="polite"
+            >
+              {avisoSemilla}
+            </p>
+          )}
+
+          {ejercicio !== null && (
+            <article className={styles.aulaTarjeta}>
+              <div className={styles.aulaTarjetaCabecera}>
+                <h3 className={styles.aulaTarjetaTitulo}>Ejercicio de práctica</h3>
+                <span className={styles.aulaEtiqueta}>semilla {ejercicio.semilla}</span>
+              </div>
+
+              <p className={styles.aulaEnunciado}>{ejercicio.enunciado}</p>
+
+              <div className={styles.aulaCampo}>
+                <label className={styles.aulaCampoEtiqueta} htmlFor="respuesta-practica">
+                  Tu respuesta ({ejercicio.etiquetaRespuesta})
+                  {ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                </label>
+                <input
+                  id="respuesta-practica"
+                  className={styles.aulaInput}
+                  type="text"
+                  inputMode="text"
+                  autoComplete="off"
+                  placeholder="Escribe solo el número"
+                  value={respuestaPractica}
+                  onChange={e => setRespuestaPractica(e.target.value)}
+                />
+              </div>
+
+              <div className={styles.aulaAcciones}>
+                <button
+                  type="button"
+                  className={styles.aulaBtnPrimario}
+                  onClick={comprobarPractica}
+                >
+                  Comprobar
+                </button>
+                <button
+                  type="button"
+                  className={styles.aulaBtnSecundario}
+                  aria-expanded={pistaPracticaAbierta}
+                  aria-controls="pista-practica"
+                  onClick={() => setPistaPracticaAbierta(!pistaPracticaAbierta)}
+                >
+                  {pistaPracticaAbierta ? 'Ocultar pista' : 'Ver pista'}
+                </button>
+                <button
+                  type="button"
+                  className={styles.aulaBtnSecundario}
+                  aria-expanded={solucionPracticaAbierta}
+                  aria-controls="solucion-practica"
+                  onClick={() => setSolucionPracticaAbierta(!solucionPracticaAbierta)}
+                >
+                  {solucionPracticaAbierta ? 'Ocultar solución' : 'Ver solución'}
+                </button>
+                <button
+                  type="button"
+                  className={styles.aulaBtnFantasma}
+                  onClick={() => verEnElCirculo(ejercicio.datos.angulo)}
+                >
+                  Ver {formatearRespuesta(ejercicio.datos.angulo, 2)}° en el círculo
+                </button>
+              </div>
+
+              {veredictoPractica !== null && (
+                <p
+                  className={`${styles.aulaVeredicto} ${veredictoPractica.correcto ? styles.aulaVeredictoOk : styles.aulaVeredictoKo}`}
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <span aria-hidden="true">{veredictoPractica.correcto ? '✅' : '❌'}</span>{' '}
+                  {textoVeredicto(
+                    veredictoPractica,
+                    ejercicio.respuestaTexto,
+                    ejercicio.etiquetaRespuesta,
+                  )}
+                </p>
+              )}
+
+              <div id="pista-practica" hidden={!pistaPracticaAbierta}>
+                <p className={styles.aulaPista}>
+                  <span aria-hidden="true">💡</span> {ejercicio.pista}
+                </p>
+              </div>
+
+              <div id="solucion-practica" hidden={!solucionPracticaAbierta}>
+                <div className={styles.aulaSolucion}>
+                  <ol className={styles.aulaPasos}>
+                    {ejercicio.pasos.map((paso, indice) => (
+                      <li key={indice} className={styles.aulaPaso}>
+                        {paso}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className={styles.aulaResultado}>
+                    Resultado:{' '}
+                    <strong>
+                      {conUnidad(ejercicio.respuestaTexto, ejercicio.etiquetaRespuesta)}
+                    </strong>
+                  </p>
+                </div>
+              </div>
+            </article>
+          )}
+        </div>
+      </section>
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0

@@ -556,3 +556,215 @@ test.describe('Regresión de los hallazgos (25/08/2026)', () => {
     expect(sinTipo, 'botones sin type').toEqual([]);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CASOS DE AULA · 21/09/2026
+// ═══════════════════════════════════════════════════════════════════════════════
+
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  toleranciaDe,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  gradosARadianes,
+  radianesAGrados,
+  redondear,
+  signoDe,
+  obtenerCuadrante,
+  calcularTangente,
+  anguloDeReferencia,
+  anguloEquivalente,
+  cuadranteNumerico,
+  tangenteExiste,
+} from '../../app/simulador-trigonometria-circulo-unitario/casos';
+
+/**
+ * Casos de aula — las siete invariantes de la sistemática `/casos-aula-meskeia`.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO DE ESTE BLOQUE
+ * Todos calculados a mano desde la definición, NUNCA copiados de lo que devuelve la app:
+ *
+ *   · sen 30° = 1/2 = 0,5 exacto (el cateto opuesto al ángulo de 30° en un triángulo
+ *     rectángulo es la mitad de la hipotenusa). Es el control de que nadie ha confundido
+ *     grados con radianes: `Math.sin(30)` —radianes— daría −0,988.
+ *   · cos 120° = −cos 60° = −0,5, porque 120° cae en el II cuadrante, donde el coseno es
+ *     negativo, y su ángulo de referencia es 180° − 120° = 60°.
+ *   · tan 45° = 1 (cateto opuesto = cateto contiguo).
+ *   · 180° = π rad, de donde 225° = 225π/180 = 5π/4 = 3,9270 rad y 5π/6 rad = 150°.
+ *   · Altura del edificio = 30 · tan 30° = 30/√3 = 17,3205 m.
+ *   · Sombra del poste = 6 / tan 60° = 6/√3 = 3,4641 m.
+ *   · Noria: 20 · sen 390° = 20 · sen 30° = 10 m (390° da una vuelta entera y sobran 30°).
+ *   · Muelle: 8 · cos 240° = 8 · (−0,5) = −4 cm.
+ *
+ * El convenio que se blinda aquí salió de los hallazgos 350-352 del Inspector: el cero no
+ * tiene signo, los ejes no pertenecen a ningún cuadrante, y la tangente donde no existe se
+ * DICE, nunca se aproxima.
+ */
+
+/** Público mayoritariamente mexicano y colombiano: ningún caso se ancla a un país. */
+const PAISES_Y_CIUDADES =
+  /\b(España|Espa(ñ|n)ol|M(é|e)xico|Mexicano|Colombia|Argentina|Chile|Per(ú|u)|Venezuela|Uruguay|Ecuador|Bolivia|Paraguay|Guatemala|Cuba|Madrid|Barcelona|Sevilla|Bogot(á|a)|Buenos Aires|Santiago|Lima|Caracas|Montevideo|Quito|La Habana|Par(í|i)s|Londres|Nueva York|Estados Unidos|Francia|Italia|Roma|Alemania|Berl(í|i)n|Portugal|Lisboa)\b/i;
+
+test.describe('Simulador del Círculo Trigonométrico · casos para clase', () => {
+  test('1 · hay exactamente 12 casos, con ids 1..12 sin huecos', () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS).toHaveLength(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan el mismo enunciado y la misma respuesta', () => {
+    const primera = CASOS.map((c) => `${c.id}|${c.enunciado}|${c.respuesta}`);
+    const segunda = CASOS.map((c) => `${c.id}|${c.enunciado}|${c.respuesta}`);
+    expect(segunda).toEqual(primera);
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', () => {
+    for (const caso of CASOS) {
+      const recalculada = resolverCaso(caso.datos);
+      expect(recalculada.ok, `caso ${caso.id} no resuelve`).toBe(true);
+      expect(recalculada.valor, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso trae enunciado, etiqueta, respuesta finita y desarrollo', () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.trim().length, `caso ${caso.id}`).toBeGreaterThan(20);
+      expect(caso.etiquetaRespuesta.trim().length, `caso ${caso.id}`).toBeGreaterThan(0);
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThan(0);
+      expect(caso.pista.trim().length, `caso ${caso.id}`).toBeGreaterThan(0);
+      expect(caso.respuestaTexto.trim().length, `caso ${caso.id}`).toBeGreaterThan(0);
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país ni una ciudad', () => {
+    for (const caso of CASOS) {
+      expect(PAISES_Y_CIUDADES.test(caso.titulo), `título del caso ${caso.id}`).toBe(false);
+      expect(PAISES_Y_CIUDADES.test(caso.enunciado), `enunciado del caso ${caso.id}`).toBe(false);
+      expect(PAISES_Y_CIUDADES.test(caso.pista), `pista del caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', () => {
+    // REPRODUCIBLE NO ES VARIADO: en simulador-genetica un xorshift32 sembrado con enteros
+    // pequeños devolvía el MISMO ejercicio con todas las semillas y pasaba igualmente la
+    // prueba de reproducibilidad. Por eso se piden varias semillas a la vez.
+    for (const semilla of [1, 7, 42, 12345, 999999]) {
+      const a = generarEjercicioAleatorio(semilla);
+      const b = generarEjercicioAleatorio(semilla);
+      expect(b.enunciado, `semilla ${semilla}`).toBe(a.enunciado);
+      expect(b.respuesta, `semilla ${semilla}`).toBe(a.respuesta);
+    }
+
+    const respuestas = new Set<number>();
+    const enunciados = new Set<string>();
+    for (let semilla = 1; semilla <= 40; semilla++) {
+      const ejercicio = generarEjercicioAleatorio(semilla);
+      respuestas.add(ejercicio.respuesta);
+      enunciados.add(ejercicio.enunciado);
+      expect(resolverCaso(ejercicio.datos).valor, `semilla ${semilla}`).toBe(ejercicio.respuesta);
+      expect(Number.isFinite(ejercicio.respuesta), `semilla ${semilla}`).toBe(true);
+      // El simulador solo admite de −360° a 720°: un ejercicio fuera de rango no se podría
+      // comprobar moviendo el círculo, que es justo lo que la app ofrece.
+      expect(ejercicio.datos.angulo, `semilla ${semilla}`).toBeGreaterThanOrEqual(-360);
+      expect(ejercicio.datos.angulo, `semilla ${semilla}`).toBeLessThanOrEqual(720);
+    }
+    expect(respuestas.size).toBeGreaterThanOrEqual(3);
+    expect(enunciados.size).toBeGreaterThanOrEqual(10);
+  });
+
+  test('7 · el convenio de la app queda fijado: grados, cero sin signo y tangente que no existe', () => {
+    // ── Grados, no radianes ────────────────────────────────────────────────────────────
+    // Un olvido aquí no revienta nada: devuelve números plausibles y equivocados.
+    expect(resolverCaso({ angulo: 30, magnitud: 'seno' }).valor).toBe(0.5);
+    expect(resolverCaso({ angulo: 60, magnitud: 'coseno' }).valor).toBe(0.5);
+    expect(resolverCaso({ angulo: 45, magnitud: 'tangente' }).valor).toBe(1);
+    expect(gradosARadianes(180)).toBeCloseTo(Math.PI, 12);
+    expect(radianesAGrados(Math.PI)).toBeCloseTo(180, 12);
+
+    // ── El cero no tiene signo ─────────────────────────────────────────────────────────
+    // `Math.cos(270°)` da −1,84·10⁻¹⁶: cero a cuatro decimales, pero con el signo puesto.
+    const cos270 = Math.cos(gradosARadianes(270));
+    expect(cos270).toBeLessThan(0); // el residuo de coma flotante ES negativo
+    expect(redondear(cos270)).toBe(0);
+    expect(Object.is(redondear(cos270), -0)).toBe(false); // sumar 0 normaliza el −0
+    expect(signoDe(cos270).clase).toBe('cero');
+    expect(signoDe(Math.sin(gradosARadianes(360))).clase).toBe('cero');
+
+    // ── Los ejes no pertenecen a ningún cuadrante ──────────────────────────────────────
+    for (const eje of [0, 90, 180, 270, 360]) {
+      expect(obtenerCuadrante(eje), `${eje}°`).toBe('—');
+      expect(cuadranteNumerico(eje), `${eje}°`).toBe(0);
+    }
+    expect(obtenerCuadrante(45)).toBe('I');
+    expect(obtenerCuadrante(120)).toBe('II');
+    expect(obtenerCuadrante(200)).toBe('III');
+    expect(obtenerCuadrante(300)).toBe('IV');
+    expect(obtenerCuadrante(-90)).toBe('—'); // −90° equivale a 270°, que es un eje
+    expect(obtenerCuadrante(-45)).toBe('IV'); // −45° equivale a 315°
+
+    // ── La tangente que no existe se DICE, no se aproxima ──────────────────────────────
+    // `Math.tan(π/2)` devuelve 1,6·10¹⁶: un número enorme pero FINITO, que `Number.isFinite`
+    // dejaría pasar y se pintaría como un resultado válido.
+    expect(Number.isFinite(Math.tan(Math.PI / 2))).toBe(true);
+    expect(Math.abs(Math.tan(Math.PI / 2))).toBeGreaterThan(1e15);
+    expect(calcularTangente(90)).toBe('∞');
+    expect(calcularTangente(270)).toBe('∞');
+    expect(tangenteExiste(90)).toBe(false);
+    expect(tangenteExiste(45)).toBe(true);
+    // Y ningún caso puede pedirla: el motor se niega en vez de devolver el número enorme.
+    const imposible = resolverCaso({ angulo: 90, magnitud: 'tangente' });
+    expect(imposible.ok).toBe(false);
+    expect(imposible.error).toBeTruthy();
+  });
+
+  test('7.bis · ángulo de referencia y equivalente, que es de donde sale el signo', () => {
+    expect(anguloEquivalente(390)).toBe(30); // una vuelta entera sobra
+    expect(anguloEquivalente(-45)).toBe(315);
+    expect(anguloEquivalente(720)).toBe(0);
+    expect(anguloDeReferencia(210)).toBe(30); // 210 − 180
+    expect(anguloDeReferencia(120)).toBe(60); // 180 − 120
+    expect(anguloDeReferencia(300)).toBe(60); // 360 − 300
+    expect(anguloDeReferencia(45)).toBe(45);
+
+    // La identidad pitagórica se cumple en cualquier ángulo, que es lo que la hace útil.
+    for (const angulo of [0, 17, 30, 45, 120, 210, 300, 359]) {
+      const s = Math.sin(gradosARadianes(angulo));
+      const c = Math.cos(gradosARadianes(angulo));
+      expect(s * s + c * c, `${angulo}°`).toBeCloseTo(1, 12);
+    }
+  });
+
+  test('los tres casos que piden redondeo enseñan el número que pidieron', () => {
+    // Si el enunciado dice «redondea a 2 decimales» y la solución muestra 17,3205, la app
+    // corrige con un formato distinto del que exigió.
+    const conRedondeo = CASOS.filter((c) => c.requiereRedondeo);
+    expect(conRedondeo.length).toBeGreaterThan(0);
+    for (const caso of conRedondeo) {
+      expect(caso.enunciado.toLowerCase(), `caso ${caso.id}`).toContain('decimales');
+      // El texto empieza por el valor a 2 decimales; el exacto va detrás, entre paréntesis.
+      const dosDecimales = redondear(caso.respuesta, 2).toFixed(2).replace('.', ',');
+      expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(dosDecimales);
+    }
+    // Y quien teclea el valor redondeado, como se le pidió, acierta.
+    for (const caso of CASOS) {
+      const tecleado = redondear(caso.respuesta, 2);
+      expect(comprobarRespuesta(tecleado, caso.respuesta).correcto, `caso ${caso.id}`).toBe(true);
+    }
+  });
+
+  test('la corrección tolera el redondeo y rechaza el error de signo', () => {
+    // La tolerancia es el MAYOR entre 0,01 y el 1 % del valor.
+    expect(toleranciaDe(100)).toBeCloseTo(1, 10);
+    expect(toleranciaDe(0.5)).toBeCloseTo(0.01, 10);
+
+    expect(comprobarRespuesta(0.5, 0.5).correcto).toBe(true);
+    // Olvidar el signo en un cuadrante donde la razón es negativa es EL error del tema:
+    // 0,5 en lugar de −0,5 tiene que suspender.
+    expect(comprobarRespuesta(0.5, -0.5).correcto).toBe(false);
+    expect(comprobarRespuesta(Number.NaN, 0.5).correcto).toBe(false);
+    expect(comprobarRespuesta(Number.NaN, 0.5).motivo).toBe('no-numerico');
+  });
+});
