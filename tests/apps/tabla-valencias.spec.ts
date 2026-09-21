@@ -4,28 +4,36 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 /**
  * Tabla de Valencias y Números de Oxidación — regresión del DATO, no de la carga.
  *
- * QUÉ PROMETE
+ * QUÉ PROMETE (releído el 21/09/2026, después del cambio de alcance)
  *   · <h1>: «Tabla de Valencias y Números de Oxidación».
- *   · Subtítulo: «Busca cualquier elemento y consulta al instante con qué números de
- *     oxidación actúa, con ejemplos de compuestos reales, iones poliatómicos, las tres
- *     nomenclaturas y un formulador de compuestos binarios».
- *   · metadata.ts / JSON-LD: 51 elementos, buscador por símbolo/nombre/nombre tradicional,
- *     un compuesto real por estado, iones poliatómicos, las tres nomenclaturas y
+ *   · Subtítulo: «Busca UN elemento y consulta al instante…» (antes decía «cualquier
+ *     elemento», y de ahí salió media inspección del 21/09).
+ *   · <title>: «Tabla de Valencias y Números de Oxidación de los Elementos | meskeIA».
+ *   · metadata.ts → openGraph y JSON-LD: **51 elementos**, buscador por símbolo/nombre/nombre
+ *     tradicional, un compuesto real por estado, iones poliatómicos, las tres nomenclaturas y
  *     «Formulador de compuestos binarios con intercambio y simplificación de subíndices».
+ *   · En pantalla: contador «51 elementos en la tabla» + párrafo de alcance.
  *   · FAQPage: hierro +2/+3, regla de deducción dentro de un compuesto, sufijos -oso/-ico,
  *     y por qué los metales de transición tienen varios estados.
  *
- * DÓNDE VIVE EL DATO — no hay módulo de datos: las 51 fichas (`ELEMENTOS`), los iones
- * (`IONES`) y el formulador (`formularBinario`) están EMBEBIDOS en app/tabla-valencias/
- * page.tsx, que son 1.760 líneas de las que 433 son el dataset químico.
+ * DÓNDE VIVE EL DATO — no hay módulo de datos: las **51** fichas (`ELEMENTOS`), los **26**
+ * iones (`IONES`) y el formulador (`formularBinario`) están EMBEBIDOS en
+ * app/tabla-valencias/page.tsx, 1.836 líneas de las que ~460 son el dataset químico.
+ * (La cabecera anterior de este fichero decía «20 iones»: son 26, contados en el dataset y
+ * en las filas de la tabla de la página.)
  *
- * LA FUENTE — la app no cita ninguna en pantalla (ni IUPAC, ni un texto de referencia, ni
- * fecha de revisión), así que el contraste de esta inspección se ancla a las recomendaciones
- * de la IUPAC (Red Book, 2005) y al CRC Handbook of Chemistry and Physics.
+ * LA FUENTE — desde el 18/09/2026 la app la declara en pantalla con <DataReference>: IUPAC,
+ * Nomenclature of Inorganic Chemistry (Red Book, 2005) y CRC Handbook of Chemistry and
+ * Physics. Es contra eso —y no contra una lectura de la propia app— contra lo que se
+ * resuelven a mano los casos de abajo.
  *
  * ⚠️ El signo menos que imprime la app es el MENOS TIPOGRÁFICO U+2212 («−»), no el guion del
  * teclado: `formatearEstado` lo escribe así a propósito. Si estas cadenas se recopian a
  * mano, el test falla por el carácter y no por la química.
+ *
+ * ⚠️ Los <h3> y los <dt> se sirven con `text-transform: uppercase`, así que `innerText` los
+ * devuelve en mayúsculas. Las aserciones de esta suite miran siempre el <dd> o el <li>, que
+ * no llevan la transformación.
  *
  * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
  *
@@ -51,16 +59,50 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       Hg(+1) + Cl(−1) NO es HgCl: el mercurio(I) es el ion diatómico Hg₂²⁺ → Hg₂Cl₂.
  *       Dos veces el mismo elemento debe rechazarse.
  *
- * LO QUE ESTÁ SANO (verificado en producción el 18/09/2026): los 51 elementos comprobados
- * uno a uno dan los estados correctos y los ejemplos de compuesto son reales; el buscador
- * acierta por símbolo, nombre, nombre tradicional y fórmula del ejemplo, ignora acentos y
- * mayúsculas, y avisa cuando no encuentra; el formulador cruza y simplifica bien, excluye
- * el −1 del oxígeno para no inventar peróxidos, y avisa del Hg₂²⁺ y de los hidruros BH₃/NH₃.
+ * LO QUE ESTÁ SANO (verificado en producción el 18/09/2026 y reverificado el 21/09/2026):
+ * los 51 elementos comprobados uno a uno dan los estados correctos y los ejemplos de
+ * compuesto son reales; el buscador acierta por símbolo, nombre, nombre tradicional y
+ * fórmula del ejemplo, ignora acentos y mayúsculas, y avisa cuando no encuentra; el
+ * formulador cruza y simplifica bien, excluye el −1 del oxígeno para no inventar peróxidos,
+ * y avisa del Hg₂²⁺ y de los hidruros BH₃/NH₃. Sin errores de consola.
  *
- * LOS 4 HALLAZGOS del 18/09/2026, al final, ya como candados de regresión: se repararon ese
- * mismo día. Conservan escrito lo que la app decía antes, que es lo que permite saber, si
- * alguno se pone rojo, si lo que ha cambiado es la app o la afirmación. (Nota histórica: eran
- * tres tests para cuatro hallazgos; el de trazabilidad no tenía caso y ahora lo tiene.)
+ * ── RE-INSPECCIÓN DEL 21/09/2026 ──────────────────────────────────────────────────────
+ *
+ * Los 4 hallazgos del 18/09 se reverificaron uno a uno en el navegador. Tres cierran del
+ * todo (928 anhídridos, 930 fichas tradicionales, 931 trazabilidad) y el cuarto cierra a
+ * medias: **929 solo cubre los gases nobles**, que era donde la regla es enunciable, y deja
+ * fuera los otros compuestos imposibles que el mismo hallazgo nombraba (AuN).
+ *
+ * Los casos de esta vuelta, resueltos a mano antes de ejecutarlos:
+ *
+ *   A · las reparaciones previas, en sus casos literales
+ *       N(+5)+O(−2): mcd(5,2)=1 → N₂O₅ · tradicional ANHÍDRIDO nítrico (el «óxido nítrico»
+ *         es el NO, otra molécula) · sistemática pentaóxido de dinitrógeno · Stock óxido de
+ *         nitrógeno(V).
+ *       N(+3)+O(−2): mcd(3,2)=1 → N₂O₃ · ANHÍDRIDO nitroso (el «óxido nitroso» es el N₂O).
+ *       S(+6)+O(−2): mcd(6,2)=2 → SO₃ · anhídrido sulfúrico.
+ *       Kr(+2)+N(−3): mcd(2,3)=1 → Kr₃N₂, que no existe → tiene que avisar.
+ *       Xe(+8)+Cl(−1): mcd(8,1)=1 → XeCl₈, que no existe → tiene que avisar.
+ *       Ficha del Cl: «anhídrido hipocloroso y ácido hipocloroso», nunca «cloruro
+ *         hipocloroso»; y la del Fe debe SEGUIR dando «óxido férrico y cloruro férrico»,
+ *         porque la reparación tenía que discriminar metal/no metal, no sustituir en bloque.
+ *
+ *   B · el alcance, contado — el dataset trae 51 elementos y la página lo dice en cuatro
+ *       sitios (contador, párrafo de alcance, og:description y JSON-LD). Los 51 son: H + 5
+ *       alcalinos + 5 alcalinotérreos + 5 del grupo 13 + 5 del 14 + 5 del 15 + 4 del 16 +
+ *       4 del 17 + 5 gases nobles + 12 metales de transición.
+ *       ⚠️ De ahí sale el hallazgo abierto: los grupos principales NO están completos —
+ *       faltan Fr(87), Ra(88), Po(84), At(85) y Rn(86), ninguno de los cuales es lantánido,
+ *       actínido ni transuránico, que es lo único que el párrafo declara excluido.
+ *
+ *   C · el límite / lo que debe rechazarse
+ *       Au(+3)+N(−3): mcd(3,3)=3 → AuN. El nitruro de oro no es un compuesto conocido, y el
+ *         formulador lo devuelve sin pestañear. Sí rechaza, en cambio, el mismo elemento en
+ *         los dos lados (S/S), que es la comprobación que sí tiene.
+ *
+ * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que DEBERÍA pasar y
+ * hoy fallan a propósito. El día que se reparen, se les quita la línea `test.fail()` y
+ * quedan como candado de regresión.
  */
 
 const BUSCADOR = '#buscador-elemento';
@@ -98,6 +140,23 @@ function nomenclatura(page: Page, rotulo: string): Locator {
 /** La fórmula grande del formulador («Fe2O3»: los subíndices van en <sub>). */
 function formula(page: Page): Locator {
   return page.locator(`${FORMULADOR} [role="status"] > p`).first();
+}
+
+/**
+ * El panel de resultado del formulador. ⚠️ Se acota al `[role="status"]` de DENTRO de la
+ * sección: un `getByRole('alert'|'status')` a secas casa también con el anunciador de rutas
+ * de Next (`#__next-route-announcer__`) y rompe el modo estricto.
+ */
+function resultado(page: Page): Locator {
+  return page.locator(`${FORMULADOR} [role="status"]`);
+}
+
+/** Abre la ficha del elemento buscado y devuelve su <article>. */
+async function abrirFicha(page: Page, termino: string): Promise<Locator> {
+  await buscar(page, termino);
+  const cabecera = page.locator(`${LISTA} article button[aria-expanded]`).first();
+  if ((await cabecera.getAttribute('aria-expanded')) === 'false') await cabecera.click();
+  return fichas(page).first();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -146,9 +205,7 @@ test('hierro, oxígeno y azufre traen todos sus estados, el más frecuente delan
 test('la ficha del hierro da Fe₂O₃ en el +3 y FeCl₂ en el +2 como compuestos reales', async ({
   page,
 }) => {
-  await buscar(page, 'hierro');
-  await page.locator(`${LISTA} article button[aria-expanded]`).first().click();
-  const ficha = fichas(page).first();
+  const ficha = await abrirFicha(page, 'hierro');
 
   // El ejemplo real de cada estado es la capa que un PDF de valencias no puede dar, y es lo
   // que sostiene la admisión de esta tabla en el material de apoyo de Stemum.
@@ -170,8 +227,8 @@ test('el hidrógeno conserva el −1 de los hidruros metálicos, no solo el +1',
   // donde el metal es menos electronegativo que él. Una tabla que solo dé +1 simplifica de más.
   await buscar(page, 'hidrógeno');
   await expect(estadosVisibles(page)).toHaveText(['+1', '−1']);
-  await page.locator(`${LISTA} article button[aria-expanded]`).first().click();
-  await expect(fichas(page).first()).toContainText('NaH');
+  const ficha = await abrirFicha(page, 'hidrógeno');
+  await expect(ficha).toContainText('NaH');
 });
 
 test('el manganeso y el cromo traen sus cinco y sus tres estados completos', async ({ page }) => {
@@ -283,7 +340,7 @@ test('el mercurio(I) se formula Hg₂Cl₂, no HgCl, y el formulador explica por
   await expect(formula(page)).toHaveText('Hg2Cl2');
   await expect(nomenclatura(page, 'Nomenclatura de Stock')).toHaveText('cloruro de mercurio(I)');
   await expect(nomenclatura(page, 'Nomenclatura tradicional')).toHaveText('cloruro mercurioso');
-  await expect(page.locator(`${FORMULADOR} [role="status"]`)).toContainText('ion diatómico Hg₂²⁺');
+  await expect(resultado(page)).toContainText('ion diatómico Hg₂²⁺');
 });
 
 test('el peróxido no se ofrece: el oxígeno negativo solo admite el −2', async ({ page }) => {
@@ -299,71 +356,106 @@ test('elegir el mismo elemento en los dos lados se rechaza con un mensaje', asyn
   await page.selectOption('#elemento-positivo', 'S');
   await page.selectOption('#elemento-negativo', 'S');
 
-  await expect(page.locator(`${FORMULADOR} [role="status"]`)).toHaveCount(0);
+  await expect(resultado(page)).toHaveCount(0);
   await expect(page.locator(FORMULADOR)).toContainText(
     'Elige dos elementos distintos, uno con estado positivo y otro con estado negativo.',
   );
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (18/09/2026)
+// LOS 4 HALLAZGOS DEL 18/09/2026 — reparados ese mismo día
+// Reverificados en navegador el 21/09/2026: 928, 930 y 931 cierran; 929 solo a medias
+// (ver el bloque de hallazgos abiertos del final).
 // ═══════════════════════════════════════════════════════════════════════════
 
 test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
-  test(
-    '928 · el N₂O₅ se nombra «anhídrido nítrico», no «óxido nítrico»',
-    async ({ page }) => {
-      await page.selectOption('#elemento-positivo', 'N');
+  test('928 · el N₂O₅ se nombra «anhídrido nítrico», no «óxido nítrico»', async ({ page }) => {
+    await page.selectOption('#elemento-positivo', 'N');
 
-      // N(+5) + O(−2) → N₂O₅, y su nombre tradicional es ANHÍDRIDO nítrico: en español los
-      // óxidos de no metal son anhídridos, y la palabra no aparece ni una vez en la página.
-      // Aquí no es solo una forma en desuso: «óxido nítrico» es el nombre consolidado del
-      // monóxido de nitrógeno (NO), así que la app le pega a N₂O₅ la etiqueta de otra
-      // molécula. Y un escalón más abajo repite la jugada: con +3 saca N₂O₃ como «óxido
-      // nitroso», que es como se llama al N₂O, el gas de la risa.
-      await expect(formula(page)).toHaveText('N2O5');
-      await expect(nomenclatura(page, 'Nomenclatura tradicional')).toHaveText('anhídrido nítrico');
-    },
-  );
+    // N(+5) + O(−2) → mcd(5,2)=1 → N₂O₅, y su nombre tradicional es ANHÍDRIDO nítrico: en
+    // español los óxidos de no metal son anhídridos. Aquí no es solo una forma en desuso:
+    // «óxido nítrico» es el nombre consolidado del monóxido de nitrógeno (NO), así que la app
+    // le pegaba a N₂O₅ la etiqueta de otra molécula.
+    await expect(formula(page)).toHaveText('N2O5');
+    await expect(nomenclatura(page, 'Nomenclatura tradicional')).toHaveText('anhídrido nítrico');
+    // Las otras dos no cambian con la reparación y sirven de control.
+    await expect(nomenclatura(page, 'Nomenclatura sistemática')).toHaveText(
+      'pentaóxido de dinitrógeno',
+    );
+    await expect(nomenclatura(page, 'Nomenclatura de Stock')).toHaveText('óxido de nitrógeno(V)');
+  });
 
-  test(
-    '929 · Kr(+2) + N(−3) avisa de que ese compuesto no existe',
-    async ({ page }) => {
-      await page.selectOption('#elemento-positivo', 'Kr');
-      await page.selectOption('#elemento-negativo', 'N');
+  test('928.ter · un escalón más abajo, el N₂O₃ es «anhídrido nitroso», no «óxido nitroso»', async ({
+    page,
+  }) => {
+    // La segunda mitad del hallazgo 928, que solo estaba escrita en un comentario: con +3 la
+    // app sacaba N₂O₃ como «óxido nitroso», que es como se llama al N₂O, el gas de la risa.
+    // N(+3) + O(−2) → mcd(3,2)=1 → N₂O₃ · anhídrido del ácido nitroso HNO₂.
+    await page.selectOption('#elemento-positivo', 'N');
+    await page.selectOption('#estado-positivo', '3');
 
-      // El kriptón solo forma compuestos con flúor (KrF₂) — lo dice la propia FAQ de esta
-      // página y lo dice su propio dataset, que no le conoce otro ejemplo. El formulador
-      // comprueba los signos y el máximo común divisor, no si los dos elementos llegan a
-      // combinarse, así que devuelve «Kr₃N₂ · dinitruro de trikriptón» con la misma cara que
-      // el Fe₂O₃. Ya sabe avisar cuando hace falta (lo hace con el Hg₂²⁺ y con los hidruros
-      // BH₃/NH₃): aquí debería hacer lo mismo.
-      await expect(page.locator(`${FORMULADOR} [role="status"]`)).toContainText('⚠️');
-    },
-  );
+    await expect(formula(page)).toHaveText('N2O3');
+    await expect(nomenclatura(page, 'Nomenclatura tradicional')).toHaveText('anhídrido nitroso');
+    await expect(nomenclatura(page, 'Nomenclatura sistemática')).toHaveText(
+      'trióxido de dinitrógeno',
+    );
+  });
 
-  test(
-    '930 · la ficha del cloro ya no propone «cloruro hipocloroso»',
-    async ({ page }) => {
-      await buscar(page, 'cloro');
-      const cabecera = page.locator(`${LISTA} article button[aria-expanded]`).first();
-      await expect(cabecera).toContainText('Cloro');
-      await cabecera.click();
+  test('929 · Kr(+2) + N(−3) avisa de que ese compuesto no existe', async ({ page }) => {
+    await page.selectOption('#elemento-positivo', 'Kr');
+    await page.selectOption('#elemento-negativo', 'N');
 
-      // El bloque «Nombre tradicional según el estado» arma sus ejemplos con una plantilla
-      // fija —«por ejemplo, óxido X y cloruro X»— que funciona con los metales (óxido férrico,
-      // cloruro férrico) y produce disparates con los no metales: el cloro no forma un cloruro
-      // de sí mismo. Salen los cuatro: cloruro hipocloroso, cloroso, clórico y perclórico, y
-      // lo mismo en azufre («cloruro sulfúrico»), nitrógeno, fósforo, yodo y bromo.
-      await expect(fichas(page).first()).not.toContainText('cloruro hipocloroso');
-      // Y lo que sí corresponde a un no metal: su anhídrido y su oxácido.
-      await expect(fichas(page).first()).toContainText('anhídrido hipocloroso');
-      await expect(fichas(page).first()).toContainText('ácido hipocloroso');
-    },
-  );
+    // El kriptón solo forma compuestos con flúor (KrF₂) — lo dice la propia FAQ de esta página
+    // y lo dice su propio dataset, que no le conoce otro ejemplo. El formulador comprueba los
+    // signos y el máximo común divisor, no si los dos elementos llegan a combinarse, así que
+    // devolvía «Kr₃N₂ · dinitruro de trikriptón» con la misma cara que el Fe₂O₃.
+    await expect(formula(page)).toHaveText('Kr3N2');
+    await expect(resultado(page)).toContainText('⚠️');
+    await expect(resultado(page)).toContainText('no es un compuesto conocido');
+  });
+
+  test('929.bis · Xe(+8) + Cl(−1) también avisa: el xenón solo reacciona con F y O', async ({
+    page,
+  }) => {
+    // El segundo caso literal del hallazgo 929, que no tenía test propio. Xe(+8) + Cl(−1) →
+    // mcd(8,1)=1 → XeCl₈. No existe ningún cloruro de xenón(VIII): la química del xenón se
+    // limita a flúor y oxígeno (XeF₂, XeF₄, XeO₃, XeO₄), como dice la FAQ de la propia página.
+    await page.selectOption('#elemento-positivo', 'Xe');
+    await page.selectOption('#elemento-negativo', 'Cl');
+    await page.selectOption('#estado-positivo', '8');
+
+    await expect(formula(page)).toHaveText('XeCl8');
+    await expect(resultado(page)).toContainText('⚠️');
+    await expect(resultado(page)).toContainText('no es un compuesto conocido');
+  });
+
+  test('930 · la ficha del cloro ya no propone «cloruro hipocloroso»', async ({ page }) => {
+    const ficha = await abrirFicha(page, 'cloro');
+    await expect(ficha).toContainText('Cloro');
+
+    // El bloque «Nombre tradicional según el estado» armaba sus ejemplos con una plantilla
+    // fija —«por ejemplo, óxido X y cloruro X»— que funciona con los metales (óxido férrico,
+    // cloruro férrico) y producía disparates con los no metales: el cloro no forma un cloruro
+    // de sí mismo. Un no metal forma anhídridos y, con agua, oxácidos: esos son sus ejemplos.
+    await expect(ficha).not.toContainText('cloruro hipocloroso');
+    await expect(ficha).toContainText('anhídrido hipocloroso y ácido hipocloroso');
+    await expect(ficha).toContainText('anhídrido perclórico y ácido perclórico');
+  });
+
+  test('930.bis · y los METALES conservan «óxido X y cloruro X», que ahí sí es correcto', async ({
+    page,
+  }) => {
+    // La reparación tenía que DISCRIMINAR metal/no metal, no sustituir la plantilla en bloque:
+    // el óxido férrico (Fe₂O₃) y el cloruro férrico (FeCl₃) son compuestos reales y siguen
+    // siendo el ejemplo que corresponde a un metal. Si esto se pusiera en rojo, la reparación
+    // del 930 se habría llevado por delante el caso que estaba bien.
+    const ficha = await abrirFicha(page, 'hierro');
+    await expect(ficha).toContainText('férrico — por ejemplo, óxido férrico y cloruro férrico');
+    await expect(ficha).not.toContainText('anhídrido férrico');
+  });
 
   test('931 · los datos declaran de dónde salen', async ({ page }) => {
-    // Las 51 fichas, los estados de oxidación, los ejemplos y los 20 iones poliatómicos se
+    // Las 51 fichas, los estados de oxidación, los ejemplos y los 26 iones poliatómicos se
     // presentaban sin fuente, sin edición de referencia y sin fecha de revisión: el único
     // rastro estaba en un comentario del código, que el visitante no ve. Los datos eran
     // CORRECTOS —comprobados elemento a elemento contra IUPAC Red Book 2005 y CRC Handbook—,
@@ -392,6 +484,10 @@ test.describe('Los 4 hallazgos del 18/09/2026, reparados el mismo día', () => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// EL ALCANCE DECLARADO (21/09/2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
 test.describe('La tabla declara hasta dónde llega (21/09/2026)', () => {
   // El title prometía «Todos los Elementos» y la tabla trae 51 de los 118. Salió del barrido
   // de la palanca «promesa incumplida», no del Inspector: el Inspector mira lo que la app
@@ -417,5 +513,116 @@ test.describe('La tabla declara hasta dónde llega (21/09/2026)', () => {
     await expect(sinResultados).toBeVisible();
     await expect(sinResultados).toContainText('no está en');
     await expect(sinResultados).toContainText('esta tabla');
+  });
+
+  test('las cuatro cifras de alcance dicen 51, y en la tabla hay 51 fichas', async ({ page }) => {
+    // Contado en el dataset de app/tabla-valencias/page.tsx el 21/09/2026: 51 entradas en
+    // ELEMENTOS (H + 5 alcalinos + 5 alcalinotérreos + 5 del grupo 13 + 5 del 14 + 5 del 15 +
+    // 4 del 16 + 4 del 17 + 5 gases nobles + 12 metales de transición = 51). La cifra aparece
+    // en CUATRO sitios distintos y ninguno puede divergir del dataset sin mentirle al visitante:
+    // el contador y el párrafo de alcance la sacan de ELEMENTOS.length, pero la og:description
+    // y el JSON-LD están escritos a mano en metadata.ts y no lo sabrían si el dataset creciera.
+    await expect(fichas(page)).toHaveCount(51);
+    await expect(
+      page.locator('section[aria-label="Buscador de elementos"] [role="status"]'),
+    ).toHaveText('51 elementos en la tabla');
+    await expect(page.getByText(/No incluye lantánidos/)).toContainText('Están los 51 elementos');
+
+    const og = await page.locator('meta[property="og:description"]').getAttribute('content');
+    expect(og).toContain('51 elementos');
+
+    // La página sirve varios bloques JSON-LD (los del layout raíz y los dos de esta app), así
+    // que se buscan todos y se exige que ALGUNO lleve la cifra: fijar el índice ataría el test
+    // al orden en que Next los inyecta, que no es asunto de esta app.
+    const schemas = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(schemas.join('\n')).toContain('51 elementos químicos');
+  });
+
+  test('la tabla de iones poliatómicos trae las 26 entradas del dataset', async ({ page }) => {
+    // Contadas en IONES el 21/09/2026: 26, no las 20 que decía la cabecera de este fichero
+    // hasta hoy. La página no publica la cifra en ningún texto, así que aquí el candado es
+    // sobre el dataset: si alguien retira iones, esto lo dice.
+    const tabla = page.getByRole('region', { name: /Iones poliatómicos/ }).getByRole('table');
+    await expect(tabla.locator('tbody tr')).toHaveCount(26);
+    // Los dos extremos de la lista, que son los que se pierden si se corta por arriba o por abajo.
+    await expect(tabla).toContainText('Amonio');
+    await expect(tabla).toContainText('Borato');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS (21/09/2026) — con test.fail(): afirman lo que DEBERÍA pasar
+// ═══════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos del 21/09/2026', () => {
+  test('932 · Au(+3) + N(−3) devuelve AuN sin avisar de que no existe', async ({ page }) => {
+    test.fail();
+
+    // Au(+3) + N(−3) → mcd(3,3)=3 → subíndices 1 y 1 → AuN. El nitruro de oro no es un
+    // compuesto químico conocido, y el formulador lo devuelve como «mononitruro de oro /
+    // nitruro de oro(III) / nitruro áurico», sin ninguna señal.
+    //
+    // Es el TERCER caso literal del hallazgo 929 del 18/09 —los otros dos eran Kr₃N₂ y
+    // XeCl₈—, y la reparación solo cubrió los gases nobles. El comentario del código lo
+    // asume y dice que «de eso avisa la nota al pie del formulador»; comprobado en el
+    // navegador el 21/09/2026, la nota al pie habla de peróxidos, compuestos ternarios y
+    // sales de oxoácidos, y NO dice en ningún momento que el intercambio de valencias pueda
+    // producir compuestos que no existan. El aviso que la reparación da por existente no
+    // está en la página.
+    //
+    // Mismo mecanismo, otros dos ejemplos comprobados hoy: Au(+1)+N(−3) → Au₃N y
+    // Ag(+1)+C(−4) → Ag₄C (el carburo de plata real es el acetiluro Ag₂C₂), los dos mudos.
+    await page.selectOption('#elemento-positivo', 'Au');
+    await page.selectOption('#elemento-negativo', 'N');
+
+    await expect(formula(page)).toHaveText('AuN');
+    // Lo que debería ocurrir: o el resultado lleva su aviso, como con los gases nobles…
+    await expect(resultado(page)).toContainText('⚠️');
+  });
+
+  test('933 · el párrafo de alcance promete «los grupos principales completos» y faltan cinco', async ({
+    page,
+  }) => {
+    test.fail();
+
+    // El párrafo dice: «Están los 51 elementos que se formulan en secundaria y bachillerato:
+    // los grupos principales COMPLETOS y los metales de transición de uso corriente. No
+    // incluye lantánidos, actínidos ni transuránicos».
+    //
+    // Contado contra el dataset el 21/09/2026, de los grupos principales faltan CINCO
+    // elementos naturales: Rn (86, gas noble), At (85, halógeno), Po (84, anfígeno),
+    // Fr (87, alcalino) y Ra (88, alcalinotérreo). Ninguno es lantánido (57-71), ni actínido
+    // (89-103), ni transuránico (>92), que es lo único que el párrafo declara fuera.
+    //
+    // La consecuencia práctica es exactamente la que el cambio del 21/09 quería evitar, y
+    // agravada: quien busca «radón» —que en bachillerato aparece al hablar de radiactividad y
+    // de la calidad del aire— lee primero que los grupos principales están completos, luego no
+    // lo encuentra, y el mensaje de la búsqueda vacía le ofrece tres explicaciones que no le
+    // valen («un lantánido, un actínido o un metal de transición poco habitual»). Que te digan
+    // que algo está y no esté es peor que no que no te digan nada.
+    await buscar(page, 'radón');
+    await expect(fichas(page)).toHaveCount(0);
+    const sinResultados = page.getByText(/No hay ningún elemento que coincida/);
+    // Lo que debería ocurrir: que el mensaje cubra también por qué NO está el radón.
+    await expect(sinResultados).toContainText(/radiactiv|gas noble pesado|Rn/);
+  });
+
+  test('934 · la ficha del carbono ofrece «ácido carbonoso», que no es una sustancia real', async ({
+    page,
+  }) => {
+    test.fail();
+
+    // Residuo de la reparación del hallazgo 930: la plantilla fija «óxido X y cloruro X» se
+    // cambió por otra plantilla fija, «anhídrido X y ácido X», para los 13 no metales con raíz
+    // tradicional. Acierta en 12 de los 13 —bórico, silícico, nitroso/nítrico,
+    // fosforoso/fosfórico, arsenioso/arsénico, antimonioso/antimónico, sulfuroso/sulfúrico,
+    // selenioso/selénico, teluroso/telúrico y los cuatro oxácidos de cada halógeno son todos
+    // compuestos reales— y falla en el carbono con +2: «anhídrido carbonoso» sí es el CO en
+    // nomenclatura tradicional, pero el «ácido carbonoso» (H₂CO₂) que la plantilla deriva de
+    // él no es una sustancia que exista. Es el mismo defecto del 930 —un ejemplo generado por
+    // plantilla sin comprobar que el compuesto existe— reducido a un único caso.
+    const ficha = await abrirFicha(page, 'carbono');
+    await expect(ficha).toContainText('carbónico — por ejemplo, anhídrido carbónico y ácido carbónico');
+    await expect(ficha).not.toContainText('ácido carbonoso');
   });
 });
