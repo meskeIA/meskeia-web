@@ -2,9 +2,20 @@
 
 import { useState } from 'react';
 import styles from './ResidenciaVsCuidadoCasa.module.css';
-import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
-import { formatCurrency } from '@/lib';
+import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, DataReference, RegionBadge } from '@/components';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  SMI_2026,
+  FISCAL_SMI_META,
+  FISCAL_DEPENDENCIA_META,
+  FISCAL_EMPLEADOS_HOGAR_META,
+  PRESTACIONES_DEPENDENCIA_2025,
+  COTIZACION_EMPLEADOS_HOGAR_2026,
+  HORAS_JORNADA_COMPLETA_MES,
+  costeMinimoEmpleadorHogar,
+  personasParaCubrir,
+} from '@/data/fiscal';
 
 // ─── Tipos y datos ────────────────────────────────────────────────────────────
 
@@ -24,48 +35,77 @@ interface Opcion {
   costeMax: number;
   factores: FactorComparacion[];
   notaPublica?: string;
+  /** Qué cubre el importe, para no comparar 3 h de servicio con 24 h de plaza */
+  cobertura: string;
+  /** De dónde sale el suelo del rango */
+  origenCoste: string;
 }
+
+// ─── Referencias de MERCADO ──────────────────────────────────────────────────
+//
+// ⚠️ Estas cuatro cifras NO son datos normativos y no tienen sello: son horquillas de
+//    mercado. Viven juntas y aquí arriba porque el 21/09/2026 el Inspector encontró
+//    CUATRO rangos distintos para el coste de una residencia en la misma página —motor
+//    1.600-3.200, tabla 1.500-4.500, FAQ 2.000-4.500 y JSON-LD 1.500-4.000— y la única
+//    forma de que no vuelvan a divergir es que solo exista un sitio donde cambiarlas
+//    (hallazgo 1126).
+export const COSTES_MERCADO = {
+  /** Plaza en residencia privada, €/mes, todo incluido y 24 h */
+  residenciaMin: 1600,
+  residenciaMax: 3200,
+  /** Servicio de ayuda a domicilio privado de agencia, €/hora */
+  sadHoraMin: 18,
+  sadHoraMax: 22,
+  /** Días de servicio al mes que se usan en LOS DOS extremos del rango del SAD */
+  sadDiasMes: 26,
+  /** Sobre el suelo legal, cuánto más se paga de hecho a un cuidador contratado */
+  margenMercadoCuidador: 1.35,
+};
 
 // ─── Lógica ───────────────────────────────────────────────────────────────────
 
+/** Cuantía máxima estatal de una prestación de dependencia, o 0 si no hay grado. */
+function cuantiaPrestacion(grado: GradoDependencia, tipo: 'PEVS' | 'PECEF'): number {
+  const n = grado === 'grado1' ? 1 : grado === 'grado2' ? 2 : grado === 'grado3' ? 3 : 0;
+  if (n === 0) return 0;
+  return PRESTACIONES_DEPENDENCIA_2025.find(p => p.grado === n && p.tipo === tipo)?.cuantiaMaximaMensual ?? 0;
+}
+
 function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia): Opcion[] {
   // Residencia privada: coste relativamente fijo, varía por CCAA
-  const residenciaMin = 1600;
-  const residenciaMax = 3200;
+  const residenciaMin = COSTES_MERCADO.residenciaMin;
+  const residenciaMax = COSTES_MERCADO.residenciaMax;
 
-  // SAD privado: precio/hora × horas × días/mes (~22 laborables, pero SAD también en fines)
-  // Usamos 26 días de media para incluir fines de semana parciales
-  const precioHoraSAD = 18; // €/hora media nacional SAD privado de agencia
-  const costeSADMin = Math.round(horasDia * precioHoraSAD * 22);
-  const costeSADMax = Math.round(horasDia * 22 * 26);
+  // ⚠️ 2026-09-21 (hallazgo 1121): los dos extremos del rango del SAD no eran el mismo
+  //    escenario con distinto precio — el mínimo usaba 22 días y el máximo 26, de modo
+  //    que variaban a la vez precio y días trabajados y salía una horquilla del 44 %.
+  //    Ahora lo único que cambia entre extremos es el precio por hora.
+  const diasSAD = COSTES_MERCADO.sadDiasMes;
+  const costeSADMin = Math.round(horasDia * COSTES_MERCADO.sadHoraMin * diasSAD);
+  const costeSADMax = Math.round(horasDia * COSTES_MERCADO.sadHoraMax * diasSAD);
 
-  // Cuidador en casa: coste real = salario neto + SS empleador (~32%) + prorrata 14 pagas
-  // SMI 2025 = 1.134 €/mes (12 pagas) → coste total empleador ~1.750 €/mes en jornada completa
-  let cuidadorMin: number;
-  let cuidadorMax: number;
-  let cuidadorTipo: string;
+  // ⚠️ 2026-09-21 (hallazgos 1115 y 1120): el coste del cuidador venía de tres tramos con
+  //    importes planos, y el resultado no era ni monótono ni legal. Pedir MÁS cuidado
+  //    salía MÁS BARATO al cruzar las 8 h/día (1.750-2.200 € → 1.300-1.700 €), el tramo
+  //    rotulado «jornada completa» empezaba en 5 h, entre 9 y 24 h el importe era idéntico
+  //    —la app no distinguía 9 horas de cobertura continua de 24— y ese mínimo de 1.300 €
+  //    quedaba por debajo del SMI antes de cualquier cotización. Ahora el suelo sale del
+  //    SMI del hogar y de la cuota del empleador, los dos de data/fiscal, y crece con las
+  //    horas sin escalones.
+  const horasMes = horasDia * 30;
+  const personas = personasParaCubrir(horasMes);
+  const cuidadorMin = Math.round(costeMinimoEmpleadorHogar(horasMes, SMI_2026.hogarHora));
+  const cuidadorMax = Math.round(cuidadorMin * COSTES_MERCADO.margenMercadoCuidador);
+  const cuidadorTipo = personas > 1
+    ? `Cuidado en casa (${horasDia}h/día · ${personas} personas)`
+    : `Cuidado en casa (${horasDia}h/día)`;
 
-  if (horasDia <= 4) {
-    // €16-20/h efectivos (neto + cuota SS empleador proporcional)
-    cuidadorMin = Math.round(horasDia * 16 * 22);
-    cuidadorMax = Math.round(horasDia * 20 * 22);
-    cuidadorTipo = 'Auxiliar a tiempo parcial';
-  } else if (horasDia <= 8) {
-    // Jornada completa: SMI 2025 + SS empleador + prorrata pagas extras ≈ 1.750 € mínimo real
-    cuidadorMin = 1750;
-    cuidadorMax = 2200;
-    cuidadorTipo = 'Auxiliar a jornada completa';
-  } else {
-    // Interno: salario inferior por alojamiento incluido; coste total empleador 1.300-1.700 €
-    cuidadorMin = 1300;
-    cuidadorMax = 1700;
-    cuidadorTipo = 'Cuidador interno (incluye alojamiento)';
-  }
-
-  const tienePrestacion = gradoDependencia === 'grado2' || gradoDependencia === 'grado3';
-  const notaPublica = gradoDependencia !== 'no_valorado'
-    ? `Con ${gradoDependencia.replace('grado', 'Grado ')} reconocido, puedes acceder a prestaciones económicas y SAD público que reducen el coste real.`
-    : 'Sin valoración de dependencia, los costes son íntegramente privados. Valorar la dependencia desbloquea ayudas públicas.';
+  const tienePrestacion = gradoDependencia !== 'no_valorado';
+  const pevs = cuantiaPrestacion(gradoDependencia, 'PEVS');
+  const pecef = cuantiaPrestacion(gradoDependencia, 'PECEF');
+  const notaPublica = tienePrestacion
+    ? `Con ${gradoDependencia.replace('grado', 'Grado ')} reconocido puedes solicitar la prestación vinculada a servicio (hasta ${formatCurrency(pevs)}/mes) o, si cuida un familiar, la de cuidados en el entorno familiar (hasta ${formatCurrency(pecef)}/mes). Son cuantías MÁXIMAS estatales y el copago las reduce según tu capacidad económica.`
+    : 'Sin valoración de dependencia, los costes son íntegramente privados. Solicitar la valoración es lo que abre el acceso a las prestaciones y a los servicios del SAAD.';
 
   return [
     {
@@ -75,15 +115,22 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
       costeTexto: `${formatCurrency(residenciaMin)} – ${formatCurrency(residenciaMax)}/mes`,
       costeMin: residenciaMin,
       costeMax: residenciaMax,
+      cobertura: '24 h al día, todos los días, con alojamiento, manutención, suministros y atención sanitaria incluidos',
+      origenCoste: 'Horquilla de mercado, no un dato normativo. Varía mucho por comunidad autónoma y por centro.',
       factores: [
         { icono: '✅', texto: 'Atención 24 horas garantizada' },
         { icono: '✅', texto: 'Libera al cuidador familiar de la dedicación 24h' },
         { icono: '✅', texto: 'Socialización y actividades' },
         { icono: '✅', texto: 'Atención sanitaria integrada' },
-        { icono: '❌', texto: 'La persona abandona su hogar' },
-        { icono: '❌', texto: 'Coste más elevado' },
+        // «Abandona su hogar» valoraba moralmente una opción legítima y atribuía la acción
+        // a la persona cuidada (hallazgo 1122): es un hecho, no un reproche.
+        { icono: '❌', texto: 'Cambio de domicilio y de entorno habitual' },
+        { icono: '❌', texto: 'Coste mensual más alto en términos absolutos' },
         { icono: '⚠️', texto: 'Variabilidad de calidad entre centros' },
       ],
+      // Hallazgo 1124: la nota de ayudas se imprimía en SAD y cuidador y nunca aquí, pese
+      // a que la PEVS está pensada precisamente para pagar una plaza residencial privada.
+      notaPublica,
     },
     {
       id: 'sad',
@@ -92,10 +139,15 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
       costeTexto: `${formatCurrency(costeSADMin)} – ${formatCurrency(costeSADMax)}/mes`,
       costeMin: costeSADMin,
       costeMax: costeSADMax,
+      cobertura: `${formatNumber(horasDia, 1)} h al día, ${diasSAD} días al mes. El resto del tiempo lo cubre la familia.`,
+      origenCoste: `${formatCurrency(COSTES_MERCADO.sadHoraMin)}–${formatCurrency(COSTES_MERCADO.sadHoraMax)}/hora de agencia privada × ${formatNumber(horasDia, 1)} h × ${diasSAD} días. Lo único que cambia entre los dos extremos es el precio por hora.`,
       factores: [
         { icono: '✅', texto: 'Permanece en su hogar' },
         { icono: '✅', texto: 'Mayor autonomía y privacidad' },
         { icono: '✅', texto: 'Coste proporcional a las horas' },
+        // Hallazgo 1123: SERVICIOS_SAAD da acceso al SAD a los grados 1, 2 y 3, así que
+        // con Grado I esta línea decía «posible si se valora dependencia» justo encima de
+        // una nota que empezaba «Con Grado 1 reconocido…».
         { icono: tienePrestacion ? '✅' : '⚠️', texto: tienePrestacion ? 'SAD público disponible con tu grado' : 'SAD público posible si se valora dependencia' },
         { icono: '❌', texto: 'No cubre las horas fuera del servicio' },
         { icono: '⚠️', texto: 'Requiere apoyo familiar complementario' },
@@ -109,10 +161,16 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
       costeTexto: `${formatCurrency(cuidadorMin)} – ${formatCurrency(cuidadorMax)}/mes`,
       costeMin: cuidadorMin,
       costeMax: cuidadorMax,
+      cobertura: personas > 1
+        ? `${formatNumber(horasDia, 1)} h al día, todos los días. Son ${formatNumber(horasMes, 0)} h al mes: más de lo que una sola persona puede trabajar legalmente (${formatNumber(HORAS_JORNADA_COMPLETA_MES, 0)} h/mes), así que hacen falta ${personas} contratos.`
+        : `${formatNumber(horasDia, 1)} h al día, todos los días (${formatNumber(horasMes, 0)} h/mes). El resto del tiempo lo cubre la familia.`,
+      origenCoste: `Suelo legal: SMI del servicio del hogar (${formatCurrency(SMI_2026.hogarHora)}/hora) más el ${formatNumber(COTIZACION_EMPLEADOS_HOGAR_2026.contingenciasComunesEmpleador, 2)} % de contingencias comunes a cargo del empleador. No incluye accidentes de trabajo, desempleo ni FOGASA, así que el coste real es algo mayor.`,
       factores: [
         { icono: '✅', texto: 'Permanece en su hogar' },
         { icono: '✅', texto: 'Atención personalizada y continua' },
-        { icono: horasDia >= 8 ? '✅' : '⚠️', texto: horasDia >= 8 ? 'Cobertura amplia de horas' : 'Cobertura limitada a las horas contratadas' },
+        personas > 1
+          ? { icono: '⚠️', texto: `Una sola persona no puede cubrir ${formatNumber(horasDia, 1)} h diarias: hacen falta ${personas} contratos y coordinar turnos` }
+          : { icono: horasDia >= 8 ? '✅' : '⚠️', texto: horasDia >= 8 ? 'Cobertura amplia de horas' : 'Cobertura limitada a las horas contratadas' },
         { icono: '⚠️', texto: 'Responsabilidad como empleador (SS y contrato)' },
         { icono: '⚠️', texto: 'Gestión de sustituciones en vacaciones/bajas' },
         { icono: '❌', texto: 'Sin cobertura sanitaria integrada' },
@@ -132,9 +190,16 @@ export default function ResidenciaVsCuidadoCasa() {
 
   function comparar() {
     setError('');
-    const horas = parseFloat(horasDia.replace(',', '.'));
-    if (isNaN(horas) || horas < 1 || horas > 24) {
+    // ⚠️ 2026-09-21 (hallazgo 1119): `parseFloat(x.replace(',', '.'))` leía el millar
+    //    español como coma decimal, así que «1.500» (mil quinientas horas) se convertía en
+    //    1,5 y pasaba el rango. Encima el blur de NumberInput sí usa el parser canónico y
+    //    acota a 24: el mismo texto valía 24 h para el control y 1,5 h para el motor.
+    const horas = parseSpanishNumber(horasDia);
+    if (Number.isNaN(horas) || horas < 1 || horas > 24) {
       setError('Introduce las horas de cuidado al día (entre 1 y 24).');
+      // ⚠️ 2026-09-21 (hallazgo 1118): antes se volvía sin tocar `opciones`, así que el
+      //    aviso convivía con tres tarjetas de importes que correspondían a otra entrada.
+      setOpciones(null);
       return;
     }
     setOpciones(calcularOpciones(horas, gradoDependencia));
@@ -150,7 +215,7 @@ export default function ResidenciaVsCuidadoCasa() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">🏡</span>
         <h1 className={styles.title}>Residencia vs Cuidado en Casa</h1>
-        <p className={styles.subtitle}>Compara costes y factores de las opciones de cuidado para mayores · 2025</p>
+        <p className={styles.subtitle}>Compara costes y factores de las opciones de cuidado para mayores · {FISCAL_SMI_META.vigencia}</p>
       </header>
 
       <RegionBadge variant="es-only" />
@@ -161,12 +226,20 @@ export default function ResidenciaVsCuidadoCasa() {
       <DisclaimerCard variant="financial"
         severity="critical">
         <span>
-          Los costes son <strong>estimaciones orientativas</strong> con medias nacionales 2025. Los precios reales varían significativamente por comunidad autónoma, calidad del servicio y situación personal.
+          Los costes son <strong>estimaciones orientativas</strong>. El suelo del cuidado en casa sale del SMI y de la cotización del empleador; los precios de residencia y de agencia privada son horquillas de mercado que varían mucho por comunidad autónoma, calidad del servicio y situación personal.
           <br /><strong>No es</strong> asesoramiento financiero ni de servicios sociales personalizado.
           <br />Las prestaciones públicas de dependencia dependen del reconocimiento oficial del grado. Consulta con los Servicios Sociales de tu municipio.
           <br /><em>meskeIA no se responsabiliza de decisiones basadas en estas estimaciones.</em>
         </span>
       </DisclaimerCard>
+
+      <DataReference
+        normativa={`SMI y prestaciones de dependencia ${FISCAL_SMI_META.vigencia}`}
+        fuente={`${FISCAL_SMI_META.fuente} · ${FISCAL_EMPLEADOS_HOGAR_META.fuente} · ${FISCAL_DEPENDENCIA_META.fuente}`}
+        verificado={FISCAL_EMPLEADOS_HOGAR_META.verificado}
+        urlOficial={FISCAL_EMPLEADOS_HOGAR_META.urlOficial}
+        nota="Las cuantías de dependencia son máximos estatales antes del copago. Los precios de residencia y de agencia privada son horquillas de mercado, no datos normativos."
+      />
 
       <div className={styles.mainContent}>
         {/* Formulario */}
@@ -231,11 +304,19 @@ export default function ResidenciaVsCuidadoCasa() {
                     <span className={styles.opcionIcono} aria-hidden="true">{opcion.icono}</span>
                     <span className={styles.opcionNombre}>{opcion.nombre}</span>
                     {opcion.id === opcionMasBajaId && (
-                      <span className={styles.opcionBadge}>Más económica</span>
+                      <span className={styles.opcionBadge}>Menor coste mensual</span>
                     )}
                   </div>
 
                   <div className={styles.opcionCoste}>{opcion.costeTexto}</div>
+
+                  {/* ⚠️ 2026-09-21 (hallazgo 1125): las tres columnas no cubren lo mismo
+                      —3 h de servicio a domicilio frente a una plaza de 24 h con alojamiento
+                      y manutención— y la insignia premiaba al importe más bajo sin decirlo. */}
+                  <p className={styles.opcionCobertura}>
+                    <strong>Qué cubre:</strong> {opcion.cobertura}
+                  </p>
+                  <p className={styles.opcionOrigen}>{opcion.origenCoste}</p>
 
                   <div className={styles.factoresLista}>
                     {opcion.factores.map((f, i) => (
@@ -294,8 +375,8 @@ export default function ResidenciaVsCuidadoCasa() {
           <tbody>
             <tr>
               <td>Coste mensual</td>
-              <td>1.500-4.500 € (pública/privada)</td>
-              <td>800-3.000 € (SAD/cuidador)</td>
+              <td>{formatCurrency(COSTES_MERCADO.residenciaMin)}–{formatCurrency(COSTES_MERCADO.residenciaMax)} (privada, todo incluido)</td>
+              <td>Proporcional a las horas: solo el servicio de cuidado</td>
             </tr>
             <tr>
               <td>Atención médica 24h</td>
@@ -371,7 +452,7 @@ export default function ResidenciaVsCuidadoCasa() {
         <h3>Preguntas frecuentes: residencia vs cuidado en casa</h3>
         <div className={styles.faqItem}>
           <strong>¿Cuánto cuesta una residencia pública vs privada?</strong>
-          <p>La residencia pública cuesta entre 1.500-2.500 €/mes (con copago según renta). La privada, entre 2.000-4.500 € según calidad y ubicación. Las listas de espera en plazas públicas pueden ser de 1-3 años.</p>
+          <p>Una plaza privada ronda los {formatCurrency(COSTES_MERCADO.residenciaMin)}–{formatCurrency(COSTES_MERCADO.residenciaMax)}/mes según calidad y ubicación, con alojamiento, manutención y atención 24 h incluidos: es el mismo rango que usa la comparativa de arriba. En una plaza pública o concertada se paga un copago calculado sobre la capacidad económica, no el precio del centro. Las listas de espera en plazas públicas pueden ser de 1-3 años.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Qué es el SAD (Servicio de Atención Domiciliaria)?</strong>
@@ -383,7 +464,7 @@ export default function ResidenciaVsCuidadoCasa() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Puede la familia cobrar por cuidar a un familiar?</strong>
-          <p>Sí, a través de la prestación económica para cuidados en el entorno familiar del SAAD (hasta 387 €/mes para Grado III). El cuidador debe darse de alta en la SS.</p>
+          <p>Sí, a través de la prestación económica para cuidados en el entorno familiar del SAAD: hasta {formatCurrency(cuantiaPrestacion('grado1', 'PECEF'))}/mes con Grado I, {formatCurrency(cuantiaPrestacion('grado2', 'PECEF'))} con Grado II y {formatCurrency(cuantiaPrestacion('grado3', 'PECEF'))} con Grado III. Son máximos estatales antes del copago. El cuidador puede darse de alta en la Seguridad Social por convenio especial, cuya cuota abona íntegramente el Estado desde 2023.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿La residencia implica perder la pensión?</strong>

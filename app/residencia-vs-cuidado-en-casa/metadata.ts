@@ -1,4 +1,18 @@
 import { Metadata } from 'next';
+import { PRESTACIONES_DEPENDENCIA_2025 } from '@/data/fiscal';
+
+/**
+ * Las cuantías del FAQPage salen de @/data/fiscal, no tecleadas.
+ *
+ * ⚠️ 2026-09-21 (hallazgo 1116 del Inspector): estaban escritas a mano y ninguna
+ *    coincidía con el módulo —«entre 153 y 387 €/mes» frente a 153-449,77, y «para
+ *    residencia, hasta unos 1.500 €/mes en grado III» frente a los 833,96 de la PEVS—.
+ *    Es lo que leen buscadores y asistentes de IA para grounding.
+ */
+const pecef = (tipo: 'PEVS' | 'PECEF', grado: number): string => {
+  const p = PRESTACIONES_DEPENDENCIA_2025.find(x => x.grado === grado && x.tipo === tipo);
+  return (p?.cuantiaMaximaMensual ?? 0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
@@ -39,7 +53,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Compara los costes orientativos de residencia privada, servicio de ayuda a domicilio (SAD) y cuidador en casa para elegir la opción de cuidado más adecuada.",
   url: "https://meskeia.com/residencia-vs-cuidado-en-casa/",
   category: 'FinanceApplication',
-  features: [],
+  features: [
+    'Comparativa de tres opciones: residencia privada, ayuda a domicilio y cuidador contratado',
+    'Coste del cuidador anclado al SMI del servicio del hogar y a la cotización del empleador, no a una cifra plana',
+    'Aviso de cuántas personas hacen falta cuando las horas superan una jornada ordinaria',
+    'Cuantías de las prestaciones de dependencia por grado (PEVS y PECEF)',
+    'Qué cubre cada importe, para no comparar horas de servicio con una plaza de 24 horas',
+    'Factores no económicos de cada opción, con su origen declarado',
+  ],
 });
 
 export const faqJsonLd = {
@@ -75,7 +96,7 @@ export const faqJsonLd = {
       name: '¿Las ayudas por dependencia cubren el coste de la residencia o del cuidador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, parcialmente. El Sistema para la Autonomía y Atención a la Dependencia (SAAD) reconoce prestaciones según el grado (I, II o III). Para residencia, la prestación puede llegar a unos 1.500 €/mes en grado III; para cuidador profesional a domicilio, hasta ~800–900 €/mes. La prestación económica para cuidador familiar (PEC) oscila entre 153 y 387 €/mes según el grado, y se cobra directamente por cuidar en casa.',
+        text: `Sí, parcialmente. El Sistema para la Autonomía y Atención a la Dependencia (SAAD) reconoce prestaciones según el grado (I, II o III). La prestación vinculada a servicio, que sirve para pagar una plaza residencial privada o un servicio acreditado, llega hasta ${pecef('PEVS', 1)} €/mes en Grado I, ${pecef('PEVS', 2)} € en Grado II y ${pecef('PEVS', 3)} € en Grado III. La prestación económica para cuidados en el entorno familiar va de ${pecef('PECEF', 1)} a ${pecef('PECEF', 3)} €/mes según el grado, y se cobra por cuidar en casa. Todas son cuantías máximas estatales: el copago las reduce según la capacidad económica.`,
       },
     },
     {

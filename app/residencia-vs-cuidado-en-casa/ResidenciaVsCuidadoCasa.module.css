@@ -423,3 +423,19 @@
     padding: 0.5rem 0.6rem;
   }
 }
+
+/* ─── Qué cubre cada opción y de dónde sale su coste (hallazgo 1125) ───── */
+
+.opcionCobertura {
+  margin: 0.5rem 0 0.35rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.opcionOrigen {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
