@@ -104,13 +104,24 @@ const REQUISITOS: Requisito[] = [
    * iba con `bloqueante: false` y sin distintivo IMPRESCINDIBLE: a quien respondía «No» se le
    * decía «Cumples los requisitos obligatorios» y se le pintaba el panel entero con su ayuda
    * mensual. Es la forma exacta del hallazgo 686 (art. 136), reparado el 10/09, y el sentido
-   * del error vuelve a ser el malo para un dictamen de elegibilidad. La pregunta ya contempla
-   * el futuro («o lo estará»), así que un «No» significa que no lo estará.
+   * del error vuelve a ser el malo para un dictamen de elegibilidad. La pregunta contempla el
+   * futuro («o lo estará»), así que un «No» significa que no lo estará.
+   *
+   * ⚠️ 21/09/2026 (hallazgo 1168) — la PREGUNTA no se ajustó cuando el requisito pasó a
+   * bloquear, y preguntaba por el REGISTRO del contrato, que la propia explicación presenta
+   * como un añadido de cada comunidad autónoma. Quien tiene su contrato por escrito y la
+   * fianza depositada —es decir, quien cumple el art. 133.1.e— pero no lo tiene registrado
+   * respondía «No» con honestidad y recibía «No cumples los requisitos obligatorios», sin
+   * panel ni matiz. Es el defecto simétrico del 852: aquel aprobaba de más y este rechazaba
+   * de más, y en un dictamen de elegibilidad los dos sentidos del error importan. La pregunta
+   * pasa a ser la del artículo por el que se bloquea; el depósito o registro autonómico se
+   * dice donde corresponde, como lo que es: algo que puede pedir tu comunidad y que este
+   * simulador no comprueba.
    */
   {
     id: 'contrato',
-    pregunta: 'El contrato de arrendamiento está registrado (o lo estará)',
-    explicacion: 'El art. 133.1.e del RD 326/2026 exige que el contrato esté formalizado por escrito y la fianza depositada. Las CA pueden pedir además su depósito oficial.',
+    pregunta: 'El contrato está por escrito y la fianza depositada (o lo estará)',
+    explicacion: 'El art. 133.1.e del RD 326/2026 exige que el contrato esté formalizado por escrito y la fianza depositada: eso es lo que se comprueba aquí. Tu comunidad autónoma puede pedir además el depósito o registro oficial del contrato, que este simulador no verifica.',
     bloqueante: true,
   },
   // El requisito de renta NO se pregunta: la app tiene el importe tecleado y el límite del
@@ -202,7 +213,18 @@ export default function SimuladorBonoJovenAlquilerPage() {
   // (hallazgo 440).
   const alquilerCrudo = parseSpanishNumber(alquilMensual);
   /** Un negativo tecleado no es un campo vacío: hay que avisar, no pedir rellenarlo de nuevo (hallazgo 538) */
-  const alquilerInvalido = Number.isFinite(alquilerCrudo) && alquilerCrudo < 0;
+  const alquilerNegativo = Number.isFinite(alquilerCrudo) && alquilerCrudo < 0;
+  /**
+   * ⚠️ 21/09/2026 (hallazgo 1170) — y un texto ILEGIBLE tampoco es un campo vacío.
+   * `parseSpanishNumberOr` devuelve su 0 por defecto en todo lo que `parseSpanishNumber`
+   * RECHAZA («mil euros», «1e3», «12abc»), así que el dato ilegible y el campo en blanco
+   * eran indistinguibles para el motor y nada lo decía en pantalla: el veredicto pedía
+   * «Introdúcela aquí arriba» a quien la ve escrita en el campo. La asimetría era del
+   * propio código —el negativo SÍ se detectaba aparte y marcaba `aria-invalid`—, no de
+   * la norma.
+   */
+  const alquilerIlegible = alquilMensual.trim() !== '' && !Number.isFinite(alquilerCrudo);
+  const alquilerInvalido = alquilerNegativo || alquilerIlegible;
   const alquilerNum = Math.max(0, parseSpanishNumberOr(alquilMensual));
   const bonificacionMaxima = BONO[tipoVivienda];
   // El bono no puede superar el 60% de la renta mensual (RD 326/2026, art. 137)
@@ -333,7 +355,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
           </div>
           {alquilerInvalido ? (
             <p className={styles.errorText} id="alquiler-error" role="alert">
-              La renta no puede ser un importe negativo.
+              {alquilerNegativo
+                ? 'La renta no puede ser un importe negativo.'
+                : `«${alquilMensual.trim()}» no es un importe válido: escribe solo la cifra, con coma para los decimales (por ejemplo, 550 o 1.250,50).`}
             </p>
           ) : (
             <span className={styles.helperText}>Introduce lo que pagas actualmente o lo que pagarás</span>
@@ -511,10 +535,20 @@ export default function SimuladorBonoJovenAlquilerPage() {
                     de {formatCurrency(rentaMaxima)}/mes que da derecho a esta ayuda.{' '}
                   </>
                 )}
+                {/*
+                  ⚠️ 21/09/2026 (hallazgo 1169) — la coletilla «así que una renta más baja no
+                  bastaría por sí sola» se añadió para el caso de DOS causas y se imprimía
+                  SIEMPRE que fallaba un bloqueante: también con la renta dentro del tope, y
+                  también con el campo vacío, hablando entonces de rebajar un importe que el
+                  usuario no había introducido. Es el error del 854 al revés —aquel callaba una
+                  causa real y este sugería una que no existe—, y en los dos casos lo que falla
+                  es la acción que induce. Ahora solo sale cuando la renta ES la otra causa.
+                */}
                 {REQUISITOS.filter((r) => r.bloqueante).some((r) => estados[r.id] === 'no') && (
                   <>
                     {rentaDentroDelLimite === false ? 'Y además, hay' : 'Hay'} al menos un requisito
-                    imprescindible que no cumples, así que una renta más baja no bastaría por sí sola.{' '}
+                    imprescindible que no cumples
+                    {rentaDentroDelLimite === false ? ', así que una renta más baja no bastaría por sí sola' : ''}.{' '}
                   </>
                 )}
                 El Bono Joven al Alquiler no estaría disponible para tu situación actual.

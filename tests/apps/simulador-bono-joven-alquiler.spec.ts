@@ -1043,7 +1043,16 @@ test.describe('Regresión — hallazgos del 14/09/2026 (852-855), reparados el 1
     // ¿La app lo presenta como una exigencia del Real Decreto?
     const tarjetas = page.locator('[class*="checkCard"]');
     const contrato = norm(await tarjetas.nth(5).innerText());
-    expect(contrato).toContain('contrato de arrendamiento'); // la tarjeta esperada
+    /*
+      ⚠️ 21/09/2026 — esta aserción localizaba la tarjeta por «contrato de arrendamiento», que
+      era el enunciado de la pregunta ANTES del hallazgo 1168. Aquella pregunta iba del
+      REGISTRO del contrato —que la propia explicación presenta como un añadido de cada
+      comunidad autónoma— mientras bloqueaba por el art. 133.1.e, que exige otra cosa. Ahora
+      la pregunta es la del artículo, y la tarjeta se localiza por lo que no ha cambiado: que
+      es la del contrato.
+    */
+    expect(contrato).toContain('contrato'); // la tarjeta esperada
+    expect(contrato).toContain('fianza depositada');
     const loPresentaComoExigencia = /debe estar formalizado por escrito/i.test(contrato);
 
     // ¿Y qué hace el veredicto cuando se responde que NO lo está ni lo estará?
@@ -1298,15 +1307,16 @@ test.describe('Inspección 21/09/2026 — casos nuevos', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 21/09/2026 — marcados `test.fail()`
-// con lo que la app DEBERÍA hacer, igual que se hizo con 642-645, 686-688 y 852-855.
-// Al repararlos se les quita la marca y quedan como guardián de regresión.
+// REGRESIÓN — los tres hallazgos de la re-inspección del 21/09/2026 (1168, 1169 y 1170),
+// REPARADOS el 21/09. Se escribieron con `test.fail()` afirmando lo que la app DEBERÍA hacer,
+// igual que 642-645, 686-688 y 852-855; al repararlos se les quitó la marca sin tocar ninguna
+// aserción, así que lo que hoy pasa en verde es exactamente lo que ayer fallaba en rojo.
 //
 // Los tres son de la misma familia: la reparación del 15/09 endureció el dictamen y el
 // texto que lo acompaña no se ajustó en el sentido contrario.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 21/09/2026', () => {
+test.describe('Regresión — hallazgos 1168, 1169 y 1170 del 21/09/2026', () => {
   // H8 (MEDIO) — la pregunta que ahora BLOQUEA no es la del artículo que ella misma cita.
   //
   // Al reparar el 852 el requisito del contrato pasó a `bloqueante: true` con distintivo
@@ -1327,7 +1337,6 @@ test.describe('Hallazgos abiertos — 21/09/2026', () => {
   // (preguntar por el contrato escrito y la fianza depositada), devolver el requisito a no
   // bloqueante, o dejar de presentar el registro como un añadido de las CA.
   test('H8 — el requisito que bloquea por el art. 133.1.e debería preguntar por lo que ese artículo exige', async ({ page }) => {
-    test.fail(); // hallazgo VIVO 21/09/2026: la pregunta bloqueante va del registro, no del art. 133.1.e
     await abrirHidratado(page);
     const tarjeta = page.locator('[class*="checkCard"]').nth(5);
     const pregunta = norm(await tarjeta.locator('[class*="checkPregunta"]').innerText());
@@ -1362,7 +1371,6 @@ test.describe('Hallazgos abiertos — 21/09/2026', () => {
   // 854 al revés (aquel callaba una causa, este insinúa una que no existe), y el sentido es
   // el mismo que la app quiere evitar — que el lector deduzca una acción equivocada.
   test('H9 — con la renta dentro del tope el rechazo no debería especular con una renta más baja', async ({ page }) => {
-    test.fail(); // hallazgo VIVO 21/09/2026: la coletilla del 854 se imprime también sin segunda causa
     await abrirHidratado(page);
     await page.getByRole('button', { name: /Vivienda completa/ }).click();
     // 600 ≤ 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e): la renta NO es el problema
@@ -1390,7 +1398,6 @@ test.describe('Hallazgos abiertos — 21/09/2026', () => {
   // el campo: no sabrá que lo que tecleó no vale, y la asimetría con el negativo es del propio
   // código, no de la norma.
   test('H10 — una renta que el parser rechaza debería señalarse, no confundirse con el campo vacío', async ({ page }) => {
-    test.fail(); // hallazgo VIVO 21/09/2026: `parseSpanishNumberOr` convierte lo ilegible en 0 sin avisar
     await abrirHidratado(page);
     await page.getByRole('button', { name: /Vivienda completa/ }).click();
     // `parseSpanishNumber('mil euros')` = NaN → `parseSpanishNumberOr` lo convierte en 0
