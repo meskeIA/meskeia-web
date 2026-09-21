@@ -38,8 +38,15 @@ export const jsonLd = generateWebAppSchema({
   name: "Chequeos Médicos Preventivos",
   description: "Descubre qué revisiones médicas preventivas te corresponden según tu edad y sexo. Basado en las recomendaciones del Ministerio de Sanidad y la SEMFyC.",
   url: "https://meskeia.com/planificador-chequeos-medicos/",
-  category: 'FinanceApplication',
-  features: [],
+  category: 'HealthApplication',
+  features: [
+    'Revisiones filtradas por la edad exacta, no por tramos',
+    'Los tres cribados poblacionales del SNS con su rango real: mama 50-69, colorrectal 50-69 y cérvix 25-65',
+    'Distinción explícita entre cribado poblacional y prueba que se valora caso por caso, como el PSA',
+    'Aviso permanente de los síntomas que no deben esperar a la próxima revisión',
+    'Lista de control para marcar qué revisiones tienes al día',
+    'Fuente citada en cada revisión (Ministerio de Sanidad, SEMFyC y sociedades científicas)',
+  ],
 });
 
 export const faqJsonLd = {

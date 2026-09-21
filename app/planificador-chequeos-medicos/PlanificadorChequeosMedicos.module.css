@@ -55,6 +55,57 @@
   flex-wrap: wrap;
 }
 
+/* La ayuda ocupa su propia línea debajo del control, sin romper la fila de arriba. */
+.filtroAyuda {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.edadInput {
+  width: 15rem;
+  max-width: 100%;
+  padding: 0.45rem 0.8rem;
+  border: 2px solid var(--border, #ddd);
+  border-radius: 8px;
+  background: var(--bg-card, #fff);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+.edadInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.avisoEdad {
+  flex-basis: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #e57373;
+  background: #fdecea;
+  color: #8e2a20;
+  font-size: 0.87rem;
+  line-height: 1.45;
+}
+[data-theme='dark'] .avisoEdad {
+  border-color: #b3564c;
+  background: rgba(229, 115, 115, 0.12);
+  color: #f2b8b2;
+}
+
+.tablaNota {
+  margin: 0.6rem 0 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .filtroLabel {
   font-size: 0.85rem;
   font-weight: 600;
@@ -522,8 +573,8 @@
 [data-theme='dark'] .warningBox { background: #332b00; border-color: #aa8800; }
 .warningHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
 .warningIcon { font-size: 1.4rem; }
-.warningHeader h3 { margin: 0; font-size: 1rem; color: #856404; }
-[data-theme='dark'] .warningHeader h3 { color: #ffc107; }
+.warningHeader h3, .warningHeader h2 { margin: 0; font-size: 1rem; color: #856404; }
+[data-theme='dark'] .warningHeader h3, [data-theme='dark'] .warningHeader h2 { color: #ffc107; }
 .warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
 .warningList li { font-size: 0.88rem; color: #856404; padding-left: 1.25rem; position: relative; }
 [data-theme='dark'] .warningList li { color: #ffd966; }

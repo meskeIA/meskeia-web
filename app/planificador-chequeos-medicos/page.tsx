@@ -6,11 +6,11 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { parseSpanishNumber } from '@/lib';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
-type GrupoEdad = '18-39' | '40-49' | '50-64' | '65+';
-type Sexo = 'todos' | 'hombre' | 'mujer';
+type Sexo = 'hombre' | 'mujer';
 type AplicaA = 'todos' | 'hombre' | 'mujer';
 type CategoriaChequeo = 'general' | 'cardiovascular' | 'oncologico' | 'sensorial' | 'oseo' | 'preventivo';
 
@@ -167,9 +167,9 @@ const CHEQUEOS: Chequeo[] = [
     categoria: 'oncologico',
     frecuencia: 'Cada 2 años',
     aplicaA: 'mujer',
-    edadDesde: 45,
+    edadDesde: 50,
     edadHasta: 69,
-    nota: 'Incluida en el Programa de Cribado de Cáncer de Mama del SNS.',
+    nota: 'El Programa de Cribado de Cáncer de Mama del SNS cita a las mujeres de 50 a 69 años (cartera común, Orden SSI/2065/2014). Algunas comunidades han empezado a invitar desde los 45: consúltalo en la tuya.',
     fuente: 'Ministerio de Sanidad',
   },
   {
@@ -181,22 +181,22 @@ const CHEQUEOS: Chequeo[] = [
     frecuencia: 'Cada 2 años',
     aplicaA: 'todos',
     edadDesde: 50,
-    edadHasta: 74,
-    nota: 'Incluido en el Programa de Cribado de Cáncer Colorrectal del SNS.',
+    edadHasta: 69,
+    nota: 'El Programa de Cribado de Cáncer Colorrectal del SNS cita a hombres y mujeres de 50 a 69 años (cartera común, Orden SSI/2065/2014). Pasados los 69 la decisión se individualiza con tu médico.',
     fuente: 'Ministerio de Sanidad',
   },
   {
     id: 'prostata',
-    nombre: 'Revisión de próstata',
-    descripcion: 'Valoración de síntomas urinarios y, si el médico lo indica, PSA en sangre.',
+    nombre: 'Próstata: NO hay cribado poblacional',
+    descripcion: 'Valoración de síntomas urinarios cuando aparecen. El PSA no es una prueba de cribado sistemático.',
     icono: '🩺',
     categoria: 'oncologico',
     aplicaA: 'hombre',
-    frecuencia: 'Según criterio médico',
+    frecuencia: 'Solo si hay síntomas o lo indica tu médico',
     edadDesde: 50,
     edadHasta: 150,
-    nota: 'Consulta a tu médico. El cribado con PSA es controvertido y debe valorarse individualmente.',
-    fuente: 'EAU / SEF',
+    nota: 'El PAPPS/semFYC recomienda EN CONTRA de ofrecer el PSA de forma sistemática a varones sin síntomas: detecta tumores que nunca habrían dado problemas y lleva a biopsias y tratamientos con efectos adversos. No forma parte de los programas de cribado del SNS. Si tienes síntomas urinarios o antecedentes familiares, coméntalo con tu médico.',
+    fuente: 'PAPPS-semFYC / AEU',
   },
   // ── ÓSEO ─────────────────────────────────────────────────────────────────
   {
@@ -251,30 +251,34 @@ const CATEGORIA_CONFIG: Record<CategoriaChequeo, { nombre: string; icono: string
   preventivo:    { nombre: 'Preventivo',        icono: '💉' },
 };
 
-// Edad representativa de cada grupo para filtrar
-const EDAD_REPR: Record<GrupoEdad, number> = {
-  '18-39': 30,
-  '40-49': 45,
-  '50-64': 55,
-  '65+':   70,
-};
-
-const GRUPOS_EDAD: GrupoEdad[] = ['18-39', '40-49', '50-64', '65+'];
+const EDAD_MINIMA = 18;
+const EDAD_MAXIMA = 110;
 
 // ─── Lógica de filtrado ───────────────────────────────────────────────────────
 
-function filtrarChequeos(
-  chequeos: Chequeo[],
-  grupo: GrupoEdad,
-  sexo: Sexo,
-): Chequeo[] {
-  const edad = EDAD_REPR[grupo];
+/**
+ * ⚠️ 2026-09-21 (hallazgos 1141, 1142 y 1145 del Inspector): esto filtraba por TRAMOS
+ *    («18-39», «40-49», «50-64», «65+») y cada tramo se evaluaba con una edad
+ *    representativa fija, su punto medio. Las consecuencias iban en los dos sentidos y
+ *    sobre cribados poblacionales:
+ *
+ *      · El tramo abierto «65+» valía siempre 70, así que a una mujer de 66 —de lleno
+ *        en el programa de mama— no se le ofrecía la mamografía, y a una de 65 no se le
+ *        ofrecía la citología en su último año de programa. Falsos negativos, y la app
+ *        no daba ninguna forma de expresar esa edad.
+ *      · «40-49» valía 45, así que a los 40 se ofrecían mamografía y control de glucosa
+ *        que el propio catálogo arranca a los 45; y a los 75, 85 o 95 se seguía ofreciendo
+ *        la sangre oculta en heces como programa del SNS.
+ *
+ *    El h1 promete «qué revisiones te corresponden según tu edad», así que la edad se
+ *    pregunta y se usa tal cual. La misma razón vale para el sexo: «Sin especificar»
+ *    dejaba pasar TODO lo exclusivo de un sexo y ponía en pantalla a la vez una tarjeta
+ *    «Solo mujeres» y otra «Solo hombres».
+ */
+function filtrarChequeos(chequeos: Chequeo[], edad: number, sexo: Sexo): Chequeo[] {
   return chequeos.filter(c => {
     const edadOk = edad >= c.edadDesde && edad <= c.edadHasta;
-    const sexoOk =
-      c.aplicaA === 'todos' ||
-      sexo === 'todos' ||
-      c.aplicaA === sexo;
+    const sexoOk = c.aplicaA === 'todos' || c.aplicaA === sexo;
     return edadOk && sexoOk;
   });
 }
@@ -333,13 +337,23 @@ function TarjetaChequeo({ chequeo, alDia, onToggle }: TarjetaChequeoProps) {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function PlanificadorChequeosMedicos() {
-  const [grupoEdad, setGrupoEdad] = useState<GrupoEdad>('40-49');
-  const [sexo, setSexo] = useState<Sexo>('todos');
+  // Arranca VACÍO: la app no contesta hasta que le preguntan (hallazgo 1145).
+  const [edadTexto, setEdadTexto] = useState('');
+  const [sexo, setSexo] = useState<Sexo | null>(null);
   const [checkados, setCheckados] = useState<Set<string>>(new Set());
 
+  const edad = useMemo(() => {
+    const n = parseSpanishNumber(edadTexto);
+    if (Number.isNaN(n) || n < EDAD_MINIMA || n > EDAD_MAXIMA) return null;
+    return Math.floor(n);
+  }, [edadTexto]);
+
+  const perfilCompleto = edad !== null && sexo !== null;
+  const edadInvalida = edadTexto.trim() !== '' && edad === null;
+
   const chequeosAplicables = useMemo(
-    () => filtrarChequeos(CHEQUEOS, grupoEdad, sexo),
-    [grupoEdad, sexo],
+    () => (perfilCompleto ? filtrarChequeos(CHEQUEOS, edad, sexo) : []),
+    [perfilCompleto, edad, sexo],
   );
 
   const totalAlDia = chequeosAplicables.filter(c => checkados.has(c.id)).length;
@@ -395,29 +409,48 @@ export default function PlanificadorChequeosMedicos() {
         </DisclaimerCard>
       </div>
 
+      {/* Síntomas de alarma — FUERA del bloque colapsable: una advertencia de salud no
+          es maquetación, y en una app cuyo mensaje es «espera a tu próxima revisión» la
+          lista de lo que NO debe esperar es la pieza que más necesita verse (hallazgo 1146). */}
+      <div className={styles.warningBox} role="note">
+        <div className={styles.warningHeader}>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+          <h2>Síntomas que no deben esperar a la próxima revisión</h2>
+        </div>
+        <ul className={styles.warningList}>
+          <li>Dolor torácico, dificultad para respirar o palpitaciones irregulares → urgencias</li>
+          <li>Pérdida de peso involuntaria mayor al 5% en 6 meses sin causa conocida</li>
+          <li>Sangrado rectal, urinario o vaginal no esperado</li>
+          <li>Bulto o nódulo nuevo en mama, testículo, cuello o axila</li>
+          <li>Cambio en lunares (tamaño, color, bordes irregulares) → dermatología</li>
+          <li>Tos persistente más de 3 semanas, especialmente con sangre o en fumadores</li>
+        </ul>
+      </div>
+
       {/* Filtros */}
       <div className={styles.filtrosCard}>
         <div className={styles.filtroGrupo}>
-          <span className={styles.filtroLabel}>Tu grupo de edad:</span>
-          <div className={styles.filtroOpciones} role="group" aria-label="Grupo de edad">
-            {GRUPOS_EDAD.map(g => (
-              <button
-                key={g}
-                type="button"
-                className={`${styles.filtroBtn} ${grupoEdad === g ? styles.filtroBtnActivo : ''}`}
-                onClick={() => setGrupoEdad(g)}
-                aria-pressed={grupoEdad === g}
-              >
-                {g} años
-              </button>
-            ))}
-          </div>
+          <label className={styles.filtroLabel} htmlFor="edad">Tu edad:</label>
+          <input
+            id="edad"
+            type="text"
+            inputMode="numeric"
+            className={styles.edadInput}
+            placeholder={`Ej: 66 (entre ${EDAD_MINIMA} y ${EDAD_MAXIMA})`}
+            value={edadTexto}
+            onChange={e => setEdadTexto(e.target.value)}
+            aria-describedby="edad-ayuda"
+          />
+          <p id="edad-ayuda" className={styles.filtroAyuda}>
+            La edad exacta, no un tramo: los programas de cribado empiezan y terminan en
+            un año concreto.
+          </p>
         </div>
 
         <div className={styles.filtroGrupo}>
           <span className={styles.filtroLabel}>Sexo biológico:</span>
           <div className={styles.filtroOpciones} role="group" aria-label="Sexo biológico">
-            {([['todos', 'Sin especificar'], ['mujer', '♀ Mujer'], ['hombre', '♂ Hombre']] as [Sexo, string][]).map(([val, label]) => (
+            {([['mujer', '♀ Mujer'], ['hombre', '♂ Hombre']] as [Sexo, string][]).map(([val, label]) => (
               <button
                 key={val}
                 type="button"
@@ -429,15 +462,39 @@ export default function PlanificadorChequeosMedicos() {
               </button>
             ))}
           </div>
+          <p className={styles.filtroAyuda}>
+            Hace falta para saber si te corresponden la mamografía, la citología o la
+            densitometría, que son distintas según el sexo.
+          </p>
         </div>
+
+        {edadInvalida && (
+          <div role="alert" aria-live="polite" className={styles.avisoEdad}>
+            <span aria-hidden="true">⚠️</span> Escribe una edad entre {EDAD_MINIMA} y {EDAD_MAXIMA} años.
+            Esta guía cubre revisiones de personas adultas.
+          </div>
+        )}
       </div>
 
       {/* Resumen / progreso */}
+      {!perfilCompleto ? (
+        <div className={styles.resumen} role="status">
+          <div className={styles.resumenTexto}>
+            Escribe tu edad y elige el sexo biológico para ver qué revisiones te
+            corresponden. Sin esos dos datos no hay nada que contar: los cribados
+            del SNS dependen precisamente de ellos.
+          </div>
+        </div>
+      ) : (
       <div className={styles.resumen}>
         <div className={styles.resumenTexto}>
-          <strong>{totalAplicables}</strong> revisiones aplicables a tu perfil
+          <strong>{totalAplicables}</strong>{' '}
+          {totalAplicables === 1 ? 'revisión aplicable' : 'revisiones aplicables'} a los {edad} años
           {totalAlDia > 0 && (
-            <span className={styles.resumenAlDia}> · <strong>{totalAlDia}</strong> marcadas como al día</span>
+            <span className={styles.resumenAlDia}>
+              {' · '}<strong>{totalAlDia}</strong>{' '}
+              {totalAlDia === 1 ? 'marcada' : 'marcadas'} como al día
+            </span>
           )}
         </div>
         {totalAlDia > 0 && (
@@ -451,11 +508,16 @@ export default function PlanificadorChequeosMedicos() {
           </p>
         )}
       </div>
+      )}
 
       {/* Listado por categorías */}
       <div className={styles.listado}>
-        {porCategoria.size === 0 ? (
-          <p className={styles.sinResultados}>No hay revisiones para el perfil seleccionado.</p>
+        {!perfilCompleto ? null : porCategoria.size === 0 ? (
+          <p className={styles.sinResultados}>
+            Con los datos indicados no queda ninguna revisión de esta guía. No significa que
+            no haya nada que hacer: a partir de cierta edad las decisiones se individualizan
+            con el médico de cabecera en vez de seguir un programa por edad.
+          </p>
         ) : (
           Array.from(porCategoria.entries()).map(([cat, chequeos]) => {
             const catConfig = CATEGORIA_CONFIG[cat];
@@ -501,36 +563,44 @@ export default function PlanificadorChequeosMedicos() {
               <tr>
                 <td>18-39 años</td>
                 <td>Tensión arterial, IMC, colesterol, salud sexual</td>
-                <td>Citología/VPH (mujeres 25+)</td>
+                <td>Cérvix: citología/VPH en mujeres de 25 a 65</td>
                 <td>Cada 1-3 años</td>
               </tr>
               <tr>
                 <td>40-49 años</td>
-                <td>Glucemia en ayunas, ECG, visión/audición</td>
-                <td>Mamografía (mujeres 45+), citología</td>
+                <td>Glucemia en ayunas (desde los 45), tensión ocular, visión/audición</td>
+                <td>Cérvix (25-65). La mamografía aún no: el programa empieza a los 50</td>
                 <td>Cada 1-2 años</td>
               </tr>
               <tr>
                 <td>50-64 años</td>
-                <td>Densitometría ósea, colonoscopia/SOH, PSA (hombres)</td>
-                <td>Cáncer colorrectal (50-74), mama (50-69)</td>
-                <td>Anual o según riesgo</td>
+                <td>Densitometría si hay factores de riesgo, control de glucosa</td>
+                <td>Mama (50-69) · colorrectal (50-69) · cérvix hasta los 65</td>
+                <td>Cada 2 años los tres cribados</td>
               </tr>
               <tr>
-                <td>65-74 años</td>
-                <td>Deterioro cognitivo, caídas, audición, función renal</td>
-                <td>Colorrectal hasta 74, mamografía hasta 70</td>
-                <td>Anual</td>
+                <td>65-69 años</td>
+                <td>Deterioro cognitivo, caídas, audición, función renal, densitometría</td>
+                <td>Mama y colorrectal hasta los 69, último año de programa</td>
+                <td>Anual la revisión; cada 2 años los cribados</td>
               </tr>
               <tr>
-                <td>75+ años</td>
+                <td>70+ años</td>
                 <td>Valoración geriátrica integral, polifarmacia, visión</td>
-                <td>Individualizado por médico</td>
+                <td>Fuera de los tres programas: se individualiza con el médico</td>
                 <td>Según estado de salud</td>
               </tr>
             </tbody>
           </table>
         </div>
+        <p className={styles.tablaNota}>
+          Los tres cribados poblacionales del SNS son mama (mujeres de 50 a 69),
+          colorrectal (50 a 69, ambos sexos) y cérvix (mujeres de 25 a 65), según la
+          cartera común de servicios (RD 1030/2006, en la redacción de la Orden
+          SSI/2065/2014). Son los únicos que llegan por carta de citación. El PSA de
+          próstata <strong>no</strong> es uno de ellos: el PAPPS/semFYC recomienda en
+          contra de ofrecerlo sistemáticamente a varones sin síntomas.
+        </p>
 
         {/* Casos de uso */}
         <h2>Casos reales de prevención efectiva</h2>
@@ -559,7 +629,7 @@ export default function PlanificadorChequeosMedicos() {
               <h3>Hombre 68 años, fumador ex</h3>
               <span className={styles.casoTag}>Respiratorio</span>
             </div>
-            <p>Antonio, exfumador de 40 paquetes-año, se apunta al cribado de cáncer de pulmón por TC de baja dosis disponible en su comunidad. Espirometría revela EPOC moderada no diagnosticada.</p>
+            <p>Antonio, exfumador de 40 paquetes-año, consulta por tos persistente. La espirometría revela una EPOC moderada no diagnosticada. Pregunta por el cribado de cáncer de pulmón con TC de baja dosis y su médico le explica que <strong>en España no es un programa poblacional</strong>: solo existen proyectos piloto, y fuera de ellos se valora caso por caso.</p>
             <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Tratamiento precoz frena el deterioro</p>
           </div>
           <div className={styles.casoCard}>
@@ -686,21 +756,6 @@ export default function PlanificadorChequeosMedicos() {
           </div>
         </div>
 
-        {/* Warning Box */}
-        <div className={styles.warningBox}>
-          <div className={styles.warningHeader}>
-            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
-            <h3>Síntomas que no deben esperar a la próxima revisión</h3>
-          </div>
-          <ul className={styles.warningList}>
-            <li>Dolor torácico, dificultad para respirar o palpitaciones irregulares → urgencias</li>
-            <li>Pérdida de peso involuntaria mayor al 5% en 6 meses sin causa conocida</li>
-            <li>Sangrado rectal, urinario o vaginal no esperado</li>
-            <li>Bulto o nódulo nuevo en mama, testículo, cuello o axila</li>
-            <li>Cambio en lunares (tamaño, color, bordes irregulares) → dermatología</li>
-            <li>Tos persistente más de 3 semanas, especialmente con sangre o en fumadores</li>
-          </ul>
-        </div>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('planificador-chequeos-medicos')} />

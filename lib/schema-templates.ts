@@ -47,7 +47,13 @@ export interface BaseAppConfig {
   description: string;
   url: string;
   features: string[];
-  category?: 'UtilityApplication' | 'BusinessApplication' | 'FinanceApplication' | 'EducationalApplication';
+  /**
+   * `HealthApplication` se añadió el 21/09/2026 (hallazgo 1150 del Inspector): una app de
+   * medicina preventiva declaraba `FinanceApplication` porque no había ninguna categoría de
+   * salud entre las cuatro, y es un valor que Schema.org define. La categoría es lo que leen
+   * los asistentes de IA para decidir de qué trata la página.
+   */
+  category?: 'UtilityApplication' | 'BusinessApplication' | 'FinanceApplication' | 'EducationalApplication' | 'HealthApplication';
   keywords?: string[];
 }
 
