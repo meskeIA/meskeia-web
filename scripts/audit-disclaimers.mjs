@@ -60,6 +60,11 @@ const NIVEL_MANUAL = {
   'calculadora-combustible':    3,  // calculadora de coste de combustible
   'calculadora-gasto-energetico': 3, // estimador gasto energético doméstico
   'planificador-mudanzas':      3,  // planificador/checklist de mudanza
+  // El riesgo NO es el de su suite: no se decide una inversión, se decide cuántos gramos de
+  // hipoclorito echar a un agua donde se bañan personas. El Inspector le retiró el aviso
+  // financiero el 18/09/2026 (503ddb65) porque apuntaba a un riesgo que la app no tiene y
+  // callaba el que sí, y lo sustituyó por uno químico propio: nivel 2 ALTO, no colapsable.
+  'calculadora-piscinas':       2,  // dosis de cloro/pH/alguicida — riesgo químico, no financiero
   // Herramientas financieras informativas (sin asesoramiento)
   'calculadora-suscripciones':  3,  // seguimiento de suscripciones personales
   'conversor-divisas':          3,  // conversor con tipos BCE (orientativo)
