@@ -637,3 +637,208 @@ test.describe('Los 3 hallazgos del 21/09/2026, reparados el mismo día', () => {
     await expect(ficha).not.toContainText('y ácido carbonoso');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FICHA DE BÚSQUEDA PARA EL AULA · 21/09/2026
+// ═══════════════════════════════════════════════════════════════════════════════
+
+import {
+  CASOS as FICHAS,
+  TOTAL_CASOS as TOTAL_FICHAS,
+  resolverCaso as resolverFicha,
+  normalizarRespuesta,
+  comprobarRespuesta as comprobarFicha,
+  generarPreguntaAleatoria,
+} from '../../app/tabla-valencias/casos';
+import { ELEMENTOS, IONES } from '../../app/tabla-valencias/datos';
+
+/**
+ * Ficha de búsqueda de aula — invariantes de la sistemática `/casos-aula-meskeia`, tipo B.
+ *
+ * Esta app es una TABLA DE CONSULTA, no una calculadora: la tarea no es resolver sino
+ * LOCALIZAR, así que las respuestas son texto y no hay tolerancia numérica. Lo que sustituye
+ * a la tolerancia es la normalización (minúsculas, tildes fuera, espacios colapsados) más una
+ * lista de sinónimos declarada caso a caso.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO DE ESTE BLOQUE
+ * Comprobado contra la química, no contra lo que devuelve la app:
+ *
+ *   · Z = 26 es el hierro, Fe.
+ *   · El azufre está en el grupo 16 (anfígenos), bajo el oxígeno.
+ *   · El aluminio tiene valencia 3 (sin signo) y actúa siempre con número de oxidación +3.
+ *   · El cobre actúa más a menudo con +2 (Cu(II)), aunque también exista +1.
+ *   · El hierro con +3 es «férrico» en nomenclatura tradicional (con +2 sería «ferroso»).
+ *   · NO₂⁻ es el nitrito; NO₃⁻ sería el nitrato.
+ *   · El flúor es el único halógeno con un solo número de oxidación, −1, por ser el elemento
+ *     más electronegativo: nunca actúa como positivo.
+ *   · El fosfato PO₄³⁻ tiene carga −3.
+ *   · En el sulfato SO₄²⁻ el azufre actúa con +6: 4 oxígenos a −2 suman −8, y −8 + 6 = −2,
+ *     que es la carga del ion.
+ *   · En el peróxido de hidrógeno H₂O₂ el oxígeno actúa con −1, no con el −2 habitual: es la
+ *     excepción que hace que sea un peróxido.
+ *
+ * EL CONVENIO QUE SE BLINDA AQUÍ es que **valencia ≠ número de oxidación**: la valencia es la
+ * capacidad de combinación y va SIN signo; el número de oxidación va CON signo. Los casos 3 y
+ * 4 piden uno y otro a propósito, y el signo NO es una grafía alternativa: quien escribe «2»
+ * donde la respuesta es «−2» no ha acertado con otra ortografía, ha dado otro dato.
+ */
+
+/**
+ * Público mayoritariamente mexicano y colombiano: ningún enunciado se ancla a un país.
+ *
+ * ⚠️ «Valencia» NO entra en esta lista aunque sea una ciudad: es el término central de la app
+ * y aparece en casi todos los enunciados. Meterla haría fallar el test por su propio tema, y
+ * la salida sería relajar la regla, que es peor que no tenerla.
+ */
+const PAISES_Y_CIUDADES =
+  /\b(España|Espa(ñ|n)ol|M(é|e)xico|Mexicano|Colombia|Argentina|Chile|Per(ú|u)|Venezuela|Uruguay|Bolivia|Paraguay|Guatemala|Cuba|Madrid|Barcelona|Sevilla|Bogot(á|a)|Buenos Aires|Caracas|Montevideo|Quito|La Habana|Par(í|i)s|Londres|Nueva York|Estados Unidos|Francia|Italia|Roma|Alemania|Berl(í|i)n|Portugal|Lisboa)\b/i;
+
+test.describe('Tabla de Valencias · ficha de búsqueda para el aula', () => {
+  test('1 · hay exactamente 12 preguntas, con ids 1..12 sin huecos', () => {
+    expect(TOTAL_FICHAS).toBe(12);
+    expect(FICHAS).toHaveLength(12);
+    expect(FICHAS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan el mismo enunciado y la misma respuesta', () => {
+    const primera = FICHAS.map((c) => `${c.id}|${c.enunciado}|${c.respuesta}`);
+    const segunda = FICHAS.map((c) => `${c.id}|${c.enunciado}|${c.respuesta}`);
+    expect(segunda).toEqual(primera);
+  });
+
+  test('3 · la respuesta declarada coincide con releerla de la tabla', () => {
+    // En el tipo B «recalcular» es volver a LEER el dato de ELEMENTOS/IONES. Caza a quien
+    // edita un enunciado y se olvida de la respuesta, y también a quien toca la tabla.
+    for (const ficha of FICHAS) {
+      const releida = resolverFicha(ficha.datos);
+      expect(releida.ok, `pregunta ${ficha.id} no resuelve`).toBe(true);
+      expect(releida.valor, `pregunta ${ficha.id}`).toBe(ficha.respuesta);
+    }
+  });
+
+  test('4 · cada pregunta trae enunciado, etiqueta, respuesta no vacía y dónde mirar', () => {
+    for (const ficha of FICHAS) {
+      expect(ficha.enunciado.trim().length, `pregunta ${ficha.id}`).toBeGreaterThan(20);
+      expect(ficha.etiquetaRespuesta.trim().length, `pregunta ${ficha.id}`).toBeGreaterThan(0);
+      expect(ficha.respuesta.trim().length, `pregunta ${ficha.id}`).toBeGreaterThan(0);
+      expect(ficha.pasos.length, `pregunta ${ficha.id}`).toBeGreaterThan(0);
+      expect(ficha.pista.trim().length, `pregunta ${ficha.id}`).toBeGreaterThan(0);
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país ni una ciudad', () => {
+    for (const ficha of FICHAS) {
+      expect(PAISES_Y_CIUDADES.test(ficha.titulo), `título de la ${ficha.id}`).toBe(false);
+      expect(PAISES_Y_CIUDADES.test(ficha.enunciado), `enunciado de la ${ficha.id}`).toBe(false);
+      expect(PAISES_Y_CIUDADES.test(ficha.pista), `pista de la ${ficha.id}`).toBe(false);
+    }
+  });
+
+  test('6 · la práctica al azar es reproducible, variada y saca los datos de la propia tabla', () => {
+    for (const semilla of [1, 7, 42, 12345, 999999]) {
+      const a = generarPreguntaAleatoria(semilla);
+      const b = generarPreguntaAleatoria(semilla);
+      expect(b.enunciado, `semilla ${semilla}`).toBe(a.enunciado);
+      expect(b.respuesta, `semilla ${semilla}`).toBe(a.respuesta);
+    }
+
+    const enunciados = new Set<string>();
+    const campos = new Set<string>();
+    for (let semilla = 1; semilla <= 40; semilla++) {
+      const pregunta = generarPreguntaAleatoria(semilla);
+      enunciados.add(pregunta.enunciado);
+      campos.add(pregunta.campo);
+      expect(pregunta.respuesta.trim().length, `semilla ${semilla}`).toBeGreaterThan(0);
+      // Su propia respuesta tiene que aceptarse: si divergieran, el alumno entrenaría con
+      // una regla y sería corregido con otra.
+      expect(comprobarFicha(pregunta.respuesta, pregunta).correcto, `semilla ${semilla}`).toBe(
+        true
+      );
+    }
+    // REPRODUCIBLE NO ES VARIADO: un generador degenerado pasa la prueba de arriba y falla
+    // aquí, que es exactamente lo que ocurrió en simulador-genetica.
+    expect(enunciados.size).toBeGreaterThanOrEqual(10);
+    expect(campos.size).toBeGreaterThanOrEqual(3);
+  });
+
+  test('7 · comparar normalizado acepta los sinónimos declarados y rechaza lo demás', () => {
+    // Lo que la normalización SÍ debe perdonar: mayúsculas, tildes, espacios sobrantes y el
+    // menos tipográfico «−» (U+2212), que es el que copia quien pega desde la propia tabla.
+    expect(normalizarRespuesta('  Férrico ')).toBe(normalizarRespuesta('ferrico'));
+    expect(normalizarRespuesta('FE')).toBe(normalizarRespuesta('fe'));
+    expect(normalizarRespuesta('−3')).toBe(normalizarRespuesta('-3'));
+
+    // Cada pregunta acepta su propia respuesta y todos los sinónimos que declara.
+    for (const ficha of FICHAS) {
+      expect(comprobarFicha(ficha.respuesta, ficha).correcto, `pregunta ${ficha.id}`).toBe(true);
+      for (const sinonimo of ficha.sinonimos) {
+        expect(
+          comprobarFicha(sinonimo, ficha).correcto,
+          `pregunta ${ficha.id}, sinónimo «${sinonimo}»`
+        ).toBe(true);
+      }
+      // Y ninguna acepta la cadena vacía, que si no sería un aprobado gratis.
+      expect(comprobarFicha('', ficha).correcto, `pregunta ${ficha.id}`).toBe(false);
+      expect(comprobarFicha('   ', ficha).correcto, `pregunta ${ficha.id}`).toBe(false);
+    }
+  });
+
+  test('7.bis · el signo no es una grafía: valencia y número de oxidación son dos datos', () => {
+    // La valencia es la capacidad de combinación y va SIN signo; el número de oxidación va
+    // CON signo. Es el convenio de esta app y el error clásico del tema.
+    const valencia = FICHAS.find((c) => c.etiquetaRespuesta.toLowerCase().includes('sin signo'));
+    expect(valencia, 'ninguna pregunta pide la valencia sin signo').toBeTruthy();
+    expect(valencia!.respuesta).not.toContain('+');
+    expect(valencia!.respuesta).not.toContain('-');
+
+    const conSigno = FICHAS.filter((c) => /^[+\-−]/.test(c.respuesta));
+    expect(conSigno.length, 'ninguna pregunta pide un número de oxidación con signo').toBeGreaterThan(
+      0
+    );
+    for (const ficha of conSigno) {
+      // Quien escribe el número sin su signo negativo NO ha acertado con otra ortografía.
+      if (/^[-−]/.test(ficha.respuesta)) {
+        const sinSigno = ficha.respuesta.replace(/^[-−]/, '');
+        expect(comprobarFicha(sinSigno, ficha).correcto, `pregunta ${ficha.id}`).toBe(false);
+      }
+      // Y la etiqueta avisa de que el signo cuenta, para que nadie lo falle por no saberlo.
+      expect(ficha.etiquetaRespuesta.toLowerCase(), `pregunta ${ficha.id}`).toContain('signo');
+    }
+  });
+
+  test('7.ter · los datos que leen las preguntas son los mismos que ve el alumno', () => {
+    // El traslado de ELEMENTOS/IONES a datos.ts existe para que la respuesta esperada salga
+    // de la MISMA tabla que se muestra. Si alguien añadiera un elemento solo en un sitio,
+    // esto caería.
+    expect(ELEMENTOS).toHaveLength(51); // la cifra que anuncian metadata.ts y el JSON-LD
+    expect(IONES.length).toBeGreaterThan(0);
+
+    const hierro = ELEMENTOS.find((e) => e.z === 26);
+    expect(hierro?.simbolo).toBe('Fe');
+    expect(hierro?.tradicional?.[3]).toBe('férrico');
+    expect(hierro?.tradicional?.[2]).toBe('ferroso');
+
+    const azufre = ELEMENTOS.find((e) => e.simbolo === 'S');
+    expect(azufre?.grupo).toContain('16');
+
+    // El flúor es el único halógeno con un solo número de oxidación: por eso vale como caso.
+    const fluor = ELEMENTOS.find((e) => e.simbolo === 'F');
+    expect(fluor?.estados).toHaveLength(1);
+    expect(fluor?.estados[0].valor).toBe(-1);
+
+    // Ningún elemento se quedó sin ejemplo al mudar la tabla.
+    for (const elemento of ELEMENTOS) {
+      expect(elemento.estados.length, `${elemento.simbolo} sin estados`).toBeGreaterThan(0);
+      for (const estado of elemento.estados) {
+        expect(estado.ejemplo.trim().length, `${elemento.simbolo} sin ejemplo`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  test('un dato que no está en la tabla no lanza: devuelve un error que la vista puede pintar', () => {
+    // Un `throw` dentro de un render de React tumba la app entera; un error devuelto se pinta.
+    const inventado = resolverFicha({ campo: 'grupo', simbolo: 'Zzz' });
+    expect(inventado.ok).toBe(false);
+    expect(inventado.error).toBeTruthy();
+  });
+});
