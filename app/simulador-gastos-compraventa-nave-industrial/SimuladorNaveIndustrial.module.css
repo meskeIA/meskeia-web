@@ -423,6 +423,18 @@
   color: #6BC5EC;
 }
 
+/* La CABECERA de esa misma tabla, que es lo que quedó tras las dos vueltas anteriores: iba
+   en línea —`background: var(--primary); color: #fff`— y fallaba en los dos temas (4,11:1 en
+   claro sobre #2E86AB y 2,79:1 en oscuro, donde --primary aclara a #3FA5D1). No es adorno:
+   son los rótulos «Concepto», «Nave industrial» y «Vivienda», lo único que dice cuál de las
+   dos columnas es la nave. `--primary-boton` es el token creado justo para esto —un fondo de
+   marca con texto blanco encima— y vale 5,47:1 en AMBOS temas, porque en oscuro conserva el
+   tono oscuro del claro (hallazgo 1175). */
+.cabeceraTabla {
+  background: var(--primary-boton);
+  color: #fff;
+}
+
 /* ===== WARNING BOX ===== */
 .warningBox {
   background: #fff8e1;

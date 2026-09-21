@@ -228,11 +228,27 @@ export default function SimuladorNaveIndustrialPage() {
         nota={FISCAL_INMUEBLES_META.nota}
       />
 
-      {/* Aviso IVA deducible */}
+      {/* Aviso IVA deducible — es el TERCERO de los avisos que explicaban un IVA que la propia
+          app niega dos tarjetas más allá, y el único que quedó fuera de la reparación del
+          hallazgo 647 por estar más arriba, antes del selector. Es además el primero que se lee
+          (hallazgo 1177). */}
       <div className={styles.ivaAviso} role="note">
-        <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de una nave industrial
-        puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Consulta con tu asesor fiscal
-        antes de tomar decisiones.
+        {territorioActualSinIva ? (
+          <>
+            <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
+            {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+            ({territorioActualSinIva.nombre}), que esta calculadora no cifra. El impuesto soportado
+            también puede ser <strong>deducible</strong>, pero con las reglas del{' '}
+            {territorioActualSinIva.impuesto}: consúltalas en la administración tributaria de{' '}
+            {datosCcaaActual.nombre} y con tu asesor fiscal antes de tomar decisiones.
+          </>
+        ) : (
+          <>
+            <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de una nave industrial
+            puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Consulta con tu asesor fiscal
+            antes de tomar decisiones.
+          </>
+        )}
       </div>
 
       {/* Formulario principal */}
@@ -589,7 +605,15 @@ export default function SimuladorNaveIndustrialPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ background: 'var(--primary)', color: '#fff' }}>
+                {/* La cabecera va por clase y con `--primary-boton`, que es el token para un
+                    fondo con texto blanco encima (5,47:1 en los dos temas). Con `--primary` en
+                    línea fallaba en AMBOS —4,11:1 en claro y 2,79:1 en oscuro, donde el tono
+                    aclara— y ningún token del módulo podía alcanzarlo. Es la tercera vuelta
+                    sobre esta misma tabla: las celdas de respuesta se repararon con el hallazgo
+                    648 y la de la cifra con el 684; las tres veces se midió el TEXTO de las
+                    celdas y la fila del `<thead>` nunca se midió, porque su color no está en el
+                    texto sino en el FONDO (hallazgo 1175). */}
+                <tr className={styles.cabeceraTabla}>
                   <th style={{ padding: '10px', textAlign: 'left' }}>Concepto</th>
                   <th style={{ padding: '10px', textAlign: 'center' }}>Nave industrial</th>
                   <th style={{ padding: '10px', textAlign: 'center' }}>Vivienda</th>
@@ -772,10 +796,22 @@ export default function SimuladorNaveIndustrialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
               <span style={{ fontSize: '1.5rem' }} aria-hidden="true">📋</span>
               <strong>Guarda todos los justificantes</strong>
+              {/* El IVA DEDUCIDO no puede ir en esta lista, y esta es justo la app cuyo público
+                  declarado lo deduce: el art. 35.1.b) LIRPF admite los tributos «inherentes a la
+                  adquisición» SATISFECHOS por el adquirente, y la norma de registro y valoración
+                  2ª del PGC excluye del precio de adquisición los impuestos indirectos
+                  «recuperables de la Hacienda Pública», que es lo que decide el beneficio en el
+                  Impuesto de Sociedades que la frase menciona. Deducirlo en el 303 y volver a
+                  restarlo de la ganancia lo cuenta dos veces e INFRAVALORA la ganancia. Dos
+                  secciones más arriba la propia tarjeta «IVA deducible» ya dice que el IVA se
+                  recupera (hallazgo 1176). */}
               <p style={{ fontSize: '0.9rem' }}>
-                Conserva facturas de ITP/IVA, notaría, registro y reformas. Al vender, estos gastos
+                Conserva facturas de ITP, notaría, registro y reformas. Al vender, estos gastos
                 incrementan el valor de adquisición y reducen la ganancia patrimonial o el beneficio
-                en el Impuesto de Sociedades.
+                en el Impuesto de Sociedades. El <strong>IVA soportado que te hayas deducido</strong>{' '}
+                no cuenta aquí: al recuperarlo deja de ser un coste, y sumarlo otra vez al valor de
+                adquisición lo contaría dos veces. Guarda igualmente sus facturas, que es lo que
+                sostiene la deducción.
               </p>
             </div>
           </div>

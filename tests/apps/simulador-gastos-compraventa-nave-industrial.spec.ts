@@ -3299,13 +3299,14 @@ test.describe('Re-inspección 21/09/2026 — tres casos nuevos', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — 21/09/2026
+// REGRESIÓN — los tres hallazgos del 21/09/2026 (1175, 1176 y 1177), REPARADOS el 21/09.
 //
-// Escritos con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan y, cuando se
-// reparen, el `test.fail()` se quita y el test se queda como regresión.
+// Se escribieron con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlos se les quitó
+// la marca sin tocar ninguna aserción, así que lo que hoy pasa en verde es exactamente lo que
+// ayer fallaba en rojo.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 21/09/2026', () => {
+test.describe('Regresión — hallazgos 1175, 1176 y 1177 del 21/09/2026', () => {
   /**
    * HALLAZGO 1 (accesibilidad, medio) — la CABECERA de la tabla comparativa es texto blanco
    * sobre `var(--primary)`, y falla en LOS DOS temas.
@@ -3328,8 +3329,7 @@ test.describe('Hallazgos abiertos — 21/09/2026', () => {
    * Efecto familia: el mismo `<tr style={{ background: 'var(--primary)', color: '#fff' }}>`
    * está escrito en línea, no en el módulo CSS, así que no lo alcanza ningún token.
    */
-  test('HALLAZGO 1 — la cabecera de la tabla comparativa no llega a 4,5:1 en ningún tema', async ({ page }) => {
-    test.fail();
+  test('REPARADO 1175 — la cabecera de la tabla comparativa llega a 4,5:1 en los dos temas', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
     // El bloque educativo nace plegado: se despliega para medir lo que el usuario ve.
@@ -3377,8 +3377,7 @@ test.describe('Hallazgos abiertos — 21/09/2026', () => {
    * El test acepta las dos reparaciones posibles: quitar el IVA de la lista, o añadir la
    * salvedad del IVA deducido a la frase.
    */
-  test('HALLAZGO 2 — el consejo de los justificantes suma al valor de adquisición un IVA que la propia app deduce', async ({ page }) => {
-    test.fail();
+  test('REPARADO 1176 — el consejo de los justificantes no suma el IVA que la propia app deduce', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado: `textContent`.
     const tarjeta = await page.evaluate(() => {
@@ -3418,8 +3417,7 @@ test.describe('Hallazgos abiertos — 21/09/2026', () => {
    * dice «En Canarias, Ceuta y Melilla no rige el IVA: allí la operación va por IGIC o IPSI,
    * que esta calculadora no cifra». `local-comercial` arrastra el mismo defecto que la nave.
    */
-  test('HALLAZGO 3 — el aviso de IVA deducible sigue prometiendo IVA en Canarias, Ceuta y Melilla', async ({ page }) => {
-    test.fail();
+  test('REPARADO 1177 — el aviso de IVA deducible nombra el IGIC/IPSI en Canarias, Ceuta y Melilla', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
 

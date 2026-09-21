@@ -482,11 +482,29 @@ export default function SimuladorLocalComercialPage() {
       />
 
       {/* Aviso IVA deducible */}
+      {/* El aviso de cabecera es el primero que se lee y era texto FIJO: prometía un IVA
+          —y una renuncia a su exención— en Canarias, Ceuta y Melilla, donde la propia app
+          responde «IGIC/IPSI · No calculado» unas tarjetas más abajo. Es el mismo defecto que
+          el hallazgo 1177 destapó en la hermana nave-industrial, y que allí ya habían cerrado
+          los dos avisos del selector de transmisión con el hallazgo 647. */}
       <div className={styles.ivaAviso} role="note">
-        <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de un local comercial
-        puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Por eso, en segunda mano entre
-        profesionales, muchas veces conviene <strong>renunciar a la exención de IVA</strong> para no pagar un ITP
-        que no se recupera. Consulta con tu asesor fiscal antes de decidir.
+        {territorioActualSinIva ? (
+          <>
+            <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
+            {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+            ({territorioActualSinIva.nombre}), que esta calculadora no cifra. El impuesto soportado
+            también puede ser <strong>deducible</strong>, pero con las reglas del{' '}
+            {territorioActualSinIva.impuesto}, y la <strong>renuncia a la exención de IVA</strong> no
+            existe allí. Consúltalo con tu asesor fiscal antes de decidir.
+          </>
+        ) : (
+          <>
+            <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de un local comercial
+            puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Por eso, en segunda mano entre
+            profesionales, muchas veces conviene <strong>renunciar a la exención de IVA</strong> para no pagar un ITP
+            que no se recupera. Consulta con tu asesor fiscal antes de decidir.
+          </>
+        )}
       </div>
 
       {/* Formulario principal */}
