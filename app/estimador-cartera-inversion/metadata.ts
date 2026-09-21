@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Estimador de Cartera de Inversión - Monte Carlo | meskeIA',
   description: 'Simula la evolución de tu cartera de inversión con Monte Carlo. Visualiza escenarios, calcula Sharpe, volatilidad y probabilidad de alcanzar tus objetivos financieros.',
-  keywords: 'simulador cartera, monte carlo inversión, backtesting, sharpe ratio, volatilidad, simulador inversiones, cartera indexada, proyección patrimonio',
+  keywords: 'simulador cartera, monte carlo inversión, sharpe ratio, volatilidad, simulador inversiones, cartera indexada, proyección patrimonio, caída máxima',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -39,8 +39,9 @@ export const jsonLd = generateWebAppSchema({
   features: [
       "Simulación Monte Carlo con 1000 escenarios de evolución del patrimonio",
       "Distribución entre 4 clases de activo: renta variable, renta fija, liquidez y alternativos",
-      "5 perfiles predefinidos: conservador, moderado-conservador, moderado, crecimiento y agresivo",
-      "Cálculo de ratio de Sharpe, volatilidad y máximo drawdown esperado",
+      "5 perfiles predefinidos: conservador, moderado, equilibrado, dinámico y agresivo",
+      "Proyección en euros de hoy, con la rentabilidad real calculada por la ecuación de Fisher",
+      "Cálculo de ratio de Sharpe con tasa libre de riesgo ajustable, volatilidad y caída máxima medida sobre los escenarios simulados",
       "Visualización de percentiles P10-P90 en gráfico interactivo",
       "Probabilidad de alcanzar un objetivo de patrimonio personalizado",
       "Gratuito, sin registro ni instalación",
@@ -72,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Cuánto debería ser la rentabilidad anual esperada de una cartera indexada?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Históricamente, una cartera global diversificada (acciones mundiales + renta fija) ha generado rentabilidades medias anuales del 6-9% nominal antes de inflación, dependiendo del periodo y la composición. Una cartera 100% renta variable ha promediado cerca del 9-10% anual en el último siglo, aunque con años de caídas superiores al 40%. Las rentabilidades pasadas no garantizan resultados futuros.',
+        text: 'Históricamente, una cartera global diversificada (acciones mundiales + renta fija) ha generado rentabilidades medias anuales del 6-9% nominal antes de inflación, dependiendo del periodo y la composición. La cifra que suele citarse para el 100% en renta variable, cerca del 9-10% anual en el último siglo, procede de la bolsa ESTADOUNIDENSE, que es el mercado con mejor comportamiento del periodo: las series de otros países dan bastante menos, y las estimaciones que publican las gestoras institucionales para la próxima década rondan el 4-6% real. Las rentabilidades pasadas no garantizan resultados futuros.',
       },
     },
     {

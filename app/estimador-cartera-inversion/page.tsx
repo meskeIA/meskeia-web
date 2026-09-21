@@ -6,7 +6,7 @@ import Link from 'next/link';
 import styles from './EstimadorCartera.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber, formatCurrency } from '@/lib';
+import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -57,13 +57,25 @@ interface SimulacionResultado {
   percentil75: number[];
   percentil90: number[];
   escenarios: number[][]; // Todos los escenarios para análisis
+  /** Caída máxima MEDIANA medida sobre las 1.000 trayectorias (fracción) */
+  caidaMaximaMediana: number;
+  /** Caída máxima del escenario que deja peor al 95 % de los demás (fracción) */
+  caidaMaximaP95: number;
+  /** Rentabilidad real (Fisher) con la que se ha proyectado (fracción) */
+  rentabilidadRealUsada: number;
 }
 
 interface MetricasCartera {
+  /** Rentabilidad NOMINAL media ponderada de la cartera (%) */
   rentabilidadEsperada: number;
+  /** Rentabilidad REAL con la que proyecta el motor, por Fisher (%) */
+  rentabilidadRealEsperada: number;
   volatilidadCartera: number;
   sharpeRatio: number;
+  /** Caída máxima mediana medida sobre las trayectorias simuladas (%) */
   maxDrawdownEsperado: number;
+  /** Caída máxima del percentil 95 de escenarios (%) */
+  maxDrawdownP95: number;
   probabilidadObjetivo: number;
   capitalFinalMediano: number;
   capitalFinalPeor: number;
@@ -116,7 +128,17 @@ const PERFILES_PREDEFINIDOS: Record<string, { nombre: string; cartera: CarteraCo
 };
 
 const NUM_SIMULACIONES = 1000;
-const TASA_LIBRE_RIESGO = 0.02; // 2% para cálculo Sharpe
+
+/**
+ * Tasa libre de riesgo por omisión del ratio de Sharpe.
+ *
+ * ⚠️ 2026-09-21 (hallazgo 1140 del Inspector): estaba fijada en el código sin fuente ni
+ *    fecha, no se mostraba en pantalla y no se podía cambiar, aunque el usuario sí podía
+ *    mover la inflación. Con carteras conservadoras decide el SIGNO del indicador: al 100 %
+ *    de liquidez, (1,5 − 2) / 0,5 = −1,00, y ese −1 depende por entero de un 2 % que la app
+ *    no declaraba. Ahora es un campo más, con su valor por omisión a la vista.
+ */
+const TASA_LIBRE_RIESGO_POR_OMISION = 2;
 
 // ============ FUNCIONES DE SIMULACIÓN ============
 
@@ -161,6 +183,17 @@ function calcularParametrosCartera(cartera: CarteraConfig): { rentabilidad: numb
 }
 
 // Simulación Monte Carlo
+/**
+ * Rentabilidad REAL por la ecuación de Fisher: (1 + nominal) / (1 + inflación) − 1.
+ *
+ * ⚠️ 2026-09-21 (hallazgo 1130): se restaba a secas. La diferencia por año es pequeña
+ *    —4,70 % frente a 4,6078 % con un 6,70 % nominal y un 2 % de inflación— pero se
+ *    compone durante todo el horizonte: unos 3.000 € sobre 160.000 € a 20 años.
+ */
+function rentabilidadRealFisher(nominal: number, inflacion: number): number {
+  return (1 + nominal) / (1 + inflacion) - 1;
+}
+
 function simularCartera(
   capitalInicial: number,
   aportacionMensual: number,
@@ -169,15 +202,26 @@ function simularCartera(
   inflacion: number
 ): SimulacionResultado {
   const { rentabilidad, volatilidad } = calcularParametrosCartera(cartera);
-  const rentabilidadReal = rentabilidad - inflacion;
+  const rentabilidadReal = rentabilidadRealFisher(rentabilidad, inflacion);
 
   const escenarios: number[][] = [];
+  const caidasMaximas: number[] = [];
   const meses = años * 12;
 
   // Generar N simulaciones
   for (let sim = 0; sim < NUM_SIMULACIONES; sim++) {
     const evolucion: number[] = [capitalInicial];
     let capital = capitalInicial;
+
+    // ⚠️ 2026-09-21 (hallazgo 1132): el «max drawdown» era volatilidad × 2,5, una regla
+    //    empírica que no dependía de ningún escenario simulado —mover horizonte, capital o
+    //    aportación no lo cambiaba ni un decimal— mientras la tarjeta educativa lo define
+    //    como «la máxima caída desde un pico hasta el siguiente mínimo». Se mide aquí, sobre
+    //    un índice de rentabilidad SIN aportaciones: con aportaciones periódicas el saldo
+    //    puede subir en plena caída del mercado y la caída quedaría enmascarada.
+    let indice = 1;
+    let maximoIndice = 1;
+    let caidaMaxima = 0;
 
     for (let mes = 1; mes <= meses; mes++) {
       // Rentabilidad mensual con variación aleatoria
@@ -187,6 +231,11 @@ function simularCartera(
 
       capital = capital * (1 + retornoMensual) + aportacionMensual;
 
+      indice = indice * (1 + retornoMensual);
+      if (indice > maximoIndice) maximoIndice = indice;
+      const caida = maximoIndice > 0 ? (maximoIndice - indice) / maximoIndice : 0;
+      if (caida > caidaMaxima) caidaMaxima = caida;
+
       // Guardar solo valores anuales para el gráfico
       if (mes % 12 === 0) {
         evolucion.push(Math.max(0, capital));
@@ -194,6 +243,7 @@ function simularCartera(
     }
 
     escenarios.push(evolucion);
+    caidasMaximas.push(caidaMaxima);
   }
 
   // Calcular percentiles por año
@@ -213,6 +263,8 @@ function simularCartera(
     percentil90.push(valoresAño[Math.floor(NUM_SIMULACIONES * 0.90)]);
   }
 
+  const caidasOrdenadas = [...caidasMaximas].sort((a, b) => a - b);
+
   return {
     años: añosArray,
     percentil10,
@@ -221,6 +273,12 @@ function simularCartera(
     percentil75,
     percentil90,
     escenarios,
+    /** Caída máxima MEDIANA de los 1.000 escenarios (fracción, no %) */
+    caidaMaximaMediana: caidasOrdenadas[Math.floor(NUM_SIMULACIONES * 0.50)],
+    /** Caída máxima del escenario que deja peor al 95 % de los demás */
+    caidaMaximaP95: caidasOrdenadas[Math.floor(NUM_SIMULACIONES * 0.95)],
+    /** Rentabilidad real (Fisher) con la que se ha proyectado */
+    rentabilidadRealUsada: rentabilidadReal,
   };
 }
 
@@ -228,13 +286,15 @@ function simularCartera(
 function calcularMetricas(
   resultado: SimulacionResultado,
   cartera: CarteraConfig,
-  objetivo: number
+  objetivo: number,
+  tasaLibreRiesgo: number,
+  inflacion: number
 ): MetricasCartera {
   const { rentabilidad, volatilidad } = calcularParametrosCartera(cartera);
-  const sharpe = (rentabilidad - TASA_LIBRE_RIESGO) / volatilidad;
+  const sharpe = (rentabilidad - tasaLibreRiesgo) / volatilidad;
 
-  // Max Drawdown esperado (aproximación empírica)
-  const maxDrawdownEsperado = volatilidad * 2.5; // Regla empírica
+  // Medido sobre las 1.000 trayectorias, no estimado con una regla del pulgar.
+  const maxDrawdownEsperado = resultado.caidaMaximaMediana;
 
   // Probabilidad de alcanzar objetivo
   const valoresFinales = resultado.escenarios.map(e => e[e.length - 1]);
@@ -246,9 +306,11 @@ function calcularMetricas(
 
   return {
     rentabilidadEsperada: rentabilidad * 100,
+    rentabilidadRealEsperada: rentabilidadRealFisher(rentabilidad, inflacion) * 100,
     volatilidadCartera: volatilidad * 100,
     sharpeRatio: sharpe,
     maxDrawdownEsperado: maxDrawdownEsperado * 100,
+    maxDrawdownP95: resultado.caidaMaximaP95 * 100,
     probabilidadObjetivo: probabilidad,
     capitalFinalMediano: ordenados[Math.floor(NUM_SIMULACIONES * 0.50)],
     capitalFinalPeor: ordenados[Math.floor(NUM_SIMULACIONES * 0.05)],
@@ -268,14 +330,59 @@ export default function SimuladorCarteraPage() {
     ? PERFILES_PREDEFINIDOS[perfilURL].cartera
     : { rv: 50, rf: 35, liq: 10, alt: 5 };
 
-  // Estado de configuración
-  const [capitalInicial, setCapitalInicial] = useState(10000);
-  const [aportacionMensual, setAportacionMensual] = useState(200);
-  const [años, setAños] = useState(20);
-  const [inflacion, setInflacion] = useState(2);
-  const [objetivo, setObjetivo] = useState(100000);
+  /**
+   * ⚠️ 2026-09-21 (hallazgo 1128 del Inspector): los cinco campos eran `type="number"`
+   *    leídos con `parseInt(e.target.value)` / `parseFloat(...)`. Teclear el separador
+   *    español devolvía OTRO número, en silencio y sin NaN en pantalla porque
+   *    `Math.max(0, … || 0)` lo tapaba: «1.500» → 500 €, «1.234,56» → 2.346 €,
+   *    «250,50» → 2.500 €/mes. La proyección entera salía de una cifra que el usuario
+   *    nunca introdujo. Y el campo no se podía vaciar: al borrarlo saltaba a 0.
+   *    Ahora el estado es TEXTO, se parsea con el parser canónico y lo inválido se dice.
+   */
+  const [capitalTexto, setCapitalTexto] = useState('10.000');
+  const [aportacionTexto, setAportacionTexto] = useState('200');
+  const [anosTexto, setAnosTexto] = useState('20');
+  const [inflacionTexto, setInflacionTexto] = useState('2');
+  const [objetivoTexto, setObjetivoTexto] = useState('100.000');
+  const [tasaLibreTexto, setTasaLibreTexto] = useState(String(TASA_LIBRE_RIESGO_POR_OMISION));
   const [cartera, setCartera] = useState<CarteraConfig>(perfilInicial);
   const [perfilSeleccionado, setPerfilSeleccionado] = useState<string>(perfilURL || '');
+
+  /** Lee un campo con el parser canónico y lo acota; `null` si no es un número válido. */
+  const leer = useCallback((texto: string, min: number, max: number, entero: boolean): number | null => {
+    if (texto.trim() === '') return null;
+    const n = parseSpanishNumber(texto);
+    if (Number.isNaN(n) || n < min || n > max) return null;
+    return entero ? Math.round(n) : n;
+  }, []);
+
+  const capitalInicial = useMemo(() => leer(capitalTexto, 0, 100_000_000, false), [capitalTexto, leer]);
+  const aportacionMensual = useMemo(() => leer(aportacionTexto, 0, 1_000_000, false), [aportacionTexto, leer]);
+  const años = useMemo(() => leer(anosTexto, 1, 50, true), [anosTexto, leer]);
+  const inflacion = useMemo(() => leer(inflacionTexto, 0, 20, false), [inflacionTexto, leer]);
+  const objetivo = useMemo(() => leer(objetivoTexto, 0, 100_000_000, false), [objetivoTexto, leer]);
+  const tasaLibreRiesgo = useMemo(() => leer(tasaLibreTexto, 0, 20, false), [tasaLibreTexto, leer]);
+
+  const camposInvalidos = useMemo(() => {
+    const fallos: string[] = [];
+    if (capitalInicial === null) fallos.push('capital inicial (0 – 100.000.000 €)');
+    if (aportacionMensual === null) fallos.push('aportación mensual (0 – 1.000.000 €)');
+    if (años === null) fallos.push('horizonte (1 – 50 años)');
+    if (inflacion === null) fallos.push('inflación (0 – 20 %)');
+    if (objetivo === null) fallos.push('objetivo (0 – 100.000.000 €)');
+    if (tasaLibreRiesgo === null) fallos.push('tasa libre de riesgo (0 – 20 %)');
+    return fallos;
+  }, [capitalInicial, aportacionMensual, años, inflacion, objetivo, tasaLibreRiesgo]);
+
+  /**
+   * Lo aportado, en la MISMA moneda que la proyección: euros de hoy. Vale sumar las
+   * mensualidades sin inflar porque la app supone que la aportación se actualiza cada
+   * año con la inflación, y así lo dice el campo.
+   */
+  const totalAportado = useMemo(
+    () => (capitalInicial ?? 0) + (aportacionMensual ?? 0) * (años ?? 0) * 12,
+    [capitalInicial, aportacionMensual, años],
+  );
 
   // Estado de resultados
   const [resultado, setResultado] = useState<SimulacionResultado | null>(null);
@@ -314,6 +421,10 @@ export default function SimuladorCarteraPage() {
 
   // Ejecutar simulación
   const ejecutarSimulacion = useCallback(() => {
+    if (
+      capitalInicial === null || aportacionMensual === null || años === null ||
+      inflacion === null || objetivo === null || tasaLibreRiesgo === null
+    ) return;
     setSimulando(true);
 
     // Usar setTimeout para no bloquear UI
@@ -327,12 +438,12 @@ export default function SimuladorCarteraPage() {
       );
       setResultado(res);
 
-      const met = calcularMetricas(res, cartera, objetivo);
+      const met = calcularMetricas(res, cartera, objetivo, tasaLibreRiesgo / 100, inflacion / 100);
       setMetricas(met);
 
       setSimulando(false);
     }, 100);
-  }, [capitalInicial, aportacionMensual, años, cartera, inflacion, objetivo]);
+  }, [capitalInicial, aportacionMensual, años, cartera, inflacion, objetivo, tasaLibreRiesgo]);
 
   // Total de pesos
   const totalPesos = cartera.rv + cartera.rf + cartera.liq + cartera.alt;
@@ -474,13 +585,11 @@ export default function SimuladorCarteraPage() {
             <div className={styles.inputWithUnit}>
               <input
                 id="capitalInicial"
-                type="number"
+                type="text"
                 className={styles.input}
-                value={capitalInicial}
-                onChange={e => setCapitalInicial(Math.max(0, parseInt(e.target.value) || 0))}
-                min={0}
-                step={1000}
-                inputMode="numeric"
+                value={capitalTexto}
+                onChange={e => setCapitalTexto(e.target.value)}
+                inputMode="decimal"
               />
               <span className={styles.inputUnit}>€</span>
             </div>
@@ -491,17 +600,20 @@ export default function SimuladorCarteraPage() {
             <div className={styles.inputWithUnit}>
               <input
                 id="aportacionMensual"
-                type="number"
+                type="text"
                 className={styles.input}
-                value={aportacionMensual}
-                onChange={e => setAportacionMensual(Math.max(0, parseInt(e.target.value) || 0))}
-                min={0}
-                step={50}
-                inputMode="numeric"
+                value={aportacionTexto}
+                onChange={e => setAportacionTexto(e.target.value)}
+                inputMode="decimal"
               />
               <span className={styles.inputUnit}>€/mes</span>
             </div>
           </div>
+          <p className={styles.notaCampo}>
+            En euros de HOY. La simulación supone que la actualizas cada año con la inflación:
+            si la dejas fija en euros corrientes, su capacidad de compra irá bajando y el
+            resultado real será menor.
+          </p>
 
           <div className={styles.inputRow}>
             <div className={styles.inputGroup}>
@@ -509,12 +621,10 @@ export default function SimuladorCarteraPage() {
               <div className={styles.inputWithUnit}>
                 <input
                   id="horizonte"
-                  type="number"
+                  type="text"
                   className={styles.input}
-                  value={años}
-                  onChange={e => setAños(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
-                  min={1}
-                  max={50}
+                  value={anosTexto}
+                  onChange={e => setAnosTexto(e.target.value)}
                   inputMode="numeric"
                 />
                 <span className={styles.inputUnit}>años</span>
@@ -526,13 +636,10 @@ export default function SimuladorCarteraPage() {
               <div className={styles.inputWithUnit}>
                 <input
                   id="inflacion"
-                  type="number"
+                  type="text"
                   className={styles.input}
-                  value={inflacion}
-                  onChange={e => setInflacion(Math.max(0, parseFloat(e.target.value) || 0))}
-                  min={0}
-                  max={10}
-                  step={0.5}
+                  value={inflacionTexto}
+                  onChange={e => setInflacionTexto(e.target.value)}
                   inputMode="decimal"
                 />
                 <span className={styles.inputUnit}>%</span>
@@ -545,17 +652,46 @@ export default function SimuladorCarteraPage() {
             <div className={styles.inputWithUnit}>
               <input
                 id="objetivo"
-                type="number"
+                type="text"
                 className={styles.input}
-                value={objetivo}
-                onChange={e => setObjetivo(Math.max(0, parseInt(e.target.value) || 0))}
-                min={0}
-                step={10000}
-                inputMode="numeric"
+                value={objetivoTexto}
+                onChange={e => setObjetivoTexto(e.target.value)}
+                inputMode="decimal"
               />
               <span className={styles.inputUnit}>€</span>
             </div>
           </div>
+          <p className={styles.notaCampo}>
+            También en euros de hoy: la probabilidad de alcanzarlo se calcula sobre una
+            proyección ya descontada de inflación, no sobre el saldo nominal de la cuenta.
+          </p>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="tasaLibre" className={styles.inputLabel}>Tasa libre de riesgo (ratio de Sharpe)</label>
+            <div className={styles.inputWithUnit}>
+              <input
+                id="tasaLibre"
+                type="text"
+                className={styles.input}
+                value={tasaLibreTexto}
+                onChange={e => setTasaLibreTexto(e.target.value)}
+                inputMode="decimal"
+              />
+              <span className={styles.inputUnit}>%</span>
+            </div>
+          </div>
+          <p className={styles.notaCampo}>
+            Es la rentabilidad que se obtendría sin asumir riesgo y el listón contra el que el
+            ratio de Sharpe mide la cartera. No hay un valor «correcto»: cambia con los tipos de
+            interés, así que se deja a la vista y se puede ajustar.
+          </p>
+
+          {camposInvalidos.length > 0 && (
+            <div role="alert" aria-live="assertive" className={styles.avisoCampos}>
+              <span aria-hidden="true">⚠️</span> Revisa estos datos antes de simular:{' '}
+              {camposInvalidos.join(' · ')}.
+            </div>
+          )}
 
           {/* Distribución de Cartera */}
           <div className={styles.carteraSection}>
@@ -568,6 +704,7 @@ export default function SimuladorCarteraPage() {
               {Object.entries(PERFILES_PREDEFINIDOS).map(([key, { nombre }]) => (
                 <button
                   key={key}
+                  type="button"
                   className={`${styles.perfilBtn} ${perfilSeleccionado === key ? styles.perfilBtnActive : ''}`}
                   onClick={() => handlePerfilChange(key)}
                   aria-pressed={perfilSeleccionado === key}
@@ -618,12 +755,16 @@ export default function SimuladorCarteraPage() {
               ))}
             </div>
 
-            {/* Total */}
+            {/* Total. ⚠️ 2026-09-21 (hallazgo 1137): la única señal de que los pesos no
+                sumaban 100 era el COLOR y un botón deshabilitado en silencio. Quien navega
+                con lector de pantalla movía un deslizador y se quedaba sin saber por qué el
+                botón dejaba de funcionar. */}
             <div className={`${styles.totalPesos} ${totalPesos !== 100 ? styles.totalError : ''}`}>
               <span>Total:</span>
               <span>{totalPesos}%</span>
               {totalPesos !== 100 && (
                 <button
+                  type="button"
                   className={styles.normalizarBtn}
                   onClick={normalizarPesos}
                 >
@@ -631,13 +772,22 @@ export default function SimuladorCarteraPage() {
                 </button>
               )}
             </div>
+            {totalPesos !== 100 && (
+              <p className={styles.avisoPesos} role="alert" aria-live="assertive">
+                <span aria-hidden="true">⚠️</span> Los pesos suman {totalPesos} %: para
+                simular tienen que sumar exactamente 100 %. Ajusta los deslizadores o pulsa
+                «Normalizar a 100%».
+              </p>
+            )}
           </div>
 
           {/* Botón simular */}
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={ejecutarSimulacion}
-            disabled={totalPesos !== 100 || simulando}
+            disabled={totalPesos !== 100 || simulando || camposInvalidos.length > 0}
+            aria-disabled={totalPesos !== 100 || simulando || camposInvalidos.length > 0}
           >
             {simulando ? (
               <>
@@ -687,7 +837,7 @@ export default function SimuladorCarteraPage() {
                   <div className={styles.metricaValor}>
                     {formatCurrency(metricas.capitalFinalMediano)}
                   </div>
-                  <div className={styles.metricaLabel}>Capital Final (Mediana)</div>
+                  <div className={styles.metricaLabel}>Capital final (mediana, en euros de hoy)</div>
                 </div>
 
                 <div className={styles.metricaCard}>
@@ -696,7 +846,7 @@ export default function SimuladorCarteraPage() {
                     {formatNumber(metricas.probabilidadObjetivo, 1)}%
                   </div>
                   <div className={styles.metricaLabel}>
-                    Prob. alcanzar {formatCurrency(objetivo)}
+                    Prob. alcanzar {formatCurrency(objetivo ?? 0)} de hoy
                   </div>
                 </div>
 
@@ -713,7 +863,13 @@ export default function SimuladorCarteraPage() {
                   <div className={styles.metricaValor}>
                     -{formatNumber(metricas.maxDrawdownEsperado, 1)}%
                   </div>
-                  <div className={styles.metricaLabel}>Max Drawdown Esperado</div>
+                  <div className={styles.metricaLabel}>
+                    Caída máxima mediana
+                    <span className={styles.metricaNota}>
+                      Medida en los {NUM_SIMULACIONES} escenarios. En el 5 % peor llega
+                      a −{formatNumber(metricas.maxDrawdownP95, 1)} %.
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -725,9 +881,17 @@ export default function SimuladorCarteraPage() {
 
                 <div className={styles.detallesGrid}>
                   <div className={styles.detalleItem}>
-                    <span className={styles.detalleLabel}>Rentabilidad esperada</span>
+                    <span className={styles.detalleLabel}>Rentabilidad nominal esperada</span>
                     <span className={styles.detalleValor}>
                       {formatNumber(metricas.rentabilidadEsperada, 2)}% anual
+                    </span>
+                  </div>
+                  {/* ⚠️ 2026-09-21 (hallazgo 1129): la tarjeta enseñaba la NOMINAL y el
+                      motor proyectaba con la real, sin que nada en pantalla lo dijera. */}
+                  <div className={styles.detalleItem}>
+                    <span className={styles.detalleLabel}>Rentabilidad real (la que proyecta)</span>
+                    <span className={styles.detalleValor}>
+                      {formatNumber(metricas.rentabilidadRealEsperada, 2)}% anual
                     </span>
                   </div>
                   <div className={styles.detalleItem}>
@@ -748,16 +912,20 @@ export default function SimuladorCarteraPage() {
                       {formatCurrency(metricas.capitalFinalMejor)}
                     </span>
                   </div>
+                  {/* ⚠️ 2026-09-21 (hallazgo 1131): «Ganancia esperada» restaba magnitudes de
+                      distinta naturaleza —mediana deflactada menos aportaciones nominales— y el
+                      resultado no era ni una ganancia real ni una nominal. Ahora las dos
+                      cifras están en euros de hoy, que es en lo que proyecta el motor. */}
                   <div className={styles.detalleItem}>
-                    <span className={styles.detalleLabel}>Total aportado</span>
+                    <span className={styles.detalleLabel}>Total aportado (euros de hoy)</span>
                     <span className={styles.detalleValor}>
-                      {formatCurrency(capitalInicial + aportacionMensual * años * 12)}
+                      {formatCurrency(totalAportado)}
                     </span>
                   </div>
                   <div className={styles.detalleItem}>
-                    <span className={styles.detalleLabel}>Ganancia esperada</span>
+                    <span className={styles.detalleLabel}>Ganancia esperada (euros de hoy)</span>
                     <span className={styles.detalleValor}>
-                      {formatCurrency(metricas.capitalFinalMediano - (capitalInicial + aportacionMensual * años * 12))}
+                      {formatCurrency(metricas.capitalFinalMediano - totalAportado)}
                     </span>
                   </div>
                 </div>
@@ -777,7 +945,17 @@ export default function SimuladorCarteraPage() {
                     <strong>Sharpe Ratio:</strong> {metricas.sharpeRatio >= 0.5 ? 'Buena relación rentabilidad/riesgo' : 'Relación rentabilidad/riesgo mejorable'} ({metricas.sharpeRatio >= 0.5 ? '> 0,5 es aceptable' : '< 0,5 es bajo'})
                   </li>
                   <li>
-                    <strong>Objetivo:</strong> Tienes un {formatNumber(metricas.probabilidadObjetivo, 0)}% de probabilidad de alcanzar {formatCurrency(objetivo)}
+                    <strong>Objetivo:</strong> Tienes un {formatNumber(metricas.probabilidadObjetivo, 0)}% de probabilidad de alcanzar {formatCurrency(objetivo ?? 0)} <strong>de poder adquisitivo de hoy</strong>
+                  </li>
+                  <li>
+                    <strong>En qué moneda está todo esto:</strong> la proyección descuenta una
+                    inflación del {formatNumber(inflacion ?? 0, 2)} % anual, así que todas las
+                    cifras están en euros de hoy. El saldo que verás en tu cuenta dentro de{' '}
+                    {años} años será mayor en euros corrientes, pero comprará lo mismo.
+                  </li>
+                  <li>
+                    <strong>Ratio de Sharpe:</strong> calculado con una tasa libre de riesgo
+                    del {formatNumber(tasaLibreRiesgo ?? 0, 2)} %, que puedes cambiar arriba.
                   </li>
                 </ul>
               </div>
@@ -827,7 +1005,7 @@ export default function SimuladorCarteraPage() {
           <h2>Conceptos Clave</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🎲 ¿Qué es Monte Carlo?</h4>
+              <h4><span aria-hidden="true">🎲</span> ¿Qué es Monte Carlo?</h4>
               <p>
                 Es una técnica que genera miles de escenarios posibles usando números aleatorios.
                 En lugar de predecir UN resultado, te muestra la distribución de posibles resultados,
@@ -835,7 +1013,7 @@ export default function SimuladorCarteraPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📊 Ratio de Sharpe</h4>
+              <h4><span aria-hidden="true">📊</span> Ratio de Sharpe</h4>
               <p>
                 Mide cuánta rentabilidad extra obtienes por cada unidad de riesgo.
                 Un Sharpe de 0.5+ es aceptable, 1+ es bueno, y 2+ es excelente.
@@ -843,7 +1021,7 @@ export default function SimuladorCarteraPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📉 Max Drawdown</h4>
+              <h4><span aria-hidden="true">📉</span> Max Drawdown</h4>
               <p>
                 Es la máxima caída desde un pico hasta el siguiente mínimo.
                 Te indica cuánto podrías llegar a perder temporalmente en el peor momento.
@@ -851,7 +1029,7 @@ export default function SimuladorCarteraPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📈 Percentiles</h4>
+              <h4><span aria-hidden="true">📈</span> Percentiles</h4>
               <p>
                 El percentil 50 (mediana) es el resultado típico.
                 El percentil 10 es el escenario pesimista (solo 10% de casos es peor).
@@ -863,7 +1041,7 @@ export default function SimuladorCarteraPage() {
 
         {/* ========== TABLA COMPARATIVA: PERFILES DE INVERSOR ========== */}
         <section className={styles.comparativaSection}>
-          <h2>⚖️ Perfiles de Inversor: ¿Cuál es el tuyo?</h2>
+          <h2><span aria-hidden="true">⚖️</span> Perfiles de Inversor: ¿Cuál es el tuyo?</h2>
           <p className={styles.comparativaSubtitle}>
             Descubre qué estrategia de cartera se adapta mejor a tu situación personal
           </p>
@@ -882,7 +1060,7 @@ export default function SimuladorCarteraPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🛡️ Conservador</strong></td>
+                  <td><strong><span aria-hidden="true">🛡️</span> Conservador</strong></td>
                   <td>20% RV, 70% RF, 10% Liquidez</td>
                   <td>3-4% anual</td>
                   <td>Baja (6-8%)</td>
@@ -890,7 +1068,7 @@ export default function SimuladorCarteraPage() {
                   <td>Preservar capital, pre-jubilados, baja tolerancia al riesgo</td>
                 </tr>
                 <tr>
-                  <td><strong>📊 Moderado</strong></td>
+                  <td><strong><span aria-hidden="true">📊</span> Moderado</strong></td>
                   <td>50% RV, 40% RF, 10% Liquidez</td>
                   <td>5-6% anual</td>
                   <td>Media (10-12%)</td>
@@ -898,7 +1076,7 @@ export default function SimuladorCarteraPage() {
                   <td>Equilibrio riesgo-rentabilidad, inversores mediana edad</td>
                 </tr>
                 <tr>
-                  <td><strong>🚀 Agresivo</strong></td>
+                  <td><strong><span aria-hidden="true">🚀</span> Agresivo</strong></td>
                   <td>80% RV, 15% RF, 5% Liquidez</td>
                   <td>7-8% anual</td>
                   <td>Alta (14-18%)</td>
@@ -915,14 +1093,18 @@ export default function SimuladorCarteraPage() {
           </div>
 
           <div className={styles.comparativaConsejo}>
-            <strong>💡 Regla de oro:</strong> Tu % de renta variable NO debe superar 120 - tu edad.
-            Ejemplo: Si tienes 40 años, máximo 80% en RV (120-40=80). Ajusta según tu tolerancia real al riesgo.
+            <strong><span aria-hidden="true">💡</span> Una regla del pulgar, no una ley:</strong> circulan dos versiones de la
+            misma heurística anglosajona —«100 − edad» y «120 − edad» en renta variable— y la
+            diferencia entre ellas son 20 puntos de cartera, lo que ya dice cuánta precisión
+            tienen. Nació con esperanzas de vida y tipos de interés distintos de los de hoy.
+            Úsala para orientarte, no para decidir: lo que manda es cuánto puedes perder sin
+            vender y cuándo vas a necesitar el dinero.
           </div>
         </section>
 
         {/* ========== CASOS DE USO: PERFILES REALES ========== */}
         <section className={styles.escenariosSection}>
-          <h2>💼 Perfiles de inversores y estrategias reales</h2>
+          <h2><span aria-hidden="true">💼</span> Perfiles de inversores y estrategias reales</h2>
           <p className={styles.escenariosSubtitle}>
             Ejemplos de carteras según edad, objetivos y situación personal
           </p>
@@ -1012,13 +1194,13 @@ export default function SimuladorCarteraPage() {
 
         {/* ========== FAQ AMPLIADO ========== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre inversión en carteras</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre inversión en carteras</h2>
 
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Cuánto dinero necesito para empezar a invertir?</h4>
               <p>
-                No hay un mínimo universal, pero <strong>recomendamos al menos 1.000-3.000 €</strong> para diversificar correctamente.
+                No hay un mínimo universal. Con fondos indexados se puede empezar con importes pequeños, porque la diversificación la da el propio fondo y no el tamaño de la aportación; lo que sí conviene mirar antes son las comisiones fijas, que pesan mucho sobre importes bajos.
                 Con menos de 1.000 €, los costes de transacción (comisiones de fondos/ETFs, custodia) pueden comerse una parte significativa de la rentabilidad.
               </p>
               <p>
@@ -1060,7 +1242,7 @@ export default function SimuladorCarteraPage() {
                 Depende de tu psicología y el momento de mercado. Dos estrategias:
               </p>
               <p>
-                <strong>Lump Sum (todo de golpe):</strong> Históricamente gana en el 60-70% de casos porque el mercado sube más de lo que baja.
+                <strong>Lump Sum (todo de golpe):</strong> en los estudios que comparan las dos formas sobre series históricas de EE. UU. y Reino Unido —el más citado es el de Vanguard de 2012— invertir de golpe sale mejor en torno a dos de cada tres periodos, sencillamente porque el mercado sube más a menudo de lo que baja.
                 Si tienes una suma grande (ej: herencia, bonus), invertirla de golpe suele ser óptimo <strong>si puedes dormir tranquilo</strong>.
               </p>
               <p>
@@ -1078,7 +1260,7 @@ export default function SimuladorCarteraPage() {
                 Ambos son vehículos de inversión pasiva excelentes. La elección depende de tu situación:
               </p>
               <p>
-                <strong>Fondos indexados:</strong> Compras directamente en la gestora (ej: Vanguard, Amundi, BlackRock a través de tu banco/broker).
+                <strong>Fondos indexados:</strong> se contratan a través de un banco, una gestora o un comercializador.
                 Sin comisiones de compra/venta en muchos casos. Ideal si haces aportaciones pequeñas frecuentes (100-200 €/mes).
                 Fiscalidad: Traspasables sin tributar (solo pagas cuando vendes definitivamente).
               </p>
@@ -1088,8 +1270,7 @@ export default function SimuladorCarteraPage() {
                 Fiscalidad: Cada venta tributa (aunque vendas para traspasar).
               </p>
               <p>
-                <strong>Recomendación:</strong> Si eres principiante con capital inicial pequeño y aportaciones mensuales, empieza con fondos indexados.
-                Si tienes sumas grandes o quieres máxima flexibilidad, ETFs.
+                <strong>En resumen:</strong> los fondos indexados encajan mejor con aportaciones pequeñas y frecuentes y con el traspaso sin tributar; los ETF, con sumas mayores y esporádicas y con quien quiera operar en mercado abierto. Ninguna de las dos opciones es mejor en abstracto.
               </p>
             </div>
 
@@ -1101,7 +1282,7 @@ export default function SimuladorCarteraPage() {
               <p>
                 1. <strong>Riesgo de vender en pérdidas:</strong> Si el mercado ha caído un 20% y vendes, cristalizas esas pérdidas.
                 Si hubieras esperado 2-3 años, probablemente se habría recuperado.<br />
-                2. <strong>Impacto fiscal:</strong> Pagas impuestos sobre las ganancias (las tasas varían según país: 19-26% en España, 10-20% en México con CETES, 15-35% en Argentina, etc.). En muchos países puedes compensar pérdidas con ganancias futuras durante varios años. Consulta tu normativa fiscal.<br />
+                2. <strong>Impacto fiscal:</strong> Pagas impuestos sobre las ganancias (las tasas varían según país: en España la base del ahorro va del 19 % al 30 % por tramos desde 2025, 10-20% en México con CETES, 15-35% en Argentina, etc.). En muchos países puedes compensar pérdidas con ganancias futuras durante varios años. Consulta tu normativa fiscal.<br />
                 3. <strong>Coste de oportunidad:</strong> Pierdes el potencial de crecimiento futuro del capital retirado.
               </p>
               <p>
@@ -1133,7 +1314,7 @@ export default function SimuladorCarteraPage() {
               <p>
                 • <strong>Fondos indexados globales (MSCI World):</strong> Invierten en 1.500+ empresas de 23 países. Para perder todo,
                 todas las empresas del mundo tendrían que quebrar (escenario apocalíptico).<br />
-                • <strong>Peor caída histórica:</strong> 2008-2009, caída del 55% desde picos. Pero quien aguantó recuperó en 3-4 años y luego multiplicó x3.<br />
+                • <strong>Caídas de referencia:</strong> la mayor de la historia moderna fue 1929-1932, del orden de un −86 % en la bolsa estadounidense, y el Nasdaq cayó cerca de un −78 % entre 2000 y 2002. La de 2008-2009, en torno al −55 %, es la más reciente de gran tamaño: quien aguantó recuperó en 3-4 años. Una cartera diversificada cae menos que la bolsa sola, pero conviene calibrar con la cifra grande, no con la cómoda.<br />
                 • <strong>Renta Fija:</strong> Mucho más estable. Bonos gubernamentales de países desarrollados casi nunca quiebran.
               </p>
               <p>
@@ -1151,7 +1332,7 @@ export default function SimuladorCarteraPage() {
 
         {/* ========== GUÍA PASO A PASO ========== */}
         <section className={styles.guideSection}>
-          <h2>📋 Guía paso a paso: Cómo construir tu cartera de inversión</h2>
+          <h2><span aria-hidden="true">📋</span> Guía paso a paso: Cómo construir tu cartera de inversión</h2>
 
           <div className={styles.stepGuide}>
             <div className={styles.step}>
@@ -1196,10 +1377,8 @@ export default function SimuladorCarteraPage() {
                   Para empezar, <strong>menos es más</strong>. Una cartera de 2-3 fondos es suficiente:
                 </p>
                 <p>
-                  • <strong>Renta Variable:</strong> 1 fondo indexado global (MSCI World o S&P 500).
-                  Ejemplo: Vanguard Global Stock Index, Amundi MSCI World.<br />
-                  • <strong>Renta Fija:</strong> 1 fondo de bonos agregados (gubernamentales + corporativos).
-                  Ejemplo: Vanguard Global Bond Index.<br />
+                  • <strong>Renta Variable:</strong> 1 fondo indexado global (por ejemplo, uno que replique el MSCI World o un índice mundial equivalente).<br />
+                  • <strong>Renta Fija:</strong> 1 fondo de bonos agregados (gubernamentales + corporativos).<br />
                   • <strong>Liquidez:</strong> Fondo monetario o depósito a corto plazo (reserva accesible).
                 </p>
                 <p>
@@ -1235,12 +1414,12 @@ export default function SimuladorCarteraPage() {
                   Compara brokers por: <strong>comisiones de compra/venta, custodia anual, variedad de fondos/ETFs</strong>.
                 </p>
                 <p>
-                  <strong>Ejemplos de brokers populares (verifica disponibilidad en tu país):</strong><br />
-                  • <strong>España:</strong> MyInvestor, Openbank, Renta 4.<br />
-                  • <strong>México:</strong> GBM+, Kuspit, Bursanet, Interactive Brokers.<br />
-                  • <strong>Argentina:</strong> IOL, Balanz, Cocos Capital.<br />
-                  • <strong>Chile/Colombia/Perú:</strong> Fintual, Tyba, Trii, Renta4 LatAm.<br />
-                  • <strong>Internacional:</strong> Interactive Brokers, eToro, DEGIRO (revisa disponibilidad por país).
+                  <strong>Qué mirar al comparar, sin fijarse en el nombre:</strong><br />
+                  • <strong>Que esté registrado</strong> en el supervisor de tu país y cubierto por su fondo de garantía de inversiones.<br />
+                  • <strong>Comisiones</strong>: de compra y venta, de custodia anual y de cambio de divisa, que es la que más se olvida.<br />
+                  • <strong>Catálogo</strong>: que tenga los fondos o ETF que quieres, no solo los suyos.<br />
+                  • <strong>Fiscalidad</strong>: si practica retención e informa a la administración de tu país, o si tendrás que declararlo por tu cuenta.<br />
+                  • <strong>Traspasos</strong>: si permite mover fondos sin vender, donde la normativa lo prevea.
                 </p>
                 <p>
                   <strong>Documentación necesaria habitual:</strong> documento de identidad, justificante de domicilio, número de cuenta bancaria.
@@ -1289,7 +1468,7 @@ export default function SimuladorCarteraPage() {
 
         {/* ========== MEJORES PRÁCTICAS ========== */}
         <section className={styles.tipsSection}>
-          <h2>✅ Mejores prácticas para inversores a largo plazo</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores prácticas para inversores a largo plazo</h2>
 
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
@@ -1364,7 +1543,7 @@ export default function SimuladorCarteraPage() {
             </li>
             <li>
               <strong>Intentar hacer market timing (adivinar cuándo comprar/vender):</strong> Incluso gestores profesionales fallan en predecir máximos y mínimos.
-              Si te pierdes los 10 mejores días del mercado en 20 años, tu rentabilidad cae a la mitad. <strong>Solución:</strong> Stay invested, no entres y salgas.
+              Las series de «mejores días» que circulan —perderse los 10 mejores días recorta la rentabilidad a la mitad— salen de la bolsa estadounidense y esconden que los mejores días suelen estar pegados a los peores, así que quien sale para evitar unos se pierde los otros. <strong>La conclusión sí se sostiene:</strong> acertar el momento de entrar y salir es muy difícil, y salir y volver cuesta más de lo que parece.
               Invierte regularmente sin intentar "esperar el mejor momento".
             </li>
             <li>
