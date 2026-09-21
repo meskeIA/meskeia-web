@@ -324,16 +324,50 @@
   color: var(--text-muted);
 }
 
-/* Modal */
+/* Modal.
+   El velo y la capa que centra el diálogo son dos elementos desde el 21/09/2026: el velo
+   lleva aria-hidden porque solo sirve para oscurecer y cerrar con el ratón, y el diálogo
+   vive en su propia capa para poder ser role="dialog" sin envolver al velo. */
 .modalOverlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modalCapa {
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1001;
   padding: 20px;
+  pointer-events: none;
+}
+
+.modalCapa > * {
+  pointer-events: auto;
+}
+
+.avisoFormulario {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #e57373;
+  background: #fdecea;
+  color: #8e2a20;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .avisoFormulario {
+  border-color: #b3564c;
+  background: rgba(229, 115, 115, 0.12);
+  color: #f2b8b2;
 }
 
 .modal {

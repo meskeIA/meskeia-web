@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import styles from './CalculadoraSuscripciones.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -50,6 +50,20 @@ const suscripcionesPopulares = [
 
 const STORAGE_KEY = 'meskeia_suscripciones';
 
+/**
+ * Las tres conversiones del cálculo, juntas y con su origen a la vista.
+ *
+ * ⚠️ 2026-09-21 (hallazgos 1077 y 1078 del Inspector): estaban dispersas y no cuadraban
+ *    entre sí — la semana se mensualizaba con 4,33 (año de 51,96 semanas) y el importe
+ *    diario se sacaba dividiendo entre 30 (año de 360 días), de modo que el diario × 365
+ *    no devolvía el anual que la propia app mostraba, con un 1,4 % de desvío.
+ */
+const MESES_ANO = 12;
+/** 365,25 días: incluye el bisiesto, que en 20 años son cinco días de suscripción */
+const DIAS_ANO = 365.25;
+/** 52,18 semanas al año repartidas en 12 meses (no 4,33) */
+const SEMANAS_MES = (DIAS_ANO / 7) / MESES_ANO;
+
 export default function CalculadoraSuscripcionesPage() {
   const [suscripciones, setSuscripciones] = useState<Suscripcion[]>([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -58,6 +72,18 @@ export default function CalculadoraSuscripcionesPage() {
   // Estado del formulario
   const [nombre, setNombre] = useState('');
   const [precio, setPrecio] = useState('');
+  const [errorFormulario, setErrorFormulario] = useState('');
+
+  /**
+   * El formulario de alta es un MODAL, y hasta el 21/09/2026 no era un diálogo (hallazgo
+   * 1080): un div sin role ni aria-modal, que no se llevaba el foco al abrirse ni lo
+   * devolvía al cerrarse, no atrapaba la tabulación —se podía tabular a la página de
+   * detrás, que seguía siendo operable— y no se cerraba con Escape. El único cierre era
+   * un clic en el overlay, un div sin rol ni equivalente de teclado. Con lector de
+   * pantalla o solo con teclado era un callejón sin salida.
+   */
+  const modalRef = useRef<HTMLDivElement>(null);
+  const focoPrevio = useRef<HTMLElement | null>(null);
   const [ciclo, setCiclo] = useState<'mensual' | 'anual' | 'semanal'>('mensual');
   const [categoria, setCategoria] = useState('streaming');
 
@@ -78,28 +104,91 @@ export default function CalculadoraSuscripcionesPage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(suscripciones));
   }, [suscripciones]);
 
+  /**
+   * Cierra el modal y deja el formulario como estaba.
+   *
+   * Es un `useCallback` sin dependencias —los setters de estado son estables— para poder
+   * citarla en las dependencias del efecto del diálogo sin silenciar la regla de hooks:
+   * silenciar la regla aquí sería tapar el aviso en vez de cumplirlo.
+   */
+  const limpiarFormulario = useCallback(() => {
+    setErrorFormulario('');
+    setNombre('');
+    setPrecio('');
+    setCiclo('mensual');
+    setCategoria('streaming');
+    setMostrarFormulario(false);
+    setEditandoId(null);
+  }, []);
+
+  // Diálogo modal: foco al abrir, Escape para cerrar, tabulación atrapada y foco devuelto.
+  useEffect(() => {
+    if (!mostrarFormulario) return;
+
+    focoPrevio.current = document.activeElement as HTMLElement | null;
+    const primero = modalRef.current?.querySelector<HTMLElement>('input, select, button');
+    primero?.focus();
+
+    const alPulsarTecla = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        limpiarFormulario();
+        return;
+      }
+      if (e.key !== 'Tab' || !modalRef.current) return;
+
+      const focusables = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(
+          'input, select, textarea, button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (focusables.length === 0) return;
+      const inicio = focusables[0];
+      const fin = focusables[focusables.length - 1];
+
+      if (e.shiftKey && document.activeElement === inicio) {
+        e.preventDefault();
+        fin.focus();
+      } else if (!e.shiftKey && document.activeElement === fin) {
+        e.preventDefault();
+        inicio.focus();
+      }
+    };
+
+    document.addEventListener('keydown', alPulsarTecla);
+    return () => {
+      document.removeEventListener('keydown', alPulsarTecla);
+      focoPrevio.current?.focus();
+    };
+  }, [mostrarFormulario, limpiarFormulario]);
+
   // Calcular totales
   const totales = useMemo(() => {
+    // ⚠️ 2026-09-21 (hallazgos 1077 y 1078): la semana se mensualizaba con 4,33, de modo
+    //    que el año efectivo salían 51,96 semanas y no 52 —siempre a la baja, justo en una
+    //    app cuyo argumento es que el total anual sorprende—, y el importe diario se
+    //    obtenía dividiendo entre 30, lo que implicaba un año de 360 días: multiplicar por
+    //    365 el diario que la app mostraba no devolvía su propio anual.
+    //    Ahora las tres cifras salen del MISMO año de 365,25 días.
+
     const activas = suscripciones.filter(s => s.activa);
 
-    let mensual = 0;
-    activas.forEach(s => {
-      if (s.ciclo === 'mensual') mensual += s.precio;
-      else if (s.ciclo === 'anual') mensual += s.precio / 12;
-      else if (s.ciclo === 'semanal') mensual += s.precio * 4.33;
-    });
+    const mensualizar = (s: Suscripcion): number => {
+      if (s.ciclo === 'anual') return s.precio / MESES_ANO;
+      if (s.ciclo === 'semanal') return s.precio * SEMANAS_MES;
+      return s.precio;
+    };
 
-    const anual = mensual * 12;
-    const diario = mensual / 30;
+    let mensual = 0;
+    activas.forEach(s => { mensual += mensualizar(s); });
+
+    const anual = mensual * MESES_ANO;
+    const diario = anual / DIAS_ANO;
 
     // Por categoría
     const porCategoria: Record<string, number> = {};
     activas.forEach(s => {
-      let mensualizado = s.precio;
-      if (s.ciclo === 'anual') mensualizado = s.precio / 12;
-      else if (s.ciclo === 'semanal') mensualizado = s.precio * 4.33;
-
-      porCategoria[s.categoria] = (porCategoria[s.categoria] || 0) + mensualizado;
+      porCategoria[s.categoria] = (porCategoria[s.categoria] || 0) + mensualizar(s);
     });
 
     return { mensual, anual, diario, porCategoria, totalActivas: activas.length };
@@ -107,12 +196,34 @@ export default function CalculadoraSuscripcionesPage() {
 
   // Añadir suscripción
   const agregarSuscripcion = () => {
-    if (!nombre.trim() || !precio) return;
+    setErrorFormulario('');
+    if (!nombre.trim()) {
+      setErrorFormulario('Pon un nombre a la suscripción.');
+      return;
+    }
+
+    // ⚠️ 2026-09-21 (hallazgos 1074-1076): el precio se parseaba con
+    //    parseFloat sobre un replace de la coma, que sustituye solo la PRIMERA y deja
+    //    el punto de millar español haciendo de decimal. La app pide formato español en el
+    //    propio placeholder («0,00»), así que «1.234,56» se guardaba como 1,23 €: tres
+    //    órdenes de magnitud por debajo, en silencio y con formato de salida impecable.
+    //    Y el único filtro era `!precio`, de modo que «abc» entraba como NaN y se
+    //    propagaba a las tres tarjetas, al desglose y a la anchura de las barras; un
+    //    precio negativo, también.
+    const precioNumero = parseSpanishNumber(precio);
+    if (Number.isNaN(precioNumero)) {
+      setErrorFormulario('El precio tiene que ser un número. Escríbelo en formato español, como 12,99 o 1.234,56.');
+      return;
+    }
+    if (precioNumero < 0) {
+      setErrorFormulario('El precio no puede ser negativo.');
+      return;
+    }
 
     const nueva: Suscripcion = {
       id: editandoId || Date.now().toString(),
       nombre: nombre.trim(),
-      precio: parseFloat(precio.replace(',', '.')),
+      precio: precioNumero,
       ciclo,
       categoria,
       activa: true,
@@ -129,20 +240,12 @@ export default function CalculadoraSuscripcionesPage() {
     limpiarFormulario();
   };
 
-  // Limpiar formulario
-  const limpiarFormulario = () => {
-    setNombre('');
-    setPrecio('');
-    setCiclo('mensual');
-    setCategoria('streaming');
-    setMostrarFormulario(false);
-    setEditandoId(null);
-  };
-
   // Editar suscripción
   const editarSuscripcion = (s: Suscripcion) => {
     setNombre(s.nombre);
-    setPrecio(s.precio.toString());
+    // `toString()` producía formato US («12.99») en un campo cuyo placeholder es «0,00»
+    // y en una app que en todo lo demás escribe en español (hallazgo 1079).
+    setPrecio(formatNumber(s.precio, 2));
     setCiclo(s.ciclo);
     setCategoria(s.categoria);
     setEditandoId(s.id);
@@ -353,9 +456,19 @@ export default function CalculadoraSuscripcionesPage() {
 
         {/* Modal de formulario */}
         {mostrarFormulario && (
-          <div className={styles.modalOverlay} onClick={limpiarFormulario}>
-            <div className={styles.modal} onClick={e => e.stopPropagation()}>
-              <h3 className={styles.modalTitulo}>
+          <div className={styles.modalOverlay} onClick={limpiarFormulario} aria-hidden="true" />
+        )}
+        {mostrarFormulario && (
+          <div className={styles.modalCapa}>
+            <div
+              ref={modalRef}
+              className={styles.modal}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-titulo"
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 className={styles.modalTitulo} id="modal-titulo">
                 {editandoId ? 'Editar suscripción' : 'Nueva suscripción'}
               </h3>
               <div className={styles.formGroup}>
@@ -411,6 +524,12 @@ export default function CalculadoraSuscripcionesPage() {
                   ))}
                 </select>
               </div>
+              {errorFormulario && (
+                <p className={styles.avisoFormulario} role="alert" aria-live="assertive">
+                  <span aria-hidden="true">⚠️</span> {errorFormulario}
+                </p>
+              )}
+
               <div className={styles.modalAcciones}>
                 <button
                   type="button"
@@ -499,53 +618,53 @@ export default function CalculadoraSuscripcionesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon}><span aria-hidden="true">🎓</span></span>
                 <strong>Estudiante universitario</strong>
               </div>
               <p className={styles.escenarioExample}>
                 Pablo, 21 años: Netflix (12,99 €) + Spotify (10,99 €) + iCloud 50GB (0,99 €) + ChatGPT Plus (20 €) = <strong>44,97 €/mes → 539,64 €/año</strong>
               </p>
               <p className={styles.escenarioTip}>
-                💡 Activa los planes universitarios: Spotify Student cuesta 5,99 €, Apple Music Student 5,99 €. Comparte Netflix con tu familia.
+                <span aria-hidden="true">💡</span> Activa los planes universitarios: Spotify Student cuesta 5,99 €, Apple Music Student 5,99 €. Comparte Netflix con tu familia.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon}><span aria-hidden="true">💼</span></span>
                 <strong>Adulto trabajador</strong>
               </div>
               <p className={styles.escenarioExample}>
                 Marta, 34 años: descubrió que pagaba <strong>12 suscripciones = 187 €/mes</strong>. El 30% eran servicios que apenas usaba — dinero invisible que se acumula mes a mes.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Auditoría trimestral obligatoria. Si no lo has abierto en 30 días, cancela sin dudas.
+                <span aria-hidden="true">💡</span> Auditoría trimestral obligatoria. Si no lo has abierto en 30 días, cancela sin dudas.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <span className={styles.escenarioIcon}><span aria-hidden="true">👨‍👩‍👧‍👦</span></span>
                 <strong>Familia con hijos</strong>
               </div>
               <p className={styles.escenarioExample}>
                 La familia García pagaba plataformas por separado: Netflix (15,99 €) + Disney+ (11,99 €) + Amazon Prime (8,99 €). Con planes familiares: <strong>potencial ahorro de 25 €/mes</strong>.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Centraliza el entretenimiento en planes familia. Un adulto gestiona, todos se benefician.
+                <span aria-hidden="true">💡</span> Centraliza el entretenimiento en planes familia. Un adulto gestiona, todos se benefician.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🖥️</span>
+                <span className={styles.escenarioIcon}><span aria-hidden="true">🖥️</span></span>
                 <strong>Freelance/Autónomo</strong>
               </div>
               <p className={styles.escenarioExample}>
                 Carlos usa Adobe CC (54,99 €) + Notion (16 €) + Figma (15 €) + Slack (7,25 €) + G-Suite (12 €) = <strong>105 €/mes deducibles en IRPF</strong>.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Las suscripciones profesionales son deducibles como autónomo. Guarda las facturas, pero revisa igualmente cuáles realmente usas.
+                <span aria-hidden="true">💡</span> Las suscripciones profesionales son deducibles como autónomo. Guarda las facturas, pero revisa igualmente cuáles realmente usas.
               </p>
             </div>
           </div>
@@ -557,50 +676,50 @@ export default function CalculadoraSuscripcionesPage() {
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Cuánto debería gastar en suscripciones como máximo?</h4>
-              <p>Los expertos en finanzas personales recomiendan no superar el <strong>5% de los ingresos netos</strong> en ocio, y el 10% sumando productividad. Con 2.000 €/mes netos, el límite sería 100-200 €/mes total.</p>
-              <p className={styles.faqTip}>💡 Si superas el 10% de tus ingresos en suscripciones, es señal clara de que necesitas revisar y cortar.</p>
+              <p>No hay una cifra oficial ni un porcentaje que valga para todo el mundo: depende de qué parte de tu ocio pasa por ahí, de si alguna suscripción sustituye a un gasto mayor y de cuánto margen te deja el resto del presupuesto. Un límite que tú te fijes y revises cada pocos meses funciona mejor que un porcentaje heredado. Lo que sí conviene mirar es el reparto por categorías de aquí arriba: si una sola se lleva la mitad del total, suele ser la primera candidata a revisar.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si superas el 10% de tus ingresos en suscripciones, es señal clara de que necesitas revisar y cortar.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo descubro todas mis suscripciones activas?</h4>
               <p>Revisa los extractos bancarios de los últimos <strong>3 meses</strong> (cuenta corriente y tarjeta por separado). Busca cargos recurrentes. También revisa el email buscando &quot;recibo&quot;, &quot;factura&quot;, &quot;renovación automática&quot;.</p>
-              <p className={styles.faqTip}>💡 Los cargos se disfrazan: &quot;AMZN*PRIME&quot; = Amazon Prime, &quot;NFLX&quot; = Netflix, &quot;SPTFY&quot; = Spotify.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los cargos se disfrazan: &quot;AMZN*PRIME&quot; = Amazon Prime, &quot;NFLX&quot; = Netflix, &quot;SPTFY&quot; = Spotify.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Es mejor pagar anual o mensual?</h4>
               <p>El ahorro anual suele ser del <strong>15-30%</strong>, pero pierdes flexibilidad. Paga anual solo si llevas más de 3 meses usándolo regularmente y tienes certeza de que continuarás.</p>
-              <p className={styles.faqTip}>💡 Nunca pagues anual una suscripción nueva. Confirma durante 3 meses que realmente la usas.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Nunca pagues anual una suscripción nueva. Confirma durante 3 meses que realmente la usas.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cuándo merece la pena el plan familiar?</h4>
               <p>Cuando lo usan <strong>3+ personas</strong> y el coste individual baja mínimo un 30%. Netflix Estándar (18 €) vs 3 cuentas individuales (38,97 €): ahorro de 20,97 €/mes.</p>
-              <p className={styles.faqTip}>💡 Compara siempre el coste por persona antes de contratar el plan familiar.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Compara siempre el coste por persona antes de contratar el plan familiar.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Las pruebas gratuitas son una trampa?</h4>
-              <p>El <strong>60% de los usuarios</strong> que se apuntan a pruebas gratuitas olvidan cancelarlas. Las empresas diseñan deliberadamente el proceso de cancelación para ser confuso.</p>
-              <p className={styles.faqTip}>💡 En el momento que te apuntas a la prueba, pon YA un recordatorio para cancelar 2 días antes de que termine.</p>
+              <p>Olvidar cancelar una prueba gratuita es tan común que tiene nombre propio en la literatura de consumo: los «patrones oscuros» de cancelación. La Comisión Europea y las autoridades de consumo llevan años persiguiéndolos precisamente porque funcionan. Circulan porcentajes muy redondos sobre cuánta gente lo olvida, pero sin estudio detrás que los sostenga: lo útil no es la cifra, sino apuntar la fecha de fin de prueba el mismo día que te das de alta.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el momento que te apuntas a la prueba, pon YA un recordatorio para cancelar 2 días antes de que termine.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo cancelo una suscripción difícil de cancelar?</h4>
-              <p>Si el proceso normal es opaco: busca en Google &quot;[nombre] cancelar suscripción España&quot;. Como último recurso, la Ley de Servicios de la Sociedad de la Información obliga a que cancelar sea igual de fácil que contratar.</p>
-              <p className={styles.faqTip}>💡 Guarda siempre la confirmación de cancelación. Si el cargo aparece igualmente, tienes prueba para disputarlo con tu banco.</p>
+              <p>Si el proceso normal es opaco: busca en Google &quot;[nombre] cancelar suscripción España&quot;. En España, el art. 62.3 del texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios (RDL 1/2007) reconoce el derecho a poner fin al contrato <strong>en la misma forma en que se celebró</strong>, sin sanción ni cargas desproporcionadas: si te contrataste con dos clics, no pueden exigirte una carta certificada.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Guarda siempre la confirmación de cancelación. Si el cargo aparece igualmente, tienes prueba para disputarlo con tu banco.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué pasa si cancelo un plan anual a mitad?</h4>
               <p>La mayoría no devuelven el dinero restante. Algunos lo convierten en crédito hasta que vence. Apple App Store y Google Play tienen políticas de reembolso más flexibles los primeros días.</p>
-              <p className={styles.faqTip}>💡 Cancela siempre 1-2 días antes de la fecha de renovación, no el mismo día. Los sistemas pueden facturar con antelación.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Cancela siempre 1-2 días antes de la fecha de renovación, no el mismo día. Los sistemas pueden facturar con antelación.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Vale la pena usar apps de gestión de suscripciones?</h4>
-              <p>Apps como Truebill o Mint detectan suscripciones en tu banco. Son útiles con muchas suscripciones, pero requieren <strong>acceso a tus datos bancarios</strong>. Esta calculadora no necesita ese acceso.</p>
-              <p className={styles.faqTip}>💡 Una hoja de cálculo o esta calculadora con revisión trimestral es suficiente para la mayoría de personas sin ceder datos bancarios.</p>
+              <p>Hay servicios que detectan las suscripciones leyendo los cargos de tu banco. Son útiles cuando tienes muchas, pero requieren <strong>acceso a tus datos bancarios</strong>, y el sector se mueve deprisa: dos de los más citados hace unos años ya no existen con aquel nombre —Truebill pasó a llamarse Rocket Money en 2022 y Mint cerró en marzo de 2024—, así que comprueba qué sigue operativo antes de dar acceso a nada. Esta calculadora no necesita ese acceso.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Una hoja de cálculo o esta calculadora con revisión trimestral es suficiente para la mayoría de personas sin ceder datos bancarios.</p>
             </div>
           </div>
         </section>
@@ -627,7 +746,7 @@ export default function CalculadoraSuscripcionesPage() {
               <div className={styles.stepNumber}>3</div>
               <div className={styles.stepContent}>
                 <strong>Introdúcelos en esta calculadora</strong>
-                <p>Registra cada suscripción con su categoría y ciclo. El total anual suele sorprender: la media española supera los 1.800 €/año.</p>
+                <p>Registra cada suscripción con su categoría y ciclo. El total anual suele sorprender, y esa es justamente la razón de sumarlo: doce cargos pequeños no se parecen a un recibo grande aunque cuesten lo mismo.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -666,34 +785,34 @@ export default function CalculadoraSuscripcionesPage() {
           <h3>6 Mejores Prácticas para Gestionar Suscripciones</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💳</span>
+              <span className={styles.tipIcon}><span aria-hidden="true">💳</span></span>
               <strong>Una tarjeta exclusiva</strong>
               <p>Usa una tarjeta virtual o específica solo para suscripciones. Así ves todos los cargos de un vistazo sin mezclarlos con otros gastos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon}><span aria-hidden="true">📅</span></span>
               <strong>Recordatorio de renovación</strong>
               <p>Al contratar cualquier suscripción anual, pon inmediatamente un recordatorio 7 días antes de la renovación para decidir si la continúas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon}><span aria-hidden="true">🔄</span></span>
               <strong>Rotación estacional</strong>
               <p>No tienes que tener todo activo siempre. Suscríbete a Netflix en invierno, cancela en verano. Alterna plataformas según el contenido disponible.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎓</span>
+              <span className={styles.tipIcon}><span aria-hidden="true">🎓</span></span>
               <strong>Aprovecha descuentos</strong>
               <p>Spotify Student (5,99 €), Apple Music Student (5,99 €), Adobe descuento educación (60%). Y revisiones en Black Friday para contratos anuales.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👨‍👩‍👧</span>
+              <span className={styles.tipIcon}><span aria-hidden="true">👨‍👩‍👧</span></span>
               <strong>Comparte legalmente</strong>
               <p>Amazon Prime, Apple One y Spotify Duo facilitan el uso compartido en el mismo hogar. Comprueba siempre que el servicio lo permite explícitamente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
-              <strong>Regla del 5%</strong>
-              <p>Si el total mensual supera el 5% de tus ingresos netos, corta. Aplica la regla de Marie Kondo: si no te aporta valor real, cancela sin culpa.</p>
+              <span className={styles.tipIcon}><span aria-hidden="true">📊</span></span>
+              <strong>Un techo tuyo</strong>
+              <p>Fija un límite mensual y revísalo cada pocos meses. Cuál sea es cosa tuya: lo que hace trabajo es tenerlo escrito y comparar el total de arriba con él, no el número concreto.</p>
             </div>
           </div>
         </section>
@@ -701,11 +820,11 @@ export default function CalculadoraSuscripcionesPage() {
         {/* Sección 6: Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon}><span aria-hidden="true">⚠️</span></span>
             <strong>6 errores que hacen que gastes de más en suscripciones</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>No cancelar las pruebas gratuitas</strong> — El 60% de los usuarios olvida cancelar antes del cargo. Las empresas cuentan con esto.</li>
+            <li><strong>No cancelar las pruebas gratuitas</strong> — El cargo llega cuando ya te has olvidado de que la contrataste. Apunta la fecha de fin de prueba en el calendario el mismo día del alta.</li>
             <li><strong>Subestimar el coste acumulado</strong> — &quot;Son solo 10 €&quot; × 10 suscripciones = 1.200 €/año. El pago fraccionado hace invisible el total real.</li>
             <li><strong>Pagar anual sin estar seguro</strong> — Contratar un plan anual de algo recién descubierto es arriesgado. Prueba 3 meses en mensual primero.</li>
             <li><strong>Ignorar las subidas de precio</strong> — Netflix, Spotify y otros suben precios silenciosamente. Sin revisión periódica, pagas más sin darte cuenta.</li>

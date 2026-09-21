@@ -182,37 +182,48 @@ test('CASO 1 · los tres ciclos se mensualizan y se suman', async ({ page }) => 
     categoria: 'otros',
   });
 
-  // 12,99 + 120/12 + 5×4,33 = 12,99 + 10,00 + 21,65 — cabecera del fichero, CASO 1.
-  await expect(valorDe(page, MENSUAL)).toHaveText('44,64 €');
-  await expect(valorDe(page, ANUAL)).toHaveText('535,68 €'); // 44,64 × 12
-  await expect(valorDe(page, DIARIO)).toHaveText('1,49 €'); // 44,64 / 30 = 1,488
+  // ⚠️ Hallazgos 1077 y 1078: la semana se mensualizaba con 4,33 (año de 51,96 semanas)
+  // y el diario se sacaba dividiendo entre 30 (año de 360 días), así que el diario × 365 no
+  // devolvía el anual que la propia app mostraba. Ahora las tres salen del mismo año de
+  // 365,25 días: SEMANAS_MES = (365,25/7)/12 = 4,3482142857.
+  // 12,99 + 120/12 + 5×4,3482142857 = 12,99 + 10,00 + 21,7410714 = 44,7310714
+  await expect(valorDe(page, MENSUAL)).toHaveText('44,73 €');
+  await expect(valorDe(page, ANUAL)).toHaveText('536,77 €'); // 44,7310714 × 12
+  await expect(valorDe(page, DIARIO)).toHaveText('1,47 €'); // 536,7728 / 365,25
   await expect(valorDe(page, ACTIVAS)).toHaveText('3');
+
+  // Y ahora las tres cifras cuadran entre sí, que es lo que antes no pasaba.
+  const leer = async (etiqueta: string) =>
+    Number((await valorDe(page, etiqueta).innerText()).replace(/[^\d,-]/g, '').replace(',', '.'));
+  expect(await leer(DIARIO)).toBeCloseTo((await leer(ANUAL)) / 365.25, 2);
+  expect(await leer(ANUAL)).toBeCloseTo((await leer(MENSUAL)) * 12, 1);
 
   // El mismo total leído como número, para que un error de magnitud (una periodicidad
   // convertida al revés daría 6.432 €/año) no pueda esconderse tras un cambio de formato.
   const anualLeido = Number(
     (await valorDe(page, ANUAL).innerText()).replace(/[^\d,-]/g, '').replace(',', '.'),
   );
-  expect(anualLeido).toBeCloseTo(535.68, 2);
+  expect(anualLeido).toBeCloseTo(536.77, 2);
 
   // Desglose por categoría, ordenado de mayor a menor gasto mensualizado.
   const montos = page.locator('[class*="categoriaMonto"]');
-  await expect(montos).toHaveText(['21,65 €/mes', '12,99 €/mes', '10,00 €/mes']);
+  await expect(montos).toHaveText(['21,74 €/mes', '12,99 €/mes', '10,00 €/mes']);
 
   // La ficha de cada suscripción conserva su importe y su ciclo originales, sin mensualizar.
   const fichaSeguro = page.locator('[class*="suscripcionItem"]').filter({ hasText: 'Seguro' });
   await expect(fichaSeguro).toContainText('120,00');
   await expect(fichaSeguro).toContainText('Anual');
 
-  // Pausar una la saca del cómputo sin borrarla: 12,99 + 21,65 = 34,64 → 415,68 €/año.
+  // Pausar una la saca del cómputo sin borrarla: 12,99 + 21,74 = 34,73 → 416,77 €/año.
   await page.getByRole('button', { name: 'Pausar Seguro' }).click();
-  await expect(valorDe(page, MENSUAL)).toHaveText('34,64 €');
-  await expect(valorDe(page, ANUAL)).toHaveText('415,68 €');
+  await expect(valorDe(page, MENSUAL)).toHaveText('34,73 €');
+  await expect(valorDe(page, ANUAL)).toHaveText('416,77 €');
   await expect(valorDe(page, ACTIVAS)).toHaveText('2');
 });
 
 test('CASO 2 · un precio en formato español con separador de miles', async ({ page }) => {
-  test.fail(); // HALLAZGO ABIERTO: parseFloat('1.234,56'.replace(',','.')) = 1,234
+  // Hallazgo 1074 · reparado el 21/09/2026: el precio se parseaba a mano y el punto de
+  // millar español acababa haciendo de decimal, así que «1.234,56» se guardaba como 1,23 €.
 
   await anadirSuscripcion(page, {
     nombre: 'Software',
@@ -222,11 +233,11 @@ test('CASO 2 · un precio en formato español con separador de miles', async ({ 
   });
 
   // 1.234,56 € al año son 1234,56 / 12 = 102,88 €/mes exactos — cabecera, CASO 2.
-  await expect(valorDe(page, ANUAL)).toHaveText('1.234,56 €');
+  // es-ES no agrupa el millar hasta cinco dígitos enteros: «1234,56 €», sin punto.
+  await expect(valorDe(page, ANUAL)).toHaveText('1234,56 €');
   await expect(valorDe(page, MENSUAL)).toHaveText('102,88 €');
-  await expect(valorDe(page, DIARIO)).toHaveText('3,43 €'); // 102,88 / 30 = 3,4293…
+  await expect(valorDe(page, DIARIO)).toHaveText('3,38 €'); // 1.234,56 / 365,25
 
-  // Lo que la app muestra hoy: «1,23 €» de gasto anual y «0,10 €» de gasto mensual.
   const mensualLeido = Number(
     (await valorDe(page, MENSUAL).innerText()).replace(/[^\d,-]/g, '').replace(',', '.'),
   );
@@ -236,7 +247,6 @@ test('CASO 2 · un precio en formato español con separador de miles', async ({ 
 });
 
 test('CASO 2.bis · «1.500» es mil quinientos, no uno con cinco', async ({ page }) => {
-  test.fail(); // HALLAZGO ABIERTO: parseFloat('1.500') = 1,5
 
   await anadirSuscripcion(page, {
     nombre: 'Coworking',
@@ -245,7 +255,7 @@ test('CASO 2.bis · «1.500» es mil quinientos, no uno con cinco', async ({ pag
     categoria: 'productividad',
   });
 
-  await expect(valorDe(page, MENSUAL)).toHaveText('1.500,00 €');
+  await expect(valorDe(page, MENSUAL)).toHaveText('1500,00 €');
   await expect(valorDe(page, ANUAL)).toHaveText('18.000,00 €'); // 1.500 × 12
 });
 
@@ -261,7 +271,9 @@ test('CASO 3 · el campo Precio vacío bloquea el alta', async ({ page }) => {
 });
 
 test('CASO 3.bis · un precio que no es un número debe rechazarse', async ({ page }) => {
-  test.fail(); // HALLAZGO ABIERTO: «abc» se acepta y el NaN contamina todos los totales
+  // Hallazgo 1075 · el único filtro era `!precio`, así que «abc» entraba como NaN y se
+  // propagaba a las TRES tarjetas, al desglose y a la anchura de las barras: el usuario
+  // perdía también el cálculo de las suscripciones válidas que ya tenía, sin ningún aviso.
 
   // Primero una suscripción válida, para comprobar que lo ya calculado no se pierde.
   await anadirSuscripcion(page, { nombre: 'Revista', precio: '12,99' });
@@ -273,15 +285,58 @@ test('CASO 3.bis · un precio que no es un número debe rechazarse', async ({ pa
   await expect(valorDe(page, ACTIVAS)).toHaveText('1');
   await expect(valorDe(page, MENSUAL)).toHaveText('12,99 €');
   await expect(valorDe(page, ANUAL)).toHaveText('155,88 €'); // 12,99 × 12
-  // Hoy las tres tarjetas dicen «No definido», porque formatCurrency(NaN) lo escribe así.
+  // Y en ningún sitio aparece el «No definido» con que formatCurrency escribe un NaN.
+  await expect(page.locator('body')).not.toContainText('No definido');
 });
 
 test('CASO 3.ter · un precio negativo debe rechazarse', async ({ page }) => {
-  test.fail(); // HALLAZGO ABIERTO: «-10» se acepta y produce un gasto negativo
 
   await intentarAlta(page, { nombre: 'Negativa', precio: '-10', categoria: 'otros' });
 
-  // Un gasto de suscripción no puede ser negativo. Hoy: «-10,00 €» y «-120,00 €».
+  // Un gasto de suscripción no puede ser negativo: antes entraba y dibujaba barras de
+  // anchura negativa en el desglose por categoría (hallazgo 1076).
   await expect(valorDe(page, ACTIVAS)).toHaveText('0');
   await expect(valorDe(page, MENSUAL)).toHaveText('0,00 €');
+});
+
+test('CASO 4 · el modal es un diálogo de verdad: foco, Escape y tabulación atrapada', async ({ page }) => {
+  // Hallazgo 1080 · era un div sin role ni aria-modal, no se llevaba el foco ni lo
+  // devolvía, no atrapaba la tabulación y no se cerraba con Escape: con lector de
+  // pantalla o solo con teclado era un callejón sin salida.
+  const abrir = page.getByRole('button', { name: '+ Añadir' });
+  await abrir.click();
+
+  const dialogo = page.getByRole('dialog');
+  await expect(dialogo).toHaveCount(1);
+  await expect(dialogo).toHaveAttribute('aria-modal', 'true');
+  // El título le da nombre accesible.
+  await expect(dialogo).toContainText('Nueva suscripción');
+
+  // Al abrirse, el foco entra en el primer campo.
+  await expect(page.locator('#nombre')).toBeFocused();
+
+  // La tabulación no se escapa a la página de detrás: desde el último control vuelve al
+  // primero. Con «Añadir» deshabilitado, el último focusable es «Cancelar».
+  await page.getByRole('button', { name: 'Cancelar' }).focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#nombre')).toBeFocused();
+
+  // Escape lo cierra y el foco vuelve al botón que lo abrió.
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(abrir).toBeFocused();
+});
+
+test('CASO 5 · al editar, el precio vuelve en formato español', async ({ page }) => {
+  // Hallazgo 1079 · `s.precio.toString()` devolvía «12.99» en un campo cuyo placeholder
+  // es «0,00», y justo en el momento de corregir un importe.
+  await anadirSuscripcion(page, { nombre: 'Revista', precio: '12,99', categoria: 'noticias' });
+
+  await page.getByRole('button', { name: /Editar Revista/ }).click();
+  await expect(page.locator('#precio')).toHaveValue('12,99');
+
+  // Y al guardar sin tocar nada, el total no se mueve.
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(page.locator('#precio')).toHaveCount(0);
+  await expect(valorDe(page, MENSUAL)).toHaveText('12,99 €');
 });
