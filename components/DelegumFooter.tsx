@@ -69,7 +69,7 @@ export default function DelegumFooter() {
           <Link href="/aviso-legal" className={styles.legalLink}>
             Aviso legal y Términos
           </Link>
-          <a href="https://meskeia.com/privacidad" className={styles.legalLink}>
+          <a href="https://meskeia.com/privacidad/" className={styles.legalLink}>
             Privacidad
           </a>
           <button type="button" className={styles.shareBtn} onClick={compartir} aria-live="polite">

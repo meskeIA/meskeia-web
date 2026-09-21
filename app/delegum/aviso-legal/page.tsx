@@ -139,7 +139,7 @@ export default function DelegumAvisoLegalPage() {
               <li>Los parámetros de cada consulta se procesan en memoria y <strong>no se almacenan</strong>.</li>
               <li>No se requiere cuenta, email ni ningún dato personal para usar el servidor.</li>
               <li>Toda la comunicación viaja cifrada por <strong>HTTPS/TLS</strong>.</li>
-              <li>Política de privacidad completa: <a href="/privacidad" className={styles.link}>meskeia.com/privacidad</a>.</li>
+              <li>Política de privacidad completa: <a href="https://meskeia.com/privacidad/" className={styles.link}>meskeia.com/privacidad</a>.</li>
             </ul>
           </section>
 

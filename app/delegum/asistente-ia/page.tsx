@@ -152,7 +152,7 @@ export default function AsistenteIaPage() {
               <li>Toda la comunicación viaja cifrada por <strong>HTTPS/TLS</strong>.</li>
               <li>No se requiere cuenta, email ni ningún dato personal para usar el servidor.</li>
               <li>Cada respuesta fiscal, laboral o financiera incluye un <strong>aviso legal</strong> de carácter orientativo y la recomendación de consultar a un profesional colegiado.</li>
-              <li>Política de privacidad completa: <a href="https://meskeia.com/privacidad" className={styles.link}>meskeia.com/privacidad</a>.</li>
+              <li>Política de privacidad completa: <a href="https://meskeia.com/privacidad/" className={styles.link}>meskeia.com/privacidad</a>.</li>
             </ul>
           </section>
 
@@ -163,7 +163,7 @@ export default function AsistenteIaPage() {
               en normativa española del ejercicio 2025 y pueden no contemplar todas las particularidades de tu caso.
               No constituyen asesoramiento fiscal, laboral ni jurídico vinculante. Para decisiones reales, consulta
               a un asesor colegiado, a un graduado social o a la Agencia Tributaria.{' '}
-              Consulta el <a href="/aviso-legal" className={styles.link}>Aviso Legal y Términos de Uso</a> completo.
+              Consulta el <a href="/aviso-legal/" className={styles.link}>Aviso Legal y Términos de Uso</a> completo.
             </div>
           </section>
 
@@ -172,7 +172,7 @@ export default function AsistenteIaPage() {
             <h2 className={styles.sectionTitle}>Soporte</h2>
             <p>
               Para dudas sobre la conexión, problemas técnicos o sugerencias de nuevas consultas,
-              usa el <a href="https://meskeia.com/contacto" className={styles.link}>formulario de contacto</a>.
+              usa el <a href="https://meskeia.com/contacto/" className={styles.link}>formulario de contacto</a>.
             </p>
           </section>
 
