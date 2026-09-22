@@ -257,8 +257,10 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
    *   = base liquidable   24.406,54
    *   cuota íntegra        2.081,95   TARIFA_ESTATAL_IS, tramo «hasta 31.955,81»:
    *                                   2.037,26 + 10,20 % × (24.406,54 − 23.968,36)
-   *   × 1,5882 → 3.306,56 €   COEFICIENTES_IS['III'][0], patrimonio < 402.678 €
-   *   × 1,9059 → 3.968,00 €   COEFICIENTES_IS['III'][3], patrimonio > 4.020.770 €
+   *   × 1,5882 → 3.306,55 €   COEFICIENTES_IS['III'][0], patrimonio < 402.678 €
+   *                          (2.081,95 × 1,5882 = 3.306,5534…; hasta el 1195 la app
+   *                           multiplicaba por 2.081,95436 y publicaba 3.306,56)
+   *   × 1,9059 → 3.967,99 €   COEFICIENTES_IS['III'][3], patrimonio > 4.020.770 €
    *
    *   Sin bonificación en cuota: en Asturias el beneficio ya se gastó en la base.
    *
@@ -266,23 +268,31 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
    * caso y anuncia «~17.200 € (21,5 %)» porque se salta los 50.000 € de reducción. Es el
    * hallazgo de contenido del acta: la app se contradice a sí misma por 5,4 veces.
    */
-  test('caso límite: Grupo III en Asturias, 3.306,56 € y 3.968,00 € según patrimonio', async ({ page }) => {
+  test('caso límite: Grupo III en Asturias, 3.306,55 € y 3.967,99 € según patrimonio', async ({ page }) => {
     await page.goto(RUTA);
 
     await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
     await page.locator('select').nth(SELECT.parentesco).selectOption('III');
     await importe(page, CAMPO.saldos, '80000');
 
-    expect(await cuota(page)).toBe('3306,56 €');
+    /*
+      ⚠️ 22/09/2026 (hallazgo 1195) — la cuota pasa de 3306,56 € a 3306,55 €. La app multiplicaba
+      el coeficiente del art. 22 LISD por los 2081,95436 € de su aritmética interna mientras
+      imprimía en pantalla «Cuota íntegra 2081,95 €», así que el desglose no cuadraba consigo
+      mismo: 2081,95 × 1,5882 = 3306,55. Ahora parte del importe liquidado, como el motor y como
+      las casillas del modelo 650.
+    */
+    expect(await cuota(page)).toBe('3306,55 €');
 
     const panel = await textoPagina(page);
     expect(panel).toContain('50.000,00 €');   // la reducción en base de Asturias, que existe
     expect(panel).toContain('24.406,54 €');   // base liquidable
     expect(panel).toContain('2081,95 €');     // cuota íntegra antes del coeficiente
 
-    // El coeficiente multiplicador del Grupo III sí crece con el patrimonio preexistente
+    // El coeficiente multiplicador del Grupo III sí crece con el patrimonio preexistente.
+    // 2081,95 × 1,9059 = 3967,9887… → 3967,99 (antes 3968,00, desde 2081,95436).
     await page.locator('select').nth(SELECT.patrimonio).selectOption('4');
-    expect(await cuota(page)).toBe('3968,00 €');
+    expect(await cuota(page)).toBe('3967,99 €');
   });
 
   /**
@@ -430,7 +440,8 @@ test.describe('Reparación 11/09/2026 — formulario, contenido y señal estruct
     await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
     await page.locator('select').nth(SELECT.parentesco).selectOption('III');
     await importe(page, CAMPO.saldos, '80000');
-    expect(await cuota(page)).toBe('3306,56 €');
+    // 22/09/2026: 3306,55 € desde el redondeo del 1195 — 2081,95 × 1,5882.
+    expect(await cuota(page)).toBe('3306,55 €');
 
     const tarjeta = await textoCompleto(page);
     /*
@@ -441,7 +452,7 @@ test.describe('Reparación 11/09/2026 — formulario, contenido y señal estruct
       (hallazgo 1153). Al derivar la tarjeta del motor (hallazgo 1152) la escribe
       `formatCurrency`, así que la grafía es Única y el test exige la del panel.
     */
-    expect(tarjeta).toContain('3306,56 €');   // la tarjeta del bloque educativo
+    expect(tarjeta).toContain('3306,55 €');   // la tarjeta del bloque educativo
     expect(tarjeta).not.toContain('3.306,56 €');
     expect(tarjeta).not.toContain('17.200');
     expect(tarjeta).toContain('50.000,00 € en la base');
@@ -1054,7 +1065,7 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
    *   (b) Activos          990.000,00 → + ajuar 29.700,00 = base imponible 1.019.700,00
    *       = base liquidable 1.003.743,13 ≥ 1.000.000 → sin exención, bonificación del 99 %
    *       cuota íntegra     269.395,34  199.291,40 + 34 % × (1.003.743,13 − 797.555,08)
-   *       − bonificación    266.701,38
+   *       − bonificación    266.701,39   269.395,34 × 99 % sobre la cuota LIQUIDADA (1195)
    *       = cuota final        2693,95 €  (tipo efectivo 0,26 %)
    *
    * 5.000 € más de herencia convierten una cuota de cero en 2.693,95 €.
@@ -1077,7 +1088,10 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
     const sobreElMillon = await panelResultados(page);
     expect(sobreElMillon).toContain('1.003.743,13 €');  // base liquidable, ya sobre el millón
     expect(sobreElMillon).toContain('269.395,34 €');    // cuota íntegra
-    expect(sobreElMillon).toContain('266.701,38 €');    // bonificación del 99 %
+    // 22/09/2026 (hallazgo 1195): la bonificación sale ahora de la cuota íntegra LIQUIDADA, y
+    // con eso el desglose cuadra con lo que se lee — 269.395,34 − 266.701,39 = 2693,95, la
+    // cuota final que esta misma prueba fija arriba. Antes daba 2693,96 y mostraba 2693,95.
+    expect(sobreElMillon).toContain('266.701,39 €');    // bonificación del 99 %
     expect(sobreElMillon).toContain('Bonificación 99,0 % (Andalucía)');
     expect(sobreElMillon, 'ya no hay exención al llegar al millón').not.toContain('Exención total');
   });
@@ -1241,7 +1255,8 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
     await page.locator('select').nth(SELECT.ccaa).selectOption('asturias');
     await page.locator('select').nth(SELECT.parentesco).selectOption('III');
     await importe(page, CAMPO.saldos, '80000');
-    expect(await cuota(page)).toBe('3306,56 €');
+    // 22/09/2026: 3306,55 € desde el redondeo del 1195 — 2081,95 × 1,5882.
+    expect(await cuota(page)).toBe('3306,55 €');
 
     const texto = await textoCompleto(page);
     // Un solo tipo efectivo para la misma operación, con el denominador del motor
@@ -1424,7 +1439,7 @@ test.describe('re-inspección 22/09/2026', () => {
    *   (b) Activos        112.579,49 → + ajuar 3.377,38 = base imponible 115.956,87
    *       = base liquid. 100.000,00  > 100.000 → ya no exime: bonificación del 99 %
    *       cuota íntegra   12.415,36
-   *       − bonificación  12.291,20
+   *       − bonificación  12.291,21
    *       = cuota final      124,15 €  (tipo efectivo 0,11 %)
    *
    * UN CÉNTIMO de herencia convierte una cuota de cero en 124,15 €.
@@ -1447,7 +1462,9 @@ test.describe('re-inspección 22/09/2026', () => {
     expect(await cuota(page)).toBe('124,15 €');
     const sobreElEscalon = await panelResultados(page);
     expect(sobreElEscalon).toContain('100.000,00 €');  // base liquidable, ya en el escalón
-    expect(sobreElEscalon).toContain('12.291,20 €');   // bonificación del 99 %
+    // 22/09/2026 (hallazgo 1195): 12.415,36 − 12.291,21 = 124,15, la cuota final que esta misma
+    // prueba fija arriba. Antes daba 124,16 y mostraba 124,15.
+    expect(sobreElEscalon).toContain('12.291,21 €');   // bonificación del 99 %
     expect(sobreElEscalon).toContain('Bonificación 99 % (Cantabria)');
     expect(sobreElEscalon, 'sigue eximiendo pasado el escalón').not.toContain('Bonificación 100 %');
   });
@@ -1524,15 +1541,21 @@ test.describe('re-inspección 22/09/2026', () => {
    *     ilustra a la app NO puede hacerlas coincidir mientras las dos aritméticas
    *     redondeen en sitios distintos.
    */
-  test('1152 — la tarjeta del sobrino sigue publicando otro tipo efectivo y otra cuota que el panel', async ({ page }) => {
-    test.fail();
-
-    // Lo que la HERRAMIENTA liquida con esos datos
+  test('1194+1195 (regresión) — la tarjeta del sobrino publica el MISMO tipo efectivo y la misma cuota que el panel', async ({ page }) => {
+    // Lo que la HERRAMIENTA liquida con esos datos.
+    //
+    // ⚠️ 22/09/2026 — la cuota pasa de 3306,56 € a 3306,55 € y el cambio es la reparación del
+    // 1195: la app multiplicaba el coeficiente del art. 22 LISD por los 2081,95436 € de su
+    // aritmética interna mientras imprimía en pantalla «Cuota íntegra 2081,95 €», así que su
+    // propio desglose no cuadraba consigo mismo por un céntimo. El motor —y el modelo 650—
+    // parten del importe liquidado. Este testigo fijaba la cifra vieja desde el 21/09.
     await page.locator('#ccaa-causante').selectOption('asturias');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '80000');
-    expect(await cuota(page)).toBe('3306,56 €');
+    expect(await cuota(page)).toBe('3306,55 €');
     expect(await panelResultados(page)).toContain('Tipo efectivo: 4,01%');
+    // El desglose cuadra con lo que se lee: 2081,95 × 1,5882 = 3306,5535… → 3306,55
+    expect(await panelResultados(page)).toContain('2081,95 €');
 
     // Lo que la TARJETA del bloque educativo dice de esos mismos datos
     const todo = await textoCompleto(page);
@@ -1541,8 +1564,11 @@ test.describe('re-inspección 22/09/2026', () => {
     const tarjeta = todo.slice(desde, hasta);
     expect(tarjeta, 'la tarjeta no está donde se esperaba').toContain('Asturias');
 
-    expect(tarjeta, 'la tarjeta publica otra cuota que el panel').toContain('3306,56 €');
+    expect(tarjeta, 'la tarjeta publica la misma cuota que el panel').toContain('3306,55 €');
     expect(tarjeta, 'el tipo efectivo sobre la base CON ajuar es 4,01 %').toContain('4,01 %');
+    // Y no queda rastro del denominador viejo: 3306,55 / 80.000 = 4,13 %, que es la división
+    // que el rótulo «% de la base con ajuar» decía no haber hecho (hallazgo 1194).
+    expect(tarjeta).not.toContain('4,13 %');
   });
 
   /**
@@ -1580,9 +1606,7 @@ test.describe('re-inspección 22/09/2026', () => {
    * el 25 % la app liquida 0,00 € donde el prorrateo —ahí ya en su suelo de 180.000 €—
    * da 919,41 €: «no pagas nada» es la forma más cara de equivocarse en un riesgo 1.
    */
-  test('Cataluña no prorratea entre herederos el tope de 500.000 € de la vivienda habitual', async ({ page }) => {
-    test.fail();
-
+  test('1193 (regresión) — Cataluña prorratea entre herederos el tope de 500.000 € de la vivienda', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('cataluna');
     await page.locator('#parentesco').selectOption('II');
     await sembrarValor(page, page.locator('#vivienda-habitual'), '1200000');
@@ -1597,5 +1621,82 @@ test.describe('re-inspección 22/09/2026', () => {
     // Y la cuota que sale de ahí, con el mismo 48,90 % de bonificación del art. 58 bis.
     // Tolerancia de medio euro: el defecto que vigila son 17.016 €.
     expect(aNumero(await cuota(page))).toBeCloseTo(17660.27, 0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Hallazgo 1196 del 22/09/2026 — la valoración del usufructo, con su norma y su techo
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// La regla iba TECLEADA (`Math.max(0.10, (89 - edad) / 100)`) y sin norma al lado, en una app
+// donde el plazo y los años de mantenimiento de la vivienda sí estaban sellados. Y sin el
+// artículo delante se había quedado sin su techo: el «89 − edad» es la forma abreviada y solo
+// vale desde los 20 años, mientras el campo admite escribir 10. Verificado el 22/09/2026 contra
+// el texto consolidado del BOE (art. 26.a LISD): en los usufructos vitalicios el valor «es igual
+// al 70 por 100 del valor total de los bienes cuando el usufructuario cuente menos de veinte
+// años, minorando […] un 1 por 100 menos por cada año más, con el límite mínimo del 10 por 100».
+test.describe('1196 — valoración del usufructo vitalicio (art. 26.a LISD)', () => {
+  /** SOLO la columna de resultados: los porcentajes viven también en la guía de abajo. */
+  const panelResultados = async (page: Page): Promise<string> =>
+    (await page.locator('[class*="resultsPanel"]').innerText()).replace(/ /g, ' ');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas']);
+  });
+
+  /**
+   * Con 15 años la app aplicaba el 74 % —(89 − 15) / 100—, por encima del máximo legal, y eso
+   * sobrevalora la base del usufructuario e infravalora la del nudo propietario.
+   *
+   * Madrid · hijo ≥21 · 100.000 € en cuentas · usufructo, usufructuario de 15 años:
+   *   base imponible con ajuar = 100.000 × 1,03 = 103.000,00
+   *   × 70 % (art. 26.a, menor de 20 años)      =  72.100,00   ← antes 76.220,00 al 74 %
+   */
+  test('por debajo de los 20 años el porcentaje es el 70 %, no «89 − edad»', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await page.getByLabel('Usufructo', { exact: true }).check();
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '15');
+
+    const panel = await panelResultados(page);
+    expect(panel, 'el tipo de adquisición aplicado es el 70 % del art. 26.a').toContain('70,0%');
+    expect(panel, 'la base ajustada es 103.000 × 70 %').toContain('72.100,00 €');
+    // El 74 % que salía de la fórmula sin techo, y su base.
+    expect(panel).not.toContain('74,0%');
+    expect(panel).not.toContain('76.220,00 €');
+  });
+
+  /**
+   * Y desde los 20 la fórmula del artículo sigue valiendo: 89 − 20 = 69 %, que es justo un
+   * punto por debajo del techo. Es el control que impide «reparar» poniendo un 70 % plano.
+   */
+  test('a partir de los 20 años se aplica «89 − edad», y a los 79 se topa en el 10 %', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await page.getByLabel('Usufructo', { exact: true }).check();
+
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '20');
+    expect(await panelResultados(page)).toContain('69,0%');
+
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '79');
+    expect(await panelResultados(page)).toContain('10,0%');
+
+    // El suelo del 10 % no se perfora pasados los 79.
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '89');
+    expect(await panelResultados(page)).toContain('10,0%');
+  });
+
+  /** El helper del campo cita la norma, como el resto de los datos normativos de la página. */
+  test('el campo de la edad cita el art. 26.a y dice el techo, no solo la fórmula', async ({ page }) => {
+    await page.locator('#parentesco').selectOption('II');
+    await page.getByLabel('Usufructo', { exact: true }).check();
+
+    const helper = await page.locator('#edad-usufructuario').locator('xpath=following-sibling::span[1]').innerText();
+    expect(helper).toContain('art. 26.a) de la Ley 29/1987 del ISD');
+    expect(helper).toContain('70% hasta los 20 años');
+    expect(helper).toContain('mínimo del 10%');
   });
 });

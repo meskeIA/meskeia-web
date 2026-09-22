@@ -504,7 +504,20 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   // reparando en `simulador-heredar-vivienda` el desglose que no cuadraba consigo mismo.
   const bonificacionPublicada = r(bonificacion);
   const cuotaFinal = r(Math.max(0, cuotaTributaria - bonificacionPublicada));
-  const tipoEfectivo = r(p.baseImponible > 0 ? (cuotaFinal / p.baseImponible) * 100 : 0);
+  /**
+   * ⚠️ 22/09/2026 (hallazgo 1194) — el denominador era `p.baseImponible`, que es el PARÁMETRO de
+   * entrada (el valor de los bienes), no la base imponible del impuesto: el ajuar doméstico se
+   * adiciona al caudal y forma parte de lo que se grava, y es lo que este mismo motor publica
+   * en `baseImponibleConAjuar`. Con 80.000 € en cuentas heredados por un sobrino asturiano
+   * salía un 4,13 % que no corresponde a ninguna división real —la cuota es 3306,55 € y la
+   * base 82.400 €, o sea 4,01 %—, y así la tarjeta del bloque educativo de
+   * `estimador-impuesto-sucesiones` publicaba un tipo distinto del que el panel de la propia
+   * herramienta imprime para los mismos datos, que sí divide por la base con ajuar.
+   *
+   * Sin ajuar (`incluyeAjuar` ausente o false) `baseConAjuar` vale lo mismo que
+   * `p.baseImponible`, así que el resto de consumidores no se mueve.
+   */
+  const tipoEfectivo = r(baseConAjuar > 0 ? (cuotaFinal / baseConAjuar) * 100 : 0);
 
   return {
     baseImponible:            r(p.baseImponible),

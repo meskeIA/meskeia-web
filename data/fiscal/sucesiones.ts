@@ -224,6 +224,57 @@ export const PLAZO_ISD = {
   verificado: '2026-09-13',
 };
 
+/**
+ * Valoración del USUFRUCTO y la NUDA PROPIEDAD en el ISD.
+ *
+ * Art. 26.a) de la Ley 29/1987 (LISD). Verificado el 22/09/2026 contra el texto consolidado
+ * del BOE, que dice literalmente: en los usufructos vitalicios «se estimará que el valor es
+ * igual al 70 por 100 del valor total de los bienes cuando el usufructuario cuente menos de
+ * veinte años, minorando, a medida que aumenta la edad, en la proporción de un 1 por 100
+ * menos por cada año más, con el límite mínimo del 10 por 100 del valor total».
+ *
+ * ⚠  Existe porque la regla iba TECLEADA en dos sitios de `estimador-impuesto-sucesiones`
+ * —`Math.max(0.10, (89 - edad) / 100)` en el cálculo y la misma fórmula escrita en el helper
+ * del campo— sin constante y sin ninguna norma al lado, en una app donde el plazo y hasta los
+ * años de mantenimiento de la vivienda sí estaban sellados (hallazgo 1196). Es la forma exacta
+ * del hallazgo 801, del que nació PLAZO_ISD.
+ *
+ * ⚠  Y sin la norma delante la regla se había quedado SIN SU TECHO. El «89 − edad» es la forma
+ * abreviada del artículo y solo vale a partir de los 20 años (89 − 20 = 69 %); por debajo, el
+ * artículo fija un 70 % plano. Como el campo de la app admite desde los 10 años, las edades de
+ * 10 a 19 devolvían del 71 % al 79 %, por encima del máximo legal: sobrevaloraba la base del
+ * usufructuario e infravaloraba la del nudo propietario. Con 15 años y 100.000 € en cuentas la
+ * app aplicaba el 74 % donde corresponde el 70 %.
+ */
+export const VALORACION_USUFRUCTO_IS = {
+  /** Minuendo de la forma abreviada «89 − edad», equivalente al artículo desde los 20 años */
+  edadReferencia: 89,
+  /** Por debajo de esta edad el artículo fija un porcentaje plano, sin fórmula */
+  edadUmbralMaximo: 20,
+  /** Porcentaje del usufructo vitalicio por debajo de `edadUmbralMaximo`, y techo de la regla */
+  porcMaximo: 70,
+  /** Suelo expreso del artículo, al que se llega a los 79 años */
+  porcMinimo: 10,
+  /** Usufructo temporal: 2 % por cada año, sin exceder del 70 % (mismo art. 26.a) */
+  porcPorAnioTemporal: 2,
+  norma: 'art. 26.a) de la Ley 29/1987 del ISD',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1987-28141#a26',
+  verificado: '2026-09-22',
+};
+
+/**
+ * Porcentaje del valor de los bienes que corresponde a un USUFRUCTO VITALICIO, por edad.
+ *
+ * Devuelve una fracción (0,70 para el 70 %). Aplica el techo y el suelo del art. 26.a): sin
+ * ellos, una edad por debajo de 20 pasaba del 70 % legal y una por encima de 79 habría bajado
+ * del 10 %.
+ */
+export function porcentajeUsufructoVitalicio(edad: number): number {
+  const { edadReferencia, edadUmbralMaximo, porcMaximo, porcMinimo } = VALORACION_USUFRUCTO_IS;
+  if (!Number.isFinite(edad) || edad < edadUmbralMaximo) return porcMaximo / 100;
+  return Math.min(porcMaximo, Math.max(porcMinimo, edadReferencia - edad)) / 100;
+}
+
 // ─── Reducciones especiales de Cataluña (Ley 19/2010) ────────────────────────
 //
 // Mismas figuras que las estatales de arriba, con importes propios. Se listan aparte porque

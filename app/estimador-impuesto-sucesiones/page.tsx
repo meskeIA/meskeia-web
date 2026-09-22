@@ -28,6 +28,8 @@ import {
   REDUCCION_VIVIENDA_MAX_IS,
   REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
   REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS,
+  VALORACION_USUFRUCTO_IS,
+  porcentajeUsufructoVitalicio,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
   REDUCCION_DISCAPACIDAD_33_IS,
@@ -481,12 +483,17 @@ export default function EstimadorImpuestoSucesionesPage() {
     const edadUsufParseada = Number.parseInt(edadUsufructuario, 10);
     const edadUsuf = Number.isFinite(edadUsufParseada) ? edadUsufParseada : 70;
     let porcentajeAdquisicion = 1;
+    /**
+     * ⚠️ 22/09/2026 (hallazgo 1196) — la regla iba tecleada aquí, sin constante y sin norma, y
+     * le faltaba el TECHO del 70 % que el art. 26.a) LISD fija por debajo de los 20 años: con
+     * los 15 que el campo admite escribir, «(89 − 15) / 100» daba un 74 % ilegal. Ahora sale
+     * de `porcentajeUsufructoVitalicio`, en `data/fiscal`, con el artículo citado al lado.
+     */
     if (tipoAdquisicion === 'usufructo') {
-      porcentajeAdquisicion = Math.max(0.10, (89 - edadUsuf) / 100);
+      porcentajeAdquisicion = porcentajeUsufructoVitalicio(edadUsuf);
       baseAjustada = baseImponibleTotal * porcHerencia * porcentajeAdquisicion;
     } else if (tipoAdquisicion === 'nuda') {
-      const porcUsuf = Math.max(0.10, (89 - edadUsuf) / 100);
-      porcentajeAdquisicion = 1 - porcUsuf;
+      porcentajeAdquisicion = 1 - porcentajeUsufructoVitalicio(edadUsuf);
       baseAjustada = baseImponibleTotal * porcHerencia * porcentajeAdquisicion;
     }
 
@@ -556,12 +563,41 @@ export default function EstimadorImpuestoSucesionesPage() {
     // 95% a todo el Grupo III sin comprobar los 65 años ni la convivencia de los 2 años
     // anteriores que exige el art. 20.2.c LISD.
     const baseViviendaHeredero = v_vivienda * porcHerencia;
+    /**
+     * ⚠️ 22/09/2026 (hallazgo 1193, ALTO) — el VALOR de la vivienda se prorrataba y su TOPE no.
+     *
+     * El de Cataluña son 500.000 € del art. 17 de la Ley 19/2010 sobre el valor CONJUNTO de la
+     * vivienda, y se reparte entre los adquirentes según su participación con un suelo de
+     * 180.000 € por sujeto pasivo — lo sella el comentario de
+     * `REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS` («el límite individual resultante del
+     * prorrateo no puede bajar de esta cifra») y lo anuncia la prosa de esta misma página, dos
+     * bloques más abajo. Dejando vacío `limiteViviendaCataluna` se le daba a CADA heredero el
+     * tope conjunto entero, así que la reducción podía superar la parte por la que la propia
+     * app le hace tributar: siempre INFRAVALORA la cuota. Medido: un hijo con el 50 % de un
+     * piso de 1.200.000 € liquidaba 643,86 € donde salen 17.660,27 €, 27 veces menos.
+     *
+     * El motor lo avisa en su propia firma —el parámetro existe «para quien conoce el valor
+     * conjunto de la vivienda y el reparto»— y esta app conoce los dos: `v_vivienda` es el
+     * conjunto y `porcHerencia` el reparto. `calcularHerenciaConjunta` hace el mismo prorrateo
+     * desde el 13/09 para el caso de varios herederos.
+     *
+     * Con el 100 % de la herencia el prorrateo devuelve el tope entero, que es lo que ya hacía:
+     * la cuota del heredero único no se mueve.
+     */
+    const limiteViviendaCataluna =
+      ccaa === 'cataluna' && v_vivienda > 0 && porcHerencia > 0
+        ? Math.max(
+            REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS,
+            REDUCCION_VIVIENDA_MAX_CATALUNA_IS * porcHerencia,
+          )
+        : undefined;
     const vivienda = evaluarReduccionVivienda({
       valorVivienda: baseViviendaHeredero > 0 ? baseViviendaHeredero : undefined,
       grupo,
       ccaa,
       edadHeredero: Number.isFinite(edadParseada) ? edadParseada : undefined,
       convivenciaDosAnios,
+      limiteViviendaCataluna,
     });
     if (vivienda.reduccion > 0) {
       reducciones.push({ concepto: 'Vivienda habitual (95%)', importe: vivienda.reduccion });
@@ -588,7 +624,19 @@ export default function EstimadorImpuestoSucesionesPage() {
 
     // Tarifa
     const tarifa = esCataluna ? TARIFA_CATALUNA_IS : TARIFA_ESTATAL_IS;
-    const cuotaIntegra = calcularTarifa(baseLiquidable, tarifa);
+    /**
+     * ⚠️ 22/09/2026 (hallazgo 1195) — a céntimo, donde lo redondea `calcularSucesion`.
+     *
+     * La cuota íntegra es una casilla del modelo 650 y de ella se parte para aplicar el
+     * coeficiente del art. 22 LISD, así que el producto tiene que salir del importe LIQUIDADO y
+     * no de los 2081,95436 € de la aritmética interna. Sin esto el desglose no cuadraba
+     * consigo mismo en pantalla: imprimía «Cuota íntegra 2081,95 €» y «× 1,5882» y una cuota
+     * tributaria de 3306,56 €, que es un céntimo más de lo que sale multiplicando las dos
+     * cifras que el usuario está leyendo. Y era además la divergencia que el hallazgo 1153 no
+     * pudo cerrar: la tarjeta del sobrino se derivó del motor y siguió dando otra cuota que el
+     * panel, porque las dos aritméticas redondeaban en sitios distintos.
+     */
+    const cuotaIntegra = Math.round(calcularTarifa(baseLiquidable, tarifa) * 100) / 100;
 
     // Coeficiente multiplicador
     const grupoBase = getGrupoBase(grupo);
@@ -830,7 +878,18 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <label className={styles.label} htmlFor="edad-usufructuario">Edad del usufructuario</label>
                 <input id="edad-usufructuario" type="number" className={styles.input} value={edadUsufructuario}
                   onChange={(e) => setEdadUsufructuario(e.target.value)} min="10" max="89" />
-                <span className={styles.helper}>Fórmula: valor usufructo = (89 – edad) / 100, mín. 10%</span>
+                {/* El helper decía la fórmula abreviada y se comía su techo, que es la mitad
+                    del artículo que importa en este campo: por debajo de 20 años el porcentaje
+                    no se calcula, son el 70 % (hallazgo 1196). Y cita la norma, como el resto
+                    de los datos normativos de esta página. */}
+                <span className={styles.helper}>
+                  {VALORACION_USUFRUCTO_IS.norma}: {VALORACION_USUFRUCTO_IS.porcMaximo}% hasta los{' '}
+                  {VALORACION_USUFRUCTO_IS.edadUmbralMaximo} años y, desde ahí,{' '}
+                  {VALORACION_USUFRUCTO_IS.edadReferencia} − edad, con un mínimo del{' '}
+                  {VALORACION_USUFRUCTO_IS.porcMinimo}%
+                  {edadUsufructuario.trim() !== '' &&
+                    ` → ${formatNumber(porcentajeUsufructoVitalicio(Number.parseInt(edadUsufructuario, 10)) * 100, 0)}%`}
+                </span>
               </div>
             )}
           </div>
