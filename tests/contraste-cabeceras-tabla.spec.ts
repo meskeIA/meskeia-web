@@ -181,6 +181,50 @@ async function peorContrasteDeCabeceras(page: Page): Promise<Medida> {
   });
 }
 
+/**
+ * El botón de <EducationalSection>, que sirve a las 1.001 apps desde un solo fichero.
+ *
+ * Su hover usaba `--secondary-texto`, un token de COLOR: en :root vale lo mismo que
+ * `--secondary-boton` —así que no oscurecía nada— pero en el tema oscuro de meskeIA se
+ * invierte a #5ABDB9 y el blanco encima caía a 2,23:1. Se mide el hover DE VERDAD, porque
+ * en reposo el botón siempre estuvo bien y el defecto solo aparecía al pasar por encima.
+ */
+test('EducationalSection: el botón cumple 4,5:1 también en HOVER y en oscuro', async ({ page }) => {
+  await page.goto('/calculadora-profundidad-campo/');
+  await prepararParaMedir(page);
+
+  const boton = page.getByRole('button', { name: /Guía Educativa/i }).first();
+  await expect(boton).toBeVisible();
+
+  const medirHover = async () => {
+    await boton.hover();
+    return esperarEstable(async () =>
+      boton.evaluate((el) => {
+        const cs = getComputedStyle(el);
+        return { color: cs.color, fondo: cs.backgroundColor };
+      }),
+    );
+  };
+
+  const ratio = (fg: string, bg: string) => {
+    const n = (s: string) => (s.match(/[\d.]+/g) ?? []).map(Number);
+    const canal = (c: number) => { const s = c / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); };
+    const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+    const l1 = lum(n(fg)), l2 = lum(n(bg));
+    return +(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05))).toFixed(2);
+  };
+
+  const claro = await medirHover();
+  expect(ratio(claro.color, claro.fondo), `hover claro · ${claro.color} sobre ${claro.fondo}`).toBeGreaterThanOrEqual(UMBRAL);
+
+  await activarTemaOscuro(page);
+  await prepararParaMedir(page);
+  const oscuro = await medirHover();
+  expect(ratio(oscuro.color, oscuro.fondo), `hover oscuro · ${oscuro.color} sobre ${oscuro.fondo}`).toBeGreaterThanOrEqual(UMBRAL);
+
+  console.log(`   EducationalSection hover: claro ${ratio(claro.color, claro.fondo)}:1 · oscuro ${ratio(oscuro.color, oscuro.fondo)}:1`);
+});
+
 for (const { slug, forma } of APPS) {
   test(`${slug}: las cabeceras de tabla cumplen 4,5:1 en ambos temas (${forma})`, async ({ page }) => {
     await page.goto(`/${slug}/`);

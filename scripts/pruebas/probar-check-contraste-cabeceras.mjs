@@ -266,6 +266,70 @@ const CASOS = [
       ].join('\n'),
     },
   },
+
+  // ── Regla 3: un token de TEXTO usado como FONDO (añadida el 22/09/2026) ──
+  {
+    n: 14,
+    nombre: 'CASO DE ORIGEN 2 · el hover de EducationalSection antes del 22/09 (blanco en el estado base)',
+    debeFallar: true,
+    ficheros: {
+      'components/EducationalSection.module.css': [
+        '.toggleButton {',
+        '  background: var(--secondary-boton, #327874);',
+        '  color: white;',
+        '}',
+        '',
+        '.toggleButton:hover {',
+        '  background: var(--secondary-texto, #2F726F);',
+        '  transform: translateY(-2px);',
+        '}',
+      ].join('\n'),
+    },
+  },
+  {
+    n: 15,
+    nombre: 'CASO DE ORIGEN 2 REPARADO · el hover con --secondary-boton',
+    debeFallar: false,
+    ficheros: {
+      'components/EducationalSection.module.css': [
+        '.toggleButton {',
+        '  background: var(--secondary-boton, #327874);',
+        '  color: white;',
+        '}',
+        '',
+        '.toggleButton:hover {',
+        '  background: var(--secondary-boton, #327874);',
+        '  transform: translateY(-2px);',
+        '}',
+      ].join('\n'),
+    },
+  },
+  {
+    n: 16,
+    nombre: 'el token -texto usado como COLOR, que es para lo que existe',
+    debeFallar: false,
+    ficheros: {
+      'app/doce/Doce.module.css': [
+        '.enlace {',
+        '  color: var(--primary-texto);',
+        '  background: transparent;',
+        '}',
+      ].join('\n'),
+    },
+  },
+  {
+    n: 17,
+    nombre: 'una cabecera rota en components/ — prueba de que barre el SEGUNDO árbol',
+    debeFallar: true,
+    ficheros: {
+      'components/TablaCompartida.module.css': [
+        '.tabla th {',
+        '  background: var(--primary);',
+        '  color: #fff;',
+        '}',
+      ].join('\n'),
+    },
+  },
 ];
 
 /** Ejecuta el candado sobre `dir` y dice si se encendió. */

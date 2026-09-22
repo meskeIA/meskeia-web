@@ -521,6 +521,18 @@ conjunta del art. 84.2 (3.400 / 2.150 €) **sí** se resta de la base y no lo d
 `npm run check:contraste-cabeceras` — lo ejecuta también `npm run build`, y **rompe el build**
 si una cabecera de tabla (`<th>`, `<thead>`, la clase `.th`) pone **texto blanco sobre
 `var(--primary)` o `var(--secondary)`**, en la hoja de estilos o en un `style={{…}}` del JSX.
+Barre **`app/` y `components/`**: nació mirando solo `app/` y el primer defecto que apareció
+después vivía en `components/`, donde un fichero sirve a las 1.001 apps a la vez.
+
+Vigila además que **un token `-texto` no se use como FONDO** con texto blanco encima.
+`--primary-texto`/`--secondary-texto` son para `color:`, y valen lo mismo que sus `-boton` en
+`:root` y en las tres verticales —así que el cambiazo no se ve en claro—, pero en el tema
+**oscuro de meskeIA** se invierten a propósito a un tono claro y el blanco encima cae a
+**2,23:1**. Salió de los 3 usos que había el 22/09/2026 (el hover del botón de
+`EducationalSection`, en claro y en oscuro, y el de copiar de `generador-contrasenas`): los tres
+del mismo commit `f50e3340` que creó los tokens, que reparó el reposo y no midió el hover en
+oscuro. Y como en `:root` los dos tokens son idénticos, ese hover no llegaba a oscurecer nada
+en ningún tema.
 
 Los colores de marca son identidad, no contraste: con blanco encima dan **4,11:1** el azul y
 **2,80:1** el teal, y en oscuro —donde `--primary` aclara a #3FA5D1— caen a **2,79** y **2,23**.
@@ -547,12 +559,22 @@ comentario anterior, y **la razón es obligatoria** — la marca a secas tambié
 números de paso** con fondo de marca medidos el 22/09/2026 (1.004 de ellos botones), que son
 campaña aparte porque cambiarlos altera el aspecto de la interacción en 782 apps.
 
+⚠️ **`--text-muted` en oscuro está MEDIDO y SIN REPARAR** (22/09/2026). Vale `#808080` y cae
+sobre exactamente dos fondos reales —medido en navegador, 447 elementos en 6 apps—: **3,49:1**
+sobre la tarjeta `#2D2D2D` (340 elementos, el peor caso) y **4,41:1** sobre la página `#1A1A1A`
+(107). Ninguno llega a 4,5. Afecta al pie, al copyright del aviso legal y a las descripciones de
+`RelatedApps`. **`#949494` sería el primer gris que cumple** sobre la tarjeta (4,54 y 5,74). No
+lo puede vigilar un candado: es un valor de `globals.css` que toca las 1.001 apps a la vez y se
+decide midiendo contra el fondo real — el mismo token ya se equivocó así el 21/08/2026, cuando
+`#757575` se eligió contra blanco puro (4,60) y sobre `#FAFAFA` daba 4,41.
+
 > Las cuatro formas que tenía el pasivo y las dos que NO debe encender: cabecera de
 > `scripts/check-contraste-cabeceras.mjs`. Sus 13 casos de prueba, en
 > `scripts/pruebas/probar-check-contraste-cabeceras.mjs`; se le reinyectan con
 > **`npm run contraste:probar-candado`**, que incluye el caso de origen en sus dos versiones —el
 > `<tr style>` de nave-industrial antes del 1175, que debe FALLAR, y el reparado, que debe CALLAR.
-> La medición por PÍXEL, en `tests/contraste-cabeceras-tabla.spec.ts`.
+> La medición por PÍXEL, en `tests/contraste-cabeceras-tabla.spec.ts`, que mide el botón de
+> `EducationalSection` EN HOVER, porque en reposo siempre estuvo bien.
 
 ### Candado del parser numérico
 

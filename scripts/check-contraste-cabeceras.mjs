@@ -46,18 +46,41 @@
  *
  * LAS DOS SUPERFICIES
  * ───────────────────
- *   A. `app/**\/*.module.css` — el grueso: un bloque de `<th>`/`<thead>`/`.th` con fondo de
+ *   A. `*.module.css` — el grueso: un bloque de `<th>`/`<thead>`/`.th` con fondo de
  *      marca. El texto blanco cuenta aunque esté en un selector HERMANO de la misma tabla:
  *      el patrón `.tabla thead tr { background }` + `.tabla th { color: white }` reparte el
  *      fondo y el color entre dos reglas, y 17 casos del drenaje tenían esa forma.
- *   B. `app/**\/*.tsx` — el estilo EN LÍNEA, que es la forma exacta del caso de origen:
+ *   B. `*.tsx` — el estilo EN LÍNEA, que es la forma exacta del caso de origen:
  *      `<tr style={{ background: 'var(--primary)', color: '#fff' }}>`. Sin esta segunda
  *      superficie el candado no detectaría el caso del que nació.
+ *
+ * En DOS árboles: `app/` y `components/`. Nació mirando solo `app/`, y el primer defecto de
+ * contraste que apareció después —el 22/09/2026, el botón de `EducationalSection`— vivía
+ * justo en `components/`, donde un solo fichero sirve a las 1.001 apps a la vez. Ampliarlo
+ * no costó pasivo: en los 32 `.module.css` de `components/` no hay ninguna cabecera de tabla.
+ *
+ * LA TERCERA REGLA: UN TOKEN DE TEXTO USADO COMO FONDO
+ * ────────────────────────────────────────────────────
+ * `--primary-texto` / `--secondary-texto` son para `color:`, no para `background:`. La pareja
+ * `-texto` / `-boton` vale LO MISMO en `:root` y en las tres verticales, así que usar uno por
+ * otro parece inocuo y pasa cualquier revisión visual en claro — pero en el tema OSCURO de
+ * meskeIA `-texto` se invierte a propósito (#5ABDB9, claro, para leerse sobre fondo oscuro) y
+ * el blanco encima cae a 2,23:1.
+ *
+ * Salió de los 3 usos que había el 22/09/2026: el hover del botón de `EducationalSection`
+ * (claro y oscuro) y el de copiar de `generador-contrasenas`. Los tres venían del mismo
+ * commit f50e3340 del 21/08/2026 que creó los tokens: se reparó el estado de reposo, el hover
+ * en claro cumplía, y el oscuro no se midió. Como en `:root` los dos tokens son idénticos, el
+ * hover además no llegaba a oscurecer nada en ningún tema.
  *
  * QUÉ NO MIRA
  * ───────────
  *   · El color de marca como TEXTO sobre fondo claro (`color: var(--primary)`, 4,11:1), que
  *     se resuelve con `--primary-texto` y es otra población, todavía sin drenar.
+ *   · `--text-muted`, que en oscuro vale #808080 y da 4,41:1 sobre #1A1A1A y 3,49:1 sobre
+ *     #2D2D2D (medido el 22/09/2026, sin reparar): es un valor de `globals.css` que afecta a
+ *     las 1.001 apps a la vez, y se decide midiendo contra los fondos donde se usa de verdad,
+ *     no por la forma del código. Un candado no puede demostrarlo.
  *   · Los fondos teñidos `color-mix(in srgb, var(--primary) 6-20%, …)`: son casi el fondo de
  *     la tarjeta y llevan texto oscuro. Solo se encienden si además hay texto blanco.
  *   · Los botones, badges y números de paso con fondo de marca (2.042 bloques medidos el
@@ -85,6 +108,11 @@ const VERBOSO = process.argv.includes('--todo');
 const RE_MARCA_FONDO = /var\(\s*--(primary|secondary)\s*\)/;
 const RE_BLANCO = /^(#fff|#ffffff|white)$/i;
 const SUSTITUTO = { primary: '--primary-boton', secondary: '--secondary-boton' };
+/** Un token de TEXTO puesto de fondo: en oscuro se invierte y el blanco encima cae a 2,23:1. */
+const RE_TEXTO_DE_FONDO = /var\(\s*--(primary|secondary)-texto\s*[,)]/;
+
+/** Los dos árboles que se barren. `components/` sirve a las 1.001 apps a la vez. */
+const ARBOLES = ['app', 'components'];
 
 // ─── Escape ────────────────────────────────────────────────────────────────────
 const RE_ESCAPE = /contraste-ok:/;
@@ -248,7 +276,7 @@ const exentas = [];
 let cssRevisados = 0;
 let cabecerasVistas = 0;
 
-for (const ruta of recorrer(path.join(RAIZ, 'app'), '.module.css')) {
+for (const ruta of ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a), '.module.css'))) {
   const css = fs.readFileSync(ruta, 'utf8');
   const lineas = css.split('\n');
   const rel = path.relative(RAIZ, ruta).replace(/\\/g, '/');
@@ -266,6 +294,45 @@ for (const ruta of recorrer(path.join(RAIZ, 'app'), '.module.css')) {
       const r = raizDe(s);
       if (r) raicesBlancas.add(r);
     }
+  }
+
+  // ── Regla 3: un token de TEXTO usado como FONDO, con texto blanco encima ──
+  // No exige que sea una cabecera: el caso real era el hover de un botón. Lo que lo hace
+  // demostrable por la forma del código es la mezcla `background: var(--…-texto)` + blanco.
+  for (const b of bloques) {
+    let fondoTexto = null;
+    for (const d of b.decls) {
+      if (!/^background(-color|-image)?$/.test(d.prop)) continue;
+      const m = d.valor.match(RE_TEXTO_DE_FONDO);
+      if (m) { fondoTexto = m[1]; break; }
+    }
+    if (!fondoTexto) continue;
+
+    // El blanco puede venir del propio bloque o del estado base (`.btn` frente a `.btn:hover`)
+    const propio = colorDe(b.decls);
+    let blanco = propio ? RE_BLANCO.test(propio) : false;
+    if (!propio) {
+      const base = sinTema(b.selector).split(',')[0].trim().replace(/:[a-z-]+(\([^)]*\))?/g, '');
+      for (const otro of bloques) {
+        const c = colorDe(otro.decls);
+        if (!c || !RE_BLANCO.test(c)) continue;
+        const otroBase = sinTema(otro.selector).split(',').map((s) => s.trim().replace(/:[a-z-]+(\([^)]*\))?/g, ''));
+        if (otroBase.includes(base)) { blanco = true; break; }
+      }
+    }
+    if (!blanco) continue;
+
+    const esc = escapeEn(lineas, b.linea);
+    if (esc === 'firmado') { exentas.push(`${rel}:${b.linea}`); continue; }
+    const porQue = esc === 'sin razón'
+      ? ' — lleva `contraste-ok:` SIN razón escrita, y una excepción sin motivo no se puede revisar'
+      : '';
+    errores.push(
+      `${rel}:${b.linea} — \`${b.selector}\` usa \`var(--${fondoTexto}-texto)\` como FONDO con texto blanco. ` +
+      `Ese token es para \`color:\`: en :root y en las tres verticales vale lo mismo que ` +
+      `\`--${fondoTexto}-boton\` —así que no oscurece nada— pero en el tema oscuro de meskeIA se ` +
+      `invierte a un tono claro y el blanco encima cae a 2,23:1. Usa \`var(--${fondoTexto}-boton)\`.${porQue}`
+    );
   }
 
   for (const b of bloques) {
@@ -300,7 +367,7 @@ for (const ruta of recorrer(path.join(RAIZ, 'app'), '.module.css')) {
 
 // ─── B. Estilo en línea en el JSX (la forma del caso de origen) ────────────────
 let tsxRevisados = 0;
-for (const ruta of recorrer(path.join(RAIZ, 'app'), '.tsx')) {
+for (const ruta of ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a), '.tsx'))) {
   const txt = fs.readFileSync(ruta, 'utf8');
   if (!txt.includes('style={{')) continue;
   const rel = path.relative(RAIZ, ruta).replace(/\\/g, '/');
@@ -348,7 +415,7 @@ if (errores.length) {
 }
 
 console.log('✅ Contraste de cabeceras correcto');
-console.log(`   · ${cssRevisados} hojas .module.css y ${tsxRevisados} .tsx revisados, sin pasivo`);
+console.log(`   · ${cssRevisados} hojas .module.css y ${tsxRevisados} .tsx de app/ y components/, sin pasivo`);
 console.log(`   · ninguna cabecera de tabla pone texto blanco sobre var(--primary)/var(--secondary)`);
 if (exentas.length) {
   console.log(`   · ${exentas.length} exenta(s) con \`contraste-ok\`: ${exentas.slice(0, 5).join(', ')}`);
