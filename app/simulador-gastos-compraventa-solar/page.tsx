@@ -477,7 +477,7 @@ export default function SimuladorSolarPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
-                <tr style={{ background: 'var(--primary)', color: '#fff' }}>
+                <tr style={{ background: 'var(--primary-boton)', color: '#fff' }}>
                   <th style={{ padding: '10px', textAlign: 'left' }}>Concepto</th>
                   <th style={{ padding: '10px', textAlign: 'center' }}>Vende promotor / empresa</th>
                   <th style={{ padding: '10px', textAlign: 'center' }}>Vende particular</th>

@@ -506,7 +506,7 @@ export default function SelectorModeloNegocioPage() {
 
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
           <thead>
-            <tr style={{ background: 'var(--primary)', color: '#fff' }}>
+            <tr style={{ background: 'var(--primary-boton)', color: '#fff' }}>
               <th style={{ padding: '0.6rem 0.75rem', textAlign: 'left' }}>Modelo</th>
               <th style={{ padding: '0.6rem 0.75rem', textAlign: 'left' }}>Capital inicial</th>
               <th style={{ padding: '0.6rem 0.75rem', textAlign: 'left' }}>Tiempo al mercado</th>
