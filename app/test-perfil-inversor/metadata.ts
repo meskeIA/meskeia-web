@@ -59,7 +59,10 @@ export const faqJsonLd = {
       name: '¿En qué invierte un perfil conservador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un inversor conservador suele optar por depósitos bancarios, letras del Tesoro, bonos gubernamentales y fondos de renta fija a corto plazo. Prioriza la preservación del capital frente a la rentabilidad, aceptando rendimientos menores a cambio de mayor estabilidad.',
+        // 1217: «letras del Tesoro» nombra un instrumento del Tesoro español en un canal que
+        // se sirve a todo el público hispanohablante; la categoría universal es la deuda
+        // pública a corto plazo, que en cada país tiene su nombre.
+        text: 'Un inversor conservador suele optar por depósitos bancarios, deuda pública a corto plazo (las letras del Tesoro, en España), bonos gubernamentales y fondos de renta fija a corto plazo. Prioriza la preservación del capital frente a la rentabilidad, aceptando rendimientos menores a cambio de mayor estabilidad.',
       },
     },
     {
@@ -75,7 +78,9 @@ export const faqJsonLd = {
       name: '¿Cada cuánto tiempo se debe revisar el perfil inversor?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se recomienda revisar el perfil inversor cada 1-2 años o ante cambios significativos en la situación personal: proximidad a la jubilación, cambio de empleo, herencia, matrimonio, divorcio o cambio en los objetivos financieros. El perfil puede evolucionar a lo largo de la vida.',
+        // 1216: decía «cada 1-2 años» mientras la página dice dos veces «al menos una vez al
+        // año» y «anualmente». Se unifica con lo que la página afirma.
+        text: 'Se recomienda revisar el perfil inversor al menos una vez al año, y además ante cambios significativos en la situación personal: proximidad a la jubilación, cambio de empleo, herencia, matrimonio, divorcio o cambio en los objetivos financieros. El perfil puede evolucionar a lo largo de la vida.',
       },
     },
   ],
@@ -87,7 +92,14 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/test-perfil-inversor/',
   category: 'FinanceApplication',
   features: [
-    '10 preguntas validadas para evaluar tolerancia al riesgo',
+    /*
+      ⚠️ 22/09/2026 (hallazgo 1216) — decía «10 preguntas validadas». No hay validación de
+      ninguna clase: el cuestionario, los pesos de 1 a 4 y los cinco tramos están escritos en
+      `page.tsx`, sin fuente, sin referencia y sin metodología declarada. En una app de riesgo 2
+      financiero, «validadas» es una credencial que la app no tiene, y este es el texto que
+      leen los asistentes de IA sin el disclaimer al lado.
+    */
+    '10 preguntas sobre horizonte temporal, experiencia y tolerancia al riesgo',
     'Resultado: uno de los cinco perfiles (conservador, moderado, equilibrado, dinámico o agresivo)',
     'Recomendaciones orientativas según el perfil obtenido',
     'En español',

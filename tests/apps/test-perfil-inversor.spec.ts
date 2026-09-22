@@ -503,10 +503,9 @@ test.describe('re-inspección 22/09/2026', () => {
   // ---------- CASO 3: lo que debe rechazarse ----------
   // La sesión guardada no es legible y la app NO se repone: se queda en la pantalla de
   // error, y como nadie borra la clave, cada recarga vuelve a caer en la misma piedra.
-  test('caso a rechazar: una sesión guardada ilegible debe empezar de cero, no romper la app', async ({
+  test('1213 — una sesión guardada ilegible empieza de cero y no rompe la app', async ({
     page,
   }) => {
-    test.fail();
     await conSesionLimpia(page);
     // `leerSesion` solo comprueba la FORMA: `typeof currentQuestion === 'number'` y
     // `typeof answers === 'object'`. Un índice de pregunta fuera de rango pasa el filtro,
@@ -529,10 +528,9 @@ test.describe('re-inspección 22/09/2026', () => {
     ).toBeNull();
   });
 
-  test('caso a rechazar (bis): `answers: null` pasa el filtro porque typeof null === "object"', async ({
+  test('1213 (bis) — `answers: null` ya no pasa el filtro por typeof null === "object"', async ({
     page,
   }) => {
-    test.fail();
     await conSesionLimpia(page);
     await page.evaluate(() =>
       sessionStorage.setItem(
@@ -547,8 +545,7 @@ test.describe('re-inspección 22/09/2026', () => {
   });
 
   // ---------- Hallazgos abiertos de esta re-inspección ----------
-  test('el aviso de borde miente en los dos extremos de la escala', async ({ page }) => {
-    test.fail();
+  test('1220 (regresión) — el aviso de borde NO sale en los dos extremos de la escala', async ({ page }) => {
     await conSesionLimpia(page);
     // 10 puntos es el MÍNIMO teórico (todo A): no existe un 9, así que «con un punto de
     // diferencia el resultado sería el perfil de al lado» es falso. Pasa igual con 40.
@@ -558,10 +555,9 @@ test.describe('re-inspección 22/09/2026', () => {
     await expect(avisoDeBorde(page)).toHaveCount(0);
   });
 
-  test('avanzar de pregunta deja el foco en el <body>: el teclado sale de la tarjeta', async ({
+  test('1215 (regresión) — avanzar de pregunta devuelve el foco a la tarjeta, no al <body>', async ({
     page,
   }) => {
-    test.fail();
     await conSesionLimpia(page);
     await empezar(page);
     await opcion(page, 1).click();
@@ -574,8 +570,7 @@ test.describe('re-inspección 22/09/2026', () => {
     expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
   });
 
-  test('los datos estructurados llaman «validadas» a las 10 preguntas', async ({ page }) => {
-    test.fail();
+  test('1216 (regresión) — los datos estructurados no llaman «validadas» a las 10 preguntas', async ({ page }) => {
     await page.goto(RUTA);
     // `featureList` del WebApplication dice «10 preguntas validadas para evaluar tolerancia
     // al riesgo». No hay validación de ninguna clase: el cuestionario y sus puntuaciones
@@ -588,8 +583,7 @@ test.describe('re-inspección 22/09/2026', () => {
     expect(estructurados).not.toContain('preguntas validadas');
   });
 
-  test('la guía sigue nombrando un índice concreto y una cifra sin fuente', async ({ page }) => {
-    test.fail();
+  test('1218 (regresión) — la guía no nombra un índice concreto ni una cifra sin fuente', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const reglasDeOro = page.locator('[class*="tipsSection"]');
@@ -603,10 +597,9 @@ test.describe('re-inspección 22/09/2026', () => {
     await expect(erroresComunes).not.toContainText('2–4% menos anual');
   });
 
-  test('app financiera que da España por supuesta sin decirlo (Latam-friendly)', async ({
+  test('1217 (regresión) — la app declara sus datos de referencia España (Latam-friendly)', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const cuerpo = page.locator('body');
@@ -620,10 +613,9 @@ test.describe('re-inspección 22/09/2026', () => {
     await expect(cuerpo).not.toContainText('Los bancos hacen el test de MiFID II');
   });
 
-  test('con la sesión restaurada incompleta el resultado da un perfil con 3 puntos', async ({
+  test('1214 (regresión) — con la sesión restaurada incompleta NO se emite resultado', async ({
     page,
   }) => {
-    test.fail();
     await conSesionLimpia(page);
     // El estado restaurado no se valida: basta con que `answers` sea un objeto. Con dos
     // respuestas y el índice en la última pregunta, la app deja pedir el resultado y
@@ -638,17 +630,29 @@ test.describe('re-inspección 22/09/2026', () => {
     );
     await page.goto(RUTA);
     await opcion(page, 0).click();
+
+    /*
+      ⚠️ 22/09/2026 — el testigo del acta comprobaba que la FLECHA cayera dentro de la barra
+      (left >= 0), dando por hecho que la reparación consistiría en colocarla bien. El propio
+      acta pide otra cosa en su «esperado» —«no hay resultado sin las 10 respuestas, como hace
+      el flujo normal, que deshabilita Ver Resultado»— y es lo correcto: la flecha era el
+      síntoma, y el defecto es emitir un juicio sobre la persona con una puntuación imposible
+      en su propia escala. Ahora el botón no promete el resultado y lleva a la primera pregunta
+      sin responder, así que no hay flecha que medir.
+    */
+    await expect(botonSiguiente(page)).toHaveText('Completar las que faltan →');
     await botonSiguiente(page).click();
-    const izquierda = await flecha(page).evaluate((el) =>
-      parseFloat((el as HTMLElement).style.left),
-    );
-    expect(izquierda).toBeGreaterThanOrEqual(0);
+
+    // No hay resultado: se ha vuelto a la primera pregunta sin contestar (la 3, porque la
+    // sesión traía la 1 y la 2, y la 10 se acaba de responder).
+    await expect(perfilMostrado(page)).toHaveCount(0);
+    await expect(flecha(page)).toHaveCount(0);
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
   });
 
-  test('una sesión a medias no deja volver a la portada ni avisa de que se ha recuperado', async ({
+  test('1221 (regresión) — una sesión a medias avisa de que se ha recuperado y deja empezar de cero', async ({
     page,
   }) => {
-    test.fail();
     await conSesionLimpia(page);
     await empezar(page);
     await opcion(page, 1).click();

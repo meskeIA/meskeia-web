@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -290,17 +290,80 @@ interface EstadoGuardado {
   answers: Record<number, number>;
 }
 
-function leerSesion(): EstadoGuardado | null {
+/**
+ * Borra la sesión guardada. Fuera del componente porque `leerSesion` también la necesita:
+ * una sesión que no se puede interpretar hay que RETIRARLA, no solo ignorarla (1213).
+ */
+function borrarSesion(): void {
   try {
-    const bruto = sessionStorage.getItem(CLAVE_SESION);
-    if (!bruto) return null;
-    const datos = JSON.parse(bruto) as EstadoGuardado;
-    if (typeof datos?.currentQuestion !== 'number' || typeof datos?.answers !== 'object') {
-      return null;
-    }
-    return datos;
+    sessionStorage.removeItem(CLAVE_SESION);
   } catch {
-    // Ventana privada, almacenamiento bloqueado o JSON corrupto: se empieza de cero.
+    // Nada que limpiar si no había dónde guardar.
+  }
+}
+
+/**
+ * ⚠️ 22/09/2026 (hallazgo 1213) — validaba solo la FORMA, y encima mal.
+ *
+ * `typeof datos.answers === 'object'` es true para `null`, así que `answers: null` pasaba el
+ * filtro y `Object.keys(null)` reventaba dentro del useEffect de recuperación; y del índice de
+ * pregunta no se comprobaba el rango, así que un `currentQuestion: 42` dejaba `QUESTIONS[42]`
+ * en undefined y `question.id` tumbaba el render. Las dos variantes daban «Algo salió mal».
+ *
+ * Y lo peor no era la caída sino que se quedaba PEGADA: al no borrarse la clave, cada recarga
+ * de esa pestaña volvía a caer en la misma piedra y «Intentar de nuevo» no servía de nada. El
+ * comentario del catch prometía justo lo contrario —«se empieza de cero»—, que es lo que ahora
+ * hace de verdad: lo que no se puede interpretar se retira.
+ */
+function leerSesion(): EstadoGuardado | null {
+  let bruto: string | null;
+  try {
+    bruto = sessionStorage.getItem(CLAVE_SESION);
+  } catch {
+    // Ventana privada o almacenamiento bloqueado: se empieza de cero, y no hay qué borrar.
+    return null;
+  }
+  if (!bruto) return null;
+
+  try {
+    const datos = JSON.parse(bruto) as unknown;
+    if (!datos || typeof datos !== 'object') throw new Error('la sesión no es un objeto');
+
+    const { currentQuestion, answers } = datos as Partial<EstadoGuardado>;
+
+    // El índice tiene que apuntar a una pregunta que existe: entero y dentro del cuestionario.
+    if (
+      typeof currentQuestion !== 'number' ||
+      !Number.isInteger(currentQuestion) ||
+      currentQuestion < 0 ||
+      currentQuestion >= QUESTIONS.length
+    ) {
+      throw new Error('índice de pregunta fuera del cuestionario');
+    }
+
+    // `typeof null === 'object'`, y un array tampoco es un mapa de respuestas.
+    if (!answers || typeof answers !== 'object' || Array.isArray(answers)) {
+      throw new Error('las respuestas no son un mapa');
+    }
+
+    // Cada entrada tiene que ser una respuesta REAL de su pregunta: la puntuación decide el
+    // perfil, así que un valor inventado emitiría un juicio sobre una escala que no existe.
+    const limpias: Record<number, number> = {};
+    for (const [clave, valor] of Object.entries(answers)) {
+      const id = Number(clave);
+      const pregunta = QUESTIONS.find((q) => q.id === id);
+      if (!pregunta) throw new Error(`la pregunta ${clave} no existe`);
+      if (typeof valor !== 'number' || !pregunta.options.some((o) => o.points === valor)) {
+        throw new Error(`la respuesta de la pregunta ${clave} no es una de sus opciones`);
+      }
+      limpias[id] = valor;
+    }
+
+    return { currentQuestion, answers: limpias };
+  } catch {
+    // JSON corrupto o contenido que no se puede interpretar: se empieza de cero, y la clave se
+    // RETIRA para que la siguiente carga no vuelva a tropezar con ella.
+    borrarSesion();
     return null;
   }
 }
@@ -309,6 +372,25 @@ export default function TestPerfilInversorPage() {
   const [phase, setPhase] = useState<'start' | 'questions' | 'result'>('start');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  /**
+   * Si la fase «questions» viene de una sesión RECUPERADA y no de pulsar «Comenzar» (1221).
+   *
+   * Quien abandonaba a mitad, se iba a la home por el logo y volvía, aterrizaba en medio de un
+   * cuestionario sin una palabra que lo explicara, y en esa fase los únicos botones son las
+   * cuatro opciones, «Anterior» y «Siguiente»: la portada quedaba inalcanzable en esa pestaña
+   * hasta terminar el test.
+   */
+  const [sesionRecuperada, setSesionRecuperada] = useState(false);
+  /**
+   * La tarjeta de la pregunta, para devolverle el foco al avanzar (1215).
+   *
+   * «Siguiente» se deshabilita en cuanto se pasa de pregunta —la nueva aún no tiene respuesta—
+   * y el navegador suelta el foco al body, así que el siguiente Tab aterrizaba en el pie y
+   * había que volver con Shift+Tab, diez veces por test.
+   */
+  const tarjetaPregunta = useRef<HTMLDivElement>(null);
+  /** Primer render de la fase de preguntas: ahí el foco no se roba, lo tiene «Comenzar». */
+  const preguntaAnterior = useRef<number | null>(null);
 
   /** Recupera el test a medio hacer tras un F5. Solo en el primer render del cliente. */
   useEffect(() => {
@@ -317,7 +399,25 @@ export default function TestPerfilInversorPage() {
     setAnswers(guardado.answers);
     setCurrentQuestion(guardado.currentQuestion);
     setPhase('questions');
+    setSesionRecuperada(true);
   }, []);
+
+  /**
+   * Al cambiar de pregunta, el foco vuelve a la tarjeta y el cambio se anuncia (1215).
+   *
+   * El foco va al contenedor con `tabIndex={-1}`, no a la primera opción: enfocar un botón de
+   * respuesta lo deja con el anillo de foco puesto y parece elegido.
+   */
+  useEffect(() => {
+    if (phase !== 'questions') {
+      preguntaAnterior.current = null;
+      return;
+    }
+    if (preguntaAnterior.current !== null && preguntaAnterior.current !== currentQuestion) {
+      tarjetaPregunta.current?.focus();
+    }
+    preguntaAnterior.current = currentQuestion;
+  }, [phase, currentQuestion]);
 
   /** Guarda lo contestado mientras se está respondiendo. */
   useEffect(() => {
@@ -329,18 +429,13 @@ export default function TestPerfilInversorPage() {
     }
   }, [phase, currentQuestion, answers]);
 
-  const olvidarSesion = () => {
-    try {
-      sessionStorage.removeItem(CLAVE_SESION);
-    } catch {
-      // Nada que limpiar si no había dónde guardar.
-    }
-  };
+  const olvidarSesion = borrarSesion;
 
   const handleStart = () => {
     setPhase('questions');
     setCurrentQuestion(0);
     setAnswers({});
+    setSesionRecuperada(false);
     olvidarSesion();
   };
 
@@ -357,6 +452,15 @@ export default function TestPerfilInversorPage() {
   const handleNext = () => {
     if (currentQuestion < QUESTIONS.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
+    } else if (!respuestasCompletas) {
+      /**
+       * 1214 — Con una sesión restaurada se podía llegar a la última pregunta sin haber
+       * contestado las anteriores, y el resultado salía con una puntuación imposible en su propia
+       * escala (3 puntos sobre un mínimo de 10). En vez de emitir ese juicio se va a la primera
+       * pregunta sin respuesta, que es lo que el flujo normal garantiza deshabilitando el botón.
+       */
+      const primeraSinRespuesta = QUESTIONS.findIndex((q) => answers[q.id] === undefined);
+      if (primeraSinRespuesta >= 0) setCurrentQuestion(primeraSinRespuesta);
     } else {
       setPhase('result');
       // El cuestionario ya está terminado: lo que se guardaba era el test A MEDIAS, para
@@ -376,6 +480,7 @@ export default function TestPerfilInversorPage() {
     setPhase('start');
     setCurrentQuestion(0);
     setAnswers({});
+    setSesionRecuperada(false);
     olvidarSesion();
   };
 
@@ -383,6 +488,34 @@ export default function TestPerfilInversorPage() {
   const totalScore = Object.values(answers).reduce((sum, points) => sum + points, 0);
   const profileType = getProfile(totalScore);
   const profile = PROFILES[profileType];
+
+  /**
+   * Los extremos de la escala, derivados del cuestionario y no tecleados (hallazgo 1220): con
+   * diez preguntas de 1 a 4 puntos, 10 y 40. Por debajo del mínimo y por encima del máximo no
+   * hay «perfil de al lado» al que pasarse, así que ahí el aviso de borde no se pinta.
+   */
+  const PUNTUACION_MINIMA = QUESTIONS.reduce(
+    (suma, q) => suma + Math.min(...q.options.map((o) => o.points)),
+    0,
+  );
+  const PUNTUACION_MAXIMA = QUESTIONS.reduce(
+    (suma, q) => suma + Math.max(...q.options.map((o) => o.points)),
+    0,
+  );
+  const enBordeDeTramo =
+    (totalScore === profile.range[0] && totalScore > PUNTUACION_MINIMA) ||
+    (totalScore === profile.range[1] && totalScore < PUNTUACION_MAXIMA);
+
+  /**
+   * ⚠️ 22/09/2026 (hallazgo 1214) — el resultado no comprobaba que hubiera diez respuestas.
+   *
+   * El flujo normal no deja llegar —«Ver Resultado» está deshabilitado sin contestar—, pero una
+   * sesión restaurada sí: con dos respuestas guardadas y la décima contestada, la app emitía un
+   * juicio con 3 puntos en una escala que empieza en 10 y se contradecía en la misma línea
+   * («Conservador · 3 puntos · tramo 10–16»), con la flecha de la barra en left: −16,67 %.
+   * `leerSesion` ya no admite respuestas inventadas (1213), pero eso no cubre las que FALTAN.
+   */
+  const respuestasCompletas = QUESTIONS.every((q) => answers[q.id] !== undefined);
 
   // Renderizar pantalla de inicio
   if (phase === 'start') {
@@ -394,6 +527,15 @@ export default function TestPerfilInversorPage() {
           <h1 className={styles.title}>🎯 Test de Perfil Inversor</h1>
           <p className={styles.subtitle}>Descubre tu tolerancia al riesgo en 5 minutos</p>
         </header>
+
+      {/*
+        ⚠️ 22/09/2026 (hallazgo 1217) — app financiera que daba España por supuesta sin decirlo
+        (CLAUDE.md §1.bis): no montaba ningún RegionBadge. Los ocho importes de ejemplo van en €,
+        aparecen «pensión pública» y «cuenta remunerada», y la guía menciona el test de idoneidad
+        de la UE. La metodología —horizonte, experiencia y tolerancia— es universal, así que el
+        badge es `es-data` y no `es-only`.
+      */}
+      <RegionBadge variant="es-data" />
 
       <LegalNotice lastUpdated="2026-02-02" />
 
@@ -618,7 +760,10 @@ export default function TestPerfilInversorPage() {
                 </div>
                 <div className={styles.escenarioExample}>
                   <p>Situación:</p>
-                  <code>Primer empleo estable. Sin hijos. Puede ahorrar 200€/mes. No necesita el dinero hasta los 40+.</code>
+                  {/* 1219 — «Puede ahorrar 200€/mes» fijaba una capacidad de ahorro concreta en un
+                      ejemplo que se lee como el caso típico. Lo que define el escenario es el
+                      HORIZONTE, no la cifra. */}
+                  <code>Primer empleo estable. Sin hijos. Puede reservar una cantidad fija cada mes. No necesita el dinero hasta los 40+.</code>
                 </div>
                 <p className={styles.escenarioTip}>
                   <strong>Perfil recomendado: Dinámico o Agresivo.</strong> El tiempo es su mayor aliado.
@@ -726,16 +871,21 @@ export default function TestPerfilInversorPage() {
                 </p>
                 <p className={styles.faqTip}>
                   💡 La regla orientativa anglosajona de &quot;110 menos edad&quot; es una heurística simplificada,
-                  no una recomendación MiFID II. Tu porcentaje real depende de tu situación completa: pensión pública,
-                  patrimonio inmobiliario, ingresos y tolerancia emocional al riesgo.
+                  no el resultado de un test de idoneidad. Tu porcentaje real depende de tu situación completa:
+                  la pensión pública que te corresponda en tu país, patrimonio inmobiliario, ingresos y
+                  tolerancia emocional al riesgo.
                 </p>
               </div>
 
               <div className={styles.faqSectionItem}>
                 <h3>¿Qué pasa si el banco me asigna un perfil diferente?</h3>
                 <p>
-                  Los bancos hacen el test de MiFID II por obligación legal, pero a veces están sesgados hacia
-                  productos propios o hacia perfiles más conservadores para reducir reclamaciones.
+                  {/* 1217 — MiFID II es una norma de la UE y se afirmaba de «los bancos» en
+                      general, ante un público que es hispanohablante, no solo europeo. */}
+                  En la Unión Europea, los bancos y las gestoras tienen que hacer un test de idoneidad
+                  (MiFID II) por obligación legal, y en otros países existen exigencias equivalentes con
+                  otro nombre. Ese test a veces está sesgado hacia productos propios o hacia perfiles más
+                  conservadores para reducir reclamaciones.
                   <strong>El perfil del banco es orientativo</strong>; el de este test busca darte una imagen más
                   objetiva de tu situación real.
                 </p>
@@ -785,10 +935,15 @@ export default function TestPerfilInversorPage() {
                 <div className={styles.stepNumber}>1</div>
                 <div className={styles.stepContent}>
                   <h3>Calcula tu colchón de emergencia</h3>
+                  {/* 1219 — lo ponía como requisito previo y en imperativo. La cifra de 3-6 meses
+                      es una referencia habitual, no un umbral que todo el mundo pueda alcanzar
+                      antes de empezar: §1.quinquies punto 2 nombra expresamente este caso. */}
                   <p>
-                    Antes de invertir, asegúrate de tener <strong>3–6 meses de gastos fijos</strong> en una
-                    cuenta de fácil acceso. Este dinero nunca debe invertirse con riesgo. Sin colchón,
-                    cualquier imprevisto te forzará a vender inversiones en el peor momento.
+                    Cuanto mayor sea el colchón de gastos fijos que puedas reservar en una cuenta de
+                    fácil acceso, menos probable es que un imprevisto te fuerce a vender inversiones
+                    en el peor momento. Como referencia se citan a menudo <strong>3–6 meses</strong>,
+                    pero eso depende de la estabilidad de tus ingresos y de tus gastos: con un
+                    colchón pequeño lo prudente es invertir menos, no dejar de empezar.
                   </p>
                 </div>
               </div>
@@ -858,9 +1013,10 @@ export default function TestPerfilInversorPage() {
                 <div className={styles.stepContent}>
                   <h3>Empieza con pequeñas aportaciones periódicas</h3>
                   <p>
-                    El <strong>DCA (aportación periódica)</strong> te permite probar tu tolerancia real al riesgo
-                    con importes pequeños. Invierte 100€/mes durante 6 meses antes de poner grandes cantidades.
-                    Si duermes bien con pérdidas del 15%, puede que seas más agresivo de lo que creías.
+                    La <strong>aportación periódica</strong> (o DCA) permite probar la tolerancia real al
+                    riesgo con importes pequeños: una cantidad que puedas sostener cada mes, durante
+                    unos meses, antes de comprometer sumas mayores. Lo que se está midiendo no es el
+                    importe, sino cómo llevas verlo bajar.
                   </p>
                 </div>
               </div>
@@ -901,9 +1057,20 @@ export default function TestPerfilInversorPage() {
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon}>🌍</span>
                 <h3>Diversifica globalmente</h3>
+                {/*
+                  ⚠️ 22/09/2026 (hallazgo 1218) — la reparación de neutralidad del 21/08/2026
+                  quitó «MSCI World» y el «60/40» del bloque de RESULTADO y dejó intacta esta
+                  guía, en la misma página: aquí seguían el índice concreto —nombre comercial de
+                  un proveedor— y una cifra de composición sin fuente ni año (decía «más de
+                  1.500 empresas»; hoy ronda las 1.300, y cambia cada revisión del índice). El
+                  «No concentres en España ni en Europa» presupone además dónde vive el lector.
+                */}
                 <p>
-                  No concentres en España ni en Europa. Un ETF global (MSCI World) te da exposición
-                  a más de 1.500 empresas de 23 países desarrollados.
+                  Concentrar la cartera en un solo país o una sola región añade un riesgo que la
+                  diversificación geográfica reparte. Los fondos indexados de renta variable
+                  global cubren cientos o miles de empresas de decenas de países en un solo
+                  producto; su composición exacta la publica cada proveedor y cambia con el
+                  tiempo, así que conviene mirarla antes de invertir.
                 </p>
               </div>
 
@@ -939,9 +1106,11 @@ export default function TestPerfilInversorPage() {
                 lo que harías de verdad lleva a un perfil inadecuado. Sé brutalmente honesto contigo mismo.
               </li>
               <li>
-                <strong>Cambiar a conservador en cada caída:</strong> El &quot;market timing&quot; (intentar predecir los
-                movimientos del mercado) destruye rentabilidad. Estadísticamente, los inversores que venden en
-                caídas y recompran tarde obtienen un 2–4% menos anual.
+                <strong>Cambiar a conservador en cada caída:</strong> intentar acertar el momento de
+                entrar y salir del mercado («market timing») suele restar rentabilidad: quien vende en
+                una caída y vuelve más tarde se pierde parte de la recuperación. La cifra concreta de
+                cuánto resta depende del estudio, del periodo y del mercado que se mire, así que aquí
+                no se da ninguna (§1.quinquies: una cifra popular sin fuente es una cifra inventada).
               </li>
               <li>
                 <strong>Invertir el fondo de emergencia:</strong> Mezclar el colchón de seguridad con inversiones
@@ -989,6 +1158,8 @@ export default function TestPerfilInversorPage() {
           <p className={styles.subtitle}>Responde con sinceridad para obtener resultados precisos</p>
         </header>
 
+        <RegionBadge variant="es-data" />
+
         <div className={styles.progressText}>
           Pregunta {currentQuestion + 1} de {QUESTIONS.length}
         </div>
@@ -996,7 +1167,36 @@ export default function TestPerfilInversorPage() {
           <div className={styles.progressFill} style={{ width: `${progress}%` }} />
         </div>
 
-        <div className={styles.questionCard}>
+        {/*
+          1221 — Quien vuelve a la URL en la misma pestaña aterrizaba en medio del cuestionario
+          sin explicación y sin forma de volver a la portada: en esta fase no hay «Comenzar
+          Test» ni «Repetir Test». Es el reverso de la reparación del 20/08/2026, que curó la
+          pérdida de estado y no dejó salida.
+        */}
+        {sesionRecuperada && (
+          <div className={styles.avisoRecuperado} role="status">
+            <p>
+              <span aria-hidden="true">↩️</span> Hemos recuperado el test que dejaste a medias en
+              esta pestaña, con {Object.keys(answers).length} de {QUESTIONS.length} respuestas.
+            </p>
+            <button type="button" className={styles.reiniciarButton} onClick={handleRestart}>
+              Empezar de cero
+            </button>
+          </div>
+        )}
+
+        {/*
+          1215 — `tabIndex={-1}` para poder recibir el foco por programa sin entrar en el orden
+          de tabulación, y el `aria-live` para que el cambio de pregunta se anuncie: el único
+          [aria-live] de esta fase era el anunciador de rutas de Next, que es de Next.
+        */}
+        <div
+          className={styles.questionCard}
+          ref={tarjetaPregunta}
+          tabIndex={-1}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <span className={styles.questionNumber}>Pregunta {question.id}</span>
           <h2 className={styles.questionText}>{question.text}</h2>
 
@@ -1034,7 +1234,18 @@ export default function TestPerfilInversorPage() {
               onClick={handleNext}
               disabled={selectedAnswer === undefined}
             >
-              {currentQuestion === QUESTIONS.length - 1 ? 'Ver Resultado' : 'Siguiente →'}
+              {/*
+                Solo cambia de rótulo cuando el botón está HABILITADO y aun así faltan
+                respuestas, que es el caso patológico del 1214 (llegar a la última desde una
+                sesión restaurada incompleta): ahí prometer «Ver Resultado» y no darlo sería la
+                mitad mala de la reparación. Deshabilitado por no haber contestado ESTA
+                pregunta, «Ver Resultado» sigue siendo lo correcto y lo que dice desde siempre.
+              */}
+              {currentQuestion === QUESTIONS.length - 1
+                ? respuestasCompletas || selectedAnswer === undefined
+                  ? 'Ver Resultado'
+                  : 'Completar las que faltan →'
+                : 'Siguiente →'}
             </button>
           </div>
         </div>
@@ -1054,6 +1265,8 @@ export default function TestPerfilInversorPage() {
         <p className={styles.subtitle}>Aquí está tu perfil de inversor personalizado</p>
       </header>
 
+      <RegionBadge variant="es-data" />
+
       <div className={styles.resultScreen}>
         <div className={styles.resultHeader}>
           <div className={styles.resultIcon}>{profile.icon}</div>
@@ -1064,7 +1277,13 @@ export default function TestPerfilInversorPage() {
               nunca: no había forma de saberse en el borde ni de rehacer la cuenta. */}
           <p className={styles.resultScore}>
             {formatNumber(totalScore, 0)} puntos · tramo {formatNumber(profile.range[0], 0)}–{formatNumber(profile.range[1], 0)}
-            {totalScore === profile.range[1] || totalScore === profile.range[0] ? (
+            {/*
+              ⚠️ 22/09/2026 (hallazgo 1220) — la condición era `totalScore === range[0] ||
+              totalScore === range[1]` a secas, sin excluir el suelo y el techo de la ESCALA, así
+              que en 10 y en 40 avisaba de un «perfil de al lado» que no existe: ni el 9 ni el 41
+              son puntuaciones posibles con diez preguntas de 1 a 4 puntos.
+            */}
+            {enBordeDeTramo ? (
               <span className={styles.resultScoreBorde}>
                 {' '}— estás justo en el borde del tramo: con un punto de diferencia el
                 resultado sería el perfil de al lado
