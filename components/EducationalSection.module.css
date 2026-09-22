@@ -56,8 +56,14 @@
   font-family: inherit;
 }
 
+/* El hover NO usa `--secondary-texto` aunque sea el tono "más oscuro" de la pareja: ese
+   token es para color de TEXTO, y en el tema oscuro de meskeIA pasa a #5ABDB9 —claro, para
+   leerse sobre fondo oscuro—, con lo que el blanco encima caía a 2,23:1. En :root y en las
+   tres verticales vale lo mismo que `--secondary-boton`, así que el hover nunca llegó a
+   oscurecer nada: solo rompía el contraste en oscuro. El realce lo dan el desplazamiento y
+   la sombra. Medido el 22/09/2026; lo vigila `npm run check:contraste-cabeceras`. */
 .toggleButton:hover {
-  background: var(--secondary-texto, #2F726F);
+  background: var(--secondary-boton, #327874);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
 }
@@ -109,7 +115,7 @@
 }
 
 [data-theme='dark'] .toggleButton:hover {
-  background: var(--secondary-texto, #2F726F);
+  background: var(--secondary-boton, #327874);
 }
 
 /* Responsive */
