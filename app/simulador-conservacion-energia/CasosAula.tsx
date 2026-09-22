@@ -102,7 +102,16 @@ export default function CasosAula() {
         <h3 className={styles.casoTitulo}>
           {practica ? 'Ejercicio de práctica' : `Caso ${caso.id} · ${caso.titulo}`}
         </h3>
-        <p className={styles.casoEnunciado}>{enunciado}</p>
+        {/*
+          ⚠️ 22/09/2026 (hallazgo 1212) — volver a pulsar «Practicar» genera otro ejercicio y
+          nada lo anunciaba: el botón lleva `aria-pressed`, que ya valía true y sigue valiendo
+          true, y la sección no tenía ninguna región viva salvo el veredicto, que solo existe
+          después de comprobar. Quien usa lector de pantalla no se enteraba de que el enunciado
+          había cambiado. Vale igual al cambiar de caso numerado, que tenía el mismo silencio.
+        */}
+        <p className={styles.casoEnunciado} role="status" aria-live="polite">
+          {enunciado}
+        </p>
 
         <div className={styles.casoRespuesta}>
           <label className={styles.casoLabel} htmlFor="casos-respuesta">

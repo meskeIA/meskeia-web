@@ -201,9 +201,19 @@ export function comprobarRespuesta(respuestaUsuario: string, valorEsperado: numb
   if (!Number.isFinite(valor)) return { correcto: false, motivo: 'no-numerico' };
   const tolerancia = toleranciaDe(valorEsperado);
   const diferencia = Math.abs(valor - valorEsperado);
+  /**
+   * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
+   * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
+   * se aceptaba por arriba y se rechazaba por abajo: con esperado 0,1 y tolerancia 0,01, «0,11»
+   * daba 0,009999999999999995 (dentro) y «0,09» daba 0,010000000000000009 (fuera). El margen de
+   * 1e-9 absorbe el ruido sin cambiar ninguna decisión real: está nueve órdenes por encima del
+   * ulp de estas cifras y siete por debajo de la tolerancia más pequeña (0,01).
+   */
+  const RUIDO_BINARIO = 1e-9;
+  const correcto = diferencia <= tolerancia + RUIDO_BINARIO;
   return {
-    correcto: diferencia <= tolerancia,
-    motivo: diferencia <= tolerancia ? 'acierto' : 'fallo',
+    correcto,
+    motivo: correcto ? 'acierto' : 'fallo',
     diferencia,
     tolerancia,
   };

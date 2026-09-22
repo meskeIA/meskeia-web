@@ -70,8 +70,23 @@ export default function CasosAula() {
         </h2>
         <p className={styles.casosIntro}>
           {TOTAL_CASOS} problemas con solución, siempre los mismos y en el mismo orden. Un
-          profesor puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Puedes
-          comprobar cada resultado moviendo los deslizadores del simulador de arriba.
+          profesor puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad.
+          {/*
+            ⚠️ 22/09/2026 (hallazgo 1209) — aquí decía «Puedes comprobar cada resultado moviendo
+            los deslizadores del simulador de arriba», y hacerlo SUSPENDÍA la respuesta correcta.
+            Los tres deslizadores van de 0,1 en 0,1, y varios casos piden una velocidad angular
+            irracional: el caso 7 necesita ω = π = 3,1416 rad/s, el control solo llega a 3,1, el
+            panel imprime entonces 9,30 m/s y el corrector rechaza ese 9,30 porque la respuesta
+            es 9,42. El caso 12 no cabe siquiera en el dominio (pide r = 0,4 m, y el deslizador
+            satura en 0,5; y ω = 12,57 rad/s, que satura en 10).
+
+            Los deslizadores son para VER el fenómeno; los casos se resuelven con las fórmulas y
+            se corrigen contra la cifra exacta. Decirlo así es lo que evita que el alumno
+            concluya que la app se contradice.
+          */}{' '}
+          Los deslizadores de arriba van de 0,1 en 0,1, así que sirven para ver cómo responde el
+          movimiento, no para reproducir al decimal los datos de cada caso: estos se resuelven
+          con las fórmulas y se corrigen contra el valor exacto.
         </p>
       </div>
 
@@ -102,7 +117,16 @@ export default function CasosAula() {
         <h3 className={styles.casoTitulo}>
           {practica ? 'Ejercicio de práctica' : `Caso ${caso.id} · ${caso.titulo}`}
         </h3>
-        <p className={styles.casoEnunciado}>{enunciado}</p>
+        {/*
+          ⚠️ 22/09/2026 (hallazgo 1212) — volver a pulsar «Practicar» genera otro ejercicio y
+          nada lo anunciaba: el botón lleva `aria-pressed`, que ya valía true y sigue valiendo
+          true, y la sección no tenía ninguna región viva salvo el veredicto, que solo existe
+          después de comprobar. Quien usa lector de pantalla no se enteraba de que el enunciado
+          había cambiado. Vale igual al cambiar de caso numerado, que tenía el mismo silencio.
+        */}
+        <p className={styles.casoEnunciado} role="status" aria-live="polite">
+          {enunciado}
+        </p>
 
         <div className={styles.casoRespuesta}>
           <label className={styles.casoLabel} htmlFor="casos-respuesta">

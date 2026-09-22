@@ -1093,33 +1093,38 @@ test.describe('re-inspección 22/09/2026', () => {
 
   /* ── Los tres hallazgos del 22/09/2026, cada uno con su caso ──────────────────────── */
 
-  test('HALLAZGO 1 — el caso 7, comprobado con los deslizadores como manda la sección, suspende', async ({
+  test('1209 (regresión) — la sección no promete comprobar los casos con los deslizadores', async ({
     page,
   }) => {
-    test.fail(); // la app rechaza la cifra que ella misma acaba de imprimir en su panel
-
     await esperarHidratacion(page, [CAMPO_CASOS]);
-    await expect(page.locator('[class*="casosIntro"]')).toContainText(
-      'moviendo los deslizadores del simulador de arriba',
-    );
 
-    // Caso 7: aspa de r = 3 m girando a f = 0,5 Hz ⟹ ω = 2π·0,5 = π = 3,1416 rad/s, que el
-    // deslizador (paso 0,1) no alcanza. El vecino más próximo es 3,1.
+    /*
+      ⚠️ 22/09/2026 — este testigo pedía que el corrector aceptara el 9,30 que el panel imprime
+      al poner el deslizador en 3,1, y esa no puede ser la reparación: la respuesta del caso 7 es
+      9,42 m/s (ω = 2π·0,5 = π, r = 3), así que darle por bueno un 9,30 es un 1,3 % de error
+      aceptado en un ejercicio de física, es decir dejar de corregir. Y con el caso 12 ni eso
+      valdría: pide r = 0,4 m y ω = 12,57 rad/s, los dos FUERA del dominio de los controles
+      (0,5-5 y 0-10), así que la promesa no se puede cumplir ni afinando el paso.
+
+      Lo que se repara es la PROMESA. Los deslizadores van de 0,1 en 0,1 y sirven para ver cómo
+      responde el movimiento; los casos se resuelven con las fórmulas. Dicho así, el alumno ya
+      no concluye que la app se contradice consigo misma.
+    */
+    const intro = page.locator('[class*="casosIntro"]');
+    await expect(intro).not.toContainText('comprobar cada resultado moviendo los deslizadores');
+    await expect(intro).toContainText('de 0,1 en 0,1');
+    await expect(intro).toContainText('se corrigen contra el valor exacto');
+
+    // Y el corrector sigue siendo exigente donde debe: la respuesta del caso 7 es 9,42, y el
+    // 9,30 que sale del deslizador redondeado NO se da por bueno.
     await page.getByRole('button', { name: /^Caso 7:/ }).click();
-    await configurar(page, 3, 3.1416, 1);
-    expect(await valorSlider(page, OMEGA), 'el paso de 0,1 no permite poner π').toBe('3.1');
-    await expect(magnitud(page, 'v tangencial')).toHaveText('9,30'); // v = 3,1 · 3
-
-    // El alumno copia lo que el panel acaba de imprimir, que es lo que la sección le dice
-    // que haga. Esperado: que se dé por bueno. Obtenido: «No es correcto, te has desviado 0,12».
-    expect(await responderTecleando(page, '9,30')).toContain('¡Correcto!');
+    expect(await responderTecleando(page, '9,42')).toContain('¡Correcto!');
+    expect(await responderTecleando(page, '9,30')).toContain('No es correcto');
   });
 
-  test('HALLAZGO 2 — en modo «Practicar» el botón de pista se declara desplegado y no despliega nada', async ({
+  test('1210 (regresión) — en modo «Practicar» no se ofrece un botón de pista sin pista', async ({
     page,
   }) => {
-    test.fail(); // el ejercicio generado no trae pista, pero el botón sigue en pantalla
-
     await esperarHidratacion(page, [CAMPO_CASOS]);
     const pista = page.getByRole('button', { name: /pista/ });
     const cajaPista = page.locator('[class*="casoPista"]');
@@ -1130,27 +1135,65 @@ test.describe('re-inspección 22/09/2026', () => {
     await expect(pista).toHaveAttribute('aria-expanded', 'true');
     await expect(cajaPista).toBeVisible();
 
-    // En el modo aleatorio, el mismo botón cambia de estado y de rótulo sin desplegar nada.
+    /*
+      ⚠️ 22/09/2026 — el testigo pedía que en el modo aleatorio apareciera una pista, y se elige
+      la otra salida que el acta dejaba abierta: no ofrecer el control. El ejercicio lo genera
+      `generarEjercicioAleatorio`, cuyo tipo `Ejercicio` no tiene el campo, así que inventarle
+      una pista sería escribir contenido nuevo en vez de cerrar el hueco. Un control de
+      despliegue no se ofrece cuando no hay nada que desplegar, y eso es lo que arregla el
+      anuncio falso del lector de pantalla.
+    */
     await page.getByRole('button', { name: /Practicar/ }).click();
-    await expect(pista).toHaveAttribute('aria-expanded', 'false');
-    await pista.click();
-    await expect(pista).toHaveAttribute('aria-expanded', 'true');
-    await expect(pista).toContainText('Ocultar pista');
-    await expect(cajaPista, 'aria-expanded=true sin nada desplegado').toBeVisible();
+    await expect(page.getByRole('button', { name: /pista/ })).toHaveCount(0);
+    await expect(cajaPista).toHaveCount(0);
+    // La solución sí sigue estando, que es lo que el modo práctica ofrece de verdad.
+    await expect(page.getByRole('button', { name: /solución/ })).toHaveCount(1);
   });
 
-  test('HALLAZGO 3 — la tolerancia no es simétrica: acepta +0,01 y rechaza −0,01', async () => {
-    test.fail(); // ±1 ulp de la resta en binario decide el veredicto en el borde exacto
-
+  test('1211 (regresión) — la tolerancia es simétrica en su borde exacto', async () => {
     // El caso 6 vale 0,1 Hz y su tolerancia es el mínimo de 0,01 (el 10 % del valor).
     expect(toleranciaDe(0.1)).toBe(0.01);
-    expect(comprobarRespuesta(0.11, 0.1).correcto).toBe(true); // +0,01 → se acepta
 
-    // Y su simétrica, que se desvía exactamente lo mismo, se rechaza con el mensaje
-    // «te has desviado 0,01», que es justo la tolerancia que la app se ha fijado.
-    expect(comprobarRespuesta(0.09, 0.1).motivo).toContain('0,01');
-    expect(comprobarRespuesta(0.09, 0.1).correcto, '−0,01 debería valer lo mismo que +0,01').toBe(
-      true,
-    );
+    /*
+      ⚠️ 22/09/2026 (1211) — la comparación decidía por el ±1 ulp de la resta en binario:
+      0,11 − 0,1 da 0,009999999999999995 (dentro) y 0,1 − 0,09 da 0,010000000000000009 (fuera),
+      así que la misma desviación se aceptaba por arriba y se rechazaba por abajo, con un mensaje
+      que cifraba la desviación igual que la tolerancia.
+    */
+    expect(comprobarRespuesta(0.11, 0.1).correcto, '+0,01').toBe(true);
+    expect(comprobarRespuesta(0.09, 0.1).correcto, '−0,01, la misma desviación').toBe(true);
+
+    // El otro caso del acta: a_c = 8 con tolerancia 0,08 (8,08 − 8 = 0,08000000000000007).
+    expect(toleranciaDe(8)).toBeCloseTo(0.08, 10);
+    expect(comprobarRespuesta(8.08, 8).correcto).toBe(true);
+    expect(comprobarRespuesta(7.92, 8).correcto).toBe(true);
+
+    // Y el margen NO relaja la tolerancia: lo que está de verdad fuera sigue fuera.
+    expect(comprobarRespuesta(0.12, 0.1).correcto).toBe(false);
+    expect(comprobarRespuesta(8.2, 8).correcto).toBe(false);
+  });
+
+  test('1212 (regresión) — generar otro ejercicio de práctica se anuncia', async ({ page }) => {
+    await esperarHidratacion(page, [CAMPO_CASOS]);
+
+    /*
+      ⚠️ 22/09/2026 (1212) — estando ya en modo práctica, volver a pulsar «Practicar» generaba
+      otro ejercicio y nada lo anunciaba: el botón lleva `aria-pressed`, que ya valía true y
+      seguía valiendo true, y dentro de la sección no había ninguna región viva salvo el
+      veredicto, que solo existe después de comprobar. Quien usa lector de pantalla no se
+      enteraba de que el enunciado había cambiado.
+    */
+    await page.getByRole('button', { name: /Practicar/ }).click();
+    const enunciado = page.locator('[class*="casoEnunciado"]');
+    await expect(enunciado).toHaveAttribute('aria-live', 'polite');
+    await expect(enunciado).toHaveAttribute('role', 'status');
+
+    // Y el enunciado cambia de verdad al volver a pulsar, que es lo que hay que anunciar.
+    const vistos = new Set<string>();
+    for (let i = 0; i < 6; i++) {
+      vistos.add(((await enunciado.textContent()) ?? '').trim());
+      await page.getByRole('button', { name: /Practicar/ }).click();
+    }
+    expect(vistos.size, 'seis tiradas no pueden dar siempre el mismo enunciado').toBeGreaterThan(1);
   });
 });

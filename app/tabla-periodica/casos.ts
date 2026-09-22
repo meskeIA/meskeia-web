@@ -466,8 +466,17 @@ export function comprobarRespuesta(
     // en absoluto. `parseFloat` se quedaría con el prefijo de «63abc» y lo daría por bueno.
     const valor = parseSpanishNumber(respuestaUsuario);
     if (!Number.isFinite(valor)) return { correcto: false, motivo: 'fallo' };
+    /**
+     * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
+     * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
+     * se aceptaba por arriba y se rechazaba por abajo. El margen de 1e-9 absorbe el ruido sin
+     * cambiar ninguna decisión real: nueve órdenes por encima del ulp de estas cifras y siete
+     * por debajo de la tolerancia más pequeña (0,01).
+     */
+    const RUIDO_BINARIO = 1e-9;
     const correcto =
-      Math.abs(valor - caso.respuestaNumerica) <= toleranciaDe(caso.respuestaNumerica);
+      Math.abs(valor - caso.respuestaNumerica) <=
+      toleranciaDe(caso.respuestaNumerica) + RUIDO_BINARIO;
     return { correcto, motivo: correcto ? 'acierto' : 'fallo' };
   }
 

@@ -337,7 +337,20 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
   }
 
   const diferencia = Math.abs(usuario - esperado);
-  if (diferencia <= tolerancia) {
+  /**
+   * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
+   * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
+   * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
+   * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
+   * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
+   * suspender a alguien.
+   *
+   * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
+   * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
+   * sin cambiar ninguna decisión real.
+   */
+  const RUIDO_BINARIO = 1e-9;
+  if (diferencia <= tolerancia + RUIDO_BINARIO) {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
