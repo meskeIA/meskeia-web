@@ -70,6 +70,12 @@ interface ResultadosComprador {
   gastosNotarioMax: number;
   gastosRegistro: number;
   gastosGestoria: number;
+  /**
+   * false cuando el texto de «Gastos de gestoría del comprador» no es un número (1201).
+   * Es el hueco que la reparación del 1157 dejó abierto EN SU PROPIA APP DE ORIGEN: aquel
+   * cierre cubrió los TRES importes del vendedor y este se quedó fuera.
+   */
+  gestoriaLegible: boolean;
   totalGastos: number;
   totalOperacion: number;
   /** null en primera mano (allí es IVA, no ITP) */
@@ -257,6 +263,15 @@ export default function SimuladorTrasteroCompraventaPage() {
     // el total en pantalla no cuadraba con las líneas visibles (hallazgo 457, la misma
     // reparación que el 165 de nave-industrial).
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
+    /**
+     * Y un importe ILEGIBLE tampoco es un cero (hallazgo 1201). `parseSpanishNumberOr`
+     * devuelve 0 cuando el parser RECHAZA el texto —«2.000.50» es NaN por diseño desde el
+     * 24/08/2026—, la tarjeta se pinta con guarda `> 0` y desaparecía, de modo que el coste
+     * total bajaba sin una línea que lo explicara y bajo el rótulo «todos los gastos». Es
+     * la dirección mala para quien presupuesta una compra: creerla más barata de lo que es.
+     */
+    const gestoriaLegible =
+      gastosGestoria.trim() === '' || Number.isFinite(parseSpanishNumber(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
@@ -322,6 +337,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       gastosNotarioMax: notaria.max,
       gastosRegistro: registro,
       gastosGestoria: gestoria,
+      gestoriaLegible,
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido: elegido,
@@ -803,12 +819,26 @@ export default function SimuladorTrasteroCompraventaPage() {
                     icon="🏛️"
                   />
 
-                  {resultadosComprador.gastosGestoria > 0 && (
+                  {/*
+                    Con la guarda `> 0` a secas, un importe que el parser no puede leer valía 0
+                    y la línea DESAPARECÍA del desglose (hallazgo 1201). Ahora se pinta igual y
+                    dice que el dato está escrito pero no se ha podido leer.
+                  */}
+                  {(resultadosComprador.gastosGestoria > 0 || !resultadosComprador.gestoriaLegible) && (
                     <ResultCard
                       title="Gastos de gestoría"
-                      value={formatCurrency(resultadosComprador.gastosGestoria)}
+                      value={
+                        resultadosComprador.gestoriaLegible
+                          ? formatCurrency(resultadosComprador.gastosGestoria)
+                          : 'Sin leer'
+                      }
                       variant="default"
                       icon="📂"
+                      description={
+                        resultadosComprador.gestoriaLegible
+                          ? undefined
+                          : 'El importe escrito no se ha podido leer, así que NO está incluido en el total. Escríbelo con coma decimal (300,50).'
+                      }
                     />
                   )}
 
@@ -820,9 +850,17 @@ export default function SimuladorTrasteroCompraventaPage() {
                     variant="info"
                     icon="➕"
                     description={
-                      resultadosComprador.impuestoNoCalculado
-                        ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
-                        : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`
+                      [
+                        `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`,
+                        resultadosComprador.impuestoNoCalculado
+                          ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                          : null,
+                        resultadosComprador.gestoriaLegible
+                          ? null
+                          : 'SIN la gestoría, que no se ha podido leer',
+                      ]
+                        .filter((x): x is string => x !== null)
+                        .join(' — ')
                     }
                   />
 
@@ -832,9 +870,18 @@ export default function SimuladorTrasteroCompraventaPage() {
                     variant="highlight"
                     icon="💳"
                     description={
-                      resultadosComprador.impuestoNoCalculado
-                        ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
-                        : 'Precio del trastero + todos los gastos'
+                      (() => {
+                        // El rótulo «todos los gastos» era falso en cuanto un importe no se
+                        // podía leer, y esta es la misma abstención que ya aplica
+                        // `impuestoNoCalculado` y en la misma dirección (hallazgo 1201).
+                        const sinCalcular = [
+                          resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
+                          resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+                        ].filter((x): x is string => x !== null);
+                        return sinCalcular.length === 0
+                          ? 'Precio del trastero + todos los gastos'
+                          : `No incluye ${sinCalcular.join(' ni ')}: el coste real será mayor`;
+                      })()
                     }
                   />
                   {resultadosComprador.tipoElegido && resultadosComprador.tipoElegido.noComprobables.length > 0 && (
@@ -1124,20 +1171,40 @@ export default function SimuladorTrasteroCompraventaPage() {
                           conceptos.push('la comisión inmobiliaria');
                           pedir('un porcentaje de comisión legible');
                         }
-                        // Los otros dos importes del vendedor tienen el mismo hueco, y en la
-                        // misma dirección: un gasto que no se lee desaparece del cálculo y
-                        // deja la cifra por encima de la real (hallazgo 1157).
-                        if (!resultadosVendedor.gastosAdquisicionLegible) {
-                          conceptos.push('los impuestos y gastos de aquella compra');
-                          pedir('un importe legible en los gastos de la compra');
-                        }
+                        // La gestoría de la venta va en la misma dirección que la comisión:
+                        // es gasto de transmisión, y al no leerse deja el neto por ENCIMA del
+                        // real (hallazgo 1157).
                         if (!resultadosVendedor.gestoriaLegible) {
                           conceptos.push('la gestoría de la venta');
                           pedir('un importe de gestoría legible');
                         }
-                        return conceptos.length === 0
-                          ? 'Lo que realmente recibes tras los gastos'
-                          : `Techo: aún NO incluye ${conceptos.join(' ni ')} (añade ${enumerarCampos(campos)})`;
+                        /**
+                         * Los impuestos y gastos de AQUELLA compra van al revés, y por eso
+                         * salen de la lista de arriba (hallazgo 1202): suman al valor de
+                         * adquisición (art. 35.1 LIRPF), así que reducen la ganancia y con
+                         * ella el IRPF, que es una de las cuatro líneas que el neto resta.
+                         * Al no leerse dejan el neto por DEBAJO del real: la cifra es un
+                         * SUELO, y meterla en la frase «Techo: aún NO incluye…» mandaba
+                         * descontar de una cifra que al leer el dato SUBE (420,10 € en el
+                         * caso del acta).
+                         */
+                        const sueloPorAdquisicion = !resultadosVendedor.gastosAdquisicionLegible;
+                        if (sueloPorAdquisicion) {
+                          pedir('un importe legible en los gastos de la compra');
+                        }
+                        if (conceptos.length === 0 && !sueloPorAdquisicion) {
+                          return 'Lo que realmente recibes tras los gastos';
+                        }
+                        const frases: string[] = [];
+                        if (conceptos.length > 0) {
+                          frases.push(`Techo: aún NO incluye ${conceptos.join(' ni ')}`);
+                        }
+                        if (sueloPorAdquisicion) {
+                          frases.push(
+                            'Suelo: faltan los impuestos y gastos de aquella compra, que al sumarse al valor de adquisición REDUCEN el IRPF y suben el neto',
+                          );
+                        }
+                        return `${frases.join('. ')} (añade ${enumerarCampos(campos)})`;
                       })()
                     }
                   />

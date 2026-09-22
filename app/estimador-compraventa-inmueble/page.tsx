@@ -161,6 +161,13 @@ interface ResultadosComprador {
   gastosNotarioMax: number;
   gastosRegistro: number;
   gastosGestoria: number;
+  /**
+   * false cuando el texto de «Gastos de gestoría del comprador» no es un número (1191).
+   * Su ResultCard se pinta bajo la guarda `> 0`, así que un importe ilegible hacía
+   * DESAPARECER la línea del desglose, en la dirección contra la que avisa por escrito el
+   * contrato de `elegirTipoITP`: «quien presupuesta 0 y paga 12.000 tiene un problema».
+   */
+  gestoriaLegible: boolean;
   totalGastos: number;
   totalOperacion: number;
   /** null en primera mano (allí es IVA, no ITP) */
@@ -202,6 +209,27 @@ interface ResultadosVendedor {
   faltaPrecioCompra: boolean;
   faltaValorSuelo: boolean;
   faltaAnios: boolean;
+  /**
+   * Los importes cuyo TEXTO el parser no ha podido leer (hallazgo 1190, ALTO).
+   *
+   * `parseSpanishNumberOr` devuelve 0 tanto con el campo VACÍO —donde es correcto y está
+   * documentado en `lib/formatters.ts`— como con un texto ILEGIBLE, donde el usuario sí
+   * escribió un dato: «193.000.00», el millar y el decimal a la estadounidense, es NaN por
+   * diseño desde el 24/08/2026. El blur del NumberInput no lo corrige (solo acota lo que sí
+   * parsea), así que el texto se queda en pantalla y nada delata la pérdida.
+   *
+   * Se distinguen uno a uno porque NO van en la misma dirección: la comisión y los otros
+   * gastos de la venta minoran el valor de transmisión —al desaparecer, el neto sube—,
+   * mientras los gastos de aquella compra, las mejoras, la reinversión y la hipoteca
+   * pendiente reducen la ganancia o eximen de ella, así que al desaparecer el neto BAJA.
+   */
+  comisionLegible: boolean;
+  otrosVentaLegible: boolean;
+  gastosAdquisicionLegible: boolean;
+  mejorasLegible: boolean;
+  /** Solo se mira cuando «Voy a reinvertir» está marcado: ahí se pierde la exención del art. 38 */
+  reinversionLegible: boolean;
+  hipotecaLegible: boolean;
 }
 
 // ===== CONSTANTES =====
@@ -325,6 +353,18 @@ export default function SimuladorCompraventaPage() {
   // Pestaña activa
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
 
+  /**
+   * ¿El texto de un campo de dinero se puede LEER? (hallazgo 1190, ALTO)
+   *
+   * Vacío es legible —y vale 0, que es lo correcto y lo que documenta `lib/formatters.ts`—;
+   * lo que no es un número, no. `parseSpanishNumberOr` no distingue los dos casos y devuelve
+   * 0 en ambos, así que los siete campos de dinero de esta página descartaban en silencio un
+   * dato que el usuario sí había escrito. Es el mismo helper que las hermanas del clúster
+   * (garaje, trastero, local-comercial) tienen desde el hallazgo 773.
+   */
+  const esLegible = (texto: string) =>
+    texto.trim() === '' || Number.isFinite(parseSpanishNumber(texto));
+
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
@@ -333,6 +373,8 @@ export default function SimuladorCompraventaPage() {
     // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
     // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0).
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
+    /** Y un importe ILEGIBLE tampoco es un cero: es un dato que falta (hallazgo 1191). */
+    const gestoriaLegible = esLegible(gastosGestoria);
 
     let impuesto = 0;
     let tipoImpuesto = '';
@@ -444,6 +486,7 @@ export default function SimuladorCompraventaPage() {
       gastosNotarioMax: notaria.max,
       gastosRegistro: registro,
       gastosGestoria: gestoria,
+      gestoriaLegible,
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido,
@@ -491,6 +534,19 @@ export default function SimuladorCompraventaPage() {
     const gestoria = parseSpanishNumberOr(gastosGestoria);
     const otrosVenta = Math.max(0, parseSpanishNumberOr(otrosGastosVenta));
     const comision = precioV * comisionPct;
+    /**
+     * Los seis importes del vendedor que `parseSpanishNumberOr` convertía en 0 sin distinguir
+     * el campo vacío del ilegible (hallazgo 1190). El caso caro es la reinversión: con el
+     * importe no leído, `importeTotalObtenido` sale del lado malo de la guarda del motor y la
+     * exención del art. 38 LIRPF se pierde ENTERA —8.910 € en el caso del acta— mientras el
+     * neto se sigue rotulando «Lo que realmente recibes».
+     */
+    const comisionLegible = esLegible(comisionInmobiliaria);
+    const otrosVentaLegible = esLegible(otrosGastosVenta);
+    const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
+    const mejorasLegible = esLegible(mejoras);
+    const reinversionLegible = esLegible(importeReinversion);
+    const hipotecaLegible = esLegible(hipotecaPendiente);
 
     // Plusvalía municipal
     let plusvalia = 0;
@@ -587,6 +643,14 @@ export default function SimuladorCompraventaPage() {
       faltaPrecioCompra: !(precioC > 0),
       faltaValorSuelo: !(valorSuelo > 0),
       faltaAnios: !aniosDisponibles,
+      comisionLegible,
+      otrosVentaLegible,
+      gastosAdquisicionLegible,
+      mejorasLegible,
+      // Solo cuenta cuando la casilla está marcada: con la reinversión desactivada el campo
+      // no entra en el cálculo y su texto no puede falsear nada.
+      reinversionLegible: !puedeReinvertir || reinversionLegible,
+      hipotecaLegible: !puedeReinvertir || hipotecaLegible,
     };
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
 
@@ -632,6 +696,32 @@ export default function SimuladorCompraventaPage() {
     ? [
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
         resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+        // Un importe que no se puede leer se tomaba como 0: estos dos son gastos de
+        // transmisión del art. 35.1 LIRPF, así que al desaparecer el neto queda por ENCIMA
+        // del real y hay que descontarlos (hallazgo 1190).
+        resultadosVendedor.comisionLegible ? null : 'la comisión inmobiliaria',
+        resultadosVendedor.otrosVentaLegible ? null : 'los otros gastos de la venta',
+      ].filter((x): x is string => x !== null)
+    : [];
+
+  /**
+   * Y lo que falta en la DIRECCIÓN CONTRARIA, que exige otro aviso (hallazgo 1190).
+   *
+   * Los gastos de aquella compra y las mejoras suman al valor de adquisición (art. 35.1
+   * LIRPF) y la reinversión exime de la ganancia (art. 38): al no poder leerse, la ganancia
+   * y el IRPF salen MAYORES que los reales y el neto queda por DEBAJO. Decir ahí «falta
+   * descontar» mandaría restar de una cifra que en realidad va a subir.
+   */
+  const faltanPorAbaratar = resultadosVendedor
+    ? [
+        resultadosVendedor.gastosAdquisicionLegible
+          ? null
+          : 'los impuestos y gastos de aquella compra',
+        resultadosVendedor.mejorasLegible ? null : 'las mejoras',
+        resultadosVendedor.reinversionLegible
+          ? null
+          : 'el importe que reinviertes (con él, la ganancia puede quedar exenta por el art. 38 LIRPF)',
+        resultadosVendedor.hipotecaLegible ? null : 'el principal pendiente de la hipoteca',
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -975,12 +1065,26 @@ export default function SimuladorCompraventaPage() {
                     icon="🏛️"
                   />
 
-                  {resultadosComprador.gastosGestoria > 0 && (
+                  {/*
+                    Con la guarda `> 0` a secas, un importe que el parser no puede leer valía 0
+                    y la línea DESAPARECÍA del desglose: no quedaba ni un «0,00 €» que delatara
+                    la pérdida (hallazgo 1191).
+                  */}
+                  {(resultadosComprador.gastosGestoria > 0 || !resultadosComprador.gestoriaLegible) && (
                     <ResultCard
                       title="Gastos de gestoría"
-                      value={formatCurrency(resultadosComprador.gastosGestoria)}
+                      value={
+                        resultadosComprador.gestoriaLegible
+                          ? formatCurrency(resultadosComprador.gastosGestoria)
+                          : 'Sin leer'
+                      }
                       variant="default"
                       icon="📂"
+                      description={
+                        resultadosComprador.gestoriaLegible
+                          ? undefined
+                          : 'El importe escrito no se ha podido leer, así que NO está incluido en el total. Escríbelo con coma decimal (300,50).'
+                      }
                     />
                   )}
 
@@ -992,9 +1096,19 @@ export default function SimuladorCompraventaPage() {
                     variant="info"
                     icon="➕"
                     description={
-                      resultadosComprador.impuestoNoCalculado
-                        ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
-                        : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`
+                      [
+                        `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`,
+                        resultadosComprador.impuestoNoCalculado
+                          ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                          : null,
+                        // Un importe que no se ha podido leer falta en el total igual que un
+                        // impuesto sin calcular, y en la misma dirección (hallazgo 1191).
+                        resultadosComprador.gestoriaLegible
+                          ? null
+                          : 'SIN la gestoría, que no se ha podido leer',
+                      ]
+                        .filter((x): x is string => x !== null)
+                        .join(' — ')
                     }
                   />
 
@@ -1004,8 +1118,17 @@ export default function SimuladorCompraventaPage() {
                     variant="highlight"
                     icon="💳"
                     description={
-                      resultadosComprador.impuestoNoCalculado
-                        ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                      resultadosComprador.impuestoNoCalculado || !resultadosComprador.gestoriaLegible
+                        ? `No incluye ${[
+                            resultadosComprador.impuestoNoCalculado
+                              ? `el ${resultadosComprador.tipoImpuesto}`
+                              : null,
+                            resultadosComprador.gestoriaLegible
+                              ? null
+                              : 'la gestoría, que no se ha podido leer',
+                          ]
+                            .filter((x): x is string => x !== null)
+                            .join(' ni ')}: el coste real será mayor`
                         : 'Precio + todos los gastos'
                     }
                   />
@@ -1379,10 +1502,21 @@ export default function SimuladorCompraventaPage() {
                           : 'warning'
                     }
                     icon="💸"
-                    description={
+    description={
                       !resultadosVendedor.irpfCalculado
                         ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
-                        : resultadosVendedor.exentoIRPF
+                        : // Con un importe ilegible entre los que REDUCEN la ganancia, esta cuota
+                          // es un techo, y el caso caro es la reinversión: el motor no aplica la
+                          // exención del art. 38 y cobra el IRPF entero de una ganancia que puede
+                          // estar exenta al 100 % (hallazgo 1190). Se dice aquí, donde se lee la
+                          // cifra, y no solo cuatro tarjetas más abajo.
+                          !resultadosVendedor.reinversionLegible
+                          ? 'El importe de reinversión no se ha podido leer, así que esta cuota NO aplica la exención del art. 38 LIRPF: escríbelo con coma decimal (250.000,50) para comprobar si la ganancia queda exenta.'
+                          : !resultadosVendedor.gastosAdquisicionLegible ||
+                              !resultadosVendedor.mejorasLegible ||
+                              !resultadosVendedor.hipotecaLegible
+                            ? 'TECHO: hay importes que no se han podido leer y que reducen la ganancia. Escríbelos con coma decimal (1.234,56).'
+                            : resultadosVendedor.exentoIRPF
                           ? 'Mayor de 65 años + vivienda habitual'
                           : resultadosVendedor.gananciaPatrimonial < 0
                             // No es una exención, es ausencia de ganancia — y la diferencia importa:
@@ -1432,9 +1566,26 @@ export default function SimuladorCompraventaPage() {
                     variant="highlight"
                     icon="💰"
                     description={
-                      faltanEnElNeto.length === 0
-                        ? 'Lo que realmente recibes'
-                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${camposQueFaltan.length <= 1 ? camposQueFaltan.join('') : `${camposQueFaltan.slice(0, -1).join(', ')} y ${camposQueFaltan[camposQueFaltan.length - 1]}`} para obtener el neto real.`
+                      (() => {
+                        // Las dos direcciones van en frases separadas: una manda descontar
+                        // (el neto está por encima del real) y la otra avisa de que la cifra
+                        // es un SUELO que sube al leer el dato (hallazgo 1190).
+                        const avisos: string[] = [];
+                        if (faltanEnElNeto.length > 0) {
+                          avisos.push(`falta descontar ${faltanEnElNeto.join(' y ')}`);
+                        }
+                        if (faltanPorAbaratar.length > 0) {
+                          avisos.push(
+                            `hay importes que no se han podido leer y REDUCEN el impuesto (${faltanPorAbaratar.join('; ')}), así que el neto real es MAYOR que este`,
+                          );
+                        }
+                        if (avisos.length === 0) return 'Lo que realmente recibes';
+                        const pedir =
+                          camposQueFaltan.length === 0
+                            ? 'Escribe los importes con coma decimal (1.234,56)'
+                            : `Rellena ${camposQueFaltan.length <= 1 ? camposQueFaltan.join('') : `${camposQueFaltan.slice(0, -1).join(', ')} y ${camposQueFaltan[camposQueFaltan.length - 1]}`}`;
+                        return `INCOMPLETO: ${avisos.join('; ')}. ${pedir} para obtener el neto real.`;
+                      })()
                     }
                   />
                 </>

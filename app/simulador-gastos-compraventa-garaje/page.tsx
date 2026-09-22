@@ -45,7 +45,13 @@ import {
   preguntaEscriturar,
   respuestaEscriturar, superaElTope } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
-import { RESPUESTA_ITP_GARAJE_SEGUNDA_MANO } from './metadata';
+import {
+  RESPUESTA_ITP_GARAJE_SEGUNDA_MANO,
+  RESPUESTA_GARAJE_SIN_VIVIENDA,
+  RESPUESTA_GARAJE_NUEVO_O_SEGUNDA_MANO,
+  RESPUESTA_PLUSVALIA_GARAJE,
+  RESPUESTA_TIPOS_REDUCIDOS_GARAJE,
+} from './metadata';
 
 /**
  * Los dos tipos de ITP que citan los ejemplos del bloque educativo, leídos de la ficha de su
@@ -85,6 +91,12 @@ interface ResultadosComprador {
   gastosNotarioMax: number;
   gastosRegistro: number;
   gastosGestoria: number;
+  /**
+   * false cuando el texto de «Gastos de gestoría del comprador» no es un número (1199).
+   * La mitad del 1157 que no se propagó: el vendedor ya se abstiene y nombra, y aquí un
+   * importe ilegible se leía como 0 y su tarjeta desaparecía por la guarda `> 0`.
+   */
+  gestoriaLegible: boolean;
   totalGastos: number;
   totalOperacion: number;
   /** null en primera mano (allí es IVA, no ITP) */
@@ -214,6 +226,16 @@ export default function SimuladorGarajeCompraventaPage() {
     // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
     // el total en pantalla no cuadraba con las líneas visibles.
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
+    /**
+     * Y un importe ILEGIBLE tampoco es un cero (hallazgo 1199): `parseSpanishNumberOr`
+     * devuelve 0 cuando el parser RECHAZA el texto, la tarjeta de gestoría se pinta con
+     * guarda `> 0` y por tanto desaparecía, dejando el presupuesto por DEBAJO del real —la
+     * dirección que el contrato de `elegirTipoITP` llama el error caro— sin una sola línea
+     * que lo explicara. La pestaña del vendedor ya sabía abstenerse y nombrarlo desde el
+     * 1157; esta se quedó fuera de aquella propagación.
+     */
+    const gestoriaLegible =
+      gastosGestoria.trim() === '' || Number.isFinite(parseSpanishNumber(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
@@ -272,6 +294,7 @@ export default function SimuladorGarajeCompraventaPage() {
       gastosNotarioMax: notaria.max,
       gastosRegistro: registro,
       gastosGestoria: gestoria,
+      gestoriaLegible,
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido: elegido,
@@ -428,11 +451,22 @@ export default function SimuladorGarajeCompraventaPage() {
         // real, sin ninguna línea que lo explique (hallazgo 1157, visto en trastero).
         resultadosVendedor.comisionLegible ? null : 'la comisión inmobiliaria',
         resultadosVendedor.gestoriaLegible ? null : 'la gestoría de la venta',
-        resultadosVendedor.gastosAdquisicionLegible
-          ? null
-          : 'los impuestos y gastos de aquella compra',
       ].filter((x): x is string => x !== null)
     : [];
+
+  /**
+   * Y lo que falta en la otra DIRECCIÓN, que es un aviso distinto (hallazgo 1198).
+   *
+   * Los impuestos y gastos de aquella compra suman al VALOR DE ADQUISICIÓN (art. 35.1
+   * LIRPF): reducen la ganancia y con ella el IRPF, que es una de las partidas que el neto
+   * resta. Al no leerse dejan el neto por DEBAJO del real, así que meterlos en la frase
+   * «falta descontar» mandaba restar 420,00 € de una cifra a la que en realidad había que
+   * sumárselos. La cifra en pantalla es entonces un SUELO, no un techo.
+   */
+  const faltanPorSumarAlValorDeAdquisicion =
+    resultadosVendedor && !resultadosVendedor.gastosAdquisicionLegible
+      ? ['los impuestos y gastos de aquella compra']
+      : [];
 
   /**
    * Los campos concretos que hay que rellenar. Sale del motor (`camposQueFaltan`), que ya
@@ -766,24 +800,54 @@ export default function SimuladorGarajeCompraventaPage() {
                     variant="default"
                     icon="🏛️"
                   />
-                  {resultadosComprador.gastosGestoria > 0 && (
+                  {/*
+                    Con la guarda `> 0` a secas, un importe que el parser no puede leer valía 0
+                    y la línea DESAPARECÍA del desglose: no quedaba ni un «0,00 €» que delatara
+                    la pérdida (hallazgo 1199). Ahora la tarjeta se pinta igual y dice que el
+                    dato está escrito pero no se ha podido leer, que es lo que la pestaña del
+                    vendedor ya hacía con sus tres importes.
+                  */}
+                  {(resultadosComprador.gastosGestoria > 0 || !resultadosComprador.gestoriaLegible) && (
                     <ResultCard
                       title="Gastos de gestoría"
-                      value={formatCurrency(resultadosComprador.gastosGestoria)}
+                      value={
+                        resultadosComprador.gestoriaLegible
+                          ? formatCurrency(resultadosComprador.gastosGestoria)
+                          : 'Sin leer'
+                      }
                       variant="default"
                       icon="📂"
+                      description={
+                        resultadosComprador.gestoriaLegible
+                          ? undefined
+                          : 'El importe escrito no se ha podido leer, así que NO está incluido en el total. Escríbelo con coma decimal (300,50).'
+                      }
                     />
                   )}
                   <div className={styles.separador} />
+                  {/*
+                    Las dos cifras de cierre se rotulaban «% sobre el precio» y «Precio + todos
+                    los gastos» aunque faltara la gestoría por ilegible (1199). Son la misma
+                    abstención que ya aplica `impuestoNoCalculado`, en la misma dirección
+                    —presupuestar de menos—, así que se dicen igual: nombrando lo que falta.
+                  */}
                   <ResultCard
                     title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                     value={formatCurrency(resultadosComprador.totalGastos)}
                     variant="info"
                     icon="➕"
                     description={
-                      resultadosComprador.impuestoNoCalculado
-                        ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
-                        : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio`
+                      [
+                        `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio`,
+                        resultadosComprador.impuestoNoCalculado
+                          ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                          : null,
+                        resultadosComprador.gestoriaLegible
+                          ? null
+                          : 'SIN la gestoría, que no se ha podido leer',
+                      ]
+                        .filter((x): x is string => x !== null)
+                        .join(' — ')
                     }
                   />
                   <ResultCard
@@ -792,9 +856,15 @@ export default function SimuladorGarajeCompraventaPage() {
                     variant="highlight"
                     icon="💳"
                     description={
-                      resultadosComprador.impuestoNoCalculado
-                        ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
-                        : 'Precio + todos los gastos'
+                      (() => {
+                        const sinCalcular = [
+                          resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
+                          resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+                        ].filter((x): x is string => x !== null);
+                        return sinCalcular.length === 0
+                          ? 'Precio + todos los gastos'
+                          : `No incluye ${sinCalcular.join(' ni ')}: el coste real será mayor`;
+                      })()
                     }
                   />
                   {/*
@@ -963,7 +1033,16 @@ export default function SimuladorGarajeCompraventaPage() {
                         value={formatCurrency(resultadosVendedor.valorAdquisicion)}
                         variant="default"
                         icon="📥"
-                        description="Precio de compra + impuestos y gastos de aquella compra"
+                        // Con los gastos de aquella compra ilegibles, la descripción de siempre
+                        // afirmaba que están sumados mientras el motor los había tomado como 0,
+                        // y con el campo relleno a la vista (hallazgo 1197). Es la mitad de
+                        // ae1358d6 que no llegó a esta app; trastero y local-comercial ya lo
+                        // dicen así.
+                        description={
+                          resultadosVendedor.gastosAdquisicionLegible
+                            ? 'Precio de compra + impuestos y gastos de aquella compra'
+                            : 'Solo el precio de compra: los impuestos y gastos de aquella compra no se han podido leer'
+                        }
                       />
                       <ResultCard
                         title="Valor de transmisión"
@@ -1062,9 +1141,23 @@ export default function SimuladorGarajeCompraventaPage() {
                     variant="highlight"
                     icon="💰"
                     description={
-                      faltanEnElNeto.length === 0
-                        ? 'Lo que realmente recibes tras gastos e impuestos'
-                        : `INCOMPLETO: falta descontar ${faltanEnElNeto.join(' y ')}. Rellena ${camposPendientes.join(' y ')} para obtener el neto real.`
+                      (() => {
+                        // Las dos direcciones van en frases separadas: una manda descontar
+                        // (el neto está por encima del real) y la otra avisa de que la cifra
+                        // es un suelo que SUBIRÁ al leer el dato (hallazgo 1198).
+                        const avisos: string[] = [];
+                        if (faltanEnElNeto.length > 0) {
+                          avisos.push(`falta descontar ${faltanEnElNeto.join(' y ')}`);
+                        }
+                        if (faltanPorSumarAlValorDeAdquisicion.length > 0) {
+                          avisos.push(
+                            `falta sumar al valor de adquisición ${faltanPorSumarAlValorDeAdquisicion.join(' y ')}, que REDUCEN el IRPF: el neto real es MAYOR que este`,
+                          );
+                        }
+                        return avisos.length === 0
+                          ? 'Lo que realmente recibes tras gastos e impuestos'
+                          : `INCOMPLETO: ${avisos.join('; ')}. Rellena ${camposPendientes.join(' y ')} para obtener el neto real.`;
+                      })()
                     }
                   />
                 </div>
@@ -1198,7 +1291,9 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Se puede comprar un garaje sin ser propietario de una vivienda?</h3>
-              <p>Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.</p>
+              {/* Las cuatro respuestas que seguían duplicadas a mano pasan a la misma constante
+                  que publica el FAQPage, y tres ya habían divergido (hallazgo 1200). */}
+              <p>{RESPUESTA_GARAJE_SIN_VIVIENDA}</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué ITP paga un garaje de segunda mano?</h3>
@@ -1213,15 +1308,15 @@ export default function SimuladorGarajeCompraventaPage() {
                   el aviso, pero ni en el bloque educativo ni en el FAQPage, así que la página
                   afirmaba sin matiz que un garaje nuevo paga IVA mientras la tarjeta de arriba
                   contestaba «IGIC — No calculado» en Canarias (hallazgo 670). */}
-              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% si se adquiere de forma independiente o en un edificio de uso no residencial. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador no calcula ahí el impuesto de la primera transmisión. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
+              <p>{RESPUESTA_GARAJE_NUEVO_O_SEGUNDA_MANO}</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿El vendedor de un garaje paga plusvalía municipal?</h3>
-              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró no hay exención sino un supuesto de <strong>no sujeción</strong> (art. 104.5 TRLRHL, redacción del RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo y acreditar la pérdida con las escrituras de compra y venta. Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.</p>
+              <p>{RESPUESTA_PLUSVALIA_GARAJE}</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Existen tipos reducidos de ITP para garajes?</h3>
-              <p>Casi todos exigen que el inmueble sea <strong>vivienda habitual</strong>, además de cumplir el requisito del comprador (edad, familia numerosa, discapacidad). Un garaje suelto nunca es vivienda habitual, así que ese tipo reducido no aplica aunque el comprador cumpla el resto: solo tributa como vivienda habitual cuando se compra vinculado a ella, en el mismo acto y edificio. Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.</p>
+              <p>{RESPUESTA_TIPOS_REDUCIDOS_GARAJE}</p>
             </div>
           </div>
         </section>

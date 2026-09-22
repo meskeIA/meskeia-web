@@ -4545,12 +4545,12 @@ test.describe('re-inspección 22/09/2026', () => {
    * El aviso del pie sí lo nombra, pero está cuatro tarjetas más abajo y bajo el rótulo
    * «IMPORTE NETO VENDEDOR»; la contradicción está aquí, en la tarjeta que enseña la cifra.
    *
-   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   * ✅ REPARADO el 22/09/2026 (hallazgo 1197): la descripción pasa a ternario, como en las
+   * dos hermanas. Se le retiró el `test.fail()` y queda como regresión.
    */
-  test('[1157·garaje] la tarjeta «Valor de adquisición» no puede decir que suma lo que no ha podido leer', async ({
+  test('[1197·garaje] la tarjeta «Valor de adquisición» no dice que suma lo que no ha podido leer', async ({
     page,
   }) => {
-      test.fail();
       await page.goto(RUTA);
       await esperarHidratacion(page, TESTIGOS_COMPRADOR);
       await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
@@ -4563,9 +4563,18 @@ test.describe('re-inspección 22/09/2026', () => {
       await esperarValorEnReact(page, gastos, '2.000.50');
 
       expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('25.000,00 €');
-      // Hoy dice «Precio de compra + impuestos y gastos de aquella compra».
-      expect(await descripcionTarjeta(page, 'Valor de adquisición')).not.toContain(
-        '+ impuestos y gastos de aquella compra',
+      // Antes decía «Precio de compra + impuestos y gastos de aquella compra» sobre una cifra
+      // que no los incluye, con el campo de esos gastos relleno a la vista.
+      expect(await descripcionTarjeta(page, 'Valor de adquisición')).toBe(
+        'Solo el precio de compra: los impuestos y gastos de aquella compra no se han podido leer',
+      );
+
+      // Con la MISMA cifra legible, la descripción vuelve a la de siempre y el valor la suma.
+      await gastos.fill('2000,50');
+      await esperarValorEnReact(page, gastos, '2000,50');
+      expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('27.000,50 €');
+      expect(await descripcionTarjeta(page, 'Valor de adquisición')).toBe(
+        'Precio de compra + impuestos y gastos de aquella compra',
       );
   });
 
@@ -4584,12 +4593,12 @@ test.describe('re-inspección 22/09/2026', () => {
    * que sumar, en una app de riesgo 1 cuyo comentario de cabecera justifica la reparación
    * diciendo «deja la cifra por encima de la real» — cierto para dos de los tres campos.
    *
-   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   * ✅ REPARADO el 22/09/2026 (hallazgo 1198): las dos direcciones van en frases separadas.
+   * Se le retiró el `test.fail()` y queda como regresión.
    */
-  test('[1157·garaje] el aviso del neto no puede mandar «descontar» unos gastos que lo aumentan', async ({
+  test('[1198·garaje] el aviso del neto no manda «descontar» unos gastos que lo aumentan', async ({
     page,
   }) => {
-      test.fail();
       await page.goto(RUTA);
       await esperarHidratacion(page, TESTIGOS_COMPRADOR);
       await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
@@ -4606,8 +4615,18 @@ test.describe('re-inspección 22/09/2026', () => {
 
       // El neto mostrado está por DEBAJO del real (35.923,25 frente a 36.343,25).
       expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('35.923,25 €');
-      expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain(
-        'falta descontar los impuestos y gastos de aquella compra',
+      const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+      expect(aviso).not.toContain('falta descontar los impuestos y gastos de aquella compra');
+      // Y lo dice en la dirección correcta: hay 420,00 € que SUMAR, no que restar.
+      expect(aviso).toContain('falta sumar al valor de adquisición');
+      expect(aviso).toContain('el neto real es MAYOR que este');
+
+      // Con la cifra legible el neto sube exactamente esos 420,00 € y el aviso desaparece.
+      await gastos.fill('2000');
+      await esperarValorEnReact(page, gastos, '2000');
+      expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('36.343,25 €');
+      expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+        'Lo que realmente recibes tras gastos e impuestos',
       );
   });
 
@@ -4629,12 +4648,13 @@ test.describe('re-inspección 22/09/2026', () => {
    * Comprador, en la dirección que su propio código llama el error caro: presupuestar de
    * menos.
    *
-   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   * ✅ REPARADO el 22/09/2026 (hallazgo 1199), y propagado a las SEIS hermanas del clúster:
+   * trastero, local-comercial, nave-industrial, solar y terreno-rústico tenían el mismo hueco.
+   * Se le retiró el `test.fail()` y queda como regresión.
    */
-  test('[1157·comprador] un importe de gestoría ilegible tampoco puede leerse como 0 € en la pestaña del comprador', async ({
+  test('[1199·comprador] un importe de gestoría ilegible tampoco se lee como 0 € en la pestaña del comprador', async ({
     page,
   }) => {
-      test.fail();
       await page.goto(RUTA);
       await esperarHidratacion(page, TESTIGOS_COMPRADOR);
       await page.selectOption('#select-ccaa', 'madrid');
@@ -4646,13 +4666,22 @@ test.describe('re-inspección 22/09/2026', () => {
 
       await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
 
-      // Hoy: la línea desaparece y el presupuesto baja 300 € sin decir una palabra.
+      // La cifra NO cambia —la app no puede inventar el importe que no ha leído— pero deja de
+      // presentarse como completa, y la línea vuelve al desglose.
       expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('26.952,05 €');
+      expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+        'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+      );
+      expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+      expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain(
+        'SIN la gestoría, que no se ha podido leer',
+      );
       const cuerpo = (await page.evaluate(() => document.body.textContent ?? '')).replace(
         /\s+/g,
         ' ',
       );
       expect(cuerpo).toMatch(/legible|no se ha(n)? podido leer/i);
+      expect(cuerpo).not.toContain('NaN');
   });
 
   /**
@@ -4695,12 +4724,12 @@ test.describe('re-inspección 22/09/2026', () => {
    *   · «¿El vendedor…paga plusvalía municipal?» y «¿Existen tipos reducidos…?» — divergen
    *     en redacción sin cambiar el fondo, que es como empezó también la del 624.
    *
-   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   * ✅ REPARADO el 22/09/2026 (hallazgo 1200): las cuatro pasan a constante compartida en
+   * `metadata.ts`, como hizo trastero con sus tres. Se le retiró el `test.fail()`.
    */
-  test('[1158·garaje] la FAQ visible y el FAQPage dicen exactamente lo mismo en las seis preguntas', async ({
+  test('[1200·garaje] la FAQ visible y el FAQPage dicen exactamente lo mismo en las seis preguntas', async ({
     page,
   }) => {
-      test.fail();
       await page.goto(RUTA);
       const bloques = await page.evaluate(() =>
         Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(

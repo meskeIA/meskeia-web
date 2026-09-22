@@ -56,6 +56,14 @@ interface ResultadosComprador {
   gastosNotarioMax: number;
   gastosRegistro: number;
   gastosGestoria: number;
+  /**
+   * false cuando el texto de «Gastos de gestoría del comprador» no es un número (1199).
+   * `parseSpanishNumberOr` devuelve 0 tanto con el campo vacío como con lo que no puede
+   * leer, y la tarjeta se pinta con guarda `> 0`: el importe desaparecía del desglose y el
+   * coste total bajaba en silencio bajo el rótulo «todos los gastos». La pestaña del
+   * vendedor ya sabía abstenerse y nombrarlo; esta se quedó fuera de aquella propagación.
+   */
+  gestoriaLegible: boolean;
   totalGastos: number;
   totalOperacion: number;
 }
@@ -116,6 +124,9 @@ export default function SimuladorNaveIndustrialPage() {
     // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
     // el total en pantalla no cuadraba con las líneas visibles.
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoria));
+    /** Un importe ILEGIBLE no es un cero: es un dato que falta (hallazgo 1199). */
+    const gestoriaLegible =
+      gastosGestoria.trim() === '' || Number.isFinite(parseSpanishNumber(gastosGestoria));
 
     let impuesto = 0;
     let tipoImpuesto = '';
@@ -182,6 +193,7 @@ export default function SimuladorNaveIndustrialPage() {
       gastosNotarioMax: notaria.max,
       gastosRegistro: registro,
       gastosGestoria: gestoria,
+      gestoriaLegible,
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
     };
@@ -549,12 +561,26 @@ export default function SimuladorNaveIndustrialPage() {
                 icon="🏛️"
               />
 
-              {resultadosComprador.gastosGestoria > 0 && (
+              {/*
+                Con la guarda `> 0` a secas, un importe que el parser no puede leer valía 0 y la
+                línea DESAPARECÍA del desglose (hallazgo 1199). Ahora se pinta igual y dice que el
+                dato está escrito pero no se ha podido leer.
+              */}
+              {(resultadosComprador.gastosGestoria > 0 || !resultadosComprador.gestoriaLegible) && (
                 <ResultCard
                   title="Gastos de gestoría"
-                  value={formatCurrency(resultadosComprador.gastosGestoria)}
+                  value={
+                    resultadosComprador.gestoriaLegible
+                      ? formatCurrency(resultadosComprador.gastosGestoria)
+                      : 'Sin leer'
+                  }
                   variant="default"
                   icon="📂"
+                  description={
+                    resultadosComprador.gestoriaLegible
+                      ? undefined
+                      : 'El importe escrito no se ha podido leer, así que NO está incluido en el total. Escríbelo con coma decimal (300,50).'
+                  }
                 />
               )}
 
@@ -566,9 +592,17 @@ export default function SimuladorNaveIndustrialPage() {
                 variant="info"
                 icon="➕"
                 description={
-                  resultadosComprador.impuestoNoCalculado
-                    ? `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio — SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
-                    : `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`
+                  [
+                    `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`,
+                    resultadosComprador.impuestoNoCalculado
+                      ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
+                      : null,
+                    // Un importe que no se ha podido leer falta en el total igual que un impuesto
+                    // sin calcular, y en la misma dirección (hallazgo 1199).
+                    resultadosComprador.gestoriaLegible ? null : 'SIN la gestoría, que no se ha podido leer',
+                  ]
+                    .filter((x): x is string => x !== null)
+                    .join(' — ')
                 }
               />
 
@@ -578,8 +612,13 @@ export default function SimuladorNaveIndustrialPage() {
                 variant="highlight"
                 icon="💳"
                 description={
-                  resultadosComprador.impuestoNoCalculado
-                    ? `No incluye el ${resultadosComprador.tipoImpuesto}: el coste real será mayor`
+                  resultadosComprador.impuestoNoCalculado || !resultadosComprador.gestoriaLegible
+                    ? `No incluye ${[
+                        resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
+                        resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+                      ]
+                        .filter((x): x is string => x !== null)
+                        .join(' ni ')}: el coste real será mayor`
                     : 'Precio + todos los gastos (antes de deducir IVA si aplica)'
                 }
               />

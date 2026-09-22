@@ -1094,18 +1094,29 @@ test.describe('Cierre y casos nuevos — 28/08/2026', () => {
    * Madrid · segunda mano · 500.000 € · gestoría «1.2.3» (a mano):
    *   ITP 30.000 + notaría 1.076,6077 + registro 345,1250 + gestoría 0 = 31.421,7327
    *   Total operación                                                  = 531.421,7327
-   * y sin tarjeta de gestoría, porque el render la esconde cuando vale 0.
+   *
+   * ⚠️ 22/09/2026 (hallazgo 1199) — este testigo pedía además que la tarjeta de gestoría NO se
+   * pintara, y esa mitad era el defecto: un importe ilegible desaparecía del desglose sin
+   * dejar rastro y el coste total seguía rotulado «todos los gastos», es decir presupuestar
+   * de menos en silencio. Las cifras NO cambian —la app no puede inventar lo que no ha
+   * leído—, pero la línea vuelve con «Sin leer» y el total dice qué le falta.
    */
-  test('B4 (rechazo) — una gestoría no numérica vale 0, no descuadra el total ni pinta NaN', async ({ page }) => {
+  test('B4 (rechazo) — una gestoría no numérica no descuadra el total ni pinta NaN, y se NOMBRA', async ({ page }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.selectOption('#select-ccaa', 'madrid');
     await rellenar(page, PRECIO, '500000');
     await rellenar(page, GESTORIA, '1.2.3');
 
-    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('31.421,73 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain(
+      'SIN la gestoría, que no se ha podido leer',
+    );
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('531.421,73 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
     const cuerpo = await page.locator('body').innerText();
     expect(cuerpo).not.toContain('NaN');
     expect(cuerpo).not.toContain('No definido');

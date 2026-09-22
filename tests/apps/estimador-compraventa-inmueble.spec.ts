@@ -3351,11 +3351,26 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
    *             se pinta)  ·  obtenido: 6,00 % y 3,50 % presentados como rebaja.
    * El pie remata invitando a llamar a la oficina liquidadora «antes de contar con la
    * rebaja», así que el error no se queda en la pantalla.
+   *
+   * ✅ REPARADO el 13/09/2026, y el TESTIGO reescrito el 22/09 (hallazgo 1192).
+   *
+   * Seguía marcado `test.fail()` nueve días después de la reparación, y ya no vigilaba nada:
+   * en este caso el aviso no se pinta, así que el test fallaba por su propia guarda de
+   * montaje —`expect(ofrecidos.length).toBeGreaterThan(0)`— y no por el defecto. Playwright
+   * lo contaba como «fallo esperado» y la suite salía verde, de modo que el testigo estaba
+   * muerto en los DOS sentidos: no avisaba de que el hallazgo se había cerrado, y si la
+   * regresión volviera seguiría en «x» sin que nadie se enterara. Es la forma de fallo del
+   * §3 de los candados de juicio: un indicador que da siempre el mismo valor deja de informar.
+   *
+   * Reescrito para que informe por los dos lados, porque comprobar la invariante sobre una
+   * lista VACÍA no prueba nada:
+   *   · perfil JOVEN → se cobra el 3,50 % y el aviso NO se pinta (nada que ofrecer por debajo)
+   *   · perfil GENERAL → se cobra el 7,00 % y el aviso SÍ aparece, con el 6,00 % de vivienda
+   *     habitual, que es una rebaja REAL: ahí es donde la invariante tiene algo que decir.
    */
-  test('HALLAZGO — el aviso no puede ofrecer un tipo por encima del que ya se ha aplicado', async ({
+  test('767 (regresión) — el aviso no ofrece tipos por encima del aplicado, y sigue ofreciendo los de abajo', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await page.locator('#ccaa-inmueble').selectOption('andalucia');
     await sembrar(page, 'Precio de la vivienda', '140000');
@@ -3366,17 +3381,32 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
     const aplicado = Number(rotulo.match(/([\d,]+)%/)![1].replace(',', '.'));
     expect(aplicado).toBe(3.5);
 
+    // Al joven andaluz ya se le cobra el reducido más bajo: no hay rebaja que ofrecerle, y el
+    // aviso desaparece en vez de ofrecerle el 6,00 % como si lo fuera.
+    await expect(page.locator('div[class*="avisoReducidos"]')).toHaveCount(0);
+
+    // Y el mecanismo sigue vivo donde SÍ hay rebaja: al perfil general se le cobra el 7,00 % y
+    // el 6,00 % de vivienda habitual es una rebaja de verdad.
+    await page.locator('#perfil-comprador').selectOption('general');
+    const rotuloGeneral = await page.locator('h3', { hasText: /^ITP/ }).first().innerText();
+    const aplicadoGeneral = Number(rotuloGeneral.match(/([\d,]+)%/)![1].replace(',', '.'));
+    expect(aplicadoGeneral).toBe(7);
+
     const ofrecidos = await page
       .locator('div[class*="avisoReducidos"]')
       .first()
       .locator('li strong')
       .allInnerTexts();
-    expect(ofrecidos.length).toBeGreaterThan(0);
+    expect(
+      ofrecidos.length,
+      'el aviso tiene que seguir ofreciendo las rebajas reales',
+    ).toBeGreaterThan(0);
     for (const linea of ofrecidos) {
       const tipo = Number(linea.match(/([\d,]+)%/)![1].replace(',', '.'));
-      expect(tipo, `«${linea}» se ofrece como rebaja sobre un ${aplicado} % ya aplicado`).toBeLessThan(
-        aplicado,
-      );
+      expect(
+        tipo,
+        `«${linea}» se ofrece como rebaja sobre un ${aplicadoGeneral} % ya aplicado`,
+      ).toBeLessThan(aplicadoGeneral);
     }
   });
 
@@ -4289,13 +4319,13 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
    * aviso — y el neto rotulado «Lo que realmente recibes», es decir declarado DEFINITIVO,
    * porque `faltanEnElNeto` solo mira la plusvalía y el precio de compra.
    *
-   * `test.fail()`: afirma lo que la app DEBERÍA hacer. Cuando se repare, se pondrá en rojo.
+   * ✅ REPARADO el 22/09/2026: los seis importes del vendedor y la gestoría del comprador
+   * distinguen el campo VACÍO del ILEGIBLE, la tarjeta del IRPF nombra la exención que no ha
+   * podido aplicar y el aviso del neto separa las dos direcciones. Queda como regresión.
    */
-  test('CASO 50 (debe rechazarse) — un importe de reinversión ilegible no puede valer 0 € en silencio', async ({
+  test('CASO 50 (regresión) — un importe de reinversión ilegible no vale 0 € en silencio', async ({
     page,
   }) => {
-    test.fail();
-
     await abrir22(page);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await sembrar22(page, 'Precio de la vivienda', '200000');
@@ -4322,6 +4352,19 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
       `el importe de reinversión ilegible se leyó como 0 €: IRPF ${irpf} y neto ${neto}, ` +
         'publicados como definitivos sin nombrar el dato que no se pudo leer',
     ).not.toContain('Lo que realmente recibes');
+
+    // Las cifras son las mismas —la app no puede inventar el importe que no ha leído— pero ya
+    // no se publican como definitivas: el aviso dice que el neto real es MAYOR.
+    expect(irpf).toBe('8910,00 €');
+    expect(neto).toBe('184.090,00 €');
+    const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(aviso).toContain('el neto real es MAYOR que este');
+    expect(aviso).toContain('art. 38 LIRPF');
+
+    // Y se dice también en la tarjeta del IRPF, que es donde se lee la cuota.
+    const avisoIrpf = await descripcionTarjeta(page, 'IRPF sobre ganancia');
+    expect(avisoIrpf).toContain('no se ha podido leer');
+    expect(avisoIrpf).toContain('art. 38 LIRPF');
   });
 
   /**
@@ -4381,11 +4424,9 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
    * contrato de `elegirTipoITP` en data/itp-ccaa.ts: «quien presupuesta 0 y paga 12.000
    * tiene un problema».
    */
-  test('CASO 51 (debe rechazarse) — una gestoría ilegible no puede desaparecer de «todos los gastos»', async ({
+  test('CASO 51 (regresión) — una gestoría ilegible no desaparece de «todos los gastos»', async ({
     page,
   }) => {
-    test.fail();
-
     await abrir22(page);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await page.locator('#ccaa-inmueble').selectOption('madrid');
@@ -4402,5 +4443,20 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
       `la gestoría ilegible se leyó como 0 € y su línea desapareció del desglose, pero ` +
         `el coste total (${total}) sigue anunciándose como completo`,
     ).not.toBe('Precio + todos los gastos');
+
+    // La línea vuelve al desglose y el coste dice qué le falta, sin inventar el importe.
+    expect(total).toBe('212.995,20 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+
+    // Con la MISMA cifra en español vuelve a contarse, y el coste sube los 2.000,50 €.
+    await sembrar22(page, 'Gastos de gestoría del comprador (€)', '2000,50');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('2000,50 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('214.995,70 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+      'Precio + todos los gastos',
+    );
   });
 });

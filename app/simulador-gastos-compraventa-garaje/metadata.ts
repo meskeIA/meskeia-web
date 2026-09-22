@@ -20,6 +20,27 @@ import { formatNumber } from '@/lib/formatters';
  */
 export const RESPUESTA_ITP_GARAJE_SEGUNDA_MANO = `El garaje tributa por el Impuesto de Transmisiones Patrimoniales (ITP) al mismo tipo que los inmuebles residenciales de su comunidad autónoma, que va del ${formatNumber(RANGO_ITP.min, 0)}% (País Vasco) al ${formatNumber(RANGO_ITP.max, 0)}% (tramo más alto de las escalas progresivas de Baleares y Cataluña). El garaje se considera inmueble residencial, pero los tipos reducidos para jóvenes, familias numerosas o personas con discapacidad casi siempre exigen que el inmueble sea la vivienda habitual, condición que un garaje suelto no cumple: solo la cumple el garaje adquirido con la vivienda, en el mismo acto.`;
 
+/**
+ * Las CUATRO que quedaron fuera del mecanismo del hallazgo 774 y que el 1200 cierra.
+ *
+ * Seguían escritas dos veces a mano —aquí abajo en `faqJsonLd` y otra vez en la FAQ visible
+ * de `page.tsx`— y tres ya habían divergido. La peor era «¿Garaje nuevo o de segunda mano?»:
+ * la reparación del hallazgo 670 añadió a la visible «por eso el simulador no calcula ahí el
+ * impuesto de la primera transmisión» y no llegó al FAQPage, que es justo el canal que citan
+ * los asistentes de IA y justo la frase que avisa de que la app se abstiene en Canarias,
+ * Ceuta y Melilla. Es la reparación que el 1158 hizo en trastero y que no se propagó aquí.
+ *
+ * Van en texto PLANO y sin `<strong>`: el énfasis tipográfico se pierde, pero una sola
+ * constante para las dos bocas es lo único que impide que vuelvan a divergir.
+ */
+export const RESPUESTA_GARAJE_SIN_VIVIENDA = 'Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.';
+
+export const RESPUESTA_GARAJE_NUEVO_O_SEGUNDA_MANO = `Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del ${formatNumber(RANGO_AJD.min, 0)}% al ${formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del ${formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% si se adquiere de forma independiente o en un edificio de uso no residencial. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador no calcula ahí el impuesto de la primera transmisión. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.`;
+
+export const RESPUESTA_PLUSVALIA_GARAJE = `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró no hay exención sino un supuesto de no sujeción (art. 104.5 TRLRHL, redacción del RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo y acreditar la pérdida con las escrituras de compra y venta. Esta calculadora aplica un tipo del ${formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}% como referencia orientativa habitual; cada ayuntamiento fija su propio tipo, con un máximo legal del ${formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%.`;
+
+export const RESPUESTA_TIPOS_REDUCIDOS_GARAJE = 'Casi todos exigen que el inmueble sea la vivienda habitual del comprador, además del requisito personal (edad, familia numerosa, discapacidad). Un garaje suelto nunca es vivienda habitual, así que el tipo reducido NO aplica aunque el comprador cumpla el resto de condiciones: solo tributa como vivienda habitual cuando se adquiere vinculado a ella, en el mismo acto y edificio. Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.';
+
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Garaje - Calcular ITP y Costes | meskeIA',
   description: 'Calcula los gastos de compra y venta de un garaje o plaza de parking en España. ITP por comunidad autónoma, notaría, registro y plusvalía municipal. Gratis y sin registro.',
@@ -96,7 +117,7 @@ export const faqJsonLd = {
       name: '¿Se puede comprar un garaje sin ser propietario de una vivienda?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.',
+        text: RESPUESTA_GARAJE_SIN_VIVIENDA,
       },
     },
     {
@@ -112,7 +133,7 @@ export const faqJsonLd = {
       name: '¿Garaje nuevo o de segunda mano: qué impuesto se paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (del ${formatNumber(RANGO_AJD.min, 0)}% al ${formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral). El IVA es del ${IVA_INMUEBLES_2025.anejoVinculado}% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del ${IVA_INMUEBLES_2025.garaje}% si se adquiere de forma independiente o en un edificio de uso no residencial. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.`,
+        text: RESPUESTA_GARAJE_NUEVO_O_SEGUNDA_MANO,
       },
     },
     {
@@ -120,7 +141,7 @@ export const faqJsonLd = {
       name: '¿El vendedor de un garaje paga plusvalía municipal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró no hay exención sino un supuesto de no sujeción (art. 104.5 TRLRHL, redacción del RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo y acreditar la pérdida con las escrituras de compra y venta. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; el tipo lo fija cada ayuntamiento hasta el máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`,
+        text: RESPUESTA_PLUSVALIA_GARAJE,
       },
     },
     {
@@ -128,7 +149,7 @@ export const faqJsonLd = {
       name: '¿Existen tipos reducidos de ITP para garajes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Casi todos exigen que el inmueble sea la vivienda habitual del comprador, además del requisito personal (edad, familia numerosa, discapacidad). Un garaje suelto nunca es vivienda habitual, así que el tipo reducido NO aplica aunque el comprador cumpla el resto de condiciones: solo tributa como vivienda habitual cuando se adquiere vinculado a ella, en el mismo acto y edificio. Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.',
+        text: RESPUESTA_TIPOS_REDUCIDOS_GARAJE,
       },
     },
   ],

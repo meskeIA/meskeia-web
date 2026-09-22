@@ -777,7 +777,11 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '1.2.3');
     // 900 de ITP + 276,55494405 de notaría + 59,03284112 de registro + 0 de gestoría
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,58 €');
-    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    // ⚠️ 22/09/2026 (hallazgo 1201): hasta hoy este testigo pedía que la tarjeta NO se pintara,
+    // y esa mitad era el defecto —el importe desaparecía sin dejar rastro—. La cifra sigue
+    // siendo la misma, porque la app no puede inventar lo que no ha podido leer, pero la línea
+    // vuelve al desglose y lo dice.
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
   });
 });
 
@@ -3714,12 +3718,19 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del añ
 // estadounidense, un copiar y pegar corriente— es NaN para `parseSpanishNumber` (lo es por
 // diseño desde el 24/08/2026) y entra por este camino.
 // Caso: 20.000 / 16.000 / 5 años / suelo 5.000 de 12.000 / gastos de adquisición «2.000.50»
-//       → esperado: el neto marcado como TECHO nombrando el dato ilegible, igual que hace la
-//         app con la comisión desde el hallazgo 773
+//       → esperado: el neto marcado nombrando el dato ilegible, igual que hace la app con la
+//         comisión desde el hallazgo 773
 //       → obtenido: valor de adquisición 16.000,00 €, ganancia 3.187,50 €, IRPF 605,63 €
 //         (frente a los 130,53 € que salen leyendo 2.000,50) y el neto presentado como
 //         «Lo que realmente recibes tras los gastos»
-test('REGRESIÓN 1157 (operativa) — unos gastos de adquisición ilegibles se nombran en vez de leerse como 0 €', async ({
+//
+// ⚠️ 22/09/2026 — este testigo pedía la palabra «Techo» y la palabra era el defecto siguiente
+// (hallazgo 1202). Aquella reparación metió los tres importes en la misma frase, y para estos
+// gastos la dirección es la CONTRARIA: suman al valor de adquisición (art. 35.1 LIRPF),
+// reducen la ganancia y con ella el IRPF, así que su ausencia deja el neto por DEBAJO del
+// real. Aquí se ve en las cifras del propio caso: el IRPF pasa de 605,63 € a 130,53 € al leer
+// el dato, es decir el neto SUBE. La aserción se cambia a «Suelo», que es lo que la cifra es.
+test('REGRESIÓN 1157+1202 (operativa) — unos gastos de adquisición ilegibles se nombran, y como SUELO', async ({
   page,
 }) => {
   await page.goto(RUTA);
@@ -3740,7 +3751,12 @@ test('REGRESIÓN 1157 (operativa) — unos gastos de adquisición ilegibles se n
   );
   await gastos.blur();
 
-  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
+  const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+  expect(aviso).toContain('los impuestos y gastos de aquella compra');
+  expect(aviso).toContain('un importe legible en los gastos de la compra');
+  // La dirección importa: leer el dato SUBE el neto, así que la cifra es un suelo.
+  expect(aviso).toMatch(/^Suelo:/);
+  expect(aviso).not.toMatch(/^Techo:/);
 });
 
 // ✅ HALLAZGO 1158 del 21/09/2026 (bajo) — contenido, REPARADO el 21/09. La FAQ visible y el
@@ -3949,13 +3965,22 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
    *   con «2.000.50»                      → total 2.023,70 · coste 28.023,70 (−300,00)
    *   con «2000,50», la MISMA cifra legible → la tarjeta vuelve con 2000,50 €
    *
-   * `test.fail()`: afirma lo que DEBERÍA pasar. La aserción de FONDO va primero, porque
-   * dentro de un `test.fail()` basta con que el test falle en algún punto.
+   * ✅ REPARADO el 22/09/2026 (hallazgo 1201). `gestoriaLegible` distingue el campo vacío del
+   * ilegible, la tarjeta se pinta igual con «Sin leer» y las dos cifras de cierre nombran lo
+   * que falta. Se le retiró el `test.fail()` y queda como regresión.
+   *
+   * ⚠️ La segunda aserción del acta —«el total no puede ser 2023,70 €»— NO se conserva, y es
+   * el punto 6 del procedimiento: el «esperado» del Inspector es una hipótesis suya, y esta
+   * apuntaba a la reparación equivocada. Para que el total dejara de ser 2.023,70 € habría
+   * que inventar un importe para un dato que la app NO ha podido leer, que es justamente lo
+   * que prohíbe la regla del aviso bajo cifra falsa: o se calcula, o no se da cifra. La
+   * reparación del VENDEDOR (hallazgo 1157, commit ae1358d6) tampoco movió el neto: nombró la
+   * partida que faltaba. El testigo gemelo del garaje (1199) lo dice así, y por eso ahí el
+   * acta fija `COSTE TOTAL` en 26.952,05 € DESPUÉS de reparar.
    */
-  test('CASO 37 (debe rechazarse) — una gestoría del comprador ilegible se lee como 0 € en silencio', async ({
+  test('CASO 37 (regresión) — una gestoría del comprador ilegible se nombra en vez de leerse como 0 €', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
@@ -3965,13 +3990,30 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
 
     // FONDO: un importe que la app no puede leer no es un cero, y el coste total no puede
     // seguir anunciándose como «todos los gastos» cuando falta uno.
-    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).not.toBe(
-      'Precio del trastero + todos los gastos',
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
     );
 
-    // Y el total no puede ser el que sale de tratarlo como 0: eso es 300 € menos que con la
-    // gestoría por defecto, sin ninguna línea en pantalla que lo explique.
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).not.toBe('2023,70 €');
+    // La línea vuelve al desglose —antes desaparecía sin dejar rastro— y dice que el importe
+    // está escrito pero no se ha podido leer.
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await descripcionTarjeta(page, 'Gastos de gestoría')).toContain(
+      'no se ha podido leer',
+    );
+
+    // El total SIGUE siendo el de tratarlo como ausente: la app no puede inventar el importe
+    // que no ha podido leer. Lo que cambia es que ya no lo presenta como completo.
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2023,70 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain(
+      'SIN la gestoría, que no se ha podido leer',
+    );
+
+    // Y con la MISMA cifra escrita en español la tarjeta vuelve con su importe.
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '2000,50');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('2000,50 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'Precio del trastero + todos los gastos',
+    );
   });
 });
 
@@ -4006,10 +4048,9 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
  *
  * Leer el dato SUBE el neto 420,10 €. El aviso dice lo contrario.
  */
-test('HALLAZGO 22/09 (contenido) — el aviso del neto llama «techo» a lo que es un suelo', async ({
+test('REGRESIÓN 22/09 (contenido) — el aviso del neto llama SUELO a lo que es un suelo', async ({
   page,
 }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   await sembrar(page, 'Precio del trastero', '26000');
@@ -4028,5 +4069,17 @@ test('HALLAZGO 22/09 (contenido) — el aviso del neto llama «techo» a lo que 
 
   // FONDO: 22.009,50 € es el SUELO —leer el dato lo sube a 22.429,60 €—, así que el aviso no
   // puede presentarlo como un techo del que aún hay que descontar.
-  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toMatch(/^Techo:/);
+  const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+  expect(aviso).not.toMatch(/^Techo:/);
+  expect(aviso).toMatch(/^Suelo:/);
+  expect(aviso).toContain('suben el neto');
+  expect(aviso).toContain('un importe legible en los gastos de la compra');
+
+  // Y con la MISMA cifra legible el neto sube los 420,10 € que el aviso anunciaba.
+  await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2000,50');
+  expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('12.000,50 €');
+  expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('22.429,60 €');
+  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+    'Lo que realmente recibes tras los gastos',
+  );
 });

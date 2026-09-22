@@ -869,8 +869,13 @@ test.describe('Re-inspección 12/09/2026 — Murcia al 7,75 % y Melilla sin IVA'
    * encaja en AGRUPA_CON_COMA, así que `parseSpanishNumber` da NaN.
    *
    * La segunda mitad prueba el OTRO parser de la página: la gestoría pasa por
-   * `parseSpanishNumberOr`, que ante NaN cae a 0 — y 0 no pinta tarjeta, así que el total
-   * queda con tres líneas y sin ninguna cifra fantasma.
+   * `parseSpanishNumberOr`, que ante NaN cae a 0, así que el total queda con tres líneas y
+   * sin ninguna cifra fantasma.
+   *
+   * ⚠️ 22/09/2026 (hallazgo 1199) — hasta hoy pedía además que la tarjeta NO se pintara, y esa
+   * mitad era el defecto: el importe desaparecía del desglose sin dejar rastro mientras el
+   * coste seguía rotulado «todos los gastos». Las cifras NO cambian; la línea vuelve con
+   * «Sin leer».
    */
   test('CASO 3 (rechazo) — «2,5,3» y «300,50,2»: los dos parsers caen del lado seguro', async ({ page }) => {
     await abrirHidratada(page);
@@ -901,8 +906,12 @@ test.describe('Re-inspección 12/09/2026 — Murcia al 7,75 % y Melilla sin IVA'
     // Registro — arancel(100.000): 24,04 + 42,0708575 + 37,56325 + (39.898,79 × 0,00075 =
     //   29,9240925) = 133,5982 + 9,015182 = 142,613382 · con el 21 % = 172,56219222
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('172,56 €');
-    // La gestoría cae a 0 y su tarjeta no se pinta (se pinta solo si el importe es > 0).
-    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    // La gestoría cae a 0 en el cálculo, pero su línea se pinta igual diciendo que el importe
+    // escrito no se ha podido leer: un dato que falta no es un cero.
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
     // Total = 6.000 + 599,90 + 172,56 = 6.772,46 · 6.772,46 / 100.000 = 6,77246 % → 6,77 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('6772,46 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('6,77%');
