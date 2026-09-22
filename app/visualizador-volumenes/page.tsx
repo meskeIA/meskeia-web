@@ -273,17 +273,44 @@ function getFormula(figura: Figura, p: {
   switch (figura) {
     // Con decimales en juego, interpolar el número tal cual escribiría "12.5" a la
     // española: la medida se teclea con coma y la fórmula debe devolverla igual.
-    case 'esfera': return `V = (4/3) × π × r³ = (4/3) × π × ${medExacta(p.radio)}³`;
+    case 'esfera': return `V = (4/3) × π × r³ = (4/3) × π × ${medExactaElevada(p.radio)}³`;
     case 'cubo': return `V = a × b × h = ${medExacta(p.ancho)} × ${medExacta(p.largo)} × ${medExacta(p.alto)}`;
-    case 'cilindro': return `V = π × r² × h = π × ${medExacta(p.radioCil)}² × ${medExacta(p.alturaCil)}`;
-    case 'cono': return `V = (1/3) × π × r² × h = (1/3) × π × ${medExacta(p.radioCon)}² × ${medExacta(p.alturaCon)}`;
-    case 'piramide': return `V = (1/3) × l² × h = (1/3) × ${medExacta(p.lado)}² × ${medExacta(p.alturaPir)}`;
+    case 'cilindro': return `V = π × r² × h = π × ${medExactaElevada(p.radioCil)}² × ${medExacta(p.alturaCil)}`;
+    case 'cono': return `V = (1/3) × π × r² × h = (1/3) × π × ${medExactaElevada(p.radioCon)}² × ${medExacta(p.alturaCon)}`;
+    case 'piramide': return `V = (1/3) × l² × h = (1/3) × ${medExactaElevada(p.lado)}² × ${medExacta(p.alturaPir)}`;
   }
 }
 
-// Una medida escrita por el usuario: sin decimales si es entera, con los que tenga si no
-function med(v: number): string {
-  return formatNumber(v, Number.isInteger(v) ? 0 : 2);
+/*
+  ⚠️ 22/09/2026 — aquí vivía `med()`, dos decimales delegando en `formatNumber`. Se retira en
+  vez de dejarla sin uso, porque dejarla es exactamente cómo nació el hallazgo 1225: la
+  reparación del 21/08/2026 la sustituyó por `medExacta()` en la fórmula y en el dibujo, y
+  sobrevivió en el eco del campo, en el aria-label y en los pies del deslizador, donde siguió
+  escribiendo «≈0» y «12.345,68» un mes más.
+*/
+
+/**
+ * La medida para el CAMPO de texto: exacta y editable (hallazgo 1225).
+ *
+ * ⚠️ 22/09/2026 — el eco de la medida seguía pasando por `med()`, que redondea a dos decimales
+ * y delega en `formatNumber`, así que por debajo de 0,0001 escribía «≈0». Al cambiar de figura
+ * y volver —el paso 5 de la guía, «Compara figuras»— el campo se remontaba con eso y pasaba a
+ * mostrar «≈0» con r = 0,00005, o «12,50» con 12,5 y «12.345,68» con 12.345,678, mientras la
+ * app seguía calculando con la medida real: volvía a haber pantalla que no corresponde a lo que
+ * se calcula, que es exactamente el defecto cerrado el 21/08/2026. Y desde «≈0» el campo ya no
+ * se podía corregir de forma natural: borrar un carácter dejaba «≈».
+ *
+ * No vale `medExacta` aquí: su notación científica informa muy bien en un rótulo, pero
+ * «5,000×10⁻⁵» dentro de un input no se puede seguir editando. Esto devuelve el decimal PLANO,
+ * que es lo que el usuario escribió.
+ *
+ * Sin separador de millar a propósito: el campo se relee con `parseSpanishNumber`, que con un
+ * punto y tres cifras detrás leería «12.345,678» como un millar y devolvería otro número.
+ */
+function medEditable(v: number): string {
+  if (Number.isInteger(v)) return String(v);
+  const plano = v.toFixed(12).replace(/0+$/, '').replace(/\.$/, '');
+  return plano.replace('.', ',');
 }
 
 /**
@@ -321,8 +348,39 @@ function medExacta(v: number): string {
   return formatNumber(v, decimales);
 }
 
+/**
+ * La medida cuando en la fórmula va ELEVADA a algo (hallazgo 1223).
+ *
+ * ⚠️ 22/09/2026 — la caja «Fórmula aplicada» pegaba el exponente del cubo al de la notación
+ * científica: con r = 0,00005 escribía «(4/3) × π × 5,000×10⁻⁵³», que se lee 10⁻⁵³, cuarenta y
+ * ocho órdenes de magnitud por debajo de lo que la app estaba calculando (el volumen sí era
+ * correcto). Al cuadrado del cilindro y del cono les pasaba igual. En cuanto la medida se
+ * escribe en notación científica, su exponente ya no se distingue del de la fórmula, así que
+ * necesita paréntesis — y el paso 4 de la guía vende justamente esto: «ver exactamente qué
+ * operaciones se están realizando».
+ */
+function medExactaElevada(v: number): string {
+  const escrita = medExacta(v);
+  return escrita.includes('×10') ? `(${escrita})` : escrita;
+}
+
+/**
+ * El volumen, con seis cifras significativas también justo por encima de 0,0001.
+ *
+ * ⚠️ 22/09/2026 (hallazgo 1224) — el tramo `v < 10` se imprimía con CUATRO decimales fijos, así
+ * que al pasar la frontera de 0,0001 el número perdía de golpe seis cifras significativas y
+ * dejaba de parecerse al real: r = 0,033 da un volumen de 1,505326×10⁻⁴ y se publicaba «0,0002»
+ * —un 33 % por encima—, mientras r = 0,0287 salía con siete cifras por estar un pelo por debajo
+ * de la frontera. Era el mismo caso de uso que motivó la reparación del 518 (medir algo pequeño
+ * en la unidad grande), resuelto por debajo y sin resolver justo por encima.
+ *
+ * El umbral de la notación científica sube de 0,0001 a 0,01, que es donde cuatro decimales
+ * dejan de dar tres cifras significativas: por debajo de 0,01 el redondeo introduce un error
+ * relativo de medio punto porcentual o más, y ahí la notación científica no es una molestia
+ * sino la única forma de no mentir.
+ */
 function formatVolumen(v: number): string {
-  if (v > 0 && v < 0.0001) return notacionCientifica(v, 6);
+  if (v > 0 && v < 0.01) return notacionCientifica(v, 6);
   if (v < 10) return formatNumber(v, 4);
   if (v < 100) return formatNumber(v, 2);
   if (v < 100000) return formatNumber(v, 1);
@@ -351,7 +409,7 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
   // escribir un decimal: el slider daba saltos de 1 y tampoco pasaba de 50, así que una lata
   // de r=12,5 había que redondearla a 13 (un 8 % de desviación) y un depósito de r=120 no
   // tenía manera de entrar. El slider sigue estando para explorar; el campo es para medir.
-  const [texto, setTexto] = useState(() => med(valor));
+  const [texto, setTexto] = useState(() => medEditable(valor));
   /**
    * Una entrada inválida se ignoraba en silencio: el texto malo se quedaba escrito
    * mientras la app seguía calculando con la última medida válida, así que el número
@@ -359,7 +417,7 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
    */
   const [avisoCampo, setAvisoCampo] = useState('');
 
-  const desdeSlider = (v: number) => { setTexto(med(v)); setAvisoCampo(''); onChange(v); };
+  const desdeSlider = (v: number) => { setTexto(medEditable(v)); setAvisoCampo(''); onChange(v); };
   const desdeCampo = (t: string) => {
     setTexto(t);
     if (t.trim() === '') { setAvisoCampo(''); return; }
@@ -406,7 +464,7 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
         value={Math.min(valor, max)}
         onChange={(e) => desdeSlider(Number(e.target.value))}
         className={styles.sliderRange}
-        aria-label={`${label}, control deslizante: ${med(valor)}${simbolo}`}
+        aria-label={`${label}, control deslizante: ${medExacta(valor)}${simbolo}`}
         style={
           {
             '--slider-pct': `${((Math.min(Math.max(valor, min), max) - min) / (max - min)) * 100}%`,
@@ -417,8 +475,8 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
         {/* Por debajo del mínimo no había aviso, al contrario que por arriba: el
             deslizador marcaba el mínimo y el pie seguía anunciando el rango normal,
             así que campo y deslizador decían cosas distintas. */}
-        <span>{valor < min ? `${med(valor)} · fuera del deslizador` : min}</span>
-        <span>{valor > max ? `${med(valor)} · fuera del deslizador` : max}</span>
+        <span>{valor < min ? `${medExacta(valor)} · fuera del deslizador` : min}</span>
+        <span>{valor > max ? `${medExacta(valor)} · fuera del deslizador` : max}</span>
       </div>
       {avisoCampo && (
         <p id={`${idCampo}-aviso`} role="alert" className={styles.avisoCampo}>
@@ -538,11 +596,19 @@ export default function VisualizadorVolumenesPage() {
             <span className={styles.resultUnidad}>unidades³</span>
           </div>
 
-          {/* Fórmula */}
-          <div className={styles.formulaBox}>
-            <span className={styles.formulaLabel}>Fórmula aplicada</span>
-            <code className={styles.formulaTexto}>{formula}</code>
-          </div>
+        </div>
+
+        {/*
+          Fórmula. Hermana del grid y no hija del panel de controles, para que en móvil el
+          DIBUJO pueda colarse entre el resultado y ella (hallazgo 1222): la reparación de
+          agosto puso los controles delante con `order`, y eso empujó el visualizador detrás de
+          esta caja, es decir a 993 px en una pantalla de 844. En escritorio el grid tiene dos
+          columnas, así que esta caja pasa a ocupar las dos y se queda justo debajo, que es
+          donde ya estaba visualmente.
+        */}
+        <div className={styles.formulaBox}>
+          <span className={styles.formulaLabel}>Fórmula aplicada</span>
+          <code className={styles.formulaTexto}>{formula}</code>
         </div>
       </div>
 

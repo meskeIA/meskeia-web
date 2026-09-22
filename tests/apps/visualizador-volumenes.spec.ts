@@ -754,10 +754,9 @@ test.describe('re-inspección 22/09/2026', () => {
 // realizando para obtener el volumen».
 // Caso: esfera r=0,00005 → esperado «(4/3) × π × (5,000×10⁻⁵)³» · obtenido
 //       «(4/3) × π × 5,000×10⁻⁵³».
-test('HALLAZGO 22/09 · la fórmula debe parentizar la medida en notación científica', async ({
+test('1223 (regresión) · la fórmula parentiza la medida en notación científica', async ({
   page,
 }) => {
-  test.fail();
   await escribir(campo(page, 'Radio (r)'), '0,00005');
   await expect(formulaAplicada(page)).toContainText('(5,000×10⁻⁵)³');
 });
@@ -770,8 +769,7 @@ test('HALLAZGO 22/09 · la fórmula debe parentizar la medida en notación cient
 // reparación del 518 —medir algo pequeño en la unidad grande, la célula o el cucurucho en
 // metros—, resuelto por debajo de la frontera y sin resolver justo por encima.
 // Caso: esfera r=0,033 → esperado 1,505326×10⁻⁴ (o «0,000151») · obtenido «0,0002».
-test('HALLAZGO 22/09 · un volumen de 1,5×10⁻⁴ no debe mostrarse como 0,0002', async ({ page }) => {
-  test.fail();
+test('1224 (regresión) · un volumen de 1,5×10⁻⁴ no se muestra como 0,0002', async ({ page }) => {
   await escribir(campo(page, 'Radio (r)'), '0,033');
   // (4/3) × π × 0,033³ = (4/3) × π × 3,5937×10⁻⁵ = 1,505326×10⁻⁴
   await expect(valorVolumen(page)).toContainText('1,50');
@@ -790,8 +788,7 @@ test('HALLAZGO 22/09 · un volumen de 1,5×10⁻⁴ no debe mostrarse como 0,000
 //     «≈0» el campo tampoco se puede corregir de forma natural: borrar un carácter deja «≈».
 // Caso: esfera r=0,00005 → Cilindro → Esfera → esperado campo «0,00005» · obtenido «≈0»,
 //       con el volumen en 5,235988×10⁻¹³ (correcto) y el pie diciendo «≈0».
-test('HALLAZGO 22/09 · el eco de la medida no debe convertirse en «≈0»', async ({ page }) => {
-  test.fail();
+test('1225 (regresión) · el eco de la medida no se convierte en «≈0»', async ({ page }) => {
   await escribir(campo(page, 'Radio (r)'), '0,00005');
   await expect(page.locator('[class*=sliderLimits]').first()).not.toContainText('≈0');
   expect(await page.locator('input[type=range]').first().getAttribute('aria-label')).not.toContain(
@@ -826,11 +823,10 @@ test.describe('en móvil (390×844) — re-inspección 22/09/2026', () => {
     hasTouch: true,
   });
 
-  test('HALLAZGO 22/09 · el dibujo debe asomar sin scroll, y el resultado caber entero', async ({
+  test('1222 (regresión) · el dibujo asoma sin scroll y el resultado cabe entero', async ({
     page,
   }) => {
-    test.fail();
-    const ALTO = 844;
+      const ALTO = 844;
     const caja = async (selector: string) => {
       const c = await page.locator(selector).first().boundingBox();
       return c ?? { y: Number.POSITIVE_INFINITY, height: 0 };

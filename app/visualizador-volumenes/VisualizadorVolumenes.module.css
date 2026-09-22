@@ -106,23 +106,46 @@
   padding: 2rem 1rem;
 }
 
+/* La fórmula es hija del grid desde el 22/09/2026 (hallazgo 1222): en escritorio cruza las
+   dos columnas y queda donde ya estaba visualmente, debajo de los controles. */
+.mainGrid > .formulaBox {
+  grid-column: 1 / -1;
+  margin: 0.75rem 0 0;
+}
+
 @media (max-width: 640px) {
   .mainGrid {
     grid-template-columns: 1fr;
     padding: 1.25rem 1rem;
   }
 
-  /* Los controles y el resultado van ANTES que el dibujo: en una pantalla estrecha el
-     SVG ocupa toda la altura visible y empujaba la herramienta fuera del pliegue, así
-     que la app se cargaba sin que se viera un solo control ni el número. */
+  /*
+    Los controles y el resultado van ANTES que el dibujo: en una pantalla estrecha el SVG
+    ocupa toda la altura visible y empujaba la herramienta fuera del pliegue, así que la app
+    se cargaba sin que se viera un solo control ni el número (20/08/2026).
+
+    ⚠️ 22/09/2026 (hallazgo 1222) — aquella reparación cumplió lo que se midió entonces y dejó
+    el DIBUJO detrás de todo, incluida la caja de fórmula: nacía a 993 px en una pantalla de
+    844, o sea entero por debajo del pliegue, y es lo que da nombre a la app y lo que su
+    subtítulo invita a mirar («observa cómo cambia el volumen en tiempo real»). Nada anunciaba
+    que hubiera un dibujo ahí abajo.
+
+    Ahora el dibujo va EN MEDIO —después del control y del resultado, antes de la fórmula— y
+    con una altura contenida, así que asoma en la primera pantalla sin devolver los controles
+    al fondo. El test de agosto seguía en verde porque solo miraba la Y de arranque del
+    control y de la tarjeta; el de hoy mide también dónde empieza el SVG.
+  */
   .svgPanel {
     order: 2;
-    min-height: 200px;
-    padding: 1rem;
   }
 
   .controlPanel {
     order: 1;
+  }
+
+  .mainGrid > .formulaBox {
+    order: 3;
+    margin-top: 0.5rem;
   }
 }
 
@@ -757,5 +780,47 @@
   .figBtn,
   .sliderRange::-webkit-slider-thumb {
     transition: none;
+  }
+}
+
+/* =========================================================
+   MÓVIL ESTRECHO — que el dibujo asome (hallazgo 1222, 22/09/2026)
+   =========================================================
+   Va al final del fichero a propósito: estas reglas compiten con `.svgPanel` y `.resultCard`,
+   que se declaran más abajo que el media query del grid, así que puestas allí perdían por
+   orden de cascada con la misma especificidad. Medido en 390×844 antes de esto: el resultado
+   acababa en 871 px con el pliegue en 844 —«unidades³» partida por la mitad— y el SVG, de 290
+   px fijos, empezaba en 896.
+   ========================================================= */
+@media (max-width: 640px) {
+  .svgPanel {
+    min-height: 0;
+    /* Lo justo para que la figura asome sobre el pliegue con el resultado ya visible. */
+    max-height: 40vh;
+    padding: 0.35rem;
+  }
+
+  .svgFigura {
+    max-height: 38vh;
+  }
+
+  /* La tarjeta del resultado se cortaba por el pliegue (92 de sus 119 px): con menos aire
+     vertical cabe entera y deja sitio al dibujo. */
+  .resultCard {
+    padding: 0.7rem 1rem;
+    margin-top: 0.3rem;
+    gap: 0.1rem;
+  }
+
+  .mainGrid {
+    padding: 0.75rem 1rem;
+  }
+
+  /* El selector ocupaba 187 px de los 844 de la pantalla con 1,75rem de aire arriba y abajo.
+     Se aprieta lo justo para que el dibujo asome: los botones no cambian de tamaño, solo el
+     aire que los rodea. */
+  .figSelector {
+    padding: 0.9rem 1rem;
+    gap: 0.5rem;
   }
 }
