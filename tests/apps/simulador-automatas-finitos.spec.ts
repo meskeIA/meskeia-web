@@ -28,6 +28,19 @@ import { test, expect } from '@playwright/test';
  *      para no depender de la velocidad del slider).
  */
 
+/**
+ * El anunciador del paso de la animación, que es `.pasoDescripcion` en `page.tsx`.
+ *
+ * ⚠️ 22/09/2026 — estos cinco localizadores buscaban `[aria-live="polite"][aria-atomic="true"]`
+ * a secas, y eso es un atributo genérico: en cuanto otra región viva de la página lo lleva, el
+ * modo estricto de Playwright rechaza el localizador por encontrar dos. Pasó al reparar el
+ * hallazgo 1212, que dio región viva al enunciado de «Casos para clase» para que el ejercicio
+ * nuevo se anuncie —dos regiones vivas en una página son perfectamente válidas en ARIA, y el
+ * cambio de enunciado tiene que anunciarse—. Se acota a la clase del elemento que estos casos
+ * quieren medir de verdad.
+ */
+const anunciadorDelPaso = (page: Page) => page.locator('[class*="pasoDescripcion"]');
+
 const RUTA = '/simulador-automatas-finitos/';
 
 test.beforeEach(async ({ page }) => {
@@ -84,11 +97,11 @@ test.describe('Caso 1 · "1001" (dos 0s, número par) → ACEPTADA', () => {
     }
 
     // 4 símbolos leídos + estado inicial = 5 pasos (posiciones 0..4).
-    await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
+    await expect(anunciadorDelPaso(page)).toContainText(
       'Paso 5 / 5',
     );
     // Traza a mano: el último símbolo leído es '1' y el estado activo queda en q0.
-    await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
+    await expect(anunciadorDelPaso(page)).toContainText(
       'Lee "1" → q0',
     );
     await expect(page.locator('[role="alert"]', { hasText: 'ACEPTADA' })).toBeVisible();
@@ -150,7 +163,7 @@ test.describe('Caso 3 · "0" (un 0, número impar) → RECHAZADA', () => {
     await page.getByRole('button', { name: 'Pausar', exact: true }).click();
     await page.getByRole('button', { name: 'Paso siguiente', exact: true }).click();
 
-    await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
+    await expect(anunciadorDelPaso(page)).toContainText(
       'Lee "0" → q1',
     );
     await expect(page.locator('[role="alert"]', { hasText: 'RECHAZADA' })).toBeVisible();
@@ -188,7 +201,7 @@ test.describe('Caso 4 · regresión: borrar un estado a media animación', () =>
     for (let i = 0; i < 4; i++) {
       await pasoSiguiente.click();
     }
-    await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
+    await expect(anunciadorDelPaso(page)).toContainText(
       'Paso 5 / 5',
     );
 
@@ -205,7 +218,7 @@ test.describe('Caso 4 · regresión: borrar un estado a media animación', () =>
     expect(erroresDePagina).toEqual([]);
 
     // 4. Y el paso se reencaja en el último válido, mostrando el efecto de la edición.
-    await expect(page.locator('[aria-live="polite"][aria-atomic="true"]')).toContainText(
+    await expect(anunciadorDelPaso(page)).toContainText(
       'Paso 2 / 2',
     );
     await expect(page.locator('[role="alert"]', { hasText: 'SIN TRANSICIÓN' })).toBeVisible();
