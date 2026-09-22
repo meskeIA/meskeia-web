@@ -254,7 +254,7 @@
 .tablaHeader {
   display: grid;
   grid-template-columns: 2fr 1fr 1.5fr 2fr;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 14px 16px;
   font-weight: 600;
@@ -539,7 +539,7 @@
 }
 
 .comparativaTable thead tr {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

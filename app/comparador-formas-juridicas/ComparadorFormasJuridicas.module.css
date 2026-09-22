@@ -780,7 +780,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: var(--spacing-md) var(--spacing-lg);
   text-align: left;
@@ -1078,7 +1078,7 @@
 
 /* Dark mode — secciones educativas */
 [data-theme='dark'] .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .comparativaTable td:first-child {

@@ -316,7 +316,7 @@
 .tablaHeader {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;

@@ -311,7 +311,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
   font-size: 0.88rem;
@@ -414,7 +414,7 @@
 }
 
 [data-theme='dark'] .comparativaTable th {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 [data-theme='dark'] .warningBox {

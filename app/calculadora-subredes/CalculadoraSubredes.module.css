@@ -380,7 +380,7 @@
 }
 
 .referenceTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -584,7 +584,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: var(--spacing-md);
   text-align: left;
@@ -766,7 +766,7 @@
 
 /* Dark mode educational v2.0 */
 [data-theme='dark'] .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .comparativaTable td {

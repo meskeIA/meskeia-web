@@ -127,7 +127,7 @@
 /* 1. Tabla comparativa */
 .tableWrapper { overflow-x: auto; margin-bottom: 1.5rem; border-radius: var(--radius); border: 1px solid var(--border); }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-.comparativaTable thead tr { background: var(--primary); color: white; }
+.comparativaTable thead tr { background: var(--primary-boton); color: white; }
 .comparativaTable th { padding: 0.75rem 1rem; text-align: left; font-weight: 600; white-space: nowrap; }
 .comparativaTable td { padding: 0.65rem 1rem; border-top: 1px solid var(--border); color: var(--text-primary); line-height: 1.5; vertical-align: top; }
 .comparativaTable tbody tr:nth-child(even) { background: var(--hover); }

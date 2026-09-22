@@ -363,7 +363,7 @@
 }
 
 .tabla th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.6rem 0.75rem;
   text-align: center;
@@ -735,7 +735,7 @@
 }
 
 [data-theme='dark'] .tabla th {
-  background: color-mix(in srgb, var(--primary) 80%, #000);
+  background: color-mix(in srgb, var(--primary-boton) 80%, #000);
 }
 
 [data-theme='dark'] .eventoCard {

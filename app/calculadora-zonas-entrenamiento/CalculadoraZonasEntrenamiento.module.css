@@ -185,7 +185,7 @@
 
 .tableWrapper { overflow-x: auto; }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-.comparativaTable th { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 0.65rem 0.9rem; text-align: left; font-weight: 600; }
+.comparativaTable th { background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; padding: 0.65rem 0.9rem; text-align: left; font-weight: 600; }
 .comparativaTable td { padding: 0.6rem 0.9rem; border-bottom: 1px solid #e0e0e0; vertical-align: top; font-size: 0.85rem; }
 .comparativaTable tbody tr:hover { background: rgba(46,134,171,0.04); }
 

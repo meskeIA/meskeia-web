@@ -349,7 +349,7 @@
   text-align: left;
   color: var(--text-primary);
 }
-.comparativaTable th { background: var(--primary); color: #fff; }
+.comparativaTable th { background: var(--primary-boton); color: #fff; }
 .comparativaTable tr:nth-child(even) td { background: var(--bg-inset); }
 
 .escenariosGrid {

@@ -314,7 +314,7 @@
 }
 
 .tablaComparativa th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.5rem 0.7rem;
   text-align: left;

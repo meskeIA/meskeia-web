@@ -251,7 +251,7 @@
   border: 1px solid var(--border);
 }
 .tablaVerdad th {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white; padding: 0.6rem 1rem; text-align: center; font-weight: 700;
 }
 .tablaVerdad td {
@@ -401,7 +401,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -411,7 +411,7 @@
 }
 
 [data-theme='dark'] .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .comparativaTable tr:nth-child(even) {

@@ -365,7 +365,7 @@
   font-size: 0.875rem;
 }
 .glosarioTable th {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   padding: 0.65rem 1rem;
   text-align: left;

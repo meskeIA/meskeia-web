@@ -221,7 +221,7 @@
   font-size: 0.875rem;
 }
 .zonasTable th {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   padding: 0.6rem 0.85rem;
   text-align: left;
@@ -296,7 +296,7 @@
   font-size: 0.875rem;
 }
 .comparativaTable th {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   padding: 0.65rem 0.9rem;
   text-align: left;

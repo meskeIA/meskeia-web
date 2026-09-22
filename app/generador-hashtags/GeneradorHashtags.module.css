@@ -584,7 +584,7 @@
 .eduComparativa h2 { color: var(--text-primary); margin-bottom: var(--spacing-lg); font-size: 1.4rem; }
 .tableWrapper { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-.comparativaTable th { background: var(--primary); color: white; padding: var(--spacing-md); text-align: left; font-weight: 600; white-space: nowrap; }
+.comparativaTable th { background: var(--primary-boton); color: white; padding: var(--spacing-md); text-align: left; font-weight: 600; white-space: nowrap; }
 .comparativaTable td { padding: var(--spacing-md); border-bottom: 1px solid var(--border); color: var(--text-primary); vertical-align: top; }
 .comparativaTable tr:nth-child(even) td { background: var(--hover); }
 .comparativaTable tr:last-child td { border-bottom: none; }
@@ -622,7 +622,7 @@
 .warningHeader strong { color: #856404; font-size: 1.1rem; }
 .warningList { margin: 0; padding-left: var(--spacing-xl); }
 .warningList li { color: #856404; margin-bottom: var(--spacing-sm); line-height: 1.5; }
-[data-theme='dark'] .comparativaTable th { background: var(--primary); }
+[data-theme='dark'] .comparativaTable th { background: var(--primary-boton); }
 [data-theme='dark'] .comparativaTable td { color: var(--text-primary); border-color: var(--border); }
 [data-theme='dark'] .comparativaTable tr:nth-child(even) td { background: var(--hover); }
 [data-theme='dark'] .escenarioCard { background: var(--bg-card); border-color: var(--border); }

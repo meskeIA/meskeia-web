@@ -399,7 +399,7 @@
 }
 
 .pvalueTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -621,7 +621,7 @@
 }
 
 .eduTablaComparativa thead th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
   font-size: 0.8rem;

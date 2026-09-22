@@ -218,7 +218,7 @@
 
 .tableWrapper { overflow-x: auto; }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-.comparativaTable th { background: var(--primary); color: white; padding: 0.7rem 1rem; text-align: left; font-weight: 600; }
+.comparativaTable th { background: var(--primary-boton); color: white; padding: 0.7rem 1rem; text-align: left; font-weight: 600; }
 .comparativaTable td { padding: 0.6rem 1rem; border-bottom: 1px solid rgba(0,0,0,0.06); color: var(--text-primary); vertical-align: top; }
 .comparativaTable tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
 

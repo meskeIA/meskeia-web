@@ -202,7 +202,7 @@
 
 /* ── Tabla educativa ── */
 .tablaEdu { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin-bottom: var(--spacing-lg); }
-.tablaEdu th { background: var(--primary); color: white; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.8rem; }
+.tablaEdu th { background: var(--primary-boton); color: white; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.8rem; }
 .tablaEdu td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-primary); line-height: 1.4; vertical-align: top; }
 .tablaEdu tr:last-child td { border-bottom: none; }
 .tablaEdu tr:nth-child(even) td { background: var(--hover); }

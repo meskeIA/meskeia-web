@@ -567,7 +567,7 @@
 /* ===== EDUCATIONAL SECTION ===== */
 .eduTablaWrapper { overflow-x: auto; margin: 1rem 0 1.5rem; }
 .eduTabla { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.eduTabla th { background: var(--primary); color: #fff; padding: 0.6rem 1rem; text-align: left; }
+.eduTabla th { background: var(--primary-boton); color: #fff; padding: 0.6rem 1rem; text-align: left; }
 .eduTabla td { padding: 0.55rem 1rem; border-bottom: 1px solid #e5e7eb; }
 .eduTabla tr:last-child td { border-bottom: none; }
 .eduTabla tr:nth-child(even) td { background: rgba(46,134,171,0.04); }

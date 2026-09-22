@@ -1036,7 +1036,7 @@
 }
 
 .comparativaTable thead th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 600;
   font-size: 0.82rem;
@@ -1067,7 +1067,7 @@
 }
 
 [data-theme='dark'] .comparativaTable thead th {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {

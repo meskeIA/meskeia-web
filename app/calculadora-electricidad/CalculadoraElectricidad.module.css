@@ -593,7 +593,7 @@
 }
 
 .factoresTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -671,7 +671,7 @@
 }
 
 .tablaComparativaV2 thead th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -877,7 +877,7 @@
 }
 
 .tablaComparativa thead th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }

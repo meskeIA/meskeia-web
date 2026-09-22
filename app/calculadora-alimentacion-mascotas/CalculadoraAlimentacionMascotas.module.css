@@ -1044,7 +1044,7 @@
 .tablaComparativa { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
 
 .tablaComparativa th {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600; white-space: nowrap;
 }
 

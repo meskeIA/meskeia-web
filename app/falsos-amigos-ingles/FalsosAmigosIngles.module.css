@@ -432,7 +432,7 @@
 /* EDUCATIONAL SECTION v2.0 */
 .tableWrapper { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--accent); margin-bottom: 1.5rem; }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.comparativaTable th { background: var(--primary); color: #fff; padding: 0.75rem 1rem; text-align: left; font-weight: 600; white-space: nowrap; }
+.comparativaTable th { background: var(--primary-boton); color: #fff; padding: 0.75rem 1rem; text-align: left; font-weight: 600; white-space: nowrap; }
 .comparativaTable td { padding: 0.7rem 1rem; border-top: 1px solid var(--accent); vertical-align: top; color: var(--text-primary); }
 .comparativaTable tr:nth-child(even) td { background: rgba(46, 134, 171, 0.04); }
 .escenariosGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }

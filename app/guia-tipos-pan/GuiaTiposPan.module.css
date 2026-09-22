@@ -421,7 +421,7 @@
 }
 
 .tabla thead {
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: #fff;
 }
 

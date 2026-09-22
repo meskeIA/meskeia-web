@@ -423,7 +423,7 @@
 .eduComparativa h2 { color: var(--text-primary); margin-bottom: var(--spacing-lg, 1.5rem); font-size: 1.4rem; }
 .tableWrapper { overflow-x: auto; border-radius: var(--radius, 8px); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-.comparativaTable th { background: var(--primary); color: white; padding: 12px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
+.comparativaTable th { background: var(--primary-boton); color: white; padding: 12px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
 .comparativaTable td { padding: 12px 14px; border-bottom: 1px solid var(--border, #e5e7eb); color: var(--text-primary); vertical-align: top; }
 .comparativaTable tr:nth-child(even) td { background: var(--hover, rgba(0,0,0,0.02)); }
 .comparativaTable tr:last-child td { border-bottom: none; }
@@ -468,7 +468,7 @@
 .warningList { margin: 0; padding-left: 24px; }
 .warningList li { color: #856404; margin-bottom: 8px; line-height: 1.5; }
 
-[data-theme='dark'] .comparativaTable th { background: var(--primary); }
+[data-theme='dark'] .comparativaTable th { background: var(--primary-boton); }
 [data-theme='dark'] .comparativaTable td { color: var(--text-primary); border-color: #374151; }
 [data-theme='dark'] .comparativaTable tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
 [data-theme='dark'] .escenarioCard { background: var(--bg-card); border-color: #374151; }

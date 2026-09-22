@@ -131,7 +131,7 @@
 /* Tabla comparativa enfermedades */
 .tablaScroll { overflow-x: auto; margin-bottom: var(--spacing-lg); border-radius: var(--radius); border: 1px solid var(--border); }
 .tablaEnfermedades { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
-.tablaEnfermedades thead { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; }
+.tablaEnfermedades thead { background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%); color: white; }
 .tablaEnfermedades th { padding: 0.65rem var(--spacing-md); text-align: left; font-weight: 600; white-space: nowrap; }
 .tablaEnfermedades td { padding: 0.6rem var(--spacing-md); border-bottom: 1px solid var(--border); color: var(--text-primary); vertical-align: middle; }
 .tablaEnfermedades tbody tr:last-child td { border-bottom: none; }

@@ -117,7 +117,7 @@
 
 .tablaCasos { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
 .tablaCasos th {
-  background: var(--primary); color: white; padding: var(--spacing-sm);
+  background: var(--primary-boton); color: white; padding: var(--spacing-sm);
   text-align: left; font-weight: 600;
 }
 .tablaCasos td { padding: var(--spacing-sm); border-bottom: 1px solid var(--border); color: var(--text-primary); }

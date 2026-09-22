@@ -247,7 +247,7 @@
 }
 
 .tablaCayley th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -330,7 +330,7 @@
 }
 
 .comparativaTable thead tr {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 

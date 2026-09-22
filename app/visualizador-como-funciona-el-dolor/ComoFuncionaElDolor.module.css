@@ -115,7 +115,7 @@
 
 /* ─── Tabla educativa ─── */
 .tablaContainer { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin: var(--spacing-md) 0 var(--spacing-lg); font-size: 0.88rem; }
-.tablaHeader { display: grid; grid-template-columns: 1fr 1.2fr 2fr 2fr; background: var(--primary); color: white; font-weight: 700; font-size: 0.8rem; }
+.tablaHeader { display: grid; grid-template-columns: 1fr 1.2fr 2fr 2fr; background: var(--primary-boton); color: white; font-weight: 700; font-size: 0.8rem; }
 .tablaHeader span { padding: 0.6rem 0.8rem; }
 .tablaFila { display: grid; grid-template-columns: 1fr 1.2fr 2fr 2fr; border-top: 1px solid var(--border); }
 .tablaFila:nth-child(even) { background: var(--hover); }

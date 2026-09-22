@@ -349,7 +349,7 @@
 }
 
 .tablaGrados th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.5rem 0.75rem;
   text-align: center;
@@ -427,7 +427,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.6rem 1rem;
   text-align: left;

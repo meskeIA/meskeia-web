@@ -353,7 +353,7 @@
 .tableWrapper { overflow-x: auto; margin: 1rem 0; }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
 .comparativaTable th {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600;
 }
 .comparativaTable td {

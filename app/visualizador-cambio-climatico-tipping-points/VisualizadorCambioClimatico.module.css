@@ -811,7 +811,7 @@
 }
 
 .tabla th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.65rem 1rem;
   text-align: left;
@@ -997,7 +997,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.65rem 1rem;
   text-align: left;

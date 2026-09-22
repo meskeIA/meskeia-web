@@ -120,7 +120,7 @@
 }
 
 .refTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.75rem 1rem;
   text-align: left;
@@ -552,7 +552,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.75rem 1rem;
   text-align: left;
@@ -804,7 +804,7 @@
 
 [data-theme='dark'] .refTable th,
 [data-theme='dark'] .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .refTable td,

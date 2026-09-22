@@ -813,7 +813,7 @@
 /* ===== EDUCATIONAL SECTION ===== */
 .tableWrapper { overflow-x: auto; margin: 1.5rem 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.comparativaTable th { background: var(--primary); color: #fff; padding: 0.75rem 1rem; text-align: left; white-space: nowrap; }
+.comparativaTable th { background: var(--primary-boton); color: #fff; padding: 0.75rem 1rem; text-align: left; white-space: nowrap; }
 .comparativaTable td { padding: 0.65rem 1rem; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
 .comparativaTable tr:nth-child(even) td { background: #f9fafb; }
 [data-theme='dark'] .comparativaTable td { border-color: #374151; }

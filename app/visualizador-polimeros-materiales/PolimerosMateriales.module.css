@@ -259,7 +259,7 @@
 }
 
 .tabla th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.65rem 0.85rem;
   text-align: left;
@@ -927,7 +927,7 @@
 }
 
 [data-theme='dark'] .tabla th {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .tabla td {
@@ -1106,7 +1106,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -1116,7 +1116,7 @@
 }
 
 [data-theme='dark'] .comparativaTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .comparativaTable tr:nth-child(even) {

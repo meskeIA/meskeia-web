@@ -309,7 +309,7 @@
 }
 
 .infraTable th {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.5rem 0.75rem;
   text-align: left;
