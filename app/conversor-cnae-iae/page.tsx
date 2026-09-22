@@ -188,6 +188,35 @@ function normalizarTexto(texto: string): string {
     .trim();
 }
 
+/**
+ * La otra forma de género de un término de oficio, o null si no aplica (hallazgo 1188).
+ *
+ * ⚠️ 22/09/2026 — el diccionario de sinónimos indexa el femenino en SIETE profesiones
+ * —abogada, arquitecta, ingeniera, fotógrafa, traductora, veterinaria y constructora—, así que
+ * el criterio estaba tomado, pero no aplicado en el resto: unos cien oficios de una sola
+ * palabra tenían el masculino indexado y el femenino no. Y como la búsqueda es por SUBCADENA
+ * —«peluquera» no está dentro de «peluquerías» ni de «peluquero»—, el femenino devolvía CERO
+ * resultados. Medido en navegador: «peluquero» 1, «peluquera» 0; «psicólogo» 1, «psicóloga» 0.
+ *
+ * No emitía ningún dato falso, pero dejaba en blanco a quien escribe su oficio como lo dice,
+ * que es exactamente lo que la página le pide («Escribe cómo describirías tu trabajo»).
+ *
+ * Se repara en el ÍNDICE y no en la consulta: así cubre de una vez los cien términos del
+ * catálogo sellado y los que se añadan después, sin tocar `data/cnae-sinonimos.json`, que es un
+ * fichero curado a mano. Solo se derivan términos de UNA palabra, para no inventar formas
+ * dentro de expresiones como «bodega de uva».
+ */
+function otroGenero(termino: string): string | null {
+  if (termino.includes(' ')) return null;
+  // -ora → -or: programadora, traductora, escritora, auditora, repartidora…
+  if (termino.endsWith('ora')) return `${termino.slice(0, -3)}or`;
+  if (termino.endsWith('or')) return `${termino}a`;
+  // -a → -o y al revés: peluquera/peluquero, psicóloga/psicólogo, letrada/letrado…
+  if (termino.endsWith('a')) return `${termino.slice(0, -1)}o`;
+  if (termino.endsWith('o')) return `${termino.slice(0, -1)}a`;
+  return null;
+}
+
 /** Deja solo los dígitos: «47.11» → «4711». */
 function soloDigitos(texto: string): string {
   return texto.replace(/\D/g, '');
@@ -269,6 +298,30 @@ export default function ConversorCnaeIaePage() {
   const [catalogo, setCatalogo] = useState<Catalogo | null>(null);
   const [estado, setEstado] = useState<EstadoCarga>('cargando');
   const [pestana, setPestana] = useState<Pestana>('cnae');
+
+  /**
+   * Navegación por flechas del patrón tabs de WAI-ARIA (hallazgo 1189).
+   *
+   * Con solo dos pestañas, ← y → alternan, e Inicio/Fin llevan a la primera y a la última. El
+   * foco va a la pestaña destino porque la activación es automática: al cambiar `pestana`, el
+   * `tabIndex` de la otra pasa a 0 y esta a -1, así que hay que moverlo a mano o se pierde.
+   */
+  const moverEntrePestanas = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const destino: Pestana | null =
+      e.key === 'ArrowLeft' || e.key === 'ArrowRight'
+        ? pestana === 'cnae'
+          ? 'iae'
+          : 'cnae'
+        : e.key === 'Home'
+          ? 'cnae'
+          : e.key === 'End'
+            ? 'iae'
+            : null;
+    if (!destino) return;
+    e.preventDefault();
+    setPestana(destino);
+    document.getElementById(`tab-${destino}`)?.focus();
+  };
 
   const [consultaCnae, setConsultaCnae] = useState('');
   const [seccionCnae, setSeccionCnae] = useState<string>('todas');
@@ -368,7 +421,15 @@ export default function ConversorCnaeIaePage() {
         codigoDigitos: soloDigitos(entrada.codigo),
         sinonimos,
         textoBusqueda: normalizarTexto(
-          `${entrada.codigo} ${entrada.titulo} ${sinonimos.join(' ')}`
+          // Las dos formas de género de cada sinónimo de una palabra (hallazgo 1188). Van al
+          // texto de BÚSQUEDA y no a `sinonimos`, que es lo que se pinta en pantalla: ahí
+          // aparecería «peluquero · peluquera» duplicando la lista sin añadir información.
+          [
+            entrada.codigo,
+            entrada.titulo,
+            ...sinonimos,
+            ...sinonimos.map(otroGenero).filter((t): t is string => t !== null),
+          ].join(' ')
         ),
       };
     });
@@ -772,6 +833,25 @@ export default function ConversorCnaeIaePage() {
       {/* ─── Buscadores ─────────────────────────────────────────────────── */}
 
       <section className={styles.buscadorPanel} aria-label="Buscadores de códigos">
+        {/*
+          ⚠️ 22/09/2026 (hallazgo 1189) — las dos pestañas llevaban su `aria-controls` fijo, pero
+          solo se monta el `role="tabpanel"` de la activa, así que el de la inactiva apuntaba
+          siempre a un id que NO está en el DOM: una referencia ARIA rota (regla
+          aria-valid-attr-value de axe). No bloqueaba nada —las dos siguen siendo alcanzables con
+          el tabulador y `aria-selected` era correcto—, pero un atributo que no resuelve es peor
+          que no ponerlo. Se montan los DOS paneles y el inactivo va con `hidden`, que lo saca
+          del árbol de accesibilidad y de la pantalla sin sacarlo del DOM, así que los dos
+          `aria-controls` resuelven siempre.
+
+          La primera versión de esta reparación dejaba el `aria-controls` solo en la pestaña
+          activa, con el argumento de que montar los dos paneles duplicaría un DOM de cientos de
+          entradas. El argumento era FALSO —`LIMITE_RESULTADOS` vale 10, así que cada panel pinta
+          diez fichas como mucho— y lo destapó el testigo del acta al seguir en rojo: su
+          comprobación no distingue «ausente» de «roto», y tenía razón en no distinguirlo.
+
+          Y se añade la navegación por flechas del patrón, que el acta nombra como recomendación:
+          con el foco en una pestaña, ← y → mueven a la otra y la activan.
+        */}
         <div className={styles.tabs} role="tablist" aria-label="Elige qué catálogo consultar">
           <button
             type="button"
@@ -779,8 +859,10 @@ export default function ConversorCnaeIaePage() {
             id="tab-cnae"
             aria-selected={pestana === 'cnae'}
             aria-controls="panel-cnae"
+            tabIndex={pestana === 'cnae' ? 0 : -1}
             className={`${styles.tab} ${pestana === 'cnae' ? styles.tabActiva : ''}`}
             onClick={() => setPestana('cnae')}
+            onKeyDown={moverEntrePestanas}
           >
             <span aria-hidden="true">🏷️</span> CNAE-2025
           </button>
@@ -790,8 +872,10 @@ export default function ConversorCnaeIaePage() {
             id="tab-iae"
             aria-selected={pestana === 'iae'}
             aria-controls="panel-iae"
+            tabIndex={pestana === 'iae' ? 0 : -1}
             className={`${styles.tab} ${pestana === 'iae' ? styles.tabActiva : ''}`}
             onClick={() => setPestana('iae')}
+            onKeyDown={moverEntrePestanas}
           >
             <span aria-hidden="true">⚖️</span> Epígrafes del IAE
           </button>
@@ -812,8 +896,13 @@ export default function ConversorCnaeIaePage() {
         )}
 
         {/* Panel CNAE-2025 */}
-        {estado === 'listo' && pestana === 'cnae' && (
-          <div id="panel-cnae" role="tabpanel" aria-labelledby="tab-cnae">
+        {estado === 'listo' && (
+          <div
+            id="panel-cnae"
+            role="tabpanel"
+            aria-labelledby="tab-cnae"
+            hidden={pestana !== 'cnae'}
+          >
             <h2 className={styles.buscadorTitulo}>Buscador de la CNAE-2025</h2>
             <p className={styles.panelIntro}>
               Escribe cómo describirías tu trabajo («hago páginas web», «peluquería»), el nombre
@@ -1001,8 +1090,13 @@ export default function ConversorCnaeIaePage() {
         )}
 
         {/* Panel IAE */}
-        {estado === 'listo' && pestana === 'iae' && (
-          <div id="panel-iae" role="tabpanel" aria-labelledby="tab-iae">
+        {estado === 'listo' && (
+          <div
+            id="panel-iae"
+            role="tabpanel"
+            aria-labelledby="tab-iae"
+            hidden={pestana !== 'iae'}
+          >
             <h2 className={styles.buscadorTitulo}>Buscador de epígrafes del IAE</h2>
             <p className={styles.panelIntro}>
               El epígrafe del IAE es el que se declara a la AEAT en el modelo 036 o 037 al darse de

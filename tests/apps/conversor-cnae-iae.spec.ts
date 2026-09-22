@@ -111,10 +111,18 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 const RUTA = '/conversor-cnae-iae/';
 
 /** Cada resultado es un <li> de la lista; el resto de clases con «ficha» son hijos suyos. */
-const fichas = (page: Page) => page.locator('li[class*="ficha"]');
+/*
+  ⚠️ 22/09/2026 (hallazgo 1189) — los dos `role="tabpanel"` se montan siempre desde la reparación
+  de hoy, y el inactivo va con `hidden`: sale del árbol de accesibilidad y de la pantalla, pero
+  NO del DOM, así que un `page.locator` sin acotar encuentra también sus elementos. Estos dos
+  helpers se acotan al panel visible, que es lo que siempre quisieron decir.
+*/
+const panelActivo = (page: Page) => page.locator('[role="tabpanel"]:not([hidden])');
+
+const fichas = (page: Page) => panelActivo(page).locator('li[class*="ficha"]');
 
 /** «N resultados · se muestran los 10 primeros…» del panel activo. */
-const contador = (page: Page) => page.locator('[class*="contador"]').first();
+const contador = (page: Page) => panelActivo(page).locator('[class*="contador"]').first();
 
 /** Aviso «X es un código de la CNAE-2009…». */
 const avisoAntiguo = (page: Page) => page.locator('[class*="avisoAntiguo"]');
@@ -299,7 +307,7 @@ test('CASO 3 (debe rechazarse) — código mal formado, inexistente y campo vac�
   await expect(contador(page)).toHaveText(/^0 resultados/);
   await expect(fichas(page)).toHaveCount(0);
   await expect(avisoAntiguo(page)).toHaveCount(0); // no puede decir que sea un código de 2009
-  await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+  await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
     'No hay ninguna entrada que encaje con lo que has escrito.',
   );
 
@@ -313,7 +321,7 @@ test('CASO 3 (debe rechazarse) — código mal formado, inexistente y campo vac�
   await buscarCnae(page, '   ');
   await expect(contador(page)).toHaveCount(0);
   await expect(fichas(page)).toHaveCount(0);
-  await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+  await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
     'Escribe arriba a qué te dedicas para localizar tu código',
   );
 
@@ -321,7 +329,7 @@ test('CASO 3 (debe rechazarse) — código mal formado, inexistente y campo vac�
   await buscarIae(page, 'zzzz');
   await expect(contador(page)).toHaveText(/^0 resultados/);
   await expect(fichas(page)).toHaveCount(0);
-  await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+  await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
     'Ningún epígrafe coincide con esa búsqueda.',
   );
 
@@ -329,7 +337,7 @@ test('CASO 3 (debe rechazarse) — código mal formado, inexistente y campo vac�
   await buscarIae(page, '');
   await expect(contador(page)).toHaveCount(0);
   await expect(fichas(page)).toHaveCount(0);
-  await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+  await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
     'Escribe arriba la actividad o el epígrafe que buscas',
   );
 });
@@ -913,7 +921,7 @@ test('CASO 6 (debe rechazarse) — lo que no existe en ninguno de los dos catál
   await buscarIae(page, '888.8');
   await expect(contador(page)).toHaveText(/^0 resultados/);
   await expect(fichas(page)).toHaveCount(0);
-  await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+  await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
     'Ningún epígrafe coincide con esa búsqueda.',
   );
 });
@@ -1257,7 +1265,7 @@ test.describe('Buscador CNAE-IAE — re-verificación del 02/09/2026', () => {
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
     await expect(avisoAntiguo(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'No hay ninguna entrada que encaje con lo que has escrito.',
     );
   });
@@ -1469,7 +1477,7 @@ test.describe('Buscador CNAE-IAE — inspección del 07/09/2026', () => {
     await buscarIae(page, '505.9');
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'Ningún epígrafe coincide con esa búsqueda.',
     );
 
@@ -1481,7 +1489,7 @@ test.describe('Buscador CNAE-IAE — inspección del 07/09/2026', () => {
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
     await expect(avisoAntiguo(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'No hay ninguna entrada que encaje con lo que has escrito.',
     );
   });
@@ -1787,7 +1795,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 10/09/2026', () => {
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
     await expect(avisoAntiguo(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'No hay ninguna entrada que encaje con lo que has escrito.',
     );
 
@@ -1796,7 +1804,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 10/09/2026', () => {
     await buscarIae(page, '861.9');
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'Ningún epígrafe coincide con esa búsqueda.',
     );
   });
@@ -2033,7 +2041,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 14/09/2026', () => {
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
     await expect(avisoAntiguo(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'No hay ninguna entrada que encaje con lo que has escrito.',
     );
 
@@ -2043,7 +2051,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 14/09/2026', () => {
     await buscarIaeVerificado(page, '945.3');
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'Ningún epígrafe coincide con esa búsqueda.',
     );
   });
@@ -2297,7 +2305,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 21/09/2026', () => {
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
     await expect(avisoAntiguo(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'No hay ninguna entrada que encaje con lo que has escrito.',
     );
 
@@ -2307,7 +2315,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 21/09/2026', () => {
     await buscarIaeVerificado(page, '972.3');
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'Ningún epígrafe coincide con esa búsqueda.',
     );
   });
@@ -2602,7 +2610,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 22/09/2026', () => {
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
     await expect(avisoAntiguo(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'No hay ninguna entrada que encaje con lo que has escrito.',
     );
 
@@ -2612,7 +2620,7 @@ test.describe('Buscador CNAE-IAE — re-inspección del 22/09/2026', () => {
     await buscarIaeVerificado(page, '731.3');
     await expect(contador(page)).toHaveText(/^0 resultados/);
     await expect(fichas(page)).toHaveCount(0);
-    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
       'Ningún epígrafe coincide con esa búsqueda.',
     );
 
@@ -2629,10 +2637,9 @@ test.describe('Buscador CNAE-IAE — re-inspección del 22/09/2026', () => {
 // se les quita la marca y se quedan como regresión, SIN tocar el valor esperado.
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('Buscador CNAE-IAE — hallazgos abiertos del 22/09/2026', () => {
-  test('BAJO — el femenino del oficio debe encontrar la misma clase que el masculino, como ya hace «abogada»', async ({
+  test('1188 (regresión) — el femenino del oficio encuentra la misma clase que el masculino', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // El diccionario de términos coloquiales SÍ indexa el femenino en siete oficios
@@ -2647,20 +2654,37 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 22/09/2026', () => {
     // pintora, odontóloga, ginecóloga, letrada, procuradora, auditora, consultora y
     // repartidora. No es un dato equivocado —la app no dice nada falso—, pero deja en blanco
     // a quien escribe su oficio como lo dice, que es justo lo que la página le pide («Escribe
-    // cómo describirías tu trabajo»), y el vacío llega también al IAE, donde «peluquera» no
-    // encuentra el 972.1 «Servicios de peluquería de señora y caballero».
+    // cómo describirías tu trabajo»).
+    //
+    // ⚠️ El acta añadía que «el vacío llega también al IAE, donde "peluquera" no encuentra el
+    // 972.1», dando por hecho que «peluquero» sí lo encontraba. Medido en navegador el
+    // 22/09/2026: en el IAE «peluquero» devuelve 0 y «peluquera» devuelve 0, así que ahí NO hay
+    // asimetría de género — el índice del IAE se construye con el código, el título y los
+    // títulos de sus padres, sin sinónimos de oficio, y «peluquería» (3 resultados) es lo único
+    // que encaja por subcadena. Que un oficio no encuentre su epígrafe es otra cosa, y no es
+    // este hallazgo.
     await buscarCnaeVerificado(page, 'peluquera');
     await expect(fichas(page).first()).toContainText('96.21');
     await expect(fichas(page).first()).toContainText('Peluquerías y barberías');
 
     await buscarCnaeVerificado(page, 'psicóloga');
     await expect(fichas(page).first()).toContainText('86.93');
+
+    // El masculino sigue encontrando lo mismo: la reparación AÑADE, no sustituye.
+    await buscarCnaeVerificado(page, 'peluquero');
+    await expect(fichas(page).first()).toContainText('96.21');
+
+    // Y la lista de sinónimos que se PINTA no se duplica con las formas derivadas: van al
+    // texto de búsqueda, no a lo que se enseña.
+    await buscarCnaeVerificado(page, 'peluquera');
+    const primeraFicha = (await fichas(page).first().innerText()).replace(/\s+/g, ' ');
+    expect(primeraFicha).toContain('peluquero');
+    expect(primeraFicha).not.toContain('peluquera ·');
   });
 
-  test('BAJO — el `aria-controls` de la pestaña inactiva apunta a un panel que no está en el DOM', async ({
+  test('1189 (regresión) — todo `aria-controls` de una pestaña resuelve a un panel del DOM', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // Solo se monta el `<div role="tabpanel">` de la pestaña activa, pero las DOS pestañas
