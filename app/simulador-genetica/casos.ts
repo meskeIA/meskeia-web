@@ -243,6 +243,32 @@ export function toleranciaDe(valor: number): number {
   return Math.max(0.01, Math.abs(valor) * 0.01);
 }
 
+/**
+ * El DOMINIO de la magnitud que se pregunta (hallazgo 1207).
+ *
+ * La tolerancia relativa del 1 % vale un punto porcentual cuando la respuesta es 100, así que
+ * un «101 %» de la descendencia se corregía como acierto: no es un error de redondeo, es una
+ * respuesta imposible en la magnitud que el enunciado pregunta. Y el mismo mecanismo aceptaba
+ * «60,5» donde la unidad es una planta entera.
+ *
+ * La comprobación va ANTES de la tolerancia, porque no es una cuestión de precisión: 101 % de
+ * una descendencia no existe por poco que se desvíe.
+ */
+function fueraDeDominio(usuario: number, magnitud: 'porcentaje' | 'individuos'): string | null {
+  if (magnitud === 'porcentaje') {
+    if (usuario < 0) return 'Un porcentaje de la descendencia no puede ser negativo.';
+    if (usuario > 100) {
+      return 'No puede haber más del 100 % de la descendencia: repasa la cuenta.';
+    }
+    return null;
+  }
+  if (usuario < 0) return 'El número de individuos no puede ser negativo.';
+  if (!Number.isInteger(usuario)) {
+    return 'El número de individuos es un número entero: no hay medias plantas.';
+  }
+  return null;
+}
+
 export interface Veredicto {
   correcto: boolean;
   motivo: string;
@@ -254,7 +280,17 @@ export interface Veredicto {
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es número se responde
  * con un veredicto, no con una excepción que tumbaría el render.
  */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+export function comprobarRespuesta(
+  usuario: number,
+  esperado: number,
+  /**
+   * La magnitud del enunciado, para rechazar lo imposible antes de medir la desviación
+   * (hallazgo 1207). OBLIGATORIA a propósito: dejarla opcional habría permitido seguir
+   * corrigiendo sin ella, que es exactamente el estado del que salió el hallazgo. Una
+   * respuesta no se puede juzgar sin saber en qué unidad está.
+   */
+  magnitud: 'porcentaje' | 'individuos',
+): Veredicto {
   const tolerancia = toleranciaDe(esperado);
 
   if (!Number.isFinite(usuario)) {
@@ -262,6 +298,16 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal).',
       diferencia: NaN,
+      tolerancia,
+    };
+  }
+
+  const imposible = fueraDeDominio(usuario, magnitud);
+  if (imposible) {
+    return {
+      correcto: false,
+      motivo: imposible,
+      diferencia: Math.abs(usuario - esperado),
       tolerancia,
     };
   }

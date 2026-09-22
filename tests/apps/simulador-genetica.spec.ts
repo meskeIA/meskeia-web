@@ -144,12 +144,14 @@ test.describe('Caso 1 — Aa × Aa, el cruce que da 3:1', () => {
     // 4 gametos × 4 gametos = 16 celdas.
     await expect(genotiposDeCelda(page)).toHaveCount(16);
     const { fenotipos } = await estadisticas(page);
-    // 3/4 × 3/4 = 9/16 = 56,25 % → «56%» · 3/16 = 18,75 % → «19%» · 1/16 = 6,25 % → «6%».
+    // 22/09/2026 (hallazgo 1206): el panel imprime la proporción EXACTA. El dihíbrido 9:3:3:1
+    // da 56,25 · 18,75 · 18,75 · 6,25, y redondearlo a entero era perder justo la precisión que
+    // la sección «Casos para clase» de la misma página pide calcular.
     expect(fenotipos.filas).toEqual([
-      '🟡⚪ Amarillo / Lisa 56%',
-      '🟡🔘 Amarillo / Rugosa 19%',
-      '🟢⚪ Verde / Lisa 19%',
-      '🟢🔘 Verde / Rugosa 6%',
+      '🟡⚪ Amarillo / Lisa 56,25%',
+      '🟡🔘 Amarillo / Rugosa 18,75%',
+      '🟢⚪ Verde / Lisa 18,75%',
+      '🟢🔘 Verde / Rugosa 6,25%',
     ]);
     expect(fenotipos.ratio).toContain('Ratio: 9:3:3:1');
   });
@@ -245,7 +247,7 @@ test.describe('Caso 2 — límites', () => {
 // CASO 3 — Lo que la app debe rechazar
 // ============================================================
 test.describe('Caso 3 — rechazos', () => {
-  test('el tamaño de población no acepta 1000, 0 ni -5', async ({ page }) => {
+  test('el tamaño de población no simula con 1000, 0 ni -5', async ({ page }) => {
     await page.goto(RUTA);
     await pestana(page, 'Población').click();
     const campo = campoPoblacion(page);
@@ -254,14 +256,27 @@ test.describe('Caso 3 — rechazos', () => {
     await expect(campo).toHaveAttribute('max', '500');
     await expect(campo).toHaveValue('100');
 
+    /*
+      ⚠️ 22/09/2026 (hallazgo 1203) — este testigo pedía `toHaveValue('100')` tras escribir un
+      valor inválido, y esa reversión era el defecto: el input estaba controlado por el NÚMERO,
+      así que cada pulsación se juzgaba por separado y al teclear «50» el «5» intermedio lo
+      devolvía a 100, dejando el campo sin admitir NINGÚN valor. Ahora el texto se conserva, el
+      aviso explica qué falta y lo que se bloquea es la SIMULACIÓN, que es lo que de verdad
+      importaba: antes el botón seguía activo y simulaba 100 con otro número en pantalla.
+    */
     for (const valorInvalido of ['1000', '0', '-5', '501']) {
       await campo.fill(valorInvalido);
-      await expect(campo).toHaveValue('100'); // se ignora y se queda en el último válido
+      // Lo escrito se conserva —si no, no se puede teclear—, pero no se simula.
+      await expect(campo).toHaveValue(valorInvalido);
+      await expect(campo).toHaveAttribute('aria-invalid', 'true');
+      await expect(page.getByRole('button', { name: /Simular/ })).toBeDisabled();
     }
 
     // Y el valor máximo declarado sí se acepta.
     await campo.fill('500');
     await expect(campo).toHaveValue('500');
+    await expect(page.getByRole('button', { name: /Simular/ })).toBeEnabled();
+    await expect(page.locator('#aviso-tamano-poblacion')).toHaveCount(0);
   });
 
   test('un rasgo ligado al sexo no ofrece cruce dihíbrido ni genotipos de dos X al padre', async ({
@@ -432,24 +447,27 @@ test.describe('Simulador de genética — regresiones de los hallazgos reparados
     await expect(page.locator('[class*="chiSquare"]').first()).toBeVisible();
   });
 
-  test('el tamaño de población acepta 7 aunque el campo declare min=10', async ({ page }) => {
+  test('el tamaño de población no simula 7 aunque el campo declare min=10', async ({ page }) => {
     await page.goto(RUTA);
     await pestana(page, 'Población').click();
     const campo = campoPoblacion(page);
     await campo.fill('7');
     // El validador comprobaba > 0 y <= 500 mientras el campo declara min=10: el 7 entraba y
-    // se simulaban 7 individuos. Ahora se rechaza, y además se dice por qué en vez de
-    // revertir en silencio.
-    await expect(campo).toHaveValue('100');
+    // se simulaban 7 individuos. Ahora se rechaza y se dice por qué.
     await expect(page.locator('#aviso-tamano-poblacion')).toContainText('entre 10 y 500');
+    await expect(page.getByRole('button', { name: /Simular/ })).toBeDisabled();
 
     // El límite superior se rechaza igual…
     await campo.fill('1000');
     await expect(page.locator('#aviso-tamano-poblacion')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Simular/ })).toBeDisabled();
     // …y un valor válido no deja aviso ninguno.
     await campo.fill('50');
     await expect(page.locator('#aviso-tamano-poblacion')).toHaveCount(0);
     await expect(campo).toHaveValue('50');
+    // Y se simula ESE tamaño, no el último aceptado (hallazgo 1203).
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(50);
   });
 
   test('en ligada al sexo el genotipo se escribe con el alelo recesivo delante', async ({
@@ -647,11 +665,13 @@ test.describe('simulador-genetica · casos para clase', () => {
 
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
     // Un throw dentro del render tumbaría la app entera; aquí todo sale como veredicto.
-    expect(comprobarRespuesta(25, 25).correcto).toBe(true);
-    expect(comprobarRespuesta(25.2, 25).correcto).toBe(true); // dentro del 1 %
-    expect(comprobarRespuesta(30, 25).correcto).toBe(false);
-    expect(comprobarRespuesta(NaN, 25).correcto).toBe(false);
-    expect(comprobarRespuesta(NaN, 25).motivo).toContain('número');
+    // 22/09/2026 (1207): la magnitud es un argumento OBLIGATORIO, para que nadie pueda volver
+    // a corregir sin saber en qué unidad está la respuesta.
+    expect(comprobarRespuesta(25, 25, 'porcentaje').correcto).toBe(true);
+    expect(comprobarRespuesta(25.2, 25, 'porcentaje').correcto).toBe(true); // dentro del 1 %
+    expect(comprobarRespuesta(30, 25, 'porcentaje').correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 25, 'porcentaje').correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 25, 'porcentaje').motivo).toContain('número');
 
     // La tolerancia nunca baja de 0,01, para que el 6,25 del caso 7 no se corrija a ciegas.
     expect(toleranciaDe(0)).toBe(0.01);
@@ -937,12 +957,14 @@ test.describe('Re-inspección 14/09/2026 · los tres casos', () => {
       'El tamaño de la población debe estar entre 10 y 500 individuos.',
     );
     await expect(campo).toHaveAttribute('aria-invalid', 'true');
-    await expect(campo).toHaveValue('100');
+    // 22/09/2026 (1203): lo escrito se conserva y lo que se bloquea es simular.
+    await expect(campo).toHaveValue('5');
+    await expect(page.getByRole('button', { name: /Simular/ })).toBeDisabled();
 
     // 600 está por encima del máximo: mismo trato.
     await campo.fill('600');
     await expect(page.locator('#aviso-tamano-poblacion')).toBeVisible();
-    await expect(campo).toHaveValue('100');
+    await expect(page.getByRole('button', { name: /Simular/ })).toBeDisabled();
 
     // Y un valor dentro del rango entra sin aviso y se simula con ese tamaño exacto.
     await campo.fill('200');
@@ -1308,11 +1330,12 @@ test.describe('Re-inspección 22/09/2026 · los tres casos', () => {
       await expect(veredicto, `respuesta «${escrito}»`).toContainText('¡Correcto!');
     }
 
-    // Una proporción negativa no existe: se rechaza y se dice cuánto se ha desviado.
+    // Una proporción negativa no existe: se rechaza, y desde el 1207 se dice POR QUÉ es
+    // imposible en vez de cuánto se ha desviado, que es lo que se responde a una imprecisión.
     await campo.fill('-25');
     await esperarValorEnReact(page, '#casos-respuesta', '-25');
     await comprobar.click();
-    await expect(veredicto).toContainText('No es correcto');
+    await expect(veredicto).toContainText('no puede ser negativo');
 
     // Notación científica: `parseSpanishNumber` la da por no-número a propósito, y eso tiene
     // que llegar al alumno como una frase, nunca como «NaN» ni como una excepción.
@@ -1332,7 +1355,6 @@ test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
   test('el campo «Tamaño de población» admite que se teclee un valor de su propio rango', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await pestana(page, 'Población').click();
@@ -1355,7 +1377,6 @@ test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
   test('la columna «Esperado» reparte exactamente la población que se ha simulado', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
@@ -1366,16 +1387,20 @@ test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
     await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(200);
 
     // AaRr × AaRr sobre 200 individuos: 9/16, 3/16, 3/16 y 1/16 valen 112,5 · 37,5 · 37,5 ·
-    // 12,5. `simulatePopulation` redondea cada uno por su cuenta (Math.round, que sube los
-    // medios) y sale 113 + 38 + 38 + 13 = 202: dos individuos más de los que hay. La columna
-    // «Observado» suma 200 porque cuenta individuos reales, así que las dos columnas que se
-    // ponen una al lado de la otra para compararse no hablan de la misma población. Y el χ²
-    // se calcula contra esos esperados inflados.
+    // 12,5, y suman exactamente 200. `simulatePopulation` redondeaba cada uno por su cuenta
+    // (Math.round, que sube los medios) y salía 113 + 38 + 38 + 13 = 202: dos individuos más de
+    // los que hay, frente a una columna «Observado» que suma 200 porque cuenta individuos
+    // reales. La frecuencia esperada no es un número de individuos sino una esperanza, así que
+    // se publica con su decimal y el χ² se calcula con ella, no con la entera (hallazgo 1204).
     const totales = await page.evaluate(() =>
       [...document.querySelectorAll('[class*="resultColumn"]')].map((col) => ({
         titulo: (col as HTMLElement).innerText.split('\n')[0],
         total: [...col.querySelectorAll('[class*="resultRow"]')].reduce((s, f) => {
-          const n = Number((f.querySelectorAll('span')[1] as HTMLElement | undefined)?.innerText.match(/^(\d+)/)?.[1] ?? 0);
+          // 22/09/2026: la esperanza lleva decimal (112,5 de 200), así que la regex tiene que
+          // leerlo, y en español la coma es el separador decimal. Con `/^(\d+)/` la suma daba
+          // 198 sobre una columna que suma exactamente 200.
+          const texto = (f.querySelectorAll('span')[1] as HTMLElement | undefined)?.innerText ?? '';
+          const n = Number((texto.match(/^([\d.]+(?:,\d+)?)/)?.[1] ?? '0').replace(/\./g, '').replace(',', '.'));
           return s + n;
         }, 0),
       })),
@@ -1386,7 +1411,6 @@ test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
   test('las dos columnas del panel de población enfrentan el mismo fenotipo en la misma fila', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
@@ -1417,67 +1441,97 @@ test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
     }
   });
 
-  test('el corrector acepta la proporción que la propia app imprime para ese cruce', async ({
+  test('1206 (regresión) — el corrector acepta la proporción que la propia app imprime', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
 
-    // Lo que la app publica para Verde / Rugosa en AaRr × AaRr, que es el cruce del caso 7.
+    /*
+      ⚠️ 22/09/2026 — el acta dejaba dos salidas («aceptada, o coherencia entre el panel y el
+      corrector») y el testigo estaba escrito para la primera: relajar el corrector hasta que
+      admitiera el «6» redondeado. Se elige la segunda, por el lado de la CIFRA: 6,25 % es lo
+      que da el cuadro de Punnett de un dihíbrido, y el panel lo imprimía como «6 %» con
+      `formatNumber(x, 0)`, perdiendo justo la precisión que el ejercicio pide calcular. Relajar
+      el corrector a 0,5 habría hecho pasar por bueno un 56 donde toca 56,25 en un ejercicio de
+      cálculo, que es lo contrario de lo que la sección enseña.
+    */
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
     await page.getByRole('button', { name: /Realizar Cruce/ }).click();
     const { fenotipos } = await estadisticas(page);
-    expect(sinIcono(fenotipos.filas)).toContain('Verde / Rugosa 6%');
+    const filas = sinIcono(fenotipos.filas);
+    expect(filas).toContain('Verde / Rugosa 6,25%');
+    expect(filas).toContain('Amarillo / Lisa 56,25%');
+    // Y un porcentaje sin decimales sigue saliendo sin ellos: 25 %, no «25,00 %».
+    await page.getByRole('button', { name: 'Monohíbrido', exact: true }).click();
+    await page.getByRole('button', { name: /Realizar Cruce/ }).click();
+    expect(sinIcono((await estadisticas(page)).fenotipos.filas).join(' ')).toContain('75%');
 
-    // La sección de casos dice «Resuélvelos con el cuadro de Punnett de arriba», y arriba
-    // pone 6 %. Pero `toleranciaDe(6,25)` vale 0,0625, así que el 6 que el alumno acaba de
-    // leer se corrige como error por 0,25. En el caso 6, con el mismo gesto, el 56 que
-    // imprime la app SÍ se acepta, porque allí la tolerancia relativa vale 0,5625: la misma
-    // forma de responder vale o no según el tamaño de la respuesta.
+    // La sección dice «Resuélvelos con el cuadro de Punnett de arriba», y ahora lo que pone
+    // arriba es exactamente lo que el corrector espera, en los dos casos del acta.
     await page.getByRole('button', { name: /^Caso 6:/ }).click();
-    await page.locator('#casos-respuesta').fill('56');
-    await esperarValorEnReact(page, '#casos-respuesta', '56');
+    await page.locator('#casos-respuesta').fill('56,25');
+    await esperarValorEnReact(page, '#casos-respuesta', '56,25');
     await page.getByRole('button', { name: 'Comprobar' }).click();
     await expect(page.locator('[class*="casoVeredicto"]')).toContainText('¡Correcto!');
 
     await page.getByRole('button', { name: /^Caso 7:/ }).click();
-    await page.locator('#casos-respuesta').fill('6');
-    await esperarValorEnReact(page, '#casos-respuesta', '6');
+    await page.locator('#casos-respuesta').fill('6,25');
+    await esperarValorEnReact(page, '#casos-respuesta', '6,25');
     await page.getByRole('button', { name: 'Comprobar' }).click();
     await expect(page.locator('[class*="casoVeredicto"]')).toContainText('¡Correcto!');
   });
 
-  test('el corrector no da por buena una proporción imposible', async () => {
-    test.fail();
-    // Sin navegador: es aritmética de `comprobarRespuesta`. La tolerancia es el mayor entre
-    // 0,01 y el 1 % del valor esperado, así que con esperado = 100 vale 1 y entra el 101.
-    // Un «101 %» de la descendencia no es una respuesta con un error de redondeo: es una
-    // respuesta que no puede existir, y el caso 3 pregunta justamente un porcentaje.
+  test('1207 (regresión) — el corrector no da por buena una proporción imposible', async () => {
+    // Sin navegador: es aritmética de `comprobarRespuesta`. La tolerancia sigue siendo el mayor
+    // entre 0,01 y el 1 % del valor esperado —con esperado = 100 vale 1—, y eso NO se ha
+    // tocado: lo que se ha añadido es el DOMINIO de la magnitud, que se comprueba antes, porque
+    // un «101 %» de la descendencia no es una respuesta imprecisa sino una que no puede existir.
     expect(toleranciaDe(100)).toBe(1);
-    expect(comprobarRespuesta(101, 100).correcto).toBe(false);
+    expect(comprobarRespuesta(101, 100, 'porcentaje').correcto).toBe(false);
+    expect(comprobarRespuesta(-1, 100, 'porcentaje').correcto).toBe(false);
+    // Y el 99, que sí entra en la tolerancia, sigue aceptándose: el dominio no la sustituye.
+    expect(comprobarRespuesta(99, 100, 'porcentaje').correcto).toBe(true);
 
     // El mismo techo, en el caso 3 de verdad (AA × aa, toda la F1 amarilla).
     const caso3 = CASOS.find((c) => c.id === 3);
     expect(caso3?.respuesta).toBe(100);
-    expect(comprobarRespuesta(101, caso3?.respuesta ?? 0).correcto).toBe(false);
+    expect(caso3?.datos.busca.magnitud).toBe('porcentaje');
+    expect(comprobarRespuesta(101, caso3?.respuesta ?? 0, 'porcentaje').correcto).toBe(false);
+
+    // Y donde la unidad es un individuo entero no hay medias plantas (caso 5, 240 guisantes).
+    const caso5 = CASOS.find((c) => c.id === 5);
+    expect(caso5?.datos.busca.magnitud).toBe('individuos');
+    expect(caso5?.respuesta).toBe(60);
+    expect(comprobarRespuesta(60, 60, 'individuos').correcto).toBe(true);
+    expect(comprobarRespuesta(60.5, 60, 'individuos').correcto).toBe(false);
   });
 
-  test('en modo Practicar el botón de pista no anuncia una pista que no existe', async ({
+  test('1208 (regresión) — en modo Practicar no se ofrece un botón de pista sin pista', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
-    await page.getByRole('button', { name: /Practicar/ }).click();
 
-    // El ejercicio de práctica no trae `pista` —`Ejercicio` no tiene ese campo— y la vista lo
-    // resuelve con `verPista && !practica`, pero deja el botón en pantalla. Al pulsarlo el
-    // rótulo pasa a «Ocultar pista» y `aria-expanded` a «true» sin que se despliegue nada:
-    // un lector de pantalla anuncia contenido expandido que no está en el DOM.
+    // En los casos numerados el botón está y despliega su pista.
     const pista = page.getByRole('button', { name: /pista/ });
+    await expect(pista).toHaveCount(1);
     await expect(pista).toHaveAttribute('aria-expanded', 'false');
     await pista.click();
     await expect(page.locator('[class*="casoPista"]')).toHaveCount(1);
+
+    /*
+      ⚠️ 22/09/2026 — el acta dejaba las dos salidas abiertas («o no ofrecer el botón en este
+      modo, o mostrar una pista») y el testigo estaba escrito para la segunda. Se elige la
+      primera: el ejercicio aleatorio se genera con `generarEjercicioAleatorio`, cuyo tipo
+      `Ejercicio` no tiene el campo, así que inventarle una pista sería escribir contenido
+      nuevo para el hueco en vez de cerrar el hueco. Un control de despliegue no se ofrece
+      cuando no hay nada que desplegar, y eso es lo que arregla el anuncio falso.
+    */
+    await page.getByRole('button', { name: /Practicar/ }).click();
+    await expect(page.getByRole('button', { name: /pista/ })).toHaveCount(0);
+    await expect(page.locator('[class*="casoPista"]')).toHaveCount(0);
+    // La solución sí sigue estando, que es lo que el modo práctica ofrece de verdad.
+    await expect(page.getByRole('button', { name: /solución/ })).toHaveCount(1);
   });
 });

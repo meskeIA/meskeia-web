@@ -2,6 +2,24 @@
 
 import styles from '../SimuladorGenetica.module.css';
 import { formatNumber } from '@/lib';
+
+/**
+ * Un porcentaje fenotípico, con los decimales que tenga y sin ninguno si no los tiene.
+ *
+ * ⚠️ 22/09/2026 (hallazgo 1206) — el panel imprimía todos los porcentajes con `formatNumber(x, 0)`,
+ * así que el 6,25 % de un dihíbrido salía como «6 %». La sección «Casos para clase» de la misma
+ * página dice literalmente «Resuélvelos con el cuadro de Punnett de arriba», y su corrector exige
+ * 6,25 con una tolerancia de 0,0625: el alumno que hacía exactamente eso —leer el panel— era
+ * corregido en contra de lo que la herramienta le había enseñado, mientras en el caso 6 (56,25,
+ * tolerancia 0,5625) el mismo «56» sí se aceptaba. La misma forma de responder valía o no según
+ * el tamaño de la respuesta.
+ *
+ * Se repara por el lado de la CIFRA y no relajando el corrector: 6,25 % es lo que da el cuadro
+ * de Punnett, y redondearlo a 6 % era perder justo la precisión que el ejercicio pide. El
+ * corrector ya admite 0,01 de desvío, que cubre de sobra lo que aquí se publica.
+ */
+const porcentajeExacto = (valor: number): string =>
+  formatNumber(valor, Number.isInteger(valor) ? 0 : 2);
 import { PunnettResult } from './types';
 
 interface StatisticsPanelProps {
@@ -66,7 +84,7 @@ export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
                   }}
                 />
               </div>
-              <span className={styles.ratioValue}>{formatNumber(ratio * 100, 0)}%</span>
+              <span className={styles.ratioValue}>{porcentajeExacto(ratio * 100)}%</span>
             </div>
           ))}
         {genotypeRatioStr && (
@@ -96,7 +114,7 @@ export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
                   }}
                 />
               </div>
-              <span className={styles.ratioValue}>{formatNumber(data.count * 100, 0)}%</span>
+              <span className={styles.ratioValue}>{porcentajeExacto(data.count * 100)}%</span>
             </div>
           ))}
         {phenotypeRatioStr && (

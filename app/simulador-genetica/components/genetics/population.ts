@@ -68,16 +68,30 @@ export function simulatePopulation(
     };
   }
 
-  // Calcular ratios esperados
+  /**
+   * Ratios esperados.
+   *
+   * ⚠️ 22/09/2026 (hallazgo 1204) — cada categoría se redondeaba por separado con `Math.round`,
+   * que además sube los medios, así que las cuatro esperanzas de un dihíbrido con N=200
+   * —112,5 · 37,5 · 37,5 · 12,5— se publicaban como 113 + 38 + 38 + 13 = 202. «Observado» suma
+   * 200 porque cuenta individuos reales, de modo que las dos columnas que se ponen una al lado
+   * de la otra PARA COMPARARSE no hablaban de la misma población.
+   *
+   * La frecuencia esperada no es un número de individuos: es una esperanza matemática, y con
+   * decimales suma exactamente N —112,5 + 37,5 + 37,5 + 12,5 = 200— que es además como la
+   * escribe cualquier libro al plantear el chi-cuadrado. Redondear el reparto habría hecho
+   * cuadrar la columna a costa de falsear el estadístico, que es lo que hay que evitar: el χ²
+   * se calcula con las frecuencias esperadas EXACTAS, no con las enteras.
+   */
   const expectedRatios: Record<string, { count: number; percentage: number }> = {};
   for (const [phenotype, data] of Object.entries(punnett.phenotypeRatios)) {
     expectedRatios[phenotype] = {
-      count: Math.round(data.count * size),
+      count: data.count * size,
       percentage: data.count * 100,
     };
   }
 
-  // Calcular chi-cuadrado
+  // Calcular chi-cuadrado, con las frecuencias esperadas exactas (hallazgo 1204)
   let chiSquare = 0;
   for (const phenotype of Object.keys(expectedRatios)) {
     const observed = observedRatios[phenotype]?.count || 0;

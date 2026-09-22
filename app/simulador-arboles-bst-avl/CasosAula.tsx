@@ -35,6 +35,8 @@ export default function CasosAula() {
   const esperado = practica ? practica.respuesta : caso.respuesta;
   const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
   const pasos = practica ? practica.pasos : caso.pasos;
+  /** Solo los casos numerados traen pista: el ejercicio aleatorio no la tiene (1208). */
+  const hayPista = !practica && Boolean(caso.pista);
   const datos = practica ? practica.datos : caso.datos;
 
   /** Al cambiar de caso se limpia todo: si no, el veredicto del anterior se queda pegado. */
@@ -153,14 +155,24 @@ export default function CasosAula() {
         )}
 
         <div className={styles.casoAyudas}>
-          <button
-            type="button"
-            className={styles.casoAyudaBoton}
-            aria-expanded={verPista}
-            onClick={() => setVerPista(!verPista)}
-          >
-            <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
-          </button>
+          {/*
+            ⚠️ 22/09/2026 (hallazgos 1208 y 1210) — el botón se pintaba siempre, también en el
+            modo «Practicar», donde el ejercicio aleatorio NO trae pista: al pulsarlo el rótulo
+            pasaba a «Ocultar pista» y `aria-expanded` a true sin que apareciera nada en el DOM,
+            así que un lector de pantalla anunciaba una región expandida vacía y quien ve la
+            pantalla pulsaba dos veces sin entender qué había hecho. Un control de despliegue no
+            puede ofrecerse cuando no hay nada que desplegar.
+          */}
+          {hayPista && (
+            <button
+              type="button"
+              className={styles.casoAyudaBoton}
+              aria-expanded={verPista}
+              onClick={() => setVerPista(!verPista)}
+            >
+              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+            </button>
+          )}
           <button
             type="button"
             className={styles.casoAyudaBoton}
@@ -171,7 +183,7 @@ export default function CasosAula() {
           </button>
         </div>
 
-        {verPista && !practica && <p className={styles.casoPista}>{caso.pista}</p>}
+        {verPista && hayPista && <p className={styles.casoPista}>{caso.pista}</p>}
 
         {verSolucion && (
           <div className={styles.casoSolucion}>
