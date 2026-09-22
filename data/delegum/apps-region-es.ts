@@ -82,6 +82,7 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'simulador-subvenciones-rehabilitacion',
   'test-estilo-parental',
   'test-obligado-declarar-renta',
+  'test-perfil-inversor',
   'test-zarit-cuidador',
   'validador-dni-nif-cif',
   'verificador-complemento-brecha-genero',
