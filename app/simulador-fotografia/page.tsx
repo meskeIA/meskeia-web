@@ -13,15 +13,21 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorFotografia.module.css';
+import {
+  ISO_VALUES,
+  APERTURE_VALUES,
+  SHUTTER_VALUES,
+  TOLERANCIA_EV,
+  isoStops,
+  apertureStops,
+  shutterStops,
+  calcDeltaEV,
+  indiceParaStops,
+} from './casos';
+import CasosAula from './CasosAula';
 
 type Modo = 'libre' | 'compensado';
 type EscenaId = 'retrato' | 'paisaje' | 'deporte';
-
-const ISO_VALUES = [100, 200, 400, 800, 1600, 3200, 6400] as const;
-const APERTURE_VALUES = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16, 22] as const;
-const SHUTTER_VALUES = [
-  1, 1 / 2, 1 / 4, 1 / 8, 1 / 15, 1 / 30, 1 / 60, 1 / 125, 1 / 250, 1 / 500, 1 / 1000, 1 / 2000, 1 / 4000,
-] as const;
 
 interface EscenaConfig {
   id: EscenaId;
@@ -66,53 +72,9 @@ const ESCENAS: EscenaConfig[] = [
   },
 ];
 
-function isoStops(idx: number) {
-  return Math.log2(ISO_VALUES[idx] / ISO_VALUES[0]);
-}
-function apertureStops(idx: number) {
-  // Cantidad de luz ∝ 1/f². Stop = -2·log2(f/f_ref). f bajo = más luz.
-  return -2 * Math.log2(APERTURE_VALUES[idx] / APERTURE_VALUES[0]);
-}
-function shutterStops(idx: number) {
-  return Math.log2(SHUTTER_VALUES[idx] / SHUTTER_VALUES[0]);
-}
-
-function calcDeltaEV(isoIdx: number, apIdx: number, shIdx: number, ref: EscenaConfig) {
-  return (
-    (isoStops(isoIdx) - isoStops(ref.isoIdx)) +
-    (apertureStops(apIdx) - apertureStops(ref.apIdx)) +
-    (shutterStops(shIdx) - shutterStops(ref.shIdx))
-  );
-}
-
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
-
-/**
- * Índice de la escala cuyo valor en stops queda más cerca del objetivo.
- *
- * El modo compensado sumaba el número de stops directamente AL ÍNDICE del deslizador. Para
- * el ISO cuela, porque `isoStops(i)` vale exactamente `i` (100, 200, 400… son potencias de
- * dos), pero para la velocidad no: `shutterStops` DECRECE al avanzar el índice (idx 0 = 1 s,
- * idx 12 = 1/4000 s), así que para aportar +n stops de luz el índice tiene que BAJAR n. Al
- * sumarlos, la corrección no cancelaba el error sino que lo DUPLICABA, y el simulador
- * enseñaba justo lo contrario de la regla que dice enseñar: de f/2,8 a f/8 en modo
- * compensado marcaba −6,0 EV donde debía marcar +0,0. Además la escala de velocidades no
- * es exactamente logarítmica (de 1/8 a 1/15 hay 0,91 stops, no 1), de modo que contar
- * índices tampoco daría el valor correcto aunque el signo fuese el bueno.
- */
-/**
- * Desviación por debajo de la cual la exposición se considera correcta.
- *
- * La escala de velocidades no es exactamente logarítmica, así que la compensación deja
- * restos de centésimas de stop, y la aritmética binaria añade los suyos: en seis
- * combinaciones de la escena Deportes el resultado exacto 0 salía −4,44·10⁻¹⁶, y
- * `formatNumber` rotula «~0» todo lo que cae entre 0 y 0,0001 — de modo que en la misma
- * pantalla convivían «Exposición correcta (~0 EV)» y «(+0,0 EV)» (hallazgo 274). Medio
- * décimo de stop no lo distingue ningún ojo ni ningún fotómetro.
- */
-const TOLERANCIA_EV = 0.05;
 
 /**
  * Lleva un parámetro a aportar `stopsDe(actual) + pendiente` stops, y devuelve lo que NO ha
@@ -127,14 +89,6 @@ function absorber(
   const objetivo = stopsDe(actual) + pendiente;
   const indice = indiceParaStops(objetivo, stopsDe, longitud);
   return { indice, restante: objetivo - stopsDe(indice) };
-}
-
-function indiceParaStops(objetivo: number, stopsDe: (i: number) => number, longitud: number) {
-  let mejor = 0;
-  for (let i = 1; i < longitud; i++) {
-    if (Math.abs(stopsDe(i) - objetivo) < Math.abs(stopsDe(mejor) - objetivo)) mejor = i;
-  }
-  return mejor;
 }
 
 function formatShutter(idx: number) {
@@ -564,6 +518,10 @@ export default function SimuladorFotografiaPage() {
             </div>
           </div>
         </div>
+
+        {/* Casos para clase — la tarea asignable. Va FUERA de EducationalSection a propósito:
+            esa sección nace colapsada y una tarea que hay que desplegar no se asigna. */}
+        <CasosAula />
 
         <EducationalSection
           title="Guía del Triángulo de Exposición"

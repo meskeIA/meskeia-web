@@ -572,3 +572,270 @@ test('todos los botones de la app llevan type="button"', async ({ page }) => {
   );
   expect(sinTipo, 'botones de la app sin type="button"').toBe(0);
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE — la tarea asignable (skill /casos-aula-meskeia), añadida el 22/09/2026
+ *
+ * Estas pruebas NO abren el navegador: importan `casos.ts` y lo ejercitan como el módulo puro
+ * que es. Van detrás del acta del Inspector, que es el contrato de la app y no se toca.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO (todos a mano desde la definición, ninguno copiado de
+ * lo que devuelve la app; si el módulo discrepa de esta tabla, manda la tabla)
+ *
+ *   ΔEV = log₂(ISO/ISO₀) + 2·log₂(N₀/N) + log₂(t/t₀), POSITIVO = más luz = sobreexpuesto.
+ *
+ *    1 · f/4 → f/8            → −2·log₂(8/4) = −2·1        = −2 EV
+ *    2 · ISO 200 → 1600       → log₂(1600/200) = log₂ 8     = +3 EV
+ *    3 · 1/125 → 1/1000       → log₂(125/1000) = log₂(1/8)  = −3 EV
+ *    4 · f/2,8 → f/1,4 = +2 EV; la velocidad debe dar −2 → 1/125 ÷ 4 = 1/500 s
+ *    5 · f/11 → f/22 = −2·log₂ 2 = −2 EV; el ISO debe dar +2 → 100 × 4 = ISO 400
+ *    6 · 1/1000 → 1/4000 = −2 EV; el diafragma debe dar +2 → f/4 ÷ 2 = f/2
+ *    7 · ISO ×4 (+2) y f/2 → f/4 (−2·log₂ 2 = −2)          = 0 EV
+ *    8 · ISO ×4 (+2) y f/2 → f/8 (−2·log₂ 4 = −4)          = −2 EV
+ *    9 · f/8 → f/11  → −2·log₂(11/8)  = −2·0,4594316 = −0,9188632 → −0,92 EV
+ *   10 · 1/60 → 1/125 → log₂(60/125)  = −1,0588937             → −1,06 EV
+ *   11 · 1/1000 → 1/250 = +2 EV; el ISO debe dar −2 → 400 ÷ 4 = ISO 100
+ *   12 · ISO 1600 → 400 = −2 EV; el diafragma debe dar +2 → f/5,6 ÷ 2 = f/2,8
+ *
+ * Los casos 9 y 10 son los que fijan el convenio de esta app: las escalas están ROTULADAS con
+ * números comerciales redondeados (f/11 por 11,314; 1/125 por 1/128), así que un salto de
+ * rótulo NO vale siempre un stop entero. Los otros diez se mueven dentro de familias exactas
+ * justamente para que su respuesta no dependa de ese redondeo.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  toleranciaDe,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  textoRespuesta,
+  isoStops,
+  apertureStops,
+  shutterStops,
+  calcDeltaEV,
+  ISO_VALUES,
+  APERTURE_VALUES,
+  SHUTTER_VALUES,
+  SHUTTER_DENOMINADORES,
+  FAMILIAS_APERTURA,
+  FAMILIAS_VELOCIDAD,
+} from '../../app/simulador-fotografia/casos';
+
+const A_MANO: Readonly<Record<number, number>> = {
+  1: -2, 2: 3, 3: -3, 4: 500, 5: 400, 6: 2, 7: 0, 8: -2, 9: -0.92, 10: -1.06, 11: 100, 12: 2.8,
+};
+
+test.describe('casos para clase · simulador-fotografia', () => {
+  test('1 · hay doce casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan el mismo enunciado y la misma respuesta', async () => {
+    for (const caso of CASOS) {
+      const gemelo = CASOS.find((c) => c.id === caso.id)!;
+      expect(gemelo.enunciado).toBe(caso.enunciado);
+      expect(gemelo.respuesta).toBe(caso.respuesta);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      const decimales = caso.datos.decimales ?? 2;
+      const factor = 10 ** decimales;
+      expect(Math.round(r.valor * factor) / factor, `caso ${caso.id}`).toBeCloseTo(caso.respuesta, 6);
+    }
+  });
+
+  test('3.bis · cada respuesta coincide con la calculada A MANO en la cabecera', async () => {
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBeCloseTo(A_MANO[caso.id], 2);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta no vacía, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThan(1);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.respuestaTexto, `caso ${caso.id}`).not.toBe('—');
+    }
+  });
+
+  test('4.bis · los casos con respuesta no redonda avisan de que hay que redondear', async () => {
+    // Si la respuesta no cae en un múltiplo de 0,25 EV, el enunciado TIENE que pedir el
+    // redondeo: si no, el alumno no sabe con cuántos decimales se le va a corregir.
+    for (const caso of CASOS.filter((c) => c.datos.pregunta === 'deltaEV')) {
+      const redonda = Math.abs(caso.respuesta * 4 - Math.round(caso.respuesta * 4)) < 1e-9;
+      if (!redonda) {
+        expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(true);
+        expect(caso.enunciado.toLowerCase(), `caso ${caso.id}`).toContain('redondea');
+      }
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    // El canal de aula es 90 % latinoamericano y España solo el 8,6 %: un enunciado anclado
+    // a un lugar excluye a la mayor parte de quien lo va a leer.
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Bolivia|Guatemala|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    // Reproducible: misma semilla, mismo ejercicio.
+    for (const semilla of [1, 7, 12345, 98765]) {
+      const a = generarEjercicioAleatorio(semilla);
+      const b = generarEjercicioAleatorio(semilla);
+      expect(b.enunciado).toBe(a.enunciado);
+      expect(b.respuesta).toBe(a.respuesta);
+    }
+
+    // Variado: un generador degenerado PASA la prueba de reproducibilidad (simulador-genetica,
+    // 14/09/2026), así que hay que pedirle varias semillas a la vez y contar respuestas.
+    const respuestas = new Set<string>();
+    for (let s = 1; s <= 40; s++) respuestas.add(String(generarEjercicioAleatorio(s).respuesta));
+    expect(respuestas.size, 'respuestas distintas en 40 semillas').toBeGreaterThanOrEqual(3);
+
+    // Misma aritmética que los fijos: su respuesta se recalcula con el mismo `resolverCaso`.
+    for (let s = 1; s <= 40; s++) {
+      const ej = generarEjercicioAleatorio(s);
+      const r = resolverCaso(ej.datos);
+      expect(r.ok, `semilla ${s}: ${r.error ?? ''}`).toBe(true);
+      const decimales = ej.datos.decimales ?? 2;
+      const factor = 10 ** decimales;
+      expect(Math.round(r.valor * factor) / factor, `semilla ${s}`).toBeCloseTo(ej.respuesta, 6);
+      expect(Number.isFinite(ej.respuesta), `semilla ${s}`).toBe(true);
+      expect(ej.etiquetaRespuesta.trim(), `semilla ${s}`).not.toBe('');
+    }
+  });
+
+  /* ── 7 · el convenio de ESTA app, fijado para que nadie lo cambie sin querer ── */
+
+  test('7 · el signo es el del fotómetro: positivo = MÁS luz', async () => {
+    // Abrir el diafragma (número f menor) mete luz; cerrarlo la quita. Con el EV clásico
+    // EV = log₂(N²/t) saldría justo al revés, y el pie de la app lo advierte.
+    const abrir = resolverCaso({ iso0: 100, ap0: 8, den0: 250, ap1: 4, pregunta: 'deltaEV' });
+    expect(abrir.valor).toBeCloseTo(2, 10);
+    const cerrar = resolverCaso({ iso0: 100, ap0: 4, den0: 250, ap1: 8, pregunta: 'deltaEV' });
+    expect(cerrar.valor).toBeCloseTo(-2, 10);
+
+    // Subir el ISO mete luz; alargar la exposición también.
+    const iso = resolverCaso({ iso0: 100, ap0: 4, den0: 250, iso1: 400, pregunta: 'deltaEV' });
+    expect(iso.valor).toBeCloseTo(2, 10);
+    const lenta = resolverCaso({ iso0: 100, ap0: 4, den0: 1000, den1: 250, pregunta: 'deltaEV' });
+    expect(lenta.valor).toBeCloseTo(2, 10);
+  });
+
+  test('7.bis · la luz va con el CUADRADO del número f, no con el número f', async () => {
+    // Es el error clásico del tema: duplicar f no divide la luz entre 2 sino entre 4.
+    const r = resolverCaso({ iso0: 100, ap0: 2, den0: 250, ap1: 4, pregunta: 'deltaEV' });
+    expect(r.valor).toBeCloseTo(-2, 10);
+    expect(Math.abs(r.valor + 1)).toBeGreaterThan(0.5);
+  });
+
+  test('7.ter · las escalas son NOMINALES: f/11 y 1/125 no valen un stop entero', async () => {
+    // Si alguien «arreglase» las escalas poniendo 11,314 y 1/128, estos dos casos cambiarían
+    // y con ellos lo que la app enseña. Los valores son los que se rotulan en una cámara.
+    const f11 = resolverCaso({ iso0: 200, ap0: 8, den0: 125, ap1: 11, pregunta: 'deltaEV' });
+    expect(f11.valor).toBeCloseTo(-2 * Math.log2(11 / 8), 10);
+    expect(f11.valor).toBeCloseTo(-0.9188632, 6);
+
+    const v125 = resolverCaso({ iso0: 400, ap0: 5.6, den0: 60, den1: 125, pregunta: 'deltaEV' });
+    expect(v125.valor).toBeCloseTo(Math.log2(60 / 125), 10);
+    expect(v125.valor).toBeCloseTo(-1.0588937, 6);
+  });
+
+  test('7.quater · dentro de una familia exacta el salto SÍ vale un número entero de stops', async () => {
+    // Es la razón por la que los diez casos restantes usan solo estas familias.
+    for (const familia of FAMILIAS_APERTURA) {
+      for (let i = 1; i < familia.length; i++) {
+        const r = resolverCaso({
+          iso0: 100, ap0: familia[i - 1], den0: 250, ap1: familia[i], pregunta: 'deltaEV',
+        });
+        expect(r.valor, `f/${familia[i - 1]} a f/${familia[i]}`).toBeCloseTo(-2, 9);
+      }
+    }
+    for (const familia of FAMILIAS_VELOCIDAD) {
+      for (let i = 1; i < familia.length; i++) {
+        const r = resolverCaso({
+          iso0: 100, ap0: 4, den0: familia[i - 1], den1: familia[i], pregunta: 'deltaEV',
+        });
+        expect(r.valor, `1/${familia[i - 1]} a 1/${familia[i]}`).toBeCloseTo(-1, 9);
+      }
+    }
+  });
+
+  test('7.quinquies · las dos listas de velocidad describen la MISMA escala', async () => {
+    // `SHUTTER_DENOMINADORES` existe para que los casos hablen de enteros; si alguien tocara
+    // una lista y no la otra, los enunciados dirían una velocidad y el motor calcularía otra.
+    expect(SHUTTER_DENOMINADORES.length).toBe(SHUTTER_VALUES.length);
+    SHUTTER_VALUES.forEach((v, i) => {
+      expect(v, `puesto ${i}`).toBe(1 / SHUTTER_DENOMINADORES[i]);
+    });
+  });
+
+  test('7.sexies · la vista y los casos calculan con LA MISMA función', async () => {
+    // `page.tsx` importa estas cinco de `casos.ts`. La comprobación es que el ΔEV de un caso
+    // coincide con el que el medidor de la app produciría para esa misma combinación.
+    const ref = { isoIdx: 0, apIdx: 3, shIdx: 8 }; // ISO 100 · f/4 · 1/250
+    const conCasos = resolverCaso({ iso0: 100, ap0: 4, den0: 250, ap1: 8, pregunta: 'deltaEV' }).valor;
+    const conVista = calcDeltaEV(0, (APERTURE_VALUES as readonly number[]).indexOf(8), 8, ref);
+    expect(conCasos).toBeCloseTo(conVista, 12);
+
+    // Y las tres funciones de stops siguen valiendo lo que la app documenta.
+    expect(isoStops((ISO_VALUES as readonly number[]).indexOf(400))).toBeCloseTo(2, 12);
+    expect(apertureStops((APERTURE_VALUES as readonly number[]).indexOf(2.8))).toBeCloseTo(-2, 12);
+    expect(shutterStops((SHUTTER_DENOMINADORES as readonly number[]).indexOf(4))).toBeCloseTo(-2, 12);
+  });
+
+  /* ── Corrección ── */
+
+  test('la corrección tolera el redondeo pero no una respuesta equivocada', async () => {
+    const caso9 = CASOS.find((c) => c.id === 9)!;
+    expect(comprobarRespuesta(-0.92, caso9.respuesta).correcto).toBe(true);
+    expect(comprobarRespuesta(-1, caso9.respuesta).correcto).toBe(false);
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(500)).toBe(5);
+  });
+
+  test('el signo invertido se corrige con un mensaje propio, no con un «te has desviado»', async () => {
+    // Quien viene de la definición clásica EV = log₂(N²/t) invierte TODOS los signos, y
+    // decirle solo «no es correcto» no le enseña dónde está el malentendido.
+    const v = comprobarRespuesta(2, -2);
+    expect(v.correcto).toBe(false);
+    expect(v.motivo).toContain('signo');
+  });
+
+  test('una entrada que no es número se responde con un veredicto, no con NaN en pantalla', async () => {
+    const v = comprobarRespuesta(NaN, -2);
+    expect(v.correcto).toBe(false);
+    expect(v.motivo).not.toContain('NaN');
+    expect(textoRespuesta(NaN, 'deltaEV')).toBe('—');
+  });
+
+  test('un caso sin respuesta en la escala se rechaza en vez de dar el valor más parecido', async () => {
+    // De f/8 a f/11 hay 0,92 EV: ningún ISO de la escala compensa eso, porque todos van de
+    // stop en stop. La resolución tiene que fallar, no devolver ISO 200 como si valiera.
+    const r = resolverCaso({ iso0: 100, ap0: 8, den0: 250, ap1: 11, pregunta: 'iso' });
+    expect(r.ok).toBe(false);
+    expect(r.error).toBeTruthy();
+    expect(Number.isFinite(r.valor)).toBe(false);
+  });
+
+  test('el texto de la respuesta lleva siempre su unidad', async () => {
+    expect(textoRespuesta(-2, 'deltaEV')).toBe('-2 EV');
+    expect(textoRespuesta(400, 'iso')).toBe('ISO 400');
+    expect(textoRespuesta(2.8, 'apertura')).toBe('f/2,8');
+    expect(textoRespuesta(500, 'velocidad')).toBe('1/500 s');
+    expect(textoRespuesta(1, 'velocidad')).toBe('1 s');
+  });
+});
