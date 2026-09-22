@@ -516,6 +516,44 @@ conjunta del art. 84.2 (3.400 / 2.150 €) **sí** se resta de la base y no lo d
 > cabecera de `scripts/check-minimo-irpf.mjs`. Sus casos de prueba, en
 > `scripts/pruebas/minimo-irpf.tsx`; se le reinyectan con **`npm run minimo:probar-candado`**.
 
+### Candado del contraste de las cabeceras de tabla
+
+`npm run check:contraste-cabeceras` — lo ejecuta también `npm run build`, y **rompe el build**
+si una cabecera de tabla (`<th>`, `<thead>`, la clase `.th`) pone **texto blanco sobre
+`var(--primary)` o `var(--secondary)`**, en la hoja de estilos o en un `style={{…}}` del JSX.
+
+Los colores de marca son identidad, no contraste: con blanco encima dan **4,11:1** el azul y
+**2,80:1** el teal, y en oscuro —donde `--primary` aclara a #3FA5D1— caen a **2,79** y **2,23**.
+Un `<th>` es negrita de ~14-16px, o sea texto pequeño: exige 4,5:1. Los tokens que sí valen
+existen desde el 21/08/2026 y se crearon para esto: **`--primary-boton`** (5,47:1) y
+**`--secondary-boton`** (5,15:1), iguales en **ambos temas**. `var(--hero-bg)` no lo enciende:
+da 8,33:1.
+
+Salió del hallazgo 1175 del Inspector (21/09/2026), **tercera vuelta sobre la misma tabla** de
+`simulador-gastos-compraventa-nave-industrial`: el 648 arregló las celdas de respuesta y el 684
+la de la cifra, y las tres veces se midió el TEXTO de las celdas mientras la fila del `<thead>`
+no se medía nunca, **porque su color no está en el texto sino en el FONDO**. El barrido del
+22/09/2026 encontró que no era un caso aislado: **683 bloques en 518 ficheros**, 389 de ellos
+fallando además en oscuro, y **3 que seguían en línea en el JSX** —`selector-modelo-negocio`,
+`simulador-gastos-compraventa-local-comercial` y `-solar`—, gemelos exactos del 1175 en apps
+hermanas que aquella reparación dejó atrás.
+
+⚠️ **Sin pasivo**, como `check:og-image`: barre el árbol entero. Se drenó el 22/09/2026, así que
+solo puede encenderlo código nuevo. Falso positivo: `contraste-ok: <razón>` en esa línea o en el
+comentario anterior, y **la razón es obligatoria** — la marca a secas también rompe el build.
+
+⚠️ **Lo que NO mira**: el color de marca como TEXTO sobre fondo claro (`color: var(--primary)`,
+4,11:1), que se resuelve con `--primary-texto`; y los **2.042 bloques de botones, tabs, badges y
+números de paso** con fondo de marca medidos el 22/09/2026 (1.004 de ellos botones), que son
+campaña aparte porque cambiarlos altera el aspecto de la interacción en 782 apps.
+
+> Las cuatro formas que tenía el pasivo y las dos que NO debe encender: cabecera de
+> `scripts/check-contraste-cabeceras.mjs`. Sus 13 casos de prueba, en
+> `scripts/pruebas/probar-check-contraste-cabeceras.mjs`; se le reinyectan con
+> **`npm run contraste:probar-candado`**, que incluye el caso de origen en sus dos versiones —el
+> `<tr style>` de nave-industrial antes del 1175, que debe FALLAR, y el reparado, que debe CALLAR.
+> La medición por PÍXEL, en `tests/contraste-cabeceras-tabla.spec.ts`.
+
 ### Candado del parser numérico
 
 `npm run check:parser` — lo ejecuta también `npm run build`, y **rompe el build** si el commit
