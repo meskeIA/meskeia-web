@@ -104,7 +104,21 @@
   /* Textos invertidos */
   --text-primary: #E8E8E8;
   --text-secondary: #B0B0B0;
-  --text-muted: #808080;
+  --text-muted: #9B9B9B; /* 6,26:1 sobre la página #1A1A1A · 4,96 sobre la tarjeta
+                            #2D2D2D · 5,16 sobre el #2A2A2A que 462 módulos declaran
+                            como tarjeta propia · 4,55 sobre el #333333 de los widgets.
+                            Era #808080, que daba 3,49 sobre la tarjeta y 4,41 sobre la
+                            página: cuando se reparó el claro el 21/08/2026 el tema
+                            oscuro no se midió, y hasta el 22/09/2026 estuvo por debajo
+                            de AA en las 1.001 apps a la vez (pie, copyright del aviso
+                            legal y descripciones de RelatedApps). Medido en navegador
+                            sobre 30 rutas, no calculado contra el fondo declarado —que
+                            es el error de agosto, cuando #757575 se eligió contra blanco
+                            puro y sobre la tarjeta real se quedaba en 4,41. NO cubre el
+                            texto muted sobre --border (#404040, 3,73) ni sobre --hover
+                            (#383838, 4,22), que son fondos de píldora y se reparan en
+                            su app. Separa 1,28:1 de --text-secondary; la compresión de
+                            la jerarquía es deliberada. */
 
   /* Bordes y hover oscuros */
   --border: #404040;
