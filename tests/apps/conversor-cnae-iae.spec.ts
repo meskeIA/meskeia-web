@@ -62,6 +62,14 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     a 96.22), confección (14.10 frente a 14.21), decoración de interiores (43.34 frente a
  *     74.13), viajes (52.32 frente a 79.11/79.12), menaje e iluminación (47.52 frente a
  *     47.55) y los puestos de mercadillo de ropa (47.12 frente a 47.71).
+ *   · RE-inspección  22/09/2026 → la batería entera (72) pasa en verde antes de tocar nada,
+ *     así que los seis hallazgos del 21/09 siguen cerrados. Tres casos nuevos en
+ *     «re-inspección del 22/09/2026», los tres en terreno no barrido: la división 69
+ *     (profesiones jurídicas), la consulta tecleada CARÁCTER A CARÁCTER —todos los casos
+ *     anteriores siembran con `fill()`, que entrega el valor en un solo evento— y el par
+ *     «69.30»/«731.3». Y 2 hallazgos BAJOS en «hallazgos abiertos del 22/09/2026», con
+ *     `test.fail()`. Ninguno de los dos es el mecanismo del 423: el diccionario de
+ *     sinónimos aguantó el barrido de esta vuelta.
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -2456,5 +2464,221 @@ test.describe('Buscador CNAE-IAE — regresión de los hallazgos 1162-1167 del 2
     await buscarCnaeVerificado(page, 'mercadillo de ropa');
     await expect(fichas(page).first()).toContainText('47.71');
     await expect(fichas(page).first()).toContainText('prendas de vestir');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 22/09/2026 — tres casos nuevos, resueltos a mano ANTES del navegador
+//
+// La batería entera (72) pasa en verde antes de tocar nada, así que los seis hallazgos del
+// 21/09 (1162-1167) siguen cerrados. Mismo método que las anteriores: cada valor esperado
+// sale del catálogo sellado (`public/datos/cnae-iae-catalogo.json`, `meta.generado` =
+// 2026-09-14) o de `data/fiscal/cnae-iae.ts`, y la consulta se siembra comprobando que llegó
+// al ESTADO de React.
+//
+// Los tres se eligieron fuera del terreno barrido: ninguna inspección anterior había entrado
+// en la división 69 (profesiones jurídicas y contables) ni había tecleado una consulta
+// CARÁCTER A CARÁCTER, que es como escribe un usuario y no como escribe `fill()`.
+//
+// EL EJE DE ESTA RE-INSPECCIÓN era la honestidad de lo que la app promete, porque no existe
+// tabla oficial CNAE ⇄ IAE. Verificado en las TRES bocas sobre el servidor de producción:
+//   · Visible y no colapsable: el <h2> «Aquí no hay conversión automática de CNAE a IAE, y
+//     es a propósito» y el DisclaimerCard crítico.
+//   · JSON-LD FAQPage (el canal que citan ChatGPT, Perplexity y Bing Copilot): la primera
+//     respuesta termina «…no existe una tabla oficial de equivalencia entre ellos».
+//   · Las dos normas se citan donde hacen falta y DERIVADAS del módulo, no transcritas:
+//     RD Legislativo 1175/1990 para el IAE, RD 10/2025 para la CNAE-2025 y RD 475/2007 como
+//     norma anterior en la tabla comparativa.
+// Nada de eso es hallazgo: está bien y no hay que romperlo.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — re-inspección del 22/09/2026', () => {
+  test('CASO 1 (normal) — «abogado» cae en 69.10 en la CNAE y en el grupo 731 de la Sección 2ª del IAE, que retiene', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── Resuelto a mano sobre el catálogo sellado ──────────────────────────
+    // CNAE-2025: la única entrada cuyo texto de búsqueda contiene «abogado» es la clase
+    // 69.10 «Actividades jurídicas» (ningún título oficial lleva la palabra; el término
+    // entra por el diccionario, junto a «abogada», «letrado» y «procurador»). Su camino es
+    // Sección N «ACTIVIDADES PROFESIONALES, CIENTÍFICAS Y TÉCNICAS» → División 69
+    // «Actividades jurídicas y de contabilidad» → Grupo 69.1 «Actividades jurídicas», y
+    // `correspondenciaInversa['6910'] = ['69.10']`, así que la nota de procedencia tiene que
+    // decir 6910 y nada más. El resultado tiene que ser UNO.
+    await buscarCnaeVerificado(page, 'abogado');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page)).toHaveCount(1);
+    await expect(fichas(page).first()).toContainText('69.10');
+    await expect(fichas(page).first()).toContainText('Actividades jurídicas');
+    await expect(fichas(page).first()).toContainText('Sección N');
+    await expect(fichas(page).first()).toContainText('División 69');
+    await expect(fichas(page).first()).toContainText(
+      'Actividades jurídicas y de contabilidad',
+    );
+    await expect(fichas(page).first()).toContainText('Grupo 69.1');
+    await expect(fichas(page).first()).toContainText('En la CNAE-2009 esto correspondía a 6910.');
+
+    // IAE: en las Tarifas el abogado NO es una actividad empresarial. El único resultado con
+    // «abogado» es el grupo 731 de la SECCIÓN 2ª —Agrupación 73 «Profesionales del Derecho»,
+    // División 7 «PROFESIONALES RELACIONADOS CON LAS ACTIVIDADES FINANCIERAS, JURÍDICAS, DE
+    // SEGUROS Y DE ALQUILERES»—, así que sus facturas a empresas y profesionales llevan
+    // retención de IRPF. El texto no se transcribe: se le pregunta a SECCIONES_IAE.
+    //
+    // Ojo al número: «731» es también un grupo de la Sección 1ª («Transporte marítimo
+    // internacional»). Por eso la consulta va por PALABRA y el aserto exige la sección.
+    await buscarIaeVerificado(page, 'abogado');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page)).toHaveCount(1);
+    await expect(fichas(page).first()).toContainText('731');
+    await expect(fichas(page).first()).toContainText('Abogados');
+    await expect(fichas(page).first()).toContainText('Sección 2ª');
+    await expect(fichas(page).first()).toContainText('Agrupación 73');
+    await expect(fichas(page).first()).toContainText('Profesionales del Derecho');
+    await expect(fichas(page).first()).toContainText(SECCION_2.retencion);
+  });
+
+  test('CASO 2 (límite) — «peluquera» tecleada carácter a carácter: cada pulsación llega al estado de React', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── Por qué este caso y no otro ───────────────────────────────────────
+    // Todos los casos anteriores de este fichero siembran con `fill()`, que entrega el valor
+    // ENTERO en un solo evento. Un campo que validara pulsación a pulsación daría verde con
+    // `fill()` y no admitiría nada tecleado, así que aquí se escribe letra a letra y se
+    // comprueba el estado de React después de CADA una.
+    //
+    // ── Resuelto a mano sobre el catálogo sellado ──────────────────────────
+    // El prefijo «peluquer» casa con exactamente TRES entradas, y ninguna de ellas lo
+    // necesita del diccionario: la clase 96.21 «Peluquerías y barberías», la clase 96.99
+    // «Otros servicios personales n.c.o.p.» y el grupo 96.2 «Peluquería, tratamientos de
+    // belleza, spas y actividades similares». Las clases van antes que el grupo.
+    await buscarCnaeVerificado(page, 'peluquero');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page).first()).toContainText('96.21');
+    await expect(fichas(page).first()).toContainText('Peluquerías y barberías');
+    await expect(fichas(page).first()).toContainText('Sección T');
+    await expect(fichas(page).first()).toContainText('División 96');
+    await expect(fichas(page).first()).toContainText('Grupo 96.2');
+    await expect(fichas(page).first()).toContainText('En la CNAE-2009 esto correspondía a 9602.');
+
+    // Ahora, tecleando. Se vacía primero y se comprueba que el vaciado también llegó.
+    const campo = page.locator('#buscador-cnae');
+    await campo.fill('');
+    await esperarValorEnReact(page, '#buscador-cnae', '');
+    await campo.focus();
+
+    let escrito = '';
+    for (const letra of 'peluquer') {
+      await campo.press(letra);
+      escrito += letra;
+      // El testigo de que la pulsación no se perdió: el ESTADO de React, no el DOM.
+      await esperarValorEnReact(page, '#buscador-cnae', escrito);
+    }
+    await expect(contador(page)).toHaveText(/^3 resultados/);
+    await expect(fichas(page)).toHaveCount(3);
+    await expect(fichas(page).nth(0)).toContainText('96.21');
+    await expect(fichas(page).nth(1)).toContainText('96.99');
+    await expect(fichas(page).nth(2)).toContainText('96.2');
+
+    // Y la última letra —la que convierte el oficio en femenino— también llega al estado.
+    // Lo que la app haga con ella es otra cosa, y va en el bloque de hallazgos abiertos.
+    await campo.press('a');
+    await esperarValorEnReact(page, '#buscador-cnae', 'peluquera');
+  });
+
+  test('CASO 3 (debe rechazarse) — «69.30» y «731.3» son verosímiles y no existen en ninguno de los dos catálogos', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // La división 69 de la CNAE-2025 se agota en los grupos 69.1 y 69.2, con una sola clase
+    // cada uno (69.10 y 69.20). «69.30» es la continuación natural de quien va contando, y
+    // no existe. Tampoco es clave de la tabla de correspondencia del INE —«6930» no figura
+    // en `correspondencia`—, así que en una app de nivel 1 crítico hay que comprobar además
+    // que NO se emita el aviso de código antiguo: inventar una equivalencia sería peor que
+    // no dar ninguna.
+    await buscarCnaeVerificado(page, '69.30');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+
+    // En el IAE, el grupo 731 de la Sección 1ª «Transporte marítimo internacional (excepto de
+    // crudos y gases)» tiene exactamente dos epígrafes, 731.1 y 731.2. «731.3» es igual de
+    // verosímil e igual de inexistente: nada en el catálogo empieza por 7313.
+    await buscarIaeVerificado(page, '731.3');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(page.locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+
+    // Contraprueba de que el rechazo es del código y no de la consulta: «731» a secas sí
+    // devuelve cuatro entradas, las dos del transporte marítimo y el grupo de Abogados.
+    await buscarIaeVerificado(page, '731');
+    await expect(contador(page)).toHaveText(/^4 resultados/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 22/09/2026 — escritos con `test.fail()` afirmando lo que DEBERÍA
+// ocurrir. El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces
+// se les quita la marca y se quedan como regresión, SIN tocar el valor esperado.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 22/09/2026', () => {
+  test('BAJO — el femenino del oficio debe encontrar la misma clase que el masculino, como ya hace «abogada»', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // El diccionario de términos coloquiales SÍ indexa el femenino en siete oficios
+    // —abogada, arquitecta, ingeniera, fotógrafa, traductora, veterinaria y constructora—,
+    // así que el criterio existe y está tomado. Lo que no está es aplicado: en el resto de
+    // profesiones solo figura el masculino, y como la búsqueda es por SUBCADENA («peluquera»
+    // no está dentro de «peluquerías» ni de «peluquero»), el femenino devuelve CERO.
+    //
+    // Medido sobre el catálogo sellado: el masculino de ~100 términos de oficio de una sola
+    // palabra no tiene su femenino indexado. Entre ellos peluquera, psicóloga, fontanera,
+    // programadora, carnicera, pescadera, panadera, jardinera, escritora, escultora,
+    // pintora, odontóloga, ginecóloga, letrada, procuradora, auditora, consultora y
+    // repartidora. No es un dato equivocado —la app no dice nada falso—, pero deja en blanco
+    // a quien escribe su oficio como lo dice, que es justo lo que la página le pide («Escribe
+    // cómo describirías tu trabajo»), y el vacío llega también al IAE, donde «peluquera» no
+    // encuentra el 972.1 «Servicios de peluquería de señora y caballero».
+    await buscarCnaeVerificado(page, 'peluquera');
+    await expect(fichas(page).first()).toContainText('96.21');
+    await expect(fichas(page).first()).toContainText('Peluquerías y barberías');
+
+    await buscarCnaeVerificado(page, 'psicóloga');
+    await expect(fichas(page).first()).toContainText('86.93');
+  });
+
+  test('BAJO — el `aria-controls` de la pestaña inactiva apunta a un panel que no está en el DOM', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // Solo se monta el `<div role="tabpanel">` de la pestaña activa, pero las DOS pestañas
+    // llevan su `aria-controls` fijo. Con la CNAE activa, `#tab-iae` apunta a `panel-iae`,
+    // que no existe; al cambiar de pestaña, el que queda colgando es el de `#tab-cnae`.
+    // Es una referencia ARIA rota (la regla `aria-valid-attr-value` de axe), no un bloqueo:
+    // las dos pestañas siguen siendo alcanzables con el tabulador y `aria-selected` es
+    // correcto en todo momento.
+    const colgando = async () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll('[role="tab"]')]
+          .filter((t) => !document.getElementById(t.getAttribute('aria-controls') ?? ''))
+          .map((t) => `${t.id} → ${t.getAttribute('aria-controls')}`),
+      );
+
+    expect(await colgando()).toEqual([]);
+    await page.getByRole('tab', { name: 'Epígrafes del IAE' }).click();
+    await expect(page.locator('#panel-iae')).toBeVisible();
+    expect(await colgando()).toEqual([]);
   });
 });

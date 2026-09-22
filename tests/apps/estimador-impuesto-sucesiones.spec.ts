@@ -1334,3 +1334,268 @@ test.describe('Estimador ISD — lo que hay por delante del primer control en 39
     expect(medidas.primerControl, 'el primer control cae en la 2.ª pantalla').toBeLessThan(844 * 2);
   });
 });
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * RE-INSPECCIÓN 22/09/2026
+ *
+ * Tres casos nuevos, resueltos a mano con las constantes de `data/fiscal/sucesiones.ts`
+ * ANTES de ejecutar la app, sobre dos comunidades que ninguna corrida anterior había
+ * tocado: Castilla-La Mancha y Cantabria, las dos únicas del catálogo cuya bonificación
+ * es `escalonado` —tramos PLANOS sobre la base liquidable, no la escala ponderada de
+ * Cataluña—, y que por tanto ejecutan una rama de `aplicarBonificacion` que hasta hoy no
+ * había ejecutado ningún test.
+ *
+ * Y dos testigos de lo que esta re-inspección encontró roto, marcados con `test.fail()`
+ * porque la reparación no es cosa del Inspector: cuando se arreglen, empezarán a pasar y
+ * Playwright lo dirá («expected to fail, but passed»), que es justo el aviso que hace
+ * falta para venir aquí a quitar la marca.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+test.describe('re-inspección 22/09/2026', () => {
+  /** SOLO la columna de resultados: los mismos importes viven también en la guía. */
+  const panelResultados = async (page: Page): Promise<string> =>
+    (await page.locator('[class*="resultsPanel"]').innerText()).split(' ').join(' ');
+
+  /** «4056,03 €» → 4056.03, para comparar magnitudes y no cadenas. */
+  const aNumero = (texto: string): number =>
+    Number(texto.replace(/[^\d.,-]/g, '').split('.').join('').replace(',', '.'));
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#vivienda-habitual', '#porcentaje-herencia']);
+  });
+
+  /**
+   * CASO NORMAL — hijo de 21 o más (Grupo II) que hereda 250.000 € en cuentas en
+   * CASTILLA-LA MANCHA, cuya bonificación es la única del catálogo con CINCO tramos
+   * planos (`BONIFICACIONES_CCAA_IS['castilla-mancha']...escalonado`): 100 % hasta
+   * 175.000 €, 95 % hasta 225.000 €, 90 % hasta 275.000 €, 85 % hasta 300.000 € y 80 %
+   * por encima, decidido por la base LIQUIDABLE. Elegido a propósito el tramo del 90 %,
+   * que es interior: un fallo en la selección del tramo se iría al 100 % (cuota cero) o
+   * al 80 % (el doble de cuota), y las dos cifras seguirían pareciendo plausibles.
+   *
+   *   Activos            250.000,00   (saldos en cuentas)
+   *   + ajuar 3 %           7.500,00   PORC_AJUAR_DOMESTICO_IS
+   *   = base imponible   257.500,00
+   *   − parentesco         15.956,87   REDUCCIONES_PARENTESCO_IS['II'] (art. 20.2.a LISD)
+   *   = base liquidable  241.543,13   → cae en el tramo «hasta 275.000» → 90 %
+   *   cuota íntegra       40.560,31    TARIFA_ESTATAL_IS, tramo «hasta 398.777,54»:
+   *                                    40.011,04 + 25,50 % × (241.543,13 − 239.389,13)
+   *   × coeficiente           1,0000   COEFICIENTES_IS['II'][0] (patrimonio < 402.678 €)
+   *   − bonificación 90 %  36.504,28
+   *   = cuota final        4056,03 €   (tipo efectivo 1,58 %)
+   */
+  test('caso normal: hijo ≥21 en Castilla-La Mancha con 250.000 € paga 4056,03 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('castilla-mancha');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '250000');
+
+    expect(await cuota(page)).toBe('4056,03 €');
+
+    const panel = await panelResultados(page);
+    expect(panel).toContain('7500,00 €');      // ajuar del 3 %
+    expect(panel).toContain('257.500,00 €');   // base imponible
+    expect(panel).toContain('15.956,87 €');    // reducción del art. 20.2.a
+    expect(panel).toContain('241.543,13 €');   // base liquidable
+    expect(panel).toContain('40.560,31 €');    // cuota íntegra, tramo del 25,50 %
+    expect(panel).toContain('36.504,28 €');    // bonificación del 90 %
+    // El rótulo tiene que decir 90: con el tramo de al lado serían 0,00 € u 8112,06 €
+    expect(panel).toContain('Bonificación 90 % (Castilla-La Mancha)');
+    expect(panel).toContain('Tipo efectivo: 1,58%');
+  });
+
+  /**
+   * CASO LÍMITE — el escalón de CANTABRIA, que su ficha declara como
+   * `escalonado: [{ hasta: 100000, porcentaje: 1.00 }, { desde: 100000, porcentaje: 0.99 }]`.
+   * No es una escala ponderada: es un acantilado sobre la base LIQUIDABLE, y basta un
+   * céntimo para caer por él.
+   *
+   * El céntimo se mete en los ACTIVOS, no en la base, porque así se comprueba de paso que
+   * el ajuar del 3 % viaja con él: 1 cts. de herencia son 1,03 cts. de base liquidable.
+   *
+   *   (a) Activos        112.579,48 → + ajuar 3.377,38 = base imponible 115.956,86
+   *       − parentesco    15.956,87   REDUCCIONES_PARENTESCO_IS['II']
+   *       = base liquid.  99.999,99  ≤ 100.000 → EXENCIÓN TOTAL (tramo del 100 %)
+   *       cuota íntegra   12.415,36   TARIFA_ESTATAL_IS, tramo «hasta 119.757,67»:
+   *                                   9.166,06 + 16,15 % × (99.999,99 − 79.880,52)
+   *       = cuota final        0,00 €
+   *
+   *   (b) Activos        112.579,49 → + ajuar 3.377,38 = base imponible 115.956,87
+   *       = base liquid. 100.000,00  > 100.000 → ya no exime: bonificación del 99 %
+   *       cuota íntegra   12.415,36
+   *       − bonificación  12.291,20
+   *       = cuota final      124,15 €  (tipo efectivo 0,11 %)
+   *
+   * UN CÉNTIMO de herencia convierte una cuota de cero en 124,15 €.
+   */
+  test('caso límite: en Cantabria un céntimo más de herencia pasa de 0,00 € a 124,15 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('cantabria');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '112579,48');
+
+    expect(await cuota(page)).toBe('0,00 €');
+    const bajoElEscalon = await panelResultados(page);
+    expect(bajoElEscalon).toContain('112.579,48 €');  // el importe se leyó con coma decimal
+    expect(bajoElEscalon).toContain('3377,38 €');     // ajuar del 3 %
+    expect(bajoElEscalon).toContain('99.999,99 €');   // base liquidable, aún bajo el escalón
+    expect(bajoElEscalon).toContain('12.415,36 €');   // cuota íntegra del tramo del 16,15 %
+    expect(bajoElEscalon).toContain('Bonificación 100 % (Cantabria)');
+
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '112579,49');
+
+    expect(await cuota(page)).toBe('124,15 €');
+    const sobreElEscalon = await panelResultados(page);
+    expect(sobreElEscalon).toContain('100.000,00 €');  // base liquidable, ya en el escalón
+    expect(sobreElEscalon).toContain('12.291,20 €');   // bonificación del 99 %
+    expect(sobreElEscalon).toContain('Bonificación 99 % (Cantabria)');
+    expect(sobreElEscalon, 'sigue eximiendo pasado el escalón').not.toContain('Bonificación 100 %');
+  });
+
+  /**
+   * CASO A RECHAZAR — DOS importes ilegibles a la vez, uno en los bienes y otro en las
+   * deudas: «doscientos mil» en los saldos y «-1.000» en la hipoteca.
+   *
+   * Las cuatro corridas anteriores probaron un solo campo ilegible cada vez, así que la
+   * rama PLURAL del aviso —«Hay importes que no se pueden leer»— y el `join` de la lista
+   * no los había ejecutado nadie. Y los dos campos vienen de listas distintas
+   * (`CAMPOS_BIENES` y `CAMPOS_DEUDAS`), que es donde un índice desplazado nombraría un
+   * campo que en pantalla se llama de otra manera.
+   *
+   * Son además los dos motivos de rechazo que existen y no la misma forma dos veces: uno
+   * no es un número (`parseSpanishNumber` devuelve NaN) y el otro es negativo, que el
+   * 11/09/2026 AUMENTABA la masa hereditaria en vez de restarla (hallazgo 740).
+   *
+   * Y después, corregidos los dos, la app tiene que volver a dar cifra y haber restado
+   * de verdad la deuda:
+   *   Activos 200.000,00 − deudas 1.000,00 = masa 199.000,00
+   *   + ajuar 5.970,00 = base imponible 204.970,00 − 15.956,87 = base liquidable 189.013,13
+   *   cuota íntegra 29.306,14 = 23.063,25 + 21,25 % × (189.013,13 − 159.634,83)
+   *   − bonificación 99 % de Madrid 29.013,08 = cuota final 293,06 €
+   */
+  test('caso a rechazar: dos importes ilegibles a la vez se nombran los DOS y no sale ninguna cifra', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), 'doscientos mil');
+    await sembrarValor(page, page.locator('#hipotecas'), '-1.000');
+
+    // Acotado al aviso de la app: `getByRole('alert')` casa también con el anunciador de
+    // rutas de Next (#__next-route-announcer__) y rompería el modo estricto.
+    const aviso = page.getByRole('alert').filter({ hasText: /no se puede[n]? leer/ });
+    await expect(aviso).toContainText('Hay importes que no se pueden leer');
+    await expect(aviso).toContainText('Saldos en cuentas bancarias');
+    await expect(aviso).toContainText('Hipotecas y préstamos hipotecarios');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+
+    // Ni una cifra parcial: ni la masa, ni el ajuar, ni una deuda tomada como cero
+    const panel = await panelResultados(page);
+    expect(panel).not.toContain('Base imponible total');
+    expect(panel).not.toContain('CUOTA A INGRESAR');
+
+    // Corregidos los dos, vuelve la estimación y la deuda está REALMENTE restada
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '200000');
+    await sembrarValor(page, page.locator('#hipotecas'), '1000');
+
+    expect(await cuota(page)).toBe('293,06 €');
+    const conCifra = await panelResultados(page);
+    expect(conCifra).toContain('199.000,00 €');   // masa hereditaria NETA, ya sin la deuda
+    expect(conCifra).toContain('204.970,00 €');   // base imponible con el ajuar
+    expect(conCifra).toContain('189.013,13 €');   // base liquidable
+    expect(conCifra).toContain('29.306,14 €');    // cuota íntegra, tramo del 21,25 %
+  });
+
+  /**
+   * ⚠️ HALLAZGO 22/09/2026 — la reparación del 1152 (21/09) NO cerró la divergencia.
+   *
+   * La tarjeta «Sobrino hereda cuenta bancaria» pasó a derivarse de `calcularSucesion`
+   * para dejar de teclear sus cifras, y con eso se arreglaron los separadores de millar.
+   * Pero el número quedó igual de separado del panel, por dos motivos distintos:
+   *
+   *  1. El TIPO EFECTIVO. El motor lo calcula sobre `p.baseImponible`, que es la base SIN
+   *     ajuar (80.000 €) → 4,13 %. La app lo calcula sobre `baseAjustada`, que sí lo
+   *     lleva (82.400 €) → 4,01 %. La tarjeta publica el del motor y lo rotula «% de la
+   *     base con ajuar», que es precisamente el denominador que NO ha usado: 3306,55 /
+   *     82.400 = 4,01 %, no 4,13 %. El rótulo que el 1152 añadió para explicar la cifra
+   *     es el que demuestra que la cifra es la otra.
+   *  2. La CUOTA. El motor redondea a céntimo en cada paso y la app no: la cuota íntegra
+   *     vale 2081,95436 €, que el motor deja en 2081,95 antes de multiplicar por el
+   *     coeficiente 1,5882. De ahí 3306,55 € en la tarjeta y 3306,56 € en el panel, para
+   *     los mismos 80.000 € de la misma comunidad. Derivar del motor una tarjeta que
+   *     ilustra a la app NO puede hacerlas coincidir mientras las dos aritméticas
+   *     redondeen en sitios distintos.
+   */
+  test('1152 — la tarjeta del sobrino sigue publicando otro tipo efectivo y otra cuota que el panel', async ({ page }) => {
+    test.fail();
+
+    // Lo que la HERRAMIENTA liquida con esos datos
+    await page.locator('#ccaa-causante').selectOption('asturias');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '80000');
+    expect(await cuota(page)).toBe('3306,56 €');
+    expect(await panelResultados(page)).toContain('Tipo efectivo: 4,01%');
+
+    // Lo que la TARJETA del bloque educativo dice de esos mismos datos
+    const todo = await textoCompleto(page);
+    const desde = todo.indexOf('Sobrino hereda cuenta bancaria');
+    const hasta = todo.indexOf('Viuda hereda empresa familiar');
+    const tarjeta = todo.slice(desde, hasta);
+    expect(tarjeta, 'la tarjeta no está donde se esperaba').toContain('Asturias');
+
+    expect(tarjeta, 'la tarjeta publica otra cuota que el panel').toContain('3306,56 €');
+    expect(tarjeta, 'el tipo efectivo sobre la base CON ajuar es 4,01 %').toContain('4,01 %');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 22/09/2026 — Cataluña prorratea el VALOR de la vivienda entre herederos,
+   * pero no su TOPE.
+   *
+   * El art. 17 de la Ley 19/2010 limita la reducción por vivienda habitual a 500.000 €
+   * «sobre el valor conjunto» y reparte ese límite entre los sujetos pasivos en
+   * proporción a su participación, con un suelo individual de 180.000 €. Que el
+   * prorrateo existe lo dice `data/fiscal/sucesiones.ts` en el comentario de
+   * `REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS` («el límite individual resultante del
+   * prorrateo no puede bajar de esta cifra»), y lo dice la PROSA de esta misma página:
+   * «500.000,00 € sobre el valor conjunto de la vivienda, con un mínimo de 180.000,00 €
+   * por heredero tras el prorrateo».
+   *
+   * El cálculo no lo hace. `evaluarReduccionVivienda` recibe la vivienda ya prorrateada
+   * (`v_vivienda * porcHerencia`) y se le deja vacío `limiteViviendaCataluna`, de modo que
+   * a CADA heredero se le aplica el tope CONJUNTO entero. El motor avisa de esto en su
+   * propia firma: ese parámetro existe «para quien conoce el valor conjunto de la vivienda
+   * y el reparto», y esta app conoce los dos.
+   *
+   *   Vivienda habitual 1.200.000,00 €, hijo ≥21 que recibe el 50 %
+   *   base imponible 1.236.000,00 → base ajustada al 50 % = 618.000,00
+   *   − parentesco 100.000,00                REDUCCIONES_PARENTESCO_CATALUNA_IS['II']
+   *   − vivienda: 95 % × 600.000 = 570.000, topado en...
+   *        · lo que hace la app:  500.000,00  (el tope CONJUNTO)
+   *        · lo que dice el art. 17: 250.000,00  (500.000 × 50 %, por encima del suelo
+   *          de 180.000 €)
+   *   = base liquidable   18.000,00 (app)   frente a  268.000,00 (art. 17)
+   *   cuota íntegra        1260,00          frente a   34.560,00   TARIFA_CATALUNA_IS
+   *   − bonificación 48,90 % del art. 58 bis, ponderada sobre los 618.000 € de base
+   *   = cuota final         643,86 €        frente a   17.660,27 €
+   *
+   * 27 veces menos impuesto del que resulta de la norma que la propia página cita. Y con
+   * el 25 % la app liquida 0,00 € donde el prorrateo —ahí ya en su suelo de 180.000 €—
+   * da 919,41 €: «no pagas nada» es la forma más cara de equivocarse en un riesgo 1.
+   */
+  test('Cataluña no prorratea entre herederos el tope de 500.000 € de la vivienda habitual', async ({ page }) => {
+    test.fail();
+
+    await page.locator('#ccaa-causante').selectOption('cataluna');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#vivienda-habitual'), '1200000');
+    await sembrarValor(page, page.locator('#porcentaje-herencia'), '50');
+
+    const panel = await panelResultados(page);
+    expect(panel, 'la base ajustada al 50 % sí se prorratea').toContain('618.000,00 €');
+
+    // El tope individual es 500.000 × 50 % = 250.000 €, no los 500.000 € del conjunto
+    expect(panel, 'el tope de la vivienda va sin prorratear').toContain('250.000,00 €');
+
+    // Y la cuota que sale de ahí, con el mismo 48,90 % de bonificación del art. 58 bis.
+    // Tolerancia de medio euro: el defecto que vigila son 17.016 €.
+    expect(aNumero(await cuota(page))).toBeCloseTo(17660.27, 0);
+  });
+});

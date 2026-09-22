@@ -373,3 +373,293 @@ test.describe('Test de perfil inversor — regresiones', () => {
     await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(1);
   });
 });
+
+// ============================================================
+// RE-INSPECCIÓN 22/09/2026
+//
+// La aritmética se volvió a resolver A MANO antes de tocar el navegador, con la misma
+// tabla de `page.tsx` (A=1 · B=2 · C=3 · D=4, suma de las diez):
+//   Caso normal   → 31 puntos (Dinámico, 29–34), que es el tramo que no tenía ni un caso.
+//   Caso límite   → los TRES cortes que nadie había probado: 16/17, 28/29 y 34/35.
+//                   El de 22/23 ya estaba cubierto arriba; estos tres, no.
+//   Caso rechazo  → la sesión guardada que no se puede leer. El estado a medias pasó a
+//                   `sessionStorage` en la reparación del 21/08/2026, así que desde
+//                   entonces hay una entrada de datos que la app no controla y que su
+//                   propio `leerSesion` dice cubrir («Ventana privada, almacenamiento
+//                   bloqueado o JSON corrupto: se empieza de cero»).
+//
+// La posición de la flecha ya no es el mapeo lineal que documenta la cabecera de este
+// fichero: desde la reparación del 21/08/2026 es
+//   getBarPosition(score) = indice*20 + 2 + (score-min)/(max-min) * 16
+// con `indice` = orden del perfil (0-4) y [min,max] su `range`. Calculada a mano para
+// cada caso de abajo y comprobada al décimo.
+// ============================================================
+test.describe('re-inspección 22/09/2026', () => {
+  /** Deja el almacenamiento de sesión limpio antes de cada caso. */
+  async function conSesionLimpia(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    await page.evaluate(() => {
+      try {
+        sessionStorage.clear();
+      } catch {
+        /* ventana privada: no había nada que limpiar */
+      }
+    });
+  }
+
+  /** El `<div id="__next-route-announcer__">` lo inyecta el cliente: mientras no está,
+   *  React no ha hidratado y el efecto de recuperación de sesión NO ha corrido todavía.
+   *  Sin esta espera, un `toHaveCount(0)` se da por bueno en el HTML del servidor y el
+   *  test pasa en falso sobre una pantalla que un instante después es la de error. */
+  async function esperarHidratacion(page: Page): Promise<void> {
+    await page.waitForSelector('#__next-route-announcer__', { state: 'attached' });
+  }
+
+  /** El texto de la puntuación: «N puntos · tramo X–Y». El `<span>` del borde va aparte. */
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+
+  // ---------- CASO 1: recorrido normal, 31 puntos ----------
+  test('caso normal: D,C,D,B,C,D,C,B,D,B suma 31 y da Dinámico con su cartera 70/20/5/5', async ({
+    page,
+  }) => {
+    await conSesionLimpia(page);
+    // 4 + 3 + 4 + 2 + 3 + 4 + 3 + 2 + 4 + 2 = 31 → tramo 29–34 → Dinámico.
+    // Ninguno de los tres casos anteriores del fichero caía en Dinámico.
+    await empezar(page);
+    await responder(page, [3, 2, 3, 1, 2, 3, 2, 1, 3, 1]);
+
+    await expect(perfilMostrado(page)).toHaveText('Dinámico');
+    await expect(puntuacion(page)).toContainText('31 puntos');
+    await expect(puntuacion(page)).toContainText('tramo 29–34');
+    // PROFILES.dinamico.traits
+    await expect(rasgo(page, 0)).toHaveText('Alto');
+    await expect(rasgo(page, 1)).toHaveText('10-15 años');
+    await expect(rasgo(page, 2)).toHaveText('15-20%');
+    await expect(rasgo(page, 3)).toHaveText('Maximizar crecimiento');
+    // PROFILES.dinamico.allocation = { rv: 70, rf: 20, liq: 5, alt: 5 }
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (70%)',
+      'Renta Fija (20%)',
+      'Liquidez (5%)',
+      'Alternativos (5%)',
+    ]);
+    // getBarPosition(31) = 3*20 + 2 + (31-29)/(34-29) * 16 = 60 + 2 + 6,4 = 68,4 %
+    expect(
+      await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left)),
+    ).toBeCloseTo(68.4, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(3);
+    // 31 no es extremo de su tramo: no debe salir el aviso de borde.
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=dinamico',
+    );
+  });
+
+  // ---------- CASO 2: los tres cortes que faltaban ----------
+  test('caso límite: los cortes 16/17, 28/29 y 34/35, resueltos a mano', async ({ page }) => {
+    test.setTimeout(150_000); // seis recorridos completos de diez preguntas
+    // Los seis recorridos, con su suma hecha antes de abrir el navegador:
+    //   16 → B×6 + A×4 = 12 + 4  (tope de Conservador, `score <= 16`)
+    //   17 → B×7 + A×3 = 14 + 3  (primer punto de Moderado)
+    //   28 → C×8 + B×2 = 24 + 4  (tope de Equilibrado, `score <= 28`)
+    //   29 → C×9 + B   = 27 + 2  (primer punto de Dinámico)
+    //   34 → D×8 + A×2 = 32 + 2  (tope de Dinámico, `score <= 34`)
+    //   35 → D×8 + B + A = 32 + 2 + 1 (primer punto de Agresivo)
+    const cortes: Array<{
+      indices: number[];
+      puntos: number;
+      perfil: string;
+      tramo: string;
+      izquierda: number;
+      segmento: number;
+    }> = [
+      { indices: [1, 1, 1, 1, 1, 1, 0, 0, 0, 0], puntos: 16, perfil: 'Conservador', tramo: '10–16', izquierda: 18, segmento: 0 },
+      { indices: [1, 1, 1, 1, 1, 1, 1, 0, 0, 0], puntos: 17, perfil: 'Moderado', tramo: '17–22', izquierda: 22, segmento: 1 },
+      { indices: [2, 2, 2, 2, 2, 2, 2, 2, 1, 1], puntos: 28, perfil: 'Equilibrado', tramo: '23–28', izquierda: 58, segmento: 2 },
+      { indices: [2, 2, 2, 2, 2, 2, 2, 2, 2, 1], puntos: 29, perfil: 'Dinámico', tramo: '29–34', izquierda: 62, segmento: 3 },
+      { indices: [3, 3, 3, 3, 3, 3, 3, 3, 0, 0], puntos: 34, perfil: 'Dinámico', tramo: '29–34', izquierda: 78, segmento: 3 },
+      { indices: [3, 3, 3, 3, 3, 3, 3, 3, 1, 0], puntos: 35, perfil: 'Agresivo', tramo: '35–40', izquierda: 82, segmento: 4 },
+    ];
+
+    for (const corte of cortes) {
+      await conSesionLimpia(page);
+      await empezar(page);
+      await responder(page, corte.indices);
+      await expect(perfilMostrado(page)).toHaveText(corte.perfil);
+      await expect(puntuacion(page)).toContainText(`${corte.puntos} puntos`);
+      await expect(puntuacion(page)).toContainText(`tramo ${corte.tramo}`);
+      // La flecha cae DENTRO del segmento nombrado, nunca sobre una divisoria.
+      expect(
+        await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left)),
+      ).toBeCloseTo(corte.izquierda, 1);
+      expect(await segmentoDeLaFlecha(page)).toBe(corte.segmento);
+      // Los seis son extremo de tramo: el aviso de «estás en el borde» tiene que salir.
+      await expect(avisoDeBorde(page)).toHaveCount(1);
+    }
+  });
+
+  // ---------- CASO 3: lo que debe rechazarse ----------
+  // La sesión guardada no es legible y la app NO se repone: se queda en la pantalla de
+  // error, y como nadie borra la clave, cada recarga vuelve a caer en la misma piedra.
+  test('caso a rechazar: una sesión guardada ilegible debe empezar de cero, no romper la app', async ({
+    page,
+  }) => {
+    test.fail();
+    await conSesionLimpia(page);
+    // `leerSesion` solo comprueba la FORMA: `typeof currentQuestion === 'number'` y
+    // `typeof answers === 'object'`. Un índice de pregunta fuera de rango pasa el filtro,
+    // y luego `QUESTIONS[42]` es undefined → `question.id` revienta el render.
+    await page.evaluate(() =>
+      sessionStorage.setItem(
+        'meskeia:test-perfil-inversor:v1',
+        JSON.stringify({ currentQuestion: 42, answers: { 1: 2 } }),
+      ),
+    );
+    await page.goto(RUTA);
+    await esperarHidratacion(page);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    // Lo que promete el comentario de `leerSesion`: «JSON corrupto: se empieza de cero».
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    // Y la clave envenenada no debe sobrevivir a la lectura fallida, o el error se repite
+    // en cada recarga de esa pestaña.
+    expect(
+      await page.evaluate(() => sessionStorage.getItem('meskeia:test-perfil-inversor:v1')),
+    ).toBeNull();
+  });
+
+  test('caso a rechazar (bis): `answers: null` pasa el filtro porque typeof null === "object"', async ({
+    page,
+  }) => {
+    test.fail();
+    await conSesionLimpia(page);
+    await page.evaluate(() =>
+      sessionStorage.setItem(
+        'meskeia:test-perfil-inversor:v1',
+        JSON.stringify({ currentQuestion: 3, answers: null }),
+      ),
+    );
+    await page.goto(RUTA);
+    await esperarHidratacion(page);
+    // `Object.keys(null)` lanza dentro del useEffect de recuperación.
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+  });
+
+  // ---------- Hallazgos abiertos de esta re-inspección ----------
+  test('el aviso de borde miente en los dos extremos de la escala', async ({ page }) => {
+    test.fail();
+    await conSesionLimpia(page);
+    // 10 puntos es el MÍNIMO teórico (todo A): no existe un 9, así que «con un punto de
+    // diferencia el resultado sería el perfil de al lado» es falso. Pasa igual con 40.
+    await empezar(page);
+    await responder(page, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    await expect(puntuacion(page)).toContainText('10 puntos');
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+  });
+
+  test('avanzar de pregunta deja el foco en el <body>: el teclado sale de la tarjeta', async ({
+    page,
+  }) => {
+    test.fail();
+    await conSesionLimpia(page);
+    await empezar(page);
+    await opcion(page, 1).click();
+    await botonSiguiente(page).click();
+    // «Siguiente →» se deshabilita al cambiar de pregunta (la nueva no tiene respuesta),
+    // así que el navegador suelta el foco: activeElement pasa a ser BODY y el siguiente
+    // Tab aterriza en el pie («catálogo de meskeIA»), no en las opciones de la pregunta
+    // que se acaba de abrir. Hay que retroceder con Shift+Tab para contestarla. Y nada
+    // anuncia el cambio: el único [aria-live] de la página es el de rutas de Next.
+    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+  });
+
+  test('los datos estructurados llaman «validadas» a las 10 preguntas', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    // `featureList` del WebApplication dice «10 preguntas validadas para evaluar tolerancia
+    // al riesgo». No hay validación de ninguna clase: el cuestionario y sus puntuaciones
+    // están escritos inline en `page.tsx`, sin fuente ni referencia. Es la frase que se
+    // llevan los asistentes de IA, en una app de riesgo financiero.
+    const estructurados = (
+      await page.locator('script[type="application/ld+json"]').allInnerTexts()
+    ).join(' ');
+    expect(estructurados).toContain('10 preguntas');
+    expect(estructurados).not.toContain('preguntas validadas');
+  });
+
+  test('la guía sigue nombrando un índice concreto y una cifra sin fuente', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const reglasDeOro = page.locator('[class*="tipsSection"]');
+    const erroresComunes = page.locator('[class*="warningBox"]');
+    // La reparación del 21/08/2026 quitó «MSCI World» y el «60/40» del RESULTADO y le puso
+    // la nota de «ejemplos ilustrativos», pero la guía educativa de la misma página sigue
+    // dando una regla en imperativo con el índice dentro —«Diversifica globalmente. No
+    // concentres en España ni en Europa. Un ETF global (MSCI World)…»— y una cifra de
+    // comportamiento sin fuente ni año («obtienen un 2–4% menos anual»).
+    await expect(reglasDeOro).not.toContainText('MSCI World');
+    await expect(erroresComunes).not.toContainText('2–4% menos anual');
+  });
+
+  test('app financiera que da España por supuesta sin decirlo (Latam-friendly)', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const cuerpo = page.locator('body');
+    // CLAUDE.md §1.bis: datos de referencia de España con metodología universal →
+    // <RegionBadge variant="es-data" />. La app no monta ninguno, y en cambio:
+    //   · «Los bancos hacen el test de MiFID II por obligación legal» (norma de la UE,
+    //     enunciada como lo que hacen «los bancos», sin más).
+    //   · ocho importes en €, «pensión pública», «cuenta remunerada».
+    //   · en el faqJsonLd que leen las IAs, «letras del Tesoro» para el conservador.
+    expect(await page.locator('[class*="egionBadge"]').count()).toBeGreaterThan(0);
+    await expect(cuerpo).not.toContainText('Los bancos hacen el test de MiFID II');
+  });
+
+  test('con la sesión restaurada incompleta el resultado da un perfil con 3 puntos', async ({
+    page,
+  }) => {
+    test.fail();
+    await conSesionLimpia(page);
+    // El estado restaurado no se valida: basta con que `answers` sea un objeto. Con dos
+    // respuestas y el índice en la última pregunta, la app deja pedir el resultado y
+    // emite un juicio sobre la persona con una puntuación IMPOSIBLE en su propia escala:
+    // «3 puntos · tramo 10–16» —el tramo no contiene la puntuación que él mismo imprime—
+    // y la flecha se va a left: -16,6667 %, fuera de la barra.
+    await page.evaluate(() =>
+      sessionStorage.setItem(
+        'meskeia:test-perfil-inversor:v1',
+        JSON.stringify({ currentQuestion: 9, answers: { 1: 1, 2: 1 } }),
+      ),
+    );
+    await page.goto(RUTA);
+    await opcion(page, 0).click();
+    await botonSiguiente(page).click();
+    const izquierda = await flecha(page).evaluate((el) =>
+      parseFloat((el as HTMLElement).style.left),
+    );
+    expect(izquierda).toBeGreaterThanOrEqual(0);
+  });
+
+  test('una sesión a medias no deja volver a la portada ni avisa de que se ha recuperado', async ({
+    page,
+  }) => {
+    test.fail();
+    await conSesionLimpia(page);
+    await empezar(page);
+    await opcion(page, 1).click();
+    await botonSiguiente(page).click();
+    // Irse y volver en la misma pestaña (el logo lleva a la home) es un recorrido normal.
+    await page.goto(RUTA);
+    await expect(enunciado(page)).toHaveCount(1); // la recuperación funciona…
+    // …pero no hay ni aviso de que se ha recuperado un test a medias ni forma de empezar
+    // de nuevo: los únicos botones de la fase son A-D, «Anterior» y «Siguiente».
+    await expect(page.getByRole('button', { name: /Comenzar Test|Repetir Test|empezar/i })).toHaveCount(
+      1,
+    );
+  });
+});

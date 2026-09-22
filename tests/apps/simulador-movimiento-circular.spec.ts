@@ -902,3 +902,255 @@ test.describe('simulador-movimiento-circular · la sección de casos en el naveg
     await expect(page.locator('canvas')).toBeVisible();
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN 22/09/2026 — Inspector
+ *
+ * Lo que había ya estaba cubierto y sigue verde (497 tests de la tanda del 22/09). Lo NUEVO
+ * desde la re-inspección del 30/08 es la tarea de aula del commit cbb02f3f (15/09/2026):
+ *   app/simulador-movimiento-circular/casos.ts        ← los 12 casos y el corrector
+ *   app/simulador-movimiento-circular/CasosAula.tsx   ← la vista, el modo «Practicar» y las ayudas
+ * y por eso las tres comprobaciones de hoy apuntan ahí, además de a tres ternas de panel que
+ * ninguna inspección anterior había pedido.
+ *
+ * LOS TRES CASOS NUEVOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * (convenio fijado por la app: ω en rad/s · v = ω·r · a_c = ω²·r · F_c = m·a_c · T = 2π/ω · f = ω/2π)
+ *
+ *   CASO A (normal) — r = 3,5 m · ω = 6 rad/s · m = 4 kg
+ *       v   = 6 · 3,5      = 21 m/s                        → «21,00»  m/s
+ *       a_c = 36 · 3,5     = 126 m/s²                      → «126,00» m/s²
+ *         (control cruzado con la otra fórmula: v²/r = 441/3,5 = 126 ✔)
+ *       F_c = 4 · 126      = 504 N                         → «504,00» N
+ *       T   = 2π/6         = 1,047197551 s                 → «1,05»   s
+ *       f   = 6/(2π)       = 0,954929659 Hz                → «0,955»  Hz
+ *         (control: T·f = 1,047198 · 0,954930 = 1,000000 ✔ son inversos)
+ *
+ *   CASO B (límite) — el TOPE de ω con los dos mínimos, terna que no se había probado:
+ *       r = 0,5 m (mínimo) · ω = 10 rad/s (tope) · m = 0,1 kg (mínimo)
+ *       v   = 10 · 0,5     = 5 m/s                         → «5,00»   m/s
+ *       a_c = 100 · 0,5    = 50 m/s²                       → «50,00»  m/s²
+ *       F_c = 0,1 · 50     = 5 N                           → «5,00»   N
+ *       T   = 2π/10        = 0,628318531 s                 → «0,63»   s
+ *       f   = 10/(2π)      = 1,591549431 Hz                → «1,592»  Hz
+ *       Y el tope por TECLADO, que es la otra forma de mover un <input type="range"> y que
+ *       ninguna prueba anterior usaba: con ω ya en 10, una flecha más no debe pasar de 10;
+ *       una flecha atrás deja 9,9 y entonces v = 9,9 · 0,5 = 4,95 m/s.
+ *
+ *   CASO C (rechazo) — lo que el CORRECTOR de los casos de aula tiene que suspender, tecleado
+ *       carácter a carácter (un fill() entrega el valor en un solo evento y no vería un campo
+ *       que validase cada pulsación; es el defecto que apareció hoy en simulador-genetica):
+ *       · Caso 2 (a_c = 4²·0,5 = 8 m/s², tolerancia 0,08):
+ *           «2»   → olvidar el CUADRADO de ω (ω·r = 4·0,5 = 2): debe suspender
+ *           «-8»  → un módulo de aceleración no es negativo: debe suspender
+ *           «0»   → tampoco: debe suspender
+ *           «8»   → correcto
+ *       · Caso 6 (f = 6/60 = 0,1 Hz), donde la tolerancia mínima de 0,01 es el 10 % del valor
+ *         y es el sitio donde una tolerancia relativa podría dejar pasar lo imposible:
+ *           «0» y «-0,1» → deben suspender. (COMPROBADO: los suspende. Aquí no se reproduce
+ *           el defecto que simulador-genetica tenía hoy en su corrector.)
+ *
+ * HALLAZGOS DE ESTA RE-INSPECCIÓN — los tres van con test.fail() hasta que se reparen
+ *   · 1 (medio, operativa): la sección promete «Puedes comprobar cada resultado moviendo los
+ *     deslizadores del simulador de arriba» y hay casos en los que eso SUSPENDE. El
+ *     deslizador de ω tiene paso 0,1 y los casos 5 y 7 piden ω = π y ω = 2π/4, que no caen en
+ *     la rejilla. Caso 7 (f = 0,5 Hz, r = 3 m → v = 9,42 m/s): con ω = 3,1 el panel imprime
+ *     9,30 y el corrector lo rechaza (tolerancia 0,0942 < 0,12); con 3,2 imprime 9,60 y
+ *     también. El caso 12 ni siquiera se puede montar: pide r = 0,4 m (mínimo 0,5) y
+ *     ω = 12,57 rad/s (máximo 10).
+ *   · 2 (medio, operativa): en el modo «Practicar» el botón de pista sigue en pantalla, pasa
+ *     a aria-expanded="true" y se rotula «Ocultar pista» sin desplegar nada, porque el
+ *     ejercicio generado no trae pista (CasosAula.tsx pinta la pista solo si !practica).
+ *   · 3 (bajo, calculo): la tolerancia no es simétrica en su borde exacto. Con esperado 0,1 y
+ *     tolerancia 0,01, «0,11» se acepta y «0,09» se rechaza con el mensaje «te has desviado
+ *     0,01» — justo la tolerancia. Es el ±1 ulp de la resta en binario (0,1−0,09 =
+ *     0,010000000000000009 y 0,11−0,1 = 0,009999999999999995), y en el caso 2 deja fuera a
+ *     «8,08» y «7,92» diciendo que se desvían 0,08 cuando la tolerancia es 0,08.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('re-inspección 22/09/2026', () => {
+  const CAMPO_CASOS = '#casos-respuesta';
+  /** Acotado a la sección de casos: la página tiene otros avisos con role="alert". */
+  const veredictoCasos = (page: Page) => page.locator('[class*="casoVeredicto"]');
+
+  /**
+   * Responde TECLEANDO carácter a carácter y devuelve el veredicto. No usa fill(): un campo
+   * que validara cada pulsación por separado rechazaría los dígitos intermedios y un fill(),
+   * que entrega el valor en un solo evento, no lo vería.
+   */
+  async function responderTecleando(page: Page, texto: string): Promise<string> {
+    const campo = page.locator(CAMPO_CASOS);
+    await campo.click();
+    await campo.press('Control+a');
+    await campo.press('Delete');
+    await campo.pressSequentially(texto, { delay: 20 });
+    // El campo tiene que haberse quedado con lo tecleado, no con un resto del valor anterior.
+    expect(await campo.inputValue(), 'el campo no admite lo que se teclea').toBe(texto);
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredictoCasos(page)).toBeVisible();
+    return ((await veredictoCasos(page).textContent()) ?? '').trim();
+  }
+
+  test('CASO A (normal) — r = 3,5 m, ω = 6 rad/s, m = 4 kg', async ({ page }) => {
+    await configurar(page, 3.5, 6, 4);
+
+    await expect(page.getByText('3,5 m', { exact: true })).toBeVisible();
+    await expect(page.getByText('6,0 rad/s', { exact: true })).toBeVisible();
+    await expect(page.getByText('4,0 kg', { exact: true })).toBeVisible();
+
+    await expect(magnitud(page, 'ω')).toHaveText('6,00');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('21,00'); // v = ω·r = 6 · 3,5
+    await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('126,00'); // a_c = 36 · 3,5 (= v²/r = 441/3,5)
+    await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('504,00'); // F_c = 4 · 126
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('1,05'); // T = 2π/6 = 1,0471976
+    await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,955'); // f = 6/2π = 0,9549297 (= 1/T)
+  });
+
+  test('CASO B (límite) — tope de ω con radio y masa en su mínimo, y el tope por teclado', async ({
+    page,
+  }) => {
+    await configurar(page, 0.5, 10, 0.1);
+    expect(await valorSlider(page, RADIO)).toBe('0.5');
+    expect(await valorSlider(page, OMEGA)).toBe('10');
+    expect(await valorSlider(page, MASA)).toBe('0.1');
+
+    await expect(magnitud(page, 'v tangencial')).toHaveText('5,00'); // v = 10 · 0,5
+    await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('50,00'); // a_c = 100 · 0,5
+    await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('5,00'); // F_c = 0,1 · 50
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('0,63'); // T = 2π/10
+    await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('1,592'); // f = 10/2π
+
+    // El mismo tope, alcanzado con el teclado: es la vía de quien no usa ratón.
+    const deslizadorOmega = page.locator('input[type="range"]').nth(OMEGA);
+    await deslizadorOmega.focus();
+    await page.keyboard.press('ArrowRight');
+    expect(await deslizadorOmega.inputValue(), 'el tope no puede rebasarse con el teclado').toBe('10');
+    await page.keyboard.press('ArrowLeft');
+    expect(await deslizadorOmega.inputValue()).toBe('9.9');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('4,95'); // v = 9,9 · 0,5
+  });
+
+  test('CASO C (rechazo) — el corrector de los casos suspende lo imposible, tecleado a mano', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, [CAMPO_CASOS]);
+
+    // Caso 2: a_c = ω²·r = 4² · 0,5 = 8 m/s². Tolerancia = 1 % = 0,08.
+    await page.getByRole('button', { name: /^Caso 2:/ }).click();
+    expect(await responderTecleando(page, '2')).toContain('No es correcto'); // olvidar el cuadrado
+    expect(await responderTecleando(page, '-8')).toContain('No es correcto'); // módulo negativo
+    expect(await responderTecleando(page, '0')).toContain('No es correcto');
+    expect(await responderTecleando(page, '8')).toContain('¡Correcto!');
+
+    // Caso 6: f = 6 vueltas/60 s = 0,1 Hz. Es el valor más pequeño de los doce, donde la
+    // tolerancia mínima de 0,01 equivale al 10 %: si una tolerancia relativa fuera a dejar
+    // pasar lo imposible, sería aquí.
+    await page.getByRole('button', { name: /^Caso 6:/ }).click();
+    expect(await responderTecleando(page, '0')).toContain('No es correcto');
+    expect(await responderTecleando(page, '-0,1')).toContain('No es correcto');
+    expect(await responderTecleando(page, '0,1')).toContain('¡Correcto!');
+
+    // Y nunca un «NaN» en pantalla, ni con algo que no es un número.
+    expect(await responderTecleando(page, 'cero coma uno')).toContain('Escribe un número');
+    await expect(veredictoCasos(page)).not.toContainText('NaN');
+  });
+
+  test('práctica — los ejercicios aleatorios varían y se corrigen con la misma física', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, [CAMPO_CASOS]);
+    const enunciado = page.locator('[class*="casoEnunciado"]');
+    const vistos = new Set<string>();
+
+    for (let i = 0; i < 5; i++) {
+      await page.getByRole('button', { name: /Practicar/ }).click();
+      const texto = ((await enunciado.textContent()) ?? '').trim();
+      vistos.add(texto);
+
+      // Se resuelve el enunciado POR SEPARADO, con aritmética escrita aquí, no llamando al
+      // módulo de la app: si la app se equivocara, llamarla se equivocaría igual.
+      const giro = texto.match(/gira a ([\d,]+) rad\/s en una circunferencia de ([\d,]+) m de radio/);
+      expect(giro, texto).not.toBeNull();
+      const omega = Number(giro![1].replace(',', '.'));
+      const radio = Number(giro![2].replace(',', '.'));
+      const kg = texto.match(/Un objeto de ([\d,]+) kg/);
+      const masa = kg ? Number(kg[1].replace(',', '.')) : NaN;
+
+      const etiqueta = ((await page.locator('[class*="casoLabel"]').textContent()) ?? '').trim();
+      const esperado = etiqueta.startsWith('v')
+        ? omega * radio
+        : etiqueta.startsWith('a_c')
+          ? omega * omega * radio
+          : masa * omega * omega * radio;
+      expect(Number.isFinite(esperado), texto).toBe(true);
+
+      const redondeado = (Math.round(esperado * 100) / 100).toString().replace('.', ',');
+      expect(await responderTecleando(page, redondeado), texto).toContain('¡Correcto!');
+    }
+
+    // Reproducible no es variado: cinco tiradas seguidas no pueden dar siempre lo mismo.
+    expect(vistos.size).toBeGreaterThan(1);
+  });
+
+  /* ── Los tres hallazgos del 22/09/2026, cada uno con su caso ──────────────────────── */
+
+  test('HALLAZGO 1 — el caso 7, comprobado con los deslizadores como manda la sección, suspende', async ({
+    page,
+  }) => {
+    test.fail(); // la app rechaza la cifra que ella misma acaba de imprimir en su panel
+
+    await esperarHidratacion(page, [CAMPO_CASOS]);
+    await expect(page.locator('[class*="casosIntro"]')).toContainText(
+      'moviendo los deslizadores del simulador de arriba',
+    );
+
+    // Caso 7: aspa de r = 3 m girando a f = 0,5 Hz ⟹ ω = 2π·0,5 = π = 3,1416 rad/s, que el
+    // deslizador (paso 0,1) no alcanza. El vecino más próximo es 3,1.
+    await page.getByRole('button', { name: /^Caso 7:/ }).click();
+    await configurar(page, 3, 3.1416, 1);
+    expect(await valorSlider(page, OMEGA), 'el paso de 0,1 no permite poner π').toBe('3.1');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('9,30'); // v = 3,1 · 3
+
+    // El alumno copia lo que el panel acaba de imprimir, que es lo que la sección le dice
+    // que haga. Esperado: que se dé por bueno. Obtenido: «No es correcto, te has desviado 0,12».
+    expect(await responderTecleando(page, '9,30')).toContain('¡Correcto!');
+  });
+
+  test('HALLAZGO 2 — en modo «Practicar» el botón de pista se declara desplegado y no despliega nada', async ({
+    page,
+  }) => {
+    test.fail(); // el ejercicio generado no trae pista, pero el botón sigue en pantalla
+
+    await esperarHidratacion(page, [CAMPO_CASOS]);
+    const pista = page.getByRole('button', { name: /pista/ });
+    const cajaPista = page.locator('[class*="casoPista"]');
+
+    // En un caso FIJO el botón cumple: se despliega y aparece la pista.
+    await page.getByRole('button', { name: /^Caso 3:/ }).click();
+    await pista.click();
+    await expect(pista).toHaveAttribute('aria-expanded', 'true');
+    await expect(cajaPista).toBeVisible();
+
+    // En el modo aleatorio, el mismo botón cambia de estado y de rótulo sin desplegar nada.
+    await page.getByRole('button', { name: /Practicar/ }).click();
+    await expect(pista).toHaveAttribute('aria-expanded', 'false');
+    await pista.click();
+    await expect(pista).toHaveAttribute('aria-expanded', 'true');
+    await expect(pista).toContainText('Ocultar pista');
+    await expect(cajaPista, 'aria-expanded=true sin nada desplegado').toBeVisible();
+  });
+
+  test('HALLAZGO 3 — la tolerancia no es simétrica: acepta +0,01 y rechaza −0,01', async () => {
+    test.fail(); // ±1 ulp de la resta en binario decide el veredicto en el borde exacto
+
+    // El caso 6 vale 0,1 Hz y su tolerancia es el mínimo de 0,01 (el 10 % del valor).
+    expect(toleranciaDe(0.1)).toBe(0.01);
+    expect(comprobarRespuesta(0.11, 0.1).correcto).toBe(true); // +0,01 → se acepta
+
+    // Y su simétrica, que se desvía exactamente lo mismo, se rechaza con el mensaje
+    // «te has desviado 0,01», que es justo la tolerancia que la app se ha fijado.
+    expect(comprobarRespuesta(0.09, 0.1).motivo).toContain('0,01');
+    expect(comprobarRespuesta(0.09, 0.1).correcto, '−0,01 debería valer lo mismo que +0,01').toBe(
+      true,
+    );
+  });
+});

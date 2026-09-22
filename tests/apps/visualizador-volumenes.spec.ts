@@ -560,3 +560,290 @@ test('521 (reparado) · la caja ya se nombra con el término geométrico exacto 
   const fila = page.getByRole('row').filter({ hasText: 'V = a × b × h' });
   await expect(fila).toContainText(/ortoedro|prisma rectangular|paralelep[íi]pedo recto/i);
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 22/09/2026 — tres casos NUEVOS resueltos a mano
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Motivo: `page.tsx` y `metadata.ts` cambiaron DESPUÉS de la re-inspección del 30/08/2026
+ * (commit d749e6ac, que reparó los hallazgos 518-521). Lo que entró ahí —la notación
+ * científica local para medidas y volúmenes por debajo de 0,0001— es código nuevo que
+ * ningún test cubría, así que estos casos lo atacan junto a las dos figuras que los
+ * bloques anteriores apenas tocan: la PIRÁMIDE y el ORTOEDRO. Ninguna cifra esperada se ha
+ * copiado de la app: la aritmética va escrita aquí abajo, hecha antes de ejecutar nada.
+ *
+ *   CASO 1 (normal) — PIRÁMIDE l = 7,5 · h = 12,8
+ *       l² = 56,25 ; 56,25 × 12,8 = 675 + 45 = 720 ; 720 / 3 = 240 exacto
+ *       → tramo [100, 100.000) → 1 decimal → «240,0»
+ *     El prisma de la misma base y altura vale el TRIPLE, que es lo que afirma el faqJsonLd
+ *     («tres pirámides iguales llenan exactamente un prisma de la misma base y altura»):
+ *       7,5 × 7,5 × 12,8 = 56,25 × 12,8 = 720 → «720,0» = 3 × 240 ✔
+ *     Y un cono con decimales en LAS DOS medidas, que ningún bloque anterior mide:
+ *       (1/3) × π × 2,5² × 9,6 = (1/3) × π × 60 = 20 π = 62,8318530718
+ *       → tramo [10, 100) → 2 decimales → «62,83»
+ *     Los dos ejemplos que la guía educativa promete POR ESCRITO, y que hasta ahora nadie
+ *     había contrastado con la herramienta que los acompaña:
+ *       depósito  r=3  h=5  → π × 9 × 5   = 45 π = 141,3716694115 → «141,4» (la guía: 141,4 m³)
+ *       cucurucho r=3  h=12 → (1/3)π×9×12 = 36 π = 113,0973355292 → «113,1» (la guía: 113,1 cm³)
+ *
+ *     DIBUJO. En la pirámide manda el lienzo: s = min(105/(l·1,732), 115/(h + l/2), 13).
+ *       l=7,5 h=12,8 → s = min(8,0831 · 6,9486 · 13) = 6,9486404834
+ *       l=7,5 h=25,6 → s = min(8,0831 · 3,9182 · 13) = 3,9182282794
+ *     La esquina izquierda de la base está en CX − l·s·0,866:
+ *       150 − 7,5 × 6,9486404834 × 0,866 = 150 − 45,131 = 104,87
+ *       150 − 7,5 × 3,9182282794 × 0,866 = 150 − 25,449 = 124,55
+ *     mientras el vértice se queda CLAVADO en y = 90,5 siempre que mande la altura:
+ *       apex_y = 148 − s·(h/2 + l/4) = 148 − [115/(h+3,75)]·(h+3,75)/2 = 148 − 57,5 = 90,5
+ *     O sea: al subir la altura la pirámide no crece, se ESTRECHA — y eso es lo que hay que
+ *     comprobar para afirmar que el dibujo reacciona. Con h=25,6 el volumen dobla:
+ *       (1/3) × 56,25 × 25,6 = 480 → «480,0»
+ *
+ *   CASO 2 (límite) — la FRONTERA de la notación científica y el tope del campo
+ *     r = 0,0001 es el primer valor que YA NO es «pequeño» para medExacta (la guarda es
+ *     v < 0,0001, estricta), así que la medida sale en decimal —«0,0001»— mientras el
+ *     volumen, que sí cae por debajo, sale en notación científica:
+ *       V = (4/3) × π × (10⁻⁴)³ = 4,188790204786×10⁻¹² → «4,188790×10⁻¹²»
+ *     Y la pirámide en el tope del campo, el tramo más alto que admite:
+ *       (1/3) × 100.000² × 100.000 = 10¹⁵/3 = 333.333.333.333.333,33
+ *       → ≥ 100.000 → 0 decimales → «333.333.333.333.333» (ni ∞ ni «No definido»)
+ *
+ *   CASO 3 (rechazo) — «1e3» NO es mil
+ *     parseSpanishNumber rechaza los exponentes (lo que no son cifras y separadores no es un
+ *     número), así que debe avisar y seguir en r=5 → 523,6. Si lo leyera como 1.000 —que es
+ *     lo que haría Number('1e3')— saldría (4/3)π×10⁹ = 4.188.790.204,79 → «4.188.790.205».
+ *     Igual con «2,5,3» y «+-4». En cambio «1.500» SÍ es una medida: en español el punto
+ *     agrupa millares, así que son mil quinientos y no uno coma cinco:
+ *       (4/3) × π × 1.500³ = 4,188790204786 × 3.375.000.000 = 14.137.166.941,15
+ *       → «14.137.166.941» (leerlo a la inglesa daría «14,1», cuatro órdenes menos)
+ */
+test.describe('re-inspección 22/09/2026', () => {
+  /** Los vértices del primer polígono del dibujo, para medir si la figura cambia de forma. */
+  async function puntosPoligono(page: Page): Promise<number[][]> {
+    const attr = await dibujo(page).locator('polygon').first().getAttribute('points');
+    return (attr ?? '').trim().split(/\s+/).map((p) => p.split(',').map(Number));
+  }
+
+  test('CASO 1 · pirámide l=7,5 h=12,8 → 240,0, y tres pirámides llenan su prisma', async ({
+    page,
+  }) => {
+    await elegirFigura(page, /Pirámide/);
+    await escribir(campo(page, 'Lado de la base (l)'), '7,5');
+    await escribir(campo(page, 'Altura (h)'), '12,8');
+
+    // (1/3) × 56,25 × 12,8 = 720/3 = 240 exacto
+    await expect(valorVolumen(page)).toHaveText('240,0');
+    await expect(formulaAplicada(page)).toHaveText('V = (1/3) × l² × h = (1/3) × 7,5² × 12,8');
+    await expect(dibujo(page).locator('text').filter({ hasText: /^l=/ })).toHaveText('l=7,5');
+
+    // El vértice está clavado en 90,5 y la base llega hasta x = 104,87 (tolerancia ±0,5 px:
+    // lo que vigila es que la figura se ESTRECHE 20 px al doblar la altura, no el subpíxel).
+    const antes = await puntosPoligono(page);
+    expect(antes[0][1]).toBeCloseTo(90.5, 1);
+    expect(antes[1][0]).toBeCloseTo(104.87, 0);
+
+    await escribir(campo(page, 'Altura (h)'), '25,6');
+    await expect(valorVolumen(page)).toHaveText('480,0'); // (1/3) × 56,25 × 25,6 = 480
+    const despues = await puntosPoligono(page);
+    expect(despues[0][1]).toBeCloseTo(90.5, 1); // el vértice no se mueve…
+    expect(despues[1][0]).toBeCloseTo(124.55, 0); // …y la base se estrecha 19,7 px
+    expect(despues[1][0]).toBeGreaterThan(antes[1][0]);
+
+    // Tres pirámides llenan el prisma de su misma base y altura (lo afirma el faqJsonLd)
+    await escribir(campo(page, 'Altura (h)'), '12,8');
+    await elegirFigura(page, /Ortoedro/);
+    await escribir(campo(page, 'Anchura (a)'), '7,5');
+    await escribir(campo(page, 'Profundidad (b)'), '7,5');
+    await escribir(campo(page, 'Altura (h)'), '12,8');
+    await expect(valorVolumen(page)).toHaveText('720,0'); // = 3 × 240
+    await expect(formulaAplicada(page)).toHaveText('V = a × b × h = 7,5 × 7,5 × 12,8');
+  });
+
+  test('CASO 1.bis · el cono con decimales, y los dos ejemplos que promete la guía', async ({
+    page,
+  }) => {
+    await elegirFigura(page, /Cono/);
+    await escribir(campo(page, 'Radio de la base (r)'), '2,5');
+    await escribir(campo(page, 'Altura (h)'), '9,6');
+    // (1/3) × π × 6,25 × 9,6 = 20 π = 62,8318530718 → dos decimales
+    await expect(valorVolumen(page)).toHaveText('62,83');
+    await expect(formulaAplicada(page)).toHaveText(
+      'V = (1/3) × π × r² × h = (1/3) × π × 2,5² × 9,6',
+    );
+
+    // «Cucurucho de helado: r=3cm, h=12cm → V=113,1 cm³», dice la guía. Que lo diga la app.
+    await escribir(campo(page, 'Radio de la base (r)'), '3');
+    await escribir(campo(page, 'Altura (h)'), '12');
+    await expect(valorVolumen(page)).toHaveText('113,1'); // 36 π = 113,0973355292
+
+    // «Depósito cilíndrico: r=3m, h=5m → V=141,4 m³ → 141.400 litros»
+    await elegirFigura(page, /Cilindro/);
+    await escribir(campo(page, 'Radio (r)'), '3');
+    await escribir(campo(page, 'Altura (h)'), '5');
+    await expect(valorVolumen(page)).toHaveText('141,4'); // 45 π = 141,3716694115
+  });
+
+  test('CASO 2 · la frontera de 0,0001 y el tope del campo en la pirámide', async ({ page }) => {
+    // r = 0,0001 no entra en la rama de notación científica de la MEDIDA (la guarda es
+    // estricta), pero su volumen sí: 4,188790204786×10⁻¹²
+    await escribir(campo(page, 'Radio (r)'), '0,0001');
+    await expect(valorVolumen(page)).toHaveText('4,188790×10⁻¹²');
+    await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 0,0001³');
+
+    // Y el tramo más alto que admite el campo, en la figura que nadie había llevado ahí:
+    // (1/3) × 100.000² × 100.000 = 10¹⁵/3
+    await elegirFigura(page, /Pirámide/);
+    await escribir(campo(page, 'Lado de la base (l)'), '100000');
+    await escribir(campo(page, 'Altura (h)'), '100000');
+    await expect(valorVolumen(page)).toHaveText('333.333.333.333.333');
+    await expect(formulaAplicada(page)).toHaveText(
+      'V = (1/3) × l² × h = (1/3) × 100.000² × 100.000',
+    );
+    await expect(page.locator('[class*=sliderLimits]').first()).toContainText(
+      '100.000 · fuera del deslizador',
+    );
+    const mostrado = await valorVolumen(page).innerText();
+    expect(mostrado).not.toMatch(/∞|No definido|NaN|e\+/);
+
+    // Con esa proporción el dibujo sigue dentro del lienzo «0 0 300 290»
+    const caja = await dibujo(page).evaluate((svg: SVGSVGElement) => {
+      const b = svg.getBBox();
+      return { x: b.x, y: b.y, x2: b.x + b.width, y2: b.y + b.height };
+    });
+    expect(caja.x).toBeGreaterThanOrEqual(0);
+    expect(caja.y).toBeGreaterThanOrEqual(0);
+    expect(caja.x2).toBeLessThanOrEqual(300);
+    expect(caja.y2).toBeLessThanOrEqual(290);
+  });
+
+  test('CASO 3 · «1e3» no es mil, y «1.500» sí es mil quinientos', async ({ page }) => {
+    const radio = campo(page, 'Radio (r)');
+    const aviso = page.locator('p[role="alert"]'); // el de la app, no el de Next
+    await expect(valorVolumen(page)).toHaveText('523,6');
+
+    for (const noEsUnNumero of ['1e3', '2,5,3', '+-4']) {
+      await escribir(radio, noEsUnNumero);
+      await expect(aviso).toHaveText(
+        'Escribe un número: se sigue calculando con la última medida válida.',
+      );
+      await expect(radio).toHaveAttribute('aria-invalid', 'true');
+      await expect(valorVolumen(page)).toHaveText('523,6');
+      await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 5³');
+    }
+    // Si «1e3» se hubiera leído como 1.000 saldría (4/3)π×10⁹ = «4.188.790.205»
+    await expect(valorVolumen(page)).not.toHaveText('4.188.790.205');
+
+    // «1.500» en español es mil quinientos: (4/3) × π × 1.500³ = 14.137.166.941,15
+    await escribir(radio, '1.500');
+    await expect(aviso).toHaveCount(0);
+    await expect(valorVolumen(page)).toHaveText('14.137.166.941');
+    await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 1500³');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 22/09/2026 — FALLAN a propósito
+// ═══════════════════════════════════════════════════════════════════════════
+
+// HALLAZGO (dato, medio) — La caja «Fórmula aplicada» PEGA el exponente del cubo al de la
+// notación científica que entró con la reparación del 518: con r = 0,00005 escribe
+// «V = (4/3) × π × 5,000×10⁻⁵³», que se lee 10⁻⁵³ — cuarenta y ocho órdenes de magnitud por
+// debajo de lo que la app está calculando. Le pasa igual al cuadrado del cilindro y del cono
+// («π × 5,000×10⁻⁵² × 20»). La medida necesita paréntesis en cuanto se escribe en notación
+// científica, porque el exponente de la fórmula ya no puede distinguirse del de la medida.
+// El paso 4 de la guía vende justamente eso: «ver exactamente qué operaciones se están
+// realizando para obtener el volumen».
+// Caso: esfera r=0,00005 → esperado «(4/3) × π × (5,000×10⁻⁵)³» · obtenido
+//       «(4/3) × π × 5,000×10⁻⁵³».
+test('HALLAZGO 22/09 · la fórmula debe parentizar la medida en notación científica', async ({
+  page,
+}) => {
+  test.fail();
+  await escribir(campo(page, 'Radio (r)'), '0,00005');
+  await expect(formulaAplicada(page)).toContainText('(5,000×10⁻⁵)³');
+});
+
+// HALLAZGO (dato, medio) — Justo POR ENCIMA de la frontera de 0,0001 el volumen pierde de
+// golpe seis cifras significativas, porque formatVolumen imprime ese tramo con cuatro
+// decimales fijos. La discontinuidad es brutal y está medida: r=0,0287 → «9,902259×10⁻⁵»
+// (siete cifras), r=0,03 → «0,0001» (una), r=0,033 → «0,0002» cuando el volumen real es
+// 1,505326×10⁻⁴, un 33 % menos que lo que se muestra. Es el mismo caso de uso que motivó la
+// reparación del 518 —medir algo pequeño en la unidad grande, la célula o el cucurucho en
+// metros—, resuelto por debajo de la frontera y sin resolver justo por encima.
+// Caso: esfera r=0,033 → esperado 1,505326×10⁻⁴ (o «0,000151») · obtenido «0,0002».
+test('HALLAZGO 22/09 · un volumen de 1,5×10⁻⁴ no debe mostrarse como 0,0002', async ({ page }) => {
+  test.fail();
+  await escribir(campo(page, 'Radio (r)'), '0,033');
+  // (4/3) × π × 0,033³ = (4/3) × π × 3,5937×10⁻⁵ = 1,505326×10⁻⁴
+  await expect(valorVolumen(page)).toContainText('1,50');
+});
+
+// HALLAZGO (dato, bajo) — El ECO de la medida sigue pasando por med(), que la reparación del
+// 21/08/2026 sustituyó por medExacta() solo en la fórmula y en el dibujo. med() redondea a
+// dos decimales y delega en formatNumber, así que por debajo de 0,0001 escribe «≈0»:
+//   · el pie del deslizador anuncia «≈0 · fuera del deslizador» con r=0,00005;
+//   · el aria-label del deslizador dice «control deslizante: ≈0» (y «12.345,68» cuando la
+//     medida es 12.345,678, que es lo mismo que ya se reparó en la caja de la fórmula);
+//   · y al cambiar de figura y volver —el paso 5 de la guía, «Compara figuras»— el campo se
+//     REMONTA con med(), de modo que pasa a mostrar «≈0» (r=0,00005) o «0,00» (r=0,0001)
+//     mientras la app sigue calculando con la medida real. Vuelve a haber una pantalla que no
+//     corresponde a lo que se calcula, que es el defecto que se cerró el 21/08/2026. Desde
+//     «≈0» el campo tampoco se puede corregir de forma natural: borrar un carácter deja «≈».
+// Caso: esfera r=0,00005 → Cilindro → Esfera → esperado campo «0,00005» · obtenido «≈0»,
+//       con el volumen en 5,235988×10⁻¹³ (correcto) y el pie diciendo «≈0».
+test('HALLAZGO 22/09 · el eco de la medida no debe convertirse en «≈0»', async ({ page }) => {
+  test.fail();
+  await escribir(campo(page, 'Radio (r)'), '0,00005');
+  await expect(page.locator('[class*=sliderLimits]').first()).not.toContainText('≈0');
+  expect(await page.locator('input[type=range]').first().getAttribute('aria-label')).not.toContain(
+    '≈0',
+  );
+
+  await elegirFigura(page, /Cilindro/);
+  await elegirFigura(page, /Esfera/);
+  await expect(valorVolumen(page)).toHaveText('5,235988×10⁻¹³'); // el cálculo sí aguanta
+  await expect(campo(page, 'Radio (r)')).toHaveValue('0,00005');
+});
+
+// HALLAZGO (operativa, medio) — En móvil el DIBUJO, que es lo que da nombre a la app y lo que
+// su subtítulo invita a mirar, nace entero por debajo del pliegue: y = 993 px en 390×844, con
+// 439 px de scroll para verlo completo. La reparación de agosto puso los controles delante
+// (order: 1 / order: 2 en el CSS a ≤640 px) y resolvió lo que entonces se midió —un control y
+// el resultado sin scroll—, pero dejó el visualizador detrás de todo. Medido hoy, en la
+// primera pantalla: h1 40 · subtítulo 110 · aviso legal 245 · selector de figura 434-620 ·
+// campo 660 · deslizador 694 · tarjeta de resultado 752-871, RECORTADA por el pliegue (92 de
+// sus 119 px; «unidades³» se corta por la mitad) · caja de fórmula 891, fuera · dibujo
+// 993-1283, fuera. Mover el deslizador y «observar cómo cambia el volumen en tiempo real»
+// exige bajar primero, y nada en pantalla dice que haya un dibujo ahí abajo.
+// Caso: viewport 390×844 → esperado que el dibujo asome en la primera pantalla y que la
+//       tarjeta de resultado quepa entera · obtenido dibujo a 993 px y tarjeta cortada en 844.
+test.describe('en móvil (390×844) — re-inspección 22/09/2026', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('HALLAZGO 22/09 · el dibujo debe asomar sin scroll, y el resultado caber entero', async ({
+    page,
+  }) => {
+    test.fail();
+    const ALTO = 844;
+    const caja = async (selector: string) => {
+      const c = await page.locator(selector).first().boundingBox();
+      return c ?? { y: Number.POSITIVE_INFINITY, height: 0 };
+    };
+
+    // Lo que ya se reparó en agosto y sigue en pie: control y resultado empiezan sin scroll
+    expect((await caja('input[type=range]')).y).toBeLessThan(ALTO);
+    expect((await caja('[class*=resultCard]')).y).toBeLessThan(ALTO);
+
+    // Lo que no: la tarjeta de resultado se corta por el pliegue…
+    const resultado = await caja('[class*=resultCard]');
+    expect(resultado.y + resultado.height).toBeLessThanOrEqual(ALTO);
+    // …y el dibujo, que es el producto de un «visualizador», no asoma en absoluto
+    expect((await caja('svg[role="img"]')).y).toBeLessThan(ALTO);
+  });
+});

@@ -79,6 +79,7 @@ import {
   COEFICIENTES_IIVTNU_2025,
   PLUSVALIA_MUNICIPAL_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  IVA_INMUEBLES_2025,
 } from '../../data/fiscal/inmuebles';
 // Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
 // es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
@@ -4272,5 +4273,466 @@ test.describe('Regresión — hallazgo 1154 de la re-inspección del 21/09/2026'
 
     // La que exige vivienda habitual, no. Hoy sale «6,00% — Vivienda habitual (primera compra)».
     expect(texto).not.toContain('Vivienda habitual');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 19. RE-INSPECCIÓN 22/09/2026 — la cola reabrió la app porque el commit ae1358d6
+//     («un importe ilegible se nombra en vez de leerse como 0 €, y la FAQ deja de estar
+//     duplicada») tocó su `page.tsx` con un mensaje que habla del TRASTERO: es una
+//     reparación hecha en la hermana y PROPAGADA aquí, así que lo primero es comprobar
+//     que llegó completa.
+//
+//     Los tres casos nuevos están resueltos a mano ANTES de ejecutar la app, con el
+//     desarrollo comentado junto a cada aserción y los importes sin redondear. Las dos
+//     comunidades elegidas —LA RIOJA y NAVARRA— no las había pisado ninguna inspección
+//     anterior (sí Madrid, Cataluña, Canarias, Ceuta, Melilla, Baleares, Murcia, Castilla
+//     y León, Andalucía, Valencia, Galicia, Extremadura, Aragón, Cantabria, Asturias y
+//     Castilla-La Mancha).
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('re-inspección 22/09/2026', () => {
+  /**
+   * CASO Y (NORMAL) — LA RIOJA · segunda mano · 32.000 € · perfil JOVEN · gestoría 300 €.
+   *
+   * Comunidad nunca probada, y con un matiz propio: sus dos reducidos de jóvenes son de
+   * «menores de 40 años» (Ley 1/2025), no de 35, así que el perfil «Joven (< 35 años)» del
+   * desplegable encaja por nombre con los dos. Ninguno se puede aplicar —ambos exigen
+   * «Primera vivienda habitual» y la app llama a `elegirTipoITP` con `viviendaHabitual:
+   * false`, porque un garaje suelto nunca lo es— de modo que los dos tienen que ENSEÑARSE
+   * como oportunidad y NINGUNO cobrarse, que es el defecto que esta familia ha repetido
+   * (hallazgos 10, 31, 514, 624, 1154).
+   *
+   * ITP — `ITP_CCAA.rioja.tipoGeneral` = 7 % (`TIPOS_ITP_CCAA_2025` «La Rioja»), sin escala:
+   *   32.000 × 7 % =                                                          2.240,000000
+   *   tipo EFECTIVO mostrado = 2.240 / 32.000 =                                     7,00 %
+   *
+   * Notaría — `calcularArancelNotarial(32000)` (RD 1426/1989, número 2):
+   *   90,15 + (30.050,61 − 6.010,12) × 0,45 % + (32.000 − 30.050,61) × 0,15 %
+   *     = 90,15 + 108,182205 + 2,924085 =                                       201,256290
+   *   × 1,21 (IVA) =                                                            243,520111
+   *   `estimarFacturaNotarial`: min ×1,5 = 365,280166 · max ×2 = 487,040222
+   *                             medio ×1,75 =                                   426,160194
+   *
+   * Registro — `calcularRegistro(32000)` (RD 1427/1989, número 2 + REGISTRO_CONCEPTOS):
+   *   24,04 + 24.040,49 × 0,175 % + 1.949,39 × 0,125 %
+   *     = 24,04 + 42,0708575 + 2,4367375 =                                       68,547595
+   *   + 6,010121 (presentación) + 3,005061 (nota simple) =                       77,562777
+   *   × 1,21 (IVA) =                                                             93,850960
+   *
+   * Total gastos — `sumarLineasVisibles` redondea cada línea ANTES de sumar:
+   *   2.240,00 + 0 (sin AJD en segunda mano) + 426,16 + 93,85 + 300,00 =       3.060,01
+   *   % sobre el precio = 3.060,01 / 32.000 =                                      9,56 %
+   * Coste total = 32.000 + 3.060,01 =                                          35.060,01
+   */
+  test('CASO Y (normal) — La Rioja, 32.000 €, perfil Joven: el 7 % general, y los dos reducidos de <40 años se enseñan sin cobrarse', async ({
+    page,
+  }) => {
+    // El tipo esperado NO se teclea: se lee de la misma ficha que compone la página.
+    expect(ITP_CCAA.rioja.tipoGeneral).toBe(7);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.selectOption('#select-ccaa', 'rioja');
+    await page.selectOption('#select-perfil', 'joven');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '32000');
+
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe(
+      `${formatNumber(ITP_CCAA.rioja.tipoGeneral, 2)}%`,
+    );
+    expect(await tituloTarjeta(page, 'ITP')).toBe('ITP (7,00%)');
+    expect(await valorTarjeta(page, 'ITP')).toBe('2240,00 €');
+    // Segunda mano: no hay AJD que pintar (el 1 % de la ficha solo rige en primera mano).
+    await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('426,16 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 365,28 € y 487,04 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('93,85 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3060,01 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '9,56% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('35.060,01 €');
+
+    // Los dos reducidos de jóvenes se ENSEÑAN con su requisito impreso, y el importe sigue
+    // siendo el del tipo general: es la regla «se enseña como oportunidad, nunca como cifra».
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
+    expect(texto).toContain('7,00% efectivo sobre el precio');
+    for (const r of ITP_CCAA.rioja.tiposReducidos.filter((t) => /j[óo]ven/i.test(t.nombre))) {
+      expect(texto).toContain(`${formatNumber(r.tipo, 2)}% — ${r.nombre}`);
+    }
+    expect(texto).toContain('Primera vivienda habitual');
+    expect(await valorTarjeta(page, 'ITP')).toBe('2240,00 €');
+    await expect(page.getByText('No definido')).toHaveCount(0);
+  });
+
+  /**
+   * CASO Z (LÍMITE) — NAVARRA · PRIMERA mano · garaje VINCULADO · 6.010,12 €.
+   *
+   * El precio es la FRONTERA EXACTA del primer tramo de los DOS aranceles
+   * (`ARANCELES_NOTARIO[0].hasta` = `ARANCELES_REGISTRO[0].hasta` = 6.010,12 €): justo ahí
+   * el bucle sale por `valor <= limiteAnterior` y se cobra la base fija sola, sin un
+   * céntimo de exceso. Ninguna inspección anterior había pisado ese borde, y es el que
+   * separa «90,15 €» de «90,15 € + el 0,45 % de lo que pase de ahí».
+   *
+   * Navarra aporta además el AJD NO NULO más bajo del catálogo (0,5 %, régimen foral): el
+   * País Vasco, que sí está probado, tiene `ajd: 0` y no pinta tarjeta, así que este caso
+   * es el testigo del extremo bajo que SÍ se cobra.
+   *
+   * IVA — garaje VINCULADO a la vivienda: `IVA_INMUEBLES_2025.anejoVinculado` = 10 %
+   *   (art. 91.Uno.1.7º LIVA, anejos transmitidos conjuntamente):
+   *   6.010,12 × 10 % =                                                          601,012000
+   *
+   * AJD — `ITP_CCAA.navarra.ajd` = 0,5 %, sin bonificación (no es Ceuta ni Melilla):
+   *   6.010,12 × 0,5 % =                                                          30,050600
+   *   tipo EFECTIVO mostrado = 30,0506 / 6.010,12 =                                  0,50 %
+   *
+   * Notaría — `calcularArancelNotarial(6010.12)`: el valor NO pasa del primer tramo,
+   *   así que es la base sola:                                                    90,150000
+   *   × 1,21 (IVA) =                                                             109,081500
+   *   min ×1,5 = 163,622250 · max ×2 = 218,163000 · medio ×1,75 =                190,892625
+   *
+   * Registro — `calcularRegistro(6010.12)`: base sola del primer tramo               24,040000
+   *   + 6,010121 (presentación) + 3,005061 (nota simple) =                       33,055182
+   *   × 1,21 (IVA) =                                                             39,996770
+   *
+   * Total gastos — `sumarLineasVisibles` redondea cada línea ANTES de sumar:
+   *   601,01 + 30,05 + 190,89 + 40,00 + 300,00 =                              1.161,95
+   *   % sobre el precio = 1.161,95 / 6.010,12 =                                   19,33 %
+   * Coste total = 6.010,12 + 1.161,95 =                                        7.172,07
+   */
+  test('CASO Z (límite) — Navarra, primera mano vinculado, 6.010,12 €: la frontera exacta del primer tramo de los dos aranceles', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.navarra.ajd).toBe(0.5);
+    expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(10);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.selectOption('#select-ccaa', 'navarra');
+    await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '6010,12');
+
+    expect(await valorTarjeta(page, 'Precio del garaje')).toBe('6010,12 €');
+    expect(await tituloTarjeta(page, 'IVA')).toBe(
+      `IVA (${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 2)}%)`,
+    );
+    expect(await valorTarjeta(page, 'IVA')).toBe('601,01 €');
+    expect(await tituloTarjeta(page, 'AJD')).toBe('AJD (0,50%)');
+    expect(await valorTarjeta(page, 'AJD')).toBe('30,05 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('190,89 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 163,62 € y 218,16 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('40,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1161,95 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '19,33% sobre el precio',
+    );
+    // En Navarra sí rige el IVA: el total es COMPLETO, no parcial como en Canarias/Ceuta.
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('7172,07 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos');
+    await expect(page.getByText('No definido')).toHaveCount(0);
+  });
+
+  /**
+   * CASO AA (DEBE RECHAZARSE) — el campo «Impuestos y gastos que pagaste al comprarlo»
+   * con un importe que el parser NO puede leer: «2.000.50», el millar y el decimal a la
+   * estadounidense, que `parseSpanishNumber` devuelve NaN por diseño desde el 24/08/2026.
+   *
+   * Es el caso LITERAL que el commit ae1358d6 (21/09/2026, hallazgo 1157) dice haber
+   * propagado a esta app desde la hermana trastero. Se comprueba aquí con el contrafactual
+   * al lado, porque el cero silencioso no se ve si no se compara.
+   *
+   * Madrid · venta 40.000 € · compra 25.000 € · 8 años · suelo 5.000 · total 12.000 ·
+   * comisión 3 % (la que trae el simulador) · gestoría de venta vacía.
+   *
+   * Plusvalía municipal — `COEFICIENTES_IIVTNU_2025` con 8 años → 0,10;
+   *   objetivo = 5.000 × 0,10 × 25 % =                                            125,000000
+   *   real     = 15.000 × (5.000/12.000) × 25 % =                               1.562,500000
+   *   recomendado = el menor =                                                    125,000000
+   *
+   * REFERENCIA con los gastos LEGIBLES (2.000 €), art. 35.1 LIRPF:
+   *   valor de adquisición = 25.000 + 2.000 =                                  27.000,00
+   *   valor de transmisión = 40.000 − 1.200 (comisión) − 125 (plusvalía) =     38.675,00
+   *   ganancia             =                                                   11.675,00
+   *   IRPF  = 6.000 × 19 % + 5.675 × 21 % = 1.140 + 1.191,75 =                  2.331,75
+   *   neto  = 40.000 − (125 + 1.200 + 2.331,75) =                              36.343,25
+   *
+   * CON EL IMPORTE ILEGIBLE, el motor lo toma como 0 y la cifra se mueve:
+   *   valor de adquisición =                                                   25.000,00
+   *   ganancia             = 38.675 − 25.000 =                                 13.675,00
+   *   IRPF  = 6.000 × 19 % + 7.675 × 21 % = 1.140 + 1.611,75 =                  2.751,75
+   *   neto  = 40.000 − (125 + 1.200 + 2.751,75) =                              35.923,25
+   *
+   * Lo exigible: que el importe ilegible se NOMBRE. El aviso del neto lo hace (la mitad
+   * propagada del 1157); las dos mitades que NO llegaron van en los dos `test.fail()` de
+   * más abajo.
+   */
+  test('CASO AA (rechazo) — un gasto de adquisición ilegible mueve el IRPF 420,00 € y el aviso del neto lo nombra', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
+    await page.getByRole('tab', { name: /Vendedor/ }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '25000');
+    await sembrarImporte(page, 'Años de propiedad', '8');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
+
+    // (a) Contrafactual: con el gasto LEGIBLE, el motor sí lo suma al valor de adquisición.
+    await sembrarImporte(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '2000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('125,00 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('27.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('38.675,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('11.675,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2331,75 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('36.343,25 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras gastos e impuestos',
+    );
+
+    // (b) Y ahora el importe que el parser rechaza, SIN blur: así lo ve quien teclea.
+    const gastos = page.locator(
+      'input[aria-label="Impuestos y gastos que pagaste al comprarlo (€)"]',
+    );
+    await gastos.fill('2.000.50');
+    await esperarValorEnReact(page, gastos, '2.000.50');
+
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('25.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('13.675,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2751,75 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('4076,75 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('35.923,25 €');
+
+    // El aviso del neto nombra la partida y el campo: es la mitad del 1157 que sí llegó.
+    const avisoNeto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(avisoNeto).toContain('los impuestos y gastos de aquella compra');
+    expect(avisoNeto).toContain('un importe legible en los gastos de la compra');
+
+    // El NaN no se asoma por ninguna parte.
+    await expect(page.getByText('No definido')).toHaveCount(0);
+    const cuerpo = (await page.evaluate(() => document.body.textContent ?? '')).replace(
+      /\s+/g,
+      ' ',
+    );
+    expect(cuerpo).not.toContain('NaN');
+
+    // `NumberInput.handleBlur` no puede normalizar lo que no es un número: el texto se queda.
+    await gastos.blur();
+    expect(await gastos.inputValue()).toBe('2.000.50');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('35.923,25 €');
+  });
+
+  /**
+   * ❌ ABIERTO 22/09/2026 (contenido, medio) — la tarjeta «Valor de adquisición» afirma que
+   * suma unos gastos que el motor ha tomado como 0.
+   *
+   * Es la mitad de ae1358d6 que NO llegó a esta app. En `trastero` la descripción es un
+   * ternario que dice «Solo el precio de compra: los impuestos y gastos de aquella compra no
+   * se han podido leer» cuando `gastosAdquisicionLegible` es false, y en `local-comercial`
+   * también. Aquí sigue siendo un literal fijo (línea 966 de `page.tsx`), de modo que la
+   * pantalla rotula 25.000,00 € como «Precio de compra + impuestos y gastos de aquella
+   * compra» con el campo de esos gastos relleno y NO leído: quien acaba de escribir 2.000,50
+   * ve su importe en el formulario y una tarjeta que dice haberlo sumado.
+   *
+   * El aviso del pie sí lo nombra, pero está cuatro tarjetas más abajo y bajo el rótulo
+   * «IMPORTE NETO VENDEDOR»; la contradicción está aquí, en la tarjeta que enseña la cifra.
+   *
+   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   */
+  test('[1157·garaje] la tarjeta «Valor de adquisición» no puede decir que suma lo que no ha podido leer', async ({
+    page,
+  }) => {
+      test.fail();
+      await page.goto(RUTA);
+      await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+      await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
+      await page.getByRole('tab', { name: /Vendedor/ }).click();
+      await sembrarImporte(page, 'Precio de compra original del garaje', '25000');
+      const gastos = page.locator(
+        'input[aria-label="Impuestos y gastos que pagaste al comprarlo (€)"]',
+      );
+      await gastos.fill('2.000.50');
+      await esperarValorEnReact(page, gastos, '2.000.50');
+
+      expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('25.000,00 €');
+      // Hoy dice «Precio de compra + impuestos y gastos de aquella compra».
+      expect(await descripcionTarjeta(page, 'Valor de adquisición')).not.toContain(
+        '+ impuestos y gastos de aquella compra',
+      );
+  });
+
+  /**
+   * ❌ ABIERTO 22/09/2026 (contenido, medio) — el aviso del neto manda «descontar» una
+   * partida que, al leerse, lo SUBE.
+   *
+   * `faltanEnElNeto` mete los tres importes ilegibles en la misma frase —«INCOMPLETO: falta
+   * descontar …»— y para dos de ellos es correcto: la comisión y la gestoría de la venta son
+   * gastos que, al no leerse, dejan el neto por ENCIMA del real. El tercero va al revés: los
+   * impuestos y gastos de aquella compra suman al valor de adquisición (art. 35.1 LIRPF),
+   * así que REDUCEN la ganancia y el IRPF, y al no leerse dejan el neto por DEBAJO.
+   *
+   * Medido en este mismo caso: neto mostrado 35.923,25 € · neto con el dato legible
+   * 36.343,25 €. La frase dice que aún hay 420,00 € que restar cuando lo que hay es 420,00 €
+   * que sumar, en una app de riesgo 1 cuyo comentario de cabecera justifica la reparación
+   * diciendo «deja la cifra por encima de la real» — cierto para dos de los tres campos.
+   *
+   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   */
+  test('[1157·garaje] el aviso del neto no puede mandar «descontar» unos gastos que lo aumentan', async ({
+    page,
+  }) => {
+      test.fail();
+      await page.goto(RUTA);
+      await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+      await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
+      await page.getByRole('tab', { name: /Vendedor/ }).click();
+      await sembrarImporte(page, 'Precio de compra original del garaje', '25000');
+      await sembrarImporte(page, 'Años de propiedad', '8');
+      await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+      await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
+      const gastos = page.locator(
+        'input[aria-label="Impuestos y gastos que pagaste al comprarlo (€)"]',
+      );
+      await gastos.fill('2.000.50');
+      await esperarValorEnReact(page, gastos, '2.000.50');
+
+      // El neto mostrado está por DEBAJO del real (35.923,25 frente a 36.343,25).
+      expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('35.923,25 €');
+      expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain(
+        'falta descontar los impuestos y gastos de aquella compra',
+      );
+  });
+
+  /**
+   * ❌ ABIERTO 22/09/2026 (operativa, medio) — la gestoría del COMPRADOR sigue leyendo como
+   * 0 € un importe que no puede leer, y sin nombrarlo.
+   *
+   * El commit ae1358d6 cubrió los tres importes del VENDEDOR («un valor ILEGIBLE no es un
+   * cero: es un dato que falta, y esta app ya sabe abstenerse y nombrarlo»). El campo
+   * «Gastos de gestoría del comprador (€)» se quedó con `Math.max(0,
+   * parseSpanishNumberOr(...))`, que devuelve 0 cuando el parser RECHAZA el texto, y su
+   * tarjeta solo se pinta con `> 0`: la línea desaparece sin dejar rastro.
+   *
+   * Madrid · 25.000 € · gestoría «2.000.50»:
+   *   con los 300 € por defecto → total 2.252,05 € · COSTE TOTAL 27.252,05 €
+   *   con el importe ilegible   → total 1.952,05 € · COSTE TOTAL 26.952,05 €
+   * y el rótulo sigue siendo «COSTE TOTAL DE ADQUISICIÓN» con la descripción «Precio + todos
+   * los gastos». La app se abstiene y avisa en la pestaña Vendedor y calla en la del
+   * Comprador, en la dirección que su propio código llama el error caro: presupuestar de
+   * menos.
+   *
+   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   */
+  test('[1157·comprador] un importe de gestoría ilegible tampoco puede leerse como 0 € en la pestaña del comprador', async ({
+    page,
+  }) => {
+      test.fail();
+      await page.goto(RUTA);
+      await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+      await page.selectOption('#select-ccaa', 'madrid');
+      await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25000');
+
+      // Referencia: con los 300 € que trae el campo, el ejemplo de Luis del bloque educativo.
+      expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2252,05 €');
+      expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('27.252,05 €');
+
+      await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+
+      // Hoy: la línea desaparece y el presupuesto baja 300 € sin decir una palabra.
+      expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('26.952,05 €');
+      const cuerpo = (await page.evaluate(() => document.body.textContent ?? '')).replace(
+        /\s+/g,
+        ' ',
+      );
+      expect(cuerpo).toMatch(/legible|no se ha(n)? podido leer/i);
+  });
+
+  /**
+   * REGRESIÓN 22/09/2026 — la OTRA mitad del commit ae1358d6: «la FAQ deja de estar
+   * duplicada». Aquí sí llegó, y el hallazgo 846 (15/09) sigue cerrado: la página sirve UN
+   * solo `FAQPage` y UN solo `WebApplication`, no dos de cada.
+   *
+   * Se mide sobre el HTML servido y no sobre el fichero: `metadata.ts` puede exportar un
+   * `jsonLd` limpio y el `layout.tsx` volver a inyectar el FAQPage por su cuenta, que es
+   * exactamente como se produjo el 846.
+   */
+  test('846 — la página sirve UN solo FAQPage y UN solo WebApplication', async ({ page }) => {
+    await page.goto(RUTA);
+    const bloques = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(
+        (s) => s.textContent ?? '',
+      ),
+    );
+    const tipos = bloques.map((b) => JSON.parse(b)['@type']);
+    expect(tipos.filter((t) => t === 'FAQPage')).toHaveLength(1);
+    expect(tipos.filter((t) => t === 'WebApplication')).toHaveLength(1);
+
+    const faq = bloques.map((b) => JSON.parse(b)).find((o) => o['@type'] === 'FAQPage');
+    expect(faq.mainEntity).toHaveLength(6);
+  });
+
+  /**
+   * ❌ ABIERTO 22/09/2026 (contenido, bajo) — tres de las seis respuestas de la FAQ siguen
+   * escritas DOS VECES a mano, y las tres ya han divergido.
+   *
+   * Es el hallazgo 1158 del commit ae1358d6, que se reparó en `trastero` (tres constantes
+   * nuevas en su `metadata.ts`) y NO se propagó aquí: en esta app solo viajan en constante
+   * `respuestaEscriturar(...)` y `RESPUESTA_ITP_GARAJE_SEGUNDA_MANO` (hallazgos 774 y 624).
+   * Las otras cuatro están copiadas en `page.tsx` y en `faqJsonLd`, y la deriva ya empezó:
+   *
+   *   · «¿Garaje nuevo o de segunda mano…?» — la visible añade «por eso el simulador no
+   *     calcula ahí el impuesto de la primera transmisión» (reparación del hallazgo 670) y
+   *     el FAQPage no. Es justo la frase que avisa de que la app se abstiene en Canarias,
+   *     Ceuta y Melilla, y falta en el canal que citan los asistentes de IA.
+   *   · «¿El vendedor…paga plusvalía municipal?» y «¿Existen tipos reducidos…?» — divergen
+   *     en redacción sin cambiar el fondo, que es como empezó también la del 624.
+   *
+   * El `test.fail()` afirma lo que DEBERÍA pasar: al repararlo se le quita la marca.
+   */
+  test('[1158·garaje] la FAQ visible y el FAQPage dicen exactamente lo mismo en las seis preguntas', async ({
+    page,
+  }) => {
+      test.fail();
+      await page.goto(RUTA);
+      const bloques = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(
+          (s) => s.textContent ?? '',
+        ),
+      );
+      const faq = bloques.map((b) => JSON.parse(b)).find((o) => o['@type'] === 'FAQPage');
+
+      const visibles = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('div'))
+          .filter(
+            (d) =>
+              /faqItem/.test(typeof d.className === 'string' ? d.className : '') &&
+              d.querySelector('h3') &&
+              d.querySelector('p'),
+          )
+          .map((d) => ({
+            q: (d.querySelector('h3')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+            a: (d.querySelector('p')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+          })),
+      );
+      expect(visibles).toHaveLength(6);
+
+      const divergen: string[] = [];
+      for (const v of visibles) {
+        const enJson = faq.mainEntity.find(
+          (m: { name: string; acceptedAnswer: { text: string } }) =>
+            m.name.replace(/\s+/g, ' ').trim() === v.q,
+        );
+        expect(enJson, `sin pareja en el FAQPage: ${v.q}`).toBeTruthy();
+        if (enJson.acceptedAnswer.text.replace(/\s+/g, ' ').trim() !== v.a) divergen.push(v.q);
+      }
+      expect(divergen).toEqual([]);
   });
 });

@@ -3790,3 +3790,243 @@ test('REGRESIÓN 1158 (contenido) — las seis respuestas de la FAQ visible y de
   }
   expect(divergentes).toEqual([]);
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RE-INSPECCIÓN 22/09/2026
+//
+// Territorio nuevo: NAVARRA (régimen foral, ITP 6 % y el AJD más bajo de la tabla junto al
+// País Vasco) y BALEARES, cuya escala progresiva de cinco tramos era la única sin usar. Y
+// una raya que ninguna ronda anterior había pisado: los 6.010,12 € donde TERMINA el primer
+// tramo del arancel notarial y del registral (RD 1426/1989 y RD 1427/1989, número 2), que
+// es el único punto del catálogo donde un trastero de precio realista cae justo en el
+// límite de un arancel.
+//
+// De dónde sale CADA cifra esperada (ninguna de memoria):
+//  - ITP general de Navarra (6 %) y de Baleares (8 % del primer tramo) → `TIPOS_ITP_CCAA_2025`
+//    en `data/fiscal/inmuebles.ts`, leído por `tipoGeneralDe()` en `data/itp-ccaa.ts`.
+//  - Escala progresiva de Baleares (8/9/10/12/13 %) y AJD de Navarra (0,5 %) → `ITP_CCAA`.
+//  - Aranceles → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,5 a ×2, medio ×1,75) y
+//    `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS` (presentación 6,010121 · nota simple 3,005061).
+//  - Ganancia e IRPF → `calcularGananciaInmueble` sobre `TRAMOS_GANANCIAS_PATRIMONIALES_2025`.
+//  - Plusvalía → `calcularPlusvaliaMunicipal` sobre `COEFICIENTES_IIVTNU_2025` (5 años → 0,17)
+//    y `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` = 25 %.
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la gestoría del comprador', () => {
+  /**
+   * CASO 35 (NORMAL) — Navarra, segunda mano, 26.000 €, comprador GENERAL.
+   *
+   * Comunidad nueva y foral: `tipoGeneral: 6` y `ajd: 0.5`, sin escala progresiva. Sus dos
+   * únicos tipos reducidos exigen vivienda habitual (5 %) o municipio despoblado + vivienda
+   * habitual (4 %), así que un trastero suelto no puede acogerse a ninguno Y tampoco se le
+   * pueden OFRECER: el aviso «Podrías pagar menos» no debe pintarse, igual que en el CASO 32.
+   *
+   * Resuelto a mano ANTES de ejecutar la app:
+   *   ITP — 26.000 × 6 % = 1.560,00 · tipo EFECTIVO = 1.560 / 26.000 = 6,00 %
+   *   Notaría — RD 1426/1989 nº 2 sobre 26.000:
+   *     90,15 + (26.000 − 6.010,12) × 0,45 % = 90,15 + 89,95446 = 180,10446
+   *     con IVA ×1,21 = 217,9263966 · ×1,5 = 326,8895949 · ×2 = 435,8527932
+   *     medio = 381,37119405 → 381,37
+   *   Registro — RD 1427/1989 nº 2 sobre 26.000:
+   *     24,04 + (26.000 − 6.010,12) × 0,175 % = 24,04 + 34,98229 = 59,02229
+   *     + 6,010121 + 3,005061 = 68,037472 · ×1,21 = 82,32534112 → 82,33
+   *   Total = 1.560 + 381,37 + 82,33 + 300 (gestoría por defecto) = 2.323,70
+   *     porcentaje = 2.323,70 / 26.000 = 8,9373 % → 8,94 %
+   *   Coste total = 26.000 + 2.323,70 = 28.323,70
+   */
+  test('CASO 35 (normal) — Navarra, segunda mano, 26.000 €, comprador general', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('navarra');
+    await sembrar(page, 'Precio del trastero', '26000');
+
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('1560,00 €');
+    expect(await descripcionTarjeta(page, /^ITP/)).toBe('ITP Comunidad Foral de Navarra');
+
+    // Régimen foral: 6 % de ITP y 0,5 % de AJD, el más bajo de la tabla tras el 0 % vasco.
+    await expect(page.getByText('ITP General').locator('xpath=..')).toContainText('6%');
+    await expect(page.getByText('AJD', { exact: true }).locator('xpath=..')).toContainText('0,5%');
+    // Navarra NO tiene escala progresiva: el aviso que la anuncia no puede aparecer.
+    await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toHaveCount(0);
+    // Segunda mano: no hay AJD.
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('381,37 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 326,89 € y 435,85 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('82,33 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2323,70 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '8,94% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('28.323,70 €');
+
+    // Los dos reducidos navarros exigen vivienda habitual: ni se aplican ni se ofrecen.
+    await expect(page.locator('[role="note"]', { hasText: /Podrías pagar menos/ })).toHaveCount(
+      0,
+    );
+  });
+
+  /**
+   * CASO 36 (LÍMITE) — Baleares, 6.010,12 €: el precio que cae EXACTAMENTE en el techo del
+   * primer tramo de los dos aranceles.
+   *
+   * `calcularArancelNotarial` y `calcularRegistro` salen del bucle con
+   * `if (valor <= limiteAnterior) break`, y ese límite es justo 6.010,12. Un céntimo menos y
+   * un céntimo más recorren ramas distintas del bucle, así que el punto es la frontera entre
+   * la cuota FIJA (90,15 € de notaría, 24,04 € de registro) y el porcentaje sobre el exceso.
+   * De paso estrena la escala de Baleares, la única de las cinco tramos sin usar: aquí solo
+   * puede entrar en su primer tramo (8 % hasta 400.000), y el aviso debe anunciar los cinco.
+   *
+   * Resuelto a mano ANTES de ejecutar la app:
+   *   ITP — 6.010,12 cabe entero en el primer tramo: 6.010,12 × 8 % = 480,8096 → 480,81
+   *     tipo EFECTIVO = 480,8096 / 6.010,12 = 8,00 %
+   *   Notaría — el bucle da la base fija del primer tramo y CORTA (6.010,12 ≤ 6.010,12):
+   *     90,15 · con IVA ×1,21 = 109,0815 · ×1,5 = 163,62225 · ×2 = 218,163
+   *     medio = 190,892625 → 190,89
+   *   Registro — misma frontera: 24,04 + 6,010121 + 3,005061 = 33,055182
+   *     ×1,21 = 39,99677022 → 40,00
+   *   Total = 480,81 + 190,89 + 40,00 + 300 = 1.011,70
+   *     porcentaje = 1.011,70 / 6.010,12 = 16,8333 % → 16,83 %
+   *   Coste total = 6.010,12 + 1.011,70 = 7.021,82
+   */
+  test('CASO 36 (límite) — Baleares, 6.010,12 €: el techo del primer tramo de los dos aranceles', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('baleares');
+    await sembrar(page, 'Precio del trastero', '6010,12');
+
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('480,81 €');
+    await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toContainText(
+      '(8% → 9% → 10% → 12% → 13%)',
+    );
+
+    // La frontera: la cuota fija del primer tramo, sin un céntimo de exceso.
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('190,89 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 163,62 € y 218,16 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('40,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1011,70 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '16,83% sobre el precio',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('7021,82 €');
+
+    // Un céntimo por encima entra en el segundo tramo, pero el exceso es de 0,45 % sobre
+    // 0,01 € — cuatro cienmilésimas — así que la pantalla NO puede moverse. Es la prueba de
+    // que la frontera es continua y no hay salto artificial al cambiar de tramo.
+    await sembrar(page, 'Precio del trastero', '6010,13');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('190,89 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('40,00 €');
+  });
+
+  /**
+   * CASO 37 (DEBE RECHAZARSE) — «2.000.50» en la gestoría del COMPRADOR.
+   *
+   * Es el hueco que la reparación del 21/09 (commit ae1358d6, hallazgo 1157) dejó abierto en
+   * su propia app de origen: allí se cubrieron los TRES importes del vendedor —comisión,
+   * gastos de aquella compra y gestoría de la venta— con `esLegible()`, y el del COMPRADOR se
+   * quedó con el `Math.max(0, parseSpanishNumberOr(gastosGestoria))` de la línea 259.
+   *
+   * «2.000.50» es el millar y el decimal a la estadounidense, y `parseSpanishNumber` devuelve
+   * NaN POR DISEÑO desde el 24/08/2026 (dos puntos, ninguno agrupa de tres en tres). El
+   * `parseSpanishNumberOr` lo convierte en 0, la tarjeta de gestoría tiene guard `> 0` y por
+   * tanto desaparece, y el total baja 300 € bajo un rótulo que sigue prometiendo «todos los
+   * gastos». Ni una palabra sobre el dato que no se ha podido leer.
+   *
+   * Medido en navegador el 22/09/2026 sobre Navarra 26.000 €:
+   *   con la gestoría por defecto (300 €) → total 2.323,70 · coste 28.323,70
+   *   con «2.000.50»                      → total 2.023,70 · coste 28.023,70 (−300,00)
+   *   con «2000,50», la MISMA cifra legible → la tarjeta vuelve con 2000,50 €
+   *
+   * `test.fail()`: afirma lo que DEBERÍA pasar. La aserción de FONDO va primero, porque
+   * dentro de un `test.fail()` basta con que el test falle en algún punto.
+   */
+  test('CASO 37 (debe rechazarse) — una gestoría del comprador ilegible se lee como 0 € en silencio', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await selectCcaa(page).selectOption('navarra');
+    await sembrar(page, 'Precio del trastero', '26000');
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+
+    // FONDO: un importe que la app no puede leer no es un cero, y el coste total no puede
+    // seguir anunciándose como «todos los gastos» cuando falta uno.
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).not.toBe(
+      'Precio del trastero + todos los gastos',
+    );
+
+    // Y el total no puede ser el que sale de tratarlo como 0: eso es 300 € menos que con la
+    // gestoría por defecto, sin ninguna línea en pantalla que lo explique.
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).not.toBe('2023,70 €');
+  });
+});
+
+// ── HALLAZGO ABIERTO de la re-inspección del 22/09/2026 ─────────────────────────
+// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
+
+/**
+ * El aviso del neto rotula «Techo» una ausencia que deja el neto por DEBAJO del real.
+ *
+ * La reparación del 1157 añadió los gastos de aquella compra a la lista de conceptos que el
+ * aviso del «IMPORTE NETO VENDEDOR» nombra cuando no se pueden leer, pero los metió en la
+ * MISMA frase que la comisión y la gestoría: «Techo: aún NO incluye …». Para esas dos es
+ * correcto —son gastos de transmisión del art. 35.1 LIRPF, y al desaparecer el neto sube—,
+ * pero los impuestos y gastos de la compra original van en la otra dirección: suman al VALOR
+ * DE ADQUISICIÓN (art. 35.1 LIRPF), reducen la ganancia y con ella el IRPF, que es una de las
+ * cuatro líneas que el neto resta. Su ausencia deja el neto por DEBAJO del real, así que la
+ * cifra en pantalla es un SUELO y el aviso la llama techo: manda al usuario a descontar de
+ * una cifra que en realidad va a subir.
+ *
+ * Medido en navegador el 22/09/2026 (venta 26.000 · compra 10.000 · 5 años · suelo 4.000 de
+ * 9.000 · comisión 3 % por defecto · sin gestoría de venta), resuelto a mano antes:
+ *   plusvalía objetivo = 4.000 × 0,17 (5 años) × 25 % = 170,00 · gana al real
+ *     (16.000 × 4.000/9.000 × 25 % = 1.777,77…), art. 107.4 y 107.5 TRLHL
+ *   comisión = 26.000 × 3 % = 780,00 · valor transmisión = 26.000 − 780 − 170 = 25.050,00
+ *
+ *   con «2.000.50» (ILEGIBLE → 0): adquisición 10.000,00 · ganancia 15.050,00
+ *     IRPF = 6.000 × 19 % + 9.050 × 21 % = 1.140 + 1.900,50 = 3.040,50
+ *     total gastos = 170 + 780 + 3.040,50 = 3.990,50 · neto = 22.009,50
+ *   con «2000,50» (la MISMA cifra, legible): adquisición 12.000,50 · ganancia 13.049,50
+ *     IRPF = 1.140 + 7.049,50 × 21 % = 1.140 + 1.480,395 = 2.620,395 → 2.620,40
+ *     total gastos = 170 + 780 + 2.620,40 = 3.570,40 · neto = 22.429,60
+ *
+ * Leer el dato SUBE el neto 420,10 €. El aviso dice lo contrario.
+ */
+test('HALLAZGO 22/09 (contenido) — el aviso del neto llama «techo» a lo que es un suelo', async ({
+  page,
+}) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await sembrar(page, 'Precio del trastero', '26000');
+  await page.getByRole('button', { name: /Vendedor/ }).click();
+  await sembrar(page, 'Precio de compra original', '10000');
+  await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2.000.50');
+  await sembrar(page, 'Años de propiedad', '5');
+  await sembrar(page, 'Valor catastral del suelo', '4000');
+  await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+
+  // La plusvalía y el IRPF SÍ están calculados: el único concepto que falta es el que va en
+  // dirección contraria, para que el aviso no pueda ser correcto «por otra de sus partes».
+  expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('170,00 €');
+  expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('10.000,00 €');
+  expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('22.009,50 €');
+
+  // FONDO: 22.009,50 € es el SUELO —leer el dato lo sube a 22.429,60 €—, así que el aviso no
+  // puede presentarlo como un techo del que aún hay que descontar.
+  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toMatch(/^Techo:/);
+});

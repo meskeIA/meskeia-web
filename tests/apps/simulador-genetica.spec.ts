@@ -1140,3 +1140,344 @@ test.describe('Re-inspección 14/09/2026 · hallazgos abiertos', () => {
     expect(guia).not.toContain('gametos del progenitor 1 en las filas');
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN · 22/09/2026 (Opus 5)
+ *
+ * Contexto: la tanda del 14/09/2026 dejó los 12 casos de aula resueltos a mano y en verde, y
+ * el 22/09 solo se tocó el CSS (b7733c6d, contraste de cabeceras). Así que esta vuelta no
+ * repite cruces ya cubiertos: va a lo que el spec anterior NO llega a tocar — el cruce 1:1,
+ * la frecuencia que vale 1 (y la que ni existe), el panel de población frente a su propia
+ * población, y el teclado sobre los dos controles editables de la página.
+ *
+ * QUÉ CRUCES CUBRÍA YA EL SPEC (para no repetirlos): Aa × Aa, AA × aa, aa+Aa en dihíbrido,
+ * AaRr × AaRr, AA Rr × aa Rr, Rr × Rr y RR × rr de flores, y los tres cruces de daltonismo.
+ * Los ratios ya fijados eran 3:1, 1:2:1, 9:3:3:1, 3:3:1:1 y 1:1:1:1.
+ *
+ * LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * (tabla de rasgos de organisms.ts: T = Alta dominante / t = Enana · A = Amarillo / a = Verde)
+ *
+ *   CASO 1 (normal) — EL RETROCRUZAMIENTO Tt × tt, guisantes, altura de planta.
+ *       Es el cruce de prueba con el que se destapa un heterocigoto, y su ratio 1:1 no
+ *       aparecía en ninguna parte del spec.
+ *       gametos del padre Tt: T, t (columnas) · gametos de la madre tt: t, t (filas)
+ *             |  T   |  t
+ *          t  | Tt   | tt
+ *          t  | Tt   | tt
+ *       genotípica  Tt 2/4 = 50 % · tt 2/4 = 50 %            → 1:1
+ *       fenotípica  Alta (Tt) 50 % · Enana (tt) 50 %          → 1:1
+ *       cada casilla 1/4 = 25,0 % · cada gameto 50 %
+ *       Lo que enseña: aquí genotipo y fenotipo coinciden en proporción, al revés que en
+ *       Aa × Aa (75/25 fenotípico contra 25/50/25 genotípico).
+ *
+ *   CASO 2 (límite) — LA FRECUENCIA QUE VALE 1: aa × aa, el homocigoto recesivo consigo mismo.
+ *       la madre y el padre solo pueden dar a  →  las cuatro casillas son aa
+ *       genotípica  aa 4/4 = 100 %   ·   fenotípica  Verde 100 %
+ *       y «Amarillo» NO es una casilla de este cuadro: su frecuencia no es 0, es que no
+ *       existe como clave, que es justo lo que `resolverCaso` tiene que distinguir.
+ *       En el panel de población: un solo fenotipo → 0 grados de libertad → el test χ² no
+ *       procede (reparación del hallazgo 832), y observado = esperado = 100 % por construcción.
+ *
+ *   CASO 3 (rechazo) — LO QUE EL CORRECTOR DEBE RECHAZAR Y LO QUE DEBE ADMITIR.
+ *       Caso 1 (Aa × Aa → 25 % de verdes) respondido de cinco formas:
+ *         «25»    → correcto          «25%» y «25 %» → correcto (el alumno escribe la unidad,
+ *                                       y `partesNumericas` recorta el símbolo pegado)
+ *         «-25»   → incorrecto (una proporción negativa no existe)
+ *         «1e3»   → no es un número: ni NaN en pantalla ni excepción
+ *       El tamaño de población ya se probó con `fill()` el 14/09; aquí se teclea, que es lo
+ *       que hace una persona (ver el primer hallazgo abierto de abajo).
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Re-inspección 22/09/2026 · los tres casos', () => {
+  test('CASO 1 (normal) · el retrocruzamiento Tt × tt da 1:1, que no es ni 3:1 ni 1:2:1', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+
+    await selectorRasgo(page, 0).selectOption('altura-planta');
+    await selectorGenotipo(page, 0).selectOption('Tt');
+    await selectorGenotipo(page, 1).selectOption('tt');
+
+    // Cuadro resuelto a mano en la cabecera, leído por filas.
+    await expect(genotiposDeCelda(page)).toHaveText(['Tt', 'tt', 'Tt', 'tt']);
+    await expect(fenotiposDeCelda(page)).toHaveText(['Alta', 'Enana', 'Alta', 'Enana']);
+    expect(await probabilidadesDeCelda(page).allInnerTexts()).toEqual([
+      '25,0%',
+      '25,0%',
+      '25,0%',
+      '25,0%',
+    ]);
+    // La madre homocigota aporta el MISMO gameto en las dos filas: la rejilla no se colapsa.
+    const [columnas, filas] = await cabeceras(page);
+    expect(columnas).toEqual(['T (50%)', 't (50%)']);
+    expect(filas).toEqual(['t (50%)', 't (50%)']);
+
+    const { genotipos, fenotipos } = await estadisticas(page);
+    expect(genotipos.filas).toEqual(['Tt 50%', 'tt 50%']);
+    expect(genotipos.ratio).toContain('Ratio: 1:1');
+    expect(genotipos.ratio).toContain('Tt · tt');
+    expect(sinIcono(fenotipos.filas)).toEqual(['Alta 50%', 'Enana 50%']);
+    expect(fenotipos.ratio).toContain('Ratio: 1:1');
+    // Y las dos proporciones suman 100 %, que es lo que hace legible un cuadro de Punnett.
+    const porcentajes = (f: string[]) =>
+      f.reduce((s, x) => s + Number(x.match(/(\d+)%$/)?.[1] ?? 0), 0);
+    expect(porcentajes(genotipos.filas)).toBe(100);
+    expect(porcentajes(fenotipos.filas)).toBe(100);
+  });
+
+  test('CASO 2 (límite) · aa × aa: una frecuencia vale 1 y la otra ni siquiera existe', async ({
+    page,
+  }) => {
+    // (a) Sin navegador: el motor de los casos de aula distingue «frecuencia 0» de «esa
+    //     casilla no está en el cuadro», que es lo que impide corregir con un 0 inventado.
+    const verde = resolverCaso({
+      tipo: 'monohibrido',
+      organismo: 'guisantes',
+      rasgo: 'color-semilla',
+      padre: 'aa',
+      madre: 'aa',
+      busca: { clase: 'fenotipo', clave: 'Verde', magnitud: 'porcentaje' },
+    });
+    expect(verde.ok).toBe(true);
+    expect(verde.valor).toBe(100);
+
+    const amarillo = resolverCaso({
+      tipo: 'monohibrido',
+      organismo: 'guisantes',
+      rasgo: 'color-semilla',
+      padre: 'aa',
+      madre: 'aa',
+      busca: { clase: 'fenotipo', clave: 'Amarillo', magnitud: 'porcentaje' },
+    });
+    expect(amarillo.ok).toBe(false);
+    expect(amarillo.error).toContain('Verde');
+    expect(Number.isNaN(amarillo.valor)).toBe(true);
+
+    // Y el retrocruzamiento del caso 1, también por la vía sin navegador: 50 % de enanas.
+    const enanas = resolverCaso({
+      tipo: 'monohibrido',
+      organismo: 'guisantes',
+      rasgo: 'altura-planta',
+      padre: 'Tt',
+      madre: 'tt',
+      busca: { clase: 'fenotipo', clave: 'Enana', magnitud: 'porcentaje' },
+    });
+    expect(enanas.valor).toBe(50);
+
+    // (b) En pantalla: las cuatro casillas son aa y no hay más fenotipo que Verde.
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await selectorGenotipo(page, 0).selectOption('aa');
+    await selectorGenotipo(page, 1).selectOption('aa');
+    await expect(genotiposDeCelda(page)).toHaveText(['aa', 'aa', 'aa', 'aa']);
+    await expect(fenotiposDeCelda(page)).toHaveText(['Verde', 'Verde', 'Verde', 'Verde']);
+
+    const { genotipos, fenotipos } = await estadisticas(page);
+    expect(genotipos.filas).toEqual(['aa 100%']);
+    expect(sinIcono(fenotipos.filas)).toEqual(['Verde 100%']);
+    // Con una sola categoría el ratio es «1», no «1:0»: el amarillo no es una casilla vacía.
+    expect(genotipos.ratio).toContain('Ratio: 1 (aa)');
+    expect(fenotipos.ratio).not.toContain('Amarillo');
+
+    // (c) Y el panel de población dice que el χ² no procede, en vez de fingir ajuste perfecto.
+    await pestana(page, 'Población').click();
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(100);
+    const chi = page.locator('[class*="chiSquare"]').first();
+    await expect(chi).toContainText('no hay grados de libertad');
+    await expect(chi).not.toContainText('Ajuste excelente');
+  });
+
+  test('CASO 3 (rechazo) · el corrector admite el símbolo % y rechaza lo que no es proporción', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    const campo = page.locator('#casos-respuesta');
+    const veredicto = page.locator('[class*="casoVeredicto"]');
+    const comprobar = page.getByRole('button', { name: 'Comprobar' });
+
+    await page.getByRole('button', { name: /^Caso 1:/ }).click();
+
+    // El alumno escribe la unidad que le pide el propio rótulo del campo.
+    for (const escrito of ['25', '25%', '25 %']) {
+      await campo.fill(escrito);
+      await esperarValorEnReact(page, '#casos-respuesta', escrito);
+      await comprobar.click();
+      await expect(veredicto, `respuesta «${escrito}»`).toContainText('¡Correcto!');
+    }
+
+    // Una proporción negativa no existe: se rechaza y se dice cuánto se ha desviado.
+    await campo.fill('-25');
+    await esperarValorEnReact(page, '#casos-respuesta', '-25');
+    await comprobar.click();
+    await expect(veredicto).toContainText('No es correcto');
+
+    // Notación científica: `parseSpanishNumber` la da por no-número a propósito, y eso tiene
+    // que llegar al alumno como una frase, nunca como «NaN» ni como una excepción.
+    await campo.fill('1e3');
+    await esperarValorEnReact(page, '#casos-respuesta', '1e3');
+    await comprobar.click();
+    await expect(veredicto).toContainText('Escribe un número');
+    await expect(page.locator('body')).not.toContainText('NaN');
+  });
+});
+
+/**
+ * HALLAZGOS ABIERTOS del 22/09/2026. Todos fallan HOY a propósito: afirman lo que debería
+ * pasar. El día que se reparen, quitar el `test.fail()` y quedan como regresión.
+ */
+test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
+  test('el campo «Tamaño de población» admite que se teclee un valor de su propio rango', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await pestana(page, 'Población').click();
+    const campo = campoPoblacion(page);
+    await expect(campo).toHaveValue('100');
+
+    // Seleccionar todo y teclear 50, que es lo que hace una persona. `handleSizeChange`
+    // juzga cada pulsación por separado: el «5» intermedio cae fuera de [10, 500], se
+    // rechaza, y React restaura el valor controlado, así que el siguiente dígito ya no se
+    // pega a él. El 14/09 esto no se vio porque el spec usa `fill()`, que entrega el valor
+    // entero en un solo evento — el único camino que la app deja abierto.
+    await campo.click();
+    await page.keyboard.press('Control+a');
+    await page.keyboard.type('50', { delay: 50 });
+    await expect(campo).toHaveValue('50');
+    // Y el aviso no debe acusar de salirse de un rango en el que 50 sí está.
+    await expect(page.locator('#aviso-tamano-poblacion')).toHaveCount(0);
+  });
+
+  test('la columna «Esperado» reparte exactamente la población que se ha simulado', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await page.getByRole('button', { name: /Realizar Cruce/ }).click();
+    await pestana(page, 'Población').click();
+    await campoPoblacion(page).fill('200');
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(200);
+
+    // AaRr × AaRr sobre 200 individuos: 9/16, 3/16, 3/16 y 1/16 valen 112,5 · 37,5 · 37,5 ·
+    // 12,5. `simulatePopulation` redondea cada uno por su cuenta (Math.round, que sube los
+    // medios) y sale 113 + 38 + 38 + 13 = 202: dos individuos más de los que hay. La columna
+    // «Observado» suma 200 porque cuenta individuos reales, así que las dos columnas que se
+    // ponen una al lado de la otra para compararse no hablan de la misma población. Y el χ²
+    // se calcula contra esos esperados inflados.
+    const totales = await page.evaluate(() =>
+      [...document.querySelectorAll('[class*="resultColumn"]')].map((col) => ({
+        titulo: (col as HTMLElement).innerText.split('\n')[0],
+        total: [...col.querySelectorAll('[class*="resultRow"]')].reduce((s, f) => {
+          const n = Number((f.querySelectorAll('span')[1] as HTMLElement | undefined)?.innerText.match(/^(\d+)/)?.[1] ?? 0);
+          return s + n;
+        }, 0),
+      })),
+    );
+    expect(totales.map((t) => t.total)).toEqual([200, 200]);
+  });
+
+  test('las dos columnas del panel de población enfrentan el mismo fenotipo en la misma fila', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await page.getByRole('button', { name: /Realizar Cruce/ }).click();
+    await pestana(page, 'Población').click();
+    await campoPoblacion(page).fill('200');
+
+    // «Esperado» sale en el orden del cuadro de Punnett; «Observado» en el orden en que cada
+    // fenotipo APARECIÓ en el sorteo, que cambia en cada corrida. Las dos columnas están
+    // pegadas para leerse fila a fila y en 5 de 6 corridas no coinciden: se acaba comparando
+    // «Verde / Lisa 48» con «Amarillo / Lisa 113». Seis corridas seguidas para que la
+    // coincidencia por azar (~10 % cada una) no dé un verde falso.
+    const ordenes: Array<[string[], string[]]> = [];
+    for (let i = 0; i < 6; i++) {
+      await page.getByRole('button', { name: /Simular/ }).click();
+      await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(200);
+      const lectura = await page.evaluate(() =>
+        [...document.querySelectorAll('[class*="resultColumn"]')].map((col) =>
+          [...col.querySelectorAll('[class*="resultRow"]')].map(
+            (f) => (f.querySelectorAll('span')[0] as HTMLElement).innerText.trim(),
+          ),
+        ),
+      );
+      ordenes.push([lectura[0], lectura[1]]);
+    }
+    for (const [observado, esperado] of ordenes) {
+      expect(observado).toEqual(esperado);
+    }
+  });
+
+  test('el corrector acepta la proporción que la propia app imprime para ese cruce', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+
+    // Lo que la app publica para Verde / Rugosa en AaRr × AaRr, que es el cruce del caso 7.
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await page.getByRole('button', { name: /Realizar Cruce/ }).click();
+    const { fenotipos } = await estadisticas(page);
+    expect(sinIcono(fenotipos.filas)).toContain('Verde / Rugosa 6%');
+
+    // La sección de casos dice «Resuélvelos con el cuadro de Punnett de arriba», y arriba
+    // pone 6 %. Pero `toleranciaDe(6,25)` vale 0,0625, así que el 6 que el alumno acaba de
+    // leer se corrige como error por 0,25. En el caso 6, con el mismo gesto, el 56 que
+    // imprime la app SÍ se acepta, porque allí la tolerancia relativa vale 0,5625: la misma
+    // forma de responder vale o no según el tamaño de la respuesta.
+    await page.getByRole('button', { name: /^Caso 6:/ }).click();
+    await page.locator('#casos-respuesta').fill('56');
+    await esperarValorEnReact(page, '#casos-respuesta', '56');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(page.locator('[class*="casoVeredicto"]')).toContainText('¡Correcto!');
+
+    await page.getByRole('button', { name: /^Caso 7:/ }).click();
+    await page.locator('#casos-respuesta').fill('6');
+    await esperarValorEnReact(page, '#casos-respuesta', '6');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(page.locator('[class*="casoVeredicto"]')).toContainText('¡Correcto!');
+  });
+
+  test('el corrector no da por buena una proporción imposible', async () => {
+    test.fail();
+    // Sin navegador: es aritmética de `comprobarRespuesta`. La tolerancia es el mayor entre
+    // 0,01 y el 1 % del valor esperado, así que con esperado = 100 vale 1 y entra el 101.
+    // Un «101 %» de la descendencia no es una respuesta con un error de redondeo: es una
+    // respuesta que no puede existir, y el caso 3 pregunta justamente un porcentaje.
+    expect(toleranciaDe(100)).toBe(1);
+    expect(comprobarRespuesta(101, 100).correcto).toBe(false);
+
+    // El mismo techo, en el caso 3 de verdad (AA × aa, toda la F1 amarilla).
+    const caso3 = CASOS.find((c) => c.id === 3);
+    expect(caso3?.respuesta).toBe(100);
+    expect(comprobarRespuesta(101, caso3?.respuesta ?? 0).correcto).toBe(false);
+  });
+
+  test('en modo Practicar el botón de pista no anuncia una pista que no existe', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await page.getByRole('button', { name: /Practicar/ }).click();
+
+    // El ejercicio de práctica no trae `pista` —`Ejercicio` no tiene ese campo— y la vista lo
+    // resuelve con `verPista && !practica`, pero deja el botón en pantalla. Al pulsarlo el
+    // rótulo pasa a «Ocultar pista» y `aria-expanded` a «true» sin que se despliegue nada:
+    // un lector de pantalla anuncia contenido expandido que no está en el DOM.
+    const pista = page.getByRole('button', { name: /pista/ });
+    await expect(pista).toHaveAttribute('aria-expanded', 'false');
+    await pista.click();
+    await expect(page.locator('[class*="casoPista"]')).toHaveCount(1);
+  });
+});

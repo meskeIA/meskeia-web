@@ -25,6 +25,8 @@ import {
 // ── Añadidos por la re-inspección del 12/09/2026 (describe del final del fichero) ──
 import { PLAZO_ITP } from '../../data/fiscal/inmuebles';
 import { PORCENTAJES_IVA } from '../../data/fiscal/iva';
+// ── Añadido por la re-inspección del 22/09/2026 (describe del final del fichero) ──
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
@@ -4113,5 +4115,292 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
       .filter(({ linea }) => /IVA (al )?\d{1,2}\s?%/.test(linea))
       .map(({ n, linea }) => `${n}: ${linea}`);
     expect(tecleados, 'los tipos de IVA salen de data/fiscal, no de la memoria').toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inspector — re-inspección 22/09/2026
+//
+// Dos frentes nuevos:
+//  (a) NAVARRA, la única comunidad que este fichero no había pisado nunca (lo dejó escrito
+//      la re-inspección del 21/09 en el CASO 45: «era, con Navarra, una de las dos únicas
+//      comunidades sin ningún caso»). Régimen foral: ITP general del 6 % sin escala y el
+//      AJD más bajo del catálogo, 0,5 %.
+//  (b) El IMPORTE ILEGIBLE, medido el mismo día en la hermana
+//      `simulador-gastos-compraventa-garaje`: un importe que `parseSpanishNumber` no puede
+//      leer —«193.000.00», con el millar y el decimal escritos los dos con punto— se
+//      convierte en 0 € y la página sigue publicando una cifra como si el dato estuviera.
+//      Aquí entran por `parseSpanishNumberOr`, que es correcto para el campo VACÍO
+//      («si el formulario dice opcional, el código tiene que tratarlo como opcional») y no
+//      distingue el vacío del ilegible.
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ilegible', () => {
+  /** Siembra comprobando que el ESTADO de React recogió el valor, y después acota con el blur. */
+  async function sembrar22(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  async function abrir22(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+  }
+
+  /** Abre la pestaña Vendedor y espera a que sus campos estén hidratados. */
+  async function abrirVendedor22(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+  }
+
+  /**
+   * CASO 48 (normal) — Navarra, PRIMERA MANO, vivienda de 300.000 €.
+   *
+   * Camino IVA + AJD por la comunidad con el AJD más bajo de la tabla (0,5 %, régimen
+   * foral): el estimador nunca lo había recorrido, y es el tipo que más se aleja del 1,5 %
+   * habitual, así que un AJD que se calculara con un tipo fijo se delataría aquí.
+   *   IVA  = 300.000 × 10 %  (IVA_INMUEBLES_2025.obraNueva)              =  30.000,00 €
+   *   AJD  = 300.000 × 0,5 % (ITP_CCAA.navarra.ajd)                      =   1.500,00 €
+   *   Notaría = arancel(300.000) × 1,21 × 1,75                           =     864,86 €
+   *     arancel = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 %
+   *               + 90.151,82×0,10 % + 149.746,97×0,05 %  = 408,43341
+   *               → ×1,21 = 494,204426 → ×1,75 = 864,857746
+   *   Registro = (216,212064 + 6,010121 + 3,005061) × 1,21               =     272,52 €
+   *     216,212064 = 24,04 + 24.040,49×0,175 % + 30.050,60×0,125 %
+   *                  + 90.151,82×0,075 % + 149.746,97×0,030 %
+   *   Gestoría (GESTORIA_TIPICA, valor por defecto del campo)             =     300,00 €
+   *   Total gastos = 30.000 + 1.500 + 864,86 + 272,52 + 300              =  32.937,38 €
+   *   % sobre precio = 32.937,38 / 300.000                                =      10,98 %
+   *   Coste total  = 300.000 + 32.937,38                                  = 332.937,38 €
+   */
+  test('CASO 48 (normal) — Navarra, obra nueva de 300.000 €: IVA al 10 % y el AJD foral del 0,5 %', async ({
+    page,
+  }) => {
+    // Anclaje: los dos tipos salen de la tabla, no de la memoria del test
+    expect(ITP_CCAA['navarra'].ajd).toBe(0.5);
+    expect(ITP_CCAA['navarra'].tipoGeneral).toBe(6);
+    expect(IVA_INMUEBLES_2025.obraNueva).toBe(10);
+
+    await abrir22(page);
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('navarra');
+    await sembrar22(page, 'Precio de la vivienda', '300000');
+
+    await expect(page.getByRole('heading', { name: 'IVA (10,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^IVA/)).toBe('30.000,00 €');
+
+    // El AJD se rotula con el tipo EFECTIVO: 1.500 / 300.000 = 0,50 %
+    await expect(page.getByRole('heading', { name: 'AJD (0,50%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
+
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('864,86 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('272,52 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('32.937,38 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('10,98% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('332.937,38 €');
+  });
+
+  /**
+   * CASO 49 (límite) — Navarra, segunda mano, EXACTAMENTE 180.304 €: el canto del tope.
+   *
+   * `ITP_CCAA.navarra` trae dos reducidos SIN colectivo —«Vivienda habitual» al 5 % con
+   * `valorMaximo` 180.304 € y «Municipios despoblados» al 4 % sin tope—, así que con perfil
+   * General los dos caen en `alAlcanceDeCualquiera` y se enseñan como oportunidad sin
+   * aplicarse. El precio se pone en el borde para medir que la comparación del tope es «≤»
+   * y no «<»: un euro más y el del 5 % tiene que desaparecer de la lista.
+   *
+   *   ITP      = 180.304 × 6 %  (tipo general; Navarra no tiene escala)  =  10.818,24 €
+   *   Notaría  = arancel(180.304) × 1,21 × 1,75                          =     738,13 €
+   *     arancel = 90,15 + 108,182205 + 45,0759 + 90,15182 + 30.050,97×0,05 %
+   *             = 348,58541 → ×1,21 = 421,788346 → ×1,75 = 738,129606
+   *   Registro = (180,3032635 + 6,010121 + 3,005061) × 1,21              =     229,08 €
+   *   Gestoría                                                            =     300,00 €
+   *   Total gastos = 10.818,24 + 738,13 + 229,08 + 300                   =  12.085,45 €  (6,70 %)
+   *   Coste total  = 180.304 + 12.085,45                                 = 192.389,45 €
+   *
+   *   Con 180.305 € el ITP pasa a 10.818,30 € y el reducido del 5 % sale de la lista.
+   */
+  test('CASO 49 (límite) — Navarra, 180.304 € justo en el tope del reducido de vivienda habitual', async ({
+    page,
+  }) => {
+    const habitual = ITP_CCAA['navarra'].tiposReducidos.find((t) => t.nombre === 'Vivienda habitual');
+    expect(habitual?.valorMaximo, 'el tope del reducido sale de la tabla').toBe(180304);
+    expect(habitual?.tipo).toBe(5);
+    /** `valorMaximo` es opcional en la ficha: el `expect` de arriba ya ha dicho que aquí existe. */
+    const tope = habitual?.valorMaximo ?? 0;
+
+    await abrir22(page);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('navarra');
+    await sembrar22(page, 'Precio de la vivienda', String(tope));
+
+    // Se COBRA el tipo general: el reducido exige requisitos que la app no pregunta
+    await expect(page.getByRole('heading', { name: 'ITP (6,00%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('10.818,24 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('738,13 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('229,08 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('12.085,45 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('6,70% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('192.389,45 €');
+
+    // …y se ENSEÑA como oportunidad, con el del 4 % detrás
+    const lineas = page.locator('ul[class*="avisoReducidosLista"] li');
+    await expect(lineas).toHaveCount(2);
+    await expect(lineas.nth(0)).toContainText('5,00% — Vivienda habitual');
+    await expect(lineas.nth(1)).toContainText('4,00% — Municipios despoblados');
+
+    // Un euro por encima del tope: el del 5 % ya no se puede ofrecer
+    await sembrar22(page, 'Precio de la vivienda', String(tope + 1));
+    expect(await valorTarjeta(page, /^ITP/)).toBe('10.818,30 €');
+    const lineasArriba = page.locator('ul[class*="avisoReducidosLista"] li');
+    await expect(lineasArriba).toHaveCount(1);
+    await expect(lineasArriba.nth(0)).toContainText('4,00% — Municipios despoblados');
+  });
+
+  /**
+   * CASO 50 (debe rechazarse) — un importe ILEGIBLE no es un cero.
+   *
+   * ⚠️ HALLAZGO 22/09/2026 (ALTO) — medido en navegador sobre localhost:3050.
+   *
+   * Siete campos de dinero de esta página se leen con `parseSpanishNumberOr`, que devuelve
+   * 0 tanto para el campo vacío como para lo que no es un número. Para el vacío es lo
+   * correcto y está documentado en `lib/formatters.ts`; para el ilegible no, porque el
+   * usuario SÍ escribió un dato y la página lo descarta sin decirlo. El texto sigue en
+   * pantalla (el blur del NumberInput no lo toca: solo acota lo que sí parsea), así que
+   * nada delata la pérdida.
+   *
+   * El caso más caro es la exención por reinversión del art. 38 LIRPF, que se pierde entera:
+   *   Venta 200.000 · compra 150.000 · 10 años · suelo catastral 50.000 · comisión 3 % ·
+   *   vivienda habitual · «Voy a reinvertir» marcado · sin hipoteca pendiente.
+   *     Plusvalía municipal = 50.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años)
+   *                           × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.000,00 €
+   *     Comisión = 200.000 × 3 %                                              =  6.000,00 €
+   *     Valor de transmisión = 200.000 − 6.000 − 1.000                        = 193.000,00 €
+   *     Ganancia = 193.000 − 150.000                                          =  43.000,00 €
+   *
+   *   · Reinversión «193000» (legible)   → proporción 1 → EXENTO · neto 193.000,00 €
+   *   · Reinversión «193.000.00»          → se lee 0 € → base 43.000 →
+   *       IRPF = 6.000×19 % + 37.000×21 % = 1.140 + 7.770                     =  8.910,00 €
+   *       neto = 200.000 − (1.000 + 6.000 + 8.910)                            = 184.090,00 €
+   *
+   * 8.910 € de diferencia, con el importe tecleado todavía visible en el campo, sin ningún
+   * aviso — y el neto rotulado «Lo que realmente recibes», es decir declarado DEFINITIVO,
+   * porque `faltanEnElNeto` solo mira la plusvalía y el precio de compra.
+   *
+   * `test.fail()`: afirma lo que la app DEBERÍA hacer. Cuando se repare, se pondrá en rojo.
+   */
+  test('CASO 50 (debe rechazarse) — un importe de reinversión ilegible no puede valer 0 € en silencio', async ({
+    page,
+  }) => {
+    test.fail();
+
+    await abrir22(page);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await sembrar22(page, 'Precio de la vivienda', '200000');
+    await abrirVendedor22(page);
+    await sembrar22(page, 'Precio de compra original', '150000');
+    await sembrar22(page, 'Años de propiedad', '10');
+    await sembrar22(page, 'Valor catastral del suelo', '50000');
+    await page.getByText('Voy a reinvertir en otra vivienda habitual').click();
+    await esperarHidratacion(page, [
+      'input[aria-label="Importe que reinviertes en la nueva vivienda"]',
+    ]);
+    await sembrar22(page, 'Importe que reinviertes en la nueva vivienda', '193.000.00');
+
+    // Lo tecleado sigue ahí: nadie lo ha corregido por detrás
+    await expect(
+      page.locator('input[aria-label="Importe que reinviertes en la nueva vivienda"]'),
+    ).toHaveValue('193.000.00');
+
+    const irpf = await valorTarjeta(page, 'IRPF sobre ganancia');
+    const neto = await valorTarjeta(page, 'IMPORTE NETO VENDEDOR');
+
+    expect(
+      await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR'),
+      `el importe de reinversión ilegible se leyó como 0 €: IRPF ${irpf} y neto ${neto}, ` +
+        'publicados como definitivos sin nombrar el dato que no se pudo leer',
+    ).not.toContain('Lo que realmente recibes');
+  });
+
+  /**
+   * CASO 50 bis (control) — el MISMO importe escrito en español sí exime.
+   *
+   * Es la mitad que tiene que seguir en verde cuando se repare el 50: la reparación no puede
+   * consistir en dejar de aplicar la exención. Cifras, arriba.
+   */
+  test('CASO 50 bis (control) — con el importe legible, la reinversión total sí deja la ganancia exenta', async ({
+    page,
+  }) => {
+    // Anclaje de los tres datos normativos del caso
+    expect(
+      COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente,
+      'coeficiente de 10 años del RDL 26/2021',
+    ).toBe(0.08);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0]).toEqual({ hasta: 6000, tipo: 19 });
+
+    await abrir22(page);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await sembrar22(page, 'Precio de la vivienda', '200000');
+    await abrirVendedor22(page);
+    await sembrar22(page, 'Precio de compra original', '150000');
+    await sembrar22(page, 'Años de propiedad', '10');
+    await sembrar22(page, 'Valor catastral del suelo', '50000');
+    await page.getByText('Voy a reinvertir en otra vivienda habitual').click();
+    await esperarHidratacion(page, [
+      'input[aria-label="Importe que reinviertes en la nueva vivienda"]',
+    ]);
+    await sembrar22(page, 'Importe que reinviertes en la nueva vivienda', '193000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('193.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('43.000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('art. 38 LIRPF');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('7000,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('193.000,00 €');
+  });
+
+  /**
+   * CASO 51 (debe rechazarse) — la otra cara del mismo hueco, en la pestaña COMPRADOR.
+   *
+   * ⚠️ HALLAZGO 22/09/2026 (MEDIO) — misma raíz que el CASO 50, dirección contraria.
+   *
+   * La gestoría del comprador también se lee con `parseSpanishNumberOr`. Con un importe
+   * ilegible vale 0 €, y como la tarjeta se pinta bajo la guarda `gastosGestoria > 0`, la
+   * línea DESAPARECE del desglose: no queda ni un «0,00 €» que delate la pérdida.
+   *
+   *   Madrid, segunda mano, 200.000 €, gestoría «2.000.50»:
+   *     ITP 12.000,00 + notaría 758,98 + registro 236,22                 = 12.995,20 €
+   *     …frente a los 13.295,20 € con la gestoría por defecto de 300 €.
+   *   Y el coste total, 212.995,20 €, sigue rotulado «Precio + todos los gastos».
+   *
+   * Aquí el desvío va a la baja, que es la dirección contra la que avisa por escrito el
+   * contrato de `elegirTipoITP` en data/itp-ccaa.ts: «quien presupuesta 0 y paga 12.000
+   * tiene un problema».
+   */
+  test('CASO 51 (debe rechazarse) — una gestoría ilegible no puede desaparecer de «todos los gastos»', async ({
+    page,
+  }) => {
+    test.fail();
+
+    await abrir22(page);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    await sembrar22(page, 'Precio de la vivienda', '200000');
+    await sembrar22(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+
+    await expect(
+      page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]'),
+    ).toHaveValue('2.000.50');
+
+    const total = await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN');
+    expect(
+      await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN'),
+      `la gestoría ilegible se leyó como 0 € y su línea desapareció del desglose, pero ` +
+        `el coste total (${total}) sigue anunciándose como completo`,
+    ).not.toBe('Precio + todos los gastos');
   });
 });
