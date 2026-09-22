@@ -1186,7 +1186,15 @@ test.describe('re-inspección 22/09/2026', () => {
     await page.getByRole('button', { name: /Practicar/ }).click();
     const enunciado = page.locator('[class*="casoEnunciado"]');
     await expect(enunciado).toHaveAttribute('aria-live', 'polite');
-    await expect(enunciado).toHaveAttribute('role', 'status');
+    await expect(enunciado).toHaveAttribute('aria-atomic', 'true');
+    /*
+      Y NO `role="status"`, que fue la primera versión de esta reparación: un enunciado de
+      ejercicio no es un mensaje de estado, y el role añade un landmark que compite con los que la
+      app ya tenga. En `simulador-fotografia` rompió nueve tests de golpe —su medidor de exposición
+      ES un `role="status"` y el localizador de su spec pasó a encontrar dos—, y lo cazó la suite
+      entera, que es para lo que se corre. El anuncio lo hace `aria-live`.
+    */
+    await expect(enunciado).not.toHaveAttribute('role', 'status');
 
     // Y el enunciado cambia de verdad al volver a pulsar, que es lo que hay que anunciar.
     const vistos = new Set<string>();

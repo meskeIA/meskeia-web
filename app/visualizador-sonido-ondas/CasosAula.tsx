@@ -113,8 +113,14 @@ export default function CasosAula() {
           true, y la sección no tenía ninguna región viva salvo el veredicto, que solo existe
           después de comprobar. Quien usa lector de pantalla no se enteraba de que el enunciado
           había cambiado. Vale igual al cambiar de caso numerado, que tenía el mismo silencio.
+
+          ⚠️ `aria-live="polite"` + `aria-atomic`, y NO `role="status"`: un enunciado de ejercicio
+          no es un mensaje de estado, y el role añade un landmark que compite con los que la app
+          ya tenga. En `simulador-fotografia` rompió nueve tests de golpe —su medidor de
+          exposición ES un `role="status"`, y el localizador del spec pasó a encontrar dos—, que
+          es la señal de que el role sobraba: el anuncio lo hace `aria-live`.
         */}
-        <p className={styles.casoEnunciado} role="status" aria-live="polite">
+        <p className={styles.casoEnunciado} aria-live="polite" aria-atomic="true">
           {enunciado}
         </p>
 
