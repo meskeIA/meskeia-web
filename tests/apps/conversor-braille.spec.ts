@@ -419,8 +419,7 @@ test.describe('re-inspección 22/09/2026', () => {
   // eso es un espacio, no un indicador»—, con ⠠ dejado atrás. Y aquí duele más: el
   // lector táctil encuentra una celda en blanco (= separación de palabra) seguida de un
   // punto 2 (= coma), de modo que la hoja punzada dice «12 ,05 ,2026».
-  test('CASO 1 (normal) — la barra inclinada debe dibujar su punto 6', async ({ page }) => {
-    test.fail();
+  test('1183 (regresión) — la barra inclinada dibuja su punto 6', async ({ page }) => {
     await page.goto(RUTA);
     await convertirHidratado(page, '12/05/2026');
     await expect(cajaResultado(page)).toHaveText('⠼⠁⠃⠠⠂⠼⠚⠑⠠⠂⠼⠃⠚⠃⠋');
@@ -455,8 +454,7 @@ test.describe('re-inspección 22/09/2026', () => {
   // Y el aviso que la app muestra dice «puede que el Código Braille Español sí les
   // asigne celda fuera de la signografía básica que cubre esta app», cuando la celda
   // está en su propia tabla dos líneas más abajo.
-  test('CASO 2 (límite) (a) — el apóstrofo tipográfico ’ (U+2019)', async ({ page }) => {
-    test.fail();
+  test('1184 (regresión) — el apóstrofo tipográfico ’ (U+2019) tiene celda', async ({ page }) => {
     await page.goto(RUTA);
 
     // Control: con el apóstrofo recto la app ya hace lo correcto desde el 21/08/2026.
@@ -485,8 +483,7 @@ test.describe('re-inspección 22/09/2026', () => {
   // La prueba de que está mal no necesita fuente externa: la vuelta de la PROPIA app
   // devuelve «3.2» de lo que ella misma escribió para «3.b», y en cambio lee bien
   // ⠼⠉⠄⠐⠃ como «3.b». La app sabe la codificación correcta; solo no la emite.
-  test('CASO 2 (límite) (b) — «3.b» y el prefijo de latina del § 8.2', async ({ page }) => {
-    test.fail();
+  test('1186 (regresión) — «3.b» emite el prefijo de latina del § 8.2', async ({ page }) => {
     await page.goto(RUTA);
 
     // Esperado ⠼⠉⠄⠐⠃ (⠼ · c=3 · punto 3 · prefijo punto 5 · b) · obtenido hoy ⠼⠉⠄⠃.
@@ -517,12 +514,43 @@ test.describe('re-inspección 22/09/2026', () => {
   // reparar en que el selector está en el otro sentido— y es el único caso en el que la
   // app devuelve algo que parece una traducción y no lo es. Lo mínimo exigible es que
   // diga algo, igual que dice algo en los otros tres modos de fallo que ya cubre.
-  test('CASO 3 (rechazo) — texto en tinta en modo Braille → Texto', async ({ page }) => {
-    test.fail();
+  test('1187 (regresión) — texto en tinta en modo Braille → Texto se avisa', async ({ page }) => {
     await page.goto(RUTA);
     await convertirHidratado(page, 'Hola mundo', 'braille');
 
     // Hoy el resultado es «Hola mundo», idéntico a la entrada, y no hay ningún aviso.
     await expect(page.locator('[class*="avisoConversion"]')).not.toHaveCount(0);
   });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 1185 — la FAQ no puede decir que el UEB es del inglés y del español a la vez
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Dos respuestas ADYACENTES afirmaban lo contrario la una de la otra: una que el UEB de 2004
+// unificó los sistemas DEL INGLÉS, y la siguiente que es «un estándar internacional adaptado al
+// español como UEB-Es». Ni «Braille Unificado en Español» ni «UEB-Es» aparecen en la página de
+// la Comisión Braille Española (ONCE), consultada el 22/09/2026, así que la afirmación se retira
+// en vez de reescribirse por otra versión. Pesa aquí más de lo normal porque la diferencia entre
+// el braille español y el inglés ES la promesa de la app, y porque una FAQPage es lo que ChatGPT,
+// Perplexity y Bing Copilot usan para fundamentar respuestas.
+test('1185 (regresión) — la FAQ no atribuye el UEB al español ni inventa un «UEB-Es»', async ({
+  page,
+}) => {
+  await page.goto(RUTA);
+  const cuerpo = (await page.evaluate(() => {
+    const clon = document.body.cloneNode(true) as HTMLElement;
+    clon.querySelectorAll('script, style').forEach((n) => n.remove());
+    return clon.textContent ?? '';
+  })).replace(/\s+/g, ' ');
+
+  expect(cuerpo).not.toContain('UEB-Es');
+  expect(cuerpo).not.toContain('Braille Unificado en Español');
+  expect(cuerpo).not.toContain('adaptado al español');
+  // Y lo que queda dicho del UEB es lo mismo en toda la página: que es del inglés.
+  expect(cuerpo).toContain('unificó los distintos sistemas del inglés');
+  expect(cuerpo).toContain('no se aplica al español');
+  // La fuente que la app cita en su código sale también en pantalla.
+  expect(cuerpo).toContain('Comisión Braille Española');
+  expect(cuerpo).toContain('Documento Técnico B 2');
 });

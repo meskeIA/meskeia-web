@@ -49,7 +49,16 @@ const textToBraille: { [key: string]: string } = {
   // el Código no se la asigna, que es lo contrario de lo que dice la fuente que ella
   // misma cita. Duele en catalán y valenciano —l'Hospitalet, d'Alacant—, que es justo
   // el público de un documento sobre lenguas cooficiales (Inspector, 20/08/2026).
-  "'": '⠄',                                            // apóstrofo — punto 3
+  //
+  // ⚠️ 22/09/2026 (hallazgo 1184) — aquella alta cubrió solo U+0027, el apóstrofo recto del
+  // teclado, y el que llevan los textos reales es U+2019: Word, Google Docs, iOS y Android lo
+  // sustituyen al escribir. Se descartaba, y encima con el aviso de que «puede que el Código
+  // Braille Español sí les asigne celda fuera de la signografía básica que cubre esta app»
+  // cuando la celda está en esta misma tabla — la misma forma del hallazgo del 20/08. Que era
+  // descuido y no decisión se ve sin salir del fichero: dos líneas más arriba las comillas
+  // tipográficas U+201C/D SÍ se normalizan, así que se contempló para la doble y no para la
+  // simple. Y deja sin reparar justo el caso que aquella reparación nombraba: «l’Hospitalet».
+  "'": '⠄', '’': '⠄', '‘': '⠄',                        // apóstrofo — punto 3
 };
 
 /**
@@ -118,6 +127,15 @@ const brailleDots: { [key: string]: number[] } = {
   // ningún punto: en la hoja a escala real eso es un espacio, no un indicador.
   '⠨': [4,6],   // signo de mayúscula (B 2 § 7)
   '⠐': [5],     // prefijo de latina minúscula (B 2 § 8.2)
+  /**
+   * ⚠️ 22/09/2026 (hallazgo 1183) — y faltaba una cuarta, por la misma razón y con el mismo
+   * efecto: U+2820 (punto 6) es la PRIMERA celda de la barra inclinada del § 6.2, que llega por
+   * `SIGNOS_COMPUESTOS` y por eso se quedó fuera de aquella reparación. `brailleDots[c] ?? []`
+   * la dibujaba con los seis puntos apagados, y en la hoja imprimible a escala real una celda
+   * sin puntos es un ESPACIO: el lector táctil encontraba separación de palabra seguida de un
+   * punto 2, así que «12/05/2026» se punzaba «12 ,05 ,2026». Afecta a toda fecha, fracción o URL.
+   */
+  '⠠': [6],     // prefijo de la barra inclinada (B 2 § 6.2)
 };
 
 const NUMBER_INDICATOR = '⠼';   // puntos 3-4-5-6 — signo de número (B 2 § 8.1)
@@ -277,6 +295,28 @@ export default function ConversorBraillePage() {
     ];
   }, [mode, result, input]);
 
+  /**
+   * ¿La entrada de «Braille → Texto» no trae NI UNA celda braille? (hallazgo 1187)
+   *
+   * ⚠️ 22/09/2026 — `convertBrailleToText` hace `brailleToText[char] || char`, así que lo que no
+   * reconoce lo copia tal cual. Para una celda braille desconocida eso quedó resuelto el
+   * 21/08/2026 —pasa al resultado y la app lo dice—, pero `celdasSinTexto` filtra por el rango
+   * Unicode del bloque braille, de modo que un texto en TINTA, que no tiene ni un carácter de
+   * ese bloque, salía entero al cuadro de resultado con el aspecto de una conversión que había
+   * ido bien.
+   *
+   * Es el error de manejo más probable de esta app: llegar, pegar y pulsar Convertir sin
+   * reparar en que el selector está en el otro sentido. Y era el único caso en que devolvía algo
+   * que PARECE una traducción y no lo es, mientras los otros tres modos de fallo sí avisan.
+   */
+  const entradaSinCeldas = useMemo(
+    () =>
+      mode === 'brailleToText' &&
+      input.trim() !== '' &&
+      !/[\u2800-\u28FF]/.test(input),
+    [mode, input],
+  );
+
   /** ¿Lleva el resultado algún signo que en español abre y cierra igual? */
   const llevaSignoAmbiguo = useMemo(
     () => (mode === 'textToBraille' ? /[⠢⠖⠦]/.test(result) : false),
@@ -405,6 +445,22 @@ export default function ConversorBraillePage() {
           result += textToBraille[char];
           continue;
         }
+        /**
+         * ⚠️ 22/09/2026 (hallazgo 1186) — cuando el punto o la coma NO van seguidos de cifra, la
+         * expresión se cerraba aquí y la letra siguiente salía sin el prefijo de latina minúscula
+         * (punto 5, B 2 § 8.2). Para el lector no hay nada que le diga que la expresión terminó:
+         * el punto 3 dentro de un número es el separador de MILLARES (§ 8.1), así que sigue en
+         * modo número y lee la celda siguiente como la cifra 2. La demostración no necesita
+         * fuente externa: la función inversa de esta misma app devolvía «3.2» de lo que ella
+         * acababa de escribir para «3.b», y en cambio leía bien la versión con el prefijo.
+         *
+         * La expresión numérica se mantiene ABIERTA, y así la rama de la primera serie de más
+         * abajo pone el prefijo donde hace falta —«3.b», «art. 2.a»—. Una letra de la segunda
+         * mitad del alfabeto no colisiona con ningún dígito y sigue cerrándola sin prefijo, y un
+         * espacio o cualquier otro signo también.
+         */
+        result += textToBraille[char];
+        continue;
       }
 
       // Un salto de línea no tiene celda, pero tampoco puede desaparecer: sin
@@ -715,6 +771,14 @@ export default function ConversorBraillePage() {
                 <strong>{sinCelda.map(nombraCaracter).join(' · ')}</strong>. El resto del texto
                 sí está completo. Puede que el Código Braille Español sí les asigne celda fuera
                 de la signografía básica que cubre esta app.
+              </p>
+            )}
+
+            {entradaSinCeldas && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span> Lo que has pegado no contiene ninguna celda
+                braille, así que ha salido tal cual: esto no es una traducción. Si querías pasar
+                un texto a braille, cambia el sentido de la conversión ahí arriba.
               </p>
             )}
 
@@ -1135,9 +1199,40 @@ export default function ConversorBraillePage() {
                 <h4>¿Es el Braille igual en todos los idiomas?</h4>
                 <p>No exactamente. El sistema de 6 puntos es universal, pero cada idioma adapta los símbolos a sus necesidades. El español tiene celdas propias para ñ, á, é, í, ó, ú y ü. En cambio no tiene signos de apertura: ¿ y ? comparten el mismo signo (puntos 2-6), igual que ¡ y ! (puntos 2-3-5), de modo que la pregunta se marca al principio y al final con la misma celda. El árabe Braille va de derecha a izquierda igual que el árabe impreso. El japonés tiene un Braille basado en silabas (kana) en lugar de letras. El chino Braille tiene variantes por dialectos (mandarín, cantonés). El UEB (Unified English Braille) de 2004 unificó los distintos sistemas del inglés en un estándar global.</p>
               </div>
+              {/*
+                ⚠️ 22/09/2026 (hallazgo 1185) — esta pregunta se titulaba «¿Qué es el Braille
+                Unificado en Español (UEB)?» y respondía que el UEB «es un estándar internacional
+                adaptado al español como UEB-Es», contradiciendo a la respuesta INMEDIATAMENTE
+                ANTERIOR, que dice bien que el UEB de 2004 unificó los sistemas DEL INGLÉS. Dos
+                párrafos seguidos afirmaban que el UEB es del inglés y que es un estándar
+                internacional adaptado al español.
+
+                Pesa más de lo normal aquí porque la diferencia entre el braille español y el
+                inglés ES la promesa de la app —su metadata, su JSON-LD y su h1 la venden por
+                eso—, y porque una FAQPage es la señal que ChatGPT, Perplexity y Bing Copilot
+                usan para fundamentar respuestas.
+
+                Ni «Braille Unificado en Español» ni la sigla «UEB-Es» aparecen en la fuente
+                oficial: la página de la Comisión Braille Española (ONCE), consultada el
+                22/09/2026, no nombra ningún estándar así. Tampoco he podido anclar el «aprobado
+                por la ONCE en 2009», que además convivía sin explicación con el documento que
+                esta app cita en su propio código. Las dos afirmaciones se retiran en vez de
+                reescribirse: lo que no se puede sostener no se sustituye por otra versión, se
+                quita. Queda la pregunta por lo que la app SÍ puede fundamentar, que es
+                precisamente su fuente.
+              */}
               <div className={styles.eduFaqItem}>
-                <h4>¿Qué es el Braille Unificado en Español (UEB)?</h4>
-                <p>El UEB (Unified English Braille, adaptado al español como UEB-Es) es un estándar internacional que busca unificar las variantes nacionales del Braille. En España, la ONCE utiliza el &quot;Braille español&quot; que ha evolucionado de forma independiente. La transición hacia estándares más unificados facilita el intercambio de materiales entre países hispanohablantes. El Código Braille Español vigente fue aprobado por la ONCE en 2009 e incluye símbolos específicos para el castellano, catalán, gallego, euskera y valenciano.</p>
+                <h4>¿Quién fija el Braille español y en qué se diferencia del inglés?</h4>
+                <p>La <strong>Comisión Braille Española</strong> (CBE), órgano de la ONCE, es la
+                máxima autoridad en España para la normativa del braille: aprueba las signografías
+                oficiales y publica los documentos técnicos que las recogen. Esta app sigue el
+                <strong> Documento Técnico B 2</strong>, «Signografía básica de las lenguas
+                cooficiales españolas» (V4, 22/01/2026), que cubre castellano, catalán, gallego,
+                euskera y valenciano. La diferencia con el braille inglés no es de matiz: en
+                español la interrogación son los puntos 2-6 y las comillas los 2-3-6, mientras en
+                inglés esos mismos 2-3-6 son la interrogación, así que un texto convertido con las
+                tablas inglesas cambia de signos de puntuación sin avisar. El UEB, que unificó los
+                sistemas del inglés en 2004, no se aplica al español.</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Se puede escribir Braille con el ordenador o smartphone?</h4>
