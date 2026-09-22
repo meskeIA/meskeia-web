@@ -1,6 +1,6 @@
 .container {
   --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
-  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #6E6E6E;
   --border: #E5E5E5; --hover: #F5F5F5;
   --radius: 12px; --radius-large: 16px;
   --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;

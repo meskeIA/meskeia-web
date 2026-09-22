@@ -27,10 +27,22 @@
 
   --text-primary: #1A1A1A;
   --text-secondary: #666666;
-  --text-muted: #6E6E6E; /* 5,10:1 sobre blanco y 4,89 sobre la tarjeta #FAFAFA.
-                            Era #757575, elegido midiendo contra blanco puro (4,60),
-                            pero sobre el fondo de tarjeta se quedaba en 4,41 y axe lo
-                            marcaba en las descripciones de RelatedApps y en el pie. */
+  --text-muted: #6E6E6E; /* 5,10:1 sobre blanco · 4,89 sobre la página #FAFAFA · 4,68
+                            sobre --hover #F5F5F5. Era #757575, elegido midiendo contra
+                            blanco puro (4,60), pero sobre el fondo de tarjeta se quedaba
+                            en 4,41 y axe lo marcaba en las descripciones de RelatedApps
+                            y en el pie.
+                            Este valor es de agosto de 2026, pero hasta el 22/09/2026 NO
+                            gobernaba: 365 módulos lo redeclaraban en su propio .container
+                            (#999999 y #888888) y ganaban sobre :root, así que 1.412 de
+                            1.722 elementos de texto pequeño medidos en 85 rutas estaban
+                            por debajo de 4,5 — el pie, el copyright de LegalNotice y las
+                            descripciones de RelatedApps heredan el valor de la APP, no
+                            este. Se drenaron los 365 en el mismo commit; la regresión
+                            vive en tests/contraste-text-muted-claro.spec.ts.
+                            Lo que no cubre, a propósito: los fondos de píldora que pintan
+                            con un token de otra cosa (--border #E5E5E5 da 4,05), porque
+                            cumplir ahí exigiría #666666, que ES --text-secondary. */
 
   --border: #E5E5E5;
   --hover: #F5F5F5;

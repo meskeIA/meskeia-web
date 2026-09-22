@@ -1,6 +1,6 @@
 .container {
   --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
-  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #6E6E6E;
   --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
   --naranja: #e67e22;
   --radius: 12px; --radius-large: 16px;
