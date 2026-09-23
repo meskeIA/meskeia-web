@@ -35,8 +35,24 @@ export async function prepararParaMedir(page: Page): Promise<void> {
  *     segunda página el botón ya dice lo contrario que en la primera: pulsarlo a
  *     ciegas devuelve al tema anterior. Por eso se comprueba el atributo ANTES de
  *     pulsar.
+ *
+ * Y espera a que React haya hidratado, que es lo que hace medible la página. Cuando el
+ * tema ya es el pedido no hay nada que pulsar y esto volvía al instante, con apps que
+ * aún no habían pintado nada: `visualizador-desigualdad-riqueza` hace
+ * `if (!montado) return null` y en claro se medía con el body a altura 0 (23/09/2026).
+ * En oscuro no se veía porque pulsar el botón ya daba ese tiempo. Si una app solo
+ * retrasa una PARTE, la medida saldría corta sin ningún aviso. El testigo es que React
+ * haya hidratado algún nodo del body (`__reactFiber$`), y no el botón de tema: la home
+ * no tiene, y allí el oscuro lo pone `prefers-color-scheme`. Después, dos fotogramas
+ * para que corran los `useEffect` que montan el contenido.
  */
 export async function activarTema(page: Page, tema: 'dark' | 'light'): Promise<void> {
+  await page.waitForFunction(
+    () => Array.from(document.querySelectorAll('body *')).some((el) => Object.keys(el).some((k) => k.startsWith('__reactFiber$'))),
+    null,
+    { timeout: 15_000 },
+  );
+  await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
   await page.emulateMedia({ colorScheme: tema });
   const etiqueta = tema === 'dark' ? /Cambiar a modo oscuro/i : /Cambiar a modo claro/i;
   const html = page.locator('html');
