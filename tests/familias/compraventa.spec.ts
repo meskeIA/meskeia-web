@@ -774,15 +774,6 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -84.64,
         nombra: /valor catastral total/i,
-        falla:
-          'HUECO C1 — es el ÚNICO de los ocho importes del vendedor leído con ' +
-          '`parseSpanishNumber` a pelo: el ilegible entra como `undefined`, indistinguible del ' +
-          'VACÍO, y no lo mira ni `faltanEnElNeto` ni `faltanPorAbaratar`. Mueve el neto ' +
-          '−84,64 € EN SILENCIO en cuanto el método real es el favorable, con «Lo que realmente ' +
-          'recibes» intacto. Y la única frase que llega a salir —«Método objetivo (falta el ' +
-          'valor catastral total para comparar)», en la tarjeta de la plusvalía— es FALSA: el ' +
-          'usuario lo escribió y lo sigue viendo en el campo. Para ponerlo en verde: el octavo ' +
-          '`esLegible` y el campo en `faltanPorAbaratar`, que es su dirección.',
       },
       {
         etiqueta: 'Comisión inmobiliaria (%)',

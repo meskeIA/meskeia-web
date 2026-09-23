@@ -230,6 +230,13 @@ interface ResultadosVendedor {
   /** Solo se mira cuando «Voy a reinvertir» está marcado: ahí se pierde la exención del art. 38 */
   reinversionLegible: boolean;
   hipotecaLegible: boolean;
+  /**
+   * El octavo importe (hueco C1 del testigo de familia). Ilegible entraba como `undefined`,
+   * indistinguible del vacío, y la plusvalía se liquidaba por el método objetivo aunque el
+   * real fuera más barato: −84,64 € de neto en silencio en el caso del testigo. Solo cuenta
+   * cuando hay plusvalía que comparar.
+   */
+  valorTotalLegible: boolean;
 }
 
 // ===== CONSTANTES =====
@@ -547,6 +554,7 @@ export default function SimuladorCompraventaPage() {
     const mejorasLegible = esLegible(mejoras);
     const reinversionLegible = esLegible(importeReinversion);
     const hipotecaLegible = esLegible(hipotecaPendiente);
+    const valorTotalLegible = esLegible(valorCatastralTotal);
 
     // Plusvalía municipal
     let plusvalia = 0;
@@ -570,7 +578,11 @@ export default function SimuladorCompraventaPage() {
         : resultadoPlusvalia.parCatastralImposible
           ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
           : !resultadoPlusvalia.metodoRealDisponible
-            ? 'Método objetivo (falta el valor catastral total para comparar)'
+            ? // «falta el valor catastral total» era falso cuando el usuario lo había escrito
+              // y lo seguía viendo en el campo (hueco C1): no falta, no se ha podido leer.
+              valorTotalLegible
+              ? 'Método objetivo (falta el valor catastral total para comparar)'
+              : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
               ? 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
@@ -651,6 +663,8 @@ export default function SimuladorCompraventaPage() {
       // no entra en el cálculo y su texto no puede falsear nada.
       reinversionLegible: !puedeReinvertir || reinversionLegible,
       hipotecaLegible: !puedeReinvertir || hipotecaLegible,
+      // Sin plusvalía liquidada (faltan datos o no hay incremento) no hay método que comparar.
+      valorTotalLegible: !plusvaliaCalculada || exentoPlusvalia || valorTotalLegible,
     };
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
 
@@ -722,6 +736,11 @@ export default function SimuladorCompraventaPage() {
           ? null
           : 'el importe que reinviertes (con él, la ganancia puede quedar exenta por el art. 38 LIRPF)',
         resultadosVendedor.hipotecaLegible ? null : 'el principal pendiente de la hipoteca',
+        // Sin él la plusvalía no se compara con el método real, que puede salir más barato:
+        // la cifra es un SUELO, igual que con los cuatro de arriba (hueco C1).
+        resultadosVendedor.valorTotalLegible
+          ? null
+          : 'el valor catastral total, que puede abaratar la plusvalía por el método real',
       ].filter((x): x is string => x !== null)
     : [];
 
