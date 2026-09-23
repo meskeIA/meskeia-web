@@ -57,6 +57,16 @@ export async function activarTema(page: Page, tema: 'dark' | 'light'): Promise<v
  * bastan para pasar de los 90s del test. `simulador-ciclo-explotacion` se colgaba así
  * —la app respondía en 6ms, era este bucle— y el fallo aparecía en la llamada
  * SIGUIENTE, acusando a `prepararParaMedir` de algo que no había hecho.
+ *
+ * Los `<details>` se abren todos de una vez dentro de la página, y no recorriendo
+ * `locator('details:not([open])').all()`. Aquello devolvía localizadores `nth(i)`
+ * VIVOS sobre una lista que encoge al abrir cada uno: a mitad del bucle los índices
+ * apuntaban más allá del final, y `evaluate` esperaba sin plazo propio a un elemento
+ * que no iba a aparecer, fuera del presupuesto de arriba. Colgaba el test hasta su
+ * timeout en toda app con dos o más `<details>` cerrados — `calculadora-huella-carbono`
+ * (16), `selector-tarifa-electrica` (6), `simulador-ciclo-explotacion` (5) — mientras
+ * la página respondía en milisegundos. Medido el 23/09/2026: era el instrumento, no
+ * la app ni el navegador.
  */
 export async function desplegarTodo(page: Page, presupuestoMs = 20_000): Promise<void> {
   const limite = Date.now() + presupuestoMs;
@@ -68,9 +78,9 @@ export async function desplegarTodo(page: Page, presupuestoMs = 20_000): Promise
       if (await b.isVisible().catch(() => false)) await b.click({ timeout: 1500 }).catch(() => {});
     }
   }
-  for (const d of await page.locator('details:not([open])').all()) {
-    await d.evaluate((el) => el.setAttribute('open', '')).catch(() => {});
-  }
+  await page.evaluate(() => {
+    document.querySelectorAll('details:not([open])').forEach((d) => d.setAttribute('open', ''));
+  });
 }
 
 export type Medida = {
@@ -193,6 +203,13 @@ export async function medirMuted(page: Page): Promise<{ medidas: Medida[]; jerar
      * color se aproxima por la primera parada porque el texto puede caer en
      * cualquier punto del degradado; cuando el gradiente es de verdad contrastado,
      * eso se ve en el propio informe y se mira la captura.
+     *
+     * La mezcla pondera también el alfa de la BASE. Mezclar el gradiente sobre el rgb
+     * de un `background-color` transparente —que es negro con alfa 0— premultiplica
+     * la capa por negro: el 6 % de azul de `visualizador-metamorfosis` salía gris
+     * rgb(240, 240, 241) y 4,48:1 donde la captura enseña un azul casi blanco y hay
+     * 4,75. Cuatro apps acusadas en falso el 23/09/2026; el caso de la prueba del
+     * instrumento no lo veía porque allí la base era blanca y opaca.
      */
     const capaDe = (cs: CSSStyleDeclaration): { capa: Capa; gradiente: boolean } => {
       const base = rgba(cs.backgroundColor) ?? { r: 0, g: 0, b: 0, a: 0 };
@@ -204,9 +221,11 @@ export async function medirMuted(page: Page): Promise<{ medidas: Medida[]; jerar
       ) ?? [];
       const g = trozos.map(rgba).find((c): c is Capa => !!c && c.a > 0);
       if (!g) return { capa: base, gradiente: false };
-      const mezcla = sobre(g, [base.r, base.g, base.b]);
+      // Porter-Duff «source over»: el gradiente se pinta ENCIMA del background-color
+      const a = g.a + base.a * (1 - g.a);
+      const canalMezcla = (arriba: number, abajo: number) => (arriba * g.a + abajo * base.a * (1 - g.a)) / a;
       return {
-        capa: { r: mezcla[0], g: mezcla[1], b: mezcla[2], a: Math.min(1, base.a + g.a * (1 - base.a)) },
+        capa: { r: canalMezcla(g.r, base.r), g: canalMezcla(g.g, base.g), b: canalMezcla(g.b, base.b), a },
         gradiente: true,
       };
     };
@@ -216,12 +235,27 @@ export async function medirMuted(page: Page): Promise<{ medidas: Medida[]; jerar
      * PROPIO elemento. Saltársela es lo que hizo acusar dos veces a MeskeiaLogo de
      * 1,58:1 cuando en pantalla se lee perfectamente: el barrido aterrizaba en el
      * fondo de página sin ver la caja blanca de en medio.
+     *
+     * Y al revés: un antepasado solo cuenta si su caja está DEBAJO del texto. Un
+     * elemento con `position: absolute` puede pintarse fuera de la caja de su padre,
+     * y el fondo del padre no llega hasta allí. Las etiquetas de la barra de
+     * temperatura de `visualizador-capas-tierra` van a 28px de una barra de 20px,
+     * sobre la página #FAFAFA, y se midieron a 2,94:1 contra el amarillo de la barra
+     * (23/09/2026). Se comprueba con el CENTRO del texto y no con su caja entera,
+     * porque un texto que desborda unos píxeles su contenedor sigue estando encima.
      */
     const fondoDe = (el: Element): { rgb: number[]; desc: string } => {
       const capas: Capa[] = [];
       let hayGradiente = false;
+      const caja = el.getBoundingClientRect();
+      const cx = caja.left + caja.width / 2, cy = caja.top + caja.height / 2;
       let n: Element | null = el;
       while (n) {
+        const r = n.getBoundingClientRect();
+        if (n !== el && (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom)) {
+          n = n.parentElement;
+          continue;
+        }
         const { capa, gradiente } = capaDe(getComputedStyle(n));
         if (capa.a > 0) {
           capas.push(capa);
@@ -296,25 +330,36 @@ export async function medirMuted(page: Page): Promise<{ medidas: Medida[]; jerar
   });
 }
 
+/** Un fondo que el token no cubre, en la ruta donde se midió y con su razón. */
+export type Exclusion = { fondo: string; ruta: string; razon: string };
+
 /**
- * ¿Cae esta medida en uno de los fondos excluidos? Devuelve su razón, o null.
+ * ¿Cae esta medida en uno de los fondos excluidos DE ESTA RUTA? Devuelve su razón, o null.
  *
  * Compara los canales con tolerancia en vez de la cadena, porque el fondo compuesto
  * se cuantiza: la cabecera desplegable de `tabla-derivadas` da rgb(45, 58, 63) donde
  * antes se anotó rgb(45, 57, 63), y una comparación literal convertía ese punto de
  * redondeo en un fallo del test que no señalaba ningún defecto real.
+ *
+ * Y cada exclusión vale solo en su ruta, porque la tolerancia hace que un color se
+ * parezca a otros: el «al mes» de `planificador-vacaciones-autonomo` en oscuro, sobre
+ * rgb(43, 56, 61) a 4,35:1, pasaba en verde excusado por la cabecera de
+ * `tabla-derivadas` (23/09/2026). Una excepción escrita para una app tapaba en
+ * silencio un defecto real de otra.
  */
 export function razonDeExclusion(
   fondo: string,
-  excluidos: Record<string, string>,
+  ruta: string,
+  excluidos: readonly Exclusion[],
   tolerancia = 2,
 ): string | null {
   const canales = (s: string) => (s.match(/\d+/g) ?? []).map(Number).slice(0, 3);
   const [r, g, b] = canales(fondo);
-  for (const [clave, razon] of Object.entries(excluidos)) {
-    const [r2, g2, b2] = canales(clave);
+  for (const e of excluidos) {
+    if (e.ruta !== ruta) continue;
+    const [r2, g2, b2] = canales(e.fondo);
     if (Math.abs(r - r2) <= tolerancia && Math.abs(g - g2) <= tolerancia && Math.abs(b - b2) <= tolerancia) {
-      return razon;
+      return e.razon;
     }
   }
   return null;

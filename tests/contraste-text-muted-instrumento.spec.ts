@@ -2,9 +2,9 @@
  * Prueba del INSTRUMENTO con el que se miden los dos specs de `--text-muted`.
  *
  * Un medidor de contraste que se equivoca no da error: da un número, y el número
- * parece un hallazgo. Los tres casos de aquí abajo son los tres errores que cometió
- * de verdad mientras se escribía, cada uno detectado por una cifra imposible o por
- * una captura, nunca por un fallo del test:
+ * parece un hallazgo. Los casos de aquí abajo son los errores que cometió de verdad,
+ * cada uno detectado por una cifra imposible o por una captura, nunca por un fallo
+ * del test:
  *
  *   1. `color(srgb 0.93 0.96 0.97)` leído con una regex numérica → rgb(1, 1, 1).
  *      Un azul clarísimo pasaba por NEGRO, y con él el único elemento del catálogo
@@ -13,6 +13,14 @@
  *      perfectamente, por no componer el alfa sobre lo que hay debajo.
  *   3. Dividir por el alfa al leer el píxel «para des-premultiplicar» →
  *      rgb(380, 380, 380), que no es un color.
+ *   4. El mismo gradiente al 6 %, pero sobre un `background-color` TRANSPARENTE: se
+ *      mezclaba con su rgb, que es negro, y el azul casi blanco salía gris. Cuatro
+ *      apps acusadas en falso entre 4,31 y 4,48 (23/09/2026); el caso 2 no lo veía
+ *      porque su base era blanca y opaca.
+ *   5. Un texto con `position: absolute` pintado FUERA de la caja de su padre,
+ *      medido contra el fondo del padre: las etiquetas de la barra de temperatura
+ *      de `visualizador-capas-tierra`, a 2,94:1 contra un amarillo que no tienen
+ *      detrás (23/09/2026).
  *
  * Si alguna vez el barrido devuelve CERO elementos, esto falla antes y dice por qué:
  * es la otra forma de mentir que ya tuvo (un matcher hexadecimal que no casaba con
@@ -34,6 +42,11 @@ const PAGINA = `
   #gradiente  { --text-muted: #6E6E6E; --text-secondary: #666666; background-color: #FFFFFF;
                 background-image: linear-gradient(135deg, rgba(46, 134, 171, 0.06), rgba(46, 134, 171, 0.06)); }
   #translucido{ --text-muted: #6E6E6E; --text-secondary: #666666; background: rgba(0, 0, 0, 0.04); }
+  #gradTransp { --text-muted: #6E6E6E; --text-secondary: #666666;
+                background-image: linear-gradient(135deg, rgba(46, 134, 171, 0.06), rgba(46, 134, 171, 0.06)); }
+  #fuera      { --text-muted: #6E6E6E; --text-secondary: #666666; position: relative;
+                width: 20px; height: 20px; padding: 0; background: linear-gradient(#FFB800, #FFB800); }
+  #fuera span { position: absolute; left: 28px; top: 0; white-space: nowrap; }
 </style></head><body>
   <div id="hex"><span class="muted">texto sobre blanco</span></div>
   <div id="corto"><span class="muted">token escrito de tres cifras</span></div>
@@ -41,6 +54,8 @@ const PAGINA = `
   <div id="srgb"><span class="muted">fondo en color(srgb ...)</span></div>
   <div id="gradiente"><span class="muted">fondo con gradiente al 6 por ciento</span></div>
   <div id="translucido"><span class="muted">fondo negro al 4 por ciento</span></div>
+  <div id="gradTransp"><span class="muted">gradiente sobre base transparente</span></div>
+  <div id="fuera"><span class="muted">texto absoluto fuera del padre</span></div>
 </body></html>`;
 
 /** ratio esperado (calculado a mano con la fórmula WCAG) y fondo que debe deducir. */
@@ -51,6 +66,8 @@ const ESPERADO: Record<string, { ratio: number; fondo: string }> = {
   'fondo en color(srgb ...)': { ratio: 4.63, fondo: 'rgb(238, 245, 248)' },
   'fondo con gradiente al 6 por ciento': { ratio: 4.75, fondo: 'rgb(242, 248, 250) (con gradiente)' },
   'fondo negro al 4 por ciento': { ratio: 4.68, fondo: 'rgb(245, 245, 245)' },
+  'gradiente sobre base transparente': { ratio: 4.75, fondo: 'rgb(242, 248, 250) (con gradiente)' },
+  'texto absoluto fuera del padre': { ratio: 5.1, fondo: 'rgb(255, 255, 255)' },
 };
 
 test('el medidor lee bien el color, el fondo y el gradiente', async ({ page }) => {
@@ -59,7 +76,7 @@ test('el medidor lee bien el color, el fondo y el gradiente', async ({ page }) =
   const { medidas } = await medirMuted(page);
 
   // Que mida ALGO: el fallo más silencioso de este instrumento es devolver cero.
-  expect(medidas.length, 'el barrido no ha encontrado ningún elemento con --text-muted').toBe(6);
+  expect(medidas.length, 'el barrido no ha encontrado ningún elemento con --text-muted').toBe(8);
 
   const canales = (s: string) => (s.match(/\d+/g) ?? []).map(Number);
   for (const [texto, esperado] of Object.entries(ESPERADO)) {

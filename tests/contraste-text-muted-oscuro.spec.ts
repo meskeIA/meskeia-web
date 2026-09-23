@@ -14,7 +14,7 @@
  */
 import { test, expect } from '@playwright/test';
 import {
-  UMBRAL, prepararParaMedir, activarTema, desplegarTodo, medirMuted, razonDeExclusion,
+  UMBRAL, prepararParaMedir, activarTema, desplegarTodo, medirMuted, razonDeExclusion, type Exclusion,
 } from './contraste-text-muted-auxiliares';
 
 /**
@@ -43,12 +43,12 @@ const RUTAS = [
  * Un fondo que NO esté aquí y falle SÍ rompe el test: es lo que detecta que alguien
  * ha añadido una superficie nueva sin medirla.
  */
-const FONDOS_EXCLUIDOS: Record<string, string> = {
-  'rgb(64, 64, 64)': '--border como fondo de píldora (checklist-declaracion-renta)',
-  'rgb(56, 56, 56)': '--hover como fondo de aviso (estimador-actualizacion-alquiler)',
-  'rgb(45, 57, 63)': 'cabecera de fila desplegable (tabla-derivadas)',
-  'rgb(26, 58, 74)': 'caja del flujo DuPont (analizador-ratios-financieros)',
-};
+const FONDOS_EXCLUIDOS: readonly Exclusion[] = [
+  { fondo: 'rgb(64, 64, 64)', ruta: '/checklist-declaracion-renta/', razon: '--border como fondo de píldora' },
+  { fondo: 'rgb(56, 56, 56)', ruta: '/estimador-actualizacion-alquiler/', razon: '--hover como fondo de aviso' },
+  { fondo: 'rgb(45, 57, 63)', ruta: '/tabla-derivadas/', razon: 'cabecera de fila desplegable' },
+  { fondo: 'rgb(26, 58, 74)', ruta: '/analizador-ratios-financieros/', razon: 'caja del flujo DuPont' },
+];
 
 for (const { ruta, que } of RUTAS) {
   test(`${ruta} · --text-muted cumple 4,5:1 en oscuro (${que})`, async ({ page }) => {
@@ -65,7 +65,7 @@ for (const { ruta, que } of RUTAS) {
     // sería legible, pero los dos niveles tipográficos dejarían de serlo.
     expect(jerarquia, `--text-muted no queda por debajo de --text-secondary en ${ruta}`).toBe('muted-mas-oscuro');
 
-    const fallan = medidas.filter((m) => m.ratio < UMBRAL && !razonDeExclusion(m.fondo, FONDOS_EXCLUIDOS));
+    const fallan = medidas.filter((m) => m.ratio < UMBRAL && !razonDeExclusion(m.fondo, ruta, FONDOS_EXCLUIDOS));
     const peor = fallan.sort((a, b) => a.ratio - b.ratio)[0];
     expect(
       fallan.length,
@@ -74,7 +74,7 @@ for (const { ruta, que } of RUTAS) {
         : '',
     ).toBe(0);
 
-    const excluidos = medidas.filter((m) => m.ratio < UMBRAL && razonDeExclusion(m.fondo, FONDOS_EXCLUIDOS));
+    const excluidos = medidas.filter((m) => m.ratio < UMBRAL && razonDeExclusion(m.fondo, ruta, FONDOS_EXCLUIDOS));
     const peorOk = Math.min(...medidas.map((m) => m.ratio).filter((r) => r >= UMBRAL));
     console.log(
       `   ${ruta}: ${medidas.length} elementos · peor cumpliendo ${peorOk}:1` +

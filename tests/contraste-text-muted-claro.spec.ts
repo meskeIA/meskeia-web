@@ -18,7 +18,7 @@
  */
 import { test, expect } from '@playwright/test';
 import {
-  UMBRAL, prepararParaMedir, activarTema, desplegarTodo, medirMuted, razonDeExclusion,
+  UMBRAL, prepararParaMedir, activarTema, desplegarTodo, medirMuted, razonDeExclusion, type Exclusion,
 } from './contraste-text-muted-auxiliares';
 
 /**
@@ -56,9 +56,9 @@ const RUTAS = [
  * Un fondo que NO esté aquí y falle SÍ rompe el test: es lo que detecta que alguien
  * ha añadido una superficie nueva sin medirla.
  */
-const FONDOS_EXCLUIDOS: Record<string, string> = {
-  'rgb(229, 229, 229)': '--border como fondo de la píldora de progreso (checklist-declaracion-renta): 4,05:1',
-};
+const FONDOS_EXCLUIDOS: readonly Exclusion[] = [
+  { fondo: 'rgb(229, 229, 229)', ruta: '/checklist-declaracion-renta/', razon: '--border como fondo de la píldora de progreso: 4,05:1' },
+];
 
 for (const { ruta, que } of RUTAS) {
   test(`${ruta} · --text-muted cumple 4,5:1 en claro (${que})`, async ({ page }) => {
@@ -77,7 +77,7 @@ for (const { ruta, que } of RUTAS) {
     // pero los dos niveles tipográficos dejarían de distinguirse.
     expect(jerarquia, `--text-muted no queda por encima de --text-secondary en ${ruta}`).toBe('muted-mas-claro');
 
-    const fallan = medidas.filter((m) => m.ratio < UMBRAL && !razonDeExclusion(m.fondo, FONDOS_EXCLUIDOS));
+    const fallan = medidas.filter((m) => m.ratio < UMBRAL && !razonDeExclusion(m.fondo, ruta, FONDOS_EXCLUIDOS));
     const peor = fallan.sort((a, b) => a.ratio - b.ratio)[0];
     expect(
       fallan.length,
@@ -86,7 +86,7 @@ for (const { ruta, que } of RUTAS) {
         : '',
     ).toBe(0);
 
-    const excluidos = medidas.filter((m) => m.ratio < UMBRAL && razonDeExclusion(m.fondo, FONDOS_EXCLUIDOS));
+    const excluidos = medidas.filter((m) => m.ratio < UMBRAL && razonDeExclusion(m.fondo, ruta, FONDOS_EXCLUIDOS));
     const peorOk = Math.min(...medidas.map((m) => m.ratio).filter((r) => r >= UMBRAL));
     console.log(
       `   ${ruta}: ${medidas.length} elementos · peor cumpliendo ${peorOk}:1` +
