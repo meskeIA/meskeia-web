@@ -1316,13 +1316,13 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS de la re-inspección del 23/09/2026 — los marcados con `test.fail()` fallan A
-// PROPÓSITO por la aserción del defecto (la preparación va antes y pasa); al repararse,
-// Playwright los da por «expected to fail» y hay que quitar la marca: quedan de regresión.
-// Los cuatro son «efecto familia»: lo que se reparó en una hermana y no llegó a ésta.
+// HALLAZGOS de la re-inspección del 23/09/2026 (1276-1279), REPARADOS el mismo día. Se
+// escribieron con `test.fail()` y fallaban por la aserción del defecto (la preparación va
+// antes y pasa); reparados, se retiró la marca y quedan de regresión.
+// Los cuatro eran «efecto familia»: lo que se reparó en una hermana y no llegó a ésta.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
+test.describe('Hallazgos reparados — re-inspección 23/09/2026', () => {
   /**
    * HALLAZGO D (contenido, medio) — con la renuncia elegida en Canarias, Ceuta o Melilla, el
    * recuadro propio de esta app («⚠️ Renuncia a la exención de IVA (Art. 20.Dos LIVA)») sigue
@@ -1340,8 +1340,7 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
    *       → esperado: ningún texto afirma que el IVA se autoliquida
    *       → obtenido: «El IVA se autoliquida por inversión del sujeto pasivo y es deducible…»
    */
-  test('HALLAZGO D — en Canarias con renuncia, el aviso de la renuncia no afirma que «el IVA se autoliquida»', async ({ page }) => {
-    test.fail();
+  test('REPARADO 23/09 (1276, antes D) — en Canarias con renuncia, el aviso de la renuncia no afirma que «el IVA se autoliquida»', async ({ page }) => {
     await abrirHidratada(page);
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
     await page.selectOption('#select-ccaa', 'canarias');
@@ -1353,8 +1352,23 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
     const aviso = page.locator('[class*="renunciaAviso"]');
     await expect(aviso).toBeVisible();
 
-    // El defecto: el recuadro de la renuncia lo contradice en la misma pantalla.
+    // El defecto: el recuadro de la renuncia lo contradecía en la misma pantalla.
     expect(await aviso.innerText()).not.toMatch(/El IVA se autoliquida/);
+    // Reparado con la forma de nave-industrial (647/1177): dice lo que sí pasa allí.
+    await expect(aviso).toContainText('no se devenga IVA');
+    await expect(aviso).toContainText('rige el IGIC');
+
+    // Igual en Ceuta y Melilla, con el IPSI.
+    for (const ciudad of ['ceuta', 'melilla']) {
+      await page.selectOption('#select-ccaa', ciudad);
+      expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+      expect(await aviso.innerText()).not.toMatch(/El IVA se autoliquida/);
+      await expect(aviso).toContainText('rige el IPSI');
+    }
+
+    // Y donde sí rige el IVA, el recuadro sigue explicando la inversión del sujeto pasivo.
+    await page.selectOption('#select-ccaa', 'madrid');
+    await expect(aviso).toContainText('El IVA se autoliquida por inversión del sujeto pasivo');
   });
 
   /**
@@ -1368,8 +1382,7 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
    * Caso: Canarias · renuncia · 150.000 € → esperado «Total gastos adicionales (parcial)»
    *       · obtenido «Total gastos adicionales» (2.048,72 €) junto a «COSTE TOTAL (PARCIAL)».
    */
-  test('HALLAZGO E — sin el IGIC, «Total gastos adicionales» se rotula parcial como el COSTE TOTAL', async ({ page }) => {
-    test.fail();
+  test('REPARADO 23/09 (1277, antes E) — sin el IGIC, «Total gastos adicionales» se rotula parcial como el COSTE TOTAL', async ({ page }) => {
     await abrirHidratada(page);
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
     await page.selectOption('#select-ccaa', 'canarias');
@@ -1380,8 +1393,13 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2448,72 €');
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL (PARCIAL)' })).toHaveCount(1);
 
-    // El defecto: la otra tarjeta con el mismo hueco no lo lleva en el título.
+    // El defecto: la otra tarjeta con el mismo hueco no lo llevaba en el título.
     expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+
+    // Con el IVA calculado (Madrid) el total es completo y el título vuelve a ser el definitivo.
+    await page.selectOption('#select-ccaa', 'madrid');
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(1);
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
   });
 
   /**
@@ -1398,8 +1416,7 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
    *       → esperado: el caso de uso y la tabla mencionan IGIC/IPSI (o Canarias, Ceuta y Melilla)
    *       → obtenido: ninguno de los dos.
    */
-  test('HALLAZGO F — el caso de uso de empresas y la tabla del solar recogen que en Canarias, Ceuta y Melilla no hay IVA', async ({ page }) => {
-    test.fail();
+  test('REPARADO 23/09 (1278, antes F) — el caso de uso de empresas y la tabla del solar recogen que en Canarias, Ceuta y Melilla no hay IVA', async ({ page }) => {
     await page.goto(RUTA);
 
     // Preparación (pasa): las dos piezas existen, y la FAQ de al lado ya tiene la excepción.
@@ -1422,6 +1439,9 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
     // El defecto, en las dos piezas.
     expect.soft(textoCaso, 'caso de uso «Empresa compra finca a otra empresa»').toMatch(/IGIC|IPSI|Canarias/);
     expect.soft(tabla, 'tabla «Finca rústica frente a solar edificable»').toMatch(/IGIC|IPSI|Canarias/);
+    // La excepción va en la FILA del IVA del empresario, no en otra celda de la tabla.
+    const fila = (await page.locator('tr', { hasText: '¿Sujeto a IVA por empresario?' }).textContent()) ?? '';
+    expect(fila.replace(/\s+/g, ' ')).toContain('IGIC o IPSI en Canarias, Ceuta y Melilla');
   });
 
   /**
@@ -1434,7 +1454,7 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
    * Hoy coinciden (21 = 21), así que el test PASA: su valor es de guardia, como el HALLAZGO 5
    * del 26/08. El día que `PORCENTAJES_IVA.general` se mueva y el texto no, se pone rojo.
    */
-  test('HALLAZGO G (guardia) — el «21%» escrito a mano en el caso de uso y en la tabla sigue coincidiendo con data/fiscal', async ({ page }) => {
+  test('REPARADO 23/09 (1279, antes G) — el tipo del caso de uso y de la tabla sigue a data/fiscal', async ({ page }) => {
     await page.goto(RUTA);
     const general = PORCENTAJES_IVA.general; // 21 — data/fiscal/iva.ts
 
@@ -1447,5 +1467,76 @@ test.describe('Hallazgos abiertos — re-inspección 23/09/2026', () => {
 
     const fila = (await page.locator('tr', { hasText: '¿Sujeto a IVA por empresario?' }).textContent()) ?? '';
     expect(fila).toContain(`${general}% + AJD`);
+
+    // Reparado: el tipo ya no está tecleado. Ningún «21%» en un texto publicado de page.tsx;
+    // se quitan antes los comentarios, que pueden citar la cifra sin publicarla.
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const pagina = readFileSync(
+      join(process.cwd(), 'app', 'simulador-gastos-compraventa-terreno-rustico', 'page.tsx'),
+      'utf8',
+    );
+    const sinComentarios = pagina.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    expect(sinComentarios.match(/\b21\s?%/g) ?? []).toEqual([]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Efecto familia de los hallazgos 1272 y 1273 de solar, encontrado al repararlos y reparado
+// aquí el mismo día (23/09/2026): la renuncia es el régimen de IVA de esta app, así que le
+// alcanzaban los dos.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — familia de los hallazgos 1272 y 1273 (23/09/2026)', () => {
+  /**
+   * Madrid · renuncia · 150.000 € · gestoría «2.000.50». Con la gestoría legible el cierre dice
+   * «antes de deducir el IVA si tienes derecho»; con la ilegible, el aviso SUSTITUÍA a esa
+   * salvedad y «el coste real será mayor» quedaba falso para quien deduce el IVA de la renuncia.
+   */
+  test('con renuncia y la gestoría ilegible, el cierre suma el aviso a la salvedad del IVA', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await page.selectOption('#select-ccaa', 'madrid');
+    await sembrarValor(page, CAMPO_PRECIO, '150000');
+    await sembrarValor(page, CAMPO_GESTORIA, '400');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toContain('antes de deducir el IVA');
+
+    await sembrarValor(page, CAMPO_GESTORIA, '2.000.50');
+    await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(1);
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+
+    // Con ITP no hay IVA que deducir: el aviso va solo.
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('No incluye la gestoría, que no se ha podido leer: el coste real será mayor');
+  });
+
+  /**
+   * La ayuda del precio: con la renuncia (IVA en pantalla) la base es la contraprestación
+   * pactada (art. 78 Ley 37/1992); con ITP, y en Canarias, Ceuta y Melilla —donde con renuncia
+   * solo se calcula el AJD—, el valor de referencia es la base mínima y vale «el mayor».
+   */
+  test('la ayuda del precio pide el precio pactado con renuncia y «el mayor de ambos» con ITP o sin IVA', async ({ page }) => {
+    await abrirHidratada(page);
+    const leerAyuda = async (): Promise<string> => {
+      const id = await page.locator(CAMPO_PRECIO).getAttribute('aria-describedby');
+      return (await page.locator(`[id="${id}"]`).innerText()).replace(/\s+/g, ' ');
+    };
+
+    expect(await leerAyuda()).toContain('el mayor de ambos');
+
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    let ayuda = await leerAyuda();
+    expect(ayuda).toContain('Precio pactado');
+    expect(ayuda).not.toContain('el mayor');
+
+    // Siguiéndola con 120.000 pactados: IVA = 120.000 × 21 % = 25.200,00 € (PORCENTAJES_IVA.general).
+    await sembrarValor(page, CAMPO_PRECIO, '120000');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('25.200,00 €');
+
+    await page.selectOption('#select-ccaa', 'canarias');
+    ayuda = await leerAyuda();
+    expect(ayuda).toContain('el mayor de ambos');
   });
 });

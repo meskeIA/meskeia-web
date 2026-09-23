@@ -1,14 +1,22 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { RANGO_AJD, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
+import { PORCENTAJES_IVA } from '@/data/fiscal';
 
 /** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
 const pct = (n: number) => `${String(n).replace('.', ',')}%`;
 
+/**
+ * IVA del solar: el tipo GENERAL del art. 90 LIVA, la MISMA constante con la que calcula
+ * page.tsx (`IVA_SOLAR = PORCENTAJES_IVA.general`, hallazgo 734). Hasta el 23/09/2026 este
+ * fichero derivaba el FAQPage del tipo del LOCAL COMERCIAL de `IVA_INMUEBLES_2025`,
+ * y escribía el «21%» a mano en la description, los features y dos respuestas (hallazgo 1275).
+ */
+const IVA_SOLAR = pct(PORCENTAJES_IVA.general);
+
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Solar / Terreno Edificable - IVA o ITP | meskeIA',
-  description: 'Calcula los gastos de compra de un solar o terreno edificable en España: IVA 21% + AJD si vende un promotor, ITP por comunidad autónoma si vende un particular, notaría, registro y plusvalía municipal del vendedor. Gratis y sin registro.',
+  description: `Calcula los gastos de compra de un solar o terreno edificable en España: IVA ${IVA_SOLAR} + AJD si vende un promotor, ITP por comunidad autónoma si vende un particular, notaría, registro y plusvalía municipal del vendedor. Gratis y sin registro.`,
   keywords: 'simulador gastos compra solar, gastos compraventa terreno edificable, iva solar, itp solar, comprar parcela urbana impuestos, comprar terreno para construir impuestos, calculadora solar españa, autopromotor terreno, escriturar solar, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -20,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Simulador Gastos Compra Solar / Terreno Edificable | meskeIA',
-    description: 'Calcula el IVA 21%, ITP, AJD, notaría y registro de la compra de un solar o terreno edificable en España.',
+    description: `Calcula el IVA ${IVA_SOLAR}, ITP, AJD, notaría y registro de la compra de un solar o terreno edificable en España.`,
     url: 'https://meskeia.com/simulador-gastos-compraventa-solar/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -29,18 +37,18 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador Gastos Compra Solar / Terreno Edificable | meskeIA',
-    description: 'IVA 21% o ITP según el vendedor, AJD, notaría y registro al comprar un solar en España. Calcula gratis.',
+    description: `IVA ${IVA_SOLAR} o ITP según el vendedor, AJD, notaría y registro al comprar un solar en España. Calcula gratis.`,
     images: ['https://meskeia.com/og-image.png'],
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador Gastos Compra Solar / Terreno Edificable',
-  description: 'Calculadora de gastos de compra de un solar o terreno edificable en España. Incluye IVA 21% más AJD cuando el vendedor es promotor o empresario, ITP por comunidad autónoma cuando el vendedor es un particular, gastos de notaría y registro, y nota sobre la plusvalía municipal del vendedor.',
+  description: `Calculadora de gastos de compra de un solar o terreno edificable en España. Incluye IVA ${IVA_SOLAR} más AJD cuando el vendedor es promotor o empresario, ITP por comunidad autónoma cuando el vendedor es un particular, gastos de notaría y registro, y nota sobre la plusvalía municipal del vendedor.`,
   url: 'https://meskeia.com/simulador-gastos-compraventa-solar/',
   category: 'FinanceApplication',
   features: [
-    'IVA 21% + AJD cuando el vendedor es promotor o empresario',
+    `IVA ${IVA_SOLAR} + AJD cuando el vendedor es promotor o empresario`,
     'ITP por comunidad autónoma cuando el vendedor es un particular',
     'Plusvalía municipal del vendedor (suelo urbano)',
     'Gastos de notaría y registro de la propiedad',
@@ -67,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Se paga IVA o ITP al comprar un solar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD, que va del ${pct(RANGO_AJD.min)} al ${pct(RANGO_AJD.max)} según la comunidad autónoma — el extremo bajo es el 0% del Régimen foral del País Vasco. Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad. No coinciden IVA e ITP en la misma operación. En Canarias, Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.`,
+        text: `Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al ${IVA_SOLAR} más AJD, que va del ${pct(RANGO_AJD.min)} al ${pct(RANGO_AJD.max)} según la comunidad autónoma — el extremo bajo es el 0% del Régimen foral del País Vasco. Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad. No coinciden IVA e ITP en la misma operación. En Canarias, Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.`,
       },
     },
     {
@@ -75,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Por qué un solar de empresario lleva IVA y no ITP?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Porque los terrenos edificables (solares) están excluidos de la exención de IVA que sí se aplica al suelo rústico. Cuando un empresario o promotor entrega un solar en el ejercicio de su actividad, la operación está sujeta y no exenta de IVA al 21%, y la escritura tributa además por Actos Jurídicos Documentados (AJD).',
+        text: `Porque los terrenos edificables (solares) están excluidos de la exención de IVA que sí se aplica al suelo rústico. Cuando un empresario o promotor entrega un solar en el ejercicio de su actividad, la operación está sujeta y no exenta de IVA al ${IVA_SOLAR}, y la escritura tributa además por Actos Jurídicos Documentados (AJD).`,
       },
     },
     {
@@ -99,7 +107,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre comprar un solar y una finca rústica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La fiscalidad es distinta. El solar edificable tributa por IVA 21% más AJD si vende un empresario, o por ITP si vende un particular, y al ser suelo urbano genera plusvalía municipal. La finca rústica no edificable está exenta de IVA (tributa por ITP incluso vendiéndola un empresario) y no genera plusvalía municipal. Por eso conviene identificar bien el tipo de suelo antes de comprar.',
+        text: `La fiscalidad es distinta. El solar edificable tributa por IVA ${IVA_SOLAR} más AJD si vende un empresario, o por ITP si vende un particular, y al ser suelo urbano genera plusvalía municipal. La finca rústica no edificable está exenta de IVA (tributa por ITP incluso vendiéndola un empresario) y no genera plusvalía municipal. Por eso conviene identificar bien el tipo de suelo antes de comprar.`,
       },
     },
   ],

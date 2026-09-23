@@ -3849,13 +3849,12 @@ test.describe('Re-inspección 23/09/2026 — familia y tres casos nuevos', () =>
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 23/09/2026.
-// Escritos con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan y, cuando se
-// reparen, se les quita la marca y se quedan como regresión. Se comprobó en el informe JSON
-// de la corrida que cada uno falla en la aserción del defecto, no en la preparación.
+// HALLAZGOS de la re-inspección del 23/09/2026 (1267 y 1268), REPARADOS el mismo día.
+// Se escribieron con `test.fail()` afirmando lo que DEBERÍA pasar, y fallaban en la aserción
+// del defecto, no en la preparación; reparados, se les quitó la marca y quedan de regresión.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 23/09/2026', () => {
+test.describe('Regresión — hallazgos 1267 y 1268 del 23/09/2026', () => {
   /**
    * HALLAZGO 1 (contenido, medio) — EFECTO FAMILIA. El FAQPage y la FAQ visible dicen que una
    * nave nueva «paga IVA al 21%» sin la salvedad de Canarias, Ceuta y Melilla, mientras la
@@ -3871,8 +3870,7 @@ test.describe('Hallazgos abiertos — 23/09/2026', () => {
    * La pregunta del FAQPage ya nombra Ceuta y Melilla —para su bonificación del ITP—, así que
    * el test exige que nombre el IGIC o el IPSI, no solo los territorios.
    */
-  test('HALLAZGO 1 — el FAQPage y la FAQ visible no dicen que en Canarias, Ceuta y Melilla no rige el IVA', async ({ page }) => {
-    test.fail();
+  test('REPARADO 23/09 (1267) — el FAQPage y la FAQ visible dicen que en Canarias, Ceuta y Melilla no rige el IVA', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
 
@@ -3900,9 +3898,13 @@ test.describe('Hallazgos abiertos — 23/09/2026', () => {
     });
     expect(visible, 'la FAQ visible existe').toContain('se paga IVA al 21%');
 
-    // EL DEFECTO — hoy ninguna de las dos nombra el impuesto que rige allí.
+    // EL DEFECTO — ninguna de las dos nombraba el impuesto que rige allí.
     expect(respuesta, `FAQPage sin salvedad territorial: «${respuesta.slice(0, 160)}…»`).toMatch(/IGIC|IPSI/);
     expect(visible, `FAQ visible sin salvedad territorial: «${visible.slice(0, 160)}…»`).toMatch(/IGIC|IPSI/);
+    // Reparado con la frase de garaje, trastero, solar y terreno-rústico, en los dos canales.
+    const salvedad = 'En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI';
+    expect(respuesta).toContain(salvedad);
+    expect(visible).toContain(salvedad);
   });
 
   /**
@@ -3921,8 +3923,7 @@ test.describe('Hallazgos abiertos — 23/09/2026', () => {
    * que la app sí calcula—: un texto del bloque educativo que se quedó con dos opciones cuando
    * la herramienta ya tenía tres.
    */
-  test('HALLAZGO 2 — el consejo del régimen de IVA presenta toda segunda mano como ITP no deducible', async ({ page }) => {
-    test.fail();
+  test('REPARADO 23/09 (1268) — el consejo del régimen de IVA ya no presenta toda segunda mano como ITP no deducible', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo vive en el DOM aunque esté plegado: `textContent`.
     const consejo = await page.evaluate(() => {
@@ -3931,12 +3932,56 @@ test.describe('Hallazgos abiertos — 23/09/2026', () => {
       );
       return (fuerte?.parentElement?.textContent ?? '').replace(/\s+/g, ' ').trim();
     });
-    expect(consejo, 'el consejo existe y compara primera y segunda mano').toContain('segunda mano (ITP no deducible)');
+    // (Hasta la reparación decía «segunda mano (ITP no deducible)»; ahora acota el ITP a la
+    // segunda mano SIN renuncia.)
+    expect(consejo, 'el consejo existe y compara primera y segunda mano').toContain('primera mano');
+    expect(consejo).toContain('Sin renuncia, la segunda mano paga ITP, que no es deducible');
 
     // La app sí ofrece la tercera vía, y la llama la habitual entre empresarios.
     await expect(page.getByRole('button', { name: /renuncia/ })).toHaveCount(1);
 
-    // EL DEFECTO — el consejo no la menciona.
+    // EL DEFECTO — el consejo no la mencionaba.
     expect(consejo, `consejo sin la renuncia: «${consejo}»`).toMatch(/renuncia/i);
+    // Reparado: nombra la renuncia, su mecánica (ISP) y que es deducible.
+    expect(consejo).toContain('inversión del sujeto pasivo');
+    expect(consejo).toContain('también es deducible');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Efecto familia del hallazgo 1272 de solar, encontrado al repararlo y reparado aquí el mismo
+// día (23/09/2026): con la gestoría ilegible, el cierre SUSTITUÍA la salvedad del IVA
+// deducible por el aviso, y «el coste real será mayor» quedaba falso para quien lo deduce.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Regresión — familia del hallazgo 1272 (23/09/2026)', () => {
+  test('obra nueva y renuncia con la gestoría ilegible: el aviso se suma a la salvedad del IVA', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await sembrar(page, PRECIO, '300000');
+    await sembrar(page, GESTORIA, '2.000.50');
+
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+
+    // Segunda mano (ITP): no hay IVA que deducir, el aviso va solo.
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('No incluye la gestoría, que no se ha podido leer: el coste real será mayor');
+
+    // Canarias con obra nueva: falta el IGIC y no hay IVA, así que tampoco hay salvedad.
+    await page.selectOption('#select-ccaa', 'canarias');
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye el IGIC ni la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
   });
 });

@@ -464,7 +464,10 @@ test.describe('Regresión — hallazgos reparados el 26/08/2026', () => {
    * motivo por el que el hallazgo 163 hizo derivar la constante en todo el clúster.
    */
   test('HALLAZGO 5 (guardia) — el 21 % escrito en los textos sigue coincidiendo con data/fiscal', async ({ page }) => {
-    const tipo = IVA_INMUEBLES_2025.local;   // 21
+    // Desde el 23/09/2026 (hallazgo 1275) la guardia compara con la constante con la que la app
+    // CALCULA (`IVA_SOLAR = PORCENTAJES_IVA.general`, hallazgo 734), y no con la del local
+    // comercial, que es la que vigilaba hasta entonces: el día que diverjan, vigilaba la equivocada.
+    const tipo = PORCENTAJES_IVA.general;   // 21
 
     await page.goto(RUTA);
     // El aviso de la compra a promotor solo se pinta con esa opción elegida (`esEmpresario`).
@@ -677,7 +680,9 @@ test.describe('Re-inspección 11/09/2026 — la escala de Aragón del art. 121-1
     await rellenar(page, PRECIO, '200000');
 
     expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
-    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,50%)');
+    // Tipo EFECTIVO desde el 23/09/2026 (hallazgo 1269): 500 / 200.000 = 0,25 %. Hasta
+    // entonces este caso exigía «AJD (0,50%)», el nominal sin bonificar, y consagraba el defecto.
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,25%)');
     expect(await valorTarjeta(page, 'AJD (')).toBe('500,00 €');
     await expect(page.locator('h3', { hasText: /COSTE TOTAL \(PARCIAL\)/ })).toHaveCount(1);
   });
@@ -878,12 +883,6 @@ test('REPARADO 11/09 (contenido) — la FAQ visible recoge la excepción que el 
 //    21 % de IVA dentro. `sumarLineasVisibles` redondea cada línea al céntimo antes de sumar.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/**
- * Los `test.fail()` de este bloque se tragan el motivo. Para ver QUÉ falla en cada uno:
- *     VER_HUECOS=1 npx playwright test tests/apps/simulador-gastos-compraventa-solar.spec.ts -g "23/09"
- */
-const HUECO_ABIERTO_2309 = !process.env.VER_HUECOS;
-
 test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () => {
   const SEL_PRECIO = `input[aria-label="${PRECIO}"]`;
   const SEL_GESTORIA = `input[aria-label="${GESTORIA}"]`;
@@ -1072,10 +1071,9 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     }
   });
 
-  // ─── HALLAZGOS ABIERTOS del 23/09/2026 ───────────────────────────────────────
-  // Escritos afirmando lo que DEBERÍA pasar: hoy fallan a propósito y, al repararse, se
-  // quedan como regresión. Cada uno falla en su ÚLTIMA aserción; lo anterior es la
-  // preparación, que pasa y comprueba que el caso está montado.
+  // ─── HALLAZGOS del 23/09/2026 (1269-1275), REPARADOS el mismo día ────────────
+  // Se escribieron afirmando lo que DEBÍA pasar y fallaban en su ÚLTIMA aserción; reparados,
+  // se quedan como regresión. Lo anterior a esa aserción es la preparación del caso.
 
   /**
    * HALLAZGO 23/09-A (cálculo, medio) — el rótulo del AJD publica el tipo NOMINAL sin
@@ -1088,8 +1086,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
    * ⚠️ Al repararlo, el caso «Ceuta con promotor» del 11/09 (que exige «AJD (0,50%)» con 500 €
    * sobre 200.000 €, o sea un 0,25 %) consagra el defecto y tendrá que reescribirse.
    */
-  test('HALLAZGO 23/09-A — en Melilla el rótulo del AJD dice 0,50 % y el importe es el 0,25 %', async ({ page }) => {
-    test.fail(HUECO_ABIERTO_2309, 'El rótulo del AJD lleva el tipo nominal sin bonificar (hueco 802 sin propagar a solar)');
+  test('REPARADO 23/09 (1269, antes 23/09-A) — en Melilla el rótulo del AJD dice 0,50 % y el importe es el 0,25 %', async ({ page }) => {
     await abrir(page, 'melilla', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '240000');
 
@@ -1106,8 +1103,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
    * prometen un IVA en Canarias, Ceuta y Melilla») y el 725 de nave-industrial: reparado el
    * 13/09 en terreno-rústico, nave-industrial y local-comercial, no en solar.
    */
-  test('HALLAZGO 23/09-B — en Ceuta el botón y la ficha de la comunidad siguen prometiendo IVA del 21 %', async ({ page }) => {
-    test.fail(HUECO_ABIERTO_2309, 'El botón y la ficha de la comunidad anuncian IVA 21 % donde no rige (803 sin propagar)');
+  test('REPARADO 23/09 (1270, antes 23/09-B) — en Ceuta el botón y la ficha de la comunidad siguen prometiendo IVA del 21 %', async ({ page }) => {
     await abrir(page, 'ceuta', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '200000');
 
@@ -1117,6 +1113,17 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     const ficha = (await page.locator('[class*="infoCcaaGrid"]').innerText()).replace(/\s+/g, ' ');
     const boton = (await page.getByRole('button', { name: /Promotor \/ Empresa/ }).innerText()).replace(/\s+/g, ' ');
     expect(`${boton} · ${ficha}`).not.toMatch(/IVA[^·]*21\s?%/);
+    // Reparado (1270) con la forma de terreno-rústico, nave-industrial y local-comercial:
+    // el botón nombra el impuesto que sí rige y la ficha lo da por no calculado.
+    expect(boton).toContain('Paga IPSI + AJD');
+    expect(ficha).toContain('IPSI (empresario) No calculado');
+
+    // Y fuera de esos territorios sigue anunciando el IVA, con el tipo de data/fiscal.
+    await page.selectOption('#select-ccaa', 'madrid');
+    await expect(page.getByRole('button', { name: /Promotor \/ Empresa/ })).toContainText(
+      `Paga IVA ${PORCENTAJES_IVA.general}% + AJD`,
+    );
+    await expect(page.locator('[class*="infoCcaaGrid"]')).toContainText(`${PORCENTAJES_IVA.general}%`);
   });
 
   /**
@@ -1126,8 +1133,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
    * adicionales (parcial)» en estimador, garaje, trastero y local-comercial (nave ya lo tenía):
    * solar y terreno-rústico se quedaron fuera. La descripción sí dice «SIN el IPSI».
    */
-  test('HALLAZGO 23/09-C — con el IPSI sin calcular, «Total gastos adicionales» no se rotula parcial', async ({ page }) => {
-    test.fail(HUECO_ABIERTO_2309, 'Una tarjeta rotula PARCIAL y la otra, con la misma omisión, no (d787b81b sin propagar)');
+  test('REPARADO 23/09 (1271, antes 23/09-C) — con el IPSI sin calcular, «Total gastos adicionales» no se rotula parcial', async ({ page }) => {
     await abrir(page, 'melilla', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '240000');
 
@@ -1148,8 +1154,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
    *   con gestoría 400 → total 66.787,38 · coste 366.787,38
    *   con «2.000.50»   → total 66.387,38 · coste 366.387,38 (−400, la gestoría fuera)
    */
-  test('HALLAZGO 23/09-D — con la gestoría ilegible el cierre pierde la salvedad del IVA deducible', async ({ page }) => {
-    test.fail(HUECO_ABIERTO_2309, 'El aviso del ilegible reemplaza a la salvedad del IVA deducible en vez de sumarse');
+  test('REPARADO 23/09 (1272, antes 23/09-D) — con la gestoría ilegible el cierre pierde la salvedad del IVA deducible', async ({ page }) => {
     await abrir(page, 'madrid', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '300000');
     await sembrarValor(page, SEL_GESTORIA, '400');
@@ -1161,6 +1166,16 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     await expect(valor(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText('366.387,38 €');
     await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toContainText('No incluye la gestoría');
     await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toContainText('deducir el IVA');
+    // Reparado (1272): el aviso se SUMA a la salvedad, en una sola frase.
+    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+
+    // Con un particular no hay IVA que deducir: el aviso queda solo, sin la salvedad.
+    await page.getByRole('button', { name: /Un particular/ }).click();
+    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
   });
 
   /**
@@ -1174,8 +1189,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
    * el IVA es el régimen ORDINARIO de comprar a un promotor. (Misma ayuda, estática, en garaje,
    * trastero y estimador, que también tienen un régimen de IVA.)
    */
-  test('HALLAZGO 23/09-E — con promotor, la ayuda del precio manda meter el valor de referencia que el IVA no usa', async ({ page }) => {
-    test.fail(HUECO_ABIERTO_2309, 'La ayuda del precio contradice a la FAQ: el IVA no se calcula sobre el valor de referencia');
+  test('REPARADO 23/09 (1273, antes 23/09-E) — con promotor, la ayuda del precio manda meter el valor de referencia que el IVA no usa', async ({ page }) => {
     await abrir(page, 'madrid', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '150000');
     await expect(valor(page, 'IVA (')).toHaveText('31.500,00 €');
@@ -1188,11 +1202,32 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
       'El IVA se calcula sobre el precio pactado',
     );
 
-    // La ayuda del campo, con el promotor elegido: si pide «el mayor», tiene que acotarlo al ITP.
-    const idAyuda = await page.locator(SEL_PRECIO).getAttribute('aria-describedby');
-    const ayuda = (await page.locator(`[id="${idAyuda}"]`).innerText()).replace(/\s+/g, ' ');
-    expect(ayuda).toContain('valor de referencia');
-    expect(/el mayor/.test(ayuda) ? /ITP|particular|IVA/.test(ayuda) : true, `Ayuda publicada: «${ayuda}»`).toBe(true);
+    // La ayuda del campo, con el promotor elegido. Reparado (1273) con la forma del 601 de
+    // nave-industrial: en el régimen de IVA pide el precio pactado y NO «el mayor».
+    const leerAyuda = async (): Promise<string> => {
+      const idAyuda = await page.locator(SEL_PRECIO).getAttribute('aria-describedby');
+      return (await page.locator(`[id="${idAyuda}"]`).innerText()).replace(/\s+/g, ' ');
+    };
+    let ayuda = await leerAyuda();
+    expect(ayuda, `Ayuda publicada: «${ayuda}»`).toContain('Precio pactado');
+    expect(ayuda, `Ayuda publicada: «${ayuda}»`).not.toContain('el mayor');
+
+    // Siguiéndola con el caso de la ficha (pactado 120.000, referencia 150.000) se escribe el
+    // pactado: IVA = 120.000 × 21 % = 25.200,00 € (PORCENTAJES_IVA.general), como dice la FAQ.
+    await sembrarValor(page, SEL_PRECIO, '120000');
+    await expect(valor(page, 'IVA (')).toHaveText('25.200,00 €');
+
+    // Con un particular (ITP) la base mínima es el valor de referencia: vuelve «el mayor».
+    await page.getByRole('button', { name: /Un particular/ }).click();
+    ayuda = await leerAyuda();
+    expect(ayuda).toContain('valor de referencia catastral (el mayor de ambos)');
+
+    // Y con promotor en Ceuta, donde solo se calcula el AJD (base mínima, la de referencia),
+    // tampoco se promete la base del IVA.
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await page.getByRole('button', { name: /Promotor \/ Empresa/ }).click();
+    ayuda = await leerAyuda();
+    expect(ayuda).toContain('el mayor de ambos');
   });
 
   /**
@@ -1203,8 +1238,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
    * (art. 104.5 TRLRHL)», la no sujeción que introdujo el RDL 26/2021 que cita
    * FISCAL_INMUEBLES_META. El FAQPage del JSON-LD sí lleva la condición.
    */
-  test('HALLAZGO 23/09-F — «el vendedor pagará la plusvalía» sin la no sujeción que la FAQ reconoce', async ({ page }) => {
-    test.fail(HUECO_ABIERTO_2309, 'La plusvalía se afirma sin condición donde la FAQ reconoce la no sujeción');
+  test('REPARADO 23/09 (1274, antes 23/09-F) — «el vendedor pagará la plusvalía» sin la no sujeción que la FAQ reconoce', async ({ page }) => {
     await abrir(page, 'madrid', 'particular');
     await sembrarValor(page, SEL_PRECIO, '120000');
 
@@ -1216,6 +1250,12 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     const nota = (await page.locator('[role="note"]', { hasText: 'Recuerda' }).innerText()).replace(/\s+/g, ' ');
     expect(nota).toContain('plusvalía municipal');
     expect(nota, `Nota publicada: «${nota}»`).toMatch(/incremento|no est[aá] sujeta|salvo|si hubo/i);
+
+    // Reparado (1274): la cabecera «Clave del solar» lleva la misma condición.
+    const cabecera = (await page.locator('[role="note"]', { hasText: 'Clave del solar' }).innerText()).replace(/\s+/g, ' ');
+    expect(cabecera, `Cabecera publicada: «${cabecera}»`).toContain('si hubo incremento real');
+    expect(cabecera).toContain('104.5 TRLRHL');
+    expect(nota).toContain('104.5 TRLRHL');
   });
 
   /**
@@ -1227,8 +1267,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
    * vigilará la equivocada. Hoy ambas valen 21: no hay diferencia en pantalla (es de guardia,
    * como lo fue el 734), pero el test falla por la forma del código.
    */
-  test('HALLAZGO 23/09-G — el FAQPage deriva el IVA de la constante del LOCAL, no de la que usa el cálculo', async () => {
-    test.fail(HUECO_ABIERTO_2309, 'metadata.ts sigue en IVA_INMUEBLES_2025.local (734 sin propagar al JSON-LD)');
+  test('REPARADO 23/09 (1275, antes 23/09-G) — el FAQPage deriva el IVA de la constante del LOCAL, no de la que usa el cálculo', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const dir = join(process.cwd(), 'app', 'simulador-gastos-compraventa-solar');
@@ -1239,5 +1278,13 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     expect(pagina).toContain('const IVA_SOLAR = PORCENTAJES_IVA.general');
     // El JSON-LD tiene que seguir a la misma constante.
     expect(meta).not.toContain('IVA_INMUEBLES_2025.local');
+    expect(meta).toContain('PORCENTAJES_IVA.general');
+
+    // Reparado (1275): ningún «21%» tecleado en un texto que se publica. Se quitan antes los
+    // comentarios, que pueden citar la cifra para explicar el porqué sin publicarla.
+    const sinComentarios = (fuente: string) =>
+      fuente.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    expect(sinComentarios(pagina).match(/\b21\s?%/g) ?? []).toEqual([]);
+    expect(sinComentarios(meta).match(/\b21\s?%/g) ?? []).toEqual([]);
   });
 });

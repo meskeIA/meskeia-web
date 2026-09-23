@@ -626,7 +626,14 @@ export default function SimuladorNaveIndustrialPage() {
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
                       ]
                         .filter((x): x is string => x !== null)
-                        .join(' ni ')}: el coste real será mayor`
+                        .join(' ni ')}: el coste real será mayor${
+                        // Con IVA en pantalla (obra nueva o renuncia, fuera de Canarias, Ceuta y
+                        // Melilla) el aviso del ilegible se SUMA a la salvedad del IVA deducible,
+                        // no la reemplaza (forma del hallazgo 1272 de solar).
+                        conIvaEnPantalla
+                          ? ' (precio + gastos antes de deducir el IVA si tienes derecho)'
+                          : ''
+                      }`
                     : 'Precio + todos los gastos (antes de deducir IVA si aplica)'
                 }
               />
@@ -759,7 +766,9 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Depende del tipo de transmisión. Si es la primera entrega del promotor (obra nueva),
                 se paga IVA al {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%. Si es de segunda mano, se paga ITP
-                al tipo general de la comunidad autónoma. Nunca se pagan los dos a la vez.
+                al tipo general de la comunidad autónoma. Nunca se pagan los dos a la vez. En Canarias, Ceuta
+                y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador
+                no calcula ahí el impuesto de la obra nueva ni el de la renuncia.
               </p>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 <strong>Con una salvedad que en naves industriales es frecuente:</strong> la segunda
@@ -831,8 +840,15 @@ export default function SimuladorNaveIndustrialPage() {
               <span style={{ fontSize: '1.5rem' }} aria-hidden="true">📑</span>
               <strong>Consulta el régimen de IVA antes de comprar</strong>
               <p style={{ fontSize: '0.9rem' }}>
-                Si tu actividad está sujeta a IVA, comprar en primera mano (IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%) puede ser más
-                ventajoso que segunda mano (ITP no deducible), especialmente en naves de alto valor.
+                {/* La segunda mano no es siempre ITP: entre empresarios cabe la renuncia a la
+                    exención, que la app calcula en su tercera opción (hallazgo 1268; forma del
+                    hallazgo B del 27/08/2026). */}
+                Si tu actividad está sujeta a IVA, el IVA de la primera mano ({formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%)
+                es deducible, y en segunda mano entre empresarios con derecho a deducción cabe la{' '}
+                <strong>renuncia a la exención</strong>: la operación vuelve al IVA, que autoliquida el comprador
+                (inversión del sujeto pasivo) y también es deducible. Sin renuncia, la segunda mano paga ITP, que no es
+                deducible: una diferencia que pesa más en naves de alto valor. La renuncia es la
+                tercera opción del selector.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>

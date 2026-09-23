@@ -211,6 +211,12 @@ export default function SimuladorTerrenoRusticoPage() {
   const ciudadBonificada = CIUDADES_CON_BONIFICACION.includes(ccaa);
   /** Canarias, Ceuta y Melilla: allí no rige el IVA, sino el IGIC o el IPSI. */
   const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
+  /**
+   * Única rama en la que el impuesto en pantalla es IVA (la renuncia fuera de Canarias, Ceuta y
+   * Melilla) y, por tanto, su base es la contraprestación pactada (art. 78 Ley 37/1992), no «el
+   * mayor» con el valor de referencia, que es la base mínima del ITP (forma del 1273 de solar).
+   */
+  const conIvaEnPantalla = esRenuncia && !territorioActualSinIva;
 
   return (
     <div className={styles.container}>
@@ -294,14 +300,33 @@ export default function SimuladorTerrenoRusticoPage() {
             </div>
           </div>
 
+          {/*
+            El recuadro afirmaba en Canarias, Ceuta y Melilla que «el IVA se autoliquida por
+            inversión del sujeto pasivo», justo encima de <AvisoTerritorioSinIva> («no se aplica el
+            IVA») y junto a la tarjeta «IGIC · No calculado». Se condiciona al territorio con la
+            forma de nave-industrial (hallazgos 647 y 1177): hallazgo 1276.
+          */}
           {esRenuncia && (
             <div className={styles.renunciaAviso} role="note">
-              <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
-              comprador y vendedor son empresarios o profesionales con derecho a deducción (por ejemplo, un
-              agricultor en régimen general que afecta la finca a su explotación). El IVA se autoliquida por
-              <strong> inversión del sujeto pasivo</strong> y es deducible si tienes derecho. A cambio, la
-              escritura tributa por AJD, que <strong>muchas CCAA aplican a un tipo incrementado</strong> en la
-              renuncia; este simulador usa el AJD general.
+              {territorioActualSinIva ? (
+                <>
+                  <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención en {datosCcaaActual.nombre}:</strong> aquí{' '}
+                  <strong>no se devenga IVA</strong>: rige el {territorioActualSinIva.impuesto}{' '}
+                  ({territorioActualSinIva.nombre}), así que ni la renuncia a la exención ni la inversión
+                  del sujeto pasivo del IVA entran en juego, y este simulador no cuantifica ese impuesto. Lo
+                  que sí calcula es el AJD de la escritura, con el tipo general de la tabla; varias
+                  comunidades le aplican un <strong>tipo incrementado</strong> cuando hay renuncia.
+                </>
+              ) : (
+                <>
+                  <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
+                  comprador y vendedor son empresarios o profesionales con derecho a deducción (por ejemplo, un
+                  agricultor en régimen general que afecta la finca a su explotación). El IVA se autoliquida por
+                  <strong> inversión del sujeto pasivo</strong> y es deducible si tienes derecho. A cambio, la
+                  escritura tributa por AJD, que <strong>muchas CCAA aplican a un tipo incrementado</strong> en la
+                  renuncia; este simulador usa el AJD general.
+                </>
+              )}
             </div>
           )}
 
@@ -311,7 +336,11 @@ export default function SimuladorTerrenoRusticoPage() {
             onChange={setPrecioVenta}
             label="Precio de compra de la finca rústica"
             placeholder="80000"
-            helperText="Precio escriturado o valor de referencia catastral (el mayor de ambos)"
+            helperText={
+              conIvaEnPantalla
+                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992)'
+                : 'Precio escriturado o valor de referencia catastral (el mayor de ambos)'
+            }
             min={0}
           />
 
@@ -503,7 +532,9 @@ export default function SimuladorTerrenoRusticoPage() {
               <div className={styles.separador} />
 
               <ResultCard
-                title="Total gastos adicionales"
+                // Le falta el mismo IGIC/IPSI que al coste total de debajo, que ya se rotula
+                // parcial (hallazgo 1277; forma de d787b81b en las hermanas).
+                title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
@@ -534,7 +565,14 @@ export default function SimuladorTerrenoRusticoPage() {
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
                       ]
                         .filter((x): x is string => x !== null)
-                        .join(' ni ')}: el coste real será mayor`
+                        .join(' ni ')}: el coste real será mayor${
+                        // El aviso del ilegible se SUMA a la salvedad del IVA deducible, no la
+                        // reemplaza: sin ella, «será mayor» es falso para quien deduce el IVA
+                        // (forma del hallazgo 1272 de solar).
+                        resultadosComprador.ivaRecuperable
+                          ? ' (precio + gastos antes de deducir el IVA si tienes derecho)'
+                          : ''
+                      }`
                     : resultadosComprador.ivaRecuperable
                       ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
                       : 'Precio + todos los gastos de la operación'
@@ -583,7 +621,11 @@ export default function SimuladorTerrenoRusticoPage() {
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>¿Sujeto a IVA por empresario?</td>
                   <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>No (exento)</td>
-                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (21% + AJD)</td>
+                  {/* El tipo sale de data/fiscal y la excepción territorial va con él, como en la
+                      FAQ de esta misma página (hallazgos 1278 y 1279). */}
+                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>
+                    Sí ({formatNumber(IVA_RENUNCIA, 0)}% + AJD); IGIC o IPSI en Canarias, Ceuta y Melilla
+                  </td>
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Plusvalía municipal</td>
@@ -625,7 +667,9 @@ export default function SimuladorTerrenoRusticoPage() {
               <strong><span aria-hidden="true">🤝</span> Empresa compra finca a otra empresa</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si ambas tienen derecho a deducción, el vendedor puede renunciar a la exención de IVA. La compra
-                pasa a IVA 21% con inversión del sujeto pasivo, que el comprador autoliquida y deduce.
+                pasa a IVA {formatNumber(IVA_RENUNCIA, 0)}% con inversión del sujeto pasivo, que el comprador
+                autoliquida y deduce. En Canarias, Ceuta y Melilla no rige el IVA: allí la operación va por
+                IGIC o IPSI, que esta calculadora no cifra.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>

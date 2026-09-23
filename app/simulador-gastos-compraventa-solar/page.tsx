@@ -197,6 +197,14 @@ export default function SimuladorSolarPage() {
   }, [precioVenta, ccaa, tipoVendedor, gastosGestoria]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
+  /** Canarias, Ceuta y Melilla: allí no rige el IVA, sino el IGIC o el IPSI. */
+  const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
+  /**
+   * Única rama en la que el impuesto en pantalla es IVA y, por tanto, su base es la
+   * contraprestación pactada (art. 78 Ley 37/1992), no «el mayor» con el valor de referencia,
+   * que es la base mínima del ITP (hallazgo 1273; misma forma que el 601 de nave-industrial).
+   */
+  const conIvaEnPantalla = esEmpresario && !territorioActualSinIva;
 
   return (
     <div className={styles.container}>
@@ -238,7 +246,8 @@ export default function SimuladorSolarPage() {
         está exento de IVA</strong>. Si lo vende un <strong>promotor o empresario</strong> pagas IVA {formatNumber(IVA_SOLAR, 0)}% + AJD;
         si lo vende un <strong>particular</strong>, pagas ITP. En <strong>Canarias, Ceuta y Melilla</strong> no
         rige el IVA: allí la operación va por <strong>IGIC</strong> o <strong>IPSI</strong>, que esta calculadora
-        no cifra. En todos los casos, al ser suelo urbano, el vendedor paga <strong>plusvalía municipal</strong>.
+        no cifra. En todos los casos, al ser suelo urbano, el vendedor paga <strong>plusvalía municipal</strong> si
+        hubo incremento real del valor del terreno (sin incremento, la transmisión no está sujeta: art. 104.5 TRLRHL).
       </div>
 
       {/* Formulario principal */}
@@ -271,7 +280,14 @@ export default function SimuladorSolarPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🏢</span>
                 <span>Promotor / Empresa</span>
-                <span className={styles.transmisionSub}>Paga IVA 21% + AJD</span>
+                {/* El rótulo no puede prometer un IVA que en Canarias, Ceuta y Melilla no se
+                    liquida, ni escribir su tipo a mano teniéndolo en data/fiscal (hallazgos
+                    1270 y 1275; forma de los 803 y 806 de terreno-rústico). */}
+                <span className={styles.transmisionSub}>
+                  {territorioActualSinIva
+                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
+                    : `Paga IVA ${formatNumber(IVA_SOLAR, 0)}% + AJD`}
+                </span>
               </button>
             </div>
           </div>
@@ -297,7 +313,11 @@ export default function SimuladorSolarPage() {
             onChange={setPrecioVenta}
             label="Precio de compra del solar"
             placeholder="120000"
-            helperText="Precio escriturado o valor de referencia catastral (el mayor de ambos)"
+            helperText={
+              conIvaEnPantalla
+                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992)'
+                : 'Precio escriturado o valor de referencia catastral (el mayor de ambos)'
+            }
             min={0}
           />
 
@@ -336,8 +356,12 @@ export default function SimuladorSolarPage() {
                 <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
-                <span className={styles.infoCcaaLabel}>IVA (empresario)</span>
-                <span className={styles.infoCcaaValue}>{IVA_SOLAR}%</span>
+                <span className={styles.infoCcaaLabel}>
+                  {territorioActualSinIva ? `${territorioActualSinIva.impuesto} (empresario)` : 'IVA (empresario)'}
+                </span>
+                <span className={styles.infoCcaaValue}>
+                  {territorioActualSinIva ? 'No calculado' : `${formatNumber(IVA_SOLAR, 0)}%`}
+                </span>
               </div>
             </div>
             {datosCcaaActual.tramosProgresivos && (
@@ -411,7 +435,16 @@ export default function SimuladorSolarPage() {
 
               {resultadosComprador.ajd > 0 && (
                 <ResultCard
-                  title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                  // Tipo EFECTIVO, no el nominal de la tabla: en Ceuta y Melilla la cuota
+                  // gradual se bonifica al 50 % (art. 57 bis.1 TRLITPAJD) y el nominal
+                  // desmentía por el doble al importe de al lado (hallazgo 1269; forma de los
+                  // 447 y 802 de las otras seis hermanas).
+                  title={`AJD (${formatNumber(
+                    resultadosComprador.precioInmueble > 0
+                      ? (resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100
+                      : datosCcaaActual.ajd,
+                    2
+                  )}%)`}
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
@@ -459,7 +492,9 @@ export default function SimuladorSolarPage() {
               <div className={styles.separador} />
 
               <ResultCard
-                title="Total gastos adicionales"
+                // Le falta el mismo IGIC/IPSI que al coste total de debajo, que ya se rotula
+                // parcial (hallazgo 1271; forma de d787b81b en las hermanas).
+                title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
@@ -490,7 +525,14 @@ export default function SimuladorSolarPage() {
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
                       ]
                         .filter((x): x is string => x !== null)
-                        .join(' ni ')}: el coste real será mayor`
+                        .join(' ni ')}: el coste real será mayor${
+                        // El aviso del ilegible se SUMA a la salvedad del IVA deducible, no la
+                        // reemplaza: sin ella, «será mayor» es falso para quien deduce el IVA
+                        // (hallazgo 1272).
+                        resultadosComprador.ivaRecuperable
+                          ? ' (precio + gastos antes de deducir el IVA si tienes derecho)'
+                          : ''
+                      }`
                     : resultadosComprador.ivaRecuperable
                       ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
                       : 'Precio + todos los gastos de la operación'
@@ -499,8 +541,9 @@ export default function SimuladorSolarPage() {
 
               <div className={styles.renunciaAviso} role="note" style={{ marginTop: '0.25rem' }}>
                 <strong>Recuerda:</strong> el solar es suelo urbano, así que el <strong>vendedor</strong> pagará
-                además la <strong>plusvalía municipal</strong> (IIVTNU). No es un coste del comprador, pero puede
-                influir en la negociación del precio.
+                además la <strong>plusvalía municipal</strong> (IIVTNU) si hubo incremento real del valor del
+                terreno; sin incremento, la transmisión no está sujeta (art. 104.5 TRLRHL). No es un coste del
+                comprador, pero puede influir en la negociación del precio.
               </div>
             </>
           ) : (
@@ -537,7 +580,7 @@ export default function SimuladorSolarPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Impuesto principal</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary-texto)' }}>IVA 21%</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary-texto)' }}>IVA {formatNumber(IVA_SOLAR, 0)}%</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700 }}>ITP (tipo general)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
@@ -567,14 +610,14 @@ export default function SimuladorSolarPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏗️</span> Autopromotor compra parcela para su casa</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si compra a un promotor, paga IVA 21% + AJD y no lo deduce (es un particular). Si compra a un
+                Si compra a un promotor, paga IVA {formatNumber(IVA_SOLAR, 0)}% + AJD y no lo deduce (es un particular). Si compra a un
                 particular, paga ITP al tipo general. En ambos casos suma notaría y registro.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏢</span> Promotora compra suelo para construir</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si compra a otro empresario, paga IVA 21% deducible en el modelo 303. Si compra a un particular,
+                Si compra a otro empresario, paga IVA {formatNumber(IVA_SOLAR, 0)}% deducible en el modelo 303. Si compra a un particular,
                 paga ITP, que no se recupera pero se incorpora al coste de la promoción.
               </p>
             </div>
