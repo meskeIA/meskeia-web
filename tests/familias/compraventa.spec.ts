@@ -197,7 +197,11 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(page, 'Precio del garaje / plaza de parking', '25000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
       await irAPestana(page, 'vendedor');
-      await sembrar(page, 'Precio de compra original del garaje', base === 'R' ? '24000' : '18000');
+      await sembrar(
+        page,
+        'Precio de compra original del garaje',
+        base === 'R' ? '24000' : base === 'P' ? '30000' : '18000',
+      );
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '1800');
       await sembrar(page, 'Años de propiedad', '8');
       await sembrar(page, 'Valor catastral del suelo (€)', '5000');
@@ -238,6 +242,18 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -342,
         nombra: /impuestos y gastos de aquella compra/i,
+      },
+      {
+        // BASE P (compra original 30.000 > venta): hay PÉRDIDA y no hay IRPF que rebajar, así
+        // que los gastos de aquella compra no mueven el neto. El aviso prometía un neto MAYOR
+        // idéntico al publicado (hallazgo 1249, efecto colateral de cfe091a7). La cifra que sí
+        // se mueve, la pérdida compensable, la vigila el spec de la app.
+        etiqueta: 'Impuestos y gastos que pagaste al comprarlo (€)',
+        panel: 'vendedor',
+        legible: '1800',
+        base: 'P',
+        direccion: 'sin_efecto',
+        delta: 0,
       },
       {
         // No es campo de dinero, pero mueve el neto: entra por eso.
@@ -817,11 +833,20 @@ const HERMANAS: readonly Hermana[] = [
 
 /** La cifra publicada está POR ENCIMA de la real: hay que descontar (TECHO). */
 const DICE_TECHO =
-  /falta(?:n)? descontar|no descuenta|(?:neto|coste) real (?:es|será) menor|\btecho:/i;
+  /falta(?:n)? descontar|no descuenta|(?:neto|coste) real (?:es|será|puede ser) menor|\btecho:/i;
 
 /** La cifra publicada está POR DEBAJO de la real: la real es MAYOR (SUELO). */
 const DICE_SUELO =
-  /(?:neto|coste) real (?:es|será) mayor|reducen el (?:irpf|impuesto)|falta sumar al valor de adquisición|\bsuelo:/i;
+  /(?:neto|coste) real (?:es|será|puede ser) mayor|reducen el (?:irpf|impuesto)|falta sumar al valor de adquisición|\bsuelo:/i;
+
+/**
+ * Una dirección SEGURA («es/será mayor/menor»). Un ilegible que no mueve la cifra no puede
+ * afirmarla: hasta el 23/09/2026 las filas `sin_efecto` terminaban sin leer el aviso, y así
+ * pasaron los hallazgos 1253 y 1263 (el total catastral con el objetivo ganando: «el neto real
+ * es MAYOR» con el neto idéntico). «Puede ser mayor» sí vale ahí: la app no puede saber si el
+ * método real ganaría, porque el dato que lo decide es justo el ilegible.
+ */
+const DICE_DIRECCION_SEGURA = /(?:neto|coste) real (?:es|será) (?:mayor|menor)/i;
 
 const SENTIDO: Record<'sube' | 'baja', { debe: RegExp; noDebe: RegExp; explica: string }> = {
   sube: {
@@ -974,6 +999,10 @@ test.describe('Testigo de familia — el importe ilegible en las 7 apps de compr
         // 5) Si no mueve nada, no hace falta aviso: ahí termina el caso.
         if (campo.direccion === 'sin_efecto') {
           expect(delta, 'Este campo no mueve la cifra en este caso base').toBeCloseTo(0, 2);
+          expect(
+            aviso,
+            `El ilegible no mueve la cifra y el aviso afirma una dirección segura.\n  Aviso publicado: ${aviso}`,
+          ).not.toMatch(DICE_DIRECCION_SEGURA);
           return;
         }
 

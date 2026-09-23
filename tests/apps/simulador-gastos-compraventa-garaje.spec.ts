@@ -706,7 +706,8 @@ test.describe('MITAD B — casos nuevos de la re-inspección (27/08/2026)', () =
     await precio.fill('1.2.3');
     await precio.blur();
     expect(await precio.inputValue()).toBe('1.2.3');
-    await expect(aviso).toBeVisible();
+    // Escrito pero ilegible: se dice que no se lee, no que falta (hallazgo 1254).
+    await expect(page.getByText('No se ha podido leer el precio «1.2.3»', { exact: false })).toBeVisible();
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
     await expect(page.getByText('No definido')).toHaveCount(0);
     // Nada de un ITP de 0,07 € sobre un precio de 1,20 €.
@@ -3204,8 +3205,9 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — los tres casos, resueltos a mano an
     await esperarValorEnReact(page, compra, '1.2.3');
 
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    // No «falta»: está escrito y a la vista, pero no se lee (hallazgo 1254).
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
-      'No calculada (falta el precio de compra original)',
+      'No calculada (el precio de compra original no se ha podido leer)',
     );
     // Ni valor de adquisición, ni de transmisión, ni ganancia: sin dato no hay tarjeta.
     await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(0);
@@ -3215,13 +3217,13 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — los tres casos, resueltos a mano an
 
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
-      'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.',
+      'El precio de compra original no se ha podido leer: escríbelo con coma decimal (1.234,56). Este impuesto NO está incluido en el neto de abajo.',
     );
     expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('1200,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1200,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('38.800,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
-      'INCOMPLETO: falta descontar la plusvalía municipal y el IRPF de la ganancia. Rellena el precio de compra original para obtener el neto real.',
+      'INCOMPLETO: falta descontar la plusvalía municipal y el IRPF de la ganancia; el precio de compra original no se ha podido leer. Escribe los importes con coma decimal (1.234,56) para obtener el neto real.',
     );
 
     // El NaN no se asoma por ninguna parte: ni «No definido» (lo que formatCurrency devuelve
@@ -4514,7 +4516,7 @@ test.describe('re-inspección 22/09/2026', () => {
     // El aviso del neto nombra la partida y el campo: es la mitad del 1157 que sí llegó.
     const avisoNeto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
     expect(avisoNeto).toContain('los impuestos y gastos de aquella compra');
-    expect(avisoNeto).toContain('un importe legible en los gastos de la compra');
+    expect(avisoNeto).toContain('Escribe los importes con coma decimal');
 
     // El NaN no se asoma por ninguna parte.
     await expect(page.getByText('No definido')).toHaveCount(0);
@@ -4618,7 +4620,7 @@ test.describe('re-inspección 22/09/2026', () => {
       const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
       expect(aviso).not.toContain('falta descontar los impuestos y gastos de aquella compra');
       // Y lo dice en la dirección correcta: hay 420,00 € que SUMAR, no que restar.
-      expect(aviso).toContain('falta sumar al valor de adquisición');
+      expect(aviso).toContain('suman al valor de adquisición y REDUCEN el IRPF');
       expect(aviso).toContain('el neto real es MAYOR que este');
 
       // Con la cifra legible el neto sube exactamente esos 420,00 € y el aviso desaparece.
@@ -5040,7 +5042,10 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('22.898,25 €');
   });
 
-  // ─── HALLAZGOS ABIERTOS 23/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar ────
+  // ─── HALLAZGOS 1249-1256 del 23/09/2026 — REPARADOS el mismo día ──────────────────────
+  //   La dirección de cada aviso sale ahora de SONDEAR el cálculo (lib/sondeoIlegibles.ts):
+  //   se repite con cada importe ilegible a un valor pequeño y a uno grande, y se compara
+  //   cada cifra. Los casos quedan como regresión, sin `test.fail()`.
 
   /**
    * ❌ ABIERTO 23/09/2026 (operativa, medio) — con PÉRDIDA, unos gastos de aquella compra
@@ -5066,7 +5071,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
   test('con pérdida, los gastos de aquella compra ilegibles no mueven el neto: no puede decir que el real es MAYOR', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await page.selectOption('#select-ccaa', 'madrid');
@@ -5114,7 +5118,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
   test('dos ilegibles en sentidos opuestos: el aviso no afirma que el neto real es MAYOR cuando es menor', async ({
     page,
   }) => {
-    test.fail();
     await prepararBaseTestigo(page);
     await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '3.5.0');
     await sembrarImporte(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '2.000.50');
@@ -5148,7 +5151,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
   test('C3 en la hermana — «falta descontar la comisión» dice que no entera, porque rebaja también el IRPF', async ({
     page,
   }) => {
-    test.fail();
     await prepararBaseTestigo(page);
     await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '3.5.0');
 
@@ -5180,7 +5182,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
   test('la tarjeta del IRPF dice que es un techo cuando un importe que reduce la ganancia no se ha podido leer', async ({
     page,
   }) => {
-    test.fail();
     await prepararBaseTestigo(page);
     await sembrarImporte(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '2.000.50');
 
@@ -5206,7 +5207,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
   test('total ilegible con el método objetivo ganando: el neto no cambia y no puede afirmar que el real es MAYOR', async ({
     page,
   }) => {
-    test.fail();
     await prepararBaseTestigo(page);
     await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '12.000.00');
 
@@ -5233,7 +5233,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
    * misma tarjeta, dice «no se ha podido leer… Escríbelo con coma decimal».
    */
   test('un precio escrito pero ilegible no se anuncia como que falta', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25.000.00');
@@ -5245,7 +5244,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
   test('un valor catastral del suelo escrito pero ilegible no se anuncia como que falta', async ({
     page,
   }) => {
-    test.fail();
     await prepararBaseTestigo(page);
     await sembrarImporte(page, 'Valor catastral del suelo (€)', '5.000.00');
 
@@ -5267,7 +5265,6 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
   test('la tarjeta de la plusvalía concuerda en plural: «faltan los años de propiedad»', async ({
     page,
   }) => {
-    test.fail();
     await prepararBaseTestigo(page);
     await sembrarImporte(page, 'Años de propiedad', '');
 
@@ -5287,16 +5284,34 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
    * comprador, y al revés. Es el hallazgo 1189 de `cnae-iae` (22/09), reparado allí
    * montando los dos paneles siempre. Tampoco hay navegación con flechas entre pestañas.
    */
-  test('las dos pestañas apuntan con aria-controls a un panel que existe', async ({ page }) => {
-    test.fail();
+  test('ninguna pestaña apunta con aria-controls a un panel que no existe, y las flechas cambian de pestaña', async ({
+    page,
+  }) => {
+    // Reparado con la otra forma válida del patrón de pestañas de la WAI-ARIA: solo se monta
+    // el panel activo, así que solo su pestaña lo nombra (montar los dos duplicaría en el DOM
+    // los textos del panel oculto). Lo que el acta señalaba —una referencia a un id que no
+    // existe— no puede darse en ninguna de las dos pestañas.
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
-    for (const nombre of ['Comprador', 'Vendedor']) {
-      const destino = await page
-        .getByRole('tab', { name: nombre, exact: true })
-        .getAttribute('aria-controls');
-      expect(destino).toBeTruthy();
-      await expect(page.locator(`[id="${destino}"]`)).toHaveCount(1);
+    for (const activa of ['Comprador', 'Vendedor']) {
+      await page.getByRole('tab', { name: activa, exact: true }).click();
+      for (const nombre of ['Comprador', 'Vendedor']) {
+        const tab = page.getByRole('tab', { name: nombre, exact: true });
+        const destino = await tab.getAttribute('aria-controls');
+        if (nombre === activa) {
+          expect(destino, `la pestaña activa «${nombre}» nombra su panel`).toBeTruthy();
+          await expect(page.locator(`[id="${destino}"]`)).toHaveCount(1);
+        } else {
+          expect(destino, `la pestaña inactiva «${nombre}» no apunta a nada inexistente`).toBeNull();
+        }
+      }
     }
+    // Flechas: desde Vendedor, ← lleva a Comprador y → vuelve a Vendedor.
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.getByRole('tab', { name: 'Comprador', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('tab', { name: 'Comprador', exact: true })).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('tab', { name: 'Vendedor', exact: true })).toHaveAttribute('aria-selected', 'true');
   });
 });
