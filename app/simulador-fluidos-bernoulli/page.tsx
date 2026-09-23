@@ -10,6 +10,7 @@ import { formatNumber } from '@/lib';
 // 23/09/2026: la usan esta página y la sección «Casos para clase», con una sola implementación.
 import {
   FLUIDOS,
+  fluidoPorId,
   P_ATMOSFERICA,
   DIAMETRO_NOMINAL,
   getSecciones,
@@ -156,7 +157,7 @@ export default function SimuladorFluidosBernoulliPage() {
   /** Ancla del selector de geometría: «Cargar en el simulador» desplaza la vista hasta aquí. */
   const simuladorRef = useRef<HTMLDivElement>(null);
 
-  const fluido = FLUIDOS.find(f => f.id === fluidoId)!;
+  const fluido = fluidoPorId(fluidoId);
   const rho = fluido.rho;
   const Q_m3s = litrosPorSegundoAM3s(Q); // Convertir L/s a m³/s
 

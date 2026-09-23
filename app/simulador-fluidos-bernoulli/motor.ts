@@ -79,7 +79,8 @@ export interface SeccionCalculada extends SeccionData {
 }
 
 export function getSecciones(geom: GeomId, ratioEstrechamiento: number, alturaDesnivel: number): SeccionData[] {
-  // ratioEstrechamiento: factor por el que se reduce el ancho en la zona estrecha (0.3-1)
+  // ratioEstrechamiento: factor por el que se reduce el ancho en la zona estrecha (0,25-1,
+  // el recorrido del deslizador)
   const D0 = DIAMETRO_NOMINAL; // diámetro nominal en m (10 cm)
   const D_estrecho = D0 * ratioEstrechamiento;
 
