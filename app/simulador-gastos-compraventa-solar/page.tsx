@@ -111,6 +111,14 @@ export default function SimuladorSolarPage() {
 
   const esEmpresario = tipoVendedor === 'empresario';
 
+  /**
+   * Un precio ESCRITO pero ilegible no es un precio vacío (grupo B del testigo de familia,
+   * 23/09/2026). El panel se abstiene igual —no hay cifra que publicar—, pero el mensaje
+   * pedía «Introduce el precio…» mientras el usuario veía su «2.000.50» escrito en el campo.
+   */
+  const precioIlegible =
+    precioVenta.trim() !== '' && !Number.isFinite(parseSpanishNumber(precioVenta));
+
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
@@ -498,7 +506,11 @@ export default function SimuladorSolarPage() {
           ) : (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
-              <p>Introduce el precio del solar para ver el desglose de gastos</p>
+              <p>
+                {precioIlegible
+                  ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio del solar para ver el desglose de gastos, con coma decimal (120.000 o 120000,50)`
+                  : 'Introduce el precio del solar para ver el desglose de gastos'}
+              </p>
             </div>
           )}
         </div>

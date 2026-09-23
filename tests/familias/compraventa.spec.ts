@@ -136,10 +136,11 @@ interface Hermana {
   preparar: (page: Page, base: string) => Promise<void>;
   campos: CampoVigilado[];
   /**
-   * Grupo B: el precio ilegible apaga el panel entero y el placeholder dice «Introduce el
-   * precio…» mientras el `2.000.50` sigue escrito a la vista. Fallo de MENSAJE, no de cifra.
+   * Grupo B: el precio ilegible apaga el panel entero, y el placeholder tiene que distinguir
+   * el campo escrito-pero-ilegible del VACÍO. Fallo de MENSAJE, no de cifra. `hueco` dice qué
+   * estaría mal si falla; `falla`, igual que en los campos, marca un hueco todavía abierto.
    */
-  mensajePrecioIlegible?: { etiqueta: string; hueco: string };
+  mensajePrecioIlegible?: { etiqueta: string; hueco: string; falla?: string };
 }
 
 /**
@@ -1004,21 +1005,18 @@ test.describe('Testigo de familia — el importe ilegible en las 7 apps de compr
 
   // ── Caso aparte: el placeholder del grupo B ─────────────────────────────────
   //    No es un fallo de CIFRA —con el precio ilegible estas tres no publican nada— sino de
-  //    MENSAJE: tratan «escrito pero ilegible» como «no escrito» y piden introducir un precio
-  //    que el usuario está viendo escrito en el campo. Va marcado porque sigue abierto.
+  //    MENSAJE: trataban «escrito pero ilegible» como «no escrito» y pedían introducir un
+  //    precio que el usuario estaba viendo escrito en el campo (nave 629 · solar 501 · terreno
+  //    539). Reparado el 23/09/2026: el placeholder distingue el campo VACÍO del que tiene un
+  //    texto que no se ha podido leer, como ya hacía la tarjeta de la gestoría de las tres.
   for (const app of HERMANAS) {
     if (!app.mensajePrecioIlegible) continue;
-    const { etiqueta, hueco } = app.mensajePrecioIlegible;
+    const { etiqueta, hueco, falla } = app.mensajePrecioIlegible;
 
-    test(`${app.slug} · el precio ilegible se confunde con el vacío — MENSAJE · HUECO ABIERTO`, async ({
-      page,
-    }) => {
-      // HUECO de MENSAJE, idéntico en las tres (nave 629 · solar 501 · terreno 539): el panel
-      // entero se sustituye por «Introduce el precio…» mientras el 2.000.50 sigue escrito y a
-      // la vista. Para ponerlo en verde basta con que el placeholder distinga el campo VACÍO
-      // del campo con un texto que no se ha podido leer, como ya hace la tarjeta de la
-      // gestoría de estas mismas tres apps.
-      if (!VER_HUECOS) test.fail();
+    test(`${app.slug} · el precio ilegible no se confunde con el vacío — MENSAJE${
+      falla ? ' · HUECO ABIERTO' : ''
+    }`, async ({ page }) => {
+      if (falla && !VER_HUECOS) test.fail();
 
       await page.goto(`/${app.slug}/`);
       await esperarHidratacion(page, [sel(etiqueta)]);
