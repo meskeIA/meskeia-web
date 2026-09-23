@@ -40,6 +40,11 @@
  * siete apps tenga su fila aquí — un campo nuevo sin fila rompe el build, que es justo lo que
  * dejó pasar A2.
  *
+ * **Ronda 13 (23/09/2026, tarde)**: las cuatro apps con vendedor calculan ya la dirección de
+ * sus avisos SONDEANDO su propio cálculo (`lib/sondeoIlegibles.ts`), en vez de razonarla campo
+ * a campo. Aquí: «puede ser mayor/menor» cuenta como dirección, una fila `sin_efecto` no puede
+ * afirmar una dirección SEGURA, y hay filas nuevas con pérdida (base P) y exención (base E).
+ *
  * ── El invariante ────────────────────────────────────────────────────────────
  * `parseSpanishNumber` devuelve NaN POR DISEÑO ante `2.000.50` (el millar y el decimal a la
  * estadounidense, un copiar y pegar corriente). De ahí:

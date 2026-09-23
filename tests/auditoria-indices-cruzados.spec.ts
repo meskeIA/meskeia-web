@@ -66,8 +66,17 @@ for (const slug of APPS) {
     // panel) y el `nth(i)` de después se queda esperando un botón que ya no existe hasta agotar
     // el test. En la primera pasada eso produjo 7 «fallos» que no eran caídas de app sino
     // timeouts de mi propio instrumento — y un instrumento que se cuelga no audita nada.
+    //
+    // ⚠️ Y se leen SIN lo que lleva `aria-hidden`: `getByRole` busca por nombre ACCESIBLE, y un
+    // emoji envuelto en `aria-hidden` (regla §5) está en el textContent pero no en el nombre.
+    // Con el textContent a secas, «▶️ Play» no casaba con el botón «Play», cada clic esperaba sus
+    // 2 s y el test agotaba el tiempo (visualizador-algoritmos, 23/09/2026, al reparar el 1300).
     const nombres = await page.locator('button:visible').evaluateAll((els) =>
-      els.map((el) => (el.textContent || '').trim()),
+      els.map((el) => {
+        const copia = el.cloneNode(true) as HTMLElement;
+        copia.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+        return (copia.textContent || '').replace(/\s+/g, ' ').trim();
+      }),
     );
     for (const nombre of nombres.slice(0, 14)) {
       if (!nombre || NO_PULSAR.test(nombre)) continue;
