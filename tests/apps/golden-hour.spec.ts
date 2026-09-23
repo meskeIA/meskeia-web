@@ -47,9 +47,8 @@ import { esperarHidratacion, leerValorEnReact, sembrarValor } from './_hidrataci
  * duración del día en latitudes medias, y que en el sol de medianoche y en la noche blanca la
  * app NO inventa horas de orto, ocaso ni crepúsculos que no existen (sale «--:--»).
  *
- * LOS HALLAZGOS van con `test.fail()`: pasan mientras el defecto siga y se voltean al repararlo.
- * Cada uno afirma SOLO lo que depende de su defecto, para que se voltee con su reparación y no
- * con la de otro.
+ * LOS HALLAZGOS (1233-1248) se repararon el 23/09/2026 reescribiendo el cálculo en
+ * `app/golden-hour/motor.ts`; sus casos quedan como regresión, sin `test.fail()`.
  */
 
 test.use({ locale: 'es-ES', serviceWorkers: 'block' });
@@ -60,6 +59,8 @@ interface CiudadNominatim {
   display_name: string;
   lat: string;
   lon: string;
+  /** addressdetails: de aquí saca la app el huso del lugar (hallazgo 1235). */
+  address?: { country_code: string };
 }
 
 /** Nominatim simulado: inversa (coordenadas → nombre) y búsqueda (nombre → coordenadas). */
@@ -184,12 +185,10 @@ test.describe('Madrid 21/06/2026 con el navegador en Madrid', () => {
     expect(Math.abs(altura - 72.66), `altura: ${panel}`).toBeLessThanOrEqual(0.3);
   });
 
-  // HALLAZGO 1 (crítico) — TODAS las horas salen 60 min antes, en cualquier lugar y huso.
-  // `getTimeForSunAngle` obtiene la hora UTC como `((…)/15 + 24) % 24`, que en JavaScript
-  // queda NEGATIVA (el `%` conserva el signo), y luego separa horas y minutos con
-  // `Math.floor`: floor(−19,25) = −20 y los minutos, −15 → −20:15 en vez de −19:15.
-  // Medido: amanecer 05:45 (NOAA 06:44:45), atardecer 20:48 (NOAA 21:48:31).
-  test.fail('las horas publicadas son las del lugar (hallazgo: salen 1 h antes)', async ({ page }) => {
+  // HALLAZGO 1233 (crítico, REPARADO) — TODAS las horas salían 60 min antes: la hora UTC se
+  // obtenía como `((…)/15 + 24) % 24`, que en JavaScript queda NEGATIVA, y `Math.floor` restaba
+  // una hora. El cálculo vive ahora en `app/golden-hour/motor.ts` (NOAA, cruces de altura).
+  test('las horas publicadas son las del lugar (hallazgo 1233)', async ({ page }) => {
     await abrirConGeolocalizacion(page, '2026-06-21');
     await esperarHora(page, 'Mañana', 'Amanecer', '06:45', 2);
     await esperarHora(page, 'Mañana', 'Hora dorada (fin)', '07:26', 3);
@@ -199,18 +198,19 @@ test.describe('Madrid 21/06/2026 con el navegador en Madrid', () => {
     await esperarHora(page, 'Tarde', 'Hora azul (fin)', '22:22', 3);
   });
 
-  // HALLAZGO 5 (medio) — a las 07:00 CEST, con el sol a +1,65° recién salido, el panel dice
-  // «Hora Dorada (tarde)» y no muestra «Próximo». Los instantes calculados caen en el día
-  // ANTERIOR (`setUTCHours` sobre la fecha UTC de la medianoche local, que en UTC+1/+2 es la
-  // víspera), así que `now < solarNoon` es siempre falso y ningún evento es futuro.
-  // Esperado: «Hora Dorada (mañana)» y «Próximo: Fin hora dorada a las 07:26».
-  test.fail('a las 07:00 el panel dice «mañana» y anuncia el próximo evento (hallazgo)', async ({ page }) => {
+  // HALLAZGO 1237 (medio, REPARADO) — a las 07:00 CEST, con el sol a +1,65° recién salido, el
+  // panel decía «Hora Dorada (tarde)» y no mostraba «Próximo»: los instantes caían en la víspera.
+  // Ahora «mañana/tarde» sale de si el sol sube, y el próximo evento se busca en víspera, hoy y
+  // mañana del huso del lugar. NOAA: fin de la dorada a las 07:25:51.
+  test('a las 07:00 el panel dice «mañana» y anuncia el próximo evento (hallazgo 1237)', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-06-21T05:00:00Z'));
     await abrirConGeolocalizacion(page, '2026-06-21', { yaEsLaDeHoy: true });
     const panel = page.locator('[class*="currentPanel"]');
     await expect(panel).toContainText(/Sol a 1[.,]\d° de altitud/); // preparación: ya hay posición
     await expect(panel).toContainText('Hora Dorada (mañana)');
-    await expect(panel).toContainText('Próximo');
+    await expect(panel).toContainText(/Próximo: Fin hora dorada a las 07:2[5-7]/);
+    // Hallazgo 1246: el azimut que prometía el JSON-LD ahora se publica (NOAA 60,1°, NE).
+    await expect(panel).toContainText(/azimut 60° \(NE\)/);
   });
 });
 
@@ -224,11 +224,10 @@ test.describe('Ciudad de México 15/03/2026 con el navegador en CDMX', () => {
     permissions: ['geolocation'],
   });
 
-  // HALLAZGO 2 (alto) — el ocaso (00:46 UTC del día siguiente) se coloca en la víspera, antes
-  // que el orto: «Duración del día: −12h −59min» y «Mediodía solar 23:45».
-  // NOAA: día 12h 2min (721,5 min) y mediodía 12:45, entre el orto y el ocaso.
-  // Afirma solo lo que NO depende del hallazgo 1 (una diferencia y un orden).
-  test.fail('la duración del día es positiva y el mediodía cae entre orto y ocaso (hallazgo)', async ({ page }) => {
+  // HALLAZGO 1234 (alto, REPARADO) — el ocaso (00:46 UTC del día siguiente) caía en la víspera,
+  // antes que el orto: «Duración del día: −12h −59min» y «Mediodía solar 23:45».
+  // NOAA: día 12h 2min (721,5 min), orto 06:44:42, mediodía 12:45:20 y ocaso 18:46:14.
+  test('la duración del día es positiva y el mediodía cae entre orto y ocaso (hallazgo 1234)', async ({ page }) => {
     await abrirConGeolocalizacion(page, '2026-03-15');
     const dia = await duracionDia(page);
     expect(Math.abs(dia.min - 721.5), `duración: ${dia.texto}`).toBeLessThanOrEqual(2);
@@ -236,11 +235,14 @@ test.describe('Ciudad de México 15/03/2026 con el navegador en CDMX', () => {
     const mediodia = minutos(await hora(page, 'Tarde', 'Mediodía solar'));
     const ocaso = minutos(await hora(page, 'Tarde', 'Atardecer'));
     expect(orto < mediodia && mediodia < ocaso, `orto ${orto} · mediodía ${mediodia} · ocaso ${ocaso}`).toBe(true);
+    await esperarHora(page, 'Mañana', 'Amanecer', '06:45', 2);
+    await esperarHora(page, 'Tarde', 'Mediodía solar', '12:45', 2);
+    await esperarHora(page, 'Tarde', 'Atardecer', '18:46', 2);
   });
 
-  // HALLAZGO 6 (medio) — la fecha por defecto se toma en UTC (`toISOString`): a las 20:00 del
-  // 15/03 en CDMX (02:00Z del 16) la app abre con el 16/03, el día de MAÑANA, sin avisar.
-  test.fail('a las 20:00 la fecha por defecto es la de hoy (hallazgo: sale mañana)', async ({ page }) => {
+  // HALLAZGO 1238 (medio, REPARADO) — la fecha por defecto se tomaba en UTC (`toISOString`): a
+  // las 20:00 del 15/03 en CDMX (02:00Z del 16) la app abría con el 16/03.
+  test('a las 20:00 la fecha por defecto es la de hoy (hallazgo 1238)', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-03-16T02:00:00Z'));
     await page.goto('/golden-hour/');
     await esperarHidratacion(page, [FECHA]);
@@ -249,17 +251,19 @@ test.describe('Ciudad de México 15/03/2026 con el navegador en CDMX', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
-// HALLAZGO 3 (alto) — las horas salen en el huso del NAVEGADOR, no en el del lugar, y la app
-// no lo dice. Un fotógrafo en Madrid que planifica Buenos Aires el 21/06/2026 lee
-// «Amanecer 12:00» (hora de Madrid, y además con el −1 h del hallazgo 1); el mismo lugar con el
-// navegador en Buenos Aires da «07:00». NOAA, en hora de Buenos Aires (UTC−3): orto 08:00:20.
-// Se afirma la INDEPENDENCIA del huso del navegador (no depende del hallazgo 1). Si la
-// reparación elige rotular el huso en vez de convertir, este caso hay que reescribirlo.
+// HALLAZGO 1235 (alto, REPARADO) — las horas salían en el huso del NAVEGADOR y la app no lo
+// decía: un fotógrafo en Madrid que planificaba Buenos Aires el 21/06/2026 leía «Amanecer
+// 12:00». La reparación CONVIERTE al huso del lugar: al elegir una ciudad, Nominatim da su país
+// (addressdetails) y el navegador, los husos de ese país (`Intl.Locale#getTimeZones`). Si el país
+// tiene uno solo, se usa; si tiene varios, se elige el más cercano y se pide comprobarlo; y el
+// huso se rotula SIEMPRE, con un selector para cambiarlo. NOAA, hora de Buenos Aires (UTC−3):
+// orto 08:00:20.
 // ─────────────────────────────────────────────────────────────────────────────────────────
 const BUENOS_AIRES: CiudadNominatim = {
   display_name: 'Buenos Aires, Ciudad Autónoma de Buenos Aires, Argentina',
   lat: '-34.6037',
   lon: '-58.3816',
+  address: { country_code: 'ar' },
 };
 
 async function amanecerConNavegadorEn(browser: Browser, timezoneId: string): Promise<string> {
@@ -267,20 +271,56 @@ async function amanecerConNavegadorEn(browser: Browser, timezoneId: string): Pro
   try {
     const page = await contexto.newPage();
     await abrirConBusqueda(page, '2026-06-21', BUENOS_AIRES);
-    await expect(page.locator('[class*="currentLocation"]')).toContainText('34.6037');
+    // Hallazgo 1247: la latitud sur, sin signo menos y con coma decimal.
+    await expect(page.locator('[class*="currentLocation"]')).toContainText('34,6037°S, 58,3816°O');
+    await expect(page.getByLabel('Horas en el huso:')).toHaveValue(/Buenos_Aires/);
     return await hora(page, 'Mañana', 'Amanecer');
   } finally {
     await contexto.close();
   }
 }
 
-test.fail('Buenos Aires: la hora no depende del huso del navegador (hallazgo)', async ({ browser }) => {
+test('Buenos Aires: la hora no depende del huso del navegador (hallazgo 1235)', async ({ browser }) => {
   const desdeBuenosAires = await amanecerConNavegadorEn(browser, 'America/Argentina/Buenos_Aires');
   const desdeMadrid = await amanecerConNavegadorEn(browser, 'Europe/Madrid');
-  expect(
-    desfase(desdeMadrid, desdeBuenosAires),
-    `amanecer de Buenos Aires: ${desdeMadrid} con el navegador en Madrid, ${desdeBuenosAires} en Buenos Aires`,
-  ).toBeLessThanOrEqual(2);
+  expect(desfase(desdeMadrid, '08:00'), `amanecer de Buenos Aires con el navegador en Madrid: ${desdeMadrid}`).toBeLessThanOrEqual(2);
+  expect(desfase(desdeBuenosAires, '08:00'), `con el navegador en Buenos Aires: ${desdeBuenosAires}`).toBeLessThanOrEqual(2);
+});
+
+test.describe('Lugar sin país conocido, navegador en Madrid', () => {
+  test.use({ timezoneId: 'Europe/Madrid' });
+
+  test('avisa de que usa el huso del dispositivo y se puede cambiar a mano (hallazgo 1235)', async ({ page }) => {
+    const sinPais: CiudadNominatim = { ...BUENOS_AIRES, address: undefined };
+    await abrirConBusqueda(page, '2026-06-21', sinPais);
+    await expect(page.getByText(/No sabemos el huso de este lugar/)).toBeVisible();
+    // En el huso de Madrid, el orto de Buenos Aires (11:00:20Z) son las 13:00.
+    await esperarHora(page, 'Mañana', 'Amanecer', '13:00', 2);
+    // El navegador lista el nombre canónico (America/Buenos_Aires): se elige por lo que contiene.
+    const selector = page.getByLabel('Horas en el huso:');
+    const valor = await selector.locator('option', { hasText: 'Buenos_Aires' }).first().getAttribute('value');
+    await selector.selectOption(valor!);
+    await esperarHora(page, 'Mañana', 'Amanecer', '08:00', 2);
+    await expect(page.getByText(/No sabemos el huso de este lugar/)).toHaveCount(0);
+  });
+});
+
+test.describe('Las Palmas (España, dos husos), navegador en Madrid', () => {
+  test.use({ timezoneId: 'Europe/Madrid' });
+
+  test('elige el huso canario y pide comprobarlo (hallazgo 1235)', async ({ page }) => {
+    const lasPalmas: CiudadNominatim = {
+      display_name: 'Las Palmas de Gran Canaria, Canarias, España',
+      lat: '28.1235',
+      lon: '-15.4363',
+      address: { country_code: 'es' },
+    };
+    await abrirConBusqueda(page, '2026-06-21', lasPalmas);
+    await expect(page.getByLabel('Horas en el huso:')).toHaveValue('Atlantic/Canary');
+    await expect(page.getByText(/tiene varios husos horarios/)).toBeVisible();
+    // NOAA, hora canaria (UTC+1): orto 07:05.
+    await esperarHora(page, 'Mañana', 'Amanecer', '07:05', 2);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
@@ -302,12 +342,20 @@ test.describe('Tromsø 21/06/2026: sol de medianoche', () => {
     expect(await hora(page, 'Tarde', 'Hora azul (fin)')).toBe('--:--');
   });
 
-  // HALLAZGO 4 (medio) — con el sol siempre por encima del horizonte, «Duración del día:
-  // 0h 0min». Esperado: 24 h (o «sol de medianoche»), nunca 0.
-  test.fail('la duración del día no es 0 con sol de medianoche (hallazgo)', async ({ page }) => {
+  // HALLAZGO 1236 (medio, REPARADO) — con el sol siempre por encima del horizonte salía
+  // «Duración del día: 0h 0min», mediodía «--:--» y ningún bloque de hora dorada. NOAA: el sol
+  // pasa la noche entre +3,09° y +6°, hora dorada continua de 22:35 a 02:57, mediodía 12:46.
+  test('con sol de medianoche: 24 h, mediodía y hora dorada nocturna (hallazgo 1236)', async ({ page }) => {
     await abrirConGeolocalizacion(page, '2026-06-21');
     const dia = await duracionDia(page);
-    expect(dia.texto, 'la duración no puede ser 0 si el sol no se pone').not.toMatch(/:\s*0h 0min/);
+    expect(dia.min, `duración: ${dia.texto}`).toBe(1440);
+    expect(dia.texto).toContain('sol de medianoche');
+    await esperarHora(page, 'Tarde', 'Mediodía solar', '12:46', 2);
+    await esperarHora(page, 'Mañana', 'Hora dorada (fin)', '02:57', 3);
+    await esperarHora(page, 'Tarde', 'Hora dorada (inicio)', '22:35', 3);
+    const bloques = page.locator('[class*="timeBlock"]');
+    await expect(bloques.filter({ hasText: 'Hora Dorada (mañana)' })).toContainText(/Desde la noche - 02:5\d/);
+    await expect(bloques.filter({ hasText: 'Hora Dorada (tarde)' })).toContainText(/22:3\d - toda la noche/);
   });
 });
 
@@ -319,6 +367,8 @@ test.describe('Oslo 21/06/2026: noche blanca', () => {
   });
 
   test('sin crepúsculo náutico ni astronómico, pero con civil', async ({ page }) => {
+    // El fin de la hora azul (NOAA 00:28 del 22/06) pertenece a la TARDE del 21 y se marca como
+    // del día siguiente, en la etiqueta y no en la hora.
     // NOAA: el sol baja a −6,65° → cruza −6° (civil) pero nunca −12° ni −18°.
     await abrirConGeolocalizacion(page, '2026-06-21');
     expect(await hora(page, 'Mañana', 'Crepúsculo náutico')).toBe('--:--');
@@ -327,13 +377,17 @@ test.describe('Oslo 21/06/2026: noche blanca', () => {
     expect(await hora(page, 'Tarde', 'Crepúsculo astronómico')).toBe('--:--');
     expect(await hora(page, 'Mañana', 'Hora azul (inicio)')).toMatch(/^\d{2}:\d{2}$/);
     expect(await hora(page, 'Tarde', 'Hora azul (fin)')).toMatch(/^\d{2}:\d{2}$/);
+    await esperarHora(page, 'Tarde', 'Hora azul (fin)', '00:28', 3);
+    await expect(
+      page.locator('[class*="tableRow"]').filter({ hasText: 'Hora azul (fin)' }),
+    ).toContainText('(día siguiente)');
   });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
-// HALLAZGO 8 (bajo) — con el navegador al oeste de Greenwich, la fecha elegida se lee en UTC
-// (`new Date('2026-03-20')` = 19/03 a las 21:00 en UTC−3) y se calcula el día ANTERIOR.
-// Ushuaia 20/03/2026: NOAA 12h 11min (731,0 min); la app da 12h 16min, que es el 19/03.
+// HALLAZGO 1239 (bajo, REPARADO) — con el navegador al oeste de Greenwich, la fecha elegida se
+// leía en UTC (`new Date('2026-03-20')` = 19/03 a las 21:00 en UTC−3) y se calculaba la víspera.
+// Ushuaia 20/03/2026: NOAA 12h 11min (731,0 min); daba 12h 16min, que es el 19/03.
 // ─────────────────────────────────────────────────────────────────────────────────────────
 test.describe('Ushuaia 20/03/2026 con el navegador en Ushuaia', () => {
   test.use({
@@ -342,7 +396,7 @@ test.describe('Ushuaia 20/03/2026 con el navegador en Ushuaia', () => {
     permissions: ['geolocation'],
   });
 
-  test.fail('se calcula la fecha elegida y no la víspera (hallazgo)', async ({ page }) => {
+  test('se calcula la fecha elegida y no la víspera (hallazgo 1239)', async ({ page }) => {
     await abrirConGeolocalizacion(page, '2026-03-20');
     const dia = await duracionDia(page);
     expect(Math.abs(dia.min - 731.0), `duración: ${dia.texto}`).toBeLessThanOrEqual(2);
@@ -359,12 +413,51 @@ test.describe('Fecha vacía', () => {
     permissions: ['geolocation'],
   });
 
-  // HALLAZGO 7 (bajo) — al borrar la fecha, las 11 filas dicen «Invalid Date» y la duración
-  // «NaNh NaNmin». Esperado: ninguna cifra (o un aviso de que falta la fecha).
-  test.fail('sin fecha no publica «Invalid Date» ni «NaN» (hallazgo)', async ({ page }) => {
+  // HALLAZGO 1240 (bajo, REPARADO) — al borrar la fecha, las 11 filas decían «Invalid Date» y
+  // la duración «NaNh NaNmin». Ahora no hay cifras y se pide la fecha.
+  test('sin fecha no publica «Invalid Date» ni «NaN» (hallazgo 1240)', async ({ page }) => {
     await abrirConGeolocalizacion(page, '2026-06-21');
     await sembrarValor(page, FECHA, '');
+    await expect(page.getByText('Elige una fecha para ver los horarios de luz.')).toBeVisible();
     await expect(page.getByText('Invalid Date')).toHaveCount(0);
     await expect(page.getByText(/NaN/)).toHaveCount(0);
   });
+
+  // HALLAZGO 1248 (bajo, REPARADO) — el campo de fecha no tenía nombre accesible.
+  test('el campo de fecha tiene nombre accesible (hallazgo 1248)', async ({ page }) => {
+    await page.goto('/golden-hour/');
+    await esperarHidratacion(page, [FECHA]);
+    await expect(page.getByLabel('Fecha')).toHaveAttribute('type', 'date');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// Contenido — hallazgos 1241, 1243, 1244, 1245 (página) y 1242, 1246 (JSON-LD)
+// Cada texto se compara con la astronomía que calcula el motor NOAA: Madrid 21/12, hora dorada
+// de 43,5 min; 21/06, 41,1 min; Quito 20/03, 27,3 min.
+// ─────────────────────────────────────────────────────────────────────────────────────────
+test('el contenido educativo y el JSON-LD dicen la astronomía correcta', async ({ page }) => {
+  await page.goto('/golden-hour/');
+  const html = await page.content();
+  // 1241: ni «15–20 minutos» en Madrid en invierno ni «el doble» de junio a diciembre.
+  expect(html).not.toContain('apenas 15–20 minutos');
+  expect(html).not.toContain('el doble de duración');
+  expect(html).toContain('dura unos 43 minutos');
+  // 1243: el ejemplo de paisaje con la hora real de Madrid el 21/06.
+  expect(html).not.toContain('20:15–21:00');
+  expect(html).toContain('21:07–21:48');
+  // 1244: los 4 minutos por grado son de LONGITUD.
+  expect(html).not.toContain('1° de latitud cambia la hora de amanecer');
+  expect(html).toContain('1° de longitud');
+  // 1245: Canarias no está en la península ni amanece la primera en junio.
+  expect(html).not.toContain('6:30 (junio, Canarias)');
+  // 1242: la hora azul del JSON-LD es la misma que calcula la página (0° a −6°).
+  const todo = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+  expect(todo).toContain('FAQPage');
+  expect(todo).not.toContain('entre 4° y 6° por debajo del horizonte, antes');
+  expect(todo).not.toContain('60-90 minutos');
+  expect(todo).not.toContain('10-15 minutos');
+  expect(todo).not.toContain('meskeIA calculan');
+  // 1246: lo que promete el JSON-LD se publica (altura y azimut).
+  expect(todo).toContain('altura y azimut');
 });

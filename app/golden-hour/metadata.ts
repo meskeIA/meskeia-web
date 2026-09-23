@@ -42,7 +42,8 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Cálculo de golden hour y blue hour por ubicación y fecha',
     'Horas de amanecer, atardecer y crepúsculo civil, náutico y astronómico',
-    'Posición del sol: azimut y elevación en tiempo real',
+    'Posición del sol en este momento: altura y azimut',
+    'Horas en el huso del lugar, también al planificar un viaje',
     'Gratuito, en español, sin registro',
   ],
 });
@@ -64,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Cuánto dura la golden hour?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La duración varía según la estación y la latitud. En verano en latitudes medias (España, México) puede durar 20-40 minutos. En invierno, cuando el sol sube más despacio, puede extenderse hasta 60-90 minutos. Cerca del ecuador la luz cambia muy rápido y la golden hour puede durar solo 10-15 minutos. En latitudes altas (Escandinavia en verano) puede prolongarse horas.',
+        text: 'Depende sobre todo de la latitud. Contada desde la salida del sol hasta que alcanza 6° de altura, cerca del ecuador dura unos 27-30 minutos todo el año, porque el sol sube casi en vertical; en latitudes medias (Madrid, Buenos Aires) dura entre 33 y 44 minutos, algo menos en los equinoccios y algo más en los solsticios. En latitudes altas se alarga mucho: en Oslo pasa de una hora, y por encima del círculo polar puede durar toda la noche en verano.',
       },
     },
     {
@@ -72,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Qué es la blue hour y cómo se diferencia de la golden hour?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La blue hour (hora azul) ocurre cuando el sol está entre 4° y 6° por debajo del horizonte, antes del amanecer y después del atardecer. La luz es fría, de tonos azulados y morados, uniforme y sin sombras. Es ideal para fotografía urbana nocturna porque hay suficiente luz ambiental para equilibrar las luces artificiales de edificios y farolas. Dura aproximadamente 20-40 minutos.',
+        text: 'La blue hour (hora azul) es el crepúsculo civil: el tramo en que el sol está entre el horizonte y 6° por debajo de él, antes del amanecer y después del atardecer (algunas apps de fotografía la reducen a la franja entre 4° y 6° bajo el horizonte). La luz es fría, de tonos azulados, uniforme y sin sombras, e ideal para fotografía urbana porque equilibra el cielo con las luces artificiales. Con esa definición dura unos 20-25 minutos cerca del ecuador y 25-35 minutos en latitudes medias, y bastante más cerca de los polos.',
       },
     },
     {
@@ -88,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Cómo calcular la golden hour para mi ciudad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La golden hour ocurre en los 30-60 minutos posteriores al amanecer y los 30-60 minutos anteriores al atardecer. Para calcularla exactamente necesitas la hora de salida y puesta del sol en tu ubicación y fecha, que varía cada día. Herramientas como la calculadora golden hour de meskeIA calculan automáticamente estas horas usando las coordenadas de tu ciudad y la fecha seleccionada.',
+        text: 'La golden hour va desde la salida del sol hasta que alcanza 6° de altura, y desde que baja de 6° hasta la puesta: entre 25 y 45 minutos en latitudes bajas y medias. Para calcularla exactamente necesitas las coordenadas del lugar y la fecha, porque cambia cada día, y leer las horas en el huso horario del lugar, no en el de tu móvil si estás planificando un viaje. Una calculadora solar hace el cálculo a partir de la ciudad y la fecha elegidas.',
       },
     },
   ],

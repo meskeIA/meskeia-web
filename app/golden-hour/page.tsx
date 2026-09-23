@@ -1,173 +1,107 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import styles from './GoldenHour.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
+import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  eventosDelDia,
+  posicionSol,
+  proximoEvento,
+  solSubiendo,
+  leerFecha,
+  fechaEnZona,
+  diasEntre,
+  desfaseZona,
+  zonaValida,
+  husoParaLugar,
+  UMBRAL,
+  type ClaveEvento,
+  type FechaCivil,
+  type OrigenHuso,
+} from './motor';
 
-// Constantes astronómicas
-const DEG_TO_RAD = Math.PI / 180;
-const RAD_TO_DEG = 180 / Math.PI;
-
-// Tipos de eventos solares
-interface SunTimes {
-  astronomicalDawn: Date | null;
-  astronomicalDusk: Date | null;
-  nauticalDawn: Date | null;
-  nauticalDusk: Date | null;
-  civilDawn: Date | null;
-  civilDusk: Date | null;
-  sunrise: Date | null;
-  sunset: Date | null;
-  goldenHourMorningEnd: Date | null;
-  goldenHourEveningStart: Date | null;
-  solarNoon: Date | null;
-  dayLength: number;
-}
-
-// Resultado de búsqueda de ciudad
+// Resultado de búsqueda de ciudades
 interface CitySearchResult {
   name: string;
   displayName: string;
   lat: number;
   lon: number;
+  /** Código ISO del país (Nominatim, addressdetails), para deducir el huso horario. */
+  pais?: string;
 }
 
-// Calcular día juliano
-function getJulianDate(date: Date): number {
-  const time = date.getTime();
-  return (time / 86400000) + 2440587.5;
+/**
+ * De dónde sale el huso con el que se escriben las horas. La app lo dice siempre en pantalla
+ * (hallazgo 1235: antes las horas salían en el huso del navegador sin avisar, y quien
+ * planificaba un viaje leía las de su país como si fueran las del destino).
+ */
+type OrigenZona = 'dispositivo' | OrigenHuso | 'manual';
+
+const NOMBRE_EVENTO: Record<ClaveEvento, string> = {
+  amanecerAstronomico: 'Inicio del crepúsculo astronómico',
+  amanecerNautico: 'Inicio del crepúsculo náutico',
+  amanecerCivil: 'Hora azul (inicio)',
+  orto: 'Amanecer',
+  finDoradaManana: 'Fin hora dorada',
+  mediodia: 'Mediodía solar',
+  inicioDoradaTarde: 'Hora dorada (inicio)',
+  ocaso: 'Atardecer',
+  anochecerCivil: 'Fin hora azul',
+  anochecerNautico: 'Fin crepúsculo náutico',
+  anochecerAstronomico: 'Noche cerrada (fin del crepúsculo astronómico)',
+};
+
+/** Fecha de hoy en el huso del DISPOSITIVO (no en UTC: hallazgo 1238). */
+function hoyLocal(): string {
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mm}-${dd}`;
 }
 
-// Calcular posición del sol
-function getSunPosition(date: Date, lat: number, lon: number): { altitude: number; azimuth: number } {
-  const jd = getJulianDate(date);
-  const n = jd - 2451545.0;
-
-  const L = (280.46 + 0.9856474 * n) % 360;
-  const g = (357.528 + 0.9856003 * n) % 360;
-  const lambda = L + 1.915 * Math.sin(g * DEG_TO_RAD) + 0.02 * Math.sin(2 * g * DEG_TO_RAD);
-  const epsilon = 23.439 - 0.0000004 * n;
-
-  const sinLambda = Math.sin(lambda * DEG_TO_RAD);
-  const cosLambda = Math.cos(lambda * DEG_TO_RAD);
-  const sinEpsilon = Math.sin(epsilon * DEG_TO_RAD);
-  const cosEpsilon = Math.cos(epsilon * DEG_TO_RAD);
-
-  const ra = Math.atan2(cosEpsilon * sinLambda, cosLambda) * RAD_TO_DEG;
-  const dec = Math.asin(sinEpsilon * sinLambda) * RAD_TO_DEG;
-
-  const utcHours = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
-  const lst = (100.46 + 0.985647 * n + lon + 15 * utcHours) % 360;
-
-  const ha = lst - ra;
-
-  const sinLat = Math.sin(lat * DEG_TO_RAD);
-  const cosLat = Math.cos(lat * DEG_TO_RAD);
-  const sinDec = Math.sin(dec * DEG_TO_RAD);
-  const cosDec = Math.cos(dec * DEG_TO_RAD);
-  const cosHa = Math.cos(ha * DEG_TO_RAD);
-
-  const altitude = Math.asin(sinLat * sinDec + cosLat * cosDec * cosHa) * RAD_TO_DEG;
-  const azimuth = Math.atan2(
-    Math.sin(ha * DEG_TO_RAD),
-    cosHa * sinLat - Math.tan(dec * DEG_TO_RAD) * cosLat
-  ) * RAD_TO_DEG + 180;
-
-  return { altitude, azimuth: azimuth % 360 };
+/** Hora «HH:MM» de un instante en el huso indicado. */
+function formatHora(ms: number | null, zona: string): string {
+  if (ms === null) return '--:--';
+  return new Date(ms).toLocaleTimeString('es-ES', { timeZone: zona, hour: '2-digit', minute: '2-digit' });
 }
 
-// Calcular hora para un ángulo solar específico
-function getTimeForSunAngle(date: Date, lat: number, lon: number, angle: number, rising: boolean): Date | null {
-  const jd = getJulianDate(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0));
-  const n = jd - 2451545.0;
-
-  const L = (280.46 + 0.9856474 * n) % 360;
-  const g = (357.528 + 0.9856003 * n) % 360;
-  const lambda = L + 1.915 * Math.sin(g * DEG_TO_RAD) + 0.02 * Math.sin(2 * g * DEG_TO_RAD);
-  const epsilon = 23.439 - 0.0000004 * n;
-
-  const sinLambda = Math.sin(lambda * DEG_TO_RAD);
-  const cosEpsilon = Math.cos(epsilon * DEG_TO_RAD);
-  const sinEpsilon = Math.sin(epsilon * DEG_TO_RAD);
-
-  const dec = Math.asin(sinEpsilon * sinLambda) * RAD_TO_DEG;
-
-  const cosHa = (Math.sin(angle * DEG_TO_RAD) - Math.sin(lat * DEG_TO_RAD) * Math.sin(dec * DEG_TO_RAD)) /
-                (Math.cos(lat * DEG_TO_RAD) * Math.cos(dec * DEG_TO_RAD));
-
-  if (cosHa < -1 || cosHa > 1) {
-    return null;
-  }
-
-  let ha = Math.acos(cosHa) * RAD_TO_DEG;
-  if (rising) ha = -ha;
-
-  const ra = Math.atan2(cosEpsilon * sinLambda, Math.cos(lambda * DEG_TO_RAD)) * RAD_TO_DEG;
-  const lst = ra + ha;
-  const utcHours = ((lst - 100.46 - 0.985647 * n - lon) / 15 + 24) % 24;
-
-  const result = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  result.setUTCHours(Math.floor(utcHours), Math.round((utcHours % 1) * 60), 0, 0);
-
-  return result;
+/** « (día siguiente)» o « (víspera)» si el instante no cae en la fecha elegida. */
+function marcaDia(ms: number | null, zona: string, fecha: FechaCivil): string {
+  if (ms === null) return '';
+  const d = diasEntre(fecha, fechaEnZona(ms, zona));
+  if (d > 0) return ' (día siguiente)';
+  if (d < 0) return ' (víspera)';
+  return '';
 }
 
-// Calcular todos los tiempos solares
-function calculateSunTimes(date: Date, lat: number, lon: number): SunTimes {
-  const sunrise = getTimeForSunAngle(date, lat, lon, -0.833, true);
-  const sunset = getTimeForSunAngle(date, lat, lon, -0.833, false);
-
-  const civilDawn = getTimeForSunAngle(date, lat, lon, -6, true);
-  const civilDusk = getTimeForSunAngle(date, lat, lon, -6, false);
-
-  const nauticalDawn = getTimeForSunAngle(date, lat, lon, -12, true);
-  const nauticalDusk = getTimeForSunAngle(date, lat, lon, -12, false);
-
-  const astronomicalDawn = getTimeForSunAngle(date, lat, lon, -18, true);
-  const astronomicalDusk = getTimeForSunAngle(date, lat, lon, -18, false);
-
-  const goldenHourMorningEnd = getTimeForSunAngle(date, lat, lon, 6, true);
-  const goldenHourEveningStart = getTimeForSunAngle(date, lat, lon, 6, false);
-
-  let solarNoon: Date | null = null;
-  if (sunrise && sunset) {
-    solarNoon = new Date((sunrise.getTime() + sunset.getTime()) / 2);
-  }
-
-  let dayLength = 0;
-  if (sunrise && sunset) {
-    dayLength = (sunset.getTime() - sunrise.getTime()) / 60000;
-  }
-
-  return {
-    astronomicalDawn,
-    astronomicalDusk,
-    nauticalDawn,
-    nauticalDusk,
-    civilDawn,
-    civilDusk,
-    sunrise,
-    sunset,
-    goldenHourMorningEnd,
-    goldenHourEveningStart,
-    solarNoon,
-    dayLength,
-  };
+/** «UTC+2», «UTC−3», «UTC+5:30». */
+function formatDesfase(minutos: number): string {
+  if (minutos === 0) return 'UTC';
+  const signo = minutos > 0 ? '+' : '−';
+  const abs = Math.abs(minutos);
+  const h = Math.floor(abs / 60);
+  const m = abs % 60;
+  return `UTC${signo}${h}${m ? `:${String(m).padStart(2, '0')}` : ''}`;
 }
 
-// Formatear hora
-function formatTime(date: Date | null): string {
-  if (!date) return '--:--';
-  return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+/** Duración en minutos → «15h 4min» (redondeando el total, para no dar «14h 60min»). */
+function formatDuracion(minutos: number): string {
+  const total = Math.round(minutos);
+  return `${Math.floor(total / 60)}h ${total % 60}min`;
 }
 
-// Formatear duración
-function formatDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = Math.round(minutes % 60);
-  return `${h}h ${m}min`;
+/** Coordenada con su hemisferio y sin signo: «34,6037°S». */
+function formatCoordenada(valor: number, positivo: string, negativo: string): string {
+  return `${formatNumber(Math.abs(valor), 4)}°${valor >= 0 ? positivo : negativo}`;
+}
+
+/** Punto cardinal (8 rumbos) de un azimut en grados. */
+function rumbo(azimut: number): string {
+  const RUMBOS = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+  return RUMBOS[Math.round(azimut / 45) % 8];
 }
 
 // Geocodificación inversa con Nominatim (coordenadas → nombre)
@@ -204,13 +138,13 @@ async function reverseGeocode(lat: number, lon: number): Promise<string> {
   }
 }
 
-// Buscar ciudades con Nominatim (nombre → coordenadas)
+// Buscar ciudades con Nominatim (nombre → coordenadas y país)
 async function searchCities(query: string): Promise<CitySearchResult[]> {
   if (query.length < 2) return [];
 
   try {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&accept-language=es&featuretype=city`,
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&accept-language=es&featuretype=city&addressdetails=1`,
       {
         headers: {
           'User-Agent': 'meskeIA Golden Hour App (https://meskeia.com)'
@@ -220,23 +154,28 @@ async function searchCities(query: string): Promise<CitySearchResult[]> {
 
     if (!response.ok) throw new Error('Error en búsqueda');
 
-    const data = await response.json();
+    const data: { display_name: string; lat: string; lon: string; address?: { country_code?: string } }[] =
+      await response.json();
 
-    return data.map((item: { display_name: string; lat: string; lon: string }) => {
-      const parts = item.display_name.split(', ');
-      const name = parts[0];
-      // Simplificar display name: ciudad, región/estado, país
-      const displayName = parts.length > 2
-        ? `${parts[0]}, ${parts[parts.length - 2]}, ${parts[parts.length - 1]}`
-        : item.display_name;
+    return data
+      .map((item) => {
+        const parts = item.display_name.split(', ');
+        const name = parts[0];
+        // Simplificar display name: ciudad, región/estado, país
+        const displayName = parts.length > 2
+          ? `${parts[0]}, ${parts[parts.length - 2]}, ${parts[parts.length - 1]}`
+          : item.display_name;
 
-      return {
-        name,
-        displayName,
-        lat: parseFloat(item.lat),
-        lon: parseFloat(item.lon)
-      };
-    });
+        return {
+          name,
+          displayName,
+          // Coordenadas decimales con punto que escribe Nominatim, no texto del usuario.
+          lat: Number(item.lat),
+          lon: Number(item.lon),
+          pais: item.address?.country_code,
+        };
+      })
+      .filter((c) => Number.isFinite(c.lat) && Number.isFinite(c.lon));
   } catch {
     return [];
   }
@@ -245,15 +184,20 @@ async function searchCities(query: string): Promise<CitySearchResult[]> {
 export default function GoldenHourPage() {
   const [lat, setLat] = useState<number | null>(null);
   const [lon, setLon] = useState<number | null>(null);
-  const [date, setDate] = useState<string>(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const [date, setDate] = useState<string>(hoyLocal);
   const [locationName, setLocationName] = useState<string>('');
-  const [sunTimes, setSunTimes] = useState<SunTimes | null>(null);
-  const [currentSunPosition, setCurrentSunPosition] = useState<{ altitude: number; azimuth: number } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+
+  // Huso horario en que se escriben las horas. Se lee del navegador al montar: en el HTML
+  // prerenderizado no hay huso del visitante.
+  const [zonaDispositivo, setZonaDispositivo] = useState<string>('');
+  const [zona, setZona] = useState<string>('');
+  const [origenZona, setOrigenZona] = useState<OrigenZona>('dispositivo');
+  const [husosDisponibles, setHusosDisponibles] = useState<string[]>([]);
+
+  // «Ahora», para el panel del estado actual. Se refresca cada minuto.
+  const [ahora, setAhora] = useState<number | null>(null);
 
   // Estados para búsqueda de ciudades
   const [searchQuery, setSearchQuery] = useState('');
@@ -263,30 +207,40 @@ export default function GoldenHourPage() {
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  // Calcular tiempos solares cuando cambian los parámetros
   useEffect(() => {
-    if (lat !== null && lon !== null) {
-      const selectedDate = new Date(date);
-      const times = calculateSunTimes(selectedDate, lat, lon);
-      setSunTimes(times);
+    const propia = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    setZonaDispositivo(propia);
+    setZona((z) => z || propia);
+    let lista: string[] = [];
+    try {
+      lista = Intl.supportedValuesOf('timeZone');
+    } catch {
+      lista = [];
     }
-  }, [lat, lon, date]);
+    if (!lista.includes(propia)) lista = [propia, ...lista];
+    setHusosDisponibles(lista);
 
-  // Actualizar posición del sol actual
-  useEffect(() => {
-    if (lat === null || lon === null) return;
+    setAhora(Date.now());
+    const intervalo = setInterval(() => setAhora(Date.now()), 60000);
+    return () => clearInterval(intervalo);
+  }, []);
 
-    const updateSunPosition = () => {
-      const now = new Date();
-      const position = getSunPosition(now, lat, lon);
-      setCurrentSunPosition(position);
-    };
+  const fecha = useMemo(() => leerFecha(date), [date]);
 
-    updateSunPosition();
-    const interval = setInterval(updateSunPosition, 60000);
+  const eventos = useMemo(() => {
+    if (lat === null || lon === null || !zona || !fecha) return null;
+    return eventosDelDia(fecha, lat, lon, zona);
+  }, [lat, lon, zona, fecha]);
 
-    return () => clearInterval(interval);
-  }, [lat, lon]);
+  const posicion = useMemo(() => {
+    if (lat === null || lon === null || ahora === null) return null;
+    return posicionSol(ahora, lat, lon);
+  }, [lat, lon, ahora]);
+
+  const proximo = useMemo(() => {
+    if (lat === null || lon === null || ahora === null || !zona) return null;
+    return proximoEvento(ahora, lat, lon, zona);
+  }, [lat, lon, ahora, zona]);
 
   // Cerrar resultados al hacer clic fuera (usando click en lugar de mousedown)
   useEffect(() => {
@@ -322,6 +276,9 @@ export default function GoldenHourPage() {
 
         setLat(newLat);
         setLon(newLon);
+        // Donde estás, la hora de tu dispositivo es la del lugar.
+        setZona(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
+        setOrigenZona('dispositivo');
 
         // Obtener nombre de la ubicación
         const name = await reverseGeocode(newLat, newLon);
@@ -372,86 +329,78 @@ export default function GoldenHourPage() {
     }, 300);
   };
 
-  // Seleccionar ciudad de los resultados
+  // Seleccionar ciudad de los resultados: el huso sale de su país, no del navegador
   const selectCity = (city: CitySearchResult) => {
+    const propia = zonaDispositivo || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    const huso = husoParaLugar(city.pais, city.lat, city.lon, Date.now(), propia);
     setLat(city.lat);
     setLon(city.lon);
+    setZona(huso.zona);
+    setOrigenZona(huso.origen);
     setLocationName(city.displayName);
     setSearchQuery('');
     setSearchResults([]);
     setShowResults(false);
   };
 
-  // Determinar período actual del día
+  const cambiarZona = (nueva: string) => {
+    if (!zonaValida(nueva)) return;
+    setZona(nueva);
+    setOrigenZona('manual');
+  };
+
+  // Período del día AHORA en el lugar, por la altura del sol y por si sube o baja
   const getCurrentPeriod = (): { name: string; icon: string; color: string } => {
-    if (!sunTimes || !currentSunPosition) {
-      return { name: 'Selecciona una ubicación', icon: '📍', color: '#666' };
+    if (!posicion || lat === null || lon === null || ahora === null) {
+      return { name: 'Selecciona una ubicación', icon: '📍', color: '#666666' };
     }
+    const alt = posicion.altura;
+    const manana = solSubiendo(ahora, lat, lon);
 
-    const now = new Date();
-    const alt = currentSunPosition.altitude;
-
-    if (alt < -18) {
+    if (alt < UMBRAL.astronomico) {
       return { name: 'Noche', icon: '🌙', color: '#1a1a2e' };
-    } else if (alt < -12) {
+    } else if (alt < UMBRAL.nautico) {
       return { name: 'Crepúsculo astronómico', icon: '✨', color: '#2d2d44' };
-    } else if (alt < -6) {
+    } else if (alt < UMBRAL.civil) {
       return { name: 'Crepúsculo náutico', icon: '🌌', color: '#3d3d5c' };
-    } else if (alt < 0) {
-      if (sunTimes.sunrise && now < sunTimes.sunrise) {
-        return { name: 'Hora Azul (mañana)', icon: '🔵', color: '#1e3a5f' };
-      } else {
-        return { name: 'Hora Azul (tarde)', icon: '🔵', color: '#1e3a5f' };
-      }
-    } else if (alt < 6) {
-      if (sunTimes.solarNoon && now < sunTimes.solarNoon) {
-        return { name: 'Hora Dorada (mañana)', icon: '🌅', color: '#ff8c00' };
-      } else {
-        return { name: 'Hora Dorada (tarde)', icon: '🌇', color: '#ff6b35' };
-      }
-    } else {
-      return { name: 'Día', icon: '☀️', color: '#ffd700' };
+    } else if (alt < UMBRAL.horizonte) {
+      return manana
+        ? { name: 'Hora Azul (mañana)', icon: '🔵', color: '#1e3a5f' }
+        : { name: 'Hora Azul (tarde)', icon: '🔵', color: '#1e3a5f' };
+    } else if (alt < UMBRAL.horaDorada) {
+      return manana
+        ? { name: 'Hora Dorada (mañana)', icon: '🌅', color: '#ff8c00' }
+        : { name: 'Hora Dorada (tarde)', icon: '🌇', color: '#ff6b35' };
     }
+    return { name: 'Día', icon: '☀️', color: '#ffd700' };
   };
 
   const currentPeriod = getCurrentPeriod();
+  const hayUbicacion = lat !== null && lon !== null;
 
-  // Calcular próximo evento
-  const getNextEvent = (): { name: string; time: Date | null } => {
-    if (!sunTimes) return { name: '', time: null };
-
-    const now = new Date();
-    const events = [
-      { name: 'Crepúsculo astronómico', time: sunTimes.astronomicalDawn },
-      { name: 'Crepúsculo náutico', time: sunTimes.nauticalDawn },
-      { name: 'Hora azul (inicio)', time: sunTimes.civilDawn },
-      { name: 'Amanecer', time: sunTimes.sunrise },
-      { name: 'Fin hora dorada', time: sunTimes.goldenHourMorningEnd },
-      { name: 'Mediodía solar', time: sunTimes.solarNoon },
-      { name: 'Hora dorada (inicio)', time: sunTimes.goldenHourEveningStart },
-      { name: 'Atardecer', time: sunTimes.sunset },
-      { name: 'Fin hora azul', time: sunTimes.civilDusk },
-      { name: 'Fin crepúsculo náutico', time: sunTimes.nauticalDusk },
-      { name: 'Noche', time: sunTimes.astronomicalDusk },
-    ].filter(e => e.time !== null);
-
-    for (const event of events) {
-      if (event.time && event.time > now) {
-        return event;
-      }
-    }
-
-    return { name: 'Mañana', time: null };
+  // Textos del huso horario, que acompañan a toda hora publicada
+  const desfaseTexto = eventos ? formatDesfase(desfaseZona(eventos.mediodia, zona)) : '';
+  const notaZona: Record<OrigenZona, string> = {
+    dispositivo: 'Es el huso de tu dispositivo, que coincide con el del lugar donde estás.',
+    pais: 'Es el huso del país del lugar elegido.',
+    estimado:
+      'Este país tiene varios husos horarios y hemos elegido el más cercano al lugar. Compruébalo y cámbialo si no es el suyo.',
+    desconocido:
+      'No sabemos el huso de este lugar, así que las horas salen en el de tu dispositivo. Si el lugar está en otro huso, elígelo aquí.',
+    manual: 'Huso elegido por ti.',
   };
+  const zonaDudosa = origenZona === 'estimado' || origenZona === 'desconocido';
 
-  const nextEvent = getNextEvent();
+  // Hora de un evento, con la marca de día si no cae en la fecha elegida
+  const horaEvento = (ms: number | null): string =>
+    fecha ? `${formatHora(ms, zona)}${marcaDia(ms, zona, fecha)}` : '--:--';
 
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🌅</span>
+        <span className={styles.heroIcon} aria-hidden="true">🌅</span>
         <h1 className={styles.title}>Golden Hour</h1>
         <p className={styles.subtitle}>
           Calcula las horas de luz dorada y hora azul para fotografía. Planifica tus sesiones con la mejor luz natural.
@@ -474,12 +423,14 @@ export default function GoldenHourPage() {
               className={styles.btnPrimary}
               disabled={isLocating}
             >
-              {isLocating ? '⏳ Localizando...' : '📍 Usar mi ubicación'}
+              <span aria-hidden="true">{isLocating ? '⏳' : '📍'}</span>{' '}
+              {isLocating ? 'Localizando...' : 'Usar mi ubicación'}
             </button>
 
             <div className={styles.dateInput}>
-              <label>Fecha:</label>
+              <label htmlFor="gh-fecha">Fecha:</label>
               <input
+                id="gh-fecha"
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
@@ -489,7 +440,9 @@ export default function GoldenHourPage() {
           </div>
 
           {locationError && (
-            <div className={styles.errorMessage}>⚠️ {locationError}</div>
+            <div className={styles.errorMessage} role="alert">
+              <span aria-hidden="true">⚠️</span> {locationError}
+            </div>
           )}
 
           {/* Buscador de ciudades */}
@@ -502,9 +455,10 @@ export default function GoldenHourPage() {
                 onChange={(e) => handleSearchChange(e.target.value)}
                 onFocus={() => setShowResults(true)}
                 placeholder="Buscar ciudad en cualquier parte del mundo..."
+                aria-label="Buscar ciudad"
                 className={styles.searchInput}
               />
-              {isSearching && <span className={styles.searchSpinner}>⏳</span>}
+              {isSearching && <span className={styles.searchSpinner} aria-hidden="true">⏳</span>}
             </div>
 
             {/* Resultados de búsqueda */}
@@ -537,10 +491,36 @@ export default function GoldenHourPage() {
           {/* Ubicación actual seleccionada */}
           {locationName && lat !== null && lon !== null && (
             <div className={styles.currentLocation}>
-              <span className={styles.locationLabel}>📍 {locationName}</span>
-              <span className={styles.coords}>
-                {lat.toFixed(4)}°{lat >= 0 ? 'N' : 'S'}, {Math.abs(lon).toFixed(4)}°{lon >= 0 ? 'E' : 'O'}
+              <span className={styles.locationLabel}>
+                <span aria-hidden="true">📍</span> {locationName}
               </span>
+              <span className={styles.coords}>
+                {formatCoordenada(lat, 'N', 'S')}, {formatCoordenada(lon, 'E', 'O')}
+              </span>
+            </div>
+          )}
+
+          {/* Huso horario de las horas publicadas */}
+          {hayUbicacion && zona && (
+            <div className={`${styles.zonaPanel} ${zonaDudosa ? styles.zonaDudosa : ''}`}>
+              <div className={styles.zonaControl}>
+                <label htmlFor="gh-huso">Horas en el huso:</label>
+                <select
+                  id="gh-huso"
+                  value={zona}
+                  onChange={(e) => cambiarZona(e.target.value)}
+                  className={styles.input}
+                >
+                  {(husosDisponibles.includes(zona) ? husosDisponibles : [zona, ...husosDisponibles]).map((z) => (
+                    <option key={z} value={z}>{z}</option>
+                  ))}
+                </select>
+                {desfaseTexto && <span className={styles.zonaDesfase}>{desfaseTexto} ese día</span>}
+              </div>
+              <p className={styles.zonaNota}>
+                {zonaDudosa && <span aria-hidden="true">⚠️ </span>}
+                {notaZona[origenZona]}
+              </p>
             </div>
           )}
 
@@ -553,109 +533,129 @@ export default function GoldenHourPage() {
         </div>
 
         {/* Estado actual - solo si hay ubicación */}
-        {lat !== null && lon !== null && (
+        {hayUbicacion && posicion && (
           <div
             className={styles.currentPanel}
             style={{ background: `linear-gradient(135deg, ${currentPeriod.color}dd, ${currentPeriod.color}99)` }}
           >
-            <div className={styles.currentIcon}>{currentPeriod.icon}</div>
+            <div className={styles.currentIcon} aria-hidden="true">{currentPeriod.icon}</div>
             <div className={styles.currentInfo}>
+              <p className={styles.currentAhora}>Ahora mismo en el lugar</p>
               <h3 className={styles.currentName}>{currentPeriod.name}</h3>
-              {currentSunPosition && (
-                <p className={styles.sunPosition}>
-                  Sol a {currentSunPosition.altitude.toFixed(1)}° de altitud
-                </p>
-              )}
-              {nextEvent.time && (
+              <p className={styles.sunPosition}>
+                Sol a {formatNumber(posicion.altura, 1)}° de altitud · azimut {formatNumber(posicion.azimut, 0)}° ({rumbo(posicion.azimut)})
+              </p>
+              {proximo && ahora !== null && (
                 <p className={styles.nextEvent}>
-                  Próximo: <strong>{nextEvent.name}</strong> a las {formatTime(nextEvent.time)}
+                  Próximo: <strong>{NOMBRE_EVENTO[proximo.clave]}</strong> a las {formatHora(proximo.instante, zona)}
+                  {diasEntre(fechaEnZona(ahora, zona), fechaEnZona(proximo.instante, zona)) > 0 ? ' de mañana' : ''}
                 </p>
               )}
             </div>
           </div>
         )}
 
+        {/* Sin fecha no hay nada que calcular (hallazgo 1240: salía «Invalid Date») */}
+        {hayUbicacion && !fecha && (
+          <div className={styles.errorMessage} role="alert">
+            <span aria-hidden="true">📅</span> Elige una fecha para ver los horarios de luz.
+          </div>
+        )}
+
         {/* Timeline visual */}
-        {sunTimes && lat !== null && (
+        {eventos && fecha && (
           <div className={styles.timelinePanel}>
             <h2 className={styles.sectionTitle}>
               <span aria-hidden="true">⏰</span> Horarios del día
             </h2>
+            <p className={styles.zonaResumen}>
+              Horas de {zona} ({desfaseTexto}).
+            </p>
+
+            {eventos.regimen === 'nochePolar' && (
+              <p className={styles.regimenAviso}>
+                <span aria-hidden="true">🌑</span> Noche polar: ese día el sol no sale. Su altura máxima, al mediodía solar, es de {formatNumber(eventos.alturaMaxima, 1)}°.
+              </p>
+            )}
+            {eventos.regimen === 'solDeMedianoche' && (
+              <p className={styles.regimenAviso}>
+                <span aria-hidden="true">🌞</span> Sol de medianoche: ese día el sol no se pone. Su altura mínima es de {formatNumber(eventos.alturaMinima, 1)}°
+                {eventos.alturaMinima < UMBRAL.horaDorada ? ', así que la noche entera es hora dorada.' : '.'}
+              </p>
+            )}
 
             <div className={styles.timeline}>
               {/* Hora azul mañana */}
-              {sunTimes.civilDawn && sunTimes.sunrise && (
+              {eventos.amanecerCivil !== null && eventos.orto !== null && (
                 <div className={styles.timeBlock} style={{ background: 'linear-gradient(135deg, #1e3a5f, #2d5a87)' }}>
-                  <span className={styles.timeIcon}>🔵</span>
+                  <span className={styles.timeIcon} aria-hidden="true">🔵</span>
                   <div className={styles.timeInfo}>
                     <span className={styles.timeName}>Hora Azul</span>
                     <span className={styles.timeRange}>
-                      {formatTime(sunTimes.civilDawn)} - {formatTime(sunTimes.sunrise)}
+                      {horaEvento(eventos.amanecerCivil)} - {horaEvento(eventos.orto)}
                     </span>
-                    <span className={styles.colorTemp}>🌡️ 9.000K - 12.000K</span>
+                    <span className={styles.colorTemp}><span aria-hidden="true">🌡️</span> 9.000K - 12.000K</span>
                   </div>
                 </div>
               )}
 
-              {/* Golden hour mañana */}
-              {sunTimes.sunrise && sunTimes.goldenHourMorningEnd && (
+              {/* Golden hour mañana (con sol de medianoche viene de la noche) */}
+              {eventos.finDoradaManana !== null && (eventos.orto !== null || eventos.regimen === 'solDeMedianoche') && (
                 <div className={styles.timeBlock} style={{ background: 'linear-gradient(135deg, #ff8c00, #ffb347)' }}>
-                  <span className={styles.timeIcon}>🌅</span>
+                  <span className={styles.timeIcon} aria-hidden="true">🌅</span>
                   <div className={styles.timeInfo}>
                     <span className={styles.timeName}>Hora Dorada (mañana)</span>
                     <span className={styles.timeRange}>
-                      {formatTime(sunTimes.sunrise)} - {formatTime(sunTimes.goldenHourMorningEnd)}
+                      {eventos.orto !== null ? horaEvento(eventos.orto) : 'Desde la noche'} - {horaEvento(eventos.finDoradaManana)}
                     </span>
-                    <span className={styles.colorTemp}>🌡️ 3.000K - 4.000K</span>
+                    <span className={styles.colorTemp}><span aria-hidden="true">🌡️</span> 3.000K - 4.000K</span>
                   </div>
                 </div>
               )}
 
               {/* Amanecer */}
-              {sunTimes.sunrise && (
+              {eventos.orto !== null && (
                 <div className={styles.eventMarker}>
-                  <span>☀️ Amanecer: {formatTime(sunTimes.sunrise)}</span>
+                  <span><span aria-hidden="true">☀️</span> Amanecer: {horaEvento(eventos.orto)}</span>
                 </div>
               )}
 
               {/* Mediodía */}
-              {sunTimes.solarNoon && (
-                <div className={styles.eventMarker}>
-                  <span>🔆 Mediodía solar: {formatTime(sunTimes.solarNoon)}</span>
-                </div>
-              )}
+              <div className={styles.eventMarker}>
+                <span><span aria-hidden="true">🔆</span> Mediodía solar: {horaEvento(eventos.mediodia)}</span>
+              </div>
 
-              {/* Golden hour tarde */}
-              {sunTimes.goldenHourEveningStart && sunTimes.sunset && (
+              {/* Golden hour tarde (con sol de medianoche sigue toda la noche) */}
+              {eventos.inicioDoradaTarde !== null && (eventos.ocaso !== null || eventos.regimen === 'solDeMedianoche') && (
                 <div className={styles.timeBlock} style={{ background: 'linear-gradient(135deg, #ff6b35, #ff8c00)' }}>
-                  <span className={styles.timeIcon}>🌇</span>
+                  <span className={styles.timeIcon} aria-hidden="true">🌇</span>
                   <div className={styles.timeInfo}>
                     <span className={styles.timeName}>Hora Dorada (tarde)</span>
                     <span className={styles.timeRange}>
-                      {formatTime(sunTimes.goldenHourEveningStart)} - {formatTime(sunTimes.sunset)}
+                      {horaEvento(eventos.inicioDoradaTarde)} - {eventos.ocaso !== null ? horaEvento(eventos.ocaso) : 'toda la noche'}
                     </span>
-                    <span className={styles.colorTemp}>🌡️ 2.500K - 3.500K</span>
+                    <span className={styles.colorTemp}><span aria-hidden="true">🌡️</span> 2.500K - 3.500K</span>
                   </div>
                 </div>
               )}
 
               {/* Atardecer */}
-              {sunTimes.sunset && (
+              {eventos.ocaso !== null && (
                 <div className={styles.eventMarker}>
-                  <span>🌅 Atardecer: {formatTime(sunTimes.sunset)}</span>
+                  <span><span aria-hidden="true">🌅</span> Atardecer: {horaEvento(eventos.ocaso)}</span>
                 </div>
               )}
 
               {/* Hora azul tarde */}
-              {sunTimes.sunset && sunTimes.civilDusk && (
+              {eventos.ocaso !== null && eventos.anochecerCivil !== null && (
                 <div className={styles.timeBlock} style={{ background: 'linear-gradient(135deg, #2d5a87, #1e3a5f)' }}>
-                  <span className={styles.timeIcon}>🔵</span>
+                  <span className={styles.timeIcon} aria-hidden="true">🔵</span>
                   <div className={styles.timeInfo}>
                     <span className={styles.timeName}>Hora Azul</span>
                     <span className={styles.timeRange}>
-                      {formatTime(sunTimes.sunset)} - {formatTime(sunTimes.civilDusk)}
+                      {horaEvento(eventos.ocaso)} - {horaEvento(eventos.anochecerCivil)}
                     </span>
-                    <span className={styles.colorTemp}>🌡️ 9.000K - 12.000K</span>
+                    <span className={styles.colorTemp}><span aria-hidden="true">🌡️</span> 9.000K - 12.000K</span>
                   </div>
                 </div>
               )}
@@ -663,13 +663,17 @@ export default function GoldenHourPage() {
 
             {/* Duración del día */}
             <div className={styles.dayLength}>
-              <span>🌞 Duración del día: <strong>{formatDuration(sunTimes.dayLength)}</strong></span>
+              <span>
+                <span aria-hidden="true">🌞</span> Duración del día: <strong>{formatDuracion(eventos.duracionDia)}</strong>
+                {eventos.regimen === 'solDeMedianoche' && ' (sol de medianoche)'}
+                {eventos.regimen === 'nochePolar' && ' (noche polar)'}
+              </span>
             </div>
           </div>
         )}
 
         {/* Tabla completa de horarios */}
-        {sunTimes && lat !== null && (
+        {eventos && fecha && (
           <div className={styles.detailsPanel}>
             <h2 className={styles.sectionTitle}>
               <span aria-hidden="true">📊</span> Detalle completo
@@ -677,57 +681,49 @@ export default function GoldenHourPage() {
 
             <div className={styles.timesTable}>
               <div className={styles.tableSection}>
-                <h4>🌅 Mañana</h4>
-                <div className={styles.tableRow}>
-                  <span>Crepúsculo astronómico</span>
-                  <span>{formatTime(sunTimes.astronomicalDawn)}</span>
-                </div>
-                <div className={styles.tableRow}>
-                  <span>Crepúsculo náutico</span>
-                  <span>{formatTime(sunTimes.nauticalDawn)}</span>
-                </div>
-                <div className={styles.tableRow}>
-                  <span>Hora azul (inicio)</span>
-                  <span>{formatTime(sunTimes.civilDawn)}</span>
-                </div>
-                <div className={`${styles.tableRow} ${styles.highlight}`}>
-                  <span>☀️ Amanecer</span>
-                  <span>{formatTime(sunTimes.sunrise)}</span>
-                </div>
-                <div className={styles.tableRow}>
-                  <span>Hora dorada (fin)</span>
-                  <span>{formatTime(sunTimes.goldenHourMorningEnd)}</span>
-                </div>
+                <h4><span aria-hidden="true">🌅</span> Mañana</h4>
+                {([
+                  ['Crepúsculo astronómico', eventos.amanecerAstronomico, false],
+                  ['Crepúsculo náutico', eventos.amanecerNautico, false],
+                  ['Hora azul (inicio)', eventos.amanecerCivil, false],
+                  ['Amanecer', eventos.orto, true],
+                  ['Hora dorada (fin)', eventos.finDoradaManana, false],
+                ] as const).map(([etiqueta, ms, destacado]) => (
+                  <div key={etiqueta} className={`${styles.tableRow} ${destacado ? styles.highlight : ''}`}>
+                    <span>
+                      {destacado && <span aria-hidden="true">☀️ </span>}
+                      {etiqueta}
+                      {marcaDia(ms, zona, fecha) && <small className={styles.marcaDia}>{marcaDia(ms, zona, fecha)}</small>}
+                    </span>
+                    <span>{formatHora(ms, zona)}</span>
+                  </div>
+                ))}
               </div>
 
               <div className={styles.tableSection}>
-                <h4>🌇 Tarde</h4>
-                <div className={styles.tableRow}>
-                  <span>Mediodía solar</span>
-                  <span>{formatTime(sunTimes.solarNoon)}</span>
-                </div>
-                <div className={styles.tableRow}>
-                  <span>Hora dorada (inicio)</span>
-                  <span>{formatTime(sunTimes.goldenHourEveningStart)}</span>
-                </div>
-                <div className={`${styles.tableRow} ${styles.highlight}`}>
-                  <span>🌅 Atardecer</span>
-                  <span>{formatTime(sunTimes.sunset)}</span>
-                </div>
-                <div className={styles.tableRow}>
-                  <span>Hora azul (fin)</span>
-                  <span>{formatTime(sunTimes.civilDusk)}</span>
-                </div>
-                <div className={styles.tableRow}>
-                  <span>Crepúsculo náutico</span>
-                  <span>{formatTime(sunTimes.nauticalDusk)}</span>
-                </div>
-                <div className={styles.tableRow}>
-                  <span>Crepúsculo astronómico</span>
-                  <span>{formatTime(sunTimes.astronomicalDusk)}</span>
-                </div>
+                <h4><span aria-hidden="true">🌇</span> Tarde</h4>
+                {([
+                  ['Mediodía solar', eventos.mediodia, false],
+                  ['Hora dorada (inicio)', eventos.inicioDoradaTarde, false],
+                  ['Atardecer', eventos.ocaso, true],
+                  ['Hora azul (fin)', eventos.anochecerCivil, false],
+                  ['Crepúsculo náutico', eventos.anochecerNautico, false],
+                  ['Crepúsculo astronómico', eventos.anochecerAstronomico, false],
+                ] as const).map(([etiqueta, ms, destacado]) => (
+                  <div key={etiqueta} className={`${styles.tableRow} ${destacado ? styles.highlight : ''}`}>
+                    <span>
+                      {destacado && <span aria-hidden="true">🌅 </span>}
+                      {etiqueta}
+                      {marcaDia(ms, zona, fecha) && <small className={styles.marcaDia}>{marcaDia(ms, zona, fecha)}</small>}
+                    </span>
+                    <span>{formatHora(ms, zona)}</span>
+                  </div>
+                ))}
               </div>
             </div>
+            <p className={styles.zonaResumen}>
+              «--:--» = el sol no cruza esa altura ese día. Horas de {zona} ({desfaseTexto}).
+            </p>
           </div>
         )}
       </main>
@@ -748,7 +744,7 @@ export default function GoldenHourPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🌅 Características</h4>
+              <h4><span aria-hidden="true">🌅</span> Características</h4>
               <ul>
                 <li>Luz cálida y suave</li>
                 <li>Sombras largas y difusas</li>
@@ -757,7 +753,7 @@ export default function GoldenHourPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>📸 Ideal para</h4>
+              <h4><span aria-hidden="true">📸</span> Ideal para</h4>
               <ul>
                 <li>Retratos al aire libre</li>
                 <li>Fotografía de paisaje</li>
@@ -778,7 +774,7 @@ export default function GoldenHourPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔵 Características</h4>
+              <h4><span aria-hidden="true">🔵</span> Características</h4>
               <ul>
                 <li>Cielo azul intenso</li>
                 <li>Luz ambiente equilibrada</li>
@@ -787,7 +783,7 @@ export default function GoldenHourPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>📸 Ideal para</h4>
+              <h4><span aria-hidden="true">📸</span> Ideal para</h4>
               <ul>
                 <li>Fotografía urbana/nocturna</li>
                 <li>Skylines de ciudades</li>
@@ -802,21 +798,21 @@ export default function GoldenHourPage() {
           <h2>Los Crepúsculos</h2>
           <div className={styles.twilightTable}>
             <div className={styles.twilightRow}>
-              <span className={styles.twilightIcon}>🌅</span>
+              <span className={styles.twilightIcon} aria-hidden="true">🌅</span>
               <div>
                 <strong>Crepúsculo civil</strong> (sol entre 0° y -6°)
                 <p>Suficiente luz para actividades al aire libre sin iluminación artificial.</p>
               </div>
             </div>
             <div className={styles.twilightRow}>
-              <span className={styles.twilightIcon}>🌌</span>
+              <span className={styles.twilightIcon} aria-hidden="true">🌌</span>
               <div>
                 <strong>Crepúsculo náutico</strong> (sol entre -6° y -12°)
                 <p>El horizonte marino aún es visible. Estrellas brillantes aparecen.</p>
               </div>
             </div>
             <div className={styles.twilightRow}>
-              <span className={styles.twilightIcon}>✨</span>
+              <span className={styles.twilightIcon} aria-hidden="true">✨</span>
               <div>
                 <strong>Crepúsculo astronómico</strong> (sol entre -12° y -18°)
                 <p>Cielo casi completamente oscuro. Ideal para astrofotografía.</p>
@@ -827,7 +823,7 @@ export default function GoldenHourPage() {
 
         {/* ===== SECCIÓN 1: TABLA COMPARATIVA ===== */}
         <section className={styles.eduComparativaSection}>
-          <h3>🎨 Comparativa de Períodos de Luz</h3>
+          <h3><span aria-hidden="true">🎨</span> Comparativa de Períodos de Luz</h3>
           <p className={styles.eduComparativaSubtitle}>Elige el mejor momento según el tipo de fotografía que buscas</p>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTablaComparativa}>
@@ -845,7 +841,7 @@ export default function GoldenHourPage() {
                 <tr>
                   <td>Golden Hour mañana</td>
                   <td>2.500–4.000K</td>
-                  <td>20–45 min</td>
+                  <td>25–45 min (más cerca de los polos)</td>
                   <td>Cálida, suave, sombras largas</td>
                   <td>Retratos, bodas, paisajes</td>
                   <td>Media</td>
@@ -853,7 +849,7 @@ export default function GoldenHourPage() {
                 <tr>
                   <td>Golden Hour tarde</td>
                   <td>2.000–3.500K</td>
-                  <td>20–45 min</td>
+                  <td>25–45 min (más cerca de los polos)</td>
                   <td>Dorada intensa, dramática</td>
                   <td>Arquitectura, atardeceres, moda</td>
                   <td>Media</td>
@@ -861,7 +857,7 @@ export default function GoldenHourPage() {
                 <tr>
                   <td>Blue Hour mañana</td>
                   <td>9.000–12.000K</td>
-                  <td>20–30 min</td>
+                  <td>20–35 min</td>
                   <td>Azul profundo, equilibrada</td>
                   <td>Urbana, monumentos, larga exp.</td>
                   <td>Alta (trípode necesario)</td>
@@ -869,7 +865,7 @@ export default function GoldenHourPage() {
                 <tr>
                   <td>Blue Hour tarde</td>
                   <td>9.000–12.000K</td>
-                  <td>20–30 min</td>
+                  <td>20–35 min</td>
                   <td>Azul intenso + luces artificiales</td>
                   <td>Skylines, puentes, edificios iluminados</td>
                   <td>Alta (trípode necesario)</td>
@@ -897,7 +893,7 @@ export default function GoldenHourPage() {
 
         {/* ===== SECCIÓN 2: CASOS DE USO PRÁCTICOS ===== */}
         <section className={styles.eduEscenariosSection}>
-          <h3>📸 Casos de Uso por Tipo de Fotografía</h3>
+          <h3><span aria-hidden="true">📸</span> Casos de Uso por Tipo de Fotografía</h3>
           <p className={styles.eduEscenariosSubtitle}>Cómo aprovechar la Golden Hour según tu especialidad</p>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
@@ -905,7 +901,7 @@ export default function GoldenHourPage() {
                 <span className={styles.eduEscenarioIcon} aria-hidden="true">🏔️</span>
                 <h4>Fotografía de Paisaje</h4>
               </div>
-              <p className={styles.eduEscenarioExample}>Madrid, verano: Golden Hour tarde = 20:15–21:00. Llega 30 min antes. Busca primer plano en sombra + horizonte iluminado.</p>
+              <p className={styles.eduEscenarioExample}>Madrid, 21 de junio: Golden Hour de tarde ≈ 21:07–21:48 (hora peninsular). Llega 30 min antes. Busca primer plano en sombra + horizonte iluminado.</p>
               <p className={styles.eduEscenarioTip}>Por qué funciona: La luz rasante crea texturas en montañas, campos y playas que son imposibles a mediodía.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
@@ -937,47 +933,47 @@ export default function GoldenHourPage() {
 
         {/* ===== SECCIÓN 3: FAQ AMPLIADO ===== */}
         <section className={styles.eduFaqSection}>
-          <h3>❓ Preguntas Frecuentes sobre Golden Hour</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Golden Hour</h3>
           <p className={styles.eduFaqSubtitle}>Todo lo que necesitas saber para planificar tus sesiones</p>
           <div className={styles.eduFaqList}>
             <div className={styles.eduFaqItem}>
               <h4>¿Cuánto dura exactamente la Golden Hour?</h4>
-              <p>La Golden Hour dura entre 20 y 60 minutos dependiendo de la latitud y la época del año. En invierno, en latitudes altas como Madrid (40°N), puede durar apenas 15–20 minutos. En verano en zonas ecuatoriales puede extenderse a 45–60 minutos. La clave: cuanto más baja la latitud y más cercano al solsticio de verano, más larga es. Esta calculadora te da los horarios exactos para cualquier lugar y fecha. 💡 Consejo: Planifica llegar 15 minutos antes del inicio.</p>
+              <p>Depende sobre todo de la latitud: cuanto más lejos del ecuador, más oblicua es la subida del sol y más dura. Tomando la hora dorada como el tramo entre la salida del sol y los 6° de altura, en Quito (ecuador) dura unos 27–30 minutos todo el año; en Madrid o Buenos Aires, entre 33 y 44 minutos; en Oslo, casi una hora en los equinoccios y más de dos en diciembre, y por encima del círculo polar puede durar toda la noche. La época del año influye menos: es algo más corta en los equinoccios y algo más larga en los solsticios. Esta calculadora te da los horarios exactos para cualquier lugar y fecha. <span aria-hidden="true">💡</span> Consejo: Planifica llegar 15 minutos antes del inicio.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cuál es mejor: Golden Hour de mañana o de tarde?</h4>
-              <p>Depende del objetivo. La Golden Hour de mañana tiene luz más fría (3.000–4.000K) y el ambiente suele estar más tranquilo, ideal para paisajes sin gente. La de tarde es más cálida (2.000–3.000K) y dramática, perfecta para retratos y arquitectura. Además, las nubes al atardecer tienden a coger más color que al amanecer. 💡 Consejo: Si fotografías personas, preferirás la tarde. Para naturaleza y paisajes solitarios, la mañana.</p>
+              <p>Depende del objetivo. La Golden Hour de mañana tiene luz más fría (3.000–4.000K) y el ambiente suele estar más tranquilo, ideal para paisajes sin gente. La de tarde es más cálida (2.000–3.000K) y dramática, perfecta para retratos y arquitectura. Además, las nubes al atardecer tienden a coger más color que al amanecer. <span aria-hidden="true">💡</span> Consejo: Si fotografías personas, preferirás la tarde. Para naturaleza y paisajes solitarios, la mañana.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo varía la Golden Hour según la estación?</h4>
-              <p>En Madrid en diciembre, la Golden Hour dura ~20 min y el sol sale a las 8:30. En junio, la Golden Hour dura ~40 min y el sol sale a las 6:45. La diferencia es de hasta 2 horas en el horario y el doble de duración. En latitudes extremas (&gt;60°N), en verano puede durar varias horas o incluso todo el día. 💡 Consejo: En invierno llega antes. El sol cae rápido y el tiempo dorado es muy corto.</p>
+              <p>Lo que más cambia con la estación es el horario, no la duración. En Madrid, el 21 de diciembre el sol sale a las 8:34 y la hora dorada de la mañana dura unos 43 minutos; el 21 de junio sale a las 6:45 y dura unos 41. Casi dos horas de diferencia en el horario y apenas dos minutos en la duración. En latitudes extremas (por encima de 60°) sí cambia mucho: en verano puede durar varias horas o la noche entera. <span aria-hidden="true">💡</span> Consejo: Comprueba el horario de cada fecha; no reutilices el de otra estación.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Hace falta trípode en Golden Hour?</h4>
-              <p>En Golden Hour (sol entre 0° y 6°) generalmente no es necesario trípode: hay luz suficiente para velocidades &gt;1/100s con ISO 400–800. Sin embargo, en Blue Hour (sol entre 0° y -6°) el trípode es imprescindible: necesitarás exposiciones de 1–10 segundos para capturar el cielo azul con luces artificiales equilibradas. 💡 Consejo: Lleva siempre el trípode aunque sea Golden Hour. Si el cielo se llena de nubes, la luz cae drásticamente.</p>
+              <p>En Golden Hour (sol entre 0° y 6°) generalmente no es necesario trípode: hay luz suficiente para velocidades &gt;1/100s con ISO 400–800. Sin embargo, en Blue Hour (sol entre 0° y -6°) el trípode es imprescindible: necesitarás exposiciones de 1–10 segundos para capturar el cielo azul con luces artificiales equilibradas. <span aria-hidden="true">💡</span> Consejo: Lleva siempre el trípode aunque sea Golden Hour. Si el cielo se llena de nubes, la luz cae drásticamente.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo afecta la nubosidad a la Golden Hour?</h4>
-              <p>Las nubes son aliadas en Golden Hour: pueden multiplicar los colores naranjas/rojos y crear cielos espectaculares. Las mejores fotos de Golden Hour suelen tener nubes dispersas (cirros o cúmulos). El cielo completamente despejado produce colores menos intensos. Las nubes densas bloquean la luz dorada pero crean luz difusa perfecta para retratos. 💡 Consejo: Sigue el parte meteorológico. Nubes dispersas + horizonte despejado = foto épica garantizada.</p>
+              <p>Las nubes son aliadas en Golden Hour: pueden multiplicar los colores naranjas/rojos y crear cielos espectaculares. Las mejores fotos de Golden Hour suelen tener nubes dispersas (cirros o cúmulos). El cielo completamente despejado produce colores menos intensos. Las nubes densas bloquean la luz dorada pero crean luz difusa perfecta para retratos. <span aria-hidden="true">💡</span> Consejo: Sigue el parte meteorológico. Nubes dispersas + horizonte despejado = foto épica garantizada.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Qué ajustes de cámara usar en Golden Hour?</h4>
-              <p>Puntos de partida: f/8 (paisajes), f/2.8 (retratos), ISO 100–400, velocidad según luz disponible. Balance de blancos: &quot;Soleado&quot; (5500K) mantiene los tonos cálidos; &quot;Auto&quot; puede enfriar la imagen. En Blue Hour: f/8, ISO 400–800, velocidad 1–10 segundos. 💡 Consejo: Desactiva el auto-ISO en Golden Hour. El ISO base más bajo de tu cámara da el máximo detalle en las sombras largas características de este período.</p>
+              <p>Puntos de partida: f/8 (paisajes), f/2.8 (retratos), ISO 100–400, velocidad según luz disponible. Balance de blancos: &quot;Soleado&quot; (5500K) mantiene los tonos cálidos; &quot;Auto&quot; puede enfriar la imagen. En Blue Hour: f/8, ISO 400–800, velocidad 1–10 segundos. <span aria-hidden="true">💡</span> Consejo: Desactiva el auto-ISO en Golden Hour. El ISO base más bajo de tu cámara da el máximo detalle en las sombras largas características de este período.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿La Golden Hour sirve para fotografía de interior?</h4>
-              <p>Indirectamente sí. Si la habitación tiene ventanas orientadas al este (mañana) u oeste (tarde), la luz dorada entrará creando haces de luz dramáticos y sombras largas. Para maximizarlo: abre persianas justo en Golden Hour, usa la luz como backlight o sidelight. 💡 Consejo: Los fotógrafos de inmuebles suelen programar sus sesiones en Golden Hour precisamente por la calidad de la luz natural que entra por las ventanas.</p>
+              <p>Indirectamente sí. Si la habitación tiene ventanas orientadas al este (mañana) u oeste (tarde), la luz dorada entrará creando haces de luz dramáticos y sombras largas. Para maximizarlo: abre persianas justo en Golden Hour, usa la luz como backlight o sidelight. <span aria-hidden="true">💡</span> Consejo: Los fotógrafos de inmuebles suelen programar sus sesiones en Golden Hour precisamente por la calidad de la luz natural que entra por las ventanas.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo uso las coordenadas GPS para planificar?</h4>
-              <p>Las coordenadas determinan con precisión la hora de salida/puesta del sol y la duración del crepúsculo. Una diferencia de 1° de latitud cambia la hora de amanecer en ~4 minutos. Esta herramienta calcula los horarios exactos con coordenadas precisas. Para planificación avanzada: usa Google Maps para identificar la dirección del amanecer/atardecer y elegir el encuadre antes de llegar. 💡 Consejo: El azimut solar (dirección del sol) es tan importante como la hora. El sol sale exactamente por el este solo en los equinoccios.</p>
+              <p>Las coordenadas determinan con precisión la hora de salida/puesta del sol y la duración del crepúsculo. Una diferencia de 1° de longitud (desplazarse hacia el este o el oeste) adelanta o retrasa el amanecer unos 4 minutos. La latitud apenas lo mueve en los equinoccios y lo mueve mucho cerca de los solsticios. Esta herramienta calcula los horarios exactos con coordenadas precisas. Para planificación avanzada: usa Google Maps para identificar la dirección del amanecer/atardecer y elegir el encuadre antes de llegar. <span aria-hidden="true">💡</span> Consejo: El azimut solar (dirección del sol) es tan importante como la hora. El sol sale exactamente por el este solo en los equinoccios.</p>
             </div>
           </div>
         </section>
 
         {/* ===== SECCIÓN 4: GUÍA PASO A PASO ===== */}
         <section className={styles.eduStepSection}>
-          <h3>📋 Guía: Planifica tu Sesión de Golden Hour</h3>
+          <h3><span aria-hidden="true">📋</span> Guía: Planifica tu Sesión de Golden Hour</h3>
           <p className={styles.eduStepSubtitle}>7 pasos para no desperdiciar ni un minuto de luz dorada</p>
           <div className={styles.eduStepGuide}>
             <div className={styles.eduStepItem}>
@@ -991,7 +987,7 @@ export default function GoldenHourPage() {
               <div className={styles.eduStepNumber} aria-hidden="true">2</div>
               <div className={styles.eduStepContent}>
                 <h4>Selecciona la fecha de la sesión</h4>
-                <p>Consulta los horarios para el día exacto. Recuerda: en España peninsular el amanecer varía desde las 6:30 (junio, Canarias) hasta las 9:00 (diciembre, Galicia). Planifica con 2–3 semanas de antelación para confirmar disponibilidad del cliente.</p>
+                <p>Consulta los horarios para el día exacto. Como referencia, en España el 21 de junio el sol sale entre las 6:14 de Mahón y las 6:58 de Vigo (y a las 7:05–7:08, hora canaria, en Canarias); el 21 de diciembre llega a salir a las 9:00 en Galicia. Planifica con 2–3 semanas de antelación para confirmar disponibilidad del cliente.</p>
               </div>
             </div>
             <div className={styles.eduStepItem}>
@@ -1034,7 +1030,7 @@ export default function GoldenHourPage() {
 
         {/* ===== SECCIÓN 5: MEJORES PRÁCTICAS ===== */}
         <section className={styles.eduTipsSection}>
-          <h3>✅ 6 Prácticas Esenciales del Fotógrafo</h3>
+          <h3><span aria-hidden="true">✅</span> 6 Prácticas Esenciales del Fotógrafo</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon} aria-hidden="true">⏰</span>

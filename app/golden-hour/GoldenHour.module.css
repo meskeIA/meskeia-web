@@ -917,3 +917,96 @@
 
 /* Marcador de profesionalización v2.0 */
 .warningBox { display: block; }
+
+/* ===== Huso horario de las horas publicadas (hallazgo 1235) ===== */
+.zonaPanel {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--secondary);
+}
+
+.zonaDudosa {
+  border-left-color: #b45309;
+  background: #fff7ed;
+}
+
+.zonaControl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.zonaControl label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.zonaControl select {
+  max-width: 100%;
+}
+
+.zonaDesfase {
+  font-family: monospace;
+  color: var(--text-secondary);
+}
+
+.zonaNota {
+  margin: var(--spacing-sm) 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.zonaDudosa .zonaNota {
+  color: #7c2d12;
+}
+
+.zonaResumen {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.detailsPanel .zonaResumen {
+  margin: var(--spacing-md) 0 0 0;
+}
+
+.regimenAviso {
+  margin: 0 0 var(--spacing-md) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+}
+
+.marcaDia {
+  margin-left: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.currentAhora {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+[data-theme='dark'] .zonaPanel {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .zonaDudosa {
+  background: #3b2106;
+  border-left-color: #f59e0b;
+}
+
+[data-theme='dark'] .zonaDudosa .zonaNota {
+  color: #fed7aa;
+}
+
+[data-theme='dark'] .regimenAviso {
+  background: var(--hover);
+  color: var(--text-primary);
+}
