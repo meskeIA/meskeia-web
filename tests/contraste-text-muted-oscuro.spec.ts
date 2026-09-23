@@ -55,6 +55,9 @@ const RUTAS = [
   { ruta: '/visualizador-desigualdad-riqueza/', que: 'tarjetas de brecha con tinte de marca' },
   { ruta: '/visualizador-fotosintesis/', que: 'fórmula sobre el color de la molécula, 3,50:1' },
   { ruta: '/visualizador-respiracion-celular/', que: 'fórmula sobre el color de la molécula, 3,50:1' },
+  // · un :root de módulo con la paleta clara, que en oscuro pisaba los tokens de globals
+  { ruta: '/selector-canal-venta/', que: ':root de módulo · el oscuro servía los tokens del claro' },
+  { ruta: '/selector-financiacion-empresa/', que: ':root de módulo · el oscuro servía los tokens del claro' },
 ] as const;
 
 /**
