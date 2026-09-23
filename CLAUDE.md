@@ -582,12 +582,6 @@ comentario anterior, y **la razón es obligatoria** — la marca a secas tambié
 números de paso** con fondo de marca medidos el 22/09/2026 (1.004 de ellos botones), que son
 campaña aparte porque cambiarlos altera el aspecto de la interacción en 782 apps.
 
-✅ **`--text-muted` ya está reparado en los DOS temas** (22/09/2026): `#6E6E6E` en claro y
-`#9B9B9B` en oscuro, en `globals.css` y en los ~360 módulos que lo redefinían. Lo que queda como
-lección: un token de `globals.css` **no lo puede vigilar un candado**, porque toca las 1.001 apps
-a la vez y se decide midiendo contra el FONDO REAL, no contra blanco puro — así se equivocó el
-21/08/2026, cuando `#757575` se eligió contra blanco (4,60) y sobre `#FAFAFA` daba 4,41.
-
 > Las cuatro formas que tenía el pasivo y las dos que NO debe encender: cabecera de
 > `scripts/check-contraste-cabeceras.mjs`. Sus 13 casos de prueba, en
 > `scripts/pruebas/probar-check-contraste-cabeceras.mjs`; se le reinyectan con
@@ -595,6 +589,28 @@ a la vez y se decide midiendo contra el FONDO REAL, no contra blanco puro — as
 > `<tr style>` de nave-industrial antes del 1175, que debe FALLAR, y el reparado, que debe CALLAR.
 > La medición por PÍXEL, en `tests/contraste-cabeceras-tabla.spec.ts`, que mide el botón de
 > `EducationalSection` EN HOVER, porque en reposo siempre estuvo bien.
+
+### Candado del token sin variante oscura
+
+`npm run check:token-oscuro` — lo ejecuta también `npm run build`, y **rompe el build** si un
+`.module.css` declara con color literal un token que `globals.css` define distinto en cada tema
+(`--text-muted`, `--bg-card`, `--border`…) sin redeclararlo en la variante oscura de ese mismo
+selector. La lista de tokens la saca de globals al arrancar, y se planta si no la encuentra.
+
+Salió del drenaje del claro del 22/09/2026 (dd66add0): pasó `--text-muted` a #6E6E6E en el
+`.container` de 364 módulos, y en 4 cuyo bloque oscuro no lo redeclaraba el oscuro cayó a
+**2,48–2,81:1**, pie y aviso legal incluidos. Con #999999 cumplía por casualidad. Llegó a
+producción. Al medir el pasivo salió la forma peor: un **`:root` de módulo** con la paleta
+clara, que es global y en oscuro servía los tokens del claro a toda la página. **Al drenar un
+token en un tema, medir el otro.**
+
+⚠️ **Sin pasivo** para los tokens de texto y superficie. **Fuera, a propósito**: `--primary`,
+`--secondary` y los semánticos, porque 472 módulos redeclaran la marca sin variante oscura
+(campaña aparte). Escape: `oscuro-ok: <razón>`, razón obligatoria. Exige que la variante
+EXISTA; si su valor cumple contraste lo miden `tests/contraste-text-muted-*.spec.ts`, porque
+un valor se decide midiendo contra el fondo REAL (el #757575 de agosto se eligió contra blanco,
+4,60, y sobre #FAFAFA daba 4,41). Sus 16 casos, con los dos de origen sacados de git:
+**`npm run oscuro:probar-candado`**.
 
 ### Candado del parser numérico
 
