@@ -43,6 +43,15 @@ const RUTAS = [
   { ruta: '/simulador-vsepr/', que: 'hereda de globals · app de Stemum' },
   { ruta: '/guia/comprar-casa/', que: 'guía-journey' },
   { ruta: '/', que: 'home' },
+  // Los seis que el barrido de 85 rutas dejó por debajo tras el drenaje (23/09/2026)
+  { ruta: '/visualizador-capas-tierra/', que: 'etiquetas absolutas fuera de su barra de color' },
+  { ruta: '/visualizador-metamorfosis/', que: 'gradiente al 6 % sobre base transparente' },
+  { ruta: '/planificador-vacaciones-autonomo/', que: 'gradiente al 8 % sobre base transparente' },
+  { ruta: '/visualizador-biomas-terrestres/', que: 'gradiente al 6 % sobre la página #FAFAFA' },
+  { ruta: '/visualizador-jubilacion-perspectiva/', que: 'gradiente al 8 % en el círculo de resultado' },
+  { ruta: '/visualizador-fuerzas-invisibles/', que: 'caja de fórmula con el color de la fuerza al 10 %' },
+  // 16 <details>: `desplegarTodo` la colgaba hasta el timeout (ver su comentario)
+  { ruta: '/calculadora-huella-carbono/', que: '16 <details> que abrir' },
 ] as const;
 
 /**

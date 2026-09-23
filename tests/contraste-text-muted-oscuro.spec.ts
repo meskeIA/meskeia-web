@@ -32,6 +32,9 @@ const RUTAS = [
   { ruta: '/visualizador-algoritmos/', que: 'simulador de Stemum · widget #333333' },
   { ruta: '/visualizador-historia-dinero/', que: 'cronología de Cronicum' },
   { ruta: '/', que: 'home' },
+  // Tapados hasta el 23/09/2026 por el medidor, que oscurecía los gradientes translúcidos
+  { ruta: '/planificador-vacaciones-autonomo/', que: 'gradiente al 15 % bajo «al mes»' },
+  { ruta: '/visualizador-fuerzas-invisibles/', que: 'caja de fórmula con el color de la fuerza al 10 %' },
 ] as const;
 
 /**
