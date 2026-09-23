@@ -188,3 +188,252 @@ test.describe('simulador-ecosistema-trofico', () => {
     await expect(explicacion).not.toContainText('han aumentado');
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (23/09/2026) — tarea de tipo C: PREDICCIÓN ANTES DE MOVER.
+ *
+ * Primera app del catálogo con una tarea de aula enteramente de predicción (equilibrio
+ * químico, 11/09, mezcla predicción y cálculo). El alumno se compromete con «sube / baja /
+ * no cambia» ANTES de cargar el escenario en el simulador; sin ese compromiso, mover la
+ * perturbación y mirar las barras no enseña nada porque no había hipótesis que romper.
+ *
+ * La regla que lo hace viable: la respuesta correcta sale de EJECUTAR el modelo de la app, no
+ * de una tabla escrita a mano. Por eso el modelo se MOVIÓ de page.tsx a motor.ts (una sola
+ * implementación) y casos.ts lo ejecuta:
+ *   app/simulador-ecosistema-trofico/motor.ts   ← ECOSISTEMAS, EVENTOS, ATENUACION, aplicarEvento
+ *   app/simulador-ecosistema-trofico/casos.ts   ← los 12 casos, el corrector y el aleatorio
+ * Las cifras del acta de arriba (70/32/13/4 con sequía al 50 %) siguen saliendo: el traslado
+ * no movió un número.
+ *
+ * LAS TRES TRAMPAS que se midieron ejecutando el modelo en 4 ecosistemas × 4 perturbaciones ×
+ * 4 intensidades (256 combinaciones nivel-escenario) ANTES de escribir un caso:
+ *   1 · El redondeo esconde el cambio. La app pinta Math.round(población): en 14 de 256 el
+ *       modelo se mueve y la pantalla no (bosque + sequía al 50 %: superdepredadores
+ *       4 → 3,59, que se pinta «4»). La respuesta se evalúa sobre lo VISIBLE, y ningún
+ *       escenario donde modelo y pantalla discrepen puede ser caso ni ejercicio.
+ *   2 · El suelo de población muerde con la caza al 100 % (carnívoros a 5 en los cuatro
+ *       ecosistemas). Solo se usan intensidades 0,5 y 0,7.
+ *   3 · El ecosistema no cambia los PORCENTAJES (poblaciones proporcionales): no hay casos
+ *       que comparen ecosistemas.
+ *
+ * LAS REGLAS DEL MODELO que fija la invariante 7 (derivadas de aplicarEvento, no de la app):
+ *   · el nivel golpeado cambia en impacto × intensidad;
+ *   · HACIA ARRIBA, cada nivel va en la dirección de su presa (se queda sin comida o la gana);
+ *   · HACIA ABAJO, cada nivel va en la dirección CONTRARIA a su depredador (se libera o lo
+ *     cazan más);
+ *   · el cambio relativo se multiplica por 0,7 a cada paso: la cascada se apaga.
+ *
+ * A mano (pradera, caza del depredador al 50 %, cambio = −0,7 × 0,5 = −0,35):
+ *   carnívoros  15 × 0,65                               = 9,75   → «10»  baja
+ *   superdep.   5 × (0,3 + 0,7 × 0,65) = 5 × 0,755     = 3,775  → «4»   baja (presa baja)
+ *   herbívoros  40 × (1 + 0,7 × 0,35)  = 40 × 1,245    = 49,8   → «50»  SUBE (depredador baja)
+ *   productores 100 × (1 − 0,7 × 0,245)                 = 82,85  → «83»  baja (depredador sube)
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import { esperarHidratacion } from './_hidratacion';
+import {
+  CASOS as CASOS_AULA,
+  TOTAL_CASOS as TOTAL_CASOS_AULA,
+  OPCIONES_DIRECCION,
+  resolverCaso,
+  simularEscenario,
+  direccionVisible,
+  escenarioSinTrampaDeRedondeo,
+  comprobarPrediccion,
+  generarEjercicioAleatorio,
+  type PerturbacionCaso,
+  type IndiceNivel,
+} from '../../app/simulador-ecosistema-trofico/casos';
+import { ECOSISTEMAS, EVENTOS } from '../../app/simulador-ecosistema-trofico/motor';
+
+const PERTURBACIONES: readonly PerturbacionCaso[] = ['sequia', 'caza-depredador', 'plaga-herbivoro', 'contaminacion'];
+
+test.describe('simulador-ecosistema-trofico · casos para clase (predicción)', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS_AULA).toBe(12);
+    expect(CASOS_AULA.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS_AULA) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.respuesta).toBe(a.respuesta);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada es la que da EJECUTAR el modelo desde `datos`', async () => {
+    for (const caso of CASOS_AULA) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(r.respuesta, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, opciones cerradas que contienen la respuesta y mecanismo', async () => {
+    for (const caso of CASOS_AULA) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.opciones.length, `caso ${caso.id}`).toBe(3);
+      expect(caso.opciones.map((o) => o.valor), `caso ${caso.id}`).toContain(caso.respuesta);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      // Ningún caso pregunta por el nivel golpeado directamente: ahí no hay nada que predecir.
+      const golpeado = EVENTOS.find((e) => e.id === caso.datos.eventoId)?.nivelAfectado;
+      if (caso.datos.clase === 'direccion') {
+        expect(caso.datos.nivel, `caso ${caso.id}`).not.toBe(golpeado);
+        // Las opciones de dirección, siempre las mismas y en el mismo orden.
+        expect(caso.opciones).toEqual(OPCIONES_DIRECCION);
+      }
+    }
+    // Mezcla de las dos clases de pregunta.
+    const clases = new Set(CASOS_AULA.map((c) => c.datos.clase));
+    expect(clases).toEqual(new Set(['direccion', 'comparacion']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS_AULA) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · la explicación enseña las cifras que el alumno VE, no las del modelo', async () => {
+    // El equivalente, en el tipo C, a «lo que el enunciado pide coincide con lo que la
+    // solución muestra»: la pantalla pinta enteros, así que el mecanismo habla en enteros.
+    for (const caso of CASOS_AULA) {
+      const r = resolverCaso(caso.datos);
+      for (const v of r.despues) expect(Number.isInteger(v), `caso ${caso.id}`).toBe(true);
+      const texto = r.pasos.join(' ');
+      expect(texto, `caso ${caso.id}: un decimal suelto en el mecanismo`).not.toMatch(/\d,\d{3,}/);
+    }
+  });
+
+  test('6 · el aleatorio es reproducible, variado, sin trampa de redondeo y con el mismo motor', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    // En el tipo C casi solo hay dos respuestas posibles (sube / baja), así que la variedad
+    // se mide sobre el ESCENARIO: con una sola semilla, o midiendo respuestas, un generador
+    // degenerado pasaría (simulador-genetica, 14/09/2026).
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    const ternas = new Set(muestras.map((m) => `${m.datos.ecosistemaId}|${m.datos.eventoId}|${m.datos.nivel}`));
+    expect(ternas.size).toBeGreaterThanOrEqual(10);
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBe(2);
+    for (const m of muestras) {
+      expect(resolverCaso(m.datos).respuesta, `semilla ${m.semilla}`).toBe(m.respuesta);
+      expect(
+        escenarioSinTrampaDeRedondeo(m.datos.ecosistemaId, m.datos.eventoId, m.datos.intensidad),
+        `semilla ${m.semilla}`,
+      ).toBe(true);
+    }
+  });
+
+  test('7 · la opción correcta sale de ejecutar el modelo: un caso a mano por mecanismo', async () => {
+    // (a) De ABAJO ARRIBA — sequía al 50 % en la pradera: el acta de arriba, 70/32/13/4.
+    const sequia = simularEscenario('pradera', 'sequia', 0.5);
+    expect(sequia.visibles).toEqual([70, 32, 13, 4]);
+
+    // (b) De ARRIBA ABAJO con alternancia — la cuenta de la cabecera: 83/50/10/4.
+    const caza = simularEscenario('pradera', 'caza-depredador', 0.5);
+    expect(caza.visibles).toEqual([83, 50, 10, 4]);
+    expect(direccionVisible(40, caza.modelo[1])).toBe('sube');
+    expect(direccionVisible(100, caza.modelo[0])).toBe('baja');
+
+    // (c) MIXTO — plaga de herbívoros al 50 % en la sabana: 42 × 1,4 = 58,8 → «59»; arriba
+    // todo sube (más comida) y abajo la vegetación baja: 100 × (1 − 0,7 × 0,4) = 72.
+    const plaga = simularEscenario('sabana', 'plaga-herbivoro', 0.5);
+    expect(plaga.visibles[0]).toBe(72);
+    expect(plaga.visibles[1]).toBe(59);
+    expect(plaga.visibles[2]).toBeGreaterThan(16);
+    expect(plaga.visibles[3]).toBeGreaterThan(6);
+
+    // (d) TRAMPA 1, el caso de origen: bosque + sequía al 50 %, superdepredadores 4 → 3,59.
+    const bosque = simularEscenario('bosque', 'sequia', 0.5);
+    expect(bosque.modelo[3]).toBeCloseTo(3.59, 2);
+    expect(bosque.visibles[3]).toBe(4);
+    expect(direccionVisible(4, bosque.modelo[3])).toBe('no-cambia');
+    expect(escenarioSinTrampaDeRedondeo('bosque', 'sequia', 0.5)).toBe(false);
+
+    // (e) TRAMPA 2: al 100 % el suelo muerde, y esa intensidad no se admite.
+    const alCien = resolverCaso({ clase: 'direccion', ecosistemaId: 'pradera', eventoId: 'caza-depredador', intensidad: 1, nivel: 1 });
+    expect(alCien.ok).toBe(false);
+    expect(alCien.respuesta).toBeNull();
+
+    // (f) Barrido completo de los escenarios válidos: la dirección de cada nivel no golpeado
+    // es la que dictan las reglas de la cabecera, y «no cambia» nunca es la correcta.
+    let comprobados = 0;
+    for (const eco of ECOSISTEMAS) {
+      for (const ev of PERTURBACIONES) {
+        for (const intensidad of [0.5, 0.7]) {
+          if (!escenarioSinTrampaDeRedondeo(eco.id, ev, intensidad)) continue;
+          const evento = EVENTOS.find((e) => e.id === ev)!;
+          const idx = evento.nivelAfectado;
+          const signoGolpe = Math.sign(evento.impacto);
+          for (let nivel = 0; nivel < 4; nivel++) {
+            if (nivel === idx) continue;
+            const r = resolverCaso({ clase: 'direccion', ecosistemaId: eco.id, eventoId: ev, intensidad, nivel: nivel as IndiceNivel });
+            // Arriba: mismo signo que el golpe. Abajo: alterna a cada paso.
+            const esperado = nivel > idx ? signoGolpe : signoGolpe * (-1) ** (idx - nivel);
+            expect(r.respuesta, `${eco.id} · ${ev} · ${intensidad} · nivel ${nivel}`).toBe(esperado > 0 ? 'sube' : 'baja');
+            comprobados++;
+          }
+        }
+      }
+    }
+    // 32 escenarios − 5 descartados por la trampa 1, × 3 niveles no golpeados.
+    expect(comprobados).toBe(27 * 3);
+  });
+
+  test('8 · corregir no lanza nunca, ni sin elección ni con un caso imposible', async () => {
+    expect(comprobarPrediccion('sube', 'sube').correcto).toBe(true);
+    expect(comprobarPrediccion('no-cambia', 'baja').correcto).toBe(false);
+    expect(comprobarPrediccion(null, 'baja').motivo).toBe('vacia');
+    expect(comprobarPrediccion('sube', null).motivo).toBe('no-disponible');
+    const inexistente = resolverCaso({ clase: 'direccion', ecosistemaId: 'marte', eventoId: 'sequia', intensidad: 0.5, nivel: 1 });
+    expect(inexistente.ok).toBe(false);
+    // La contaminación no admite preguntas de MAGNITUD: su descripción promete golpear a los
+    // herbívoros y el modelo solo golpea a los productores.
+    const magnitud = resolverCaso({ clase: 'comparacion', ecosistemaId: 'pradera', eventoId: 'contaminacion', intensidad: 0.7, nivelA: 1, nivelB: 2 });
+    expect(magnitud.ok).toBe(false);
+  });
+});
+
+test.describe('simulador-ecosistema-trofico · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['section[aria-labelledby="aula-titulo"] input[type="radio"]']);
+  });
+
+  test('comprometerse, comprobar y SOLO entonces cargar el escenario en el simulador', async ({ page }) => {
+    // Caso 3: pradera + caza al 50 %, ¿qué les pasa a los herbívoros? → suben (40 → 50).
+    await seccion(page).getByRole('button', { name: /^Caso 3:/ }).click();
+    await expect(seccion(page).getByRole('button', { name: /Cargar en el simulador/ })).toHaveCount(0);
+
+    await seccion(page).getByRole('radio', { name: 'Sube' }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
+    // La elección queda bloqueada: no se puede cambiar la predicción tras ver el veredicto.
+    await expect(seccion(page).getByRole('radio', { name: 'Baja' })).toBeDisabled();
+
+    await seccion(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('50%');
+    const barras = page.locator('[role="meter"]');
+    await expect(barras.nth(1)).toHaveAttribute('aria-valuenow', '50');
+    await expect(barras.nth(0)).toHaveAttribute('aria-valuenow', '83');
+  });
+
+  test('«no cambia» en un nivel no adyacente se corrige como el error típico que es', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 4:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'No cambia' }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('No. Predijiste');
+  });
+});

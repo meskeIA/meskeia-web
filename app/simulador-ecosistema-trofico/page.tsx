@@ -1,147 +1,16 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import styles from './SimuladorEcosistemaTrofico.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
-
-// ============================================
-// TIPOS
-// ============================================
-interface NivelTrofico {
-  nombre: string;
-  emoji: string;
-  ejemplos: string;
-  poblacion: number;
-  energiaPorcentaje: number;
-}
-
-interface Ecosistema {
-  id: string;
-  nombre: string;
-  emoji: string;
-  niveles: [NivelTrofico, NivelTrofico, NivelTrofico, NivelTrofico];
-}
-
-type TipoEvento = 'ninguno' | 'sequia' | 'caza-depredador' | 'plaga-herbivoro' | 'contaminacion';
-
-interface Evento {
-  id: TipoEvento;
-  nombre: string;
-  descripcion: string;
-  nivelAfectado: 0 | 1 | 2 | 3;
-  impacto: number;
-}
-
-// ============================================
-// DATOS DE ECOSISTEMAS
-// ============================================
-const ECOSISTEMAS: Ecosistema[] = [
-  {
-    id: 'pradera',
-    nombre: 'Pradera',
-    emoji: '🌾',
-    niveles: [
-      { nombre: 'Productores', emoji: '🌿', ejemplos: 'Gramíneas, hierbas', poblacion: 100, energiaPorcentaje: 100 },
-      { nombre: 'Herbívoros', emoji: '🐇', ejemplos: 'Conejos, ratones, insectos', poblacion: 40, energiaPorcentaje: 10 },
-      { nombre: 'Carnívoros', emoji: '🦊', ejemplos: 'Zorros, serpientes', poblacion: 15, energiaPorcentaje: 1 },
-      { nombre: 'Superdepredadores', emoji: '🦅', ejemplos: 'Águilas, halcones', poblacion: 5, energiaPorcentaje: 0.1 },
-    ],
-  },
-  {
-    id: 'bosque',
-    nombre: 'Bosque Templado',
-    emoji: '🌲',
-    niveles: [
-      { nombre: 'Productores', emoji: '🌳', ejemplos: 'Robles, hayas, arbustos', poblacion: 100, energiaPorcentaje: 100 },
-      { nombre: 'Herbívoros', emoji: '🦌', ejemplos: 'Ciervos, jabatos, orugas', poblacion: 35, energiaPorcentaje: 10 },
-      { nombre: 'Carnívoros', emoji: '🐺', ejemplos: 'Lobos, linces, búhos', poblacion: 12, energiaPorcentaje: 1 },
-      { nombre: 'Superdepredadores', emoji: '🐻', ejemplos: 'Osos, águilas reales', poblacion: 4, energiaPorcentaje: 0.1 },
-    ],
-  },
-  {
-    id: 'oceano',
-    nombre: 'Océano',
-    emoji: '🌊',
-    niveles: [
-      { nombre: 'Productores', emoji: '🦠', ejemplos: 'Fitoplancton, algas', poblacion: 100, energiaPorcentaje: 100 },
-      { nombre: 'Herbívoros', emoji: '🦐', ejemplos: 'Zooplancton, gambas, sardinas', poblacion: 38, energiaPorcentaje: 10 },
-      { nombre: 'Carnívoros', emoji: '🐟', ejemplos: 'Peces medianos, calamares', poblacion: 14, energiaPorcentaje: 1 },
-      { nombre: 'Superdepredadores', emoji: '🦈', ejemplos: 'Tiburones, atunes, delfines', poblacion: 5, energiaPorcentaje: 0.1 },
-    ],
-  },
-  {
-    id: 'sabana',
-    nombre: 'Sabana',
-    emoji: '🌅',
-    niveles: [
-      { nombre: 'Productores', emoji: '🌾', ejemplos: 'Acacia, gramíneas tropicales', poblacion: 100, energiaPorcentaje: 100 },
-      { nombre: 'Herbívoros', emoji: '🦓', ejemplos: 'Cebras, ñus, jirafas', poblacion: 42, energiaPorcentaje: 10 },
-      { nombre: 'Carnívoros', emoji: '🐆', ejemplos: 'Guepardos, leopardos, hienas', poblacion: 16, energiaPorcentaje: 1 },
-      { nombre: 'Superdepredadores', emoji: '🦁', ejemplos: 'Leones, cocodrilos', poblacion: 6, energiaPorcentaje: 0.1 },
-    ],
-  },
-];
-
-// ============================================
-// EVENTOS PERTURBADORES
-// ============================================
-const EVENTOS: Evento[] = [
-  { id: 'ninguno', nombre: 'Sin perturbación', descripcion: 'Ecosistema en equilibrio', nivelAfectado: 0, impacto: 0 },
-  { id: 'sequia', nombre: 'Sequía', descripcion: 'La falta de lluvia reduce drásticamente los productores', nivelAfectado: 0, impacto: -0.6 },
-  { id: 'caza-depredador', nombre: 'Caza excesiva del depredador', descripcion: 'La caza ilegal reduce la población de carnívoros', nivelAfectado: 2, impacto: -0.7 },
-  { id: 'plaga-herbivoro', nombre: 'Plaga de herbívoros', descripcion: 'Una plaga hace crecer los herbívoros sin control', nivelAfectado: 1, impacto: 0.8 },
-  { id: 'contaminacion', nombre: 'Contaminación del agua', descripcion: 'Pesticidas diezman a los productores y herbívoros', nivelAfectado: 0, impacto: -0.5 },
-];
-
-// ============================================
-// MODELO DE CASCADA TRÓFICA
-// ============================================
-function aplicarEvento(
-  niveles: NivelTrofico[],
-  evento: Evento,
-  intensidad: number
-): NivelTrofico[] {
-  const result = niveles.map(n => ({ ...n }));
-
-  if (evento.id === 'ninguno') return result;
-
-  const idx = evento.nivelAfectado;
-  const cambio = evento.impacto * intensidad;
-
-  // Afectar el nivel directamente
-  result[idx] = {
-    ...result[idx],
-    poblacion: Math.max(5, Math.min(100, niveles[idx].poblacion * (1 + cambio))),
-  };
-
-  // Efecto en cascada hacia arriba (depredadores): quedarse sin presa arrastra al depredador
-  for (let i = idx + 1; i < result.length; i++) {
-    const factorPresa = result[i - 1].poblacion / niveles[i - 1].poblacion;
-    result[i] = {
-      ...result[i],
-      poblacion: Math.max(2, Math.min(100, niveles[i].poblacion * (1 - ATENUACION + ATENUACION * factorPresa))),
-    };
-  }
-
-  // Efecto en cascada hacia abajo (presas): perder depredador libera a la presa
-  for (let i = idx - 1; i >= 0; i--) {
-    const factorDepred = result[i + 1].poblacion / niveles[i + 1].poblacion;
-    // Con la MISMA atenuación que hacia arriba. Antes era `2 − factorDepred`, que traslada el
-    // cambio con magnitud idéntica: un −50 % en el depredador daba un +50 % en la presa,
-    // mientras el paso 3 del bloque educativo prometía «un cambio menor, del orden del
-    // 20-30 %, en los niveles adyacentes» (hallazgo 324). La asimetría no tenía ninguna
-    // justificación biológica: era la de arriba la que atenuaba y la de abajo la que no.
-    result[i] = {
-      ...result[i],
-      poblacion: Math.max(5, Math.min(100, niveles[i].poblacion * (1 + ATENUACION * (1 - factorDepred)))),
-    };
-  }
-
-  return result;
-}
+// El modelo de la cascada (tipos, ecosistemas, eventos, ATENUACION y aplicarEvento) vive en
+// `motor.ts` desde el 23/09/2026: lo comparten el simulador y los casos para clase, y una
+// sola implementación es lo que impide que la app suspenda una respuesta que ella misma pinta.
+import { ECOSISTEMAS, EVENTOS, aplicarEvento, type Evento, type NivelTrofico, type TipoEvento } from './motor';
+import CasosAula from './CasosAula';
 
 // ============================================
 // TEXTO DINÁMICO DE EXPLICACIÓN
@@ -190,14 +59,6 @@ function generarExplicacion(
 // ============================================
 const COLORES_NIVEL = ['#3a7d44', '#d4a017', '#d4621c', '#c0392b'];
 
-/**
- * Cuánto del cambio de un nivel llega al de al lado.
- *
- * Es lo que hace que una cascada trófica se vaya apagando en vez de propagarse intacta, y va
- * en LOS DOS SENTIDOS: hasta el 25/08/2026 la cascada hacia arriba atenuaba con este mismo
- * 0,7 y la de abajo no atenuaba nada, sin ninguna razón biológica detrás.
- */
-const ATENUACION = 0.7;
 const NOMBRES_CLASE_NIVEL = [
   styles.nivelProductor,
   styles.nivelHerbivoro,
@@ -241,6 +102,28 @@ export default function SimuladorEcosistemaTroficoPage() {
     setIntensidad(0.5);
   };
 
+  /**
+   * «Cargar en el simulador» de los casos para clase: pone el ecosistema, la perturbación y
+   * la intensidad del caso con los MISMOS tres setters que usan los controles, y sube la vista
+   * hasta ellos para que el alumno vea la cascada que acaba de predecir.
+   */
+  const refControles = useRef<HTMLDivElement>(null);
+  const cargarCasoEnSimulador = useCallback(
+    (idEcosistema: string, idEvento: TipoEvento, intensidadCaso: number) => {
+      setEcosistemaId(idEcosistema);
+      setEventoId(idEvento);
+      setIntensidad(intensidadCaso);
+      const reducirMovimiento =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      refControles.current?.scrollIntoView({
+        behavior: reducirMovimiento ? 'auto' : 'smooth',
+        block: 'center',
+      });
+    },
+    []
+  );
+
   return (
     <div className={styles.container}>
         <MeskeiaLogo />
@@ -256,7 +139,7 @@ export default function SimuladorEcosistemaTroficoPage() {
         <LegalNotice />
 
         {/* SELECTOR DE ECOSISTEMA */}
-        <div className={styles.ecosistemaSelector} role="group" aria-label="Seleccionar ecosistema">
+        <div ref={refControles} className={styles.ecosistemaSelector} role="group" aria-label="Seleccionar ecosistema">
           {ECOSISTEMAS.map(eco => (
             <button
               type="button"
@@ -439,6 +322,9 @@ export default function SimuladorEcosistemaTroficoPage() {
             <span aria-hidden="true">🔄</span> Restablecer equilibrio
           </button>
         </div>
+
+        {/* CASOS PARA CLASE — predicción antes de mover (el cálculo vive en casos.ts) */}
+        <CasosAula onCargarEnSimulador={cargarCasoEnSimulador} />
 
         {/* BLOQUE EDUCATIVO v2.0 */}
         <EducationalSection
