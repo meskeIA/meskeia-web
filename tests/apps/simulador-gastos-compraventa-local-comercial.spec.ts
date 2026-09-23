@@ -2078,3 +2078,33 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Valencia, la ganancia en cero y el 
     expect(await casilla.innerText()).toBe('21%');
   });
 });
+
+/**
+ * Reparación del 23/09/2026 — hueco A3 del testigo de familia (`tests/familias/compraventa.spec.ts`).
+ *
+ * Con un porcentaje de comisión ilegible («3.5.0»), el neto ya avisaba de que faltaba
+ * descontarla, pero su propia tarjeta publicaba «0,00 €»: un cero falso al lado de un aviso
+ * que decía lo contrario. Garaje y trastero la esconden; aquí se pinta «Sin leer», como la
+ * gestoría del comprador de esta misma app. El testigo de familia no lo ve porque mide la
+ * cifra FINAL de cada panel, no las tarjetas del desglose.
+ *
+ *   precio 400.000 · comisión 3 % → 400.000 × 3 % = 12.000,00 € (control)
+ */
+test.describe('Reparación 23/09/2026 — la tarjeta de una comisión ilegible', () => {
+  test('[A3] una comisión ilegible dice «Sin leer» y no publica «0,00 €»', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_12_09);
+    await sembrarImporte12(page, 'Precio del local comercial', '400000');
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+
+    // Control: legible, publica el importe.
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3');
+    expect(await valorTarjeta(page, /^Comisión de la inmobiliaria$/)).toBe('12.000,00 €');
+
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
+    expect(await valorTarjeta(page, /^Comisión de la inmobiliaria$/)).toBe('Sin leer');
+    expect(await descripcionTarjeta(page, /^Comisión de la inmobiliaria$/)).toContain(
+      'no se ha podido leer',
+    );
+  });
+});

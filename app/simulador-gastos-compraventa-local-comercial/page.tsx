@@ -1236,11 +1236,23 @@ export default function SimuladorLocalComercialPage() {
                     }
                   />
 
+                  {/* Un porcentaje ilegible valía 0 y la tarjeta publicaba «0,00 €», un cero
+                      falso al lado de un neto que ya avisaba de lo contrario (hueco A3). Se
+                      pinta «Sin leer», como la gestoría del comprador de esta misma app. */}
                   <ResultCard
                     title="Comisión de la inmobiliaria"
-                    value={formatCurrency(resultadosVendedor.comisionInmobiliaria)}
+                    value={
+                      resultadosVendedor.comisionLegible
+                        ? formatCurrency(resultadosVendedor.comisionInmobiliaria)
+                        : 'Sin leer'
+                    }
                     variant="default"
                     icon="🤝"
+                    description={
+                      resultadosVendedor.comisionLegible
+                        ? undefined
+                        : 'El porcentaje escrito no se ha podido leer, así que NO está descontado del neto. Escríbelo con coma decimal (3,5).'
+                    }
                   />
 
                   <div className={styles.separador} />
