@@ -396,7 +396,8 @@
 
 .savingLabel {
   font-size: 0.9rem;
-  color: var(--text-muted);
+  /* --text-secondary: sobre el gradiente al 15 % del tema oscuro, muted daba 4,35:1 */
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
