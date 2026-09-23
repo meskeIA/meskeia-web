@@ -460,7 +460,11 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '500');
       await irAPestana(page, 'vendedor');
       await page.getByRole('button', { name: /Local afecto a actividad/ }).click();
-      await sembrar(page, 'Precio de compra original', base === 'R' ? '195000' : '150000');
+      await sembrar(
+        page,
+        'Precio de compra original',
+        base === 'R' ? '195000' : base === 'P' ? '250000' : '150000',
+      );
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '15000');
       await sembrar(page, 'Amortizaciones acumuladas deducidas (€)', '20000');
       await sembrar(page, 'Años de propiedad', '10');
@@ -508,6 +512,27 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'sube',
         delta: 4200,
         nombra: /amortizaciones/i,
+      },
+      {
+        // BASE P (compra original 250.000 > venta 200.000): PÉRDIDA de 51.500,00 €, sin IRPF.
+        // Los gastos de aquella compra no mueven el neto, y el aviso no puede prometer uno
+        // MAYOR (la guarda de A1); la pérdida, que sí se mueve, la vigila el spec (1259).
+        etiqueta: 'Impuestos y gastos que pagaste al comprarlo (€)',
+        panel: 'vendedor',
+        legible: '15000',
+        base: 'P',
+        direccion: 'sin_efecto',
+        delta: 0,
+      },
+      {
+        // Y las amortizaciones: solo habría IRPF si superasen la pérdida, así que el aviso no
+        // puede afirmar «el neto real será menor» (hallazgo 1258); «puede ser menor», sí.
+        etiqueta: 'Amortizaciones acumuladas deducidas (€)',
+        panel: 'vendedor',
+        legible: '20000',
+        base: 'P',
+        direccion: 'sin_efecto',
+        delta: 0,
       },
       {
         etiqueta: 'Años de propiedad',

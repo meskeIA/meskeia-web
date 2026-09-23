@@ -2145,14 +2145,11 @@ test.describe('Reparación 23/09/2026 — la tarjeta de una comisión ilegible',
 //     23 % hasta 200.000 · 27 % hasta 300.000 · 30 % el resto) sobre la fórmula del art. 35
 //     LIRPF y el art. 40 RIRPF de `data/fiscal/ganancia-inmueble.ts`.
 //
-// Los hallazgos van con `test.fail()`: afirman lo que DEBERÍA pasar. Con
-//     VER_HUECOS=1 npx playwright test tests/apps/simulador-gastos-compraventa-local-comercial.spec.ts
-// se quitan las marcas y la salida enseña, en cada uno, la aserción que cae (la convención del
-// testigo de familia). Todas las aserciones previas a la del defecto son cifras que la
-// reparación no puede mover; si una cayera, el caso fallaría por la preparación.
+// Los hallazgos (1257-1266) se repararon el 23/09/2026 y sus casos quedan como regresión, sin
+// `test.fail()`. Todas las aserciones previas a la del defecto son cifras que la reparación no
+// podía mover; si una cayera, el caso fallaría por la preparación.
 // ═════════════════════════════════════════════════════════════════════════════
 
-const VER_HUECOS_2309 = Boolean(process.env.VER_HUECOS);
 const ILEGIBLE_2309 = '2.000.50';
 
 /** Título y descripción de la tarjeta del neto, que es donde tiene que estar el aviso. */
@@ -2495,7 +2492,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   //     IRPF 38.865,50 y «NETO QUE RECIBES 134.984,50 €» sin una palabra.
   // ══════════════════════════════════════════════════════════════════════════
   test('CASO 28 (rechazo) — unas amortizaciones mayores que el precio de compra y sus gastos no se liquidan en silencio', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     expect(ITP_CCAA.navarra.tipoGeneral).toBe(6);
     expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 8)?.coeficiente).toBe(0.1);
 
@@ -2520,9 +2516,36 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
     // El dato imposible: el neto tiene que nombrarlo, no publicarse limpio.
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '150000');
     expect(await avisoNeto2309(page)).toMatch(/amortizaci/i);
+    // …y no liquidar con él (hallazgo 1261): ni cuota, ni neto definitivo, ni tarjetas que
+    // desaparezcan justo cuando hay que explicar el dato.
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/superan todo el coste de adquisición \(129\.000,00 €\)/);
+    expect(await page.locator('h3', { hasText: /^NETO QUE RECIBES/ }).first().innerText()).toContain('(PARCIAL)');
+    expect(await avisoNeto2309(page)).toMatch(/revisa las amortizaciones deducidas/i);
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('0,00 €');
+    await expect(page.locator('h3', { hasText: 'Valor de transmisión' })).toHaveCount(1);
+    // Con las amortizaciones iguales al coste (129.000) el dato ya es posible y se liquida.
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '129000');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).not.toBe('Sin calcular');
+    await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(1);
   });
 
-  // ─── HALLAZGOS ABIERTOS 23/09/2026 — con `test.fail()`: afirman lo que DEBERÍA pasar ────
+  // HALLAZGO 1266 — la ayuda de «Años de propiedad» sale de COEFICIENTES_IIVTNU_2025: el tope
+  // de años y la comparación del coeficiente de la reventa antes del año no van a mano.
+  test('la ayuda de los años de propiedad se deriva de la tabla de coeficientes del IIVTNU', async ({ page }) => {
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    const tope = Math.max(...COEFICIENTES_IIVTNU_2025.map((c) => c.anios));
+    const c0 = COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)!.coeficiente;
+    const c1 = COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 1)!.coeficiente;
+    const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const ayuda = page.getByText(/Años completos desde la compra/);
+    await expect(ayuda).toContainText(`cuenta como máximo ${tope}`);
+    await expect(ayuda).toContainText(`con un coeficiente de ${fmt(c0)}`);
+    if (c0 > c1) await expect(ayuda).toContainText(`mayor que el ${fmt(c1)} del primer año`);
+  });
+
+  // ─── HALLAZGOS 1257-1266 del 23/09/2026 — REPARADOS el mismo día ──────────────────────
+  //   La dirección de cada aviso sale ahora de SONDEAR el cálculo (lib/sondeoIlegibles.ts).
 
   /**
    * ❌ ABIERTO (operativa, medio) — DOS ilegibles en sentidos opuestos: el aviso del NETO
@@ -2541,7 +2564,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    * El real es 1.216,00 € MENOR, y la segunda frase dice «el neto real es MAYOR que este».
    */
   test('dos ilegibles opuestos (comisión y gastos de aquella compra): el neto no afirma que el real es MAYOR cuando es menor', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', ILEGIBLE_2309);
@@ -2563,7 +2585,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    * «…el neto real será menor. …así que el neto real es MAYOR que este».
    */
   test('dos ilegibles opuestos (gastos de aquella compra y amortizaciones): el neto dice lo mismo que la tarjeta del IRPF, no las dos direcciones', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', ILEGIBLE_2309);
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', ILEGIBLE_2309);
@@ -2591,7 +2612,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    *   amortizaciones «2.000.50» → adquisición 260.000 → pérdida                    66.500,00
    */
   test('con pérdida, unas amortizaciones ilegibles no hacen decir al neto que el real será menor', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page, '250000');
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '10000');
     expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('46.500,00 €');
@@ -2616,7 +2636,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    *   amortizaciones «2.000.50» → adquisición 260.000 → pérdida 66.500,00 (real 46.500,00)
    */
   test('con pérdida, los gastos de aquella compra ilegibles: la pérdida dice que no se han podido leer', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page, '250000');
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', ILEGIBLE_2309);
 
@@ -2628,7 +2647,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   test('con pérdida, las amortizaciones ilegibles: la pérdida dice que no se han podido leer', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page, '250000');
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '10000');
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', ILEGIBLE_2309);
@@ -2653,7 +2671,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    *   IRPF = 1.140 + 9.240 + 3.700 × 23 % = 11.231,00 (real 9.897,00: +1.334,00 €)
    */
   test('con la comisión ilegible, la tarjeta del IRPF dice que es un techo', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
 
@@ -2662,7 +2679,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   test('con la comisión ilegible, «Valor de transmisión» no afirma que la ha restado', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
 
@@ -2683,7 +2699,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    * 23 %): 6.000 × (1 − 23 %) = 4.620 ≤ 4.666 ≤ 6.000.
    */
   test('C3 en la hermana — «No descuenta la comisión» dice que no entera, porque rebaja también el IRPF', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
 
@@ -2702,7 +2717,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    * familia mide el delta (0,00 €) pero no que el aviso calle.
    */
   test('total ilegible con el método objetivo ganando: el neto no cambia y no puede afirmar que el real es MAYOR', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '100.000.00');
 
@@ -2725,7 +2739,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    *   precio de venta», sin más.
    */
   test('con los gastos de aquella compra ilegibles, el total de la venta no se publica como definitivo', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', ILEGIBLE_2309);
 
@@ -2745,7 +2758,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
    * de compra («Falta el precio de compra original») y los años («faltan los años»).
    */
   test('un precio escrito pero ilegible no se anuncia como que falta', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await sembrarImporte12(page, 'Precio del local comercial', '200.000.00');
     await expect(page.locator('input[aria-label="Precio del local comercial"]')).toHaveValue('200.000.00');
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
@@ -2755,7 +2767,6 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   test('un valor catastral del suelo escrito pero ilegible no se anuncia como que falta', async ({ page }) => {
-    if (!VER_HUECOS_2309) test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Valor catastral del suelo (€)', '40.000.00');
 
