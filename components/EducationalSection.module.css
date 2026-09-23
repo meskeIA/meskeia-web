@@ -97,8 +97,11 @@
 }
 
 /* Dark Mode Support */
+/* #303030 y no var(--hover): esta caja es una superficie de lectura, no una píldora,
+   y --text-muted (#9B9B9B) daba 4,22:1 sobre el #383838 de globals y 4,55 sobre el
+   #333333 que 398 módulos declaran. Con #303030, 4,75 en todas las apps a la vez. */
 [data-theme='dark'] .container {
-  background: var(--hover);
+  background: #303030;
   border-color: var(--border);
 }
 
