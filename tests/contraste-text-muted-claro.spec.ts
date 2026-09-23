@@ -52,6 +52,10 @@ const RUTAS = [
   { ruta: '/visualizador-fuerzas-invisibles/', que: 'caja de fórmula con el color de la fuerza al 10 %' },
   // 16 <details>: `desplegarTodo` la colgaba hasta el timeout (ver su comentario)
   { ruta: '/calculadora-huella-carbono/', que: '16 <details> que abrir' },
+  // Remedición del 23/09/2026 con el medidor corregido, sobre 170 rutas
+  { ruta: '/calculadora-frigorias-btu/', que: 'opción marcada y resultado destacado, 4,41:1' },
+  { ruta: '/visualizador-cadena-alimentaria/', que: 'etapa activa con gradiente de marca, 4,46:1' },
+  { ruta: '/visualizador-tipos-interes-bce/', que: 'contexto sobre el badge de política, 4,45:1' },
 ] as const;
 
 /**

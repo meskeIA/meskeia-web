@@ -35,6 +35,26 @@ const RUTAS = [
   // Tapados hasta el 23/09/2026 por el medidor, que oscurecía los gradientes translúcidos
   { ruta: '/planificador-vacaciones-autonomo/', que: 'gradiente al 15 % bajo «al mes»' },
   { ruta: '/visualizador-fuerzas-invisibles/', que: 'caja de fórmula con el color de la fuerza al 10 %' },
+  // Remedición del 23/09/2026 con el medidor corregido, sobre 170 rutas
+  // · el drenaje del claro (dd66add0) dejó el token sin valor oscuro: #6E6E6E en oscuro
+  { ruta: '/calculadora-z-score-altman/', que: 'bloque oscuro sin --text-muted, 2,81:1' },
+  { ruta: '/calculadora-amortizacion-inmovilizado/', que: 'bloque oscuro sin --text-muted, 2,48:1' },
+  { ruta: '/calculadora-valoracion-empresa/', que: 'bloque oscuro sin --text-muted, 2,81:1' },
+  { ruta: '/simulador-financiacion-empresarial/', que: 'bloque oscuro sin --text-muted, 2,81:1' },
+  // · la caja de <EducationalSection> pintaba --hover: #383838 heredado de globals, 4,22:1
+  { ruta: '/guia-aceite-oliva/', que: 'caption de tabla en la guía educativa' },
+  { ruta: '/guia-te/', que: 'caption de tabla en la guía educativa' },
+  { ruta: '/orientador-discapacidad/', que: 'nota de tabla en la guía educativa' },
+  { ruta: '/visualizador-oceanos-corrientes/', que: 'caption y fuentes en la guía educativa' },
+  // · cajas propias con tinte de marca, --hover o color de widget
+  { ruta: '/asistente-alta-autonomo/', que: 'cabecera de fase sobre --hover y sobre gradiente al 10 %' },
+  { ruta: '/checklist-preparar-verifactu/', que: 'badge «Sin empezar» con gris al 12 %' },
+  { ruta: '/calculadora-fov-video/', que: 'sensor activo con tinte de marca' },
+  { ruta: '/calculadora-frigorias-btu/', que: 'opción marcada y resultado destacado, 3,89:1' },
+  { ruta: '/enchufes-por-pais/', que: 'consejo con tinte de marca' },
+  { ruta: '/visualizador-desigualdad-riqueza/', que: 'tarjetas de brecha con tinte de marca' },
+  { ruta: '/visualizador-fotosintesis/', que: 'fórmula sobre el color de la molécula, 3,50:1' },
+  { ruta: '/visualizador-respiracion-celular/', que: 'fórmula sobre el color de la molécula, 3,50:1' },
 ] as const;
 
 /**
