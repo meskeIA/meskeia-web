@@ -205,7 +205,8 @@
 
 .badgePendiente {
   background: rgba(153, 153, 153, 0.12);
-  color: var(--text-muted);
+  /* --text-secondary: sobre el gris al 12 % muted daba 4,22:1 en oscuro */
+  color: var(--text-secondary);
 }
 
 /* Chevron */
