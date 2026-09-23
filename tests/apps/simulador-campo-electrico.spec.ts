@@ -14,7 +14,9 @@ import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
  * correcto no garantiza.
  *
  * DÓNDE VIVE EL CÁLCULO
- *   app/simulador-campo-electrico/page.tsx  (no hay motor.ts; todo está en el componente)
+ *   app/simulador-campo-electrico/motor.ts  (desde el 23/09/2026; en las dos inspecciones
+ *     todo estaba en page.tsx y se MOVIÓ sin cambiar una operación). La vista, sufijoNotacion
+ *     y el dibujo del lienzo siguen en page.tsx.
  *     · K_COULOMB = 8.99e9 N·m²/C²   ·   NC_TO_C = 1e-9   (las cargas se meten en nC)
  *     · calcularCampoEnPunto(x, y, cargas) → { Ex, Ey, V, singular }
  *         para cada carga:  dx = x − c.x ; dy = y − c.y ; r² = dx² + dy²
