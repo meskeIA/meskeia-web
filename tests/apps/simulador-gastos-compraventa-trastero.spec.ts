@@ -4083,3 +4083,543 @@ test('REGRESIÓN 22/09 (contenido) — el aviso del neto llama SUELO a lo que es
     'Lo que realmente recibes tras los gastos',
   );
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha, el IRPF al 30 % y los
+// efectos colaterales de la reparación del importe ilegible
+//
+// Posterior a cfe091a7 (el ilegible se nombra en las siete apps y el aviso dice en qué
+// dirección falta) y a 758e053f (el valor catastral total ilegible, hueco C1). Esta app es la
+// de ORIGEN del defecto (ae1358d6, hallazgo 1157). El testigo de familia
+// (`tests/familias/compraventa.spec.ts`, 52/52) ya mide campo a campo la CIFRA FINAL de cada
+// panel; aquí se mira lo que ese testigo no puede ver: las tarjetas INTERMEDIAS, los casos en
+// que el aviso sale sin que el neto se mueva, y dos ilegibles a la vez con direcciones
+// opuestas.
+//
+// Territorio nuevo: ANDALUCÍA y CASTILLA-LA MANCHA, las dos únicas comunidades que ninguna
+// ronda de este fichero había elegido. Y dos escalas en su último escalón, que ningún caso
+// había pisado: la base del ahorro por encima de 300.000 € (el 30 %) y el coeficiente del
+// IIVTNU de «20 o más años» (0,45) frente al de 19 (0,36).
+//
+// De dónde sale CADA cifra esperada (ninguna de memoria):
+//  - ITP general: Andalucía 7 % y Castilla-La Mancha 9 % → `TIPOS_ITP_CCAA_2025`
+//    (`data/fiscal/inmuebles.ts`), leído por `tipoGeneralDe()` en `data/itp-ccaa.ts`. Ninguna
+//    de las dos tiene `tramosProgresivos`: el tipo es plano.
+//  - Tipos reducidos que se ofrecen o no → `ITP_CCAA[…].tiposReducidos` + `elegirTipoITP`
+//    con `viviendaHabitual: false`.
+//  - Notaría → `ARANCELES_NOTARIO` × 1,21 (IVA) × `FACTURA_NOTARIAL` (1,5 · 1,75 · 2).
+//  - Registro → `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS` (6,010121 + 3,005061) × 1,21.
+//  - Plusvalía → `COEFICIENTES_IIVTNU_2025` (6 años 0,16 · 7 años 0,12 · 19 años 0,36 ·
+//    20 años 0,45) × `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` (25 %), y el método real
+//    (art. 107.5 TRLHL) con la proporción suelo/total de `calcularPlusvaliaMunicipal`.
+//  - Ganancia e IRPF → `calcularGananciaInmueble` (art. 35 LIRPF) sobre
+//    `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000 · 23 % hasta
+//    200.000 · 27 % hasta 300.000 · 30 % el resto).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Con `VER_HUECOS=1` los hallazgos abiertos dejan de estar marcados y enseñan su fallo. */
+const VER_HUECOS_23_09 = Boolean(process.env.VER_HUECOS);
+
+/** El texto del marcador de posición del panel activo (cuando no hay resultados). */
+const textoMarcador = (page: Page) => page.locator('[class*="placeholder"] p').first();
+
+/**
+ * El recuadro «Podrías pagar menos…» de los tipos reducidos que no se pueden comprobar. Por su
+ * `role="note"` y su título: la clase `avisoReducidos` es prefijo de las de sus hijos.
+ */
+const avisoReducidos = (page: Page) =>
+  page.locator('[role="note"]', { hasText: 'Podrías pagar menos' });
+
+test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el IRPF al 30 %', () => {
+  /**
+   * CASO 38 (NORMAL) — Andalucía, segunda mano, 21.500 €, FAMILIA NUMEROSA, y su venta.
+   *
+   * COMPRADOR, resuelto a mano:
+   *   ITP = 21.500 × 7 % = 1.505,00 (tipo general; el 3,5 % de familia numerosa exige
+   *     «Vivienda habitual», que un trastero suelto no es → se OFRECE, no se aplica)
+   *   notaría: arancel = 90,15 + (21.500 − 6.010,12) × 0,45 % = 90,15 + 69,70446 = 159,85446
+   *     × 1,21 = 193,42390 → factura ×1,5 = 290,1358 · ×1,75 = 338,4918 · ×2 = 386,8478
+   *     → 338,49 (entre 290,14 y 386,85)
+   *   registro: 24,04 + 15.489,88 × 0,175 % = 51,14729 + 9,015182 = 60,162472 × 1,21
+   *     = 72,79659 → 72,80
+   *   gestoría 300,00 (la del campo por defecto)
+   *   total = 1.505,00 + 338,49 + 72,80 + 300,00 = 2.216,29 (10,3083… % → 10,31 %)
+   *   coste = 21.500 + 2.216,29 = 23.716,29
+   *
+   * VENDEDOR — compra 12.000 · gastos de aquella compra 1.100 · 7 años · suelo 6.000 de
+   * 14.000 · comisión 4 % · gestoría del vendedor 250:
+   *   plusvalía objetivo = 6.000 × 0,12 × 25 % = 180,00
+   *   plusvalía real = (21.500 − 12.000) × 6.000/14.000 × 25 % = 1.017,86 → gana el objetivo
+   *   comisión = 21.500 × 4 % = 860,00
+   *   transmisión = 21.500 − 860 − 250 − 180 = 20.210,00 · adquisición = 13.100,00
+   *   ganancia = 7.110,00 → IRPF = 6.000 × 19 % + 1.110 × 21 % = 1.140 + 233,10 = 1.373,10
+   *   total = 180 + 860 + 250 + 1.373,10 = 2.663,10 · neto = 21.500 − 2.663,10 = 18.836,90
+   */
+  test('CASO 38 (normal) — Andalucía, segunda mano, 21.500 €, familia numerosa', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await selectCcaa(page).selectOption('andalucia');
+    await selectPerfil(page).selectOption('familia-numerosa');
+    await sembrar(page, 'Precio del trastero', '21500');
+
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('1505,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveText('ITP (7,00%)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('338,49 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 290,14 € y 386,85 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('72,80 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2216,29 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('10,31% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('23.716,29 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio del trastero + todos los gastos');
+
+    // El 3,5 % de familia numerosa se ENSEÑA con su requisito de vivienda habitual, pero no
+    // se cobra: 21.500 × 3,5 % serían 752,50 €, y la tarjeta dice 1.505,00 €.
+    const reducidos = (await avisoReducidos(page).innerText()).replace(ESPACIO_DURO, ' ');
+    expect(reducidos).toContain('3,50% — Familia numerosa');
+    expect(reducidos).toContain('Vivienda habitual');
+
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '12000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1100');
+    await sembrar(page, 'Años de propiedad', '7');
+    await sembrar(page, 'Valor catastral del suelo', '6000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '14000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '4');
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '250');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('180,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('13.100,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('20.210,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7110,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1373,10 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4%)')).toBe('860,00 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('250,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2663,10 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.836,90 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras los gastos',
+    );
+  });
+
+  /**
+   * CASO 39 (LÍMITE) — Castilla-La Mancha, 360.000 €: la base del ahorro en su ÚLTIMO tramo
+   * (30 %) y el coeficiente del IIVTNU en la raya de los 20 años.
+   *
+   * COMPRADOR, perfil general, resuelto a mano:
+   *   ITP = 360.000 × 9 % = 32.400,00 (sin escala en esta comunidad)
+   *   notaría: 90,15 + 24.040,49 × 0,45 % (108,182205) + 30.050,60 × 0,15 % (45,0759)
+   *     + 90.151,82 × 0,10 % (90,15182) + 209.746,97 × 0,05 % (104,873485) = 438,43341
+   *     × 1,21 = 530,50443 → ×1,5 = 795,7566 · ×1,75 = 928,3827 · ×2 = 1.061,0089
+   *   registro: 24,04 + 24.040,49 × 0,175 % (42,0708575) + 30.050,60 × 0,125 % (37,56325)
+   *     + 90.151,82 × 0,075 % (67,613865) + 209.746,97 × 0,03 % (62,924091) = 234,2120635
+   *     + 9,015182 = 243,2272455 × 1,21 = 294,30497 → 294,30
+   *   total = 32.400 + 928,38 + 294,30 + 300 = 33.922,68 (9,4230 % → 9,42 %)
+   *   coste = 393.922,68
+   *   El reducido «Vivienda habitual (primera compra)» (6 %) NO puede ofrecerse: exige
+   *   primera vivienda (hallazgos 1154/1155) y su tope es 180.000 €.
+   *
+   * VENDEDOR — compra 40.000 · sin gastos de aquella compra · 20 años · suelo 10.000 · total
+   * vacío · comisión 0 · sin gestoría:
+   *   plusvalía = 10.000 × 0,45 × 25 % = 1.125,00 (sin total no hay método real)
+   *   transmisión = 360.000 − 1.125 = 358.875,00 · ganancia = 358.875 − 40.000 = 318.875,00
+   *   IRPF = 6.000 × 19 % (1.140) + 44.000 × 21 % (9.240) + 150.000 × 23 % (34.500)
+   *        + 100.000 × 27 % (27.000) + 18.875 × 30 % (5.662,50) = 77.542,50
+   *   total = 1.125 + 77.542,50 = 78.667,50 · neto = 281.332,50
+   *   Con 19 años (0,36): plusvalía 900,00 · ganancia 319.100 · IRPF = 71.880 + 19.100 × 30 %
+   *   = 77.610,00 · total 78.510,00 · neto 281.490,00
+   */
+  test('CASO 39 (límite) — Castilla-La Mancha, 360.000 €: el IRPF al 30 % y la raya de los 20 años', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await selectCcaa(page).selectOption('castilla-mancha');
+    await sembrar(page, 'Precio del trastero', '360000');
+
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('32.400,00 €');
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveText('ITP (9,00%)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('928,38 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'entre 795,76 € y 1061,01 €',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('294,30 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('33.922,68 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,42% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('393.922,68 €');
+    expect(await avisoReducidos(page).innerText()).not.toContain('Vivienda habitual (primera compra)');
+
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '40000');
+    await sembrar(page, 'Años de propiedad', '20');
+    await sembrar(page, 'Valor catastral del suelo', '10000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '0');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1125,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (falta el valor catastral total para comparar)',
+    );
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('358.875,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('318.875,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('77.542,50 €');
+    await expect(page.locator('h3', { hasText: 'Comisión inmobiliaria' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('78.667,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('281.332,50 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras los gastos',
+    );
+
+    // Un año menos cruza la raya del coeficiente: 0,36 en vez de 0,45.
+    await sembrar(page, 'Años de propiedad', '19');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('900,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('77.610,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('78.510,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('281.490,00 €');
+  });
+
+  /**
+   * CASO 40 (DEBE RECHAZARSE) — un valor catastral del suelo de 0 no liquida una plusvalía
+   * de 0,00 € ni la da por «no sujeta»: es un dato que falta.
+   *
+   * Venta 18.000 · compra 11.000 · gastos de aquella compra 900 · 6 años · suelo «0» · total
+   * 8.000 · comisión 3 % por defecto · sin gestoría del vendedor. Resuelto a mano:
+   *   con suelo 0 → plusvalía SIN CALCULAR (no entra en el neto)
+   *     comisión = 540,00 · transmisión = 18.000 − 540 = 17.460,00 · adquisición 11.900,00
+   *     ganancia = 5.560,00 → IRPF = 5.560 × 19 % = 1.056,40
+   *     total = 540 + 1.056,40 = 1.596,40 · neto = 16.403,60 (TECHO)
+   *   con suelo 3.000 → plusvalía = 3.000 × 0,16 × 25 % = 120,00 (el real, 7.000 × 3/8 × 25 %
+   *     = 656,25, pierde) · transmisión 17.340 · ganancia 5.440 → IRPF 1.033,60
+   *     total = 120 + 540 + 1.033,60 = 1.693,60 · neto = 16.306,40, por DEBAJO del techo
+   */
+  test('CASO 40 (debe rechazarse) — un valor catastral del suelo de 0 no es una plusvalía de 0 €', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '18000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '11000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '900');
+    await sembrar(page, 'Años de propiedad', '6');
+    await sembrar(page, 'Valor catastral del suelo', '0');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '8000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No calculada (falta el valor catastral del suelo)',
+    );
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1056,40 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1596,40 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('16.403,60 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Techo: aún NO incluye la plusvalía municipal (añade el valor catastral del suelo)',
+    );
+    // El 0 se queda en el campo: el blur no lo reescribe (min = 0).
+    await expect(page.locator('input[aria-label="Valor catastral del suelo"]')).toHaveValue('0');
+
+    // Con un suelo de verdad el neto BAJA: lo de arriba era un techo, como decía el aviso.
+    await sembrar(page, 'Valor catastral del suelo', '3000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('120,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1033,60 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('16.306,40 €');
+  });
+
+  /**
+   * COLATERAL (verde) — el aviso nuevo NO sale donde no debe.
+   *
+   * Un campo VACÍO no es un ilegible; «1000.25» (el decimal con punto) SÍ es legible y vale
+   * 1.000,25; y el ilegible de un panel no se cuela en el otro. Base 15.000 (Madrid) y en el
+   * vendedor compra 10.000 · 5 años · suelo 4.000 · total VACÍO · comisión 3 % · sin gestoría:
+   *   comprador sin gestoría: ITP 900,00 + notaría 276,55 + registro 59,03 = 1.235,58
+   *   plusvalía = 4.000 × 0,17 × 25 % = 170,00 (sin total no hay método real)
+   *   con gastos 1.000,25: adquisición 11.000,25 · transmisión 15.000 − 450 − 170 = 14.380
+   *     ganancia 3.379,75 → IRPF 642,1525 → 642,15 · total 1.262,15 · neto 13.737,85
+   */
+  test('COLATERAL (verde) — un campo vacío o un decimal con punto no disparan el aviso del ilegible', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '15000');
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '');
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1235,58 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio del trastero + todos los gastos');
+
+    // Y el ilegible del comprador se queda en su panel.
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '10000');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '4000');
+
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (falta el valor catastral total para comparar)',
+    );
+    expect(await descripcionTarjeta(page, 'Valor de adquisición')).toBe(
+      'Precio de compra + impuestos y gastos de aquella compra',
+    );
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras los gastos',
+    );
+
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000.25');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('11.000,25 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('642,15 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.737,85 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'Lo que realmente recibes tras los gastos',
+    );
+  });
+});
+
+// ── HALLAZGOS ABIERTOS de la re-inspección del 23/09/2026 ────────────────────────
+// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
+// La aserción de FONDO va la primera, detrás de una preparación que ya usan casos en verde.
+// Con `VER_HUECOS=1` se quitan las marcas y cada uno enseña su fallo.
+
+test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó en las otras tarjetas', () => {
+  /**
+   * HALLAZGO (operativa, medio) — la tarjeta del IRPF publica como DEFINITIVA una cuota
+   * calculada con un importe ilegible leído como 0.
+   *
+   * Las reparaciones 1157/1202 avisan en el neto («Suelo: …») y en «Valor de adquisición»,
+   * pero la cuota que el vendedor lee en «IRPF sobre ganancia» sigue rotulada «Tributación en
+   * base del ahorro», como si fuera la buena. La referencia de la familia
+   * (`estimador-compraventa-inmueble`, hallazgo 1190 y C3) la marca «TECHO: hay importes que
+   * no se han podido leer y que reducen la ganancia». Vale igual para la comisión y la
+   * gestoría de la venta ilegibles (las tres reducen la ganancia, así que sin ellas la cuota
+   * es siempre un techo).
+   *
+   * Caso literal del 1202 (venta 26.000 · compra 10.000 · gastos «2.000.50» · 5 años · suelo
+   * 4.000 de 9.000 · comisión 3 %), resuelto a mano en el test de arriba:
+   *   ilegible → ganancia 15.050,00 → IRPF 6.000 × 19 % + 9.050 × 21 % = 3.040,50
+   *   «2000,50» → ganancia 13.049,50 → IRPF 1.140 + 7.049,50 × 21 % = 2.620,395 → 2.620,40
+   * La tarjeta publica 3.040,50 € como definitivos: 420,10 € de más.
+   */
+  test('HALLAZGO (operativa) — la cuota del IRPF con unos gastos de compra ilegibles se marca como techo', async ({
+    page,
+  }) => {
+    if (!VER_HUECOS_23_09) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '26000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '10000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2.000.50');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '4000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+
+    // FONDO: la cuota que se publica es un techo, y la tarjeta tiene que decirlo.
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(
+      /techo|no se ha(?:n)? podido leer/i,
+    );
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('3040,50 €');
+
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2000,50');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2620,40 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).not.toMatch(/techo/i);
+  });
+
+  /**
+   * HALLAZGO (operativa, medio) — el aviso del «Suelo» sale cuando el neto NO se mueve, y la
+   * cifra que SÍ se mueve se publica sin aviso.
+   *
+   * La frase del 1202 («…REDUCEN el IRPF y suben el neto») se añade siempre que los gastos
+   * de aquella compra no se leen, haya o no IRPF que reducir. En una venta con PÉRDIDA la
+   * cuota es 0 con el dato y sin él, así que el neto no sube ni un céntimo; lo que se mueve
+   * es la pérdida compensable, y esa tarjeta no dice nada. Resuelto a mano (venta 15.000 ·
+   * compra 20.000 · 5 años · suelo 4.000 de 9.000 · comisión 3 % · gestoría 500):
+   *   plusvalía NO SUJETA (15.000 − 20.000 < 0, art. 104.5 TRLHL)
+   *   transmisión = 15.000 − 450 − 500 = 14.050,00 · IRPF 0 · neto = 14.050,00 en los dos
+   *   pérdida con «2.000.50» = 20.000 − 14.050 = 5.950,00
+   *   pérdida con «2000,50» = 22.000,50 − 14.050 = 7.950,50 (2.000,50 € más que compensar)
+   * Y sin precio de compra pasa lo mismo: el IRPF ni siquiera está en el neto —la propia
+   * frase dice «aún NO incluye … el IRPF de la ganancia»— y a continuación promete que
+   * reducirlo lo subirá.
+   */
+  test('HALLAZGO (operativa) — con pérdida, unos gastos de compra ilegibles no «suben el neto»: mueven la pérdida', async ({
+    page,
+  }) => {
+    if (!VER_HUECOS_23_09) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '20000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2.000.50');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '4000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '500');
+
+    // FONDO 1: el neto no se mueve, así que no puede prometer que subirá.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toMatch(/suben el neto/i);
+    // FONDO 2: lo que se mueve es la pérdida compensable, y ahí es donde hay que nombrarlo.
+    expect(await descripcionTarjeta(page, 'Pérdida patrimonial')).toMatch(
+      /no se ha(?:n)? podido leer|aquella compra/i,
+    );
+    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('5950,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('14.050,00 €');
+
+    // Sin precio de compra el IRPF no está en el neto: tampoco hay nada que «suba».
+    await sembrar(page, 'Precio de compra original', '');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toMatch(/suben el neto/i);
+
+    // Con la misma cifra legible: el neto no cambia y la pérdida crece 2.000,50 €.
+    await sembrar(page, 'Precio de compra original', '20000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2000,50');
+    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('7950,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('14.050,00 €');
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — dos ilegibles de dirección OPUESTA y la misma cifra se
+   * rotula a la vez «Techo:» y «Suelo:».
+   *
+   * Un techo dice que la real es menor o igual; un suelo, que es mayor o igual. Las dos a la
+   * vez solo son ciertas si la cifra es la buena, y aquí no lo es. Resuelto a mano (venta
+   * 20.000 · compra 16.000 · 5 años · suelo 5.000 de 12.000 · comisión 3 %):
+   *   plusvalía = 5.000 × 0,17 × 25 % = 212,50 (el real, 4.000 × 5/12 × 25 % = 416,67, pierde)
+   *   gestoría y gastos de compra «2.000.50» → transmisión 19.187,50 · ganancia 3.187,50
+   *     IRPF 605,625 → 605,63 · total 1.418,13 · neto 18.581,87 «Techo: … Suelo: …»
+   *   los dos «2000,50» → transmisión 17.187,00 · adquisición 18.000,50 → PÉRDIDA de 813,50
+   *     IRPF 0 · total 212,50 + 600 + 2.000,50 = 2.813,00 · neto 17.187,00
+   * El neto real queda 1.394,87 € POR DEBAJO: el «Suelo:» es falso. Con la comisión y los
+   * gastos de compra ilegibles sobre la base del testigo sale al revés (13.507,30 publicado y
+   * 13.522,89 real), así que la dirección de conjunto no se conoce y no se puede afirmar
+   * ninguna de las dos. La referencia dice «INCOMPLETO» y luego «el neto real es MAYOR», con
+   * el mismo defecto.
+   */
+  test('HALLAZGO (contenido) — con ilegibles de dirección opuesta el neto no puede ser techo y suelo a la vez', async ({
+    page,
+  }) => {
+    if (!VER_HUECOS_23_09) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '20000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '16000');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '5000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '12000');
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '2.000.50');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2.000.50');
+
+    // FONDO: una sola cifra no puede declararse techo y suelo en la misma frase.
+    const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(aviso).not.toMatch(/Techo:[\s\S]*Suelo:|Suelo:[\s\S]*Techo:/);
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.581,87 €');
+
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '2000,50');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2000,50');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.187,00 €');
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — «Techo: aún NO incluye la comisión inmobiliaria» invita a
+   * restar la comisión ENTERA, y el hueco es menor: es la C3 de la referencia, que no llegó.
+   *
+   * `0f70fdf8` corrigió en `estimador-compraventa-inmueble` que «falta descontar la comisión»
+   * mandaba restar el importe completo cuando la comisión también rebaja el IRPF, y publica
+   * la cota («rebaja también el IRPF al descontarla, hasta un T % de su importe»). Aquí el
+   * aviso sigue sin decirlo. Base del testigo (venta 15.000 · compra 10.000 · gastos 1.000 ·
+   * 5 años · suelo 4.000 de 9.000 · gestoría 500), resuelto a mano:
+   *   comisión «3.5.0» → transmisión 15.000 − 500 − 170 = 14.330 · ganancia 3.330
+   *     IRPF 632,70 · total 1.302,70 · neto 13.697,30
+   *   comisión 3 → comisión 450 · transmisión 13.880 · ganancia 2.880 · IRPF 547,20
+   *     total 1.667,20 · neto 13.332,80
+   * Restar los 450,00 € da 13.247,30; el real es 13.332,80, porque el IRPF baja 85,50 € a la
+   * vez (450 × 19 %, el tipo marginal de esa base).
+   */
+  test('HALLAZGO (contenido) — el techo de una comisión ilegible dice que al descontarla también baja el IRPF', async ({
+    page,
+  }) => {
+    if (!VER_HUECOS_23_09) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '10000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '4000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '500');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3.5.0');
+
+    // FONDO: el aviso de la comisión tiene que decir que su descuento rebaja también el IRPF.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toMatch(
+      /comisi[oó]n[^.]*IRPF/i,
+    );
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.697,30 €');
+
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.332,80 €');
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — «Valor de transmisión» afirma restar una comisión que el
+   * motor ha tomado como 0.
+   *
+   * Es la gemela de lo que el 1157 corrigió en «Valor de adquisición» («deja además de
+   * afirmar que suma unos gastos que el motor tomó como 0»): aquí la descripción sigue siendo
+   * «Precio de venta − comisión, gestoría y plusvalía municipal» con la comisión ilegible.
+   * Base del testigo con comisión «3.5.0»: 15.000 − 500 (gestoría) − 170 (plusvalía) =
+   * 14.330,00, sin comisión. Lo mismo con la gestoría de la venta ilegible.
+   */
+  test('HALLAZGO (contenido) — «Valor de transmisión» no afirma restar una comisión que no ha podido leer', async ({
+    page,
+  }) => {
+    if (!VER_HUECOS_23_09) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '10000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
+    await sembrar(page, 'Años de propiedad', '5');
+    await sembrar(page, 'Valor catastral del suelo', '4000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '500');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3.5.0');
+
+    // FONDO: la descripción no puede decir que resta una comisión que no ha restado.
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/no se ha podido leer/i);
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('14.330,00 €');
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — un importe escrito pero ilegible se trata como NO escrito:
+   * el marcador pide «Introduce el precio» con «2.000.50» a la vista.
+   *
+   * Es el hueco de MENSAJE que `8d7dcd1b` reparó en el grupo B (nave-industrial dice hoy «No
+   * se ha podido leer el precio «2.000.50»…»). El testigo de familia solo declara ese caso
+   * para el grupo B, y el trastero —con el garaje y el estimador— se quedó fuera. Lo mismo
+   * pasa en el vendedor con un precio de compra «10.000.00»: la plusvalía dice «falta el
+   * precio de compra original» y el neto pide «añade el precio de compra original», un dato
+   * que el usuario ve escrito (es lo que la C1 corrigió para el valor catastral total: «no
+   * falta, no se lee»).
+   */
+  test('HALLAZGO (contenido) — un precio escrito pero ilegible se nombra como ilegible, no como ausente', async ({
+    page,
+  }) => {
+    if (!VER_HUECOS_23_09) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '2.000.50');
+    await expect(page.locator('input[aria-label="Precio del trastero"]')).toHaveValue('2.000.50');
+
+    // FONDO: el precio está escrito; lo que pasa es que no se ha podido leer.
+    await expect(textoMarcador(page)).toContainText(/no se ha podido leer/i);
+
+    await sembrar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: /Vendedor/ }).click();
+    await sembrar(page, 'Precio de compra original', '10.000.00');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toMatch(/no se ha podido leer/i);
+  });
+});
