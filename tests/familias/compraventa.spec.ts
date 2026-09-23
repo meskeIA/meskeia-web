@@ -274,15 +274,6 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -20.83,
         nombra: /valor catastral total/i,
-        falla:
-          'HUECO C1 EN LA HERMANA — «Valor catastral total» se lee con `parseSpanishNumber` a ' +
-          'pelo: el ilegible entra como `undefined`, indistinguible del VACÍO, y la plusvalía se ' +
-          'liquida por el método objetivo aunque el real sea más barato. El neto baja en silencio ' +
-          'y la tarjeta de la plusvalía dice «falta el valor catastral total para comparar», que ' +
-          'es falso: el usuario lo escribió. La fila `sin_efecto` de arriba no lo veía porque en ' +
-          'el caso base gana el objetivo, y por eso la medición del 23/09 dio esta app por sana ' +
-          'en este campo. Para ponerlo en verde: su `esLegible` y el campo en la lista de ' +
-          'dirección contraria («el neto real es MAYOR»).',
       },
       {
         etiqueta: 'Comisión inmobiliaria del vendedor (%)',
@@ -397,15 +388,6 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -58.89,
         nombra: /valor catastral total/i,
-        falla:
-          'HUECO C1 EN LA HERMANA — «Valor catastral total» se lee con `parseSpanishNumber` a ' +
-          'pelo: el ilegible entra como `undefined`, indistinguible del VACÍO, y la plusvalía se ' +
-          'liquida por el método objetivo aunque el real sea más barato. El neto baja en silencio ' +
-          'y la tarjeta de la plusvalía dice «falta el valor catastral total para comparar», que ' +
-          'es falso: el usuario lo escribió. La fila `sin_efecto` de arriba no lo veía porque en ' +
-          'el caso base gana el objetivo, y por eso la medición del 23/09 dio esta app por sana ' +
-          'en este campo. Para ponerlo en verde: su `esLegible` y el campo en la lista de ' +
-          'dirección contraria («el neto real es MAYOR»).',
       },
       {
         etiqueta: 'Comisión inmobiliaria (%)',
@@ -529,15 +511,6 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -243,
         nombra: /valor catastral total/i,
-        falla:
-          'HUECO C1 EN LA HERMANA — «Valor catastral total» se lee con `parseSpanishNumber` a ' +
-          'pelo: el ilegible entra como `undefined`, indistinguible del VACÍO, y la plusvalía se ' +
-          'liquida por el método objetivo aunque el real sea más barato. El neto baja en silencio ' +
-          'y la tarjeta de la plusvalía dice «falta el valor catastral total para comparar», que ' +
-          'es falso: el usuario lo escribió. La fila `sin_efecto` de arriba no lo veía porque en ' +
-          'el caso base gana el objetivo, y por eso la medición del 23/09 dio esta app por sana ' +
-          'en este campo. Para ponerlo en verde: su `esLegible` y el campo en la lista de ' +
-          'dirección contraria («el neto real es MAYOR»).',
       },
       {
         etiqueta: 'Comisión de la inmobiliaria (%)',

@@ -128,6 +128,12 @@ interface ResultadosVendedor {
   comisionLegible: boolean;
   gestoriaLegible: boolean;
   gastosAdquisicionLegible: boolean;
+  /**
+   * false cuando el valor catastral total no se puede leer y hay plusvalía que comparar.
+   * Sin él la plusvalía se liquida por el método objetivo aunque el real sea más barato, y
+   * el neto baja en silencio (hueco C1 del testigo de familia, visto en el estimador).
+   */
+  valorTotalLegible: boolean;
 }
 
 // ===== CONSTANTES =====
@@ -353,6 +359,7 @@ export default function SimuladorGarajeCompraventaPage() {
     const comisionLegible = esLegible(comisionInmobiliaria);
     const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
+    const valorTotalLegible = esLegible(valorCatastralTotal);
     const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
@@ -385,7 +392,11 @@ export default function SimuladorGarajeCompraventaPage() {
         : resultadoPlusvalia.parCatastralImposible
           ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
           : !resultadoPlusvalia.metodoRealDisponible
-            ? 'Método objetivo (falta el valor catastral total para comparar)'
+            ? // «falta el valor catastral total» era falso cuando el usuario lo había
+              // escrito y lo seguía viendo en el campo (hueco C1): no falta, no se lee.
+              valorTotalLegible
+              ? 'Método objetivo (falta el valor catastral total para comparar)'
+              : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
               ? 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
@@ -433,6 +444,8 @@ export default function SimuladorGarajeCompraventaPage() {
       comisionLegible,
       gestoriaLegible,
       gastosAdquisicionLegible,
+      // Sin plusvalía liquidada (faltan datos o no hay incremento) no hay método que comparar.
+      valorTotalLegible: faltan.length > 0 || exentoPlusvalia || valorTotalLegible,
     };
   }, [precioGaraje, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
 
@@ -482,6 +495,7 @@ export default function SimuladorGarajeCompraventaPage() {
         ...(resultadosVendedor.gastosAdquisicionLegible
           ? []
           : ['un importe legible en los gastos de la compra']),
+        ...(resultadosVendedor.valorTotalLegible ? [] : ['un valor catastral total legible']),
       ]))
     : [];
 
@@ -1152,6 +1166,14 @@ export default function SimuladorGarajeCompraventaPage() {
                         if (faltanPorSumarAlValorDeAdquisicion.length > 0) {
                           avisos.push(
                             `falta sumar al valor de adquisición ${faltanPorSumarAlValorDeAdquisicion.join(' y ')}, que REDUCEN el IRPF: el neto real es MAYOR que este`,
+                          );
+                        }
+                        // El valor catastral total no va al valor de adquisición sino a la
+                        // plusvalía, pero en la misma dirección: sin leerlo, la cifra es un
+                        // SUELO (hueco C1 del testigo de familia).
+                        if (!resultadosVendedor.valorTotalLegible) {
+                          avisos.push(
+                            'el valor catastral total no se ha podido leer, y con él la plusvalía puede salir más barata por el método real: el neto real es MAYOR que este',
                           );
                         }
                         return avisos.length === 0

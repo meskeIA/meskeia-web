@@ -120,6 +120,12 @@ interface ResultadosVendedor {
   gastosAdquisicionLegible: boolean;
   /** false cuando «Gestoría y certificados del vendedor» no es un número (1157). */
   gestoriaLegible: boolean;
+  /**
+   * false cuando el valor catastral total no se puede leer y hay plusvalía que comparar.
+   * Sin él la plusvalía se liquida por el método objetivo aunque el real sea más barato, y
+   * el neto baja en silencio (hueco C1 del testigo de familia, visto en el estimador).
+   */
+  valorTotalLegible: boolean;
   /** Los campos concretos que faltan para calcularla, para nombrarlos en el aviso */
   camposQueFaltan: string[];
   comisionInmobiliaria: number;
@@ -407,6 +413,7 @@ export default function SimuladorTrasteroCompraventaPage() {
     const comisionTexto = comisionInmobiliaria.trim();
     const comisionLegible = esLegible(comisionTexto);
     const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
+    const valorTotalLegible = esLegible(valorCatastralTotal);
     const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
@@ -449,7 +456,11 @@ export default function SimuladorTrasteroCompraventaPage() {
         : resultadoPlusvalia.parCatastralImposible
           ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
           : !resultadoPlusvalia.metodoRealDisponible
-            ? 'Método objetivo (falta el valor catastral total para comparar)'
+            ? // «falta el valor catastral total» era falso cuando el usuario lo había
+              // escrito y lo seguía viendo en el campo (hueco C1): no falta, no se lee.
+              valorTotalLegible
+              ? 'Método objetivo (falta el valor catastral total para comparar)'
+              : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
               ? 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
@@ -480,6 +491,8 @@ export default function SimuladorTrasteroCompraventaPage() {
       comisionLegible,
       gastosAdquisicionLegible,
       gestoriaLegible,
+      // Sin plusvalía liquidada (faltan datos o no hay incremento) no hay método que comparar.
+      valorTotalLegible: !plusvaliaCalculada || exentoPlusvalia || valorTotalLegible,
       /** Los campos concretos que faltan, para que el aviso del neto no los adivine */
       camposQueFaltan: faltan,
       comisionInmobiliaria: comision,
@@ -1192,7 +1205,14 @@ export default function SimuladorTrasteroCompraventaPage() {
                         if (sueloPorAdquisicion) {
                           pedir('un importe legible en los gastos de la compra');
                         }
-                        if (conceptos.length === 0 && !sueloPorAdquisicion) {
+                        // El valor catastral total va a la plusvalía, no al valor de
+                        // adquisición, pero en la misma dirección: sin leerlo, la cifra es un
+                        // SUELO (hueco C1 del testigo de familia).
+                        const sueloPorCatastral = !resultadosVendedor.valorTotalLegible;
+                        if (sueloPorCatastral) {
+                          pedir('un valor catastral total legible');
+                        }
+                        if (conceptos.length === 0 && !sueloPorAdquisicion && !sueloPorCatastral) {
                           return 'Lo que realmente recibes tras los gastos';
                         }
                         const frases: string[] = [];
@@ -1202,6 +1222,11 @@ export default function SimuladorTrasteroCompraventaPage() {
                         if (sueloPorAdquisicion) {
                           frases.push(
                             'Suelo: faltan los impuestos y gastos de aquella compra, que al sumarse al valor de adquisición REDUCEN el IRPF y suben el neto',
+                          );
+                        }
+                        if (sueloPorCatastral) {
+                          frases.push(
+                            'Suelo: el valor catastral total no se ha podido leer, y con él la plusvalía puede salir más barata por el método real',
                           );
                         }
                         return `${frases.join('. ')} (añade ${enumerarCampos(campos)})`;

@@ -113,6 +113,12 @@ interface ResultadosVendedor {
    * hermanas no lo tienen (hueco A2 del testigo de familia).
    */
   amortizacionesLegible: boolean;
+  /**
+   * false cuando el valor catastral total no se puede leer y hay plusvalía que comparar.
+   * Sin él la plusvalía se liquida por el método objetivo aunque el real sea más barato, y
+   * el neto baja en silencio (hueco C1 del testigo de familia, visto en el estimador).
+   */
+  valorTotalLegible: boolean;
   totalGastos: number;
   netoVendedor: number;
 }
@@ -341,6 +347,7 @@ export default function SimuladorLocalComercialPage() {
     const comisionLegible = esLegible(comisionInmobiliaria);
     const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
+    const valorTotalLegible = esLegible(valorCatastralTotal);
     const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
     const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
     const comision = precioV * comisionPct;
@@ -389,7 +396,11 @@ export default function SimuladorLocalComercialPage() {
         : resultadoPlusvalia.parCatastralImposible
           ? `Método objetivo, ${tipoMunicipal} (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)`
           : !resultadoPlusvalia.metodoRealDisponible
-          ? `Método objetivo, ${tipoMunicipal} (falta el valor catastral total para comparar)`
+          ? // «falta el valor catastral total» era falso cuando el usuario lo había
+            // escrito y lo seguía viendo en el campo (hueco C1): no falta, no se lee.
+            valorTotalLegible
+            ? `Método objetivo, ${tipoMunicipal} (falta el valor catastral total para comparar)`
+            : `Método objetivo, ${tipoMunicipal}, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).`
           : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
             ? `Método real (más favorable), ${tipoMunicipal}`
             : `Método objetivo (más favorable), ${tipoMunicipal}`;
@@ -440,6 +451,8 @@ export default function SimuladorLocalComercialPage() {
       gestoriaLegible,
       gastosAdquisicionLegible,
       amortizacionesLegible,
+      // Sin plusvalía liquidada (faltan datos o no hay incremento) no hay método que comparar.
+      valorTotalLegible: !plusvaliaCalculada || exentoPlusvalia || valorTotalLegible,
       totalGastos,
       netoVendedor: precioV - totalGastos,
     };
@@ -489,14 +502,18 @@ export default function SimuladorLocalComercialPage() {
    * y el neto queda por DEBAJO del real: «No descuenta…: el neto real será menor» mandaba
    * restar 3.404,00 € de una cifra que en realidad sube (testigo de familia, hueco A1).
    *
-   * Solo cuando hay IRPF que rebajar: con pérdida o sin precio de compra no mueven nada, y
-   * decir entonces «el neto real es MAYOR» sería falso.
+   * Los gastos, solo cuando hay IRPF que rebajar: con pérdida o sin precio de compra no
+   * mueven nada, y decir entonces «el neto real es MAYOR» sería falso. El valor catastral
+   * total no depende del IRPF sino de la plusvalía, y su bandera ya calla sin ella (C1).
    */
-  const faltanPorAbaratar = resultadosVendedor && resultadosVendedor.irpfGanancia > 0
+  const faltanPorAbaratar = resultadosVendedor
     ? [
-        resultadosVendedor.gastosAdquisicionLegible
+        resultadosVendedor.gastosAdquisicionLegible || !(resultadosVendedor.irpfGanancia > 0)
           ? null
           : 'los impuestos y gastos de aquella compra',
+        resultadosVendedor.valorTotalLegible
+          ? null
+          : 'el valor catastral total, que puede abaratar la plusvalía por el método real',
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -514,6 +531,7 @@ export default function SimuladorLocalComercialPage() {
           ...(resultadosVendedor.amortizacionesLegible
             ? []
             : ['un importe legible en las amortizaciones']),
+          ...(resultadosVendedor.valorTotalLegible ? [] : ['un valor catastral total legible']),
         ])
       )
     : [];
