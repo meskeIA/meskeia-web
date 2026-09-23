@@ -491,15 +491,6 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'sube',
         delta: 4200,
         nombra: /amortizaciones/i,
-        falla:
-          'HUECO A2 — se lee con `parseSpanishNumberOr` A PELO: ni `esLegible` ni bandera en ' +
-          '`ResultadosVendedor`. El ilegible vale 0, sube el neto +4.200,00 € y baja el IRPF ' +
-          '−4.200,00 €, y la tarjeta se publica como DEFINITIVA («NETO QUE RECIBES», sin ' +
-          '«(PARCIAL)») y sin una palabra. Es un campo EXCLUSIVO de esta app —solo existe con ' +
-          'el perfil «Local afecto a actividad»—, y por eso la reparación en lote del 22/09 no ' +
-          'lo vio: las otras seis hermanas no lo tienen. Para ponerlo en verde: bandera ' +
-          '`amortizacionesLegible` y el campo en la lista de «falta descontar», que aquí SÍ es ' +
-          'la dirección correcta.',
       },
       {
         etiqueta: 'Años de propiedad',

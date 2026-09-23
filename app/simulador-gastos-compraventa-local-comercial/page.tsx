@@ -106,6 +106,13 @@ interface ResultadosVendedor {
   comisionLegible: boolean;
   gestoriaLegible: boolean;
   gastosAdquisicionLegible: boolean;
+  /**
+   * false cuando las amortizaciones no se pueden leer, y solo con el perfil «Local afecto a
+   * actividad», que es el único en el que el campo existe. Es el campo EXCLUSIVO de esta app
+   * y por eso la reparación en lote del clúster (`cfe091a7`) no lo vio: las otras seis
+   * hermanas no lo tienen (hueco A2 del testigo de familia).
+   */
+  amortizacionesLegible: boolean;
   totalGastos: number;
   netoVendedor: number;
 }
@@ -394,6 +401,10 @@ export default function SimuladorLocalComercialPage() {
     const amortizaciones = perfilVendedor === 'afecto-actividad'
       ? Math.max(0, parseSpanishNumberOr(amortizacionesAcumuladas))
       : 0;
+    // Ilegibles valían 0, y con ellas a 0 el valor de adquisición sube, la ganancia baja y el
+    // neto se publicaba +4.200,00 € por encima del real como si fuera definitivo (hueco A2).
+    const amortizacionesLegible =
+      perfilVendedor !== 'afecto-actividad' || esLegible(amortizacionesAcumuladas);
 
     const g = calcularGananciaInmueble({
       precioVenta: precioV,
@@ -428,6 +439,7 @@ export default function SimuladorLocalComercialPage() {
       comisionLegible,
       gestoriaLegible,
       gastosAdquisicionLegible,
+      amortizacionesLegible,
       totalGastos,
       netoVendedor: precioV - totalGastos,
     };
@@ -458,6 +470,12 @@ export default function SimuladorLocalComercialPage() {
         // real, sin ninguna línea que lo explique (hallazgo 1157, visto en trastero).
         resultadosVendedor.comisionLegible ? null : 'la comisión inmobiliaria',
         resultadosVendedor.gestoriaLegible ? null : 'la gestoría de la venta',
+        // Las amortizaciones MINORAN el valor de adquisición (art. 40 RIRPF): sin ellas la
+        // ganancia y el IRPF salen menores y el neto, por ENCIMA del real, que es la dirección
+        // de esta lista (hueco A2). Sin precio de compra el IRPF ya se nombra entero arriba.
+        resultadosVendedor.amortizacionesLegible || !resultadosVendedor.irpfCalculado
+          ? null
+          : 'el IRPF que añaden las amortizaciones deducidas',
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -493,6 +511,9 @@ export default function SimuladorLocalComercialPage() {
           ...(resultadosVendedor.gastosAdquisicionLegible
             ? []
             : ['un importe legible en los gastos de la compra']),
+          ...(resultadosVendedor.amortizacionesLegible
+            ? []
+            : ['un importe legible en las amortizaciones']),
         ])
       )
     : [];
@@ -1102,7 +1123,10 @@ export default function SimuladorLocalComercialPage() {
                             : '') +
                           (resultadosVendedor.gastosAdquisicionLegible
                             ? ''
-                            : '. Los impuestos y gastos de aquella compra no se han podido leer y no están sumados')
+                            : '. Los impuestos y gastos de aquella compra no se han podido leer y no están sumados') +
+                          (resultadosVendedor.amortizacionesLegible
+                            ? ''
+                            : '. Las amortizaciones deducidas no se han podido leer y no están restadas')
                         }
                       />
                       <ResultCard
@@ -1174,10 +1198,23 @@ export default function SimuladorLocalComercialPage() {
                     description={
                       !resultadosVendedor.irpfCalculado
                         ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
-                        : // Se dice aquí, donde se lee la cuota, y no solo en el neto (como el estimador).
-                          !resultadosVendedor.gastosAdquisicionLegible && resultadosVendedor.irpfGanancia > 0
-                          ? 'TECHO: los impuestos y gastos de aquella compra no se han podido leer, y reducen la ganancia. Escríbelos con coma decimal (1.234,56).'
-                          : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`
+                        : // Se dice aquí, donde se lee la cuota, y no solo en el neto (como el
+                          // estimador). Cada importe ilegible la mueve en un sentido distinto.
+                          (() => {
+                            const techo =
+                              !resultadosVendedor.gastosAdquisicionLegible && resultadosVendedor.irpfGanancia > 0;
+                            const suelo = !resultadosVendedor.amortizacionesLegible;
+                            if (techo && suelo) {
+                              return 'Cuota sin cerrar: ni los impuestos y gastos de aquella compra ni las amortizaciones se han podido leer, y la mueven en sentidos contrarios. Escríbelos con coma decimal (1.234,56).';
+                            }
+                            if (techo) {
+                              return 'TECHO: los impuestos y gastos de aquella compra no se han podido leer, y reducen la ganancia. Escríbelos con coma decimal (1.234,56).';
+                            }
+                            if (suelo) {
+                              return 'SUELO: las amortizaciones deducidas no se han podido leer, y aumentan la ganancia. Escríbelas con coma decimal (1.234,56).';
+                            }
+                            return `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`;
+                          })()
                     }
                   />
 
