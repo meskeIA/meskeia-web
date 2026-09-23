@@ -26,24 +26,33 @@ function generarExplicacion(
   }
 
   const cambioPorc = (n: number, o: number): number => Math.round(Math.abs((n - o) / o * 100));
-  const direccion = (n: number, o: number): string => n < o ? 'reducido' : 'aumentado';
+  // «Reducir» es pronominal en este uso («se han reducido»); «aumentar», no («han aumentado»).
+  const verbo = (n: number, o: number): string => n < o ? 'se han reducido' : 'han aumentado';
   const nivelNombres = originales.map(n => n.nombre.toLowerCase());
 
+  // El verbo solo se repite cuando cambia de sentido respecto al nivel anterior:
+  // «Los productores se han reducido un 30 %, los herbívoros un 21 %…»
   const partes: string[] = [];
+  let verboAnterior = '';
 
   for (let i = 0; i < niveles.length; i++) {
     const porc = cambioPorc(niveles[i].poblacion, originales[i].poblacion);
     if (porc > 2) {
+      const verboNivel = verbo(niveles[i].poblacion, originales[i].poblacion);
+      const sujeto = `${partes.length === 0 ? 'Los' : 'los'} ${nivelNombres[i]}`;
       partes.push(
-        `Los ${nivelNombres[i]} han ${direccion(niveles[i].poblacion, originales[i].poblacion)} un ${porc}%`
+        verboNivel === verboAnterior
+          ? `${sujeto} un ${porc} %`
+          : `${sujeto} ${verboNivel} un ${porc} %`
       );
+      verboAnterior = verboNivel;
     }
   }
 
   let texto = evento.descripcion + '. ';
 
   if (partes.length === 0) {
-    texto += `Con una intensidad del ${Math.round(intensidad * 100)}%, el impacto en las poblaciones es mínimo.`;
+    texto += `Con una intensidad del ${Math.round(intensidad * 100)} %, el impacto en las poblaciones es mínimo.`;
   } else if (partes.length === 1) {
     texto += partes[0] + '.';
   } else {

@@ -12,7 +12,7 @@
  * que ejecuta el mismo `aplicarEvento` con el que el simulador pinta la cascada.
  *
  * ⚠️ Esta sección NO pinta textos «N ind. rel.», ni `role="meter"`, ni `role="status"`, ni
- * frases del tipo «han reducido un X %»: el acta del Inspector
+ * frases del tipo «se han reducido un X %»: el acta del Inspector
  * (`tests/apps/simulador-ecosistema-trofico.spec.ts`) localiza con ellos la pirámide, las
  * barras y el panel de explicación, y un duplicado aquí los volvería ambiguos.
  */

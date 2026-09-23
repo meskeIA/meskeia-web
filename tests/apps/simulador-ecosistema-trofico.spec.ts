@@ -69,7 +69,7 @@ import { test, expect, Page } from '@playwright/test';
  *     la identidad es exacta y NO debe pintarse ningún paréntesis de delta.
  *       Pradera queda en [100, 40, 15, 5] con el evento seleccionado.
  *       Como ningún porcentaje supera el 2 %, la explicación cae en la rama sin partes:
- *       «… Con una intensidad del 0%, el impacto en las poblaciones es mínimo.»
+ *       «… Con una intensidad del 0 %, el impacto en las poblaciones es mínimo.»
  */
 
 const RUTA = '/simulador-ecosistema-trofico/';
@@ -121,12 +121,13 @@ test.describe('simulador-ecosistema-trofico', () => {
     // exact: por subcadena, «4 ind. rel.» también casaría con «14 ind. rel.».
     await expect(page.getByText('4 ind. rel.', { exact: true })).toBeVisible();
 
-    // Porcentajes de generarExplicacion(): 30 · 21 · 15 · 10, todos a la baja
+    // Porcentajes de generarExplicacion(): 30 · 21 · 15 · 10, todos a la baja. Se aserta la
+    // frase entera porque el verbo solo se escribe una vez: el sentido de los tres últimos lo
+    // da la elipsis, y un trozo suelto («herbívoros un 21 %») ya no lo comprobaría.
     const explicacion = page.locator('[role="status"]');
-    await expect(explicacion).toContainText('productores han reducido un 30%');
-    await expect(explicacion).toContainText('herbívoros han reducido un 21%');
-    await expect(explicacion).toContainText('carnívoros han reducido un 15%');
-    await expect(explicacion).toContainText('superdepredadores han reducido un 10%');
+    await expect(explicacion).toContainText(
+      'Los productores se han reducido un 30 %, los herbívoros un 21 %, los carnívoros un 15 % y los superdepredadores un 10 %.'
+    );
   });
 
   test('CASO 2 · caza del depredador al 100 % → el suelo de 5 muerde y la cascada va en ambos sentidos', async ({
@@ -166,10 +167,9 @@ test.describe('simulador-ecosistema-trofico', () => {
     // de los carnívoros llega como +47 % a los herbívoros y como −33 % a los productores.
     // Antes se propagaba intacta —67 % en los tres— y el texto del paso 3 mentía.
     const explicacion = page.locator('[role="status"]');
-    await expect(explicacion).toContainText('carnívoros han reducido un 67%');
-    await expect(explicacion).toContainText('herbívoros han aumentado un 47%');
-    await expect(explicacion).toContainText('productores han reducido un 33%');
-    await expect(explicacion).toContainText('superdepredadores han reducido un 47%');
+    await expect(explicacion).toContainText(
+      'Los productores se han reducido un 33 %, los herbívoros han aumentado un 47 %, los carnívoros se han reducido un 67 % y los superdepredadores un 47 %.'
+    );
   });
 
   test('CASO 3 · degenerado: intensidad 0 % deja el ecosistema idéntico y sin deltas', async ({ page }) => {
@@ -187,7 +187,7 @@ test.describe('simulador-ecosistema-trofico', () => {
     // Rama sin partes de generarExplicacion(): describe el evento pero no nombra ningún nivel
     const explicacion = page.locator('[role="status"]');
     await expect(explicacion).toContainText(
-      'Con una intensidad del 0%, el impacto en las poblaciones es mínimo.'
+      'Con una intensidad del 0 %, el impacto en las poblaciones es mínimo.'
     );
     await expect(explicacion).not.toContainText('han reducido');
     await expect(explicacion).not.toContainText('han aumentado');
