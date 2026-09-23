@@ -20,6 +20,15 @@
  *                       no el paso del tiempo: por eso la cola no va por calendario.
  *   3. NUNCA VISTA    — por prioridad (uso real × riesgo), no por orden alfabético.
  *
+ * LAS FAMILIAS SALEN JUNTAS
+ * ─────────────────────────
+ * Si una app pertenece a una familia declarada en `familias.mjs`, la cola saca el grupo
+ * ENTERO y no la app suelta. Sale de haber medido (23/09/2026) que reparar en lote no
+ * cierra el problema: el commit `cfe091a7` reparó el clúster de compraventa «en las SIETE
+ * apps» y aun así dejó cuatro huecos, uno de ellos reintroduciendo en una hermana el mismo
+ * defecto que corregía en otra. Verlas de una en una, con meses de separación, es lo que
+ * hace que eso no se detecte. El detalle, en la cabecera de `familias.mjs`.
+ *
  * POR QUÉ EL ORDEN IMPORTA TANTO (medido el 14/08/2026 sobre el dump de Turso)
  * ───────────────────────────────────────────────────────────────────────────
  * El 50 % del uso del catálogo está en 22 apps y el 80 % en 114; hay 410 apps con dos
@@ -28,6 +37,7 @@
  */
 
 import { abrir, SQL_INVALIDADA } from './db.mjs';
+import { FAMILIAS, familiaDe, slugsHuerfanos } from './familias.mjs';
 
 const args = process.argv.slice(2);
 const RESUMEN = args.includes('--resumen');
@@ -90,28 +100,100 @@ if (RESUMEN) {
   const cubierto = db.prepare('SELECT SUM(usos) s FROM apps WHERE ultima_inspeccion IS NOT NULL').get().s || 0;
   console.log(`\n  uso del catálogo ya inspeccionado: ${(100 * cubierto / total).toFixed(1)} %`);
   console.log(`  (es la cifra que importa, no el % de apps: el 80 % del uso está en 114 apps)`);
+
+  const huerf = slugsHuerfanos(db);
+  console.log(`\n  familias declaradas: ${FAMILIAS.length} (salen JUNTAS de la cola)`);
+  for (const f of FAMILIAS) {
+    const pend = f.slugs.filter((s) => {
+      const r = db.prepare(
+        `SELECT 1 x FROM apps WHERE slug = ? AND (test_estado = 'rojo' OR ${SQL_INVALIDADA} OR ultima_inspeccion IS NULL)`,
+      ).get(s);
+      return !!r;
+    }).length;
+    console.log(`    ${f.id.padEnd(14)} ${f.slugs.length} apps · ${pend} pendientes · ${f.testigo}`);
+  }
+  if (huerf.length) {
+    console.log(`  ⚠ ${huerf.length} slug(s) declarados que ya no existen — corrige familias.mjs:`);
+    for (const h of huerf) console.log(`      ${h.familia} → ${h.slug}`);
+  }
   process.exit(0);
+}
+
+/** Una línea de app, con su prioridad, uso y avisos. */
+function linea(f, sangria = '  ') {
+  const deps = JSON.parse(f.deps || '[]');
+  const sospecha = f.usos >= 50 && f.duracion_media > 0 && f.duracion_media < 30;
+  return (
+    `${sangria}${String(Math.round(f.p)).padStart(3)}  ${f.slug.padEnd(44)} ` +
+    `${f.segmento.padEnd(11)} riesgo ${f.riesgo}  ${String(f.usos).padStart(5)} usos` +
+    (sospecha ? `  ⚠ ${f.duracion_media}s de estancia` : '') +
+    (deps.length ? `  [${deps.length} dep]` : '')
+  );
+}
+
+/** En qué cola está un slug ahora mismo, o null si está al día. */
+const SQL_ESTADO = db.prepare(`
+  SELECT slug, ${PRIORIDAD} AS p, segmento, riesgo, usos, duracion_media, deps, ultima_inspeccion,
+         CASE WHEN test_estado = 'rojo' THEN 'ROJO'
+              WHEN ${SQL_INVALIDADA} THEN 'INVALIDADA'
+              WHEN ultima_inspeccion IS NULL THEN 'NUEVA'
+              ELSE 'al día' END AS estado
+  FROM apps WHERE slug = ?`);
+
+const huerfanos = slugsHuerfanos(db);
+if (huerfanos.length) {
+  console.log('\n⚠ Familias con slugs que ya no existen en el catálogo (corrige familias.mjs):');
+  for (const h of huerfanos) console.log(`    ${h.familia} → ${h.slug}`);
 }
 
 let quedan = CUANTAS;
 let mostradas = 0;
+const familiasYaSacadas = new Set();
+
 for (const c of COLAS) {
   if (quedan <= 0) break;
-  const filas = db.prepare(c.sql).all().slice(0, quedan);
-  if (!filas.length) continue;
-  console.log(`\n${c.titulo}`);
-  for (const f of filas) {
-    const deps = JSON.parse(f.deps || '[]');
-    const sospecha = f.usos >= 50 && f.duracion_media > 0 && f.duracion_media < 30;
-    console.log(
-      `  ${String(Math.round(f.p)).padStart(3)}  ${f.slug.padEnd(38)} ` +
-      `${f.segmento.padEnd(11)} riesgo ${f.riesgo}  ${String(f.usos).padStart(5)} usos` +
-      (sospecha ? `  ⚠ ${f.duracion_media}s de estancia` : '') +
-      (deps.length ? `  [${deps.length} dep]` : ''),
-    );
+  const todas = db.prepare(c.sql).all();
+  const elegidas = [];
+
+  for (const f of todas) {
+    if (quedan <= 0) break;
+    const fam = familiaDe(f.slug);
+
+    if (!fam) {
+      elegidas.push({ tipo: 'app', fila: f });
+      quedan -= 1;
+      continue;
+    }
+    if (familiasYaSacadas.has(fam.id)) continue;   // ya salió entera más arriba
+
+    // La familia sale ENTERA: las que están pendientes cuentan contra el cupo; las que
+    // están al día se listan como contexto, porque el testigo las mide igualmente.
+    const miembros = fam.slugs.map((s) => SQL_ESTADO.get(s)).filter(Boolean);
+    elegidas.push({ tipo: 'familia', familia: fam, miembros });
+    familiasYaSacadas.add(fam.id);
+    quedan -= miembros.filter((m) => m.estado !== 'al día').length;
   }
-  mostradas += filas.length;
-  quedan -= filas.length;
+
+  if (!elegidas.length) continue;
+  console.log(`\n${c.titulo}`);
+
+  for (const e of elegidas) {
+    if (e.tipo === 'app') {
+      console.log(linea(e.fila));
+      mostradas += 1;
+      continue;
+    }
+    const pendientes = e.miembros.filter((m) => m.estado !== 'al día').length;
+    console.log(`\n  👯 FAMILIA «${e.familia.nombre}» — se inspeccionan JUNTAS ` +
+                `(${pendientes} de ${e.miembros.length} pendientes)`);
+    console.log(`     testigo:    ${e.familia.testigo}`);
+    console.log(`     referencia: ${e.familia.referencia} — el patrón correcto, no rediseñar`);
+    console.log(`     invariante: ${e.familia.invariante}`);
+    for (const m of e.miembros) {
+      console.log(linea(m, '      ') + `  · ${m.estado}`);
+    }
+    mostradas += pendientes;
+  }
 }
 
 if (!mostradas) console.log('\nNada en cola: todo el catálogo está inspeccionado y sin cambios desde entonces.');
