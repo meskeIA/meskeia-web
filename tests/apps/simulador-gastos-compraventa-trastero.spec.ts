@@ -761,9 +761,8 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
     await page.goto(RUTA);
     await rellenar(page, 'Precio del trastero', '1.2.3');
 
-    await expect(
-      page.getByText('Introduce el precio del trastero para ver el desglose de gastos del comprador'),
-    ).toBeVisible();
+    // Escrito pero ilegible: se dice que no se lee, no que falta (hallazgo 1285).
+    await expect(page.getByText('No se ha podido leer el precio «1.2.3»', { exact: false })).toBeVisible();
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: 'Gastos de notaría' })).toHaveCount(0);
     await expect(page.getByText('No definido')).toHaveCount(0);
@@ -2304,7 +2303,8 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
     // tampoco se calcula — y el aviso nombra ESE campo, no los otros dos, que están puestos.
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
     const metodo22 = await descripcionTarjeta(page, 'Plusvalía municipal');
-    expect(metodo22).toContain('falta el precio de compra original');
+    // Escrito pero ilegible: no «falta», no se lee (hallazgo 1285).
+    expect(metodo22).toContain('el precio de compra original no se ha podido leer');
     expect(metodo22).not.toContain('valor catastral del suelo');
     expect(metodo22).not.toContain('años de propiedad');
 
@@ -2326,7 +2326,9 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
     const neto22 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
     expect(neto22).toContain('Techo');
     expect(neto22).toContain('la plusvalía municipal ni el IRPF de la ganancia');
-    expect(neto22).toContain('añade el precio de compra original');
+    // Escrito pero ilegible: se nombra como tal y se pide corregirlo UNA vez (1285 y 639).
+    expect(neto22).toContain('El precio de compra original no se ha podido leer');
+    expect(neto22.match(/precio de compra original/g) ?? []).toHaveLength(1);
 
     // Y en ninguna parte de la página puede haber NaN. Se busca sobre el texto completo y
     // con mayúsculas: `getByText('NaN')` no distingue mayúsculas y casaría con «ganancia».
@@ -2614,7 +2616,8 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     // están puestos. El verbo concuerda en plural («faltan los años»), hallazgo 638.
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
     const metodo25 = await descripcionTarjeta(page, 'Plusvalía municipal');
-    expect(metodo25).toBe('No calculada (faltan los años de propiedad)');
+    // Escritos pero ilegibles: no «faltan», no se leen (hallazgo 1285); el plural concuerda.
+    expect(metodo25).toBe('No calculada (no se han podido leer los años de propiedad)');
 
     // Y ni rastro de las dos lecturas equivocadas:
     //   · como 0 años → objetivo 5.000 × 0,14 × 25 % = 175,00 · real (20.000−14.000) ×
@@ -2644,7 +2647,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     // El neto se presenta como TECHO, nombrando el concepto que falta y el campo que lo
     // desbloquea (hallazgos 483 y 639).
     const neto25 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(neto25).toBe('Techo: aún NO incluye la plusvalía municipal (añade los años de propiedad)');
+    expect(neto25).toBe('Techo: aún NO incluye la plusvalía municipal. No se han podido leer los años de propiedad (escribe con coma decimal, como 1.234,56, lo que no se ha podido leer)');
 
     // Y en ninguna parte de la página puede haber NaN. Mayúsculas incluidas: `getByText`
     // no distingue y casaría con «ganancia».
@@ -3753,7 +3756,7 @@ test('REGRESIÓN 1157+1202 (operativa) — unos gastos de adquisición ilegibles
 
   const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
   expect(aviso).toContain('los impuestos y gastos de aquella compra');
-  expect(aviso).toContain('un importe legible en los gastos de la compra');
+  expect(aviso).toContain('escribe con coma decimal');
   // La dirección importa: leer el dato SUBE el neto, así que la cifra es un suelo.
   expect(aviso).toMatch(/^Suelo:/);
   expect(aviso).not.toMatch(/^Techo:/);
@@ -4072,8 +4075,8 @@ test('REGRESIÓN 22/09 (contenido) — el aviso del neto llama SUELO a lo que es
   const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
   expect(aviso).not.toMatch(/^Techo:/);
   expect(aviso).toMatch(/^Suelo:/);
-  expect(aviso).toContain('suben el neto');
-  expect(aviso).toContain('un importe legible en los gastos de la compra');
+  expect(aviso).toContain('REDUCEN el IRPF: el neto real es mayor que este');
+  expect(aviso).toContain('escribe con coma decimal');
 
   // Y con la MISMA cifra legible el neto sube los 420,10 € que el aviso anunciaba.
   await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2000,50');
@@ -4116,9 +4119,6 @@ test('REGRESIÓN 22/09 (contenido) — el aviso del neto llama SUELO a lo que es
 //    `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000 · 23 % hasta
 //    200.000 · 27 % hasta 300.000 · 30 % el resto).
 // ═════════════════════════════════════════════════════════════════════════════
-
-/** Con `VER_HUECOS=1` los hallazgos abiertos dejan de estar marcados y enseñan su fallo. */
-const VER_HUECOS_23_09 = Boolean(process.env.VER_HUECOS);
 
 /** El texto del marcador de posición del panel activo (cuando no hay resultados). */
 const textoMarcador = (page: Page) => page.locator('[class*="placeholder"] p').first();
@@ -4376,10 +4376,9 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
   });
 });
 
-// ── HALLAZGOS ABIERTOS de la re-inspección del 23/09/2026 ────────────────────────
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// La aserción de FONDO va la primera, detrás de una preparación que ya usan casos en verde.
-// Con `VER_HUECOS=1` se quitan las marcas y cada uno enseña su fallo.
+// ── HALLAZGOS 1280-1285 de la re-inspección del 23/09/2026 — REPARADOS el mismo día ──
+// La dirección de cada aviso sale ahora de SONDEAR el cálculo (lib/sondeoIlegibles.ts). Los
+// casos quedan como regresión, sin `test.fail()`.
 
 test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó en las otras tarjetas', () => {
   /**
@@ -4403,7 +4402,6 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
   test('HALLAZGO (operativa) — la cuota del IRPF con unos gastos de compra ilegibles se marca como techo', async ({
     page,
   }) => {
-    if (!VER_HUECOS_23_09) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '26000');
@@ -4445,7 +4443,6 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
   test('HALLAZGO (operativa) — con pérdida, unos gastos de compra ilegibles no «suben el neto»: mueven la pérdida', async ({
     page,
   }) => {
-    if (!VER_HUECOS_23_09) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '15000');
@@ -4498,7 +4495,6 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
   test('HALLAZGO (contenido) — con ilegibles de dirección opuesta el neto no puede ser techo y suelo a la vez', async ({
     page,
   }) => {
-    if (!VER_HUECOS_23_09) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '20000');
@@ -4539,7 +4535,6 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
   test('HALLAZGO (contenido) — el techo de una comisión ilegible dice que al descontarla también baja el IRPF', async ({
     page,
   }) => {
-    if (!VER_HUECOS_23_09) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '15000');
@@ -4575,7 +4570,6 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
   test('HALLAZGO (contenido) — «Valor de transmisión» no afirma restar una comisión que no ha podido leer', async ({
     page,
   }) => {
-    if (!VER_HUECOS_23_09) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '15000');
@@ -4608,7 +4602,6 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
   test('HALLAZGO (contenido) — un precio escrito pero ilegible se nombra como ilegible, no como ausente', async ({
     page,
   }) => {
-    if (!VER_HUECOS_23_09) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '2.000.50');

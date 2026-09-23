@@ -333,7 +333,7 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(page, 'Precio del trastero', '15000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
       await irAPestana(page, 'vendedor');
-      await sembrar(page, 'Precio de compra original', base === 'R' ? '14000' : '10000');
+      await sembrar(page, 'Precio de compra original', base === 'R' ? '14000' : base === 'P' ? '20000' : '10000');
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
       await sembrar(page, 'Años de propiedad', '5');
       await sembrar(page, 'Valor catastral del suelo', '4000');
@@ -374,6 +374,17 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -190,
         nombra: /impuestos y gastos de aquella compra/i,
+      },
+      {
+        // BASE P (compra original 20.000 > venta 15.000): PÉRDIDA, sin IRPF que rebajar; los
+        // gastos de aquella compra no mueven el neto y el aviso no puede prometer que suba
+        // (hallazgo 1281). La pérdida, que sí se mueve, la vigila el spec de la app.
+        etiqueta: 'Impuestos y gastos que pagaste al comprarlo',
+        panel: 'vendedor',
+        legible: '1000',
+        base: 'P',
+        direccion: 'sin_efecto',
+        delta: 0,
       },
       {
         etiqueta: 'Años de propiedad',

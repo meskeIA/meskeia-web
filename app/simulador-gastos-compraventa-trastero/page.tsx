@@ -26,6 +26,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
@@ -86,25 +87,9 @@ interface ResultadosComprador {
 const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
 const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
 
-/**
- * Un dato que la plusvalía necesita y el usuario no ha dado, con su número gramatical:
- * «el valor catastral del suelo» es singular y «los años de propiedad», plural. Sin esa
- * marca el aviso decía «falta los años de propiedad» (hallazgo 638).
- */
-interface CampoQueFalta {
-  texto: string;
-  plural: boolean;
-}
-
-/** «A» · «A y B» · «A, B y C»: la coma delante del último dejaba la lista sin cerrar. */
-const enumerarCampos = (campos: string[]): string =>
-  campos.length <= 1
-    ? campos.join('')
-    : `${campos.slice(0, -1).join(', ')} y ${campos[campos.length - 1]}`;
-
-/** El verbo concuerda con lo que falta: dos o más campos, o uno solo en plural → «faltan». */
-const verboFaltar = (campos: CampoQueFalta[]): string =>
-  campos.length > 1 || (campos.length === 1 && campos[0].plural) ? 'faltan' : 'falta';
+// La concordancia de «falta/faltan» (hallazgo 638) y la enumeración de campos viven desde
+// el 23/09/2026 en lib/sondeoIlegibles.ts (`faltaOFaltan`, `enumerar`), compartidas con las
+// hermanas: el mismo defecto de concordancia reapareció en garaje (hallazgo 1255).
 
 interface ResultadosVendedor {
   precioVenta: number;
@@ -128,6 +113,9 @@ interface ResultadosVendedor {
   valorTotalLegible: boolean;
   /** Los campos concretos que faltan para calcularla, para nombrarlos en el aviso */
   camposQueFaltan: string[];
+  /** …separados en los VACÍOS y los escritos que no se leen, que no «faltan» (hallazgo 1285) */
+  camposVacios: string[];
+  camposIlegibles: string[];
   comisionInmobiliaria: number;
   gastosGestoria: number;
   totalGastos: number;
@@ -138,9 +126,14 @@ interface ResultadosVendedor {
   /** Ni ganancia ni pérdida: se vende exactamente por el valor de adquisición. */
   sinGananciaNiPerdida: boolean;
   gananciaPatrimonial: number;
+  baseImponibleIRPF: number;
   irpfGanancia: number;
   /** false mientras falte el precio de compra: entonces el 0 no es una exención (hallazgo 483) */
   irpfCalculado: boolean;
+  /** Hacia dónde queda cada cifra real con los importes ilegibles, CALCULADO por sondeo */
+  veredictoNeto: Veredicto;
+  veredictoIrpf: Veredicto;
+  veredictoGanancia: Veredicto;
 }
 
 /**
@@ -234,6 +227,71 @@ const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'discapacidad', label: 'Persona con discapacidad' },
 ];
 
+
+// ===== CÁLCULO DEL VENDEDOR =====
+/**
+ * Los importes del vendedor ya leídos. Un importe ILEGIBLE entra como 0 (o `undefined` el
+ * valor catastral total): es lo que publica la app, y el sondeo de abajo mide cuánto y hacia
+ * dónde se movería cada cifra si ese importe tuviera el valor que el usuario quiso escribir.
+ */
+interface EntradaVendedor {
+  precioV: number;
+  /** NaN si falta o no se lee */
+  precioC: number;
+  /** Años enteros ya validados; NaN si faltan, no se leen o son negativos */
+  anios: number;
+  valorSuelo: number;
+  valorTotal: number | undefined;
+  comisionPct: number;
+  gestoria: number;
+  gastosAdquisicion: number;
+}
+
+/**
+ * El cálculo del vendedor, puro, para poder ejecutarlo varias veces: una con lo que se lee y
+ * otra por cada importe ilegible sondeado (hallazgos 1280-1285). La dirección de un aviso se
+ * CALCULA con esto, no se razona.
+ */
+function calcularVendedor(e: EntradaVendedor) {
+  const comision = e.precioV * e.comisionPct;
+  const plusvaliaCalculable = e.valorSuelo > 0 && Number.isFinite(e.anios) && e.precioC > 0;
+  const resultadoPlusvalia = plusvaliaCalculable
+    ? calcularPlusvaliaMunicipal({
+        valorCatastralSuelo: e.valorSuelo,
+        aniosPropiedad: e.anios,
+        precioCompra: e.precioC,
+        precioVenta: e.precioV,
+        valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
+      })
+    : null;
+  const plusvalia = resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0;
+
+  // Ganancia patrimonial e IRPF (trastero: sin exención por vivienda habitual ni edad).
+  // Motor único del art. 35 LIRPF: los impuestos y gastos de la compra suman al valor
+  // de adquisición y la plusvalía municipal resta del valor de transmisión.
+  const g = calcularGananciaInmueble({
+    precioVenta: e.precioV,
+    precioCompra: e.precioC > 0 ? e.precioC : 0,
+    gastosAdquisicion: e.gastosAdquisicion,
+    gastosTransmision: comision + e.gestoria,
+    plusvaliaMunicipal: plusvalia,
+  });
+  const hayDatosGanancia = e.precioC > 0;
+  const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
+  const totalGastos = sumarLineasVisibles(plusvalia, comision, e.gestoria, irpf);
+  return {
+    comision,
+    resultadoPlusvalia,
+    plusvalia,
+    g,
+    hayDatosGanancia,
+    irpf,
+    totalGastos,
+    neto: e.precioV - totalGastos,
+    /** Con signo: negativa si hay pérdida. 0 sin precio de compra. */
+    ganancia: hayDatosGanancia ? g.ganancia : 0,
+  };
+}
 
 export default function SimuladorTrasteroCompraventaPage() {
   // Estado del formulario
@@ -355,17 +413,15 @@ export default function SimuladorTrasteroCompraventaPage() {
     const precioV = parseSpanishNumber(precioVenta);
     const precioC = parseSpanishNumber(precioCompraOriginal);
     // Los años se leen del STRING, no del número: «0» es un dato VÁLIDO —el trastero
-    // revendido antes de cumplir el año, que desde el RDL 26/2021 sí tributa y lo hace con
-    // el coeficiente de «Menos de 1 año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más
-    // alto de la tabla)— y lo que impide calcular es el campo VACÍO. Con
-    // `parseInt(aniosPropiedad) || 0` los dos valían 0: el 0 explícito desactivaba la
-    // plusvalía y, en cuanto el blur del NumberInput reescribía el campo a «1» por su
-    // min={1}, se liquidaba con el coeficiente del año 1 (0,13), es decir DE MENOS, y el
-    // error se propagaba al art. 35 LIRPF porque la plusvalía resta del valor de
-    // transmisión (hallazgo 682 del Inspector; patrón ya reparado en local-comercial).
-    // Un año NEGATIVO no se acota a 0: se rechaza, como venía haciéndose (CASO 19 de esta
-    // app). Acotarlo lo convertiría en una reventa antes del año y liquidaría un impuesto a
-    // partir de un dato imposible.
+    // revendido antes de cumplir el año, que tributa con el coeficiente de «Menos de 1
+    // año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más alto de la tabla)— y lo que
+    // impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
+    // valían 0: el 0 explícito desactivaba la plusvalía y, en cuanto el blur del
+    // NumberInput reescribía el campo a «1» por su min={1}, se liquidaba con el
+    // coeficiente del año 1 (0,13), es decir DE MENOS (hallazgo 682 del Inspector).
+    // Un año NEGATIVO no se acota a 0: se rechaza, como venía haciéndose. Acotarlo lo
+    // convertiría en una reventa antes del año y liquidaría un impuesto a partir de un dato
+    // imposible (CASO 19 de esta app).
     const aniosTexto = aniosPropiedad.trim();
     /**
      * ⚠️ 13/09/2026 — la guarda era `Math.trunc(parseSpanishNumber(texto)) >= 0`, y
@@ -384,130 +440,254 @@ export default function SimuladorTrasteroCompraventaPage() {
 
     if (!Number.isFinite(precioV) || precioV <= 0) return null;
 
-    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
-    // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (guard > 0),
-    // así que el neto del vendedor subía por encima del propio precio de venta sin ninguna
-    // línea que lo explicara (hallazgo 486, mismo defecto que el 457 ya acotó en el comprador).
     /**
-     * ⚠️ 13/09/2026 — `parseSpanishNumberOr` devuelve su valor por defecto (0) cuando el
-     * parser RECHAZA el texto, así que el NaN de «1.2.3» y un campo vacío eran la misma cosa
-     * para el motor; y con la comisión en 0 su tarjeta ni se pinta (su guard es > 0), de modo
-     * que no quedaba en pantalla ninguna línea que explicara la diferencia. El error iba
-     * además en la dirección mala: la comisión es gasto de transmisión del art. 35.1 LIRPF,
-     * así que al desaparecer subían la ganancia, el IRPF y el neto (hallazgo 773).
-     *
      * Un valor ILEGIBLE no es un cero: es un dato que falta, y esta app ya sabe abstenerse y
-     * nombrarlo (lo hace con la plusvalía y con el IRPF). El negativo sí se acota a 0 a
-     * propósito, que es otra cosa y viene de los hallazgos 457 y 486.
-     */
-    /**
-     * ⚠️ 21/09/2026 — aquella reparación añadió `comisionLegible` SOLO a la comisión, y los
-     * otros dos importes del vendedor se quedaron con el mismo defecto (hallazgo 1157): los
-     * dos son partidas del art. 35.1 LIRPF, así que al leerse como 0 suben la ganancia y el
-     * IRPF —los gastos de aquella compra— o el neto —la gestoría de esta venta—. No hace
-     * falta teclear basura para llegar: «2.000.50», el millar y el decimal a la
-     * estadounidense, es NaN por diseño desde el 24/08/2026.
+     * nombrarlo. `parseSpanishNumberOr` devuelve su 0 por defecto cuando el parser RECHAZA el
+     * texto, así que el NaN de «2.000.50» —el millar y el decimal a la estadounidense, un
+     * copiar y pegar corriente— y un campo vacío eran la misma cosa para el motor (hallazgos
+     * 773 y 1157, vistos en trastero).
      */
     const esLegible = (texto: string) =>
       texto.trim() === '' || Number.isFinite(parseSpanishNumber(texto));
-    const comisionTexto = comisionInmobiliaria.trim();
-    const comisionLegible = esLegible(comisionTexto);
+    const comisionLegible = esLegible(comisionInmobiliaria);
+    const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
     const valorTotalLegible = esLegible(valorCatastralTotal);
-    const gestoriaLegible = esLegible(gastosGestoriaVenta);
-    const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
-    const gestoria = Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta));
-    const comision = precioV * comisionPct;
 
-    // Plusvalía municipal
-    let plusvalia = 0;
-    // El aviso nombra lo que de VERDAD falta, uno a uno. Decía siempre «faltan datos» y
-    // el neto mandaba a rellenar «los años de propiedad y el valor catastral del suelo»,
-    // así que con solo los años en blanco releías un campo ya relleno y el precio de compra
-    // no se nombraba nunca (hallazgo 590; es el 437, que la app hermana garaje ya reparó).
-    // El verbo y la enumeración se componen aparte: «falta» era fijo y la lista iba separada
-    // por comas, así que en cuanto faltaba un plural o dos campos el aviso desconcordaba
-    // («No calculada (falta el valor catastral del suelo, los años de propiedad)»,
-    // hallazgo 638).
-    const camposFaltantes: CampoQueFalta[] = [
-      valorSuelo > 0 ? null : { texto: 'el valor catastral del suelo', plural: false },
-      aniosDisponibles ? null : { texto: 'los años de propiedad', plural: true },
-      precioC > 0 ? null : { texto: 'el precio de compra original', plural: false },
-    ].filter((x): x is CampoQueFalta => x !== null);
-    const faltan = camposFaltantes.map(c => c.texto);
-    let metodoPlusvalia = `No calculada (${verboFaltar(camposFaltantes)} ${enumerarCampos(faltan)})`;
-    let exentoPlusvalia = false;
-    let plusvaliaCalculada = false;
+    // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
+    // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (hallazgo 474).
+    const entrada: EntradaVendedor = {
+      precioV,
+      precioC,
+      anios: aniosDisponibles ? anios : NaN,
+      valorSuelo,
+      valorTotal: valorTotal > 0 ? valorTotal : undefined,
+      comisionPct: Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100,
+      gestoria: Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta)),
+      gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
+    };
+    const r = calcularVendedor(entrada);
 
-    if (faltan.length === 0) {
-      plusvaliaCalculada = true;
-      const resultadoPlusvalia = calcularPlusvaliaMunicipal({
-        valorCatastralSuelo: valorSuelo,
-        aniosPropiedad: anios,
-        precioCompra: precioC,
-        precioVenta: precioV,
-        valorCatastralTotal: valorTotal > 0 ? valorTotal : undefined,
-      });
+    // El aviso nombra lo que de verdad falta. Antes decía siempre «falta valor catastral
+    // del suelo», así que quien no había puesto el precio de compra o los años releía un
+    // campo que ya tenía relleno (hallazgo 590). Y separa lo que está VACÍO de lo que está
+    // escrito pero no se lee, que no «falta»: el usuario lo ve (hallazgo 1285).
+    const ilegibleTexto = (t: string) => escritoIlegible(t, parseSpanishNumber);
+    const faltanVacios = [
+      valorSuelo > 0 || ilegibleTexto(valorCatastralSuelo) ? null : 'el valor catastral del suelo',
+      aniosDisponibles || ilegibleTexto(aniosPropiedad) ? null : 'los años de propiedad',
+      precioC > 0 || ilegibleTexto(precioCompraOriginal) ? null : 'el precio de compra original',
+    ].filter((x): x is string => x !== null);
+    const faltanIlegibles = [
+      ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
+      ilegibleTexto(aniosPropiedad) ? 'los años de propiedad' : null,
+      ilegibleTexto(precioCompraOriginal) ? 'el precio de compra original' : null,
+    ].filter((x): x is string => x !== null);
+    const faltan = [...faltanVacios, ...faltanIlegibles];
+    const porQueNoSeCalcula = [
+      faltanVacios.length > 0 ? faltaOFaltan(faltanVacios) : null,
+      faltanIlegibles.length > 0 ? noSePudoLeer(faltanIlegibles) : null,
+    ].filter((x): x is string => x !== null).join('; ');
 
-      plusvalia = resultadoPlusvalia.recomendado;
-      exentoPlusvalia = resultadoPlusvalia.exento;
-      metodoPlusvalia = resultadoPlusvalia.exento
+    let metodoPlusvalia = `No calculada (${porQueNoSeCalcula})`;
+    const rp = r.resultadoPlusvalia;
+    const exentoPlusvalia = rp ? rp.exento : false;
+    if (rp) {
+      metodoPlusvalia = rp.exento
         ? 'No sujeta (sin incremento de valor)'
-        : resultadoPlusvalia.parCatastralImposible
+        : rp.parCatastralImposible
           ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
-          : !resultadoPlusvalia.metodoRealDisponible
+          : !rp.metodoRealDisponible
             ? // «falta el valor catastral total» era falso cuando el usuario lo había
               // escrito y lo seguía viendo en el campo (hueco C1): no falta, no se lee.
               valorTotalLegible
               ? 'Método objetivo (falta el valor catastral total para comparar)'
               : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
-            : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+            : rp.metodoReal < rp.metodoObjetivo
               ? 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
     }
 
-    // Ganancia patrimonial e IRPF con el motor único del art. 35 LIRPF: los impuestos
-    // y gastos de la compra suman al valor de adquisición y la plusvalía municipal
-    // resta del valor de transmisión.
-    const g = calcularGananciaInmueble({
-      precioVenta: precioV,
-      precioCompra: precioC,
-      gastosAdquisicion: parseSpanishNumberOr(gastosAdquisicion),
-      gastosTransmision: comision + gestoria,
-      plusvaliaMunicipal: plusvalia,
-    });
-
-    const hayDatosGanancia = precioC > 0;
-    const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
-    const totalGastos = sumarLineasVisibles(plusvalia, comision, gestoria, irpf);
-    const neto = precioV - totalGastos;
+    /**
+     * El SONDEO de los importes ilegibles: se repite el cálculo con cada uno a un valor
+     * pequeño y a uno grande, y `veredictoIlegibles` dice hacia dónde queda cada cifra real.
+     * Antes la dirección se escribía a mano y fallaba donde nadie la había pensado: la tarjeta
+     * del IRPF se publicaba como definitiva (1280); con pérdida, sin IRPF que rebajar, prometía
+     * que el neto subiría (1281); y con dos ilegibles opuestos decía «Techo» y «Suelo» a la vez
+     * (1282).
+     */
+    const sondas: { nombre: string; pequeno: EntradaVendedor; grande: EntradaVendedor }[] = [];
+    if (!comisionLegible) {
+      sondas.push({
+        nombre: 'la comisión inmobiliaria',
+        pequeno: { ...entrada, comisionPct: 0.0001 },
+        grande: { ...entrada, comisionPct: 0.1 },
+      });
+    }
+    if (!gestoriaLegible) {
+      sondas.push({
+        nombre: 'la gestoría de la venta',
+        pequeno: { ...entrada, gestoria: 1 },
+        grande: { ...entrada, gestoria: precioV },
+      });
+    }
+    if (!gastosAdquisicionLegible) {
+      sondas.push({
+        nombre: 'los impuestos y gastos de aquella compra',
+        pequeno: { ...entrada, gastosAdquisicion: 1 },
+        grande: { ...entrada, gastosAdquisicion: precioV * 10 },
+      });
+    }
+    if (!valorTotalLegible && valorSuelo > 0) {
+      // El total va del propio suelo (todo es suelo) a un múltiplo enorme (casi nada lo es).
+      sondas.push({
+        nombre: 'el valor catastral total',
+        pequeno: { ...entrada, valorTotal: valorSuelo },
+        grande: { ...entrada, valorTotal: valorSuelo * 1000 },
+      });
+    }
+    const sondeadas = sondas.map((s) => ({
+      nombre: s.nombre,
+      pequeno: calcularVendedor(s.pequeno),
+      grande: calcularVendedor(s.grande),
+    }));
+    const veredictoDe = (cifra: (x: ReturnType<typeof calcularVendedor>) => number): Veredicto =>
+      veredictoIlegibles(
+        cifra(r),
+        sondeadas.map((s) => ({ nombre: s.nombre, pequeno: cifra(s.pequeno), grande: cifra(s.grande) })),
+      );
 
     return {
       precioVenta: precioV,
-      plusvaliaMunicipal: plusvalia,
+      plusvaliaMunicipal: r.plusvalia,
       metodoPlusvalia,
-      exentoPlusvalia,
-      plusvaliaCalculada,
-      comisionLegible,
-      gastosAdquisicionLegible,
-      gestoriaLegible,
-      // Sin plusvalía liquidada (faltan datos o no hay incremento) no hay método que comparar.
-      valorTotalLegible: !plusvaliaCalculada || exentoPlusvalia || valorTotalLegible,
-      /** Los campos concretos que faltan, para que el aviso del neto no los adivine */
+      plusvaliaCalculada: rp !== null,
+      /**
+       * Los campos que de verdad faltan, para que el pie del neto no los vuelva a deducir
+       * con un ternario de dos ramas que ignoraba la tercera causa: con los AÑOS DE
+       * PROPIEDAD en blanco mandaba a rellenar el valor del suelo, ya relleno (hallazgo 576).
+       */
       camposQueFaltan: faltan,
-      comisionInmobiliaria: comision,
-      gastosGestoria: gestoria,
-      totalGastos,
-      netoVendedor: neto,
-      valorAdquisicion: hayDatosGanancia ? g.valorAdquisicion : 0,
-      valorTransmision: g.valorTransmision,
-      gananciaPatrimonial: hayDatosGanancia ? g.ganancia : 0,
-      esPerdida: hayDatosGanancia && g.esPerdida,
-      sinGananciaNiPerdida: hayDatosGanancia && g.sinGananciaNiPerdida,
-      irpfGanancia: irpf,
-      irpfCalculado: hayDatosGanancia,
+      camposVacios: faltanVacios,
+      camposIlegibles: faltanIlegibles,
+      exentoPlusvalia,
+      comisionInmobiliaria: r.comision,
+      gastosGestoria: entrada.gestoria,
+      totalGastos: r.totalGastos,
+      netoVendedor: r.neto,
+      valorAdquisicion: r.hayDatosGanancia ? r.g.valorAdquisicion : 0,
+      valorTransmision: r.g.valorTransmision,
+      gananciaPatrimonial: r.ganancia,
+      esPerdida: r.hayDatosGanancia && r.g.esPerdida,
+      sinGananciaNiPerdida: r.hayDatosGanancia && r.g.sinGananciaNiPerdida,
+      baseImponibleIRPF: r.hayDatosGanancia ? r.g.baseImponible : 0,
+      irpfGanancia: r.irpf,
+      irpfCalculado: r.hayDatosGanancia,
+      comisionLegible,
+      gestoriaLegible,
+      gastosAdquisicionLegible,
+      // Sin plusvalía liquidada (faltan datos o no hay incremento) no hay método que comparar.
+      valorTotalLegible: rp === null || exentoPlusvalia || valorTotalLegible,
+      veredictoNeto: veredictoDe((x) => x.neto),
+      veredictoIrpf: veredictoDe((x) => x.irpf),
+      veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
+
+  /**
+   * Lo que el neto NO incluye por falta de datos, para que «IMPORTE NETO VENDEDOR» no se
+   * presente como definitivo cuando en realidad hay una partida sin calcular (efecto familia
+   * del hallazgo 483, ya reparado en estimador-compraventa-inmueble).
+   */
+  const faltanEnElNeto = resultadosVendedor
+    ? [
+        resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
+        resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+      ].filter((x): x is string => x !== null)
+    : [];
+
+  /**
+   * C3 · la MAGNITUD de «falta descontar» (testigo de familia, propagado desde el estimador,
+   * 0f70fdf8). La comisión y la gestoría de la venta son gastos de transmisión (art. 35.1
+   * LIRPF): descontarlas baja también la ganancia y con ella el IRPF, así que el hueco real
+   * es menor que su importe. Esa rebaja no puede superar el tipo MARGINAL del ahorro en la
+   * base de ahora (la escala es progresiva y la base solo puede bajar), y ese tipo es una
+   * cota que se puede publicar sin inventar nada (hallazgo 1283).
+   */
+  const tipoMarginalAhorro =
+    resultadosVendedor && resultadosVendedor.irpfGanancia > 0
+      ? (TRAMOS_GANANCIAS_PATRIMONIALES_2025.find((t) => resultadosVendedor.baseImponibleIRPF <= t.hasta)
+          ?.tipo ?? TIPO_AHORRO_MAX)
+      : null;
+
+  /**
+   * Lo que el aviso del neto dice de los importes ilegibles, calculado por el sondeo, en el
+   * dialecto de esta app: «Techo:» si la cifra real es menor, «Suelo:» si es mayor, y ninguno
+   * de los dos si se mueven en sentidos contrarios, que es cuando la app no puede saberlo
+   * (hallazgo 1282: con los dos a la vez, solo serían ciertos si la cifra fuese la correcta).
+   */
+  const avisoIlegiblesNeto = (() => {
+    const v = resultadosVendedor?.veredictoNeto;
+    if (!v || v.tipo === 'ninguno') return null;
+    if (v.tipo === 'mixto') {
+      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${v.menor.length > 1 ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${v.mayor.length > 1 ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
+    }
+    if (v.tipo === 'menor') {
+      const deducibles = v.campos.filter((c) => c === 'la comisión inmobiliaria' || c === 'la gestoría de la venta');
+      const matiz =
+        deducibles.length === 0 || tipoMarginalAhorro === null
+          ? ''
+          : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`;
+      return v.seguro
+        ? `Techo: aún NO incluye ${enumerar(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}`
+        : `Techo: ${noSePudoLeer(v.campos)}, y el neto real puede ser menor que este`;
+    }
+    const explica = v.campos.map((c) =>
+      c === 'los impuestos y gastos de aquella compra'
+        ? 'los impuestos y gastos de aquella compra, que al sumarse al valor de adquisición REDUCEN el IRPF'
+        : c === 'el valor catastral total'
+          ? 'el valor catastral total, y con él la plusvalía puede salir más barata por el método real'
+          : c,
+    );
+    return `Suelo: ${noSePudoLeer(explica)}: el neto real ${v.seguro ? 'es' : 'puede ser'} mayor que este`;
+  })();
+
+  /**
+   * Los campos concretos que hay que rellenar o corregir. Sale del motor (`camposQueFaltan`),
+   * que ya los conoce uno a uno (hallazgo 576), y de los ilegibles que mueven alguna cifra.
+   */
+  const camposPendientes = resultadosVendedor
+    ? Array.from(new Set([
+        ...resultadosVendedor.camposVacios,
+        ...(resultadosVendedor.irpfCalculado || resultadosVendedor.camposIlegibles.includes('el precio de compra original')
+          ? []
+          : ['el precio de compra original']),
+      ]))
+    : [];
+  const hayIlegiblesQueCorregir =
+    (resultadosVendedor?.camposIlegibles.length ?? 0) > 0 ||
+    (resultadosVendedor !== null && resultadosVendedor.veredictoNeto.tipo !== 'ninguno');
+
+  /** Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve. */
+  const avisoTarjeta = (v: Veredicto, que: string): string | null => {
+    if (v.tipo === 'ninguno') return null;
+    if (v.tipo === 'mixto') {
+      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven ${que} en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
+    }
+    return v.tipo === 'menor'
+      ? `TECHO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} menor. Escríbelo con coma decimal (1.234,56).`
+      : `SUELO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} mayor. Escríbelo con coma decimal (1.234,56).`;
+  };
+
+  /** La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. */
+  const avisoPerdida = (v: Veredicto): string | null => {
+    if (v.tipo === 'ninguno') return null;
+    if (v.tipo === 'mixto') {
+      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven la pérdida en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
+    }
+    const mayorPerdida = v.tipo === 'menor';
+    return `${noSePudoLeer(v.campos)}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. Escríbelo con coma decimal (1.234,56).`;
+  };
 
   const datosCcaaActual = ITP_CCAA[ccaa];
 
@@ -930,7 +1110,11 @@ export default function SimuladorTrasteroCompraventaPage() {
               ) : (
                 <div className={styles.placeholder}>
                   <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
-                  <p>Introduce el precio del trastero para ver el desglose de gastos del comprador</p>
+                  <p>
+                    {escritoIlegible(precioVenta, parseSpanishNumber)
+                      ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio del trastero con coma decimal (15.000 o 15000,50) para ver el desglose de gastos del comprador`
+                      : 'Introduce el precio del trastero para ver el desglose de gastos del comprador'}
+                  </p>
                 </div>
               )}
             </div>
@@ -1059,7 +1243,16 @@ export default function SimuladorTrasteroCompraventaPage() {
                         value={formatCurrency(resultadosVendedor.valorTransmision)}
                         variant="default"
                         icon="📤"
-                        description="Precio de venta − comisión, gestoría y plusvalía municipal"
+                        // Afirmaba restar una comisión o una gestoría que el motor había tomado
+                        // como 0 por ilegibles (hallazgo 1284, la gemela del 1157).
+                        description={
+                          resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
+                            ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
+                            : `Precio de venta − plusvalía municipal y los gastos que se leen: ${noSePudoLeer([
+                                ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
+                                ...(resultadosVendedor.gestoriaLegible ? [] : ['la gestoría de la venta']),
+                              ])}`
+                        }
                       />
                     </>
                   )}
@@ -1084,7 +1277,10 @@ export default function SimuladorTrasteroCompraventaPage() {
                       value={formatCurrency(Math.abs(resultadosVendedor.gananciaPatrimonial))}
                       variant="success"
                       icon="📉"
-                      description="Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede compensar en la declaración"
+                      description={
+                        avisoPerdida(resultadosVendedor.veredictoGanancia) ??
+                        'Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede compensar en la declaración'
+                      }
                     />
                   ) : (
                     resultadosVendedor.gananciaPatrimonial > 0 && (
@@ -1093,7 +1289,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                         value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
                         variant="info"
                         icon="📈"
-                        description="Base para IRPF (base del ahorro)"
+                        description={
+                          avisoTarjeta(resultadosVendedor.veredictoGanancia, 'la ganancia') ?? 'Base para IRPF (base del ahorro)'
+                        }
                       />
                     )
                   )}
@@ -1119,26 +1317,45 @@ export default function SimuladorTrasteroCompraventaPage() {
                     icon="💸"
                     description={
                       !resultadosVendedor.irpfCalculado
-                        ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
-                        : `Tributación en base del ahorro (${TIPO_AHORRO_MIN}%-${TIPO_AHORRO_MAX}%)`
+                        ? resultadosVendedor.camposIlegibles.includes('el precio de compra original')
+                          ? 'El precio de compra original no se ha podido leer: escríbelo con coma decimal (1.234,56). Este impuesto NO está incluido en el neto de abajo.'
+                          : 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                        : (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota') ??
+                          `Tributación en base del ahorro (${TIPO_AHORRO_MIN}%-${TIPO_AHORRO_MAX}%)`)
                     }
                   />
 
-                  {resultadosVendedor.comisionInmobiliaria > 0 && (
+                  {/* Un importe ilegible no hace desaparecer su línea: se ve «Sin leer» (la forma
+                      del A3 de local-comercial y del 1191 del estimador). */}
+                  {(resultadosVendedor.comisionInmobiliaria > 0 || !resultadosVendedor.comisionLegible) && (
                     <ResultCard
-                      title={`Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}%)`}
-                      value={formatCurrency(resultadosVendedor.comisionInmobiliaria)}
+                      title={
+                        resultadosVendedor.comisionLegible
+                          ? `Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}%)`
+                          : 'Comisión inmobiliaria'
+                      }
+                      value={resultadosVendedor.comisionLegible ? formatCurrency(resultadosVendedor.comisionInmobiliaria) : 'Sin leer'}
                       variant="default"
                       icon="🏪"
+                      description={
+                        resultadosVendedor.comisionLegible
+                          ? undefined
+                          : 'El porcentaje no se ha podido leer: escríbelo con coma decimal (3,5)'
+                      }
                     />
                   )}
 
-                  {resultadosVendedor.gastosGestoria > 0 && (
+                  {(resultadosVendedor.gastosGestoria > 0 || !resultadosVendedor.gestoriaLegible) && (
                     <ResultCard
                       title="Gastos de gestoría"
-                      value={formatCurrency(resultadosVendedor.gastosGestoria)}
+                      value={resultadosVendedor.gestoriaLegible ? formatCurrency(resultadosVendedor.gastosGestoria) : 'Sin leer'}
                       variant="default"
                       icon="📂"
+                      description={
+                        resultadosVendedor.gestoriaLegible
+                          ? undefined
+                          : 'El importe no se ha podido leer: escríbelo con coma decimal (1.234,56)'
+                      }
                     />
                   )}
 
@@ -1149,6 +1366,16 @@ export default function SimuladorTrasteroCompraventaPage() {
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="warning"
                     icon="➖"
+                    description={
+                      faltanEnElNeto.length > 0 || avisoIlegiblesNeto
+                        ? `Parcial: ${[
+                            faltanEnElNeto.length > 0 ? `sin ${enumerar(faltanEnElNeto)}` : null,
+                            avisoIlegiblesNeto ? 'con importes que no se han podido leer (ver el neto de abajo)' : null,
+                          ]
+                            .filter(Boolean)
+                            .join('; ')}`
+                        : undefined
+                    }
                   />
 
                   <ResultCard
@@ -1157,79 +1384,24 @@ export default function SimuladorTrasteroCompraventaPage() {
                     variant="highlight"
                     icon="💰"
                     description={
-                      // El IRPF también puede faltar por falta de precio de compra, y hasta el
-                      // hallazgo 483 este aviso solo nombraba la plusvalía: el IRPF quedaba
-                      // fuera del neto sin que nada lo mencionara. Desde el hallazgo 639 los
-                      // CONCEPTOS que faltan van por un lado y los CAMPOS que hay que rellenar
-                      // por otro, sin repetirlos: el precio de compra original bloquea los dos
-                      // cálculos a la vez y se pedía dos veces en la misma frase.
+                      // Los CONCEPTOS que faltan (plusvalía, IRPF) van por un lado y los CAMPOS que
+                      // hay que rellenar por otro, sin repetirlos (hallazgo 639). La dirección de
+                      // los importes ilegibles la da el sondeo del cálculo (avisoIlegiblesNeto).
                       (() => {
-                        const conceptos: string[] = [];
-                        const campos: string[] = [];
-                        const pedir = (campo: string) => {
-                          if (!campos.includes(campo)) campos.push(campo);
-                        };
-                        if (!resultadosVendedor.plusvaliaCalculada && !resultadosVendedor.exentoPlusvalia) {
-                          conceptos.push('la plusvalía municipal');
-                          resultadosVendedor.camposQueFaltan.forEach(pedir);
-                        }
-                        if (!resultadosVendedor.irpfCalculado) {
-                          conceptos.push('el IRPF de la ganancia');
-                          pedir('el precio de compra original');
-                        }
-                        // Una comisión que no se puede leer NO es un 0 %: es un dato que falta,
-                        // y su ausencia sube el neto Y el IRPF, porque es gasto de transmisión
-                        // del art. 35.1 LIRPF (hallazgo 773).
-                        if (!resultadosVendedor.comisionLegible) {
-                          conceptos.push('la comisión inmobiliaria');
-                          pedir('un porcentaje de comisión legible');
-                        }
-                        // La gestoría de la venta va en la misma dirección que la comisión:
-                        // es gasto de transmisión, y al no leerse deja el neto por ENCIMA del
-                        // real (hallazgo 1157).
-                        if (!resultadosVendedor.gestoriaLegible) {
-                          conceptos.push('la gestoría de la venta');
-                          pedir('un importe de gestoría legible');
-                        }
-                        /**
-                         * Los impuestos y gastos de AQUELLA compra van al revés, y por eso
-                         * salen de la lista de arriba (hallazgo 1202): suman al valor de
-                         * adquisición (art. 35.1 LIRPF), así que reducen la ganancia y con
-                         * ella el IRPF, que es una de las cuatro líneas que el neto resta.
-                         * Al no leerse dejan el neto por DEBAJO del real: la cifra es un
-                         * SUELO, y meterla en la frase «Techo: aún NO incluye…» mandaba
-                         * descontar de una cifra que al leer el dato SUBE (420,10 € en el
-                         * caso del acta).
-                         */
-                        const sueloPorAdquisicion = !resultadosVendedor.gastosAdquisicionLegible;
-                        if (sueloPorAdquisicion) {
-                          pedir('un importe legible en los gastos de la compra');
-                        }
-                        // El valor catastral total va a la plusvalía, no al valor de
-                        // adquisición, pero en la misma dirección: sin leerlo, la cifra es un
-                        // SUELO (hueco C1 del testigo de familia).
-                        const sueloPorCatastral = !resultadosVendedor.valorTotalLegible;
-                        if (sueloPorCatastral) {
-                          pedir('un valor catastral total legible');
-                        }
-                        if (conceptos.length === 0 && !sueloPorAdquisicion && !sueloPorCatastral) {
-                          return 'Lo que realmente recibes tras los gastos';
-                        }
                         const frases: string[] = [];
-                        if (conceptos.length > 0) {
-                          frases.push(`Techo: aún NO incluye ${conceptos.join(' ni ')}`);
+                        if (faltanEnElNeto.length > 0) frases.push(`Techo: aún NO incluye ${faltanEnElNeto.join(' ni ')}`);
+                        if (resultadosVendedor.camposIlegibles.length > 0) {
+                          frases.push(`${noSePudoLeer(resultadosVendedor.camposIlegibles).replace(/^./, (c) => c.toUpperCase())}`);
                         }
-                        if (sueloPorAdquisicion) {
-                          frases.push(
-                            'Suelo: faltan los impuestos y gastos de aquella compra, que al sumarse al valor de adquisición REDUCEN el IRPF y suben el neto',
-                          );
-                        }
-                        if (sueloPorCatastral) {
-                          frases.push(
-                            'Suelo: el valor catastral total no se ha podido leer, y con él la plusvalía puede salir más barata por el método real',
-                          );
-                        }
-                        return `${frases.join('. ')} (añade ${enumerarCampos(campos)})`;
+                        if (avisoIlegiblesNeto) frases.push(avisoIlegiblesNeto);
+                        if (frases.length === 0) return 'Lo que realmente recibes tras los gastos';
+                        const pedir = [
+                          camposPendientes.length > 0 ? `añade ${enumerar(camposPendientes)}` : null,
+                          hayIlegiblesQueCorregir ? 'escribe con coma decimal, como 1.234,56, lo que no se ha podido leer' : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' y ');
+                        return `${frases.join('. ')} (${pedir})`;
                       })()
                     }
                   />
@@ -1237,7 +1409,11 @@ export default function SimuladorTrasteroCompraventaPage() {
               ) : (
                 <div className={styles.placeholder}>
                   <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
-                  <p>Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor</p>
+                  <p>
+                    {escritoIlegible(precioVenta, parseSpanishNumber)
+                      ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio de venta con coma decimal (15.000 o 15000,50) para calcular el neto del vendedor`
+                      : 'Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor'}
+                  </p>
                 </div>
               )}
             </div>
