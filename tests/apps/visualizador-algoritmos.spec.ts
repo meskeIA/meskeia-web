@@ -86,32 +86,52 @@ const RUTA = '/visualizador-algoritmos/';
  * nodo <canvas>: esa es la de su creación y alterna con su gemela en cada render, así que la mitad
  * de las veces devuelve el array de un render atrás (medido: tras «Usar este array» leía aún el
  * array aleatorio anterior). Índice = orden en pantalla (0 = el único del modo individual).
+ *
+ * Espera a que el lienzo EXISTA en ese árbol en vez de leerlo una sola vez. `esperarHidratacion`
+ * no lo garantiza: React pone el rastreador al input durante el RENDER de la hidratación de su
+ * límite de Suspense, antes de confirmarlo, y el árbol vigente es el confirmado. Medido el
+ * 23/09/2026 con la CPU a 1/20: al volver `esperarHidratacion` el árbol tenía 110 fibras, dos
+ * límites aún deshidratados y 0 lienzos; medio segundo después, 951 fibras y 1 lienzo. Así falló
+ * el CASO 3 de 51 valores en la suite completa («hay 0»), que lee el array antes de tocar nada.
  */
 async function leerBarras(page: Page, indiceCanvas = 0): Promise<number[]> {
-  return page.evaluate((indice) => {
-    type Fibra = {
-      memoizedProps?: { bars?: { value: number }[]; maxValue?: number } | null;
-      child: Fibra | null;
-      sibling: Fibra | null;
-      stateNode?: { current?: Fibra };
-    };
-    const doc = document as unknown as Record<string, unknown>;
-    const clave = Object.keys(doc).find((k) => k.startsWith('__reactContainer$'));
-    if (!clave) throw new Error('No se encontró la raíz de React en document');
-    const raiz = (doc[clave] as Fibra).stateNode?.current;
-    if (!raiz) throw new Error('La raíz de React no tiene árbol vigente');
-    const lienzos: number[][] = [];
-    const pila: Fibra[] = [raiz];
-    while (pila.length) {
-      const f = pila.pop() as Fibra;
-      const p = f.memoizedProps;
-      if (p && p.bars && 'maxValue' in p) lienzos.push(p.bars.map((b) => b.value));
-      if (f.sibling) pila.push(f.sibling);
-      if (f.child) pila.push(f.child);
-    }
-    if (!lienzos[indice]) throw new Error(`No hay SortingCanvas nº ${indice} (hay ${lienzos.length})`);
-    return lienzos[indice];
-  }, indiceCanvas);
+  let foto: { total: number; lienzo: number[] | null } = { total: 0, lienzo: null };
+  try {
+    await expect
+      .poll(
+        async () => {
+          foto = await page.evaluate((indice) => {
+            type Fibra = {
+              memoizedProps?: { bars?: { value: number }[]; maxValue?: number } | null;
+              child: Fibra | null;
+              sibling: Fibra | null;
+              stateNode?: { current?: Fibra };
+            };
+            const doc = document as unknown as Record<string, unknown>;
+            const clave = Object.keys(doc).find((k) => k.startsWith('__reactContainer$'));
+            const raiz = clave ? (doc[clave] as Fibra).stateNode?.current : undefined;
+            if (!raiz) return { total: 0, lienzo: null };
+            const lienzos: number[][] = [];
+            const pila: Fibra[] = [raiz];
+            while (pila.length) {
+              const f = pila.pop() as Fibra;
+              const p = f.memoizedProps;
+              if (p && p.bars && 'maxValue' in p) lienzos.push(p.bars.map((b) => b.value));
+              if (f.sibling) pila.push(f.sibling);
+              if (f.child) pila.push(f.child);
+            }
+            return { total: lienzos.length, lienzo: lienzos[indice] ?? null };
+          }, indiceCanvas);
+          return foto.lienzo !== null;
+        },
+        { timeout: 10000 },
+      )
+      .toBe(true);
+  } catch {
+    // El mensaje del poll solo diría «esperaba true»; el de abajo dice cuántos lienzos había.
+  }
+  if (!foto.lienzo) throw new Error(`No hay SortingCanvas nº ${indiceCanvas} (hay ${foto.total})`);
+  return foto.lienzo;
 }
 
 /** Valor de una tarjeta de métricas del modo individual, por su etiqueta. */
