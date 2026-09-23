@@ -491,6 +491,34 @@ razón es obligatoria** — la marca a secas también rompe el build.
 > de línea— están en `scripts/pruebas/probar-check-legal-notice.mjs` como casos que exigen que
 > **calle**. Se le reinyectan los 8 con **`npm run legal:probar-candado`**.
 
+### Candado de las celdas braille
+
+`npm run check:braille` — lo ejecuta también `npm run build`, y **rompe el build** si una celda
+que `conversor-braille` puede EMITIR no tiene entrada en `brailleDots`, o si los puntos de una
+entrada no cuadran con su código Unicode (el bloque U+2800 codifica los puntos en bits, así que
+los de `⠙` = U+2819 son forzosamente 1-4-5).
+
+Salió del **mismo defecto dos veces**, con la lección de la primera escrita en el código: el
+21/08/2026 faltaban los tres indicadores —numeral, mayúscula y latina minúscula— y el 22/09
+(hallazgo 1183) faltaba `⠠`, la primera celda de la barra inclinada, que llega por
+`SIGNOS_COMPUESTOS` y por eso se quedó fuera de aquella reparación. `brailleDots[c] ?? []` no da
+error: devuelve una celda con los seis puntos apagados, y **en la hoja imprimible a escala real
+eso es un espacio**, así que el lector táctil leía «12/05/2026» como «12 ,05 ,2026». Duele en el
+único producto FÍSICO del catálogo, que no se puede desmentir después.
+
+⚠️ **El Cuadre no podía verlo**: compara conjuntos antes/después, así que cubre la desaparición
+de una entrada y es ciego a que nunca existiera — «nacer no es una sorpresa».
+
+⚠️ **Sin pasivo**: las 50 entradas actuales cumplen las dos reglas, así que solo puede
+encenderlo código nuevo. Y **sin escape**, a propósito: una celda emitible sin puntos no tiene
+falso positivo posible, y un patrón que no cuadra con su Unicode es un error de tecleo.
+
+> Qué NO mira (`brailleToText`, y si la celda es la correcta para su carácter en tinta, que eso
+> lo dice el B 2 y no la aritmética): cabecera de `scripts/check-celdas-braille.mjs`. Sus cinco
+> trampas, en `scripts/pruebas/probar-check-celdas-braille.mjs`, y se le reinyectan con
+> **`npm run braille:probar-candado`** — la quinta le renombra la tabla y exige que se PLANTE en
+> vez de dar verde, y es la que destapó que su propio regex leía cualquier `brailleDotsLoQueSea`.
+
 ### Candado del mínimo personal del IRPF
 
 `npm run check:minimo-irpf` — lo ejecuta también `npm run build`, y **rompe el build** si en un
@@ -559,14 +587,11 @@ comentario anterior, y **la razón es obligatoria** — la marca a secas tambié
 números de paso** con fondo de marca medidos el 22/09/2026 (1.004 de ellos botones), que son
 campaña aparte porque cambiarlos altera el aspecto de la interacción en 782 apps.
 
-⚠️ **`--text-muted` en oscuro está MEDIDO y SIN REPARAR** (22/09/2026). Vale `#808080` y cae
-sobre exactamente dos fondos reales —medido en navegador, 447 elementos en 6 apps—: **3,49:1**
-sobre la tarjeta `#2D2D2D` (340 elementos, el peor caso) y **4,41:1** sobre la página `#1A1A1A`
-(107). Ninguno llega a 4,5. Afecta al pie, al copyright del aviso legal y a las descripciones de
-`RelatedApps`. **`#949494` sería el primer gris que cumple** sobre la tarjeta (4,54 y 5,74). No
-lo puede vigilar un candado: es un valor de `globals.css` que toca las 1.001 apps a la vez y se
-decide midiendo contra el fondo real — el mismo token ya se equivocó así el 21/08/2026, cuando
-`#757575` se eligió contra blanco puro (4,60) y sobre `#FAFAFA` daba 4,41.
+✅ **`--text-muted` ya está reparado en los DOS temas** (22/09/2026): `#6E6E6E` en claro y
+`#9B9B9B` en oscuro, en `globals.css` y en los ~360 módulos que lo redefinían. Lo que queda como
+lección: un token de `globals.css` **no lo puede vigilar un candado**, porque toca las 1.001 apps
+a la vez y se decide midiendo contra el FONDO REAL, no contra blanco puro — así se equivocó el
+21/08/2026, cuando `#757575` se eligió contra blanco (4,60) y sobre `#FAFAFA` daba 4,41.
 
 > Las cuatro formas que tenía el pasivo y las dos que NO debe encender: cabecera de
 > `scripts/check-contraste-cabeceras.mjs`. Sus 13 casos de prueba, en
