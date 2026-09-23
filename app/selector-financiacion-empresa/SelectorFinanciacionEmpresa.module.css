@@ -1,14 +1,9 @@
 /* Selector Financiación Empresa — CSS Module meskeIA */
 
-:root {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
-  --accent: #7FB3D3;
-  --bg-primary: #FAFAFA;
-  --bg-card: #FFFFFF;
-  --text-primary: #1A1A1A;
-  --text-secondary: #666666;
-  --text-muted: #6E6E6E;
+/* En .container y solo lo propio: era un :root con la paleta entera copiada de globals.
+   :root es GLOBAL, así que en oscuro pisaba los tokens oscuros de globals y el aviso legal
+   salía en blanco y la pregunta en #1A1A1A sobre la tarjeta #2A2A2A. */
+.container {
   --radius: 12px;
   --shadow: 0 2px 12px rgba(46, 134, 171, 0.10);
 }
