@@ -108,11 +108,11 @@
 
 /* Barra de temperatura */
 .tempBar {
-  width: 80px;
+  width: 150px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 .tempLabel {
   font-size: 0.75rem;
@@ -122,18 +122,34 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+/* Las marcas van en una línea y centradas en su punto de la barra: en dos líneas y
+   apoyadas por abajo se pisaban (500 °C y 15 °C están a 16px) y la de 5.400 °C
+   montaba sobre el rótulo «Temperatura». */
+.tempEscala { position: relative; display: flex; }
 .tempGradient {
   width: 20px;
   height: 200px;
   background: linear-gradient(to top, #FFB800, #CC0000, #D2691E, #8B6914, #4A90D9);
   border-radius: 10px;
-  position: relative;
+}
+.tempMarcas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 28px;
+  top: 0;
+  bottom: 0;
 }
 .tempMarca {
   position: absolute;
-  left: 28px;
+  left: 0;
+  bottom: calc(var(--pos) * 1%);
+  transform: translateY(50%);
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 0.3rem;
+  line-height: 1.2;
   white-space: nowrap;
 }
 .tempTemp { font-size: 0.7rem; font-weight: 700; color: var(--text-primary); }
@@ -473,9 +489,13 @@
   .tabNav { gap: 0.3rem; }
   .tabBtn { font-size: 0.75rem; padding: var(--spacing-sm) 0.6rem; }
   .capasLayout { flex-direction: column; }
-  .tempBar { width: 100%; flex-direction: row; gap: var(--spacing-md); }
+  /* En horizontal no caben cinco marcas en su posición: van en fila bajo la barra,
+     del centro a la superficie, que es el orden de sus colores de izquierda a derecha. */
+  .tempBar { width: 100%; }
+  .tempEscala { width: 100%; flex-direction: column; gap: var(--spacing-sm); }
   .tempGradient { width: 100%; height: 20px; background: linear-gradient(to right, #4A90D9, #8B6914, #D2691E, #CC0000, #FFB800); border-radius: 10px; }
-  .tempMarca { left: auto; top: 28px; flex-direction: row; gap: 0.3rem; }
+  .tempMarcas { position: static; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 0.5rem; }
+  .tempMarca { position: static; transform: none; flex-direction: column; align-items: center; gap: 0; order: calc(0 - var(--pos)); }
   .capaDatos { grid-template-columns: 1fr; }
   .capasGrid { grid-template-columns: 1fr; }
   .ondasGrid { grid-template-columns: 1fr; }

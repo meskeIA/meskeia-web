@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './CapasTierra.module.css';
 import {
   MeskeiaLogo,
@@ -385,17 +385,20 @@ export default function VisualizadorCapasTierraPage() {
               {/* Barra de temperatura */}
               <div className={styles.tempBar}>
                 <div className={styles.tempLabel}>Temperatura</div>
-                <div className={styles.tempGradient}>
-                  {TEMPERATURA_MARCAS.map(marca => (
-                    <div
-                      key={marca.label}
-                      className={styles.tempMarca}
-                      style={{ bottom: `${marca.pos}%` }}
-                    >
-                      <span className={styles.tempTemp}>{marca.temp}</span>
-                      <span className={styles.tempNombre}>{marca.label}</span>
-                    </div>
-                  ))}
+                <div className={styles.tempEscala}>
+                  <div className={styles.tempGradient} />
+                  <ul className={styles.tempMarcas}>
+                    {TEMPERATURA_MARCAS.map(marca => (
+                      <li
+                        key={marca.label}
+                        className={styles.tempMarca}
+                        style={{ '--pos': marca.pos } as CSSProperties}
+                      >
+                        <span className={styles.tempTemp}>{marca.temp}</span>
+                        <span className={styles.tempNombre}>{marca.label}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
