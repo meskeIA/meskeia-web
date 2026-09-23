@@ -59,6 +59,15 @@ const LIMITE_X = SVG_WIDTH / 2 / SCALE;
 const LIMITE_Y = SVG_HEIGHT / 2 / SCALE;
 const acotarAlLienzo = (v: number, limite: number) => Math.max(-limite, Math.min(limite, v));
 
+/**
+ * Coordenada del SVG redondeada a la centésima de píxel, para las que salen de Math.sin, cos y
+ * atan2 (las flechas del lienzo). El HTML lo genera Node y lo hidrata Chromium, y sus V8 no dan
+ * el mismo último bit en esas funciones: medido el 23/09/2026 con el dipolo de arranque, 4 de
+ * las 161 flechas diferían en la 15.ª cifra (…265487 frente a …265483) y React avisaba de un
+ * desajuste en `points`. Una centésima de píxel no se ve; la cifra 15.ª tampoco.
+ */
+const redondearSvg = (v: number) => Math.round(v * 100) / 100;
+
 const worldToSvg = (x: number, y: number): Punto => ({
   x: ORIGIN_X + x * SCALE,
   y: ORIGIN_Y - y * SCALE,
@@ -540,8 +549,8 @@ export default function SimuladorCampoElectrico() {
       // Longitud escalada logarítmicamente para visualización
       const len = Math.min(28, 6 + 14 * Math.log10(1 + (9 * it.mag) / Math.max(maxMag, 1e-6)));
       const ang = Math.atan2(-it.Ey, it.Ex); // -Ey porque Y svg invertida
-      const x2 = it.sx + len * Math.cos(ang);
-      const y2 = it.sy + len * Math.sin(ang);
+      const x2 = redondearSvg(it.sx + len * Math.cos(ang));
+      const y2 = redondearSvg(it.sy + len * Math.sin(ang));
       return { sx: it.sx, sy: it.sy, x2, y2, ang };
     });
   }, [cargas, verVectores]);
@@ -846,10 +855,10 @@ export default function SimuladorCampoElectrico() {
                 {rejillaVectores.map((v, i) => {
                   const head = 4;
                   const ang = v.ang;
-                  const hx1 = v.x2 - head * Math.cos(ang - Math.PI / 6);
-                  const hy1 = v.y2 - head * Math.sin(ang - Math.PI / 6);
-                  const hx2 = v.x2 - head * Math.cos(ang + Math.PI / 6);
-                  const hy2 = v.y2 - head * Math.sin(ang + Math.PI / 6);
+                  const hx1 = redondearSvg(v.x2 - head * Math.cos(ang - Math.PI / 6));
+                  const hy1 = redondearSvg(v.y2 - head * Math.sin(ang - Math.PI / 6));
+                  const hx2 = redondearSvg(v.x2 - head * Math.cos(ang + Math.PI / 6));
+                  const hy2 = redondearSvg(v.y2 - head * Math.sin(ang + Math.PI / 6));
                   return (
                     <g key={`v${i}`} pointerEvents="none">
                       <line
@@ -942,13 +951,13 @@ export default function SimuladorCampoElectrico() {
                     const fmag = Math.sqrt(datosPrueba.Fx * datosPrueba.Fx + datosPrueba.Fy * datosPrueba.Fy);
                     const lenF = Math.min(50, 14 + 30 * Math.log10(1 + fmag * 1e8));
                     const ang = Math.atan2(-datosPrueba.Fy, datosPrueba.Fx);
-                    const x2 = pruebaSvg.x + lenF * Math.cos(ang);
-                    const y2 = pruebaSvg.y + lenF * Math.sin(ang);
+                    const x2 = redondearSvg(pruebaSvg.x + lenF * Math.cos(ang));
+                    const y2 = redondearSvg(pruebaSvg.y + lenF * Math.sin(ang));
                     const head = 6;
-                    const hx1 = x2 - head * Math.cos(ang - Math.PI / 6);
-                    const hy1 = y2 - head * Math.sin(ang - Math.PI / 6);
-                    const hx2 = x2 - head * Math.cos(ang + Math.PI / 6);
-                    const hy2 = y2 - head * Math.sin(ang + Math.PI / 6);
+                    const hx1 = redondearSvg(x2 - head * Math.cos(ang - Math.PI / 6));
+                    const hy1 = redondearSvg(y2 - head * Math.sin(ang - Math.PI / 6));
+                    const hx2 = redondearSvg(x2 - head * Math.cos(ang + Math.PI / 6));
+                    const hy2 = redondearSvg(y2 - head * Math.sin(ang + Math.PI / 6));
                     return (
                       <g pointerEvents="none">
                         <line

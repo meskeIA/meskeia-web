@@ -740,6 +740,28 @@ test('REGRESIÓN q₀ (contraste) — el rótulo de la sonda se lee en los dos t
   expect(await estable(), 'q₀ en oscuro (antes 1,22:1)').toBeGreaterThanOrEqual(4.5);
 });
 
+// REGRESIÓN (23/09/2026) — el HTML servido y el hidratado no daban las mismas flechas. Node
+// (V8 13.6) y Chromium 151 no coinciden en el último bit de Math.sin/cos/atan2, así que 4 de
+// las 161 flechas del dipolo de arranque salían con `points` distintos en la 15.ª cifra
+// (…265487 en el servidor, …265483 en el cliente) y React avisaba del desajuste. Ya pasaba
+// antes del commit 94623f2a: el código de las flechas no cambió. Se arregla redondeando las
+// coordenadas a la centésima de píxel.
+test('REGRESIÓN hidratación — las flechas del lienzo salen iguales del servidor y del cliente', async ({
+  page,
+}) => {
+  const avisos: string[] = [];
+  page.on('console', (m) => {
+    if (/hydrat|didn.t match|did not match/i.test(m.text())) avisos.push(m.text().slice(0, 300));
+  });
+  await page.goto(RUTA, { waitUntil: 'networkidle' });
+  await esperarHidratacion(page, ['#magnitud']);
+  // El aviso lo emite React DESPUÉS de dar la hidratación por buena (va por la cola de errores
+  // recuperables), así que el testigo de hidratación llega antes que él: sin esta espera el
+  // test pasaba en verde también con el código sin reparar. Comprobado quitando la reparación.
+  await page.waitForTimeout(1500);
+  expect(avisos, 'avisos de hidratación en la consola').toEqual([]);
+});
+
 /* ═══════════════════════════════════════════════════════════════════════════════════════════
  * CASOS PARA CLASE (23/09/2026) — la tarea asignable de esta app (tipo A, casos numerados).
  *
