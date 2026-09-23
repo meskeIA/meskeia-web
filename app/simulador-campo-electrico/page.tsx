@@ -925,7 +925,7 @@ export default function SimuladorCampoElectrico() {
                     x={pruebaSvg.x}
                     y={pruebaSvg.y - 16}
                     fontSize="11"
-                    fill="#1f2937"
+                    className={styles.etiquetaPrueba}
                     fontWeight="700"
                     textAnchor="middle"
                   >

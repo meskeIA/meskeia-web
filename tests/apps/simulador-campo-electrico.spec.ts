@@ -695,6 +695,51 @@ test('REGRESIÓN 270 (accesibilidad) — el lienzo se maneja con el teclado', as
   await expect(valor(page, 'Posición y')).toHaveText('-1,00 m');
 });
 
+// REGRESIÓN (23/09/2026, observación de los casos para clase) — el rótulo «q₀» iba con
+// fill="#1f2937" fijo: sobre el lienzo oscuro (#0f172a) daba 1,22:1 y desaparecía. Ahora sigue
+// a --text-primary: 16,63:1 en claro y 14,57:1 en oscuro, medidos en navegador.
+// El tema se pone con el BOTÓN real: poner `data-theme` a mano no sirve, el gestor de tema lo
+// pisa al hidratar. Y se lee hasta que dos lecturas coinciden, que la transición de color
+// devuelve valores intermedios justo después de cambiar.
+test('REGRESIÓN q₀ (contraste) — el rótulo de la sonda se lee en los dos temas', async ({ page }) => {
+  const contrasteRotulo = () =>
+    page.evaluate(() => {
+      const canal = (c: number) => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+      const rgb = (s: string): number[] => {
+        const m = s.match(/^rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)/);
+        if (!m) throw new Error(`color que no es rgb(): ${s}`);
+        return [Number(m[1]), Number(m[2]), Number(m[3])];
+      };
+      const svg = document.querySelector('svg[aria-label="Lienzo del campo eléctrico"]');
+      if (!svg) throw new Error('no hay lienzo');
+      const rotulo = [...svg.querySelectorAll('text')].find((t) => t.textContent?.trim() === 'q₀');
+      if (!rotulo) throw new Error('no hay rótulo q₀');
+      const l1 = lum(rgb(getComputedStyle(rotulo).fill));
+      const l2 = lum(rgb(getComputedStyle(svg).backgroundColor));
+      return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
+    });
+  const estable = async (): Promise<number> => {
+    let anterior = await contrasteRotulo();
+    for (let i = 0; i < 30; i++) {
+      await page.waitForTimeout(100);
+      const actual = await contrasteRotulo();
+      if (actual === anterior) return actual;
+      anterior = actual;
+    }
+    return anterior;
+  };
+
+  expect(await estable(), 'q₀ en claro').toBeGreaterThanOrEqual(4.5);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  expect(await estable(), 'q₀ en oscuro (antes 1,22:1)').toBeGreaterThanOrEqual(4.5);
+});
+
 /* ═══════════════════════════════════════════════════════════════════════════════════════════
  * CASOS PARA CLASE (23/09/2026) — la tarea asignable de esta app (tipo A, casos numerados).
  *

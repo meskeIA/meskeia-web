@@ -288,6 +288,13 @@
   cursor: grabbing;
 }
 
+/* Rótulo «q₀» sobre la sonda. Iba con fill="#1f2937" fijo en el SVG: sobre el lienzo oscuro
+   (#0f172a) daba 1,22:1 y la etiqueta desaparecía. El token de texto cambia con el tema. */
+.etiquetaPrueba {
+  fill: var(--text-primary);
+  pointer-events: none;
+}
+
 .cargaLabel {
   font-size: 11px;
   fill: white;
