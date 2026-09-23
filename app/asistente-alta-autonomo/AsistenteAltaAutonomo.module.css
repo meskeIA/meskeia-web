@@ -258,7 +258,9 @@
 .faseDescripcion {
   display: block;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  /* --text-secondary: la cabecera pasa por --hover, --border (hover) y un gradiente al
+     10 %, y muted daba en oscuro 4,22 · 3,73 · 4,45, y 4,05 en el hover del claro */
+  color: var(--text-secondary);
 }
 
 .faseProgreso {
