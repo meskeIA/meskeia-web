@@ -150,7 +150,9 @@
 
 .sensorDetalle {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  /* --text-secondary: en el sensor activo, con la marca al 15 %, muted daba 4,35:1 en
+     oscuro; en claro, 4,63 activo y 4,68 en hover, sin margen */
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 
