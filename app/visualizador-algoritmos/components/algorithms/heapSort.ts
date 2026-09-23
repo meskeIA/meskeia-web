@@ -26,7 +26,7 @@ export function generateHeapSortSteps(initialArray: number[]): AlgorithmStep[] {
       steps.push({
         type: 'compare',
         indices: [izq, mayor],
-        line: 11,
+        line: 10,
         description: `Hijo izquierdo ${arr[izq]} frente a ${arr[mayor]}`,
       });
       if (arr[izq] > arr[mayor]) mayor = izq;
@@ -36,7 +36,7 @@ export function generateHeapSortSteps(initialArray: number[]): AlgorithmStep[] {
       steps.push({
         type: 'compare',
         indices: [der, mayor],
-        line: 13,
+        line: 12,
         description: `Hijo derecho ${arr[der]} frente a ${arr[mayor]}`,
       });
       if (arr[der] > arr[mayor]) mayor = der;

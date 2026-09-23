@@ -38,7 +38,7 @@ export function generateQuickSortSteps(initialArray: number[]): AlgorithmStep[] 
       steps.push({
         type: 'compare',
         indices: [j, high],
-        line: 11,
+        line: 12,
         description: `Comparando ${arr[j]} con pivote ${pivot}`,
       });
 
@@ -50,7 +50,7 @@ export function generateQuickSortSteps(initialArray: number[]): AlgorithmStep[] 
           steps.push({
             type: 'swap',
             indices: [i, j],
-            line: 13,
+            line: 14,
             description: `${arr[j]} <= ${pivot}, intercambiando posiciones ${i} y ${j}`,
           });
 
@@ -64,7 +64,7 @@ export function generateQuickSortSteps(initialArray: number[]): AlgorithmStep[] 
       steps.push({
         type: 'swap',
         indices: [i + 1, high],
-        line: 16,
+        line: 17,
         description: `Colocando pivote ${pivot} en su posición final ${i + 1}`,
       });
 
@@ -75,7 +75,7 @@ export function generateQuickSortSteps(initialArray: number[]): AlgorithmStep[] 
     steps.push({
       type: 'sorted',
       indices: [i + 1],
-      line: 17,
+      line: 18,
       description: `Pivote ${arr[i + 1]} está en su posición correcta`,
     });
 

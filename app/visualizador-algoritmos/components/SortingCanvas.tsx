@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import { ArrayBar, BAR_COLORS } from './types';
 import styles from './SortingCanvas.module.css';
 
@@ -11,6 +11,10 @@ interface SortingCanvasProps {
 
 export default function SortingCanvas({ bars, maxValue }: SortingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // El array por defecto es aleatorio: el del HTML prerenderizado no es el del navegador, así
+  // que la etiqueta con los valores se escribe tras montar (si no, React no puede hidratar).
+  const [montado, setMontado] = useState(false);
+  useEffect(() => setMontado(true), []);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -104,9 +108,18 @@ export default function SortingCanvas({ bars, maxValue }: SortingCanvasProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, [draw]);
 
+  // El array es el resultado de la app y solo existe dibujado: el lector de pantalla lo recibe
+  // como texto (hallazgo 1299).
+  const ordenado = bars.length > 0 && bars.every((b) => b.state === 'sorted');
+  const etiqueta = montado
+    ? `Array de ${bars.length} valores${ordenado ? ', ya ordenado' : ''}: ${bars.map((b) => b.value).join(', ')}`
+    : `Array de ${bars.length} valores`;
+
   return (
     <div className={styles.canvasContainer}>
-      <canvas ref={canvasRef} className={styles.canvas} />
+      <canvas ref={canvasRef} className={styles.canvas} role="img" aria-label={etiqueta}>
+        {etiqueta}
+      </canvas>
     </div>
   );
 }

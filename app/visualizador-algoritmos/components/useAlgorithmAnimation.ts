@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { AnimationState, AlgorithmStep, AlgorithmMetrics, ArrayBar, SortingAlgorithm } from './types';
 import { generateSteps } from './algorithms';
+import { EstadoReproduccion, estadoInicial, aplicarPaso } from './replay';
 
 interface UseAlgorithmAnimationOptions {
   initialArray: number[];
@@ -28,6 +29,28 @@ interface UseAlgorithmAnimationReturn {
   setSpeed: (speed: number) => void;
 }
 
+/** Accesos al array que cuesta cada tipo de paso (leer dos claves, intercambiar, escribir). */
+function accesosDe(paso: AlgorithmStep): number {
+  if (paso.type === 'compare') return 2;
+  if (paso.type === 'swap') return 4;
+  if (paso.type === 'set') return paso.indices.length;
+  return 0;
+}
+
+/**
+ * Animación del modo individual.
+ *
+ * El estado que avanza (barras, contadores e índice del paso) vive en refs que se actualizan
+ * de forma SÍNCRONA dentro de `executeStep`, y cada paso se aplica con `aplicarPaso`, que no
+ * muta: devuelve barras nuevas. Antes los refs se copiaban del estado de React en efectos, y a
+ * 10 ms por paso el temporizador llegaba antes que el efecto: el mismo paso se ejecutaba dos
+ * veces, y como mutaba los objetos barra compartidos, un intercambio duplicado se deshacía y
+ * el array acababa desordenado pintado de verde (hallazgo 1291).
+ *
+ * Los contadores son los MISMOS que los de la comparativa (`replay.ts`): comparaciones y
+ * movimientos (intercambios + escrituras). El panel publicaba solo los «swap», así que
+ * Insertion, Merge y Counting salían siempre con 0 (hallazgo 1294).
+ */
 export function useAlgorithmAnimation({
   initialArray,
   algorithm,
@@ -36,6 +59,7 @@ export function useAlgorithmAnimation({
   // Estado de la animación
   const [animationState, setAnimationState] = useState<AnimationState>('idle');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [totalSteps, setTotalSteps] = useState(0);
   const [bars, setBars] = useState<ArrayBar[]>(() =>
     initialArray.map((value) => ({ value, state: 'normal' }))
   );
@@ -49,198 +73,43 @@ export function useAlgorithmAnimation({
     elapsedTime: 0,
   });
 
-  // Refs para valores que necesitan ser actuales en callbacks
+  // Estado vivo de la reproducción: se lee y se escribe en el mismo instante
   const stepsRef = useRef<AlgorithmStep[]>([]);
+  const estadoRef = useRef<EstadoReproduccion>(estadoInicial(initialArray));
+  const indiceRef = useRef(0);
+  const accesosRef = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
   const animationStateRef = useRef<AnimationState>('idle');
-  const currentStepRef = useRef(0);
   const speedRef = useRef(initialSpeed);
-  const barsRef = useRef<ArrayBar[]>([]);
-
-  // Sincronizar refs
-  useEffect(() => {
-    animationStateRef.current = animationState;
-  }, [animationState]);
-
-  useEffect(() => {
-    currentStepRef.current = currentStepIndex;
-  }, [currentStepIndex]);
 
   useEffect(() => {
     speedRef.current = speed;
   }, [speed]);
 
-  useEffect(() => {
-    barsRef.current = bars;
-  }, [bars]);
-
-  // Generar pasos cuando cambia el array o algoritmo
-  useEffect(() => {
-    stepsRef.current = generateSteps(algorithm, initialArray);
-    reset();
-  }, [initialArray, algorithm]);
-
-  // Calcular delay basado en velocidad (1 = lento ~1000ms, 100 = rápido ~10ms)
-  const getDelay = useCallback(() => {
-    return Math.max(10, 1010 - speedRef.current * 10);
+  const cambiarEstado = useCallback((nuevo: AnimationState) => {
+    animationStateRef.current = nuevo;
+    setAnimationState(nuevo);
   }, []);
 
-  // Ejecutar un paso
-  const executeStep = useCallback((stepIndex: number): boolean => {
-    if (stepIndex >= stepsRef.current.length) {
-      setAnimationState('finished');
-      return false;
-    }
-
-    const step = stepsRef.current[stepIndex];
-    const newBars = [...barsRef.current];
-
-    // Resetear estados visuales (excepto sorted)
-    newBars.forEach((bar) => {
-      if (bar.state !== 'sorted') {
-        bar.state = 'normal';
-      }
-    });
-
-    // Actualizar métricas
-    setMetrics((prev) => {
-      const newMetrics = { ...prev };
-      if (step.type === 'compare') {
-        newMetrics.comparisons++;
-        newMetrics.arrayAccesses += 2;
-      } else if (step.type === 'swap') {
-        newMetrics.swaps++;
-        newMetrics.arrayAccesses += 4;
-      } else if (step.type === 'set') {
-        newMetrics.arrayAccesses += 1;
-      }
-      newMetrics.elapsedTime = Date.now() - startTimeRef.current;
-      return newMetrics;
-    });
-
-    // Aplicar el paso
-    switch (step.type) {
-      case 'compare':
-        step.indices.forEach((idx) => {
-          if (newBars[idx]) newBars[idx].state = 'comparing';
-        });
-        break;
-
-      case 'swap':
-        step.indices.forEach((idx) => {
-          if (newBars[idx]) newBars[idx].state = 'swapping';
-        });
-        // Intercambiar valores
-        if (step.indices.length === 2) {
-          const [i, j] = step.indices;
-          const temp = newBars[i].value;
-          newBars[i].value = newBars[j].value;
-          newBars[j].value = temp;
-        }
-        break;
-
-      case 'set':
-        if (step.values && step.indices.length > 0) {
-          step.indices.forEach((idx, i) => {
-            if (newBars[idx] && step.values && step.values[i] !== undefined) {
-              newBars[idx].value = step.values[i];
-              newBars[idx].state = 'swapping';
-            }
-          });
-        }
-        break;
-
-      case 'pivot':
-        step.indices.forEach((idx) => {
-          if (newBars[idx]) newBars[idx].state = 'pivot';
-        });
-        break;
-
-      case 'sorted':
-        step.indices.forEach((idx) => {
-          if (newBars[idx]) newBars[idx].state = 'sorted';
-        });
-        break;
-
-      case 'merge-split':
-      case 'merge-combine':
-        // Marcar rango para visualización
-        step.indices.forEach((idx) => {
-          if (newBars[idx]) newBars[idx].state = 'comparing';
-        });
-        break;
-    }
-
-    setBars(newBars);
-    setCurrentLine(step.line);
-    setCurrentDescription(step.description);
-    setCurrentStepIndex(stepIndex + 1);
-
-    return true;
-  }, []);
-
-  // Loop de animación
-  const runAnimation = useCallback(() => {
-    if (animationStateRef.current !== 'running') return;
-
-    const hasMore = executeStep(currentStepRef.current);
-
-    if (hasMore && animationStateRef.current === 'running') {
-      timeoutRef.current = setTimeout(runAnimation, getDelay());
-    }
-  }, [executeStep, getDelay]);
-
-  // Iniciar animación
-  const play = useCallback(() => {
-    if (animationState === 'finished') {
-      reset();
-      setTimeout(() => {
-        startTimeRef.current = Date.now();
-        setAnimationState('running');
-      }, 50);
-    } else {
-      if (animationState === 'idle') {
-        startTimeRef.current = Date.now();
-      }
-      setAnimationState('running');
-    }
-  }, [animationState]);
-
-  // Pausar animación
-  const pause = useCallback(() => {
-    setAnimationState('paused');
+  const detenerTemporizador = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
   }, []);
-
-  // Avanzar un paso
-  const step = useCallback(() => {
-    if (animationState === 'running') {
-      pause();
-    }
-    if (animationState === 'finished') return;
-
-    if (animationState === 'idle') {
-      startTimeRef.current = Date.now();
-      setAnimationState('paused');
-    }
-
-    executeStep(currentStepRef.current);
-  }, [animationState, pause, executeStep]);
 
   // Resetear
   const reset = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    detenerTemporizador();
+    estadoRef.current = estadoInicial(initialArray);
+    indiceRef.current = 0;
+    accesosRef.current = 0;
+    startTimeRef.current = 0;
 
-    setAnimationState('idle');
+    cambiarEstado('idle');
     setCurrentStepIndex(0);
-    setBars(initialArray.map((value) => ({ value, state: 'normal' })));
+    setBars(estadoRef.current.bars);
     setCurrentLine(-1);
     setCurrentDescription('');
     setMetrics({
@@ -249,31 +118,102 @@ export function useAlgorithmAnimation({
       arrayAccesses: 0,
       elapsedTime: 0,
     });
-    startTimeRef.current = 0;
-  }, [initialArray]);
+  }, [initialArray, detenerTemporizador, cambiarEstado]);
+
+  // Generar pasos cuando cambia el array o algoritmo
+  useEffect(() => {
+    stepsRef.current = generateSteps(algorithm, initialArray);
+    setTotalSteps(stepsRef.current.length);
+    reset();
+  }, [initialArray, algorithm, reset]);
+
+  // Calcular delay basado en velocidad (1 = lento ~1000ms, 100 = rápido ~10ms)
+  const getDelay = useCallback(() => {
+    return Math.max(10, 1010 - speedRef.current * 10);
+  }, []);
+
+  // Ejecutar el paso siguiente. Devuelve true si quedan más.
+  const executeStep = useCallback((): boolean => {
+    const pasos = stepsRef.current;
+    const i = indiceRef.current;
+    if (i >= pasos.length) {
+      cambiarEstado('finished');
+      return false;
+    }
+
+    const paso = pasos[i];
+    const nuevo = aplicarPaso(estadoRef.current, paso);
+    estadoRef.current = nuevo;
+    indiceRef.current = i + 1;
+    accesosRef.current += accesosDe(paso);
+
+    setBars(nuevo.bars);
+    setMetrics({
+      comparisons: nuevo.comparaciones,
+      swaps: nuevo.movimientos,
+      arrayAccesses: accesosRef.current,
+      elapsedTime: Date.now() - startTimeRef.current,
+    });
+    setCurrentLine(paso.line);
+    setCurrentDescription(paso.description);
+    setCurrentStepIndex(i + 1);
+
+    if (i + 1 >= pasos.length) {
+      cambiarEstado('finished');
+      return false;
+    }
+    return true;
+  }, [cambiarEstado]);
+
+  // Loop de animación
+  const runAnimation = useCallback(() => {
+    timeoutRef.current = null;
+    if (animationStateRef.current !== 'running') return;
+
+    const hasMore = executeStep();
+
+    if (hasMore && animationStateRef.current === 'running') {
+      timeoutRef.current = setTimeout(runAnimation, getDelay());
+    }
+  }, [executeStep, getDelay]);
+
+  // Iniciar animación (al terminar, «Reiniciar» vuelve a empezar desde el principio)
+  const play = useCallback(() => {
+    if (animationStateRef.current === 'running') return;
+    if (animationStateRef.current === 'finished') reset();
+    if (animationStateRef.current === 'idle') startTimeRef.current = Date.now();
+    cambiarEstado('running');
+    detenerTemporizador();
+    runAnimation();
+  }, [reset, cambiarEstado, detenerTemporizador, runAnimation]);
+
+  // Pausar animación
+  const pause = useCallback(() => {
+    detenerTemporizador();
+    cambiarEstado('paused');
+  }, [detenerTemporizador, cambiarEstado]);
+
+  // Avanzar un paso
+  const step = useCallback(() => {
+    if (animationStateRef.current === 'finished') return;
+    detenerTemporizador();
+    if (animationStateRef.current === 'idle') startTimeRef.current = Date.now();
+    cambiarEstado('paused');
+    executeStep();
+  }, [detenerTemporizador, cambiarEstado, executeStep]);
 
   // Cambiar velocidad
   const setSpeed = useCallback((newSpeed: number) => {
     setSpeedState(Math.max(1, Math.min(100, newSpeed)));
   }, []);
 
-  // Efecto para iniciar/detener animación cuando cambia el estado
-  useEffect(() => {
-    if (animationState === 'running') {
-      runAnimation();
-    }
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [animationState, runAnimation]);
+  // Al desmontar no puede quedar un temporizador vivo
+  useEffect(() => detenerTemporizador, [detenerTemporizador]);
 
   return {
     animationState,
     currentStep: currentStepIndex,
-    totalSteps: stepsRef.current.length,
+    totalSteps,
     bars,
     currentLine,
     currentDescription,

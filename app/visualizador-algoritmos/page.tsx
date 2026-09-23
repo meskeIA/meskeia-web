@@ -56,6 +56,44 @@ const PRESETS: { id: string; etiqueta: string; construir: () => number[] }[] = [
   },
 ];
 
+// Qué significa la barra violeta en cada algoritmo (hallazgo 1306: solo se explicaba en Quick)
+const SIGNIFICADO_VIOLETA: Partial<Record<SortingAlgorithm, string>> = {
+  quick: 'Pivote',
+  selection: 'Mínimo actual',
+  insertion: 'Clave que se inserta',
+  heap: 'Nodo que se hunde',
+  counting: 'Valor que se cuenta',
+};
+
+/**
+ * Lee el array escrito por el usuario. Devuelve los números o el texto del aviso: un token que
+ * no es un entero del 1 al 100 se nombra, no se descarta en silencio (hallazgo 1295: «5, abc, 3,
+ * 200, 8» se aplicaba como 5, 3, 8 y «2.5» se truncaba a 2).
+ */
+function leerArrayPropio(texto: string): { numeros: number[] } | { error: string } {
+  const tokens = texto.split(/[\s,;]+/).filter((t) => t.length > 0);
+  const numeros: number[] = [];
+  const rechazados: string[] = [];
+  for (const t of tokens) {
+    const n = /^\d+$/.test(t) ? Number(t) : NaN;
+    if (Number.isInteger(n) && n >= 1 && n <= 100) numeros.push(n);
+    else rechazados.push(t);
+  }
+  const faltanNumeros = { error: 'Escribe al menos 2 números enteros entre 1 y 100, separados por comas.' };
+  if (numeros.length === 0) return faltanNumeros;
+  if (rechazados.length > 0) {
+    const lista = rechazados.slice(0, 5).map((t) => `«${t}»`).join(', ');
+    return {
+      error: `No se puede usar ${lista}${rechazados.length > 5 ? '…' : ''}: solo valen enteros del 1 al 100 (sin decimales). Corrígelo o bórralo.`,
+    };
+  }
+  if (numeros.length < 2) return faltanNumeros;
+  if (numeros.length > 50) {
+    return { error: 'El máximo son 50 elementos para que la animación se siga bien.' };
+  }
+  return { numeros };
+}
+
 // Selección por defecto del modo comparativa: dos cuadráticos y dos O(n log n)
 const COMPARATIVA_POR_DEFECTO: SortingAlgorithm[] = ['bubble', 'insertion', 'quick', 'merge'];
 
@@ -146,23 +184,15 @@ export default function VisualizadorAlgoritmosPage() {
 
   // Aplicar un array escrito por el usuario (separado por comas o espacios)
   const handleAplicarArray = useCallback(() => {
-    const numeros = arrayPropio
-      .split(/[\s,;]+/)
-      .map((t) => parseInt(t, 10))
-      .filter((v) => Number.isFinite(v) && v >= 1 && v <= 100);
-
-    if (numeros.length < 2) {
-      setErrorArray('Escribe al menos 2 números enteros entre 1 y 100, separados por comas.');
-      return;
-    }
-    if (numeros.length > 50) {
-      setErrorArray('El máximo son 50 elementos para que la animación se siga bien.');
+    const lectura = leerArrayPropio(arrayPropio);
+    if ('error' in lectura) {
+      setErrorArray(lectura.error);
       return;
     }
 
     setErrorArray('');
-    setArraySize(numeros.length);
-    setArray(numeros);
+    setArraySize(lectura.numeros.length);
+    setArray(lectura.numeros);
   }, [arrayPropio]);
 
   return (
@@ -175,7 +205,7 @@ export default function VisualizadorAlgoritmosPage() {
         <h1 className={styles.title}>Visualizador de Algoritmos de Ordenación</h1>
         <p className={styles.subtitle}>
           Siete algoritmos animados paso a paso, con el pseudocódigo resaltado línea a
-          línea y el recuento de comparaciones e intercambios en vivo
+          línea y el recuento de comparaciones y movimientos en vivo
         </p>
       </header>
 
@@ -249,15 +279,15 @@ export default function VisualizadorAlgoritmosPage() {
             <div className={styles.controlButtons}>
               {!comparativa.enMarcha ? (
                 <button type="button" className={`${styles.controlBtn} ${styles.play}`} onClick={comparativa.play}>
-                  ▶️ Empezar carrera
+                  <span aria-hidden="true">▶️</span> Empezar carrera
                 </button>
               ) : (
                 <button type="button" className={`${styles.controlBtn} ${styles.pause}`} onClick={comparativa.pause}>
-                  ⏸️ Pausa
+                  <span aria-hidden="true">⏸️</span> Pausa
                 </button>
               )}
               <button type="button" className={`${styles.controlBtn} ${styles.reset}`} onClick={comparativa.reset}>
-                🔄 Reiniciar
+                <span aria-hidden="true">🔄</span> Reiniciar
               </button>
             </div>
             <div className={styles.speedControl}>
@@ -315,32 +345,34 @@ export default function VisualizadorAlgoritmosPage() {
             <div className={styles.controlButtons}>
               {animationState !== 'running' ? (
                 <button
+                  type="button"
                   className={`${styles.controlBtn} ${styles.play}`}
                   onClick={play}
-                  disabled={animationState === 'finished' && currentStep >= totalSteps}
                 >
-                  ▶️ {animationState === 'finished' ? 'Reiniciar' : 'Play'}
+                  <span aria-hidden="true">▶️</span> {animationState === 'finished' ? 'Reiniciar' : 'Play'}
                 </button>
               ) : (
-                <button className={`${styles.controlBtn} ${styles.pause}`} onClick={pause}>
-                  ⏸️ Pausar
+                <button type="button" className={`${styles.controlBtn} ${styles.pause}`} onClick={pause}>
+                  <span aria-hidden="true">⏸️</span> Pausar
                 </button>
               )}
 
               <button
+                type="button"
                 className={styles.controlBtn}
                 onClick={step}
                 disabled={animationState === 'running' || animationState === 'finished'}
               >
-                ⏭️ Paso
+                <span aria-hidden="true">⏭️</span> Paso
               </button>
 
               <button
+                type="button"
                 className={styles.controlBtn}
                 onClick={reset}
                 disabled={animationState === 'idle'}
               >
-                🔄 Reset
+                <span aria-hidden="true">🔄</span> Reset
               </button>
             </div>
 
@@ -381,10 +413,10 @@ export default function VisualizadorAlgoritmosPage() {
               <div className={`${styles.legendColor} ${styles.sorted}`}></div>
               <span>Ordenado</span>
             </div>
-            {(algorithm === 'quick') && (
+            {SIGNIFICADO_VIOLETA[algorithm] && (
               <div className={styles.legendItem}>
                 <div className={`${styles.legendColor} ${styles.pivot}`}></div>
-                <span>Pivote</span>
+                <span>{SIGNIFICADO_VIOLETA[algorithm]}</span>
               </div>
             )}
           </div>
@@ -410,7 +442,7 @@ export default function VisualizadorAlgoritmosPage() {
           {/* Panel de Complejidad */}
           <div className={styles.complexityPanel}>
             <h3 className={styles.complexityTitle}>
-              <span>⚡</span> Complejidad
+              <span aria-hidden="true">⚡</span> Complejidad
             </h3>
             <div className={styles.complexityGrid}>
               <div className={styles.complexityItem}>
@@ -458,7 +490,7 @@ export default function VisualizadorAlgoritmosPage() {
           onClick={handleGenerateArray}
           disabled={animationState === 'running'}
         >
-          🎲 Generar Array Aleatorio
+          <span aria-hidden="true">🎲</span> Generar Array Aleatorio
         </button>
       </div>
 
@@ -528,7 +560,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* Tabla comparativa */}
           <section className={styles.guideSection}>
-            <h2>📊 Comparativa Completa de Algoritmos</h2>
+            <h2><span aria-hidden="true">📊</span> Comparativa Completa de Algoritmos</h2>
             <table className={styles.comparisonTable}>
               <thead>
                 <tr>
@@ -601,8 +633,8 @@ export default function VisualizadorAlgoritmosPage() {
                   <td>O(n + k)</td>
                   <td>O(n + k)</td>
                   <td>O(n + k)</td>
-                  <td>O(k)</td>
-                  <td>Sí</td>
+                  <td>O(k) la animada · O(n + k) la estable</td>
+                  <td>Sí, la versión con suma acumulada</td>
                   <td>Enteros con rango k acotado</td>
                 </tr>
               </tbody>
@@ -611,7 +643,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>👥 ¿Quién usa este visualizador?</h2>
+            <h2><span aria-hidden="true">👥</span> ¿Quién usa este visualizador?</h2>
             <div className={styles.casosUsoGrid}>
               <div className={styles.casoCard}>
                 <div className={styles.casoIcon}>🎓</div>
@@ -654,7 +686,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* FAQ */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas Frecuentes sobre Algoritmos</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Algoritmos</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <div className={styles.faqPregunta}>¿Por qué Quick Sort es más rápido en la práctica si tiene peor caso O(n²)?</div>
@@ -710,7 +742,9 @@ export default function VisualizadorAlgoritmosPage() {
                 <div className={styles.faqRespuesta}>
                   Para arrays de menos de 10-20 elementos, Insertion Sort suele ganar por su constante
                   pequeña y mejor comportamiento de caché. Además, si el array está casi ordenado (pocas
-                  inversiones), Insertion Sort es O(n) mientras Quick Sort sigue siendo O(n log n).
+                  inversiones), Insertion Sort es casi O(n), mientras que un Quick Sort con pivote fijo
+                  (el último elemento, como el de esta app) se acerca a O(n²): pruébalo con el caso
+                  «Casi ordenado». Con pivote aleatorio o mediana de tres vuelve a O(n log n).
                   Por eso muchos Quick Sort modernos cambian a Insertion Sort para subproblemas pequeños.
                 </div>
               </div>
@@ -727,7 +761,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* Guía paso a paso */}
           <section className={styles.guideSection}>
-            <h2>🗺️ Cómo elegir el algoritmo correcto: 6 pasos</h2>
+            <h2><span aria-hidden="true">🗺️</span> Cómo elegir el algoritmo correcto: 6 pasos</h2>
             <ol className={styles.pasosList}>
               <li className={styles.paso}>
                 <span className={styles.pasoNum}>1</span>
@@ -802,10 +836,10 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* Tips y Errores */}
           <section className={styles.guideSection}>
-            <h2>💡 Tips y Errores Frecuentes</h2>
+            <h2><span aria-hidden="true">💡</span> Tips y Errores Frecuentes</h2>
             <div className={styles.tipsErrorsSection}>
               <div className={styles.tipsColumn}>
-                <div className={styles.tipsHeader}>✅ Tips de Experto</div>
+                <div className={styles.tipsHeader}><span aria-hidden="true">✅</span> Tips de Experto</div>
                 <div className={styles.tipItem}>
                   Para arrays pequeños (&lt;20 elementos), Insertion Sort gana por la constante pequeña
                   y mejor localidad de caché, aunque su Big O sea peor.
@@ -832,7 +866,7 @@ export default function VisualizadorAlgoritmosPage() {
                 </div>
               </div>
               <div className={styles.tipsColumn}>
-                <div className={styles.errorsHeader}>❌ Errores Frecuentes</div>
+                <div className={styles.errorsHeader}><span aria-hidden="true">❌</span> Errores Frecuentes</div>
                 <div className={styles.errorItem}>
                   Confundir complejidad media con peor caso. Quick Sort tiene O(n log n) promedio
                   pero O(n²) peor caso, no al revés.
@@ -863,7 +897,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* Conceptos clave (mantenido del original) */}
           <section className={styles.guideSection}>
-            <h2>📖 Conceptos Clave de Complejidad</h2>
+            <h2><span aria-hidden="true">📖</span> Conceptos Clave de Complejidad</h2>
 
             <div className={styles.tipCard}>
               <h4>¿Qué significa O(n²) en la práctica?</h4>
@@ -898,7 +932,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* ===== SECCIÓN 1: TABLA COMPARATIVA v2.0 ===== */}
           <section className={styles.guideSection}>
-            <h2>📊 Tabla Comparativa Completa</h2>
+            <h2><span aria-hidden="true">📊</span> Tabla Comparativa Completa</h2>
             <div className={styles.tableWrapper}>
               <table className={styles.comparativaTable}>
                 <thead>
@@ -972,8 +1006,8 @@ export default function VisualizadorAlgoritmosPage() {
                     <td>O(n+k)</td>
                     <td>O(n+k)</td>
                     <td>O(n+k)</td>
-                    <td>O(k)</td>
-                    <td>Sí</td>
+                    <td>O(k) la animada · O(n+k) la estable</td>
+                    <td>Sí, la versión con suma acumulada</td>
                     <td>Enteros en rango pequeño y conocido (k &lt;&lt; n)</td>
                   </tr>
                 </tbody>
@@ -983,7 +1017,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* ===== SECCIÓN 2: ESCENARIOS v2.0 ===== */}
           <section className={styles.guideSection}>
-            <h2>🎯 Escenarios Reales de Uso</h2>
+            <h2><span aria-hidden="true">🎯</span> Escenarios Reales de Uso</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
@@ -1045,7 +1079,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* ===== SECCIÓN 3: FAQ v2.0 ===== */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas Frecuentes (versión avanzada)</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes (versión avanzada)</h2>
             <div className={styles.faqListV2}>
               <div className={styles.faqItemV2}>
                 <strong>¿Por qué Quicksort es más rápido que Mergesort si tienen la misma complejidad O(n log n)?</strong>
@@ -1061,7 +1095,7 @@ export default function VisualizadorAlgoritmosPage() {
               </div>
               <div className={styles.faqItemV2}>
                 <strong>¿Qué es el algoritmo Timsort?</strong>
-                <p>El algoritmo usado por Python y Java (Arrays.sort). Híbrido de Mergesort + InsertionSort que detecta subsecuencias ya ordenadas (runs) y las combina. Rendimiento real O(n) en datos casi ordenados, O(n log n) en peor caso.</p>
+                <p>El algoritmo de Python (sort y sorted) y de Java para objetos (Arrays.sort con objetos y Collections.sort; con tipos primitivos Java usa Dual-Pivot Quicksort). Híbrido de Mergesort + InsertionSort que detecta subsecuencias ya ordenadas (runs) y las combina. Rendimiento real O(n) en datos casi ordenados, O(n log n) en peor caso.</p>
               </div>
               <div className={styles.faqItemV2}>
                 <strong>¿Por qué el peor caso de Quicksort es O(n²)?</strong>
@@ -1084,7 +1118,7 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* ===== SECCIÓN 4: GUÍA PASO A PASO v2.0 ===== */}
           <section className={styles.guideSection}>
-            <h2>🗺️ Cómo elegir el algoritmo correcto: 7 pasos</h2>
+            <h2><span aria-hidden="true">🗺️</span> Cómo elegir el algoritmo correcto: 7 pasos</h2>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -1132,7 +1166,7 @@ export default function VisualizadorAlgoritmosPage() {
                 <div className={styles.stepNumber}>7</div>
                 <div className={styles.stepContent}>
                   <strong>En producción: usa la librería del lenguaje</strong>
-                  <p>Python sort(), Java Arrays.sort(), C++ std::sort() — son híbridos optimizados que superan cualquier implementación manual.</p>
+                  <p>Python sort(), Java Arrays.sort(), C++ std::sort() — son híbridos optimizados (Timsort, Dual-Pivot Quicksort, Introsort) que superan cualquier implementación manual.</p>
                 </div>
               </div>
             </div>
@@ -1140,17 +1174,17 @@ export default function VisualizadorAlgoritmosPage() {
 
           {/* ===== SECCIÓN 5: MEJORES PRÁCTICAS v2.0 ===== */}
           <section className={styles.guideSection}>
-            <h2>💡 Mejores Prácticas</h2>
+            <h2><span aria-hidden="true">💡</span> Mejores Prácticas</h2>
             <div className={styles.tipsGridV2}>
               <div className={styles.tipsGridCard}>
                 <span className={styles.tipIconV2} aria-hidden="true">🏎️</span>
                 <strong>Confía en la librería</strong>
-                <p>Python sort()/sorted(), Java Arrays.sort(), C++ std::sort() son Timsort/Introsort optimizados. Más rápidos que cualquier implementación propia.</p>
+                <p>Python sort()/sorted() usa Timsort; Java Arrays.sort(), Timsort con objetos y Dual-Pivot Quicksort con primitivos; C++ std::sort(), Introsort. Más rápidos que cualquier implementación propia.</p>
               </div>
               <div className={styles.tipsGridCard}>
                 <span className={styles.tipIconV2} aria-hidden="true">📏</span>
                 <strong>Mide antes de optimizar</strong>
-                <p>Para n&lt;10.000 la diferencia entre O(n²) y O(n log n) es &lt;1ms. Optimiza solo cuando el profiler lo confirma.</p>
+                <p>Con n pequeño (decenas o cientos) la diferencia entre O(n²) y O(n log n) no se nota; con 10.000 elementos ya son decenas o cientos de milisegundos frente a unos pocos. Optimiza cuando el profiler lo confirme con tus datos.</p>
               </div>
               <div className={styles.tipsGridCard}>
                 <span className={styles.tipIconV2} aria-hidden="true">🧮</span>
@@ -1165,7 +1199,7 @@ export default function VisualizadorAlgoritmosPage() {
               <div className={styles.tipsGridCard}>
                 <span className={styles.tipIconV2} aria-hidden="true">💾</span>
                 <strong>Localidad de caché</strong>
-                <p>En arrays grandes, algoritmos con acceso secuencial (Mergesort, Heapsort) aprovechan mejor la caché L1/L2 que los de acceso aleatorio.</p>
+                <p>En arrays grandes, los algoritmos que recorren la memoria de forma secuencial (Quicksort en su partición, Mergesort en la fusión) aprovechan mejor la caché L1/L2. Heapsort es el contraejemplo clásico: salta de la posición i a la 2i+1 y por eso suele ser más lento que Quicksort aunque tenga la misma complejidad.</p>
               </div>
               <div className={styles.tipsGridCard}>
                 <span className={styles.tipIconV2} aria-hidden="true">🔗</span>

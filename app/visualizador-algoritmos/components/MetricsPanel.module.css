@@ -47,3 +47,13 @@
     font-size: 1.25rem;
   }
 }
+
+.metricNota {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 0.1rem;
+}
+
+[data-theme='dark'] .metricNota {
+  color: var(--text-secondary);
+}

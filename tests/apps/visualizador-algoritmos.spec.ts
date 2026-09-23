@@ -32,7 +32,7 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  * salida temprana, Selection con intercambio, Quick con partición de Lomuto y pivote = último)
  *
  *   CASO 1 (normal) — 5, 3, 8, 1, 9, 2 (8 inversiones)
- *       Bubble     15 comparaciones (5+4+3+2+1) · 8 intercambios (= inversiones) → 1, 2, 3, 5, 8, 9
+ *       Bubble     15 comparaciones (5+4+3+2+1; la 5.ª pasada no intercambia y para) · 8 intercambios
  *       Selection  15 comparaciones · 4 intercambios (i=3 ya tiene su mínimo)
  *       Insertion  11 comparaciones: 8 que desplazan + 3 que detienen el bucle (i=2: 5>8 no;
  *                  i=4: 8>9 no; i=5: 1>2 no). Mueve 11 valores (8 desplazamientos + 3 inserciones)
@@ -59,7 +59,10 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  * comparativa da las mismas comparaciones que la ejecución individual; la tabla de complejidades
  * está bien en lo esencial (Quick peor O(n²), Heap no estable, Selection no estable, Merge O(n)).
  *
- * HALLAZGOS (los de cálculo y operativa van con test.fail(); se voltean al repararlos)
+ * HALLAZGOS 1291-1307 — REPARADOS el 23/09/2026; sus casos quedan como regresión sin test.fail().
+ *   Tras la reparación el panel individual publica MOVIMIENTOS (intercambios + escrituras), la
+ *   misma cifra que la comparativa; Bubble lleva bandera de salida temprana (su «Mejor O(n)» es
+ *   cierto: 4 comparaciones sobre 10…50); Insertion cuenta la comparación que detiene el bucle.
  *   1. A velocidad 100 (10 ms/paso) el primer paso tras «Play» se ejecuta DOS veces: el temporizador
  *      llega antes de que React actualice currentStepRef/barsRef, y como executeStep muta los
  *      objetos barra compartidos, un intercambio duplicado se DESHACE. 7, 3 con un «Paso» previo y
@@ -171,12 +174,12 @@ async function ejecutarHastaElFinal(page: Page): Promise<void> {
   expect(m && m[1] === m[2], `la animación no llegó al final: «${texto}»`).toBeTruthy();
 }
 
-async function correr(page: Page, algoritmo: string): Promise<{ comparaciones: string; intercambios: string; barras: number[] }> {
+async function correr(page: Page, algoritmo: string): Promise<{ comparaciones: string; movimientos: string; barras: number[] }> {
   await elegir(page, algoritmo);
   await ejecutarHastaElFinal(page);
   return {
     comparaciones: (await metrica(page, 'Comparaciones').textContent()) ?? '',
-    intercambios: (await metrica(page, 'Intercambios').textContent()) ?? '',
+    movimientos: (await metrica(page, 'Movimientos').textContent()) ?? '',
     barras: await leerBarras(page),
   };
 }
@@ -199,31 +202,31 @@ test.describe('CASO 1 (normal) — 5, 3, 8, 1, 9, 2', () => {
 
   test('Bubble, Selection y Quick cuadran con el libro y dejan 1, 2, 3, 5, 8, 9', async ({ page }) => {
     // Bubble: 5+4+3+2+1 = 15 comparaciones; 8 intercambios = 8 inversiones del array
-    expect(await correr(page, 'Bubble Sort')).toEqual({ comparaciones: '15', intercambios: '8', barras: [1, 2, 3, 5, 8, 9] });
+    expect(await correr(page, 'Bubble Sort')).toEqual({ comparaciones: '15', movimientos: '8', barras: [1, 2, 3, 5, 8, 9] });
     // Selection: 15 comparaciones; 4 intercambios (en i=3 el 5 ya es el mínimo)
-    expect(await correr(page, 'Selection Sort')).toEqual({ comparaciones: '15', intercambios: '4', barras: [1, 2, 3, 5, 8, 9] });
+    expect(await correr(page, 'Selection Sort')).toEqual({ comparaciones: '15', movimientos: '4', barras: [1, 2, 3, 5, 8, 9] });
     // Quick (Lomuto, pivote = último): particiones de 5 (pivote 2), 3 (pivote 3) y 2 (pivote 8)
     // comparaciones = 10; 4 intercambios efectivos (1↔5, 2↔3 al colocar el 2, 8↔3, 9↔8)
-    expect(await correr(page, 'Quick Sort')).toEqual({ comparaciones: '10', intercambios: '4', barras: [1, 2, 3, 5, 8, 9] });
+    expect(await correr(page, 'Quick Sort')).toEqual({ comparaciones: '10', movimientos: '4', barras: [1, 2, 3, 5, 8, 9] });
   });
 
   test('Merge, Heap y Counting cuadran con el libro', async ({ page }) => {
     // Merge: fusiones de 1 + 2 (mitad izquierda) + 1 + 2 (mitad derecha) + 5 (fusión final) = 11
     // comparaciones; no intercambia, escribe
-    expect(await correr(page, 'Merge Sort')).toEqual({ comparaciones: '11', intercambios: '0', barras: [1, 2, 3, 5, 8, 9] });
+    expect(await correr(page, 'Merge Sort')).toEqual({ comparaciones: '11', movimientos: '16', barras: [1, 2, 3, 5, 8, 9] });
     // Heap: construir el montículo + 5 extracciones = 15 comparaciones y 10 intercambios
-    expect(await correr(page, 'Heap Sort')).toEqual({ comparaciones: '15', intercambios: '10', barras: [1, 2, 3, 5, 8, 9] });
+    expect(await correr(page, 'Heap Sort')).toEqual({ comparaciones: '15', movimientos: '10', barras: [1, 2, 3, 5, 8, 9] });
     // Counting: no compara; reescribe los 6 valores desde el recuento
-    expect(await correr(page, 'Counting Sort')).toEqual({ comparaciones: '0', intercambios: '0', barras: [1, 2, 3, 5, 8, 9] });
+    expect(await correr(page, 'Counting Sort')).toEqual({ comparaciones: '0', movimientos: '6', barras: [1, 2, 3, 5, 8, 9] });
   });
 
-  test('HALLAZGO 2 — Insertion Sort cuenta también la comparación que detiene el bucle', async ({ page }) => {
-    test.fail(true, 'HALLAZGO 2: Insertion solo emite «compare» cuando A[j] > clave; la comparación que da falso y para el «mientras» no se cuenta. Caso 1: publica 8 (= inversiones), el libro da 11.');
+  test('HALLAZGO 1292 — Insertion Sort cuenta también la comparación que detiene el bucle', async ({ page }) => {
     const r = await correr(page, 'Insertion Sort');
     expect(r.barras).toEqual([1, 2, 3, 5, 8, 9]); // la ordenación en sí es correcta
     console.log(`[HALLAZGO 2] Insertion caso 1 → comparaciones publicadas: ${r.comparaciones} (esperado 11)`);
     // 8 comparaciones que desplazan + 3 que detienen el bucle (5>8, 8>9 y 1>2 falsas)
     expect(r.comparaciones).toBe('11');
+    expect(r.movimientos).toBe('11'); // 8 desplazamientos + 3 inserciones (hallazgo 1294)
   });
 });
 
@@ -237,7 +240,7 @@ test.describe('CASO 2 (límite) — inverso, ya ordenado y n = 2', () => {
   test('Inverso 50, 40, 30, 20, 10: Bubble n(n−1)/2 = 10 comparaciones y 10 intercambios', async ({ page }) => {
     await usarArray(page, '50, 40, 30, 20, 10');
     await expect(contadorPasos(page)).toHaveText('Paso 0 de 25'); // 10 + 10 + 5 «ordenado»
-    expect(await correr(page, 'Bubble Sort')).toEqual({ comparaciones: '10', intercambios: '10', barras: [10, 20, 30, 40, 50] });
+    expect(await correr(page, 'Bubble Sort')).toEqual({ comparaciones: '10', movimientos: '10', barras: [10, 20, 30, 40, 50] });
     // Insertion en su peor caso: las 10 comparaciones desplazan y todas las claves llegan a j = −1
     const ins = await correr(page, 'Insertion Sort');
     expect(ins.comparaciones).toBe('10');
@@ -255,20 +258,18 @@ test.describe('CASO 2 (límite) — inverso, ya ordenado y n = 2', () => {
     expect({ comparaciones: c.comparaciones, barras: c.barras }).toEqual({ comparaciones: '0', barras: [3, 7] });
   });
 
-  test('HALLAZGO 2 — ya ordenado 10…50: Insertion hace n−1 = 4 comparaciones, no 0', async ({ page }) => {
-    test.fail(true, 'HALLAZGO 2: en su MEJOR caso Insertion publica 0 comparaciones; el O(n) que anuncia el panel son las n−1 = 4 comparaciones que detienen el bucle.');
+  test('HALLAZGO 1292 — ya ordenado 10…50: Insertion hace n−1 = 4 comparaciones, no 0', async ({ page }) => {
     await usarArray(page, '10, 20, 30, 40, 50');
-    await expect(contadorPasos(page)).toHaveText('Paso 0 de 15'); // aún con Bubble: 10 comparaciones + 5 «ordenado»
+    await expect(contadorPasos(page)).toHaveText('Paso 0 de 6'); // aún con Bubble: 4 comparaciones + 2 «ordenado»
     const r = await correr(page, 'Insertion Sort');
     expect(r.barras).toEqual([10, 20, 30, 40, 50]);
     console.log(`[HALLAZGO 2] Insertion ya ordenado → comparaciones publicadas: ${r.comparaciones} (esperado 4)`);
     expect(r.comparaciones).toBe('4');
   });
 
-  test('HALLAZGO 6 — Bubble: el «Mejor» del panel y el contador sobre un array ya ordenado cuadran', async ({ page }) => {
-    test.fail(true, 'HALLAZGO 6: el panel dice «Mejor O(n)» pero el Bubble animado (y su pseudocódigo) no tiene salida temprana: sobre 5 valores ya ordenados hace 10 comparaciones, no n−1 = 4.');
+  test('HALLAZGO 1296 — Bubble: el «Mejor» del panel y el contador sobre un array ya ordenado cuadran', async ({ page }) => {
     await usarArray(page, '10, 20, 30, 40, 50');
-    await expect(contadorPasos(page)).toHaveText('Paso 0 de 15'); // 10 comparaciones + 5 «ordenado»
+    await expect(contadorPasos(page)).toHaveText('Paso 0 de 6'); // una pasada: 4 comparaciones + 2 «ordenado»
     const mejor = (await page.getByText('Mejor', { exact: true }).locator('xpath=following-sibling::div[1]').textContent())?.trim();
     const r = await correr(page, 'Bubble Sort');
     expect(r.barras).toEqual([10, 20, 30, 40, 50]);
@@ -278,8 +279,7 @@ test.describe('CASO 2 (límite) — inverso, ya ordenado y n = 2', () => {
     expect(r.comparaciones).toBe(mejor === 'O(n)' ? '4' : '10');
   });
 
-  test('HALLAZGO 1 — a velocidad 100, «Paso» y luego «Play» sobre 7, 3 deja el array ORDENADO', async ({ page }) => {
-    test.fail(true, 'HALLAZGO 1: a 10 ms/paso el primer paso tras Play se ejecuta dos veces; el intercambio duplicado se deshace y la app termina con 7, 3 marcado como ordenado y 2 intercambios. En 5, 3, 8, 1, 9, 2 con Play directo: 16 comparaciones en vez de 15.');
+  test('HALLAZGO 1291 — a velocidad 100, «Paso» y luego «Play» sobre 7, 3 deja el array ORDENADO', async ({ page }) => {
     await sembrarValor(page, '#speed-slider', 100);
     await usarArray(page, '7, 3');
     await expect(contadorPasos(page)).toHaveText('Paso 0 de 4'); // comparar, intercambiar, 2 «ordenado»
@@ -287,10 +287,22 @@ test.describe('CASO 2 (límite) — inverso, ya ordenado y n = 2', () => {
     await expect(contadorPasos(page)).toHaveText('Paso 1 de 4');
     await ejecutarHastaElFinal(page);
     const barras = await leerBarras(page);
-    const intercambios = await metrica(page, 'Intercambios').textContent();
-    console.log(`[HALLAZGO 1] 7, 3 a velocidad 100 → barras ${barras.join(', ')}, intercambios ${intercambios} (esperado 3, 7 y 1)`);
+    const movimientos = await metrica(page, 'Movimientos').textContent();
     expect(barras).toEqual([3, 7]);
-    expect(intercambios).toBe('1');
+    expect(movimientos).toBe('1');
+  });
+
+  test('HALLAZGO 1291 — a velocidad 100 con «Play» directo, 5, 3, 8, 1, 9, 2 da las 15 comparaciones del libro', async ({ page }) => {
+    await sembrarValor(page, '#speed-slider', 100);
+    await usarArray(page, '5, 3, 8, 1, 9, 2');
+    await expect(contadorPasos(page)).toHaveText('Paso 0 de 29');
+    for (let intento = 0; intento < 3; intento++) {
+      await page.getByRole('button', { name: /Play|Reiniciar/ }).click();
+      await expect(page.getByRole('button', { name: /Reiniciar/ })).toBeVisible({ timeout: 20000 });
+      expect(await metrica(page, 'Comparaciones').textContent()).toBe('15');
+      expect(await metrica(page, 'Movimientos').textContent()).toBe('8');
+      expect(await leerBarras(page)).toEqual([1, 2, 3, 5, 8, 9]);
+    }
   });
 });
 
@@ -313,27 +325,28 @@ test.describe('CASO 3 (rechazo) — entrada propia inválida', () => {
     expect(await leerBarras(page)).toEqual(antes);
   });
 
-  test('HALLAZGO 5 — «5, abc, 3, 200, 8» y «2.5, 7.9, 3» avisan en vez de aplicarse recortados', async ({ page }) => {
-    test.fail(true, 'HALLAZGO 5: el filtro descarta en silencio «abc» y «200» (se aplica 5, 3, 8) y parseInt trunca «2.5, 7.9» a 2, 7 sin avisar.');
+  test('HALLAZGO 1295 — «5, abc, 3, 200, 8» y «2.5, 7.9, 3» avisan en vez de aplicarse recortados', async ({ page }) => {
+    const antes = await leerBarras(page);
     await usarArray(page, '5, abc, 3, 200, 8');
-    await page.waitForTimeout(300); // solo para que el diagnóstico lea el estado ya asentado
-    console.log(`[HALLAZGO 5] «5, abc, 3, 200, 8» → barras ${(await leerBarras(page)).join(', ')}, avisos: ${await avisoArray(page).count()}`);
-    await expect(avisoArray(page)).toBeVisible();
+    await expect(avisoArray(page)).toContainText('«abc», «200»');
+    expect(await leerBarras(page)).toEqual(antes);
     await usarArray(page, '2.5, 7.9, 3');
-    await expect(avisoArray(page)).toBeVisible();
+    await expect(avisoArray(page)).toContainText('«2.5», «7.9»');
+    await usarArray(page, '-4, 6, 0, 9');
+    await expect(avisoArray(page)).toContainText('«-4», «0»');
+    expect(await leerBarras(page)).toEqual(antes);
   });
 });
 
 // ─── Pseudocódigo, comparativa y controles ─────────────────────────────────────────────────
 
 test.describe('Pseudocódigo resaltado, comparativa y controles', () => {
-  test('HALLAZGO 3 — la línea resaltada es la que ejecuta la operación descrita', async ({ page }) => {
-    test.fail(true, 'HALLAZGO 3: Quick resalta «para j desde bajo hasta alto - 1» al comparar con el pivote; Heap resalta la asignación «mayor = 2*raíz+1»; Merge resalta «copiar A[izq..medio] a L»; Counting resalta «fin para» al contar.');
+  test('HALLAZGO 1293 — la línea resaltada es la que ejecuta la operación descrita', async ({ page }) => {
     await usarArray(page, '5, 3, 8, 1');
     const casos: { alg: string; descripcion: RegExp; linea: string }[] = [
       { alg: 'Quick Sort', descripcion: /^Comparando \d+ con pivote/, linea: 'si A[j] <= pivote entonces' },
       { alg: 'Heap Sort', descripcion: /^Hijo izquierdo/, linea: 'si A[2*raíz+1] > A[mayor] entonces' },
-      { alg: 'Merge Sort', descripcion: /^Comparando \d+ con \d+$/, linea: 'fusionar L y R de vuelta a A' },
+      { alg: 'Merge Sort', descripcion: /^Comparando \d+ con \d+$/, linea: 'si L[i] <= R[j] entonces' },
       { alg: 'Counting Sort', descripcion: /^Cuenta del valor/, linea: 'recuento[v] = recuento[v] + 1' },
     ];
     const resaltada = page.locator('[class*="highlighted"] code');
@@ -346,20 +359,37 @@ test.describe('Pseudocódigo resaltado, comparativa y controles', () => {
         if (c.descripcion.test((await descripcion.textContent()) ?? '')) break;
       }
       await expect(descripcion).toHaveText(c.descripcion);
-      console.log(`[HALLAZGO 3] ${c.alg} · «${await descripcion.textContent()}» → resalta «${(await resaltada.textContent())?.trim()}»`);
       await expect(resaltada).toHaveText(c.linea);
     }
   });
 
-  test('HALLAZGO 7 — al terminar, el botón «Reiniciar» está habilitado', async ({ page }) => {
-    test.fail(true, 'HALLAZGO 7: el botón muestra «▶️ Reiniciar» y a la vez disabled={finished && currentStep >= totalSteps}, que al terminar siempre se cumple.');
+  test('HALLAZGO 1297 — al terminar, el botón «Reiniciar» está habilitado y vuelve a empezar', async ({ page }) => {
     await sembrarValor(page, '#speed-slider', 90);
     await usarArray(page, '7, 3');
     await expect(contadorPasos(page)).toHaveText('Paso 0 de 4');
     await ejecutarHastaElFinal(page);
     const reiniciar = page.getByRole('button', { name: /Reiniciar/ });
-    console.log(`[HALLAZGO 7] al terminar, «${await reiniciar.textContent()}» disabled=${await reiniciar.isDisabled()}`);
     await expect(reiniciar).toBeEnabled();
+    await reiniciar.click();
+    await expect(page.getByRole('button', { name: /Reiniciar/ })).toBeVisible({ timeout: 20000 });
+    await expect(contadorPasos(page)).toHaveText('Paso 4 de 4');
+    expect(await leerBarras(page)).toEqual([3, 7]);
+  });
+
+  test('HALLAZGO 1299 — el lienzo anuncia el array y si ya está ordenado', async ({ page }) => {
+    await sembrarValor(page, '#speed-slider', 90);
+    await usarArray(page, '7, 3');
+    await expect(page.getByRole('img', { name: 'Array de 2 valores: 7, 3' })).toBeVisible();
+    await ejecutarHastaElFinal(page);
+    await expect(page.getByRole('img', { name: 'Array de 2 valores, ya ordenado: 3, 7' })).toBeVisible();
+  });
+
+  test('HALLAZGO 1306 — la leyenda explica el violeta en cada algoritmo que lo usa', async ({ page }) => {
+    const leyenda = page.locator('[class*="legend"]').first();
+    for (const [alg, texto] of [['Quick Sort', 'Pivote'], ['Selection Sort', 'Mínimo actual'], ['Insertion Sort', 'Clave que se inserta'], ['Heap Sort', 'Nodo que se hunde'], ['Counting Sort', 'Valor que se cuenta']]) {
+      await elegir(page, alg);
+      await expect(leyenda).toContainText(texto);
+    }
   });
 
   test.describe('modo comparativa sobre 5, 3, 8, 1, 9, 2', () => {
@@ -378,7 +408,7 @@ test.describe('Pseudocódigo resaltado, comparativa y controles', () => {
 
     async function carrera(page: Page): Promise<void> {
       await page.getByRole('button', { name: /Empezar carrera/ }).click();
-      await expect(contadorCarrera(page)).toHaveText('Paso 45 / 45', { timeout: 15000 }); // Insertion, el más largo: 45 pasos
+      await expect(contadorCarrera(page)).toHaveText('Paso 48 / 48', { timeout: 15000 }); // Insertion, el más largo: 48 pasos
       await expect(page.getByRole('button', { name: /Empezar carrera/ })).toBeVisible();
     }
 
@@ -397,27 +427,35 @@ test.describe('Pseudocódigo resaltado, comparativa y controles', () => {
       for (let i = 0; i < 4; i++) expect(await leerBarras(page, i)).toEqual([1, 2, 3, 5, 8, 9]);
     });
 
-    test('HALLAZGO 7 — volver a pulsar «Empezar carrera» tras la meta no pasa de 45 / 45', async ({ page }) => {
-      test.fail(true, 'HALLAZGO 7: tick() incrementa el progreso aunque ya no queden pasos: 46 / 45, 47 / 45…');
+    test('HALLAZGO 1298 — volver a pulsar «Empezar carrera» tras la meta no pasa de 48 / 48', async ({ page }) => {
       await carrera(page);
       await page.getByRole('button', { name: /Empezar carrera/ }).click();
       await page.waitForTimeout(500); // el tick de más es inmediato; se lee después, sin sondeo
-      const texto = await contadorCarrera(page).textContent();
-      console.log(`[HALLAZGO 7] tras volver a pulsar → «${texto}»`);
-      expect(texto).toBe('Paso 45 / 45');
+      expect(await contadorCarrera(page).textContent()).toBe('Paso 48 / 48');
     });
 
-    test('HALLAZGO 4 — el panel individual de Insertion publica los mismos 11 movimientos que la comparativa', async ({ page }) => {
-      test.fail(true, 'HALLAZGO 4: el panel individual solo cuenta pasos «swap»: Insertion, Merge y Counting salen con «Intercambios 0» mientras la comparativa les cuenta 11, 16 y 6 movimientos sobre el mismo array.');
+    test('HALLAZGO 1294 — el panel individual de Insertion publica los mismos 11 movimientos que la comparativa', async ({ page }) => {
       await carrera(page);
       await expect(dato(page, 'Insertion Sort', 'Movimientos')).toHaveText('Movimientos: 11');
       await page.getByRole('button', { name: /Un algoritmo en detalle/ }).click();
       await sembrarValor(page, '#speed-slider', 90);
       await elegir(page, 'Insertion Sort');
       await ejecutarHastaElFinal(page);
-      const movimientos = await metrica(page, /^(Intercambios|Movimientos)$/).textContent();
-      console.log(`[HALLAZGO 4] Insertion individual → ${movimientos} (comparativa: 11)`);
-      expect(movimientos).toBe('11');
+      expect(await metrica(page, 'Movimientos').textContent()).toBe('11');
     });
   });
+});
+
+// ─── Contenido (1302-1305, 1307) ────────────────────────────────────────────────────────────
+
+test('el contenido no contradice lo que la app anima ni la bibliografía', async ({ page }) => {
+  const html = await page.content();
+  expect(html).not.toContain('Quick Sort sigue siendo O(n log n)'); // 1302
+  expect(html).not.toContain('es &lt;1ms'); // 1303
+  expect(html).not.toContain('acceso secuencial (Mergesort, Heapsort)'); // 1304
+  expect(html).toContain('O(k) la animada · O(n + k) la estable'); // 1305
+  expect(html).not.toContain('usado por Python y Java (Arrays.sort)'); // 1307
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+  expect(jsonLd).not.toContain('Timsort o Introsort, que combinan Merge Sort e Insertion Sort'); // 1307
+  expect(jsonLd).toContain('Introsort (C++), que combina Quick Sort, Heap Sort e Insertion Sort');
 });

@@ -19,7 +19,7 @@ export default function AlgorithmCode({
   return (
     <div className={styles.codePanel}>
       <h3 className={styles.title}>
-        <span>📝</span> Pseudocódigo
+        <span aria-hidden="true">📝</span> Pseudocódigo
       </h3>
 
       <div className={styles.codeContainer}>
@@ -27,6 +27,7 @@ export default function AlgorithmCode({
           <div
             key={index}
             className={`${styles.codeLine} ${index === highlightedLine ? styles.highlighted : ''}`}
+            aria-current={index === highlightedLine ? 'step' : undefined}
           >
             <span className={styles.lineNumber}>{index + 1}</span>
             <code className={styles.lineContent}>{line || ' '}</code>
@@ -36,7 +37,7 @@ export default function AlgorithmCode({
 
       {description && (
         <div className={styles.stepDescription}>
-          <span className={styles.icon}>💡</span>
+          <span className={styles.icon} aria-hidden="true">💡</span>
           <p className={styles.text}>{description}</p>
         </div>
       )}

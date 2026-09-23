@@ -82,6 +82,13 @@ export function useComparativa(
     if (!enMarchaRef.current) return;
 
     const i = progresoRef.current;
+    // Tras la meta no queda paso que dar: volver a pulsar «Empezar carrera» sumaba uno más
+    // al contador (46 / 45) sin mover nada (hallazgo 1298).
+    const maximo = Math.max(0, ...Object.values(pasosRef.current).map((p) => p.length));
+    if (i >= maximo) {
+      setEnMarcha(false);
+      return;
+    }
     const siguientes: Record<string, EstadoReproduccion> = {};
     let quedanPasos = false;
 

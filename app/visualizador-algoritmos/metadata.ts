@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Algoritmos de Ordenación Paso a Paso | meskeIA',
-  description: 'Visualiza paso a paso los 7 algoritmos de ordenación: Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort. Con el pseudocódigo resaltado línea a línea, contador de comparaciones e intercambios y tu propio array.',
+  description: 'Visualiza paso a paso los 7 algoritmos de ordenación: Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort. Con el pseudocódigo resaltado línea a línea, contador de comparaciones y movimientos y tu propio array.',
   keywords: 'algoritmos ordenación, metodos de ordenamiento, bubble sort, quick sort, merge sort, selection sort, insertion sort, heap sort, counting sort, visualizador algoritmos, simulador ordenacion, estructuras datos, informática, programación, universidad, aprender algoritmos, complejidad algoritmos, big O',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -39,14 +39,14 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Visualizador de Algoritmos de Ordenación',
-  description: 'Visualizador interactivo paso a paso de los 7 algoritmos de ordenación: Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort. Muestra el pseudocódigo resaltado línea a línea mientras se anima, cuenta comparaciones e intercambios, y admite tu propio array. Para estudiantes de informática y programación.',
+  description: 'Visualizador interactivo paso a paso de los 7 algoritmos de ordenación: Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort. Muestra el pseudocódigo resaltado línea a línea mientras se anima, cuenta comparaciones y movimientos (intercambios y escrituras), y admite tu propio array. Para estudiantes de informática y programación.',
   url: 'https://meskeia.com/visualizador-algoritmos/',
   category: 'EducationalApplication',
   features: [
     'Visualización paso a paso de 7 algoritmos de ordenación',
     'Bubble, Selection, Insertion, Quick, Merge, Heap y Counting Sort',
     'Pseudocódigo resaltado línea a línea mientras avanza la animación',
-    'Contador en vivo de comparaciones, intercambios y accesos al array',
+    'Contador en vivo de comparaciones, movimientos y accesos al array',
     'Control de velocidad, modo paso a paso y pausa',
     'Tu propio array: prueba casos ya ordenados, invertidos o con repetidos',
     'Tabla comparativa de complejidad, memoria y estabilidad de los 7',
@@ -96,7 +96,7 @@ export const faqJsonLd = {
       name: '¿Qué algoritmo de ordenación debo usar en la práctica al programar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En la mayoría de lenguajes modernos (Python, Java, JavaScript, C++) la función de ordenación estándar implementa variantes de Timsort o Introsort, que combinan Merge Sort e Insertion Sort para obtener el mejor rendimiento en casos reales. En la práctica, lo más sensato es usar la función nativa del lenguaje. Implementar un algoritmo propio solo tiene sentido en casos muy específicos de optimización.',
+        text: 'En la mayoría de lenguajes modernos (Python, Java, JavaScript, C++) la función de ordenación estándar implementa algoritmos híbridos: Timsort (Python, y Java con objetos), que combina Merge Sort e Insertion Sort; Introsort (C++), que combina Quick Sort, Heap Sort e Insertion Sort; o Dual-Pivot Quicksort (Java con tipos primitivos). En la práctica, lo más sensato es usar la función nativa del lenguaje. Implementar un algoritmo propio solo tiene sentido en casos muy específicos de optimización.',
       },
     },
   ],

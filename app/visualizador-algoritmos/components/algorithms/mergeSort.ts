@@ -29,7 +29,7 @@ export function generateMergeSortSteps(initialArray: number[]): AlgorithmStep[] 
     steps.push({
       type: 'merge-combine',
       indices: [left, right],
-      line: 9,
+      line: 10,
       description: `Fusionando subarrays [${leftArr.join(', ')}] y [${rightArr.join(', ')}]`,
     });
 
@@ -42,7 +42,7 @@ export function generateMergeSortSteps(initialArray: number[]): AlgorithmStep[] 
       steps.push({
         type: 'compare',
         indices: [left + i, mid + 1 + j],
-        line: 11,
+        line: 13,
         description: `Comparando ${leftArr[i]} con ${rightArr[j]}`,
       });
 
@@ -52,7 +52,7 @@ export function generateMergeSortSteps(initialArray: number[]): AlgorithmStep[] 
           type: 'set',
           indices: [k],
           values: [leftArr[i]],
-          line: 12,
+          line: 14,
           description: `Colocando ${leftArr[i]} en posición ${k}`,
         });
         i++;
@@ -62,7 +62,7 @@ export function generateMergeSortSteps(initialArray: number[]): AlgorithmStep[] 
           type: 'set',
           indices: [k],
           values: [rightArr[j]],
-          line: 13,
+          line: 16,
           description: `Colocando ${rightArr[j]} en posición ${k}`,
         });
         j++;
@@ -77,7 +77,7 @@ export function generateMergeSortSteps(initialArray: number[]): AlgorithmStep[] 
         type: 'set',
         indices: [k],
         values: [leftArr[i]],
-        line: 14,
+        line: 18,
         description: `Copiando ${leftArr[i]} restante a posición ${k}`,
       });
       i++;
@@ -91,7 +91,7 @@ export function generateMergeSortSteps(initialArray: number[]): AlgorithmStep[] 
         type: 'set',
         indices: [k],
         values: [rightArr[j]],
-        line: 14,
+        line: 18,
         description: `Copiando ${rightArr[j]} restante a posición ${k}`,
       });
       j++;
@@ -105,7 +105,7 @@ export function generateMergeSortSteps(initialArray: number[]): AlgorithmStep[] 
         steps.push({
           type: 'sorted',
           indices: [idx],
-          line: 6,
+          line: 5,
           description: idx === right ? '¡Array completamente ordenado!' : '',
         });
       }

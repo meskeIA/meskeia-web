@@ -24,7 +24,8 @@ export default function MetricsPanel({ metrics }: MetricsPanelProps) {
 
       <div className={styles.metricCard}>
         <div className={styles.metricValue}>{formatNumber(metrics.swaps, 0)}</div>
-        <div className={styles.metricLabel}>Intercambios</div>
+        <div className={styles.metricLabel}>Movimientos</div>
+        <div className={styles.metricNota}>intercambios y escrituras</div>
       </div>
 
       <div className={styles.metricCard}>

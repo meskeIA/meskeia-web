@@ -28,7 +28,7 @@ export function generateCountingSortSteps(initialArray: number[]): AlgorithmStep
     steps.push({
       type: 'pivot',
       indices: [i],
-      line: 4,
+      line: 3,
       description: `Cuenta del valor ${arr[i]}: ahora aparece ${recuento[arr[i]]} ${recuento[arr[i]] === 1 ? 'vez' : 'veces'}`,
     });
   }

@@ -47,6 +47,17 @@ export function generateInsertionSortSteps(initialArray: number[]): AlgorithmSte
       j--;
     }
 
+    // La comparación que da FALSO y detiene el «mientras» también es una comparación: sin
+    // ella, el contador publicaba las inversiones y el mejor caso salía con 0 (hallazgo 1292).
+    if (j >= 0) {
+      steps.push({
+        type: 'compare',
+        indices: [j, j + 1],
+        line: 4,
+        description: `${arr[j]} ≤ ${key}: el bucle se detiene y ${key} va en la posición ${j + 1}`,
+      });
+    }
+
     // Insertar la clave en su posición correcta
     if (j + 1 !== i) {
       arr[j + 1] = key;
