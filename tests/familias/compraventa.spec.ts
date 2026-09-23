@@ -708,7 +708,8 @@ const HERMANAS: readonly Hermana[] = [
       'sin reinversión. Publica COSTE TOTAL 213.295,20 € y NETO 184.090,00 €. · ' +
       'BASE A = B + reinvierte 193.000 (exento, NETO 193.000,00). · ' +
       "BASE A' = B + reinvierte 150.000 + hipoteca 2.000,50 (NETO 191.181,64). · " +
-      'BASE C = B + catastral total 700.000 (método real, NETO 184.174,64).',
+      'BASE C = B + catastral total 700.000 (método real, NETO 184.174,64). · ' +
+      'BASE E = B + mayor de 65 (exento por edad, NETO 193.000,00).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^IMPORTE NETO VENDEDOR$/,
@@ -722,6 +723,10 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(page, 'Comisión inmobiliaria (%)', '3');
       if (base === 'C') {
         await sembrar(page, 'Valor catastral total (suelo + construcción)', '700000');
+      }
+      if (base === 'E') {
+        // Mayor de 65 que vende su vivienda habitual: exención total (art. 33.4.b LIRPF).
+        await page.getByRole('checkbox', { name: /Soy mayor de 65 años/ }).check();
       }
       if (base === 'A' || base === "A'") {
         await page
@@ -779,6 +784,17 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -420.1,
         nombra: /impuestos y gastos de aquella compra/i,
+      },
+      {
+        // BASE E (mayor de 65 + vivienda habitual, exención total): los gastos de aquella
+        // compra no pueden mover una cuota exenta. Se publicaban «TECHO» y «el neto real es
+        // MAYOR» con el neto idéntico, borrando además el motivo de la exención (hallazgo 1227).
+        etiqueta: 'Impuestos y gastos que pagaste al comprar',
+        panel: 'vendedor',
+        legible: '2000,50',
+        base: 'E',
+        direccion: 'sin_efecto',
+        delta: 0,
       },
       {
         etiqueta: 'Inversiones y mejoras (opcional)',

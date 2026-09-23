@@ -2031,9 +2031,8 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     // El campo conserva lo tecleado (nadie lo ha "corregido" por detrás)
     await expect(page.locator('input[aria-label="Precio de la vivienda"]')).toHaveValue('1.2.3');
 
-    await expect(
-      page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),
-    ).toBeVisible();
+    // Escrito pero ilegible: se dice que no se lee, no que falta (hallazgo 1231).
+    await expect(page.getByText('No se ha podido leer el precio «1.2.3»', { exact: false })).toBeVisible();
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: /COSTE TOTAL/ })).toHaveCount(0);
 
@@ -3331,7 +3330,8 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
     );
     expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('233.695,00 €');
     expect(await descripcionTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe(
-      'INCOMPLETO: falta descontar la plusvalía municipal. Rellena el valor catastral del suelo para obtener el neto real.',
+      // El suelo está escrito pero no se lee: no «falta», se pide corregirlo (hallazgo 1231).
+      'INCOMPLETO: falta descontar la plusvalía municipal; el valor catastral del suelo no se ha podido leer. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtener el neto real.',
     );
   });
 
@@ -4544,7 +4544,8 @@ test.describe('Reparación 23/09/2026 — la magnitud de «falta descontar la co
  * Cuotas del ahorro que se repiten abajo: hasta 50.000 → 10.380 € · hasta 200.000 → 44.880 € ·
  * hasta 300.000 → 71.880 €.
  *
- * Los hallazgos van con `test.fail()`. Para que ninguno pueda «fallar como se esperaba» por su
+ * Los hallazgos (1226-1232) se REPARARON el 23/09/2026 y ya no llevan `test.fail()`; lo que
+ * sigue explica cómo se escribieron. Para que ninguno pudiera «fallar como se esperaba» por su
  * propio montaje (la trampa del 1192), el caso «CONTROL de montaje» de este bloque, que va en
  * VERDE, repite cada preparación y exige las cifras que la app publica hoy: si un montaje se
  * rompe, se pone rojo ese control y no se esconde detrás de un fallo esperado.
@@ -4766,7 +4767,7 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(/^TECHO:/);
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('612.560,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
-      'falta descontar la comisión inmobiliaria (la comisión rebaja también el IRPF al descontarla, hasta un 30 % de su importe)',
+      'falta descontar la comisión inmobiliaria, que no se ha podido leer (la comisión inmobiliaria rebaja también el IRPF al descontarla, hasta un 30 % de su importe)',
     );
 
     // El canto: la base queda en 300.000 exactos y el tramo es el del 27 %
@@ -4848,7 +4849,9 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('184.090,00 €');
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
     expect(aviso).toContain('el valor catastral total');
-    expect(aviso).toContain('el neto real es MAYOR que este');
+    // «puede ser»: con el total ilegible la app no sabe si el método real ganaría, porque el
+    // dato que lo decide es justo el que no lee (lo calcula el sondeo, lib/sondeoIlegibles.ts).
+    expect(aviso).toContain('el neto real puede ser MAYOR que este');
 
     await sembrar23(page, 'Valor catastral total (suelo + construcción)', '700000');
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('892,86 €');
@@ -4964,8 +4967,12 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *   menos 9.000 × 77 % = 6.930,00 €; el real es 285.068,12 − 278.634,29 = 6.433,83 €.
    *   esperado: hueco ≥ importe × (1 − T/100)  ·  obtenido: 6.433,83 < 6.930,00 (496,17 € fuera)
    */
-  test('H1 (hallazgo) — con hipoteca pendiente, la rebaja del IRPF supera la cota «hasta un T %»', async ({ page }) => {
-    test.fail(); // H1 — la cota de C3 no vale con reinversión parcial + principal pendiente
+  test('H1 (hallazgo 1226, REPARADO) — con reinversión parcial no se publica una cota «hasta un T %» que no vale', async ({ page }) => {
+    // La reparación retira la cota en vez de corregirla: con la exención proporcional del
+    // art. 41 RIRPF, la comisión baja también el importe total obtenido (el denominador), y
+    // cada euro puede bajar la base en MÁS de un euro — aquí un 28,51 % frente al 23 % que se
+    // publicaba. No hay tipo que acote esa rebaja sin inventarlo, así que el aviso dice solo lo
+    // que es cierto siempre: que el neto real baja menos que el importe de la comisión.
     await montarH1(page);
     const netoReal = aEuros23(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR'));
     const importe = 300000 * 0.03;
@@ -4973,19 +4980,12 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     await sembrar23(page, 'Comisión inmobiliaria (%)', '3.0.0');
     const netoPublicado = aEuros23(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR'));
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    const cota = aviso.match(/hasta un (\d+) % de su importe/);
-    expect(cota, `el aviso ya no publica la cota. Aviso: ${aviso}`).not.toBeNull();
-    const tipo = Number(cota?.[1]);
-
+    expect(aviso).not.toMatch(/hasta un \d+ % de su importe/);
+    expect(aviso).toContain('rebaja también el IRPF al descontarla, así que el neto real baja menos que su importe');
+    // Y lo que dice es cierto: el hueco real (6.433,83 €) es menor que la comisión (9.000 €).
     const hueco = netoPublicado - netoReal;
-    const es = (n: number): string =>
-      new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
-    expect(
-      hueco,
-      `el aviso dice que la comisión rebaja el IRPF «hasta un ${tipo} %», pero con la hipoteca ` +
-        `pendiente lo rebaja un ${es((1 - hueco / importe) * 100)} %: el hueco real es ` +
-        `${es(hueco)} € y la cota promete al menos ${es(importe * (1 - tipo / 100))} €`,
-    ).toBeGreaterThanOrEqual(importe * (1 - tipo / 100) - 0.01);
+    expect(hueco).toBeGreaterThan(0);
+    expect(hueco).toBeLessThan(importe);
   });
 
   /**
@@ -5010,7 +5010,6 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *   obtenido: «TECHO: …» · «INCOMPLETO: … el neto real es MAYOR que este …»
    */
   test('H2 (hallazgo) — un ilegible que no mueve nada no puede decir que el neto real es MAYOR', async ({ page }) => {
-    test.fail(); // H2 — el aviso de ilegible no mira si el importe puede mover la cuota
     await vendedor23(page, '200000', [...BASE_B, ['Impuestos y gastos que pagaste al comprar', '2.000.50']], {
       mayor65: true,
     });
@@ -5040,7 +5039,6 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
   test('H3 (hallazgo) — con el valor catastral total ilegible, el IRPF no puede publicarse como definitivo', async ({
     page,
   }) => {
-    test.fail(); // H3 — la tarjeta del IRPF no se entera de C1
     expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.45);
     await montarH3(page);
     await sembrar23(page, 'Valor catastral total (suelo + construcción)', '600.000.00');
@@ -5069,14 +5067,17 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *             leer y REDUCEN el impuesto (las mejoras), así que el neto real es MAYOR que este.»
    */
   test('H4 (hallazgo) — dos ilegibles opuestos no pueden rematar «el neto real es MAYOR»', async ({ page }) => {
-    test.fail(); // H4 — el aviso afirma MAYOR con un real 5.110,00 € menor
     await vendedor23(page, '200000', [
       ...BASE_B,
       ['Comisión inmobiliaria (%)', '3.5.0'],
       ['Inversiones y mejoras (opcional)', '2.000.00'],
     ]);
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(aviso).toContain('falta descontar la comisión inmobiliaria');
+    // Los nombra a los dos y dice que no se puede saber hacia dónde queda el neto real: la
+    // dirección conjunta depende de lo que valgan (reparado con el sondeo, hallazgo 1229).
+    expect(aviso).toContain('la comisión inmobiliaria');
+    expect(aviso).toContain('las mejoras');
+    expect(aviso).toContain('sentidos contrarios');
     expect(aviso, 'con el dato leído el neto real es 183.720,00 €, 5.110,00 € MENOS que el publicado').not.toContain(
       'el neto real es MAYOR que este',
     );
@@ -5098,7 +5099,6 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *   obtenido: «Precio de compra + impuestos y gastos de aquella compra + mejoras» · sin línea
    */
   test('H5 (hallazgo) — el desglose del vendedor dice qué importes no se han podido leer', async ({ page }) => {
-    test.fail(); // H5 — la mitad de 1197 y de A3 que no llegó a la app de referencia
     await vendedor23(page, '200000', [...BASE_B, ['Impuestos y gastos que pagaste al comprar', '2.000.50']]);
     expect.soft(await descripcionTarjeta(page, 'Valor de adquisición')).toMatch(/no se han? podido leer/);
 
@@ -5121,12 +5121,11 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *   esperado: «no se ha podido leer» · obtenido: «Introduce…», «Falta…», «Rellena…»
    */
   test('H6 (hallazgo) — un precio escrito pero ilegible no se pide como si faltara', async ({ page }) => {
-    test.fail(); // H6 — el mensaje del grupo B no llegó a la app de referencia
     await abrir23(page);
     await sembrar23(page, 'Precio de la vivienda', '200.000.00');
     expect
       .soft(await page.getByText(/Introduce el precio/).first().innerText())
-      .toMatch(/no se ha podido leer/);
+      .toMatch(/no se ha podido leer/i);
 
     await vendedor23(page, '200000', [...BASE_B.slice(1), ['Precio de compra original', '150.000.00']]);
     expect.soft(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(/no se ha podido leer/);
@@ -5145,8 +5144,23 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *   obtenido: «Lo que realmente recibes»
    */
   test('H7 (hallazgo) — con el par catastral imposible el neto no es definitivo', async ({ page }) => {
-    test.fail(); // H7 — el neto no se entera del par imposible
     await montarParImposible(page);
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toBe('Lo que realmente recibes');
   });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Propagación del hallazgo 1273 de solar (23/09/2026): la ayuda del precio no manda escribir
+// «el mayor» con el valor de referencia catastral cuando el impuesto es IVA, cuya base es la
+// contraprestación pactada (art. 78 Ley 37/1992). En Canarias, Ceuta y Melilla no hay IVA.
+// ─────────────────────────────────────────────────────────────────────────────
+test('la ayuda del precio depende del régimen: en IVA, el precio pactado (familia del 1273)', async ({ page }) => {
+  await page.goto('/estimador-compraventa-inmueble/');
+  await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+  const ayuda = page.getByText(/Precio escriturado o valor de referencia catastral|Precio pactado en la escritura/).first();
+  await expect(ayuda).toContainText('(el mayor)');
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await expect(ayuda).toContainText('la base del IVA es la contraprestación');
+  await page.locator('select').filter({ has: page.locator('option[value="canarias"]') }).first().selectOption('canarias');
+  await expect(ayuda).toContainText('(el mayor)');
 });

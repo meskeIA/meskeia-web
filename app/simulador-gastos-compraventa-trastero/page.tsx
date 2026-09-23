@@ -842,7 +842,14 @@ export default function SimuladorTrasteroCompraventaPage() {
             onChange={setPrecioVenta}
             label="Precio del trastero"
             placeholder="15000"
-            helperText="Precio escriturado o valor de referencia catastral (el mayor)"
+            // La base del IVA es la contraprestación pactada (art. 78 Ley 37/1992); «el mayor»
+            // con el valor de referencia catastral es la base mínima del ITP. Propagado del
+            // hallazgo 1273 de solar: esta app también tiene régimen de IVA en primera mano.
+            helperText={
+              tipoTransmision === 'primera-mano' && !TERRITORIOS_SIN_IVA[ccaa]
+                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992)'
+                : 'Precio escriturado o valor de referencia catastral (el mayor)'
+            }
             min={0}
           />
 

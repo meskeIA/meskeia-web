@@ -4616,3 +4616,19 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toMatch(/no se ha podido leer/i);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Propagación del hallazgo 1273 de solar (23/09/2026): la ayuda del precio no manda escribir
+// «el mayor» con el valor de referencia catastral cuando el impuesto es IVA, cuya base es la
+// contraprestación pactada (art. 78 Ley 37/1992). En Canarias, Ceuta y Melilla no hay IVA.
+// ─────────────────────────────────────────────────────────────────────────────
+test('la ayuda del precio depende del régimen: en IVA, el precio pactado (familia del 1273)', async ({ page }) => {
+  await page.goto('/simulador-gastos-compraventa-trastero/');
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  const ayuda = page.getByText(/Precio escriturado o valor de referencia catastral|Precio pactado en la escritura/).first();
+  await expect(ayuda).toContainText('(el mayor)');
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await expect(ayuda).toContainText('la base del IVA es la contraprestación');
+  await page.locator('select').filter({ has: page.locator('option[value="canarias"]') }).first().selectOption('canarias');
+  await expect(ayuda).toContainText('(el mayor)');
+});
