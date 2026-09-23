@@ -147,8 +147,12 @@ export default function SimuladorPlanoInclinado() {
     const alturaTotal = longitud * Math.sin(rad);
     const energiaPotencial = masa * G * alturaTotal;
     const trabajoRozamiento = muK * normal * longitud;
+    // Trabajo de F en la bajada: F es positiva cuesta arriba y el bloque se desplaza cuesta
+    // abajo, así que W = −F·L (positivo si empuja hacia abajo). Sin él, el balance no cierra
+    // con F ≠ 0 (hallazgo 1289).
+    const trabajoFuerza = -fuerza * longitud;
     const energiaCinetica = bajaLibremente
-      ? Math.max(energiaPotencial - trabajoRozamiento + fuerza * longitud, 0)
+      ? Math.max(energiaPotencial - trabajoRozamiento + trabajoFuerza, 0)
       : null;
 
     return {
@@ -168,6 +172,7 @@ export default function SimuladorPlanoInclinado() {
       alturaTotal,
       energiaPotencial,
       trabajoRozamiento,
+      trabajoFuerza,
       energiaCinetica,
     };
   }, [masa, angulo, muS, muK, fuerza, longitud]);
@@ -181,6 +186,16 @@ export default function SimuladorPlanoInclinado() {
   const u = recorridoVigente ? simulacion.u : posicionInicial;
   const velocidad = recorridoVigente ? simulacion.v : 0;
   const enMarcha = animando && recorridoVigente;
+
+  // Un cambio de parámetros anula el recorrido entero: la animación se detiene y el recorrido
+  // anterior se olvida. Si solo se dejaba de ver, al devolver el deslizador a su valor la clave
+  // volvía a coincidir y el bloque seguía solo desde media rampa (hallazgo 1288).
+  useEffect(() => {
+    if (simulacion.clave !== '' && simulacion.clave !== claveParametros) {
+      setAnimando(false);
+      setSimulacion({ clave: '', u: 0, v: 0 });
+    }
+  }, [claveParametros, simulacion.clave]);
 
   // Bucle de animación (movimiento uniformemente acelerado sobre la rampa).
   // La integración vive en refs: el estado de React solo recibe el valor de cada fotograma.
@@ -204,17 +219,25 @@ export default function SimuladorPlanoInclinado() {
       // Solo se frena en un extremo si el bloque se dirige HACIA él. El bloque parte
       // justo en un tope (la cima al bajar, la base al subir) y el primer fotograma
       // tiene dt = 0: comparar sin mirar la velocidad detendría la animación ahí mismo.
+      // Al llegar al tope, la velocidad es la de ESE punto (v² = v₀² + 2·a·Δu), no la del
+      // fotograma que ya lo ha rebasado: si no, la instantánea final superaba a la analítica
+      // publicada justo encima (hallazgo 1287).
+      let vFinal = vNueva;
+      const alTope = (tope: number): number =>
+        Math.sign(vNueva) * Math.sqrt(Math.max(0, velocidadRef.current ** 2 + 2 * a * (tope - uRef.current)));
       if (uNueva <= 0 && vNueva < 0) {
+        vFinal = alTope(0);
         uNueva = 0;
         seguir = false;
       } else if (uNueva >= longitud && vNueva > 0) {
+        vFinal = alTope(longitud);
         uNueva = longitud;
         seguir = false;
       }
 
       uRef.current = uNueva;
-      velocidadRef.current = vNueva;
-      setSimulacion({ clave: claveParametros, u: uNueva, v: vNueva });
+      velocidadRef.current = vFinal;
+      setSimulacion({ clave: claveParametros, u: uNueva, v: vFinal });
 
       if (!seguir) {
         setAnimando(false);
@@ -234,12 +257,13 @@ export default function SimuladorPlanoInclinado() {
       setAnimando(false);
       return;
     }
-    // Si el recorrido anterior ya no vale (o terminó), se parte de la posición inicial
-    const arranque = recorridoVigente && simulacion.u > 0 && simulacion.u < longitud
-      ? simulacion.u
-      : posicionInicial;
+    // Solo se reanuda un recorrido a medias (pausado). Si ya no vale o TERMINÓ, se parte de la
+    // posición inicial y en REPOSO: tomar la velocidad del final relanzaba el bloque cada vez
+    // más deprisa (hallazgo 1286).
+    const aMedias = recorridoVigente && simulacion.u > 0 && simulacion.u < longitud;
+    const arranque = aMedias ? simulacion.u : posicionInicial;
     uRef.current = arranque;
-    velocidadRef.current = recorridoVigente ? simulacion.v : 0;
+    velocidadRef.current = aMedias ? simulacion.v : 0;
     setSimulacion({ clave: claveParametros, u: arranque, v: velocidadRef.current });
     setAnimando(true);
   }, [enMarcha, recorridoVigente, simulacion, longitud, posicionInicial, claveParametros]);
@@ -708,6 +732,9 @@ export default function SimuladorPlanoInclinado() {
 
             <div className={styles.resultBlock}>
               <h3 className={styles.resultTitle}>Análisis de fuerzas</h3>
+              <p className={styles.resultNota}>
+                Con g = 9,81 m/s². Si en clase usáis g = 9,8, las cifras cambian en el tercer dígito.
+              </p>
 
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Peso P = m·g</span>
@@ -775,6 +802,22 @@ export default function SimuladorPlanoInclinado() {
                       {formatNumber(fisica.trabajoRozamiento, 2)} J
                     </span>
                   </div>
+                  {fuerza !== 0 && (
+                    <div className={styles.resultRow}>
+                      <span className={styles.resultLabel}>Trabajo de la fuerza aplicada (−F·L)</span>
+                      <span className={styles.resultValue}>
+                        {formatNumber(fisica.trabajoFuerza, 2)} J
+                      </span>
+                    </div>
+                  )}
+                  {fisica.energiaCinetica !== null && (
+                    <div className={styles.resultRow}>
+                      <span className={styles.resultLabel}>Energía cinética al llegar (½·m·v²)</span>
+                      <span className={styles.resultValue}>
+                        {formatNumber(fisica.energiaCinetica, 2)} J
+                      </span>
+                    </div>
+                  )}
                 </>
               ) : (
                 <p className={styles.resultNota}>
@@ -824,7 +867,7 @@ export default function SimuladorPlanoInclinado() {
                 </tr>
                 <tr>
                   <td>Peso paralelo</td>
-                  <td>Pₓ = m·g·sen θ</td>
+                  <td>Pₓ = m·g·sen θ (g = 9,81 m/s²)</td>
                   <td>N</td>
                   <td>Es la fuerza que tira del bloque cuesta abajo</td>
                 </tr>
@@ -1048,8 +1091,9 @@ export default function SimuladorPlanoInclinado() {
               <div>
                 <strong>Contrasta con la energía</strong>
                 <p>
-                  La energía cinética al final debe ser m·g·h menos el trabajo del rozamiento. Si no
-                  cuadra, hay un error en la aceleración.
+                  La energía cinética al final debe ser m·g·h menos el trabajo del rozamiento, más el
+                  trabajo de la fuerza aplicada si la hay (−F·L: positivo si empuja cuesta abajo,
+                  negativo si frena). Si no cuadra, revisa la aceleración.
                 </p>
               </div>
             </div>

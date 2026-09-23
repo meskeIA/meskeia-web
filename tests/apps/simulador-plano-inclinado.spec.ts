@@ -57,7 +57,7 @@ import {
  *   céntimo, el estático publicado es P∥ y no μₛ·N, su flecha cambia de sentido con F, el
  *   límite tg θ = μₛ queda en reposo, μₖ nunca supera a μₛ y en reposo no hay animación.
  *
- * HALLAZGOS ABIERTOS (al final, con `test.fail()`: afirman lo que DEBERÍA pasar)
+ * HALLAZGOS 1286-1290 — REPARADOS el 23/09/2026 (H1-H3 abajo, sin `test.fail()`, y H4-H5 al final)
  *   H1 · alto · «Soltar el bloque» por segunda vez, sin «Reiniciar posición», relanza el
  *        bloque desde la cima CON la velocidad final del recorrido anterior (`handleSoltar`
  *        toma `simulacion.v` aunque el arranque vuelva a `posicionInicial`). Caso 1:
@@ -324,11 +324,6 @@ test.describe('Simulador de plano inclinado — la animación y lo publicado', (
   test('H1 — soltar otra vez sin reiniciar relanza el bloque desde la cima y EN REPOSO', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'HALLAZGO H1: la segunda suelta arranca desde la cima con la velocidad final de la ' +
-        'anterior (handleSoltar toma simulacion.v). Caso 1: llega a 8,82 m/s en vez de 6,20.',
-    );
     await sembrarCaso1(page);
     await pausarReloj(page);
 
@@ -348,11 +343,6 @@ test.describe('Simulador de plano inclinado — la animación y lo publicado', (
   test('H2 — al llegar abajo, la velocidad instantánea es la publicada (7,75 m/s)', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'HALLAZGO H2: la velocidad instantánea final es la del fotograma que ya rebasó la base ' +
-        '(u se capa a 0, v no): 7,82 m/s junto a «Velocidad al llegar abajo 7,75 m/s».',
-    );
     // 5 kg · 60° · μₛ 0,20 (μₖ baja con él a 0,20): a = 7,514709 → v = √(2·7,514709·4) = 7,753559
     await sembrarValor(page, '#angulo', 60);
     await sembrarValor(page, '#mus', 0.2);
@@ -376,11 +366,6 @@ test.describe('Simulador de plano inclinado — cambiar parámetros en marcha', 
   });
 
   test('H3 — devolver un deslizador a su valor NO reanuda sola la animación', async ({ page }) => {
-    test.fail(
-      true,
-      'HALLAZGO H3: «animando» sigue en true al invalidar el recorrido; al volver a la misma ' +
-        'clave de parámetros la animación se reanuda sola desde donde se quedó.',
-    );
     await sembrarCaso1(page);
     await botonSoltar(page).click();
     await page.waitForTimeout(700); // a medio camino (≈ 5,2 m)
@@ -398,5 +383,35 @@ test.describe('Simulador de plano inclinado — cambiar parámetros en marcha', 
     await page.waitForTimeout(500);
     await expect(botonSoltar(page)).toHaveText(/Soltar el bloque/);
     expect(await leerFila(page, 'Posición sobre la rampa')).toBe('6,00 m');
+  });
+});
+
+test.describe('Simulador de plano inclinado — balance de energía y g', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  // HALLAZGO 1289 — con F ≠ 0 el balance publicado no cerraba: faltaba el trabajo de F.
+  // 5 kg · 25° · μₛ 0,50 · μₖ 0,30 · F −10 N · L 4 m: Ep = 5·9,81·4·sen 25° = 82,92 J,
+  // rozamiento 0,30·5·9,81·cos 25°·4 = 53,35 J, W(F) = −(−10)·4 = +40,00 J → Ec = 69,57 J,
+  // que es ½·5·v² con la v publicada (5,28 m/s).
+  test('H4 — con fuerza aplicada, el balance incluye su trabajo y cierra', async ({ page }) => {
+    await sembrarValor(page, '#angulo', 25);
+    await sembrarValor(page, '#mus', 0.5);
+    await sembrarValor(page, '#muk', 0.3);
+    await sembrarValor(page, '#fuerza', -10);
+    await expect.poll(() => leerFila(page, 'Trabajo de la fuerza aplicada (−F·L)')).toBe('40,00 J');
+    expect(await leerFila(page, 'Energía potencial inicial')).toBe('82,92 J');
+    expect(await leerFila(page, 'Disipado por rozamiento')).toBe('53,35 J');
+    expect(await leerFila(page, 'Energía cinética al llegar (½·m·v²)')).toBe('69,57 J');
+    const v = await valor(page, 'Velocidad al llegar abajo');
+    expect(0.5 * 5 * v * v).toBeCloseTo(69.57, 0);
+  });
+
+  // HALLAZGO 1290 — la página no decía qué g usa.
+  test('H5 — la página dice que usa g = 9,81 m/s²', async ({ page }) => {
+    await expect(page.getByText('Con g = 9,81 m/s²')).toBeVisible();
+    expect(await leerFila(page, 'Peso P = m·g')).toBe('49,05 N');
   });
 });
