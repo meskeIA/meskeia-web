@@ -538,7 +538,10 @@ export default function SimuladorCompraventaPage() {
     // explicara. Mismo defecto que d787b81b ya acotó en la gestoría del comprador arriba,
     // sin propagarlo a la partida gemela (hallazgos 476, 477).
     const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
-    const gestoria = parseSpanishNumberOr(gastosGestoria);
+    // Aquí se leía `const gestoria = parseSpanishNumberOr(gastosGestoria)` y no se usaba en
+    // ningún punto: la gestoría de ese campo la paga el COMPRADOR y el art. 35.1 LIRPF no la
+    // admite en la ganancia del vendedor (ver la llamada al motor). Se retiró el 23/09/2026
+    // en vez de guardarla con `esLegible`: vigilar un importe que no mueve nada es ruido (C2).
     const otrosVenta = Math.max(0, parseSpanishNumberOr(otrosGastosVenta));
     const comision = precioV * comisionPct;
     /**
@@ -666,7 +669,7 @@ export default function SimuladorCompraventaPage() {
       // Sin plusvalía liquidada (faltan datos o no hay incremento) no hay método que comparar.
       valorTotalLegible: !plusvaliaCalculada || exentoPlusvalia || valorTotalLegible,
     };
-  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
+  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
 
   /**
    * Estima los impuestos y gastos que el vendedor pagó al comprar el inmueble, para
