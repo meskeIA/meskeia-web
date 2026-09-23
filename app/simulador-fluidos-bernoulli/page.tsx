@@ -5,41 +5,27 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorFluidosBernoulli.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-
-// ============================================
-// TIPOS
-// ============================================
-type GeomId = 'venturi' | 'desnivel' | 'estenosis';
-type FluidoId = 'agua' | 'aceite' | 'sangre' | 'aire';
-
-interface Fluido {
-  id: FluidoId;
-  nombre: string;
-  rho: number; // kg/m³
-}
-
-const FLUIDOS: Fluido[] = [
-  { id: 'agua', nombre: 'Agua', rho: 1000 },
-  { id: 'aceite', nombre: 'Aceite', rho: 920 },
-  { id: 'sangre', nombre: 'Sangre', rho: 1060 },
-  { id: 'aire', nombre: 'Aire', rho: 1.225 },
-];
-
-interface SeccionData {
-  id: string;
-  nombre: string;
-  x: number; // px en la tubería
-  ancho: number; // ancho de la tubería en este punto (m)
-  altura: number; // altura del tubo en m respecto a referencia
-}
+// La física (fluidos, secciones, continuidad y Bernoulli) vive en ./motor.ts desde el
+// 23/09/2026: la usan esta página y la sección «Casos para clase», con una sola implementación.
+import {
+  FLUIDOS,
+  P_ATMOSFERICA,
+  DIAMETRO_NOMINAL,
+  getSecciones,
+  calcularSecciones,
+  caudalMasico as calcularCaudalMasico,
+  presionMinima as calcularPresionMinima,
+  diferenciaPresion,
+  litrosPorSegundoAM3s,
+  type GeomId,
+  type FluidoId,
+} from './motor';
+import CasosAula from './CasosAula';
+import type { ConfiguracionSimulador } from './casos';
 
 // ============================================
 // UTILIDADES
 // ============================================
-const G = 9.81;
-
-/** Presión atmosférica normal (Pa). Es el valor de referencia que cita el bloque educativo. */
-const P_ATMOSFERICA = 101325;
 
 /**
  * Paso del deslizador de presión (Pa). La rejilla se construye DESDE la presión
@@ -88,36 +74,11 @@ function fmtPresion(P: number): string {
 // ============================================
 // CONFIGURACIÓN GEOMETRÍAS
 // ============================================
-function getSecciones(geom: GeomId, ratioEstrechamiento: number, alturaDesnivel: number): SeccionData[] {
-  // ratioEstrechamiento: factor por el que se reduce el ancho en la zona estrecha (0.3-1)
-  const D0 = 0.10; // diámetro nominal en m (10 cm)
-  const D_estrecho = D0 * ratioEstrechamiento;
-
-  if (geom === 'venturi') {
-    return [
-      { id: '1', nombre: 'Entrada', x: 0.05, ancho: D0, altura: 0 },
-      { id: '2', nombre: 'Garganta', x: 0.50, ancho: D_estrecho, altura: 0 },
-      { id: '3', nombre: 'Salida', x: 0.95, ancho: D0, altura: 0 },
-    ];
-  }
-  if (geom === 'desnivel') {
-    return [
-      { id: '1', nombre: 'Inferior', x: 0.10, ancho: D0, altura: 0 },
-      { id: '2', nombre: 'Subida', x: 0.50, ancho: D0, altura: alturaDesnivel * 0.5 },
-      { id: '3', nombre: 'Superior', x: 0.90, ancho: D0, altura: alturaDesnivel },
-    ];
-  }
-  // estenosis (vena con estrechamiento brusco)
-  return [
-    { id: '1', nombre: 'Pre-estenosis', x: 0.15, ancho: D0, altura: 0 },
-    { id: '2', nombre: 'Estenosis', x: 0.50, ancho: D_estrecho, altura: 0 },
-    { id: '3', nombre: 'Post-estenosis', x: 0.85, ancho: D0, altura: 0 },
-  ];
-}
+// `getSecciones` vive en ./motor.ts. El dibujo sigue aquí: es vista, no física.
 
 // Devuelve el ancho de la tubería en un x normalizado (0-1) para una geometría
 function anchoEnX(x: number, geom: GeomId, ratio: number): number {
-  const D0 = 0.10;
+  const D0 = DIAMETRO_NOMINAL;
   const D_estrecho = D0 * ratio;
 
   if (geom === 'desnivel') return D0; // ancho constante
@@ -182,10 +143,12 @@ export default function SimuladorFluidosBernoulliPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number | null>(null);
   const particulasRef = useRef<{ x: number; yOffset: number }[]>([]);
+  /** Ancla del selector de geometría: «Cargar en el simulador» desplaza la vista hasta aquí. */
+  const simuladorRef = useRef<HTMLDivElement>(null);
 
   const fluido = FLUIDOS.find(f => f.id === fluidoId)!;
   const rho = fluido.rho;
-  const Q_m3s = Q / 1000; // Convertir L/s a m³/s
+  const Q_m3s = litrosPorSegundoAM3s(Q); // Convertir L/s a m³/s
 
   // ============================================
   // SECCIONES Y CÁLCULOS
@@ -195,31 +158,33 @@ export default function SimuladorFluidosBernoulliPage() {
     [geom, ratioEstrechamiento, alturaDesnivel]
   );
 
-  // Para cada sección: A, v, P
-  const datos = useMemo(() => {
-    return secciones.map((s, idx) => {
-      const A = Math.PI * (s.ancho / 2) * (s.ancho / 2); // m²
-      const v = Q_m3s / A; // m/s
-      // Bernoulli desde sección 0:
-      // P1 + ½ρv1² + ρgh1 = P_i + ½ρv_i² + ρgh_i
-      let P: number;
-      if (idx === 0) {
-        P = P0;
-      } else {
-        const A0 = Math.PI * (secciones[0].ancho / 2) * (secciones[0].ancho / 2);
-        const v0 = Q_m3s / A0;
-        const h0 = secciones[0].altura;
-        P = P0 + 0.5 * rho * (v0 * v0 - v * v) + rho * G * (h0 - s.altura);
-      }
-      return { ...s, A, v, P };
-    });
-  }, [secciones, Q_m3s, rho, P0]);
+  // Para cada sección: A, v, P (continuidad + Bernoulli desde la sección 1, en ./motor.ts)
+  const datos = useMemo(
+    () => calcularSecciones(secciones, Q_m3s, rho, P0),
+    [secciones, Q_m3s, rho, P0]
+  );
 
   // Caudal másico
-  const caudalMasico = useMemo(() => Q_m3s * rho, [Q_m3s, rho]);
+  const caudalMasico = useMemo(() => calcularCaudalMasico(Q_m3s, rho), [Q_m3s, rho]);
 
   /** La presión más baja de las tres secciones: la que decide si el modelo sigue siendo válido. */
-  const presionMinima = useMemo(() => Math.min(...datos.map(d => d.P)), [datos]);
+  const presionMinima = useMemo(() => calcularPresionMinima(datos), [datos]);
+
+  /**
+   * «Cargar en el simulador» de la sección de casos: pone la geometría, el fluido, el caudal,
+   * el estrechamiento o el desnivel y la presión de entrada del caso. Solo llega aquí una
+   * configuración que cabe en la rejilla de los deslizadores (lo comprueba ./casos.ts).
+   */
+  const cargarConfiguracion = useCallback((c: ConfiguracionSimulador) => {
+    setGeom(c.geometria);
+    setFluidoId(c.fluido);
+    setQ(c.caudalLs);
+    if (c.ratio !== undefined) setRatio(c.ratio);
+    if (c.desnivel !== undefined) setAlturaDesnivel(c.desnivel);
+    setP0(c.presionEntrada);
+    const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    simuladorRef.current?.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'start' });
+  }, []);
 
   // ============================================
   // ANIMACIÓN PARTÍCULAS
@@ -478,10 +443,7 @@ export default function SimuladorFluidosBernoulliPage() {
     return () => observer.disconnect();
   }, [dibujar]);
 
-  const dP = useMemo(() => {
-    if (datos.length < 2) return 0;
-    return datos[1].P - datos[0].P;
-  }, [datos]);
+  const dP = useMemo(() => diferenciaPresion(datos), [datos]);
 
   return (
     <div className={styles.container}>
@@ -498,7 +460,7 @@ export default function SimuladorFluidosBernoulliPage() {
       <LegalNotice />
 
       {/* GEOMETRÍA */}
-      <div className={styles.geomSelector}>
+      <div className={styles.geomSelector} ref={simuladorRef}>
         <button
           type="button"
           className={`${styles.geomBtn} ${geom === 'venturi' ? styles.geomBtnActive : ''}`}
@@ -772,6 +734,10 @@ export default function SimuladorFluidosBernoulliPage() {
           </div>
         </div>
       </div>
+
+      {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia). Va ANTES del
+          bloque educativo y nunca dentro: <EducationalSection> nace plegado. */}
+      <CasosAula onCargar={cargarConfiguracion} />
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0

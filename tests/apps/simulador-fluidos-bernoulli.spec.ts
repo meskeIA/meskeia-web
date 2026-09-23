@@ -386,7 +386,11 @@ test('CASO 3 · los imposibles se rechazan y quedan en el mínimo legal, sin NaN
   page,
 }) => {
   // No hay ni un campo de texto: la barandilla es el min/max de cada deslizador.
-  expect(await page.locator('input[type="text"], input[type="number"]').count()).toBe(0);
+  // Acotado a los CONTROLES del simulador el 23/09/2026: la sección «Casos para clase» trae
+  // su casilla de respuesta (#casos-respuesta), que no gobierna la tubería.
+  expect(
+    await page.locator('input[type="text"]:not(#casos-respuesta), input[type="number"]').count(),
+  ).toBe(0);
 
   // Entre los dos intentos de cada deslizador se vuelve a un valor legal A PROPÓSITO: si no, el
   // control ya estaría en su mínimo, el navegador dejaría ahí el segundo imposible igualmente y
@@ -700,4 +704,201 @@ test('HALLAZGO J · los rótulos están asociados a su deslizador y los emojis v
     return [...new Set(fuera)];
   });
   expect(emojisSueltos, 'emojis junto a texto sin aria-hidden').toEqual([]);
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (23/09/2026) — la tarea asignable de esta app (tipo A, casos numerados).
+ *
+ * El cálculo vivía dentro de un useMemo que leía el estado de React. Se EXTRAJO a una función
+ * pura y el useMemo la llama; getSecciones, FLUIDOS, G y P_ATMOSFERICA se MOVIERON:
+ *   app/simulador-fluidos-bernoulli/motor.ts   ← calcularSecciones, presionBernoulli, …
+ *   app/simulador-fluidos-bernoulli/casos.ts   ← los 12 casos, el corrector y el aleatorio
+ * La tabla del acta de arriba (100,84 kPa en la garganta de fábrica) sigue saliendo igual: el
+ * traslado no movió un número.
+ *
+ * CONVENIO DE ESTA APP (el que más confunde en el tema):
+ *   · presiones ABSOLUTAS (P₁ = 101.325 Pa de fábrica); los casos que piden una presión, y no
+ *     una diferencia, dicen «absoluta» en el enunciado;
+ *   · g = 9,81 m/s² — solo lo declaran los casos cuya respuesta cambia con g = 10 (8 y 9);
+ *   · caudal en L/s (1 L/s = 0,001 m³/s), diámetro nominal 10 cm.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO (a mano; A = π·D²/4):
+ *   1 · A = 78,54 cm², v = 0,002/0,0078540 = 0,2546 → dos decimales         = 0,25 m/s
+ *   2 · A₁/A₂ = (10/5)² = 4 → v₂ = 1,5·4                                      = 6 m/s
+ *   3 · D₂ = D₁·√(v₁/v₂) = 2·√(1,5/6) = 2·0,5                                 = 1 cm
+ *   4 · v₁ = 0,254648, v₂ = 4·v₁ = 1,018592; ΔP = 500·(v₁² − v₂²) = −486,34  → −486 Pa
+ *   5 · v₁ = 0,01/0,0078540 = 1,27324, v₂ = v₁/0,4² = 7,95775
+ *       P₂ = 101.325 + 500·(1,62114 − 63,32574) = 70.472,7 Pa                → 70,47 kPa
+ *   6 · el mismo Venturi con aire: 0,6125·(1,62114 − 63,32574) = −37,79      → −38 Pa
+ *   7 · ṁ = ρ·Q = 920·0,0025                                                  = 2,3 kg/s
+ *   8 · diámetro constante, sube 3 m: ΔP = −ρ·g·Δh = −1000·9,81·3 = −29.430  → −29,43 kPa
+ *   9 · aceite, sube 5 m: 101.325 − 920·9,81·5 = 101.325 − 45.126 = 56.199   → 56,20 kPa
+ *  10 · v₂/v₁ = (D₁/D₂)² = 1/0,4²                                             = 6,25
+ *  11 · sangre, 10→5 cm, 2 L/s: 530·(0,064846 − 1,037530) = −515,52         → −516 Pa
+ *  12 · 7500 = ½·1000·(16 − 1)·v₁² → v₁ = 1 m/s → Q = 0,0078540 m³/s        → 7,85 L/s
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import {
+  CASOS as CASOS_AULA,
+  TOTAL_CASOS as TOTAL_CASOS_AULA,
+  resolverCaso,
+  comprobarRespuesta,
+  toleranciaDe,
+  generarEjercicioAleatorio,
+  configuracionSimulador,
+} from '../../app/simulador-fluidos-bernoulli/casos';
+import {
+  G,
+  P_ATMOSFERICA,
+  calcularSecciones,
+  getSecciones,
+  presionBernoulli,
+} from '../../app/simulador-fluidos-bernoulli/motor';
+
+const A_MANO_AULA: Readonly<Record<number, number>> = {
+  1: 0.25,
+  2: 6,
+  3: 1,
+  4: -486,
+  5: 70.47,
+  6: -38,
+  7: 2.3,
+  8: -29.43,
+  9: 56.2,
+  10: 6.25,
+  11: -516,
+  12: 7.85,
+};
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («70,47 kPa» → 2). */
+function decimalesMostrados(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+const redondeo = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+test.describe('simulador-fluidos-bernoulli · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS_AULA).toBe(12);
+    expect(CASOS_AULA.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS_AULA) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS_AULA) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeo(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS_AULA) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS_AULA) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    // Lección de simulador-trigonometria-circulo-unitario (21/09/2026): «redondea a 2
+    // decimales» en el enunciado y cuatro en la solución.
+    for (const caso of CASOS_AULA) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostrados(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9;
+      if (!exacto) {
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades/i);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(redondeo(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
+      // Todos se pueden cargar en el simulador: si no, el alumno no podría comprobarlos.
+      expect(configuracionSimulador(m.datos)).not.toBeNull();
+    }
+  });
+
+  test('7 · el convenio queda fijado: presión ABSOLUTA, g = 9,81 y la tabla de la app', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS_AULA) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_AULA[caso.id]);
+    }
+
+    // (b) Las constantes del convenio.
+    expect(G).toBe(9.81);
+    expect(P_ATMOSFERICA).toBe(101325);
+
+    // (c) La garganta del Venturi de fábrica con el motor movido: la MISMA cifra que la tabla
+    // del acta de arriba (100,84 kPa), y absoluta: parte de 1 atm, no de cero.
+    const fabrica = calcularSecciones(getSecciones('venturi', 0.5, 2), 0.002, 1000, P_ATMOSFERICA);
+    expect(fabrica[1].P).toBeCloseTo(100838.66, 1);
+    expect(fabrica[1].v / fabrica[0].v).toBeCloseTo(4, 10);
+
+    // (d) g solo pesa donde hay desnivel: con g = 10 el caso 8 daría −30,00 kPa y suspende.
+    expect(presionBernoulli(0, 1000, 0.25, 0, 0.25, 3, 10)).toBeCloseTo(-30000, 6);
+    expect(comprobarRespuesta(-30, -29.43).correcto).toBe(false);
+
+    // (e) El olvido clásico del caso 5: restar solo ½ρv₂² sin el v₁² de la entrada.
+    const olvido = (101325 - 500 * 7.95775 ** 2) / 1000; // 69,66 kPa
+    expect(comprobarRespuesta(olvido, 70.47).correcto).toBe(false);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    expect(comprobarRespuesta(-486, -486).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 6).correcto).toBe(false);
+    expect(comprobarRespuesta(486, -486).motivo).toMatch(/signo/i);
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(-486)).toBeCloseTo(4.86, 10);
+  });
+});
+
+test.describe('simulador-fluidos-bernoulli · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  test('el caso 5 se carga en el simulador y la garganta da la cifra de la solución', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 5:/ }).click();
+    await seccion(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
+    // 10 L/s, D₂/D₁ = 0,4, agua: P₂ = 70.472,7 Pa absolutos → «70,47 kPa» en la tabla.
+    const filas = await tabla(page);
+    expect(filas[1][0]).toBe('Garganta');
+    expect(filas[1][4]).toBe('70,47 kPa');
+
+    await seccion(page).locator('#casos-respuesta').fill('70,47');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
+  });
 });
