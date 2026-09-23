@@ -13,6 +13,16 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumberOr } from '@/lib';
 import styles from './SimuladorCampoElectrico.module.css';
+import {
+  K_COULOMB,
+  NC_TO_C,
+  calcularCampoEnPunto,
+  energiaPotencial,
+  fuerzaSobreCarga,
+  modulo,
+  type CargaPuntual,
+} from './motor';
+import CasosAula from './CasosAula';
 
 // ============================================================
 // Tipos
@@ -33,11 +43,9 @@ type Modo = 'add-pos' | 'add-neg' | 'move' | 'delete';
 type Preset = 'puntual' | 'dipolo' | 'cuadrupolo' | 'lineal';
 
 // ============================================================
-// Constantes físicas
+// Constantes físicas: viven en ./motor.ts (K_COULOMB, NC_TO_C, RADIO_SINGULARIDAD), que
+// comparte la física con los «Casos para clase». Aquí solo queda la geometría del lienzo.
 // ============================================================
-const K_COULOMB = 8.99e9; // N·m²/C²
-const NC_TO_C = 1e-9; // 1 nC = 1e-9 C
-
 // Geometría del lienzo
 const SVG_WIDTH = 800;
 const SVG_HEIGHT = 500;
@@ -63,43 +71,8 @@ const svgToWorld = (sx: number, sy: number): Punto => ({
 // ============================================================
 // Cálculos del campo
 // ============================================================
-/**
- * Radio alrededor de cada carga donde E y V divergen y no hay cifra que dar.
- *
- * La guardia estaba —hay que saltarse el término, o sale Infinity— pero no se decía: se
- * presentaba el campo de LAS DEMÁS cargas como si fuese el del punto, con el mismo formato y
- * sin ningún aviso. Sobre una carga de +5 nC de un dipolo, el panel daba «44,95 N/C» y un
- * potencial NEGATIVO, que son los de la otra carga. Y soltar la sonda encima es un gesto
- * natural: mide 10 px de radio y la carga 17.
- */
-const RADIO_SINGULARIDAD = 0.05; // m
-
-function calcularCampoEnPunto(
-  x: number,
-  y: number,
-  cargas: Carga[]
-): { Ex: number; Ey: number; V: number; singular: boolean } {
-  let Ex = 0;
-  let Ey = 0;
-  let V = 0;
-  let singular = false;
-  for (const c of cargas) {
-    const dx = x - c.x;
-    const dy = y - c.y;
-    const r2 = dx * dx + dy * dy;
-    const r = Math.sqrt(r2);
-    if (r < RADIO_SINGULARIDAD) {
-      singular = true;
-      continue;
-    }
-    const qC = c.q * NC_TO_C;
-    const factor = (K_COULOMB * qC) / (r2 * r); // E = kq/r² · r̂
-    Ex += factor * dx;
-    Ey += factor * dy;
-    V += (K_COULOMB * qC) / r;
-  }
-  return { Ex, Ey, V, singular };
-}
+// `calcularCampoEnPunto` y la guardia de singularidad se trasladaron a ./motor.ts sin cambiar
+// nada: la usan el panel de la sonda y la corrección de los casos, y no pueden divergir.
 
 function generarId(): string {
   return Math.random().toString(36).substring(2, 9);
@@ -508,6 +481,22 @@ export default function SimuladorCampoElectrico() {
     setCargas([]);
   };
 
+  /**
+   * «Cargar en el simulador» desde los Casos para clase: sustituye las cargas por las del caso
+   * y, si el caso fija un punto, lleva allí la sonda. Solo usa los setters que ya existían;
+   * el panel de resultados, que es una región viva, anuncia las cifras nuevas por sí solo.
+   */
+  const handleCargarCaso = (nuevas: readonly CargaPuntual[], punto?: Punto) => {
+    setCargas(nuevas.map((c) => ({ id: generarId(), x: c.x, y: c.y, q: c.q })));
+    if (punto) {
+      setPruebaPos({
+        x: acotarAlLienzo(punto.x, LIMITE_X),
+        y: acotarAlLienzo(punto.y, LIMITE_Y),
+      });
+    }
+    svgRef.current?.scrollIntoView({ block: 'center' });
+  };
+
   // Evitar menú contextual en el SVG (clic derecho elimina cargas en modo no-delete)
   useEffect(() => {
     const svg = svgRef.current;
@@ -588,13 +577,13 @@ export default function SimuladorCampoElectrico() {
 
   // Cálculos sobre la carga de prueba (q0 = +1 nC)
   const datosPrueba = useMemo(() => {
-    const q0 = 1 * NC_TO_C;
+    // F = q₀·E y U = q₀·V salen de ./motor.ts, las MISMAS funciones con que se corrigen los
+    // casos: el panel y la corrección no pueden dar cifras distintas.
+    const Q_PRUEBA_NC = 1;
     const { Ex, Ey, V, singular } = calcularCampoEnPunto(pruebaPos.x, pruebaPos.y, cargas);
-    const E = Math.sqrt(Ex * Ex + Ey * Ey);
-    const Fx = q0 * Ex;
-    const Fy = q0 * Ey;
-    const F = Math.sqrt(Fx * Fx + Fy * Fy);
-    const U = q0 * V;
+    const E = modulo(Ex, Ey);
+    const { Fx, Fy, F } = fuerzaSobreCarga(Q_PRUEBA_NC, Ex, Ey);
+    const U = energiaPotencial(Q_PRUEBA_NC, V);
     return { Ex, Ey, E, V, Fx, Fy, F, U, singular };
   }, [cargas, pruebaPos]);
 
@@ -1106,6 +1095,9 @@ export default function SimuladorCampoElectrico() {
 
           </div>
         </section>
+
+        {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}
+        <CasosAula onCargarEnSimulador={handleCargarCaso} />
 
         {/* Sección educativa v2.0 */}
         <EducationalSection

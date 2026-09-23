@@ -694,3 +694,213 @@ test('REGRESIÓN 270 (accesibilidad) — el lienzo se maneja con el teclado', as
   await expect(valor(page, 'Posición x')).toHaveText('2,00 m');
   await expect(valor(page, 'Posición y')).toHaveText('-1,00 m');
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (23/09/2026) — la tarea asignable de esta app (tipo A, casos numerados).
+ *
+ * Salió del canal aula: 70 visitas de aula, la nº 1 de física sin tarea dentro. La física
+ * vive ahora en dos módulos sin React:
+ *   app/simulador-campo-electrico/motor.ts   ← calcularCampoEnPunto, F = q₀·E, U = q₀·V
+ *   app/simulador-campo-electrico/casos.ts   ← los 12 casos, el corrector y el aleatorio
+ * y el panel de la sonda usa el MISMO motor que la corrección (regla de oro: se MOVIÓ, no se
+ * replicó). Las cifras del acta de arriba (16,41 N/C con +5 nC a r² = 2,74) lo confirman: el
+ * traslado no movió un número.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO — a mano, con k = 8,99·10⁹ y q en nC (k·1 nC = 8,99):
+ *   1 · +5 nC, r = 1        → E = 8,99·5/1²                         = 44,95 N/C
+ *   2 · +5 nC, r = 2        → E = 8,99·5/4 = 11,2375 → redondeo     = 11,24 N/C
+ *   3 · −4 nC, P = (2; 0)   → |E| = 8,99·4/4 = 8,99, apunta a la carga (−x) → Eₓ = −8,99 N/C
+ *   4 · −3 nC, r = 1,5      → V = 8,99·(−3)/1,5                     = −17,98 V
+ *   5 · +2 en (−1;0), −2 en (1;0), P = origen: las dos empujan a +x → 17,98 + 17,98 = 35,96 N/C
+ *   6 · +6 en (−1;0) → Eₓ = 53,94; +8 en (0;−1) → Eᵧ = 71,92; |E| = 8,99·√(36+64) = 89,90 N/C
+ *   7 · +4 nC a 0,5 m → E = 8,99·4/0,25 = 143,84; F = 3 nC · 143,84      = 431,52 nN
+ *   8 · +6 nC a 3 m   → V = 17,98; U = −2 nC · 17,98                     = −35,96 nJ
+ *   9 · +4 en −1,5 y +1 en 1,5: 4/d₁² = 1/d₂², d₁ = 2d₂, d₁ + d₂ = 3 → d₁ = 2 → x = 0,50 m
+ *  10 · +6 en origen, −5 en (1,5; 0), P = (0; 2): r₂ = 2,5 (terna 1,5-2-2,5)
+ *                          → V = 8,99·(6/2 − 5/2,5) = 8,99·1           = 8,99 V
+ *  11 · −6 nC, bolita +2 nC a 1 m: Eₓ = −53,94 → Fₓ = 2·(−53,94)        = −107,88 nN
+ *  12 · +5 nC en (0; 0,5), gota −2 nC en origen: Eᵧ = −179,8 (hacia abajo)
+ *                          → Fᵧ = −2·(−179,8), hacia arriba: la atrae  = 359,60 nN
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import {
+  CASOS as CASOS_AULA,
+  TOTAL_CASOS as TOTAL_CASOS_AULA,
+  resolverCaso,
+  comprobarRespuesta,
+  toleranciaDe,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-campo-electrico/casos';
+import { calcularCampoEnPunto, modulo } from '../../app/simulador-campo-electrico/motor';
+
+const A_MANO_AULA: Readonly<Record<number, number>> = {
+  1: 44.95,
+  2: 11.24,
+  3: -8.99,
+  4: -17.98,
+  5: 35.96,
+  6: 89.9,
+  7: 431.52,
+  8: -35.96,
+  9: 0.5,
+  10: 8.99,
+  11: -107.88,
+  12: 359.6,
+};
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («11,24 N/C» → 2). */
+function decimalesMostrados(texto: string): number {
+  const m = texto.match(/-?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+test.describe('simulador-campo-electrico · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS_AULA).toBe(12);
+    expect(CASOS_AULA.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS_AULA) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS_AULA) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(Math.round(r.valor * 100) / 100, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita, desarrollo y unidad', async () => {
+    for (const caso of CASOS_AULA) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(caso.unidad);
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS_AULA) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    // Lección de simulador-trigonometria-circulo-unitario (21/09/2026): tres casos pedían
+    // «redondea a 2 decimales» y la solución enseñaba cuatro, así que el alumno escribía lo
+    // pedido y leía otra cifra al comprobar.
+    for (const caso of CASOS_AULA) {
+      expect(decimalesMostrados(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(2);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(
+        caso.respuestaTexto,
+      );
+      if (caso.requiereRedondeo) {
+        expect(caso.enunciado, `caso ${caso.id}: exige redondeo y no lo pide`).toMatch(/redonde/i);
+      } else {
+        // Si no se pide redondear, la cifra mostrada ES la exacta.
+        expect(Math.abs(resolverCaso(caso.datos).valor - caso.respuesta), `caso ${caso.id}`).toBeLessThan(1e-9);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+    expect(Math.round(resolverCaso(a.datos).valor * 100) / 100).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta), `semilla ${m.semilla}`).toBe(true);
+      expect(Math.round(resolverCaso(m.datos).valor * 100) / 100, `semilla ${m.semilla}`).toBe(m.respuesta);
+    }
+  });
+
+  test('7 · el convenio queda fijado: k = 8,99·10⁹, q en nC, E vector y V escalar con signo', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS_AULA) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_AULA[caso.id]);
+    }
+
+    // (b) k·1 nC a 1 m = 8,99 N/C exactos: la constante es la de la app, no 9·10⁹.
+    const unidad = calcularCampoEnPunto(1, 0, [{ x: 0, y: 0, q: 1 }]);
+    expect(unidad.Ex).toBeCloseTo(8.99, 10);
+    expect(unidad.V).toBeCloseTo(8.99, 10);
+    // …pero quien use el 9·10⁹ del libro no suspende: 45 frente a 44,95 es un 0,11 %.
+    expect(comprobarRespuesta(45, 44.95).correcto).toBe(true);
+
+    // (c) E es un vector: en el punto medio de dos cargas iguales se anula, V no.
+    const medio = calcularCampoEnPunto(0, 0, [
+      { x: -1, y: 0, q: 3 },
+      { x: 1, y: 0, q: 3 },
+    ]);
+    expect(modulo(medio.Ex, medio.Ey)).toBeCloseTo(0, 10);
+    expect(medio.V).toBeCloseTo(2 * 8.99 * 3, 10);
+
+    // (d) El punto de la sonda del acta de arriba, con el motor movido: 44,95/2,74.
+    const sonda = calcularCampoEnPunto(1.5, 0.7, [{ x: 0, y: 0, q: 5 }]);
+    expect(modulo(sonda.Ex, sonda.Ey)).toBeCloseTo(16.405109, 5);
+  });
+
+  test('8 · corregir no lanza nunca y nombra el error de signo', async () => {
+    expect(comprobarRespuesta(44.95, 44.95).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 44.95).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 44.95).motivo).toContain('número');
+    // El error típico del tema: el valor bien y el sentido al revés.
+    const signo = comprobarRespuesta(8.99, -8.99);
+    expect(signo.correcto).toBe(false);
+    expect(signo.motivo).toContain('SIGNO');
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(431.52)).toBeCloseTo(4.3152, 10);
+
+    // Un punto encima de la carga no da «Infinity»: se rechaza con un error legible.
+    const encima = resolverCaso({ cargas: [{ x: 0, y: 0, q: 5 }], punto: { x: 0.01, y: 0 }, magnitud: 'modulo-E' });
+    expect(encima.ok).toBe(false);
+    expect(Number.isNaN(encima.valor)).toBe(true);
+    // Ni una lista de cargas vacía.
+    expect(resolverCaso({ cargas: [], punto: { x: 1, y: 0 }, magnitud: 'V' }).ok).toBe(false);
+  });
+});
+
+test.describe('simulador-campo-electrico · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  test('el caso 7 se carga en el simulador y el panel da el E que usa la solución', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 7:/ }).click();
+    await seccion(page).getByRole('button', { name: 'Cargar en el simulador' }).click();
+    // +4 nC en el origen y la sonda en (0,5; 0): E = 8,99·4/0,25 = 143,84 N/C.
+    await expect(valor(page, 'Posición x')).toHaveText('0,50 m');
+    await expect(valor(page, '|E| (campo)')).toHaveText('143,84 N/C');
+
+    await seccion(page).locator('#casos-respuesta').fill('431,52');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
+  });
+
+  test('una respuesta con el signo cambiado se nombra como tal', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 3:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('8,99');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('SIGNO');
+    // Y el menos tipográfico «−» vale igual que el guion.
+    await seccion(page).locator('#casos-respuesta').fill('−8,99');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
+  });
+});
