@@ -483,15 +483,6 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -3404,
         nombra: /impuestos y gastos de aquella compra/i,
-        falla:
-          'HUECO A1 — el campo entra en `faltanEnElNeto` (líneas 461-463), la lista de «lo ' +
-          'que falta DESCONTAR», y la app publica «No descuenta los impuestos y gastos de ' +
-          'aquella compra: el neto real será MENOR». La dirección medida es la CONTRARIA: al ' +
-          'leerse, el neto SUBE a 182.803,00 €, o sea que la cifra en pantalla es un SUELO. Es ' +
-          'el defecto del trastero (hallazgo 1157) REINTRODUCIDO aquí por la misma reparación ' +
-          'que lo corregía, y su propio comentario lo cita («visto en trastero»). Para ponerlo ' +
-          'en verde: moverlo a la lista de la dirección contraria, con la redacción que ya ' +
-          'usan garaje, trastero y el estimador.',
       },
       {
         etiqueta: 'Amortizaciones acumuladas deducidas (€)',

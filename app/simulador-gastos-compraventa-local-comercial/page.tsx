@@ -458,6 +458,24 @@ export default function SimuladorLocalComercialPage() {
         // real, sin ninguna línea que lo explique (hallazgo 1157, visto en trastero).
         resultadosVendedor.comisionLegible ? null : 'la comisión inmobiliaria',
         resultadosVendedor.gestoriaLegible ? null : 'la gestoría de la venta',
+      ].filter((x): x is string => x !== null)
+    : [];
+
+  /**
+   * Y lo que falta en la DIRECCIÓN CONTRARIA, que exige otro aviso.
+   *
+   * ⚠️ 23/09/2026 — los impuestos y gastos de aquella compra estaban en la lista de arriba,
+   * y su comentario citaba el hallazgo 1157 «visto en trastero»: la reparación en lote del
+   * 22/09 (`cfe091a7`) corrigió allí la dirección y aquí la reintrodujo. Suman al valor de
+   * adquisición (art. 35.1 LIRPF), así que al no leerse la ganancia y el IRPF salen MAYORES
+   * y el neto queda por DEBAJO del real: «No descuenta…: el neto real será menor» mandaba
+   * restar 3.404,00 € de una cifra que en realidad sube (testigo de familia, hueco A1).
+   *
+   * Solo cuando hay IRPF que rebajar: con pérdida o sin precio de compra no mueven nada, y
+   * decir entonces «el neto real es MAYOR» sería falso.
+   */
+  const faltanPorAbaratar = resultadosVendedor && resultadosVendedor.irpfGanancia > 0
+    ? [
         resultadosVendedor.gastosAdquisicionLegible
           ? null
           : 'los impuestos y gastos de aquella compra',
@@ -1072,10 +1090,19 @@ export default function SimuladorLocalComercialPage() {
                         value={formatCurrency(resultadosVendedor.valorAdquisicionCorregido)}
                         variant="default"
                         icon="📥"
+                        // Con los gastos de aquella compra ilegibles, el rótulo afirmaba que están
+                        // sumados mientras el motor los había tomado como 0 (hueco A1 del testigo
+                        // de familia; garaje y trastero ya lo decían así).
                         description={
-                          resultadosVendedor.amortizacionesRestadas > 0
-                            ? `Compra + impuestos y gastos de aquella compra − ${formatCurrency(resultadosVendedor.amortizacionesRestadas)} de amortizaciones deducidas`
-                            : 'Precio de compra + impuestos y gastos de aquella compra'
+                          (resultadosVendedor.gastosAdquisicionLegible
+                            ? 'Precio de compra + impuestos y gastos de aquella compra'
+                            : 'Precio de compra') +
+                          (resultadosVendedor.amortizacionesRestadas > 0
+                            ? ` − ${formatCurrency(resultadosVendedor.amortizacionesRestadas)} de amortizaciones deducidas`
+                            : '') +
+                          (resultadosVendedor.gastosAdquisicionLegible
+                            ? ''
+                            : '. Los impuestos y gastos de aquella compra no se han podido leer y no están sumados')
                         }
                       />
                       <ResultCard
@@ -1147,7 +1174,10 @@ export default function SimuladorLocalComercialPage() {
                     description={
                       !resultadosVendedor.irpfCalculado
                         ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
-                        : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`
+                        : // Se dice aquí, donde se lee la cuota, y no solo en el neto (como el estimador).
+                          !resultadosVendedor.gastosAdquisicionLegible && resultadosVendedor.irpfGanancia > 0
+                          ? 'TECHO: los impuestos y gastos de aquella compra no se han podido leer, y reducen la ganancia. Escríbelos con coma decimal (1.234,56).'
+                          : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`
                     }
                   />
 
@@ -1176,14 +1206,32 @@ export default function SimuladorLocalComercialPage() {
                       impuesto, igual que el panel del comprador rotula «COSTE TOTAL
                       (PARCIAL)» donde no calcula el IGIC/IPSI (hallazgo 666). */}
                   <ResultCard
-                    title={faltanEnElNeto.length === 0 ? 'NETO QUE RECIBES' : 'NETO QUE RECIBES (PARCIAL)'}
+                    title={
+                      faltanEnElNeto.length === 0 && faltanPorAbaratar.length === 0
+                        ? 'NETO QUE RECIBES'
+                        : 'NETO QUE RECIBES (PARCIAL)'
+                    }
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
                     description={
-                      faltanEnElNeto.length === 0
-                        ? 'Precio de venta menos impuestos, comisión y gestoría'
-                        : `No descuenta ${enumerarEnEspanol(faltanEnElNeto)}: el neto real será menor. Rellena ${enumerarEnEspanol(camposPendientes)} para obtenerlo.`
+                      (() => {
+                        // Las dos direcciones van en frases separadas: una manda descontar (el
+                        // neto está por encima del real) y la otra avisa de que la cifra es un
+                        // SUELO que sube al leer el dato. La segunda frase es la del estimador.
+                        const avisos: string[] = [];
+                        if (faltanEnElNeto.length > 0) {
+                          avisos.push(`No descuenta ${enumerarEnEspanol(faltanEnElNeto)}: el neto real será menor`);
+                        }
+                        if (faltanPorAbaratar.length > 0) {
+                          avisos.push(
+                            `Hay importes que no se han podido leer y REDUCEN el impuesto (${faltanPorAbaratar.join('; ')}), así que el neto real es MAYOR que este`,
+                          );
+                        }
+                        return avisos.length === 0
+                          ? 'Precio de venta menos impuestos, comisión y gestoría'
+                          : `${avisos.join('. ')}. Rellena ${enumerarEnEspanol(camposPendientes)} para obtenerlo.`;
+                      })()
                     }
                   />
 
