@@ -100,7 +100,10 @@ export const EVENTOS: Evento[] = [
   { id: 'sequia', nombre: 'Sequía', descripcion: 'La falta de lluvia reduce drásticamente los productores', nivelAfectado: 0, impacto: -0.6 },
   { id: 'caza-depredador', nombre: 'Caza excesiva del depredador', descripcion: 'La caza ilegal reduce la población de carnívoros', nivelAfectado: 2, impacto: -0.7 },
   { id: 'plaga-herbivoro', nombre: 'Plaga de herbívoros', descripcion: 'Una plaga hace crecer los herbívoros sin control', nivelAfectado: 1, impacto: 0.8 },
-  { id: 'contaminacion', nombre: 'Contaminación del agua', descripcion: 'Pesticidas diezman a los productores y herbívoros', nivelAfectado: 0, impacto: -0.5 },
+  // Hasta el 23/09/2026 decía «diezman a los productores y herbívoros», pero el modelo solo
+  // golpea a los productores (nivelAfectado: 0): los herbívoros bajan por la cascada, como en
+  // la sequía. Se alineó el TEXTO al modelo, no al revés, para no mover el acta del Inspector.
+  { id: 'contaminacion', nombre: 'Contaminación del agua', descripcion: 'Pesticidas diezman a los productores', nivelAfectado: 0, impacto: -0.5 },
 ];
 
 /**
