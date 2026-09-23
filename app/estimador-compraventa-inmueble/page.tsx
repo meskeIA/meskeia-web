@@ -748,6 +748,29 @@ export default function SimuladorCompraventaPage() {
     : [];
 
   /**
+   * C3 · la MAGNITUD de «falta descontar» (testigo de familia, 23/09/2026).
+   *
+   * La comisión y los otros gastos de la venta son gastos de transmisión (art. 35.1 LIRPF):
+   * descontarlos baja también la ganancia, y con ella el IRPF. «Falta descontar la comisión»
+   * invitaba a restar los 7.000,00 € enteros cuando el hueco real era 5.530,00 €, porque el
+   * IRPF bajaba 1.470,00 € a la vez. Esa rebaja no puede superar el tipo MARGINAL del ahorro
+   * en la base de ahora (la escala es progresiva y la base solo puede bajar), así que ese
+   * tipo es una cota que se puede publicar sin inventar nada. Solo cuando hay IRPF.
+   */
+  const tipoMarginalAhorro =
+    resultadosVendedor && resultadosVendedor.irpfGanancia > 0
+      ? (TRAMOS_GANANCIAS_PATRIMONIALES_2025.find((t) => resultadosVendedor.baseImponibleIRPF <= t.hasta)
+          ?.tipo ?? TIPO_AHORRO_MAX)
+      : null;
+  const deduciblesSinLeer =
+    resultadosVendedor && tipoMarginalAhorro !== null
+      ? [
+          resultadosVendedor.comisionLegible ? null : 'la comisión',
+          resultadosVendedor.otrosVentaLegible ? null : 'los otros gastos de la venta',
+        ].filter((x): x is string => x !== null)
+      : [];
+
+  /**
    * Qué CAMPOS rellenar para que el neto se calcule entero. No se deduce de qué impuesto
    * quedó sin calcular (plusvaliaCalculada/irpfCalculado): los dos dependen del precio de
    * compra, así que con el suelo ya relleno y solo el precio en blanco, esa deducción pedía
@@ -1536,7 +1559,10 @@ export default function SimuladorCompraventaPage() {
                           ? 'El importe de reinversión no se ha podido leer, así que esta cuota NO aplica la exención del art. 38 LIRPF: escríbelo con coma decimal (250.000,50) para comprobar si la ganancia queda exenta.'
                           : !resultadosVendedor.gastosAdquisicionLegible ||
                               !resultadosVendedor.mejorasLegible ||
-                              !resultadosVendedor.hipotecaLegible
+                              !resultadosVendedor.hipotecaLegible ||
+                              // La comisión y los otros gastos de la venta también reducen la
+                              // ganancia: sin leerlos, esta cuota es un techo (C3).
+                              deduciblesSinLeer.length > 0
                             ? 'TECHO: hay importes que no se han podido leer y que reducen la ganancia. Escríbelos con coma decimal (1.234,56).'
                             : resultadosVendedor.exentoIRPF
                           ? 'Mayor de 65 años + vivienda habitual'
@@ -1594,7 +1620,14 @@ export default function SimuladorCompraventaPage() {
                         // es un SUELO que sube al leer el dato (hallazgo 1190).
                         const avisos: string[] = [];
                         if (faltanEnElNeto.length > 0) {
-                          avisos.push(`falta descontar ${faltanEnElNeto.join(' y ')}`);
+                          // …pero no entero: la comisión y los otros gastos rebajan el IRPF (C3).
+                          const soloComision =
+                            deduciblesSinLeer.length === 1 && deduciblesSinLeer[0] === 'la comisión';
+                          const matiz =
+                            deduciblesSinLeer.length === 0 || tipoMarginalAhorro === null
+                              ? ''
+                              : ` (${deduciblesSinLeer.join(' y ')} ${soloComision ? 'rebaja' : 'rebajan'} también el IRPF al descontar${soloComision ? 'la' : 'los'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`;
+                          avisos.push(`falta descontar ${faltanEnElNeto.join(' y ')}${matiz}`);
                         }
                         if (faltanPorAbaratar.length > 0) {
                           avisos.push(

@@ -4460,3 +4460,61 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
     );
   });
 });
+
+/**
+ * Reparación del 23/09/2026 — hueco C3 del testigo de familia (`tests/familias/compraventa.spec.ts`).
+ *
+ * El testigo de familia vigila la DIRECCIÓN del aviso; este caso vigila su MAGNITUD. Con la
+ * comisión ilegible, «falta descontar la comisión inmobiliaria» invitaba a restar los
+ * 7.000,00 € enteros cuando el hueco real era 5.530,00 €: la comisión es gasto de la venta
+ * (art. 35.1 LIRPF) y al descontarla baja también el IRPF, 1.470,00 €.
+ *
+ * La app publica ahora una COTA: «hasta un T % de su importe», con T el tipo marginal del
+ * ahorro en la base actual. El caso no copia la cifra: la MIDE y exige que la cota sea cierta,
+ *     importe × (1 − T/100) ≤ hueco real ≤ importe
+ *
+ * BASE B del testigo — precio 200.000 · compra 150.000 · 10 años · suelo 50.000 · vivienda
+ * habitual · comisión 3,5 % → 7.000,00 € · tipo marginal 21 % (la base está entre 6.000 y
+ * 50.000) → hueco entre 5.530,00 € y 7.000,00 €. Medido: 5.530,00 €.
+ */
+test.describe('Reparación 23/09/2026 — la magnitud de «falta descontar la comisión»', () => {
+  async function sembrarC3(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  test('[C3] la cota que publica el aviso de la comisión es cierta', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+    await sembrarC3(page, 'Precio de la vivienda', '200000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    await sembrarC3(page, 'Precio de compra original', '150000');
+    await sembrarC3(page, 'Años de propiedad', '10');
+    await sembrarC3(page, 'Valor catastral del suelo', '50000');
+
+    const aEuros = (t: string): number => Number(t.replace(/[€\s.]/g, '').replace(',', '.'));
+
+    await sembrarC3(page, 'Comisión inmobiliaria (%)', '3,5');
+    const netoReal = aEuros(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR'));
+    const importe = 200000 * 0.035;
+
+    await sembrarC3(page, 'Comisión inmobiliaria (%)', '3.5.0');
+    const netoPublicado = aEuros(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR'));
+    const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+
+    expect(aviso).toContain('falta descontar la comisión inmobiliaria');
+    const cota = aviso.match(/rebaja también el IRPF al descontarla, hasta un (\d+) % de su importe/);
+    expect(cota, `el aviso no publica la cota del IRPF. Aviso: ${aviso}`).not.toBeNull();
+    const tipo = Number(cota?.[1]);
+    // El tipo publicado sale de la tabla, no del texto: es el tramo de la base actual.
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t) => t.tipo)).toContain(tipo);
+
+    const hueco = netoPublicado - netoReal;
+    expect(hueco).toBeGreaterThanOrEqual(importe * (1 - tipo / 100) - 0.01);
+    expect(hueco).toBeLessThanOrEqual(importe + 0.01);
+    expect(hueco).toBeCloseTo(5530, 2);
+  });
+});
