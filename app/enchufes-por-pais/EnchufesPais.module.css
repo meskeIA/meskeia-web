@@ -436,7 +436,8 @@ details[open] .referenciaSummary::before {
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  /* --text-secondary: sobre la marca al 12 % del tema oscuro, muted daba 4,33:1 */
+  color: var(--text-secondary);
   margin: 0;
   padding: 0.5rem 0.75rem;
   background: rgba(46, 134, 171, 0.06);
