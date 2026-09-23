@@ -14,7 +14,8 @@ import { test, expect, Page } from '@playwright/test';
  * de la pantalla sea EXACTAMENTE la de la fórmula del código y (b) las invariantes: sin NaN,
  * sin poblaciones negativas, suelos respetados, e intensidad 0 % = identidad.
  *
- * DÓNDE VIVE EL CÁLCULO — app/simulador-ecosistema-trofico/page.tsx
+ * DÓNDE VIVE EL CÁLCULO — app/simulador-ecosistema-trofico/motor.ts (desde el 23/09/2026;
+ *   antes, dentro de page.tsx). generarExplicacion() y el render siguen en page.tsx.
  *   · const ECOSISTEMAS  → 4 ecosistemas × 4 niveles con `poblacion` de partida.
  *                          Pradera = [100, 40, 15, 5] (productores → superdepredadores).
  *   · const EVENTOS      → sequía {nivel 0, impacto −0,6} · caza-depredador {nivel 2, −0,7}
@@ -24,7 +25,9 @@ import { test, expect, Page } from '@playwright/test';
  *       cascada HACIA ARRIBA (i = idx+1 … 3), con factorPresa = P[i−1] / P0[i−1]:
  *                            P[i]   = max(2, min(100, P0[i] × (0,3 + 0,7 × factorPresa)))
  *       cascada HACIA ABAJO  (i = idx−1 … 0), con factorDepred = P[i+1] / P0[i+1]:
- *                            P[i]   = max(5, min(100, P0[i] × (2 − factorDepred)))
+ *                            P[i]   = max(5, min(100, P0[i] × (1 + 0,7 × (1 − factorDepred))))
+ *                            Atenúa con el MISMO 0,7 que la de arriba desde el 25/08/2026
+ *                            (hallazgo 324); antes era `2 − factorDepred` y no atenuaba.
  *   · generarExplicacion() → % = round(|nuevo − viejo| / viejo × 100); solo se nombra si > 2
  *   · Render: `Math.round(poblacion)` en la pirámide, en la barra y en aria-valuenow;
  *             el delta es `Math.round(actual − original)` y se pinta si `actual !== original`.
@@ -51,17 +54,18 @@ import { test, expect, Page } from '@playwright/test';
  *       arriba  P3: factorPresa = 5/15 = 0,3333
  *           = 5 × (0,3 + 0,7 × 0,3333) = 5 × 0,53333            = 2,6667   → «3»   (−2)
  *       abajo   P1: factorDepred = 5/15 = 0,3333
- *           = 40 × (2 − 0,3333) = 40 × 1,66667                  = 66,6667  → «67»  (+27)
- *       abajo   P0: factorDepred = 66,6667/40 = 1,66667
- *           = 100 × (2 − 1,66667)                               = 33,3333  → «33»  (−67)
+ *           = 40 × (1 + 0,7 × (1 − 0,3333)) = 40 × 1,46667      = 58,6667  → «59»  (+19)
+ *       abajo   P0: factorDepred = 58,6667/40 = 1,46667
+ *           = 100 × (1 + 0,7 × (1 − 1,46667)) = 100 × 0,67333   = 67,3333  → «67»  (−33)
  *       Invariantes: ninguna población negativa ni NaN; el suelo max(5, …) impide que un
  *       nivel se extinga (15 → 5 = 33 % de la original, nunca 0), aunque la pista de la FAQ
- *       hable de «la eliminación de un nivel». La cascada hacia ABAJO no atenúa: −67 % en
- *       carnívoros produce +67 % en herbívoros y −67 % en productores.
+ *       hable de «la eliminación de un nivel». La cascada hacia ABAJO se apaga nivel a nivel:
+ *       −67 % en carnívoros produce +47 % en herbívoros y −33 % en productores.
+ *       (Con la fórmula anterior al 25/08 daba 67 (+27) y 33 (−67): se propagaba intacta.)
  *
  *   CASO 3 (degenerado: la perturbación que no perturba) — cualquier evento + intensidad 0 %
  *     cambio = impacto × 0 = 0 ⇒ P[idx] = P0[idx] × 1 · factorPresa = 1 ⇒ (0,3 + 0,7) = 1
- *     · factorDepred = 1 ⇒ (2 − 1) = 1. Y en coma flotante 0,3 + 0,7 === 1 EXACTO, así que
+ *     · factorDepred = 1 ⇒ (1 + 0,7 × 0) = 1. Y en coma flotante 0,3 + 0,7 === 1 EXACTO, así que
  *     la identidad es exacta y NO debe pintarse ningún paréntesis de delta.
  *       Pradera queda en [100, 40, 15, 5] con el evento seleccionado.
  *       Como ningún porcentaje supera el 2 %, la explicación cae en la rama sin partes:
@@ -114,7 +118,8 @@ test.describe('simulador-ecosistema-trofico', () => {
     await expect(page.getByText('70 ind. rel.')).toBeVisible();
     await expect(page.getByText('32 ind. rel.')).toBeVisible();
     await expect(page.getByText('13 ind. rel.')).toBeVisible();
-    await expect(page.getByText('4 ind. rel.')).toBeVisible();
+    // exact: por subcadena, «4 ind. rel.» también casaría con «14 ind. rel.».
+    await expect(page.getByText('4 ind. rel.', { exact: true })).toBeVisible();
 
     // Porcentajes de generarExplicacion(): 30 · 21 · 15 · 10, todos a la baja
     const explicacion = page.locator('[role="status"]');
