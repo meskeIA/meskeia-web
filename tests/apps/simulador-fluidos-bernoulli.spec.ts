@@ -488,6 +488,10 @@ test('HALLAZGO B · con desnivel, la caída no se atribuye a un estrechamiento q
 
   expect(await page.locator('#ctrl-estrechamiento').count()).toBe(0);
   expect(tarjetas[0][2]).not.toContain('estrechamiento');
+  // Y la fórmula de la nota es la de la cifra: la tarjeta compara con la sección INTERMEDIA
+  // (h₂ = Δh/2), así que «ρ·g·Δh» con el Δh del deslizador daba el doble, 9.810 Pa (23/09/2026).
+  expect(tarjetas[0][2]).toContain('ρ·g·(h₂ − h₁)');
+  expect(tarjetas[0][2]).not.toContain('ρ·g·Δh');
 });
 
 // HALLAZGO C (operativa, medio) · El dibujo del desnivel escala con

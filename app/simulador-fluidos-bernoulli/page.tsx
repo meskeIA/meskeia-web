@@ -677,7 +677,10 @@ export default function SimuladorFluidosBernoulliPage() {
                 (dh = 0), los dos alcanzables de un tirón. Y con desnivel el diámetro es
                 CONSTANTE: atribuir la caída a un estrechamiento que no existe explicaba el
                 número por el mecanismo equivocado, contradiciendo a la tarjeta de la propia
-                geometría cuatro bloques más arriba. */}
+                geometría cuatro bloques más arriba.
+                La nota de desnivel escribe ρ·g·(h₂ − h₁) y no ρ·g·Δh: el deslizador llama Δh al
+                desnivel TOTAL, y la tarjeta compara con la sección intermedia, a Δh/2. Con
+                Δh = 1 m la fórmula de la nota daba 9.810 Pa junto a una cifra de 4.905. */}
             <span className={styles.resultRange}>
               {dP === 0
                 ? geom === 'desnivel'
@@ -685,7 +688,7 @@ export default function SimuladorFluidosBernoulliPage() {
                   : 'Sin estrechamiento no hay caída: la sección es constante'
                 : dP < 0
                   ? geom === 'desnivel'
-                    ? <><span aria-hidden="true">⚠️</span> Subir cuesta presión: se convierte en energía potencial (ρ·g·Δh)</>
+                    ? <><span aria-hidden="true">⚠️</span> Subir cuesta presión: se convierte en energía potencial (ρ·g·(h₂ − h₁))</>
                     : <><span aria-hidden="true">⚠️</span> La presión CAE en el estrechamiento (paradoja Bernoulli)</>
                   : 'La presión sube'}
             </span>
