@@ -66,6 +66,9 @@
 .hojaMolIcono { font-size: 1.5rem; }
 .hojaMolNombre { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
 .hojaMolFormula { font-size: 0.7rem; color: var(--text-muted); }
+/* En oscuro el botón toma el fondo de su molécula (.molO2, #064E3B…) y muted daba 3,50:1;
+   la fórmula hereda el color claro de la molécula, que está hecho para ese fondo */
+[data-theme='dark'] .hojaMolFormula { color: inherit; }
 
 .hojaCentral { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); position: relative; }
 .hojaFlechaEntrada, .hojaFlechaSalida { font-size: 1.5rem; color: var(--primary); animation: flujo 1.5s ease-in-out infinite; }
