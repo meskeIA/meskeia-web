@@ -90,8 +90,6 @@ export default function SimuladorEcosistemaTroficoPage() {
   // Pirámide: nivel 0 = base (más ancho), nivel 3 = cúspide (más estrecho)
   // Los niveles se muestran de abajo a arriba, así que invertimos para el render
   const nivelesInvertidos = [...nivelesActuales].reverse();
-  const originalesInvertidos = [...ecosistema.niveles].reverse();
-  const coloresInvertidos = [...COLORES_NIVEL].reverse();
   const clasesInvertidas = [...NOMBRES_CLASE_NIVEL].reverse();
 
   // Anchos de pirámide: base 100%, luego 75%, 50%, 30%
