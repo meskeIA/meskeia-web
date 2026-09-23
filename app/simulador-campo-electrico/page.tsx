@@ -180,6 +180,13 @@ function lineasDesdeCargas(cargas: Carga[], lineasPorCargaUnitaria: number): Pun
 // ============================================================
 // Equipotenciales (marching squares simplificado)
 // ============================================================
+/**
+ * Corte del potencial para DIBUJAR equipotenciales: más ancho que RADIO_SINGULARIDAD (0,05 m)
+ * para que los contornos no se amontonen junto a cada carga, donde V crece sin límite. Es solo
+ * dibujo: la fórmula del potencial es la de ./motor.ts, la misma que da la cifra del panel.
+ */
+const RADIO_CORTE_EQUIPOTENCIALES = 0.08; // m
+
 function generarEquipotenciales(
   cargas: Carga[],
   niveles: number[]
@@ -199,19 +206,8 @@ function generarEquipotenciales(
     for (let i = 0; i <= cols; i++) {
       const x = xMin + i * dx;
       const y = yMin + j * dy;
-      let v = 0;
-      let saltar = false;
-      for (const c of cargas) {
-        const ddx = x - c.x;
-        const ddy = y - c.y;
-        const r = Math.sqrt(ddx * ddx + ddy * ddy);
-        if (r < 0.08) {
-          saltar = true;
-          break;
-        }
-        v += (K_COULOMB * c.q * NC_TO_C) / r;
-      }
-      fila.push(saltar ? Number.NaN : v);
+      const { V: v, singular } = calcularCampoEnPunto(x, y, cargas, RADIO_CORTE_EQUIPOTENCIALES);
+      fila.push(singular ? Number.NaN : v);
     }
     V.push(fila);
   }

@@ -59,13 +59,18 @@ export interface CampoEnPunto {
  * todas las cargas.
  *
  * El vector de cada término es (punto − carga), así que con q > 0 el campo se ALEJA de la
- * carga y con q < 0 apunta HACIA ella. Las cargas a menos de RADIO_SINGULARIDAD del punto se
+ * carga y con q < 0 apunta HACIA ella. Las cargas a menos de `radioCorte` del punto se
  * saltan y se marca `singular`: ahí no hay cifra que dar.
+ *
+ * `radioCorte` vale RADIO_SINGULARIDAD salvo para el DIBUJO de las equipotenciales, que corta
+ * a 0,08 m para no amontonar trazos junto a cada carga. Se pasa aquí en vez de repetir la
+ * fórmula del potencial en la vista, que es lo que se hacía hasta el 23/09/2026.
  */
 export function calcularCampoEnPunto(
   x: number,
   y: number,
   cargas: readonly CargaPuntual[],
+  radioCorte: number = RADIO_SINGULARIDAD,
 ): CampoEnPunto {
   let Ex = 0;
   let Ey = 0;
@@ -76,7 +81,7 @@ export function calcularCampoEnPunto(
     const dy = y - c.y;
     const r2 = dx * dx + dy * dy;
     const r = Math.sqrt(r2);
-    if (r < RADIO_SINGULARIDAD) {
+    if (r < radioCorte) {
       singular = true;
       continue;
     }
