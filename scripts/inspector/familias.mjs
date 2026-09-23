@@ -18,10 +18,13 @@
  * y mete el campo en la lista contraria. Otro hueco era un campo EXCLUSIVO de una hermana
  * (amortizaciones), que el lote no podía ver porque las demás no lo tienen.
  *
- * De ahí las dos consecuencias que este fichero sostiene:
+ * De ahí las tres consecuencias que este fichero sostiene:
  *   1. La cola las saca JUNTAS, en vez de garaje en septiembre y solar en diciembre.
  *   2. Cada familia tiene un TESTIGO que mide las N a la vez y CALCULA la dirección del
  *      efecto en lugar de razonarla.
+ *   3. El candado `check:familias` (en `npm run build`, desde el 23/09/2026) ejecuta ese
+ *      testigo y exige que cubra cada `NumberInput` de cada hermana. Lee ESTA lista: una
+ *      familia nueva entra en el build con declararla aquí.
  *
  * ⚠️ POR QUÉ LA LISTA ES A MANO Y NO SE DERIVA DEL NOMBRE
  * ──────────────────────────────────────────────────────

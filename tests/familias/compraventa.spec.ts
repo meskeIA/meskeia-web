@@ -34,6 +34,12 @@
  * Esa es la razón de ser de este fichero: **una reparación hecha a propósito en las siete no
  * basta; hace falta un testigo que las mida a la vez.**
  *
+ * **Todos cerrados el 23/09/2026** (de `0bff1872` a `8d7dcd1b`), cada uno quitando el `falla`
+ * de su fila: 52/52 en verde, ninguno marcado. Desde ese día el candado `check:familias`
+ * ejecuta este fichero en cada `npm run build` y exige además que cada `NumberInput` de las
+ * siete apps tenga su fila aquí — un campo nuevo sin fila rompe el build, que es justo lo que
+ * dejó pasar A2.
+ *
  * ── El invariante ────────────────────────────────────────────────────────────
  * `parseSpanishNumber` devuelve NaN POR DISEÑO ante `2.000.50` (el millar y el decimal a la
  * estadounidense, un copiar y pegar corriente). De ahí:
@@ -52,11 +58,12 @@
  * caso por fila. **Añadir la octava hermana el día de mañana es añadir una fila**, no
  * escribir un test. Lo mismo con un campo nuevo en una app que ya está.
  *
- * Los tres huecos abiertos —y los tres del placeholder del grupo B— van con `test.fail()`, que
- * se traga el motivo. Para leerlo:
+ * Un hueco nuevo se escribe ANTES de repararlo: su fila con `falla: '<razón>'`, que la marca
+ * `test.fail()` y se traga el motivo. Para leerlo:
  *     VER_HUECOS=1 npx playwright test tests/familias/compraventa.spec.ts
  * Esa corrida quita las marcas y enseña, en cada uno, el aviso que la app publica frente al
- * que la dirección MEDIDA exige. Reparar una de las siete = quitarle el `falla` a su fila.
+ * que la dirección MEDIDA exige. Reparar = quitarle el `falla` a su fila; y si se olvida,
+ * el caso pasa, Playwright lo da por fallido («expected to fail») y el build se para.
  *
  * ── Trampas MEDIDAS, que este fichero ya esquiva ──────────────────────────────
  *  · La HIPOTECA PENDIENTE de `estimador-compraventa-inmueble` no se puede probar con
