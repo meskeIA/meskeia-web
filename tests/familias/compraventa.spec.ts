@@ -26,6 +26,10 @@
  *        otras seis hermanas no tienen ese campo: por eso la reparación en lote no lo vio.
  *   C1 · `estimador-compraventa-inmueble` tiene un octavo campo, «Valor catastral total»,
  *        cuyo ilegible es indistinguible del vacío y mueve el neto −84,64 € en silencio.
+ *        Y el MISMO hueco en garaje, trastero y local-comercial (−20,83 €, −58,89 € y
+ *        −243,00 €), que la medición del 23/09 no vio porque sus filas usaban un caso base
+ *        en el que gana el método objetivo y el campo no puede mover nada: se destapó al
+ *        reparar, el 23/09/2026, dándoles una base R en la que gana el real.
  *
  * Esa es la razón de ser de este fichero: **una reparación hecha a propósito en las siete no
  * basta; hace falta un testigo que las mida a la vez.**
@@ -59,7 +63,9 @@
  *    reinversión TOTAL: la proporción satura en `Math.min(1, …)` y el delta es 0,00 €, así
  *    que el caso daría VERDE sin probar nada. Va sobre la BASE A' (reinversión parcial).
  *  · El VALOR CATASTRAL TOTAL no se puede probar con el método objetivo ganando (delta
- *    0,00 €). Va sobre la BASE C.
+ *    0,00 €). Va sobre la BASE C en el estimador y sobre la BASE R en garaje, trastero y
+ *    local-comercial. Las filas `sin_efecto` de esas tres se quedan para dejarlo dicho: son
+ *    las que las dieron por sanas en ese campo, y un verde sin delta no prueba nada.
  *  · Las AMORTIZACIONES de `local-comercial` solo existen con el perfil «Local afecto a
  *    actividad»: la preparación de esa app lo pulsa.
  *  · El `id` de los inputs lo genera React (`_R_…`): aquí se localiza SIEMPRE por
@@ -174,15 +180,16 @@ const HERMANAS: readonly Hermana[] = [
       'COMPRADOR: precio 25.000 · Madrid · segunda mano · perfil General · gestoría 300. ' +
       'VENDEDOR: compra original 18.000 · gastos de aquella compra 1.800 · 8 años · ' +
       'catastral suelo 5.000 · catastral total 12.000 · comisión 3 % · gestoría 500. ' +
-      'Publica COSTE TOTAL 27.252,05 € y NETO 22.898,25 €.',
+      'Publica COSTE TOTAL 27.252,05 € y NETO 22.898,25 €. · ' +
+      'BASE R = base + compra original 24.000 (gana el método real de la plusvalía, NETO 23.645,83).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^IMPORTE NETO VENDEDOR$/,
-    preparar: async (page) => {
+    preparar: async (page, base) => {
       await sembrar(page, 'Precio del garaje / plaza de parking', '25000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
       await irAPestana(page, 'vendedor');
-      await sembrar(page, 'Precio de compra original del garaje', '18000');
+      await sembrar(page, 'Precio de compra original del garaje', base === 'R' ? '24000' : '18000');
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '1800');
       await sembrar(page, 'Años de propiedad', '8');
       await sembrar(page, 'Valor catastral del suelo (€)', '5000');
@@ -245,12 +252,37 @@ const HERMANAS: readonly Hermana[] = [
       {
         // TRAMPA: con este caso base el método objetivo ya gana, así que el ilegible no mueve
         // nada. Se queda en la tabla justamente para dejarlo dicho: sin delta no hace falta
-        // aviso, y quien lo pruebe aquí no está probando nada (en el estimador sí mueve: C1).
+        // aviso, y quien lo pruebe aquí no está probando nada. ⚠️ Y NO significa que el campo
+        // esté protegido: con la base R de la fila siguiente sí mueve, y esta fila es la que dio
+        // la app por sana en la medición del 23/09.
         etiqueta: 'Valor catastral total (suelo + construcción) (€)',
         panel: 'vendedor',
         legible: '12000',
         direccion: 'sin_efecto',
         delta: 0,
+      },
+      {
+        // EL CASO QUE LA FILA DE ARRIBA NO PUEDE PROBAR, y por el que esa fila daba a esta
+        // app por sana. Con la BASE R (compra original 24.000) el incremento real es
+        // pequeño, el método real gana y el ilegible SÍ mueve el neto: −20,83 € en
+        // silencio, medido el 23/09/2026. Es el hueco C1 del estimador, idéntico aquí.
+        etiqueta: 'Valor catastral total (suelo + construcción) (€)',
+        panel: 'vendedor',
+        legible: '12000',
+        ilegible: '12.000.00',
+        base: 'R',
+        direccion: 'baja',
+        delta: -20.83,
+        nombra: /valor catastral total/i,
+        falla:
+          'HUECO C1 EN LA HERMANA — «Valor catastral total» se lee con `parseSpanishNumber` a ' +
+          'pelo: el ilegible entra como `undefined`, indistinguible del VACÍO, y la plusvalía se ' +
+          'liquida por el método objetivo aunque el real sea más barato. El neto baja en silencio ' +
+          'y la tarjeta de la plusvalía dice «falta el valor catastral total para comparar», que ' +
+          'es falso: el usuario lo escribió. La fila `sin_efecto` de arriba no lo veía porque en ' +
+          'el caso base gana el objetivo, y por eso la medición del 23/09 dio esta app por sana ' +
+          'en este campo. Para ponerlo en verde: su `esLegible` y el campo en la lista de ' +
+          'dirección contraria («el neto real es MAYOR»).',
       },
       {
         etiqueta: 'Comisión inmobiliaria del vendedor (%)',
@@ -277,15 +309,16 @@ const HERMANAS: readonly Hermana[] = [
       'COMPRADOR: precio 15.000 · Madrid · segunda mano · perfil General · gestoría 300. ' +
       'VENDEDOR: compra original 10.000 · gastos de aquella compra 1.000 · 5 años · ' +
       'catastral suelo 4.000 · catastral total 9.000 · comisión 3 % · gestoría 500. ' +
-      'Publica COSTE TOTAL 16.535,58 € y NETO 13.332,80 €.',
+      'Publica COSTE TOTAL 16.535,58 € y NETO 13.332,80 €. · ' +
+      'BASE R = base + compra original 14.000 (gana el método real de la plusvalía, NETO 13.938,89).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^IMPORTE NETO VENDEDOR$/,
-    preparar: async (page) => {
+    preparar: async (page, base) => {
       await sembrar(page, 'Precio del trastero', '15000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
       await irAPestana(page, 'vendedor');
-      await sembrar(page, 'Precio de compra original', '10000');
+      await sembrar(page, 'Precio de compra original', base === 'R' ? '14000' : '10000');
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
       await sembrar(page, 'Años de propiedad', '5');
       await sembrar(page, 'Valor catastral del suelo', '4000');
@@ -352,6 +385,29 @@ const HERMANAS: readonly Hermana[] = [
         delta: 0,
       },
       {
+        // EL CASO QUE LA FILA DE ARRIBA NO PUEDE PROBAR, y por el que esa fila daba a esta
+        // app por sana. Con la BASE R (compra original 14.000) el incremento real es
+        // pequeño, el método real gana y el ilegible SÍ mueve el neto: −58,89 € en
+        // silencio, medido el 23/09/2026. Es el hueco C1 del estimador, idéntico aquí.
+        etiqueta: 'Valor catastral total (suelo + construcción)',
+        panel: 'vendedor',
+        legible: '9000',
+        ilegible: '9.000.00',
+        base: 'R',
+        direccion: 'baja',
+        delta: -58.89,
+        nombra: /valor catastral total/i,
+        falla:
+          'HUECO C1 EN LA HERMANA — «Valor catastral total» se lee con `parseSpanishNumber` a ' +
+          'pelo: el ilegible entra como `undefined`, indistinguible del VACÍO, y la plusvalía se ' +
+          'liquida por el método objetivo aunque el real sea más barato. El neto baja en silencio ' +
+          'y la tarjeta de la plusvalía dice «falta el valor catastral total para comparar», que ' +
+          'es falso: el usuario lo escribió. La fila `sin_efecto` de arriba no lo veía porque en ' +
+          'el caso base gana el objetivo, y por eso la medición del 23/09 dio esta app por sana ' +
+          'en este campo. Para ponerlo en verde: su `esLegible` y el campo en la lista de ' +
+          'dirección contraria («el neto real es MAYOR»).',
+      },
+      {
         etiqueta: 'Comisión inmobiliaria (%)',
         panel: 'vendedor',
         legible: '3',
@@ -377,16 +433,17 @@ const HERMANAS: readonly Hermana[] = [
       'VENDEDOR con perfil «Local afecto a actividad» (OBLIGATORIO para que exista el campo ' +
       'de amortizaciones): compra original 150.000 · gastos de aquella compra 15.000 · ' +
       'amortizaciones 20.000 · 10 años · catastral suelo 40.000 · catastral total 100.000 · ' +
-      'comisión 3 % · gestoría 500. Publica COSTE TOTAL 213.495,20 € y NETO 182.803,00 €.',
+      'comisión 3 % · gestoría 500. Publica COSTE TOTAL 213.495,20 € y NETO 182.803,00 €. · ' +
+      'BASE R = base + compra original 195.000 (gana el método real de la plusvalía, NETO 192.430,00).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^NETO QUE RECIBES/,
-    preparar: async (page) => {
+    preparar: async (page, base) => {
       await sembrar(page, 'Precio del local comercial', '200000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '500');
       await irAPestana(page, 'vendedor');
       await page.getByRole('button', { name: /Local afecto a actividad/ }).click();
-      await sembrar(page, 'Precio de compra original', '150000');
+      await sembrar(page, 'Precio de compra original', base === 'R' ? '195000' : '150000');
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '15000');
       await sembrar(page, 'Amortizaciones acumuladas deducidas (€)', '20000');
       await sembrar(page, 'Años de propiedad', '10');
@@ -476,6 +533,29 @@ const HERMANAS: readonly Hermana[] = [
         legible: '100000',
         direccion: 'sin_efecto',
         delta: 0,
+      },
+      {
+        // EL CASO QUE LA FILA DE ARRIBA NO PUEDE PROBAR, y por el que esa fila daba a esta
+        // app por sana. Con la BASE R (compra original 195.000) el incremento real es
+        // pequeño, el método real gana y el ilegible SÍ mueve el neto: −243,00 € en
+        // silencio, medido el 23/09/2026. Es el hueco C1 del estimador, idéntico aquí.
+        etiqueta: 'Valor catastral total (suelo + construcción) (€)',
+        panel: 'vendedor',
+        legible: '100000',
+        ilegible: '100.000.00',
+        base: 'R',
+        direccion: 'baja',
+        delta: -243,
+        nombra: /valor catastral total/i,
+        falla:
+          'HUECO C1 EN LA HERMANA — «Valor catastral total» se lee con `parseSpanishNumber` a ' +
+          'pelo: el ilegible entra como `undefined`, indistinguible del VACÍO, y la plusvalía se ' +
+          'liquida por el método objetivo aunque el real sea más barato. El neto baja en silencio ' +
+          'y la tarjeta de la plusvalía dice «falta el valor catastral total para comparar», que ' +
+          'es falso: el usuario lo escribió. La fila `sin_efecto` de arriba no lo veía porque en ' +
+          'el caso base gana el objetivo, y por eso la medición del 23/09 dio esta app por sana ' +
+          'en este campo. Para ponerlo en verde: su `esLegible` y el campo en la lista de ' +
+          'dirección contraria («el neto real es MAYOR»).',
       },
       {
         etiqueta: 'Comisión de la inmobiliaria (%)',
