@@ -5,6 +5,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorFluidosBernoulli.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 // La física (fluidos, secciones, continuidad y Bernoulli) vive en ./motor.ts desde el
 // 23/09/2026: la usan esta página y la sección «Casos para clase», con una sola implementación.
 import {
@@ -57,9 +58,18 @@ function fmtDensidad(rho: number): string {
   return rho.toLocaleString('es-ES', { maximumFractionDigits: 3 });
 }
 
+/**
+ * Cifra en formato español con `formatNumber` y el signo menos tipográfico «−», el mismo que
+ * escribe la tarjeta de ΔP (hasta el 23/09/2026 la tabla y el manómetro salían con «-»).
+ * Lo que redondea a cero se da como 0, igual que hacía `toFixed`: formatNumber escribe «≈0»
+ * por debajo de 0,0001, y en la tarjeta saldría «−≈0 Pa». es-ES no agrupa los números de
+ * cuatro cifras, así que «4905 Pa» sigue igual; los de cinco no llegan aquí (≥ 10.000 Pa va
+ * en kPa).
+ */
 function fmt(n: number, decimales = 2): string {
   if (!isFinite(n)) return '∞';
-  return n.toFixed(decimales).replace('.', ',');
+  if (Math.abs(n) < 0.5 / 10 ** decimales) return formatNumber(0, decimales);
+  return formatNumber(n, decimales).replace('-', '−');
 }
 
 function fmtPresion(P: number): string {

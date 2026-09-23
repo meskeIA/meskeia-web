@@ -23,7 +23,8 @@ import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
  * El diámetro nominal tampoco se declara ni se puede tocar: D₀ = 0,10 m fijo en las tres
  * geometrías, y solo se ajusta la razón D₂/D₁.
  *
- * DÓNDE VIVE EL CÁLCULO — app/simulador-fluidos-bernoulli/page.tsx (no hay motor.ts)
+ * DÓNDE VIVE EL CÁLCULO — app/simulador-fluidos-bernoulli/motor.ts desde el 23/09/2026 (en la
+ *   inspección estaba en page.tsx; se MOVIÓ sin tocar una operación). Formato y dibujo, en page.tsx.
  *   · getSecciones(geom, ratio, Δh): tres secciones por geometría, con D₀ = 0,10 m
  *       venturi     Entrada(D₀, h=0) · Garganta(D₀·ratio, h=0) · Salida(D₀, h=0)
  *       desnivel    Inferior(D₀, h=0) · Subida(D₀, h=Δh/2) · Superior(D₀, h=Δh)  ← sin
@@ -31,10 +32,12 @@ import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
  *       estenosis   igual que venturi, con la transición más brusca en el dibujo
  *   · datos: A = π·(D/2)² · v = Q/A · P = P₁ + ½ρ(v₁²−v²) + ρg(h₁−h). Es Bernoulli despejado,
  *       y está bien despejado: los signos y el orden de los subíndices son los correctos.
- *   · fmt(n,d) = n.toFixed(d).replace('.', ',') — coma decimal y SIN separador de millares.
+ *   · fmt(n,d) = formatNumber(n, d) con el menos tipográfico «−» (desde el 23/09/2026; en
+ *       la inspección era n.toFixed(d).replace('.', ',') y la tabla salía con «-»). Lo que
+ *       redondea a cero se da como 0, no como el «≈0» de formatNumber.
  *       fmtPresion(P) = kPa con 2 decimales si |P| ≥ 10000 Pa, si no Pa con 0 decimales.
- *       No usa lib/formatters, pero en el rango alcanzable ninguna cifra llega a los cinco
- *       dígitos que es-ES agruparía, salvo las ρ, que se imprimen CRUDAS: ahí sí falla (G).
+ *       es-ES no agrupa los números de cuatro cifras («4905 Pa») y en el rango alcanzable
+ *       ninguna cifra de fmt llega a cinco, salvo las ρ, que se imprimían CRUDAS (G).
  *   · Manómetro del canvas: columna de altura (|P| / máx|P|)·70 + 8 px.  ← origen del
  *       HALLAZGO A: normaliza al máximo absoluto y usa el VALOR ABSOLUTO.
  *   · updateParticulas: vNorm = (v_local / v_ref)·0,15, con v_local = Q/A_local y
@@ -74,7 +77,7 @@ import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
  *       v₂ = 0,01 / 4,908739·10⁻⁴ = 20,371833 m/s        → «20,37 m/s»   (16·v₁ = 1/0,25² ✔)
  *       P₂ = 101325 + 500·(1,621139 − 415,011580)
  *          = 101325 + 500·(−413,390441)
- *          = 101325 − 206695,22 = −105370,22 Pa          → «-105,37 kPa»
+ *          = 101325 − 206695,22 = −105370,22 Pa          → «−105,37 kPa»
  *       ΔP = −206695,22 Pa                               → «−206,70 kPa»
  *       La velocidad NO tiende a infinito: la razón mínima es 0,25, así que A₂ nunca es cero
  *       y v₂ topa en 20,37 m/s. Pero la presión ABSOLUTA sale negativa, que es físicamente
@@ -363,7 +366,7 @@ test('CASO 2 · en el límite v₂ = 20,37 m/s y la presión absoluta se va a �
   // A₂ = π·(0,025/2)² = 4,908739·10⁻⁴ m² = 4,91 cm²
   // v₂ = 0,01/4,908739·10⁻⁴ = 20,371833 m/s = 16·v₁ (= 1/0,25², la continuidad al cuadrado)
   // P₂ = 101325 + 500·(1,621139 − 415,011580) = 101325 − 206695,22 = −105370,22 Pa
-  expect(filas[1]).toEqual(['Garganta', '2,5', '4,91', '20,37', '-105,37 kPa', '0,00']);
+  expect(filas[1]).toEqual(['Garganta', '2,5', '4,91', '20,37', '−105,37 kPa', '0,00']);
   expect(filas[2]).toEqual(['Salida', '10,0', '78,54', '1,27', '101,33 kPa', '0,00']);
 
   const tarjetas = await panel(page);
@@ -585,7 +588,7 @@ test('HALLAZGO E · una presión absoluta negativa viene con su aviso de cavitac
   await poner(page, 'Caudal', 10);
   await poner(page, 'Ratio de estrechamiento', 0.25);
 
-  expect((await tabla(page))[1][4]).toBe('-105,37 kPa'); // P₂ = 101325 − 206695,22
+  expect((await tabla(page))[1][4]).toBe('−105,37 kPa'); // P₂ = 101325 − 206695,22
   await expect(page.locator('body')).toContainText(/cavitaci[oó]n/i);
 });
 
