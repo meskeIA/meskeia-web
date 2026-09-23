@@ -399,7 +399,7 @@ escrita: `CUADRE_OK="por qué es correcto" git commit -m "…"`.
 `npm run cuadre` (y el `pre-commit`, que es donde **bloquea**) — cuenta y compara; no opina.
 Cubre la clase de fallo que los otros candados no pueden ver: **se coló algo que nadie pidió**.
 
-Los 18 candados comprueban propiedades POSITIVAS enumeradas de antemano —«esto debe estar, y
+Los 19 candados comprueban propiedades POSITIVAS enumeradas de antemano —«esto debe estar, y
 está»—; ninguno mira un borrado (`grep diff-filter=D scripts/check-*.mjs` devuelve 0). El caso
 que mejor lo enseña es `check:csp`: exige que todo dominio cargado esté PERMITIDO, que es
 coherencia, no novedad — añadir la llamada y el permiso a la vez le cuadra.
@@ -569,14 +569,9 @@ existen desde el 21/08/2026 y se crearon para esto: **`--primary-boton`** (5,47:
 **`--secondary-boton`** (5,15:1), iguales en **ambos temas**. `var(--hero-bg)` no lo enciende:
 da 8,33:1.
 
-Salió del hallazgo 1175 del Inspector (21/09/2026), **tercera vuelta sobre la misma tabla** de
-`simulador-gastos-compraventa-nave-industrial`: el 648 arregló las celdas de respuesta y el 684
-la de la cifra, y las tres veces se midió el TEXTO de las celdas mientras la fila del `<thead>`
-no se medía nunca, **porque su color no está en el texto sino en el FONDO**. El barrido del
-22/09/2026 encontró que no era un caso aislado: **683 bloques en 518 ficheros**, 389 de ellos
-fallando además en oscuro, y **3 que seguían en línea en el JSX** —`selector-modelo-negocio`,
-`simulador-gastos-compraventa-local-comercial` y `-solar`—, gemelos exactos del 1175 en apps
-hermanas que aquella reparación dejó atrás.
+Salió del hallazgo 1175 (21/09/2026), tercera vuelta sobre la misma tabla: las tres veces se
+midió el TEXTO de las celdas y nunca la fila del `<thead>`, **cuyo color está en el FONDO**. El
+barrido que lo siguió (683 bloques en 518 ficheros), en la cabecera del script.
 
 ⚠️ **Sin pasivo**, como `check:og-image`: barre el árbol entero. Se drenó el 22/09/2026, así que
 solo puede encenderlo código nuevo. Falso positivo: `contraste-ok: <razón>` en esa línea o en el
@@ -658,6 +653,27 @@ estado de React coincide desde el principio, así que el caso pasa aunque la app
 > Sus casos de prueba, en `scripts/pruebas/hidratacion-tests.ts`; se le reinyectan con
 > **`npm run hidratacion:probar-candado`**. La carrera misma se reproduce en
 > `tests/hidratacion-carrera.spec.ts`, estrangulando la CPU.
+
+### Candado de las familias de apps
+
+`npm run check:familias` — lo ejecuta también `npm run build` (~20 s), y **rompe el build** si
+el testigo de una familia no está en verde o si su tabla no cubre cada `<NumberInput>` de cada
+hermana. Lee la MISMA declaración que la cola del Inspector, `scripts/inspector/familias.mjs`:
+una familia nueva entra en el build con declararla allí.
+
+Es el único candado que **ejecuta** en vez de leer, y a propósito: su caso de origen (el hueco A1
+de compraventa, 23/09/2026) era de DIRECCIÓN —el campo tenía guarda, bandera y aviso, y el aviso
+decía lo contrario— y ninguna forma del código lo delata. La versión estática tentadora («existe
+`esLegible()`») habría dado en rojo tres apps sanas que escriben la guarda inline.
+
+⚠️ **Sin pasivo**: nació con el testigo de compraventa en 52/52 y los 46 campos de sus siete apps
+con fila. Un hueco nuevo se escribe con `falla: '<razón>'` en su fila ANTES de repararlo: no
+rompe, se imprime con su cuenta; y una marca cuyo caso ya pasa **sí** rompe. Un campo que no mueve
+ninguna cifra publicada: `familia-ok: <razón>`. En Vercel se omite la ejecución (no hay navegador).
+
+> Por qué un lote hecho a propósito «en las siete» dejó cinco huecos: cabecera de
+> `scripts/check-familias.mjs`. Sus 7 trampas, con el A1 reinyectado en el código real:
+> **`npm run familias:probar-candado`**.
 
 ### Candado de la tarjeta social
 
