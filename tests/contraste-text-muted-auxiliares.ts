@@ -67,16 +67,34 @@ export async function activarTema(page: Page, tema: 'dark' | 'light'): Promise<v
  * (16), `selector-tarifa-electrica` (6), `simulador-ciclo-explotacion` (5) — mientras
  * la página respondía en milisegundos. Medido el 23/09/2026: era el instrumento, no
  * la app ni el navegador.
+ *
+ * Los `[aria-expanded="false"]` tenían la misma forma —`nth(i)` sobre una lista que
+ * encoge al abrir—, sin colgarse porque `isVisible` no espera: se SALTABAN secciones.
+ * Al abrir el primero, el que era el segundo pasa a ser el primero e `i` ya va por el
+ * segundo, así que se abría uno de cada dos y el texto de los otros no se medía. Ahora
+ * se busca cada vez el primero visible que siga cerrado, y se cuentan los intentos
+ * sobre cada elemento: dos como mucho, para que un botón que no abre nada, o un
+ * acordeón que cierra el anterior al abrir el siguiente, no se reintente en bucle. El
+ * segundo intento es el que hacía la segunda vuelta de antes: un clic que llega antes
+ * de que React hidrate no abre nada.
  */
 export async function desplegarTodo(page: Page, presupuestoMs = 20_000): Promise<void> {
   const limite = Date.now() + presupuestoMs;
-  for (let vuelta = 0; vuelta < 2 && Date.now() < limite; vuelta++) {
-    const cerrados = page.locator('[aria-expanded="false"]');
-    const n = Math.min(await cerrados.count(), 40);
-    for (let i = 0; i < n && Date.now() < limite; i++) {
-      const b = cerrados.nth(i);
-      if (await b.isVisible().catch(() => false)) await b.click({ timeout: 1500 }).catch(() => {});
-    }
+  for (let clic = 0; clic < 80 && Date.now() < limite; clic++) {
+    const hay = await page.evaluate(() => {
+      document.querySelector('[data-desplegar-ahora]')?.removeAttribute('data-desplegar-ahora');
+      const siguiente = Array.from(document.querySelectorAll('[aria-expanded="false"]')).find((el) => {
+        if (Number(el.getAttribute('data-desplegar-intentos') ?? 0) >= 2) return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden';
+      });
+      if (!siguiente) return false;
+      siguiente.setAttribute('data-desplegar-intentos', String(Number(siguiente.getAttribute('data-desplegar-intentos') ?? 0) + 1));
+      siguiente.setAttribute('data-desplegar-ahora', '');
+      return true;
+    });
+    if (!hay) break;
+    await page.locator('[data-desplegar-ahora]').click({ timeout: 1500 }).catch(() => {});
   }
   await page.evaluate(() => {
     document.querySelectorAll('details:not([open])').forEach((d) => d.setAttribute('open', ''));
