@@ -129,8 +129,11 @@
                             puro y sobre la tarjeta real se quedaba en 4,41. NO cubre el
                             texto muted sobre --border (#404040, 3,73) ni sobre --hover
                             (#383838, 4,22), que son fondos de píldora y se reparan en
-                            su app. Separa 1,28:1 de --text-secondary; la compresión de
-                            la jerarquía es deliberada. */
+                            su app. La excepción es <EducationalSection>: su caja es
+                            superficie de lectura en todas las apps, no píldora, y en
+                            oscuro pinta #303030 (4,75) en vez de --hover. Separa
+                            1,28:1 de --text-secondary; la compresión de la jerarquía
+                            es deliberada. */
 
   /* Bordes y hover oscuros */
   --border: #404040;
