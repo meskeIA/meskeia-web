@@ -330,7 +330,8 @@
 .brechaLabel {
   display: block;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  /* --text-secondary: sobre la marca al 12 % del tema oscuro, muted daba 4,33:1 */
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 0.3rem;
