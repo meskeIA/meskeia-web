@@ -217,7 +217,9 @@
 
 .contextoHistorico {
   font-size: 0.82rem;
-  color: var(--text-muted);
+  /* --text-secondary: sobre los tres tintes del badge, muted daba en claro 4,45
+     (restrictiva) y ~4,52 y ~4,56 (expansiva y neutral) */
+  color: var(--text-secondary);
   margin: 0;
   font-style: italic;
 }
