@@ -20,6 +20,10 @@ import { calcularITP, calcularNotario, calcularRegistro, ITP_CCAA, type Comunida
  * (el veredicto no cambia en ninguna de las 1.048.576 combinaciones). Las razones citan las
  * respuestas que más empujan hacia el veredicto y, aparte, las que empujan en contra, con la
  * puntuación y los umbrales a la vista.
+ *
+ * DESDE LA INSPECCIÓN DEL 24/09/2026 (hallazgos 1459-1461) el veredicto SÍ cambia en 53.688
+ * perfiles: con un ahorro por debajo del 20 % o menos de 3 años de plazo, «comprar» pasa a
+ * «esperar» y el resultado dice por qué (ver `LIMITES` en el motor).
  */
 
 async function esperarHidratacionBotones(page: Page): Promise<void> {
@@ -119,7 +123,13 @@ test('motor: las razones van en la dirección del veredicto y citan lo respondid
     if (i === PREGUNTAS.length) {
       total++;
       const res = calcularResultado(r);
-      const esperado = res.puntuacion >= UMBRAL ? 'compra' : res.puntuacion <= -UMBRAL ? 'alquila' : 'espera';
+      // Reescrito el 24/09/2026: este esperado era el umbral puro, y consagraba el defecto de los
+      // hallazgos 1459 y 1460 («comprar» con menos del 10 % ahorrado o menos de 3 años de plazo).
+      // Ahora, si la puntuación da «comprar» con un ahorro por debajo del 20 % o un horizonte de
+      // menos de 3 años, el veredicto es «esperar».
+      const porPuntos = res.puntuacion >= UMBRAL ? 'compra' : res.puntuacion <= -UMBRAL ? 'alquila' : 'espera';
+      const conLimite = ['bajo', 'justo'].includes(r.ahorro) || r.horizonte === 'corto';
+      const esperado = porPuntos === 'compra' && conLimite ? 'espera' : porPuntos;
       if (res.veredicto !== esperado) mal('veredicto fuera de umbral');
       if (res.veredicto !== 'espera' && res.razones.length === 0) mal('veredicto sin razones');
       const aFavor = res.veredicto === 'alquila' ? 'resta' : 'suma';
@@ -147,9 +157,8 @@ test('motor: las razones van en la dirección del veredicto y citan lo respondid
 // los pesos de motor.ts: se suman las 10 respuestas y se compara con ±8.
 //
 // Las cifras normativas se contrastan con data/itp-ccaa.ts y data/fiscal, nunca de memoria.
-// Cada hallazgo abierto va como test.fail(): pasa hoy y se pone rojo cuando se repare. La
-// aserción de cada uno es la CONDICIÓN del defecto, así que se enciende se repare por donde se
-// repare (filtrando o avisando; cambiando la FAQ o la pantalla).
+// Los 14 hallazgos (1459-1472) se repararon el mismo día: sus test.fail() pasaron a exigir la
+// reparación (al final del describe).
 // ─────────────────────────────────────────────────────────────────────────────────────────
 test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la guía y la FAQ, contraste', () => {
   type Rgba = { r: number; g: number; b: number; a: number };
@@ -292,8 +301,12 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
 
   // +3 +4 +2 +3 +1 0 +1 +1 0 +2 = +17 → comprar. Sin ninguna respuesta negativa: no hay contrapeso.
   const NORMAL = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20% y el 30%', 'Muy improbable, estoy arraigado/a', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
-  // +3 +4 −1 −1 +1 0 +1 +1 0 0 = +8 → comprar (el umbral incluye el +8).
-  const MAS_8 = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 10% y el 20%', 'No descarto que ocurra', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+  // +3 +4 +2 −1 −2 0 +1 +1 0 0 = +8 → comprar (el umbral incluye el +8).
+  // Reescrito el 24/09/2026: el perfil del umbral llevaba «Entre el 10% y el 20%», que desde la
+  // reparación de los hallazgos 1459-1461 es un límite (no llega a la entrada) y da «esperar»;
+  // ese caso vive ahora en MAS_8_SIN_ENTRADA. Este cambia el ahorro a «Entre el 20% y el 30%»
+  // (+3) y la situación personal a «En transición» (−3) para seguir sumando +8.
+  const MAS_8 = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20% y el 30%', 'No descarto que ocurra', 'En transición (separación, nido vacío...)', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
   // +4 +2 −1 −1 +1 0 +1 +1 0 0 = +7 → esperar.
   const MAS_7 = ['Indefinidamente', 'Autónomo consolidado (+3 años)', 'Entre el 10% y el 20%', 'No descarto que ocurra', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
   // −4 −3 −1 −1 −1 0 +1 +1 0 0 = −8 → alquilar.
@@ -359,163 +372,235 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
     expect(await contraste(page, '[class*="btnRepetir"]')).toBeGreaterThanOrEqual(4.5);
   });
 
-  // ─ Hallazgos abiertos ─
+  // ─ Hallazgos reparados el 24/09/2026 ─
+  // Eran test.fail() que documentaban el defecto; ahora exigen la reparación, con el texto
+  // esperado entero. Las cifras de gastos se calcularon a mano con data/itp-ccaa y el precio de
+  // 200.000 €: notaría 758,98 € + registro 236,22 € = 0,498 % del precio;
+  //   usada:  Ceuta y Melilla 6 % con la bonificación del 50 % (art. 57 bis TRLITPAJD) = 3 % → 3,5 %;
+  //           Cataluña 10 % → 10,5 %.
+  //   nueva:  IVA 10 % + AJD de la vivienda habitual: País Vasco 0 % → 10,5 %; 1,5 % → 12 %.
+  //   ahorro para una usada: 20 % + 3,498 % = 46.995 € ≈ 47.000 €; 20 % + 10,498 % ≈ 61.000 €.
+  // Si data/itp-ccaa cambia un tipo, estos literales se ponen en rojo: es el aviso de que la guía
+  // y la FAQ publican otra cifra, y hay que recalcularlos a mano.
+  const FRASE_GASTOS_HOY =
+    'con los tipos generales de cada comunidad (sin reducciones por colectivo), los impuestos, la notaría y el registro de una vivienda de 200.000 € suman del 3,5 % (Ceuta y Melilla) al 10,5 % (Cataluña) del precio si es usada, y del 10,5 % al 12 % si es nueva';
 
-  test('«Menos del 10 %» ahorrado no puede salir en «comprar» sin avisar de la entrada', async ({ page }) => {
-    // HALLAZGO abierto: el ahorro es un PESO (−4), no un límite. La propia opción dice «Entrada
-    // insuficiente en la mayoría de casos» y la FAQ, que el banco financia hasta el 80 % y los
-    // gastos van aparte. La única huella en pantalla es «resta 4 puntos». Barrido: 13.620 de los
-    // 262.144 perfiles con esa respuesta salen en «comprar».
-    test.fail();
-    test.setTimeout(90_000);
+  // +3 +4 −1 −1 +1 0 +1 +1 0 0 = +8, con «Entre el 10% y el 20%»: era el perfil del umbral +8.
+  // Ahora el ahorro no llega a la entrada y «comprar» no puede salir (hallazgo 1461 + familia a).
+  const MAS_8_SIN_ENTRADA = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 10% y el 20%', 'No descarto que ocurra', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+
+  const aviso = (page: Page, id: string) => page.locator(`[data-limite="${id}"]`);
+  /** El texto del aviso sin el icono decorativo (⚠️, aria-hidden) que lo encabeza. */
+  const textoAviso = async (page: Page, id: string): Promise<string> =>
+    (await aviso(page, id).innerText()).replace(/^⚠️\s*/, '').replace(/\s+/g, ' ');
+  const proximos = async (page: Page): Promise<string[]> => page.locator('[class*="proximoItem"]').allInnerTexts();
+
+  test('1459 «Menos del 10 %» ahorrado: no sale «comprar», y el aviso explica la entrada, los gastos y el aval ICO', async ({ page }) => {
+    // SIN_AHORRO: +14 por puntos → antes «Tu situación apunta a comprar». Ahora «esperar» con el
+    // aviso. Financiación: «normalmente, hasta un máximo del 80 %» del valor de tasación (Banco de
+    // España, Portal del Cliente Bancario, 12/03/2024). Aval: data/fiscal/ayudas-personas.ts.
     await abrirTest(page);
     await responderEtiquetas(page, SIN_AHORRO);
     const texto = await textoResultado(page);
-    const compra = texto.includes('Tu situación apunta a comprar');
-    const avisa = /insuficiente|no (te )?alcanza|no cubre|80\s?%/i.test(texto);
-    const n = contar((r, v) => r.ahorro === 'bajo' && v === 'compra');
-    expect(compra && !avisa, `«comprar» sin aviso de la entrada (${n} perfiles en el motor)`).toBe(false);
+    expect(texto).not.toContain('Tu situación apunta a comprar');
+    await expect(page.locator('[class*="veredictoValor"]')).toHaveText('Espera antes de decidir');
+    await expect(page.locator('[class*="veredictoDesc"]')).toHaveText(
+      'Por puntuación, tus respuestas apuntarían a comprar, pero has declarado algo que ninguna otra respuesta compensa: mientras siga así, comprar no sale como recomendación. Justo debajo tienes qué es y qué puedes hacer.',
+    );
+    expect(await textoAviso(page, 'ahorro')).toBe(
+      `Has declarado un ahorro de «Menos del 10% del precio buscado». El banco suele financiar como máximo el 80 % del valor de tasación (según el Banco de España), así que la entrada —el 20 %— y los gastos de compra salen del ahorro. En España, ${FRASE_GASTOS_HOY}. Con menos del 20 % no se llega ni a la entrada. La vía que existe para ese hueco es el Aval ICO para primera vivienda: Aval del Estado que cubre parte de la entrada de la hipoteca para facilitar el acceso a la primera vivienda a jóvenes y familias con hijos menores, sin necesidad de ahorrar el 20% inicial. Comprueba si cumples sus requisitos.`,
+    );
+    await expect(aviso(page, 'ahorro').getByRole('link', { name: 'Comprueba si cumples sus requisitos' })).toHaveAttribute('href', '/orientador-aval-ico/');
+    expect(texto).toContain('Tu puntuación total es +14: a partir de +8 la orientación es comprar, hasta −8 alquilar, y entre medias, esperar. Aquí pasa de ese umbral, pero lo que has declarado arriba impide recomendar la compra.');
+    expect(await proximos(page)).toEqual([
+      'Calcula cuánto te falta: la entrada que el banco no financia más los gastos de compra de tu comunidad',
+      'Comprueba si cumples los requisitos del aval ICO para la primera vivienda',
+      'Compara con la calculadora de alquiler vs compra cuando tengas datos concretos',
+    ]);
   });
 
-  test('«Menos de 3 años» en la ciudad no puede salir en «comprar» sin avisar del plazo', async ({ page }) => {
-    // HALLAZGO abierto: la guía de la propia app dice «Si tienes que vender antes de amortizarlos,
-    // perderás dinero casi con certeza» y la FAQ, «Con un horizonte de menos de 5 años, la compra
-    // raramente compensa». El horizonte solo resta 4. Barrido: 12.340 de 262.144 salen en «comprar».
-    test.fail();
+  test('familia a: ningún perfil con el ahorro bajo el 20 % o menos de 3 años de plazo sale en «comprar»', () => {
+    // Barrido del motor real. Antes salían en «comprar» 13.620 perfiles con «Menos del 10 %»,
+    // 29.472 con «Entre el 10% y el 20%» y 12.340 con «Menos de 3 años» (actas 1459-1461); hoy
+    // son 53.688 perfiles distintos (1.744 cumplen dos límites a la vez) y los 53.688 salen en
+    // «esperar» con su aviso.
     test.setTimeout(90_000);
+    let violan = 0;
+    let limitados = 0;
+    let sinAviso = 0;
+    contar((r, v) => {
+      const res = calcularResultado(r);
+      const conLimite = ['bajo', 'justo'].includes(r.ahorro) || r.horizonte === 'corto';
+      if (conLimite && v === 'compra') violan++;
+      if (res.limitado) {
+        limitados++;
+        if (res.veredictoPorPuntos !== 'compra' || res.veredicto !== 'espera' || res.limites.length === 0) sinAviso++;
+      }
+      return false;
+    });
+    expect({ violan, limitados, sinAviso }).toEqual({ violan: 0, limitados: 53_688, sinAviso: 0 });
+  });
+
+  test('1460 «Menos de 3 años» en la ciudad: no sale «comprar», y el aviso dice por qué', async ({ page }) => {
+    // HORIZONTE_CORTO: +22 por puntos. Con menos de 3 años los gastos de compra (del 3,5 % al
+    // 10,5 % en una usada) no se recuperan salvo revalorización o un ahorro de alquiler que no se
+    // puede dar por hecho: lo que ya decía la guía de la propia app.
     await abrirTest(page);
     await responderEtiquetas(page, HORIZONTE_CORTO);
-    const texto = await textoResultado(page);
-    const compra = texto.includes('Tu situación apunta a comprar');
-    const avisa = /amortiz|equilibrio|perder(ás)? dinero|raramente compensa|costes (de compra|iniciales|de transacción)/i.test(texto);
-    const n = contar((r, v) => r.horizonte === 'corto' && v === 'compra');
-    expect(compra && !avisa, `«comprar» con horizonte < 3 años sin aviso (${n} perfiles en el motor)`).toBe(false);
+    await expect(page.locator('[class*="veredictoValor"]')).toHaveText('Espera antes de decidir');
+    expect(await textoAviso(page, 'horizonte')).toBe(
+      'Has declarado que prevés quedarte «Menos de 3 años». Los gastos de compra no se recuperan al vender (del 3,5 % (Ceuta y Melilla) al 10,5 % (Cataluña) del precio solo en impuestos, notaría y registro de una vivienda usada, más los de la venta), y en tan poco tiempo solo compensan si la vivienda se revaloriza o si el alquiler que te ahorras supera con creces lo que cuesta ser propietario: ninguna de las dos cosas se puede dar por hecha.',
+    );
+    await expect(aviso(page, 'ahorro')).toHaveCount(0); // «Más del 30%»: el ahorro no es el límite
+    expect(await proximos(page)).toEqual([
+      'Repite el test cuando sepas si vas a quedarte más de 3 años en la zona',
+      'Compara con la calculadora de alquiler vs compra cuando tengas datos concretos',
+    ]);
   });
 
-  test('la escala del ahorro cuadra con lo que la FAQ dice que hace falta', async ({ page }) => {
-    // HALLAZGO abierto: la FAQ pide 60.000-70.000 € para un piso de 200.000 € (20 % de entrada +
-    // 10-15 % de gastos = 30-35 %), pero la pregunta 3 llama «Lo mínimo» a tener entre el 10 % y el
-    // 20 % y «Entrada cómoda con algo de colchón» a tener entre el 20 % y el 30 %. Con data/itp-ccaa
-    // los gastos de una usada de 200.000 € van del 3,5 % (Ceuta y Melilla) al 10,5 % (Cataluña):
-    // con menos del 20 % no se llega a entrada + gastos en ninguna comunidad.
-    test.fail();
+  test('1461 la escala del ahorro cuadra con la FAQ: del 10 al 20 % ya no es «Lo mínimo», y el +8 que se queda corto no sale «comprar»', async ({ page }) => {
     await abrirTest(page);
     const faq = await faqServido(page);
-    // Hasta la pregunta 3: «Más de 7 años» · «Contrato indefinido o funcionario».
+    expect(faq).not.toContain('necesitarías disponer de entre 60.000 y 70.000 € en ahorros');
     for (const etiqueta of ['Más de 7 años', 'Contrato indefinido o funcionario']) {
       await page.locator('[role="radio"]', { has: page.getByText(etiqueta, { exact: true }) }).click();
       await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
     }
     await page.getByText('¿Cuánto ahorro tienes disponible para la entrada y gastos?').waitFor();
-    const opciones = (await page.locator('[role="radio"]').allInnerTexts()).map((t) => t.replace(/\s+/g, ' '));
-    const pideMasDel30 = faq.includes('necesitarías disponer de entre 60.000 y 70.000 € en ahorros');
-    const llamaMinimoAl10a20 = opciones.some((o) => o.includes('Entre el 10% y el 20%') && o.includes('Lo mínimo'));
-    expect(pideMasDel30 && llamaMinimoAl10a20, opciones.join(' | ')).toBe(false);
+    expect(await page.locator('[role="radio"] [class*="opcionDesc"]').allInnerTexts()).toEqual([
+      'No llega a la entrada que el banco no suele financiar',
+      'Todavía no cubre la entrada y los gastos sin aval ni ayuda',
+      'Cubre la entrada; los gastos, según la comunidad y la vivienda',
+      'Cubre la entrada y los gastos en la mayoría de casos',
+    ]);
+    // El antiguo perfil del umbral +8 tenía entre el 10 y el 20 %: ahora es «esperar», con aviso.
+    await abrirTest(page);
+    await responderEtiquetas(page, MAS_8_SIN_ENTRADA);
+    const texto = await textoResultado(page);
+    expect(texto).toContain('Tu puntuación total es +8:');
+    await expect(page.locator('[class*="veredictoValor"]')).toHaveText('Espera antes de decidir');
+    expect(await textoAviso(page, 'ahorro')).toContain('Has declarado un ahorro de «Entre el 10% y el 20%».');
   });
 
-  test('los gastos de compra de la guía y la FAQ cuadran con data/itp-ccaa', async ({ page }) => {
-    // HALLAZGO abierto: guía «En total, entre un 10% y un 15% adicional sobre el precio» y FAQ
-    // «en España, entre el 10% y el 15% adicional del precio», escritos a mano. Con el motor de
-    // compraventa del repo (ITP general + notaría + registro, 200.000 €, usada): País Vasco 4,5 %,
-    // Madrid 6,5 %, Andalucía 7,5 %, Cataluña 10,5 %; obra nueva (IVA 10 % + AJD) 10,5-12 %.
-    // 18 de los 19 territorios quedan por debajo del 10 % en vivienda usada.
-    test.fail();
+  test('1462 los gastos de compra de la guía y la FAQ salen de data/itp-ccaa, no de un «10-15 %» a mano', async ({ page }) => {
+    // Comprobación independiente de ./cifras.ts: se recalcula aquí con el motor de compraventa.
     const precio = 200_000;
-    const usada = (Object.keys(ITP_CCAA) as ComunidadAutonoma[]).map((c) => (calcularITP(precio, c) + calcularNotario(precio) + calcularRegistro(precio)) / precio);
-    const bajoDiez = usada.filter((x) => x < 0.10).length;
+    const usada = (Object.keys(ITP_CCAA) as ComunidadAutonoma[]).map(
+      (c) => (calcularITP(precio, c, 'vivienda') + calcularNotario(precio) + calcularRegistro(precio)) / precio,
+    );
+    expect(Math.round(Math.min(...usada) * 1000) / 10).toBe(3.5);
+    expect(Math.round(Math.max(...usada) * 1000) / 10).toBe(10.5);
     await abrirTest(page);
     const faq = await faqServido(page);
-    const anuncia = faq.includes('entre el 10% y el 15% adicional del precio');
-    expect(anuncia && bajoDiez > 0, `${bajoDiez} de ${usada.length} territorios bajo el 10 %`).toBe(false);
+    expect(faq).not.toMatch(/10% y (el )?15%/);
+    expect(faq).toContain(`En cuanto a los gastos, en España, ${FRASE_GASTOS_HOY}. Para una vivienda usada de 200.000 €, eso supone reunir entre 47.000 € y 61.000 €, según la comunidad.`);
+    await responderEtiquetas(page, NORMAL);
+    const guia = await guiaDesplegada(page);
+    expect(guia).not.toMatch(/10% y (un )?15%/);
+    expect(guia).toContain(`pero los gastos no: en España, ${FRASE_GASTOS_HOY}.`);
   });
 
-  test('la guía y la FAQ dan el mismo plazo para que comprar compense', async ({ page }) => {
-    // HALLAZGO abierto: la guía dice «La regla general es que necesitas entre 5 y 8 años» y, más
-    // abajo, «más de 7-10 años»; la FAQ, «generalmente en 7 a 12 años». Ninguno cita fuente.
-    test.fail();
+  test('1463 la guía y la FAQ dicen lo mismo del plazo, sin horquillas sin fuente', async ({ page }) => {
+    const SIN_PLAZO = 'No hay un número de años que valga para todos: depende de los gastos de compra y de venta, de lo que cueste el alquiler frente a ser propietario y de cómo evolucionen los precios.';
+    const DEL_TEST = 'Este test trata un horizonte de «Menos de 3 años» como un límite (con él no recomienda comprar, digan lo que digan las demás respuestas) y uno de «Más de 7 años» o «Indefinidamente» como un factor a favor.';
     await abrirTest(page);
     const faq = await faqServido(page);
     await responderEtiquetas(page, NORMAL);
     const guia = await guiaDesplegada(page);
-    const contradice = guia.includes('entre 5 y 8 años') && faq.includes('7 a 12 años');
-    expect(contradice).toBe(false);
+    for (const [donde, t] of [['FAQ', faq], ['guía', guia]] as const) {
+      expect(t, donde).toContain(`${SIN_PLAZO}`);
+      expect(t, donde).toContain(DEL_TEST);
+      expect(t, donde).not.toMatch(/5 y 8 años|7 a 12 años|7-10 años|próximos 5 años|estudios sobre el mercado/);
+    }
   });
 
-  test('tema claro: el veredicto «esperar» y «alquilar» se lee (texto grande, 3:1)', async ({ page }) => {
-    // HALLAZGO abierto: el título del veredicto es la cifra principal de la app (24 px en negrita).
-    // «Espera antes de decidir» va en #e8a020 = 2,22:1 y «Por ahora, mejor alquilar» en --secondary
-    // = 2,80:1. «Esperar» sale en 667.152 de las 1.048.576 combinaciones. En oscuro pasan (6,22 y 6,17).
-    test.fail();
-    await abrirTest(page);
-    await responderEtiquetas(page, MAS_7);
-    const espera = await contraste(page, '[class*="veredictoValor"]');
-    await abrirTest(page);
-    await responderEtiquetas(page, MENOS_8);
-    const alquila = await contraste(page, '[class*="veredictoValor"]');
-    expect(Math.min(espera, alquila), `espera ${espera.toFixed(2)} · alquila ${alquila.toFixed(2)}`).toBeGreaterThanOrEqual(3);
+  test('1464 tema claro: el título del veredicto se lee en los tres casos', async ({ page }) => {
+    // Esperar #9A6200 = 5,1:1 sobre la tarjeta blanca (era #e8a020, 2,22) · alquilar
+    // --secondary-texto #327874 = 5,15 (era --secondary, 2,80) · comprar --primary-texto 5,47.
+    const casos: [readonly string[], string, number][] = [
+      [MAS_7, 'Espera antes de decidir', 5.1],
+      [MENOS_8, 'Por ahora, mejor alquilar', 5.15],
+      [NORMAL, 'Tu situación apunta a comprar', 5.47],
+    ];
+    for (const [perfil, titulo, esperado] of casos) {
+      await abrirTest(page);
+      await responderEtiquetas(page, perfil);
+      await expect(page.locator('[class*="veredictoValor"]')).toHaveText(titulo);
+      expect(await contraste(page, '[class*="veredictoValor"]'), titulo).toBeCloseTo(esperado, 1);
+    }
   });
 
-  test('«alquilar» no pide ahorrar para la entrada a quien tiene más del 30 %', async ({ page }) => {
-    // HALLAZGO abierto: los próximos pasos son fijos por veredicto. Barrido: 20.585 perfiles con
-    // «Más del 30%» (y 33.027 con «Entre el 20% y el 30%») salen en «alquilar» y reciben
-    // «Establece un objetivo de ahorro para la entrada».
-    test.fail();
+  test('1465 los próximos pasos no piden ahorrar para la entrada a quien ya la tiene', async ({ page }) => {
+    // ALQUILA_CON_AHORRO: −16, «alquilar», con «Más del 30%».
     await abrirTest(page);
     await responderEtiquetas(page, ALQUILA_CON_AHORRO);
-    const texto = await textoResultado(page);
-    const alquila = texto.includes('Por ahora, mejor alquilar');
-    expect(alquila && texto.includes('Más del 30%') && texto.includes('Establece un objetivo de ahorro para la entrada')).toBe(false);
+    await expect(page.locator('[class*="veredictoValor"]')).toHaveText('Por ahora, mejor alquilar');
+    expect(await proximos(page)).toEqual([
+      'Define un plazo en el que revisarás esta decisión (1-2 años)',
+      'Tu ahorro ya alcanza la entrada: lo que inclina el resultado hacia el alquiler son otros factores',
+      'Sigue el mercado de tu zona sin prisas',
+      'Compara con la calculadora de alquiler vs compra cuando tengas datos concretos',
+    ]);
+    // Barrido: ningún perfil con el 20 % o más recibe un paso que le pida ahorrar para la entrada
+    // (antes: 20.585 con «Más del 30%» y 33.027 con «Entre el 20% y el 30%» en «alquilar»).
+    test.setTimeout(90_000);
+    const n = contar((r) =>
+      ['suficiente', 'holgado'].includes(r.ahorro) &&
+      calcularResultado(r).proximosPasos.some((p) => /objetivo de ahorro|ahorra para la entrada/.test(p)),
+    );
+    expect(n).toBe(0);
   });
 
-  test('la FAQ no atribuye a los primeros años unos intereses del 30-50 % del capital', async ({ page }) => {
-    // HALLAZGO abierto: 200.000 € al 3 % a 30 años (cuota 843,21 €): los intereses de los cinco
-    // primeros años son 28.405 € = 14,2 % del capital; los de toda la vida, 103.555 € = 51,8 %.
-    // Lo que supera el 50 % en los primeros años es la parte de INTERÉS de cada cuota (58,7 %).
-    test.fail();
-    await abrirTest(page);
-    expect(await faqServido(page)).not.toContain('pueden superar el 30-50% del capital en los primeros años');
-  });
-
-  test('la FAQ de ahorros no ignora el aval ICO que recoge data/fiscal', async ({ page }) => {
-    // HALLAZGO abierto: data/fiscal/ayudas-personas.ts ('aval-ico-vivienda'): aval del Estado para
-    // jóvenes y familias con hijos menores «sin necesidad de ahorrar el 20% inicial». La FAQ dice,
-    // sin matiz, «necesitas cubrir el 20% restante con ahorros propios».
-    test.fail();
+  test('1466 la FAQ da el peso de los intereses con un ejemplo calculado, no «30-50 % del capital en los primeros años»', async ({ page }) => {
+    // Sistema francés, 200.000 € al 3 % a 30 años, calculado aquí aparte: cuota 843,21 €;
+    // intereses del primer año 5.942,90 € sobre 10.118,50 € pagados = 58,7 %; intereses totales
+    // 843,2081 × 360 − 200.000 = 103.554,90 €.
+    const i = 0.03 / 12;
+    const cuota = (200_000 * i) / (1 - (1 + i) ** -360);
+    expect(cuota).toBeCloseTo(843.21, 2);
+    expect(cuota * 360 - 200_000).toBeCloseTo(103_554.9, 0);
     await abrirTest(page);
     const faq = await faqServido(page);
-    expect(faq.includes('necesitas cubrir el 20% restante con ahorros propios') && !/aval/i.test(faq)).toBe(false);
+    expect(faq).not.toContain('30-50%');
+    expect(faq).toContain('los intereses de la hipoteca (por ejemplo, con 200.000 € al 3 % a 30 años, el 58,7 % de lo que se paga el primer año son intereses, y en toda la vida del préstamo suman unos 103.555 €)');
   });
 
-  test('monta el aviso de región (§1.bis): hipoteca, ITP, AJD e IBI son de España', async ({ page }) => {
-    // HALLAZGO abierto: mismo caso que selector-mascota 1340 y selector-calefaccion 1400.
-    test.fail();
+  test('1467 la FAQ de ahorros nombra el aval ICO de data/fiscal', async ({ page }) => {
     await abrirTest(page);
-    await expect(page.locator('[role="note"][aria-label*="España"]')).toHaveCount(1, { timeout: 2_000 });
+    const faq = await faqServido(page);
+    expect(faq).not.toContain('necesitas cubrir el 20% restante con ahorros propios');
+    expect(faq).toContain('La excepción es el Aval ICO para primera vivienda: Aval del Estado que cubre parte de la entrada de la hipoteca');
   });
 
-  test('lleva <DataReference> tras el aviso, porque publica cifras normativas', async ({ page }) => {
-    // HALLAZGO abierto: gastos de compra (ITP o IVA, AJD), 80 % de financiación: sin normativa,
-    // fuente ni fecha de verificación (política de disclaimers, «App sin DataReference»).
-    test.fail();
+  test('1468 monta el aviso de región tras el hero', async ({ page }) => {
     await abrirTest(page);
-    await expect(page.locator('[role="note"][aria-label="Datos de referencia normativos"]')).toHaveCount(1, { timeout: 2_000 });
+    const region = page.locator('[role="note"][aria-label*="España"]');
+    await expect(region).toHaveCount(1);
+    await expect(region).toContainText('Datos de referencia: España (impuestos, gastos de compra, financiación y ayudas).');
   });
 
-  test('el JSON-LD WebApplication declara sus funciones (§1.ter)', async ({ page }) => {
-    // HALLAZGO abierto: metadata.ts exporta jsonLd con `features: []`; el servido lleva
-    // "featureList":[] (las 8 funciones solo están en la etiqueta meta `schema:WebApplication`).
-    test.fail();
+  test('1469 lleva <DataReference> justo después del aviso de responsabilidad', async ({ page }) => {
+    await abrirTest(page);
+    const ref = page.locator('[role="note"][aria-label="Datos de referencia normativos"]');
+    await expect(ref).toHaveCount(1);
+    await expect(ref).toContainText('Gastos de compra de vivienda (ITP, IVA y AJD)');
+    await expect(ref).toContainText('Financiación habitual de hasta el 80 % del valor de tasación: Banco de España, Portal del Cliente Bancario (12/03/2024).');
+    // Orden en el DOM: el DisclaimerCard y, a continuación, el sello.
+    const siguiente = await page.locator('[class*="disclaimerCard"]').first().evaluate((el) => el.nextElementSibling?.getAttribute('aria-label') ?? '');
+    expect(siguiente).toBe('Datos de referencia normativos');
+  });
+
+  test('1470 el JSON-LD WebApplication declara sus 7 funciones', async ({ page }) => {
     await abrirTest(page);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques.map((b) => JSON.parse(b) as { '@type'?: string; featureList?: string[] }).find((j) => j['@type'] === 'WebApplication');
-    expect(app?.featureList?.length ?? 0).toBeGreaterThanOrEqual(4);
+    expect(app?.featureList).toHaveLength(7);
+    expect(app?.featureList).toContain('Avisa cuando el ahorro para la entrada o el plazo de permanencia impiden recomendar la compra');
   });
 
-  test('tema claro: los textos pequeños en color de marca llegan a 4,5:1', async ({ page }) => {
-    // HALLAZGO abierto: «Pregunta N de 10» (--primary, 13,6 px) 3,93 · razonesTitulo (--primary,
-    // 14,4 px) 3,67 · «← Repetir el test» 3,93. Misma forma que selector-mascota 1343; allí se
-    // resolvió con --primary-texto. Ningún candado lo mira.
-    test.fail();
+  test('1471 tema claro: los textos pequeños de marca llegan a 4,5:1', async ({ page }) => {
+    // --primary-texto #26718F: 5,47 sobre blanco; sobre el fondo de la página y de la sección de
+    // razones (capa azul al 6 %) queda algo por debajo, y por encima de 4,5.
     await abrirTest(page);
     const paso = await contraste(page, '[class*="progresoPaso"]');
     await responderEtiquetas(page, NORMAL);
@@ -524,13 +609,69 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
     expect(Math.min(paso, titulo, repetir), `paso ${paso.toFixed(2)} · razones ${titulo.toFixed(2)} · repetir ${repetir.toFixed(2)}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('de familia: el hero del resultado se lee (subtítulo a 4,5:1)', async ({ page }) => {
-    // HALLAZGO abierto (de FAMILIA, lo tienen también las referencias): .heroResultados usa
-    // linear-gradient(--primary → --secondary) y no --hero-bg. Subtítulo 2,87 en claro y 2,21 en
-    // oscuro; el <h1> 3,29 / 2,46; «Empezar el test» 3,20 / 2,42; «Siguiente» 3,26 / 2,44.
-    test.fail();
+  test('1472 de familia: hero del resultado sobre --hero-bg, y botones sobre --primary-boton, en los dos temas', async ({ page }) => {
+    // Blanco sobre #1a5278 = 8,33 (el subtítulo lleva opacidad 0,88) · sobre #26718F = 5,47.
+    for (const oscuro of [false, true]) {
+      await abrirTest(page);
+      if (oscuro) await temaOscuro(page);
+      const tema = oscuro ? 'oscuro' : 'claro';
+      await page.locator('[role="radio"]').first().click();
+      await expect(page.locator('[class*="btnSiguiente"]')).toHaveCSS('opacity', '1');
+      expect(await contraste(page, '[class*="btnSiguiente"]'), `Siguiente (${tema})`).toBeCloseTo(5.47, 1);
+      for (let i = 0; i < NORMAL.length; i++) {
+        await page.locator('[role="radiogroup"] [role="radio"]', { has: page.getByText(NORMAL[i], { exact: true }) }).click();
+        await page.getByRole('button', { name: i === NORMAL.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+      }
+      await page.getByRole('heading', { name: 'Tu resultado' }).waitFor();
+      await expect(page.locator('[class*="heroResultados"]')).toHaveCSS('background-image', 'none');
+      await expect(page.locator('[class*="heroResultados"]')).toHaveCSS('background-color', 'rgb(26, 82, 120)');
+      expect(await contraste(page, '[class*="heroTitleSm"]'), `h1 (${tema})`).toBeCloseTo(8.33, 1);
+      expect(await contraste(page, '[class*="heroSubtitleSm"]'), `subtítulo (${tema})`).toBeGreaterThanOrEqual(4.5);
+    }
+    // «Empezar el test →», en la intro.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-alquiler-vs-compra/');
+    await esperarHidratacionBotones(page);
+    expect(await contraste(page, '[class*="btnStart"]'), 'Empezar').toBeCloseTo(5.47, 1);
+  });
+
+  test('familia g: al pulsar «Ver resultado» el foco va al encabezado del resultado, no a <body>', async ({ page }) => {
     await abrirTest(page);
     await responderEtiquetas(page, NORMAL);
-    expect(await contraste(page, '[class*="heroSubtitleSm"]')).toBeGreaterThanOrEqual(4.5);
+    await expect(page.getByRole('heading', { name: 'Tu resultado' })).toBeFocused();
   });
+});
+
+// Visto en la sesión de reparación del 24/09/2026 (la misma forma que las hermanas de seguros):
+// a 360 y 390 px la barra fija del logo (10-52 px) tapaba el título de la intro (46-84 px) y el
+// «Tu resultado» (31-61 px). Mide el TEXTO de h1/h2 contra las cajas de la barra fija.
+test('móvil y escritorio: el logo fijo no tapa el título, ni en la intro ni en el resultado', async ({ page }) => {
+  const solapes: string[] = [];
+  const medir = (momento: string) => page.evaluate((m) => {
+    window.scrollTo(0, 0);
+    const fuera: string[] = [];
+    const fijos = Array.from(document.querySelectorAll('[class*="headerBar"] > *')).map((e) => e.getBoundingClientRect());
+    for (const h of Array.from(document.querySelectorAll('h1, h2')).slice(0, 3)) {
+      const rango = document.createRange();
+      rango.selectNodeContents(h);
+      for (const t of Array.from(rango.getClientRects())) for (const f of fijos) {
+        if (t.left < f.right && f.left < t.right && t.top < f.bottom && f.top < t.bottom) {
+          fuera.push(`${m}: «${(h.textContent ?? '').slice(0, 30)}» ${Math.round(t.top)}-${Math.round(t.bottom)} bajo ${Math.round(f.top)}-${Math.round(f.bottom)}`);
+        }
+      }
+    }
+    return fuera;
+  }, momento);
+  for (const ancho of [360, 390, 768, 1024, 1280]) {
+    await page.setViewportSize({ width: ancho, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-alquiler-vs-compra/');
+    await esperarHidratacionBotones(page);
+    solapes.push(...(await medir(`${ancho}px intro`)));
+    await page.getByRole('button', { name: /Empezar el test/ }).click();
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await responder(page, Array(10).fill(0));
+    solapes.push(...(await medir(`${ancho}px resultado`)));
+  }
+  expect(solapes).toEqual([]);
 });

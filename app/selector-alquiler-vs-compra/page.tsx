@@ -1,12 +1,70 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorAlquilerVsCompra.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
+import {
+  MeskeiaLogo,
+  Footer,
+  LegalNotice,
+  RelatedApps,
+  EducationalSection,
+  ShareCard,
+  DisclaimerCard,
+  DataReference,
+  RegionBadge,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularResultado, PREGUNTAS, VEREDICTOS, UMBRAL, puntuacionConSigno, type Resultado } from './motor';
+import {
+  calcularResultado,
+  PREGUNTAS,
+  VEREDICTOS,
+  UMBRAL,
+  DESCRIPCION_LIMITADA,
+  FRASE_PLAZO_DEL_TEST,
+  FRASE_SIN_PLAZO_UNIVERSAL,
+  puntuacionConSigno,
+  type Limite,
+  type Resultado,
+} from './motor';
+import {
+  AVAL_ICO,
+  ENTRADA_HABITUAL,
+  FINANCIACION_HABITUAL,
+  FRASE_GASTOS,
+  RANGO_GASTOS_USADA,
+  REFERENCIA_NORMATIVA,
+  porcentaje,
+} from './cifras';
 
-// Las preguntas con sus puntos, los veredictos y la lógica viven en ./motor.ts.
+// Las preguntas con sus puntos, los veredictos y la lógica viven en ./motor.ts; las cifras que
+// salen de la normativa o de una fuente externa, en ./cifras.ts.
+
+/**
+ * Por qué un límite aparta «comprar», con las cifras de ./cifras.ts (hallazgos 1459 y 1460).
+ */
+function AvisoLimite({ limite }: { limite: Limite }) {
+  if (limite.id === 'ahorro') {
+    return (
+      <p className={styles.avisoLimite} role="note" data-limite="ahorro">
+        <span aria-hidden="true">⚠️</span> Has declarado un ahorro de «{limite.etiqueta}». El banco suele
+        financiar como máximo el {porcentaje(FINANCIACION_HABITUAL.maximo)} del valor de tasación (según el
+        Banco de España), así que la entrada —el {porcentaje(ENTRADA_HABITUAL)}— y los gastos de compra salen
+        del ahorro. En España, {FRASE_GASTOS}. Con menos del {porcentaje(ENTRADA_HABITUAL)} no se llega ni a
+        la entrada. La vía que existe para ese hueco es el {AVAL_ICO.nombre}: {AVAL_ICO.descripcion}{' '}
+        <a href={AVAL_ICO.url} className={styles.avisoEnlace}>Comprueba si cumples sus requisitos</a>.
+      </p>
+    );
+  }
+  return (
+    <p className={styles.avisoLimite} role="note" data-limite="horizonte">
+      <span aria-hidden="true">⚠️</span> Has declarado que prevés quedarte «{limite.etiqueta}». Los gastos de
+      compra no se recuperan al vender ({RANGO_GASTOS_USADA} del precio solo en impuestos, notaría y registro
+      de una vivienda usada, más los de la venta), y en tan poco tiempo solo compensan si la vivienda se
+      revaloriza o si el alquiler que te ahorras supera con creces lo que cuesta ser propietario: ninguna de
+      las dos cosas se puede dar por hecha.
+    </p>
+  );
+}
 
 // ─────────────────────────────────────────────
 // Helpers para mostrar etiqueta de respuesta
@@ -30,6 +88,13 @@ export default function SelectorAlquilerVsCompra() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+
+  // Al pulsar «Ver resultado» el test se desmonta con el botón que tenía el foco, que caía a
+  // <body>: se lleva al encabezado del resultado (familia de selectores, punto g).
+  const encabezadoResultado = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (pantalla === 'resultado') encabezadoResultado.current?.focus();
+  }, [pantalla]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
@@ -75,15 +140,30 @@ export default function SelectorAlquilerVsCompra() {
         </header>
       ) : (
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu resultado</h1>
+          <h1 className={styles.heroTitleSm} ref={encabezadoResultado} tabIndex={-1}>Tu resultado</h1>
           <p className={styles.heroSubtitleSm}>
             {resultado ? VEREDICTOS[resultado.veredicto].titulo : ''}
           </p>
         </header>
       )}
 
+      {/* Hipoteca, ITP, IVA de obra nueva, AJD, IBI y el aval ICO son de España; el test sobre la
+          situación personal vale en cualquier país (hallazgo 1468). */}
+      <RegionBadge
+        variant="es-data"
+        text="Datos de referencia: España (impuestos, gastos de compra, financiación y ayudas). El test sobre tu situación vale en cualquier país"
+      />
+
       <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />
+      {/* Publica gastos de compra y financiación, que caducan: normativa, fuente y fecha (hallazgo 1469). */}
+      <DataReference
+        normativa={REFERENCIA_NORMATIVA.normativa}
+        fuente={REFERENCIA_NORMATIVA.fuente}
+        verificado={REFERENCIA_NORMATIVA.verificado}
+        urlOficial={REFERENCIA_NORMATIVA.urlOficial}
+        nota={REFERENCIA_NORMATIVA.nota}
+      />
 
       {pantalla === 'inicio' && (
         <div className={styles.introContainer}>
@@ -198,8 +278,15 @@ export default function SelectorAlquilerVsCompra() {
             </span>
             <p className={styles.veredictoLabel}>{VEREDICTOS[resultado.veredicto].etiqueta}</p>
             <p className={styles.veredictoValor}>{VEREDICTOS[resultado.veredicto].titulo}</p>
-            <p className={styles.veredictoDesc}>{VEREDICTOS[resultado.veredicto].descripcion}</p>
+            <p className={styles.veredictoDesc}>
+              {resultado.limitado ? DESCRIPCION_LIMITADA : VEREDICTOS[resultado.veredicto].descripcion}
+            </p>
           </div>
+
+          {/* Lo declarado que la puntuación no puede compensar, dicho a la cara (hallazgos 1459, 1460). */}
+          {resultado.limitado && resultado.limites.map((limite) => (
+            <AvisoLimite key={limite.id} limite={limite} />
+          ))}
 
           {/* Grid de 4 factores clave */}
           <div className={styles.factoresGrid}>
@@ -248,6 +335,7 @@ export default function SelectorAlquilerVsCompra() {
               Tu puntuación total es {puntuacionConSigno(resultado.puntuacion)}: a partir de{' '}
               {puntuacionConSigno(UMBRAL)} la orientación es comprar, hasta {puntuacionConSigno(-UMBRAL)} alquilar,
               y entre medias, esperar.
+              {resultado.limitado && ' Aquí pasa de ese umbral, pero lo que has declarado arriba impide recomendar la compra.'}
             </p>
             {resultado.razones.length > 0 ? (
               resultado.razones.map((razon) => (
@@ -272,7 +360,7 @@ export default function SelectorAlquilerVsCompra() {
           {/* Próximos pasos */}
           <div className={styles.proximosSection}>
             <p className={styles.proximosTitulo}>Próximos pasos</p>
-            {VEREDICTOS[resultado.veredicto].proximosPasos.map((paso, i) => (
+            {resultado.proximosPasos.map((paso, i) => (
               <p key={i} className={styles.proximoItem}>{paso}</p>
             ))}
           </div>
@@ -291,13 +379,19 @@ export default function SelectorAlquilerVsCompra() {
             subtitle="Más allá de los números, los factores que realmente importan al decidir entre arriendo y compra"
             defaultOpen={false}
           >
-            <h3>La regla del break-even: cuántos años necesitas</h3>
+            {/* Las cifras salen de ./cifras.ts y el plazo de ./motor.ts, lo mismo que lee la FAQ.
+                Decía «entre un 10% y un 15%» de gastos, escrito a mano (hallazgo 1462), y «entre 5 y
+                8 años» frente a los «7 a 12» de la FAQ (hallazgo 1463). */}
+            <h3>El punto de equilibrio: cuántos años hacen falta</h3>
             <p>
-              Comprar tiene costes iniciales muy elevados: entrada (20-30%), gastos notariales, impuestos
-              (ITP o IVA, AJD) y tasación. En total, entre un 10% y un 15% adicional sobre el precio.
-              Si tienes que vender antes de amortizarlos, perderás dinero casi con certeza. La regla
-              general es que necesitas <strong>entre 5 y 8 años</strong> en la misma vivienda para que
-              la compra compense frente al alquiler, dependiendo del mercado.
+              Comprar tiene costes iniciales que no se recuperan al vender. La entrada sigue siendo
+              patrimonio tuyo (el banco suele financiar como máximo el {porcentaje(FINANCIACION_HABITUAL.maximo)} del
+              valor de tasación, así que el {porcentaje(ENTRADA_HABITUAL)} restante sale del ahorro), pero los gastos no:
+              en España, {FRASE_GASTOS}. Si tienes que vender antes de amortizarlos, pierdes esa parte,
+              más los gastos de la venta.
+            </p>
+            <p>
+              {FRASE_SIN_PLAZO_UNIVERSAL} {FRASE_PLAZO_DEL_TEST}
             </p>
 
             <h3>Costes ocultos de la compra que nadie menciona</h3>
@@ -330,8 +424,8 @@ export default function SelectorAlquilerVsCompra() {
             </p>
             <ul>
               <li>Estabilidad laboral sólida (indefinido o autónomo consolidado +3 años).</li>
-              <li>Horizonte temporal de más de 7-10 años en la misma zona.</li>
-              <li>Ahorro suficiente para la entrada sin agotar el colchón de emergencia.</li>
+              <li>Horizonte de más de 7 años en la misma zona (el tramo que este test puntúa a favor).</li>
+              <li>Ahorro para la entrada y los gastos sin agotar el colchón de emergencia, o acceso al {AVAL_ICO.nombre} si cumples sus requisitos.</li>
               <li>Cuota hipotecaria razonable respecto a tus ingresos netos (como referencia orientativa, los bancos suelen exigir que no supere el 30-35%, pero esta cifra varía según tu perfil completo de ingresos y gastos).</li>
               <li>Mercado donde el alquiler es proporcionalmente más caro que la hipoteca equivalente.</li>
             </ul>
