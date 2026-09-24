@@ -1642,6 +1642,8 @@ test.describe('simulador-genetica · grupo sanguíneo ABO en el motor', () => {
 test.describe('simulador-genetica · grupo sanguíneo ABO en el navegador', () => {
   async function abreABO(page: Page): Promise<void> {
     await page.goto(RUTA);
+    // Sin el ABO, ni rastro del enlace a la sangre: no es para el público de Mendel.
+    await expect(page.locator('a[href="/visualizador-sangre-componentes/"]')).toHaveCount(0);
     await page.getByRole('button', { name: /Humanos/ }).click();
     await selectorRasgo(page, 0).selectOption('grupo-abo');
     await expect(selectorGenotipo(page, 0)).toHaveValue('AO');
@@ -1662,6 +1664,10 @@ test.describe('simulador-genetica · grupo sanguíneo ABO en el navegador', () =
     await expect(genotiposDeCelda(page)).toHaveText(['IᴬIᴮ', 'Iᴮi', 'Iᴬi', 'ii']);
     await expect(fenotiposDeCelda(page)).toHaveText(['Grupo AB', 'Grupo B', 'Grupo A', 'Grupo O']);
 
+    // Con el ABO en el cruce aparece el enlace a la compatibilidad de grupos, y solo entonces.
+    const enlaceSangre = page.locator('a[href="/visualizador-sangre-componentes/"]');
+    await expect(enlaceSangre).toHaveCount(1);
+
     const { genotipos, fenotipos } = await estadisticas(page);
     expect(fenotipos.filas).toHaveLength(4);
     for (const fila of fenotipos.filas) expect(fila).toMatch(/Grupo (A|B|AB|O) 25%$/);
@@ -1677,6 +1683,8 @@ test.describe('simulador-genetica · grupo sanguíneo ABO en el navegador', () =
     await expect(selectorGenotipo(page, 3)).toHaveValue('Dd');
 
     await expect(genotiposDeCelda(page)).toHaveCount(16);
+    // Con el ABO como primer rasgo del dihíbrido el enlace sigue a la vista.
+    await expect(page.locator('a[href="/visualizador-sangre-componentes/"]')).toHaveCount(1);
     const { fenotipos } = await estadisticas(page);
     expect(fenotipos.filas.some((f) => f.includes('Grupo O / Rh negativo') && f.endsWith('6,25%'))).toBe(true);
     expect(fenotipos.filas.some((f) => f.includes('Grupo AB / Rh positivo') && f.endsWith('18,75%'))).toBe(true);

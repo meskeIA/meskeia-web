@@ -1454,7 +1454,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sistemas-circulatorios/', icon: '❤️', name: 'Sistemas Circulatorios', description: 'Del corazón de 2 al de 4 cámaras' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Glóbulos blancos en acción' },
     { url: '/visualizador-digestion-nutrientes/', icon: '🍎', name: 'Digestión y Nutrientes', description: 'Nutrientes que viajan en sangre' },
-    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+    { url: '/simulador-genetica/', icon: '🧬', name: 'Genética Mendeliana', description: '¿Qué grupo sanguíneo tendrán los hijos? Cruces ABO y Rh' },
   ],
   'visualizador-adn-codigo-genetico': [
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Donde vive el ADN' },

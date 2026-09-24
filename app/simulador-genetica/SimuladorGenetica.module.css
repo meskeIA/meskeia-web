@@ -178,6 +178,23 @@
   font-style: italic;
 }
 
+/* Enlace dentro del texto del rasgo: --primary-texto y no --primary, que como texto sobre
+   fondo claro se queda en 4,11:1. El token ya se aclara solo en el tema oscuro. */
+.enlaceRasgo {
+  color: var(--primary-texto);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-style: normal;
+}
+
+.enlaceRasgo:hover {
+  text-decoration-thickness: 2px;
+}
+
+[data-theme='dark'] .enlaceRasgo {
+  color: var(--primary-texto);
+}
+
 /* Selectores de Padres */
 .parentsContainer {
   display: grid;

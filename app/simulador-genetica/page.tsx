@@ -292,6 +292,18 @@ export default function SimuladorGeneticaPage() {
               </div>
             )}
 
+            {/* Solo con el ABO en el cruce: la pregunta que sigue a «qué grupo tendrán los
+                hijos» es «a quién pueden donar», y esa la responde otra app. Va en el texto y
+                no como tarjeta de RelatedApps, cuyas cuatro plazas son del público de Mendel. */}
+            {rasgosDelCruce.some((r) => r.id === 'grupo-abo') && (
+              <p className={styles.inheritanceInfo}>
+                ¿Qué grupo puede donar sangre a cuál?{' '}
+                <a href="/visualizador-sangre-componentes/" className={styles.enlaceRasgo}>
+                  Compatibilidad de grupos en Componentes de la Sangre
+                </a>
+              </p>
+            )}
+
             {/* Selectores de Padres */}
             <div className={styles.parentsContainer}>
               {/* Padre 1 */}
