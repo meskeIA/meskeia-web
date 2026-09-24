@@ -2,130 +2,27 @@
 
 import React, { useState } from 'react';
 import styles from './SelectorMascota.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
+import { calcularResultado, MASCOTAS, ETIQUETA_MENSUAL, type Resultado } from './motor';
+import {
+  MeskeiaLogo,
+  Footer,
+  LegalNotice,
+  RegionBadge,
+  RelatedApps,
+  EducationalSection,
+  ShareCard,
+  DisclaimerCard,
+} from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
 // ─────────────────────────────────────────────
 
-type MascotaKey = 'perro-pequeno' | 'perro-mediano' | 'perro-grande' | 'gato' | 'roedor' | 'pez' | 'pajaro' | 'reptil';
-
 interface Opcion { valor: string; etiqueta: string; desc: string; }
 interface Pregunta { id: number; categoria: string; pregunta: string; icon: string; opciones: Opcion[]; }
 
-interface MascotaInfo {
-  nombre: string;
-  perfil: string;
-  icon: string;
-  costeInicial: string;
-  costeMensual: string;
-  esperanzaVida: string;
-  descripcion: string;
-  pros: string[];
-  contras: string[];
-}
-
-interface Resultado {
-  mascota: MascotaKey;
-  razones: string[];
-  consejos: string[];
-}
-
-// ─────────────────────────────────────────────
-// Datos de mascotas
-// ─────────────────────────────────────────────
-
-const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
-  'perro-pequeno': {
-    nombre: 'Perro pequeño',
-    perfil: 'Razas toy o miniatura (Chihuahua, Yorkshire, Bichón…)',
-    icon: '🐕',
-    costeInicial: '500 – 2.000 €',
-    costeMensual: '80 – 150 €',
-    esperanzaVida: '12 – 18 años',
-    descripcion: 'Compañero muy afectivo y adaptable a espacios pequeños. Necesita paseos diarios aunque cortos. Muy longevo comparado con razas grandes.',
-    pros: ['Adaptado a piso sin jardín', 'Muy longevo (hasta 18 años)', 'Fácil de transportar', 'Poco consumo de comida'],
-    contras: ['Necesita paseos diarios', 'Muy dependiente del dueño', 'Veterinario y peluquería regulares', 'Puede ser más nervioso/ladrador'],
-  },
-  'perro-mediano': {
-    nombre: 'Perro mediano',
-    perfil: 'Spaniel, Beagle, Border Collie, mestizos…',
-    icon: '🐶',
-    costeInicial: '300 – 1.500 €',
-    costeMensual: '100 – 200 €',
-    esperanzaVida: '10 – 14 años',
-    descripcion: 'El equilibrio entre compañía, ejercicio y espacio. Versátil para ciudad y campo. Ideal para familias activas.',
-    pros: ['Muy versátil', 'Ideal para familias con niños', 'Gran variedad de carácter', 'Adopción muy disponible'],
-    contras: ['Requiere ejercicio diario (30-60 min)', 'No apto para ausencias largas', 'Coste veterinario relevante', 'Necesita adiestramiento básico'],
-  },
-  'perro-grande': {
-    nombre: 'Perro grande',
-    perfil: 'Labrador, Pastor Alemán, Golden, Mastín…',
-    icon: '🦮',
-    costeInicial: '400 – 2.000 €',
-    costeMensual: '150 – 280 €',
-    esperanzaVida: '8 – 12 años',
-    descripcion: 'Compañero fiel y protector. Requiere espacio, ejercicio abundante y compromiso económico mayor. Ideal con jardín o acceso fácil a zonas verdes.',
-    pros: ['Fidelidad y vínculo muy profundo', 'Excelente con niños', 'Buen perro guardián', 'Temperamento generalmente tranquilo'],
-    contras: ['Necesita mucho espacio y ejercicio', 'Coste alimentación elevado', 'Veterinario más caro', 'Menor esperanza de vida'],
-  },
-  gato: {
-    nombre: 'Gato',
-    perfil: 'Europeo común, Siamés, Persa, Maine Coon…',
-    icon: '🐱',
-    costeInicial: '100 – 1.500 €',
-    costeMensual: '50 – 120 €',
-    esperanzaVida: '12 – 20 años',
-    descripcion: 'Independiente pero afectivo en sus propios términos. No necesita paseos, tolera bien las ausencias de un día. Ideal para personas con ritmo de vida ocupado.',
-    pros: ['Muy independiente', 'Sin paseos obligatorios', 'Coste mensual moderado', 'Longevo y adaptable a piso'],
-    contras: ['Puede ser difícil de "entrenar"', 'Pelo y alergias frecuentes', 'Arañazos en muebles', 'Necesita bandeja de arena limpia'],
-  },
-  roedor: {
-    nombre: 'Roedor',
-    perfil: 'Hámster, cobaya, conejo, chinchilla, rata…',
-    icon: '🐹',
-    costeInicial: '30 – 150 €',
-    costeMensual: '15 – 40 €',
-    esperanzaVida: '2 – 10 años (según especie)',
-    descripcion: 'Mascotas de bajo coste y mantenimiento limitado. Ideales como primera mascota o para niños. Vida relativamente corta (salvo conejos y chinchillas).',
-    pros: ['Coste muy bajo', 'Sin paseos', 'Ocupan poco espacio', 'Buena primera mascota para niños'],
-    contras: ['Corta esperanza de vida (excepto conejos)', 'Interacción limitada', 'Activos de noche (hámster)', 'Pérdida puede ser dura para niños pequeños'],
-  },
-  pez: {
-    nombre: 'Peces',
-    perfil: 'Goldfish, tropicales, betta, marino…',
-    icon: '🐠',
-    costeInicial: '50 – 500 €',
-    costeMensual: '10 – 30 €',
-    esperanzaVida: '1 – 15 años (según especie)',
-    descripcion: 'La mascota más silenciosa y de menor interacción. Muy decorativa y relajante. El acuario requiere mantenimiento periódico pero no afecta a la vida diaria.',
-    pros: ['Sin ruido ni alérgenos', 'Sin paseos ni atención constante', 'Decorativos y relajantes', 'Compatible con alergias'],
-    contras: ['Interacción prácticamente nula', 'Acuario requiere mantenimiento semanal', 'Sensibles a cambios de agua', 'No te reconocen'],
-  },
-  pajaro: {
-    nombre: 'Pájaro',
-    perfil: 'Periquito, canario, agapornis, loro…',
-    icon: '🦜',
-    costeInicial: '30 – 800 €',
-    costeMensual: '20 – 60 €',
-    esperanzaVida: '5 – 30 años (según especie)',
-    descripcion: 'Animados y musicales. Los periquitos y canarios son económicos y relativamente fáciles. Los loros son muy inteligentes pero exigen mucha atención y estimulación.',
-    pros: ['Alegran el ambiente con sonidos', 'Bajo coste (periquitos/canarios)', 'Muy longevos (loros)', 'Sin paseos ni jardín'],
-    contras: ['Ruido puede ser molesto', 'Plumas y alérgenos en el ambiente', 'Jaula requiere limpieza frecuente', 'Loros necesitan mucha interacción'],
-  },
-  reptil: {
-    nombre: 'Reptil',
-    perfil: 'Gecko, tortuga, camaleón, serpiente…',
-    icon: '🦎',
-    costeInicial: '100 – 600 €',
-    costeMensual: '20 – 70 €',
-    esperanzaVida: '10 – 50 años (según especie)',
-    descripcion: 'Mascotas únicas para perfiles específicos. Requieren instalaciones especiales (terrario, luz UV, temperatura). Muy longevas, especialmente las tortugas.',
-    pros: ['Sin alérgenos (piel/pelo)', 'Sin ruido', 'Fascinantes para entusiastas', 'Muy longevos (tortugas)'],
-    contras: ['Interacción muy limitada', 'Instalación cara y específica', 'Alimentación viva en algunos casos', 'Nicho, no apto para todos'],
-  },
-};
+// Los datos de cada mascota y la lógica de recomendación viven en ./motor.ts.
 
 // ─────────────────────────────────────────────
 // Preguntas del test (10)
@@ -222,112 +119,10 @@ const PREGUNTAS: Pregunta[] = [
   },
 ];
 
-// ─────────────────────────────────────────────
-// Lógica de recomendación
-// ─────────────────────────────────────────────
-
-function calcularResultado(r: Record<number, string>): Resultado {
-  const razones: string[] = [];
-  const consejos: string[] = [];
-
-  // Puntos por mascota
-  const p: Record<MascotaKey, number> = {
-    'perro-pequeno': 0, 'perro-mediano': 0, 'perro-grande': 0,
-    gato: 0, roedor: 0, pez: 0, pajaro: 0, reptil: 0,
-  };
-
-  // Tiempo disponible
-  if (r[1] === 'mucho') { p['perro-mediano'] += 3; p['perro-grande'] += 3; p['perro-pequeno'] += 2; p.gato += 1; }
-  if (r[1] === 'medio') { p['perro-pequeno'] += 2; p.gato += 3; p['perro-mediano'] += 1; }
-  if (r[1] === 'poco') { p.gato += 3; p.pez += 2; p.pajaro += 1; }
-  if (r[1] === 'minimo') { p.pez += 3; p.reptil += 2; p.roedor += 1; }
-
-  // Horas solo
-  if (r[2] === 'siempre') { p['perro-grande'] += 2; p['perro-mediano'] += 2; }
-  if (r[2] === 'pocas') { p['perro-pequeno'] += 1; p.gato += 1; }
-  if (r[2] === 'muchas') { p.gato += 3; p.pez += 2; p.pajaro += 1; }
-  if (r[2] === 'viajes') { p.pez += 3; p.reptil += 2; p.roedor += 1; p.gato -= 1; }
-
-  // Espacio
-  if (r[3] === 'jardin') { p['perro-grande'] += 3; p['perro-mediano'] += 2; }
-  if (r[3] === 'piso_grande') { p['perro-mediano'] += 2; p['perro-pequeno'] += 1; p.gato += 2; }
-  if (r[3] === 'piso_normal') { p['perro-pequeno'] += 2; p.gato += 2; }
-  if (r[3] === 'piso_pequeno') { p.gato += 3; p.pez += 2; p.roedor += 2; p.pajaro += 1; }
-
-  // Actividad física
-  if (r[4] === 'mucho') { p['perro-grande'] += 2; p['perro-mediano'] += 2; }
-  if (r[4] === 'medio') { p['perro-mediano'] += 1; p['perro-pequeno'] += 1; }
-  if (r[4] === 'poco') { p.gato += 2; p.pez += 2; p.reptil += 1; }
-
-  // Niños
-  if (r[5] === 'si_pequenos') { p['perro-mediano'] += 1; p.roedor -= 1; p.reptil -= 2; }
-  if (r[5] === 'si_mayores') { p['perro-mediano'] += 2; p.gato += 1; p.roedor += 1; }
-  if (r[5] === 'adolescentes') { p['perro-mediano'] += 1; p.gato += 1; }
-
-  // Alergias / restricciones
-  if (r[6] === 'alergia_pelo') { p.pez += 4; p.reptil += 3; p.pajaro += 1; p.gato -= 3; p['perro-pequeno'] -= 3; p['perro-mediano'] -= 3; p['perro-grande'] -= 3; }
-  if (r[6] === 'sin_ruido') { p.pez += 3; p.reptil += 2; p.gato += 1; p.pajaro -= 2; p['perro-pequeno'] -= 1; }
-  if (r[6] === 'comunidad') { p.pez += 2; p.roedor += 1; p.gato += 1; p['perro-grande'] -= 2; }
-
-  // Vínculo buscado
-  if (r[7] === 'compania') { p['perro-pequeno'] += 2; p['perro-mediano'] += 2; p.gato += 1; }
-  if (r[7] === 'juego') { p['perro-mediano'] += 2; p.gato += 1; p.roedor += 1; }
-  if (r[7] === 'tranquilidad') { p.pez += 2; p.gato += 2; p.reptil += 1; }
-  if (r[7] === 'novedad') { p.reptil += 3; p.pajaro += 2; }
-
-  // Duración compromiso
-  if (r[8] === 'largo') { p['perro-pequeno'] += 1; p.gato += 2; p.reptil += 1; }
-  if (r[8] === 'corto') { p.roedor += 3; p.pez += 1; }
-
-  // Presupuesto inicial
-  if (r[9] === 'minimo') { p.gato += 2; p['perro-mediano'] += 1; p.roedor += 2; }
-  if (r[9] === 'muy_bajo' || r[9] === 'bajo') { p.roedor += 1; p.pez += 1; p['perro-grande'] -= 1; }
-
-  // Presupuesto mensual
-  if (r[10] === 'muy_bajo') { p.pez += 3; p.roedor += 2; p.pajaro += 1; p['perro-grande'] -= 3; p['perro-mediano'] -= 1; }
-  if (r[10] === 'bajo') { p.gato += 1; p.pajaro += 1; p['perro-pequeno'] += 1; p['perro-grande'] -= 2; }
-  if (r[10] === 'alto') { p['perro-grande'] += 2; p['perro-mediano'] += 1; }
-
-  // Determinar ganadora
-  const sorted = (Object.entries(p) as [MascotaKey, number][]).sort((a, b) => b[1] - a[1]);
-  const mascota = sorted[0][0];
-
-  // Razones
-  const info = MASCOTAS[mascota];
-  if (mascota === 'gato') {
-    razones.push('El gato encaja perfectamente con un estilo de vida ocupado: es independiente, no necesita paseos y tolera bien las ausencias.');
-    if (r[3] === 'piso_pequeno' || r[3] === 'piso_normal') razones.push('Tu espacio es ideal para un gato: se adaptan perfectamente a pisos sin necesitar jardín.');
-  }
-  if (mascota === 'perro-pequeno' || mascota === 'perro-mediano' || mascota === 'perro-grande') {
-    razones.push('Tu perfil activo y el tiempo que puedes dedicarle hace del perro tu mascota natural.');
-    if (r[5] === 'si_mayores') razones.push('Con niños de 5 a 12 años, un perro es una elección excelente: fomenta la responsabilidad y el vínculo emocional.');
-  }
-  if (mascota === 'pez') {
-    razones.push('Dado tu ritmo de vida y las restricciones existentes, los peces son la opción más compatible: sin alérgenos, sin ruido y sin paseos.');
-  }
-  if (mascota === 'roedor') {
-    razones.push('Para tu presupuesto y disponibilidad, un roedor es la mascota más práctica: bajo coste, sin paseos y cuidados sencillos.');
-  }
-  if (mascota === 'reptil') {
-    razones.push('Tu interés por algo diferente y las restricciones de alérgenos apuntan a un reptil: fascinantes, silenciosos y sin pelo.');
-  }
-  if (mascota === 'pajaro') {
-    razones.push('Un pájaro aporta alegría y compañía sin necesidad de paseos ni espacio extra, encajando bien con tu situación.');
-  }
-  razones.push(`Coste mensual estimado para ${info.nombre}: ${info.costeMensual}. Esperanza de vida: ${info.esperanzaVida}.`);
-
-  // Consejos
-  consejos.push('🏥 Antes de decidir, visita una protectora o refugio: adoptar es más económico y salvas una vida.');
-  if (mascota === 'perro-pequeno' || mascota === 'perro-mediano' || mascota === 'perro-grande') {
-    consejos.push('💉 Presupuesta seguro de salud para mascotas: una operación puede costar entre 500 y 3.000 €. Hay seguros desde 15 €/mes.');
-    consejos.push('📋 Chip, vacunas, esterilización y licencia PPP (si aplica) son gastos obligatorios los primeros meses.');
-  }
-  if (mascota === 'gato') {
-    consejos.push('✂️ La esterilización reduce problemas de salud y comportamiento: entre 100 y 250 € dependiendo del sexo y la clínica.');
-  }
-  consejos.push('⏳ Una mascota es un compromiso de años. Asegúrate de tener plan B para vacaciones, enfermedad o cambios de vida.');
-
-  return { mascota, razones, consejos };
+/** Lista legible: «A, B y C». */
+function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
 }
 
 // ─────────────────────────────────────────────
@@ -354,6 +149,12 @@ export default function SelectorMascota() {
   function retroceder() { if (paso > 0) setPaso(p => p - 1); }
   function reiniciar() { setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null); }
 
+  const ficha = resultado ? MASCOTAS[resultado.mascota] : null;
+  const porPerfil = resultado ? MASCOTAS[resultado.mascotaPorPerfil] : null;
+  const motivoRecorte = resultado && resultado.mascotaPorPerfil !== resultado.mascota
+    ? resultado.descartes[resultado.mascotaPorPerfil]
+    : undefined;
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -372,6 +173,10 @@ export default function SelectorMascota() {
           <p className={styles.heroSubtitleSm}>Resultado personalizado basado en tu estilo de vida</p>
         </header>
       )}
+
+      {/* Costes en euros, licencia PPP y normativa española en la guía: la metodología es
+          universal pero los datos de referencia no (hallazgo 1340). */}
+      <RegionBadge variant="es-data" />
 
       <LegalNotice />
       <DisclaimerCard variant="general" severity="high" />
@@ -412,8 +217,20 @@ export default function SelectorMascota() {
               <span className={styles.progresoPaso}>Pregunta {paso + 1} de {totalPreguntas}</span>
               <span className={styles.progresoCategoria}>{preguntaActual.categoria}</span>
             </div>
-            <div className={styles.progresoBar} role="progressbar" aria-label={`Pregunta ${paso + 1} de ${totalPreguntas}`} aria-valuenow={paso + 1} aria-valuemin={1} aria-valuemax={totalPreguntas}>
-              <div className={styles.progresoRelleno} style={{ width: `${progreso}%` }} />
+            <div
+              className={styles.progresoBar}
+              role="progressbar"
+              // Lo anunciado y lo pintado van sobre la misma escala: preguntas RESPONDIDAS.
+              // aria-valuenow era el número de pregunta (paso + 1) mientras el relleno es
+              // paso / total, así que iban desfasados un paso entero (hallazgo 1342, mismo
+              // defecto y misma reparación que selector-smartphone, hallazgo 951).
+              aria-label={`Pregunta ${paso + 1} de ${totalPreguntas}`}
+              aria-valuenow={paso}
+              aria-valuemin={0}
+              aria-valuemax={totalPreguntas}
+              aria-valuetext={`Pregunta ${paso + 1} de ${totalPreguntas}`}
+            >
+              <div className={styles.progresoRelleno} data-progreso={progreso} style={{ width: `${progreso}%` }} />
             </div>
           </div>
           <div className={styles.preguntaCard}>
@@ -424,7 +241,11 @@ export default function SelectorMascota() {
                 <button key={op.valor} type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => seleccionarOpcion(op.valor)}
-                  aria-pressed={respuestas[preguntaActual.id] === op.valor ? true : false}
+                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
+                  // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
+                  // radio dentro (hallazgo 1341; selector-smartphone, hallazgo 950).
+                  role="radio"
+                  aria-checked={respuestas[preguntaActual.id] === op.valor}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>
@@ -441,51 +262,87 @@ export default function SelectorMascota() {
         </div>
       )}
 
-      {pantalla === 'resultado' && resultado && (
+      {pantalla === 'resultado' && resultado && ficha && porPerfil && (
         <div className={styles.resultadosContainer}>
           <div className={styles.recomendacionCard}>
-            <span className={styles.recomendacionIcon} aria-hidden="true">{MASCOTAS[resultado.mascota].icon}</span>
+            <span className={styles.recomendacionIcon} aria-hidden="true">{ficha.icon}</span>
             <p className={styles.recomendacionLabel}>Tu mascota ideal</p>
-            <p className={styles.recomendacionValor}>{MASCOTAS[resultado.mascota].nombre}</p>
-            <p className={styles.recomendacionPerfil}>{MASCOTAS[resultado.mascota].perfil}</p>
-            <p className={styles.recomendacionDesc}>{MASCOTAS[resultado.mascota].descripcion}</p>
+            <p className={styles.recomendacionValor}>{ficha.nombre}</p>
+            <p className={styles.recomendacionPerfil}>{ficha.perfil}</p>
+            <p className={styles.recomendacionDesc}>{ficha.descripcion}</p>
           </div>
+
+          {/* Lo declarado como límite, dicho a la cara: la alergia, la edad de los niños o el
+              presupuesto han apartado a la que ganaba por estilo de vida (hallazgos 1332, 1333). */}
+          {motivoRecorte && (
+            <p className={styles.avisoRecorte} role="note">
+              <span aria-hidden="true">⚠️</span> Por estilo de vida encajaría{' '}
+              <strong>{porPerfil.conArticulo}</strong>, pero{' '}
+              {motivoRecorte === 'alergia' && 'has declarado alergia al pelo: la recomendación se limita a animales sin pelo.'}
+              {motivoRecorte === 'salud' && 'con niños menores de 5 años no se recomiendan reptiles en casa (riesgo de salmonela, según los CDC).'}
+              {motivoRecorte === 'presupuesto' && (
+                <>su coste mensual ({porPerfil.costeMensual}) no cabe en tu presupuesto de{' '}
+                  {ETIQUETA_MENSUAL[respuestas[10]]}: la recomendación se ajusta a lo que cabe en ese tramo.</>
+              )}
+            </p>
+          )}
+
+          {/* Un empate no se resuelve en silencio por el orden del código (hallazgo 1334). */}
+          {resultado.empatadas.length > 0 && (
+            <p className={styles.avisoEmpate} role="note">
+              <span aria-hidden="true">⚖️</span> Empate: con tus respuestas,{' '}
+              {enumerar([resultado.mascota, ...resultado.empatadas].map(k => MASCOTAS[k].conArticulo))}{' '}
+              encajan exactamente igual; {resultado.criterioDesempate}.
+            </p>
+          )}
 
           <div className={styles.costesGrid}>
             <div className={styles.costeCard}>
               <p className={styles.costeLabel}>Coste inicial</p>
-              <p className={styles.costeValor}>{MASCOTAS[resultado.mascota].costeInicial}</p>
+              <p className={styles.costeValor}>{resultado.costeInicial.valor}</p>
+              {resultado.costeInicial.nota && <p className={styles.costeNota}>{resultado.costeInicial.nota}</p>}
             </div>
             <div className={styles.costeCard}>
               <p className={styles.costeLabel}>Coste mensual</p>
-              <p className={styles.costeValor}>{MASCOTAS[resultado.mascota].costeMensual}</p>
+              <p className={styles.costeValor}>{ficha.costeMensual}</p>
             </div>
             <div className={styles.costeCard}>
               <p className={styles.costeLabel}>Esperanza de vida</p>
-              <p className={styles.costeValor}>{MASCOTAS[resultado.mascota].esperanzaVida}</p>
+              <p className={styles.costeValor}>{ficha.esperanzaVida}</p>
             </div>
           </div>
 
           <div className={styles.prosContrasGrid}>
             <div className={styles.prosCard}>
               <p className={styles.prosTitulo}>Puntos a favor</p>
-              {MASCOTAS[resultado.mascota].pros.map((p, i) => <p key={i} className={styles.prosItem}>{p}</p>)}
+              {ficha.pros.map((p, i) => <p key={i} className={styles.prosItem}>{p}</p>)}
             </div>
             <div className={styles.contrasCard}>
               <p className={styles.contrasTitulo}>A tener en cuenta</p>
-              {MASCOTAS[resultado.mascota].contras.map((c, i) => <p key={i} className={styles.contrasItem}>{c}</p>)}
+              {ficha.contras.map((c, i) => <p key={i} className={styles.contrasItem}>{c}</p>)}
             </div>
           </div>
 
           <div className={styles.consejosSection}>
-            <p className={styles.consejosTitulo}>Antes de decidirte</p>
+            <p className={styles.consejosTitulo}>Por qué esta recomendación</p>
             {resultado.razones.map((r, i) => <p key={i} className={styles.consejoItem}>{r}</p>)}
+          </div>
+
+          {resultado.aTenerEnCuenta.length > 0 && (
+            <div className={styles.consejosSection}>
+              <p className={styles.consejosTitulo}>Lo que juega en contra, según tus respuestas</p>
+              {resultado.aTenerEnCuenta.map((t, i) => <p key={i} className={styles.consejoItem}>{t}</p>)}
+            </div>
+          )}
+
+          <div className={styles.consejosSection}>
+            <p className={styles.consejosTitulo}>Antes de decidirte</p>
             {resultado.consejos.map((c, i) => <p key={i} className={styles.consejoItem}>{c}</p>)}
           </div>
 
           <button type="button" className={styles.btnRepetir} onClick={reiniciar} aria-label="Repetir el test">← Repetir el test</button>
 
-          <EducationalSection title="Guía completa: elegir mascota en España" subtitle="Costes reales, derechos, obligaciones y consejos prácticos" defaultOpen={false}>
+          <EducationalSection title="Guía completa: elegir mascota" subtitle="Costes reales, derechos, obligaciones y consejos prácticos" defaultOpen={false}>
             <h3>El coste real de tener una mascota</h3>
             <p>Muchas personas subestiman el coste de mantener una mascota. Además del coste mensual visible (comida, arena, accesorios), hay gastos ocultos importantes: veterinario de urgencias, vacunas anuales, peluquería, guardería en vacaciones y posibles operaciones.</p>
             <div className={styles.warningBox}>
@@ -493,14 +350,14 @@ export default function SelectorMascota() {
             </div>
 
             <h3>Adopción vs compra</h3>
-            <p>España tiene uno de los índices de abandono animal más altos de Europa. Las protectoras y refugios tienen miles de perros y gatos de todas las edades esperando familia. Adoptar es gratuito o tiene coste mínimo, los animales llegan ya vacunados, desparasitados y a menudo esterilizados, y el proceso incluye un filtro de idoneidad.</p>
-            <p>Comprar a un criador registrado tiene sentido si buscas una raza específica por razones concretas (alergias a ciertos pelos, tamaño muy específico, perro de trabajo). Evita siempre los anuncios de particulares sin garantías.</p>
+            <p>Las protectoras y refugios tienen perros y gatos de todas las edades esperando familia. Adoptar suele ser gratuito o tener una tasa reducida, los animales llegan normalmente vacunados, desparasitados y a menudo esterilizados, y el proceso incluye un filtro de idoneidad.</p>
+            <p>Comprar a un criador registrado tiene sentido si buscas una raza específica por razones concretas (tamaño muy específico, perro de trabajo). Ninguna raza de perro o gato está libre de alérgenos: si en casa hay alergia, consulta con el alergólogo antes de elegir. Evita siempre los anuncios de particulares sin garantías.</p>
 
-            <h3>Obligaciones legales en España (2023)</h3>
-            <p>La Ley de Bienestar Animal (5/2023) establece obligaciones relevantes: esterilización obligatoria de perros y gatos en plazo (salvo reproducción controlada), licencia para razas PPP, chip identificativo obligatorio, inscripción en el Registro de Animales de Compañía de tu comunidad y prohibición del abandono con penas de hasta 18 meses de prisión.</p>
+            <h3>Obligaciones legales: el ejemplo de España</h3>
+            <p>En España, la Ley 7/2023, de 28 de marzo, de protección de los derechos y el bienestar de los animales (BOE-A-2023-7936), obliga a identificar a los gatos con microchip y a esterilizarlos antes de los seis meses, salvo los inscritos como reproductores (art. 26.i); para los perros no impone la esterilización, pero sí evitar su reproducción incontrolada (art. 26.d). Los perros potencialmente peligrosos necesitan licencia municipal (Ley 50/1999). El abandono en condiciones que pongan en peligro la vida o la integridad del animal es delito (art. 340 ter del Código Penal, reformado por la LO 3/2023), castigado con multa de uno a seis meses o trabajos en beneficio de la comunidad; la prisión de hasta 18 meses corresponde al maltrato (art. 340 bis). En otros países, las obligaciones las fija su propia legislación de bienestar animal.</p>
 
             <h3>Mascotas y alquiler</h3>
-            <p>Desde la Ley de Arrendamientos Urbanos reformada, el propietario no puede prohibir mascotas de compañía en contratos nuevos, aunque puede exigir depósito adicional. Consulta siempre tu contrato específico y habla con el propietario antes de adoptar.</p>
+            <p>En España, la Ley de Arrendamientos Urbanos (Ley 29/1994) no regula las mascotas y la Ley 7/2023 no la modificó: una cláusula del contrato que prohíba tener animales es válida, y no respetarla puede ser motivo para resolver el contrato. Si el contrato no dice nada, en general no se puede impedir tener un animal de compañía, aunque respondes de los daños que cause en la vivienda. En otros países la regla cambia, así que lee tu contrato y la ley de arrendamientos de tu país, y habla con el propietario antes de adoptar.</p>
           </EducationalSection>
         </div>
       )}

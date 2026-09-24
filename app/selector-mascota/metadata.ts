@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Selector de Mascota — ¿Qué animal se adapta a mí? | meskeIA',
   description:
-    'Test de 10 preguntas para saber qué mascota te conviene según tu estilo de vida, vivienda, tiempo disponible y presupuesto. Perro, gato, roedor, pez, pájaro o reptil.',
+    'Test de 10 preguntas para saber qué mascota te conviene según tu estilo de vida, vivienda, tiempo disponible y presupuesto. Perro, gato, pequeño mamífero, pez, pájaro o reptil.',
   keywords: [
     'qué mascota tener',
     'selector mascota',
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
       generateWebAppSchema({
         name: 'Selector de Mascota',
         description:
-          'Test orientativo de 10 preguntas para descubrir qué tipo de mascota (perro, gato, roedor, pez, pájaro o reptil) se adapta mejor a tu estilo de vida, espacio, tiempo disponible y presupuesto.',
+          'Test orientativo de 10 preguntas para descubrir qué tipo de mascota (perro, gato, pequeño mamífero, pez, pájaro o reptil) se adapta mejor a tu estilo de vida, espacio, tiempo disponible y presupuesto.',
         url: 'https://meskeia.com/selector-mascota/',
         features: [
           'Test de 10 preguntas sobre estilo de vida y situación',
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Mascota",
-  description: "Test de 10 preguntas para saber qué mascota te conviene según tu estilo de vida, vivienda, tiempo disponible y presupuesto. Perro, gato, roedor, pez, pájaro o reptil.",
+  description: "Test de 10 preguntas para saber qué mascota te conviene según tu estilo de vida, vivienda, tiempo disponible y presupuesto. Perro, gato, pequeño mamífero, pez, pájaro o reptil.",
   url: "https://meskeia.com/selector-mascota/",
   category: 'UtilityApplication',
   features: [],
@@ -97,7 +97,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta mantener una mascota al mes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste varía mucho según la especie. Un perro puede suponer entre 80 y 200 € mensuales (alimentación, veterinario, peluquería, seguro). Un gato suele costar entre 40 y 100 € al mes. Los roedores pequeños pueden mantenerse por menos de 20 € mensuales. Los peces, una vez montado el acuario, tienen gastos de mantenimiento de 10-30 € al mes. A estos importes habría que sumar gastos veterinarios imprevistos.',
+        text: 'El coste varía mucho según la especie y el tamaño. Como referencia en España: un perro, entre 80 y 280 € mensuales según su tamaño (alimentación, veterinario, peluquería, seguro); un gato, entre 50 y 120 €; un pequeño mamífero como un hámster o una cobaya, entre 15 y 40 €; y los peces, una vez montado el acuario, entre 10 y 30 €. A estos importes hay que sumar los gastos veterinarios imprevistos.',
       },
     },
     {
@@ -105,7 +105,7 @@ export const faqJsonLd = {
       name: '¿Qué mascota es mejor si hay niños pequeños en casa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los perros de temperamento tranquilo y razas sociables (como el Golden Retriever o el Labrador) son excelentes con niños, aunque requieren supervisión. Los gatos también pueden convivir bien con niños, dependiendo del carácter del animal. Los roedores como cobayas o conejos enanos son buenos para niños mayores de 6-7 años que ya pueden manipularlos con cuidado. Los reptiles y ciertos pájaros exóticos no se recomiendan en familias con niños muy pequeños.',
+        text: 'Los perros de temperamento tranquilo y razas sociables (como el Golden Retriever o el Labrador) son excelentes con niños, aunque requieren supervisión. Los gatos también pueden convivir bien con niños, dependiendo del carácter del animal. Los pequeños mamíferos como las cobayas o los conejos enanos (el conejo es un lagomorfo, no un roedor) encajan mejor con niños que ya pueden manipularlos con cuidado. Los reptiles no se recomiendan en casas con niños menores de 5 años por el riesgo de salmonela, según los CDC de Estados Unidos.',
       },
     },
     {

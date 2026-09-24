@@ -42,7 +42,8 @@
 .testContainer { max-width: 620px; margin: 2rem auto 3rem; padding: 0 1rem; }
 .progresoWrap { margin-bottom: 1.75rem; }
 .progresoInfo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+/* Texto pequeño de marca: --primary-texto (5,47:1), no --primary (3,93:1 medido; hallazgo 1343). */
+.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary-texto); }
 .progresoCategoria { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .progresoBar { height: 6px; background: var(--bg-card); border-radius: 3px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); }
 .progresoRelleno { height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 3px; transition: width 0.4s ease; }
@@ -92,7 +93,7 @@
 .recomendacionIcon { font-size: 4rem; margin-bottom: 0.75rem; display: block; }
 .recomendacionLabel { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.4rem; }
 .recomendacionValor { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
-.recomendacionPerfil { font-size: 1rem; color: var(--secondary); font-weight: 600; margin-bottom: 0.75rem; }
+.recomendacionPerfil { font-size: 1rem; color: var(--secondary-texto); font-weight: 600; margin-bottom: 0.75rem; }
 .recomendacionDesc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; text-align: left; }
 
 /* ─── Costes ───────────────────────────────────────────────────── */
@@ -102,7 +103,9 @@
 @media (max-width: 500px) { .costesGrid { grid-template-columns: 1fr; } }
 .costeCard { background: var(--bg-card); border-radius: 12px; padding: 1.25rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
 .costeLabel { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
-.costeValor { font-size: 1.15rem; font-weight: 700; color: var(--primary); }
+/* 1,15rem en negrita (18,4 px) no llega a «texto grande» (18,66 px): exige 4,5:1. */
+.costeValor { font-size: 1.15rem; font-weight: 700; color: var(--primary-texto); }
+.costeNota { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45; margin: 0.4rem 0 0; }
 
 /* ─── Pros/Contras ─────────────────────────────────────────────── */
 .prosContrasGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.75rem; }
@@ -110,12 +113,13 @@
 
 .prosCard { background: rgba(72,169,166,0.07); border: 1px solid rgba(72,169,166,0.25); border-radius: 12px; padding: 1.25rem; }
 .contrasCard { background: rgba(255,100,100,0.05); border: 1px solid rgba(255,100,100,0.2); border-radius: 12px; padding: 1.25rem; }
-.prosTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary); margin: 0 0 0.75rem; }
-.contrasTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #e05555; margin: 0 0 0.75rem; }
+.prosTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-texto); margin: 0 0 0.75rem; }
+/* #e05555 daba 3,59:1 en claro; #b42318 da ~6:1 sobre el fondo rosado de la tarjeta. */
+.contrasTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #b42318; margin: 0 0 0.75rem; }
 .prosItem { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; padding: 0.3rem 0; display: flex; gap: 0.5rem; }
 .prosItem::before { content: '✓'; color: var(--secondary); font-weight: 700; flex-shrink: 0; }
 .contrasItem { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; padding: 0.3rem 0; display: flex; gap: 0.5rem; }
-.contrasItem::before { content: '✗'; color: #e05555; font-weight: 700; flex-shrink: 0; }
+.contrasItem::before { content: '✗'; color: #b42318; font-weight: 700; flex-shrink: 0; }
 
 /* ─── Consejos ─────────────────────────────────────────────────── */
 .consejosSection { background: rgba(255,193,7,0.08); border: 1px solid rgba(255,193,7,0.35); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; }
@@ -125,15 +129,25 @@
 
 .btnRepetir {
   display: block; width: 100%; max-width: 320px; margin: 0 auto 2rem;
-  padding: 0.85rem 1.5rem; background: transparent; border: 2px solid var(--primary);
-  border-radius: 10px; color: var(--primary); font-size: 0.95rem; font-weight: 600;
+  padding: 0.85rem 1.5rem; background: transparent; border: 2px solid var(--primary-texto);
+  border-radius: 10px; color: var(--primary-texto); font-size: 0.95rem; font-weight: 600;
   cursor: pointer; transition: background 0.18s, color 0.18s;
 }
-.btnRepetir:hover { background: var(--primary); color: #fff; }
+.btnRepetir:hover { background: var(--primary-boton); color: #fff; }
 .btnRepetir:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .warningBox { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.4); border-radius: 10px; padding: 1rem 1.25rem; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; }
 
+/* Avisos del resultado: lo que ha apartado a la opción por estilo de vida, y los empates */
+.avisoRecorte, .avisoEmpate {
+  margin: 0 0 1.25rem; padding: 0.85rem 1rem; border: 1px solid #f59e0b; border-left-width: 4px;
+  border-radius: 8px; background: #fef3c7; color: #78350f; font-size: 0.93rem; line-height: 1.5;
+}
+.avisoEmpate { border-color: var(--primary-texto); background: rgba(46,134,171,0.08); color: var(--text-primary); }
+
+[data-theme='dark'] .avisoRecorte { border-color: #b45309; background: #3a2a08; color: #fde68a; }
+[data-theme='dark'] .avisoEmpate { background: rgba(63,165,209,0.12); }
+[data-theme='dark'] .contrasTitulo, [data-theme='dark'] .contrasItem::before { color: #ff7b7b; }
 [data-theme='dark'] .progresoBar { border-color: rgba(255,255,255,0.08); }
 [data-theme='dark'] .costeCard { box-shadow: none; border: 1px solid rgba(255,255,255,0.08); }
 
