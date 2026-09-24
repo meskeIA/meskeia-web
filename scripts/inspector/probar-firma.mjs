@@ -85,8 +85,19 @@ sembrar('se-rompe', { n: 100, cortas: 0.82, reintentos: 0.04, desde: 13, hasta: 
 // Siempre igual, aunque con más cortas que el catálogo: no hay cambio que avisar
 sembrar('estable', { n: 250, cortas: 0.66, reintentos: 0.04, desde: 55, hasta: 0 });
 
+// Ida y vuelta: visita corta, salto a otra herramienta y «atrás» a los dos minutos. Es la
+// forma que tenían las cinco apps que marcó la segunda versión del detector, y es navegación
+// sana. 45 de sus 150 visitas son vueltas; si contasen como recarga, sería la app «rota».
+for (let k = 0; k < 45; k++) {
+  const s = `s${++sesiones}`;
+  insertar.run('ida-y-vuelta', 8, `100.1.${k}.1`, 'web', s, momento(k % 30, 0));
+  insertar.run('normal-1', 40, `100.1.${k}.1`, 'web', s, momento(k % 30, 1));
+  insertar.run('ida-y-vuelta', 15, `100.1.${k}.1`, 'web', s, momento(k % 30, 3));
+}
+sembrar('ida-y-vuelta', { n: 60, cortas: 0.7, reintentos: 0 });
+
 const catalogo = [...Array.from({ length: 10 }, (_, k) => `normal-${k + 1}`),
-  'rota', 'consulta-rapida', 'aula', 'pocas', 'bot', 'se-rompe', 'estable'];
+  'rota', 'consulta-rapida', 'aula', 'pocas', 'bot', 'se-rompe', 'estable', 'ida-y-vuelta'];
 const r = calcularFirma(db, { slugs: catalogo, hasta: HASTA });
 
 let fallos = 0;
@@ -105,6 +116,7 @@ exigir('consulta-rapida', null, 'muchas cortas pero se resuelve a la primera: na
 exigir('aula', null, 'misma IP y navegador, pero cada alumno en su sesión');
 exigir('pocas', null, 'por debajo de 60 visitas no se juzga');
 exigir('estable', null, 'más cortas que el catálogo, pero sin reintentos ni cambio');
+exigir('ida-y-vuelta', null, 'vuelve tras pasar por otra app: es navegación, no recarga');
 exigir('normal-1', null, 'una app corriente');
 if (r.apps.has('portada')) { fallos++; console.log('  ✗ portada: está fuera del catálogo y no debe evaluarse'); }
 else console.log('  ✓ portada          fuera        — no está en el catálogo');

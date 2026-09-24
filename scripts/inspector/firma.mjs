@@ -12,12 +12,13 @@
  * QUÉ MIDE
  * ────────
  * Una visita corta sola no dice nada: consultar un dato en quince segundos es un éxito. Lo
- * que delata una app rota es la visita corta SEGUIDA DE OTRA CARGA de la misma app, en la
- * misma sesión, en menos de diez minutos: la persona no ha conseguido lo que venía a buscar
- * y lo reintenta. Dos señales, las dos contra el catálogo del mismo periodo:
+ * que delata una app rota es la RECARGA: una visita corta seguida de otra carga de la misma
+ * app, en la misma sesión, en menos de diez minutos y SIN haber pasado por otra app entre
+ * medias. La persona no ha conseguido lo que venía a buscar y lo reintenta. Dos señales, las
+ * dos contra el catálogo del mismo periodo:
  *
  *   NIVEL   — 30 días: % de visitas cortas ≥ catálogo + 8 puntos
- *             Y % de reintentos tras visita corta ≥ 1,6 × catálogo. Mínimo 60 visitas.
+ *             Y % de recargas ≥ 2 × catálogo. Mínimo 60 visitas.
  *   CAMBIO  — los últimos 14 días frente a los 42 anteriores: el % de visitas cortas sube
  *             10 puntos o más con z ≥ 3. Mínimo 30 visitas recientes y 60 de base.
  *
@@ -29,12 +30,13 @@
  * ──────────────────────────
  * `Permissions-Policy: camera=()` tuvo rotas cinco meses `lupa-digital` y las demás apps de
  * cámara, y el fallo INFLABA su uso: la gente recargaba creyendo que había fallado el
- * permiso. Medido sobre el dump, la lupa rota tenía 76 % de visitas cortas y 14,6 % de
- * reintentos por sesión, frente al 67 % y 8,2 % del catálogo; reparada, 55 % y 4-7 %.
+ * permiso. Medido sobre el dump, la lupa rota tenía 76 % de visitas cortas y 14-15 % de
+ * recargas, frente al 67 % y 4-5 % del catálogo; reparada, 55 % y 3-6 %.
  * Calibración, en doce cortes semanales del 06/07 al 21/09/2026:
  *   - La lupa sale en las dos ventanas en que estaba rota (06/07 y 20/07) y en ninguna
- *     posterior al arreglo del 21/07. En la del 13/07 se queda a 7,4 puntos, bajo el umbral.
- *   - El nivel marca entre 0 y 5 apps por semana; el cambio, 0 o 1.
+ *     posterior al arreglo del 21/07. En la del 13/07 se queda a 1,3 puntos del umbral de
+ *     cortas.
+ *   - El nivel marca 0 o 1 apps por semana; el cambio, 0 o 1.
  * ⚠️ La parte de CAMBIO no tiene caso real con fecha dentro de los datos (en febrero, cuando
  *    se rompió la cámara, esas apps tenían 2-3 visitas al mes). Está probada con casos
  *    sintéticos en `probar-firma.mjs`, no con una rotura observada.
@@ -46,6 +48,15 @@
  * no uno recargando (`simulador-movimiento-circular` pasaba del 8 % al 58 % de «reintentos»
  * en una semana de clase). `sesion_id` vive en `sessionStorage`: sobrevive a una recarga en
  * la misma pestaña y es distinto para cada alumno.
+ *
+ * SIN OTRA APP EN MEDIO
+ * ─────────────────────
+ * La segunda versión, el mismo 24/09, contaba cualquier vuelta a la app en diez minutos, y
+ * marcó cinco apps. Al abrir los casos, entre el 80 % y el 100 % de sus «reintentos» tenían
+ * otra app visitada en medio: la persona iba a otra herramienta (o a la portada) y volvía con
+ * «atrás», que es navegación sana, no un fallo. En la lupa sana es al revés: 36 de 54 son
+ * recargas puras. Con la condición de no haber pasado por otra app, las cinco dejan de salir
+ * y la lupa rota sigue saliendo, con más margen (3 × el catálogo en vez de 1,8 ×).
  *
  * LO QUE NO PUEDE VER
  * ───────────────────
@@ -64,7 +75,7 @@ export const UMBRALES = {
   DIAS_NIVEL: 30,
   MIN_VISITAS: 60,
   EXCESO_CORTAS: 8,        // puntos sobre el catálogo
-  FACTOR_REINTENTO: 1.6,   // veces el catálogo
+  FACTOR_REINTENTO: 2,     // veces el catálogo
   DIAS_RECIENTE: 14,
   DIAS_BASE: 42,
   MIN_RECIENTE: 30,
@@ -146,7 +157,7 @@ export function calcularFirma(db, { slugs, hasta } = {}) {
   db.prepare('CREATE INDEX IF NOT EXISTS ix_firma ON uso_aplicaciones(sesion_id, aplicacion, created_at)').run();
   const dentro = slugs ? new Set(slugs) : null;
 
-  // ── Nivel: 30 días, visitas cortas y reintentos tras visita corta ──
+  // ── Nivel: 30 días, visitas cortas y recargas tras visita corta ──
   const nivel = db.prepare(`
     WITH v AS (
       SELECT id, aplicacion, created_at, sesion_id, duracion_segundos
@@ -162,6 +173,11 @@ export function calcularFirma(db, { slugs, hasta } = {}) {
         WHERE w.sesion_id = v.sesion_id AND w.aplicacion = v.aplicacion AND w.id < v.id
           AND w.created_at >= datetime(v.created_at, '-${U.MINUTOS_REINTENTO} minutes')
           AND (w.duracion_segundos IS NULL OR w.duracion_segundos < ${U.SEGUNDOS_CORTA})
+          -- Sin otra app entre las dos cargas: ir a otra herramienta y volver es navegación
+          AND NOT EXISTS (
+            SELECT 1 FROM v x
+            WHERE x.sesion_id = v.sesion_id AND x.id > w.id AND x.id < v.id AND x.aplicacion <> v.aplicacion
+          )
       )) AS reintentos
     FROM v GROUP BY aplicacion`).all({ hasta }).filter(f => !dentro || dentro.has(f.slug));
 
@@ -202,7 +218,7 @@ export function calcularFirma(db, { slugs, hasta } = {}) {
     }
 
     const partes = [];
-    if (esNivel) partes.push(`${p(cortas)} cortas (catálogo ${p(catalogo.cortas)}) y ${p(reintentos)} reintentos (catálogo ${p(catalogo.reintentos)}) en ${f.n} visitas`);
+    if (esNivel) partes.push(`${p(cortas)} cortas (catálogo ${p(catalogo.cortas)}) y ${p(reintentos)} recargas (catálogo ${p(catalogo.reintentos)}) en ${f.n} visitas`);
     if (esCambio) partes.push(`cortas ${p(esCambio.antes)} → ${p(esCambio.ahora)} en ${U.DIAS_RECIENTE} días (z ${pct.format(esCambio.z)})`);
 
     apps.set(f.slug, {
@@ -233,14 +249,14 @@ if (esPrincipal) {
 
   const r = calcularFirma(cargarDump(rutaDump), { slugs: catalogo, hasta });
   console.log(`\nFirma de rotura · ${path.basename(rutaDump)} · 30 días hasta el ${r.hasta.split('-').reverse().join('/')}`);
-  console.log(`  catálogo: ${r.catalogo.visitas.toLocaleString('es-ES', { useGrouping: 'always' })} visitas · ${p(r.catalogo.cortas)} cortas · ${p(r.catalogo.reintentos)} reintentos tras visita corta`);
-  console.log(`  umbral de nivel: ≥ ${p(r.catalogo.cortas + UMBRALES.EXCESO_CORTAS)} cortas y ≥ ${p(UMBRALES.FACTOR_REINTENTO * r.catalogo.reintentos)} reintentos, con ≥ ${UMBRALES.MIN_VISITAS} visitas\n`);
+  console.log(`  catálogo: ${r.catalogo.visitas.toLocaleString('es-ES', { useGrouping: 'always' })} visitas · ${p(r.catalogo.cortas)} cortas · ${p(r.catalogo.reintentos)} recargas tras visita corta`);
+  console.log(`  umbral de nivel: ≥ ${p(r.catalogo.cortas + UMBRALES.EXCESO_CORTAS)} cortas y ≥ ${p(UMBRALES.FACTOR_REINTENTO * r.catalogo.reintentos)} recargas, con ≥ ${UMBRALES.MIN_VISITAS} visitas\n`);
 
   if (pedidas.length) {
     for (const s of pedidas) {
       const a = r.apps.get(s);
       if (!a) { console.log(`  ${s.padEnd(44)} sin visitas en la ventana (o no está en el catálogo)`); continue; }
-      console.log(`  ${s.padEnd(44)} ${String(a.visitas).padStart(5)} visitas · ${p(a.cortas).padStart(7)} cortas · ${p(a.reintentos).padStart(7)} reintentos  ${a.firma ? `⚠ ${a.firma}` : '· sin firma'}`);
+      console.log(`  ${s.padEnd(44)} ${String(a.visitas).padStart(5)} visitas · ${p(a.cortas).padStart(7)} cortas · ${p(a.reintentos).padStart(7)} recargas  ${a.firma ? `⚠ ${a.firma}` : '· sin firma'}`);
       if (a.detalle) console.log(`  ${''.padEnd(44)} ${a.detalle}`);
     }
   } else {
