@@ -1080,7 +1080,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                         ].filter((x): x is string => x !== null);
                         return sinCalcular.length === 0
                           ? 'Precio del trastero + todos los gastos'
-                          : `No incluye ${sinCalcular.join(' ni ')}: el coste real será mayor`;
+                          : `No incluye ${sinCalcular.join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`;
                       })()
                     }
                   />

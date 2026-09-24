@@ -1152,7 +1152,7 @@ export default function SimuladorLocalComercialPage() {
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
                       ]
                         .filter((x): x is string => x !== null)
-                        .join(' ni ')}: el coste real será mayor`
+                        .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`
                     : resultadosComprador.ivaRecuperable
                       ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
                       : 'Precio + todos los gastos de la operación'

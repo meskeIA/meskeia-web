@@ -1368,7 +1368,7 @@ export default function SimuladorCompraventaPage() {
                               : 'la gestoría, que no se ha podido leer',
                           ]
                             .filter((x): x is string => x !== null)
-                            .join(' ni ')}: el coste real será mayor`
+                            .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`
                         : 'Precio + todos los gastos'
                     }
                   />

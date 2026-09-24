@@ -1061,7 +1061,10 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
 
     // Legible otra vez: el aviso de la gestoría se va y queda solo el del IGIC.
     await sembrarValor(page, SEL_GESTORIA, '500');
-    await expect(descripcion(page, /^COSTE TOTAL/)).toHaveText('No incluye el IGIC: el coste real será mayor');
+    // 24/09/2026: «puede ser mayor» y no «será»: el IGIC tiene tipo cero (viviendas protegidas
+    // con garaje y anexos, equipamiento comunitario; Ley canaria 4/2012, arts. 52 y 58) y el
+    // IPSI depende de la ordenanza de cada ciudad. Solo la gestoría ilegible autoriza el «será».
+    await expect(descripcion(page, /^COSTE TOTAL/)).toHaveText('No incluye el IGIC: el coste real puede ser mayor');
 
     // Cero y vacío son datos, no ilegibles: sin tarjeta de gestoría y sin aviso.
     for (const v of ['0', '']) {

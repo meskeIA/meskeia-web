@@ -45,6 +45,16 @@
  * a campo. Aquí: «puede ser mayor/menor» cuenta como dirección, una fila `sin_efecto` no puede
  * afirmar una dirección SEGURA, y hay filas nuevas con pérdida (base P) y exención (base E).
  *
+ * **Segundo invariante (24/09/2026), el impuesto que no se calcula**: en Canarias, Ceuta y
+ * Melilla, con la operación que devengaría IVA, las siete NO calculan el IGIC/IPSI y el coste
+ * total del comprador sale «(PARCIAL)». Ese aviso tiene que nombrar el impuesto y decir que el
+ * coste real «PUEDE ser mayor», nunca «será»: el IGIC puede ser CERO (viviendas protegidas con
+ * su garaje y anexos, art. 58.Uno.1 Ley canaria 4/2012; equipamiento comunitario, art. 52) y el
+ * IPSI depende de la ordenanza de cada ciudad. Solo si ADEMÁS la gestoría es ilegible, que
+ * seguro suma, vale «será mayor». Salió de una sospecha del Inspector del 24/09/2026, con el
+ * mismo criterio de las bases V: «es/será» solo si es seguro. Va en el campo `sinIva` de cada
+ * hermana y en el segundo `describe` del final.
+ *
  * ── El invariante ────────────────────────────────────────────────────────────
  * `parseSpanishNumber` devuelve NaN POR DISEÑO ante `2.000.50` (el millar y el decimal a la
  * estadounidense, un copiar y pegar corriente). De ahí:
@@ -153,6 +163,13 @@ interface Hermana {
    * estaría mal si falla; `falla`, igual que en los campos, marca un hueco todavía abierto.
    */
   mensajePrecioIlegible?: { etiqueta: string; hueco: string; falla?: string };
+  /**
+   * Cómo se lleva la app a Canarias con una operación que devengaría IVA, que es donde no
+   * calcula el IGIC (`impuestoNoCalculado`). `selectorTerritorio` es el `<select>` de la
+   * comunidad; `operaciones`, el rótulo de cada botón que devenga IVA (obra nueva, renuncia a la
+   * exención o vendedor empresario, según la app): un caso por operación.
+   */
+  sinIva: { selectorTerritorio: string; operaciones: RegExp[] };
 }
 
 /**
@@ -196,6 +213,7 @@ const HERMANAS: readonly Hermana[] = [
       'Publica COSTE TOTAL 27.252,05 € y NETO 22.898,25 €. · ' +
       'BASE R = base + compra original 24.000 (gana el método real de la plusvalía, NETO 23.645,83).',
     pestanas: true,
+    sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Primera mano/] },
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^IMPORTE NETO VENDEDOR/,
     preparar: async (page, base) => {
@@ -344,6 +362,7 @@ const HERMANAS: readonly Hermana[] = [
       'Publica COSTE TOTAL 16.535,58 € y NETO 13.332,80 €. · ' +
       'BASE R = base + compra original 14.000 (gana el método real de la plusvalía, NETO 13.938,89).',
     pestanas: true,
+    sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Primera mano/] },
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^IMPORTE NETO VENDEDOR/,
     preparar: async (page, base) => {
@@ -480,6 +499,10 @@ const HERMANAS: readonly Hermana[] = [
       'comisión 3 % · gestoría 500. Publica COSTE TOTAL 213.495,20 € y NETO 182.803,00 €. · ' +
       'BASE R = base + compra original 195.000 (gana el método real de la plusvalía, NETO 192.430,00).',
     pestanas: true,
+    sinIva: {
+      selectorTerritorio: '#select-ccaa',
+      operaciones: [/Obra nueva \/ Promotor/, /2ª mano con renuncia/],
+    },
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^NETO QUE RECIBES/,
     preparar: async (page, base) => {
@@ -649,6 +672,10 @@ const HERMANAS: readonly Hermana[] = [
       'Precio 500.000 · Madrid · segunda mano · gestoría 500. ITP 6,00 %. ' +
       'Publica Total gastos adicionales 31.921,73 € y COSTE TOTAL 531.921,73 €.',
     pestanas: false,
+    sinIva: {
+      selectorTerritorio: '#select-ccaa',
+      operaciones: [/Obra nueva \/ Promotor/, /2ª mano con renuncia/],
+    },
     cifraComprador: /^COSTE TOTAL/,
     preparar: async (page) => {
       await sembrar(page, 'Precio de compra de la nave industrial', '500000');
@@ -682,6 +709,7 @@ const HERMANAS: readonly Hermana[] = [
       'Precio 120.000 · Madrid · vende un particular · gestoría 500. ITP 6,00 %. ' +
       'Publica Total gastos adicionales 8.532,96 € y COSTE TOTAL 128.532,96 €.',
     pestanas: false,
+    sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Promotor \/ Empresa/] },
     cifraComprador: /^COSTE TOTAL/,
     preparar: async (page) => {
       await sembrar(page, 'Precio de compra del solar', '120000');
@@ -715,6 +743,7 @@ const HERMANAS: readonly Hermana[] = [
       'Precio 80.000 · Madrid · operación ITP · gestoría 400. ITP 6,00 %. ' +
       'Publica Total gastos adicionales 5.911,96 € y COSTE TOTAL 85.911,96 €.',
     pestanas: false,
+    sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Con renuncia a la exención/] },
     cifraComprador: /^COSTE TOTAL/,
     preparar: async (page) => {
       await sembrar(page, 'Precio de compra de la finca rústica', '80000');
@@ -760,6 +789,7 @@ const HERMANAS: readonly Hermana[] = [
       'BASE E = B + mayor de 65 (exento por edad, NETO 193.000,00). · ' +
       'BASE V = B con el precio de compra original VACÍO (sin IRPF calculado).',
     pestanas: true,
+    sinIva: { selectorTerritorio: '#ccaa-inmueble', operaciones: [/Primera mano/] },
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^IMPORTE NETO VENDEDOR/,
     preparar: async (page, base) => {
@@ -1195,6 +1225,105 @@ test.describe('Testigo de familia — el importe ilegible en las 7 apps de compr
         mensaje,
         `El precio está escrito y a la vista, pero ${hueco}.\n  Mensaje publicado: ${mensaje}`,
       ).toMatch(/no se ha podido leer|no se puede leer|ilegible/i);
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  El segundo invariante: el IGIC/IPSI que no se calcula «PUEDE» subir el coste, no «lo hará»
+//
+//  En Canarias, con la operación que devengaría IVA, ninguna de las siete calcula el IGIC:
+//  el coste total sale «(PARCIAL)» y su aviso lo nombra. Pero el IGIC puede ser CERO (tipo
+//  cero de las viviendas protegidas con su garaje y anexos, art. 58.Uno.1 Ley canaria 4/2012;
+//  equipamiento comunitario, art. 52), así que la única dirección honrada es «puede ser
+//  mayor». La gestoría ilegible sí suma seguro: con ella, y solo con ella, «será mayor».
+//  Sospecha del Inspector del 24/09/2026; el criterio es el de las bases V.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** Deja la hermana en su caso base, en Canarias y con la operación que devenga IVA. */
+async function llevarACanarias(page: Page, app: Hermana, operacion: RegExp): Promise<void> {
+  await page.goto(`/${app.slug}/`);
+  await esperarHidratacion(page, [sel(app.campos[0].etiqueta)]);
+  await app.preparar(page, 'base');
+  if (app.pestanas) await irAPestana(page, 'comprador');
+  await page.locator(app.sinIva.selectorTerritorio).selectOption('canarias');
+  const boton = page.getByRole('button', { name: operacion });
+  await boton.click();
+  await expect(boton).toHaveAttribute('aria-pressed', 'true');
+}
+
+/** El rótulo del botón para el título del caso, sin los escapes de la expresión regular. */
+const rotuloDe = (operacion: RegExp): string => operacion.source.replace(/\\/g, '');
+
+/** El campo de gestoría del COMPRADOR, tomado de la propia tabla para no duplicar su rótulo. */
+function gestoriaComprador(app: Hermana): string {
+  const campo = app.campos.find((c) => c.panel === 'comprador' && /gestoría/i.test(c.etiqueta));
+  if (!campo) {
+    throw new Error(`La fila de ${app.slug} no tiene campo de gestoría del comprador en la tabla.`);
+  }
+  return campo.etiqueta;
+}
+
+test.describe('Testigo de familia — el IGIC que no se calcula en las 7 apps de compraventa', () => {
+  test.describe.configure({ timeout: 60_000 });
+
+  for (const app of HERMANAS) {
+    for (const operacion of app.sinIva.operaciones) {
+      test(`${app.slug} · Canarias + ${rotuloDe(operacion)} — el coste real PUEDE ser mayor`, async ({
+        page,
+      }) => {
+        await llevarACanarias(page, app, operacion);
+
+        exigirCifra(
+          await leerCifra(page, app.cifraComprador),
+          'En Canarias la app tiene que seguir publicando el coste total, aunque sea parcial.',
+        );
+        const aviso = await leerAviso(page, app.cifraComprador);
+
+        expect(
+          aviso.split(' · ')[0],
+          `Sin el IGIC calculado el coste total no se rotula como definitivo.\n  Aviso: ${aviso}`,
+        ).toMatch(/\(PARCIAL\)/);
+        expect(aviso, `El aviso no nombra el impuesto que falta.\n  Aviso: ${aviso}`).toMatch(
+          /\bIGIC\b/,
+        );
+        expect(
+          aviso,
+          `Lo único que falta es el IGIC, que puede ser CERO: el aviso tiene que decir «puede ser ` +
+            `mayor».\n  Aviso: ${aviso}`,
+        ).toMatch(/coste real puede ser mayor/i);
+        expect(
+          aviso,
+          `El aviso afirma una dirección SEGURA con un impuesto que puede ser cero.\n  Aviso: ${aviso}`,
+        ).not.toMatch(DICE_DIRECCION_SEGURA);
+        expect(aviso, `Vocabulario retirado el 24/09/2026.\n  Aviso: ${aviso}`).not.toMatch(
+          DIALECTO_RETIRADO,
+        );
+      });
+    }
+
+    // Con la gestoría ILEGIBLE además del IGIC, algo suma seguro: ahí sí «será mayor».
+    const primera = app.sinIva.operaciones[0];
+    test(`${app.slug} · Canarias + ${rotuloDe(primera)} + gestoría ilegible — el coste real SERÁ mayor`, async ({
+      page,
+    }) => {
+      await llevarACanarias(page, app, primera);
+      await sembrar(page, gestoriaComprador(app), ILEGIBLE);
+
+      exigirCifra(
+        await leerCifra(page, app.cifraComprador),
+        'Con la gestoría ilegible la app tiene que seguir publicando el coste total parcial.',
+      );
+      const aviso = await leerAviso(page, app.cifraComprador);
+
+      expect(aviso.split(' · ')[0], `Aviso: ${aviso}`).toMatch(/\(PARCIAL\)/);
+      expect(aviso, `El aviso no nombra el IGIC.\n  Aviso: ${aviso}`).toMatch(/\bIGIC\b/);
+      expect(aviso, `El aviso no nombra la gestoría ilegible.\n  Aviso: ${aviso}`).toMatch(/gestoría/i);
+      expect(
+        aviso,
+        `La gestoría ilegible suma seguro: el aviso tiene que decir «será mayor».\n  Aviso: ${aviso}`,
+      ).toMatch(/coste real será mayor/i);
+      expect(aviso, `Aviso: ${aviso}`).not.toMatch(/coste real puede ser mayor/i);
     });
   }
 });

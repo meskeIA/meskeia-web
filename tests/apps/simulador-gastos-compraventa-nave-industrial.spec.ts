@@ -3602,7 +3602,10 @@ test.describe('Re-inspección 23/09/2026 — familia y tres casos nuevos', () =>
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('4015,81 €');
     const conDato = await valorTarjeta(page, 'COSTE TOTAL');
     expect(conDato).toBe('324.015,81 €');
-    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye el IGIC: el coste real será mayor');
+    // 24/09/2026: «puede ser mayor» y no «será»: el IGIC tiene tipo cero (viviendas protegidas
+    // con garaje y anexos, equipamiento comunitario; Ley canaria 4/2012, arts. 52 y 58) y el
+    // IPSI depende de la ordenanza de cada ciudad. Solo la gestoría ilegible autoriza el «será».
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye el IGIC: el coste real puede ser mayor');
 
     // Con el dato ilegible.
     await sembrar(page, GESTORIA, '2.000.50');

@@ -1062,7 +1062,7 @@ export default function SimuladorGarajeCompraventaPage() {
                         ].filter((x): x is string => x !== null);
                         return sinCalcular.length === 0
                           ? 'Precio + todos los gastos'
-                          : `No incluye ${sinCalcular.join(' ni ')}: el coste real será mayor`;
+                          : `No incluye ${sinCalcular.join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`;
                       })()
                     }
                   />

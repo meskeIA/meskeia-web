@@ -25,6 +25,13 @@ interface Props {
  * calcula; lo que no puede es inventarse una cifra.
  *
  * Se devuelve `null` cuando no aplica, para que quien lo use no tenga que condicionarlo.
+ *
+ * ⚠️ El impuesto que falta PUEDE SER CERO, así que las siete apps dicen que el coste real
+ * «puede ser mayor», no que «será mayor» (24/09/2026). El IGIC tiene tipo cero en las entregas
+ * de viviendas protegidas por sus promotores, con su garaje y anexos si se transmiten a la
+ * vez (art. 58.Uno.1 Ley canaria 4/2012), y en las obras de equipamiento comunitario
+ * (art. 52); el IPSI depende de la ordenanza de cada ciudad. Solo un importe que seguro suma
+ * —la gestoría ilegible— autoriza el «será».
  */
 export default function AvisoTerritorioSinIva({ ccaa, aplica = true }: Props) {
   const territorio = TERRITORIOS_SIN_IVA[ccaa];

@@ -525,7 +525,7 @@ export default function SimuladorSolarPage() {
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
                       ]
                         .filter((x): x is string => x !== null)
-                        .join(' ni ')}: el coste real será mayor${
+                        .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}${
                         // El aviso del ilegible se SUMA a la salvedad del IVA deducible, no la
                         // reemplaza: sin ella, «será mayor» es falso para quien deduce el IVA
                         // (hallazgo 1272).

@@ -925,8 +925,11 @@ test.describe('MITAD A — el cierre del IVA en Canarias, verificado (28/08/2026
     );
     expect(await tituloTarjeta(page, 'COSTE TOTAL')).toBe('COSTE TOTAL (PARCIAL)');
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('25.939,55 €');
+    // 24/09/2026: «puede ser mayor» y no «será»: el IGIC tiene tipo cero (viviendas protegidas
+    // con garaje y anexos, equipamiento comunitario; Ley canaria 4/2012, arts. 52 y 58) y el
+    // IPSI depende de la ordenanza de cada ciudad. Solo la gestoría ilegible autoriza el «será».
     expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
-      'No incluye el IGIC: el coste real será mayor',
+      'No incluye el IGIC: el coste real puede ser mayor',
     );
   });
 
@@ -3866,8 +3869,11 @@ test.describe('RE-INSPECCIÓN 18/09/2026 — los tres casos, resueltos a mano an
       '3,06% sobre el precio — SIN el IPSI, que no está incluido',
     );
     expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('28.856,99 €');
+    // 24/09/2026: «puede ser mayor» y no «será»: el IGIC tiene tipo cero (viviendas protegidas
+    // con garaje y anexos, equipamiento comunitario; Ley canaria 4/2012, arts. 52 y 58) y el
+    // IPSI depende de la ordenanza de cada ciudad. Solo la gestoría ilegible autoriza el «será».
     expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
-      'No incluye el IPSI: el coste real será mayor',
+      'No incluye el IPSI: el coste real puede ser mayor',
     );
   });
 

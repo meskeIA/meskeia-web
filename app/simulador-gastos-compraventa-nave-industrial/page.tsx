@@ -626,7 +626,7 @@ export default function SimuladorNaveIndustrialPage() {
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
                       ]
                         .filter((x): x is string => x !== null)
-                        .join(' ni ')}: el coste real será mayor${
+                        .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}${
                         // Con IVA en pantalla (obra nueva o renuncia, fuera de Canarias, Ceuta y
                         // Melilla) el aviso del ilegible se SUMA a la salvedad del IVA deducible,
                         // no la reemplaza (forma del hallazgo 1272 de solar).
