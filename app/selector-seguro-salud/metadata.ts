@@ -1,5 +1,18 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { TEXTO_CARENCIAS, TEXTO_COPAGO, TEXTO_PRIMA_MEDIA } from './motor';
+
+/** Las funciones reales de la app: alimentan la meta schema:WebApplication y el JSON-LD. */
+const FUNCIONES = [
+  'Test de 10 preguntas sobre uso médico, situación y presupuesto',
+  'Orientación: sanidad pública, seguro complementario o seguro completo',
+  'Detecta si ya tienes cobertura por tu empresa o por una mutualidad de funcionarios',
+  'Con un presupuesto ajustado no recomienda el seguro completo y avisa de comprobar la prima',
+  'Avisos de preexistencias, embarazo en curso y periodos de carencia',
+  'Explica la puntuación con todo lo que suma y lo que resta',
+  'Referencia de precio con fuente (UNESPA) en lugar de cifras sin origen',
+  '100% en el navegador, sin registro ni instalación',
+];
 
 export const metadata: Metadata = {
   title: 'Selector de Seguro de Salud — ¿Me conviene el privado? | meskeIA',
@@ -47,18 +60,9 @@ export const metadata: Metadata = {
       generateWebAppSchema({
         name: 'Selector de Seguro de Salud',
         description:
-          'Test orientativo de 10 preguntas para saber si un seguro de salud privado tiene sentido según tu situación, uso médico habitual, CCAA de residencia y presupuesto. Incluye recomendación de cobertura y coste orientativo.',
+          'Test orientativo de 10 preguntas para saber si un seguro de salud privado tiene sentido según tu situación, uso médico habitual, espera para el especialista en tu zona y presupuesto. Incluye recomendación de cobertura y referencia de precio con fuente.',
         url: 'https://meskeia.com/selector-seguro-salud/',
-        features: [
-          'Test de 10 preguntas sobre uso médico y situación',
-          'Recomendación: sanidad pública, seguro complementario o seguro completo',
-          'Cobertura recomendada según perfil',
-          'Rango de precio orientativo en España',
-          'Cuándo compensa y cuándo no',
-          '100% en el navegador, sin registro ni instalación',
-          'Gratuito y sin publicidad',
-          'En español',
-        ],
+        features: FUNCIONES,
       })
     ),
   },
@@ -69,7 +73,7 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber si te conviene contratar un seguro de salud privado en España, qué cobertura necesitas y en qué situaciones tiene más sentido.",
   url: "https://meskeia.com/selector-seguro-salud/",
   category: 'FinanceApplication',
-  features: [],
+  features: FUNCIONES,
 });
 
 export const faqJsonLd = {
@@ -81,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Cuándo merece la pena contratar un seguro de salud privado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un seguro privado aporta más valor cuando las listas de espera en tu comunidad autónoma son largas para especialistas o pruebas diagnósticas, cuando tienes necesidades médicas frecuentes que la sanidad pública cubre con demora, o cuando valoras la libre elección de médico y la atención rápida. También es útil si viajas con frecuencia o trabajas por cuenta propia sin acceso a mutua de empresa.',
+        text: 'Un seguro privado aporta más valor cuando las listas de espera en tu zona son largas para especialistas o pruebas diagnósticas, cuando tienes necesidades médicas frecuentes que la sanidad pública cubre con demora, o cuando valoras la libre elección de médico y la atención rápida. También puede compensar si trabajas por cuenta propia, porque una espera larga puede alargar una baja. Si ya tienes un seguro completo de empresa o una mutualidad de funcionarios, contratar otro rara vez tiene sentido.',
       },
     },
     {
@@ -89,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta un seguro de salud privado en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El precio varía según la edad, la cobertura y la aseguradora. Para una persona adulta joven (25-35 años) sin preexistencias, un seguro de salud básico con copago puede costar entre 40 y 80 € al mes. Los seguros sin copago o con cobertura dental y hospitalización completa pueden superar los 120-150 € al mes. A partir de los 50 años, las primas aumentan de forma significativa.',
+        text: `El precio de una póliza depende sobre todo de la edad, de la cobertura y de si tiene copago. Como referencia, ${TEXTO_PRIMA_MEDIA}. El copago abarata la prima; una póliza completa, sin copago y con hospitalización, queda por encima de una con copago. Para saber el tuyo, pide presupuesto con tus datos.`,
       },
     },
     {
@@ -97,7 +101,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre un seguro con copago y uno sin copago?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En un seguro con copago pagas una cantidad fija por cada visita al médico (generalmente entre 2 y 15 € por consulta), lo que reduce la prima mensual. En un seguro sin copago no pagas nada en el momento de la visita, pero la prima mensual es más alta. El modelo con copago suele ser más económico si tus visitas son ocasionales; el sin copago compensa si acudes al médico con mucha frecuencia.',
+        text: `En un seguro con copago pagas una cantidad por cada servicio médico, ${TEXTO_COPAGO}, lo que reduce la prima mensual. En un seguro sin copago no pagas nada en el momento de la visita, pero la prima mensual es más alta. El modelo con copago suele ser más económico si tus visitas son ocasionales; el sin copago compensa si acudes al médico con mucha frecuencia.`,
       },
     },
     {
@@ -113,7 +117,7 @@ export const faqJsonLd = {
       name: '¿Los seguros de salud cubren enfermedades preexistentes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende de la aseguradora y del tipo de enfermedad. Las preexistencias declaradas en el momento de contratar pueden quedar excluidas de la cobertura o conllevar una sobretasa en la prima. Algunas aseguradoras aplican períodos de carencia (3-12 meses) antes de cubrir determinadas prestaciones. Es obligatorio declarar las enfermedades conocidas al contratar; no hacerlo puede dar lugar a la nulidad del contrato.',
+        text: `Antes de contratar, la aseguradora te presenta un cuestionario de salud, y tienes el deber de declarar en él todas las circunstancias que conozcas y que puedan influir en la valoración del riesgo (art. 10 de la Ley 50/1980 de Contrato de Seguro). La asistencia relacionada con enfermedades anteriores a la contratación suele quedar excluida de la cobertura (OCU) o encarecer la prima. Además, ${TEXTO_CARENCIAS}. Si en el cuestionario hubo reserva o inexactitud, la aseguradora puede rescindir el contrato en el plazo de un mes desde que lo conoce; si antes ocurre un siniestro, la prestación se reduce en proporción a la diferencia de prima, y si hubo dolo o culpa grave queda liberada del pago.`,
       },
     },
   ],

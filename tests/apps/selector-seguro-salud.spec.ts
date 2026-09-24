@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { calcularResultado, PESOS, PREGUNTAS, UMBRAL_COMPLEMENTARIO, UMBRAL_PUBLICO } from '../../app/selector-seguro-salud/motor';
+import { calcularResultado, PESOS, PREGUNTAS, UMBRAL_COMPLEMENTARIO, UMBRAL_PUBLICO, VEREDICTOS } from '../../app/selector-seguro-salud/motor';
 
 /**
  * Asesor de Seguro de Salud (selector-seguro-salud) — reparado el 24/09/2026 desde una
@@ -20,6 +20,10 @@ import { calcularResultado, PESOS, PREGUNTAS, UMBRAL_COMPLEMENTARIO, UMBRAL_PUBL
  * EL MOTOR (app/selector-seguro-salud/motor.ts): mismos puntos, umbrales y respuestas que
  * fuerzan (veredicto y puntuación idénticos en las 1.048.576 combinaciones). Las razones dicen
  * qué ha decidido el resultado y qué respuestas han sumado y restado.
+ *
+ * Después, el 24/09/2026, la reparación de los hallazgos 1420-1436 cambió el motor a propósito:
+ * filtros (seguro de empresa, mutualidad en la 5 o en la 10, «Hasta 40 €/mes»), la pregunta 3
+ * por la espera en tu zona y la 4 con cinco opciones. El test «motor» de abajo se reescribió.
  */
 
 async function esperarHidratacionBotones(page: Page): Promise<void> {
@@ -120,25 +124,66 @@ test('«seguro completo» siempre dice por qué, aunque no haya hijos ni se sea 
   expect(texto).toContain('Salud dental: «Es un gasto importante para mí cada año» suma 3 puntos.');
 });
 
-test('motor: el veredicto no cambia, y las razones dicen qué lo ha decidido', () => {
-  test.setTimeout(180_000);
+test('motor: filtros, avisos y la cuenta entera, en las 1.310.720 combinaciones', () => {
+  // Reescrito el 24/09/2026 (reparación de 1420-1436). Antes exigía `forzado ? 'publico'` para
+  // las tres respuestas que deciden, lo que consagraba el título «Sanidad pública es suficiente»
+  // a quien tiene un seguro completo de empresa (1434); y recorría 4^10 perfiles: la pregunta 4
+  // separa ahora «embarazada ahora» de «planeo un embarazo» (1424), así que son 4^9 · 5.
+  test.setTimeout(240_000);
   const r: Record<number, string> = {};
   const fallos: string[] = [];
   const mal = (msg: string) => { if (fallos.length < 10) fallos.push(`${JSON.stringify(r)} → ${msg}`); };
-  let total = 0;
+  const cuenta = { total: 0, poco: 0, mutualistas: 0, cronicosQueContratan: 0, embarazoCurso: 0, empresa: 0 };
   const recorrer = (i: number): void => {
     if (i === PREGUNTAS.length) {
-      total++;
+      cuenta.total++;
       const res = calcularResultado(r);
       let puntos = 0;
       for (const [id, porRespuesta] of Object.entries(PESOS)) puntos += porRespuesta[r[Number(id)]] ?? 0;
       const porPuntos = puntos <= UMBRAL_PUBLICO ? 'publico' : puntos <= UMBRAL_COMPLEMENTARIO ? 'complementario' : 'completo';
-      const forzado = r[10] === 'si_completo' || r[10] === 'muface' || r[9] === 'nada';
+      const mutualista = r[10] === 'muface' || r[5] === 'funcionario';
+      const esperado =
+        r[10] === 'si_completo' ? 'empresa'
+          : mutualista ? 'mutualidad'
+            : r[9] === 'nada' ? 'publico'
+              : r[9] === 'poco' && porPuntos === 'completo' ? 'complementario'
+                : porPuntos;
       if (res.puntuacion !== puntos) mal('puntuación distinta');
-      if (res.veredicto !== (forzado ? 'publico' : porPuntos)) mal('veredicto distinto');
+      if (res.veredicto !== esperado) mal(`veredicto ${res.veredicto}, esperado ${esperado}`);
       if (res.razones.length === 0) mal('sin razones');
+      // 1423: «Hasta 40 €/mes» nunca acaba en el seguro completo.
+      if (r[9] === 'poco') { cuenta.poco++; if (res.veredicto === 'completo') mal('completo con «Hasta 40 €/mes»'); }
+      // 1421: la mutualidad, declarada en la 5 o en la 10, nunca acaba en «contrata un seguro».
+      if (mutualista && r[10] !== 'si_completo') {
+        cuenta.mutualistas++;
+        if (res.veredicto === 'complementario' || res.veredicto === 'completo') mal('mutualista al que se orienta a contratar');
+      }
+      // 1422: quien tiene una enfermedad crónica y sale «contratar» recibe SIEMPRE el aviso.
+      if (r[2] === 'cronico' && (res.veredicto === 'complementario' || res.veredicto === 'completo')) {
+        cuenta.cronicosQueContratan++;
+        if (!res.avisos.some((a) => a.includes('cuestionario de salud') && a.includes('suele quedar excluida'))) mal('crónica sin aviso de preexistencias');
+      }
+      // 1424: el embarazo en curso no suma puntos y, si no hay filtro, se avisa de que ese parto no se cubre.
+      if (r[4] === 'embarazo_curso') {
+        cuenta.embarazoCurso++;
+        if (res.razones.some((x) => x.includes('embarazada') && x.includes('suma'))) mal('el embarazo en curso suma');
+        if (!res.forzadoPor && !res.avisos.some((a) => a.includes('no cubra este embarazo ni este parto'))) mal('embarazo en curso sin aviso');
+      }
+      // 1434: con seguro completo de empresa el título no es «Sanidad pública es suficiente».
+      if (r[10] === 'si_completo') { cuenta.empresa++; if (VEREDICTOS[res.veredicto].nombre === 'Sanidad pública es suficiente') mal('empresa titulada pública'); }
+      // 1432: sin filtro, la cuenta que se ve da el total (todas las sumas y todas las restas).
+      if (!res.forzadoPor) {
+        const citados = res.razones
+          .map((x) => x.match(/» (suma|resta) (\d+) puntos?\.$/))
+          .filter((m): m is RegExpMatchArray => m !== null)
+          .reduce((acc, m) => acc + (m[1] === 'suma' ? 1 : -1) * Number(m[2]), 0);
+        if (citados !== puntos) mal(`la cuenta visible da ${citados} y la puntuación es ${puntos}`);
+      }
+      // 1425 y 1433: ni la descripción fija de antes ni la asunción de capacidad de ahorro.
+      if (res.descripcion.includes('principalmente para reducir tiempos de espera')) mal('descripción fija del complementario');
+      if (res.consejos.some((c) => c.texto.includes('ahorrar el equivalente'))) mal('consejo de ahorrar el equivalente');
       if (res.razones.some((x) => x.includes('Tu uso médico actual no justifica'))) mal('razón fija de antes');
-      if (forzado && porPuntos !== 'publico' && !res.razones.some((x) => x.startsWith('Sin esa respuesta'))) mal('no dice qué daría la puntuación');
+      if (res.forzadoPor && porPuntos !== 'publico' && !res.razones.some((x) => x.startsWith('Sin esa respuesta'))) mal('no dice qué daría la puntuación');
       for (const x of res.razones) {
         const citada = x.match(/«([^»]+)»/)?.[1];
         if (citada && !citada.startsWith('seguro') && !citada.startsWith('sanidad')
@@ -153,32 +198,63 @@ test('motor: el veredicto no cambia, y las razones dicen qué lo ha decidido', (
   };
   recorrer(0);
   expect(fallos).toEqual([]);
-  expect(total).toBe(1_048_576);
+  expect(cuenta.total).toBe(1_310_720);
+  // Que las comprobaciones de arriba no pasen en vacío: 1/4 de los perfiles con «Hasta 40 €/mes»,
+  // 1/4 con seguro de empresa, 1/5 con embarazo en curso.
+  expect(cuenta.poco).toBe(327_680);
+  expect(cuenta.empresa).toBe(327_680);
+  expect(cuenta.embarazoCurso).toBe(262_144);
+  expect(cuenta.mutualistas).toBeGreaterThan(0);
+  expect(cuenta.cronicosQueContratan).toBeGreaterThan(0);
+});
+
+// Fuera del acta: al medir la reparación de la forma g (el foco va al h1 del resultado) se vio
+// que la barra fija de MeskeiaLogo (0-62 px en móvil) tapaba ENTERO ese h1 (32-61 px a 390 px) y
+// el principio del de la intro (48-117 px): el foco caía en un título oculto. El hero deja ahora
+// 80 px arriba en todos los anchos, el hueco de la plantilla (en hogar, a 1024 px el logo de
+// escritorio, hasta 77 px, tapaba también el título de la intro). Se mide la caja real del
+// TEXTO del h1 contra la del logo y la del botón de tema, en cinco anchos y en las dos pantallas.
+test('móvil y escritorio: el logo fijo y el botón de tema no tapan el título, ni en la intro ni en el resultado', async ({ page }) => {
+  const solapes: string[] = [];
+  const medir = (momento: string) => page.evaluate((m) => {
+    window.scrollTo(0, 0);
+    const h1 = document.querySelector('h1');
+    if (!h1) return [`${m}: sin h1`];
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const texto = Array.from(rango.getClientRects());
+    const fijos = Array.from(document.querySelectorAll('[class*="headerBar"] > *')).map((e) => e.getBoundingClientRect());
+    const fuera: string[] = [];
+    for (const t of texto) for (const f of fijos) {
+      if (t.left < f.right && f.left < t.right && t.top < f.bottom && f.top < t.bottom) fuera.push(`${m}: texto ${Math.round(t.top)}-${Math.round(t.bottom)} bajo ${Math.round(f.top)}-${Math.round(f.bottom)}`);
+    }
+    return fuera;
+  }, momento);
+  for (const ancho of [360, 390, 768, 1024, 1280]) {
+    await page.setViewportSize({ width: ancho, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-seguro-salud/');
+    await esperarHidratacionBotones(page);
+    solapes.push(...(await medir(`${ancho}px intro`)));
+    await page.getByRole('button', { name: /Empezar el test/ }).click();
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await responder(page, Array(10).fill(0));
+    solapes.push(...(await medir(`${ancho}px resultado`)));
+  }
+  expect(solapes).toEqual([]);
 });
 
 /**
- * INSPECCIÓN DEL 24/09/2026 (Inspector, primera inspección, tras la reparación en lote 99acf1e0).
+ * REPARACIÓN DEL 24/09/2026 de los hallazgos 1420-1436 (primera inspección del Inspector, tras la
+ * reparación en lote 99acf1e0). Los tests que eran `test.fail()` pasan a exigir lo reparado;
+ * los que ya pasaban siguen, y el que fijaba el precio «35 – 80 €/mes» se reescribe (1427).
  *
- * Los radios, la barra y las razones que dicen qué decidió el resultado ya los cubren los cinco
- * tests de arriba y el testigo de familia: no se repiten. Lo nuevo es lo que el usuario DECLARA
- * como límite y el motor trata como un punto más (en selector-mascota, hallazgos 1332 y 1333),
- * los datos de la pregunta de comunidad autónoma y el contenido de la guía y de la FAQ.
- *
- * Recuento del motor sobre las 1.048.576 combinaciones (barrido del Inspector en su scratchpad):
- *   · «Hasta 40 €/mes» → «seguro completo» (60 – 180 €/mes) en 70.052 de 262.144.
- *   · «Funcionario/a (con MUFACE, ISFAS…)» → contratar un seguro en 84.716 de 262.144 (31.756
- *     de ellos «completo»): solo fuerza «pública» la MUFACE de la pregunta 10, no la de la 5.
- *   · «Tengo una enfermedad crónica» → seguro privado en 95.288 de 262.144; en 28.280 la crónica
- *     es la que sube el veredicto; en 0 el resultado menciona las preexistencias.
- *   · «Estoy embarazada o planeando estarlo» decide el veredicto en 40.948 perfiles.
- *   · «Andalucía, Valencia, Murcia, Castilla-La Mancha…» (+2) frente a «Cataluña, Galicia,
- *     Aragón, Canarias…» (0) cambia el veredicto en 25.106 de 262.144.
- *   · «Seguro completo» con la nota «familia de 3» a quien dijo «No tengo hijos»: 41.128.
- *   · «Sanidad pública» por puntos que muestra las sumas y oculta las restas: 15.860 de 17.460.
- *
- * Los perfiles son el índice de la opción elegida en cada una de las 10 preguntas, en orden.
+ * Los perfiles son el índice de la opción elegida en cada una de las 10 preguntas, en orden. La
+ * pregunta 3 ya no es la comunidad autónoma sino la espera en tu zona (corta · entre 2 y 4 meses o
+ * no lo sé · más de 4 meses · rural), con los MISMOS índices de puntos: 0 · 0 · +2 · +2. La 4 tiene
+ * cinco opciones: sin hijos · 1 hijo · 2 o más · embarazada ahora (0) · planeo un embarazo (+3).
  */
-test.describe('Inspección 24/09/2026 — límites declarados, comunidades, datos y contraste', () => {
+test.describe('Reparación 24/09/2026 — límites declarados, espera en tu zona, datos y contraste', () => {
   const valorVeredicto = (page: Page) => page.locator('[class*="veredictoValor"]').innerText();
   /** El resultado SIN la guía educativa (que nace plegada): veredicto, cobertura, razones y consejos. */
   const resultado = async (page: Page): Promise<string> => {
@@ -187,27 +263,34 @@ test.describe('Inspección 24/09/2026 — límites declarados, comunidades, dato
     );
     return partes.join(' ').replace(/\s+/g, ' ');
   };
+  /** Los avisos del resultado (role="note", fuera de la guía plegada). */
+  const avisos = async (page: Page): Promise<string> =>
+    (await page.locator('p[role="note"][class*="aviso"]').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
   const faqJsonLd = async (page: Page): Promise<string> => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     return bloques.find((b) => b.includes('"FAQPage"')) ?? '';
   };
   const abrirGuia = async (page: Page): Promise<string> => {
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    await expect(page.getByText('MUFACE e ISFAS: la opción de los funcionarios')).toBeVisible();
+    await expect(page.getByText('MUFACE, ISFAS y MUGEJU: las mutualidades de funcionarios')).toBeVisible();
     return (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
   };
 
-  // Ocasional (0) · Un especialista (+2) · Cataluña, Galicia… (0) · 1 hijo (+2) · Cuenta ajena (0)
+  // Ocasional (0) · Un especialista (+2) · Espera entre 2 y 4 meses (0) · 1 hijo (+2) · Cuenta ajena (0)
   // · «Lo acepto» (0) · Dental bien (0) · «No, pero me interesa» (0) · 40 – 100 €/mes (0) · Sin
   // seguro de empresa (0) = 4 → de 3 a 7, complementario (motor.ts: UMBRAL_PUBLICO 2, _COMPLEMENTARIO 7).
-  test('caso normal: 4 puntos → seguro complementario de 35 – 80 €/mes, con sus dos razones', async ({ page }) => {
+  // REESCRITO (1427): antes exigía «35 – 80 €/mes», una horquilla sin fuente que el FAQPage
+  // contradecía. Ahora la referencia es la prima media del sector: 12.059 M€ / 12,6 M personas /
+  // 12 = 79,76 → «≈ 80 €/mes de media» (UNESPA, 2024).
+  test('caso normal: 4 puntos → complementario, con la referencia de precio de UNESPA y lo que pesa', async ({ page }) => {
     await abrirTest(page);
     const texto = await responder(page, [1, 1, 1, 1, 0, 1, 0, 2, 2, 2]);
     expect(await valorVeredicto(page)).toBe('Seguro complementario recomendado');
-    await expect(page.locator('[class*="precioRango"]')).toHaveText('35 – 80 €/mes');
+    await expect(page.locator('[class*="precioRango"]')).toHaveText('≈ 80 €/mes de media');
     expect(texto).toContain('Tu puntuación es 4: de 3 a 7, un seguro que complemente a la sanidad pública.');
     expect(texto).toContain('Especialistas: «Sí, un especialista» suma 2 puntos.');
     expect(texto).toContain('Hijos: «Sí, 1 hijo» suma 2 puntos.');
+    await expect(page.locator('[class*="veredictoDesc"]')).toContainText('lo que más pesa es el seguimiento de especialistas y la atención a tus hijos');
   });
 
   // Todo a cero salvo dental «Es un gasto importante» (+3) y «Hasta 40 €/mes» (−1) = 2 → pública
@@ -237,8 +320,10 @@ test.describe('Inspección 24/09/2026 — límites declarados, comunidades, dato
   });
 
   test('riesgo 2: el aviso es «high», está abierto en el resultado y no vive en la guía plegada', async ({ page }) => {
-    // _private/DISCLAIMER-POLICY.md: salud + finanzas sin componente fiscal ni clínico → Nivel 2,
-    // severity="high", nunca colapsable.
+    // _private/DISCLAIMER-POLICY.md: seguros («Calculadoras de ahorro, seguros…») → Nivel 2,
+    // severity="high", nunca colapsable. La reparación añade avisos de preexistencias y cita el
+    // art. 10 de la Ley de Contrato de Seguro, pero la app sigue sin calcular nada fiscal ni
+    // clínico (disparadores del Nivel 1): se revisó y el nivel no cambia.
     await abrirTest(page);
     await responder(page, [1, 1, 1, 1, 0, 1, 0, 2, 2, 2]);
     const aviso = page.locator('[role="note"]').filter({ hasText: 'TÚ ERES RESPONSABLE' });
@@ -248,172 +333,201 @@ test.describe('Inspección 24/09/2026 — límites declarados, comunidades, dato
     expect(await aviso.evaluate((el) => !!el.closest('[class*="ducational"]'))).toBe(false);
   });
 
-  // SISLE-SNS a 31/12/2025 (Ministerio de Sanidad, LISTAS_PUBLICACION_Dic_2025.pdf), tiempo medio
-  // de espera para primera consulta (SNS 102 días): Navarra 152 y País Vasco 49 («buen rendimiento
-  // relativo»); Canarias 162, Aragón 138, Cataluña 120 y Galicia 63 («esperas moderadas»);
-  // Andalucía 136, C. Valenciana 95, Murcia 89 y Castilla-La Mancha 64 («mayor presión
-  // asistencial», +2 puntos). Quirúrgica (SNS 121): C. Valenciana 88 y CLM 92 frente a Cataluña 142.
-  test('HALLAZGO abierto: la pregunta de comunidad califica sistemas de salud sin fuente, y la cifra oficial lo contradice', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: nota valorativa por territorio (§1.quinquies, regla 6) que además suma puntos.
+  // 1420: la pregunta 3 calificaba tres grupos de comunidades sin fuente y daba +2 al tercero; el
+  // SISLE-SNS a 31/12/2025 lo contradecía. Ahora pregunta la espera en TU zona, con la media
+  // oficial como referencia: 102 días (LISTAS_PUBLICACION_Dic_2025.pdf, pág. 14, «TOTAL … 102»).
+  // El caso de la ficha (Ocasional · un especialista · … · «Preferiría no esperar» · 40 – 100 €)
+  // da 2 → pública con «entre 2 y 4 meses» y 4 → complementario con «más de 4 meses»: lo que
+  // mueve el veredicto es la espera declarada, no la comunidad.
+  test('1420: la pregunta de la espera no califica comunidades, cita la media oficial y es la espera la que decide', async ({ page }) => {
     await abrirTest(page);
-    for (const i of [0, 0]) {
+    for (const i of [1, 1]) {
       await page.locator('[role="radiogroup"] [role="radio"]').nth(i).click();
       await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
     }
     await page.getByText('Pregunta 3 de 10').first().waitFor();
     const opciones = (await page.locator('[role="radiogroup"]').innerText()).replace(/\s+/g, ' ');
-    expect(opciones).toContain('Castilla-La Mancha'); // precondición: es la pregunta de comunidad
-    const valorativo = /buen rendimiento relativo|mayor presión asistencial|esperas moderadas/.test(opciones);
-    expect(!valorativo || /SISLE/.test(opciones)).toBe(true);
+    expect(opciones).not.toMatch(/Andaluc|Madrid|Navarra|Catalu|Castilla|Canarias|Valencia|Murcia|País Vasco|Galicia|Aragón/);
+    expect(opciones).not.toMatch(/buen rendimiento|presión asistencial|esperas moderadas/);
+    expect(opciones).toContain('Referencia: 102 días de media en el sistema público (SISLE-SNS, 31/12/2025)');
+    for (const [espera, veredicto] of [[1, 'Sanidad pública es suficiente'], [2, 'Seguro complementario recomendado']] as const) {
+      await abrirTest(page);
+      await responder(page, [1, 1, espera, 0, 0, 1, 0, 2, 2, 2]);
+      expect(await valorVeredicto(page)).toBe(veredicto);
+    }
   });
 
-  // Muy frecuente (+3) · Varios especialistas (+3) · Cataluña… (0) · Sin hijos · Cuenta ajena ·
-  // Acceso «crítico» (+3) · Dental bien · «Me interesa» · HASTA 40 €/MES (−1) · Sin seguro de
-  // empresa = 8 → completo, cuya ficha empieza en 60 €/mes. Se admite ficha que quepa o aviso.
-  test('HALLAZGO abierto: «Hasta 40 €/mes» → seguro completo de «60 – 180 €/mes», sin aviso', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el presupuesto es un peso (−1), no un límite; 70.052 perfiles.
+  // 1423: Muy frecuente (+3) · Varios especialistas (+3) · Espera 2-4 meses (0) · Sin hijos · Cuenta
+  // ajena · Acceso «crítico» (+3) · Dental bien · «Me interesa» · HASTA 40 €/MES (−1) · Sin seguro
+  // de empresa = 8 → por puntos «completo», acotado a complementario, con el aviso y la media de
+  // UNESPA (≈ 80 €/mes, el doble del tope).
+  test('1423: «Hasta 40 €/mes» ya no acaba en el seguro completo, y se dice por qué', async ({ page }) => {
     await abrirTest(page);
-    await responder(page, [3, 2, 1, 0, 0, 3, 0, 2, 1, 2]);
-    expect(await valorVeredicto(page)).toBe('Seguro privado completo recomendado');
-    const minimo = Number((await page.locator('[class*="precioRango"]').innerText()).match(/\d+/)?.[0]);
-    const resto = (await resultado(page)).replace('Presupuesto: «Hasta 40 €/mes» resta 1 punto.', '');
-    expect(minimo <= 40 || /presupuesto/i.test(resto)).toBe(true);
+    const texto = await responder(page, [3, 2, 1, 0, 0, 3, 0, 2, 1, 2]);
+    expect(await valorVeredicto(page)).toBe('Seguro complementario recomendado');
+    expect(texto).toContain('Tu puntuación es 8: desde 8 apuntaría a un seguro privado completo, pero con un presupuesto de «Hasta 40 €/mes» la orientación se queda en un seguro complementario.');
+    const aviso = await avisos(page);
+    expect(aviso).toContain('Por puntos saldría un seguro completo, pero has dicho que puedes pagar «Hasta 40 €/mes»');
+    expect(aviso).toContain('la prima media del sector es de unos 80 € al mes por persona asegurada (UNESPA, 2024)');
   });
 
-  // Con frecuencia (+2) · Un especialista (+2) · Cataluña… (0) · 2 o más hijos (+3) ·
-  // FUNCIONARIO/A (CON MUFACE, ISFAS…) (−3) · «Muy importante» (+2) · Dental pendiente (+2) ·
-  // «Me interesa» · 40 – 100 € · «No, tendría que contratarlo yo» = 8 → completo. Con «Tengo
-  // mutualidad» en la pregunta 10 la app fuerza «pública»; con la misma mutualidad en la 5, no.
-  test('HALLAZGO abierto: quien declara MUFACE/ISFAS en la pregunta 5 recibe «seguro privado completo»', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: la mutualidad de la pregunta 5 resta 3; solo la de la 10 filtra.
+  // 1421: Con frecuencia (+2) · Un especialista (+2) · Espera 2-4 meses · 2 o más hijos (+3) ·
+  // FUNCIONARIO/A CON MUTUALIDAD (−3) · «Muy importante» (+2) · Dental pendiente (+2) · «Me interesa» ·
+  // 40 – 100 € · «No, tendría que contratarlo yo» = 8. Antes: «Seguro privado completo recomendado».
+  test('1421: quien declara mutualidad en la pregunta 5 no recibe «contrata un seguro»', async ({ page }) => {
     await abrirTest(page);
-    await responder(page, [2, 1, 1, 2, 2, 2, 1, 2, 2, 2]);
-    const veredicto = await valorVeredicto(page);
-    const resto = (await resultado(page)).replace(/[^.]*(suma|resta) \d+ puntos?\./g, '');
-    expect(veredicto === 'Sanidad pública es suficiente' || /MUFACE|mutualidad/i.test(resto)).toBe(true);
+    const texto = await responder(page, [2, 1, 1, 2, 2, 2, 1, 2, 2, 2]);
+    expect(await valorVeredicto(page)).toBe('Tu mutualidad ya te da cobertura');
+    expect(texto).toContain('Tienes mutualidad de funcionarios (MUFACE, ISFAS, MUGEJU)');
+    expect(texto).toContain('Sin esa respuesta, tu puntuación (8) apuntaría a «seguro privado completo recomendado».');
+    await expect(page.locator('[class*="precioRango"]')).toHaveText('0 € adicionales');
   });
 
-  // Muy frecuente (+3) · «Tengo una enfermedad crónica» (+2) · Madrid… (0) · Sin hijos · Cuenta
-  // ajena · Acceso «crítico» (+3) · Dental bien · «No estoy seguro» · 40 – 100 € · Sin seguro de
-  // empresa = 8 → completo (sin la crónica, 6 → complementario). La FAQ de la misma página dice
-  // que las preexistencias «pueden quedar excluidas de la cobertura o conllevar una sobretasa».
-  test('HALLAZGO abierto: la enfermedad crónica suma para contratar y el resultado no avisa de las preexistencias', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: 0 de 262.144 perfiles crónicos lo mencionan fuera de la guía plegada.
+  // 1422: Muy frecuente (+3) · «Tengo una enfermedad crónica» (+2) · Espera corta (0) · Sin hijos ·
+  // Cuenta ajena · Acceso «crítico» (+3) · Dental bien · «No estoy seguro» · 40 – 100 € · Sin seguro
+  // = 8 → completo; sin la crónica, 6 → complementario. Ley 50/1980, art. 10 (cuestionario) y OCU
+  // («Está excluida de cobertura la asistencia relacionada con enfermedades … preexistentes»).
+  test('1422: la enfermedad crónica lleva el aviso de preexistencias y dice qué saldría sin ella', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [3, 3, 0, 0, 0, 3, 0, 3, 2, 2]);
     expect(await valorVeredicto(page)).toBe('Seguro privado completo recomendado');
-    expect(await resultado(page)).toMatch(/preexist/i);
+    const aviso = await avisos(page);
+    expect(aviso).toContain('Has declarado una enfermedad crónica.');
+    expect(aviso).toContain('art. 10 de la Ley 50/1980 de Contrato de Seguro');
+    expect(aviso).toContain('suele quedar excluida de la cobertura o encarecer la prima (OCU)');
+    expect(aviso).toContain('Sin esa respuesta, la orientación sería «seguro complementario recomendado».');
   });
 
-  // Ocasional · Solo cabecera · Cataluña… · «ESTOY EMBARAZADA o planeando estarlo» (+3) · Cuenta
-  // ajena · «Lo acepto» · Dental bien · «Me interesa» · 40 – 100 € · Sin seguro = 3 →
-  // complementario, con el embarazo como única razón. Un embarazo en curso al contratar es
-  // preexistencia y el parto tiene carencia de 8 meses (lo dice el propio consejo): no se cubre.
-  test('HALLAZGO abierto: el embarazo en curso es la razón para contratar, y no se dice que ese parto no se cubre', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: la opción junta «estoy embarazada» con «planeando»; decide 40.948 perfiles.
+  // 1424: Ocasional · Solo cabecera · Espera 2-4 meses · «ESTOY EMBARAZADA AHORA» (0) · Cuenta ajena ·
+  // «Lo acepto» · Dental bien · «Me interesa» · 40 – 100 € · Sin seguro = 0 → pública, con el aviso
+  // de que una póliza nueva no cubre ese parto. «Planeo un embarazo» (+3) = 3 → complementario,
+  // con el aviso de carencias: OCU, «entre 6 y 8 meses, dependiendo del tratamiento».
+  test('1424: el embarazo en curso no es razón para contratar y se avisa; planearlo lleva el aviso de carencias', async ({ page }) => {
     await abrirTest(page);
-    await responder(page, [1, 0, 1, 3, 0, 1, 0, 2, 2, 2]);
-    const texto = await resultado(page);
-    expect(texto).toContain('Hijos: «Estoy embarazada o planeando estarlo» suma 3 puntos.');
-    expect(texto).toMatch(/embarazo en curso|ya (estás )?embarazada|preexist/i);
+    const texto = await responder(page, [1, 0, 1, 3, 0, 1, 0, 2, 2, 2]);
+    expect(await valorVeredicto(page)).toBe('Sanidad pública es suficiente');
+    expect(texto).not.toMatch(/embarazada[^.]*suma/);
+    expect(await avisos(page)).toContain('Si ya estás embarazada, lo normal es que una póliza nueva no cubra este embarazo ni este parto');
+    await abrirTest(page);
+    const planeando = await responder(page, [1, 0, 1, 4, 0, 1, 0, 2, 2, 2]);
+    expect(await valorVeredicto(page)).toBe('Seguro complementario recomendado');
+    expect(planeando).toContain('Hijos: «Planeo un embarazo» suma 3 puntos.');
+    expect(await avisos(page)).toContain('normalmente de 6 a 8 meses');
   });
 
-  // Casi nunca · Solo cabecera · Madrid… · Sin hijos · Cuenta ajena · «PUEDO ESPERAR SIN
-  // PROBLEMA» · Dental «gasto importante» (+3) · «No estoy seguro» · 40 – 100 € · Sin seguro = 3
-  // → complementario: la ficha fija dice que es «principalmente para reducir tiempos de espera».
-  test('HALLAZGO abierto: a quien puede esperar y solo suma el dentista, «para reducir tiempos de espera en especialistas»', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: descripción fija del veredicto; 13.180 perfiles «puedo esperar» + «solo cabecera».
+  // 1425: Casi nunca · Solo cabecera · Espera corta · Sin hijos · Cuenta ajena · «PUEDO ESPERAR SIN
+  // PROBLEMA» · Dental «gasto importante» (+3) · «No estoy seguro» · 40 – 100 € · Sin seguro = 3 →
+  // complementario: la descripción dice que pesa el dentista, no «reducir tiempos de espera».
+  test('1425: la descripción del complementario dice lo que ha pesado en ese perfil', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [0, 0, 0, 0, 0, 0, 2, 3, 2, 2]);
     expect(await valorVeredicto(page)).toBe('Seguro complementario recomendado');
-    await expect(page.locator('[class*="veredictoDesc"]')).not.toContainText('principalmente para reducir tiempos de espera en especialistas');
+    const desc = page.locator('[class*="veredictoDesc"]');
+    await expect(desc).not.toContainText('principalmente para reducir tiempos de espera en especialistas');
+    await expect(desc).toContainText('En tu caso, lo que más pesa es la salud dental.');
   });
 
-  // Muy frecuente (+3) · Varios (+3) · Cataluña… · NO TENGO HIJOS · «Desempleo, estudiante o
-  // JUBILADO/A» · Crítico (+3) · Dental gasto (+3) · Satisfecho (+2) · Más de 100 € (+1) · Sin
-  // seguro = 15 → completo, con el precio de una «familia de 3 (adultos 30-45 años + 1 niño)».
-  test('HALLAZGO abierto: sin hijos y jubilado, el precio que se enseña es el de una familia de 3 de 30-45 años', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: nota de precio fija; 41.128 «completo» sin hijos.
+  // 1426: Muy frecuente (+3) · Varios (+3) · Espera 2-4 meses · NO TENGO HIJOS · «Desempleo, estudiante o
+  // JUBILADO/A» · Crítico (+3) · Dental gasto (+3) · Satisfecho (+2) · Más de 100 € (+1) · Sin seguro
+  // = 15 → completo. La nota ya no habla de una «familia de 3» y dice que la app no pregunta la edad.
+  test('1426: la nota de precio no supone una familia de 3 de 30-45 años', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [3, 2, 1, 0, 3, 3, 2, 0, 3, 2]);
     expect(await valorVeredicto(page)).toBe('Seguro privado completo recomendado');
-    await expect(page.locator('[class*="precioNota"]')).not.toContainText('familia de 3');
+    const nota = page.locator('[class*="precioNota"]');
+    await expect(nota).not.toContainText('familia de 3');
+    await expect(nota).toContainText('Esta app no pregunta tu edad');
+    await expect(nota).toContainText('Es por persona');
   });
 
-  // FAQPage: «básico con copago … entre 40 y 80 € al mes» para UNA persona joven. Pantalla:
-  // completo desde 60 €/mes para TRES personas = 20 €/persona, la mitad del básico de la FAQ.
-  test('HALLAZGO abierto: la FAQ da 40 €/mes por persona al seguro básico; la pantalla, 20 €/persona al completo', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: las dos cifras de la misma página no caben juntas.
+  // 1427: una sola verdad. Pantalla y FAQPage salen de motor.ts: UNESPA 12.059 M€ (2024) / 12,6 M
+  // personas → ≈ 80 €/mes; copago «normalmente entre 3 y 20 euros por cada servicio médico» (OCU),
+  // igual en el FAQPage y en la guía (antes 2-15 € y 3-8 €).
+  test('1427: el FAQPage, la pantalla y la guía dan las mismas cifras de precio y copago', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [3, 2, 1, 0, 3, 3, 2, 0, 3, 2]);
-    const minimoFaq = Number((await faqJsonLd(page)).match(/entre (\d+) y \d+ € al mes/)?.[1]);
-    expect(minimoFaq).toBe(40); // precondición
-    const minimo = Number((await page.locator('[class*="precioRango"]').innerText()).match(/\d+/)?.[0]);
-    const personas = /familia de 3/.test(await page.locator('[class*="precioNota"]').innerText()) ? 3 : 1;
-    expect(minimo / personas).toBeGreaterThanOrEqual(minimoFaq);
+    await expect(page.locator('[class*="precioRango"]')).toHaveText('≈ 80 €/mes de media');
+    const faq = await faqJsonLd(page);
+    expect(faq).toContain('12.059 millones de euros en primas en 2024');
+    expect(faq).toContain('unos 80 € al mes por persona asegurada');
+    expect(faq).not.toContain('entre 40 y 80 € al mes');
+    expect(faq).toContain('normalmente entre 3 y 20 € por cada servicio médico (OCU)');
+    expect(await abrirGuia(page)).toContain('normalmente entre 3 y 20 € por cada servicio médico (OCU)');
   });
 
-  // Real Decreto-ley 28/2018 (BOE-A-2018-17992): desde el 1/1/2019 la incapacidad temporal por
-  // contingencias comunes es de cobertura OBLIGATORIA en el RETA.
-  test('HALLAZGO abierto: la guía dice que los autónomos no tienen «baja por enfermedad garantizada»', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: falso desde 2019.
-    await abrirTest(page);
-    await responder(page, [1, 1, 1, 1, 0, 1, 0, 2, 2, 2]);
-    expect(await abrirGuia(page)).not.toContain('sin baja por enfermedad garantizada');
-  });
-
-  test('HALLAZGO abierto: la guía se fecha «en 2025» y da como vigente el ranking de la OMS del año 2000', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el World Health Report 2000 es el único ranking de la OMS; nunca se repitió.
+  // 1428: LGSS art. 315 (IT de cobertura obligatoria en el RETA) y art. 321 (prestación desde el
+  // cuarto día de baja, redacción del RDL 28/2018, en vigor desde el 01/01/2019).
+  test('1428: la guía no dice que los autónomos no tienen baja por enfermedad', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [1, 1, 1, 1, 0, 1, 0, 2, 2, 2]);
     const guia = await abrirGuia(page);
-    const rankingSinAnio = /ranking de la OMS/.test(guia) && !/2000/.test(guia);
-    expect(guia.includes('El sistema sanitario español en 2025') || rankingSinAnio).toBe(false);
+    expect(guia).not.toContain('sin baja por enfermedad garantizada');
+    expect(guia).toContain('la incapacidad temporal es de cobertura obligatoria en el régimen de autónomos desde el 1 de enero de 2019 (Real Decreto-ley 28/2018');
   });
 
-  // Ley 50/1980 de Contrato de Seguro, art. 10: el deber es responder al cuestionario del
-  // asegurador; ante reserva o inexactitud, este puede RESCINDIR en un mes, y con dolo o culpa
-  // grave queda liberado del pago. No es «nulidad del contrato».
-  test('HALLAZGO abierto: la FAQ dice que no declarar una enfermedad da «nulidad del contrato»', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: figura jurídica equivocada en el FAQPage (lo leen las IAs).
+  test('1429: la guía no se fecha en un año cerrado ni da por vigente el ranking de la OMS del año 2000', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, [1, 1, 1, 1, 0, 1, 0, 2, 2, 2]);
+    const guia = await abrirGuia(page);
+    expect(guia).not.toContain('El sistema sanitario español en 2025');
+    expect(guia).not.toMatch(/ranking de la OMS|mejores del mundo/);
+    expect(guia).toContain('102 días de media en el conjunto del Sistema Nacional de Salud');
+  });
+
+  // 1430: Ley 50/1980, art. 10 — deber de declarar según el cuestionario; rescisión en un mes;
+  // reducción proporcional si el siniestro llega antes; liberación del pago con dolo o culpa grave.
+  test('1430: la FAQ describe el art. 10 de la Ley de Contrato de Seguro, no una «nulidad»', async ({ page }) => {
     await page.goto('/selector-seguro-salud/');
-    expect(await faqJsonLd(page)).toContain('FAQPage'); // precondición
-    expect(await faqJsonLd(page)).not.toContain('nulidad del contrato');
+    const faq = await faqJsonLd(page);
+    expect(faq).toContain('FAQPage'); // precondición
+    expect(faq).not.toContain('nulidad del contrato');
+    expect(faq).toContain('rescindir el contrato en el plazo de un mes');
+    expect(faq).toContain('si hubo dolo o culpa grave queda liberada del pago');
   });
 
-  test('HALLAZGO abierto: una app del sistema sanitario español sin RegionBadge', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: §1.bis, «¿En qué comunidad autónoma resides?», MUFACE, € (como selector-mascota, 1340).
+  test('1431: la app lleva el aviso de región (sistema sanitario español)', async ({ page }) => {
     await page.goto('/selector-seguro-salud/');
     await esperarHidratacionBotones(page);
-    await expect(page.locator('text=/Solo España|Datos de referencia: España/')).toHaveCount(1, { timeout: 1_000 });
+    await expect(page.getByRole('note', { name: 'Aviso: esta herramienta aplica únicamente a España' })).toHaveCount(1);
+    await expect(page.locator('text=/Solo España: basado en el sistema sanitario público español/')).toHaveCount(1);
+    // Aplica solo a España por una ley que no es fiscal: Delegum no es la fuente de nada de lo
+    // que dice la app, así que el aviso no lo enlaza (RegionBadge fuenteDelegum={false}).
+    await expect(page.getByText('Fuente de los datos: Delegum')).toHaveCount(0);
   });
 
-  // El mismo perfil del caso de límite: dental +3, «Hasta 40 €/mes» −1 = 2. La pantalla dice
-  // «Tu puntuación es 2» y enseña solo el +3: la resta que lleva a pública no aparece.
-  test('HALLAZGO abierto: en «sanidad pública» por puntos se enseñan las sumas y se ocultan las restas', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: motor.ts solo lista las restas si el veredicto NO es pública; 15.860 perfiles.
+  // 1432: dental +3, «Hasta 40 €/mes» −1 = 2 → pública. La cuenta visible da el total: la suma Y la resta.
+  test('1432: en «sanidad pública» por puntos se enseñan las sumas y las restas', async ({ page }) => {
     await abrirTest(page);
     const texto = await responder(page, [0, 0, 0, 0, 0, 0, 2, 3, 1, 2]);
+    expect(texto).toContain('Tu puntuación es 2:');
     expect(texto).toContain('Salud dental: «Es un gasto importante para mí cada año» suma 3 puntos.');
     expect(texto).toContain('Presupuesto: «Hasta 40 €/mes» resta 1 punto.');
   });
 
-  // Todo a cero · «Desempleo, estudiante o jubilado/a» · «NADA, no quiero gasto extra» → pública
-  // forzada; el consejo le pide ahorrar «el equivalente» (§1.quinquies, regla 2).
-  test('HALLAZGO abierto: a quien no quiere ningún gasto se le aconseja ahorrar «el equivalente» del seguro', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: asunción de capacidad de ahorro; sale en los 262.144 perfiles con «Nada».
+  // 1433: Todo a cero · «Desempleo, estudiante o jubilado/a» · «NADA, no quiero gasto extra» →
+  // pública forzada. Ya no se aconseja ahorrar «el equivalente» (§1.quinquies, regla 2).
+  test('1433: a quien no quiere ningún gasto no se le aconseja ahorrar el equivalente del seguro', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [0, 0, 0, 0, 3, 0, 0, 3, 0, 2]);
     expect(await valorVeredicto(page)).toBe('Sanidad pública es suficiente');
-    expect(await resultado(page)).not.toContain('ahorrar el equivalente en un fondo de emergencia sanitaria');
+    const texto = await resultado(page);
+    expect(texto).not.toContain('ahorrar el equivalente');
+    expect(texto).toContain('Si tu situación cambia');
   });
 
-  test('HALLAZGO abierto: con seguro privado completo de empresa, el veredicto se titula «Sanidad pública es suficiente»', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el título, la cobertura y «0 €/mes · vía impuestos» contradicen su propia razón.
+  test('1434: con seguro completo de empresa, el veredicto es aprovecharlo, no «Sanidad pública es suficiente»', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [0, 0, 0, 0, 0, 0, 0, 2, 2, 0]);
     expect(await resultado(page)).toContain('Ya tienes cobertura privada completa pagada por tu empresa');
-    expect(await valorVeredicto(page)).not.toBe('Sanidad pública es suficiente');
+    expect(await valorVeredicto(page)).toBe('Aprovecha tu seguro de empresa');
+    await expect(page.locator('[class*="precioRango"]')).toHaveText('0 € adicionales');
+    await expect(page.locator('[class*="precioNota"]')).not.toContainText('impuestos');
+  });
+
+  test('sin marcas de aseguradoras en los consejos (política del proyecto; forma del 1519 de hogar)', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, [3, 2, 1, 0, 3, 3, 2, 0, 3, 2]);
+    expect(await resultado(page)).not.toMatch(/Sanitas|Adeslas|Asisa|AXA|DKV/);
   });
 
   // ─── Contraste, con los colores COMPUTADOS y el fondo real compuesto (o cada parada del degradado) ───
@@ -447,7 +561,10 @@ test.describe('Inspección 24/09/2026 — límites declarados, comunidades, dato
       }
       let fondo = base;
       for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
-      return ratio(sobre(leer(getComputedStyle(el).color) as Rgba, fondo), fondo);
+      // La opacidad del propio texto (el subtítulo del hero va a 0,88) también cuenta.
+      const tinta = leer(getComputedStyle(el).color) as Rgba;
+      tinta.a *= Number(getComputedStyle(el).opacity);
+      return ratio(sobre(tinta, fondo), fondo);
     });
   }
   const COMPLEMENTARIO = [1, 1, 1, 1, 0, 1, 0, 2, 2, 2] as const;
@@ -459,29 +576,35 @@ test.describe('Inspección 24/09/2026 — límites declarados, comunidades, dato
     const m: Record<string, [number, number]> = {};
     await abrirTest(page);
     m.progresoPaso = [await contraste(page, '[class*="progresoPaso"]'), 4.5];
+    await page.locator('[role="radio"]').first().click(); // habilitado: un botón deshabilitado está exento
+    m.btnSiguiente = [await contraste(page, '[class*="btnSiguiente"]'), 4.5];
     await responder(page, COMPLEMENTARIO);
+    m.heroSubtitulo = [await contraste(page, '[class*="heroSubtitleSm"]'), 4.5];
     m.razonesTitulo = [await contraste(page, '[class*="razonesTitulo"]'), 4.5];
     m.btnRepetir = [await contraste(page, '[class*="btnRepetir"]'), 4.5];
+    m.veredictoComplementario = [await contraste(page, '[class*="veredictoValor"]'), 3];
     await abrirTest(page);
     await responder(page, PUBLICO);
     m.veredictoPublico = [await contraste(page, '[class*="veredictoValor"]'), 3];
     await abrirTest(page);
     await responder(page, COMPLETO);
     m.veredictoCompleto = [await contraste(page, '[class*="veredictoValor"]'), 3];
+    m.aviso = [await contraste(page, 'p[role="note"][class*="aviso"]'), 4.5];
     return m;
   }
 
-  test('HALLAZGO abierto: en tema claro, cinco textos de marca no llegan a su mínimo', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: --primary/--secondary/#e8a020 como texto; lo que toca es --primary-texto/--secondary-texto.
-    // Medido hoy: progresoPaso 3,93 · razonesTitulo 3,67 · btnRepetir 3,93 (mín. 4,5) ·
-    // veredicto «pública» (--secondary) 2,80 · veredicto «completo» (#e8a020) 2,22 (mín. 3).
+  // 1435 y 1436. Medido antes de reparar, en claro: progresoPaso 3,93 · razonesTitulo 3,67 ·
+  // btnRepetir 3,93 · veredicto «pública» (--secondary) 2,80 · «completo» (#e8a020) 2,22 · hero del
+  // resultado y «Siguiente →» sobre el degradado, 2,80. Ahora: --primary-texto (5,47:1 sobre blanco),
+  // --secondary-texto (5,15), #b45309 en claro (5,02) y --hero-bg / --primary-boton de fondo.
+  test('1435/1436: en tema claro, los textos de marca, el hero del resultado y los botones llegan a su mínimo', async ({ page }) => {
     const m = await medirTextosDeMarca(page);
-    expect(Object.entries(m).filter(([, [v, min]]) => v < min).map(([k]) => k)).toEqual([]);
+    expect(Object.entries(m).filter(([, [v, min]]) => v < min).map(([k, [v]]) => `${k} ${v.toFixed(2)}`)).toEqual([]);
   });
 
-  test('en tema oscuro esos mismos textos sí llegan', async ({ page }) => {
-    // Medido hoy: progresoPaso 6,23 · razonesTitulo 5,86 · btnRepetir 6,23 · pública 6,17 ·
-    // completo 6,22. Es la guarda para cuando se drene el tema claro.
+  test('en tema oscuro esos mismos textos también llegan', async ({ page }) => {
+    // Antes de reparar pasaban en oscuro los textos (6,23 · 5,86 · 6,23 · 6,17 · 6,22) y fallaba el
+    // hero del resultado (2,23). Es la guarda de que drenar el claro no ha roto el oscuro.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-seguro-salud/');
     await esperarHidratacionBotones(page);
@@ -489,17 +612,28 @@ test.describe('Inspección 24/09/2026 — límites declarados, comunidades, dato
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     const m = await medirTextosDeMarca(page); // abrirTest navega de nuevo: el tema se conserva
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    expect(Object.entries(m).filter(([, [v, min]]) => v < min).map(([k]) => k)).toEqual([]);
+    expect(Object.entries(m).filter(([, [v, min]]) => v < min).map(([k, [v]]) => `${k} ${v.toFixed(2)}`)).toEqual([]);
   });
 
-  test('HALLAZGO abierto (de familia): hero del resultado y botones en blanco sobre el degradado --primary→--secondary', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el hero va sobre --hero-bg (8,33:1); hoy el subtítulo da 2,80 en claro.
-    // Medido hoy, peor parada del degradado: claro 2,80 (hero y botones) · oscuro 2,23.
+  test('1436: el hero del resultado usa --hero-bg, como el de la intro', async ({ page }) => {
     await abrirTest(page);
-    await page.locator('[role="radio"]').first().click(); // habilitado: un botón deshabilitado está exento
-    const siguiente = await contraste(page, '[class*="btnSiguiente"]');
     await responder(page, COMPLEMENTARIO);
-    const subtitulo = await contraste(page, '[class*="heroSubtitleSm"]');
-    expect({ subtitulo: subtitulo >= 4.5, siguiente: siguiente >= 4.5 }).toEqual({ subtitulo: true, siguiente: true });
+    const fondo = await page.locator('[class*="heroResultados"]').evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { imagen: cs.backgroundImage, color: cs.backgroundColor };
+    });
+    expect(fondo).toEqual({ imagen: 'none', color: 'rgb(26, 82, 120)' });
+  });
+
+  test('al pulsar «Ver resultado» con el teclado el foco va al encabezado del resultado (familia, forma g)', async ({ page }) => {
+    await abrirTest(page);
+    for (let i = 0; i < 10; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+      if (i < 9) await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await page.getByRole('button', { name: 'Ver resultado' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByRole('heading', { name: 'Tu perfil de cobertura sanitaria' }).waitFor();
+    await expect(page.getByRole('heading', { name: 'Tu perfil de cobertura sanitaria' })).toBeFocused();
   });
 });
