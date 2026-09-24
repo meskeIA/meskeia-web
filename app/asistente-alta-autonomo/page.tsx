@@ -993,7 +993,13 @@ export default function AsistenteAltaAutonomoPage() {
 
               {datos.situacionLaboral === 'pluriactividad' && (
                 <div className={styles.infoPluriactividad}>
-                  <span aria-hidden="true">ℹ️</span> En pluriactividad puedes tener bonificaciones en la cuota según tu cotización por cuenta ajena.
+                  <span aria-hidden="true">ℹ️</span> En pluriactividad no hay una reducción propia de la cuota (la del 50 % desapareció en 2023), pero si lo que cotizas por contingencias comunes en los dos regímenes supera el umbral que fija cada año la Ley de Presupuestos, la Seguridad Social te devuelve el 50 % del exceso (art. 313 LGSS).
+                </div>
+              )}
+
+              {datos.situacionLaboral === 'colaborador_familiar' && (
+                <div className={styles.infoPluriactividad}>
+                  <span aria-hidden="true">ℹ️</span> Como familiar colaborador no tienes la tarifa plana (art. 38 ter.11 de la Ley 20/2007), pero sí una bonificación de la cuota por contingencias comunes de la base mínima del tramo 1: del 50 % durante 18 meses y del 25 % los 6 siguientes, si no has estado de alta en el RETA en los 5 años anteriores (art. 35). Esta herramienta no la descuenta de la cuota que calcula.
                 </div>
               )}
             </div>
@@ -1340,7 +1346,7 @@ export default function AsistenteAltaAutonomoPage() {
                   <td>Cuota mínima mensual</td>
                   <td>Desde ~{euros(CUOTA_MINIMA_TRAMO_1)}/mes (rendimientos bajos)</td>
                   <td>~{euros(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual)}/mes (base mínima RETA admin., obligatoria)</td>
-                  <td>Posible reducción del 50 % el 1.º año</td>
+                  <td>Sin reducción propia; reintegro del 50 % del exceso de cotización (art. 313 LGSS)</td>
                 </tr>
                 <tr>
                   <td>Tarifa plana {TARIFA_PLANA_TXT}</td>
@@ -1406,12 +1412,12 @@ export default function AsistenteAltaAutonomoPage() {
               <p className={styles.escenarioExample}>
                 Laura trabaja en una empresa a jornada parcial y también atiende clientes privados.
                 Su situación es de <strong>pluriactividad</strong>: cotiza en el Régimen General por su
-                empleo y en el RETA por las consultas. Puede acogerse a una <strong>bonificación del 50 %
-                en la cuota RETA durante el primer año</strong>. Tributa en IRPF por ambas fuentes de renta
+                empleo y en el RETA por las consultas. Si es su primera alta como autónoma, tiene la <strong>tarifa plana también en
+                pluriactividad</strong>; la bonificación del 50 % que existía para este caso desapareció en 2023. Tributa en IRPF por ambas fuentes de renta
                 y presenta el 130 trimestralmente por los rendimientos de actividad.
               </p>
               <p className={styles.escenarioTip}>
-                <span aria-hidden="true">💡</span> Si la suma de bases de cotización supera el tope máximo anual, puede solicitar devolución del exceso a la SS.
+                <span aria-hidden="true">💡</span> Si lo que cotiza por contingencias comunes en los dos regímenes supera el umbral que fija cada año la Ley de Presupuestos, la Seguridad Social le devuelve el 50 % del exceso (art. 313 LGSS).
               </p>
             </div>
 
@@ -1501,8 +1507,8 @@ export default function AsistenteAltaAutonomoPage() {
               <summary>¿Tengo que darme de alta en el IAE? ¿Cuánto cuesta?</summary>
               <p>
                 El alta en el <strong>IAE (Impuesto de Actividades Económicas)</strong> se realiza automáticamente
-                al presentar el modelo 036 o 037. Todos los autónomos están <strong>exentos de pago</strong> mientras
-                su cifra de negocios no supere <strong>1.000.000 € anuales</strong>. El epígrafe IAE que elijas
+                al presentar el modelo 036 o 037. Las personas físicas están <strong>exentas de pago</strong> sea cual sea su
+                cifra de negocios (el límite de 1.000.000 € es para las sociedades; art. 82.1.c del TRLRHL). El epígrafe IAE que elijas
                 determina el tipo de IVA aplicable y las deducciones disponibles; es importante elegirlo correctamente
                 desde el inicio, ya que cambiarlo requiere presentar una modificación censal.
               </p>
@@ -1574,8 +1580,8 @@ export default function AsistenteAltaAutonomoPage() {
               <div className={styles.stepContent}>
                 <strong>Alta en el IAE (Impuesto Actividades Económicas)</strong>
                 <p>
-                  Incluida automáticamente en el modelo 036/037. Estás <strong>exento de pago</strong> si tu
-                  facturación anual es inferior a 1.000.000 €. Elige bien el epígrafe: determina el tipo de IVA
+                  Incluida automáticamente en el modelo 036/037. Como persona física estás <strong>exento de pago</strong> sea cual sea
+                  tu facturación (art. 82.1.c del TRLRHL). Elige bien el epígrafe: determina el tipo de IVA
                   que aplicas y las deducciones permitidas.
                 </p>
               </div>

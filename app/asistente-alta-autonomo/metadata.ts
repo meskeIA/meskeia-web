@@ -1,5 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { formatNumber } from '@/lib/formatters';
+import { TRAMOS_RETA_2025, TARIFA_PLANA_2025 } from '@/data/fiscal';
+
+// Las cifras del FAQPage salen de data/fiscal, como las de la página: hasta el 24/09/2026 iban
+// escritas a mano («80 €/mes», «~206 €») y no habrían cambiado con la norma.
+const TRAMO_1 = TRAMOS_RETA_2025[0];
+const TRAMO_MAX = TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
+const eur = (v: number) => `${formatNumber(v, 0)} €`;
 
 export const metadata: Metadata = {
   title: 'Asistente Alta Autónomo - Guía Paso a Paso para Darse de Alta | meskeIA',
@@ -59,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga de cuota de autónomo en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Desde 2023 la cuota de autónomos depende de los ingresos reales netos. En 2026 hay 15 tramos: el mínimo es de ~206 € al mes para ingresos netos inferiores a 670 €/mes, y el máximo es de ~1.607 € para ingresos por encima de 6.000 €/mes. La cuota base elegida determina también la prestación por incapacidad y la futura pensión.',
+        text: `Desde 2023 la cuota de autónomos depende de los ingresos reales netos. En 2026 hay ${TRAMOS_RETA_2025.length} tramos: el mínimo es de ~${eur(TRAMO_1.cuotaMinima)} al mes para ingresos netos inferiores a ${eur(TRAMO_1.rendimientoMax ?? 0)}/mes, y el máximo es de ~${eur(TRAMO_MAX.cuotaMaxima)} para ingresos por encima de ${eur(TRAMO_MAX.rendimientoMin)}/mes. La cuota base elegida determina también la prestación por incapacidad y la futura pensión.`,
       },
     },
     {
@@ -67,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Existe una tarifa plana para nuevos autónomos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Los nuevos autónomos que se den de alta por primera vez (o tras 2 años sin estarlo) tienen derecho a la cuota reducida de 80 €/mes durante los primeros 12 meses, prorrogable otros 12 meses si los rendimientos netos no superan el Salario Mínimo Interprofesional (art. 38 ter de la Ley 20/2007). Hay que solicitarla en el mismo momento del alta en la Seguridad Social: no se puede pedir después.',
+        text: `Sí. Los nuevos autónomos que se den de alta por primera vez (o tras 2 años sin estarlo) tienen derecho a la cuota reducida de ${eur(TARIFA_PLANA_2025.cuota)}/mes durante los primeros ${TARIFA_PLANA_2025.duracion} meses, prorrogable otros ${TARIFA_PLANA_2025.duracion} meses si los rendimientos netos no superan el Salario Mínimo Interprofesional (art. 38 ter de la Ley 20/2007). Hay que solicitarla en el mismo momento del alta en la Seguridad Social: no se puede pedir después. Los familiares colaboradores no tienen tarifa plana (art. 38 ter.11), sino una bonificación propia (art. 35).`,
       },
     },
     {
@@ -75,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Qué es el IAE y cuándo hay que darse de alta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Impuesto sobre Actividades Económicas (IAE) es el censo de actividades económicas gestionado por Hacienda. Darse de alta en el IAE equivale a declarar qué actividad se va a ejercer y en qué epígrafe. Esta gestión se realiza simultáneamente con el modelo 036/037 y es obligatoria antes de iniciar la actividad. La mayoría de autónomos con facturación inferior a 1 millón de euros anuales están exentos del pago del impuesto, aunque sí deben figurar en el censo.',
+        text: 'El Impuesto sobre Actividades Económicas (IAE) es el censo de actividades económicas gestionado por Hacienda. Darse de alta en el IAE equivale a declarar qué actividad se va a ejercer y en qué epígrafe. Esta gestión se realiza simultáneamente con el modelo 036/037 y es obligatoria antes de iniciar la actividad. Las personas físicas están exentas del pago sea cual sea su facturación, y las sociedades lo están mientras su cifra de negocios no llegue a 1 millón de euros (art. 82.1.c del TRLRHL), aunque todos deben figurar en el censo.',
       },
     },
     {

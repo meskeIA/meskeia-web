@@ -280,3 +280,36 @@ test('REGRESIÓN 1374 · un solo plazo para el alta en el RETA y la prórroga li
   expect(jsonLd).not.toContain('30 días hábiles');
   expect(jsonLd).toContain('60 días naturales de antelación');
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sospechas del Inspector reparadas el 24/09/2026 — cotejadas en el BOE ese día.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('24/09 · colaborador familiar: sin tarifa plana (art. 38 ter.11) y con la bonificación del art. 35', async ({ page }) => {
+  await page.getByRole('button', { name: /Mis Datos/ }).click();
+  await page.locator('input[name="situacionLaboral"][value="colaborador_familiar"]').check();
+  await expect(page.getByText('¡Puedes solicitar la tarifa plana!')).toHaveCount(0);
+  const aviso = page.locator('[class*="infoPluriactividad"]').filter({ hasText: 'familiar colaborador' });
+  await expect(aviso).toContainText('art. 38 ter.11');
+  await expect(aviso).toContainText('50 % durante 18 meses');
+  await expect(aviso).toContainText('25 % los 6 siguientes');
+});
+
+test('24/09 · pluriactividad: el 50 % es un reintegro del exceso (art. 313 LGSS), no una reducción el primer año', async ({ page }) => {
+  // Art. 313 LGSS en la redacción del RDL 13/2022 (desde 2023): reintegro del 50 % del exceso
+  // de cotización por contingencias comunes sobre el umbral de la LPGE. No hay reducción de cuota.
+  await expect(page.locator('body')).not.toContainText('Posible reducción del 50 % el 1.º año');
+  await expect(page.locator('body')).not.toContainText('bonificación del 50 % en la cuota RETA durante el primer año');
+  await page.getByRole('button', { name: /Mis Datos/ }).click();
+  await page.locator('input[name="situacionLaboral"][value="pluriactividad"]').check();
+  await expect(page.locator('[class*="infoPluriactividad"]').first()).toContainText('art. 313 LGSS');
+});
+
+test('24/09 · IAE: las personas físicas están exentas sin límite de cifra (art. 82.1.c TRLRHL)', async ({ page }) => {
+  const html = await page.content();
+  expect(html).not.toContain('su cifra de negocios no supere');
+  expect(html).not.toContain('La mayoría de autónomos con facturación inferior a 1 millón');
+  expect(html).toContain('Las personas físicas están exentas del pago sea cual sea su facturación');
+  // Y las cifras del FAQPage salen de data/fiscal: la tarifa plana, 80 €.
+  expect(html).toContain('cuota reducida de 80 €/mes durante los primeros 12 meses');
+});
