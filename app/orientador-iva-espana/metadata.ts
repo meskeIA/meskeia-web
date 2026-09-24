@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { PORCENTAJES_IVA } from '@/data/fiscal';
 
 export const metadata: Metadata = {
   title: 'Orientador del IVA en España: qué IVA aplicar en cada operación - meskeIA',
@@ -53,7 +54,7 @@ export const jsonLd = generateWebAppSchema({
     'Operaciones nacionales, intracomunitarias, exportaciones e importaciones',
     'Comparativa del mismo importe en distintos ámbitos',
     'Indica los modelos tributarios aplicables (303, 349, 369)',
-    'Tipos de IVA español 21%, 10% y 4% con ejemplos',
+    `Tipos de IVA español ${PORCENTAJES_IVA.general} %, ${PORCENTAJES_IVA.reducido} % y ${PORCENTAJES_IVA.superreducido} % con ejemplos`,
     'Funciona 100% en el navegador, sin registro ni instalación',
     'Gratuito y sin publicidad',
   ],
@@ -85,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Las exportaciones llevan IVA?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. Las exportaciones de bienes fuera de la Unión Europea están exentas de IVA (art. 21 de la Ley del IVA). Es una exención plena: facturas sin IVA pero conservas el derecho a deducir el IVA soportado. Necesitas el DUA o documento aduanero que pruebe la salida de la mercancía. Vender a Canarias, Ceuta o Melilla también se considera exportación a efectos de IVA.',
+        text: 'No. Las exportaciones de bienes fuera de la Unión Europea están exentas de IVA (art. 21 de la Ley del IVA). Es una exención plena: facturas sin IVA pero conservas el derecho a deducir el IVA soportado. Necesitas el DUA o documento aduanero que pruebe la salida de la mercancía. Enviar bienes a Canarias, Ceuta o Melilla también se considera exportación; los servicios, en cambio, siguen las reglas de localización y, prestados a un particular de esos territorios, llevan IVA español (art. 69 de la Ley del IVA).',
       },
     },
     {

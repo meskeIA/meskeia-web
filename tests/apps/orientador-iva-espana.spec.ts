@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { PORCENTAJES_IVA, TIPOS_IVA } from '../../data/fiscal/iva';
 
 /**
  * orientador-iva-espana — generado por /inspector el 24/09/2026.
@@ -19,6 +20,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     del 69.Dos, que NO alcanza a destinatarios de Canarias, Ceuta o Melilla
  *   · Régimen OSS (régimen de la Unión): Sección 3.ª del Cap. XI del Título IX,
  *     arts. 163 unvicies a 163 quatervicies. El 163 quaterdecies es el criterio de caja.
+ *
+ *   · Canarias, Ceuta y Melilla quedan fuera del territorio de aplicación (art. 3.Dos.1.º). Solo
+ *     los BIENES que se les envían son exportación exenta (art. 21); los servicios se localizan
+ *     por los arts. 69-70: B2B no sujeto (69.Uno.1.º), B2C con IVA español (69.Uno.2.º).
+ *
+ * Los porcentajes se escriben «21 %», con espacio (formato español).
  *
  * `formatNumber` usa `toLocaleString('es-ES')`, que no agrupa los millares hasta las cinco
  * cifras: 1.250,04 sale «1250,04». Es la convención de la RAE y del resto del catálogo.
@@ -95,13 +102,13 @@ test('caso normal: venta nacional B2B de bienes al 10 % sobre 12.500,40 €', as
   await elegir(page, LUGAR, 'España');
   await elegir(page, NATURALEZA, 'Bienes');
   await elegir(page, CLIENTE, 'Empresa');
-  await elegir(page, TIPO, '10%');
+  await elegir(page, TIPO, '10 %');
   await escribirBase(page, '12.500,40');
 
   await expect(resultado(page).getByRole('heading', { level: 2 })).toHaveText('Operación interior — facturas con IVA');
   const f = await factura(page);
   expect(f.base).toBe('12.500,40 €');
-  expect(f.ivaEtiqueta).toBe('IVA 10%');
+  expect(f.ivaEtiqueta).toBe('IVA 10 %');
   expect(f.iva).toBe('1250,04 €');
   expect(f.total).toBe('13.750,44 €');
   await expect(resultado(page)).toContainText('Arts. 90-91 Ley 37/1992 del IVA.');
@@ -118,24 +125,27 @@ test('caso límite: adquisición intracomunitaria de bienes al 4 %, autorrepercu
   await elegir(page, LUGAR, 'Resto de la UE');
   await elegir(page, NATURALEZA, 'Bienes');
   await elegir(page, CLIENTE, 'Empresa');
-  await elegir(page, TIPO, '4%');
+  await elegir(page, TIPO, '4 %');
   await escribirBase(page, '25.000');
 
   await expect(resultado(page).getByRole('heading', { level: 2 })).toHaveText('Adquisición intracomunitaria de bienes (B2B)');
   await expect(resultado(page)).toContainText('Inversión del sujeto pasivo');
   const f = await factura(page);
   expect(f.base).toBe('25.000,00 €');
-  expect(f.ivaEtiqueta).toBe('IVA Autorrepercutes el 4%');
+  expect(f.ivaEtiqueta).toBe('IVA Autorrepercutes el 4 %');
   expect(f.iva).toBe('—');
   expect(f.total).toBe('25.000,00 €');
-  await expect(resultado(page)).toContainText('Autorrepercutes 1000,00 € de IVA (4%) en tu modelo 303');
+  await expect(resultado(page)).toContainText('Autorrepercutes 1000,00 € de IVA (4 %) en tu modelo 303');
   await expect(resultado(page)).toContainText('Efecto neto: 0 €.');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('entrada no numérica: no sale NaN ni «No definido», la base queda a 0,00 €', async ({ page }) => {
-  // parseSpanishNumber('abc') = NaN y la app lo convierte en 0 → base, total 0,00 €, IVA «—».
+// Hallazgo 1329 (reparado): una base ilegible ya no pasa a 0 en silencio.
+test('entrada no numérica: aviso role="alert", sin NaN, factura a 0,00 € que cuadra', async ({ page }) => {
   await escribirBase(page, 'abc');
+  const aviso = page.getByRole('alert').filter({ hasText: 'no es un importe válido' });
+  await expect(aviso).toBeVisible();
+  await expect(page.locator(BASE)).toHaveAttribute('aria-invalid', 'true');
   const f = await factura(page);
   expect(f.base).toBe('0,00 €');
   expect(f.iva).toBe('—');
@@ -144,71 +154,118 @@ test('entrada no numérica: no sale NaN ni «No definido», la base queda a 0,00
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGO (24/09/2026): una base negativa se acepta sin aviso y la factura queda descuadrada
-// consigo misma: la línea de IVA muestra «—» (solo pinta la cuota si es > 0) pero el total sí
-// suma la cuota negativa. Con -500 al 21 %: base -500,00 €, IVA «—», total -605,00 €.
-// Da igual cómo se repare —rechazar la base con aviso o pintar la cuota -105,00 €—: el test
-// exige que total = base + IVA mostrado, y se pondrá verde en cuanto cuadre.
-test.fail('caso a rechazar: base negativa -500 € → la factura debe cuadrar (base + IVA = total)', async ({ page }) => {
+// Hallazgo 1329 (reparado): antes, -500 al 21 % daba base -500,00 €, IVA «—» y total -605,00 €
+// (la factura no cuadraba consigo misma). Ahora la base negativa se rechaza con aviso y la
+// factura se pinta a 0: base + IVA = total.
+test('base negativa -500 €: se rechaza con aviso y la factura cuadra (base + IVA = total)', async ({ page }) => {
   await elegir(page, ACCION, 'Emito la factura');
   await elegir(page, LUGAR, 'España');
-  await elegir(page, TIPO, '10%');
-  await elegir(page, TIPO, '21%');
+  await elegir(page, TIPO, '10 %');
+  await elegir(page, TIPO, '21 %');
   await escribirBase(page, '-500');
 
+  await expect(page.getByRole('alert').filter({ hasText: 'no puede ser negativa' })).toBeVisible();
   const f = await factura(page);
   expect(importe(f.base) + importe(f.iva)).toBeCloseTo(importe(f.total), 2);
+  expect(f.total).toBe('0,00 €');
+  // La comparativa hereda la misma base: ninguna fila puede sumar una cuota negativa.
+  await expect(page.getByRole('region', { name: 'Comparativa del mismo importe por ámbito' })).not.toContainText('-');
+
+  // Y al corregir la base, el aviso desaparece: 500 × 21 % = 105,00 € → total 605,00 €.
+  await escribirBase(page, '500');
+  await expect(page.getByRole('alert').filter({ hasText: 'no puede ser negativa' })).toHaveCount(0);
+  const g = await factura(page);
+  expect(g.iva).toBe('105,00 €');
+  expect(g.total).toBe('605,00 €');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGO (24/09/2026): un servicio prestado a un PARTICULAR residente en Canarias, Ceuta o
-// Melilla sale «Exenta (0 %)» por el art. 21 LIVA, que es la exención de las exportaciones de
+// Hallazgo 1327 (reparado): un servicio prestado a un PARTICULAR residente en Canarias, Ceuta o
+// Melilla salía «Exenta (0 %)» por el art. 21 LIVA, que es la exención de las exportaciones de
 // BIENES. La regla que aplica es el art. 69.Uno.2.º (servicio B2C: se localiza donde está el
 // prestador), y la excepción del 69.Dos se cierra expresamente para estos territorios («salvo
 // en el caso de que dicho destinatario esté establecido [...] en las Islas Canarias, Ceuta o
-// Melilla»). Esperado con 1.000 € al 21 % (art. 90.Uno): IVA 210,00 €, total 1210,00 €.
-test.fail('servicio a particular de Canarias: tributa con IVA español (art. 69.Uno.2.º y 69.Dos)', async ({ page }) => {
+// Melilla»). Con 1.000 € al 21 % (art. 90.Uno): IVA 210,00 €, total 1210,00 €.
+test('servicio a particular de Canarias: tributa con IVA español (art. 69.Uno.2.º y 69.Dos)', async ({ page }) => {
   await elegir(page, ACCION, 'Emito la factura');
   await elegir(page, LUGAR, 'Canarias');
   await elegir(page, NATURALEZA, 'Servicios');
   await elegir(page, CLIENTE, 'Particular');
-  await elegir(page, TIPO, '10%');
-  await elegir(page, TIPO, '21%');
+  await elegir(page, TIPO, '10 %');
+  await elegir(page, TIPO, '21 %');
   await escribirBase(page, '1.000,00');
 
   const f = await factura(page);
   expect(f.iva).toBe('210,00 €');
   expect(f.total).toBe('1210,00 €');
+  await expect(resultado(page)).toContainText('Arts. 69.Uno.2.º y 69.Dos Ley 37/1992');
+  await expect(resultado(page)).not.toContainText('Exenta (0 %)');
+});
+
+// Hallazgo 1327, lado B2B: sin IVA, pero por NO SUJECIÓN (art. 69.Uno.1.º), no por el art. 21.
+test('servicio a empresa de Canarias: no sujeto por el art. 69.Uno.1.º, no exento por el art. 21', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Servicios');
+  await elegir(page, CLIENTE, 'Empresa');
+  await escribirBase(page, '1.000,00');
+
+  const f = await factura(page);
+  expect(f.ivaEtiqueta).toBe('IVA No sujeta');
+  expect(f.iva).toBe('—');
+  expect(f.total).toBe('1000,00 €');
+  await expect(resultado(page)).toContainText('No sujeto / fuera de territorio');
+  await expect(resultado(page)).toContainText('69.Uno.1.º Ley 37/1992');
+  await expect(resultado(page)).not.toContainText('Exenta (0 %)');
+});
+
+// Hallazgo 1327, lo que sí era correcto: los BIENES enviados a Canarias son exportación exenta
+// (art. 21.1.º) también cuando el comprador es un particular.
+test('bienes a particular de Canarias: siguen siendo exportación exenta (art. 21)', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Bienes');
+  await elegir(page, CLIENTE, 'Particular');
+  await escribirBase(page, '1.000,00');
+
+  const f = await factura(page);
+  expect(f.ivaEtiqueta).toBe('IVA Exenta (0 %)');
+  expect(f.total).toBe('1000,00 €');
+  await expect(resultado(page)).toContainText('Arts. 3 y 21 Ley 37/1992');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGO (24/09/2026): en «Emito · Fuera de la UE · Servicios» la app ignora si la otra parte
-// es empresa o particular y da en los dos casos el mismo resultado —«Sin IVA español»— con el
-// texto «Por regla general, los servicios prestados a destinatarios establecidos fuera de la UE
-// se localizan fuera». Para un particular la regla general es la contraria (art. 69.Uno.2.º:
-// IVA español); fuera solo quedan los servicios de la lista del 69.Dos. El test exige que el
-// escenario B2C no sea idéntico al B2B.
-test.fail('servicio a particular fuera de la UE: no puede resolverse igual que el B2B (art. 69.Uno.2.º)', async ({ page }) => {
+// Hallazgo 1328 (reparado): en «Emito · Fuera de la UE · Servicios» la app ignoraba si la otra
+// parte es empresa o particular. Para un particular la regla general es IVA español
+// (art. 69.Uno.2.º); fuera solo quedan los servicios de la lista del 69.Dos.
+// 1.000 € al 21 % → IVA 210,00 €, total 1210,00 €. B2B: no sujeto, total 1000,00 €.
+test('servicio a particular fuera de la UE: regla general IVA español (art. 69.Uno.2.º)', async ({ page }) => {
   await elegir(page, ACCION, 'Emito la factura');
   await elegir(page, LUGAR, 'Fuera de la UE');
   await elegir(page, NATURALEZA, 'Servicios');
+  await elegir(page, TIPO, '10 %');
+  await elegir(page, TIPO, '21 %');
   await escribirBase(page, '1.000,00');
 
   await elegir(page, CLIENTE, 'Empresa');
   const b2b = limpiar(await resultado(page).innerText());
+  expect((await factura(page)).total).toBe('1000,00 €');
+
   await elegir(page, CLIENTE, 'Particular');
   const b2c = limpiar(await resultado(page).innerText());
-
   expect(b2c).not.toBe(b2b);
+  const f = await factura(page);
+  expect(f.iva).toBe('210,00 €');
+  expect(f.total).toBe('1210,00 €');
+  await expect(resultado(page)).toContainText('69.Dos');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGO (24/09/2026): la base legal de la venta a distancia B2C a la UE cita
-// «163 quaterdecies y ss.» como régimen OSS. En el texto consolidado del BOE el art. 163
-// quaterdecies es «Efectos de la renuncia o exclusión del régimen especial del criterio de
-// caja»; el régimen de la Unión (OSS) son los arts. 163 unvicies a 163 quatervicies, y el
-// umbral de 10.000 € (UMBRAL_OSS.importe) lo fija el art. 73.
-test.fail('venta a distancia B2C a la UE: la base legal del OSS cita los artículos del régimen de la Unión', async ({ page }) => {
+// Hallazgo 1330 (reparado): la base legal citaba «163 quaterdecies y ss.» como régimen OSS. En
+// el texto consolidado del BOE el art. 163 quaterdecies es «Efectos de la renuncia o exclusión
+// del régimen especial del criterio de caja»; el régimen de la Unión (OSS) son los arts. 163
+// unvicies a 163 quatervicies, y el umbral de 10.000 € (UMBRAL_OSS.importe) lo fija el art. 73.
+test('venta a distancia B2C a la UE: la base legal del OSS cita los artículos del régimen de la Unión', async ({ page }) => {
   await elegir(page, ACCION, 'Emito la factura');
   await elegir(page, LUGAR, 'Resto de la UE');
   await elegir(page, CLIENTE, 'Particular');
@@ -216,4 +273,20 @@ test.fail('venta a distancia B2C a la UE: la base legal del OSS cita los artícu
   await expect(resultado(page).getByRole('heading', { level: 2 })).toHaveText('Venta a distancia a particular de la UE (B2C)');
   await expect(resultado(page)).not.toContainText('163 quaterdecies');
   await expect(resultado(page)).toContainText('163 unvicies');
+  await expect(resultado(page)).toContainText('73');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hallazgo 1331 (reparado): los tipos que se muestran salen de data/fiscal/iva.ts, no de
+// literales. El test lee el módulo y exige que la página diga lo mismo.
+test('los tipos de IVA mostrados salen de data/fiscal (PORCENTAJES_IVA / TIPOS_IVA)', async ({ page }) => {
+  const lista = TIPOS_IVA.map((t) => `${t.porcentaje} %`);
+  const esperada = `${lista.slice(0, -1).join(', ')} o ${lista[lista.length - 1]}`;
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'España');
+  await expect(resultado(page)).toContainText(`Aplicar el tipo correcto del producto o servicio (${esperada})`);
+  // El tipo marcado al cargar es el general.
+  await expect(
+    page.getByRole('group', { name: TIPO, exact: true }).getByRole('button', { name: new RegExp(`^${PORCENTAJES_IVA.general} %`) }),
+  ).toHaveAttribute('aria-pressed', 'true');
 });
