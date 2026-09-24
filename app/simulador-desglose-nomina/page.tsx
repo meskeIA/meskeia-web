@@ -25,6 +25,7 @@ import {
   calcularReduccionRendimientosTrabajo,
   FISCAL_IRPF_META,
   calcularDeduccionRentasBajas,
+  limitarDeduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 import styles from './SimuladorDesgloseNomina.module.css';
 
@@ -130,10 +131,13 @@ export default function SimuladorDesgloseNominaPage() {
     const tMEI = COTIZACIONES_SS_2026.mef;
     const totalSSPct = tCC + tDes + tFP + tMEI;
 
-    // Base de cotización: salario mensual prorrateado (bruto/12), limitada entre la base mínima y máxima
+    // Base de cotización: salario mensual prorrateado (bruto/12), con tope en la base máxima.
+    // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así
+    // que un bruto anual por debajo solo puede ser jornada parcial o parte del año — y entonces
+    // se cotiza por lo cobrado. Hasta el 24/09/2026 se subía a la mínima: 14.000 € a media
+    // jornada cotizaban sobre 17.092,80 € (1.111 € en vez de 910 €).
     const salarioMensualSS = brutoVal / 12;
-    const baseSSAnual =
-      Math.min(Math.max(salarioMensualSS, BASES_SS_2026.minima), BASES_SS_2026.maxima) * 12;
+    const baseSSAnual = Math.min(salarioMensualSS, BASES_SS_2026.maxima) * 12;
 
     const cotCC = baseSSAnual * (tCC / 100);
     const cotDesempleo = baseSSAnual * (tDes / 100);
@@ -163,8 +167,12 @@ export default function SimuladorDesgloseNominaPage() {
       desglose: desgloseTramos,
     } = calcularCuotaIRPF(baseLiquidable, minimoPersonal);
 
-    // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
-    const deduccionRentasBajas = calcularDeduccionRentasBajas(rnt, 0);
+    // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
+    // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
+    const deduccionRentasBajas = limitarDeduccionRendimientosTrabajo(
+      calcularDeduccionRentasBajas(brutoVal, 0, 2026),
+      cuotaIntegra,
+    );
     const cuotaAuto = Math.max(0, cuotaIntegra - deduccionRentasBajas);
 
     const irpfRetenido =
@@ -777,15 +785,15 @@ export default function SimuladorDesgloseNominaPage() {
         {/* Sección 2: Casos de uso reales */}
         <section className={styles.guideSection}>
           <h3>Casos de Uso Reales</h3>
-          <p>Cuatro perfiles típicos en España con cálculos orientativos a 2025:</p>
+          <p>Cuatro perfiles típicos en España con cálculos orientativos a 2026:</p>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>👨‍🔧 Mileurista — 14.000 € brutos / 14 pagas</h4>
+              <h4><span aria-hidden="true">👨‍🔧</span> Mileurista a tiempo parcial — 14.000 € brutos / 14 pagas</h4>
               <p>
-                <strong>SS trabajador:</strong> ~1.072 €/año (sobre la base mínima de cotización, 1.381,20 €/mes)<br />
-                <strong>IRPF retenido:</strong> 0 € (base liquidable negativa, no tributa)<br />
-                <strong>Neto anual:</strong> ~12.930 €<br />
-                <strong>Neto mensual:</strong> ~923 €/paga
+                <strong>SS trabajador:</strong> ~910 €/año (6,50 % de lo cobrado: por debajo del SMI anual el contrato es a tiempo parcial y se cotiza por el salario real)<br />
+                <strong>IRPF retenido:</strong> 0 € (el mínimo personal cubre toda la base, no tributa)<br />
+                <strong>Neto anual:</strong> ~13.090 €<br />
+                <strong>Neto mensual:</strong> ~935 €/paga
               </p>
               <p className={styles.escenarioTip}>
                 Con un solo pagador y &lt;22.000 € no estás obligado a declarar IRPF.

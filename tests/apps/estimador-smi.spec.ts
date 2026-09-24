@@ -14,8 +14,9 @@ import { test, expect, Page } from '@playwright/test';
  *   1. Con el SMI, la base imponible (6.680,89 €) y el mínimo (5.550 €) caen los DOS dentro
  *      del primer tramo. Ahí escala(B) − escala(m) y escala(B − m) valen exactamente lo
  *      mismo: (B − m) × 19 %. Los dos métodos solo divergen cuando la base cruza de tramo.
- *   2. Y aunque divergieran, la deducción del art. 80 bis (340 € para rentas bajas) supera la
- *      cuota resultante, así que el IRPF sale 0 € por cualquiera de los dos caminos.
+ *   2. Y aunque divergieran, la deducción por obtención de rendimientos del trabajo (DA 61.ª
+ *      LIRPF; 590,89 € en 2026 para el SMI) supera la cuota resultante, así que el IRPF sale
+ *      0 € por cualquiera de los dos caminos.
  *
  * La app solo calcula sobre el SMI, así que el defecto no tenía forma de aflorar. Se reparó
  * igual —la fórmula ya no vive aquí, la pone `calcularCuotaIntegraGeneral`— porque el día que
@@ -27,7 +28,9 @@ import { test, expect, Page } from '@playwright/test';
  *   · cotización trabajador 2026: 6,50 %, sobre base mensual acotada entre 1.424,40 y 5.101,20
  *   · gastos art. 19.2.f: 2.000 € · reducción art. 20: 7.302 € para RNT ≤ 14.852 €
  *   · mínimo del contribuyente, art. 57: 5.550 € · escala art. 63: 12.450 @19 %…
- *   · deducción art. 80 bis: 340 € completos para RNT ≤ 14.852 €
+ *   · deducción DA 61.ª en su redacción de 2026 (art. 28 del RDL 5/2026): 590,89 € para
+ *     íntegros ≤ 17.094 €, con tope en la cuota íntegra (hasta el 24/09/2026 la app aplicaba la
+ *     de 2025 —340 €— y la calculaba sobre el neto)
  */
 
 const RUTA = '/estimador-smi/';
@@ -56,12 +59,13 @@ test('el neto del SMI 2026 sale de la cadena completa, mínimo incluido', async 
   //   escala(6.680,89) = 6.680,89 × 19 % = 1.269,3691 €
   //   escala(5.550)    = 1.054,50 €
   //   cuota íntegra    = 214,8691 €      ← los dos métodos coinciden: ambos en el primer tramo
-  // Deducción art. 80 bis = 340,00 € (RNT ≤ 14.852) > cuota → IRPF = 0,00 €
+  // Deducción DA 61.ª 2026: íntegros 17.094 ≤ 17.094 → 590,89 €, topada en la cuota → 214,87 €
+  //   → IRPF = 0,00 €. La fila enseña lo que de verdad se deduce, no los 590,89 €.
   // Neto anual = 17.094 − 1.111,11 − 0 = 15.982,89 € → 1.141,64 €/mes en 14 pagas
   expect(await fila(page, 'Salario bruto anual')).toBe('17.094,00 €');
   expect(await fila(page, 'Seguridad Social (trabajador)')).toBe('-1111,11 €');
   expect(await fila(page, 'IRPF')).toBe('-0,00 €');
-  expect(await fila(page, 'Deducción rentas bajas (art. 80 bis)')).toBe('+340,00 €');
+  expect(await fila(page, 'Deducción por rendimientos del trabajo (ya restada del IRPF)')).toBe('+214,87 €');
 
   const neto = page.locator('css=div:has(> span > strong:text-is("Salario neto anual"))').first();
   expect(limpiar(await neto.locator('span').nth(1).innerText())).toBe('15.982,89 €');

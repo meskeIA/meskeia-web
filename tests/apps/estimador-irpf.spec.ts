@@ -25,8 +25,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   · reducción art. 20 (RDL 4/2024): 7.302 € hasta 14.852 € de RNT; 7.302 − 1,75 × (RNT −
  *     14.852) hasta 17.673,52; 2.364,34 − 1,14 × (RNT − 17.673,52) hasta 19.747,5; luego 0.
  *     Se pierde con más de 6.500 € de rentas distintas del trabajo (art. 20.2).
- *   · deducción por obtención de rendimientos del trabajo: 340 € con RNT ≤ 14.852 €
- *     (`DEDUCCION_RENTAS_BAJAS_2025`); solo con nómina (prestación efectiva de servicios).
+ *   · deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, Manual AEAT Renta
+ *     2025): sobre los rendimientos ÍNTEGROS, 340 € hasta 16.576 € y 340 − 0,2 × (íntegros −
+ *     16.576) hasta 18.276 €; tope en la cuota íntegra GENERAL, donde tributa el trabajo
+ *     (`DEDUCCION_RENDIMIENTOS_TRABAJO_2025`); solo con nómina (prestación efectiva de servicios).
  *   · cotización del trabajador de 2025: 4,70 + 1,55 + 0,10 + 0,12 = 6,47 %, base máxima
  *     4.909,50 €/mes, mínima 1.381,20 €/mes (`COTIZACIONES_SS_2025`, `BASES_SS_2025`)
  *   · base del ahorro (dividendos e intereses, arts. 46 y 66): 6.000 @19 % · 50.000 @21 % …
@@ -170,17 +172,47 @@ test('CASO 4 (normal) · 30.000 € brutos, soltero/a, sin hijos → cuota ínte
   expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('4928,70 €');
 });
 
-test('CASO 5 (límite bajo) · 17.500 € y 500 € retenidos: reducción máxima y deducción dejan cuota 0', async ({ page }) => {
+test('CASO 5 (límite bajo) · 17.500 € y 500 € retenidos: la deducción va sobre los ÍNTEGROS (155,20 €, no 340 €)', async ({ page }) => {
   // SS 2025: 1.458,33 €/mes × 6,47 % × 12 = 1.132,25 €
   // RNT = 17.500 − 1.132,25 − 2.000 = 14.367,75 € ≤ 14.852 → reducción art. 20 = 7.302 €
   // Base = 7.065,75 € → cuota íntegra = 1.515,75 × 19 % = 287,99 €
-  // Deducción (RNT ≤ 14.852) = 340 € → cuota 0 → A DEVOLVER 500,00 €
+  // Deducción DA 61.ª sobre los ÍNTEGROS: 340 − 0,2 × (17.500 − 16.576) = 155,20 € — la misma
+  //   cifra que da la AEAT para 17.500 € en el Ejemplo 3 del Manual Renta 2025. Hasta el
+  //   24/09/2026 la app la calculaba sobre el neto (14.367,75 € ≤ 14.852) y daba 340 €.
+  // Cuota tras deducción = 287,99 − 155,20 = 132,79 € → A DEVOLVER 500 − 132,79 = 367,21 €
   await estimar(page, { bruto: '17500', retenciones: '500' });
 
   expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(287.99, 1);
-  expect(await tarjeta(page, 'Deducción rentas bajas')).toBe('-340,00€');
+  expect(await tarjeta(page, 'Deducción rentas bajas')).toBe('-155,20€');
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A DEVOLVER');
-  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('500,00 €');
+  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(367.21, 1);
+});
+
+test('CASO 5 bis · DA 61.ª: el tope es la cuota GENERAL; la del ahorro no la amplía', async ({ page }) => {
+  // Trabajo 15.000 € (por debajo del SMI: jornada parcial, se cotiza por lo cobrado) →
+  //   SS 2025 = 15.000 × 6,47 % = 970,50 € · RNT = 15.000 − 970,50 − 2.000 = 12.029,50 €
+  //   → reducción art. 20 = 7.302 € · base general = 4.727,50 €, por debajo del mínimo
+  //   (5.550 €) → cuota general 0 y pasan 822,50 € de mínimo a la base del ahorro (art. 56.2).
+  // Capital 3.000 € (≤ 6.500: no quita la deducción) → cuota del ahorro =
+  //   (3.000 − 822,50) × 19 % = 413,725 €
+  // Deducción: 15.000 ≤ 16.576 → 340 €, pero su tope es la parte de la cuota que corresponde
+  //   al trabajo, y el trabajo solo está en la base general, cuya cuota es 0 → deducción 0.
+  //   Antes se restaba de la cuota TOTAL: 413,73 − 340 = 73,73 €, 340 € de menos.
+  await estimar(page, { bruto: '15000', capital: '3000' });
+
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(413.73, 1);
+  await expect(page.getByRole('heading', { level: 3, name: 'Deducción rentas bajas', exact: true })).toHaveCount(0);
+  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(413.73, 1);
+});
+
+test('CASO 5 ter · por debajo del SMI se cotiza por lo cobrado, no por la base mínima de jornada completa', async ({ page }) => {
+  // 12.000 € de nómina en 2025 solo pueden ser jornada parcial o parte del año (el SMI de 2025
+  //   son 16.576 € y la base mínima, 1.381,20 €/mes, es la de jornada completa).
+  //   SS = 12.000 × 6,47 % = 776,40 €. Hasta el 24/09/2026 la app la subía a la mínima:
+  //   1.381,20 × 6,47 % × 12 = 1.072,36 €, 295,96 € de más.
+  // Base general = 12.000 − 776,40 − 2.000 − 7.302 = 1.921,60 € (con la mínima salía 1.625,64 €)
+  await estimar(page, { bruto: '12000' });
+  expect(await tarjeta(page, 'Base imponible general')).toBe('1921,60€');
 });
 
 test('CASO 6 (límite alto) · 400.000 € brutos entra en el tramo del 47 %', async ({ page }) => {

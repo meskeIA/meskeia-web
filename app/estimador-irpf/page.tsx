@@ -14,7 +14,7 @@ import {
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
-  DEDUCCION_RENTAS_BAJAS_2025,
+  DEDUCCION_RENDIMIENTOS_TRABAJO_2025,
   MINIMOS_IRPF_2025,
   OBLIGACION_DECLARAR_2025,
   calcularCuotaIntegraGeneral,
@@ -292,7 +292,7 @@ export default function EstimadorIRPFPage() {
                     unit="€"
                     variant="success"
                     icon="🟢"
-                    description={`Por obtención de rendimientos del trabajo (sueldos de menos de ${eur0(DEDUCCION_RENTAS_BAJAS_2025.limiteMaximo)})`}
+                    description={`Por obtención de rendimientos del trabajo (nóminas de menos de ${eur0(DEDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteMaximo)} brutos)`}
                   />
                 )}
                 <ResultCard
@@ -900,7 +900,7 @@ export default function EstimadorIRPFPage() {
               <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <h4>Comprueba las deducciones autonómicas de tu CCAA</h4>
               <p>
-                Las comunidades autónomas tienen deducciones propias que pueden ser muy relevantes: nacimiento de hijo (hasta 600 €/hijo en algunas CCAA), alquiler de vivienda habitual (hasta 15–20 % en Cataluña, Madrid, Valencia...), gastos de guardería, rehabilitación energética, o cuidado de familiares. Consulta el catálogo de tu comunidad en la web de la AEAT antes de confirmar.
+                Las comunidades autónomas tienen deducciones propias que pueden ser muy relevantes: por nacimiento o adopción de hijos, por alquiler de vivienda habitual (un porcentaje de lo pagado, con límites de renta y de importe distintos en cada comunidad), por gastos de guardería, por rehabilitación energética o por cuidado de familiares. Consulta el catálogo de tu comunidad en la web de la AEAT antes de confirmar.
               </p>
             </div>
 
@@ -922,16 +922,16 @@ export default function EstimadorIRPFPage() {
                 <strong>Olvidar declarar cuentas o inmuebles en el extranjero.</strong> Si tienes cuentas bancarias, inmuebles o valores en el extranjero con saldo superior a 50.000 €, debes presentar el modelo 720. Tras la STJUE de 27/01/2022 y la Ley 5/2022, el régimen sancionador se ajustó al régimen general de la LGT; consulta el detalle vigente en la AEAT.
               </li>
               <li>
-                <strong>No declarar el alquiler de tu vivienda (o segunda residencia).</strong> La AEAT cruza datos con los inquilinos: si tu inquilino declara el alquiler como gasto y tú no declaras los ingresos, Hacienda detectará la discrepancia. La regularización incluye cuota + intereses de demora + recargo del 15–20 % si es voluntaria tardía, o sanción si es inspeccionada.
+                <strong>No declarar el alquiler de tu vivienda (o segunda residencia).</strong> La AEAT cruza datos con los inquilinos: si tu inquilino se aplica una deducción por alquiler, declara tu NIF, y si tú no declaras los ingresos, Hacienda detectará la discrepancia. Si lo regularizas tú antes de que te lo pida, pagas la cuota más un recargo del 1 % y otro 1 % por cada mes completo de retraso, que pasa a ser del 15 % más intereses de demora pasados 12 meses (art. 27 LGT); si llega antes Hacienda, la cuota va con intereses y sanción.
               </li>
               <li>
                 <strong>Ignorar la exención por reinversión en vivienda habitual al vender.</strong> Si vendes tu vivienda habitual y reinviertes el total en otra en el plazo de <strong>2 años</strong>, la ganancia patrimonial queda exenta de IRPF. Si no lo declaras correctamente (aunque no debas pagar), la AEAT puede considerar que no has aplicado la exención correctamente.
               </li>
               <li>
-                <strong>No fraccionar el pago si la cuota es alta.</strong> Si la declaración sale a pagar más de 1.000 € y no tienes liquidez inmediata, el fraccionamiento automático (60 % en junio + 40 % en noviembre) <strong>no tiene coste ni recargo</strong>. Olvidarlo y pagar fuera de plazo sí genera recargos del 5–20 % según el retraso.
+                <strong>No fraccionar el pago si la cuota es alta.</strong> Si la declaración sale a pagar más de 1.000 € y no tienes liquidez inmediata, el fraccionamiento automático (60 % en junio + 40 % en noviembre) <strong>no tiene coste ni recargo</strong>. Presentarla en plazo sin pagar sí genera recargos del periodo ejecutivo: del 5 %, 10 % o 20 % según cuándo acabes pagando (art. 28 LGT).
               </li>
               <li>
-                <strong>Presentar fuera de plazo aunque salga a devolver.</strong> Presentar la declaración después del 30 de junio, aunque el resultado sea a devolver, puede conllevar una <strong>sanción formal de 200 €</strong> (reducible al 50 % si se paga voluntariamente, quedando en 100 €). No existe ventaja fiscal en retrasar una declaración a devolver.
+                <strong>Presentar fuera de plazo aunque salga a devolver.</strong> Presentar la declaración después del 30 de junio, aunque el resultado sea a devolver, si estabas obligado a presentarla puede conllevar una <strong>multa de 200 €</strong>, que se queda en la mitad —100 €— si la presentas antes de que Hacienda te la requiera (art. 198 LGT). No existe ventaja fiscal en retrasar una declaración a devolver.
               </li>
             </ul>
           </div>

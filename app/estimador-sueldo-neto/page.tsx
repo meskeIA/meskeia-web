@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularReduccionRendimientosTrabajo, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, SMI_2026 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularReduccionRendimientosTrabajo, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, limitarDeduccionRendimientosTrabajo, SMI_2026 } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -49,11 +49,12 @@ function calcularIRPF(baseLiquidable: number, minimoPersonalFamiliar: number): n
 function calcularSeguridadSocial(salarioBrutoAnual: number): { anual: number; mensual: number; desglose: Record<string, number> } {
   const salarioMensual = salarioBrutoAnual / 12;
 
-  // Aplicar bases de cotización
-  const baseCotizacion = Math.max(
-    BASES_SS_2026.minima,
-    Math.min(salarioMensual, BASES_SS_2026.maxima)
-  );
+  // Aplicar la base MÁXIMA de cotización.
+  // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así
+  // que un bruto anual por debajo solo puede ser jornada parcial o parte del año — y entonces
+  // se cotiza por lo cobrado. Hasta el 24/09/2026 se subía a la mínima: 14.000 € a media
+  // jornada cotizaban sobre 17.092,80 € (1.111 € en vez de 910 €).
+  const baseCotizacion = Math.min(salarioMensual, BASES_SS_2026.maxima);
 
   const desglose: Record<string, number> = {};
   let totalMensual = 0;
@@ -151,8 +152,12 @@ function calcularBrutoANeto(
   );
   const minimos = calcularMinimosPersonales(numHijos, hijosMenores3);
   const cuotaIRPF = calcularIRPF(baseLiquidable, minimos);
-  // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
-  const deduccion = calcularDeduccionRentasBajas(rnt, 0);
+  // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
+  // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
+  const deduccion = limitarDeduccionRendimientosTrabajo(
+    calcularDeduccionRentasBajas(brutoAnual, 0, 2026),
+    cuotaIRPF,
+  );
   const irpfAnual = Math.max(0, cuotaIRPF - deduccion);
   const tipoRetencion = brutoAnual > 0 ? (irpfAnual / brutoAnual) * 100 : 0;
   const netoAnual = brutoAnual - ss.anual - irpfAnual;
@@ -462,7 +467,7 @@ export default function EstimadorSueldoNetoPage() {
                   </div>
                   {resultado.deduccionRentasBajas > 0 && (
                     <div className={styles.desgloseRow}>
-                      <span>Deducción rentas bajas (art. 80 bis)</span>
+                      <span>Deducción por rendimientos del trabajo</span>
                       <span className={styles.desgloseValue} style={{ color: '#27ae60' }}>-{formatCurrency(resultado.deduccionRentasBajas)}</span>
                     </div>
                   )}
@@ -864,12 +869,12 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> 14.000 € brutos, reducción por cuidado de hijos (50%)</p>
                 <ul>
-                  <li>SS trabajador (6,50% sobre base mínima 1.424,40 €/mes): <strong>~1.111 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~4.391 €</strong></li>
-                  <li>Mínimo personal + familia monoparental: <strong>~7.700 €</strong></li>
+                  <li>SS trabajador (6,50 % de lo cobrado: a tiempo parcial se cotiza por el salario real, no por la base mínima de jornada completa): <strong>~910 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~3.788 €</strong></li>
+                  <li>Mínimo personal + mínimo por un hijo: <strong>7.950 €</strong></li>
                   <li>IRPF anual: <strong>0 € (base liquidable negativa, no tributa)</strong></li>
                   <li>Retención efectiva: <strong>0%</strong></li>
-                  <li>Neto anual: <strong>~12.889 €</strong></li>
+                  <li>Neto anual: <strong>~13.090 €</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
@@ -915,7 +920,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Cuánto es el SMI 2026 y cómo afecta a mi neto?</h4>
               <p>
-                El SMI 2026 es <strong>{formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas = {formatCurrency(SMI_2026.anual)} brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.126 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
+                El SMI 2026 es <strong>{formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas = {formatCurrency(SMI_2026.anual)} brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.142 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
               </p>
             </div>
 
@@ -1073,8 +1078,10 @@ export default function EstimadorSueldoNetoPage() {
               <p>
                 <strong>Rendimientos del trabajo superiores a 22.000 €</strong> con un solo pagador
                 están obligados a declarar la renta. Con dos o más pagadores, el límite baja a
-                15.000 € si el segundo pagador supera los 1.500 € anuales. No presentar la declaración
-                cuando estás obligado conlleva una sanción mínima de 200 €.
+                15.000 € si el segundo pagador supera los 1.500 € anuales. Presentarla fuera de plazo
+                cuando estás obligado conlleva un recargo del 1 % al 15 % si sale a pagar (art. 27 LGT) o,
+                si sale a devolver, una multa de 200 € que baja a 100 € si la presentas antes de que
+                Hacienda te la pida (art. 198 LGT).
               </p>
             </div>
           </div>

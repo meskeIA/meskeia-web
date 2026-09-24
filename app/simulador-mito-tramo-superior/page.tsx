@@ -732,7 +732,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
               <h4>¿Hay alguna situación donde subir el bruto me perjudique?</h4>
               <p>
                 <strong>Por tramos IRPF: no, jamás.</strong> Pero pueden existir <em>efectos colaterales</em>
-                en bonificaciones específicas: pérdida de la deducción por rentas bajas (umbral 18.276 €),
+                en bonificaciones específicas: la deducción por obtención de rendimientos del trabajo, que se va reduciendo hasta desaparecer (en 2026, con 20.048,45 € brutos),
                 pérdida de ayudas autonómicas con tope de renta, pérdida del bono social eléctrico, o
                 cambio de tramo en becas universitarias. Estos casos son puntuales y no se deben al IRPF
                 en sí, sino a otros umbrales independientes.

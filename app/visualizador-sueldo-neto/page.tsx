@@ -26,6 +26,7 @@ import {
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   calcularReduccionRendimientosTrabajo,
   calcularDeduccionRentasBajas,
+  limitarDeduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 import Chart from 'chart.js/auto';
 
@@ -88,7 +89,11 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
 
   // 1. Cotizaciones SS (sobre base mensual prorrateada, limitada a topes)
   const pagas = LIQUIDACIONES_SS_ANUALES;
-  const baseSS = Math.min(Math.max(brutoMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
+  // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así
+  // que un bruto anual por debajo solo puede ser jornada parcial o parte del año — y entonces
+  // se cotiza por lo cobrado. Hasta el 24/09/2026 se subía a la mínima: 14.000 € a media
+  // jornada cotizaban sobre 17.092,80 € (1.111 € en vez de 910 €).
+  const baseSS = Math.min(brutoMensual, BASES_SS_2026.maxima);
   const ssContingencias = baseSS * (COTIZACIONES_SS_2026.contingenciasComunes / 100) * pagas;
   const ssDesempleo = baseSS * (COTIZACIONES_SS_2026.desempleo / 100) * pagas;
   const ssFormacion = baseSS * (COTIZACIONES_SS_2026.formacionProfesional / 100) * pagas;
@@ -128,8 +133,12 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
   const cuotaMinimoIRPF = cuotaEscalaGeneral(Math.min(minimoPersonal, baseGravable));
   const cuotaIntegraIRPF = calcularCuotaIntegraGeneral(baseGravable, minimoPersonal);
 
-  // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
-  const deduccionRentasBajas = calcularDeduccionRentasBajas(rendimientoNeto, 0);
+  // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
+  // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
+  const deduccionRentasBajas = limitarDeduccionRendimientosTrabajo(
+    calcularDeduccionRentasBajas(brutoAnual, 0, 2026),
+    cuotaIntegraIRPF,
+  );
   const retencionIRPF = Math.max(0, cuotaIntegraIRPF - deduccionRentasBajas);
   const tipoEfectivoIRPF = brutoAnual > 0 ? (retencionIRPF / brutoAnual) * 100 : 0;
 

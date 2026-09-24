@@ -26,6 +26,7 @@ import {
   calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   calcularDeduccionRentasBajas,
+  limitarDeduccionRendimientosTrabajo,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   calcularReduccionRendimientosTrabajo,
@@ -53,7 +54,7 @@ function calcularSSMensual(brutoMensual: number): number {
   return base * (tipo / 100);
 }
 
-function calcularIRPFAnual(brutoAnual: number): number {
+function calcularIRPFAnual(brutoAnual: number): { irpf: number; deduccion: number } {
   const ssMensual = calcularSSMensual(brutoAnual / 12);
   const ssAnual = ssMensual * 12;
   const rnt = Math.max(0, brutoAnual - ssAnual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
@@ -72,22 +73,22 @@ function calcularIRPFAnual(brutoAnual: number): number {
   // tambien acepta sueldos por encima del SMI, y ahi el error llegaba a 1.443 EUR/ano.
   const cuota = calcularCuotaIntegraGeneral(baseImponible, MINIMOS_IRPF_2025.personal);
 
-  // Deducción rentas bajas (art. 80 bis)
-  const deduccion = calcularDeduccionRentasBajas(rnt, 0);
-  return Math.max(0, cuota - deduccion);
+  // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
+  // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
+  const deduccion = limitarDeduccionRendimientosTrabajo(
+    calcularDeduccionRentasBajas(brutoAnual, 0, 2026),
+    cuota,
+  );
+  return { irpf: Math.max(0, cuota - deduccion), deduccion };
 }
 
 function calcularNetoSMI(pagas: 12 | 14) {
   const brutoAnual = SMI_2026.anual;
   const ssMensual = calcularSSMensual(brutoAnual / 12);
   const ssAnual = ssMensual * 12;
-  const irpfAnual = calcularIRPFAnual(brutoAnual);
+  const { irpf: irpfAnual, deduccion: deduccionRentasBajas } = calcularIRPFAnual(brutoAnual);
   const netoAnual = brutoAnual - ssAnual - irpfAnual;
   const netoMensual = netoAnual / pagas;
-
-  // RNT para mostrar deducción
-  const rnt = Math.max(0, brutoAnual - ssAnual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-  const deduccionRentasBajas = calcularDeduccionRentasBajas(rnt, 0);
 
   return {
     brutoAnual,
@@ -319,7 +320,7 @@ export default function EstimadorSMIPage() {
               </div>
               {neto.deduccionRentasBajas > 0 && (
                 <div className={styles.desgloseRow}>
-                  <span>Deducción rentas bajas (art. 80 bis)</span>
+                  <span>Deducción por rendimientos del trabajo (ya restada del IRPF)</span>
                   <span className={styles.desgloseValue} style={{ color: '#27ae60' }}>
                     +{formatCurrency(neto.deduccionRentasBajas)}
                   </span>

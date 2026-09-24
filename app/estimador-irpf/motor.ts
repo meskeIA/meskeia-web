@@ -34,13 +34,14 @@ import {
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   calcularReduccionRendimientosTrabajo,
   calcularDeduccionRentasBajas,
+  limitarDeduccionRendimientosTrabajo,
   calcularCuotaIntegraGeneral,
   cuotaEscalaGeneral,
   desglosarEscalaGeneral,
 } from '@/data/fiscal';
 
 /** Ejercicio que calcula el estimador. Todos los datos importados arriba son de este año. */
-export const EJERCICIO = 2025;
+export const EJERCICIO = 2025 as const;
 
 export type SituacionFamiliar = 'soltero' | 'casado_un_ingreso' | 'casado_dos_ingresos' | 'familia_monoparental';
 
@@ -109,7 +110,11 @@ export interface ResultadoIRPF {
 /** Cotización del trabajador de 2025: contingencias comunes + desempleo + FP + MEI = 6,47 %. */
 export function cotizacionTrabajadorAnual(brutoAnual: number): number {
   if (!(brutoAnual > 0)) return 0;
-  const baseMensual = Math.max(BASES_SS_2025.minima, Math.min(brutoAnual / 12, BASES_SS_2025.maxima));
+  // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así
+  // que un bruto anual por debajo solo puede ser jornada parcial o parte del año — y entonces
+  // se cotiza por lo cobrado. Hasta el 24/09/2026 se subía a la mínima: 14.000 € a media
+  // jornada cotizaban sobre 16.574,40 € (1.072,36 € en vez de 905,80 €).
+  const baseMensual = Math.min(brutoAnual / 12, BASES_SS_2025.maxima);
   const tipo = COTIZACIONES_SS_2025.contingenciasComunes + COTIZACIONES_SS_2025.desempleo
     + COTIZACIONES_SS_2025.formacionProfesional + COTIZACIONES_SS_2025.mef;
   return baseMensual * (tipo / 100) * 12;
@@ -192,9 +197,16 @@ export function estimarIRPF(e: EntradaIRPF): ResultadoIRPF {
 
   const cuotaIntegra = cuotaIntegraGeneral + cuotaIntegraAhorro;
 
-  // Deducción por obtención de rendimientos del trabajo: solo prestación efectiva de servicios.
+  // Deducción por obtención de rendimientos del trabajo (DA 61.ª): solo prestación efectiva
+  // de servicios, sobre los rendimientos ÍNTEGROS, y con tope en la cuota íntegra GENERAL,
+  // que es donde tributa el trabajo — la cuota del ahorro no la amplía. Hasta el 24/09/2026
+  // se calculaba sobre el neto y contra la cuota total: 17.500 € íntegros daban 340 € donde
+  // la AEAT da 155,20 € (Manual Renta 2025, Ejemplo 3).
   const deduccionRentasBajas = e.conNomina && bruto > 0
-    ? calcularDeduccionRentasBajas(rendimientoNetoTrabajo, capital)
+    ? limitarDeduccionRendimientosTrabajo(
+        calcularDeduccionRentasBajas(bruto, capital, EJERCICIO),
+        cuotaIntegraGeneral,
+      )
     : 0;
   const cuotaTrasDeducciones = Math.max(0, cuotaIntegra - deduccionRentasBajas);
   const retenciones = Math.max(0, e.retenciones);

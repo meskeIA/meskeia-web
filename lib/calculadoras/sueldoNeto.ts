@@ -18,6 +18,7 @@ import {
   calcularReduccionRendimientosTrabajo,
   FISCAL_IRPF_META,
   calcularDeduccionRentasBajas,
+  limitarDeduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -105,7 +106,11 @@ export function calcularSueldoNeto(p: ParametrosSueldoNeto): ResultadoSueldoNeto
 
   // Cotización SS: base = clamp(salario mensual, mínima, máxima)
   const salarioMensual = p.brutoAnual / 12;
-  const baseSS = Math.min(Math.max(salarioMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
+  // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así
+  // que un bruto anual por debajo solo puede ser jornada parcial o parte del año — y entonces
+  // se cotiza por lo cobrado. Hasta el 24/09/2026 se subía a la mínima: 14.000 € a media
+  // jornada cotizaban sobre 17.092,80 € (1.111 € en vez de 910 €).
+  const baseSS = Math.min(salarioMensual, BASES_SS_2026.maxima);
   const tipoSS = (
     COTIZACIONES_SS_2026.contingenciasComunes +
     COTIZACIONES_SS_2026.desempleo +
@@ -130,8 +135,12 @@ export function calcularSueldoNeto(p: ParametrosSueldoNeto): ResultadoSueldoNeto
   // formula la pone data/fiscal/irpf.ts y deja de estar copiada aqui.
   const cuotaIntegra = calcularCuotaIntegraGeneral(baseLiquidableGeneral, minimoPersonalFamiliar);
 
-  // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
-  const deduccionRentasBajas = calcularDeduccionRentasBajas(baseImponible, 0);
+  // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
+  // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
+  const deduccionRentasBajas = limitarDeduccionRendimientosTrabajo(
+    calcularDeduccionRentasBajas(p.brutoAnual, 0, 2026),
+    cuotaIntegra,
+  );
   const cuotaIRPF = r(Math.max(0, cuotaIntegra - deduccionRentasBajas));
 
   // Tipo de retención

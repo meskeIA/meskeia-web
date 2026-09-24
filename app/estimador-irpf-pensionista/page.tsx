@@ -65,7 +65,7 @@ const calcularCuotaIRPF = cuotaEscalaGeneral;
  *
  * El importe sale de `REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtrasRentas`, la constante
  * del PROPIO art. 20. Durante unas horas del 20/09/2026 se tomó prestado el umbral homónimo
- * de `DEDUCCION_RENTAS_BAJAS_2025` (art. 80 bis), porque era el único importable y coincide
+ * de la deducción de la DA 61.ª (entonces `DEDUCCION_RENTAS_BAJAS_2025`, rotulada «art. 80 bis»), porque era el único importable y coincide
  * en 6.500 €: son dos artículos distintos, y si uno se moviera y el otro no, la app habría
  * publicado la cifra equivocada sin que nada avisara. El dato ya tiene constante propia.
  */

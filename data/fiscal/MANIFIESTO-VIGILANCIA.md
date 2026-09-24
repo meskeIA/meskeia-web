@@ -172,11 +172,11 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 ### 3.2 Cadencia anual — bloque enero (LPGE, cotización, revalorización)
 
 #### `irpf.ts` — IRPF y cotización SS cuenta ajena (2 bloques con META propia)
-- **Contiene**: tramos IRPF (estatal + autonómico medio), mínimos personales/familiares, gastos deducibles y reducción por rendimientos del trabajo, deducción art. 80 bis, umbrales de obligación de declarar, helpers de tipo marginal; bloque SS: tipos de cotización del trabajador (Orden PJC/297/2026).
+- **Contiene**: tramos IRPF (estatal + autonómico medio), mínimos personales/familiares, gastos deducibles y reducción por rendimientos del trabajo, deducción por obtención de rendimientos del trabajo de la DA 61.ª (cuantías por ejercicio: 2025 y 2026), umbrales de obligación de declarar, helpers de tipo marginal; bloque SS: tipos de cotización del trabajador (Orden PJC/297/2026).
 - **Normativa**: Ley 35/2006 + LPGE; Orden anual de cotización.
-- **Vigilar**: LPGE o RDL que modifique tramos/mínimos/reducciones; Orden de cotización de cada enero (tipos + MEI); RD del SMI (mueve el umbral de obligación de declarar de perceptores con dos pagadores).
+- **Vigilar**: LPGE o RDL que modifique tramos/mínimos/reducciones; Orden de cotización de cada enero (tipos + MEI); RD del SMI (mueve el umbral de obligación de declarar de perceptores con dos pagadores) **y, detrás de cada RD del SMI, el RDL que reescribe la DA 61.ª** para que el nuevo SMI no tribute: añadir el ejercicio a `DEDUCCION_RENDIMIENTOS_TRABAJO`.
 - **Cadencia**: anual (ene) + RDL puntuales.
-- **Alerta metodológica**: deflactación automática de tramos (debate recurrente), cambio en la estructura de la reducción por rendimientos del trabajo (la LPGE 2025 ya la retocó), tributación del SMI, cuota de solidaridad para bases altas (RDL 2/2023, en despliegue progresivo — afecta al bloque SS).
+- **Alerta metodológica**: deflactación automática de tramos (debate recurrente), cambio en la estructura de la reducción por rendimientos del trabajo (la LPGE 2025 ya la retocó), tributación del SMI, cuota de solidaridad para bases altas (RDL 2/2023, en despliegue progresivo — afecta al bloque SS). ⚠️ **La DA 61.ª de 2026 llegó escondida**: la reescribió el art. 28 del RDL 5/2026, de 17/02/2026, un decreto de ayudas por inundaciones en Andalucía y Extremadura, y las apps de nómina siguieron con los 340 € de 2025 hasta el 24/09/2026. Un RDL «de otra cosa» puede tocar el IRPF: buscar por el artículo, no por el título.
 - **Verificado**: 2025-01-15 (IRPF, vigencia 2025) · 2026-06-13 (SS, vigencia 2026).
 
 #### `autonomos.ts` — Cotización RETA por ingresos reales

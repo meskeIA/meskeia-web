@@ -59,6 +59,25 @@ test.beforeEach(async ({ page }) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+test('CASO 0 · DA 61.ª de 2026: con 19.000 € el IRPF es 647,35 € y el neto 17.117,65 €', async ({ page }) => {
+  // SS 2026: 19.000 / 12 = 1.583,33 €/mes × 6,50 % × 12 = 1.235,00 €
+  // RNT = 19.000 − 1.235 − 2.000 = 15.765,00 € → reducción art. 20 = 7.302 − 1,75 × 913 = 5.704,25 €
+  // Base = 10.060,75 € → cuota = (10.060,75 − 5.550) × 19 % = 857,04 €
+  // Deducción DA 61.ª de 2026 (art. 28 RDL 5/2026) sobre los ÍNTEGROS:
+  //   590,89 − 0,2 × (19.000 − 17.094) = 209,69 € → IRPF = 647,35 €
+  // Hasta el 24/09/2026: la de 2025 sobre el neto, 249,34 € → 607,70 € de IRPF.
+  // Neto = 19.000 − 1.235 − 647,35 = 17.117,65 €
+  // El slider va de 12.000 a 200.000 en pasos de 500: Home y 14 pasos a la derecha.
+  await page.locator('#situacion-select').selectOption('soltero');
+  const slider = page.getByRole('slider', { name: 'Salario bruto anual en euros' });
+  await slider.focus();
+  await page.keyboard.press('Home');
+  for (let i = 0; i < 14; i++) await page.keyboard.press('ArrowRight');
+  await expect(slider).toHaveValue('19000');
+  expect(await pasoCascada(page, '= Salario NETO Anual')).toBe('17.117,65 €');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 test('CASO 1 · 30.000 € brutos, soltero/a, 14 pagas', async ({ page }) => {
   // SS: base 2.500 €/mes (entre la mínima 1.424,40 y la máxima 5.101,20) × 6,50 % × 12 = 1.950,00 €
   // RNT = 30.000 − 1.950 − 2.000 = 26.050,00 € → reducción art. 20 = 0 € (supera 19.747,5 €)
@@ -67,7 +86,7 @@ test('CASO 1 · 30.000 € brutos, soltero/a, 14 pagas', async ({ page }) => {
   //                  = 2.365,50 + 1.860,00 + 1.755,00 = 5.980,50 €
   //   escala(5.550)  = 5.550×19 %                      = 1.054,50 €
   //   cuota íntegra  = 5.980,50 − 1.054,50             = 4.926,00 €
-  // Deducción art. 80 bis: 0 € (RNT 26.050 € > 18.276 €)
+  // Deducción DA 61.ª: 0 € (30.000 € íntegros > 20.048,45 €)
   // Neto anual = 30.000 − 1.950 − 4.926 = 23.124,00 € → 1.651,71 €/mes en 14 pagas
   //
   // El método defectuoso daba escala(26.050 − 5.550) = 4.315,50 €: 610,50 € menos.

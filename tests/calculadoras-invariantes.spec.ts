@@ -47,6 +47,7 @@ import { test, expect } from '@playwright/test';
 import { calcularFiniquito } from '../lib/calculadoras/finiquito';
 import { calcularIndemnizacionDespido } from '../lib/calculadoras/indemnizacionDespido';
 import { calcularSueldoNeto } from '../lib/calculadoras/sueldoNeto';
+import { calcularDeduccionRentasBajas, limitarDeduccionRendimientosTrabajo } from '../data/fiscal/irpf';
 import { calcularCuotaAutonomo } from '../lib/calculadoras/cuotaAutonomo';
 import { compararModulosVsDirecta } from '../lib/calculadoras/modulosVsDirecta';
 import {
@@ -2000,6 +2001,45 @@ test.describe('Golden — calcularFiniquito (Capa 1 · ET arts. 52-56)', () => {
     expect(f.totalFiniquitoBruto).toBeCloseTo(2705.08, 2);
   });
 
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF) — data/fiscal/irpf.ts
+// Fuentes: Manual práctico Renta 2025 (AEAT), cap. 18, y art. 28 del RDL 5/2026 (BOE-A-2026-3810).
+// Hasta el 24/09/2026 se calculaba sobre el NETO, con umbral 14.852 € y rotulada «art. 80 bis».
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('DA 61.ª — deducción por obtención de rendimientos del trabajo', () => {
+  test('2025: 17.500 € íntegros → 155,20 € (Manual AEAT Renta 2025, Ejemplo 3)', () => {
+    expect(calcularDeduccionRentasBajas(17500, 0, 2025)).toBeCloseTo(155.2, 2);
+  });
+  test('2025: completa hasta 16.576 €, cero desde 18.276 €', () => {
+    expect(calcularDeduccionRentasBajas(16576, 0, 2025)).toBe(340);
+    expect(calcularDeduccionRentasBajas(18276, 0, 2025)).toBe(0);
+    expect(calcularDeduccionRentasBajas(18275, 0, 2025)).toBeCloseTo(0.2, 2);
+  });
+  test('2026: 590,89 € hasta el SMI (17.094 €), 590,89 − 0,2 × exceso, cero desde 20.048,45 €', () => {
+    expect(calcularDeduccionRentasBajas(17094, 0, 2026)).toBeCloseTo(590.89, 2);
+    expect(calcularDeduccionRentasBajas(19000, 0, 2026)).toBeCloseTo(209.69, 2);
+    expect(calcularDeduccionRentasBajas(20048.45, 0, 2026)).toBe(0);
+  });
+  test('más de 6.500 € de otras rentas la anulan', () => {
+    expect(calcularDeduccionRentasBajas(15000, 6500, 2026)).toBeCloseTo(590.89, 2);
+    expect(calcularDeduccionRentasBajas(15000, 6500.01, 2026)).toBe(0);
+  });
+  test('el tope es la cuota íntegra general por el peso del trabajo en su base', () => {
+    expect(limitarDeduccionRendimientosTrabajo(340, 120)).toBe(120);
+    expect(limitarDeduccionRendimientosTrabajo(340, 1000)).toBe(340);
+    expect(limitarDeduccionRendimientosTrabajo(340, 1000, 0.25)).toBe(250);
+    expect(limitarDeduccionRendimientosTrabajo(340, 0)).toBe(0);
+  });
+  test('calcularSueldoNeto (API y MCP) aplica la de 2026: 19.000 € → IRPF 647,35 €', () => {
+    // SS 1.235,00 · RNT 15.765,00 · reducción art. 20 5.704,25 · base 10.060,75
+    // cuota (10.060,75 − 5.550) × 19 % = 857,04 · deducción 590,89 − 0,2 × 1.906 = 209,69
+    const r = calcularSueldoNeto({ brutoAnual: 19000, situacion: 'soltero', pagas: 14 });
+    expect(r.cuotaSSAnual).toBeCloseTo(1235, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(647.35, 2);
+  });
 });
 
 // ────────────────────────────────────────────────────────────────────────────

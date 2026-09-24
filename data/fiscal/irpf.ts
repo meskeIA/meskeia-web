@@ -273,7 +273,7 @@ export const GASTOS_DEDUCIBLES_TRABAJO_2025 = {
  * publica en `limiteOtrasRentas` para que quien la necesite la compruebe antes de llamar a
  * `calcularReduccionRendimientosTrabajo`—. El 20/09/2026 dejó de estar solo en este
  * comentario: `estimador-irpf-pensionista` lo necesitaba y, al no haber constante, había
- * tomado prestado el umbral homónimo de `DEDUCCION_RENTAS_BAJAS_2025` (art. 80 bis). Son
+ * tomado prestado el umbral homónimo de la deducción de la DA 61.ª. Son
  * DOS artículos distintos que hoy coinciden en 6.500 €: si uno se moviera y el otro no, el
  * préstamo publicaría la cifra equivocada sin que nada avisara.
  *
@@ -313,45 +313,118 @@ export function calcularReduccionRendimientosTrabajo(rendimientoNetoTrabajo: num
   return Math.max(0, Math.round(bruta * 100) / 100);
 }
 
-// ─── Deducción por rendimientos del trabajo para rentas bajas (art. 80 bis) ──
+// ─── Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF) ─────
 
 /**
- * Deducción en cuota por obtención de rendimientos del trabajo (art. 80 bis LIRPF)
- * Introducida por RDL 4/2024, aplicable desde ejercicio 2025.
+ * Deducción en la cuota líquida por obtención de rendimientos del trabajo — disposición
+ * adicional sexagésima primera de la Ley 35/2006. Existe para que quien cobra el SMI no
+ * tribute: por eso sus umbrales se mueven cada año con el SMI.
  *
- * Requisitos:
- * - Rendimientos netos del trabajo ≤ limiteMaximo (18.276 €)
- * - Otras rentas (no del trabajo) ≤ limiteOtrasRentas (6.500 €)
+ * Requisitos (DA 61.ª.1):
+ * - Rendimientos ÍNTEGROS del trabajo derivados de la prestación efectiva de servicios en
+ *   una relación laboral o estatutaria, por debajo de `limiteMaximo`. Las pensiones no son
+ *   prestación efectiva de servicios: no dan derecho y cuentan como «otras rentas».
+ * - Rentas distintas de esas (excluidas las exentas) no superiores a `limiteOtrasRentas`.
  *
  * Cuantía:
- * - RNT ≤ limiteCompleto (14.852 €): deducción completa (340 €)
- * - limiteCompleto < RNT ≤ limiteMaximo: deducción proporcional decreciente
- * - RNT > limiteMaximo: sin deducción
+ * - Íntegros ≤ `limiteCompleto` (el SMI anual del ejercicio): `deduccionMaxima`.
+ * - Entre `limiteCompleto` y `limiteMaximo`: deduccionMaxima − 0,2 × (íntegros − limiteCompleto),
+ *   que llega a 0 justo en `limiteMaximo`.
+ * - Tope: la parte de la suma de las cuotas íntegras estatal y autonómica que
+ *   proporcionalmente corresponda a esos rendimientos netos del trabajo. El trabajo solo
+ *   entra en la base liquidable GENERAL, así que el tope es la cuota íntegra general en la
+ *   proporción que el trabajo pese en esa base: sin otras rentas en ella, la cuota íntegra
+ *   general entera (Ejemplo 1 del Manual AEAT: «los rendimientos del trabajo representan
+ *   el 100 % de la base liquidable general»). Es el mismo criterio de reparto por bases que
+ *   el Manual aplica a la deducción por rentas obtenidas en Ceuta y Melilla, que usa la
+ *   misma redacción.
  *
- * Fuente: art. 80 bis Ley 35/2006 del IRPF
- * Verificado: 2026-04-01
+ * ⚠️ HASTA EL 24/09/2026 este módulo decía «art. 80 bis», aplicaba la escala sobre el
+ * rendimiento NETO (completa hasta 14.852 € —el umbral del art. 20, no el de esta
+ * deducción— y lineal hasta 18.276 € netos) y solo tenía la cuantía de 2025. Caso con el
+ * Manual AEAT (Ejemplo 3): 17.500 € íntegros → la AEAT da 155,20 €; el módulo daba 340 €.
+ * Y las apps de nómina de 2026 seguían con los 340 € de 2025.
+ *
+ * Fuentes:
+ * - 2025: AEAT, Manual práctico Renta 2025, cap. 18, «Deducción por obtención de
+ *   rendimientos del trabajo» (cuantía, requisitos y Ejemplos 1-3).
+ * - 2026: art. 28 del Real Decreto-ley 5/2026, de 17 de febrero (BOE-A-2026-3810), que da
+ *   nueva redacción a la DA 61.ª con efectos desde el 1 de enero de 2026.
+ * Verificado: 2026-09-24
  */
-export const DEDUCCION_RENTAS_BAJAS_2025 = {
-  deduccionMaxima:     340,     // € anuales
-  limiteCompleto:    14852,     // RNT hasta aquí: deducción máxima
-  limiteMaximo:      18276,     // RNT por encima: sin deducción
-  limiteOtrasRentas:  6500,     // Máximo de rentas no laborales permitido
+export interface ParametrosDeduccionRendimientosTrabajo {
+  /** € anuales */
+  deduccionMaxima: number;
+  /** Íntegros hasta aquí (SMI anual del ejercicio): deducción máxima */
+  limiteCompleto: number;
+  /** Íntegros desde aquí: sin deducción */
+  limiteMaximo: number;
+  /** € de deducción que se pierden por cada euro de íntegros sobre `limiteCompleto` */
+  pendiente: number;
+  /** Rentas distintas de las del trabajo (excluidas exentas) por encima: sin deducción */
+  limiteOtrasRentas: number;
+}
+
+export const DEDUCCION_RENDIMIENTOS_TRABAJO_2025: ParametrosDeduccionRendimientosTrabajo = {
+  deduccionMaxima:     340,
+  limiteCompleto:    16576,
+  limiteMaximo:      18276,
+  pendiente:           0.2,
+  limiteOtrasRentas:  6500,
+};
+
+export const DEDUCCION_RENDIMIENTOS_TRABAJO_2026: ParametrosDeduccionRendimientosTrabajo = {
+  deduccionMaxima:  590.89,
+  limiteCompleto:    17094,
+  limiteMaximo:   20048.45,
+  pendiente:           0.2,
+  limiteOtrasRentas:  6500,
+};
+
+export type EjercicioDeduccionTrabajo = 2025 | 2026;
+
+export const DEDUCCION_RENDIMIENTOS_TRABAJO: Record<EjercicioDeduccionTrabajo, ParametrosDeduccionRendimientosTrabajo> = {
+  2025: DEDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  2026: DEDUCCION_RENDIMIENTOS_TRABAJO_2026,
 };
 
 /**
- * Calcula la deducción por rentas bajas del trabajo (art. 80 bis LIRPF).
- * @param rnt Rendimiento Neto del Trabajo (después de gastos deducibles art.19, antes de reducción art.20)
- * @param otrasRentas Suma de rentas no laborales (capital, imputadas, etc.). 0 si no se conocen.
- * @returns Importe de la deducción (0 a 340 €)
+ * Fuente ÚNICA de la deducción de la DA 61.ª. Devuelve la cuantía ANTES del tope sobre la
+ * cuota; el tope lo aplica quien tiene la cuota, con `limitarDeduccionRendimientosTrabajo`.
+ *
+ * @param integrosTrabajo Rendimientos ÍNTEGROS del trabajo por prestación efectiva de
+ *   servicios (el bruto de la nómina, sin restar cotizaciones ni gastos). Nunca pensiones.
+ * @param otrasRentas Rentas no exentas distintas de esas (capital, pensiones…). 0 si no hay.
+ * @param ejercicio Año cuyas cuantías se aplican.
  */
-export function calcularDeduccionRentasBajas(rnt: number, otrasRentas: number = 0): number {
-  const d = DEDUCCION_RENTAS_BAJAS_2025;
+export function calcularDeduccionRentasBajas(
+  integrosTrabajo: number,
+  otrasRentas: number,
+  ejercicio: EjercicioDeduccionTrabajo,
+): number {
+  const d = DEDUCCION_RENDIMIENTOS_TRABAJO[ejercicio];
+  if (!Number.isFinite(integrosTrabajo) || integrosTrabajo <= 0) return 0;
   if (otrasRentas > d.limiteOtrasRentas) return 0;
-  if (rnt <= 0) return 0;
-  if (rnt <= d.limiteCompleto) return d.deduccionMaxima;
-  if (rnt > d.limiteMaximo) return 0;
-  // Interpolación lineal entre limiteCompleto y limiteMaximo
-  return d.deduccionMaxima * (1 - (rnt - d.limiteCompleto) / (d.limiteMaximo - d.limiteCompleto));
+  if (integrosTrabajo >= d.limiteMaximo) return 0;
+  if (integrosTrabajo <= d.limiteCompleto) return d.deduccionMaxima;
+  const importe = d.deduccionMaxima - d.pendiente * (integrosTrabajo - d.limiteCompleto);
+  return Math.max(0, Math.round(importe * 100) / 100);
+}
+
+/**
+ * Tope de la DA 61.ª.1, último párrafo: la deducción no puede superar la parte de la cuota
+ * íntegra que corresponde a los rendimientos netos del trabajo. El trabajo tributa en la
+ * base general, así que el tope es la cuota íntegra GENERAL por el peso del trabajo en
+ * la base liquidable general (1 cuando no hay otra renta en esa base). La cuota del
+ * ahorro no lo amplía.
+ */
+export function limitarDeduccionRendimientosTrabajo(
+  deduccion: number,
+  cuotaIntegraGeneral: number,
+  pesoTrabajoEnBaseGeneral: number = 1,
+): number {
+  const peso = Math.min(1, Math.max(0, pesoTrabajoEnBaseGeneral));
+  return Math.max(0, Math.min(deduccion, cuotaIntegraGeneral * peso));
 }
 
 // ─── Helpers: estimación tipo marginal ────────────────────────────────────────

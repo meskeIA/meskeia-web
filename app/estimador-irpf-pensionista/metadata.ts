@@ -5,7 +5,6 @@ import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  DEDUCCION_RENTAS_BAJAS_2025,
   OBLIGACION_DECLARAR_2025,
   cuotaEscalaGeneral,
 } from '@/data/fiscal';
@@ -18,7 +17,7 @@ import {
  * 75 años cifrado en 1.215 € de cuota cuando la escala vigente da 1.539 €. Ahora salen todas de
  * `@/data/fiscal`: si la norma cambia allí, este texto cambia con ella.
  */
-const LIMITE_OTRAS_RENTAS_ART_20 = DEDUCCION_RENTAS_BAJAS_2025.limiteOtrasRentas;
+const LIMITE_OTRAS_RENTAS_ART_20 = REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtrasRentas;
 const VALOR_MINIMO_75 = cuotaEscalaGeneral(MINIMOS_IRPF_2025.personal_75);
 
 export const metadata: Metadata = {

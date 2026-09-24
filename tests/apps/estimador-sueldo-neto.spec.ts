@@ -19,8 +19,9 @@ import { test, expect, Page } from '@playwright/test';
  *   · MINIMOS_IRPF_2025.personal  — 5.550 € (soltero, sin hijos)
  *   · GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral — 2.000 € (art. 19.2.f)
  *   · REDUCCION_RENDIMIENTOS_TRABAJO_2025 — art. 20 LIRPF (RNT ≥ 19.747,5 € → 0 €)
- *   · DEDUCCION_RENTAS_BAJAS_2025 (vía calcularDeduccionRentasBajas) — art. 80 bis
- *     (0 € cuando el RNT supera 18.276 €, como en los dos casos siguientes)
+ *   · DEDUCCION_RENDIMIENTOS_TRABAJO_2026 (vía calcularDeduccionRentasBajas) — DA 61.ª
+ *     LIRPF, redacción del RDL 5/2026 (0 € con íntegros ≥ 20.048,45 €, como en los dos casos
+ *     siguientes)
  *   · COTIZACIONES_SS_2026 — 4,70 + 1,55 + 0,10 + 0,15 = 6,50 % trabajador
  *     (Orden PJC/297/2026, DT 38ª LGSS)
  *   · BASES_SS_2026 — mínima 1.424,40 €/mes, máxima 5.101,20 €/mes
@@ -139,6 +140,20 @@ test.beforeEach(async ({ page }) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+test('CASO 0 · DA 61.ª de 2026: 19.000 € brutos deducen 209,69 € (590,89 − 0,2 × 1.906)', async ({ page }) => {
+  // SS 2026: 19.000 / 12 = 1.583,33 €/mes × 6,50 % × 12 = 1.235,00 €
+  // RNT = 19.000 − 1.235 − 2.000 = 15.765,00 € → reducción art. 20 = 7.302 − 1,75 × 913 = 5.704,25 €
+  // Base = 10.060,75 € → cuota = (10.060,75 − 5.550) × 19 % = 857,04 € (primer tramo entero)
+  // Deducción DA 61.ª, redacción de 2026 (art. 28 del RDL 5/2026), sobre los ÍNTEGROS:
+  //   590,89 − 0,2 × (19.000 − 17.094) = 209,69 € → IRPF = 857,04 − 209,69 = 647,35 €
+  // Hasta el 24/09/2026 la app aplicaba la de 2025 sobre el NETO: 340 × (1 − 913 / 3.424) =
+  //   249,34 € → 607,70 € de IRPF.
+  await calcular(page, '19000');
+  expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-209,69 €');
+  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('647,35 €');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 test('CASO 1 (normal) · 30.000 € brutos, soltero/a, 0 hijos, 12 pagas', async ({ page }) => {
   await calcular(page, '30000');
   expect(await hayResultados(page)).toBe(true);
@@ -156,7 +171,7 @@ test('CASO 1 (normal) · 30.000 € brutos, soltero/a, 0 hijos, 12 pagas', async
   //                  = 2.365,50 + 1.860,00 + 1.755,00 = 5.980,50 €
   //   escala(5.550)  = 5.550×19 %                     = 1.054,50 €
   //   cuota          = 5.980,50 − 1.054,50            = 4.926,00 €
-  // Deducción art. 80 bis: 0 € (el RNT de 26.050 € supera el límite de 18.276 €).
+  // Deducción DA 61.ª: 0 € (30.000 € íntegros superan los 20.048,45 € de 2026).
   expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('4926,00 €');
   expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('16,42%');
 
