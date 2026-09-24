@@ -549,8 +549,15 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
     // primero programado sea setValueAtTime(0, t0); eso no llega a sonar.
     const validas = muestras.filter((m) => m.dt > 0);
     expect(validas.length, `${etiqueta}: hay muestras`).toBeGreaterThan(5);
-    // Arranca desde abajo: la primera muestra rendida está lejos del volumen (0,5).
-    expect(validas[0].valor, `${etiqueta}: ganancia al arrancar (${validas[0].dt.toFixed(3)} s)`).toBeLessThan(0.15);
+    // Arranca desde abajo: la primera muestra rendida está en la rampa, no en el volumen. Se mide
+    // contra la rampa EN SU INSTANTE (0,5 × dt / 0,1, con el margen de ±0,1 de abajo): la primera
+    // muestra cae cada vez en un momento distinto, y un umbral fijo (< 0,15) fallaba 3 de cada 5
+    // veces con la app correcta, a los 32 ms, donde la rampa vale 0,16 (suite del 25/09/2026). El
+    // defecto sigue fallando: 0,5 al instante, o un salto a 0,5 a los 20 ms.
+    const primera = validas[0];
+    expect(primera.valor, `${etiqueta}: ganancia al arrancar (${primera.dt.toFixed(3)} s)`).toBeLessThan(
+      Math.min(0.45, (0.5 * primera.dt) / 0.1 + 0.1),
+    );
     // Nunca baja: una rampa de subida, sin escalones hacia atrás.
     for (let i = 1; i < validas.length; i++) {
       expect(validas[i].valor, `${etiqueta}: muestra ${i} a ${validas[i].dt.toFixed(3)} s`).toBeGreaterThanOrEqual(
