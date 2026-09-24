@@ -1,6 +1,7 @@
 import { Trait, PopulationSimulation, PunnettResult } from '../types';
 import { determinePhenotype } from './crosses';
 import { formatNumber } from '@/lib';
+import { pValorChiCuadrado, valorCriticoChiCuadrado } from './chiCuadrado';
 
 /**
  * El p-valor, con el separador decimal español.
@@ -133,6 +134,9 @@ export function generatePopulationGrid(
   return rows;
 }
 
+/** Nivel de significación del contraste que publica la pestaña Población. */
+export const ALFA_CHI_CUADRADO = 0.05;
+
 // Interpretar resultado del chi-cuadrado
 export function interpretChiSquare(
   chiSquare: number,
@@ -141,23 +145,18 @@ export function interpretChiSquare(
   interpretation: string;
   isSignificant: boolean;
   pValue: string;
+  /** El p-valor exacto, P(χ²_gl > χ²); null cuando el test no procede. */
+  pValor: number | null;
+  /** El valor crítico con α = 0,05 para ESTOS grados de libertad; null si no procede. */
+  valorCritico: number | null;
 } {
-  // Valores críticos aproximados para α = 0.05
-  const criticalValues: Record<number, number> = {
-    1: 3.841,
-    2: 5.991,
-    3: 7.815,
-    4: 9.488,
-    5: 11.070,
-  };
-
   /**
    * Con UNA sola categoría no hay test que hacer.
    *
    * ⚠️ 14/09/2026 (hallazgo 832) — un cruce que produce un único fenotipo (AA × aa: toda la
    * F1 es Aa) deja 0 grados de libertad. El estadístico no puede valer entonces otra cosa
    * que 0, porque observado y esperado coinciden por construcción, y `criticalValues[0]` no
-   * existe, así que caía al valor de 1 g.l. (3,841) y la app presentaba «χ² = 0,000 · p >
+   * existía, así que caía al valor de 1 g.l. (3,841) y la app presentaba «χ² = 0,000 · p >
    * 0,5 · Ajuste excelente a las proporciones esperadas», idéntico en todas las corridas,
    * como si fuera evidencia de ajuste. El bloque educativo promete que «el test chi-cuadrado
    * verifica si los resultados son estadísticamente esperables», y ahí no verificaba nada.
@@ -168,33 +167,47 @@ export function interpretChiSquare(
         'El cruce produce un solo fenotipo, así que no hay grados de libertad: no hay proporciones que contrastar y el test no procede.',
       isSignificant: false,
       pValue: 'no procede',
+      pValor: null,
+      valorCritico: null,
     };
   }
 
-  const critical = criticalValues[degreesOfFreedom] || 3.841;
-  const isSignificant = chiSquare > critical;
+  /**
+   * El veredicto sale del p-valor EXACTO para los grados de libertad del cruce (hallazgo 1586,
+   * ver `chiCuadrado.ts`): antes, una tabla de críticos de gl 1 a 5 con `|| 3.841` para el
+   * resto juzgaba un cruce de 8 fenotipos (gl = 7, crítico 14,067) como si tuviera uno.
+   *
+   * Las cuatro franjas se cortan ahora por el propio p y no por fracciones del crítico. Antes
+   * «Ajuste excelente · p > 0,5» era χ² < 0,5 para cualquier gl, y con gl = 1 la mediana es
+   * 0,455: un χ² de 0,48 daba p = 0,49 y se publicaba «p > 0,5».
+   */
+  const pValor = pValorChiCuadrado(chiSquare, degreesOfFreedom);
+  const valorCritico = valorCriticoChiCuadrado(degreesOfFreedom, ALFA_CHI_CUADRADO);
+  const isSignificant = pValor < ALFA_CHI_CUADRADO;
 
   let interpretation: string;
   let pValue: string;
 
-  if (chiSquare < 0.5) {
+  if (isSignificant) {
+    interpretation = 'Diferencia significativa con lo esperado';
+    pValue = pTexto('<', ALFA_CHI_CUADRADO);
+  } else if (pValor > 0.5) {
     interpretation = 'Ajuste excelente a las proporciones esperadas';
     pValue = pTexto('>', 0.5);
-  } else if (chiSquare < critical * 0.5) {
+  } else if (pValor > 0.1) {
     interpretation = 'Buen ajuste a las proporciones mendelianas';
     pValue = pTexto('>', 0.1);
-  } else if (!isSignificant) {
-    interpretation = 'Ajuste aceptable, diferencias por azar';
-    pValue = pTexto('>', 0.05);
   } else {
-    interpretation = 'Diferencia significativa con lo esperado';
-    pValue = pTexto('<', 0.05);
+    interpretation = 'Ajuste aceptable, diferencias por azar';
+    pValue = pTexto('>', ALFA_CHI_CUADRADO);
   }
 
   return {
     interpretation,
     isSignificant,
     pValue,
+    pValor,
+    valorCritico,
   };
 }
 

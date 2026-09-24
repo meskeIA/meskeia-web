@@ -46,6 +46,12 @@ export interface Trait {
    * los ratios y de los casos de aula siguen siendo las internas ('AO', 'Grupo A').
    */
   notacion?: Record<string, string>;
+  /**
+   * Ninguno de sus fenotipos es una afectación: el árbol genealógico no rellena el símbolo de
+   * nadie y marca solo al portador del alelo recesivo. Es el caso de los grupos sanguíneos
+   * (ABO y Rh): el grupo O y el Rh negativo son grupos como los demás, no condiciones.
+   */
+  sinAfectados?: boolean;
 }
 
 // Organismo

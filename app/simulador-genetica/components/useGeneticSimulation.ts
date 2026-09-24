@@ -43,7 +43,11 @@ interface UseGeneticSimulationState {
   // Resultados
   crossResult: CrossResult | null;
   punnettResult: PunnettResult | null;
+  /** De qué cruce es el cuadro de Punnett: la `firmaDelCruce` con que se calculó. */
+  firmaPunnett: string | null;
   populationSimulation: PopulationSimulation | null;
+  /** De qué cruce es la población simulada: la firma del cuadro del que se sorteó. */
+  firmaPoblacion: string | null;
   pedigreeChart: PedigreeChart | null;
 
   // Animación
@@ -89,6 +93,34 @@ interface UseGeneticSimulationReturn extends UseGeneticSimulationState {
 const DEFAULT_ORGANISM = ORGANISMS[0]; // Guisantes
 const DEFAULT_TRAIT = DEFAULT_ORGANISM.traits[0];
 
+/**
+ * Todo lo que decide qué cruce hay en pantalla, en una cadena: si cambia, el cuadro de
+ * Punnett es otro y cualquier población simulada con el anterior deja de valer.
+ *
+ * ⚠️ 24/09/2026 (hallazgo 1587, ALTO) — la población solo se anulaba al cambiar de organismo o
+ * de característica 1. Con cualquier otro cambio (un genotipo, el segundo rasgo, el tipo de
+ * cruce) el panel seguía pintando los individuos del cruce anterior, con fenotipos que el
+ * nuevo no puede dar; «Observado» contaba solo las filas que coincidían con el cuadro nuevo y
+ * dejaba de sumar N, y el χ² viejo se juzgaba con los grados de libertad del nuevo, así que el
+ * veredicto cambiaba sin haber simulado nada. Es la forma del hallazgo 825 (el árbol viejo).
+ *
+ * En vez de repetir la anulación en cada setter —que es como se olvidó la primera vez, y como
+ * se olvidaría con el próximo control— la población lleva la firma del cruce con que se
+ * simuló, y solo se enseña mientras esa firma sea la del cruce actual.
+ */
+function firmaDelCruce(s: UseGeneticSimulationState): string {
+  const dihibrido = s.crossType === 'dihybrid' && s.selectedTrait2 !== null;
+  return [
+    s.selectedOrganism.id,
+    s.selectedTrait1.id,
+    s.parent1Genotype,
+    s.parent2Genotype,
+    s.parent1Sex,
+    s.parent2Sex,
+    dihibrido ? `${s.selectedTrait2?.id}:${s.parent1Genotype2}:${s.parent2Genotype2}` : 'monohibrido',
+  ].join('|');
+}
+
 export function useGeneticSimulation(): UseGeneticSimulationReturn {
   const [state, setState] = useState<UseGeneticSimulationState>({
     selectedOrganism: DEFAULT_ORGANISM,
@@ -105,7 +137,9 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
 
     crossResult: null,
     punnettResult: null,
+    firmaPunnett: null,
     populationSimulation: null,
+    firmaPoblacion: null,
     pedigreeChart: null,
 
     animationState: 'idle',
@@ -312,10 +346,19 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
         prev.parent2Sex
       );
 
+      // Una población simulada con OTRO cruce se descarta aquí, que es por donde pasa cualquier
+      // cambio de entrada (el efecto de page.tsx), para que no reaparezca al volver a él. Pulsar
+      // «Realizar Cruce» sin cambiar nada la conserva: sigue siendo de este cruce (hallazgo 1587).
+      const firma = firmaDelCruce(prev);
+      const poblacionVigente = prev.firmaPoblacion === firma;
+
       return {
         ...prev,
         punnettResult: punnett,
+        firmaPunnett: firma,
         crossResult,
+        populationSimulation: poblacionVigente ? prev.populationSimulation : null,
+        firmaPoblacion: poblacionVigente ? prev.firmaPoblacion : null,
         animationState: 'idle',
         animationStep: 0,
       };
@@ -337,6 +380,10 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
       return {
         ...prev,
         populationSimulation: simulation,
+        // La firma del CUADRO del que se sortea, no la de los controles: si alguna vez se
+        // simulara antes de que el efecto rehaga el cuadro, la población quedaría marcada como
+        // de su cruce de verdad y no se enseñaría con el nuevo.
+        firmaPoblacion: prev.firmaPunnett,
         populationSize: simSize,
       };
     });
@@ -421,7 +468,9 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
       parent2Sex: 'female',
       crossResult: null,
       punnettResult: null,
+      firmaPunnett: null,
       populationSimulation: null,
+      firmaPoblacion: null,
       pedigreeChart: null,
       animationState: 'idle',
       animationStep: 0,
@@ -429,8 +478,17 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
     });
   }, []);
 
+  /**
+   * La población solo sale de aquí si es del cruce actual (hallazgo 1587). `performCrossing` ya
+   * la descarta al rehacer el cuadro, pero entre el cambio de un control y ese efecto hay un
+   * render: esta comprobación impide que en él asome la población vieja con el cruce nuevo.
+   */
+  const poblacionDelCruceActual =
+    state.firmaPoblacion === firmaDelCruce(state) ? state.populationSimulation : null;
+
   return {
     ...state,
+    populationSimulation: poblacionDelCruceActual,
     setSelectedOrganism,
     setSelectedTrait1,
     setSelectedTrait2,

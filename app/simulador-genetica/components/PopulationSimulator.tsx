@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from '../SimuladorGenetica.module.css';
 import { formatNumber } from '@/lib';
 import { PopulationSimulation, PunnettResult, Trait } from './types';
-import { interpretChiSquare, notacionGenotipo } from './genetics';
+import { interpretChiSquare, notacionGenotipo, ALFA_CHI_CUADRADO } from './genetics';
 
 const TAMANO_MINIMO = 10;
 const TAMANO_MAXIMO = 500;
@@ -83,8 +83,13 @@ export default function PopulationSimulator({
     onSetSize(valor);
   };
 
-  // Calcular grados de libertad (número de fenotipos - 1)
-  const degreesOfFreedom = Object.keys(punnett.phenotypeRatios).length - 1;
+  /**
+   * Grados de libertad = número de clases fenotípicas − 1, contados sobre las esperanzas de LA
+   * PROPIA simulación y no sobre el cuadro de arriba: el χ² y sus grados de libertad tienen que
+   * hablar del mismo cruce. Antes se leían del cuadro en pantalla, y con la población de un
+   * cruce anterior todavía visible (hallazgo 1587) el χ² viejo se juzgaba con los gl del nuevo.
+   */
+  const degreesOfFreedom = simulation ? Object.keys(simulation.expectedRatios).length - 1 : 0;
 
   /**
    * El orden en que se listan los fenotipos en las DOS columnas (hallazgo 1205): el del cuadro
@@ -202,11 +207,20 @@ export default function PopulationSimulator({
           {chiSquareResult && (
             <div className={styles.chiSquare}>
               <div className={styles.chiSquareTitle}>
-                📐 Prueba Chi-cuadrado (χ²)
+                <span aria-hidden="true">📐</span> Prueba Chi-cuadrado (χ²)
               </div>
               <div className={styles.chiSquareValue}>
                 χ² = {formatNumber(simulation.chiSquare ?? 0, 3)}
               </div>
+              {/* Los grados de libertad y el valor crítico con que se juzga, a la vista: es la
+                  comparación que el alumno hace con la tabla, y la que delata si el contraste
+                  se hace con los grados de libertad del cruce (hallazgo 1586). */}
+              {chiSquareResult.valorCritico !== null && (
+                <div className={styles.chiSquareGrados}>
+                  gl = {degreesOfFreedom} · valor crítico (α = {formatNumber(ALFA_CHI_CUADRADO, 2)}) ={' '}
+                  {formatNumber(chiSquareResult.valorCritico, 3)}
+                </div>
+              )}
               <div className={styles.chiSquareInterpretation}>
                 {/* Con 0 grados de libertad no hay p-valor que dar: la interpretación lo
                     explica sola y anteponerle una «p» diría justo lo contrario (hallazgo 832). */}

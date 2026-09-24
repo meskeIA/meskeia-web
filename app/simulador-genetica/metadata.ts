@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Qué proporciones fenotípicas da un cruce monohíbrido?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un cruce monohíbrido entre dos heterocigotos (Aa × Aa) con dominancia completa da una proporción fenotípica de 3:1, es decir, 3 individuos con el rasgo dominante por cada 1 con el rasgo recesivo. La proporción genotípica subyacente es 1:2:1 (1 AA, 2 Aa, 1 aa). Si la herencia es de dominancia incompleta o codominancia, la proporción fenotípica pasa a ser 1:2:1 porque el heterocigoto muestra su propio fenotipo.',
+        text: 'Un cruce monohíbrido entre dos heterocigotos (Aa × Aa) con dominancia completa da una proporción fenotípica de 3:1, es decir, 3 individuos con el rasgo dominante por cada 1 con el rasgo recesivo. La proporción genotípica subyacente es 1:2:1 (1 AA, 2 Aa, 1 aa). Con dominancia incompleta el heterocigoto muestra su propio fenotipo y la proporción fenotípica pasa a ser 1:2:1. En la codominancia depende de los alelos: en el grupo sanguíneo ABO, IᴬIᴮ × IᴬIᴮ da 1:2:1 (A, AB y B), pero Iᴬi × Iᴬi da 3:1 porque Iᴬ domina sobre i, e Iᴬi × Iᴮi da 1:1:1:1 (AB, A, B y O).',
       },
     },
     {

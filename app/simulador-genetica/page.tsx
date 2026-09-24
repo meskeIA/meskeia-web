@@ -263,10 +263,26 @@ export default function SimuladorGeneticaPage() {
                   </option>
                 ))}
               </select>
+              {/* Los emojis del modo de herencia, en su propio nodo con aria-hidden: dentro del
+                  literal de cadena el lector de pantalla anunciaba «gota de sangre» delante de
+                  «Codominancia» (hallazgo 1591), y el candado check:a11y-jsx no mira dentro de
+                  las expresiones. Los tres modos, porque los tres tenían la misma forma. */}
               <p className={styles.inheritanceInfo}>
-                {selectedTrait1.inheritanceMode === 'sex-linked' && '🔗 Ligada al sexo - '}
-                {selectedTrait1.inheritanceMode === 'incomplete' && '🎨 Dominancia incompleta - '}
-                {selectedTrait1.inheritanceMode === 'codominant' && '🩸 Codominancia y alelos múltiples - '}
+                {selectedTrait1.inheritanceMode === 'sex-linked' && (
+                  <>
+                    <span aria-hidden="true">🔗</span> Ligada al sexo -{' '}
+                  </>
+                )}
+                {selectedTrait1.inheritanceMode === 'incomplete' && (
+                  <>
+                    <span aria-hidden="true">🎨</span> Dominancia incompleta -{' '}
+                  </>
+                )}
+                {selectedTrait1.inheritanceMode === 'codominant' && (
+                  <>
+                    <span aria-hidden="true">🩸</span> Codominancia y alelos múltiples -{' '}
+                  </>
+                )}
                 {selectedTrait1.description}
               </p>
             </div>
@@ -695,7 +711,13 @@ export default function SimuladorGeneticaPage() {
                   <td><strong>Portadores detectables</strong></td>
                   <td>❌ No (igual que dominante)</td>
                   <td>✅ Sí (fenotipo intermedio)</td>
-                  <td>✅ Sí (ambos rasgos visibles)</td>
+                  {/* ⚠️ 24/09/2026 (hallazgo 1590) — decía «✅ Sí (ambos rasgos visibles)», que
+                      vale para IᴬIᴮ; el portador de i (Iᴬi, Iᴮi) es de grupo A o B como el
+                      homocigoto, y por eso el árbol lo marca como portador. */}
+                  <td>
+                    <span aria-hidden="true">⚠️</span> Solo el heterocigoto IᴬIᴮ (grupo AB); el
+                    portador de i (Iᴬi, Iᴮi) no se distingue de IᴬIᴬ ni de IᴮIᴮ
+                  </td>
                   <td>✅ Hembras portadoras (X^R X^r)</td>
                 </tr>
                 <tr>
@@ -856,11 +878,22 @@ Hija portadora (XD Xd) × marido sano (XD Y):
 
             <div className={styles.faqItem}>
               <h4>❓ ¿Por qué en algunos cruces no obtengo la proporción 3:1?</h4>
+              {/*
+                ⚠️ 24/09/2026 (hallazgo 1588) — decía que el 3:1 es «exclusivo» de la dominancia
+                completa y que con codominancia «el ratio fenotípico será 1:2:1». El único rasgo
+                codominante de la app, el ABO, lo desmiente: con tres alelos, dos heterocigotos
+                dan 3:1, 1:1:1:1 o 2:1:1 según cuáles lleven, y el 1:2:1 solo sale de
+                IᴬIᴮ × IᴬIᴮ. Cada proporción de aquí la imprime la pestaña Estadísticas.
+              */}
               <p>
-                La proporción 3:1 es exclusiva del cruce monohíbrido entre dos heterocigotos
-                (Aa × Aa) con dominancia completa. Si usas dominancia incompleta o codominancia,
-                el ratio fenotípico será 1:2:1 porque el heterocigoto muestra un fenotipo
-                diferente. En cruces dihíbridos, la proporción esperada es 9:3:3:1.
+                El 3:1 aparece al cruzar dos heterocigotos (Aa × Aa) para un carácter con
+                dominancia completa. Con dominancia incompleta el heterocigoto tiene su propio
+                fenotipo y el mismo cruce da 1:2:1 (rojo : rosa : blanco). En el grupo ABO, que
+                tiene tres alelos, depende de cuáles lleve cada progenitor: IᴬIᴮ × IᴬIᴮ da 1:2:1
+                (A : AB : B); Iᴬi × Iᴬi da 3:1 (A : O), porque Iᴬ domina sobre i; Iᴬi × Iᴮi da
+                1:1:1:1 (AB : B : A : O), e IᴬIᴮ × Iᴬi, 2:1:1 (A : AB : B). En un cruce dihíbrido
+                entre dos dobles heterocigotos (AaBb × AaBb) con dominancia completa, la
+                proporción esperada es 9:3:3:1.
               </p>
               <p className={styles.faqTip}>
                 💡 <strong>Tip:</strong> Siempre identifica primero el modo de herencia antes
@@ -945,9 +978,20 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 El chi-cuadrado (χ²) compara las proporciones observadas en la simulación
                 con las esperadas según la teoría mendeliana. Un valor χ² bajo (p &gt; 0,05)
                 indica que las diferencias son atribuibles al azar y los resultados
-                son <strong>compatibles con las leyes de Mendel</strong>. Un valor alto
-                (p &lt; 0,05) sugiere que algo no encaja con la herencia simple (ligamiento,
-                selección, muestra pequeña).
+                son <strong>compatibles con las leyes de Mendel</strong>. Con datos reales, un
+                valor alto (p &lt; 0,05) sugiere que algo no encaja con la herencia simple
+                (ligamiento, selección) o que la muestra es demasiado pequeña para el test.
+              </p>
+              {/* Hallazgo 1586: con los grados de libertad bien contados, un p < 0,05 sale en
+                  torno a 1 de cada 20 corridas, y la frase de arriba lo leería como un fallo de
+                  la herencia. Los dos críticos, de la tabla del NIST (ver chiCuadrado.ts). */}
+              <p>
+                Los grados de libertad son el número de fenotipos menos uno, y el valor crítico
+                con el que se compara el χ² depende de ellos: 3,841 con 1 grado de libertad y
+                14,067 con 7 (α = 0,05). Como el simulador sortea la población con las
+                proporciones teóricas, aquí la herencia simple se cumple siempre; aun así, en
+                torno a 1 de cada 20 simulaciones dará p &lt; 0,05 por puro azar, que es el error
+                que acepta un nivel de significación del 5 %.
               </p>
               <p className={styles.faqTip}>
                 💡 <strong>Regla práctica:</strong> Con muestras pequeñas (&lt;30 individuos)

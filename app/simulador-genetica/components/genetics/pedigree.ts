@@ -249,12 +249,18 @@ function createPedigreeIndividual(
     const d = trait.alleles.dominant.symbol;
 
     /**
-     * Con alelos codominantes (ABO) no hay «afectados»: el grupo O es un fenotipo más, no una
+     * En los grupos sanguíneos no hay «afectados»: el grupo O es un fenotipo más, no una
      * condición, y pintarlo con el símbolo relleno del árbol lo habría presentado como tal.
-     * Lo que sí se marca es el PORTADOR de i (Iᴬi, Iᴮi), porque es justo lo que explica que
-     * dos padres de grupo A puedan tener un hijo O.
+     * Lo que sí se marca es el PORTADOR del alelo recesivo (Iᴬi, Iᴮi), porque es justo lo que
+     * explica que dos padres de grupo A puedan tener un hijo O.
+     *
+     * ⚠️ 24/09/2026 (hallazgo 1589) — la excepción se escribió con `trait.alleles.codominant`,
+     * así que solo alcanzaba al ABO: el Factor Rh, de dominancia completa, caía en la rama
+     * general y el Rh negativo (dd) salía relleno bajo la leyenda «Afectado», en una app con
+     * aviso médico. La excepción es del RASGO (`sinAfectados`), no del modo de herencia. El
+     * portador sale igual para los dos: heterocigoto con un alelo recesivo (Iᴬi, Iᴮi, Dd).
      */
-    if (trait.alleles.codominant) {
+    if (trait.sinAfectados) {
       return {
         id,
         generation,

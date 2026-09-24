@@ -610,6 +610,14 @@
   color: var(--text-primary);
 }
 
+/* Grados de libertad y valor crítico (hallazgo 1586). Colores por token: su variante oscura
+   la pone globals.css. */
+.chiSquareGrados {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
 .chiSquareInterpretation {
   font-size: 0.9rem;
   color: var(--text-secondary);

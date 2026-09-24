@@ -336,6 +336,7 @@ export const HUMANOS: Organism = {
         recessive: { symbol: 'O', name: 'i (sin antígeno)', isDominant: false },
       },
       notacion: { A: 'Iᴬ', B: 'Iᴮ', O: 'i' },
+      sinAfectados: true,
       phenotypes: [
         { genotypes: ['AA', 'AO'], name: 'Grupo A', color: '#EF4444', icon: '🅰️' },
         { genotypes: ['BB', 'BO'], name: 'Grupo B', color: '#3B82F6', icon: '🅱️' },
@@ -349,6 +350,8 @@ export const HUMANOS: Organism = {
       inheritanceMode: 'complete',
       description:
         'Simplificación escolar del gen RHD: el Rh positivo (D) domina sobre el negativo (d)',
+      // El Rh negativo es un grupo sanguíneo, no una afectación (hallazgo 1589).
+      sinAfectados: true,
       alleles: {
         dominant: { symbol: 'D', name: 'Rh positivo', isDominant: true },
         recessive: { symbol: 'd', name: 'Rh negativo', isDominant: false },

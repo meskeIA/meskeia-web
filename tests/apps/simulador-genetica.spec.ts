@@ -1734,7 +1734,11 @@ test.describe('simulador-genetica · grupo sanguíneo ABO en el navegador', () =
  *                                enseñando grupos que Iᴬi × ii no da.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-import { interpretChiSquare } from '../../app/simulador-genetica/components/genetics';
+import {
+  interpretChiSquare,
+  pValorChiCuadrado,
+  valorCriticoChiCuadrado,
+} from '../../app/simulador-genetica/components/genetics';
 
 /** Humanos → Grupo sanguíneo ABO, con la app hidratada. Arranca en Iᴬi × Iᴮi. */
 async function abreABOHidratada(page: Page): Promise<void> {
@@ -1936,97 +1940,236 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: los casos resueltos a mano',
   });
 });
 
-/* HALLAZGOS ABIERTOS del 24/09/2026: `test.fail()` — afirman lo que debería pasar y hoy fallan
- * por su aserción. El día que se reparen, quitar el `test.fail()` y quedan como regresión. */
-test.describe('Inspección 24/09/2026 — ABO y Rh: hallazgos abiertos', () => {
-  test('con 8 fenotipos (gl = 7) el χ² se juzga contra 14,067, no contra el 3,841 de gl = 1 (motor)', async () => {
-    // HALLAZGO abierto: `criticalValues` de interpretChiSquare solo llega a gl = 5 y cae a
-    // 3,841 (gl = 1) para gl = 7, que es lo que da el ABO de cuatro grupos × un segundo rasgo.
-    // χ² = 5 con 7 g.l.: p = 0,66 (gamma incompleta, calculado aparte) → NO significativo.
-    test.fail();
-    const r = interpretChiSquare(5, 7);
-    expect(r.isSignificant).toBe(false);
-    expect(r.pValue).not.toBe('< 0,05');
+/** La línea «gl = … · valor crítico (α = 0,05) = …» del panel del χ² (hallazgo 1586). */
+const lineaGrados = (page: Page) => page.locator('[class*="chiSquareGrados"]');
+
+/** Las dos columnas del panel de población, fila a fila: [observado, esperado]. */
+async function leerPoblacion(page: Page): Promise<Array<Array<{ nombre: string; cifra: string }>>> {
+  return page.evaluate(() =>
+    [...document.querySelectorAll('[class*="resultColumn"]')].map((col) =>
+      [...col.querySelectorAll('[class*="resultRow"]')].map((f) => {
+        const [nombre, cifra] = [...f.querySelectorAll('span')].map((s) =>
+          (s.textContent ?? '').replace(/\s+/g, ' ').trim(),
+        );
+        return { nombre, cifra };
+      }),
+    ),
+  );
+}
+
+/* REPARADOS el 24/09/2026 (hallazgos 1586-1591). Eran `test.fail()`; se reescribieron como
+ * regresiones y se ampliaron: los originales comprobaban la AUSENCIA del defecto y, en el caso
+ * de la población, un panel vacío los habría pasado sin demostrar nada del cruce nuevo. */
+test.describe('Inspección 24/09/2026 — ABO y Rh: hallazgos reparados', () => {
+  test('1586 · los valores críticos del χ² (α = 0,05) son los de la tabla publicada, gl 1 a 8', async () => {
+    // NIST/SEMATECH e-Handbook of Statistical Methods, §1.3.6.7.4, columna 0,95 de la tabla de
+    // cola superior (https://www.itl.nist.gov/div898/handbook/eda/section3/eda3674.htm),
+    // consultada el 24/09/2026. La app los CALCULA (chiCuadrado.ts); aquí se cotejan con la tabla
+    // redondeados a las tres cifras con que la tabla los imprime.
+    const NIST_095 = [3.841, 5.991, 7.815, 9.488, 11.07, 12.592, 14.067, 15.507];
+    NIST_095.forEach((tabla, i) => {
+      const gl = i + 1;
+      expect(Math.round(valorCriticoChiCuadrado(gl, 0.05) * 1000) / 1000, `gl = ${gl}`).toBe(tabla);
+      // Y el p-valor en el crítico de la tabla es 0,05 (a la precisión de su redondeo).
+      expect(pValorChiCuadrado(tabla, gl), `gl = ${gl}`).toBeCloseTo(0.05, 3);
+    });
+    // Columna 0,90 de la misma tabla: el corte de la franja «p > 0,1».
+    const NIST_090 = [2.706, 4.605, 6.251, 7.779, 9.236, 10.645, 12.017, 13.362];
+    NIST_090.forEach((tabla, i) => {
+      expect(pValorChiCuadrado(tabla, i + 1), `gl = ${i + 1}`).toBeCloseTo(0.1, 3);
+    });
   });
 
-  test('con 8 fenotipos (gl = 7) la app no llama «Diferencia significativa» a un χ² < 14,067', async ({
+  test('1586 · con 8 fenotipos (gl = 7) el χ² se juzga contra 14,067 y no contra el 3,841 de gl = 1 (motor)', async () => {
+    // p-valores de referencia calculados aparte con scipy.stats.chi2.sf (SciPy 1.18.1), que
+    // coinciden con los de la ficha (gamma incompleta): χ² = 5 → 0,66; 4,640 → 0,70;
+    // 8,096 → 0,32; 12,416 → 0,088 (tres de las corridas que la app publicaba como significativas).
+    expect(pValorChiCuadrado(5, 7)).toBeCloseTo(0.66, 2);
+    expect(pValorChiCuadrado(4.64, 7)).toBeCloseTo(0.7038, 4);
+    expect(pValorChiCuadrado(8.096, 7)).toBeCloseTo(0.3242, 4);
+    expect(pValorChiCuadrado(12.416, 7)).toBeCloseTo(0.0877, 4);
+
+    const cinco = interpretChiSquare(5, 7);
+    expect(cinco.isSignificant).toBe(false);
+    expect(cinco.pValue).toBe('> 0,5'); // p = 0,66
+    expect(cinco.interpretation).toBe('Ajuste excelente a las proporciones esperadas');
+    expect(Math.round((cinco.valorCritico ?? 0) * 1000) / 1000).toBe(14.067);
+
+    expect(interpretChiSquare(8.096, 7).pValue).toBe('> 0,1'); // p = 0,32
+    expect(interpretChiSquare(12.416, 7).pValue).toBe('> 0,05'); // p = 0,088
+    // A un lado y otro del crítico: 14,1 → p = 0,0494 (scipy), significativo; 14,0 no.
+    expect(interpretChiSquare(14.1, 7).isSignificant).toBe(true);
+    expect(interpretChiSquare(14.1, 7).pValue).toBe('< 0,05');
+    expect(interpretChiSquare(14.0, 7).isSignificant).toBe(false);
+  });
+
+  test('1586 · el mismo χ² cambia de veredicto con los grados de libertad, y las franjas salen del p exacto', async () => {
+    // El χ² = 6,960 de la ficha del 1587: con gl = 3 (cuatro grupos) p = 0,073 → aceptable;
+    // con gl = 1 (dos grupos) p = 0,0083 → significativo (scipy). Es correcto que difieran: por
+    // eso el panel no puede juzgar una población con los gl de OTRO cruce (test del 1587).
+    expect(interpretChiSquare(6.96, 3).pValue).toBe('> 0,05');
+    expect(interpretChiSquare(6.96, 3).isSignificant).toBe(false);
+    expect(interpretChiSquare(6.96, 1).pValue).toBe('< 0,05');
+    // La franja «p > 0,5» era «χ² < 0,5» para cualquier gl. Con gl = 1 la mediana es 0,455:
+    // χ² = 0,48 da p = 0,488 (scipy), que NO es > 0,5 → «p > 0,1».
+    expect(pValorChiCuadrado(0.48, 1)).toBeCloseTo(0.4884, 4);
+    expect(interpretChiSquare(0.48, 1).pValue).toBe('> 0,1');
+    // Sin grados de libertad sigue sin haber test (reparación 832).
+    expect(interpretChiSquare(0, 0).pValue).toBe('no procede');
+    expect(interpretChiSquare(0, 0).valorCritico).toBeNull();
+  });
+
+  test('1586 · con 8 fenotipos (gl = 7) el veredicto en pantalla es coherente con 14,067 y lo dice', async ({
     page,
   }) => {
-    // HALLAZGO abierto: el mismo defecto en pantalla. Bajo la hipótesis nula (la simulación
-    // SORTEA con las proporciones esperadas), P(χ²₇ > 3,841) = 0,80: cuatro de cada cinco
-    // corridas honestas se publican como «p < 0,05 · Diferencia significativa con lo
-    // esperado». Es justo el cruce del caso 16 de «Casos para clase» (Iᴬi Dd × Iᴮi Dd).
-    test.fail();
+    // El caso de la ficha: Iᴬi Dd × Iᴮi dd, 8 fenotipos. Antes 9 de 12 corridas salían «p < 0,05
+    // · Diferencia significativa», 8 de ellas con χ² < 14,067. Ahora, en las dos direcciones:
+    // por debajo de 14,067 nunca significativo; por encima, siempre.
     await abreABOxRhOchoFenotipos(page);
     await pestana(page, 'Población').click();
     await campoPoblacion(page).fill('500');
-    const malEtiquetadas: string[] = [];
-    for (let i = 0; i < 30 && malEtiquetadas.length === 0; i++) {
+    const incoherentes: string[] = [];
+    for (let i = 0; i < 12; i++) {
       await page.getByRole('button', { name: /Simular/ }).click();
       await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(500);
       const { chi, texto } = await leerChi(page);
-      // χ²(0,95; 7) = 14,067 (tabla estándar de la χ²).
-      if (chi < 14.067 && /Diferencia significativa|p < 0,05/.test(texto)) {
-        malEtiquetadas.push(`χ² = ${chi} (gl = 7) → «${texto}»`);
-      }
+      const diceSignificativo = /Diferencia significativa|p < 0,05/.test(texto);
+      if (diceSignificativo !== chi > 14.067) incoherentes.push(`χ² = ${chi} (gl = 7) → «${texto}»`);
     }
-    expect(malEtiquetadas).toEqual([]);
+    expect(incoherentes).toEqual([]);
+    // Y lo que el alumno coteja con su tabla, a la vista.
+    await expect(lineaGrados(page)).toHaveText('gl = 7 · valor crítico (α = 0,05) = 14,067');
   });
 
-  test('el panel de población no sigue enseñando grupos que el cruce actual no puede dar', async ({
+  test('1587 · al cambiar el genotipo de la madre, la población del cruce anterior desaparece', async ({
     page,
   }) => {
-    // HALLAZGO abierto: `populationSimulation` solo se anula al cambiar de organismo o de
-    // característica 1; los setters de genotipo (y el de rasgo 2 y el de tipo de cruce) no la
-    // tocan. La forma del hallazgo 825 (árbol viejo), aquí en la pestaña Población.
-    test.fail();
+    // El caso de la ficha: Iᴬi × Iᴮi → Población → Simular (100) → madre = ii.
     await abreABOHidratada(page);
     await pestana(page, 'Población').click();
     await page.getByRole('button', { name: /Simular/ }).click();
     const individuos = page.locator('[class*="populationIndividual"]');
     await expect(individuos).toHaveCount(100);
-    // Precondición: el sorteo de Iᴬi × Iᴮi tiene grupos AB y B (P de no tenerlos ≈ 0,5¹⁰⁰).
+    // Precondición: el sorteo de Iᴬi × Iᴮi tiene grupos AB y B (P de no tenerlos ≈ 0,5¹⁰⁰), y se
+    // juzga con gl = 3 (cuatro grupos).
     const antes = await individuos.evaluateAll((els) => els.map((e) => e.getAttribute('title') ?? ''));
     expect(antes.some((t) => /: Grupo (AB|B)$/.test(t))).toBe(true);
+    await expect(lineaGrados(page)).toHaveText('gl = 3 · valor crítico (α = 0,05) = 7,815');
 
-    // La madre pasa a ii: Iᴬi × ii solo da Iᴬi (grupo A) e ii (grupo O).
+    // La madre pasa a ii. Iᴬi × ii solo da Iᴬi (grupo A) e ii (grupo O).
     await selectorGenotipo(page, 1).selectOption('OO');
-    await pestana(page, 'Punnett').click();
-    await expect(genotiposDeCelda(page)).toHaveText(['Iᴬi', 'ii', 'Iᴬi', 'ii']);
-    await pestana(page, 'Población').click();
+    // Nada del sorteo anterior: ni individuos, ni columnas, ni un χ² reinterpretado con gl = 1.
+    await expect(individuos).toHaveCount(0);
+    await expect(page.locator('[class*="resultColumn"]')).toHaveCount(0);
+    await expect(page.locator('[class*="chiSquare"]')).toHaveCount(0);
+    await expect(page.getByText('Haz clic en "Simular" para generar una población')).toBeVisible();
 
-    const imposibles = await page
-      .locator('[class*="populationIndividual"]')
-      .evaluateAll((els) => els.map((e) => e.getAttribute('title') ?? '').filter((t) => /: Grupo (AB|B)$/.test(t)));
-    expect(imposibles).toEqual([]);
+    // Y la nueva simulación es la del cruce nuevo, a mano: columnas Iᴬ|i, filas i|i →
+    // Iᴬi, ii, Iᴬi, ii → grupo A 1/2 y grupo O 1/2 → esperado 50 y 50 de 100; gl = 2 − 1 = 1,
+    // crítico 3,841 (NIST, gl = 1).
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(individuos).toHaveCount(100);
+    const titulos = await individuos.evaluateAll((els) => els.map((e) => e.getAttribute('title') ?? ''));
+    expect(titulos.filter((t) => !/^(Iᴬi: Grupo A|ii: Grupo O)$/.test(t))).toEqual([]);
+    const [observado, esperado] = await leerPoblacion(page);
+    expect(observado.map((f) => f.nombre)).toEqual(['Grupo A', 'Grupo O']);
+    expect(esperado).toEqual([
+      { nombre: 'Grupo A', cifra: '50 (50,0%)' },
+      { nombre: 'Grupo O', cifra: '50 (50,0%)' },
+    ]);
+    // «Observado» vuelve a sumar N (antes sumaba 63 de 100).
+    expect(observado.reduce((suma, f) => suma + Number(f.cifra.split(' ')[0]), 0)).toBe(100);
+    await expect(lineaGrados(page)).toHaveText('gl = 1 · valor crítico (α = 0,05) = 3,841');
   });
 
-  test('la FAQ no dice que la codominancia da 1:2:1 cuando el ABO de la app da 3:1 y 1:1:1:1', async ({
-    page,
-  }) => {
-    // HALLAZGO abierto: «¿Por qué en algunos cruces no obtengo la proporción 3:1?» dice que el
-    // 3:1 es exclusivo de la dominancia completa y que con codominancia «el ratio fenotípico
-    // será 1:2:1». El único rasgo codominante de la app lo desmiente con sus valores por defecto.
-    test.fail();
+  test('1587 · la población se invalida con cualquier cambio del cruce, y solo entonces', async ({ page }) => {
+    // Los setters que no la tocaban: segundo rasgo, tipo de cruce y genotipos del rasgo 2 (y el
+    // de Guisantes Aa × Aa → AA × Aa que cita la ficha). Y lo contrario: «Realizar Cruce» sin
+    // cambiar nada no la borra, porque sigue siendo de este cruce.
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await pestana(page, 'Población').click();
+    const individuos = page.locator('[class*="populationIndividual"]');
+    const simular = async () => {
+      await page.getByRole('button', { name: /Simular/ }).click();
+      await expect(individuos).toHaveCount(100);
+    };
+
+    await simular();
+    await page.getByRole('button', { name: /Realizar Cruce/ }).click();
+    await expect(individuos).toHaveCount(100);
+
+    // Guisantes Aa × Aa → padre AA: fuera. Y al volver a Aa NO reaparece la vieja.
+    await selectorGenotipo(page, 0).selectOption('AA');
+    await expect(individuos).toHaveCount(0);
+    await selectorGenotipo(page, 0).selectOption('Aa');
+    await expect(individuos).toHaveCount(0);
+
+    // Tipo de cruce → Dihíbrido.
+    await simular();
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await expect(selectorRasgo(page, 1)).toHaveValue('forma-semilla');
+    await expect(individuos).toHaveCount(0);
+
+    // Segundo rasgo: Forma de semilla → Color de flor.
+    await simular();
+    await selectorRasgo(page, 1).selectOption('color-flor');
+    await expect(individuos).toHaveCount(0);
+
+    // Genotipo del rasgo 2 del padre: Pp → PP.
+    await simular();
+    await selectorGenotipo(page, 2).selectOption('PP');
+    await expect(individuos).toHaveCount(0);
+
+    // Y vuelta a Monohíbrido.
+    await simular();
+    await page.getByRole('button', { name: 'Monohíbrido', exact: true }).click();
+    await expect(individuos).toHaveCount(0);
+  });
+
+  test('1588 · la FAQ dice las proporciones del ABO que imprime la propia app', async ({ page }) => {
+    // Resueltos a mano (columnas = gametos del padre, filas = de la madre):
+    //   Iᴬi × Iᴮi   → IᴬIᴮ, Iᴮi, Iᴬi, ii          → 1:1:1:1 (AB : B : A : O)
+    //   Iᴬi × Iᴬi   → IᴬIᴬ, Iᴬi, Iᴬi, ii          → 3:1 (A : O), Iᴬ domina sobre i
+    //   IᴬIᴮ × IᴬIᴮ → IᴬIᴬ, IᴬIᴮ, IᴬIᴮ, IᴮIᴮ      → 1:2:1 (A : AB : B)
+    //   IᴬIᴮ × Iᴬi  → IᴬIᴬ, IᴬIᴮ, Iᴬi, Iᴮi        → 2:1:1 (A : AB : B)
     await abreABOHidratada(page);
-    // Iᴬi × Iᴮi (por defecto) → 1:1:1:1; Iᴬi × Iᴬi (dos heterocigotos) → 3 A : 1 O.
-    expect((await estadisticas(page)).fenotipos.ratio).toBe('Ratio: 1:1:1:1 (Grupo AB · Grupo B · Grupo A · Grupo O)');
-    await pestana(page, 'Punnett').click();
-    await selectorGenotipo(page, 1).selectOption('AO');
-    await expect(genotiposDeCelda(page)).toHaveText(['IᴬIᴬ', 'Iᴬi', 'Iᴬi', 'ii']);
-    expect((await estadisticas(page)).fenotipos.ratio).toBe('Ratio: 3:1 (Grupo A · Grupo O)');
+    const ratio = async (padre: string, madre: string) => {
+      await pestana(page, 'Punnett').click();
+      await selectorGenotipo(page, 0).selectOption(padre);
+      await selectorGenotipo(page, 1).selectOption(madre);
+      return (await estadisticas(page)).fenotipos.ratio;
+    };
+    expect(await ratio('AO', 'BO')).toBe('Ratio: 1:1:1:1 (Grupo AB · Grupo B · Grupo A · Grupo O)');
+    expect(await ratio('AO', 'AO')).toBe('Ratio: 3:1 (Grupo A · Grupo O)');
+    expect(await ratio('AB', 'AB')).toBe('Ratio: 1:2:1 (Grupo A · Grupo AB · Grupo B)');
+    expect(await ratio('AB', 'AO')).toBe('Ratio: 2:1:1 (Grupo A · Grupo AB · Grupo B)');
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const guia = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
     expect(guia).not.toContain('codominancia, el ratio fenotípico será 1:2:1');
+    expect(guia).not.toContain('La proporción 3:1 es exclusiva');
+    expect(guia).toContain('IᴬIᴮ × IᴬIᴮ da 1:2:1 (A : AB : B)');
+    expect(guia).toContain('Iᴬi × Iᴬi da 3:1 (A : O)');
+    expect(guia).toContain('Iᴬi × Iᴮi da 1:1:1:1 (AB : B : A : O)');
+    expect(guia).toContain('IᴬIᴮ × Iᴬi, 2:1:1 (A : AB : B)');
+
+    // El FAQPage (lo que leen los buscadores y las IA) decía lo mismo que la FAQ visible.
+    const faq = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('script[type="application/ld+json"]')]
+          .map((s) => s.textContent ?? '')
+          .find((t) => t.includes('"FAQPage"')) ?? '',
+    );
+    expect(faq).toContain('¿Qué proporciones fenotípicas da un cruce monohíbrido?');
+    expect(faq).not.toContain('dominancia incompleta o codominancia, la proporción fenotípica pasa a ser 1:2:1');
+    expect(faq).toContain('Iᴬi × Iᴬi da 3:1');
+    expect(faq).toContain('Iᴬi × Iᴮi da 1:1:1:1');
   });
 
-  test('el árbol no pinta el Rh negativo como «Afectado», igual que no lo hace con el grupo O', async ({
+  test('1589 · el árbol no pinta el Rh negativo como «Afectado», igual que no lo hace con el grupo O', async ({
     page,
   }) => {
-    // HALLAZGO abierto: el commit df61f210 deja el grupo O sin símbolo de afectado porque «es un
-    // fenotipo más, no una condición»; el Rh negativo es exactamente eso y sale relleno.
-    test.fail();
     await abreABOHidratada(page);
     await selectorRasgo(page, 0).selectOption('factor-rh');
     await pestana(page, 'Pedigree').click();
@@ -2037,15 +2180,43 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: hallazgos abiertos', () => {
     await expect(dd).toHaveCount(1);
     await expect(dd.locator('[class*="pedigreePhenotype"]')).toHaveText('Rh negativo');
     await expect(dd.locator('[class*="affected"]')).toHaveCount(0);
+    // Nadie relleno, y los cuatro Dd (los dos padres y dos hijos) marcados como portadores de d.
+    await expect(individuos.locator('[class*="affected"]')).toHaveCount(0);
+    const heterocigotos = individuos.filter({
+      has: page.locator('[class*="pedigreeGenotype"]', { hasText: /^Dd$/ }),
+    });
+    await expect(heterocigotos).toHaveCount(4);
+    await expect(heterocigotos.locator('[class*="carrier"]')).toHaveCount(4);
+    // La leyenda no ofrece «Afectado» para un grupo sanguíneo y nombra el alelo del portador.
+    const leyenda = page.locator('[class*="pedigreeLegend"]');
+    await expect(leyenda).not.toContainText('Afectado');
+    await expect(leyenda).toContainText('Portador de d');
   });
 
-  test('la tabla comparativa no dice que en el ABO los portadores se detectan a simple vista', async ({
+  test('1589 · en el motor: Rh sin afectados, y un rasgo que no es grupo sanguíneo los sigue marcando', async () => {
+    const rh = rasgoHumano('factor-rh');
+    for (let i = 0; i < 5; i++) {
+      const arbol = generateSimplePedigree('Dd', 'Dd', rh, 4);
+      expect(arbol.individuals.some((ind) => ind.isAffected)).toBe(false);
+      expect(arbol.individuals.filter((ind) => ind.isCarrier).map((ind) => ind.genotype)).toEqual([
+        'Dd',
+        'Dd',
+        'Dd',
+        'Dd',
+      ]);
+    }
+    // El ABO sigue igual con la marca nueva: Iᴬi portador, ii sin rellenar.
+    const abo = generateSimplePedigree('AO', 'OO', rasgoHumano('grupo-abo'), 4);
+    expect(abo.individuals.some((ind) => ind.isAffected)).toBe(false);
+    expect(abo.individuals.find((ind) => ind.id === 'p1')?.isCarrier).toBe(true);
+    // Guisantes Aa × Aa (color de semilla): el aa sigue siendo el «afectado» del árbol de libro.
+    const guisante = generateSimplePedigree('Aa', 'Aa', GUISANTES.traits[0], 4);
+    expect(guisante.individuals.filter((ind) => ind.isAffected).map((ind) => ind.genotype)).toEqual(['aa']);
+  });
+
+  test('1590 · la tabla comparativa no dice que en el ABO los portadores se detectan a simple vista', async ({
     page,
   }) => {
-    // HALLAZGO abierto: la columna Codominancia (ejemplo: ABO) dice «Portadores detectables ✅ Sí
-    // (ambos rasgos visibles)», pero el portador de i que marca el propio árbol (Iᴬi) es grupo A,
-    // indistinguible de IᴬIᴬ; el caso 15 de la app pregunta justo por eso.
-    test.fail();
     await abreABOHidratada(page);
     await pestana(page, 'Pedigree').click();
     // Precondición: el árbol marca al padre Iᴬi (grupo A) como portador.
@@ -2057,23 +2228,33 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: hallazgos abiertos', () => {
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const fila = page.locator('table tr', { hasText: 'Portadores detectables' });
     // Columnas: Criterio · Completa · Incompleta · Codominancia · Ligada al sexo.
-    await expect(fila.locator('td').nth(3)).not.toHaveText('✅ Sí (ambos rasgos visibles)');
+    const celda = fila.locator('td').nth(3);
+    await expect(celda).not.toHaveText('✅ Sí (ambos rasgos visibles)');
+    await expect(celda).toContainText('Solo el heterocigoto IᴬIᴮ (grupo AB)');
+    await expect(celda).toContainText('el portador de i (Iᴬi, Iᴮi) no se distingue de IᴬIᴬ ni de IᴮIᴮ');
   });
 
-  test('el emoji del modo de herencia «Codominancia» va con aria-hidden', async ({ page }) => {
-    // HALLAZGO abierto: línea nueva de hoy con el emoji dentro de un literal de cadena; el
-    // candado check:a11y-jsx no la ve porque no mira dentro de expresiones JSX.
-    test.fail();
+  test('1591 · el emoji del modo de herencia va con aria-hidden, en los tres modos', async ({ page }) => {
+    const textoLegible = () =>
+      page
+        .locator('p[class*="inheritanceInfo"]')
+        .first()
+        .evaluate((p) => {
+          const copia = p.cloneNode(true) as HTMLElement;
+          copia.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+          return (copia.textContent ?? '').replace(/\s+/g, ' ').trim();
+        });
+
     await abreABOHidratada(page);
-    const legible = await page
-      .locator('p[class*="inheritanceInfo"]')
-      .first()
-      .evaluate((p) => {
-        const copia = p.cloneNode(true) as HTMLElement;
-        copia.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
-        return copia.textContent ?? '';
-      });
-    expect(legible).toContain('Codominancia y alelos múltiples');
-    expect(legible).not.toContain('🩸');
+    expect(await textoLegible()).toMatch(/^Codominancia y alelos múltiples - Tres alelos/);
+    expect(await textoLegible()).not.toContain('🩸');
+
+    await selectorRasgo(page, 0).selectOption('daltonismo');
+    expect(await textoLegible()).toMatch(/^Ligada al sexo - El daltonismo/);
+    expect(await textoLegible()).not.toContain('🔗');
+
+    await page.getByRole('button', { name: /Flores/ }).click();
+    expect(await textoLegible()).toMatch(/^Dominancia incompleta - Rojo y blanco/);
+    expect(await textoLegible()).not.toContain('🎨');
   });
 });

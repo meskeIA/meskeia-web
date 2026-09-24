@@ -30,6 +30,15 @@ export default function PedigreeChart({ pedigree, rasgo }: PedigreeChartProps) {
 
   const generationLabels = ['Padres', 'Hijos'];
 
+  /**
+   * En un rasgo sin afectados (grupos sanguíneos) la leyenda no ofrece «Afectado»: nadie en el
+   * árbol puede llevar ese símbolo, y anunciarlo sugeriría que el grupo O o el Rh negativo lo
+   * son (hallazgo 1589). El portador se nombra por su alelo, en la notación de pantalla.
+   */
+  const sinAfectados = rasgo.sinAfectados === true;
+  const recesivo = rasgo.alleles.recessive.symbol;
+  const aleloRecesivo = rasgo.notacion?.[recesivo] ?? recesivo;
+
   return (
     <div className={styles.pedigreeContainer}>
       {sortedGenerations.map(([genIndex, individuals], i) => (
@@ -67,19 +76,21 @@ export default function PedigreeChart({ pedigree, rasgo }: PedigreeChartProps) {
       <div className={styles.pedigreeLegend}>
         <div className={styles.legendItem}>
           <div className={styles.legendSymbol}></div>
-          <span>Macho no afectado</span>
+          <span>{sinAfectados ? 'Macho' : 'Macho no afectado'}</span>
         </div>
         <div className={styles.legendItem}>
           <div className={`${styles.legendSymbol} ${styles.female}`}></div>
-          <span>Hembra no afectada</span>
+          <span>{sinAfectados ? 'Hembra' : 'Hembra no afectada'}</span>
         </div>
-        <div className={styles.legendItem}>
-          <div className={`${styles.legendSymbol} ${styles.affected}`}></div>
-          <span>Afectado</span>
-        </div>
+        {!sinAfectados && (
+          <div className={styles.legendItem}>
+            <div className={`${styles.legendSymbol} ${styles.affected}`}></div>
+            <span>Afectado</span>
+          </div>
+        )}
         <div className={styles.legendItem}>
           <div className={`${styles.legendSymbol} ${styles.carrier}`}></div>
-          <span>Portador</span>
+          <span>{sinAfectados ? `Portador de ${aleloRecesivo}` : 'Portador'}</span>
         </div>
       </div>
     </div>
