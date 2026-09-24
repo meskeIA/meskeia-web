@@ -62,7 +62,7 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '📱',
     pais: 'Corea del Sur / China',
     empresa: 'Samsung Display, BOE Technology (China), LG Display',
-    cosте: '~25–30%',
+    cosте: '~25–30\u00A0%',
     curioso:
       'Una pantalla OLED de alta gama contiene más de 800 millones de subpíxeles. Samsung fabrica pantallas para Apple aunque sean competidores directos en smartphones.',
     x: 90,
@@ -74,9 +74,9 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '⚙️',
     pais: 'Diseñado en EEUU/UK — Fabricado en Taiwán/Corea',
     empresa: 'Apple / Qualcomm (diseño) → TSMC / Samsung Foundry (fabricación)',
-    cosте: '~20–25%',
+    cosте: '~20–25\u00A0%',
     curioso:
-      'TSMC fabrica chips para Apple, AMD, NVIDIA, Qualcomm y decenas de empresas más — aunque no diseña ninguno. El 92% de los chips más avanzados del mundo se fabrican en Taiwán.',
+      'TSMC fabrica chips para Apple, AMD, NVIDIA, Qualcomm y decenas de empresas más — aunque no diseña ninguno. Según la Semiconductor Industry Association y el Boston Consulting Group (abril de 2021), el 92\u00A0% de la capacidad mundial para fabricar los chips más avanzados (por debajo de 10 nanómetros) estaba en Taiwán, y el 8\u00A0% restante en Corea del Sur.',
     x: 270,
     y: 55,
   },
@@ -86,9 +86,9 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '🔋',
     pais: 'Litio de Chile/Australia — Celdas en China',
     empresa: 'CATL, BYD, LG Energy Solution, Samsung SDI',
-    cosте: '~10–15%',
+    cosте: '~10–15\u00A0%',
     curioso:
-      'El litio del Triángulo del Litio (Chile, Argentina, Bolivia) representa el 60% de las reservas mundiales. Sin embargo, el 75% de la producción de celdas de batería ocurre en China.',
+      'El litio del Triángulo del Litio (Chile, Argentina, Bolivia) representa el 60\u00A0% de las reservas mundiales. Sin embargo, el 75\u00A0% de la producción de celdas de batería ocurre en China.',
     x: 450,
     y: 55,
   },
@@ -98,9 +98,9 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '📷',
     pais: 'Japón / China / Suecia',
     empresa: 'Sony Semiconductor (sensores), Largan Precision (lentes), Sunny Optical',
-    cosте: '~10–12%',
+    cosте: '~10–12\u00A0%',
     curioso:
-      'El sensor de imagen Sony IMX es tan dominante que incluso los iPhone y Galaxy usan sensores Sony. Sony controla ~45% del mercado mundial de sensores CMOS para smartphones.',
+      'El sensor de imagen Sony IMX es tan dominante que incluso los iPhone y Galaxy usan sensores Sony. Sony controla ~45\u00A0% del mercado mundial de sensores CMOS para smartphones.',
     x: 90,
     y: 175,
   },
@@ -110,9 +110,9 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '💾',
     pais: 'Japón / Corea del Sur / China',
     empresa: 'Kioxia (Japón), SK Hynix (Corea), Samsung, Micron (EEUU)',
-    cosте: '~8–12%',
+    cosте: '~8–12\u00A0%',
     curioso:
-      'Un smartphone de 256 GB contiene capas de memoria apiladas verticalmente (3D NAND) con hasta 232 capas de células de memoria. En febrero de 2022, una contaminación de materiales de fabricación paró parte de la producción de las plantas que Kioxia y Western Digital comparten en Yokkaichi y Kitakami (Japón): se echaron a perder al menos 6,5 exabytes de memoria flash (Western Digital, 2022). Entre las dos empresas fabricaban cerca de un tercio de la NAND mundial (32,5 % en el 3.er trimestre de 2021, según TrendForce).',
+      'Un smartphone de 256 GB contiene capas de memoria apiladas verticalmente (3D NAND) con hasta 232 capas de células de memoria. En febrero de 2022, una contaminación de materiales de fabricación paró parte de la producción de las plantas que Kioxia y Western Digital comparten en Yokkaichi y Kitakami (Japón): se echaron a perder al menos 6,5 exabytes de memoria flash (Western Digital, 2022). Entre las dos empresas fabricaban cerca de un tercio de la NAND mundial (32,5\u00A0% en el 3.er trimestre de 2021, según TrendForce).',
     x: 270,
     y: 175,
   },
@@ -122,7 +122,7 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '📡',
     pais: 'Finlandia / Suecia / EEUU',
     empresa: 'Qualcomm (módems), Ericsson, Nokia (tecnología base), Murata (componentes RF)',
-    cosте: '~5–8%',
+    cosте: '~5–8\u00A0%',
     curioso:
       'Un smartphone 5G puede contener hasta 15 antenas distintas (Wi-Fi, Bluetooth, GPS, 5G mmWave, NFC). El diseño de antenas en metales tan finos requiere simulaciones de campo electromagnético durante meses.',
     x: 450,
@@ -134,7 +134,7 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '🏗️',
     pais: 'China (fabricación) — Bauxita de Guinea/Australia',
     empresa: 'Foxconn, Pegatron, BYD Electronics (mecanizado CNC)',
-    cosте: '~5–7%',
+    cosте: '~5–7\u00A0%',
     curioso:
       'El chasis de un iPhone requiere más de 100 operaciones de fresado CNC. El aluminio 7075 aeroespacial empleado es tan duro que las máquinas CNC desgastan sus brocas cada pocos centenares de piezas.',
     x: 90,
@@ -146,9 +146,9 @@ const COMPONENTES: ComponenteSmartphone[] = [
     icono: '🔧',
     pais: 'China / India / Vietnam',
     empresa: 'Foxconn (Hon Hai), Pegatron, Wingtech — plantas en Zhengzhou, Chennai, Hanói',
-    cosте: '~3–5%',
+    cosте: '~3–5\u00A0%',
     curioso:
-      'La fábrica de Foxconn en Zhengzhou ("iPhone City") emplea 350.000 personas y puede fabricar 500.000 iPhones al día. A pesar de la complejidad del producto, el ensamblaje manual representa solo el 3–5% del coste total.',
+      'En los picos de producción, la fábrica de Foxconn en Zhengzhou («iPhone City») llegaba a reunir a unas 350.000 personas y podía fabricar 500.000 iPhones al día (The New York Times, diciembre de 2016). A pesar de la complejidad del producto, el ensamblaje manual representa solo el 3–5\u00A0% del coste total.',
     x: 270,
     y: 295,
   },
@@ -172,7 +172,7 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
   {
     anio: 'Marzo 2021',
     titulo: 'Bloqueo del Canal de Suez (Ever Given)',
-    resumen: 'El portacontenedores Ever Given (400 m de eslora) encalló durante 6 días, bloqueando el paso de 12% del comercio mundial.',
+    resumen: 'El portacontenedores Ever Given (400 m de eslora) encalló y cortó durante 6 días el Canal de Suez, por el que pasa en torno al 12\u00A0% del comercio mundial (Ministerio de Asuntos Exteriores y Comercio de Nueva Zelanda, abril de 2021).',
     duracion: '6 días',
     coste: '9.600 millones de $ en mercancías retenidas cada día (Lloyd’s List, marzo de 2021)',
     industrias: 'Petróleo, electrónica, textil, alimentación, automóvil',
@@ -184,7 +184,7 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
     titulo: 'COVID-19: cierre de fábricas en Asia',
     resumen: 'Los cierres de Wuhan y la región del Delta del Río Perla interrumpieron la producción de electrónica, textil y componentes para todo el mundo en el segundo trimestre de 2020.',
     duracion: '~3–4 meses (cierre masivo)',
-    coste: '−14,3 % en el volumen del comercio mundial de mercancías respecto al trimestre anterior, la mayor caída registrada (OMC, octubre de 2020)',
+    coste: '−14,3\u00A0% en el volumen del comercio mundial de mercancías respecto al trimestre anterior, la mayor caída registrada (OMC, octubre de 2020)',
     industrias: 'Toda la manufactura: textil, electrónica, farmacéutica, alimentación',
     leccion:
       'La hiperdependencia de una única región para manufactura expone a la economía global a riesgos sistémicos. La pandemia fue el detonante que puso la resiliencia de cadenas de suministro en la agenda política de todos los gobiernos.',
@@ -194,10 +194,10 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
     titulo: 'Inundaciones en Tailandia',
     resumen: 'Las peores inundaciones en décadas anegaron la región de Ayutthaya, donde se concentraba gran parte de la producción mundial de discos duros (HDD).',
     duracion: '~4 meses',
-    coste: '46.500 millones de $ en daños y pérdidas, el 12,6 % del PIB tailandés (Banco Mundial, 2012)',
+    coste: '46.500 millones de $ en daños y pérdidas, el 12,6\u00A0% del PIB tailandés (Banco Mundial, 2012)',
     industrias: 'Almacenamiento de datos, electrónica personal, servidores',
     leccion:
-      'Tailandia concentraba el 45% de la producción mundial de HDDs. La concentración geográfica extrema de un componente convierte un desastre natural local en una crisis tecnológica global. El precio de los discos duros se triplicó durante 6 meses.',
+      'Tailandia montaba en torno al 40\u00A0% de los discos duros del mundo (IHS iSuppli, 2011). La concentración geográfica extrema de un componente convierte un desastre natural local en una crisis tecnológica global: el precio de los discos duros se disparó y un año después aún no había vuelto al nivel previo a la inundación (IEEE Spectrum, 2012).',
   },
   {
     anio: 'Marzo 2011',
@@ -302,7 +302,7 @@ export default function VisualizadorCadenasSuministro() {
   const getJicEstado = (): string => {
     if (nivelDisrupcion < 20) return 'Stock de seguridad intacto — sin impacto';
     if (nivelDisrupcion < 50) return 'Buffer absorbe la tensión — producción normal';
-    if (nivelDisrupcion < 75) return 'Stocks al 40% — producción sostenida aún';
+    if (nivelDisrupcion < 75) return 'Stocks al 40\u00A0% — producción sostenida aún';
     return 'Reservas agotadas — impacto significativo';
   };
 
@@ -342,16 +342,16 @@ export default function VisualizadorCadenasSuministro() {
             >
               <defs>
                 <linearGradient id="gradFondo" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#E8F4F8" />
-                  <stop offset="100%" stopColor="#D0EAF2" />
+                  <stop offset="0%" className={styles.fondoInicio} />
+                  <stop offset="100%" className={styles.fondoFin} />
                 </linearGradient>
                 <linearGradient id="gradComp" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#2E86AB" />
-                  <stop offset="100%" stopColor="#48A9A6" />
+                  <stop offset="0%" className={styles.compInicio} />
+                  <stop offset="100%" className={styles.compFin} />
                 </linearGradient>
                 <linearGradient id="gradCompActivo" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#1A6A8A" />
-                  <stop offset="100%" stopColor="#2E8A86" />
+                  <stop offset="0%" className={styles.compActivoInicio} />
+                  <stop offset="100%" className={styles.compActivoFin} />
                 </linearGradient>
               </defs>
 
@@ -359,7 +359,7 @@ export default function VisualizadorCadenasSuministro() {
               <rect x="0" y="0" width="540" height="380" rx="14" fill="url(#gradFondo)" />
 
               {/* Título del diagrama */}
-              <text x="270" y="28" textAnchor="middle" fontSize="13" fontWeight="700" fill="#2E86AB">
+              <text x="270" y="28" textAnchor="middle" fontSize="13" fontWeight="700" className={styles.svgTitulo}>
                 Componentes globales de un smartphone moderno
               </text>
 
@@ -382,10 +382,10 @@ export default function VisualizadorCadenasSuministro() {
               <rect x="220" y="145" width="100" height="90" rx="10" fill="#2E86AB" opacity="0.15" />
               <rect x="228" y="153" width="84" height="74" rx="7" fill="#2E86AB" opacity="0.25" />
               <text x="270" y="193" textAnchor="middle" fontSize="18" fill="#2E86AB" aria-hidden="true">📱</text>
-              <text x="270" y="210" textAnchor="middle" fontSize="9" fontWeight="600" fill="#2E86AB">
+              <text x="270" y="210" textAnchor="middle" fontSize="9" fontWeight="600" className={styles.svgTextoCentro}>
                 ~40 países
               </text>
-              <text x="270" y="222" textAnchor="middle" fontSize="8" fill="#2E86AB" opacity="0.8">
+              <text x="270" y="222" textAnchor="middle" fontSize="8" className={styles.svgTextoCentro}>
                 involucrados
               </text>
 
@@ -419,7 +419,6 @@ export default function VisualizadorCadenasSuministro() {
                       height="56"
                       rx="8"
                       fill={isActivo ? 'url(#gradCompActivo)' : 'url(#gradComp)'}
-                      opacity={isActivo ? 1 : 0.82}
                     />
                     <text
                       x={comp.x + 55}
@@ -504,7 +503,7 @@ export default function VisualizadorCadenasSuministro() {
           <div className={styles.sliderContainer}>
             <div className={styles.sliderLabel}>
               <span>Nivel de disrupción en la cadena de suministro</span>
-              <span className={styles.sliderValor}>{nivelDisrupcion}%</span>
+              <span className={styles.sliderValor}>{nivelDisrupcion}&nbsp;%</span>
             </div>
             <input
               type="range"
@@ -676,10 +675,12 @@ export default function VisualizadorCadenasSuministro() {
         </div>
 
         <div className={styles.tendencia}>
-          <strong>Tendencia 2020–2024:</strong> Según McKinsey Global Institute, el 81% de las empresas
-          manufactureras globales han comenzado a diversificar su base de proveedores desde 2020.
-          Alrededor del 45% ha movido parte de su producción a nuevas geografías, y se espera
-          que hasta el 26% del comercio mundial se relocalice en la próxima década.
+          <strong>Tendencia desde 2020:</strong> En la encuesta de McKinsey a 113 responsables de
+          cadenas de suministro (primavera de 2022), el 81&nbsp;% decía haber recurrido a un
+          segundo proveedor en el último año y el 44&nbsp;% estar regionalizando su red de
+          suministro. El McKinsey Global Institute estimó en 2020 que entre el 16&nbsp;% y el
+          26&nbsp;% de las exportaciones mundiales de bienes podrían cambiar de país en cinco
+          años: una estimación de lo que está en juego, no una previsión de que vaya a ocurrir.
         </div>
       </section>
 
@@ -710,7 +711,7 @@ export default function VisualizadorCadenasSuministro() {
               En 1956, el camionero Malcom McLean tuvo la idea de colocar camiones enteros sobre
               barcos. El contenedor estandarizado de acero (TEU: Twenty-foot Equivalent Unit) redujo
               el coste de carga de 5,83 $ por tonelada (carga suelta, 1956) a unos 0,16 $ por tonelada
-              en el primer viaje del Ideal-X — una reducción del 97 % (cifras recogidas por Marc
+              en el primer viaje del Ideal-X — una reducción del 97&nbsp;% (cifras recogidas por Marc
               Levinson en «The Box», 2006).
             </p>
             <p>
@@ -741,9 +742,9 @@ export default function VisualizadorCadenasSuministro() {
             <p>
               Una pequeña variación en la demanda del consumidor final puede amplificarse
               progresivamente hacia atrás en la cadena, provocando grandes oscilaciones en los
-              pedidos a proveedores. Si los supermercados incrementan sus pedidos un 5% ante
-              señales de escasez, el mayorista hace pedidos de un 10% más, el fabricante de un 20%
-              más, y el proveedor de materias primas puede ver pedidos con un 40% de incremento.
+              pedidos a proveedores. Si los supermercados incrementan sus pedidos un 5&nbsp;% ante
+              señales de escasez, el mayorista hace pedidos de un 10&nbsp;% más, el fabricante de un 20&nbsp;%
+              más, y el proveedor de materias primas puede ver pedidos con un 40&nbsp;% de incremento.
             </p>
             <p>
               El término fue acuñado por Jay Forrester (MIT, 1961) y popularizado por Hau Lee

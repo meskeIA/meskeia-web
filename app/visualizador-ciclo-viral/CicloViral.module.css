@@ -107,6 +107,39 @@
   stroke: var(--primary);
 }
 
+/* Círculo y número de cada etapa. El número es texto de 12 unidades en peso 800 (texto
+   pequeño, 4,5:1): con #2E86AB sobre blanco, o blanco sobre #2E86AB en la activa, daba 4,1:1.
+   Los tokens -texto y -boton son los de 5,47:1, iguales en los dos temas los -boton. */
+.circuloEtapa {
+  fill: #FFFFFF;
+  stroke: var(--primary);
+}
+
+.circuloEtapaActivo {
+  fill: var(--primary-boton);
+  stroke: var(--hero-bg);
+}
+
+.numeroEtapa {
+  fill: #26718F;
+}
+
+.numeroEtapaActivo {
+  fill: #FFFFFF;
+}
+
+/* Rótulo fuera del círculo, sobre el fondo de la tarjeta (--bg-card): hereda el contraste del
+   texto normal en los dos temas. La etapa activa se marca en peso, no solo en color. */
+.etiquetaEtapa {
+  fill: var(--text-primary);
+  font-weight: 500;
+}
+
+.etiquetaEtapaActiva {
+  fill: var(--primary-texto);
+  font-weight: 800;
+}
+
 /* ─── Panel de detalle ───────────────────────────── */
 .panelDetalle {
   background: var(--bg-card);

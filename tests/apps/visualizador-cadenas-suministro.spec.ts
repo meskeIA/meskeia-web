@@ -94,7 +94,7 @@ test('caso normal — a 60 % el JIT está en crisis y el JIC aguanta; el procesa
   // Estado de arranque (nivel 0): tramo 0–19.
   await comprobar(
     page,
-    '0%',
+    '0\u00A0%',
     'Sistema funcionando con normalidad',
     false,
     'Stock de seguridad intacto — sin impacto',
@@ -104,10 +104,10 @@ test('caso normal — a 60 % el JIT está en crisis y el JIC aguanta; el procesa
   await sembrarValor(page, DESLIZADOR, 60);
   await comprobar(
     page,
-    '60%',
+    '60\u00A0%',
     'Crisis moderada — paradas de producción',
     true,
-    'Stocks al 40% — producción sostenida aún',
+    'Stocks al 40\u00A0% — producción sostenida aún',
     false,
   );
 
@@ -118,7 +118,7 @@ test('caso normal — a 60 % el JIT está en crisis y el JIC aguanta; el procesa
   await expect(procesador).toHaveAttribute('aria-pressed', 'true');
   await expect(panel.getByRole('heading', { name: 'Procesador (SoC)' })).toBeVisible();
   // Literales de COMPONENTES[1] en page.tsx.
-  await expect(panel.locator('span[class*="costeBadge"]')).toHaveText('~20–25%');
+  await expect(panel.locator('span[class*="costeBadge"]')).toHaveText('~20–25\u00A0%');
   await expect(panel).toContainText('TSMC / Samsung Foundry (fabricación)');
 
   // Segundo clic: se cierra y vuelve el panel vacío.
@@ -133,13 +133,13 @@ test('caso límite — los umbrales 20, 50 y 75 cambian el estado exactamente do
   page,
 }) => {
   const tramos: Array<[number, string, string, boolean, string, boolean]> = [
-    [19, '19%', 'Sistema funcionando con normalidad', false, 'Stock de seguridad intacto — sin impacto', false],
-    [20, '20%', 'Tensión inicial — leve escasez de piezas', false, 'Buffer absorbe la tensión — producción normal', false],
-    [49, '49%', 'Tensión inicial — leve escasez de piezas', false, 'Buffer absorbe la tensión — producción normal', false],
-    [50, '50%', 'Crisis moderada — paradas de producción', true, 'Stocks al 40% — producción sostenida aún', false],
-    [74, '74%', 'Crisis moderada — paradas de producción', true, 'Stocks al 40% — producción sostenida aún', false],
-    [75, '75%', 'Colapso total — líneas paradas semanas', true, 'Reservas agotadas — impacto significativo', true],
-    [100, '100%', 'Colapso total — líneas paradas semanas', true, 'Reservas agotadas — impacto significativo', true],
+    [19, '19\u00A0%', 'Sistema funcionando con normalidad', false, 'Stock de seguridad intacto — sin impacto', false],
+    [20, '20\u00A0%', 'Tensión inicial — leve escasez de piezas', false, 'Buffer absorbe la tensión — producción normal', false],
+    [49, '49\u00A0%', 'Tensión inicial — leve escasez de piezas', false, 'Buffer absorbe la tensión — producción normal', false],
+    [50, '50\u00A0%', 'Crisis moderada — paradas de producción', true, 'Stocks al 40\u00A0% — producción sostenida aún', false],
+    [74, '74\u00A0%', 'Crisis moderada — paradas de producción', true, 'Stocks al 40\u00A0% — producción sostenida aún', false],
+    [75, '75\u00A0%', 'Colapso total — líneas paradas semanas', true, 'Reservas agotadas — impacto significativo', true],
+    [100, '100\u00A0%', 'Colapso total — líneas paradas semanas', true, 'Reservas agotadas — impacto significativo', true],
   ];
   for (const [valor, rotulo, jit, jitC, jic, jicC] of tramos) {
     await sembrarValor(page, DESLIZADOR, valor);
@@ -156,7 +156,7 @@ test('caso fuera de rango — 150 se recorta a 100 % y −20 a 0 %, con el estad
   expect(await sembrarValorAcotado(page, DESLIZADOR, 150)).toBe('100');
   await comprobar(
     page,
-    '100%',
+    '100\u00A0%',
     'Colapso total — líneas paradas semanas',
     true,
     'Reservas agotadas — impacto significativo',
@@ -166,7 +166,7 @@ test('caso fuera de rango — 150 se recorta a 100 % y −20 a 0 %, con el estad
   expect(await sembrarValorAcotado(page, DESLIZADOR, -20)).toBe('0');
   await comprobar(
     page,
-    '0%',
+    '0\u00A0%',
     'Sistema funcionando con normalidad',
     false,
     'Stock de seguridad intacto — sin impacto',
@@ -280,7 +280,7 @@ test('datos — mangos de Walmart, −14,3 % de la OMC, contaminación de Kioxia
   await covid.click();
   await expect(covid).toHaveAttribute('aria-expanded', 'true');
   const panelCovid = page.locator('[role="listitem"]').filter({ has: covid });
-  await expect(panelCovid).toContainText('−14,3 %');
+  await expect(panelCovid).toContainText('−14,3\u00A0%');
   await expect(panelCovid).toContainText('respecto al trimestre anterior');
   await expect(panelCovid).toContainText('OMC');
   await expect(panelCovid).not.toContainText('30%');
@@ -306,4 +306,96 @@ test('datos — mangos de Walmart, −14,3 % de la OMC, contaminación de Kioxia
   });
   expect(texto.match(/\$\s?\d/g) ?? [], 'símbolo $ delante de una cifra').toEqual([]);
   expect(texto.match(/\d+M\b/g) ?? [], 'abreviatura «M» anglosajona').toEqual([]);
+});
+
+// SOSPECHA del Inspector (24/09/2026) — cifras populares sin fuente y «N%» pegados.
+// Entrada: abrir las fichas del procesador y del ensamblaje y desplegar Tailandia.
+// Esperado, cotejado con la fuente el 24/09/2026:
+//   · 92 % de la capacidad por debajo de 10 nm en Taiwán — SIA y BCG, abril de 2021.
+//   · ~12 % del comercio mundial por Suez — MFAT de Nueva Zelanda, abril de 2021.
+//   · Tailandia: ~40 % de los discos duros (IHS iSuppli, 2011), NO 45 %; y no «se triplicó».
+//   · Zhengzhou: 350.000 personas EN LOS PICOS — The New York Times, diciembre de 2016.
+//   · McKinsey: 81 % y 44 % son de una encuesta de 2022 a 113 responsables; el 16-26 % del MGI
+//     (2020) es lo que «está en juego» en cinco años, no «el 26 % en la próxima década».
+//   · Ningún texto propio con la cifra pegada al signo.
+test('sospecha — cada cifra con su fuente y año, y ningún «N%» pegado', async ({ page }) => {
+  const panel = page.locator('div[class*="panelDetalle"]');
+  await page.getByRole('button', { name: 'Ver detalles de Procesador (SoC)' }).click();
+  await expect(panel).toContainText('92 % de la capacidad mundial');
+  await expect(panel).toContainText('Semiconductor Industry Association y el Boston Consulting Group (abril de 2021)');
+
+  await page.getByRole('button', { name: 'Ver detalles de Ensamblaje final' }).click();
+  await expect(panel).toContainText('350.000 personas');
+  await expect(panel).toContainText('The New York Times, diciembre de 2016');
+
+  const suez = page.locator('[role="listitem"]').filter({ hasText: 'Ever Given' });
+  await expect(suez).toContainText('12 % del comercio mundial');
+  await expect(suez).toContainText('Nueva Zelanda, abril de 2021');
+
+  const tailandia = page.getByRole('button', { name: 'Inundaciones en Tailandia' });
+  await tailandia.click();
+  const panelTailandia = page.locator('[role="listitem"]').filter({ has: tailandia });
+  await expect(panelTailandia).toContainText('40 % de los discos duros del mundo (IHS iSuppli, 2011)');
+  await expect(panelTailandia).not.toContainText('45');
+  await expect(panelTailandia).not.toContainText('triplicó');
+
+  const tendencia = page.locator('div[class*="tendencia"]');
+  await expect(tendencia).toContainText('113 responsables');
+  await expect(tendencia).toContainText('no una previsión');
+  await expect(tendencia).not.toContainText('próxima década');
+
+  const texto = await page.evaluate(() => {
+    const copia = document.body.cloneNode(true) as HTMLElement;
+    copia
+      .querySelectorAll('script, style, svg, section[aria-label="Aplicaciones relacionadas"]')
+      .forEach((n) => n.remove());
+    return copia.textContent ?? '';
+  });
+  expect(texto.match(/\d%/g) ?? [], 'porcentaje pegado a la cifra').toEqual([]);
+});
+
+// SOSPECHA del Inspector (24/09/2026) — el fondo del SVG era #E8F4F8→#D0EAF2 escrito en el
+// propio SVG: en oscuro quedaba una isla clara dentro de la tarjeta oscura. Medido antes de
+// reparar: stop-color rgb(232,244,248) en los dos temas. Esperado: el fondo cambia con el tema
+// y el título del diagrama y el blanco de las tarjetas se leen a 4,5:1 en los dos.
+test('sospecha — el diagrama tiene variante oscura y sus textos se leen en los dos temas', async ({ page }) => {
+  const medir = () =>
+    page.evaluate(() => {
+      const canal = (c: number) => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      const rgb = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+      const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+      const ratio = (a: number[], b: number[]) => {
+        const [l1, l2] = [lum(a), lum(b)];
+        return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
+      };
+      const svg = document.querySelector('svg[role="group"]');
+      if (!svg) throw new Error('sin diagrama');
+      const paradas = (id: string) =>
+        [...svg.querySelectorAll(`#${id} stop`)].map((s) => rgb(getComputedStyle(s).stopColor));
+      const fondo = paradas('gradFondo');
+      const tarjeta = paradas('gradComp');
+      const titulo = rgb(getComputedStyle(svg.querySelector('text') as Element).fill);
+      const blanco = [255, 255, 255];
+      return {
+        fondo: fondo.map((c) => c.join(',')),
+        titulo: Math.min(...fondo.map((c) => ratio(titulo, c))),
+        tarjetas: Math.min(...tarjeta.map((c) => ratio(blanco, c))),
+      };
+    });
+
+  const claro = await medir();
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  const oscuro = await medir();
+
+  expect(oscuro.fondo[0], 'el fondo del SVG no cambia con el tema').not.toBe(claro.fondo[0]);
+  expect(oscuro.fondo[0]).not.toBe('232,244,248');
+  for (const [tema, m] of [['claro', claro], ['oscuro', oscuro]] as const) {
+    expect(m.titulo, `título del diagrama, tema ${tema}`).toBeGreaterThanOrEqual(4.5);
+    expect(m.tarjetas, `blanco sobre las tarjetas, tema ${tema}`).toBeGreaterThanOrEqual(4.5);
+  }
 });

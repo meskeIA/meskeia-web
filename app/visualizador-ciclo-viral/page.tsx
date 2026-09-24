@@ -18,7 +18,7 @@ import styles from './CicloViral.module.css';
 interface EtapaCiclo {
   numero: number;
   nombre: string;
-  /** Rótulo corto del círculo del diagrama: explícito, porque recortar el nombre repetía «Liberación» en la 3 y la 6. */
+  /** Rótulo corto junto al círculo del diagrama: explícito, porque recortar el nombre repetía «Liberación» en la 3 y la 6. */
   etiqueta: string;
   icono: string;
   descripcion: string;
@@ -207,6 +207,24 @@ const MECANISMOS: MecanismoEvasion[] = [
   },
 ];
 
+interface PosicionEtiqueta {
+  x: number;
+  y: number;
+  ancla: 'start' | 'middle' | 'end';
+}
+
+/**
+ * Dónde va el rótulo de una etapa: fuera de su círculo (r = 17) y hacia el exterior del ciclo,
+ * para no pisar la célula (elipse de 90 a 410 en x y de 70 a 350 en y). La etapa 1 comparte
+ * sitio con el virión, cuyas espículas llegan a 26 del centro: su rótulo va a la derecha.
+ */
+function posicionEtiqueta(e: EtapaCiclo): PosicionEtiqueta {
+  if (e.cy < 100) return { x: e.cx + 30, y: e.cy + 4, ancla: 'start' };
+  if (e.cy > 340) return { x: e.cx, y: e.cy + 32, ancla: 'middle' };
+  if (e.cx > 250) return { x: e.cx + 22, y: e.cy + 4, ancla: 'start' };
+  return { x: e.cx - 22, y: e.cy + 4, ancla: 'end' };
+}
+
 // ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
@@ -278,9 +296,11 @@ export default function VisualizadorCicloViral() {
         <div className={styles.cicloWrapper}>
           <div className={styles.svgContainer}>
             {/* role="group" y no role="img": los hijos de un img son presentacionales y las
-                etapas pulsables desaparecerían para el lector de pantalla. */}
+                etapas pulsables desaparecerían para el lector de pantalla.
+                El viewBox empieza en −14 para que quepan los rótulos de la izquierda
+                («Ensamblaje» y «Liberación» llegan hasta x = −7). */}
             <svg
-              viewBox="0 0 500 420"
+              viewBox="-14 0 528 420"
               className={styles.svgCelula}
               aria-label="Diagrama interactivo del ciclo de replicación viral con 6 etapas"
               role="group"
@@ -386,6 +406,7 @@ export default function VisualizadorCicloViral() {
               {/* Etapas pulsables: ratón, teclado (Tab + Enter/Espacio) y lector de pantalla */}
               {ETAPAS.map((e) => {
                 const activo = etapaActiva === e.numero;
+                const rotulo = posicionEtiqueta(e);
                 return (
                   <g
                     key={e.numero}
@@ -410,26 +431,31 @@ export default function VisualizadorCicloViral() {
                       cx={e.cx}
                       cy={e.cy}
                       r="17"
-                      fill={activo ? '#2E86AB' : '#FFFFFF'}
-                      stroke={activo ? '#1A5C7A' : '#2E86AB'}
+                      className={activo ? styles.circuloEtapaActivo : styles.circuloEtapa}
                       strokeWidth="2.5"
                     />
                     <text
                       x={e.cx}
-                      y={e.cy - 2}
+                      y={e.cy + 4}
                       textAnchor="middle"
-                      fontSize="11"
+                      fontSize="12"
                       fontWeight="800"
-                      fill={activo ? 'white' : '#2E86AB'}
+                      className={activo ? styles.numeroEtapaActivo : styles.numeroEtapa}
                     >
                       {e.numero}
                     </text>
+                    {/* La etiqueta va FUERA del círculo, hacia el exterior del ciclo. Dentro, a 7
+                        unidades y en blanco con la etapa activa, «Replicación» (35,6) y
+                        «Ensamblaje» (35,7) medían más que el diámetro de 34, y a la altura del
+                        texto la cuerda es aún menor: lo que sobresalía era blanco sobre claro
+                        (sospecha del Inspector, medida el 24/09/2026). Fuera no pisa la célula
+                        (ninguna posición entra en la elipse) y se lee sobre el fondo de la tarjeta. */}
                     <text
-                      x={e.cx}
-                      y={e.cy + 10}
-                      textAnchor="middle"
-                      fontSize="7"
-                      fill={activo ? 'white' : '#48A9A6'}
+                      x={rotulo.x}
+                      y={rotulo.y}
+                      textAnchor={rotulo.ancla}
+                      fontSize="10"
+                      className={activo ? styles.etiquetaEtapaActiva : styles.etiquetaEtapa}
                     >
                       {e.etiqueta}
                     </text>

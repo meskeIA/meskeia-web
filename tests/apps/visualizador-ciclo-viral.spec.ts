@@ -293,6 +293,53 @@ test.describe('CASO 2 · el diagrama (reparado el 24/09/2026, hallazgos 1359-136
     // Sin solape vertical: el rótulo acaba por encima de donde empieza el círculo.
     expect(rotulo.y + rotulo.height).toBeLessThanOrEqual(c4.y);
   });
+
+  test('SOSPECHA · con la etapa activa, ningún rótulo desborda su círculo ni el diagrama', async ({ page }) => {
+    // Sospecha del Inspector, medida el 24/09/2026 antes de reparar: con el rótulo DENTRO del
+    // círculo (r = 17, diámetro 34) a 7 unidades y en blanco, getBBox() daba 35,6 de ancho a
+    // «Replicación» y 35,7 a «Ensamblaje»: blanco sobre claro en lo que sobresalía.
+    // ENTRADA activar cada etapa → ESPERADO su rótulo entero FUERA del círculo (caja del texto
+    // a más de 17 del centro), dentro del viewBox, fuera de la célula y a ≥ 4,5:1 sobre la tarjeta.
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    for (let n = 1; n <= 6; n++) {
+      await circulo(page, n).click();
+      await expect(circulo(page, n)).toHaveAttribute('aria-pressed', 'true');
+      const m = await circulo(page, n).evaluate((g) => {
+        const canal = (c: number) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        };
+        const rgb = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+        const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+        const c = g.querySelector('circle[r="17"]') as SVGCircleElement;
+        const t = g.querySelectorAll('text')[1] as SVGTextElement;
+        const bb = t.getBBox();
+        const cx = Number(c.getAttribute('cx'));
+        const cy = Number(c.getAttribute('cy'));
+        const px = Math.max(bb.x, Math.min(cx, bb.x + bb.width));
+        const py = Math.max(bb.y, Math.min(cy, bb.y + bb.height));
+        const svg = (g as SVGGraphicsElement).ownerSVGElement as SVGSVGElement;
+        const vb = svg.viewBox.baseVal;
+        const esquinas = [[bb.x, bb.y], [bb.x + bb.width, bb.y], [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]];
+        // La célula es la elipse (250, 210) con radios 160 × 140.
+        const enCelula = esquinas.some(([x, y]) => ((x - 250) / 160) ** 2 + ((y - 210) / 140) ** 2 < 1);
+        const l1 = lum(rgb(getComputedStyle(t).fill));
+        const l2 = lum(rgb(getComputedStyle(svg.parentElement as Element).backgroundColor));
+        return {
+          etiqueta: t.textContent ?? '',
+          holgura: Math.hypot(px - cx, py - cy) - 17,
+          dentro: bb.x >= vb.x && bb.y >= vb.y && bb.x + bb.width <= vb.x + vb.width && bb.y + bb.height <= vb.y + vb.height,
+          enCelula,
+          contraste: (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05),
+        };
+      });
+      expect(m.holgura, `«${m.etiqueta}» toca su círculo`).toBeGreaterThan(0);
+      expect(m.dentro, `«${m.etiqueta}» se sale del viewBox`).toBe(true);
+      expect(m.enCelula, `«${m.etiqueta}» pisa la célula`).toBe(false);
+      expect(m.contraste, `«${m.etiqueta}» activo sobre la tarjeta`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

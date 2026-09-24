@@ -224,6 +224,30 @@ test('caso 2a-dibujo · con F = 0 el lienzo no pinta un vector fuerza', async ({
   await expect(page.locator('[class*="vFuerza"]')).toHaveCount(0);
 });
 
+test('caso 2a-dibujo-v · el lienzo dibuja v⊥ = v·sen θ, y con θ = 0° no hay flecha que girar', async ({ page }) => {
+  // Sospecha del Inspector (24/09/2026), confirmada en el navegador antes de reparar: con
+  // θ = 0° la trayectoria desaparecía (r = 0) pero la flecha v seguía midiendo 62 px y su
+  // extremo pasaba de (339, 257) a (318, 212) en medio segundo: giraba en el plano ⊥ B sin v⊥.
+  // Mismo patrón que el hallazgo 1346 con F. El lienzo es el plano perpendicular a B:
+  //   θ = 90° → sen 90° = 1   → 62 px (v⊥ = v)
+  //   θ = 30° → sen 30° = 0,5 → 31 px
+  //   θ = 0°  → sen 0° = 0    → sin flecha (la partícula avanza a lo largo de B)
+  const flecha = page.locator('[class*="vVelocidad"] line');
+  const largo = () =>
+    flecha.evaluate((l) => {
+      const n = (a: string) => Number(l.getAttribute(a));
+      return Math.hypot(n('x2') - n('x1'), n('y2') - n('y1'));
+    });
+  await sembrarValor(page, '#anguloVB', 30);
+  await expect.poll(largo).toBeCloseTo(31, 1);
+  await expect(page.locator('[class*="vVelocidad"] text')).toHaveText('v⊥');
+  await sembrarValor(page, '#anguloVB', 90);
+  await expect.poll(largo).toBeCloseTo(62, 1);
+  await sembrarValor(page, '#anguloVB', 0);
+  await expect(valorDeFila(page, 'Componente v perpendicular')).toHaveText('0 m/s');
+  await expect(page.locator('[class*="vVelocidad"]')).toHaveCount(0);
+});
+
 // ── CASO 3 ────────────────────────────────────────────────────────────────────────────
 
 test('caso 3a · I negativa y r = 0 se capan al mínimo y el campo sigue finito', async ({ page }) => {

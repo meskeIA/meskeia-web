@@ -6291,7 +6291,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-ecosistema-trofico': [
     { url: '/simulador-fotosintesis-factores/', icon: '🌿', name: 'Fotosíntesis: Factores Limitantes', description: 'Los productores de la base de la pirámide fijan energía mediante fotosíntesis' },
-    { url: '/visualizador-ecosistema/', icon: '🌱', name: 'Ecosistema', description: 'Pirámide trófica, regla del 10% y ciclos biogeoquímicos explicados' },
+    { url: '/visualizador-ecosistema/', icon: '🌱', name: 'Ecosistema', description: 'Pirámide trófica, regla del 10 % y ciclos biogeoquímicos explicados' },
     { url: '/visualizador-celula/', icon: '🔬', name: 'Célula', description: 'La célula es la unidad de todos los organismos de la cadena trófica' },
     { url: '/visualizador-evolucion-molecular/', icon: '🔬', name: 'Evolución Molecular', description: 'La evolución da forma a las relaciones depredador-presa del ecosistema' },
   ],

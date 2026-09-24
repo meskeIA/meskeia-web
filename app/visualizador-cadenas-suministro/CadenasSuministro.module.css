@@ -98,6 +98,45 @@
   stroke-width: 3;
 }
 
+/* Colores del diagrama como clases y no como stopColor/fill fijos: con #E8F4F8 escrito en el
+   SVG, en oscuro quedaba una isla clara dentro de la tarjeta oscura, y el título en #2E86AB
+   daba 3,5:1 sobre ese fondo (sospecha del Inspector, 24/09/2026). El extremo claro pasa de
+   #D0EAF2 a #E0F1F6 para que --primary-texto llegue a 4,5:1 en todo el degradado. */
+.fondoInicio {
+  stop-color: #E8F4F8;
+}
+
+.fondoFin {
+  stop-color: #E0F1F6;
+}
+
+/* Tarjetas de componente: texto blanco de 7,5-8,5 unidades encima. Con #2E86AB→#48A9A6 al
+   82 % de opacidad el blanco se quedaba en ≈2,4:1 en la esquina teal; los tokens -boton son
+   los de «texto blanco encima» (5,47:1 y 5,15:1) e iguales en los dos temas. */
+.compInicio {
+  stop-color: var(--primary-boton);
+}
+
+.compFin {
+  stop-color: var(--secondary-boton);
+}
+
+.compActivoInicio {
+  stop-color: var(--hero-bg);
+}
+
+.compActivoFin {
+  stop-color: #255F5C;
+}
+
+.svgTitulo {
+  fill: var(--primary-texto);
+}
+
+.svgTextoCentro {
+  fill: var(--text-primary);
+}
+
 /* ─── Panel de detalle componente ───────────────── */
 .panelDetalle {
   background: var(--bg-card);
@@ -657,6 +696,15 @@
 [data-theme='dark'] .eduCard {
   background: var(--bg-card);
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Fondo del diagrama en oscuro: #3FA5D1 (--primary-texto) sobre #1B2A33 da ≈5,3:1. */
+[data-theme='dark'] .fondoInicio {
+  stop-color: #1B2A33;
+}
+
+[data-theme='dark'] .fondoFin {
+  stop-color: #16232B;
 }
 
 [data-theme='dark'] .tabla tbody tr {

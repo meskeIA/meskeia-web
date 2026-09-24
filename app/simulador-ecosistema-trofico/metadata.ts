@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Simulador de Ecosistema: Cadena Trófica',
-    description: 'Simula el impacto de perturbaciones en un ecosistema y observa cómo la energía fluye a través de los niveles tróficos con la regla del 10%.',
+    description: 'Simula el impacto de perturbaciones en un ecosistema y observa cómo la energía fluye a través de los niveles tróficos con la regla del 10\u00A0%.',
     url: 'https://meskeia.com/simulador-ecosistema-trofico',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Ecosistema: Cadena Trófica',
-  description: 'Herramienta educativa interactiva que simula el impacto de perturbaciones ambientales en ecosistemas reales. Visualiza la pirámide trófica, la regla del 10% y las cascadas tróficas en pradera, bosque, océano y sabana.',
+  description: 'Herramienta educativa interactiva que simula el impacto de perturbaciones ambientales en ecosistemas reales. Visualiza la pirámide trófica, la regla del 10\u00A0% y las cascadas tróficas en pradera, bosque, océano y sabana.',
   url: 'https://meskeia.com/simulador-ecosistema-trofico/',
   category: 'EducationalApplication',
   keywords: [
@@ -59,7 +59,7 @@ export const jsonLd = generateWebAppSchema({
     'Pirámide trófica visual con 4 niveles y flujo de energía',
     'Barras animadas de población antes y después del evento',
     'Explicación dinámica de la cascada trófica generada',
-    'Bloque educativo completo sobre cadenas tróficas y regla del 10%',
+    'Bloque educativo completo sobre cadenas tróficas y regla del 10\u00A0%',
   ],
 });
 
@@ -77,10 +77,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es la regla del 10% en ecología?',
+      name: '¿Qué es la regla del 10\u00A0% en ecología?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La regla del 10% establece que solo aproximadamente el 10% de la energía de un nivel trófico se transfiere al nivel superior; el 90% restante se pierde como calor en la respiración celular o queda en biomasa no consumida. Propuesta por Raymond Lindeman en 1942, esta regla explica por qué las cadenas tróficas tienen pocos eslabones (habitualmente 4-5) y por qué hay muchos más productores que depredadores en cualquier ecosistema.',
+        text: 'La regla del 10\u00A0% establece que solo aproximadamente el 10\u00A0% de la energía de un nivel trófico se transfiere al nivel superior; el 90\u00A0% restante se pierde como calor en la respiración celular o queda en biomasa no consumida. Propuesta por Raymond Lindeman en 1942, esta regla explica por qué las cadenas tróficas tienen pocos eslabones (habitualmente 4-5) y por qué hay muchos más productores que depredadores en cualquier ecosistema.',
       },
     },
     {

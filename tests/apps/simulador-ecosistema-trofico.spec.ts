@@ -92,8 +92,9 @@ async function leerBarras(page: Page): Promise<{ etiqueta: string; valor: number
 async function seleccionar(page: Page, evento: string, intensidad: string): Promise<void> {
   await page.getByRole('button', { name: evento, exact: true }).click();
   await page.locator('#slider-intensidad').fill(intensidad);
+  // Con espacio de no separación entre la cifra y el signo (sospecha del Inspector, 24/09/2026).
   await expect(page.locator('label[for="slider-intensidad"]')).toContainText(
-    `${Math.round(parseFloat(intensidad) * 100)}%`
+    `${Math.round(parseFloat(intensidad) * 100)}\u00A0%`
   );
 }
 
@@ -191,6 +192,31 @@ test.describe('simulador-ecosistema-trofico', () => {
     );
     await expect(explicacion).not.toContainText('han reducido');
     await expect(explicacion).not.toContainText('han aumentado');
+  });
+
+  // Sospecha del Inspector (24/09/2026): unos 15 «N%» pegados, contra la norma española
+  // «N %». Entrada: caza del depredador al 71 %. Esperado: la etiqueta dice «71 %» con
+  // espacio de no separación, la leyenda «10 %» / «1 %», y en ningún texto de la página
+  // —bloque educativo colapsado incluido, por eso textContent y no innerText— queda una
+  // cifra pegada al signo. Los anchos de la pirámide ('30%'…'100%') son CSS y no salen aquí.
+  test('SOSPECHA · ningún porcentaje visible va pegado a la cifra: «71 %», no «71%»', async ({ page }) => {
+    await seleccionar(page, 'Caza excesiva del depredador', '0.71');
+    const etiqueta = await page.locator('label[for="slider-intensidad"]').textContent();
+    expect(etiqueta).toContain('71\u00A0%');
+
+    const textos = await page.evaluate(() => {
+      const main = document.querySelector('main') ?? document.body;
+      const copia = main.cloneNode(true) as HTMLElement;
+      // Fuera también las tarjetas de apps relacionadas: su texto sale de data/app-relations.ts
+      // y es de OTRAS apps («Pirámide trófica, regla del 10% y ciclos…» es de visualizador-ecosistema).
+      copia
+        .querySelectorAll('script, style, section[aria-label="Aplicaciones relacionadas"]')
+        .forEach((n) => n.remove());
+      return copia.textContent ?? '';
+    });
+    expect(textos).toContain('solo el 10\u00A0% de la energía sube');
+    expect(textos).toContain('regla del 10\u00A0%');
+    expect(textos.match(/\d%/g) ?? []).toEqual([]);
   });
 });
 
@@ -429,7 +455,7 @@ test.describe('simulador-ecosistema-trofico · la sección de casos en el navega
     await expect(seccion(page).getByRole('radio', { name: 'Baja' })).toBeDisabled();
 
     await seccion(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
-    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('50%');
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('50\u00A0%');
     const barras = page.locator('[role="meter"]');
     await expect(barras.nth(1)).toHaveAttribute('aria-valuenow', '50');
     await expect(barras.nth(0)).toHaveAttribute('aria-valuenow', '83');

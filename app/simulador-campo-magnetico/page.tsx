@@ -98,6 +98,14 @@ const FUERZA_REFERENCIA = CARGA_ELEMENTAL * 5e6 * 0.5;
 const LARGO_FUERZA_REFERENCIA = 48; // px de la flecha F con la fuerza de referencia
 const LARGO_FUERZA_MIN = 12; // px: por debajo la punta taparía la línea
 const LARGO_FUERZA_MAX = 120; // px: por encima se sale del lienzo
+/**
+ * El lienzo es el plano perpendicular a B, así que la flecha de velocidad es la proyección
+ * v⊥ = v·sen θ: 62 px con θ = 90° y proporcional a sen θ por debajo. Con θ = 0° no hay nada
+ * que dibujar, porque la partícula avanza a lo largo de B (sospecha del Inspector del
+ * 24/09/2026, mismo patrón que el hallazgo 1346 con F: medía siempre 62 px y seguía girando).
+ */
+const LARGO_VELOCIDAD_PERPENDICULAR = 62;
+const LARGO_VELOCIDAD_MIN = 12; // px: por debajo la punta taparía la línea
 
 /** Distancias del control del hilo (m) y su recorrido en el dibujo (px desde el hilo). */
 const DISTANCIA_MIN = 0.005;
@@ -380,7 +388,11 @@ export default function SimuladorCampoMagnetico() {
     return { finX, finY, puntos: `${finX},${finY} ${p1x},${p1y} ${p2x},${p2y}` };
   };
 
-  const vectorV = flechaVector(posParticula.x, posParticula.y, dirVelocidad.x, dirVelocidad.y, 62);
+  // v⊥ = v·sen θ: el largo sigue a sen θ y con v⊥ = 0 no hay flecha (ver LARGO_VELOCIDAD_*).
+  const senoVB = senoCosenoGrados(anguloVB).sen;
+  const largoVelocidad =
+    senoVB > 0 ? Math.max(LARGO_VELOCIDAD_PERPENDICULAR * senoVB, LARGO_VELOCIDAD_MIN) : 0;
+  const vectorV = flechaVector(posParticula.x, posParticula.y, dirVelocidad.x, dirVelocidad.y, largoVelocidad);
   // Largo de F proporcional a la fuerza calculada, acotado para que quepa; con F = 0 no hay
   // flecha (hallazgo 1346: antes medía siempre 48 px, también con θ = 0°).
   const largoFuerza =
@@ -583,24 +595,26 @@ export default function SimuladorCampoMagnetico() {
                       />
                     )}
 
-                    {/* Vector velocidad */}
-                    <g className={styles.vVelocidad}>
-                      <line
-                        x1={posParticula.x}
-                        y1={posParticula.y}
-                        x2={vectorV.finX}
-                        y2={vectorV.finY}
-                        className={styles.vectorLinea}
-                      />
-                      <polygon points={vectorV.puntos} className={styles.vectorPunta} />
-                      <text
-                        x={vectorV.finX + dirVelocidad.x * 14}
-                        y={vectorV.finY + dirVelocidad.y * 14}
-                        className={styles.vectorTexto}
-                      >
-                        v
-                      </text>
-                    </g>
+                    {/* Vector velocidad en el plano: v⊥, solo si existe */}
+                    {largoVelocidad > 0 && (
+                      <g className={styles.vVelocidad}>
+                        <line
+                          x1={posParticula.x}
+                          y1={posParticula.y}
+                          x2={vectorV.finX}
+                          y2={vectorV.finY}
+                          className={styles.vectorLinea}
+                        />
+                        <polygon points={vectorV.puntos} className={styles.vectorPunta} />
+                        <text
+                          x={vectorV.finX + dirVelocidad.x * 14}
+                          y={vectorV.finY + dirVelocidad.y * 14}
+                          className={styles.vectorTexto}
+                        >
+                          v⊥
+                        </text>
+                      </g>
+                    )}
 
                     {/* Vector fuerza (centrípeta): solo si hay fuerza */}
                     {largoFuerza > 0 && (

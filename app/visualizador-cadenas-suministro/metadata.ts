@@ -70,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Qué es el reshoring y por qué lo están haciendo grandes empresas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El reshoring es el proceso de traer de vuelta la producción al país de origen (o cerca de él), revirtiéndola deslocalización de las décadas pasadas. El nearshoring traslada la producción a países vecinos y el friendshoring a países aliados políticamente. Los motivos son la reducción del riesgo geopolítico, los costes de transporte más altos, las lecciones de la pandemia y las políticas industriales como la Chips Act de EEUU (2022) o la European Chips Act (2023), que destinan miles de millones a fabricación local de semiconductores.',
+        text: 'El reshoring es el proceso de traer de vuelta la producción al país de origen (o cerca de él), revirtiendo la deslocalización de las décadas pasadas. El nearshoring traslada la producción a países vecinos y el friendshoring a países aliados políticamente. Los motivos son la reducción del riesgo geopolítico, los costes de transporte más altos, las lecciones de la pandemia y las políticas industriales como la Chips Act de EEUU (2022) o la European Chips Act (2023), que destinan miles de millones a fabricación local de semiconductores.',
       },
     },
     {
@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Cuáles han sido las mayores disrupciones de cadenas de suministro de la historia reciente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Entre las disrupciones más impactantes destacan: el tsunami de Japón de 2011, que paralizó fábricas de Toyota y autopartes globales durante semanas; el bloqueo del Canal de Suez por el Ever Given en 2021 (6 días, ~9.000 millones de dólares diarios retenidos); la escasez global de semiconductores de 2020-2023, que afectó a la fabricación de coches, consolas y electrónica; y la pandemia de COVID-19, que colapsó simultáneamente la oferta (cierres de fábricas) y la demanda (cambios de consumo), con efectos que duraron hasta 2023.',
+        text: 'Entre las disrupciones más impactantes destacan: el tsunami de Japón de 2011, que paralizó fábricas de Toyota y autopartes globales durante semanas; el bloqueo del Canal de Suez por el Ever Given en 2021 (6 días, unos 9.600 millones de dólares en mercancías retenidas cada día, según Lloyd’s List); la escasez global de semiconductores de 2020-2023, que afectó a la fabricación de coches, consolas y electrónica; y la pandemia de COVID-19, que colapsó simultáneamente la oferta (cierres de fábricas) y la demanda (cambios de consumo), con efectos que duraron hasta 2023.',
       },
     },
   ],

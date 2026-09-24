@@ -139,7 +139,7 @@ export default function SimuladorEcosistemaTroficoPage() {
           <h1 className={styles.title}><span aria-hidden="true">🌍</span> Simulador de Ecosistema: Cadena Trófica</h1>
           <p className={styles.subtitle}>
             Selecciona un ecosistema, aplica una perturbación y observa cómo la cascada trófica
-            transforma cada nivel. Aprende la regla del 10% de la energía en acción.
+            transforma cada nivel. Aprende la regla del 10&nbsp;% de la energía en acción.
           </p>
         </header>
 
@@ -181,7 +181,7 @@ export default function SimuladorEcosistemaTroficoPage() {
         {eventoId !== 'ninguno' && (
           <div className={styles.intensidadRow}>
             <label htmlFor="slider-intensidad" className={styles.intensidadLabel}>
-              Intensidad de la perturbación: <strong>{Math.round(intensidad * 100)}%</strong>
+              Intensidad de la perturbación: <strong>{Math.round(intensidad * 100)}&nbsp;%</strong>
             </label>
             <input
               id="slider-intensidad"
@@ -220,7 +220,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                       — es decir, el público de secundaria al que apunta la metadata. */}
                   {idx > 0 && (
                     <div className={styles.flechaEnergia} aria-hidden="true">
-                      <span>↑ solo el 10% de la energía sube a este nivel</span>
+                      <span>↑ solo el 10&nbsp;% de la energía sube a este nivel</span>
                     </div>
                   )}
                   <div
@@ -292,7 +292,7 @@ export default function SimuladorEcosistemaTroficoPage() {
             {/* Leyenda energía */}
             <div className={styles.leyendaEnergia}>
               <p className={styles.leyendaNota}>
-                Esta leyenda representa la <strong>transferencia de energía</strong> entre niveles (regla del 10%),
+                Esta leyenda representa la <strong>transferencia de energía</strong> entre niveles (regla del 10&nbsp;%),
                 un concepto distinto de la <strong>población relativa</strong> mostrada en las barras de arriba:
                 un nivel puede tener pocos individuos pero canalizar mucha energía, o al contrario.
               </p>
@@ -307,7 +307,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                   <div className={styles.leyendaLinea} key={nivel.nombre}>
                     <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[idx] }} />
                     <span>
-                      {nivel.nombre}: {formatNumber(nivel.energiaPorcentaje, nivel.energiaPorcentaje < 1 ? 1 : 0)}%
+                      {nivel.nombre}: {formatNumber(nivel.energiaPorcentaje, nivel.energiaPorcentaje < 1 ? 1 : 0)}&nbsp;%
                       {idx === 0 ? ' energía solar' : ''}
                     </span>
                   </div>
@@ -336,10 +336,10 @@ export default function SimuladorEcosistemaTroficoPage() {
         {/* BLOQUE EDUCATIVO v2.0 */}
         <EducationalSection
           title="Aprende sobre cadenas tróficas y ecosistemas"
-          subtitle="La regla del 10%, las cascadas tróficas y las especies clave explicadas"
+          subtitle="La regla del 10&nbsp;%, las cascadas tróficas y las especies clave explicadas"
         >
           <section>
-            <h3>¿Qué es una cadena trófica y la regla del 10%?</h3>
+            <h3>¿Qué es una cadena trófica y la regla del 10&nbsp;%?</h3>
             <p>
               Una <strong>cadena trófica</strong> es la secuencia ordenada de organismos en un ecosistema
               según quién come a quién. Cada eslabón se denomina <em>nivel trófico</em>: productores
@@ -347,9 +347,9 @@ export default function SimuladorEcosistemaTroficoPage() {
               (carnívoros) y depredadores ápice o superdepredadores.
             </p>
             <p>
-              La <strong>regla del 10%</strong> (o ley de Lindeman, 1942) establece que, en promedio,
-              solo el 10% de la energía acumulada en un nivel trófico se transfiere al siguiente.
-              El 90% restante se pierde como calor metabólico, respiración, excreción y tejidos no
+              La <strong>regla del 10&nbsp;%</strong> (o ley de Lindeman, 1942) establece que, en promedio,
+              solo el 10&nbsp;% de la energía acumulada en un nivel trófico se transfiere al siguiente.
+              El 90&nbsp;% restante se pierde como calor metabólico, respiración, excreción y tejidos no
               consumibles. Esto explica por qué la pirámide de energía siempre tiene base ancha:
               se necesitan enormes cantidades de vegetación para mantener a pocos depredadores ápice.
             </p>
@@ -486,7 +486,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                     afirmación de que un nivel no pueda extinguirse. */}
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> En el simulador, prueba &quot;caza excesiva del
-                  depredador&quot; al 100% en la pradera: los carnívoros caen a un tercio y el efecto
+                  depredador&quot; al 100&nbsp;% en la pradera: los carnívoros caen a un tercio y el efecto
                   recorre toda la pirámide, apagándose a cada nivel. El modelo tiene un suelo de
                   población y no llega a cero —es una simplificación, no una afirmación de que un
                   nivel no pueda extinguirse—, pero la forma de la cascada es la misma que
@@ -497,8 +497,8 @@ export default function SimuladorEcosistemaTroficoPage() {
               <div className={styles.faqItem}>
                 <h4>¿Por qué la pirámide de energía siempre tiene base ancha?</h4>
                 <p>
-                  Porque la energía se <strong>disipa</strong> en cada transferencia. Solo el 10%
-                  pasa al nivel siguiente; el 90% se usa en metabolismo, se pierde como calor o
+                  Porque la energía se <strong>disipa</strong> en cada transferencia. Solo el 10&nbsp;%
+                  pasa al nivel siguiente; el 90&nbsp;% se usa en metabolismo, se pierde como calor o
                   queda en partes no consumidas (raíces, huesos, celulosa). Para que haya 1 kg de
                   depredador ápice, se necesitan ~10 kg de carnívoro, ~100 kg de herbívoro y ~1000 kg
                   de productor. Esto limita físicamente la longitud de las cadenas tróficas.
@@ -529,7 +529,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 <h4>¿Cuántos eslabones puede tener una cadena trófica?</h4>
                 <p>
                   En la naturaleza, raramente más de <strong>4-6 eslabones</strong>. La razón es
-                  física: con la regla del 10%, para el sexto nivel solo quedaría el 0,001% de la
+                  física: con la regla del 10&nbsp;%, para el sexto nivel solo quedaría el 0,001&nbsp;% de la
                   energía original, lo que hace matemáticamente imposible mantener una población
                   viable. En ecosistemas oceánicos muy productivos (gran biomasa de fitoplancton)
                   pueden existir cadenas algo más largas.
@@ -578,7 +578,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 <div className={styles.stepNumber}>3</div>
                 <div className={styles.stepContent}>
                   <strong>Evalúa la magnitud del impacto con el modelo simplificado</strong>
-                  <p>Como aproximación orientativa (no una ley empírica), cada nivel trófico tiende a atenuar el impacto: en este simulador un cambio del 50% en un nivel se traduce en algo más de un 35% en el nivel de al lado, y en torno a un 25% en el siguiente, porque los ecosistemas tienen cierta inercia y capacidad de amortiguación. Puedes seguirlo tú: prueba «caza excesiva del depredador» al 71% en la pradera y verás −50% en carnívoros, +35% en herbívoros y −24% en productores. La magnitud real varía mucho según el ecosistema y las especies implicadas.</p>
+                  <p>Como aproximación orientativa (no una ley empírica), cada nivel trófico tiende a atenuar el impacto: en este simulador un cambio del 50&nbsp;% en un nivel se traduce en algo más de un 35&nbsp;% en el nivel de al lado, y en torno a un 25&nbsp;% en el siguiente, porque los ecosistemas tienen cierta inercia y capacidad de amortiguación. Puedes seguirlo tú: prueba «caza excesiva del depredador» al 71&nbsp;% en la pradera y verás −50&nbsp;% en carnívoros, +35&nbsp;% en herbívoros y −24&nbsp;% en productores. La magnitud real varía mucho según el ecosistema y las especies implicadas.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -632,7 +632,7 @@ export default function SimuladorEcosistemaTroficoPage() {
             <ul className={styles.warningList}>
               <li><strong>Confundir cadena con red trófica</strong> — La cadena es una simplificación lineal. En la naturaleza existen redes complejas donde cada especie interactúa con muchas otras. La cadena es útil para estudiar, no para modelar la realidad completa.</li>
               <li><strong>Creer que los depredadores son «malos» para el ecosistema</strong> — Los depredadores son esenciales: regulan las poblaciones de herbívoros, evitan el sobrepastoreo y mantienen la biodiversidad. Sin depredadores, los herbívoros destruyen la vegetación.</li>
-              <li><strong>No entender que la energía se pierde como calor</strong> — El 90% de la energía no «desaparece»: se convierte en calor por el metabolismo. Solo el 10% queda en tejidos consumibles. Esta pérdida es irreversible (2.ª ley de la termodinámica).</li>
+              <li><strong>No entender que la energía se pierde como calor</strong> — El 90&nbsp;% de la energía no «desaparece»: se convierte en calor por el metabolismo. Solo el 10&nbsp;% queda en tejidos consumibles. Esta pérdida es irreversible (2.ª ley de la termodinámica).</li>
               <li><strong>Confundir biomasa con número de individuos</strong> — Un ecosistema puede tener pocos herbívoros en número pero mucha biomasa (vacas vs. insectos). La pirámide de individuos puede invertirse; la de energía, nunca.</li>
               <li><strong>Olvidar los descomponedores</strong> — Bacterias, hongos y detritívoros son el «nivel trófico oculto» que recicla la materia orgánica muerta. Sin ellos, los nutrientes quedarían inmovilizados y los productores dejarían de crecer.</li>
             </ul>
