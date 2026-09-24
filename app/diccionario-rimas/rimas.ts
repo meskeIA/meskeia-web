@@ -55,13 +55,40 @@ export interface Escansion {
   nucleo: string;
 }
 
-/** Descompone una palabra y localiza su núcleo de rima. */
-export const escandirPalabra = (palabra: string): Escansion | null => {
-  const limpia = palabra
+/** Lo que queda de la entrada tras quitar todo lo que no es una letra del español. */
+const limpiarEntrada = (texto: string): string =>
+  texto
     .toLowerCase()
     .trim()
     .replace(/[^a-záéíóúüñ]/g, '');
+
+/**
+ * Sin una vocal no hay sílaba y, por tanto, no hay núcleo desde el que rimar.
+ * La «y» cuenta como vocal: en «rey», «muy» o la conjunción «y» suena /i/.
+ * Deja fuera las onomatopeyas sin vocal («prr», «psst», «mmm») y las siglas que
+ * se leen letra a letra («DVD», «SMS»): su sonido no se deduce de la escritura.
+ */
+const tieneNucleoVocalico = (limpia: string): boolean =>
+  [...limpia].some((c) => VOCALES.includes(c) || c === 'y');
+
+/**
+ * Por qué una entrada no se puede escandir, para decírselo al usuario:
+ * `'sin-letras'` («123», «!!!»), `'sin-vocales'` («prr», «DVD») o `null` si sí se puede.
+ */
+export const motivoSinEscansion = (texto: string): 'sin-letras' | 'sin-vocales' | null => {
+  const limpia = limpiarEntrada(texto);
+  if (!limpia) return 'sin-letras';
+  if (!tieneNucleoVocalico(limpia)) return 'sin-vocales';
+  return null;
+};
+
+/** Descompone una palabra y localiza su núcleo de rima. */
+export const escandirPalabra = (palabra: string): Escansion | null => {
+  const limpia = limpiarEntrada(palabra);
   if (!limpia) return null;
+  // Antes caía al «núcleo = palabra entera» y «prr» salía como una sílaba aguda
+  // que rimaba desde «-prr» (sospecha del Inspector, 24/09/2026)
+  if (!tieneNucleoVocalico(limpia)) return null;
 
   const silabas = separarSilabas(limpia);
   if (silabas.length === 0) return null;

@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion } from './_hidratacion';
+import { activarTema } from '../contraste-text-muted-auxiliares';
 
 /**
  * orientador-grado-dependencia — la puntuación del BVD (RD 174/2011) y lo que puede prometer
@@ -309,5 +310,59 @@ test.describe('orientador-grado-dependencia', () => {
     await estimar(page);
     await expect(resultado(page)).toContainText('Grado III');
     expect(await medir()).toBeGreaterThanOrEqual(4.5);
+  });
+  /*
+   * SOSPECHA DEL INSPECTOR (24/09/2026), CONFIRMADA Y REPARADA el mismo día:
+   *  · metadata: `jsonLd.features` vacío y categoría FinanceApplication en una app
+   *    sociosanitaria → 7 características reales y EducationalApplication (como test-fragilidad).
+   *  · Sin <RegionBadge variant="es-only" /> siendo España-estructural (BVD, LAPAD, SAAD).
+   *  · Botón «Estimar grado orientativo»: texto blanco sobre degradado --primary→--secondary.
+   *    A mano (WCAG 2.x): blanco sobre #48A9A6 = 1,05 / 0,3264… → 2,80:1; sobre #2E86AB 4,11:1.
+   *    Con --primary-boton #26718F → 5,47:1 y --secondary-boton #327874 → 5,15:1, en los dos temas.
+   */
+  test('sospecha: FAQ/JSON-LD con features y categoría sociosanitaria, y aviso es-only tras el hero', async ({ page }) => {
+    await abrir(page);
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents())
+      .map((t) => JSON.parse(t) as Record<string, unknown>);
+    const app = ld.find((d) => d['@type'] === 'WebApplication');
+    expect(app, 'hay JSON-LD WebApplication').toBeTruthy();
+    expect(app!.applicationCategory).toBe('EducationalApplication');
+    const features = app!.featureList as string[] | string | undefined;
+    const lista = Array.isArray(features) ? features : (features ?? '').split(/,\s*|\n/).filter(Boolean);
+    expect(lista.length).toBeGreaterThanOrEqual(4);
+    expect(lista.join(' ')).toContain('Baremo de Valoración de la Dependencia');
+
+    // El aviso de ámbito va justo después del hero y antes del aviso legal
+    const orden = await page.evaluate(() => {
+      const hero = document.querySelector('header[class*="hero"]');
+      const siguiente = hero?.nextElementSibling;
+      return siguiente?.textContent ?? '';
+    });
+    expect(orden).toMatch(/España/);
+  });
+
+  test('sospecha: el botón «Estimar» tiene contraste AA con texto blanco en los dos extremos del degradado y en los dos temas', async ({ page }) => {
+    async function peorContraste(): Promise<number> {
+      return page.getByRole('button', { name: 'Estimar grado orientativo' }).evaluate((btn) => {
+        const estilo = getComputedStyle(btn);
+        const lum = ([r, g, b]: number[]) => {
+          const f = (v: number) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const colores = [...estilo.backgroundImage.matchAll(/rgba?\(([^)]+)\)/g)]
+          .map((m) => m[1].split(',').slice(0, 3).map((v) => Number(v.trim())));
+        const texto = lum((estilo.color.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number));
+        if (colores.length < 2) return 0;
+        return Math.min(...colores.map((c) => {
+          const f = lum(c);
+          return (Math.max(texto, f) + 0.05) / (Math.min(texto, f) + 0.05);
+        }));
+      });
+    }
+    await abrir(page);
+    await activarTema(page, 'light');
+    expect(await peorContraste()).toBeGreaterThanOrEqual(4.5);
+    await activarTema(page, 'dark');
+    expect(await peorContraste()).toBeGreaterThanOrEqual(4.5);
   });
 });

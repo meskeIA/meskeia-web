@@ -19,6 +19,7 @@ import {
   buscarRimas,
   indexarBloque,
   indiceVacio,
+  motivoSinEscansion,
 } from './rimas';
 import { formasVerbalesFlexionadas } from './formas-verbales';
 
@@ -165,7 +166,12 @@ export default function DiccionarioRimasPage() {
   // Hay texto pero no ninguna letra («123», «!!!»): el motor no tiene palabra
   // que escandir y devuelve null. Sin este aviso la pantalla se quedaba igual
   // que antes de escribir (hallazgo 1309 del Inspector, 24/09/2026).
-  const entradaSinLetras = indice !== null && consulta.trim() !== '' && resultado === null;
+  // Lo mismo con letras pero sin vocal («prr», «DVD»): no hay sílaba ni núcleo
+  // de rima, y antes se escandía la palabra entera como si lo fuera.
+  const motivoAviso =
+    indice !== null && consulta.trim() !== '' && resultado === null
+      ? motivoSinEscansion(consulta)
+      : null;
 
   const relatedApps = getRelatedApps('diccionario-rimas');
   const truncado = resultado ? resultado.palabras.length > LIMITE_VISIBLE && !verTodas : false;
@@ -291,10 +297,17 @@ export default function DiccionarioRimasPage() {
           en cuanto aparece, y se vacía sola cuando la entrada vuelve a ser válida.
           Vacía no ocupa sitio: no lleva margen ni relleno propios */}
       <div role="alert">
-        {entradaSinLetras && (
+        {motivoAviso === 'sin-letras' && (
           <p className={styles.avisoEntrada}>
             «{consulta.trim()}» no contiene ninguna letra. Escribe una palabra para buscar con qué
             rima.
+          </p>
+        )}
+        {motivoAviso === 'sin-vocales' && (
+          <p className={styles.avisoEntrada}>
+            «{consulta.trim()}» no tiene ninguna vocal: sin vocal no hay sílaba ni sonido desde el
+            que rimar. Si es una sigla que se lee letra a letra, escríbela como suena (por ejemplo,
+            «deuvedé» en vez de «DVD»).
           </p>
         )}
       </div>

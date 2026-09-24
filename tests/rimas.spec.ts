@@ -213,10 +213,21 @@ test.describe('Búsqueda sobre un índice', () => {
   });
 
   test('una palabra sin rimas devuelve lista vacía, no error', () => {
-    const r = buscarRimas(indice, 'zzzz', 'consonante', false, {
+    // «zigzag» (zig-zag, aguda, núcleo «-ag»): ninguna del índice acaba en -ag
+    const r = buscarRimas(indice, 'zigzag', 'consonante', false, {
       silabas: null,
       acentuacion: null,
     });
     expect(r!.palabras).toEqual([]);
+  });
+
+  test('una entrada sin vocales («zzzz») no se escande: null, no una rima desde «-zzzz»', () => {
+    // Hasta el 24/09/2026 el caso de arriba usaba «zzzz» y daba por buena la escansión
+    // de la palabra entera como núcleo (sospecha del Inspector, reparada ese día)
+    const r = buscarRimas(indice, 'zzzz', 'consonante', false, {
+      silabas: null,
+      acentuacion: null,
+    });
+    expect(r).toBeNull();
   });
 });

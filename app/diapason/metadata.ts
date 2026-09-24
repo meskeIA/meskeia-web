@@ -38,7 +38,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Tono La 440 Hz (ISO 16) generado con Web Audio API, sin archivos de audio externos',
-    'Presets de afinación: barroco 415 Hz, estándar 440 Hz, orquesta europea 442/443 Hz, Renacimiento 466 Hz',
+    'Presets de afinación: estándar 440 Hz, orquesta europea 442/443 Hz y las convenciones de música antigua 415 Hz (barroco) y 466 Hz (Chorton)',
     'Frecuencia personalizable de 20 a 2000 Hz con slider y control numérico',
     'Cuatro tipos de onda: senoidal, triangular, cuadrada y sierra',
     'Control de volumen con rampa suave (sin clic ni artefactos de audio)',
@@ -65,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Por qué el La de referencia es 440Hz y no otra frecuencia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La frecuencia de 440Hz para el La4 fue acordada como estándar internacional en la Conferencia de Londres de 1939; la ISO, fundada en 1947, la adoptó en 1955 (recomendación ISO R 16) y la confirmó en 1975 como norma ISO 16. Antes existían variantes: muchas orquestas barrocas usaban 415Hz y algunas modernas emplean 442Hz o 444Hz. El 440Hz se impuso por ser un valor de consenso que facilitaba la convivencia entre fabricantes e intérpretes de todo el mundo.',
+        text: 'La frecuencia de 440Hz para el La4 fue acordada como estándar internacional en la Conferencia de Londres de 1939; la ISO, fundada en 1947, la adoptó en 1955 (recomendación ISO R 16) y la confirmó en 1975 como norma ISO 16. Antes la afinación variaba según la ciudad, la época y el instrumento: en el barroco, de unos 392 Hz en Francia a unos 465 Hz en Venecia. Hoy algunas orquestas emplean 442Hz o 444Hz, y los grupos de música antigua usan por convención 415 Hz. El 440Hz se impuso por ser un valor de consenso que facilitaba la convivencia entre fabricantes e intérpretes de todo el mundo.',
       },
     },
     {
@@ -89,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Pueden usarse frecuencias distintas de 440Hz para afinar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Algunas orquestas filarmónicas europeas prefieren 442Hz o 443Hz, ya que el sonido resulta ligeramente más brillante. Los grupos de música antigua suelen usar 415Hz (algo más de un semitono por debajo del estándar moderno: unos −101 cents) para reproducir la sonoridad de los siglos XVII y XVIII. Lo importante es que todos los instrumentos de un conjunto compartan la misma frecuencia de referencia.',
+        text: 'Sí. Algunas orquestas filarmónicas europeas prefieren 442Hz o 443Hz, ya que el sonido resulta ligeramente más brillante. Los grupos de música antigua suelen usar 415Hz (algo más de un semitono por debajo del estándar moderno: unos −101 cents) para acercarse a la sonoridad de los siglos XVII y XVIII; es una convención del siglo XX, elegida por quedar un semitono por debajo de 440 Hz, porque en aquella época no había una afinación única. Para el repertorio alemán del XVII-XVIII algunos usan 466 Hz (Chorton). Lo importante es que todos los instrumentos de un conjunto compartan la misma frecuencia de referencia.',
       },
     },
   ],

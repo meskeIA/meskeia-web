@@ -38,8 +38,17 @@ export const jsonLd = generateWebAppSchema({
   name: "Orientador Grado de Dependencia",
   description: "Cuestionario orientativo para estimar el grado de dependencia (I, II o III) según el Baremo de Valoración de la Dependencia español. Guía para solicitar la valoración oficial y acceder a prestaciones.",
   url: "https://meskeia.com/orientador-grado-dependencia/",
-  category: 'FinanceApplication',
-  features: [],
+  // Sociosanitaria, no financiera: misma categoría que test-fragilidad
+  category: 'EducationalApplication',
+  features: [
+    'Cuestionario con las actividades y tareas del Baremo de Valoración de la Dependencia (BVD, RD 174/2011) para personas de 18 años o más',
+    'Puntuación con los pesos oficiales de cada actividad del baremo, en su escala general o específica',
+    'Actividad «Tomar decisiones» y escala específica cuando hay una condición que afecta a las funciones mentales',
+    'Resultado como intervalo de puntos según el tipo de apoyo, con el grado orientativo (I, II o III) y aviso cuando cae en el límite entre dos grados',
+    'Prestaciones y servicios del SAAD de cada grado, con las cuantías máximas de las prestaciones económicas de 2025',
+    'Tabla comparativa de grados y prestaciones de la Ley 39/2006 (LAPAD)',
+    'Próximos pasos para solicitar la valoración oficial en los Servicios Sociales del municipio',
+  ],
 });
 
 export const faqJsonLd = {

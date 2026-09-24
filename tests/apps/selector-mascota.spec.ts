@@ -452,3 +452,75 @@ test('motor: el desempate por coste mensual cuando el vínculo no decide', () =>
   expect(e.empatadas).toEqual(['gato']);
   expect(e.criterioDesempate).toBe('se muestran primero unos peces porque su coste mensual mínimo es el más bajo');
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOSPECHA DEL INSPECTOR (24/09/2026), CONFIRMADA Y REPARADA el mismo día — §1.quinquies
+// Cifras populares sin fuente en consejos, guía y FAQPage: «una operación puede costar entre
+// 500 y 3.000 €» (consejo del perro), «entre 500 y 4.000 €» y «seguro desde ~15-25 €/mes»
+// (guía), «esterilización entre 100 y 250 €» (consejo del gato), «entre 2 y 4 salidas al día» y
+// «ansiedad si se quedan solos más de 6-8 horas» (FAQPage), y las horquillas de coste de las
+// fichas presentadas como dato. Ninguna tenía fuente; las dos primeras ni coincidían entre sí.
+// Ahora: las cifras de precio sin fuente se quitan (dependen del país y de la clínica); lo que
+// queda cita la encuesta de la OCU de 05/04/2022 (1.131 €/año por perro, 986 € por gato; 45 % y
+// 24 % de urgencias en el último año) o las guías de RSPCA y PDSA (no dejar al perro solo de
+// forma habitual más de cuatro horas); y las horquillas de las fichas, que usa el filtro de
+// presupuesto y por eso se quedan, se declaran estimación orientativa para España.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CIFRA_DE_PRECIO_SIN_FUENTE = /(entre|desde)\s+~?\d[\d.]*\s*(y|–|-)?\s*[\d.]*\s*€/;
+
+test('sospecha §1.quinquies (motor): ningún consejo da un precio sin fuente', () => {
+  const OPCIONES: string[][] = [
+    ['mucho', 'medio', 'poco', 'minimo'], ['siempre', 'pocas', 'muchas', 'viajes'],
+    ['jardin', 'piso_grande', 'piso_normal', 'piso_pequeno'], ['mucho', 'medio', 'poco'],
+    ['si_pequenos', 'si_mayores', 'no', 'adolescentes'], ['alergia_pelo', 'comunidad', 'sin_ruido', 'ninguna'],
+    ['compania', 'juego', 'tranquilidad', 'novedad'], ['largo', 'medio', 'corto'],
+    ['minimo', 'bajo', 'medio', 'alto'], ['muy_bajo', 'bajo', 'medio', 'alto'],
+  ];
+  const consejos = new Set<string>();
+  const ganadoras = new Set<MascotaKey>();
+  const idx = new Array(10).fill(0);
+  for (;;) {
+    const r: Record<number, string> = {};
+    OPCIONES.forEach((o, i) => { r[i + 1] = o[idx[i]]; });
+    const res = calcularResultado(r);
+    ganadoras.add(res.mascota);
+    res.consejos.forEach((c) => consejos.add(c));
+    let k = 9;
+    while (k >= 0 && ++idx[k] === OPCIONES[k].length) { idx[k] = 0; k--; }
+    if (k < 0) break;
+  }
+  // Recorre de verdad los consejos del perro y del gato, que eran los que llevaban las cifras
+  expect(ganadoras.has('gato')).toBe(true);
+  expect([...ganadoras].some((m) => m.startsWith('perro'))).toBe(true);
+  for (const c of consejos) expect(c, c).not.toMatch(CIFRA_DE_PRECIO_SIN_FUENTE);
+  expect([...consejos].some((c) => c.includes('OCU (España, 2022)'))).toBe(true);
+  for (const info of Object.values(MASCOTAS)) {
+    for (const t of info.contras) expect(t).not.toMatch(/\d+\s*-\s*\d+\s*min/);
+  }
+});
+
+test('sospecha §1.quinquies (app): guía, horquillas y FAQPage sin cifras populares sin fuente', async ({ page }) => {
+  await abrirTest(page);
+  await responder(page, NORMAL);
+  await leerFicha(page);
+  // Las horquillas de la ficha se declaran estimación, con la media medida por la OCU al lado
+  await expect(page.locator('[class*="notaCostes"]')).toContainText('estimación de meskeIA, 2026');
+  await expect(page.locator('[class*="notaCostes"]')).toContainText('1.131 € al año por perro');
+
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+  expect(cuerpo).not.toContain('entre 500 y 4.000 €');
+  expect(cuerpo).not.toContain('15-25 €/mes');
+  expect(cuerpo).not.toContain('entre 100 y 250 €');
+  expect(cuerpo).not.toContain('entre 500 y 3.000 €');
+  expect(cuerpo).toContain('el 45 % de los dueños de perro y el 24 % de los de gato');
+
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+  expect(ld).toContain('"FAQPage"');
+  expect(ld).not.toContain('entre 2 y 4 salidas');
+  expect(ld).not.toContain('6-8 horas');
+  expect(ld).not.toContain('entre 80 y 280 €');
+  expect(ld).toContain('RSPCA y la PDSA');
+  expect(ld).toContain('OCU de 2022');
+});

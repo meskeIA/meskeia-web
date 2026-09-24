@@ -302,3 +302,62 @@ test.describe('diccionario-rimas — regresión 1308: g suave de «gue/gui» ≠
     for (const w of ['tierra', 'sierra']) expect(lista, `falta ${w} (-erra)`).toContain(w);
   });
 });
+
+/*
+ * SOSPECHA DEL INSPECTOR (24/09/2026), CONFIRMADA Y REPARADA el mismo día:
+ * una entrada con letras pero sin ninguna vocal no se podía escandir y la app lo hacía igual.
+ * Ejecutado sobre el motor ANTES de la reparación:
+ *   escandirPalabra('prr') → { silabas: ['prr'], acentuacion: 'aguda', nucleo: 'prr' }
+ * — indiceVocalNuclear() devolvía -1 y el `iv < 0 ? 0` tomaba la palabra entera como núcleo,
+ * así que la pantalla decía «1 sílaba · aguda · rima desde -prr». Lo mismo «psst», «mmm», «grr»
+ * y las 13 siglas del diccionario que se leen letra a letra (dvd, sms, gps, tnt…).
+ *
+ * Esperado, a mano: sin vocal no hay sílaba ni núcleo → null, y la app lo dice.
+ * La «y» cuenta como vocal (suena /i/): rey → «-ey», muy → «-uy», hoy → «-oy», y la conjunción
+ * «y» sigue escandiéndose. Ninguna palabra del diccionario con vocal cambia de núcleo.
+ */
+test.describe('diccionario-rimas — sospecha: entrada con letras y sin vocales', () => {
+  test('motor: «prr», «psst», «mmm», «dvd» no se escanden', () => {
+    for (const w of ['prr', 'psst', 'mmm', 'dvd', 'SMS']) {
+      expect(escandirPalabra(w), `${w} no tiene núcleo vocálico`).toBeNull();
+    }
+  });
+
+  test('motor: la «y» cuenta como vocal — rey, muy, hoy, jersey y la conjunción «y»', () => {
+    expect(escandirPalabra('rey')?.nucleo).toBe('ey');
+    expect(escandirPalabra('muy')?.nucleo).toBe('uy');
+    expect(escandirPalabra('hoy')?.nucleo).toBe('oy');
+    expect(escandirPalabra('jersey')?.nucleo).toBe('ey');
+    expect(escandirPalabra('y')).not.toBeNull();
+  });
+
+  test('app: «prr» avisa de que no tiene vocal y no pinta resultado; «rey» vuelve a rimar', async ({ page }) => {
+    await abrir(page);
+    const aviso = page
+      .locator('[role="alert"]:not(#__next-route-announcer__)')
+      .filter({ hasText: 'ninguna vocal' });
+
+    await buscar(page, 'prr');
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('«prr» no tiene ninguna vocal');
+    await expect(resultado(page)).toHaveCount(0);
+    await expect(page.getByText('rima desde -prr')).toHaveCount(0);
+
+    await buscar(page, 'rey');
+    await expect(aviso).toHaveCount(0);
+    await expect(resultado(page)).toContainText('rima desde -ey');
+    const lista = await palabrasVisibles(page);
+    expect(lista, 'rey rima con ley').toContain('ley');
+  });
+
+  test('app: una sigla sin vocales («DVD») sugiere escribirla como suena', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'DVD');
+    const aviso = page
+      .locator('[role="alert"]:not(#__next-route-announcer__)')
+      .filter({ hasText: 'ninguna vocal' });
+    await expect(aviso).toContainText('«DVD» no tiene ninguna vocal');
+    await expect(aviso).toContainText('escríbela como suena');
+    await expect(resultado(page)).toHaveCount(0);
+  });
+});

@@ -311,6 +311,14 @@ export default function SelectorMascota() {
               <p className={styles.costeValor}>{ficha.esperanzaVida}</p>
             </div>
           </div>
+          {/* Las horquillas no salen de una encuesta: se dice, y se contrastan con la
+              media que midió la OCU (sospecha del Inspector, 24/09/2026, §1.quinquies) */}
+          <p className={styles.notaCostes}>
+            Horquillas orientativas para España (estimación de meskeIA, 2026): cambian mucho con la
+            ciudad, la raza y la clínica. Como contraste, la encuesta de la OCU de 2022 midió un gasto
+            medio de 1.131 € al año por perro (unos 94 € al mes) y de 986 € por gato (unos 82 €). Fuera
+            de España, tómalas solo como proporción entre especies.
+          </p>
 
           <div className={styles.prosContrasGrid}>
             <div className={styles.prosCard}>
@@ -346,7 +354,7 @@ export default function SelectorMascota() {
             <h3>El coste real de tener una mascota</h3>
             <p>Muchas personas subestiman el coste de mantener una mascota. Además del coste mensual visible (comida, arena, accesorios), hay gastos ocultos importantes: veterinario de urgencias, vacunas anuales, peluquería, guardería en vacaciones y posibles operaciones.</p>
             <div className={styles.warningBox}>
-              <strong>Coste veterinario de urgencia:</strong> una operación de urgencia en un perro o gato puede costar entre 500 y 4.000 € según el problema. Un seguro de salud para mascotas desde ~15-25 €/mes puede evitar una situación económica difícil.
+              <strong>Coste veterinario de urgencia:</strong> una operación de urgencia puede costar tanto como varios meses de manutención, y no es un caso raro: en la encuesta de la OCU de 2022, el 45 % de los dueños de perro y el 24 % de los de gato tuvieron que llevarlo a urgencias en el último año. Un seguro de salud para mascotas (su precio depende de la especie, la edad y la cobertura) u otra forma de prever ese gasto puede evitar una situación económica difícil.
             </div>
 
             <h3>Adopción vs compra</h3>

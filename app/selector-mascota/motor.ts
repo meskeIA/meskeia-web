@@ -95,7 +95,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     esperanzaVida: '10 – 14 años',
     descripcion: 'El equilibrio entre compañía, ejercicio y espacio. Versátil para ciudad y campo. Ideal para familias activas.',
     pros: ['Muy versátil', 'Ideal para familias con niños', 'Gran variedad de carácter', 'Adopción muy disponible'],
-    contras: ['Requiere ejercicio diario (30-60 min)', 'No apto para ausencias largas', 'Coste veterinario relevante', 'Necesita adiestramiento básico'],
+    contras: ['Requiere ejercicio a diario', 'No apto para ausencias largas', 'Coste veterinario relevante', 'Necesita adiestramiento básico'],
     tienePelo: true,
     adoptable: true,
   },
@@ -312,7 +312,7 @@ const RAZON_A_FAVOR: Record<number, Record<string, Frase>> = {
   },
   2: {
     siempre: (m, v) => `Casi siempre hay alguien en casa, y ${m} lo ${v('agradece', 'agradecen')}: no ${v('pasará', 'pasarán')} horas a solas.`,
-    pocas: (m, v) => `La casa se queda vacía 3 – 5 horas, un margen que ${m} ${v('tolera', 'toleran')} bien.`,
+    pocas: (m, v) => `La casa se queda vacía 3 – 5 horas: ${m} lo ${v('lleva', 'llevan')} mejor que otras opciones, aunque a un perro las guías de bienestar animal (RSPCA, PDSA) aconsejan no dejarlo solo más de cuatro horas seguidas.`,
     muchas: (m, v) => `La casa se queda vacía 6 – 10 horas: ${m} lo ${v('tolera', 'toleran')} mejor que un perro.`,
     viajes: (m, v) => `Viajas varios días seguidos: ${m} lo ${v('lleva', 'llevan')} mejor que otros animales, con un cuidador puntual o un sistema automático.`,
   },
@@ -508,11 +508,11 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   const consejos: string[] = [];
   consejos.push('🏥 Antes de decidir, visita una protectora o refugio: adoptar suele ser más económico y das hogar a un animal que lo necesita.');
   if (esPerro(mascota)) {
-    consejos.push('💉 Presupuesta seguro de salud para mascotas: una operación puede costar entre 500 y 3.000 €. Hay seguros desde 15 €/mes.');
+    consejos.push('💉 Prevé cómo afrontarías un gasto veterinario imprevisto, con un seguro de salud para mascotas o de otra forma: en la encuesta de la OCU (España, 2022), el 45 % de los dueños de perro tuvo que llevarlo a urgencias en el último año. El precio del seguro depende de la especie, la edad, la raza y lo que cubra: compara varias ofertas.');
     consejos.push('📋 Chip, vacunas y, si el perro está catalogado como potencialmente peligroso, licencia y seguro son gastos de los primeros meses. En España la esterilización del perro no es obligatoria por ley estatal, pero sí evitar que críe sin control.');
   }
   if (mascota === 'gato') {
-    consejos.push('✂️ La esterilización reduce problemas de salud y comportamiento: entre 100 y 250 € dependiendo del sexo y la clínica. En España es obligatoria antes de los 6 meses (Ley 7/2023, art. 26.i), salvo gatos inscritos como reproductores.');
+    consejos.push('✂️ La esterilización reduce problemas de salud y comportamiento. Su precio depende del sexo (en la hembra es una cirugía abdominal, más compleja que la castración del macho) y de la clínica: pide presupuesto. En España es obligatoria antes de los 6 meses (Ley 7/2023, art. 26.i), salvo gatos inscritos como reproductores.');
   }
   consejos.push('⏳ Una mascota es un compromiso de años. Asegúrate de tener plan B para vacaciones, enfermedad o cambios de vida.');
 

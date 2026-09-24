@@ -18,8 +18,8 @@ const FRECUENCIAS_PRESET: FrecuenciaPreset[] = [
   { nombre: 'La 432Hz', frecuencia: 432, descripcion: 'Afinación alternativa "natural"' },
   { nombre: 'La 442Hz', frecuencia: 442, descripcion: 'Orquestas europeas' },
   { nombre: 'La 443Hz', frecuencia: 443, descripcion: 'Algunas orquestas (Berlín)' },
-  { nombre: 'La 415Hz', frecuencia: 415, descripcion: 'Música barroca' },
-  { nombre: 'La 466Hz', frecuencia: 466, descripcion: 'Renacimiento (medio tono arriba)' },
+  { nombre: 'La 415Hz', frecuencia: 415, descripcion: 'Barroco · convención historicista' },
+  { nombre: 'La 466Hz', frecuencia: 466, descripcion: 'Chorton · convención historicista' },
 ];
 
 const NOTAS_ES = ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'];
@@ -400,17 +400,17 @@ export default function DiapasonPage() {
                 <td>+11,76 cents</td>
               </tr>
               <tr>
-                <td><strong>Barroco</strong></td>
+                <td><strong>Barroco (convención actual)</strong></td>
                 <td>415,0 Hz</td>
-                <td>S. XVII-XVIII / Europa</td>
-                <td>Grupos de música antigua</td>
+                <td>Convención de la interpretación historicista (s. XX), no un estándar de época</td>
+                <td>Grupos de música antigua, repertorio barroco</td>
                 <td>−101,27 cents (algo más de un semitono)</td>
               </tr>
               <tr>
-                <td><strong>Renacentista</strong></td>
+                <td><strong>Chorton (convención actual)</strong></td>
                 <td>466,0 Hz</td>
-                <td>S. XV-XVI / Europa</td>
-                <td>Música de época renacentista</td>
+                <td>Convención historicista, próxima al Chorton alemán y a la afinación de cornetas de los s. XVI-XVII</td>
+                <td>Grupos de música antigua: repertorio alemán del XVII-XVIII y parte del renacentista</td>
                 <td>+99,39 cents (casi un semitono arriba)</td>
               </tr>
               <tr>
@@ -443,7 +443,7 @@ export default function DiapasonPage() {
           </div>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">🎼</span> Interpretación barroca</h3>
-            <p>Para tocar con instrumentos de época (clavicémbalo, viola da gamba, flauta dulce barroca), selecciona 415 Hz. Así tu instrumento moderno sonará &quot;en tono&quot; con los instrumentos históricos.</p>
+            <p>Para tocar con un grupo de música antigua (clavicémbalo, viola da gamba, flauta dulce barroca), selecciona 415 Hz, la convención más extendida para el repertorio barroco. Pregunta antes: algunos grupos afinan a 392, 430 o 466 Hz según el repertorio.</p>
           </div>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">🎹</span> Profesor de música</h3>
@@ -487,7 +487,11 @@ export default function DiapasonPage() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Por qué el barroco usa 415 Hz y no otro valor?</h3>
-            <p>415 Hz equivale aproximadamente a La♭4 en afinación moderna: el La♭4 temperado está en 415,30 Hz, así que 415 Hz queda unos 101 cents por debajo de 440 Hz, algo más de un semitono. Se usa la cifra redonda por comodidad. Esta afinación está documentada en instrumentos originales de los siglos XVII-XVIII y es el estándar adoptado por los grupos de interpretación históricamente informada (HIP).</p>
+            <p>415 Hz equivale aproximadamente a La♭4 en afinación moderna: el La♭4 temperado está en 415,30 Hz, así que 415 Hz queda unos 101 cents por debajo de 440 Hz, algo más de un semitono. Es una <strong>convención del siglo XX</strong>, no el estándar de una época: en los siglos XVII-XVIII no había una afinación única, y lo que se sabe de ella sale de medir instrumentos y diapasones que se conservan, que van de unos 392 Hz en Francia a unos 465 Hz en Venecia (el diapasón atribuido a Händel está hacia 423 Hz). Según el organólogo Jeremy Montagu (<em>Why Differing Pitch Standards?</em>, 2019), los grupos de interpretación históricamente informada (HIP) eligieron 415 Hz sobre todo porque queda prácticamente un semitono por debajo de 440 Hz: así un clave afinado a 440 Hz podía transponer, o desplazar su teclado un semitono, para tocar con ellos. La historia detallada está en Bruce Haynes, <em>A History of Performing Pitch: The Story of &quot;A&quot;</em> (2002).</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>¿Era 466 Hz la afinación del Renacimiento?</h3>
+            <p>No hubo una afinación renacentista: variaba según la ciudad, la institución y el instrumento. 466 Hz, un semitono por encima de 440 Hz, es otra convención actual de la interpretación historicista. Se aproxima al <em>Chorton</em> o <em>Cornetton</em>, la afinación alta de órganos y cornetas en el ámbito alemán de los siglos XVII y XVIII, y a la de las cornetas y sacabuches de Venecia y otras ciudades italianas a finales del siglo XVI y en el XVII, en torno a 465 Hz. Por eso algunos grupos la usan para ese repertorio y para parte del renacentista, pero no es el &quot;La del Renacimiento&quot;.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Cómo afina un piano si el diapasón solo da el La?</h3>
@@ -501,7 +505,7 @@ export default function DiapasonPage() {
             <div className={styles.stepNumber}>1</div>
             <div className={styles.stepContent}>
               <h3>Elige la frecuencia de referencia</h3>
-              <p>Selecciona el estándar que uses: 440 Hz para música moderna, 442-443 Hz si tocas con orquesta europea, 415 Hz para música barroca.</p>
+              <p>Selecciona el estándar que uses: 440 Hz para música moderna, 442-443 Hz si tocas con orquesta europea, 415 Hz si tocas repertorio barroco con un grupo de música antigua.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -604,7 +608,7 @@ export default function DiapasonPage() {
             <div className={styles.infoCard}>
               <span className={styles.infoIcon} aria-hidden="true">🎼</span>
               <h4>Música barroca</h4>
-              <p>Los instrumentos de época se afinan a 415Hz, aproximadamente un semitono por debajo del estándar.</p>
+              <p>Los grupos de música antigua suelen afinar a 415 Hz, un semitono por debajo del estándar. Es una convención actual: en el barroco la afinación variaba según la ciudad y el instrumento.</p>
             </div>
           </div>
         </div>

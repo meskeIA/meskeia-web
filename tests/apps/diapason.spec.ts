@@ -267,3 +267,35 @@ test('hallazgos 1368-1369: botones con type, presets con aria-pressed y deslizad
   await expect(page.getByRole('slider', { name: 'Volumen' })).toHaveCount(1);
   await expect(page.getByRole('slider', { name: /Frecuencia en Hz/ })).toHaveCount(1);
 });
+
+/*
+ * SOSPECHA DEL INSPECTOR (24/09/2026), CONFIRMADA Y REPARADA el mismo día:
+ * el preset de 466 Hz se etiquetaba «Renacimiento (medio tono arriba)» y la tabla lo daba como
+ * «Renacentista · S. XV-XVI», como si hubiera habido un La renacentista. No lo hubo: la afinación
+ * variaba según ciudad, institución e instrumento. 466 Hz es una convención actual de la
+ * interpretación historicista, próxima al Chorton/Cornetton alemán (s. XVII-XVIII) y a la de las
+ * cornetas venecianas (~465 Hz). Lo mismo con 415 Hz, que se presentaba como «el estándar»
+ * documentado en los s. XVII-XVIII: es una convención del s. XX elegida por quedar un semitono
+ * bajo 440 Hz (J. Montagu, «Why Differing Pitch Standards?», 2019; B. Haynes, «A History of
+ * Performing Pitch», 2002).
+ */
+test('sospecha 466/415 Hz: se presentan como convenciones historicistas, no como estándares de época', async ({
+  page,
+}) => {
+  const p466 = page.getByRole('button', { name: /La 466Hz/ });
+  await expect(p466).toContainText('Chorton · convención historicista');
+  await expect(p466).not.toContainText('Renacimiento');
+  await expect(page.getByRole('button', { name: /La 415Hz/ })).toContainText('Barroco · convención historicista');
+
+  const texto = (await page.locator('body').textContent()) ?? '';
+  expect(texto).not.toContain('Renacentista');
+  expect(texto).not.toContain('S. XV-XVI / Europa');
+  expect(texto).not.toContain('es el estándar adoptado por los grupos');
+  expect(texto).toContain('No hubo una afinación renacentista');
+  expect(texto).toContain('convención del siglo XX');
+
+  // Los cents no cambian: 1200 · log2(466/440) = +99,39
+  expect(texto).toContain('+99,39 cents');
+  await p466.click();
+  await expect(p466).toHaveAttribute('aria-pressed', 'true');
+});

@@ -156,3 +156,6 @@
   .progresoRelleno { transition: none; }
   .btnStart, .opcionBtn, .btnSiguiente, .btnAnterior, .btnRepetir { transition: none; }
 }
+
+/* Nota de fuente bajo las horquillas de coste: pegada a la rejilla, que ya trae su margen */
+.notaCostes { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin: -1rem 0 1.75rem; }

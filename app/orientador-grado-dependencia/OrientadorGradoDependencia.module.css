@@ -172,7 +172,9 @@
 .btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  /* Tokens -boton: pensados para texto blanco encima (5,47:1 y 5,15:1 en ambos temas).
+     Con --primary/--secondary el extremo teal daba ~2,8:1 (sospecha del Inspector, 24/09/2026) */
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);

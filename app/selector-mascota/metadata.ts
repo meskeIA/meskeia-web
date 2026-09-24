@@ -69,7 +69,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber qué mascota te conviene según tu estilo de vida, vivienda, tiempo disponible y presupuesto. Perro, gato, pequeño mamífero, pez, pájaro o reptil.",
   url: "https://meskeia.com/selector-mascota/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Test de 10 preguntas sobre estilo de vida y situación',
+    'Recomendación de tipo de mascota y perfil concreto',
+    'Coste mensual orientativo de mantenimiento',
+    'La alergia y el presupuesto acotan la recomendación',
+    'Empates entre candidatas explicados',
+    'Pros y contras adaptados a tus respuestas',
+  ],
 });
 
 export const faqJsonLd = {
@@ -89,7 +96,7 @@ export const faqJsonLd = {
       name: '¿Qué mascota es más fácil de cuidar para alguien que trabaja muchas horas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los peces son la opción más autónoma: con una alimentación diaria y limpieza semanal del acuario es suficiente. Los gatos toleran bien la soledad durante la jornada laboral. Los reptiles y los roedores también requieren poca atención diaria. Los perros, en cambio, necesitan entre 2 y 4 salidas al día y pueden desarrollar ansiedad si se quedan solos más de 6-8 horas seguidas.',
+        text: 'Los peces son la opción más autónoma: con una alimentación diaria y limpieza semanal del acuario es suficiente. Los gatos toleran bien la soledad durante la jornada laboral. Los reptiles y los roedores también requieren poca atención diaria. Los perros, en cambio, necesitan salir y hacer ejercicio a diario, y asociaciones británicas de bienestar animal como la RSPCA y la PDSA recomiendan no dejarlos solos de forma habitual más de cuatro horas seguidas: con jornadas largas fuera hace falta un paseador, una guardería canina o alguien que los atienda.',
       },
     },
     {
@@ -97,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta mantener una mascota al mes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste varía mucho según la especie y el tamaño. Como referencia en España: un perro, entre 80 y 280 € mensuales según su tamaño (alimentación, veterinario, peluquería, seguro); un gato, entre 50 y 120 €; un pequeño mamífero como un hámster o una cobaya, entre 15 y 40 €; y los peces, una vez montado el acuario, entre 10 y 30 €. A estos importes hay que sumar los gastos veterinarios imprevistos.',
+        text: 'El coste varía mucho según la especie, el tamaño, la ciudad y la clínica. Como referencia en España, la encuesta de la OCU de 2022 midió un gasto medio de 1.131 € al año por perro (unos 94 € al mes, entre alimentación, higiene y veterinario) y de 986 € por gato (unos 82 € al mes). Un perro grande cuesta más que uno pequeño, y los pequeños mamíferos, los peces y los pájaros de jaula cuestan bastante menos una vez hecha la instalación. A estos importes hay que sumar los gastos veterinarios imprevistos. En otros países, compáralos con los precios locales.',
       },
     },
     {
