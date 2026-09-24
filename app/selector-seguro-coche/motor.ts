@@ -275,28 +275,44 @@ export const PREGUNTAS: Pregunta[] = [
   },
 ];
 
+/*
+ * LAS FICHAS DESCRIBEN LA MODALIDAD, NO A QUIÉN LE VA BIEN (hallazgos 1475, 1476, 1482-1484).
+ * Antes cada descripción decía para quién era «ideal» («vehículos antiguos de bajo valor»,
+ * «coches de valor medio», «vehículos nuevos, de alto valor»), y como la ficha es fija salía
+ * igual a quien acababa de declarar lo contrario: un coche de menos de dos años y más de
+ * 25.000 € recibía el básico «ideal para vehículos antiguos de bajo valor». Lo que depende de
+ * lo declarado va aparte, en las NOTAS de `calcularResultado`.
+ *
+ * Fuera también lo que la póliza no garantiza por nombre: «Conductor designado sin recargo»
+ * (a quien declara un conductor joven frecuente), «Cualquier daño queda cubierto» (la póliza
+ * tiene límites y exclusiones) y las cifras sin fuente de la franquicia.
+ *
+ * La responsabilidad civil obligatoria cubre en todo el Espacio Económico Europeo con una sola
+ * prima (RDL 8/2004, texto refundido de la LRCSCVM, art. 4.1, BOE-A-2004-18911), así que va en
+ * la ficha de terceros: antes solo el todo riesgo decía cubrir «en el extranjero» (hallazgo 1482).
+ */
 export const RESULTADOS: Record<Modalidad, ResultadoInfo> = {
   terceros_basico: {
     titulo: 'Seguro a Terceros Básico',
     descripcion:
-      'La cobertura mínima legal. Ideal para vehículos antiguos de bajo valor donde el coste del seguro podría superar el valor del coche.',
+      'La cobertura mínima que exige la ley en España: la responsabilidad civil obligatoria, que paga los daños que causes a otras personas y a sus bienes. No cubre los daños de tu propio coche.',
     icono: '🛡️',
     coberturas: [
-      'Responsabilidad civil obligatoria',
-      'Daños a terceros (personas y bienes)',
+      'Responsabilidad civil obligatoria: daños a personas y a bienes de terceros, hasta los límites legales',
+      'Esa misma cobertura en todo el Espacio Económico Europeo (EEE), con la misma prima',
       'Asistencia en viaje básica (según compañía)',
-      'Defensa jurídica básica',
+      'Defensa jurídica básica (según compañía)',
     ],
     advertencia:
-      'No cubre daños propios del vehículo. Si sufres un accidente sin culpable identificado, correrás con el gasto de reparación.',
+      'No cubre los daños de tu coche: si el accidente es culpa tuya o no se identifica al responsable, la reparación la pagas tú.',
   },
   terceros_ampliado: {
     titulo: 'Seguro a Terceros Ampliado',
     descripcion:
-      'Amplía la cobertura básica con protección ante robos, incendios, fenómenos naturales y daños en lunas. Una opción equilibrada para coches de valor medio.',
+      'Suma a la responsabilidad civil obligatoria la protección de tu propio coche ante robo, incendio, rotura de lunas y fenómenos naturales, pero no ante los daños por accidente.',
     icono: '🛡️',
     coberturas: [
-      'Responsabilidad civil obligatoria',
+      'Todo lo del terceros básico (responsabilidad civil válida en el EEE)',
       'Robo e intento de robo',
       'Incendio y explosión',
       'Rotura de lunas (parabrisas, luneta, laterales)',
@@ -309,33 +325,30 @@ export const RESULTADOS: Record<Modalidad, ResultadoInfo> = {
   todo_riesgo_franquicia: {
     titulo: 'Todo Riesgo con Franquicia',
     descripcion:
-      'Cobertura total con una parte del coste de reparación a tu cargo (franquicia). Protección completa a un precio más asequible.',
+      'Cubre también los daños de tu coche en un accidente, aunque sea culpa tuya: en cada siniestro de daños propios pagas tú la franquicia pactada y la compañía, el resto.',
     icono: '🔰',
     coberturas: [
       'Todo lo incluido en terceros ampliado',
       'Daños propios por accidente (independientemente de la culpa)',
       'Daños en aparcamiento (golpes sin parte contrario)',
       'Actos vandálicos',
-      'Cobertura en el extranjero (zona UE)',
     ],
     advertencia:
-      'En cada siniestro deberás abonar la franquicia pactada (habitualmente entre 150 € y 600 €). Compara el importe de la franquicia antes de contratar.',
+      'En cada siniestro con daños propios pagas la franquicia pactada. Su importe cambia mucho de una póliza a otra: compáralo antes de contratar, junto con la prima.',
   },
   todo_riesgo_sin_franquicia: {
     titulo: 'Todo Riesgo sin Franquicia',
     descripcion:
-      'La cobertura más completa del mercado. Cualquier daño queda cubierto sin coste adicional. Recomendado para vehículos nuevos, de alto valor o conductores noveles.',
+      'La modalidad más amplia: cubre los daños de tu coche en un accidente sin franquicia a tu cargo, dentro de los límites y exclusiones que fije la póliza.',
     icono: '⭐',
     coberturas: [
-      'Cobertura total de daños propios y a terceros',
-      'Sin coste adicional por siniestro (0 € franquicia)',
-      'Robo, incendio, lunas y fenómenos naturales',
-      'Conductor designado sin recargo',
-      'Vehículo de sustitución incluido (según póliza)',
-      'Cobertura en toda Europa',
+      'Todo lo incluido en terceros ampliado',
+      'Daños propios por accidente, sin franquicia a tu cargo',
+      'Daños en aparcamiento y actos vandálicos',
+      'Vehículo de sustitución (según póliza)',
     ],
     advertencia:
-      'Es la opción más cara del mercado. Valora si la prima anual compensa respecto al valor real del vehículo.',
+      'Es la modalidad más cara. Valora si la prima anual compensa respecto al valor real del vehículo.',
   },
 };
 
@@ -367,6 +380,35 @@ const DESEMPATE: { indice: number; motivo: string }[] = [
   { indice: 1, motivo: 'encaja mejor con el valor de tu coche' },
 ];
 
+/**
+ * LO DECLARADO QUE CHOCA CON LA RECOMENDACIÓN: NOTAS, NO FILTROS (hallazgos 1473-1477).
+ *
+ * La familia de los selectores filtra cuando el usuario declara una imposibilidad (un
+ * presupuesto máximo, una alergia). Aquí ninguna respuesta lo es, y por eso cada una se DICE en
+ * pantalla en vez de apartar modalidades:
+ *
+ *  · Financiación. La ley solo obliga a la responsabilidad civil (RDL 8/2004, art. 2.1); el
+ *    todo riesgo, si acaso, lo exige el CONTRATO de préstamo o leasing, y no todos. Filtrar
+ *    repondría el «todo riesgo obligatorio» que la guía decía y era falso (hallazgo 1478). Con
+ *    una recomendación a terceros se avisa de revisar el contrato y se nombra el todo riesgo
+ *    que mejor encaja (1473).
+ *  · Valor. Que el coche valga poco o mucho no hace imposible ninguna modalidad: cambia lo que
+ *    compensa. Como regla, el seguro indemniza según el valor del coche justo antes del
+ *    siniestro (Ley 50/1980, art. 26), así que con menos de 3.000 € y un todo riesgo se avisa y
+ *    se nombra el terceros que mejor encaja (1474); con un coche nuevo o de más de 25.000 € y
+ *    un terceros, se recuerda que la reparación propia corre de su cuenta (1475).
+ *  · Uso profesional y conductores menores de 25 años. No cambian la modalidad, cambian lo que
+ *    hay que DECLARAR: si el riesgo se declaró inexacto, la prestación se reduce en proporción
+ *    a la prima (Ley 50/1980, art. 10; art. 11 si cambia después de contratar) (1476, 1477).
+ */
+export type TipoNota = 'financiacion' | 'valor-bajo' | 'valor-alto' | 'uso-profesional' | 'conductor-joven';
+
+export interface Nota {
+  tipo: TipoNota;
+  /** La modalidad que la nota propone comparar, cuando la hay. */
+  alternativa?: Modalidad;
+}
+
 export interface Resultado {
   modalidad: Modalidad;
   puntos: Record<Modalidad, number>;
@@ -374,6 +416,68 @@ export interface Resultado {
   empatadas: Modalidad[];
   /** Frase que explica cómo se ha deshecho el empate; vacía si no lo hay. */
   criterioDesempate: string;
+  /** Lo declarado que hay que decir junto a la recomendación, en este orden. */
+  notas: Nota[];
+}
+
+/** Índices de las respuestas que disparan una nota (posición de la opción en su pregunta). */
+export const RESPUESTA = {
+  antiguedadMenos2: [0, 0],
+  valorMas25000: [1, 0],
+  valorMenos3000: [1, 3],
+  financiado: [2, 0],
+  usoProfesional: [5, 2],
+  jovenFrecuente: [9, 0],
+  jovenEsporadico: [9, 1],
+} as const;
+
+const ES_TODO_RIESGO: Record<Modalidad, boolean> = {
+  terceros_basico: false,
+  terceros_ampliado: false,
+  todo_riesgo_franquicia: true,
+  todo_riesgo_sin_franquicia: true,
+};
+export const esTodoRiesgo = (k: Modalidad): boolean => ES_TODO_RIESGO[k];
+
+/**
+ * La modalidad a la que más empuja cada opción de una pregunta (la de mayor peso). Es lo que
+ * rotulan la guía y el FAQPage: antes la guía decía «3 a 7 años → todo riesgo con franquicia»,
+ * con tramos que no eran los de la pregunta, y el FAQ, «terceros ampliado» para más de diez
+ * años donde la guía decía «básico» (hallazgo 1480). Ahora los dos leen los pesos del test.
+ */
+export function favoritaDeOpcion(indicePregunta: number, indiceOpcion: number): Modalidad {
+  const pesos = PREGUNTAS[indicePregunta].opciones[indiceOpcion].pesos;
+  return [...CLAVES].sort((a, b) => (pesos[b] ?? 0) - (pesos[a] ?? 0) || ORDEN_PRIMA[a] - ORDEN_PRIMA[b])[0];
+}
+
+/** La opción sin su aclaración entre paréntesis: «Menos de 2 años (vehículo nuevo…)» → «Menos de 2 años». */
+export const textoCorto = (texto: string): string => texto.replace(/\s*\(.*\)\s*$/, '');
+
+/** Nombre de la modalidad dentro de una frase, sin artículo. */
+export const NOMBRE_CORTO: Record<Modalidad, string> = {
+  terceros_basico: 'terceros básico',
+  terceros_ampliado: 'terceros ampliado',
+  todo_riesgo_franquicia: 'todo riesgo con franquicia',
+  todo_riesgo_sin_franquicia: 'todo riesgo sin franquicia',
+};
+
+/** Pregunta 1 (antigüedad) y pregunta 2 (valor), las dos que rotulan la guía y el FAQPage. */
+export const PREGUNTA_ANTIGUEDAD = 0;
+export const PREGUNTA_VALOR = 1;
+
+/** Cada opción de una pregunta con la modalidad a la que más empuja, en el orden del test. */
+export function orientacionDe(indicePregunta: number): { opcion: string; modalidad: Modalidad }[] {
+  return PREGUNTAS[indicePregunta].opciones.map((o, i) => ({
+    opcion: textoCorto(o.texto),
+    modalidad: favoritaDeOpcion(indicePregunta, i),
+  }));
+}
+
+/** La misma orientación en una frase: «menos de 2 años → todo riesgo sin franquicia; …». */
+export function orientacionEnFrase(indicePregunta: number): string {
+  return orientacionDe(indicePregunta)
+    .map(({ opcion, modalidad }) => `${opcion.charAt(0).toLowerCase()}${opcion.slice(1)} → ${NOMBRE_CORTO[modalidad]}`)
+    .join('; ');
 }
 
 /** `respuestas[i]` es el ÍNDICE de la opción elegida en la pregunta i. */
@@ -411,5 +515,19 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
     criterioDesempate = `se muestra primero ${CON_ARTICULO[modalidad]} porque ${usados.join(' y, a igualdad, ')}`;
   }
 
-  return { modalidad, puntos, empatadas, criterioDesempate };
+  // La alternativa que se nombra es la mejor del otro grupo con el MISMO orden que la
+  // recomendación (puntos y, a igualdad, los mismos criterios de desempate).
+  const eligio = ([p, o]: readonly [number, number]) => respuestas[p] === o;
+  const mejor = (grupoTodoRiesgo: boolean) => orden.find((k) => esTodoRiesgo(k) === grupoTodoRiesgo);
+  const notas: Nota[] = [];
+  const recomiendaTR = esTodoRiesgo(modalidad);
+  if (eligio(RESPUESTA.financiado) && !recomiendaTR) notas.push({ tipo: 'financiacion', alternativa: mejor(true) });
+  if (eligio(RESPUESTA.valorMenos3000) && recomiendaTR) notas.push({ tipo: 'valor-bajo', alternativa: mejor(false) });
+  if ((eligio(RESPUESTA.valorMas25000) || eligio(RESPUESTA.antiguedadMenos2)) && !recomiendaTR) {
+    notas.push({ tipo: 'valor-alto', alternativa: mejor(true) });
+  }
+  if (eligio(RESPUESTA.usoProfesional)) notas.push({ tipo: 'uso-profesional' });
+  if (eligio(RESPUESTA.jovenFrecuente) || eligio(RESPUESTA.jovenEsporadico)) notas.push({ tipo: 'conductor-joven' });
+
+  return { modalidad, puntos, empatadas, criterioDesempate, notas };
 }

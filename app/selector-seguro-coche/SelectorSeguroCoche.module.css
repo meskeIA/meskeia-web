@@ -1,12 +1,10 @@
 /* ===================================================
    Selector de Seguro de Coche — meskeIA
-   Paleta: #2E86AB (primary), #48A9A6 (secondary)
+   Los colores de marca salen de globals.css (con su variante oscura): el módulo los fijaba en
+   .container y el azul claro seguía en el tema oscuro (hallazgo 1486).
    =================================================== */
 
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
-  --accent: #7FB3D3;
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -144,10 +142,12 @@
   border-color: var(--primary);
 }
 
+/* Texto de marca pequeño sobre el azul pálido: --primary-texto (4,89:1), no --primary (3,67:1
+   medido; hallazgo 1486). */
 .opcion.seleccionada {
   border-color: var(--primary);
   background: #e8f4fb;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -177,13 +177,14 @@
   gap: var(--spacing-md);
 }
 
+/* Blanco sobre --primary-boton (5,47:1 en los dos temas), no sobre --primary (4,11:1; hallazgo 1486). */
 .btnPrimary {
   padding: 0.75rem 1.75rem;
   font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -219,7 +220,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:focus-visible {
@@ -242,7 +243,7 @@
 
 .btnReiniciar:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnReiniciar:focus-visible {
@@ -259,8 +260,10 @@
   margin-bottom: var(--spacing-xl);
 }
 
+/* El mismo --hero-bg que el hero de la intro (8,33:1 con blanco); el degradado a teal dejaba
+   el subtítulo en 2,65:1 (hallazgo 1487, de familia). */
 .resultadoCard {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   border-radius: var(--radius-large);
   padding: var(--spacing-xl);
   color: white;
@@ -277,6 +280,11 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 var(--spacing-sm);
+}
+
+/* Recibe el foco al mostrar el resultado (tabIndex=-1): sin anillo, porque no es un control. */
+.resultadoTitulo:focus {
+  outline: none;
 }
 
 .resultadoSubtitulo {
@@ -394,4 +402,23 @@
 
 [data-theme='dark'] .avisoEmpate {
   background: rgba(63, 165, 209, 0.12);
+}
+
+/* Lo declarado que choca con la recomendación (financiación, valor, uso, conductores jóvenes):
+   hallazgos 1473-1477. */
+.avisoNota {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #b7791f;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fff8e6;
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoNota {
+  border-color: #d69e2e;
+  background: #2a2200;
 }

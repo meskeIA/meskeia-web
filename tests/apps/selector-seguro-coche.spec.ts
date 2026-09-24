@@ -144,7 +144,8 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
 // Los recorridos llevan las respuestas LITERALES y la suma hecha a mano con los pesos de
 // motor.ts, en el orden (básico, ampliado, TR con franquicia, TR sin franquicia). Los recuentos
 // de los comentarios salen de enumerar las 93.312 combinaciones con el motor real.
-// Cada hallazgo abierto va como test.fail(): pasa hoy y se pone rojo cuando se repare.
+// Los 15 hallazgos (1473-1487) se repararon el mismo día: sus test.fail() pasaron a exigir la
+// reparación (al final del describe).
 // Lo que ya cubren los cuatro tests de arriba (radios, barra, el empate del coche nuevo y el
 // barrido de empates) no se repite aquí.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -329,183 +330,287 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, fichas fijas
     }
   });
 
-  // ── Hallazgos abiertos ──────────────────────────────────────────────────────
+  test('tema oscuro: la nota de lo declarado, «Siguiente» y el hero del resultado también pasan', async ({ page }) => {
+    // Medido tras la reparación del 24/09/2026 (hallazgos 1486 y 1487 en oscuro).
+    await abrirTest(page);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('[class*="container"]').first()).toHaveCSS('background-color', 'rgb(26, 26, 26)');
+    await page.locator('[role="radio"]').nth(1).click();
+    // --primary-boton es el mismo #26718F en los dos temas.
+    await expect(page.locator('[class*="btnPrimary"]')).toHaveCSS('background-color', 'rgb(38, 113, 143)');
+    await expect(page.locator('[class*="btnPrimary"]')).toHaveCSS('opacity', '1'); // deja de estar deshabilitado
+    expect(await contraste(page, '[class*="btnPrimary"]'), 'Siguiente').toBeGreaterThanOrEqual(4.5);
+    expect(await contraste(page, '[role="radio"][aria-checked="true"] [class*="opcionTexto"]'), 'opción marcada').toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('button', { name: 'Ir a la siguiente pregunta' }).click();
+    for (let i = 1; i < FINANCIADO_NUEVO.length; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(FINANCIADO_NUEVO[i]).click();
+      await page.getByRole('button', { name: i === FINANCIADO_NUEVO.length - 1 ? 'Ver resultado' : 'Ir a la siguiente pregunta' }).click();
+    }
+    await titulo(page).waitFor();
+    expect(await contraste(page, '[class*="avisoNota"]'), 'nota').toBeGreaterThanOrEqual(4.5);
+    expect(await contraste(page, '[class*="resultadoTitulo"]'), 'título del resultado').toBeGreaterThanOrEqual(4.5);
+    expect(await contraste(page, '[class*="resultadoSubtitulo"]'), 'subtítulo del resultado').toBeGreaterThanOrEqual(4.5);
+  });
 
-  test('HALLAZGO financiado: con financiación activa recomienda un seguro a terceros sin mencionar la financiación', async ({ page }) => {
-    // HALLAZGO abierto: la propia guía dice «Si el coche es nuevo o financiado: todo riesgo» y
-    // «el contrato de leasing o préstamo suele exigir todo riesgo», pero «Sí, sigue con
-    // financiación activa» solo suma puntos (TRsf +3, TRf +1). Barrido: 7.209 de los 46.656
-    // perfiles financiados acaban en terceros (2.986 básico, 4.223 ampliado; 1.989 por empate).
-    // Esperado (referencia: filtrar o avisar): todo riesgo —en FINANCIADO, TRf y TRsf empatan a 3,
-    // la pregunta 9 no los separa y el valor sí (TRf 1, TRsf 0) → TR con franquicia— o un aviso
-    // que nombre la financiación. Obtenido: Terceros Ampliado (12), y en FINANCIADO_NUEVO
-    // Terceros Básico por empate con la ficha «Ideal para vehículos antiguos de bajo valor».
-    test.fail();
+  // ── Hallazgos reparados el 24/09/2026 ───────────────────────────────────────
+  // Eran test.fail() que documentaban el defecto; ahora exigen la reparación. Los textos
+  // esperados se escriben enteros, y las modalidades que se nombran salen de la suma a mano de
+  // los comentarios de cada perfil (arriba), no del motor.
+
+  /** Recorre las 93.312 combinaciones con el motor real. */
+  function barrer(visita: (r: readonly number[]) => void): void {
+    const r: number[] = [];
+    const rec = (i: number): void => {
+      if (i === PREGUNTAS.length) { visita(r); return; }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) { r[i] = k; rec(i + 1); }
+    };
+    rec(0);
+  }
+
+  const nota = (page: Page, tipo: string) => page.locator(`[data-nota="${tipo}"]`);
+  /** El texto de la nota sin el icono decorativo (⚠️, aria-hidden) que la encabeza. */
+  const textoDeNota = async (page: Page, tipo: string): Promise<string> =>
+    (await nota(page, tipo).innerText()).replace(/^⚠️\s*/, '');
+
+  test('1473 financiado: con una recomendación a terceros se avisa del contrato y se nombra el todo riesgo que mejor encaja', async ({ page }) => {
+    // Por qué nota y no filtro: la ley solo obliga a la RC (RDL 8/2004, art. 2.1, BOE-A-2004-18911);
+    // el todo riesgo lo exige, si acaso, el contrato. Filtrar repondría el «todo riesgo
+    // obligatorio» del hallazgo 1478. La recomendación por puntos no cambia.
+    // FINANCIADO: TRf 3 y TRsf 3 empatan; la pregunta 9 («Sí, sin problemas») no los separa y el
+    // valor (3.000-10.000 €: TRf 1, TRsf 0) deja delante el todo riesgo con franquicia.
     await abrirTest(page);
     await responder(page, FINANCIADO);
-    expect(await zonaResultado(page).innerText()).toMatch(/Todo Riesgo|[Ff]inanci/);
+    await expect(titulo(page)).toHaveText('Seguro a Terceros Ampliado');
+    expect(await textoDeNota(page, 'financiacion')).toBe(
+      'Has dicho que el coche sigue financiado. La ley solo obliga a la responsabilidad civil, pero tu contrato de préstamo o leasing puede exigir un seguro a todo riesgo: revísalo antes de contratar. Si lo exige, la opción que mejor encaja con tus respuestas es el todo riesgo con franquicia.',
+    );
+    // FINANCIADO_NUEVO: básico y TRsf empatan a 9 (gana el básico por la pregunta 9); el todo
+    // riesgo que mejor encaja es el sin franquicia (9 frente a 1).
     await abrirTest(page);
     await responder(page, FINANCIADO_NUEVO);
-    expect(await zonaResultado(page).innerText()).toMatch(/Todo Riesgo|[Ff]inanci/);
+    await expect(titulo(page)).toHaveText('Seguro a Terceros Básico');
+    expect(await textoDeNota(page, 'financiacion')).toContain('la opción que mejor encaja con tus respuestas es el todo riesgo sin franquicia.');
+
+    // Barrido: los 7.209 financiados que acaban en terceros (el recuento del acta) llevan TODOS
+    // la nota, con un todo riesgo como alternativa; ninguno que acabe en todo riesgo la lleva.
+    let enTerceros = 0;
+    const fallos: string[] = [];
+    barrer((r) => {
+      if (r[2] !== 0) return;
+      const res = calcularResultado(r);
+      const n = res.notas.find((x) => x.tipo === 'financiacion');
+      const tr = res.modalidad.startsWith('todo_riesgo');
+      if (!tr) enTerceros++;
+      if (!tr && !(n && n.alternativa?.startsWith('todo_riesgo'))) fallos.push(JSON.stringify(r));
+      if (tr && n) fallos.push(`${JSON.stringify(r)} con nota sobrante`);
+    });
+    expect(fallos.slice(0, 5)).toEqual([]);
+    expect(enTerceros).toBe(7_209);
   });
 
-  test('HALLAZGO valor: un coche de más de 10 años y menos de 3.000 € recibe todo riesgo sin que se nombre el valor', async ({ page }) => {
-    // HALLAZGO abierto: la ficha de básico («Ideal para vehículos antiguos de bajo valor donde el
-    // coste del seguro podría superar el valor del coche»), la guía («Más de 12 años → terceros
-    // básico») y el FAQPage («El todo riesgo suele compensar cuando el valor del vehículo supera
-    // los 8.000-10.000 €») dicen una cosa y el recuento otra. Barrido: 6.969 de los 11.664
-    // perfiles SIN financiar con «Menos de 3.000 €» acaban en todo riesgo (5.657 con franquicia,
-    // cuya ficha no dice nada del valor; 1.312 sin franquicia, con la advertencia genérica).
-    // Esperado: terceros (básico 10 es el segundo) o un aviso que nombre el valor declarado.
-    // Obtenido: Todo Riesgo con Franquicia (11).
-    test.fail();
+  test('1474 valor: con menos de 3.000 € y un todo riesgo se nombra el valor y el terceros que mejor encaja', async ({ page }) => {
+    // Como regla, el seguro indemniza según el valor del coche justo antes del siniestro (Ley
+    // 50/1980, art. 26, BOE-A-1980-22501). VIEJO_BARATO: TRf 11 frente a básico 10, que es el
+    // terceros mejor puntuado (ampliado 6).
     await abrirTest(page);
     await responder(page, VIEJO_BARATO);
-    expect(await zonaResultado(page).innerText()).toMatch(/Terceros|valor|3\.000/);
+    await expect(titulo(page)).toHaveText('Todo Riesgo con Franquicia');
+    expect(await textoDeNota(page, 'valor-bajo')).toBe(
+      'Has dicho que el coche vale «Menos de 3.000 €». Como regla, el seguro indemniza según el valor que tenía el coche justo antes del siniestro (Ley 50/1980 de Contrato de Seguro, art. 26), así que la prima de un todo riesgo puede acercarse a lo máximo que llegaría a pagarte. Pide también precio para el seguro a terceros básico, la modalidad a terceros que mejor encaja con tus respuestas.',
+    );
+    // Barrido: los 6.969 perfiles SIN financiar del acta, y todos los demás de menos de 3.000 €
+    // que acaban en todo riesgo, llevan la nota con un terceros como alternativa.
+    let sinFinanciar = 0;
+    const fallos: string[] = [];
+    barrer((r) => {
+      if (r[1] !== 3) return;
+      const res = calcularResultado(r);
+      if (!res.modalidad.startsWith('todo_riesgo')) return;
+      if (r[2] === 1) sinFinanciar++;
+      const n = res.notas.find((x) => x.tipo === 'valor-bajo');
+      if (!(n && n.alternativa?.startsWith('terceros'))) fallos.push(JSON.stringify(r));
+    });
+    expect(fallos.slice(0, 5)).toEqual([]);
+    expect(sinFinanciar).toBe(6_969);
   });
 
-  test('HALLAZGO ficha fija: a un coche de menos de 2 años y más de 25.000 € le dice «ideal para vehículos antiguos de bajo valor»', async ({ page }) => {
-    // HALLAZGO abierto: la descripción de cada modalidad es fija. Barrido: 2.138 perfiles con
-    // «Menos de 2 años» o «Más de 25.000 €» reciben el básico con esa frase; 2.414 con «Más de
-    // 25.000 €» reciben el ampliado con «Una opción equilibrada para coches de valor medio».
-    test.fail();
+  test('1475 ficha fija: un coche de menos de 2 años y más de 25.000 € ya no lee «ideal para vehículos antiguos de bajo valor»', async ({ page }) => {
+    // Las fichas describen la modalidad, no a quién le va bien; lo que depende de lo declarado va
+    // en la nota. NUEVO_CARO_BASICO: básico 10; el todo riesgo mejor puntuado es el sin
+    // franquicia (6 frente a 1).
     await abrirTest(page);
     await responder(page, NUEVO_CARO_BASICO);
     await expect(titulo(page)).toHaveText('Seguro a Terceros Básico');
-    expect(await page.locator('[class*="resultadoSubtitulo"]').innerText()).not.toContain('Ideal para vehículos antiguos de bajo valor');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText(
+      'La cobertura mínima que exige la ley en España: la responsabilidad civil obligatoria, que paga los daños que causes a otras personas y a sus bienes. No cubre los daños de tu propio coche.',
+    );
+    expect(await textoDeNota(page, 'valor-alto')).toBe(
+      'Has dicho que el coche tiene «Menos de 2 años (vehículo nuevo o casi nuevo)» y vale «Más de 25.000 €». Con un seguro a terceros, si tienes un accidente del que eres responsable, la reparación de tu coche la pagas tú. Si no podrías asumirla, compara también el todo riesgo sin franquicia, el todo riesgo que mejor encaja con tus respuestas.',
+    );
+    // Ninguna ficha dice ya para quién es «ideal»: son las mismas en los 93.312 perfiles.
+    const fichas = JSON.stringify(RESULTADOS);
+    expect(fichas).not.toMatch(/[Ii]deal para|valor medio|Recomendado para/);
   });
 
-  test('HALLAZGO conductor joven: a quien declara un conductor joven frecuente le promete «Conductor designado sin recargo»', async ({ page }) => {
-    // HALLAZGO abierto: la guía dice «Los conductores menores de 25 años pagan primas más
-    // elevadas» y el FAQPage que los noveles pagan más «en cualquier modalidad». Barrido: 12.129
-    // perfiles con «Sí, conductor/a joven o novel frecuente» reciben esa ficha.
-    test.fail();
+  test('1476 conductor joven: sin «Conductor designado sin recargo», y con el recordatorio de declararlo', async ({ page }) => {
+    // JOVEN_FRECUENTE: TRsf 14. Declarar al conductor: Ley 50/1980, arts. 10 (al contratar) y 11
+    // (si cambia después).
     await abrirTest(page);
     await responder(page, JOVEN_FRECUENTE);
     await expect(titulo(page)).toHaveText('Todo Riesgo sin Franquicia');
-    expect(await page.locator('[class*="coberturaItem"]').allInnerTexts()).not.toContain('Conductor designado sin recargo');
+    expect(await page.locator('[class*="coberturaItem"]').allInnerTexts()).toEqual([
+      'Todo lo incluido en terceros ampliado',
+      'Daños propios por accidente, sin franquicia a tu cargo',
+      'Daños en aparcamiento y actos vandálicos',
+      'Vehículo de sustitución (según póliza)',
+    ]);
+    expect(await textoDeNota(page, 'conductor-joven')).toBe(
+      'Has dicho que conducen el coche menores de 25 años («Sí, conductor/a joven o novel frecuente»): decláralos en la póliza tal como lo usan, como conductores habituales u ocasionales. Si no constan, o constan como ocasionales siendo habituales, en un siniestro la indemnización puede reducirse (Ley 50/1980 de Contrato de Seguro, arts. 10 y 11).',
+    );
+    // Barrido: los 62.208 perfiles con un menor de 25 (frecuente o esporádico) llevan la nota.
+    let conJoven = 0;
+    let sinNota = 0;
+    barrer((r) => {
+      if (r[9] > 1) return;
+      conJoven++;
+      if (!calcularResultado(r).notas.some((x) => x.tipo === 'conductor-joven')) sinNota++;
+    });
+    expect({ conJoven, sinNota }).toEqual({ conJoven: 62_208, sinNota: 0 });
   });
 
-  test('HALLAZGO uso profesional: el resultado no dice nada de un uso que hay que declarar en la póliza', async ({ page }) => {
-    // HALLAZGO abierto: «Uso profesional o comercial intensivo» solo suma puntos; en los 23.328
-    // perfiles que lo eligen, la pantalla —y la guía— no dicen que el uso se declara a la
-    // aseguradora (art. 10 de la Ley 50/1980: si el riesgo se declaró inexacto, la prestación se
-    // reduce en proporción a la prima). Esperado: una mención al uso declarado. Obtenido: la
-    // ficha de terceros ampliado, idéntica a la del uso particular.
-    test.fail();
+  test('1477 uso profesional: el resultado dice que ese uso se declara en la póliza', async ({ page }) => {
+    // PROFESIONAL: ampliado 10 frente a TRf 9. Ley 50/1980, art. 10: declarado inexacto, la
+    // prestación se reduce en proporción a la prima.
     await abrirTest(page);
     await responder(page, PROFESIONAL);
     await expect(titulo(page)).toHaveText('Seguro a Terceros Ampliado');
-    expect(await zonaResultado(page).innerText()).toMatch(/profesional|comercial|declar/i);
+    expect(await textoDeNota(page, 'uso-profesional')).toBe(
+      'Has elegido «Uso profesional o comercial intensivo»: declara ese uso al contratar. Hay que declarar a la aseguradora todo lo que influya en el riesgo, y si se declaró de forma inexacta, en un siniestro la indemnización se reduce en proporción a la prima que habría correspondido (Ley 50/1980 de Contrato de Seguro, art. 10).',
+    );
+    let profesionales = 0;
+    let sinNota = 0;
+    barrer((r) => {
+      if (r[5] !== 2) return;
+      profesionales++;
+      if (!calcularResultado(r).notas.some((x) => x.tipo === 'uso-profesional')) sinNota++;
+    });
+    expect({ profesionales, sinNota }).toEqual({ profesionales: 23_328, sinNota: 0 });
   });
 
-  test('HALLAZGO guía: «Si el coche es nuevo o financiado: todo riesgo obligatorio»', async ({ page }) => {
-    // HALLAZGO abierto: la única obligación legal es la responsabilidad civil (RDL 8/2004,
-    // art. 2.1, BOE-A-2004-18911); un coche nuevo sin financiar no tiene obligación de todo
-    // riesgo, y en el financiado la exige, si acaso, el contrato. La propia guía, más abajo,
-    // dice «suele exigir».
-    test.fail();
-    await abrirTest(page);
-    expect(await abrirGuia(page)).not.toContain('todo riesgo obligatorio');
-  });
-
-  test('HALLAZGO Latam: la guía dice que el mínimo legal cubre los daños a los bienes de otros, también en Colombia y Chile', async ({ page }) => {
-    // HALLAZGO abierto: nombra Colombia, México, Argentina y Chile y afirma «Normalmente se exige
-    // por ley … RC obligatoria, que cubre los daños que puedas causar a otras personas o sus
-    // bienes». En Colombia el SOAT cubre «los daños corporales que se causen a las personas»
-    // (EOSF art. 192.1; Ley 769/2002, art. 42) y en Chile el SOAP la muerte y las lesiones
-    // corporales (Ley 18.490, art. 24): ninguno cubre bienes.
-    test.fail();
+  test('1478 guía: ya no dice «todo riesgo obligatorio»; la única obligación legal es la RC', async ({ page }) => {
+    // RDL 8/2004, art. 2.1 (BOE-A-2004-18911): «Todo propietario de vehículos a motor que tenga
+    // su estacionamiento habitual en España estará obligado a suscribir y mantener en vigor un
+    // contrato de seguro» — el de responsabilidad civil.
     await abrirTest(page);
     const guia = await abrirGuia(page);
-    expect(guia).toContain('Colombia');
-    expect(guia).not.toContain('que cubre los daños que puedas causar a otras personas o sus bienes');
+    expect(guia).not.toContain('todo riesgo obligatorio');
+    expect(guia).toContain('Ninguna ley lo exige; si el coche está financiado, revisa el contrato, porque puede pedirlo.');
+    expect(guia).toContain('Es una condición del contrato, no de la ley, que solo obliga a la responsabilidad civil.');
   });
 
-  test('HALLAZGO RegionBadge: normativa y cifras de España sin aviso de ámbito', async ({ page }) => {
-    // HALLAZGO abierto (§1.bis): tramos en €, cobertura «zona UE», renovación con preaviso de un
-    // mes (art. 22 de la Ley 50/1980) presentada a lectores de cuatro países latinoamericanos.
-    test.fail();
+  test('1479 Latam: la guía no atribuye a otros países lo que cubre el seguro obligatorio español', async ({ page }) => {
+    // La guía se ciñe a la ley española (RDL 8/2004, arts. 2.1 y 4.1) y dice que en otros países
+    // el mínimo, y lo que cubre, depende de su ley. Ya no nombra Colombia ni Chile.
     await abrirTest(page);
-    await expect(page.locator('[role="note"][aria-label*="España"]')).toHaveCount(1);
+    const guia = await abrirGuia(page);
+    expect(guia).not.toContain('que cubre los daños que puedas causar a otras personas o sus bienes');
+    expect(guia).not.toMatch(/Colombia|Chile|Argentina|México/);
+    expect(guia).toContain('y el seguro mínimo obligatorio, y lo que cubre, depende de la ley de cada uno. Esta guía describe el caso de España');
   });
 
-  test('HALLAZGO FAQPage: para un coche de más de 10 años y poco valor dice «terceros ampliado»; la guía, «terceros básico»', async ({ page }) => {
-    // HALLAZGO abierto: el FAQPage (lo que leen las IA) y la guía se contradicen, y además los
-    // tramos de la guía (3 / 7 / 12 años) no son los de la pregunta 1 (2 / 5 / 10).
-    test.fail();
+  test('1481 RegionBadge: aviso de ámbito tras el hero', async ({ page }) => {
+    await abrirTest(page);
+    const aviso = page.locator('[role="note"][aria-label*="España"]');
+    await expect(aviso).toHaveCount(1);
+    await expect(aviso).toContainText('Normativa de referencia: España.');
+  });
+
+  test('1480 FAQPage y guía: la misma orientación por antigüedad, con los tramos de la pregunta 1', async ({ page }) => {
+    // A mano, con los pesos de la pregunta 1: <2 años TRsf 3 · 2-5 años TRf 2 · 5-10 años
+    // ampliado 2 · >10 años básico 3. Y de la pregunta 2: >25.000 € TRsf 3 · 10.000-25.000 € TRf 2 ·
+    // 3.000-10.000 € ampliado 2 · <3.000 € básico 3.
     await abrirTest(page);
     const faq = JSON.stringify(await jsonLd(page, 'FAQPage'));
-    const guia = await abrirGuia(page);
-    const faqAmpliado = faq.includes('más de diez años y un valor de mercado bajo, el seguro a terceros ampliado suele ser suficiente');
-    const guiaBasico = /Más de 12 años → terceros básico/.test(guia);
-    expect(faqAmpliado && guiaBasico, 'FAQ «ampliado» frente a guía «básico»').toBe(false);
-  });
-
-  test('HALLAZGO extranjero: «Cobertura en el extranjero (zona UE)» solo en las fichas de todo riesgo', async () => {
-    // HALLAZGO abierto: el seguro obligatorio ya cubre la responsabilidad civil «en todo el
-    // territorio del Espacio Económico Europeo» con una sola prima (RDL 8/2004, art. 4.1). Listarlo
-    // solo en el todo riesgo sugiere que el de terceros no cubre fuera.
-    test.fail();
-    const enTR = RESULTADOS.todo_riesgo_franquicia.coberturas.some((c) => /extranjero|Europa/.test(c));
-    const enTerceros = RESULTADOS.terceros_basico.coberturas.some((c) => /extranjero|Europa|EEE|UE/.test(c));
-    expect(enTR && !enTerceros, 'solo el todo riesgo dice cubrir en el extranjero').toBe(false);
-  });
-
-  test('HALLAZGO cifras sin fuente: «el precio puede variar un 40 %», «franquicia habitualmente entre 150 € y 600 €»', async ({ page }) => {
-    // HALLAZGO abierto (neutralidad editorial, regla 1): ninguna de las cifras atribuye fuente ni año.
-    test.fail();
-    await abrirTest(page);
+    expect(faq).toContain('menos de 2 años → todo riesgo sin franquicia; entre 2 y 5 años → todo riesgo con franquicia; entre 5 y 10 años → terceros ampliado; más de 10 años → terceros básico');
+    expect(faq).toContain('más de 25.000 € → todo riesgo sin franquicia; entre 10.000 € y 25.000 € → todo riesgo con franquicia; entre 3.000 € y 10.000 € → terceros ampliado; menos de 3.000 € → terceros básico');
+    expect(faq).not.toContain('el seguro a terceros ampliado suele ser suficiente');
     await abrirGuia(page);
-    const consejo = await page.locator('li', { hasText: '40 %' }).innerText();
-    expect(consejo).toMatch(/según|fuente|estudio|OCU|\(\d{4}\)/);
-    expect(RESULTADOS.todo_riesgo_franquicia.advertencia).toMatch(/según|fuente|estudio|\(\d{4}\)/);
+    const lista = page.locator('section', { has: page.getByRole('heading', { name: '¿Cómo influye la antigüedad del vehículo en la elección?' }) }).locator('li');
+    expect(await lista.allInnerTexts()).toEqual([
+      'Menos de 2 años → todo riesgo sin franquicia',
+      'Entre 2 y 5 años → todo riesgo con franquicia',
+      'Entre 5 y 10 años → terceros ampliado',
+      'Más de 10 años → terceros básico',
+    ]);
   });
 
-  test('HALLAZGO todo riesgo: «Cualquier daño queda cubierto sin coste adicional»', async ({ page }) => {
-    // HALLAZGO abierto: absoluto que la propia app desmiente («Lee el condicionado específico de
-    // cada póliza: las coberturas incluidas pueden diferir», «Vehículo de sustitución incluido
-    // (según póliza)»). Sale en los 26.236 perfiles que reciben TR sin franquicia.
-    test.fail();
+  test('1482 extranjero: la RC en el Espacio Económico Europeo figura también en las fichas de terceros', async ({ page }) => {
+    // RDL 8/2004, art. 4.1: la RC obligatoria cubre «mediante el pago de una sola prima, en todo
+    // el territorio del Espacio Económico Europeo».
+    expect(RESULTADOS.terceros_basico.coberturas).toContain('Esa misma cobertura en todo el Espacio Económico Europeo (EEE), con la misma prima');
+    expect(RESULTADOS.terceros_ampliado.coberturas).toContain('Todo lo del terceros básico (responsabilidad civil válida en el EEE)');
+    expect(JSON.stringify(RESULTADOS)).not.toMatch(/zona UE|toda Europa/);
+    await abrirTest(page);
+    await responder(page, NORMAL);
+    await expect(page.locator('[class*="coberturaItem"]').first()).toHaveText('Todo lo del terceros básico (responsabilidad civil válida en el EEE)');
+  });
+
+  test('1483 cifras sin fuente: fuera el «40 %», la franquicia «entre 150 € y 600 €», los «500 €» y los «8.000-10.000 €»', async ({ page }) => {
+    await abrirTest(page);
+    const faq = JSON.stringify(await jsonLd(page, 'FAQPage'));
+    expect(faq).not.toMatch(/150|600 €|500 €|8\.000/);
+    expect(RESULTADOS.todo_riesgo_franquicia.advertencia).toBe(
+      'En cada siniestro con daños propios pagas la franquicia pactada. Su importe cambia mucho de una póliza a otra: compáralo antes de contratar, junto con la prima.',
+    );
+    const guia = await abrirGuia(page);
+    expect(guia).not.toContain('40 %');
+    expect(guia).toContain('Compara siempre varios presupuestos: para la misma modalidad, el precio cambia mucho de una compañía a otra y según tu perfil.');
+  });
+
+  test('1484 todo riesgo sin franquicia: sin la promesa absoluta «Cualquier daño queda cubierto»', async ({ page }) => {
     await abrirTest(page);
     await responder(page, JOVEN_FRECUENTE);
-    expect(await page.locator('[class*="resultadoSubtitulo"]').innerText()).not.toContain('Cualquier daño queda cubierto');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText(
+      'La modalidad más amplia: cubre los daños de tu coche en un accidente sin franquicia a tu cargo, dentro de los límites y exclusiones que fije la póliza.',
+    );
   });
 
-  test('HALLAZGO JSON-LD: el WebApplication sale con featureList vacío', async ({ page }) => {
-    // HALLAZGO abierto: metadata.ts pasa `features: []`; el CLAUDE.md (§1.ter) pide 4-8 reales.
-    test.fail();
+  test('1485 JSON-LD: el WebApplication declara 7 funciones reales', async ({ page }) => {
     await abrirTest(page);
     const app = await jsonLd(page, 'WebApplication');
-    expect((app.featureList as unknown[]).length).toBeGreaterThanOrEqual(4);
+    expect(app.featureList).toHaveLength(7);
+    expect(app.featureList).toContain('Avisa cuando lo que declaras choca con la recomendación: financiación, valor del coche, uso profesional o conductores jóvenes');
   });
 
-  test('HALLAZGO contraste: la opción marcada y «Siguiente →» no llegan a 4,5:1 en claro', async ({ page }) => {
-    // HALLAZGO abierto: opción marcada #2E86AB sobre #e8f4fb, 0,95rem en 600 → 3,67:1;
-    // «Siguiente →» blanco sobre #2E86AB, 1rem en 600 → 4,11:1 (igual en oscuro). No lo vigila
-    // ningún candado (check:contraste-cabeceras solo mira <th>/<thead>).
-    test.fail();
+  test('1486 contraste en claro: la opción marcada y «Siguiente →» llegan a 4,5:1', async ({ page }) => {
+    // Opción marcada: --primary-texto #26718F sobre #e8f4fb = 4,89 (era --primary, 3,67).
+    // «Siguiente →»: blanco sobre --primary-boton #26718F = 5,47 (era --primary, 4,11).
     await abrirTest(page);
     const radio = page.locator('[role="radio"]').nth(1);
     await radio.click();
     await expect(radio).toHaveCSS('background-color', 'rgb(232, 244, 251)');
+    await expect(radio).toHaveCSS('color', 'rgb(38, 113, 143)');
     await expect(page.locator('[class*="btnPrimary"]')).toHaveCSS('opacity', '1');
     const marcada = await contraste(page, '[role="radio"][aria-checked="true"] [class*="opcionTexto"]');
     const siguiente = await contraste(page, '[class*="btnPrimary"]');
-    expect({ marcada: marcada >= 4.5, siguiente: siguiente >= 4.5 }, `marcada ${marcada.toFixed(2)} · siguiente ${siguiente.toFixed(2)}`)
-      .toEqual({ marcada: true, siguiente: true });
+    expect(marcada, 'opción marcada').toBeCloseTo(4.89, 1);
+    expect(siguiente, 'Siguiente').toBeCloseTo(5.47, 1);
   });
 
-  test('HALLAZGO de familia: el hero del resultado pone blanco sobre el degradado de marca y no llega al contraste', async ({ page }) => {
-    // HALLAZGO abierto (de familia; lo tienen las dos referencias): medido bajo la extensión
-    // real del texto en NORMAL, el subtítulo (0,95rem, opacidad 0,9) da 2,65:1 (exige 4,5); el
-    // título (24px en negrita, exige 3) pasa por poco con 3,14. Los colores no cambian con el tema.
-    test.fail();
+  test('1487 de familia: el hero del resultado va sobre --hero-bg y se lee', async ({ page }) => {
+    // Blanco sobre #1a5278 = 8,33; el subtítulo lleva opacidad 0,9 y sigue muy por encima de 4,5.
     await abrirTest(page);
     await responder(page, NORMAL);
-    const t = await contraste(page, '[class*="resultadoTitulo"]');
-    const s = await contraste(page, '[class*="resultadoSubtitulo"]');
-    expect({ titulo: t >= 3, subtitulo: s >= 4.5 }, `título ${t.toFixed(2)} · subtítulo ${s.toFixed(2)}`)
-      .toEqual({ titulo: true, subtitulo: true });
+    await expect(page.locator('[class*="resultadoCard"]')).toHaveCSS('background-image', 'none');
+    await expect(page.locator('[class*="resultadoCard"]')).toHaveCSS('background-color', 'rgb(26, 82, 120)');
+    expect(await contraste(page, '[class*="resultadoTitulo"]'), 'título').toBeCloseTo(8.33, 1);
+    expect(await contraste(page, '[class*="resultadoSubtitulo"]'), 'subtítulo').toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('familia g: al pulsar «Ver resultado» el foco va al título del resultado, no a <body>', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, NORMAL);
+    await expect(titulo(page)).toBeFocused();
   });
 });

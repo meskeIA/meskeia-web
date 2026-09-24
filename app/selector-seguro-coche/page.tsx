@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSeguroCoche.module.css';
 import {
   MeskeiaLogo,
@@ -10,11 +10,80 @@ import {
   ShareCard,
   EducationalSection,
   DisclaimerCard,
+  RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularResultado, PREGUNTAS, RESULTADOS, CON_ARTICULO, type Resultado } from './motor';
+import {
+  calcularResultado,
+  PREGUNTAS,
+  RESULTADOS,
+  CON_ARTICULO,
+  RESPUESTA,
+  NOMBRE_CORTO,
+  PREGUNTA_ANTIGUEDAD,
+  orientacionDe,
+  type Nota,
+  type Resultado,
+} from './motor';
 
 // Las preguntas con sus pesos, las fichas de cada modalidad y la lógica viven en ./motor.ts.
+
+/** La respuesta literal que el usuario eligió, para citarla entre comillas. */
+function respuestaLiteral([pregunta, opcion]: readonly [number, number]): string {
+  return PREGUNTAS[pregunta].opciones[opcion].texto;
+}
+
+/**
+ * Lo declarado que choca con la recomendación, dicho con sus palabras (hallazgos 1473-1477).
+ * Por qué son notas y no filtros: comentario de `Nota` en ./motor.ts.
+ */
+function textoNota(nota: Nota, respuestas: readonly number[]): string {
+  const alternativa = nota.alternativa ? CON_ARTICULO[nota.alternativa] : '';
+  const eligio = ([p, o]: readonly [number, number]) => respuestas[p] === o;
+  switch (nota.tipo) {
+    case 'financiacion':
+      return (
+        'Has dicho que el coche sigue financiado. La ley solo obliga a la responsabilidad civil, ' +
+        'pero tu contrato de préstamo o leasing puede exigir un seguro a todo riesgo: revísalo antes ' +
+        `de contratar. Si lo exige, la opción que mejor encaja con tus respuestas es ${alternativa}.`
+      );
+    case 'valor-bajo':
+      return (
+        `Has dicho que el coche vale «${respuestaLiteral(RESPUESTA.valorMenos3000)}». Como regla, el ` +
+        'seguro indemniza según el valor que tenía el coche justo antes del siniestro (Ley 50/1980 de ' +
+        'Contrato de Seguro, art. 26), así que la prima de un todo riesgo puede acercarse a lo máximo ' +
+        `que llegaría a pagarte. Pide también precio para ${alternativa}, la modalidad a terceros ` +
+        'que mejor encaja con tus respuestas.'
+      );
+    case 'valor-alto': {
+      const dicho = [
+        eligio(RESPUESTA.antiguedadMenos2) && `tiene «${respuestaLiteral(RESPUESTA.antiguedadMenos2)}»`,
+        eligio(RESPUESTA.valorMas25000) && `vale «${respuestaLiteral(RESPUESTA.valorMas25000)}»`,
+      ].filter((x): x is string => Boolean(x));
+      return (
+        `Has dicho que el coche ${enumerar(dicho)}. Con un seguro a terceros, si tienes un accidente ` +
+        'del que eres responsable, la reparación de tu coche la pagas tú. Si no podrías asumirla, ' +
+        `compara también ${alternativa}, el todo riesgo que mejor encaja con tus respuestas.`
+      );
+    }
+    case 'uso-profesional':
+      return (
+        `Has elegido «${respuestaLiteral(RESPUESTA.usoProfesional)}»: declara ese uso al contratar. ` +
+        'Hay que declarar a la aseguradora todo lo que influya en el riesgo, y si se declaró de forma ' +
+        'inexacta, en un siniestro la indemnización se reduce en proporción a la prima que habría ' +
+        'correspondido (Ley 50/1980 de Contrato de Seguro, art. 10).'
+      );
+    case 'conductor-joven': {
+      const cual = eligio(RESPUESTA.jovenFrecuente) ? RESPUESTA.jovenFrecuente : RESPUESTA.jovenEsporadico;
+      return (
+        `Has dicho que conducen el coche menores de 25 años («${respuestaLiteral(cual)}»): decláralos ` +
+        'en la póliza tal como lo usan, como conductores habituales u ocasionales. Si no constan, o ' +
+        'constan como ocasionales siendo habituales, en un siniestro la indemnización puede reducirse ' +
+        '(Ley 50/1980 de Contrato de Seguro, arts. 10 y 11).'
+      );
+    }
+  }
+}
 
 /** Lista legible: «A, B y C». */
 function enumerar(items: string[]): string {
@@ -32,6 +101,13 @@ export default function SelectorSeguroCochePage() {
   const [opcionSeleccionada, setOpcionSeleccionada] = useState<number | null>(null);
   const [calculo, setCalculo] = useState<Resultado | null>(null);
   const resultado = calculo ? calculo.modalidad : null;
+
+  // Al pulsar «Ver resultado» el test se desmonta con el botón que tenía el foco, que caía a
+  // <body>: se lleva al título del resultado (familia de selectores, punto g).
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (calculo) tituloResultado.current?.focus();
+  }, [calculo]);
 
   const totalPreguntas = PREGUNTAS.length;
   const progresoPct = resultado
@@ -89,6 +165,13 @@ export default function SelectorSeguroCochePage() {
           franquicia.
         </p>
       </header>
+
+      {/* La responsabilidad civil obligatoria, su ámbito en el EEE y el preaviso de la póliza
+          son de la ley española; las modalidades se parecen en otros países (hallazgo 1481). */}
+      <RegionBadge
+        variant="es-data"
+        text="Normativa de referencia: España. En otros países las modalidades se parecen, pero el seguro obligatorio y lo que cubre dependen de su ley"
+      />
 
       <LegalNotice />
 
@@ -169,7 +252,7 @@ export default function SelectorSeguroCochePage() {
             <div className={styles.resultadoIcono} aria-hidden="true">
               {RESULTADOS[resultado].icono}
             </div>
-            <h2 className={styles.resultadoTitulo}>
+            <h2 className={styles.resultadoTitulo} ref={tituloResultado} tabIndex={-1}>
               {RESULTADOS[resultado].titulo}
             </h2>
             <p className={styles.resultadoSubtitulo}>
@@ -186,6 +269,12 @@ export default function SelectorSeguroCochePage() {
               encajan exactamente igual; {calculo.criterioDesempate}.
             </p>
           )}
+
+          {calculo && calculo.notas.map((nota) => (
+            <p key={nota.tipo} className={styles.avisoNota} role="note" data-nota={nota.tipo}>
+              <span aria-hidden="true">⚠️</span> {textoNota(nota, respuestas)}
+            </p>
+          ))}
 
           {/* Coberturas incluidas */}
           <div className={styles.resultadoDetalles}>
@@ -226,14 +315,18 @@ export default function SelectorSeguroCochePage() {
       >
         <section>
           <h2>¿Qué tipos de seguro de coche (carro o auto) existen?</h2>
+          {/* Antes afirmaba para Colombia, México, Argentina y Chile que el mínimo legal cubre los
+              daños a personas «o sus bienes», y no en todos es así (hallazgo 1479). La guía se
+              ciñe a lo que la app puede sostener: la ley española. */}
           <p>
-            El seguro del vehículo recibe distintos nombres según el país (seguro de coche
-            en España, seguro de carro en Colombia o México, seguro de auto en Argentina o
-            Chile), pero la estructura de coberturas es muy similar. Normalmente se exige
-            por ley contratar como mínimo un seguro de responsabilidad civil (RC)
-            obligatoria, que cubre los daños que puedas causar a otras personas o sus
-            bienes. A partir de ahí, cada compañía estructura sus productos en cuatro
-            grandes modalidades:
+            El seguro del vehículo recibe distintos nombres según el país (seguro de coche,
+            de carro o de auto), y el seguro mínimo obligatorio, y lo que cubre, depende de la
+            ley de cada uno. Esta guía describe el caso de España, donde todo propietario de
+            un coche con estacionamiento habitual en el país debe tener un seguro de
+            responsabilidad civil (RC) obligatoria (Real Decreto Legislativo 8/2004, art. 2.1),
+            que cubre los daños que causes a otras personas y a sus bienes, y que vale en todo el
+            Espacio Económico Europeo con una sola prima (art. 4.1). A partir de ahí, las
+            compañías estructuran sus productos en cuatro grandes modalidades:
           </p>
           <ul>
             <li>
@@ -260,17 +353,19 @@ export default function SelectorSeguroCochePage() {
           <p>
             La antigüedad es uno de los factores más importantes. A mayor antigüedad, menor
             valor de mercado y menor sentido tiene contratar una cobertura muy amplia, pues
-            la prima podría superar el propio valor del coche. Como regla general:
+            la prima podría acercarse al propio valor del coche. Así empuja este test según la
+            antigüedad (pregunta 1):
           </p>
+          {/* Sale de los pesos de la pregunta 1, como el FAQPage: antes la guía tenía sus
+              propios tramos (3 / 7 / 12 años) y contradecía al FAQ (hallazgo 1480). */}
           <ul>
-            <li>Menos de 3 años → todo riesgo sin franquicia</li>
-            <li>3 a 7 años → todo riesgo con franquicia</li>
-            <li>7 a 12 años → terceros ampliado</li>
-            <li>Más de 12 años → terceros básico</li>
+            {orientacionDe(PREGUNTA_ANTIGUEDAD).map(({ opcion, modalidad }) => (
+              <li key={opcion}>{opcion} → {NOMBRE_CORTO[modalidad]}</li>
+            ))}
           </ul>
           <p>
-            Esta guía es orientativa; el valor real y el uso del vehículo pueden cambiar
-            la recomendación.
+            Es solo un punto de partida: el valor del coche, la financiación, tu experiencia y
+            lo que podrías pagar de tu bolsillo pueden cambiar la recomendación.
           </p>
         </section>
 
@@ -300,13 +395,17 @@ export default function SelectorSeguroCochePage() {
               Para el primer coche (de bajo valor): terceros ampliado para no encarecer
               demasiado la prima.
             </li>
+            {/* Decía «todo riesgo obligatorio»: la ley solo obliga a la responsabilidad civil
+                (RDL 8/2004, art. 2.1); el todo riesgo, si acaso, lo exige el contrato (hallazgo 1478). */}
             <li>
-              Si el coche es nuevo o financiado: todo riesgo obligatorio y, si la prima es
-              asumible, sin franquicia.
+              Si el coche es nuevo o de valor alto: el todo riesgo cubre también los daños
+              propios. Ninguna ley lo exige; si el coche está financiado, revisa el contrato,
+              porque puede pedirlo.
             </li>
             <li>
-              Añadir al conductor joven como conductor principal (no secundario) para evitar
-              problemas en caso de siniestro.
+              Declarar al conductor joven tal como usa el coche, como conductor habitual u
+              ocasional: si figura como ocasional y en realidad es el habitual, la
+              indemnización puede reducirse (Ley 50/1980 de Contrato de Seguro, art. 10).
             </li>
           </ul>
         </section>
@@ -314,25 +413,28 @@ export default function SelectorSeguroCochePage() {
         <section>
           <h2>Consejos para contratar o cambiar de seguro</h2>
           <ul>
+            {/* Sin el «puede variar un 40 %», que no tenía fuente ni año (hallazgo 1483). */}
             <li>
-              Compara siempre al menos 3 presupuestos: el precio puede variar un 40 % entre
-              compañías para la misma cobertura.
+              Compara siempre varios presupuestos: para la misma modalidad, el precio cambia
+              mucho de una compañía a otra y según tu perfil.
             </li>
             <li>
               Lee el condicionado específico de cada póliza: las coberturas incluidas pueden
               diferir aunque la modalidad tenga el mismo nombre.
             </li>
             <li>
-              El seguro se renueva automáticamente cada año; tienes derecho a cancelar con
-              un mes de antelación antes de la fecha de renovación.
+              Si la póliza se prorroga cada año, puedes oponerte a la prórroga avisando con al
+              menos un mes de antelación a su vencimiento (Ley 50/1980, art. 22).
             </li>
             <li>
-              Informa siempre de todos los conductores habituales para evitar que la
-              aseguradora pueda reducir la indemnización por conductor no declarado.
+              Informa siempre de todos los conductores habituales y del uso real del coche
+              (particular o profesional): si el riesgo se declaró de forma inexacta, la
+              indemnización se reduce en proporción a la prima (Ley 50/1980, art. 10).
             </li>
             <li>
-              Si el coche está financiado, el contrato de leasing o préstamo suele exigir
-              todo riesgo sin franquicia o con franquicia máxima pactada.
+              Si el coche está financiado, revisa el contrato de préstamo o leasing: puede
+              exigir un seguro a todo riesgo. Es una condición del contrato, no de la ley, que
+              solo obliga a la responsabilidad civil.
             </li>
           </ul>
         </section>
