@@ -57,7 +57,7 @@ export const faqJsonLd = {
       name: '¿Qué es un diapasón y para qué sirve?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un diapasón es una herramienta que emite un tono de referencia para afinar instrumentos musicales. El estándar internacional es La 440Hz (también llamado A4 o A 440), adoptado en 1939 por la ISO. Se usa en orquestas, coros, clases de música y grabaciones para asegurar que todos los instrumentos suenen a la misma altura.',
+        text: 'Un diapasón es una herramienta que emite un tono de referencia para afinar instrumentos musicales. El estándar internacional es La 440Hz (también llamado A4 o A 440), recomendado en la Conferencia de Londres de 1939 y recogido por la ISO en la norma ISO 16 (1955, revisada en 1975). Se usa en orquestas, coros, clases de música y grabaciones para asegurar que todos los instrumentos suenen a la misma altura.',
       },
     },
     {
@@ -65,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Por qué el La de referencia es 440Hz y no otra frecuencia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La frecuencia de 440Hz para el La4 fue acordada como estándar internacional en la Conferencia de Londres de 1939 y ratificada por la ISO en 1975 (norma ISO 16). Antes existían variantes: muchas orquestas barrocas usaban 415Hz y algunas modernas emplean 442Hz o 444Hz. El 440Hz se impuso por ser un valor de consenso que facilitaba la convivencia entre fabricantes e intérpretes de todo el mundo.',
+        text: 'La frecuencia de 440Hz para el La4 fue acordada como estándar internacional en la Conferencia de Londres de 1939; la ISO, fundada en 1947, la adoptó en 1955 (recomendación ISO R 16) y la confirmó en 1975 como norma ISO 16. Antes existían variantes: muchas orquestas barrocas usaban 415Hz y algunas modernas emplean 442Hz o 444Hz. El 440Hz se impuso por ser un valor de consenso que facilitaba la convivencia entre fabricantes e intérpretes de todo el mundo.',
       },
     },
     {
@@ -89,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Pueden usarse frecuencias distintas de 440Hz para afinar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Algunas orquestas filarmónicas europeas prefieren 442Hz o 443Hz, ya que el sonido resulta ligeramente más brillante. Los grupos de música antigua suelen usar 415Hz (un semitono por debajo del estándar moderno) para reproducir la sonoridad de los siglos XVII y XVIII. Lo importante es que todos los instrumentos de un conjunto compartan la misma frecuencia de referencia.',
+        text: 'Sí. Algunas orquestas filarmónicas europeas prefieren 442Hz o 443Hz, ya que el sonido resulta ligeramente más brillante. Los grupos de música antigua suelen usar 415Hz (algo más de un semitono por debajo del estándar moderno: unos −101 cents) para reproducir la sonoridad de los siglos XVII y XVIII. Lo importante es que todos los instrumentos de un conjunto compartan la misma frecuencia de referencia.',
       },
     },
   ],

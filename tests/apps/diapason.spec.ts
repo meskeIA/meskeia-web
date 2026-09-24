@@ -155,34 +155,115 @@ test('caso de rechazo: fuera de 20–2000 Hz se recorta al salir del campo y el 
   await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([440]);
 });
 
-test('dos cambios de onda seguidos no dejan un oscilador huérfano sonando tras Detener', async ({
+/** Pulsa dos botones de onda desde el propio navegador con `ms` milisegundos entre ellos. */
+async function dosOndas(page: Page, primera: string, segunda: string, ms: number): Promise<void> {
+  // En la MISMA tarea no vale: React agrupa los dos cambios de estado en uno.
+  await page.evaluate(
+    async ([a, b, espera]) => {
+      const boton = (t: string) =>
+        [...document.querySelectorAll('button')].find((el) => el.textContent?.includes(t));
+      boton(a)?.click();
+      await new Promise((r) => setTimeout(r, espera));
+      boton(b)?.click();
+    },
+    [primera, segunda, ms] as [string, string, number],
+  );
+}
+
+test('hallazgo 1362: dos cambios de onda seguidos no dejan un oscilador huérfano tras Detener', async ({
   page,
 }) => {
-  // HALLAZGO del Inspector (24/09/2026): cambiar de onda mientras suena hace
-  // detenerAudio() + setTimeout(iniciarAudio, 150). Si se pulsa otra onda antes de ~50 ms
-  // se programan DOS arranques y el primero pierde su referencia: queda un oscilador
-  // triangular con ganancia 0,5 que ni «Detener» ni los presets alcanzan. Medido:
-  // Senoidal → Triangular → Cuadrada → Detener deja sonando [triangle a 440 Hz].
-  test.fail();
+  // Antes: cambiar de onda hacía detenerAudio() + setTimeout(iniciarAudio, 150); con otra onda
+  // antes de ~50 ms se programaban DOS arranques y quedaba un triangular a 440 Hz que ni
+  // «Detener» ni los presets alcanzaban. Ahora la onda se cambia en caliente sobre el MISMO
+  // oscilador: en toda la secuencia solo se crea uno.
   await botonReproducir(page).click();
   await expect.poll(() => sonando(page)).toHaveLength(1);
 
-  // Los dos clics desde el propio navegador con 20 ms entre ellos: el hueco se abre con
-  // cualquier intervalo por debajo de ~50 ms (el segundo temporizador de parada llega antes
-  // que el primer arranque y no encuentra nada que parar). En la MISMA tarea no vale: React
-  // agrupa los dos cambios de estado en uno y el defecto no se ve.
-  await page.evaluate(async () => {
-    const boton = (t: string) =>
-      [...document.querySelectorAll('button')].find((b) => b.textContent?.includes(t));
-    boton('Triangular')?.click();
-    await new Promise((r) => setTimeout(r, 20));
-    boton('Cuadrada')?.click();
-  });
+  await dosOndas(page, 'Triangular', 'Cuadrada', 20);
   await expect(page.getByRole('button', { name: /Cuadrada/ })).toHaveAttribute('aria-pressed', 'true');
   await page.waitForTimeout(600);
   expect((await sonando(page)).map((o) => o.tipo)).toEqual(['square']);
+  expect(await osciladores(page), 'un único oscilador creado en toda la secuencia').toHaveLength(1);
 
   await botonReproducir(page).click();
   await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
   await expect.poll(() => sonando(page), { timeout: 2000 }).toHaveLength(0);
+
+  // Y tras elegir 415 nada vuelve a sonar (el huérfano seguía a 440 Hz).
+  await page.getByRole('button', { name: /La 415Hz/ }).click();
+  await page.waitForTimeout(300);
+  expect(await sonando(page)).toHaveLength(0);
+});
+
+test('hallazgo 1363: con 100–150 ms entre dos ondas suena la onda que queda marcada', async ({
+  page,
+}) => {
+  await botonReproducir(page).click();
+  await expect.poll(() => sonando(page)).toHaveLength(1);
+  for (const ms of [105, 145]) {
+    await dosOndas(page, 'Triangular', 'Cuadrada', ms);
+    await expect(page.getByRole('button', { name: /Cuadrada/ })).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(400);
+    expect((await sonando(page)).map((o) => o.tipo), `intervalo ${ms} ms`).toEqual(['square']);
+    await page.getByRole('button', { name: /Senoidal/ }).click();
+    await expect.poll(async () => (await sonando(page)).map((o) => o.tipo)).toEqual(['sine']);
+  }
+  expect(await osciladores(page)).toHaveLength(1);
+});
+
+test('hallazgo 1364: la etiqueta muestra la nota temperada más cercana y su desvío en cents', async ({
+  page,
+}) => {
+  const nota = page.getByTestId('nota-cercana');
+  // 440 Hz = La4 exacto.
+  await expect(nota).toContainText('La');
+  await expect(nota).toContainText('A4');
+  await expect(nota).toContainText('0 cents');
+
+  const casos: [string, string, string, string][] = [
+    // Do4 temperado = 440 · 2^(−9/12) = 261,63 Hz → 262 Hz = 1200·log2(262/261,626) = +2,5 cents
+    ['262', 'Do', 'C4', '+2,5 cents'],
+    // 415 Hz: n = 12·log2(415/440) = −1,013 → Sol♯4 (415,305 Hz), 1200·log2(415/415,305) = −1,3 cents
+    ['415', 'Sol♯', 'G♯4', '−1,3 cents'],
+    // 2000 Hz: n = 26,21 → Si6 = 440 · 2^(26/12) = 1975,53 Hz; 1200·log2(2000/1975,53) = +21,3 cents
+    ['2000', 'Si', 'B6', '+21,3 cents'],
+  ];
+  for (const [entrada, nombre, cientifica, cents] of casos) {
+    await page.locator(CAMPO).fill(entrada);
+    await esperarValorEnReact(page, CAMPO, entrada);
+    await expect(pantalla(page)).toHaveText(entrada);
+    await expect(nota.locator('[class*="notaNombre"]'), `${entrada} Hz`).toHaveText(nombre);
+    await expect(nota.locator('[class*="notaOctava"]'), `${entrada} Hz`).toHaveText(cientifica);
+    await expect(nota.locator('[class*="notaCents"]'), `${entrada} Hz`).toHaveText(cents);
+  }
+});
+
+test('hallazgos 1365-1367: datos de la tabla y la FAQ', async ({ page }) => {
+  const texto = await page.locator('body').textContent();
+  // 1200 · log2(415/440) = −101,27 cents: algo MÁS de un semitono.
+  expect(texto).toContain('−101,27 cents');
+  expect(texto).not.toContain('-99 cents');
+  expect(texto).not.toContain('exactamente un semitono');
+  // La ISO se fundó en 1947: en 1939 fue la Conferencia de Londres (ISA).
+  expect(texto).not.toContain('En 1939 la ISO');
+  expect(texto).not.toContain('some jazz');
+});
+
+test('hallazgos 1368-1369: botones con type, presets con aria-pressed y deslizadores con nombre', async ({
+  page,
+}) => {
+  const sinType = await page
+    .locator('main button:not([type]), [class*="container"] button:not([type])')
+    .count();
+  expect(sinType).toBe(0);
+
+  await expect(page.getByRole('button', { name: /La 440Hz/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /La 432Hz/ })).toHaveAttribute('aria-pressed', 'false');
+  await page.getByRole('button', { name: /La 432Hz/ }).click();
+  await expect(page.getByRole('button', { name: /La 432Hz/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /La 440Hz/ })).toHaveAttribute('aria-pressed', 'false');
+
+  await expect(page.getByRole('slider', { name: 'Volumen' })).toHaveCount(1);
+  await expect(page.getByRole('slider', { name: /Frecuencia en Hz/ })).toHaveCount(1);
 });
