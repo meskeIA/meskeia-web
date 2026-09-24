@@ -150,6 +150,23 @@ export interface Moneda {
   zona: string;
 }
 
+/**
+ * El GÉNERO de cada moneda decide la concordancia del numeral, y las centenas concuerdan
+ * siempre (DPD, s. v. «uno» §2.3): declararlo mal escribe «doscientas lempiras» en un cheque.
+ * Por eso cada género está cotejado con el DLE (acepción de «unidad monetaria», consultado el
+ * 24/09/2026) y no se deduce de la terminación de la palabra:
+ *
+ *   euro m. · peso m. · dólar m. · sol m. · boliviano m. · quetzal m. («moneda guatemalteca»)
+ *   · colón m. · lempira m. · córdoba m. · guaraní m. · bolívar m. · libra f.
+ *   https://dle.rae.es/lempira — «1. m. Unidad monetaria de Honduras.»
+ *   https://dle.rae.es/córdoba — «1. m. Unidad monetaria de Nicaragua.»
+ *   https://dle.rae.es/libra   — libra esterlina: «1. f. Unidad monetaria del Reino Unido…»
+ *
+ * Las dos que terminan en -a son la trampa: «lempira» y «córdoba» son MASCULINOS («un lempira»,
+ * «veintiún córdobas»). El lempira estuvo declarado femenino hasta el hallazgo 1537 del
+ * Inspector (24/09/2026). Las subunidades (céntimo, centavo, centésimo, penique) son todas
+ * masculinas en el DLE, y la fracción se escribe siempre en masculino (cantidadALetras).
+ */
 export const MONEDAS: Moneda[] = [
   { codigo: 'EUR', singular: 'euro', plural: 'euros', fraccionSingular: 'céntimo', fraccionPlural: 'céntimos', genero: 'masculino', zona: 'España y zona euro' },
   { codigo: 'MXN', singular: 'peso', plural: 'pesos', fraccionSingular: 'centavo', fraccionPlural: 'centavos', genero: 'masculino', zona: 'México' },
@@ -161,7 +178,7 @@ export const MONEDAS: Moneda[] = [
   { codigo: 'BOB', singular: 'boliviano', plural: 'bolivianos', fraccionSingular: 'centavo', fraccionPlural: 'centavos', genero: 'masculino', zona: 'Bolivia' },
   { codigo: 'GTQ', singular: 'quetzal', plural: 'quetzales', fraccionSingular: 'centavo', fraccionPlural: 'centavos', genero: 'masculino', zona: 'Guatemala' },
   { codigo: 'CRC', singular: 'colón', plural: 'colones', fraccionSingular: 'céntimo', fraccionPlural: 'céntimos', genero: 'masculino', zona: 'Costa Rica' },
-  { codigo: 'HNL', singular: 'lempira', plural: 'lempiras', fraccionSingular: 'centavo', fraccionPlural: 'centavos', genero: 'femenino', zona: 'Honduras' },
+  { codigo: 'HNL', singular: 'lempira', plural: 'lempiras', fraccionSingular: 'centavo', fraccionPlural: 'centavos', genero: 'masculino', zona: 'Honduras' },
   { codigo: 'NIO', singular: 'córdoba', plural: 'córdobas', fraccionSingular: 'centavo', fraccionPlural: 'centavos', genero: 'masculino', zona: 'Nicaragua' },
   { codigo: 'PYG', singular: 'guaraní', plural: 'guaraníes', fraccionSingular: 'céntimo', fraccionPlural: 'céntimos', genero: 'masculino', zona: 'Paraguay' },
   { codigo: 'UYU', singular: 'peso', plural: 'pesos', fraccionSingular: 'centésimo', fraccionPlural: 'centésimos', genero: 'masculino', zona: 'Uruguay' },
@@ -298,4 +315,209 @@ export function numeroALetras(
   }
 
   return negativo ? `menos ${texto}` : texto;
+}
+
+// ─── La moneda escrita junto a la cifra ────────────────────────────────────────
+
+/**
+ * Lo que señala la moneda cuando viene escrito junto a la cifra: un símbolo («£1.500»,
+ * «S/ 1,500.00»), un código ISO («1.500 EUR», que es como la propia app etiqueta el importe)
+ * o el nombre («1500 pesos»).
+ *
+ * ── Por qué existe (hallazgos 1540 y 1542 del Inspector, 24/09/2026) ─────────────────────
+ * El parser toleraba €, $ y £ pegados a la cifra, pero los TIRABA: «£1.500» salía «mil
+ * quinientos euros» sin ningún aviso, y quien pegaba «$1,500.00» desde México leía «euros».
+ * A la vez rechazaba con «Escribe solo cifras» los símbolos de las monedas que la propia app
+ * ofrece en su selector: «S/ 1,500.00», «Q1,500.00», «RD$1,500.00». Ahora todos se leen, y
+ * la marca no se descarta: la vista la usa para elegir la moneda o avisa de que no coincide.
+ *
+ * ── De dónde salen los símbolos ─────────────────────────────────────────────────────────
+ * CLDR 48 (Unicode Common Locale Data Repository): el símbolo de cada moneda en la
+ * configuración regional de su propio país —el que escribe `Intl.NumberFormat` al formatear
+ * en es-MX, es-PE, es-HN…—, consultado el 24/09/2026 con el ICU 78.2 de Node 24:
+ *   EUR € · GBP £ · PEN S/ · GTQ Q · HNL L · NIO C$ · CRC ₡ · DOP RD$ · PYG Gs. y ₲
+ *   · BOB Bs · VES Bs.S · USD $ y US$ · MXN, ARS, COP, CLP y UYU $.
+ * Se admite además el punto de abreviatura que se suele añadir a los que acaban en letra o
+ * en barra («S/.», «L.», «Q.», «Bs.»): es un punto que no forma parte de la cifra.
+ *
+ * ── Las marcas ambiguas, decididas ──────────────────────────────────────────────────────
+ *   · «$» lo usan seis pesos y el dólar. NO se adivina cuál: si la moneda elegida es una de
+ *     ellas, cuadra; si no, la vista avisa y pide elegir. Entre pesos el texto es idéntico
+ *     («pesos… centavos», salvo los centésimos uruguayos), pero entre peso y dólar no.
+ *   · «Bs» abrevia tanto «bolivianos» como «bolívares»: se trata igual que «$».
+ *   · «L» y «Q» son una sola letra, pero dentro de este selector solo hay un lempira y un
+ *     quetzal, y se exigen EN MAYÚSCULA y sin otra letra pegada («SOL» no acaba en «L»).
+ * Los códigos ISO y los nombres se aceptan en mayúsculas o minúsculas, y los nombres también
+ * sin tilde («dolares»). «M.N.» (moneda nacional, habitual en facturas de México) se admite
+ * al final, pero no señala ninguna moneda por sí solo.
+ */
+export interface MarcaMoneda {
+  /** Tal como se escribió: «£», «RD$», «usd», «pesos». Dos si iba delante y detrás. */
+  textos: string[];
+  /**
+   * Códigos de MONEDAS que encajan. Más de uno si la marca es ambigua («$», «Bs», «pesos»);
+   * VACÍO si la de delante y la de detrás se contradicen («$1.500 €»).
+   */
+  codigos: string[];
+}
+
+export interface EntradaConMarca {
+  /** La cifra sin la marca, con su signo: lo que hay que pasar a `parseSpanishNumber` */
+  cifra: string;
+  marca: MarcaMoneda | null;
+  /** Lo que iba delante y detrás de la cifra, para reescribir el campo sin perder la marca */
+  antes: string;
+  despues: string;
+}
+
+const PESOS_Y_DOLAR = ['MXN', 'ARS', 'COP', 'CLP', 'USD', 'UYU', 'DOP'];
+
+/** Símbolos de CLDR 48 (ver arriba), de más largo a más corto para que «RD$» gane a «$» */
+const SIMBOLOS: Array<{ simbolo: string; codigos: string[] }> = [
+  { simbolo: 'Bs.S', codigos: ['VES'] },
+  { simbolo: 'US$', codigos: ['USD'] },
+  { simbolo: 'RD$', codigos: ['DOP'] },
+  { simbolo: 'C$', codigos: ['NIO'] },
+  { simbolo: 'S/', codigos: ['PEN'] },
+  { simbolo: 'Bs', codigos: ['BOB', 'VES'] },
+  { simbolo: 'Gs', codigos: ['PYG'] },
+  { simbolo: '€', codigos: ['EUR'] },
+  { simbolo: '£', codigos: ['GBP'] },
+  { simbolo: '₡', codigos: ['CRC'] },
+  { simbolo: '₲', codigos: ['PYG'] },
+  { simbolo: '$', codigos: PESOS_Y_DOLAR },
+  { simbolo: 'Q', codigos: ['GTQ'] },
+  { simbolo: 'L', codigos: ['HNL'] },
+];
+
+const CODIGOS_ISO = new Set(MONEDAS.map((m) => m.codigo));
+
+const sinTildes = (texto: string) =>
+  texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** «pesos» → los seis pesos; «dolares» → USD… Singular y plural, sin tildes */
+const NOMBRES = new Map<string, string[]>();
+for (const m of MONEDAS) {
+  for (const nombre of [m.singular, m.plural]) {
+    const clave = sinTildes(nombre);
+    const codigos = NOMBRES.get(clave) ?? [];
+    if (!codigos.includes(m.codigo)) codigos.push(m.codigo);
+    NOMBRES.set(clave, codigos);
+  }
+}
+
+const esLetra = (c: string | undefined) => !!c && /\p{L}/u.test(c);
+/** Los símbolos que acaban en letra o barra admiten el punto de abreviatura: «S/.», «L.» */
+const admitePunto = (simbolo: string) => /[\p{L}/]$/u.test(simbolo);
+
+interface Pieza {
+  consumido: string;
+  texto: string;
+  codigos: string[];
+}
+
+function leerDelante(texto: string): Pieza | null {
+  const iso = texto.match(/^([A-Za-z]{3})(?!\p{L})\s*/u);
+  if (iso && CODIGOS_ISO.has(iso[1].toUpperCase())) {
+    return { consumido: iso[0], texto: iso[1], codigos: [iso[1].toUpperCase()] };
+  }
+  for (const { simbolo, codigos } of SIMBOLOS) {
+    if (!texto.startsWith(simbolo)) continue;
+    let fin = simbolo.length;
+    if (admitePunto(simbolo) && texto[fin] === '.') fin += 1;
+    // «Q» o «L» seguidas de otra letra son una palabra, no un símbolo
+    if (esLetra(simbolo.slice(-1)) && esLetra(texto[fin])) continue;
+    const espacios = texto.slice(fin).match(/^\s*/)?.[0] ?? '';
+    return { consumido: texto.slice(0, fin) + espacios, texto: texto.slice(0, fin), codigos };
+  }
+  return null;
+}
+
+function leerDetras(texto: string): Pieza | null {
+  for (const { simbolo, codigos } of SIMBOLOS) {
+    for (const variante of admitePunto(simbolo) ? [`${simbolo}.`, simbolo] : [simbolo]) {
+      if (!texto.endsWith(variante)) continue;
+      const inicio = texto.length - variante.length;
+      // «SOL» no acaba en el símbolo «L»: la letra de antes lo delata
+      if (esLetra(variante[0]) && esLetra(texto[inicio - 1])) continue;
+      const espacios = texto.slice(0, inicio).match(/\s*$/)?.[0] ?? '';
+      return { consumido: espacios + variante, texto: variante, codigos };
+    }
+  }
+  const palabra = texto.match(/\s*(\p{L}+)$/u);
+  if (palabra) {
+    const porNombre = NOMBRES.get(sinTildes(palabra[1]));
+    if (porNombre) return { consumido: palabra[0], texto: palabra[1], codigos: porNombre };
+    if (palabra[1].length === 3 && CODIGOS_ISO.has(palabra[1].toUpperCase())) {
+      return { consumido: palabra[0], texto: palabra[1], codigos: [palabra[1].toUpperCase()] };
+    }
+  }
+  return null;
+}
+
+/**
+ * Separa la cifra de la moneda escrita junto a ella. Sin marca, la cifra es la entrada tal
+ * cual, de modo que todo lo que ya se leía se sigue leyendo exactamente igual.
+ */
+export function separarMarcaMoneda(entrada: string): EntradaConMarca {
+  let cuerpo = entrada.trim();
+  let signo = '';
+  let antes = '';
+  let despues = '';
+  const piezas: Pieza[] = [];
+
+  // El signo puede ir delante del símbolo («-$1.500»): pasa a la cifra
+  const conSigno = cuerpo.match(/^([+-])\s*/);
+  const delante = leerDelante(conSigno ? cuerpo.slice(conSigno[0].length) : cuerpo);
+  if (delante) {
+    if (conSigno) {
+      signo = conSigno[1];
+      cuerpo = cuerpo.slice(conSigno[0].length);
+    }
+    antes = delante.consumido;
+    cuerpo = cuerpo.slice(delante.consumido.length);
+    piezas.push(delante);
+  }
+
+  // «M.N.» (moneda nacional) cierra el importe, pero no dice cuál es la moneda
+  const monedaNacional = cuerpo.match(/(?:^|[^\p{L}])(\s*M\.?\s?N\.?)$/iu);
+  if (monedaNacional) {
+    despues = monedaNacional[1];
+    cuerpo = cuerpo.slice(0, cuerpo.length - monedaNacional[1].length);
+  }
+  const detras = leerDetras(cuerpo);
+  if (detras) {
+    despues = detras.consumido + despues;
+    cuerpo = cuerpo.slice(0, cuerpo.length - detras.consumido.length);
+    piezas.push(detras);
+  }
+
+  if (piezas.length === 0 && !monedaNacional) {
+    return { cifra: entrada, marca: null, antes: '', despues: '' };
+  }
+
+  const marca: MarcaMoneda | null =
+    piezas.length === 0
+      ? null
+      : {
+          textos: piezas.map((p) => p.texto),
+          codigos: piezas.reduce<string[]>(
+            (comunes, p) => comunes.filter((c) => p.codigos.includes(c)),
+            piezas[0].codigos,
+          ),
+        };
+
+  return { cifra: `${signo}${cuerpo.trim()}`, marca, antes, despues };
+}
+
+/** «el peso y el dólar», «la libra»: las monedas de unos códigos, sin repetir nombre */
+export function nombrarMonedas(codigos: string[], conjuncion: 'y' | 'o' = 'y'): string {
+  const nombres: string[] = [];
+  for (const m of MONEDAS) {
+    if (!codigos.includes(m.codigo)) continue;
+    const nombre = `${m.genero === 'femenino' ? 'la' : 'el'} ${m.singular}`;
+    if (!nombres.includes(nombre)) nombres.push(nombre);
+  }
+  if (nombres.length <= 1) return nombres[0] ?? '';
+  return `${nombres.slice(0, -1).join(', ')} ${conjuncion} ${nombres[nombres.length - 1]}`;
 }

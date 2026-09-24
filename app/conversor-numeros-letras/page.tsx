@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState, type FocusEvent, type MouseEvent } from 'react';
 import styles from './ConversorNumerosLetras.module.css';
 import {
   MeskeiaLogo,
@@ -16,17 +16,49 @@ import {
   parseSpanishNumber,
   partesNumericas,
   lecturaAmbiguaAlternativa,
+  type PartesNumericas,
 } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   MONEDAS,
   cantidadALetras,
   numeroALetras,
+  separarMarcaMoneda,
+  nombrarMonedas,
   LIMITE_NUMERO_A_LETRAS,
   type EstiloFraccion,
+  type MarcaMoneda,
 } from '@/lib/numeroALetras';
 
 type Modo = 'importe' | 'numero';
+
+interface Resultado {
+  texto: string;
+  error: string;
+  valor?: number;
+  partes?: PartesNumericas;
+}
+
+const MENSAJE_NO_RECONOCIDA = 'No se reconoce esa cantidad. Escribe solo cifras, con coma o punto decimal.';
+
+/**
+ * Etiqueta de control del número suelto, con las cifras decimales TAL COMO SE TECLEARON.
+ *
+ * Hallazgo 1543 (24/09/2026): la etiqueta forzaba dos decimales mientras el texto leía todas
+ * las cifras, así que «1,5» se etiquetaba «1,50» y «0,001» «0,00» junto a «cero coma cero cero
+ * uno». Las dos lecturas del mismo número tienen que coincidir. La parte entera sí pasa por
+ * `formatNumber` (cabe entera en un número exacto: el tope es 999.999.999.999); los decimales
+ * NO, porque como número ya han perdido sus ceros finales y sus cifras más allá de la 15.ª.
+ */
+function etiquetaNumeroSuelto(valor: number, partes: PartesNumericas): string {
+  const signo = valor < 0 ? '-' : ''; // -0 no lleva signo, igual que el texto («cero»)
+  const entera = formatNumber(Number(partes.entera || '0'), 0);
+  return `${signo}${entera}${partes.decimales ? `,${partes.decimales}` : ''}`;
+}
+
+const citar = (textos: string[]) => textos.map((t) => `«${t}»`).join(' y ');
+const mismaMarca = (a: MarcaMoneda | null, b: MarcaMoneda | null) =>
+  JSON.stringify(a) === JSON.stringify(b);
 
 const EJEMPLOS = [
   { etiqueta: '3.847,50', valor: '3.847,50' },
@@ -49,19 +81,35 @@ export default function ConversorNumerosLetrasPage() {
   const [estiloFraccion, setEstiloFraccion] = useState<EstiloFraccion>('letras');
   const [mayusculas, setMayusculas] = useState(false);
   const [copiado, setCopiado] = useState(false);
+  /** Moneda que eligió la app por el símbolo tecleado, para decirlo (hallazgo 1540) */
+  const [monedaPorMarca, setMonedaPorMarca] = useState<string | null>(null);
+
+  const bloqueCantidad = useRef<HTMLDivElement>(null);
+  const recienEnfocado = useRef(false);
 
   const moneda = MONEDAS.find((m) => m.codigo === codigoMoneda) ?? MONEDAS[0];
 
-  const resultado = useMemo(() => {
+  // La moneda escrita junto a la cifra («£1.500», «S/ 1,500.00», «1500 pesos») se separa
+  // ANTES de leer el número, y no se tira: decide la moneda o se avisa (hallazgos 1540 y 1542).
+  const lectura = useMemo(() => separarMarcaMoneda(entrada), [entrada]);
+
+  const resultado = useMemo<Resultado>(() => {
     const limpio = entrada.trim();
     if (limpio === '') return { texto: '', error: '' };
 
     // `partesNumericas` da además las cifras decimales TAL COMO SE TECLEARON: el número ya no
     // recuerda el cero final de 0,50 y esta app promete leerlas «una a una».
-    const partes = partesNumericas(limpio);
-    const valor = parseSpanishNumber(limpio);
+    const partes = partesNumericas(lectura.cifra);
+    const valor = parseSpanishNumber(lectura.cifra);
     if (!partes || !Number.isFinite(valor)) {
-      return { texto: '', error: 'No se reconoce esa cantidad. Escribe solo cifras, con coma o punto decimal.' };
+      return { texto: '', error: MENSAJE_NO_RECONOCIDA };
+    }
+    // «$1.500 €»: dos monedas que se contradicen. Elegir una sería adivinar en un pagaré.
+    if (modo === 'importe' && lectura.marca && lectura.marca.codigos.length === 0) {
+      return {
+        texto: '',
+        error: `${citar(lectura.marca.textos)} no son la misma moneda: deja solo una.`,
+      };
     }
     // El tope se compara contra la parte ENTERA: la ayuda anuncia «hasta 999.999.999.999 y dos
     // decimales», y comparando el valor completo el propio máximo declarado se rechazaba.
@@ -87,11 +135,59 @@ export default function ConversorNumerosLetrasPage() {
           : mayusculas
             ? numeroALetras(valor, 'masculino', partes.decimales).toUpperCase()
             : numeroALetras(valor, 'masculino', partes.decimales);
-      return { texto, error: '', valor };
+      return { texto, error: '', valor, partes };
     } catch (e) {
       return { texto: '', error: e instanceof Error ? e.message : 'No se ha podido convertir la cantidad.' };
     }
-  }, [entrada, modo, moneda, estiloFraccion, mayusculas]);
+  }, [entrada, lectura, modo, moneda, estiloFraccion, mayusculas]);
+
+  /**
+   * Si lo tecleado trae una marca que solo puede ser UNA moneda del selector («£», «S/», «L»,
+   * «RD$»…), la app la elige y lo dice. Solo cuando la marca CAMBIA: seguir tecleando cifras
+   * detrás de «£» no vuelve a pisar una moneda que el usuario haya cambiado a mano.
+   * Las ambiguas («$», «Bs», «pesos») no eligen nada: se avisa abajo y se pide elegir.
+   */
+  const cambiarEntrada = (nueva: string) => {
+    const marcaNueva = separarMarcaMoneda(nueva).marca;
+    if (
+      modo === 'importe' &&
+      marcaNueva?.codigos.length === 1 &&
+      !mismaMarca(marcaNueva, lectura.marca) &&
+      marcaNueva.codigos[0] !== codigoMoneda
+    ) {
+      setCodigoMoneda(marcaNueva.codigos[0]);
+      setMonedaPorMarca(marcaNueva.codigos[0]);
+    }
+    setEntrada(nueva);
+  };
+
+  /**
+   * Hallazgo 1539: el campo llega RELLENO con un ejemplo, y al tocarlo el cursor quedaba al
+   * final, así que teclear «1500» producía «3.847,501500» —que se redondeaba a 3.847,50 y el
+   * panel no cambiaba—. Al entrar en el campo se selecciona todo: lo que se teclea SUSTITUYE
+   * al ejemplo. El `mouseup` que sigue al primer clic deshace la selección en Chrome, de ahí
+   * `recienEnfocado`.
+   *
+   * Hallazgo 1538, el que mejor explica la firma de rotura en móvil: al tocar el campo, el
+   * teclado virtual tapa media pantalla y el resultado quedaba debajo. En pantallas estrechas
+   * se sube el campo hasta arriba (bajo la barra fija del logo, `scroll-margin-top`), de modo
+   * que el resultado, que va justo detrás, queda en la mitad que el teclado deja libre.
+   * Instantáneo y no suave: un desplazamiento animado lo interrumpe el del propio navegador
+   * al abrir el teclado.
+   */
+  const alEnfocarCampo = (e: FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.select();
+    recienEnfocado.current = true;
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      bloqueCantidad.current?.scrollIntoView({ block: 'start' });
+    }
+  };
+
+  const alSoltarEnCampo = (e: MouseEvent<HTMLInputElement>) => {
+    if (!recienEnfocado.current) return;
+    recienEnfocado.current = false;
+    e.preventDefault();
+  };
 
   const copiar = async () => {
     if (!resultado.texto) return;
@@ -111,9 +207,27 @@ export default function ConversorNumerosLetrasPage() {
   // dice en voz alta y ofrece la otra lectura en vez de adivinar en silencio, porque de aquí
   // sale la cantidad de un pagaré y equivocarse cuesta un factor mil.
   const alternativa = useMemo(
-    () => (resultado.error ? null : lecturaAmbiguaAlternativa(entrada)),
-    [entrada, resultado.error]
+    () => (resultado.error ? null : lecturaAmbiguaAlternativa(lectura.cifra)),
+    [lectura.cifra, resultado.error]
   );
+
+  /**
+   * Hallazgo 1539, la otra mitad: un importe se redondea a céntimos, y con más de dos
+   * decimales eso cambiaba la cifra EN SILENCIO («3.847,501500» salía igual que 3.847,50).
+   * Se dice. Calla cuando ya habla el aviso de la coma ambigua, que explica esa misma lectura.
+   */
+  const decimalesDeMas =
+    modo === 'importe' &&
+    !resultado.error &&
+    !alternativa &&
+    valorNumerico !== null &&
+    (resultado.partes?.decimales.length ?? 0) > 2;
+
+  const marca = resultado.error ? null : lectura.marca;
+  const marcaCuadra = !!marca && marca.codigos.includes(moneda.codigo);
+  const nombresMarca = marca ? nombrarMonedas(marca.codigos, 'o') : '';
+  const monedaDeLaMarca =
+    marca?.codigos.length === 1 ? MONEDAS.find((m) => m.codigo === marca.codigos[0]) : undefined;
 
   return (
     <div className={styles.container}>
@@ -132,14 +246,13 @@ export default function ConversorNumerosLetrasPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="general" severity="medium">
-        Esta herramienta aplica las reglas ortográficas del español, no valida documentos. Antes de
-        firmar un cheque, un pagaré o un contrato, comprueba que la cantidad en letras y la escrita
-        en cifras coinciden: si difieren, la normativa mercantil suele dar preferencia a la escrita
-        en letras.
-      </DisclaimerCard>
-
-      {/* ═══════ HERRAMIENTA ═══════ */}
+      {/*
+        ═══════ HERRAMIENTA ═══════
+        Orden pensado para el móvil (hallazgo 1538): lo que se elige ANTES de escribir (modo y
+        moneda) va encima del campo, y el resultado va JUSTO DEBAJO, antes que los ajustes finos
+        (ejemplos, decimales, mayúsculas). Antes había unos 770 px entre el campo y el resultado,
+        y con el teclado abierto no se veía nada de lo que se tecleaba.
+      */}
       <div className={styles.card}>
         <div className={styles.modoSelector} role="group" aria-label="Qué se va a escribir en letras">
           <button
@@ -160,43 +273,9 @@ export default function ConversorNumerosLetrasPage() {
           </button>
         </div>
 
-        <div className={styles.campoPrincipal}>
-          <label className={styles.label} htmlFor="cantidad">
-            Cantidad
-          </label>
-          <input
-            id="cantidad"
-            type="text"
-            inputMode="decimal"
-            className={styles.input}
-            value={entrada}
-            onChange={(e) => setEntrada(e.target.value)}
-            placeholder="3.847,50"
-            autoComplete="off"
-          />
-          <p className={styles.helper}>
-            Admite los dos formatos: 3.847,50 y 3,847.50. Hasta{' '}
-            {formatNumber(LIMITE_NUMERO_A_LETRAS, 0)} y dos decimales.
-          </p>
-        </div>
-
-        <div className={styles.ejemplos}>
-          <span className={styles.ejemplosLabel}>Prueba con:</span>
-          {EJEMPLOS.map((ej) => (
-            <button
-              key={ej.valor}
-              type="button"
-              className={styles.ejemploBtn}
-              onClick={() => setEntrada(ej.valor)}
-            >
-              {ej.etiqueta}
-            </button>
-          ))}
-        </div>
-
-        {modo === 'importe' && (
-          <div className={styles.opciones}>
-            <div className={styles.opcionCampo}>
+        <div className={styles.entrada}>
+          {modo === 'importe' && (
+            <div className={styles.campoMoneda}>
               <label className={styles.label} htmlFor="moneda">
                 Moneda
               </label>
@@ -204,7 +283,10 @@ export default function ConversorNumerosLetrasPage() {
                 id="moneda"
                 className={styles.select}
                 value={codigoMoneda}
-                onChange={(e) => setCodigoMoneda(e.target.value)}
+                onChange={(e) => {
+                  setCodigoMoneda(e.target.value);
+                  setMonedaPorMarca(null);
+                }}
               >
                 {MONEDAS.map((m) => (
                   <option key={`${m.codigo}-${m.zona}`} value={m.codigo}>
@@ -213,39 +295,32 @@ export default function ConversorNumerosLetrasPage() {
                 ))}
               </select>
             </div>
+          )}
 
-            <div className={styles.opcionCampo}>
-              <span className={styles.label} id="etiqueta-decimales">
-                Decimales
-              </span>
-              <div className={styles.estiloGrid} role="group" aria-labelledby="etiqueta-decimales">
-                {ESTILOS_FRACCION.map((estilo) => (
-                  <button
-                    key={estilo.id}
-                    type="button"
-                    className={`${styles.estiloBtn} ${estiloFraccion === estilo.id ? styles.estiloBtnActivo : ''}`}
-                    aria-pressed={estiloFraccion === estilo.id}
-                    onClick={() => setEstiloFraccion(estilo.id)}
-                  >
-                    <strong>{estilo.etiqueta}</strong>
-                    <small>{estilo.ayuda}</small>
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className={styles.campoPrincipal} ref={bloqueCantidad}>
+            <label className={styles.label} htmlFor="cantidad">
+              Cantidad
+            </label>
+            <input
+              id="cantidad"
+              type="text"
+              inputMode="decimal"
+              className={styles.input}
+              value={entrada}
+              onChange={(e) => cambiarEntrada(e.target.value)}
+              onFocus={alEnfocarCampo}
+              onMouseUp={alSoltarEnCampo}
+              onBlur={() => {
+                recienEnfocado.current = false;
+              }}
+              placeholder="Por ejemplo, 1.500,00"
+              autoComplete="off"
+            />
+            <p className={styles.helper}>
+              Admite 3.847,50 y 3,847.50, con o sin símbolo de moneda. Hasta{' '}
+              {formatNumber(LIMITE_NUMERO_A_LETRAS, 0)} y dos decimales.
+            </p>
           </div>
-        )}
-
-        <div className={styles.opcionMayusculas}>
-          <button
-            type="button"
-            className={`${styles.toggleBtn} ${mayusculas ? styles.toggleBtnActivo : ''}`}
-            aria-pressed={mayusculas}
-            onClick={() => setMayusculas((v) => !v)}
-          >
-            <span aria-hidden="true">🔠</span> MAYÚSCULAS
-          </button>
-          <span className={styles.toggleAyuda}>Con tildes, como manda la ortografía</span>
         </div>
       </div>
 
@@ -263,7 +338,9 @@ export default function ConversorNumerosLetrasPage() {
                   ? ''
                   : modo === 'importe'
                     ? `${formatNumber(valorNumerico, 2)} ${moneda.codigo}`
-                    : formatNumber(valorNumerico, valorNumerico % 1 === 0 ? 0 : 2)}
+                    : resultado.partes
+                      ? etiquetaNumeroSuelto(valorNumerico, resultado.partes)
+                      : ''}
               </span>
               <button type="button" className={styles.copiarBtn} onClick={copiar}>
                 <span aria-hidden="true">{copiado ? '✅' : '📋'}</span>{' '}
@@ -273,6 +350,50 @@ export default function ConversorNumerosLetrasPage() {
             <p className={styles.resultadoTexto} aria-live="polite">
               {resultado.texto}
             </p>
+
+            {/* La moneda escrita junto a la cifra: elegida, contradicha o sobrante (1540) */}
+            {marca && modo === 'numero' && (
+              <p className={styles.nota} role="status">
+                En «Número suelto» no se escribe la moneda: {citar(marca.textos)} se ha dejado
+                fuera. Para escribirla, elige «Importe con moneda».
+              </p>
+            )}
+            {marca && modo === 'importe' && marcaCuadra && monedaPorMarca === moneda.codigo && (
+              <p className={styles.nota} role="status">
+                Moneda elegida por {citar(marca.textos)}: {moneda.singular} ({moneda.zona}). Si no
+                es la tuya, cámbiala en «Moneda».
+              </p>
+            )}
+            {marca && modo === 'importe' && !marcaCuadra && (
+              <div className={styles.aviso} role="status">
+                <p className={styles.avisoTexto}>
+                  {citar(marca.textos)} {monedaDeLaMarca || !nombresMarca.includes(' o ') ? 'indica' : 'puede ser'}{' '}
+                  {nombresMarca}, pero el texto sale en <strong>{moneda.plural}</strong>, la moneda
+                  elegida.{monedaDeLaMarca ? '' : ' Elige la tuya en «Moneda».'}
+                </p>
+                {monedaDeLaMarca && (
+                  <button
+                    type="button"
+                    className={styles.avisoBtn}
+                    onClick={() => {
+                      setCodigoMoneda(monedaDeLaMarca.codigo);
+                      setMonedaPorMarca(monedaDeLaMarca.codigo);
+                    }}
+                  >
+                    Escribir en {monedaDeLaMarca.plural}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {decimalesDeMas && valorNumerico !== null && (
+              <div className={styles.aviso} role="status">
+                <p className={styles.avisoTexto}>
+                  Un importe lleva dos decimales como mucho: <strong>{entrada.trim()}</strong> se
+                  ha leído como <strong>{formatNumber(valorNumerico, 2)}</strong>.
+                </p>
+              </div>
+            )}
 
             {alternativa && (
               <div className={styles.desambiguacion} role="status">
@@ -285,7 +406,7 @@ export default function ConversorNumerosLetrasPage() {
                 <button
                   type="button"
                   className={styles.desambiguacionBtn}
-                  onClick={() => setEntrada(alternativa.texto)}
+                  onClick={() => setEntrada(`${lectura.antes}${alternativa.texto}${lectura.despues}`)}
                 >
                   Leer {alternativa.texto}
                 </button>
@@ -305,6 +426,64 @@ export default function ConversorNumerosLetrasPage() {
           <p className={styles.vacio}>Escribe una cantidad para verla en letras.</p>
         )}
       </div>
+
+      {/* ═══════ AJUSTES ═══════ */}
+      <div className={styles.card}>
+        <div className={styles.ejemplos}>
+          <span className={styles.ejemplosLabel}>Prueba con:</span>
+          {EJEMPLOS.map((ej) => (
+            <button
+              key={ej.valor}
+              type="button"
+              className={styles.ejemploBtn}
+              onClick={() => setEntrada(ej.valor)}
+            >
+              {ej.etiqueta}
+            </button>
+          ))}
+        </div>
+
+        {modo === 'importe' && (
+          <div className={styles.opcionCampo}>
+            <span className={styles.label} id="etiqueta-decimales">
+              Decimales
+            </span>
+            <div className={styles.estiloGrid} role="group" aria-labelledby="etiqueta-decimales">
+              {ESTILOS_FRACCION.map((estilo) => (
+                <button
+                  key={estilo.id}
+                  type="button"
+                  className={`${styles.estiloBtn} ${estiloFraccion === estilo.id ? styles.estiloBtnActivo : ''}`}
+                  aria-pressed={estiloFraccion === estilo.id}
+                  onClick={() => setEstiloFraccion(estilo.id)}
+                >
+                  <strong>{estilo.etiqueta}</strong>
+                  <small>{estilo.ayuda}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className={styles.opcionMayusculas}>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${mayusculas ? styles.toggleBtnActivo : ''}`}
+            aria-pressed={mayusculas}
+            onClick={() => setMayusculas((v) => !v)}
+          >
+            <span aria-hidden="true">🔠</span> MAYÚSCULAS
+          </button>
+          <span className={styles.toggleAyuda}>Con tildes, como manda la ortografía</span>
+        </div>
+      </div>
+
+      <DisclaimerCard variant="general" severity="medium">
+        Esta herramienta aplica las reglas ortográficas del español, no valida documentos. Antes de
+        firmar un cheque, un pagaré o un contrato, comprueba que la cantidad en letras y la escrita
+        en cifras coinciden: si difieren, la normativa mercantil suele dar preferencia a la escrita
+        en letras.
+      </DisclaimerCard>
 
       {/* ═══════ CONTENIDO EDUCATIVO ═══════ */}
       <EducationalSection
@@ -425,6 +604,11 @@ export default function ConversorNumerosLetrasPage() {
             </p>
             <p className={styles.faqTip}>
               <span aria-hidden="true">💡</span> «Millón» es masculino siempre: doscientos un millones de libras, no doscientas una.
+            </p>
+            {/* DLE, s. v. «lempira» y «córdoba»: «m. Unidad monetaria de…» (hallazgo 1537) */}
+            <p className={styles.faqTip}>
+              <span aria-hidden="true">💡</span> Que acabe en -a no la hace femenina: el lempira y el
+              córdoba son masculinos según el diccionario académico. Un lempira, doscientos córdobas.
             </p>
           </li>
           <li className={styles.faqItem}>
