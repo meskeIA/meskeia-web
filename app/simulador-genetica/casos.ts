@@ -1,5 +1,5 @@
 /**
- * Casos de aula de simulador-genetica — 12 cruces fijos con respuesta comprobable.
+ * Casos de aula de simulador-genetica — 16 cruces fijos con respuesta comprobable.
  *
  * POR QUÉ ESTE FICHERO VIVE FUERA DE LA VISTA
  * El build compila `page.tsx` sin comprobar si la genética está bien: un cruce mal resuelto
@@ -45,6 +45,13 @@
  *    individuos lo calculan como proporción × población, que es el valor ESPERADO y es
  *    determinista. Un caso que cambiara de respuesta entre dos lecturas rompería la consigna
  *    «haz los casos 3, 7 y 11», que es la razón de ser de todo esto.
+ *
+ * 7. GRUPO SANGUÍNEO ABO (casos 13-16, 24/09/2026): dentro del motor los alelos son A, B y O
+ *    —parte los genotipos letra a letra—, así que las claves de `busca` son las internas
+ *    ('AO', 'Grupo A'). Los ENUNCIADOS y el desarrollo se escriben con la notación de los
+ *    libros (Iᴬ, Iᴮ, i), que traduce `notacionGenotipo`. Y no se pregunta por un grupo que el
+ *    cruce no da (¿un O de un padre AB?): la respuesta sería 0 y el motor la trata como clave
+ *    inexistente; ese razonamiento va en la pista.
  * ────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -53,6 +60,7 @@ import {
   generateMonohybridPunnett,
   generateDihybridPunnett,
   generateSexLinkedPunnett,
+  notacionGenotipo,
 } from './components/genetics';
 import type { Trait, PunnettResult } from './components/types';
 import { formatNumber } from '@/lib';
@@ -168,8 +176,10 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
     return { ok: false, valor: NaN, pasos: [], error: 'No existe ese organismo o ese rasgo' };
   }
 
-  const { cuadro } = encontrado;
+  const { cuadro, rasgos } = encontrado;
   const { busca } = datos;
+  /** Los alelos del ABO se escriben Iᴬ, Iᴮ, i; los demás rasgos pasan intactos. */
+  const escribir = (texto: string) => notacionGenotipo(texto, rasgos);
 
   const fraccion =
     busca.clase === 'fenotipo'
@@ -202,11 +212,11 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
   }
 
   const pasos: string[] = [];
-  pasos.push(`Gametos del primer progenitor: ${cuadro.gametes1.join(', ')}`);
-  pasos.push(`Gametos del segundo progenitor: ${cuadro.gametes2.join(', ')}`);
+  pasos.push(`Gametos del primer progenitor: ${cuadro.gametes1.map(escribir).join(', ')}`);
+  pasos.push(`Gametos del segundo progenitor: ${cuadro.gametes2.map(escribir).join(', ')}`);
   pasos.push(`El cuadro de Punnett tiene ${casillas} casillas, todas igual de probables.`);
   pasos.push(
-    `Casillas que dan ${busca.clase === 'fenotipo' ? 'el fenotipo' : 'el genotipo'} «${busca.clave}»: ${aciertos} de ${casillas}.`
+    `Casillas que dan ${busca.clase === 'fenotipo' ? 'el fenotipo' : 'el genotipo'} «${busca.clase === 'genotipo' ? escribir(busca.clave) : busca.clave}»: ${aciertos} de ${casillas}.`
   );
 
   if (busca.magnitud === 'individuos') {
@@ -560,6 +570,81 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     pista:
       'El varón recibe su único X de la madre, y ella solo puede darle Xd. La mitad de la descendencia son varones.',
   },
+  {
+    id: 13,
+    titulo: 'Grupos sanguíneos: dos padres que esconden un alelo i',
+    enunciado:
+      'El grupo sanguíneo ABO tiene tres alelos: Iᴬ e Iᴮ son codominantes entre sí y los dos dominan sobre i. Un padre de grupo A heterocigoto (Iᴬi) y una madre de grupo B heterocigota (Iᴮi) tienen descendencia. ¿Qué porcentaje de la descendencia será de grupo O?',
+    categoria: 'aplicado',
+    datos: {
+      tipo: 'monohibrido',
+      organismo: 'humanos',
+      rasgo: 'grupo-abo',
+      padre: 'AO',
+      madre: 'BO',
+      busca: { clase: 'fenotipo', clave: 'Grupo O', magnitud: 'porcentaje' },
+    },
+    etiquetaRespuesta: '% de grupo O',
+    pista:
+      'El grupo O es ii: hace falta que cada progenitor aporte su alelo i. Este cruce da los cuatro grupos a la vez.',
+  },
+  {
+    id: 14,
+    titulo: 'Codominancia: un progenitor AB y otro O',
+    enunciado:
+      'Un progenitor de grupo AB (IᴬIᴮ) tiene descendencia con otro de grupo O (ii). ¿Qué porcentaje de la descendencia será de grupo A?',
+    categoria: 'aplicado',
+    datos: {
+      tipo: 'monohibrido',
+      organismo: 'humanos',
+      rasgo: 'grupo-abo',
+      padre: 'AB',
+      madre: 'OO',
+      busca: { clase: 'fenotipo', clave: 'Grupo A', magnitud: 'porcentaje' },
+    },
+    etiquetaRespuesta: '% de grupo A',
+    pista:
+      'El progenitor O solo aporta i. Fíjate en que ningún hijo sale AB ni O: ninguno tendrá el grupo de sus padres.',
+  },
+  {
+    id: 15,
+    titulo: 'Mismo grupo, distinto genotipo',
+    enunciado:
+      'Un progenitor de grupo AB (IᴬIᴮ) tiene descendencia con otro de grupo A heterocigoto (Iᴬi). ¿Qué porcentaje de la descendencia tendrá el genotipo Iᴬi, es decir, será de grupo A pero portadora del alelo i?',
+    categoria: 'abstracto',
+    datos: {
+      tipo: 'monohibrido',
+      organismo: 'humanos',
+      rasgo: 'grupo-abo',
+      padre: 'AB',
+      madre: 'AO',
+      busca: { clase: 'genotipo', clave: 'AO', magnitud: 'porcentaje' },
+    },
+    etiquetaRespuesta: '% de genotipo Iᴬi',
+    pista:
+      'El grupo A sale por dos genotipos, IᴬIᴬ e Iᴬi. Aquí se pregunta solo por uno de ellos: no confundas grupo con genotipo.',
+  },
+  {
+    id: 16,
+    titulo: 'Grupo ABO y factor Rh a la vez',
+    enunciado:
+      'El factor Rh se hereda aparte del grupo ABO, con el Rh positivo (D) dominante sobre el negativo (d). Un padre Iᴬi Dd (grupo A, Rh positivo) y una madre Iᴮi Dd (grupo B, Rh positivo) tienen descendencia. ¿Qué porcentaje de la descendencia será de grupo O y Rh negativo?',
+    categoria: 'abstracto',
+    datos: {
+      tipo: 'dihibrido',
+      organismo: 'humanos',
+      rasgo1: 'grupo-abo',
+      rasgo2: 'factor-rh',
+      padre1: 'AO',
+      padre2: 'Dd',
+      madre1: 'BO',
+      madre2: 'Dd',
+      busca: { clase: 'fenotipo', clave: 'Grupo O / Rh negativo', magnitud: 'porcentaje' },
+    },
+    etiquetaRespuesta: '% de grupo O y Rh negativo',
+    pista:
+      'Los dos genes son independientes: multiplica la probabilidad de ser O por la de ser Rh negativo. El cuadro tiene 16 casillas.',
+  },
 ];
 
 /** Texto legible de la respuesta, con formato español (coma decimal). */
@@ -570,7 +655,7 @@ function formatearRespuesta(valor: number, etiqueta: string): string {
 }
 
 /**
- * Los 12 casos, con la respuesta YA CALCULADA por el motor de la app. Si un cruce no se
+ * Los casos, con la respuesta YA CALCULADA por el motor de la app. Si un cruce no se
  * puede resolver, el caso sale con respuesta NaN en vez de tumbar el módulo: el test lo
  * caza (invariante 4) y la vista lo puede pintar.
  */
@@ -652,7 +737,7 @@ const COMBINACIONES: ReadonlyArray<{ padre: string; madre: string; clave: string
 })();
 
 /**
- * Ejercicio aleatorio de cruce monohíbrido. Usa EL MISMO `resolverCaso` que los 12 fijos:
+ * Ejercicio aleatorio de cruce monohíbrido. Usa EL MISMO `resolverCaso` que los casos fijos:
  * si divergieran, el alumno entrenaría con una regla y sería corregido con otra.
  */
 export function generarEjercicioAleatorio(semilla = Date.now()): Ejercicio {

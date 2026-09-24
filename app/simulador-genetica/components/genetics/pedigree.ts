@@ -245,14 +245,36 @@ function createPedigreeIndividual(
     // Herencia autosómica
     phenotypeInfo = determinePhenotype(genotype, trait);
 
-    // Verificar si es afectado (homocigoto recesivo)
     const r = trait.alleles.recessive.symbol;
+    const d = trait.alleles.dominant.symbol;
+
+    /**
+     * Con alelos codominantes (ABO) no hay «afectados»: el grupo O es un fenotipo más, no una
+     * condición, y pintarlo con el símbolo relleno del árbol lo habría presentado como tal.
+     * Lo que sí se marca es el PORTADOR de i (Iᴬi, Iᴮi), porque es justo lo que explica que
+     * dos padres de grupo A puedan tener un hijo O.
+     */
+    if (trait.alleles.codominant) {
+      return {
+        id,
+        generation,
+        position,
+        sex,
+        genotype,
+        phenotype: phenotypeInfo.name,
+        phenotypeColor: phenotypeInfo.color,
+        isAffected: false,
+        isCarrier: genotype.length === 2 && genotype.includes(r) && genotype !== `${r}${r}`,
+        parentIds,
+      };
+    }
+
+    // Verificar si es afectado (homocigoto recesivo)
     if (genotype === `${r}${r}`) {
       isAffected = true;
     }
 
     // Verificar si es portador (heterocigoto)
-    const d = trait.alleles.dominant.symbol;
     if (
       (genotype.includes(d) && genotype.includes(r)) ||
       genotype === `${d}${r}` ||

@@ -16,6 +16,7 @@ import {
   getTraitById,
   getPossibleGenotypes,
   getSexLinkedGenotypes,
+  genotiposPorDefecto,
   performCross,
   generateMonohybridPunnett,
   generateDihybridPunnett,
@@ -118,9 +119,7 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
     const organism = getOrganismById(organismId);
     if (organism) {
       const trait = organism.traits[0];
-      const defaultGenotype = trait.inheritanceMode === 'sex-linked'
-        ? getSexLinkedGenotypes(trait, 'male')[0]
-        : getPossibleGenotypes(trait)[1]; // Heterocigoto por defecto
+      const [genotipo1, genotipo2] = genotiposPorDefecto(trait);
 
       setState((prev) => ({
         ...prev,
@@ -128,10 +127,8 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
         selectedTrait1: trait,
         selectedTrait2: null,
         crossType: 'monohybrid',
-        parent1Genotype: defaultGenotype,
-        parent2Genotype: trait.inheritanceMode === 'sex-linked'
-          ? getSexLinkedGenotypes(trait, 'female')[1]
-          : defaultGenotype,
+        parent1Genotype: genotipo1,
+        parent2Genotype: genotipo2,
         crossResult: null,
         punnettResult: null,
         populationSimulation: null,
@@ -144,9 +141,7 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
     setState((prev) => {
       const trait = getTraitById(prev.selectedOrganism, traitId);
       if (trait) {
-        const defaultGenotype = trait.inheritanceMode === 'sex-linked'
-          ? getSexLinkedGenotypes(trait, 'male')[0]
-          : getPossibleGenotypes(trait)[1];
+        const [genotipo1, genotipo2] = genotiposPorDefecto(trait);
 
         /**
          * Un rasgo ligado al X no puede quedarse dentro de un cruce DIHÍBRIDO.
@@ -178,10 +173,8 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
                 parent2Genotype2: '',
               }
             : {}),
-          parent1Genotype: defaultGenotype,
-          parent2Genotype: trait.inheritanceMode === 'sex-linked'
-            ? getSexLinkedGenotypes(trait, 'female')[1]
-            : defaultGenotype,
+          parent1Genotype: genotipo1,
+          parent2Genotype: genotipo2,
           crossResult: null,
           punnettResult: null,
           populationSimulation: null,
@@ -208,13 +201,13 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
 
       const trait = getTraitById(prev.selectedOrganism, traitId);
       if (trait) {
-        const defaultGenotype = getPossibleGenotypes(trait)[1];
+        const [genotipo1, genotipo2] = genotiposPorDefecto(trait);
         return {
           ...prev,
           selectedTrait2: trait,
           crossType: 'dihybrid',
-          parent1Genotype2: defaultGenotype,
-          parent2Genotype2: defaultGenotype,
+          parent1Genotype2: genotipo1,
+          parent2Genotype2: genotipo2,
           crossResult: null,
           punnettResult: null,
         };
@@ -232,13 +225,13 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
         );
         if (availableTraits.length > 0) {
           const trait2 = availableTraits[0];
-          const defaultGenotype = getPossibleGenotypes(trait2)[1];
+          const [genotipo1, genotipo2] = genotiposPorDefecto(trait2);
           return {
             ...prev,
             crossType: type,
             selectedTrait2: trait2,
-            parent1Genotype2: defaultGenotype,
-            parent2Genotype2: defaultGenotype,
+            parent1Genotype2: genotipo1,
+            parent2Genotype2: genotipo2,
           };
         }
       }

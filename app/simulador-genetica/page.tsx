@@ -13,6 +13,7 @@ import {
   PedigreeChart,
   getPossibleGenotypes,
   getSexLinkedGenotypes,
+  notacionGenotipo,
 } from './components';
 
 type TabType = 'punnett' | 'stats' | 'population' | 'pedigree';
@@ -165,6 +166,13 @@ export default function SimuladorGeneticaPage() {
 
   const canDoDihybrid = availableTraitsForDihybrid.length > 0 && !isSexLinked;
 
+  /**
+   * Los rasgos del cruce en pantalla, en el orden en que el motor escribe los genotipos
+   * («AO Dd»). Solo sirven para la NOTACIÓN: el ABO se calcula con A, B y O y se lee Iᴬ, Iᴮ, i.
+   */
+  const rasgosDelCruce =
+    crossType === 'dihybrid' && selectedTrait2 ? [selectedTrait1, selectedTrait2] : [selectedTrait1];
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -258,6 +266,7 @@ export default function SimuladorGeneticaPage() {
               <p className={styles.inheritanceInfo}>
                 {selectedTrait1.inheritanceMode === 'sex-linked' && '🔗 Ligada al sexo - '}
                 {selectedTrait1.inheritanceMode === 'incomplete' && '🎨 Dominancia incompleta - '}
+                {selectedTrait1.inheritanceMode === 'codominant' && '🩸 Codominancia y alelos múltiples - '}
                 {selectedTrait1.description}
               </p>
             </div>
@@ -300,7 +309,7 @@ export default function SimuladorGeneticaPage() {
                 >
                   {parent1Genotypes.map((g) => (
                     <option key={g} value={g}>
-                      {g}
+                      {notacionGenotipo(g, [selectedTrait1])}
                     </option>
                   ))}
                 </select>
@@ -327,7 +336,7 @@ export default function SimuladorGeneticaPage() {
                 >
                   {parent2Genotypes.map((g) => (
                     <option key={g} value={g}>
-                      {g}
+                      {notacionGenotipo(g, [selectedTrait1])}
                     </option>
                   ))}
                 </select>
@@ -350,7 +359,7 @@ export default function SimuladorGeneticaPage() {
                   >
                     {getPossibleGenotypes(selectedTrait2).map((g) => (
                       <option key={g} value={g}>
-                        {g}
+                        {notacionGenotipo(g, [selectedTrait2])}
                       </option>
                     ))}
                   </select>
@@ -365,7 +374,7 @@ export default function SimuladorGeneticaPage() {
                   >
                     {getPossibleGenotypes(selectedTrait2).map((g) => (
                       <option key={g} value={g}>
-                        {g}
+                        {notacionGenotipo(g, [selectedTrait2])}
                       </option>
                     ))}
                   </select>
@@ -437,6 +446,7 @@ export default function SimuladorGeneticaPage() {
               {activeTab === 'punnett' && (
                 <PunnettSquare
                   punnett={punnettResult}
+                  rasgos={rasgosDelCruce}
                   animationState={animationState}
                   animationStep={animationStep}
                   onStartAnimation={startAnimation}
@@ -446,12 +456,13 @@ export default function SimuladorGeneticaPage() {
               )}
 
               {activeTab === 'stats' && (
-                <StatisticsPanel punnett={punnettResult} />
+                <StatisticsPanel punnett={punnettResult} rasgos={rasgosDelCruce} />
               )}
 
               {activeTab === 'population' && (
                 <PopulationSimulator
                   punnett={punnettResult}
+                  rasgos={rasgosDelCruce}
                   simulation={populationSimulation}
                   populationSize={populationSize}
                   onSimulate={runPopulationSimulation}
@@ -460,7 +471,7 @@ export default function SimuladorGeneticaPage() {
               )}
 
               {activeTab === 'pedigree' && pedigreeChart && (
-                <PedigreeChart pedigree={pedigreeChart} />
+                <PedigreeChart pedigree={pedigreeChart} rasgo={selectedTrait1} />
               )}
 
               {activeTab === 'pedigree' && !pedigreeChart && (
@@ -574,7 +585,11 @@ export default function SimuladorGeneticaPage() {
           <h3>Codominancia</h3>
           <p>
             Ambos alelos se expresan completamente. Ejemplo: grupos sanguíneos ABO,
-            donde el genotipo AB expresa ambos antígenos.
+            donde el genotipo IᴬIᴮ expresa los dos antígenos y da el grupo AB. El ABO es
+            además un caso de alelos múltiples: hay tres (Iᴬ, Iᴮ e i) y i es recesivo frente
+            a los otros dos, así que dos padres de grupo A pueden tener un hijo de grupo O.
+            Puedes cruzarlo en <strong>Humanos → Grupo sanguíneo ABO</strong>, solo o junto al
+            factor Rh en un cruce dihíbrido.
           </p>
 
           <h3>Herencia ligada al sexo</h3>
@@ -628,8 +643,8 @@ export default function SimuladorGeneticaPage() {
           <h2>⚖️ Comparativa: Tipos de Herencia Genética</h2>
           <p className={styles.comparativaSubtitle}>
             Cuatro modos de herencia clave en genética mendeliana y sus diferencias.
-            El simulador permite practicar dominancia completa, incompleta y herencia
-            ligada al sexo; la codominancia se incluye aquí como referencia conceptual.
+            El simulador permite practicar los cuatro: dominancia completa, incompleta,
+            codominancia (grupos sanguíneos ABO, en Humanos) y herencia ligada al sexo.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -661,7 +676,7 @@ export default function SimuladorGeneticaPage() {
                   <td><strong>Ejemplo clásico</strong></td>
                   <td>Color flor guisante (P/p)</td>
                   <td>Boca de dragón rojo × blanco</td>
-                  <td>Grupos sanguíneos ABO (I^A/I^B)</td>
+                  <td>Grupos sanguíneos ABO (Iᴬ/Iᴮ)</td>
                   <td>Daltonismo (X^R/X^r), hemofilia</td>
                 </tr>
                 <tr>

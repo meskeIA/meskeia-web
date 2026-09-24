@@ -719,6 +719,12 @@ export default function SimuladorPunnettPage() {
                 simplemente dominantes sobre i. Un cruce I<sup>A</sup>i × I<sup>B</sup>i produce
                 grupos A, B, AB y O en proporción 1:1:1:1. No aplica dominancia estricta.
               </p>
+              {/* Con tres alelos no cabe en los selectores AA/Aa/aa de esta app: se resuelve en la
+                  que sí lo simula (24/09/2026). stemum.com redirige la ruta a meskeia.com. */}
+              <p style={{ fontSize: '0.88rem', marginTop: '0.3rem' }}>
+                <a href="/simulador-genetica/">Crúzalo en el Simulador de Genética Mendeliana</a>{' '}
+                (Humanos → Grupo sanguíneo ABO), también junto al factor Rh.
+              </p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👁️</span>

@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import styles from '../SimuladorGenetica.module.css';
 import { formatNumber } from '@/lib';
-import { PopulationSimulation, PunnettResult } from './types';
-import { interpretChiSquare } from './genetics';
+import { PopulationSimulation, PunnettResult, Trait } from './types';
+import { interpretChiSquare, notacionGenotipo } from './genetics';
 
 const TAMANO_MINIMO = 10;
 const TAMANO_MAXIMO = 500;
 
 interface PopulationSimulatorProps {
   punnett: PunnettResult;
+  /** Los rasgos del cruce, en orden: solo para escribir los genotipos del tooltip. */
+  rasgos: Trait[];
   simulation: PopulationSimulation | null;
   populationSize: number;
   onSimulate: (size?: number) => void;
@@ -19,6 +21,7 @@ interface PopulationSimulatorProps {
 
 export default function PopulationSimulator({
   punnett,
+  rasgos,
   simulation,
   populationSize,
   onSimulate,
@@ -142,7 +145,7 @@ export default function PopulationSimulator({
               <span
                 key={i}
                 className={styles.populationIndividual}
-                title={`${ind.genotype}: ${ind.phenotype}`}
+                title={`${notacionGenotipo(ind.genotype, rasgos)}: ${ind.phenotype}`}
               >
                 {ind.phenotypeIcon}
               </span>

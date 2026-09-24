@@ -2,13 +2,16 @@
 
 import { Fragment } from 'react';
 import styles from '../SimuladorGenetica.module.css';
-import { PedigreeChart as PedigreeChartType, PedigreeIndividual } from './types';
+import { PedigreeChart as PedigreeChartType, PedigreeIndividual, Trait } from './types';
+import { notacionGenotipo } from './genetics';
 
 interface PedigreeChartProps {
   pedigree: PedigreeChartType;
+  /** El rasgo del árbol: solo para escribir los genotipos (Iᴬi en vez de AO). */
+  rasgo: Trait;
 }
 
-export default function PedigreeChart({ pedigree }: PedigreeChartProps) {
+export default function PedigreeChart({ pedigree, rasgo }: PedigreeChartProps) {
   // Agrupar individuos por generación
   const generations: Map<number, PedigreeIndividual[]> = new Map();
 
@@ -42,7 +45,7 @@ export default function PedigreeChart({ pedigree }: PedigreeChartProps) {
                   fragmento, no en el hijo: React avisaba de «unique key prop» en consola. */}
               {individuals.map((ind, idx) => (
                 <Fragment key={ind.id}>
-                  <PedigreeIndividualComponent individual={ind} />
+                  <PedigreeIndividualComponent individual={ind} rasgo={rasgo} />
                   {idx === 0 && individuals.length > 1 && (
                     <div className={styles.pedigreeConnection} />
                   )}
@@ -53,7 +56,7 @@ export default function PedigreeChart({ pedigree }: PedigreeChartProps) {
             // Hijos: mostrar en fila
             <div style={{ display: 'flex', gap: 'var(--spacing-lg)' }}>
               {individuals.map((ind) => (
-                <PedigreeIndividualComponent key={ind.id} individual={ind} />
+                <PedigreeIndividualComponent key={ind.id} individual={ind} rasgo={rasgo} />
               ))}
             </div>
           )}
@@ -85,8 +88,10 @@ export default function PedigreeChart({ pedigree }: PedigreeChartProps) {
 
 function PedigreeIndividualComponent({
   individual,
+  rasgo,
 }: {
   individual: PedigreeIndividual;
+  rasgo: Trait;
 }) {
   const symbolClasses = [
     styles.pedigreeSymbol,
@@ -102,7 +107,7 @@ function PedigreeIndividualComponent({
       <div className={symbolClasses}>
         {individual.isAffected ? '' : individual.sex === 'male' ? '♂' : '♀'}
       </div>
-      <div className={styles.pedigreeGenotype}>{individual.genotype}</div>
+      <div className={styles.pedigreeGenotype}>{notacionGenotipo(individual.genotype, [rasgo])}</div>
       <div className={styles.pedigreePhenotype}>{individual.phenotype}</div>
     </div>
   );

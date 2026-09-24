@@ -28,10 +28,24 @@ export interface Trait {
   alleles: {
     dominant: AlleleDefinition;
     recessive: AlleleDefinition;
-    codominant?: AlleleDefinition; // Para codominancia (ej: grupo sanguíneo)
+    /**
+     * Tercer alelo, codominante con `dominant` y dominante sobre `recessive`: Iᴮ en el sistema
+     * ABO, donde Iᴬ e Iᴮ se expresan a la vez (grupo AB) y los dos tapan a i. Con él el rasgo
+     * tiene seis genotipos en vez de tres (ver `getPossibleGenotypes`).
+     */
+    codominant?: AlleleDefinition;
   };
   phenotypes: PhenotypeDefinition[];
   description: string;
+  /**
+   * Cómo se ESCRIBE cada alelo en pantalla, cuando no es su símbolo interno.
+   *
+   * El motor trabaja con alelos de UNA letra —parte genotipos y gametos por posición—, así
+   * que el ABO vive dentro como A, B y O y se muestra como Iᴬ, Iᴮ e i, que es la notación de
+   * los libros. La traducción la hace `notacionGenotipo`, y solo en la vista: las claves de
+   * los ratios y de los casos de aula siguen siendo las internas ('AO', 'Grupo A').
+   */
+  notacion?: Record<string, string>;
 }
 
 // Organismo

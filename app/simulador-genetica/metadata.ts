@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Cruces Genéticos y Leyes de Mendel | meskeIA',
-  description: 'Simulador de cruces genéticos y herencia mendeliana en español: cuadro de Punnett, cruce monohíbrido (3:1) y dihíbrido (9:3:3:1), proporciones fenotípicas, genotipo y fenotipo, alelos dominante y recesivo. Alternativa interactiva para practicar las leyes de Mendel y los patrones mendelianos de la herencia.',
-  keywords: 'cruces genéticos, simulador de cruces genéticos, leyes de Mendel, herencia mendeliana, patrones mendelianos, cruce monohíbrido, cruce dihíbrido, proporciones fenotípicas, cuadro de Punnett, cuadro de herencia mendeliana, genotipo, fenotipo, alelo dominante, alelo recesivo, cruces genéticos con monedas, dihíbrido, cromosomas',
+  description: 'Simulador de cruces genéticos y herencia mendeliana en español: cuadro de Punnett, cruce monohíbrido (3:1) y dihíbrido (9:3:3:1), proporciones fenotípicas, genotipo y fenotipo, alelos dominante y recesivo, y herencia de los grupos sanguíneos ABO y el factor Rh. Alternativa interactiva para practicar las leyes de Mendel y los patrones mendelianos de la herencia.',
+  keywords: 'cruces genéticos, simulador de cruces genéticos, leyes de Mendel, herencia mendeliana, patrones mendelianos, cruce monohíbrido, cruce dihíbrido, proporciones fenotípicas, cuadro de Punnett, cuadro de herencia mendeliana, genotipo, fenotipo, alelo dominante, alelo recesivo, cruces genéticos con monedas, dihíbrido, cromosomas, herencia de grupos sanguíneos, grupo sanguíneo ABO, codominancia, alelos múltiples, factor Rh',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -110,12 +110,20 @@ export const faqJsonLd = {
         text: 'Las leyes de Mendel son los tres principios que describen los patrones mendelianos de la herencia. La 1ª ley (uniformidad) dice que al cruzar dos razas puras toda la F1 es igual. La 2ª ley (segregación) explica que los alelos se separan al formar los gametos, reapareciendo el rasgo recesivo en la F2 en proporción 3:1. La 3ª ley (transmisión independiente) indica que genes de caracteres distintos se heredan por separado, dando la proporción 9:3:3:1 en un cruce dihíbrido.',
       },
     },
+    {
+      '@type': 'Question',
+      name: '¿Qué grupo sanguíneo pueden tener los hijos según el de los padres?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El grupo ABO depende de tres alelos: Iᴬ e Iᴮ son codominantes entre sí y los dos dominan sobre i. Una persona de grupo A puede ser IᴬIᴬ o Iᴬi, y una de grupo B, IᴮIᴮ o Iᴮi, así que dos padres Iᴬi × Iᴮi pueden tener hijos de los cuatro grupos (A, B, AB y O), cada uno con un 25 % de probabilidad. En cambio, un progenitor AB (IᴬIᴮ) con otro O (ii) solo puede tener hijos A o B, al 50 %. El factor Rh se hereda aparte, con el positivo dominante: dos padres Rh positivos heterocigotos tienen un 25 % de probabilidad de un hijo Rh negativo.',
+      },
+    },
   ],
 };
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Cruces Genéticos y Leyes de Mendel',
-  description: 'Simulador interactivo de cruces genéticos y herencia mendeliana en español. Genera el cuadro de Punnett del cruce monohíbrido (proporción fenotípica 3:1) y dihíbrido (9:3:3:1), muestra genotipo y fenotipo, alelos dominante y recesivo, herencia ligada al sexo, árboles genealógicos y simulación de poblaciones. Alternativa interactiva para practicar las leyes de Mendel y los patrones mendelianos de la herencia.',
+  description: 'Simulador interactivo de cruces genéticos y herencia mendeliana en español. Genera el cuadro de Punnett del cruce monohíbrido (proporción fenotípica 3:1) y dihíbrido (9:3:3:1), muestra genotipo y fenotipo, alelos dominante y recesivo, herencia ligada al sexo, codominancia con los grupos sanguíneos ABO y el factor Rh, árboles genealógicos y simulación de poblaciones. Alternativa interactiva para practicar las leyes de Mendel y los patrones mendelianos de la herencia.',
   url: 'https://meskeia.com/simulador-genetica/',
   category: 'EducationalApplication',
   features: [
@@ -124,9 +132,10 @@ export const jsonLd = generateWebAppSchema({
     'Simulación de cruces genéticos paso a paso',
     'Alelos dominante y recesivo, genotipo y fenotipo',
     'Herencia ligada al sexo y autosómica',
+    'Codominancia y alelos múltiples: herencia de los grupos sanguíneos ABO y del factor Rh',
     'Árboles genealógicos (pedigrees)',
     'Simulación de frecuencias alélicas en poblaciones',
     'En español, alternativa interactiva a las prácticas de las leyes de Mendel',
   ],
-  keywords: ['cruces genéticos', 'leyes de Mendel', 'herencia mendeliana', 'patrones mendelianos', 'cruce monohíbrido', 'cruce dihíbrido', 'proporciones fenotípicas', 'cuadro de Punnett', 'genotipo', 'fenotipo', 'alelo dominante', 'alelo recesivo', 'biología'],
+  keywords: ['cruces genéticos', 'leyes de Mendel', 'herencia mendeliana', 'patrones mendelianos', 'cruce monohíbrido', 'cruce dihíbrido', 'proporciones fenotípicas', 'cuadro de Punnett', 'genotipo', 'fenotipo', 'alelo dominante', 'alelo recesivo', 'grupos sanguíneos', 'codominancia', 'biología'],
 });

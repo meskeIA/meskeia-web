@@ -3,10 +3,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import styles from '../SimuladorGenetica.module.css';
 import { formatNumber } from '@/lib';
-import { PunnettResult, PunnettAnimationState } from './types';
+import { PunnettResult, PunnettAnimationState, Trait } from './types';
+import { notacionGenotipo } from './genetics';
 
 interface PunnettSquareProps {
   punnett: PunnettResult;
+  /** Los rasgos del cruce, en orden: solo para escribir los alelos (Iᴬ, Iᴮ, i en el ABO). */
+  rasgos: Trait[];
   animationState: PunnettAnimationState;
   animationStep: number;
   onStartAnimation: () => void;
@@ -16,6 +19,7 @@ interface PunnettSquareProps {
 
 export default function PunnettSquare({
   punnett,
+  rasgos,
   animationState,
   animationStep,
   onStartAnimation,
@@ -103,7 +107,7 @@ export default function PunnettSquare({
                   transition: 'opacity 0.3s',
                 }}
               >
-                {gamete}
+                {notacionGenotipo(gamete, rasgos)}
                 <br />
                 <small>({formatNumber((1 / gametesColumna.length) * 100, 0)}%)</small>
               </th>
@@ -119,7 +123,7 @@ export default function PunnettSquare({
                   transition: 'opacity 0.3s',
                 }}
               >
-                {gamete2}
+                {notacionGenotipo(gamete2, rasgos)}
                 <br />
                 <small>({formatNumber((1 / gametesFila.length) * 100, 0)}%)</small>
               </th>
@@ -142,7 +146,7 @@ export default function PunnettSquare({
                       transition: 'all 0.3s ease',
                     }}
                   >
-                    <div className={styles.cellGenotype}>{cell.genotype}</div>
+                    <div className={styles.cellGenotype}>{notacionGenotipo(cell.genotype, rasgos)}</div>
                     <div className={styles.cellIcon}>{cell.phenotypeIcon}</div>
                     <div className={styles.cellPhenotype}>{cell.phenotype}</div>
                     <div className={styles.cellProbability}>

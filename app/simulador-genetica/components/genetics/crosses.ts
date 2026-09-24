@@ -124,6 +124,22 @@ export function normalizeGenotype(genotypeStr: string, trait: Trait): string {
     return genotypeStr; // Ya viene normalizado
   }
 
+  /**
+   * Con tres alelos el orden es el de dominancia: Iᴬ, Iᴮ, i → AA, AO, BB, BO, AB, OO, que son
+   * las claves de la tabla de fenotipos. Se fija por rango y no con `localeCompare`, aunque hoy
+   * A < B < O coincida con él: un tercer alelo con otra letra lo desordenaría sin avisar y el
+   * fenotipo saldría «Desconocido».
+   */
+  const c = trait.alleles.codominant?.symbol;
+  if (c) {
+    const rango = (alelo: string) => (alelo === d ? 0 : alelo === c ? 1 : alelo === r ? 2 : 3);
+    return genotypeStr
+      .replace(/\s/g, '')
+      .split('')
+      .sort((a, b) => rango(a) - rango(b))
+      .join('');
+  }
+
   // Contar alelos
   const alleles = genotypeStr.replace(/\s/g, '').split('');
   const sorted = alleles.sort((a, b) => {

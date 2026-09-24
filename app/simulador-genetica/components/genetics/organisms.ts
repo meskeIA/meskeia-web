@@ -1,4 +1,4 @@
-import { Organism, PHENOTYPE_COLORS } from '../types';
+import { Organism, Trait, PHENOTYPE_COLORS } from '../types';
 
 // Guisantes de Mendel - El organismo clásico
 export const GUISANTES: Organism = {
@@ -315,6 +315,49 @@ export const HUMANOS: Organism = {
         },
       ],
     },
+    /**
+     * Grupo sanguíneo ABO: tres alelos, codominancia entre dos de ellos.
+     *
+     * Hasta el 24/09/2026 la app lo contaba en su tabla comparativa «como referencia
+     * conceptual» y no lo simulaba, y `simulador-punnett` lo traía como tarjeta de texto con
+     * selectores AA/Aa/aa: el ejercicio estándar del tema no se podía resolver en ninguna de
+     * las dos apps. Dentro, los alelos son A, B y O porque el motor parte los genotipos letra a
+     * letra; en pantalla salen como Iᴬ, Iᴮ e i (`notacion`).
+     */
+    {
+      id: 'grupo-abo',
+      name: 'Grupo sanguíneo ABO',
+      inheritanceMode: 'codominant',
+      description:
+        'Tres alelos: Iᴬ e Iᴮ son codominantes entre sí (IᴬIᴮ da el grupo AB) y los dos dominan sobre i',
+      alleles: {
+        dominant: { symbol: 'A', name: 'Iᴬ (antígeno A)', isDominant: true },
+        codominant: { symbol: 'B', name: 'Iᴮ (antígeno B)', isDominant: true },
+        recessive: { symbol: 'O', name: 'i (sin antígeno)', isDominant: false },
+      },
+      notacion: { A: 'Iᴬ', B: 'Iᴮ', O: 'i' },
+      phenotypes: [
+        { genotypes: ['AA', 'AO'], name: 'Grupo A', color: '#EF4444', icon: '🅰️' },
+        { genotypes: ['BB', 'BO'], name: 'Grupo B', color: '#3B82F6', icon: '🅱️' },
+        { genotypes: ['AB'], name: 'Grupo AB', color: '#8B5CF6', icon: '🆎' },
+        { genotypes: ['OO'], name: 'Grupo O', color: '#9CA3AF', icon: '🅾️' },
+      ],
+    },
+    {
+      id: 'factor-rh',
+      name: 'Factor Rh',
+      inheritanceMode: 'complete',
+      description:
+        'Simplificación escolar del gen RHD: el Rh positivo (D) domina sobre el negativo (d)',
+      alleles: {
+        dominant: { symbol: 'D', name: 'Rh positivo', isDominant: true },
+        recessive: { symbol: 'd', name: 'Rh negativo', isDominant: false },
+      },
+      phenotypes: [
+        { genotypes: ['DD', 'Dd'], name: 'Rh positivo', color: '#DC2626', icon: '➕' },
+        { genotypes: ['dd'], name: 'Rh negativo', color: '#F3F4F6', icon: '➖' },
+      ],
+    },
   ],
 };
 
@@ -371,11 +414,41 @@ export function getTraitById(organism: Organism, traitId: string) {
   return organism.traits.find((trait) => trait.id === traitId);
 }
 
-// Genotipos posibles para un rasgo
-export function getPossibleGenotypes(trait: { alleles: { dominant: { symbol: string }; recessive: { symbol: string } } }): string[] {
+/**
+ * Genotipos posibles para un rasgo, ya normalizados (el alelo que manda, primero).
+ *
+ * Con un alelo codominante son seis y no tres: AA, AO, BB, BO, AB y OO en el ABO. El orden
+ * importa, porque la vista toma el índice 1 como heterocigoto por defecto (ver
+ * `genotiposPorDefecto`).
+ */
+export function getPossibleGenotypes(trait: {
+  alleles: { dominant: { symbol: string }; recessive: { symbol: string }; codominant?: { symbol: string } };
+}): string[] {
   const d = trait.alleles.dominant.symbol;
   const r = trait.alleles.recessive.symbol;
+  const c = trait.alleles.codominant?.symbol;
+  if (c) {
+    return [`${d}${d}`, `${d}${r}`, `${c}${c}`, `${c}${r}`, `${d}${c}`, `${r}${r}`];
+  }
   return [`${d}${d}`, `${d}${r}`, `${r}${r}`];
+}
+
+/**
+ * Los genotipos con los que arranca un cruce al elegir el rasgo: [progenitor 1, progenitor 2].
+ *
+ * - Ligado al sexo: padre XD Y × madre portadora.
+ * - Con alelo codominante: Iᴬi × Iᴮi, el cruce de libro del ABO, el único que da los cuatro
+ *   grupos a la vez. Arrancar en Iᴬi × Iᴬi habría enseñado un 3:1 de apariencia mendeliana
+ *   justo en el rasgo que existe para salirse de él.
+ * - El resto: heterocigoto × heterocigoto.
+ */
+export function genotiposPorDefecto(trait: Trait): [string, string] {
+  if (trait.inheritanceMode === 'sex-linked') {
+    return [getSexLinkedGenotypes(trait, 'male')[0], getSexLinkedGenotypes(trait, 'female')[1]];
+  }
+  const posibles = getPossibleGenotypes(trait);
+  if (trait.alleles.codominant) return [posibles[1], posibles[3]];
+  return [posibles[1], posibles[1]];
 }
 
 // Genotipos posibles para herencia ligada al sexo

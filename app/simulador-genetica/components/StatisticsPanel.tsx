@@ -20,13 +20,16 @@ import { formatNumber } from '@/lib';
  */
 const porcentajeExacto = (valor: number): string =>
   formatNumber(valor, Number.isInteger(valor) ? 0 : 2);
-import { PunnettResult } from './types';
+import { PunnettResult, Trait } from './types';
+import { notacionGenotipo } from './genetics';
 
 interface StatisticsPanelProps {
   punnett: PunnettResult;
+  /** Los rasgos del cruce, en orden: solo para escribir los genotipos (Iᴬi en vez de AO). */
+  rasgos: Trait[];
 }
 
-export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
+export default function StatisticsPanel({ punnett, rasgos }: StatisticsPanelProps) {
   /**
    * Ratio simplificado, EN EL MISMO ORDEN QUE LAS BARRAS Y CON SU ETIQUETA.
    *
@@ -56,7 +59,12 @@ export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
     return `${numeros} (${leyenda})`;
   };
 
-  const genotypeRatioStr = calculateSimplifiedRatio(punnett.genotypeRatios);
+  // Las claves del motor son internas ('AO'); en pantalla van con la notación del rasgo.
+  const genotypeRatioStr = calculateSimplifiedRatio(
+    Object.fromEntries(
+      Object.entries(punnett.genotypeRatios).map(([k, v]) => [notacionGenotipo(k, rasgos), v])
+    )
+  );
   const phenotypeRatioStr = calculateSimplifiedRatio(
     Object.fromEntries(
       Object.entries(punnett.phenotypeRatios).map(([k, v]) => [k, v.count])
@@ -73,7 +81,7 @@ export default function StatisticsPanel({ punnett }: StatisticsPanelProps) {
           .map(([genotype, ratio]) => (
             <div key={genotype} className={styles.ratioBar}>
               <span className={styles.ratioLabel}>
-                <strong>{genotype}</strong>
+                <strong>{notacionGenotipo(genotype, rasgos)}</strong>
               </span>
               <div className={styles.ratioBarContainer}>
                 <div

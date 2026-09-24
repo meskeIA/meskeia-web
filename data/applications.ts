@@ -527,7 +527,7 @@ export const applicationsDatabase: Application[] = [
   // ============================================
   // 14. Biomedicina y Ciencias de la Salud (2)
   // ============================================
-  { name: "Simulador de Genética Mendeliana", suites: ["estudiantes", "salud"], icon: "🧬", description: "Simula cruces genéticos, cuadros de Punnett, herencia ligada al sexo, árboles genealógicos y simulación de poblaciones con estadísticas chi-cuadrado", url: "/simulador-genetica/", keywords: ["genetica", "mendel", "punnett", "herencia", "alelos", "genotipo", "fenotipo", "dominante", "recesivo", "cromosomas", "biologia", "universidad"] },
+  { name: "Simulador de Genética Mendeliana", suites: ["estudiantes", "salud"], icon: "🧬", description: "Simula cruces genéticos, cuadros de Punnett, herencia ligada al sexo, grupos sanguíneos ABO y factor Rh, árboles genealógicos y simulación de poblaciones con estadísticas chi-cuadrado", url: "/simulador-genetica/", keywords: ["genetica", "mendel", "punnett", "herencia", "alelos", "genotipo", "fenotipo", "dominante", "recesivo", "cromosomas", "biologia", "universidad"] },
   { name: "Calculadora de Estadística Médica", suites: ["salud", "estudiantes"], icon: "🩺", description: "Calcula sensibilidad, especificidad, VPP, VPN, razones de verosimilitud, odds ratio, riesgo relativo, NNT con intervalos de confianza. Ideal para epidemiología y pruebas diagnósticas", url: "/calculadora-estadistica-medica/", keywords: ["estadistica medica", "sensibilidad", "especificidad", "VPP", "VPN", "odds ratio", "riesgo relativo", "NNT", "epidemiologia", "pruebas diagnosticas", "medicina", "universidad"] },
 
   // ============================================
