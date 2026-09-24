@@ -28,7 +28,10 @@
 }
 
 .heroResultados {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  /* --hero-bg (8,33:1 con blanco), como el hero de la intro. El degradado --primary →
+     --secondary dejaba el subtítulo en 2,80:1 en claro y el título en 2,40:1 en oscuro
+     (hallazgo 1404; familia de selectores, forma b). */
+  background: var(--hero-bg);
   color: #fff;
   text-align: center;
   padding: 2rem 1.5rem 1.75rem;
@@ -45,6 +48,10 @@
   opacity: 0.88;
   margin: 0;
 }
+
+/* Recibe el foco al llegar al resultado (tabIndex=-1): visible solo si se navega con teclado. */
+.heroTitleSm:focus { outline: none; }
+.heroTitleSm:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 /* ─── Intro ────────────────────────────────────────────────────── */
 .introContainer {
@@ -145,7 +152,9 @@
   margin-bottom: 0.5rem;
 }
 
-.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+/* Texto pequeño de marca: --primary-texto / --secondary-texto, que llegan a 4,5:1 sobre fondo
+   claro y traen su variante oscura en globals.css (hallazgo 1403; selector-mascota, 1343). */
+.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary-texto); }
 .progresoCategoria { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
 .progresoBar {
@@ -269,7 +278,7 @@
 .recomendacionCardAlt { border-top-color: var(--secondary); }
 .recomendacionIcon { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
 .recomendacionLabel { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.4rem; }
-.recomendacionValor { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; line-height: 1.3; }
+.recomendacionValor { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.75rem; line-height: 1.3; }
 .recomendacionDesc { font-size: 0.87rem; color: var(--text-secondary); line-height: 1.55; margin: 0; text-align: left; }
 
 /* ─── Costes ───────────────────────────────────────────────────── */
@@ -302,7 +311,7 @@
 }
 
 .costeLabel { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
-.costeValor { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+.costeValor { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); }
 
 /* ─── Razones y consejos ───────────────────────────────────────── */
 .razonesSection {
@@ -313,7 +322,7 @@
   margin-bottom: 1.75rem;
 }
 
-.razonesTitulo { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin: 0 0 0.75rem; }
+.razonesTitulo { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary-texto); margin: 0 0 0.75rem; }
 
 .razonItem {
   font-size: 0.9rem;
@@ -355,8 +364,9 @@
   margin-bottom: 1.75rem;
 }
 
-.subvencionesTitulo { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary); margin: 0 0 0.75rem; }
+.subvencionesTitulo { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-texto); margin: 0 0 0.75rem; }
 .subvencionesDesc { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+.subvencionesDesc + .subvencionesDesc { margin-top: 0.6rem; }
 
 /* ─── Botón repetir ────────────────────────────────────────────── */
 .btnRepetir {
@@ -366,16 +376,16 @@
   margin: 0 auto 2rem;
   padding: 0.85rem 1.5rem;
   background: transparent;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-texto);
   border-radius: 10px;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.18s, color 0.18s;
 }
 
-.btnRepetir:hover { background: var(--primary); color: #fff; }
+.btnRepetir:hover { background: var(--primary-boton); color: #fff; }
 .btnRepetir:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ─── Warning box (v2.0) ───────────────────────────────────────── */
@@ -391,7 +401,9 @@
 
 /* ─── Dark mode ────────────────────────────────────────────────── */
 [data-theme='dark'] .progresoBar { border-color: rgba(255, 255, 255, 0.08); }
-[data-theme='dark'] .costeItem { background: rgba(255, 255, 255, 0.04); }
+/* Fondo de página (#1A1A1A) bajo las cifras de coste, como en claro: el blanco al 4 % aclaraba
+   la tarjeta y dejaba costeValor en 4,36:1 y costeLabel en 4,39:1 (hallazgo 1403). */
+[data-theme='dark'] .costeItem { background: var(--bg-primary); }
 
 @media (prefers-reduced-motion: reduce) {
   .introIcon { animation: none; }
@@ -416,3 +428,60 @@
 [data-theme='dark'] .avisoEmpate {
   background: rgba(63, 165, 209, 0.12);
 }
+
+/* Una sola tarjeta cuando los filtros no dejan alternativa */
+.recomendacionGridUna { grid-template-columns: 1fr; }
+
+/* Aviso de lo apartado por un límite declarado (presupuesto, unidad exterior, gas) y de la
+   caldera reciente: mismo patrón y colores que selector-mascota (hallazgos 1332, 1333) */
+.avisoRecorte {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #f59e0b;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+.avisoRecorteTitulo { font-weight: 700; margin: 0 0 0.35rem; }
+.avisoRecorteItem { margin: 0.25rem 0 0; }
+
+[data-theme='dark'] .avisoRecorte { border-color: #b45309; background: #3a2a08; color: #fde68a; }
+
+/* Ventajas e inconvenientes del sistema recomendado y de la alternativa (hallazgo 1393) */
+.prosContrasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.prosContrasCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+.prosContrasTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.75rem; }
+.prosContrasSub {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin: 0.75rem 0 0.35rem;
+}
+.prosLista, .contrasLista { list-style: none; padding: 0; margin: 0; }
+.prosLista li, .contrasLista li {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  padding: 0.2rem 0;
+  display: flex;
+  gap: 0.5rem;
+}
+.prosLista li::before { content: '✓'; color: var(--secondary-texto); font-weight: 700; flex-shrink: 0; }
+.contrasLista li::before { content: '–'; color: var(--text-secondary); font-weight: 700; flex-shrink: 0; }
+
+[data-theme='dark'] .prosContrasCard { box-shadow: none; border: 1px solid rgba(255, 255, 255, 0.08); }

@@ -1,10 +1,36 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import {
+  SISTEMAS,
+  RENDIMIENTO_AEROTERMIA,
+  FUENTE_RENDIMIENTO,
+  SIN_AYUDAS_CALDERAS_FOSILES,
+  AYUDAS_RENOVABLES,
+  AYUDAS_PROGRAMA_2021,
+} from './motor';
+
+/*
+ * Los resultados posibles son los cinco sistemas de motor.ts. El suelo radiante es una
+ * RESPUESTA de la pregunta 3, no un resultado, y los radiadores eléctricos sí lo son y no se
+ * nombraban (hallazgo 1394): este es el texto que leen los buscadores y las IA.
+ */
+const SISTEMAS_EN_TEXTO = 'aerotermia, bomba de calor (split), caldera de gas, pellet o radiadores eléctricos';
+const DESCRIPCION = `Test de 10 preguntas para saber qué sistema de calefacción te conviene: ${SISTEMAS_EN_TEXTO}. Según vivienda, clima, uso, presupuesto y ayudas públicas.`;
+
+/** Características REALES de la app, para los dos schema (familia de selectores, forma e). */
+const CARACTERISTICAS = [
+  'Test de 10 preguntas sobre vivienda, clima, uso y presupuesto',
+  'Recomendación de sistema principal y alternativa entre cinco tecnologías',
+  'Aparta, y lo explica, los sistemas que no caben en el presupuesto o que necesitan una unidad exterior o gas natural que no tienes',
+  'Coste de instalación y coste anual orientativos',
+  'Ventajas e inconvenientes del sistema recomendado y de la alternativa',
+  'Información sobre ayudas públicas y la normativa europea de calderas',
+  '100% en el navegador, sin registro ni instalación',
+];
 
 export const metadata: Metadata = {
   title: 'Selector de Sistema de Calefacción — ¿Cuál me conviene? | meskeIA',
-  description:
-    'Test de 10 preguntas para saber qué sistema de calefacción te conviene: caldera de gas, bomba de calor, aerotermia, suelo radiante o pellet. Según vivienda, uso y subvenciones disponibles.',
+  description: DESCRIPCION,
   keywords: [
     'qué calefacción instalar',
     'aerotermia o caldera de gas',
@@ -13,14 +39,14 @@ export const metadata: Metadata = {
     'mejor sistema de calefacción España',
     'cambiar caldera gas',
     'aerotermia precio España',
-    'subvenciones calefacción 2025',
+    'subvenciones calefacción',
     'calefacción eficiente hogar',
     'bomba de calor aerotermia diferencia',
   ],
   openGraph: {
     title: '¿Qué sistema de calefacción te conviene? Test gratuito | meskeIA',
     description:
-      'Aerotermia, bomba de calor, caldera de gas, pellet o suelo radiante. Descubre cuál se adapta mejor a tu vivienda, uso y presupuesto.',
+      'Aerotermia, bomba de calor (split), caldera de gas, pellet o radiadores eléctricos. Descubre cuál se adapta mejor a tu vivienda, uso y presupuesto.',
     type: 'website',
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-calefaccion/',
@@ -36,7 +62,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '¿Aerotermia o caldera? Test para elegir calefacción | meskeIA',
     description:
-      'Test de 10 preguntas para encontrar tu sistema de calefacción ideal según vivienda, uso y subvenciones disponibles.',
+      'Test de 10 preguntas para encontrar tu sistema de calefacción ideal según vivienda, uso, presupuesto y ayudas públicas.',
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
@@ -46,19 +72,9 @@ export const metadata: Metadata = {
     'schema:WebApplication': JSON.stringify(
       generateWebAppSchema({
         name: 'Selector de Sistema de Calefacción',
-        description:
-          'Test orientativo de 10 preguntas para descubrir qué sistema de calefacción (aerotermia, bomba de calor, caldera de gas, pellet o suelo radiante) se adapta mejor a tu vivienda, uso y presupuesto. Incluye información sobre subvenciones disponibles.',
+        description: `Test orientativo de 10 preguntas para descubrir qué sistema de calefacción (${SISTEMAS_EN_TEXTO}) se adapta mejor a tu vivienda, uso y presupuesto. Incluye información sobre ayudas públicas.`,
         url: 'https://meskeia.com/selector-calefaccion/',
-        features: [
-          'Test de 10 preguntas sobre vivienda y uso',
-          'Recomendación de sistema principal y alternativa',
-          'Estimación de coste de instalación orientativa',
-          'Información sobre subvenciones PERTE y Next Generation EU',
-          'Pros y contras de cada tecnología',
-          '100% en el navegador, sin registro ni instalación',
-          'Gratuito y sin publicidad',
-          'En español',
-        ],
+        features: CARACTERISTICAS,
       })
     ),
   },
@@ -66,10 +82,10 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Sistema de Calefacción",
-  description: "Test de 10 preguntas para saber qué sistema de calefacción te conviene: caldera de gas, bomba de calor, aerotermia, suelo radiante o pellet. Según vivienda, uso y subvenciones disponibles.",
+  description: DESCRIPCION,
   url: "https://meskeia.com/selector-calefaccion/",
   category: 'FinanceApplication',
-  features: [],
+  features: CARACTERISTICAS,
 });
 
 export const faqJsonLd = {
@@ -81,7 +97,7 @@ export const faqJsonLd = {
       name: '¿Qué sistema de calefacción consume menos y es más barato?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En términos de coste de funcionamiento, las bombas de calor (aerotermia) son actualmente las más eficientes: por cada kWh eléctrico consumido generan entre 3 y 5 kWh de calor (COP 3-5). Sin embargo, el coste total depende del precio de la electricidad frente al gas, el aislamiento de la vivienda y la zona climática. En viviendas bien aisladas en zonas con inviernos suaves, la aerotermia suele ser la opción más económica a largo plazo.',
+        text: `En coste de funcionamiento, las bombas de calor (aerotermia) están entre los sistemas más eficientes: generan ${RENDIMIENTO_AEROTERMIA} (${FUENTE_RENDIMIENTO}), algo menos con mucho frío o con radiadores de alta temperatura. El coste total depende del precio de la electricidad frente al del gas, del aislamiento de la vivienda y del clima. Como orientación, este test usa un coste anual de ${SISTEMAS.aerotermia.costeAnual} para la aerotermia, ${SISTEMAS['caldera-gas'].costeAnual} para la caldera de gas y ${SISTEMAS.electrico.costeAnual} para los radiadores eléctricos.`,
       },
     },
     {
@@ -97,7 +113,7 @@ export const faqJsonLd = {
       name: '¿Qué subvenciones existen para cambiar la calefacción en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2025 siguen activas las ayudas del Plan de Recuperación (fondos Next Generation EU) canalizadas a través del IDAE y las comunidades autónomas. Las más relevantes son las del Programa PERTE para la rehabilitación energética de edificios y las ayudas directas a la sustitución de calderas de combustibles fósiles por sistemas de energía renovable (aerotermia, geotermia, biomasa). Los porcentajes de subvención oscilan entre el 30 % y el 70 % según la renta y el tipo de actuación.',
+        text: `${AYUDAS_RENOVABLES} Conviene comprobar en la agencia de energía de la comunidad o en el IDAE si hay alguna convocatoria abierta. ${AYUDAS_PROGRAMA_2021} Para una caldera de gas nueva no hay ayudas: ${SIN_AYUDAS_CALDERAS_FOSILES}.`,
       },
     },
     {
@@ -113,7 +129,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta instalar una caldera de pellet frente a una de gas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una caldera de pellet de gama media para una vivienda unifamiliar cuesta entre 4.000 y 8.000 € instalada, frente a los 2.500-4.500 € de una caldera de gas de condensación. Sin embargo, el pellet es un combustible más barato que el gas natural en muchas zonas de España, lo que puede amortizar la diferencia en 5-8 años dependiendo del consumo. La caldera de pellet requiere además un espacio de almacenamiento y una limpieza periódica más frecuente.',
+        text: `Con las horquillas orientativas que usa este test, una caldera o estufa de pellet cuesta ${SISTEMAS.pellet.costeInstalacion} instalada y una caldera de gas ${SISTEMAS['caldera-gas'].costeInstalacion}; el coste anual orientativo es de ${SISTEMAS.pellet.costeAnual} frente a ${SISTEMAS['caldera-gas'].costeAnual}. El pellet necesita además espacio de almacenamiento y un mantenimiento más frecuente, y la caldera de gas, acometida de gas natural. De las dos, solo la de pellet puede optar hoy a ayudas públicas en la UE: la de gas quedó fuera en 2025.`,
       },
     },
   ],

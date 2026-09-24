@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorCalefaccion.module.css';
 import {
   MeskeiaLogo,
@@ -10,9 +10,21 @@ import {
   EducationalSection,
   ShareCard,
   DisclaimerCard,
+  RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularResultado, SISTEMAS, PREGUNTAS, type Resultado } from './motor';
+import {
+  calcularResultado,
+  SISTEMAS,
+  PREGUNTAS,
+  RENDIMIENTO_AEROTERMIA,
+  FUENTE_RENDIMIENTO,
+  SIN_AYUDAS_CALDERAS_FOSILES,
+  AYUDAS_RENOVABLES,
+  AYUDAS_PROGRAMA_2021,
+  AYUDAS_DONDE_MIRAR,
+  type Resultado,
+} from './motor';
 
 // Los sistemas, las preguntas con sus pesos y la lógica de recomendación viven en ./motor.ts.
 
@@ -33,6 +45,13 @@ export default function SelectorCalefaccion() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+
+  // Al pulsar «Ver resultado» la sección del test se desmonta con el botón que tenía el foco, y
+  // el foco caía a <body>: se lleva al encabezado del resultado (familia de selectores, forma g).
+  useEffect(() => {
+    if (pantalla === 'resultado') tituloResultado.current?.focus();
+  }, [pantalla]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
@@ -77,10 +96,14 @@ export default function SelectorCalefaccion() {
         </header>
       ) : (
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu sistema de calefacción ideal</h1>
+          <h1 className={styles.heroTitleSm} ref={tituloResultado} tabIndex={-1}>Tu sistema de calefacción ideal</h1>
           <p className={styles.heroSubtitleSm}>Resultado personalizado basado en tu vivienda y situación</p>
         </header>
       )}
+
+      {/* Costes en euros, ayudas que convocan las comunidades autónomas y normativa europea:
+          la metodología es universal, los datos de referencia son de España (hallazgo 1400). */}
+      <RegionBadge variant="es-data" />
 
       <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />
@@ -97,15 +120,15 @@ export default function SelectorCalefaccion() {
             </div>
             <h2 className={styles.introTitulo}>¿Aerotermia, gas o bomba de calor?</h2>
             <p className={styles.introDesc}>
-              Elegir el sistema de calefacción es una decisión que afecta a tu confort y a tu factura durante 15-20 años.
-              El mercado ha cambiado mucho: las bombas de calor y la aerotermia están desbancando al gas gracias a las
-              subvenciones y a su mayor eficiencia. Este test analiza tu vivienda y situación real para orientarte.
+              Elegir el sistema de calefacción es una decisión que afecta a tu confort y a tu factura durante muchos
+              años. Este test analiza tu vivienda y tu situación real para orientarte entre cinco sistemas: aerotermia,
+              bomba de calor (split), caldera de gas, pellet y radiadores eléctricos.
             </p>
             <ul className={styles.introFeatures} aria-label="Qué obtendrás">
               <li><span aria-hidden="true">✅</span> Sistema principal recomendado con alternativa</li>
               <li><span aria-hidden="true">✅</span> Coste de instalación y coste anual orientativo</li>
-              <li><span aria-hidden="true">✅</span> Pros y contras de cada tecnología</li>
-              <li><span aria-hidden="true">✅</span> Información sobre subvenciones disponibles</li>
+              <li><span aria-hidden="true">✅</span> Ventajas e inconvenientes del sistema recomendado y de la alternativa</li>
+              <li><span aria-hidden="true">✅</span> Información sobre ayudas públicas y normativa europea</li>
               <li><span aria-hidden="true">✅</span> Consejos personalizados según tu situación</li>
             </ul>
             <button type="button" className={styles.btnStart} onClick={() => setPantalla('test')}>
@@ -185,20 +208,48 @@ export default function SelectorCalefaccion() {
         <div className={styles.resultadosContainer}>
 
           {/* Recomendaciones */}
-          <div className={styles.recomendacionGrid}>
+          <div className={`${styles.recomendacionGrid} ${resultado.sistemaAlternativa ? '' : styles.recomendacionGridUna}`}>
             <div className={styles.recomendacionCard}>
               <span className={styles.recomendacionIcon} aria-hidden="true">{SISTEMAS[resultado.sistemaPrincipal].icon}</span>
-              <p className={styles.recomendacionLabel}>Tu mejor opción</p>
+              <p className={styles.recomendacionLabel}>
+                {resultado.planificarSustitucion ? 'Para cuando sustituyas tu caldera' : 'Tu mejor opción'}
+              </p>
               <p className={styles.recomendacionValor}>{SISTEMAS[resultado.sistemaPrincipal].nombre}</p>
               <p className={styles.recomendacionDesc}>{SISTEMAS[resultado.sistemaPrincipal].descripcion}</p>
             </div>
-            <div className={`${styles.recomendacionCard} ${styles.recomendacionCardAlt}`}>
-              <span className={styles.recomendacionIcon} aria-hidden="true">{SISTEMAS[resultado.sistemaAlternativa].icon}</span>
-              <p className={styles.recomendacionLabel}>Alternativa a considerar</p>
-              <p className={styles.recomendacionValor}>{SISTEMAS[resultado.sistemaAlternativa].nombre}</p>
-              <p className={styles.recomendacionDesc}>{SISTEMAS[resultado.sistemaAlternativa].descripcion}</p>
-            </div>
+            {resultado.sistemaAlternativa && (
+              <div className={`${styles.recomendacionCard} ${styles.recomendacionCardAlt}`}>
+                <span className={styles.recomendacionIcon} aria-hidden="true">{SISTEMAS[resultado.sistemaAlternativa].icon}</span>
+                <p className={styles.recomendacionLabel}>Alternativa a considerar</p>
+                <p className={styles.recomendacionValor}>{SISTEMAS[resultado.sistemaAlternativa].nombre}</p>
+                <p className={styles.recomendacionDesc}>{SISTEMAS[resultado.sistemaAlternativa].descripcion}</p>
+              </div>
+            )}
           </div>
+
+          {/* Caldera de menos de 5 años: el sistema que gana es para cuando toque sustituirla, no
+              una obra para ya; antes salía «Tu mejor opción» junto a «no tiene sentido cambiarla
+              ahora» (hallazgo 1392). */}
+          {resultado.planificarSustitucion && (
+            <p className={styles.avisoRecorte} role="note">
+              <span aria-hidden="true">🔄</span> Tu caldera de gas tiene menos de 5 años: lo habitual es
+              conservarla mientras funcione bien. {SISTEMAS[resultado.sistemaPrincipal].nombre} es el sistema
+              que mejor encaja con tu vivienda para cuando llegue el momento de sustituirla.
+            </p>
+          )}
+
+          {/* Lo declarado como límite, dicho a la cara: presupuesto, unidad exterior o gas han
+              apartado a los que iban por delante (hallazgos 1389, 1390 y 1391). */}
+          {resultado.avisosDescarte.length > 0 && (
+            <div className={styles.avisoRecorte} role="note">
+              <p className={styles.avisoRecorteTitulo}>
+                <span aria-hidden="true">⚠️</span> Ajustado a lo que has declarado
+              </p>
+              {resultado.avisosDescarte.map((a) => (
+                <p key={a} className={styles.avisoRecorteItem}>{a}</p>
+              ))}
+            </div>
+          )}
 
           {/* Un empate no se resuelve en silencio por el orden del código: antes lo ganaba
               siempre la aerotermia, que era la primera del array de puntuaciones. */}
@@ -213,7 +264,7 @@ export default function SelectorCalefaccion() {
           {/* Costes */}
           <div className={styles.costesSection}>
             <p className={styles.costesTitulo}>Costes orientativos — {SISTEMAS[resultado.sistemaPrincipal].nombre}</p>
-            <p className={styles.costesNota}>Estimaciones aproximadas. Varían según marca, tamaño de vivienda e instalador.</p>
+            <p className={styles.costesNota}>Horquillas orientativas para España (estimación de meskeIA). Varían según el equipo, el tamaño de la vivienda y el instalador.</p>
             <div className={styles.costesGrid}>
               <div className={styles.costeItem}>
                 <p className={styles.costeLabel}>Instalación</p>
@@ -223,9 +274,11 @@ export default function SelectorCalefaccion() {
                 <p className={styles.costeLabel}>Coste anual</p>
                 <p className={styles.costeValor}>{SISTEMAS[resultado.sistemaPrincipal].costeAnual}</p>
               </div>
+              {/* Antes: «Vida útil 15 – 25 años», la misma cifra para los cinco sistemas y sin
+                  fuente (hallazgo 1401). La refrigeración sí es propia de cada sistema. */}
               <div className={styles.costeItem}>
-                <p className={styles.costeLabel}>Vida útil</p>
-                <p className={styles.costeValor}>15 – 25 años</p>
+                <p className={styles.costeLabel}>Refrigeración</p>
+                <p className={styles.costeValor}>{SISTEMAS[resultado.sistemaPrincipal].refrigera ? 'Sí' : 'No'}</p>
               </div>
             </div>
           </div>
@@ -238,15 +291,35 @@ export default function SelectorCalefaccion() {
             ))}
           </div>
 
-          {/* Subvenciones */}
+          {/* Ventajas e inconvenientes: la intro y la metadata los prometían y el motor los
+              tenía, pero la pantalla no los pintaba (hallazgo 1393). */}
+          <div className={styles.prosContrasGrid}>
+            {[resultado.sistemaPrincipal, ...(resultado.sistemaAlternativa ? [resultado.sistemaAlternativa] : [])].map(k => (
+              <div key={k} className={styles.prosContrasCard}>
+                <h2 className={styles.prosContrasTitulo}>{SISTEMAS[k].nombre}</h2>
+                <p className={styles.prosContrasSub}>Ventajas</p>
+                <ul className={styles.prosLista}>
+                  {SISTEMAS[k].pros.map(p => <li key={p}>{p}</li>)}
+                </ul>
+                <p className={styles.prosContrasSub}>Inconvenientes</p>
+                <ul className={styles.contrasLista}>
+                  {SISTEMAS[k].contras.map(c => <li key={c}>{c}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Ayudas: sin programas que no financian calefacción (MOVES, un «PERTE Industria
+              Verde» inexistente), sin porcentajes sin fuente y sin anclar a 2025 (hallazgos
+              1396 y 1398). El texto sale de las constantes del motor, las mismas del FAQPage. */}
           {resultado.subvenciones && (
             <div className={styles.subvencionesSection}>
-              <p className={styles.subvencionesTitulo}><span aria-hidden="true">🏛️</span> Subvenciones disponibles en 2025</p>
+              <p className={styles.subvencionesTitulo}><span aria-hidden="true">🏛️</span> Ayudas públicas</p>
               <p className={styles.subvencionesDesc}>
-                El programa <strong>Next Generation EU</strong> y el <strong>PERTE Industria Verde</strong> ofrecen ayudas
-                de hasta el <strong>40-60% del coste</strong> para instalación de bombas de calor, aerotermia y sistemas
-                de energía renovable. Se tramitan a través de cada comunidad autónoma. Consulta el portal del{' '}
-                <strong>IDAE (idae.es)</strong> o tu ayuntamiento para los programas vigentes en tu zona.
+                {AYUDAS_RENOVABLES} {AYUDAS_PROGRAMA_2021} {AYUDAS_DONDE_MIRAR}
+              </p>
+              <p className={styles.subvencionesDesc}>
+                Para una caldera de gas nueva no hay ayudas: {SIN_AYUDAS_CALDERAS_FOSILES}.
               </p>
             </div>
           )}
@@ -264,26 +337,28 @@ export default function SelectorCalefaccion() {
           </button>
 
           <EducationalSection
-            title="Guía completa: sistemas de calefacción en España 2025"
+            title="Guía completa: sistemas de calefacción en España"
             subtitle="Aerotermia, bomba de calor, gas, pellet y eléctrico explicados"
             defaultOpen={false}
           >
-            <h3>El mapa de tecnologías en 2025</h3>
+            <h3>El mapa de tecnologías</h3>
             <p>
               La calefacción en España está viviendo una transición acelerada. La normativa europea (Directiva de Eficiencia
-              Energética de Edificios) obliga a que las nuevas instalaciones sean cada vez más eficientes, y las subvenciones
-              públicas están haciendo que la aerotermia y las bombas de calor sean la opción más rentable a largo plazo.
+              Energética de Edificios) obliga a que las nuevas instalaciones sean cada vez más eficientes, y desde 2025 ya no
+              permite subvencionar calderas independientes de combustibles fósiles.
             </p>
 
             <h3>Aerotermia: la gran protagonista</h3>
             <p>
               La aerotermia es una bomba de calor aire-agua: extrae calor del aire exterior (incluso a temperaturas negativas)
-              y lo transfiere al agua del circuito de calefacción. Un equipo estándar produce 3-4 kWh de calor por cada kWh
-              eléctrico consumido (COP 3-4). Puede alimentar radiadores, suelo radiante y producir agua caliente sanitaria.
+              y lo transfiere al agua del circuito de calefacción. Rinde {RENDIMIENTO_AEROTERMIA} ({FUENTE_RENDIMIENTO}),
+              algo menos cuanto más frío hace fuera y cuanto más caliente tiene que salir el agua. Puede alimentar
+              radiadores, suelo radiante y producir agua caliente sanitaria.
             </p>
             <p>
-              Su principal ventaja frente al gas es que el precio de la electricidad puede estabilizarse con tarifa supervalle
-              y paneles solares, mientras que el gas natural está sujeto a volatilidad de mercados internacionales.
+              Su principal ventaja frente al gas es que el coste de la electricidad puede bajar aprovechando las horas más
+              baratas de la tarifa y el autoconsumo solar, mientras que el gas natural está sujeto a la volatilidad de los
+              mercados internacionales.
             </p>
 
             <h3>Bomba de calor (split): la opción intermedia</h3>
@@ -295,15 +370,19 @@ export default function SelectorCalefaccion() {
 
             <h3>Gas natural: cuándo tiene sentido mantenerlo</h3>
             <p>
-              Si tienes una caldera de gas reciente (menos de 7 años) en buen estado, cambiarla ahora no es rentable.
-              La vida útil de una buena caldera es de 15-20 años. La estrategia más sensata es planificar la sustitución
-              por aerotermia cuando llegue al final de su vida útil, aprovechando entonces las subvenciones disponibles.
+              Si tu caldera de gas es reciente (menos de 5 años) y funciona bien, cambiarla ahora rara vez compensa. Lo
+              sensato es planificar con qué la sustituirás cuando llegue el momento y comprobar entonces qué ayudas hay
+              para ese sistema.
             </p>
+            {/* Antes decía que la UE exige «mezcla con hidrógeno o biogás» a las calderas nuevas
+                desde 2025 y que el gas tiene «menor apoyo de subvenciones». No existe esa
+                obligación, y el apoyo no es menor: es nulo (hallazgo 1397). */}
             <div className={styles.warningBox}>
-              <strong>Normativa 2025:</strong> La UE ha establecido que a partir de 2025 las calderas de gas nuevas
-              deben cumplir requisitos de mezcla con hidrógeno o biogás. En nuevas construcciones, la tendencia es
-              hacia sistemas totalmente libres de combustibles fósiles. Para rehabilitaciones, el gas sigue siendo
-              una opción legal pero con menor apoyo de subvenciones.
+              <strong>Normativa europea:</strong> {SIN_AYUDAS_CALDERAS_FOSILES}, salvo las seleccionadas para inversión
+              antes de 2025. La directiva no prohíbe instalarlas, pero pide a los Estados que vayan sustituyéndolas con
+              planes nacionales. Sí pueden recibir ayudas, en proporción a su parte renovable, los sistemas híbridos, como
+              una caldera combinada con una bomba de calor o con energía solar térmica (Comunicación de la Comisión
+              Europea de octubre de 2024).
             </div>
 
             <h3>Pellet: la renovable más económica en zonas sin gas</h3>
@@ -313,12 +392,11 @@ export default function SelectorCalefaccion() {
               tienen alimentación automática y rendimientos superiores al 90%.
             </p>
 
-            <h3>Cómo aprovechar las subvenciones</h3>
+            {/* Antes: «Next Generation EU</strong>» y, en la línea siguiente, «canalizados»: el
+                salto de línea de JSX se comía el espacio (hallazgo 1402). Ahora es una sola cadena. */}
+            <h3>Cómo buscar ayudas públicas</h3>
             <p>
-              Las ayudas del plan <strong>MOVES</strong>, <strong>PERTE</strong> y los fondos <strong>Next Generation EU</strong>
-              canalizados por las comunidades autónomas pueden cubrir entre el 40% y el 70% del coste en el caso de
-              instalaciones renovables (aerotermia, geotermia, biomasa). Los plazos y condiciones varían por CCAA.
-              El portal <strong>idae.es</strong> mantiene un buscador de ayudas actualizado.
+              {AYUDAS_RENOVABLES} {AYUDAS_PROGRAMA_2021} {AYUDAS_DONDE_MIRAR}
             </p>
           </EducationalSection>
         </div>
