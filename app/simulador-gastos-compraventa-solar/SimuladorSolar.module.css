@@ -353,6 +353,32 @@
   background: #444;
 }
 
+/* ===== TABLA «EL IMPUESTO DEPENDE DE QUIÉN VENDA» (bloque educativo) =====
+
+   Las celdas de respuesta de «¿IVA deducible?» iban con `#27ae60` y `#c0392b` en línea, sin
+   token ni variante de tema: 2,64:1 en claro y 2,43:1 en oscuro, muy por debajo del 4,5:1 que
+   exige un texto normal de 14,4 px (hallazgo 1594). Son los mismos pares que resolvieron el
+   hallazgo 648 en nave-industrial y el 804 en terreno-rústico, medidos contra los dos fondos
+   que la tabla llega a tener en cada tema (el de la sección y el de las filas alternas):
+     · claro:  #176A3A → 6,10:1 y 6,37:1 · #B32D1F → 5,82:1 y 6,07:1
+     · oscuro: #6FDC9C y #FF9A8C, por encima de 5,7:1 en los dos.
+   El color NO es el único portador del dato: la celda dice «Sí …» o «No …» en palabras. */
+.celdaSi {
+  color: #176A3A;
+}
+
+.celdaNo {
+  color: #B32D1F;
+}
+
+[data-theme='dark'] .celdaSi {
+  color: #6FDC9C;
+}
+
+[data-theme='dark'] .celdaNo {
+  color: #FF9A8C;
+}
+
 /* ===== WARNING BOX ===== */
 .warningBox {
   background: #fff8e1;

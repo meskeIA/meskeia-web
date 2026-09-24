@@ -24,17 +24,25 @@ import {
   ComunidadAutonoma,
   calcularITP,
   calcularAJD,
+  tipoAJD,
+  tipoGeneralITP,
+  describirSubidaITP,
   estimarFacturaNotarial,
+  notariaDeLibreAcuerdo,
+  LIMITE_ARANCEL_NOTARIAL,
   calcularRegistro,
   ENLACE_CATASTRO,
-  RANGO_AJD,
+  RANGO_AJD_OTROS,
+  RANGO_ITP_OTROS,
   TERRITORIOS_SIN_IVA,
+  CIUDADES_CON_BONIFICACION,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
 } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PORCENTAJES_IVA } from '@/data/fiscal';
+import { FISCAL_INMUEBLES_META, PORCENTAJES_IVA } from '@/data/fiscal';
 
 // ===== TIPOS =====
 // Solar / terreno edificable (suelo urbano):
@@ -49,10 +57,18 @@ interface ResultadosComprador {
   porcentajeImpuesto: number;
   /** En Canarias, Ceuta y Melilla no rige el IVA: no se inventa cifra. */
   impuestoNoCalculado: boolean;
+  /** Se ha aplicado la bonificación del 50 % de Ceuta y Melilla (art. 57 bis TRLITPAJD). */
+  bonificado: boolean;
   ajd: number;
   gastosNotario: number;
   gastosNotarioMin: number;
   gastosNotarioMax: number;
+  /**
+   * El valor supera LIMITE_ARANCEL_NOTARIAL: lo que excede no tiene arancel y sus honorarios
+   * son de libre acuerdo (RD 1426/1989, número 2). La cifra de notaría es la del arancel hasta
+   * ese límite, así que la factura real PUEDE ser mayor (hallazgo 1599).
+   */
+  notariaLibre: boolean;
   gastosRegistro: number;
   gastosGestoria: number;
   /**
@@ -103,6 +119,17 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
  */
 const IVA_SOLAR = PORCENTAJES_IVA.general;
 
+/** El 50 % del art. 57 bis TRLITPAJD, derivado de la constante que aplica el motor. */
+const BONIFICACION_CIUDADES = `${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} %`;
+
+/**
+ * La nota del sello de datos, con el rango de lo que paga un SOLAR. El sello común habla del
+ * ITP de la vivienda (del 4 % vasco hacia arriba), que no es el de esta app, y callaba la
+ * bonificación que la app sí aplica en Ceuta y Melilla: el suelo publicado quedaba por encima
+ * del 3 % efectivo que se cobra allí (hallazgo 1593).
+ */
+const NOTA_DATOS = `El ITP de un solar va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${BONIFICACION_CIUDADES} (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+
 export default function SimuladorSolarPage() {
   const [precioVenta, setPrecioVenta] = useState('');
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
@@ -122,7 +149,10 @@ export default function SimuladorSolarPage() {
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
-    if (!Number.isFinite(precio) || precio <= 0) return null;
+    // La guarda mira el precio que se PINTA, al céntimo (hallazgo 1601): «0,004» pasaba el
+    // `precio <= 0`, se pintaba «0,00 €» y publicaba un desglose entero con un 18.272.250 %
+    // sobre el precio, cuando el «0» escrito devuelve el marcador.
+    if (!Number.isFinite(precio) || Math.round(precio * 100) <= 0) return null;
 
     // Un gasto no puede ser negativo: el min={0} de NumberInput solo corrige al salir del
     // campo, y hasta entonces la cifra entraba en el total contradiciendo a su desglose.
@@ -154,12 +184,15 @@ export default function SimuladorSolarPage() {
         impuesto = precio * (porcentaje / 100);
         ivaRecuperable = true;
       }
-      ajd = calcularAJD(precio, ccaa);
+      // El solar edificable no está exento de IVA: no hay renuncia, así que el AJD es el
+      // general del objeto `'otro'` (País Vasco, 0,5 %: la exención foral es solo de la primera
+      // vivienda, hallazgo 1592).
+      ajd = calcularAJD(precio, ccaa, { objeto: 'otro' });
     } else {
       // Vendedor particular: ITP tipo general de la CCAA.
-      // Sin tercer argumento: así se aplica la escala progresiva de las 7 CCAA
-      // que la tienen, en vez del tipo plano del primer tramo.
-      impuesto = calcularITP(precio, ccaa);
+      // Sin tipo forzado: así se aplica la escala progresiva o el umbral de la comunidad, y
+      // `'otro'` le da el tipo de lo que no es vivienda (País Vasco: 7 %, no el 4 %).
+      impuesto = calcularITP(precio, ccaa, 'otro');
       tipoImpuesto = 'ITP';
       // Tipo EFECTIVO: con escala progresiva el importe no es un porcentaje plano del
       // precio, asi que mostrar el tipo nominal contradiria a la cifra de al lado.
@@ -183,10 +216,12 @@ export default function SimuladorSolarPage() {
       tipoImpuesto,
       porcentajeImpuesto: porcentaje,
       impuestoNoCalculado,
+      bonificado: tipoVendedor === 'particular' && CIUDADES_CON_BONIFICACION.includes(ccaa),
       ajd,
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
       gastosNotarioMax: notaria.max,
+      notariaLibre: notariaDeLibreAcuerdo(precio),
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       gestoriaLegible,
@@ -205,6 +240,32 @@ export default function SimuladorSolarPage() {
    * que es la base mínima del ITP (hallazgo 1273; misma forma que el 601 de nave-industrial).
    */
   const conIvaEnPantalla = esEmpresario && !territorioActualSinIva;
+  /** Ceuta y Melilla bonifican el 50 % de la cuota (art. 57 bis TRLITPAJD), y hay que decirlo. */
+  const ciudadBonificada = CIUDADES_CON_BONIFICACION.includes(ccaa);
+  /**
+   * Los tipos del recuadro de la comunidad, del motor: el ITP de lo que no es vivienda al precio
+   * escrito (el umbral valenciano lo cambia; el País Vasco cobra el 7 %) y el AJD general de un
+   * solar (el País Vasco, 0,5 %: hallazgo 1592).
+   */
+  const precioLeido = parseSpanishNumber(precioVenta);
+  const itpGeneralRotulo = tipoGeneralITP(
+    ccaa,
+    'otro',
+    Number.isFinite(precioLeido) && precioLeido > 0 ? precioLeido : 0
+  );
+  const ajdRotulo = tipoAJD(ccaa, { objeto: 'otro' }).tipo;
+  /** Escala progresiva o umbral, con las palabras de cada uno (forma de los hallazgos 1581/1602). */
+  const subidaITP = describirSubidaITP(ccaa);
+  /**
+   * A la cifra final le falta algo: el impuesto indirecto sin calcular, una gestoría ilegible
+   * (hallazgo 1595) o la parte de la notaría de libre acuerdo (1599). Un solo criterio para los
+   * dos títulos, con las mismas palabras que el caso del IGIC/IPSI.
+   */
+  const cierreParcial =
+    resultadosComprador !== null &&
+    (resultadosComprador.impuestoNoCalculado ||
+      !resultadosComprador.gestoriaLegible ||
+      resultadosComprador.notariaLibre);
 
   return (
     <div className={styles.container}>
@@ -237,7 +298,7 @@ export default function SimuladorSolarPage() {
         fuente={FISCAL_INMUEBLES_META.fuente}
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
-        nota={FISCAL_INMUEBLES_META.nota}
+        nota={NOTA_DATOS}
       />
 
       {/* Aviso clave: quién vende decide el impuesto */}
@@ -349,11 +410,24 @@ export default function SimuladorSolarPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.tipoGeneral)}%</span>
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(itpGeneralRotulo)}%</span>
               </div>
+              {/*
+                Sin esta casilla, el recuadro anunciaba «ITP General 6%» y la tarjeta cobraba el
+                3 %, sin que nada nombrara la bonificación (hallazgo 1593; la forma que resolvió
+                el 729 en la hermana terreno-rústico).
+              */}
+              {ciudadBonificada && (
+                <div className={styles.infoCcaaItem}>
+                  <span className={styles.infoCcaaLabel}>Bonificación en cuota</span>
+                  <span className={styles.infoCcaaValue}>
+                    −{formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}%
+                  </span>
+                </div>
+              )}
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRotulo)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>
@@ -364,15 +438,29 @@ export default function SimuladorSolarPage() {
                 </span>
               </div>
             </div>
-            {datosCcaaActual.tramosProgresivos && (
+            {/* Escala o umbral, con las palabras del motor: Valencia se anunciaba como «escala
+                progresiva (9% → 11%)» y el 11 % grava TODO el valor, no el exceso. */}
+            {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> {subidaITP}.
               </p>
             )}
-            <p className={styles.infoCcaaNote}>
-              Los solares tributan por el <strong>tipo general</strong> de ITP cuando vende un particular
-              (los tipos reducidos solo aplican a la vivienda habitual).
-            </p>
+            {/* En Ceuta y Melilla la nota negaba una rebaja que la app sí aplica: la
+                bonificación no es un tipo reducido de vivienda sino del SITIO (hallazgo 1593). */}
+            {ciudadBonificada ? (
+              <p className={styles.infoCcaaNote}>
+                Los solares tributan por el <strong>tipo general</strong> de ITP cuando vende un particular,
+                pero en {datosCcaaActual.nombre} se aplica además la{' '}
+                <strong>bonificación del {BONIFICACION_CIUDADES} de la cuota</strong> del artículo 57 bis
+                del TRLITPAJD, que corresponde a los inmuebles situados en la ciudad sea cual sea su uso.
+                El simulador ya la descuenta.
+              </p>
+            ) : (
+              <p className={styles.infoCcaaNote}>
+                Los solares tributan por el <strong>tipo general</strong> de ITP cuando vende un particular
+                (los tipos reducidos solo aplican a la vivienda habitual).
+              </p>
+            )}
           </div>
 
           {/* Gestoría */}
@@ -429,7 +517,11 @@ export default function SimuladorSolarPage() {
                     ? `En ${datosCcaaActual.nombre} no rige el IVA: la compra al promotor tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     : esEmpresario
                       ? 'Deducible si eres empresa/autónomo sujeto a IVA; no deducible si autopromueves tu vivienda'
-                      : 'Tipo general — los solares no tienen tipos reducidos de ITP'
+                      // La bonificación se NOMBRA donde se aplica: «no tienen tipos reducidos»
+                      // bajo un 3,00 % negaba la rebaja que la cifra ya lleva (hallazgo 1593).
+                      : resultadosComprador.bonificado
+                        ? `Tipo general con la bonificación del ${BONIFICACION_CIUDADES} de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)`
+                        : 'Tipo general — los solares no tienen tipos reducidos de ITP'
                 }
               />
 
@@ -442,19 +534,30 @@ export default function SimuladorSolarPage() {
                   title={`AJD (${formatNumber(
                     resultadosComprador.precioInmueble > 0
                       ? (resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100
-                      : datosCcaaActual.ajd,
+                      : ajdRotulo,
                     2
                   )}%)`}
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
+                  description={
+                    ciudadBonificada
+                      ? `Con la bonificación del ${BONIFICACION_CIUDADES} de Ceuta y Melilla aplicada (art. 57 bis.1 TRLITPAJD)`
+                      : undefined
+                  }
                 />
               )}
 
               <ResultCard
                 title="Gastos de notaría (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosNotario)}
-                description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
+                description={
+                  resultadosComprador.notariaLibre
+                    // Por encima del límite el arancel no fija cantidad (hallazgo 1599): la cifra
+                    // es la del tramo reglado y lo que excede se pacta con el notario.
+                    ? `Arancel hasta ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}: factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. Lo que excede de ese valor no tiene arancel: sus honorarios son de libre acuerdo con el notario (RD 1426/1989, número 2), así que la factura real puede ser mayor.`
+                    : `Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`
+                }
                 variant="default"
                 icon="📝"
               />
@@ -493,8 +596,9 @@ export default function SimuladorSolarPage() {
 
               <ResultCard
                 // Le falta el mismo IGIC/IPSI que al coste total de debajo, que ya se rotula
-                // parcial (hallazgo 1271; forma de d787b81b en las hermanas).
-                title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
+                // parcial (hallazgo 1271; forma de d787b81b en las hermanas). Y con el mismo
+                // criterio, la gestoría ilegible (1595) y la notaría de libre acuerdo (1599).
+                title={cierreParcial ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
@@ -507,6 +611,9 @@ export default function SimuladorSolarPage() {
                     // Un importe que no se ha podido leer falta en el total igual que un impuesto
                     // sin calcular, y en la misma dirección (hallazgo 1199).
                     resultadosComprador.gestoriaLegible ? null : 'SIN la gestoría, que no se ha podido leer',
+                    resultadosComprador.notariaLibre
+                      ? `SIN la parte de la notaría de libre acuerdo (el valor que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)})`
+                      : null,
                   ]
                     .filter((x): x is string => x !== null)
                     .join(' — ')
@@ -514,15 +621,16 @@ export default function SimuladorSolarPage() {
               />
 
               <ResultCard
-                title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
+                title={cierreParcial ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
                 description={
-                  resultadosComprador.impuestoNoCalculado || !resultadosComprador.gestoriaLegible
+                  cierreParcial
                     ? `No incluye ${[
                         resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+                        resultadosComprador.notariaLibre ? 'la parte de la notaría de libre acuerdo' : null,
                       ]
                         .filter((x): x is string => x !== null)
                         .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}${
@@ -562,7 +670,7 @@ export default function SimuladorSolarPage() {
       {/* Contenido educativo */}
       <EducationalSection
         title="Guía fiscal para la compra de un solar"
-        subtitle="Quién vende decide el impuesto, y por qué el solar sí genera plusvalía municipal"
+        subtitle="Quién vende decide el impuesto, y por qué el solar, a diferencia de la finca rústica, puede pagar plusvalía municipal"
         icon="📚"
       >
         {/* Tabla comparativa según vendedor */}
@@ -580,23 +688,36 @@ export default function SimuladorSolarPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Impuesto principal</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary-texto)' }}>IVA {formatNumber(IVA_SOLAR, 0)}%</td>
+                  {/* La excepción territorial va con el tipo, como en la FAQ y en el botón: la
+                      tabla afirmaba el IVA sin excepción (hallazgo 1596; forma de la hermana
+                      terreno-rústico). */}
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary-texto)' }}>
+                    IVA {formatNumber(IVA_SOLAR, 0)}%; IGIC o IPSI en Canarias, Ceuta y Melilla
+                  </td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700 }}>ITP (tipo general)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
-                  <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>AJD</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>Sí ({formatNumber(RANGO_AJD.min, 0)}%–{formatNumber(RANGO_AJD.max, 1)}%)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>No</td>
+                  <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>AJD</td>
+                  {/* El rango de lo que NO es vivienda: el 0 % vasco era la exención de la
+                      primera vivienda, y un solar paga allí el 0,5 % (hallazgo 1592). */}
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>Sí ({formatTipoNominal(RANGO_AJD_OTROS.min)}%–{formatTipoNominal(RANGO_AJD_OTROS.max)}%)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>No</td>
                 </tr>
+                {/* Las celdas de respuesta van por clase (.celdaSi / .celdaNo), con variante
+                    oscura: los dos hexadecimales en línea no tenían tema y daban 2,64:1 y 2,43:1
+                    (hallazgo 1594; la forma del 648 de nave-industrial). La respuesta la lleva la
+                    PALABRA, no el color. */}
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>¿IVA deducible?</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#27ae60' }}>Sí (si actividad sujeta)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#c0392b' }}>No hay IVA</td>
+                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (si actividad sujeta)</td>
+                  <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>No hay IVA</td>
                 </tr>
+                {/* Sin la condición del incremento, la fila afirmaba la plusvalía que la FAQ y
+                    el aviso de arriba ya condicionan (hallazgo 1597, lo que dejó el 1274). */}
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px' }}>Plusvalía municipal (vendedor)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (suelo urbano)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (suelo urbano)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí, si hubo incremento real del valor del suelo (art. 104.5 TRLRHL)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí, si hubo incremento real del valor del suelo (art. 104.5 TRLRHL)</td>
                 </tr>
               </tbody>
             </table>
@@ -607,28 +728,33 @@ export default function SimuladorSolarPage() {
         <section style={{ marginTop: '2rem' }}>
           <h2>Casos de uso habituales</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            {/* Las dos primeras tarjetas afirmaban el IVA sin la excepción de Canarias, Ceuta y
+                Melilla que la FAQ, la cabecera y el botón ya llevan (hallazgo 1596). */}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏗️</span> Autopromotor compra parcela para su casa</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si compra a un promotor, paga IVA {formatNumber(IVA_SOLAR, 0)}% + AJD y no lo deduce (es un particular). Si compra a un
+                Si compra a un promotor, paga IVA {formatNumber(IVA_SOLAR, 0)}% + AJD y no lo deduce (es un particular);
+                en Canarias, Ceuta y Melilla, IGIC o IPSI en lugar del IVA. Si compra a un
                 particular, paga ITP al tipo general. En ambos casos suma notaría y registro.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏢</span> Promotora compra suelo para construir</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si compra a otro empresario, paga IVA {formatNumber(IVA_SOLAR, 0)}% deducible en el modelo 303. Si compra a un particular,
-                paga ITP, que no se recupera pero se incorpora al coste de la promoción.
+                Si compra a otro empresario, paga IVA {formatNumber(IVA_SOLAR, 0)}% deducible en el modelo 303 (en
+                Canarias, Ceuta y Melilla, IGIC o IPSI, con sus propias reglas, que esta calculadora no cifra). Si
+                compra a un particular, paga ITP, que no se recupera pero se incorpora al coste de la promoción.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏛️</span> El vendedor y la plusvalía municipal</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Al ser suelo urbano, el vendedor paga plusvalía municipal por el incremento de valor del terreno.
-                No es coste del comprador, pero conviene tenerlo en cuenta al negociar el precio.
+                Al ser suelo urbano, el vendedor paga plusvalía municipal si hubo incremento real del valor
+                del terreno; sin incremento, la transmisión no está sujeta (art. 104.5 TRLRHL). No es coste
+                del comprador, pero conviene tenerlo en cuenta al negociar el precio.
               </p>
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">📐</span> Verifica la calificación urbanística</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Confirma en el ayuntamiento que la parcela es suelo urbano consolidado y edificable, con las

@@ -192,6 +192,26 @@
   color: #7FB3D3;
 }
 
+/*
+  24/09/2026 — en Ceuta y Melilla la renuncia a la exención no existe (el IPSI no la regula) y
+  su botón se desactiva. Se marca con el borde discontinuo y el cursor, SIN opacidad: el rótulo
+  «No existe en el IPSI: paga ITP» es justo lo que el usuario tiene que poder leer.
+*/
+.transmisionBtn:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+.transmisionBtn:disabled:hover {
+  border-color: #e0e0e0;
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .transmisionBtn:disabled:hover {
+  border-color: #555;
+  background: #333;
+}
+
 .transmisionIcon {
   font-size: 1.5rem;
 }

@@ -1,7 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { RANGO_ITP, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, PORCENTAJES_IVA } from '@/data/fiscal';
+import {
+  RANGO_ITP_OTROS,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
+} from '@/data/itp-ccaa';
+import { PORCENTAJES_IVA } from '@/data/fiscal';
 
 /** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
 const pct = (n: number) => `${String(n).replace('.', ',')}%`;
@@ -67,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga al comprar una finca rústica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La transmisión de un terreno rústico no edificable está exenta de IVA (Art. 20.Uno.20º de la Ley del IVA), incluso cuando el vendedor es empresario. Por eso, por regla general se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad autónoma, que va del ${pct(RANGO_ITP.min)} al ${pct(RANGO_ITP.max)} contando el tramo más alto de las comunidades con escala progresiva. En Ceuta y Melilla la cuota se bonifica al 50% (art. 57 bis del TRLITPAJD), lo que deja el tipo efectivo por debajo de ese mínimo. Entre particulares siempre se paga ITP.`,
+        text: `La transmisión de un terreno rústico no edificable está exenta de IVA (Art. 20.Uno.20º de la Ley del IVA), incluso cuando el vendedor es empresario. Por eso, por regla general se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad autónoma, que va del ${pct(RANGO_ITP_OTROS.min)} al ${pct(RANGO_ITP_OTROS.max)} contando el tramo más alto de las comunidades con escala progresiva. En Ceuta y Melilla la cuota se bonifica al ${pct(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} (art. 57 bis del TRLITPAJD), lo que deja el tipo efectivo por debajo de ese mínimo. Entre particulares siempre se paga ITP.`,
       },
     },
     {
@@ -83,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Puede aplicarse IVA en la compra de una finca rústica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Por regla general la operación está exenta de IVA y tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a la exención (Art. 20.Dos LIVA): la compra pasa a tributar por IVA al ${pct(PORCENTAJES_IVA.general)} con inversión del sujeto pasivo, que el comprador autoliquida y deduce en el modelo 303. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos y su propia mecánica: la calculadora no cifra ese impuesto.`,
+        text: `Por regla general la operación está exenta de IVA y tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a la exención (Art. 20.Dos LIVA): la compra pasa a tributar por IVA al ${pct(PORCENTAJES_IVA.general)} con inversión del sujeto pasivo, que el comprador autoliquida y deduce en el modelo 303. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos y su propia mecánica. En Canarias la renuncia existe igual, sobre la exención del IGIC (art. 50.Cinco de la Ley canaria 4/2012), con inversión del sujeto pasivo; la calculadora no cifra ese impuesto. En Ceuta y Melilla el IPSI no admite la renuncia (Ley 8/1991, arts. 7 y 20.3), así que allí se paga siempre ITP.`,
       },
     },
     {
@@ -99,7 +105,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia comprar una finca rústica de comprar un solar edificable?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La fiscalidad cambia. El terreno rústico no edificable está exento de IVA, tributa por ITP y no genera plusvalía municipal. En cambio, un solar o terreno edificable vendido por un promotor o empresario tributa por IVA al ${pct(PORCENTAJES_IVA.general)} más AJD, y al ser suelo urbano sí genera plusvalía municipal para el vendedor. Son dos operaciones distintas con impuestos distintos. En Canarias, Ceuta y Melilla el IVA de esa segunda operación se sustituye por el IGIC o el IPSI.`,
+        text: `La fiscalidad cambia. El terreno rústico no edificable está exento de IVA, tributa por ITP y no genera plusvalía municipal. En cambio, un solar o terreno edificable vendido por un promotor o empresario tributa por IVA al ${pct(PORCENTAJES_IVA.general)} más AJD, y al ser suelo urbano está sujeto a la plusvalía municipal del vendedor cuando hay incremento real del valor del terreno (sin incremento, la transmisión no está sujeta: art. 104.5 TRLRHL). Son dos operaciones distintas con impuestos distintos. En Canarias, Ceuta y Melilla el IVA de esa segunda operación se sustituye por el IGIC o el IPSI.`,
       },
     },
   ],

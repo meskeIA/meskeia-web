@@ -23,11 +23,17 @@ import {
   ComunidadAutonoma,
   calcularITP,
   calcularAJD,
+  tipoAJD,
+  tipoGeneralITP,
+  describirSubidaITP,
   estimarFacturaNotarial,
+  notariaDeLibreAcuerdo,
+  LIMITE_ARANCEL_NOTARIAL,
   calcularRegistro,
   ENLACE_CATASTRO,
-  RANGO_AJD,
-  RANGO_ITP,
+  RANGO_AJD_OTROS,
+  RANGO_AJD_VIVIENDA,
+  RANGO_ITP_OTROS,
   TERRITORIOS_SIN_IVA,
   BONIFICACION_CUOTA_CEUTA_MELILLA,
   CIUDADES_CON_BONIFICACION,
@@ -51,9 +57,17 @@ interface ResultadosComprador {
   /** Cierto cuando se ha aplicado la bonificación del 50 % de Ceuta y Melilla */
   bonificado: boolean;
   ajd: number;
+  /** Tipo nominal del AJD y por qué es ese (general, o el propio de la renuncia). */
+  ajdTipo: ReturnType<typeof tipoAJD>;
   gastosNotario: number;
   gastosNotarioMin: number;
   gastosNotarioMax: number;
+  /**
+   * El valor supera LIMITE_ARANCEL_NOTARIAL: lo que excede no tiene arancel y sus honorarios
+   * son de libre acuerdo (RD 1426/1989, número 2). La cifra de notaría es la del arancel hasta
+   * ese límite, así que la factura real PUEDE ser mayor (hallazgo 1599).
+   */
+  notariaLibre: boolean;
   gastosRegistro: number;
   gastosGestoria: number;
   /**
@@ -105,6 +119,40 @@ const IVA_NAVE_INDUSTRIAL = IVA_INMUEBLES_2025.local;
 // hallazgo D del 27/08/2026 con el 21 % y el 19-30 %).
 const BONIFICACION_CIUDADES = `${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} %`;
 
+/**
+ * Dónde NO existe la renuncia a la exención de la segunda entrega (hallazgo 1584, 24/09/2026).
+ *
+ * En Ceuta y Melilla la página decía a la vez que la renuncia «no se aplica aquí» y la
+ * calculaba (quitaba el ITP y liquidaba AJD): 17.600 € de diferencia en una nave de 640.000 €
+ * por elegir una opción que la propia página negaba. Se decidió con la norma, leída en el BOE
+ * (BOE-A-1991-7645, Ley 8/1991 del IPSI, texto consolidado):
+ *  · el art. 7 declara exentas las entregas de inmuebles que lo estén «en la legislación común
+ *    del Impuesto sobre el Valor Añadido», y la ley no regula ninguna renuncia a esa exención
+ *    (ni la palabra aparece en el texto);
+ *  · el art. 20.3 prohíbe deducir el IPSI soportado en la compra de inmuebles, y la renuncia
+ *    del art. 20.Dos LIVA exige justo lo contrario: un adquirente con derecho a deducir;
+ *  · el art. 3.c) remite la incompatibilidad con las TPO a «las normas de la legislación
+ *    común», y el art. 7.5 TRLITPAJD sujeta a TPO la entrega exenta de un inmueble.
+ * Así que allí la segunda mano de una nave paga SIEMPRE ITP (bonificado, art. 57 bis.3.a).
+ *
+ * Canarias no está en la lista: el IGIC sí tiene la renuncia (art. 50.Cinco Ley canaria
+ * 4/2012, sobre la exención del 50.Uno.22.º), con inversión del sujeto pasivo (art. 19.1.2.º g
+ * Ley 20/1991) y sin TPO (art. 4.4 de esa misma ley).
+ */
+const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 'melilla'];
+
+/** Las comunidades con tipo de AJD propio de la renuncia VERIFICADO en su norma (motor). */
+const CCAA_CON_AJD_DE_RENUNCIA = Object.values(ITP_CCAA)
+  .filter((c) => c.ajdRenuncia !== undefined)
+  .map((c) => c.nombre);
+
+/**
+ * La nota del sello de datos, con el rango de lo que paga una NAVE. El sello común habla del ITP
+ * de la vivienda (del 4 % vasco hacia arriba), que no es el de esta app: una nave paga el 7 % en
+ * el País Vasco (hallazgo 1582) y, con la bonificación, el 3 % efectivo en Ceuta y Melilla.
+ */
+const NOTA_DATOS = `El ITP de una nave va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${BONIFICACION_CIUDADES} (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+
 // El helper `tipoNominal` que vivía aquí subió a `lib/formatters.ts` como
 // `formatTipoNominal` el 25/08/2026: el mismo defecto estaba en las otras seis apps del
 // clúster, cada una con un número de decimales distinto (hallazgos 331 y 333).
@@ -123,10 +171,23 @@ export default function SimuladorNaveIndustrialPage() {
   const precioIlegible =
     precioVenta.trim() !== '' && !Number.isFinite(parseSpanishNumber(precioVenta));
 
+  /**
+   * La transmisión que se CALCULA. En Ceuta y Melilla la renuncia no existe (ver
+   * TERRITORIOS_SIN_RENUNCIA): allí se calcula la segunda mano y el botón de la renuncia se
+   * desactiva. Se deriva en lugar de reescribir el estado para no perder la elección del
+   * usuario si vuelve a una comunidad donde la renuncia sí existe.
+   */
+  const renunciaImposible = TERRITORIOS_SIN_RENUNCIA.includes(ccaa);
+  const transmision: TipoTransmision =
+    tipoTransmision === 'segunda-mano-renuncia' && renunciaImposible ? 'segunda-mano' : tipoTransmision;
+
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
-    if (!Number.isFinite(precio) || precio <= 0) return null;
+    // Sobre el precio que se PINTA, al céntimo: «0,004» se pintaba «0,00 €» y publicaba un
+    // desglose entero con un porcentaje sobre el precio de millones por ciento (forma del
+    // hallazgo 1601 de la hermana solar). Un precio que se ve como cero es el cero.
+    if (!Number.isFinite(precio) || Math.round(precio * 100) <= 0) return null;
 
     // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
     // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
@@ -150,33 +211,39 @@ export default function SimuladorNaveIndustrialPage() {
     // paga ITP. Para el público que declara la app (empresas y autónomos) es el caso
     // frecuente, no el raro, y hasta el 23/08/2026 no se podía ni elegir. La hermana del
     // local comercial ya lo modelaba así.
-    const conIva = tipoTransmision === 'primera-mano' || tipoTransmision === 'segunda-mano-renuncia';
+    const conIva = transmision === 'primera-mano' || transmision === 'segunda-mano-renuncia';
+    const conRenuncia = transmision === 'segunda-mano-renuncia';
 
     if (conIva) {
       if (territorioSinIva) {
-        // Allí no se devenga IVA: se nombra el impuesto que corresponde y no se inventa cifra
+        // Allí no se devenga IVA: se nombra el impuesto que corresponde y no se inventa cifra.
+        // Con renuncia solo se llega aquí en Canarias (IGIC, art. 50.Cinco Ley 4/2012).
         tipoImpuesto = territorioSinIva.impuesto;
         impuestoNoCalculado = true;
       } else {
         // Nave industrial: IVA de local comercial (inmueble no residencial)
-        tipoImpuesto = tipoTransmision === 'segunda-mano-renuncia' ? 'IVA (renuncia · ISP)' : 'IVA';
+        tipoImpuesto = conRenuncia ? 'IVA (renuncia · ISP)' : 'IVA';
         porcentaje = IVA_NAVE_INDUSTRIAL;
         impuesto = precio * (porcentaje / 100);
       }
     } else {
-      // ITP segunda mano — tipo general de la CCAA (sin tipos reducidos: nave industrial es comercial)
-      // Sin tercer argumento: así se aplica la escala progresiva de las 7 CCAA
-      // que la tienen, en vez del tipo plano del primer tramo.
-      impuesto = calcularITP(precio, ccaa);
+      // ITP segunda mano — tipo general de la CCAA (sin tipos reducidos: nave industrial es comercial).
+      // Sin tipo forzado: así se aplica la escala progresiva o el umbral de la comunidad, y
+      // `'otro'` le da el tipo de los inmuebles que no son vivienda (País Vasco: 7 %, no el 4 %
+      // de la vivienda, hallazgo 1582).
+      impuesto = calcularITP(precio, ccaa, 'otro');
       tipoImpuesto = 'ITP';
       // Tipo EFECTIVO: con escala progresiva —o con la bonificación aplicada— el importe no
       // es un porcentaje plano del precio, así que el tipo nominal contradiría a la cifra.
       porcentaje = precio > 0 ? (impuesto / precio) * 100 : 0;
     }
 
-    // AJD solo aplica en primera mano (IVA + AJD). En Ceuta y Melilla la cuota gradual de
-    // documentos notariales también se bonifica al 50 % (art. 57 bis.1 TRLITPAJD).
-    const ajd = conIva ? calcularAJD(precio, ccaa) : 0;
+    // AJD solo aplica cuando la operación va por IVA/IGIC/IPSI (obra nueva o renuncia). En
+    // Ceuta y Melilla la cuota gradual de documentos notariales también se bonifica al 50 %
+    // (art. 57 bis.1 TRLITPAJD). Con renuncia, el tipo propio de la comunidad donde está
+    // verificado (Valencia, 2 %: hallazgo 1603 de la hermana terreno-rústico).
+    const contextoAJD = { objeto: 'otro' as const, renunciaExencionIVA: conRenuncia };
+    const ajd = conIva ? calcularAJD(precio, ccaa, contextoAJD) : 0;
 
     const notaria = estimarFacturaNotarial(precio);
 
@@ -196,24 +263,55 @@ export default function SimuladorNaveIndustrialPage() {
       impuestoNoCalculado,
       bonificado,
       ajd,
+      ajdTipo: tipoAJD(ccaa, contextoAJD),
       gastosNotario: notario,
       gastosNotarioMin: notaria.min,
       gastosNotarioMax: notaria.max,
+      notariaLibre: notariaDeLibreAcuerdo(precio),
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       gestoriaLegible,
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
     };
-  }, [precioVenta, ccaa, tipoTransmision, gastosGestoria]);
+  }, [precioVenta, ccaa, transmision, gastosGestoria]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
   const esCiudadBonificada = CIUDADES_CON_BONIFICACION.includes(ccaa);
   /** Las dos ramas en las que el impuesto es IVA y, por tanto, la base es la contraprestación */
   const conIvaEnPantalla =
-    (tipoTransmision === 'primera-mano' || tipoTransmision === 'segunda-mano-renuncia') &&
+    (transmision === 'primera-mano' || transmision === 'segunda-mano-renuncia') &&
     !territorioActualSinIva;
+  /** El impuesto cuya exención se renuncia: el IVA, o el IGIC en Canarias. */
+  const impuestoDeLaRenuncia = territorioActualSinIva?.impuesto ?? 'IVA';
+  /**
+   * Los tipos del recuadro de la comunidad, del motor y para ESTA operación: el ITP de una nave
+   * (no el de la vivienda) al precio escrito —el umbral valenciano lo cambia—, y el AJD que
+   * corresponde a la transmisión elegida.
+   */
+  const precioLeido = parseSpanishNumber(precioVenta);
+  const itpGeneralRotulo = tipoGeneralITP(
+    ccaa,
+    'otro',
+    Number.isFinite(precioLeido) && precioLeido > 0 ? precioLeido : 0
+  );
+  const ajdRotulo = tipoAJD(ccaa, {
+    objeto: 'otro',
+    renunciaExencionIVA: transmision === 'segunda-mano-renuncia',
+  });
+  /** Escala progresiva o umbral, con las palabras de cada uno (hallazgo 1581). */
+  const subidaITP = describirSubidaITP(ccaa);
+  /**
+   * A la cifra final le falta algo: el impuesto indirecto sin calcular, una gestoría ilegible
+   * (hallazgo 1585) o la parte de la notaría que es de libre acuerdo (hallazgo 1599). Un solo
+   * criterio para los dos títulos, con las mismas palabras que el caso del IGIC/IPSI.
+   */
+  const cierreParcial =
+    resultadosComprador !== null &&
+    (resultadosComprador.impuestoNoCalculado ||
+      !resultadosComprador.gestoriaLegible ||
+      resultadosComprador.notariaLibre);
 
   return (
     <div className={styles.container}>
@@ -245,7 +343,7 @@ export default function SimuladorNaveIndustrialPage() {
         fuente={FISCAL_INMUEBLES_META.fuente}
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
-        nota={FISCAL_INMUEBLES_META.nota}
+        nota={NOTA_DATOS}
       />
 
       {/* Aviso IVA deducible — es el TERCERO de los avisos que explicaban un IVA que la propia
@@ -285,9 +383,9 @@ export default function SimuladorNaveIndustrialPage() {
             <div className={styles.transmisionGrid} role="group" aria-labelledby="etiqueta-transmision">
               <button
                 type="button"
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
+                className={`${styles.transmisionBtn} ${transmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
-                aria-pressed={tipoTransmision === 'segunda-mano'}
+                aria-pressed={transmision === 'segunda-mano'}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🔄</span>
                 <span>Segunda mano</span>
@@ -298,9 +396,9 @@ export default function SimuladorNaveIndustrialPage() {
                   a la exención es el caso frecuente, no el raro. */}
               <button
                 type="button"
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
+                className={`${styles.transmisionBtn} ${transmision === 'primera-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('primera-mano')}
-                aria-pressed={tipoTransmision === 'primera-mano'}
+                aria-pressed={transmision === 'primera-mano'}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Obra nueva / Promotor</span>
@@ -312,38 +410,54 @@ export default function SimuladorNaveIndustrialPage() {
                     : `Paga IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD`}
                 </span>
               </button>
+              {/* En Ceuta y Melilla la renuncia no existe (TERRITORIOS_SIN_RENUNCIA, hallazgo
+                  1584): el botón se desactiva y dice por qué, en vez de calcular una opción que
+                  el aviso de debajo niega. En Canarias la renuncia es a la exención del IGIC. */}
               <button
                 type="button"
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano-renuncia' ? styles.active : ''}`}
+                className={`${styles.transmisionBtn} ${transmision === 'segunda-mano-renuncia' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano-renuncia')}
-                aria-pressed={tipoTransmision === 'segunda-mano-renuncia'}
+                aria-pressed={transmision === 'segunda-mano-renuncia'}
+                disabled={renunciaImposible}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
-                <span>2ª mano con renuncia al IVA</span>
+                <span>2ª mano con renuncia al {impuestoDeLaRenuncia}</span>
                 <span className={styles.transmisionSub}>
-                  {territorioActualSinIva
-                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
-                    : `IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% (ISP) + AJD`}
+                  {renunciaImposible
+                    ? 'No existe en el IPSI: paga ITP'
+                    : territorioActualSinIva
+                      ? `Paga ${territorioActualSinIva.impuesto} (ISP) + AJD`
+                      : `IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% (ISP) + AJD`}
                 </span>
               </button>
             </div>
-            {/* Los dos avisos miran TERRITORIOS_SIN_IVA, igual que el rótulo del botón desde la
-                reparación del hallazgo 490: eran texto FIJO y explicaban en Canarias, Ceuta y
-                Melilla un IVA que la tarjeta de al lado niega en la misma pantalla — el de
-                «Segunda mano» invitaba a una tercera opción que allí no devuelve ningún IVA, y
-                el de la renuncia describía una autoliquidación por ISP que allí no se produce
-                (hallazgo 647). */}
-            {tipoTransmision === 'segunda-mano' && (
+            {/* Los dos avisos miran el territorio, igual que el rótulo del botón desde la
+                reparación del hallazgo 490. Desde el 24/09/2026 (hallazgo 1584) distinguen además
+                Canarias, donde la renuncia EXISTE —a la exención del IGIC—, de Ceuta y Melilla,
+                donde el IPSI no la tiene: antes los tres decían que «no se aplica aquí» mientras
+                la app la calculaba. */}
+            {transmision === 'segunda-mano' && (
               <p className={styles.avisoRenuncia} role="note">
                 <span aria-hidden="true">ℹ️</span>{' '}
-                {territorioActualSinIva ? (
+                {renunciaImposible && territorioActualSinIva ? (
                   <>
                     En {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
-                    ({territorioActualSinIva.nombre}), con sus propias exenciones: la{' '}
-                    <strong>renuncia a la exención de IVA</strong> —habitual entre empresarios en el resto
-                    de España— <strong>no se aplica aquí</strong>, así que la tercera opción no liquida
-                    ninguna cuota de IVA. Consulta el régimen del {territorioActualSinIva.impuesto} en la
-                    administración tributaria de {datosCcaaActual.nombre}.
+                    ({territorioActualSinIva.nombre}), y en él <strong>no existe la renuncia a la
+                    exención</strong>: la Ley 8/1991 toma sus exenciones de la ley del IVA (art. 7) sin
+                    regular ninguna renuncia, y no deja deducir el {territorioActualSinIva.impuesto}{' '}
+                    soportado en la compra de un inmueble (art. 20.3), que es lo que la renuncia exige en
+                    la ley del IVA (art. 20.Dos). La segunda mano de una nave paga siempre ITP, así que la
+                    tercera opción no se puede elegir aquí.
+                  </>
+                ) : territorioActualSinIva ? (
+                  <>
+                    En {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+                    ({territorioActualSinIva.nombre}). También en él la segunda entrega de una nave está
+                    exenta y, entre empresarios con derecho a deducción, se puede{' '}
+                    <strong>renunciar a esa exención</strong> (art. 50.Cinco Ley canaria 4/2012): la
+                    operación pasa al {territorioActualSinIva.impuesto}, que autoliquida el comprador
+                    (inversión del sujeto pasivo), y no se paga ITP. Si es tu caso, usa la tercera opción;
+                    el {territorioActualSinIva.impuesto} no lo cifra este simulador.
                   </>
                 ) : (
                   <>
@@ -355,17 +469,27 @@ export default function SimuladorNaveIndustrialPage() {
                 )}
               </p>
             )}
-            {tipoTransmision === 'segunda-mano-renuncia' && (
+            {transmision === 'segunda-mano-renuncia' && (
               <p className={styles.avisoRenuncia} role="note">
                 <span aria-hidden="true">ℹ️</span>{' '}
                 {territorioActualSinIva ? (
                   <>
-                    En {datosCcaaActual.nombre} <strong>no se devenga IVA</strong>: allí rige el{' '}
-                    {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}), así que ni la
-                    renuncia a la exención ni la inversión del sujeto pasivo del IVA entran en juego, y
-                    este simulador no cuantifica ese impuesto. Lo que sí calcula es el AJD de la escritura,
-                    con el tipo general de la tabla; varias comunidades le aplican un{' '}
-                    <strong>tipo incrementado</strong> cuando hay renuncia.
+                    En {datosCcaaActual.nombre} <strong>no se devenga IVA</strong>: la renuncia es a la
+                    exención del {territorioActualSinIva.impuesto} (art. 50.Cinco Ley canaria 4/2012), y
+                    ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por
+                    inversión del sujeto pasivo (art. 19.1.2.º g Ley 20/1991). Con la renuncia la
+                    operación deja de pagar ITP (art. 4.4 de esa misma ley) y la escritura paga AJD. Este
+                    simulador no cuantifica el {territorioActualSinIva.impuesto}; el AJD sí, con el tipo
+                    general de la comunidad —algunas le aplican un <strong>tipo incrementado</strong>{' '}
+                    cuando hay renuncia—.
+                  </>
+                ) : ajdRotulo.motivo === 'renuncia' ? (
+                  <>
+                    Con renuncia a la exención el IVA no se paga al vendedor: lo{' '}
+                    <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
+                    deducible si tu actividad está sujeta a IVA. El AJD de la escritura va al{' '}
+                    <strong>tipo propio de la renuncia</strong> en {datosCcaaActual.nombre} (
+                    {formatTipoNominal(ajdRotulo.tipo)}%), que es el que se aplica aquí.
                   </>
                 ) : (
                   <>
@@ -424,7 +548,9 @@ export default function SimuladorNaveIndustrialPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.tipoGeneral)}%</span>
+                {/* El de una nave, no el de la vivienda: en el País Vasco, 7 % y no 4 %
+                    (hallazgo 1582); en Valencia, el 11 % si el precio pasa del millón (1581). */}
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(itpGeneralRotulo)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
@@ -433,7 +559,9 @@ export default function SimuladorNaveIndustrialPage() {
                     lleva los decimales que no tiene. Este era el último de la página al que
                     se le forzaban dos, mientras la tabla comparativa de la misma página ya
                     escribía ese rango sin ellos (hallazgo 685). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
+                {/* Del motor y para esta operación: el País Vasco cobra el 0,5 % a una nave
+                    (hallazgo 1583) y Valencia el 2 % con renuncia (1603). */}
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRotulo.tipo)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>
@@ -444,9 +572,11 @@ export default function SimuladorNaveIndustrialPage() {
                 </span>
               </div>
             </div>
-            {datosCcaaActual.tramosProgresivos && (
+            {/* Escala o umbral, con las palabras del motor: Valencia se anunciaba como «escala
+                progresiva (9% → 11%)» y el 11 % grava TODO el valor, no el exceso (hallazgo 1581). */}
+            {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> {subidaITP}.
               </p>
             )}
             {esCiudadBonificada ? (
@@ -526,13 +656,13 @@ export default function SimuladorNaveIndustrialPage() {
                 icon="📋"
                 description={
                   resultadosComprador.impuestoNoCalculado
-                    ? `En ${datosCcaaActual.nombre} no rige el IVA: ${tipoTransmision === 'segunda-mano-renuncia' ? 'la renuncia a la exención' : 'la obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    ? `En ${datosCcaaActual.nombre} no rige el IVA: ${transmision === 'segunda-mano-renuncia' ? `la renuncia a la exención del ${resultadosComprador.tipoImpuesto}` : 'la obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     // startsWith y no igualdad estricta: con renuncia el rótulo es
                     // «IVA (renuncia · ISP)» y caía al ramal del ITP, así que bajo un IVA de
                     // 105.000 € se leía «naves industriales no tienen tipos reducidos», que
                     // es del impuesto que en esa operación NO se paga (hallazgo 600).
                     : resultadosComprador.tipoImpuesto.startsWith('IVA')
-                      ? tipoTransmision === 'segunda-mano-renuncia'
+                      ? transmision === 'segunda-mano-renuncia'
                         ? 'Lo autoliquida el comprador por inversión del sujeto pasivo (no se paga al vendedor) y es deducible si tienes derecho'
                         : 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
                       : resultadosComprador.bonificado
@@ -550,14 +680,28 @@ export default function SimuladorNaveIndustrialPage() {
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
-                  description={resultadosComprador.bonificado ? `Con la bonificación del ${BONIFICACION_CIUDADES} de Ceuta y Melilla aplicada` : undefined}
+                  description={
+                    resultadosComprador.bonificado
+                      ? `Con la bonificación del ${BONIFICACION_CIUDADES} de Ceuta y Melilla aplicada`
+                      : resultadosComprador.ajdTipo.motivo === 'renuncia'
+                        ? `Tipo propio de la renuncia a la exención en ${datosCcaaActual.nombre}`
+                        : transmision === 'segunda-mano-renuncia'
+                          ? 'Tipo general de la comunidad: algunas aplican uno incrementado cuando hay renuncia'
+                          : undefined
+                  }
                 />
               )}
 
               <ResultCard
                 title="Gastos de notaría (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosNotario)}
-                description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
+                description={
+                  resultadosComprador.notariaLibre
+                    // Por encima del límite el arancel no fija cantidad (hallazgo 1599): la cifra
+                    // es la del tramo reglado y lo que excede se pacta con el notario.
+                    ? `Arancel hasta ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}: factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. Lo que excede de ese valor no tiene arancel: sus honorarios son de libre acuerdo con el notario (RD 1426/1989, número 2), así que la factura real puede ser mayor.`
+                    : `Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`
+                }
                 variant="default"
                 icon="📝"
               />
@@ -594,8 +738,11 @@ export default function SimuladorNaveIndustrialPage() {
 
               <div className={styles.separador} />
 
+              {/* «(parcial)» con el mismo criterio que el caso del IGIC/IPSI: la gestoría ilegible
+                  (hallazgo 1585) y la notaría de libre acuerdo (1599) también dejan fuera algo,
+                  y la descripción ya lo decía bajo un título de cifra definitiva. */}
               <ResultCard
-                title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
+                title={cierreParcial ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
@@ -608,6 +755,9 @@ export default function SimuladorNaveIndustrialPage() {
                     // Un importe que no se ha podido leer falta en el total igual que un impuesto
                     // sin calcular, y en la misma dirección (hallazgo 1199).
                     resultadosComprador.gestoriaLegible ? null : 'SIN la gestoría, que no se ha podido leer',
+                    resultadosComprador.notariaLibre
+                      ? `SIN la parte de la notaría de libre acuerdo (el valor que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)})`
+                      : null,
                   ]
                     .filter((x): x is string => x !== null)
                     .join(' — ')
@@ -615,15 +765,16 @@ export default function SimuladorNaveIndustrialPage() {
               />
 
               <ResultCard
-                title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
+                title={cierreParcial ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
                 description={
-                  resultadosComprador.impuestoNoCalculado || !resultadosComprador.gestoriaLegible
+                  cierreParcial
                     ? `No incluye ${[
                         resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+                        resultadosComprador.notariaLibre ? 'la parte de la notaría de libre acuerdo' : null,
                       ]
                         .filter((x): x is string => x !== null)
                         .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}${
@@ -704,8 +855,10 @@ export default function SimuladorNaveIndustrialPage() {
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px' }}>AJD obra nueva</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}%)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}%)</td>
+                  {/* Un rango por objeto: el 0 % es la exención foral de la primera VIVIENDA y una
+                      nave paga allí el 0,5 % (hallazgo 1583). */}
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatTipoNominal(RANGO_AJD_OTROS.min)}% – {formatTipoNominal(RANGO_AJD_OTROS.max)}%)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatTipoNominal(RANGO_AJD_VIVIENDA.min)}% – {formatTipoNominal(RANGO_AJD_VIVIENDA.max)}%)</td>
                 </tr>
               </tbody>
             </table>
@@ -768,7 +921,7 @@ export default function SimuladorNaveIndustrialPage() {
                 se paga IVA al {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%. Si es de segunda mano, se paga ITP
                 al tipo general de la comunidad autónoma. Nunca se pagan los dos a la vez. En Canarias, Ceuta
                 y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador
-                no calcula ahí el impuesto de la obra nueva ni el de la renuncia.
+                no calcula ahí el impuesto de la obra nueva, ni en Canarias el de la renuncia.
               </p>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 <strong>Con una salvedad que en naves industriales es frecuente:</strong> la segunda
@@ -776,9 +929,12 @@ export default function SimuladorNaveIndustrialPage() {
                 a deducción es habitual <strong>renunciar a esa exención</strong>. Entonces la operación vuelve
                 al IVA (con inversión del sujeto pasivo: lo declara el comprador) y no se paga ITP, aunque el
                 AJD suele ir a un tipo incrementado en muchas comunidades. El simulador lo
-                contempla en su tercera opción, «2ª mano con renuncia al IVA»; lo que no ajusta es el tipo
-                incrementado de AJD que varias comunidades aplican en ese supuesto, así que conviene
-                contrastarlo con tu asesor.
+                contempla en su tercera opción, «2ª mano con renuncia al IVA», y aplica el AJD propio de la
+                renuncia donde está verificado en su norma ({CCAA_CON_AJD_DE_RENUNCIA.join(', ')}); en las
+                demás usa el general, así que conviene contrastarlo con tu asesor. En Canarias la renuncia
+                existe, pero a la exención del IGIC (art. 50.Cinco Ley canaria 4/2012). En Ceuta y Melilla,
+                en cambio, el IPSI no la admite (Ley 8/1991, arts. 7 y 20.3): allí la segunda mano de una
+                nave paga siempre ITP.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -794,7 +950,7 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) son exclusivos de
                 inmuebles residenciales. Para naves industriales y locales comerciales aplica el tipo general
-                de la comunidad, que hoy va del {formatTipoNominal(RANGO_ITP.min)}% al {formatTipoNominal(RANGO_ITP.max)}%
+                de la comunidad, que hoy va del {formatTipoNominal(RANGO_ITP_OTROS.min)}% al {formatTipoNominal(RANGO_ITP_OTROS.max)}%
                 — el techo corresponde al tramo más alto de las comunidades con escala progresiva, así que una
                 nave cara puede pagar un tipo efectivo superior al nominal de su comunidad. La excepción no es
                 un tipo reducido sino una bonificación de cuota: en Ceuta y Melilla se descuenta el{' '}
@@ -810,7 +966,8 @@ export default function SimuladorNaveIndustrialPage() {
                 el AJD solo se pagaría sobre la escritura de hipoteca, si la hay—. Pero si el comprador y el
                 vendedor renuncian a la exención (tercera opción de «Tipo de transmisión»), la operación
                 vuelve al IVA y sí devenga AJD sobre la propia compraventa, con varias comunidades aplicándole
-                un tipo incrementado.
+                un tipo incrementado. El País Vasco, que exime del AJD la primera transmisión de una
+                vivienda, sí lo cobra a una nave.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -894,7 +1051,7 @@ export default function SimuladorNaveIndustrialPage() {
             <li>El IVA del {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma.</li>
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
-            <li>La renuncia a la exención de IVA en segunda mano SÍ se calcula, en la tercera opción de «Tipo de transmisión». Lo que esta calculadora no contempla son otras situaciones especiales: operaciones vinculadas, permutas, aportaciones no dinerarias a sociedades o transmisiones de unidad económica autónoma.</li>
+            <li>La renuncia a la exención de IVA en segunda mano SÍ se calcula, en la tercera opción de «Tipo de transmisión» (en Canarias, la del IGIC; en Ceuta y Melilla el IPSI no la admite y la opción se desactiva). Lo que esta calculadora no contempla son otras situaciones especiales: operaciones vinculadas, permutas, aportaciones no dinerarias a sociedades o transmisiones de unidad económica autónoma.</li>
             <li>Consulta siempre con tu asesor fiscal antes de cerrar la operación.</li>
           </ul>
         </div>

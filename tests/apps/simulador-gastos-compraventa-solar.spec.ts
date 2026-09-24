@@ -50,7 +50,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { IVA_INMUEBLES_2025 } from '../../data/fiscal/inmuebles';
 import { PORCENTAJES_IVA } from '../../data/fiscal/iva';
-import { RANGO_AJD } from '../../data/itp-ccaa';
+import { ITP_CCAA, LIMITE_ARANCEL_NOTARIAL, RANGO_AJD_OTROS, RANGO_ITP_OTROS } from '../../data/itp-ccaa';
 import { esperarHidratacion, sembrarValor, esperarValorEnReact } from './_hidratacion';
 
 const RUTA = '/simulador-gastos-compraventa-solar/';
@@ -170,7 +170,7 @@ test.describe('Simulador de gastos de compra de solar — inspección 26/08/2026
     await rellenar(page, PRECIO, '2500000');
     await rellenar(page, GESTORIA, '500');
 
-    await expect(page.getByText(/escala progresiva \(8% → 9% → 10% → 12% → 13%\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(8 % → 9 % → 10 % → 12 % → 13 %\)/)).toBeVisible();
     expect(await valorTarjeta(page, 'ITP (')).toBe('275.000,00 €');
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (11,00%)');
 
@@ -307,16 +307,26 @@ test.describe('Simulador de gastos de compra de solar — inspección 26/08/2026
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.495,20 €');
   });
 
-  /** El País Vasco no cobra AJD (`ITP_CCAA['pais-vasco'].ajd = 0`, régimen foral). */
-  test('País Vasco, empresario: se liquida el IVA pero NO se cobra AJD', async ({ page }) => {
+  /**
+   * País Vasco, empresario: se liquida el IVA y el AJD foral del 0,5 %.
+   *
+   * ⚠️ 24/09/2026 (hallazgo 1592) — hasta ese día este test se llamaba «se liquida el IVA pero
+   * NO se cobra AJD» y CONSAGRABA el defecto: `ITP_CCAA['pais-vasco'].ajd = 0` era la exención
+   * foral de la primera transmisión de VIVIENDA (NF 18/1987 de Gipuzkoa, art. 41.I.B.11), y un
+   * solar comprado a un promotor paga el 0,5 % (Gipuzkoa, NF 18/1987 art. 29.2; Bizkaia, NF
+   * 1/2011 art. 44.1). El motor lo lleva ya: `ajd: 0.5`, `ajdVivienda: 0`.
+   */
+  test('País Vasco, empresario: se liquida el IVA y el AJD foral del 0,5 %', async ({ page }) => {
+    expect(ITP_CCAA['pais-vasco'].ajd).toBe(0.5);
     await page.goto(RUTA);
     await page.selectOption('#select-ccaa', 'pais-vasco');
     await page.getByRole('button', { name: /Promotor \/ Empresa/ }).click();
     await rellenar(page, PRECIO, '100000');
 
-    // AJD = 100.000 × 0 % = 0, y la tarjeta solo se pinta si el importe es > 0.
-    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
-    // El IVA sí, al 21 %: 100.000 × 21 % = 21.000
+    // AJD = 100.000 × 0,5 % = 500
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('500,00 €');
+    // El IVA, al 21 %: 100.000 × 21 % = 21.000
     expect(await valorTarjeta(page, 'IVA (')).toBe('21.000,00 €');
   });
 
@@ -400,20 +410,27 @@ test.describe('Regresión — hallazgos reparados el 26/08/2026', () => {
    * ya lo usan. Es el mismo defecto que el hallazgo 2 de
    * `simulador-gastos-compraventa-terreno-rustico`, allí en su variante de rango de ITP.
    */
-  test('HALLAZGO 2 — el FAQPage y la tabla educativa anuncian un AJD mínimo del 0,5 % que la propia app desmiente', async ({ page }) => {
-    // El rango de verdad, derivado de la tabla: min = 0 (País Vasco), max = 1,5.
-    expect(RANGO_AJD.min).toBe(0);
-    expect(RANGO_AJD.max).toBe(1.5);
+  test('HALLAZGO 2 — el FAQPage y la tabla educativa derivan el rango de AJD del motor', async ({ page }) => {
+    // ⚠️ 24/09/2026 (hallazgo 1592): este test fijaba `RANGO_AJD.min = 0` y prohibía el
+    // «0,5%–1,5%» en la tabla, es decir, CONSAGRABA el 0 % vasco, que era la exención de la
+    // primera VIVIENDA y no la de un solar (0,5 %, NF 18/1987 art. 29.2 y NF 1/2011 art. 44.1).
+    // Lo que sigue valiendo del hallazgo 2 del 26/08 es que el rango se DERIVE, no el número:
+    // ahora es el de lo que no es vivienda, 0,5 – 1,5.
+    expect(RANGO_AJD_OTROS).toEqual({ min: 0.5, max: 1.5 });
 
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
     expect(faq).not.toBe('');
+    // El texto escrito a mano de antes («entre el 0,5% y el 1,5%») no vuelve; el derivado, sí.
     expect(faq).not.toContain('entre el 0,5% y el 1,5%');
+    expect(faq).toContain('del 0,5% al 1,5%');
+    expect(faq).not.toContain('el 0% del Régimen foral del País Vasco');
 
     // Y lo mismo en la tabla comparativa del bloque educativo (llega plegada: textContent).
     const cuerpo = (await page.locator('body').textContent()) ?? '';
-    expect(cuerpo).not.toContain('0,5%–1,5%');
+    expect(cuerpo).toContain('Sí (0,5%–1,5%)');
+    expect(cuerpo).not.toContain('Sí (0%–1,5%)');
   });
 
   /**
@@ -534,7 +551,7 @@ test.describe('Re-inspección 11/09/2026 — la escala de Aragón del art. 121-1
     await rellenar(page, GESTORIA, '500');
 
     // Los cinco escalones se anuncian con formatTipoNominal (formato español: «8,5%», no «8.5%»)
-    await expect(page.getByText(/escala progresiva \(8% → 8,5% → 9% → 9,5% → 10%\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(8 % → 8,50 % → 9 % → 9,50 % → 10 %\)/)).toBeVisible();
 
     expect(await valorTarjeta(page, 'ITP (')).toBe('40.750,00 €');
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,15%)');
@@ -968,7 +985,7 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     await sembrarValor(page, SEL_PRECIO, '2000000');
     await sembrarValor(page, SEL_GESTORIA, '650');
 
-    await expect(page.getByText(/escala progresiva \(10% → 11% → 12% → 13%\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(10 % → 11 % → 12 % → 13 %\)/)).toBeVisible();
     await expect(rotulo(page, /^ITP \(/)).toHaveText('ITP (11,50%)');
     await expect(valor(page, 'ITP (')).toHaveText('230.000,00 €');
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
@@ -1044,8 +1061,13 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     await expect(valor(page, 'Gastos de gestoría')).toHaveText('Sin leer');
     await expect(valor(page, 'Total gastos adicionales')).toHaveText('19.137,38 €');
     await expect(descripcion(page, 'Total gastos adicionales')).toContainText('SIN la gestoría, que no se ha podido leer');
-    await expect(valor(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText('319.137,38 €');
-    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText(
+    // 24/09/2026 (hallazgo 1595): el título es PARCIAL, como cuando falta el IGIC. Hasta ese día
+    // este test leía la tarjeta por «COSTE TOTAL DE ADQUISICIÓN», el título de una cifra
+    // definitiva, y así consagraba el defecto.
+    await expect(rotulo(page, /^Total gastos adicionales/)).toHaveText('Total gastos adicionales (parcial)');
+    await expect(rotulo(page, /^COSTE TOTAL/)).toHaveText('COSTE TOTAL (PARCIAL)');
+    await expect(valor(page, /^COSTE TOTAL/)).toHaveText('319.137,38 €');
+    await expect(descripcion(page, /^COSTE TOTAL/)).toHaveText(
       'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
     );
 
@@ -1166,17 +1188,20 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toContainText('antes de deducir el IVA');
 
     await sembrarValor(page, SEL_GESTORIA, '2.000.50');
-    await expect(valor(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText('366.387,38 €');
-    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toContainText('No incluye la gestoría');
-    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toContainText('deducir el IVA');
+    // 24/09/2026 (hallazgo 1595): con la gestoría ilegible la tarjeta se titula «(PARCIAL)» y se
+    // lee por «COSTE TOTAL»; hasta ese día se leía por el título de la cifra definitiva.
+    await expect(rotulo(page, /^COSTE TOTAL/)).toHaveText('COSTE TOTAL (PARCIAL)');
+    await expect(valor(page, /^COSTE TOTAL/)).toHaveText('366.387,38 €');
+    await expect(descripcion(page, /^COSTE TOTAL/)).toContainText('No incluye la gestoría');
+    await expect(descripcion(page, /^COSTE TOTAL/)).toContainText('deducir el IVA');
     // Reparado (1272): el aviso se SUMA a la salvedad, en una sola frase.
-    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText(
+    await expect(descripcion(page, /^COSTE TOTAL/)).toHaveText(
       'No incluye la gestoría, que no se ha podido leer: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
     );
 
     // Con un particular no hay IVA que deducir: el aviso queda solo, sin la salvedad.
     await page.getByRole('button', { name: /Un particular/ }).click();
-    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText(
+    await expect(descripcion(page, /^COSTE TOTAL/)).toHaveText(
       'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
     );
   });
@@ -1318,9 +1343,9 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
 //    `REGISTRO_MAXIMO = 2.181,67` y el IVA del 21 %.
 // Todo resuelto ANTES de abrir el navegador con un script propio que no llama a la app.
 //
-// HALLAZGOS ABIERTOS: se marcan con `hallazgoAbierto()`, que es un `test.fail()` salvo con
-// `VER_HUECOS=1` (la misma convención que el testigo de familia): así se lee, en cada uno, la
-// aserción que falla. Cada uno falla en su ÚLTIMA aserción; lo anterior es la preparación.
+// HALLAZGOS: se escribieron con un `test.fail()` salvo con `VER_HUECOS=1` (la convención del
+// testigo de familia), cada uno fallando en su ÚLTIMA aserción. Reparados el 24/09/2026
+// (1592-1601), la marca y su ayudante se retiraron y se quedan como regresión.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el testigo de familia no mira', () => {
@@ -1336,11 +1361,6 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
   /** El marcador de posición del panel de resultados (y no el anunciador de rutas de Next). */
   const marcador = (page: Page) => page.locator('[class*="placeholder"] p');
   const normaliza = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
-
-  /** Marca un hallazgo ABIERTO: pasa hoy porque falla, y se pondrá rojo al repararse. */
-  const hallazgoAbierto = () => {
-    if (!process.env.VER_HUECOS) test.fail();
-  };
 
   async function abrir(page: Page, ccaa: string, vende: 'particular' | 'promotor'): Promise<void> {
     await page.goto(RUTA);
@@ -1397,8 +1417,10 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    *   ITP = 12.000.000 × 6 % = 720.000,00 (Madrid sin escala → tipo EFECTIVO 6,00 %)
    *   registro: 306,51 + 11.398.987,90 × 0,02 % = 2.586,31 > tope → 2.181,67
    *            + 9,015182 = 2.190,685182 · con IVA = 2.650,729070 → 2.650,73
-   * La notaría NO se ancla aquí: por encima de 6.010.121,04 € el RD 1426/1989 no tiene tramo
-   * (hallazgo aparte, abajo). Sí se exige que el total sume sus líneas visibles.
+   * La notaría NO se anclaba aquí: por encima de 6.010.121,04 € el RD 1426/1989 no tiene tramo
+   * (hallazgo 1599, abajo). Reparado el 24/09/2026: se calcula el arancel hasta ese límite
+   * (2.181,672142 × 1,21 × 1,75 = 4.619,690761 → 4.619,69) y el resto es de libre acuerdo, así
+   * que el cierre sale «(PARCIAL)»: total 720.000 + 4.619,69 + 2.650,73 + 500 = 727.770,42.
    */
   test('CASO 2 (límite) — Madrid, particular, 12.000.000 €: el registro llega a su tope de 2.181,67 €', async ({ page }) => {
     const { parseSpanishNumber } = await import('../../lib/formatters');
@@ -1415,11 +1437,14 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     await expect(valor(page, 'Registro de la Propiedad')).toHaveText('2650,73 €');
     await expect(valor(page, 'Gastos de gestoría')).toHaveText('500,00 €');
 
+    await expect(valor(page, 'Gastos de notaría')).toHaveText('4619,69 €');
     const lineas =
       (await euros('ITP (')) + (await euros('Gastos de notaría')) +
       (await euros('Registro de la Propiedad')) + (await euros('Gastos de gestoría'));
     expect(await euros('Total gastos adicionales')).toBeCloseTo(lineas, 2);
-    expect(await euros('COSTE TOTAL DE ADQUISICIÓN')).toBeCloseTo(12_000_000 + lineas, 2);
+    await expect(valor(page, 'Total gastos adicionales')).toHaveText('727.770,42 €');
+    await expect(rotulo(page, /^COSTE TOTAL/)).toHaveText('COSTE TOTAL (PARCIAL)');
+    expect(await euros(/^COSTE TOTAL/)).toBeCloseTo(12_000_000 + lineas, 2);
   });
 
   /**
@@ -1511,7 +1536,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     await sembrarValor(page, SEL_GESTORIA, '0');
     await sembrarValor(page, SEL_PRECIO, '250000');
 
-    await expect(page.getByText('escala progresiva (8% → 10%)')).toBeVisible();
+    await expect(page.getByText('escala progresiva (8 % → 10 %)')).toBeVisible();
     await expect(valor(page, 'ITP (')).toHaveText('20.000,00 €');
     await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
     await expect(valor(page, 'Total gastos adicionales')).toHaveText('21.066,29 €');
@@ -1525,7 +1550,9 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     await expect(valor(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText('271.067,40 €');
   });
 
-  // ─── HALLAZGOS ABIERTOS del 24/09/2026 ──────────────────────────────────────
+  // ─── HALLAZGOS del 24/09/2026 (1592-1601), REPARADOS el mismo día ────────────
+  // Se escribieron con `hallazgoAbierto()` y fallaban en su ÚLTIMA aserción; reparados, pierden
+  // la marca y se quedan como regresión. Lo anterior a esa aserción es la preparación del caso.
 
   /**
    * HALLAZGO (dato, alto) — el AJD del País Vasco vale 0 en `ITP_CCAA['pais-vasco'].ajd` y la
@@ -1543,15 +1570,22 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    *   200.000 × 0,5 % = 1.000,00 → total 42.000 + 1.000 + 758,98 + 236,22 + 500 = 44.495,20
    *   coste 244.495,20 (la app publica 243.495,20, sin tarjeta de AJD).
    */
-  test('HALLAZGO 24/09 — País Vasco con promotor: no cobra el AJD del 0,5 % de las Normas Forales', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1592 — País Vasco con promotor: cobra el AJD del 0,5 % de las Normas Forales', async ({ page }) => {
     await abrir(page, 'pais-vasco', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '200000');
     await sembrarValor(page, SEL_GESTORIA, '500');
     await expect(valor(page, 'IVA (')).toHaveText('42.000,00 €');
 
-    // Lo que tiene que haber: una tarjeta de AJD al 0,5 % y el coste con ella dentro.
+    // Una tarjeta de AJD al 0,5 % y el coste con ella dentro.
     await expect(page.locator('h3', { hasText: /^AJD \(/ })).toHaveCount(1);
+    await expect(rotulo(page, /^AJD \(/)).toHaveText('AJD (0,50%)');
+    await expect(valor(page, 'AJD (')).toHaveText('1000,00 €');
+    await expect(valor(page, 'Total gastos adicionales')).toHaveText('44.495,20 €');
+    await expect(valor(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText('244.495,20 €');
+    // La ficha rotula el mismo 0,5 %, y el ITP de lo que no es vivienda (7 %, no el 4 %).
+    const ficha = normaliza(await page.locator('[class*="infoCcaaGrid"]').innerText());
+    expect(ficha).toContain('AJD 0,5%');
+    expect(ficha).toContain('ITP General 7%');
   });
 
   /**
@@ -1565,8 +1599,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * para Ceuta y Melilla un «Bonificación general 50%» cuya única condición es el sitio.
    *   Melilla, particular, 180.000 € → 180.000 × 6 % × 50 % = 5.400,00 (3,00 %)
    */
-  test('HALLAZGO 24/09 — en Melilla la cuota va bonificada al 50 % y la página dice que no hay rebaja', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1593 — en Melilla la cuota va bonificada al 50 % y la página lo dice', async ({ page }) => {
     await abrir(page, 'melilla', 'particular');
     await sembrarValor(page, SEL_PRECIO, '180000');
     await expect(rotulo(page, /^ITP \(/)).toHaveText('ITP (3,00%)');
@@ -1583,6 +1616,11 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
       },
       `Panel publicado: «${texto.slice(0, 600)}…»`,
     ).toEqual({ nombraLaBonificacion: true, niegaQueHayaRebaja: false });
+    // Y lo nombra junto a la cifra, con su artículo, y en la ficha.
+    await expect(descripcion(page, 'ITP (')).toHaveText(
+      'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)',
+    );
+    expect(ficha).toContain('Bonificación en cuota −50%');
   });
 
   /**
@@ -1594,8 +1632,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * Texto de 14,4 px normal: exige 4,5:1. Ningún candado lo ve (check:contraste-cabeceras mira
    * los <th>, check:token-oscuro los .module.css). El 733 reparó el --primary de esta app.
    */
-  test('HALLAZGO 24/09 — las celdas verde y roja de la tabla no llegan al 4,5:1', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1594 — las celdas verde y roja de la tabla llegan al 4,5:1 en los dos temas', async ({ page }) => {
     const contraste = (loc: ReturnType<Page['locator']>) =>
       loc.evaluate((el) => {
         const parse = (c: string): number[] => {
@@ -1666,8 +1703,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * hermanas con pestaña de vendedor en cuanto un importe es ilegible.
    *   Galicia, promotor, 250.000, gestoría «2.000.50» → total 57.316,29 · coste 307.316,29
    */
-  test('HALLAZGO 24/09 — con la gestoría ilegible, total y coste se titulan como definitivos', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1595 — con la gestoría ilegible, total y coste se titulan «(PARCIAL)»', async ({ page }) => {
     await abrir(page, 'galicia', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '250000');
     await sembrarValor(page, SEL_GESTORIA, '2.000.50');
@@ -1691,8 +1727,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * IVA 21% deducible en el modelo 303») no. La hermana terreno-rústico sí lo escribe en su
    * tabla: «IGIC o IPSI en Canarias, Ceuta y Melilla» (su page.tsx:627).
    */
-  test('HALLAZGO 24/09 (731 a medias) — tabla y casos de uso siguen sin el IGIC/IPSI', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1596 (731 a medias) — tabla y casos de uso recogen el IGIC/IPSI', async ({ page }) => {
     await page.goto(RUTA);
     // El bloque educativo llega plegado: su texto está en el DOM y se lee con textContent.
     const seccion = (h2: string) =>
@@ -1715,8 +1750,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * plusvalía municipal»), que contradice a la cuarta del mismo FAQPage («Si no ha habido
    * incremento real de valor, la transmisión no está sujeta al impuesto»).
    */
-  test('HALLAZGO 24/09 (1274 a medias) — la tabla y el FAQPage afirman la plusvalía sin condición', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1597 (1274 a medias) — la tabla y el FAQPage condicionan la plusvalía al incremento', async ({ page }) => {
     await page.goto(RUTA);
     const fila = normaliza(
       await page.locator('tr', { has: page.locator('td', { hasText: 'Plusvalía municipal (vendedor)' }) }).textContent(),
@@ -1726,7 +1760,8 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
       mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
     };
     const sexta = faq.mainEntity?.find((q) => q.name.includes('finca rústica'))?.acceptedAnswer.text ?? '';
-    expect(sexta).toContain('genera plusvalía municipal');
+    // (La respuesta decía «genera plusvalía municipal»; reparada, dice que está sujeto a ella.)
+    expect(sexta).toContain('plusvalía municipal');
 
     const condiciona = (s: string) => /incremento|no est[aá] sujeta|si hubo|salvo/i.test(s);
     expect({ tabla: condiciona(fila), faqPage: condiciona(sexta) }).toEqual({ tabla: true, faqPage: true });
@@ -1740,8 +1775,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * municipal, que corresponde al vendedor; se muestra solo como recordatorio». El
    * `description` del JSON-LD sí lo dice bien («y nota sobre la plusvalía municipal»).
    */
-  test('HALLAZGO 24/09 — la meta description promete calcular la plusvalía que la app no calcula', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1598 — la meta description no promete calcular la plusvalía que la app no calcula', async ({ page }) => {
     await page.goto(RUTA);
     const cuerpo = normaliza(await page.locator('body').textContent());
     expect(cuerpo).toContain('No calcula la plusvalía municipal');
@@ -1752,6 +1786,11 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
       // `\b`: «notaría» no es una «nota» sobre la plusvalía.
       !/\b(nota|recordatorio|aviso|recuerda)\b[^.]*plusvalía/i.test(desc);
     expect(prometeCalculo, `meta description: «${desc}»`).toBe(false);
+    // Y el WebApplication tampoco la lista como algo que se calcula.
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques.find((b) => b.includes('"WebApplication"')) ?? '';
+    expect(app).not.toContain('"Plusvalía municipal del vendedor (suelo urbano)"');
+    expect(app).toContain('no se calcula');
   });
 
   /**
@@ -1763,14 +1802,19 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * (6.134,06-8.178,75) sin decirlo; 2.536,71 € del punto medio salen de ese tramo
    * (5.989.878,96 × 0,02 % × 1,21 × 1,75). Módulo compartido: afecta a las siete.
    */
-  test('HALLAZGO 24/09 — por encima de 6.010.121,04 € la notaría no avisa de que es libre', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1599 — por encima de 6.010.121,04 € la notaría avisa de que es libre', async ({ page }) => {
     await abrir(page, 'madrid', 'particular');
     await sembrarValor(page, SEL_PRECIO, '12000000');
     await expect(valor(page, 'ITP (')).toHaveText('720.000,00 €');
-    await expect(valor(page, 'Gastos de notaría')).toHaveText('7156,40 €');
+    // Arancel hasta el límite: 2.181,672142 × 1,21 = 2.639,823292 → ×1,5 = 3.959,73 · ×2 =
+    // 5.279,65 · medio ×1,75 = 4.619,69 (antes, 7.156,40 con el séptimo tramo inexistente).
+    expect(LIMITE_ARANCEL_NOTARIAL).toBe(6010121.04);
+    await expect(valor(page, 'Gastos de notaría')).toHaveText('4619,69 €');
+    await expect(descripcion(page, 'Gastos de notaría')).toContainText('entre 3959,73 € y 5279,65 €');
 
     await expect(descripcion(page, 'Gastos de notaría')).toContainText(/libremente|libre acuerdo/i, { timeout: 2000 });
+    await expect(descripcion(page, /^COSTE TOTAL/)).toContainText('la parte de la notaría de libre acuerdo');
+    await expect(descripcion(page, /^COSTE TOTAL/)).toContainText('el coste real puede ser mayor');
   });
 
   /**
@@ -1780,8 +1824,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * `FISCAL_INMUEBLES_META.fuente` (data/fiscal/inmuebles.ts:20), así que sale igual en toda
    * app que lo pinte.
    */
-  test('HALLAZGO 24/09 — el DataReference cita una «Ley 1/1993» del ITP que es un Real Decreto Legislativo', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1600 — el DataReference cita el Real Decreto Legislativo 1/1993 del ITP', async ({ page }) => {
     await page.goto(RUTA);
     const referencia = normaliza(
       await page.locator('[role="note"]', { hasText: 'DATOS DE REFERENCIA' }).first().innerText(),
@@ -1797,13 +1840,73 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
    * del solar 0,00 €», ITP 0,00 €, notaría 190,89 € y registro 40,00 € (los mínimos de
    * arancel), gestoría 500, total 730,89 € y «18.272.250,00% sobre el precio de compra».
    */
-  test('HALLAZGO 24/09 — un precio que se pinta 0,00 € publica un 18.272.250 % sobre el precio', async ({ page }) => {
-    hallazgoAbierto();
+  test('REPARADO 1601 — un precio que se pinta 0,00 € no publica desglose', async ({ page }) => {
     await abrir(page, 'madrid', 'particular');
     await sembrarValor(page, SEL_PRECIO, '0');
     await expect(marcador(page)).toHaveText(MARCADOR_VACIO);
 
     await sembrarValor(page, SEL_PRECIO, '0,004');
     await expect(page.locator('h3', { hasText: 'Precio del solar' })).toHaveCount(0, { timeout: 2000 });
+    await expect(marcador(page)).toHaveText(MARCADOR_VACIO);
+    // 0,01 € sí se pinta como un importe: es un precio, aunque absurdo, y se calcula.
+    await sembrarValor(page, SEL_PRECIO, '0,01');
+    await expect(valor(page, 'Precio del solar')).toHaveText('0,01 €');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REPARACIÓN 24/09/2026 — lo que la reparación del motor toca en el solar y los hallazgos no
+// nombraban: el umbral valenciano (hallazgos 1581/1602 de las hermanas) y el ITP vasco de lo
+// que no es vivienda (1582), con un particular como vendedor.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Reparación 24/09/2026 — umbral valenciano, País Vasco y DataReference del solar', () => {
+  const SEL_PRECIO = `input[aria-label="${PRECIO}"]`;
+  const SEL_GESTORIA = `input[aria-label="${GESTORIA}"]`;
+
+  /**
+   * Comunitat Valenciana, particular, 1.200.000 €, gestoría 500 € (Ley 13/1997, art. 13.Uno,
+   * BOE-A-1998-8202: por encima de un millón, el 11 % sobre TODO el valor):
+   *   ITP = 1.200.000 × 11 % = 132.000 · notaría 1.564,06 · registro 526,75
+   *   total = 132.000 + 1.564,06 + 526,75 + 500 = 134.590,81 · coste 1.334.590,81
+   */
+  test('Valencia, particular, 1.200.000 €: el 11 % grava todo el valor y el recuadro lo llama umbral', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    await page.selectOption('#select-ccaa', 'valencia');
+    await page.getByRole('button', { name: /Un particular/ }).click();
+    await sembrarValor(page, SEL_PRECIO, '1200000');
+    await sembrarValor(page, SEL_GESTORIA, '500');
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (11,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('132.000,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('134.590,81 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.334.590,81 €');
+    const recuadro = (await page.locator('[class*="infoCcaa"]').first().innerText()).replace(/\s+/g, ' ');
+    expect(recuadro).toContain('pasa al 11 % sobre TODO el valor, no solo sobre el exceso');
+    expect(recuadro).not.toContain('escala progresiva');
+  });
+
+  /** País Vasco, particular, 200.000 €: 200.000 × 7 % = 14.000 (el 4 % es de la vivienda). */
+  test('País Vasco, particular, 200.000 €: el ITP de un solar es el 7 %, no el 4 % de la vivienda', async ({ page }) => {
+    expect(ITP_CCAA['pais-vasco'].tipoGeneralNoVivienda).toBe(7);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    await page.selectOption('#select-ccaa', 'pais-vasco');
+    await page.getByRole('button', { name: /Un particular/ }).click();
+    await sembrarValor(page, SEL_PRECIO, '200000');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (7,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('14.000,00 €');
+  });
+
+  /** El sello de datos dice lo que paga un SOLAR, con la bonificación que la app aplica. */
+  test('DataReference: el rango del ITP de un solar y la bonificación de Ceuta y Melilla', async ({ page }) => {
+    await page.goto(RUTA);
+    const referencia = (
+      await page.locator('[role="note"]', { hasText: 'DATOS DE REFERENCIA' }).first().innerText()
+    ).replace(/\s+/g, ' ');
+    expect(referencia).toContain(`El ITP de un solar va del ${RANGO_ITP_OTROS.min}% al ${RANGO_ITP_OTROS.max}%`);
+    expect(referencia).toContain('en Ceuta y Melilla la cuota se bonifica un 50 %');
+    expect(referencia).not.toContain('del 4% (País Vasco');
   });
 });
