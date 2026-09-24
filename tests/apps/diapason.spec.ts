@@ -74,6 +74,15 @@ function botonReproducir(page: Page) {
   return page.getByRole('button', { name: /tono de referencia/ });
 }
 
+/*
+ * Estado del botón principal. Hasta el 24/09/2026 estos tests lo leían en `aria-pressed`, que
+ * el botón llevaba A LA VEZ que un nombre que cambia con el estado: el lector anunciaba
+ * «Detener tono de referencia, activado» (hallazgo 1510). Se retiró aria-pressed y se conserva
+ * el nombre que cambia (coincide con el texto visible), así que el estado se lee en el nombre.
+ */
+const SONANDO = 'Detener tono de referencia';
+const PARADO = 'Reproducir tono de referencia';
+
 function pantalla(page: Page) {
   return page.locator('[class*="frecuenciaNumero"]');
 }
@@ -92,7 +101,7 @@ test('caso normal: por defecto suena un único La senoidal a 440 Hz y Detener lo
   // La4 = 440 Hz, el valor por defecto que anuncian el hero y la metadata.
   await expect(pantalla(page)).toHaveText('440');
   await botonReproducir(page).click();
-  await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'true');
+  await expect(botonReproducir(page)).toHaveAttribute('aria-label', SONANDO);
 
   await expect.poll(() => sonando(page)).toHaveLength(1);
   const [osc] = await sonando(page);
@@ -101,7 +110,7 @@ test('caso normal: por defecto suena un único La senoidal a 440 Hz y Detener lo
   expect(osc.frecuencia).toBeCloseTo(440, 2);
 
   await botonReproducir(page).click();
-  await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+  await expect(botonReproducir(page)).toHaveAttribute('aria-label', PARADO);
   await expect.poll(() => sonando(page)).toHaveLength(0);
 });
 
@@ -187,7 +196,7 @@ test('hallazgo 1362: dos cambios de onda seguidos no dejan un oscilador huérfan
   expect(await osciladores(page), 'un único oscilador creado en toda la secuencia').toHaveLength(1);
 
   await botonReproducir(page).click();
-  await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+  await expect(botonReproducir(page)).toHaveAttribute('aria-label', PARADO);
   await expect.poll(() => sonando(page), { timeout: 2000 }).toHaveLength(0);
 
   // Y tras elegir 415 nada vuelve a sonar (el huérfano seguía a 440 Hz).
@@ -379,7 +388,7 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
       expect(await osciladores(page), `intervalo ${ms} ms`).toHaveLength(arranques);
 
       await botonReproducir(page).click();
-      await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+      await expect(botonReproducir(page)).toHaveAttribute('aria-label', PARADO);
       // El stop va a +0,1 s en el reloj de audio: el `ended` llega poco después.
       await expect.poll(() => vivos(page), { message: `intervalo ${ms} ms` }).toHaveLength(0);
       await page.getByRole('button', { name: /Senoidal/ }).click();
@@ -420,10 +429,10 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
       ['PLAY', 0],
     ]);
     await expect.poll(() => vivos(page)).toHaveLength(1);
-    await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'true');
+    await expect(botonReproducir(page)).toHaveAttribute('aria-label', SONANDO);
     // 7 clics más (10 en total, par): detenido y sin nada vivo.
     await rafaga(page, Array.from({ length: 7 }, (): [string, number] => ['PLAY', 5]));
-    await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+    await expect(botonReproducir(page)).toHaveAttribute('aria-label', PARADO);
     await expect.poll(() => vivos(page)).toHaveLength(0);
   });
 
@@ -449,7 +458,10 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
 
   test('tabla de afinaciones: cada fila da los cents que salen de su frecuencia', async ({ page }) => {
     // Esperados a mano, 1200·log2(f/440): 442 → +7,85 · 441 → +3,93 · 443 → +11,76 ·
-    // 415 → −101,27 · 466 → +99,39 · 432 → −31,77 · 430,5 → −37,79.
+    // 415 → −101,27 · 466 → +99,39 · 432 → −31,77 · 430,54 → −37,63.
+    // REESCRITO el 24/09/2026: la última fila esperaba «430,5 Hz» y «−37,79 cents», que son los
+    // cents de la frecuencia REDONDEADA (hallazgo 1512). El tono científico es Do4 = 256 Hz:
+    // La4 = 256·2^(9/12) = 430,5390 Hz y 1200·log2(430,5390/440) = −37,6317 cents.
     const esperados: Record<string, string> = {
       '440,0 Hz': 'Referencia (0 cents)',
       '442,0 Hz': '+7,85 cents',
@@ -458,7 +470,7 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
       '415,0 Hz': '−101,27 cents',
       '466,0 Hz': '+99,39 cents',
       '432,0 Hz': '−31,77 cents',
-      '430,5 Hz': '−37,79 cents',
+      '430,54 Hz': '−37,63 cents',
     };
     const filas = page.locator('table tbody tr');
     await expect(filas).toHaveCount(Object.keys(esperados).length);
@@ -494,68 +506,124 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
     await expect(movil.locator('[class*="frecuenciaNumero"]')).toHaveText('415');
     await expect(movil.getByRole('button', { name: /La 415Hz/ })).toHaveAttribute('aria-pressed', 'true');
     await expect(movil.getByRole('button', { name: /Cuadrada/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(movil.getByRole('button', { name: /tono de referencia/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(movil.getByRole('button', { name: /tono de referencia/ })).toHaveAttribute('aria-label', SONANDO);
     await ctx.close();
   });
 
-  test('HALLAZGO abierto: la entrada del tono no tiene rampa (salta a la ganancia de golpe)', async ({
-    page,
-  }) => {
-    // HALLAZGO abierto: iniciarAudio programa 0 → volumen en 0,1 s, pero el efecto de volumen
-    // hace setValueAtTime(volumen, currentTime) en cuanto `reproduciendo` pasa a true y pisa la
-    // rampa. La metadata promete «Control de volumen con rampa suave (sin clic ni artefactos de
-    // audio)». Con la rampa lineal, a los 30-80 ms la ganancia vale entre 0,15 y 0,40 (volumen 0,5).
-    // Medido: en caliente el salto a 0,5 es inmediato (mismo currentTime que la rampa); en frío,
-    // a los ~20 ms (de 0,10 a 0,50 de golpe). Por eso se mide el SEGUNDO arranque, y desde 30 ms.
-    test.fail();
-    await botonReproducir(page).click();
-    await expect.poll(() => vivos(page)).toHaveLength(1);
-    await botonReproducir(page).click();
-    await expect.poll(() => vivos(page)).toHaveLength(0);
-    await botonReproducir(page).click();
-    const muestra = await page.evaluate(async () => {
-      const g = window.__ganancias.at(-1);
-      if (!g) return null;
-      for (let i = 0; i < 500; i++) {
+  // ── HALLAZGOS 1508-1512, REPARADOS el 24/09/2026 ───────────────────────────────────────────
+  // Eran test.fail() que documentaban cada defecto; se reescriben como regresión en verde.
+
+  /**
+   * Pulsa el botón principal y muestrea, desde la propia página, la ganancia del GainNode que ese
+   * clic crea, en el reloj de audio, hasta `limite` segundos. El muestreo se arranca ANTES del
+   * clic y espera al nodo nuevo; el clic es el de Playwright (un gesto de usuario real): con un
+   * `element.click()` sintético, el AudioContext del primer arranque se quedaba suspendido y el
+   * reloj no avanzaba.
+   */
+  async function arrancarYMuestrear(page: Page, limite: number): Promise<{ dt: number; valor: number }[]> {
+    const muestreo = page.evaluate(async (hasta) => {
+      const antes = window.__ganancias.length;
+      for (let i = 0; i < 2000 && window.__ganancias.length === antes; i++) {
+        await new Promise((r) => setTimeout(r, 1));
+      }
+      const g = window.__ganancias[antes];
+      if (!g) return [];
+      const muestras: { dt: number; valor: number }[] = [];
+      for (let i = 0; i < 3000; i++) {
         const dt = g.ctx.currentTime - g.t0;
-        if (dt >= 0.03 && dt <= 0.08) return { dt, valor: g.nodo.gain.value };
-        if (dt > 0.08) break;
+        muestras.push({ dt, valor: g.nodo.gain.value });
+        if (dt > hasta) break;
         await new Promise((r) => setTimeout(r, 2));
       }
-      return null;
+      return muestras;
+    }, limite);
+    await botonReproducir(page).click();
+    return muestreo;
+  }
+
+  /** La rampa de entrada: de 0 al volumen (0,5) en 0,1 s, lineal y sin saltos. */
+  function comprobarRampaDeEntrada(muestras: { dt: number; valor: number }[], etiqueta: string): void {
+    // Solo cuentan las muestras con el reloj de audio ya en marcha (dt > 0): antes de que el hilo
+    // de audio procese el primer cuanto, `gain.value` devuelve el valor por defecto del nodo (1),
+    // no el programado. Medido el 24/09/2026: la muestra del instante del clic leía 1 aunque lo
+    // primero programado sea setValueAtTime(0, t0); eso no llega a sonar.
+    const validas = muestras.filter((m) => m.dt > 0);
+    expect(validas.length, `${etiqueta}: hay muestras`).toBeGreaterThan(5);
+    // Arranca desde abajo: la primera muestra rendida está lejos del volumen (0,5).
+    expect(validas[0].valor, `${etiqueta}: ganancia al arrancar (${validas[0].dt.toFixed(3)} s)`).toBeLessThan(0.15);
+    // Nunca baja: una rampa de subida, sin escalones hacia atrás.
+    for (let i = 1; i < validas.length; i++) {
+      expect(validas[i].valor, `${etiqueta}: muestra ${i} a ${validas[i].dt.toFixed(3)} s`).toBeGreaterThanOrEqual(
+        validas[i - 1].valor - 1e-6,
+      );
+    }
+    // A mitad de rampa, lejos del 0,5: lineal, 0,5 × dt / 0,1 (±0,1 por el cuanto de 128 muestras).
+    const enMitad = validas.filter((m) => m.dt >= 0.02 && m.dt <= 0.08);
+    expect(enMitad.length, `${etiqueta}: muestras entre 20 y 80 ms`).toBeGreaterThan(0);
+    for (const m of enMitad) {
+      expect(m.valor, `${etiqueta}: ganancia a ${m.dt.toFixed(3)} s`).toBeLessThan(0.45);
+      expect(Math.abs(m.valor - (0.5 * m.dt) / 0.1), `${etiqueta}: lineal a ${m.dt.toFixed(3)} s`).toBeLessThan(0.1);
+    }
+    // Y llega al volumen elegido.
+    expect(muestras.at(-1)!.valor, `${etiqueta}: volumen final`).toBeCloseTo(0.5, 3);
+  }
+
+  test('1509 · la entrada del tono sube en rampa desde 0, en frío y en caliente', async ({ page }) => {
+    // Antes, el efecto de volumen hacía setValueAtTime(volumen, currentTime) en cuanto
+    // `reproduciendo` pasaba a true y pisaba la rampa: en caliente, 0,5 al instante; en frío, de
+    // 0,10 a 0,50 de golpe a los ~20 ms. La metadata promete «rampa suave (sin clic)».
+    comprobarRampaDeEntrada(await arrancarYMuestrear(page, 0.15), 'en frío');
+    await botonReproducir(page).click();
+    await expect.poll(() => vivos(page)).toHaveLength(0);
+    comprobarRampaDeEntrada(await arrancarYMuestrear(page, 0.15), 'en caliente');
+    await botonReproducir(page).click();
+    await expect.poll(() => vivos(page)).toHaveLength(0);
+  });
+
+  test('1509 · mover el volumen con el tono sonando es una rampa, no un escalón', async ({ page }) => {
+    await botonReproducir(page).click();
+    await expect.poll(() => vivos(page)).toHaveLength(1);
+    await page.waitForTimeout(300); // pasada la rampa de entrada: la ganancia está en 0,5
+    // El muestreo corre en la página mientras Playwright pulsa Inicio en el deslizador (0,5 → 0).
+    const muestreo = page.evaluate(async () => {
+      const g = window.__ganancias.at(-1)!;
+      const muestras: number[] = [];
+      const t0 = g.ctx.currentTime;
+      while (g.ctx.currentTime - t0 < 0.8) {
+        muestras.push(g.nodo.gain.value);
+        await new Promise((r) => setTimeout(r, 2));
+      }
+      return muestras;
     });
-    // Sin muestra en la ventana, el test no puede medir nada: eso NO es el hallazgo.
-    expect(muestra, 'muestra de ganancia entre 30 y 80 ms').not.toBeNull();
-    expect(muestra!.valor, `ganancia a ${muestra!.dt.toFixed(3)} s del arranque`).toBeLessThan(0.45);
+    await page.getByRole('slider', { name: 'Volumen' }).press('Home');
+    const muestras = await muestreo;
+    await expect(page.getByRole('slider', { name: 'Volumen' })).toHaveAttribute('aria-valuetext', '0 %');
+    expect(muestras[0]).toBeCloseTo(0.5, 3);
+    expect(muestras.at(-1)!).toBeCloseTo(0, 3);
+    // Con un escalón no habría ningún valor intermedio; con la rampa de 50 ms hay varios.
+    const intermedias = muestras.filter((v) => v > 0.05 && v < 0.45);
+    expect(intermedias.length, `muestras: ${muestras.map((v) => v.toFixed(2)).join(' ')}`).toBeGreaterThanOrEqual(2);
+    for (let i = 1; i < muestras.length; i++) expect(muestras[i]).toBeLessThanOrEqual(muestras[i - 1] + 1e-6);
   });
 
-  test('HALLAZGO abierto: el botón principal cambia de nombre Y lleva aria-pressed', async ({ page }) => {
-    // HALLAZGO abierto: «Reproducir tono de referencia» sin pulsar y «Detener tono de referencia»
-    // [pressed] sonando. WAI-ARIA APG (Button pattern): el nombre de un botón conmutador no debe
-    // cambiar con su estado; si cambia, no lleva aria-pressed. Vale cualquiera de las dos salidas.
-    test.fail();
+  test('1510 · el botón principal cambia de nombre con el estado y NO lleva aria-pressed', async ({ page }) => {
+    // WAI-ARIA APG, patrón Button: si el nombre de un conmutador cambia con su estado, no se
+    // marca con aria-pressed. El nombre sigue al texto visible («Reproducir» / «Detener»).
     const boton = botonReproducir(page);
-    const nombreParado = await boton.getAttribute('aria-label');
+    await expect(boton).toHaveAccessibleName(PARADO);
+    expect(await boton.getAttribute('aria-pressed')).toBeNull();
+    await expect(boton).toContainText('Reproducir');
     await boton.click();
-    await expect(boton).toHaveAttribute('aria-label', /tono de referencia/);
-    await page.waitForTimeout(200);
-    const nombreSonando = await boton.getAttribute('aria-label');
-    const pulsado = await boton.getAttribute('aria-pressed');
-    expect(
-      pulsado === null || nombreParado === nombreSonando,
-      `parado «${nombreParado}», sonando «${nombreSonando}» con aria-pressed=${pulsado}`,
-    ).toBe(true);
+    await expect(boton).toHaveAccessibleName(SONANDO);
+    expect(await boton.getAttribute('aria-pressed')).toBeNull();
+    await expect(boton).toContainText('Detener');
+    await boton.click();
+    await expect(boton).toHaveAccessibleName(PARADO);
   });
 
-  test('HALLAZGO abierto: en oscuro la descripción del preset activo queda bajo 4,5:1', async ({ page }) => {
-    // HALLAZGO abierto: .presetDesc (12,8 px, peso 400) usa --text-muted (#9b9b9b en oscuro) sobre
-    // el fondo del preset activo, rgba(46,134,171,0,1) compuesto sobre --bg-card: 4,45:1 medido.
-    // Texto pequeño exige 4,5:1 (WCAG 1.4.3). En claro da 4,53:1 y los presets inactivos, 6,26:1.
-    test.fail();
-    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await page.waitForTimeout(600); // transition: all 0.2s de los presets
-    const ratio = await page.evaluate(() => {
+  /** Contraste de la descripción del preset activo, con el fondo translúcido compuesto. */
+  async function contrastePresetActivo(page: Page): Promise<number> {
+    return page.evaluate(() => {
       const leer = (c: string) => {
         const p = (c.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0').split(/[ ,/]+/).filter(Boolean).map(Number);
         return { r: p[0], g: p[1], b: p[2], a: p[3] ?? 1 };
@@ -590,32 +658,58 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
       const [l1, l2] = [lum(texto), lum(fondo)];
       return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
     });
-    expect(ratio, 'la medida tiene que existir').toBeGreaterThan(1);
-    expect(ratio).toBeGreaterThanOrEqual(4.5);
+  }
+
+  test('1511 · la descripción del preset activo pasa de 4,5:1 en oscuro y en claro', async ({ page }) => {
+    // Antes: --text-muted #9B9B9B sobre rgb(45,54,58) = 4,45:1 en oscuro. Ahora --text-secondary:
+    // #B0B0B0 → 5,70:1 en oscuro; #666666 sobre rgb(234,243,247) → 5,10:1 en claro.
+    await page.addStyleTag({ content: '*{transition:none !important}' });
+    const claro = await contrastePresetActivo(page);
+    expect(claro, 'claro').toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    const oscuro = await contrastePresetActivo(page);
+    expect(oscuro, 'la medida tiene que existir').toBeGreaterThan(1);
+    expect(oscuro, 'oscuro').toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO abierto: la fila «Verdi / Natural» mezcla el 432 histórico de Verdi con la etiqueta «natural»', async ({
+  test('1508 · la fila del 432 es el diapasón italiano de Verdi, y «natural» se atribuye al movimiento 432', async ({
     page,
   }) => {
-    // HALLAZGO abierto: el 432 de Verdi es histórico (Congresso dei Musicisti Italiani, Milán, 1881;
-    // decreto del Ministerio de la Guerra italiano de 1884; E. Lockhart, «Tuning Sounds in Italy,
-    // 1750–1885», Nineteenth-Century Music Review 22, 2025). «Natural» es la etiqueta moderna del
-    // movimiento 432 (Schiller Institute, 1988, «Verdi tuning» derivada de Do = 256 Hz), que la
-    // propia FAQ de la página llama mito. La fila nombra el estándar «Verdi / Natural».
-    test.fail();
-    const celda = page.locator('table tbody tr').filter({ hasText: '432,0 Hz' }).locator('td').first();
-    await expect(celda).toContainText('Verdi');
-    await expect(celda).not.toContainText('Natural', { timeout: 1000 });
+    // Fuente: E. Lockhart, «Tuning Sounds in Italy, 1750–1885», Nineteenth-Century Music Review
+    // 22 (2025), 344-360: Boito defendió A = 432 en el Congresso dei Musicisti Italiani (Milán,
+    // 16-21/06/1881); un decreto del Ministerio de la Guerra de 1884 lo prescribió para «all
+    // orchestral and military ensembles»; en 1885 el congreso de Viena votó el diapason normal
+    // (435 Hz). El Schiller Institute lo promueve desde finales de los ochenta como «natural».
+    const fila = page.locator('table tbody tr').filter({ hasText: '432,0 Hz' });
+    const celdas = fila.locator('td');
+    await expect(celdas.nth(0)).toHaveText('Diapasón italiano (Verdi)');
+    await expect(celdas.nth(2)).toContainText('Milán, 1881');
+    await expect(celdas.nth(2)).toContainText('Ministerio de la Guerra (1884)');
+    await expect(celdas.nth(3)).toContainText('el movimiento «432 Hz», que lo llama «natural» sin base acústica');
+    await expect(celdas.nth(4)).toHaveText('−31,77 cents');
+    await expect(fila).not.toContainText('Natural');
+    await expect(fila).not.toContainText('jazz');
+    // El preset tampoco presenta «natural» como descripción del 432.
+    const preset = page.getByRole('button', { name: /La 432Hz/ });
+    await expect(preset).toContainText('Italia 1881-1884 · diapasón de Verdi');
+    await expect(preset).not.toContainText('natural');
   });
 
-  test('HALLAZGO abierto: el tono científico (Do4 = 256 Hz) es La4 = 430,54 Hz, −37,63 cents', async ({
+  test('1512 · el tono científico (Do4 = 256 Hz) es La4 = 430,54 Hz y −37,63 cents, propuesto en 1713', async ({
     page,
   }) => {
-    // HALLAZGO abierto: 256 · 2^(9/12) = 430,54 Hz → 1200·log2(430,54/440) = −37,63 cents
-    // (Wikipedia, «Scientific pitch»: «~37.63 cents lower than A440», A4 = 430.54 Hz). La tabla
-    // redondea a 430,5 Hz y da los cents de ese redondeo con dos decimales: −37,79.
-    test.fail();
+    // Calculado, no copiado: 256 · 2^(9/12) = 430,5390 Hz; 1200 · log2(430,5390 / 440) = −37,6317.
+    const la4 = 256 * 2 ** (9 / 12);
+    expect(la4).toBeCloseTo(430.539, 3);
+    expect(1200 * Math.log2(la4 / 440)).toBeCloseTo(-37.6317, 3);
     const fila = page.locator('table tbody tr').filter({ hasText: 'Científico' });
-    await expect(fila).toContainText('−37,63', { timeout: 1000 });
+    const celdas = fila.locator('td');
+    await expect(celdas.nth(1)).toHaveText('430,54 Hz');
+    await expect(celdas.nth(4)).toHaveText('−37,63 cents');
+    // Wikipedia, «Scientific pitch»: «first proposed in 1713 by French physicist Joseph Sauveur».
+    await expect(celdas.nth(2)).toContainText('1713');
+    await expect(fila).not.toContainText('Siglo XIX');
+    await expect(fila).not.toContainText('−37,79');
   });
 });

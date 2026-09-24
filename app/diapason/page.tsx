@@ -15,12 +15,17 @@ interface FrecuenciaPreset {
 
 const FRECUENCIAS_PRESET: FrecuenciaPreset[] = [
   { nombre: 'La 440Hz', frecuencia: 440, descripcion: 'Estándar internacional (ISO 16)' },
-  { nombre: 'La 432Hz', frecuencia: 432, descripcion: 'Afinación alternativa "natural"' },
+  // Decía «Afinación alternativa "natural"»: la etiqueta del movimiento 432 que la FAQ desmiente,
+  // no la del diapasón histórico italiano (hallazgo 1508, ver la fila de la tabla).
+  { nombre: 'La 432Hz', frecuencia: 432, descripcion: 'Italia 1881-1884 · diapasón de Verdi' },
   { nombre: 'La 442Hz', frecuencia: 442, descripcion: 'Orquestas europeas' },
   { nombre: 'La 443Hz', frecuencia: 443, descripcion: 'Algunas orquestas (Berlín)' },
   { nombre: 'La 415Hz', frecuencia: 415, descripcion: 'Barroco · convención historicista' },
   { nombre: 'La 466Hz', frecuencia: 466, descripcion: 'Chorton · convención historicista' },
 ];
+
+/** Rampa al mover el volumen con el tono sonando: sin escalón audible (hallazgo 1509). */
+const RAMPA_VOLUMEN_S = 0.05;
 
 const NOTAS_ES = ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'];
 const NOTAS_EN = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
@@ -182,12 +187,26 @@ export default function DiapasonPage() {
     }
   }, [frecuencia]);
 
-  // Actualizar volumen en tiempo real
+  /**
+   * Volumen en tiempo real, con rampa (hallazgo 1509).
+   *
+   * Dependía de [volumen, reproduciendo] y hacía setValueAtTime(volumen, currentTime): al pasar
+   * `reproduciendo` a true se ejecutaba justo después de iniciarAudio y PISABA su rampa de
+   * entrada 0 → volumen en 0,1 s, así que el tono arrancaba de golpe (el chasquido que la
+   * metadata promete evitar); y mover el deslizador era un escalón. Ahora solo reacciona al
+   * VOLUMEN (gainNodeRef solo existe mientras suena: detenerAudio lo suelta) y lleva la ganancia
+   * al valor nuevo con una rampa corta desde el valor en curso, también si llega a mitad de la
+   * rampa de entrada.
+   */
   useEffect(() => {
-    if (gainNodeRef.current && audioContextRef.current && reproduciendo) {
-      gainNodeRef.current.gain.setValueAtTime(volumen, audioContextRef.current.currentTime);
-    }
-  }, [volumen, reproduciendo]);
+    const ctx = audioContextRef.current;
+    const gain = gainNodeRef.current;
+    if (!ctx || !gain) return;
+    const ahora = ctx.currentTime;
+    gain.gain.cancelScheduledValues(ahora);
+    gain.gain.setValueAtTime(gain.gain.value, ahora);
+    gain.gain.linearRampToValueAtTime(volumen, ahora + RAMPA_VOLUMEN_S);
+  }, [volumen]);
 
   // Actualizar tipo de onda en caliente, sobre el mismo oscilador (sin reiniciar)
   useEffect(() => {
@@ -228,12 +247,15 @@ export default function DiapasonPage() {
           <span className={styles.notaCents}>{textoCents(nota.cents)}</span>
         </div>
 
-        {/* Botón principal */}
+        {/* Botón principal. Su nombre cambia con el estado («Reproducir…» / «Detener…», como el
+            texto visible), así que NO lleva aria-pressed: el patrón Button del WAI-ARIA APG pide
+            que un conmutador conserve el nombre, y si el nombre cambia no se marca como
+            conmutador. Con los dos a la vez se anunciaba «Detener… activado» (hallazgo 1510).
+            a11y-ok: el nombre cambia con el estado; aria-pressed aquí sería el defecto 1510 */}
         <button
           type="button"
           className={`${styles.btnDiapason} ${reproduciendo ? styles.activo : ''}`}
           onClick={toggleAudio}
-          aria-pressed={reproduciendo}
           aria-label={reproduciendo ? 'Detener tono de referencia' : 'Reproducir tono de referencia'}
         >
           <span className={styles.diapasonIcon} aria-hidden="true">
@@ -413,19 +435,31 @@ export default function DiapasonPage() {
                 <td>Grupos de música antigua: repertorio alemán del XVII-XVIII y parte del renacentista</td>
                 <td>+99,39 cents (casi un semitono arriba)</td>
               </tr>
+              {/* Hallazgo 1508. La fila se llamaba «Verdi / Natural», con usuarios «Comunidad
+                  alternativa, algo de jazz»: juntaba el 432 histórico (Congreso de Músicos
+                  Italianos, Milán, 16-21/06/1881; decreto del Ministerio de la Guerra de 1884
+                  para orquestas y bandas militares; E. Lockhart, «Tuning Sounds in Italy,
+                  1750–1885», Nineteenth-Century Music Review 22, 2025) con la etiqueta «natural»
+                  del movimiento 432 que el Schiller Institute promueve desde finales de los años
+                  ochenta, y que la FAQ de esta misma página desmiente. «Algo de jazz» no tenía
+                  fuente. Los cents, 1200·log2(432/440) = −31,77. */}
               <tr>
-                <td><strong>Verdi / Natural</strong></td>
+                <td><strong>Diapasón italiano (Verdi)</strong></td>
                 <td>432,0 Hz</td>
-                <td>S. XIX / Italia</td>
-                <td>Comunidad alternativa, algo de jazz</td>
+                <td>Italia: Congreso de Músicos Italianos (Milán, 1881) y decreto del Ministerio de la Guerra (1884); en 1885 la conferencia de Viena respaldó el 435 Hz</td>
+                <td>Uso histórico. Hoy lo reivindica el movimiento «432 Hz», que lo llama «natural» sin base acústica (ver la FAQ)</td>
                 <td>−31,77 cents</td>
               </tr>
+              {/* Hallazgo 1512. Decía 430,5 Hz y −37,79 cents (los cents del redondeo) y «Siglo
+                  XIX». Do4 = 256 Hz en temperamento igual: La4 = 256·2^(9/12) = 430,54 Hz y
+                  1200·log2(430,54/440) = −37,63 cents (calculado; Wikipedia, «Scientific pitch»).
+                  Lo propuso Joseph Sauveur en 1713. */}
               <tr>
                 <td><strong>Científico / Filosófico</strong></td>
-                <td>430,5 Hz</td>
-                <td>Siglo XIX</td>
-                <td>Uso histórico, investigación</td>
-                <td>−37,79 cents</td>
+                <td>430,54 Hz</td>
+                <td>1713, propuesto por Joseph Sauveur (Do4 = 256 Hz)</td>
+                <td>No lo usan las orquestas; aparece en textos científicos porque todos los Do caen en potencias de 2 (128, 256, 512 Hz…)</td>
+                <td>−37,63 cents</td>
               </tr>
             </tbody>
           </table>

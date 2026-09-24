@@ -271,6 +271,13 @@
   color: var(--text-muted);
 }
 
+/* En el preset activo el fondo lleva el tinte de marca y --text-muted se quedaba en 4,45:1 en
+   oscuro (#9B9B9B sobre rgb(45,54,58)). Con --text-secondary: 5,70:1 en oscuro y 5,10:1 en
+   claro (hallazgo 1511). */
+.presetBtn.presetActivo .presetDesc {
+  color: var(--text-secondary);
+}
+
 /* Frecuencia personalizada */
 .customSection {
   background: var(--bg-card);
