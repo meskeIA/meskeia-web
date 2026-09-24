@@ -26,8 +26,11 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   La idea que enseña la sección es justo esa asimetría: el JIT cae en crisis en 50 y el JIC
  *   aguanta hasta 75. Un umbral corrido (`<=` por `<`) la borraría sin que nada se rompa.
  *
- *   El % del componente sale literal de COMPONENTES (Procesador: «~20–25%»). Las ocho horquillas
- *   suman 86–114 % con punto medio 100 %: coherentes como reparto del coste del dispositivo.
+ *   El % del componente se calcula con la partida de COMPONENTES sobre COSTE_MATERIALES_TOTAL:
+ *   la lista de materiales que TechInsights estimó en su desmontaje de septiembre de 2018 (453 $).
+ *   Hasta el hallazgo 1534 eran ocho horquillas sin fuente («~20–25 %» el procesador) que sumaban
+ *   el 100 % en su punto medio; ahora cada una es una partida de la fuente y las ocho suman el
+ *   85,1 % (el resto son partidas que el diagrama no dibuja).
  *
  * LOS DEFECTOS QUE DEJÓ DOCUMENTADOS (reparados el 24/09/2026; los test.fail pasan a regresión)
  *   · Teclado: ni los 8 componentes (`<g role="button">` sin tabIndex ni onKeyDown) ni los 5
@@ -117,8 +120,9 @@ test('caso normal — a 60 % el JIT está en crisis y el JIC aguanta; el procesa
   await procesador.click();
   await expect(procesador).toHaveAttribute('aria-pressed', 'true');
   await expect(panel.getByRole('heading', { name: 'Procesador (SoC)' })).toBeVisible();
-  // Literales de COMPONENTES[1] en page.tsx.
-  await expect(panel.locator('span[class*="costeBadge"]')).toHaveText('~20–25\u00A0%');
+  // COMPONENTES[1] en page.tsx. Antes «~20–25 %», una horquilla sin fuente (hallazgo 1534); ahora
+  // la partida «Applications Processor/Modems» de TechInsights: 72 / 453 = 15,894 % → «15,9 %».
+  await expect(panel.locator('span[class*="costeBadge"]')).toHaveText('15,9\u00A0%');
   await expect(panel).toContainText('TSMC / Samsung Foundry (fabricación)');
 
   // Segundo clic: se cierra y vuelve el panel vacío.
@@ -414,9 +418,10 @@ test('sospecha — el diagrama tiene variante oscura y sus textos se leen en los
 //   · Qué debe cambiar al activar una crisis, según el modelo de datos de page.tsx: SOLO
 //     `disrupcionActiva`. El diagrama (componenteActivo) y el deslizador no se tocan, y abrir
 //     una crisis pliega la anterior.
-//   · Hallazgos abiertos (test.fail): badge de coste y franja «~40 países» con blanco sobre la
-//     marca, color de marca como texto en claro, rótulos del SVG ilegibles en móvil, y cinco
-//     datos que sus fuentes desmienten.
+//   · Hallazgos 1528-1536: badge de coste y franja «~40 países» con blanco sobre la marca, color
+//     de marca como texto en claro, rótulos del SVG ilegibles en móvil, y cinco datos que sus
+//     fuentes desmienten. Nacieron como test.fail y se repararon el mismo 24/09/2026: ahora son
+//     regresión, cada uno con su fuente cotejada.
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -501,9 +506,10 @@ test.describe('Inspección 24/09/2026 — re-inspección tras 95060386 y 0d54c8f
     );
 
   // CASO 1 (1349, teclado del diagrama). Esperado resuelto a mano con COMPONENTES y el CSS:
-  //   Espacio en «Batería de litio» → solo la batería pulsada y pintada activa, badge «~10–15 %»,
+  //   Espacio en «Batería de litio» → solo la batería pulsada y pintada activa, badge «2,0 %»,
   //   la página no se desplaza; Enter en «Módulo de cámaras» → pasa el testigo (batería false),
-  //   badge «~10–12 %»; Enter otra vez → ninguno pulsado y panel vacío. Foco visible: el rect
+  //   badge «9,7 %»; Enter otra vez → ninguno pulsado y panel vacío. (Los badges eran «~10–15 %» y
+  //   «~10–12 %», horquillas sin fuente: tras el hallazgo 1534 son 9 / 453 y 44 / 453 de TechInsights.) Foco visible: el rect
   //   lleva stroke --text-primary a 3 px (claro rgb(26, 26, 26), oscuro rgb(232, 232, 232)).
   test('teclado — Espacio y Enter en el diagrama: un solo componente pulsado y pintado, con foco visible en los dos temas', async ({
     page,
@@ -519,7 +525,7 @@ test.describe('Inspección 24/09/2026 — re-inspección tras 95060386 y 0d54c8f
     expect(await page.evaluate(() => window.scrollY), 'Espacio no debe desplazar la página').toBe(scrollAntes);
     await expect(componente(page, 'Batería de litio')).toHaveAttribute('aria-pressed', 'true');
     await expect(panel(page).getByRole('heading', { name: 'Batería de litio' })).toBeVisible();
-    await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText('~10–15 %');
+    await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText('2,0 %');
     let estado = await estadoDiagrama(page);
     expect(estado.map((e) => e.pulsado)).toEqual([false, false, true, false, false, false, false, false]);
     for (const e of estado) expect(e.pintadoActivo, 'aria-pressed y el relleno activo deben coincidir').toBe(e.pulsado);
@@ -528,7 +534,7 @@ test.describe('Inspección 24/09/2026 — re-inspección tras 95060386 y 0d54c8f
     await page.keyboard.press('Enter');
     await expect(componente(page, 'Módulo de cámaras')).toHaveAttribute('aria-pressed', 'true');
     await expect(componente(page, 'Batería de litio')).toHaveAttribute('aria-pressed', 'false');
-    await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText('~10–12 %');
+    await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText('9,7 %');
     estado = await estadoDiagrama(page);
     expect(estado.map((e) => e.pulsado)).toEqual([false, false, false, true, false, false, false, false]);
     for (const e of estado) expect(e.pintadoActivo).toBe(e.pulsado);
@@ -594,130 +600,200 @@ test.describe('Inspección 24/09/2026 — re-inspección tras 95060386 y 0d54c8f
     await expect(botones.nth(1)).toHaveAttribute('aria-expanded', 'true');
   });
 
-  // HALLAZGO abierto: .costeBadge pone blanco sobre var(--primary). Texto de 13,6 px peso 700
-  // (texto pequeño: exige 4,5:1). Resuelto a mano: blanco sobre #2E86AB = 4,11:1 en claro y
-  // sobre #3FA5D1 = 2,79:1 en oscuro. Es la campaña de botones/badges con fondo de marca, que
-  // ningún candado mira (check:contraste-cabeceras solo vigila <th>/<thead>/.th).
+  // HALLAZGO 1528 (reparado el 24/09/2026): .costeBadge ponía blanco sobre var(--primary). Texto
+  // de 13,6 px peso 700 (texto pequeño: exige 4,5:1). Resuelto a mano antes: blanco sobre #2E86AB
+  // = 4,11:1 en claro y sobre #3FA5D1 = 2,79:1 en oscuro. Ahora el fondo es --primary-boton
+  // (#26718F en los dos temas): blanco encima = 5,47:1.
   test('contraste — el badge de coste del componente se lee a 4,5:1 en claro y en oscuro', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: badge de coste 4,11:1 en claro y 2,79:1 en oscuro');
     await componente(page, 'Batería de litio').click();
     const sel = 'span[class*="costeBadge"]';
     const claro = await contrasteMinimo(page, sel);
     await ponerOscuro(page);
     const oscuro = await contrasteMinimo(page, sel);
-    expect(claro, 'badge de coste, tema claro').toBeGreaterThanOrEqual(4.5);
-    expect(oscuro, 'badge de coste, tema oscuro').toBeGreaterThanOrEqual(4.5);
+    expect(claro, 'badge de coste, tema claro (antes 4,11:1)').toBeGreaterThanOrEqual(4.5);
+    expect(oscuro, 'badge de coste, tema oscuro (antes 2,79:1)').toBeGreaterThanOrEqual(4.5);
   });
 
-  // HALLAZGO abierto: la franja «Un smartphone moderno pasa por ~40 países…» es blanco sobre un
-  // degradado var(--primary) → var(--secondary), 14,4 px peso 600. Peor extremo, resuelto a
-  // mano: #48A9A6 = 2,80:1 en claro y #5ABDB9 = 2,23:1 en oscuro. Misma campaña sin candado.
+  // HALLAZGO 1529 (reparado): la franja «Un smartphone moderno pasa por ~40 países…» era blanco
+  // sobre un degradado var(--primary) → var(--secondary), 14,4 px peso 600. Peor extremo antes:
+  // #48A9A6 = 2,80:1 en claro y #5ABDB9 = 2,23:1 en oscuro. Ahora --primary-boton →
+  // --secondary-boton (#26718F → #327874 en los dos temas): peor extremo 5,15:1.
   test('contraste — la franja «~40 países» se lee a 4,5:1 en todo su degradado, en claro y en oscuro', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: franja ~40 países 2,80:1 en claro y 2,23:1 en oscuro');
     const sel = 'div[class*="contadorPaises"]';
     const claro = await contrasteMinimo(page, sel);
     await ponerOscuro(page);
     const oscuro = await contrasteMinimo(page, sel);
-    expect(claro, 'franja ~40 países, tema claro').toBeGreaterThanOrEqual(4.5);
-    expect(oscuro, 'franja ~40 países, tema oscuro').toBeGreaterThanOrEqual(4.5);
+    expect(claro, 'franja ~40 países, tema claro (antes 2,80:1)').toBeGreaterThanOrEqual(4.5);
+    expect(oscuro, 'franja ~40 países, tema oscuro (antes 2,23:1)').toBeGreaterThanOrEqual(4.5);
   });
 
-  // HALLAZGO abierto: color de marca como TEXTO en tema claro. El año de cada crisis
-  // (.timelineAnio, var(--secondary), 12,8 px bold) da 2,80:1 sobre la tarjeta blanca; el
-  // «Tendencia desde 2020:» (var(--primary) sobre su degradado claro) 3,59:1; los títulos de las
-  // tarjetas JIT/JIC (var(--primary), 16,8 px bold) 4,11:1. En oscuro los tres pasan (6,17 /
-  // 5,21 / 4,93). El candado de cabeceras no mira el color de marca como texto: se resuelve con
-  // --primary-texto / --secondary-texto, que la propia app ya usa en .jitEstadoOk.
-  test('contraste — el color de marca usado como texto llega a 4,5:1 en tema claro', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: timelineAnio 2,80:1 · tendencia 3,59:1 · jitNombre 4,11:1 en claro');
-    const medidas = {
-      'año de la crisis (.timelineAnio)': await contrasteMinimo(page, 'p[class*="timelineAnio"]'),
-      'Tendencia desde 2020 (.tendencia strong)': await contrasteMinimo(page, 'div[class*="tendencia"] strong'),
-      'título JIT (.jitNombre)': await contrasteMinimo(page, 'h3[class*="jitNombre"]'),
+  // HALLAZGO 1530 (reparado): color de marca como TEXTO en tema claro. Antes: el año de cada crisis
+  // (.timelineAnio, var(--secondary), 12,8 px bold) 2,80:1; «Tendencia desde 2020:» 3,59:1; los
+  // títulos en var(--primary) por debajo de 18,66 px bold (.jitNombre, .componenteNombre,
+  // .reshoringNombre, .eduCard h4, .sliderValor) 4,11:1. Se miden todos los que nombra el acta,
+  // más la duración de la crisis desplegada (.timelineStatNum, 16 px bold: mismo defecto), en los
+  // dos temas: en oscuro los tokens -texto valen lo mismo que la marca, que ya pasaba.
+  test('contraste — el color de marca usado como texto llega a 4,5:1 en claro y en oscuro', async ({ page }) => {
+    await componente(page, 'Pantalla OLED').click();
+    await page.getByRole('button', { name: 'Crisis global de semiconductores' }).click();
+    const selectores: Record<string, string> = {
+      'año de la crisis (.timelineAnio)': 'p[class*="timelineAnio"]',
+      'Tendencia desde 2020 (.tendencia strong)': 'div[class*="tendencia"] strong',
+      'título JIT (.jitNombre)': 'h3[class*="jitNombre"]',
+      'título de la ficha (.componenteNombre)': 'h3[class*="componenteNombre"]',
+      'estrategia (.reshoringNombre)': 'h3[class*="reshoringNombre"]',
+      'guía (.eduCard h4)': 'div[class*="eduCard"] h4',
+      'valor del deslizador (.sliderValor)': 'span[class*="sliderValor"]',
+      'duración de la crisis (.timelineStatNum)': 'span[class*="timelineStatNum"]',
     };
-    for (const [nombre, valor] of Object.entries(medidas)) {
-      expect(valor, `${nombre}, tema claro`).toBeGreaterThanOrEqual(4.5);
+    const medir = async (tema: string) => {
+      for (const [nombre, sel] of Object.entries(selectores)) {
+        expect(await contrasteMinimo(page, sel), `${nombre}, tema ${tema}`).toBeGreaterThanOrEqual(4.5);
+      }
+    };
+    await medir('claro');
+    await ponerOscuro(page);
+    await medir('oscuro');
+  });
+
+  // HALLAZGO 1531 (reparado): los rótulos del SVG escalaban con un viewBox de 540 unidades; a 375 px
+  // de ancho el SVG medía 293 px (escala 0,543) y los nombres (8,5 u) salían a 4,6 px, los países
+  // (7,5 u) a 4,1 px; a 1280 px, 6,8 y 6,0 px. Y tres nombres se cortaban con «…».
+  // Ahora: viewBox de 320 u, dos columnas, rótulos de 14 u (nombre) y 13 u (origen). Resuelto a
+  // mano para 375 px: sección 375 − 2 × 24 = 327; tarjeta del SVG 327 − 2 × 8 − 2 × 1 = 309 px;
+  // escala 309 / 320 = 0,966 → 13,5 y 12,6 px. Esperado: ≥ 12 px (lo más pequeño que la app usa
+  // en su HTML, .timelineStatLabel, 0,75rem) a 375 y 390 px y en escritorio, sin «…» y con cada
+  // rótulo dentro de su tarjeta. La escala se lee del viewBox real, no de un 540 fijo: el test
+  // anterior lo daba por supuesto.
+  test('móvil — los rótulos del diagrama se pintan a 12 px o más y caben en su tarjeta, a 375, 390 y 1280 px', async ({ page }) => {
+    for (const ancho of [375, 390, 1280]) {
+      await page.setViewportSize({ width: ancho, height: 812 });
+      await page.waitForTimeout(200);
+      const rotulos = await page.evaluate(() => {
+        const svg = document.querySelector('svg[role="group"]') as SVGSVGElement | null;
+        if (!svg) throw new Error('sin diagrama');
+        const escala = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
+        return [...svg.querySelectorAll('g[role="button"] text')]
+          .filter((t) => !/\p{Extended_Pictographic}/u.test(t.textContent ?? ''))
+          .map((t) => {
+            const texto = t as SVGTextElement;
+            const caja = texto.closest('g')?.querySelector('rect');
+            const cajaX = Number(caja?.getAttribute('x'));
+            const cajaAncho = Number(caja?.getAttribute('width'));
+            const bb = texto.getBBox();
+            return {
+              texto: texto.textContent ?? '',
+              px: Number(texto.getAttribute('font-size')) * escala,
+              dentro: bb.x >= cajaX + 4 && bb.x + bb.width <= cajaX + cajaAncho - 4,
+            };
+          });
+      });
+      expect(rotulos.length).toBe(16); // 8 nombres + 8 orígenes
+      const minimo = Math.min(...rotulos.map((r) => r.px));
+      expect(minimo, `rótulo más pequeño a ${ancho} px (antes 4,1 px a 375)`).toBeGreaterThanOrEqual(12);
+      expect(rotulos.filter((r) => r.texto.includes('…')).map((r) => r.texto), `recortes a ${ancho} px`).toEqual([]);
+      expect(rotulos.filter((r) => !r.dentro).map((r) => r.texto), `rótulos que se salen a ${ancho} px`).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `scroll horizontal a ${ancho} px`).toBeLessThanOrEqual(ancho);
     }
   });
 
-  // HALLAZGO abierto: los rótulos del SVG escalan con el viewBox de 540 unidades. A 375 px de
-  // ancho el SVG mide 293 px (escala 0,543): los nombres (8,5 u) salen a 4,6 px y los países
-  // (7,5 u) a 4,1 px. Esperado: al menos 12 px, el tamaño más pequeño que la propia app usa en
-  // su HTML (.timelineStatLabel, 0,75rem).
-  test('móvil — los nombres de los componentes del diagrama se pintan a 12 px o más a 375 px de ancho', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: rótulos del SVG a 4,6 px (nombres) y 4,1 px (países) en móvil');
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.waitForTimeout(200);
-    const px = await page.evaluate(() => {
-      const svg = document.querySelector('svg[role="group"]');
-      if (!svg) throw new Error('sin diagrama');
-      const escala = svg.getBoundingClientRect().width / 540;
-      return [...svg.querySelectorAll('g[role="button"] text')]
-        .filter((t) => !/\p{Extended_Pictographic}/u.test(t.textContent ?? ''))
-        .map((t) => Number(t.getAttribute('font-size')) * escala);
-    });
-    expect(px.length).toBe(16); // 8 nombres + 8 países
-    expect(Math.min(...px), 'tamaño pintado del rótulo más pequeño, en px').toBeGreaterThanOrEqual(12);
-  });
-
-  // HALLAZGO abierto (dato): «el 60 % de las reservas mundiales» para el Triángulo del Litio.
-  // USGS, Mineral Commodity Summaries 2026 (litio): reservas Chile 9,2 Mt + Argentina 4,4 Mt de
-  // 37 Mt mundiales = 37 %; Bolivia no tiene reservas declaradas (sus 23 Mt son RECURSOS). En la
-  // edición de 2025: (9,3 + 4,0) / 30 = 44 %. Ni sumando recursos de los tres países se llega:
-  // (28 + 23 + 13) / 150 = 43 %.
-  test('dato — la ficha de la batería no atribuye al Triángulo del Litio el 60 % de las reservas', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: 60 % de reservas frente al 37 % del USGS 2026');
+  // HALLAZGO 1532 (reparado, dato): decía «el 60 % de las reservas mundiales» para el Triángulo del
+  // Litio. USGS, Mineral Commodity Summaries 2026 (litio), cotejado el 24/09/2026 en
+  // https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-lithium.pdf: reservas Chile 9.200.000 t +
+  // Argentina 4.400.000 t de 37.000.000 t mundiales = 36,8 % ≈ 37 %; Bolivia no figura en reservas
+  // (23 Mt de RECURSOS); recursos de los tres, (28 + 23 + 13) / 150 = 42,7 % ≈ 43 %.
+  test('dato — la ficha de la batería da el 37 % de reservas del USGS 2026, no el 60 %', async ({ page }) => {
     await componente(page, 'Batería de litio').click();
     const texto = (await panel(page).textContent()) ?? '';
     expect(texto).toContain('Triángulo del Litio');
     expect(texto).not.toMatch(/60\s?%\s+de las reservas/);
+    expect(texto).toContain('reúnen el 37 % de las reservas mundiales');
+    expect(texto).toContain('9,2 y 4,4 de 37 millones de toneladas');
+    expect(texto).toContain('USGS, Mineral Commodity Summaries 2026');
+    expect(texto).toContain('en torno al 43 %');
   });
 
-  // HALLAZGO abierto (dato): «más de 800 millones de subpíxeles» en una OLED de móvil.
-  // Aritmética: la de más resolución en móvil, 3120 × 1440 = 4.492.800 píxeles; × 3 subpíxeles
-  // = 13,5 millones (con matriz diamante, ~2 por píxel, ~9 millones). La cifra es ~60 veces
-  // mayor; ni un televisor 8K llega (7680 × 4320 × 3 = 99,5 millones).
-  test('dato — la ficha de la pantalla no dice «800 millones de subpíxeles»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: 800 millones de subpíxeles frente a ~13,5 millones');
+  // HALLAZGO 1533 (reparado, dato): decía «más de 800 millones de subpíxeles». Aritmética de
+  // resolución con una pantalla QHD+ de gama alta de 3120 × 1440 (resolución que da samsung.com/uk,
+  // «Which Phone Has The Best Display?», cotejado el 24/09/2026): 3120 × 1440 = 4.492.800 píxeles;
+  // × 3 subpíxeles (rojo, verde, azul) = 13.478.400 ≈ 13,5 millones.
+  test('dato — la ficha de la pantalla calcula los subpíxeles por resolución (≈ 13,5 millones)', async ({ page }) => {
     await componente(page, 'Pantalla OLED').click();
     await expect(panel(page).getByRole('heading', { name: 'Pantalla OLED' })).toBeVisible();
     await expect(panel(page)).not.toContainText('800 millones de subpíxeles');
+    await expect(panel(page)).toContainText('(3120 × 1440 píxeles) tiene 4.492.800 píxeles');
+    await expect(panel(page)).toContainText('unos 13,5 millones');
   });
 
-  // HALLAZGO abierto (dato): la batería «~10–15 %» del coste del dispositivo. TechInsights
-  // (iPhone XS Max, 2018): batería 9 $ de 443 $ de lista de materiales = 2,0 %. Se exige que el
-  // tope de la horquilla no pase del 5 %, margen de sobra para otros modelos y años.
-  test('dato — la batería no aparece como el 10–15 % del coste del móvil', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: batería ~10–15 % frente al ~2 % de TechInsights');
+  // HALLAZGO 1534 (reparado, dato): la batería salía como «~10–15 %» del coste, y las ocho
+  // horquillas no tenían fuente. Ahora cada componente es una partida de la lista de materiales de
+  // TechInsights (desmontaje de septiembre de 2018, revisado el 27/09/2018 a 453 $),
+  // https://www.techinsights.com/blog/apple-iphone-xs-max-teardown, cotejada el 24/09/2026.
+  // Esperados resueltos a mano, partida / 453 redondeado a un decimal:
+  //   Pantalla 90,50 → 19,978 → 20,0 · Procesador y módems 72,00 → 15,894 → 15,9 ·
+  //   Batería 9,00 → 1,987 → 2,0 · Cámaras 44,00 → 9,713 → 9,7 · Memoria 64,50 → 14,238 → 14,2 ·
+  //   Señal mixta y RF 23,00 → 5,077 → 5,1 · Mecánica y carcasas 58,00 → 12,804 → 12,8 ·
+  //   Pruebas, ensamblaje y materiales 24,50 → 5,408 → 5,4.
+  // El tope de la batería ≤ 5 % del acta se mantiene.
+  test('dato — el coste de cada componente es su partida de TechInsights (batería 2,0 %)', async ({ page }) => {
+    const esperados: Array<[string, string, string]> = [
+      ['Pantalla OLED', '20,0', 'Partida «Pantalla»: 90,50 $ de 453,00 $'],
+      ['Procesador (SoC)', '15,9', 'Partida «Procesador de aplicaciones y módems»: 72,00 $'],
+      ['Batería de litio', '2,0', 'Partida «Batería»: 9,00 $ de 453,00 $'],
+      ['Módulo de cámaras', '9,7', 'Partida «Cámaras»: 44,00 $'],
+      ['Memoria flash (NAND)', '14,2', 'Partida «Memoria»: 64,50 $'],
+      ['Antenas 5G', '5,1', 'Partida «Señal mixta y radiofrecuencia»: 23,00 $'],
+      ['Chasis de aluminio', '12,8', 'Partida «Piezas mecánicas y carcasas»: 58,00 $'],
+      ['Ensamblaje final', '5,4', 'Partida «Pruebas, ensamblaje y materiales auxiliares»: 24,50 $'],
+    ];
+    const badge = panel(page).locator('span[class*="costeBadge"]');
+    for (const [nombre, pct, partida] of esperados) {
+      await componente(page, nombre).click();
+      await expect(badge, nombre).toHaveText(`${pct} %`);
+      await expect(panel(page)).toContainText(partida);
+      await expect(panel(page)).toContainText('TechInsights');
+      await expect(panel(page)).toContainText('septiembre de 2018');
+    }
     await componente(page, 'Batería de litio').click();
-    const badge = (await panel(page).locator('span[class*="costeBadge"]').textContent()) ?? '';
-    const cifras = (badge.match(/\d+/g) ?? []).map(Number);
+    const cifras = ((await badge.textContent()) ?? '').replace(',', '.').match(/[\d.]+/g)?.map(Number) ?? [];
     expect(cifras.length).toBeGreaterThan(0);
-    expect(Math.max(...cifras), `tope de la horquilla «${badge}»`).toBeLessThanOrEqual(5);
+    expect(Math.max(...cifras), 'peso de la batería (antes «~10–15 %»)').toBeLessThanOrEqual(5);
+    await expect(panel(page)).not.toContainText('Coste aproximado del total del dispositivo');
   });
 
-  // HALLAZGO abierto (dato): «El término fue acuñado por Jay Forrester (MIT, 1961)». Lee,
-  // Padmanabhan y Whang (MIT Sloan Management Review, 15/04/1997): «P&G called this phenomenon
-  // the "bullwhip" effect». Forrester describió la AMPLIFICACIÓN de la demanda (1958, 1961),
-  // pero no le puso ese nombre.
-  test('dato — el término «efecto látigo» no se atribuye a Forrester', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: el término lo acuñó P&G, no Forrester');
+  // HALLAZGO 1535 (reparado, dato): «El término fue acuñado por Jay Forrester (MIT, 1961)». Lee,
+  // Padmanabhan y Whang (MIT Sloan Management Review, 15/04/1997), cotejado el 24/09/2026: «logistics
+  // executives at Procter & Gamble (P&G) examined the order patterns for one of their best-selling
+  // products, Pampers […] P&G called this phenomenon the "bullwhip" effect». Forrester describió la
+  // amplificación en Harvard Business Review (julio-agosto de 1958), sin ponerle ese nombre.
+  test('dato — el término «efecto látigo» se atribuye a P&G según Lee et al., no a Forrester', async ({ page }) => {
     const guia = (await page.locator('body').textContent()) ?? '';
     expect(guia).toContain('efecto látigo');
     expect(guia).not.toMatch(/término fue acuñado por Jay Forrester/);
+    expect(guia).toContain('ya describió esta amplificación en 1958, en la Harvard Business');
+    expect(guia).toMatch(/responsables de\s+logística de Procter & Gamble/);
+    expect(guia).toMatch(/Seungjin Whang \(MIT\s+Sloan Management Review, 1997\)/);
   });
 
-  // HALLAZGO abierto (contenido): calcos del inglés. «subsidios billonarios (CHIPS Act…)»: en
-  // español un billón son 10^12; la CHIPS Act de EEUU son 52.700 millones de $ y la European
-  // Chips Act unos 43.000 millones de €, así que la palabra infla la cifra por mil. Y
-  // «Toyota Production System, 1950s» (en español: «años cincuenta» o «década de 1950»).
-  test('contenido — sin «billonarios» para la CHIPS Act ni «1950s»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto: «subsidios billonarios» y «1950s»');
+  // HALLAZGO 1536 (reparado, contenido): «subsidios billonarios (CHIPS Act…)» — en español un
+  // billón son 10^12 — y «Toyota Production System, 1950s». Cifras cotejadas el 24/09/2026:
+  //   · Casa Blanca, hoja informativa del 09/08/2022: «The CHIPS and Science Act provides $52.7
+  //     billion for American semiconductor research, development, manufacturing, and workforce
+  //     development» → 52.700 millones de $.
+  //   · Comisión Europea, IP/22/729 (08/02/2022): «It will mobilise more than €43 billion euros of
+  //     public and private investments» → más de 43.000 millones de €; en vigor el 21/09/2023
+  //     (IP/23/4518).
+  test('contenido — cuantías de la CHIPS Act y la Ley Europea de Chips en millones, y «década de 1950»', async ({ page }) => {
     const chips = page.getByRole('button', { name: 'Crisis global de semiconductores' });
     await chips.click();
     const detalle = page.locator('#disrupcion-detalle-0');
-    await expect(detalle).toContainText('CHIPS Act');
+    await expect(detalle).toContainText('CHIPS and Science Act');
+    await expect(detalle).toContainText('52.700 millones de $');
+    await expect(detalle).toContainText('más de 43.000 millones de € de inversión pública y privada');
+    await expect(detalle).toContainText('21/09/2023');
     await expect(detalle).not.toContainText('billonarios');
-    await expect(page.locator('div[class*="jitCard"]').first()).not.toContainText('1950s');
+    const jit = page.locator('div[class*="jitCard"]').first();
+    await expect(jit).not.toContainText('1950s');
+    await expect(jit).toContainText('Sistema de Producción Toyota, década de 1950');
   });
 });

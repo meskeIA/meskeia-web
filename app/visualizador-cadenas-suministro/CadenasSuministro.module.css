@@ -80,10 +80,22 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
+/* Hallazgo 1531: el diagrama se dibuja en un viewBox de 320 unidades con rótulos de 13-14, así
+   que se lee a ≥ 12,5 px en un móvil de 375 px. En una sola columna (tableta) se limita el ancho
+   para que no crezca hasta ocupar la pantalla entera. */
 .svgDiagrama {
   width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   height: auto;
   display: block;
+}
+
+@media (max-width: 600px) {
+  /* Cada píxel de relleno le quita ancho, y por tanto tamaño de letra, al diagrama. */
+  .svgContainer {
+    padding: 0.5rem;
+  }
 }
 
 /* Componentes del SVG: <g role="button" tabIndex=0>. El foco se marca en el borde del
@@ -137,6 +149,19 @@
   fill: var(--text-primary);
 }
 
+/* Decorativos: conexiones y silueta del smartphone central, con el color de marca del tema. */
+.svgLinea {
+  stroke: var(--primary);
+  stroke-width: 1.5;
+  stroke-opacity: 0.45;
+  stroke-dasharray: 4 3;
+}
+
+.svgHub {
+  fill: var(--primary);
+  fill-opacity: 0.15;
+}
+
 /* ─── Panel de detalle componente ───────────────── */
 .panelDetalle {
   background: var(--bg-card);
@@ -185,10 +210,13 @@
   flex-shrink: 0;
 }
 
+/* Color de marca como texto (hallazgo 1530): 18,4 px bold es texto pequeño (umbral de texto
+   grande, 18,66 px bold) y --primary daba 4,11:1 en claro. Lo mismo en .sliderValor, .jitNombre,
+   .timelineAnio, .timelineStatNum, .reshoringNombre, .tendencia strong y .eduCard h4. */
 .componenteNombre {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -209,6 +237,7 @@
 
 .componenteCoste {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.88rem;
@@ -218,13 +247,22 @@
   color: var(--text-secondary);
 }
 
+/* Hallazgo 1528: blanco sobre --primary daba 4,11:1 en claro y 2,79:1 en oscuro. --primary-boton
+   es el token de «texto blanco encima» (5,47:1), igual en los dos temas. */
 .costeBadge {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.2rem 0.65rem;
   border-radius: 12px;
   font-weight: 700;
   font-size: 0.85rem;
+}
+
+.costeFuente {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
 }
 
 .componenteCurioso {
@@ -242,7 +280,9 @@
   text-align: center;
   margin-top: 1.25rem;
   padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  /* Hallazgo 1529: blanco sobre --primary → --secondary daba 2,80:1 en el extremo teal (2,23:1
+     en oscuro). Los tokens -boton son los de texto blanco encima: 5,47:1 y 5,15:1 en los dos temas. */
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: 12px;
   color: white;
   font-size: 0.9rem;
@@ -275,7 +315,7 @@
 }
 
 .sliderValor {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 800;
 }
 
@@ -322,7 +362,7 @@
 .jitNombre {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -429,7 +469,7 @@
 .timelineAnio {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 0.25rem;
@@ -506,7 +546,7 @@
 .timelineStatNum {
   font-size: 1rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
 }
 
@@ -552,7 +592,7 @@
 .reshoringNombre {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -634,7 +674,7 @@
 }
 
 .tendencia strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── Sección educativa ──────────────────────────── */
@@ -655,7 +695,7 @@
 .eduCard h4 {
   font-size: 0.97rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -725,8 +765,10 @@
   background: rgba(72, 169, 166, 0.12);
 }
 
+/* La duración de la crisis (.timelineStatNum, 16 px bold en --primary-texto) daba 4,33:1 sobre el
+   tinte al 12 % en oscuro; al 6 % sube a ≈ 4,6:1 (medido al reparar el hallazgo 1530). */
 [data-theme='dark'] .timelineStat {
-  background: rgba(46, 134, 171, 0.12);
+  background: rgba(46, 134, 171, 0.06);
 }
 
 [data-theme='dark'] .timelineDetalle {

@@ -9,22 +9,35 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 import styles from './CadenasSuministro.module.css';
 
 // ─────────────────────────────────────────────
 // Tipos
 // ─────────────────────────────────────────────
 
+/** Una partida de la lista de materiales estimada por TechInsights (ver COSTE_MATERIALES_TOTAL). */
+interface PartidaCoste {
+  /** Nombre de la partida en la tabla de la fuente, traducido. */
+  partida: string;
+  /** Estimación de la fuente para esa partida, en dólares. */
+  dolares: number;
+  /** Aclaración cuando la partida no coincide exactamente con el componente del diagrama. */
+  nota?: string;
+}
+
 interface ComponenteSmartphone {
   id: string;
   nombre: string;
+  /** Rótulo corto del diagrama: cabe en la tarjeta a tamaño legible en móvil. */
+  rotulo: string;
+  /** Origen abreviado para el diagrama; el completo es `pais`. */
+  origen: string;
   icono: string;
   pais: string;
   empresa: string;
-  cosте: string;
+  coste: PartidaCoste;
   curioso: string;
-  x: number;
-  y: number;
 }
 
 interface DisrupcionHistorica {
@@ -55,104 +68,174 @@ interface FilaComparativaReloc {
 // Datos: Componentes del smartphone
 // ─────────────────────────────────────────────
 
+/*
+ * Reparto del coste: UNA sola fuente, con modelo y año, en vez de ocho horquillas sin fuente
+ * que sumaban el 100 % en su punto medio (hallazgo 1534 del Inspector, 24/09/2026: la batería
+ * salía como «~10–15 %» y en los desmontajes ronda el 2 %).
+ *
+ * Fuente: TechInsights, «Apple iPhone Xs Max Teardown» (256 GB, modelo A1921), publicado el
+ * 17/09/2018 y revisado el 27/09/2018 de 443 a 453 $ por el sistema 3D Touch de la pantalla.
+ * https://www.techinsights.com/blog/apple-iphone-xs-max-teardown — tabla «Estimated Costs»:
+ *   Applications Processor/Modems 72,00 · Battery 9,00 · Connectivity & Sensors 18,00 ·
+ *   Cameras 44,00 · Display 90,50 · Memory 64,50 · Mixed Signal/RF 23,00 ·
+ *   Power Management/Audio 14,50 · Other Electronics 35,00 · Mechanicals/Housings 58,00 ·
+ *   Test/Assembly/Supporting Materials 24,50 · Total 453,00 $.
+ * Las ocho partidas del diagrama suman 385,50 $ (85,1 %); el resto son conectividad y sensores,
+ * gestión de energía y audio y «otra electrónica». En pantalla no se nombra el modelo (la app
+ * describe perfiles técnicos, no productos): «smartphone de gama alta de 256 GB, 2018».
+ */
+const COSTE_MATERIALES_TOTAL = 453;
+
 const COMPONENTES: ComponenteSmartphone[] = [
   {
     id: 'pantalla',
     nombre: 'Pantalla OLED',
+    rotulo: 'Pantalla OLED',
+    origen: 'Corea del Sur',
     icono: '📱',
     pais: 'Corea del Sur / China',
     empresa: 'Samsung Display, BOE Technology (China), LG Display',
-    cosте: '~25–30\u00A0%',
+    coste: { partida: 'Pantalla', dolares: 90.5 },
+    // Hallazgo 1533: decía «más de 800 millones de subpíxeles». Aritmética de resolución con una
+    // pantalla QHD+ de gama alta (3120 × 1440, «Which Phone Has The Best Display?», samsung.com/uk):
+    // 3120 × 1440 = 4.492.800 píxeles × 3 subpíxeles = 13.478.400 ≈ 13,5 millones.
     curioso:
-      'Una pantalla OLED de alta gama contiene más de 800 millones de subpíxeles. Samsung fabrica pantallas para Apple aunque sean competidores directos en smartphones.',
-    x: 90,
-    y: 55,
+      'Una pantalla de móvil de gama alta con resolución QHD+ (3120 × 1440 píxeles) tiene 4.492.800 píxeles: con tres subpíxeles por píxel (rojo, verde y azul), unos 13,5 millones. Samsung fabrica pantallas para Apple aunque sean competidores directos en smartphones.',
   },
   {
     id: 'procesador',
     nombre: 'Procesador (SoC)',
+    rotulo: 'Procesador',
+    origen: 'EEUU → Taiwán',
     icono: '⚙️',
     pais: 'Diseñado en EEUU/UK — Fabricado en Taiwán/Corea',
     empresa: 'Apple / Qualcomm (diseño) → TSMC / Samsung Foundry (fabricación)',
-    cosте: '~20–25\u00A0%',
+    coste: {
+      partida: 'Procesador de aplicaciones y módems',
+      dolares: 72,
+      nota: 'La fuente cuenta en la misma partida el procesador y los módems.',
+    },
     curioso:
-      'TSMC fabrica chips para Apple, AMD, NVIDIA, Qualcomm y decenas de empresas más — aunque no diseña ninguno. Según la Semiconductor Industry Association y el Boston Consulting Group (abril de 2021), el 92\u00A0% de la capacidad mundial para fabricar los chips más avanzados (por debajo de 10 nanómetros) estaba en Taiwán, y el 8\u00A0% restante en Corea del Sur.',
-    x: 270,
-    y: 55,
+      'TSMC fabrica chips para Apple, AMD, NVIDIA, Qualcomm y decenas de empresas más — aunque no diseña ninguno. Según la Semiconductor Industry Association y el Boston Consulting Group (abril de 2021), el 92 % de la capacidad mundial para fabricar los chips más avanzados (por debajo de 10 nanómetros) estaba en Taiwán, y el 8 % restante en Corea del Sur.',
   },
   {
     id: 'bateria',
     nombre: 'Batería de litio',
+    rotulo: 'Batería',
+    origen: 'Chile → China',
     icono: '🔋',
     pais: 'Litio de Chile/Australia — Celdas en China',
     empresa: 'CATL, BYD, LG Energy Solution, Samsung SDI',
-    cosте: '~10–15\u00A0%',
+    coste: { partida: 'Batería', dolares: 9 },
+    // Hallazgo 1532: decía que el Triángulo del Litio «representa el 60 % de las reservas
+    // mundiales». USGS, Mineral Commodity Summaries 2026 (litio, febrero de 2026),
+    // https://pubs.usgs.gov/periodicals/mcs2026/mcs2026-lithium.pdf — reservas: Chile 9.200.000 t,
+    // Argentina 4.400.000 t, mundo 37.000.000 t → 13,6 / 37 = 36,8 % ≈ 37 %. Bolivia no figura en
+    // la tabla de reservas; en «World Resources» (medidos e indicados, ~150 Mt): Argentina 28,
+    // Bolivia 23, Chile 13 → 64 / 150 = 42,7 % ≈ 43 %.
     curioso:
-      'El litio del Triángulo del Litio (Chile, Argentina, Bolivia) representa el 60\u00A0% de las reservas mundiales. Sin embargo, el 75\u00A0% de la producción de celdas de batería ocurre en China.',
-    x: 450,
-    y: 55,
+      'Chile y Argentina, dos de los tres países del llamado Triángulo del Litio, reúnen el 37 % de las reservas mundiales: 9,2 y 4,4 de 37 millones de toneladas de litio contenido (USGS, Mineral Commodity Summaries 2026). Bolivia, el tercero, no tiene reservas declaradas, pero sí 23 millones de toneladas de recursos; contando los recursos, los tres países suman 64 de unos 150 millones de toneladas, en torno al 43 %. Sin embargo, el 75 % de la producción de celdas de batería ocurre en China.',
   },
   {
     id: 'camaras',
     nombre: 'Módulo de cámaras',
+    rotulo: 'Cámaras',
+    origen: 'Japón / China',
     icono: '📷',
     pais: 'Japón / China / Suecia',
     empresa: 'Sony Semiconductor (sensores), Largan Precision (lentes), Sunny Optical',
-    cosте: '~10–12\u00A0%',
+    coste: { partida: 'Cámaras', dolares: 44 },
     curioso:
-      'El sensor de imagen Sony IMX es tan dominante que incluso los iPhone y Galaxy usan sensores Sony. Sony controla ~45\u00A0% del mercado mundial de sensores CMOS para smartphones.',
-    x: 90,
-    y: 175,
+      'El sensor de imagen Sony IMX es tan dominante que incluso los iPhone y Galaxy usan sensores Sony. Sony controla ~45 % del mercado mundial de sensores CMOS para smartphones.',
   },
   {
     id: 'memoria',
     nombre: 'Memoria flash (NAND)',
+    rotulo: 'Memoria flash',
+    origen: 'Japón / Corea',
     icono: '💾',
     pais: 'Japón / Corea del Sur / China',
     empresa: 'Kioxia (Japón), SK Hynix (Corea), Samsung, Micron (EEUU)',
-    cosте: '~8–12\u00A0%',
+    coste: {
+      partida: 'Memoria',
+      dolares: 64.5,
+      nota: 'La fuente da una sola partida de memoria, sin separar la flash del resto.',
+    },
     curioso:
-      'Un smartphone de 256 GB contiene capas de memoria apiladas verticalmente (3D NAND) con hasta 232 capas de células de memoria. En febrero de 2022, una contaminación de materiales de fabricación paró parte de la producción de las plantas que Kioxia y Western Digital comparten en Yokkaichi y Kitakami (Japón): se echaron a perder al menos 6,5 exabytes de memoria flash (Western Digital, 2022). Entre las dos empresas fabricaban cerca de un tercio de la NAND mundial (32,5\u00A0% en el 3.er trimestre de 2021, según TrendForce).',
-    x: 270,
-    y: 175,
+      'Un smartphone de 256 GB contiene capas de memoria apiladas verticalmente (3D NAND) con hasta 232 capas de células de memoria. En febrero de 2022, una contaminación de materiales de fabricación paró parte de la producción de las plantas que Kioxia y Western Digital comparten en Yokkaichi y Kitakami (Japón): se echaron a perder al menos 6,5 exabytes de memoria flash (Western Digital, 2022). Entre las dos empresas fabricaban cerca de un tercio de la NAND mundial (32,5 % en el 3.er trimestre de 2021, según TrendForce).',
   },
   {
     id: 'antenas',
     nombre: 'Antenas 5G',
+    rotulo: 'Antenas 5G',
+    origen: 'Finlandia / Suecia',
     icono: '📡',
     pais: 'Finlandia / Suecia / EEUU',
     empresa: 'Qualcomm (módems), Ericsson, Nokia (tecnología base), Murata (componentes RF)',
-    cosте: '~5–8\u00A0%',
+    // TechInsights identifica el módem del modelo desmontado como un 4G LTE (XMM7560): no hay
+    // partida 5G, y la de radiofrecuencia es la más cercana a las antenas.
+    coste: {
+      partida: 'Señal mixta y radiofrecuencia',
+      dolares: 23,
+      nota: 'El móvil desmontado es 4G: la partida recoge la radiofrecuencia en general, no solo las antenas, y el módem va con el procesador.',
+    },
     curioso:
       'Un smartphone 5G puede contener hasta 15 antenas distintas (Wi-Fi, Bluetooth, GPS, 5G mmWave, NFC). El diseño de antenas en metales tan finos requiere simulaciones de campo electromagnético durante meses.',
-    x: 450,
-    y: 175,
   },
   {
     id: 'chasis',
     nombre: 'Chasis de aluminio',
+    rotulo: 'Chasis',
+    origen: 'China',
     icono: '🏗️',
     pais: 'China (fabricación) — Bauxita de Guinea/Australia',
     empresa: 'Foxconn, Pegatron, BYD Electronics (mecanizado CNC)',
-    cosте: '~5–7\u00A0%',
+    coste: { partida: 'Piezas mecánicas y carcasas', dolares: 58 },
     curioso:
       'El chasis de un iPhone requiere más de 100 operaciones de fresado CNC. El aluminio 7075 aeroespacial empleado es tan duro que las máquinas CNC desgastan sus brocas cada pocos centenares de piezas.',
-    x: 90,
-    y: 295,
   },
   {
     id: 'ensamblaje',
     nombre: 'Ensamblaje final',
+    rotulo: 'Ensamblaje',
+    origen: 'China / India',
     icono: '🔧',
     pais: 'China / India / Vietnam',
     empresa: 'Foxconn (Hon Hai), Pegatron, Wingtech — plantas en Zhengzhou, Chennai, Hanói',
-    cosте: '~3–5\u00A0%',
+    coste: { partida: 'Pruebas, ensamblaje y materiales auxiliares', dolares: 24.5 },
     curioso:
-      'En los picos de producción, la fábrica de Foxconn en Zhengzhou («iPhone City») llegaba a reunir a unas 350.000 personas y podía fabricar 500.000 iPhones al día (The New York Times, diciembre de 2016). A pesar de la complejidad del producto, el ensamblaje manual representa solo el 3–5\u00A0% del coste total.',
-    x: 270,
-    y: 295,
+      'En los picos de producción, la fábrica de Foxconn en Zhengzhou («iPhone City») llegaba a reunir a unas 350.000 personas y podía fabricar 500.000 iPhones al día (The New York Times, diciembre de 2016). A pesar de la complejidad del producto, en la estimación de TechInsights (2018) las pruebas, el ensamblaje y los materiales auxiliares suman solo el 5,4 % del coste de materiales.',
   },
 ];
+
+/** Peso de una partida en la lista de materiales, en %. */
+const pesoCoste = (c: PartidaCoste): number => (c.dolares / COSTE_MATERIALES_TOTAL) * 100;
+
+// ─────────────────────────────────────────────
+// Geometría del diagrama
+// ─────────────────────────────────────────────
+
+/*
+ * Hallazgo 1531: con un viewBox de 540 unidades y rótulos de 7,5–8,5, a 375 px de ancho los
+ * nombres se pintaban a 4,6 px (y a 6,8 px en escritorio), y tres se cortaban con «…». Ahora el
+ * diagrama es de dos columnas en un viewBox de 320 unidades, casi 1:1 con el ancho de un móvil
+ * (≈ 309 px a 375 px de pantalla), y los rótulos son de 14 y 13 unidades: ≥ 12,5 px en móvil y
+ * ≈ 17 px en escritorio. Los rótulos son cortos (`rotulo`, `origen`) para caber sin recortes.
+ */
+const VB_ANCHO = 320;
+const VB_ALTO = 410;
+const TARJETA_ANCHO = 146;
+const TARJETA_ALTO = 64;
+const COLUMNAS_X = [6, 168];
+const FILA_Y0 = 122;
+const FILA_PASO = 72;
+const EJE_X = VB_ANCHO / 2;
+const HUB = { x: 112, y: 38, ancho: 96, alto: 70 };
+
+const posicion = (i: number): { x: number; y: number } => ({
+  x: COLUMNAS_X[i % 2],
+  y: FILA_Y0 + Math.floor(i / 2) * FILA_PASO,
+});
 
 // ─────────────────────────────────────────────
 // Datos: Disrupciones históricas
@@ -166,8 +249,14 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
     duracion: '~2,5 años',
     coste: '210.000 millones de $ de ingresos perdidos por la industria del automóvil solo en 2021 (AlixPartners, septiembre de 2021)',
     industrias: 'Automoción, electrónica de consumo, electrodomésticos, defensa',
+    // Hallazgo 1536: decía «subsidios billonarios», calco de «billion» (en español un billón son
+    // 10^12). Cifras de la fuente oficial: «The CHIPS and Science Act provides $52.7 billion for
+    // American semiconductor research, development, manufacturing, and workforce development»
+    // (Casa Blanca, hoja informativa del 09/08/2022); la Ley Europea de Chips «will mobilise more
+    // than €43 billion euros of public and private investments» (Comisión Europea, IP/22/729,
+    // 08/02/2022) y entró en vigor el 21/09/2023 (IP/23/4518).
     leccion:
-      'La filosofía just-in-time sin inventario mínimo de componentes estratégicos puede paralizar industrias enteras. Varios países aprobaron subsidios billonarios (CHIPS Act en EEUU, European Chips Act) para relocalizar fabricación.',
+      'La filosofía just-in-time sin inventario mínimo de componentes estratégicos puede paralizar industrias enteras. Para relocalizar fabricación, Estados Unidos aprobó en 2022 la CHIPS and Science Act, con 52.700 millones de $ para investigación, fabricación y formación en semiconductores (Casa Blanca, agosto de 2022), y la Unión Europea, la Ley Europea de Chips (European Chips Act), en vigor desde el 21/09/2023, con la que la Comisión Europea prevé movilizar más de 43.000 millones de € de inversión pública y privada.',
   },
   {
     anio: 'Marzo 2021',
@@ -335,7 +424,7 @@ export default function VisualizadorCadenasSuministro() {
           {/* SVG con los componentes clicables */}
           <div className={styles.svgContainer}>
             <svg
-              viewBox="0 0 540 380"
+              viewBox={`0 0 ${VB_ANCHO} ${VB_ALTO}`}
               className={styles.svgDiagrama}
               aria-label="Diagrama interactivo de componentes de un smartphone con 8 componentes clicables"
               role="group"
@@ -356,41 +445,57 @@ export default function VisualizadorCadenasSuministro() {
               </defs>
 
               {/* Fondo */}
-              <rect x="0" y="0" width="540" height="380" rx="14" fill="url(#gradFondo)" />
+              <rect x="0" y="0" width={VB_ANCHO} height={VB_ALTO} rx="14" fill="url(#gradFondo)" />
 
               {/* Título del diagrama */}
-              <text x="270" y="28" textAnchor="middle" fontSize="13" fontWeight="700" className={styles.svgTitulo}>
-                Componentes globales de un smartphone moderno
+              <text x={EJE_X} y="24" textAnchor="middle" fontSize="13" fontWeight="700" className={styles.svgTitulo}>
+                Componentes globales de un smartphone
               </text>
 
-              {/* Líneas de conexión al centro */}
-              {COMPONENTES.map((comp) => (
-                <line
-                  key={`linea-${comp.id}`}
-                  x1={comp.x + 55}
-                  y1={comp.y + 28}
-                  x2={270}
-                  y2={190}
-                  stroke="#2E86AB"
-                  strokeWidth="1"
-                  strokeOpacity="0.25"
-                  strokeDasharray="4 3"
-                />
-              ))}
+              {/* Conexiones: un eje vertical desde el smartphone y un tramo hasta cada tarjeta */}
+              <line
+                className={styles.svgLinea}
+                x1={EJE_X}
+                y1={HUB.y + HUB.alto}
+                x2={EJE_X}
+                y2={posicion(COMPONENTES.length - 1).y + TARJETA_ALTO / 2}
+              />
+              {COMPONENTES.map((comp, i) => {
+                const { x, y } = posicion(i);
+                const borde = i % 2 === 0 ? x + TARJETA_ANCHO : x;
+                return (
+                  <line
+                    key={`linea-${comp.id}`}
+                    className={styles.svgLinea}
+                    x1={borde}
+                    y1={y + TARJETA_ALTO / 2}
+                    x2={EJE_X}
+                    y2={y + TARJETA_ALTO / 2}
+                  />
+                );
+              })}
 
               {/* Smartphone central */}
-              <rect x="220" y="145" width="100" height="90" rx="10" fill="#2E86AB" opacity="0.15" />
-              <rect x="228" y="153" width="84" height="74" rx="7" fill="#2E86AB" opacity="0.25" />
-              <text x="270" y="193" textAnchor="middle" fontSize="18" fill="#2E86AB" aria-hidden="true">📱</text>
-              <text x="270" y="210" textAnchor="middle" fontSize="9" fontWeight="600" className={styles.svgTextoCentro}>
+              <rect
+                className={styles.svgHub}
+                x={HUB.x}
+                y={HUB.y}
+                width={HUB.ancho}
+                height={HUB.alto}
+                rx="12"
+              />
+              <text x={EJE_X} y={HUB.y + 26} textAnchor="middle" fontSize="20" aria-hidden="true">📱</text>
+              <text x={EJE_X} y={HUB.y + 46} textAnchor="middle" fontSize="13" fontWeight="700" className={styles.svgTextoCentro}>
                 ~40 países
               </text>
-              <text x="270" y="222" textAnchor="middle" fontSize="8" className={styles.svgTextoCentro}>
+              <text x={EJE_X} y={HUB.y + 62} textAnchor="middle" fontSize="13" className={styles.svgTextoCentro}>
                 involucrados
               </text>
 
               {/* Botones de componentes */}
-              {COMPONENTES.map((comp) => {
+              {COMPONENTES.map((comp, i) => {
+                const { x, y } = posicion(i);
+                const centro = x + TARJETA_ANCHO / 2;
                 const isActivo = componenteActivo === comp.id;
                 const alternar = () => setComponenteActivo(isActivo ? null : comp.id);
                 return (
@@ -413,41 +518,21 @@ export default function VisualizadorCadenasSuministro() {
                   >
                     <rect
                       className={styles.componenteRect}
-                      x={comp.x}
-                      y={comp.y}
-                      width="110"
-                      height="56"
+                      x={x}
+                      y={y}
+                      width={TARJETA_ANCHO}
+                      height={TARJETA_ALTO}
                       rx="8"
                       fill={isActivo ? 'url(#gradCompActivo)' : 'url(#gradComp)'}
                     />
-                    <text
-                      x={comp.x + 55}
-                      y={comp.y + 20}
-                      textAnchor="middle"
-                      fontSize="16"
-                      fill="white"
-                    >
+                    <text x={centro} y={y + 23} textAnchor="middle" fontSize="18" fill="white">
                       {comp.icono}
                     </text>
-                    <text
-                      x={comp.x + 55}
-                      y={comp.y + 36}
-                      textAnchor="middle"
-                      fontSize="8.5"
-                      fontWeight="700"
-                      fill="white"
-                    >
-                      {comp.nombre.length > 16 ? comp.nombre.slice(0, 15) + '…' : comp.nombre}
+                    <text x={centro} y={y + 42} textAnchor="middle" fontSize="14" fontWeight="700" fill="white">
+                      {comp.rotulo}
                     </text>
-                    <text
-                      x={comp.x + 55}
-                      y={comp.y + 48}
-                      textAnchor="middle"
-                      fontSize="7.5"
-                      fill="white"
-                      opacity="0.88"
-                    >
-                      {comp.pais.split('/')[0].trim().slice(0, 20)}
+                    <text x={centro} y={y + 57} textAnchor="middle" fontSize="13" fill="white">
+                      {comp.origen}
                     </text>
                   </g>
                 );
@@ -470,9 +555,18 @@ export default function VisualizadorCadenasSuministro() {
                   <strong>Fabricantes principales:</strong> {componente.empresa}
                 </div>
                 <div className={styles.componenteCoste}>
-                  <span className={styles.costeLabel}>Coste aproximado del total del dispositivo:</span>
-                  <span className={styles.costeBadge}>{componente.cosте}</span>
+                  <span className={styles.costeLabel}>Peso en el coste de materiales:</span>
+                  <span className={styles.costeBadge}>
+                    {formatNumber(pesoCoste(componente.coste), 1)}&nbsp;%
+                  </span>
                 </div>
+                <p className={styles.costeFuente}>
+                  Partida «{componente.coste.partida}»: {formatNumber(componente.coste.dolares, 2)}&nbsp;$
+                  de {formatNumber(COSTE_MATERIALES_TOTAL, 2)}&nbsp;$ en la estimación de TechInsights
+                  para un smartphone de gama alta de 256&nbsp;GB (septiembre de 2018). Es el coste de
+                  las piezas, no el precio de venta.
+                  {componente.coste.nota && <> {componente.coste.nota}</>}
+                </p>
                 <div className={styles.componenteCurioso}>
                   <strong>Dato curioso:</strong> {componente.curioso}
                 </div>
@@ -523,7 +617,7 @@ export default function VisualizadorCadenasSuministro() {
                 <span className={styles.jitIcono} aria-hidden="true">⚡</span>
                 <div>
                   <h3 className={styles.jitNombre}>Just-in-Time (JIT)</h3>
-                  <p className={styles.jitSubnombre}>Toyota Production System, 1950s</p>
+                  <p className={styles.jitSubnombre}>Sistema de Producción Toyota, década de 1950</p>
                 </div>
               </div>
               <div className={`${styles.jitEstado} ${isJitCrisis ? styles.jitEstadoCrisis : styles.jitEstadoOk}`}>
@@ -746,11 +840,18 @@ export default function VisualizadorCadenasSuministro() {
               señales de escasez, el mayorista hace pedidos de un 10&nbsp;% más, el fabricante de un 20&nbsp;%
               más, y el proveedor de materias primas puede ver pedidos con un 40&nbsp;% de incremento.
             </p>
+            {/* Hallazgo 1535: decía «El término fue acuñado por Jay Forrester (MIT, 1961)». Forrester
+                describió la amplificación (Harvard Business Review, julio-agosto de 1958), pero el
+                nombre, según Lee, Padmanabhan y Whang (MIT Sloan Management Review, 15/04/1997),
+                es de P&G: «P&G called this phenomenon the "bullwhip" effect». */}
             <p>
-              El término fue acuñado por Jay Forrester (MIT, 1961) y popularizado por Hau Lee
-              (Stanford, 1997). La solución es la visibilidad en tiempo real de la demanda en todos
-              los eslabones y la reducción de lead times, algo que la digitalización e IoT están
-              facilitando.
+              Jay Forrester (MIT) ya describió esta amplificación en 1958, en la Harvard Business
+              Review. El nombre vino después: según Hau Lee, V. Padmanabhan y Seungjin Whang (MIT
+              Sloan Management Review, 1997), que lo popularizaron, fueron los responsables de
+              logística de Procter &amp; Gamble quienes, al estudiar los pedidos de uno de sus
+              pañales más vendidos, llamaron a este fenómeno «efecto látigo» (bullwhip). La
+              solución es la visibilidad en tiempo real de la demanda en todos los eslabones y la
+              reducción de lead times, algo que la digitalización e IoT están facilitando.
             </p>
           </div>
 
