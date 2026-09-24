@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorPortatil.module.css';
 import {
   MeskeiaLogo,
@@ -10,11 +10,23 @@ import {
   EducationalSection,
   ShareCard,
   DisclaimerCard,
+  RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularResultado, FORMATOS, OS_INFO, GAMAS, PREGUNTAS, FORMATO_CON_ARTICULO, type Resultado } from './motor';
+import {
+  calcularResultado,
+  FORMATOS,
+  OS_INFO,
+  GAMAS,
+  PREGUNTAS,
+  FORMATO_CON_ARTICULO,
+  RAM_MINIMA_GB,
+  RAM_RECOMENDADA_GB,
+  RAM_EXIGENTE_GB,
+  type Resultado,
+} from './motor';
 
-// Las preguntas, las fichas, los modelos y la lógica de recomendación viven en ./motor.ts.
+// Las preguntas, el perfil técnico y la lógica de recomendación viven en ./motor.ts.
 
 /** Lista legible: «A, B y C». */
 function enumerar(items: string[]): string {
@@ -33,10 +45,17 @@ export default function SelectorPortatil() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
+
+  // Al pulsar «Ver resultado» se desmonta la sección del test con el botón que tenía el foco, y el
+  // foco caía a <body>: se lleva al encabezado del resultado (familia selector-*, forma g).
+  useEffect(() => {
+    if (pantalla === 'resultado') tituloResultado.current?.focus();
+  }, [pantalla]);
 
   function seleccionarOpcion(valor: string) {
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
@@ -77,13 +96,20 @@ export default function SelectorPortatil() {
         </header>
       ) : (
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu ordenador ideal</h1>
+          <h1 className={styles.heroTitleSm} ref={tituloResultado} tabIndex={-1}>Tu ordenador ideal</h1>
           <p className={styles.heroSubtitleSm}>Resultado personalizado basado en tu perfil y uso</p>
         </header>
       )}
 
+      {/* Las horquillas de las gamas y la pregunta de presupuesto están en euros, y los precios de
+          referencia de Apple son los de España: la metodología es universal pero los datos de
+          referencia no (hallazgo 1417, como el 949 de smartphone). */}
+      <RegionBadge variant="es-data" />
+
       <LegalNotice />
-      <DisclaimerCard variant="technical" severity="medium" />
+      {/* Test de consumo: aviso para el público general, no «para profesionales del dominio»
+          (hallazgo 1416, como el 952 de smartphone). */}
+      <DisclaimerCard variant="general" severity="medium" />
 
       {/* ── INTRO ── */}
       {pantalla === 'intro' && (
@@ -97,15 +123,15 @@ export default function SelectorPortatil() {
             </div>
             <h2 className={styles.introTitulo}>¿Portátil (laptop), sobremesa, Mac o Windows?</h2>
             <p className={styles.introDesc}>
-              El mercado de computadoras tiene más opciones que nunca: chips Apple Silicon, portátiles (laptops y
-              notebooks) ultraligeros, mini PCs, 2 en 1 táctiles… y una brecha enorme entre la oferta de entrada y la
-              gama pro. Este test te orienta hacia el formato, sistema operativo y gama que mejor encajan con tu uso real.
+              El mercado de computadoras tiene más opciones que nunca: portátiles (laptops y notebooks) ultraligeros,
+              mini PCs, torres para jugar… y una brecha enorme entre la oferta de entrada y la gama pro. Este test te
+              orienta hacia el formato, el sistema operativo y la gama que mejor encajan con tu uso real.
             </p>
             <ul className={styles.introFeatures} aria-label="Qué obtendrás">
-              <li><span aria-hidden="true">✅</span> Formato recomendado (portátil, sobremesa, 2 en 1…)</li>
-              <li><span aria-hidden="true">✅</span> Sistema operativo según tu perfil</li>
-              <li><span aria-hidden="true">✅</span> Gama con precio orientativo</li>
-              <li><span aria-hidden="true">✅</span> Modelos de referencia concretos</li>
+              <li><span aria-hidden="true">✅</span> Formato recomendado (portátil, sobremesa o mini PC)</li>
+              <li><span aria-hidden="true">✅</span> Sistema operativo según tu perfil (Windows, macOS, Linux o ChromeOS)</li>
+              <li><span aria-hidden="true">✅</span> Gama con precio orientativo, acotada a tu presupuesto</li>
+              <li><span aria-hidden="true">✅</span> Características técnicas que buscar, sin marcas ni modelos</li>
               <li><span aria-hidden="true">✅</span> Consejos de compra personalizados</li>
             </ul>
             <button type="button" className={styles.btnStart} onClick={() => setPantalla('test')}>
@@ -209,6 +235,25 @@ export default function SelectorPortatil() {
             </div>
           </div>
 
+          {/* El presupuesto declarado, dicho a la cara: en los tramos intermedios no acotaba nada y
+              la gama podía salir por encima del tramo (hallazgo 1405, como el 943 de smartphone). */}
+          {resultado.recortadaPorPresupuesto && (
+            <p className={styles.avisoPresupuesto} role="note">
+              <span aria-hidden="true">💶</span> Tu uso apuntaba a la{' '}
+              <strong>{GAMAS[resultado.gamaPorUso].nombre.toLowerCase()}</strong>{' '}
+              ({GAMAS[resultado.gamaPorUso].precioOrientativo}), pero la recomendación se ajusta al
+              presupuesto que has declarado. Lo que sigue es lo mejor que cabe en tu tramo.
+            </p>
+          )}
+          {resultado.ampliadaPorPresupuesto && (
+            <p className={styles.avisoPresupuesto} role="note">
+              <span aria-hidden="true">💶</span> Con tu uso declarado bastaría la{' '}
+              <strong>{GAMAS[resultado.gamaPorUso].nombre.toLowerCase()}</strong>{' '}
+              ({GAMAS[resultado.gamaPorUso].precioOrientativo}): el salto responde a tu
+              presupuesto, no a una necesidad técnica.
+            </p>
+          )}
+
           {/* Un empate de formato no se resuelve en silencio por el orden del array: con «A
               veces» y pantalla grande, portátil y sobremesa empatan. */}
           {resultado.formatosEmpatados.length > 0 && (
@@ -227,30 +272,34 @@ export default function SelectorPortatil() {
             ))}
           </div>
 
-          {/* Modelos */}
-          <div className={styles.modelosSection}>
-            <p className={styles.modelosTitulo}>
-              Modelos de referencia — {OS_INFO[resultado.os].nombre} · {GAMAS[resultado.gama].nombre}
+          {/* Perfil técnico: qué buscar, sin marcas ni modelos. Las 27 fichas de modelos con
+              precio caducaban en meses y se salían de su propia gama (hallazgos 1406, 1407, 1411
+              y 1412; política del proyecto desde 81fd4bea en smartphone). */}
+          <div className={styles.perfilSection}>
+            <h2 className={styles.perfilTitulo}>
+              Qué buscar — {FORMATOS[resultado.formato].nombre} · {OS_INFO[resultado.os].nombre} · {GAMAS[resultado.gama].nombre}
+            </h2>
+            <p className={styles.perfilNota}>
+              Horquilla orientativa de la gama: <strong>{GAMAS[resultado.gama].precioOrientativo}</strong>. Compara
+              las fichas técnicas con esta lista, en la tienda que prefieras.
             </p>
-            <p className={styles.modelosNota}>Orientativo. Los precios varían según tienda y configuración.</p>
-            <div className={styles.modelosGrid}>
-              {resultado.modelos.map((m, i) => (
-                <div key={i} className={styles.modeloItem}>
-                  <span className={styles.modeloIcon} aria-hidden="true">{m.icon}</span>
-                  <div className={styles.modeloInfo}>
-                    <p className={styles.modeloNombre}>{m.nombre} · {m.precio}</p>
-                    <p className={styles.modeloDesc}>{m.nota}</p>
-                  </div>
-                </div>
+            <ul className={styles.perfilLista}>
+              {resultado.perfil.map((l, i) => (
+                <li key={i} className={styles.perfilItem}>
+                  <span className={styles.perfilIcono} aria-hidden="true">{l.icono}</span>
+                  <span>{l.texto}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
           {/* Consejos */}
           <div className={styles.consejosSection}>
             <p className={styles.consejosTitulo}>Antes de comprar</p>
             {resultado.consejos.map((c, i) => (
-              <p key={i} className={styles.consejoItem}>{c}</p>
+              <p key={i} className={styles.consejoItem}>
+                <span aria-hidden="true">{c.icono}</span> {c.texto}
+              </p>
             ))}
           </div>
 
@@ -259,8 +308,8 @@ export default function SelectorPortatil() {
           </button>
 
           <EducationalSection
-            title="Guía completa: cómo elegir ordenador en 2025"
-            subtitle="Formato, OS, gama, qué especificaciones importan y cuándo comprar"
+            title="Guía completa: cómo elegir ordenador"
+            subtitle="Formato, sistema, gama, qué especificaciones importan y cuándo comprar"
             defaultOpen={false}
           >
             <h3>Portátil (laptop o notebook) vs sobremesa: la primera decisión</h3>
@@ -272,45 +321,52 @@ export default function SelectorPortatil() {
               externo es más rentable.
             </p>
             <p>
-              Los <strong>2 en 1</strong> (bisagra 360° con pantalla táctil) son ideales para estudiantes que toman
-              notas a mano o creativos que usan stylus. No son los más potentes por euro, pero ofrecen versatilidad real.
-              Los <strong>mini PC</strong> son una opción emergente: muy compactos, silenciosos y con buen rendimiento a
-              precios razonables (Beelink, Intel NUC, Mac mini).
+              Los <strong>2 en 1</strong> (bisagra de 360° con pantalla táctil) son portátiles pensados para tomar
+              notas a mano o dibujar con lápiz. No son los más potentes por su precio, pero ofrecen versatilidad real.
+              Los <strong>mini PC</strong> son sobremesas del tamaño de un libro: silenciosos, con poco consumo y
+              suficientes para cualquier uso que no pida una gráfica dedicada; para jugar a títulos exigentes o editar
+              vídeo con soltura, una torre sigue dando más margen.
             </p>
 
             <h3>Windows, macOS, Linux o ChromeOS</h3>
             <p>
-              <strong>Windows</strong> tiene la mayor compatibilidad de software: es obligatorio si usas AutoCAD, SolidWorks,
-              software de empresa o quieres gaming serio. La variedad de modelos y precios es enorme.
+              <strong>Windows</strong> tiene la mayor compatibilidad de software: es imprescindible si usas programas
+              que solo existen para Windows (algunas herramientas de ingeniería, CAD o de empresa) o si quieres jugar a
+              títulos exigentes. La variedad de equipos y precios es enorme.
             </p>
             <p>
-              <strong>macOS</strong> es la mejor opción si ya usas iPhone y quieres integración perfecta (AirDrop, iMessage,
-              Continuity Camera). El chip Apple Silicon (M3, M4) es excepcionalmente eficiente: mejor autonomía y
-              rendimiento por vatio que cualquier chip Intel/AMD equivalente. La Suite Adobe, Final Cut Pro y Logic Pro
-              funcionan mejor que en cualquier otra plataforma.
+              <strong>macOS</strong> encaja si ya usas iPhone y quieres integración entre dispositivos. Los chips de
+              Apple destacan por su eficiencia (autonomía y rendimiento por vatio), y algunos programas de vídeo y
+              audio de Apple solo existen para sus equipos. No hay ningún Mac nuevo por debajo de 600 € a precio
+              general.
             </p>
             <p>
-              <strong>Linux</strong> es la opción de los desarrolladores y administradores de sistemas. Máxima
+              <strong>Linux</strong> es habitual entre desarrolladores y administradores de sistemas. Máxima
               personalización, excelente para programación, servidores y ciencia de datos. Requiere cierta curva de
               aprendizaje y algunos programas populares no tienen versión nativa.
             </p>
             <p>
-              <strong>ChromeOS</strong> es ligero, seguro y perfecto para tareas en la nube y Google Workspace.
-              Ideal para perfiles básicos, estudiantes de educación y entornos corporativos con Google.
+              <strong>ChromeOS</strong> es ligero, seguro y pensado para tareas en la nube y Google Workspace.
+              Encaja en perfiles básicos, en educación y en entornos de trabajo con Google; no instala programas de
+              escritorio tradicionales.
             </p>
 
             <h3>Qué especificaciones importan de verdad</h3>
             <ul>
-              <li><strong>Procesador (CPU):</strong> para ofimática, cualquier Intel Core i5/Ryzen 5 actual es suficiente. Para edición de vídeo o IA, busca i7/Ryzen 7 o el M3 Pro/M4 Pro de Apple.</li>
-              <li><strong>RAM:</strong> 8 GB es el mínimo para 2025. Con 16 GB irás cómodo para multitarea. 32 GB si editas vídeo o usas máquinas virtuales.</li>
-              <li><strong>Almacenamiento:</strong> SSD NVMe obligatorio. 256 GB es justo; 512 GB es lo recomendable; 1 TB si guardas muchos archivos localmente.</li>
-              <li><strong>Pantalla:</strong> resolución mínima Full HD (1920×1080). Un panel IPS da mejores colores que TN. OLED es excelente para creativos pero más caro y con riesgo de burn-in.</li>
-              <li><strong>Batería:</strong> los fabricantes mienten. Busca reseñas con prueba de batería real en Notebookcheck o YouTube.</li>
+              <li><strong>Procesador (CPU):</strong> los dos grandes fabricantes de procesadores para PC numeran sus gamas
+                como series 3, 5, 7 y 9. Para ofimática basta una serie 5 reciente; para edición de vídeo o IA, una serie 7
+                o superior, o las gamas intermedias y altas de los chips de Apple.</li>
+              <li><strong>RAM:</strong> {RAM_MINIMA_GB} GB es el mínimo razonable. Con {RAM_RECOMENDADA_GB} GB irás cómodo
+                para multitarea. {RAM_EXIGENTE_GB} GB si editas vídeo o usas máquinas virtuales.</li>
+              <li><strong>Almacenamiento:</strong> SSD siempre. 256 GB es justo; 512 GB es lo recomendable; 1 TB si guardas muchos archivos localmente.</li>
+              <li><strong>Pantalla:</strong> resolución mínima Full HD (1920×1080). Un panel IPS da mejores colores que uno TN. OLED es excelente para creativos, pero más caro y con riesgo de marcas permanentes.</li>
+              <li><strong>Batería:</strong> la cifra del fabricante se mide en condiciones favorables. Busca pruebas independientes de batería en uso real.</li>
             </ul>
             <div className={styles.warningBox}>
-              <strong>Truco de compra:</strong> la generación del procesador importa más que el número de serie.
-              Un Intel Core Ultra 5 (13ª-14ª gen) supera claramente a un Core i7 de 10ª generación. Comprueba siempre
-              el año del chip, no solo el modelo.
+              <strong>Truco de compra:</strong> la generación del procesador importa tanto como su serie: una serie 5
+              reciente puede rendir como una serie 7 de hace varios años. Comprueba el año del chip, no solo su nombre, y
+              ojo con la nomenclatura: los Intel Core Ultra (Series 1, Series 2…) son una familia distinta de los Core i
+              de 13.ª y 14.ª generación.
             </div>
           </EducationalSection>
         </div>

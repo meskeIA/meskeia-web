@@ -1,5 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
-import { calcularResultado, PREGUNTAS } from '../../app/selector-portatil/motor';
+import {
+  calcularResultado, PREGUNTAS, ORDEN_GAMAS, TOPE_POR_PRESUPUESTO, PESOS_MAC, PESOS_LINUX, PESOS_CHROME, FORMATOS,
+} from '../../app/selector-portatil/motor';
 import { activarTema } from '../contraste-text-muted-auxiliares';
 
 /**
@@ -19,10 +21,13 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  *     tu ecosistema Apple ya establecido…»; y a cualquier gama alta o pro, «Tu uso intensivo o
  *     creativo justifica…», aunque la hubiera subido solo el presupuesto.
  *
- * EL MOTOR (app/selector-portatil/motor.ts): las mismas preguntas, pesos y reglas de formato,
- * sistema y gama (comprobado sobre las 331.776 combinaciones: formato, sistema, gama y modelos
- * idénticos a los de antes). Lo que cambia: el empate de formato se anuncia y lo decide la
- * pregunta de movilidad; las razones citan lo respondido y dicen cuándo manda el presupuesto.
+ * EL MOTOR (app/selector-portatil/motor.ts), en aquella reparación: las mismas preguntas, pesos
+ * y reglas de formato, sistema y gama. Lo que cambió: el empate de formato se anuncia y lo decide
+ * la pregunta de movilidad; las razones citan lo respondido y dicen cuándo manda el presupuesto.
+ * La reparación de los hallazgos 1405-1419 (bloque del final) SÍ cambia reglas: el presupuesto
+ * pasa a ser un tope, hay restricciones de sistema, Linux y el mini PC son alcanzables, el 2 en 1
+ * deja de ser un resultado y las fichas de modelos son ahora un perfil técnico. Los seis tests de
+ * arriba siguen valiendo tal cual: sus perfiles no dependen de nada de eso.
  */
 
 async function esperarHidratacionBotones(page: Page): Promise<void> {
@@ -174,14 +179,15 @@ test('motor: ningún empate de formato en silencio, y ninguna razón cita algo n
   expect(empates).toBe(27_648);
 });
 
+
 // ═════════════════════════════════════════════════════════════════════════════
-// INSPECCIÓN 24/09/2026 — la reparación en lote del 99acf1e0, vista desde fuera
+// REPARACIÓN 24/09/2026 — hallazgos 1405-1419 de la inspección del mismo día
 // ═════════════════════════════════════════════════════════════════════════════
 //
-// Lo que ya cubren los tests de arriba (radios, barra, empate de formato, razones de Mac sin
-// Apple y gama ampliada por «Más de 1.800 €») NO se repite: se comprobó y está bien.
-// Lo de aquí son los hallazgos ABIERTOS de esta inspección, cada uno con su test.fail(): pasa
-// hoy y se pondrá ROJO el día que se repare (entonces se quita el test.fail).
+// La inspección dejó aquí 18 test.fail(), uno por hallazgo. Se han reescrito como tests en verde
+// que reproducen el caso de su ficha y exigen el comportamiento reparado; los barridos del motor
+// cuentan 0 perfiles en falta donde antes contaban miles. Cada test dice de qué hallazgo sale y,
+// cuando la reparación no es la que el «esperado» de la ficha suponía, por qué.
 //
 // Índices de opción por pregunta (0 = la primera), para leer los recorridos:
 //   P1 uso: básico 0 · ofimática 1 · diseño 2 · programación 3
@@ -195,74 +201,81 @@ test('motor: ningún empate de formato en silencio, y ninguna razón cita algo n
 //   P10 reacondicionado: sí 0 · depende 1 · prefiero nuevo 2
 
 // Ofimática · No juego · A diario · Compacto · Alguno · Sin requisitos · 3–6 h · 4–5 años ·
-// 600–1.100 € · Dependería. Resuelto a mano: portátil 4+1 = 5 frente al 2 en 1 2+1 = 3 (sin
-// empate) · Mac 1, Linux 0, ChromeOS 0 → Windows · gama 0 puntos → de entrada 300 – 600 €.
+// 600–1.100 € · Dependería. A mano: portátil 4+1 = 5 frente a 0 del escritorio · Mac 1 (Alguno),
+// Linux 0 (no programa), ChromeOS 0 → Windows · uso 0 puntos → gama de entrada 300 – 600 €, con
+// margen en el tramo de 600 a 1.100 €.
 const INSP_NORMAL = [1, 0, 0, 0, 1, 3, 1, 1, 1, 1] as const;
 
 // Diseño · Gaming exigente · A diario · Estándar · Ninguno · Sin requisitos · 6–10 h · 6 años o
-// más · 600–1.100 € · Prefiero nuevo. Gama: 3 + 3 + 2 + 2 = 10 → pro, y el tramo 600–1.100 € no
-// la acota (solo lo hacen «Hasta 600 €» y «Más de 1.800 €»).
+// más · 600–1.100 € · Prefiero nuevo. Uso 3 + 3 + 2 + 2 = 10 → pro; el tope del tramo 600–1.100 €
+// es la gama media.
 const INSP_MEDIO_A_PRO = [2, 3, 0, 1, 2, 3, 2, 2, 1, 2] as const;
 
-// Igual pero < 3 h · 2–3 años · 1.100–1.800 €. Uso 3 + 3 = 6 (alta); el propio tramo suma +2
-// y la lleva a 8 → pro, POR ENCIMA del tramo que la ha subido.
+// Igual pero < 3 h · 2–3 años · 1.100–1.800 €. Uso 3 + 3 = 6 → alta, que cabe en su tramo. Antes
+// el tramo sumaba +2 y la llevaba a 8 → pro, por encima del tramo que la había subido.
 const INSP_ALTO_A_PRO = [2, 3, 0, 1, 2, 3, 0, 0, 2, 2] as const;
 
 // Ofimática · No juego · A diario · Compacto · Ecosistema Apple · Sin requisitos · < 3 h ·
-// 2–3 años · 600–1.100 € · PREFIERO NUEVO SIEMPRE. Mac 3 → macOS · gama 0 → de entrada, cuya
-// única ficha es «MacBook Air M2 (reacondicionado) · ~900 €».
+// 2–3 años · 600–1.100 € · PREFIERO NUEVO SIEMPRE. Mac 3 → macOS · uso 0 → entrada, pero no hay
+// Mac nuevo por debajo de 600 € → gama media, que cabe en el tramo. Antes: única ficha «MacBook
+// Air M2 (reacondicionado) · ~900 €».
 const INSP_REACOND_A_NUEVO = [1, 0, 0, 0, 0, 3, 0, 0, 1, 2] as const;
 
 // Ofimática · Juego bastante · A diario · Compacto · Ecosistema Apple · Sin requisitos · 3–6 h ·
-// 4–5 años · 600–1.100 € · Dependería. Mac 3 · gama 1 → media 600 – 1.100 € (dentro del tramo),
-// pero sus dos fichas cuestan ~1.299 € y ~1.499 €.
+// 4–5 años · 600–1.100 € · Dependería. Mac 3 · uso 1 → media 600 – 1.100 €. Antes sus dos fichas
+// costaban ~1.299 € y ~1.499 €.
 const INSP_MAC_MEDIA = [1, 2, 0, 0, 0, 3, 1, 1, 1, 1] as const;
 
 // Ofimática · No juego · Siempre en casa · Grande · Ninguno · Sin requisitos · 6–10 h · 4–5 años ·
-// 1.100–1.800 € · Prefiero nuevo. Sobremesa 3 + 2 = 5 · Windows · gama 2 + 2 = 4 → alta: las
-// tres fichas de Windows · alta son portátiles.
+// 1.100–1.800 € · Prefiero nuevo. Escritorio 3 + 2 = 5 · Windows · uso 2 → media. Sin juegos, sin
+// edición y sin gama alta → mini PC (antes: «Sobremesa + Monitor» con tres portátiles de ficha).
 const INSP_SOBREMESA = [1, 0, 2, 2, 2, 3, 2, 1, 2, 2] as const;
 
 // Uso básico · Gaming exigente · A diario · Compacto · Ninguno · Solo web y Google · < 3 h ·
-// 2–3 años · 600–1.100 € · Sí. ChromeOS 3 + 2 = 5 con uso básico → ChromeOS · gama 3 → media.
+// 2–3 años · 600–1.100 € · Sí. ChromeOS 3 + 2 = 5 con uso básico, pero el gaming exigente lo
+// aparta → Windows, y la razón lo dice.
 const INSP_CHROME_GAMING = [0, 3, 0, 0, 2, 2, 0, 0, 1, 0] as const;
 
 // Programación · No juego · A diario · Compacto · Ninguno · Sin requisitos · < 3 h · 2–3 años ·
-// 600–1.100 € · Sí. El mejor perfil posible para Linux: 2 puntos (el umbral es 3) → Windows.
+// 600–1.100 € · Sí. Linux 2 (programación) sin requisitos de software → Linux; Mac 1.
 const INSP_LINUX_MEJOR = [3, 0, 0, 0, 2, 3, 0, 0, 1, 0] as const;
 
-/** Gama máxima de cada tramo: la app publica las MISMAS horquillas en P9 y en GAMAS. */
-const TOPE_TRAMO: Record<string, string> = { bajo: 'basica', medio: 'media', alto: 'alta', premium: 'pro' };
-const MAX_TRAMO: Record<string, number> = { bajo: 600, medio: 1100, alto: 1800, premium: Infinity };
-const ORDEN_GAMA = ['basica', 'media', 'alta', 'pro'];
-/** Fichas que NO son portátiles (por su nombre y nota en motor.ts). */
-const FICHAS_SOBREMESA = new Set(['Mac mini M4', 'Mac Studio M4 Max', 'System76 Thelio (sobremesa)', 'Lenovo ThinkStation P360 Ultra']);
-const euros = (s: string) => Number(s.replace(/[^\d]/g, ''));
+// Diseño · No juego · A diario · Compacto · Ninguno · Sin requisitos · < 3 h · 2–3 años ·
+// 600–1.100 € · Sí: el perfil que la ficha del 2 en 1 describía («creativos en movimiento»).
+const INSP_CREATIVO_MOVIL = [2, 0, 0, 0, 2, 3, 0, 0, 1, 0] as const;
 
-interface RecuentoInspeccion {
+// Ofimática · No juego · Siempre en casa · Me da igual · Ninguno · Sin requisitos · < 3 h ·
+// 2–3 años · 600–1.100 € · Sí: el mejor perfil para el mini PC según la ficha 1410.
+const INSP_MINI_PC = [1, 0, 2, 3, 2, 3, 0, 0, 1, 0] as const;
+
+const MARCAS = /Lenovo|Dell|ASUS|Acer|HP 15s|MacBook|Mac mini|Chromebook|System76|Framework|ThinkPad|Amazon|Back Market|Notebookcheck|Beelink|Intel NUC/;
+
+interface RecuentoReparacion {
   total: number;
   formatos: Record<string, number>;
   sistemas: Record<string, number>;
   gamaSobreTramo: number;
-  fichasSobreTramoDentroDeGama: number;
+  perfilConPrecio: number;
   reacondicionadoANuevo: number;
-  fichasContraFormato: number;
-  gamingSinAviso: number;
+  macEnEntrada: number;
+  chromeSobreMedia: number;
+  perfilContraFormato: number;
+  gamingFueraDeWindows: number;
+  bastanteConChromeOS: number;
   ningunaInclinaFalsa: number;
+  conMarcas: number;
 }
 
-let recuentoInspeccion: RecuentoInspeccion | null = null;
-/** Las 331.776 combinaciones, una sola vez por worker (~1,5 s). */
-function barridoInspeccion(): RecuentoInspeccion {
-  if (recuentoInspeccion) return recuentoInspeccion;
-  // Pesos de sistema copiados de motor.ts (PESOS_MAC/LINUX/CHROME no se exportan): solo para
-  // saber si ALGUNA respuesta sumó a favor de otro sistema.
-  const sumaAMac = (r: Record<number, string>) => r[5] === 'si_muchos' || r[5] === 'alguno' || r[6] === 'adobe' || r[1] === 'dev';
-  const sumaALinux = (r: Record<number, string>) => r[1] === 'dev';
-  const sumaAChrome = (r: Record<number, string>) => r[6] === 'google' || r[1] === 'basico';
-  const c: RecuentoInspeccion = {
-    total: 0, formatos: {}, sistemas: {}, gamaSobreTramo: 0, fichasSobreTramoDentroDeGama: 0,
-    reacondicionadoANuevo: 0, fichasContraFormato: 0, gamingSinAviso: 0, ningunaInclinaFalsa: 0,
+let recuentoReparacion: RecuentoReparacion | null = null;
+/** Las 331.776 combinaciones, una sola vez por worker. */
+function barridoReparacion(): RecuentoReparacion {
+  if (recuentoReparacion) return recuentoReparacion;
+  const sumaA = (tabla: Record<number, Record<string, number>>, r: Record<number, string>) =>
+    Object.entries(tabla).some(([id, pesos]) => (pesos[r[Number(id)]] ?? 0) > 0);
+  const c: RecuentoReparacion = {
+    total: 0, formatos: {}, sistemas: {}, gamaSobreTramo: 0, perfilConPrecio: 0, reacondicionadoANuevo: 0,
+    macEnEntrada: 0, chromeSobreMedia: 0, perfilContraFormato: 0, gamingFueraDeWindows: 0,
+    bastanteConChromeOS: 0, ningunaInclinaFalsa: 0, conMarcas: 0,
   };
   const ops = PREGUNTAS.map((p) => p.opciones);
   const r: Record<number, string> = {};
@@ -275,19 +288,25 @@ function barridoInspeccion(): RecuentoInspeccion {
     const res = calcularResultado(r);
     c.formatos[res.formato] = (c.formatos[res.formato] ?? 0) + 1;
     c.sistemas[res.os] = (c.sistemas[res.os] ?? 0) + 1;
-    const sobreTramo = ORDEN_GAMA.indexOf(res.gama) > ORDEN_GAMA.indexOf(TOPE_TRAMO[r[9]]);
-    if (sobreTramo) c.gamaSobreTramo++;
-    if (!sobreTramo && res.modelos.length > 0 && res.modelos.every((m) => euros(m.precio) > MAX_TRAMO[r[9]])) c.fichasSobreTramoDentroDeGama++;
-    if (r[10] === 'no' && res.modelos.some((m) => /reacondicionado/i.test(m.nombre))) c.reacondicionadoANuevo++;
-    const sobremesaSinSobremesa = res.formato === 'sobremesa' && res.modelos.length > 0 && res.modelos.every((m) => !FICHAS_SOBREMESA.has(m.nombre));
-    const portatilConSobremesa = res.formato === 'portatil' && res.modelos.some((m) => FICHAS_SOBREMESA.has(m.nombre));
-    if (sobremesaSinSobremesa || portatilConSobremesa) c.fichasContraFormato++;
+    if (ORDEN_GAMAS.indexOf(res.gama) > ORDEN_GAMAS.indexOf(TOPE_POR_PRESUPUESTO[r[9]])) c.gamaSobreTramo++;
+    const perfil = res.perfil.map((l) => l.texto);
+    if (perfil.some((t) => /€/.test(t))) c.perfilConPrecio++;
+    if (r[10] === 'no' && [...perfil, ...res.consejos.map((l) => l.texto)].some((t) => /reacondicionad/i.test(t))) c.reacondicionadoANuevo++;
+    if (res.os === 'mac' && res.gama === 'basica') c.macEnEntrada++;
+    if (res.os === 'chromeos' && ORDEN_GAMAS.indexOf(res.gama) > ORDEN_GAMAS.indexOf('media')) c.chromeSobreMedia++;
+    const dePortatil = perfil.some((t) => /^Pantalla de|^Peso de|pesará más/.test(t));
+    const deEscritorio = perfil.some((t) => /^Monitor aparte|^Mini PC con|^Torre con/.test(t));
+    if (res.formato === 'portatil' ? deEscritorio || !dePortatil : dePortatil || !deEscritorio) c.perfilContraFormato++;
+    if (res.formato === 'mini-pc' && !perfil.some((t) => t.startsWith('Mini PC con'))) c.perfilContraFormato++;
+    if (res.formato === 'sobremesa' && !perfil.some((t) => t.startsWith('Torre con'))) c.perfilContraFormato++;
+    if (r[2] === 'alto' && res.os !== 'windows') c.gamingFueraDeWindows++;
+    if (r[2] === 'medio' && res.os === 'chromeos') c.bastanteConChromeOS++;
     const razonSistema = res.razones.find((x) => x.startsWith('Sistema')) ?? '';
-    if (r[2] === 'alto' && (res.os === 'chromeos' || res.os === 'mac') && !/jueg|gaming/i.test(razonSistema)) c.gamingSinAviso++;
-    if (razonSistema.includes('ninguna de tus respuestas inclina') && (sumaAMac(r) || sumaALinux(r) || sumaAChrome(r))) c.ningunaInclinaFalsa++;
+    if (razonSistema.includes('ninguna de tus respuestas inclina') && (sumaA(PESOS_MAC, r) || sumaA(PESOS_LINUX, r) || sumaA(PESOS_CHROME, r))) c.ningunaInclinaFalsa++;
+    if (MARCAS.test(JSON.stringify(res))) c.conMarcas++;
   };
   recorrer(0);
-  recuentoInspeccion = c;
+  recuentoReparacion = c;
   return c;
 }
 
@@ -323,9 +342,11 @@ async function contrasteReal(page: Page, selector: string): Promise<number> {
 }
 
 const tarjeta = (page: Page, i: number) => page.locator('[class*="recomendacionValor"]').nth(i);
-const fichas = (page: Page) => page.locator('[class*="modeloNombre"]').allInnerTexts();
+const lineasPerfil = (page: Page) => page.locator('[class*="perfilItem"]').allInnerTexts();
+const razonDe = async (page: Page, prefijo: string) =>
+  (await page.locator('[class*="razonItem"]').allInnerTexts()).find((x) => x.startsWith(prefijo)) ?? '';
 
-test.describe('Inspección 24/09/2026 — presupuesto, resultados inalcanzables, fichas de modelos y contenido', () => {
+test.describe('Reparación 24/09/2026 — presupuesto, sistemas y formatos alcanzables, perfil técnico y contenido', () => {
   test('caso normal: ofimática a diario con 600–1.100 € → portátil, Windows, gama de entrada', async ({ page }) => {
     await abrirTest(page);
     const texto = await responder(page, INSP_NORMAL);
@@ -336,186 +357,229 @@ test.describe('Inspección 24/09/2026 — presupuesto, resultados inalcanzables,
     await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
     expect(texto).toContain('300 – 600 €');
     expect(texto).toContain('Formato — Portátil, por lo que has respondido: movilidad, «Sí, a diario» (+4); tamaño de pantalla, «Compacto (13-14")» (+1).');
+    expect(texto).toContain('Gama — de entrada: ninguna de tus respuestas pide más potencia que la de un equipo de entrada. Cabe con margen en tu presupuesto de 600 a 1.100 €.');
   });
 
-  test('HALLAZGO abierto: con 600–1.100 € o 1.100–1.800 € la gama no se acota al tramo declarado', async ({ page }) => {
-    // HALLAZGO abierto: el presupuesto es un PESO en los tramos intermedios (79.488 perfiles), como el 943 de smartphone.
-    test.fail();
+  test('1405: con 600–1.100 € o 1.100–1.800 € la gama no pasa del tramo declarado, y se dice', async ({ page }) => {
     test.setTimeout(60_000);
     await abrirTest(page);
-    await responder(page, INSP_MEDIO_A_PRO);
-    // Esperado (lo que hace la referencia, TOPE_POR_PRESUPUESTO de selector-smartphone): gama media.
-    // Hoy: «Workstation / Pro · 1.800 – 4.000+ €» con fichas de ~2.200 € y ~2.500 €.
+    const texto = await responder(page, INSP_MEDIO_A_PRO);
+    // Uso 10 puntos → pro; tope del tramo 600–1.100 € → gama media (TOPE_POR_PRESUPUESTO).
     await expect(tarjeta(page, 2)).toHaveText('Gama media');
+    expect(texto).toContain('Gama — media: tus respuestas de uso apuntaban a la gama workstation o pro (1.800 – 4.000+ €), pero has declarado un presupuesto de 600 a 1.100 €. Manda el presupuesto.');
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toContainText('la recomendación se ajusta al presupuesto que has declarado');
+    // Con gaming exigente en un tramo medio, el perfil avisa de que la gráfica será de entrada.
+    expect((await lineasPerfil(page)).join(' ')).toContain('Gráfica dedicada: en esta gama será de entrada');
     await abrirTest(page);
-    const texto = await responder(page, INSP_ALTO_A_PRO);
-    // Esperado: gama alta (tope de 1.100–1.800 €). Hoy: pro, y la razón cita «presupuesto,
-    // «1.100 – 1.800 €» (+2)» como motivo para salirse de ese mismo tramo.
+    const texto2 = await responder(page, INSP_ALTO_A_PRO);
+    // Uso 6 → alta, que cabe en 1.100–1.800 €: el tramo ya no suma puntos ni se cita como motivo.
     await expect(tarjeta(page, 2)).toHaveText('Gama alta');
-    expect(texto).not.toContain('presupuesto, «1.100 – 1.800 €» (+2)');
+    expect(texto2).not.toContain('presupuesto, «1.100 – 1.800 €» (+2)');
+    expect(texto2).toContain('Gama — alta, por lo que has respondido: uso principal, «Diseño, foto o vídeo» (+3); videojuegos, «Gaming exigente» (+3).');
   });
 
-  test('HALLAZGO abierto: barrido — ningún perfil recibe una gama por encima de su tramo', () => {
-    // HALLAZGO abierto: hoy 79.488 (32.832 medio→alta, 12.096 medio→pro, 34.560 alto→pro).
-    test.fail();
-    expect(barridoInspeccion().gamaSobreTramo).toBe(0);
+  test('1405: barrido — ningún perfil recibe una gama por encima de su tramo', () => {
+    test.setTimeout(120_000);
+    // Antes de la reparación: 79.488 (32.832 medio→alta, 12.096 medio→pro, 34.560 alto→pro).
+    expect(barridoReparacion().gamaSobreTramo).toBe(0);
   });
 
-  test('HALLAZGO abierto: en la gama media de macOS las dos fichas se salen del tramo 600–1.100 €', async ({ page }) => {
-    // HALLAZGO abierto: MacBook Air M3 13" ~1.299 € y 15" ~1.499 € bajo «Gama media 600 – 1.100 €» (10.800 perfiles).
-    test.fail();
+  test('1406: el perfil técnico no da precios propios: solo la horquilla de su gama', async ({ page }) => {
     await abrirTest(page);
     await responder(page, INSP_MAC_MEDIA);
-    await expect(tarjeta(page, 2)).toHaveText('Gama media');
-    for (const f of await fichas(page)) expect(euros(f.split('·').pop() ?? ''), f).toBeLessThanOrEqual(1100);
-    expect(barridoInspeccion().fichasSobreTramoDentroDeGama).toBe(0);
-  });
-
-  test('HALLAZGO abierto: a quien responde «Prefiero nuevo siempre» no se le propone un reacondicionado', async ({ page }) => {
-    // HALLAZGO abierto: «MacBook Air M2 (reacondicionado) · ~900 €» con P10 = «Prefiero nuevo siempre» (768 perfiles).
-    test.fail();
-    await abrirTest(page);
-    await responder(page, INSP_REACOND_A_NUEVO);
     await expect(tarjeta(page, 1)).toHaveText('macOS (Apple)');
-    for (const f of await fichas(page)) expect(f).not.toMatch(/reacondicionado/i);
-    expect(barridoInspeccion().reacondicionadoANuevo).toBe(0);
+    await expect(tarjeta(page, 2)).toHaveText('Gama media');
+    // Toda cifra en euros del bloque es la horquilla de la gama media, 600 – 1.100 €.
+    const bloque = await page.locator('[class*="perfilSection"]').innerText();
+    const euros = [...bloque.matchAll(/([\d.]+)\s*(?:–\s*([\d.]+)\s*)?€/g)].flatMap((m) => [m[1], m[2]]).filter(Boolean).map((s) => Number(s.replace(/\./g, '')));
+    expect(euros).toEqual([600, 1100]);
+    // «Juego bastante» con macOS: la razón avisa del catálogo (hallazgo 1408, forma blanda).
+    expect(await razonDe(page, 'Sistema')).toContain('Juegas bastante: comprueba antes que tus juegos existen para este sistema');
+    expect(barridoReparacion().perfilConPrecio).toBe(0);
   });
 
-  test('HALLAZGO abierto: las fichas de modelos no contradicen el formato recomendado', async ({ page }) => {
-    // HALLAZGO abierto: las fichas dependen solo de sistema × gama; 134.448 perfiles (sobremesa con
-    // solo portátiles, o portátil con Mac mini / Mac Studio / ThinkStation).
-    test.fail();
+  test('1407: a quien prefiere nuevo no se le propone un reacondicionado, y un Mac no sale en la gama de entrada', async ({ page }) => {
+    await abrirTest(page);
+    const texto = await responder(page, INSP_REACOND_A_NUEVO);
+    await expect(tarjeta(page, 1)).toHaveText('macOS (Apple)');
+    // Uso 0 → entrada, pero no hay Mac nuevo por debajo de 600 € (MAC_GAMA_MINIMA, Apple Newsroom
+    // España, 11/03/2026) → gama media, que cabe en 600–1.100 €.
+    await expect(tarjeta(page, 2)).toHaveText('Gama media');
+    expect(texto).toContain('Gama — media: con tu uso bastaría la gama de entrada, pero no hay ningún Mac nuevo por debajo de 600 € a precio general; la gama media (600 – 1.100 €) cabe en tu presupuesto.');
+    expect(texto).not.toMatch(/reacondicionad/i);
+    const b = barridoReparacion();
+    expect(b.reacondicionadoANuevo).toBe(0);
+    expect(b.macEnEntrada).toBe(0);
+  });
+
+  test('1411: el perfil técnico sigue al formato: a quien sale escritorio no se le describe un portátil', async ({ page }) => {
     await abrirTest(page);
     await responder(page, INSP_SOBREMESA);
-    await expect(tarjeta(page, 0)).toHaveText('Sobremesa + Monitor');
-    // Hoy: Dell XPS 15, Lenovo ThinkPad X1 Carbon y ASUS ProArt Studiobook, los tres portátiles.
-    for (const f of await fichas(page)) expect(f).not.toMatch(/XPS 15|X1 Carbon|ProArt Studiobook/);
-    expect(barridoInspeccion().fichasContraFormato).toBe(0);
+    // Ofimática sin juegos y gama media → mini PC (ver 1410); antes, «Sobremesa + Monitor» con
+    // tres portátiles de ficha.
+    await expect(tarjeta(page, 0)).toHaveText('Mini PC + Monitor');
+    const perfil = (await lineasPerfil(page)).join(' · ');
+    expect(perfil).toContain('Monitor aparte de 27" o más con panel IPS');
+    expect(perfil).toContain('Mini PC con las salidas de vídeo');
+    expect(perfil).not.toMatch(/Pantalla de|Peso de/);
+    // Barrido: portátil ⇔ pantalla/peso; escritorio ⇔ monitor aparte y su mini PC o su torre.
+    expect(barridoReparacion().perfilContraFormato).toBe(0);
   });
 
-  test('HALLAZGO abierto: el resultado no lista marcas ni modelos comerciales (política 81fd4bea)', async ({ page }) => {
-    // HALLAZGO abierto: fichas «Lenovo IdeaPad 3 · ~400 €»… y un consejo de marcas; smartphone los retiró el 18/05/2026.
-    test.fail();
+  test('1412: el resultado no lista marcas ni modelos comerciales', async ({ page }) => {
     await abrirTest(page);
     await responder(page, INSP_NORMAL);
-    const bloque = await page.locator('[class*="resultadosContainer"]').innerText();
-    expect(bloque).not.toMatch(/Lenovo|Dell|ASUS|Acer|HP 15s|MacBook|Mac mini|Chromebook|System76|Framework|ThinkPad/);
+    // textContent: incluye la guía educativa plegada, que citaba marcas de mini PC y un sitio de pruebas.
+    const bloque = await page.locator('[class*="resultadosContainer"]').textContent();
+    expect(bloque).not.toMatch(MARCAS);
     await expect(page.locator('[class*="modeloNombre"]')).toHaveCount(0);
+    await expect(page.locator('[class*="perfilItem"]').first()).toBeVisible();
+    expect(barridoReparacion().conMarcas).toBe(0);
   });
 
-  test('HALLAZGO abierto: a quien declara «Gaming exigente» no se le da ChromeOS sin avisar', async ({ page }) => {
-    // HALLAZGO abierto: 25.488 perfiles con gaming exigente salen en macOS o ChromeOS, y el bloque
-    // educativo de la propia app dice que Windows es «obligatorio si … quieres gaming serio».
-    test.fail();
+  test('1408: «Gaming exigente» aparta ChromeOS (y macOS y Linux), y la razón lo dice', async ({ page }) => {
     await abrirTest(page);
     await responder(page, INSP_CHROME_GAMING);
-    const sistema = (await tarjeta(page, 1).innerText()).trim();
-    const razonSistema = (await page.locator('[class*="razonItem"]').allInnerTexts()).find((x) => x.startsWith('Sistema')) ?? '';
-    // Esperado: Windows, o una razón de sistema que reconozca el desfase con los juegos.
-    expect(sistema === 'Windows' || /jueg|gaming/i.test(razonSistema), `${sistema} · ${razonSistema}`).toBe(true);
-    expect(barridoInspeccion().gamingSinAviso).toBe(0);
-  });
-
-  test('HALLAZGO abierto: barrido — Linux, que la app anuncia, sale en algún perfil', () => {
-    // HALLAZGO abierto: PESOS_LINUX suma como mucho 2 («Programación») y la regla exige 3 → 0 de 331.776.
-    test.fail();
-    expect(barridoInspeccion().sistemas.linux ?? 0).toBeGreaterThan(0);
-  });
-
-  test('HALLAZGO abierto: barrido — el 2 en 1, que la app anuncia, sale en algún perfil', () => {
-    // HALLAZGO abierto: máximo 4 (a diario + compacto + diseño) y entonces el portátil tiene 5 → 0 de 331.776.
-    test.fail();
-    expect(barridoInspeccion().formatos['dos-en-uno'] ?? 0).toBeGreaterThan(0);
-  });
-
-  test('HALLAZGO abierto: barrido — el mini PC, que la app describe, sale en algún perfil', () => {
-    // HALLAZGO abierto: solo suma con «Siempre en casa» (+2), donde el sobremesa ya tiene +3 → 0 de 331.776.
-    test.fail();
-    expect(barridoInspeccion().formatos['mini-pc'] ?? 0).toBeGreaterThan(0);
-  });
-
-  test('HALLAZGO abierto: «ninguna de tus respuestas inclina hacia otro sistema» solo cuando es verdad', async ({ page }) => {
-    // HALLAZGO abierto: 103.680 de los 117.504 perfiles con esa frase tienen respuestas que SÍ sumaron a otro sistema.
-    test.fail();
-    await abrirTest(page);
-    const texto = await responder(page, INSP_LINUX_MEJOR);
     await expect(tarjeta(page, 1)).toHaveText('Windows');
-    // «Programación» sumó +2 a Linux (su máximo posible) y +1 a Mac.
-    expect(texto).not.toContain('ninguna de tus respuestas inclina hacia otro sistema');
-    expect(barridoInspeccion().ningunaInclinaFalsa).toBe(0);
+    expect(await razonDe(page, 'Sistema')).toBe(
+      'Sistema — Windows. Por lo que has respondido (software que necesitas, «Solo herramientas web y Google» (+3); uso principal, «Uso básico» (+2)) encajaría ChromeOS, pero juegas a títulos exigentes («Gaming exigente»), y Windows es la plataforma con más catálogo y compatibilidad para ellos: mandan los juegos.',
+    );
+    const b = barridoReparacion();
+    // Antes: 25.488 perfiles con gaming exigente en macOS o ChromeOS.
+    expect(b.gamingFueraDeWindows).toBe(0);
+    // «Juego bastante» también aparta ChromeOS, que no instala software de escritorio (su ficha).
+    expect(b.bastanteConChromeOS).toBe(0);
   });
 
-  test('HALLAZGO abierto: el aviso de responsabilidad se dirige al público general', async ({ page }) => {
-    // HALLAZGO abierto: variant="technical" → «dirigida a profesionales del dominio», como el 952 de smartphone.
-    test.fail();
+  test('1409: Linux, que la app anuncia, sale para programación sin requisitos de software', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, INSP_LINUX_MEJOR);
+    await expect(tarjeta(page, 1)).toHaveText('Linux');
+    expect(await razonDe(page, 'Sistema')).toContain('Sistema — Linux, por lo que has respondido: uso principal, «Programación o ciencia de datos» (+2), y sin requisitos de software que lo impidan.');
+    expect((await lineasPerfil(page)).join(' ')).toContain('Compatibilidad con Linux comprobada');
+    // Recuento del motor tras la reparación (antes: 0 de 331.776).
+    expect(barridoReparacion().sistemas.linux).toBe(11_664);
+  });
+
+  test('1410: el mini PC sale cuando el uso no pide torre; el 2 en 1 deja de prometerse y queda como consejo', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, INSP_MINI_PC);
+    await expect(tarjeta(page, 0)).toHaveText('Mini PC + Monitor');
+    expect(await razonDe(page, 'Formato')).toContain('un mini PC lo cubre en mucho menos espacio que una torre');
+    // El 2 en 1 no tenía ninguna pregunta que lo distinguiera (lápiz, pantalla táctil): ya no es un
+    // resultado, sino un consejo para el perfil que su ficha describía.
+    await abrirTest(page);
+    await responder(page, INSP_CREATIVO_MOVIL);
+    await expect(tarjeta(page, 0)).toHaveText('Portátil');
+    await expect(page.locator('[class*="consejoItem"]').filter({ hasText: 'convertibles 2 en 1' })).toHaveCount(1);
+    const b = barridoReparacion();
+    expect(b.formatos['mini-pc']).toBe(28_320);
+    expect(b.formatos['dos-en-uno'] ?? 0).toBe(0);
+    expect(Object.keys(FORMATOS)).toEqual(['portatil', 'sobremesa', 'mini-pc']);
+    // Nada de lo que se sirve promete el 2 en 1 como resultado del test.
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    await expect(page.getByText('Formato recomendado (portátil, sobremesa o mini PC)')).toBeVisible();
+    const jsonld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(jsonld).not.toMatch(/Recomendación de formato[^"]*2 en 1/);
+    expect(jsonld).toContain('Recomendación de sistema operativo: Windows, macOS, Linux o ChromeOS');
+  });
+
+  test('1415: «ninguna de tus respuestas inclina hacia otro sistema» solo cuando es verdad', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, INSP_NORMAL);
+    await expect(tarjeta(page, 1)).toHaveText('Windows');
+    // «Alguno» sumó +1 a macOS sin llegar al umbral de 3.
+    expect(await razonDe(page, 'Sistema')).toBe(
+      'Sistema — Windows: alguna respuesta sumaba a otro sistema (macOS: dispositivos Apple, «Alguno» (+1)), pero no lo bastante para recomendarlo; Windows es el de mayor compatibilidad de software.',
+    );
+    expect(barridoReparacion().ningunaInclinaFalsa).toBe(0);
+  });
+
+  test('1416: el aviso de responsabilidad se dirige al público general', async ({ page }) => {
     await page.goto('/selector-portatil/');
     await esperarHidratacionBotones(page);
     await expect(page.getByText(/profesionales del dominio/)).toHaveCount(0);
+    await expect(page.getByText(/carácter orientativo/).first()).toBeVisible();
   });
 
-  test('HALLAZGO abierto: los precios en euros y los canales de compra declaran su ámbito (RegionBadge)', async ({ page }) => {
-    // HALLAZGO abierto: sin <RegionBadge variant="es-data" />, como el 949 de smartphone.
-    test.fail();
+  test('1417: los precios en euros declaran su ámbito (RegionBadge es-data)', async ({ page }) => {
     await page.goto('/selector-portatil/');
     await esperarHidratacionBotones(page);
     await expect(page.getByText(/Datos de referencia: España/)).toBeVisible();
   });
 
-  test('HALLAZGO abierto: nada fechado en 2025 presentado en presente', async ({ page }) => {
-    // HALLAZGO abierto: «Guía completa: cómo elegir ordenador en 2025», «8 GB es el mínimo para 2025»
-    // y «modelos de referencia actualizados para 2025» en la meta description.
-    test.fail();
+  test('1413: nada fechado en 2025 presentado en presente', async ({ page }) => {
     await abrirTest(page);
     await responder(page, INSP_NORMAL);
     expect(await page.locator('meta[name="description"]').getAttribute('content')).not.toContain('2025');
+    expect(await page.locator('meta[name="keywords"]').getAttribute('content')).not.toContain('2025');
     expect(await page.locator('[class*="resultadosContainer"]').textContent()).not.toContain('2025');
+    // En el JSON-LD, salvo `datePublished` (2025-01-22): la fecha de publicación es un hecho, no
+    // contenido presentado en presente.
+    const jsonld = (await page.locator('script[type="application/ld+json"]').allTextContents())
+      .map((b) => JSON.stringify({ ...(JSON.parse(b) as Record<string, unknown>), datePublished: undefined }));
+    expect(jsonld.join(' ')).not.toContain('2025');
   });
 
-  test('HALLAZGO abierto: el truco de compra no confunde Core Ultra con la 13.ª-14.ª generación', async ({ page }) => {
-    // HALLAZGO abierto: Intel ARK: el Core Ultra 5 125H es «Intel Core Ultra Processors (Series 1)»,
-    // Meteor Lake; la 13.ª-14.ª generación son los Core i de Raptor Lake.
-    test.fail();
+  test('1418: el truco de compra no confunde Core Ultra con la 13.ª-14.ª generación', async ({ page }) => {
+    // Intel ARK: el Core Ultra 5 125H es «Intel Core Ultra processors (Series 1)», Meteor Lake.
     await abrirTest(page);
     await responder(page, INSP_NORMAL);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    await expect(page.getByText(/Truco de compra/)).toBeVisible();
-    await expect(page.getByText(/Core Ultra 5 \(13ª-14ª gen\)/)).toHaveCount(0);
+    const truco = page.locator('[class*="warningBox"]');
+    await expect(truco).toContainText('Truco de compra');
+    await expect(truco).not.toContainText('13ª-14ª gen');
+    await expect(truco).toContainText('los Intel Core Ultra (Series 1, Series 2…) son una familia distinta de los Core i de 13.ª y 14.ª generación');
   });
 
-  test('HALLAZGO abierto: textos pequeños de marca a 4,5:1 en tema claro', async ({ page }) => {
-    // HALLAZGO abierto: medido el 24/09 — progresoPaso 3,93 · recomendacionValor 4,11 · razonesTitulo 3,67 ·
-    // btnRepetir 3,93 (var(--primary) sobre fondo claro).
-    test.fail();
+  test('1419: textos pequeños de marca a 4,5:1 en claro, y el perfil técnico en oscuro', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' });
     await abrirTest(page);
     await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
     expect.soft(await contrasteReal(page, '[class*="progresoPaso"]'), 'progresoPaso').toBeGreaterThanOrEqual(4.5);
     await responder(page, INSP_NORMAL);
-    for (const clase of ['recomendacionValor', 'razonesTitulo', 'btnRepetir']) {
+    for (const clase of ['recomendacionValor', 'razonesTitulo', 'btnRepetir', 'perfilItem', 'perfilNota']) {
       expect.soft(await contrasteReal(page, `[class*="${clase}"]`), clase).toBeGreaterThanOrEqual(4.5);
     }
-  });
-
-  test('HALLAZGO abierto: la nota de cada ficha a 4,5:1 en tema oscuro', async ({ page }) => {
-    // HALLAZGO abierto: modeloDesc #9B9B9B sobre la ficha oscura (blanco al 4 % sobre #2D2D2D) = 4,39:1.
-    test.fail();
+    // Oscuro: la nota de cada ficha (modeloDesc, 4,39:1) ya no existe; se mide su relevo.
     await page.goto('/selector-portatil/');
     await esperarHidratacionBotones(page);
     await activarTema(page, 'dark');
     await page.getByRole('button', { name: /Empezar el test/ }).click();
     await page.getByText('Pregunta 1 de 10').first().waitFor();
+    expect.soft(await contrasteReal(page, '[class*="progresoPaso"]'), 'progresoPaso (oscuro)').toBeGreaterThanOrEqual(4.5);
     await responder(page, INSP_NORMAL);
-    expect(await contrasteReal(page, '[class*="modeloDesc"]')).toBeGreaterThanOrEqual(4.5);
+    for (const clase of ['recomendacionValor', 'razonesTitulo', 'btnRepetir', 'perfilItem', 'perfilNota']) {
+      expect.soft(await contrasteReal(page, `[class*="${clase}"]`), `${clase} (oscuro)`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
-  test('HALLAZGO abierto: el hero de resultados (texto blanco sobre degradado de marca) llega a 3:1', async ({ page }) => {
-    // HALLAZGO abierto: «Tu ordenador ideal» 2,80:1 en claro y 2,23:1 en oscuro sobre
-    // var(--primary)→var(--secondary), en vez de var(--hero-bg).
-    test.fail();
-    await page.emulateMedia({ colorScheme: 'light' });
+  test('1414: el hero de resultados y los botones de avance llegan a su umbral en los dos temas', async ({ page }) => {
+    for (const tema of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme: 'light' });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/selector-portatil/');
+      await esperarHidratacionBotones(page);
+      if (tema === 'dark') await activarTema(page, 'dark');
+      // Botones con fondo de marca y texto blanco (0,9 y 1,05 rem): texto normal, umbral 4,5:1.
+      expect.soft(await contrasteReal(page, '[class*="btnStart"]'), `btnStart (${tema})`).toBeGreaterThanOrEqual(4.5);
+      await page.getByRole('button', { name: /Empezar el test/ }).click();
+      await page.getByText('Pregunta 1 de 10').first().waitFor();
+      await page.locator('[role="radio"]').nth(INSP_NORMAL[0]).click();
+      expect.soft(await contrasteReal(page, '[class*="btnSiguiente"]'), `btnSiguiente (${tema})`).toBeGreaterThanOrEqual(4.5);
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+      await page.getByText('Pregunta 2 de 10').first().waitFor();
+      await responder(page, INSP_NORMAL.slice(1));
+      // «Tu ordenador ideal»: 32 px en negrita = texto grande, 3:1; el subtítulo (16 px), 4,5:1.
+      expect.soft(await contrasteReal(page, '[class*="heroTitleSm"]'), `heroTitleSm (${tema})`).toBeGreaterThanOrEqual(3);
+      expect.soft(await contrasteReal(page, '[class*="heroSubtitleSm"]'), `heroSubtitleSm (${tema})`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test('familia (forma g): tras «Ver resultado» el foco va al encabezado del resultado', async ({ page }) => {
     await abrirTest(page);
     await responder(page, INSP_NORMAL);
-    // 32 px en negrita = texto grande: umbral 3:1.
-    expect(await contrasteReal(page, '[class*="heroTitleSm"]')).toBeGreaterThanOrEqual(3);
+    await expect.poll(() => page.evaluate(() => document.activeElement?.textContent ?? '')).toBe('Tu ordenador ideal');
   });
 });
