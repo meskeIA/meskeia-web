@@ -455,8 +455,10 @@
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 768px) {
+  /* 80px arriba: el hero va a sangre y el logo fijo de MeskeiaLogo (hasta ~62px) tapaba el
+     principio del título hasta 768px de ancho. Mismo hueco que deja la plantilla. */
   .hero {
-    padding: 2rem 1rem 2rem;
+    padding: 80px 1rem 2rem;
   }
 
   .main {
