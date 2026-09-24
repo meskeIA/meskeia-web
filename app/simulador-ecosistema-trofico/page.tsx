@@ -9,12 +9,47 @@ import { formatNumber } from '@/lib';
 // El modelo de la cascada (tipos, ecosistemas, eventos, ATENUACION y aplicarEvento) vive en
 // `motor.ts` desde el 23/09/2026: lo comparten el simulador y los casos para clase, y una
 // sola implementación es lo que impide que la app suspenda una respuesta que ella misma pinta.
-import { ECOSISTEMAS, EVENTOS, aplicarEvento, type Evento, type NivelTrofico, type TipoEvento } from './motor';
+import {
+  AVISO_BIOMAGNIFICACION,
+  ECOSISTEMAS,
+  EVENTOS,
+  aplicarEvento,
+  perturbacionAplicable,
+  type Evento,
+  type NivelTrofico,
+  type TipoEvento,
+} from './motor';
 import CasosAula from './CasosAula';
 
 // ============================================
 // TEXTO DINÁMICO DE EXPLICACIÓN
 // ============================================
+
+/** El porcentaje de cambio que imprime el panel «¿Qué está pasando?», sobre la población sin redondear. */
+function cambioPorcentual(nuevo: number, original: number): number {
+  return Math.round(Math.abs((nuevo - original) / original * 100));
+}
+
+/** El panel solo nombra un nivel si su cambio pasa de este porcentaje. */
+const UMBRAL_PANEL = 2;
+
+/**
+ * La cifra que se pinta de una población (barra, pirámide y `aria-valuenow`) y sus decimales.
+ *
+ * Entera, SALVO cuando el redondeo escondería un cambio que el panel sí anuncia. Con enteros,
+ * bosque + sequía al 50 % llevaba a los superdepredadores de 4 a 3,59 y la barra seguía
+ * diciendo «4», sin delta, mientras el panel decía «se han reducido… un 10 %» (hallazgo 1609).
+ * Ahora se pinta «3,6 (-0,4)». Con el umbral del panel, un cambio que el panel calla (sequía al
+ * 1 %: herbívoros 39,83) sigue saliendo «40» sin delta, como exige el hallazgo 328.
+ */
+function cifraPoblacion(actual: number, original: number): { valor: number; decimales: 0 | 1 } {
+  const entera = Math.round(actual);
+  if (entera === original && cambioPorcentual(actual, original) > UMBRAL_PANEL) {
+    return { valor: Math.round(actual * 10) / 10, decimales: 1 };
+  }
+  return { valor: entera, decimales: 0 };
+}
+
 function generarExplicacion(
   evento: Evento,
   niveles: NivelTrofico[],
@@ -25,7 +60,6 @@ function generarExplicacion(
     return 'El ecosistema está en equilibrio. Las poblaciones se mantienen estables gracias al balance entre predadores y presas. Cada nivel trófico regula al siguiente mediante retroalimentación negativa.';
   }
 
-  const cambioPorc = (n: number, o: number): number => Math.round(Math.abs((n - o) / o * 100));
   // «Reducir» es pronominal en este uso («se han reducido»); «aumentar», no («han aumentado»).
   const verbo = (n: number, o: number): string => n < o ? 'se han reducido' : 'han aumentado';
   const nivelNombres = originales.map(n => n.nombre.toLowerCase());
@@ -36,8 +70,8 @@ function generarExplicacion(
   let verboAnterior = '';
 
   for (let i = 0; i < niveles.length; i++) {
-    const porc = cambioPorc(niveles[i].poblacion, originales[i].poblacion);
-    if (porc > 2) {
+    const porc = cambioPorcentual(niveles[i].poblacion, originales[i].poblacion);
+    if (porc > UMBRAL_PANEL) {
       const verboNivel = verbo(niveles[i].poblacion, originales[i].poblacion);
       const sujeto = `${partes.length === 0 ? 'Los' : 'los'} ${nivelNombres[i]}`;
       partes.push(
@@ -60,13 +94,34 @@ function generarExplicacion(
     texto += 'Esta es la cascada trófica en acción: la perturbación de un nivel se propaga a todos los demás.';
   }
 
+  // Con la contaminación la cascada pinta la cúspide como el nivel MENOS afectado: se avisa de
+  // lo que el modelo deja fuera (hallazgo 1607). Si no hay impacto, no hay nada que matizar.
+  if (evento.id === 'contaminacion' && partes.length > 0) {
+    texto += ' ' + AVISO_BIOMAGNIFICACION;
+  }
+
   return texto;
 }
 
 // ============================================
 // COLORES POR NIVEL
 // ============================================
-const COLORES_NIVEL = ['#3a7d44', '#d4a017', '#d4621c', '#c0392b'];
+// Salen de variables del módulo CSS (hallazgo 1612). Eran hex fijos (#d4a017 para los
+// herbívoros) que servían igual de relleno y de TEXTO: la cifra de la barra daba 2,38:1 en
+// claro y, en oscuro, la de productores 2,87:1. Ahora el relleno y el fondo de la pirámide
+// usan `--color-*` (blanco encima ≥ 5:1) y las cifras, `--texto-*`, que tiene variante oscura.
+const COLORES_NIVEL = [
+  'var(--color-productor)',
+  'var(--color-herbivoro)',
+  'var(--color-carnivoro)',
+  'var(--color-superdepr)',
+];
+const COLORES_TEXTO_NIVEL = [
+  'var(--texto-productor)',
+  'var(--texto-herbivoro)',
+  'var(--texto-carnivoro)',
+  'var(--texto-superdepr)',
+];
 
 const NOMBRES_CLASE_NIVEL = [
   styles.nivelProductor,
@@ -84,7 +139,13 @@ export default function SimuladorEcosistemaTroficoPage() {
   const [intensidad, setIntensidad] = useState<number>(0.5);
 
   const ecosistema = ECOSISTEMAS.find(e => e.id === ecosistemaId) ?? ECOSISTEMAS[0];
-  const evento = EVENTOS.find(e => e.id === eventoId) ?? EVENTOS[0];
+  // Una perturbación sin sentido en este ecosistema (sequía en el océano) no se aplica nunca.
+  const evento =
+    (perturbacionAplicable(ecosistema, eventoId) ? EVENTOS.find(e => e.id === eventoId) : undefined) ?? EVENTOS[0];
+  const eventosDisponibles = EVENTOS.filter(ev => perturbacionAplicable(ecosistema, ev.id));
+  const notasNoAplicables = Object.values(ecosistema.perturbacionesNoAplicables ?? {}).filter(
+    (nota): nota is string => typeof nota === 'string'
+  );
 
   const nivelesActuales = useMemo(
     () => aplicarEvento(ecosistema.niveles, evento, intensidad),
@@ -163,22 +224,25 @@ export default function SimuladorEcosistemaTroficoPage() {
 
         {/* SELECTOR DE EVENTO */}
         <div className={styles.eventoSelector} role="group" aria-label="Seleccionar perturbación">
-          {EVENTOS.map(ev => (
+          {eventosDisponibles.map(ev => (
             <button
               type="button"
               key={ev.id}
-              className={`${styles.eventoBtn} ${eventoId === ev.id ? styles.eventoBtnActivo : ''}`}
+              className={`${styles.eventoBtn} ${evento.id === ev.id ? styles.eventoBtnActivo : ''}`}
               onClick={() => setEventoId(ev.id)}
-              aria-pressed={eventoId === ev.id}
+              aria-pressed={evento.id === ev.id}
               title={ev.descripcion}
             >
               {ev.nombre}
             </button>
           ))}
         </div>
+        {notasNoAplicables.map(nota => (
+          <p key={nota} className={styles.eventoNota}>{nota}</p>
+        ))}
 
         {/* SLIDER DE INTENSIDAD */}
-        {eventoId !== 'ninguno' && (
+        {evento.id !== 'ninguno' && (
           <div className={styles.intensidadRow}>
             <label htmlFor="slider-intensidad" className={styles.intensidadLabel}>
               Intensidad de la perturbación: <strong>{Math.round(intensidad * 100)}&nbsp;%</strong>
@@ -208,6 +272,7 @@ export default function SimuladorEcosistemaTroficoPage() {
             <p className={styles.piramideTitulo}>Pirámide trófica</p>
             {nivelesInvertidos.map((nivel, idx) => {
               const idxOriginal = 3 - idx;
+              const cifra = cifraPoblacion(nivel.poblacion, ecosistema.niveles[idxOriginal].poblacion);
               return (
                 <div key={nivel.nombre} className={styles.nivelWrapper}>
                   {/* Flecha de energía entre niveles (no en el último = base) */}
@@ -233,7 +298,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                       <span className={styles.nivelNombre}>{nivel.nombre}</span>
                       <span className={styles.nivelEjemplos}>{ecosistema.niveles[idxOriginal].ejemplos}</span>
                       <span className={styles.nivelPob}>
-                        {Math.round(nivel.poblacion)} ind. rel.
+                        {formatNumber(cifra.valor, cifra.decimales)} ind. rel.
                       </span>
                     </div>
                   </div>
@@ -250,21 +315,25 @@ export default function SimuladorEcosistemaTroficoPage() {
               const porcActual = nivel.poblacion;
               const porcOriginal = original.poblacion;
               const color = COLORES_NIVEL[idx];
+              // La cifra y su delta salen de `cifraPoblacion`, la misma que usa la pirámide.
+              const cifra = cifraPoblacion(porcActual, porcOriginal);
+              const delta = cifra.valor - porcOriginal;
+              const textoCifra = formatNumber(cifra.valor, cifra.decimales);
               return (
                 <div key={nivel.nombre} className={styles.barraGrupo}>
                   <div className={styles.barraLabelRow}>
                     <span className={styles.barraLabel}>
                       <span aria-hidden="true">{nivel.emoji}</span> {nivel.nombre}
                     </span>
-                    <span className={styles.barraValor} style={{ color }}>
-                      {Math.round(porcActual)}
-                      {/* El delta se decide sobre el valor REDONDEADO, que es el que se
-                          imprime. Comparando los valores sin redondear, una sequía al 1 %
-                          pintaba «40 (0)» —un cambio de cero anunciado como si fuera un
-                          cambio— porque la diferencia real era 0,168 (hallazgo 328). */}
-                      {Math.round(porcActual - porcOriginal) !== 0 && (
+                    <span className={styles.barraValor} style={{ color: COLORES_TEXTO_NIVEL[idx] }}>
+                      {textoCifra}
+                      {/* El delta se decide sobre la cifra IMPRESA. Comparando los valores sin
+                          redondear, una sequía al 1 % pintaba «40 (0)» —un cambio de cero
+                          anunciado como si fuera un cambio— porque la diferencia real era
+                          0,168 (hallazgo 328). */}
+                      {delta !== 0 && (
                         <span className={styles.barraDelta}>
-                          {' '}({porcActual > porcOriginal ? '+' : ''}{Math.round(porcActual - porcOriginal)})
+                          {' '}({delta > 0 ? '+' : ''}{formatNumber(delta, cifra.decimales)})
                         </span>
                       )}
                     </span>
@@ -279,10 +348,10 @@ export default function SimuladorEcosistemaTroficoPage() {
                       className={styles.barraActual}
                       style={{ width: `${porcActual}%`, backgroundColor: color }}
                       role="meter"
-                      aria-valuenow={Math.round(porcActual)}
+                      aria-valuenow={cifra.valor}
                       aria-valuemin={0}
                       aria-valuemax={100}
-                      aria-label={`${nivel.nombre}: ${Math.round(porcActual)} individuos relativos`}
+                      aria-label={`${nivel.nombre}: ${textoCifra} individuos relativos`}
                     />
                   </div>
                 </div>
@@ -346,12 +415,18 @@ export default function SimuladorEcosistemaTroficoPage() {
               (plantas, algas, fitoplancton), consumidores primarios (herbívoros), consumidores secundarios
               (carnívoros) y depredadores ápice o superdepredadores.
             </p>
+            {/* Decía «la regla del 10 % (o ley de Lindeman, 1942) establece»: Lindeman no la
+                llamó ley y citó eficiencias del 0,1 % al 37,5 % (Wikipedia, «Ecological
+                efficiency»). Es una media con mucha dispersión (hallazgo 1610). */}
             <p>
-              La <strong>regla del 10&nbsp;%</strong> (o ley de Lindeman, 1942) establece que, en promedio,
-              solo el 10&nbsp;% de la energía acumulada en un nivel trófico se transfiere al siguiente.
-              El 90&nbsp;% restante se pierde como calor metabólico, respiración, excreción y tejidos no
-              consumibles. Esto explica por qué la pirámide de energía siempre tiene base ancha:
-              se necesitan enormes cantidades de vegetación para mantener a pocos depredadores ápice.
+              La llamada <strong>regla del 10&nbsp;%</strong>, que se suele atribuir al trabajo de
+              Raymond Lindeman (1942), resume una tendencia media: de la energía acumulada en un nivel
+              trófico, en promedio solo en torno al 10&nbsp;% llega a formar parte del siguiente. No es una
+              ley exacta: el propio Lindeman no la llamó ley y citó eficiencias desde el 0,1&nbsp;% hasta
+              el 37,5&nbsp;%, y la cifra real cambia mucho entre ecosistemas y grupos de organismos. El resto
+              se pierde como calor en la respiración o queda en heces, restos y tejidos no consumidos,
+              que aprovechan los descomponedores. Por eso la pirámide de energía tiene base ancha: hace
+              falta mucha vegetación para mantener a pocos depredadores ápice.
             </p>
             <div className={styles.formulaBox}>
               Energía en nivel n+1 ≈ Energía en nivel n × 0,10
@@ -497,11 +572,13 @@ export default function SimuladorEcosistemaTroficoPage() {
               <div className={styles.faqItem}>
                 <h4>¿Por qué la pirámide de energía siempre tiene base ancha?</h4>
                 <p>
-                  Porque la energía se <strong>disipa</strong> en cada transferencia. Solo el 10&nbsp;%
-                  pasa al nivel siguiente; el 90&nbsp;% se usa en metabolismo, se pierde como calor o
-                  queda en partes no consumidas (raíces, huesos, celulosa). Para que haya 1 kg de
-                  depredador ápice, se necesitan ~10 kg de carnívoro, ~100 kg de herbívoro y ~1000 kg
-                  de productor. Esto limita físicamente la longitud de las cadenas tróficas.
+                  Porque la energía se <strong>disipa</strong> en cada transferencia. De media, solo en
+                  torno al 10&nbsp;% pasa al nivel siguiente (la cifra real varía mucho); el resto se usa en
+                  el metabolismo y se pierde como calor, o queda en partes no consumidas (raíces, huesos,
+                  celulosa). Con una eficiencia del 10&nbsp;% en cada paso, 1 kg de depredador ápice
+                  necesitaría del orden de 10 kg de carnívoro, 100 kg de herbívoro y 1.000 kg de
+                  productor. Esa pérdida en cada paso es una de las razones de que las cadenas tróficas
+                  sean cortas.
                 </p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> La segunda ley de la termodinámica es la raíz de este principio: en toda
@@ -525,18 +602,45 @@ export default function SimuladorEcosistemaTroficoPage() {
                 </p>
               </div>
 
+              {/* Hallazgo 1607: la perturbación «Contaminación del agua» pinta la cúspide como el
+                  nivel menos afectado, que con pesticidas persistentes es lo contrario de lo que
+                  se enseña en clase. Se explica aquí, con la fuente, qué deja fuera el modelo. */}
               <div className={styles.faqItem}>
-                <h4>¿Cuántos eslabones puede tener una cadena trófica?</h4>
+                <h4>¿Qué es la biomagnificación y por qué el simulador no la calcula?</h4>
                 <p>
-                  En la naturaleza, raramente más de <strong>4-6 eslabones</strong>. La razón es
-                  física: con la regla del 10&nbsp;%, para el sexto nivel solo quedaría el 0,001&nbsp;% de la
-                  energía original, lo que hace matemáticamente imposible mantener una población
-                  viable. En ecosistemas oceánicos muy productivos (gran biomasa de fitoplancton)
-                  pueden existir cadenas algo más largas.
+                  Un contaminante <strong>persistente</strong> (que el organismo no degrada ni
+                  elimina bien, como el DDT o el mercurio) se acumula en los tejidos
+                  (<em>bioacumulación</em>) y pasa al depredador con cada presa que se come, así que su
+                  concentración aumenta a cada nivel que sube (<em>biomagnificación</em>). En un
+                  estuario de Long Island (EE. UU.), Woodwell, Wurster e Isaacson (<em>Science</em>,
+                  1967) midieron DDT desde 0,04 partes por millón en el plancton hasta 75 en una gaviota:
+                  más de tres órdenes de magnitud.
                 </p>
                 <p className={styles.faqTip}>
-                  <span aria-hidden="true">💡</span> Los ecosistemas tropicales húmedos tienen cadenas más largas porque la
-                  alta productividad primaria permite sustentar más niveles.
+                  <span aria-hidden="true">💡</span> La «Contaminación del agua» del simulador solo sigue
+                  la falta de alimento: golpea a los productores y el efecto se apaga al subir, así que
+                  los superdepredadores salen como el nivel menos afectado. Con un tóxico persistente,
+                  en la realidad suelen ser los que acumulan las dosis más altas.
+                </p>
+              </div>
+
+              <div className={styles.faqItem}>
+                {/* Decía «raramente más de 4-6 eslabones» y, a renglón seguido, que el sexto
+                    nivel era «matemáticamente imposible»: la regla del 10 % tratada como ley
+                    exacta (hallazgo 1610). Se retiraron también dos afirmaciones sin fuente
+                    (cadenas más largas en océanos muy productivos y en el trópico húmedo). */}
+                <p>
+                  Pocos: lo habitual es que una cadena no pase de <strong>cinco niveles</strong>. Una
+                  razón es energética: si en cada paso llegara el 10&nbsp;%, al quinto nivel le quedaría
+                  el 0,01&nbsp;% de la energía que fijaron los productores, y al sexto, el 0,001&nbsp;%. No
+                  es una imposibilidad matemática —la eficiencia real de cada paso varía y hay cadenas
+                  algo más largas—, sino una dificultad creciente para sostener poblaciones viables
+                  arriba del todo.
+                </p>
+                <p className={styles.faqTip}>
+                  <span aria-hidden="true">💡</span> La energía no es la única explicación que se ha
+                  propuesto: otras hipótesis relacionan la longitud de las cadenas con el tamaño del
+                  ecosistema o con el tipo de hábitat.
                 </p>
               </div>
 
@@ -564,7 +668,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 <div className={styles.stepNumber}>1</div>
                 <div className={styles.stepContent}>
                   <strong>Identifica el nivel trófico directamente afectado</strong>
-                  <p>Determina si la perturbación afecta a los productores (sequía, contaminación), herbívoros (plaga), carnívoros (caza) o superdepredadores. El nivel directamente impactado es el punto de partida de la cascada.</p>
+                  <p>Determina si la perturbación afecta a los productores (sequía, contaminación), herbívoros (plaga), carnívoros (caza) o superdepredadores. El nivel directamente impactado es el punto de partida de la cascada. Si es un contaminante persistente, piensa además en la biomagnificación, que este simulador no calcula.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -578,7 +682,9 @@ export default function SimuladorEcosistemaTroficoPage() {
                 <div className={styles.stepNumber}>3</div>
                 <div className={styles.stepContent}>
                   <strong>Evalúa la magnitud del impacto con el modelo simplificado</strong>
-                  <p>Como aproximación orientativa (no una ley empírica), cada nivel trófico tiende a atenuar el impacto: en este simulador un cambio del 50&nbsp;% en un nivel se traduce en algo más de un 35&nbsp;% en el nivel de al lado, y en torno a un 25&nbsp;% en el siguiente, porque los ecosistemas tienen cierta inercia y capacidad de amortiguación. Puedes seguirlo tú: prueba «caza excesiva del depredador» al 71&nbsp;% en la pradera y verás −50&nbsp;% en carnívoros, +35&nbsp;% en herbívoros y −24&nbsp;% en productores. La magnitud real varía mucho según el ecosistema y las especies implicadas.</p>
+                  {/* Decía «algo más de un 35 %»: con ATENUACION = 0,7 pasa exactamente el 70 %
+                      del cambio relativo, así que un 50 % da un 35 % justo (hallazgo 1611). */}
+                  <p>Como aproximación orientativa (no una ley empírica), cada nivel trófico tiende a atenuar el impacto: en este simulador cada nivel transmite a su vecino el 70&nbsp;% de su cambio relativo, así que un cambio del 50&nbsp;% en un nivel se traduce en un 35&nbsp;% en el nivel de al lado y en un 24,5&nbsp;% en el siguiente (mientras ningún nivel toque el suelo o el techo de población del modelo), porque los ecosistemas tienen cierta inercia y capacidad de amortiguación. Puedes seguirlo tú: prueba «caza excesiva del depredador» al 71&nbsp;% en la pradera y verás −50&nbsp;% en carnívoros, +35&nbsp;% en herbívoros y −24&nbsp;% en productores (redondeados: el cambio exacto de los carnívoros es −49,7&nbsp;%). La magnitud real varía mucho según el ecosistema y las especies implicadas.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -632,7 +738,10 @@ export default function SimuladorEcosistemaTroficoPage() {
             <ul className={styles.warningList}>
               <li><strong>Confundir cadena con red trófica</strong> — La cadena es una simplificación lineal. En la naturaleza existen redes complejas donde cada especie interactúa con muchas otras. La cadena es útil para estudiar, no para modelar la realidad completa.</li>
               <li><strong>Creer que los depredadores son «malos» para el ecosistema</strong> — Los depredadores son esenciales: regulan las poblaciones de herbívoros, evitan el sobrepastoreo y mantienen la biodiversidad. Sin depredadores, los herbívoros destruyen la vegetación.</li>
-              <li><strong>No entender que la energía se pierde como calor</strong> — El 90&nbsp;% de la energía no «desaparece»: se convierte en calor por el metabolismo. Solo el 10&nbsp;% queda en tejidos consumibles. Esta pérdida es irreversible (2.ª ley de la termodinámica).</li>
+              {/* Decía «el 90 % se convierte en calor; solo el 10 % queda en tejidos
+                  consumibles», que contradecía la sección 1: parte de lo que no pasa al nivel
+                  siguiente es excreción y tejido no consumido (hallazgo 1610). */}
+              <li><strong>No entender adónde va la energía</strong> — La energía que no pasa al nivel siguiente (de media, en torno al 90&nbsp;%, con mucha variación) no «desaparece»: una parte se disipa como calor en la respiración y otra queda en heces, restos y tejidos no consumidos, que aprovechan los descomponedores. La que se disipa como calor ya no vuelve a la cadena (2.ª ley de la termodinámica).</li>
               <li><strong>Confundir biomasa con número de individuos</strong> — Un ecosistema puede tener pocos herbívoros en número pero mucha biomasa (vacas vs. insectos). La pirámide de individuos puede invertirse; la de energía, nunca.</li>
               <li><strong>Olvidar los descomponedores</strong> — Bacterias, hongos y detritívoros son el «nivel trófico oculto» que recicla la materia orgánica muerta. Sin ellos, los nutrientes quedarían inmovilizados y los productores dejarían de crecer.</li>
             </ul>

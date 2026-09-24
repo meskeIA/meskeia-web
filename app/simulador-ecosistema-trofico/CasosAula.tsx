@@ -17,7 +17,7 @@
  * barras y el panel de explicación, y un duplicado aquí los volvería ambiguos.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorEcosistemaTrofico.module.css';
 import { ECOSISTEMAS, EVENTOS, type TipoEvento } from './motor';
@@ -111,9 +111,27 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
     });
   }
 
+  /**
+   * Foco tras «Comprobar» (hallazgo 1613). Al bloquear la predicción, el botón «Comprobar» se
+   * desmonta y el foco caía al <body>: un lector de pantalla perdía la posición justo cuando se
+   * abren «Cargar en el simulador» y «Ver por qué pasa». Se lleva a «Cargar», la acción
+   * siguiente; el veredicto lo anuncia su `role="alert"`. Solo tras comprobar: al volver a un
+   * caso ya comprobado desde la botonera, el foco se queda en la botonera.
+   */
+  const refCargar = useRef<HTMLButtonElement>(null);
+  const enfocarCargar = useRef(false);
+  useEffect(() => {
+    if (bloqueada && enfocarCargar.current) {
+      enfocarCargar.current = false;
+      refCargar.current?.focus();
+    }
+  }, [bloqueada]);
+
   function comprobar() {
     if (bloqueada) return;
-    setVeredictos(previos => ({ ...previos, [clave]: comprobarPrediccion(eleccion, pregunta.respuesta) }));
+    const resultado = comprobarPrediccion(eleccion, pregunta.respuesta);
+    enfocarCargar.current = resultado.motivo !== 'vacia';
+    setVeredictos(previos => ({ ...previos, [clave]: resultado }));
   }
 
   function cargar() {
@@ -251,7 +269,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
           )}
           {bloqueada && (
             <>
-              <button type="button" className={styles.aulaBtnPrimario} onClick={cargar}>
+              <button ref={refCargar} type="button" className={styles.aulaBtnPrimario} onClick={cargar}>
                 <span aria-hidden="true">⬆️</span> Cargar en el simulador
               </button>
               <button

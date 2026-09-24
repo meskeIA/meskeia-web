@@ -16,10 +16,13 @@
  * ────────────────────────────────────────────────────────────────────
  * 1. SE EVALÚA LO QUE SE VE, NO EL MODELO. La app pinta `Math.round(poblacion)`, así que la
  *    dirección correcta es el signo de `Math.round(nuevo) − original`. En unas pocas
- *    combinaciones el modelo cambia y la pantalla no (bosque + sequía al 50 %: los
- *    superdepredadores van de 4 a 3,59, que se pinta «4»). Un caso así pediría «baja» y el
- *    alumno, al cargarlo, vería que no cambia: `escenarioSinTrampaDeRedondeo` los descarta,
- *    en los doce fijos y en el modo práctica.
+ *    combinaciones el modelo cambia y el entero no (bosque + sequía al 50 %: los
+ *    superdepredadores van de 4 a 3,59, que entero sería «4»). Desde el 24/09/2026 el
+ *    simulador pinta ahí la cifra con un decimal («3,6 (-0,4)»), para no enseñar una barra
+ *    quieta junto a un panel que dice «un 10 %» (hallazgo 1609); pero la explicación de los
+ *    casos razona con las cifras enteras, así que `escenarioSinTrampaDeRedondeo` los sigue
+ *    descartando, en los doce fijos y en el modo práctica. Fuera de esos escenarios, lo que
+ *    pinta el simulador es exactamente `visibles`.
  * 2. SOLO INTENSIDADES DE 0,5 Y 0,7. Con la caza al 100 % los carnívoros tocan el suelo de 5
  *    en los cuatro ecosistemas y la cascada deja de ser la del mecanismo: se recorta.
  * 3. LOS PORCENTAJES SON LOS DEL PANEL «¿Qué está pasando?»: `Math.round(|nuevo − viejo| /
@@ -28,9 +31,13 @@
  *    con las cifras enteras de las barras, el orden sale igual.
  * 4. EL ECOSISTEMA NO CAMBIA LOS PORCENTAJES (las poblaciones de partida son proporcionales),
  *    así que nunca se pregunta «¿en qué ecosistema cae más…?».
- * 5. NADA DE MAGNITUDES CON LA CONTAMINACIÓN: su descripción dice que diezma a productores y
- *    herbívoros, pero el modelo solo golpea directamente a los productores. La DIRECCIÓN sale
- *    igual por los dos caminos; la magnitud no.
+ * 5. NADA DE MAGNITUDES CON LA CONTAMINACIÓN: el modelo solo sigue la falta de alimento y
+ *    deja fuera la biomagnificación (hallazgo 1607), que con un contaminante persistente
+ *    castiga más a los niveles altos. La DIRECCIÓN sale igual por los dos caminos (baja); el
+ *    orden de magnitudes, no. Por eso la contaminación solo entra en preguntas de dirección,
+ *    y su explicación termina con `AVISO_BIOMAGNIFICACION`.
+ * 6. SOLO PERTURBACIONES CON SENTIDO EN SU ECOSISTEMA (`perturbacionAplicable`): ni sequía en el
+ *    océano ni nada que el simulador no ofrezca (hallazgo 1608).
  *
  * «No cambia» nunca es correcta con intensidad > 0 en este modelo, pero se ofrece siempre como
  * opción: es el error típico («los productores no se enteran de que se caza a los
@@ -45,9 +52,11 @@
 import { formatNumber } from '@/lib';
 import {
   ATENUACION,
+  AVISO_BIOMAGNIFICACION,
   ECOSISTEMAS,
   EVENTOS,
   aplicarEvento,
+  perturbacionAplicable,
   type Ecosistema,
   type Evento,
   type TipoEvento,
@@ -127,7 +136,10 @@ export interface Escenario {
   antes: readonly number[];
   /** Lo que devuelve el modelo, sin redondear. */
   modelo: readonly number[];
-  /** Lo que pinta la app: `Math.round` de lo anterior. */
+  /**
+   * Las cifras enteras: `Math.round` de lo anterior. Es lo que pinta la app en todo escenario
+   * sin la trampa 1 (en los que la tienen, el simulador añade un decimal: convenio, punto 1).
+   */
   visibles: readonly number[];
   /** Los porcentajes del panel «¿Qué está pasando?». */
   porcentajes: readonly number[];
@@ -291,15 +303,18 @@ export function comparacionDiscrimina(escenario: Escenario, a: IndiceNivel, b: I
 
 /** Por qué unos datos no sirven para un caso, o `null` si sirven. */
 export function motivoDatosInvalidos(datos: DatosCaso): string | null {
-  if (ecosistemaDe(datos.ecosistemaId) === null) return 'Ese ecosistema no existe';
+  const ecosistema = ecosistemaDe(datos.ecosistemaId);
+  if (ecosistema === null) return 'Ese ecosistema no existe';
   const evento = eventoDe(datos.eventoId);
   if (evento === null || evento.id === 'ninguno') return 'Esa perturbación no existe';
+  if (!perturbacionAplicable(ecosistema, datos.eventoId))
+    return 'Esa perturbación no tiene sentido en ese ecosistema';
   if (!esIntensidadDeCaso(datos.intensidad)) return 'Los casos solo usan intensidades del 50 % y del 70 %';
   if (!escenarioSinTrampaDeRedondeo(datos.ecosistemaId, datos.eventoId, datos.intensidad))
     return 'En este escenario el redondeo de la pantalla esconde un cambio del modelo';
   if (datos.clase === 'comparacion') {
     if (datos.eventoId === 'contaminacion')
-      return 'Con la contaminación no se comparan magnitudes: el modelo solo golpea a los productores';
+      return 'Con la contaminación no se comparan magnitudes: el modelo deja fuera la biomagnificación';
     const escenario = simularEscenario(datos.ecosistemaId, datos.eventoId, datos.intensidad);
     if (!comparacionDiscrimina(escenario, datos.nivelA, datos.nivelB))
       return 'Los dos niveles cambian casi lo mismo: la comparación no tiene respuesta inequívoca';
@@ -410,6 +425,9 @@ export function resolverCaso(datos: DatosCaso): ResultadoCaso {
     pasos.push(
       `Conclusión: los ${nombreNivel(ecosistema, n)} ${respuesta === 'sube' ? 'suben' : respuesta === 'baja' ? 'bajan' : 'no cambian'} (de ${entero(escenario.antes[n])} a ${entero(escenario.visibles[n])}).`
     );
+    // La dirección es la misma por los dos caminos, pero la magnitud que pinta el modelo no
+    // (hallazgo 1607): se dice, para que el alumno no se lleve que la cúspide es la que menos sufre.
+    if (datos.eventoId === 'contaminacion') pasos.push(AVISO_BIOMAGNIFICACION);
     return { ...comun, respuesta, pasos };
   }
 
@@ -535,10 +553,14 @@ interface Definicion {
  */
 const DEFINICIONES: readonly Definicion[] = [
   // ── Dirección: de abajo arriba ──
+  // Caso 1: hasta el 24/09/2026 era una sequía en el OCÉANO, que no tiene sentido ecológico (el
+  // fitoplancton no depende de la lluvia; hallazgo 1608). Conserva número, título, pregunta
+  // (carnívoros, dos pasos por encima del golpe), intensidad y respuesta (baja), en la sabana:
+  // 16 → 13,65 «14», barras 70 · 33 · 14 · 5.
   {
     titulo: 'La sequía llega a los carnívoros',
     categoria: 'aplicado',
-    datos: { clase: 'direccion', ecosistemaId: 'oceano', eventoId: 'sequia', intensidad: 0.5, nivel: 2 },
+    datos: { clase: 'direccion', ecosistemaId: 'sabana', eventoId: 'sequia', intensidad: 0.5, nivel: 2 },
     pista: 'La sequía no toca a los carnívoros. Pregúntate de qué comen sus presas.',
   },
   {
@@ -672,7 +694,9 @@ const RESERVA_PRACTICA: DatosDireccion = {
 /**
  * Ejercicio de dirección al azar: ecosistema, perturbación, intensidad (0,5 o 0,7) y un nivel
  * NO golpeado directamente, que es donde está el aprendizaje. Descarta los escenarios de la
- * trampa 1 y usa EL MISMO `resolverCaso` que los doce fijos: si divergieran, el alumno
+ * trampa 1 y las perturbaciones sin sentido en su ecosistema (la sequía en el océano salía en 2
+ * de cada 25 ejercicios hasta el 24/09/2026, hallazgo 1608), y usa EL MISMO `resolverCaso` que
+ * los doce fijos: si divergieran, el alumno
  * entrenaría con una regla y sería corregido con otra.
  *
  * Solo pregunta dirección, así que las respuestas correctas posibles son dos (sube / baja):

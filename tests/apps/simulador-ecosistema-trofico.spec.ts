@@ -275,7 +275,12 @@ import {
   type PerturbacionCaso,
   type IndiceNivel,
 } from '../../app/simulador-ecosistema-trofico/casos';
-import { ECOSISTEMAS, EVENTOS } from '../../app/simulador-ecosistema-trofico/motor';
+import {
+  ECOSISTEMAS,
+  EVENTOS,
+  aplicarEvento,
+  perturbacionAplicable,
+} from '../../app/simulador-ecosistema-trofico/motor';
 
 const PERTURBACIONES: readonly PerturbacionCaso[] = ['sequia', 'caza-depredador', 'plaga-herbivoro', 'contaminacion'];
 
@@ -401,6 +406,9 @@ test.describe('simulador-ecosistema-trofico · casos para clase (predicción)', 
     let comprobados = 0;
     for (const eco of ECOSISTEMAS) {
       for (const ev of PERTURBACIONES) {
+        // Desde el 24/09/2026 la sequía no se aplica en el océano (hallazgo 1608): no es un
+        // escenario válido y resolverCaso lo rechaza.
+        if (!perturbacionAplicable(eco, ev)) continue;
         for (const intensidad of [0.5, 0.7]) {
           if (!escenarioSinTrampaDeRedondeo(eco.id, ev, intensidad)) continue;
           const evento = EVENTOS.find((e) => e.id === ev)!;
@@ -417,8 +425,9 @@ test.describe('simulador-ecosistema-trofico · casos para clase (predicción)', 
         }
       }
     }
-    // 32 escenarios − 5 descartados por la trampa 1, × 3 niveles no golpeados.
-    expect(comprobados).toBe(27 * 3);
+    // 32 escenarios − 5 descartados por la trampa 1 − 2 sin sentido (océano + sequía al 50 y al
+    // 70 %, hallazgo 1608), × 3 niveles no golpeados. Hasta el 24/09/2026 eran 27 × 3.
+    expect(comprobados).toBe(25 * 3);
   });
 
   test('8 · corregir no lanza nunca, ni sin elección ni con un caso imposible', async () => {
@@ -428,8 +437,8 @@ test.describe('simulador-ecosistema-trofico · casos para clase (predicción)', 
     expect(comprobarPrediccion('sube', null).motivo).toBe('no-disponible');
     const inexistente = resolverCaso({ clase: 'direccion', ecosistemaId: 'marte', eventoId: 'sequia', intensidad: 0.5, nivel: 1 });
     expect(inexistente.ok).toBe(false);
-    // La contaminación no admite preguntas de MAGNITUD: su descripción promete golpear a los
-    // herbívoros y el modelo solo golpea a los productores.
+    // La contaminación no admite preguntas de MAGNITUD: el modelo deja fuera la
+    // biomagnificación, así que su orden de magnitudes no es el real (hallazgo 1607).
     const magnitud = resolverCaso({ clase: 'comparacion', ecosistemaId: 'pradera', eventoId: 'contaminacion', intensidad: 0.7, nivelA: 1, nivelB: 2 });
     expect(magnitud.ok).toBe(false);
   });
@@ -491,7 +500,8 @@ test.describe('simulador-ecosistema-trofico · la sección de casos en el navega
  *
  *   LOS 12 CASOS, cada uno con la respuesta que da el modelo y las barras que el alumno VE al
  *   mover él mismo los controles (no con «Cargar», que ya cubre el describe anterior):
- *     1 Océano sequía 50 %   carnívoros 14 → 11,94 «12» BAJA         [70,30,12,4]
+ *     1 Sabana sequía 50 %   carnívoros 16 → 13,65 «14» BAJA         [70,33,14,5]
+ *       (hasta el 24/09/2026 era Océano + sequía, 14 → 11,94 «12»: sin sentido ecológico, 1608)
  *     2 Pradera contam. 70 % super 5 → 4,40 «4» BAJA                 [65,30,12,4]
  *     3 Pradera caza 50 %    herbívoros 40 → 49,8 «50» SUBE          [83,50,10,4]
  *     4 Océano caza 50 %     productores 100 → 82,85 «83» BAJA       [83,47,9,4]
@@ -554,7 +564,10 @@ test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, lí
   }) => {
     test.setTimeout(120_000);
     const CASOS_A_MANO = [
-      { id: 1, eco: 'Océano', ev: 'Sequía', i: '0.5', resp: 'Baja', vis: [70, 30, 12, 4] },
+      // Caso 1 en la sabana desde el 24/09/2026 (hallazgo 1608). A mano: sequía 50 % → cambio −0,30;
+      // herbívoros 42 × 0,79 = 33,18 «33»; carnívoros 16 × (0,3 + 0,7 × 0,79) = 13,648 «14»;
+      // superdepredadores 6 × 0,8971 = 5,38 «5».
+      { id: 1, eco: 'Sabana', ev: 'Sequía', i: '0.5', resp: 'Baja', vis: [70, 33, 14, 5] },
       { id: 2, eco: 'Pradera', ev: 'Contaminación del agua', i: '0.7', resp: 'Baja', vis: [65, 30, 12, 4] },
       { id: 3, eco: 'Pradera', ev: 'Caza excesiva del depredador', i: '0.5', resp: 'Sube', vis: [83, 50, 10, 4] },
       { id: 4, eco: 'Océano', ev: 'Caza excesiva del depredador', i: '0.5', resp: 'Baja', vis: [83, 47, 9, 4] },
@@ -591,9 +604,12 @@ test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, lí
     );
   });
 
-  test('A · Océano + contaminación al 50 %: 75 / 31 / 12 / 5 y la descripción nueva (9b4e29f9)', async ({ page }) => {
+  test('A · Océano + contaminación al 50 %: 75 / 31 / 12 / 4,6 y la descripción nueva (9b4e29f9)', async ({ page }) => {
     await ponerEscenario(page, 'Océano', 'Contaminación del agua', '0.5');
-    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['75 (-25)', '31 (-7)', '12 (-2)', '5']);
+    // REESCRITO el 24/09/2026: esperaba «5» sin delta para los superdepredadores junto a un panel
+    // que dice «un 9 %», que es exactamente el hallazgo 1609 (la ficha cita este escenario).
+    // 5 × 0,91425 = 4,571: entero sería «5»; con el decimal, «4,6 (-0,4)».
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['75 (-25)', '31 (-7)', '12 (-2)', '4,6 (-0,4)']);
     await expect(page.locator('[role="status"]')).toContainText(
       'Pesticidas diezman a los productores. Los productores se han reducido un 25 %, los herbívoros un 18 %, los carnívoros un 12 % y los superdepredadores un 9 %.'
     );
@@ -665,94 +681,224 @@ test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, lí
     expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['99 (-1)', '40', '15', '5']);
   });
 
-  // ── HALLAZGOS ABIERTOS ─────────────────────────────────────────────────────────────────────
+  // ── HALLAZGOS 1607-1613, REPARADOS el 24/09/2026 ───────────────────────────────────────────
+  // Eran test.fail() que documentaban cada defecto; se reescriben como regresión en verde.
 
-  test('HALLAZGO abierto: con pesticidas en el agua, la cúspide sale como el nivel MENOS afectado y nada avisa de la biomagnificación', async ({
+  test('1607 · con pesticidas en el agua, el panel, el caso 2 y la guía avisan de la biomagnificación', async ({
     page,
   }) => {
-    // HALLAZGO abierto: pradera + contaminación 70 % → −35 / −25 / −17 / −12 %, lo contrario de
-    // la biomagnificación del DDT (Woodwell, Wurster e Isaacson, Science 1967: 0,04 ppm en el
-    // plancton, 75 ppm en una gaviota). Se pone verde si el panel lo advierte o si el modelo cambia.
-    test.fail();
+    // Pradera + contaminación 70 % → −35 / −25 / −17 / −12 %: la cascada del modelo se apaga al
+    // subir y la cúspide sale como el nivel MENOS afectado, lo contrario de la biomagnificación
+    // del DDT (Woodwell, Wurster e Isaacson, Science 156:821, 1967: 0,04 ppm en el plancton,
+    // 75 ppm en una gaviota). El modelo no se cambia (no hay dato de toxicidad que convertir en
+    // población); se AVISA en los tres sitios donde sale la contaminación.
     await ponerEscenario(page, 'Pradera', 'Contaminación del agua', '0.7');
-    const panel = (await page.locator('[role="status"]').textContent()) ?? '';
-    const barras = await leerBarras(page);
-    const caidaProductores = Math.abs(barras[0].valor - 100) / 100;
-    const caidaCuspide = Math.abs(barras[3].valor - 5) / 5;
-    expect(/biomagnific|bioacumul/i.test(panel) || caidaCuspide >= caidaProductores).toBe(true);
+    const panel = page.locator('[role="status"]');
+    await expect(panel).toContainText(
+      'los herbívoros un 25 %, los carnívoros un 17 % y los superdepredadores un 12 %.'
+    );
+    await expect(panel).toContainText('deja fuera la biomagnificación');
+    await expect(panel).toContainText('los superdepredadores suelen acumular las dosis más altas');
+    // Sin contaminación, el panel no lo menciona (no es un aviso genérico).
+    await ponerEscenario(page, 'Pradera', 'Sequía', '0.7');
+    await expect(panel).not.toContainText('biomagnificación');
+
+    // Caso 2 (pradera + contaminación 70 %, superdepredadores → baja): la explicación termina con el aviso.
+    await seccion(page).getByRole('button', { name: /^Caso 2:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Baja' }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto! La respuesta es «Baja»');
+    await seccion(page).getByRole('button', { name: /Ver por qué pasa/ }).click();
+    await expect(seccion(page).locator('ol li').last()).toContainText('deja fuera la biomagnificación');
+
+    // La guía lo explica con la fuente y la cifra del abstract del artículo.
+    const texto = await page.evaluate(() => document.body.textContent ?? '');
+    expect(texto).toContain('desde 0,04 partes por millón en el plancton hasta 75 en una gaviota');
+    expect(texto).toContain('Woodwell, Wurster e Isaacson');
   });
 
-  test('HALLAZGO abierto: el caso 1 plantea una sequía («falta de lluvia») que diezma al fitoplancton del océano', async ({
+  test('1608 · el caso 1 ya no es una sequía en el océano, el simulador no la ofrece y la práctica no la genera', async ({
     page,
   }) => {
-    // HALLAZGO abierto: escenario sin sentido ecológico en un caso FIJO para asignar en clase.
-    test.fail();
-    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
-    const enunciado =
-      (await seccion(page).locator('p[aria-live="polite"][aria-atomic="true"]').textContent()) ?? '';
-    expect(enunciado).not.toMatch(/Océano[\s\S]*falta de lluvia/);
+    // El fitoplancton no depende de la lluvia (luz y nutrientes). El caso 1 conserva número,
+    // título, pregunta y respuesta en la sabana: carnívoros 16 → 13,65 «14», baja.
+    await seccion(page).getByRole('button', { name: /^Caso 1: La sequía llega a los carnívoros/ }).click();
+    const enunciado = seccion(page).locator('p[aria-live="polite"][aria-atomic="true"]');
+    await expect(enunciado).toContainText('En el ecosistema Sabana se aplica la perturbación «Sequía» con una intensidad del 50 %');
+    await expect(enunciado).toContainText('¿qué les pasa a los carnívoros?');
+    await seccion(page).getByRole('radio', { name: 'Baja' }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto! La respuesta es «Baja»');
+
+    // En el océano no hay botón «Sequía» y se dice por qué; en la sabana, sí.
+    const perturbaciones = page.getByRole('group', { name: 'Seleccionar perturbación' });
+    await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Océano', exact: true }).click();
+    await expect(perturbaciones.getByRole('button', { name: 'Sequía', exact: true })).toHaveCount(0);
+    await expect(perturbaciones.getByRole('button')).toHaveCount(4);
+    await expect(page.getByText('En el océano no hay «Sequía»')).toBeVisible();
+    await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Sabana', exact: true }).click();
+    await expect(perturbaciones.getByRole('button', { name: 'Sequía', exact: true })).toHaveCount(1);
+    await expect(page.getByText('En el océano no hay «Sequía»')).toHaveCount(0);
+
+    // Práctica: en 500 semillas (antes salía en 2 de cada 25) ninguna sequía en el océano, y el
+    // caso válido sigue existiendo en los ecosistemas terrestres.
+    const oceanoSequia = Array.from({ length: 500 }, (_, i) => generarEjercicioAleatorio(i + 1)).filter(
+      (e) => e.datos.ecosistemaId === 'oceano' && e.datos.eventoId === 'sequia'
+    );
+    expect(oceanoSequia).toHaveLength(0);
+    expect(resolverCaso({ clase: 'direccion', ecosistemaId: 'oceano', eventoId: 'sequia', intensidad: 0.5, nivel: 2 }).ok).toBe(false);
+    for (const caso of CASOS_AULA) {
+      const eco = ECOSISTEMAS.find((e) => e.id === caso.datos.ecosistemaId)!;
+      expect(perturbacionAplicable(eco, caso.datos.eventoId), `caso ${caso.id}`).toBe(true);
+    }
   });
 
-  test('HALLAZGO abierto: la barra de superdepredadores no cambia («4») y el panel dice que se han reducido un 10 %', async ({
-    page,
-  }) => {
-    // HALLAZGO abierto: bosque + sequía al 50 % → 4 × 0,8971 = 3,59, que se pinta «4» sin delta.
-    test.fail();
+  test('1609 · barra, pirámide y panel dicen lo mismo aunque el cambio sea de menos de un individuo', async ({ page }) => {
+    // Bosque + sequía 50 %: superdepredadores 4 × 0,8971 = 3,588. Entero se pintaba «4» sin
+    // delta mientras el panel decía «un 10 %». Ahora «3,6 (-0,4)»: 0,41 / 4 = 10 %.
     await ponerEscenario(page, 'Bosque Templado', 'Sequía', '0.5');
     const barras = await leerBarras(page);
-    const panel = (await page.locator('[role="status"]').textContent()) ?? '';
-    expect(barras[3].texto === '4' && panel.includes('los superdepredadores un 10 %')).toBe(false);
+    expect(barras.map((b) => b.texto)).toEqual(['70 (-30)', '28 (-7)', '10 (-2)', '3,6 (-0,4)']);
+    expect(barras[3].valor).toBe(3.6);
+    expect(barras[3].etiqueta).toBe('Superdepredadores: 3,6 individuos relativos');
+    await expect(page.getByText('3,6 ind. rel.', { exact: true })).toBeVisible();
+    await expect(page.locator('[role="status"]')).toContainText('los superdepredadores un 10 %');
+
+    // Los cinco escenarios de intensidad 0,5/0,7 donde el entero escondía el cambio (barrido del
+    // motor, 24/09/2026). A mano, superdepredadores: pradera 5 → 4,571; bosque 4 → 3,657 (50 %)
+    // y 4 → 3,520 (70 %); océano 5 → 4,571. En los cinco, cada nivel que el panel nombra tiene delta.
+    const ESCENARIOS: [string, string, string, string[]][] = [
+      ['Pradera', 'Contaminación del agua', '0.5', ['75 (-25)', '33 (-7)', '13 (-2)', '4,6 (-0,4)']],
+      ['Bosque Templado', 'Contaminación del agua', '0.5', ['75 (-25)', '29 (-6)', '11 (-1)', '3,7 (-0,3)']],
+      ['Bosque Templado', 'Contaminación del agua', '0.7', ['65 (-35)', '26 (-9)', '10 (-2)', '3,5 (-0,5)']],
+      ['Océano', 'Contaminación del agua', '0.5', ['75 (-25)', '31 (-7)', '12 (-2)', '4,6 (-0,4)']],
+    ];
+    for (const [eco, ev, i, esperado] of ESCENARIOS) {
+      await ponerEscenario(page, eco, ev, i);
+      expect((await leerBarras(page)).map((b) => b.texto), `${eco} · ${ev} · ${i}`).toEqual(esperado);
+    }
+    // Y lo que el panel calla sigue sin delta (hallazgo 328): sequía al 1 %, herbívoros 39,83 → «40».
+    await ponerEscenario(page, 'Pradera', 'Sequía', '0.01');
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['99 (-1)', '40', '15', '5']);
   });
 
-  test('HALLAZGO abierto: la FAQ declara «matemáticamente imposible» el sexto nivel tras admitir cadenas de 4-6 eslabones', async ({
-    page,
-  }) => {
-    // HALLAZGO abierto: la regla del 10 % tratada como ley exacta; Lindeman (1942) no la llamó
-    // ley y citó eficiencias del 0,1 % al 37,5 %.
-    test.fail();
-    expect(await page.evaluate(() => document.body.textContent ?? '')).not.toContain('matemáticamente imposible');
+  test('1610 · la regla del 10 % sale como media aproximada, no como ley exacta', async ({ page }) => {
+    // Fuente: Wikipedia, «Ecological efficiency»: «Lindeman did not call it a "law" and cited
+    // ecological efficiencies ranging from 0.1% to 37.5%».
+    const texto = await page.evaluate(() => document.body.textContent ?? '');
+    expect(texto).not.toContain('matemáticamente imposible');
+    expect(texto).not.toContain('ley de Lindeman');
+    expect(texto).not.toContain('Solo el 10 % pasa al nivel siguiente');
+    expect(texto).not.toContain('Solo el 10 % queda en tejidos consumibles');
+    expect(texto).toContain('no la llamó ley y citó eficiencias desde el 0,1 % hasta el 37,5 %');
+    // La FAQ de los eslabones ya no se contradice: «no es una imposibilidad matemática».
+    expect(texto).toContain('No es una imposibilidad matemática');
+    // El FAQPage (JSON-LD) dice lo mismo que la página.
+    const faq = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' ')
+    );
+    expect(faq).toContain('Es una aproximación, no una ley exacta');
+    expect(faq).not.toContain('Propuesta por Raymond Lindeman en 1942, esta regla explica');
   });
 
-  test('HALLAZGO abierto: el paso 3 dice «algo más de un 35 %» y el modelo da exactamente 0,7 × 50 = 35 %', async ({
-    page,
-  }) => {
-    // HALLAZGO abierto: resto de la reparación del 324; con el 71 % que propone sale 34,79 %, algo MENOS.
-    test.fail();
-    expect(await page.evaluate(() => document.body.textContent ?? '')).not.toContain('algo más de un 35');
+  test('1611 · el paso 3 da el 35 % exacto que transmite el modelo, no «algo más»', async ({ page }) => {
+    // Con ATENUACION = 0,7: carnívoros −50 % (caza a 5/7 de intensidad: −0,7 × 5/7 = −0,5) →
+    // herbívoros 1 + 0,7 × 0,5 = 1,35 (+35 % exacto) → productores 1 − 0,7 × 0,35 = 0,755 (−24,5 %).
+    const pradera = ECOSISTEMAS.find((e) => e.id === 'pradera')!;
+    const caza = EVENTOS.find((e) => e.id === 'caza-depredador')!;
+    const r = aplicarEvento(pradera.niveles, caza, 5 / 7).map((n) => n.poblacion);
+    expect(r[2] / 15).toBeCloseTo(0.5, 10);
+    expect(r[1] / 40).toBeCloseTo(1.35, 10);
+    expect(r[0] / 100).toBeCloseTo(0.755, 10);
+    const texto = await page.evaluate(() => document.body.textContent ?? '');
+    expect(texto).not.toContain('algo más de un 35');
+    expect(texto).toContain('se traduce en un 35 % en el nivel de al lado y en un 24,5 % en el siguiente');
   });
 
-  test('HALLAZGO abierto: el botón de perturbación activa pone blanco sobre el teal (2,80:1)', async ({ page }) => {
-    // HALLAZGO abierto: .eventoBtnActivo = #fff sobre var(--secondary) #48A9A6 con texto de 14,4 px.
-    test.fail();
+  test('1612 · contraste ≥ 4,5:1 en los botones activos, la pirámide, las cifras y el título, en claro', async ({ page }) => {
     await page.getByRole('button', { name: 'Sequía', exact: true }).click();
-    // Fuera del botón: con el ratón encima se mide el :hover (#3A8A87, 4,07:1), no el reposo.
+    // Fuera del botón: con el ratón encima se mediría el :hover, que ahora es el mismo color.
     await page.mouse.move(0, 0);
-    expect(
-      await contrasteDe(page, '[aria-label="Seleccionar perturbación"] button[aria-pressed="true"]')
-    ).toBeGreaterThanOrEqual(4.5);
-  });
-
-  test('HALLAZGO abierto: el rótulo «Herbívoros» de la pirámide pone blanco sobre #D4A017 (2,38:1)', async ({ page }) => {
-    // HALLAZGO abierto: también «Carnívoros» 3,77:1, los ejemplos 2,10:1 y «N ind. rel.» 2,28:1.
-    test.fail();
-    expect(await contrasteDe(page, '[role="listitem"] span:text-is("Herbívoros")')).toBeGreaterThanOrEqual(4.5);
-  });
-
-  test('HALLAZGO abierto: la cifra de la barra de herbívoros va en #D4A017 sobre fondo claro (2,38:1)', async ({ page }) => {
-    // HALLAZGO abierto: color inline COLORES_NIVEL[1]; en oscuro, productores 2,87:1 y superdepredadores 2,64:1.
-    test.fail();
+    // Medido antes: 2,80:1 (perturbación, blanco sobre #48A9A6) y 4,11:1 (ecosistema, sobre #2E86AB).
+    expect(await contrasteDe(page, '[aria-label="Seleccionar perturbación"] button[aria-pressed="true"]')).toBeGreaterThanOrEqual(4.5);
+    expect(await contrasteDe(page, '[aria-label="Seleccionar ecosistema"] button[aria-pressed="true"]')).toBeGreaterThanOrEqual(4.5);
+    // Pirámide (antes: «Herbívoros» 2,38:1, sus ejemplos 2,10:1, «Carnívoros» 3,77:1). Sin opacity,
+    // que aclaraba el blanco: se comprueba aparte porque contrasteDe no la compone.
+    for (const sel of [
+      '[role="listitem"] span:text-is("Herbívoros")',
+      '[role="listitem"] span:text-is("Conejos, ratones, insectos")',
+      '[role="listitem"] span:text-is("32 ind. rel.")',
+      '[role="listitem"] span:text-is("Carnívoros")',
+      '[role="listitem"] span:text-is("Zorros, serpientes")',
+      '[role="listitem"] span:text-is("Gramíneas, hierbas")',
+      '[role="listitem"] span:text-is("Águilas, halcones")',
+    ]) {
+      expect(await contrasteDe(page, sel), sel).toBeGreaterThanOrEqual(4.5);
+      expect(await page.locator(sel).first().evaluate((el) => getComputedStyle(el).opacity), sel).toBe('1');
+    }
+    // Cifra y delta de la barra de herbívoros (antes 2,38:1 y 1,98:1): pradera + contaminación 70 % → «30 (-10)».
     await ponerEscenario(page, 'Pradera', 'Contaminación del agua', '0.7');
     expect(await contrasteDe(page, 'span[style*="color"]:has-text("30")')).toBeGreaterThanOrEqual(4.5);
+    expect(await page.locator('span[style*="color"]:has-text("30") > span').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    // Título del panel (antes 4,11:1 con var(--primary) como texto).
+    expect(await contrasteDe(page, 'h2:text-is("¿Qué está pasando?")')).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO abierto: al comprobar con el teclado, el botón desaparece y el foco cae al <body>', async ({ page }) => {
-    // HALLAZGO abierto: «Comprobar» se desmonta al bloquear la predicción y nadie recoloca el foco.
-    test.fail();
+  test('1612 · en oscuro, las cifras de las barras y el título del panel también pasan de 4,5:1', async ({ page }) => {
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await ponerEscenario(page, 'Pradera', 'Sequía', '0.5');
+    // Barras 70 · 32 · 13 · 4 (CASO 1). Antes, en oscuro: productores 2,87:1 y superdepredadores 2,64:1.
+    const cifras = page.locator('[class*="barraValor"]');
+    await expect(cifras).toHaveCount(4);
+    for (let i = 0; i < 4; i++) {
+      const ratio = await cifras.nth(i).evaluate((el) => {
+        const rgb = (c: string): number[] => (c.match(/[\d.]+/g) ?? []).map(Number);
+        const lum = (c: number[]): number => {
+          const f = (v: number): number => {
+            const s = v / 255;
+            return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+        };
+        let fondo: number[] = [255, 255, 255];
+        for (let e: Element | null = el; e; e = e.parentElement) {
+          const c = rgb(getComputedStyle(e).backgroundColor);
+          if (c.length === 3 || (c.length >= 4 && c[3] >= 1)) {
+            fondo = c;
+            break;
+          }
+        }
+        const a = lum(rgb(getComputedStyle(el).color));
+        const b = lum(fondo);
+        return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      });
+      expect(ratio, `barra ${i}`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(await contrasteDe(page, 'h2:text-is("¿Qué está pasando?")')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('1613 · al comprobar con el teclado, el foco pasa a «Cargar en el simulador», no al <body>', async ({ page }) => {
     await seccion(page).getByRole('button', { name: /^Caso 5:/ }).click();
     await seccion(page).getByRole('radio', { name: 'Baja' }).check();
     await seccion(page).getByRole('button', { name: 'Comprobar' }).focus();
     await page.keyboard.press('Enter');
     await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
-    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    await expect(seccion(page).getByRole('button', { name: /Cargar en el simulador/ })).toBeFocused();
+    // El siguiente Tab sigue el orden natural: «Ver por qué pasa».
+    await page.keyboard.press('Tab');
+    await expect(seccion(page).getByRole('button', { name: /Ver por qué pasa/ })).toBeFocused();
+
+    // Sin elegir, «Comprobar» sigue ahí y conserva el foco (no hay nada que cargar).
+    await seccion(page).getByRole('button', { name: /^Caso 6:/ }).click();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(seccion(page).getByRole('alert')).toContainText('Elige una de las tres opciones');
+    await expect(seccion(page).getByRole('button', { name: 'Comprobar' })).toBeFocused();
+
+    // Volver con la botonera a un caso ya comprobado no roba el foco: se queda en la botonera.
+    await seccion(page).getByRole('button', { name: /^Caso 5:/ }).focus();
+    await page.keyboard.press('Enter');
+    await expect(seccion(page).getByRole('button', { name: /^Caso 5:/ })).toBeFocused();
   });
 });

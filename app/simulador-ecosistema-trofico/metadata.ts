@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Qué es la regla del 10\u00A0% en ecología?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La regla del 10\u00A0% establece que solo aproximadamente el 10\u00A0% de la energía de un nivel trófico se transfiere al nivel superior; el 90\u00A0% restante se pierde como calor en la respiración celular o queda en biomasa no consumida. Propuesta por Raymond Lindeman en 1942, esta regla explica por qué las cadenas tróficas tienen pocos eslabones (habitualmente 4-5) y por qué hay muchos más productores que depredadores en cualquier ecosistema.',
+        text: 'Es una aproximación, no una ley exacta: de media, en torno al 10\u00A0% de la energía de un nivel trófico pasa a formar parte del nivel superior; el resto se pierde como calor en la respiración o queda en heces y biomasa no consumida. Se suele atribuir al trabajo de Raymond Lindeman (1942), que no la llamó ley y citó eficiencias desde el 0,1\u00A0% hasta el 37,5\u00A0%: la cifra real varía mucho entre ecosistemas. Ayuda a entender por qué las cadenas tróficas son cortas (lo habitual es que no pasen de cinco niveles) y por qué hay mucha más energía en los productores que en los depredadores.',
       },
     },
     {

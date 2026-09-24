@@ -22,11 +22,19 @@
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
 
-  /* Colores tróficos */
+  /* Colores tróficos (hallazgo 1612). Son el FONDO de la pirámide, con texto blanco encima, y
+     el relleno de las barras. Blanco sobre cada uno: 5,00 · 5,38 · 5,48 · 5,44:1. Los
+     herbívoros (#d4a017, 2,38:1) y los carnívoros (#d4621c, 3,77:1) se oscurecieron. */
   --color-productor: #3a7d44;
-  --color-herbivoro: #d4a017;
-  --color-carnivoro: #d4621c;
+  --color-herbivoro: #8a6400;
+  --color-carnivoro: #b04a0e;
   --color-superdepr: #c0392b;
+  /* Las mismas cifras como TEXTO sobre --bg-card (#FFFFFF): el mismo contraste que arriba.
+     En oscuro llevan su variante propia, porque sobre #2A2A2A los de arriba no llegan (2,6-3,0). */
+  --texto-productor: #3a7d44;
+  --texto-herbivoro: #8a6400;
+  --texto-carnivoro: #b04a0e;
+  --texto-superdepr: #c0392b;
 
   max-width: 1200px;
   margin: 0 auto;
@@ -46,6 +54,11 @@
   --text-muted: #9B9B9B;
   --border: #404040;
   --hover: #333333;
+  /* Sobre --bg-card #2A2A2A: 6,43 · 7,36 · 5,72 · 5,31:1 (hallazgo 1612). */
+  --texto-productor: #6fbf7a;
+  --texto-herbivoro: #e0b43c;
+  --texto-carnivoro: #ee8a4c;
+  --texto-superdepr: #f07b6e;
 }
 
 /* ============================================
@@ -112,15 +125,12 @@
   outline-offset: 2px;
 }
 
-.ecosistemaBtnActivo {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: white;
-}
-
+/* Fondo de marca con texto blanco: --primary-boton (5,47:1), no --primary (4,11:1). Hallazgo 1612. */
+.ecosistemaBtnActivo,
 .ecosistemaBtnActivo:hover {
-  background: #256a8a;
-  border-color: #256a8a;
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
+  color: white;
 }
 
 /* ============================================
@@ -156,15 +166,22 @@
   outline-offset: 2px;
 }
 
-.eventoBtnActivo {
-  border-color: var(--secondary);
-  background: var(--secondary);
+/* --secondary-boton (5,15:1): con --secondary eran 2,80:1, y 4,07:1 el :hover (#3a8a87). Hallazgo 1612. */
+.eventoBtnActivo,
+.eventoBtnActivo:hover {
+  border-color: var(--secondary-boton);
+  background: var(--secondary-boton);
   color: white;
 }
 
-.eventoBtnActivo:hover {
-  background: #3a8a87;
-  border-color: #3a8a87;
+/* Por qué falta una perturbación en este ecosistema (la sequía en el océano, hallazgo 1608). */
+.eventoNota {
+  max-width: 600px;
+  margin: calc(-1 * var(--spacing-sm)) auto var(--spacing-lg);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text-secondary);
 }
 
 /* ============================================
@@ -189,7 +206,7 @@
 }
 
 .intensidadLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .slider {
@@ -287,16 +304,16 @@
   line-height: 1.2;
 }
 
+/* Sin `opacity`: aclaraba el blanco hasta 2,10:1 sobre los herbívoros (hallazgo 1612). La
+   jerarquía la dan el tamaño y el peso. */
 .nivelEjemplos {
   font-size: 0.7rem;
-  opacity: 0.85;
   line-height: 1.2;
 }
 
 .nivelPob {
   font-size: 0.8rem;
   font-weight: 600;
-  opacity: 0.95;
 }
 
 /* ============================================
@@ -343,10 +360,10 @@
   font-weight: 700;
 }
 
+/* Sin `opacity` (hallazgo 1612: el delta de los herbívoros bajaba a 1,98:1). */
 .barraDelta {
   font-size: 0.8rem;
   font-weight: 500;
-  opacity: 0.8;
 }
 
 .barraTrack {
@@ -427,10 +444,11 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* --primary-texto: con --primary daba 4,11:1 en claro y 3,50:1 en oscuro (hallazgo 1612). */
 .explicacionTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -457,13 +475,15 @@
   border: 2px solid var(--primary);
   border-radius: 999px;
   background: transparent;
-  color: var(--primary);
+  /* Mismo defecto que el 1612, en el mismo módulo: --primary como texto daba ~3,9:1. */
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btnReset:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   transform: translateY(-1px);
 }
@@ -483,7 +503,7 @@
   padding: var(--spacing-md) var(--spacing-lg);
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   margin: var(--spacing-md) 0;
   font-weight: 600;
@@ -571,7 +591,8 @@
 
 .faqTip {
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  /* --secondary como texto sobre su propio tinte daba ~2,6:1; --secondary-texto, 4,79 / 5,34:1. */
+  color: var(--secondary-texto) !important;
   font-style: italic;
   padding: 0.4rem 0.6rem;
   background: rgba(72, 169, 166, 0.08);
@@ -601,7 +622,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;

@@ -25,14 +25,19 @@ export interface NivelTrofico {
   energiaPorcentaje: number;
 }
 
+export type TipoEvento = 'ninguno' | 'sequia' | 'caza-depredador' | 'plaga-herbivoro' | 'contaminacion';
+
 export interface Ecosistema {
   id: string;
   nombre: string;
   emoji: string;
   niveles: [NivelTrofico, NivelTrofico, NivelTrofico, NivelTrofico];
+  /**
+   * Perturbaciones que en este ecosistema no tienen sentido ecológico, con el motivo que se
+   * enseña en pantalla. Ni el simulador las ofrece ni los casos para clase las usan.
+   */
+  perturbacionesNoAplicables?: Partial<Record<TipoEvento, string>>;
 }
-
-export type TipoEvento = 'ninguno' | 'sequia' | 'caza-depredador' | 'plaga-herbivoro' | 'contaminacion';
 
 export interface Evento {
   id: TipoEvento;
@@ -78,6 +83,13 @@ export const ECOSISTEMAS: Ecosistema[] = [
       { nombre: 'Carnívoros', emoji: '🐟', ejemplos: 'Peces medianos, calamares', poblacion: 14, energiaPorcentaje: 1 },
       { nombre: 'Superdepredadores', emoji: '🦈', ejemplos: 'Tiburones, atunes, delfines', poblacion: 5, energiaPorcentaje: 0.1 },
     ],
+    // Hasta el 24/09/2026 el océano admitía la «Sequía» («la falta de lluvia reduce
+    // drásticamente los productores»), y el caso 1 para clase la usaba: la producción del
+    // fitoplancton depende de la luz y de los nutrientes, no de la lluvia (hallazgo 1608).
+    perturbacionesNoAplicables: {
+      sequia:
+        'En el océano no hay «Sequía»: la producción del fitoplancton la limitan la luz y los nutrientes (nitratos, fosfatos, hierro…), no la lluvia.',
+    },
   },
   {
     id: 'sabana',
@@ -103,8 +115,29 @@ export const EVENTOS: Evento[] = [
   // Hasta el 23/09/2026 decía «diezman a los productores y herbívoros», pero el modelo solo
   // golpea a los productores (nivelAfectado: 0): los herbívoros bajan por la cascada, como en
   // la sequía. Se alineó el TEXTO al modelo, no al revés, para no mover el acta del Inspector.
+  // ⚠️ El modelo solo sigue la FALTA DE ALIMENTO y deja fuera la biomagnificación, que con un
+  // contaminante persistente golpea más cuanto más arriba (hallazgo 1607). No se calcula —no
+  // hay un dato de toxicidad que convertir en población—, pero se AVISA donde sale, con el
+  // MISMO texto (AVISO_BIOMAGNIFICACION, abajo): en el panel «¿Qué está pasando?», en la
+  // explicación de los casos para clase y, con su fuente, en la guía.
   { id: 'contaminacion', nombre: 'Contaminación del agua', descripcion: 'Pesticidas diezman a los productores', nivelAfectado: 0, impacto: -0.5 },
 ];
+
+/**
+ * Lo que el modelo NO calcula de la contaminación (hallazgo 1607). La cascada que pinta el
+ * simulador se apaga al subir, así que la cúspide sale como el nivel MENOS afectado; con un
+ * contaminante persistente la concentración crece a cada nivel. Fuente del dato: Woodwell,
+ * Wurster e Isaacson, «DDT residues in an east coast estuary», Science 156:821-824 (1967):
+ * «concentrations of DDT increasing with trophic level through more than three orders of
+ * magnitude from 0.04 part per million in plankton to 75 parts per million in a ring-billed gull».
+ */
+export const AVISO_BIOMAGNIFICACION =
+  'Ojo: este modelo solo sigue la falta de alimento y deja fuera la biomagnificación. Con un contaminante persistente, como el DDT, la concentración del tóxico aumenta a cada nivel que sube, así que en la realidad los superdepredadores suelen acumular las dosis más altas aunque aquí salgan como el nivel menos afectado.';
+
+/** ¿Tiene sentido ecológico aplicar esta perturbación en este ecosistema? (hallazgo 1608) */
+export function perturbacionAplicable(ecosistema: Ecosistema, eventoId: TipoEvento): boolean {
+  return ecosistema.perturbacionesNoAplicables?.[eventoId] === undefined;
+}
 
 /**
  * Cuánto del cambio de un nivel llega al de al lado.
