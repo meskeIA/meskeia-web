@@ -1,5 +1,29 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { VEREDICTOS, type VeredictoKey } from './motor';
+
+/** Las funciones reales de la app: alimentan la meta schema:WebApplication y el JSON-LD (§1.ter;
+ *  el JSON-LD salía con "featureList": [], hallazgo 1523). */
+const FUNCIONES = [
+  'Test de 10 preguntas sobre la vivienda, la zona y lo que quieres proteger',
+  'Orientación entre cobertura básica, multirriesgo estándar o multirriesgo completa',
+  'Distingue propietario con o sin hipoteca, inquilino y vivienda alquilada a otros',
+  'Contempla segundas residencias y viviendas vacías',
+  'Coberturas incluidas y recomendadas según lo que declaras',
+  'Avisa cuando lo declarado (precio, objetos de valor) no encaja con la cobertura',
+  'Explica la regla proporcional del infraseguro con un ejemplo',
+  '100% en el navegador, sin registro',
+];
+
+/** El FAQPage describe los MISMOS niveles y precios que la pantalla (hallazgo 1516, forma h). */
+const enumerar = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} y ${xs[xs.length - 1]}`);
+const incluye = (k: VeredictoKey) =>
+  enumerar(VEREDICTOS[k].coberturaIncluida.filter((i) => !i.texto.startsWith('Todo lo de')).map((i) => i.texto.charAt(0).toLowerCase() + i.texto.slice(1)));
+const RESPUESTA_NIVELES =
+  `En este test, la cobertura básica incluye ${incluye('basica')}. La multirriesgo estándar añade ${incluye('estandar')}. ` +
+  `La completa, además, ${incluye('completa')}. Como horquilla orientativa (estimación de meskeIA para una vivienda media en España): ` +
+  `${VEREDICTOS.basica.precioOrientativo} la básica, ${VEREDICTOS.estandar.precioOrientativo} la estándar y ${VEREDICTOS.completa.precioOrientativo} la completa; ` +
+  'el precio real depende del capital asegurado, la zona, la vivienda y la aseguradora. Quien vive de alquiler no asegura el continente, que es del propietario: le basta el contenido y la responsabilidad civil.';
 
 export const metadata: Metadata = {
   title: 'Selector de Seguro de Hogar — ¿Qué cobertura necesitas? | meskeIA',
@@ -43,16 +67,7 @@ export const metadata: Metadata = {
       name: 'Selector de Seguro de Hogar',
       description: 'Test orientativo para determinar qué tipo de seguro de hogar conviene según tipo de vivienda, régimen de tenencia, zona geográfica, valor del contenido y prioridades del usuario.',
       url: 'https://meskeia.com/selector-seguro-hogar/',
-      features: [
-        'Test de 10 preguntas sobre vivienda y perfil',
-        '3 niveles de cobertura analizados',
-        'Considera régimen propietario/inquilino',
-        'Análisis de zona y riesgos',
-        'Coberturas recomendadas detalladas',
-        '100% en el navegador, sin registro',
-        'Gratuito y sin publicidad',
-        'En español',
-      ],
+      features: FUNCIONES,
     })),
   },
 };
@@ -62,7 +77,7 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber qué tipo de seguro de hogar te conviene: cobertura básica, multirriesgo estándar o completa. Según vivienda, zona, contenido y prioridades.",
   url: "https://meskeia.com/selector-seguro-hogar/",
   category: 'FinanceApplication',
-  features: [],
+  features: FUNCIONES,
 });
 
 export const faqJsonLd = {
@@ -74,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Qué cubre un seguro de hogar básico y en qué se diferencia de un multirriesgo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un seguro básico cubre únicamente el continente (estructura del edificio) frente a incendios y daños por agua principales. Un multirriesgo estándar amplía la protección al contenido (muebles, electrodomésticos), responsabilidad civil frente a terceros, robo y averías eléctricas. El multirriesgo completo añade coberturas como rotura de cristales, defensa jurídica, asistencia en el hogar 24h y daños estéticos. La diferencia de precio entre niveles suele ser de 50-150 € anuales.',
+        text: RESPUESTA_NIVELES,
       },
     },
     {

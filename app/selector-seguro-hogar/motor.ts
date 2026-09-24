@@ -2,16 +2,23 @@
  * Motor de selector-seguro-hogar.
  *
  * Vive aparte, sin dependencias, para poder enumerar todas las combinaciones de respuestas sin
- * navegador: mismo patrón que `app/selector-mascota/motor.ts` (commit 934e57bc). Las preguntas,
- * sus puntos y los umbrales (básica hasta 10, estándar hasta 20, completa desde 21) son los
- * MISMOS que tenía la página.
+ * navegador: mismo patrón que `app/selector-mascota/motor.ts` (commit 934e57bc). Los umbrales
+ * (básica hasta 10, estándar hasta 20, completa desde 21) son los MISMOS que tenía la página.
  *
- * Aquí no hay empates que deshacer: es UNA puntuación contra dos umbrales. Lo que cambia son
- * las razones. Antes cada cobertura traía cuatro fijas, y a quien salía «completa» sin un solo
- * objeto de valor y en pleno centro urbano le decía «Tienes objetos de valor que requieren
- * cobertura específica» y «Vives en zona con riesgos específicos (inundación, incendio
- * forestal, robo)». Ahora se citan las respuestas que más han sumado, y aparte las que no han
- * sumado nada, con la puntuación y los umbrales a la vista.
+ * Es UNA puntuación contra dos umbrales. La reparación del 24/09/2026 (hallazgos 1513-1527)
+ * separa lo que el usuario DECLARA como situación de lo que es una preferencia:
+ *
+ *   · FILTRO: ser inquilino/a. La propia opción dice «Solo necesitas asegurar el contenido y RC»:
+ *     el continente es del propietario y el inquilino no tiene interés asegurable en él (art. 25
+ *     de la Ley 50/1980 de Contrato de Seguro). Las fichas ya no le mandan valorar ni asegurar el
+ *     continente, y el precio se lo dice (1513).
+ *   · PESO CON AVISO: «El precio más bajo posible» es una PRIORIDAD entre tres, no un tope: la app
+ *     no pregunta cuánto se puede pagar, y bajar de nivel a quien tiene hipoteca, zona de riesgo y
+ *     objetos de valor lo dejaría sin cubrir lo que acaba de declarar. Se mantiene como peso, pero
+ *     si la orientación no es la básica se dice a la cara, con lo que costaría cada nivel (1514).
+ *   · AVISOS de lo declarado que la ficha no cubre: objetos de valor con la básica (1515), y las
+ *     dos situaciones que antes no se podían declarar: vivienda que se alquila a otros y vivienda
+ *     no habitual (segunda residencia o vacía) (1521).
  */
 
 export type VeredictoKey = 'basica' | 'estandar' | 'completa';
@@ -38,6 +45,9 @@ export const PREGUNTAS: Pregunta[] = [
       { valor: 'propietario_hipoteca', etiqueta: 'Propietario/a con hipoteca vigente', descripcion: 'El banco suele exigir un seguro mínimo', puntos: 3 },
       { valor: 'propietario_libre', etiqueta: 'Propietario/a sin hipoteca', descripcion: 'Libre de elegir la cobertura', puntos: 2 },
       { valor: 'inquilino', etiqueta: 'Inquilino/a', descripcion: 'Solo necesitas asegurar el contenido y RC', puntos: 0 },
+      // Antes no se podía declarar (hallazgo 1521): el arrendador asegura el continente y su RC,
+      // no las pertenencias de quien vive en la vivienda.
+      { valor: 'arrendador', etiqueta: 'Propietario/a de una vivienda que alquilo a otros', descripcion: 'Aseguras el continente y tu RC; el contenido es de quien vive en ella', puntos: 2 },
     ],
   },
   {
@@ -98,6 +108,9 @@ export const PREGUNTAS: Pregunta[] = [
       { valor: 'pareja', etiqueta: 'Dos personas (pareja, compañeros...)', descripcion: 'Uso normal del hogar', puntos: 1 },
       { valor: 'familia', etiqueta: 'Familia con hijos menores', descripcion: 'Más actividad, más probabilidad de accidentes domésticos', puntos: 2 },
       { valor: 'compartido', etiqueta: 'Piso compartido con varias personas', descripcion: 'Mayor rotación y uso del espacio', puntos: 2 },
+      // Antes no se podía declarar (hallazgo 1521), aunque el FAQ da la «vivienda vacacional o no
+      // habitual» como uno de los factores que más encarecen la prima.
+      { valor: 'nadie', etiqueta: 'Nadie de forma habitual (segunda residencia o vivienda vacía)', descripcion: 'Sin nadie dentro, un siniestro puede tardar en descubrirse', puntos: 2 },
     ],
   },
   {
@@ -141,47 +154,58 @@ export const PREGUNTAS: Pregunta[] = [
     icono: '🎯',
     texto: '¿Qué priorizas al elegir un seguro de hogar?',
     opciones: [
-      { valor: 'precio', etiqueta: 'El precio más bajo posible', descripcion: 'Cobertura mínima obligatoria', puntos: 0 },
+      // Antes: «Cobertura mínima obligatoria», también a inquilinos y a propietarios sin hipoteca.
+      // El seguro de daños solo es exigible sobre el inmueble hipotecado (RD 716/2009, art. 10.1),
+      // y el FAQ de la misma página dice que para el inquilino no es obligatorio (hallazgo 1520).
+      { valor: 'precio', etiqueta: 'El precio más bajo posible', descripcion: 'Pagar lo menos posible, aunque cubra menos', puntos: 0 },
       { valor: 'equilibrio', etiqueta: 'Equilibrio cobertura-precio', descripcion: 'Bien cubierto sin excesos', puntos: 1 },
       { valor: 'completo', etiqueta: 'La cobertura más amplia posible', descripcion: 'Tranquilidad total aunque cueste más', puntos: 3 },
     ],
   },
 ];
 
-export const VEREDICTOS: Record<VeredictoKey, {
+/** Un elemento de ficha. `continente`: solo tiene sentido para quien asegura el inmueble (no el
+ *  inquilino). `inquilino`: lo que se dice en su lugar al inquilino, si hay algo que decir. */
+interface ItemFicha { texto: string; continente?: true; inquilino?: string }
+
+interface Ficha {
   icono: string;
   etiqueta: string;
   titulo: string;
   descripcion: string;
   precioOrientativo: string;
   precioNota: string;
-  coberturaIncluida: string[];
-  coberturaRecomendada: string[];
-  consejos: string[];
-}> = {
+  coberturaIncluida: ItemFicha[];
+  coberturaRecomendada: ItemFicha[];
+  consejos: ItemFicha[];
+}
+
+const NOTA_ESTIMACION = 'Horquilla orientativa (estimación de meskeIA) para una vivienda media en España: el precio final depende del capital asegurado, la zona, la vivienda y la aseguradora.';
+
+export const VEREDICTOS: Record<VeredictoKey, Ficha> = {
   basica: {
     icono: '🛡️',
     etiqueta: 'Tipo de cobertura recomendada',
     titulo: 'Cobertura Básica',
     descripcion: 'Tu perfil no requiere una cobertura muy amplia. Una póliza básica que cubra los daños más frecuentes y la responsabilidad civil te dará tranquilidad sin gastar de más.',
     precioOrientativo: '100 – 200 €/año',
-    precioNota: 'Orientativo para piso medio en España. Precio final depende de la aseguradora y características.',
+    precioNota: NOTA_ESTIMACION,
     coberturaIncluida: [
-      'Incendio y explosión',
-      'Daños por agua (tuberías propias)',
-      'Responsabilidad civil frente a terceros',
-      'Robo con fuerza en el inmueble',
-      'Fenómenos eléctricos',
+      { texto: 'Incendio y explosión' },
+      { texto: 'Daños por agua (tuberías propias)' },
+      { texto: 'Responsabilidad civil frente a terceros' },
+      { texto: 'Robo con fuerza en el inmueble' },
+      { texto: 'Fenómenos eléctricos' },
     ],
     coberturaRecomendada: [
-      'Asistencia en el hogar 24h (reparaciones urgentes)',
-      'Defensa jurídica básica',
+      { texto: 'Asistencia en el hogar 24h (reparaciones urgentes)' },
+      { texto: 'Defensa jurídica básica' },
     ],
     consejos: [
-      'Comprueba que el capital del continente está actualizado si eres propietario',
-      'La RC a terceros es imprescindible: una fuga tuya puede causar daños cuantiosos',
-      'Revisa la póliza anualmente — los precios y necesidades cambian',
-      'Aunque el seguro sea básico, lee bien las exclusiones',
+      { texto: 'Comprueba que el capital del continente está actualizado: es el coste de reconstruir la vivienda, sin el suelo', continente: true },
+      { texto: 'La RC a terceros es imprescindible: una fuga tuya puede causar daños cuantiosos' },
+      { texto: 'Revisa la póliza anualmente — los precios y necesidades cambian' },
+      { texto: 'Aunque el seguro sea básico, lee bien las exclusiones' },
     ],
   },
   estandar: {
@@ -190,66 +214,87 @@ export const VEREDICTOS: Record<VeredictoKey, {
     titulo: 'Multirriesgo Estándar',
     descripcion: 'Tu situación aconseja una póliza multirriesgo que va más allá de lo básico. Protección completa contra los riesgos más frecuentes y algunos específicos de tu caso.',
     precioOrientativo: '200 – 400 €/año',
-    precioNota: 'Orientativo para hogar medio en España. El precio varía según capitales asegurados y aseguradora.',
+    precioNota: NOTA_ESTIMACION,
     coberturaIncluida: [
-      'Todo lo de la cobertura básica',
-      'Daños por agua de comunidad y vecinos',
-      'Robo y expoliación (también fuera del hogar)',
-      'Fenómenos atmosféricos (granizo, viento, nieve)',
-      'Asistencia en el hogar 24h',
-      'Defensa jurídica',
+      { texto: 'Todo lo de la cobertura básica' },
+      { texto: 'Daños por agua de comunidad y vecinos' },
+      { texto: 'Robo y expoliación (también fuera del hogar)' },
+      { texto: 'Fenómenos atmosféricos (granizo, viento, nieve)' },
+      { texto: 'Asistencia en el hogar 24h' },
+      { texto: 'Defensa jurídica' },
     ],
     coberturaRecomendada: [
-      'Objetos de valor con capital específico',
-      'Daños estéticos si el piso es relativamente moderno',
-      'Seguro de hogar vacacional si tienes segunda residencia',
+      { texto: 'Objetos de valor con capital específico' },
+      { texto: 'Daños estéticos si el piso es relativamente moderno', continente: true },
+      { texto: 'Seguro de hogar vacacional si tienes segunda residencia' },
     ],
     consejos: [
-      'Declara correctamente el valor del contenido — el infraseguro te perjudica',
-      'Pregunta por el capital de robo: algunos básicos tienen límites muy bajos',
-      'La asistencia 24h es de las coberturas más usadas — valórala bien',
-      'Compara al menos 3 presupuestos antes de decidir',
+      { texto: 'Declara correctamente el valor del contenido — el infraseguro te perjudica' },
+      { texto: 'Pregunta por el capital de robo: algunos básicos tienen límites muy bajos' },
+      { texto: 'La asistencia 24h es de las coberturas más usadas — valórala bien' },
+      { texto: 'Compara al menos 3 presupuestos antes de decidir' },
     ],
   },
   completa: {
     icono: '⭐',
     etiqueta: 'Tipo de cobertura recomendada',
     titulo: 'Multirriesgo Completa',
-    descripcion: 'Tu perfil justifica la cobertura más amplia disponible. Ya sea por el valor de la vivienda, el contenido, la zona de riesgo o tus prioridades, una póliza completa te dará la máxima tranquilidad.',
+    // Antes: «Ya sea por el valor de la vivienda [que la app no pregunta], el contenido, la zona de
+    // riesgo o tus prioridades», también a quien había elegido el precio más bajo (1513, 1514).
+    // La descripción de la pantalla la compone calcularResultado con lo que ha pesado.
+    descripcion: 'Tu perfil justifica la cobertura más amplia disponible.',
     precioOrientativo: '400 – 800 €/año',
-    precioNota: 'Orientativo para hogar con contenido de valor en España. Puede variar significativamente según el caso.',
+    precioNota: NOTA_ESTIMACION,
     coberturaIncluida: [
-      'Todo lo de la cobertura estándar',
-      'Daños estéticos y ornamentales',
-      'Objetos de especial valor (joyería, obras de arte, colecciones)',
-      'Protección jurídica amplia',
-      'Responsabilidad civil ampliada',
-      'Todo riesgo accidental del contenido',
+      { texto: 'Todo lo de la cobertura estándar' },
+      { texto: 'Daños estéticos y ornamentales', continente: true },
+      { texto: 'Objetos de especial valor (joyería, obras de arte, colecciones)' },
+      { texto: 'Protección jurídica amplia' },
+      { texto: 'Responsabilidad civil ampliada' },
+      { texto: 'Todo riesgo accidental del contenido' },
     ],
     coberturaRecomendada: [
-      'Valoración pericial del continente y contenido',
-      'Cobertura específica de equipos electrónicos portátiles',
-      'Seguro de segunda residencia o de alquiler (arriendo) si procede',
+      { texto: 'Valoración pericial del continente y contenido', continente: true, inquilino: 'Tasación del contenido y de los objetos de valor' },
+      { texto: 'Cobertura específica de equipos electrónicos portátiles' },
+      { texto: 'Seguro de segunda residencia o de alquiler (arriendo) si procede' },
     ],
     consejos: [
-      'Solicita una valoración profesional del continente para asegurarlo correctamente',
-      'Los objetos de valor especial (joyas, arte) suelen necesitar tasación y declaración expresa',
-      'Lee las condiciones de indemnización: valor venal vs valor nuevo hace mucha diferencia',
-      'Revisa si tu póliza cubre daños durante obras o reformas',
+      { texto: 'Solicita una valoración profesional del continente para asegurarlo correctamente', continente: true, inquilino: 'Haz un inventario del contenido y, si tienes objetos de valor, pide su tasación para fijar bien el capital' },
+      { texto: 'Los objetos de valor especial (joyas, arte) suelen necesitar tasación y declaración expresa' },
+      { texto: 'Lee las condiciones de indemnización: valor venal vs valor nuevo hace mucha diferencia' },
+      { texto: 'Revisa si tu póliza cubre daños durante obras o reformas', continente: true },
     ],
   },
 };
+
+/** La ficha que ve ESTE perfil, ya filtrada por lo que ha declarado. */
+export interface FichaResuelta {
+  descripcion: string;
+  precioNota: string;
+  coberturaIncluida: string[];
+  coberturaRecomendada: string[];
+  consejos: string[];
+}
 
 export interface Resultado {
   veredicto: VeredictoKey;
   puntuacion: number;
   /** Las respuestas que más han sumado, de más a menos. */
   razones: string[];
-  /** Las que no han sumado nada. */
+  /** Las que no han sumado nada: TODAS (antes se cortaban en tres y la prioridad desaparecía, 1514). */
   sinPeso: string[];
+  ficha: FichaResuelta;
+  /** Lo declarado que la cobertura recomendada no recoge, dicho a la cara (role="note"). */
+  avisos: string[];
 }
 
 const enLetra = (n: number) => `${n} ${n === 1 ? 'punto' : 'puntos'}`;
+const enumerar = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} y ${xs[xs.length - 1]}`);
+
+/** Resuelve una lista de la ficha para el régimen declarado. */
+function resolver(items: ItemFicha[], inquilino: boolean): string[] {
+  return items.flatMap((it) => (it.continente && inquilino ? (it.inquilino ? [it.inquilino] : []) : [it.texto]));
+}
 
 export function calcularResultado(respuestas: Record<string, string>): Resultado {
   let puntuacion = 0;
@@ -268,10 +313,48 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
   else if (puntuacion <= UMBRAL_ESTANDAR) veredicto = 'estandar';
   else veredicto = 'completa';
 
-  const razones = suman
-    .sort((a, b) => b.puntos - a.puntos || a.i - b.i)
-    .slice(0, 3)
-    .map((s) => `${s.categoria}: «${s.etiqueta}» suma ${enLetra(s.puntos)}.`);
+  const ordenadas = [...suman].sort((a, b) => b.puntos - a.puntos || a.i - b.i);
+  const razones = ordenadas.slice(0, 3).map((s) => `${s.categoria}: «${s.etiqueta}» suma ${enLetra(s.puntos)}.`);
 
-  return { veredicto, puntuacion, razones, sinPeso: noSuman.slice(0, 3) };
+  // ─ La ficha de ESTE perfil ─
+  const base = VEREDICTOS[veredicto];
+  const inquilino = respuestas.regimen === 'inquilino';
+  // Las categorías van en mayúsculas de título («Valor del Contenido»): en la frase, en minúscula.
+  const pesa = enumerar(ordenadas.slice(0, 2).map((s) => s.categoria.toLowerCase()));
+  const descripcion = veredicto === 'completa' && pesa ? `${base.descripcion} Lo que más ha pesado: ${pesa}.` : base.descripcion;
+  const precioNota = inquilino
+    ? `${base.precioNota} Las horquillas son de pólizas con continente: una de inquilino, solo con contenido y responsabilidad civil, asegura menos capital y su prima es menor.`
+    : base.precioNota;
+  const ficha: FichaResuelta = {
+    descripcion,
+    precioNota,
+    coberturaIncluida: resolver(base.coberturaIncluida, inquilino),
+    coberturaRecomendada: resolver(base.coberturaRecomendada, inquilino),
+    consejos: resolver(base.consejos, inquilino),
+  };
+
+  // ─ Avisos ─
+  const avisos: string[] = [];
+  if (respuestas.prioridad === 'precio' && veredicto !== 'basica') {
+    avisos.push(
+      `Has dicho que priorizas el precio más bajo posible, pero por tus respuestas la orientación es la ${base.titulo.toLowerCase()} (${base.precioOrientativo}, estimación de meskeIA). Si contratas solo la cobertura básica (${VEREDICTOS.basica.precioOrientativo}), revisa en «Coberturas incluidas» lo que dejarías fuera, sobre todo lo que tiene que ver con lo que más ha sumado: ${pesa}.`,
+    );
+  }
+  if ((respuestas.objetos_valor === 'algo' || respuestas.objetos_valor === 'mucho') && veredicto === 'basica') {
+    avisos.push(
+      'Has declarado objetos de especial valor, pero la cobertura básica no los incluye: pide que se declaren en la póliza con su capital (a menudo con tasación) o valora una multirriesgo que los cubra.',
+    );
+  }
+  if (respuestas.regimen === 'arrendador') {
+    avisos.push(
+      'Si alquilas la vivienda a otros, tú aseguras el continente, tu responsabilidad civil como propietario/a y, si la alquilas amueblada, tu mobiliario; las pertenencias de quien vive en ella las asegura esa persona. Díselo a la aseguradora al contratar: que la vivienda esté alquilada influye en la valoración del riesgo y hay que declararlo (art. 10 de la Ley 50/1980 de Contrato de Seguro).',
+    );
+  }
+  if (respuestas.convivientes === 'nadie') {
+    avisos.push(
+      'Si no es tu vivienda habitual (segunda residencia o vivienda vacía), díselo a la aseguradora al contratar: influye en la valoración del riesgo y hay que declararlo (art. 10 de la Ley 50/1980 de Contrato de Seguro). Revisa además qué coberturas limita la póliza mientras la vivienda está deshabitada.',
+    );
+  }
+
+  return { veredicto, puntuacion, razones, sinPeso: noSuman, ficha, avisos };
 }

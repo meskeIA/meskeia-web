@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSeguroHogar.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { calcularResultado, PREGUNTAS, VEREDICTOS, UMBRAL_BASICA, UMBRAL_ESTANDAR, type Resultado } from './motor';
 
@@ -19,6 +19,13 @@ export default function SelectorSeguroHogar() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+
+  // Al pulsar «Ver resultado» la sección del test se desmonta con el botón que tenía el foco, y
+  // el foco caía a <body> (hallazgo 1527): se lleva al encabezado del resultado.
+  useEffect(() => {
+    if (pantalla === 'resultado') tituloResultado.current?.focus();
+  }, [pantalla]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
@@ -65,10 +72,14 @@ export default function SelectorSeguroHogar() {
         </header>
       ) : (
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu cobertura recomendada</h1>
+          <h1 className={styles.heroTitleSm} ref={tituloResultado} tabIndex={-1}>Tu cobertura recomendada</h1>
           <p className={styles.heroSubtitleSm}>{veredictoData?.titulo ?? ''}</p>
         </header>
       )}
+
+      {/* Ley de Contrato de Seguro, Consorcio de Compensación de Seguros, seguro exigido con
+          hipoteca y precios del mercado español: la app no sirve fuera de España (hallazgo 1522). */}
+      <RegionBadge variant="es-only" fuenteDelegum={false} text="Solo España: coberturas, precios y normativa de los seguros de hogar españoles (Ley de Contrato de Seguro y Consorcio de Compensación de Seguros)" />
 
       <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />
@@ -186,24 +197,33 @@ export default function SelectorSeguroHogar() {
             <span className={styles.veredictoIcon} aria-hidden="true">{veredictoData.icono}</span>
             <p className={styles.veredictoLabel}>{veredictoData.etiqueta}</p>
             <p className={styles.veredictoValor}>{veredictoData.titulo}</p>
-            <p className={styles.veredictoDesc}>{veredictoData.descripcion}</p>
+            <p className={styles.veredictoDesc}>{resultado.ficha.descripcion}</p>
           </div>
+
+          {/* Lo declarado que la cobertura recomendada no recoge, dicho a la cara y fuera de la guía
+              plegada (hallazgos 1514, 1515 y 1521). */}
+          {resultado.avisos.map((aviso) => (
+            <p key={aviso} className={styles.aviso} role="note">
+              <span aria-hidden="true">⚠️</span> {aviso}
+            </p>
+          ))}
 
           {/* Precio orientativo */}
           <p className={styles.precioRango}>{veredictoData.precioOrientativo}</p>
-          <p className={styles.precioNota}>{veredictoData.precioNota}</p>
+          <p className={styles.precioNota}>{resultado.ficha.precioNota}</p>
 
-          {/* Grid de coberturas */}
+          {/* Grid de coberturas: la ficha ya filtrada por lo declarado (al inquilino no se le manda
+              valorar ni asegurar el continente, que no es suyo: hallazgo 1513) */}
           <div className={styles.coberturaGrid}>
             <div className={styles.coberturaCard}>
               <p className={styles.coberturaTitulo}>Coberturas incluidas</p>
-              {veredictoData.coberturaIncluida.map((item, i) => (
+              {resultado.ficha.coberturaIncluida.map((item, i) => (
                 <p key={i} className={styles.coberturaItem}>{item}</p>
               ))}
             </div>
             <div className={styles.coberturaCard}>
               <p className={styles.coberturaTitulo}>También recomendamos</p>
-              {veredictoData.coberturaRecomendada.map((item, i) => (
+              {resultado.ficha.coberturaRecomendada.map((item, i) => (
                 <p key={i} className={styles.coberturaItem}>{item}</p>
               ))}
             </div>
@@ -236,7 +256,7 @@ export default function SelectorSeguroHogar() {
           {/* Antes de contratar */}
           <div className={styles.consejosSection}>
             <p className={styles.consejosTitulo}>Antes de contratar</p>
-            {veredictoData.consejos.map((consejo, i) => (
+            {resultado.ficha.consejos.map((consejo, i) => (
               <p key={i} className={styles.consejoItem}>{consejo}</p>
             ))}
           </div>
@@ -257,33 +277,52 @@ export default function SelectorSeguroHogar() {
             </p>
 
             <h3>Qué es el infraseguro y cómo evitarlo</h3>
+            {/* Antes el ejemplo medía el capital contra lo que «vale» el piso. La regla proporcional
+                (art. 30 de la Ley 50/1980) compara la suma asegurada con el valor del interés
+                asegurado, y el continente se asegura por reconstrucción sin el suelo (hallazgo 1518). */}
             <p>
-              El infraseguro ocurre cuando el capital asegurado es inferior al valor real de lo que quieres proteger.
-              En caso de siniestro, la aseguradora aplica la <em>regla proporcional</em>: si tienes asegurado el 60%
-              del valor real, solo te indemnizarán el 60% del daño, aunque el daño sea parcial.
+              El infraseguro ocurre cuando el capital asegurado es inferior al valor del interés asegurado: para el
+              continente, lo que costaría reconstruir la vivienda, sin el suelo; para el contenido, el valor de tus
+              bienes tal como lo defina la póliza. En caso de siniestro, la aseguradora aplica la <em>regla
+              proporcional</em> (art. 30 de la Ley 50/1980 de Contrato de Seguro): si tienes asegurado el 60 % de ese
+              valor, te indemnizará el 60 % del daño, aunque el daño sea parcial, salvo que la póliza la excluya.
             </p>
             <div className={styles.warningBox}>
-              <strong>Ejemplo práctico:</strong> Si tu piso vale 200.000 € pero lo tienes asegurado por 120.000 €,
-              en un incendio que cause 40.000 € de daño solo recibirás 24.000 € (60%). Actualiza el capital
-              asegurado cada pocos años y cuando hagas reformas importantes.
+              <strong>Ejemplo práctico:</strong> tu piso se vende por 200.000 €, pero reconstruirlo (sin el suelo, que
+              no se quema) costaría 150.000 €. Si lo tienes asegurado por 90.000 €, cubres el 60 % del valor de
+              reconstrucción: en un incendio con 40.000 € de daños, la aseguradora pagará 24.000 € (el 60 %). Si lo
+              aseguras por 150.000 €, no hay infraseguro y cobras los 40.000 €; asegurarlo por los 200.000 € del
+              precio de venta sería pagar prima por el suelo. Actualiza el capital asegurado cada pocos años y cuando
+              hagas reformas importantes.
             </div>
 
-            <h3>Los 5 siniestros más frecuentes en hogares españoles</h3>
+            <h3>Qué siniestros son más frecuentes en los hogares españoles</h3>
+            {/* Antes: agua 45 %, robo 20 %, incendio 15 %, fenómenos 12 % y RC 8 %, sin fuente y sumando
+                exactamente 100 (hallazgo 1517). Cifras de ICEA, nota del 25/06/2025. */}
+            <p>
+              Según ICEA (Análisis Técnico de los Seguros Multirriesgo, estadística del año 2024), el 38,2 % de los
+              siniestros de hogar fueron daños por agua, seguidos de los de asistencia, con un 15,2 %. Por importe,
+              los daños por agua supusieron el 42,4 % del total; los cristales, el 10,8 %, y los fenómenos
+              atmosféricos, el 9,3 %. Por siniestro, un incendio costó de media 3.719 €, frente a 718 € un robo.
+            </p>
             <ul>
-              <li><strong>Daños por agua (45%):</strong> Fugas, roturas de tuberías, filtraciones desde pisos superiores y comunidades. Es el siniestro más habitual y una de las coberturas más usadas.</li>
-              <li><strong>Robo (20%):</strong> Tanto en el interior como expoliación fuera del hogar. La cobertura varía mucho entre pólizas: revisa el capital máximo y las exclusiones.</li>
-              <li><strong>Incendio y explosión (15%):</strong> Menos frecuente pero potencialmente catastrófico. Suele estar incluido en todas las coberturas.</li>
-              <li><strong>Fenómenos atmosféricos (12%):</strong> Granizo, viento, nieve, rayos. El Consorcio de Compensación de Seguros cubre algunos fenómenos extraordinarios.</li>
-              <li><strong>Responsabilidad civil (8%):</strong> Daños causados a terceros (vecinos, viandantes) por descuidos o accidentes en tu vivienda.</li>
+              <li><strong>Daños por agua:</strong> fugas, roturas de tuberías, filtraciones desde pisos superiores y comunidades. Es el siniestro más habitual.</li>
+              <li><strong>Asistencia:</strong> reparaciones urgentes de fontanería, cerrajería o electricidad; es la segunda causa por número de siniestros.</li>
+              <li><strong>Cristales y fenómenos atmosféricos:</strong> roturas de cristales, granizo, viento, nieve o rayos. El Consorcio de Compensación de Seguros cubre algunos fenómenos extraordinarios.</li>
+              <li><strong>Incendio y explosión:</strong> potencialmente catastrófico. Suele estar incluido en todas las coberturas.</li>
+              <li><strong>Robo:</strong> tanto en el interior como expoliación fuera del hogar. La cobertura varía mucho entre pólizas: revisa el capital máximo y las exclusiones.</li>
+              <li><strong>Responsabilidad civil:</strong> daños causados a terceros (vecinos, viandantes) por descuidos o accidentes en tu vivienda.</li>
             </ul>
 
             <h3>Propietario vs inquilino: qué cubre cada uno</h3>
             <p>
-              Como <strong>propietario</strong> necesitas asegurar el continente (obligatorio si tienes hipoteca)
-              y opcionalmente el contenido y la responsabilidad civil. Como <strong>inquilino</strong>, el
+              Como <strong>propietario</strong> necesitas asegurar el continente (obligatorio si tienes hipoteca: el
+              Real Decreto 716/2009, art. 10, exige asegurar el inmueble contra daños por su valor de tasación, sin el
+              suelo) y opcionalmente el contenido y la responsabilidad civil. Como <strong>inquilino</strong>, el
               continente es responsabilidad del propietario; tú solo necesitas asegurar tu contenido y una
-              buena responsabilidad civil por daños que puedas causar. Un seguro de inquilino puede costar
-              desde 60-100 €/año y te protege de situaciones como una fuga tuya que inunde al vecino de abajo.
+              buena responsabilidad civil por daños que puedas causar. Un seguro de inquilino asegura menos capital
+              que uno con continente, así que su prima es menor, y te protege de situaciones como una fuga tuya que
+              inunde al vecino de abajo.
               Tanto si hablamos de alquiler como de arriendo, el reparto es el mismo: el dueño asegura el
               inmueble y quien arrienda protege sus propias pertenencias y su responsabilidad civil.
             </p>
@@ -294,7 +333,9 @@ export default function SelectorSeguroHogar() {
               <li><strong>Lee las exclusiones:</strong> Los seguros excluyen habitualmente daños por humedad ambiental, desgaste ordinario, obras sin permiso y siniestros por negligencia grave.</li>
               <li><strong>Atención a las franquicias:</strong> Algunas pólizas económicas tienen franquicias (cantidad mínima que asumes tú) de 150-300 €, lo que hace inútil reclamar siniestros pequeños.</li>
               <li><strong>Consorcio de Compensación de Seguros:</strong> Cualquier seguro de hogar en España incluye automáticamente cobertura del Consorcio para catástrofes naturales extraordinarias (terremotos, inundaciones graves, erupciones). No necesitas contratarlo por separado.</li>
-              <li><strong>Compara con agregadores:</strong> Mutua Madrileña, Mapfre, Allianz, Generali y AXA son las más grandes, pero comparadores como RACC o Acierto pueden ofrecerte mejores condiciones personalizadas.</li>
+              {/* Antes nombraba siete marcas y atribuía «mejores condiciones» a dos, en una app que promete
+                  orientar «sin sesgos comerciales» (hallazgo 1519). */}
+              <li><strong>Pide varios presupuestos:</strong> directamente a aseguradoras o a través de un mediador o un comparador, pero compara siempre las mismas coberturas y los mismos capitales, no solo la prima.</li>
             </ul>
           </EducationalSection>
 

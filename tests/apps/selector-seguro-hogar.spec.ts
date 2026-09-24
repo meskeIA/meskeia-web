@@ -19,6 +19,9 @@ import { calcularResultado, PREGUNTAS, UMBRAL_BASICA, UMBRAL_ESTANDAR } from '..
  * EL MOTOR (app/selector-seguro-hogar/motor.ts): mismas preguntas, puntos y umbrales (el
  * veredicto no cambia en ninguna de las 414.720 combinaciones). Las razones citan las
  * respuestas que más han sumado y, aparte, las que no han sumado nada.
+ *
+ * Después, el 24/09/2026, la reparación de los hallazgos 1513-1527 añadió dos opciones (1521),
+ * filtró la ficha del inquilino y añadió avisos: el test «motor» de abajo se reescribió.
  */
 
 async function esperarHidratacionBotones(page: Page): Promise<void> {
@@ -61,7 +64,8 @@ const COMPLETA_SIN_OBJETOS = [0, 1, 3, 3, 0, 2, 0, 2, 2, 2] as const;
 test('el grupo de opciones tiene radios de verdad, y aria-checked sigue al clic', async ({ page }) => {
   await abrirTest(page);
   const grupo = page.locator('[role="radiogroup"]').first();
-  await expect(grupo.locator('[role="radio"]')).toHaveCount(3);
+  // 4 desde el 24/09/2026: la pregunta 1 admite «vivienda que alquilo a otros» (hallazgo 1521).
+  await expect(grupo.locator('[role="radio"]')).toHaveCount(4);
   await expect(grupo.locator('[aria-pressed]')).toHaveCount(0);
   await expect(grupo.locator('[aria-checked="true"]')).toHaveCount(0);
   await grupo.locator('[role="radio"]').nth(2).click();
@@ -105,14 +109,20 @@ test('las razones salen de las respuestas: sin objetos de valor no se afirma que
   expect(texto).toContain('Objetos de Alto Valor: «No, nada especialmente valioso» no suma puntos.');
 });
 
-test('motor: el veredicto sigue los umbrales y las razones citan lo respondido', () => {
+test('motor: el veredicto sigue los umbrales, las razones citan lo respondido y la ficha respeta lo declarado', () => {
+  // Reescrito el 24/09/2026 (reparación de 1513-1527): la pregunta 1 admite ahora «vivienda que
+  // alquilo a otros» y la 6 «nadie de forma habitual» (1521), así que son 4·4·4·4·4·5·3·5·3·3 =
+  // 691.200 combinaciones (antes 414.720). Además de lo de antes, exige lo reparado en TODAS.
+  test.setTimeout(180_000);
   const r: Record<string, string> = {};
   const fallos: string[] = [];
   const mal = (msg: string) => { if (fallos.length < 10) fallos.push(`${JSON.stringify(r)} → ${msg}`); };
-  let total = 0;
+  const cuenta = { total: 0, inquilinos: 0, precioSinBasica: 0, objetosEnBasica: 0 };
+  // Lo que se le mandaba al inquilino sobre un continente que no es suyo (1513).
+  const CONTINENTE = /valoraci[oó]n (profesional|pericial) del continente|capital del continente|Daños estéticos|obras o reformas/i;
   const recorrer = (i: number): void => {
     if (i === PREGUNTAS.length) {
-      total++;
+      cuenta.total++;
       const res = calcularResultado(r);
       const esperado = res.puntuacion <= UMBRAL_BASICA ? 'basica' : res.puntuacion <= UMBRAL_ESTANDAR ? 'estandar' : 'completa';
       if (res.veredicto !== esperado) mal('veredicto fuera de umbral');
@@ -123,6 +133,30 @@ test('motor: el veredicto sigue los umbrales y las razones citan lo respondido',
         if (!op) mal(`cita «${citada}», no respondida`);
         else if (res.razones.includes(x) !== op.puntos > 0) mal(`«${citada}» en la lista equivocada`);
       }
+      // 1514: la prioridad declarada nunca desaparece de «Lo que no ha sumado».
+      if (r.prioridad === 'precio' && !res.sinPeso.some((x) => x.includes('El precio más bajo posible'))) mal('la prioridad «precio» no aparece');
+      const ficha = [res.ficha.descripcion, ...res.ficha.coberturaIncluida, ...res.ficha.coberturaRecomendada, ...res.ficha.consejos].join(' | ');
+      // 1513: al inquilino no se le manda valorar ni asegurar el continente, y el precio se lo dice.
+      if (r.regimen === 'inquilino') {
+        cuenta.inquilinos++;
+        if (CONTINENTE.test(ficha)) mal('continente en la ficha del inquilino');
+        if (!res.ficha.precioNota.includes('una de inquilino')) mal('precio de propietario sin aviso al inquilino');
+      }
+      // La completa ya no se justifica «por el valor de la vivienda», que la app no pregunta.
+      if (ficha.includes('valor de la vivienda')) mal('valor de la vivienda');
+      // 1514: «El precio más bajo posible» fuera de la básica lleva SIEMPRE el aviso.
+      if (r.prioridad === 'precio' && res.veredicto !== 'basica') {
+        cuenta.precioSinBasica++;
+        if (!res.avisos.some((a) => a.startsWith('Has dicho que priorizas el precio más bajo posible'))) mal('precio sin aviso');
+      }
+      // 1515: objetos de valor declarados con la básica, avisados.
+      if ((r.objetos_valor === 'algo' || r.objetos_valor === 'mucho') && res.veredicto === 'basica') {
+        cuenta.objetosEnBasica++;
+        if (!res.avisos.some((a) => a.includes('la cobertura básica no los incluye'))) mal('objetos de valor sin aviso');
+      }
+      // 1521: arrendador y vivienda no habitual, avisados.
+      if (r.regimen === 'arrendador' && !res.avisos.some((a) => a.startsWith('Si alquilas la vivienda a otros'))) mal('arrendador sin aviso');
+      if (r.convivientes === 'nadie' && !res.avisos.some((a) => a.startsWith('Si no es tu vivienda habitual'))) mal('vivienda no habitual sin aviso');
       return;
     }
     for (const o of PREGUNTAS[i].opciones) {
@@ -132,18 +166,58 @@ test('motor: el veredicto sigue los umbrales y las razones citan lo respondido',
   };
   recorrer(0);
   expect(fallos).toEqual([]);
-  expect(total).toBe(414_720);
+  expect(cuenta.total).toBe(691_200);
+  // Que las comprobaciones no pasen en vacío (antes de reparar: 13.886 inquilinos en completa con
+  // continente, 16.288 + 114.494 «precio» fuera de la básica, 2.827 con objetos de valor en básica).
+  expect(cuenta.inquilinos).toBe(172_800);
+  expect(cuenta.precioSinBasica).toBeGreaterThan(0);
+  expect(cuenta.objetosEnBasica).toBeGreaterThan(0);
+});
+
+// Fuera del acta: al medir la reparación de la forma g (el foco va al h1 del resultado) se vio
+// que la barra fija de MeskeiaLogo (0-62 px en móvil) tapaba ENTERO ese h1 (32-61 px a 390 px) y
+// el principio del de la intro (48-117 px): el foco caía en un título oculto. El hero deja ahora
+// 80 px arriba en todos los anchos, el hueco de la plantilla (en hogar, a 1024 px el logo de
+// escritorio, hasta 77 px, tapaba también el título de la intro). Se mide la caja real del
+// TEXTO del h1 contra la del logo y la del botón de tema, en cinco anchos y en las dos pantallas.
+test('móvil y escritorio: el logo fijo y el botón de tema no tapan el título, ni en la intro ni en el resultado', async ({ page }) => {
+  const solapes: string[] = [];
+  const medir = (momento: string) => page.evaluate((m) => {
+    window.scrollTo(0, 0);
+    const h1 = document.querySelector('h1');
+    if (!h1) return [`${m}: sin h1`];
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const texto = Array.from(rango.getClientRects());
+    const fijos = Array.from(document.querySelectorAll('[class*="headerBar"] > *')).map((e) => e.getBoundingClientRect());
+    const fuera: string[] = [];
+    for (const t of texto) for (const f of fijos) {
+      if (t.left < f.right && f.left < t.right && t.top < f.bottom && f.top < t.bottom) fuera.push(`${m}: texto ${Math.round(t.top)}-${Math.round(t.bottom)} bajo ${Math.round(f.top)}-${Math.round(f.bottom)}`);
+    }
+    return fuera;
+  }, momento);
+  for (const ancho of [360, 390, 768, 1024, 1280]) {
+    await page.setViewportSize({ width: ancho, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-seguro-hogar/');
+    await esperarHidratacionBotones(page);
+    solapes.push(...(await medir(`${ancho}px intro`)));
+    await page.getByRole('button', { name: /Empezar el test/ }).click();
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await responder(page, Array(10).fill(0));
+    solapes.push(...(await medir(`${ancho}px resultado`)));
+  }
+  expect(solapes).toEqual([]);
 });
 
 /**
- * Primera inspección del Inspector (24/09/2026). Los esperados se calcularon a mano con los
- * puntos de motor.ts antes de abrir la app; los recuentos salen de enumerar las 414.720
- * combinaciones con calcularResultado (scratch del Inspector, barrido.mjs).
- *
- * Los índices de cada perfil son la posición de la opción en cada una de las 10 preguntas,
- * en el orden de la pantalla (0 = la primera).
+ * REPARACIÓN DEL 24/09/2026 de los hallazgos 1513-1527 (primera inspección del Inspector). Los que
+ * eran `test.fail()` pasan a exigir lo reparado. Los esperados se calcularon a mano con los puntos
+ * de motor.ts; los índices de cada perfil son la posición de la opción en cada una de las 10
+ * preguntas, en el orden de la pantalla (0 = la primera). Las opciones nuevas van al FINAL de su
+ * pregunta (la 1 y la 6), así que los índices de los perfiles de la inspección no cambian.
  */
-test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y contraste', () => {
+test.describe('Reparación 24/09/2026 — restricciones declaradas, FAQ, guía y contraste', () => {
   // Propietario/a sin hipoteca (2) · Piso (1) · Entre 10 y 30 años (1) · 10.000-30.000 € (2) ·
   // Centro urbano (2) · Dos personas (1) · Nada valioso (0) · Daños por agua (1) · Ninguno (0) ·
   // Equilibrio (1) = 11 → estándar. El mismo con «El precio más bajo posible» (0) = 10 → básica.
@@ -157,7 +231,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
   // «EL PRECIO MÁS BAJO POSIBLE» (0) = 24 → completa.
   const INQUILINO_PRECIO_24 = [2, 1, 3, 3, 3, 0, 2, 4, 2, 0] as const;
   // El mismo con «Menos de 10 años» (0) = 21 → completa. Con cuatro respuestas a cero antes de la
-  // prioridad, «Lo que no ha sumado» se corta en tres y la prioridad declarada desaparece.
+  // prioridad, «Lo que no ha sumado» se cortaba en tres y la prioridad declarada desaparecía.
   const INQUILINO_PRECIO_21 = [2, 1, 0, 3, 3, 0, 2, 4, 2, 0] as const;
   // Inquilino/a (0) · Estudio (0) · Menos de 10 años (0) · Menos de 10.000 € (0) · Centro urbano (2) ·
   // Solo/a (0) · «SÍ, BASTANTE VALOR ACUMULADO» (4) · Agua (1) · Ninguno (0) · Precio (0) = 7 → básica.
@@ -171,6 +245,10 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
     }
     await page.getByRole('heading', { name: 'Tu cobertura recomendada' }).waitFor();
   }
+
+  const textoResultado = async (page: Page) => (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+  const avisos = async (page: Page) =>
+    (await page.locator('p[role="note"][class*="aviso"]').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
 
   /** La guía está en el DOM aunque plegada (display: none): textContent la lee entera. Sin
    *  getByRole, que no ve lo oculto. */
@@ -187,7 +265,8 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
     return hallado;
   }
 
-  /** Contraste del color computado contra el fondo compuesto real (capas semitransparentes incluidas). */
+  /** Contraste del color computado contra el fondo compuesto real (capas semitransparentes y la
+   *  opacidad del propio texto incluidas). */
   async function contraste(page: Page, selector: string): Promise<number> {
     return page.locator(selector).first().evaluate((el) => {
       const leer = (s: string) => {
@@ -205,30 +284,33 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
       const capas: C[] = [];
       let base: C = { r: 255, g: 255, b: 255, a: 1 };
       for (let n: Element | null = el; n; n = n.parentElement) {
-        const c = leer(getComputedStyle(n).backgroundColor);
+        const estilo = getComputedStyle(n);
+        if (estilo.backgroundImage.includes('gradient')) return 0; // un degradado bajo el texto: se da por fallido
+        const c = leer(estilo.backgroundColor);
         if (c && c.a > 0) { if (c.a >= 1) { base = c; break; } capas.push(c); }
       }
       let fondo = base;
       for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
-      const tinta = sobre(leer(getComputedStyle(el).color) as C, fondo);
+      const color = leer(getComputedStyle(el).color) as C;
+      color.a *= Number(getComputedStyle(el).opacity);
+      const tinta = sobre(color, fondo);
       const [a, b] = [lum(tinta), lum(fondo)].sort((p, q) => q - p);
       return (a + 0.05) / (b + 0.05);
     });
   }
 
-  // ── Lo que funciona (pasan hoy) ───────────────────────────────────────────
+  // ── Lo que ya funcionaba ───────────────────────────────────────────────────
 
   test('la frontera de los umbrales cae donde dice la pantalla: 10 → básica, 11 → estándar, 3 → básica', async ({ page }) => {
     await verResultado(page, BASICA_10);
-    let texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    let texto = await textoResultado(page);
     expect(texto).toContain('Cobertura Básica');
     expect(texto).toContain('100 – 200 €/año');
     expect(texto).toContain('Tu puntuación es 10:');
-    // Tres ceros exactos (objetos, siniestros, prioridad): caben enteros en «Lo que no ha sumado».
     expect(texto).toContain('Prioridad al Contratar: «El precio más bajo posible» no suma puntos.');
 
     await verResultado(page, ESTANDAR_11);
-    texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    texto = await textoResultado(page);
     expect(texto).toContain('Multirriesgo Estándar');
     expect(texto).toContain('200 – 400 €/año');
     expect(texto).toContain('Tu puntuación es 11:');
@@ -236,7 +318,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
     expect(texto).toContain('Régimen de Tenencia: «Propietario/a sin hipoteca» suma 2 puntos. Valor del Contenido: «Entre 10.000 y 30.000 €» suma 2 puntos. Zona Geográfica: «Centro urbano consolidado» suma 2 puntos.');
 
     await verResultado(page, MINIMO_3);
-    texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    texto = await textoResultado(page);
     expect(texto).toContain('Cobertura Básica');
     expect(texto).toContain('Tu puntuación es 3:');
   });
@@ -263,110 +345,91 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
     await expect(aviso).toContainText('asesoramiento');
   });
 
-  // ── Hallazgos abiertos (test.fail: se pondrán rojos cuando se reparen) ─────
+  // ── Hallazgos reparados ────────────────────────────────────────────────────
 
-  test('inquilino/a: el resultado no le manda valorar ni asegurar el continente', async ({ page }) => {
-    // HALLAZGO abierto: la opción dice «Inquilino/a — Solo necesitas asegurar el contenido y RC», y la
-    // ficha fija de «completa» le aconseja «Solicita una valoración profesional del continente para
-    // asegurarlo correctamente» y le recomienda «Valoración pericial del continente y contenido».
-    // Barrido: los 13.886 perfiles de inquilino con resultado «completa» (de 138.240 inquilinos).
-    test.fail();
+  test('1513: al inquilino/a el resultado no le manda valorar ni asegurar el continente', async ({ page }) => {
+    // La opción dice «Inquilino/a — Solo necesitas asegurar el contenido y RC»; el inquilino no tiene
+    // interés asegurable en el continente (art. 25 de la Ley 50/1980). La ficha de «completa» le
+    // decía «Solicita una valoración profesional del continente…» y «Valoración pericial del
+    // continente y contenido». Ahora, en su lugar, inventario y tasación del contenido.
     await verResultado(page, INQUILINO_PRECIO_24);
-    const texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    const texto = await textoResultado(page);
     expect(texto).toContain('Multirriesgo Completa');
     expect(texto).not.toMatch(/valoraci[oó]n (profesional|pericial) del continente/i);
+    expect(texto).not.toContain('valor de la vivienda');
+    // La descripción dice lo que ha pesado (contenido y zona, 4 puntos cada una, por orden de pregunta).
+    expect(texto).toContain('Tu perfil justifica la cobertura más amplia disponible. Lo que más ha pesado: valor del contenido y zona geográfica.');
+    expect(texto).toContain('Tasación del contenido y de los objetos de valor');
+    expect(texto).toContain('una de inquilino, solo con contenido y responsabilidad civil, asegura menos capital y su prima es menor');
   });
 
-  test('«El precio más bajo posible» no acaba en la cobertura más amplia sin decirlo', async ({ page }) => {
-    // HALLAZGO abierto: la opción se describe como «Cobertura mínima obligatoria», suma 0 y no acota:
-    // de 138.240 perfiles que la eligen, 16.288 reciben «Multirriesgo Completa — la cobertura más
-    // amplia disponible … o tus prioridades», 400 – 800 €/año, y 114.494 la estándar (200 – 400);
-    // solo 7.458 la básica. La única huella es «no suma puntos», y en 12 perfiles de «completa» (este
-    // es uno) ni eso: la lista se corta en tres. Esperado (referencia de la familia): acotar o avisar.
-    test.fail();
+  test('1514: «El precio más bajo posible» fuera de la básica se dice, y la prioridad no desaparece', async ({ page }) => {
+    // Es una PRIORIDAD, no un tope (la app no pregunta cuánto se puede pagar): sigue siendo un peso,
+    // pero el aviso lo dice con los precios de los dos niveles (estimación de meskeIA).
     for (const perfil of [INQUILINO_PRECIO_24, INQUILINO_PRECIO_21]) {
       await verResultado(page, perfil);
-      const texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
-      const resto = texto.replace('Prioridad al Contratar: «El precio más bajo posible» no suma puntos.', '');
-      const acota = !texto.includes('Multirriesgo Completa');
-      const avisa = /precio más bajo|presupuesto/i.test(resto);
-      expect(acota || avisa, `perfil ${perfil.join(',')}: completa sin aviso del precio declarado`).toBe(true);
+      const texto = await textoResultado(page);
+      expect(texto).toContain('Multirriesgo Completa');
+      expect(texto, `perfil ${perfil.join(',')}`).toContain('Prioridad al Contratar: «El precio más bajo posible» no suma puntos.');
+      expect(await avisos(page)).toContain('Has dicho que priorizas el precio más bajo posible, pero por tus respuestas la orientación es la multirriesgo completa (400 – 800 €/año, estimación de meskeIA). Si contratas solo la cobertura básica (100 – 200 €/año)');
     }
   });
 
-  test('objetos de valor declarados con cobertura básica: el resultado los menciona', async ({ page }) => {
-    // HALLAZGO abierto: la opción dice «Requiere cobertura específica o valoración» y sale «Cobertura
-    // Básica», cuyas coberturas, recomendaciones y consejos no mencionan los objetos de valor; su única
-    // aparición es como razón n.º 1 de «Por qué esta cobertura». Barrido: 389 perfiles con «bastante
-    // valor» y 2.438 con «algunos artículos» salen en básica.
-    test.fail();
+  test('1515: objetos de valor declarados con la cobertura básica, avisados', async ({ page }) => {
     await verResultado(page, OBJETOS_BASICA_7);
-    const texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
-    expect(texto).toContain('Cobertura Básica');
-    const sinRazon = texto.replace(/Objetos de Alto Valor: «[^»]+» suma \d+ puntos\./, '');
-    expect(sinRazon).toMatch(/objetos de (especial |alto )?valor|joyas|tasaci[oó]n/i);
+    expect(await textoResultado(page)).toContain('Cobertura Básica');
+    expect(await avisos(page)).toContain('Has declarado objetos de especial valor, pero la cobertura básica no los incluye');
   });
 
-  test('el FAQPage describe los niveles y precios que da la pantalla', async ({ page }) => {
-    // HALLAZGO abierto: el FAQPage dice que el básico «cubre únicamente el continente» y deja la RC y el
-    // robo al estándar; la pantalla da a la básica «Responsabilidad civil frente a terceros» y «Robo con
-    // fuerza en el inmueble» (y se la recomienda a inquilinos, que no aseguran continente). Dice que la
-    // diferencia entre niveles «suele ser de 50-150 € anuales»; la pantalla da 100 – 200 / 200 – 400 /
-    // 400 – 800 €/año (saltos de 100 a 400 €).
-    test.fail();
+  test('1516: el FAQPage describe los niveles y precios que da la pantalla', async ({ page }) => {
+    // Antes: «Un seguro básico cubre únicamente el continente…» (la pantalla da a la básica la RC y el
+    // robo) y «la diferencia entre niveles suele ser de 50-150 € anuales» (la pantalla, saltos de 100
+    // a 400 €). Ahora la respuesta se compone con las mismas constantes de motor.ts.
     await verResultado(page, BASICA_10);
-    const texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
-    expect(texto).toContain('Responsabilidad civil frente a terceros');
+    expect(await textoResultado(page)).toContain('Responsabilidad civil frente a terceros');
     const faq = await jsonLd(page, 'FAQPage');
     const primera = JSON.stringify((faq.mainEntity as unknown[])[0]);
     expect(primera).not.toContain('cubre únicamente el continente');
     expect(primera).not.toContain('50-150 € anuales');
+    expect(primera).toContain('la cobertura básica incluye incendio y explosión, daños por agua (tuberías propias), responsabilidad civil frente a terceros, robo con fuerza en el inmueble y fenómenos eléctricos');
+    expect(primera).toContain('100 – 200 €/año la básica, 200 – 400 €/año la estándar y 400 – 800 €/año la completa');
   });
 
-  test('la guía no publica frecuencias de siniestro que contradicen a ICEA', async ({ page }) => {
-    // HALLAZGO abierto: «Los 5 siniestros más frecuentes»: agua 45 %, robo 20 %, incendio 15 %,
-    // fenómenos 12 %, RC 8 % (suman 100, sin fuente). ICEA (datos 2021, por número): agua 37,1 %,
-    // cristales 14,7 %, asistencia 11,2 %, daños eléctricos 9,6 %, fenómenos atmosféricos 7,6 %,
-    // robos 3,4 %; en 2024, agua 38,2 % y asistencia 15,2 %.
-    test.fail();
+  test('1517: la guía da las frecuencias de siniestro de ICEA, con su año', async ({ page }) => {
+    // ICEA, nota del 25/06/2025 (estadística del año 2024): agua 38,2 % y asistencia 15,2 % por número;
+    // por importe, agua 42,4 %, cristales 10,8 % y fenómenos atmosféricos 9,3 %; coste medio por
+    // siniestro 3.719 € el incendio y 718 € el robo. Antes: «Robo (20%)», en segundo lugar.
     await verResultado(page, BASICA_10);
     const guia = await textoGuia(page);
-    expect(guia).toContain('siniestros más frecuentes');
     expect(guia).not.toContain('Robo (20%)');
+    expect(guia).toContain('el 38,2 % de los siniestros de hogar fueron daños por agua, seguidos de los de asistencia, con un 15,2 %');
+    expect(guia).toContain('estadística del año 2024');
   });
 
-  test('el ejemplo de infraseguro compara con el valor de reconstrucción, no con lo que «vale» el piso', async ({ page }) => {
-    // HALLAZGO abierto: «Si tu piso vale 200.000 € pero lo tienes asegurado por 120.000 € … solo
-    // recibirás 24.000 €». La regla proporcional (art. 30 LCS) compara con el valor del interés
-    // asegurado; el continente se asegura por reconstrucción sin suelo, como dice la propia FAQ.
-    test.fail();
+  test('1518: el ejemplo de infraseguro compara con el valor de reconstrucción, no con el precio del piso', async ({ page }) => {
+    // Art. 30 de la Ley 50/1980: la proporción es suma asegurada / valor del interés. Reconstruir
+    // (sin suelo) 150.000 €, asegurado 90.000 € → 60 %; daño 40.000 € → 24.000 €. Asegurado por
+    // 150.000 €, sin infraseguro: los 40.000 €. El precio de venta (200.000 €) no entra en la cuenta.
     await verResultado(page, BASICA_10);
     const guia = await textoGuia(page);
-    // Hasta la cifra indemnizada (los puntos de millar impiden cortar por la primera frase).
     const inicio = guia.indexOf('Ejemplo práctico:');
     expect(inicio).toBeGreaterThanOrEqual(0);
-    const ejemplo = guia.slice(inicio, inicio + 200);
-    expect(ejemplo).toContain('200.000 €');
-    expect(ejemplo).toMatch(/reconstru/i);
+    const ejemplo = guia.slice(inicio, inicio + 600);
+    expect(ejemplo).toContain('reconstruirlo (sin el suelo, que no se quema) costaría 150.000 €');
+    expect(ejemplo).toContain('Si lo tienes asegurado por 90.000 €, cubres el 60 % del valor de reconstrucción');
+    expect(ejemplo).toContain('la aseguradora pagará 24.000 € (el 60 %)');
+    expect(ejemplo).toContain('Si lo aseguras por 150.000 €, no hay infraseguro y cobras los 40.000 €');
+    expect(guia).not.toContain('Si tu piso vale 200.000 € pero lo tienes asegurado por 120.000 €');
   });
 
-  test('la guía no recomienda aseguradoras ni comparadores por su marca', async ({ page }) => {
-    // HALLAZGO abierto: «Mutua Madrileña, Mapfre, Allianz, Generali y AXA son las más grandes, pero
-    // comparadores como RACC o Acierto pueden ofrecerte mejores condiciones», sin fuente, en una app
-    // que promete orientar «sin sesgos comerciales».
-    test.fail();
+  test('1519: la guía no recomienda aseguradoras ni comparadores por su marca', async ({ page }) => {
     await verResultado(page, BASICA_10);
     const guia = await textoGuia(page);
     expect(guia).toContain('Cómo comparar seguros');
     expect(guia).not.toMatch(/Mapfre|Allianz|Generali|AXA|Mutua Madrileña|RACC|Acierto/);
   });
 
-  test('la opción de precio no presenta como obligatoria una cobertura que no lo es', async ({ page }) => {
-    // HALLAZGO abierto: pregunta 10, «El precio más bajo posible — Cobertura mínima obligatoria», también
-    // a quien acaba de marcar «Inquilino/a» o «Propietario/a sin hipoteca». El seguro de daños solo es
-    // exigible sobre el inmueble hipotecado (RD 716/2009, art. 10); la propia FAQ dice que para el
-    // inquilino no es legalmente obligatorio.
-    test.fail();
+  test('1520: la opción de precio no presenta como obligatoria una cobertura que no lo es', async ({ page }) => {
     await abrirTest(page);
     const perfil = [2, 0, 0, 0, 0, 0, 0, 0, 0];
     for (const i of perfil) {
@@ -376,31 +439,28 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
     const precio = page.locator('[role="radio"]').first();
     await expect(precio).toContainText('El precio más bajo posible');
     await expect(precio).not.toContainText('obligatoria');
+    await expect(precio).toContainText('Pagar lo menos posible, aunque cubra menos');
   });
 
-  test('la normativa y los precios de España llevan el aviso de región', async ({ page }) => {
-    // HALLAZGO abierto: Consorcio de Compensación de Seguros, seguro exigido con hipoteca, precios «en
-    // España» en euros… y ningún RegionBadge (§1.bis). Mismo caso que el 1340 de mascota.
-    test.fail();
+  test('1522: la normativa y los precios de España llevan el aviso de región', async ({ page }) => {
     await page.goto('/selector-seguro-hogar/');
     await esperarHidratacionBotones(page);
-    await expect(page.getByRole('note', { name: /España/ })).toHaveCount(1, { timeout: 2_000 });
+    await expect(page.getByRole('note', { name: 'Aviso: esta herramienta aplica únicamente a España' })).toHaveCount(1);
+    await expect(page.locator('text=/Solo España: coberturas, precios y normativa de los seguros de hogar españoles/')).toHaveCount(1);
+    // Aplica solo a España por una ley que no es fiscal: Delegum no es la fuente de nada de lo
+    // que dice la app, así que el aviso no lo enlaza (RegionBadge fuenteDelegum={false}).
+    await expect(page.getByText('Fuente de los datos: Delegum')).toHaveCount(0);
   });
 
-  test('el JSON-LD WebApplication lista las funciones', async ({ page }) => {
-    // HALLAZGO abierto: metadata.ts exporta jsonLd con features: [] y el layout lo inyecta con
-    // "featureList":[] (§1.ter pide 4-8). Las 8 funciones solo están en la meta schema:WebApplication.
-    test.fail();
+  test('1523: el JSON-LD WebApplication lista las funciones', async ({ page }) => {
     await page.goto('/selector-seguro-hogar/');
     const app = await jsonLd(page, 'WebApplication');
-    expect((app.featureList as unknown[]).length).toBeGreaterThanOrEqual(4);
+    const funciones = app.featureList as unknown[];
+    expect(funciones.length).toBeGreaterThanOrEqual(4);
+    expect(funciones.length).toBeLessThanOrEqual(8);
   });
 
-  test('se puede declarar una segunda residencia, una vivienda vacía o un piso que se alquila a otros', async ({ page }) => {
-    // HALLAZGO abierto: ni la pregunta 1 (régimen) ni la 6 (quién vive) lo admiten, aunque la FAQ da la
-    // «vivienda vacacional o no habitual» como uno de los factores que más encarecen. El arrendador
-    // (continente + RC, sin el contenido del inquilino) tampoco tiene opción.
-    test.fail();
+  test('1521: se puede declarar una segunda residencia, una vivienda vacía o un piso que se alquila a otros', async ({ page }) => {
     await abrirTest(page);
     const opciones: string[] = [];
     for (let i = 0; i < 6; i++) {
@@ -408,24 +468,34 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
       await page.locator('[role="radio"]').first().click();
       await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
     }
-    expect(opciones.length).toBeGreaterThan(15);
-    expect(opciones.join(' | ')).toMatch(/segunda residencia|vac[ií]a|alquilo|arrendador|no habitual/i);
+    const todas = opciones.join(' | ');
+    expect(todas).toContain('Propietario/a de una vivienda que alquilo a otros');
+    expect(todas).toContain('Nadie de forma habitual (segunda residencia o vivienda vacía)');
+    // Y el resultado lo recoge: propietario que alquila (2) · piso (1) · 10-30 años (1) · 10.000-30.000 € (2) ·
+    // centro urbano (2) · NADIE de forma habitual (2) · nada valioso (0) · agua (1) · ninguno (0) ·
+    // equilibrio (1) = 12 → estándar, con los dos avisos (art. 10 de la Ley 50/1980: declarar el riesgo).
+    await verResultado(page, [3, 0, 1, 1, 0, 4, 0, 0, 0, 1]);
+    const texto = await textoResultado(page);
+    expect(texto).toContain('Multirriesgo Estándar');
+    expect(texto).toContain('Tu puntuación es 12:');
+    const aviso = await avisos(page);
+    expect(aviso).toContain('Si alquilas la vivienda a otros, tú aseguras el continente');
+    expect(aviso).toContain('Si no es tu vivienda habitual (segunda residencia o vivienda vacía), díselo a la aseguradora');
   });
 
-  test('tema claro: el título del veredicto se lee (texto grande, 3:1)', async ({ page }) => {
-    // HALLAZGO abierto: «Multirriesgo Completa» en #e8a020 escrito a mano da 2,22:1 (92.491 de 414.720
-    // perfiles) y «Cobertura Básica» en --secondary 2,80:1 (12.261). 24 px en negrita → mínimo 3:1.
-    test.fail();
+  test('1524: tema claro, el título del veredicto se lee (texto grande, 3:1)', async ({ page }) => {
+    // Antes: «Multirriesgo Completa» en #e8a020 2,22:1 y «Cobertura Básica» en --secondary 2,80:1.
+    // Ahora #b45309 en claro (5,02:1 sobre blanco) y --secondary-texto (5,15:1).
     await verResultado(page, INQUILINO_PRECIO_24);
     expect(await contraste(page, '[class*="veredictoValor"]')).toBeGreaterThanOrEqual(3);
     await verResultado(page, BASICA_10);
     expect(await contraste(page, '[class*="veredictoValor"]')).toBeGreaterThanOrEqual(3);
+    await verResultado(page, ESTANDAR_11);
+    expect(await contraste(page, '[class*="veredictoValor"]')).toBeGreaterThanOrEqual(3);
   });
 
-  test('tema claro: los textos pequeños de marca llegan a 4,5:1', async ({ page }) => {
-    // HALLAZGO abierto: «Pregunta N de 10» (progresoPaso) 3,93:1, «Por qué esta cobertura» y «Lo que no
-    // ha sumado» (razonesTitulo) 3,67:1, «← Repetir el test» 3,93:1. En oscuro pasan (6,23 / 5,60 / 6,23).
-    test.fail();
+  test('1525: tema claro, los textos pequeños de marca llegan a 4,5:1', async ({ page }) => {
+    // Antes: progresoPaso 3,93 · razonesTitulo 3,67 · btnRepetir 3,93. Ahora --primary-texto.
     await abrirTest(page);
     expect(await contraste(page, '[class*="progresoPaso"]')).toBeGreaterThanOrEqual(4.5);
     await verResultado(page, ESTANDAR_11);
@@ -433,23 +503,45 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
     expect(await contraste(page, '[class*="btnRepetir"]')).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('el hero del resultado usa --hero-bg, como el de la intro (de familia)', async ({ page }) => {
-    // HALLAZGO abierto: .heroResultados pinta linear-gradient(135deg, --primary, --secondary). Bajo la
-    // caja real del texto, el subtítulo (16 px, opacidad 0,88) baja a 2,90:1 en claro y 2,22:1 en oscuro.
-    test.fail();
+  test('1524/1525/1526: en tema oscuro los mismos textos, el hero y los botones siguen llegando', async ({ page }) => {
+    // Guarda del oscuro: en la inspección pasaban los textos (6,22 · 6,17 · 4,93 · 6,23 · 5,60) y
+    // fallaba el hero sobre el degradado (subtítulo 2,22, título 2,42, botones 2,42-2,44).
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-seguro-hogar/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    const m: Record<string, [number, number]> = {};
+    await abrirTest(page);
+    m.progresoPaso = [await contraste(page, '[class*="progresoPaso"]'), 4.5];
+    await page.locator('[role="radio"]').first().click(); // habilitado: un botón deshabilitado está exento
+    m.btnSiguiente = [await contraste(page, '[class*="btnSiguiente"]'), 4.5];
+    await verResultado(page, INQUILINO_PRECIO_24);
+    m.completa = [await contraste(page, '[class*="veredictoValor"]'), 3];
+    m.heroSubtitulo = [await contraste(page, '[class*="heroSubtitleSm"]'), 4.5];
+    m.aviso = [await contraste(page, 'p[role="note"][class*="aviso"]'), 4.5];
+    await verResultado(page, BASICA_10);
+    m.basica = [await contraste(page, '[class*="veredictoValor"]'), 3];
+    m.razonesTitulo = [await contraste(page, '[class*="razonesTitulo"]'), 4.5];
+    m.btnRepetir = [await contraste(page, '[class*="btnRepetir"]'), 4.5];
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    expect(Object.entries(m).filter(([, [v, min]]) => v < min).map(([k, [v]]) => `${k} ${v.toFixed(2)}`)).toEqual([]);
+  });
+
+  test('1526: el hero del resultado usa --hero-bg, como el de la intro, y los botones --primary-boton', async ({ page }) => {
+    await abrirTest(page);
+    await page.locator('[role="radio"]').first().click();
+    expect(await contraste(page, '[class*="btnSiguiente"]')).toBeGreaterThanOrEqual(4.5);
     await verResultado(page, ESTANDAR_11);
     const fondo = await page.locator('[class*="heroResultados"]').evaluate((el) => {
       const cs = getComputedStyle(el);
       return { imagen: cs.backgroundImage, color: cs.backgroundColor };
     });
-    expect(fondo.imagen).toBe('none');
-    expect(fondo.color).toBe('rgb(26, 82, 120)');
+    expect(fondo).toEqual({ imagen: 'none', color: 'rgb(26, 82, 120)' });
+    expect(await contraste(page, '[class*="heroSubtitleSm"]')).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('al pulsar «Ver resultado» el foco no se pierde en <body> (de familia)', async ({ page }) => {
-    // HALLAZGO abierto: la sección del test se desmonta con el botón enfocado y el foco cae a <body>;
-    // el resultado no está en ninguna región viva, así que un lector de pantalla no anuncia nada.
-    test.fail();
+  test('1527: al pulsar «Ver resultado» con el teclado el foco va al encabezado del resultado', async ({ page }) => {
     await abrirTest(page);
     for (let i = 0; i < 10; i++) {
       await page.locator('[role="radiogroup"] [role="radio"]').first().click();
@@ -458,6 +550,6 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, FAQ, guía y
     await page.getByRole('button', { name: 'Ver resultado' }).focus();
     await page.keyboard.press('Enter');
     await page.getByRole('heading', { name: 'Tu cobertura recomendada' }).waitFor();
-    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    await expect(page.getByRole('heading', { name: 'Tu cobertura recomendada' })).toBeFocused();
   });
 });

@@ -4,9 +4,14 @@
 .hero { background: var(--hero-bg); color: #fff; text-align: center; padding: 3rem 1.5rem 2.5rem; }
 .heroTitle { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; margin: 0 0 0.75rem; line-height: 1.2; }
 .heroSubtitle { font-size: clamp(1rem, 2vw, 1.2rem); opacity: 0.9; margin: 0; line-height: 1.5; }
-.heroResultados { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; text-align: center; padding: 2rem 1.5rem 1.75rem; }
+/* Hero del resultado sobre --hero-bg como el de la intro: con el degradado a teal el subtítulo bajaba
+   a 2,80:1 en claro y 2,22:1 en oscuro (familia de selectores, forma b). */
+.heroResultados { background: var(--hero-bg); color: #fff; text-align: center; padding: 2rem 1.5rem 1.75rem; }
 .heroTitleSm { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin: 0 0 0.4rem; }
 .heroSubtitleSm { font-size: 1rem; opacity: 0.88; margin: 0; }
+/* Recibe el foco al llegar al resultado (tabIndex=-1): visible solo si se navega con teclado. */
+.heroTitleSm:focus { outline: none; }
+.heroTitleSm:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 /* ─── Intro ────────────────────────────────────────────────────── */
 .introContainer { max-width: 620px; margin: 2rem auto 3rem; padding: 0 1rem; }
@@ -23,7 +28,7 @@
 .introFeatures li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.95rem; color: var(--text-secondary); }
 .introFeatures li span { font-size: 1.1rem; flex-shrink: 0; }
 
-.btnStart { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; border: none; border-radius: 10px; padding: 0.9rem 2.5rem; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; width: 100%; }
+.btnStart { background: var(--primary-boton); color: #fff; border: none; border-radius: 10px; padding: 0.9rem 2.5rem; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; width: 100%; }
 .btnStart:hover { opacity: 0.9; transform: translateY(-1px); }
 .btnStart:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 
@@ -31,7 +36,7 @@
 .testContainer { max-width: 620px; margin: 2rem auto 3rem; padding: 0 1rem; }
 .progresoWrap { margin-bottom: 1.75rem; }
 .progresoInfo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary-texto); }
 .progresoCategoria { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .progresoBar { height: 6px; background: var(--bg-card); border-radius: 3px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); }
 .progresoRelleno { height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 3px; transition: width 0.4s ease; }
@@ -47,9 +52,9 @@
 .opcionDesc { font-size: 0.8rem; color: var(--text-muted); }
 .navegacion { display: flex; gap: 0.75rem; justify-content: space-between; }
 .btnAnterior { background: transparent; border: 2px solid var(--text-muted); border-radius: 8px; padding: 0.75rem 1.25rem; font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; transition: border-color 0.18s, color 0.18s; min-width: 110px; }
-.btnAnterior:hover { border-color: var(--primary); color: var(--primary); }
+.btnAnterior:hover { border-color: var(--primary-texto); color: var(--primary-texto); }
 .btnAnterior:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.btnSiguiente { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; color: #fff; cursor: pointer; flex: 1; transition: opacity 0.2s; }
+.btnSiguiente { background: var(--primary-boton); border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; color: #fff; cursor: pointer; flex: 1; transition: opacity 0.2s; }
 .btnSiguiente:disabled { opacity: 0.4; cursor: not-allowed; }
 .btnSiguiente:not(:disabled):hover { opacity: 0.9; }
 .btnSiguiente:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -69,11 +74,12 @@
 
 /* Variantes de veredicto */
 .veredicto_basica { border-top: 4px solid var(--secondary); }
-.veredicto_basica .veredictoValor { color: var(--secondary); }
+.veredicto_basica .veredictoValor { color: var(--secondary-texto); }
 .veredicto_estandar { border-top: 4px solid var(--primary); }
-.veredicto_estandar .veredictoValor { color: var(--primary); }
+.veredicto_estandar .veredictoValor { color: var(--primary-texto); }
 .veredicto_completa { border-top: 4px solid #e8a020; }
-.veredicto_completa .veredictoValor { color: #e8a020; }
+.veredicto_completa .veredictoValor { color: #b45309; }
+[data-theme='dark'] .veredicto_completa .veredictoValor { color: #e8a020; }
 
 /* ─── Cobertura y precio ───────────────────────────────────────── */
 .coberturaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.75rem; }
@@ -81,15 +87,15 @@
 .coberturaCard { background: var(--bg-card); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
 .coberturaTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0 0 0.75rem; }
 .coberturaItem { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; padding: 0.35rem 0; display: flex; gap: 0.5rem; }
-.coberturaItem::before { content: '✓'; color: var(--secondary); font-weight: 700; flex-shrink: 0; }
-.precioRango { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin: 0.5rem 0 0.25rem; }
+.coberturaItem::before { content: '✓'; color: var(--secondary-texto); font-weight: 700; flex-shrink: 0; }
+.precioRango { font-size: 1.3rem; font-weight: 700; color: var(--primary-texto); margin: 0.5rem 0 0.25rem; }
 .precioNota { font-size: 0.83rem; color: var(--text-muted); margin: 0; }
 
 /* ─── Por qué esta cobertura ───────────────────────────────────── */
 .razonesSection { background: rgba(46,134,171,0.06); border: 1px solid rgba(46,134,171,0.2); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; }
-.razonesTitulo { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin: 0 0 0.75rem; }
+.razonesTitulo { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary-texto); margin: 0 0 0.75rem; }
 .razonItem { font-size: 0.9rem; color: var(--text-primary); line-height: 1.55; padding: 0.4rem 0; display: flex; gap: 0.5rem; }
-.razonItem::before { content: '✓'; color: var(--secondary); font-weight: 700; flex-shrink: 0; }
+.razonItem::before { content: '✓'; color: var(--secondary-texto); font-weight: 700; flex-shrink: 0; }
 
 /* ─── Consejos ─────────────────────────────────────────────────── */
 .consejosSection { background: rgba(255,193,7,0.08); border: 1px solid rgba(255,193,7,0.35); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; }
@@ -97,8 +103,8 @@
 .consejoItem { font-size: 0.9rem; color: var(--text-primary); line-height: 1.55; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,193,7,0.2); }
 .consejoItem:last-child { border-bottom: none; }
 
-.btnRepetir { display: block; width: 100%; max-width: 320px; margin: 0 auto 2rem; padding: 0.85rem 1.5rem; background: transparent; border: 2px solid var(--primary); border-radius: 10px; color: var(--primary); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.18s, color 0.18s; }
-.btnRepetir:hover { background: var(--primary); color: #fff; }
+.btnRepetir { display: block; width: 100%; max-width: 320px; margin: 0 auto 2rem; padding: 0.85rem 1.5rem; background: transparent; border: 2px solid var(--primary-texto); border-radius: 10px; color: var(--primary-texto); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.18s, color 0.18s; }
+.btnRepetir:hover { background: var(--primary-boton); color: #fff; }
 .btnRepetir:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ─── Warning Box (indicador v2.0) ────────────────────────────── */
@@ -134,3 +140,17 @@
 /* La puntuación contra los umbrales, y las respuestas que empujan en sentido contrario */
 .puntuacionNota { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.5rem; }
 .razonContraria::before { content: '•'; color: var(--text-secondary); }
+
+/* Avisos del resultado: lo que no cabe en lo declarado o lo que la póliza puede no cubrir
+   (mismo estilo que el avisoRecorte de selector-mascota) */
+.aviso {
+  margin: 0 0 1.25rem; padding: 0.85rem 1rem; border: 1px solid #f59e0b; border-left-width: 4px;
+  border-radius: 8px; background: #fef3c7; color: #78350f; font-size: 0.93rem; line-height: 1.5;
+}
+[data-theme='dark'] .aviso { border-color: #b45309; background: #3a2a08; color: #fde68a; }
+
+/* 80px arriba, en todos los anchos: el hero va a sangre y la barra fija de MeskeiaLogo (hasta ~62px en
+   móvil, ~77px en escritorio) tapaba el título: entero en el resultado a 390px (h1 de 32 a 61px), que
+   además recibe el foco al llegar, y el de la intro de hogar a 1024px. Es el hueco que deja la
+   plantilla para el logo fijo (templates/app-base, margin-top: 80px; como en 272b0ee7). */
+.hero, .heroResultados { padding-top: 80px; }
