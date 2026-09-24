@@ -202,6 +202,22 @@ test('servicio a particular de Canarias: tributa con IVA español (art. 69.Uno.2
   await expect(resultado(page)).not.toContainText('Exenta (0 %)');
 });
 
+// Sospecha del 24/09/2026 (reparada ese día): el camino anterior afirmaba «IVA español» para
+// cualquier servicio, y los prestados por vía electrónica a un particular que reside en Canarias
+// los localiza en Canarias el art. 17.Uno.4 de la Ley 20/1991 del IGIC, esté donde esté el
+// prestador (cotejado en el BOE, BOE-A-1991-14463). La app no los modela: tiene que decirlo.
+test('servicio a particular de Canarias: avisa de que los servicios electrónicos tributan por IGIC (art. 17 Ley 20/1991)', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Servicios');
+  await elegir(page, CLIENTE, 'Particular');
+  await escribirBase(page, '1.000,00');
+
+  await expect(resultado(page)).toContainText('art. 17 Ley 20/1991');
+  await expect(resultado(page)).toContainText('tributan por IGIC, no por IVA');
+  await expect(resultado(page)).toContainText('esta respuesta NO vale');
+});
+
 // Hallazgo 1327, lado B2B: sin IVA, pero por NO SUJECIÓN (art. 69.Uno.1.º), no por el art. 21.
 test('servicio a empresa de Canarias: no sujeto por el art. 69.Uno.1.º, no exento por el art. 21', async ({ page }) => {
   await elegir(page, ACCION, 'Emito la factura');

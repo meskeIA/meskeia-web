@@ -467,13 +467,17 @@ function resolver(o: Opciones): Resultado {
       requisitos: [
         'Factura con IVA español, igual que en una operación interior',
         'Comprobar si el servicio tiene regla especial de localización (art. 70 LIVA: inmuebles, transporte, restauración, eventos…)',
+        'Si es un servicio electrónico, de telecomunicaciones o de radiodifusión (software, suscripciones, descargas, streaming…), esta respuesta NO vale: ver el aviso',
       ],
       modelos: ['Modelo 303 — IVA repercutido'],
       facturaNota: `Base imponible + ${pct(o.tipo)} de IVA, desglosado en la factura.`,
       alerta:
         'Facturar sin IVA a un particular de Canarias, Ceuta o Melilla como si fuera una exportación es un error: la exención del art. 21 LIVA es solo para bienes que salen del territorio. ' +
-        'Los servicios con regla especial se localizan por ella (por ejemplo, los relacionados con un inmueble situado en Canarias).',
-      baseLegal: 'Arts. 69.Uno.2.º y 69.Dos Ley 37/1992; tipos, arts. 90-91.',
+        'Los servicios con regla especial se localizan por ella (por ejemplo, los relacionados con un inmueble situado en Canarias). ' +
+        'Y los servicios prestados por vía electrónica a un particular que reside en Canarias los localiza en Canarias la propia ley del IGIC (art. 17 Ley 20/1991), ' +
+        'esté donde esté quien los presta: tributan por IGIC, no por IVA. Los de telecomunicaciones y radiodifusión también tienen reglas propias, y en Ceuta y Melilla ' +
+        'manda la ordenanza del IPSI de cada ciudad. Esta herramienta no resuelve esos casos: confírmalos con la Agencia Tributaria Canaria o la AEAT antes de facturar.',
+      baseLegal: 'Arts. 69.Uno.2.º y 69.Dos Ley 37/1992; tipos, arts. 90-91; servicios electrónicos: art. 17 Ley 20/1991 (IGIC).',
     };
   }
   if (o.naturaleza === 'servicios') {
