@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Cómo darse de alta como autónomo paso a paso?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El proceso tiene tres pasos principales: primero dar de alta la actividad en Hacienda mediante el modelo 036 o 037 (trámite gratuito online en la Sede Electrónica de la AEAT); segundo, inscribirse en el Régimen Especial de Trabajadores Autónomos (RETA) en la Seguridad Social dentro de los 30 días hábiles siguientes al inicio de actividad; y tercero, obtener las licencias municipales o sectoriales si la actividad las requiere. El orden correcto es primero Hacienda, luego Seguridad Social.',
+        text: 'El proceso tiene tres pasos principales: primero dar de alta la actividad en Hacienda mediante el modelo 036 o 037 (trámite gratuito online en la Sede Electrónica de la AEAT); segundo, inscribirse en el Régimen Especial de Trabajadores Autónomos (RETA) en la Seguridad Social antes de iniciar la actividad, como máximo con 60 días naturales de antelación (art. 32.3 del RD 84/1996); y tercero, obtener las licencias municipales o sectoriales si la actividad las requiere. El orden correcto es primero Hacienda, luego Seguridad Social.',
       },
     },
     {
@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Existe una tarifa plana para nuevos autónomos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Los nuevos autónomos que se den de alta por primera vez (o tras 2 años sin estarlo) tienen derecho a la cuota reducida de 80 €/mes durante los primeros 12 meses, prorrogable otros 12 meses si los ingresos netos no superan el Salario Mínimo Interprofesional. Esta bonificación se solicita automáticamente al tramitar el alta en la Seguridad Social.',
+        text: 'Sí. Los nuevos autónomos que se den de alta por primera vez (o tras 2 años sin estarlo) tienen derecho a la cuota reducida de 80 €/mes durante los primeros 12 meses, prorrogable otros 12 meses si los rendimientos netos no superan el Salario Mínimo Interprofesional (art. 38 ter de la Ley 20/2007). Hay que solicitarla en el mismo momento del alta en la Seguridad Social: no se puede pedir después.',
       },
     },
     {

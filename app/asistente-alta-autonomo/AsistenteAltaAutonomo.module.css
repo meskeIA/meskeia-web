@@ -1559,3 +1559,11 @@
     font-size: 0.85rem;
   }
 }
+
+/* Sección del epígrafe IAE (1.ª empresarial, 2.ª profesional) — token de texto con variante en ambos temas */
+.epigrafeSeccion {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+}

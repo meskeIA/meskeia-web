@@ -7,9 +7,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * QUÉ PROMETE LA APP
  * ──────────────────
  * «Guía completa para darte de alta como trabajador autónomo en España. Checklist interactivo
- * con todos los trámites y calculadora de cuota.» La calculadora NO pide rendimientos: ofrece
- * cuatro bases (mínima, «intermedia» de 1.200 €, máxima y personalizada) y calcula
- * cuota = base × tipo, con la tarifa plana como alternativa si la situación es «Primera alta».
+ * con todos los trámites y calculadora de cuota.» Desde el 24/09/2026 la calculadora pide los
+ * rendimientos netos mensuales (opcional) y con ellos sitúa al usuario en su tramo de
+ * TRAMOS_RETA_2025; ofrece cuatro bases (mínima y máxima DEL TRAMO, «intermedia» de 1.200 €
+ * acotada al tramo, y personalizada) y calcula cuota = base × tipo, con la tarifa plana como
+ * alternativa en «Primera alta» o en pluriactividad con primera alta. Sin rendimientos, la
+ * horquilla es la general [653,59 ; 5.101,20], que es lo que miden los CASOS 1-3.
  *
  * DE DÓNDE SALE CADA CIFRA — de `data/fiscal`, NO de lo que devuelve la app
  * ───────────────────────────────────────────────────────────────────────────
@@ -24,8 +27,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * ⚠️ es-ES NO agrupa las cifras de cuatro dígitos (minimumGroupingDigits = 2): «1510,57 €»
  * sin punto y «18.322,54 €» con él. Es el formateador compartido, no un defecto de la app.
  *
- * HALLAZGOS ABIERTOS: al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que hoy
- * fallan a propósito; al repararlos se les quita la marca y quedan como candado.
+ * REGRESIONES: al final, una por hallazgo reparado el 24/09/2026 (1370-1375), con la fuente
+ * de cada valor esperado en su comentario.
  */
 
 const RUTA = '/asistente-alta-autonomo/';
@@ -155,56 +158,125 @@ test('CASO 3 · entradas que no son una base: negativa, texto y vacío acaban en
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGOS ABIERTOS
+// REGRESIONES DE LOS HALLAZGOS REPARADOS (24/09/2026)
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO · con el foco en el campo, una base negativa publica una cuota negativa', async ({ page }) => {
-  // Hasta el blur la app calcula con el valor crudo: «-100» muestra cuota −31,50 € y
-  // «Ahorro primer año: -1338,00 €». Lo que DEBERÍA pasar: ninguna cuota negativa en pantalla
-  // (una base por debajo de 653,59 € no existe en el RETA de 2026).
-  test.fail(true, 'Hallazgo abierto: base negativa → cuota −31,50 € mientras el campo tiene el foco');
+test('REGRESIÓN 1375 · con el foco en el campo, una base negativa NO publica una cuota negativa', async ({ page }) => {
+  // Antes, hasta el blur la app calculaba con el valor crudo: «-100» → cuota −31,50 € y
+  // «Ahorro primer año: -1338,00 €». Ahora la base se acota a la horquilla también con el
+  // foco puesto: −100 → 653,59 € (base mínima del tramo 1) → 205,88 € y ahorro 1510,57 €.
   await abrirCostes(page);
   await elegirBase(page, 'personalizada');
   await escribirBase(page, '-100');
-  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).not.toMatch(/^-/);
+  await expect(campoPersonalizado(page)).toBeFocused();
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('205,88 €');
+  expect(await texto(ahorro(page))).toBe('1510,57 €');
+  // Y por arriba: 9.000 con el foco → 5.101,20 → 1606,88 €
+  await escribirBase(page, '9000');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('1606,88 €');
 });
 
-test('HALLAZGO · pluriactividad en primera alta no ve la tarifa plana', async ({ page }) => {
-  // La situación es un radio EXCLUSIVO: «Primera alta» o «Pluriactividad». Quien se da de alta
-  // por primera vez y además trabaja por cuenta ajena no puede marcar las dos cosas, y al
-  // elegir «Pluriactividad» la calculadora quita la tarifa plana (puedesTarifaPlana solo es
-  // cierto con 'nueva_alta'). La propia tabla educativa de la app dice «Tarifa plana 80 € ·
-  // Pluriactividad: ✅ Sí si es primera alta como autónomo».
-  //   Esperado (TARIFA_PLANA_2025): fila «Con tarifa plana» 80,00 €/mes y cuota anual 960,00 €
-  //   Obtenido hoy: sin fila de tarifa plana y cuota anual 205,880850 × 12 = 2470,57 €
-  test.fail(true, 'Hallazgo abierto: pluriactividad en primera alta pierde la tarifa plana');
+test('REGRESIÓN 1371 · pluriactividad en primera alta conserva la tarifa plana', async ({ page }) => {
+  // Art. 38 ter de la Ley 20/2007: la cuota reducida es para quien causa alta inicial (o sin
+  // alta en los 2 años anteriores), sin excluir a quien además trabaja por cuenta ajena.
+  //   Con «primera alta» marcada (por defecto): 80,00 €/mes y cuota anual 80 × 12 = 960,00 €
+  //   Sin ella: sin tarifa plana, cuota anual 653,59 × 31,50 % × 12 = 2.470,5702 → 2470,57 €
   await page.getByRole('button', { name: /Mis Datos/ }).click();
   await page.locator('input[name="situacionLaboral"][value="pluriactividad"]').check();
+  const primeraAlta = page.getByRole('checkbox', { name: /Es mi primera alta como autónomo/ });
+  await expect(primeraAlta).toBeChecked();
+  await expect(page.getByText('¡Puedes solicitar la tarifa plana!')).toBeVisible();
   await abrirCostes(page);
-  await expect(filaCuota(page, 'Con tarifa plana')).toHaveText(/80,00\s€\/mes/, { timeout: 2000 });
+  await expect(filaCuota(page, 'Con tarifa plana')).toHaveText(/80,00\s€\/mes/);
   expect(await texto(filaCoste(page, 'Cuota autónomo (anual)'))).toBe('960,00 €');
+
+  await page.getByRole('button', { name: /Mis Datos/ }).click();
+  await primeraAlta.uncheck();
+  await abrirCostes(page);
+  await expect(filaCuota(page, 'Con tarifa plana')).toHaveCount(0);
+  expect(await texto(filaCoste(page, 'Cuota autónomo (anual)'))).toBe('2470,57 €');
 });
 
-test('HALLAZGO · el epígrafe 849.7 no es «diseño gráfico» en las Tarifas del IAE', async ({ page }) => {
-  // La lista EPIGRAFES_COMUNES está escrita a mano en la app. Contrastada con el catálogo
-  // oficial que publica data/fiscal/cnae-iae.ts (public/datos/cnae-iae-catalogo.json,
-  // RD Legislativo 1175/1990):
-  //   849.7 (sección 1.ª) = «Servicios de gestión administrativa»   — la app: «diseño gráfico»
-  //   849.5 = mensajería y reparto (la app: traducción; traductores = 774 de la sección 2.ª)
-  //   721.1 = transporte urbano colectivo (la app: taxi/VTC; autotaxis = 721.2)
-  //   855   = alquiler de medios de transporte / corredores de apuestas (la app: agentes
-  //           comerciales; son el 511 de la sección 2.ª)
-  //   831   = médicos de medicina general (la app: especialistas; son el 832)
-  //   769.9 = otros servicios de telecomunicación (la app: otros servicios informáticos)
-  // Al pulsar el epígrafe, la app rellena la descripción con su etiqueta: quien lo copie al
-  // 036/037 declara una actividad que no es la suya.
-  test.fail(true, 'Hallazgo abierto: la descripción de 849.7 no es la de las Tarifas del IAE');
+test('REGRESIÓN 1370 · los epígrafes de la lista llevan el literal del catálogo oficial del IAE', async ({ page }) => {
+  // El literal de cada epígrafe sale de public/datos/cnae-iae-catalogo.json (el catálogo que
+  // publica data/fiscal/cnae-iae.ts, RDL 1175/1990), buscado por SECCIÓN y código: el mismo
+  // número es otra actividad en otra sección. Se coteja cada botón contra ese JSON.
+  const respuesta = await page.request.get('/datos/cnae-iae-catalogo.json');
+  expect(respuesta.ok()).toBe(true);
+  const catalogo = (await respuesta.json()) as { iae: { seccion: string; codigo: string; titulo: string }[] };
+
   await page.getByRole('button', { name: /Mis Datos/ }).click();
-  await page.locator('button[class*="btnBuscarEpigrafe"]').click();
-  await page.locator('button[class*="epigrafeItem"]').filter({ hasText: '849.7' }).click();
-  await expect(page.getByPlaceholder('Ej: 763')).toHaveValue('849.7');
-  await expect(page.getByPlaceholder('Ej: Programación informática')).toHaveValue(
-    /gestión administrativa/i,
-    { timeout: 2000 },
-  );
+  await page.getByRole('button', { name: 'Ver epígrafes IAE frecuentes' }).click();
+  const botones = page.locator('button[class*="epigrafeItem"]');
+  await expect(botones.first()).toBeVisible();
+  const n = await botones.count();
+  expect(n).toBeGreaterThanOrEqual(15);
+  for (let i = 0; i < n; i++) {
+    const boton = botones.nth(i);
+    const seccion = await boton.getAttribute('data-seccion');
+    const codigo = await texto(boton.locator('[class*="epigrafeCodigo"]'));
+    const oficial = catalogo.iae.find(e => e.seccion === seccion && e.codigo === codigo);
+    expect(oficial, `${seccion} ${codigo} no está en el catálogo`).toBeTruthy();
+    const titulo = oficial!.titulo;
+    const esperado = titulo.charAt(0).toUpperCase() + titulo.slice(1);
+    expect(await texto(boton.locator('[class*="epigrafeDesc"]'))).toContain(esperado);
+  }
+
+  // 763 de la sección 2.ª = «Programadores y Analistas de Informática» (antes la lista lo
+  // daba como «Programadores, informáticos» y el caso de Pedro, como «Publicidad y RRPP»)
+  await botones.filter({ hasText: 'Programadores y Analistas de Informática' }).click();
+  await expect(page.getByPlaceholder('Ej: 763')).toHaveValue('763');
+  await expect(page.getByPlaceholder('Ej: Programación informática')).toHaveValue('Programadores y Analistas de Informática');
+  await expect(page.getByText('Sección 2ª de las Tarifas del IAE')).toBeVisible();
+});
+
+test('REGRESIÓN 1372 · los rendimientos netos sitúan la cuota en su tramo de 2026', async ({ page }) => {
+  // TRAMOS_RETA_2025 (tabla 2026, Orden PJC/297/2026 art. 18): 1.600 €/mes cae en el tramo 6
+  // (más de 1.500 y hasta 1.700), base entre 960,78 y 1.700,00 €.
+  //   base mínima: 960,78 × 31,50 % = 302,6457 → 302,65 €
+  //   base máxima: 1.700 × 31,50 % = 535,50 €
+  //   personalizada 5.000 → se acota a 1.700 → 535,50 €
+  await abrirCostes(page);
+  const rendimientos = page.getByRole('textbox', { name: 'Rendimientos netos mensuales previstos' });
+  await rendimientos.fill('1.600');
+  await esperarValorEnReact(page, rendimientos, '1.600');
+  await expect(page.locator('strong', { hasText: 'Tramo 6' })).toBeVisible();
+  expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('960,78 €');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('302,65 €');
+
+  await elegirBase(page, 'maxima');
+  expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('1700,00 €');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('535,50 €');
+
+  await elegirBase(page, 'personalizada');
+  await escribirBase(page, '5000');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('535,50 €');
+});
+
+test('REGRESIÓN 1373 · la SL tributa con la escala de micropymes y el 15 % de nueva creación', async ({ page }) => {
+  // data/fiscal/sociedades.ts: TIPOS_IS_2025.general 25 %, nuevaCreacion 15 %,
+  // TRAMOS_IS_MICROPYMES_2026 = 19 % hasta 50.000 € y 21 % en el resto
+  await abrirCostes(page);
+  const fila = page.locator('table tr').filter({ hasText: 'Fiscalidad' });
+  const t = await texto(fila);
+  expect(t).toContain('25 % general');
+  expect(t).toContain('19 % hasta 50.000 €');
+  expect(t).toContain('21 % en el resto');
+  expect(t).toContain('15 % los dos primeros ejercicios');
+  expect(t).not.toContain('IS fijo');
+});
+
+test('REGRESIÓN 1374 · un solo plazo para el alta en el RETA y la prórroga ligada al SMI', async ({ page }) => {
+  // Art. 32.3 RD 84/1996: el alta de autónomos se solicita «con carácter previo» al inicio de
+  // la actividad, dentro de los 60 días naturales anteriores. Art. 38 ter.2 Ley 20/2007: la
+  // prórroga de la tarifa plana depende de que los rendimientos no lleguen al SMI.
+  const cuerpo = limpiar((await page.locator('body').textContent()) ?? '');
+  expect(cuerpo).not.toContain('tras Hacienda');
+  expect(cuerpo).not.toContain('siguientes al alta en Hacienda');
+  expect(cuerpo).not.toContain('desde el inicio de la actividad para darte');
+  expect(cuerpo).not.toContain('si su comunidad tiene extensión');
+  expect(cuerpo).toContain('hasta 60 días antes del inicio');
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(jsonLd).not.toContain('30 días hábiles');
+  expect(jsonLd).toContain('60 días naturales de antelación');
 });

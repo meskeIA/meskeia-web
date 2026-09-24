@@ -7,7 +7,12 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, RelatedApps, Educational
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025, FISCAL_AUTONOMOS_META } from '@/data/fiscal/autonomos';
+import {
+  TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025, TRAMOS_RETA_2025, FISCAL_AUTONOMOS_META,
+  TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, AUTONOMO_SOCIETARIO_2025, SMI_2026,
+  CNAE_IAE_RUTA_CATALOGO, FISCAL_CNAE_IAE_META,
+} from '@/data/fiscal';
+import type { TramoCotizacion } from '@/data/fiscal';
 
 // Tipos
 type TipoActividad = 'profesional' | 'empresarial' | 'artistica';
@@ -32,6 +37,14 @@ interface DatosAutonomo {
   tieneEmpleados: boolean;
   baseElegida: 'minima' | 'media' | 'maxima' | 'personalizada';
   basePersonalizada: string;
+  /**
+   * Primera alta en el RETA (o sin alta en los dos años anteriores). Solo se pregunta en
+   * pluriactividad: el art. 38 ter LETA no excluye a quien además trabaja por cuenta ajena.
+   * Opcional porque los datos guardados antes del 24/09/2026 no lo traen.
+   */
+  primeraAltaPluriactividad?: boolean;
+  /** Rendimientos netos mensuales previstos (texto tal cual lo escribe el usuario). */
+  rendimientosNetos?: string;
 }
 
 interface ChecklistItem {
@@ -45,22 +58,46 @@ interface ChecklistItem {
   enlaceUtil?: { texto: string; url: string };
 }
 
-// Bases de cotización 2026 (tramos por rendimientos reales — RDL 13/2022)
+// Bases de cotización 2026 (tramos por rendimientos reales — RDL 13/2022).
+// Sin rendimientos, la «mínima» es la del tramo 1 (TRAMOS_RETA_2025[0]), que solo vale para
+// rendimientos de hasta 670 €/mes; con rendimientos, cada base se acota a la horquilla de su
+// tramo (calcularCuotaAutonomo).
+const TRAMO_1 = TRAMOS_RETA_2025[0];
 const BASES_COTIZACION = {
-  minima: { base: BASES_RETA_2025.minima, descripcion: 'Base mínima (rendimientos bajos)' },
-  media: { base: 1200, descripcion: 'Base intermedia' },
-  maxima: { base: BASES_RETA_2025.maxima, descripcion: 'Base máxima' },
+  minima: { base: BASES_RETA_2025.minima, descripcion: 'Base mínima de tu tramo', sinTramo: 'Base mínima (tramo 1)' },
+  media: { base: 1200, descripcion: 'Base intermedia', sinTramo: 'Base intermedia' },
+  maxima: { base: BASES_RETA_2025.maxima, descripcion: 'Base máxima de tu tramo', sinTramo: 'Base máxima' },
 };
+
+/**
+ * Tramo de la tabla de 2026 que corresponde a unos rendimientos netos mensuales.
+ * Los límites son «hasta X €» (tramo 1: ≤ 670; tramo 2: > 670 y ≤ 900…), así que manda
+ * el primer tramo cuyo rendimientoMax no se supera.
+ */
+function tramoPorRendimientos(rendimientos: number): TramoCotizacion {
+  const encontrado = TRAMOS_RETA_2025.find(t => t.rendimientoMax === null || rendimientos <= t.rendimientoMax);
+  return encontrado ?? TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
+}
+
+const acotar = (valor: number, min: number, max: number) => Math.min(Math.max(valor, min), max);
+
+// Formato de las cifras normativas en la prosa: «80 €», «17.094 €», «515 €»
+const euros = (valor: number) => `${formatNumber(valor, 0)} €`;
 
 // Tipo cotización autónomo 2026 (31,50% — RDL 16/2025)
 const TIPO_COTIZACION = TIPO_COTIZACION_RETA;
 
-// Tarifa plana 2026
+// Tarifa plana 2026 (art. 38 ter Ley 20/2007): 12 meses, prorrogables otros 12 si los
+// rendimientos netos anuales no llegan al SMI
 const TARIFA_PLANA = {
   importe: TARIFA_PLANA_2025.cuota,
   duracion: TARIFA_PLANA_2025.duracion,
   ampliacion: { importe: TARIFA_PLANA_2025.cuota, duracion: TARIFA_PLANA_2025.duracion, condicion: 'rendimientos < SMI' },
 };
+const TARIFA_PLANA_TXT = euros(TARIFA_PLANA.importe);
+// Cuota mínima del tramo 1 y ahorro de la tarifa plana frente a ella, para los ejemplos
+const CUOTA_MINIMA_TRAMO_1 = TRAMO_1.baseMinima * TIPO_COTIZACION_RETA;
+const AHORRO_TARIFA_PLANA_TRAMO_1 = (CUOTA_MINIMA_TRAMO_1 - TARIFA_PLANA.importe) * TARIFA_PLANA.duracion;
 
 // Checklist por fases
 const CHECKLIST_ITEMS: Omit<ChecklistItem, 'completado'>[] = [
@@ -123,7 +160,7 @@ const CHECKLIST_ITEMS: Omit<ChecklistItem, 'completado'>[] = [
     id: 'alta-reta',
     fase: 3,
     texto: 'Alta en RETA (Régimen Especial Trabajadores Autónomos)',
-    descripcion: 'Obligatorio en los 60 días siguientes al alta en Hacienda. Se hace en la Sede Electrónica de la Seguridad Social.',
+    descripcion: 'Antes de empezar la actividad: se solicita como máximo con 60 días naturales de antelación a su inicio (art. 32.3 RD 84/1996), después del alta en Hacienda. Se hace en la Sede Electrónica de la Seguridad Social.',
     obligatorio: true,
     enlaceUtil: { texto: 'Alta RETA online', url: 'https://sede.seg-social.gob.es/wps/portal/sede/sede/Ciudadanos/CiijilAutonomos' },
   },
@@ -146,7 +183,7 @@ const CHECKLIST_ITEMS: Omit<ChecklistItem, 'completado'>[] = [
     id: 'tarifa-plana',
     fase: 3,
     texto: 'Solicitar tarifa plana (si aplica)',
-    descripcion: '80€/mes durante 12 meses si es tu primera alta o no has sido autónomo en los últimos 2 años. Ampliable otros 12 meses.',
+    descripcion: `${TARIFA_PLANA_TXT}/mes durante ${TARIFA_PLANA.duracion} meses si es tu primera alta o no has sido autónomo en los últimos 2 años (3 si ya la disfrutaste). Prorrogable otros ${TARIFA_PLANA.ampliacion.duracion} meses si tus rendimientos netos siguen por debajo del SMI. Se pide al darte de alta.`,
     obligatorio: false,
   },
   // FASE 4: Licencias y permisos
@@ -228,28 +265,42 @@ const FASES = [
   { numero: 5, nombre: 'Operatividad', icono: '🚀', descripcion: 'Puesta en marcha' },
 ];
 
-// Epígrafes IAE comunes
-const EPIGRAFES_COMUNES = [
-  { codigo: '841', descripcion: 'Servicios jurídicos (abogados)' },
-  { codigo: '842', descripcion: 'Servicios financieros y contables' },
-  { codigo: '843', descripcion: 'Servicios técnicos (arquitectos, ingenieros)' },
-  { codigo: '844', descripcion: 'Servicios de publicidad, RRPP, marketing' },
-  { codigo: '849.5', descripcion: 'Servicios de traducción' },
-  { codigo: '849.7', descripcion: 'Servicios de diseño gráfico' },
-  { codigo: '861', descripcion: 'Pintores, escultores, ceramistas' },
-  { codigo: '899', descripcion: 'Otros profesionales (consultores, formadores)' },
-  { codigo: '651', descripcion: 'Comercio menor textil y confección' },
-  { codigo: '659', descripcion: 'Comercio menor (otros productos)' },
-  { codigo: '673', descripcion: 'Servicios de restauración (bares, cafeterías)' },
-  { codigo: '721.1', descripcion: 'Transporte de viajeros (taxi, VTC)' },
-  { codigo: '722', descripcion: 'Transporte de mercancías' },
-  { codigo: '831', descripcion: 'Médicos especialistas' },
-  { codigo: '836', descripcion: 'Fisioterapeutas, masajistas' },
-  { codigo: '855', descripcion: 'Agentes comerciales' },
-  { codigo: '933.9', descripcion: 'Profesores, enseñanza' },
-  { codigo: '763', descripcion: 'Programadores, informáticos' },
-  { codigo: '769.9', descripcion: 'Otros servicios informáticos' },
+// Epígrafes IAE frecuentes en un alta de autónomo: aquí solo se elige QUÉ códigos ofrecer.
+// El literal de cada uno NO se escribe a mano: sale del catálogo oficial de las Tarifas del
+// IAE (RDL 1175/1990) que publica data/fiscal/cnae-iae.ts, porque la app lo copia a la
+// descripción de la actividad y quien lo pasa al 036/037 declararía otra cosa (hallazgo 1370:
+// 6 de 19 etiquetas escritas a mano no eran las de la Tarifa). El mismo número puede ser una
+// actividad distinta en cada sección (841 es «Servicios jurídicos» en la 1.ª y «Naturópatas…»
+// en la 2.ª), por eso cada referencia lleva su sección.
+type SeccionIaeRef = '1ª' | '2ª' | '3ª';
+const EPIGRAFES_COMUNES: { seccion: SeccionIaeRef; codigo: string }[] = [
+  { seccion: '2ª', codigo: '731' },   // abogacía
+  { seccion: '2ª', codigo: '741' },   // economistas
+  { seccion: '1ª', codigo: '842' },   // servicios financieros y contables
+  { seccion: '1ª', codigo: '843.1' }, // ingeniería
+  { seccion: '1ª', codigo: '843.2' }, // arquitectura
+  { seccion: '2ª', codigo: '751' },   // publicidad y RRPP (profesional)
+  { seccion: '2ª', codigo: '774' },   // traducción
+  { seccion: '2ª', codigo: '763' },   // programación
+  { seccion: '2ª', codigo: '776' },   // psicología
+  { seccion: '2ª', codigo: '832' },   // medicina especializada
+  { seccion: '2ª', codigo: '836' },   // fisioterapia
+  { seccion: '2ª', codigo: '826' },   // enseñanza
+  { seccion: '2ª', codigo: '511' },   // agentes comerciales
+  { seccion: '2ª', codigo: '861' },   // artes plásticas
+  { seccion: '2ª', codigo: '899' },   // otros profesionales
+  { seccion: '1ª', codigo: '651.2' }, // comercio de ropa
+  { seccion: '1ª', codigo: '659.9' }, // otro comercio al por menor
+  { seccion: '1ª', codigo: '673.2' }, // cafés y bares
+  { seccion: '1ª', codigo: '721.2' }, // taxi
+  { seccion: '1ª', codigo: '722' },   // transporte de mercancías
 ];
+
+interface EpigrafeCatalogo { seccion: string; codigo: string; tipo: string; titulo: string }
+interface EpigrafeResuelto { seccion: SeccionIaeRef; codigo: string; titulo: string }
+
+/** El catálogo trae algún epígrafe en minúscula inicial («otros cafés y bares»). */
+const conMayuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 
 const STORAGE_KEY = 'meskeia-alta-autonomo';
 
@@ -281,6 +332,35 @@ export default function AsistenteAltaAutonomoPage() {
   const [pestanaActiva, setPestanaActiva] = useState<'checklist' | 'datos' | 'costes'>('checklist');
   const [faseExpandida, setFaseExpandida] = useState<number | null>(1);
   const [mostrarEpigrafes, setMostrarEpigrafes] = useState(false);
+  const [epigrafes, setEpigrafes] = useState<EpigrafeResuelto[] | null>(null);
+  const [errorEpigrafes, setErrorEpigrafes] = useState(false);
+  // Sección del epígrafe elegido en la lista (1.ª empresarial, 2.ª profesional…), solo informativa
+  const [seccionElegida, setSeccionElegida] = useState<SeccionIaeRef | null>(null);
+
+  // El catálogo IAE (~315 KB) solo se descarga la primera vez que se abre la lista
+  useEffect(() => {
+    if (!mostrarEpigrafes || epigrafes !== null) return;
+    let cancelado = false;
+    fetch(CNAE_IAE_RUTA_CATALOGO)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<{ iae: EpigrafeCatalogo[] }>;
+      })
+      .then(catalogo => {
+        if (cancelado) return;
+        const resueltos: EpigrafeResuelto[] = [];
+        for (const ref of EPIGRAFES_COMUNES) {
+          const entrada = catalogo.iae.find(e => e.seccion === ref.seccion && e.codigo === ref.codigo);
+          if (entrada) resueltos.push({ ...ref, titulo: conMayuscula(entrada.titulo) });
+        }
+        setEpigrafes(resueltos);
+        setErrorEpigrafes(false);
+      })
+      .catch(() => {
+        if (!cancelado) setErrorEpigrafes(true);
+      });
+    return () => { cancelado = true; };
+  }, [mostrarEpigrafes, epigrafes]);
 
   // Cargar datos guardados
   useEffect(() => {
@@ -320,15 +400,17 @@ export default function AsistenteAltaAutonomoPage() {
     setDatos(prev => ({ ...prev, [campo]: valor }));
   };
 
-  const seleccionarEpigrafe = (codigo: string, descripcion: string) => {
-    actualizarDato('epigrafeIAE', codigo);
-    actualizarDato('descripcionActividad', descripcion);
+  const seleccionarEpigrafe = (ep: EpigrafeResuelto) => {
+    actualizarDato('epigrafeIAE', ep.codigo);
+    actualizarDato('descripcionActividad', ep.titulo);
+    setSeccionElegida(ep.seccion);
     setMostrarEpigrafes(false);
   };
 
   const reiniciarTodo = () => {
     if (confirm('¿Estás seguro de que quieres reiniciar todos los datos? Esta acción no se puede deshacer.')) {
       localStorage.removeItem(STORAGE_KEY);
+      setSeccionElegida(null);
       setChecklist(CHECKLIST_ITEMS.map(item => ({ ...item, completado: false })));
       setDatos({
         nombre: '',
@@ -377,22 +459,39 @@ export default function AsistenteAltaAutonomoPage() {
     return itemsFase.length > 0 ? Math.round((completados.length / itemsFase.length) * 100) : 0;
   };
 
+  // Rendimientos netos mensuales → tramo de la tabla de 2026. Vacío o no numérico: sin tramo.
+  const rendimientosNum = parseSpanishNumber(datos.rendimientosNetos ?? '');
+  const tramo: TramoCotizacion | null = Number.isFinite(rendimientosNum)
+    ? tramoPorRendimientos(rendimientosNum)
+    : null;
+  // Horquilla de bases que se puede elegir: la del tramo, o la general si no hay rendimientos
+  const baseMin = tramo ? tramo.baseMinima : BASES_RETA_2025.minima;
+  const baseMax = tramo ? tramo.baseMaxima : BASES_RETA_2025.maxima;
+  const baseDeOpcion = (clave: keyof typeof BASES_COTIZACION) =>
+    clave === 'minima' ? baseMin : clave === 'maxima' ? baseMax : acotar(BASES_COTIZACION.media.base, baseMin, baseMax);
+
   const calcularCuotaAutonomo = () => {
     let base: number;
     if (datos.baseElegida === 'personalizada') {
-      base = parseSpanishNumber(datos.basePersonalizada) || BASES_COTIZACION.minima.base;
+      // Se acota también con el foco puesto: una base fuera de la horquilla no existe, y sin
+      // acotar la app publicaba cuotas negativas hasta el blur (hallazgo 1375)
+      const escrita = parseSpanishNumber(datos.basePersonalizada);
+      base = Number.isFinite(escrita) ? acotar(escrita, baseMin, baseMax) : baseMin;
     } else {
-      base = BASES_COTIZACION[datos.baseElegida].base;
+      base = baseDeOpcion(datos.baseElegida);
     }
 
     const cuotaNormal = base * TIPO_COTIZACION;
-    const puedesTarifaPlana = datos.situacionLaboral === 'nueva_alta';
+    // Art. 38 ter Ley 20/2007: la tarifa plana es para quien causa alta inicial (o sin alta en
+    // los 2 años anteriores), también en pluriactividad (hallazgo 1371)
+    const puedesTarifaPlana = datos.situacionLaboral === 'nueva_alta'
+      || (datos.situacionLaboral === 'pluriactividad' && datos.primeraAltaPluriactividad !== false);
 
     return {
       base,
       cuotaNormal,
       tarifaPlana: puedesTarifaPlana ? TARIFA_PLANA.importe : null,
-      ahorroPrimerAno: puedesTarifaPlana ? (cuotaNormal - TARIFA_PLANA.importe) * 12 : 0,
+      ahorroPrimerAno: puedesTarifaPlana ? (cuotaNormal - TARIFA_PLANA.importe) * TARIFA_PLANA.duracion : 0,
     };
   };
 
@@ -430,7 +529,7 @@ export default function AsistenteAltaAutonomoPage() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>💼</span>
+        <span className={styles.heroIcon} aria-hidden="true">💼</span>
         <h1 className={styles.title}>Asistente Alta Autónomo</h1>
         <p className={styles.subtitle}>
           Guía completa para darte de alta como trabajador autónomo en España.
@@ -455,21 +554,21 @@ export default function AsistenteAltaAutonomoPage() {
       {/* Info rápida */}
       <section className={styles.infoRapida}>
         <div className={styles.infoCard}>
-          <span className={styles.infoIcon}>💰</span>
+          <span className={styles.infoIcon} aria-hidden="true">💰</span>
           <div className={styles.infoTexto}>
             <span className={styles.infoValor}>{formatCurrency(TARIFA_PLANA.importe)}/mes</span>
-            <span className={styles.infoLabel}>Tarifa plana (12 meses)</span>
+            <span className={styles.infoLabel}>Tarifa plana ({TARIFA_PLANA.duracion} meses)</span>
           </div>
         </div>
         <div className={styles.infoCard}>
-          <span className={styles.infoIcon}>📅</span>
+          <span className={styles.infoIcon} aria-hidden="true">📅</span>
           <div className={styles.infoTexto}>
-            <span className={styles.infoValor}>60 días</span>
-            <span className={styles.infoLabel}>Plazo alta RETA tras Hacienda</span>
+            <span className={styles.infoValor}>Antes de empezar</span>
+            <span className={styles.infoLabel}>Alta RETA: hasta 60 días antes del inicio</span>
           </div>
         </div>
         <div className={styles.infoCard}>
-          <span className={styles.infoIcon}>📝</span>
+          <span className={styles.infoIcon} aria-hidden="true">📝</span>
           <div className={styles.infoTexto}>
             <span className={styles.infoValor}>2 trámites</span>
             <span className={styles.infoLabel}>Hacienda + Seg. Social</span>
@@ -497,22 +596,28 @@ export default function AsistenteAltaAutonomoPage() {
       {/* Pestañas */}
       <div className={styles.pestanas}>
         <button
+          type="button"
+          aria-pressed={pestanaActiva === 'checklist'}
           className={`${styles.pestana} ${pestanaActiva === 'checklist' ? styles.pestanaActiva : ''}`}
           onClick={() => setPestanaActiva('checklist')}
         >
-          <span>✅</span> Checklist
+          <span aria-hidden="true">✅</span> Checklist
         </button>
         <button
+          type="button"
+          aria-pressed={pestanaActiva === 'datos'}
           className={`${styles.pestana} ${pestanaActiva === 'datos' ? styles.pestanaActiva : ''}`}
           onClick={() => setPestanaActiva('datos')}
         >
-          <span>📝</span> Mis Datos
+          <span aria-hidden="true">📝</span> Mis Datos
         </button>
         <button
+          type="button"
+          aria-pressed={pestanaActiva === 'costes'}
           className={`${styles.pestana} ${pestanaActiva === 'costes' ? styles.pestanaActiva : ''}`}
           onClick={() => setPestanaActiva('costes')}
         >
-          <span>💰</span> Cuota y Costes
+          <span aria-hidden="true">💰</span> Cuota y Costes
         </button>
       </div>
 
@@ -551,11 +656,13 @@ export default function AsistenteAltaAutonomoPage() {
               return (
                 <div key={fase.numero} className={styles.faseBloque}>
                   <button
+                    type="button"
+                    aria-expanded={expandida}
                     className={`${styles.faseHeader} ${expandida ? styles.faseHeaderExpandida : ''}`}
                     onClick={() => setFaseExpandida(expandida ? null : fase.numero)}
                   >
                     <div className={styles.faseInfo}>
-                      <span className={styles.faseIcono}>{fase.icono}</span>
+                      <span className={styles.faseIcono} aria-hidden="true">{fase.icono}</span>
                       <div className={styles.faseTitulos}>
                         <span className={styles.faseNombre}>Fase {fase.numero}: {fase.nombre}</span>
                         <span className={styles.faseDescripcion}>{fase.descripcion}</span>
@@ -569,7 +676,7 @@ export default function AsistenteAltaAutonomoPage() {
                         />
                       </div>
                       <span className={styles.faseProgresoTexto}>{progresoFase}%</span>
-                      <span className={styles.faseExpandir}>{expandida ? '▼' : '▶'}</span>
+                      <span className={styles.faseExpandir} aria-hidden="true">{expandida ? '▼' : '▶'}</span>
                     </div>
                   </button>
 
@@ -600,7 +707,7 @@ export default function AsistenteAltaAutonomoPage() {
                               rel="noopener noreferrer"
                               className={styles.enlaceUtil}
                             >
-                              🔗 {item.enlaceUtil.texto}
+                              <span aria-hidden="true">🔗</span> {item.enlaceUtil.texto}
                             </a>
                           )}
                         </div>
@@ -623,7 +730,7 @@ export default function AsistenteAltaAutonomoPage() {
             {/* Datos personales */}
             <div className={styles.datosSeccion}>
               <h3 className={styles.datosSeccionTitulo}>
-                <span>👤</span> Datos Personales
+                <span aria-hidden="true">👤</span> Datos Personales
               </h3>
               <div className={styles.datosGrid}>
                 <div className={styles.inputGroup}>
@@ -681,7 +788,7 @@ export default function AsistenteAltaAutonomoPage() {
             {/* Domicilio */}
             <div className={styles.datosSeccion}>
               <h3 className={styles.datosSeccionTitulo}>
-                <span>📍</span> Domicilio Fiscal
+                <span aria-hidden="true">📍</span> Domicilio Fiscal
               </h3>
               <div className={styles.datosGrid}>
                 <div className={styles.inputGroupFull}>
@@ -731,7 +838,7 @@ export default function AsistenteAltaAutonomoPage() {
             {/* Actividad */}
             <div className={styles.datosSeccion}>
               <h3 className={styles.datosSeccionTitulo}>
-                <span>💼</span> Actividad Económica
+                <span aria-hidden="true">💼</span> Actividad Económica
               </h3>
               <div className={styles.datosGrid}>
                 <div className={styles.inputGroupFull}>
@@ -764,7 +871,7 @@ export default function AsistenteAltaAutonomoPage() {
                     <input
                       type="text"
                       value={datos.epigrafeIAE}
-                      onChange={e => actualizarDato('epigrafeIAE', e.target.value)}
+                      onChange={e => { actualizarDato('epigrafeIAE', e.target.value); setSeccionElegida(null); }}
                       placeholder="Ej: 763"
                       className={styles.input}
                     />
@@ -772,10 +879,17 @@ export default function AsistenteAltaAutonomoPage() {
                       type="button"
                       onClick={() => setMostrarEpigrafes(!mostrarEpigrafes)}
                       className={styles.btnBuscarEpigrafe}
+                      aria-label={mostrarEpigrafes ? 'Cerrar la lista de epígrafes' : 'Ver epígrafes IAE frecuentes'}
+                      aria-expanded={mostrarEpigrafes}
                     >
                       {mostrarEpigrafes ? '✕' : '🔍'}
                     </button>
                   </div>
+                  {seccionElegida && (
+                    <span className={styles.epigrafeSeccion}>
+                      Sección {seccionElegida} de las Tarifas del IAE
+                    </span>
+                  )}
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Descripción actividad</label>
@@ -790,15 +904,31 @@ export default function AsistenteAltaAutonomoPage() {
 
                 {mostrarEpigrafes && (
                   <div className={styles.listaEpigrafes}>
-                    <p className={styles.listaEpigrafesInfo}>Epígrafes comunes (pulsa para seleccionar):</p>
-                    {EPIGRAFES_COMUNES.map(ep => (
+                    <p className={styles.listaEpigrafesInfo}>
+                      Epígrafes frecuentes con su literal oficial ({FISCAL_CNAE_IAE_META.iae.fuente}).
+                      Pulsa para seleccionar; si ninguno encaja, busca el tuyo en el{' '}
+                      <a href="/conversor-cnae-iae/">buscador de CNAE e IAE</a>.
+                    </p>
+                    {errorEpigrafes && (
+                      <p className={styles.listaEpigrafesInfo} role="alert">
+                        No se ha podido cargar el catálogo oficial de epígrafes. Vuelve a abrir la lista o usa el buscador.
+                      </p>
+                    )}
+                    {!errorEpigrafes && epigrafes === null && (
+                      <p className={styles.listaEpigrafesInfo} aria-live="polite">Cargando el catálogo oficial…</p>
+                    )}
+                    {epigrafes?.map(ep => (
                       <button
-                        key={ep.codigo}
+                        type="button"
+                        key={`${ep.seccion}-${ep.codigo}`}
                         className={styles.epigrafeItem}
-                        onClick={() => seleccionarEpigrafe(ep.codigo, ep.descripcion)}
+                        data-seccion={ep.seccion}
+                        onClick={() => seleccionarEpigrafe(ep)}
                       >
                         <span className={styles.epigrafeCodigo}>{ep.codigo}</span>
-                        <span className={styles.epigrafeDesc}>{ep.descripcion}</span>
+                        <span className={styles.epigrafeDesc}>
+                          {ep.titulo} <span className={styles.epigrafeSeccion}>· sección {ep.seccion}</span>
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -819,7 +949,7 @@ export default function AsistenteAltaAutonomoPage() {
             {/* Situación laboral */}
             <div className={styles.datosSeccion}>
               <h3 className={styles.datosSeccionTitulo}>
-                <span>📋</span> Situación Laboral
+                <span aria-hidden="true">📋</span> Situación Laboral
               </h3>
               <div className={styles.situacionOpciones}>
                 {[
@@ -843,23 +973,35 @@ export default function AsistenteAltaAutonomoPage() {
                 ))}
               </div>
 
-              {datos.situacionLaboral === 'nueva_alta' && (
+              {datos.situacionLaboral === 'pluriactividad' && (
+                <label className={styles.opcionCheck}>
+                  <input
+                    type="checkbox"
+                    checked={datos.primeraAltaPluriactividad !== false}
+                    onChange={e => actualizarDato('primeraAltaPluriactividad', e.target.checked)}
+                  />
+                  <span>Es mi primera alta como autónomo (o no he estado de alta en los 2 últimos años; 3 si ya disfruté la tarifa plana)</span>
+                </label>
+              )}
+
+              {cuotaInfo.tarifaPlana !== null && (
                 <div className={styles.infoTarifaPlana}>
-                  ✅ <strong>¡Puedes solicitar la tarifa plana!</strong> 80€/mes durante 12 meses.
+                  <span aria-hidden="true">✅</span> <strong>¡Puedes solicitar la tarifa plana!</strong> {TARIFA_PLANA_TXT}/mes durante {TARIFA_PLANA.duracion} meses
+                  {datos.situacionLaboral === 'pluriactividad' && ', también en pluriactividad (art. 38 ter de la Ley 20/2007)'}.
                 </div>
               )}
 
               {datos.situacionLaboral === 'pluriactividad' && (
                 <div className={styles.infoPluriactividad}>
-                  ℹ️ En pluriactividad puedes tener bonificaciones en la cuota según tu cotización por cuenta ajena.
+                  <span aria-hidden="true">ℹ️</span> En pluriactividad puedes tener bonificaciones en la cuota según tu cotización por cuenta ajena.
                 </div>
               )}
             </div>
 
             {/* Botones de acción */}
             <div className={styles.datosAcciones}>
-              <button onClick={reiniciarTodo} className={styles.btnSecundario}>
-                🗑️ Reiniciar todo
+              <button type="button" onClick={reiniciarTodo} className={styles.btnSecundario}>
+                <span aria-hidden="true">🗑️</span> Reiniciar todo
               </button>
             </div>
           </div>
@@ -871,13 +1013,41 @@ export default function AsistenteAltaAutonomoPage() {
             {/* Calculadora de cuota */}
             <div className={styles.calculadoraCuota}>
               <h3 className={styles.costesSeccionTitulo}>
-                <span>🧮</span> Calculadora de Cuota Autónomo
+                <span aria-hidden="true">🧮</span> Calculadora de Cuota Autónomo
               </h3>
 
               <div className={styles.basesCotizacion}>
                 <p className={styles.basesInfo}>
-                  Desde 2023 la cuota se calcula según tus rendimientos netos previstos.
-                  Elige una base de cotización:
+                  Desde 2023 la cuota se calcula según tus rendimientos netos previstos: te sitúan en
+                  uno de los {TRAMOS_RETA_2025.length} tramos de la tabla de 2026, y dentro de su horquilla eliges la base.
+                </p>
+
+                <NumberInput
+                  label="Rendimientos netos mensuales previstos"
+                  value={datos.rendimientosNetos ?? ''}
+                  onChange={val => actualizarDato('rendimientosNetos', val)}
+                  placeholder="Ej: 1.600"
+                  min={0}
+                  suffix="€/mes"
+                  helperText="Ingresos de la actividad menos gastos deducibles, en media mensual."
+                />
+
+                <p className={styles.basesInfo} aria-live="polite">
+                  {tramo ? (
+                    <>
+                      <strong>Tramo {tramo.id}</strong>
+                      {tramo.rendimientoMax === null
+                        ? ` (rendimientos de más de ${formatCurrency(tramo.rendimientoMin)}/mes)`
+                        : ` (rendimientos de ${tramo.id === 1 ? 'hasta' : `más de ${formatCurrency(tramo.rendimientoMin)} y hasta`} ${formatCurrency(tramo.rendimientoMax)}/mes)`}
+                      : base entre {formatCurrency(tramo.baseMinima)} y {formatCurrency(tramo.baseMaxima)}.
+                    </>
+                  ) : (
+                    <>
+                      Sin rendimientos, la base mínima es la del tramo 1 ({formatCurrency(TRAMO_1.baseMinima)}), que
+                      solo corresponde a rendimientos de hasta {formatCurrency(TRAMO_1.rendimientoMax ?? 0)}/mes. Con
+                      más rendimientos la base mínima sube: indícalos arriba.
+                    </>
+                  )}
                 </p>
 
                 <div className={styles.basesOpciones}>
@@ -891,8 +1061,8 @@ export default function AsistenteAltaAutonomoPage() {
                         onChange={() => actualizarDato('baseElegida', key)}
                       />
                       <div className={styles.baseOpcionInfo}>
-                        <span className={styles.baseOpcionValor}>{formatCurrency(info.base)}</span>
-                        <span className={styles.baseOpcionDesc}>{info.descripcion}</span>
+                        <span className={styles.baseOpcionValor}>{formatCurrency(baseDeOpcion(key))}</span>
+                        <span className={styles.baseOpcionDesc}>{tramo ? info.descripcion : info.sinTramo}</span>
                       </div>
                     </label>
                   ))}
@@ -912,8 +1082,8 @@ export default function AsistenteAltaAutonomoPage() {
                           value={datos.basePersonalizada}
                           onChange={val => actualizarDato('basePersonalizada', val)}
                           placeholder="Ej: 1100"
-                          min={BASES_COTIZACION.minima.base}
-                          max={BASES_COTIZACION.maxima.base}
+                          min={baseMin}
+                          max={baseMax}
                         />
                       )}
                     </div>
@@ -940,7 +1110,7 @@ export default function AsistenteAltaAutonomoPage() {
                 {cuotaInfo.tarifaPlana && (
                   <>
                     <div className={`${styles.cuotaItem} ${styles.cuotaTarifaPlana}`}>
-                      <span>🎉 Con tarifa plana (12 meses)</span>
+                      <span><span aria-hidden="true">🎉</span> Con tarifa plana ({TARIFA_PLANA.duracion} meses)</span>
                       <strong>{formatCurrency(cuotaInfo.tarifaPlana)}/mes</strong>
                     </div>
                     <div className={styles.cuotaAhorro}>
@@ -954,20 +1124,20 @@ export default function AsistenteAltaAutonomoPage() {
             {/* Costes anuales estimados */}
             <div className={styles.costesAnuales}>
               <h3 className={styles.costesSeccionTitulo}>
-                <span>📊</span> Costes Anuales Estimados
+                <span aria-hidden="true">📊</span> Costes Anuales Estimados
               </h3>
 
               <div className={styles.costesDesglose}>
                 <div className={styles.costeItem}>
                   <div className={styles.costeNombre}>
-                    <span>🛡️</span> Cuota autónomo (anual)
+                    <span aria-hidden="true">🛡️</span> Cuota autónomo (anual)
                   </div>
                   <div className={styles.costeValor}>{formatCurrency(costes.cuotaAnual)}</div>
                 </div>
 
                 <div className={styles.costeItem}>
                   <div className={styles.costeNombre}>
-                    <span>👔</span> Gestoría (opcional)
+                    <span aria-hidden="true">👔</span> Gestoría (opcional)
                   </div>
                   <div className={styles.costeValor}>
                     {formatCurrency(costes.gestoriaAnualMin)} - {formatCurrency(costes.gestoriaAnualMax)}
@@ -976,7 +1146,7 @@ export default function AsistenteAltaAutonomoPage() {
 
                 <div className={styles.costeItem}>
                   <div className={styles.costeNombre}>
-                    <span>🔒</span> Seguro Resp. Civil (recomendado)
+                    <span aria-hidden="true">🔒</span> Seguro Resp. Civil (recomendado)
                   </div>
                   <div className={styles.costeValor}>
                     {formatCurrency(costes.seguroRCMin)} - {formatCurrency(costes.seguroRCMax)}
@@ -999,7 +1169,7 @@ export default function AsistenteAltaAutonomoPage() {
             {/* Comparativa autónomo vs SL */}
             <div className={styles.comparativa}>
               <h3 className={styles.costesSeccionTitulo}>
-                <span>⚖️</span> ¿Autónomo o Sociedad Limitada?
+                <span aria-hidden="true">⚖️</span> ¿Autónomo o Sociedad Limitada?
               </h3>
 
               <div className={styles.comparativaTabla}>
@@ -1015,7 +1185,7 @@ export default function AsistenteAltaAutonomoPage() {
                     <tr>
                       <td>Capital inicial</td>
                       <td className={styles.ventaja}>0 €</td>
-                      <td>Mínimo 3.000 €</td>
+                      <td>Desde 1 € (art. 4 Ley de Sociedades de Capital); por debajo de 3.000 €, reserva legal reforzada</td>
                     </tr>
                     <tr>
                       <td>Responsabilidad</td>
@@ -1025,12 +1195,17 @@ export default function AsistenteAltaAutonomoPage() {
                     <tr>
                       <td>Fiscalidad</td>
                       <td>IRPF progresivo (19-47%, efectivo bajo en ingresos pequeños-medios)</td>
-                      <td>IS fijo (25%, ventajoso solo con beneficios altos)</td>
+                      <td>
+                        Impuesto sobre Sociedades: {TIPOS_IS_2025.general} % general;
+                        con cifra de negocio inferior a 1 millón de euros, {TRAMOS_IS_MICROPYMES_2026[0].tipo} % hasta{' '}
+                        {euros(TRAMOS_IS_MICROPYMES_2026[0].hasta)} de base y {TRAMOS_IS_MICROPYMES_2026[1].tipo} % en el resto (2026);
+                        {' '}{TIPOS_IS_2025.nuevaCreacion} % los dos primeros ejercicios con beneficio si es de nueva creación
+                      </td>
                     </tr>
                     <tr>
                       <td>Cuota Seg. Social</td>
-                      <td>Desde 80€/mes (tarifa plana)</td>
-                      <td>~515€/mes (autónomo societario obligatorio)</td>
+                      <td>Desde {TARIFA_PLANA_TXT}/mes (tarifa plana)</td>
+                      <td>~{euros(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual)}/mes (base mínima del autónomo societario)</td>
                     </tr>
                     <tr>
                       <td>Trámites</td>
@@ -1057,7 +1232,7 @@ export default function AsistenteAltaAutonomoPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <strong>💡 Recomendación general:</strong> Empieza como autónomo si facturas menos de 40.000-50.000€/año.
+                <strong><span aria-hidden="true">💡</span> Recomendación general:</strong> Empieza como autónomo si facturas menos de 40.000-50.000€/año.
                 Cuando superes esa cifra o necesites limitar responsabilidad, valora constituir una SL.
               </div>
             </div>
@@ -1067,7 +1242,7 @@ export default function AsistenteAltaAutonomoPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento profesional</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento profesional</h3>
         <p>
           Esta herramienta proporciona información <strong>orientativa y educativa</strong> sobre el proceso de alta como autónomo en España.
           <strong> No constituye asesoramiento legal ni fiscal</strong>. Los requisitos, cuotas y procedimientos pueden variar
@@ -1092,7 +1267,7 @@ export default function AsistenteAltaAutonomoPage() {
           <h2>Obligaciones fiscales del autónomo</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📅 Trimestrales</h4>
+              <h4><span aria-hidden="true">📅</span> Trimestrales</h4>
               <ul>
                 <li><strong>Modelo 303</strong>: Declaración IVA</li>
                 <li><strong>Modelo 130</strong>: Pago fraccionado IRPF (estimación directa)</li>
@@ -1101,7 +1276,7 @@ export default function AsistenteAltaAutonomoPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>📆 Anuales</h4>
+              <h4><span aria-hidden="true">📆</span> Anuales</h4>
               <ul>
                 <li><strong>Modelo 390</strong>: Resumen anual IVA</li>
                 <li><strong>Modelo 100</strong>: Declaración de la Renta</li>
@@ -1163,15 +1338,15 @@ export default function AsistenteAltaAutonomoPage() {
               <tbody>
                 <tr>
                   <td>Cuota mínima mensual</td>
-                  <td>Desde ~206 €/mes (rendimientos bajos)</td>
-                  <td>~515 €/mes (base mínima RETA admin., obligatoria)</td>
+                  <td>Desde ~{euros(CUOTA_MINIMA_TRAMO_1)}/mes (rendimientos bajos)</td>
+                  <td>~{euros(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual)}/mes (base mínima RETA admin., obligatoria)</td>
                   <td>Posible reducción del 50 % el 1.º año</td>
                 </tr>
                 <tr>
-                  <td>Tarifa plana 80 €</td>
-                  <td>✅ Sí (primeras altas o sin alta en 2 años)</td>
-                  <td>❌ No disponible</td>
-                  <td>✅ Sí si es primera alta como autónomo</td>
+                  <td>Tarifa plana {TARIFA_PLANA_TXT}</td>
+                  <td><span aria-hidden="true">✅</span> Sí (primeras altas o sin alta en 2 años)</td>
+                  <td><span aria-hidden="true">✅</span> Sí, en las mismas condiciones (art. 38 ter.9 Ley 20/2007)</td>
+                  <td><span aria-hidden="true">✅</span> Sí si es primera alta como autónomo</td>
                 </tr>
                 <tr>
                   <td>Obligaciones fiscales</td>
@@ -1208,24 +1383,24 @@ export default function AsistenteAltaAutonomoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
                 <h4>Joven de 30 años que deja su trabajo para negocio digital</h4>
               </div>
               <p className={styles.escenarioExample}>
                 Pedro trabajaba por cuenta ajena y decide montar una agencia de marketing digital.
-                Se da de alta el <strong>1 de marzo</strong>, solicita la tarifa plana de <strong>80 €/mes</strong> durante
-                12 meses (y 12 meses más si su comunidad tiene extensión). Presenta el <strong>modelo 037</strong> en
-                Hacienda el mismo día del alta en SS. Elige el epígrafe IAE <em>763 — Publicidad y RRPP</em>.
+                Se da de alta el <strong>1 de marzo</strong>, solicita la tarifa plana de <strong>{TARIFA_PLANA_TXT}/mes</strong> durante
+                {TARIFA_PLANA.duracion} meses (y {TARIFA_PLANA.ampliacion.duracion} meses más si sus rendimientos netos siguen por debajo del SMI). Presenta el <strong>modelo 037</strong> en
+                Hacienda antes que el alta en SS, y las dos antes de empezar. Elige el epígrafe IAE <em>751 de la sección 2.ª — Profesionales de la Publicidad, relaciones públicas y similares</em>.
                 Declara el domicilio fiscal en su vivienda habitual y emite facturas con IVA 21 %.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Al no tener empleados ni local arrendado, el modelo 037 es suficiente. Ahorra ~1.510 € en cuotas SS durante el primer año (cuota mínima ~206 €/mes − tarifa plana 80 €/mes, ×12).
+                <span aria-hidden="true">💡</span> Al no tener empleados ni local arrendado, el modelo 037 es suficiente. Si sus rendimientos no pasan de {euros(TRAMO_1.rendimientoMax ?? 0)}/mes, ahorra ~{euros(AHORRO_TARIFA_PLANA_TRAMO_1)} en cuotas SS durante el primer año (cuota mínima del tramo 1 ~{euros(CUOTA_MINIMA_TRAMO_1)}/mes − tarifa plana {TARIFA_PLANA_TXT}/mes, ×{TARIFA_PLANA.duracion}); con más rendimientos, más.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <h4>Profesional liberal (abogado, psicólogo) con consultas privadas</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1236,13 +1411,13 @@ export default function AsistenteAltaAutonomoPage() {
                 y presenta el 130 trimestralmente por los rendimientos de actividad.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Si la suma de bases de cotización supera el tope máximo anual, puede solicitar devolución del exceso a la SS.
+                <span aria-hidden="true">💡</span> Si la suma de bases de cotización supera el tope máximo anual, puede solicitar devolución del exceso a la SS.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h4>Persona en desempleo que crea su propia empresa</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1253,13 +1428,13 @@ export default function AsistenteAltaAutonomoPage() {
                 La tarifa plana es compatible con ambas modalidades.
               </p>
               <p className={styles.escenarioTip}>
-                💡 La capitalización permite invertir hasta el 100 % si se crea una sociedad o se contrata a otra persona.
+                <span aria-hidden="true">💡</span> La capitalización permite invertir hasta el 100 % si se crea una sociedad o se contrata a otra persona.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <h4>Extranjero residente en España que quiere ser autónomo</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1271,7 +1446,7 @@ export default function AsistenteAltaAutonomoPage() {
                 El resto del proceso es idéntico al de cualquier ciudadano español.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Los ciudadanos de la UE no necesitan autorización de trabajo adicional; con el NIE es suficiente.
+                <span aria-hidden="true">💡</span> Los ciudadanos de la UE no necesitan autorización de trabajo adicional; con el NIE es suficiente.
               </p>
             </div>
           </div>
@@ -1286,7 +1461,7 @@ export default function AsistenteAltaAutonomoPage() {
               <p>
                 El alta es obligatoria cuando existe <strong>habitualidad</strong> en la actividad económica.
                 La jurisprudencia del Tribunal Supremo indica que se presume habitualidad cuando los ingresos
-                suponen el <strong>Salario Mínimo Interprofesional (SMI)</strong> en cómputo anual (~17.094 € en 2026).
+                suponen el <strong>Salario Mínimo Interprofesional (SMI)</strong> en cómputo anual ({euros(SMI_2026.anual)} en 2026).
                 Por debajo de ese umbral puede discutirse, pero Hacienda puede igualmente exigir el alta si detecta
                 facturación recurrente. Ante la duda, consúltalo con un asesor.
               </p>
@@ -1294,8 +1469,9 @@ export default function AsistenteAltaAutonomoPage() {
             <details className={styles.faqItemPro}>
               <summary>¿Puedo darme de alta y baja varias veces en el año?</summary>
               <p>
-                Sí, pero con consecuencias. Desde 2023 se puede causar baja hasta <strong>3 veces al año</strong> en el
-                RETA sin perder la tarifa plana (si el período entre alta y baja es suficiente). Sin embargo, altas
+                Sí, pero con consecuencias. Una baja en el RETA mientras disfrutas de la tarifa plana{' '}
+                <strong>la extingue</strong> (art. 38 ter.4 de la Ley 20/2007), y para volver a pedirla necesitas
+                3 años sin alta. Además, altas
                 y bajas frecuentes pueden llamar la atención de Hacienda, que podría iniciar un procedimiento para
                 verificar que realmente cesó la actividad en cada baja. Guarda siempre documentación que acredite
                 el cese (cierre de contratos, fin de facturación, etc.).
@@ -1304,11 +1480,12 @@ export default function AsistenteAltaAutonomoPage() {
             <details className={styles.faqItemPro}>
               <summary>¿Qué es la tarifa plana y cuáles son sus condiciones exactas?</summary>
               <p>
-                La <strong>tarifa plana</strong> es una bonificación de la cuota RETA que la reduce a <strong>80 €/mes
-                durante los primeros 12 meses</strong> (prorrogables otros 12 si los rendimientos netos siguen por debajo
-                del SMI). Condiciones: (1) ser persona física (no societario); (2) no haber estado dado de alta en el
-                RETA en los <strong>2 años anteriores</strong> (3 años si ya disfrutaste la tarifa plana antes);
-                (3) solicitarla <strong>en el mismo momento del alta</strong>; (4) no tener deudas con SS ni Hacienda.
+                La <strong>tarifa plana</strong> es una cuota reducida del RETA de <strong>{TARIFA_PLANA_TXT}/mes
+                durante los primeros {TARIFA_PLANA.duracion} meses</strong> (prorrogables otros {TARIFA_PLANA.ampliacion.duracion} si los rendimientos netos siguen por debajo
+                del SMI, {euros(SMI_2026.anual)} anuales en 2026). Condiciones (art. 38 ter de la Ley 20/2007): (1) alta inicial o no haber estado
+                de alta en el RETA en los <strong>2 años anteriores</strong> (3 años si ya disfrutaste la tarifa plana antes);
+                (2) solicitarla <strong>en el mismo momento del alta</strong>. Alcanza también a los socios de sociedades
+                de capital encuadrados en el RETA y a quien está en pluriactividad.
               </p>
             </details>
             <details className={styles.faqItemPro}>
@@ -1386,9 +1563,9 @@ export default function AsistenteAltaAutonomoPage() {
                 <strong>Alta en el RETA — Seguridad Social</strong>
                 <p>
                   Trámite en la <strong>Sede Electrónica de la SS</strong> o en un Punto de Atención al Emprendedor
-                  (PAE). Dispones de <strong>60 días naturales</strong> desde el inicio de la actividad para darte
-                  de alta, aunque las cotizaciones se devengan desde el día 1. Aquí es donde solicitas la tarifa
-                  plana si te corresponde.
+                  (PAE). Se solicita <strong>antes de iniciar la actividad</strong>, como máximo con{' '}
+                  <strong>60 días naturales de antelación</strong> (art. 32.3 del RD 84/1996), y surte efectos desde
+                  la fecha de inicio que indiques. Aquí es donde solicitas la tarifa plana si te corresponde.
                 </p>
               </div>
             </li>
@@ -1457,42 +1634,42 @@ export default function AsistenteAltaAutonomoPage() {
           <h2>6 consejos para empezar con buen pie</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <div>
                 <strong>Darte de alta el día 1 del mes</strong>
                 <p>La cuota RETA se paga por mes completo. Darte de alta el día 2 supone pagar el mes entero sin haber cotizado el primer día. Planifica la fecha de alta siempre a principio de mes.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <div>
                 <strong>Solicitar la tarifa plana el día del alta</strong>
-                <p>La tarifa plana de 80 €/mes solo puede solicitarse en el momento del alta en el RETA. No se puede pedir retroactivamente. Si te olvidas, pierdes los 12 meses de bonificación.</p>
+                <p>La tarifa plana de {TARIFA_PLANA_TXT}/mes solo puede solicitarse en el momento del alta en el RETA. No se puede pedir retroactivamente. Si te olvidas, pierdes los {TARIFA_PLANA.duracion} meses de cuota reducida.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <div>
                 <strong>Elegir bien el epígrafe IAE</strong>
                 <p>El epígrafe determina el tipo de IVA que aplicas (21 %, 10 %, exento) y las deducciones disponibles. Un epígrafe incorrecto puede obligarte a corregir facturas emitidas y generar regularizaciones.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <div>
                 <strong>Abrir cuenta bancaria separada desde el primer día</strong>
                 <p>Aunque no es obligatorio, separar las finanzas personales de las profesionales simplifica enormemente la contabilidad y evita problemas en una eventual inspección de Hacienda.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📎</span>
+              <span className={styles.tipIcon} aria-hidden="true">📎</span>
               <div>
                 <strong>Guardar el justificante de alta</strong>
                 <p>Conserva el resguardo del modelo 036/037 y el certificado de alta en SS. Son la prueba oficial de cuándo iniciaste la actividad; necesarios para deducciones, subvenciones y posibles inspecciones.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🗺️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🗺️</span>
               <div>
                 <strong>Informarte de las bonificaciones autonómicas</strong>
                 <p>Algunas Comunidades Autónomas ofrecen hasta 6 meses adicionales de cuota cero o subvenciones directas al emprendimiento. Consulta la web de tu comunidad o un PAE antes de iniciar el alta.</p>
@@ -1505,7 +1682,7 @@ export default function AsistenteAltaAutonomoPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>6 errores frecuentes que debes evitar</h3>
             </div>
             <ul className={styles.warningList}>
@@ -1531,12 +1708,12 @@ export default function AsistenteAltaAutonomoPage() {
               <li>
                 <strong>No solicitar la tarifa plana en el momento del alta:</strong> Es el error más costoso.
                 La tarifa plana solo puede obtenerse al tramitar el alta en el RETA. Perder esta bonificación
-                supone pagar más de 1.500 € adicionales en el primer año.
+                supone pagar al menos {euros(AHORRO_TARIFA_PLANA_TRAMO_1)} más en el primer año.
               </li>
               <li>
-                <strong>Ignorar el plazo de 60 días para el alta en SS:</strong> Aunque legalmente tienes 60 días
-                naturales desde el inicio de la actividad, las cotizaciones se devengan desde el día 1. Un alta
-                tardía genera recargo del 20 % más intereses de demora sobre las cuotas atrasadas.
+                <strong>Darse de alta en la SS después de empezar:</strong> el alta en el RETA se pide antes del
+                inicio de la actividad (como máximo 60 días naturales antes, art. 32.3 del RD 84/1996). Un alta
+                tardía hace que se reclamen las cuotas atrasadas con recargo e intereses.
               </li>
             </ul>
           </div>
