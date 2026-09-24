@@ -205,7 +205,7 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(
         page,
         'Precio de compra original del garaje',
-        base === 'R' ? '24000' : base === 'P' ? '30000' : '18000',
+        base === 'R' ? '24000' : base === 'P' ? '30000' : base === 'V' ? '' : '18000',
       );
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '1800');
       await sembrar(page, 'Años de propiedad', '8');
@@ -257,6 +257,18 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '1800',
         base: 'P',
+        direccion: 'sin_efecto',
+        delta: 0,
+      },
+      {
+        // BASE V (precio de compra original VACÍO): sin él no hay IRPF calculado, así que los
+        // gastos de aquella compra tampoco mueven el neto. Es el caso literal del acta del
+        // 23/09/2026 (neto idéntico y «el neto real es MAYOR»), que la base P cubría solo por
+        // la variante de la pérdida. Criterio decidido el 24/09: «es/será» solo si es seguro.
+        etiqueta: 'Impuestos y gastos que pagaste al comprarlo (€)',
+        panel: 'vendedor',
+        legible: '1800',
+        base: 'V',
         direccion: 'sin_efecto',
         delta: 0,
       },
@@ -338,7 +350,7 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(page, 'Precio del trastero', '15000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
       await irAPestana(page, 'vendedor');
-      await sembrar(page, 'Precio de compra original', base === 'R' ? '14000' : base === 'P' ? '20000' : '10000');
+      await sembrar(page, 'Precio de compra original', base === 'R' ? '14000' : base === 'P' ? '20000' : base === 'V' ? '' : '10000');
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000');
       await sembrar(page, 'Años de propiedad', '5');
       await sembrar(page, 'Valor catastral del suelo', '4000');
@@ -388,6 +400,16 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '1000',
         base: 'P',
+        direccion: 'sin_efecto',
+        delta: 0,
+      },
+      {
+        // BASE V (precio de compra original VACÍO): sin IRPF calculado, los gastos de aquella
+        // compra no mueven el neto. El caso literal del acta del 23/09/2026 (ver garaje).
+        etiqueta: 'Impuestos y gastos que pagaste al comprarlo',
+        panel: 'vendedor',
+        legible: '1000',
+        base: 'V',
         direccion: 'sin_efecto',
         delta: 0,
       },
@@ -468,7 +490,7 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(
         page,
         'Precio de compra original',
-        base === 'R' ? '195000' : base === 'P' ? '250000' : '150000',
+        base === 'R' ? '195000' : base === 'P' ? '250000' : base === 'V' ? '' : '150000',
       );
       await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '15000');
       await sembrar(page, 'Amortizaciones acumuladas deducidas (€)', '20000');
@@ -536,6 +558,27 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '20000',
         base: 'P',
+        direccion: 'sin_efecto',
+        delta: 0,
+      },
+      {
+        // BASE V (precio de compra original VACÍO): sin IRPF ni plusvalía calculados, ningún
+        // ilegible del vendedor mueve el neto. Lo que destapó esta base (24/09/2026) no era del
+        // ilegible sino del CAMPO PENDIENTE: «No descuenta la plusvalía municipal y el IRPF de
+        // la ganancia: el neto real será menor», falso vendiendo con pérdida, donde los dos
+        // salen a cero y el neto real es igual. Ahora dice «puede ser menor».
+        etiqueta: 'Impuestos y gastos que pagaste al comprarlo (€)',
+        panel: 'vendedor',
+        legible: '15000',
+        base: 'V',
+        direccion: 'sin_efecto',
+        delta: 0,
+      },
+      {
+        etiqueta: 'Amortizaciones acumuladas deducidas (€)',
+        panel: 'vendedor',
+        legible: '20000',
+        base: 'V',
         direccion: 'sin_efecto',
         delta: 0,
       },
@@ -714,7 +757,8 @@ const HERMANAS: readonly Hermana[] = [
       'BASE A = B + reinvierte 193.000 (exento, NETO 193.000,00). · ' +
       "BASE A' = B + reinvierte 150.000 + hipoteca 2.000,50 (NETO 191.181,64). · " +
       'BASE C = B + catastral total 700.000 (método real, NETO 184.174,64). · ' +
-      'BASE E = B + mayor de 65 (exento por edad, NETO 193.000,00).',
+      'BASE E = B + mayor de 65 (exento por edad, NETO 193.000,00). · ' +
+      'BASE V = B con el precio de compra original VACÍO (sin IRPF calculado).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
     cifraVendedor: /^IMPORTE NETO VENDEDOR$/,
@@ -722,7 +766,7 @@ const HERMANAS: readonly Hermana[] = [
       await sembrar(page, 'Precio de la vivienda', '200000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
       await irAPestana(page, 'vendedor');
-      await sembrar(page, 'Precio de compra original', '150000');
+      await sembrar(page, 'Precio de compra original', base === 'V' ? '' : '150000');
       await sembrar(page, 'Años de propiedad', '10');
       await sembrar(page, 'Valor catastral del suelo', '50000');
       await sembrar(page, 'Comisión inmobiliaria (%)', '3');
@@ -798,6 +842,17 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '2000,50',
         base: 'E',
+        direccion: 'sin_efecto',
+        delta: 0,
+      },
+      {
+        // BASE V (precio de compra original VACÍO): la otra forma de no tener IRPF, y la del
+        // caso literal del acta del 23/09/2026 (neto 194.000,00 € idéntico y «el neto real es
+        // MAYOR que este»).
+        etiqueta: 'Impuestos y gastos que pagaste al comprar',
+        panel: 'vendedor',
+        legible: '2000,50',
+        base: 'V',
         direccion: 'sin_efecto',
         delta: 0,
       },

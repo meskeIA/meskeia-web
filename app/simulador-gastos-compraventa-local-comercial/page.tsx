@@ -1494,8 +1494,10 @@ export default function SimuladorLocalComercialPage() {
                     description={
                       (() => {
                         const avisos: string[] = [];
+                        // «puede ser», no «será»: un impuesto sin calcular también puede salir a cero —
+                        // vendiendo con pérdida no hay IRPF ni plusvalía—, y entonces el neto real es igual.
                         if (faltanEnElNeto.length > 0) {
-                          avisos.push(`No descuenta ${enumerarEnEspanol(faltanEnElNeto)}: el neto real será menor`);
+                          avisos.push(`No descuenta ${enumerarEnEspanol(faltanEnElNeto)}: el neto real puede ser menor`);
                         }
                         if (resultadosVendedor.camposIlegibles.length > 0) {
                           const f = noSePudoLeer(resultadosVendedor.camposIlegibles);
