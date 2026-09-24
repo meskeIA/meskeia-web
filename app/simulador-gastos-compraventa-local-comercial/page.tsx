@@ -19,7 +19,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 import {
   calcularGananciaInmueble,
   IVA_INMUEBLES_2025,
@@ -677,8 +677,8 @@ export default function SimuladorLocalComercialPage() {
         c === 'las amortizaciones deducidas' ? 'el IRPF que añaden las amortizaciones deducidas' : c,
       );
       return v.seguro
-        ? `No descuenta ${enumerar(nombres)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real será menor`
-        : `${noSePudoLeer(v.campos).replace(/^./, (c) => c.toUpperCase())}: el neto real puede ser menor que este`;
+        ? `No descuenta ${enumerarNi(nombres)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
+        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
     }
     const explica = v.campos.map((c) =>
       c === 'los impuestos y gastos de aquella compra'
@@ -713,9 +713,7 @@ export default function SimuladorLocalComercialPage() {
     if (v.tipo === 'mixto') {
       return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven ${que} en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
     }
-    return v.tipo === 'menor'
-      ? `TECHO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} menor. Escríbelo con coma decimal (1.234,56).`
-      : `SUELO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} mayor. Escríbelo con coma decimal (1.234,56).`;
+    return `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. Escríbelo con coma decimal (1.234,56).`;
   };
 
   /** La pérdida es la ganancia con el signo cambiado: su dirección es la contraria (1259). */
@@ -1477,7 +1475,7 @@ export default function SimuladorLocalComercialPage() {
                     description={
                       `${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta` +
                       (faltanEnElNeto.length > 0
-                        ? ` — SIN ${enumerarEnEspanol(faltanEnElNeto)}, que no se ${faltanEnElNeto.length > 1 ? 'incluyen' : 'incluye'}`
+                        ? ` — SIN ${enumerarNi(faltanEnElNeto)}, que no se ${faltanEnElNeto.length > 1 ? 'incluyen' : 'incluye'}`
                         : '') +
                       (avisoIlegiblesNeto ? ' — con importes que no se han podido leer (ver el neto de abajo)' : '')
                     }
@@ -1497,7 +1495,7 @@ export default function SimuladorLocalComercialPage() {
                         // «puede ser», no «será»: un impuesto sin calcular también puede salir a cero —
                         // vendiendo con pérdida no hay IRPF ni plusvalía—, y entonces el neto real es igual.
                         if (faltanEnElNeto.length > 0) {
-                          avisos.push(`No descuenta ${enumerarEnEspanol(faltanEnElNeto)}: el neto real puede ser menor`);
+                          avisos.push(`No descuenta ${enumerarNi(faltanEnElNeto)}: el neto real puede ser menor que este`);
                         }
                         if (resultadosVendedor.camposIlegibles.length > 0) {
                           const f = noSePudoLeer(resultadosVendedor.camposIlegibles);

@@ -26,7 +26,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
@@ -621,10 +621,10 @@ export default function SimuladorTrasteroCompraventaPage() {
       : null;
 
   /**
-   * Lo que el aviso del neto dice de los importes ilegibles, calculado por el sondeo, en el
-   * dialecto de esta app: «Techo:» si la cifra real es menor, «Suelo:» si es mayor, y ninguno
-   * de los dos si se mueven en sentidos contrarios, que es cuando la app no puede saberlo
-   * (hallazgo 1282: con los dos a la vez, solo serían ciertos si la cifra fuese la correcta).
+   * Lo que el aviso del neto dice de los importes ilegibles, calculado por el sondeo, en la
+   * redacción común de la familia (24/09/2026; hasta entonces esta app decía «Techo:»/«Suelo:»):
+   * cada frase termina en la dirección del neto real, y «Sin cerrar» si se mueven en sentidos
+   * contrarios, que es cuando la app no puede saberlo (hallazgo 1282).
    */
   const avisoIlegiblesNeto = (() => {
     const v = resultadosVendedor?.veredictoNeto;
@@ -639,17 +639,17 @@ export default function SimuladorTrasteroCompraventaPage() {
           ? ''
           : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`;
       return v.seguro
-        ? `Techo: aún NO incluye ${enumerar(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}`
-        : `Techo: ${noSePudoLeer(v.campos)}, y el neto real puede ser menor que este`;
+        ? `No descuenta ${enumerarNi(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
+        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
     }
     const explica = v.campos.map((c) =>
       c === 'los impuestos y gastos de aquella compra'
-        ? 'los impuestos y gastos de aquella compra, que al sumarse al valor de adquisición REDUCEN el IRPF'
+        ? 'los impuestos y gastos de aquella compra (suman al valor de adquisición y REDUCEN el IRPF)'
         : c === 'el valor catastral total'
-          ? 'el valor catastral total, y con él la plusvalía puede salir más barata por el método real'
+          ? 'el valor catastral total (con él la plusvalía puede salir más barata por el método real)'
           : c,
     );
-    return `Suelo: ${noSePudoLeer(explica)}: el neto real ${v.seguro ? 'es' : 'puede ser'} mayor que este`;
+    return `${mayuscula(noSePudoLeer(explica))}: el neto real ${v.seguro ? 'es' : 'puede ser'} MAYOR que este`;
   })();
 
   /**
@@ -668,15 +668,15 @@ export default function SimuladorTrasteroCompraventaPage() {
     (resultadosVendedor?.camposIlegibles.length ?? 0) > 0 ||
     (resultadosVendedor !== null && resultadosVendedor.veredictoNeto.tipo !== 'ninguno');
 
+  const netoParcial = faltanEnElNeto.length > 0 || avisoIlegiblesNeto !== null || (resultadosVendedor?.camposIlegibles.length ?? 0) > 0;
+
   /** Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve. */
   const avisoTarjeta = (v: Veredicto, que: string): string | null => {
     if (v.tipo === 'ninguno') return null;
     if (v.tipo === 'mixto') {
       return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven ${que} en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
     }
-    return v.tipo === 'menor'
-      ? `TECHO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} menor. Escríbelo con coma decimal (1.234,56).`
-      : `SUELO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} mayor. Escríbelo con coma decimal (1.234,56).`;
+    return `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. Escríbelo con coma decimal (1.234,56).`;
   };
 
   /** La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. */
@@ -1368,25 +1368,29 @@ export default function SimuladorTrasteroCompraventaPage() {
 
                   <div className={styles.separador} />
 
+                  {/* Redacción común de la familia (decidida el 24/09/2026, la de local-comercial):
+                      el título dice «(PARCIAL)» y cada frase termina en la dirección del neto real. */}
                   <ResultCard
-                    title="Total gastos vendedor"
+                    title={netoParcial ? 'Total gastos vendedor (parcial)' : 'Total gastos vendedor'}
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="warning"
                     icon="➖"
                     description={
                       faltanEnElNeto.length > 0 || avisoIlegiblesNeto
-                        ? `Parcial: ${[
-                            faltanEnElNeto.length > 0 ? `sin ${enumerar(faltanEnElNeto)}` : null,
+                        ? [
+                            faltanEnElNeto.length > 0
+                              ? `SIN ${enumerarNi(faltanEnElNeto)}, que no se ${faltanEnElNeto.length > 1 ? 'incluyen' : 'incluye'}`
+                              : null,
                             avisoIlegiblesNeto ? 'con importes que no se han podido leer (ver el neto de abajo)' : null,
                           ]
                             .filter(Boolean)
-                            .join('; ')}`
+                            .join(' — ')
                         : undefined
                     }
                   />
 
                   <ResultCard
-                    title="IMPORTE NETO VENDEDOR"
+                    title={netoParcial ? 'IMPORTE NETO VENDEDOR (PARCIAL)' : 'IMPORTE NETO VENDEDOR'}
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
@@ -1394,21 +1398,24 @@ export default function SimuladorTrasteroCompraventaPage() {
                       // Los CONCEPTOS que faltan (plusvalía, IRPF) van por un lado y los CAMPOS que
                       // hay que rellenar por otro, sin repetirlos (hallazgo 639). La dirección de
                       // los importes ilegibles la da el sondeo del cálculo (avisoIlegiblesNeto).
+                      // «puede ser», no «será»: un impuesto sin calcular también puede salir a cero.
                       (() => {
                         const frases: string[] = [];
-                        if (faltanEnElNeto.length > 0) frases.push(`Techo: aún NO incluye ${faltanEnElNeto.join(' ni ')}`);
+                        if (faltanEnElNeto.length > 0) {
+                          frases.push(`No descuenta ${enumerarNi(faltanEnElNeto)}: el neto real puede ser menor que este`);
+                        }
                         if (resultadosVendedor.camposIlegibles.length > 0) {
-                          frases.push(`${noSePudoLeer(resultadosVendedor.camposIlegibles).replace(/^./, (c) => c.toUpperCase())}`);
+                          frases.push(mayuscula(noSePudoLeer(resultadosVendedor.camposIlegibles)));
                         }
                         if (avisoIlegiblesNeto) frases.push(avisoIlegiblesNeto);
                         if (frases.length === 0) return 'Lo que realmente recibes tras los gastos';
                         const pedir = [
-                          camposPendientes.length > 0 ? `añade ${enumerar(camposPendientes)}` : null,
-                          hayIlegiblesQueCorregir ? 'escribe con coma decimal, como 1.234,56, lo que no se ha podido leer' : null,
+                          camposPendientes.length > 0 ? `rellena ${enumerar(camposPendientes)}` : null,
+                          hayIlegiblesQueCorregir ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer' : null,
                         ]
                           .filter(Boolean)
                           .join(' y ');
-                        return `${frases.join('. ')} (${pedir})`;
+                        return `${frases.join('. ')}. ${mayuscula(pedir)} para obtenerlo.`;
                       })()
                     }
                   />

@@ -1388,7 +1388,7 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — los tres casos, resueltos a mano an
       expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('750,00 €');
       expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('24.250,00 €');
       const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-      expect(neto).toContain('INCOMPLETO');
+      expect(neto).toContain('No descuenta');
       expect(neto).toContain('la plusvalía municipal');
       expect(neto).toContain('el IRPF de la ganancia');
     }
@@ -1715,7 +1715,7 @@ test.describe('INSPECCIÓN 02/09/2026 — los tres casos, resueltos a mano antes
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1791,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2691,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.309,00 €');
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
     await expect(page.getByText('No definido')).toHaveCount(0);
 
     // (b) Al salir del campo NO pasa nada: el dato imposible sigue ahí y sigue sin liquidarse.
@@ -1741,7 +1741,7 @@ test.describe('INSPECCIÓN 02/09/2026 — los tres casos, resueltos a mano antes
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('9100,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1791,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2691,00 €');
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.309,00 €');
   });
 });
@@ -2446,7 +2446,7 @@ test.describe('INSPECCIÓN 10/09/2026 — los tres casos, resueltos a mano antes
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1980,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('28.020,00 €');
     // Y el neto se declara incompleto, porque la plusvalía municipal sigue sin datos.
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
 
     // Al salir del campo, el valor se normaliza a 0 y nada cambia.
     await campo.blur();
@@ -2817,7 +2817,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — los tres casos, resueltos a mano an
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('3978,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('36.022,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
-      'INCOMPLETO: falta descontar la plusvalía municipal. Rellena el valor catastral del suelo para obtener el neto real.',
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. Rellena el valor catastral del suelo para obtenerlo.',
     );
     await expect(page.getByText('No definido')).toHaveCount(0);
 
@@ -3223,7 +3223,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — los tres casos, resueltos a mano an
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1200,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('38.800,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
-      'INCOMPLETO: falta descontar la plusvalía municipal y el IRPF de la ganancia; el precio de compra original no se ha podido leer. Escribe los importes con coma decimal (1.234,56) para obtener el neto real.',
+      'No descuenta la plusvalía municipal ni el IRPF de la ganancia: el neto real puede ser menor que este. El precio de compra original no se ha podido leer. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
     );
 
     // El NaN no se asoma por ninguna parte: ni «No definido» (lo que formatCurrency devuelve
@@ -3605,7 +3605,7 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — los tres casos, resueltos a mano an
     await sembrarImporte(page, 'Años de propiedad', '-3', { blur: false });
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.240,00 €');
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
 
     // 2) Al salir del campo NO se acota: el dato imposible sigue siendo imposible.
     //
@@ -3626,7 +3626,7 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — los tres casos, resueltos a mano an
     // que con el foco dentro. Antes: «175,00 €» y 29.098,25 € presentados como definitivos.
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.240,00 €');
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
   });
 });
 
@@ -4516,7 +4516,7 @@ test.describe('re-inspección 22/09/2026', () => {
     // El aviso del neto nombra la partida y el campo: es la mitad del 1157 que sí llegó.
     const avisoNeto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
     expect(avisoNeto).toContain('los impuestos y gastos de aquella compra');
-    expect(avisoNeto).toContain('Escribe los importes con coma decimal');
+    expect(avisoNeto).toContain('Escribe con coma decimal (1.234,56) lo que no se ha podido leer');
 
     // El NaN no se asoma por ninguna parte.
     await expect(page.getByText('No definido')).toHaveCount(0);
@@ -4618,7 +4618,7 @@ test.describe('re-inspección 22/09/2026', () => {
       // El neto mostrado está por DEBAJO del real (35.923,25 frente a 36.343,25).
       expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('35.923,25 €');
       const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-      expect(aviso).not.toContain('falta descontar los impuestos y gastos de aquella compra');
+      expect(aviso).not.toContain('No descuenta los impuestos y gastos de aquella compra');
       // Y lo dice en la dirección correcta: hay 420,00 € que SUMAR, no que restar.
       expect(aviso).toContain('suman al valor de adquisición y REDUCEN el IRPF');
       expect(aviso).toContain('el neto real es MAYOR que este');
@@ -5157,7 +5157,7 @@ test.describe('re-inspección 23/09/2026 — la familia tras cfe091a7 y 758e053f
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('869,25 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('23.505,75 €');
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(aviso).toContain('falta descontar la comisión inmobiliaria');
+    expect(aviso).toContain('No descuenta la comisión inmobiliaria');
     // Como la referencia: la comisión rebaja también el IRPF, hasta el tipo marginal (19 %).
     expect(aviso).toMatch(/comisi[óo]n[^.;]*IRPF/i);
   });

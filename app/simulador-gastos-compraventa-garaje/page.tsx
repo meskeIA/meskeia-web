@@ -19,7 +19,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr, registrarEventoInteraccion } from '@/lib';
-import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
@@ -601,7 +601,7 @@ export default function SimuladorGarajeCompraventaPage() {
     const v = resultadosVendedor?.veredictoNeto;
     if (!v || v.tipo === 'ninguno') return null;
     if (v.tipo === 'mixto') {
-      return `${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${v.menor.length > 1 ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${v.mayor.length > 1 ? 'subirían' : 'subiría'}), así que no se puede saber si el neto real es mayor o menor que este`;
+      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${v.menor.length > 1 ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${v.mayor.length > 1 ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
     }
     if (v.tipo === 'menor') {
       const deducibles = v.campos.filter((c) => c === 'la comisión inmobiliaria' || c === 'la gestoría de la venta');
@@ -610,8 +610,8 @@ export default function SimuladorGarajeCompraventaPage() {
           ? ''
           : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`;
       return v.seguro
-        ? `falta descontar ${enumerar(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}`
-        : `${noSePudoLeer(v.campos)}: el neto real puede ser menor que este`;
+        ? `No descuenta ${enumerarNi(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
+        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
     }
     const explica = v.campos.map((c) =>
       c === 'los impuestos y gastos de aquella compra'
@@ -620,7 +620,7 @@ export default function SimuladorGarajeCompraventaPage() {
           ? 'el valor catastral total (con él la plusvalía puede salir más barata por el método real)'
           : c,
     );
-    return `${noSePudoLeer(explica)}: el neto real ${v.seguro ? 'es' : 'puede ser'} MAYOR que este`;
+    return `${mayuscula(noSePudoLeer(explica))}: el neto real ${v.seguro ? 'es' : 'puede ser'} MAYOR que este`;
   })();
 
   /**
@@ -639,15 +639,15 @@ export default function SimuladorGarajeCompraventaPage() {
     (resultadosVendedor?.camposIlegibles.length ?? 0) > 0 ||
     (resultadosVendedor !== null && resultadosVendedor.veredictoNeto.tipo !== 'ninguno');
 
+  const netoParcial = faltanEnElNeto.length > 0 || avisoIlegiblesNeto !== null || (resultadosVendedor?.camposIlegibles.length ?? 0) > 0;
+
   /** Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve. */
   const avisoTarjeta = (v: Veredicto, que: string): string | null => {
     if (v.tipo === 'ninguno') return null;
     if (v.tipo === 'mixto') {
       return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven ${que} en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
     }
-    return v.tipo === 'menor'
-      ? `TECHO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} menor. Escríbelo con coma decimal (1.234,56).`
-      : `SUELO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} mayor. Escríbelo con coma decimal (1.234,56).`;
+    return `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. Escríbelo con coma decimal (1.234,56).`;
   };
 
   /** La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. */
@@ -1361,45 +1361,52 @@ export default function SimuladorGarajeCompraventaPage() {
                     />
                   )}
                   <div className={styles.separador} />
+                  {/* Redacción común de la familia (decidida el 24/09/2026, la de local-comercial):
+                      el título dice «(PARCIAL)» y cada frase termina en la dirección del neto real. */}
                   <ResultCard
-                    title="Total gastos vendedor"
+                    title={netoParcial ? 'Total gastos vendedor (parcial)' : 'Total gastos vendedor'}
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="warning"
                     icon="➖"
                     description={
                       faltanEnElNeto.length > 0 || avisoIlegiblesNeto
-                        ? `Parcial: ${[
-                            faltanEnElNeto.length > 0 ? `sin ${enumerar(faltanEnElNeto)}` : null,
+                        ? [
+                            faltanEnElNeto.length > 0
+                              ? `SIN ${enumerarNi(faltanEnElNeto)}, que no se ${faltanEnElNeto.length > 1 ? 'incluyen' : 'incluye'}`
+                              : null,
                             avisoIlegiblesNeto ? 'con importes que no se han podido leer (ver el neto de abajo)' : null,
                           ]
                             .filter(Boolean)
-                            .join('; ')}`
+                            .join(' — ')
                         : undefined
                     }
                   />
                   <ResultCard
-                    title="IMPORTE NETO VENDEDOR"
+                    title={netoParcial ? 'IMPORTE NETO VENDEDOR (PARCIAL)' : 'IMPORTE NETO VENDEDOR'}
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
                     description={
                       (() => {
                         // La dirección de los importes ilegibles la da el sondeo del cálculo
-                        // (avisoIlegiblesNeto); aquí solo se compone la frase.
+                        // (avisoIlegiblesNeto); aquí solo se compone la frase. «puede ser», no
+                        // «será»: un impuesto sin calcular también puede salir a cero.
                         const avisos: string[] = [];
-                        if (faltanEnElNeto.length > 0) avisos.push(`falta descontar ${enumerar(faltanEnElNeto)}`);
+                        if (faltanEnElNeto.length > 0) {
+                          avisos.push(`No descuenta ${enumerarNi(faltanEnElNeto)}: el neto real puede ser menor que este`);
+                        }
                         if (resultadosVendedor.camposIlegibles.length > 0) {
-                          avisos.push(noSePudoLeer(resultadosVendedor.camposIlegibles));
+                          avisos.push(mayuscula(noSePudoLeer(resultadosVendedor.camposIlegibles)));
                         }
                         if (avisoIlegiblesNeto) avisos.push(avisoIlegiblesNeto);
                         if (avisos.length === 0) return 'Lo que realmente recibes tras gastos e impuestos';
                         const pedir = [
                           camposPendientes.length > 0 ? `Rellena ${enumerar(camposPendientes)}` : null,
-                          hayIlegiblesQueCorregir ? 'escribe los importes con coma decimal (1.234,56)' : null,
+                          hayIlegiblesQueCorregir ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer' : null,
                         ]
                           .filter(Boolean)
                           .join(' y ');
-                        return `INCOMPLETO: ${avisos.join('; ')}. ${pedir.charAt(0).toUpperCase()}${pedir.slice(1)} para obtener el neto real.`;
+                        return `${avisos.join('. ')}. ${mayuscula(pedir)} para obtenerlo.`;
                       })()
                     }
                   />

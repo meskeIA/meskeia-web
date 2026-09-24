@@ -1420,7 +1420,7 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('14.550,00 €');
     // …y tiene que decir que es un techo, nombrando las DOS cosas que faltan.
     const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(neto).toContain('Techo');
+    expect(neto).toContain('No descuenta');
     expect(neto).toContain('plusvalía municipal');
     expect(neto).toContain('IRPF');
 
@@ -1700,7 +1700,7 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2034,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.966,00 €');
     // …y ese neto TIENE que anunciarse como techo, no como lo que se recibe.
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
 
     // Con el dato puesto (1 año de tenencia):
     await rellenar(page, 'Años de propiedad', '1');
@@ -1986,7 +1986,7 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.237,10 €');
     // Y el neto se anuncia como techo, nombrando el campo que de verdad falta.
     const neto19 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(neto19).toContain('Techo');
+    expect(neto19).toContain('No descuenta');
     expect(neto19).toContain('los años de propiedad');
   });
 });
@@ -2324,7 +2324,7 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('540,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.460,00 €');
     const neto22 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(neto22).toContain('Techo');
+    expect(neto22).toContain('No descuenta');
     expect(neto22).toContain('la plusvalía municipal ni el IRPF de la ganancia');
     // Escrito pero ilegible: se nombra como tal y se pide corregirlo UNA vez (1285 y 639).
     expect(neto22).toContain('El precio de compra original no se ha podido leer');
@@ -2647,7 +2647,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     // El neto se presenta como TECHO, nombrando el concepto que falta y el campo que lo
     // desbloquea (hallazgos 483 y 639).
     const neto25 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(neto25).toBe('Techo: aún NO incluye la plusvalía municipal. No se han podido leer los años de propiedad (escribe con coma decimal, como 1.234,56, lo que no se ha podido leer)');
+    expect(neto25).toBe('No descuenta la plusvalía municipal: el neto real puede ser menor que este. No se han podido leer los años de propiedad. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.');
 
     // Y en ninguna parte de la página puede haber NaN. Mayúsculas incluidas: `getByText`
     // no distingue y casaría con «ganancia».
@@ -3385,7 +3385,7 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('10.100,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2001,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.099,00 €');
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
   });
 });
 
@@ -3444,7 +3444,7 @@ test('REPARADO 15/09 (operativa) — al salir del campo, unos años negativos si
 
   expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
   // Y el neto sigue siendo un TECHO, no lo que se recibe: igual que con el foco dentro.
-  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('Techo');
+  expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
 });
 
 // ⚠️ ABIERTO 14/09/2026 (medio) — contenido. Lo que la app ROTULA cuando la ganancia
@@ -3756,10 +3756,10 @@ test('REGRESIÓN 1157+1202 (operativa) — unos gastos de adquisición ilegibles
 
   const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
   expect(aviso).toContain('los impuestos y gastos de aquella compra');
-  expect(aviso).toContain('escribe con coma decimal');
+  expect(aviso).toContain('Escribe con coma decimal (1.234,56)');
   // La dirección importa: leer el dato SUBE el neto, así que la cifra es un suelo.
-  expect(aviso).toMatch(/^Suelo:/);
-  expect(aviso).not.toMatch(/^Techo:/);
+  expect(aviso).toMatch(/el neto real es MAYOR que este/);
+  expect(aviso).not.toMatch(/menor que este/);
 });
 
 // ✅ HALLAZGO 1158 del 21/09/2026 (bajo) — contenido, REPARADO el 21/09. La FAQ visible y el
@@ -4073,10 +4073,10 @@ test('REGRESIÓN 22/09 (contenido) — el aviso del neto llama SUELO a lo que es
   // FONDO: 22.009,50 € es el SUELO —leer el dato lo sube a 22.429,60 €—, así que el aviso no
   // puede presentarlo como un techo del que aún hay que descontar.
   const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-  expect(aviso).not.toMatch(/^Techo:/);
-  expect(aviso).toMatch(/^Suelo:/);
-  expect(aviso).toContain('REDUCEN el IRPF: el neto real es mayor que este');
-  expect(aviso).toContain('escribe con coma decimal');
+  expect(aviso).not.toMatch(/menor que este/);
+  expect(aviso).toMatch(/el neto real es MAYOR que este/);
+  expect(aviso).toContain('REDUCEN el IRPF): el neto real es MAYOR que este');
+  expect(aviso).toContain('Escribe con coma decimal (1.234,56)');
 
   // Y con la MISMA cifra legible el neto sube los 420,10 € que el aviso anunciaba.
   await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '2000,50');
@@ -4315,7 +4315,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1596,40 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('16.403,60 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
-      'Techo: aún NO incluye la plusvalía municipal (añade el valor catastral del suelo)',
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. Rellena el valor catastral del suelo para obtenerlo.',
     );
     // El 0 se queda en el campo: el blur no lo reescribe (min = 0).
     await expect(page.locator('input[aria-label="Valor catastral del suelo"]')).toHaveValue('0');
@@ -4508,7 +4508,7 @@ test.describe('HALLAZGOS 23/09/2026 — lo que la reparación del ilegible dejó
 
     // FONDO: una sola cifra no puede declararse techo y suelo en la misma frase.
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(aviso).not.toMatch(/Techo:[\s\S]*Suelo:|Suelo:[\s\S]*Techo:/);
+    expect(aviso).not.toMatch(/menor que este[\s\S]*mayor que este|mayor que este[\s\S]*menor que este/i);
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.581,87 €');
 
     await sembrar(page, 'Gestoría y certificados del vendedor (€)', '2000,50');

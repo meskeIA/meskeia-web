@@ -7,7 +7,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -879,10 +879,16 @@ export default function SimuladorCompraventaPage() {
           ?.tipo ?? TIPO_AHORRO_MAX)
       : null;
 
-  /** Cómo se nombra, en el aviso del SUELO, cada importe que abarata el impuesto. */
+  /**
+   * Cómo se nombra, en el aviso del SUELO, cada importe que abarata el impuesto: el paréntesis
+   * dice POR QUÉ leerlo sube el neto, igual que en las hermanas (redacción común, 24/09/2026).
+   */
   const EXPLICA_SUELO: Record<string, string> = {
+    'los impuestos y gastos de aquella compra':
+      'los impuestos y gastos de aquella compra (suman al valor de adquisición y REDUCEN el IRPF)',
+    'las mejoras': 'las mejoras (suman al valor de adquisición y REDUCEN el IRPF)',
     'el importe que reinviertes': 'el importe que reinviertes (con él, la ganancia puede quedar exenta por el art. 38 LIRPF)',
-    'el valor catastral total': 'el valor catastral total, que puede abaratar la plusvalía por el método real',
+    'el valor catastral total': 'el valor catastral total (con él la plusvalía puede salir más barata por el método real)',
   };
 
   /** Lo que el aviso del neto dice de los importes ilegibles, calculado por el sondeo. */
@@ -891,7 +897,7 @@ export default function SimuladorCompraventaPage() {
     if (!v || v.tipo === 'ninguno') return null;
     if (v.tipo === 'mixto') {
       // Con dos ilegibles opuestos no se puede afirmar una dirección (hallazgo 1229).
-      return `sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${v.menor.length > 1 ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${v.mayor.length > 1 ? 'subirían' : 'subiría'}), así que no se puede saber si el neto real es mayor o menor que este`;
+      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${v.menor.length > 1 ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${v.mayor.length > 1 ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
     }
     if (v.tipo === 'menor') {
       const deducibles = v.campos.filter(
@@ -906,11 +912,11 @@ export default function SimuladorCompraventaPage() {
             ? ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`
             : ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, así que el neto real baja menos que su importe)`;
       return v.seguro
-        ? `falta descontar ${enumerar(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}`
-        : `${noSePudoLeer(v.campos)}: el neto real puede ser menor que este`;
+        ? `No descuenta ${enumerarNi(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
+        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
     }
     const explica = v.campos.map((c) => EXPLICA_SUELO[c] ?? c);
-    return `hay importes que no se han podido leer y REDUCEN el impuesto (${explica.join('; ')}), así que el neto real ${v.seguro ? 'es' : 'puede ser'} MAYOR que este`;
+    return `${mayuscula(noSePudoLeer(explica))}: el neto real ${v.seguro ? 'es' : 'puede ser'} MAYOR que este`;
   })();
 
   /** Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve. */
@@ -927,9 +933,7 @@ export default function SimuladorCompraventaPage() {
     if (v.tipo === 'mixto') {
       return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven ${que} en sentidos contrarios. Escríbelos con coma decimal (1.234,56).${art38}`;
     }
-    return v.tipo === 'menor'
-      ? `TECHO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} menor. Escríbelo con coma decimal (1.234,56).${art38}`
-      : `SUELO: ${noSePudoLeer(v.campos)}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} mayor. Escríbelo con coma decimal (1.234,56).`;
+    return `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. Escríbelo con coma decimal (1.234,56).${v.tipo === 'menor' ? art38 : ''}`;
   };
 
   /** La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. */
@@ -961,6 +965,12 @@ export default function SimuladorCompraventaPage() {
           : null,
       ].filter((x): x is string => x !== null)
     : [];
+
+  const netoParcial =
+    faltanEnElNeto.length > 0 ||
+    avisoIlegiblesNeto !== null ||
+    (resultadosVendedor?.camposIlegibles.length ?? 0) > 0 ||
+    (resultadosVendedor?.parCatastralImposible ?? false);
 
   return (
     <div className={styles.container}>
@@ -1823,25 +1833,29 @@ export default function SimuladorCompraventaPage() {
                   {/* El aviso nombra TODAS las partidas que faltan, no solo la plusvalía: con el
                       precio de compra en blanco, el IRPF tampoco entra en el neto y el único
                       aviso que había daba a entender que el resto estaba completo. */}
+                  {/* Redacción común de la familia (decidida el 24/09/2026, la de local-comercial):
+                      el título dice «(PARCIAL)» y cada frase termina en la dirección del neto real. */}
                   <ResultCard
-                    title="Total gastos vendedor"
+                    title={netoParcial ? 'Total gastos vendedor (parcial)' : 'Total gastos vendedor'}
                     value={formatCurrency(resultadosVendedor.totalGastos)}
                     variant="warning"
                     icon="➖"
                     description={
                       faltanEnElNeto.length > 0 || avisoIlegiblesNeto
                         ? [
-                            faltanEnElNeto.length > 0 ? `Sin ${faltanEnElNeto.join(' ni ')}` : null,
-                            avisoIlegiblesNeto ? 'Con importes que no se han podido leer (ver el neto de abajo)' : null,
+                            faltanEnElNeto.length > 0
+                              ? `SIN ${enumerarNi(faltanEnElNeto)}, que no se ${faltanEnElNeto.length > 1 ? 'incluyen' : 'incluye'}`
+                              : null,
+                            avisoIlegiblesNeto ? 'con importes que no se han podido leer (ver el neto de abajo)' : null,
                           ]
                             .filter(Boolean)
-                            .join('. ')
+                            .join(' — ')
                         : undefined
                     }
                   />
 
                   <ResultCard
-                    title="IMPORTE NETO VENDEDOR"
+                    title={netoParcial ? 'IMPORTE NETO VENDEDOR (PARCIAL)' : 'IMPORTE NETO VENDEDOR'}
                     value={formatCurrency(resultadosVendedor.netoVendedor)}
                     variant="highlight"
                     icon="💰"
@@ -1850,9 +1864,12 @@ export default function SimuladorCompraventaPage() {
                         // La dirección de los importes ilegibles la da el sondeo del cálculo
                         // (avisoIlegiblesNeto); aquí solo se compone la frase.
                         const avisos: string[] = [];
-                        if (faltanEnElNeto.length > 0) avisos.push(`falta descontar ${faltanEnElNeto.join(' y ')}`);
+                        // «puede ser», no «será»: un impuesto sin calcular también puede salir a cero.
+                        if (faltanEnElNeto.length > 0) {
+                          avisos.push(`No descuenta ${enumerarNi(faltanEnElNeto)}: el neto real puede ser menor que este`);
+                        }
                         if (resultadosVendedor.camposIlegibles.length > 0) {
-                          avisos.push(noSePudoLeer(resultadosVendedor.camposIlegibles));
+                          avisos.push(mayuscula(noSePudoLeer(resultadosVendedor.camposIlegibles)));
                         }
                         if (avisoIlegiblesNeto) avisos.push(avisoIlegiblesNeto);
                         // El par catastral imposible: la plusvalía se liquidó por el objetivo sin
@@ -1860,7 +1877,7 @@ export default function SimuladorCompraventaPage() {
                         // mecanismo que el total ilegible de C1).
                         if (resultadosVendedor.parCatastralImposible) {
                           avisos.push(
-                            'el valor catastral del suelo supera al total, y con el recibo del IBI bien leído la plusvalía puede salir más barata por el método real: el neto real puede ser MAYOR que este',
+                            'El valor catastral del suelo supera al total, y con el recibo del IBI bien leído la plusvalía puede salir más barata por el método real: el neto real puede ser MAYOR que este',
                           );
                         }
                         if (avisos.length === 0) return 'Lo que realmente recibes';
@@ -1872,7 +1889,7 @@ export default function SimuladorCompraventaPage() {
                           resultadosVendedor.parCatastralImposible ? 'revisa los dos valores catastrales del recibo del IBI' : null,
                         ].filter((x): x is string => x !== null);
                         const texto = pedir.join(' y ');
-                        return `INCOMPLETO: ${avisos.join('; ')}. ${texto.charAt(0).toUpperCase()}${texto.slice(1)} para obtener el neto real.`;
+                        return `${avisos.join('. ')}. ${mayuscula(texto)} para obtenerlo.`;
                       })()
                     }
                   />

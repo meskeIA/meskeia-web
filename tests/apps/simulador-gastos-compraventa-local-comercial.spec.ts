@@ -2221,7 +2221,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
     // A1 — la cuota es un TECHO, y el valor de adquisición no dice que suma lo que no leyó.
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', ILEGIBLE_2309);
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('13.301,00 €');
-    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/^TECHO:/);
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/real es menor/);
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('130.000,00 €');
     expect(await descripcionTarjeta(page, 'Valor de adquisición')).toContain(
       'no se han podido leer y no están sumados',
@@ -2231,7 +2231,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
     // A2 — la cuota es un SUELO, y el valor de adquisición dice que no las ha restado.
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', ILEGIBLE_2309);
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('5697,00 €');
-    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/^SUELO:/);
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/real (?:es|puede ser) mayor/);
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('165.000,00 €');
     expect(await descripcionTarjeta(page, 'Valor de adquisición')).toContain('no están restadas');
     expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('187.003,00 €');
@@ -2253,7 +2253,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
     await expect(page.locator('input[aria-label="Amortizaciones acumuladas deducidas (€)"]')).toHaveValue(
       ILEGIBLE_2309,
     );
-    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/^SUELO:/);
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/real (?:es|puede ser) mayor/);
 
     // Los opcionales VACÍOS: vacío no es ilegible, y el neto sale definitivo.
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '');

@@ -197,7 +197,7 @@ const HERMANAS: readonly Hermana[] = [
       'BASE R = base + compra original 24.000 (gana el método real de la plusvalía, NETO 23.645,83).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
-    cifraVendedor: /^IMPORTE NETO VENDEDOR$/,
+    cifraVendedor: /^IMPORTE NETO VENDEDOR/,
     preparar: async (page, base) => {
       await sembrar(page, 'Precio del garaje / plaza de parking', '25000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
@@ -345,7 +345,7 @@ const HERMANAS: readonly Hermana[] = [
       'BASE R = base + compra original 14.000 (gana el método real de la plusvalía, NETO 13.938,89).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
-    cifraVendedor: /^IMPORTE NETO VENDEDOR$/,
+    cifraVendedor: /^IMPORTE NETO VENDEDOR/,
     preparar: async (page, base) => {
       await sembrar(page, 'Precio del trastero', '15000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
@@ -761,7 +761,7 @@ const HERMANAS: readonly Hermana[] = [
       'BASE V = B con el precio de compra original VACÍO (sin IRPF calculado).',
     pestanas: true,
     cifraComprador: /^COSTE TOTAL/,
-    cifraVendedor: /^IMPORTE NETO VENDEDOR$/,
+    cifraVendedor: /^IMPORTE NETO VENDEDOR/,
     preparar: async (page, base) => {
       await sembrar(page, 'Precio de la vivienda', '200000');
       await sembrar(page, 'Gastos de gestoría del comprador (€)', '300');
@@ -927,29 +927,29 @@ const HERMANAS: readonly Hermana[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
-//  El vocabulario de la DIRECCIÓN, tal como lo escriben las siete apps
+//  El vocabulario de la DIRECCIÓN: UNA sola redacción desde el 24/09/2026
 //
-//  ⚠️ La familia habla TRES dialectos para decir lo mismo, y eso también es fruto de que
-//  la lógica esté escrita siete veces:
-//    · garaje y el estimador → «falta descontar …» / «… REDUCEN el IRPF: el neto real es
-//      MAYOR que este».
-//    · trastero              → «Techo: aún NO incluye …» / «Suelo: faltan …, que … REDUCEN
-//      el IRPF y suben el neto».
-//    · los paneles de COMPRADOR de las seis → «No incluye …: el coste real será mayor».
-//    · local-comercial       → «No descuenta …: el neto real será menor».
-//  Este testigo acepta los cuatro: lo que vigila es la DIRECCIÓN, no la redacción. Por eso
-//  «Techo:» y «Suelo:» se buscan CON DOS PUNTOS — un `/\bsuelo\b/` suelto casaría con
-//  «el valor catastral del suelo», que sale en la mitad de los avisos y no dice nada de la
-//  dirección.
+//  Hasta ese día la familia hablaba cuatro dialectos para decir lo mismo («falta descontar»
+//  en garaje y el estimador, «Techo:/Suelo:» en trastero, «No descuenta…: será menor» en
+//  local-comercial, «No incluye…» en los paneles de comprador), y este testigo los aceptaba
+//  todos porque vigilaba la dirección y no la prosa. El usuario decidió unificarlos en la de
+//  local-comercial: el título dice «(PARCIAL)» y cada frase termina en la dirección de la
+//  cifra real, en palabras llanas («el neto real es / puede ser menor | MAYOR que este»).
+//  Desde entonces el testigo EXIGE esa redacción: el dialecto retirado rompe el build.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /** La cifra publicada está POR ENCIMA de la real: hay que descontar (TECHO). */
-const DICE_TECHO =
-  /falta(?:n)? descontar|no descuenta|(?:neto|coste) real (?:es|será|puede ser) menor|\btecho:/i;
+const DICE_TECHO = /no descuenta|(?:neto|coste) real (?:es|será|puede ser) menor/i;
 
 /** La cifra publicada está POR DEBAJO de la real: la real es MAYOR (SUELO). */
-const DICE_SUELO =
-  /(?:neto|coste) real (?:es|será|puede ser) mayor|reducen el (?:irpf|impuesto)|falta sumar al valor de adquisición|\bsuelo:/i;
+const DICE_SUELO = /(?:neto|coste) real (?:es|será|puede ser) mayor/i;
+
+/**
+ * El vocabulario RETIRADO el 24/09/2026. «Techo:» y «Suelo:» van CON DOS PUNTOS: un
+ * `/\bsuelo\b/` suelto casaría con «el valor catastral del suelo», que no dice nada.
+ */
+const DIALECTO_RETIRADO =
+  /falta(?:n)? descontar|\btecho:|\bsuelo:|\bINCOMPLETO\b|aún NO incluye|hay importes que no se han podido leer/i;
 
 /**
  * Una dirección SEGURA («es/será mayor/menor»). Un ilegible que no mueve la cifra no puede
@@ -1108,6 +1108,13 @@ test.describe('Testigo de familia — el importe ilegible en las 7 apps de compr
             `Si el motor ha cambiado a propósito, actualiza la fila de la tabla.`,
         ).toBeCloseTo(campo.delta, 2);
 
+        // 4 bis) UNA sola redacción en la familia (decisión del 24/09/2026).
+        expect(
+          aviso,
+          `El aviso usa el vocabulario retirado el 24/09/2026; la redacción común es la de ` +
+            `local-comercial.\n  Aviso publicado: ${aviso}`,
+        ).not.toMatch(DIALECTO_RETIRADO);
+
         // 5) Si no mueve nada, no hace falta aviso: ahí termina el caso.
         if (campo.direccion === 'sin_efecto') {
           expect(delta, 'Este campo no mueve la cifra en este caso base').toBeCloseTo(0, 2);
@@ -1147,6 +1154,15 @@ test.describe('Testigo de familia — el importe ilegible en las 7 apps de compr
           `El aviso dice la dirección CONTRARIA a la medida (${eur.format(delta)}): ` +
             `${esperado.explica}.\n  Aviso publicado: ${aviso}`,
         ).not.toMatch(esperado.noDebe);
+
+        // 9) Y el neto que se mueve no se rotula como definitivo: su título dice «(PARCIAL)»,
+        //    como el del comprador cuando no calcula un impuesto (redacción común, 24/09/2026).
+        if (campo.panel === 'vendedor') {
+          expect(
+            aviso.split(' · ')[0],
+            `La cifra se movió ${eur.format(delta)} y el título del neto no dice «(PARCIAL)».`,
+          ).toMatch(/\(PARCIAL\)/);
+        }
       });
     }
   }

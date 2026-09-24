@@ -1551,10 +1551,10 @@ test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
     expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('7500,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('7500,00 €');
     expect(await descripcionTarjeta(page, 'Total gastos vendedor')).toBe(
-      'Sin la plusvalía municipal ni el IRPF de la ganancia',
+      'SIN la plusvalía municipal ni el IRPF de la ganancia, que no se incluyen',
     );
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('242.500,00 €');
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('INCOMPLETO');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
   });
 
   // Reparados el 30/08/2026 (Inspector, ronda 8, hallazgos 509-512). Los cuatro pasaron
@@ -1586,7 +1586,7 @@ test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
     // El suelo YA está relleno: el único dato que falta es el precio de compra.
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
-      'Rellena el precio de compra original para obtener el neto real',
+      'Rellena el precio de compra original para obtenerlo',
     );
   });
 
@@ -3326,12 +3326,12 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
     // El total y el neto dejan fuera la plusvalía, y lo dicen nombrando el campo que falta
     expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('16.305,00 €');
     expect(await descripcionTarjeta(page, /^Total gastos vendedor/)).toBe(
-      'Sin la plusvalía municipal',
+      'SIN la plusvalía municipal, que no se incluye',
     );
     expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('233.695,00 €');
     expect(await descripcionTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe(
       // El suelo está escrito pero no se lee: no «falta», se pide corregirlo (hallazgo 1231).
-      'INCOMPLETO: falta descontar la plusvalía municipal; el valor catastral del suelo no se ha podido leer. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtener el neto real.',
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. El valor catastral del suelo no se ha podido leer. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
     );
   });
 
@@ -4039,7 +4039,7 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('20.755,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('229.245,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
-      'INCOMPLETO: falta descontar la plusvalía municipal',
+      'No descuenta la plusvalía municipal',
     );
 
     // CONTROL: con un dato válido sí liquida, así que el rechazo de arriba no es parálisis
@@ -4505,7 +4505,7 @@ test.describe('Reparación 23/09/2026 — la magnitud de «falta descontar la co
     const netoPublicado = aEuros(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR'));
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
 
-    expect(aviso).toContain('falta descontar la comisión inmobiliaria');
+    expect(aviso).toContain('No descuenta la comisión inmobiliaria');
     const cota = aviso.match(/rebaja también el IRPF al descontarla, hasta un (\d+) % de su importe/);
     expect(cota, `el aviso no publica la cota del IRPF. Aviso: ${aviso}`).not.toBeNull();
     const tipo = Number(cota?.[1]);
@@ -4764,10 +4764,10 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
 
     await sembrar23(page, 'Comisión inmobiliaria (%)', '3.0.0');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('86.640,00 €');
-    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(/^TECHO:/);
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(/real es menor/);
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('612.560,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
-      'falta descontar la comisión inmobiliaria, que no se ha podido leer (la comisión inmobiliaria rebaja también el IRPF al descontarla, hasta un 30 % de su importe)',
+      'No descuenta la comisión inmobiliaria, que no se ha podido leer (la comisión inmobiliaria rebaja también el IRPF al descontarla, hasta un 30 % de su importe): el neto real es menor que este',
     );
 
     // El canto: la base queda en 300.000 exactos y el tramo es el del 27 %
@@ -4848,7 +4848,7 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     );
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('184.090,00 €');
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
-    expect(aviso).toContain('el valor catastral total');
+    expect(aviso).toContain('El valor catastral total');
     // «puede ser»: con el total ilegible la app no sabe si el método real ganaría, porque el
     // dato que lo decide es justo el que no lee (lo calcula el sondeo, lib/sondeoIlegibles.ts).
     expect(aviso).toContain('el neto real puede ser MAYOR que este');

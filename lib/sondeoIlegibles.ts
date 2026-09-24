@@ -94,6 +94,12 @@ export function enumerar(partes: readonly string[]): string {
   return `${partes.slice(0, -1).join(', ')} y ${partes[partes.length - 1]}`;
 }
 
+/** «a», «a ni b», «a, b ni c»: la enumeración detrás de una negación («No descuenta…»). */
+export function enumerarNi(partes: readonly string[]): string {
+  if (partes.length <= 1) return partes.join('');
+  return `${partes.slice(0, -1).join(', ')} ni ${partes[partes.length - 1]}`;
+}
+
 /** true si la frase nominal es plural: «los años de propiedad», «las mejoras». */
 function esPlural(partes: readonly string[]): boolean {
   return partes.length > 1 || /^(los|las)\s/i.test(partes[0] ?? '');
@@ -116,6 +122,11 @@ export function noSePudoLeer(partes: readonly string[]): string {
   return esPlural(partes)
     ? `no se han podido leer ${enumerar(partes)}`
     : `${enumerar(partes)} no se ha podido leer`;
+}
+
+/** La frase con la primera letra en mayúscula, para cuando abre un aviso. */
+export function mayuscula(frase: string): string {
+  return frase.charAt(0).toUpperCase() + frase.slice(1);
 }
 
 /** ¿Está el texto escrito pero no se puede leer como número? (vacío = no escrito) */
