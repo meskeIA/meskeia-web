@@ -29,10 +29,19 @@
  *
  * QUÉ NO HACE, Y POR QUÉ
  * ──────────────────────
- * NO obliga a arreglar el pasivo. A 25/08/2026 son 85 ficheros y 185 usos, y de una muestra
- * de 60 **35 no validan el resultado del parseo**: cambiarlos en bloque haría aparecer «NaN»
- * en pantalla en más de la mitad, porque `parseSpanishNumber` devuelve NaN donde `parseFloat`
- * devolvía un número. Sería cambiar un defecto silencioso por uno visible, en 85 apps a la vez.
+ * NO obliga a arreglar el pasivo. A 25/08/2026 son 85 ficheros y 185 usos (el commit que creó
+ * el candado, d8cdd0f9, y el CLAUDE.md de aquel día dijeron 191 usos en 87 ficheros; las dos
+ * cuentas son del mismo día y no se reconciliaron), y de una muestra de 60 **35 no validan el
+ * resultado del parseo**: cambiarlos en bloque haría aparecer «NaN» en pantalla en más de la
+ * mitad, porque `parseSpanishNumber` devuelve NaN donde `parseFloat` devolvía un número. Sería
+ * cambiar un defecto silencioso por uno visible, en 85 apps a la vez. El 24/09/2026, con el
+ * Inspector drenando app por app, `--todo` da 158 usos en 80 ficheros.
+ *
+ * Su PRIMERA versión era ciega a la forma MÁS habitual del catálogo: dos `replace` encadenados
+ * (`x.replace(/\./g, '').replace(',', '.')`, que además quita el millar), donde el paréntesis
+ * del primero rompía un patrón que exigiera `[^)]*`. Veía 153 de 188 usos reales. No se
+ * descubrió ejecutándolo —pasaba en verde— sino comparándolo con un grep independiente; de ahí
+ * que `scripts/pruebas/parser-numerico.tsx` incluya esa forma.
  *
  * Así que este candado juzga **las líneas que cada commit añade**, igual que `check:a11y-jsx`
  * y `check:secrets`, y por la misma razón: un candado por fichero rompería el build al tocar

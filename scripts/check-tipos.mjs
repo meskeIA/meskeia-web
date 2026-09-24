@@ -28,6 +28,14 @@
  * quedara un solo error de sintaxis en los ficheros generados, no da por buena la
  * validación — la declara ciega y falla. Es el mismo principio que el `--autocomprobar`
  * de la Ronda.
+ *
+ * ── El caso simétrico: `npx tsc --noEmit <fichero>` (10/09/2026) ──────────────
+ * El CLAUDE.md mandaba verificar `data/fiscal/` con `npx tsc --noEmit data/fiscal/index.ts`,
+ * y eso devolvía SIEMPRE error (código 2) aunque el código estuviera perfecto: pasarle un
+ * fichero hace que tsc ignore el `tsconfig.json`, así que el alias `@/lib/formatters` no
+ * resuelve y encima entra en conflicto un tipo de `@types/dom-webcodecs`. Uno decía siempre
+ * «0 errores» sin mirar y el otro siempre «error» sin que lo hubiera. Para cualquiera de los
+ * dos casos, la única validación que vale es `npm run check:tipos`.
  */
 
 import { execFileSync } from 'child_process';

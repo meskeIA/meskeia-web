@@ -14,6 +14,10 @@
  * El 3 es un patrón mal teclado, que es lo que la regla B añade sobre la A. Y los dos últimos
  * son los que impiden que este candado se vuelva decorativo: tiene que CALLAR con el código
  * bueno y PLANTARSE cuando no ha entendido el fichero, en vez de dar verde por no haber mirado.
+ *
+ * El quinto (renombrar la tabla a `brailleDotsRenombrado`) fue el que destapó que el propio
+ * regex del candado leía cualquier `brailleDotsLoQueSea`: con la tabla renombrada seguía
+ * encontrándola y daba verde, en vez de plantarse.
  */
 
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';

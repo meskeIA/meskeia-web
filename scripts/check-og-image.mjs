@@ -30,10 +30,12 @@
  *   C. Que toda imagen referenciada exista en `public/` y que ningún redirect de
  *      `next.config.ts` se la lleve por delante (la causa 2, que ningún ojo
  *      humano detecta leyendo el metadata).
- *   D. El pasivo de meskeIA (apps sin imagen fuera de los portales) se CUENTA y
- *      se nombra, pero no detiene el build: son 105 apps al escribir esto y
- *      romper por ellas dejaría el candado desactivado en una semana. Es el mismo
- *      criterio de `check:a11y-jsx` y `check:parser`.
+ *   D. Que toda app de meskeIA fuera de los portales con `openGraph` declare
+ *      `images`. Nació como pasivo que solo se contaba (105 apps al escribir esto:
+ *      romper por ellas habría dejado el candado desactivado en una semana), y
+ *      desde el drenaje del 29/08/2026 también rompe el build (ver el bloque D).
+ *
+ * Delegum es la excepción: sus apps NO llevan la og del portal (ver `PORTALES`).
  *
  * `--todo` lista el pasivo entero en vez de una muestra.
  */
@@ -52,9 +54,8 @@ const leer = (p) => fs.readFileSync(path.join(RAIZ, p), 'utf8');
 const existe = (p) => fs.existsSync(path.join(RAIZ, p));
 
 /**
- * Portales con imagen de marca propia. Al abrir un vertical nuevo (Stemum y
- * Delegum siguen pendientes de decisión a 29/08/2026), se añade aquí su entrada
- * y el candado pasa a exigirla.
+ * Portales con imagen de marca propia. Los cuatro verticales están cubiertos; al
+ * abrir uno nuevo se añade aquí su entrada y el candado pasa a exigirla.
  */
 const PORTALES = [
   {
@@ -83,10 +84,18 @@ const PORTALES = [
   },
   {
     nombre: 'Delegum',
-    // No tiene catálogo de apps: las apps de meskeIA vinculadas a Delegum
-    // conservan la og de meskeIA (decisión del 29/08/2026, porque no forman una
-    // lista de la que derivar). Lo que sí es suyo son las 21 páginas del árbol:
-    // home, fichas de /datos-fiscales/, asistente y blog.
+    // Sin catálogo, a propósito: las apps de meskeIA vinculadas a Delegum
+    // conservan la og de meskeIA. NO es por falta de lista —`DELEGUM_APP_SLUGS`
+    // existe, en data/delegum/soluciones.ts— sino porque Delegum no sirve apps
+    // bajo su dominio: su proxy no hace passthrough de los slugs del catálogo,
+    // así que `delegum.com/estimador-irpf/` da 404 mientras
+    // `coquinum.com/escandallo-food-cost/` da 200. Esas apps solo se ven bajo
+    // meskeia.com, y ponerles la og de Delegum las marcaría con una marca que el
+    // visitante nunca llega a ver. `DELEGUM_APP_SLUGS` alimenta Soluciones
+    // (enrutado por journey), no pertenencia al portal. Lo que sí es suyo son las
+    // 21 páginas del árbol: home, fichas de /datos-fiscales/, asistente y blog.
+    // (Hasta el 24/09/2026 este comentario daba el motivo viejo del 29/08: «no
+    // forman una lista de la que derivar».)
     catalogo: null,
     imagen: 'https://delegum.com/delegum/og-image.png',
     arbol: 'app/delegum',

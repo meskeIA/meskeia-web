@@ -41,8 +41,10 @@
  *
  * QUÉ NO HACE
  * ───────────
- * · No mira el catálogo entero en cada build, solo lo que cambia. El pasivo de las ~1.100
- *   apps anteriores es una campaña aparte: `--todo` lo mide, pero no rompe nada.
+ * · No mira el catálogo entero en cada build, solo lo que cambia. El pasivo del catálogo es
+ *   una campaña aparte: `--todo` lo mide, pero no rompe nada. Al nacer el candado eran ~5.000
+ *   incumplimientos en 731 ficheros (23/08/2026); el 24/09/2026, 4.361 de las dos reglas
+ *   unívocas y 3.205 casos de las que piden criterio.
  * · No se ejecuta en Vercel (ver abajo).
  * · No sustituye a `npm run test:a11y` (axe sobre el navegador): esto es análisis del
  *   código fuente y solo ve estas tres reglas.

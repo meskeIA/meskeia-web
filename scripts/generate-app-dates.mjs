@@ -15,6 +15,12 @@
  * y `git log` no devolvería fechas fiables. Si git falla aquí, se conserva el JSON
  * anterior en vez de escribir datos peores.
  *
+ * ⚠️ ORDEN: el build ejecuta este script ANTES de que exista el commit que se está
+ * preparando, así que el JSON no puede contener ese cambio y el `lastmod` va siempre
+ * un commit por detrás. Pasó en 9472e33a y 83227161, que hubo que corregir con un
+ * commit extra. Lo refresca `/push` después del build, en commit propio y NO con
+ * `--amend` (enmendar tocaría un commit que puede ser de otra conversación).
+ *
  * Uso:  node scripts/generate-app-dates.mjs
  */
 import { execFileSync } from 'node:child_process';

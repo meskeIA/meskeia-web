@@ -55,9 +55,14 @@
  * Tampoco entra en `app/`, `components/` ni `lib/`: el setter nativo en código de producción
  * es otra cosa (y otra discusión). Este candado es sobre pruebas.
  *
+ * Y hay un fallo que NINGÚN testigo detecta, ni este: sembrar el valor que el input YA tiene.
+ * El estado de React coincide desde el principio, así que el caso pasa aunque la app esté
+ * sorda. `SIEMBRA_ESTRICTA=1 npx playwright test tests/apps` lo audita y nombra cada una
+ * (documentado en `tests/apps/_hidratacion.ts`).
+ *
  * Se comprueba que dispara donde debe y calla donde debe con
  * `npm run hidratacion:probar-candado`, que le reinyecta los casos de
- * `scripts/pruebas/hidratacion-tests.txt`.
+ * `scripts/pruebas/hidratacion-tests.ts`.
  *
  * FALSO POSITIVO
  * ──────────────

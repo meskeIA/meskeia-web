@@ -13,9 +13,13 @@
  *      Coquinum, que hoy no tiene ese redirect pero puede tenerlo mañana.
  *   4. Una og que no existe en `public/`.
  *
+ * Más dos que salieron después: una página propia de portal sin imagen (las 20
+ * de Delegum) y una app corriente de meskeIA sin `images`. Esta última nació como
+ * pasivo que solo avisaba (105 apps al escribir el candado, 96 al drenarlo); desde
+ * el drenaje del 29/08/2026 también tiene que romper.
+ *
  * Y los dos que debe dejar pasar, que importan igual: el estado actual del
- * repositorio, y el pasivo de meskeIA (105 apps sin imagen), que avisa pero NO
- * puede romper el build.
+ * repositorio y una app exenta con `og-ok:`.
  *
  * Cada caso muta ficheros reales y los restaura siempre, pase lo que pase.
  */

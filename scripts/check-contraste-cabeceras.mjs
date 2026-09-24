@@ -84,15 +84,22 @@
  *   · Los fondos teñidos `color-mix(in srgb, var(--primary) 6-20%, …)`: son casi el fondo de
  *     la tarjeta y llevan texto oscuro. Solo se encienden si además hay texto blanco.
  *   · Los botones, badges y números de paso con fondo de marca (2.042 bloques medidos el
- *     22/09/2026): campaña aparte, porque cambiarlos altera el aspecto de la interacción.
+ *     22/09/2026, 1.004 de ellos botones, en 782 apps): campaña aparte, porque cambiarlos
+ *     altera el aspecto de la interacción.
  *
  * ESCAPE
  * ──────
  * `contraste-ok: <razón>` en esa línea o en la anterior. **La razón es obligatoria**: la
  * marca a secas también rompe el build, igual que en `check:legal`.
  *
- * Sus casos de prueba están en `scripts/pruebas/contraste-cabeceras/`, y se le reinyectan
- * con `npm run contraste:probar-candado`.
+ * Sus casos de prueba están en `scripts/pruebas/probar-check-contraste-cabeceras.mjs`, y se
+ * le reinyectan con `npm run contraste:probar-candado` (incluye el caso de origen en sus dos
+ * versiones: el `<tr style>` de nave-industrial antes del 1175, que debe FALLAR, y el
+ * reparado, que debe CALLAR).
+ *
+ * La medición por PÍXEL, que este candado no hace, vive en
+ * `tests/contraste-cabeceras-tabla.spec.ts`: mide el botón de `EducationalSection` EN HOVER,
+ * porque en reposo siempre estuvo bien y el defecto de la tercera regla solo existía ahí.
  */
 
 import fs from 'node:fs';

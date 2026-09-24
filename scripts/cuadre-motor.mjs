@@ -12,7 +12,10 @@
  * los últimos 100 commits reales: leyendo líneas, el detector habría bloqueado 21 de 100,
  * porque un reformateo produce exactamente las mismas líneas que un borrado —añadir un
  * candado reescribe entera la línea "build" de package.json, y mover un <div role="alert">
- * lo borra y lo vuelve a escribir—. Comparando conjuntos, 8 de 400.
+ * lo borra y lo vuelve a escribir—. Comparando conjuntos, 8 de 400. Y de esos 400, los 40 que
+ * crearon apps no disparan ninguna regla: todas miran lo que DESAPARECE, y nacer no es una
+ * sorpresa. Es también su punto ciego —lo que nace ya sin algo—, y lo cubren los candados sin
+ * pasivo (`check:legal`, `check:braille`, `check:token-oscuro`…).
  *
  * Una regla que mira líneas cuenta tecleo. Una que compara conjuntos cuenta hechos.
  */

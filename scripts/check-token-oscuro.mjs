@@ -57,7 +57,9 @@
  *     Campaña aparte, como los 2.042 botones de `check:contraste-cabeceras`. Si se drena,
  *     se saca de `FUERA` y el candado pasa a exigirlo.
  *   · Si el valor oscuro que se declara CUMPLE contraste: eso lo miden los specs
- *     `tests/contraste-text-muted-*.spec.ts`. Este candado solo exige que exista.
+ *     `tests/contraste-text-muted-*.spec.ts`. Este candado solo exige que exista. Un valor se
+ *     decide midiendo contra el fondo REAL donde se usa: el #757575 de agosto se eligió contra
+ *     blanco (4,60:1) y sobre el #FAFAFA en que vivía daba 4,41:1.
  *   · Los `style={{…}}` del JSX, que no declaran tokens en el catálogo.
  *
  * SE PLANTA SI NO PUEDE MIRAR
