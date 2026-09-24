@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { aFonemas, escandirPalabra } from '../../app/diccionario-rimas/rimas';
 
 /**
  * Inspector — diccionario-rimas (segmento interactiva, riesgo 3)
@@ -46,8 +47,7 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *           diga, no una pantalla que se queda igual que antes de escribir.
  *       «   » → nada que buscar, y sin inventar resultado.
  *
- * HALLAZGOS (24/09/2026), documentados con test.fail() para que se pongan en verde al
- * repararlos:
+ * HALLAZGOS (24/09/2026), REPARADOS el mismo día (hallazgos 1308 y 1309 del Inspector):
  *   A. aFonemas() convierte primero «gue/gui» en «ge/gi» y DESPUÉS aplica «g ante e/i = jota»,
  *      así que la «u» muda se pierde dos veces: «pliegue» sale /plieXe/ y rima en consonante
  *      con hereje, eje, fleje, deje, esqueje… (15 de sus 24 consonantes son falsas), y esas
@@ -55,6 +55,13 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *      tras la vocal tónica (albergue → conserje, merengue → alquequenje, águila → 0 rimas).
  *   B. «123» (o cualquier entrada sin letras) no produce ningún aviso: la búsqueda devuelve
  *      null y la pantalla se queda como si no se hubiera escrito nada.
+ *
+ * REPARACIÓN
+ *   A. aFonemas() resuelve «ge/gi = jota» ANTES de quitar la u muda de «gue/gui», y «güe/güi»
+ *      (la u suena) conserva su marca propia. Casos resueltos a mano en el bloque «Regresión
+ *      1308» del final.
+ *   B. Región role="alert" siempre montada bajo el buscador: con texto sin letras pinta un
+ *      aviso, y como la búsqueda devuelve null, el resultado anterior desaparece.
  */
 
 const RUTA = '/diccionario-rimas/';
@@ -131,10 +138,10 @@ test.describe('diccionario-rimas — caso 2: «u» muda de «gue» e hiato de «
     for (const w of ['despliegue', 'repliegue', 'llegue']) expect(lista, `falta ${w} (/eɣe/)`).toContain(w);
   });
 
-  // HALLAZGO A (24/09/2026): aFonemas() aplica «gue → ge» y luego «ge → xe» (jota), y la
-  // «u» muda desaparece: hereje, eje, fleje y esqueje salen como CONSONANTES de pliegue.
-  // Hoy: 24 consonantes, 15 con jota. Quitar test.fail() al reparar aFonemas().
-  test.fail('pliegue: hereje, eje, fleje y esqueje NO riman en consonante (jota ≠ g suave)', async ({ page }) => {
+  // HALLAZGO A (1308, reparado 24/09/2026): antes aFonemas() aplicaba «gue → ge» y luego
+  // «ge → xe» (jota): hereje, eje, fleje y esqueje salían como CONSONANTES de pliegue
+  // (24 consonantes, 15 con jota).
+  test('pliegue: hereje, eje, fleje y esqueje NO riman en consonante (jota ≠ g suave)', async ({ page }) => {
     await abrir(page);
     await buscar(page, 'pliegue');
     await pestana(page, 'consonante');
@@ -144,9 +151,9 @@ test.describe('diccionario-rimas — caso 2: «u» muda de «gue» e hiato de «
     }
   });
 
-  // HALLAZGO A, cara asonante: como el motor las cree consonantes, las excluye de la pestaña
-  // asonante, que es donde van (e-e). Quitar test.fail() al reparar aFonemas().
-  test.fail('pliegue: hereje y eje salen en la pestaña ASONANTE (e-e)', async ({ page }) => {
+  // HALLAZGO A, cara asonante: cuando el motor las creía consonantes, las excluía de la
+  // pestaña asonante, que es donde van (e-e).
+  test('pliegue: hereje y eje salen en la pestaña ASONANTE (e-e)', async ({ page }) => {
     await abrir(page);
     await buscar(page, 'pliegue');
     await pestana(page, 'asonante');
@@ -189,15 +196,109 @@ test.describe('diccionario-rimas — caso 3: entrada sucia o sin letras', () => 
     await expect(page.getByText(/\bNaN\b/)).toHaveCount(0);
   });
 
-  // HALLAZGO B (24/09/2026): «123» no contiene ninguna letra; escandirPalabra() devuelve null
-  // y la app no dice nada — la pantalla queda igual que antes de escribir. Esperado: un aviso
-  // que diga que la entrada no es una palabra. Quitar test.fail() al añadirlo.
-  test.fail('«123» avisa de que no hay ninguna palabra que buscar', async ({ page }) => {
+  // HALLAZGO B (1309, reparado 24/09/2026): «123» no contiene ninguna letra; escandirPalabra()
+  // devuelve null y antes la app no decía nada.
+  test('«123» avisa de que no hay ninguna palabra que buscar', async ({ page }) => {
     await abrir(page);
     await buscar(page, '123');
     const aviso = page
       .locator('#estado-diccionario, [role="alert"]:not(#__next-route-announcer__), section[aria-live="polite"]')
       .filter({ hasText: /letra|palabra v[aá]lida|no (es|contiene) una palabra/i });
     await expect(aviso.first()).toBeVisible();
+  });
+});
+
+test.describe('diccionario-rimas — regresión 1309: el aviso limpia el resultado anterior', () => {
+  test('«camino» → «!!!»: desaparece la lista y sale el aviso; «camino» otra vez: vuelve y el aviso se va', async ({ page }) => {
+    await abrir(page);
+    const aviso = page
+      .locator('[role="alert"]:not(#__next-route-announcer__)')
+      .filter({ hasText: 'ninguna letra' });
+
+    await buscar(page, 'camino');
+    await expect(resultado(page)).toHaveCount(1);
+    await expect(aviso).toHaveCount(0);
+
+    // «!!!»: sin ninguna letra → no hay palabra que escandir
+    await buscar(page, '!!!');
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('«!!!» no contiene ninguna letra');
+    await expect(resultado(page)).toHaveCount(0);
+
+    await buscar(page, 'camino');
+    await expect(resultado(page)).toContainText('rima desde -ino');
+    await expect(aviso).toHaveCount(0);
+  });
+});
+
+/*
+ * REGRESIÓN 1308 — la g suave de «gue/gui» frente a la jota de «ge/gi», resuelta a mano.
+ * Clave con distinción (seseo = false); x = jota, g = g suave, U = u que suena (güe).
+ *
+ *   sigue    si-gue, llana, tónica «si»          → núcleo «igue»  → u muda   → /ige/
+ *   elige    e-li-ge, llana, tónica «li»         → núcleo «ige»   → g+e=jota → /ixe/   ≠ sigue
+ *   guerra   gue-rra, llana; en «ue» manda la e  → «erra»         → rr = R   → /eRa/
+ *   tierra   tie-rra, llana; en «ie» manda la e  → «erra»         → /eRa/             = guerra
+ *   pliegue  → «egue» → /ege/ · hereje → «eje» → /exe/                                ≠
+ *   albergue al-ber-gue → «ergue» → /erge/ · desvergue, envergue → /erge/             =
+ *            alberge «erge» → /erxe/ · conserje «erje» → /erxe/                       ≠ albergue
+ *   bilingüe bi-lin-güe, llana → «ingüe» → la u SÍ suena → /ingUe/
+ *            lingue lin-gue → «ingue» → /inge/ · laringe → «inge» → /inxe/          los tres ≠
+ *   águila   á-gui-la, esdrújula → «águila» → /agila/ (antes /axila/, como «axila»)
+ *
+ * Ninguna otra app importa rimas.ts (grep de «diccionario-rimas/rimas» en app/ y lib/: solo
+ * page.tsx y tests/rimas.spec.ts), así que la reparación no alcanza a nadie más.
+ */
+test.describe('diccionario-rimas — regresión 1308: g suave de «gue/gui» ≠ jota', () => {
+  const fon = (p: string): string => aFonemas(escandirPalabra(p)!.nucleo, false);
+
+  test('motor: «sigue» NO rima en consonante con «elige»', () => {
+    expect(fon('sigue')).toBe('ige');
+    expect(fon('elige')).toBe('ixe');
+  });
+
+  test('motor: «guerra» SÍ rima en consonante con «tierra»', () => {
+    expect(fon('guerra')).toBe('eRa');
+    expect(fon('guerra')).toBe(fon('tierra'));
+  });
+
+  test('motor: «pliegue» ≠ «hereje»; «albergue» = «envergue» ≠ «conserje»', () => {
+    expect(fon('pliegue')).toBe('ege');
+    expect(fon('hereje')).toBe('exe');
+    expect(fon('albergue')).toBe(fon('envergue'));
+    expect(fon('albergue')).not.toBe(fon('conserje'));
+    expect(fon('alberge')).toBe(fon('conserje'));
+  });
+
+  test('motor: con diéresis la u suena — «bilingüe» ≠ «lingue» ≠ «laringe»', () => {
+    expect(escandirPalabra('bilingüe')!.nucleo).toBe('ingüe');
+    expect(fon('bilingüe')).toBe('ingUe');
+    expect(fon('lingue')).toBe('inge');
+    expect(fon('laringe')).toBe('inxe');
+  });
+
+  test('motor: «águila» deja de sonar como «axila»', () => {
+    expect(fon('águila')).toBe('agila');
+    expect(fon('águila')).not.toBe(fon('axila'));
+  });
+
+  test('app: «albergue» consonante con desvergue y envergue, sin alberge ni conserje', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'albergue');
+    await pestana(page, 'consonante');
+    await expect(resultado(page)).toContainText('rima desde -ergue');
+    const lista = await palabrasVisibles(page);
+    for (const w of ['desvergue', 'envergue']) expect(lista, `falta ${w} (/erge/)`).toContain(w);
+    for (const w of ['alberge', 'conserje']) expect(lista, `sobra ${w} (/erxe/, jota)`).not.toContain(w);
+  });
+
+  test('app: «guerra» consonante con tierra y sierra', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'guerra');
+    await pestana(page, 'consonante');
+    // A mano: gue-rra, en «ue» manda la e → núcleo «-erra»
+    await expect(resultado(page)).toContainText('2 sílabas · llana · rima desde -erra');
+    const lista = await palabrasVisibles(page);
+    for (const w of ['tierra', 'sierra']) expect(lista, `falta ${w} (-erra)`).toContain(w);
   });
 });

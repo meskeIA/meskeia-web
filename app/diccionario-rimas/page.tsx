@@ -162,6 +162,11 @@ export default function DiccionarioRimasPage() {
     }
   };
 
+  // Hay texto pero no ninguna letra («123», «!!!»): el motor no tiene palabra
+  // que escandir y devuelve null. Sin este aviso la pantalla se quedaba igual
+  // que antes de escribir (hallazgo 1309 del Inspector, 24/09/2026).
+  const entradaSinLetras = indice !== null && consulta.trim() !== '' && resultado === null;
+
   const relatedApps = getRelatedApps('diccionario-rimas');
   const truncado = resultado ? resultado.palabras.length > LIMITE_VISIBLE && !verTodas : false;
 
@@ -281,6 +286,18 @@ export default function DiccionarioRimasPage() {
           </p>
         </div>
       </section>
+
+      {/* Región viva siempre montada: así el lector de pantalla anuncia el aviso
+          en cuanto aparece, y se vacía sola cuando la entrada vuelve a ser válida.
+          Vacía no ocupa sitio: no lleva margen ni relleno propios */}
+      <div role="alert">
+        {entradaSinLetras && (
+          <p className={styles.avisoEntrada}>
+            «{consulta.trim()}» no contiene ninguna letra. Escribe una palabra para buscar con qué
+            rima.
+          </p>
+        )}
+      </div>
 
       {/* ── Resultado ───────────────────────────────────────────────────── */}
       {resultado && (

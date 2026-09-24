@@ -100,14 +100,17 @@ export const aFonemas = (nucleo: string, seseo: boolean): string => {
   s = s.replace(/ch/g, 'C');
   s = s.replace(/ll/g, 'Y');
   s = s.replace(/rr/g, 'R');
-  s = s.replace(/gü([ei])/g, 'gU$1'); // «güe» /gwe/ frente a «gue» /ge/
+  s = s.replace(/gü([ei])/g, 'gU$1'); // «güe» /gwe/: la u suena, y la g sigue siendo suave
   s = s.replace(/qu([ei])/g, 'k$1');
-  s = s.replace(/gu([ei])/g, 'g$1');
+  // La jota escrita con g («ge», «gi») se resuelve ANTES de quitar la u muda de
+  // «gue/gui»: al revés, «sigue» pasaba a «sige» y de ahí a /sixe/, y rimaba en
+  // consonante con «elige» (hallazgo 1308 del Inspector, 24/09/2026).
+  s = s.replace(/g([ei])/g, 'x$1');
+  s = s.replace(/gu([ei])/g, 'g$1'); // «gue» /ge/ con g suave: la u no suena
   s = s.replace(/h/g, ''); // muda (ya se salvó la «ch»)
   s = s.replace(/c([ei])/g, seseo ? 's$1' : 'Z$1');
   s = s.replace(/z/g, seseo ? 's' : 'Z');
   s = s.replace(/c/g, 'k');
-  s = s.replace(/g([ei])/g, 'x$1');
   s = s.replace(/j/g, 'x');
   s = s.replace(/v/g, 'b');
   s = s.replace(/y/g, 'Y'); // yeísmo: «calló» y «cayó» riman

@@ -488,6 +488,16 @@
   color: var(--text-secondary);
 }
 
+.avisoEntrada {
+  margin: 0 0 1.5rem;
+  padding: 0.9rem 1.1rem;
+  background: rgba(217, 119, 6, 0.08);
+  border-left: 4px solid #d97706;
+  border-radius: 8px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
 .warningBox {
   background: rgba(217, 119, 6, 0.08);
   border-left: 4px solid #d97706;
@@ -620,6 +630,11 @@
 [data-theme='dark'] .eduTabla th,
 [data-theme='dark'] .eduTabla td {
   border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .avisoEntrada {
+  background: rgba(251, 191, 36, 0.1);
+  border-left-color: #fbbf24;
 }
 
 [data-theme='dark'] .warningBox {
