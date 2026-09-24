@@ -59,6 +59,34 @@ export const FAMILIAS = [
       'simulador-gastos-compraventa-terreno-rustico',
     ],
   },
+  {
+    // Salió de los hallazgos 950/951 de selector-smartphone, repetidos tal cual en
+    // selector-mascota (1341/1342, 24/09/2026) y localizados por la sospecha de esa inspección
+    // en otras nueve: el mismo armazón de pregunta + opciones + barra, escrito once veces.
+    // El invariante es solo ese armazón; los motores son distintos en cada hermana y los mide
+    // el spec de cada una en tests/apps/.
+    id: 'selectores',
+    nombre: 'Asesores de preguntas encadenadas (selector-*)',
+    testigo: 'tests/familias/selectores.spec.ts',
+    invariante:
+      'Una elección única es un radio: role="radio" con aria-checked, nunca aria-pressed, y ' +
+      'una sola marcada. La barra de progreso anuncia la MISMA fracción que pinta: ' +
+      '(valuenow − valuemin) / (valuemax − valuemin) = ancho del relleno.',
+    referencia: 'selector-smartphone',
+    slugs: [
+      'selector-smartphone',
+      'selector-mascota',
+      'selector-alquiler-vs-compra',
+      'selector-calefaccion',
+      'selector-ejercicio',
+      'selector-formacion-postgrado',
+      'selector-movilidad-urbana',
+      'selector-portatil',
+      'selector-seguro-coche',
+      'selector-seguro-hogar',
+      'selector-seguro-salud',
+    ],
+  },
 ];
 
 const PORSLUG = new Map();

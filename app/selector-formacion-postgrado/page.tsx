@@ -12,213 +12,15 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { calcularResultado, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS } from './motor';
 
-/* ===================================================
-   Tipos
-   =================================================== */
+// Las preguntas con sus pesos, las fichas de cada vía y la lógica viven en ./motor.ts.
 
-type TipoFormacion = 'master' | 'fp_superior' | 'bootcamp' | 'oposiciones' | 'certificacion';
-
-interface Opcion {
-  texto: string;
-  icono: string;
-  pesos: Partial<Record<TipoFormacion, number>>;
+/** Lista legible: «A, B y C». */
+function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
 }
-
-interface Pregunta {
-  id: number;
-  texto: string;
-  icono: string;
-  opciones: Opcion[];
-}
-
-interface Resultado {
-  tipo: TipoFormacion;
-  titulo: string;
-  descripcion: string;
-  icono: string;
-  puntos: string[];
-  duracion: string;
-  coste: string;
-}
-
-/* ===================================================
-   Datos
-   =================================================== */
-
-const PREGUNTAS: Pregunta[] = [
-  {
-    id: 1,
-    texto: '¿Cuál es tu principal motivación para seguir formándote?',
-    icono: '🎯',
-    opciones: [
-      { texto: 'Conseguir estabilidad laboral y empleo seguro', icono: '🛡️', pesos: { oposiciones: 4, certificacion: 1 } },
-      { texto: 'Especializarme académicamente en mi área', icono: '🎓', pesos: { master: 4, fp_superior: 1 } },
-      { texto: 'Cambiar de sector rápidamente', icono: '🔄', pesos: { bootcamp: 4, certificacion: 2 } },
-      { texto: 'Mejorar mi posición en la empresa actual', icono: '📈', pesos: { certificacion: 4, master: 2 } },
-    ],
-  },
-  {
-    id: 2,
-    texto: '¿Cuánto tiempo puedes dedicar a la formación?',
-    icono: '⏰',
-    opciones: [
-      { texto: '3-6 meses a tiempo completo', icono: '⚡', pesos: { bootcamp: 4, certificacion: 2 } },
-      { texto: '1-2 años compaginando con trabajo', icono: '⚖️', pesos: { master: 3, fp_superior: 3, oposiciones: 2 } },
-      { texto: '2-4 años de preparación constante', icono: '📅', pesos: { oposiciones: 4, master: 2 } },
-      { texto: 'Unas semanas o meses de aprendizaje flexible', icono: '🗓️', pesos: { certificacion: 4, bootcamp: 2 } },
-    ],
-  },
-  {
-    id: 3,
-    texto: '¿Cuál es tu situación actual?',
-    icono: '💼',
-    opciones: [
-      { texto: 'Recién graduado/a, sin experiencia laboral', icono: '🆕', pesos: { master: 3, fp_superior: 3, oposiciones: 2 } },
-      { texto: 'Trabajo en mi sector y quiero avanzar', icono: '📊', pesos: { certificacion: 4, master: 3 } },
-      { texto: 'Trabajo en otro sector y quiero cambiar', icono: '🔀', pesos: { bootcamp: 4, fp_superior: 2 } },
-      { texto: 'Llevo tiempo desempleado/a y quiero reincorporarme', icono: '🚀', pesos: { fp_superior: 3, bootcamp: 3, oposiciones: 2 } },
-    ],
-  },
-  {
-    id: 4,
-    texto: '¿Cuál es tu presupuesto estimado para la formación?',
-    icono: '💶',
-    opciones: [
-      { texto: 'Menos de 2.000 €', icono: '💰', pesos: { oposiciones: 3, certificacion: 4, fp_superior: 2 } },
-      { texto: 'Entre 2.000 € y 6.000 €', icono: '💳', pesos: { fp_superior: 3, bootcamp: 3, certificacion: 2 } },
-      { texto: 'Entre 6.000 € y 15.000 €', icono: '🏦', pesos: { master: 3, bootcamp: 3 } },
-      { texto: 'Más de 15.000 € o dispongo de beca', icono: '🎓', pesos: { master: 4 } },
-    ],
-  },
-  {
-    id: 5,
-    texto: '¿Qué tipo de objetivo profesional tienes?',
-    icono: '🏆',
-    opciones: [
-      { texto: 'Acceder a un puesto en la Administración Pública', icono: '🏛️', pesos: { oposiciones: 5, certificacion: 1 } },
-      { texto: 'Especializarme en un área concreta con título oficial', icono: '📜', pesos: { master: 4, fp_superior: 2 } },
-      { texto: 'Trabajar en tecnología o startups', icono: '💻', pesos: { bootcamp: 5, certificacion: 3 } },
-      { texto: 'Adquirir habilidades prácticas reconocidas en mi sector', icono: '🔧', pesos: { fp_superior: 4, certificacion: 3 } },
-    ],
-  },
-  {
-    id: 6,
-    texto: '¿Cuánta experiencia laboral previa tienes?',
-    icono: '📋',
-    opciones: [
-      { texto: 'Sin experiencia o menos de 1 año', icono: '🌱', pesos: { master: 3, fp_superior: 3, oposiciones: 2 } },
-      { texto: 'Entre 1 y 3 años de experiencia', icono: '🌿', pesos: { fp_superior: 2, bootcamp: 3, oposiciones: 2 } },
-      { texto: 'Entre 3 y 7 años de experiencia', icono: '🌳', pesos: { certificacion: 4, master: 2, bootcamp: 2 } },
-      { texto: 'Más de 7 años de experiencia profesional', icono: '🏅', pesos: { certificacion: 5, master: 2 } },
-    ],
-  },
-  {
-    id: 7,
-    texto: '¿Qué modalidad de estudio prefieres?',
-    icono: '🏫',
-    opciones: [
-      { texto: 'Presencial, con contacto directo con docentes y compañeros', icono: '🏛️', pesos: { master: 3, fp_superior: 3, oposiciones: 2 } },
-      { texto: 'Online, con flexibilidad total de horario', icono: '💻', pesos: { bootcamp: 3, certificacion: 4 } },
-      { texto: 'Híbrido o semipresencial', icono: '🔄', pesos: { master: 3, fp_superior: 2, bootcamp: 2 } },
-      { texto: 'Estudio autónomo en casa', icono: '🏠', pesos: { oposiciones: 4, certificacion: 3 } },
-    ],
-  },
-  {
-    id: 8,
-    texto: '¿A qué sector te interesa orientar tu carrera?',
-    icono: '🏢',
-    opciones: [
-      { texto: 'Tecnología, datos, programación o ciberseguridad', icono: '💻', pesos: { bootcamp: 5, certificacion: 3 } },
-      { texto: 'Administración pública, educación o justicia', icono: '🏛️', pesos: { oposiciones: 5, master: 1 } },
-      { texto: 'Empresa, finanzas, marketing o gestión', icono: '📊', pesos: { master: 4, certificacion: 3 } },
-      { texto: 'Sanidad, industria, comercio o sector técnico', icono: '⚙️', pesos: { fp_superior: 5, certificacion: 2 } },
-    ],
-  },
-  {
-    id: 9,
-    texto: '¿Con qué urgencia necesitas incorporarte al mercado laboral?',
-    icono: '⏱️',
-    opciones: [
-      { texto: 'Lo antes posible, en meses', icono: '🚀', pesos: { bootcamp: 4, certificacion: 4 } },
-      { texto: 'En 1-2 años, puedo esperar', icono: '⏳', pesos: { master: 3, fp_superior: 4 } },
-      { texto: 'En 3-5 años, priorizo la preparación profunda', icono: '🎯', pesos: { oposiciones: 5, master: 2 } },
-      { texto: 'No tengo urgencia, me importa más la calidad', icono: '🌟', pesos: { master: 4, fp_superior: 2 } },
-    ],
-  },
-  {
-    id: 10,
-    texto: '¿Qué importancia le das al título o certificado oficial?',
-    icono: '🎓',
-    opciones: [
-      { texto: 'Necesito un título universitario oficial reconocido', icono: '📜', pesos: { master: 5 } },
-      { texto: 'Prefiero titulación pública con valor en el mercado', icono: '🏫', pesos: { fp_superior: 5, oposiciones: 2 } },
-      { texto: 'Me interesan más las habilidades que el título', icono: '🔧', pesos: { bootcamp: 4, certificacion: 4 } },
-      { texto: 'Quiero un certificado reconocido internacionalmente', icono: '🌍', pesos: { certificacion: 5, master: 2 } },
-    ],
-  },
-];
-
-const RESULTADOS: Record<TipoFormacion, Resultado> = {
-  master: {
-    tipo: 'master',
-    titulo: 'Máster Universitario',
-    descripcion:
-      'Tu perfil encaja con un máster universitario oficial. Buscas especialización académica profunda con un título reconocido, tienes tiempo para una formación de calidad y te orientas hacia sectores como empresa, gestión o áreas técnicas que valoran el prestigio académico.',
-    icono: '🎓',
-    puntos: ['Título oficial universitario', 'Alta especialización académica', 'Redes de contactos universitarias', 'Acceso a doctorado si lo deseas'],
-    duracion: '1-2 años',
-    coste: '3.000 – 30.000 €',
-  },
-  fp_superior: {
-    tipo: 'fp_superior',
-    titulo: 'FP de Grado Superior',
-    descripcion:
-      'La Formación Profesional de Grado Superior es tu mejor opción. Ofrece formación práctica con alta empleabilidad, titulación pública reconocida y costes muy inferiores a los de un máster. Ideal si te orientas a sectores industriales, sanitarios, de gestión o servicios.',
-    icono: '🔧',
-    puntos: ['Titulación pública oficial', 'Alta tasa de inserción laboral', 'Prácticas en empresa incluidas', 'Opción de FP Dual muy valorada'],
-    duracion: '1-2 años',
-    coste: '0 – 2.000 € (pública/privada)',
-  },
-  bootcamp: {
-    tipo: 'bootcamp',
-    titulo: 'Bootcamp / Formación Online Intensiva',
-    descripcion:
-      'Tu perfil se adapta a un bootcamp o formación online intensiva. Necesitas incorporarte al mercado rápidamente, te interesa la tecnología o el cambio de sector, y valoras las habilidades prácticas por encima del título. El retorno de inversión suele ser muy rápido.',
-    icono: '💻',
-    puntos: ['Resultados rápidos (3-6 meses)', 'Alta demanda en tecnología', 'Orientado a proyectos reales', 'Comunidad y networking activo'],
-    duracion: '3-6 meses',
-    coste: '2.000 – 12.000 €',
-  },
-  oposiciones: {
-    tipo: 'oposiciones',
-    titulo: 'Preparación de Oposiciones',
-    descripcion:
-      'Tu prioridad es la estabilidad laboral y el empleo público. Tienes paciencia para una preparación exigente y buscas un puesto en la Administración Pública, la educación o la justicia. Las oposiciones ofrecen empleo de por vida con condiciones muy ventajosas.',
-    icono: '🏛️',
-    puntos: ['Empleo público estable y vitalicio', 'Sueldo con progresión regulada', 'Conciliación y derechos laborales', 'Posibilidad de estudio autónomo'],
-    duracion: '2-5 años de preparación',
-    coste: '500 – 3.000 € (academia/materiales)',
-  },
-  certificacion: {
-    tipo: 'certificacion',
-    titulo: 'Certificación Profesional',
-    descripcion:
-      'Tienes experiencia laboral y lo que necesitas es validar y ampliar habilidades concretas. Las certificaciones profesionales (PMP, AWS, CFA, Google, Microsoft...) son reconocidas internacionalmente, se pueden obtener en semanas o meses, y tienen gran valor en el mercado.',
-    icono: '🏅',
-    puntos: ['Reconocimiento internacional', 'Formato flexible y online', 'Alta valoración por empresas', 'Actualizable y renovable'],
-    duracion: 'Semanas a 6 meses',
-    coste: '200 – 3.000 €',
-  },
-};
-
-const LABELS: Record<TipoFormacion, string> = {
-  master: '🎓 Máster',
-  fp_superior: '🔧 FP Superior',
-  bootcamp: '💻 Bootcamp',
-  oposiciones: '🏛️ Oposiciones',
-  certificacion: '🏅 Certificación',
-};
 
 /* ===================================================
    Componente principal
@@ -232,53 +34,6 @@ export default function SelectorFormacionPostgradoPage() {
   const totalPreguntas = PREGUNTAS.length;
   const pregunta = PREGUNTAS[preguntaActual];
   const opcionSeleccionada = respuestas[pregunta.id] ?? -1;
-
-  // Calcular puntuaciones
-  const calcularResultado = (): TipoFormacion => {
-    const puntuaciones: Record<TipoFormacion, number> = {
-      master: 0,
-      fp_superior: 0,
-      bootcamp: 0,
-      oposiciones: 0,
-      certificacion: 0,
-    };
-    PREGUNTAS.forEach((preg) => {
-      const idxRespuesta = respuestas[preg.id];
-      if (idxRespuesta !== undefined) {
-        const opcion = preg.opciones[idxRespuesta];
-        if (opcion) {
-          (Object.keys(opcion.pesos) as TipoFormacion[]).forEach((tipo) => {
-            puntuaciones[tipo] += opcion.pesos[tipo] ?? 0;
-          });
-        }
-      }
-    });
-    return (Object.keys(puntuaciones) as TipoFormacion[]).reduce((a, b) =>
-      puntuaciones[a] >= puntuaciones[b] ? a : b
-    );
-  };
-
-  const getPuntuaciones = (): Record<TipoFormacion, number> => {
-    const puntuaciones: Record<TipoFormacion, number> = {
-      master: 0,
-      fp_superior: 0,
-      bootcamp: 0,
-      oposiciones: 0,
-      certificacion: 0,
-    };
-    PREGUNTAS.forEach((preg) => {
-      const idxRespuesta = respuestas[preg.id];
-      if (idxRespuesta !== undefined) {
-        const opcion = preg.opciones[idxRespuesta];
-        if (opcion) {
-          (Object.keys(opcion.pesos) as TipoFormacion[]).forEach((tipo) => {
-            puntuaciones[tipo] += opcion.pesos[tipo] ?? 0;
-          });
-        }
-      }
-    });
-    return puntuaciones;
-  };
 
   const seleccionarOpcion = (idx: number) => {
     setRespuestas((prev) => ({ ...prev, [pregunta.id]: idx }));
@@ -303,19 +58,22 @@ export default function SelectorFormacionPostgradoPage() {
     setPreguntaActual(0);
   };
 
-  const tipoGanador = paso === 'resultado' ? calcularResultado() : null;
-  const resultado = tipoGanador ? RESULTADOS[tipoGanador] : null;
-  const puntuaciones = paso === 'resultado' ? getPuntuaciones() : null;
+  const calculo = paso === 'resultado' ? calcularResultado(respuestas) : null;
+  const resultado = calculo ? FORMACIONES[calculo.tipo] : null;
+  const puntuaciones = calculo ? calculo.puntos : null;
   const maxPuntuacion = puntuaciones
     ? Math.max(...(Object.values(puntuaciones) as number[]))
     : 1;
 
-  // Ordenar alternativas por puntuación
-  const alternativasOrdenadas: [TipoFormacion, number][] = puntuaciones
-    ? (Object.entries(puntuaciones) as [TipoFormacion, number][]).sort(([, a], [, b]) => b - a)
+  // La comparativa usa el MISMO orden que elige la ganadora: antes un `sort` estable repetía
+  // en la lista el sesgo del objeto (a igualdad de puntos, siempre el máster primero).
+  const alternativasOrdenadas = calculo && puntuaciones
+    ? calculo.orden.map((tipo) => [tipo, puntuaciones[tipo]] as const)
     : [];
 
-  const progresoPct = ((preguntaActual + (opcionSeleccionada >= 0 ? 1 : 0)) / totalPreguntas) * 100;
+  // Preguntas respondidas: las anteriores y, si ya se ha marcado, la actual.
+  const respondidas = preguntaActual + (opcionSeleccionada >= 0 ? 1 : 0);
+  const progresoPct = (respondidas / totalPreguntas) * 100;
 
   return (
     <div className={styles.container}>
@@ -343,9 +101,22 @@ export default function SelectorFormacionPostgradoPage() {
             <span className={styles.progresoTexto}>
               {preguntaActual + 1} / {totalPreguntas}
             </span>
-            <div className={styles.progresoBar} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={1} aria-valuemax={totalPreguntas}>
+            {/* Lo anunciado y lo pintado van sobre la misma escala: preguntas RESPONDIDAS.
+                aria-valuenow era el número de pregunta con mínimo 1 mientras el relleno cuenta
+                también la actual en cuanto se marca, así que un lector de pantalla anunciaba
+                otra fracción que la que se veía (selector-smartphone, hallazgo 951). */}
+            <div
+              className={styles.progresoBar}
+              role="progressbar"
+              aria-label={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}
+              aria-valuenow={respondidas}
+              aria-valuemin={0}
+              aria-valuemax={totalPreguntas}
+              aria-valuetext={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}
+            >
               <div
                 className={styles.progresoFill}
+                data-progreso={progresoPct}
                 style={{ width: `${progresoPct}%` }}
               />
             </div>
@@ -367,7 +138,11 @@ export default function SelectorFormacionPostgradoPage() {
                   type="button"
                   className={`${styles.opcion} ${opcionSeleccionada === idx ? styles.seleccionada : ''}`}
                   onClick={() => seleccionarOpcion(idx)}
-                  aria-pressed={opcionSeleccionada === idx}
+                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
+                  // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
+                  // radio dentro (selector-smartphone, hallazgo 950).
+                  role="radio"
+                  aria-checked={opcionSeleccionada === idx}
                 >
                   <span className={styles.opcionIcono} aria-hidden="true">{opcion.icono}</span>
                   <span className={styles.opcionTexto}>{opcion.texto}</span>
@@ -404,15 +179,37 @@ export default function SelectorFormacionPostgradoPage() {
       )}
 
       {/* Resultado */}
-      {paso === 'resultado' && resultado && puntuaciones && (
+      {paso === 'resultado' && calculo && resultado && puntuaciones && (
         <section className={styles.resultado} aria-label="Tu recomendación de formación">
           <div className={styles.resultadoCard}>
             <div className={styles.resultadoBadge} aria-label="Tu recomendación principal">
-              ✨ Tu formación recomendada
+              <span aria-hidden="true">✨</span> Tu formación recomendada
             </div>
             <span className={styles.resultadoIcono} aria-hidden="true">{resultado.icono}</span>
             <h2 className={styles.resultadoTitulo}>{resultado.titulo}</h2>
             <p className={styles.resultadoDescripcion}>{resultado.descripcion}</p>
+
+            {/* Un empate no se resuelve en silencio por el orden del objeto: antes lo ganaba
+                siempre el máster, que era el primero. */}
+            {calculo.empatadas.length > 0 && (
+              <p className={styles.avisoEmpate} role="note">
+                <span aria-hidden="true">⚖️</span> Empate: con tus respuestas,{' '}
+                {enumerar([calculo.tipo, ...calculo.empatadas].map((k) => CON_ARTICULO[k]))}{' '}
+                encajan exactamente igual; {calculo.criterioDesempate}.
+              </p>
+            )}
+
+            {/* Por qué: las respuestas que más han sumado. La descripción de cada vía afirmaba
+                cosas del usuario que no dependían de lo que había contestado («Tienes
+                experiencia laboral…» a quien había marcado «Sin experiencia»). */}
+            <div className={styles.razones}>
+              <h3>Por qué esta recomendación</h3>
+              <ul>
+                {calculo.razones.map((razon) => (
+                  <li key={razon}>{razon}</li>
+                ))}
+              </ul>
+            </div>
 
             {/* Puntos clave */}
             <div className={styles.resultadoPuntos} role="list" aria-label="Ventajas clave">
@@ -459,7 +256,7 @@ export default function SelectorFormacionPostgradoPage() {
             {/* Acciones */}
             <div className={styles.accionesResultado}>
               <button type="button" className={styles.btnSecundario} onClick={reiniciar}>
-                🔄 Repetir el test
+                <span aria-hidden="true">🔄</span> Repetir el test
               </button>
             </div>
           </div>

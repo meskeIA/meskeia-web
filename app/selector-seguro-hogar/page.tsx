@@ -4,284 +4,9 @@ import React, { useState } from 'react';
 import styles from './SelectorSeguroHogar.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { calcularResultado, PREGUNTAS, VEREDICTOS, UMBRAL_BASICA, UMBRAL_ESTANDAR, type Resultado } from './motor';
 
-// ─────────────────────────────────────────────
-// Tipos
-// ─────────────────────────────────────────────
-
-type VeredictoKey = 'basica' | 'estandar' | 'completa';
-
-interface Pregunta {
-  id: string;
-  categoria: string;
-  icono: string;
-  texto: string;
-  opciones: { valor: string; etiqueta: string; descripcion: string; puntos: number }[];
-}
-
-interface Resultado {
-  veredicto: VeredictoKey;
-  puntuacion: number;
-}
-
-// ─────────────────────────────────────────────
-// Preguntas del test (10)
-// ─────────────────────────────────────────────
-
-const PREGUNTAS: Pregunta[] = [
-  {
-    id: 'regimen',
-    categoria: 'Régimen de Tenencia',
-    icono: '🏠',
-    texto: '¿Eres propietario/a o inquilino/a?',
-    opciones: [
-      { valor: 'propietario_hipoteca', etiqueta: 'Propietario/a con hipoteca vigente', descripcion: 'El banco suele exigir un seguro mínimo', puntos: 3 },
-      { valor: 'propietario_libre', etiqueta: 'Propietario/a sin hipoteca', descripcion: 'Libre de elegir la cobertura', puntos: 2 },
-      { valor: 'inquilino', etiqueta: 'Inquilino/a', descripcion: 'Solo necesitas asegurar el contenido y RC', puntos: 0 },
-    ],
-  },
-  {
-    id: 'tipo_vivienda',
-    categoria: 'Tipo de Vivienda',
-    icono: '🏡',
-    texto: '¿Qué tipo de vivienda tienes?',
-    opciones: [
-      { valor: 'piso', etiqueta: 'Piso en edificio de varios vecinos', descripcion: 'Riesgo compartido con comunidad', puntos: 1 },
-      { valor: 'unifamiliar', etiqueta: 'Casa unifamiliar o adosado', descripcion: 'Mayor exposición perimetral', puntos: 3 },
-      { valor: 'atico_bajo', etiqueta: 'Ático o planta baja', descripcion: 'Más expuesto a filtraciones, robos y clima', puntos: 2 },
-      { valor: 'estudio', etiqueta: 'Estudio pequeño o local', descripcion: 'Necesidades más limitadas', puntos: 0 },
-    ],
-  },
-  {
-    id: 'antiguedad',
-    categoria: 'Antigüedad del Edificio',
-    icono: '🏗️',
-    texto: '¿Cuántos años tiene aproximadamente el edificio?',
-    opciones: [
-      { valor: 'nuevo', etiqueta: 'Menos de 10 años', descripcion: 'Instalaciones en buen estado, menos riesgo', puntos: 0 },
-      { valor: 'reciente', etiqueta: 'Entre 10 y 30 años', descripcion: 'Buen estado general', puntos: 1 },
-      { valor: 'maduro', etiqueta: 'Entre 30 y 50 años', descripcion: 'Puede haber instalaciones antiguas', puntos: 2 },
-      { valor: 'antiguo', etiqueta: 'Más de 50 años', descripcion: 'Mayor riesgo de daños estructurales o instalaciones', puntos: 3 },
-    ],
-  },
-  {
-    id: 'contenido',
-    categoria: 'Valor del Contenido',
-    icono: '🛋️',
-    texto: '¿Cuánto vale el contenido de tu hogar? (muebles, electrónica, ropa, equipos...)',
-    opciones: [
-      { valor: 'bajo', etiqueta: 'Menos de 10.000 €', descripcion: 'Contenido básico', puntos: 0 },
-      { valor: 'medio', etiqueta: 'Entre 10.000 y 30.000 €', descripcion: 'Hogar equipado con normalidad', puntos: 2 },
-      { valor: 'alto', etiqueta: 'Entre 30.000 y 60.000 €', descripcion: 'Buen equipamiento y electrónica', puntos: 3 },
-      { valor: 'muy_alto', etiqueta: 'Más de 60.000 €', descripcion: 'Equipamiento premium o colecciones', puntos: 4 },
-    ],
-  },
-  {
-    id: 'zona',
-    categoria: 'Zona Geográfica',
-    icono: '📍',
-    texto: '¿En qué tipo de zona está tu vivienda?',
-    opciones: [
-      { valor: 'urbano', etiqueta: 'Centro urbano consolidado', descripcion: 'Riesgo de robo moderado-alto', puntos: 2 },
-      { valor: 'extrarradio', etiqueta: 'Extrarradio o urbanización', descripcion: 'Menor densidad, posible mayor riesgo de robo', puntos: 2 },
-      { valor: 'rural_costa', etiqueta: 'Zona rural o costa', descripcion: 'Riesgos climáticos y de aislamiento', puntos: 3 },
-      { valor: 'riesgo', etiqueta: 'Zona con riesgo de inundación o incendio forestal', descripcion: 'Riesgo natural significativo', puntos: 4 },
-    ],
-  },
-  {
-    id: 'convivientes',
-    categoria: 'Unidad Familiar',
-    icono: '👨‍👩‍👧',
-    texto: '¿Cuántas personas viven habitualmente en la vivienda?',
-    opciones: [
-      { valor: 'solo', etiqueta: 'Vivo solo/a', descripcion: 'Menor riesgo de daños internos', puntos: 0 },
-      { valor: 'pareja', etiqueta: 'Dos personas (pareja, compañeros...)', descripcion: 'Uso normal del hogar', puntos: 1 },
-      { valor: 'familia', etiqueta: 'Familia con hijos menores', descripcion: 'Más actividad, más probabilidad de accidentes domésticos', puntos: 2 },
-      { valor: 'compartido', etiqueta: 'Piso compartido con varias personas', descripcion: 'Mayor rotación y uso del espacio', puntos: 2 },
-    ],
-  },
-  {
-    id: 'objetos_valor',
-    categoria: 'Objetos de Alto Valor',
-    icono: '💎',
-    texto: '¿Tienes objetos de especial valor en casa?',
-    opciones: [
-      { valor: 'no', etiqueta: 'No, nada especialmente valioso', descripcion: 'Sin artículos fuera de lo habitual', puntos: 0 },
-      { valor: 'algo', etiqueta: 'Sí, algunos artículos de valor (joyas, equipo fotográfico...)', descripcion: 'Conviene asegurarlos específicamente', puntos: 2 },
-      { valor: 'mucho', etiqueta: 'Sí, bastante valor acumulado (arte, instrumentos, colecciones...)', descripcion: 'Requiere cobertura específica o valoración', puntos: 4 },
-    ],
-  },
-  {
-    id: 'preocupacion',
-    categoria: 'Principal Preocupación',
-    icono: '⚠️',
-    texto: '¿Qué te preocupa más respecto a tu vivienda?',
-    opciones: [
-      { valor: 'agua', etiqueta: 'Daños por agua (tuberías, filtraciones, comunidad)', descripcion: 'El siniestro más frecuente en España', puntos: 1 },
-      { valor: 'robo', etiqueta: 'Robo o vandalismo', descripcion: 'Especialmente si sales mucho o es una zona activa', puntos: 2 },
-      { valor: 'incendio', etiqueta: 'Incendio, explosión o fenómenos climáticos', descripcion: 'Daños catastróficos que requieren cobertura sólida', puntos: 3 },
-      { valor: 'rc', etiqueta: 'Responsabilidad civil (dañar a vecinos)', descripcion: 'Una fuga mía que cause daños al piso de abajo', puntos: 1 },
-      { valor: 'todo', etiqueta: 'Todo por igual, quiero estar tranquilo/a', descripcion: 'Cobertura amplia como prioridad', puntos: 3 },
-    ],
-  },
-  {
-    id: 'siniestros',
-    categoria: 'Historial de Siniestros',
-    icono: '📋',
-    texto: '¿Has tenido siniestros en tu vivienda en los últimos 5 años?',
-    opciones: [
-      { valor: 'ninguno', etiqueta: 'No, ninguno', descripcion: 'Historial limpio', puntos: 0 },
-      { valor: 'menor', etiqueta: 'Sí, uno menor (pequeña fuga, cristal roto...)', descripcion: 'Incidentes menores son frecuentes', puntos: 1 },
-      { valor: 'significativo', etiqueta: 'Sí, uno o más importantes', descripcion: 'La experiencia de siniestro eleva la percepción del riesgo', puntos: 3 },
-    ],
-  },
-  {
-    id: 'prioridad',
-    categoria: 'Prioridad al Contratar',
-    icono: '🎯',
-    texto: '¿Qué priorizas al elegir un seguro de hogar?',
-    opciones: [
-      { valor: 'precio', etiqueta: 'El precio más bajo posible', descripcion: 'Cobertura mínima obligatoria', puntos: 0 },
-      { valor: 'equilibrio', etiqueta: 'Equilibrio cobertura-precio', descripcion: 'Bien cubierto sin excesos', puntos: 1 },
-      { valor: 'completo', etiqueta: 'La cobertura más amplia posible', descripcion: 'Tranquilidad total aunque cueste más', puntos: 3 },
-    ],
-  },
-];
-
-// ─────────────────────────────────────────────
-// Datos de veredictos
-// ─────────────────────────────────────────────
-
-const VEREDICTOS: Record<VeredictoKey, {
-  icono: string;
-  etiqueta: string;
-  titulo: string;
-  descripcion: string;
-  precioOrientativo: string;
-  precioNota: string;
-  coberturaIncluida: string[];
-  coberturaRecomendada: string[];
-  razones: string[];
-  consejos: string[];
-}> = {
-  basica: {
-    icono: '🛡️',
-    etiqueta: 'Tipo de cobertura recomendada',
-    titulo: 'Cobertura Básica',
-    descripcion: 'Tu perfil no requiere una cobertura muy amplia. Una póliza básica que cubra los daños más frecuentes y la responsabilidad civil te dará tranquilidad sin gastar de más.',
-    precioOrientativo: '100 – 200 €/año',
-    precioNota: 'Orientativo para piso medio en España. Precio final depende de la aseguradora y características.',
-    coberturaIncluida: [
-      'Incendio y explosión',
-      'Daños por agua (tuberías propias)',
-      'Responsabilidad civil frente a terceros',
-      'Robo con fuerza en el inmueble',
-      'Fenómenos eléctricos',
-    ],
-    coberturaRecomendada: [
-      'Asistencia en el hogar 24h (reparaciones urgentes)',
-      'Defensa jurídica básica',
-    ],
-    razones: [
-      'Tu vivienda tiene bajo riesgo relativo',
-      'El valor del contenido no justifica una prima mayor',
-      'No tienes factores de riesgo adicionales',
-      'La cobertura básica cubre los siniestros más frecuentes',
-    ],
-    consejos: [
-      'Comprueba que el capital del continente está actualizado si eres propietario',
-      'La RC a terceros es imprescindible: una fuga tuya puede causar daños cuantiosos',
-      'Revisa la póliza anualmente — los precios y necesidades cambian',
-      'Aunque el seguro sea básico, lee bien las exclusiones',
-    ],
-  },
-  estandar: {
-    icono: '🏠',
-    etiqueta: 'Tipo de cobertura recomendada',
-    titulo: 'Multirriesgo Estándar',
-    descripcion: 'Tu situación aconseja una póliza multirriesgo que va más allá de lo básico. Protección completa contra los riesgos más frecuentes y algunos específicos de tu caso.',
-    precioOrientativo: '200 – 400 €/año',
-    precioNota: 'Orientativo para hogar medio en España. El precio varía según capitales asegurados y aseguradora.',
-    coberturaIncluida: [
-      'Todo lo de la cobertura básica',
-      'Daños por agua de comunidad y vecinos',
-      'Robo y expoliación (también fuera del hogar)',
-      'Fenómenos atmosféricos (granizo, viento, nieve)',
-      'Asistencia en el hogar 24h',
-      'Defensa jurídica',
-    ],
-    coberturaRecomendada: [
-      'Objetos de valor con capital específico',
-      'Daños estéticos si el piso es relativamente moderno',
-      'Seguro de hogar vacacional si tienes segunda residencia',
-    ],
-    razones: [
-      'Tu vivienda o zona presenta riesgos moderados',
-      'El valor del contenido justifica una cobertura más amplia',
-      'La asistencia en el hogar te dará mucha tranquilidad',
-      'Las coberturas adicionales pueden ahorrarte disgustos',
-    ],
-    consejos: [
-      'Declara correctamente el valor del contenido — el infraseguro te perjudica',
-      'Pregunta por el capital de robo: algunos básicos tienen límites muy bajos',
-      'La asistencia 24h es de las coberturas más usadas — valórala bien',
-      'Compara al menos 3 presupuestos antes de decidir',
-    ],
-  },
-  completa: {
-    icono: '⭐',
-    etiqueta: 'Tipo de cobertura recomendada',
-    titulo: 'Multirriesgo Completa',
-    descripcion: 'Tu perfil justifica la cobertura más amplia disponible. Ya sea por el valor de la vivienda, el contenido, la zona de riesgo o tus prioridades, una póliza completa te dará la máxima tranquilidad.',
-    precioOrientativo: '400 – 800 €/año',
-    precioNota: 'Orientativo para hogar con contenido de valor en España. Puede variar significativamente según el caso.',
-    coberturaIncluida: [
-      'Todo lo de la cobertura estándar',
-      'Daños estéticos y ornamentales',
-      'Objetos de especial valor (joyería, obras de arte, colecciones)',
-      'Protección jurídica amplia',
-      'Responsabilidad civil ampliada',
-      'Todo riesgo accidental del contenido',
-    ],
-    coberturaRecomendada: [
-      'Valoración pericial del continente y contenido',
-      'Cobertura específica de equipos electrónicos portátiles',
-      'Seguro de segunda residencia o de alquiler (arriendo) si procede',
-    ],
-    razones: [
-      'Tu vivienda o contenido tienen valor elevado',
-      'Vives en zona con riesgos específicos (inundación, incendio forestal, robo)',
-      'Tienes objetos de valor que requieren cobertura específica',
-      'Prefieres tranquilidad total a ahorrar en la prima',
-    ],
-    consejos: [
-      'Solicita una valoración profesional del continente para asegurarlo correctamente',
-      'Los objetos de valor especial (joyas, arte) suelen necesitar tasación y declaración expresa',
-      'Lee las condiciones de indemnización: valor venal vs valor nuevo hace mucha diferencia',
-      'Revisa si tu póliza cubre daños durante obras o reformas',
-    ],
-  },
-};
-
-// ─────────────────────────────────────────────
-// Lógica de resultado
-// ─────────────────────────────────────────────
-
-function calcularResultado(respuestas: Record<string, string>): Resultado {
-  let puntuacion = 0;
-  PREGUNTAS.forEach(p => {
-    const resp = respuestas[p.id];
-    const op = p.opciones.find(o => o.valor === resp);
-    if (op) puntuacion += op.puntos;
-  });
-
-  let veredicto: VeredictoKey;
-  if (puntuacion <= 10) veredicto = 'basica';
-  else if (puntuacion <= 20) veredicto = 'estandar';
-  else veredicto = 'completa';
-
-  return { veredicto, puntuacion };
-}
+// Las preguntas con sus puntos, los veredictos y la lógica viven en ./motor.ts.
 
 // ─────────────────────────────────────────────
 // Componente principal
@@ -393,11 +118,16 @@ export default function SelectorSeguroHogar() {
               className={styles.progresoBar}
               role="progressbar"
               aria-label={`Progreso del test: pregunta ${paso + 1} de ${totalPreguntas}`}
-              aria-valuenow={paso + 1}
-              aria-valuemin={1}
+              // Lo anunciado y lo pintado van sobre la misma escala: preguntas RESPONDIDAS
+              // (paso / total). aria-valuenow era el número de pregunta con mínimo 1, y un
+              // lector de pantalla anunciaba otra fracción que la que se veía (mismo defecto
+              // y misma reparación que selector-smartphone, hallazgo 951).
+              aria-valuenow={paso}
+              aria-valuemin={0}
               aria-valuemax={totalPreguntas}
+              aria-valuetext={`Pregunta ${paso + 1} de ${totalPreguntas}`}
             >
-              <div className={styles.progresoRelleno} style={{ width: `${progreso}%` }} />
+              <div className={styles.progresoRelleno} data-progreso={progreso} style={{ width: `${progreso}%` }} />
             </div>
           </div>
 
@@ -411,7 +141,11 @@ export default function SelectorSeguroHogar() {
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => seleccionarOpcion(op.valor)}
-                  aria-pressed={respuestas[preguntaActual.id] === op.valor ? true : false}
+                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
+                  // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
+                  // radio dentro (selector-smartphone, hallazgo 950).
+                  role="radio"
+                  aria-checked={respuestas[preguntaActual.id] === op.valor}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.descripcion}</span>
@@ -478,10 +212,26 @@ export default function SelectorSeguroHogar() {
           {/* Por qué esta cobertura */}
           <div className={styles.razonesSection}>
             <p className={styles.razonesTitulo}>Por qué esta cobertura</p>
-            {veredictoData.razones.map((razon, i) => (
-              <p key={i} className={styles.razonItem}>{razon}</p>
+            {/* Salen de las respuestas. Antes eran cuatro fijas por cobertura, y a quien salía
+                «completa» sin objetos de valor le decían «Tienes objetos de valor que
+                requieren cobertura específica». */}
+            <p className={styles.puntuacionNota}>
+              Tu puntuación es {resultado.puntuacion}: hasta {UMBRAL_BASICA}, cobertura básica; hasta{' '}
+              {UMBRAL_ESTANDAR}, multirriesgo estándar; por encima, multirriesgo completa. Lo que más ha sumado:
+            </p>
+            {resultado.razones.map((razon) => (
+              <p key={razon} className={styles.razonItem}>{razon}</p>
             ))}
           </div>
+
+          {resultado.sinPeso.length > 0 && (
+            <div className={styles.razonesSection}>
+              <p className={styles.razonesTitulo}>Lo que no ha sumado</p>
+              {resultado.sinPeso.map((razon) => (
+                <p key={razon} className={`${styles.razonItem} ${styles.razonContraria}`}>{razon}</p>
+              ))}
+            </div>
+          )}
 
           {/* Antes de contratar */}
           <div className={styles.consejosSection}>

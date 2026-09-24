@@ -12,361 +12,14 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { calcularResultado, PREGUNTAS, RESULTADOS, CON_ARTICULO, type Resultado } from './motor';
 
-// ============================================================
-// Tipos
-// ============================================================
+// Las preguntas con sus pesos, las fichas de cada modalidad y la lógica viven en ./motor.ts.
 
-type Modalidad =
-  | 'terceros_basico'
-  | 'terceros_ampliado'
-  | 'todo_riesgo_franquicia'
-  | 'todo_riesgo_sin_franquicia';
-
-interface Opcion {
-  texto: string;
-  icono: string;
-  pesos: Partial<Record<Modalidad, number>>;
-}
-
-interface Pregunta {
-  id: number;
-  texto: string;
-  icono: string;
-  opciones: Opcion[];
-}
-
-interface ResultadoInfo {
-  titulo: string;
-  descripcion: string;
-  icono: string;
-  coberturas: string[];
-  advertencia: string;
-}
-
-// ============================================================
-// Datos del test
-// ============================================================
-
-const PREGUNTAS: Pregunta[] = [
-  {
-    id: 1,
-    texto: '¿Cuántos años tiene tu vehículo?',
-    icono: '📅',
-    opciones: [
-      {
-        texto: 'Menos de 2 años (vehículo nuevo o casi nuevo)',
-        icono: '🆕',
-        pesos: { todo_riesgo_sin_franquicia: 3 },
-      },
-      {
-        texto: 'Entre 2 y 5 años',
-        icono: '🚗',
-        pesos: { todo_riesgo_franquicia: 2, todo_riesgo_sin_franquicia: 1 },
-      },
-      {
-        texto: 'Entre 5 y 10 años',
-        icono: '🚙',
-        pesos: { terceros_ampliado: 2, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'Más de 10 años',
-        icono: '🏚️',
-        pesos: { terceros_basico: 3, terceros_ampliado: 1 },
-      },
-    ],
-  },
-  {
-    id: 2,
-    texto: '¿Cuál es el valor de mercado aproximado de tu coche?',
-    icono: '💶',
-    opciones: [
-      {
-        texto: 'Más de 25.000 €',
-        icono: '💎',
-        pesos: { todo_riesgo_sin_franquicia: 3 },
-      },
-      {
-        texto: 'Entre 10.000 € y 25.000 €',
-        icono: '💰',
-        pesos: { todo_riesgo_franquicia: 2, todo_riesgo_sin_franquicia: 1 },
-      },
-      {
-        texto: 'Entre 3.000 € y 10.000 €',
-        icono: '🪙',
-        pesos: { terceros_ampliado: 2, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'Menos de 3.000 €',
-        icono: '📉',
-        pesos: { terceros_basico: 3 },
-      },
-    ],
-  },
-  {
-    id: 3,
-    texto: '¿El coche está financiado (préstamo o leasing)?',
-    icono: '🏦',
-    opciones: [
-      {
-        texto: 'Sí, sigue con financiación activa',
-        icono: '✅',
-        pesos: { todo_riesgo_sin_franquicia: 3, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'No, es de mi propiedad total',
-        icono: '❌',
-        pesos: { terceros_basico: 1, terceros_ampliado: 1, todo_riesgo_franquicia: 1 },
-      },
-    ],
-  },
-  {
-    id: 4,
-    texto: '¿Cuántos años llevas conduciendo?',
-    icono: '🎓',
-    opciones: [
-      {
-        texto: 'Menos de 2 años (conductor novel)',
-        icono: '🟢',
-        pesos: { todo_riesgo_sin_franquicia: 2, todo_riesgo_franquicia: 2 },
-      },
-      {
-        texto: 'Entre 2 y 5 años',
-        icono: '🟡',
-        pesos: { todo_riesgo_franquicia: 2, terceros_ampliado: 1 },
-      },
-      {
-        texto: 'Más de 5 años con experiencia sólida',
-        icono: '🏆',
-        pesos: { terceros_basico: 1, terceros_ampliado: 1 },
-      },
-    ],
-  },
-  {
-    id: 5,
-    texto: '¿Has tenido siniestros o partes en los últimos 3 años?',
-    icono: '🚨',
-    opciones: [
-      {
-        texto: 'No, ninguno',
-        icono: '😊',
-        pesos: { terceros_basico: 1, terceros_ampliado: 1 },
-      },
-      {
-        texto: 'Uno leve (golpe pequeño, rayada)',
-        icono: '😐',
-        pesos: { todo_riesgo_franquicia: 2, terceros_ampliado: 1 },
-      },
-      {
-        texto: 'Más de uno o alguno grave',
-        icono: '😬',
-        pesos: { todo_riesgo_sin_franquicia: 2, todo_riesgo_franquicia: 1 },
-      },
-    ],
-  },
-  {
-    id: 6,
-    texto: '¿Cuál es el uso principal del vehículo?',
-    icono: '🛣️',
-    opciones: [
-      {
-        texto: 'Uso particular ocasional (fines de semana)',
-        icono: '🌅',
-        pesos: { terceros_basico: 2, terceros_ampliado: 1 },
-      },
-      {
-        texto: 'Uso diario (trabajo, familia)',
-        icono: '🏢',
-        pesos: { terceros_ampliado: 1, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'Uso profesional o comercial intensivo',
-        icono: '🔧',
-        pesos: { todo_riesgo_sin_franquicia: 2, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'Lo comparten varias personas (coche de empresa o familiar)',
-        icono: '👨‍👩‍👧',
-        pesos: { todo_riesgo_franquicia: 2, todo_riesgo_sin_franquicia: 1 },
-      },
-    ],
-  },
-  {
-    id: 7,
-    texto: '¿Conduces principalmente en zona urbana o rural?',
-    icono: '🗺️',
-    opciones: [
-      {
-        texto: 'Zona urbana con tráfico denso (ciudad)',
-        icono: '🏙️',
-        pesos: { todo_riesgo_franquicia: 2, todo_riesgo_sin_franquicia: 1 },
-      },
-      {
-        texto: 'Zona semiurbana o mixta',
-        icono: '🌆',
-        pesos: { terceros_ampliado: 1, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'Principalmente carretera o zona rural',
-        icono: '🌳',
-        pesos: { terceros_basico: 1, terceros_ampliado: 2 },
-      },
-    ],
-  },
-  {
-    id: 8,
-    texto: '¿Tienes garaje o aparcamiento privado habitual?',
-    icono: '🅿️',
-    opciones: [
-      {
-        texto: 'Sí, siempre guardo el coche en garaje privado',
-        icono: '✅',
-        pesos: { terceros_basico: 1, terceros_ampliado: 1 },
-      },
-      {
-        texto: 'A veces, pero también aparca en calle',
-        icono: '🔄',
-        pesos: { terceros_ampliado: 1, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'No, siempre en la calle o zona pública',
-        icono: '❌',
-        pesos: { terceros_ampliado: 2, todo_riesgo_franquicia: 1 },
-      },
-    ],
-  },
-  {
-    id: 9,
-    texto: '¿Podrías asumir una reparación importante de tu bolsillo si ocurriera un accidente?',
-    icono: '💳',
-    opciones: [
-      {
-        texto: 'Sí, sin problemas (tengo ahorro suficiente)',
-        icono: '💪',
-        pesos: { terceros_basico: 2, terceros_ampliado: 1 },
-      },
-      {
-        texto: 'Podría asumir parte, pero no el total',
-        icono: '😅',
-        pesos: { todo_riesgo_franquicia: 3 },
-      },
-      {
-        texto: 'No, sería un problema económico serio',
-        icono: '😰',
-        pesos: { todo_riesgo_sin_franquicia: 3 },
-      },
-    ],
-  },
-  {
-    id: 10,
-    texto: '¿Hay conductores menores de 25 años que usen habitualmente el coche?',
-    icono: '👨‍🎓',
-    opciones: [
-      {
-        texto: 'Sí, conductor/a joven o novel frecuente',
-        icono: '🧑',
-        pesos: { todo_riesgo_sin_franquicia: 2, todo_riesgo_franquicia: 1 },
-      },
-      {
-        texto: 'Sí, esporádicamente',
-        icono: '🔁',
-        pesos: { todo_riesgo_franquicia: 2, terceros_ampliado: 1 },
-      },
-      {
-        texto: 'No, solo conductores con experiencia',
-        icono: '✅',
-        pesos: { terceros_basico: 1, terceros_ampliado: 1 },
-      },
-    ],
-  },
-];
-
-const RESULTADOS: Record<Modalidad, ResultadoInfo> = {
-  terceros_basico: {
-    titulo: 'Seguro a Terceros Básico',
-    descripcion:
-      'La cobertura mínima legal. Ideal para vehículos antiguos de bajo valor donde el coste del seguro podría superar el valor del coche.',
-    icono: '🛡️',
-    coberturas: [
-      'Responsabilidad civil obligatoria',
-      'Daños a terceros (personas y bienes)',
-      'Asistencia en viaje básica (según compañía)',
-      'Defensa jurídica básica',
-    ],
-    advertencia:
-      'No cubre daños propios del vehículo. Si sufres un accidente sin culpable identificado, correrás con el gasto de reparación.',
-  },
-  terceros_ampliado: {
-    titulo: 'Seguro a Terceros Ampliado',
-    descripcion:
-      'Amplía la cobertura básica con protección ante robos, incendios, fenómenos naturales y daños en lunas. Una opción equilibrada para coches de valor medio.',
-    icono: '🛡️',
-    coberturas: [
-      'Responsabilidad civil obligatoria',
-      'Robo e intento de robo',
-      'Incendio y explosión',
-      'Rotura de lunas (parabrisas, luneta, laterales)',
-      'Fenómenos naturales y daños por inundación',
-      'Asistencia en carretera 24h',
-    ],
-    advertencia:
-      'No incluye cobertura de daños propios por accidente. Si chocas por tu culpa, los daños en tu coche no quedarán cubiertos.',
-  },
-  todo_riesgo_franquicia: {
-    titulo: 'Todo Riesgo con Franquicia',
-    descripcion:
-      'Cobertura total con una parte del coste de reparación a tu cargo (franquicia). Protección completa a un precio más asequible.',
-    icono: '🔰',
-    coberturas: [
-      'Todo lo incluido en terceros ampliado',
-      'Daños propios por accidente (independientemente de la culpa)',
-      'Daños en aparcamiento (golpes sin parte contrario)',
-      'Actos vandálicos',
-      'Cobertura en el extranjero (zona UE)',
-    ],
-    advertencia:
-      'En cada siniestro deberás abonar la franquicia pactada (habitualmente entre 150 € y 600 €). Compara el importe de la franquicia antes de contratar.',
-  },
-  todo_riesgo_sin_franquicia: {
-    titulo: 'Todo Riesgo sin Franquicia',
-    descripcion:
-      'La cobertura más completa del mercado. Cualquier daño queda cubierto sin coste adicional. Recomendado para vehículos nuevos, de alto valor o conductores noveles.',
-    icono: '⭐',
-    coberturas: [
-      'Cobertura total de daños propios y a terceros',
-      'Sin coste adicional por siniestro (0 € franquicia)',
-      'Robo, incendio, lunas y fenómenos naturales',
-      'Conductor designado sin recargo',
-      'Vehículo de sustitución incluido (según póliza)',
-      'Cobertura en toda Europa',
-    ],
-    advertencia:
-      'Es la opción más cara del mercado. Valora si la prima anual compensa respecto al valor real del vehículo.',
-  },
-};
-
-// ============================================================
-// Lógica de puntuación
-// ============================================================
-
-function calcularResultado(respuestas: number[]): Modalidad {
-  const puntos: Record<Modalidad, number> = {
-    terceros_basico: 0,
-    terceros_ampliado: 0,
-    todo_riesgo_franquicia: 0,
-    todo_riesgo_sin_franquicia: 0,
-  };
-
-  respuestas.forEach((opcionIdx, preguntaIdx) => {
-    const opcion = PREGUNTAS[preguntaIdx].opciones[opcionIdx];
-    (Object.entries(opcion.pesos) as [Modalidad, number][]).forEach(([modalidad, peso]) => {
-      puntos[modalidad] += peso;
-    });
-  });
-
-  return (Object.entries(puntos) as [Modalidad, number][]).reduce((a, b) =>
-    b[1] > a[1] ? b : a
-  )[0];
+/** Lista legible: «A, B y C». */
+function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
 }
 
 // ============================================================
@@ -377,7 +30,8 @@ export default function SelectorSeguroCochePage() {
   const [preguntaActual, setPreguntaActual] = useState(0);
   const [respuestas, setRespuestas] = useState<number[]>([]);
   const [opcionSeleccionada, setOpcionSeleccionada] = useState<number | null>(null);
-  const [resultado, setResultado] = useState<Modalidad | null>(null);
+  const [calculo, setCalculo] = useState<Resultado | null>(null);
+  const resultado = calculo ? calculo.modalidad : null;
 
   const totalPreguntas = PREGUNTAS.length;
   const progresoPct = resultado
@@ -403,8 +57,7 @@ export default function SelectorSeguroCochePage() {
           : null
       );
     } else {
-      const modalidad = calcularResultado(nuevasRespuestas);
-      setResultado(modalidad);
+      setCalculo(calcularResultado(nuevasRespuestas));
     }
   };
 
@@ -419,7 +72,7 @@ export default function SelectorSeguroCochePage() {
     setPreguntaActual(0);
     setRespuestas([]);
     setOpcionSeleccionada(null);
-    setResultado(null);
+    setCalculo(null);
   };
 
   const pregunta = PREGUNTAS[preguntaActual];
@@ -468,7 +121,11 @@ export default function SelectorSeguroCochePage() {
                   type="button"
                   className={`${styles.opcion} ${opcionSeleccionada === idx ? styles.seleccionada : ''}`}
                   onClick={() => handleSeleccionarOpcion(idx)}
-                  aria-pressed={opcionSeleccionada === idx}
+                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
+                  // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
+                  // radio dentro (selector-smartphone, hallazgo 950).
+                  role="radio"
+                  aria-checked={opcionSeleccionada === idx}
                 >
                   <span className={styles.opcionIcono} aria-hidden="true">
                     {opcion.icono}
@@ -519,6 +176,16 @@ export default function SelectorSeguroCochePage() {
               {RESULTADOS[resultado].descripcion}
             </p>
           </div>
+
+          {/* Un empate no se resuelve en silencio por el orden del objeto: antes se quedaba
+              siempre la primera, terceros básico, la de menos cobertura. */}
+          {calculo && calculo.empatadas.length > 0 && (
+            <p className={styles.avisoEmpate} role="note">
+              <span aria-hidden="true">⚖️</span> Empate: con tus respuestas,{' '}
+              {enumerar([calculo.modalidad, ...calculo.empatadas].map((k) => CON_ARTICULO[k]))}{' '}
+              encajan exactamente igual; {calculo.criterioDesempate}.
+            </p>
+          )}
 
           {/* Coberturas incluidas */}
           <div className={styles.resultadoDetalles}>

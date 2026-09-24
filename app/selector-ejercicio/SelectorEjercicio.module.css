@@ -190,3 +190,21 @@
   .progresoRelleno { transition: none; }
   .btnStart, .opcionBtn, .btnSiguiente, .btnAnterior, .btnRepetir { transition: none; }
 }
+
+/* Aviso de empate: dos opciones con la misma puntuación y el criterio que las ordena
+   (mismo patrón que selector-mascota, hallazgo 1334) */
+.avisoEmpate {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--primary-texto);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoEmpate {
+  background: rgba(63, 165, 209, 0.12);
+}

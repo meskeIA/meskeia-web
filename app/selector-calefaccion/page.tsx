@@ -12,332 +12,14 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { calcularResultado, SISTEMAS, PREGUNTAS, type Resultado } from './motor';
 
-// ─────────────────────────────────────────────
-// Tipos
-// ─────────────────────────────────────────────
+// Los sistemas, las preguntas con sus pesos y la lógica de recomendación viven en ./motor.ts.
 
-type SistemaKey = 'aerotermia' | 'bomba-calor' | 'caldera-gas' | 'pellet' | 'electrico';
-
-interface Opcion {
-  valor: string;
-  etiqueta: string;
-  desc: string;
-}
-
-interface Pregunta {
-  id: number;
-  categoria: string;
-  pregunta: string;
-  icon: string;
-  opciones: Opcion[];
-}
-
-interface SistemaInfo {
-  nombre: string;
-  icon: string;
-  costeInstalacion: string;
-  costeAnual: string;
-  descripcion: string;
-  pros: string[];
-  contras: string[];
-}
-
-interface Resultado {
-  sistemaPrincipal: SistemaKey;
-  sistemaAlternativa: SistemaKey;
-  razones: string[];
-  consejos: string[];
-  subvenciones: boolean;
-}
-
-// ─────────────────────────────────────────────
-// Datos de sistemas
-// ─────────────────────────────────────────────
-
-const SISTEMAS: Record<SistemaKey, SistemaInfo> = {
-  aerotermia: {
-    nombre: 'Aerotermia',
-    icon: '🌡️',
-    costeInstalacion: '8.000 – 15.000 €',
-    costeAnual: '600 – 1.100 €',
-    descripcion: 'Sistema de bomba de calor aire-agua que calienta, enfría y produce ACS. Alta eficiencia: por cada kWh eléctrico genera 3-4 kWh de calor.',
-    pros: ['Calefacción + refrigeración + ACS en un solo equipo', 'COP 3-4: muy eficiente', 'Subvenciones de hasta el 40-60%', 'Ideal con tarifa supervalle nocturna'],
-    contras: ['Inversión inicial alta', 'Requiere espacio exterior para la unidad', 'Rendimiento menor con frío extremo'],
-  },
-  'bomba-calor': {
-    nombre: 'Bomba de Calor (split)',
-    icon: '❄️',
-    costeInstalacion: '2.000 – 5.000 €',
-    costeAnual: '500 – 900 €',
-    descripcion: 'Equipos de aire acondicionado con función calefacción. Sin obras, instalación rápida. Ideal para pisos o casas con radiadores eléctricos.',
-    pros: ['Menor inversión inicial', 'Sin obras importantes', 'Calefacción y refrigeración', 'Instalación rápida (días)'],
-    contras: ['Sin ACS integrado', 'Calor por convección (menos confort que suelo radiante)', 'Menos subvenciones que aerotermia'],
-  },
-  'caldera-gas': {
-    nombre: 'Caldera de Gas',
-    icon: '🔥',
-    costeInstalacion: '2.500 – 5.000 €',
-    costeAnual: '900 – 1.600 €',
-    descripcion: 'Sistema consolidado, instalación sencilla y amplia red de servicio técnico. En declive por normativa europea de eficiencia energética.',
-    pros: ['Inversión inicial moderada', 'Red de técnicos muy amplia', 'Calor instantáneo', 'Compatible con instalaciones existentes'],
-    contras: ['Gas sujeto a volatilidad de precios', 'Normativa europea restrictiva desde 2025', 'Huella de carbono mayor', 'Sin refrigeración'],
-  },
-  pellet: {
-    nombre: 'Caldera o Estufa de Pellet',
-    icon: '🪵',
-    costeInstalacion: '5.000 – 12.000 €',
-    costeAnual: '700 – 1.200 €',
-    descripcion: 'Combustible renovable de bajo coste. Muy eficiente en zonas rurales con acceso a pellet a buen precio. Requiere almacenamiento.',
-    pros: ['Combustible renovable y barato', 'Alta autonomía con tolva grande', 'Subvenciones disponibles', 'Buena alternativa sin gas natural'],
-    contras: ['Necesita espacio de almacenamiento', 'Mantenimiento más frecuente', 'Requiere suministro regular de pellet', 'Sin refrigeración'],
-  },
-  electrico: {
-    nombre: 'Radiadores Eléctricos de Bajo Consumo',
-    icon: '⚡',
-    costeInstalacion: '800 – 2.500 €',
-    costeAnual: '1.000 – 2.000 €',
-    descripcion: 'Solución sin obras ni instalación de gas. Ideal para uso puntual o complementario. Coste energético más alto, pero inversión mínima.',
-    pros: ['Sin obras ni instalación compleja', 'Coste inicial muy bajo', 'Control independiente por estancia', 'Sin mantenimiento'],
-    contras: ['Coste eléctrico más alto', 'Sin refrigeración ni ACS', 'No recomendado como sistema principal en climas fríos'],
-  },
-};
-
-// ─────────────────────────────────────────────
-// Preguntas del test (10)
-// ─────────────────────────────────────────────
-
-const PREGUNTAS: Pregunta[] = [
-  {
-    id: 1,
-    categoria: 'Tu vivienda',
-    pregunta: '¿Qué tipo de vivienda tienes?',
-    icon: '🏠',
-    opciones: [
-      { valor: 'piso', etiqueta: 'Piso en bloque', desc: 'Apartamento o piso en edificio' },
-      { valor: 'chalet', etiqueta: 'Casa unifamiliar o chalet', desc: 'Vivienda independiente con exterior' },
-      { valor: 'adosado', etiqueta: 'Adosado o semidetachado', desc: 'Casa con vecinos en pared medianera' },
-      { valor: 'rural', etiqueta: 'Casa rural o de campo', desc: 'Vivienda aislada fuera de la ciudad' },
-    ],
-  },
-  {
-    id: 2,
-    categoria: 'Tu vivienda',
-    pregunta: '¿Cuántos metros cuadrados tiene tu vivienda aproximadamente?',
-    icon: '📐',
-    opciones: [
-      { valor: 'pequena', etiqueta: 'Menos de 60 m²', desc: 'Estudio o piso pequeño' },
-      { valor: 'media', etiqueta: '60 – 100 m²', desc: 'Piso o casa mediana' },
-      { valor: 'grande', etiqueta: '100 – 180 m²', desc: 'Casa grande o chalet' },
-      { valor: 'muygrande', etiqueta: 'Más de 180 m²', desc: 'Vivienda muy amplia' },
-    ],
-  },
-  {
-    id: 3,
-    categoria: 'Tu vivienda',
-    pregunta: '¿Qué sistema de distribución de calor tienes instalado?',
-    icon: '🔧',
-    opciones: [
-      { valor: 'radiadores', etiqueta: 'Radiadores de agua', desc: 'Los radiadores clásicos conectados a caldera' },
-      { valor: 'suelo', etiqueta: 'Suelo radiante', desc: 'Calefacción por el suelo' },
-      { valor: 'fancoils', etiqueta: 'Fan-coils o conductos', desc: 'Sistema de aire forzado' },
-      { valor: 'ninguno', etiqueta: 'Ninguno instalado aún', desc: 'Instalación nueva o primera vez' },
-    ],
-  },
-  {
-    id: 4,
-    categoria: 'Tu vivienda',
-    pregunta: '¿Cuál es el clima de tu zona?',
-    icon: '🌤️',
-    opciones: [
-      { valor: 'frio', etiqueta: 'Frío o muy frío', desc: 'Inviernos largos, nieve ocasional (interior, norte)' },
-      { valor: 'templado', etiqueta: 'Templado', desc: 'Inviernos suaves, veranos cálidos' },
-      { valor: 'caluroso', etiqueta: 'Cálido o mediterráneo', desc: 'Inviernos cortos, veranos muy calurosos' },
-      { valor: 'canarias', etiqueta: 'Clima muy suave', desc: 'Canarias o costa sur sin frío real' },
-    ],
-  },
-  {
-    id: 5,
-    categoria: 'Tu situación actual',
-    pregunta: '¿Tienes actualmente caldera de gas natural?',
-    icon: '⛽',
-    opciones: [
-      { valor: 'si_reciente', etiqueta: 'Sí, menos de 5 años', desc: 'Caldera nueva, en buen estado' },
-      { valor: 'si_vieja', etiqueta: 'Sí, más de 10 años', desc: 'Caldera antigua, próxima a renovación' },
-      { valor: 'no_gas', etiqueta: 'No, sin gas natural', desc: 'No hay acometida de gas en mi zona' },
-      { valor: 'otro', etiqueta: 'Otro sistema', desc: 'Gasoil, propano, eléctrico…' },
-    ],
-  },
-  {
-    id: 6,
-    categoria: 'Tu uso',
-    pregunta: '¿Necesitas también refrigeración en verano?',
-    icon: '🌞',
-    opciones: [
-      { valor: 'imprescindible', etiqueta: 'Sí, imprescindible', desc: 'Veranos muy calurosos, sin aire sería imposible' },
-      { valor: 'util', etiqueta: 'Sí, me sería muy útil', desc: 'Caluroso pero me las arreglaba sin él' },
-      { valor: 'poco', etiqueta: 'Poco o nada', desc: 'Mi zona no lo requiere' },
-    ],
-  },
-  {
-    id: 7,
-    categoria: 'Tu uso',
-    pregunta: '¿Cuántos meses al año usas la calefacción?',
-    icon: '📅',
-    opciones: [
-      { valor: 'pocos', etiqueta: '2 – 3 meses', desc: 'Inviernos cortos y suaves' },
-      { valor: 'medio', etiqueta: '4 – 5 meses', desc: 'Invierno estándar' },
-      { valor: 'mucho', etiqueta: '6 o más meses', desc: 'Clima frío, uso muy prolongado' },
-    ],
-  },
-  {
-    id: 8,
-    categoria: 'Tu situación actual',
-    pregunta: '¿Tienes o puedes instalar una unidad exterior (compresor)?',
-    icon: '🏗️',
-    opciones: [
-      { valor: 'si', etiqueta: 'Sí, tengo espacio exterior', desc: 'Terraza, jardín o fachada exterior' },
-      { valor: 'comunidad', etiqueta: 'Depende de la comunidad', desc: 'Piso en bloque, necesito permiso' },
-      { valor: 'no', etiqueta: 'No tengo espacio', desc: 'Sin posibilidad de instalar unidad exterior' },
-    ],
-  },
-  {
-    id: 9,
-    categoria: 'Tu presupuesto',
-    pregunta: '¿Cuál es tu presupuesto para la instalación?',
-    icon: '💶',
-    opciones: [
-      { valor: 'bajo', etiqueta: 'Menos de 3.000 €', desc: 'Inversión mínima' },
-      { valor: 'medio', etiqueta: '3.000 – 8.000 €', desc: 'Inversión moderada' },
-      { valor: 'alto', etiqueta: '8.000 – 15.000 €', desc: 'Dispuesto a invertir con vista al largo plazo' },
-      { valor: 'premium', etiqueta: 'Más de 15.000 €', desc: 'Quiero la mejor solución posible' },
-    ],
-  },
-  {
-    id: 10,
-    categoria: 'Tu presupuesto',
-    pregunta: '¿Te interesan las subvenciones disponibles (Next Generation EU, PERTE)?',
-    icon: '🏛️',
-    opciones: [
-      { valor: 'si', etiqueta: 'Sí, quiero aprovecharlas', desc: 'Dispuesto a hacer los trámites necesarios' },
-      { valor: 'quizas', etiqueta: 'Si no son muy complicadas', desc: 'Solo si el proceso es sencillo' },
-      { valor: 'no', etiqueta: 'Prefiero no complicarme', desc: 'Prefiero una solución directa sin trámites' },
-    ],
-  },
-];
-
-// ─────────────────────────────────────────────
-// Lógica de recomendación
-// ─────────────────────────────────────────────
-
-function calcularResultado(r: Record<number, string>): Resultado {
-  let puntoAerotermia = 0;
-  let puntoBombaSplit = 0;
-  let puntoCalderas = 0;
-  let puntoPellet = 0;
-  let puntoElectrico = 0;
-  const razones: string[] = [];
-  const consejos: string[] = [];
-
-  // Tipo de vivienda
-  if (r[1] === 'chalet' || r[1] === 'adosado') { puntoAerotermia += 2; puntoPellet += 1; }
-  if (r[1] === 'rural') { puntoPellet += 3; puntoAerotermia += 1; }
-  if (r[1] === 'piso') { puntoBombaSplit += 2; puntoElectrico += 1; }
-
-  // Tamaño
-  if (r[2] === 'grande' || r[2] === 'muygrande') { puntoAerotermia += 2; puntoPellet += 1; }
-  if (r[2] === 'pequena') { puntoBombaSplit += 2; puntoElectrico += 2; }
-
-  // Sistema de distribución actual
-  if (r[3] === 'radiadores') { puntoCalderas += 2; puntoAerotermia += 1; }
-  if (r[3] === 'suelo') { puntoAerotermia += 3; }
-  if (r[3] === 'ninguno') { puntoAerotermia += 2; puntoBombaSplit += 1; }
-
-  // Clima
-  if (r[4] === 'frio') { puntoAerotermia += 1; puntoPellet += 2; puntoCalderas += 1; }
-  if (r[4] === 'caluroso' || r[4] === 'canarias') { puntoBombaSplit += 3; puntoAerotermia += 1; }
-  if (r[4] === 'templado') { puntoAerotermia += 2; puntoBombaSplit += 1; }
-
-  // Gas actual
-  if (r[5] === 'si_reciente') { puntoCalderas += 4; }
-  if (r[5] === 'si_vieja') { puntoAerotermia += 2; puntoBombaSplit += 1; }
-  if (r[5] === 'no_gas') { puntoAerotermia += 2; puntoPellet += 1; puntoBombaSplit += 1; }
-
-  // Refrigeración
-  if (r[6] === 'imprescindible') { puntoBombaSplit += 3; puntoAerotermia += 2; }
-  if (r[6] === 'util') { puntoBombaSplit += 1; puntoAerotermia += 1; }
-
-  // Meses de uso
-  if (r[7] === 'mucho') { puntoAerotermia += 2; puntoPellet += 1; }
-  if (r[7] === 'pocos') { puntoBombaSplit += 2; puntoElectrico += 1; }
-
-  // Unidad exterior
-  if (r[8] === 'no') { puntoCalderas += 2; puntoElectrico += 2; }
-  if (r[8] === 'comunidad') { puntoBombaSplit += 1; puntoElectrico += 1; }
-  if (r[8] === 'si') { puntoAerotermia += 2; puntoBombaSplit += 2; }
-
-  // Presupuesto
-  if (r[9] === 'bajo') { puntoElectrico += 4; puntoBombaSplit += 2; }
-  if (r[9] === 'medio') { puntoBombaSplit += 2; puntoCalderas += 1; puntoPellet += 1; }
-  if (r[9] === 'alto') { puntoAerotermia += 3; }
-  if (r[9] === 'premium') { puntoAerotermia += 4; }
-
-  // Subvenciones
-  const subvenciones = r[10] === 'si' || r[10] === 'quizas';
-  if (subvenciones) { puntoAerotermia += 2; puntoPellet += 1; }
-
-  // Ordenar por puntuación
-  const scores: [SistemaKey, number][] = [
-    ['aerotermia', puntoAerotermia],
-    ['bomba-calor', puntoBombaSplit],
-    ['caldera-gas', puntoCalderas],
-    ['pellet', puntoPellet],
-    ['electrico', puntoElectrico],
-  ];
-  scores.sort((a, b) => b[1] - a[1]);
-
-  const sistemaPrincipal = scores[0][0];
-  const sistemaAlternativa = scores[1][0];
-
-  // Razones
-  if (sistemaPrincipal === 'aerotermia') {
-    razones.push('La aerotermia es la opción más eficiente y subvencionada en 2025: calienta, enfría y produce ACS en un solo equipo.');
-    if (r[3] === 'suelo') razones.push('Tu suelo radiante es ideal para aerotermia: trabaja a baja temperatura y maximiza la eficiencia del sistema.');
-    if (subvenciones) razones.push('Con las subvenciones Next Generation EU puedes cubrir hasta el 40-60% del coste de instalación.');
-  }
-  if (sistemaPrincipal === 'bomba-calor') {
-    razones.push('Una bomba de calor tipo split es la solución más equilibrada: menor inversión inicial, sin obras mayores y con refrigeración incluida.');
-    if (r[6] === 'imprescindible') razones.push('Al necesitar también refrigeración en verano, un equipo que hace ambas cosas es la opción más rentable.');
-  }
-  if (sistemaPrincipal === 'caldera-gas') {
-    razones.push('Con una caldera reciente en buen estado, mantenerla es la decisión económicamente más sensata a corto plazo.');
-    razones.push('Considera planificar la transición a bomba de calor o aerotermia cuando la caldera llegue al final de su vida útil (10-15 años).');
-  }
-  if (sistemaPrincipal === 'pellet') {
-    razones.push('En tu zona rural o sin gas natural, el pellet ofrece el coste energético más bajo con combustible renovable de producción nacional.');
-    razones.push('Las calderas de pellet modernas tienen alta autonomía y rendimiento superior al 95%.');
-  }
-  if (sistemaPrincipal === 'electrico') {
-    razones.push('Para tu situación (presupuesto ajustado o uso reducido), los radiadores eléctricos de bajo consumo son la opción más práctica sin obras.');
-    razones.push('A largo plazo, considera una bomba de calor cuando puedas invertir: el ahorro en factura lo amortiza en pocos años.');
-  }
-
-  // Consejos
-  if (r[5] === 'si_reciente') {
-    consejos.push('💡 Tu caldera es reciente: no tiene sentido cambiarla ahora. Espera a que llegue a los 10-12 años para planificar la transición a sistemas renovables.');
-  }
-  if (subvenciones) {
-    consejos.push('🏛️ Las subvenciones del programa PERTE Industria Verde y Next Generation EU para renovables se solicitan a través de tu comunidad autónoma. Consulta la web del IDAE (idae.es).');
-  }
-  if (r[4] === 'frio' && (sistemaPrincipal === 'aerotermia' || sistemaPrincipal === 'bomba-calor')) {
-    consejos.push('🌡️ En climas muy fríos, elige equipos con COP garantizado por debajo de -10°C. Las marcas japonesas (Mitsubishi, Daikin, Fujitsu) son referencia en este aspecto.');
-  }
-  consejos.push('🔧 Pide siempre al menos 3 presupuestos de instaladores certificados. La calidad de la instalación es tan importante como el equipo elegido.');
-  if (r[3] === 'radiadores' && sistemaPrincipal === 'aerotermia') {
-    consejos.push('📊 Con radiadores existentes, una aerotermia de alta temperatura (hasta 65°C) funciona perfectamente. Es más cara pero evita cambiar todos los radiadores.');
-  }
-
-  return { sistemaPrincipal, sistemaAlternativa, razones, consejos, subvenciones };
+/** Lista legible: «A, B y C». */
+function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
 }
 
 // ─────────────────────────────────────────────
@@ -444,12 +126,17 @@ export default function SelectorCalefaccion() {
             <div
               className={styles.progresoBar}
               role="progressbar"
+              // Lo anunciado y lo pintado van sobre la misma escala: preguntas RESPONDIDAS
+              // (paso / total). aria-valuenow era el número de pregunta con mínimo 1, y un
+              // lector de pantalla anunciaba otra fracción que la que se veía (mismo defecto
+              // y misma reparación que selector-smartphone, hallazgo 951).
               aria-label={`Pregunta ${paso + 1} de ${totalPreguntas}`}
-              aria-valuenow={paso + 1}
-              aria-valuemin={1}
+              aria-valuenow={paso}
+              aria-valuemin={0}
               aria-valuemax={totalPreguntas}
+              aria-valuetext={`Pregunta ${paso + 1} de ${totalPreguntas}`}
             >
-              <div className={styles.progresoRelleno} style={{ width: `${progreso}%` }} />
+              <div className={styles.progresoRelleno} data-progreso={progreso} style={{ width: `${progreso}%` }} />
             </div>
           </div>
 
@@ -463,7 +150,11 @@ export default function SelectorCalefaccion() {
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => seleccionarOpcion(op.valor)}
-                  aria-pressed={respuestas[preguntaActual.id] === op.valor ? true : false}
+                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
+                  // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
+                  // radio dentro (selector-smartphone, hallazgo 950).
+                  role="radio"
+                  aria-checked={respuestas[preguntaActual.id] === op.valor}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>
@@ -508,6 +199,16 @@ export default function SelectorCalefaccion() {
               <p className={styles.recomendacionDesc}>{SISTEMAS[resultado.sistemaAlternativa].descripcion}</p>
             </div>
           </div>
+
+          {/* Un empate no se resuelve en silencio por el orden del código: antes lo ganaba
+              siempre la aerotermia, que era la primera del array de puntuaciones. */}
+          {resultado.empatados.length > 0 && (
+            <p className={styles.avisoEmpate} role="note">
+              <span aria-hidden="true">⚖️</span> Empate: con tus respuestas,{' '}
+              {enumerar([resultado.sistemaPrincipal, ...resultado.empatados].map(k => SISTEMAS[k].conArticulo))}{' '}
+              encajan exactamente igual; {resultado.criterioDesempate}.
+            </p>
+          )}
 
           {/* Costes */}
           <div className={styles.costesSection}>

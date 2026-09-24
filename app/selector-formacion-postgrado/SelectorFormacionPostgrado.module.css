@@ -621,3 +621,53 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Por qué esta recomendación: las respuestas que más han sumado a la vía elegida */
+.razones {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  text-align: left;
+}
+
+[data-theme='dark'] .razones {
+  background: #222;
+}
+
+.razones h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.razones ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Aviso de empate: dos opciones con la misma puntuación y el criterio que las ordena
+   (mismo patrón que selector-mascota, hallazgo 1334) */
+.avisoEmpate {
+  text-align: left;
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--primary-texto);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoEmpate {
+  background: rgba(63, 165, 209, 0.12);
+}

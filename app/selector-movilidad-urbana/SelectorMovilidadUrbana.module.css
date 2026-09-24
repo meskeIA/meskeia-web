@@ -420,6 +420,67 @@
   color: #e5e5e5;
 }
 
+/* ===== POR QUÉ Y EMPATE ===== */
+
+/* Las respuestas que más han sumado al medio recomendado */
+.razones {
+  text-align: left;
+  background-color: #f5f9fb;
+  border: 1px solid #dbe7ee;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.5rem;
+}
+
+.razones h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.5rem;
+}
+
+.razones ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-primary, #1a1a1a);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.razones li + li {
+  margin-top: 0.35rem;
+}
+
+[data-theme='dark'] .razones {
+  background-color: #1e3040;
+  border-color: #2f4a5c;
+}
+
+[data-theme='dark'] .razones h3,
+[data-theme='dark'] .razones ul {
+  color: #e5e5e5;
+}
+
+/* Aviso de empate: dos opciones con la misma puntuación y el criterio que las ordena
+   (mismo patrón que selector-mascota, hallazgo 1334) */
+.avisoEmpate {
+  text-align: left;
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--primary-texto);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoEmpate {
+  background: rgba(63, 165, 209, 0.12);
+}
+
+
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 480px) {

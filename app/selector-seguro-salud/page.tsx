@@ -4,241 +4,9 @@ import React, { useState } from 'react';
 import styles from './SelectorSeguroSalud.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { calcularResultado, PREGUNTAS, VEREDICTOS, type Resultado } from './motor';
 
-// ─────────────────────────────────────────────
-// Tipos
-// ─────────────────────────────────────────────
-
-type VeredictoKey = 'publico' | 'complementario' | 'completo';
-
-interface Opcion { valor: string; etiqueta: string; desc: string; }
-interface Pregunta { id: number; categoria: string; pregunta: string; icon: string; opciones: Opcion[]; }
-
-interface VeredictoInfo {
-  nombre: string;
-  icon: string;
-  descripcion: string;
-  cobertura: string[];
-  precioOrientativo: string;
-  precioNota: string;
-}
-
-interface Resultado {
-  veredicto: VeredictoKey;
-  puntuacion: number;
-  razones: string[];
-  consejos: string[];
-}
-
-// ─────────────────────────────────────────────
-// Datos de veredictos
-// ─────────────────────────────────────────────
-
-const VEREDICTOS: Record<VeredictoKey, VeredictoInfo> = {
-  publico: {
-    nombre: 'Sanidad pública es suficiente',
-    icon: '🏥',
-    descripcion: 'Según tu perfil, el sistema público de salud cubre bien tus necesidades actuales. Contratar un seguro privado no aportaría valor suficiente para justificar el coste.',
-    cobertura: ['Médico de cabecera y especialistas', 'Hospitalización y urgencias', 'Analíticas y pruebas diagnósticas', 'Medicamentos con copago reducido'],
-    precioOrientativo: '0 €/mes',
-    precioNota: 'La sanidad pública está financiada vía impuestos',
-  },
-  complementario: {
-    nombre: 'Seguro complementario recomendado',
-    icon: '🛡️',
-    descripcion: 'Tu perfil se beneficiaría de un seguro que complemente la sanidad pública: principalmente para reducir tiempos de espera en especialistas y acceder a segunda opinión médica.',
-    cobertura: ['Especialistas sin lista de espera', 'Segunda opinión médica', 'Urgencias privadas', 'Cobertura dental básica (con módulo adicional)'],
-    precioOrientativo: '35 – 80 €/mes',
-    precioNota: 'Precio orientativo para adulto de 30-50 años. Varía por edad, CCAA y aseguradora.',
-  },
-  completo: {
-    nombre: 'Seguro privado completo recomendado',
-    icon: '⭐',
-    descripcion: 'Tu situación justifica claramente un seguro de salud privado completo: uso médico frecuente, hijos, residencia en zona con largas esperas o trabajo por cuenta propia sin mutua de empresa.',
-    cobertura: ['Médico de cabecera privado', 'Todos los especialistas', 'Hospitalización en clínica privada', 'Urgencias 24h', 'Pruebas diagnósticas (resonancias, TAC…)', 'Ginecología y pediatría completas'],
-    precioOrientativo: '60 – 180 €/mes',
-    precioNota: 'Precio orientativo para familia de 3 (adultos 30-45 años + 1 niño). Varía mucho por edad y CCAA.',
-  },
-};
-
-// ─────────────────────────────────────────────
-// Preguntas del test (10)
-// ─────────────────────────────────────────────
-
-const PREGUNTAS: Pregunta[] = [
-  {
-    id: 1, categoria: 'Tu uso médico', pregunta: '¿Con qué frecuencia vas al médico aproximadamente?', icon: '🩺',
-    opciones: [
-      { valor: 'raro', etiqueta: 'Casi nunca (1 vez al año o menos)', desc: 'Visitas solo en caso de urgencia clara' },
-      { valor: 'normal', etiqueta: 'Ocasional (2-4 veces al año)', desc: 'Revisiones y alguna consulta puntual' },
-      { valor: 'frecuente', etiqueta: 'Con frecuencia (5-10 veces al año)', desc: 'Seguimiento de alguna condición' },
-      { valor: 'muy_frecuente', etiqueta: 'Muy frecuente (más de 10 veces)', desc: 'Crónico o condición que requiere seguimiento continuo' },
-    ],
-  },
-  {
-    id: 2, categoria: 'Tu uso médico', pregunta: '¿Necesitas seguimiento de alguna especialidad médica de forma regular?', icon: '👨‍⚕️',
-    opciones: [
-      { valor: 'no', etiqueta: 'No, solo médico de cabecera', desc: 'Sin especialistas activos en este momento' },
-      { valor: 'uno', etiqueta: 'Sí, un especialista', desc: 'Cardiólogo, dermatólogo, traumatólogo…' },
-      { valor: 'varios', etiqueta: 'Sí, varios especialistas', desc: 'Seguimiento en varias especialidades' },
-      { valor: 'cronico', etiqueta: 'Tengo una enfermedad crónica', desc: 'Diabetes, HTA, artritis, tiroides…' },
-    ],
-  },
-  {
-    id: 3, categoria: 'Tu situación', pregunta: '¿En qué comunidad autónoma resides?', icon: '🗺️',
-    opciones: [
-      { valor: 'buena', etiqueta: 'Madrid, Navarra o País Vasco', desc: 'Sanidad pública con buen rendimiento relativo' },
-      { valor: 'media', etiqueta: 'Cataluña, Galicia, Aragón, Canarias…', desc: 'Sistema público con esperas moderadas' },
-      { valor: 'saturada', etiqueta: 'Andalucía, Valencia, Murcia, Castilla-La Mancha…', desc: 'Sistemas con mayor presión asistencial' },
-      { valor: 'rural', etiqueta: 'Zona rural o con poca oferta sanitaria', desc: 'Lejanía de centros especializados' },
-    ],
-  },
-  {
-    id: 4, categoria: 'Tu situación', pregunta: '¿Tienes hijos menores de 18 años a cargo?', icon: '👨‍👩‍👧',
-    opciones: [
-      { valor: 'no', etiqueta: 'No tengo hijos', desc: 'Sin menores a cargo' },
-      { valor: 'si_1', etiqueta: 'Sí, 1 hijo', desc: 'Un menor en la unidad familiar' },
-      { valor: 'si_varios', etiqueta: 'Sí, 2 o más hijos', desc: 'Varios menores a cargo' },
-      { valor: 'embarazo', etiqueta: 'Estoy embarazada o planeando estarlo', desc: 'Cobertura maternal importante' },
-    ],
-  },
-  {
-    id: 5, categoria: 'Tu situación', pregunta: '¿Cuál es tu situación laboral?', icon: '💼',
-    opciones: [
-      { valor: 'empresa', etiqueta: 'Empleado/a por cuenta ajena', desc: 'Trabajo para una empresa' },
-      { valor: 'autonomo', etiqueta: 'Autónomo/a o freelance', desc: 'Trabajo por cuenta propia' },
-      { valor: 'funcionario', etiqueta: 'Funcionario/a (con MUFACE, ISFAS…)', desc: 'Tengo mutualidad de funcionarios' },
-      { valor: 'desempleo', etiqueta: 'Desempleo, estudiante o jubilado/a', desc: 'Sin relación laboral activa' },
-    ],
-  },
-  {
-    id: 6, categoria: 'Tu uso médico', pregunta: '¿Cuánto valoras el acceso rápido a especialistas (sin esperar meses)?', icon: '⏱️',
-    opciones: [
-      { valor: 'poco', etiqueta: 'Puedo esperar sin problema', desc: 'Las listas de espera no me afectan mucho' },
-      { valor: 'algo', etiqueta: 'Preferiría no esperar, pero lo acepto', desc: 'Me adaptaría aunque no es ideal' },
-      { valor: 'mucho', etiqueta: 'Para mí es muy importante ir rápido', desc: 'Las esperas me generan estrés o perjuicio real' },
-      { valor: 'critico', etiqueta: 'Es crítico por mi trabajo o condición', desc: 'No puedo permitirme largas bajas o esperas' },
-    ],
-  },
-  {
-    id: 7, categoria: 'Tu uso médico', pregunta: '¿Cuál es tu situación de salud dental?', icon: '🦷',
-    opciones: [
-      { valor: 'bien', etiqueta: 'Bien, solo revisiones anuales', desc: 'Sin tratamientos pendientes' },
-      { valor: 'necesito', etiqueta: 'Necesito tratamientos próximamente', desc: 'Empastes, extracciones, ortodoncia…' },
-      { valor: 'critico', etiqueta: 'Es un gasto importante para mí cada año', desc: 'Gasto dental recurrente y significativo' },
-      { valor: 'indiferente', etiqueta: 'Voy a clínicas privadas de precio económico', desc: 'Ya tengo solución para el dentista' },
-    ],
-  },
-  {
-    id: 8, categoria: 'Tu situación', pregunta: '¿Has tenido ya algún seguro de salud privado?', icon: '📋',
-    opciones: [
-      { valor: 'si_contento', etiqueta: 'Sí y estaba muy satisfecho/a', desc: 'Le saqué partido real' },
-      { valor: 'si_neutro', etiqueta: 'Sí pero apenas lo usé', desc: 'No amortizaba el coste mensual' },
-      { valor: 'no_interes', etiqueta: 'No, pero me interesa', desc: 'Primera vez que lo considero seriamente' },
-      { valor: 'no_duda', etiqueta: 'No, y no estoy seguro/a de si lo necesito', desc: 'Dudas sobre si compensa' },
-    ],
-  },
-  {
-    id: 9, categoria: 'Tu presupuesto', pregunta: '¿Cuánto estarías dispuesto/a a pagar mensualmente?', icon: '💶',
-    opciones: [
-      { valor: 'nada', etiqueta: 'Nada, no quiero gasto extra', desc: 'La sanidad pública debe ser suficiente' },
-      { valor: 'poco', etiqueta: 'Hasta 40 €/mes', desc: 'Gasto muy ajustado' },
-      { valor: 'medio', etiqueta: '40 – 100 €/mes', desc: 'Inversión razonable en salud' },
-      { valor: 'alto', etiqueta: 'Más de 100 €/mes', desc: 'La salud es mi prioridad' },
-    ],
-  },
-  {
-    id: 10, categoria: 'Tu presupuesto', pregunta: '¿Tienes actualmente algún seguro de salud por convenio de empresa?', icon: '🏢',
-    opciones: [
-      { valor: 'si_completo', etiqueta: 'Sí, completo pagado por la empresa', desc: 'Cobertura total sin coste para mí' },
-      { valor: 'si_parcial', etiqueta: 'Sí, pero con cobertura limitada', desc: 'Cubre lo básico, quiero ampliar' },
-      { valor: 'no', etiqueta: 'No, tendría que contratarlo yo', desc: 'Sin seguro de empresa actualmente' },
-      { valor: 'muface', etiqueta: 'Tengo mutualidad de funcionarios (MUFACE/ISFAS)', desc: 'Funcionario con cobertura específica' },
-    ],
-  },
-];
-
-// ─────────────────────────────────────────────
-// Lógica de recomendación
-// ─────────────────────────────────────────────
-
-function calcularResultado(r: Record<number, string>): Resultado {
-  let puntos = 0; // Más puntos = más justificado el seguro privado
-  const razones: string[] = [];
-  const consejos: string[] = [];
-
-  // Uso médico
-  if (r[1] === 'frecuente') puntos += 2;
-  if (r[1] === 'muy_frecuente') puntos += 3;
-  if (r[2] === 'uno') puntos += 2;
-  if (r[2] === 'varios') puntos += 3;
-  if (r[2] === 'cronico') puntos += 2; // Crónico a veces mejor en pública
-  if (r[6] === 'mucho') puntos += 2;
-  if (r[6] === 'critico') puntos += 3;
-  if (r[7] === 'necesito') puntos += 2;
-  if (r[7] === 'critico') puntos += 3;
-
-  // Situación
-  if (r[3] === 'saturada') puntos += 2;
-  if (r[3] === 'rural') puntos += 2;
-  if (r[4] === 'si_1') puntos += 2;
-  if (r[4] === 'si_varios') puntos += 3;
-  if (r[4] === 'embarazo') puntos += 3;
-  if (r[5] === 'autonomo') puntos += 2;
-  if (r[5] === 'funcionario') puntos -= 3; // MUFACE ya cubre
-  if (r[8] === 'si_contento') puntos += 2;
-
-  // Presupuesto
-  if (r[9] === 'nada') puntos -= 3;
-  if (r[9] === 'poco') puntos -= 1;
-  if (r[9] === 'alto') puntos += 1;
-  if (r[10] === 'si_completo') puntos -= 5; // Ya lo tiene
-  if (r[10] === 'muface') puntos -= 4;
-
-  // Determinar veredicto
-  let veredicto: VeredictoKey;
-  if (puntos <= 2) veredicto = 'publico';
-  else if (puntos <= 7) veredicto = 'complementario';
-  else veredicto = 'completo';
-
-  // Override por condición específica
-  if (r[10] === 'si_completo') veredicto = 'publico';
-  if (r[10] === 'muface') veredicto = 'publico';
-  if (r[9] === 'nada') veredicto = 'publico';
-
-  // Razones
-  if (veredicto === 'publico') {
-    razones.push('Tu uso médico actual no justifica el coste mensual de un seguro privado. La sanidad pública cubre bien tu perfil.');
-    if (r[10] === 'si_completo') razones.push('Ya tienes cobertura privada completa a través de tu empresa: aprovéchala al máximo.');
-    if (r[10] === 'muface') razones.push('Como funcionario/a con MUFACE o ISFAS ya tienes cobertura privada comparable a un seguro de calidad.');
-  }
-  if (veredicto === 'complementario') {
-    razones.push('Un seguro complementario te aportará principalmente acceso rápido a especialistas sin listas de espera.');
-    if (r[3] === 'saturada') razones.push('Las esperas en tu comunidad autónoma hacen que el acceso rápido a especialistas sea especialmente valioso.');
-    if (r[7] === 'necesito') razones.push('Un módulo dental puede ahorrarte más que el coste anual del seguro si tienes tratamientos próximos.');
-  }
-  if (veredicto === 'completo') {
-    if (r[4] !== 'no') razones.push('Con hijos a cargo, la pediatría privada y la ausencia de esperas para urgencias infantiles justifica la inversión.');
-    if (r[5] === 'autonomo') razones.push('Como autónomo/a, sin baja laboral por enfermedad garantizada, el acceso rápido a atención médica es crítico para tu actividad.');
-    if (r[6] === 'critico') razones.push('Dado que el tiempo de acceso médico es crítico para tu trabajo, el seguro privado es una herramienta de productividad real.');
-  }
-
-  // Consejos generales
-  if (veredicto !== 'publico') {
-    consejos.push('🔍 Compara siempre al menos 3 aseguradoras: Sanitas, Adeslas, Asisa, AXA Salud y DKV son las principales en España. Los precios y redes varían mucho por zona.');
-    consejos.push('📋 Revisa la red de médicos en tu ciudad antes de contratar: importa más la calidad de la red que el precio.');
-    if (r[7] === 'necesito' || r[7] === 'critico') {
-      consejos.push('🦷 El dental suele ser módulo aparte. Compara si compensa un seguro dental independiente (desde 8 €/mes) frente al módulo dentro del seguro general.');
-    }
-    consejos.push('⚠️ Atención a las carencias: la mayoría de seguros tienen periodos sin cobertura para partos (8 meses), operaciones (6-8 meses) y algunas especialidades.');
-  }
-  if (veredicto === 'publico') {
-    consejos.push('💊 Aunque no necesites seguro privado ahora, considera ahorrar el equivalente en un fondo de emergencia sanitaria para imprevistos.');
-    consejos.push('📞 Conoce bien los recursos de tu sistema público: muchas CCAA tienen apps para cita online, telemedicina y resultados digitales.');
-  }
-
-  return { veredicto, puntuacion: puntos, razones, consejos };
-}
+// Las preguntas, los puntos, los veredictos y la lógica viven en ./motor.ts.
 
 // ─────────────────────────────────────────────
 // Componente principal
@@ -323,8 +91,20 @@ export default function SelectorSeguroSalud() {
               <span className={styles.progresoPaso}>Pregunta {paso + 1} de {totalPreguntas}</span>
               <span className={styles.progresoCategoria}>{preguntaActual.categoria}</span>
             </div>
-            <div className={styles.progresoBar} role="progressbar" aria-label={`Pregunta ${paso + 1} de ${totalPreguntas}`} aria-valuenow={paso + 1} aria-valuemin={1} aria-valuemax={totalPreguntas}>
-              <div className={styles.progresoRelleno} style={{ width: `${progreso}%` }} />
+            {/* Lo anunciado y lo pintado van sobre la misma escala: preguntas RESPONDIDAS
+                (paso / total). aria-valuenow era el número de pregunta con mínimo 1, y un
+                lector de pantalla anunciaba otra fracción que la que se veía (mismo defecto y
+                misma reparación que selector-smartphone, hallazgo 951). */}
+            <div
+              className={styles.progresoBar}
+              role="progressbar"
+              aria-label={`Pregunta ${paso + 1} de ${totalPreguntas}`}
+              aria-valuenow={paso}
+              aria-valuemin={0}
+              aria-valuemax={totalPreguntas}
+              aria-valuetext={`Pregunta ${paso + 1} de ${totalPreguntas}`}
+            >
+              <div className={styles.progresoRelleno} data-progreso={progreso} style={{ width: `${progreso}%` }} />
             </div>
           </div>
           <div className={styles.preguntaCard}>
@@ -335,7 +115,11 @@ export default function SelectorSeguroSalud() {
                 <button key={op.valor} type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => seleccionarOpcion(op.valor)}
-                  aria-pressed={respuestas[preguntaActual.id] === op.valor}
+                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
+                  // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
+                  // radio dentro (selector-smartphone, hallazgo 950).
+                  role="radio"
+                  aria-checked={respuestas[preguntaActual.id] === op.valor}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>

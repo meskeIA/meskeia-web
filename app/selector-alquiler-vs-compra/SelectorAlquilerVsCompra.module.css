@@ -106,3 +106,7 @@
   .progresoRelleno { transition: none; }
   .btnStart, .opcionBtn, .btnSiguiente, .btnAnterior, .btnRepetir { transition: none; }
 }
+
+/* La puntuación contra los umbrales, y las respuestas que empujan en sentido contrario */
+.puntuacionNota { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.5rem; }
+.razonContraria::before { content: '•'; color: var(--text-secondary); }
