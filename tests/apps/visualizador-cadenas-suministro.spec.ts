@@ -29,7 +29,7 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   El % del componente sale literal de COMPONENTES (Procesador: «~20–25%»). Las ocho horquillas
  *   suman 86–114 % con punto medio 100 %: coherentes como reparto del coste del dispositivo.
  *
- * LOS DEFECTOS QUE DEJA DOCUMENTADOS (test.fail: se pondrán en verde al repararlos)
+ * LOS DEFECTOS QUE DEJÓ DOCUMENTADOS (reparados el 24/09/2026; los test.fail pasan a regresión)
  *   · Teclado: ni los 8 componentes (`<g role="button">` sin tabIndex ni onKeyDown) ni los 5
  *     eventos de la línea de tiempo (`<div role="listitem" onClick>`) reciben foco. Medido con
  *     Tab desde el principio de la página: el foco pasa del LegalNotice al deslizador sin tocar
@@ -39,6 +39,15 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *     (fondo compuesto 252,233,233) y 2,70:1 en oscuro (fondo 63,44,44). Es texto de 14 px en
  *     peso 600, o sea texto pequeño: exige 4,5:1. El bloque [data-theme='dark'] redeclara
  *     .jitEstadoOk pero no .jitEstadoCrisis.
+ *   · Datos (hallazgos 1351-1354), cotejados con su fuente el 24/09/2026:
+ *       – Trazabilidad Walmart/IBM: la prueba de 2,2 s (antes casi 7 días) fue con MANGOS
+ *         cortados, 2016-2017 (Frank Yiannas, Walmart). Las lechugas son el brote de E. coli de
+ *         2018 que llevó a exigir la red a los proveedores de hoja verde (carta del 24/09/2018).
+ *       – 2.º trimestre de 2020: la OMC (nota de prensa 862, 06/10/2020) da −14,3 % en volumen
+ *         RESPECTO AL TRIMESTRE ANTERIOR, no un −30 %.
+ *       – Kioxia: no hubo inundación en 2020; fue la contaminación de materiales en Yokkaichi y
+ *         Kitakami, febrero de 2022, ≥ 6,5 exabytes (Western Digital, 2022).
+ *       – Dólares: formato español («210.000 millones de $»), nunca «$210.000M».
  */
 
 const RUTA = '/visualizador-cadenas-suministro/';
@@ -168,8 +177,7 @@ test('caso fuera de rango — 150 se recorta a 100 % y −20 a 0 %, con el estad
 // DEFECTO (24/09/2026) — teclado. Los componentes y los eventos NO reciben foco con Tab.
 // Se recorre con Tab desde el principio y se anotan los focos hasta el botón de la guía
 // educativa, que va DESPUÉS del deslizador y de la línea de tiempo en el DOM.
-test('DEFECTO teclado — los 8 componentes y los 5 eventos se alcanzan con Tab', async ({ page }) => {
-  test.fail(true, 'Hallazgo 24/09/2026: <g role="button"> y <div role="listitem" onClick> sin tabIndex');
+test('teclado — los 8 componentes y los 5 eventos se alcanzan con Tab', async ({ page }) => {
   const focos: string[] = [];
   for (let i = 0; i < 120; i++) {
     await page.keyboard.press('Tab');
@@ -186,12 +194,25 @@ test('DEFECTO teclado — los 8 componentes y los 5 eventos se alcanzan con Tab'
   const eventos = focos.filter((f) => f === 'EVENTO');
   expect(componentes, `focos recorridos: ${focos.join(' · ')}`).toHaveLength(8);
   expect(eventos).toHaveLength(5);
+
+  // Y se accionan con teclado: Enter abre la ficha del componente, Espacio despliega el evento.
+  const procesador = page.getByRole('button', { name: 'Ver detalles de Procesador (SoC)' });
+  await procesador.focus();
+  await page.keyboard.press('Enter');
+  await expect(procesador).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('div[class*="panelDetalle"]').getByRole('heading', { name: 'Procesador (SoC)' })).toBeVisible();
+
+  const suez = page.getByRole('button', { name: 'Bloqueo del Canal de Suez (Ever Given)' });
+  await expect(suez).toHaveAttribute('aria-expanded', 'false');
+  await suez.focus();
+  await page.keyboard.press(' ');
+  await expect(suez).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByText('Lección aprendida:')).toBeVisible();
 });
 
 // DEFECTO (24/09/2026) — contraste del estado en crisis, en los dos temas. Medido en navegador:
 // 4,14:1 en claro y 2,70:1 en oscuro, frente a 4,5:1 exigible a texto de 14 px peso 600.
-test('DEFECTO contraste — el rótulo en crisis se lee a 4,5:1 en claro y en oscuro', async ({ page }) => {
-  test.fail(true, 'Hallazgo 24/09/2026: .jitEstadoCrisis #dc2626 da 4,14:1 en claro y 2,70:1 en oscuro');
+test('contraste — el rótulo en crisis se lee a 4,5:1 en claro y en oscuro', async ({ page }) => {
   await sembrarValor(page, DESLIZADOR, 80);
 
   const contraste = () =>
@@ -239,6 +260,50 @@ test('DEFECTO contraste — el rótulo en crisis se lee a 4,5:1 en claro y en os
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   const oscuro = await estable();
 
-  expect(claro, 'rótulo en crisis, tema claro (hoy 4,14:1)').toBeGreaterThanOrEqual(4.5);
-  expect(oscuro, 'rótulo en crisis, tema oscuro (hoy 2,70:1)').toBeGreaterThanOrEqual(4.5);
+  expect(claro, 'rótulo en crisis, tema claro (antes 4,14:1)').toBeGreaterThanOrEqual(4.5);
+  expect(oscuro, 'rótulo en crisis, tema oscuro (antes 2,70:1)').toBeGreaterThanOrEqual(4.5);
+});
+
+// DATOS (hallazgos 1351-1354) — regresión de los cuatro textos corregidos. Las fuentes están en
+// la cabecera; aquí se comprueba que la página dice lo que dicen ellas y no lo de antes.
+test('datos — mangos de Walmart, −14,3 % de la OMC, contaminación de Kioxia 2022 y dólares en formato español', async ({
+  page,
+}) => {
+  // 1351 — la guía educativa está en el DOM aunque nazca plegada.
+  const guia = await page.locator('main, body').first().textContent();
+  expect(guia).toContain('mangos cortados');
+  expect(guia).toContain('2,2 segundos');
+  expect(guia).not.toMatch(/rastrear lechugas/);
+
+  // 1352 — evento COVID desplegado.
+  const covid = page.getByRole('button', { name: 'COVID-19: cierre de fábricas en Asia' });
+  await covid.click();
+  await expect(covid).toHaveAttribute('aria-expanded', 'true');
+  const panelCovid = page.locator('[role="listitem"]').filter({ has: covid });
+  await expect(panelCovid).toContainText('−14,3 %');
+  await expect(panelCovid).toContainText('respecto al trimestre anterior');
+  await expect(panelCovid).toContainText('OMC');
+  await expect(panelCovid).not.toContainText('30%');
+
+  // 1353 — ficha de la memoria NAND.
+  await page.getByRole('button', { name: 'Ver detalles de Memoria flash (NAND)' }).click();
+  const panel = page.locator('div[class*="panelDetalle"]');
+  await expect(panel).toContainText('febrero de 2022');
+  await expect(panel).toContainText('Yokkaichi y Kitakami');
+  await expect(panel).not.toContainText('inundación');
+
+  // 1354 — ninguna cifra con el $ delante ni con la «M» anglosajona pegada. Se despliega la
+  // crisis de semiconductores, que es el caso del acta.
+  const chips = page.getByRole('button', { name: 'Crisis global de semiconductores' });
+  await chips.click();
+  const semis = page.locator('[role="listitem"]').filter({ has: chips });
+  await expect(semis).toContainText('210.000 millones de $');
+  // Texto de la página SIN los <script> de Next (su payload RSC lleva referencias «$7»).
+  const texto = await page.evaluate(() => {
+    const copia = document.body.cloneNode(true) as HTMLElement;
+    copia.querySelectorAll('script, style').forEach((n) => n.remove());
+    return copia.textContent ?? '';
+  });
+  expect(texto.match(/\$\s?\d/g) ?? [], 'símbolo $ delante de una cifra').toEqual([]);
+  expect(texto.match(/\d+M\b/g) ?? [], 'abreviatura «M» anglosajona').toEqual([]);
 });

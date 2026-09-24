@@ -112,7 +112,7 @@ const COMPONENTES: ComponenteSmartphone[] = [
     empresa: 'Kioxia (Japón), SK Hynix (Corea), Samsung, Micron (EEUU)',
     cosте: '~8–12%',
     curioso:
-      'Un smartphone de 256 GB contiene capas de memoria apiladas verticalmente (3D NAND) con hasta 232 capas de células de memoria. En 2020, una inundación en una fábrica de Kioxia afectó al 30% del suministro mundial de NAND.',
+      'Un smartphone de 256 GB contiene capas de memoria apiladas verticalmente (3D NAND) con hasta 232 capas de células de memoria. En febrero de 2022, una contaminación de materiales de fabricación paró parte de la producción de las plantas que Kioxia y Western Digital comparten en Yokkaichi y Kitakami (Japón): se echaron a perder al menos 6,5 exabytes de memoria flash (Western Digital, 2022). Entre las dos empresas fabricaban cerca de un tercio de la NAND mundial (32,5 % en el 3.er trimestre de 2021, según TrendForce).',
     x: 270,
     y: 175,
   },
@@ -164,7 +164,7 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
     titulo: 'Crisis global de semiconductores',
     resumen: 'La pandemia disparó la demanda de electrónicos mientras cerraban las fábricas. La industria automovilística, que había cancelado pedidos de chips en 2020, no pudo recuperar su lugar en la cola de producción.',
     duracion: '~2,5 años',
-    coste: '$210.000M pérdidas industria auto',
+    coste: '210.000 millones de $ de ingresos perdidos por la industria del automóvil solo en 2021 (AlixPartners, septiembre de 2021)',
     industrias: 'Automoción, electrónica de consumo, electrodomésticos, defensa',
     leccion:
       'La filosofía just-in-time sin inventario mínimo de componentes estratégicos puede paralizar industrias enteras. Varios países aprobaron subsidios billonarios (CHIPS Act en EEUU, European Chips Act) para relocalizar fabricación.',
@@ -174,17 +174,17 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
     titulo: 'Bloqueo del Canal de Suez (Ever Given)',
     resumen: 'El portacontenedores Ever Given (400 m de eslora) encalló durante 6 días, bloqueando el paso de 12% del comercio mundial.',
     duracion: '6 días',
-    coste: '$9.600M/día en comercio bloqueado',
+    coste: '9.600 millones de $ en mercancías retenidas cada día (Lloyd’s List, marzo de 2021)',
     industrias: 'Petróleo, electrónica, textil, alimentación, automóvil',
     leccion:
       'Una única vía marítima concentra un porcentaje enorme del comercio global. El incidente aceleró el debate sobre la resiliencia de las rutas de transporte y la diversificación de proveedores logísticos.',
   },
   {
-    anio: 'Q2 2020',
+    anio: '2.º trimestre de 2020',
     titulo: 'COVID-19: cierre de fábricas en Asia',
     resumen: 'Los cierres de Wuhan y la región del Delta del Río Perla interrumpieron la producción de electrónica, textil y componentes para todo el mundo en el segundo trimestre de 2020.',
     duracion: '~3–4 meses (cierre masivo)',
-    coste: 'Caída 30% comercio global en Q2 2020',
+    coste: '−14,3 % en el volumen del comercio mundial de mercancías respecto al trimestre anterior, la mayor caída registrada (OMC, octubre de 2020)',
     industrias: 'Toda la manufactura: textil, electrónica, farmacéutica, alimentación',
     leccion:
       'La hiperdependencia de una única región para manufactura expone a la economía global a riesgos sistémicos. La pandemia fue el detonante que puso la resiliencia de cadenas de suministro en la agenda política de todos los gobiernos.',
@@ -194,7 +194,7 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
     titulo: 'Inundaciones en Tailandia',
     resumen: 'Las peores inundaciones en décadas anegaron la región de Ayutthaya, donde se concentraba gran parte de la producción mundial de discos duros (HDD).',
     duracion: '~4 meses',
-    coste: '$45.000M en daños económicos',
+    coste: '46.500 millones de $ en daños y pérdidas, el 12,6 % del PIB tailandés (Banco Mundial, 2012)',
     industrias: 'Almacenamiento de datos, electrónica personal, servidores',
     leccion:
       'Tailandia concentraba el 45% de la producción mundial de HDDs. La concentración geográfica extrema de un componente convierte un desastre natural local en una crisis tecnológica global. El precio de los discos duros se triplicó durante 6 meses.',
@@ -202,9 +202,9 @@ const DISRUPCIONES: DisrupcionHistorica[] = [
   {
     anio: 'Marzo 2011',
     titulo: 'Terremoto y tsunami de Japón (Tōhoku)',
-    resumen: 'El terremoto de 9.0 y el tsunami subsiguiente destruyeron instalaciones industriales clave en el norte de Japón, interrumpiendo el suministro de más de 500 componentes para la industria automovilística global.',
+    resumen: 'El terremoto de magnitud 9,0 y el tsunami subsiguiente destruyeron instalaciones industriales clave en el norte de Japón, interrumpiendo el suministro de más de 500 componentes para la industria automovilística global.',
     duracion: '~6 meses para recuperación parcial',
-    coste: '$210.000M daños totales',
+    coste: '16,9 billones de yenes en daños directos, unos 210.000 millones de $ al cambio de entonces (Oficina del Gabinete de Japón, junio de 2011)',
     industrias: 'Automoción, electrónica, semiconductores especializados (Renesas)',
     leccion:
       'Japón era proveedor único (single-source) de ciertos pigmentos, resinas y chips de microcontrolador para toda la industria auto global. El concepto de "single-source risk" pasó a ser central en la gestión de cadenas de suministro.',
@@ -222,7 +222,7 @@ const ESTRATEGIAS: EstrategiaReloc[] = [
     definicion:
       'Repatriación de la producción al país de origen. La empresa trae de vuelta fábricas que había deslocalizado décadas atrás, motivada por costes logísticos, riesgo geopolítico o incentivos gubernamentales.',
     ejemplo:
-      'Intel construye dos gigafábricas en Ohio (EEUU) con $20.000M de inversión bajo el CHIPS Act. Apple trasladó líneas de ensamblaje de Mac Pro a Texas.',
+      'Intel anunció en enero de 2022 dos fábricas de chips en Ohio (EEUU) con una inversión inicial de más de 20.000 millones de $ (Intel, 2022); la obra se ha retrasado varias veces. Apple trasladó líneas de ensamblaje de Mac Pro a Texas.',
   },
   {
     icono: '🌍',
@@ -338,7 +338,7 @@ export default function VisualizadorCadenasSuministro() {
               viewBox="0 0 540 380"
               className={styles.svgDiagrama}
               aria-label="Diagrama interactivo de componentes de un smartphone con 8 componentes clicables"
-              role="img"
+              role="group"
             >
               <defs>
                 <linearGradient id="gradFondo" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -381,7 +381,7 @@ export default function VisualizadorCadenasSuministro() {
               {/* Smartphone central */}
               <rect x="220" y="145" width="100" height="90" rx="10" fill="#2E86AB" opacity="0.15" />
               <rect x="228" y="153" width="84" height="74" rx="7" fill="#2E86AB" opacity="0.25" />
-              <text x="270" y="193" textAnchor="middle" fontSize="18" fill="#2E86AB">📱</text>
+              <text x="270" y="193" textAnchor="middle" fontSize="18" fill="#2E86AB" aria-hidden="true">📱</text>
               <text x="270" y="210" textAnchor="middle" fontSize="9" fontWeight="600" fill="#2E86AB">
                 ~40 países
               </text>
@@ -392,16 +392,27 @@ export default function VisualizadorCadenasSuministro() {
               {/* Botones de componentes */}
               {COMPONENTES.map((comp) => {
                 const isActivo = componenteActivo === comp.id;
+                const alternar = () => setComponenteActivo(isActivo ? null : comp.id);
                 return (
+                  // Un <g> del SVG no es un <button>: el foco (tabIndex) y Enter/Espacio se dan
+                  // a mano para que el teclado llegue a la ficha de cada componente.
                   <g
                     key={comp.id}
-                    onClick={() => setComponenteActivo(isActivo ? null : comp.id)}
-                    style={{ cursor: 'pointer' }}
+                    onClick={alternar}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        alternar();
+                      }
+                    }}
+                    tabIndex={0}
+                    className={styles.componenteBoton}
                     role="button"
                     aria-label={`Ver detalles de ${comp.nombre}`}
                     aria-pressed={isActivo}
                   >
                     <rect
+                      className={styles.componenteRect}
                       x={comp.x}
                       y={comp.y}
                       width="110"
@@ -572,22 +583,29 @@ export default function VisualizadorCadenasSuministro() {
         <div className={styles.timeline} role="list">
           {DISRUPCIONES.map((d, i) => {
             const isActiva = disrupcionActiva === i;
+            const idDetalle = `disrupcion-detalle-${i}`;
             return (
-              <div
-                key={i}
-                className={styles.timelineItem}
-                onClick={() => setDisrupcionActiva(isActiva ? null : i)}
-                role="listitem"
-                aria-expanded={isActiva}
-              >
+              <div key={i} className={styles.timelineItem} role="listitem">
                 <div className={styles.timelinePunto} aria-hidden="true" />
                 <div className={`${styles.timelineCard} ${isActiva ? styles.timelineCardActiva : ''}`}>
                   <p className={styles.timelineAnio}>{d.anio}</p>
-                  <h3 className={styles.timelineTitulo}>{d.titulo}</h3>
+                  {/* El botón (aria-expanded) vive en el título; su ::after se estira sobre
+                      toda la tarjeta para que el clic en cualquier punto siga desplegándola. */}
+                  <h3 className={styles.timelineTitulo}>
+                    <button
+                      type="button"
+                      className={styles.timelineBoton}
+                      aria-expanded={isActiva}
+                      aria-controls={isActiva ? idDetalle : undefined}
+                      onClick={() => setDisrupcionActiva(isActiva ? null : i)}
+                    >
+                      {d.titulo}
+                    </button>
+                  </h3>
                   <p className={styles.timelineResumen}>{d.resumen}</p>
 
                   {isActiva && (
-                    <div className={styles.timelineDetalle}>
+                    <div className={styles.timelineDetalle} id={idDetalle}>
                       <div className={styles.timelineStats}>
                         <div className={styles.timelineStat}>
                           <span className={styles.timelineStatNum}>{d.duracion}</span>
@@ -687,11 +705,13 @@ export default function VisualizadorCadenasSuministro() {
           </div>
 
           <div className={styles.eduCard}>
-            <h4>La revolución del contenedor (Malcolm McLean, 1956)</h4>
+            <h4>La revolución del contenedor (Malcom McLean, 1956)</h4>
             <p>
-              En 1956, el camionero Malcolm McLean tuvo la idea de colocar camiones enteros sobre
+              En 1956, el camionero Malcom McLean tuvo la idea de colocar camiones enteros sobre
               barcos. El contenedor estandarizado de acero (TEU: Twenty-foot Equivalent Unit) redujo
-              el coste de carga/descarga de $5,86/tonelada a $0,16/tonelada — una reducción del 97%.
+              el coste de carga de 5,83 $ por tonelada (carga suelta, 1956) a unos 0,16 $ por tonelada
+              en el primer viaje del Ideal-X — una reducción del 97 % (cifras recogidas por Marc
+              Levinson en «The Box», 2006).
             </p>
             <p>
               Esta innovación hizo económicamente viable la fabricación en Asia para vender en Europa
@@ -742,11 +762,15 @@ export default function VisualizadorCadenasSuministro() {
               compartido de cada transacción, transferencia y transformación de un producto.
             </p>
             <p>
-              Walmart usa blockchain para rastrear lechugas desde la granja hasta la tienda en
-              2,2 segundos (antes tardaba 6 días). Maersk y IBM desplegaron TradeLens para
-              digitalizar el transporte marítimo. La UE exige desde 2024 pasaportes digitales
-              de producto para baterías de vehículos eléctricos, incluyendo trazabilidad de materias
-              primas desde la mina.
+              En una prueba de 2016-2017 con IBM, Walmart rastreó un envase de mangos cortados
+              desde la tienda hasta la granja en 2,2 segundos, frente a casi 7 días por el método
+              tradicional (Frank Yiannas, Walmart, 2018). Tras el brote de E. coli de 2018 ligado a
+              la lechuga romana, Walmart exigió a sus proveedores de hoja verde sumarse a esa red,
+              IBM Food Trust (carta a proveedores del 24/09/2018). No todo cuajó: Maersk e IBM
+              cerraron en 2023 TradeLens, su plataforma para el transporte marítimo, por falta de
+              adopción del sector. En la UE, el Reglamento (UE) 2023/1542 exige desde el 18/02/2027
+              un pasaporte digital para las baterías de vehículos eléctricos, de movilidad ligera e
+              industriales de más de 2 kWh, con datos de origen de sus materias primas.
             </p>
           </div>
 

@@ -86,6 +86,18 @@
   display: block;
 }
 
+/* Componentes del SVG: <g role="button" tabIndex=0>. El foco se marca en el borde del
+   rectángulo, porque el outline de un <g> no se pinta igual en todos los navegadores. */
+.componenteBoton {
+  cursor: pointer;
+  outline: none;
+}
+
+.componenteBoton:focus-visible .componenteRect {
+  stroke: var(--text-primary);
+  stroke-width: 3;
+}
+
 /* ─── Panel de detalle componente ───────────────── */
 .panelDetalle {
   background: var(--bg-card);
@@ -290,14 +302,16 @@
   transition: background 0.3s, color 0.3s;
 }
 
+/* Texto de 14 px (texto pequeño, 4,5:1): el color de marca como texto va en --primary-texto. */
 .jitEstadoOk {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
+/* #b91c1c sobre el fondo compuesto (252,233,233) da 5,6:1; el #dc2626 anterior daba 4,14:1. */
 .jitEstadoCrisis {
   background: rgba(220, 38, 38, 0.1);
-  color: #dc2626;
+  color: #b91c1c;
 }
 
 .jitPropiedad {
@@ -355,6 +369,7 @@
 }
 
 .timelineCard {
+  position: relative;
   background: var(--bg-card);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
@@ -388,6 +403,35 @@
   margin: 0 0 0.4rem;
 }
 
+/* Botón de despliegue en el título; su ::after cubre la tarjeta entera, así que el clic en
+   cualquier punto la despliega igual que antes, y el foco de teclado rodea toda la tarjeta. */
+.timelineBoton {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.timelineBoton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+}
+
+.timelineBoton:focus-visible {
+  outline: none;
+}
+
+.timelineBoton:focus-visible::after {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .timelineResumen {
   font-size: 0.875rem;
   color: var(--text-secondary);
@@ -396,6 +440,9 @@
 }
 
 .timelineDetalle {
+  /* Por encima del ::after del botón: el detalle desplegado se puede leer y seleccionar. */
+  position: relative;
+  z-index: 1;
   margin-top: 0.85rem;
   padding-top: 0.85rem;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
@@ -640,6 +687,12 @@
 
 [data-theme='dark'] .jitEstadoOk {
   background: rgba(46, 134, 171, 0.15);
+}
+
+/* En oscuro el rojo de claro caía a 2,70:1: se aclara el texto (≈ 7:1 sobre 63,44,44). */
+[data-theme='dark'] .jitEstadoCrisis {
+  background: rgba(220, 38, 38, 0.15);
+  color: #fca5a5;
 }
 
 [data-theme='dark'] .tendencia {
