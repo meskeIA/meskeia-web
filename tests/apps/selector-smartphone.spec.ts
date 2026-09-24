@@ -347,3 +347,94 @@ test('el HTML servido no promete modelos concretos que la app no da', async ({ p
   expect(html).toContain('500-900 €');
   expect(html).not.toContain('250-600 €');
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. Hero de la pantalla de resultado (defecto de familia, 24/09/2026)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Contraste MÍNIMO del texto de un elemento contra su fondo real: en cada esquina de cada línea
+ * del texto (un Range, no la caja del bloque), con la opacidad acumulada del elemento y sus
+ * ancestros, sobre las capas de fondo compuestas hasta la primera opaca. Si una capa es un
+ * degradado lineal, se evalúa en ese mismo punto (así se mide también el defecto de antes).
+ */
+async function contrasteMinimo(page: Page, selector: string): Promise<number> {
+  return page.locator(selector).first().evaluate((el) => {
+    type RGBA = { r: number; g: number; b: number; a: number };
+    const parse = (s: string): RGBA => {
+      const p = (s.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(/[ ,/]+/).filter(Boolean).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p[3] ?? 1 };
+    };
+    const lum = (c: RGBA) => {
+      const f = (v: number) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    };
+    const ratio = (x: RGBA, y: RGBA) => { const [a, b] = [lum(x), lum(y)].sort((p, q) => q - p); return (a + 0.05) / (b + 0.05); };
+    const sobre = (arriba: RGBA, abajo: RGBA): RGBA => ({
+      r: arriba.r * arriba.a + abajo.r * (1 - arriba.a),
+      g: arriba.g * arriba.a + abajo.g * (1 - arriba.a),
+      b: arriba.b * arriba.a + abajo.b * (1 - arriba.a),
+      a: 1,
+    });
+    const degradadoEn = (n: Element, x: number, y: number): RGBA => {
+      const img = getComputedStyle(n).backgroundImage;
+      const paradas = [...img.matchAll(/rgba?\([^)]+\)/g)].map((m) => parse(m[0]));
+      const ang = (Number(img.match(/(-?[\d.]+)deg/)?.[1] ?? 180) * Math.PI) / 180;
+      const c = n.getBoundingClientRect();
+      const L = Math.abs(c.width * Math.sin(ang)) + Math.abs(c.height * Math.cos(ang));
+      const u = Math.min(1, Math.max(0, 0.5 + ((x - (c.left + c.width / 2)) * Math.sin(ang) - (y - (c.top + c.height / 2)) * Math.cos(ang)) / L));
+      const [p0, p1] = [paradas[0], paradas[paradas.length - 1]];
+      return { r: p0.r + (p1.r - p0.r) * u, g: p0.g + (p1.g - p0.g) * u, b: p0.b + (p1.b - p0.b) * u, a: 1 };
+    };
+    const fondoEn = (x: number, y: number): RGBA => {
+      const capas: RGBA[] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        if (getComputedStyle(n).backgroundImage.includes('gradient')) { capas.push(degradadoEn(n, x, y)); break; }
+        const c = parse(getComputedStyle(n).backgroundColor);
+        if (c.a > 0) { capas.push(c); if (c.a >= 1) break; }
+      }
+      let f: RGBA = { r: 255, g: 255, b: 255, a: 1 };
+      for (let i = capas.length - 1; i >= 0; i--) f = sobre(capas[i], f);
+      return f;
+    };
+    let op = 1;
+    for (let n: Element | null = el; n; n = n.parentElement) op *= Number(getComputedStyle(n).opacity);
+    const color = parse(getComputedStyle(el).color);
+    const rango = document.createRange();
+    rango.selectNodeContents(el);
+    let min = Infinity;
+    for (const t of [...rango.getClientRects()].filter((q) => q.width > 0)) {
+      for (const [x, y] of [[t.left + 1, t.top + 1], [t.right - 1, t.bottom - 1], [t.left + 1, t.bottom - 1], [t.right - 1, t.top + 1]]) {
+        const bg = fondoEn(x, y);
+        min = Math.min(min, ratio(sobre({ ...color, a: color.a * op }, bg), bg));
+      }
+    }
+    return min;
+  });
+}
+
+test('el hero del resultado usa --hero-bg y su texto llega al contraste mínimo en los dos temas', async ({ page }) => {
+  // Antes: linear-gradient(135deg, var(--primary), var(--secondary)) con texto blanco. En el
+  // extremo teal, el subtítulo (1rem, opacidad 0,88) quedaba en 2,82:1 en claro y 2,19 en oscuro,
+  // y el <h1> (texto grande, exige 3:1) en 2,45 en oscuro. Es el hallazgo 1444 de
+  // selector-mascota, defecto de familia (regla b): el hero de resultado lleva var(--hero-bg),
+  // #1a5278 en los dos temas, igual que el de la intro.
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+  await abrirTest(page);
+  await responder(page, SOLO_LLAMAR);
+  await leerResultado(page);
+  const hero = page.locator('[class*="heroResultados"]');
+  for (const tema of ['claro', 'oscuro'] as const) {
+    if (tema === 'oscuro') {
+      await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    }
+    // Sin transiciones en marcha: justo tras cambiar de tema, getComputedStyle aún da el fondo anterior
+    await page.waitForFunction(() =>
+      document.getAnimations().every((a) => !(a instanceof CSSTransition) || a.playState !== 'running'));
+    expect(await hero.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el).backgroundImage]), tema)
+      .toEqual(['rgb(26, 82, 120)', 'none']);
+    expect(await contrasteMinimo(page, '[class*="heroResultados"] p'), `subtítulo, ${tema}`).toBeGreaterThanOrEqual(4.5);
+    expect(await contrasteMinimo(page, '[class*="heroResultados"] h1'), `h1, ${tema}`).toBeGreaterThanOrEqual(3);
+  }
+});

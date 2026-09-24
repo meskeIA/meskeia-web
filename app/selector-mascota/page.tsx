@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorMascota.module.css';
 import { calcularResultado, MASCOTAS, ETIQUETA_MENSUAL, type Resultado } from './motor';
 import {
@@ -136,6 +136,13 @@ export default function SelectorMascota() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+
+  // «Ver resultado» se desmonta con el test y el foco caía a <body>: se lleva al título del
+  // resultado (regla g de la familia de selectores).
+  useEffect(() => {
+    if (pantalla === 'resultado') tituloResultado.current?.focus();
+  }, [pantalla]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
@@ -169,7 +176,7 @@ export default function SelectorMascota() {
         </header>
       ) : (
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu mascota ideal</h1>
+          <h1 className={styles.heroTitleSm} ref={tituloResultado} tabIndex={-1}>Tu mascota ideal</h1>
           <p className={styles.heroSubtitleSm}>Resultado personalizado basado en tu estilo de vida</p>
         </header>
       )}
@@ -279,7 +286,11 @@ export default function SelectorMascota() {
               <span aria-hidden="true">⚠️</span> Por estilo de vida encajaría{' '}
               <strong>{porPerfil.conArticulo}</strong>, pero{' '}
               {motivoRecorte === 'alergia' && 'has declarado alergia al pelo: la recomendación se limita a animales sin pelo.'}
-              {motivoRecorte === 'salud' && 'con niños menores de 5 años no se recomiendan reptiles en casa (riesgo de salmonela, según los CDC).'}
+              {motivoRecorte === 'salud' && resultado.mascotaPorPerfil === 'reptil' &&
+                'con niños menores de 5 años los CDC de Estados Unidos no recomiendan reptiles en casa (riesgo de salmonela).'}
+              {/* Los CDC incluyen a los roedores en la misma recomendación (hallazgo 1441) */}
+              {motivoRecorte === 'salud' && resultado.mascotaPorPerfil === 'roedor' &&
+                'con niños menores de 5 años los CDC de Estados Unidos recomiendan evitar el contacto con roedores, y a esa edad el riesgo de infección con cualquier pequeño mamífero es mayor.'}
               {motivoRecorte === 'presupuesto' && (
                 <>su coste mensual ({porPerfil.costeMensual}) no cabe en tu presupuesto de{' '}
                   {ETIQUETA_MENSUAL[respuestas[10]]}: la recomendación se ajusta a lo que cabe en ese tramo.</>

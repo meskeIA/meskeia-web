@@ -28,8 +28,11 @@
 }
 
 /* ─── Hero resultados (más compacto) ───────────────────────────── */
+/* var(--hero-bg), como el hero de la intro (8,33:1 con blanco). El degradado
+   --primary→--secondary dejaba el subtítulo en 2,82:1 en claro y 2,19 en oscuro: defecto de
+   familia que se registró en selector-mascota (hallazgo 1444, regla b de los selectores). */
 .heroResultados {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   color: #fff;
   text-align: center;
   padding: 2rem 1.5rem 1.75rem;

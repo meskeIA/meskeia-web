@@ -73,7 +73,7 @@ export const jsonLd = generateWebAppSchema({
     'Test de 10 preguntas sobre estilo de vida y situación',
     'Recomendación de tipo de mascota y perfil concreto',
     'Coste mensual orientativo de mantenimiento',
-    'La alergia y el presupuesto acotan la recomendación',
+    'La alergia, los niños menores de 5 años y el presupuesto acotan la recomendación',
     'Empates entre candidatas explicados',
     'Pros y contras adaptados a tus respuestas',
   ],
@@ -112,7 +112,7 @@ export const faqJsonLd = {
       name: '¿Qué mascota es mejor si hay niños pequeños en casa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los perros de temperamento tranquilo y razas sociables (como el Golden Retriever o el Labrador) son excelentes con niños, aunque requieren supervisión. Los gatos también pueden convivir bien con niños, dependiendo del carácter del animal. Los pequeños mamíferos como las cobayas o los conejos enanos (el conejo es un lagomorfo, no un roedor) encajan mejor con niños que ya pueden manipularlos con cuidado. Los reptiles no se recomiendan en casas con niños menores de 5 años por el riesgo de salmonela, según los CDC de Estados Unidos.',
+        text: 'Los perros de temperamento tranquilo y razas sociables (como el Golden Retriever o el Labrador) son excelentes con niños, aunque requieren supervisión. Los gatos también pueden convivir bien con niños, dependiendo del carácter del animal. Los pequeños mamíferos como las cobayas o los conejos enanos (el conejo es un lagomorfo, no un roedor) encajan mejor con niños de 5 años o más que ya pueden manipularlos con cuidado. Con menores de 5 años, los CDC de Estados Unidos no recomiendan reptiles ni anfibios en casa, por el riesgo de salmonela, y recomiendan que eviten el contacto con roedores (hámster, rata, cobaya…); además cuentan a los menores de 5 años entre quienes más riesgo de infección tienen con cualquier pequeño mamífero, conejo incluido.',
       },
     },
     {

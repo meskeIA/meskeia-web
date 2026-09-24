@@ -11,23 +11,45 @@
  *     y conejo)— y el resultado lo explica. El pájaro no se descarta, pero se avisa de que las
  *     plumas y su polvo también son alérgenos.
  *
- *  2. Niños menores de 5 años y reptiles. Los CDC de EE. UU. recomiendan no tener reptiles ni
- *     anfibios en hogares con menores de 5 años por el riesgo de salmonelosis
- *     (cdc.gov/healthy-pets, «Reptiles and Amphibians»). Mismo tratamiento que la alergia:
- *     filtro de salud, no resta de puntos.
+ *  2. Niños menores de 5 años: reptiles y pequeños mamíferos. Los CDC de EE. UU. dicen que los
+ *     reptiles y anfibios «aren't recommended for households with young children» y que los
+ *     menores de 5 años no deben tocarlos (cdc.gov/healthy-pets, «Reptiles and Amphibians»); y
+ *     «CDC recommends that children under 5 years old avoid contact with reptiles, amphibians,
+ *     poultry (including chicks and ducklings), and rodents» (cdc.gov/healthy-pets/risk-factors).
+ *     Antes solo se filtraba el reptil, y a 953 perfiles con niños menores de 5 años se les
+ *     recomendaba un «pequeño mamífero (hámster, rata, cobaya…)» (hallazgo 1441). La ficha
+ *     agrupa roedores y conejo; el conejo no está en esa lista, pero la página de los CDC sobre
+ *     pequeños mamíferos cuenta a los menores de 5 años entre quienes más riesgo tienen con
+ *     todos ellos, conejo incluido, así que la ficha entera se filtra y se dice por qué.
  *
  *  3. El presupuesto mensual acota (hallazgo 1333). Un animal cabe en un tramo si el MÍNIMO de
- *     su horquilla de coste mensual no supera el techo del tramo. Si la mejor opción por estilo
- *     de vida no cabe, se recomienda la mejor que cabe y se dice cuál era la otra.
+ *     su horquilla de coste mensual queda POR DEBAJO del techo del tramo (hallazgo 1438: con
+ *     «no supera», el perro pequeño de 80 – 150 € entraba en «30 – 80 €/mes» aunque toda su
+ *     horquilla estuviera en el techo o por encima). No se exige que quepa la horquilla entera,
+ *     como en selector-smartphone, porque aquí las horquillas no están alineadas con los tramos:
+ *     un gato de 50 – 120 € en «30 – 80 €/mes» cabe en los meses normales, y el resultado avisa
+ *     de que la parte alta se sale. Si la mejor opción por estilo de vida no cabe, se recomienda
+ *     la mejor que cabe y se dice cuál era la otra.
+ *
+ *  3.bis El presupuesto INICIAL (hallazgo 1437). Con «Hasta 300 €», a un animal cuya compra
+ *     empieza en 300 € o más (los tres perros) se le enseña la tasa de adopción, con el precio
+ *     de compra y los 300 € declarados en la nota; si solo la parte alta de la horquilla pasa
+ *     de 300 €, se avisa. No se filtra: los perros se adoptan en protectoras.
  *
  *  4. Empates (hallazgo 1334). Antes los resolvía el orden de declaración del objeto de puntos:
  *     siempre a favor del perro, en silencio. Ahora, a igualdad de puntos, gana la que más
  *     encaja con el vínculo que buscas (pregunta 7); si sigue el empate, la de menor coste
- *     mensual mínimo, y después la de menor coste inicial mínimo. El empate se anuncia.
+ *     mensual mínimo, y después la de menor coste inicial mínimo. El empate se anuncia, y cada
+ *     criterio nombra a las que deja detrás cuando no es el mismo para todas (hallazgo 1442:
+ *     «su coste mensual mínimo es el más bajo» era falso si otra empatada, apartada por el
+ *     vínculo, costaba menos).
  *
  *  5. Las razones salen de las respuestas (hallazgo 1335). Antes eran un texto fijo por animal
  *     («Tu perfil activo…» al perro de un sedentario). Ahora se citan las respuestas que más
- *     han sumado a la ganadora y, aparte, las que van en su contra.
+ *     han sumado a la ganadora y, aparte, las que van en su contra: también la necesidad de
+ *     silencio frente a un perro (1439), el ciclo de vida corto frente a un animal longevo
+ *     (1440) y las 3 – 5 horas a solas de un perro, que dejan de ser una razón «a favor»
+ *     (1443: RSPCA y PDSA aconsejan no dejarlo solo más de cuatro horas).
  */
 
 export type MascotaKey =
@@ -50,6 +72,7 @@ export interface MascotaInfo {
   icon: string;
   costeInicial: string;
   costeInicialMin: number;
+  costeInicialMax: number;
   costeMensual: string;
   costeMensualMin: number;
   costeMensualMax: number;
@@ -71,6 +94,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🐕',
     costeInicial: '500 – 2.000 €',
     costeInicialMin: 500,
+    costeInicialMax: 2000,
     costeMensual: '80 – 150 €',
     costeMensualMin: 80,
     costeMensualMax: 150,
@@ -89,6 +113,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🐶',
     costeInicial: '300 – 1.500 €',
     costeInicialMin: 300,
+    costeInicialMax: 1500,
     costeMensual: '100 – 200 €',
     costeMensualMin: 100,
     costeMensualMax: 200,
@@ -107,6 +132,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🦮',
     costeInicial: '400 – 2.000 €',
     costeInicialMin: 400,
+    costeInicialMax: 2000,
     costeMensual: '150 – 280 €',
     costeMensualMin: 150,
     costeMensualMax: 280,
@@ -125,6 +151,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🐱',
     costeInicial: '100 – 1.500 €',
     costeInicialMin: 100,
+    costeInicialMax: 1500,
     costeMensual: '50 – 120 €',
     costeMensualMin: 50,
     costeMensualMax: 120,
@@ -146,6 +173,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🐹',
     costeInicial: '30 – 150 €',
     costeInicialMin: 30,
+    costeInicialMax: 150,
     costeMensual: '15 – 40 €',
     costeMensualMin: 15,
     costeMensualMax: 40,
@@ -164,6 +192,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🐠',
     costeInicial: '50 – 500 €',
     costeInicialMin: 50,
+    costeInicialMax: 500,
     costeMensual: '10 – 30 €',
     costeMensualMin: 10,
     costeMensualMax: 30,
@@ -182,6 +211,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🦜',
     costeInicial: '30 – 800 €',
     costeInicialMin: 30,
+    costeInicialMax: 800,
     costeMensual: '20 – 60 €',
     costeMensualMin: 20,
     costeMensualMax: 60,
@@ -200,6 +230,7 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     icon: '🦎',
     costeInicial: '100 – 600 €',
     costeInicialMin: 100,
+    costeInicialMax: 600,
     costeMensual: '20 – 70 €',
     costeMensualMin: 20,
     costeMensualMax: 70,
@@ -219,6 +250,21 @@ export const CLAVES: MascotaKey[] = [
 
 const PERROS: MascotaKey[] = ['perro-pequeno', 'perro-mediano', 'perro-grande'];
 const esPerro = (m: MascotaKey) => PERROS.includes(m);
+
+/** Animales cuya ficha da una esperanza de vida que empieza en 5 años o más. */
+const LONGEVOS: MascotaKey[] = [...PERROS, 'gato', 'reptil', 'pajaro'];
+
+/** Techo de la pregunta 9 «Hasta 300 €», en euros. */
+export const TECHO_INICIAL_BAJO = 300;
+
+/** Animales que los CDC desaconsejan con niños menores de 5 años (ver la cabecera, punto 2). */
+const NO_CON_MENORES_DE_5: MascotaKey[] = ['reptil', 'roedor'];
+
+/** Lista legible: «A, B y C». */
+function enumerarConY(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
+}
 
 type Pesos = Partial<Record<MascotaKey, number>>;
 
@@ -312,7 +358,9 @@ const RAZON_A_FAVOR: Record<number, Record<string, Frase>> = {
   },
   2: {
     siempre: (m, v) => `Casi siempre hay alguien en casa, y ${m} lo ${v('agradece', 'agradecen')}: no ${v('pasará', 'pasarán')} horas a solas.`,
-    pocas: (m, v) => `La casa se queda vacía 3 – 5 horas: ${m} lo ${v('lleva', 'llevan')} mejor que otras opciones, aunque a un perro las guías de bienestar animal (RSPCA, PDSA) aconsejan no dejarlo solo más de cuatro horas seguidas.`,
+    // A un perro no se le da como razón a favor (hallazgo 1443): va a `tensiones`, con la
+    // recomendación de RSPCA y PDSA de no dejarlo solo más de cuatro horas.
+    pocas: (m, v) => `La casa se queda vacía 3 – 5 horas: ${m} lo ${v('lleva', 'llevan')} mejor que otras opciones.`,
     muchas: (m, v) => `La casa se queda vacía 6 – 10 horas: ${m} lo ${v('tolera', 'toleran')} mejor que un perro.`,
     viajes: (m, v) => `Viajas varios días seguidos: ${m} lo ${v('lleva', 'llevan')} mejor que otros animales, con un cuidador puntual o un sistema automático.`,
   },
@@ -353,7 +401,9 @@ const RAZON_A_FAVOR: Record<number, Record<string, Frase>> = {
   },
   10: {
     muy_bajo: (m, v) => `Con menos de 30 €/mes, ${m} ${v('es', 'son')} de lo poco que cabe en tu presupuesto.`,
-    bajo: (m) => `Con 30 – 80 €/mes puedes mantener ${m}.`,
+    // «puedes mantener» prometía de más: el animal cabe si su mínimo queda por debajo de 80 €,
+    // y si la parte alta se sale se avisa aparte (hallazgo 1438).
+    bajo: (m) => `Tu tramo de 30 – 80 €/mes cubre el coste mensual mínimo de ${m}.`,
     alto: (m) => `Con más de 180 €/mes cubres con holgura los gastos de ${m}.`,
   },
 };
@@ -371,21 +421,32 @@ function tensiones(m: MascotaKey, r: Record<number, string>): string[] {
     if (r[2] === 'muchas' || r[2] === 'viajes') {
       t.push(`La casa se queda vacía ${r[2] === 'muchas' ? '6 – 10 horas' : 'varios días seguidos'}: un perro lo lleva mal sin paseador, guardería o alguien que lo atienda.`);
     }
+    if (r[2] === 'pocas') {
+      // RSPCA («no longer than four hours») y PDSA («shouldn't be left alone for more than 4
+      // hours at a time»): el tramo declarado llega a cinco (hallazgo 1443).
+      t.push(`La casa se queda vacía 3 – 5 horas: las guías de bienestar animal (RSPCA, PDSA) aconsejan no dejar a un perro solo más de cuatro horas seguidas, así que los días largos alguien tendrá que sacar a ${nombre}.`);
+    }
     if (r[3] === 'piso_pequeno' && m !== 'perro-pequeno') {
       t.push(`En menos de 50 m², ${nombre} necesitará salidas largas para compensar la falta de espacio.`);
+    }
+    if (r[6] === 'sin_ruido') {
+      // Antes solo se avisaba del ruido del pájaro, que no gana en ningún perfil con silencio;
+      // al perro mediano y al grande ni siquiera les restaba puntos (hallazgo 1439).
+      t.push(`Has indicado que necesitas silencio: ${nombre} puede ladrar, sobre todo cuando se queda solo o se aburre; el ejercicio diario y el adiestramiento lo reducen, pero no lo eliminan.`);
     }
   }
   if (m === 'gato' && r[2] === 'viajes') {
     t.push('Un gato tolera un día solo, no varios: con viajes frecuentes necesitarás a alguien que pase a atenderlo.');
-  }
-  if (m === 'roedor' && r[5] === 'si_pequenos') {
-    t.push('Con niños menores de 5 años, un pequeño mamífero se manipula con supervisión: se estresa y muerde si lo aprietan.');
   }
   if (m === 'pajaro' && r[6] === 'sin_ruido') {
     t.push('Necesitas silencio: elige especies calladas (el canario canta, los periquitos y los loros gritan).');
   }
   if (m === 'roedor' && r[8] === 'corto') {
     t.push('Si buscas un ciclo corto, el hámster o la rata (2 – 3 años); la chinchilla o el conejo viven muchos más años.');
+  }
+  if (r[8] === 'corto' && LONGEVOS.includes(m)) {
+    // Solo el pequeño mamífero tenía tensión con «ciclo corto» (hallazgo 1440).
+    t.push(`Prefieres un compromiso más corto, pero la esperanza de vida de ${nombre} es de ${MASCOTAS[m].esperanzaVida}: es un compromiso de muchos años.`);
   }
   return t;
 }
@@ -429,8 +490,9 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   const techo = TECHO_MENSUAL[r[10]] ?? Infinity;
   for (const k of CLAVES) {
     if (r[6] === 'alergia_pelo' && MASCOTAS[k].tienePelo) descartes[k] = 'alergia';
-    else if (r[5] === 'si_pequenos' && k === 'reptil') descartes[k] = 'salud';
-    else if (MASCOTAS[k].costeMensualMin > techo) descartes[k] = 'presupuesto';
+    else if (r[5] === 'si_pequenos' && NO_CON_MENORES_DE_5.includes(k)) descartes[k] = 'salud';
+    // Cabe si su mínimo queda POR DEBAJO del techo (hallazgo 1438; ver la cabecera, punto 3).
+    else if (MASCOTAS[k].costeMensualMin >= techo) descartes[k] = 'presupuesto';
   }
 
   // ─ Orden explicable: puntos; luego vínculo buscado; luego coste mensual; luego inicial ─
@@ -450,23 +512,38 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   const empatadas = admitidas.slice(1).filter((k) => puntos[k] === puntos[mascota]);
   let criterioDesempate = '';
   if (empatadas.length > 0) {
-    const segunda = empatadas[0];
+    // El criterio que separa a la recomendada de CADA empatada, no solo de la segunda (hallazgo
+    // 1442). Si es el mismo para todas, se dice tal cual (y el superlativo es verdad: es menor que
+    // el de todas); si no, cada criterio nombra a las que ha dejado detrás.
     const seMuestra = `${info.plural ? 'se muestran' : 'se muestra'} primero ${info.conArticulo}`;
-    if ((vinculo[mascota] ?? 0) !== (vinculo[segunda] ?? 0)) {
-      criterioDesempate = `${seMuestra} porque ${info.plural ? 'encajan' : 'encaja'} mejor con el vínculo que buscas`;
-    } else if (info.costeMensualMin !== MASCOTAS[segunda].costeMensualMin) {
-      criterioDesempate = `${seMuestra} porque su coste mensual mínimo es el más bajo`;
-    } else {
-      criterioDesempate = `${seMuestra} porque su coste inicial mínimo es el más bajo`;
-    }
+    const decisivo = (k: MascotaKey): 0 | 1 | 2 => {
+      if ((vinculo[mascota] ?? 0) !== (vinculo[k] ?? 0)) return 0;
+      if (info.costeMensualMin !== MASCOTAS[k].costeMensualMin) return 1;
+      return 2;
+    };
+    const v = (sing: string, plur: string) => (info.plural ? plur : sing);
+    const criterios = [
+      { motivo: `${v('encaja', 'encajan')} mejor con el vínculo que buscas`, frente: (o: string) => `${v('encaja', 'encajan')} mejor que ${o} con el vínculo que buscas` },
+      { motivo: 'su coste mensual mínimo es el más bajo', frente: (o: string) => `su coste mensual mínimo es más bajo que el de ${o}` },
+      { motivo: 'su coste inicial mínimo es el más bajo', frente: (o: string) => `su coste inicial mínimo es más bajo que el de ${o}` },
+    ];
+    const grupos = [...new Set(empatadas.map(decisivo))].sort((a, b) => a - b);
+    const porque = grupos.length === 1
+      ? criterios[grupos[0]].motivo
+      : grupos
+        .map((g) => criterios[g].frente(enumerarConY(empatadas.filter((k) => decisivo(k) === g).map((k) => MASCOTAS[k].conArticulo))))
+        .join(', y ');
+    criterioDesempate = `${seMuestra} porque ${porque}`;
   }
 
   // ─ Razones: las respuestas que más han sumado a la ganadora ─
   const razones: string[] = [];
   const aFavor = Object.entries(aporte)
     .map(([id, pesos]) => ({ id: Number(id), valor: pesos[mascota] ?? 0 }))
-    // Solo las que tienen frase: la alergia se explica aparte, con el filtro.
+    // Solo las que tienen frase: la alergia se explica aparte, con el filtro. Las 3 – 5 horas a
+    // solas no son una razón a favor de un perro (hallazgo 1443): van a `tensiones`.
     .filter((x) => x.valor > 0 && RAZON_A_FAVOR[x.id]?.[r[x.id]] !== undefined)
+    .filter((x) => !(x.id === 2 && r[2] === 'pocas' && esPerro(mascota)))
     .sort((a, b) => b.valor - a.valor || a.id - b.id)
     .slice(0, 3);
   for (const { id } of aFavor) {
@@ -478,9 +555,12 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   if (r[6] === 'alergia_pelo') {
     razones.push('Has declarado alergia al pelo: se han descartado perros, gatos y pequeños mamíferos (roedores y conejo), porque todos tienen pelo.');
   }
-  // Solo si el reptil competía de verdad: si iba por detrás, el filtro no ha cambiado nada.
+  // Solo si el descartado competía de verdad: si iba por detrás, el filtro no ha cambiado nada.
   if (descartes.reptil === 'salud' && puntos.reptil >= puntos[mascota]) {
-    razones.push('Con niños menores de 5 años se ha descartado el reptil: los CDC recomiendan no tener reptiles en casa a esa edad por el riesgo de salmonela.');
+    razones.push('Con niños menores de 5 años se ha descartado el reptil: los CDC de Estados Unidos no recomiendan reptiles ni anfibios en hogares con niños pequeños, por el riesgo de salmonela.');
+  }
+  if (descartes.roedor === 'salud' && puntos.roedor >= puntos[mascota]) {
+    razones.push('Con niños menores de 5 años se ha descartado el pequeño mamífero: los CDC de Estados Unidos recomiendan que a esa edad eviten el contacto con roedores (hámster, rata, cobaya…) y cuentan a los menores de 5 años entre quienes más riesgo de infección tienen con cualquier pequeño mamífero, conejo incluido.');
   }
   if (mascotaPorPerfil !== mascota && descartes[mascotaPorPerfil] === 'presupuesto') {
     const otra = MASCOTAS[mascotaPorPerfil];
@@ -503,6 +583,13 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   if (r[9] === 'minimo' && !info.adoptable) {
     aTenerEnCuenta.push(`Con ${info.conArticulo} el coste inicial es sobre todo la instalación (${mascota === 'pez' ? 'acuario' : mascota === 'reptil' ? 'terrario, luz UV y calor' : 'jaula y accesorios'}), que no se ahorra adoptando.`);
   }
+  // «Hasta 300 €» con un coste inicial que puede pasar de ahí (hallazgo 1437). Si incluso el
+  // mínimo llega a 300 €, el valor que se enseña ya es la tasa de adopción (más abajo).
+  if (r[9] === 'bajo' && info.costeInicialMin < TECHO_INICIAL_BAJO && info.costeInicialMax > TECHO_INICIAL_BAJO) {
+    aTenerEnCuenta.push(
+      `El coste inicial de ${info.conArticulo} (${info.costeInicial}) puede pasar de los 300 € que has indicado: con ese presupuesto, ${info.adoptable ? 'busca en protectoras o en la parte baja de esa horquilla' : 'empieza por una instalación sencilla'}.`,
+    );
+  }
 
   // ─ Consejos ─
   const consejos: string[] = [];
@@ -522,7 +609,14 @@ export function calcularResultado(r: Record<number, string>): Resultado {
           valor: 'Tasa de adopción',
           nota: `La fija cada protectora y suele incluir chip y vacunas. Comprando: ${info.costeInicial}.`,
         }
-      : { valor: info.costeInicial, nota: '' };
+      : r[9] === 'bajo' && info.costeInicialMin >= TECHO_INICIAL_BAJO
+        // «Hasta 300 €» y una compra que empieza en 300 € o más: enseñar el precio de compra sin
+        // más contradecía la respuesta (hallazgo 1437). Solo ocurre con los perros, adoptables.
+        ? {
+            valor: 'Tasa de adopción',
+            nota: `Comprar ${info.conArticulo} cuesta ${info.costeInicial}, por encima de los 300 € que has indicado; la tasa de adopción la fija cada protectora y suele incluir chip y vacunas.`,
+          }
+        : { valor: info.costeInicial, nota: '' };
 
   return {
     mascota,

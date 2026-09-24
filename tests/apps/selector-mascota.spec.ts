@@ -15,9 +15,12 @@ import { calcularResultado, MASCOTAS, TECHO_MENSUAL, type MascotaKey } from '../
  *   Suma pesos por respuesta a ocho candidatas (la tabla PESOS, la misma de antes salvo la
  *   resta por alergia). Después aplica como FILTRO lo que el usuario declara como límite:
  *     · alergia al pelo → fuera perros, gato y pequeños mamíferos;
- *     · niños menores de 5 años → fuera el reptil (recomendación de los CDC por salmonela);
- *     · presupuesto mensual → fuera todo animal cuyo coste mensual MÍNIMO supere el techo del
- *       tramo (30 / 80 / 180 €, sin techo en «más de 180 €»).
+ *     · niños menores de 5 años → fuera el reptil y el pequeño mamífero (CDC: reptiles no
+ *       recomendados en hogares con niños pequeños; menores de 5 años, evitar el contacto con
+ *       roedores; hallazgo 1441 del 24/09/2026, que amplió el filtro a los roedores);
+ *     · presupuesto mensual → fuera todo animal cuyo coste mensual MÍNIMO no quede por debajo
+ *       del techo del tramo (30 / 80 / 180 €, sin techo en «más de 180 €»; hallazgo 1438, que
+ *       cambió «supere» por «no quede por debajo»).
  *   Los empates se deshacen por el vínculo buscado (P7), luego por el menor coste mensual
  *   mínimo y luego por el menor coste inicial mínimo, y se anuncian en pantalla.
  *
@@ -424,7 +427,10 @@ test('motor: ninguna combinación rompe un límite declarado, y todo empate se e
     const clave = JSON.stringify(r);
     if (r[6] === 'alergia_pelo' && info.tienePelo) infracciones.push(`pelo con alergia: ${clave}`);
     if (r[5] === 'si_pequenos' && res.mascota === 'reptil') infracciones.push(`reptil con < 5 años: ${clave}`);
-    if (info.costeMensualMin > TECHO_MENSUAL[r[10]]) infracciones.push(`fuera de presupuesto: ${clave}`);
+    // Desde la reparación del 1441 (24/09/2026), también el pequeño mamífero
+    if (r[5] === 'si_pequenos' && res.mascota === 'roedor') infracciones.push(`roedor con < 5 años: ${clave}`);
+    // Desde la reparación del 1438: el mínimo tiene que quedar POR DEBAJO del techo, no igualarlo
+    if (info.costeMensualMin >= TECHO_MENSUAL[r[10]]) infracciones.push(`fuera de presupuesto: ${clave}`);
     if (res.empatadas.length > 0 && res.criterioDesempate === '') infracciones.push(`empate mudo: ${clave}`);
     if (res.razones.join(' ').includes('Tu perfil activo')) infracciones.push(`razón fija: ${clave}`);
     let i = 9;
@@ -532,10 +538,12 @@ test('sospecha §1.quinquies (app): guía, horquillas y FAQPage sin cifras popul
 // arriba, que se han vuelto a ejecutar en verde con los casos literales de sus actas. No se
 // duplican aquí. Lo que sigue es lo que la reparación dejó a medias o no tocó.
 //
-// Cada hallazgo abierto va como test.fail(): pasa hoy y se pone rojo cuando se repare. Cada
-// uno recorre primero su caso en el navegador (respuestas literales, puntos hechos a mano
-// con la tabla PESOS de motor.ts) y después cuenta los perfiles afectados en las 589.824
-// combinaciones; el recuento de hoy va en el comentario.
+// REPARADOS el 24/09/2026 (hallazgos 1437-1444): los test.fail() se han retirado. Cada test
+// recorre su caso en el navegador (respuestas literales, puntos hechos a mano con la tabla
+// PESOS de motor.ts) y después exige 0 perfiles afectados en las 589.824 combinaciones. Donde
+// la reparación cambia la recomendación del caso de la ficha (1438, 1441), el test fija la
+// nueva y lo dice; donde el caso de la ficha ya no reproducía el defecto con el motor reparado
+// por otra vía (1437, 1443), se ha buscado otro perfil que sí lo reproducía con el motor viejo.
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación dejó a medias', () => {
@@ -686,55 +694,62 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
     expect(await contraste(page, '[class*="recomendacionValor"]'), 'recomendacionValor').toBeGreaterThanOrEqual(3);
   });
 
-  // ── HALLAZGO 1: el presupuesto INICIAL no acota ni avisa ──────────────────────
+  // ── 1437: el presupuesto INICIAL no acotaba ni avisaba ────────────────────────
+  // El caso de la ficha (… Hasta 300 € · 30 – 80 €/mes) ya no da perro pequeño: con el 1438
+  // reparado, su mínimo (80 €) no queda por debajo de 80 y gana el gato. Se usa el mismo perfil
+  // con «80 – 180 €/mes», donde el motor viejo enseñaba la compra de 500 – 2.000 € sin más:
   // P1 Mucho · P2 3 – 5 h · P3 Piso normal · P4 Moderado · P5 Sin niños · P6 Sin restricciones ·
-  // P7 Compañía · P8 Toda la vida · P9 HASTA 300 € · P10 30 – 80 €/mes
-  // perro-pequeño 2+1+2+1+2+1+1 = 10 · gato 1+1+2+1+2+1 = 8 · perro-mediano 3+1+2 = 6 (fuera,
-  // 100 €/mes > 80) → Perro pequeño, cuya ficha de compra es «500 – 2.000 €».
-  test('hallazgo: con «Hasta 300 €» de inversión inicial no se enseña una compra de 500 – 2.000 € sin avisar', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: solo «Lo mínimo» cambia el coste inicial (1339); «Hasta 300 €» no acota ni avisa
+  // P7 Compañía · P8 Toda la vida · P9 HASTA 300 € · P10 80 – 180 €/mes
+  // perro-pequeño 2+1+2+1+2+1 = 9 · gato 1+1+2+1+2 = 7 · perro-mediano 3+1+2 = 6 → Perro pequeño
+  // (80 € < 180). Su compra empieza en 500 €, por encima de 300: se enseña la tasa de adopción y
+  // la nota nombra los 300 € declarados.
+  test('1437: con «Hasta 300 €» no se enseña una compra de 500 – 2.000 € sin decirlo', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
       'Mucho — más de 2 h', '3 – 5 horas', 'Piso normal', 'Moderado', 'No, solo adultos',
-      'Sin restricciones', 'Compañía constante', 'Para toda la vida', 'Hasta 300 €', '30 – 80 €/mes',
+      'Sin restricciones', 'Compañía constante', 'Para toda la vida', 'Hasta 300 €', '80 – 180 €/mes',
     ]);
     const ficha = await leerFicha(page);
     expect(ficha.mascota).toBe('Perro pequeño');
-    // Esperado: otra candidata, la tasa de adopción o un aviso que nombre los 300 € declarados
-    expect(ficha.inicial !== '500 – 2.000 €' || ficha.texto.includes('300 €'), `coste inicial «${ficha.inicial}» con «Hasta 300 €»`).toBe(true);
-    // Hoy: 1.356 perfiles (perro pequeño 1.272 · perro grande 84)
+    expect(ficha.inicial).toBe('Tasa de adopción');
+    await expect(page.locator('[class*="costeNota"]')).toHaveText(
+      'Comprar un perro pequeño cuesta 500 – 2.000 €, por encima de los 300 € que has indicado; la tasa de adopción la fija cada protectora y suele incluir chip y vacunas.',
+    );
+    // Motor viejo: 1.356 perfiles (perro pequeño 1.272 · perro grande 84)
     expect(recontar().inicialFueraSinAviso).toBe(0);
   });
 
-  // ── HALLAZGO 2: la frontera del tramo mensual (1333 a medias) ────────────────
-  // P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo · P5 Niños < 5 · P6 Comunidad ·
-  // P7 Compañía · P8 Varios años · P9 Hasta 300 € · P10 30 – 80 €/mes
-  // perro-mediano 3+2+2+2+1+2 = 12 (fuera: 100 €/mes > 80) · perro-grande 3+2+3+2−2−1−2 = 5
-  // (fuera) · perro-pequeño 2+2+1 = 5 · gato 1+1+1+1 = 4 · pez 2+1 = 3 → Perro pequeño, que
-  // «cabe» porque su mínimo (80 €) no supera el techo (80 €): toda su horquilla, 80 – 150 €,
-  // queda en el techo o por encima.
-  test('hallazgo: el perro pequeño (80 – 150 €) no se presenta como que cabe en 30 – 80 €/mes', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: sustituye al perro mediano «que no cabe» con otro perro cuyo mínimo es el techo del tramo
+  // ── 1438: la frontera del tramo mensual ──────────────────────────────────────
+  // El caso literal de la ficha: P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo ·
+  // P5 Niños < 5 · P6 Comunidad · P7 Compañía · P8 Varios años · P9 Hasta 300 € · P10 30 – 80 €/mes
+  // perro-mediano 3+2+2+2+1+2 = 12 (fuera: 100 € no queda por debajo de 80) · perro-grande 5
+  // (fuera: 150 €) · perro-pequeño 2+2+1 = 5 (fuera: su mínimo, 80 €, ES el techo) · gato
+  // 1+1+1+1 = 4 (50 € < 80) · pez 2+1 = 3 → Gato. Antes: perro pequeño, «Con 30 – 80 €/mes puedes
+  // mantener un perro pequeño». Ahora el gato, avisando de que su parte alta se sale del tramo.
+  test('1438: un animal cuyo mínimo es el techo del tramo no «cabe», y se recomienda uno que sí', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
       'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'Sí, menores de 5 años',
       'La comunidad restringe', 'Compañía constante', 'Varios años con posibilidad', 'Hasta 300 €', '30 – 80 €/mes',
     ]);
     const ficha = await leerFicha(page);
+    expect(ficha.mascota).toBe('Gato');
+    expect(ficha.mensual).toBe('50 – 120 €');
     await expect(page.locator('[class*="avisoRecorte"]')).toContainText('encajaría un perro mediano');
+    await expect(page.locator('[class*="avisoRecorte"]')).toContainText('(100 – 200 €) no cabe en tu presupuesto de 30 – 80 €/mes');
     expect(ficha.texto).not.toContain('Con 30 – 80 €/mes puedes mantener un perro pequeño');
     expect(ficha.texto).not.toContain('La parte alta de la horquilla de un perro pequeño (80 – 150 €)');
-    // Hoy: 3.195 perfiles con el perro pequeño en «30 – 80 €/mes» (1.925 sustituyen al mediano)
+    expect(ficha.texto).toContain('La parte alta de la horquilla de un gato (50 – 120 €) supera tu tramo de 30 – 80 €/mes');
+    // Motor viejo: 3.195 perfiles con el perro pequeño en «30 – 80 €/mes»
     expect(recontar().fronteraMensual).toBe(0);
   });
 
-  // ── HALLAZGO 3: «Necesidad de silencio» y perro ──────────────────────────────
+  // ── 1439: «Necesidad de silencio» y perro ────────────────────────────────────
   // P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo · P5 Niños 5-12 · P6 SILENCIO ·
   // P7 Juego · P8 Varios años · P9 Sin límite · P10 Más de 180 €/mes
-  // perro-mediano 3+2+2+2+2+2+1 = 14 · perro-grande 3+2+3+2+2 = 12 · gato 1+1+1+1 = 4 ·
-  // pez 3 → Perro mediano. «Necesidad de silencio» no le resta nada al perro mediano.
-  test('hallazgo: a quien necesita silencio no se le recomienda un perro sin mencionar el ruido', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: tensiones() solo avisa del ruido del pájaro, que nunca gana con silencio
+  // perro-mediano 3+2+2+2+2+2+1 = 14 · perro-grande 3+2+3+2+2 = 12 → Perro mediano. Es una
+  // preferencia (un perro puede ladrar o no), no una imposibilidad: se cita, no se filtra.
+  test('1439: a quien necesita silencio, el perro se le recomienda mencionando los ladridos', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
       'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'Sí, de 5 a 12 años',
@@ -742,18 +757,16 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
     ]);
     const ficha = await leerFicha(page);
     expect(ficha.mascota).toBe('Perro mediano');
-    expect(ficha.texto).toMatch(/ruido|ladr/i);
-    // Hoy: 15.866 perfiles (perro mediano 15.035 · grande 497 · pequeño 334)
+    expect(ficha.texto).toContain('Has indicado que necesitas silencio: un perro mediano puede ladrar, sobre todo cuando se queda solo o se aburre; el ejercicio diario y el adiestramiento lo reducen, pero no lo eliminan.');
+    // Motor viejo: 15.866 perfiles (perro mediano 15.035 · grande 497 · pequeño 334)
     expect(recontar().silencioPerroMudo).toBe(0);
   });
 
-  // ── HALLAZGO 4: «ciclo de vida más corto» y animal de 12 – 20 años ───────────
+  // ── 1440: «ciclo de vida más corto» y animal de 12 – 20 años ─────────────────
   // P1 Bastante · P2 6 – 10 h · P3 Piso normal · P4 Moderado · P5 Sin niños · P6 Sin restricciones ·
   // P7 Compañía · P8 CICLO CORTO · P9 300 – 1.000 € · P10 80 – 180 €/mes
-  // gato 3+3+2+1 = 9 · perro-pequeño 2+2+1+2 = 7 · perro-mediano 1+1+2 = 4 · roedor 3 · pez 3
-  // → Gato, «12 – 20 años». No hay ninguna tensión, así que ni siquiera sale la sección.
-  test('hallazgo: a quien pide un ciclo de vida corto no se le da un gato de 12 – 20 años sin decirlo', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: solo el pequeño mamífero tiene tensión con «ciclo corto»
+  // gato 3+3+2+1 = 9 · perro-pequeño 2+2+1+2 = 7 → Gato, «12 – 20 años», y ahora lo dice.
+  test('1440: a quien pide un ciclo de vida corto, el gato de 12 – 20 años se le recomienda diciéndolo', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
       'Bastante — 1-2 h', '6 – 10 horas', 'Piso normal', 'Moderado', 'No, solo adultos',
@@ -762,43 +775,44 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
     const ficha = await leerFicha(page);
     expect(ficha.mascota).toBe('Gato');
     expect(ficha.vida).toBe('12 – 20 años');
-    expect(ficha.texto).toMatch(/ciclo|más corto/i);
-    // Hoy: 75.333 perfiles (gato 50.485 · perro mediano 19.768 · reptil 3.088 · perro pequeño
-    // 1.508 · perro grande 467 · pájaro 17)
+    expect(ficha.texto).toContain('Prefieres un compromiso más corto, pero la esperanza de vida de un gato es de 12 – 20 años: es un compromiso de muchos años.');
+    // Motor viejo: 75.333 perfiles (gato 50.485 · perro mediano 19.768 · reptil 3.088 · …)
     expect(recontar().cortoLongevoMudo).toBe(0);
   });
 
-  // ── HALLAZGO 5: la recomendación de los CDC sobre menores de 5 años incluye a los roedores ──
-  // P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo · P5 NIÑOS < 5 · P6 Comunidad ·
-  // P7 Compañía · P8 Ciclo corto · P9 Lo mínimo · P10 Menos de 30 €/mes
-  // perro-mediano 3+2+2+2+1+2+1−1 = 12 (fuera, 100 €/mes) · roedor −1+1+3+2+2 = 7 ·
-  // pez 2+1+3 = 6 · gato 1+1+1+2 = 5 (fuera, 50 €/mes) · reptil −2 (fuera, niños) →
-  // Pequeño mamífero, con la tarjeta fija «Buena primera mascota para niños».
-  // Fuente: cdc.gov/healthy-pets/risk-factors — «CDC recommends that children under 5 years old
-  // avoid contact with reptiles, amphibians, poultry (including chicks and ducklings), and rodents.»
-  test('hallazgo: con niños menores de 5 años no se recomiendan roedores sin la advertencia de los CDC', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el filtro CDC se aplica al reptil y no a los roedores, que la misma recomendación incluye
+  // ── 1441: los CDC incluyen a los roedores en la recomendación sobre menores de 5 años ──
+  // cdc.gov/healthy-pets/risk-factors: «CDC recommends that children under 5 years old avoid
+  // contact with reptiles, amphibians, poultry (including chicks and ducklings), and rodents.»
+  // El caso literal: P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo · P5 NIÑOS < 5 ·
+  // P6 Comunidad · P7 Compañía · P8 Ciclo corto · P9 Lo mínimo · P10 Menos de 30 €/mes
+  // perro-mediano 12 (fuera, 100 €/mes) · roedor −1+1+3+2+2 = 7 (fuera AHORA, CDC) ·
+  // pez 2+1+3 = 6 → Peces. Antes: Pequeño mamífero con «Buena primera mascota para niños».
+  // Como el pequeño mamífero sumaba más que los peces, el descarte se explica.
+  test('1441: con niños menores de 5 años no se recomiendan roedores, y se cita a los CDC', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
       'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'Sí, menores de 5 años',
       'La comunidad restringe', 'Compañía constante', 'ciclo de vida más corto', 'Lo mínimo', 'Menos de 30 €/mes',
     ]);
     const ficha = await leerFicha(page);
-    expect(ficha.mascota).toBe('Pequeño mamífero');
-    expect(ficha.texto).toContain('CDC');
+    expect(ficha.mascota).toBe('Peces');
+    expect(ficha.texto).toContain('Con niños menores de 5 años se ha descartado el pequeño mamífero: los CDC de Estados Unidos recomiendan que a esa edad eviten el contacto con roedores');
     await expect(page.locator('[class*="prosCard"]')).not.toContainText('Buena primera mascota para niños');
-    // Hoy: 953 perfiles con niños < 5 años y pequeño mamífero, ninguno con la advertencia
+    // Motor viejo: 953 perfiles con niños < 5 años y pequeño mamífero, sin la advertencia
     expect(recontar().roedorNinosSinCdc).toBe(0);
+    // Y el FAQPage, que es lo que leen las IA, ya no limita la advertencia a los reptiles
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    expect(ld).toContain('recomiendan que eviten el contacto con roedores');
   });
 
-  // ── HALLAZGO 6: el criterio de desempate anunciado no es el que decide ───────
+  // ── 1442: el criterio de desempate anunciado es el que decide ────────────────
   // P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo · P5 Sin niños · P6 Silencio ·
   // P7 Juego · P8 Ciclo corto · P9 300 – 1.000 € · P10 30 – 80 €/mes
-  // gato 1+1+1+1 = 4 · roedor 1+3 = 4 · pez 3+1 = 4 (empate a 4; perros fuera por 80 €/mes).
-  // Vínculo «Juego»: roedor +1, gato +1, pez 0 → quedan roedor y gato; decide el coste mensual
-  // mínimo entre ESOS dos (15 € < 50 €). Los peces cuestan 10 €: «el más bajo» es falso.
-  test('hallazgo: el empate no dice «coste mensual más bajo» cuando una empatada cuesta menos', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: criterioDesempate solo compara con la segunda y usa un superlativo
+  // gato 1+1+1+1 = 4 · roedor 1+3 = 4 · pez 3+1 = 4 (perros fuera por 80 €/mes). Vínculo «Juego»:
+  // roedor +1, gato +1, pez 0 → los peces quedan detrás por el vínculo; entre roedor y gato
+  // decide el coste mensual (15 € < 50 €). Los peces (10 €) cuestan menos que el roedor: el
+  // superlativo «el más bajo» era falso; ahora cada criterio nombra a quien deja detrás.
+  test('1442: el empate dice qué criterio deja detrás a cada empatada', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
       'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
@@ -807,50 +821,86 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
     const ficha = await leerFicha(page);
     expect(ficha.mascota).toBe('Pequeño mamífero');
     const empate = (await page.locator('[class*="avisoEmpate"]').innerText()).replace(/\s+/g, ' ');
-    expect(empate).toContain('unos peces');
-    expect(empate.includes('coste mensual mínimo es el más bajo'), empate).toBe(false);
-    // Hoy: 506 perfiles de los 21.637 en que se anuncia ese criterio
+    expect(empate).toContain('un pequeño mamífero, un gato y unos peces encajan exactamente igual; se muestra primero un pequeño mamífero porque encaja mejor que unos peces con el vínculo que buscas, y su coste mensual mínimo es más bajo que el de un gato.');
+    expect(empate).not.toContain('es el más bajo');
+    // Motor viejo: 506 perfiles de los 21.637 en que se anunciaba ese criterio
     expect(recontar().criterioCosteFalso).toBe(0);
   });
 
-  // ── HALLAZGO 7: una razón «a favor» que se contradice con la fuente que cita ──
-  // P1 Mucho · P2 3 – 5 h · P3 Jardín · P4 Muy activo · P5 Niños < 5 · P6 Comunidad · P7 Compañía ·
-  // P8 Toda la vida · P9 Hasta 300 € · P10 30 – 80 €/mes
-  // perro-pequeño 2+1+2+1+1 = 7 = gato 1+1+1+1+2+1 = 7; el vínculo (Compañía: +2 frente a +1)
-  // deja delante al perro pequeño. Sus tres mayores aportes: P1 (+2), P7 (+2) y P2 (+1).
-  test('hallazgo: con 3 – 5 horas fuera no se dice que un perro «lo lleva mejor que otras opciones»', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: RAZON_A_FAVOR[2].pocas sirve igual al gato que al perro
+  // ── 1443: las 3 – 5 horas a solas no son una razón «a favor» de un perro ─────
+  // El caso de la ficha ya no da perro con el 1438 reparado (30 – 80 €/mes aparta al perro
+  // pequeño); este es uno de los perfiles en que el motor viejo SÍ daba la razón al perro:
+  // P1 Mucho · P2 3 – 5 h · P3 Piso amplio · P4 Moderado · P5 Sin niños · P6 Comunidad ·
+  // P7 Compañía · P8 Toda la vida · P9 Hasta 300 € · P10 80 – 180 €/mes
+  // perro-pequeño 2+1+1+1+2+1 = 8 · perro-mediano 3+2+1+2 = 8 · gato 1+1+2+1+1+2 = 8. Empate a 8:
+  // el vínculo (Compañía: pequeño 2 = mediano 2 > gato 1) deja detrás al gato, y el coste
+  // mensual (80 € < 100 €) al mediano → Perro pequeño. Aportes: P1 +2, P7 +2 y, entre los +1,
+  // P2 era el primero por número; ahora P2 no es razón a favor y sale P3. La recomendación de
+  // RSPCA y PDSA (no dejarlo solo más de cuatro horas) va a «Lo que juega en contra».
+  test('1443: con 3 – 5 horas fuera no se dice que un perro «lo lleva mejor que otras opciones»', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
-      'Mucho — más de 2 h', '3 – 5 horas', 'Casa con jardín', 'Muy activo', 'Sí, menores de 5 años',
-      'La comunidad restringe', 'Compañía constante', 'Para toda la vida', 'Hasta 300 €', '30 – 80 €/mes',
+      'Mucho — más de 2 h', '3 – 5 horas', 'Piso amplio', 'Moderado', 'No, solo adultos',
+      'La comunidad restringe', 'Compañía constante', 'Para toda la vida', 'Hasta 300 €', '80 – 180 €/mes',
     ]);
     const ficha = await leerFicha(page);
     expect(ficha.mascota).toBe('Perro pequeño');
     expect(ficha.texto).not.toContain('un perro pequeño lo lleva mejor que otras opciones');
-    // Hoy: 1.134 perfiles
+    expect(ficha.texto).toContain('Un piso de más de 80 m² deja sitio de sobra para un perro pequeño.');
+    expect(ficha.texto).toContain('La casa se queda vacía 3 – 5 horas: las guías de bienestar animal (RSPCA, PDSA) aconsejan no dejar a un perro solo más de cuatro horas seguidas, así que los días largos alguien tendrá que sacar a un perro pequeño.');
+    await expect(page.locator('[class*="avisoEmpate"]')).toContainText(
+      'se muestra primero un perro pequeño porque encaja mejor que un gato con el vínculo que buscas, y su coste mensual mínimo es más bajo que el de un perro mediano',
+    );
+    // Motor viejo: 1.134 perfiles
     expect(recontar().razon35hPerro).toBe(0);
   });
 
-  // ── HALLAZGO 8 (de familia): hero de resultado y botones con texto blanco sobre el degradado de marca ──
-  // --primary → --secondary; en claro, el extremo teal da 2,80:1 con blanco. Obligatorio en hero:
-  // var(--hero-bg). Medido en el punto menos favorable de la caja real del texto.
-  test('hallazgo: el hero del resultado y los botones de avance llegan al contraste mínimo', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: degradado --primary→--secondary en vez de --hero-bg / --*-boton
+  // ── 1444 (de familia): hero de resultado y botones de avance ─────────────────
+  // Antes: degradado --primary→--secondary con texto blanco; subtítulo 2,82 en claro y 2,19 en
+  // oscuro, <h1> 2,45 en oscuro, «Empezar el test» 3,20 / 2,42 y «Siguiente» 3,26 / 2,44. Ahora
+  // el hero usa var(--hero-bg) (#1a5278 en los dos temas) y los botones var(--primary-boton)
+  // (#26718F en los dos temas). Se mide en claro y en oscuro con el conmutador real.
+  test('1444: el hero del resultado y los botones de avance llegan al contraste mínimo en los dos temas', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/selector-mascota/');
+    await esperarHidratacionBotones(page);
+    const cambiarTema = async (a: 'oscuro' | 'claro') => {
+      await page.getByRole('button', { name: a === 'oscuro' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro' }).click();
+      if (a === 'oscuro') await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      else await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
+      await esperarSinTransiciones(page);
+    };
+    const medir = async (tema: string) => {
+      await esperarSinTransiciones(page);
+      expect(await contrasteSobreDegradado(page, '[class*="btnStart"]', ''), `btnStart, ${tema}`).toBeGreaterThanOrEqual(4.5);
+    };
+    await medir('claro');
+    await cambiarTema('oscuro');
+    await medir('oscuro');
+    await page.getByRole('button', { name: /Empezar el test/ }).click();
+    await page.locator('[role="radio"]').first().click();
+    await esperarSinTransiciones(page);
+    expect(await contrasteSobreDegradado(page, '[class*="btnSiguiente"]', ''), 'btnSiguiente, oscuro').toBeGreaterThanOrEqual(4.5);
+    await cambiarTema('claro');
+    expect(await contrasteSobreDegradado(page, '[class*="btnSiguiente"]', ''), 'btnSiguiente, claro').toBeGreaterThanOrEqual(4.5);
+    await responder(page, NORMAL);
+    await leerFicha(page);
+    await esperarSinTransiciones(page);
+    const fondoHero = () => page.locator('[class*="heroResultados"]').evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el).backgroundImage]);
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') await cambiarTema('oscuro');
+      expect(await fondoHero(), tema).toEqual(['rgb(26, 82, 120)', 'none']);
+      // Subtítulo 1rem al 88 %: 4,5:1 · <h1> 2rem en negrita (texto grande): 3:1
+      expect(await contrasteSobreDegradado(page, '[class*="heroResultados"]', 'p'), `heroSubtitleSm, ${tema}`).toBeGreaterThanOrEqual(4.5);
+      expect(await contrasteSobreDegradado(page, '[class*="heroResultados"]', 'h1'), `heroTitleSm, ${tema}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  // ── Familia (regla g): al pulsar «Ver resultado» el foco no cae a <body> ──
+  test('familia g: tras «Ver resultado» el foco está en el título del resultado', async ({ page }) => {
     await abrirTest(page);
     await responder(page, NORMAL);
     await leerFicha(page);
-    // Subtítulo 1rem, opacidad 0,88: 4,5:1. Medido hoy: 2,82 en claro, 2,19 en oscuro.
-    expect(await contrasteSobreDegradado(page, '[class*="heroResultados"]', 'p'), 'heroSubtitleSm').toBeGreaterThanOrEqual(4.5);
-    // <h1> 2rem en negrita (texto grande): 3:1. Medido hoy: 3,26 en claro (pasa), 2,45 en oscuro.
-    expect(await contrasteSobreDegradado(page, '[class*="heroResultados"]', 'h1'), 'heroTitleSm').toBeGreaterThanOrEqual(3);
-    // «Empezar el test →» 1,05rem y «Siguiente →» 0,9rem, seminegrita: 4,5:1.
-    // Medido hoy: 3,20 y 3,26 en claro; 2,42 y 2,44 en oscuro.
-    await page.getByRole('button', { name: 'Repetir el test' }).click();
-    expect(await contrasteSobreDegradado(page, '[class*="btnStart"]', ''), 'btnStart').toBeGreaterThanOrEqual(4.5);
-    await page.getByRole('button', { name: /Empezar el test/ }).click();
-    await page.locator('[role="radio"]').first().click();
-    expect(await contrasteSobreDegradado(page, '[class*="btnSiguiente"]', ''), 'btnSiguiente').toBeGreaterThanOrEqual(4.5);
+    await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeFocused();
   });
 });

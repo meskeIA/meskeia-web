@@ -8,12 +8,17 @@
 .heroTitle { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; margin: 0 0 0.75rem; line-height: 1.2; }
 .heroSubtitle { font-size: clamp(1rem, 2vw, 1.2rem); opacity: 0.9; margin: 0; line-height: 1.5; }
 
+/* var(--hero-bg), como el hero de la intro: el degradado --primary→--secondary daba 2,82:1 al
+   subtítulo en claro y 2,19 en oscuro (hallazgo 1444, de familia: regla b). */
 .heroResultados {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   color: #fff; text-align: center; padding: 2rem 1.5rem 1.75rem;
 }
 .heroTitleSm { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin: 0 0 0.4rem; }
 .heroSubtitleSm { font-size: 1rem; opacity: 0.88; margin: 0; }
+/* Recibe el foco al mostrarse el resultado (tabIndex -1): anillo solo con teclado */
+.heroTitleSm:focus { outline: none; }
+.heroTitleSm:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 /* ─── Intro ────────────────────────────────────────────────────── */
 .introContainer { max-width: 620px; margin: 2rem auto 3rem; padding: 0 1rem; }
@@ -30,8 +35,10 @@
 .introFeatures li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.95rem; color: var(--text-secondary); }
 .introFeatures li span { font-size: 1.1rem; flex-shrink: 0; }
 
+/* Fondo de marca con texto blanco: --primary-boton (5,47:1 en los dos temas). Sobre el degradado,
+   3,20:1 en claro y 2,42 en oscuro (hallazgo 1444). */
 .btnStart {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--primary-boton);
   color: #fff; border: none; border-radius: 10px; padding: 0.9rem 2.5rem;
   font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; width: 100%;
 }
@@ -73,8 +80,9 @@
 }
 .btnAnterior:hover { border-color: var(--primary); color: var(--primary); }
 .btnAnterior:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+/* Mismo motivo que .btnStart: 3,26:1 y 2,44 sobre el degradado (hallazgo 1444). */
 .btnSiguiente {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--primary-boton);
   border: none; border-radius: 8px; padding: 0.75rem 1.5rem;
   font-size: 0.9rem; font-weight: 600; color: #fff; cursor: pointer; flex: 1; transition: opacity 0.2s;
 }
