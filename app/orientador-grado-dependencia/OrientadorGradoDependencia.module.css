@@ -85,7 +85,37 @@
 /* ─── Áreas y preguntas ─────────────────────────────── */
 
 .areaSection {
+  margin: 0 0 var(--spacing-md);
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.apoyoGroup {
+  margin: var(--spacing-lg) 0 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.pesoActividad {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.condicionMental {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem;
   margin-bottom: var(--spacing-md);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  cursor: pointer;
 }
 
 .areaTitle {
@@ -93,7 +123,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
   padding: 0.25rem 0.5rem;
   background: rgba(46, 134, 171, 0.08);
@@ -183,35 +213,36 @@
 .gradoVerde {
   background: #f0faf0;
   border-color: var(--success);
-  color: var(--success);
+  color: #1E6B3E; /* 6,08:1 sobre el fondo */
 }
 
 .gradoAmarillo {
   background: #fef9e7;
   border-color: #F4D03F;
-  color: #B7950B;
+  color: #7A5A00; /* 6,05:1 */
 }
 
 .gradoNaranja {
   background: #fef5ec;
   border-color: var(--orange);
-  color: var(--orange);
+  color: #9A4A0B; /* 5,80:1 */
 }
 
 .gradoRojo {
   background: #fdf2f2;
   border-color: var(--danger);
-  color: var(--danger);
+  color: #A8281B; /* 6,42:1 */
 }
 
-[data-theme='dark'] .gradoVerde { background: #1a3a1a; }
-[data-theme='dark'] .gradoAmarillo { background: #2a2a0a; }
-[data-theme='dark'] .gradoNaranja { background: #3a2a10; }
-[data-theme='dark'] .gradoRojo { background: #3a1a1a; }
+[data-theme='dark'] .gradoVerde { background: #1a3a1a; color: #7EDC9F; }   /* 7,59:1 */
+[data-theme='dark'] .gradoAmarillo { background: #2a2a0a; color: #F4D03F; } /* 9,72:1 */
+[data-theme='dark'] .gradoNaranja { background: #3a2a10; color: #F5A962; }  /* 7,07:1 */
+[data-theme='dark'] .gradoRojo { background: #3a1a1a; color: #F59A91; }     /* 7,38:1 */
 
 .gradoIcono { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
 .gradoTitulo { font-size: 1.15rem; font-weight: 700; }
-.gradoDescripcion { font-size: 0.88rem; opacity: 0.9; margin-top: 0.35rem; }
+.gradoPuntuacion { font-size: 0.95rem; font-weight: 600; margin-top: 0.4rem; color: var(--text-primary); }
+.gradoDescripcion { font-size: 0.88rem; margin-top: 0.35rem; color: var(--text-primary); }
 
 /* ─── Prestaciones ──────────────────────────────────── */
 
@@ -290,6 +321,12 @@
 
 .comparativaTable tr:hover {
   background: #f9fafb;
+}
+
+.notaTabla {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
 }
 
 [data-theme='dark'] .comparativaTable th {
