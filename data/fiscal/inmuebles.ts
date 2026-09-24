@@ -6,7 +6,7 @@
  * Verifica siempre en la fuente oficial antes de tomar decisiones.
  *
  * Fuentes:
- *   - ITP/AJD: Ley 1/1993 del ITP y AJD + tipos autonómicos
+ *   - ITP/AJD: Real Decreto Legislativo 1/1993 (texto refundido del ITP y AJD) + tipos autonómicos
  *   - Plusvalías IRPF: Ley 35/2006 del IRPF (art. 46-49)
  *   - IVA: Ley 37/1992 del IVA
  *   - Plusvalía municipal: RDL 26/2021
@@ -17,12 +17,15 @@
  */
 
 export const FISCAL_INMUEBLES_META = {
-  fuente: 'Ley 1/1993 ITP-AJD + Ley 35/2006 IRPF + Ley 37/1992 IVA + RDL 26/2021',
+  // «Ley 1/1993» no existe: el texto refundido del impuesto es un Real Decreto Legislativo
+  // (BOE-A-1993-25359). Lo publicaba el sello de toda app de riesgo 1 que lo pinta (hallazgo
+  // 1600 del Inspector, 24/09/2026).
+  fuente: 'Real Decreto Legislativo 1/1993 (ITP y AJD) + Ley 35/2006 IRPF + Ley 37/1992 IVA + RDL 26/2021',
   verificado: '2026-06-17',
   vigencia: '2026',
   urlOficialITP: 'https://sede.agenciatributaria.gob.es/Sede/itp-ajd.html',
   urlOficialIRPF: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
-  nota: 'El ITP varía por comunidad autónoma: del 4% (País Vasco) al 10% de tipo general, y hasta el 13% en el tramo más alto de las comunidades con escala progresiva (Baleares y Cataluña). Los tipos indicados son orientativos. Consulta el tipo exacto de tu CCAA antes de calcular.',
+  nota: 'El ITP de la vivienda varía por comunidad autónoma: del 4% (País Vasco, donde el resto de inmuebles tributa al 7%) al 10% de tipo general, y hasta el 13% en el tramo más alto de las comunidades con escala progresiva (Baleares y Cataluña). Los tipos indicados son orientativos. Consulta el tipo exacto de tu CCAA antes de calcular.',
 };
 
 // ─── ITP (Impuesto Transmisiones Patrimoniales) — Vivienda de segunda mano ───
@@ -32,6 +35,13 @@ export interface TipoITPCCAA {
   tipo: number;       // % sobre el valor del inmueble
   reducido?: number;  // % para jóvenes u otros colectivos (si existe)
   notaReducido?: string;
+  /**
+   * Tipo de los inmuebles que NO son vivienda (local, nave, solar, terreno, y garaje o trastero
+   * que no se transmiten con la vivienda), solo donde la norma los grava distinto de ella.
+   * Sin este campo, el tipo general `tipo` vale para cualquier inmueble.
+   */
+  tipoNoVivienda?: number;
+  notaNoVivienda?: string;
 }
 
 /**
@@ -55,7 +65,16 @@ export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
   { ccaa: 'Madrid',             tipo: 6,    reducido: 5.4,  notaReducido: 'Bonificación 10% sobre cuota, vivienda habitual ≤250.000 € (6% → 5,4% efectivo); familia numerosa: 4%; jóvenes <35 en municipios <2.500 hab.: exento 100%' },
   { ccaa: 'Murcia',             tipo: 7.75, reducido: 3,    notaReducido: 'Tipo general 7,75% desde 25/07/2025 (Ley 3/2025, antes 8%). Reducido 3% (art. 8.6 del Decreto Legislativo 1/2010): jóvenes de edad ≤40 en vivienda habitual, con base imponible general menos mínimo personal y familiar <40.000 € y base del ahorro ≤1.800 €, SIN límite de valor del inmueble; familia numerosa (renta <44.000 €, +6.000 € por hijo); discapacidad ≥65%. VPO régimen especial: 4%' },
   { ccaa: 'Navarra',            tipo: 6,    reducido: 5,    notaReducido: 'Jóvenes <35 años, familias con 2+ hijos, discapacidad o VPO (vivienda habitual ≤180.304 €)' },
-  { ccaa: 'País Vasco',         tipo: 4,    reducido: 2.5,  notaReducido: 'Jóvenes <35 años, familia numerosa, discapacidad ≥65% o VPO (vivienda habitual). Normativa foral: puede variar ligeramente entre Álava/Bizkaia/Gipuzkoa' },
+  // 24/09/2026 (hallazgo 1582 del Inspector): el 4 % es SOLO de la vivienda. Verificado en el
+  // texto consolidado de las dos normas forales: Bizkaia, NF 1/2011 art. 13 (a: «El 7 por 100
+  // si se trata de la transmisión de bienes inmuebles»; b: 4 % «la transmisión de viviendas en
+  // general, incluidas las plazas de garaje, con un máximo de dos unidades, y anexos, situados
+  // en el mismo edificio, que se transmitan conjuntamente […] no tendrán la consideración de
+  // anexos a viviendas los locales de negocio»), y Gipuzkoa, NF 18/1987 art. 11.1, a) y b), con
+  // la misma redacción (texto vigente de 2025 de la Diputación). Álava (NF 11/2003) no se pudo
+  // consultar en su fuente oficial: se le aplica lo que las otras dos dicen igual.
+  { ccaa: 'País Vasco',         tipo: 4,    reducido: 2.5,  notaReducido: 'Jóvenes <35 años, familia numerosa, discapacidad ≥65% o VPO (vivienda habitual). Normativa foral: puede variar ligeramente entre Álava/Bizkaia/Gipuzkoa',
+    tipoNoVivienda: 7, notaNoVivienda: 'El 4% es solo de la vivienda (y hasta dos garajes y anexos del mismo edificio transmitidos con ella). Locales, naves, solares, terrenos y garajes o trasteros sueltos: 7% (NF 1/2011 de Bizkaia, art. 13.a; NF 18/1987 de Gipuzkoa, art. 11.1.a). Álava sin verificar.' },
   { ccaa: 'Valencia',           tipo: 9,    reducido: 8,    notaReducido: 'Tipo general 9% desde 01/06/2026 (antes 10%) para vivienda usada ≤1.000.000 €; 11% por encima. Reducido 8% jóvenes <35/VPO; 6% jóvenes <35 (≤180.000 €); 4% familia numerosa/monoparental/discapacidad' },
   { ccaa: 'Media orientativa',  tipo: 8 },
 ];
@@ -208,15 +227,15 @@ export const COSTES_COMPRAVENTA_2025 = {
 
 export const PLUSVALIA_MUNICIPAL_META = {
   nombre: 'Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (IIVTNU)',
-  baseNormativa: 'RDL 26/2021, de 8 de noviembre + coeficientes actualizados por Ley de Presupuestos',
+  baseNormativa: 'TRLRHL (RD Legislativo 2/2004), arts. 104-110; coeficientes del art. 107.4 en la redacción del art. 24 del RDL 8/2023',
   quien: 'Paga el vendedor. En herencias, el heredero. En donaciones, el donatario.',
   tipoMaximoLegal: 30,  // % — Límite legal que ningún municipio puede superar
   tipoOrientativo: 25,  // % — Media orientativa para estimaciones sin dato municipal
   nota: 'El tipo impositivo lo fija cada Ayuntamiento hasta el máximo legal del 30%. Consulta el tipo exacto de tu municipio antes de calcular.',
-  urlReferencia: 'https://sede.agenciatributaria.gob.es',
-  verificado: '2025-01-15',
-  vigencia: '2025',
-  aviso: 'Los coeficientes se actualizan anualmente por Ley de Presupuestos. Verificar para el ejercicio en curso.',
+  urlReferencia: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-4214#a107',
+  verificado: '2026-09-24',
+  vigencia: '2026',
+  aviso: 'Los coeficientes máximos se actualizan por norma con rango de ley; cada Ayuntamiento puede aplicar los suyos, iguales o inferiores. Verificar para el ejercicio en curso.',
 };
 
 /**
@@ -284,14 +303,28 @@ export const PLAZO_IIVTNU = {
 };
 
 /**
- * Coeficientes máximos IIVTNU por años de tenencia — 2025
+ * Coeficientes máximos del IIVTNU por años de generación (art. 107.4 TRLRHL)
  *
- * Fuente: RDL 26/2021 + actualización anual vía Ley de Presupuestos.
  * Los Ayuntamientos pueden aplicar coeficientes INFERIORES a estos máximos.
  * Para calcular: Base imponible = Valor catastral del suelo × coeficiente
  *
- * ⚠️ Si España no aprueba PGE, se prorrogan los del ejercicio anterior.
- * Verificar en: https://www.hacienda.gob.es
+ * ── Verificado el 24/09/2026 contra el BOE (hallazgo 1559 del Inspector) ─────
+ * API de legislación consolidada, BOE-A-2004-4214, bloque a107, última versión (28/01/2026).
+ * Es la tabla que el art. 24 del RDL 8/2023 dio al art. 107.4, vigente desde el 01/01/2024.
+ * Las dos actualizaciones posteriores decayeron: la del RDL 9/2024 (derogado el 22/01/2025,
+ * no convalidado) y la del RDL 16/2025 («Se deja sin efecto la modificación de los importes
+ * máximos de los coeficientes», por la Resolución de 27/01/2026 que publica su derogación).
+ *
+ * Hasta ese día aquí estaba la tabla con la que el RDL 26/2021 redactó el artículo (vigente
+ * del 10/11/2021 al 31/12/2022), sellada como «2025»: coincidía con la vigente en UNO de los
+ * 21 tramos. La leían siete sitios del catálogo —el motor de la familia de compraventa, el de
+ * la API y el MCP, `estimador-plusvalia-municipal`, `simulador-heredar-vivienda`…—, así que
+ * todos liquidaban la plusvalía con coeficientes de 2022: 7 años a 0,12 en vez de 0,20, o
+ * 20 años a 0,45 en vez de 0,40. El nombre de la constante se conserva para no romper a
+ * nadie; lo que manda es la fecha de verificación de PLUSVALIA_MUNICIPAL_META.
+ *
+ * ⚠️ No se lee con `find()` a mano: `coeficienteIIVTNU()` aplica además el PRORRATEO por
+ * meses del periodo inferior a un año, que la ley exige y ninguna consulta directa hacía.
  */
 export interface CoeficienteIIVTNU {
   anios: number;        // Años de tenencia (0 = menos de 1 año)
@@ -300,25 +333,81 @@ export interface CoeficienteIIVTNU {
 }
 
 export const COEFICIENTES_IIVTNU_2025: CoeficienteIIVTNU[] = [
-  { anios: 0,  label: 'Menos de 1 año',  coeficiente: 0.14 },
-  { anios: 1,  label: '1 año',           coeficiente: 0.13 },
-  { anios: 2,  label: '2 años',          coeficiente: 0.15 },
-  { anios: 3,  label: '3 años',          coeficiente: 0.16 },
-  { anios: 4,  label: '4 años',          coeficiente: 0.17 },
-  { anios: 5,  label: '5 años',          coeficiente: 0.17 },
-  { anios: 6,  label: '6 años',          coeficiente: 0.16 },
-  { anios: 7,  label: '7 años',          coeficiente: 0.12 },
-  { anios: 8,  label: '8 años',          coeficiente: 0.10 },
-  { anios: 9,  label: '9 años',          coeficiente: 0.09 },
-  { anios: 10, label: '10 años',         coeficiente: 0.08 },
-  { anios: 11, label: '11 años',         coeficiente: 0.08 },
-  { anios: 12, label: '12 años',         coeficiente: 0.08 },
-  { anios: 13, label: '13 años',         coeficiente: 0.08 },
-  { anios: 14, label: '14 años',         coeficiente: 0.10 },
-  { anios: 15, label: '15 años',         coeficiente: 0.12 },
-  { anios: 16, label: '16 años',         coeficiente: 0.16 },
-  { anios: 17, label: '17 años',         coeficiente: 0.20 },
-  { anios: 18, label: '18 años',         coeficiente: 0.26 },
-  { anios: 19, label: '19 años',         coeficiente: 0.36 },
-  { anios: 20, label: '20 o más años',   coeficiente: 0.45 },
+  { anios: 0,  label: 'Menos de 1 año', coeficiente: 0.15 },
+  { anios: 1,  label: '1 año',          coeficiente: 0.15 },
+  { anios: 2,  label: '2 años',         coeficiente: 0.14 },
+  { anios: 3,  label: '3 años',         coeficiente: 0.14 },
+  { anios: 4,  label: '4 años',         coeficiente: 0.16 },
+  { anios: 5,  label: '5 años',         coeficiente: 0.18 },
+  { anios: 6,  label: '6 años',         coeficiente: 0.19 },
+  { anios: 7,  label: '7 años',         coeficiente: 0.20 },
+  { anios: 8,  label: '8 años',         coeficiente: 0.19 },
+  { anios: 9,  label: '9 años',         coeficiente: 0.15 },
+  { anios: 10, label: '10 años',        coeficiente: 0.12 },
+  { anios: 11, label: '11 años',        coeficiente: 0.10 },
+  { anios: 12, label: '12 años',        coeficiente: 0.09 },
+  { anios: 13, label: '13 años',        coeficiente: 0.09 },
+  { anios: 14, label: '14 años',        coeficiente: 0.09 },
+  { anios: 15, label: '15 años',        coeficiente: 0.09 },
+  { anios: 16, label: '16 años',        coeficiente: 0.10 },
+  { anios: 17, label: '17 años',        coeficiente: 0.13 },
+  { anios: 18, label: '18 años',        coeficiente: 0.17 },
+  { anios: 19, label: '19 años',        coeficiente: 0.23 },
+  { anios: 20, label: '20 o más años',  coeficiente: 0.40 },
 ];
+
+/** Coeficiente del IIVTNU ya resuelto para un periodo de generación concreto. */
+export interface CoeficienteIIVTNUAplicado {
+  /** Coeficiente que multiplica al valor catastral del suelo. */
+  coeficiente: number;
+  /** Fila de la tabla de la que sale («Menos de 1 año», «7 años», «20 o más años»…). */
+  label: string;
+  /** Periodo inferior a un año: el coeficiente anual se ha prorrateado por meses completos. */
+  prorrateado: boolean;
+  /** Meses completos usados en el prorrateo (solo si `prorrateado`). */
+  meses?: number;
+  /**
+   * Sin los meses, el prorrateo se hace con 11, el máximo que cabe por debajo del año: la
+   * cifra es entonces un TECHO, y quien la publique tiene que decirlo.
+   */
+  cotaSuperior: boolean;
+}
+
+/**
+ * El coeficiente del art. 107.4 TRLRHL para unos años de generación, con las dos reglas de
+ * cómputo que el mismo apartado fija y que las siete consultas directas a la tabla aplicaban
+ * cada una a su manera (verificado en el BOE el 24/09/2026, hallazgo 1560 del Inspector):
+ *
+ *  - «En el cómputo del número de años transcurridos se tomarán años completos»: `Math.floor`,
+ *    con tope en 20 («Igual o superior a 20 años»).
+ *  - «En el caso de que el periodo de generación sea inferior a un año, se prorrateará el
+ *    coeficiente anual teniendo en cuenta el número de meses completos». Hasta ese día toda la
+ *    reventa dentro del año se liquidaba con el coeficiente ENTERO, por encima de lo que la ley
+ *    permite para cualquier número de meses.
+ *
+ * Sin `mesesCompletos` ni años con decimales (las apps que solo preguntan años enteros), un
+ * periodo inferior al año se calcula con 11 meses y se marca `cotaSuperior`: es la cifra más
+ * alta que la ley admite, no la del usuario.
+ */
+export function coeficienteIIVTNU(anios: number, mesesCompletos?: number): CoeficienteIIVTNUAplicado {
+  const aniosCompletos = Math.min(Math.max(0, Math.floor(anios)), 20);
+  const fila =
+    COEFICIENTES_IIVTNU_2025.find((c) => c.anios === aniosCompletos) ??
+    COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1];
+  if (aniosCompletos >= 1) {
+    return { coeficiente: fila.coeficiente, label: fila.label, prorrateado: false, cotaSuperior: false };
+  }
+  // Unos años con decimales por debajo de uno ya dicen los meses (0,5 años = 6 meses completos),
+  // que es como los reciben los motores de la API y el MCP.
+  const deLosAnios = anios > 0 && anios < 1 ? anios * 12 : undefined;
+  const mesesDados = mesesCompletos ?? deLosAnios;
+  const sinMeses = mesesDados === undefined || !Number.isFinite(mesesDados);
+  const meses = sinMeses ? 11 : Math.min(Math.max(0, Math.floor(mesesDados as number)), 11);
+  return {
+    coeficiente: (fila.coeficiente * meses) / 12,
+    label: fila.label,
+    prorrateado: true,
+    meses,
+    cotaSuperior: sinMeses,
+  };
+}

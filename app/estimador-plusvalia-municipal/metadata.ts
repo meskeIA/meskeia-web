@@ -1,5 +1,12 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { COEFICIENTES_IIVTNU_2025 } from '@/data/fiscal';
+import { formatNumber } from '@/lib';
+
+// Extremos de la tabla vigente, derivados: hasta el 24/09/2026 el FAQPage los traía escritos
+// a mano con la tabla caducada del RDL 26/2021 (0,14 … 0,45), hallazgo 1559.
+const COEF_MENOS_DE_UN_ANIO = formatNumber(COEFICIENTES_IIVTNU_2025[0].coeficiente, 2);
+const COEF_VEINTE_O_MAS = formatNumber(COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1].coeficiente, 2);
 
 export const metadata: Metadata = {
   title: 'Estimador Plusvalía Municipal (IIVTNU) 2025 | meskeIA',
@@ -56,7 +63,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la Plusvalía Municipal después del Real Decreto-ley 26/2021?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Desde noviembre de 2021 (RDL 26/2021), el contribuyente puede elegir entre dos métodos y pagar el que resulte menor. El método objetivo multiplica el valor catastral del suelo por un coeficiente fijado por el Ministerio según los años de tenencia (de 0,14 para 1 año a 0,45 para 20 o más años). El método real calcula la ganancia real del suelo comparando el precio de compra y el de venta proporcionales al terreno. El ayuntamiento aplica después el tipo impositivo municipal, que no puede superar el 30 %.',
+        text: `Desde noviembre de 2021 (RDL 26/2021), el contribuyente puede elegir entre dos métodos y pagar el que resulte menor. El método objetivo multiplica el valor catastral del suelo por un coeficiente máximo fijado por ley según los años de tenencia (de ${COEF_MENOS_DE_UN_ANIO} por debajo del año, prorrateado por meses completos, a ${COEF_VEINTE_O_MAS} para 20 o más años; cada ayuntamiento puede aplicar uno menor). El método real calcula la ganancia real del suelo comparando el precio de compra y el de venta proporcionales al terreno. El ayuntamiento aplica después el tipo impositivo municipal, que no puede superar el 30 %.`,
       },
     },
     {

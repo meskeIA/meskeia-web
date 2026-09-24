@@ -22,15 +22,28 @@
  * - Valencia: tipo general 10% → 9% (≤1M €; 11% por encima) desde 01/06/2026
  * - Baleares: reducidos corregidos (jóvenes <30/discapacidad ≥33%: 0%; familia numerosa/VPO: 5%)
  *
+ * Cambios verificados el 24/09/2026 en la norma, no en terceros (hallazgos 1581-1583, 1592,
+ * 1599, 1602 y 1603 del Inspector):
+ * - Valencia: el 11 % por encima de un millón es un UMBRAL sobre todo el valor, no un tramo.
+ *   AJD general 1,4 % (devengos desde el 01/06/2026), 2 % con renuncia a la exención del IVA y
+ *   0,1 % en la vivienda habitual (Ley 5/2026, vigente desde el 11/08/2026). Ley 13/1997,
+ *   arts. 13.Uno y 14, texto consolidado del BOE (BOE-A-1998-8202, versión del 11/08/2026).
+ * - País Vasco: el 4 % del ITP y la exención del AJD son de la VIVIENDA; el resto de inmuebles
+ *   paga el 7 % de ITP y el 0,5 % de AJD (NF 1/2011 de Bizkaia, arts. 13, 44 y 58.35; NF
+ *   18/1987 de Gipuzkoa, arts. 11.1, 29.2 y 41.I.B.11). Álava sin verificar en su fuente.
+ * - Notaría: por encima de 6.010.121,04 € el arancel no fija cantidad (RD 1426/1989, nº 2).
+ *
  * Fuentes:
  * - ATRM Murcia: https://agenciatributaria.carm.es
- * - Garrigues (Valencia 2026): https://www.garrigues.com
+ * - Valencia: https://www.boe.es/buscar/act.php?id=BOE-A-1998-8202 (arts. 13 y 14)
+ * - Bizkaia: https://www.bizkaia.eus (NF 1/2011, texto consolidado)
+ * - Gipuzkoa: https://www.gipuzkoa.eus (NF 18/1987, texto vigente)
  * - OCU / Idealista (referencia general por CCAA)
  */
 
 // ===== TIPOS =====
 
-import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025 } from '@/data/fiscal';
+import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 /**
@@ -63,6 +76,27 @@ const tipoGeneralDe = (nombreEnDataFiscal: string): number => {
   }
   return ficha.tipo;
 };
+
+/**
+ * El tipo de los inmuebles que no son vivienda, SOLO donde `data/fiscal` declara uno propio
+ * (hoy, el País Vasco). Se lee de la ficha por la misma razón que el general: el valor tiene
+ * un solo dueño.
+ */
+const tipoNoViviendaDe = (nombreEnDataFiscal: string): number | undefined =>
+  TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === nombreEnDataFiscal)?.tipoNoVivienda;
+
+/**
+ * Qué se transmite, a efectos de impuesto. Es OBLIGATORIO en `elegirTipoITP`, `calcularITP` y
+ * `calcularAJD` desde el 24/09/2026, a propósito: el País Vasco grava la vivienda al 4 % y el
+ * resto de inmuebles al 7 %, y la exención de AJD de la primera transmisión es solo de la
+ * vivienda. Con un valor por defecto, la app que no lo pasara heredaría en silencio el tipo de
+ * la otra (que es exactamente lo que pasaba: una nave pagaba el ITP de la vivienda, hallazgo
+ * 1582). Obligatorio, TypeScript señala cada llamada que tiene que decidirlo.
+ *
+ * - `vivienda`: la vivienda, y los garajes (hasta dos) y anexos que se transmiten con ella.
+ * - `otro`: local, nave, solar, terreno, y garaje o trastero que se compran sueltos.
+ */
+export type ObjetoTransmision = 'vivienda' | 'otro';
 
 export type ComunidadAutonoma =
   | 'andalucia'
@@ -101,9 +135,24 @@ export interface TipoReducido {
 export interface DatosCCAA {
   nombre: string;
   tipoGeneral: number;          // Tipo fijo general
-  tramosProgresivos?: TramoITP[]; // Si hay escala progresiva
+  /** Tipo de los inmuebles que no son vivienda, si la comunidad los grava distinto. */
+  tipoGeneralNoVivienda?: number;
+  tramosProgresivos?: TramoITP[]; // Si hay escala progresiva (cada tramo, a su tipo)
+  /**
+   * Tipo ÚNICO que sustituye al general sobre TODO el valor cuando este supera un umbral. No
+   * es una escala: en Valencia, 1.200.000 € pagan el 11 % de 1.200.000, no el 9 % del primer
+   * millón y el 11 % del resto (Ley 13/1997, art. 13.Uno: «el tipo aplicable será el 11 %»).
+   */
+  umbralTipoUnico?: { superiorA: number; tipo: number };
   tiposReducidos: TipoReducido[];
-  ajd: number;                  // Actos Jurídicos Documentados (para hipoteca)
+  /** AJD general de las primeras copias de escrituras (cuota gradual). */
+  ajd: number;
+  /** AJD de la vivienda cuando difiere del general (País Vasco: exenta la primera transmisión). */
+  ajdVivienda?: number;
+  /** AJD de la vivienda habitual del comprador, si la comunidad la rebaja. */
+  ajdViviendaHabitual?: number;
+  /** AJD cuando se ha renunciado a la exención del IVA (art. 20.Dos LIVA), si hay tipo propio. */
+  ajdRenuncia?: number;
   notas: string;
 }
 
@@ -511,10 +560,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
   'valencia': {
     nombre: 'Comunidad Valenciana',
     tipoGeneral: tipoGeneralDe('Valencia'),
-    tramosProgresivos: [
-      { hasta: 1000000, tipo: 9 },
-      { hasta: Infinity, tipo: 11 },
-    ],
+    // Umbral, no escala (hallazgos 1581 y 1602): hasta el 24/09/2026 era `tramosProgresivos`
+    // y 1.200.000 € liquidaban 112.000 € en lugar de 132.000.
+    umbralTipoUnico: { superiorA: 1_000_000, tipo: 11 },
     tiposReducidos: [
       {
         nombre: 'VPO primera vivienda',
@@ -553,8 +601,14 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['Víctima de violencia de género', 'Vivienda habitual'],
       },
     ],
-    ajd: 1.5,
-    notas: 'Tipo general 9% desde el 01/06/2026 (antes 10%) para vivienda usada ≤1.000.000 €; 11% por encima. Múltiples tipos reducidos para colectivos.',
+    // Ley 13/1997, art. 14 (BOE-A-1998-8202, versión del 11/08/2026): Cuatro, 1,4 % «en los
+    // demás casos» para devengos desde el 01/06/2026 (antes 1,5); Dos, 2 % con renuncia a la
+    // exención del IVA (hallazgo 1603); Uno.a), 0,1 % en la adquisición de vivienda habitual
+    // (Ley 5/2026, art. 23).
+    ajd: 1.4,
+    ajdViviendaHabitual: 0.1,
+    ajdRenuncia: 2,
+    notas: 'Tipo general 9% desde el 01/06/2026 (antes 10%); si el valor supera 1.000.000 €, el 11% sobre TODO el valor. Múltiples tipos reducidos para colectivos. AJD 1,4% (0,1% en vivienda habitual y 2% con renuncia a la exención del IVA).',
   },
 
   'extremadura': {
@@ -710,6 +764,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
   'pais-vasco': {
     nombre: 'País Vasco',
     tipoGeneral: tipoGeneralDe('País Vasco'),
+    tipoGeneralNoVivienda: tipoNoViviendaDe('País Vasco'),
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual (hasta 120 m²)',
@@ -727,8 +782,14 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['Álava', 'Municipio con problemas de despoblación'],
       },
     ],
-    ajd: 0,
-    notas: 'ITP más bajo de España (4%). Sin AJD. Régimen foral propio.',
+    // El AJD foral es el 0,5 % (Bizkaia, NF 1/2011 art. 44.1; Gipuzkoa, NF 18/1987 art. 29.2),
+    // y la exención es solo de la «primera transmisión de viviendas», con hasta dos garajes y
+    // anexos del mismo edificio y sin los locales de negocio (Bizkaia art. 58.35). Hasta el
+    // 24/09/2026 era `ajd: 0` para todo: una nave o un solar comprados a un promotor no pagaban
+    // AJD (hallazgos 1583 y 1592).
+    ajd: 0.5,
+    ajdVivienda: 0,
+    notas: 'Régimen foral propio. ITP del 4% en vivienda (el más bajo de España) y del 7% en el resto de inmuebles. AJD del 0,5%, del que está exenta la primera transmisión de vivienda.',
   },
 
   'rioja': {
@@ -813,8 +874,18 @@ export const ARANCELES_NOTARIO: TramoArancel[] = [
   { hasta: 150253.03, base: 243.40, exceso: 0.10 },
   { hasta: 601012.10, base: 333.56, exceso: 0.05 },
   { hasta: 6010121.04, base: 558.94, exceso: 0.03 },
-  { hasta: Infinity, base: 2181.67, exceso: 0.02 },
+  // No hay séptimo tramo: «Por lo que excede de 6.010.121,04 euros el Notario percibirá la
+  // cantidad que libremente acuerde con las partes otorgantes» (RD 1426/1989, nº 2.1,
+  // verificado en el BOE el 24/09/2026). Hasta ese día aquí había un { exceso: 0.02 } que la
+  // norma no tiene (hallazgo 1599): el arancel se calcula hasta el límite y lo que excede lo
+  // tiene que avisar la app con `notariaDeLibreAcuerdo`.
 ];
+
+/** Valor a partir del cual el arancel notarial deja de fijar cantidad (RD 1426/1989, nº 2.1). */
+export const LIMITE_ARANCEL_NOTARIAL = 6010121.04;
+
+/** ¿Parte de los honorarios del notario es de libre acuerdo, y por tanto no se puede estimar? */
+export const notariaDeLibreAcuerdo = (valor: number): boolean => valor > LIMITE_ARANCEL_NOTARIAL;
 
 // Aranceles del Registro de la Propiedad
 export const ARANCELES_REGISTRO: TramoArancel[] = [
@@ -839,6 +910,8 @@ export interface TipoElegido {
   tipo: number;
   /** true si es un tipo reducido; false si es el tipo general */
   esReducido: boolean;
+  /** Qué se transmite: `importeITP` lo necesita para aplicar el tipo general que toca. */
+  objeto: ObjetoTransmision;
   nombre?: string;
   /** Condiciones del tipo aplicado, para mostrarlas junto al resultado */
   condiciones?: string[];
@@ -967,11 +1040,21 @@ export function elegirTipoITP(
   ccaa: ComunidadAutonoma,
   perfil: PerfilComprador,
   precio: number,
-  { viviendaHabitual }: { viviendaHabitual: boolean }
+  { viviendaHabitual, objeto }: { viviendaHabitual: boolean; objeto: ObjetoTransmision }
 ): TipoElegido {
   const datos = ITP_CCAA[ccaa];
-  const general: TipoElegido = { tipo: datos.tipoGeneral, esReducido: false, noComprobables: [] };
+  const general: TipoElegido = {
+    tipo: tipoGeneralITP(ccaa, objeto, precio),
+    esReducido: false,
+    objeto,
+    noComprobables: [],
+  };
   if (!datos.tiposReducidos.length) return general;
+  // Donde la comunidad grava aparte lo que no es vivienda (País Vasco), sus reducidos son de
+  // la vivienda: el 2,5 % hasta 120 m² y el de familia numerosa lo dicen en la norma foral; el
+  // de zonas despobladas de Álava no se ha podido verificar. Con otro objeto no se aplican ni se
+  // ofrecen como oportunidad: si alguno fuera alcanzable, el error es por exceso, el recuperable.
+  if (objeto === 'otro' && datos.tipoGeneralNoVivienda !== undefined) return general;
 
 
   // Bonificaciones que dependen del SITIO y no del comprador: se aplican con cualquier
@@ -991,6 +1074,7 @@ export function elegirTipoITP(
     ? {
         tipo: mejorAutomatico.tipo,
         esReducido: true,
+        objeto,
         nombre: mejorAutomatico.nombre,
         noComprobables: [],
       }
@@ -1014,7 +1098,7 @@ export function elegirTipoITP(
       r !== mejorAutomatico &&
       !DE_COLECTIVO.test(normaliza(r.nombre)) &&
       (!r.valorMaximo || precio <= r.valorMaximo) &&
-      r.tipo < (porUbicacion?.tipo ?? datos.tipoGeneral) &&
+      r.tipo < (porUbicacion?.tipo ?? general.tipo) &&
       // Un reducido que exige vivienda habitual esta DESCARTADO, no «sin comprobar»,
       // cuando la app ya sabe que no lo es (un garaje o un trastero sueltos nunca lo son).
       !(!viviendaHabitual && exigeViviendaHabitual(r))
@@ -1114,6 +1198,7 @@ export function elegirTipoITP(
   return {
     tipo: mejor.tipo,
     esReducido: true,
+    objeto,
     nombre: mejor.nombre,
     condiciones: mejor.condiciones,
     // Contra el tipo que se cobra, no contra el general: es la salida por la que se colaba
@@ -1143,7 +1228,47 @@ export function elegirTipoITP(
  */
 export function importeITP(valor: number, ccaa: ComunidadAutonoma, elegido: TipoElegido): number {
   if (elegido.esReducido) return valor * (elegido.tipo / 100);
-  return calcularITP(valor, ccaa); // sin tercer argumento: usa la escala si existe
+  // Sin tipo forzado: usa la escala o el umbral si existen, y el tipo del objeto que toca
+  return calcularITP(valor, ccaa, elegido.objeto);
+}
+
+/**
+ * El tipo general NOMINAL que se aplica a un valor: el de la vivienda o el del resto de
+ * inmuebles, y el del umbral cuando el valor lo supera (Valencia: 11 % sobre todo el valor por
+ * encima del millón). Con escala progresiva devuelve el del primer tramo, que es el que se
+ * rotula junto al tipo efectivo.
+ */
+export function tipoGeneralITP(ccaa: ComunidadAutonoma, objeto: ObjetoTransmision, valor: number): number {
+  const datos = ITP_CCAA[ccaa];
+  if (datos.umbralTipoUnico && valor > datos.umbralTipoUnico.superiorA) return datos.umbralTipoUnico.tipo;
+  return objeto === 'otro' && datos.tipoGeneralNoVivienda !== undefined
+    ? datos.tipoGeneralNoVivienda
+    : datos.tipoGeneral;
+}
+
+/**
+ * Cómo sube el tipo general con el valor, dicho con las palabras que corresponden, o null si
+ * no sube. Existe porque las siete apps del clúster pintaban «Esta comunidad aplica escala
+ * progresiva (9 % → 11 %)» para Valencia, que no tiene escala sino umbral: el recuadro
+ * describía justo el cálculo equivocado que hacía el motor (hallazgos 1581 y 1602).
+ */
+export function describirSubidaITP(ccaa: ComunidadAutonoma): string | null {
+  const datos = ITP_CCAA[ccaa];
+  const pct = (t: number) => `${formatNumber(t, Number.isInteger(t) ? 0 : 2)} %`;
+  if (datos.umbralTipoUnico) {
+    return (
+      `el tipo general es del ${pct(datos.tipoGeneral)}, y si el valor supera ` +
+      `${formatNumber(datos.umbralTipoUnico.superiorA, 0)} € pasa al ` +
+      `${pct(datos.umbralTipoUnico.tipo)} sobre TODO el valor, no solo sobre el exceso`
+    );
+  }
+  if (datos.tramosProgresivos?.length) {
+    return (
+      `aplica escala progresiva (${datos.tramosProgresivos.map((t) => pct(t.tipo)).join(' → ')}): ` +
+      `cada tramo del valor tributa a su tipo`
+    );
+  }
+  return null;
 }
 
 /**
@@ -1157,19 +1282,28 @@ export function importeITP(valor: number, ccaa: ComunidadAutonoma, elegido: Tipo
  * escribirlo a mano garantiza que se quede atrás en cuanto una comunidad se mueva.
  *
  * `min` es el tipo general más bajo y `max` el tramo más alto de las escalas
- * progresivas. Deliberadamente NO entran los tipos reducidos, que bajan mucho más
- * (Madrid llega a 0 % y Castilla y León a 0,01 %): el rango describe lo que paga quien
- * no encaja en ningún colectivo, que es la lectura útil de «el ITP va del X al Y».
+ * progresivas (o el tipo de un umbral). Deliberadamente NO entran los tipos reducidos, que
+ * bajan mucho más (Madrid llega a 0 % y Castilla y León a 0,01 %): el rango describe lo que
+ * paga quien no encaja en ningún colectivo, que es la lectura útil de «el ITP va del X al Y».
+ *
+ * ── Dos rangos desde el 24/09/2026 (hallazgo 1582) ───────────────────────────
+ * Hasta ese día había uno solo, y su mínimo era el 4 % de la VIVIENDA vasca: las apps de
+ * nave, local, solar o terreno lo publicaban en su FAQ para inmuebles que allí pagan el 7 %.
+ * El nombre viejo (`RANGO_ITP`) se retiró para que cada app tuviera que elegir el suyo.
  */
-export const RANGO_ITP: { min: number; max: number } = (() => {
-  const comunidades = Object.values(ITP_CCAA);
-  const generales = comunidades.map((c) => c.tipoGeneral);
-  const deEscalas = comunidades.flatMap((c) => (c.tramosProgresivos ?? []).map((t) => t.tipo));
-  return {
-    min: Math.min(...generales),
-    max: Math.max(...generales, ...deEscalas),
-  };
-})();
+function rangoITP(objeto: ObjetoTransmision): { min: number; max: number } {
+  const claves = Object.keys(ITP_CCAA) as ComunidadAutonoma[];
+  const generales = claves.map((c) => tipoGeneralITP(c, objeto, 0));
+  const altos = claves.flatMap((c) => [
+    ...(ITP_CCAA[c].tramosProgresivos ?? []).map((t) => t.tipo),
+    ...(ITP_CCAA[c].umbralTipoUnico ? [ITP_CCAA[c].umbralTipoUnico!.tipo] : []),
+  ]);
+  return { min: Math.min(...generales), max: Math.max(...generales, ...altos) };
+}
+/** ITP de la vivienda (y de los garajes y anexos que se transmiten con ella). */
+export const RANGO_ITP_VIVIENDA = rangoITP('vivienda');
+/** ITP de local, nave, solar, terreno, y garaje o trastero sueltos. */
+export const RANGO_ITP_OTROS = rangoITP('otro');
 
 /**
  * Rango de AJD (Actos Jurídicos Documentados) en primera transmisión, DERIVADO de la tabla.
@@ -1177,24 +1311,34 @@ export const RANGO_ITP: { min: number; max: number } = (() => {
  * ── De dónde sale (21/08/2026) ────────────────────────────────────────────────
  * El Inspector encontró el mismo defecto en cuatro apps del clúster de compraventa: la
  * FAQ y las tablas comparativas anunciaban «entre el 0,5 % y el 1,5 % según la comunidad»
- * mientras la propia app cobraba 0 € de AJD en el País Vasco (`ajd: 0`, régimen foral) y
- * su recuadro de comunidad lo decía en la misma pantalla. El extremo alto sí acertaba; el
- * bajo no. Es el caso de RANGO_ITP repetido: un rango es un dato derivado de la tabla, y
- * escribirlo a mano garantiza que se quede atrás en cuanto una comunidad se mueva.
+ * mientras la propia app cobraba 0 € de AJD en el País Vasco y su recuadro de comunidad lo
+ * decía en la misma pantalla. Es el caso de RANGO_ITP repetido: un rango es un dato derivado
+ * de la tabla, y escribirlo a mano garantiza que se quede atrás en cuanto una comunidad se mueva.
+ *
+ * ── Dos rangos desde el 24/09/2026 (hallazgos 1583 y 1592) ───────────────────
+ * Aquel 0 % era la exención foral de la primera VIVIENDA, y el rango único la publicaba para
+ * naves y solares, que allí pagan el 0,5 %. Sin los tipos incrementados por renuncia al IVA,
+ * que solo están verificados en Valencia: el rango es el AJD general de cada comunidad.
  */
-export const RANGO_AJD: { min: number; max: number } = (() => {
-  const tipos = Object.values(ITP_CCAA).map((c) => c.ajd);
+function rangoAJD(objeto: ObjetoTransmision): { min: number; max: number } {
+  const claves = Object.keys(ITP_CCAA) as ComunidadAutonoma[];
+  const tipos = claves.map((c) => tipoAJD(c, { objeto }).tipo);
   return { min: Math.min(...tipos), max: Math.max(...tipos) };
-})();
+}
+/** AJD de la primera transmisión de una vivienda (sin contar rebajas por vivienda habitual). */
+export const RANGO_AJD_VIVIENDA = rangoAJD('vivienda');
+/** AJD de local, nave, solar, terreno, y garaje o trastero sueltos. */
+export const RANGO_AJD_OTROS = rangoAJD('otro');
 
 // ===== FUNCIONES DE CÁLCULO =====
 
 /**
- * Calcula el ITP según la comunidad autónoma y tipo aplicable
+ * Calcula el ITP según la comunidad autónoma, lo que se transmite y, si se fuerza, un tipo.
  */
 export function calcularITP(
   valor: number,
   ccaa: ComunidadAutonoma,
+  objeto: ObjetoTransmision,
   tipoAplicable?: number // Si se quiere forzar un tipo reducido
 ): number {
   const datos = ITP_CCAA[ccaa];
@@ -1206,9 +1350,12 @@ export function calcularITP(
     return valor * (tipoAplicable / 100);
   }
 
-  const cuota = datos.tramosProgresivos && datos.tramosProgresivos.length > 0
-    ? calcularITPProgresivo(valor, datos.tramosProgresivos)
-    : valor * (datos.tipoGeneral / 100);
+  const cuota =
+    datos.umbralTipoUnico && valor > datos.umbralTipoUnico.superiorA
+      ? valor * (datos.umbralTipoUnico.tipo / 100)
+      : datos.tramosProgresivos && datos.tramosProgresivos.length > 0
+        ? calcularITPProgresivo(valor, datos.tramosProgresivos)
+        : valor * (tipoGeneralITP(ccaa, objeto, valor) / 100);
 
   return aplicarBonificacionCiudad(cuota, ccaa);
 }
@@ -1280,14 +1427,49 @@ export function calcularIVA(valor: number, tipoInmueble: 'vivienda' | 'garaje' |
   return valor * (tipo / 100);
 }
 
+/** Lo que decide el tipo del AJD de una primera copia de escritura de compraventa. */
+export interface ContextoAJD {
+  /** Qué se transmite (obligatorio: ver `ObjetoTransmision`). */
+  objeto: ObjetoTransmision;
+  /** La vivienda será la habitual del comprador (Valencia la grava al 0,1 %). */
+  viviendaHabitual?: boolean;
+  /** Entrega con renuncia a la exención del IVA (art. 20.Dos LIVA): Valencia, 2 %. */
+  renunciaExencionIVA?: boolean;
+}
+
+export type MotivoAJD = 'general' | 'vivienda' | 'vivienda-habitual' | 'renuncia';
+
+/**
+ * El tipo NOMINAL del AJD para una operación, y por qué es ese. Sin la bonificación de Ceuta
+ * y Melilla, que aplica `calcularAJD` por el sitio del inmueble.
+ *
+ * Orden: la renuncia manda sobre lo demás (es un inmueble no residencial por definición);
+ * luego la vivienda habitual y la vivienda; si no, el general. Los tipos propios solo están
+ * declarados donde se han verificado en la norma (24/09/2026: Valencia y País Vasco); en el
+ * resto de comunidades rige su `ajd`, y las apps avisan de que algunas incrementan el de la
+ * renuncia.
+ */
+export function tipoAJD(ccaa: ComunidadAutonoma, contexto: ContextoAJD): { tipo: number; motivo: MotivoAJD } {
+  const datos = ITP_CCAA[ccaa];
+  if (contexto.renunciaExencionIVA && datos.ajdRenuncia !== undefined) {
+    return { tipo: datos.ajdRenuncia, motivo: 'renuncia' };
+  }
+  if (contexto.objeto === 'vivienda') {
+    if (contexto.viviendaHabitual && datos.ajdViviendaHabitual !== undefined) {
+      return { tipo: datos.ajdViviendaHabitual, motivo: 'vivienda-habitual' };
+    }
+    if (datos.ajdVivienda !== undefined) return { tipo: datos.ajdVivienda, motivo: 'vivienda' };
+  }
+  return { tipo: datos.ajd, motivo: 'general' };
+}
+
 /**
  * Calcula AJD (Actos Jurídicos Documentados)
  */
-export function calcularAJD(valor: number, ccaa: ComunidadAutonoma): number {
-  const datos = ITP_CCAA[ccaa];
+export function calcularAJD(valor: number, ccaa: ComunidadAutonoma, contexto: ContextoAJD): number {
   // El art. 57 bis.1 del TRLITPAJD bonifica al 50 % la cuota gradual de documentos
   // notariales cuando el Registro radica en Ceuta o Melilla — mismo criterio de sitio.
-  return aplicarBonificacionCiudad(valor * (datos.ajd / 100), ccaa);
+  return aplicarBonificacionCiudad(valor * (tipoAJD(ccaa, contexto).tipo / 100), ccaa);
 }
 
 /**
@@ -1297,11 +1479,13 @@ export function calcularAJD(valor: number, ccaa: ComunidadAutonoma): number {
 export function calcularArancelNotarial(valor: number): number {
   let total = 0;
   let limiteAnterior = 0;
+  // Solo la parte reglada: lo que excede de LIMITE_ARANCEL_NOTARIAL es de libre acuerdo.
+  const reglado = Math.min(valor, LIMITE_ARANCEL_NOTARIAL);
 
   for (const tramo of ARANCELES_NOTARIO) {
-    if (valor <= limiteAnterior) break;
+    if (reglado <= limiteAnterior) break;
 
-    const base = Math.min(valor, tramo.hasta);
+    const base = Math.min(reglado, tramo.hasta);
     if (limiteAnterior === 0) {
       total = tramo.base;
     } else {
@@ -1505,6 +1689,12 @@ export interface DatosPlusvalia {
    * Para suelo sin construcción (solar, finca rústica) coincide con el valor del suelo.
    */
   valorCatastralTotal?: number;
+  /**
+   * Meses completos, solo cuando el periodo es inferior a un año (años = 0): el coeficiente
+   * anual se prorratea por ellos (art. 107.4 TRLRHL). Sin este dato se usa 11, el máximo, y el
+   * resultado sale marcado como `cotaSuperior`.
+   */
+  mesesCompletos?: number;
   tipoMaximo?: number; // Por defecto el tipo orientativo (25%); el máximo legal es 30%
 }
 
@@ -1526,6 +1716,13 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   parCatastralImposible: boolean;
   recomendado: number;
   exento: boolean;
+  /** Coeficiente aplicado en el método objetivo. */
+  coeficiente: number;
+  /**
+   * Periodo inferior a un año sin los meses: el objetivo se ha calculado con 11, el máximo, y es
+   * un TECHO (hallazgo 1560). La app que lo publique tiene que decirlo.
+   */
+  cotaSuperior: boolean;
 } {
   const {
     valorCatastralSuelo,
@@ -1533,18 +1730,19 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
     precioCompra,
     precioVenta,
     valorCatastralTotal,
+    mesesCompletos,
     tipoMaximo = PLUSVALIA_MUNICIPAL_META.tipoOrientativo,
   } = datos;
 
-  // Coeficientes oficiales (RDL 26/2021 + actualización anual), centralizados en data/fiscal/inmuebles.ts
+  // Coeficiente del art. 107.4 TRLRHL con sus dos reglas de cómputo (años completos, y prorrateo
+  // por meses por debajo del año), centralizadas en data/fiscal (`coeficienteIIVTNU`).
   //
-  // El suelo es 0, no 1: la tabla tiene fila propia para «Menos de 1 año» (coeficiente 0,14,
-  // el tercero más alto), porque desde el RDL 26/2021 la reventa antes del año SÍ tributa.
-  // Con el suelo en 1 ese coeficiente era inalcanzable desde cualquier app del catálogo y la
-  // transmisión más rápida se liquidaba con el del año 1, que es MENOR (hallazgo 666 del
-  // Inspector, 07/09/2026). Las apps que usan el 0 como «campo vacío» filtran antes de llamar.
-  const aniosCapped = Math.min(Math.max(aniosPropiedad, 0), 20);
-  const coeficiente = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosCapped)?.coeficiente ?? 0.45;
+  // El suelo es 0, no 1: la tabla tiene fila propia para «Menos de 1 año», porque desde el RDL
+  // 26/2021 la reventa antes del año SÍ tributa (hallazgo 666). Pero ese coeficiente es ANUAL y
+  // se prorratea por meses completos: aplicarlo entero superaba lo que la ley permite para
+  // cualquier reventa dentro del año (hallazgo 1560, 24/09/2026). Las apps que usan el 0 como
+  // «campo vacío» filtran antes de llamar.
+  const { coeficiente, cotaSuperior } = coeficienteIIVTNU(aniosPropiedad, mesesCompletos);
 
   // Método objetivo (art. 107.4 TRLHL)
   const baseObjetivo = valorCatastralSuelo * coeficiente;
@@ -1588,6 +1786,8 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
     parCatastralImposible,
     recomendado,
     exento,
+    coeficiente,
+    cotaSuperior,
   };
 }
 
@@ -1636,8 +1836,11 @@ export function respuestaEscriturar({ inmueble, valorReferencia }: CasoEscritura
     `RD 1426/1989 y la extensión de la escritura. A eso hay que sumarle la inscripción en el ` +
     `Registro de la Propiedad (unos ${euros(registro)} € para ese mismo importe) y, sobre ` +
     `todo, el impuesto de la transmisión, que es la partida más grande: el ITP, del ` +
-    `${formatNumber(RANGO_ITP.min, 0)}% al ${formatNumber(RANGO_ITP.max, 0)}% según la ` +
-    `comunidad autónoma, o IVA más AJD cuando la operación tributa por IVA —esta página ` +
+    `${formatNumber(RANGO_ITP_OTROS.min, 0)}% al ${formatNumber(RANGO_ITP_OTROS.max, 0)}% según la ` +
+    // El rango es de tipos nominales: en Ceuta y Melilla la cuota se bonifica al 50 % y se paga
+    // la mitad, por debajo del mínimo (hallazgo 1593, 24/09/2026).
+    `comunidad autónoma (la mitad en Ceuta y Melilla, por su bonificación del ` +
+    `${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)} %), o IVA más AJD cuando la operación tributa por IVA —esta página ` +
     `explica más abajo cuál de los dos toca en este caso—. Si además se encarga la gestión a ` +
     `una gestoría, súmale su minuta. El simulador de arriba lo calcula para tu precio y tu ` +
     `comunidad.`

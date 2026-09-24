@@ -1,5 +1,25 @@
 import { Metadata } from 'next';
-import { PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
+import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
+import { formatNumber } from '@/lib';
+
+/** La respuesta sobre los coeficientes, compuesta con la tabla vigente de data/fiscal. */
+const RESPUESTA_COEFICIENTES = (() => {
+  const c = COEFICIENTES_IIVTNU_2025;
+  const f = (n: number) => formatNumber(n, 2);
+  const minimo = Math.min(...c.map((x) => x.coeficiente));
+  const aniosMinimo = c.filter((x) => x.coeficiente === minimo).map((x) => x.anios);
+  const tramoMinimo =
+    aniosMinimo.length > 1
+      ? `entre los ${aniosMinimo[0]} y los ${aniosMinimo[aniosMinimo.length - 1]} años`
+      : `a los ${aniosMinimo[0]} años`;
+  return (
+    `Los coeficientes máximos van de ${f(c[0].coeficiente)} para menos de un año de tenencia ` +
+    `(prorrateado por meses completos) a ${f(c[c.length - 1].coeficiente)} para 20 o más años, ` +
+    `con su valor más bajo, ${f(minimo)}, ${tramoMinimo}. Cada ayuntamiento puede aplicar ` +
+    `coeficientes iguales o inferiores a esos máximos, y el tipo de gravamen no puede superar ` +
+    `el ${formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%.`
+  );
+})();
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/plusvalia-municipal/';
 
@@ -122,7 +142,10 @@ export const faqJsonLd = {
       name: '¿Cuál es el coeficiente de la plusvalía según los años?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los coeficientes máximos van desde 0,14 para menos de un año de tenencia hasta 0,45 para 20 o más años, pasando por valores más bajos en torno a los 8-13 años (0,08). Cada ayuntamiento puede aplicar coeficientes iguales o inferiores a esos máximos, y el tipo de gravamen no puede superar el 30%.',
+        // Derivado de la tabla: hasta el 24/09/2026 estaba escrito a mano con la del RDL 26/2021
+        // (0,14 … 0,45), caducada desde 2023, en el FAQPage que leen los asistentes de IA
+        // (hallazgo 1559).
+        text: RESPUESTA_COEFICIENTES,
       },
     },
   ],

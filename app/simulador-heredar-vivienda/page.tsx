@@ -23,7 +23,7 @@ import {
   BONIFICACIONES_CCAA_IS,
   COEFICIENTES_IS,
   COEFICIENTES_CATALUNA_IS,
-  COEFICIENTES_IIVTNU_2025,
+  coeficienteIIVTNU,
   REDUCCION_VIVIENDA_PORC_IS,
   PORC_AJUAR_DOMESTICO_IS,
   REDUCCION_VIVIENDA_MAX_IS,
@@ -540,10 +540,11 @@ function calcularPlusvaliaMunicipal(
   aniosTenencia: number,
   valorCatastralTotal: number
 ): ResultadoPlusvalia {
-  // Coeficiente según años (max 20)
+  // Coeficiente según años (max 20). Desde el 24/09/2026 sale de `coeficienteIIVTNU`, que lee
+  // la tabla vigente del art. 107.4 (RDL 8/2023) y prorratea por meses por debajo del año;
+  // antes se consultaba aquí la del RDL 26/2021, caducada desde 2023 (hallazgos 1559 y 1560).
   const aniosClamp = Math.min(20, Math.max(0, aniosTenencia));
-  const coefRow = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosClamp);
-  const coeficiente = coefRow?.coeficiente ?? 0.45;
+  const coeficiente = coeficienteIIVTNU(aniosClamp).coeficiente;
 
   // Método objetivo: valor catastral del suelo × coef × tipo municipal (art. 107.4 TRLHL)
   const baseObjetiva = valorCatastralSuelo * coeficiente;
@@ -1355,8 +1356,15 @@ export default function SimuladorHeredarViviendaPage() {
               <strong>{formatCurrency(valorCatastralSuelo)}</strong>
             </div>
             <div className={styles.panelLine}>
-              <span>Coeficiente {plusvalia.aniosTenencia} años</span>
-              <strong>{formatNumber(plusvalia.coeficiente, 2)}</strong>
+              {/* Por debajo del año el coeficiente se prorratea por meses y la app no los pregunta:
+                  es el TECHO con 11 meses (coeficienteIIVTNU), y con dos decimales 0,1375 se leía
+                  «0,14» junto a una cuota calculada con 0,1375 (24/09/2026, hallazgo 1560). */}
+              <span>
+                {plusvalia.aniosTenencia < 1
+                  ? 'Coeficiente, menos de 1 año (máximo: prorrateado a 11 meses)'
+                  : `Coeficiente ${plusvalia.aniosTenencia} años`}
+              </span>
+              <strong>{formatNumber(plusvalia.coeficiente, plusvalia.aniosTenencia < 1 ? 4 : 2)}</strong>
             </div>
             <div className={styles.panelLine}>
               <span>Tipo municipal (orientativo)</span>
@@ -1425,8 +1433,10 @@ export default function SimuladorHeredarViviendaPage() {
                   <>
                     <div className={styles.panelLine}>
                       <span>
-                        − Plusvalía municipal de la venta ({plusvaliaVenta.aniosTenencia} años,
-                        coef. {formatNumber(plusvaliaVenta.coeficiente, 2)})
+                        − Plusvalía municipal de la venta ({plusvaliaVenta.aniosTenencia < 1
+                          ? 'menos de 1 año, coef. máximo'
+                          : `${plusvaliaVenta.aniosTenencia} años, coef.`}{' '}
+                        {formatNumber(plusvaliaVenta.coeficiente, plusvaliaVenta.aniosTenencia < 1 ? 4 : 2)})
                       </span>
                       <strong>−{formatCurrency(plusvaliaVenta.cuotaFinal)}</strong>
                     </div>

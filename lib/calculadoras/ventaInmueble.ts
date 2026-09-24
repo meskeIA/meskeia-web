@@ -10,7 +10,7 @@
  */
 
 import {
-  COEFICIENTES_IIVTNU_2025,
+  coeficienteIIVTNU,
   PLUSVALIA_MUNICIPAL_META,
   FISCAL_IRPF_META,
   calcularGananciaInmueble,
@@ -136,9 +136,8 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
     iivtnuCalculable = true;
 
     // Método objetivo (art. 107.4 TRLHL): valor catastral del suelo × coeficiente
-    const aniosClamped = Math.min(Math.floor(p.aniosTenencia), 20);
-    const coefEntry = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosClamped)
-      ?? COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1];
+    // Años completos, tope en 20 y prorrateo por meses bajo el año (hallazgos 1559 y 1560).
+    const coefEntry = coeficienteIIVTNU(p.aniosTenencia);
     const baseObjetivo = r(valorCatastralSuelo * coefEntry.coeficiente);
     const plusvaliaObjetivo = r(baseObjetivo * (tipoMunicipal / 100));
 

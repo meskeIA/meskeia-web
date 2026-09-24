@@ -18,8 +18,8 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   COEFICIENTES_IIVTNU_2025,
+  coeficienteIIVTNU,
   PLUSVALIA_MUNICIPAL_META,
-  FISCAL_INMUEBLES_META,
   PLAZO_IIVTNU,
 } from '@/data/fiscal';
 
@@ -41,6 +41,10 @@ export default function EstimadorPlusvaliaMunicipalPage() {
   // Datos comunes
   const [vcSuelo, setVcSuelo] = useState('');
   const [aniosTenencia, setAniosTenencia] = useState('');
+  // Solo con «Menos de 1 año»: el coeficiente anual se prorratea por meses completos
+  // (art. 107.4 TRLRHL). Hasta el 24/09/2026 la FAQ lo prometía y el cálculo no lo hacía:
+  // aplicaba el coeficiente entero a cualquier reventa dentro del año (hallazgo 1560).
+  const [mesesTenencia, setMesesTenencia] = useState('');
   const [tipoMunicipal, setTipoMunicipal] = useState('25');
 
   // Datos método real (opcionales)
@@ -52,11 +56,9 @@ export default function EstimadorPlusvaliaMunicipalPage() {
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [errores, setErrores] = useState<string[]>([]);
 
-  const obtenerCoeficiente = (anios: number): number => {
-    const aniosClamp = Math.min(Math.max(0, Math.floor(anios)), 20);
-    const entrada = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosClamp);
-    return entrada?.coeficiente ?? COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1].coeficiente;
-  };
+  const menosDeUnAnio = aniosTenencia === '0';
+  const obtenerCoeficiente = (anios: number): number =>
+    coeficienteIIVTNU(anios, menosDeUnAnio && mesesTenencia !== '' ? Number(mesesTenencia) : undefined).coeficiente;
 
   const calcular = () => {
     const nuevosErrores: string[] = [];
@@ -70,6 +72,9 @@ export default function EstimadorPlusvaliaMunicipalPage() {
     }
     if (!aniosTenencia || isNaN(aniosNum) || aniosNum < 0) {
       nuevosErrores.push('Introduce los años de tenencia (0 o más).');
+    }
+    if (menosDeUnAnio && mesesTenencia === '') {
+      nuevosErrores.push('Con menos de 1 año, indica los meses completos: el coeficiente se prorratea por ellos.');
     }
     if (!tipoMunicipal || isNaN(tipoNum) || tipoNum <= 0 || tipoNum > 30) {
       nuevosErrores.push('El tipo impositivo municipal debe estar entre 0,01% y 30%.');
@@ -140,6 +145,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
   const resetear = () => {
     setVcSuelo('');
     setAniosTenencia('');
+    setMesesTenencia('');
     setTipoMunicipal('25');
     setPrecioAdquisicion('');
     setPrecioTransmision('');
@@ -150,7 +156,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
   };
 
   const aniosSeleccionados = parseSpanishNumber(aniosTenencia);
-  const coefMostrar = !isNaN(aniosSeleccionados) && aniosSeleccionados >= 0
+  const coefMostrar = !isNaN(aniosSeleccionados) && aniosSeleccionados >= 0 && !(menosDeUnAnio && mesesTenencia === '')
     ? obtenerCoeficiente(aniosSeleccionados)
     : null;
 
@@ -202,14 +208,14 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               Años de tenencia
               {coefMostrar !== null && (
                 <span className={styles.coefBadge}>
-                  Coeficiente: {formatNumber(coefMostrar, 2)}
+                  Coeficiente: {formatNumber(coefMostrar, menosDeUnAnio ? 4 : 2)}
                 </span>
               )}
             </label>
             <select
               className={styles.select}
               value={aniosTenencia}
-              onChange={e => setAniosTenencia(e.target.value)}
+              onChange={e => { setAniosTenencia(e.target.value); setMesesTenencia(''); }}
               aria-label="Años de tenencia del inmueble"
             >
               <option value="">Selecciona los años</option>
@@ -221,6 +227,31 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </select>
             <p className={styles.helperText}>Tiempo transcurrido desde la adquisición hasta la transmisión</p>
           </div>
+
+          {menosDeUnAnio && (
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="meses-tenencia">
+                Meses completos de tenencia
+              </label>
+              <select
+                id="meses-tenencia"
+                className={styles.select}
+                value={mesesTenencia}
+                onChange={e => setMesesTenencia(e.target.value)}
+              >
+                <option value="">Selecciona los meses</option>
+                {Array.from({ length: 12 }, (_, m) => (
+                  <option key={m} value={m}>
+                    {m === 1 ? '1 mes' : `${m} meses`}
+                  </option>
+                ))}
+              </select>
+              <p className={styles.helperText}>
+                Por debajo del año, el coeficiente de {formatNumber(COEFICIENTES_IIVTNU_2025[0].coeficiente, 2)} se
+                prorratea por los meses completos (art. 107.4 TRLRHL): con 6 meses, la mitad.
+              </p>
+            </div>
+          )}
 
           <NumberInput
             value={tipoMunicipal}
@@ -384,8 +415,10 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             {coefMostrar !== null && (
               <div className={styles.notaCalculo}>
                 <p>
-                  <strong>Coeficiente aplicado:</strong> {formatNumber(coefMostrar, 2)}&nbsp;
-                  (según tabla IIVTNU 2025, RDL 26/2021)
+                  {/* Con prorrateo, cuatro decimales: con dos, 0,075 se leía «0,08» junto a una cuota
+                      calculada con 0,075 (regresión del 24/09/2026, al introducir el prorrateo). */}
+                  <strong>Coeficiente aplicado:</strong> {formatNumber(coefMostrar, menosDeUnAnio ? 4 : 2)}&nbsp;
+                  (máximos del art. 107.4 TRLRHL, redacción del RDL 8/2023)
                 </p>
               </div>
             )}
@@ -396,10 +429,12 @@ export default function EstimadorPlusvaliaMunicipalPage() {
       {/* DisclaimerCard — siempre visible, fuera de cualquier toggle */}
       <DisclaimerCard variant="financial" severity="critical" />
 
+      {/* El sello del IIVTNU, no el del módulo de inmuebles: FISCAL_INMUEBLES_META fecha una revisión
+          del ITP y cita normas que esta app no aplica (misma forma que el hallazgo 610). */}
       <DataReference
-        normativa={FISCAL_INMUEBLES_META.fuente}
-        fuente={FISCAL_INMUEBLES_META.fuente}
-        verificado={FISCAL_INMUEBLES_META.verificado}
+        normativa="Plusvalía municipal (IIVTNU)"
+        fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
+        verificado={PLUSVALIA_MUNICIPAL_META.verificado}
         urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
       />
 
@@ -470,7 +505,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>Coeficientes 2025 (máximos legales)</h2>
+          <h2>Coeficientes máximos legales vigentes</h2>
           <div className={styles.tablaScroll}>
             <table className={styles.tablaCoeficientes}>
               <thead>
@@ -490,7 +525,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </table>
           </div>
           <p className={styles.tablaNote}>
-            Fuente: RDL 26/2021 + actualización Ley de Presupuestos.
+            Fuente: art. 107.4 del TRLRHL, en la redacción del RDL 8/2023 (vigente desde 2024).
             Los Ayuntamientos pueden aplicar coeficientes inferiores a estos máximos.
           </p>
         </section>
@@ -559,7 +594,9 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 Tipo municipal: <strong>25 %</strong>.
               </p>
               <ul>
-                <li><strong>Método objetivo:</strong> 50.000 × 0,45 × 25% = <strong>5.625 €</strong></li>
+                {/* 2009 → 2024 son 15 años: coeficiente vigente de 15 años (hasta el 24/09/2026 ponía
+                    0,45, que no era el de 15 años ni en la tabla caducada). */}
+                <li><strong>Método objetivo:</strong> 50.000 × {formatNumber(coeficienteIIVTNU(15).coeficiente, 2)} × 25% = <strong>{formatNumber(50000 * coeficienteIIVTNU(15).coeficiente * 0.25, 0)} €</strong></li>
                 <li><strong>Método real:</strong> (220.000 − 120.000) × 55,6% × 25% = <strong>13.900 €</strong></li>
               </ul>
               <p className={styles.escenarioTip}>
@@ -681,9 +718,9 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             <div className={styles.faqItem}>
               <dt>¿Cómo se calcula si tengo el inmueble menos de 1 año?</dt>
               <dd>
-                Si la tenencia es inferior a 12 meses, se aplica el coeficiente correspondiente a <strong>menos
-                de 1 año</strong> (0,14 según la tabla 2025). El cálculo es proporcional a los meses completos
-                transcurridos. En el método real, el incremento también puede ser muy elevado en poco tiempo,
+                Si la tenencia es inferior a 12 meses, el coeficiente de <strong>menos de 1 año</strong>
+                ({formatNumber(COEFICIENTES_IIVTNU_2025[0].coeficiente, 2)} como máximo estatal) se prorratea
+                por los meses completos transcurridos (art. 107.4 TRLRHL): con 6 meses se aplica la mitad. En el método real, el incremento también puede ser muy elevado en poco tiempo,
                 por lo que conviene comparar ambos métodos igualmente.
               </dd>
             </div>
@@ -702,7 +739,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             <div className={styles.faqItem}>
               <dt>¿Qué pasa si el Ayuntamiento tiene coeficientes inferiores a los máximos legales?</dt>
               <dd>
-                Los coeficientes de la tabla (RDL 26/2021) son <strong>máximos legales</strong>. Cada Ayuntamiento
+                Los coeficientes de la tabla (art. 107.4 TRLRHL) son <strong>máximos legales</strong>. Cada Ayuntamiento
                 puede aprobar en ordenanza fiscal unos coeficientes iguales o inferiores. Si tu municipio
                 aplica coeficientes menores, la cuota por el método objetivo será más baja que la estimada
                 aquí. Siempre consulta la ordenanza fiscal de tu Ayuntamiento antes de autoliquidar.
@@ -758,7 +795,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <div className={styles.stepContent}>
                 <strong>Calcula por el método objetivo</strong>
                 <p>
-                  Fórmula: <em>Valor catastral del suelo × coeficiente (tabla 2025 según años) × tipo municipal</em>.
+                  Fórmula: <em>Valor catastral del suelo × coeficiente (máximo legal según años) × tipo municipal</em>.
                   El tipo municipal máximo es el 30%; consulta la ordenanza de tu municipio para el tipo real aplicado.
                 </p>
               </div>

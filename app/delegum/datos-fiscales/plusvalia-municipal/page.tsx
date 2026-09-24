@@ -152,8 +152,9 @@ export default function PlusvaliaMunicipalPage() {
               </table>
             </div>
             <p className={styles.tableFoot}>
-              Los coeficientes se actualizan cada año por la Ley de Presupuestos. Si no se aprueba,
-              se prorrogan los del ejercicio anterior.
+              El art. 107.4 prevé actualizarlos por norma con rango de ley (puede ser la de
+              Presupuestos); mientras no se actualizan, siguen vigentes los últimos aprobados. Por
+              debajo del año, el coeficiente se prorratea por meses completos.
             </p>
           </section>
 

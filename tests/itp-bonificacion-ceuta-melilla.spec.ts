@@ -37,32 +37,32 @@ test.describe('ITP — bonificación del 50 % en Ceuta y Melilla (art. 57 bis TR
   test('Ceuta: 500.000 € tributan 15.000 €, la mitad del 6 % general', () => {
     // Tipo general declarado para Ceuta: 6 % → 30.000 €. Bonificado al 50 % → 15.000 €.
     expect(ITP_CCAA['ceuta'].tipoGeneral).toBe(6);
-    expect(calcularITP(500000, 'ceuta')).toBeCloseTo(15000, 2);
+    expect(calcularITP(500000, 'ceuta', 'otro')).toBeCloseTo(15000, 2);
   });
 
   test('Melilla: mismo trato que Ceuta', () => {
-    expect(calcularITP(500000, 'melilla')).toBeCloseTo(15000, 2);
+    expect(calcularITP(500000, 'melilla', 'otro')).toBeCloseTo(15000, 2);
   });
 
   test('el tipo EFECTIVO resultante es el 3 %, y así debe rotularse', () => {
-    expect((calcularITP(500000, 'ceuta') / 500000) * 100).toBeCloseTo(3, 6);
+    expect((calcularITP(500000, 'ceuta', 'otro') / 500000) * 100).toBeCloseTo(3, 6);
   });
 
   test('la bonificación NO alcanza a las demás comunidades', () => {
     // Madrid, 6 % plano, sin bonificación
-    expect(calcularITP(500000, 'madrid')).toBeCloseTo(30000, 2);
+    expect(calcularITP(500000, 'madrid', 'otro')).toBeCloseTo(30000, 2);
     // Canarias, 6,5 % plano
-    expect(calcularITP(500000, 'canarias')).toBeCloseTo(32500, 2);
+    expect(calcularITP(500000, 'canarias', 'otro')).toBeCloseTo(32500, 2);
     // Murcia, 7,75 % plano
-    expect(calcularITP(300000, 'murcia')).toBeCloseTo(23250, 2);
+    expect(calcularITP(300000, 'murcia', 'otro')).toBeCloseTo(23250, 2);
   });
 
   test('el AJD de Ceuta y Melilla también se bonifica (art. 57 bis.1)', () => {
     // Ceuta declara AJD del 0,5 %: 500.000 × 0,5 % = 2.500 → bonificado 1.250
     expect(ITP_CCAA['ceuta'].ajd).toBe(0.5);
-    expect(calcularAJD(500000, 'ceuta')).toBeCloseTo(1250, 2);
+    expect(calcularAJD(500000, 'ceuta', { objeto: 'otro' })).toBeCloseTo(1250, 2);
     // Madrid, 0,75 %, sin bonificar
-    expect(calcularAJD(500000, 'madrid')).toBeCloseTo(3750, 2);
+    expect(calcularAJD(500000, 'madrid', { objeto: 'otro' })).toBeCloseTo(3750, 2);
   });
 
   /**
@@ -73,7 +73,7 @@ test.describe('ITP — bonificación del 50 % en Ceuta y Melilla (art. 57 bis TR
   test('un tipo forzado no vuelve a bonificarse', () => {
     const reducido = ITP_CCAA['ceuta'].tiposReducidos[0];
     expect(reducido.tipo).toBe(3);
-    expect(calcularITP(500000, 'ceuta', reducido.tipo)).toBeCloseTo(15000, 2);
+    expect(calcularITP(500000, 'ceuta', 'otro', reducido.tipo)).toBeCloseTo(15000, 2);
   });
 
   test('la constante de bonificación es del 50 %', () => {

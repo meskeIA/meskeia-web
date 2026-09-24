@@ -62,24 +62,24 @@ test.describe('Aragón — escala del art. 121-1 (cuota acumulada)', () => {
 
   for (const [valor, cuota] of cortes) {
     test(`${valor.toLocaleString('es-ES')} € liquidan ${cuota.toLocaleString('es-ES')} €`, () => {
-      expect(calcularITP(valor, 'aragon')).toBeCloseTo(cuota, 2);
+      expect(calcularITP(valor, 'aragon', 'vivienda')).toBeCloseTo(cuota, 2);
     });
   }
 
   test('por encima de 750.000 € el exceso va al 10 %', () => {
     // 1.000.000 → 64.500 + 250.000 × 10 % = 64.500 + 25.000 = 89.500
-    expect(calcularITP(1000000, 'aragon')).toBeCloseTo(89500, 2);
+    expect(calcularITP(1000000, 'aragon', 'vivienda')).toBeCloseTo(89500, 2);
   });
 
   test('dentro del primer tramo es el 8 % liso', () => {
-    expect(calcularITP(100000, 'aragon')).toBeCloseTo(8000, 2);
-    expect(calcularITP(200000, 'aragon')).toBeCloseTo(16000, 2);
+    expect(calcularITP(100000, 'aragon', 'vivienda')).toBeCloseTo(8000, 2);
+    expect(calcularITP(200000, 'aragon', 'vivienda')).toBeCloseTo(16000, 2);
   });
 
   test('REGRESIÓN: los tres escalones intermedios existen', () => {
     // El fallo de origen era una escala de dos tramos, que daba 42.000 € sobre 500.000 €.
     expect(aragon.tramosProgresivos).toHaveLength(5);
-    expect(calcularITP(500000, 'aragon')).not.toBeCloseTo(42000, 2);
+    expect(calcularITP(500000, 'aragon', 'vivienda')).not.toBeCloseTo(42000, 2);
   });
 });
 
@@ -94,7 +94,7 @@ test.describe('Aragón — bonificaciones en cuota como tipo efectivo', () => {
   });
 
   test('un joven que compra por 100.000 € paga 7.000 €, no 6.000 ni 5.000', () => {
-    const cuota = calcularITP(100000, 'aragon', reducido('Jóvenes < 35 años').tipo);
+    const cuota = calcularITP(100000, 'aragon', 'vivienda', reducido('Jóvenes < 35 años').tipo);
     expect(cuota).toBeCloseTo(7000, 2);
     // Las dos cifras que salían antes por los dos canales:
     expect(cuota).not.toBeCloseTo(6000, 2);

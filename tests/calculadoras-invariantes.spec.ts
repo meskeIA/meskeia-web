@@ -615,7 +615,9 @@ test.describe('Invariantes de composición — consulta_venta_vivienda', () => {
    *
    * Resuelto a mano con el caso del acta: venta 30.000, compra 28.000, 20 años, suelo 8.000,
    * total 5.000, tipo municipal 25 %.
-   *   · Método objetivo: 8.000 × 0,45 (coeficiente de 20 años) × 25 % = 900,00 €
+   *   · Método objetivo: 8.000 × 0,40 (coeficiente de 20 años) × 25 % = 800,00 €
+ *     (24/09/2026, hallazgo 1559: hasta ese día aquí ponía 0,45 → 900,00 €, el coeficiente de la
+ *     tabla del RDL 26/2021, caducada desde 2023; el vigente del art. 107.4 es 0,40)
    *   · Método real con la proporción acotada a 1: 2.000 × 1 × 25 % = 500,00 € ← lo que salía
    * El motor elegía el real por ser menor, y publicaba un neto rotulado «lo que realmente
    * recibes» en una app de riesgo 1.
@@ -626,7 +628,7 @@ test.describe('Invariantes de composición — consulta_venta_vivienda', () => {
       valorCatastralSuelo: 8000, valorCatastralTotal: 5000, tipoMunicipalIIVTNU: 25,
       comisionInmobiliaria: 0,
     });
-    expect(imposible.plusvaliaMunicipal).toBeCloseTo(900, 2);
+    expect(imposible.plusvaliaMunicipal).toBeCloseTo(800, 2);
     expect(imposible.metodoPlusvalia).toContain('Método objetivo');
     expect(imposible.metodoPlusvalia).toContain('no puede superar al total');
     expect(imposible.metodoPlusvalia).not.toContain('Método real');
@@ -634,7 +636,7 @@ test.describe('Invariantes de composición — consulta_venta_vivienda', () => {
 
   test('SANO [900]: el mismo par AL DERECHO sigue eligiendo el método real', () => {
     // Suelo 5.000 y total 8.000: la proporción es 0,625 y el real da
-    // 2.000 × 0,625 × 25 % = 312,50 €, por debajo de los 900 € del objetivo. El rechazo de
+    // 2.000 × 0,625 × 25 % = 312,50 €, por debajo de los 800 € del objetivo. El rechazo de
     // arriba no puede llevarse por delante el caso legítimo.
     const correcto = calcularVentaInmueble({
       precioVenta: 30000, precioCompra: 28000, aniosTenencia: 20,
@@ -3346,12 +3348,19 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
 // Acta completa en `_private/inspector/MOTORES.md`.
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Coeficiente oficial sellado en data/fiscal, con el clamp que aplican la app y ventaInmueble. */
+/**
+ * Coeficiente oficial sellado en data/fiscal, recalculado AQUÍ con las dos reglas del art. 107.4
+ * TRLRHL y sin llamar a `coeficienteIIVTNU` (sería comprobar la función contra sí misma): años
+ * completos con tope en 20 y, por debajo del año, el coeficiente anual prorrateado por meses
+ * completos (0,5 años = 6 meses; 0 años sin meses = 11, el techo). Hallazgo 1560, 24/09/2026.
+ */
 function coefOficialIIVTNU(anios: number): number {
   const clamp = Math.min(Math.max(0, Math.floor(anios)), 20);
   const e = COEFICIENTES_IIVTNU_2025.find((c) => c.anios === clamp);
   if (!e) throw new Error(`data/fiscal no declara coeficiente para ${anios} años`);
-  return e.coeficiente;
+  if (clamp >= 1) return e.coeficiente;
+  const meses = anios > 0 ? Math.floor(anios * 12) : 11;
+  return (e.coeficiente * meses) / 12;
 }
 
 test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coeficientes', () => {
@@ -3370,27 +3379,29 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
   // No lo levantó el Inspector, y no es un fallo suyo: la app aquí está BIEN. Es el motor
   // compartido, que ninguna app llama, el que diverge.
 
-  test('CRÍTICO: 10 años de tenencia aplican el coeficiente 0,08 de data/fiscal, no el 0,22 propio', () => {
-    // Objetivo (data/fiscal, 10 años → 0,08): 40.000 × 0,08 = 3.200 → 25 % = 800,00 €
+  test('CRÍTICO: 10 años de tenencia aplican el coeficiente 0,12 de data/fiscal, no el 0,22 propio', () => {
+    // 24/09/2026 (hallazgo 1559): data/fiscal pasó de la tabla caducada del RDL 26/2021 (0,08) a
+    // la vigente del RDL 8/2023, verificada en el BOE: 10 años → 0,12.
+    // Objetivo: 40.000 × 0,12 = 4.800 → 25 % = 1.200,00 €
     // Real: (200.000 − 150.000) × (40.000/100.000) = 20.000 → 25 % = 5.000,00 €
-    // El contribuyente elige el menor → 800,00 €. El motor cobra 2.200,00 € (+1.400,00 €).
+    // El contribuyente elige el menor → 1.200,00 €. El motor viejo cobraba 2.200,00 €.
     const res = calcularIIVTNU({
       valorCatastralSuelo: 40000, valorCatastralTotal: 100000, aniosTenencia: 10,
       tipoImpositivo: 25, precioAdquisicion: 150000, precioTransmision: 200000,
     });
-    expect(res.coeficienteAplicado).toBe(0.08);
-    expect(res.cuotaIIVTNU).toBe(800);
+    expect(res.coeficienteAplicado).toBe(0.12);
+    expect(res.cuotaIIVTNU).toBe(1200);
   });
 
-  test('CRÍTICO: 20 años exactos son «20 o más años» → coeficiente 0,45', () => {
+  test('CRÍTICO: 20 años exactos son «20 o más años» → coeficiente 0,40', () => {
     // data/fiscal declara `{ anios: 20, label: '20 o más años', coeficiente: 0.45 }`, y la propia
     // cabecera del motor dice «>20 usa valor especial»: el tramo se rompe justo en el borde.
-    // 60.000 × 0,45 = 27.000 → 30 % = 8.100,00 €. El motor liquida 5.400,00 € (−2.700,00 €).
+    // Vigente (RDL 8/2023, hallazgo 1559): 0,40. 60.000 × 0,40 = 24.000 → 30 % = 7.200,00 €.
     const res = calcularIIVTNU({
       valorCatastralSuelo: 60000, valorCatastralTotal: 120000, aniosTenencia: 20, tipoImpositivo: 30,
     });
-    expect(res.coeficienteAplicado).toBe(0.45);
-    expect(res.cuotaIIVTNU).toBe(8100);
+    expect(res.coeficienteAplicado).toBe(0.4);
+    expect(res.cuotaIIVTNU).toBe(7200);
   });
 
   test('CRÍTICO · NINGUNA CLAVE SE CAE: los años con decimales no pueden ir al coeficiente máximo', () => {
@@ -3402,19 +3413,21 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
     //
     // «Siete años y medio» es la forma natural de decírselo a un LLM, y
     // /api/chatgpt/plusvalia-municipal acepta cualquier `number` ≥ 0.
-    // 50.000 × 0,12 (año 7) = 6.000 → 25 % = 1.500,00 €. El motor cobra 5.625,00 € (+4.125,00 €).
+    // 50.000 × 0,20 (año 7, tabla vigente del RDL 8/2023) = 10.000 → 25 % = 2.500,00 €.
     const medio = calcularIIVTNU({
       valorCatastralSuelo: 50000, valorCatastralTotal: 100000, aniosTenencia: 7.5, tipoImpositivo: 25,
     });
-    expect(medio.coeficienteAplicado).toBe(0.12);
-    expect(medio.cuotaIIVTNU).toBe(1500);
+    expect(medio.coeficienteAplicado).toBe(0.2);
+    expect(medio.cuotaIIVTNU).toBe(2500);
 
-    // Y medio año NO entra por la rama de «menos de 1 año»: `anios === 0` solo casa con el 0 exacto.
+    // Y medio año entra por «menos de 1 año», con el coeficiente anual PRORRATEADO por los seis
+    // meses completos (art. 107.4, hallazgo 1560): 0,15 × 6/12 = 0,075 → 50.000 × 0,075 = 3.750
+    // → 25 % = 937,50 €. Antes se aplicaba el coeficiente entero (0,14 → 1.750,00 €).
     const seisMeses = calcularIIVTNU({
       valorCatastralSuelo: 50000, valorCatastralTotal: 100000, aniosTenencia: 0.5, tipoImpositivo: 25,
     });
-    expect(seisMeses.coeficienteAplicado).toBe(0.14);
-    expect(seisMeses.cuotaIIVTNU).toBe(1750);
+    expect(seisMeses.coeficienteAplicado).toBeCloseTo(0.075, 10);
+    expect(seisMeses.cuotaIIVTNU).toBe(937.5);
   });
 
   test('BARRIDO: todo año de 0 a 40, entero o con decimales, da el coeficiente de data/fiscal', () => {
@@ -3425,7 +3438,7 @@ test.describe('Motores 09/09 — IIVTNU: el motor llevaba su PROPIA tabla de coe
         valorCatastralSuelo: 100000, valorCatastralTotal: 200000, aniosTenencia: anios, tipoImpositivo: 30,
       });
       const esperado = coefOficialIIVTNU(anios);
-      if (res.coeficienteAplicado !== esperado) {
+      if (Math.abs(res.coeficienteAplicado - esperado) > 1e-12) {
         fallos.push(`${anios}a: motor ${res.coeficienteAplicado} != data/fiscal ${esperado}`);
       }
     }

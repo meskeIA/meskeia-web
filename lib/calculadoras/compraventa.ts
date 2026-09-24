@@ -13,7 +13,7 @@ import {
   IVA_INMUEBLES_2025,
   TIPOS_AJD_2025,
   COSTES_COMPRAVENTA_2025,
-  COEFICIENTES_IIVTNU_2025,
+  coeficienteIIVTNU,
   PLUSVALIA_MUNICIPAL_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_INMUEBLES_META,
@@ -228,13 +228,16 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
     let metodoPlusvalia = '';
 
     if (p.valorCatastralSuelo && p.aniosTenencia !== undefined) {
-      const anios = Math.min(Math.max(0, Math.floor(p.aniosTenencia)), 20);
-      const coefData = COEFICIENTES_IIVTNU_2025.find(c => c.anios === anios)
-        ?? COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1];
+      // Años completos, tope en 20 y prorrateo por meses bajo el año: coeficienteIIVTNU
+      // (hallazgos 1559 y 1560, 24/09/2026).
+      const coefData = coeficienteIIVTNU(p.aniosTenencia);
       const tipoMunicipal = Math.min(p.tipoMunicipalIIVTNU ?? PLUSVALIA_MUNICIPAL_META.tipoOrientativo, PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal);
       const baseImponibleIIVTNU = r(p.valorCatastralSuelo * coefData.coeficiente);
       plusvaliaMunicipal = r(baseImponibleIIVTNU * tipoMunicipal / 100);
-      metodoPlusvalia = `Método objetivo: valor catastral suelo (${p.valorCatastralSuelo.toLocaleString('es-ES')} €) × coeficiente ${coefData.coeficiente} (${coefData.label}) × tipo ${tipoMunicipal}%`;
+      const tramo = coefData.prorrateado
+        ? `${coefData.label}, prorrateado por ${coefData.meses} meses${coefData.cotaSuperior ? ' (máximo: sin los meses exactos)' : ''}`
+        : coefData.label;
+      metodoPlusvalia = `Método objetivo: valor catastral suelo (${p.valorCatastralSuelo.toLocaleString('es-ES')} €) × coeficiente ${coefData.coeficiente.toLocaleString('es-ES', { maximumFractionDigits: 4 })} (${tramo}) × tipo ${tipoMunicipal}%`;
     }
 
     // IRPF sobre ganancia patrimonial

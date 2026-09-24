@@ -253,7 +253,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '18000',
         direccion: 'sube',
-        delta: 851.75,
+        delta: 942.88, // 851,75 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /precio de compra original/i,
       },
       {
@@ -297,7 +297,7 @@ const HERMANAS: readonly Hermana[] = [
         legible: '8',
         ilegible: '1.0.5',
         direccion: 'sube',
-        delta: 101.25,
+        delta: 192.38, // 101,25 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /años de (?:propiedad|tenencia)/i,
       },
       {
@@ -305,7 +305,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '5000',
         direccion: 'sube',
-        delta: 101.25,
+        delta: 192.38, // 101,25 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral del suelo/i,
       },
       {
@@ -331,7 +331,7 @@ const HERMANAS: readonly Hermana[] = [
         ilegible: '12.000.00',
         base: 'R',
         direccion: 'baja',
-        delta: -20.83,
+        delta: -133.33, // -20,83 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral total/i,
       },
       {
@@ -398,7 +398,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '10000',
         direccion: 'sube',
-        delta: 717.2,
+        delta: 725.3, // 717,2 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /precio de compra original/i,
       },
       {
@@ -438,7 +438,7 @@ const HERMANAS: readonly Hermana[] = [
         legible: '5',
         ilegible: '1.0.5',
         direccion: 'sube',
-        delta: 137.7,
+        delta: 145.8, // 137,7 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /años de (?:propiedad|tenencia)/i,
       },
       {
@@ -446,7 +446,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '4000',
         direccion: 'sube',
-        delta: 137.7,
+        delta: 145.8, // 137,7 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral del suelo/i,
       },
       {
@@ -467,7 +467,7 @@ const HERMANAS: readonly Hermana[] = [
         ilegible: '9.000.00',
         base: 'R',
         direccion: 'baja',
-        delta: -58.89,
+        delta: -68.89, // -58,89 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral total/i,
       },
       {
@@ -544,7 +544,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '150000',
         direccion: 'sube',
-        delta: 10697,
+        delta: 11013, // 10697 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /precio de compra original/i,
       },
       {
@@ -552,7 +552,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '15000',
         direccion: 'baja',
-        delta: -3404,
+        delta: -3396, // -3404 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /impuestos y gastos de aquella compra/i,
       },
       {
@@ -611,7 +611,7 @@ const HERMANAS: readonly Hermana[] = [
         legible: '10',
         ilegible: '1.0.5',
         direccion: 'sube',
-        delta: 632,
+        delta: 948, // 632 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /años de (?:propiedad|tenencia)/i,
       },
       {
@@ -619,7 +619,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '40000',
         direccion: 'sube',
-        delta: 632,
+        delta: 948, // 632 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral del suelo/i,
       },
       {
@@ -640,7 +640,7 @@ const HERMANAS: readonly Hermana[] = [
         ilegible: '100.000.00',
         base: 'R',
         direccion: 'baja',
-        delta: -243,
+        delta: -567, // -243 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral total/i,
       },
       {
@@ -649,7 +649,7 @@ const HERMANAS: readonly Hermana[] = [
         legible: '3',
         ilegible: '3.5.0',
         direccion: 'sube',
-        delta: 4666,
+        delta: 4674, // 4666 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /comisión inmobiliaria/i,
       },
       {
@@ -842,7 +842,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '150000',
         direccion: 'sube',
-        delta: 9910,
+        delta: 10305, // 9910 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /precio de compra original/i,
       },
       {
@@ -851,7 +851,7 @@ const HERMANAS: readonly Hermana[] = [
         legible: '10',
         ilegible: '1.0.5',
         direccion: 'sube',
-        delta: 790,
+        delta: 1185, // 790 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /años de (?:propiedad|tenencia)/i,
       },
       {
@@ -899,7 +899,7 @@ const HERMANAS: readonly Hermana[] = [
         panel: 'vendedor',
         legible: '50000',
         direccion: 'sube',
-        delta: 790,
+        delta: 1185, // 790 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral del suelo/i,
       },
       {
@@ -911,7 +911,7 @@ const HERMANAS: readonly Hermana[] = [
         ilegible: '700.000.00',
         base: 'C',
         direccion: 'baja',
-        delta: -84.64,
+        delta: -479.64, // -84,64 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /valor catastral total/i,
       },
       {
@@ -938,7 +938,7 @@ const HERMANAS: readonly Hermana[] = [
         legible: '193000',
         base: 'A',
         direccion: 'baja',
-        delta: -8910,
+        delta: -8805, // -8910 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /reinviert/i,
       },
       {
@@ -949,7 +949,7 @@ const HERMANAS: readonly Hermana[] = [
         legible: '2000,50',
         base: "A'",
         direccion: 'baja',
-        delta: -73.51,
+        delta: -73.03, // -73,51 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /hipoteca/i,
       },
     ],

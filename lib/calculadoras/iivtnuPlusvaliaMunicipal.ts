@@ -15,7 +15,7 @@
  *   - STC 182/2021: no puede gravarse una transmisión sin incremento real de valor
  *   - STC 59/2017: no puede gravarse si no hay plusvalía real
  *
- * Coeficientes máximos RDL 26/2021 (actualizados por Ley 22/2021 y PGE):
+ * Coeficientes máximos del art. 107.4 TRLHL (redacción del RDL 8/2023, vigente desde 2024):
  *   Cada municipio aplica sus coeficientes propios (≤ máximos estatales).
  *   Los coeficientes son por "años de generación" del incremento, y NO viven aquí:
  *   son los de `COEFICIENTES_IIVTNU_2025` en `data/fiscal/inmuebles.ts`.
@@ -28,7 +28,7 @@
  * Encadenable con: calcular_compraventa_inmueble, calcular_venta_inmueble, calcular_itp_ccaa
  */
 
-import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
+import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, type CoeficienteIIVTNUAplicado } from '@/data/fiscal';
 
 // ─── Coeficientes máximos estatales ─────────────────────────────────────────
 // La tabla NO se copia aquí: es `COEFICIENTES_IIVTNU_2025` de `data/fiscal/inmuebles.ts`,
@@ -42,6 +42,10 @@ import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fisca
 // años 10-13 → 0,45 a los 20) y la del motor era casi plana. Como este es justo el motor que
 // alimenta /api/chatgpt/plusvalia-municipal y el MCP, meskeIA publicaba dos plusvalías
 // distintas del mismo inmueble según se preguntara por la web o por un LLM.
+//
+// ⚠️ Y la unificación eligió la tabla equivocada: la «forma de U» era la del RDL 26/2021,
+// caducada desde el 01/01/2023. El 24/09/2026 se verificó el art. 107.4 en el BOE y data/fiscal
+// pasó a la tabla vigente (RDL 8/2023), que es la que se lee aquí (hallazgo 1559).
 
 /** Tipo impositivo máximo legal (art. 108 TRLHL), tomado del módulo sellado. */
 const TIPO_MAX_IIVTNU = PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal; // % máximo legal
@@ -58,11 +62,11 @@ const TIPO_MAX_IIVTNU = PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal; // % máximo l
  *   - Suelo en 0: la fila `anios: 0` es «Menos de 1 año» (0,14), y ahí entra también
  *     medio año, que antes no casaba con la comparación `=== 0`.
  */
-function coeficienteMaximoEstatal(aniosTenencia: number): number {
-  const anios = Math.min(Math.max(0, Math.floor(aniosTenencia)), 20);
-  const entrada = COEFICIENTES_IIVTNU_2025.find(c => c.anios === anios)
-    ?? COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1];
-  return entrada.coeficiente;
+function coeficienteMaximoEstatal(aniosTenencia: number): CoeficienteIIVTNUAplicado {
+  // Desde el 24/09/2026 la tabla no se consulta aquí: `coeficienteIIVTNU` aplica las mismas
+  // reglas (años completos, tope en 20) y además el prorrateo por meses por debajo del año,
+  // que este motor no hacía (hallazgo 1560).
+  return coeficienteIIVTNU(aniosTenencia);
 }
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────
@@ -162,7 +166,8 @@ export function calcularIIVTNU(p: ParametrosIIVTNU): ResultadoIIVTNU {
   const r = (n: number) => Math.round(n * 100) / 100;
   const advertencias: string[] = [];
 
-  const coefMax = coeficienteMaximoEstatal(p.aniosTenencia);
+  const coefEstatal = coeficienteMaximoEstatal(p.aniosTenencia);
+  const coefMax = coefEstatal.coeficiente;
 
   // El coeficiente municipal solo puede ser IGUAL O INFERIOR al máximo estatal
   // (art. 107.4 TRLHL); el negativo ya lo ha rechazado la validación de arriba.
@@ -235,14 +240,17 @@ export function calcularIIVTNU(p: ParametrosIIVTNU): ResultadoIIVTNU {
     advertencias.push('NO se ha comprobado si existe incremento real de valor: falta el precio de adquisición, el de transmisión o ambos. Sin los dos no puede verificarse la sujeción al impuesto (art. 104.5 TRLHL y STC 182/2021): si el inmueble se transmite por un precio igual o inferior al de adquisición, la operación NO está sujeta y la cuota calculada aquí no sería exigible. El campo "hayIncrementoReal" se devuelve como false porque NO CONSTA, no porque se haya descartado.');
   }
   advertencias.push('El IIVTNU lo liquida (o autoliquida, según el municipio) el vendedor/transmitente. En donaciones y herencias, es el adquirente quien tributa.');
-  advertencias.push('Los coeficientes aplicados son los MÁXIMOS estatales (RDL 26/2021). Su municipio puede aplicar coeficientes propios iguales o inferiores — consulte con el Ayuntamiento o el texto de su Ordenanza Fiscal.');
+  advertencias.push('Los coeficientes aplicados son los MÁXIMOS estatales (art. 107.4 TRLHL, en la redacción del RDL 8/2023, vigente desde 2024). Su municipio puede aplicar coeficientes propios iguales o inferiores — consulte con el Ayuntamiento o el texto de su Ordenanza Fiscal.');
   if (p.tipoImpositivo === undefined) {
     advertencias.push(`Se ha aplicado el tipo impositivo máximo legal del ${TIPO_MAX_IIVTNU}%. El tipo real de su municipio puede ser inferior — verifique en la Ordenanza Fiscal municipal.`);
   }
-  if (p.aniosTenencia < 1) {
-    // La fila `anios: 0` de COEFICIENTES_IIVTNU_2025 es «Menos de 1 año»: cubre también
-    // medio año, que con la comparación `=== 0` anterior se quedaba fuera del aviso.
-    advertencias.push(`Transmisión en menos de 1 año desde la adquisición: se aplica el coeficiente del tramo "menos de 1 año" (${coefMax.toLocaleString('es-ES')}). Compruebe si su municipio aplica norma específica para períodos inferiores al año.`);
+  if (coefEstatal.prorrateado) {
+    // Por debajo del año, el art. 107.4 prorratea el coeficiente anual por meses completos
+    // (hallazgo 1560, 24/09/2026). Con años enteros (0) no se conocen los meses: se usa 11, el
+    // máximo, y se dice que es un techo.
+    advertencias.push(coefEstatal.cotaSuperior
+      ? 'Transmisión en menos de 1 año: el coeficiente anual del tramo "menos de 1 año" se prorratea por meses completos (art. 107.4 TRLHL). Sin los meses se ha usado 11, el máximo posible, así que la cuota es un TECHO: indique los años con decimales (0,5 = 6 meses) para calcularla exacta.'
+      : `Transmisión en menos de 1 año: el coeficiente anual del tramo "menos de 1 año" se ha prorrateado por ${coefEstatal.meses} meses completos (art. 107.4 TRLHL) y queda en ${coefMax.toLocaleString('es-ES', { maximumFractionDigits: 4 })}.`);
   }
   advertencias.push('Método real: para acogerse a él, el contribuyente debe probarlo aportando las escrituras de adquisición y transmisión. La base imponible real se calcula proporcionalmente al peso del suelo en el valor catastral total.');
 
