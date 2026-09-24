@@ -1,18 +1,27 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { formatNumber } from '@/lib/formatters';
+import {
+  TRAMOS_IRPF_2025,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  MINIMOS_IRPF_2025,
+  OBLIGACION_DECLARAR_2025,
+  calcularCuotaIntegraGeneral,
+} from '@/data/fiscal';
+import { EJERCICIO } from './motor';
 
 export const metadata: Metadata = {
-  title: 'Estimador IRPF 2025 - Orientación Declaración Renta | meskeIA',
-  description: 'Estima orientativamente tu cuota de IRPF 2025. Calcula la cuota íntegra, retenciones y si saldrá a pagar o devolver según tu situación personal y familiar.',
-  keywords: 'estimador irpf, declaracion renta 2025, cuota irpf, tramos irpf, minimo personal familiar, retencion irpf, a pagar devolver hacienda',
+  title: `Estimador IRPF ${EJERCICIO} - Orientación Declaración Renta | meskeIA`,
+  description: `Estima orientativamente tu cuota de IRPF ${EJERCICIO}. Calcula la cuota íntegra, retenciones y si saldrá a pagar o devolver según tu situación personal y familiar.`,
+  keywords: `estimador irpf, declaracion renta ${EJERCICIO}, cuota irpf, tramos irpf, minimo personal familiar, retencion irpf, a pagar devolver hacienda`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador IRPF 2025 - Orientación Declaración Renta',
-    description: 'Estima orientativamente tu cuota de IRPF 2025: cuota íntegra, retenciones y resultado final.',
+    title: `Estimador IRPF ${EJERCICIO} - Orientación Declaración Renta`,
+    description: `Estima orientativamente tu cuota de IRPF ${EJERCICIO}: cuota íntegra, retenciones y resultado final.`,
     url: 'https://meskeia.com/estimador-irpf/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador IRPF 2025 | meskeIA',
-    description: 'Estima orientativamente tu declaración de la renta 2025',
+    title: `Estimador IRPF ${EJERCICIO} | meskeIA`,
+    description: `Estima orientativamente tu declaración de la renta ${EJERCICIO}`,
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -34,16 +43,41 @@ export const metadata: Metadata = {
   },
 };
 
+// ─── Cifras del FAQ: salen de data/fiscal, no se escriben a mano ──────────────
+//
+// Hasta el 24/09/2026 el FAQ daba la escala estatal en «5 tramos… más de 60.000 € al 22,5 %»,
+// omitía el tramo de más de 300.000 € y decía que con 40.000 € de base el marginal era el
+// 22,5 %, mientras la app aplicaba la escala combinada del 19 al 47 % (hallazgo 1316).
+
+const eur = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 0 : 2)} €`;
+const pct = (n: number): string => `${formatNumber(n, n % 1 === 0 ? 0 : 2)} %`;
+
+function describirEscala(escala: { hasta: number; tipo: number }[]): string {
+  return escala
+    .map((t, i) => {
+      const desde = i === 0 ? 0 : escala[i - 1].hasta;
+      if (i === 0) return `hasta ${eur(t.hasta)} al ${pct(t.tipo)}`;
+      if (t.hasta === Infinity) return `más de ${eur(desde)} al ${pct(t.tipo)}`;
+      return `de ${eur(desde)} a ${eur(t.hasta)} al ${pct(t.tipo)}`;
+    })
+    .join('; ');
+}
+
+const BASE_EJEMPLO = 40000;
+const MARGINAL_EJEMPLO = TRAMOS_IRPF_2025.find((t) => BASE_EJEMPLO <= t.hasta)?.tipo ?? 0;
+const EFECTIVO_EJEMPLO = (calcularCuotaIntegraGeneral(BASE_EJEMPLO, MINIMOS_IRPF_2025.personal) / BASE_EJEMPLO) * 100;
+const OBLIGACION = OBLIGACION_DECLARAR_2025;
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuáles son los tramos del IRPF en 2025?',
+      name: `¿Cuáles son los tramos del IRPF en ${EJERCICIO}?`,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El IRPF estatal 2025 tiene 5 tramos: hasta 12.450 € tributa al 9,5%; de 12.450 a 20.200 € al 12%; de 20.200 a 35.200 € al 15%; de 35.200 a 60.000 € al 18,5%; y más de 60.000 € al 22,5%. A estos tipos se suman los tramos autonómicos, que varían por comunidad. El tipo efectivo real suele ser muy inferior al marginal porque cada tramo solo aplica a la renta que le corresponde.',
+        text: `La escala general (tarifa estatal + autonómica media) que aplica este estimador tiene ${TRAMOS_IRPF_2025.length} tramos: ${describirEscala(TRAMOS_IRPF_2025)}. Cada comunidad autónoma aprueba su propia tarifa, así que el tipo real varía por región. Los dividendos e intereses no van a esta escala sino a la del ahorro: ${describirEscala(TRAMOS_GANANCIAS_PATRIMONIALES_2025)}.`,
       },
     },
     {
@@ -51,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Qué es el mínimo personal y familiar en el IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es la parte de la renta que no tributa porque se considera necesaria para cubrir las necesidades vitales básicas. En 2025 el mínimo personal general es de 5.550 €. Se incrementa por edad (1.150 € si tienes más de 65 años, 1.400 € si tienes más de 75) y por descendientes, ascendientes o discapacidad a tu cargo. Reduce directamente la cuota íntegra, no la base imponible.',
+        text: `Es la parte de la renta que no tributa porque se considera necesaria para cubrir las necesidades vitales básicas. En ${EJERCICIO} el mínimo del contribuyente es de ${eur(MINIMOS_IRPF_2025.personal)} (${eur(MINIMOS_IRPF_2025.personal_65)} desde los 65 años y ${eur(MINIMOS_IRPF_2025.personal_75)} desde los 75), más los mínimos por descendientes, ascendientes o discapacidad. No reduce la base imponible: se grava a tipo cero. La escala se aplica a la base entera y también al mínimo, y la segunda cuota se resta de la primera (art. 63.1.2.º de la Ley del IRPF).`,
       },
     },
     {
@@ -59,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Cuándo sale a devolver la declaración de la renta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La declaración sale a devolver cuando las retenciones practicadas por tu pagador a lo largo del año superan la cuota diferencial calculada. Esto ocurre habitualmente si has tenido múltiples pagadores, variaciones salariales a mitad de año, hijos nacidos en el ejercicio, deducciones autonómicas o situaciones que reducen tu cuota como hipoteca pre-2013 o aportaciones a planes de pensiones.',
+        text: 'La declaración sale a devolver cuando las retenciones y pagos a cuenta practicados a lo largo del año superan la cuota resultante. Esto ocurre habitualmente si has tenido variaciones salariales a mitad de año, hijos nacidos en el ejercicio, deducciones autonómicas o situaciones que reducen tu cuota como la deducción por vivienda anterior a 2013 o las aportaciones a planes de pensiones. Con varios pagadores suele ocurrir lo contrario: sale a pagar.',
       },
     },
     {
@@ -67,7 +101,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre tipo marginal y tipo efectivo del IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El tipo marginal es el porcentaje que aplica al último euro de renta ganada (el tramo en que te encuentras). El tipo efectivo es el porcentaje real de impuestos pagados sobre el total de la renta: siempre es inferior al marginal porque los primeros tramos tributan a tipos menores. Con 40.000 € de base, el marginal puede ser el 22,5% pero el efectivo total ronda el 14-16%.',
+        text: `El tipo marginal es el porcentaje que se aplica al último euro de renta (el del tramo en que te encuentras). El tipo efectivo es el porcentaje real de impuestos pagados sobre el total de la base: siempre es inferior al marginal porque los primeros tramos tributan a tipos menores y el mínimo personal tributa a tipo cero. Con ${eur(BASE_EJEMPLO)} de base, el marginal es el ${pct(MARGINAL_EJEMPLO)} y el efectivo, con el mínimo de ${eur(MINIMOS_IRPF_2025.personal)}, el ${pct(EFECTIVO_EJEMPLO)}.`,
       },
     },
     {
@@ -75,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Qué es la cuota íntegra del IRPF y cómo se calcula?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La cuota íntegra es el resultado de aplicar la tarifa del IRPF (tramos estatales + autonómicos) a la base liquidable general y a la base del ahorro. Sobre ella se aplican después las deducciones (mínimo personal y familiar, por doble imposición, por maternidad...) para obtener la cuota líquida. La diferencia entre cuota líquida y retenciones ya practicadas es el resultado final: a pagar o a devolver.',
+        text: 'La cuota íntegra es el resultado de aplicar la escala general (estatal + autonómica) a la base liquidable general y la escala del ahorro a la base liquidable del ahorro, restando en cada una la cuota que corresponde al mínimo personal y familiar, que así tributa a tipo cero. Después se restan las deducciones (autonómicas, por donativos, por vivienda del régimen transitorio...) para obtener la cuota líquida, y de ella las retenciones y pagos a cuenta: el resultado es la cantidad a pagar o a devolver.',
       },
     },
     {
@@ -83,7 +117,7 @@ export const faqJsonLd = {
       name: '¿Están obligados a declarar todos los contribuyentes en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. En general, no están obligados a declarar quienes obtienen rentas del trabajo inferiores a 22.000 € anuales de un solo pagador, o inferiores a 15.876 € de dos o más pagadores cuando el segundo pagador supera 1.500 € al año. Hay excepciones: obtener rentas del capital o actividades económicas superiores a 1.600 €, o imputaciones de renta superiores a 1.000 €, obligan a declarar.',
+        text: `No. En general, no están obligados a declarar quienes obtienen rendimientos del trabajo de hasta ${eur(OBLIGACION.trabajo.unPagador)} anuales de un solo pagador, o de hasta ${eur(OBLIGACION.trabajo.variosPagadores)} con dos o más pagadores cuando del segundo y siguientes se reciben más de ${eur(OBLIGACION.trabajo.limiteSegundoPagador)} al año. Hay excepciones: los rendimientos del capital mobiliario y las ganancias patrimoniales sujetos a retención de más de ${eur(OBLIGACION.capitalMobiliario.limite)}, o las rentas inmobiliarias imputadas de más de ${eur(OBLIGACION.rentasImputadas.limite)}, obligan a declarar.`,
       },
     },
   ],
@@ -91,8 +125,15 @@ export const faqJsonLd = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Estimador IRPF",
-  description: "Estima orientativamente tu cuota de IRPF 2025. Calcula la cuota íntegra, retenciones y si saldrá a pagar o devolver según tu situación personal y familiar.",
+  description: `Estima orientativamente tu cuota de IRPF ${EJERCICIO}. Calcula la cuota íntegra, retenciones y si saldrá a pagar o devolver según tu situación personal y familiar.`,
   url: "https://meskeia.com/estimador-irpf/",
   category: 'FinanceApplication',
-  features: [],
+  features: [
+    'Cuota íntegra con la escala general y la del ahorro',
+    'Mínimo personal y familiar gravado a tipo cero (art. 63.1.2.º)',
+    'Reducción por rendimientos del trabajo y gastos deducibles',
+    'Reducción por tributación conjunta y familia monoparental',
+    'Resultado a pagar o a devolver frente a las retenciones',
+    'Desglose por tramos',
+  ],
 });

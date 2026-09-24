@@ -9,101 +9,67 @@ import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
-  desglosarEscalaGeneral,
-  cuotaEscalaGeneral,
+  TRAMOS_IRPF_2025,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
-  MINIMOS_IRPF_2025,
-  COTIZACIONES_SS_2026,
-  BASES_SS_2026,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
-  calcularDeduccionRentasBajas,
+  DEDUCCION_RENTAS_BAJAS_2025,
+  MINIMOS_IRPF_2025,
+  OBLIGACION_DECLARAR_2025,
+  calcularCuotaIntegraGeneral,
 } from '@/data/fiscal';
+import { EJERCICIO, estimarIRPF, type EntradaIRPF, type ResultadoIRPF, type SituacionFamiliar } from './motor';
 
-// ─── Tipos ────────────────────────────────────────────────────────────────────
+// ─── Ejemplos del bloque educativo ────────────────────────────────────────────
+//
+// Salen del MISMO motor que la calculadora: hasta el 24/09/2026 eran cifras escritas a mano
+// que restaban el mínimo de la base y arrastraban la reducción residual del art. 20 ya
+// derogada, y contradecían a la propia app en más de 1.000 € (hallazgo 1314).
 
-type SituacionFamiliar = 'soltero' | 'casado_un_ingreso' | 'casado_dos_ingresos' | 'familia_monoparental';
+const ENTRADA_BASE: EntradaIRPF = {
+  brutoTrabajo: 0,
+  capitalMobiliario: 0,
+  retenciones: 0,
+  situacion: 'soltero',
+  numHijos: 0,
+  hijosMenores3: 0,
+  conNomina: true,
+};
 
-interface DesgloseTramo {
-  desde: number;
-  hasta: number | null;
-  tipo: number;
-  baseAplicada: number;
-  cuota: number;
-}
+const ESC_SOLTERO = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 28000 });
+const ESC_CASADA = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 45000, situacion: 'casado_dos_ingresos', numHijos: 2 });
+const ESC_CASADA_SIN_HIJOS = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 45000, situacion: 'casado_dos_ingresos' });
+const ESC_PENSION = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 18000, conNomina: false });
+const ESC_PENSION_65 = estimarIRPF({
+  ...ENTRADA_BASE, brutoTrabajo: 18000, conNomina: false, minimoContribuyente: MINIMOS_IRPF_2025.personal_65,
+});
+const ESC_PENSION_24 = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 24000, conNomina: false });
+const ESC_SUELDO_30 = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 30000 });
+const ESC_SUELDO_50 = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 50000 });
 
-// ─── Lógica de cálculo ────────────────────────────────────────────────────────
+// Autónomo: la calculadora no admite rendimientos de actividades económicas, así que el
+// ejemplo aplica a mano la misma escala y el mismo método del mínimo (art. 63.1.2.º).
+const AUTONOMO_RENDIMIENTO_NETO = 35000;
+const AUTONOMO_CUOTA = calcularCuotaIntegraGeneral(AUTONOMO_RENDIMIENTO_NETO, MINIMOS_IRPF_2025.personal);
 
-/**
- * Cuota integra de la base liquidable general (art. 63.1.2 LIRPF) con su desglose por tramos.
- *
- * La escala se aplica dos veces: a la base liquidable entera y al minimo personal y
- * familiar; la segunda cuota se resta de la primera. El desglose por tramos es el de la
- * PRIMERA aplicacion, que es la que describe la ley.
- *
- * ATENCION 12/09/2026: hasta esta fecha esta app restaba los minimos de la base antes de
- * aplicar la escala, que los valora al tipo marginal y subestima la cuota. Con minimos
- * familiares grandes el error es muy alto: 1.507,50 EUR con 40.000 EUR de base y dos hijos,
- * 3.691 EUR con 70.000 EUR y tres hijos.
- */
-function calcularCuotaIRPF(
-  baseLiquidableGeneral: number,
-  minimo: number
-): { cuota: number; cuotaEscala: number; cuotaMinimo: number; desglose: DesgloseTramo[] } {
-  const base = Math.max(0, baseLiquidableGeneral);
-  const { cuota: cuotaEscala, tramos } = desglosarEscalaGeneral(base);
-  const cuotaMinimo = cuotaEscalaGeneral(Math.min(Math.max(0, minimo), base));
+// FAQ del tipo marginal frente al efectivo
+const FAQ_BASE = 35200;
+const FAQ_CUOTA = calcularCuotaIntegraGeneral(FAQ_BASE, MINIMOS_IRPF_2025.personal);
+const FAQ_MARGINAL = TRAMOS_IRPF_2025.find((t) => FAQ_BASE <= t.hasta)?.tipo ?? 0;
 
-  const desglose: DesgloseTramo[] = tramos.map((t) => ({
-    desde: t.desde,
-    hasta: t.hasta,
+const pct = (n: number): string => `${formatNumber(n, 2)} %`;
+const eur = (n: number): string => formatCurrency(n);
+/** Importe normativo sin céntimos cuando no los tiene (19.747,5 € no se redondea). */
+const eur0 = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 0 : 2)} €`;
+
+/** Tabla de una escala (general o del ahorro) con los límites que trae data/fiscal. */
+function filasEscala(escala: { hasta: number; tipo: number }[]) {
+  return escala.map((t, i) => ({
+    desde: i === 0 ? 0 : escala[i - 1].hasta,
+    hasta: t.hasta === Infinity ? null : t.hasta,
     tipo: t.tipo,
-    baseAplicada: t.base,
-    cuota: t.cuota,
   }));
-
-  return { cuota: Math.max(0, cuotaEscala - cuotaMinimo), cuotaEscala, cuotaMinimo, desglose };
-}
-
-function calcularMinimos(situacion: SituacionFamiliar, numHijos: number, hijosMenores3: number): number {
-  let minimos = MINIMOS_IRPF_2025.personal;
-
-  if (numHijos >= 1) minimos += MINIMOS_IRPF_2025.hijo_1;
-  if (numHijos >= 2) minimos += MINIMOS_IRPF_2025.hijo_2;
-  if (numHijos >= 3) minimos += MINIMOS_IRPF_2025.hijo_3;
-  if (numHijos >= 4) minimos += MINIMOS_IRPF_2025.hijo_4_mas * (numHijos - 3);
-  minimos += Math.min(hijosMenores3, numHijos) * MINIMOS_IRPF_2025.hijo_menor_3;
-
-  return minimos;
-}
-
-/**
- * Reduccion por tributacion conjunta (art. 84.2, reglas 3 y 4 LIRPF).
- *
- * ATENCION 12/09/2026: los 2.150 EUR de la unidad monoparental estaban SUMADOS a los minimos
- * dentro de calcularMinimos, y los 3.400 EUR del matrimonio con un solo ingreso no se
- * aplicaban en absoluto. No es un minimo: la norma dice «la base imponible se reducira», asi
- * que va contra la base y se valora al tipo marginal, mientras que el minimo del art. 63.1.2
- * se grava a tipo cero. Sumarla al minimo le daba el tratamiento del otro.
- */
-function calcularReduccionTributacionConjunta(situacion: SituacionFamiliar, numHijos: number): number {
-  if (situacion === 'casado_un_ingreso') return REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental;
-  if (situacion === 'familia_monoparental' && numHijos > 0) {
-    return REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
-  }
-  return 0;
-}
-
-function calcularSSLaboralAnual(brutoAnual: number): number {
-  const baseMensual = Math.max(BASES_SS_2026.minima, Math.min(brutoAnual / 12, BASES_SS_2026.maxima));
-  const tipoTotal = COTIZACIONES_SS_2026.contingenciasComunes + COTIZACIONES_SS_2026.desempleo
-    + COTIZACIONES_SS_2026.formacionProfesional + COTIZACIONES_SS_2026.mef;
-  return baseMensual * (tipoTotal / 100) * 12;
-}
-
-function calcularReduccionRRT(rnt: number): number {
-  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -119,24 +85,8 @@ export default function EstimadorIRPFPage() {
   const [esTrabajador, setEsTrabajador] = useState(true);
 
   // Resultado
-  const [resultado, setResultado] = useState<{
-    brutoAnual: number;
-    reduccionTrabajo: number;
-    ssAnual: number;
-    baseImponibleGeneral: number;
-    minimosPersonalesFamiliares: number;
-    reduccionConjunta: number;
-    baseLiquidable: number;
-    cuotaEscala: number;
-    cuotaMinimo: number;
-    cuotaIntegra: number;
-    desgloseTramos: DesgloseTramo[];
-    deduccionRentasBajas: number;
-    cuotaTrasDeducciones: number;
-    retenciones: number;
-    cuotaDiferencial: number;
-    tipoEfectivo: number;
-  } | null>(null);
+  const [resultado, setResultado] = useState<ResultadoIRPF | null>(null);
+  const [aviso, setAviso] = useState('');
 
   const calcular = useCallback(() => {
     const bruto = parseSpanishNumber(rendimientosTrabajo) || 0;
@@ -145,70 +95,24 @@ export default function EstimadorIRPFPage() {
     const hijos = parseInt(numHijos) || 0;
     const hijosM3 = parseInt(hijosMenores3) || 0;
 
-    if (bruto <= 0 && capital <= 0) return;
+    // Una entrada que no se puede estimar BORRA el resultado anterior: si no, la cifra de la
+    // entrada previa seguía a la vista como si fuera de la nueva (hallazgo 1313).
+    if (bruto <= 0 && capital <= 0) {
+      setResultado(null);
+      setAviso('Introduce unos rendimientos del trabajo o del capital mayores que 0 para estimar el IRPF.');
+      return;
+    }
 
-    // SS laboral (si es trabajador)
-    const ssAnual = esTrabajador ? calcularSSLaboralAnual(bruto) : 0;
-
-    // Gastos deducibles generales del trabajo (art. 19.2.f LIRPF)
-    const gastosDeducibles = esTrabajador && bruto > 0 ? GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral : 0;
-
-    // Rendimiento Neto del Trabajo (RNT) = bruto - SS - gastos deducibles
-    const rnt = Math.max(0, bruto - ssAnual - gastosDeducibles);
-
-    // Reducción por RNT (art. 20 LIRPF) — sobre el RNT, con umbrales correctos 2025
-    const reduccionTrabajo = esTrabajador && bruto > 0 ? calcularReduccionRRT(rnt) : 0;
-
-    // Base imponible general = RNTR + capital mobiliario
-    const baseImponibleGeneral = Math.max(0, rnt - reduccionTrabajo) + capital;
-
-    // Minimos del art. 57 a 61: NO reducen la base, entran en la cuota a tipo cero.
-    const minimosPersonalesFamiliares = calcularMinimos(situacion, hijos, hijosM3);
-
-    // Base liquidable general = base imponible menos las reducciones de BASE (art. 84.2).
-    const reduccionConjunta = calcularReduccionTributacionConjunta(situacion, hijos);
-    const baseLiquidable = Math.max(0, baseImponibleGeneral - reduccionConjunta);
-
-    // Cuota íntegra
-    const {
-      cuota: cuotaIntegra,
-      cuotaEscala,
-      cuotaMinimo,
-      desglose: desgloseTramos,
-    } = calcularCuotaIRPF(baseLiquidable, minimosPersonalesFamiliares);
-
-    // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
-    const deduccionRentasBajas = esTrabajador && bruto > 0
-      ? calcularDeduccionRentasBajas(rnt, capital)
-      : 0;
-
-    // Cuota tras deducciones (no puede ser negativa)
-    const cuotaTrasDeducciones = Math.max(0, cuotaIntegra - deduccionRentasBajas);
-
-    // Cuota diferencial
-    const cuotaDiferencial = cuotaTrasDeducciones - retenciones;
-
-    // Tipo efectivo sobre base imponible
-    const tipoEfectivo = baseImponibleGeneral > 0 ? (cuotaTrasDeducciones / baseImponibleGeneral) * 100 : 0;
-
-    setResultado({
-      brutoAnual: bruto,
-      reduccionTrabajo,
-      ssAnual,
-      baseImponibleGeneral,
-      minimosPersonalesFamiliares,
-      reduccionConjunta,
-      baseLiquidable,
-      cuotaEscala,
-      cuotaMinimo,
-      cuotaIntegra,
-      desgloseTramos,
-      deduccionRentasBajas,
-      cuotaTrasDeducciones,
-      retenciones,
-      cuotaDiferencial,
-      tipoEfectivo,
-    });
+    setAviso('');
+    setResultado(estimarIRPF({
+      brutoTrabajo: Math.max(0, bruto),
+      capitalMobiliario: Math.max(0, capital),
+      retenciones: Math.max(0, retenciones),
+      situacion,
+      numHijos: hijos,
+      hijosMenores3: hijosM3,
+      conNomina: esTrabajador,
+    }));
   }, [rendimientosTrabajo, rendimientosCapital, situacion, numHijos, hijosMenores3, retencionesPracticadas, esTrabajador]);
 
   const limpiar = () => {
@@ -218,6 +122,7 @@ export default function EstimadorIRPFPage() {
     setNumHijos('0');
     setHijosMenores3('0');
     setResultado(null);
+    setAviso('');
   };
 
   return (
@@ -226,9 +131,9 @@ export default function EstimadorIRPFPage() {
 
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">📊</span>
-        <h1 className={styles.title}>Estimador IRPF 2025</h1>
+        <h1 className={styles.title}>{`Estimador IRPF ${EJERCICIO}`}</h1>
         <p className={styles.subtitle}>
-          Oriéntate sobre tu declaración de la renta: cuota íntegra, retenciones y resultado orientativo
+          Oriéntate sobre tu declaración de la renta del ejercicio {EJERCICIO} (se presenta en {EJERCICIO + 1}): cuota íntegra, retenciones y resultado orientativo
         </p>
       </header>
 
@@ -240,10 +145,11 @@ export default function EstimadorIRPFPage() {
       <DisclaimerCard variant="financial" severity="critical" />
 
       <DataReference
-        normativa={FISCAL_IRPF_META.fuente}
+        normativa={`IRPF ${EJERCICIO} (declaración de la renta de ${EJERCICIO + 1})`}
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
+        nota={`Todos los datos son del ejercicio ${EJERCICIO}: escala general y del ahorro, mínimos, reducciones y cotización del trabajador (tipos y bases de ${EJERCICIO}, Orden PJC/178/2025).`}
       />
 
       <div className={styles.mainContent}>
@@ -259,9 +165,16 @@ export default function EstimadorIRPFPage() {
                   checked={esTrabajador}
                   onChange={e => setEsTrabajador(e.target.checked)}
                   style={{ marginRight: '0.5rem' }}
+                  aria-describedby="ayuda-nomina"
                 />
                 Soy trabajador por cuenta ajena (con nómina)
               </label>
+              <p id="ayuda-nomina" className={styles.ayuda}>
+                Decide la cotización a la Seguridad Social y la deducción por obtención de rendimientos
+                del trabajo, que exige prestar servicios. Desmárcala si es una pensión: los{' '}
+                {eur0(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)} de gastos (art. 19.2.f) y
+                la reducción del art. 20 se aplican igual.
+              </p>
             </div>
 
             <NumberInput
@@ -278,7 +191,7 @@ export default function EstimadorIRPFPage() {
               onChange={setRendimientosCapital}
               label="Rendimientos del capital mobiliario (opcional)"
               placeholder="0"
-              helperText="Dividendos, intereses bancarios recibidos en el año"
+              helperText={`Dividendos e intereses del año. Van a la base del ahorro, con su propia escala (del ${TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo} % al ${TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo} %)`}
               min={0}
             />
 
@@ -333,6 +246,9 @@ export default function EstimadorIRPFPage() {
                 Limpiar
               </button>
             </div>
+            <div role="alert" aria-live="polite">
+              {aviso && <p className={styles.aviso}>{aviso}</p>}
+            </div>
           </div>
         </div>
 
@@ -365,7 +281,9 @@ export default function EstimadorIRPFPage() {
                   unit="€"
                   variant="highlight"
                   icon="📊"
-                  description="IRPF antes de deducciones y retenciones"
+                  description={resultado.baseLiquidableAhorro > 0
+                    ? 'Base general + base del ahorro, antes de deducciones y retenciones'
+                    : 'IRPF antes de deducciones y retenciones'}
                 />
                 {resultado.deduccionRentasBajas > 0 && (
                   <ResultCard
@@ -374,7 +292,7 @@ export default function EstimadorIRPFPage() {
                     unit="€"
                     variant="success"
                     icon="🟢"
-                    description="Art. 80 bis LIRPF (trabajo < 18.276 €)"
+                    description={`Por obtención de rendimientos del trabajo (sueldos de menos de ${eur0(DEDUCCION_RENTAS_BAJAS_2025.limiteMaximo)})`}
                   />
                 )}
                 <ResultCard
@@ -383,16 +301,28 @@ export default function EstimadorIRPFPage() {
                   unit="%"
                   variant="info"
                   icon="📈"
-                  description="Porcentaje sobre base imponible"
+                  description={resultado.baseImponibleAhorro > 0
+                    ? 'Porcentaje sobre la suma de las dos bases imponibles'
+                    : 'Porcentaje sobre base imponible'}
                 />
                 <ResultCard
-                  title="Base imponible"
+                  title="Base imponible general"
                   value={formatNumber(resultado.baseImponibleGeneral, 2)}
                   unit="€"
                   variant="default"
                   icon="📋"
-                  description="Bruto menos SS y reducciones"
+                  description="Trabajo: bruto menos cotización, gastos y reducción del art. 20"
                 />
+                {resultado.baseImponibleAhorro > 0 && (
+                  <ResultCard
+                    title="Base del ahorro"
+                    value={formatNumber(resultado.baseImponibleAhorro, 2)}
+                    unit="€"
+                    variant="default"
+                    icon="🏦"
+                    description="Dividendos e intereses (arts. 46 y 66 LIRPF)"
+                  />
+                )}
                 <ResultCard
                   title="Mínimos personales"
                   value={formatNumber(resultado.minimosPersonalesFamiliares, 2)}
@@ -405,39 +335,44 @@ export default function EstimadorIRPFPage() {
 
               {/* Desglose por tramos */}
               <div className={styles.tramosSection}>
-                <h3 className={styles.tramosTitle}><span aria-hidden="true">📊</span> Desglose por tramos IRPF 2025</h3>
-                <table className={styles.tramosTable}>
-                  <thead>
-                    <tr>
-                      <th>Desde</th>
-                      <th>Hasta</th>
-                      <th>Tipo</th>
-                      <th>Base aplicada</th>
-                      <th>Cuota</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {resultado.desgloseTramos
-                      .filter(t => t.baseAplicada > 0)
-                      .map((t, i) => (
-                        <tr key={i} className={styles.tramoAplicado}>
-                          <td>{formatCurrency(t.desde)}</td>
-                          <td>{t.hasta !== null ? formatCurrency(t.hasta) : 'En adelante'}</td>
-                          <td>{t.tipo}%</td>
-                          <td>{formatCurrency(t.baseAplicada)}</td>
-                          <td>{formatCurrency(t.cuota)}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+                <h3 className={styles.tramosTitle}><span aria-hidden="true">📊</span> {`Desglose por tramos IRPF ${EJERCICIO} · base general`}</h3>
+                {resultado.desgloseTramos.length > 0 ? (
+                  <table className={styles.tramosTable}>
+                    <thead>
+                      <tr>
+                        <th>Desde</th>
+                        <th>Hasta</th>
+                        <th>Tipo</th>
+                        <th>Base aplicada</th>
+                        <th>Cuota</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {resultado.desgloseTramos
+                        .filter(t => t.baseAplicada > 0)
+                        .map((t, i) => (
+                          <tr key={i} className={styles.tramoAplicado}>
+                            <td>{formatCurrency(t.desde)}</td>
+                            <td>{t.hasta !== null ? formatCurrency(t.hasta) : 'En adelante'}</td>
+                            <td>{t.tipo}%</td>
+                            <td>{formatCurrency(t.baseAplicada)}</td>
+                            <td>{formatCurrency(t.cuota)}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className={styles.tramosNota}>La base liquidable general es 0: no hay cuota general.</p>
+                )}
                 <p className={styles.tramosNota}>
-                  Los tramos se aplican a la base liquidable <strong>entera</strong> y suman{' '}
-                  {formatCurrency(resultado.cuotaEscala)}. De ahí se resta la misma escala
+                  Los tramos se aplican a la base liquidable general <strong>entera</strong>{' '}
+                  ({formatCurrency(resultado.baseLiquidableGeneral)}) y suman{' '}
+                  {formatCurrency(resultado.cuotaEscalaGeneral)}. De ahí se resta la misma escala
                   aplicada al mínimo personal y familiar (
-                  {formatCurrency(resultado.minimosPersonalesFamiliares)} →{' '}
-                  {formatCurrency(resultado.cuotaMinimo)}), que es la forma en que la ley lo
-                  grava a tipo cero (art. 63.1.2.º LIRPF). Cuota íntegra:{' '}
-                  {formatCurrency(resultado.cuotaIntegra)}.
+                  {formatCurrency(Math.min(resultado.minimosPersonalesFamiliares, resultado.baseLiquidableGeneral))} →{' '}
+                  {formatCurrency(resultado.cuotaMinimoGeneral)}), que es la forma en que la ley lo
+                  grava a tipo cero (art. 63.1.2.º LIRPF). Cuota íntegra general:{' '}
+                  {formatCurrency(resultado.cuotaIntegraGeneral)}.
                   {resultado.reduccionConjunta > 0 && (
                     <>
                       {' '}Antes de todo eso se restó de la base la reducción por tributación
@@ -445,7 +380,56 @@ export default function EstimadorIRPFPage() {
                       LIRPF), que esa sí reduce la base.
                     </>
                   )}
+                  {resultado.reduccionPerdidaPorOtrasRentas && (
+                    <>
+                      {' '}No se aplica la reducción por rendimientos del trabajo: tus otras rentas
+                      superan {eur0(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtrasRentas)} (art. 20 LIRPF).
+                    </>
+                  )}
                 </p>
+
+                {resultado.baseLiquidableAhorro > 0 && (
+                  <>
+                    <h3 className={styles.tramosTitle}><span aria-hidden="true">🏦</span> {`Base del ahorro IRPF ${EJERCICIO}`}</h3>
+                    <table className={styles.tramosTable}>
+                      <thead>
+                        <tr>
+                          <th>Desde</th>
+                          <th>Hasta</th>
+                          <th>Tipo</th>
+                          <th>Base aplicada</th>
+                          <th>Cuota</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {resultado.desgloseAhorro
+                          .filter(t => t.baseAplicada > 0)
+                          .map((t, i) => (
+                            <tr key={i} className={styles.tramoAplicado}>
+                              <td>{formatCurrency(t.desde)}</td>
+                              <td>{t.hasta !== null ? formatCurrency(t.hasta) : 'En adelante'}</td>
+                              <td>{t.tipo}%</td>
+                              <td>{formatCurrency(t.baseAplicada)}</td>
+                              <td>{formatCurrency(t.cuota)}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                    <p className={styles.tramosNota}>
+                      Los dividendos y los intereses no se suman a la base general: tributan en la
+                      base del ahorro con su propia escala (art. 66 LIRPF), que suma{' '}
+                      {formatCurrency(resultado.cuotaEscalaAhorro)}.
+                      {resultado.minimoEnAhorro > 0 && (
+                        <>
+                          {' '}La parte del mínimo que no cabía en la base general (
+                          {formatCurrency(resultado.minimoEnAhorro)}) se grava a tipo cero en esta
+                          base (art. 56.2 LIRPF): {formatCurrency(resultado.cuotaMinimoAhorro)} menos.
+                        </>
+                      )}
+                      {' '}Cuota íntegra del ahorro: {formatCurrency(resultado.cuotaIntegraAhorro)}.
+                    </p>
+                  </>
+                )}
               </div>
             </>
           ) : (
@@ -459,7 +443,7 @@ export default function EstimadorIRPFPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento fiscal</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento fiscal</h3>
         <p>
           Este estimador proporciona una <strong>aproximación orientativa</strong> basada en{' '}
           <a href={FISCAL_IRPF_META.urlOficial} target="_blank" rel="noopener noreferrer">
@@ -469,6 +453,7 @@ export default function EstimadorIRPFPage() {
         <ul>
           <li>Tu comunidad autónoma (la tarifa autonómica puede diferir del tipo medio usado aquí)</li>
           <li>Deducciones autonómicas y estatales aplicables a tu situación</li>
+          <li>Tu edad, ascendientes a cargo o discapacidad, que aumentan el mínimo y esta calculadora no pide</li>
           <li>Otras fuentes de renta no incluidas (inmuebles, actividades económicas, plusvalías)</li>
           <li>Aportaciones a planes de pensiones, hipotecas antiguas, donativos, etc.</li>
           <li>Cambios normativos posteriores a la fecha de verificación</li>
@@ -481,7 +466,7 @@ export default function EstimadorIRPFPage() {
           o consulta con un asesor fiscal.
         </p>
         <p className={styles.disclaimerFecha}>
-          Datos verificados: {FISCAL_IRPF_META.verificado} | Vigencia: {FISCAL_IRPF_META.vigencia}
+          Datos verificados: {FISCAL_IRPF_META.verificado} | Ejercicio calculado: {EJERCICIO}
         </p>
       </div>
 
@@ -500,52 +485,75 @@ export default function EstimadorIRPFPage() {
 
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>1️⃣ Base imponible</h4>
+              <h4><span aria-hidden="true">1️⃣</span> Base imponible</h4>
               <p>
-                Es el resultado de restar a los ingresos brutos las cotizaciones a la Seguridad Social
-                y la reducción por rendimientos del trabajo (hasta 6.498 € para rentas bajas).
+                En la base general, al sueldo bruto se le restan la cotización a la Seguridad Social,{' '}
+                {eur0(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)} de otros gastos y la reducción por
+                rendimientos del trabajo: hasta {eur0(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} en
+                rentas bajas, que se agota con {eur0(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)} de
+                rendimiento neto. Dividendos e intereses van aparte, a la base del ahorro.
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>2️⃣ Mínimo personal y familiar</h4>
+              <h4><span aria-hidden="true">2️⃣</span> Mínimo personal y familiar</h4>
               <p>
-                Una cantidad que reduce la base liquidable y no tributa: 5.550 € por defecto, más
-                cantidades adicionales por hijos, ascendientes o discapacidad.
+                La parte de la renta que no tributa: {eur0(MINIMOS_IRPF_2025.personal)} por defecto, más
+                cantidades por edad, hijos, ascendientes o discapacidad. <strong>No reduce la base</strong>:
+                se grava a tipo cero (art. 63.1.2.º LIRPF). La escala se aplica a la base entera y
+                también al mínimo, y la segunda cuota se resta de la primera.
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>3️⃣ Cuota íntegra</h4>
+              <h4><span aria-hidden="true">3️⃣</span> Cuota íntegra</h4>
               <p>
-                El resultado de aplicar los tramos del IRPF a la base liquidable. Es un impuesto
-                progresivo: cada tramo solo se aplica a la parte de renta que entra en él.
+                El resultado de aplicar la escala general a la base liquidable general y la escala
+                del ahorro a la del ahorro, menos la cuota del mínimo. Es un impuesto progresivo:
+                cada tramo solo se aplica a la parte de renta que entra en él.
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>4️⃣ Cuota diferencial</h4>
+              <h4><span aria-hidden="true">4️⃣</span> Cuota diferencial</h4>
               <p>
-                Cuota íntegra menos las retenciones ya practicadas durante el año. Si es positiva,
-                debes pagar a Hacienda. Si es negativa, Hacienda te devuelve.
+                Cuota íntegra menos deducciones y menos las retenciones ya practicadas durante el año.
+                Si es positiva, debes pagar a Hacienda. Si es negativa, Hacienda te devuelve.
               </p>
             </div>
           </div>
 
-          <h3>Tramos IRPF 2025 orientativos</h3>
+          <h3>{`Escala general IRPF ${EJERCICIO} (estatal + autonómica media)`}</h3>
           <table className={styles.tramosOrientativos}>
             <thead>
               <tr><th>Desde</th><th>Hasta</th><th>Tipo marginal</th></tr>
             </thead>
             <tbody>
-              <tr><td>0 €</td><td>12.450 €</td><td>19%</td></tr>
-              <tr><td>12.450 €</td><td>20.200 €</td><td>24%</td></tr>
-              <tr><td>20.200 €</td><td>35.200 €</td><td>30%</td></tr>
-              <tr><td>35.200 €</td><td>60.000 €</td><td>37%</td></tr>
-              <tr><td>60.000 €</td><td>300.000 €</td><td>45%</td></tr>
-              <tr><td>300.000 €</td><td>En adelante</td><td>47%</td></tr>
+              {filasEscala(TRAMOS_IRPF_2025).map((t) => (
+                <tr key={t.desde}>
+                  <td>{eur0(t.desde)}</td>
+                  <td>{t.hasta !== null ? eur0(t.hasta) : 'En adelante'}</td>
+                  <td>{t.tipo} %</td>
+                </tr>
+              ))}
             </tbody>
           </table>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
             * Tipos orientativos que combinan tarifa estatal + autonómica media. Tu CCAA puede variar.
           </p>
+
+          <h3>{`Escala de la base del ahorro IRPF ${EJERCICIO} (dividendos, intereses y ganancias)`}</h3>
+          <table className={styles.tramosOrientativos}>
+            <thead>
+              <tr><th>Desde</th><th>Hasta</th><th>Tipo</th></tr>
+            </thead>
+            <tbody>
+              {filasEscala(TRAMOS_GANANCIAS_PATRIMONIALES_2025).map((t) => (
+                <tr key={t.desde}>
+                  <td>{eur0(t.desde)}</td>
+                  <td>{t.hasta !== null ? eur0(t.hasta) : 'En adelante'}</td>
+                  <td>{t.tipo} %</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </section>
 
         {/* ── SECCIÓN 1: Tabla comparativa de perfiles ──────────────────── */}
@@ -566,30 +574,38 @@ export default function EstimadorIRPFPage() {
               <tbody>
                 <tr>
                   <td><strong>Obligación de declarar</strong></td>
-                  <td>Un pagador &gt;22.000 € / dos pagadores &gt;15.000 €</td>
+                  <td>
+                    Un pagador: más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.unPagador)} · varios pagadores:
+                    más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)} si del 2.º y siguientes
+                    llegan más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}
+                  </td>
                   <td>Siempre si ingresos &gt;1.000 € (actividad económica)</td>
-                  <td>Igual que asalariado; pensión mínima exenta si &lt;22.000 €</td>
-                  <td>Umbral individual &gt;15.000 € si el 2.º pagador supera 1.500 €</td>
+                  <td>Los mismos umbrales que el asalariado: la pensión es rendimiento del trabajo</td>
+                  <td>Cada uno con su propio umbral si declaran por separado</td>
                 </tr>
                 <tr>
                   <td><strong>Cómo se retiene</strong></td>
                   <td>La empresa retiene automáticamente en nómina</td>
                   <td>Clientes retienen 15 % (7 % primeros 3 años); pagos propios trimestrales (mod. 130)</td>
-                  <td>La SS retiene según cuantía de pensión</td>
+                  <td>La entidad que paga la pensión retiene según su cuantía</td>
                   <td>Cada empleador retiene según sus datos; riesgo de infra-retención</td>
                 </tr>
                 <tr>
                   <td><strong>Deducciones típicas</strong></td>
                   <td>SS, reducción rendimientos trabajo, mínimos familiares</td>
                   <td>Todos los gastos de actividad, cuotas RETA, amortizaciones</td>
-                  <td>Reducción específica pensionistas, mínimo personal ≥65 (6.700 €)</td>
-                  <td>Mínimos familiares compartidos; puede convenir tributación conjunta</td>
+                  <td>
+                    {eur0(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)} de gastos y reducción del art. 20
+                    como cualquier rendimiento del trabajo; mínimo personal de{' '}
+                    {eur0(MINIMOS_IRPF_2025.personal_65)} desde los 65 años
+                  </td>
+                  <td>Mínimo por hijos repartido a partes iguales si declaran por separado; puede convenir tributación conjunta</td>
                 </tr>
                 <tr>
                   <td><strong>Tipo efectivo orientativo</strong></td>
-                  <td>~14 % en 30.000 € brutos; ~22 % en 50.000 €</td>
-                  <td>~12–18 % sobre rendimiento neto (sin gastos deducibles)</td>
-                  <td>~10–14 % en pensiones medias (18.000–24.000 €)</td>
+                  <td>{pct(ESC_SUELDO_30.tipoEfectivo)} con 30.000 € brutos; {pct(ESC_SUELDO_50.tipoEfectivo)} con 50.000 €</td>
+                  <td>{pct((AUTONOMO_CUOTA / AUTONOMO_RENDIMIENTO_NETO) * 100)} con 35.000 € de rendimiento neto</td>
+                  <td>{pct(ESC_PENSION.tipoEfectivo)} a {pct(ESC_PENSION_24.tipoEfectivo)} con pensiones de 18.000 a 24.000 € (menos desde los 65 años)</td>
                   <td>Individualmente menor; conjunta puede ser peor si ambos ingresos similares</td>
                 </tr>
                 <tr>
@@ -602,12 +618,21 @@ export default function EstimadorIRPFPage() {
               </tbody>
             </table>
           </div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+            Tipo efectivo: cuota tras deducciones sobre la base imponible, calculado con la escala
+            general de esta página, soltero/a sin hijos y el mínimo personal de{' '}
+            {eur0(MINIMOS_IRPF_2025.personal)}.
+          </p>
         </section>
 
         {/* ── SECCIÓN 2: Casos de uso con ejemplos concretos ────────────── */}
         <section className={styles.guideSection}>
           <h2>Ejemplos reales: cuánto pagas según tu situación</h2>
-          <p>Cuatro perfiles con cálculos orientativos para el ejercicio 2025 (tarifa estatal + autonómica media):</p>
+          <p>
+            Cuatro perfiles calculados con la misma fórmula que la calculadora de arriba, para el
+            ejercicio {EJERCICIO} (tarifa estatal + autonómica media). Los tres primeros puedes
+            reproducirlos introduciendo sus datos.
+          </p>
           <div className={styles.escenariosGrid}>
 
             <div className={styles.escenarioCard}>
@@ -615,72 +640,75 @@ export default function EstimadorIRPFPage() {
                 <span className={styles.escenarioIcon} aria-hidden="true">👨‍💼</span>
                 <h4>Asalariado soltero, 28.000 € brutos</h4>
               </div>
-              <div className={styles.escenarioExample}>
-                <p><strong>Cotización SS:</strong> ~1.745 €/año</p>
-                <p><strong>Reducción rendimientos trabajo:</strong> ~3.700 €</p>
-                <p><strong>Base imponible:</strong> ~22.555 €</p>
-                <p><strong>Mínimo personal:</strong> 5.550 €</p>
-                <p><strong>Cuota íntegra:</strong> ~3.170 €</p>
-                <p><strong>Tipo efectivo:</strong> ~11,4 %</p>
-                <p><strong>Retención habitual:</strong> ~3.200–3.400 €</p>
+              <div className={styles.escenarioExample} data-escenario="soltero-28000">
+                <p><strong>Cotización SS:</strong> {eur(ESC_SOLTERO.ssAnual)}/año</p>
+                <p><strong>Otros gastos (art. 19.2.f):</strong> {eur(ESC_SOLTERO.gastosDeducibles)}</p>
+                <p><strong>Reducción rendimientos trabajo:</strong> {eur(ESC_SOLTERO.reduccionTrabajo)} (se agota con {eur0(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)} de rendimiento neto)</p>
+                <p><strong>Base imponible:</strong> {eur(ESC_SOLTERO.baseImponibleGeneral)}</p>
+                <p><strong>Mínimo personal:</strong> {eur(ESC_SOLTERO.minimosPersonalesFamiliares)} (a tipo cero, no se resta de la base)</p>
+                <p><strong>Cuota íntegra:</strong> {eur(ESC_SOLTERO.cuotaIntegra)}</p>
+                <p><strong>Tipo efectivo:</strong> {pct(ESC_SOLTERO.tipoEfectivo)} de la base</p>
               </div>
               <div className={styles.escenarioTip}>
-                Resultado habitual: pequeña devolución de 100–300 € si la retención fue correcta. Si tiene dos pagadores (el segundo &gt;1.500 €), puede salir a pagar.
+                Si la empresa retuvo bien durante el año —la retención se calcula con la misma escala y el mismo mínimo—, la declaración suele quedar cerca de cero. Si tiene dos pagadores (el segundo &gt;{eur0(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}), puede salir a pagar.
               </div>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">👩‍👧‍👦</span>
-                <h4>Asalariada casada, 45.000 €, 2 hijos menores</h4>
+                <h4>Asalariada casada, 45.000 €, 2 hijos, declaración individual</h4>
               </div>
-              <div className={styles.escenarioExample}>
-                <p><strong>SS:</strong> ~2.800 €/año</p>
-                <p><strong>Base imponible:</strong> ~38.800 €</p>
-                <p><strong>Mínimo personal + familiar:</strong> 5.550 + 2.400 + 2.700 = <strong>10.650 €</strong></p>
-                <p><strong>Base liquidable:</strong> ~28.150 €</p>
-                <p><strong>Cuota íntegra:</strong> ~6.400 €</p>
-                <p><strong>Tipo efectivo:</strong> ~13,6 %</p>
-              </div>
-              <div className={styles.escenarioTip}>
-                El mínimo familiar por los 2 hijos (2.400 € + 2.700 €) ahorra 969 € de cuota respecto a no tenerlos: el mínimo no reduce la base, se le aplica la escala desde cero, así que esos 5.100 € se valoran al 19 % y no a tu tipo marginal. Si ambos cónyuges trabajan y declaran individualmente, suele ser más ventajoso que la conjunta.
-              </div>
-            </div>
-
-            <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon} aria-hidden="true">🧾</span>
-                <h4>Autónomo, 35.000 € rendimiento neto</h4>
-              </div>
-              <div className={styles.escenarioExample}>
-                <p><strong>Cuota RETA (base mínima ~330 €/mes):</strong> ~3.960 €/año</p>
-                <p><strong>Base imponible tras RETA:</strong> ~31.040 €</p>
-                <p><strong>Sin reducción rendimientos trabajo</strong> (actividad económica)</p>
-                <p><strong>Mínimo personal:</strong> 5.550 €</p>
-                <p><strong>Base liquidable:</strong> ~25.490 €</p>
-                <p><strong>Cuota íntegra:</strong> ~5.450 €</p>
-                <p><strong>Tipo efectivo:</strong> ~13,4 % sobre rendimiento neto</p>
+              <div className={styles.escenarioExample} data-escenario="casada-45000">
+                <p><strong>SS:</strong> {eur(ESC_CASADA.ssAnual)}/año</p>
+                <p><strong>Base imponible:</strong> {eur(ESC_CASADA.baseImponibleGeneral)}</p>
+                <p>
+                  <strong>Mínimo personal + familiar:</strong> {eur0(MINIMOS_IRPF_2025.personal)} + ({eur0(MINIMOS_IRPF_2025.hijo_1)} + {eur0(MINIMOS_IRPF_2025.hijo_2)}) ÷ 2 ={' '}
+                  <strong>{eur(ESC_CASADA.minimosPersonalesFamiliares)}</strong>
+                </p>
+                <p><strong>Cuota íntegra:</strong> {eur(ESC_CASADA.cuotaIntegra)}</p>
+                <p><strong>Tipo efectivo:</strong> {pct(ESC_CASADA.tipoEfectivo)} de la base</p>
               </div>
               <div className={styles.escenarioTip}>
-                La cuota RETA es deducible como gasto de actividad. Si además tiene gastos de vehículo, material o local, la base real puede ser significativamente menor. Los pagos fraccionados trimestrales (mod. 130) anticipan parte de esta cuota.
+                Si los dos progenitores declaran por separado, el mínimo por los hijos se reparte a partes iguales (art. 61.1.ª LIRPF): {eur((MINIMOS_IRPF_2025.hijo_1 + MINIMOS_IRPF_2025.hijo_2) / 2)} para cada uno, que le ahorran {eur(ESC_CASADA_SIN_HIJOS.cuotaIntegra - ESC_CASADA.cuotaIntegra)} de cuota. El mínimo no reduce la base: se le aplica la escala desde cero, así que se valora al {TRAMOS_IRPF_2025[0].tipo} % y no a su tipo marginal. En la calculadora corresponde a «Casado/a (dos ingresos)».
               </div>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
-                <h4>Pensionista, 18.000 € jubilación</h4>
+                <h4>Pensionista, 18.000 € de pensión</h4>
               </div>
-              <div className={styles.escenarioExample}>
-                <p><strong>Reducción pensionistas (art. 20 LIRPF):</strong> ~1.800 €</p>
-                <p><strong>Base imponible:</strong> ~16.200 €</p>
-                <p><strong>Mínimo personal ≥65 años:</strong> 6.700 € (en lugar de 5.550 €)</p>
-                <p><strong>Base liquidable:</strong> ~9.500 €</p>
-                <p><strong>Cuota íntegra:</strong> ~1.805 €</p>
-                <p><strong>Tipo efectivo:</strong> ~10,0 %</p>
+              <div className={styles.escenarioExample} data-escenario="pension-18000">
+                <p><strong>Cotización:</strong> no hay (la pensión no cotiza)</p>
+                <p><strong>Otros gastos (art. 19.2.f):</strong> {eur(ESC_PENSION.gastosDeducibles)}</p>
+                <p><strong>Reducción rendimientos trabajo (art. 20):</strong> {eur(ESC_PENSION.reduccionTrabajo)}</p>
+                <p><strong>Base imponible:</strong> {eur(ESC_PENSION.baseImponibleGeneral)}</p>
+                <p><strong>Mínimo personal general:</strong> {eur(ESC_PENSION.minimosPersonalesFamiliares)}</p>
+                <p><strong>Cuota íntegra:</strong> {eur(ESC_PENSION.cuotaIntegra)}</p>
+                <p><strong>Tipo efectivo:</strong> {pct(ESC_PENSION.tipoEfectivo)} de la base</p>
+                <p><strong>Desde los 65 años</strong> (mínimo de {eur0(MINIMOS_IRPF_2025.personal_65)}): cuota íntegra {eur(ESC_PENSION_65.cuotaIntegra)}</p>
               </div>
               <div className={styles.escenarioTip}>
-                El mínimo personal de 6.700 € (≥65 años) o 8.100 € (≥75 años) reduce notablemente la cuota. La SS suele retener de forma ajustada, por lo que el resultado suele ser próximo a cero (ni paga ni devuelve).
+                En la calculadora, desmarca «Soy trabajador por cuenta ajena»: la pensión no cotiza ni da derecho a la deducción por obtención de rendimientos del trabajo, pero sí a los gastos y a la reducción del art. 20. La calculadora no pide la edad; el mínimo de {eur0(MINIMOS_IRPF_2025.personal_65)} (≥65 años) o {eur0(MINIMOS_IRPF_2025.personal_75)} (≥75 años) lo aplica el{' '}
+                <a href="/estimador-irpf-pensionista/">estimador IRPF para pensionistas</a>.
+              </div>
+            </div>
+
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧾</span>
+                <h4>Autónomo, 35.000 € de rendimiento neto</h4>
+              </div>
+              <div className={styles.escenarioExample} data-escenario="autonomo-35000">
+                <p><strong>Rendimiento neto de la actividad:</strong> {eur(AUTONOMO_RENDIMIENTO_NETO)}, ya descontados la cuota de autónomos y los gastos deducibles</p>
+                <p><strong>Sin reducción por rendimientos del trabajo</strong> (es actividad económica)</p>
+                <p><strong>Mínimo personal:</strong> {eur(MINIMOS_IRPF_2025.personal)} (a tipo cero)</p>
+                <p><strong>Cuota íntegra:</strong> {eur(AUTONOMO_CUOTA)}</p>
+                <p><strong>Tipo efectivo:</strong> {pct((AUTONOMO_CUOTA / AUTONOMO_RENDIMIENTO_NETO) * 100)} del rendimiento neto</p>
+              </div>
+              <div className={styles.escenarioTip}>
+                Esta calculadora no admite rendimientos de actividades económicas: el ejemplo aplica a mano la misma escala y el mismo método del mínimo. La cuota de autónomos es gasto deducible de la actividad, y los pagos fraccionados trimestrales (mod. 130) anticipan parte de esta cuota.
               </div>
             </div>
 
@@ -695,14 +723,14 @@ export default function EstimadorIRPFPage() {
             <div className={styles.faqItem}>
               <h4>¿Estoy obligado a declarar si solo tengo un pagador?</h4>
               <p>
-                Con un único pagador, el umbral de obligación es <strong>22.000 € brutos anuales</strong>. Por debajo, no estás obligado, aunque puede convenirte si tienes derecho a devolución (por ejemplo, deducciones autonómicas o por maternidad). Con dos o más pagadores, si el segundo supera 1.500 €, el umbral baja a <strong>15.000 €</strong>.
+                Con un único pagador, el umbral de obligación es <strong>{eur0(OBLIGACION_DECLARAR_2025.trabajo.unPagador)} brutos anuales</strong>. Por debajo, no estás obligado, aunque puede convenirte si tienes derecho a devolución (por ejemplo, deducciones autonómicas o por maternidad). Con dos o más pagadores, si del segundo y siguientes llegan más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}, el umbral baja a <strong>{eur0(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)}</strong>.
               </p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre tipo marginal y tipo efectivo?</h4>
               <p>
-                El <strong>tipo marginal</strong> es el porcentaje que se aplica al último euro que ganas (el del tramo más alto en el que entras). El <strong>tipo efectivo</strong> es el porcentaje real que pagas sobre toda tu base imponible. Por ejemplo, si ganas 35.200 € tu tipo marginal es 30 %, pero tu tipo efectivo será aproximadamente el 14–16 %, porque los primeros tramos tributan a tipos menores.
+                El <strong>tipo marginal</strong> es el porcentaje que se aplica al último euro que ganas (el del tramo más alto en el que entras). El <strong>tipo efectivo</strong> es el porcentaje real que pagas sobre toda tu base imponible. Por ejemplo, con una base de {eur0(FAQ_BASE)} tu tipo marginal es el {FAQ_MARGINAL} %, pero tu tipo efectivo es el {pct((FAQ_CUOTA / FAQ_BASE) * 100)} ({eur(FAQ_CUOTA)} de cuota, con el mínimo personal a tipo cero), porque los primeros tramos tributan a tipos menores.
               </p>
             </div>
 
@@ -737,7 +765,7 @@ export default function EstimadorIRPFPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué pasa si no estoy obligado pero me conviene declarar?</h4>
               <p>
-                Puedes presentar la declaración voluntariamente aunque no estés obligado. Es habitual que salga <strong>a devolver</strong> en estos casos, por ejemplo si tuviste retenciones en nómina o tienes derecho a deducciones (maternidad, alquiler autonómico, donativos). La AEAT tiene un plazo de 6 meses para devolver desde la fecha de presentación; si lo supera, debe abonarte intereses.
+                Puedes presentar la declaración voluntariamente aunque no estés obligado. Es habitual que salga <strong>a devolver</strong> en estos casos, por ejemplo si tuviste retenciones en nómina o tienes derecho a deducciones (maternidad, alquiler autonómico, donativos). La AEAT tiene 6 meses desde el final del plazo de presentación para devolver (art. 103 LIRPF); si lo supera, debe abonarte intereses de demora.
               </p>
             </div>
 
@@ -805,7 +833,7 @@ export default function EstimadorIRPFPage() {
               <div className={styles.stepContent}>
                 <h4>Comparar tributación individual vs conjunta (si eres pareja)</h4>
                 <p>
-                  Renta WEB permite simular ambas modalidades sin confirmar. Hazlo siempre que estés casado/a. La <strong>conjunta suele convenir solo si uno de los dos no tiene ingresos o son muy bajos</strong> (&lt;3.000 €/año). Con dos sueldos similares, la individual es casi siempre mejor, porque en conjunta se pierde la reducción personal de 5.550 € del segundo cónyuge.
+                  Renta WEB permite simular ambas modalidades sin confirmar. Hazlo siempre que estés casado/a. La <strong>conjunta suele convenir solo si uno de los dos no tiene ingresos o son muy bajos</strong>. Con dos sueldos similares, la individual es casi siempre mejor, porque en conjunta la unidad familiar tiene un solo mínimo del contribuyente ({eur0(MINIMOS_IRPF_2025.personal)}) y se pierde el del segundo cónyuge.
                 </p>
               </div>
             </div>
