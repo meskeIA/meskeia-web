@@ -28,6 +28,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { execFileSync } from 'child_process';
 import { abrir, RAIZ } from './db.mjs';
+import { calcularFirma, cargarDump, dumpMasReciente } from './firma.mjs';
 
 // ─── Riesgo por suite ─────────────────────────────────────────────────────────
 // Derivado de _private/DISCLAIMER-POLICY.md. Cuando una app pertenece a varias
@@ -219,6 +220,28 @@ if (retirables.length) {
   for (const r of retirables) borrar.run(r.slug);
 }
 
+// ─── Firma de rotura ──────────────────────────────────────────────────────────
+// Visitas cortas seguidas de recarga: la huella de una app que la gente no consigue usar.
+// El criterio y su calibración, en la cabecera de `firma.mjs`.
+//
+// `firma_desde` se CONSERVA mientras la firma siga saltando y se borra cuando deja de
+// hacerlo: así una app inspeccionada después de que apareciera sale de la cola FIRMA y no
+// vuelve cada mes por la misma señal ya revisada, pero sí vuelve si la firma desaparece y
+// reaparece más tarde, que es una señal nueva.
+let firma = null;
+const rutaDump = dumpMasReciente();
+if (rutaDump) {
+  firma = calcularFirma(cargarDump(rutaDump), { slugs: [...vivas] });
+  const marcar = db.prepare(`UPDATE apps SET firma = ?, firma_detalle = ?,
+    firma_desde = COALESCE(firma_desde, ?) WHERE slug = ?`);
+  const limpiar = db.prepare(`UPDATE apps SET firma = NULL, firma_detalle = NULL, firma_desde = NULL WHERE slug = ?`);
+  for (const slug of vivas) {
+    const f = firma.apps.get(slug);
+    if (f?.firma) marcar.run(f.firma, f.detalle, firma.hasta, slug);
+    else limpiar.run(slug);
+  }
+}
+
 const cuenta = q => db.prepare(q).get().n;
 console.log(`\nBase del Inspector · _private/inspector/inspector.db`);
 console.log(`  ${n} apps sincronizadas` + (sinCarpeta ? ` · ${sinCarpeta} en el catálogo sin carpeta en app/` : ''));
@@ -236,3 +259,10 @@ console.log('\n  por riesgo:');
 for (const r of db.prepare('SELECT riesgo, COUNT(*) n FROM apps GROUP BY riesgo ORDER BY riesgo').all())
   console.log(`    nivel ${r.riesgo}      ${String(r.n).padStart(4)} apps`);
 console.log(`\n  sin inspeccionar todavía: ${cuenta('SELECT COUNT(*) n FROM apps WHERE ultima_inspeccion IS NULL')}`);
+if (firma) {
+  const marcadas = db.prepare('SELECT slug, firma FROM apps WHERE firma IS NOT NULL ORDER BY slug').all();
+  console.log(`  firma de rotura (30 días hasta el ${firma.hasta.split('-').reverse().join('/')}): ` +
+    (marcadas.length ? `${marcadas.length} · ${marcadas.map(m => `${m.slug} (${m.firma})`).join(', ')}` : 'ninguna'));
+} else {
+  console.log('  ⚠️  sin dump en _backups/turso: la firma de rotura NO se ha recalculado');
+}

@@ -103,10 +103,18 @@ export function abrir() {
  * `--revalidar-reparadas` para saber si una reparación es POSTERIOR a la última vez que la
  * app se dio por buena. Con fechas de día no se puede: se inspecciona y se repara el mismo día
  * (ver la cabecera de `cerrar.mjs`).
+ *
+ * `apps.firma*` (24/09/2026) guardan la firma de rotura de `firma.mjs`: qué señal salta
+ * (`nivel`, `cambio` o las dos), la frase que la explica y el día en que empezó a saltar.
+ * `firma_desde` es lo que decide si una app YA inspeccionada vuelve a la cola: solo si la
+ * firma apareció después de su última inspección.
  */
 const COLUMNAS_NUEVAS = [
   ['hallazgos', 'cerrado', 'TEXT'],
   ['apps', 'validada', 'TEXT'],
+  ['apps', 'firma', 'TEXT'],
+  ['apps', 'firma_detalle', 'TEXT'],
+  ['apps', 'firma_desde', 'TEXT'],
 ];
 function migrar(db) {
   for (const [tabla, columna, tipo] of COLUMNAS_NUEVAS) {

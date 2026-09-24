@@ -10,15 +10,20 @@
  * esto, para que la decisión de "qué toca hoy" sea reproducible y auditable en vez de
  * quedar al criterio de lo que el modelo recuerde de la sesión anterior.
  *
- * LAS TRES COLAS, EN ORDEN DE PRIORIDAD
- * ─────────────────────────────────────
+ * LAS CUATRO COLAS, EN ORDEN DE PRIORIDAD
+ * ───────────────────────────────────────
  *   1. TEST EN ROJO   — algo que se verificó se ha roto. Es el caso que justifica todo
  *                       esto: `lupa-digital` funcionaba en el móvil del usuario y dejó
  *                       de hacerlo sin que nadie tocara la app.
- *   2. INVALIDADA     — cambió su código o un dato de `data/fiscal` del que depende
+ *   2. FIRMA          — ya inspeccionada, pero DESPUÉS apareció en Analytics la firma de
+ *                       una app que la gente no consigue usar (visitas cortas seguidas de
+ *                       recarga; ver `firma.mjs`). Es la vía para lo que rompe una app sin
+ *                       tocar su código —una cabecera, un navegador nuevo— y que por eso
+ *                       nunca la invalidaría. Sale de la cola al volver a inspeccionarla.
+ *   3. INVALIDADA     — cambió su código o un dato de `data/fiscal` del que depende
  *                       DESPUÉS de inspeccionarla. Lo que rompe una app es un cambio,
  *                       no el paso del tiempo: por eso la cola no va por calendario.
- *   3. NUNCA VISTA    — por prioridad (uso real × riesgo), no por orden alfabético.
+ *   4. NUNCA VISTA    — por prioridad (uso real × riesgo), no por orden alfabético.
  *
  * LAS FAMILIAS SALEN JUNTAS
  * ─────────────────────────
@@ -52,15 +57,25 @@ const db = abrir();
  * entre 900 y 1.200 casi ninguna, y sin log las cuatro apps más visitadas coparían la
  * cola durante semanas.
  *
- * El tercer sumando es el que aporta el caso de lupa-digital: muchas visitas y estancia
- * mínima es la firma de una app en la que se entra y se sale porque no funciona. Como
- * indicio basta para mirarla antes; como prueba no vale nada, y por eso solo ordena.
+ * El tercer sumando es el que aporta el caso de lupa-digital: la firma de una app en la que
+ * se entra, no se consigue nada y se recarga. Como indicio basta para mirarla antes; como
+ * prueba no vale nada, y por eso solo ordena.
+ *
+ * Hasta el 24/09/2026 ese sumando era «≥ 50 usos y estancia media < 30 s». No podía ver la
+ * lupa: la media de la estancia se calcula solo sobre las visitas con duración registrada, y
+ * unas pocas visitas largas la suben por encima de 30 s aunque la mayoría se vaya a los
+ * pocos segundos. La firma de `firma.mjs` se calibró sobre la lupa rota y la marca.
  */
 const PRIORIDAD = `
   (LOG(usos + 1) * 10)
   + ((5 - riesgo) * 5)
-  + (CASE WHEN usos >= 50 AND duracion_media > 0 AND duracion_media < 30 THEN 20 ELSE 0 END)
+  + (CASE WHEN firma IS NOT NULL THEN 20 ELSE 0 END)
   - (CASE WHEN segmento = 'contenido' THEN 15 ELSE 0 END)
+`;
+
+/** Inspeccionada ANTES de que apareciera la firma: la inspección no pudo tenerla en cuenta. */
+const SQL_FIRMA_NUEVA = `
+  firma IS NOT NULL AND ultima_inspeccion IS NOT NULL AND ultima_inspeccion < firma_desde
 `;
 
 const COLAS = [
@@ -68,6 +83,13 @@ const COLAS = [
     clave: 'ROJO',
     titulo: 'Test en rojo — se ha roto algo que ya estaba verificado',
     sql: `SELECT *, ${PRIORIDAD} AS p FROM apps WHERE test_estado = 'rojo' ORDER BY p DESC`,
+  },
+  {
+    clave: 'FIRMA',
+    titulo: 'Firma de rotura — la gente entra, no lo consigue y recarga (apareció tras la inspección)',
+    sql: `SELECT *, ${PRIORIDAD} AS p FROM apps
+          WHERE ${SQL_FIRMA_NUEVA} AND COALESCE(test_estado, '') <> 'rojo' AND NOT (${SQL_INVALIDADA})
+          ORDER BY p DESC`,
   },
   {
     clave: 'INVALIDADA',
@@ -122,19 +144,20 @@ if (RESUMEN) {
 /** Una línea de app, con su prioridad, uso y avisos. */
 function linea(f, sangria = '  ') {
   const deps = JSON.parse(f.deps || '[]');
-  const sospecha = f.usos >= 50 && f.duracion_media > 0 && f.duracion_media < 30;
   return (
     `${sangria}${String(Math.round(f.p)).padStart(3)}  ${f.slug.padEnd(44)} ` +
     `${f.segmento.padEnd(11)} riesgo ${f.riesgo}  ${String(f.usos).padStart(5)} usos` +
-    (sospecha ? `  ⚠ ${f.duracion_media}s de estancia` : '') +
-    (deps.length ? `  [${deps.length} dep]` : '')
+    (deps.length ? `  [${deps.length} dep]` : '') +
+    (f.firma ? `\n${sangria}     ⚠ firma de rotura (${f.firma}): ${f.firma_detalle}` : '')
   );
 }
 
 /** En qué cola está un slug ahora mismo, o null si está al día. */
 const SQL_ESTADO = db.prepare(`
   SELECT slug, ${PRIORIDAD} AS p, segmento, riesgo, usos, duracion_media, deps, ultima_inspeccion,
+         firma, firma_detalle,
          CASE WHEN test_estado = 'rojo' THEN 'ROJO'
+              WHEN ${SQL_FIRMA_NUEVA} AND NOT (${SQL_INVALIDADA}) THEN 'FIRMA'
               WHEN ${SQL_INVALIDADA} THEN 'INVALIDADA'
               WHEN ultima_inspeccion IS NULL THEN 'NUEVA'
               ELSE 'al día' END AS estado

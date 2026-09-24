@@ -60,6 +60,8 @@
     "test:apps": "npx playwright test tests/apps",
     "ronda:hoy": "node scripts/ronda-hoy.mjs",
     "inspector:hallazgos": "node scripts/inspector/cerrar.mjs",
+    "inspector:firma": "node scripts/inspector/firma.mjs",
+    "inspector:probar-firma": "node scripts/inspector/probar-firma.mjs",
     "inspector:probar-contador": "node scripts/inspector/probar-contador.mjs",
     "inspector:probar-familias": "node scripts/inspector/probar-familias.mjs",
     "inspector:probar-revalidar": "node scripts/inspector/probar-revalidar.mjs",
