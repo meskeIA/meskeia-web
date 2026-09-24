@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { calcularResultado, CLAVES, ORDEN_COSTE, PREGUNTAS, type EjercicioKey } from '../../app/selector-ejercicio/motor';
+import { calcularResultado, CLAVES, EJERCICIOS, ORDEN_COSTE, PREGUNTAS, TECHO_CUOTA, TECHO_SESION, type EjercicioKey } from '../../app/selector-ejercicio/motor';
 
 /**
  * ¿Qué ejercicio te conviene? (selector-ejercicio) — reparado el 24/09/2026 desde una sospecha
@@ -11,17 +11,20 @@ import { calcularResultado, CLAVES, ORDEN_COSTE, PREGUNTAS, type EjercicioKey } 
  *   · La barra decía aria-valuenow = paso + 1 con mínimo 1, y pintaba paso / 10: en la
  *     pregunta 2 anunciaba 0,111 y pintaba 0,100.
  *   · Empates: el ganador salía de ordenar `Object.entries(puntos)`: a igualdad, el primero del
- *     objeto, siempre el gimnasio. Enumerado: 340.435 de los 1.376.256 perfiles (el 24,7 %)
- *     empatan en cabeza, y en 210.415 el criterio explícito cambia el ganador. Entre ellos, el
- *     perfil de abajo: con «Problemas de espalda o columna» la app mandaba al gimnasio, que
- *     puntúa 1 en esa pregunta, habiendo natación y yoga con 3.
+ *     objeto, siempre el gimnasio.
  *   · Razones fijas: la app no da un «por qué»; las fichas (beneficios, equipo, consejos)
  *     describen la actividad, no al usuario. No había nada que reparar ahí.
  *
- * EL MOTOR (app/selector-ejercicio/motor.ts): las mismas preguntas y pesos (comprobado sobre
- * todas las combinaciones: sin empate, el ganador no cambia en ninguna). A igualdad de puntos,
- * primero la limitación física (pregunta 7), luego el objetivo (1), luego el presupuesto (5) y
- * por último el menor coste de partida; el empate se anuncia con el criterio que lo decide.
+ * EL MOTOR (app/selector-ejercicio/motor.ts): las mismas preguntas y pesos. A igualdad de
+ * puntos, primero la limitación física (pregunta 7), luego el objetivo (1), luego el
+ * presupuesto (5) y por último el menor coste de partida; el empate se anuncia con el criterio
+ * que lo decide.
+ *
+ * SEGUNDA REPARACIÓN, el mismo 24/09/2026 (hallazgos 1378-1388 del Inspector): lo declarado
+ * como límite —una limitación física o la prioridad de bajo impacto frente al running, «En casa,
+ * sin salir», la cuota mensual y el tiempo por sesión— pasa de peso a FILTRO, y lo apartado se
+ * dice en pantalla. Los dos tests de abajo que suponían otra cosa se reescribieron, cada uno con
+ * su motivo en un comentario.
  */
 
 async function esperarHidratacionBotones(page: Page): Promise<void> {
@@ -61,8 +64,10 @@ async function responder(page: Page, indices: readonly number[]): Promise<string
 //   2,3,2,3,1,2 + 1,2,1,1,2,3 + 2,3,3,2,2,3 + 0,0,0,0,2,3 + 3,2,2,2,3,2 + 3,3,3,3,2,1 +
 //   1,1,3,1,3,2 + 2,1,2,2,1,1 + 2,1,1,1,2,0 + 3,2,2,2,1,2
 //   = gimnasio 19 · running 18 · natación 19 · ciclismo 17 · yoga 19 · casa 19.
-// Cuádruple empate a 19. Espalda: natación 3 = yoga 3 > casa 2 > gimnasio 1. Entre natación y
-// yoga, el objetivo «perder peso»: natación 2 > yoga 1. Antes: gimnasio, por ir primero.
+// REESCRITO el 24/09/2026 (hallazgo 1380): este test exigía la NATACIÓN a quien acababa de
+// responder «En casa, sin salir»; consagraba el defecto. Ahora, en casa solo caben el yoga o el
+// pilates y el entrenamiento en casa, empatados a 19: espalda yoga 3 > casa 2 → yoga. La
+// natación, que iba primera por puntos (espalda 3, objetivo 2), se aparta y se dice.
 const ESPALDA = [0, 0, 0, 0, 2, 3, 2, 1, 3, 1] as const;
 
 test('el grupo de opciones tiene radios de verdad, y aria-checked sigue al clic', async ({ page }) => {
@@ -97,21 +102,23 @@ test('la barra de progreso anuncia lo mismo que pinta', async ({ page }) => {
   }
 });
 
-test('un empate se anuncia, y con problemas de espalda no gana el gimnasio por ir primero', async ({ page }) => {
+test('un empate se anuncia, y con problemas de espalda en casa gana el yoga por la limitación', async ({ page }) => {
   await abrirTest(page);
   await responder(page, ESPALDA);
-  await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Natación');
+  await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Yoga y Pilates');
   const empate = page.locator('[class*="avisoEmpate"]');
-  await expect(empate).toContainText(
-    'la natación, el yoga o el pilates, el entrenamiento en casa y el gimnasio encajan exactamente igual',
-  );
-  await expect(empate).toContainText(
-    'se muestra primero la natación porque se adapta mejor a la limitación física que has indicado y, a igualdad, encaja mejor con tu objetivo principal',
+  await expect(empate).toContainText('el yoga o el pilates y el entrenamiento en casa encajan exactamente igual');
+  await expect(empate).toContainText('se muestra primero el yoga o el pilates porque se adapta mejor a la limitación física que has indicado');
+  await expect(page.locator('[class*="avisoRecorte"][role="note"]')).toContainText(
+    'Por puntos iba por delante la natación, pero no se hace en casa y has indicado «En casa, sin salir».',
   );
 });
 
-test('motor: ningún empate queda en silencio, y el criterio que se anuncia es verdad', () => {
-  test.setTimeout(180_000);
+test('motor: ningún empate queda en silencio, el criterio que se anuncia es verdad y los filtros se cumplen', () => {
+  // REESCRITO el 24/09/2026. Antes exigía que la recomendada tuviera la puntuación máxima de las
+  // SEIS actividades; desde los hallazgos 1378-1382 la máxima se toma entre las ADMITIDAS, y los
+  // empates se cuentan entre ellas: 276.594 (antes, 340.435 entre las seis).
+  test.setTimeout(240_000);
   const DESEMPATE = [
     { id: 'limitaciones', frase: 'se adapta mejor a la limitación física' },
     { id: 'objetivo', frase: 'encaja mejor con tu objetivo principal' },
@@ -127,9 +134,17 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
     if (i === PREGUNTAS.length) {
       total++;
       const res = calcularResultado(r);
-      const max = Math.max(...CLAVES.map((k) => res.puntos[k]));
-      if (res.puntos[res.ejercicio] !== max) mal('no tiene la puntuación máxima');
-      const reales = CLAVES.filter((k) => k !== res.ejercicio && res.puntos[k] === max);
+      // Los filtros, recalculados aquí a partir de las fichas.
+      const bajoImpacto = ['rodillas', 'espalda', 'general'].includes(r.limitaciones) || r.prioridad === 'impacto';
+      const admitidas = CLAVES.filter((k) =>
+        !(bajoImpacto && k === 'running') &&
+        !(r.lugar === 'casa' && k !== 'yoga-pilates' && k !== 'entrenamiento-casa') &&
+        EJERCICIOS[k].cuotaMin <= TECHO_CUOTA[r.presupuesto] &&
+        EJERCICIOS[k].sesionMinima <= TECHO_SESION[r.tiempo]);
+      if (!admitidas.includes(res.ejercicio)) mal('recomienda una actividad que no pasa los filtros');
+      const max = Math.max(...admitidas.map((k) => res.puntos[k]));
+      if (res.puntos[res.ejercicio] !== max) mal('no tiene la puntuación máxima de las admitidas');
+      const reales = admitidas.filter((k) => k !== res.ejercicio && res.puntos[k] === max);
       if (reales.length !== res.empatados.length) mal('empatados mal contados');
       if (reales.length === 0 && res.criterioDesempate !== '') mal('criterio sin empate');
       if (reales.length > 0) empates++;
@@ -143,6 +158,8 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
           if (!res.criterioDesempate.includes('menor coste de partida')) mal('no nombra el coste');
         }
       }
+      // Todo lo que iba por delante y se ha apartado sale en pantalla con su motivo.
+      if (res.avisosDescarte.length !== res.apartados.length) mal('apartada sin aviso');
       return;
     }
     for (const o of PREGUNTAS[i].opciones) {
@@ -153,42 +170,49 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
   recorrer(0);
   expect(fallos).toEqual([]);
   expect(total).toBe(1_376_256);
-  expect(empates).toBe(340_435);
+  expect(empates).toBe(276_594);
 });
 
 /**
- * INSPECCIÓN DEL 24/09/2026 (Inspector, tras la reparación en lote del commit 99acf1e0).
- *
- * La reparación de hoy (radios, barra, empates) la cubren los cuatro tests de arriba y el
- * testigo de familia: no se repite aquí. Lo nuevo es lo que el usuario DECLARA como límite y
- * la app trata como un peso más (forma a de la familia; en selector-mascota, hallazgo 1332).
- *
- * Recuento del motor sobre las 1.376.256 combinaciones (scratchpad del Inspector, barrido.mjs):
- *   · Rodillas («Evito impactos») → running en 2.429 perfiles; articulares generales («Bajo
- *     impacto necesario») → running en 2.157. Juntos, 4.586: la cifra de la sospecha de esta
- *     tarde eran las DOS limitaciones sumadas, no solo la de rodillas.
- *   · Espalda → running en 20.884 (el FAQPage de la misma página dice bajo impacto).
- *   · «En casa, sin salir» → gimnasio, running, natación o ciclismo en 74.600 de 344.064.
- *   · «Cero euros, sin gasto» → gimnasio (25-50 €/mes) o natación (20-40 €/mes) en 72.411.
- *   · «Menos de 30 minutos» → ciclismo («salidas de 1-3 horas») o gimnasio («sesiones de
- *     45-75 min») en 70.567.
- *
+ * HALLAZGOS 1378-1388 (Inspección del 24/09/2026), reparados el mismo día. El Inspector los dejó
+ * como test.fail(); se retiran, y cada test exige ahora la reparación con su caso literal.
+ * Recuento del Inspector antes de reparar, sobre las 1.376.256 combinaciones: running con
+ * rodillas o articulares 4.586 · con espalda 20.884 · fuera de casa con «En casa, sin salir»
+ * 74.600 · cuota con «Cero euros» 72.411 · ciclismo o gimnasio con «Menos de 30 minutos» 70.567.
  * Los perfiles se dan como índice de la opción en cada una de las 10 preguntas, en orden.
  */
-test.describe('Inspección 24/09/2026 — límites declarados, datos de salud y contraste', () => {
+test.describe('Hallazgos 1378-1388 — límites declarados, datos de salud y contraste', () => {
   const texto = async (page: Page) => (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
   const recomendado = (page: Page) => page.locator('[class*="recomendacionValor"]').innerText();
+  const aviso = (page: Page) => page.locator('[class*="avisoRecorte"][role="note"]');
+
+  /** Recorre las 1.376.256 combinaciones con el motor real. */
+  function barrer(visitar: (r: Record<string, string>, res: ReturnType<typeof calcularResultado>) => void): void {
+    const r: Record<string, string> = {};
+    const rec = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        visitar(r, calcularResultado(r));
+        return;
+      }
+      for (const o of PREGUNTAS[i].opciones) {
+        r[PREGUNTAS[i].id] = o.valor;
+        rec(i + 1);
+      }
+    };
+    rec(0);
+  }
 
   // Ganar músculo · 30-60 min · Me da igual · Instalación · 20-60 €/mes · Buena · Ninguna ·
   // Rutinas · Sala o máquinas · Eficacia. Pesos (gim, run, nat, cic, yoga, casa):
   //   3,0,1,1,1,2 + 2,3,2,2,3,3 + 3,2,2,2,2,2 + 3,0,3,1,2,0 + 3,2,2,2,3,2 + 3,2,2,2,2,2 +
   //   3,3,3,3,3,3 + 3,2,2,2,2,2 + 3,1,1,1,1,2 + 3,2,2,2,1,2
-  //   = gimnasio 29 · running 17 · natación 20 · ciclismo 18 · yoga 20 · casa 20. Sin empate.
-  test('caso normal: perfil de fuerza en instalación → gimnasio, sin aviso de empate', async ({ page }) => {
+  //   = gimnasio 29 · running 17 · natación 20 · ciclismo 18 · yoga 20 · casa 20. Sin empate ni filtro.
+  test('caso normal: perfil de fuerza en instalación → gimnasio, sin avisos', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [1, 1, 2, 2, 2, 2, 0, 0, 1, 1]);
     await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Gimnasio y Entrenamiento de Fuerza');
     await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(aviso(page)).toHaveCount(0);
     await expect(page.locator('[class*="statValor"]').nth(2)).toHaveText('25-50 €/mes según instalación');
   });
 
@@ -205,103 +229,132 @@ test.describe('Inspección 24/09/2026 — límites declarados, datos de salud y 
     await expect(siguiente).toBeEnabled();
   });
 
+  // ─ 1378: rodillas, articulaciones y la prioridad «Bajo impacto» ─
+
   // Perder peso · <30 min · Solo · Aire libre · 0 € · Regular · RODILLAS · Rutinas · Individual ·
   // Eficacia. Pesos: 2,3,2,3,1,2 + 1,2,1,1,2,3 + 2,3,3,2,2,3 + 0,3,1,3,1,0 + 0,2,0,1,1,3 +
   //   2,2,2,2,2,2 + 2,0,3,2,2,2 + 3,2,2,2,2,2 + 1,3,3,3,2,2 + 3,2,2,2,1,2
   //   = gimnasio 16 · running 22 · natación 19 · ciclismo 21 · yoga 16 · casa 21.
-  // Con el running apartado (la referencia filtra lo declarado como límite), empatan ciclismo y
-  // casa a 21; rodillas 2 = 2, objetivo 3 > 2 → ciclismo. Hoy: running, sin mencionar la rodilla.
-  test('HALLAZGO abierto: con «Problemas de rodillas» («Evito impactos») recomienda running', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: la limitación de rodillas es un peso, no un filtro.
+  // Filtros: running (impacto, rodillas), ciclismo (salidas de 1-3 horas con «Menos de 30
+  // minutos», hallazgo 1382), gimnasio y natación (cuota con «Cero euros», 1381). Quedan yoga
+  // 16 y casa 21 → entrenamiento en casa. El Inspector esperaba el ciclismo porque solo apartaba
+  // el running; con el tiempo declarado, el ciclismo tampoco cabe.
+  test('1378 rodillas («Evito impactos»): no sale el running, y se dice por qué', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [0, 0, 0, 1, 0, 1, 1, 0, 2, 1]);
-    expect(await recomendado(page)).not.toBe('Running y Carrera');
+    expect(await recomendado(page)).toBe('Entrenamiento en Casa');
+    await expect(aviso(page)).toContainText('Por puntos iba por delante el running, pero es una actividad de impacto y has indicado «Problemas de rodillas o piernas».');
+    await expect(aviso(page)).toContainText('Por puntos iba por delante el ciclismo, pero su ficha habla de salidas de 1-3 horas y has indicado «Menos de 30 minutos».');
+    const t = await texto(page);
+    expect(t).toContain('consulta con un fisioterapeuta o un médico deportivo qué ejercicios te convienen');
+    expect(t).toContain('elige ejercicios sin saltos ni impactos');
   });
 
-  // Igual que el anterior con «Problemas articulares generales» («Bajo impacto necesario»),
-  // motivación social y prioridad comodidad: gimnasio 13 · running 22 · natación 17 ·
-  // ciclismo 20 · yoga 18 · casa 20. Sin el running: ciclismo = casa a 20; articular 2 = 2,
-  // objetivo 3 > 2 → ciclismo.
-  test('HALLAZGO abierto: con «Problemas articulares generales» recomienda running', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: «Bajo impacto necesario» tampoco filtra.
+  // Igual que el anterior con «Problemas articulares generales», motivación social y prioridad
+  // comodidad: gimnasio 13 · running 22 · natación 17 · ciclismo 20 · yoga 18 · casa 20.
+  // Sin running (impacto), ciclismo (tiempo), gimnasio y natación (cuota): casa 20 > yoga 18.
+  test('1378 articulares («Bajo impacto necesario»): no sale el running', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [0, 0, 0, 1, 0, 1, 3, 3, 2, 0]);
-    expect(await recomendado(page)).not.toBe('Running y Carrera');
+    expect(await recomendado(page)).toBe('Entrenamiento en Casa');
+    await expect(aviso(page)).toContainText('es una actividad de impacto y has indicado «Problemas articulares generales»');
   });
 
-  test('HALLAZGO abierto (motor): ningún perfil con rodillas o articulares debería dar running', () => {
-    test.fail(); // HALLAZGO abierto: hoy 4.586 perfiles (2.429 rodillas + 2.157 articulares).
-    test.setTimeout(180_000);
-    const r: Record<string, string> = {};
-    let running = 0;
-    const recorrer = (i: number): void => {
-      if (i === PREGUNTAS.length) {
-        if ((r.limitaciones === 'rodillas' || r.limitaciones === 'general') && calcularResultado(r).ejercicio === 'running') running++;
-        return;
-      }
-      for (const o of PREGUNTAS[i].opciones) {
-        r[PREGUNTAS[i].id] = o.valor;
-        recorrer(i + 1);
-      }
-    };
-    recorrer(0);
-    expect(running).toBe(0);
+  // Cardio · 30-60 min · Solo · Aire libre · Hasta 20 € · Muy buena · Ninguna · Progreso ·
+  // Individual · BAJO IMPACTO PARA LAS ARTICULACIONES. Pesos: 1,3,3,3,1,1 + 2,3,2,2,3,3 +
+  //   2,3,3,2,2,3 + 0,3,1,3,1,0 + 1,3,1,2,2,3 + 3,3,3,3,2,1 + 3,3,3,3,3,3 + 3,3,2,3,1,2 +
+  //   1,3,3,3,2,2 + 1,0,3,2,3,2
+  //   = gimnasio 17 · running 27 · natación 24 · ciclismo 26 · yoga 20 · casa 20.
+  // Sin limitación, pero la prioridad declarada es el bajo impacto: sin el running, ciclismo 26.
+  test('1378 prioridad «Bajo impacto para las articulaciones»: no sale el running', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, [2, 1, 0, 1, 1, 3, 0, 2, 2, 3]);
+    expect(await recomendado(page)).toBe('Ciclismo (Ruta o MTB)');
+    await expect(aviso(page)).toContainText('Por puntos iba por delante el running, pero es una actividad de impacto y priorizas el bajo impacto para las articulaciones.');
   });
+
+  test('1378 y 1379 (motor): con una limitación física o la prioridad de bajo impacto, nunca running', () => {
+    // Antes: 4.586 con rodillas o articulares, 20.884 con espalda y 2.354 con la prioridad.
+    test.setTimeout(240_000);
+    let mal = 0;
+    barrer((r, res) => {
+      const bajoImpacto = ['rodillas', 'espalda', 'general'].includes(r.limitaciones) || r.prioridad === 'impacto';
+      if (bajoImpacto && res.ejercicio === 'running') mal++;
+    });
+    expect(mal).toBe(0);
+  });
+
+  // ─ 1379: espalda ─
 
   // Perder peso · <30 min · Solo · Aire libre · 0 € · Muy buena · ESPALDA · Progreso ·
   // Individual · Comodidad = gimnasio 15 · running 25 · natación 19 · ciclismo 21 · yoga 17 ·
-  // casa 21. El FAQPage de la página: «problemas de rodilla o espalda → bajo impacto: natación,
-  // acuagym, ciclismo estático o yoga». Se admite la reparación por filtro o por aviso.
-  test('HALLAZGO abierto: con «Problemas de espalda» recomienda running y no lo menciona', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: la pantalla contradice el FAQPage de la misma página.
+  // casa 21. Sin running (impacto; el FAQPage de la página: «problemas de rodilla o espalda →
+  // bajo impacto»), ciclismo (tiempo), gimnasio y natación (cuota): casa 21 > yoga 17.
+  test('1379 espalda: no sale el running, y la pantalla nombra la espalda', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [0, 0, 0, 1, 0, 3, 2, 2, 2, 0]);
-    const valor = await recomendado(page);
-    expect(valor !== 'Running y Carrera' || /espalda/i.test(await texto(page))).toBe(true);
+    expect(await recomendado(page)).toBe('Entrenamiento en Casa');
+    await expect(aviso(page)).toContainText('es una actividad de impacto y has indicado «Problemas de espalda o columna»');
   });
+
+  // ─ 1380: «En casa, sin salir» ─
 
   // Ganar músculo · 1-2 h · Me da igual · EN CASA, SIN SALIR · 20-60 € · Muy buena · Ninguna ·
-  // Social · Sala · Eficacia. Pesos: 3,0,1,1,1,2 + 3,2,3,3,2,2 + 3,2,2,2,2,2 + 0,0,0,0,2,3 +
-  //   3,2,2,2,3,2 + 3,3,3,3,2,1 + 3,3,3,3,3,3 + 2,2,1,2,2,0 + 3,1,1,1,1,2 + 3,2,2,2,1,2
-  //   = gimnasio 26 · running 17 · natación 18 · ciclismo 19 · yoga 19 · casa 19.
-  // Entre lo que se hace en casa: yoga = casa a 19; limitación 3 = 3; objetivo músculo 2 > 1 →
-  // entrenamiento en casa. Hoy: el gimnasio, a quien ha dicho «sin salir», y sin aviso.
-  test('HALLAZGO abierto: «En casa, sin salir» → gimnasio', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el lugar declarado es un peso; 74.600 perfiles salen fuera de casa.
+  // Social · Sala · Eficacia = gimnasio 26 · running 17 · natación 18 · ciclismo 19 · yoga 19 ·
+  // casa 19. En casa: yoga = casa a 19; limitación 3 = 3; objetivo músculo 2 > 1 → casa.
+  test('1380 «En casa, sin salir»: entrenamiento en casa, no el gimnasio', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [1, 2, 2, 0, 2, 3, 0, 3, 1, 1]);
-    const valor = await recomendado(page);
-    const fuera = ['Gimnasio y Entrenamiento de Fuerza', 'Running y Carrera', 'Natación', 'Ciclismo (Ruta o MTB)'].includes(valor);
-    expect(!fuera || /sin salir|en casa/i.test(await texto(page))).toBe(true);
+    expect(await recomendado(page)).toBe('Entrenamiento en Casa');
+    await expect(aviso(page)).toContainText('Por puntos iba por delante el gimnasio, pero no se hace en casa y has indicado «En casa, sin salir».');
+    await expect(page.locator('[class*="avisoEmpate"]')).toContainText('se muestra primero el entrenamiento en casa porque encaja mejor con tu objetivo principal');
   });
+
+  test('1380, 1381 y 1382 (motor): ni fuera de casa, ni cuotas que no caben, ni sesiones que no caben', () => {
+    // Antes: 74.600 fuera de casa · 72.411 cuotas con «Cero euros» y 38.916 gimnasios con «Hasta
+    // 20 €/mes» · 70.567 ciclismos o gimnasios con «Menos de 30 minutos».
+    test.setTimeout(240_000);
+    const mal = { casa: 0, cuota: 0, sesion: 0, equipoSinAviso: 0 };
+    barrer((r, res) => {
+      const f = EJERCICIOS[res.ejercicio];
+      if (r.lugar === 'casa' && !f.enCasa) mal.casa++;
+      if (f.cuotaMin > TECHO_CUOTA[r.presupuesto]) mal.cuota++;
+      if (f.sesionMinima > TECHO_SESION[r.tiempo]) mal.sesion++;
+      // Con «Cero euros», el equipo de partida que no es cuota (zapatillas, bicicleta) se avisa.
+      if (r.presupuesto === 'cero' && f.equipoDePartida && !res.aTenerEnCuenta.some((t) => t.includes(f.equipoDePartida))) mal.equipoSinAviso++;
+    });
+    expect(mal).toEqual({ casa: 0, cuota: 0, sesion: 0, equipoSinAviso: 0 });
+  });
+
+  // ─ 1381: «Cero euros, sin gasto» ─
 
   // Ganar músculo · Más de 2 h · Me da igual · Donde sea · CERO EUROS · Buena · Ninguna ·
-  // Rutinas · Equipo · Eficacia. Pesos: 3,0,1,1,1,2 + 3,2,3,3,2,1 + 3,2,2,2,2,2 + 2,2,2,2,2,2 +
-  //   0,2,0,1,1,3 + 3,2,2,2,2,2 + 3,3,3,3,3,3 + 3,2,2,2,2,2 + 2,1,1,1,2,0 + 3,2,2,2,1,2
-  //   = gimnasio 25 · running 18 · natación 18 · ciclismo 19 · yoga 18 · casa 19.
-  // Sin las cuotas (gimnasio 25-50 €/mes, natación 20-40 €/mes): ciclismo = casa a 19;
-  // objetivo músculo 2 > 1 → entrenamiento en casa. Hoy: gimnasio con «25-50 €/mes».
-  test('HALLAZGO abierto: «Cero euros, sin gasto» → gimnasio de 25-50 €/mes', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el presupuesto es un peso; 72.411 perfiles con 0 € reciben una cuota.
+  // Rutinas · Equipo · Eficacia = gimnasio 25 · running 18 · natación 18 · ciclismo 19 · yoga 18
+  // · casa 19. Sin las cuotas (gimnasio, natación): ciclismo = casa a 19; objetivo 2 > 1 → casa.
+  test('1381 «Cero euros, sin gasto»: sin cuota de gimnasio, y se dice', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [1, 3, 2, 3, 0, 2, 0, 0, 3, 1]);
-    const valor = await recomendado(page);
-    const conCuota = valor === 'Gimnasio y Entrenamiento de Fuerza' || valor === 'Natación';
-    expect(!conCuota || /presupuesto|sin gasto|cero euros/i.test(await texto(page))).toBe(true);
+    expect(await recomendado(page)).toBe('Entrenamiento en Casa');
+    await expect(aviso(page)).toContainText('Por puntos iba por delante el gimnasio, pero su cuota (25-50 €/mes según instalación) no cabe en «Cero euros, sin gasto».');
   });
 
+  // ─ 1382: «Menos de 30 minutos» ─
+
   // Perder peso · MENOS DE 30 MIN · Con compañía · Aire libre · >60 € · Muy sedentario ·
-  // Ninguna · Variedad · Ninguna rutina · Diversión. Pesos: 2,3,2,3,1,2 + 1,2,1,1,2,3 +
-  //   2,2,1,2,2,1 + 0,3,1,3,1,0 + 3,2,3,3,3,2 + 2,1,2,2,3,3 + 3,3,3,3,3,3 + 2,1,2,2,1,1 +
-  //   2,2,2,2,3,3 + 1,2,2,3,2,1
-  //   = gimnasio 18 · running 21 · natación 19 · ciclismo 24 · yoga 21 · casa 19.
-  // Sale ciclismo, cuya ficha pide «salidas de 1-3 horas». Se admite ficha coherente o aviso.
-  test('HALLAZGO abierto: «Menos de 30 minutos» → ciclismo con «salidas de 1-3 horas»', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: la frecuencia de la ficha contradice el tiempo declarado.
+  // Ninguna · Variedad · Ninguna rutina · Diversión = gimnasio 18 · running 21 · natación 19 ·
+  // ciclismo 24 · yoga 21 · casa 19. Sin el ciclismo (salidas de 1-3 horas): running = yoga a
+  // 21; limitación 3 = 3; objetivo perder peso 3 > 1 → running, con sesiones de 20-60 min.
+  test('1382 «Menos de 30 minutos»: no sale el ciclismo de 1-3 horas, y el FAQPage dice lo mismo', async ({ page, request }) => {
     await abrirTest(page);
     await responder(page, [0, 0, 1, 1, 3, 0, 0, 1, 0, 2]);
-    const frecuencia = await page.locator('[class*="statValor"]').first().innerText();
-    expect(!/1-3 horas|45-75 min/.test(frecuencia) || /30 minutos|poco tiempo/i.test(await texto(page))).toBe(true);
+    expect(await recomendado(page)).toBe('Running y Carrera');
+    await expect(page.locator('[class*="statValor"]').first()).toHaveText('3-4 días/semana, sesiones de 20-60 min');
+    await expect(aviso(page)).toContainText('Por puntos iba por delante el ciclismo, pero su ficha habla de salidas de 1-3 horas y has indicado «Menos de 30 minutos».');
+    // El FAQPage ya no da el ciclismo como opción para quien tiene poco tiempo.
+    const html = await (await request.get('/selector-ejercicio/')).text();
+    const faq = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]).find((b) => b.includes('"FAQPage"')) ?? '';
+    expect(faq).toContain('Con menos de 30 minutos por sesión, este test aparta las actividades cuya sesión habitual es más larga, como el gimnasio (sesiones de 45-75 min) o el ciclismo de ruta (salidas de 1-3 horas).');
+    expect(faq).not.toContain('caminar rápido, ciclismo o entrenamientos HIIT');
   });
 
   // Cardio · 30-60 min · Solo · Aire libre · Hasta 20 € · Muy buena · Ninguna · Progreso ·
@@ -309,44 +362,65 @@ test.describe('Inspección 24/09/2026 — límites declarados, datos de salud y 
   // casa 20. Un running limpio, sin ninguna limitación, para mirar la ficha.
   const RUNNING_LIMPIO = [2, 1, 0, 1, 1, 3, 0, 2, 2, 1] as const;
 
-  test('HALLAZGO abierto: la ficha de running afirma que el calzado es la principal causa de lesión', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: lo es la carga de entrenamiento y la lesión previa (revisiones sistemáticas).
+  // ─ 1383, 1386, 1388: la ficha de running y el formato ─
+
+  test('1383 la ficha de running ya no dice que el calzado es la principal causa de lesión', async ({ page }) => {
+    // Fuentes: Saragiotto et al., Sports Med 2014 (PMID 24809248): «The main risk factor reported
+    // was previous injury (last 12 months)»; Correia et al., J Sport Health Sci 2024 (PMID
+    // 38697289): «the multifactorial basis of injury incidence in running».
     await abrirTest(page);
     await responder(page, RUNNING_LIMPIO);
     await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Running y Carrera');
-    expect(await texto(page)).not.toContain('principal causa de lesión');
+    const t = await texto(page);
+    expect(t).not.toContain('principal causa de lesión');
+    expect(t).toContain('haber tenido otra lesión en los últimos 12 meses (Saragiotto et al., 2014)');
   });
 
-  test('HALLAZGO abierto: la ficha de running da por «imprescindible» un sujetador deportivo a cualquiera', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: el test no pregunta nada que permita suponerlo.
+  test('1386 la ficha de running no da por «imprescindible» un sujetador a cualquiera', async ({ page }) => {
     await abrirTest(page);
     await responder(page, RUNNING_LIMPIO);
-    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Running y Carrera');
-    expect(await texto(page)).not.toContain('Sujetador deportivo de sujeción alta (imprescindible)');
+    const t = await texto(page);
+    expect(t).not.toContain('Sujetador deportivo de sujeción alta (imprescindible)');
+    expect(t).toContain('Si usas sujetador, uno deportivo de sujeción alta');
   });
 
-  test('HALLAZGO abierto: cifras en euros sin espacio antes del símbolo («80-150€»)', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: formato español obligatorio, «80-150 €».
+  test('1388 formato español: espacio antes de «€» y entre cifra y unidad, en pantalla y en todas las fichas', async ({ page }) => {
     await abrirTest(page);
     await responder(page, RUNNING_LIMPIO);
-    await expect(page.locator('[class*="statValor"]').nth(2)).toContainText('zapatillas');
-    expect(await page.locator('[class*="statValor"]').nth(2).innerText()).not.toMatch(/\d€/);
+    await expect(page.locator('[class*="statValor"]').nth(2)).toHaveText('Casi gratuito — solo zapatillas de calidad (~80-150 € que duran 500-800 km)');
+    // Las seis fichas, enteras: «300-1.500€», «1,6-2g/kg», «1h», «2x1 metros» eran los casos.
+    const pegadas = CLAVES.flatMap((k) => {
+      const f = EJERCICIOS[k];
+      return [f.frecuencia, f.inicio, f.coste, ...f.beneficios, ...f.equipo, ...f.consejos].filter((s) => /\d€|\dg\/|\dh\b|\dx\d/.test(s)).map((s) => `${k}: ${s}`);
+    });
+    expect(pegadas).toEqual([]);
   });
 
-  test('HALLAZGO abierto: la guía da «60-90 días» para consolidar un hábito, sin fuente', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: Lally et al. (2010) midieron mediana 66 días, rango 18-254.
+  // ─ 1385: el hábito ─
+
+  test('1385 la guía atribuye la cifra del hábito (Lally et al., 2010) con su dispersión', async ({ page }) => {
+    // Fuente: Lally, van Jaarsveld, Potts y Wardle, «How are habits formed», Eur J Soc Psychol
+    // 2010;40(6):998-1009 (resumen en Crossref: 96 voluntarios, 12 semanas, «ranged from 18 to
+    // 254 days»); los 66 días y que el ejercicio tardó más, en el resumen de la BPS.
     await abrirTest(page);
     await responder(page, RUNNING_LIMPIO);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.getByText('Cómo crear el hábito deportivo')).toBeVisible();
-    expect(await texto(page)).not.toContain('se consolida en 60-90 días');
+    const t = await texto(page);
+    expect(t).not.toContain('se consolida en 60-90 días');
+    expect(t).not.toContain('21 días como se creía');
+    expect(t).toContain('en torno a 66 días, con enormes diferencias entre personas: de 18 a 254 días');
+    expect(t).toContain('Lally y colaboradores');
+    expect(t).not.toMatch(/Lally[^.]*demostr/);
   });
 
-  test('HALLAZGO abierto: precios en euros y guía «en España» sin RegionBadge', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: §1.bis del CLAUDE.md, variant="es-data" (como selector-mascota, 1340).
+  // ─ 1387: región ─
+
+  test('1387 precios en euros: RegionBadge «Datos de referencia: España»', async ({ page }) => {
     await page.goto('/selector-ejercicio/');
     await esperarHidratacionBotones(page);
-    await expect(page.getByText('Datos de referencia: España')).toHaveCount(1, { timeout: 1_000 });
+    await expect(page.getByText('Datos de referencia: España. La metodología es universal')).toHaveCount(1);
+    await expect(page.locator('[role="note"][aria-label*="España"]')).toHaveCount(1);
   });
 
   // ─── Contraste, con los colores COMPUTADOS y el fondo real compuesto ───
@@ -380,9 +454,8 @@ test.describe('Inspección 24/09/2026 — límites declarados, datos de salud y 
   // Todos son texto pequeño (13,6-16 px; 16 px en negrita no llega a «grande»): exigen 4,5:1.
   const TEXTOS_RESULTADO = ['recomendacionPerfil', 'statValor', 'beneficiosTitulo', 'equipoTitulo', 'btnRepetir'];
 
-  test('HALLAZGO abierto: en tema claro, seis textos pequeños de marca no llegan a 4,5:1', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: --primary/--secondary como texto; lo que toca es --primary-texto/--secondary-texto.
-    // Medido hoy: progresoPaso 3,93 · recomendacionPerfil 2,80 · statValor 4,11 ·
+  test('1384 en tema claro, los textos pequeños de marca llegan a 4,5:1', async ({ page }) => {
+    // Medido antes de reparar: progresoPaso 3,93 · recomendacionPerfil 2,80 · statValor 4,11 ·
     // beneficiosTitulo 2,52 · equipoTitulo 3,63 · btnRepetir 3,93.
     await abrirTest(page);
     const medidos: Record<string, number> = { progresoPaso: await contraste(page, '[class*="progresoPaso"]') };
@@ -391,9 +464,10 @@ test.describe('Inspección 24/09/2026 — límites declarados, datos de salud y 
     expect(Object.entries(medidos).filter(([, v]) => v < 4.5)).toEqual([]);
   });
 
-  test('en tema oscuro esos mismos textos sí pasan de 4,5:1', async ({ page }) => {
-    // Medido hoy: progresoPaso 6,23 · perfil 6,17 · statValor 4,93 · beneficios 6,75 ·
-    // equipo 5,60 · repetir 6,23. Es la guarda para cuando se drene el tema claro.
+  test('en tema oscuro esos mismos textos siguen por encima de 4,5:1', async ({ page }) => {
+    // Medido el 24/09/2026 antes de reparar: progresoPaso 6,23 · perfil 6,17 · statValor 4,93 ·
+    // beneficios 6,75 · equipo 5,60 · repetir 6,23. En oscuro, los tokens -texto son los mismos
+    // colores que --primary/--secondary, así que la reparación del claro no los mueve.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-ejercicio/');
     await esperarHidratacionBotones(page);
@@ -406,5 +480,33 @@ test.describe('Inspección 24/09/2026 — límites declarados, datos de salud y 
     for (const c of TEXTOS_RESULTADO) {
       await expect.poll(() => contraste(page, `[class*="${c}"]`), { message: c }).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  test('los avisos nuevos (recorte y «a tener en cuenta») se leen en los dos temas', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, [0, 0, 0, 1, 0, 1, 1, 0, 2, 1]);
+    for (const c of ['avisoRecorteItem', 'aTenerItem', 'aTenerTitulo']) expect(await contraste(page, `[class*="${c}"]`), c).toBeGreaterThanOrEqual(4.5);
+    await page.evaluate(() => localStorage.setItem('meskeia-theme', 'dark'));
+    await abrirTest(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await responder(page, [0, 0, 0, 1, 0, 1, 1, 0, 2, 1]);
+    for (const c of ['avisoRecorteItem', 'aTenerItem', 'aTenerTitulo']) expect(await contraste(page, `[class*="${c}"]`), `oscuro ${c}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('hero de resultados: --hero-bg sin degradado, con el blanco por encima de 4,5:1 (familia, forma b)', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, RUNNING_LIMPIO);
+    const hero = page.locator('[class*="heroResultados"]');
+    expect(await hero.evaluate((e) => getComputedStyle(e).backgroundImage)).toBe('none');
+    expect(await contraste(page, '[class*="heroSubtitleSm"]')).toBeGreaterThanOrEqual(4.5);
+    expect(await contraste(page, '[class*="heroTitleSm"]')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('foco: al pulsar «Ver resultado» el foco va al encabezado del resultado (familia, forma g)', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, RUNNING_LIMPIO);
+    await expect
+      .poll(() => page.evaluate(() => `${document.activeElement?.tagName}:${document.activeElement?.textContent ?? ''}`))
+      .toBe('H1:Tu ejercicio recomendado');
   });
 });

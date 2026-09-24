@@ -1,5 +1,17 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { EJERCICIOS } from './motor';
+
+/** Características REALES de la app, para los dos schema (familia de selectores, forma e). */
+const CARACTERISTICAS = [
+  'Test de 10 preguntas sobre objetivos, tiempo, lugar, presupuesto y condición física',
+  'Seis tipos de ejercicio analizados: gimnasio, running, natación, ciclismo, yoga o pilates y entrenamiento en casa',
+  'Aparta, y lo explica, las actividades de impacto si declaras una limitación física',
+  'Respeta lo que declaras como límite: entrenar en casa, el presupuesto mensual y el tiempo por sesión',
+  'Frecuencia, coste estimado y cómo empezar con cada actividad',
+  'Beneficios, equipamiento y consejos para mantener la constancia',
+  '100% en el navegador, sin registro',
+];
 
 export const metadata: Metadata = {
   title: 'Selector de Ejercicio — ¿Qué deporte te conviene? | meskeIA',
@@ -42,16 +54,7 @@ export const metadata: Metadata = {
       name: 'Selector de Ejercicio',
       description: 'Test orientativo para descubrir qué tipo de ejercicio o deporte se adapta mejor al perfil, objetivos, disponibilidad y condición física del usuario.',
       url: 'https://meskeia.com/selector-ejercicio/',
-      features: [
-        'Test de 10 preguntas sobre perfil deportivo',
-        '6 tipos de ejercicio analizados',
-        'Consideración de limitaciones físicas',
-        'Análisis de presupuesto y disponibilidad',
-        'Plan orientativo de inicio',
-        '100% en el navegador, sin registro',
-        'Gratuito y sin publicidad',
-        'En español',
-      ],
+      features: CARACTERISTICAS,
     })),
   },
 };
@@ -61,7 +64,7 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para descubrir qué tipo de ejercicio o deporte se adapta mejor a tus objetivos, disponibilidad, presupuesto y condición física actual.",
   url: "https://meskeia.com/selector-ejercicio/",
   category: 'UtilityApplication',
-  features: [],
+  features: CARACTERISTICAS,
 });
 
 export const faqJsonLd = {
@@ -73,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Qué ejercicio me conviene si soy principiante y tengo poco tiempo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para principiantes con agenda ajustada, las actividades de baja complejidad técnica y alta eficiencia son las más adecuadas: caminar rápido, ciclismo o entrenamientos HIIT de 20-30 minutos. Lo más importante es la constancia; incluso 3 sesiones semanales de 30 minutos producen mejoras cardiovasculares y de fuerza en pocas semanas. Elegir una actividad que encaje con tu horario real reduce el riesgo de abandono.',
+        text: `Para quien empieza con la agenda ajustada, lo más práctico son actividades de sesión corta y sin desplazamientos: caminar rápido, entrenar en casa con el propio peso, yoga o pilates guiados, o correr alternando carrera y caminata. Con menos de 30 minutos por sesión, este test aparta las actividades cuya sesión habitual es más larga, como el gimnasio (${EJERCICIOS.gimnasio.sesion}) o el ciclismo de ruta (${EJERCICIOS.ciclismo.sesion}). La Organización Mundial de la Salud recomienda a los adultos al menos 150 minutos semanales de actividad moderada y recuerda que toda actividad cuenta, así que las sesiones cortas también suman.`,
       },
     },
     {

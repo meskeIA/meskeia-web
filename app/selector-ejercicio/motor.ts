@@ -11,6 +11,30 @@
  * (pregunta 7: la seguridad antes que la preferencia); si sigue el empate, el que mejor encaja
  * con el objetivo principal (pregunta 1), luego con el presupuesto (pregunta 5), y por último el
  * de menor coste de partida. El empate se anuncia en pantalla con el criterio que lo ha deshecho.
+ *
+ * LO DECLARADO COMO LÍMITE ES UN FILTRO, NO UN PESO (hallazgos 1378-1382; forma a de la familia
+ * de selectores, la de selector-mascota 1332 y selector-smartphone 943). Antes todas las
+ * respuestas solo sumaban puntos, y la app recomendaba correr a quien había dicho «Evito
+ * impactos», el gimnasio a quien había dicho «En casa, sin salir» o una cuota de 25-50 €/mes a
+ * quien había dicho «El deporte debe ser gratuito». Ahora se apartan, y se dice en pantalla:
+ *   · Impacto: el running es la única actividad de impacto de las seis. Se aparta con
+ *     cualquier limitación declarada (rodillas «Evito impactos», articulaciones «Bajo impacto
+ *     necesario», espalda) y con la prioridad «Bajo impacto para las articulaciones». Es lo
+ *     mismo que dice el FAQPage de esta página: con problemas de rodilla o espalda, lo más
+ *     seguro es el bajo impacto (natación, acuagym, ciclismo estático o yoga). Es una app de
+ *     salud (riesgo 2): ante una limitación declarada, primero la seguridad.
+ *   · Lugar «En casa, sin salir»: solo lo que se hace en casa (entrenamiento en casa y yoga o
+ *     pilates, cuya ficha dice «Puede practicarse en casa sin equipamiento»). «Sin salir» es
+ *     una exclusión; «Al aire libre» o «En instalación» son preferencias y siguen pesando.
+ *   · Presupuesto mensual: cabe si la CUOTA mínima de la ficha no supera el techo del tramo
+ *     (gimnasio 25-50 €/mes, natación 20-40 €/mes; criterio de selector-mascota). El equipo
+ *     de partida que no es cuota (zapatillas, bicicleta) no filtra, pero con «Cero euros» se
+ *     avisa de él.
+ *   · Tiempo por sesión: cabe si la sesión MÍNIMA de la ficha no supera el tiempo declarado
+ *     (gimnasio 45-75 min, ciclismo 1-3 horas; con «Menos de 30 minutos» quedan fuera).
+ * Las demás respuestas (objetivo, compañía, condición, motivación, experiencia y las otras
+ * prioridades) son preferencias y siguen siendo pesos. El entrenamiento en casa pasa todos los
+ * filtros (sin impacto, en casa, sin cuota, sesiones desde 20 min), así que siempre queda una.
  */
 
 export type EjercicioKey = 'gimnasio' | 'running' | 'natacion' | 'ciclismo' | 'yoga-pilates' | 'entrenamiento-casa';
@@ -50,6 +74,18 @@ export interface EjercicioInfo {
   beneficios: string[];
   equipo: string[];
   consejos: string[];
+  /** Actividad de impacto (se corre y se aterriza a cada zancada): filtro de las limitaciones. */
+  impacto: boolean;
+  /** Se puede hacer sin salir de casa: filtro de «En casa, sin salir». */
+  enCasa: boolean;
+  /** Cuota mensual mínima y máxima de la ficha, en €/mes: filtro del presupuesto. */
+  cuotaMin: number;
+  cuotaMax: number;
+  /** Equipo de partida que no es cuota, dicho como en la ficha (aviso con «Cero euros»). */
+  equipoDePartida: string;
+  /** Duración de sesión que da la ficha, y su mínimo en minutos: filtro del tiempo. */
+  sesion: string;
+  sesionMinima: number;
 }
 
 
@@ -195,9 +231,16 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     frecuencia: '3-4 días/semana, sesiones de 45-75 min',
     inicio: 'Pide orientación inicial a un monitor para no lesionarte',
     coste: '25-50 €/mes según instalación',
+    impacto: false,
+    enCasa: false,
+    cuotaMin: 25,
+    cuotaMax: 50,
+    equipoDePartida: '',
+    sesion: 'sesiones de 45-75 min',
+    sesionMinima: 45,
     beneficios: ['Mejora de fuerza y masa muscular demostrable', 'Control total de cargas y progresión', 'Acceso a todos los grupos musculares', 'Protección articular a largo plazo si entrenas bien', 'Independiente del clima'],
     equipo: ['Zapatillas de entrenamiento (no de running)', 'Ropa cómoda y transpirable', 'Toalla y candado para taquilla', 'Botella de agua reutilizable', 'Opcional: guantes, cinturón, straps'],
-    consejos: ['Empieza con pesos bajos para aprender la técnica', 'El descanso entre sesiones es tan importante como entrenar', 'La progresión debe ser gradual: no subas más del 10% de carga por semana', 'Come proteína suficiente (1,6-2g/kg de peso) si quieres ganar músculo'],
+    consejos: ['Empieza con pesos bajos para aprender la técnica', 'El descanso entre sesiones es tan importante como entrenar', 'La progresión debe ser gradual: no subas más del 10% de carga por semana', 'Come proteína suficiente (1,6-2 g por kg de peso al día) si quieres ganar músculo'],
   },
   running: {
     icono: '🏃',
@@ -206,10 +249,17 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     descripcion: 'El running es la actividad aeróbica más accesible. Solo necesitas zapatillas y salir a la calle. Extraordinario para la salud cardiovascular, gestión del estrés y pérdida de grasa con constancia.',
     frecuencia: '3-4 días/semana, sesiones de 20-60 min',
     inicio: 'Método run-walk: empieza alternando 1 min corriendo / 2 min caminando',
-    coste: 'Casi gratuito — solo zapatillas de calidad (~80-150€ que duran 500-800 km)',
+    coste: 'Casi gratuito — solo zapatillas de calidad (~80-150 € que duran 500-800 km)',
+    impacto: true,
+    enCasa: false,
+    cuotaMin: 0,
+    cuotaMax: 0,
+    equipoDePartida: 'unas zapatillas de running (~80-150 €)',
+    sesion: 'sesiones de 20-60 min',
+    sesionMinima: 20,
     beneficios: ['Mejora cardiovascular muy rápida', 'Quema calórica alta por sesión', 'Libera endorfinas y reduce el estrés', 'Puedes hacerlo en cualquier lugar del mundo', 'Comunidad muy amplia y accesible'],
-    equipo: ['Zapatillas de running específicas (imprescindible)', 'Ropa técnica transpirable', 'Reloj o app para medir ritmo y distancia', 'Sujetador deportivo de sujeción alta (imprescindible)', 'Opcional: auriculares inalámbricos'],
-    consejos: ['El 80% de tu entrenamiento debe ser a ritmo conversacional (test: puedes hablar)', 'Descansa al menos un día entre sesiones al principio', 'Estira y fortalece el core para prevenir lesiones', 'El calzado inadecuado es la principal causa de lesión en runners'],
+    equipo: ['Zapatillas de running específicas (imprescindible)', 'Ropa técnica transpirable', 'Reloj o app para medir ritmo y distancia', 'Si usas sujetador, uno deportivo de sujeción alta', 'Opcional: auriculares inalámbricos'],
+    consejos: ['El 80% de tu entrenamiento debe ser a ritmo conversacional (test: puedes hablar)', 'Descansa al menos un día entre sesiones al principio', 'Estira y fortalece el core para prevenir lesiones', 'Las lesiones del corredor tienen varias causas a la vez: el entrenamiento, la salud y los hábitos, la morfología y la biomecánica (Correia et al., 2024). El factor de riesgo que más se repite en los estudios de seguimiento es haber tenido otra lesión en los últimos 12 meses (Saragiotto et al., 2014): si vienes de una, empieza con más prudencia'],
   },
   natacion: {
     icono: '🏊',
@@ -219,9 +269,16 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     frecuencia: '3-4 días/semana, sesiones de 30-60 min',
     inicio: 'Empieza con 20-30 min y aumenta el volumen progresivamente',
     coste: '20-40 €/mes en piscina municipal, más en centros privados',
+    impacto: false,
+    enCasa: false,
+    cuotaMin: 20,
+    cuotaMax: 40,
+    equipoDePartida: '',
+    sesion: 'sesiones de 30-60 min',
+    sesionMinima: 30,
     beneficios: ['Cero impacto articular', 'Trabaja todo el cuerpo en una sesión', 'Mejora capacidad pulmonar y cardiovascular', 'Indicada en embarazo, artritis, obesidad, rehabilitación', 'Refrescante en verano, climatizada en invierno'],
     equipo: ['Bañador/bañadora de lycra (no de playa)', 'Gafas de natación', 'Gorro de silicona', 'Chanclas para la zona de duchas', 'Opcional: tabla, pull buoy, aletas'],
-    consejos: ['Si no tienes buena técnica, una clase inicial vale mucho la inversión', 'Aprende al menos 2 estilos para variar y evitar sobrecargas', 'El cloro reseca: hidrata la piel y el cabello después', 'Comer justo antes de nadar puede causar molestias — espera 1h'],
+    consejos: ['Si no tienes buena técnica, una clase inicial vale mucho la inversión', 'Aprende al menos 2 estilos para variar y evitar sobrecargas', 'El cloro reseca: hidrata la piel y el cabello después', 'Comer justo antes de nadar puede causar molestias — espera 1 h'],
   },
   ciclismo: {
     icono: '🚴',
@@ -230,7 +287,14 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     descripcion: 'El ciclismo combina ejercicio cardiovascular intenso con bajo impacto articular. Tanto en ruta como en montaña, ofrece paisajes, comunidad activa y una herramienta de transporte sostenible.',
     frecuencia: '2-4 días/semana, salidas de 1-3 horas',
     inicio: 'Empieza en terreno llano y ve aumentando la distancia gradualmente',
-    coste: 'Inversión inicial en bici (300-1.500€) + mantenimiento anual',
+    coste: 'Inversión inicial en bici (300-1.500 €) + mantenimiento anual',
+    impacto: false,
+    enCasa: false,
+    cuotaMin: 0,
+    cuotaMax: 0,
+    equipoDePartida: 'una bicicleta (300-1.500 €)',
+    sesion: 'salidas de 1-3 horas',
+    sesionMinima: 60,
     beneficios: ['Muy alta quema calórica en salidas largas', 'Bajo impacto en rodillas y articulaciones', 'Puede ser transporte y ejercicio a la vez', 'Comunidad muy activa y solidaria', 'Paisajes y naturaleza como motivación'],
     equipo: ['Bicicleta adecuada al uso (ruta, MTB, urbana)', 'Casco (obligatorio en carretera)', 'Culotte acolchado', 'Gafas de sol y guantes', 'Agua y gel energético para salidas largas'],
     consejos: ['Regula la altura del sillín: la rodilla debe quedar casi extendida abajo', 'En carretera, sé siempre visible (luces, chaleco en condiciones de poca visibilidad)', 'El mantenimiento básico (inflado, cadena) lo puedes aprender fácilmente', 'Empieza con distancias cortas: la resistencia ciclista se construye despacio'],
@@ -243,9 +307,16 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     frecuencia: '3-5 días/semana, sesiones de 30-60 min',
     inicio: 'Clases para principiantes presenciales o apps guiadas',
     coste: 'Gratis con apps o YouTube · 30-80 €/mes en estudio',
+    impacto: false,
+    enCasa: true,
+    cuotaMin: 0,
+    cuotaMax: 80,
+    equipoDePartida: '',
+    sesion: 'sesiones de 30-60 min',
+    sesionMinima: 30,
     beneficios: ['Reducción del estrés y la ansiedad demostrada', 'Mejora de postura y consciencia corporal', 'Flexibilidad y movilidad articular', 'Fortalecimiento del core y músculos estabilizadores', 'Puede practicarse en casa sin equipamiento'],
-    equipo: ['Esterilla antideslizante (imprescindible)', 'Ropa cómoda y elástica', 'Opcional: bloque y correa de yoga', 'Espacio despejado de 2x1 metros'],
-    consejos: ['No fuerces las posturas — el dolor es una señal, no un objetivo', 'La constancia importa más que la intensidad: 20 min diarios supera 90 min una vez/semana', 'Yoga y pilates son complementarios, no rivales — combínalos si puedes', 'El yoga online de calidad es excelente y gratuito en YouTube'],
+    equipo: ['Esterilla antideslizante (imprescindible)', 'Ropa cómoda y elástica', 'Opcional: bloque y correa de yoga', 'Espacio despejado de 2 × 1 metros'],
+    consejos: ['No fuerces las posturas — el dolor es una señal, no un objetivo', 'La constancia importa más que la intensidad: 20 min diarios superan a 90 min una vez por semana', 'Yoga y pilates son complementarios, no rivales — combínalos si puedes', 'El yoga online de calidad es excelente y gratuito en YouTube'],
   },
   'entrenamiento-casa': {
     icono: '🏠',
@@ -255,9 +326,16 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     frecuencia: '4-5 días/semana, sesiones de 20-45 min',
     inicio: 'Elige un programa estructurado (app, YouTube, entrenador online)',
     coste: 'Gratis o mínimo — opcional invertir en mancuernas o bandas elásticas',
+    impacto: false,
+    enCasa: true,
+    cuotaMin: 0,
+    cuotaMax: 0,
+    equipoDePartida: '',
+    sesion: 'sesiones de 20-45 min',
+    sesionMinima: 20,
     beneficios: ['Sin desplazamiento ni cuota de instalación', 'Horario totalmente libre', 'Ideal para empezar sin vergüenza social', 'Muy efectivo con programas bien diseñados', 'Puedes combinar distintos estilos (HIIT, fuerza, yoga...)'],
-    equipo: ['Espacio despejado de al menos 2x2 metros', 'Esterilla', 'Opcional: mancuernas ajustables, bandas elásticas, barra de dominadas', 'Dispositivo para seguir el entrenamiento'],
-    consejos: ['La autodisciplina es el mayor reto: fija un horario fijo como si fuera una cita', 'Sigue programas estructurados, no hagas ejercicios al azar', 'El HIIT de 20-30 min puede ser tan efectivo como 1h en el gym', 'La ventilación del espacio importa: evita sitios cerrados y sin aire'],
+    equipo: ['Espacio despejado de al menos 2 × 2 metros', 'Esterilla', 'Opcional: mancuernas ajustables, bandas elásticas, barra de dominadas', 'Dispositivo para seguir el entrenamiento'],
+    consejos: ['La autodisciplina es el mayor reto: fija un horario fijo como si fuera una cita', 'Sigue programas estructurados, no hagas ejercicios al azar', 'El HIIT de 20-30 min puede ser tan efectivo como 1 h en el gimnasio', 'La ventilación del espacio importa: evita sitios cerrados y sin aire'],
   },
 };
 
@@ -289,6 +367,24 @@ export const ORDEN_COSTE: Record<EjercicioKey, number> = {
   ciclismo: 5,
 };
 
+/** Techo de cuota de cada tramo de la pregunta 5, en €/mes. */
+export const TECHO_CUOTA: Record<string, number> = {
+  cero: 0,
+  bajo: 20,
+  medio: 60,
+  alto: Infinity,
+};
+
+/** Techo de minutos por sesión de cada tramo de la pregunta 2. */
+export const TECHO_SESION: Record<string, number> = {
+  poco: 30,
+  medio: 60,
+  bastante: 120,
+  mucho: Infinity,
+};
+
+export type MotivoDescarte = 'impacto' | 'casa' | 'presupuesto' | 'tiempo';
+
 /** Las preguntas que deshacen un empate, en orden, y cómo se dice cada una. */
 const DESEMPATE: { pregunta: string; motivo: string }[] = [
   { pregunta: 'limitaciones', motivo: 'se adapta mejor a la limitación física que has indicado' },
@@ -298,12 +394,25 @@ const DESEMPATE: { pregunta: string; motivo: string }[] = [
 
 export interface Resultado {
   ejercicio: EjercicioKey;
+  /** La que ganaría por puntos si no se aplicara ningún límite declarado. */
+  ejercicioPorPuntos: EjercicioKey;
   puntos: Record<EjercicioKey, number>;
-  /** Otras actividades con la MISMA puntuación que la recomendada. */
+  /** Por qué no puede recomendarse cada actividad apartada por un límite declarado. */
+  descartes: Partial<Record<EjercicioKey, MotivoDescarte[]>>;
+  /** Las que iban por delante de la recomendada y se han apartado, en su orden. */
+  apartados: EjercicioKey[];
+  /** Una frase por cada apartada, con su motivo: lo que se dice en pantalla. */
+  avisosDescarte: string[];
+  /** Otras actividades ADMITIDAS con la MISMA puntuación que la recomendada. */
   empatados: EjercicioKey[];
   /** Frase que explica cómo se ha deshecho el empate; vacía si no lo hay. */
   criterioDesempate: string;
+  /** Lo que conviene saber con estas respuestas aunque la actividad haya pasado los filtros. */
+  aTenerEnCuenta: string[];
 }
+
+const etiquetaDe = (pregunta: string, valor: string | undefined) =>
+  PREGUNTAS.find((p) => p.id === pregunta)?.opciones.find((o) => o.valor === valor)?.etiqueta ?? '';
 
 export function calcularResultado(respuestas: Record<string, string>): Resultado {
   const puntos = Object.fromEntries(CLAVES.map((k) => [k, 0])) as Record<EjercicioKey, number>;
@@ -324,8 +433,66 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
     }
     return ORDEN_COSTE[a] - ORDEN_COSTE[b];
   };
-  const orden = [...CLAVES].sort(ordenar);
+  // ─ Filtros: lo declarado como límite no se negocia a puntos ─
+  const limitacion = respuestas.limitaciones;
+  const conLimitacion = limitacion === 'rodillas' || limitacion === 'espalda' || limitacion === 'general';
+  const pideBajoImpacto = conLimitacion || respuestas.prioridad === 'impacto';
+  const techoCuota = TECHO_CUOTA[respuestas.presupuesto] ?? Infinity;
+  const techoSesion = TECHO_SESION[respuestas.tiempo] ?? Infinity;
+  const descartes: Resultado['descartes'] = {};
+  for (const k of CLAVES) {
+    const info = EJERCICIOS[k];
+    const motivos: MotivoDescarte[] = [];
+    if (pideBajoImpacto && info.impacto) motivos.push('impacto');
+    if (respuestas.lugar === 'casa' && !info.enCasa) motivos.push('casa');
+    if (info.cuotaMin > techoCuota) motivos.push('presupuesto');
+    if (info.sesionMinima > techoSesion) motivos.push('tiempo');
+    if (motivos.length > 0) descartes[k] = motivos;
+  }
+
+  const ordenTotal = [...CLAVES].sort(ordenar);
+  // Nunca queda vacía: el entrenamiento en casa pasa los cuatro filtros.
+  const orden = ordenTotal.filter((k) => !descartes[k]);
   const ejercicio = orden[0];
+  const ejercicioPorPuntos = ordenTotal[0];
+
+  // ─ Lo apartado, dicho a la cara ─
+  const motivoEnFrase = (k: EjercicioKey, m: MotivoDescarte): string => {
+    const info = EJERCICIOS[k];
+    if (m === 'impacto') {
+      return conLimitacion
+        ? `es una actividad de impacto y has indicado «${etiquetaDe('limitaciones', limitacion)}»`
+        : 'es una actividad de impacto y priorizas el bajo impacto para las articulaciones';
+    }
+    if (m === 'casa') return 'no se hace en casa y has indicado «En casa, sin salir»';
+    if (m === 'presupuesto') return `su cuota (${info.coste}) no cabe en «${etiquetaDe('presupuesto', respuestas.presupuesto)}»`;
+    return `su ficha habla de ${info.sesion} y has indicado «${etiquetaDe('tiempo', respuestas.tiempo)}»`;
+  };
+  const apartados = ordenTotal.slice(0, ordenTotal.indexOf(ejercicio));
+  const avisosDescarte = apartados.map((k) => {
+    const motivos = (descartes[k] ?? []).map((m) => motivoEnFrase(k, m)).join(', y además ');
+    return `Por puntos iba por delante ${CON_ARTICULO[k]}, pero ${motivos}.`;
+  });
+
+  // ─ A tener en cuenta: lo que conviene saber aunque haya pasado los filtros ─
+  const info = EJERCICIOS[ejercicio];
+  const aTenerEnCuenta: string[] = [];
+  if (conLimitacion) {
+    aTenerEnCuenta.push(
+      `Has indicado «${etiquetaDe('limitaciones', limitacion)}»: antes de empezar, consulta con un fisioterapeuta o un médico deportivo qué ejercicios te convienen, y deja los que te causen dolor.`,
+    );
+    if (ejercicio === 'entrenamiento-casa' || ejercicio === 'gimnasio') {
+      aTenerEnCuenta.push('Con esa limitación, elige ejercicios sin saltos ni impactos: muchas rutinas de HIIT los incluyen.');
+    }
+  }
+  if (respuestas.presupuesto === 'cero' && info.equipoDePartida) {
+    aTenerEnCuenta.push(`Con «Cero euros, sin gasto», cuenta con el equipo de partida si no lo tienes ya: ${info.equipoDePartida}.`);
+  }
+  if (info.cuotaMin > 0 && info.cuotaMax > techoCuota) {
+    aTenerEnCuenta.push(
+      `La parte alta de la cuota de ${CON_ARTICULO[ejercicio]} (${info.coste}) supera «${etiquetaDe('presupuesto', respuestas.presupuesto)}»: compara precios antes de apuntarte.`,
+    );
+  }
 
   const empatados = orden.slice(1).filter((k) => puntos[k] === puntos[ejercicio]);
   let criterioDesempate = '';
@@ -341,5 +508,5 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
     criterioDesempate = `se muestra primero ${CON_ARTICULO[ejercicio]} porque ${usados.join(' y, a igualdad, ')}`;
   }
 
-  return { ejercicio, puntos, empatados, criterioDesempate };
+  return { ejercicio, ejercicioPorPuntos, puntos, descartes, apartados, avisosDescarte, empatados, criterioDesempate, aTenerEnCuenta };
 }

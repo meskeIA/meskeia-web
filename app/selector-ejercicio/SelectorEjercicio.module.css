@@ -8,12 +8,17 @@
 .heroTitle { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; margin: 0 0 0.75rem; line-height: 1.2; }
 .heroSubtitle { font-size: clamp(1rem, 2vw, 1.2rem); opacity: 0.9; margin: 0; line-height: 1.5; }
 
+/* --hero-bg (8,33:1 con blanco), como el hero de la intro: el degradado --primary → --secondary
+   no llegaba al contraste mínimo con texto blanco (familia de selectores, forma b). */
 .heroResultados {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   color: #fff; text-align: center; padding: 2rem 1.5rem 1.75rem;
 }
 .heroTitleSm { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin: 0 0 0.4rem; }
 .heroSubtitleSm { font-size: 1rem; opacity: 0.88; margin: 0; }
+/* Recibe el foco al llegar al resultado (tabIndex=-1): visible solo si se navega con teclado. */
+.heroTitleSm:focus { outline: none; }
+.heroTitleSm:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 /* ─── Intro ────────────────────────────────────────────────────── */
 .introContainer { max-width: 620px; margin: 2rem auto 3rem; padding: 0 1rem; }
@@ -42,7 +47,9 @@
 .testContainer { max-width: 620px; margin: 2rem auto 3rem; padding: 0 1rem; }
 .progresoWrap { margin-bottom: 1.75rem; }
 .progresoInfo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+/* Texto pequeño de marca: --primary-texto / --secondary-texto, que llegan a 4,5:1 sobre fondo
+   claro y traen su variante oscura en globals.css (hallazgo 1384; selector-mascota, 1343). */
+.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary-texto); }
 .progresoCategoria { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .progresoBar { height: 6px; background: var(--bg-card); border-radius: 3px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); }
 .progresoRelleno { height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 3px; transition: width 0.4s ease; }
@@ -91,8 +98,8 @@
 }
 .recomendacionIcon { font-size: 4rem; margin-bottom: 0.75rem; display: block; }
 .recomendacionLabel { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.4rem; }
-.recomendacionValor { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
-.recomendacionPerfil { font-size: 1rem; color: var(--secondary); font-weight: 600; margin-bottom: 0.75rem; }
+.recomendacionValor { font-size: 1.6rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.5rem; }
+.recomendacionPerfil { font-size: 1rem; color: var(--secondary-texto); font-weight: 600; margin-bottom: 0.75rem; }
 .recomendacionDesc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; text-align: left; }
 
 /* ─── Stats Grid ───────────────────────────────────────────────── */
@@ -102,7 +109,7 @@
 @media (max-width: 500px) { .statsGrid { grid-template-columns: 1fr; } }
 .statCard { background: var(--bg-card); border-radius: 12px; padding: 1.25rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
 .statLabel { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
-.statValor { font-size: 1rem; font-weight: 700; color: var(--primary); line-height: 1.4; }
+.statValor { font-size: 1rem; font-weight: 700; color: var(--primary-texto); line-height: 1.4; }
 
 /* ─── Beneficios ───────────────────────────────────────────────── */
 .beneficiosSection {
@@ -111,7 +118,7 @@
 }
 .beneficiosTitulo {
   font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-  color: var(--secondary); margin: 0 0 0.75rem;
+  color: var(--secondary-texto); margin: 0 0 0.75rem;
 }
 .beneficioItem {
   font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;
@@ -126,7 +133,7 @@
 }
 .equipoTitulo {
   font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-  color: var(--primary); margin: 0 0 0.75rem;
+  color: var(--primary-texto); margin: 0 0 0.75rem;
 }
 .equipoItem {
   font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;
@@ -152,11 +159,11 @@
 /* ─── Repetir ──────────────────────────────────────────────────── */
 .btnRepetir {
   display: block; width: 100%; max-width: 320px; margin: 0 auto 2rem;
-  padding: 0.85rem 1.5rem; background: transparent; border: 2px solid var(--primary);
-  border-radius: 10px; color: var(--primary); font-size: 0.95rem; font-weight: 600;
+  padding: 0.85rem 1.5rem; background: transparent; border: 2px solid var(--primary-texto);
+  border-radius: 10px; color: var(--primary-texto); font-size: 0.95rem; font-weight: 600;
   cursor: pointer; transition: background 0.18s, color 0.18s;
 }
-.btnRepetir:hover { background: var(--primary); color: #fff; }
+.btnRepetir:hover { background: var(--primary-boton); color: #fff; }
 .btnRepetir:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ─── Warning Box (v2.0 obligatorio) ──────────────────────────── */
@@ -208,3 +215,32 @@
 [data-theme='dark'] .avisoEmpate {
   background: rgba(63, 165, 209, 0.12);
 }
+
+/* Aviso de lo apartado por un límite declarado (limitación física, «En casa, sin salir»,
+   presupuesto, tiempo): mismo patrón y colores que selector-mascota (hallazgos 1332, 1333) */
+.avisoRecorte {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #f59e0b;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+.avisoRecorteTitulo { font-weight: 700; margin: 0 0 0.35rem; }
+.avisoRecorteItem { margin: 0.25rem 0 0; }
+[data-theme='dark'] .avisoRecorte { border-color: #b45309; background: #3a2a08; color: #fde68a; }
+
+/* Lo que conviene saber con estas respuestas aunque la actividad haya pasado los filtros */
+.aTenerSection {
+  background: var(--bg-card); border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;
+}
+.aTenerTitulo {
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-primary); margin: 0 0 0.5rem;
+}
+.aTenerItem { font-size: 0.9rem; color: var(--text-primary); line-height: 1.55; margin: 0.35rem 0 0; }
+[data-theme='dark'] .aTenerSection { border-color: rgba(255, 255, 255, 0.12); }

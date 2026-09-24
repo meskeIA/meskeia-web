@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorEjercicio.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { calcularResultado, PREGUNTAS, EJERCICIOS, CON_ARTICULO, type Resultado } from './motor';
 
@@ -25,6 +25,13 @@ export default function SelectorEjercicio() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+
+  // Al pulsar «Ver resultado» la sección del test se desmonta con el botón que tenía el foco, y
+  // el foco caía a <body>: se lleva al encabezado del resultado (familia de selectores, forma g).
+  useEffect(() => {
+    if (pantalla === 'resultado') tituloResultado.current?.focus();
+  }, [pantalla]);
 
   const totalPreguntas = PREGUNTAS.length;
   const preguntaActual = PREGUNTAS[paso];
@@ -72,10 +79,14 @@ export default function SelectorEjercicio() {
         </header>
       ) : (
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu ejercicio recomendado</h1>
+          <h1 className={styles.heroTitleSm} ref={tituloResultado} tabIndex={-1}>Tu ejercicio recomendado</h1>
           <p className={styles.heroSubtitleSm}>{ejercicioActual?.nombre ?? ''}</p>
         </header>
       )}
+
+      {/* Costes y tramos de presupuesto en euros: la metodología es universal, los datos de
+          referencia son de España (hallazgo 1387; selector-mascota, 1340). */}
+      <RegionBadge variant="es-data" />
 
       <LegalNotice />
       <DisclaimerCard variant="medical" severity="high" />
@@ -193,6 +204,20 @@ export default function SelectorEjercicio() {
             <p className={styles.recomendacionDesc}>{ejercicioActual.descripcion}</p>
           </div>
 
+          {/* Lo declarado como límite, dicho a la cara: la limitación física, «En casa, sin
+              salir», el presupuesto o el tiempo han apartado a las que iban por delante
+              (hallazgos 1378-1382). */}
+          {resultado.avisosDescarte.length > 0 && (
+            <div className={styles.avisoRecorte} role="note">
+              <p className={styles.avisoRecorteTitulo}>
+                <span aria-hidden="true">⚠️</span> Ajustado a lo que has declarado
+              </p>
+              {resultado.avisosDescarte.map(a => (
+                <p key={a} className={styles.avisoRecorteItem}>{a}</p>
+              ))}
+            </div>
+          )}
+
           {/* Un empate no se resuelve en silencio por el orden del objeto: antes lo ganaba
               siempre el gimnasio, que era el primero. Pasa en uno de cada cuatro perfiles. */}
           {resultado.empatados.length > 0 && (
@@ -201,6 +226,15 @@ export default function SelectorEjercicio() {
               {enumerar([resultado.ejercicio, ...resultado.empatados].map(k => CON_ARTICULO[k]))}{' '}
               encajan exactamente igual; {resultado.criterioDesempate}.
             </p>
+          )}
+
+          {resultado.aTenerEnCuenta.length > 0 && (
+            <div className={styles.aTenerSection}>
+              <p className={styles.aTenerTitulo}>A tener en cuenta con tus respuestas</p>
+              {resultado.aTenerEnCuenta.map(t => (
+                <p key={t} className={styles.aTenerItem}>{t}</p>
+              ))}
+            </div>
           )}
 
           {/* Stats grid: frecuencia, inicio, coste */}
@@ -269,10 +303,14 @@ export default function SelectorEjercicio() {
 
             <h3>Cómo crear el hábito deportivo</h3>
             <p>
-              El mayor obstáculo no es la falta de tiempo ni de dinero: es la formación del hábito. Las investigaciones
-              sobre cambio de comportamiento señalan que un hábito deportivo se consolida en 60-90 días de práctica
-              regular, no en 21 días como se creía. La clave es el encadenamiento: vincular el ejercicio a algo que
-              ya haces automáticamente (después de despertarte, antes de ducharte, al volver del trabajo).
+              El mayor obstáculo no es la falta de tiempo ni de dinero: es la formación del hábito. Un estudio que
+              siguió a 96 personas durante 12 semanas (Lally y colaboradores, European Journal of Social Psychology,
+              2010) estimó que una conducta nueva repetida a diario tardaba en volverse automática en torno a 66 días,
+              con enormes diferencias entre personas: de 18 a 254 días. Las conductas de ejercicio tardaron más que las
+              de comer o beber, y saltarse un día suelto no cambió el proceso. Cada participante repetía su conducta en
+              un mismo contexto (por ejemplo, «después del desayuno»), y los autores propusieron que es esa repetición
+              en un contexto estable la que la vuelve automática: de ahí la idea de vincular el ejercicio a algo que ya
+              haces cada día (despertarte, ducharte, volver del trabajo).
             </p>
             <p>
               Empieza con sesiones más cortas de lo que crees necesario. Es mejor entrenar 15 minutos todos los días
