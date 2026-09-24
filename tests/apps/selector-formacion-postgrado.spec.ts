@@ -20,10 +20,12 @@ import { parseSpanishNumber } from '../../lib/formatters';
  *     la certificación a quien había marcado «Sin experiencia o menos de 1 año», con «Tienes
  *     experiencia laboral y lo que necesitas es validar y ampliar habilidades concretas».
  *
- * EL MOTOR (app/selector-formacion-postgrado/motor.ts): las mismas preguntas y pesos
- * (comprobado sobre todas las combinaciones: sin empate, el ganador no cambia). A igualdad,
+ * EL MOTOR (app/selector-formacion-postgrado/motor.ts): las mismas preguntas y pesos. A igualdad,
  * primero la motivación (pregunta 1), luego el objetivo profesional (5) y por último el menor
  * coste mínimo; el empate se anuncia. Las razones citan las respuestas que más han sumado.
+ * Desde la reparación de los hallazgos 1445-1458 (bloque del final), cuatro respuestas son
+ * LÍMITES y no pesos (presupuesto, tiempo, urgencia y título): se elige entre las vías que los
+ * cumplen, y si ninguna los cumple todos, entre las que incumplen menos, con un aviso.
  */
 
 async function abrirTest(page: Page): Promise<void> {
@@ -50,18 +52,23 @@ async function responder(page: Page, indices: readonly number[]): Promise<string
   return (await page.locator('section[class*="resultado"]').innerText()).replace(/\s+/g, ' ');
 }
 
-// Estabilidad laboral · 3-6 meses · Recién graduado · Menos de 2.000 € · Administración Pública ·
-// Sin experiencia · Presencial · Empresa, finanzas… · Lo antes posible · Título universitario.
-// (máster, FP, bootcamp, oposiciones, certificación), pregunta a pregunta:
-//   P1 op 4, cert 1 · P2 boot 4, cert 2 · P3 máster 3, FP 3, op 2 · P4 op 3, cert 4, FP 2 ·
+// Estabilidad laboral · 1-2 años compaginando · Recién graduado · Menos de 2.000 € ·
+// Administración Pública · Sin experiencia · Presencial · Empresa, finanzas… · Sin urgencia ·
+// Me interesan más las habilidades. (máster, FP, bootcamp, oposiciones, certificación), a mano:
+//   P1 op 4, cert 1 · P2 máster 3, FP 3, op 2 · P3 máster 3, FP 3, op 2 · P4 op 3, cert 4, FP 2 ·
 //   P5 op 5, cert 1 · P6 máster 3, FP 3, op 2 · P7 máster 3, FP 3, op 2 · P8 máster 4, cert 3 ·
-//   P9 boot 4, cert 4 · P10 máster 5
-//   = máster 18 · FP 11 · bootcamp 8 · oposiciones 18 · certificación 15.
-// Empate a 18; la motivación («estabilidad laboral») da 4 a oposiciones y 0 al máster.
-// Antes: máster, por ser la primera clave.
-const EMPATE = [0, 0, 0, 0, 0, 0, 0, 2, 0, 0] as const;
+//   P9 máster 4, FP 2 · P10 boot 4, cert 4
+//   = máster 20 · FP 16 · bootcamp 4 · oposiciones 20 · certificación 13.
+// Límites: solo el presupuesto aparta el bootcamp (desde 2.000 €). Empate a 20 entre dos vías que
+// lo cumplen todo; la motivación («estabilidad laboral») da 4 a oposiciones y 0 al máster.
+//
+// El perfil que usaba este test hasta la reparación de 1446/1447 ([0,0,0,0,0,0,0,2,0,0]: 3-6 meses,
+// urgencia en meses y «Necesito un título universitario») recomendaba oposiciones, de 2-5 años y
+// sin título universitario: consagraba el defecto. Ahora da certificación con un aviso.
+const EMPATE = [0, 1, 0, 0, 0, 0, 0, 2, 3, 2] as const;
 
-// Igual, pero sector «Tecnología…» y «Me interesan más las habilidades que el título»:
+// Estabilidad · 3-6 meses · Recién graduado · Menos de 2.000 € · Administración Pública · Sin
+// experiencia · Presencial · Tecnología · Lo antes posible · «Me interesan más las habilidades»:
 //   máster 3+3+3 = 9 · FP 11 · bootcamp 4+5+4+4 = 17 · oposiciones 18 ·
 //   certificación 1+2+4+1+3+4+4 = 19. Gana la certificación a quien ha marcado «Sin
 //   experiencia», y antes se le decía «Tienes experiencia laboral…».
@@ -111,7 +118,7 @@ test('un empate se anuncia y lo deshace la motivación, no ser la primera clave'
   await expect(page.locator('[class*="avisoEmpate"]')).toContainText(
     'la preparación de oposiciones y el máster universitario encajan exactamente igual; se muestra primero la preparación de oposiciones porque encaja mejor con tu motivación principal',
   );
-  // La comparativa sigue el mismo orden: oposiciones antes que máster, aunque empaten a 18.
+  // La comparativa sigue el mismo orden: oposiciones antes que máster, aunque empaten a 20.
   const etiquetas = await page.locator('[class*="alternativaLabel"]').allInnerTexts();
   expect(etiquetas.slice(0, 2).map((e) => e.replace(/^\S+\s/, ''))).toEqual(['Oposiciones', 'Máster']);
   expect(texto).toContain('Motivación: has respondido «Conseguir estabilidad laboral y empleo seguro», que suma 4 puntos a la preparación de oposiciones.');
@@ -145,9 +152,15 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
     if (i === PREGUNTAS.length) {
       total++;
       const res = calcularResultado(r);
-      const max = Math.max(...CLAVES.map((k) => res.puntos[k]));
-      if (res.puntos[res.tipo] !== max || res.orden[0] !== res.tipo) mal('no encabeza con la puntuación máxima');
-      const reales = CLAVES.filter((k) => k !== res.tipo && res.puntos[k] === max);
+      // Desde la reparación de 1445-1447 se elige entre las CANDIDATAS (las que incumplen menos
+      // límites declarados), no entre las cinco: antes este test exigía la puntuación máxima de
+      // todas, que es justo lo que recomendaba bootcamps a quien no podía pagarlos.
+      const minimo = Math.min(...CLAVES.map((k) => res.incumple[k].length));
+      const esperadas = CLAVES.filter((k) => res.incumple[k].length === minimo);
+      if (esperadas.length !== res.candidatas.length || esperadas.some((k) => !res.candidatas.includes(k))) mal('candidatas mal elegidas');
+      const max = Math.max(...res.candidatas.map((k) => res.puntos[k]));
+      if (res.puntos[res.tipo] !== max || res.orden[0] !== res.tipo || !res.candidatas.includes(res.tipo)) mal('no encabeza con la puntuación máxima de las candidatas');
+      const reales = res.candidatas.filter((k) => k !== res.tipo && res.puntos[k] === max);
       if (reales.length !== res.empatadas.length) mal('empatadas mal contadas');
       if (reales.length === 0 && res.criterioDesempate !== '') mal('criterio sin empate');
       if (reales.length > 0) empates++;
@@ -176,30 +189,32 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
   recorrer(0);
   expect(fallos).toEqual([]);
   expect(total).toBe(1_048_576);
-  expect(empates).toBe(88_071);
+  // 88.071 antes de la reparación, cuando competían siempre las cinco vías; con los límites,
+  // compiten menos y empatan menos (recuento del motor el 24/09/2026).
+  expect(empates).toBe(57_371);
 });
 
 /**
- * INSPECCIÓN 24/09/2026 (Inspector, primera inspección de la app).
+ * REPARACIÓN 24/09/2026 — hallazgos 1445-1458 (Inspector, primera inspección de la app).
  *
- * Barrido con el motor real sobre las 1.048.576 combinaciones (2,6 s). Las respuestas que declaran
- * un LÍMITE suman puntos pero no acotan nada:
- *   · «Menos de 2.000 €» → máster (ficha desde 3.000 €) o bootcamp (desde 2.000 €):
- *     52.194 de 262.144 perfiles (máster 37.741 · bootcamp 14.453).
- *   · «3-6 meses a tiempo completo» (100.335 de 262.144) o «Unas semanas o meses de aprendizaje
- *     flexible» (89.219 de 262.144) → máster o FP (1-2 años) u oposiciones (2-5 años).
- *   · «Necesito un título universitario oficial reconocido» → una vía que no lo da:
- *     120.554 de 262.144 (certificación 56.495 · bootcamp 30.474 · oposiciones 21.816 · FP 11.769).
- * La referencia (selector-smartphone 943, selector-mascota 1332/1333) FILTRA lo declarado o AVISA
- * del desfase en pantalla: los tests de navegador aceptan cualquiera de las dos reparaciones.
+ * La inspección dejó aquí 17 test.fail(); se han reescrito como tests en verde que reproducen el
+ * caso de su ficha y exigen lo reparado. Los tres casos que ya pasaban (normal, rechazo y fracción
+ * de la comparativa) se conservan; el normal cambia «35 pts» por «35 puntos» (ver 1456).
+ *
+ * Límites (hallazgos 1445-1447): la inspección aceptaba filtrar o avisar. La reparación hace las
+ * dos cosas: FILTRA cuando alguna vía cumple todos los límites, y AVISA cuando ninguna puede
+ * (p. ej. «Necesito un título universitario» con «3-6 meses»: el único título universitario, el
+ * máster, dura 1-2 años). Por eso los barridos cuentan perfiles SIN aviso, no perfiles con la vía
+ * «incumplidora»: esos últimos existen por lógica (163.840 perfiles no tienen ninguna vía posible).
  *
  * Las respuestas van por índice de opción (0-3) en el orden de las preguntas 1 a 10.
  */
-test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la guía y accesibilidad', () => {
+test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la guía y accesibilidad', () => {
   interface PreguntaFaq { name: string; acceptedAnswer: { text: string } }
-  interface BloqueJsonLd { '@type'?: string; mainEntity?: PreguntaFaq[] }
+  interface BloqueJsonLd { '@type'?: string; mainEntity?: PreguntaFaq[]; featureList?: string[] }
 
   const tituloResultado = (page: Page) => page.locator('[class*="resultadoTitulo"]').innerText();
+  const aviso = (page: Page) => page.locator('[class*="avisoRestricciones"]');
 
   /** El mínimo de «Coste orientativo: 2.000 – 12.000 €.», en euros. */
   const minimoPublicado = async (page: Page): Promise<number> => {
@@ -210,11 +225,13 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
 
   /** El bloque educativo entero (se monta siempre; plegado solo se oculta por CSS). */
   const textoGuia = (page: Page) =>
-    page.locator('[class*="guideSection"]').evaluateAll((els) => els.map((e) => e.textContent ?? '').join(' '));
+    page.locator('[class*="guideSection"]').evaluateAll((els) => els.map((e) => e.textContent ?? '').join(' ').replace(/\s+/g, ' '));
+
+  const leerJsonLd = async (page: Page): Promise<BloqueJsonLd[]> =>
+    (await page.locator('script[type="application/ld+json"]').allTextContents()).map((b) => JSON.parse(b) as BloqueJsonLd);
 
   const leerFaq = async (page: Page): Promise<{ p: string; r: string }[]> => {
-    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
-    const faq = bloques.map((b) => JSON.parse(b) as BloqueJsonLd).find((j) => j['@type'] === 'FAQPage');
+    const faq = (await leerJsonLd(page)).find((j) => j['@type'] === 'FAQPage');
     return (faq?.mainEntity ?? []).map((q) => ({ p: q.name, r: q.acceptedAnswer.text }));
   };
 
@@ -246,6 +263,36 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
       return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
     }, selector);
 
+  /** Las 1.048.576 combinaciones, una vez por worker: perfiles en falta tras la reparación. */
+  interface Barrido { presupuestoSinAviso: number; tiempoSinAviso: number; tituloSinAviso: number; compatibleIgnorada: number; sinNingunaPosible: number }
+  let barrido: Barrido | null = null;
+  const barrer = (): Barrido => {
+    if (barrido) return barrido;
+    const c: Barrido = { presupuestoSinAviso: 0, tiempoSinAviso: 0, tituloSinAviso: 0, compatibleIgnorada: 0, sinNingunaPosible: 0 };
+    const r: Record<number, number> = {};
+    const largas: TipoFormacion[] = ['master', 'fp_superior', 'oposiciones'];
+    const recorrer = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        const avisa = res.avisoRestricciones;
+        if (r[4] === 0 && COSTE_MINIMO[res.tipo] >= 2000 && !/presupuesto/.test(avisa)) c.presupuestoSinAviso++;
+        if ((r[2] === 0 || r[2] === 3 || r[9] === 0) && largas.includes(res.tipo) && !/dura /.test(avisa)) c.tiempoSinAviso++;
+        if (r[10] === 0 && res.tipo !== 'master' && !/título universitario/.test(avisa)) c.tituloSinAviso++;
+        const hayCompatible = CLAVES.some((k) => res.incumple[k].length === 0);
+        if (hayCompatible && res.incumple[res.tipo].length > 0) c.compatibleIgnorada++;
+        if (!hayCompatible) c.sinNingunaPosible++;
+        return;
+      }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) {
+        r[PREGUNTAS[i].id] = k;
+        recorrer(i + 1);
+      }
+    };
+    recorrer(0);
+    barrido = c;
+    return c;
+  };
+
   // Especializarme académicamente · 1-2 años compaginando · Trabajo en mi sector · 6.000-15.000 € ·
   // Especializarme con título oficial · 3-7 años · Híbrido · Empresa, finanzas… · Sin urgencia ·
   // Necesito un título universitario oficial.
@@ -253,14 +300,19 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
 
   test('caso normal: especialización con título oficial → máster 35, sin empate, comparativa en su orden', async ({ page }) => {
     // A mano (pesos de motor.ts): máster 4+3+3+3+4+2+3+4+4+5 = 35 · certificación 4+4+3 = 11 ·
-    // FP 1+3+2+2+2 = 10 · bootcamp 3+2+2 = 7 · oposiciones 2.
+    // FP 1+3+2+2+2 = 10 · bootcamp 3+2+2 = 7 · oposiciones 2. Con «Necesito un título
+    // universitario», solo el máster cumple: las otras cuatro llevan la nota «sin título
+    // universitario oficial» en la comparativa.
     await abrirTest(page);
     const texto = await responder(page, NORMAL);
     await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Máster Universitario');
     await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
-    expect(await page.locator('[class*="alternativaPct"]').allInnerTexts()).toEqual(['35 pts', '11 pts', '10 pts', '7 pts', '2 pts']);
+    await expect(aviso(page)).toHaveCount(0);
+    // «35 puntos» y no «35 pts»: la abreviatura daba «1 pts» con un punto (hallazgo 1456).
+    expect(await page.locator('[class*="alternativaPct"]').allInnerTexts()).toEqual(['35 puntos', '11 puntos', '10 puntos', '7 puntos', '2 puntos']);
     const etiquetas = (await page.locator('[class*="alternativaLabel"]').allInnerTexts()).map((e) => e.replace(/^\S+\s/, ''));
     expect(etiquetas).toEqual(['Máster', 'Certificación', 'FP Superior', 'Bootcamp', 'Oposiciones']);
+    await expect(page.locator('[class*="alternativaIncumple"]').filter({ hasText: 'sin título universitario oficial' })).toHaveCount(4);
     // Las tres que más suman al máster; a igual valor (4 puntos), por número de pregunta.
     expect(texto).toContain('Título: has respondido «Necesito un título universitario oficial reconocido», que suma 5 puntos al máster universitario.');
     expect(texto).toContain('Motivación: has respondido «Especializarme académicamente en mi área», que suma 4 puntos al máster universitario.');
@@ -283,9 +335,9 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
     await expect(page.locator('[role="radio"]').nth(2)).toHaveAttribute('aria-checked', 'true');
   });
 
-  test('cada barra de la comparativa, si anuncia un valor, anuncia la misma fracción que pinta', async ({ page }) => {
-    // Lo anunciado coincide con lo pintado: pts / puntuación de la recomendada (35 en el caso
-    // normal). Lo que está mal es el rol, no la fracción (ver el test.fail de más abajo).
+  test('cada barra de la comparativa pinta su fracción de la puntuación más alta', async ({ page }) => {
+    // Pintado: pts / puntuación más alta (35 en el caso normal). Desde 1456 la barra es decorativa
+    // (aria-hidden, sin valor anunciado): el texto de al lado dice los puntos.
     await abrirTest(page);
     await responder(page, NORMAL);
     const barras = page.locator('[class*="alternativaBarWrap"] > *');
@@ -308,226 +360,187 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
     }
   });
 
-  test('presupuesto «Menos de 2.000 €»: la vía recomendada cabe en él, o la pantalla avisa', async ({ page }) => {
-    // HALLAZGO abierto: el presupuesto es un peso y no un filtro (52.194 de 262.144 perfiles con
-    // «Menos de 2.000 €» acaban en máster o bootcamp, y la pantalla no dice nada del presupuesto).
-    test.fail();
+  test('1445: con «Menos de 2.000 €» el bootcamp se aparta y se dice; el máster cabe en universidad pública', async ({ page }) => {
     // Cambiar de sector · 3-6 meses · Otro sector · MENOS DE 2.000 € · Tecnología · 1-3 años ·
-    // Online · Tecnología · Lo antes posible · Habilidades → bootcamp 36 («2.000 – 12.000 €») ·
-    // certificación 26 (desde 200 €), que es lo que quedaría filtrando.
+    // Online · Tecnología · Lo antes posible · Habilidades → bootcamp 36 (desde 2.000 €) ·
+    // certificación 26 (desde 200 €), que cumple todos los límites.
     await abrirTest(page);
-    let texto = await responder(page, [2, 0, 2, 0, 2, 1, 1, 0, 0, 2]);
-    expect.soft((await minimoPublicado(page)) < 2000 || /presupuesto/i.test(texto), `bootcamp → ${await tituloResultado(page)}`).toBe(true);
-    // Especializarme · 1-2 años · Recién graduado · MENOS DE 2.000 € · título oficial · Sin experiencia ·
-    // Presencial · Empresa · Sin urgencia · Necesito título → máster 33 («3.000 – 30.000 €») · FP 19.
+    await responder(page, [2, 0, 2, 0, 2, 1, 1, 0, 0, 2]);
+    expect(await tituloResultado(page)).toBe('Certificación Profesional');
+    await expect(aviso(page)).toContainText(
+      'Por afinidad encajaría más el bootcamp (36 puntos), pero su coste orientativo empieza en 2.000 €, y tu presupuesto es de menos de 2.000 €.',
+    );
+    expect(await minimoPublicado(page)).toBeLessThan(2000);
+    // Especializarme · 1-2 años · Recién graduado · MENOS DE 2.000 € · título oficial · Sin
+    // experiencia · Presencial · Empresa · Sin urgencia · Necesito título → máster 33: su mínimo es
+    // ahora el precio público (820,80 €, hallazgo 1448), que cabe en el presupuesto.
     await abrirTest(page);
-    texto = await responder(page, [1, 1, 0, 0, 1, 0, 0, 2, 3, 0]);
-    expect.soft((await minimoPublicado(page)) < 2000 || /presupuesto/i.test(texto), `máster → ${await tituloResultado(page)}`).toBe(true);
+    await responder(page, [1, 1, 0, 0, 1, 0, 0, 2, 3, 0]);
+    expect(await tituloResultado(page)).toBe('Máster Universitario');
+    expect(await minimoPublicado(page)).toBeCloseTo(820.8, 2);
+    expect(barrer().presupuestoSinAviso).toBe(0);
   });
 
-  test('tiempo «3-6 meses» o «Unas semanas o meses»: la duración recomendada cabe, o la pantalla avisa', async ({ page }) => {
-    // HALLAZGO abierto: el tiempo disponible es un peso y no un filtro (189.554 de 524.288 perfiles
-    // con esas dos respuestas acaban en una vía de 1 año o más, sin aviso).
-    test.fail();
-    const larga = /Duración estimada: (1-2 años|2-5 años)/;
-    // Especializarme · 3-6 MESES A TIEMPO COMPLETO · Recién graduado · >15.000 € o beca · título oficial ·
-    // Sin experiencia · Presencial · Empresa · Sin urgencia · Necesito título → máster 34 · FP 14.
+  test('1446: con «3-6 meses» o «Unas semanas o meses» la vía larga se aparta, o se dice que no cabe', async ({ page }) => {
+    // Especializarme · 3-6 MESES A TIEMPO COMPLETO · Recién graduado · >15.000 € o beca · título
+    // oficial · Sin experiencia · Presencial · Empresa · Sin urgencia · Necesito título → ninguna
+    // vía cumple (el título solo lo da el máster, que dura 1-2 años): máster 34, con aviso.
     await abrirTest(page);
-    let texto = await responder(page, [1, 0, 0, 3, 1, 0, 0, 2, 3, 0]);
-    expect.soft(!larga.test(texto) || /3-6 meses|tiempo disponible/i.test(texto), `3-6 meses → ${await tituloResultado(page)}`).toBe(true);
-    // Estabilidad · UNAS SEMANAS O MESES · Desempleado · <2.000 € · Administración Pública · 1-3 años ·
-    // Autónomo · Administración · LO ANTES POSIBLE, EN MESES · Titulación pública → oposiciones 27
-    // («2-5 años de preparación») · certificación 17.
+    await responder(page, [1, 0, 0, 3, 1, 0, 0, 2, 3, 0]);
+    expect(await tituloResultado(page)).toBe('Máster Universitario');
+    await expect(aviso(page)).toContainText(
+      'Ninguna vía cumple a la vez todo lo que has declarado. El máster universitario es la que menos choca con tus límites, pero dura 1-2 años, más de lo que puedes dedicar («3-6 meses a tiempo completo»).',
+    );
+    // Estabilidad · UNAS SEMANAS O MESES · Desempleado · <2.000 € · Administración Pública ·
+    // 1-3 años · Autónomo · Administración · LO ANTES POSIBLE · Titulación pública → oposiciones 27
+    // (2-5 años) se aparta; certificación 17, que cumple todo.
     await abrirTest(page);
-    texto = await responder(page, [0, 3, 3, 0, 0, 1, 3, 1, 0, 1]);
-    expect.soft(!larga.test(texto) || /semanas o meses|tiempo disponible/i.test(texto), `semanas → ${await tituloResultado(page)}`).toBe(true);
+    await responder(page, [0, 3, 3, 0, 0, 1, 3, 1, 0, 1]);
+    expect(await tituloResultado(page)).toBe('Certificación Profesional');
+    await expect(aviso(page)).toContainText(
+      'Por afinidad encajaría más la preparación de oposiciones (27 puntos), pero dura 2-5 años de preparación, más de lo que puedes dedicar («Unas semanas o meses de aprendizaje flexible»); y tampoco encaja con tu urgencia de incorporarte en meses.',
+    );
+    expect(barrer().tiempoSinAviso).toBe(0);
   });
 
-  test('«Necesito un título universitario oficial»: sale el máster, o la pantalla avisa de que la vía no lo da', async ({ page }) => {
-    // HALLAZGO abierto: 120.554 de 262.144 perfiles con esa respuesta acaban en una vía que no da
-    // título universitario, y la tabla de la guía lo reconoce («Certificado propio» para el bootcamp).
-    test.fail();
+  test('1447: «Necesito un título universitario oficial» → máster, o aviso de que la vía no lo da', async ({ page }) => {
     // Cambiar de sector · 3-6 meses · Otro sector · 2.000-6.000 € · Tecnología · 1-3 años · Online ·
-    // Tecnología · Lo antes posible · NECESITO TÍTULO UNIVERSITARIO → bootcamp 35 · máster 5.
+    // Tecnología · Lo antes posible · NECESITO TÍTULO → el máster no cabe en 3-6 meses ni en la
+    // urgencia (2 límites), el bootcamp solo incumple el título (1): bootcamp 35, con aviso.
     await abrirTest(page);
-    const texto = await responder(page, [2, 0, 2, 1, 2, 1, 1, 0, 0, 0]);
-    const titulo = await tituloResultado(page);
-    expect(titulo === 'Máster Universitario' || /título universitario/i.test(texto), `obtenido: ${titulo}`).toBe(true);
+    await responder(page, [2, 0, 2, 1, 2, 1, 1, 0, 0, 0]);
+    expect(await tituloResultado(page)).toBe('Bootcamp / Formación Online Intensiva');
+    await expect(aviso(page)).toContainText(
+      'Ninguna vía cumple a la vez todo lo que has declarado. El bootcamp es la que menos choca con tus límites, pero no da un título universitario oficial, y has respondido que lo necesitas.',
+    );
+    const b = barrer();
+    expect(b.tituloSinAviso).toBe(0);
+    // Si alguna vía cumple todos los límites, la recomendada es una de ellas; si ninguna puede,
+    // se avisa (los 163.840 perfiles con título + tiempo o urgencia incompatibles).
+    expect(b.compatibleIgnorada).toBe(0);
+    expect(b.sinNingunaPosible).toBe(163_840);
   });
 
-  test('motor: ningún perfil queda fuera de su presupuesto, de su tiempo o de su título declarado', () => {
-    // HALLAZGO abierto (los tres de arriba, contados). Hoy: 52.194 · 189.554 · 120.554.
-    // Si la reparación elige AVISAR en vez de filtrar, estos recuentos no bajan: cámbialos por los
-    // perfiles que se quedan sin aviso.
-    test.fail();
-    test.setTimeout(120_000);
-    const r: Record<number, number> = {};
-    const cuenta = { presupuesto: 0, tiempo: 0, titulo: 0 };
-    const largas: TipoFormacion[] = ['master', 'fp_superior', 'oposiciones'];
-    const recorrer = (i: number): void => {
-      if (i === PREGUNTAS.length) {
-        const { tipo } = calcularResultado(r);
-        if (r[4] === 0 && COSTE_MINIMO[tipo] >= 2000) cuenta.presupuesto++;
-        if ((r[2] === 0 || r[2] === 3) && largas.includes(tipo)) cuenta.tiempo++;
-        if (r[10] === 0 && tipo !== 'master') cuenta.titulo++;
-        return;
-      }
-      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) {
-        r[PREGUNTAS[i].id] = k;
-        recorrer(i + 1);
-      }
-    };
-    recorrer(0);
-    expect.soft(cuenta.presupuesto, '«Menos de 2.000 €» → máster o bootcamp').toBe(0);
-    expect.soft(cuenta.tiempo, '«3-6 meses» o «semanas» → vía de 1 año o más').toBe(0);
-    expect.soft(cuenta.titulo, '«Necesito un título universitario» → otra vía').toBe(0);
-  });
-
-  test('el coste mínimo del máster no supera el precio público de un máster de 60 ECTS', async ({ page }) => {
-    // HALLAZGO abierto: la ficha publica «3.000 – 30.000 €» (y COSTE_MINIMO = 3.000 desempata con
-    // él), la guía dice «universidades públicas desde 1.500 €», y el máster no habilitante público
-    // cuesta en Andalucía 13,68 €/crédito (Junta de Andalucía, nota del 08/08/2024, precio mantenido
-    // en 2025/26 por el Decreto 142/2025): 60 ECTS × 13,68 € = 820,80 €, con bonificación del 99 %
-    // de los créditos aprobados en primera matrícula.
-    test.fail();
+  test('1448: el coste mínimo del máster es el precio público de 60 ECTS, en la ficha y en la guía', async ({ page }) => {
+    // 60 ECTS × 13,68 €/crédito (máster no habilitante, primera matrícula, Junta de Andalucía,
+    // curso 2026/2027) = 820,80 €. Antes: «3.000 – 30.000 €» y «universidades públicas desde 1.500 €».
     await abrirTest(page);
     await responder(page, NORMAL);
-    expect.soft(await minimoPublicado(page), 'ficha del máster').toBeLessThanOrEqual(820.8);
+    expect(await minimoPublicado(page)).toBeCloseTo(820.8, 2);
+    expect(COSTE_MINIMO.master).toBeCloseTo(60 * 13.68, 6);
     const guia = await textoGuia(page);
-    const desde = guia.match(/públicas desde ([\d.,]+)\s*€/)?.[1];
-    if (desde) expect.soft(parseSpanishNumber(desde), 'guía: «universidades públicas desde…»').toBeLessThanOrEqual(820.8);
+    expect(guia).not.toMatch(/públicas desde 1\.500/);
+    expect(guia).toContain('60 créditos de un máster no habilitante cuestan 820,80 € en Andalucía (13,68 € por crédito en primera matrícula, curso 2026/2027)');
   });
 
-  test('guía y FAQ: medicina y psicología clínica no tienen máster habilitante', async ({ page }) => {
-    // HALLAZGO abierto: Medicina se ejerce con el Grado (Orden ECI/332/2008, 360 ECTS) y la
-    // especialidad por residencia MIR; Psicología Clínica, por residencia PIR (RD 2490/1998). El
-    // máster habilitante de psicología es el de Psicología General Sanitaria (Ley 33/2011, DA 7.ª).
-    test.fail();
-    await abrirTest(page);
-    const frase = (await textoGuia(page)).match(/[^.]*másteres habilitantes[^.]*\./i)?.[0] ?? '';
-    expect.soft(frase, 'guía').not.toMatch(/medicina|psicología clínica/i);
-    const faqMaster = (await leerFaq(page)).find((q) => /Vale la pena hacer un máster/.test(q.p))?.r ?? '';
-    const casiObligatorio = faqMaster.match(/[^.]*casi obligatorio[^.]*\./)?.[0] ?? '';
-    expect.soft(casiObligatorio, 'FAQ').not.toMatch(/medicina|psicología clínica/i);
-  });
-
-  test('guía: el cuerpo de Maestros no exige el máster de profesorado', async ({ page }) => {
-    // HALLAZGO abierto: LOE art. 93 exige para primaria el título de Maestro o el Grado equivalente;
-    // la formación pedagógica de postgrado (el máster) es del art. 94, para ESO y bachillerato.
-    // Además el MIR/EIR/FIR se presenta como «oposición» en una sección cuyo resultado es
-    // «Funcionario de carrera» y «un empleo de por vida», cuando da un contrato de residencia
-    // temporal (RD 1146/2006).
-    test.fail();
+  test('1449: medicina y psicología clínica no tienen máster habilitante (guía y FAQ)', async ({ page }) => {
+    // Medicina: Grado de 360 ECTS (Orden ECI/332/2008) y especialidad por MIR; Psicología Clínica
+    // por residencia (RD 2490/1998). Habilitantes reales: abogacía y procura (Ley 34/2006),
+    // psicología general sanitaria (Ley 33/2011, DA 7.ª), profesorado (LOE, arts. 94-95),
+    // arquitectura e ingenierías (UNED y Universidad de Granada, listas de másteres habilitantes).
     await abrirTest(page);
     const guia = await textoGuia(page);
-    expect.soft(guia).not.toMatch(/\(Maestros[^)]*\):\s*requieren máster/);
-    expect.soft(guia).not.toMatch(/Cuerpos sanitarios \(MIR/);
+    expect(guia).not.toMatch(/habilitantes \(arquitectura, medicina, psicología clínica\)/);
+    expect(guia).toContain('Medicina no tiene máster habilitante: se ejerce con el grado de 360 créditos (Orden ECI/332/2008)');
+    expect(guia).toContain('la psicología general sanitaria (Ley 33/2011, disposición adicional 7.ª)');
+    const faqMaster = (await leerFaq(page)).find((q) => /Vale la pena hacer un máster/.test(q.p))?.r ?? '';
+    expect(faqMaster).not.toContain('casi obligatorio');
+    expect(faqMaster).toContain('Medicina, en cambio, se ejerce con el grado, y sus especialidades se obtienen por residencia (MIR), no por un máster.');
   });
 
-  test('FAQ: la cifra del INE sobre el empleo de los titulados de máster es la que publica el INE', async ({ page }) => {
-    // HALLAZGO abierto: la EILU 2019 del INE (última edición, 29/10/2020) da una tasa de empleo del
-    // 86,1 % a los titulados universitarios y del 87,3 % a los de máster: 1,2 puntos, no un 8 %.
-    test.fail();
+  test('1450: el cuerpo de Maestros no exige el máster de profesorado, y el MIR no es una oposición', async ({ page }) => {
+    // LOE art. 93 (Primaria: título de Maestro o Grado equivalente) y arts. 94-95 (Secundaria,
+    // Bachillerato y FP: grado + formación pedagógica de postgrado). RD 1146/2006: el MIR es una
+    // relación laboral especial de residencia, temporal.
+    await abrirTest(page);
+    const guia = await textoGuia(page);
+    expect(guia).not.toMatch(/\(Maestros[^)]*\):\s*requieren máster/);
+    expect(guia).not.toMatch(/Cuerpos sanitarios \(MIR/);
+    expect(guia).not.toContain('empleo de por vida');
+    expect(guia).toContain('para Primaria (Maestros), el título de Maestro o el Grado equivalente (LOE, art. 93)');
+    expect(guia).toContain('contrato de residencia temporal (RD 1146/2006)');
+  });
+
+  test('1451: la cifra del INE sobre el empleo de los titulados de máster es la que publica el INE', async ({ page }) => {
+    // INE, EILU 2019 (29/10/2020, última edición en INEbase): 86,1 % los graduados universitarios
+    // del curso 2013-2014 y 87,3 % los titulados de máster. Antes: «un 8 % superior».
     await abrirTest(page);
     const faqMaster = (await leerFaq(page)).find((q) => /Vale la pena hacer un máster/.test(q.p))?.r ?? '';
-    expect(faqMaster).not.toMatch(/un 8\s?% superior/);
+    expect(faqMaster).not.toMatch(/8\s?% superior/);
+    expect(faqMaster).toContain('la tasa de empleo en 2019 de los graduados universitarios del curso 2013-2014 era del 86,1 %, y la de los titulados de máster, del 87,3 %');
   });
 
-  test('FAQ: las duraciones y las vías son las de la pantalla', async ({ page }) => {
-    // HALLAZGO abierto: el FAQ (lo que leen buscadores e IA) da «3-9 meses» al bootcamp y «1-4 años»
-    // a las oposiciones; la ficha dice «3-6 meses» y «2-5 años de preparación». La primera respuesta
-    // enumera las opciones sin la FP de grado superior, que es una de las cinco que da la app.
-    test.fail();
+  test('1452: el FAQ da las duraciones de la pantalla y las cinco vías', async ({ page }) => {
     await abrirTest(page);
     const faq = await leerFaq(page);
     const bootcamp = faq.find((q) => /bootcamp de un máster/.test(q.p))?.r ?? '';
-    expect.soft(bootcamp, 'bootcamp').toContain(FORMACIONES.bootcamp.duracion);
-    const rangoOposiciones = FORMACIONES.oposiciones.duracion.match(/\d+-\d+ años/)?.[0] ?? '2-5 años';
+    expect(bootcamp).toContain(`(${FORMACIONES.bootcamp.duracion})`);
+    expect(bootcamp).not.toContain('3-9 meses');
     const oposiciones = faq.find((q) => /oposiciones/.test(q.p))?.r ?? '';
-    expect.soft(oposiciones, 'oposiciones').toContain(rangoOposiciones);
-    expect.soft(faq[0]?.r ?? '', 'primera respuesta').toMatch(/\bFP\b|Formación Profesional/);
+    expect(oposiciones).toContain(FORMACIONES.oposiciones.duracion);
+    expect(oposiciones).not.toContain('1-4 años');
+    // La cifra de aprobados («entre el 5 % y el 15 %») no tenía fuente: se ha retirado.
+    expect(oposiciones).not.toMatch(/\d\s?%/);
+    expect(faq[0]?.r ?? '').toContain(`una FP de grado superior (${FORMACIONES.fp_superior.duracion})`);
   });
 
-  test('guía: la inserción de la FP superior sale de la estadística oficial', async ({ page }) => {
-    // HALLAZGO abierto: «superior al 75 % en muchas familias profesionales». El Ministerio de
-    // Educación (nota del 26/11/2025, titulados de 2020-2021) da un 51,1 % de afiliación al primer
-    // año en grado superior; en torno al 75 % solo a los tres años y solo en tres familias
-    // (Informática y Comunicaciones, Fabricación Mecánica, Instalación y Mantenimiento).
-    test.fail();
-    await abrirTest(page);
-    expect(await textoGuia(page)).not.toMatch(/superior\s+al\s+75\s?%\s+en muchas familias/);
-  });
-
-  test('aviso de región: los datos de España se señalan (§1.bis)', async ({ page }) => {
-    // HALLAZGO abierto: guía «en España», SEPE, FP Dual, Administración General del Estado, MIR,
-    // precios en euros y «según institución, CCAA y modalidad» en el resultado, sin RegionBadge.
-    test.fail();
-    await abrirTest(page);
-    expect(await page.locator('[role="note"][aria-label*="España"]').count()).toBeGreaterThan(0);
-  });
-
-  test('guía: sin ranking fechado en un año cerrado ni certificaciones de otro país', async ({ page }) => {
-    // HALLAZGO abierto: «Certificaciones más demandadas en España (2025)», a 24/09/2026 y sin fuente,
-    // con el CPA (licencia de contable público de EE. UU.) en la lista.
-    test.fail();
+  test('1453: la inserción de la FP superior sale de la estadística oficial, con su plazo', async ({ page }) => {
+    // Ministerio de Educación, FP y Deportes, nota del 26/11/2025 (titulados 2020-2021): 51,1 % de
+    // afiliación al primer año en grado superior; en torno al 65 % el primer año y cerca del 75 % al
+    // tercero en Informática y Comunicaciones, Fabricación Mecánica e Instalación y Mantenimiento.
     await abrirTest(page);
     const guia = await textoGuia(page);
-    expect.soft(guia).not.toMatch(/más demandadas en España \(2025\)/);
-    expect.soft(guia).not.toMatch(/\bCPA\b/);
+    expect(guia).not.toMatch(/superior\s+al\s+75\s?%\s+en muchas familias/);
+    expect(guia).toContain('la tasa media de afiliación de los titulados de grado superior fue del 51,1 % al año de terminar');
   });
 
-  test('la comparativa no se anuncia como «barra de progreso»', async ({ page }) => {
-    // HALLAZGO abierto: cinco role="progressbar" (árbol de accesibilidad: nombre «🎓 Máster: 35
-    // puntos», valuenow 35, valuemin 0, valuemax 35, sin aria-valuetext). Un lector dice «barra de
-    // progreso, 100 %»: progreso de ninguna tarea, y el 100 % es relativo a la recomendada, no al
-    // máximo posible (37 para el máster). El ítem ya dice en texto «Máster» y «35 pts».
-    test.fail();
+  test('1454: los datos de España se señalan (RegionBadge) y el resultado no habla de «CCAA»', async ({ page }) => {
     await abrirTest(page);
-    await responder(page, NORMAL);
-    expect(await page.locator('[class*="alternativas"] [role="progressbar"]').count()).toBe(0);
+    await expect(page.locator('[role="note"][aria-label*="España"]')).toHaveCount(1);
+    const texto = await responder(page, NORMAL);
+    expect(texto).not.toContain('CCAA');
+    // Equivalencias para quien viene de otro sistema (créditos, título propio, acceso con título extranjero).
+    expect(await textoGuia(page)).toContain('Si vienes de otro sistema educativo');
   });
 
-  test('la comparativa no lee los emojis ni dice «1 pts»', async ({ page }) => {
-    // HALLAZGO abierto: el emoji de LABELS va como texto suelto (sin aria-hidden) en la etiqueta y
-    // dentro del aria-label de la barra; el candado a11y-jsx no lo ve porque sale de una cadena de
-    // datos, no de JSX. Con 1 punto la pantalla dice «1 pts» y la barra «1 puntos».
-    test.fail();
+  test('1455: sin ranking fechado en un año cerrado ni certificaciones de otro país', async ({ page }) => {
+    await abrirTest(page);
+    const guia = await textoGuia(page);
+    expect(guia).not.toMatch(/\(2025\)/);
+    expect(guia).not.toMatch(/\bCPA\b/);
+    expect(guia).toContain('Algunas certificaciones con reconocimiento internacional');
+  });
+
+  test('1456: la comparativa no es una barra de progreso, no lee los emojis y no dice «1 pts»', async ({ page }) => {
     await abrirTest(page);
     await responder(page, NORMAL);
+    await expect(page.locator('[class*="alternativas"] [role="progressbar"]')).toHaveCount(0);
+    await expect(page.locator('[class*="alternativaBarWrap"][aria-hidden="true"]')).toHaveCount(5);
     const emojiSuelto = await page.locator('[class*="alternativaLabel"]').evaluateAll((els) =>
       els.filter((e) => [...e.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && /\p{Extended_Pictographic}/u.test(n.textContent ?? ''))).length,
     );
-    expect.soft(emojiSuelto, 'etiquetas con emoji leído').toBe(0);
-    const nombres = await page.locator('[class*="alternativaBarWrap"] > *').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label') ?? ''));
-    expect.soft(nombres.filter((n) => /\p{Extended_Pictographic}/u.test(n)), 'aria-label con emoji').toEqual([]);
+    expect(emojiSuelto, 'etiquetas con emoji leído').toBe(0);
     // Estabilidad · Unas semanas · Desempleado · <2.000 € · Administración · 1-3 años · Autónomo ·
     // Administración · Lo antes posible · Titulación pública → el máster suma 1 (sector, +1).
     await abrirTest(page);
     await responder(page, [0, 3, 3, 0, 0, 1, 3, 1, 0, 1]);
-    expect.soft(await page.locator('[class*="alternativaPct"]').allInnerTexts()).not.toContain('1 pts');
+    const puntos = await page.locator('[class*="alternativaPct"]').allInnerTexts();
+    expect(puntos).toContain('1 punto');
+    expect(puntos).not.toContain('1 pts');
   });
 
-  test('tras «Ver resultado» el foco o un anuncio llevan al resultado', async ({ page }) => {
-    // HALLAZGO abierto: la sección del test se desmonta con el botón que tenía el foco, y el foco cae
-    // a <body>; el resultado no está en ninguna región viva. Es de familia: la referencia
-    // (selector-smartphone) tampoco mueve el foco.
-    test.fail();
+  test('1458: tras «Ver resultado» el foco va al título del resultado', async ({ page }) => {
     await abrirTest(page);
     await responder(page, NORMAL);
-    const llega = await page.evaluate(() => {
-      const seccion = document.querySelector('section[class*="resultado"]');
+    await expect.poll(() => page.evaluate(() => {
       const activo = document.activeElement;
-      const enFoco = Boolean(seccion && activo && seccion.contains(activo));
-      const anunciado = Boolean(seccion && (seccion.closest('[aria-live], [role="status"]') || seccion.querySelector('[aria-live], [role="status"]')));
-      return enFoco || anunciado;
-    });
-    expect(llega).toBe(true);
+      return activo?.className.includes('resultadoTitulo') ? activo.textContent : `${activo?.tagName}`;
+    })).toBe('Máster Universitario');
   });
 
-  test('contraste en claro: textos pequeños en color de marca ≥ 4,5:1', async ({ page }) => {
-    // HALLAZGO abierto. Medido hoy: preguntaNumero 4,11 · «Siguiente →» 4,11 (blanco sobre #2E86AB) ·
-    // resultadoBadge 3,65 · h3 de la guía 3,77 (#2E86AB sobre fondo claro).
-    test.fail();
+  test('1457: contraste en claro, textos pequeños en color de marca ≥ 4,5:1', async ({ page }) => {
+    // Medido antes de reparar: preguntaNumero 4,11 · «Siguiente →» 4,11 · resultadoBadge 3,65 ·
+    // h3 de la guía 3,77.
     await abrirTest(page);
     await page.locator('[role="radio"]').first().click();
     await expect(page.getByRole('button', { name: /^Siguiente/ })).toBeEnabled();
@@ -543,12 +556,10 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
     for (const [clave, ratio] of Object.entries(medidas)) expect.soft(ratio, clave).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('contraste en oscuro: textos pequeños en color de marca ≥ 4,5:1', async ({ page }) => {
-    // HALLAZGO abierto. El módulo redeclara --primary: #2E86AB en .container y no en su variante
-    // oscura, así que tapa el #3FA5D1 oscuro de globals (check:token-oscuro deja --primary fuera a
-    // propósito). Medido hoy: preguntaNumero 4,11 · «Siguiente →» 4,11 · resultadoBadge 3,13 ·
+  test('1457: contraste en oscuro, textos pequeños en color de marca ≥ 4,5:1', async ({ page }) => {
+    // El módulo ya no redeclara --primary en .container, que tapaba el #3FA5D1 oscuro de globals.
+    // Medido antes de reparar: preguntaNumero 4,11 · «Siguiente →» 4,11 · resultadoBadge 3,13 ·
     // h3 de la guía 3,21.
-    test.fail();
     await abrirTest(page);
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -568,5 +579,13 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
     medidas.resultadoBadge = await contraste(page, '[class*="resultadoBadge"]');
     medidas.h3Guia = await contraste(page, '[class*="guideSection"] h3');
     for (const [clave, ratio] of Object.entries(medidas)) expect.soft(ratio, clave).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('familia (forma e): el JSON-LD declara características reales', async ({ page }) => {
+    await abrirTest(page);
+    const web = (await leerJsonLd(page)).find((j) => j['@type'] === 'WebApplication');
+    const features = web?.featureList ?? [];
+    expect(features.length).toBeGreaterThanOrEqual(4);
+    expect(features.length).toBeLessThanOrEqual(8);
   });
 });

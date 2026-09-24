@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FORMACIONES } from './motor';
 
 export const metadata: Metadata = {
   title: 'Selector de Formación Postgrado | ¿Máster, FP, Bootcamp u Oposiciones? | meskeIA',
@@ -36,9 +37,25 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber qué tipo de formación postgrado se adapta mejor a tu perfil: máster universitario, FP de grado superior, bootcamp online, oposiciones o certificación profesional.",
   url: "https://meskeia.com/selector-formacion-postgrado/",
   category: 'EducationalApplication',
-  features: [],
+  // Antes vacío (familia selector-*, forma e): lo que la app hace de verdad.
+  features: [
+    'Test de 10 preguntas sobre motivación, tiempo, presupuesto, experiencia y objetivos',
+    'Compara cinco vías: máster universitario, FP de grado superior, bootcamp, oposiciones y certificación profesional',
+    'Respeta tus límites de presupuesto, tiempo, urgencia y título, y avisa si ninguna vía los cumple todos',
+    'Razones sacadas de tus respuestas y comparativa de afinidad con cada vía',
+    'Duración y coste orientativos de cada vía',
+    'Guía con la normativa de másteres habilitantes, acceso a cuerpos docentes y créditos ECTS',
+  ],
 });
 
+const { master, fp_superior: fp, bootcamp, oposiciones, certificacion } = FORMACIONES;
+
+/**
+ * Las duraciones y las vías salen de FORMACIONES, las mismas constantes que la pantalla: el FAQ
+ * daba «3-9 meses» al bootcamp y «1-4 años» a las oposiciones, y la primera respuesta olvidaba la
+ * FP (hallazgo 1452; familia selector-*, forma h). Las cifras que no tenían fuente (la tasa de
+ * aprobados, «un 8 % superior según el INE») se han retirado o sustituido por la fuente.
+ */
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -48,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Qué hacer después de terminar la carrera universitaria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las opciones principales son: un máster universitario para profundizar en tu área o acceder a investigación, un bootcamp para adquirir habilidades técnicas en poco tiempo, oposiciones para acceder a empleo público estable, una certificación profesional reconocida por el sector o directamente la entrada al mercado laboral. La mejor opción depende de tus objetivos, disponibilidad económica y cuánto tiempo estás dispuesto a invertir en formación.',
+        text: `Las opciones principales son: un máster universitario (${master.duracion}) para especializarte o acceder al doctorado, una FP de grado superior (${fp.duracion}) si buscas formación práctica orientada al empleo, un bootcamp (${bootcamp.duracion}) para adquirir habilidades técnicas en poco tiempo, oposiciones (${oposiciones.duracion}) para acceder a empleo público estable, una certificación profesional (${certificacion.duracion.toLowerCase()}) reconocida por el sector o directamente la entrada al mercado laboral. La mejor opción depende de tus objetivos, del tiempo del que dispones y de tu presupuesto.`,
       },
     },
     {
@@ -56,7 +73,12 @@ export const faqJsonLd = {
       name: '¿Vale la pena hacer un máster universitario?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende del campo y del objetivo. En sectores como derecho, medicina, psicología clínica o investigación, el máster es casi obligatorio. En tecnología, el retorno económico de un máster puede ser similar al de un bootcamp de 6 meses pero con un coste y tiempo mucho mayor. Según el INE, los titulados con máster tienen una tasa de empleo un 8% superior a los licenciados sin postgrado, aunque el diferencial varía mucho por área.',
+        // Máster habilitantes: Ley 34/2006 (abogacía y procura), Ley 33/2011 DA 7.ª (psicología
+        // general sanitaria), LOE arts. 94-95 (profesorado). Medicina no: se ejerce con el grado
+        // (Orden ECI/332/2008) y la especialidad es por residencia MIR (hallazgo 1449). Empleo: INE,
+        // Encuesta de Inserción Laboral de Titulados Universitarios 2019, publicada el 29/10/2020, la
+        // última edición en INEbase (hallazgo 1451; antes decía «un 8 % superior»).
+        text: 'Depende del objetivo. Es obligatorio para ejercer las profesiones reguladas con máster habilitante, como la abogacía y la procura, la psicología general sanitaria o el profesorado de secundaria, y es la vía general de acceso al doctorado. Medicina, en cambio, se ejerce con el grado, y sus especialidades se obtienen por residencia (MIR), no por un máster. Según la Encuesta de Inserción Laboral de Titulados Universitarios del INE (2019), la tasa de empleo en 2019 de los graduados universitarios del curso 2013-2014 era del 86,1 %, y la de los titulados de máster, del 87,3 %.',
       },
     },
     {
@@ -64,7 +86,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia un bootcamp de un máster?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un bootcamp es una formación intensiva (3-9 meses) centrada en habilidades prácticas y empleabilidad inmediata, principalmente en tecnología y marketing digital. Un máster universitario dura entre 1 y 2 años, otorga titulación oficial reconocida por el sistema universitario y combina teoría y práctica. Los bootcamps son más baratos y rápidos; los másteres, más valorados para roles de dirección o investigación.',
+        text: `Un bootcamp es una formación intensiva (${bootcamp.duracion}) centrada en habilidades prácticas y empleabilidad inmediata, principalmente en tecnología; da un certificado propio, no un título oficial. Un máster universitario dura ${master.duracion}, otorga una titulación oficial reconocida por el sistema universitario y combina teoría y práctica. El bootcamp es más rápido; el máster da un título oficial y es la vía general de acceso al doctorado.`,
       },
     },
     {
@@ -72,7 +94,7 @@ export const faqJsonLd = {
       name: '¿Para quién son recomendables las oposiciones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las oposiciones son adecuadas para personas que valoran la estabilidad laboral a largo plazo, toleran bien el estudio memorístico y estructurado durante 1-4 años, y tienen capacidad de financiar ese periodo de preparación. Son especialmente competitivas en cuerpos como la Administración General del Estado, la judicatura o el magisterio. La tasa de aprobados en cuerpos de acceso libre suele estar entre el 5% y el 15% de los presentados.',
+        text: `Las oposiciones son adecuadas para personas que valoran la estabilidad laboral a largo plazo, toleran bien el estudio memorístico y estructurado durante un periodo largo (${oposiciones.duracion}) y pueden sostener ese tiempo de preparación. Son especialmente competitivas en cuerpos como la Administración General del Estado, la judicatura o la docencia.`,
       },
     },
     {
@@ -80,7 +102,7 @@ export const faqJsonLd = {
       name: '¿Qué es una certificación profesional y cuándo tiene sentido hacerla?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una certificación profesional es un título emitido por una organización o empresa reconocida en un sector (PMP en gestión de proyectos, AWS en cloud, CFA en finanzas, CISSP en ciberseguridad). Tiene sentido cuando ya tienes experiencia en el área y necesitas acreditar tus competencias de forma reconocida internacionalmente. Son más rápidas y económicas que un máster, y en algunos sectores tienen más peso en la contratación que un título universitario adicional.',
+        text: `Una certificación profesional es un título emitido por una organización o empresa reconocida en un sector (PMP en gestión de proyectos, AWS en la nube, CFA en finanzas, CISSP en ciberseguridad). Se obtiene en ${certificacion.duracion.toLowerCase()} y tiene sentido cuando ya tienes experiencia en el área y necesitas acreditar tus competencias de forma reconocida internacionalmente. Suele ser más rápida que un máster, pero no es un título universitario oficial.`,
       },
     },
   ],

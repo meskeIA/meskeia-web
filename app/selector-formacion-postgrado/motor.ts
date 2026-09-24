@@ -16,6 +16,21 @@
  *     respuestas: «Tienes experiencia laboral…» a quien había marcado «Sin experiencia», o
  *     «Tu prioridad es la estabilidad laboral» a quien buscaba cambiar de sector. Ahora la
  *     descripción habla de la vía, y las razones citan las respuestas que más le han sumado.
+ *
+ *  3. Restricciones declaradas (hallazgos 1445, 1446 y 1447; familia selector-*, forma a). Cuatro
+ *     respuestas no son preferencias sino límites que la propia ficha de cada vía permite comprobar:
+ *       · presupuesto «Menos de 2.000 €» → fuera la vía cuyo coste orientativo EMPIEZA por encima;
+ *       · tiempo «3-6 meses a tiempo completo» o «Unas semanas o meses» → fuera las vías que duran
+ *         un año o más (máster, FP de grado superior, oposiciones);
+ *       · urgencia «Lo antes posible, en meses» → lo mismo;
+ *       · «Necesito un título universitario oficial reconocido» → solo el máster lo da.
+ *     Se recomienda la vía de más afinidad entre las que cumplen todos los límites. Si ninguna los
+ *     cumple todos, la que incumple MENOS (a igualdad, la de más afinidad), y la pantalla dice cuál
+ *     no cumple y por qué. Las demás respuestas siguen siendo pesos: «Prefiero titulación pública»
+ *     o «certificado internacional» expresan una preferencia, no una imposibilidad.
+ *
+ *  4. Coste del máster (hallazgo 1448). La ficha decía «3.000 – 30.000 €» y COSTE_MINIMO desempataba
+ *     con 3.000 €; en universidad pública, 60 ECTS cuestan 820,80 € en Andalucía (ver FORMACIONES).
  */
 
 export type TipoFormacion = 'master' | 'fp_superior' | 'bootcamp' | 'oposiciones' | 'certificacion';
@@ -40,7 +55,11 @@ export interface FormacionInfo {
   icono: string;
   puntos: string[];
   duracion: string;
+  /** Duración mínima en meses de la horquilla de `duracion`: la usa el filtro de tiempo. */
+  duracionMinimaMeses: number;
   coste: string;
+  /** Solo el máster da un título universitario oficial. */
+  daTituloUniversitario: boolean;
 }
 
 export const PREGUNTAS: Pregunta[] = [
@@ -164,8 +183,14 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
       'El máster universitario oficial es la vía de la especialización académica con título reconocido. Pide uno o dos años y suele valorarse en sectores como la empresa, la gestión o las áreas técnicas que miran el expediente académico.',
     icono: '🎓',
     puntos: ['Título oficial universitario', 'Alta especialización académica', 'Redes de contactos universitarias', 'Acceso a doctorado si lo deseas'],
+    // 60, 90 o 120 ECTS (RD 822/2021, art. 17.1) a 60 ECTS por curso (RD 1125/2003, art. 4.1).
     duracion: '1-2 años',
-    coste: '3.000 – 30.000 €',
+    duracionMinimaMeses: 12,
+    // 60 ECTS × 13,68 €/crédito en primera matrícula de un máster no habilitante en Andalucía,
+    // curso 2026/2027 (Junta de Andalucía, nota de agosto de 2026, que la sitúa entre las
+    // comunidades más económicas). Antes: «3.000 – 30.000 €», sin fuente (hallazgo 1448).
+    coste: '820,80 € o más (60 ECTS en universidad pública de Andalucía; el precio por crédito lo fija cada comunidad, y en la privada, cada centro)',
+    daTituloUniversitario: true,
   },
   fp_superior: {
     tipo: 'fp_superior',
@@ -173,9 +198,13 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     descripcion:
       'La Formación Profesional de Grado Superior ofrece formación práctica con alta empleabilidad, titulación pública reconocida y costes muy inferiores a los de un máster. Está pensada para sectores industriales, sanitarios, de gestión o servicios.',
     icono: '🔧',
-    puntos: ['Titulación pública oficial', 'Alta tasa de inserción laboral', 'Prácticas en empresa incluidas', 'Opción de FP Dual muy valorada'],
+    // «Alta tasa de inserción laboral» sin cifra ni fuente: la estadística oficial da un 51,1 % de
+    // afiliación al primer año (ver la guía, hallazgo 1453).
+    puntos: ['Titulación pública oficial', 'Orientada al empleo', 'Prácticas en empresa incluidas', 'Opción de FP Dual'],
     duracion: '1-2 años',
+    duracionMinimaMeses: 12,
     coste: '0 – 2.000 € (pública/privada)',
+    daTituloUniversitario: false,
   },
   bootcamp: {
     tipo: 'bootcamp',
@@ -183,9 +212,11 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     descripcion:
       'El bootcamp o la formación online intensiva es la vía corta hacia un puesto, sobre todo en tecnología o para cambiar de sector: prima las habilidades prácticas sobre el título, y se completa en meses.',
     icono: '💻',
-    puntos: ['Resultados rápidos (3-6 meses)', 'Alta demanda en tecnología', 'Orientado a proyectos reales', 'Comunidad y networking activo'],
+    puntos: ['Resultados rápidos (3-6 meses)', 'Enfocado en tecnología', 'Orientado a proyectos reales', 'Comunidad y networking activo'],
     duracion: '3-6 meses',
+    duracionMinimaMeses: 3,
     coste: '2.000 – 12.000 €',
+    daTituloUniversitario: false,
   },
   oposiciones: {
     tipo: 'oposiciones',
@@ -193,9 +224,11 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     descripcion:
       'Las oposiciones son la vía del empleo público en la Administración, la educación o la justicia. Piden una preparación larga y exigente, y a cambio ofrecen una plaza estable con condiciones reguladas.',
     icono: '🏛️',
-    puntos: ['Empleo público estable y vitalicio', 'Sueldo con progresión regulada', 'Conciliación y derechos laborales', 'Posibilidad de estudio autónomo'],
+    puntos: ['Plaza pública estable', 'Sueldo con progresión regulada', 'Conciliación y derechos laborales', 'Posibilidad de estudio autónomo'],
     duracion: '2-5 años de preparación',
+    duracionMinimaMeses: 24,
     coste: '500 – 3.000 € (academia/materiales)',
+    daTituloUniversitario: false,
   },
   certificacion: {
     tipo: 'certificacion',
@@ -203,18 +236,25 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     descripcion:
       'Las certificaciones profesionales (PMP, AWS, CFA, Google, Microsoft…) validan habilidades concretas, se obtienen en semanas o meses y tienen reconocimiento internacional. Rinden más cuando se apoyan en experiencia laboral previa.',
     icono: '🏅',
-    puntos: ['Reconocimiento internacional', 'Formato flexible y online', 'Alta valoración por empresas', 'Actualizable y renovable'],
+    puntos: ['Reconocimiento internacional', 'Formato flexible y online', 'Valida habilidades concretas', 'Actualizable y renovable'],
     duracion: 'Semanas a 6 meses',
+    duracionMinimaMeses: 0,
     coste: '200 – 3.000 €',
+    daTituloUniversitario: false,
   },
 };
 
+/**
+ * Nombre corto de cada vía para la comparativa. Sin el emoji: iba dentro de la cadena y el lector
+ * de pantalla lo leía en voz alta (hallazgo 1456); la página lo pinta aparte, con aria-hidden, desde
+ * FORMACIONES[tipo].icono.
+ */
 export const LABELS: Record<TipoFormacion, string> = {
-  master: '🎓 Máster',
-  fp_superior: '🔧 FP Superior',
-  bootcamp: '💻 Bootcamp',
-  oposiciones: '🏛️ Oposiciones',
-  certificacion: '🏅 Certificación',
+  master: 'Máster',
+  fp_superior: 'FP Superior',
+  bootcamp: 'Bootcamp',
+  oposiciones: 'Oposiciones',
+  certificacion: 'Certificación',
 };
 
 /** Orden de declaración: SOLO para recorrer, nunca para desempatar. */
@@ -230,15 +270,49 @@ export const CON_ARTICULO: Record<TipoFormacion, string> = {
 };
 
 /**
- * Mínimo de la horquilla de coste que publica cada ficha, en euros: último criterio de
- * desempate. FP 0 € · certificación 200 € · oposiciones 500 € · bootcamp 2.000 € · máster 3.000 €.
+ * Mínimo de la horquilla de coste que publica cada ficha, en euros: lo usa el filtro de
+ * presupuesto y es el último criterio de desempate. FP 0 € · certificación 200 € · oposiciones
+ * 500 € · máster 820,80 € (60 ECTS en universidad pública de Andalucía; antes 3.000 €, hallazgo
+ * 1448) · bootcamp 2.000 €.
  */
 export const COSTE_MINIMO: Record<TipoFormacion, number> = {
   fp_superior: 0,
   certificacion: 200,
   oposiciones: 500,
+  master: 820.8,
   bootcamp: 2000,
-  master: 3000,
+};
+
+/** Los cuatro límites declarables (ver la cabecera, punto 3). */
+export type Restriccion = 'presupuesto' | 'tiempo' | 'urgencia' | 'titulo';
+
+/** Presupuesto máximo de cada respuesta de la pregunta 4, en euros (por índice de opción). */
+const PRESUPUESTO_MAXIMO = [2000, 6000, 15000, Infinity];
+
+/** Meses que caben en cada respuesta de tiempo (pregunta 2) y de urgencia (pregunta 9). */
+const MESES_TIEMPO = [6, 24, 48, 6];
+const MESES_URGENCIA = [6, 24, 60, Infinity];
+
+/** Qué límites incumple cada vía con estas respuestas. */
+function incumplimientos(tipo: TipoFormacion, respuestas: Record<number, number>): Restriccion[] {
+  const f = FORMACIONES[tipo];
+  const lista: Restriccion[] = [];
+  // «Menos de 2.000 €»: fuera la vía cuyo coste orientativo EMPIEZA en 2.000 € o más.
+  if (COSTE_MINIMO[tipo] >= (PRESUPUESTO_MAXIMO[respuestas[4]] ?? Infinity)) lista.push('presupuesto');
+  // Una vía que dura como mínimo un año no cabe en «3-6 meses» ni en «unas semanas o meses»; con
+  // «1-2 años» o más, las horquillas se solapan y no se descarta nada.
+  if (f.duracionMinimaMeses > (MESES_TIEMPO[respuestas[2]] ?? Infinity)) lista.push('tiempo');
+  if (f.duracionMinimaMeses > (MESES_URGENCIA[respuestas[9]] ?? Infinity)) lista.push('urgencia');
+  if (respuestas[10] === 0 && !f.daTituloUniversitario) lista.push('titulo');
+  return lista;
+}
+
+/** Cómo se dice, en la comparativa, cada límite incumplido. */
+export const RESTRICCION_CORTA: Record<Restriccion, string> = {
+  presupuesto: 'fuera de tu presupuesto',
+  tiempo: 'más larga que tu tiempo disponible',
+  urgencia: 'más larga que tu urgencia',
+  titulo: 'sin título universitario oficial',
 };
 
 /** Nombre corto de lo que pregunta cada pregunta, para citar la respuesta en las razones. */
@@ -264,13 +338,22 @@ const DESEMPATE: { pregunta: number; motivo: string }[] = [
 export interface Resultado {
   tipo: TipoFormacion;
   puntos: Record<TipoFormacion, number>;
-  /** Todas las vías, de más a menos afinidad, con el mismo criterio que elige la ganadora. */
+  /** La recomendada primero; después las demás, de más a menos afinidad, con el mismo criterio. */
   orden: TipoFormacion[];
-  /** Otras vías con la MISMA puntuación que la recomendada. */
+  /** Las vías entre las que se ha elegido: las que incumplen menos límites (idealmente, ninguno). */
+  candidatas: TipoFormacion[];
+  /** Qué límites declarados incumple cada vía. */
+  incumple: Record<TipoFormacion, Restriccion[]>;
+  /** Otras candidatas con la MISMA puntuación que la recomendada. */
   empatadas: TipoFormacion[];
   /** Frase que explica cómo se ha deshecho el empate; vacía si no lo hay. */
   criterioDesempate: string;
   razones: string[];
+  /**
+   * Aviso de restricciones: o la recomendada incumple algo (no había ninguna que lo cumpliera
+   * todo), o una vía con más afinidad se ha apartado por un límite. Vacío si no hay nada que decir.
+   */
+  avisoRestricciones: string;
 }
 
 const puntosEnLetra = (n: number) => `${n} ${n === 1 ? 'punto' : 'puntos'}`;
@@ -298,10 +381,14 @@ export function calcularResultado(respuestas: Record<number, number>): Resultado
     }
     return COSTE_MINIMO[a] - COSTE_MINIMO[b];
   };
-  const orden = [...CLAVES].sort(ordenar);
-  const tipo = orden[0];
+  // ─ Límites declarados: se elige entre las vías que incumplen menos (hallazgos 1445-1447) ─
+  const incumple = Object.fromEntries(CLAVES.map((k) => [k, incumplimientos(k, respuestas)])) as Record<TipoFormacion, Restriccion[]>;
+  const menosIncumplidos = Math.min(...CLAVES.map((k) => incumple[k].length));
+  const candidatas = CLAVES.filter((k) => incumple[k].length === menosIncumplidos).sort(ordenar);
+  const tipo = candidatas[0];
+  const orden = [tipo, ...CLAVES.filter((k) => k !== tipo).sort(ordenar)];
 
-  const empatadas = orden.slice(1).filter((k) => puntos[k] === puntos[tipo]);
+  const empatadas = candidatas.slice(1).filter((k) => puntos[k] === puntos[tipo]);
   let criterioDesempate = '';
   if (empatadas.length > 0) {
     // El criterio que la separa de CADA empatada; si no es el mismo para todas, se dicen los
@@ -325,5 +412,37 @@ export function calcularResultado(respuestas: Record<number, number>): Resultado
       `${TEMA[p.id]}: has respondido «${p.opciones[respuestas[p.id]].texto}», que suma ${puntosEnLetra(valor)} ${aNombre(CON_ARTICULO[tipo])}.`,
     );
 
-  return { tipo, puntos, orden, empatadas, criterioDesempate, razones };
+  // ─ Aviso de restricciones ─
+  const motivo = (k: TipoFormacion, r: Restriccion): string => {
+    const f = FORMACIONES[k];
+    switch (r) {
+      case 'presupuesto':
+        return `su coste orientativo empieza en ${f.coste.split(' ')[0]} €, y tu presupuesto es de menos de 2.000 €`;
+      case 'tiempo':
+        return `dura ${f.duracion}, más de lo que puedes dedicar («${PREGUNTAS[1].opciones[respuestas[2]].texto}»)`;
+      case 'urgencia':
+        return incumple[k].includes('tiempo')
+          ? 'tampoco encaja con tu urgencia de incorporarte en meses'
+          : `dura ${f.duracion}, y necesitas incorporarte lo antes posible, en meses`;
+      case 'titulo':
+        return 'no da un título universitario oficial, y has respondido que lo necesitas';
+    }
+  };
+  const motivos = (k: TipoFormacion) => {
+    const partes = incumple[k].map((r) => motivo(k, r));
+    return partes.length <= 1 ? partes.join('') : `${partes.slice(0, -1).join('; ')}; y ${partes[partes.length - 1]}`;
+  };
+  let avisoRestricciones = '';
+  if (incumple[tipo].length > 0) {
+    avisoRestricciones = `Ninguna vía cumple a la vez todo lo que has declarado. ${capitalizar(CON_ARTICULO[tipo])} es la que menos choca con tus límites, pero ${motivos(tipo)}.`;
+  } else {
+    const apartada = orden.find((k) => incumple[k].length > 0 && puntos[k] > puntos[tipo]);
+    if (apartada) {
+      avisoRestricciones = `Por afinidad encajaría más ${CON_ARTICULO[apartada]} (${puntosEnLetra(puntos[apartada])}), pero ${motivos(apartada)}.`;
+    }
+  }
+
+  return { tipo, puntos, orden, candidatas, incumple, empatadas, criterioDesempate, razones, avisoRestricciones };
 }
+
+const capitalizar = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

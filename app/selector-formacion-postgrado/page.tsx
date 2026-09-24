@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './SelectorFormacionPostgrado.module.css';
 import {
   MeskeiaLogo,
@@ -10,9 +10,10 @@ import {
   ShareCard,
   EducationalSection,
   DisclaimerCard,
+  RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularResultado, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS } from './motor';
+import { calcularResultado, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS, RESTRICCION_CORTA } from './motor';
 
 // Las preguntas con sus pesos, las fichas de cada vía y la lógica viven en ./motor.ts.
 
@@ -30,6 +31,14 @@ export default function SelectorFormacionPostgradoPage() {
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [paso, setPaso] = useState<'quiz' | 'resultado'>('quiz');
   const [preguntaActual, setPreguntaActual] = useState(0);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+
+  // Al pulsar «Ver resultado» se desmonta la sección del test con el botón que tenía el foco, y el
+  // foco caía a <body> sin que nada se anunciara: se lleva al título del resultado (hallazgo 1458;
+  // familia selector-*, forma g).
+  useEffect(() => {
+    if (paso === 'resultado') tituloResultado.current?.focus();
+  }, [paso]);
 
   const totalPreguntas = PREGUNTAS.length;
   const pregunta = PREGUNTAS[preguntaActual];
@@ -65,8 +74,9 @@ export default function SelectorFormacionPostgradoPage() {
     ? Math.max(...(Object.values(puntuaciones) as number[]))
     : 1;
 
-  // La comparativa usa el MISMO orden que elige la ganadora: antes un `sort` estable repetía
-  // en la lista el sesgo del objeto (a igualdad de puntos, siempre el máster primero).
+  // La comparativa usa el MISMO orden que elige la ganadora: la recomendada primero y después las
+  // demás por afinidad. Antes un `sort` estable repetía en la lista el sesgo del objeto (a igualdad
+  // de puntos, siempre el máster primero).
   const alternativasOrdenadas = calculo && puntuaciones
     ? calculo.orden.map((tipo) => [tipo, puntuaciones[tipo]] as const)
     : [];
@@ -87,6 +97,14 @@ export default function SelectorFormacionPostgradoPage() {
           FP superior, bootcamp, oposiciones o certificación profesional.
         </p>
       </header>
+
+      {/* Títulos, precios públicos y normativa son los de España; en otros países las vías
+          equivalentes existen con otros nombres, precios y requisitos (hallazgo 1454, como el
+          1340 de mascota). */}
+      <RegionBadge
+        variant="es-data"
+        text="Datos de referencia: España (títulos, precios públicos y normativa). En otros países, las vías equivalentes tienen otros nombres, precios y requisitos"
+      />
 
       <LegalNotice />
 
@@ -186,7 +204,7 @@ export default function SelectorFormacionPostgradoPage() {
               <span aria-hidden="true">✨</span> Tu formación recomendada
             </div>
             <span className={styles.resultadoIcono} aria-hidden="true">{resultado.icono}</span>
-            <h2 className={styles.resultadoTitulo}>{resultado.titulo}</h2>
+            <h2 className={styles.resultadoTitulo} ref={tituloResultado} tabIndex={-1}>{resultado.titulo}</h2>
             <p className={styles.resultadoDescripcion}>{resultado.descripcion}</p>
 
             {/* Un empate no se resuelve en silencio por el orden del objeto: antes lo ganaba
@@ -196,6 +214,15 @@ export default function SelectorFormacionPostgradoPage() {
                 <span aria-hidden="true">⚖️</span> Empate: con tus respuestas,{' '}
                 {enumerar([calculo.tipo, ...calculo.empatadas].map((k) => CON_ARTICULO[k]))}{' '}
                 encajan exactamente igual; {calculo.criterioDesempate}.
+              </p>
+            )}
+
+            {/* Límites declarados (presupuesto, tiempo, urgencia, título): si la recomendada incumple
+                alguno, o si una vía con más afinidad se ha apartado por uno, se dice (hallazgos
+                1445, 1446 y 1447). */}
+            {calculo.avisoRestricciones && (
+              <p className={styles.avisoRestricciones} role="note">
+                <span aria-hidden="true">⚠️</span> {calculo.avisoRestricciones}
               </p>
             )}
 
@@ -225,32 +252,38 @@ export default function SelectorFormacionPostgradoPage() {
               <span aria-hidden="true">📌</span>
               <span>
                 <strong>Duración estimada:</strong> {resultado.duracion} &nbsp;·&nbsp;{' '}
-                <strong>Coste orientativo:</strong> {resultado.coste}. Estas cifras son orientativas y pueden variar según institución, CCAA y modalidad.
+                <strong>Coste orientativo:</strong> {resultado.coste}. Estas cifras son orientativas y pueden variar según institución, región y modalidad.
               </span>
             </div>
 
-            {/* Puntuaciones comparativas */}
+            {/* Puntuaciones comparativas. La barra es DECORATIVA (aria-hidden): no mide el progreso
+                de ninguna tarea, así que role="progressbar" hacía decir «barra de progreso, 100 %»
+                a un lector de pantalla, relativo a la recomendada (hallazgo 1456). El texto de al
+                lado ya dice los puntos, y el emoji va aparte, oculto. */}
             <div className={styles.alternativas}>
               <h3>Comparativa de afinidad con cada vía</h3>
-              <div className={styles.alternativasList} role="list" aria-label="Puntuaciones por tipo de formación">
+              <p className={styles.alternativasNota}>Puntos que suman tus respuestas a cada vía; la barra es proporcional a la puntuación más alta.</p>
+              <ul className={styles.alternativasList}>
                 {alternativasOrdenadas.map(([tipo, pts]) => (
-                  <div key={tipo} className={styles.alternativaItem} role="listitem">
-                    <span className={styles.alternativaLabel}>{LABELS[tipo]}</span>
-                    <div className={styles.alternativaBarWrap}>
+                  <li key={tipo} className={styles.alternativaItem}>
+                    <span className={styles.alternativaLabel}>
+                      <span aria-hidden="true">{FORMACIONES[tipo].icono}</span> {LABELS[tipo]}
+                    </span>
+                    <div className={styles.alternativaBarWrap} aria-hidden="true">
                       <div
                         className={styles.alternativaBar}
                         style={{ width: `${maxPuntuacion > 0 ? (pts / maxPuntuacion) * 100 : 0}%` }}
-                        role="progressbar"
-                        aria-valuenow={pts}
-                        aria-valuemin={0}
-                        aria-valuemax={maxPuntuacion}
-                        aria-label={`${LABELS[tipo]}: ${pts} puntos`}
                       />
                     </div>
-                    <span className={styles.alternativaPct}>{pts} pts</span>
-                  </div>
+                    <span className={styles.alternativaPct}>{pts} {pts === 1 ? 'punto' : 'puntos'}</span>
+                    {calculo.incumple[tipo].length > 0 && (
+                      <span className={styles.alternativaIncumple}>
+                        {calculo.incumple[tipo].map((r) => RESTRICCION_CORTA[r]).join(' · ')}
+                      </span>
+                    )}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
             {/* Acciones */}
@@ -288,7 +321,7 @@ export default function SelectorFormacionPostgradoPage() {
               <tr>
                 <td><span aria-hidden="true">🎓</span> Máster Universitario</td>
                 <td>1-2 años</td>
-                <td>3.000 – 30.000 €</td>
+                <td>Desde 820,80 € (pública)</td>
                 <td>Oficial universitario</td>
               </tr>
               <tr>
@@ -331,25 +364,46 @@ export default function SelectorFormacionPostgradoPage() {
           <ul>
             <li>Acceso a programas de doctorado y carrera investigadora.</li>
             <li>Redes de contactos (networking) universitarias con valor a largo plazo.</li>
-            <li>Los másteres habilitantes (arquitectura, medicina, psicología clínica) son requisito legal para ejercer.</li>
-            <li>El precio varía enormemente: universidades públicas desde 1.500 €, privadas hasta 30.000 €.</li>
+            <li>
+              Algunas profesiones reguladas exigen un máster habilitante para ejercer: por ejemplo, la
+              abogacía y la procura (Ley 34/2006), la psicología general sanitaria (Ley 33/2011,
+              disposición adicional 7.ª), el profesorado de secundaria, bachillerato y FP (LOE, arts. 94 y
+              95), la arquitectura o varias ingenierías.
+            </li>
+            <li>
+              Medicina no tiene máster habilitante: se ejerce con el grado de 360 créditos (Orden
+              ECI/332/2008), y las especialidades médicas, igual que la Psicología Clínica (RD
+              2490/1998), se obtienen por el sistema de residencia (MIR, PIR), no por un máster.
+            </li>
+            <li>
+              En universidad pública, 60 créditos de un máster no habilitante cuestan 820,80 € en
+              Andalucía (13,68 € por crédito en primera matrícula, curso 2026/2027), una de las comunidades
+              más económicas; el precio por crédito lo fija cada comunidad, y en la privada, cada centro.
+            </li>
           </ul>
         </section>
 
         <section className={styles.guideSection}>
-          <h2>FP de Grado Superior: formación práctica con alta empleabilidad</h2>
+          <h2>FP de Grado Superior: formación práctica orientada al empleo</h2>
           <h3>Cuándo elegirla</h3>
+          {/* La guía decía «inserción superior al 75 % en muchas familias», sin fuente: el 75 % solo
+              se alcanza a los tres años y en tres familias (hallazgo 1453). Fuente: nota del
+              Ministerio del 26/11/2025 (La Moncloa, «Aumenta el porcentaje de alumnado de Grado Medio
+              y Grado Superior que trabaja al año de graduarse»). */}
           <p>
-            La Formación Profesional es una opción infravalorada con una tasa de inserción laboral superior
-            al 75 % en muchas familias profesionales. Es ideal si buscas formación práctica orientada
-            al empleo, con costes bajos y titulación pública reconocida.
+            La Formación Profesional de grado superior es formación práctica orientada al empleo, con
+            costes bajos y titulación pública reconocida. Según el Ministerio de Educación, Formación
+            Profesional y Deportes (titulados del curso 2020-2021, nota del 26/11/2025), la tasa media de
+            afiliación de los titulados de grado superior fue del 51,1 % al año de terminar; en las tres
+            familias con más afiliación (Informática y Comunicaciones, Fabricación Mecánica e Instalación y
+            Mantenimiento), en torno al 65 % el primer año y cerca del 75 % al tercero.
           </p>
           <h3>Ventajas clave</h3>
           <ul>
             <li>Las plazas públicas tienen coste muy reducido o gratuito.</li>
             <li>La FP Dual combina empresa y aula: muy valorada por los empleadores.</li>
             <li>Permite acceso directo a grados universitarios en muchos casos.</li>
-            <li>Sectores con mayor demanda: sanidad, informática, energías renovables, logística.</li>
+            <li>La afiliación cambia mucho de una familia profesional a otra: consulta la de la familia que te interesa.</li>
           </ul>
         </section>
 
@@ -358,7 +412,7 @@ export default function SelectorFormacionPostgradoPage() {
           <h3>Cuándo elegirlo</h3>
           <p>
             Los bootcamps son la opción más popular para quienes quieren entrar en tecnología o cambiar
-            de sector en el menor tiempo posible. En 3-6 meses puedes aprender programación,
+            de sector en el menor tiempo posible. En unos meses puedes aprender programación,
             ciberseguridad, diseño UX o análisis de datos con enfoque 100 % práctico.
           </p>
           <h3>Lo que debes valorar</h3>
@@ -376,15 +430,23 @@ export default function SelectorFormacionPostgradoPage() {
           <p>
             Si tu prioridad es la seguridad laboral, la conciliación y condiciones laborales estables,
             las oposiciones son la vía más sólida. Requieren una preparación exigente y constante
-            de 2 a 5 años, pero el resultado es un empleo de por vida en la Administración Pública.
+            ({FORMACIONES.oposiciones.duracion}), y el resultado es una plaza estable en la Administración Pública.
           </p>
           <h3>Tipos principales de oposiciones en España</h3>
           <ul>
-            <li><strong>Cuerpos docentes</strong> (Maestros, Secundaria, FP): requieren máster de formación del profesorado.</li>
+            <li>
+              <strong>Cuerpos docentes</strong>: para Primaria (Maestros), el título de Maestro o el Grado
+              equivalente (LOE, art. 93); para Secundaria, Bachillerato y FP, un grado más la formación
+              pedagógica y didáctica de postgrado, el máster de profesorado (LOE, arts. 94 y 95).
+            </li>
             <li><strong>Cuerpos de la Administración General del Estado</strong> (Hacienda, Interior, Justicia).</li>
             <li><strong>Administraciones autonómicas y locales</strong>: plazas más numerosas y próximas.</li>
-            <li><strong>Cuerpos sanitarios</strong> (MIR, EIR, FIR): vías específicas muy competitivas.</li>
           </ul>
+          <p>
+            El MIR, el EIR o el FIR no son oposiciones a una plaza: son pruebas de acceso a la formación
+            sanitaria especializada, que se cursa con un contrato de residencia temporal (RD 1146/2006),
+            no como funcionario.
+          </p>
         </section>
 
         <section className={styles.guideSection}>
@@ -395,13 +457,38 @@ export default function SelectorFormacionPostgradoPage() {
             internacionalmente, las certificaciones son la opción más eficiente. Son especialmente
             valiosas en tecnología, gestión de proyectos, finanzas y marketing digital.
           </p>
-          <h3>Certificaciones más demandadas en España (2025)</h3>
+          <h3>Algunas certificaciones con reconocimiento internacional</h3>
           <ul>
             <li><strong>Tecnología</strong>: AWS Certified, Google Cloud, Microsoft Azure, CompTIA Security+.</li>
             <li><strong>Gestión de proyectos</strong>: PMP (PMI), PRINCE2, Scrum Master (PSM/CSM).</li>
-            <li><strong>Finanzas</strong>: CFA, CPA, FRM.</li>
+            <li><strong>Finanzas</strong>: CFA, FRM.</li>
             <li><strong>Marketing digital</strong>: Google Ads, HubSpot, Meta Blueprint.</li>
             <li><strong>Idiomas</strong>: Cambridge, TOEFL, DELE (siempre un plus).</li>
+          </ul>
+        </section>
+
+        <section className={styles.guideSection}>
+          <h2>Si vienes de otro sistema educativo</h2>
+          <ul>
+            <li>
+              <strong>Créditos ECTS</strong>: un curso a tiempo completo son 60 créditos, y cada crédito,
+              entre 25 y 30 horas de trabajo (RD 1125/2003, art. 4). Un máster tiene 60, 90 o 120 créditos
+              (RD 822/2021, art. 17).
+            </li>
+            <li>
+              <strong>Título oficial o propio</strong>: los «másteres propios» de las universidades no son
+              títulos oficiales (RD 822/2021, art. 36). Si necesitas un título oficial, busca «Máster
+              Universitario» en su denominación.
+            </li>
+            <li>
+              <strong>Acceso al máster con un título extranjero</strong>: con un grado de fuera del Espacio
+              Europeo de Educación Superior se puede acceder sin homologarlo, tras comprobar la universidad su
+              nivel, pero ese acceso no equivale a la homologación (RD 822/2021, art. 18.2).
+            </li>
+            <li>
+              <strong>Doctorado</strong>: con carácter general, pide un grado y un máster universitario que
+              sumen al menos 300 créditos (RD 99/2011, art. 6).
+            </li>
           </ul>
         </section>
       </EducationalSection>
