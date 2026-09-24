@@ -454,3 +454,25 @@
   line-height: 1.5;
   margin: var(--spacing-sm) 0 0;
 }
+
+/* Celdas «Sí / No» de la tabla de los tres escenarios del bloque educativo. Iban con color
+   literal inline (#27ae60 y #c0392b) sin variante oscura, en texto de 14,4 px: 2,64:1 el verde
+   en claro y 3,20:1 el rojo en oscuro (hallazgo 1580). Colores propios de la tabla, medidos
+   contra sus fondos (#fff/#f5f5f5 en claro, #1a1a1a/#303030 en oscuro): ≥ 5,35:1 los cuatro. */
+.tablaEscenarios {
+  --celda-favorable: #18743a;
+  --celda-desfavorable: #b03a2e;
+}
+
+[data-theme='dark'] .tablaEscenarios {
+  --celda-favorable: #81c784;
+  --celda-desfavorable: #ef9a9a;
+}
+
+.celdaFavorable {
+  color: var(--celda-favorable);
+}
+
+.celdaDesfavorable {
+  color: var(--celda-desfavorable);
+}

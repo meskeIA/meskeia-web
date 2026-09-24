@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
+import { CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar, tipoGeneralITP } from '@/data/itp-ccaa';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
 
@@ -14,6 +14,12 @@ import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
  *  texto lo leen los asistentes de IA (hallazgo 641). */
 const IVA_ANEJO = IVA_INMUEBLES_2025.anejoVinculado;
 const IVA_GENERAL = IVA_INMUEBLES_2025.garaje;
+/**
+ * El País Vasco grava la vivienda (y los anexos transmitidos con ella) al 4 % y el trastero
+ * suelto al 7 % (hallazgo 1582, NF 1/2011 de Bizkaia, art. 13). Leídos del motor.
+ */
+const ITP_PV_VIVIENDA = tipoGeneralITP('pais-vasco', 'vivienda', 0);
+const ITP_PV_SUELTO = tipoGeneralITP('pais-vasco', 'otro', 0);
 
 /**
  * Las dos respuestas que se contradecían con la propia calculadora, en UN solo sitio.
@@ -35,7 +41,13 @@ const IVA_GENERAL = IVA_INMUEBLES_2025.garaje;
  */
 export const RESPUESTA_IVA_TRASTERO_NUEVO = `Depende de cómo se compre. Si el promotor transmite el trastero conjuntamente con la vivienda como anejo, se aplica el IVA reducido del ${IVA_ANEJO}% (art. 91.Uno.1.7º de la Ley del IVA). Si el trastero se adquiere de forma independiente, con su propia finca registral y en operación separada, tributa al tipo general del ${IVA_GENERAL}%. Es el mismo criterio que se aplica a las plazas de garaje. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos.`;
 
-export const RESPUESTA_PLUSVALIA_TRASTERO = `Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay ganancia, se puede acreditar la pérdida y quedar exento. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`;
+/**
+ * ⚠️ 24/09/2026 (hallazgo 1569): decía que sin ganancia «se puede acreditar la pérdida y quedar
+ * exento». El art. 104.5 del TRLRHL (redacción del RDL 26/2021, verificado en el BOE ese día) es
+ * un supuesto de NO SUJECIÓN —«No se producirá la sujeción al impuesto […] respecto de los cuales
+ * se constate la inexistencia de incremento de valor»—, que es lo que ya decía la tarjeta.
+ */
+export const RESPUESTA_PLUSVALIA_TRASTERO = `Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay incremento de valor —por ejemplo, si vendes por lo mismo que pagaste o por menos—, la transmisión no está sujeta al impuesto (art. 104.5 del texto refundido de la Ley de Haciendas Locales): no es una exención, el impuesto no llega a devengarse, aunque hay que declararlo y aportar las escrituras de compra y venta. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}% como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}%.`;
 
 /**
  * Las tres que se quedaron fuera del mecanismo del hallazgo 774 y que el 1157/1158 cierra.
@@ -49,7 +61,7 @@ export const RESPUESTA_PLUSVALIA_TRASTERO = `Sí. La plusvalía municipal (Impue
  * España-only que el CLAUDE.md pide evitar— y el precio es el mismo que ya se pagó con las
  * dos primeras: la respuesta visible pierde sus `<strong>`.
  */
-export const RESPUESTA_VINCULADO_VS_INDEPENDIENTE = `El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al ${IVA_ANEJO}% como anejo y el independiente al ${IVA_GENERAL}%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.`;
+export const RESPUESTA_VINCULADO_VS_INDEPENDIENTE = `El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal principal está en la obra nueva: el vinculado paga IVA al ${IVA_ANEJO}% como anejo y el independiente al ${IVA_GENERAL}%. En segunda mano ambos pagan ITP al tipo de la comunidad autónoma —salvo en el País Vasco, donde el trastero comprado por separado paga el ${ITP_PV_SUELTO}% y no el ${ITP_PV_VIVIENDA}% de la vivienda—, aunque los tipos reducidos por perfil del comprador suelen exigir que la compra sea de vivienda habitual. Consulta siempre con un asesor fiscal antes de la operación.`;
 
 export const RESPUESTA_COMPRAR_SIN_VIVIENDA = `Sí. Si el trastero tiene finca registral propia (trastero independiente), se puede comprar y vender de forma autónoma sin necesidad de adquirir la vivienda a la que originalmente estuvo vinculado. Esta es una operación habitual, especialmente en comunidades de propietarios donde el trastero sale a la venta de forma separada.`;
 
@@ -89,7 +101,7 @@ const webAppSchema = generateWebAppSchema({
   url: 'https://meskeia.com/simulador-gastos-compraventa-trastero/',
   category: 'FinanceApplication',
   features: [
-    'ITP por comunidad autónoma para trastero (tipo residencial)',
+    'ITP por comunidad autónoma para trastero comprado por separado',
     `IVA ${IVA_ANEJO}% si va con la vivienda como anejo, ${IVA_GENERAL}% si es independiente (obra nueva)`,
     'Gastos de notaría y registro de la propiedad',
     'Plusvalía municipal del vendedor',

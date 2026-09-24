@@ -207,7 +207,9 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('145.500,00 €');
     expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('54.500,00 €');
     await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
+    // ⚠️ 24/09/2026 (hallazgo 1554): aquí se exigía «EXENTO», que consagraba el defecto: con
+    // pérdida no hay nada exento, hay ausencia de ganancia (la mitad del 724 que no se reparó).
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('SIN CUOTA');
 
     // Total gastos vendedor = 0 plusvalía + 4.500 comisión + 0 otros + 0 IRPF
     expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('4500,00 €');
@@ -249,15 +251,17 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     //   quedarse corto en el valor de ADQUISICIÓN infla la ganancia y el IRPF.
     //   estimación = 11.766,77 + 300 = 12.066,77 → el campo muestra «12.067»
     //   valor de adquisición = 180.000 + 12.067 = 192.067
-    //   valor de transmisión = 250.000 − 7.500 de comisión − 1.250 de plusvalía = 241.250
+    //   plusvalía (24/09/2026, hallazgo 1559: coeficientes del RDL 8/2023, 8 años = 0,19;
+    //   antes 0,10) = 50.000 × 0,19 × 25 % = 2.375 (el real daría 7.291,67: gana el objetivo)
+    //   valor de transmisión = 250.000 − 7.500 de comisión − 2.375 de plusvalía = 240.125
     //   (la gestoría de la VENTA la paga el comprador y no resta aquí: art. 35.1 LIRPF,
     //    reparado el 21/08/2026 — es otra partida distinta de la de la compra de entonces)
-    //   ganancia = 241.250 − 192.067 = 49.183
-    //   IRPF = 6.000×19 % + 43.183×21 % = 1.140 + 9.068,43 = 10.208,43
+    //   ganancia = 240.125 − 192.067 = 48.058
+    //   IRPF = 6.000×19 % + 42.058×21 % = 1.140 + 8.832,18 = 9.972,18
     // Antes de la corrección daba: adquisición 180.011,44 € · ganancia 60.938,56 € · IRPF 12.895,87 €
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('192.067,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('49.183,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('10.208,43 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('48.058,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('9972,18 €');
   });
 
   // ✅ CORREGIDO el 14/08/2026 — con el perfil «Joven (< 35 años)» la app
@@ -296,19 +300,20 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
 
     // Con los opcionales a 0 la app da estas cifras exactas (comprobado):
-    //   plusvalía objetivo = 50.000 × 0,10 (COEFICIENTES_IIVTNU_2025, 8 años) × 25 % = 1.250
+    //   plusvalía objetivo = 50.000 × 0,19 (art. 107.4 TRLRHL, RDL 8/2023, 8 años; era 0,10
+    //   con la tabla caducada, hallazgo 1559) × 25 % = 2.375
     //   (el método real daría 70.000 × 50.000/120.000 × 25 % = 7.291,67 → gana el objetivo)
-    //   valor de transmisión = 250.000 − 7.500 − 1.250 = 241.250 ; ganancia = 61.250
+    //   valor de transmisión = 250.000 − 7.500 − 2.375 = 240.125 ; ganancia = 60.125
     //   (sin la gestoría del comprador: art. 35.1 LIRPF, reparado el 21/08/2026)
-    //   IRPF = 6.000×19 % + 44.000×21 % + 11.250×23 % = 1.140 + 9.240 + 2.587,50 = 12.967,50
-    //   neto = 250.000 − (1.250 plusvalía + 7.500 comisión + 12.967,50 IRPF) = 228.282,50
+    //   IRPF = 6.000×19 % + 44.000×21 % + 10.125×23 % = 1.140 + 9.240 + 2.328,75 = 12.708,75
+    //   neto = 250.000 − (2.375 plusvalía + 7.500 comisión + 12.708,75 IRPF) = 227.416,25
     // Obtenido hoy sin tocar los opcionales: «No definido» en IRPF, total y neto, y la
     // tarjeta de ganancia ni se pinta (la condición para mostrarla es `ganancia > 0`, y
     // NaN > 0 es false), de ahí que se compruebe primero que existe.
     await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(1);
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('61.250,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('12.967,50 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.282,50 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('60.125,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('12.708,75 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('227.416,25 €');
   });
 
   // ✅ CORREGIDO el 14/08/2026 - mismo NaN en la pestaña Comprador. La guarda
@@ -342,10 +347,13 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, /^IVA/)).toBe('18.000,00 €');
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
 
-    // AJD sobre la escritura de compraventa: ITP_CCAA.valencia.ajd = 1,5 (coincide con
-    // TIPOS_AJD_2025.general de `data/fiscal/inmuebles.ts`) → 180.000 × 1,5 % = 2.700
-    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (1,50%)');
-    expect(await valorTarjeta(page, /^AJD/)).toBe('2700,00 €');
+    // AJD sobre la escritura de compraventa: ITP_CCAA.valencia.ajd = 1,4 desde el 01/06/2026
+    // (Ley 13/1997, art. 14.Cuatro, verificado en el BOE el 24/09/2026, hallazgo 1603; hasta
+    // ese día la tabla decía 1,5) → 180.000 × 1,4 % = 2.520. La app no pregunta si será la
+    // vivienda habitual (0,1 %): cobra el general y lo enseña en la descripción.
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (1,40%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('2520,00 €');
+    expect(await descripcionTarjeta(page, /^AJD/)).toContain('el AJD baja al 0,1 %: serían 180,00 €');
 
     // Notaría (ARANCELES_NOTARIO, RD 1426/1989) sobre 180.000 €:
     //   90,15 + 24.040,49×0,45 % + 30.050,60×0,15 % + 90.151,82×0,10 % + 29.746,97×0,05 %
@@ -356,10 +364,10 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     //   = 180,21206 ; × 1,21 → 218,0566
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('228,96 €');
 
-    // Total = 18.000 + 2.700 + 421,6044 + 218,0566 + 300 = 21.639,6610 → 12,02 % del precio
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.966,77 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,20%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('201.966,77 €');
+    // Total = 18.000 + 2.520 + 737,81 + 228,96 + 300 = 21.786,77 → 12,10 % del precio
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.786,77 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,10%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('201.786,77 €');
   });
 
   test('CASO 9 (límite: tramo más alto) — Baleares, 2.500.000 €: los cinco tramos de la escala', async ({ page }) => {
@@ -430,23 +438,22 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await rellenar(page, 'Importe que reinviertes en la nueva vivienda', '300000');
     // «Hipoteca pendiente de la vivienda que vendes» se deja SIN TOCAR, a propósito.
 
-    // Plusvalía municipal: objetivo = 60.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años) ×
-    // 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.200 ; real = 100.000 ×
-    // (60.000/150.000) × 25 % = 10.000 → gana el objetivo, 1.200 €.
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1200,00 €');
+    // Plusvalía municipal: objetivo = 60.000 × 0,12 (art. 107.4 TRLRHL, RDL 8/2023, 10 años;
+    // era 0,08 con la tabla caducada, hallazgo 1559) × 25 % (PLUSVALIA_MUNICIPAL_META.
+    // tipoOrientativo) = 1.800 ; real = 100.000 × (60.000/150.000) × 25 % = 10.000 → gana el
+    // objetivo, 1.800 €.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
     // Art. 35 LIRPF: adquisición = 200.000 ; transmisión = 300.000 − 9.000 de comisión
-    //              − 1.200 de plusvalía = 289.800 ; ganancia = 89.800 (la gestoría del
+    //              − 1.800 de plusvalía = 289.200 ; ganancia = 89.200 (la gestoría del
     //              comprador ya no resta: art. 35.1 LIRPF, reparado el 21/08/2026)
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('89.800,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('89.200,00 €');
 
-    // Art. 41.1 RIRPF: importe total obtenido = 289.800 − 0 de préstamo pendiente = 289.800.
-    // Se reinvierten 300.000 ≥ 289.800 → proporción 1 → exención TOTAL (art. 38 LIRPF).
-    // Obtenido hoy: «19.465,00 €» de IRPF (6.000×19 % + 44.000×21 % + 39.500×23 %) y un neto
-    // de 270.035,00 €, es decir 19.465 € de impuesto inventado sobre una ganancia exenta.
+    // Art. 41.1 RIRPF: importe total obtenido = 289.200 − 0 de préstamo pendiente = 289.200.
+    // Se reinvierten 300.000 ≥ 289.200 → proporción 1 → exención TOTAL (art. 38 LIRPF).
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('Reinversión total');
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('10.200,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('289.800,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('10.800,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('289.200,00 €');
   });
 
   test('CASO 11 bis (control) — la misma reinversión con «0» escrito a mano sí queda exenta', async ({ page }) => {
@@ -464,9 +471,10 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
 
     // Mismos datos que el CASO 11, con la única diferencia del «0». Este control es lo que
     // convierte al 11 en un defecto demostrado y no en una discrepancia de criterio fiscal:
-    // el motor calcula bien la exención en cuanto el campo no está vacío.
+    // el motor calcula bien la exención en cuanto el campo no está vacío. Neto con la tabla
+    // del RDL 8/2023 (hallazgo 1559): 300.000 − 1.800 − 9.000 = 289.200.
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('289.800,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('289.200,00 €');
   });
 
   // ⚠️ HALLAZGO ABIERTO (Inspector, 16/08/2026) — el otro rincón al que no llegó el 2067ddbe.
@@ -867,7 +875,12 @@ test('REGRESIÓN (dato) — el rango de AJD del bloque educativo deja fuera el 0
 }) => {
   await page.goto(RUTA);
   await selectCcaa(page).selectOption('pais-vasco');
-  await expect(page.locator('[class*="infoCcaa"]').first()).toContainText('Sin AJD');
+  // ⚠️ 24/09/2026 (hallazgos 1583 y 1592): el País Vasco no es «Sin AJD». Su AJD foral es el
+  // 0,5 % (NF 1/2011 de Bizkaia, art. 44.1) y lo que está exento es la primera transmisión de
+  // VIVIENDA (art. 58.35). Con «Vivienda» elegida, el recuadro sigue diciendo AJD 0 %; la nota
+  // de la comunidad ya no dice «Sin AJD», y el rango del bloque educativo conserva el 0 %.
+  await expect(page.locator('[class*="infoCcaa"]').first()).toContainText('AJD0%');
+  await expect(page.locator('[class*="infoCcaa"]').first()).toContainText('exenta la primera transmisión de vivienda');
 
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   await expect(page.getByText(/Actos Jurídicos Documentados\)/).first()).toContainText('0%');
@@ -934,21 +947,21 @@ test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
     await page.getByText('Voy a reinvertir en otra vivienda habitual').click();
     await rellenar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
 
-    // Plusvalía municipal: objetivo = 60.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años)
-    //   × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.200
+    // Plusvalía municipal: objetivo = 60.000 × 0,12 (art. 107.4 TRLRHL, RDL 8/2023, 10 años;
+    //   era 0,08 con la tabla caducada, hallazgo 1559) × 25 % = 1.800
     //   real = 100.000 × (60.000/150.000) × 25 % = 10.000 → gana el objetivo
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1200,00 €');
-    // Valor de transmisión = 300.000 − 9.000 de comisión − 1.200 de plusvalía = 289.800
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('289.800,00 €');
-    // Ganancia = 289.800 − 200.000 = 89.800
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('89.800,00 €');
-    // Importe total obtenido (art. 41 RIRPF) = 289.800 − 0 de hipoteca pendiente
-    //   proporción reinvertida = 150.000 / 289.800 = 0,5175983…
-    //   exenta = 89.800 × 0,5175983 = 46.480,3313 → base = 89.800 − 46.480,3313 = 43.319,6687
-    //   IRPF = 6.000×19 % + 37.319,6687×21 % = 1.140 + 7.837,1304 = 8.977,1304
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8977,13 €');
-    // Neto = 300.000 − (1.200 + 9.000 + 8.977,1304) = 280.822,8696
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('280.822,87 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
+    // Valor de transmisión = 300.000 − 9.000 de comisión − 1.800 de plusvalía = 289.200
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('289.200,00 €');
+    // Ganancia = 289.200 − 200.000 = 89.200
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('89.200,00 €');
+    // Importe total obtenido (art. 41 RIRPF) = 289.200 − 0 de hipoteca pendiente
+    //   proporción reinvertida = 150.000 / 289.200 = 0,5186722…
+    //   exenta = 89.200 × 0,5186722 = 46.265,5602 → base = 89.200 − 46.265,5602 = 42.934,4398
+    //   IRPF = 6.000×19 % + 36.934,4398×21 % = 1.140 + 7.756,2324 = 8.896,2324
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8896,23 €');
+    // Neto = 300.000 − (1.800 + 9.000 + 8.896,23) = 280.303,77
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('280.303,77 €');
   });
 
   // Art. 57 bis TRLITPAJD: la cuota se bonifica al 50 % por estar el inmueble en Ceuta o
@@ -1139,7 +1152,9 @@ test('REGRESIÓN — el porcentaje de reinversión sale con punto decimal inglé
   await page.getByText('Voy a reinvertir en otra vivienda habitual').click();
   await rellenar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
 
-  expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('51,8 %');
+  // 150.000 / 289.200 = 51,867 % con la plusvalía del RDL 8/2023 (1.800 €, hallazgo 1559);
+  // con la tabla caducada eran 150.000 / 289.800 = 51,76 %. Lo que vigila es la coma.
+  expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('51,9 %');
 });
 
 // ✅ REPARADO 27/08/2026 — dato (BAJO).
@@ -1338,15 +1353,16 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
   // La misma pantalla con los dos campos del vendedor en su valor legítimo. Sujeta el
   // montaje de los dos test.fail() de abajo: si esto se pone rojo, lo que falla es el
   // caso, no el hallazgo.
-  //   plusvalía .... objetivo 50.000 × 0,10 (8 años) × 25 % = 1.250 ; real
-  //                  70.000 × (50.000/120.000) × 25 % = 7.291,67 → gana el objetivo
+  //   plusvalía .... objetivo 50.000 × 0,19 (8 años, art. 107.4 TRLRHL en la redacción del
+  //                  RDL 8/2023; era 0,10 con la tabla caducada, hallazgo 1559) × 25 % = 2.375 ;
+  //                  real 70.000 × (50.000/120.000) × 25 % = 7.291,67 → gana el objetivo
   //   comisión ..... 250.000 × 3 % = 7.500
-  //   v. transmis. . 250.000 − 7.500 − 1.250 = 241.250
-  //   ganancia ..... 241.250 − 180.000 = 61.250
-  //   IRPF ......... 6.000×19 % + 44.000×21 % + 11.250×23 % = 1.140 + 9.240 + 2.587,50
-  //                  = 12.967,50
-  //   total gastos . 1.250 + 7.500 + 0 + 12.967,50 = 21.717,50
-  //   neto ......... 250.000 − 21.717,50 = 228.282,50
+  //   v. transmis. . 250.000 − 7.500 − 2.375 = 240.125
+  //   ganancia ..... 240.125 − 180.000 = 60.125
+  //   IRPF ......... 6.000×19 % + 44.000×21 % + 10.125×23 % = 1.140 + 9.240 + 2.328,75
+  //                  = 12.708,75
+  //   total gastos . 2.375 + 7.500 + 0 + 12.708,75 = 22.583,75
+  //   neto ......... 250.000 − 22.583,75 = 227.416,25
   test('CASO 20 (control) — vendedor con comisión del 3 % y sin otros gastos', async ({ page }) => {
     await page.goto(RUTA);
     await rellenar(page, 'Precio de la vivienda', '250000');
@@ -1357,12 +1373,12 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
     await rellenar(page, 'Comisión inmobiliaria (%)', '3');
 
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1250,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('241.250,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('61.250,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('12.967,50 €');
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('21.717,50 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.282,50 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2375,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('240.125,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('60.125,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('12.708,75 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('22.583,75 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('227.416,25 €');
   });
 });
 
@@ -1382,7 +1398,8 @@ test(
     // SIN blur: así es como está el campo mientras el usuario teclea
     await page.locator('input[aria-label="Otros gastos de la venta (opcional)"]').fill('-2000');
 
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.282,50 €');
+    // El neto del CASO 20 (227.416,25 € con los coeficientes del RDL 8/2023, hallazgo 1559).
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('227.416,25 €');
   },
 );
 
@@ -1400,7 +1417,10 @@ test(
     // SIN blur, igual que arriba
     await page.locator('input[aria-label="Comisión inmobiliaria (%)"]').fill('-3');
 
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('234.057,50 €');
+    // Comisión acotada a 0: plusvalía 50.000 × 0,19 × 25 % = 2.375 (RDL 8/2023, 1559) ·
+    // ganancia 250.000 − 2.375 − 180.000 = 67.625 · IRPF 1.140 + 9.240 + 17.625 × 23 % =
+    // 14.433,75 · neto 250.000 − 2.375 − 14.433,75 = 233.191,25
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('233.191,25 €');
   },
 );
 
@@ -1648,29 +1668,29 @@ test.describe('Inspector 02/09/2026 — comprador y vendedor de punta a punta', 
     // «Impuestos y gastos que pagaste al comprar», «mejoras» y «otros gastos» se dejan
     // vacíos a propósito: son opcionales y `parseSpanishNumberOr` los lee como 0.
 
-    // Plusvalía municipal (art. 107 TRLHL, RDL 26/2021):
-    //   objetivo = 50.000 × 0,08 (COEFICIENTES_IIVTNU_2025, 10 años)
-    //              × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.000
+    // Plusvalía municipal (art. 107.4 TRLRHL en la redacción del RDL 8/2023; hasta el
+    // 24/09/2026 la app usaba la tabla caducada del RDL 26/2021, 0,08 a 10 años, hallazgo 1559):
+    //   objetivo = 50.000 × 0,12 (10 años) × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 1.500
     //   real     = (200.000 − 150.000) × 50.000/120.000 × 25 % = 5.208,33
-    //   → el contribuyente elige el más favorable: 1.000 €
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1000,00 €');
+    //   → el contribuyente elige el más favorable: 1.500 €
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1500,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
       'Método objetivo (más favorable)',
     );
 
     // Art. 35 LIRPF (calcularGananciaInmueble):
     //   adquisición = 150.000 + 0 gastos + 0 mejoras = 150.000
-    //   transmisión = 200.000 − 6.000 (comisión 3 %) − 1.000 (plusvalía) = 193.000
-    //   ganancia    = 193.000 − 150.000 = 43.000
+    //   transmisión = 200.000 − 6.000 (comisión 3 %) − 1.500 (plusvalía) = 192.500
+    //   ganancia    = 192.500 − 150.000 = 42.500
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('150.000,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('193.000,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('43.000,00 €');
-    // TRAMOS_GANANCIAS_PATRIMONIALES_2025: 6.000×19 % + 37.000×21 % = 1.140 + 7.770 = 8.910
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8910,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('192.500,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('42.500,00 €');
+    // TRAMOS_GANANCIAS_PATRIMONIALES_2025: 6.000×19 % + 36.500×21 % = 1.140 + 7.665 = 8.805
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8805,00 €');
     expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('6000,00 €');
-    // 1.000 plusvalía + 6.000 comisión + 0 otros + 8.910 IRPF = 15.910 ; neto = 184.090
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('15.910,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('184.090,00 €');
+    // 1.500 plusvalía + 6.000 comisión + 0 otros + 8.805 IRPF = 16.305 ; neto = 183.695
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('16.305,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('183.695,00 €');
   });
 
   test('CASO 25 (límite: el tramo MÁS ALTO de Cataluña) — 1.600.000 €, el 13 % que nadie pisaba', async ({
@@ -1985,13 +2005,14 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     await rellenar(page, 'Precio de la vivienda', '1000000');
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
 
-    // La escala que la app anuncia es la que tiene que aplicar
-    expect(ITP_CCAA.valencia.tramosProgresivos).toEqual([
-      { hasta: 1000000, tipo: 9 },
-      { hasta: Infinity, tipo: 11 },
-    ]);
-    await expect(page.locator('p', { hasText: 'escala progresiva' }).first()).toContainText(
-      '9% → 11%',
+    // ⚠️ 24/09/2026 (hallazgos 1581 y 1602): este caso consagraba el cálculo EQUIVOCADO. El
+    // 11 % valenciano no es un tramo sobre el exceso sino un UMBRAL sobre todo el valor: «Si
+    // el valor […] fuera superior a 1.000.000 de euros, el tipo aplicable será el 11 %» (Ley
+    // 13/1997, art. 13.Uno, texto consolidado del BOE). Hasta el 1.000.000 exacto, el 9 %.
+    expect(ITP_CCAA.valencia.tramosProgresivos).toBeUndefined();
+    expect(ITP_CCAA.valencia.umbralTipoUnico).toEqual({ superiorA: 1000000, tipo: 11 });
+    await expect(page.locator('p', { hasText: 'sobre TODO el valor' }).first()).toContainText(
+      'el tipo general es del 9 %, y si el valor supera 1.000.000 € pasa al 11 %',
     );
 
     expect(await valorTarjeta(page, /^ITP/)).toBe('90.000,00 €');
@@ -2002,14 +2023,14 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     expect(await descripcionTarjeta(page, /^Total gastos adicionales/)).toBe('9,22% sobre el precio');
     expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('1.092.215,36 €');
 
-    // Un euro por encima del canto: el 11 % grava el EXCESO, no el total
+    // Un euro por encima del canto: el 11 % grava TODO el valor → 1.000.001 × 11 % = 110.000,11
     await rellenar(page, 'Precio de la vivienda', '1000001');
-    expect(await valorTarjeta(page, /^ITP/)).toBe('90.000,11 €');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('110.000,11 €');
 
-    // Y 200.000 € por encima: 90.000 + 22.000
+    // Y 200.000 € por encima: 1.200.000 × 11 % = 132.000 (no los 112.000 de «9 % + 11 %»)
     await rellenar(page, 'Precio de la vivienda', '1200000');
-    expect(await valorTarjeta(page, /^ITP/)).toBe('112.000,00 €');
-    await expect(page.locator('h3', { hasText: 'ITP (9,33%)' })).toBeVisible();
+    expect(await valorTarjeta(page, /^ITP/)).toBe('132.000,00 €');
+    await expect(page.locator('h3', { hasText: 'ITP (11,00%)' })).toBeVisible();
   });
 
   /**
@@ -2057,18 +2078,19 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
    * DOS cosas; con solo la edad, la ganancia tributa entera.
    * Venta 300.000 · compra 200.000 · 12 años · suelo 40.000 · catastral total 100.000 ·
    * comisión 3 % · sin gastos de adquisición ni mejoras ni otros gastos.
-   *   Plusvalía municipal (COEFICIENTES_IIVTNU_2025[12] = 0,08; tipo orientativo 25 %):
-   *     objetivo = 40.000 × 0,08 × 25 %                            =    800,00 €
+   *   Plusvalía municipal (12 años = 0,09 en el art. 107.4 TRLRHL, redacción del RDL 8/2023;
+   *   era 0,08 con la tabla caducada, hallazgo 1559; tipo orientativo 25 %):
+   *     objetivo = 40.000 × 0,09 × 25 %                            =    900,00 €
    *     real     = 100.000 × (40.000/100.000) × 25 %               = 10.000,00 €
-   *     recomendado = min                                          =    800,00 € (objetivo)
+   *     recomendado = min                                          =    900,00 € (objetivo)
    *   Comisión = 300.000 × 3 %                                     =  9.000,00 €
    *   Valor de adquisición = 200.000                               = 200.000,00 €
-   *   Valor de transmisión = 300.000 − 9.000 − 800                 = 290.200,00 €
-   *   Ganancia = 290.200 − 200.000                                 =  90.200,00 €
-   *   IRPF = 6.000×19 % + 44.000×21 % + 40.200×23 %
-   *        = 1.140 + 9.240 + 9.246                                 =  19.626,00 €
-   *   Total gastos = 800 + 9.000 + 19.626                          =  29.426,00 €
-   *   Neto = 300.000 − 29.426                                      = 270.574,00 €
+   *   Valor de transmisión = 300.000 − 9.000 − 900                 = 290.100,00 €
+   *   Ganancia = 290.100 − 200.000                                 =  90.100,00 €
+   *   IRPF = 6.000×19 % + 44.000×21 % + 40.100×23 %
+   *        = 1.140 + 9.240 + 9.223                                 =  19.603,00 €
+   *   Total gastos = 900 + 9.000 + 19.603                          =  29.503,00 €
+   *   Neto = 300.000 − 29.503                                      = 270.497,00 €
    */
   test('CASO 31 (límite) — mayor de 65 años SIN vivienda habitual: la exención del art. 33.4.b no procede', async ({
     page,
@@ -2083,19 +2105,19 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     await page.getByRole('checkbox', { name: 'Es mi vivienda habitual' }).uncheck();
     await page.getByRole('checkbox', { name: 'Soy mayor de 65 años' }).check();
 
-    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('800,00 €');
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('900,00 €');
     expect(await descripcionTarjeta(page, /^Plusvalía municipal/)).toBe(
       'Método objetivo (más favorable)',
     );
     expect(await valorTarjeta(page, /^Valor de adquisición/)).toBe('200.000,00 €');
-    expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('290.200,00 €');
-    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('90.200,00 €');
-    expect(await valorTarjeta(page, /IRPF sobre ganancia/)).toBe('19.626,00 €');
+    expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('290.100,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('90.100,00 €');
+    expect(await valorTarjeta(page, /IRPF sobre ganancia/)).toBe('19.603,00 €');
     expect(await descripcionTarjeta(page, /IRPF sobre ganancia/)).toBe(
       'Tributación en base del ahorro',
     );
-    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('29.426,00 €');
-    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('270.574,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('29.503,00 €');
+    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('270.497,00 €');
     // El neto está COMPLETO: no falta ninguna partida por descontar
     expect(await descripcionTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe(
       'Lo que realmente recibes',
@@ -2119,9 +2141,9 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     expect(await descripcionTarjeta(page, /IRPF sobre ganancia/)).toBe(
       'Mayor de 65 años + vivienda habitual',
     );
-    // Sin IRPF, el total del vendedor son plusvalía (800) + comisión (9.000)
-    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('9800,00 €');
-    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('290.200,00 €');
+    // Sin IRPF, el total del vendedor son plusvalía (900, RDL 8/2023) + comisión (9.000)
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('9900,00 €');
+    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('290.100,00 €');
   });
 
   /**
@@ -2255,7 +2277,9 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     // no es lo que produce el formateador de la app para esa cifra —la tarjeta de AJD dice
     // «2700,00 €» (CASO 8)—, y esa fue la señal de que iba tecleado. Se comparan las cifras
     // sin millares para que el test no dependa de cuál de los dos formatos salga.
-    const cuota = (180000 * ITP_CCAA.valencia.ajd) / 100;
+    // Redondeado: con el 1,4 % de 2026, 180.000 × 1,4 / 100 da 2519,9999999999995 en coma
+    // flotante, y el ejemplo escribe euros enteros (2.520 €).
+    const cuota = Math.round((180000 * ITP_CCAA.valencia.ajd) / 100);
     const sinMillares = (await caso.innerText()).replace(/\./g, '');
     expect(sinMillares).toContain(`${cuota} €`);
   });
@@ -2298,11 +2322,21 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     await page.locator('#ccaa-inmueble').selectOption('pais-vasco');
     await rellenar(page, 'Precio de la vivienda', '200000');
 
-    expect(ITP_CCAA['pais-vasco'].ajd).toBe(0);
+    // ⚠️ 24/09/2026 (hallazgos 1583 y 1592): el 0 es de la VIVIENDA, no de toda la comunidad.
+    // El AJD foral es el 0,5 % (NF 1/2011 de Bizkaia, art. 44.1) y la exención es de la
+    // primera transmisión de vivienda (art. 58.35). El control sigue valiendo para la vivienda.
+    expect(ITP_CCAA['pais-vasco'].ajdVivienda).toBe(0);
+    expect(ITP_CCAA['pais-vasco'].ajd).toBe(0.5);
     expect(await valorTarjeta(page, /^IVA/)).toBe('20.000,00 €');
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
     expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('21.295,20 €');
     expect(await valorTarjeta(page, /COSTE TOTAL DE ADQUISICIÓN/)).toBe('221.295,20 €');
+
+    // Y un local nuevo en el mismo sitio SÍ paga AJD: 200.000 × 0,5 % = 1.000; IVA 21 % = 42.000
+    await page.getByRole('button', { name: /Local comercial/ }).click();
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,50%)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1000,00 €');
+    expect(await valorTarjeta(page, /^IVA/)).toBe('42.000,00 €');
   });
 });
 
@@ -2355,19 +2389,20 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
    * ── VENDEDOR ──────────────────────────────────────────────────────────────
    * Compra 200.000 €, 10 años, suelo catastral 60.000 €, total catastral 100.000 €,
    * comisión 3 %, sin otros gastos, sin gastos de adquisición, vivienda habitual, < 65 años.
-   *   Plusvalía objetivo = 60.000 × 0,08 × 25 %                    =  1.200,00 €
-   *     (COEFICIENTES_IIVTNU_2025 → 10 años = 0,08 · PLUSVALIA_MUNICIPAL_META.tipoOrientativo = 25)
+   *   Plusvalía objetivo = 60.000 × 0,12 × 25 %                    =  1.800,00 €
+   *     (art. 107.4 TRLRHL en la redacción del RDL 8/2023 → 10 años = 0,12; era 0,08 con la
+   *      tabla caducada del RDL 26/2021, hallazgo 1559 · tipoOrientativo = 25)
    *   Plusvalía real     = (300.000 − 200.000) × 0,6 × 25 %        = 15.000,00 €
    *     → gana el OBJETIVO, que es el menor (art. 107.5 TRLHL)
    *   Comisión           = 300.000 × 3 %                           =  9.000,00 €
    *   Valor adquisición  = 200.000                                 = 200.000,00 €
-   *   Valor transmisión  = 300.000 − 9.000 − 1.200                 = 289.800,00 €
-   *   Ganancia           = 289.800 − 200.000                       =  89.800,00 €
+   *   Valor transmisión  = 300.000 − 9.000 − 1.800                 = 289.200,00 €
+   *   Ganancia           = 289.200 − 200.000                       =  89.200,00 €
    *   IRPF (base del ahorro, TRAMOS_GANANCIAS_PATRIMONIALES_2025):
-   *     6.000×19 % = 1.140 · 44.000×21 % = 9.240 · 39.800×23 % = 9.154
-   *                                                              =  19.534,00 €
-   *   Total gastos vendedor = 1.200 + 9.000 + 19.534              =  29.734,00 €
-   *   Neto               = 300.000 − 29.734                        = 270.266,00 €
+   *     6.000×19 % = 1.140 · 44.000×21 % = 9.240 · 39.200×23 % = 9.016
+   *                                                              =  19.396,00 €
+   *   Total gastos vendedor = 1.800 + 9.000 + 19.396              =  30.196,00 €
+   *   Neto               = 300.000 − 30.196                        = 269.804,00 €
    */
   test('CASO 33 (normal) — Cantabria, 300.000 €: las dos pestañas de la misma operación', async ({
     page,
@@ -2409,18 +2444,18 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
     await rellenar(page, 'Comisión inmobiliaria (%)', '3');
 
-    // es-ES no agrupa los millares de una cifra de cuatro dígitos: «1200,00 €», no «1.200,00 €»
-    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('1200,00 €');
+    // es-ES no agrupa los millares de una cifra de cuatro dígitos: «1800,00 €», no «1.800,00 €»
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('1800,00 €');
     expect(await descripcionTarjeta(page, /^Plusvalía municipal/)).toBe(
       'Método objetivo (más favorable)',
     );
     expect(await valorTarjeta(page, /^Valor de adquisición/)).toBe('200.000,00 €');
-    expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('289.800,00 €');
-    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('89.800,00 €');
-    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.534,00 €');
+    expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('289.200,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('89.200,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.396,00 €');
     expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('9000,00 €');
-    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('29.734,00 €');
-    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('270.266,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('30.196,00 €');
+    expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('269.804,00 €');
     // El neto está COMPLETO: no falta ninguna partida por descontar
     expect(await descripcionTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
   });
@@ -2428,11 +2463,12 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
   /**
    * CASO 34 bis (control) — el mismo caso con 1 AÑO de tenencia, que sí funciona.
    *
-   * Coeficiente de COEFICIENTES_IIVTNU_2025 para `anios: 1` = 0,13:
-   *   Plusvalía objetivo = 60.000 × 0,13 × 25 % = 1.950,00 €
+   * Coeficiente del art. 107.4 TRLRHL para 1 año en la redacción del RDL 8/2023 = 0,15 (era
+   * 0,13 con la tabla caducada del RDL 26/2021, hallazgo 1559):
+   *   Plusvalía objetivo = 60.000 × 0,15 × 25 % = 2.250,00 €
    * Sirve para aislar el CASO 34: lo que falla no es el año 1, es el año 0.
    */
-  test('CASO 34 bis (control) — 1 año de tenencia liquida con el coeficiente 0,13', async ({
+  test('CASO 34 bis (control) — 1 año de tenencia liquida con el coeficiente del primer año', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2445,8 +2481,8 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
     await rellenar(page, 'Comisión inmobiliaria (%)', '3');
 
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 1)?.coeficiente).toBe(0.13);
-    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('1950,00 €');
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 1)?.coeficiente).toBe(0.15);
+    expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('2250,00 €');
   });
 
   /**
@@ -2481,9 +2517,24 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
    *     Plusvalía 1.950,00 € · transmisión 289.050,00 € · ganancia 89.050,00 € ·
    *     IRPF 19.361,50 € · total 30.311,50 € · neto 269.688,50 €
    *     (y sin salir del campo: «Sin calcular», con el neto rotulado INCOMPLETO)
+   *
+   * ⚠️ 24/09/2026 (hallazgo 1560): el esperado de arriba también estaba mal. El coeficiente de
+   * «Menos de 1 año» es ANUAL y el art. 107.4 TRLRHL lo prorratea por meses completos («En el
+   * caso de que el periodo de generación sea inferior a un año, se prorrateará el coeficiente
+   * anual teniendo en cuenta el número de meses completos», BOE-A-2004-4214, verificado ese
+   * día). Aplicarlo entero superaba lo que la ley permite para CUALQUIER reventa dentro del año.
+   * Ahora la app pregunta los meses completos y, mientras no se eligen, la plusvalía falta:
+   *   coeficiente vigente (RDL 8/2023) = 0,15 · con 6 meses: 0,15 × 6/12 = 0,075
+   *     Plusvalía          = 60.000 × 0,075 × 25 %                 =  1.125,00 €
+   *     Valor transmisión  = 300.000 − 9.000 − 1.125               = 289.875,00 €
+   *     Ganancia           = 289.875 − 200.000                     =  89.875,00 €
+   *     IRPF   = 6.000×19 % + 44.000×21 % + 39.875×23 %            =  19.551,25 €
+   *     Total gastos       = 1.125 + 9.000 + 19.551,25             =  29.676,25 €
+   *     Neto               = 300.000 − 29.676,25                   = 270.323,75 €
+   *   y con 11 meses (el máximo): 60.000 × 0,15 × 11/12 × 25 %     =  2.062,50 €
    */
   test(
-    'CASO 34 (límite) — 0 años de tenencia: la reventa antes del año tributa con el coeficiente 0,14',
+    'CASO 34 (límite) — 0 años de tenencia: la reventa antes del año prorratea el coeficiente por meses completos',
     async ({ page }) => {
       await page.goto(RUTA);
       await page.locator('#ccaa-inmueble').selectOption('cantabria');
@@ -2494,8 +2545,8 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
       await rellenar(page, 'Valor catastral total (suelo + construcción)', '100000');
       await rellenar(page, 'Comisión inmobiliaria (%)', '3');
 
-      // El coeficiente existe en la tabla y es mayor que el del año 1
-      expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.14);
+      // El coeficiente ANUAL de «Menos de 1 año» (RDL 8/2023)
+      expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.15);
 
       const campoAnios = page.locator('input[aria-label="Años de propiedad"]');
       await campoAnios.fill('0');
@@ -2503,13 +2554,25 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
 
       // 1) El campo no puede reescribirse solo: «0 años» es un dato válido, no un error
       expect(await campoAnios.inputValue()).toBe('0');
-      // 2) Y la plusvalía sale por el coeficiente de «Menos de 1 año»
-      expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('2100,00 €');
-      expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('288.900,00 €');
-      expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('88.900,00 €');
-      expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.327,00 €');
-      expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('30.427,00 €');
-      expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('269.573,00 €');
+      // 2) Sin los meses completos la plusvalía FALTA, como cualquier dato vacío
+      expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+      expect(await descripcionTarjeta(page, /^Plusvalía municipal/)).toContain(
+        'Faltan los meses completos desde la compra',
+      );
+      expect(await descripcionTarjeta(page, /IMPORTE NETO VENDEDOR/)).toContain(
+        'Elige los meses completos desde la compra para obtenerlo.',
+      );
+      // 3) Con 6 meses completos, el coeficiente anual prorrateado
+      await page.locator('#meses-completos').selectOption('6');
+      expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('1125,00 €');
+      expect(await valorTarjeta(page, /^Valor de transmisión/)).toBe('289.875,00 €');
+      expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('89.875,00 €');
+      expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.551,25 €');
+      expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('29.676,25 €');
+      expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('270.323,75 €');
+      // 4) Y con 11, el máximo que cabe por debajo del año: sigue por debajo del año entero
+      await page.locator('#meses-completos').selectOption('11');
+      expect(await valorTarjeta(page, /^Plusvalía municipal/)).toBe('2062,50 €');
     },
   );
 
@@ -2796,7 +2859,10 @@ test.describe('Inspector 11/09/2026 — re-inspección: Aragón y residuos de re
 
     // La escala que la ficha declara, y que el panel de la comunidad anuncia en pantalla
     expect(ITP_CCAA.aragon.tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 8.5, 9, 9.5, 10]);
-    await expect(page.getByText(/escala progresiva \(8% → 8,5% → 9% → 9,5% → 10%\)/)).toBeVisible();
+    // Desde el 24/09/2026 la frase la escribe `describirSubidaITP` del motor, con el espacio
+    // antes del % (hallazgos 1581 y 1602: distingue la escala del umbral de Valencia).
+    // (el motor escribe los tipos no enteros con dos decimales: «8,50 %»)
+    await expect(page.getByText(/escala progresiva \(8 % → 8,50 % → 9 % → 9,50 % → 10 %\)/)).toBeVisible();
 
     expect(await valorTarjeta(page, /^ITP/)).toBe('40.750,00 €');
     // El rótulo lleva el tipo EFECTIVO: con escala progresiva el nominal contradiría al importe
@@ -3256,7 +3322,8 @@ test.describe('Inspector 12/09/2026 — re-inspección: el tope de Castilla y Le
 
     // La escala que la ficha declara, y que el panel de la comunidad anuncia en pantalla
     expect(ITP_CCAA['castilla-leon'].tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 10]);
-    await expect(page.getByText(/escala progresiva \(8% → 10%\)/)).toBeVisible();
+    // La frase del motor (`describirSubidaITP`), con el espacio antes del %.
+    await expect(page.getByText(/escala progresiva \(8 % → 10 %\)/)).toBeVisible();
 
     await expect(page.getByRole('heading', { name: 'ITP (8,00%)' })).toBeVisible();
     expect(await valorTarjeta(page, /^ITP/)).toBe('20.000,00 €');
@@ -3653,8 +3720,9 @@ test.describe('Inspector 14/09/2026 — anejos residenciales y segunda boca del 
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,55% sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('271.366,29 €');
 
-    // Y que la escala que la app anuncia es la de la tabla, no otra
-    const tramos = (ITP_CCAA['asturias'].tramosProgresivos ?? []).map((t) => `${t.tipo}%`);
+    // Y que la escala que la app anuncia es la de la tabla, no otra. Desde el 24/09/2026 el
+    // recuadro la escribe `describirSubidaITP` del motor, con el espacio antes del % («8 %»).
+    const tramos = (ITP_CCAA['asturias'].tramosProgresivos ?? []).map((t) => `${t.tipo} %`);
     await expect(page.locator('p[class*="infoCcaaNote"]').first()).toContainText(tramos.join(' → '));
   });
 
@@ -4011,19 +4079,20 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
    *        IRPF                                                    =  13.255,00 €
    *     total gastos = 7.500 + 13.255                              =  20.755,00 €
    *     neto         = 250.000 − 20.755                            = 229.245,00 €
-   *   CONTROL (8 años, dato válido): coeficiente 0,10 de COEFICIENTES_IIVTNU_2025 y
+   *   CONTROL (8 años, dato válido): coeficiente 0,19 del art. 107.4 TRLRHL en la redacción
+   *     del RDL 8/2023 (era 0,10 con la tabla caducada, hallazgo 1559) y
    *     PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25 %).
-   *     plusvalía = 60.000 × 0,10 × 25 %                           =   1.500,00 €
-   *     ganancia  = (250.000 − 7.500 − 1.500) − 180.000            =  61.000,00 €
-   *     IRPF      = 1.140 + 9.240 + 11.000 × 23 % (2.530)          =  12.910,00 €
-   *     total gastos = 1.500 + 7.500 + 12.910                      =  21.910,00 €
-   *     neto         = 250.000 − 21.910                            = 228.090,00 €
+   *     plusvalía = 60.000 × 0,19 × 25 %                           =   2.850,00 €
+   *     ganancia  = (250.000 − 7.500 − 2.850) − 180.000            =  59.650,00 €
+   *     IRPF      = 1.140 + 9.240 + 9.650 × 23 % (2.219,50)        =  12.599,50 €
+   *     total gastos = 2.850 + 7.500 + 12.599,50                   =  22.949,50 €
+   *     neto         = 250.000 − 22.949,50                         = 227.050,50 €
    */
   test('CASO 47 (debe rechazarse) — «-0,5» años de tenencia no puede liquidar plusvalía', async ({
     page,
   }) => {
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.14);
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 8)?.coeficiente).toBe(0.1);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.15);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 8)?.coeficiente).toBe(0.19);
     expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
 
     await abrir21(page);
@@ -4044,12 +4113,12 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
 
     // CONTROL: con un dato válido sí liquida, así que el rechazo de arriba no es parálisis
     await sembrar21(page, 'Años de propiedad', '8');
-    await expect.poll(async () => valorTarjeta(page, 'Plusvalía municipal')).toBe('1500,00 €');
+    await expect.poll(async () => valorTarjeta(page, 'Plusvalía municipal')).toBe('2850,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
       'Método objetivo (falta el valor catastral total para comparar)',
     );
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('21.910,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('228.090,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('22.949,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('227.050,50 €');
   });
 
   /**
@@ -4354,9 +4423,12 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
     ).not.toContain('Lo que realmente recibes');
 
     // Las cifras son las mismas —la app no puede inventar el importe que no ha leído— pero ya
-    // no se publican como definitivas: el aviso dice que el neto real es MAYOR.
-    expect(irpf).toBe('8910,00 €');
-    expect(neto).toBe('184.090,00 €');
+    // no se publican como definitivas: el aviso dice que el neto real es MAYOR. Con la tabla
+    // del RDL 8/2023 (hallazgo 1559): plusvalía 50.000 × 0,12 × 25 % = 1.500 · ganancia
+    // 200.000 − 6.000 − 1.500 − 150.000 = 42.500 · IRPF 1.140 + 36.500 × 21 % = 8.805 ·
+    // neto 200.000 − 1.500 − 6.000 − 8.805 = 183.695.
+    expect(irpf).toBe('8805,00 €');
+    expect(neto).toBe('183.695,00 €');
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
     expect(aviso).toContain('el neto real es MAYOR que este');
     expect(aviso).toContain('art. 38 LIRPF');
@@ -4376,11 +4448,13 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
   test('CASO 50 bis (control) — con el importe legible, la reinversión total sí deja la ganancia exenta', async ({
     page,
   }) => {
-    // Anclaje de los tres datos normativos del caso
+    // Anclaje de los tres datos normativos del caso. El coeficiente de 10 años es el del
+    // art. 107.4 TRLRHL en la redacción del RDL 8/2023 (0,12); el 0,08 que anclaba este test
+    // era el de la tabla caducada del RDL 26/2021 (hallazgo 1559).
     expect(
       COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente,
-      'coeficiente de 10 años del RDL 26/2021',
-    ).toBe(0.08);
+      'coeficiente de 10 años del RDL 8/2023',
+    ).toBe(0.12);
     expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
     expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0]).toEqual({ hasta: 6000, tipo: 19 });
 
@@ -4397,13 +4471,14 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
     ]);
     await sembrar22(page, 'Importe que reinviertes en la nueva vivienda', '193000');
 
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1000,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('193.000,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('43.000,00 €');
+    // 193.000 reinvertidos ≥ 192.500 obtenidos → reinversión total (art. 41 RIRPF)
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1500,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('192.500,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('42.500,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('art. 38 LIRPF');
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('7000,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('193.000,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('7500,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('192.500,00 €');
   });
 
   /**
@@ -4437,16 +4512,17 @@ test.describe('Inspector 22/09/2026 — re-inspección: Navarra y el importe ile
       page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]'),
     ).toHaveValue('2.000.50');
 
-    const total = await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN');
+    // Desde el 24/09/2026 el título también lo dice: «COSTE TOTAL (PARCIAL)» (hallazgo 1556).
+    const total = await valorTarjeta(page, /^COSTE TOTAL/);
     expect(
-      await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN'),
+      await descripcionTarjeta(page, /^COSTE TOTAL/),
       `la gestoría ilegible se leyó como 0 € y su línea desapareció del desglose, pero ` +
         `el coste total (${total}) sigue anunciándose como completo`,
     ).not.toBe('Precio + todos los gastos');
 
     // La línea vuelve al desglose y el coste dice qué le falta, sin inventar el importe.
     expect(total).toBe('212.995,20 €');
-    expect(await descripcionTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe(
+    expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
       'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
     );
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
@@ -4659,15 +4735,17 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *
    * VENDEDOR — compra 120.000 · 7 años · suelo 30.000 · total 90.000 · gastos de aquella
    * compra 8.500 · mejoras 4.000 · otros gastos de la venta 600 · comisión 3 % · habitual:
-   *   Plusvalía objetivo = 30.000 × 0,12 (7 años) × 25 %                        =     900,00 €
+   *   Plusvalía objetivo = 30.000 × 0,20 (7 años) × 25 %                        =   1.500,00 €
+   *     (art. 107.4 TRLRHL en la redacción del RDL 8/2023; era 0,12 con la tabla caducada
+   *      del RDL 26/2021, hallazgo 1559)
    *   Plusvalía real     = 60.000 × (30.000 / 90.000) × 25 %                    =   5.000,00 €
    *     → gana el objetivo, «Método objetivo (más favorable)»
    *   Comisión = 180.000 × 3 %                                                 =   5.400,00 €
    *   Valor de adquisición = 120.000 + 8.500 + 4.000                           = 132.500,00 €
-   *   Valor de transmisión = 180.000 − 5.400 − 600 − 900                       = 173.100,00 €
-   *   Ganancia = 40.600 → IRPF = 6.000×19 % + 34.600×21 % = 1.140 + 7.266     =   8.406,00 €
-   *   Total gastos = 900 + 5.400 + 600 + 8.406                                 =  15.306,00 €
-   *   Neto = 180.000 − 15.306                                                  = 164.694,00 €
+   *   Valor de transmisión = 180.000 − 5.400 − 600 − 1.500                     = 172.500,00 €
+   *   Ganancia = 40.000 → IRPF = 6.000×19 % + 34.000×21 % = 1.140 + 7.140     =   8.280,00 €
+   *   Total gastos = 1.500 + 5.400 + 600 + 8.280                               =  15.780,00 €
+   *   Neto = 180.000 − 15.780                                                  = 164.220,00 €
    * Todos legibles: ni un aviso de ilegible puede aparecer (el aviso nuevo no se dispara solo).
    */
   test('CASO 52 (normal) — La Rioja, perfil discapacidad, 180.000 €: las dos pestañas', async ({ page }) => {
@@ -4675,7 +4753,7 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     expect(discapacidad?.tipo, 'el reducido sale de la tabla').toBe(5);
     expect(discapacidad?.condiciones).toEqual(['Discapacidad ≥ 33%', 'Vivienda habitual']);
     expect(ITP_CCAA['rioja'].tipoGeneral).toBe(7);
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 7)?.coeficiente).toBe(0.12);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 7)?.coeficiente).toBe(0.2);
     expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
 
     await abrir23(page);
@@ -4707,17 +4785,17 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     await sembrar23(page, 'Inversiones y mejoras (opcional)', '4000');
     await sembrar23(page, 'Otros gastos de la venta (opcional)', '600');
 
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('900,00 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1500,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('132.500,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('173.100,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('40.600,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8406,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('172.500,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('40.000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8280,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro');
     expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('5400,00 €');
     expect(await valorTarjeta(page, 'Otros gastos de la venta')).toBe('600,00 €');
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('15.306,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('164.694,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('15.780,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('164.220,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes');
   });
 
@@ -4727,21 +4805,23 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    *
    * La cota que publica C3 («hasta un T % de su importe») nunca se había medido fuera del 21 %.
    * Venta 700.000 · compra 350.000 · 10 años · suelo 40.000 · sin catastral total · 3 %:
-   *   Plusvalía = 40.000 × 0,08 × 25 %                                          =     800,00 €
+   *   Plusvalía = 40.000 × 0,12 × 25 %                                          =   1.200,00 €
+   *     (10 años = 0,12 en la redacción del RDL 8/2023; era 0,08, hallazgo 1559)
    *   Comisión  = 700.000 × 3 %                                                 =  21.000,00 €
-   *   · Legible:  ganancia = 700.000 − 21.000 − 800 − 350.000 = 328.200
-   *               IRPF = 71.880 + 28.200 × 30 %                                 =  80.340,00 €
-   *               neto = 700.000 − (800 + 21.000 + 80.340)                      = 597.860,00 €
-   *   · «3.0.0»:  ganancia = 349.200 → IRPF = 71.880 + 49.200 × 30 %            =  86.640,00 €
-   *               neto = 700.000 − (800 + 86.640)                               = 612.560,00 €
+   *   · Legible:  ganancia = 700.000 − 21.000 − 1.200 − 350.000 = 327.800
+   *               IRPF = 71.880 + 27.800 × 30 %                                 =  80.220,00 €
+   *               neto = 700.000 − (1.200 + 21.000 + 80.220)                    = 597.580,00 €
+   *   · «3.0.0»:  ganancia = 348.800 → IRPF = 71.880 + 48.800 × 30 %            =  86.520,00 €
+   *               neto = 700.000 − (1.200 + 86.520)                             = 612.280,00 €
    *   Hueco = 14.700,00 € = 21.000 × (1 − 30 %): las dos bases están en el 30 %, así que la
    *   cota se alcanza CON IGUALDAD. Aviso: «hasta un 30 % de su importe».
    *
-   * Y en el canto: compra 399.200 → con la comisión ilegible la base es 300.000 EXACTOS, que
-   * `find(base <= hasta)` coloca en el 27 % (el último euro tributa al 27 %, no al 30 %):
-   *   · «3.0.0»:  IRPF = 71.880 → neto = 700.000 − (800 + 71.880)               = 627.320,00 €
+   * Y en el canto: compra 398.800 (399.200 con la plusvalía de 800 € de la tabla caducada) →
+   * con la comisión ilegible la base es 300.000 EXACTOS, que `find(base <= hasta)` coloca en
+   * el 27 % (el último euro tributa al 27 %, no al 30 %):
+   *   · «3.0.0»:  IRPF = 71.880 → neto = 700.000 − (1.200 + 71.880)             = 626.920,00 €
    *   · Legible:  ganancia 279.000 → IRPF = 44.880 + 79.000 × 27 % = 66.210
-   *               neto = 700.000 − (800 + 21.000 + 66.210)                      = 611.990,00 €
+   *               neto = 700.000 − (1.200 + 21.000 + 66.210)                    = 611.590,00 €
    *   Hueco = 15.330,00 € = 21.000 × (1 − 27 %).
    */
   test('CASO 53 (límite) — la cota de «falta descontar la comisión» en el 30 % y en el canto de 300.000 €', async ({
@@ -4751,36 +4831,36 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
       { hasta: 300000, tipo: 27 },
       { hasta: Infinity, tipo: 30 },
     ]);
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.08);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.12);
 
     await vendedor23(page, '700000', [
       ['Precio de compra original', '350000'],
       ['Años de propiedad', '10'],
       ['Valor catastral del suelo', '40000'],
     ]);
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('80.340,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('597.860,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('80.220,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('597.580,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes');
 
     await sembrar23(page, 'Comisión inmobiliaria (%)', '3.0.0');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('86.640,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('86.520,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(/real es menor/);
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('612.560,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('612.280,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
       'No descuenta la comisión inmobiliaria, que no se ha podido leer (la comisión inmobiliaria rebaja también el IRPF al descontarla, hasta un 30 % de su importe): el neto real es menor que este',
     );
 
     // El canto: la base queda en 300.000 exactos y el tramo es el del 27 %
-    await sembrar23(page, 'Precio de compra original', '399200');
+    await sembrar23(page, 'Precio de compra original', '398800');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('300.000,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('71.880,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('627.320,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('626.920,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
       'hasta un 27 % de su importe',
     );
     await sembrar23(page, 'Comisión inmobiliaria (%)', '3');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('66.210,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('611.990,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('611.590,00 €');
   });
 
   /**
@@ -4788,31 +4868,32 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    * ningún inmueble (el total incluye el suelo): el método real no se puede liquidar con él.
    *
    * Venta 185.000 · compra 180.000 · 6 años · suelo 60.000 · total 45.000 · 3 %:
-   *   Objetivo = 60.000 × 0,16 (6 años) × 25 %                                  =   2.400,00 €
+   *   Objetivo = 60.000 × 0,19 (6 años, RDL 8/2023; era 0,16, hallazgo 1559) × 25 % =   2.850,00 €
    *   Lo que NO puede salir: el real con la proporción topada a 1 —
    *     5.000 × min(1, 60.000/45.000) × 25 % = 1.250 €, «más favorable» (hallazgo 900).
    *   Comisión = 185.000 × 3 %                                                  =   5.550,00 €
-   *   Valor de transmisión = 185.000 − 5.550 − 2.400                            = 177.050,00 €
-   *   Pérdida = 180.000 − 177.050                                               =   2.950,00 €
-   *   Neto = 185.000 − (2.400 + 5.550)                                          = 177.050,00 €
+   *   Valor de transmisión = 185.000 − 5.550 − 2.850                            = 176.600,00 €
+   *   Pérdida = 180.000 − 176.600                                               =   3.400,00 €
+   *   Neto = 185.000 − (2.850 + 5.550)                                          = 176.600,00 €
    * Con el par al derecho (suelo 45.000 · total 60.000):
-   *   objetivo = 45.000 × 0,16 × 25 % = 1.800 · real = 5.000 × 0,75 × 25 % = 937,50 → 937,50 €
+   *   objetivo = 45.000 × 0,19 × 25 % = 2.137,50 · real = 5.000 × 0,75 × 25 % = 937,50 → 937,50 €
    *   valor de transmisión = 185.000 − 5.550 − 937,50 = 178.512,50 = neto          178.512,50 €
    */
   test('CASO 54 (debe rechazarse) — el par catastral imposible no se liquida por el método real', async ({ page }) => {
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 6)?.coeficiente).toBe(0.16);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 6)?.coeficiente).toBe(0.19);
 
     await montarParImposible(page);
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2400,00 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2850,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain(
       'revisa los dos campos del recibo del IBI',
     );
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('177.050,00 €');
-    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('2950,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('176.600,00 €');
+    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('3400,00 €');
+    // Con pérdida no hay nada exento: «SIN CUOTA» (hallazgo 1554; aquí se exigía «EXENTO»).
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('SIN CUOTA');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('No hay ganancia que gravar');
-    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('7950,00 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('177.050,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('8400,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('176.600,00 €');
 
     // El mismo recibo con los dos campos al derecho sí compara y gana el método real
     await sembrar23(page, 'Valor catastral del suelo', '45000');
@@ -4825,10 +4906,11 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
   /**
    * REPARACIÓN C1 (85a4a29c) — el caso literal del commit, con sus dos bordes: el campo VACÍO
    * no es ilegible, y el legible no dispara el aviso.
-   *   BASE B, total vacío     → objetivo 1.000,00 · «falta el valor catastral total» · neto
-   *                             184.090,00 «Lo que realmente recibes».
+   *   BASE B, total vacío     → objetivo 1.500,00 (0,12, RDL 8/2023; era 1.000 con el 0,08
+   *                             caducado, hallazgo 1559) · «falta el valor catastral total» ·
+   *                             neto 183.695,00 «Lo que realmente recibes».
    *   total «700.000.00»      → la plusvalía dice que NO SE HA PODIDO LEER (no que falta) y el
-   *                             neto, 184.090,00, que el real es MAYOR.
+   *                             neto, 183.695,00, que el real es MAYOR.
    *   total 700.000 (legible) → real = 50.000 × (50.000/700.000) × 25 % = 892,86 €;
    *                             ganancia 43.107,14 → IRPF 1.140 + 37.107,14 × 21 % = 8.932,50;
    *                             neto = 200.000 − (892,86 + 6.000 + 8.932,50) = 184.174,64 €.
@@ -4838,15 +4920,15 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
       'Método objetivo (falta el valor catastral total para comparar)',
     );
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('184.090,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('183.695,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes');
 
     await sembrar23(page, 'Valor catastral total (suelo + construcción)', '700.000.00');
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1000,00 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1500,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain(
       'el valor catastral total no se ha podido leer',
     );
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('184.090,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('183.695,00 €');
     const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
     expect(aviso).toContain('El valor catastral total');
     // «puede ser»: con el total ilegible la app no sabe si el método real ganaría, porque el
@@ -4864,7 +4946,8 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
   /**
    * REPARACIÓN C2 (e107b44c) — la gestoría del COMPRADOR no entra en la ganancia del vendedor
    * (art. 35.1 LIRPF), así que ilegible tampoco puede tocar el panel del vendedor.
-   *   BASE B con gestoría «2.000.50» → IRPF 8.910,00 · neto 184.090,00 «Lo que realmente recibes».
+   *   BASE B con gestoría «2.000.50» → IRPF 8.805,00 · neto 183.695,00 «Lo que realmente recibes»
+   *   (con los coeficientes del RDL 8/2023, hallazgo 1559).
    */
   test('REPARACIÓN C2 — una gestoría del comprador ilegible no mueve ni avisa en el vendedor', async ({ page }) => {
     await abrir23(page);
@@ -4875,9 +4958,9 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
     for (const [etiqueta, valor] of BASE_B) await sembrar23(page, etiqueta, valor);
 
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8910,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8805,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('184.090,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('183.695,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes');
   });
 
@@ -4891,43 +4974,53 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
   test('CONTROL de montaje — las preparaciones de H1-H7 publican las cifras del motor', async ({ page }) => {
     test.setTimeout(90_000);
 
-    // H1 — cifras resueltas en el propio hallazgo
+    // Cifras recalculadas el 24/09/2026 con los coeficientes del art. 107.4 TRLRHL en la
+    // redacción del RDL 8/2023 (hallazgo 1559): 10 años = 0,12 y ≥ 20 años = 0,40.
+    // H1 — plusvalía 50.000 × 0,12 × 25 % = 1.500 · VT 289.500 · G 189.500 · ITO 139.500 ·
+    //      base 189.500 × 39.500/139.500 = 53.657,71 → IRPF 10.380 + 3.657,71 × 23 % = 11.221,27
+    //      · neto 300.000 − 1.500 − 9.000 − 11.221,27 = 278.278,73. Con «3.0.0»: VT 298.500 ·
+    //      G 198.500 · ITO 148.500 · base 198.500 × 48.500/148.500 = 64.829,97 → IRPF 10.380 +
+    //      14.829,97 × 23 % = 13.790,89 · neto 300.000 − 1.500 − 13.790,89 = 284.709,11
     await montarH1(page);
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('11.365,71 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('278.634,29 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('11.221,27 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('278.278,73 €');
     await sembrar23(page, 'Comisión inmobiliaria (%)', '3.0.0');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('13.931,88 €');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('285.068,12 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('13.790,89 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('284.709,11 €');
 
     // H2 — mayor de 65 + vivienda habitual: exento con y sin los gastos de aquella compra
+    //      (neto 200.000 − 1.500 − 6.000 = 192.500)
     await vendedor23(page, '200000', [...BASE_B, ['Impuestos y gastos que pagaste al comprar', '2000,50']], {
       mayor65: true,
     });
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('193.000,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('192.500,00 €');
     await sembrar23(page, 'Impuestos y gastos que pagaste al comprar', '2.000.50');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('EXENTO');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('193.000,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('192.500,00 €');
 
-    // H3 — con el total legible gana el método real; ilegible, el objetivo
+    // H3 — con el total legible gana el método real; ilegible, el objetivo:
+    //      60.000 × 0,40 × 25 % = 6.000 · ganancia 85.000 → IRPF 10.380 + 35.000 × 23 % = 18.430
     await montarH3(page);
     await sembrar23(page, 'Valor catastral total (suelo + construcción)', '600000');
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2500,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('19.235,00 €');
     await sembrar23(page, 'Valor catastral total (suelo + construcción)', '600.000.00');
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('6750,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('18.257,50 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('6000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('18.430,00 €');
 
-    // H4 — las dos direcciones a la vez
+    // H4 — las dos direcciones a la vez: legible VT 191.500 · adquisición 152.000 · ganancia
+    //      39.500 → IRPF 1.140 + 33.500 × 21 % = 8.175 · neto 200.000 − 1.500 − 7.000 − 8.175
+    //      = 183.325; ilegibles VT 198.500 · ganancia 48.500 → IRPF 10.065 · neto 188.435
     await vendedor23(page, '200000', [
       ...BASE_B,
       ['Comisión inmobiliaria (%)', '3,5'],
       ['Inversiones y mejoras (opcional)', '2000'],
     ]);
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('183.720,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('183.325,00 €');
     await sembrar23(page, 'Comisión inmobiliaria (%)', '3.5.0');
     await sembrar23(page, 'Inversiones y mejoras (opcional)', '2.000.00');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('188.830,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('188.435,00 €');
 
     // H5 — el valor de adquisición se queda en el precio de compra
     await vendedor23(page, '200000', [...BASE_B, ['Impuestos y gastos que pagaste al comprar', '2.000.50']]);
@@ -4940,7 +5033,7 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
 
     // H7 — el par imposible, cifras en el CASO 54
     await montarParImposible(page);
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('177.050,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('176.600,00 €');
   });
 
   /**
@@ -5039,7 +5132,8 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
   test('H3 (hallazgo) — con el valor catastral total ilegible, el IRPF no puede publicarse como definitivo', async ({
     page,
   }) => {
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.45);
+    // ≥ 20 años = 0,40 en la redacción del RDL 8/2023 (era 0,45, hallazgo 1559)
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.4);
     await montarH3(page);
     await sembrar23(page, 'Valor catastral total (suelo + construcción)', '600.000.00');
     const cuota = await valorTarjeta(page, 'IRPF sobre ganancia');
@@ -5317,31 +5411,35 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
 
   /**
    * CASO 56 (normal, vendedor) — Galicia · venta 380.000 · compra 210.000 · 22 años · suelo
-   * 160.000 · total 400.000 · comisión 3 % · «Estimar por mí». Tres cosas a la vez que ningún
+   * 160.000 · total 500.000 · comisión 3 % · «Estimar por mí». Tres cosas a la vez que ningún
    * caso anterior juntó: el botón en una comunidad de tipo plano, el tope de 20 años del
    * coeficiente con el método REAL ganando, y el tramo del 23 % de la base del ahorro.
+   *
+   * ⚠️ 24/09/2026 (hallazgo 1559): con el coeficiente vigente de ≥ 20 años (0,40, RDL 8/2023;
+   * era 0,45) y el total de 400.000 que llevaba el caso, el real (17.000) ya no ganaba al
+   * objetivo (16.000). Para seguir probando lo que el caso prueba, el total pasa a 500.000.
    *
    *   Estimar = ITP Galicia 8 % plano (210.000 × 8 % = 16.800) + notaría (363,43341 × 1,21 ×
    *             1,75 = 769,57) + registro (198,2272455 × 1,21 = 239,86) + gestoría 300
    *           = 18.109,43 → el campo recibe «18.109», que se relee 18.109 (millar español)
-   *   Plusvalía: 22 años → tope de 20 → coeficiente 0,45
-   *     objetivo = 160.000 × 0,45 × 25 %                                        =  18.000,00 €
-   *     real     = (380.000 − 210.000) × (160.000 / 400.000) × 25 %             =  17.000,00 €
-   *     → «Método real (más favorable)», 17.000,00 €
+   *   Plusvalía: 22 años → tope de 20 → coeficiente 0,40
+   *     objetivo = 160.000 × 0,40 × 25 %                                        =  16.000,00 €
+   *     real     = (380.000 − 210.000) × (160.000 / 500.000) × 25 %             =  13.600,00 €
+   *     → «Método real (más favorable)», 13.600,00 €
    *   Comisión = 380.000 × 3 %                                                  =  11.400,00 €
    *   Valor de adquisición = 210.000 + 18.109                                   = 228.109,00 €
-   *   Valor de transmisión = 380.000 − 11.400 − 17.000                          = 351.600,00 €
-   *   Ganancia = 123.491 → IRPF = 6.000×19 % + 44.000×21 % + 73.491×23 %
-   *            = 1.140 + 9.240 + 16.902,93                                      =  27.282,93 €
-   *   Total gastos = 17.000 + 11.400 + 27.282,93                                =  55.682,93 €
-   *   Neto = 380.000 − 55.682,93                                                = 324.317,07 €
+   *   Valor de transmisión = 380.000 − 11.400 − 13.600                          = 355.000,00 €
+   *   Ganancia = 126.891 → IRPF = 6.000×19 % + 44.000×21 % + 76.891×23 %
+   *            = 1.140 + 9.240 + 17.684,93                                      =  28.064,93 €
+   *   Total gastos = 13.600 + 11.400 + 28.064,93                                =  53.064,93 €
+   *   Neto = 380.000 − 53.064,93                                                = 326.935,07 €
    */
   test('CASO 56 (normal) — Galicia, «Estimar por mí», método real con el tope de 20 años y tramo del 23 %', async ({
     page,
   }) => {
     expect(ITP_CCAA['galicia'].tipoGeneral).toBe(8);
     expect(ITP_CCAA['galicia'].tramosProgresivos).toBeUndefined();
-    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.45);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.4);
     expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(0, 3).map((t) => t.tipo)).toEqual([19, 21, 23]);
 
     await abrir24(page);
@@ -5355,17 +5453,17 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
     const gastos = page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]');
     await esperarValorEnReact(page, gastos, '18.109');
     await sembrar24(page, 'Valor catastral del suelo', '160000');
-    await sembrar24(page, 'Valor catastral total (suelo + construcción)', '400000');
+    await sembrar24(page, 'Valor catastral total (suelo + construcción)', '500000');
 
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('17.000,00 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('13.600,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método real (más favorable)');
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('228.109,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('351.600,00 €');
-    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('123.491,00 €');
-    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('27.282,93 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('355.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('126.891,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('28.064,93 €');
     expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('11.400,00 €');
-    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('55.682,93 €');
-    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('324.317,07 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('53.064,93 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('326.935,07 €');
     expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
   });
 
@@ -5381,23 +5479,27 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
   });
 
   /**
-   * CONTROL de montaje — repite la preparación de cada `test.fail()` de abajo y exige las cifras
-   * que la app publica hoy, calculadas a mano. Si esto se pone rojo, el que falla es el montaje,
-   * no el hallazgo.
+   * CONTROL de montaje — repite la preparación de cada hallazgo de abajo y exige las cifras que
+   * la app publica, calculadas a mano. Si esto se pone rojo, el que falla es el montaje, no el
+   * hallazgo.
+   *
+   * ⚠️ 24/09/2026 — las cifras se recalcularon con los coeficientes del art. 107.4 TRLRHL en la
+   * redacción del RDL 8/2023 (hallazgo 1559): 10 años = 0,12 (antes 0,08).
    */
   test('CONTROL de montaje — las preparaciones de los hallazgos del 24/09 publican las cifras del motor', async ({
     page,
   }) => {
     // Siete montajes seguidos, cada uno con su navegación: el límite de 30 s no alcanza.
     test.setTimeout(90_000);
-    // Local SIN marcar nada: plusvalía 60.000 × 0,08 × 25 % = 1.200 · comisión 9.000 ·
-    // ganancia 300.000 − 9.000 − 1.200 − 200.000 = 89.800 → IRPF 1.140 + 9.240 + 39.800×23 %
-    // = 19.534,00 · neto 300.000 − 1.200 − 9.000 − 19.534 = 270.266,00
+    // Local: plusvalía 60.000 × 0,12 × 25 % = 1.800 · comisión 9.000 · ganancia 300.000 −
+    // 9.000 − 1.800 − 200.000 = 89.200 → IRPF 1.140 + 9.240 + 39.200 × 23 % = 19.396,00 ·
+    // neto 300.000 − 1.800 − 9.000 − 19.396 = 269.804,00. Y sin casillas de vivienda habitual:
+    // con un local ya no se ofrecen (hallazgo 1553).
     await montarLocal(page);
-    await expect(page.getByRole('checkbox', { name: 'Es mi vivienda habitual' })).toBeChecked();
-    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1200,00 €');
-    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.534,00 €');
-    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('270.266,00 €');
+    await expect(page.getByRole('checkbox', { name: 'Es mi vivienda habitual' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.396,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.804,00 €');
 
     // Ganancia cero: 200.000 − 0 − 0 (no sujeta) − 200.000 = 0
     await montarGananciaCero(page);
@@ -5410,10 +5512,10 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
     expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('57.500,00 €');
     expect(await descripcionTarjeta(page, 'Pérdida patrimonial')).toContain('la pérdida real es mayor que esta');
 
-    // Mixto: comisión 0 y mejoras 0 → plusvalía 1.000 · ganancia 49.000 · IRPF 10.170 ·
-    // neto 200.000 − 1.000 − 10.170 = 188.830,00
+    // Mixto: comisión 0 y mejoras 0 → plusvalía 50.000 × 0,12 × 25 % = 1.500 · ganancia
+    // 48.500 · IRPF 1.140 + 42.500 × 21 % = 10.065 · neto 200.000 − 1.500 − 10.065 = 188.435,00
     await montarMixto(page);
-    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('188.830,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('188.435,00 €');
     expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain('Sin cerrar');
 
     // Gestoría ilegible: 12.000 + 758,98 + 236,22 = 12.995,20 · coste 212.995,20
@@ -5423,101 +5525,135 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
       'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
     );
 
-    // Comisión «3.5»: 200.000 × 3,5 % = 7.000 · ganancia 200.000 − 7.000 − 1.000 − 150.000 = 42.000
+    // Comisión «3.5»: 200.000 × 3,5 % = 7.000 · ganancia 200.000 − 7.000 − 1.500 − 150.000 =
+    // 41.500 → IRPF 1.140 + 35.500 × 21 % = 8.595,00
     await montarComisionPunto(page);
     expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('7000,00 €');
-    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8700,00 €');
-
-    // La FAQ que vigila el hallazgo existe en las dos bocas
-    await page.goto(RUTA);
-    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    await expect(page.getByRole('heading', { name: '¿Cuándo se está exento de pagar plusvalía municipal?' })).toBeVisible();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8595,00 €');
   });
 
   /**
-   * HALLAZGO abierto (ALTO) — la pestaña Vendedor aplica las exenciones de VIVIENDA HABITUAL
-   * (art. 33.4.b y art. 38 LIRPF) a un LOCAL comercial: la casilla «Es mi vivienda habitual»
-   * viene marcada por defecto sea cual sea el tipo de inmueble, y `exentoIRPF =
-   * vendedorMayor65 && esViviendaHabitual` no mira `tipoInmueble`. El comprador de esta misma app
-   * ya lo resuelve (`puedeSerViviendaHabitual = tipoInmueble === 'vivienda'`, hallazgo 833), las
-   * hermanas garaje, trastero y local-comercial no aplican ninguna de las dos exenciones, y el
-   * JSON-LD de la propia página dice que «no se aplican a otros inmuebles».
-   *   Esperado (sin exención, CONTROL de arriba): IRPF 19.534,00 € · neto 270.266,00 €
-   *   Obtenido: «EXENTO · Mayor de 65 años + vivienda habitual» · neto 289.800,00 €
+   * HALLAZGO 1553 (ALTO), REPARADO — la pestaña Vendedor aplicaba las exenciones de VIVIENDA
+   * HABITUAL (art. 33.4.b y art. 38 LIRPF) a un LOCAL comercial: «Es mi vivienda habitual» venía
+   * marcada por defecto sea cual sea el tipo de inmueble, y `exentoIRPF = vendedorMayor65 &&
+   * esViviendaHabitual` no miraba `tipoInmueble`. Ahora las casillas solo se ofrecen con
+   * «Vivienda», y el cálculo mira el tipo aunque el estado de las casillas sobreviva al cambio.
+   *   Caso: marcar «Soy mayor de 65 años» con Vivienda y pasar a Local comercial.
+   *   Esperado (sin exención, CONTROL de arriba): IRPF 19.396,00 € · neto 269.804,00 €
+   *   Obtenido antes: «EXENTO · Mayor de 65 años + vivienda habitual» · neto 289.200,00 €
    */
-  test.fail('HALLAZGO 24/09 — un local comercial no puede quedar exento por mayor de 65 y vivienda habitual', async ({
+  test('HALLAZGO 1553 — un local comercial no queda exento por mayor de 65 y vivienda habitual', async ({
     page,
   }) => {
-    await montarLocal(page);
+    await abrir24(page);
+    await sembrar24(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    await sembrar24(page, 'Precio de compra original', '200000');
+    await sembrar24(page, 'Años de propiedad', '10');
+    await sembrar24(page, 'Valor catastral del suelo', '60000');
     await page.getByRole('checkbox', { name: 'Soy mayor de 65 años' }).check();
-    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.534,00 €');
-    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('270.266,00 €');
+    // Con la vivienda habitual (marcada por defecto) sí está exenta: es el control.
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+
+    // El mismo estado de las casillas, con un local: ni se ofrecen ni eximen.
+    await page.getByRole('button', { name: /Local comercial/ }).click();
+    await expect(page.getByRole('checkbox', { name: 'Soy mayor de 65 años' })).toHaveCount(0);
+    await expect(page.getByRole('checkbox', { name: 'Es mi vivienda habitual' })).toHaveCount(0);
+    await expect(page.getByRole('note').filter({ hasText: 'art. 33.4.b LIRPF' })).toContainText(
+      'no se aplican a la venta de un local comercial',
+    );
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.396,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.804,00 €');
   });
 
-  /** HALLAZGO abierto (ALTO, misma raíz) — y tampoco por reinversión en vivienda habitual (art. 38). */
-  test.fail('HALLAZGO 24/09 — un local comercial no puede quedar exento por reinversión en vivienda habitual', async ({
+  /** HALLAZGO 1553 (ALTO, misma raíz), REPARADO — ni por reinversión en vivienda habitual (art. 38). */
+  test('HALLAZGO 1553 — un local comercial no queda exento por reinversión en vivienda habitual', async ({
     page,
   }) => {
-    await montarLocal(page);
+    await abrir24(page);
+    await sembrar24(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    await sembrar24(page, 'Precio de compra original', '200000');
+    await sembrar24(page, 'Años de propiedad', '10');
+    await sembrar24(page, 'Valor catastral del suelo', '60000');
     await page.getByRole('checkbox', { name: /Voy a reinvertir en otra vivienda habitual/ }).check();
     await esperarHidratacion(page, ['input[aria-label="Importe que reinviertes en la nueva vivienda"]']);
     await sembrar24(page, 'Importe que reinviertes en la nueva vivienda', '300000');
-    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.534,00 €');
+    // Control con la vivienda: 300.000 reinvertidos ≥ 289.200 obtenidos → exención total.
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+
+    await page.getByRole('button', { name: /Local comercial/ }).click();
+    await expect(page.getByRole('checkbox', { name: /Voy a reinvertir/ })).toHaveCount(0);
+    await expect(page.locator('input[aria-label="Importe que reinviertes en la nueva vivienda"]')).toHaveCount(0);
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.396,00 €');
   });
 
   /**
-   * HALLAZGO abierto (BAJO) — residuo del 724. Sin ganancia ni pérdida, la tarjeta del IRPF dice
-   * «EXENTO» y debajo «Tributación en base del ahorro», la pareja exacta que el 724 retiró en la
-   * pérdida: la rama `gananciaPatrimonial < 0` deja fuera el cero, y la tarjeta de al lado
-   * (hallazgos 823/845) dice «no hay IRPF que pagar ni pérdida que compensar». No hay exención
-   * que aplicar, ni tributación.
+   * HALLAZGO 1554 (BAJO), REPARADO — residuo del 724. Sin ganancia ni pérdida la tarjeta del IRPF
+   * decía «EXENTO · Tributación en base del ahorro»: no hay exención ni tributación, hay ausencia
+   * de ganancia. Ahora «SIN CUOTA», como las hermanas, con una descripción que no afirma ninguna
+   * de las dos cosas. La pérdida, igual: ya no es «EXENTO».
    */
-  test.fail('HALLAZGO 24/09 — sin ganancia ni pérdida, el IRPF no está «EXENTO» ni «tributa»', async ({ page }) => {
+  test('HALLAZGO 1554 — sin ganancia ni pérdida, el IRPF no está «EXENTO» ni «tributa»', async ({ page }) => {
     await montarGananciaCero(page);
-    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).not.toBe('Tributación en base del ahorro');
-    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).not.toBe('EXENTO');
-  });
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('SIN CUOTA');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'No hay ganancia que gravar, así que esta venta no tiene IRPF',
+    );
 
-  /**
-   * HALLAZGO abierto (BAJO) — la redacción común de 85c9c9fe no llegó a la tarjeta de la PÉRDIDA:
-   * `avisoPerdida` es la única que compone `noSePudoLeer(...)` sin `mayuscula()`, así que la frase
-   * abre en minúscula («no se han podido leer los impuestos…»). Misma línea en garaje, trastero y
-   * local-comercial.
-   */
-  test.fail('HALLAZGO 24/09 — el aviso de la pérdida empieza en mayúscula, como los demás', async ({ page }) => {
     await montarPerdidaIlegible(page);
-    expect(await descripcionTarjeta(page, 'Pérdida patrimonial')).toMatch(/^[A-ZÁÉÍÓÚÑ]/);
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('SIN CUOTA');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toContain('No hay ganancia que gravar');
   });
 
   /**
-   * HALLAZGO abierto (BAJO) — concordancia: el verbo se conjuga por el NÚMERO DE CAMPOS y no por
-   * el sujeto, así que sale «las mejoras lo subiría»; y las tarjetas del IRPF y de la ganancia
-   * rematan «Escríbelo» detrás de dos importes.
+   * HALLAZGO 1555 (BAJO), REPARADO — la redacción común no llegaba a la tarjeta de la PÉRDIDA
+   * (`avisoPerdida` era la única sin `mayuscula()`), el «Sin cerrar» conjugaba por el número de
+   * campos («las mejoras lo subiría») y las tarjetas remataban «Escríbelo» tras dos importes.
    */
-  test.fail('HALLAZGO 24/09 — «las mejoras lo subiría» y «Escríbelo» tras dos importes', async ({ page }) => {
+  test('HALLAZGO 1555 — el aviso de la pérdida empieza en mayúscula, como los demás', async ({ page }) => {
+    await montarPerdidaIlegible(page);
+    expect(await descripcionTarjeta(page, 'Pérdida patrimonial')).toBe(
+      'No se han podido leer los impuestos y gastos de aquella compra: la pérdida real es mayor que esta. Escríbelo con coma decimal (1.234,56).',
+    );
+  });
+
+  test('HALLAZGO 1555 — «las mejoras lo subirían» y «Escríbelos» tras dos importes', async ({ page }) => {
     await montarMixto(page);
-    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).not.toContain('las mejoras lo subiría');
-    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).not.toContain('. Escríbelo con');
+    const neto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    expect(neto).toContain('(la comisión inmobiliaria lo bajaría; las mejoras lo subirían)');
+    expect(neto).not.toContain('las mejoras lo subiría)');
+    // La cuota: los dos ilegibles la bajarían (la comisión es gasto de transmisión y las mejoras
+    // suman al valor de adquisición), así que la dirección es segura y el remate va en plural.
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'No se han podido leer la comisión inmobiliaria y las mejoras, así que la cuota real es menor. Escríbelos con coma decimal (1.234,56).',
+    );
   });
 
   /**
-   * HALLAZGO abierto (BAJO) — con la gestoría ilegible el coste del comprador sigue titulado
-   * «COSTE TOTAL DE ADQUISICIÓN» mientras su descripción dice «el coste real será mayor». La regla
-   * de 85c9c9fe —una cifra que el ilegible mueve se rotula «(PARCIAL)»— rige en el neto del
-   * vendedor y en el IGIC de esta misma tarjeta, no aquí. Igual en las siete hermanas.
+   * HALLAZGO 1556 (BAJO), REPARADO — con la gestoría ilegible, el comprador titulaba «COSTE
+   * TOTAL DE ADQUISICIÓN» y «Total gastos adicionales» mientras la descripción decía «será
+   * mayor». Misma condición que el IGIC/IPSI no calculado: «(PARCIAL)» (patrón de familia 1).
    */
-  test.fail('HALLAZGO 24/09 — un coste total al que le falta la gestoría se rotula (PARCIAL)', async ({ page }) => {
+  test('HALLAZGO 1556 — un coste total al que le falta la gestoría se rotula (PARCIAL)', async ({ page }) => {
     await montarGestoriaIlegible(page);
-    expect(await textoH3(page, /^COSTE TOTAL/)).toContain('PARCIAL');
+    expect(await textoH3(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await textoH3(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    // Con la gestoría legible vuelve a ser definitivo.
+    await sembrar24(page, 'Gastos de gestoría del comprador (€)', '300');
+    expect(await textoH3(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
   });
 
   /**
-   * HALLAZGO abierto (BAJO, dato) — la FAQ visible y las dos del JSON-LD dicen que sin incremento
-   * se puede «quedar exento» de la plusvalía municipal. El art. 104.5 TRLRHL (RDL 26/2021) es un
-   * supuesto de NO SUJECIÓN, y la tarjeta de esta misma página dice «NO SUJETA» desde el hallazgo
-   * 901; la hermana nave-industrial ya lo escribe «no sujeción, no una exención».
+   * HALLAZGO 1557 (BAJO, dato), REPARADO — la FAQ visible y las dos del JSON-LD decían que sin
+   * incremento se puede «quedar exento». El art. 104.5 TRLRHL (redacción del RDL 26/2021,
+   * verificado en el BOE el 24/09/2026) dice «No se producirá la sujeción al impuesto en las
+   * transmisiones de terrenos respecto de los cuales se constate la inexistencia de incremento
+   * de valor»: es NO SUJECIÓN, que es lo que dice la tarjeta desde el hallazgo 901.
    */
-  test.fail('HALLAZGO 24/09 (dato) — sin incremento de valor la plusvalía no está «exenta», no está sujeta', async ({
+  test('HALLAZGO 1557 (dato) — sin incremento de valor la plusvalía no está «exenta», no está sujeta', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -5525,15 +5661,174 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
     const visible = await page.locator('div[class*="faqList"]').innerText();
     const schemas = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     expect(`${visible} ${schemas}`).not.toMatch(/quedar exento/);
+    await expect(page.getByRole('heading', { name: '¿Cuándo no se paga plusvalía municipal?' })).toBeVisible();
+    expect(visible).toContain('la transmisión no está sujeta al impuesto (art. 104.5');
+    // Las dos bocas del JSON-LD dicen lo mismo que la FAQ visible
+    expect(schemas).toContain('no está sujeta');
+    expect(schemas.match(/no está sujeta/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
   });
 
   /**
-   * HALLAZGO abierto (BAJO) — el título de la comisión repite la CADENA tecleada en vez de
-   * formatear el número: con «3.5» calcula bien el 3,5 % (7.000,00 €) y rotula «(3.5%)», con el
-   * punto decimal estadounidense (CLAUDE.md global §2).
+   * HALLAZGO 1558 (BAJO), REPARADO — el título de la comisión repetía la CADENA tecleada: «3.5»
+   * se calculaba bien (3,5 %) y se rotulaba «(3.5%)», con el punto estadounidense.
    */
-  test.fail('HALLAZGO 24/09 — el porcentaje de la comisión se rotula en formato español', async ({ page }) => {
+  test('HALLAZGO 1558 — el porcentaje de la comisión se rotula en formato español', async ({ page }) => {
     await montarComisionPunto(page);
     expect(await textoH3(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (3,5%)');
+  });
+
+  // ─── Los patrones de familia, también en la referencia (24/09/2026) ─────────────────────
+
+  /**
+   * PATRÓN 2 (hallazgos 1546, 1562 y 1570 de las hermanas; la referencia tenía la misma forma).
+   * Con la plusvalía «Sin calcular» (suelo vacío) el valor de transmisión decía restarla, y la
+   * ganancia y el IRPF salían como definitivos cuando son un MÁXIMO: al calcularse, la plusvalía
+   * resta del valor de transmisión (art. 35.1 LIRPF).
+   *   BASE B sin suelo: ganancia 200.000 − 6.000 − 150.000 = 44.000 → IRPF 1.140 + 38.000 × 21 %
+   *   = 9.120,00. Con el suelo (50.000): plusvalía 1.500 · ganancia 42.500 · IRPF 8.805,00.
+   */
+  test('PATRÓN 2 — sin la plusvalía, la ganancia y el IRPF son un máximo y la transmisión no la resta', async ({
+    page,
+  }) => {
+    await vendedor24(page, '200000', [
+      ['Precio de compra original', '150000'],
+      ['Años de propiedad', '10'],
+    ]);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toBe(
+      'Precio de venta − comisión y otros gastos de la venta, sin la plusvalía municipal, que falta',
+    );
+    expect(await textoH3(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('44.000,00 €');
+    expect(await textoH3(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('9120,00 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor.',
+    );
+    // Con el suelo la cuota baja, que es lo que el «máximo» anunciaba
+    await sembrar24(page, 'Valor catastral del suelo', '50000');
+    expect(await textoH3(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8805,00 €');
+  });
+
+  /**
+   * PATRÓN 4 (hallazgos 1548, 1564 y 1572) — vendiendo por debajo de la compra la no sujeción del
+   * art. 104.5 TRLRHL no depende del suelo: sin él, la plusvalía sale «NO SUJETA» y el neto es
+   * definitivo. 150.000 · compra 200.000 · 10 años · suelo VACÍO · 3 %: neto 150.000 − 4.500 =
+   * 145.500,00 (el mismo que con el suelo, CASO 3).
+   */
+  test('PATRÓN 4 — vendiendo con pérdida, la plusvalía no sujeta no necesita el suelo', async ({ page }) => {
+    await vendedor24(page, '150000', [
+      ['Precio de compra original', '200000'],
+      ['Años de propiedad', '10'],
+    ]);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('No sujeta (sin incremento de valor)');
+    expect(await textoH3(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('145.500,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * PATRÓN 5 (hallazgos 1552, 1566 y 1578) — un año negativo se rechaza, pero no «falta»: está
+   * escrito y a la vista. La app dice que no puede ser negativo y pide corregirlo.
+   */
+  test('PATRÓN 5 — unos años negativos no «faltan»: no pueden ser negativos', async ({ page }) => {
+    await vendedor24(page, '300000', [
+      ['Precio de compra original', '200000'],
+      ['Años de propiedad', '-3'],
+      ['Valor catastral del suelo', '60000'],
+    ]);
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('-3');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Los años de tenencia no pueden ser negativos. Este impuesto NO está incluido en el neto de abajo.',
+    );
+    const neto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    expect(neto).toContain('Corrige los años de tenencia (no pueden ser negativos) para obtenerlo.');
+    expect(neto).not.toMatch(/faltan? los años|Rellena los años/);
+  });
+
+  /**
+   * PATRÓN 6 (hallazgos 1549, 1565 y 1575) — la tarjeta «Sin ganancia ni pérdida» no puede negar
+   * una pérdida que la app sabe que hay sin leer.
+   *   200.000 · compra 192.500 · 10 años · suelo 50.000 · 3 %: plusvalía 1.500 · ganancia
+   *   200.000 − 6.000 − 1.500 − 192.500 = 0. Con los gastos de aquella compra «2.000.50», que
+   *   con cualquier valor positivo darían una pérdida compensable.
+   */
+  test('PATRÓN 6 — el cero con un importe ilegible no niega la pérdida', async ({ page }) => {
+    await vendedor24(page, '200000', [
+      ['Precio de compra original', '192500'],
+      ['Años de propiedad', '10'],
+      ['Valor catastral del suelo', '50000'],
+    ]);
+    expect(await valorTarjeta(page, 'Sin ganancia ni pérdida')).toBe('0,00 €');
+    expect(await descripcionTarjeta(page, 'Sin ganancia ni pérdida')).toBe(
+      'Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar',
+    );
+    await sembrar24(page, 'Impuestos y gastos que pagaste al comprar', '2.000.50');
+    expect(await valorTarjeta(page, 'Sin ganancia ni pérdida')).toBe('0,00 €');
+    expect(await descripcionTarjeta(page, 'Sin ganancia ni pérdida')).toBe(
+      'No se han podido leer los impuestos y gastos de aquella compra, así que hay una pérdida que se compensaría en la declaración. Escríbelo con coma decimal (1.234,56).',
+    );
+  });
+
+  /**
+   * HALLAZGO 1561 (visto en trastero; la referencia tenía el mismo mecanismo) — con un ilegible
+   * que SUBIRÍA el neto y la plusvalía que FALTA, que lo bajaría, no hay dirección segura.
+   *   20.000 · compra 16.000 · años VACÍOS · suelo 10.000 de 12.000 · 3 % · gastos «2.000.50»:
+   *   ganancia 20.000 − 600 − 16.000 = 3.400 → IRPF 646 · neto 20.000 − 600 − 646 = 18.754,00
+   */
+  test('HALLAZGO 1561 — un ilegible que sube el neto y la plusvalía que falta: «Sin cerrar»', async ({ page }) => {
+    await vendedor24(page, '20000', [
+      ['Precio de compra original', '16000'],
+      ['Valor catastral del suelo', '10000'],
+      ['Valor catastral total (suelo + construcción)', '12000'],
+      ['Impuestos y gastos que pagaste al comprar', '2.000.50'],
+    ]);
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('18.754,00 €');
+    const aviso = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    expect(aviso).not.toContain('el neto real es MAYOR');
+    expect(aviso).toContain(
+      'Sin cerrar: no se han podido leer los impuestos y gastos de aquella compra y lo subirían, pero falta la plusvalía municipal, que lo bajaría',
+    );
+  });
+
+  /**
+   * PRORRATEO (hallazgo 1560) — ya cubierto en el CASO 34; aquí, la ayuda del campo, que decía
+   * «con un coeficiente mayor»: prorrateado, el coeficiente de la reventa dentro del año es
+   * siempre MENOR que el de un año entero.
+   */
+  test('HALLAZGO 1560 — la ayuda de los años ya no promete «un coeficiente mayor»', async ({ page }) => {
+    await abrir24(page);
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    const ayuda = await page.locator('input[aria-label="Años de propiedad"]').evaluate((el) => {
+      const id = el.getAttribute('aria-describedby');
+      return (id ? document.getElementById(id)?.textContent : el.parentElement?.parentElement?.textContent) ?? '';
+    });
+    expect(ayuda).not.toContain('coeficiente mayor');
+    expect(ayuda).toContain('meses completos');
+  });
+
+  /**
+   * HALLAZGO 1599 (motor) en la pantalla — por encima de 6.010.121,04 € el arancel notarial no
+   * fija cantidad (RD 1426/1989, nº 2.1). Madrid · 7.000.000 € · segunda mano:
+   *   ITP 6 % = 420.000 · notaría hasta el límite: (558,94 + 5.409.108,94 × 0,03 %) × 1,21 ×
+   *   1,75 = 2.181,6727 × 2,1175 = 4.619,69 € · y la parte que excede, de libre acuerdo: el
+   *   coste total se rotula «(PARCIAL)» con «puede ser mayor».
+   */
+  test('HALLAZGO 1599 — la notaría por encima del arancel es de libre acuerdo y el coste sale (PARCIAL)', async ({
+    page,
+  }) => {
+    await abrir24(page);
+    await sembrar24(page, 'Precio de la vivienda', '7000000');
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe('4619,69 €');
+    expect(await descripcionTarjeta(page, /^Gastos de notaría/)).toContain(
+      'Por encima de 6.010.121,04 € el arancel no fija cantidad',
+    );
+    expect(await textoH3(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
+      'No incluye la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real puede ser mayor',
+    );
   });
 });

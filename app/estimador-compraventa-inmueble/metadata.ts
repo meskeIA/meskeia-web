@@ -3,7 +3,9 @@ import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/s
 import {
   ITP_CCAA,
   ComunidadAutonoma,
-  RANGO_ITP,
+  // El rango de la VIVIENDA: desde el 24/09/2026 hay dos, y el País Vasco grava al 7 % lo que
+  // no es vivienda (hallazgo 1582). Esta app es el estimador de vivienda.
+  RANGO_ITP_VIVIENDA,
   BANDA_PRECIO_VIVIENDA,
   horquillaFedatarios,
   horquillaEdadJoven,
@@ -48,8 +50,17 @@ const notariaDe = (precio: number) => {
   return `${euros(f.min)} y ${euros(f.max)}`;
 };
 const tipoDe = (id: keyof typeof ITP_CCAA) => pct(ITP_CCAA[id].tipoGeneral);
-const techoDe = (id: keyof typeof ITP_CCAA) =>
-  pct(Math.max(ITP_CCAA[id].tipoGeneral, ...(ITP_CCAA[id].tramosProgresivos ?? []).map((t) => t.tipo)));
+/** El tipo más alto de una comunidad: el último tramo de su escala o el de su umbral (Valencia). */
+const techoDe = (id: keyof typeof ITP_CCAA) => {
+  const { tipoGeneral, tramosProgresivos, umbralTipoUnico } = ITP_CCAA[id];
+  return pct(
+    Math.max(
+      tipoGeneral,
+      ...(tramosProgresivos ?? []).map((t) => t.tipo),
+      ...(umbralTipoUnico ? [umbralTipoUnico.tipo] : []),
+    ),
+  );
+};
 
 /**
  * Gestoría que la calculadora propone por defecto. Vive aquí porque entra en la horquilla
@@ -120,7 +131,7 @@ export const HORQUILLA_GASTOS_COMPRAVENTA: { min: number; max: number } = (() =>
       const itp = importeITP(
         precio,
         ccaa,
-        elegirTipoITP(ccaa, 'general', precio, { viviendaHabitual: true }),
+        elegirTipoITP(ccaa, 'general', precio, { viviendaHabitual: true, objeto: 'vivienda' }),
       );
       porcentajes.push(
         (sumarLineasVisibles(itp, notaria, registro, GESTORIA_TIPICA) / precio) * 100,
@@ -129,7 +140,7 @@ export const HORQUILLA_GASTOS_COMPRAVENTA: { min: number; max: number } = (() =>
       if (!TERRITORIOS_SIN_IVA[ccaa]) {
         const iva = precio * (IVA_INMUEBLES_2025.obraNueva / 100);
         porcentajes.push(
-          (sumarLineasVisibles(iva, calcularAJD(precio, ccaa), notaria, registro, GESTORIA_TIPICA) /
+          (sumarLineasVisibles(iva, calcularAJD(precio, ccaa, { objeto: 'vivienda' }), notaria, registro, GESTORIA_TIPICA) /
             precio) *
             100,
         );
@@ -235,6 +246,18 @@ const webAppSchema = generateWebAppSchema({
   keywords: ['gastos compra vivienda', 'gastos venta vivienda', 'compraventa vivienda', 'ITP', 'IVA', 'plusvalía municipal', 'España'],
 });
 
+/**
+ * «¿Cuándo no se paga plusvalía municipal?», en UNA sola constante para la FAQ visible y el
+ * FAQPage. Decía «quedar exento», y el art. 104.5 del TRLRHL (redacción del RDL 26/2021,
+ * verificado en el BOE el 24/09/2026) articula un supuesto de NO SUJECIÓN: «No se producirá la
+ * sujeción al impuesto en las transmisiones de terrenos respecto de los cuales se constate la
+ * inexistencia de incremento de valor», con la carga de declarar la transmisión y aportar los
+ * títulos. La tarjeta del vendedor ya decía «NO SUJETA» desde el hallazgo 901 (hallazgo 1557).
+ */
+export const PREGUNTA_NO_SUJECION = '¿Cuándo no se paga plusvalía municipal?';
+export const RESPUESTA_NO_SUJECION =
+  'Cuando no hay incremento de valor del terreno —por ejemplo, si vendes por lo mismo que pagaste o por menos—, la transmisión no está sujeta al impuesto (art. 104.5 del texto refundido de la Ley de Haciendas Locales, en la redacción del RDL 26/2021, tras la sentencia del Tribunal Constitucional de 26 de octubre de 2021). No es una exención: el impuesto no llega a devengarse. Aun así hay que declarar la transmisión y aportar las escrituras de compra y de venta para acreditarlo. Si hay incremento, el vendedor puede elegir el método de cálculo más favorable: objetivo o real.';
+
 const faqSchema = generateFAQSchema({
   url: 'https://meskeia.com/estimador-compraventa-inmueble/',
   mainEntity: [
@@ -244,7 +267,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
-      answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el ${pct(HORQUILLA_FEDATARIOS_PCT.min)} al ${pct(HORQUILLA_FEDATARIOS_PCT.max)} del precio. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
+      answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP_VIVIENDA.min} % y el ${RANGO_ITP_VIVIENDA.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el ${pct(HORQUILLA_FEDATARIOS_PCT.min)} al ${pct(HORQUILLA_FEDATARIOS_PCT.max)} del precio. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',
@@ -259,8 +282,8 @@ const faqSchema = generateFAQSchema({
       answer: 'Desde 2022, la base imponible del ITP es el mayor valor entre el precio escriturado y el valor de referencia catastral (publicado por el Catastro). Si el valor de referencia supera el precio de compra, deberás pagar ITP sobre ese valor mayor, aunque hayas comprado más barato.',
     },
     {
-      question: '¿Cuándo se está exento de pagar plusvalía municipal?',
-      answer: 'Desde la sentencia del Tribunal Constitucional de 2021, si no existe ganancia real en el valor del terreno (vendes por menos de lo que compraste), puedes acreditar la pérdida y quedar exento. El vendedor puede elegir el método de cálculo más favorable: objetivo o real.',
+      question: PREGUNTA_NO_SUJECION,
+      answer: RESPUESTA_NO_SUJECION,
     },
     {
       question: '¿Qué gastos puede deducir el comprador en la declaración de la renta?',
@@ -288,7 +311,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga de ITP al comprar una vivienda de segunda mano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El Impuesto de Transmisiones Patrimoniales (ITP) varía entre el ${RANGO_ITP.min} % y el ${RANGO_ITP.max} % del valor del inmueble según la comunidad autónoma. Cataluña aplica el ${tipoDe('cataluna')} de tipo general y escala hasta el ${techoDe('cataluna')} en los inmuebles de más valor, Madrid el ${tipoDe('madrid')}, Andalucía el ${tipoDe('andalucia')} y el País Vasco el ${tipoDe('pais-vasco')}. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.`,
+        text: `El Impuesto de Transmisiones Patrimoniales (ITP) de una vivienda varía entre el ${RANGO_ITP_VIVIENDA.min} % y el ${RANGO_ITP_VIVIENDA.max} % de su valor según la comunidad autónoma. Cataluña aplica el ${tipoDe('cataluna')} de tipo general y escala hasta el ${techoDe('cataluna')} en los inmuebles de más valor, Madrid el ${tipoDe('madrid')}, Andalucía el ${tipoDe('andalucia')} y el País Vasco el ${tipoDe('pais-vasco')}. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.`,
       },
     },
     {
@@ -320,7 +343,7 @@ export const faqJsonLd = {
       name: '¿Qué es la plusvalía municipal y quién la paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La plusvalía municipal (IIVTNU, Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) grava el aumento de valor del suelo desde la última transmisión. La paga el vendedor, salvo en herencias y donaciones (donde la paga el heredero o donatario). Desde la sentencia del Tribunal Constitucional de 2021, si no hay ganancia real en el terreno se puede acreditar la pérdida y quedar exento o pagar menos.',
+        text: 'La plusvalía municipal (IIVTNU, Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) grava el aumento de valor del suelo desde la última transmisión. La paga el vendedor, salvo en herencias y donaciones (donde la paga el heredero o donatario). Si no hay incremento de valor del terreno, la transmisión no está sujeta (art. 104.5 del texto refundido de la Ley de Haciendas Locales, redacción del RDL 26/2021): el impuesto no llega a devengarse, aunque hay que declarar la transmisión y aportar las escrituras de compra y venta. Si lo hay, el vendedor elige el método de cálculo más favorable, el objetivo o el real.',
       },
     },
   ],

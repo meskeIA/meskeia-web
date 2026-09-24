@@ -27,6 +27,7 @@ import {
   PLUSVALIA_MUNICIPAL_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   COEFICIENTES_IIVTNU_2025,
+  GANANCIAS_PATRIMONIALES_META,
 } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -40,7 +41,17 @@ import {
   ENLACE_CATASTRO,
   TERRITORIOS_SIN_IVA,
   CIUDADES_CON_BONIFICACION,
-  RANGO_AJD,
+  // Los rangos de lo que no es vivienda (un local nunca lo es): el AJD de la FAQ visible y el
+  // ITP del sello de datos.
+  RANGO_AJD_OTROS,
+  tipoGeneralITP,
+  tipoAJD,
+  describirSubidaITP,
+  notariaDeLibreAcuerdo,
+  LIMITE_ARANCEL_NOTARIAL,
+  RANGO_ITP_OTROS,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
+  type ObjetoTransmision,
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
@@ -71,6 +82,11 @@ interface ResultadosComprador {
    * `> 0`, así que el importe desaparecía del desglose y el coste total bajaba en silencio.
    */
   gestoriaLegible: boolean;
+  /**
+   * Por encima de 6.010.121,04 € el arancel no fija cantidad: el exceso es de libre acuerdo con
+   * el notario (RD 1426/1989, nº 2.1; hallazgo 1599), y la estimación solo cubre la parte reglada.
+   */
+  notariaLibre: boolean;
   totalGastos: number;
   totalOperacion: number;
   ivaRecuperable: boolean; // true si el impuesto principal es IVA (deducible si el comprador es sujeto pasivo)
@@ -89,6 +105,23 @@ interface ResultadosVendedor {
   /** …separados en los VACÍOS y los escritos que no se leen, que no «faltan» (hallazgo 1265) */
   camposVacios: string[];
   camposIlegibles: string[];
+  /** Años escritos y legibles pero negativos: no «faltan», son imposibles (patrón 5, 1578). */
+  aniosNegativos: boolean;
+  /** Años = 0 sin los meses completos elegidos: el coeficiente se prorratea por ellos (1560). */
+  faltanMeses: boolean;
+  /** El suelo supera al total: la plusvalía real puede ser menor y el neto MAYOR (1571). */
+  parCatastralImposible: boolean;
+  /**
+   * La plusvalía FALTA y la ganancia sí se calcula: al calcularse restará del valor de
+   * transmisión (art. 35.1 LIRPF), así que la ganancia y el IRPF son un MÁXIMO (patrón 2, 1570).
+   */
+  plusvaliaPendiente: boolean;
+  /**
+   * Las amortizaciones superan el precio de compra y los gastos de aquella compra no se han
+   * podido leer: la app no puede decir que sean imposibles (hallazgo 1573), pero sí cuánto
+   * tendrían que sumar esos gastos para que cuadren. 0 si no es el caso.
+   */
+  excesoSobrePrecio: number;
   exentoPlusvalia: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
@@ -154,6 +187,8 @@ interface EntradaVendedor {
   precioC: number;
   /** Años enteros ya validados; NaN si faltan, no se leen o son negativos */
   anios: number;
+  /** Meses completos cuando los años son 0 (prorrateo del art. 107.4 TRLRHL); si no, undefined */
+  meses: number | undefined;
   valorSuelo: number;
   valorTotal: number | undefined;
   comisionPct: number;
@@ -170,11 +205,23 @@ interface EntradaVendedor {
  */
 function calcularVendedor(e: EntradaVendedor) {
   const comision = e.precioV * e.comisionPct;
-  const plusvaliaCalculable = e.valorSuelo > 0 && Number.isFinite(e.anios) && e.precioC > 0;
+  /**
+   * Vendiendo por el precio de compra o por debajo no hay incremento de valor, y la no sujeción
+   * del art. 104.5 TRLRHL no depende del suelo ni de los años: el motor la decide con venta −
+   * compra ≤ 0. Sin el suelo la plusvalía quedaba «Sin calcular», el neto «(PARCIAL)» y se
+   * mandaba al recibo del IBI a por un dato que no cambia nada, contra el propio bloque
+   * educativo, que dice «si vendes con pérdida no hay impuesto» (patrón 4, hallazgo 1572).
+   */
+  const sinIncremento = e.precioC > 0 && e.precioV <= e.precioC;
+  /** Con años = 0 hacen falta además los meses completos, para prorratear el coeficiente (1560). */
+  const periodoCompleto = Number.isFinite(e.anios) && (e.anios >= 1 || e.meses !== undefined);
+  const plusvaliaCalculable = e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
   const resultadoPlusvalia = plusvaliaCalculable
     ? calcularPlusvaliaMunicipal({
-        valorCatastralSuelo: e.valorSuelo,
-        aniosPropiedad: e.anios,
+        // Sin incremento el suelo y los años no intervienen (sale no sujeta): se pasan a 0.
+        valorCatastralSuelo: e.valorSuelo > 0 ? e.valorSuelo : 0,
+        aniosPropiedad: Number.isFinite(e.anios) ? e.anios : 0,
+        mesesCompletos: e.meses,
         precioCompra: e.precioC,
         precioVenta: e.precioV,
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
@@ -205,6 +252,12 @@ function calcularVendedor(e: EntradaVendedor) {
     irpf,
     totalGastos,
     neto: e.precioV - totalGastos,
+    /**
+     * El neto sin el IRPF, que es el que se publica cuando las amortizaciones son imposibles y el
+     * IRPF no se liquida: el sondeo tiene que medir ESE, o apaga los ilegibles que sí lo mueven
+     * (hallazgo 1574).
+     */
+    netoSinIrpf: e.precioV - sumarLineasVisibles(plusvalia, comision, e.gestoria),
     /** Con signo: negativa si hay pérdida. 0 sin precio de compra. */
     ganancia: hayDatosGanancia ? g.ganancia : 0,
   };
@@ -212,21 +265,35 @@ function calcularVendedor(e: EntradaVendedor) {
 
 /**
  * La ayuda del campo de los años, derivada de COEFICIENTES_IIVTNU_2025 (hallazgo 1266): el
- * tope de años y la comparación del coeficiente de la reventa antes del año los fija la Ley de
- * Presupuestos cada año, y escritos a mano quedaban falsos en silencio al cambiar la tabla.
+ * tope de años y el coeficiente de la reventa antes del año los fija una norma con rango de ley,
+ * y escritos a mano quedaban falsos en silencio al cambiar la tabla.
+ *
+ * ⚠️ 24/09/2026 (hallazgo 1560): comparaba el coeficiente de «menos de 1 año» con el del primer
+ * año como si se aplicara entero, y el art. 107.4 TRLRHL lo PRORRATEA por meses completos: la
+ * reventa dentro del año paga siempre menos que un año entero. Ahora la app pregunta los meses.
  */
 const COEF_MENOS_DE_UN_ANIO = COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente ?? 0;
-const COEF_UN_ANIO = COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 1)?.coeficiente ?? 0;
 const ANIOS_TOPE_IIVTNU = Math.max(...COEFICIENTES_IIVTNU_2025.map((c) => c.anios));
 const AYUDA_ANIOS_PROPIEDAD =
   `Años completos desde la compra (la plusvalía municipal cuenta como máximo ${ANIOS_TOPE_IIVTNU}). ` +
-  `Escribe 0 si revendes antes de cumplir el año: esa reventa también tributa, con un coeficiente de ` +
-  `${formatNumber(COEF_MENOS_DE_UN_ANIO, 2)}` +
-  (COEF_MENOS_DE_UN_ANIO > COEF_UN_ANIO
-    ? ` (mayor que el ${formatNumber(COEF_UN_ANIO, 2)} del primer año).`
-    : COEF_MENOS_DE_UN_ANIO < COEF_UN_ANIO
-      ? ` (menor que el ${formatNumber(COEF_UN_ANIO, 2)} del primer año).`
-      : ' (el mismo que el del primer año).');
+  `Escribe 0 si revendes antes de cumplir el año: esa reventa también tributa, y te preguntaremos los ` +
+  `meses completos, porque el coeficiente anual (${formatNumber(COEF_MENOS_DE_UN_ANIO, 2)}) se prorratea por ellos.`;
+
+/** Lo que se transmite, a efectos del ITP y del AJD: un local nunca es vivienda (hallazgo 1582). */
+const OBJETO: ObjetoTransmision = 'otro';
+
+/**
+ * «la gestoría de la venta lo bajaría» · «los impuestos y gastos de aquella compra lo subirían»:
+ * el verbo concuerda con el SUJETO, no con el número de campos (hallazgo 1577 y hermanos). Es la
+ * regla de `esPlural` de lib/sondeoIlegibles.ts, que no se exporta.
+ */
+const sujetoPlural = (partes: readonly string[]): boolean =>
+  partes.length > 1 || /^(los|las)\s/i.test(partes[0] ?? '');
+/** «Escríbelo» detrás de un importe, «Escríbelos» detrás de dos o más. */
+const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
+
+/** Los meses completos del periodo inferior a un año, para el prorrateo del art. 107.4 TRLRHL. */
+const MESES_COMPLETOS = Array.from({ length: 12 }, (_, m) => m);
 
 // ===== CONSTANTES =====
 const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
@@ -263,11 +330,29 @@ const IVA_LOCAL_COMERCIAL = IVA_INMUEBLES_2025.local;
 const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
 const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
 
+/**
+ * Dónde NO existe la renuncia a la exención de la segunda entrega. En Ceuta y Melilla la Ley
+ * 8/1991 del IPSI toma sus exenciones de la ley del IVA (art. 7) sin regular ninguna renuncia, y
+ * no deja deducir el IPSI soportado en la compra de inmuebles (art. 20.3), que es lo que la
+ * renuncia del art. 20.Dos LIVA exige. Canarias no está: el IGIC sí la tiene (art. 50.Cinco Ley
+ * canaria 4/2012). Decisión común de la familia, verificada en el BOE por nave-industrial
+ * (hallazgo 1584, 24/09/2026); aquí la app calculaba la renuncia en los tres territorios.
+ */
+const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 'melilla'];
+
 /** Enumera en español: «a», «a y b», «a, b y c». */
 function enumerarEnEspanol(partes: string[]): string {
   if (partes.length <= 1) return partes[0] ?? '';
   return `${partes.slice(0, -1).join(', ')} y ${partes[partes.length - 1]}`;
 }
+
+/**
+ * La nota del sello de datos, con el rango de lo que paga un local comercial. La común
+ * (`FISCAL_INMUEBLES_META.nota`) habla del ITP de la VIVIENDA, del 4 % vasco hacia arriba, y aquí
+ * el País Vasco cobra el 7 % (hallazgo 1582); la bonificación de Ceuta y Melilla sale del motor.
+ * Decisión común de la familia con nave, solar y terreno (24/09/2026).
+ */
+const NOTA_DATOS = `El ITP de un local comercial va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} % (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
 
 export default function SimuladorLocalComercialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -279,6 +364,8 @@ export default function SimuladorLocalComercialPage() {
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
   const [gastosAdquisicion, setGastosAdquisicion] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
+  /** Meses completos cuando se vende antes de cumplir el año ('' = sin elegir). */
+  const [mesesCompletos, setMesesCompletos] = useState('');
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
   const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
@@ -291,15 +378,28 @@ export default function SimuladorLocalComercialPage() {
 
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
 
-  const esRenuncia = tipoTransmision === 'segunda-mano-renuncia';
+  /**
+   * La transmisión que se CALCULA. En Ceuta y Melilla la renuncia no existe (ver
+   * TERRITORIOS_SIN_RENUNCIA): allí se calcula la segunda mano y el botón de la renuncia se
+   * desactiva. Se deriva en lugar de reescribir el estado para no perder la elección si se vuelve
+   * a una comunidad donde la renuncia sí existe (la misma decisión que nave-industrial, 1584).
+   */
+  const renunciaImposible = TERRITORIOS_SIN_RENUNCIA.includes(ccaa);
+  const transmision: TipoTransmision =
+    tipoTransmision === 'segunda-mano-renuncia' && renunciaImposible ? 'segunda-mano' : tipoTransmision;
+  const esRenuncia = transmision === 'segunda-mano-renuncia';
   /** Las dos ramas en las que el impuesto es IVA y, por tanto, la base es la contraprestación */
   const conIvaEnPantalla =
-    (tipoTransmision === 'primera-mano' || esRenuncia) && !TERRITORIOS_SIN_IVA[ccaa];
+    (transmision === 'primera-mano' || esRenuncia) && !TERRITORIOS_SIN_IVA[ccaa];
+  /** El impuesto cuya exención se renuncia: el IVA, o el IGIC en Canarias. */
+  const impuestoDeLaRenuncia = TERRITORIOS_SIN_IVA[ccaa]?.impuesto ?? 'IVA';
 
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
-    if (!Number.isFinite(precio) || precio <= 0) return null;
+    // Sobre el precio que se PINTA, al céntimo: «0,004» se pinta «0,00 €» y publicaba un desglose
+    // entero sobre un precio que se ve como cero (hallazgo 1601, decisión común de la familia).
+    if (!Number.isFinite(precio) || Math.round(precio * 100) <= 0) return null;
 
     // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
     // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0), así que
@@ -321,7 +421,7 @@ export default function SimuladorLocalComercialPage() {
     // (art. 57 bis TRLITPAJD). La pantalla tiene que decirlo: imprimía el tipo NOMINAL
     // sobre un importe ya bonificado (hallazgos 619 y 623).
     const bonificado = CIUDADES_CON_BONIFICACION.includes(ccaa);
-    const conIva = tipoTransmision === 'primera-mano' || tipoTransmision === 'segunda-mano-renuncia';
+    const conIva = transmision === 'primera-mano' || transmision === 'segunda-mano-renuncia';
 
     if (conIva && territorioSinIva) {
       // Allí no se devenga IVA sino IGIC o IPSI: se nombra el impuesto que corresponde y no
@@ -330,30 +430,33 @@ export default function SimuladorLocalComercialPage() {
       // canario o ceutí y no exenta.
       tipoImpuesto = territorioSinIva.impuesto;
       impuestoNoCalculado = true;
-      ajd = calcularAJD(precio, ccaa);
+      // Con renuncia solo se llega aquí en Canarias (IGIC, art. 50.Cinco Ley 4/2012); la tabla
+      // no tiene allí tipo de AJD propio de la renuncia, así que sale el general del sitio.
+      ajd = calcularAJD(precio, ccaa, { objeto: OBJETO, renunciaExencionIVA: transmision === 'segunda-mano-renuncia' });
       ivaRecuperable = true;
-    } else if (tipoTransmision === 'primera-mano') {
+    } else if (transmision === 'primera-mano') {
       // Obra nueva del promotor: IVA 21% + AJD
       tipoImpuesto = 'IVA';
       porcentaje = IVA_LOCAL_COMERCIAL;
       impuesto = precio * (porcentaje / 100);
-      ajd = calcularAJD(precio, ccaa);
+      // Un local no es vivienda: en el País Vasco paga el 0,5 %, sin la exención de la
+      // primera transmisión de vivienda (hallazgos 1583 y 1592).
+      ajd = calcularAJD(precio, ccaa, { objeto: OBJETO });
       ivaRecuperable = true;
-    } else if (tipoTransmision === 'segunda-mano-renuncia') {
+    } else if (transmision === 'segunda-mano-renuncia') {
       // Segunda mano con renuncia a la exención de IVA (Art. 20.Dos LIVA)
-      // → IVA 21% con inversión del sujeto pasivo + AJD (a menudo a tipo incrementado según CCAA)
+      // → IVA 21% con inversión del sujeto pasivo + AJD, al tipo de la renuncia donde la
+      // comunidad lo tiene y está verificado (Valencia, 2 %: Ley 13/1997, art. 14.Dos; 1603).
       tipoImpuesto = 'IVA (renuncia · ISP)';
       porcentaje = IVA_LOCAL_COMERCIAL;
       impuesto = precio * (porcentaje / 100);
-      ajd = calcularAJD(precio, ccaa);
+      ajd = calcularAJD(precio, ccaa, { objeto: OBJETO, renunciaExencionIVA: true });
       ivaRecuperable = true;
     } else {
       // Segunda mano sin renuncia → exenta de IVA → ITP tipo general de la CCAA
-      const datosCcaa = ITP_CCAA[ccaa];
-      const tipoAplicable = datosCcaa.tipoGeneral;
-      // Sin tercer argumento: así se aplica la escala progresiva de las 7 CCAA
-      // que la tienen, en vez del tipo plano del primer tramo.
-      impuesto = calcularITP(precio, ccaa);
+      // Sin tipo forzado: así se aplica la escala progresiva de las CCAA que la tienen, el
+      // umbral de Valencia y el tipo de lo que no es vivienda (País Vasco, 7 %; hallazgo 1582).
+      impuesto = calcularITP(precio, ccaa, OBJETO);
       tipoImpuesto = 'ITP';
       // Tipo EFECTIVO: con escala progresiva el importe no es un porcentaje plano del
       // precio, asi que mostrar el tipo nominal contradiria a la cifra de al lado.
@@ -384,12 +487,13 @@ export default function SimuladorLocalComercialPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       gestoriaLegible,
+      notariaLibre: notariaDeLibreAcuerdo(precio),
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       ivaRecuperable,
       bonificado,
     };
-  }, [precioVenta, ccaa, tipoTransmision, gastosGestoria]);
+  }, [precioVenta, ccaa, transmision, gastosGestoria]);
 
   // ===== CÁLCULOS VENDEDOR =====
   // El vendedor de un local paga plusvalía municipal (es suelo urbano) e IRPF sobre la
@@ -401,8 +505,8 @@ export default function SimuladorLocalComercialPage() {
     const precioC = parseSpanishNumber(precioCompraOriginal);
     // Los años se leen del STRING, no del número: «0» es un dato VÁLIDO —el local
     // revendido antes de cumplir el año, que tributa con el coeficiente de «Menos de 1
-    // año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más alto de la tabla)— y lo que
-    // impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
+    // año» de COEFICIENTES_IIVTNU_2025, prorrateado por meses completos (hallazgo 1560)— y lo
+    // que impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
     // valían 0, así que el 0 explícito desactivaba la plusvalía y ese 0 se propagaba como
     // un cero real: no minoraba el valor de transmisión, subía la ganancia y el neto se
     // daba por firme (hallazgo 666 del Inspector, 07/09/2026).
@@ -424,10 +528,17 @@ export default function SimuladorLocalComercialPage() {
     const aniosNegativo = aniosBruto < 0 || Object.is(aniosBruto, -0);
     const anios = Math.trunc(aniosBruto);
     const aniosDisponibles = Number.isFinite(anios) && !aniosNegativo;
+    /**
+     * Por debajo del año el art. 107.4 TRLRHL prorratea el coeficiente anual por los meses
+     * completos: con años = 0 hacen falta los meses, y mientras no se elijan faltan, como
+     * cualquier dato vacío (hallazgo 1560). Hasta el 24/09/2026 se aplicaba el coeficiente ENTERO.
+     */
+    const meses = aniosDisponibles && anios === 0 && mesesCompletos !== '' ? Number(mesesCompletos) : undefined;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
-    if (!Number.isFinite(precioV) || precioV <= 0) return null;
+    // Al céntimo, como el comprador: un precio de venta que se pinta 0,00 € no es un precio (1601).
+    if (!Number.isFinite(precioV) || Math.round(precioV * 100) <= 0) return null;
 
     /**
       * ⚠️ 13/09/2026 — estos dos eran los ÚNICOS importes del panel sin acotar mientras el
@@ -462,6 +573,7 @@ export default function SimuladorLocalComercialPage() {
       precioV,
       precioC,
       anios: aniosDisponibles ? anios : NaN,
+      meses,
       valorSuelo,
       valorTotal: valorTotal > 0 ? valorTotal : undefined,
       comisionPct: Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100,
@@ -477,8 +589,21 @@ export default function SimuladorLocalComercialPage() {
      * exceso y liquidaba un IRPF enorme como definitivo. Se rechaza como el par catastral
      * imposible (hallazgo 900): la app nombra el dato y no liquida el IRPF con él.
      */
+    /**
+     * ⚠️ 24/09/2026 (hallazgo 1573): con los gastos de aquella compra ILEGIBLES el coste de
+     * adquisición no se conoce —el ilegible entraba aquí como 0— y la regla declaraba imposibles
+     * unas amortizaciones posibles, mandaba revisar un dato correcto y callaba el que no se había
+     * podido leer. Solo se afirma la imposibilidad con los gastos leídos; si no, el IRPF se liquida
+     * y el sondeo de los gastos dice hacia dónde queda, como con cualquier otro ilegible.
+     */
     const costeAdquisicion = precioC > 0 ? precioC + entrada.gastosAdquisicion : 0;
-    const amortizacionesImposibles = precioC > 0 && entrada.amortizaciones > costeAdquisicion;
+    const amortizacionesImposibles =
+      precioC > 0 && gastosAdquisicionLegible && entrada.amortizaciones > costeAdquisicion;
+    /** Lo que tendrían que sumar los gastos ilegibles para que las amortizaciones cuadren. */
+    const excesoSobrePrecio =
+      precioC > 0 && !gastosAdquisicionLegible && entrada.amortizaciones > precioC
+        ? entrada.amortizaciones - precioC
+        : 0;
     const r = calcularVendedor(entrada);
     const irpfPublicable = r.hayDatosGanancia && !amortizacionesImposibles;
     const irpf = irpfPublicable ? r.irpf : 0;
@@ -487,24 +612,34 @@ export default function SimuladorLocalComercialPage() {
     // El aviso nombra SOLO lo que de verdad falta, y concuerda el verbo (hallazgo 666). Y
     // separa lo VACÍO de lo escrito que no se lee, que no «falta»: el usuario lo ve (1265).
     const ilegibleTexto = (t: string) => escritoIlegible(t, parseSpanishNumber);
+    const rp = r.resultadoPlusvalia;
+    /**
+     * Con la plusvalía ya resuelta (sin incremento no hace falta el suelo ni los años, patrón 4)
+     * esos dos campos no bloquean nada: nombrarlos marcaría «(PARCIAL)» un neto definitivo.
+     */
+    const plusvaliaResuelta = rp !== null;
+    // Un año negativo no «falta»: está escrito, se lee y es imposible (patrón 5, hallazgo 1578).
+    const aniosNegativos = !plusvaliaResuelta && aniosNegativo;
+    const faltanMeses = !plusvaliaResuelta && aniosDisponibles && anios === 0 && meses === undefined;
     const faltanVacios = [
-      valorSuelo > 0 || ilegibleTexto(valorCatastralSuelo) ? null : 'el valor catastral del suelo',
-      aniosDisponibles || ilegibleTexto(aniosPropiedad) ? null : 'los años de propiedad',
+      plusvaliaResuelta || valorSuelo > 0 || ilegibleTexto(valorCatastralSuelo) ? null : 'el valor catastral del suelo',
+      plusvaliaResuelta || aniosDisponibles || aniosNegativo || ilegibleTexto(aniosPropiedad) ? null : 'los años de propiedad',
+      faltanMeses ? 'los meses completos desde la compra' : null,
       precioC > 0 || ilegibleTexto(precioCompraOriginal) ? null : 'el precio de compra original',
     ].filter((x): x is string => x !== null);
     const faltanIlegibles = [
-      ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
-      ilegibleTexto(aniosPropiedad) ? 'los años de propiedad' : null,
+      !plusvaliaResuelta && ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
+      !plusvaliaResuelta && ilegibleTexto(aniosPropiedad) ? 'los años de propiedad' : null,
       ilegibleTexto(precioCompraOriginal) ? 'el precio de compra original' : null,
     ].filter((x): x is string => x !== null);
     const camposQueFaltan = [...faltanVacios, ...faltanIlegibles];
     const porQueNoSeCalcula = [
       faltanVacios.length > 0 ? faltaOFaltan(faltanVacios) : null,
       faltanIlegibles.length > 0 ? noSePudoLeer(faltanIlegibles) : null,
+      aniosNegativos ? 'los años de propiedad no pueden ser negativos' : null,
     ].filter((x): x is string => x !== null).join('; ');
 
     let metodoPlusvalia = `No calculada (${porQueNoSeCalcula})`;
-    const rp = r.resultadoPlusvalia;
     const exentoPlusvalia = rp ? rp.exento : false;
     if (rp) {
       /**
@@ -575,13 +710,17 @@ export default function SimuladorLocalComercialPage() {
         grande: { ...entrada, valorTotal: valorSuelo * 1000 },
       });
     }
-    const sondeadas = amortizacionesImposibles
-      ? []
-      : sondas.map((sd) => ({
-          nombre: sd.nombre,
-          pequeno: calcularVendedor(sd.pequeno),
-          grande: calcularVendedor(sd.grande),
-        }));
+    /**
+     * ⚠️ 24/09/2026 (hallazgo 1574): con las amortizaciones imposibles el sondeo se apagaba
+     * ENTERO, y una comisión o una gestoría de la venta ilegibles desaparecían del aviso del neto
+     * aunque lo movieran. Ahora se sondea siempre; lo que cambia es la cifra que se mide: el neto
+     * que se publica, que en ese caso no lleva IRPF (abajo, `netoPublicado`).
+     */
+    const sondeadas = sondas.map((sd) => ({
+      nombre: sd.nombre,
+      pequeno: calcularVendedor(sd.pequeno),
+      grande: calcularVendedor(sd.grande),
+    }));
     const veredictoDe = (cifra: (x: ReturnType<typeof calcularVendedor>) => number): Veredicto =>
       veredictoIlegibles(
         cifra(r),
@@ -596,6 +735,11 @@ export default function SimuladorLocalComercialPage() {
       camposQueFaltan,
       camposVacios: faltanVacios,
       camposIlegibles: faltanIlegibles,
+      aniosNegativos,
+      faltanMeses,
+      parCatastralImposible: rp !== null && !rp.exento && rp.parCatastralImposible,
+      plusvaliaPendiente: !plusvaliaResuelta && irpfPublicable,
+      excesoSobrePrecio,
       exentoPlusvalia,
       comisionInmobiliaria: r.comision,
       gastosGestoria: entrada.gestoria,
@@ -618,12 +762,14 @@ export default function SimuladorLocalComercialPage() {
       valorTotalLegible: rp === null || exentoPlusvalia || valorTotalLegible,
       totalGastos,
       netoVendedor: precioV - totalGastos,
-      veredictoNeto: veredictoDe((x) => x.neto),
-      veredictoIrpf: veredictoDe((x) => x.irpf),
-      veredictoGanancia: veredictoDe((x) => x.ganancia),
+      // Sin IRPF publicable (amortizaciones imposibles) el neto publicado es el que no lo lleva,
+      // y la cuota y la ganancia no se enseñan: nada que sondear en ellas (hallazgo 1574).
+      veredictoNeto: veredictoDe((x) => (amortizacionesImposibles ? x.netoSinIrpf : x.neto)),
+      veredictoIrpf: amortizacionesImposibles ? { tipo: 'ninguno' } : veredictoDe((x) => x.irpf),
+      veredictoGanancia: amortizacionesImposibles ? { tipo: 'ninguno' } : veredictoDe((x) => x.ganancia),
     };
   }, [
-    precioVenta, precioCompraOriginal, gastosAdquisicion, aniosPropiedad,
+    precioVenta, precioCompraOriginal, gastosAdquisicion, aniosPropiedad, mesesCompletos,
     valorCatastralSuelo, valorCatastralTotal,
     // gastosGestoriaVenta, NO gastosGestoria: la del comprador no entra en el IRPF del
     // vendedor (art. 35.1 LIRPF). El campo se separó el 20/08/2026 pero solo en el valor,
@@ -634,6 +780,42 @@ export default function SimuladorLocalComercialPage() {
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   const territorioActualSinIva = TERRITORIOS_SIN_IVA[ccaa];
+  /** El precio escrito, para rotular el tipo que le toca (0 mientras no se lea). */
+  const precioLeido = (() => {
+    const p = parseSpanishNumber(precioVenta);
+    return Number.isFinite(p) && p > 0 ? p : 0;
+  })();
+  /**
+   * Cómo sube el tipo con el valor, en palabras del motor, que distingue la escala (cada tramo a
+   * su tipo) del umbral de Valencia (el 11 % sobre TODO el valor): el recuadro decía «escala
+   * progresiva (9 % → 11 %)» y describía justo el cálculo equivocado (hallazgos 1581 y 1602).
+   */
+  const subidaITP = (() => {
+    const texto = describirSubidaITP(ccaa);
+    if (texto === null) return null;
+    return ITP_CCAA[ccaa].umbralTipoUnico ? `En esta comunidad, ${texto}.` : `Esta comunidad ${texto}.`;
+  })();
+  /**
+   * El AJD de la operación elegida, del motor: el de un local, y con renuncia el de la renuncia
+   * donde la comunidad lo tiene y está verificado (Valencia, 2 %; hallazgo 1603). En Ceuta y
+   * Melilla la renuncia no existe (`transmision` ya la ha convertido en segunda mano); en
+   * Canarias es a la exención del IGIC, y su AJD es el general.
+   */
+  const ajdRenuncia = tipoAJD(ccaa, { objeto: OBJETO, renunciaExencionIVA: esRenuncia });
+  const ajdRenunciaPropio = ajdRenuncia.motivo === 'renuncia';
+  /** Al coste del comprador le falta algo: el IGIC/IPSI, la gestoría ilegible o la notaría libre. */
+  const costeCompradorParcial =
+    !!resultadosComprador &&
+    (resultadosComprador.impuestoNoCalculado ||
+      !resultadosComprador.gestoriaLegible ||
+      resultadosComprador.notariaLibre);
+  /** Años escritos que se leen como 0 (reventa antes del año): hay que preguntar los meses. */
+  const aniosEnCero = (() => {
+    const t = aniosPropiedad.trim();
+    if (t === '') return false;
+    const n = parseSpanishNumber(t);
+    return Number.isFinite(n) && n >= 0 && !Object.is(n, -0) && Math.trunc(n) === 0;
+  })();
 
   /**
    * Lo que el neto NO descuenta por falta de datos. Solo se miraba la plusvalía, así que con
@@ -665,7 +847,15 @@ export default function SimuladorLocalComercialPage() {
     const v = resultadosVendedor?.veredictoNeto;
     if (!v || v.tipo === 'ninguno') return null;
     if (v.tipo === 'mixto') {
-      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${v.menor.length > 1 ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${v.mayor.length > 1 ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
+      // El verbo concuerda con el sujeto: «los impuestos y gastos de aquella compra lo
+      // subirían», no «lo subiría» (redacción común, hallazgos 1555, 1568 y 1577).
+      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${sujetoPlural(v.menor) ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${sujetoPlural(v.mayor) ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
+    }
+    if (v.tipo === 'mayor' && faltanEnElNeto.length > 0) {
+      // Un ilegible que SUBIRÍA el neto no permite afirmar «el neto real es MAYOR» si a la vez
+      // FALTA un impuesto que lo bajaría: el sondeo solo mide los ilegibles, y la dirección
+      // segura era falsa en cuanto se rellenaba el dato vacío (hallazgo 1561).
+      return `Sin cerrar: ${noSePudoLeer(v.campos)} y ${sujetoPlural(v.campos) ? 'lo subirían' : 'lo subiría'}, pero ${faltaOFaltan(faltanEnElNeto)}, que ${sujetoPlural(faltanEnElNeto) ? 'lo bajarían' : 'lo bajaría'}: no se puede saber si el neto real es mayor o menor que este`;
     }
     if (v.tipo === 'menor') {
       const deducibles = v.campos.filter((c) => c === 'la comisión inmobiliaria' || c === 'la gestoría de la venta');
@@ -695,7 +885,7 @@ export default function SimuladorLocalComercialPage() {
   const camposPendientes = resultadosVendedor
     ? Array.from(
         new Set([
-          ...resultadosVendedor.camposVacios,
+          ...resultadosVendedor.camposVacios.filter((c) => c !== 'los meses completos desde la compra'),
           ...(resultadosVendedor.irpfCalculado ||
           resultadosVendedor.amortizacionesImposibles ||
           resultadosVendedor.camposIlegibles.includes('el precio de compra original')
@@ -707,26 +897,80 @@ export default function SimuladorLocalComercialPage() {
   const hayIlegiblesQueCorregir =
     (resultadosVendedor?.camposIlegibles.length ?? 0) > 0 || avisoIlegiblesNeto !== null;
 
-  /** Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve. */
-  const avisoTarjeta = (v: Veredicto, que: string): string | null => {
-    if (v.tipo === 'ninguno') return null;
-    if (v.tipo === 'mixto') {
-      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven ${que} en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
+  /**
+   * El par catastral imposible (suelo mayor que total) también deja el neto sin cerrar: la
+   * plusvalía se liquidó por el objetivo sin compararla con el real, que puede ser más barato.
+   * Es lo que la referencia hace desde 70cce469/85c9c9fe (patrón 3, hallazgo 1571).
+   */
+  const netoParcial =
+    faltanEnElNeto.length > 0 ||
+    avisoIlegiblesNeto !== null ||
+    (resultadosVendedor?.camposIlegibles.length ?? 0) > 0 ||
+    (resultadosVendedor?.parCatastralImposible ?? false);
+
+  /**
+   * ¿La plusvalía FALTA mientras la ganancia sí se calcula? Al calcularse restará del valor de
+   * transmisión (art. 35.1 LIRPF): la ganancia y el IRPF publicados son un MÁXIMO, y la pérdida
+   * un mínimo (patrón de familia 2, hallazgo 1570).
+   */
+  const plusvaliaPendiente = resultadosVendedor?.plusvaliaPendiente ?? false;
+
+  /**
+   * Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve, o cuando falta
+   * la plusvalía, que la bajaría (patrón 2). Si los dos tiran en sentidos contrarios la app no
+   * puede saber hacia dónde queda la cifra real, y lo dice.
+   */
+  const avisoTarjeta = (v: Veredicto, que: string, cuentaPlusvalia = true): string | null => {
+    const pendiente = cuentaPlusvalia && plusvaliaPendiente;
+    const frasePlusvalia = `No resta la plusvalía municipal, que falta, así que ${que} real puede ser menor`;
+    if (v.tipo === 'ninguno') return pendiente ? `${frasePlusvalia}.` : null;
+    if (v.tipo === 'mixto' || (pendiente && v.tipo === 'mayor')) {
+      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      return `Sin cerrar: ${pendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven ${que} en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
-    return `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. Escríbelo con coma decimal (1.234,56).`;
+    // «Escríbelos» detrás de dos importes (redacción común, hallazgos 1555 y 1577).
+    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    return pendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
-  /** La pérdida es la ganancia con el signo cambiado: su dirección es la contraria (1259). */
+  /** La cifra es un MÁXIMO por la plusvalía que falta y ningún ilegible tira en contra. */
+  const esMaximoPorPlusvalia = (v: Veredicto): boolean =>
+    plusvaliaPendiente && (v.tipo === 'ninguno' || v.tipo === 'menor');
+
+  /**
+   * La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. Abre en
+   * mayúscula, como los demás avisos de la redacción común (hallazgo 1577).
+   */
   const avisoPerdida = (v: Veredicto): string | null => {
-    if (v.tipo === 'ninguno') return null;
-    if (v.tipo === 'mixto') {
-      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven la pérdida en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
+    const frasePlusvalia = 'No resta la plusvalía municipal, que falta, así que la pérdida real puede ser mayor que esta';
+    if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
+    if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
+      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven la pérdida en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const mayorPerdida = v.tipo === 'menor';
-    return `${noSePudoLeer(v.campos)}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. Escríbelo con coma decimal (1.234,56).`;
+    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
-  const netoParcial = faltanEnElNeto.length > 0 || avisoIlegiblesNeto !== null || (resultadosVendedor?.camposIlegibles.length ?? 0) > 0;
+  /**
+   * «Sin ganancia ni pérdida» con un importe ilegible o con la plusvalía pendiente: ese cero no
+   * es firme, y la tarjeta no puede negar una pérdida (o una ganancia) que la app sabe que puede
+   * haber. Tenía texto fijo y no miraba el sondeo (patrón 6, hallazgo 1575).
+   */
+  const avisoCero = (v: Veredicto): string | null => {
+    const frasePlusvalia = 'No resta la plusvalía municipal, que falta: con ella puede haber una pérdida que se compensaría en la declaración';
+    if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
+    if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
+      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y tiran en sentidos contrarios: puede haber ganancia o pérdida. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
+    }
+    const ilegible =
+      v.tipo === 'menor'
+        ? `${mayuscula(noSePudoLeer(v.campos))}, así que ${v.seguro ? 'hay' : 'puede haber'} una pérdida que se compensaría en la declaración. ${escribelo(v.campos)} con coma decimal (1.234,56).`
+        : `${mayuscula(noSePudoLeer(v.campos))}, así que ${v.seguro ? 'hay' : 'puede haber'} una ganancia, y con ella IRPF. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
+  };
 
   return (
     <div className={styles.container}>
@@ -762,15 +1006,26 @@ export default function SimuladorLocalComercialPage() {
         fuente={FISCAL_INMUEBLES_META.fuente}
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
-        nota={FISCAL_INMUEBLES_META.nota}
+        nota={NOTA_DATOS}
       />
 
+      {/* Y un sello por tributo en la mitad del vendedor: el IRPF de la ganancia se publicaba
+          bajo la fuente y la fecha de la PLUSVALÍA, que no son las de la escala del ahorro con
+          la que la app lo calcula. Es la reparación del hallazgo 781 de simulador-heredar-
+          vivienda, que no había llegado aquí (hallazgo 1579). */}
       <DataReference
-        normativa={`Plusvalía municipal (IIVTNU) e IRPF de la ganancia ${PLUSVALIA_MUNICIPAL_META.vigencia} · lo que paga quien vende`}
+        normativa={`Plusvalía municipal (IIVTNU) ${PLUSVALIA_MUNICIPAL_META.vigencia} · lo que paga quien vende`}
         fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
         verificado={PLUSVALIA_MUNICIPAL_META.verificado}
         urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
         nota={`${PLUSVALIA_MUNICIPAL_META.aviso} ${PLUSVALIA_MUNICIPAL_META.nota}`}
+      />
+      <DataReference
+        normativa={`IRPF de la ganancia ${GANANCIAS_PATRIMONIALES_META.vigencia} · lo que paga quien vende`}
+        fuente={GANANCIAS_PATRIMONIALES_META.fuente}
+        verificado={GANANCIAS_PATRIMONIALES_META.verificado}
+        urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
+        nota={GANANCIAS_PATRIMONIALES_META.nota}
       />
 
       {/* Aviso IVA deducible */}
@@ -786,8 +1041,17 @@ export default function SimuladorLocalComercialPage() {
             {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
             ({territorioActualSinIva.nombre}), que esta calculadora no cifra. El impuesto soportado
             también puede ser <strong>deducible</strong>, pero con las reglas del{' '}
-            {territorioActualSinIva.impuesto}, y la <strong>renuncia a la exención de IVA</strong> no
-            existe allí. Consúltalo con tu asesor fiscal antes de decidir.
+            {territorioActualSinIva.impuesto}.{' '}
+            {/* Decía que la renuncia «no existe allí» en los tres territorios, y en Canarias sí:
+                es a la exención del IGIC (art. 50.Cinco Ley canaria 4/2012). En Ceuta y Melilla el
+                IPSI no la regula (Ley 8/1991, arts. 7 y 20.3). Decisión común de la familia con
+                nave-industrial (hallazgo 1584). */}
+            {renunciaImposible ? (
+              <>La <strong>renuncia a la exención</strong> no existe en el {territorioActualSinIva.impuesto}: la segunda mano paga siempre ITP.</>
+            ) : (
+              <>En segunda mano entre empresarios con derecho a deducción se puede <strong>renunciar a la exención del {territorioActualSinIva.impuesto}</strong> (art. 50.Cinco Ley canaria 4/2012).</>
+            )}{' '}
+            Consúltalo con tu asesor fiscal antes de decidir.
           </>
         ) : (
           <>
@@ -810,36 +1074,42 @@ export default function SimuladorLocalComercialPage() {
             <div className={styles.transmisionGrid}>
               <button
                 type="button"
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
+                className={`${styles.transmisionBtn} ${transmision === 'segunda-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano')}
-                aria-pressed={tipoTransmision === 'segunda-mano'}
+                aria-pressed={transmision === 'segunda-mano'}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🔄</span>
                 <span>Segunda mano</span>
                 <span className={styles.transmisionSub}>Paga ITP (tipo general)</span>
               </button>
+              {/* En Ceuta y Melilla la renuncia no existe (TERRITORIOS_SIN_RENUNCIA): el botón se
+                  desactiva y dice por qué, en vez de calcular una opción que la ley no tiene. En
+                  Canarias la renuncia es a la exención del IGIC. */}
               <button
                 type="button"
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano-renuncia' ? styles.active : ''}`}
+                className={`${styles.transmisionBtn} ${transmision === 'segunda-mano-renuncia' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('segunda-mano-renuncia')}
-                aria-pressed={tipoTransmision === 'segunda-mano-renuncia'}
+                aria-pressed={transmision === 'segunda-mano-renuncia'}
+                disabled={renunciaImposible}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
-                <span>2ª mano con renuncia IVA</span>
+                <span>2ª mano con renuncia {impuestoDeLaRenuncia}</span>
                 {/* En Canarias, Ceuta y Melilla no rige el IVA (IGIC/IPSI): el rótulo no puede
                     prometer un IVA que el recuadro de abajo desmiente, y el tipo se lee de
                     data/fiscal en vez de teclearse (hallazgos 620 y 621). */}
                 <span className={styles.transmisionSub}>
-                  {territorioActualSinIva
-                    ? `Paga ${territorioActualSinIva.impuesto} + AJD`
-                    : `IVA ${formatNumber(IVA_LOCAL_COMERCIAL, 0)}% (ISP) + AJD`}
+                  {renunciaImposible
+                    ? `No existe en el ${territorioActualSinIva?.impuesto ?? 'IPSI'}: paga ITP`
+                    : territorioActualSinIva
+                      ? `Paga ${territorioActualSinIva.impuesto} (ISP) + AJD`
+                      : `IVA ${formatNumber(IVA_LOCAL_COMERCIAL, 0)}% (ISP) + AJD`}
                 </span>
               </button>
               <button
                 type="button"
-                className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
+                className={`${styles.transmisionBtn} ${transmision === 'primera-mano' ? styles.active : ''}`}
                 onClick={() => setTipoTransmision('primera-mano')}
-                aria-pressed={tipoTransmision === 'primera-mano'}
+                aria-pressed={transmision === 'primera-mano'}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Obra nueva / Promotor</span>
@@ -861,19 +1131,30 @@ export default function SimuladorLocalComercialPage() {
           {esRenuncia && (
             <div className={styles.renunciaAviso} role="note">
               {territorioActualSinIva ? (
+                // Solo se llega aquí en Canarias: en Ceuta y Melilla la renuncia no existe y
+                // `transmision` ya es la segunda mano. Decía que «ni la renuncia ni la inversión
+                // del sujeto pasivo entran en juego», y en el IGIC entran las dos.
                 <>
-                  <strong><span aria-hidden="true">⚠️</span> Aquí no hay IVA al que renunciar:</strong> en {datosCcaaActual.nombre} rige
-                  el <strong>{territorioActualSinIva.impuesto}</strong>, no el IVA, así que ni la renuncia a la
-                  exención del art. 20.Dos LIVA ni la inversión del sujeto pasivo entran en juego. Esta
-                  calculadora no cifra ese impuesto: consulta sus tipos y su mecánica propia.
+                  <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención del {territorioActualSinIva.impuesto}:</strong> en{' '}
+                  {datosCcaaActual.nombre} no se devenga IVA, sino el <strong>{territorioActualSinIva.impuesto}</strong>, y la
+                  renuncia es a su exención (art. 50.Cinco Ley canaria 4/2012), entre empresarios con derecho a
+                  deducción. Ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por inversión
+                  del sujeto pasivo, la operación deja de pagar ITP y la escritura paga AJD. Esta calculadora no
+                  cifra el {territorioActualSinIva.impuesto}; el AJD sí, con el tipo general de la comunidad.
                 </>
               ) : (
                 <>
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
                   comprador y vendedor son empresarios o profesionales con derecho a deducción. El IVA se autoliquida
                   por <strong>inversión del sujeto pasivo</strong> (no se paga al vendedor) y es deducible si tienes
-                  derecho. A cambio, la escritura tributa por AJD, que <strong>muchas CCAA aplican a un tipo
-                  incrementado</strong> (a menudo 1,5%–2%) en caso de renuncia; este simulador usa el AJD general.
+                  derecho. A cambio, la escritura tributa por AJD, que <strong>algunas comunidades aplican a un tipo
+                  incrementado</strong> en caso de renuncia.{' '}
+                  {/* El «(a menudo 1,5%–2%)» que iba aquí no tenía fuente. El tipo de la renuncia
+                      solo está verificado en Valencia (Ley 13/1997, art. 14.Dos: 2 %, hallazgo 1603),
+                      y ahí el simulador lo aplica; en el resto usa el general y lo dice. */}
+                  {ajdRenunciaPropio
+                    ? <>En {datosCcaaActual.nombre} es del {formatTipoNominal(ajdRenuncia.tipo)}%, y es el que aplica este simulador.</>
+                    : <>Este simulador usa el AJD general de {datosCcaaActual.nombre}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.</>}
                 </>
               )}
             </div>
@@ -913,7 +1194,7 @@ export default function SimuladorLocalComercialPage() {
             </select>
           </div>
 
-          <AvisoTerritorioSinIva ccaa={ccaa} aplica={tipoTransmision === 'primera-mano' || esRenuncia} />
+          <AvisoTerritorioSinIva ccaa={ccaa} aplica={transmision === 'primera-mano' || esRenuncia} />
 
           {/* Info CCAA */}
           <div className={styles.infoCcaa}>
@@ -924,11 +1205,16 @@ export default function SimuladorLocalComercialPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.tipoGeneral)}%</span>
+                {/* Del motor, para un local y con el precio escrito: el País Vasco grava al 7 % lo
+                    que no es vivienda, y Valencia pasa al 11 % por encima del millón (hallazgos
+                    1581 y 1582). `datosCcaaActual.tipoGeneral` es el de la vivienda. */}
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(tipoGeneralITP(ccaa, OBJETO, precioLeido))}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
+                {/* El de un local (el País Vasco ya no sale a 0 %) y, con renuncia, el de la
+                    renuncia donde está verificado (hallazgos 1583 y 1603). */}
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRenuncia.tipo)}%</span>
               </div>
               <div className={styles.infoCcaaItem}>
 {/*
@@ -950,9 +1236,10 @@ export default function SimuladorLocalComercialPage() {
                 </span>
               </div>
             </div>
-            {datosCcaaActual.tramosProgresivos && (
+            {/* Escala o umbral, con sus palabras: Valencia no tiene escala (hallazgos 1581 y 1602). */}
+            {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> Esta CCAA aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> {subidaITP}
               </p>
             )}
             <p className={styles.infoCcaaNote}>
@@ -1074,7 +1361,9 @@ export default function SimuladorLocalComercialPage() {
                     resultadosComprador.bonificado
                       ? 'Con la bonificación del 50 % de Ceuta y Melilla aplicada'
                       : esRenuncia
-                        ? 'Algunas CCAA aplican un tipo de AJD incrementado en la renuncia'
+                        ? ajdRenunciaPropio
+                          ? `Tipo propio de la renuncia a la exención del IVA en ${datosCcaaActual.nombre}`
+                          : `AJD general de ${datosCcaaActual.nombre}: algunas comunidades aplican un tipo incrementado en la renuncia`
                         : undefined
                   }
                 />
@@ -1083,7 +1372,11 @@ export default function SimuladorLocalComercialPage() {
               <ResultCard
                 title="Gastos de notaría (IVA incluido)"
                 value={formatCurrency(resultadosComprador.gastosNotario)}
-                description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
+                description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.${
+                  resultadosComprador.notariaLibre
+                    ? ` Por encima de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)} el arancel no fija cantidad: lo que excede se cobra según lo que acuerdes con el notario (RD 1426/1989, nº 2.1), y esta estimación no lo incluye.`
+                    : ''
+                }`}
                 variant="default"
                 icon="📝"
               />
@@ -1120,8 +1413,12 @@ export default function SimuladorLocalComercialPage() {
 
               <div className={styles.separador} />
 
+              {/* Las dos cifras de cierre se titulan «(PARCIAL)» con la MISMA condición que ya
+                  las rotulaba así sin el IGIC/IPSI: la gestoría ilegible y la notaría de libre
+                  acuerdo les quitan algo en la misma dirección (patrón de familia 1, hallazgo
+                  1576; y el 1599 del arancel). */}
               <ResultCard
-                title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
+                title={costeCompradorParcial ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                 value={formatCurrency(resultadosComprador.totalGastos)}
                 variant="info"
                 icon="➕"
@@ -1134,6 +1431,7 @@ export default function SimuladorLocalComercialPage() {
                     // Un importe que no se ha podido leer falta en el total igual que un impuesto
                     // sin calcular, y en la misma dirección (hallazgo 1199).
                     resultadosComprador.gestoriaLegible ? null : 'SIN la gestoría, que no se ha podido leer',
+                    resultadosComprador.notariaLibre ? 'SIN la parte de la notaría que es de libre acuerdo' : null,
                   ]
                     .filter((x): x is string => x !== null)
                     .join(' — ')
@@ -1141,15 +1439,18 @@ export default function SimuladorLocalComercialPage() {
               />
 
               <ResultCard
-                title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
+                title={costeCompradorParcial ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
                 description={
-                  resultadosComprador.impuestoNoCalculado || !resultadosComprador.gestoriaLegible
+                  costeCompradorParcial
                     ? `No incluye ${[
                         resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+                        resultadosComprador.notariaLibre
+                          ? `la parte de la notaría que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}, que es de libre acuerdo`
+                          : null,
                       ]
                         .filter((x): x is string => x !== null)
                         .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`
@@ -1236,7 +1537,8 @@ export default function SimuladorLocalComercialPage() {
                   helperText={AYUDA_ANIOS_PROPIEDAD}
                   min={0}
                   // El blur NO acota este campo: su min es 0 y el 0 SIGNIFICA la reventa antes
-                  // del año (coeficiente 0,14, el tercero más alto de la tabla), así que
+                  // del año (el coeficiente anual prorrateado por meses completos, art. 107.4
+                  // TRLRHL; hasta el 24/09/2026, un 0,14 fijo), así que
                   // reescribir al mínimo un valor imposible lo convertía en un supuesto fiscal
                   // válido y caro —2.800 € de IIVTNU a partir del «−1» que la propia app
                   // acababa de rechazar— y el neto se presentaba como definitivo (hallazgo
@@ -1244,6 +1546,29 @@ export default function SimuladorLocalComercialPage() {
                   // decide sobre un año negativo es la guarda `aniosNegativo` del useMemo.
                   acotarAlSalir={false}
                 />
+
+                {/* Con años = 0, los meses completos del prorrateo (hallazgo 1560). Un <select>
+                    y no un NumberInput: son doce valores cerrados, no un importe que se escriba mal. */}
+                {aniosEnCero && (
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label} htmlFor="meses-completos">
+                      Meses completos desde la compra
+                    </label>
+                    <select
+                      id="meses-completos"
+                      value={mesesCompletos}
+                      onChange={(e) => setMesesCompletos(e.target.value)}
+                      className={styles.select}
+                    >
+                      <option value="">Elige los meses</option>
+                      {MESES_COMPLETOS.map((m) => (
+                        <option key={m} value={String(m)}>
+                          {m === 1 ? '1 mes' : `${m} meses`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <NumberInput
                   value={valorCatastralSuelo}
@@ -1346,6 +1671,11 @@ export default function SimuladorLocalComercialPage() {
                             : '. Las amortizaciones deducidas no se han podido leer y no están restadas') +
                           (resultadosVendedor.amortizacionesImposibles
                             ? `. Atención: las amortizaciones superan todo el coste de adquisición (${formatCurrency(resultadosVendedor.costeAdquisicion)}): no puede ser, porque se amortiza solo la construcción. Revisa el dato`
+                            : '') +
+                          // Con los gastos ilegibles no se puede afirmar que sean imposibles
+                          // (hallazgo 1573): se dice qué tendrían que sumar para cuadrar.
+                          (resultadosVendedor.excesoSobrePrecio > 0
+                            ? `. Las amortizaciones superan el precio de compra: solo cuadran si los impuestos y gastos de aquella compra, que no se han podido leer, suman al menos ${formatCurrency(resultadosVendedor.excesoSobrePrecio)}`
                             : '')
                         }
                       />
@@ -1356,10 +1686,14 @@ export default function SimuladorLocalComercialPage() {
                         icon="📤"
                         // Afirmaba restar una comisión que el motor había tomado como 0 por
                         // ilegible (hallazgo 1260, la gemela del 1197).
+                        // Sin la plusvalía calculada no puede decir que la resta: el motor la tomó
+                        // como 0, y la ganancia y el IRPF de abajo son un máximo (patrón 2, 1570).
                         description={
                           resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
-                            ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
-                            : `Precio de venta − plusvalía municipal y los gastos que se leen: ${noSePudoLeer([
+                            ? resultadosVendedor.plusvaliaCalculada
+                              ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
+                              : 'Precio de venta − comisión y gestoría, sin la plusvalía municipal, que falta'
+                            : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ' (sin la plusvalía municipal, que falta)'}: ${noSePudoLeer([
                                 ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                                 ...(resultadosVendedor.gestoriaLegible ? [] : ['la gestoría de la venta']),
                               ])}`
@@ -1380,7 +1714,12 @@ export default function SimuladorLocalComercialPage() {
                       value={formatCurrency(0)}
                       variant="default"
                       icon="⚖️"
-                      description="Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar"
+                      // El cero no es firme con un importe ilegible o sin la plusvalía: lo dice el
+                      // sondeo, no un texto fijo (patrón 6, hallazgo 1575).
+                      description={
+                        avisoCero(resultadosVendedor.veredictoGanancia) ??
+                        'Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar'
+                      }
                     />
                   ) : resultadosVendedor.esPerdida ? (
                     <ResultCard
@@ -1398,7 +1737,12 @@ export default function SimuladorLocalComercialPage() {
                        salía era un «0,00 €» que no es cero, es desconocido (hallazgo 1159). */
                     resultadosVendedor.gananciaPatrimonial > 0 && (
                       <ResultCard
-                        title="Ganancia patrimonial"
+                        // Un MÁXIMO mientras falte la plusvalía (patrón 2, hallazgo 1570).
+                        title={
+                          esMaximoPorPlusvalia(resultadosVendedor.veredictoGanancia)
+                            ? 'Ganancia patrimonial (máximo)'
+                            : 'Ganancia patrimonial'
+                        }
                         value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
                         variant="default"
                         icon="📈"
@@ -1411,7 +1755,11 @@ export default function SimuladorLocalComercialPage() {
                   )}
 
                   <ResultCard
-                    title="IRPF sobre la ganancia"
+                    title={
+                      resultadosVendedor.irpfGanancia > 0 && esMaximoPorPlusvalia(resultadosVendedor.veredictoIrpf)
+                        ? 'IRPF sobre la ganancia (máximo)'
+                        : 'IRPF sobre la ganancia'
+                    }
                     // «Sin calcular» en gris, y no «SIN CUOTA» en verde, cuando falta el precio
                     // de compra: ese 0 no es una exención, es un dato que falta. Es el efecto
                     // familia del 483 que garaje, trastero y el hub ya cerraban (hallazgo 1159).
@@ -1439,8 +1787,13 @@ export default function SimuladorLocalComercialPage() {
                             : 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
                           : // Se dice aquí, donde se lee la cuota, y no solo en el neto; la
                             // dirección la da el sondeo (hallazgo 1260).
-                            (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota') ??
-                            `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`)
+                            // Sin ganancia no hay nada que tribute (la forma del hallazgo 1554).
+                            (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) ??
+                            (resultadosVendedor.gananciaPatrimonial < 0
+                              ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
+                              : resultadosVendedor.gananciaPatrimonial === 0
+                                ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
+                                : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`))
                     }
                   />
 
@@ -1502,11 +1855,23 @@ export default function SimuladorLocalComercialPage() {
                           avisos.push(`${f.charAt(0).toUpperCase()}${f.slice(1)}`);
                         }
                         if (avisoIlegiblesNeto) avisos.push(avisoIlegiblesNeto);
+                        // El par catastral imposible: la plusvalía se liquidó por el objetivo sin
+                        // compararla con el real, que puede salir más barato. `netoParcial` no lo
+                        // miraba (patrón 3, hallazgo 1571, lo que la referencia hace desde 85c9c9fe).
+                        if (resultadosVendedor.parCatastralImposible) {
+                          avisos.push(
+                            'El valor catastral del suelo supera al total, y con el recibo del IBI bien leído la plusvalía puede salir más barata por el método real: el neto real puede ser MAYOR que este',
+                          );
+                        }
                         if (avisos.length === 0) return 'Precio de venta menos impuestos, comisión y gestoría';
                         const pedir = [
                           camposPendientes.length > 0 ? `Rellena ${enumerarEnEspanol(camposPendientes)}` : null,
+                          resultadosVendedor.faltanMeses ? 'elige los meses completos desde la compra' : null,
+                          // Un año negativo no «falta»: se corrige (patrón 5, hallazgo 1578).
+                          resultadosVendedor.aniosNegativos ? 'corrige los años de propiedad (no pueden ser negativos)' : null,
                           hayIlegiblesQueCorregir ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer' : null,
                           resultadosVendedor.amortizacionesImposibles ? 'revisa las amortizaciones deducidas' : null,
+                          resultadosVendedor.parCatastralImposible ? 'revisa los dos valores catastrales del recibo del IBI' : null,
                         ].filter((x): x is string => x !== null);
                         const texto = pedir.join(' y ');
                         return `${avisos.join('. ')}. ${texto.charAt(0).toUpperCase()}${texto.slice(1)} para obtenerlo.`;
@@ -1546,7 +1911,7 @@ export default function SimuladorLocalComercialPage() {
         <section>
           <h2>Los tres escenarios fiscales de un local comercial</h2>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+            <table className={styles.tablaEscenarios} style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ background: 'var(--primary-boton)', color: '#fff' }}>
                   <th style={{ padding: '10px', textAlign: 'left' }}>Escenario</th>
@@ -1560,19 +1925,21 @@ export default function SimuladorLocalComercialPage() {
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Obra nueva (promotor)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}%</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', color: '#27ae60' }}>Sí (si sujeto pasivo)</td>
+                  {/* Colores de la tabla con variante oscura (hallazgo 1580): el #27ae60 literal
+                      daba 2,64:1 en claro, y el #c0392b de abajo 3,20:1 en oscuro. */}
+                  <td className={styles.celdaFavorable} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (si sujeto pasivo)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>Segunda mano (regla general)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0', fontWeight: 700 }}>ITP (tipo general)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>No</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0', color: '#c0392b' }}>No (ITP no se recupera)</td>
+                  <td className={styles.celdaDesfavorable} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid #e0e0e0' }}>No (ITP no se recupera)</td>
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px' }}>Segunda mano con renuncia a la exención</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 700, color: 'var(--primary)' }}>IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% (ISP)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (a menudo incrementado)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', color: '#27ae60' }}>Sí (si sujeto pasivo)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (incrementado en algunas comunidades)</td>
+                  <td className={styles.celdaFavorable} style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (si sujeto pasivo)</td>
                 </tr>
               </tbody>
             </table>
@@ -1657,11 +2024,14 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Cuánto AJD se paga si hay renuncia a la exención de IVA?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                La escritura tributa por AJD y muchas comunidades aplican un tipo incrementado (habitualmente
-                entre el 1,5% y el 2%) cuando existe renuncia a la exención de IVA, frente al tipo general,
-                que va del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su
-                régimen foral, y en Ceuta y Melilla se descuenta el 50% de la cuota. Este simulador aplica el
-                AJD general de la CCAA; confirma el tipo incrementado exacto de tu comunidad antes de firmar.
+                {/* Sin la horquilla «habitualmente entre el 1,5% y el 2%», que no tenía fuente, y
+                    sin «el País Vasco no lo cobra»: allí un local paga el 0,5 % (hallazgos 1583 y
+                    1603). El tipo de la renuncia de Valencia sale de la tabla. */}
+                La escritura tributa por AJD, y algunas comunidades aplican un tipo incrementado cuando existe
+                renuncia a la exención de IVA —la Comunitat Valenciana, el {formatTipoNominal(ITP_CCAA.valencia.ajdRenuncia ?? ITP_CCAA.valencia.ajd)}% (Ley 13/1997, art. 14)—,
+                frente al tipo general, que para un local va del {formatNumber(RANGO_AJD_OTROS.min, 1)}% al {formatNumber(RANGO_AJD_OTROS.max, 1)}% según la
+                comunidad; en Ceuta y Melilla se descuenta el 50% de la cuota. Este simulador aplica el tipo de la
+                renuncia donde está verificado y el AJD general en el resto; confirma el de tu comunidad antes de firmar.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -1722,7 +2092,7 @@ export default function SimuladorLocalComercialPage() {
           </div>
           <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
             <li>La renuncia a la exención de IVA solo es válida entre empresarios o profesionales con derecho a deducción; no todos los compradores pueden acogerse.</li>
-            <li>En la renuncia, muchas CCAA aplican un tipo de AJD incrementado; este simulador usa el AJD general, así que el coste real de AJD puede ser mayor.</li>
+            <li>En la renuncia, algunas comunidades aplican un tipo de AJD incrementado; este simulador solo lo aplica donde está verificado (Comunitat Valenciana) y en el resto usa el AJD general, así que el coste real de AJD puede ser mayor.</li>
             <li>El IVA solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
             <li>En la pestaña de vendedor, el tipo municipal del IIVTNU se estima con un valor orientativo: cada ayuntamiento fija el suyo, así que confirma el de tu municipio.</li>

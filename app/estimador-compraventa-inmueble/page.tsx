@@ -22,15 +22,31 @@ import {
   importeITP,
   TipoElegido,
   ENLACE_CATASTRO,
-  RANGO_ITP,
-  RANGO_AJD,
+  // Dos rangos desde el 24/09/2026 (hallazgos 1582 y 1583): el País Vasco grava la vivienda al
+  // 4 % y el resto al 7 %, y la exención del AJD es solo de la primera transmisión de vivienda.
+  // Este estimador es de VIVIENDA, así que sus textos citan el rango de la vivienda.
+  RANGO_ITP_VIVIENDA,
+  RANGO_AJD_VIVIENDA,
+  RANGO_AJD_OTROS,
+  tipoGeneralITP,
+  tipoAJD,
+  describirSubidaITP,
+  type ObjetoTransmision,
   BANDA_PRECIO_VIVIENDA,
   horquillaFedatarios,
   horquillaEdadJoven,
+  notariaDeLibreAcuerdo,
+  LIMITE_ARANCEL_NOTARIAL,
   TERRITORIOS_SIN_IVA,
   sumarLineasVisibles, superaElTope } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
-import { HORQUILLA_GASTOS_COMPRAVENTA, GESTORIA_TIPICA, HORQUILLA_GESTORIA } from './metadata';
+import {
+  HORQUILLA_GASTOS_COMPRAVENTA,
+  GESTORIA_TIPICA,
+  HORQUILLA_GESTORIA,
+  PREGUNTA_NO_SUJECION,
+  RESPUESTA_NO_SUJECION,
+} from './metadata';
 
 /**
  * La edad tope del tipo joven se LEE de la tabla, igual que en el FAQPage de metadata.ts.
@@ -72,7 +88,20 @@ const EJEMPLO_OBRA_NUEVA: { ccaa: ComunidadAutonoma; precio: number } = {
   precio: 180000,
 };
 const EJEMPLO_OBRA_NUEVA_IVA = EJEMPLO_OBRA_NUEVA.precio * (IVA_INMUEBLES_2025.obraNueva / 100);
-const EJEMPLO_OBRA_NUEVA_AJD = calcularAJD(EJEMPLO_OBRA_NUEVA.precio, EJEMPLO_OBRA_NUEVA.ccaa);
+/**
+ * El AJD de Carlos es el de la VIVIENDA sin la rebaja de la vivienda habitual: es lo que cobra
+ * la calculadora, que no pregunta si lo será. Desde el 24/09/2026 Valencia tiene los dos tipos
+ * (1,4 % general y 0,1 % en vivienda habitual, Ley 13/1997, art. 14) y el ejemplo nombra los dos.
+ */
+const EJEMPLO_OBRA_NUEVA_AJD_TIPO = tipoAJD(EJEMPLO_OBRA_NUEVA.ccaa, { objeto: 'vivienda' }).tipo;
+const EJEMPLO_OBRA_NUEVA_AJD = calcularAJD(EJEMPLO_OBRA_NUEVA.precio, EJEMPLO_OBRA_NUEVA.ccaa, { objeto: 'vivienda' });
+const EJEMPLO_OBRA_NUEVA_AJD_HABITUAL = tipoAJD(EJEMPLO_OBRA_NUEVA.ccaa, {
+  objeto: 'vivienda',
+  viviendaHabitual: true,
+});
+
+/** El tipo de ITP del País Vasco para lo que no es vivienda, leído de la tabla (hallazgo 1582). */
+const ITP_PV_NO_VIVIENDA = tipoGeneralITP('pais-vasco', 'otro', 0);
 
 /**
  * El caso de Marta, por la misma vía que el de Carlos: DEL MOTOR, no de la memoria.
@@ -147,6 +176,44 @@ const EJEMPLO_MARTA_AHORRO =
 // Inmuebles que pueden optar a tipos reducidos de ITP (solo residenciales)
 const INMUEBLES_RESIDENCIALES: TipoInmueble[] = ['vivienda', 'garaje', 'trastero'];
 
+/**
+ * Qué se transmite, a efectos del ITP y del AJD: el motor lo exige desde el 24/09/2026 porque
+ * el País Vasco grava la vivienda al 4 % y el resto de inmuebles al 7 %, y exime del AJD solo
+ * la primera transmisión de vivienda (hallazgos 1582 y 1583).
+ *  · ITP de segunda mano: solo la VIVIENDA. El garaje y el trastero se calculan aquí con SU
+ *    precio, es decir sueltos, que es la misma razón por la que no son vivienda habitual
+ *    (hallazgo 833); y el local, la nave y el terreno no lo son nunca.
+ *  · AJD de obra nueva: la vivienda y sus anejos, porque en primera mano esta app los trata como
+ *    transmitidos CON la vivienda (IVA del anejo vinculado); la exención foral alcanza a hasta
+ *    dos garajes y anexos del mismo edificio (NF 1/2011 de Bizkaia, art. 58.35).
+ */
+const objetoITPDe = (t: TipoInmueble): ObjetoTransmision => (t === 'vivienda' ? 'vivienda' : 'otro');
+const objetoAJDDe = (t: TipoInmueble): ObjetoTransmision =>
+  INMUEBLES_RESIDENCIALES.includes(t) ? 'vivienda' : 'otro';
+
+/**
+ * «la comisión inmobiliaria lo bajaría» · «las mejoras lo subirían»: el verbo concuerda con el
+ * SUJETO, no con el número de campos (hallazgo 1555). Es la regla de `esPlural` de
+ * lib/sondeoIlegibles.ts, que no se exporta.
+ */
+const sujetoPlural = (partes: readonly string[]): boolean =>
+  partes.length > 1 || /^(los|las)\s/i.test(partes[0] ?? '');
+/** «Escríbelo» detrás de un importe, «Escríbelos» detrás de dos o más (hallazgo 1555). */
+const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
+
+/** Cada inmueble con su artículo, para las frases que lo nombran. */
+const CON_ARTICULO: Record<TipoInmueble, string> = {
+  vivienda: 'una vivienda',
+  garaje: 'un garaje',
+  trastero: 'un trastero',
+  local: 'un local comercial',
+  nave: 'una nave industrial',
+  terreno: 'un terreno',
+};
+
+/** Los meses completos del periodo inferior a un año, para el prorrateo del art. 107.4 TRLRHL. */
+const MESES_COMPLETOS = Array.from({ length: 12 }, (_, m) => m);
+
 // Normaliza tildes para comparar nombres de tipos reducidos (ej: "Jóvenes" → "jovenes")
 
 interface ResultadosComprador {
@@ -169,6 +236,12 @@ interface ResultadosComprador {
    * contrato de `elegirTipoITP`: «quien presupuesta 0 y paga 12.000 tiene un problema».
    */
   gestoriaLegible: boolean;
+  /**
+   * Por encima de 6.010.121,04 € el arancel no fija cantidad: el exceso es de libre acuerdo
+   * con el notario (RD 1426/1989, nº 2.1; hallazgo 1599). La notaría estimada solo cubre la
+   * parte reglada, así que el coste total no es definitivo.
+   */
+  notariaLibre: boolean;
   totalGastos: number;
   totalOperacion: number;
   /** null en primera mano (allí es IVA, no ITP) */
@@ -210,6 +283,19 @@ interface ResultadosVendedor {
   faltaPrecioCompra: boolean;
   faltaValorSuelo: boolean;
   faltaAnios: boolean;
+  /**
+   * Los años están escritos y se leen, pero son negativos: no «faltan», son imposibles, y el
+   * aviso tiene que decirlo así (patrón de familia 5, hallazgo 1552 y hermanos).
+   */
+  aniosNegativos: boolean;
+  /** Años = 0 sin los meses completos elegidos: el coeficiente se prorratea por ellos (1560). */
+  faltanMeses: boolean;
+  /**
+   * La plusvalía FALTA (no se ha podido calcular) y la ganancia sí: al calcularla restará del
+   * valor de transmisión (art. 35.1 LIRPF), así que la ganancia y el IRPF publicados son un
+   * MÁXIMO (patrón de familia 2).
+   */
+  plusvaliaPendiente: boolean;
   /**
    * Los importes cuyo TEXTO el parser no ha podido leer (hallazgo 1190, ALTO).
    *
@@ -262,6 +348,8 @@ interface EntradaVendedor {
   precioC: number;
   /** Años enteros ya validados; NaN si faltan, no se leen o son negativos */
   anios: number;
+  /** Meses completos cuando los años son 0 (prorrateo del art. 107.4 TRLRHL); si no, undefined */
+  meses: number | undefined;
   valorSuelo: number;
   valorTotal: number | undefined;
   comisionPct: number;
@@ -281,11 +369,23 @@ interface EntradaVendedor {
  */
 function calcularVendedor(e: EntradaVendedor) {
   const comision = e.precioV * e.comisionPct;
-  const plusvaliaCalculable = e.valorSuelo > 0 && Number.isFinite(e.anios) && e.precioC > 0;
+  /**
+   * Vendiendo por el precio de compra o por debajo no hay incremento de valor, y la no sujeción
+   * del art. 104.5 TRLRHL no depende del suelo ni de los años: el motor la decide con venta −
+   * compra ≤ 0. Hasta el 24/09/2026 la plusvalía quedaba «Sin calcular» sin el suelo, el neto
+   * salía «(PARCIAL)» y se mandaba al recibo del IBI a por un dato que no cambia nada (patrón de
+   * familia 4, hallazgos 1548, 1564 y 1572).
+   */
+  const sinIncremento = e.precioC > 0 && e.precioV <= e.precioC;
+  /** Con años = 0 hacen falta además los meses completos, para prorratear el coeficiente (1560). */
+  const periodoCompleto = Number.isFinite(e.anios) && (e.anios >= 1 || e.meses !== undefined);
+  const plusvaliaCalculable = e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
   const resultadoPlusvalia = plusvaliaCalculable
     ? calcularPlusvaliaMunicipal({
-        valorCatastralSuelo: e.valorSuelo,
-        aniosPropiedad: e.anios,
+        // Sin incremento el suelo y los años no intervienen (sale no sujeta): se pasan a 0.
+        valorCatastralSuelo: e.valorSuelo > 0 ? e.valorSuelo : 0,
+        aniosPropiedad: Number.isFinite(e.anios) ? e.anios : 0,
+        mesesCompletos: e.meses,
         precioCompra: e.precioC,
         precioVenta: e.precioV,
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
@@ -429,6 +529,8 @@ export default function SimuladorCompraventaPage() {
   // Datos del vendedor (para plusvalía)
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
+  /** Meses completos cuando se vende antes de cumplir el año ('' = sin elegir). */
+  const [mesesCompletos, setMesesCompletos] = useState('');
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
   const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [vendedorMayor65, setVendedorMayor65] = useState(false);
@@ -462,7 +564,9 @@ export default function SimuladorCompraventaPage() {
   // ===== CÁLCULOS =====
   const resultadosComprador = useMemo((): ResultadosComprador | null => {
     const precio = parseSpanishNumber(precioVenta);
-    if (!Number.isFinite(precio) || precio <= 0) return null;
+    // Sobre el precio que se PINTA, al céntimo: «0,004» se pinta «0,00 €» y publicaba un desglose
+    // entero sobre un precio que se ve como cero (hallazgo 1601, decisión común de la familia).
+    if (!Number.isFinite(precio) || Math.round(precio * 100) <= 0) return null;
 
     // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
     // un importe negativo se sumaba al total y su tarjeta ni se pintaba (guard > 0).
@@ -544,6 +648,7 @@ export default function SimuladorCompraventaPage() {
       const perfilEfectivo: PerfilComprador = esResidencial ? perfilComprador : 'general';
       const elegido = elegirTipoITP(ccaa, perfilEfectivo, precio, {
         viviendaHabitual: puedeSerViviendaHabitual,
+        objeto: objetoITPDe(tipoInmueble),
       });
       tipoElegido = elegido;
       impuesto = importeITP(precio, ccaa, elegido);
@@ -555,7 +660,10 @@ export default function SimuladorCompraventaPage() {
 
     // AJD: Solo aplica en primera mano (junto con IVA). En segunda mano se paga ITP, no AJD
     // El AJD en segunda mano solo aplicaría sobre la escritura de hipoteca (no sobre la compraventa)
-    const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
+    // Sin `viviendaHabitual`: la app no pregunta si lo será, y Valencia la grava al 0,1 % frente
+    // al 1,4 % general. Se cobra el general y la tarjeta del AJD enseña la rebaja (24/09/2026).
+    const ajd =
+      tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa, { objeto: objetoAJDDe(tipoInmueble) }) : 0;
 
     const notaria = estimarFacturaNotarial(precio);
 
@@ -581,6 +689,7 @@ export default function SimuladorCompraventaPage() {
       gastosRegistro: registro,
       gastosGestoria: gestoria,
       gestoriaLegible,
+      notariaLibre: notariaDeLibreAcuerdo(precio),
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido,
@@ -592,8 +701,8 @@ export default function SimuladorCompraventaPage() {
     const precioC = parseSpanishNumber(precioCompraOriginal);
     // Los años se leen del STRING, no del número: «0» es un dato VÁLIDO —el inmueble
     // revendido antes de cumplir el año, que tributa con el coeficiente de «Menos de 1
-    // año» de COEFICIENTES_IIVTNU_2025 (0,14, el tercero más alto de la tabla)— y lo que
-    // impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
+    // año» de COEFICIENTES_IIVTNU_2025 prorrateado por meses completos (hallazgo 1560)— y lo
+    // que impide calcular es el campo VACÍO. Con `parseInt(aniosPropiedad) || 0` los dos
     // valían 0: el 0 explícito dejaba la plusvalía «Sin calcular» y fuera del neto, y en
     // cuanto el blur del NumberInput reescribía el campo a «1» por su min={1} se liquidaba
     // con el coeficiente del año 1 (0,13), es decir DE MENOS. Los dos caminos infravaloran
@@ -614,10 +723,18 @@ export default function SimuladorCompraventaPage() {
     const aniosNegativo = aniosBruto < 0 || Object.is(aniosBruto, -0);
     const anios = Math.trunc(aniosBruto);
     const aniosDisponibles = Number.isFinite(anios) && !aniosNegativo;
+    /**
+     * Por debajo del año el art. 107.4 TRLRHL prorratea el coeficiente anual por los meses
+     * completos, así que con años = 0 hacen falta los meses: mientras no se elijan faltan, como
+     * cualquier dato vacío (hallazgo 1560). Hasta el 24/09/2026 se aplicaba el coeficiente
+     * ENTERO, por encima de lo que la ley permite para cualquier reventa dentro del año.
+     */
+    const meses = aniosDisponibles && anios === 0 && mesesCompletos !== '' ? Number(mesesCompletos) : undefined;
     const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
     const valorTotal = parseSpanishNumber(valorCatastralTotal);
 
-    if (!Number.isFinite(precioV) || precioV <= 0) return null;
+    // Al céntimo, como el comprador: un precio de venta que se pinta 0,00 € no es un precio (1601).
+    if (!Number.isFinite(precioV) || Math.round(precioV * 100) <= 0) return null;
 
     // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
     // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (guard > 0),
@@ -645,12 +762,23 @@ export default function SimuladorCompraventaPage() {
     const hipotecaLegible = esLegible(hipotecaPendiente);
     const valorTotalLegible = esLegible(valorCatastralTotal);
 
-    const exentoIRPF = vendedorMayor65 && esViviendaHabitual;
-    const puedeReinvertir = esViviendaHabitual && reinvierte && !exentoIRPF;
+    /**
+     * Las dos exenciones de la ganancia —mayores de 65 (art. 33.4.b LIRPF) y reinversión (art. 38
+     * LIRPF)— son de la VIVIENDA habitual. Hasta el 24/09/2026 se aplicaban a un local, una nave
+     * o un terreno, porque «Es mi vivienda habitual» venía marcada por defecto sea cual sea el
+     * inmueble y aquí no se miraba el tipo: 19.534 € de IRPF de menos en el caso del acta
+     * (hallazgo 1553, ALTO). Es lo que el comprador ya resolvía (`puedeSerViviendaHabitual`,
+     * hallazgo 833), lo que las hermanas garaje, trastero y local no aplican nunca y lo que el
+     * JSON-LD de esta página afirma. Las casillas ya solo se pintan con «Vivienda».
+     */
+    const puedeSerViviendaHabitual = tipoInmueble === 'vivienda';
+    const exentoIRPF = puedeSerViviendaHabitual && vendedorMayor65 && esViviendaHabitual;
+    const puedeReinvertir = puedeSerViviendaHabitual && esViviendaHabitual && reinvierte && !exentoIRPF;
     const entrada: EntradaVendedor = {
       precioV,
       precioC,
       anios: aniosDisponibles ? anios : NaN,
+      meses,
       valorSuelo,
       valorTotal: valorTotal > 0 ? valorTotal : undefined,
       comisionPct,
@@ -690,11 +818,14 @@ export default function SimuladorCompraventaPage() {
               : 'Método objetivo (más favorable)';
     }
 
-    // Escrito pero ilegible no es «falta» (hallazgo 1231): se nombra aparte.
+    // Escrito pero ilegible no es «falta» (hallazgo 1231): se nombra aparte. Y con la plusvalía
+    // ya resuelta (sin incremento no hace falta el suelo ni los años, patrón 4) esos dos campos
+    // no bloquean nada: nombrarlos marcaría «(PARCIAL)» un neto que es definitivo.
+    const plusvaliaResuelta = rp !== null;
     const ilegibleTexto = (t: string) => escritoIlegible(t, parseSpanishNumber);
     const camposIlegibles = [
-      ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
-      ilegibleTexto(aniosPropiedad) ? 'los años de tenencia' : null,
+      !plusvaliaResuelta && ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
+      !plusvaliaResuelta && ilegibleTexto(aniosPropiedad) ? 'los años de tenencia' : null,
       ilegibleTexto(precioCompraOriginal) ? 'el precio de compra original' : null,
     ].filter((x): x is string => x !== null);
 
@@ -794,8 +925,12 @@ export default function SimuladorCompraventaPage() {
       // !(x > 0) y no «x <= 0»: con el campo vacío, parseSpanishNumber devuelve NaN, y
       // NaN <= 0 es false — el mismo bug que el propio hallazgo 512 venía a cerrar.
       faltaPrecioCompra: !(precioC > 0),
-      faltaValorSuelo: !(valorSuelo > 0),
-      faltaAnios: !aniosDisponibles,
+      faltaValorSuelo: !plusvaliaResuelta && !(valorSuelo > 0),
+      // Un año negativo no «falta»: está escrito y es imposible (patrón 5, hallazgo 1552).
+      faltaAnios: !plusvaliaResuelta && !aniosDisponibles && !aniosNegativo,
+      aniosNegativos: !plusvaliaResuelta && aniosNegativo,
+      faltanMeses: !plusvaliaResuelta && aniosDisponibles && anios === 0 && meses === undefined,
+      plusvaliaPendiente: !plusvaliaResuelta && hayDatosGanancia,
       comisionLegible,
       otrosVentaLegible,
       gastosAdquisicionLegible,
@@ -814,7 +949,7 @@ export default function SimuladorCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioVenta, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente]);
+  }, [precioVenta, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble]);
 
   /**
    * Estima los impuestos y gastos que el vendedor pagó al comprar el inmueble, para
@@ -835,7 +970,8 @@ export default function SimuladorCompraventaPage() {
     // corto infla la ganancia y el IRPF. La misma página daba dos ITP distintos para
     // el mismo precio. No se aplican tipos reducidos a propósito: es una estimación de
     // lo que se pagó hace años, y el perfil del comprador de entonces no se pregunta.
-    const itp = calcularITP(precioC, ccaa);
+    // Con el objeto del inmueble: en el País Vasco una vivienda pagó el 4 % y un local el 7 %.
+    const itp = calcularITP(precioC, ccaa, objetoITPDe(tipoInmueble));
     // Las CUATRO partidas que enumera el rótulo del campo que se rellena («ITP o IVA,
     // notaría, registro y gestoría de aquella compra»). La gestoría faltaba: la pestaña
     // Comprador de esta misma app la suma para el mismo precio (GESTORIA_TIPICA), así que
@@ -848,6 +984,34 @@ export default function SimuladorCompraventaPage() {
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   const esInmuebleResidencial = INMUEBLES_RESIDENCIALES.includes(tipoInmueble);
+  /** El precio escrito, para rotular el tipo que le toca (0 mientras no se lea). */
+  const precioLeido = (() => {
+    const p = parseSpanishNumber(precioVenta);
+    return Number.isFinite(p) && p > 0 ? p : 0;
+  })();
+  /**
+   * Cómo sube el tipo con el valor, en palabras del motor, que distingue la escala (cada tramo a
+   * su tipo) del umbral de Valencia (el 11 % sobre TODO el valor): el recuadro decía «escala
+   * progresiva (9 % → 11 %)» y describía justo el cálculo equivocado (hallazgos 1581 y 1602).
+   */
+  const subidaITP = (() => {
+    const texto = describirSubidaITP(ccaa);
+    if (texto === null) return null;
+    return ITP_CCAA[ccaa].umbralTipoUnico ? `En esta comunidad, ${texto}.` : `Esta comunidad ${texto}.`;
+  })();
+  /** Años escritos que se leen como 0 (reventa antes del año): hay que preguntar los meses. */
+  const aniosEnCero = (() => {
+    const t = aniosPropiedad.trim();
+    if (t === '') return false;
+    const n = parseSpanishNumber(t);
+    return Number.isFinite(n) && n >= 0 && !Object.is(n, -0) && Math.trunc(n) === 0;
+  })();
+  /** Al coste del comprador le falta algo: el IGIC/IPSI, la gestoría ilegible o la notaría libre. */
+  const costeCompradorParcial =
+    !!resultadosComprador &&
+    (resultadosComprador.impuestoNoCalculado ||
+      !resultadosComprador.gestoriaLegible ||
+      resultadosComprador.notariaLibre);
 
   /**
    * Las partidas que el neto del vendedor NO está descontando porque faltan datos.
@@ -896,8 +1060,15 @@ export default function SimuladorCompraventaPage() {
     const v = resultadosVendedor?.veredictoNeto;
     if (!v || v.tipo === 'ninguno') return null;
     if (v.tipo === 'mixto') {
-      // Con dos ilegibles opuestos no se puede afirmar una dirección (hallazgo 1229).
-      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${v.menor.length > 1 ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${v.mayor.length > 1 ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
+      // Con dos ilegibles opuestos no se puede afirmar una dirección (hallazgo 1229). El verbo
+      // concuerda con el sujeto: «las mejoras lo subirían», no «lo subiría» (hallazgo 1555).
+      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${sujetoPlural(v.menor) ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${sujetoPlural(v.mayor) ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
+    }
+    if (v.tipo === 'mayor' && faltanEnElNeto.length > 0) {
+      // Un ilegible que SUBIRÍA el neto no permite afirmar «el neto real es MAYOR» si a la vez
+      // FALTA un impuesto que lo bajaría: el sondeo solo mide los ilegibles, y la dirección
+      // segura era falsa en cuanto se rellenaba el dato vacío (hallazgo 1561).
+      return `Sin cerrar: ${noSePudoLeer(v.campos)} y ${sujetoPlural(v.campos) ? 'lo subirían' : 'lo subiría'}, pero ${faltaOFaltan(faltanEnElNeto)}, que ${sujetoPlural(faltanEnElNeto) ? 'lo bajarían' : 'lo bajaría'}: no se puede saber si el neto real es mayor o menor que este`;
     }
     if (v.tipo === 'menor') {
       const deducibles = v.campos.filter(
@@ -919,9 +1090,22 @@ export default function SimuladorCompraventaPage() {
     return `${mayuscula(noSePudoLeer(explica))}: el neto real ${v.seguro ? 'es' : 'puede ser'} MAYOR que este`;
   })();
 
-  /** Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve. */
-  const avisoTarjeta = (v: Veredicto, que: string): string | null => {
-    if (v.tipo === 'ninguno') return null;
+  /**
+   * ¿La plusvalía FALTA mientras la ganancia sí se calcula? Al calcularse restará del valor de
+   * transmisión (art. 35.1 LIRPF): la ganancia y el IRPF publicados son un MÁXIMO, y la pérdida
+   * un mínimo (patrón de familia 2, hallazgos 1546, 1562 y 1570).
+   */
+  const plusvaliaPendiente = resultadosVendedor?.plusvaliaPendiente ?? false;
+
+  /**
+   * Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve, o cuando falta
+   * la plusvalía, que la bajaría (patrón 2). Si los dos tiran en sentidos contrarios la app no
+   * puede saber hacia dónde queda la cifra real, y lo dice.
+   */
+  const avisoTarjeta = (v: Veredicto, que: string, cuentaPlusvalia = true): string | null => {
+    const pendiente = cuentaPlusvalia && plusvaliaPendiente;
+    const frasePlusvalia = `No resta la plusvalía municipal, que falta, así que ${que} real puede ser menor`;
+    if (v.tipo === 'ninguno') return pendiente ? `${frasePlusvalia}.` : null;
     // El caso caro es la reinversión: sin leerla, el motor no aplica la exención del art. 38
     // LIRPF y cobra el IRPF entero de una ganancia que puede estar exenta al 100 % (1190).
     const reinversionSinLeer =
@@ -930,20 +1114,52 @@ export default function SimuladorCompraventaPage() {
     const art38 = reinversionSinLeer
       ? ' Sin el importe que reinviertes, esta cuota NO aplica la exención del art. 38 LIRPF: escríbelo para comprobar si la ganancia queda exenta.'
       : '';
-    if (v.tipo === 'mixto') {
-      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven ${que} en sentidos contrarios. Escríbelos con coma decimal (1.234,56).${art38}`;
+    if (v.tipo === 'mixto' || (pendiente && v.tipo === 'mayor')) {
+      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      return `Sin cerrar: ${pendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven ${que} en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).${art38}`;
     }
-    return `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. Escríbelo con coma decimal (1.234,56).${v.tipo === 'menor' ? art38 : ''}`;
+    // «Escríbelos» detrás de dos importes (hallazgo 1555).
+    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. ${escribelo(v.campos)} con coma decimal (1.234,56).${v.tipo === 'menor' ? art38 : ''}`;
+    return pendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
-  /** La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. */
+  /** La cifra es un MÁXIMO por la plusvalía que falta y ningún ilegible tira en contra. */
+  const esMaximoPorPlusvalia = (v: Veredicto): boolean =>
+    plusvaliaPendiente && (v.tipo === 'ninguno' || v.tipo === 'menor');
+
+  /**
+   * La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. Abre en
+   * mayúscula, como los demás avisos de la redacción común (hallazgo 1555).
+   */
   const avisoPerdida = (v: Veredicto): string | null => {
-    if (v.tipo === 'ninguno') return null;
-    if (v.tipo === 'mixto') {
-      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])} y mueven la pérdida en sentidos contrarios. Escríbelos con coma decimal (1.234,56).`;
+    const frasePlusvalia = 'No resta la plusvalía municipal, que falta, así que la pérdida real puede ser mayor que esta';
+    if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
+    if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
+      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven la pérdida en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const mayorPerdida = v.tipo === 'menor';
-    return `${noSePudoLeer(v.campos)}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. Escríbelo con coma decimal (1.234,56).`;
+    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
+  };
+
+  /**
+   * «Sin ganancia ni pérdida» con un importe ilegible o con la plusvalía pendiente: ese cero no
+   * es firme, y la tarjeta no puede negar una pérdida (o una ganancia) que la app sabe que puede
+   * haber. Tenía texto fijo y no miraba el sondeo (patrón 6, hallazgos 1549, 1565 y 1575).
+   */
+  const avisoCero = (v: Veredicto): string | null => {
+    const frasePlusvalia = 'No resta la plusvalía municipal, que falta: con ella puede haber una pérdida que se compensaría en la declaración';
+    if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
+    if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
+      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y tiran en sentidos contrarios: puede haber ganancia o pérdida. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
+    }
+    const ilegible =
+      v.tipo === 'menor'
+        ? `${mayuscula(noSePudoLeer(v.campos))}, así que ${v.seguro ? 'hay' : 'puede haber'} una pérdida que se compensaría en la declaración. ${escribelo(v.campos)} con coma decimal (1.234,56).`
+        : `${mayuscula(noSePudoLeer(v.campos))}, así que ${v.seguro ? 'hay' : 'puede haber'} una ganancia, y con ella IRPF. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
   /**
@@ -963,8 +1179,23 @@ export default function SimuladorCompraventaPage() {
         resultadosVendedor.faltaAnios && !resultadosVendedor.camposIlegibles.includes('los años de tenencia')
           ? 'los años de tenencia'
           : null,
+        // Con años = 0, los meses completos del prorrateo (hallazgo 1560).
+        resultadosVendedor.faltanMeses ? 'los meses completos desde la compra' : null,
       ].filter((x): x is string => x !== null)
     : [];
+
+  /**
+   * El cero del IRPF es de una EXENCIÓN solo si hay ganancia que eximir: por edad, o por
+   * reinversión total. Sin ganancia no hay nada exento ni nada que tribute (hallazgo 1554).
+   */
+  const irpfExento =
+    !!resultadosVendedor &&
+    resultadosVendedor.irpfCalculado &&
+    resultadosVendedor.gananciaPatrimonial > 0 &&
+    (resultadosVendedor.exentoIRPF || resultadosVendedor.baseImponibleIRPF === 0);
+
+  /** Los años escritos en negativo: no faltan, son imposibles (patrón 5, hallazgo 1552). */
+  const AVISO_ANIOS_NEGATIVOS = 'los años de tenencia no pueden ser negativos';
 
   const netoParcial =
     faltanEnElNeto.length > 0 ||
@@ -1152,16 +1383,25 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.tipoGeneral)}%</span>
+                {/* Del motor, con lo que se transmite y el precio: el País Vasco grava al 7 % lo
+                    que no es vivienda, y Valencia pasa al 11 % por encima del millón (hallazgos
+                    1581 y 1582). `datosCcaaActual.tipoGeneral` es solo el de la vivienda. */}
+                <span className={styles.infoCcaaValue}>
+                  {formatTipoNominal(tipoGeneralITP(ccaa, objetoITPDe(tipoInmueble), precioLeido))}%
+                </span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(datosCcaaActual.ajd)}%</span>
+                <span className={styles.infoCcaaValue}>
+                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoInmueble) }).tipo)}%
+                </span>
               </div>
             </div>
-            {datosCcaaActual.tramosProgresivos && (
+            {/* Escala o umbral, con las palabras de cada uno: Valencia no tiene escala, sino un
+                11 % sobre TODO el valor por encima del millón (hallazgos 1581 y 1602). */}
+            {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${formatTipoNominal(t.tipo)}%`).join(' → ')})
+                <span aria-hidden="true">⚠️</span> {subidaITP}
               </p>
             )}
             <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>
@@ -1287,13 +1527,26 @@ export default function SimuladorCompraventaPage() {
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
+                      description={(() => {
+                        // Donde la vivienda habitual tiene un AJD propio (Valencia, 0,1 %, Ley
+                        // 13/1997 art. 14), se cobra el general —la app no pregunta si lo será— y
+                        // se enseña la rebaja, como los tipos reducidos del ITP (24/09/2026).
+                        if (tipoInmueble !== 'vivienda') return undefined;
+                        const habitual = tipoAJD(ccaa, { objeto: 'vivienda', viviendaHabitual: true });
+                        if (habitual.motivo !== 'vivienda-habitual') return undefined;
+                        return `Si va a ser tu vivienda habitual, en ${datosCcaaActual.nombre} el AJD baja al ${formatTipoNominal(habitual.tipo)} %: serían ${formatCurrency(calcularAJD(resultadosComprador.precioInmueble, ccaa, { objeto: 'vivienda', viviendaHabitual: true }))}. No lo aplicamos porque no lo preguntamos.`;
+                      })()}
                     />
                   )}
 
                   <ResultCard
                     title="Gastos de notaría (IVA incluido)"
                     value={formatCurrency(resultadosComprador.gastosNotario)}
-                    description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.`}
+                    description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.${
+                      resultadosComprador.notariaLibre
+                        ? ` Por encima de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)} el arancel no fija cantidad: lo que excede se cobra según lo que acuerdes con el notario (RD 1426/1989, nº 2.1), y esta estimación no lo incluye.`
+                        : ''
+                    }`}
                     variant="default"
                     icon="📝"
                   />
@@ -1330,8 +1583,13 @@ export default function SimuladorCompraventaPage() {
 
                   <div className={styles.separador} />
 
+                  {/* Las dos cifras de cierre se titulan «(PARCIAL)» con la MISMA condición que
+                      ya las rotulaba así sin el IGIC/IPSI: les falta algo en la misma dirección.
+                      La gestoría ilegible y la notaría de libre acuerdo se quedaban fuera, con la
+                      descripción diciendo «será mayor» bajo un título de definitivo (patrón de
+                      familia 1, hallazgo 1556; y el 1599 del arancel). */}
                   <ResultCard
-                    title={resultadosComprador.impuestoNoCalculado ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
+                    title={costeCompradorParcial ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales'}
                     value={formatCurrency(resultadosComprador.totalGastos)}
                     variant="info"
                     icon="➕"
@@ -1346,6 +1604,9 @@ export default function SimuladorCompraventaPage() {
                         resultadosComprador.gestoriaLegible
                           ? null
                           : 'SIN la gestoría, que no se ha podido leer',
+                        resultadosComprador.notariaLibre
+                          ? 'SIN la parte de la notaría que es de libre acuerdo'
+                          : null,
                       ]
                         .filter((x): x is string => x !== null)
                         .join(' — ')
@@ -1353,12 +1614,12 @@ export default function SimuladorCompraventaPage() {
                   />
 
                   <ResultCard
-                    title={resultadosComprador.impuestoNoCalculado ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
+                    title={costeCompradorParcial ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN'}
                     value={formatCurrency(resultadosComprador.totalOperacion)}
                     variant="highlight"
                     icon="💳"
                     description={
-                      resultadosComprador.impuestoNoCalculado || !resultadosComprador.gestoriaLegible
+                      costeCompradorParcial
                         ? `No incluye ${[
                             resultadosComprador.impuestoNoCalculado
                               ? `el ${resultadosComprador.tipoImpuesto}`
@@ -1366,6 +1627,9 @@ export default function SimuladorCompraventaPage() {
                             resultadosComprador.gestoriaLegible
                               ? null
                               : 'la gestoría, que no se ha podido leer',
+                            resultadosComprador.notariaLibre
+                              ? `la parte de la notaría que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}, que es de libre acuerdo`
+                              : null,
                           ]
                             .filter((x): x is string => x !== null)
                             .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`
@@ -1503,7 +1767,10 @@ export default function SimuladorCompraventaPage() {
                   onChange={setAniosPropiedad}
                   label="Años de propiedad"
                   placeholder="10"
-                  helperText="Años completos desde la compra hasta ahora. Escribe 0 si vendes antes de cumplir el año: esa reventa también tributa, y con un coeficiente mayor."
+                  // «con un coeficiente mayor» era falso: por debajo del año el coeficiente
+                  // anual se PRORRATEA por meses completos (art. 107.4 TRLRHL), así que siempre
+                  // es menor que el de un año entero (hallazgo 1560).
+                  helperText="Años completos desde la compra hasta ahora. Escribe 0 si vendes antes de cumplir el año: esa reventa también tributa, y te preguntaremos los meses completos, porque el coeficiente se prorratea por ellos."
                   /*
                     SIN min={0} a propósito (hallazgo 722). El motor rechaza por escrito el año
                     negativo —acotarlo lo convertiría en una reventa antes del año y liquidaría un
@@ -1515,6 +1782,30 @@ export default function SimuladorCompraventaPage() {
                   */
                   max={50}
                 />
+
+                {/* Con años = 0, los meses completos: el art. 107.4 TRLRHL prorratea el
+                    coeficiente anual por ellos (hallazgo 1560). Un <select> y no un NumberInput:
+                    son doce valores cerrados y no un importe que pueda escribirse mal. */}
+                {aniosEnCero && (
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label} htmlFor="meses-completos">
+                      Meses completos desde la compra
+                    </label>
+                    <select
+                      id="meses-completos"
+                      value={mesesCompletos}
+                      onChange={(e) => setMesesCompletos(e.target.value)}
+                      className={styles.select}
+                    >
+                      <option value="">Elige los meses</option>
+                      {MESES_COMPLETOS.map((m) => (
+                        <option key={m} value={String(m)}>
+                          {m === 1 ? '1 mes' : `${m} meses`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div className={styles.campoConAccion}>
                   <NumberInput
@@ -1581,36 +1872,47 @@ export default function SimuladorCompraventaPage() {
                   min={0}
                 />
 
-                <div className={styles.checkboxGroup}>
-                  <label className={styles.checkbox}>
-                    <input
-                      type="checkbox"
-                      checked={esViviendaHabitual}
-                      onChange={(e) => setEsViviendaHabitual(e.target.checked)}
-                    />
-                    <span>Es mi vivienda habitual</span>
-                  </label>
-                  <label className={styles.checkbox}>
-                    <input
-                      type="checkbox"
-                      checked={vendedorMayor65}
-                      onChange={(e) => setVendedorMayor65(e.target.checked)}
-                    />
-                    <span>Soy mayor de 65 años</span>
-                  </label>
-                  {esViviendaHabitual && !vendedorMayor65 && (
+                {/* Las dos exenciones de la ganancia son de la VIVIENDA habitual (arts. 33.4.b y
+                    38 LIRPF): con otro inmueble las casillas no se ofrecen, en vez de venir
+                    marcadas y eximir a un local, una nave o un terreno (hallazgo 1553, ALTO). */}
+                {tipoInmueble === 'vivienda' ? (
+                  <div className={styles.checkboxGroup}>
                     <label className={styles.checkbox}>
                       <input
                         type="checkbox"
-                        checked={reinvierte}
-                        onChange={(e) => setReinvierte(e.target.checked)}
+                        checked={esViviendaHabitual}
+                        onChange={(e) => setEsViviendaHabitual(e.target.checked)}
                       />
-                      <span>Voy a reinvertir en otra vivienda habitual</span>
+                      <span>Es mi vivienda habitual</span>
                     </label>
-                  )}
-                </div>
+                    <label className={styles.checkbox}>
+                      <input
+                        type="checkbox"
+                        checked={vendedorMayor65}
+                        onChange={(e) => setVendedorMayor65(e.target.checked)}
+                      />
+                      <span>Soy mayor de 65 años</span>
+                    </label>
+                    {esViviendaHabitual && !vendedorMayor65 && (
+                      <label className={styles.checkbox}>
+                        <input
+                          type="checkbox"
+                          checked={reinvierte}
+                          onChange={(e) => setReinvierte(e.target.checked)}
+                        />
+                        <span>Voy a reinvertir en otra vivienda habitual</span>
+                      </label>
+                    )}
+                  </div>
+                ) : (
+                  <p className={styles.derivacionPie} role="note">
+                    La exención de los mayores de 65 años (art. 33.4.b LIRPF) y la de reinversión
+                    (art. 38 LIRPF) son de la <strong>vivienda habitual</strong>: no se aplican a
+                    la venta de {CON_ARTICULO[tipoInmueble]}, así que la ganancia tributa entera.
+                  </p>
+                )}
 
-                {esViviendaHabitual && reinvierte && !vendedorMayor65 && (
+                {tipoInmueble === 'vivienda' && esViviendaHabitual && reinvierte && !vendedorMayor65 && (
                   <>
                     <NumberInput
                       value={importeReinversion}
@@ -1672,6 +1974,8 @@ export default function SimuladorCompraventaPage() {
                             resultadosVendedor.camposIlegibles.length > 0
                               ? noSePudoLeer(resultadosVendedor.camposIlegibles)
                               : null,
+                            // Escrito, legible e imposible: ni «falta» ni «no se lee» (patrón 5).
+                            resultadosVendedor.aniosNegativos ? AVISO_ANIOS_NEGATIVOS : null,
                           ]
                             .filter((x): x is string => x !== null)
                             .join('; ')
@@ -1704,10 +2008,14 @@ export default function SimuladorCompraventaPage() {
                       value={formatCurrency(resultadosVendedor.valorTransmision)}
                       variant="default"
                       icon="📤"
+                      // Sin la plusvalía calculada no puede decir que la resta: el motor la tomó
+                      // como 0 y la ganancia y el IRPF de abajo son un máximo (patrón 2).
                       description={
                         resultadosVendedor.comisionLegible && resultadosVendedor.otrosVentaLegible
-                          ? 'Precio de venta − comisión, otros gastos de la venta y plusvalía municipal'
-                          : `Precio de venta − plusvalía municipal y los gastos que se leen: ${noSePudoLeer([
+                          ? resultadosVendedor.plusvaliaCalculada
+                            ? 'Precio de venta − comisión, otros gastos de la venta y plusvalía municipal'
+                            : 'Precio de venta − comisión y otros gastos de la venta, sin la plusvalía municipal, que falta'
+                          : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ' (sin la plusvalía municipal, que falta)'}: ${noSePudoLeer([
                               ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                               ...(resultadosVendedor.otrosVentaLegible ? [] : ['los otros gastos de la venta']),
                             ])}`
@@ -1721,13 +2029,18 @@ export default function SimuladorCompraventaPage() {
                       Antes caía por la rama de la pérdida —`esPerdida` es `ganancia <= 0`— y la
                       app afirmaba dos cosas falsas a la vez: que se vendía por debajo del coste y
                       que había una pérdida compensable en la declaración (hallazgos 823 y 845).
+                      Y el cero no es firme si un importe no se ha podido leer o falta la
+                      plusvalía: lo dice el sondeo, no un texto fijo (patrón 6).
                     */
                     <ResultCard
                       title="Sin ganancia ni pérdida"
                       value={formatCurrency(0)}
                       variant="default"
                       icon="⚖️"
-                      description="Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar"
+                      description={
+                        avisoCero(resultadosVendedor.veredictoGanancia) ??
+                        'Vendes exactamente por el valor de adquisición: no hay IRPF que pagar ni pérdida que compensar'
+                      }
                     />
                   ) : resultadosVendedor.esPerdida ? (
                     <ResultCard
@@ -1743,7 +2056,13 @@ export default function SimuladorCompraventaPage() {
                   ) : (
                     resultadosVendedor.gananciaPatrimonial > 0 && (
                       <ResultCard
-                        title="Ganancia patrimonial"
+                        // Un MÁXIMO mientras falte la plusvalía, que resta del valor de
+                        // transmisión al calcularse (patrón 2): se rotula como tal.
+                        title={
+                          esMaximoPorPlusvalia(resultadosVendedor.veredictoGanancia)
+                            ? 'Ganancia patrimonial (máximo)'
+                            : 'Ganancia patrimonial'
+                        }
                         value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
                         variant="info"
                         icon="📈"
@@ -1758,38 +2077,52 @@ export default function SimuladorCompraventaPage() {
                   )}
 
                   <ResultCard
-                    title="IRPF sobre ganancia"
+                    title={
+                      resultadosVendedor.irpfGanancia > 0 && esMaximoPorPlusvalia(resultadosVendedor.veredictoIrpf)
+                        ? 'IRPF sobre ganancia (máximo)'
+                        : 'IRPF sobre ganancia'
+                    }
+                    // «EXENTO» solo cuando hay una ganancia que una exención deja sin cuota. Sin
+                    // ganancia, o con pérdida, no hay nada exento: es ausencia de ganancia, y el cero
+                    // salía «EXENTO · Tributación en base del ahorro» (hallazgo 1554, residuo del 724).
                     value={
                       !resultadosVendedor.irpfCalculado
                         ? 'Sin calcular'
-                        : resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0
+                        : irpfExento
                           ? 'EXENTO'
-                          : formatCurrency(resultadosVendedor.irpfGanancia)
+                          : resultadosVendedor.irpfGanancia > 0
+                            ? formatCurrency(resultadosVendedor.irpfGanancia)
+                            : 'SIN CUOTA'
                     }
                     variant={
                       !resultadosVendedor.irpfCalculado
                         ? 'default'
-                        : resultadosVendedor.exentoIRPF || resultadosVendedor.irpfGanancia === 0
+                        : irpfExento || resultadosVendedor.irpfGanancia === 0
                           ? 'success'
                           : 'warning'
                     }
                     icon="💸"
-    description={
+                    description={
                       !resultadosVendedor.irpfCalculado
                         ? resultadosVendedor.camposIlegibles.includes('el precio de compra original')
                           ? 'El precio de compra original no se ha podido leer: escríbelo con coma decimal (1.234,56). Este impuesto NO está incluido en el neto de abajo.'
                           : 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
                         : // La dirección de los ilegibles la da el sondeo: una cuota exenta por edad
                           // no puede moverse y ya no se rotula «TECHO» borrando el motivo de la
-                          // exención (1227); el total catastral la SUBE, no la baja (1228).
-                          (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota') ??
-                          (resultadosVendedor.exentoIRPF
-                            ? 'Mayor de 65 años + vivienda habitual'
+                          // exención (1227); el total catastral la SUBE, no la baja (1228). La
+                          // plusvalía que falta solo cuenta si hay cuota que bajar (patrón 2).
+                          (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) ??
+                          (irpfExento
+                            ? resultadosVendedor.exentoIRPF
+                              ? 'Mayor de 65 años + vivienda habitual'
+                              : resultadosVendedor.motivoExencion ?? 'Ganancia exenta'
                             : resultadosVendedor.gananciaPatrimonial < 0
                               // No es una exención, es ausencia de ganancia — y la diferencia importa:
                               // una pérdida se compensa en la declaración y una exención no (724).
                               ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
-                              : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'))
+                              : resultadosVendedor.gananciaPatrimonial === 0
+                                ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
+                                : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'))
                     }
                   />
 
@@ -1799,7 +2132,9 @@ export default function SimuladorCompraventaPage() {
                     <ResultCard
                       title={
                         resultadosVendedor.comisionLegible
-                          ? `Comisión inmobiliaria (${comisionInmobiliaria}%)`
+                          ? // El número, formateado, y no la cadena tecleada: «3.5» se rotulaba
+                            // «(3.5%)», con el punto estadounidense (hallazgo 1558).
+                            `Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}%)`
                           : 'Comisión inmobiliaria'
                       }
                       value={resultadosVendedor.comisionLegible ? formatCurrency(resultadosVendedor.comisionInmobiliaria) : 'Sin leer'}
@@ -1881,8 +2216,12 @@ export default function SimuladorCompraventaPage() {
                           );
                         }
                         if (avisos.length === 0) return 'Lo que realmente recibes';
+                        const rellenar = camposQueFaltan.filter((c) => c !== 'los meses completos desde la compra');
                         const pedir = [
-                          camposQueFaltan.length > 0 ? `Rellena ${enumerar(camposQueFaltan)}` : null,
+                          rellenar.length > 0 ? `Rellena ${enumerar(rellenar)}` : null,
+                          resultadosVendedor.faltanMeses ? 'elige los meses completos desde la compra' : null,
+                          // Un año negativo no «falta»: se corrige (patrón 5, hallazgo 1552).
+                          resultadosVendedor.aniosNegativos ? 'corrige los años de tenencia (no pueden ser negativos)' : null,
                           resultadosVendedor.camposIlegibles.length > 0 || avisoIlegiblesNeto
                             ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer'
                             : null,
@@ -1966,7 +2305,8 @@ export default function SimuladorCompraventaPage() {
               <h4><span aria-hidden="true">🔄</span> Segunda mano → ITP</h4>
               <p>
                 El <strong>Impuesto de Transmisiones Patrimoniales</strong> grava las compras de inmuebles de segunda mano.
-                Cada comunidad autónoma fija su propio tipo, que va del {formatNumber(RANGO_ITP.min, 0)}% (País Vasco) al {formatNumber(RANGO_ITP.max, 0)}% (el tramo más alto de las escalas progresivas de Baleares y Cataluña).
+                Cada comunidad autónoma fija su propio tipo, que en la vivienda va del {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}% (País Vasco) al {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}% (el tramo más alto de las escalas progresivas de Baleares y Cataluña).
+                En el País Vasco ese {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}% es solo de la vivienda: un local, una nave, un terreno o un garaje comprado por separado pagan el {formatNumber(ITP_PV_NO_VIVIENDA, 0)}%.
               </p>
               <p>
                 La base imponible es el <strong>mayor valor</strong> entre el precio escriturado y el valor de referencia catastral.
@@ -1980,7 +2320,8 @@ export default function SimuladorCompraventaPage() {
                 Los locales comerciales y las naves industriales pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.local, 0)}%</strong>, y el suelo edificable, el tipo general del <strong>{formatNumber(PORCENTAJES_IVA.general, 0)}%</strong> (art. 90 LIVA), que es el que aplica la calculadora de arriba.
               </p>
               <p>
-                Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados), que va del {formatNumber(RANGO_AJD.min, 0)}% al {formatNumber(RANGO_AJD.max, 1)}% según la comunidad: el País Vasco no lo cobra, por su régimen foral.
+                Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados), que en la vivienda va del {formatNumber(RANGO_AJD_VIVIENDA.min, 0)}% al {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}% según la comunidad: el País Vasco exime la primera transmisión de vivienda, por su régimen foral.
+                En locales, naves y suelo va del {formatNumber(RANGO_AJD_OTROS.min, 1)}% al {formatNumber(RANGO_AJD_OTROS.max, 1)}%, también en el País Vasco.
               </p>
             </div>
 
@@ -2081,13 +2422,13 @@ export default function SimuladorCompraventaPage() {
                 <tr>
                   <td>ITP</td>
                   <td>No aplica</td>
-                  <td>{formatNumber(RANGO_ITP.min, 0)}% – {formatNumber(RANGO_ITP.max, 0)}% (según CC.AA.)</td>
+                  <td>{formatNumber(RANGO_ITP_VIVIENDA.min, 0)}% – {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}% (según CC.AA.)</td>
                   <td>Comprador</td>
                 </tr>
                 <tr>
                   <td>AJD</td>
-                  <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}%</td>
-                  <td>{formatNumber(RANGO_AJD.min, 0)}% – {formatNumber(RANGO_AJD.max, 1)}% (con hipoteca)</td>
+                  <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}%</td>
+                  <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}% (con hipoteca)</td>
                   <td>Comprador · con hipoteca, la entidad financiera (Ley 5/2019)</td>
                 </tr>
                 <tr>
@@ -2146,8 +2487,11 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoTag}>Comprador obra nueva</span>
               </div>
               <p>Carlos compra un piso nuevo en Valencia por {eurosEnteros(EJEMPLO_OBRA_NUEVA.precio)}. Paga el {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA ({eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA)})
-              más el {formatTipoNominal(ITP_CCAA[EJEMPLO_OBRA_NUEVA.ccaa].ajd)}% de AJD ({eurosEnteros(EJEMPLO_OBRA_NUEVA_AJD)}) al ser la primera transmisión del promotor.
-              El total de impuestos asciende a {eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA + EJEMPLO_OBRA_NUEVA_AJD)}.</p>
+              más el {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_TIPO)}% de AJD ({eurosEnteros(EJEMPLO_OBRA_NUEVA_AJD)}) al ser la primera transmisión del promotor.
+              El total de impuestos asciende a {eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA + EJEMPLO_OBRA_NUEVA_AJD)}.
+              {EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.motivo === 'vivienda-habitual'
+                ? <> Si el piso va a ser su vivienda habitual, el AJD valenciano baja al {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.tipo)}%.</>
+                : null}</p>
               <div className={styles.casoResultado}>IVA + AJD frente a ITP en segunda mano</div>
             </div>
             <div className={styles.casoCard}>
@@ -2199,10 +2543,11 @@ export default function SimuladorCompraventaPage() {
               de compra, deberás pagar ITP sobre ese valor mayor, aunque hayas comprado más barato.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Cuándo se está exento de pagar plusvalía municipal?</h4>
-              <p>Desde la sentencia del Tribunal Constitucional de 2021, si no existe ganancia real en el valor
-              del terreno (vendes por menos de lo que compraste), puedes acreditar la pérdida y quedar exento.
-              El vendedor puede elegir el método de cálculo más favorable: objetivo o real.</p>
+              {/* «Quedar exento» era falso: el art. 104.5 TRLRHL (redacción del RDL 26/2021) articula
+                  un supuesto de NO SUJECIÓN, que es lo que ya dice la tarjeta del vendedor (hallazgo
+                  1557). La misma respuesta, en las dos bocas del JSON-LD de metadata.ts. */}
+              <h4>{PREGUNTA_NO_SUJECION}</h4>
+              <p>{RESPUESTA_NO_SUJECION}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué gastos puede deducir el comprador en la declaración de la renta?</h4>

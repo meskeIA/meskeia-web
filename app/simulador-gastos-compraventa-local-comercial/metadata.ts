@@ -1,21 +1,35 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { RANGO_AJD, RANGO_ITP, CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar } from '@/data/itp-ccaa';
+import {
+  ITP_CCAA,
+  RANGO_AJD_OTROS,
+  RANGO_ITP_OTROS,
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
+} from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 /** Los rangos que cita el JSON-LD se DERIVAN de la tabla: escritos a mano contradecían al
  *  panel, que muestra «AJD 0 %» en el País Vasco y el 0,25 % efectivo de Ceuta y Melilla
  *  tras la bonificación (hallazgo 622). */
-const AJD_MIN = formatNumber(RANGO_AJD.min, 0);
-const AJD_MAX = formatNumber(RANGO_AJD.max, 1);
+const AJD_MIN = formatNumber(RANGO_AJD_OTROS.min, 1);
+const AJD_MAX = formatNumber(RANGO_AJD_OTROS.max, 1);
+/**
+ * ⚠️ 24/09/2026 (hallazgos 1582, 1583 y 1603): los rangos son los de lo que NO es vivienda. El
+ * 4 % de ITP y el 0 % de AJD del País Vasco son de la vivienda: un local paga allí el 7 % y el
+ * 0,5 %, y el FAQPage decía «el País Vasco no lo cobra». El AJD de la renuncia de Valencia (2 %)
+ * es el único tipo de renuncia verificado, y se lee de la tabla.
+ */
+const AJD_RENUNCIA_VALENCIA = formatNumber(ITP_CCAA.valencia.ajdRenuncia ?? ITP_CCAA.valencia.ajd, 0);
 
 /** Y por la misma razón el rango del ITP, que la pregunta del ITP tenía escrito a mano
  *  («del 4% al 10%-11%») mientras la primera pregunta del MISMO bloque ya lo derivaba y
  *  decía «del 4% al 13%» — el 13 % que la propia app cobra en el tramo alto de Baleares y
  *  de Cataluña (hallazgo 665). */
-const ITP_MIN = formatNumber(RANGO_ITP.min, 0);
-const ITP_MAX = formatNumber(RANGO_ITP.max, 0);
+const ITP_MIN = formatNumber(RANGO_ITP_OTROS.min, 0);
+const ITP_MAX = formatNumber(RANGO_ITP_OTROS.max, 0);
 
 /** Extremos de la base del ahorro, derivados de la tabla con la que la app calcula el
  *  IRPF de la ganancia (`calcularGananciaInmueble`), en vez de teclearlos (hallazgo 667). */
@@ -87,7 +101,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga al comprar un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}% más AJD (del ${AJD_MIN}% al ${AJD_MAX}% según la comunidad autónoma; el País Vasco no lo cobra). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}% al ${ITP_MAX}%. No coinciden IVA e ITP en la misma operación.`,
+        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}% más AJD (del ${AJD_MIN}% al ${AJD_MAX}% según la comunidad autónoma). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}% al ${ITP_MAX}%. No coinciden IVA e ITP en la misma operación.`,
       },
     },
     {
@@ -103,7 +117,7 @@ export const faqJsonLd = {
       name: '¿Cuándo conviene renunciar a la exención de IVA al comprar un local?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Interesa cuando el comprador es empresario o autónomo con derecho a deducir el IVA. El ITP es un coste no recuperable, mientras que el IVA autoliquidado por inversión del sujeto pasivo se deduce en la declaración trimestral (modelo 303), con un coste financiero cercano a cero. A cambio, la escritura tributa por AJD, que en muchas comunidades se aplica a un tipo incrementado cuando existe renuncia a la exención.',
+        text: `Interesa cuando el comprador es empresario o autónomo con derecho a deducir el IVA. El ITP es un coste no recuperable, mientras que el IVA autoliquidado por inversión del sujeto pasivo se deduce en la declaración trimestral (modelo 303), con un coste financiero cercano a cero. A cambio, la escritura tributa por AJD, que algunas comunidades aplican a un tipo incrementado cuando existe renuncia a la exención (en la Comunitat Valenciana, el ${AJD_RENUNCIA_VALENCIA}%).`,
       },
     },
     {
