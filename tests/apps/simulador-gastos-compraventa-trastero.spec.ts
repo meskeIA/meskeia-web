@@ -4632,3 +4632,417 @@ test('la ayuda del precio depende del régimen: en IVA, el precio pactado (famil
   await page.locator('select').filter({ has: page.locator('option[value="canarias"]') }).first().selectOption('canarias');
   await expect(ayuda).toContainText('(el mayor)');
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INSPECCIÓN 24/09/2026 — tras 758e053f, 1b09235c, 85c9c9fe y 5b5d33ae
+//
+//  Esperados resueltos a mano ANTES de abrir el navegador, con una calculadora que no
+//  importa nada del repositorio (constantes transcritas de data/itp-ccaa.ts y
+//  data/fiscal/inmuebles.ts). Los coeficientes VIGENTES del IIVTNU salen del texto
+//  consolidado del BOE (BOE-A-2004-4214, art. 107.4 TRLRHL, versión del 28/01/2026: el
+//  Congreso derogó el RDL 16/2025 y rige la tabla del art. 24 del RDL 8/2023).
+//
+//  Primero, cuatro casos en verde sobre los controles que NO son NumberInput (el punto
+//  ciego del testigo de familia): la escala progresiva × perfil, la modalidad × territorio
+//  × tipo de transmisión, Ceuta con la gestoría ilegible (el testigo solo prueba Canarias)
+//  y un vendedor en el que gana el método REAL con cualquiera de las dos tablas de
+//  coeficientes. Después, los hallazgos abiertos con `test.fail()`, cada uno con su
+//  aserción de FONDO en primer lugar.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** Título de una ResultCard (donde la redacción común escribe el «(PARCIAL)»). */
+async function tituloTarjeta24(page: Page, titulo: RegExp): Promise<string> {
+  return (await page.locator('h3').filter({ hasText: titulo }).first().innerText()).trim();
+}
+
+/** «1.234,56 €» → 1234.56; NaN si la tarjeta no publica un importe («SIN CALCULAR»…). */
+const euros24 = (s: string): number =>
+  Number(s.replace(ESPACIO_DURO, ' ').replace(/[€\s]/g, '').replace(/\./g, '').replace(',', '.'));
+
+/** Deja la pestaña Vendedor con los siete campos escritos (vacío = no escrito). */
+async function vendedor24(
+  page: Page,
+  d: { venta: string; compra: string; gastos: string; anios: string; suelo: string; total: string; comision: string; gestoria: string },
+): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await sembrar(page, 'Precio del trastero', d.venta);
+  await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+  await sembrar(page, 'Precio de compra original', d.compra);
+  await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', d.gastos);
+  await sembrar(page, 'Años de propiedad', d.anios);
+  await sembrar(page, 'Valor catastral del suelo', d.suelo);
+  await sembrar(page, 'Valor catastral total (suelo + construcción)', d.total);
+  await sembrar(page, 'Comisión inmobiliaria (%)', d.comision);
+  await sembrar(page, 'Gestoría y certificados del vendedor (€)', d.gestoria);
+}
+
+test.describe('Inspección 24/09/2026 — la escala de Castilla y León, la modalidad × territorio y los coeficientes del IIVTNU', () => {
+  /**
+   * CASO 38 (normal) — Castilla y León, SEGUNDO tramo de su escala, al que ningún caso
+   * llegaba (el 11/09 se probó a 20.000 €). Segunda mano · 260.000 € · familia numerosa ·
+   * gestoría 300. De ITP_CCAA['castilla-leon'].tramosProgresivos (8 % hasta 250.000, 10 %):
+   *   ITP = 250.000 × 8 % + 10.000 × 10 % = 21.000,00 € → efectivo 8,0769 % → «ITP (8,08%)»
+   *   notaría: arancel 388,43341 (tramos 1-5 de ARANCELES_NOTARIO) × 1,21 × 1,75 = 822,51 €
+   *     (horquilla × 1,5 / × 2 = 705,01 – 940,01 €)
+   *   registro: 204,2120635 (ARANCELES_REGISTRO) + 6,010121 + 3,005061 = 213,2272455
+   *     × 1,21 = 258,00 €
+   *   total = 21.000,00 + 822,51 + 258,00 + 300,00 = 22.380,51 € (8,61 %)
+   *   coste = 282.380,51 €
+   * El reducido de familia numerosa (4 %) exige vivienda habitual: se ofrece y NO se cobra.
+   */
+  test('CASO 38 — Castilla y León 260.000 €: el 10 % del segundo tramo y el 4 % de familia numerosa sin aplicar', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('castilla-leon');
+    await page.locator('#select-perfil').selectOption('familia-numerosa');
+    await sembrar(page, 'Precio del trastero', '260000');
+
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (8,08%)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('21.000,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('822,51 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('entre 705,01 € y 940,01 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('258,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('22.380,51 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,61% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('282.380,51 €');
+    await expect(page.getByText(/escala progresiva \(8% → 10%\)/)).toBeVisible();
+    const oportunidad = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    await expect(oportunidad).toContainText('4,00% — Familia numerosa');
+    await expect(oportunidad).toContainText('Vivienda habitual');
+  });
+
+  /**
+   * CASO 39 (obra nueva, vinculado e independiente) — Galicia · primera mano · 9.500 € ·
+   * gestoría 300. IVA_INMUEBLES_2025.anejoVinculado = 10 y .garaje = 21 (art. 91.Uno.1.7º
+   * LIVA); AJD de ITP_CCAA['galicia'] = 1,5 %:
+   *   vinculado:     IVA 950,00 · AJD 142,50 · notaría 224,15 · registro 47,39 → total 1.664,04
+   *                  (17,52 %) · coste 11.164,04 €
+   *   independiente: IVA 1.995,00 → total 2.709,04 (28,52 %) · coste 12.209,04 €
+   * Y la COMBINACIÓN de controles que el testigo no ve: con «Independiente» marcado, pasar a
+   * Canarias (el selector desaparece y no hay IVA: IGIC «No calculado», AJD 0,75 % = 71,25,
+   * total parcial 642,79 y coste 10.142,79 «puede ser mayor»), volver a Galicia (el 21 %
+   * vuelve, porque la elección se conserva) y pasar a segunda mano (la modalidad no entra:
+   * ITP 8 % = 760,00, coste 10.831,54 y ningún aviso del IVA de obra nueva).
+   */
+  test('CASO 39 — obra nueva en Galicia: 10 % vinculado, 21 % independiente, y la elección sobrevive a Canarias', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('galicia');
+    await sembrar(page, 'Precio del trastero', '9500');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (10,00%)');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('950,00 €');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('142,50 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('224,15 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('47,39 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('11.164,04 €');
+
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00%)');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('1995,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('28,52% sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('12.209,04 €');
+    await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 21%');
+
+    await page.locator('#select-ccaa').selectOption('canarias');
+    await expect(page.locator('#rotulo-modalidad')).toHaveCount(0);
+    expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('71,25 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('642,79 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('10.142,79 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('No incluye el IGIC: el coste real puede ser mayor');
+
+    await page.locator('#select-ccaa').selectOption('galicia');
+    await expect(page.getByRole('button', { name: /Independiente/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('1995,00 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('12.209,04 €');
+
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await expect(page.locator('#rotulo-modalidad')).toHaveCount(0);
+    await expect(page.getByText(/el trastero independiente tributa al/)).toHaveCount(0);
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (8,00%)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('760,00 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('10.831,54 €');
+  });
+
+  /**
+   * CASO 39b — Ceuta en obra nueva (el segundo invariante de 5b5d33ae; el testigo de familia
+   * lo prueba solo en Canarias). 9.500 €: IPSI sin calcular, AJD 9.500 × 0,5 % × 50 %
+   * (art. 57 bis TRLITPAJD) = 23,75 € → «AJD (0,25%)»:
+   *   gestoría 300      → total parcial 595,29 (6,27 %) · coste 10.095,29 · «puede ser mayor»
+   *   gestoría ilegible → total parcial 295,29 (3,11 %) · coste 9.795,29 · «será mayor»
+   * (el IPSI puede ser cero; la gestoría ilegible suma seguro).
+   */
+  test('CASO 39b — Ceuta: sin el IPSI el coste «puede ser» mayor, y con la gestoría ilegible «será» mayor', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('ceuta');
+    await sembrar(page, 'Precio del trastero', '9500');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (0,25%)');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('23,75 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('595,29 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('10.095,29 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('No incluye el IPSI: el coste real puede ser mayor');
+
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('295,29 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('9795,29 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
+      'No incluye el IPSI ni la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
+  });
+
+  /**
+   * CASO 40 (vendedor con ganancia) — gana el método REAL con las DOS tablas de coeficientes,
+   * así que este caso no depende del hallazgo de los coeficientes de más abajo. 21.000 € de
+   * venta · compra 19.000 · gastos 300 · 6 años · suelo 7.000 de 14.000 · comisión 2 %:
+   *   objetivo 7.000 × 0,16 × 25 % = 280,00 (con la tabla vigente del BOE, 0,19 → 332,50)
+   *   real (21.000 − 19.000) × 7.000/14.000 × 25 % = 250,00 → gana el real
+   *   transmisión 21.000 − 420 − 250 = 20.330,00 · adquisición 19.300,00 · ganancia 1.030,00
+   *   IRPF 1.030 × 19 % = 195,70 · total 250 + 420 + 195,70 = 865,70 · neto 20.134,30,
+   * DEFINITIVO: ni «(PARCIAL)» ni aviso (la redacción común de 85c9c9fe no se pasa de largo).
+   */
+  test('CASO 40 — vendedor: gana el método real y el neto se publica definitivo', async ({ page }) => {
+    await vendedor24(page, { venta: '21000', compra: '19000', gastos: '300', anios: '6', suelo: '7000', total: '14000', comision: '2', gestoria: '' });
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('250,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método real (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('20.330,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('1030,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('195,70 €');
+    expect(await tituloTarjeta24(page, /Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (2%)');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('865,70 €');
+    expect(await tituloTarjeta24(page, /IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('20.134,30 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes tras los gastos');
+  });
+});
+
+test.describe('HALLAZGOS 24/09/2026 — abiertos', () => {
+  /**
+   * HALLAZGO (dato, alto) — los coeficientes del IIVTNU son los del RDL 26/2021 ORIGINAL.
+   *
+   * COEFICIENTES_IIVTNU_2025 (data/fiscal/inmuebles.ts, «verificado 15/01/2025») reproduce la
+   * tabla con la que el RDL 26/2021 redactó el art. 107.4 TRLRHL (vigente del 10/11/2021 al
+   * 31/12/2022). El texto consolidado del BOE (BOE-A-2004-4214, consultado en sesión) la da
+   * cambiada cuatro veces después: art. 71 Ley 31/2022 (2023), art. 24 RDL 8/2023 (2024),
+   * RDL 9/2024 y RDL 16/2025 (los dos derogados por el Congreso). Hoy rige la del RDL 8/2023:
+   *   <1 0,15 · 1 0,15 · 2 0,14 · 3 0,14 · 4 0,16 · 5 0,18 · 6 0,19 · 7 0,20 · 8 0,19 · 9 0,15 ·
+   *   10 0,12 · 11 0,10 · 12-15 0,09 · 16 0,10 · 17 0,13 · 18 0,17 · 19 0,23 · ≥20 0,40
+   * Coinciden 1 de 21 tramos (4 años, 0,16). Base del testigo con 7 años:
+   *   tabla de la app 4.000 × 0,12 × 25 % = 120,00 · neto 13.373,30
+   *   tabla vigente   4.000 × 0,20 × 25 % = 200,00 · IRPF 541,50 · neto 13.308,50
+   * (el método real, 5.000 × 4/9 × 25 % = 555,56, pierde con las dos).
+   */
+  test('HALLAZGO (dato) — la plusvalía de 7 años usa el coeficiente vigente del art. 107.4 TRLRHL (0,20)', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '15000', compra: '10000', gastos: '1000', anios: '7', suelo: '4000', total: '9000', comision: '3', gestoria: '500' });
+
+    // FONDO: 4.000 × 0,20 (RDL 8/2023, vigente) × 25 % = 200,00 €.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('200,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.308,50 €');
+  });
+
+  /**
+   * HALLAZGO (cálculo, medio) — la reventa antes del año liquida el coeficiente ENTERO.
+   *
+   * El art. 107.4 TRLRHL (redacción del RDL 26/2021, igual hoy) dice: «En el caso de que el
+   * periodo de generación sea inferior a un año, se prorrateará el coeficiente anual teniendo
+   * en cuenta el número de meses completos». La app aplica 0,14 sin prorratear. Con 11 meses
+   * —el máximo antes del año— el coeficiente vigente da 0,15 × 11/12 = 0,1375; con la tabla
+   * de la propia app, 0,14 × 11/12 = 0,1283. Caso literal del hallazgo 682:
+   *   15.000 / 12.000 / 0 años / suelo 4.000 de 9.000 / 3 % → la app 140,00 €
+   *   máximo legal para CUALQUIER reventa de menos de un año: 4.000 × 0,1375 × 25 % = 137,50 €
+   * Y la ayuda del campo promete lo contrario: «esa reventa también tributa, y con un
+   * coeficiente mayor».
+   */
+  test('HALLAZGO (cálculo) — la plusvalía de menos de un año no supera el máximo del prorrateo por meses', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '15000', compra: '12000', gastos: '', anios: '0', suelo: '4000', total: '9000', comision: '3', gestoria: '' });
+
+    // FONDO: nunca por encima de 4.000 × 0,15 × 11/12 × 25 % = 137,50 € (abstenerse, 0, también vale).
+    const plusvalia = euros24(await valorTarjeta(page, 'Plusvalía municipal'));
+    expect(Number.isFinite(plusvalia) ? plusvalia : 0).toBeLessThanOrEqual(137.5);
+    await expect(page.getByText(/con un coeficiente mayor/)).toHaveCount(0);
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — un dato que FALTA y uno ILEGIBLE que mueven el neto en
+   * sentidos opuestos, y el aviso afirma una dirección SEGURA.
+   *
+   * Es el 1282 con un vacío en lugar del segundo ilegible: el sondeo solo mide los ilegibles,
+   * así que no ve que la plusvalía que falta tira hacia abajo. 20.000 / 16.000 / gastos
+   * «2.000.50» / años VACÍOS / suelo 10.000 de 12.000 / 3 %:
+   *   publicado: transmisión 19.400 · ganancia 3.400 · IRPF 646,00 · neto 18.754,00, con
+   *   «…puede ser menor que este. … el neto real es MAYOR que este»
+   *   con 20 años y «2000,50»: plusvalía real 4.000 × 10/12 × 25 % = 833,33 (el objetivo,
+   *   1.125,00 o 1.000,00 con la tabla vigente, pierde) · IRPF 107,57 · neto 18.459,10:
+   *   294,90 € POR DEBAJO. (Con 5 años sale 18.789,84, por encima: no se puede saber.)
+   */
+  test('HALLAZGO (contenido) — con la plusvalía sin calcular, un ilegible no permite afirmar que el neto «es MAYOR»', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '20000', compra: '16000', gastos: '2.000.50', anios: '', suelo: '10000', total: '12000', comision: '3', gestoria: '' });
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.754,00 €');
+
+    // FONDO: con una partida que falta en sentido contrario, ninguna dirección es segura.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toMatch(/neto real es (?:mayor|menor)/i);
+  });
+
+  /**
+   * HALLAZGO (contenido, medio) — con la plusvalía SIN CALCULAR, «Valor de transmisión» dice
+   * que la resta, y la ganancia y el IRPF se publican como definitivos siendo techos.
+   *
+   * Mismo defecto que el 1546 de garaje, hoy; la referencia hace lo mismo. Base del testigo
+   * con los años vacíos: 15.000 − 450 − 500 = 14.050,00 (sin plusvalía) bajo «Precio de venta
+   * − comisión, gestoría y plusvalía municipal»; ganancia 3.050,00 e IRPF 579,50 «Tributación
+   * en base del ahorro». Con 5 años: transmisión 13.880,00 e IRPF 547,20 (32,30 € menos).
+   */
+  test('HALLAZGO (contenido) — «Valor de transmisión» no afirma restar una plusvalía sin calcular', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '15000', compra: '10000', gastos: '1000', anios: '', suelo: '4000', total: '9000', comision: '3', gestoria: '500' });
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('14.050,00 €');
+
+    // FONDO: la descripción de siempre afirma restar la plusvalía, y no la ha restado.
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).not.toBe(
+      'Precio de venta − comisión, gestoría y plusvalía municipal',
+    );
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).not.toBe('Tributación en base del ahorro (19%-30%)');
+  });
+
+  /**
+   * HALLAZGO (operativa, bajo) — EFECTO FAMILIA del 1232 de la referencia (70cce469 y
+   * 85c9c9fe): con el par catastral imposible el neto se publica DEFINITIVO. Base del testigo
+   * con suelo 9.000 y total 4.000: objetivo 9.000 × 0,17 × 25 % = 382,50 · IRPF 506,83 ·
+   * neto 13.160,67 «Lo que realmente recibes». Con el recibo al derecho (4.000/9.000) el neto
+   * es 13.332,80: MAYOR. El 1547 de garaje, hoy, dice lo mismo de esta app.
+   */
+  test('HALLAZGO (operativa) — con el par catastral imposible el neto no se publica como definitivo', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '15000', compra: '10000', gastos: '1000', anios: '5', suelo: '9000', total: '4000', comision: '3', gestoria: '500' });
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.160,67 €');
+
+    // FONDO: como en la referencia, el neto se rotula «(PARCIAL)».
+    expect(await tituloTarjeta24(page, /IMPORTE NETO VENDEDOR/)).toMatch(/\(PARCIAL\)/);
+  });
+
+  /**
+   * HALLAZGO (operativa, bajo) — venta por debajo de la compra y suelo VACÍO: la plusvalía no
+   * puede existir (art. 104.5 TRLRHL: «No se producirá la sujeción…»), y la app la da por
+   * «SIN CALCULAR (falta el valor catastral del suelo)» y avisa de que el neto «puede ser
+   * menor». 15.000 / 18.000 / 1.000 / 8 años / suelo vacío / 3 % → neto 14.550,00 con el
+   * suelo o sin él (con 4.000 sale NO SUJETA). El 1548 de garaje, hoy.
+   */
+  test('HALLAZGO (operativa) — con pérdida y sin valor del suelo, el neto no «puede ser menor»', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '15000', compra: '18000', gastos: '1000', anios: '8', suelo: '', total: '', comision: '3', gestoria: '' });
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('14.550,00 €');
+
+    // FONDO: el neto es el definitivo; no hay plusvalía que pueda bajarlo.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toMatch(/puede ser menor/i);
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — ganancia exactamente cero porque los gastos de aquella
+   * compra no se leen: «ni pérdida que compensar», cuando con cualquier importe positivo la
+   * hay. 20.000 / 19.030 / «2.000.50» / 5 años / suelo 4.000 (sin total) / comisión 4 %:
+   * transmisión 20.000 − 800 − 170 = 19.030,00 = adquisición → «Sin ganancia ni pérdida».
+   * Con «2000,50» la app da «Pérdida patrimonial 2000,50 €». El 1549 de garaje, hoy.
+   */
+  test('HALLAZGO (contenido) — con la ganancia en cero por un ilegible, la app no niega la pérdida compensable', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '20000', compra: '19030', gastos: '2.000.50', anios: '5', suelo: '4000', total: '', comision: '4', gestoria: '' });
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('19.030,00 €');
+
+    // FONDO: nada en el panel niega la pérdida que el dato ilegible esconde.
+    expect(await page.locator('[class*="resultados"]').first().innerText()).not.toMatch(/ni pérdida que compensar/);
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — unos años NEGATIVOS, escritos y a la vista, se anuncian como
+   * si faltaran: «No calculada (faltan los años de propiedad)» y «Rellena los años de
+   * propiedad». La guarda los rechaza bien (no liquida); lo que falla es el mensaje. Base del
+   * testigo con «-3». El 1552 de garaje, hoy.
+   */
+  test('HALLAZGO (contenido) — unos años negativos no «faltan»: se dice que no pueden ser negativos', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '15000', compra: '10000', gastos: '1000', anios: '-3', suelo: '4000', total: '9000', comision: '3', gestoria: '500' });
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('-3');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+
+    // FONDO: el dato está escrito; no «falta».
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toMatch(/faltan? los años/i);
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — con la gestoría del COMPRADOR ilegible, las dos cifras de
+   * cierre conservan el título de definitivas mientras su descripción dice «SIN la gestoría»
+   * y «el coste real será mayor». La redacción común (85c9c9fe) titula «(PARCIAL)» la cifra
+   * a la que le falta algo, y esta misma tarjeta lo hace cuando falta el IGIC/IPSI. Madrid ·
+   * primera mano · vinculado · 9.500 € · gestoría «2.000.50» → IVA 950,00 · AJD 71,25 ·
+   * notaría 224,15 · registro 47,39 → total 1.292,79 · coste 10.792,79 bajo «COSTE TOTAL DE
+   * ADQUISICIÓN». El 1550 de garaje y el 1556 de la referencia, hoy.
+   */
+  test('HALLAZGO (contenido) — con la gestoría del comprador ilegible el coste se rotula «(PARCIAL)»', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '9500');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+    expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('10.792,79 €');
+
+    // FONDO: la cifra final a la que le falta la gestoría no se titula como definitiva.
+    expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toMatch(/\(PARCIAL\)/);
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) — la redacción común no llegó a dos ramas del sondeo.
+   * `avisoPerdida` compone `noSePudoLeer(...)` sin `mayuscula()` y la descripción de la
+   * pérdida abre en minúscula («no se han podido leer los impuestos…»); y el «Sin cerrar»
+   * conjuga por el número de campos, no del sujeto: «los impuestos y gastos de aquella compra
+   * lo subiría». Los mismos que el 1551 y el 1555 de hoy en garaje y en la referencia.
+   *   pérdida: 15.000 / 20.000 / «2.000.50» / 5 años / 4.000 de 9.000 / 3 % / 500
+   *   mixto:   20.000 / 16.000 / «2.000.50» / 5 años / 5.000 de 12.000 / 3 % / «2.000.50»
+   */
+  test('HALLAZGO (contenido) — el aviso de la pérdida abre en mayúscula', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '15000', compra: '20000', gastos: '2.000.50', anios: '5', suelo: '4000', total: '9000', comision: '3', gestoria: '500' });
+    const aviso = await descripcionTarjeta(page, 'Pérdida patrimonial');
+    expect(aviso).toMatch(/aquella compra/);
+
+    // FONDO: la primera letra de la descripción.
+    expect(aviso.charAt(0)).toBe(aviso.charAt(0).toUpperCase());
+  });
+
+  test('HALLAZGO (contenido) — «Sin cerrar» concuerda el verbo con su sujeto plural', async ({ page }) => {
+    test.fail();
+    await vendedor24(page, { venta: '20000', compra: '16000', gastos: '2.000.50', anios: '5', suelo: '5000', total: '12000', comision: '3', gestoria: '2.000.50' });
+    const aviso = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(aviso).toMatch(/^Sin cerrar/);
+
+    // FONDO: «los impuestos y gastos de aquella compra lo subirían», no «lo subiría».
+    expect(aviso).not.toMatch(/aquella compra lo subiría/);
+  });
+
+  /**
+   * HALLAZGO (dato, bajo) — la FAQ visible y el FAQPage dicen que sin incremento de valor se
+   * puede «quedar exento» de la plusvalía. El art. 104.5 TRLRHL (BOE-A-2004-4214, consultado
+   * en sesión) lo articula como NO SUJECIÓN («No se producirá la sujeción al impuesto…»), y la
+   * tarjeta de esta misma página dice «NO SUJETA» desde el hallazgo 901. El 1557 de la
+   * referencia, hoy.
+   */
+  test('HALLAZGO (dato) — la FAQ de la plusvalía habla de no sujeción, no de exención', async ({ page }) => {
+    test.fail();
+    const html = await (await page.request.get(RUTA)).text();
+    expect(html).toContain('¿Se paga plusvalía municipal al vender un trastero?');
+
+    // FONDO: ni la FAQ visible ni el FAQPage prometen una «exención» que la ley no articula.
+    expect(html).not.toContain('quedar exento');
+  });
+});

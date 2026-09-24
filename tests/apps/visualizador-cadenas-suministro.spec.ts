@@ -399,3 +399,325 @@ test('sospecha — el diagrama tiene variante oscura y sus textos se leen en los
     expect(m.tarjetas, `blanco sobre las tarjetas, tema ${tema}`).toBeGreaterThanOrEqual(4.5);
   }
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// RE-INSPECCIÓN del 24/09/2026 (tarde), tras 95060386 y 0d54c8f9.
+//
+// Lo que ya cubrían los tests de arriba y NO se duplica: los 8 + 5 focos con Tab, Enter en el
+// procesador, Espacio en Suez, el contraste del rótulo en crisis (re-medido: 5,54:1 en claro
+// sobre 251,5/233,3/233,3 y 6,64:1 en oscuro sobre 71,3/44/44) y los textos de 1351-1354.
+//
+// Lo que se añade:
+//   · Teclado a fondo: Espacio en un componente, exclusividad (un solo componente pulsado) y
+//     que aria-pressed coincida con lo que se PINTA (fill url(#gradCompActivo)); foco visible
+//     en claro y en oscuro; las 5 crisis una a una con Enter, cada una con su detalle.
+//   · Qué debe cambiar al activar una crisis, según el modelo de datos de page.tsx: SOLO
+//     `disrupcionActiva`. El diagrama (componenteActivo) y el deslizador no se tocan, y abrir
+//     una crisis pliega la anterior.
+//   · Hallazgos abiertos (test.fail): badge de coste y franja «~40 países» con blanco sobre la
+//     marca, color de marca como texto en claro, rótulos del SVG ilegibles en móvil, y cinco
+//     datos que sus fuentes desmienten.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Contraste mínimo de un texto contra su fondo compuesto real: se apilan las capas
+ * semitransparentes hasta la primera opaca y, si una capa es un degradado, se mide contra cada
+ * uno de sus extremos (el peor manda). Colores computados, nunca leídos del CSS con regex.
+ */
+async function contrasteMinimo(page: Page, selector: string): Promise<number> {
+  return page.evaluate((sel) => {
+    const canal = (c: number) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+    const ratio = (a: number[], b: number[]) => {
+      const [l1, l2] = [lum(a), lum(b)];
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    };
+    const nums = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).map(Number);
+    const colores = (s: string): number[][] => [...s.matchAll(/rgba?\([^)]*\)/g)].map((m) => nums(m[0]));
+    const el = document.querySelector(sel);
+    if (!el) throw new Error(`no existe ${sel}`);
+    type Capa = { grad: number[][] } | { color: number[] };
+    const capas: Capa[] = [];
+    for (let e: Element | null = el; e; e = e.parentElement) {
+      const cs = getComputedStyle(e);
+      const grad = cs.backgroundImage !== 'none' ? colores(cs.backgroundImage) : [];
+      const c = nums(cs.backgroundColor);
+      const a = c.length === 4 ? c[3] : 1;
+      if (grad.length) {
+        capas.push({ grad });
+        if (grad.every((g) => (g.length === 4 ? g[3] : 1) === 1)) break;
+      } else if (c.length && a > 0) {
+        capas.push({ color: [c[0], c[1], c[2], a] });
+        if (a === 1) break;
+      }
+    }
+    const sobre = (base: number[], [r, g, b, a = 1]: number[]) => [
+      r * a + base[0] * (1 - a),
+      g * a + base[1] * (1 - a),
+      b * a + base[2] * (1 - a),
+    ];
+    let bases: number[][] = [[255, 255, 255]];
+    for (const capa of capas.reverse()) {
+      bases = 'grad' in capa ? capa.grad.flatMap((g) => bases.map((b) => sobre(b, g))) : bases.map((b) => sobre(b, capa.color));
+    }
+    const texto = nums(getComputedStyle(el).color).slice(0, 3);
+    return Math.round(Math.min(...bases.map((b) => ratio(texto, b))) * 100) / 100;
+  }, selector);
+}
+
+async function ponerOscuro(page: Page): Promise<void> {
+  // El gestor de tema pisa un data-theme puesto a mano: se usa el conmutador real.
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.waitForTimeout(400); // transiciones de 0,3 s en los rótulos
+}
+
+/** Pulsa Tab hasta que el foco caiga en el elemento con ese aria-label. */
+async function tabularHasta(page: Page, etiquetaAria: string): Promise<void> {
+  for (let i = 0; i < 40; i++) {
+    await page.keyboard.press('Tab');
+    const foco = await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? '');
+    if (foco === etiquetaAria) return;
+  }
+  throw new Error(`Tab no llegó a «${etiquetaAria}»`);
+}
+
+test.describe('Inspección 24/09/2026 — re-inspección tras 95060386 y 0d54c8f9', () => {
+  const componente = (page: Page, nombre: string): Locator =>
+    page.getByRole('button', { name: `Ver detalles de ${nombre}` });
+  const panel = (page: Page): Locator => page.locator('div[class*="panelDetalle"]');
+
+  /** [pulsado, pintado activo] de cada uno de los 8 componentes, en orden. */
+  const estadoDiagrama = (page: Page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('g[role="button"]')].map((g) => ({
+        pulsado: g.getAttribute('aria-pressed') === 'true',
+        pintadoActivo: g.querySelector('rect')?.getAttribute('fill') === 'url(#gradCompActivo)',
+      })),
+    );
+
+  // CASO 1 (1349, teclado del diagrama). Esperado resuelto a mano con COMPONENTES y el CSS:
+  //   Espacio en «Batería de litio» → solo la batería pulsada y pintada activa, badge «~10–15 %»,
+  //   la página no se desplaza; Enter en «Módulo de cámaras» → pasa el testigo (batería false),
+  //   badge «~10–12 %»; Enter otra vez → ninguno pulsado y panel vacío. Foco visible: el rect
+  //   lleva stroke --text-primary a 3 px (claro rgb(26, 26, 26), oscuro rgb(232, 232, 232)).
+  test('teclado — Espacio y Enter en el diagrama: un solo componente pulsado y pintado, con foco visible en los dos temas', async ({
+    page,
+  }) => {
+    await tabularHasta(page, 'Ver detalles de Batería de litio');
+    const rectBateria = componente(page, 'Batería de litio').locator('rect');
+    await expect(rectBateria).toHaveCSS('stroke', 'rgb(26, 26, 26)');
+    await expect(rectBateria).toHaveCSS('stroke-width', '3px');
+    await expect(componente(page, 'Pantalla OLED').locator('rect')).toHaveCSS('stroke', 'none');
+
+    const scrollAntes = await page.evaluate(() => window.scrollY);
+    await page.keyboard.press(' ');
+    expect(await page.evaluate(() => window.scrollY), 'Espacio no debe desplazar la página').toBe(scrollAntes);
+    await expect(componente(page, 'Batería de litio')).toHaveAttribute('aria-pressed', 'true');
+    await expect(panel(page).getByRole('heading', { name: 'Batería de litio' })).toBeVisible();
+    await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText('~10–15 %');
+    let estado = await estadoDiagrama(page);
+    expect(estado.map((e) => e.pulsado)).toEqual([false, false, true, false, false, false, false, false]);
+    for (const e of estado) expect(e.pintadoActivo, 'aria-pressed y el relleno activo deben coincidir').toBe(e.pulsado);
+
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(componente(page, 'Módulo de cámaras')).toHaveAttribute('aria-pressed', 'true');
+    await expect(componente(page, 'Batería de litio')).toHaveAttribute('aria-pressed', 'false');
+    await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText('~10–12 %');
+    estado = await estadoDiagrama(page);
+    expect(estado.map((e) => e.pulsado)).toEqual([false, false, false, true, false, false, false, false]);
+    for (const e of estado) expect(e.pintadoActivo).toBe(e.pulsado);
+
+    await page.keyboard.press('Enter');
+    estado = await estadoDiagrama(page);
+    expect(estado.every((e) => !e.pulsado && !e.pintadoActivo)).toBe(true);
+    await expect(panel(page)).toContainText('Pulsa cualquier componente del diagrama');
+
+    // Oscuro: foco de teclado (Shift+Tab desde el deslizador cae en el último componente).
+    await ponerOscuro(page);
+    await page.locator(DESLIZADOR).focus();
+    await page.keyboard.press('Shift+Tab');
+    const rectEnsamblaje = componente(page, 'Ensamblaje final').locator('rect');
+    await expect(rectEnsamblaje).toHaveCSS('stroke', 'rgb(232, 232, 232)');
+    await expect(rectEnsamblaje).toHaveCSS('stroke-width', '3px');
+  });
+
+  // CASO 2 (1349, las 5 crisis). Esperado del array DISRUPCIONES de page.tsx: con Enter, cada
+  // crisis se despliega sola (la anterior se pliega), su aria-controls apunta a un id que existe
+  // y muestra su duración literal. Activar una crisis NO toca el diagrama ni el deslizador: la
+  // memoria NAND sigue pulsada y el nivel sigue en «0 %». Un clic en el resumen (no en el
+  // título) también despliega, por el ::after del botón.
+  test('crisis — las 5 se abren con Enter de una en una, sin tocar el diagrama ni el deslizador', async ({ page }) => {
+    const duraciones = [
+      '~2,5 años',
+      '6 días',
+      '~3–4 meses (cierre masivo)',
+      '~4 meses',
+      '~6 meses para recuperación parcial',
+    ];
+    await componente(page, 'Memoria flash (NAND)').click();
+    const botones = page.locator('[role="listitem"] button');
+    await expect(botones).toHaveCount(5);
+
+    for (let i = 0; i < 5; i++) {
+      await botones.nth(i).focus();
+      await page.keyboard.press('Enter');
+      const expandidos = await botones.evaluateAll((bs) => bs.map((b) => b.getAttribute('aria-expanded')));
+      expect(expandidos, `solo la crisis ${i} desplegada`).toEqual(
+        Array.from({ length: 5 }, (_, j) => (j === i ? 'true' : 'false')),
+      );
+      const idDetalle = await botones.nth(i).getAttribute('aria-controls');
+      expect(idDetalle).toBe(`disrupcion-detalle-${i}`);
+      const detalle = page.locator(`#${idDetalle}`);
+      await expect(detalle.locator('span[class*="timelineStatNum"]').first()).toHaveText(duraciones[i]);
+      await expect(detalle).toContainText('Lección aprendida:');
+      await expect(page.locator('div[class*="timelineDetalle"]')).toHaveCount(1);
+      await expect(componente(page, 'Memoria flash (NAND)')).toHaveAttribute('aria-pressed', 'true');
+      await expect(etiqueta(page)).toHaveText('0 %');
+    }
+
+    // Espacio pliega la última.
+    await page.keyboard.press(' ');
+    await expect(botones.nth(4)).toHaveAttribute('aria-expanded', 'false');
+
+    // Clic en el resumen de Suez, en coordenadas: el ::after del botón cubre la tarjeta.
+    const resumen = page.locator('[role="listitem"]').nth(1).locator('p[class*="timelineResumen"]');
+    await resumen.scrollIntoViewIfNeeded();
+    const caja = await resumen.boundingBox();
+    if (!caja) throw new Error('sin caja del resumen');
+    await page.mouse.click(caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await expect(botones.nth(1)).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  // HALLAZGO abierto: .costeBadge pone blanco sobre var(--primary). Texto de 13,6 px peso 700
+  // (texto pequeño: exige 4,5:1). Resuelto a mano: blanco sobre #2E86AB = 4,11:1 en claro y
+  // sobre #3FA5D1 = 2,79:1 en oscuro. Es la campaña de botones/badges con fondo de marca, que
+  // ningún candado mira (check:contraste-cabeceras solo vigila <th>/<thead>/.th).
+  test('contraste — el badge de coste del componente se lee a 4,5:1 en claro y en oscuro', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: badge de coste 4,11:1 en claro y 2,79:1 en oscuro');
+    await componente(page, 'Batería de litio').click();
+    const sel = 'span[class*="costeBadge"]';
+    const claro = await contrasteMinimo(page, sel);
+    await ponerOscuro(page);
+    const oscuro = await contrasteMinimo(page, sel);
+    expect(claro, 'badge de coste, tema claro').toBeGreaterThanOrEqual(4.5);
+    expect(oscuro, 'badge de coste, tema oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  // HALLAZGO abierto: la franja «Un smartphone moderno pasa por ~40 países…» es blanco sobre un
+  // degradado var(--primary) → var(--secondary), 14,4 px peso 600. Peor extremo, resuelto a
+  // mano: #48A9A6 = 2,80:1 en claro y #5ABDB9 = 2,23:1 en oscuro. Misma campaña sin candado.
+  test('contraste — la franja «~40 países» se lee a 4,5:1 en todo su degradado, en claro y en oscuro', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: franja ~40 países 2,80:1 en claro y 2,23:1 en oscuro');
+    const sel = 'div[class*="contadorPaises"]';
+    const claro = await contrasteMinimo(page, sel);
+    await ponerOscuro(page);
+    const oscuro = await contrasteMinimo(page, sel);
+    expect(claro, 'franja ~40 países, tema claro').toBeGreaterThanOrEqual(4.5);
+    expect(oscuro, 'franja ~40 países, tema oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  // HALLAZGO abierto: color de marca como TEXTO en tema claro. El año de cada crisis
+  // (.timelineAnio, var(--secondary), 12,8 px bold) da 2,80:1 sobre la tarjeta blanca; el
+  // «Tendencia desde 2020:» (var(--primary) sobre su degradado claro) 3,59:1; los títulos de las
+  // tarjetas JIT/JIC (var(--primary), 16,8 px bold) 4,11:1. En oscuro los tres pasan (6,17 /
+  // 5,21 / 4,93). El candado de cabeceras no mira el color de marca como texto: se resuelve con
+  // --primary-texto / --secondary-texto, que la propia app ya usa en .jitEstadoOk.
+  test('contraste — el color de marca usado como texto llega a 4,5:1 en tema claro', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: timelineAnio 2,80:1 · tendencia 3,59:1 · jitNombre 4,11:1 en claro');
+    const medidas = {
+      'año de la crisis (.timelineAnio)': await contrasteMinimo(page, 'p[class*="timelineAnio"]'),
+      'Tendencia desde 2020 (.tendencia strong)': await contrasteMinimo(page, 'div[class*="tendencia"] strong'),
+      'título JIT (.jitNombre)': await contrasteMinimo(page, 'h3[class*="jitNombre"]'),
+    };
+    for (const [nombre, valor] of Object.entries(medidas)) {
+      expect(valor, `${nombre}, tema claro`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  // HALLAZGO abierto: los rótulos del SVG escalan con el viewBox de 540 unidades. A 375 px de
+  // ancho el SVG mide 293 px (escala 0,543): los nombres (8,5 u) salen a 4,6 px y los países
+  // (7,5 u) a 4,1 px. Esperado: al menos 12 px, el tamaño más pequeño que la propia app usa en
+  // su HTML (.timelineStatLabel, 0,75rem).
+  test('móvil — los nombres de los componentes del diagrama se pintan a 12 px o más a 375 px de ancho', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: rótulos del SVG a 4,6 px (nombres) y 4,1 px (países) en móvil');
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.waitForTimeout(200);
+    const px = await page.evaluate(() => {
+      const svg = document.querySelector('svg[role="group"]');
+      if (!svg) throw new Error('sin diagrama');
+      const escala = svg.getBoundingClientRect().width / 540;
+      return [...svg.querySelectorAll('g[role="button"] text')]
+        .filter((t) => !/\p{Extended_Pictographic}/u.test(t.textContent ?? ''))
+        .map((t) => Number(t.getAttribute('font-size')) * escala);
+    });
+    expect(px.length).toBe(16); // 8 nombres + 8 países
+    expect(Math.min(...px), 'tamaño pintado del rótulo más pequeño, en px').toBeGreaterThanOrEqual(12);
+  });
+
+  // HALLAZGO abierto (dato): «el 60 % de las reservas mundiales» para el Triángulo del Litio.
+  // USGS, Mineral Commodity Summaries 2026 (litio): reservas Chile 9,2 Mt + Argentina 4,4 Mt de
+  // 37 Mt mundiales = 37 %; Bolivia no tiene reservas declaradas (sus 23 Mt son RECURSOS). En la
+  // edición de 2025: (9,3 + 4,0) / 30 = 44 %. Ni sumando recursos de los tres países se llega:
+  // (28 + 23 + 13) / 150 = 43 %.
+  test('dato — la ficha de la batería no atribuye al Triángulo del Litio el 60 % de las reservas', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: 60 % de reservas frente al 37 % del USGS 2026');
+    await componente(page, 'Batería de litio').click();
+    const texto = (await panel(page).textContent()) ?? '';
+    expect(texto).toContain('Triángulo del Litio');
+    expect(texto).not.toMatch(/60\s?%\s+de las reservas/);
+  });
+
+  // HALLAZGO abierto (dato): «más de 800 millones de subpíxeles» en una OLED de móvil.
+  // Aritmética: la de más resolución en móvil, 3120 × 1440 = 4.492.800 píxeles; × 3 subpíxeles
+  // = 13,5 millones (con matriz diamante, ~2 por píxel, ~9 millones). La cifra es ~60 veces
+  // mayor; ni un televisor 8K llega (7680 × 4320 × 3 = 99,5 millones).
+  test('dato — la ficha de la pantalla no dice «800 millones de subpíxeles»', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: 800 millones de subpíxeles frente a ~13,5 millones');
+    await componente(page, 'Pantalla OLED').click();
+    await expect(panel(page).getByRole('heading', { name: 'Pantalla OLED' })).toBeVisible();
+    await expect(panel(page)).not.toContainText('800 millones de subpíxeles');
+  });
+
+  // HALLAZGO abierto (dato): la batería «~10–15 %» del coste del dispositivo. TechInsights
+  // (iPhone XS Max, 2018): batería 9 $ de 443 $ de lista de materiales = 2,0 %. Se exige que el
+  // tope de la horquilla no pase del 5 %, margen de sobra para otros modelos y años.
+  test('dato — la batería no aparece como el 10–15 % del coste del móvil', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: batería ~10–15 % frente al ~2 % de TechInsights');
+    await componente(page, 'Batería de litio').click();
+    const badge = (await panel(page).locator('span[class*="costeBadge"]').textContent()) ?? '';
+    const cifras = (badge.match(/\d+/g) ?? []).map(Number);
+    expect(cifras.length).toBeGreaterThan(0);
+    expect(Math.max(...cifras), `tope de la horquilla «${badge}»`).toBeLessThanOrEqual(5);
+  });
+
+  // HALLAZGO abierto (dato): «El término fue acuñado por Jay Forrester (MIT, 1961)». Lee,
+  // Padmanabhan y Whang (MIT Sloan Management Review, 15/04/1997): «P&G called this phenomenon
+  // the "bullwhip" effect». Forrester describió la AMPLIFICACIÓN de la demanda (1958, 1961),
+  // pero no le puso ese nombre.
+  test('dato — el término «efecto látigo» no se atribuye a Forrester', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: el término lo acuñó P&G, no Forrester');
+    const guia = (await page.locator('body').textContent()) ?? '';
+    expect(guia).toContain('efecto látigo');
+    expect(guia).not.toMatch(/término fue acuñado por Jay Forrester/);
+  });
+
+  // HALLAZGO abierto (contenido): calcos del inglés. «subsidios billonarios (CHIPS Act…)»: en
+  // español un billón son 10^12; la CHIPS Act de EEUU son 52.700 millones de $ y la European
+  // Chips Act unos 43.000 millones de €, así que la palabra infla la cifra por mil. Y
+  // «Toyota Production System, 1950s» (en español: «años cincuenta» o «década de 1950»).
+  test('contenido — sin «billonarios» para la CHIPS Act ni «1950s»', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: «subsidios billonarios» y «1950s»');
+    const chips = page.getByRole('button', { name: 'Crisis global de semiconductores' });
+    await chips.click();
+    const detalle = page.locator('#disrupcion-detalle-0');
+    await expect(detalle).toContainText('CHIPS Act');
+    await expect(detalle).not.toContainText('billonarios');
+    await expect(page.locator('div[class*="jitCard"]').first()).not.toContainText('1950s');
+  });
+});

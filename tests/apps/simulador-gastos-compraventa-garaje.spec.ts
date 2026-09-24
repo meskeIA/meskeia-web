@@ -5337,3 +5337,490 @@ test('la ayuda del precio depende del régimen: en IVA, el precio pactado (famil
   await page.locator('select').filter({ has: page.locator('option[value="canarias"]') }).first().selectOption('canarias');
   await expect(ayuda).toContainText('(el mayor)');
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 24/09/2026 — tras 464b61f5 (sondeo), 70cce469, 85c9c9fe (una sola redacción
+// del neto incompleto) y 5b5d33ae (sin el IGIC/IPSI el coste real «puede ser» mayor).
+//
+// Cuatro casos resueltos a mano ANTES de ejecutar (notas en el scratch del Inspector), con
+// los mismos módulos de la cabecera de este fichero. Lo que el testigo de familia ya mide
+// (Canarias «puede/será», las filas de ilegibles de la base del testigo) no se repite: aquí va
+// lo que él no ve — Ceuta y Melilla con el «puede ser», el cruce de controles que no son
+// `NumberInput` (tipo de transmisión × tipo de garaje × territorio sin IVA × perfil) y los
+// estados del vendedor con la plusvalía «Sin calcular», el par catastral imposible y la
+// ganancia exactamente cero.
+//
+// Los títulos se anclan con una expresión regular dentro del panel de la pestaña: «IVA» a
+// secas casaría también con «Gastos de notaría (IVA incluido)».
+// ═════════════════════════════════════════════════════════════════════════════
+
+const i24Normaliza = (s: string): string => s.replace(/\s+/g, ' ').trim();
+const i24Rotulo = (page: Page, titulo: RegExp) =>
+  page.locator('[role="tabpanel"] h3').filter({ hasText: titulo }).first();
+async function i24Valor(page: Page, titulo: RegExp): Promise<string> {
+  return i24Normaliza(
+    await i24Rotulo(page, titulo).locator('xpath=../following-sibling::div[1]/p').innerText(),
+  );
+}
+async function i24Desc(page: Page, titulo: RegExp): Promise<string> {
+  return i24Normaliza(await i24Rotulo(page, titulo).locator('xpath=../following-sibling::p[1]').innerText());
+}
+async function i24Titulo(page: Page, titulo: RegExp): Promise<string> {
+  return i24Normaliza(await i24Rotulo(page, titulo).innerText());
+}
+
+/** La pestaña del vendedor con los ocho datos (vacío = campo en blanco). */
+async function i24Vendedor(
+  page: Page,
+  d: {
+    venta: string;
+    compra: string;
+    gastos: string;
+    anios: string;
+    suelo: string;
+    total: string;
+    comision: string;
+    gestoria: string;
+  },
+): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+  await sembrarImporte(page, 'Precio del garaje / plaza de parking', d.venta);
+  await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+  await sembrarImporte(page, 'Precio de compra original del garaje', d.compra);
+  await sembrarImporte(page, 'Impuestos y gastos que pagaste al comprarlo (€)', d.gastos);
+  await sembrarImporte(page, 'Años de propiedad', d.anios);
+  await sembrarImporte(page, 'Valor catastral del suelo (€)', d.suelo);
+  await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', d.total);
+  await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', d.comision);
+  await sembrarImporte(page, 'Gestoría y certificados del vendedor (€)', d.gestoria);
+}
+
+test.describe('Inspección 24/09/2026 — sondeo, redacción común del neto y el IPSI «puede ser»', () => {
+  /**
+   * CASO AE (LÍMITE) — ASTURIAS · segunda mano · 320.000 € · perfil FAMILIA NUMEROSA · gestoría
+   * 300 €. Comunidad con escala progresiva (8 % hasta 300.000, 9 % hasta 500.000, 10 %) y el
+   * PRIMER CRUCE de tramo que ninguna inspección había pisado en ella (el CASO S del 18/09 se
+   * quedó en 45.000 €), cruzado con un perfil cuyos dos reducidos topan en 150.000 €.
+   *
+   * elegirTipoITP: candidatos por «familia» = «Familia numerosa» y «Familia monoparental», los
+   *   dos al 4 % con `valorMaximo: 150000` → ninguno aplicable → tipo general CON ESCALA, y los
+   *   dos se enseñan con «tu precio supera ese límite» (hallazgo 765).
+   * ITP = 300.000 × 8 % + 20.000 × 9 % = 24.000 + 1.800 =                        25.800,00
+   *   efectivo 25.800 / 320.000 = 8,0625 % → «ITP (8,06%)» (el plano del 8 % daría 25.600)
+   * Notaría — 90,15 + 24.040,49 × 0,45 % + 30.050,60 × 0,15 % + 90.151,82 × 0,10 %
+   *   + 169.746,97 × 0,05 % = 418,43341 × 1,21 = 506,3044261
+   *   → ×1,5 = 759,46 · ×2 = 1.012,61 · ×1,75 =                                      886,03
+   * Registro — 24,04 + 42,0708575 + 37,56325 + 67,613865 + 169.746,97 × 0,030 % (50,924091)
+   *   = 222,2120635 + 6,010121 + 3,005061 = 231,2272455 × 1,21 =                     279,78
+   * Total = 25.800 + 886,03 + 279,78 + 300 = 27.265,81 (8,52 %) · coste =         347.265,81
+   */
+  test('CASO AE (límite) — Asturias 320.000 €: la escala cruza al 9 % y los reducidos de 150.000 € se enseñan descartados', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.asturias.tramosProgresivos).toEqual([
+      { hasta: 300000, tipo: 8 },
+      { hasta: 500000, tipo: 9 },
+      { hasta: Infinity, tipo: 10 },
+    ]);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'asturias');
+    await page.selectOption('#select-perfil', 'familia-numerosa');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '320000');
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    await expect(page.getByText('Esta comunidad aplica escala progresiva')).toContainText('(8% → 9% → 10%)');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (8,06%)');
+    expect(await i24Valor(page, /^ITP/)).toBe('25.800,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('886,03 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('entre 759,46 € y 1012,61 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('279,78 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('27.265,81 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('8,52% sobre el precio');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('347.265,81 €');
+
+    const aviso = i24Normaliza(
+      await page.locator('[role="tabpanel"] [role="note"]').filter({ hasText: 'Podrías pagar menos' }).innerText(),
+    );
+    expect(aviso).toContain('8,06% efectivo sobre el precio');
+    expect(aviso).toContain('4,00% — Familia numerosa');
+    // Las dos líneas del 4 % van marcadas: 320.000 € supera su tope de 150.000 €.
+    expect(aviso.match(/tu precio supera ese límite/g)?.length).toBe(2);
+  });
+
+  /**
+   * CASO AF (NORMAL, obra nueva) — GALICIA · primera mano · 28.000 € · gestoría 250 €, con los
+   * dos tipos de garaje, y el cruce con los dos territorios sin IVA que el testigo de familia no
+   * recorre (solo va a Canarias): MELILLA y CEUTA.
+   *
+   * AJD Galicia 1,5 % = 420,00 · Notaría — 90,15 + 21.989,88 × 0,45 % = 189,10446 × 1,21
+   *   = 228,8163966 → ×1,5 = 343,22 · ×2 = 457,63 · ×1,75 = 400,43
+   * Registro — 24,04 + 21.989,88 × 0,175 % + 9,015182 = 71,537472 × 1,21 = 86,56
+   * VINCULADO (`anejoVinculado` 10 %): IVA 2.800,00 · total 3.956,99 (14,13 %) · coste 31.956,99
+   * INDEPENDIENTE (`garaje` 21 %): IVA 5.880,00 · total 7.036,99 (25,13 %) · coste 35.036,99
+   * MELILLA: sin selector de tipo de garaje (hallazgo 475); IPSI «No calculado»; AJD 28.000 ×
+   *   0,5 % × 50 % (art. 57 bis TRLITPAJD) = 70,00 «AJD (0,25%)»; total (parcial) 806,99
+   *   (2,88 %); COSTE TOTAL (PARCIAL) 28.806,99 «…el coste real puede ser mayor» (5b5d33ae).
+   *   Con la gestoría «2.000.50»: 556,99 (1,99 %) y 28.556,99 «…será mayor».
+   * De vuelta a Galicia, la elección «Independiente» sigue pulsada y el 21 % vuelve.
+   */
+  test('CASO AF (normal) — Galicia obra nueva 10 % / 21 %, y Melilla y Ceuta sin IPSI: «puede ser mayor», «será» solo con la gestoría ilegible', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.galicia.ajd).toBe(1.5);
+    expect(ITP_CCAA.melilla.ajd).toBe(0.5);
+    expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(10);
+    expect(IVA_INMUEBLES_2025.garaje).toBe(21);
+    expect(TERRITORIOS_SIN_IVA.melilla?.impuesto).toBe('IPSI');
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'galicia');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '28000');
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '250');
+
+    // Vinculado es el que viene pulsado.
+    await expect(page.getByRole('button', { name: /Vinculado a vivienda/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await i24Titulo(page, /^IVA/)).toBe('IVA (10,00%)');
+    expect(await i24Valor(page, /^IVA/)).toBe('2800,00 €');
+    expect(await i24Titulo(page, /^AJD/)).toBe('AJD (1,50%)');
+    expect(await i24Valor(page, /^AJD/)).toBe('420,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('400,43 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('86,56 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('3956,99 €');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('31.956,99 €');
+
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    expect(await i24Titulo(page, /^IVA/)).toBe('IVA (21,00%)');
+    expect(await i24Valor(page, /^IVA/)).toBe('5880,00 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('25,13% sobre el precio');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('35.036,99 €');
+
+    await page.selectOption('#select-ccaa', 'melilla');
+    await expect(page.getByRole('button', { name: /Independiente/ })).toHaveCount(0);
+    expect(await i24Valor(page, /^IPSI/)).toBe('No calculado');
+    expect(await i24Titulo(page, /^AJD/)).toBe('AJD (0,25%)');
+    expect(await i24Valor(page, /^AJD/)).toBe('70,00 €');
+    expect(await i24Titulo(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('806,99 €');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('28.806,99 €');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe('No incluye el IPSI: el coste real puede ser mayor');
+
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('556,99 €');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('28.556,99 €');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe(
+      'No incluye el IPSI ni la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
+
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '250');
+    await page.selectOption('#select-ccaa', 'ceuta');
+    expect(await i24Valor(page, /^IPSI/)).toBe('No calculado');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('28.806,99 €');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe('No incluye el IPSI: el coste real puede ser mayor');
+
+    // Y de vuelta a Galicia, la elección hecha antes de pasar por Melilla se conserva.
+    await page.selectOption('#select-ccaa', 'galicia');
+    await expect(page.getByRole('button', { name: /Independiente/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('35.036,99 €');
+  });
+
+  /**
+   * CASO AG (NORMAL, vendedor con ganancia y plusvalía) — venta 40.000 · compra 25.000 · gastos
+   * de aquella compra 2.500 · 5 AÑOS (coeficiente 0,17, el máximo de la tabla, nunca probado) ·
+   * suelo 6.000 · total 15.000 · comisión 4 % · gestoría de la venta 350.
+   *
+   * Plusvalía objetivo = 6.000 × 0,17 × 25 % = 255,00 · real = 15.000 × (6.000/15.000) × 25 %
+   *   = 1.500,00 → gana el objetivo: 255,00
+   * Comisión 1.600 · transmisión 40.000 − 1.600 − 350 − 255 = 37.795,00 · adquisición 27.500,00
+   * Ganancia 10.295,00 · IRPF 6.000 × 19 % + 4.295 × 21 % = 1.140 + 901,95 = 2.041,95
+   * Total 4.246,95 · NETO 35.753,05, definitivo.
+   *
+   * Con la gestoría de la venta «2.000.50» (ilegible → 0, redacción común del 24/09):
+   *   transmisión 38.145,00 · ganancia 10.645,00 · IRPF 1.140 + 4.645 × 21 % = 2.115,45
+   *   total 3.970,45 · NETO (PARCIAL) 36.029,55 — 276,50 por encima (= 350 × 79 %). El aviso
+   *   dice «es menor» (seguro: un euro ya lo mueve) con la cota del marginal del 21 %.
+   */
+  test('CASO AG (normal) — vendedor con ganancia en el 2.º tramo y plusvalía objetivo, y su gestoría ilegible con la redacción común', async ({
+    page,
+  }) => {
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 5)?.coeficiente).toBe(0.17);
+
+    await i24Vendedor(page, {
+      venta: '40000',
+      compra: '25000',
+      gastos: '2500',
+      anios: '5',
+      suelo: '6000',
+      total: '15000',
+      comision: '4',
+      gestoria: '350',
+    });
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('255,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('27.500,00 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('37.795,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('10.295,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('2041,95 €');
+    expect(await i24Titulo(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (4%)');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('4246,95 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('35.753,05 €');
+
+    await sembrarImporte(page, 'Gestoría y certificados del vendedor (€)', '2.000.50');
+    expect(await i24Valor(page, /^Gestoría y certificados del vendedor/)).toBe('Sin leer');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('38.145,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('10.645,00 €');
+    expect(await i24Desc(page, /^Ganancia patrimonial/)).toContain('la ganancia real es menor');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('2115,45 €');
+    expect(await i24Desc(page, /^IRPF sobre ganancia/)).toContain('la cuota real es menor');
+    expect(await i24Titulo(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('3970,45 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('36.029,55 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'No descuenta la gestoría de la venta, que no se ha podido leer (la gestoría de la venta rebaja también el IRPF al descontarla, hasta un 21 % de su importe): el neto real es menor que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+  });
+
+  /**
+   * CASO AH (RECHAZO) — la base del CASO AG con «Años de propiedad» = «-3», saliendo del campo.
+   * Un año negativo se RECHAZA, no se acota a 0 (hallazgos 764, 822 y 844): la plusvalía queda
+   * «Sin calcular», el campo conserva «-3», y el neto se publica PARCIAL sin ella:
+   *   transmisión 40.000 − 1.600 − 350 = 38.050,00 · ganancia 10.550,00
+   *   IRPF 1.140 + 4.550 × 21 % = 2.095,50 · total 4.045,50 · NETO (PARCIAL) 35.954,50
+   */
+  test('CASO AH (rechazo) — años «-3»: no se liquida la plusvalía, el campo conserva el texto y el neto sale parcial', async ({
+    page,
+  }) => {
+    await i24Vendedor(page, {
+      venta: '40000',
+      compra: '25000',
+      gastos: '2500',
+      anios: '-3',
+      suelo: '6000',
+      total: '15000',
+      comision: '4',
+      gestoria: '350',
+    });
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('-3');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('10.550,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('2095,50 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('4045,50 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('35.954,50 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toContain(
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este',
+    );
+  });
+});
+
+test.describe('Hallazgos abiertos — inspección del 24/09/2026', () => {
+  /**
+   * ❌ HALLAZGO abierto (contenido, medio) — EFECTO FAMILIA desde trastero (0dba12c9, 02/09).
+   * La fila «Tipos reducidos ITP» de la tabla garaje/vivienda dice «Sí (joven, discapacidad…)»
+   * en las DOS columnas, es decir, que el garaje los tiene igual que la vivienda. El motor los
+   * descarta siempre (`viviendaHabitual: false`), la FAQ de la misma sección dice «el tipo
+   * reducido NO aplica aunque el comprador cumpla el resto de condiciones» y el ejemplo de
+   * Carlos, «NO aplican a un garaje suelto». Trastero reescribió su fila el 02/09 («Según CCAA,
+   * pero casi todos exigen vivienda habitual»); aquí no llegó.
+   * Andalucía · Joven · 18.000 € → la app liquida ITP (7,00%) 1260,00 €, no los 630 € del 3,5 %.
+   */
+  test('la fila «Tipos reducidos ITP» del garaje no los promete como a la vivienda', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: la celda del garaje dice «Sí (joven, discapacidad…)».
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    const celdaGaraje = i24Normaliza(
+      await page.locator('tr', { hasText: 'Tipos reducidos ITP' }).locator('td').nth(1).innerText(),
+    );
+    expect(celdaGaraje).toMatch(/vivienda habitual|no aplica/i);
+  });
+
+  /**
+   * ❌ HALLAZGO abierto (contenido, medio) — con la plusvalía «Sin calcular», la tarjeta «Valor
+   * de transmisión» sigue diciendo que resta la plusvalía municipal, y el IRPF y la ganancia se
+   * publican como definitivos siendo TECHOS (la plusvalía, al calcularse, resta del valor de
+   * transmisión). Es la forma del 1197 (una descripción que afirma incluir lo que el motor tomó
+   * como 0) y del 1251 (IRPF definitivo que es un techo), con la causa que el sondeo no cubre:
+   * el suelo VACÍO o ilegible, que es el estado con el que se abre la pestaña.
+   * Base del testigo con el suelo vacío: transmisión 25.000 − 750 − 500 = 23.750,00 (sin
+   * plusvalía), ganancia 3950,00, IRPF 750,50 € «Tributación en base del ahorro» (con el suelo
+   * 5.000 el IRPF es 726,75 €).
+   */
+  test('con la plusvalía sin calcular, «Valor de transmisión» no afirma haberla restado', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: la descripción dice «− comisión, gestoría y plusvalía municipal».
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '18000',
+      gastos: '1800',
+      anios: '8',
+      suelo: '',
+      total: '12000',
+      comision: '3',
+      gestoria: '500',
+    });
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('23.750,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('750,50 €');
+    expect(await i24Desc(page, /^Valor de transmisión/)).not.toBe(
+      'Precio de venta − comisión, gestoría y plusvalía municipal',
+    );
+  });
+
+  /**
+   * ❌ HALLAZGO abierto (operativa, bajo) — EFECTO FAMILIA del 1232 de la referencia (70cce469
+   * y 85c9c9fe): con el par catastral imposible (suelo > total) la plusvalía se liquida por el
+   * objetivo sin comparar con el real, pero el neto se publica DEFINITIVO. La referencia lo
+   * rotula «(PARCIAL)» con «el neto real puede ser MAYOR que este».
+   * Base del testigo con suelo 8.000 / total 5.000: objetivo 8.000 × 0,10 × 25 % = 200,00 ·
+   * ganancia 3750,00 · IRPF 712,50 · neto 22.837,50 «Lo que realmente recibes…». Con el recibo
+   * al derecho (5.000 / 8.000) el neto es 22.898,25 €: MAYOR.
+   */
+  test('con el par catastral imposible, el neto no se publica como definitivo (efecto familia del 1232)', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO abierto: el neto dice «Lo que realmente recibes tras gastos e impuestos».
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '18000',
+      gastos: '1800',
+      anios: '8',
+      suelo: '8000',
+      total: '5000',
+      comision: '3',
+      gestoria: '500',
+    });
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('200,00 €');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('22.837,50 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).not.toBe('Lo que realmente recibes tras gastos e impuestos');
+  });
+
+  /**
+   * ❌ HALLAZGO abierto (operativa, bajo) — vendiendo por DEBAJO del precio de compra, la no
+   * sujeción del art. 104.5 TRLRHL no depende del valor catastral del suelo (el motor la decide
+   * con venta − compra ≤ 0), pero la app no llama al motor sin el suelo: rotula la plusvalía
+   * «Sin calcular», marca el neto «(PARCIAL)» con «el neto real puede ser menor que este» y
+   * manda rellenar el suelo. El neto no puede ser menor: con el suelo es idéntico y NO SUJETA.
+   * Venta 20.000 · compra 24.000 · gastos 1.500 · 10 años · suelo vacío · comisión 3 % →
+   * pérdida 6100,00 · SIN CUOTA · neto 19.400,00 (con suelo 5.000: 19.400,00 definitivo).
+   */
+  test('vendiendo por debajo de la compra, el suelo vacío no hace «parcial» un neto que no puede bajar', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO abierto: el neto dice «el neto real puede ser menor que este».
+    await i24Vendedor(page, {
+      venta: '20000',
+      compra: '24000',
+      gastos: '1500',
+      anios: '10',
+      suelo: '',
+      total: '',
+      comision: '3',
+      gestoria: '',
+    });
+    expect(await i24Valor(page, /^Pérdida patrimonial/)).toBe('6100,00 €');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('19.400,00 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).not.toContain('el neto real puede ser menor');
+  });
+
+  /**
+   * ❌ HALLAZGO abierto (contenido, bajo) — con la ganancia EXACTAMENTE en cero porque los
+   * gastos de aquella compra no se han podido leer, la tarjeta «Sin ganancia ni pérdida» afirma
+   * «ni pérdida que compensar» mientras la de al lado dice que esos gastos no se leyeron: con
+   * cualquier importe positivo hay una pérdida compensable. Es el borde que el 1249 dejó fuera
+   * (la pérdida sí avisa desde 464b61f5; el cero, que viene del 823, no).
+   * Venta 30.000 · compra 30.000 · gastos «2.000.50» · 10 años · suelo 5.000 · comisión 0 →
+   * «Sin ganancia ni pérdida 0,00 €»; con gastos 2.000 → «Pérdida patrimonial 2000,00 €».
+   */
+  test('con los gastos de aquella compra ilegibles, el cero no afirma que no hay pérdida que compensar', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO abierto: «no hay IRPF que pagar ni pérdida que compensar».
+    await i24Vendedor(page, {
+      venta: '30000',
+      compra: '30000',
+      gastos: '2.000.50',
+      anios: '10',
+      suelo: '5000',
+      total: '',
+      comision: '0',
+      gestoria: '',
+    });
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('30.000,00 €');
+    const panel = i24Normaliza(await page.locator('[role="tabpanel"]').innerText());
+    expect(panel).not.toContain('ni pérdida que compensar');
+  });
+
+  /**
+   * ❌ HALLAZGO abierto (contenido, bajo) — con la gestoría del COMPRADOR ilegible, el coste
+   * total se sigue titulando «COSTE TOTAL DE ADQUISICIÓN» (y el total, «Total gastos
+   * adicionales») mientras su descripción dice «el coste real será mayor». La redacción común
+   * del 24/09 titula «(PARCIAL)» toda cifra final que no incluye algo, y así lo hace esta misma
+   * tarjeta cuando lo que falta es el IGIC/IPSI. Está igual en la referencia.
+   * Madrid · 25.000 € · gestoría «2.000.50» → COSTE TOTAL DE ADQUISICIÓN 26.952,05 €.
+   */
+  test('con la gestoría del comprador ilegible, el coste total se titula «(PARCIAL)»', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: el título sigue siendo «COSTE TOTAL DE ADQUISICIÓN».
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25000');
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('26.952,05 €');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toContain('el coste real será mayor');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toContain('(PARCIAL)');
+  });
+
+  /**
+   * ❌ HALLAZGO abierto (contenido, bajo) — la descripción de la «Pérdida patrimonial» con un
+   * ilegible empieza en MINÚSCULA: `avisoPerdida` nació en 464b61f5 sin la `mayuscula()` que
+   * 85c9c9fe puso al neto y a las tarjetas del IRPF y de la ganancia.
+   * Venta 25.000 · compra 30.000 · gastos «2.000.50» · 8 años · suelo 5.000 · total 12.000 ·
+   * comisión 3 % · gestoría 500 → «no se han podido leer los impuestos y gastos de aquella
+   * compra: la pérdida real es mayor que esta…» sobre 6250,00 € (con 1.800: 8050,00 €).
+   */
+  test('el aviso de la pérdida patrimonial empieza en mayúscula, como los demás', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: empieza por «no se han podido leer…».
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '30000',
+      gastos: '2.000.50',
+      anios: '8',
+      suelo: '5000',
+      total: '12000',
+      comision: '3',
+      gestoria: '500',
+    });
+    expect(await i24Valor(page, /^Pérdida patrimonial/)).toBe('6250,00 €');
+    expect(await i24Desc(page, /^Pérdida patrimonial/)).toContain('la pérdida real es mayor que esta');
+    expect(await i24Desc(page, /^Pérdida patrimonial/)).toMatch(/^[A-ZÁÉÍÓÚÑ]/);
+  });
+
+  /**
+   * ❌ HALLAZGO abierto (contenido, bajo) — un año de propiedad NEGATIVO se rechaza bien, pero
+   * se anuncia como que FALTA: «No calculada (faltan los años de propiedad)» y «Rellena los años
+   * de propiedad», con «-3» escrito y a la vista. Es la forma del 1254 (lo escrito no «falta»)
+   * con un valor legible pero imposible, que 464b61f5 no separó de los vacíos.
+   * Base del CASO AH (años «-3», tras salir del campo).
+   */
+  test('un año de propiedad negativo no se anuncia como que falta', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: «No calculada (faltan los años de propiedad)».
+    await i24Vendedor(page, {
+      venta: '40000',
+      compra: '25000',
+      gastos: '2500',
+      anios: '-3',
+      suelo: '6000',
+      total: '15000',
+      comision: '4',
+      gestoria: '350',
+    });
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('-3');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).not.toContain('faltan los años de propiedad');
+  });
+});

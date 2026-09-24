@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * Inspector — conversor-numeros-letras (segmento CÁLCULO / LENGUA, riesgo 3)
@@ -457,4 +458,253 @@ test('MEJORA · el aviso calla donde no hay duda, para no dejar de informar', as
     'ochocientos treinta mil cuatrocientos euros',
   );
   await expect(aviso).toHaveCount(0);
+});
+
+/**
+ * ══════════════════════════════════════════════════════════════════════════════════════════
+ * TERCERA INSPECCIÓN · 24/09/2026 — re-inspección por FIRMA DE ROTURA
+ * ══════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * Vuelve a la cola porque en los 30 días hasta el 23/09 hizo 82,2 % de visitas cortas
+ * (catálogo 62,3 %) y 6,8 % de recargas (catálogo 2,9 %) en 73 visitas. Se buscó lo que
+ * impide USAR la app, no solo lo que calcula mal.
+ *
+ * LOS 6 HALLAZGOS ANTERIORES (232-236 y 263) SIGUEN REPARADOS: los cubren, sin cambios, los
+ * bloques CASO 2a / REGRESIÓN 1 (232), CASO 2c / REGRESIÓN 2 (233), CASO 3 (234), CASO 2b /
+ * REGRESIÓN 4 (235), REGRESIÓN 5 (236) y REGRESIÓN 6 (263), que pasan hoy. No se duplican aquí
+ * 21, 100, 101, 1.000.000, 21.000, 0,05 ni el negativo -21: ya están arriba.
+ *
+ * ESPERADOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *   · Regla del parser (lib/formatters.ts): fuera espacios (normal, NBSP y fino U+202F) y un
+ *     €, $ o £ pegado; con los dos separadores manda el último; con uno solo, el español.
+ *     De ahí: 1500 · 1.500 · 1 500 · 1500 € · €1500 → 1.500; 1500,50 · 1.500,50 · 1,500.50 ·
+ *     1500.5 · «1 500,50» con NBSP (lo que pega Excel en es-ES) → 1.500,50.
+ *   · Norma: DPD, s. v. «uno» §2.2 (las leyes de la apócope rigen dentro de los numerales
+ *     complejos: «treinta y un kilos») y §2.3 (concordancia; con «mil» interpuesto es
+ *     opcional, «cuarenta y una mil libras»; las centenas concuerdan siempre: «setecientas mil
+ *     toneladas»); DPD, s. v. «millón» (con «de» si no sigue otro numeral).
+ *   · Género de las monedas: DLE, s. v. «lempira»: «1. m. Unidad monetaria de Honduras.»
+ *     (consultado el 24/09/2026), y Ley Monetaria de Honduras, art. 1: «La unidad monetaria
+ *     de Honduras es el Lempira».
+ */
+test.describe('Inspección 24/09/2026 — importes reales, lempira, móvil y tema oscuro', () => {
+  const panel = (page: Page) => page.locator('[role="region"][aria-label="Resultado"]');
+
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#cantidad']);
+  });
+
+  test('las formas reales de teclear o pegar 1.500 € se leen todas igual', async ({ page }) => {
+    for (const entrada of ['1500', '1.500', '1 500', '1500 €', '€1500', '  1500  ', '+1500']) {
+      expect(await enLetras(page, entrada), entrada).toBe('mil quinientos euros');
+    }
+    // «1 500,50» con NBSP y con espacio fino: es lo que llega al copiar de Excel o de Intl
+    for (const entrada of ['1500,50', '1.500,50', '1,500.50', '1500.5', '1 500,50', '1 500,50', '1.500,50 €']) {
+      expect(await enLetras(page, entrada), entrada).toBe('mil quinientos euros con cincuenta céntimos');
+    }
+    // DPD, s. v. «millón»: millones redondos, con «de»
+    expect(await enLetras(page, '15.000.000')).toBe('quince millones de euros');
+    expect(await enLetras(page, '-20')).toBe('menos veinte euros');
+
+    // «1,500»: coma sola = decimal español (1,50 €), y la app avisa con la otra lectura a un clic
+    expect(await enLetras(page, '1,500')).toBe('un euro con cincuenta céntimos');
+    await expect(panel(page).locator('[role="status"]')).toContainText('1,500');
+    await expect(page.getByRole('button', { name: 'Leer 1500' })).toBeVisible();
+  });
+
+  test('clásicos que faltaban: 1.000.001, doscientas y veintiuna mil libras', async ({ page }) => {
+    // DPD «uno» §2.2: la apócope rige dentro del numeral complejo, como «treinta y un kilos»
+    expect(await enLetras(page, '1.000.001')).toBe('un millón un euros');
+
+    await page.locator('#moneda').selectOption('GBP');
+    // DPD «uno» §2.3: las centenas concuerdan siempre con el sustantivo femenino
+    expect(await enLetras(page, '200')).toBe('doscientas libras');
+    // DPD «uno» §2.3: con «mil» interpuesto la concordancia es opcional; la app da la femenina,
+    // que según el DPD «se está imponiendo en la lengua actual»
+    expect(await enLetras(page, '21.000')).toBe('veintiuna mil libras');
+
+    // Suelto no hay sustantivo detrás, así que va la forma plena (DPD «uno» §2.2)
+    await page.getByRole('button', { name: /Número suelto/ }).click();
+    expect(await enLetras(page, '1.000.001')).toBe('un millón uno');
+  });
+
+  test.describe('portapapeles', () => {
+    test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+    test('Copiar deja en el portapapeles exactamente el importe en letras', async ({ page }) => {
+      expect(await enLetras(page, '1.500,50')).toBe('mil quinientos euros con cincuenta céntimos');
+      await page.getByRole('button', { name: /Copiar/ }).click();
+      await expect(page.getByRole('button', { name: /Copiado/ })).toBeVisible();
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        'mil quinientos euros con cincuenta céntimos',
+      );
+    });
+  });
+
+  /**
+   * HALLAZGO abierto (alto, dato): el lempira es MASCULINO y la app lo declara femenino en
+   * MONEDAS (lib/numeroALetras.ts, genero: 'femenino'). DLE, s. v. «lempira»: «1. m. Unidad
+   * monetaria de Honduras»; Ley Monetaria de Honduras, art. 1: «La unidad monetaria de
+   * Honduras es EL Lempira». Con la concordancia de las centenas, que es obligatoria (DPD
+   * «uno» §2.3), la app escribe en el cheque «doscientas lempiras». Honduras aportaba 20 de
+   * las 282 visitas del 17-21/08.
+   */
+  test('HALLAZGO lempira · el lempira es masculino: un lempira, veintiún y doscientos lempiras', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: HNL declarado femenino; da «una lempira», «doscientas lempiras»');
+    await page.locator('#moneda').selectOption('HNL');
+    expect(await enLetras(page, '1')).toBe('un lempira');
+    expect(await enLetras(page, '21')).toBe('veintiún lempiras');
+    expect(await enLetras(page, '200')).toBe('doscientos lempiras');
+  });
+
+  /**
+   * HALLAZGO abierto (medio, operativa): el símbolo de moneda tecleado se descarta en silencio
+   * y se escribe la moneda del selector, que por defecto es el euro. Quien pega «$1,500.00» o
+   * «£1.500» lee «mil quinientos euros» sin ningún aviso. Lo correcto, con cualquier
+   * reparación razonable: o el resultado no dice «euros», o la app avisa de que el símbolo
+   * no coincide con la moneda elegida.
+   */
+  test('HALLAZGO símbolo · «£1.500» y «$1,500.00» no pueden salir en euros sin avisar', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: el £/$ tecleado se descarta y sale «mil quinientos euros» sin aviso');
+    for (const entrada of ['£1.500', '$1,500.00']) {
+      const texto = await enLetras(page, entrada);
+      const avisos = await panel(page).locator('[role="status"], [role="alert"]').count();
+      expect(avisos > 0 || !texto.includes('euros'), `${entrada} → «${texto}»`).toBe(true);
+    }
+  });
+
+  /**
+   * HALLAZGO abierto (bajo, operativa): la app tolera €, $ y £ pegados a la cifra, pero
+   * rechaza el símbolo de monedas que ella misma ofrece en el selector: S/ (sol), Q
+   * (quetzal), RD$ (peso dominicano), L (lempira), C$ (córdoba), ₡ (colón). El mensaje sí
+   * explica qué quiere («Escribe solo cifras»), así que no es mudo, pero es incoherente con
+   * «$1,500.00», que entra.
+   */
+  test('HALLAZGO símbolos · los de las monedas del selector se rechazan y el $ no', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: «S/ 1,500.00» se rechaza mientras «$1,500.00» se acepta');
+    expect(await enLetras(page, '$1,500.00')).toBe('mil quinientos euros'); // el $ sí entra
+    for (const entrada of ['S/ 1,500.00', 'Q1,500.00', 'RD$1,500.00']) {
+      // enLetras espera al texto en letras: hoy no llega porque sale el aviso de rechazo
+      expect(await enLetras(page, entrada), entrada).toContain('mil quinientos');
+    }
+  });
+
+  /**
+   * HALLAZGO abierto (bajo, contenido): en «Número suelto» la etiqueta de control, que es la
+   * que confirma cómo se ha interpretado la cifra (REGRESIÓN 2), redondea a dos decimales lo
+   * que el texto lee entero: «1,5» se etiqueta «1,50» y se lee «uno coma cinco»; «0,001» se
+   * etiqueta «0,00» y se lee «cero coma cero cero uno».
+   */
+  test('HALLAZGO etiqueta · en número suelto la etiqueta enseña la cifra que se lee', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: la etiqueta de número suelto fuerza dos decimales');
+    await page.getByRole('button', { name: /Número suelto/ }).click();
+    const etiqueta = panel(page).locator('span').first();
+    expect(await enLetras(page, '1,5')).toBe('uno coma cinco');
+    await expect(etiqueta).toHaveText('1,5', { timeout: 1000 });
+    expect(await enLetras(page, '0,001')).toBe('cero coma cero cero uno');
+    await expect(etiqueta).toHaveText('0,001', { timeout: 1000 });
+  });
+
+  /**
+   * HALLAZGO abierto (medio, accesibilidad): regresión de ff406b1b (26/08). La regla del aviso
+   * de coma ambigua se insertó EN MEDIO de la lista de selectores oscuros de .helper,
+   * .ejemplosLabel y .toggleAyuda, de modo que en tema oscuro esos tres textos pierden su
+   * color (#94a3b8) y heredan el fondo ámbar del aviso: tres franjas marrones bajo el campo,
+   * «Prueba con:» y «Con tildes…», con el texto a 4,12:1 (13,6 px, pide 4,5:1). En claro, sin
+   * fondo. Lo correcto: fondo transparente también en oscuro.
+   */
+  test('HALLAZGO oscuro · los textos de ayuda no llevan el fondo ámbar del aviso', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: en oscuro .helper/.ejemplosLabel/.toggleAyuda tienen fondo rgba(245, 158, 11, 0.14)');
+    const ayuda = page.locator('#cantidad ~ p').first();
+    await expect(ayuda).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)'); // tema claro: sin fondo
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    // Lectura ÚNICA tras la transición de 0,3 s de globals.css: un toHaveCSS con reintentos
+    // casaría con el primer fotograma de la transición, que aún es transparente.
+    await page.waitForTimeout(700);
+    expect(await ayuda.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+  });
+
+  /**
+   * HALLAZGO abierto (bajo, accesibilidad): texto blanco sobre el color de marca en los
+   * botones activos. «Importe con moneda» activo: blanco sobre #2E86AB = 4,11:1 en claro y
+   * blanco sobre rgb(63,165,209) = 2,80:1 en oscuro, a 16 px/600 (no es texto grande: pide
+   * 4,5:1). El CLAUDE.md lo deja fuera del candado de contraste («botones y badges con fondo
+   * de marca, campaña aparte»), así que ningún candado lo habría parado.
+   */
+  test('HALLAZGO contraste · el botón de modo activo alcanza 4,5:1 en oscuro', async ({ page }) => {
+    test.fail(true, 'HALLAZGO abierto: blanco sobre --primary oscuro = 2,80:1');
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    const activo = page.getByRole('button', { name: /Importe con moneda/ });
+    await expect(activo).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(400); // la transición de fondo es de 0,2 s
+    const ratio = await activo.evaluate((el) => {
+      const rgb = (c: string) => (c.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+      const lum = (c: string) => {
+        const [r, g, b] = rgb(c).map((v) => {
+          const s = v / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const cs = getComputedStyle(el);
+      const a = lum(cs.color);
+      const b = lum(cs.backgroundColor);
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    });
+    expect(ratio).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test.describe('en móvil (390×844, táctil)', () => {
+    // Enumerado en vez de `...devices['Pixel 7']`: un `devices` dentro de un describe forzaría
+    // un worker nuevo, y estas cinco opciones no.
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('sin scroll horizontal', async ({ page }) => {
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+    });
+
+    /**
+     * HALLAZGO abierto (medio, operativa) — el que mejor explica la firma de rotura. En móvil
+     * el resultado vive ~770 px por debajo del campo (en medio: moneda, los tres estilos de
+     * decimales y MAYÚSCULAS). Al tocar el campo y escribir, ni el texto en letras, ni el aviso
+     * de rechazo, ni el de coma ambigua están a la vista, y eso sin contar el teclado virtual,
+     * que tapa otra media pantalla. Medido en Pixel 7 (412×839): campo en y=847 (ya por debajo
+     * de la primera pantalla), resultado en y=1615.
+     */
+    test('HALLAZGO móvil · al escribir en el campo, el resultado está a la vista', async ({ page }) => {
+      test.fail(true, 'HALLAZGO abierto: el resultado queda fuera de la pantalla mientras se escribe');
+      await page.locator('#cantidad').tap();
+      await page.locator('#cantidad').fill('1500');
+      await expect(page.locator('p[aria-live="polite"]')).toHaveText('mil quinientos euros');
+      await expect(page.locator('#cantidad')).toBeInViewport();
+      await expect(page.locator('p[aria-live="polite"]')).toBeInViewport({ timeout: 1000 });
+    });
+
+    /**
+     * HALLAZGO abierto (medio, operativa): el campo llega RELLENO con 3.847,50 (no es un
+     * placeholder). Al tocarlo el cursor queda al final, y quien teclea su importe sin borrar
+     * produce «3.847,501500»: el parser lo acepta (la coma es el último separador, así que son
+     * seis decimales) y el importe redondea a 3.847,50, de modo que el panel sigue diciendo
+     * exactamente lo mismo que antes, sin aviso, pese a que la ayuda anuncia «dos decimales».
+     * Lo correcto, con cualquier reparación: o sale el importe tecleado, o sale un aviso.
+     */
+    test('HALLAZGO precargado · tocar el campo y teclear 1500 no deja el resultado igual en silencio', async ({ page }) => {
+      test.fail(true, 'HALLAZGO abierto: «3.847,50» + «1500» = «3.847,501500», leído como 3.847,50 sin aviso');
+      await page.locator('#cantidad').tap();
+      await page.keyboard.type('1500');
+      await expect(page.locator('#cantidad')).toHaveValue(/1500$/);
+      const texto = (await page.locator('p[aria-live="polite"]').textContent()) ?? '';
+      const alertas = await panel(page).locator('[role="alert"], [role="status"]').count();
+      expect(alertas > 0 || texto.startsWith('mil quinientos'), `obtenido «${texto}»`).toBe(true);
+    });
+  });
 });
