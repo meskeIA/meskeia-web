@@ -1,10 +1,10 @@
 'use client';
-// @disclaimer: exempt
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
+import DisclaimerCard from '@/components/DisclaimerCard';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
@@ -18,6 +18,8 @@ import styles from './CicloViral.module.css';
 interface EtapaCiclo {
   numero: number;
   nombre: string;
+  /** Rótulo corto del círculo del diagrama: explícito, porque recortar el nombre repetía «Liberación» en la 3 y la 6. */
+  etiqueta: string;
   icono: string;
   descripcion: string;
   detalle: string;
@@ -48,6 +50,7 @@ const ETAPAS: EtapaCiclo[] = [
   {
     numero: 1,
     nombre: 'Adhesión',
+    etiqueta: 'Adhesión',
     icono: '🔑',
     descripcion:
       'El virus reconoce receptores específicos de la célula huésped mediante proteínas de superficie complementarias.',
@@ -60,35 +63,38 @@ const ETAPAS: EtapaCiclo[] = [
   {
     numero: 2,
     nombre: 'Entrada',
+    etiqueta: 'Entrada',
     icono: '🚪',
     descripcion:
       'El virus penetra en el interior de la célula huésped mediante fusión de membranas o endocitosis.',
     detalle:
-      'Los virus envueltos (como VIH o influenza) fusionan su membrana lipídica con la membrana celular, inyectando la cápside directamente. Los virus no envueltos suelen entrar por endocitosis: la célula los engloba en una vesícula (endosoma), desde la cual escapan al citoplasma.',
-    ejemplo: 'VIH: la glicoproteína gp41 media la fusión de membranas. Adenovirus: entra por endocitosis y escapa del endosoma por rotura osmótica.',
+      'Los virus envueltos fusionan su envoltura lipídica con una membrana de la célula, y según el virus lo hacen en dos sitios. Algunos, como el VIH, se fusionan directamente con la membrana plasmática y la cápside queda en el citoplasma. Otros, como la gripe, entran primero por endocitosis mediada por receptor y se fusionan con la membrana del endosoma cuando este se acidifica. Los virus no envueltos no tienen envoltura que fusionar: suelen entrar por endocitosis y escapan del endosoma al citoplasma.',
+    ejemplo: 'VIH: la glicoproteína gp41 media la fusión con la membrana plasmática. Influenza: a pH ácido (en torno a 5-6) la hemaglutinina cambia de forma y fusiona la envoltura con la membrana del endosoma. Adenovirus (no envuelto): entra por endocitosis y rompe la membrana del endosoma para salir al citoplasma.',
     cx: 430,
     cy: 130,
   },
   {
     numero: 3,
     nombre: 'Liberación del genoma',
+    etiqueta: 'Genoma',
     icono: '📦',
     descripcion:
       'La cápside viral se desensambla (decapsidación) y libera el material genético viral en el citoplasma o el núcleo.',
     detalle:
-      'Una vez dentro, la cápside debe abrirse para liberar el genoma viral. Este proceso puede ocurrir en el citoplasma o, en virus que necesitan acceder al núcleo (como los de ADN), el genoma viaja al poro nuclear. El momento y lugar de la decapsidación están controlados por señales bioquímicas del entorno celular.',
-    ejemplo: 'Influenza: la acidificación del endosoma activa la proteína M2 (canal de protones), desestabilizando la cápside. El ARN segmentado se libera al citoplasma.',
+      'Una vez dentro, la cápside debe abrirse para liberar el genoma viral. Este proceso puede ocurrir en el citoplasma o, en virus que necesitan acceder al núcleo (la mayoría de los de ADN, pero también la gripe), el genoma viaja al poro nuclear. El momento y lugar de la decapsidación están controlados por señales bioquímicas del entorno celular.',
+    ejemplo: 'Influenza: la acidificación del endosoma abre el canal de protones M2, que acidifica el interior del virión y suelta las ribonucleoproteínas de la proteína de matriz M1. Tras la fusión con el endosoma, los 8 segmentos de ARN salen al citoplasma y viajan al núcleo, donde la gripe replica su genoma.',
     cx: 430,
     cy: 290,
   },
   {
     numero: 4,
     nombre: 'Replicación y transcripción',
+    etiqueta: 'Replicación',
     icono: '⚙️',
     descripcion:
       'La maquinaria celular es secuestrada para fabricar ARNm viral y replicar el genoma del virus.',
     detalle:
-      'Los virus ADN suelen replicarse en el núcleo, aprovechando las polimerasas de la célula. Los virus ARN replican en el citoplasma con su propia ARN-polimerasa dependiente de ARN (RdRp), ya que la célula no tiene esta enzima. Los retrovirus primero convierten su ARN en ADN mediante la transcriptasa inversa, y luego integran ese ADN en el genoma huésped.',
+      'Los virus ADN suelen replicarse en el núcleo, aprovechando las polimerasas de la célula. La mayoría de los virus ARN replican en el citoplasma con su propia ARN-polimerasa dependiente de ARN (RdRp), ya que la célula no tiene esta enzima. La excepción clásica es la gripe, que transcribe y replica su ARN en el núcleo. Los retrovirus primero convierten su ARN en ADN mediante la transcriptasa inversa, y luego integran ese ADN en el genoma huésped.',
     ejemplo: 'SARS-CoV-2: su RdRp replica el ARN genómico de ~30.000 bases en el citoplasma. Herpesvirus: replica su ADN en el núcleo usando polimerasas propias y del huésped.',
     cx: 250,
     cy: 370,
@@ -96,6 +102,7 @@ const ETAPAS: EtapaCiclo[] = [
   {
     numero: 5,
     nombre: 'Ensamblaje',
+    etiqueta: 'Ensamblaje',
     icono: '🧩',
     descripcion:
       'Las proteínas virales recién sintetizadas y las copias del genoma se ensamblan en nuevos viriones.',
@@ -108,11 +115,12 @@ const ETAPAS: EtapaCiclo[] = [
   {
     numero: 6,
     nombre: 'Liberación',
+    etiqueta: 'Liberación',
     icono: '💥',
     descripcion:
       'Los nuevos viriones salen de la célula por lisis o por gemación (budding), listos para infectar otras células.',
     detalle:
-      'Lisis: la célula se llena de viriones hasta reventar, liberando miles de partículas de golpe. Es típica de bacteriófagos y algunos virus animales (poliovirus). Gemación o budding: el virión brota de la membrana plasmática envuelto en lípidos del huésped. No mata inmediatamente la célula. Es el mecanismo de VIH, influenza y coronavirus.',
+      'Lisis: la célula se llena de viriones hasta reventar, liberando miles de partículas de golpe. Es típica de bacteriófagos y algunos virus animales (poliovirus). Gemación o budding: el virión brota de la membrana plasmática envuelto en lípidos del huésped. No mata inmediatamente la célula. Es el mecanismo del VIH y de la gripe. Los coronavirus brotan hacia membranas internas (el compartimento intermedio entre el retículo y el Golgi) y salen de la célula por exocitosis.',
     ejemplo: 'Influenza: la neuraminidasa (NA) corta el ácido siálico que retiene los viriones en la membrana, permitiendo la diseminación. Por eso los inhibidores de NA son antivirales efectivos.',
     cx: 70,
     cy: 130,
@@ -133,7 +141,7 @@ const COMPARATIVA: FilaComparacion[] = [
   {
     aspecto: 'Lugar de replicación',
     adn: 'Núcleo celular',
-    arn: 'Citoplasma',
+    arn: 'Citoplasma, en la mayoría (la gripe es la excepción: en el núcleo)',
     retrovirus: 'Citoplasma → núcleo (integración)',
   },
   {
@@ -150,7 +158,7 @@ const COMPARATIVA: FilaComparacion[] = [
   },
   {
     aspecto: 'Integración en huésped',
-    adn: 'Algunos (herpesvirus: episoma extracromosómico)',
+    adn: 'Rara y accidental (VPH, hepatitis B); los herpesvirus persisten como episoma, sin integrarse',
     arn: 'No',
     retrovirus: 'Sí (provirus permanente en el genoma)',
   },
@@ -207,6 +215,36 @@ export default function VisualizadorCicloViral() {
   const [etapaActiva, setEtapaActiva] = useState<number | null>(null);
   const [seccionActiva, setSeccionActiva] = useState<'adn' | 'arn' | 'retrovirus'>('arn');
 
+  // Abrir una etapa desde la lista desmonta la lista, y cerrar la ficha desmonta el botón
+  // «Cerrar»: sin mover el foco a mano, en los dos casos caía a <body>.
+  const tituloRef = useRef<HTMLHeadingElement>(null);
+  const listaRef = useRef<HTMLUListElement>(null);
+  const focoPendiente = useRef<'ficha' | number | null>(null);
+
+  useEffect(() => {
+    const destino = focoPendiente.current;
+    focoPendiente.current = null;
+    if (destino === 'ficha') {
+      tituloRef.current?.focus();
+    } else if (typeof destino === 'number') {
+      listaRef.current?.querySelectorAll<HTMLButtonElement>('button')[destino - 1]?.focus();
+    }
+  }, [etapaActiva]);
+
+  const alternarEtapa = (numero: number) => {
+    setEtapaActiva((actual) => (actual === numero ? null : numero));
+  };
+
+  const abrirDesdeLista = (numero: number) => {
+    focoPendiente.current = 'ficha';
+    setEtapaActiva(numero);
+  };
+
+  const cerrarFicha = () => {
+    focoPendiente.current = etapaActiva;
+    setEtapaActiva(null);
+  };
+
   const etapa = etapaActiva !== null ? ETAPAS[etapaActiva - 1] : null;
 
   return (
@@ -224,6 +262,12 @@ export default function VisualizadorCicloViral() {
 
       <LegalNotice />
 
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} title="Aviso sanitario">
+        Este visualizador es biología molecular educativa. No describe síntomas, no permite
+        diagnosticar ninguna infección viral y no sustituye el consejo de un profesional
+        sanitario: cualquier preocupación sobre tu salud debe consultarse con él.
+      </DisclaimerCard>
+
       {/* ─── Visualizador SVG interactivo ─────────────────── */}
       <section className={styles.section}>
         <h2 className={styles.tituloSeccion}>Las 6 etapas del ciclo viral</h2>
@@ -233,13 +277,14 @@ export default function VisualizadorCicloViral() {
 
         <div className={styles.cicloWrapper}>
           <div className={styles.svgContainer}>
+            {/* role="group" y no role="img": los hijos de un img son presentacionales y las
+                etapas pulsables desaparecerían para el lector de pantalla. */}
             <svg
               viewBox="0 0 500 420"
               className={styles.svgCelula}
               aria-label="Diagrama interactivo del ciclo de replicación viral con 6 etapas"
-              role="img"
+              role="group"
             >
-              {/* Gradiente de fondo de la célula */}
               <defs>
                 <radialGradient id="gradCelula" cx="50%" cy="50%" r="50%">
                   <stop offset="0%" stopColor="#E8F4F8" />
@@ -251,93 +296,115 @@ export default function VisualizadorCicloViral() {
                 </radialGradient>
               </defs>
 
-              {/* Célula huésped */}
-              <ellipse
-                cx="250"
-                cy="210"
-                rx="160"
-                ry="140"
-                fill="url(#gradCelula)"
-                stroke="#48A9A6"
-                strokeWidth="2.5"
-                strokeDasharray="8 4"
-              />
+              {/* Fondo decorativo: se pinta ANTES que las etapas y no recibe clics, para que
+                  ninguna flecha ni el virión le roben el clic a un círculo. */}
+              <g aria-hidden="true" pointerEvents="none">
+                {/* Célula huésped */}
+                <ellipse
+                  cx="250"
+                  cy="210"
+                  rx="160"
+                  ry="140"
+                  fill="url(#gradCelula)"
+                  stroke="#48A9A6"
+                  strokeWidth="2.5"
+                  strokeDasharray="8 4"
+                />
 
-              {/* Núcleo celular */}
-              <ellipse
-                cx="250"
-                cy="220"
-                rx="65"
-                ry="55"
-                fill="url(#gradNucleo)"
-                stroke="#2E86AB"
-                strokeWidth="2"
-              />
+                {/* Núcleo celular */}
+                <ellipse
+                  cx="250"
+                  cy="220"
+                  rx="65"
+                  ry="55"
+                  fill="url(#gradNucleo)"
+                  stroke="#2E86AB"
+                  strokeWidth="2"
+                />
 
-              {/* Etiqueta núcleo */}
-              <text x="250" y="215" textAnchor="middle" fontSize="11" fill="#1A5C7A" fontWeight="600">
-                Núcleo
-              </text>
-              <text x="250" y="230" textAnchor="middle" fontSize="9" fill="#2E86AB">
-                (ADN celular)
-              </text>
+                <text x="250" y="215" textAnchor="middle" fontSize="11" fill="#1A5C7A" fontWeight="600">
+                  Núcleo
+                </text>
+                <text x="250" y="230" textAnchor="middle" fontSize="9" fill="#2E86AB">
+                  (ADN celular)
+                </text>
 
-              {/* Ribosomas en el citoplasma */}
-              {[
-                [185, 175], [310, 185], [185, 265], [310, 270], [220, 300], [280, 155],
-              ].map(([x, y], i) => (
-                <circle key={i} cx={x} cy={y} r="4" fill="#48A9A6" opacity="0.4" />
-              ))}
+                {/* Ribosomas en el citoplasma */}
+                {[
+                  [185, 175], [310, 185], [185, 265], [310, 270], [220, 300], [280, 155],
+                ].map(([x, y], i) => (
+                  <circle key={i} cx={x} cy={y} r="4" fill="#48A9A6" opacity="0.4" />
+                ))}
 
-              {/* Etiqueta célula */}
-              <text x="250" y="365" textAnchor="middle" fontSize="11" fill="#48A9A6" fontWeight="500">
-                Célula huésped
-              </text>
+                {/* Etiqueta célula: dentro de la membrana y por encima del círculo 4 (cy=370, r=17) */}
+                <text x="250" y="335" textAnchor="middle" fontSize="11" fill="#48A9A6" fontWeight="500">
+                  Célula huésped
+                </text>
 
-              {/* Virión externo (etapa 1) */}
-              <g transform="translate(250,40)">
-                <circle r="18" fill="#E74C3C" opacity="0.85" />
-                <circle r="18" fill="none" stroke="#C0392B" strokeWidth="1.5" />
-                {/* Espículas */}
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((ang, i) => {
-                  const rad = (ang * Math.PI) / 180;
-                  return (
-                    <line
-                      key={i}
-                      x1={Math.cos(rad) * 18}
-                      y1={Math.sin(rad) * 18}
-                      x2={Math.cos(rad) * 26}
-                      y2={Math.sin(rad) * 26}
-                      stroke="#C0392B"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  );
-                })}
-                <text y="5" textAnchor="middle" fontSize="10" fill="white" fontWeight="700">V</text>
+                {/* Virión externo (etapa 1) */}
+                <g transform="translate(250,40)">
+                  <circle r="18" fill="#E74C3C" opacity="0.85" />
+                  <circle r="18" fill="none" stroke="#C0392B" strokeWidth="1.5" />
+                  {[0, 45, 90, 135, 180, 225, 270, 315].map((ang, i) => {
+                    const rad = (ang * Math.PI) / 180;
+                    return (
+                      <line
+                        key={i}
+                        x1={Math.cos(rad) * 18}
+                        y1={Math.sin(rad) * 18}
+                        x2={Math.cos(rad) * 26}
+                        y2={Math.sin(rad) * 26}
+                        stroke="#C0392B"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    );
+                  })}
+                </g>
+
+                {/* Flechas indicando sentido del ciclo */}
+                {[
+                  'M 250 57 Q 370 80 430 130',
+                  'M 430 147 Q 450 210 430 290',
+                  'M 430 307 Q 370 360 250 370',
+                  'M 250 370 Q 130 360 70 290',
+                  'M 70 290 Q 50 210 70 130',
+                  'M 70 113 Q 130 60 232 42',
+                ].map((d) => (
+                  <path
+                    key={d}
+                    d={d}
+                    fill="none"
+                    stroke="#2E86AB"
+                    strokeWidth="1.5"
+                    strokeDasharray="5 3"
+                    opacity="0.5"
+                  />
+                ))}
               </g>
 
-              {/* Círculos de etapas clicables */}
+              {/* Etapas pulsables: ratón, teclado (Tab + Enter/Espacio) y lector de pantalla */}
               {ETAPAS.map((e) => {
                 const activo = etapaActiva === e.numero;
                 return (
                   <g
                     key={e.numero}
-                    onClick={() => setEtapaActiva(activo ? null : e.numero)}
-                    style={{ cursor: 'pointer' }}
+                    className={styles.etapaSvg}
+                    onClick={() => alternarEtapa(e.numero)}
+                    onKeyDown={(ev) => {
+                      if (ev.key === 'Enter' || ev.key === ' ') {
+                        ev.preventDefault();
+                        alternarEtapa(e.numero);
+                      }
+                    }}
                     role="button"
+                    tabIndex={0}
                     aria-label={`Etapa ${e.numero}: ${e.nombre}`}
                     aria-pressed={activo}
                   >
-                    {/* Sombra/halo cuando activo */}
+                    <circle className={styles.anilloFoco} cx={e.cx} cy={e.cy} r="23" fill="none" />
                     {activo && (
-                      <circle
-                        cx={e.cx}
-                        cy={e.cy}
-                        r="22"
-                        fill="#2E86AB"
-                        opacity="0.25"
-                      />
+                      <circle cx={e.cx} cy={e.cy} r="22" fill="#2E86AB" opacity="0.25" />
                     )}
                     <circle
                       cx={e.cx}
@@ -364,68 +431,11 @@ export default function VisualizadorCicloViral() {
                       fontSize="7"
                       fill={activo ? 'white' : '#48A9A6'}
                     >
-                      {e.nombre.split(' ')[0]}
+                      {e.etiqueta}
                     </text>
                   </g>
                 );
               })}
-
-              {/* Flechas indicando sentido del ciclo */}
-              <path
-                d="M 250 57 Q 370 80 430 130"
-                fill="none"
-                stroke="#2E86AB"
-                strokeWidth="1.5"
-                strokeDasharray="5 3"
-                markerEnd="url(#arrowBlue)"
-                opacity="0.5"
-              />
-              <path
-                d="M 430 147 Q 450 210 430 290"
-                fill="none"
-                stroke="#2E86AB"
-                strokeWidth="1.5"
-                strokeDasharray="5 3"
-                opacity="0.5"
-              />
-              <path
-                d="M 430 307 Q 370 360 250 370"
-                fill="none"
-                stroke="#2E86AB"
-                strokeWidth="1.5"
-                strokeDasharray="5 3"
-                opacity="0.5"
-              />
-              <path
-                d="M 250 370 Q 130 360 70 290"
-                fill="none"
-                stroke="#2E86AB"
-                strokeWidth="1.5"
-                strokeDasharray="5 3"
-                opacity="0.5"
-              />
-              <path
-                d="M 70 290 Q 50 210 70 130"
-                fill="none"
-                stroke="#2E86AB"
-                strokeWidth="1.5"
-                strokeDasharray="5 3"
-                opacity="0.5"
-              />
-              <path
-                d="M 70 113 Q 130 60 232 42"
-                fill="none"
-                stroke="#2E86AB"
-                strokeWidth="1.5"
-                strokeDasharray="5 3"
-                opacity="0.5"
-              />
-
-              <defs>
-                <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-                  <path d="M0,0 L0,8 L8,4 z" fill="#2E86AB" opacity="0.5" />
-                </marker>
-              </defs>
             </svg>
           </div>
 
@@ -437,7 +447,9 @@ export default function VisualizadorCicloViral() {
                   <span className={styles.etapaNumero}>{etapa.numero}</span>
                   <div>
                     <span className={styles.etapaIcono} aria-hidden="true">{etapa.icono}</span>
-                    <h3 className={styles.etapaNombre}>{etapa.nombre}</h3>
+                    <h3 className={styles.etapaNombre} ref={tituloRef} tabIndex={-1}>
+                      {etapa.nombre}
+                    </h3>
                   </div>
                 </div>
                 <p className={styles.etapaDescripcion}>{etapa.descripcion}</p>
@@ -451,7 +463,7 @@ export default function VisualizadorCicloViral() {
                 <button
                   type="button"
                   className={styles.btnCerrar}
-                  onClick={() => setEtapaActiva(null)}
+                  onClick={cerrarFicha}
                   aria-label="Cerrar detalle de etapa"
                 >
                   Cerrar
@@ -461,13 +473,13 @@ export default function VisualizadorCicloViral() {
               <div className={styles.panelVacio}>
                 <span aria-hidden="true" className={styles.panelVacioIcono}>👆</span>
                 <p>Pulsa una etapa numerada en el diagrama para ver el detalle molecular</p>
-                <ul className={styles.etapaLista}>
+                <ul className={styles.etapaLista} ref={listaRef}>
                   {ETAPAS.map((e) => (
                     <li key={e.numero}>
                       <button
                         type="button"
                         className={styles.etapaBoton}
-                        onClick={() => setEtapaActiva(e.numero)}
+                        onClick={() => abrirDesdeLista(e.numero)}
                       >
                         <span className={styles.etapaBotonNum}>{e.numero}</span>
                         <span>{e.nombre}</span>
@@ -598,14 +610,14 @@ export default function VisualizadorCicloViral() {
               <p>
                 Los retrovirus llevan dos copias de su genoma de ARN monocatenario y una enzima única:
                 la transcriptasa inversa (TI). Esta enzima sintetiza ADN a partir del ARN viral (proceso
-                que invierte el &quot;dogma central&quot; habitual de ARN→proteína). El ADN resultante
+                que invierte el paso ADN→ARN del &quot;dogma central&quot; ADN→ARN→proteína). El ADN resultante
                 se integra en el genoma huésped como &quot;provirus&quot;, donde puede permanecer silencioso
                 indefinidamente o activarse para producir nuevos viriones.
               </p>
               <p>
                 La TI también es propensa a errores: las mutaciones se acumulan al ritmo de los virus ARN,
                 lo que hace muy difícil la erradicación completa. Además del VIH, el HTLV-1 (asociado
-                a leucemia de células T) es otro retrovirus humano importante. Los endovirus retrovirales
+                a leucemia de células T) es otro retrovirus humano importante. Los retrovirus endógenos
                 representan ~8% del genoma humano, evidencia de integraciones ancestrales.
               </p>
             </div>
@@ -697,17 +709,12 @@ export default function VisualizadorCicloViral() {
               El estrés puede inducir la escisión del profago y la entrada al ciclo lítico.
             </p>
             <p>
-              Este mecanismo tiene implicaciones biotecnológicas: la ingeniería de fagos lisogénicos
-              es la base de técnicas de edición genética y de la CRISPR (originalmente un sistema
-              inmune bacteriano contra fagos).
+              Este mecanismo tiene implicaciones biotecnológicas: las enzimas de recombinación del
+              fago lambda, un fago temperado, son la base de técnicas de edición del genoma bacteriano
+              (recombineering). CRISPR es otra historia: se descubrió como sistema inmune de las
+              bacterias contra los fagos.
             </p>
           </div>
-        </div>
-
-        <div className={styles.warningBox} role="note">
-          Este visualizador es biología molecular educativa. No describe síntomas ni permite
-          diagnosticar ninguna infección viral. Cualquier preocupación sobre salud personal
-          debe consultarse con un profesional sanitario.
         </div>
       </EducationalSection>
 

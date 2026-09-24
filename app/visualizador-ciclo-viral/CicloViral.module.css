@@ -86,6 +86,27 @@
   display: block;
 }
 
+/* Etapas pulsables del diagrama: el foco se dibuja como un anillo alrededor del círculo,
+   porque el outline de un <g> no sigue su forma. var(--primary) cambia solo con el tema. */
+.etapaSvg {
+  cursor: pointer;
+  outline: none;
+}
+
+.anilloFoco {
+  stroke: var(--primary);
+  stroke-width: 3;
+  opacity: 0;
+}
+
+.etapaSvg:focus-visible .anilloFoco {
+  opacity: 1;
+}
+
+[data-theme='dark'] .anilloFoco {
+  stroke: var(--primary);
+}
+
 /* ─── Panel de detalle ───────────────────────────── */
 .panelDetalle {
   background: var(--bg-card);
@@ -136,6 +157,16 @@
   font-weight: 700;
   color: var(--primary);
   margin: 0;
+}
+
+/* El título recibe el foco al abrir una etapa desde la lista (tabIndex=-1) */
+.etapaNombre:focus {
+  outline: none;
+}
+
+.etapaNombre:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .etapaDescripcion {
@@ -478,16 +509,6 @@
   margin-bottom: 0;
 }
 
-/* ─── Warning box ─────────────────────────────────── */
-.warningBox {
-  background: rgba(46, 134, 171, 0.08);
-  border-left: 3px solid var(--primary);
-  padding: 0.75rem 1rem;
-  border-radius: 0 6px 6px 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
 
 /* ─── Dark mode ──────────────────────────────────── */
 [data-theme='dark'] .container {

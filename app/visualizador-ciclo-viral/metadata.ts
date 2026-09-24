@@ -54,7 +54,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre virus ADN y virus ARN?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los virus ADN (como el herpesvirus o el adenovirus) almacenan su información genética en ADN bicatenario y suelen replicarse en el núcleo celular, siendo generalmente más estables y con menor tasa de mutación. Los virus ARN (como influenza o SARS-CoV-2) usan ARN como material genético, se replican en el citoplasma y tienen tasas de mutación mucho más altas debido a la menor fidelidad de las ARN polimerasas, lo que facilita su evolución rápida.',
+        text: 'Los virus ADN (como el herpesvirus o el adenovirus) almacenan su información genética en ADN bicatenario y suelen replicarse en el núcleo celular, siendo generalmente más estables y con menor tasa de mutación. Los virus ARN (como SARS-CoV-2 o la gripe) usan ARN como material genético, en su mayoría se replican en el citoplasma (la gripe es la excepción clásica: lo hace en el núcleo) y tienen tasas de mutación mucho más altas debido a la menor fidelidad de las ARN polimerasas, lo que facilita su evolución rápida.',
       },
     },
     {
