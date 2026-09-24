@@ -16,6 +16,30 @@
  *     le acompañaba «Vives en una ciudad bien comunicada, tus horarios son regulares…» aunque
  *     se hubiera respondido red «deficiente» y horarios nocturnos. Ahora la descripción habla
  *     del medio, y las razones citan las respuestas que más le han sumado.
+ *
+ *  3. Lo declarado como imposibilidad es un FILTRO, no un peso (hallazgos 1488-1490; regla a de
+ *     la familia de selectores, con selector-mascota como referencia). Antes todas las
+ *     respuestas solo sumaban, así que salía el transporte público a quien acababa de decir que
+ *     en su zona no lo hay, la bici o la moto a quien tiene limitaciones de movilidad
+ *     importantes y la bici a más de 40 km. Ahora se descarta:
+ *       · el transporte público con la red «Deficiente o inexistente en mi zona»;
+ *       · la bici o el patinete y la moto con «Sí, tengo limitaciones importantes» (riesgo de
+ *         seguridad, no una preferencia);
+ *       · la bici o el patinete con «Más de 40 km» (su propia ficha: «rinde en trayectos
+ *         cortos»);
+ *       · la combinación multimodal cuando, con esos descartes, no quedan dos medios que
+ *         combinar (sin red y con limitaciones solo queda el coche).
+ *     El coche nunca se descarta, así que siempre hay recomendación. Si lo descartado sumaba
+ *     tantos puntos o más que lo recomendado, el resultado lo dice (`avisoDescarte`).
+ *
+ *  4. Lo demás son PREFERENCIAS y siguen siendo pesos, pero ya no en silencio (hallazgos
+ *     1491-1494): bultos o sillas de bebé habituales, coste «crítico», seguridad vial como
+ *     prioridad, clima adverso y trayectos de 15-40 km en bici o de más de 40 en moto. Son
+ *     compromisos que alguien puede aceptar (un portabultos, ropa de lluvia, un casco), no
+ *     imposibilidades; cuando juegan contra el medio recomendado, `enContra` cita la respuesta.
+ *
+ *  5. Costes: una sola fuente (`COSTE_MENSUAL`). La tarjeta, la guía y el FAQPage daban cifras
+ *     distintas para el mismo medio (hallazgo 1496); ahora todas se derivan de esta tabla.
  */
 
 export type TipoTransporte =
@@ -276,6 +300,34 @@ export const PREGUNTAS: Pregunta[] = [
   },
 ];
 
+/**
+ * Horquilla de coste mensual de cada medio, en €/mes: la ÚNICA fuente de las cifras de coste de
+ * la tarjeta, la guía y el FAQPage (hallazgo 1496) y del último criterio de desempate.
+ *
+ * No sale de una estadística oficial: es una estimación orientativa de meskeIA (2026) para una
+ * ciudad española, y la pantalla lo dice. El INE (EPF) publica el gasto de los hogares en
+ * transporte, no el coste de cada medio; por eso las cifras se presentan como horquilla y con
+ * lo que incluye cada una.
+ */
+export const COSTE_MENSUAL: Record<TipoTransporte, { min: number; max: number; incluye: string }> = {
+  coche_propio: { min: 400, max: 700, incluye: 'amortización, seguro, combustible, aparcamiento y mantenimiento' },
+  transporte_publico: { min: 20, max: 80, incluye: 'abono mensual de metro, autobús o cercanías' },
+  moto_escuter: { min: 100, max: 200, incluye: 'seguro, combustible, mantenimiento y amortización de una moto de ciudad' },
+  bici_patinete: { min: 5, max: 30, incluye: 'mantenimiento de una bici convencional o carga de un patinete o bici eléctrica, sin contar la compra' },
+  combinacion: { min: 80, max: 250, incluye: 'abono más bici o patinete, o uso puntual de coche o taxi' },
+};
+
+/** Entero con punto de miles («4.800»): `es-ES` no agrupa los números de cuatro cifras. */
+const miles = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+/** «400–700 €/mes» */
+export const rangoMensual = (k: TipoTransporte) => `${miles(COSTE_MENSUAL[k].min)}–${miles(COSTE_MENSUAL[k].max)} €/mes`;
+
+/** «4.800–8.400 €» al año (la misma horquilla por doce). */
+export const rangoAnual = (k: TipoTransporte) => `${miles(COSTE_MENSUAL[k].min * 12)}–${miles(COSTE_MENSUAL[k].max * 12)} €`;
+
+const textoCoste = (k: TipoTransporte) => `Coste estimado: ${rangoMensual(k)} (${COSTE_MENSUAL[k].incluye})`;
+
 export const TRANSPORTES: Record<TipoTransporte, TransporteInfo> = {
   coche_propio: {
     tipo: 'coche_propio',
@@ -290,24 +342,25 @@ export const TRANSPORTES: Record<TipoTransporte, TransporteInfo> = {
       'Protección ante cualquier condición meteorológica',
       'Ideal para zonas con transporte público deficiente',
     ],
-    costoMensual:
-      'Coste estimado: 400–700 €/mes (amortización, seguro, combustible, aparcamiento y mantenimiento en ciudad española)',
+    costoMensual: textoCoste('coche_propio'),
   },
   transporte_publico: {
     tipo: 'transporte_publico',
     titulo: 'Transporte Público',
     etiqueta: 'Económico y sin estrés',
     icono: '🚇',
+    // «la opción más económica» chocaba con la bici, que cuesta menos (hallazgo 1496).
     descripcion:
-      'El transporte público es la opción más económica cuando la red cubre tus trayectos y tus horarios: sin tráfico que conducir ni aparcamiento que buscar.',
+      'El transporte público es de las opciones más económicas cuando la red cubre tus trayectos y tus horarios: sin tráfico que conducir ni aparcamiento que buscar.',
     ventajas: [
-      'El más económico: desde 20–60 €/mes con abono',
+      // Antes «El más económico: desde 20–60 €/mes con abono», con otra horquilla que la del
+      // coste estimado de la misma tarjeta (20–80 €/mes). La cifra vive solo en `costoMensual`.
+      'Coste bajo: pagas el abono o los billetes',
       'Sin preocupaciones de aparcamiento ni tráfico',
       'Tiempo productivo durante el trayecto',
       'Sin coche que mantener ni aparcar',
     ],
-    costoMensual:
-      'Coste estimado: 20–80 €/mes (abono transporte en grandes ciudades españolas, incluyendo metro, bus y cercanías)',
+    costoMensual: textoCoste('transporte_publico'),
   },
   moto_escuter: {
     tipo: 'moto_escuter',
@@ -322,24 +375,25 @@ export const TRANSPORTES: Record<TipoTransporte, TransporteInfo> = {
       'Menor coste que el coche',
       'Ideal para distancias de 5–30 km en ciudad',
     ],
-    costoMensual:
-      'Coste estimado: 100–200 €/mes (seguro, combustible, mantenimiento y amortización de una moto de ciudad)',
+    costoMensual: textoCoste('moto_escuter'),
   },
   bici_patinete: {
     tipo: 'bici_patinete',
     titulo: 'Bicicleta o Patinete Eléctrico',
     etiqueta: 'Sostenible y económico',
     icono: '🚴',
+    // Antes «Rinde en distancias cortas, con buen clima…», leído también por quien acababa de
+    // declarar clima adverso (hallazgo 1494). Ahora dice lo que le resta al medio, y el clima
+    // declarado se cita aparte, en `enContra`.
     descripcion:
-      'La bici o el patinete eléctrico es la opción más sostenible y la de menor coste. Rinde en distancias cortas, con buen clima y donde hay infraestructura ciclista.',
+      'La bici o el patinete eléctrico es la opción más sostenible y la de menor coste. Rinde mejor en trayectos cortos y donde hay carriles bici; la lluvia, el frío o el calor fuerte le restan comodidad.',
     ventajas: [
       'Coste casi nulo de operación',
       'Cero emisiones contaminantes',
       'Ejercicio físico integrado en tu rutina',
       'Sin problemas de aparcamiento ni atascos',
     ],
-    costoMensual:
-      'Coste estimado: 5–30 €/mes (mantenimiento bici convencional o carga eléctrica de patinete/e-bike)',
+    costoMensual: textoCoste('bici_patinete'),
   },
   combinacion: {
     tipo: 'combinacion',
@@ -354,8 +408,7 @@ export const TRANSPORTES: Record<TipoTransporte, TransporteInfo> = {
       'Adaptación a diferentes condiciones meteorológicas',
       'Menor dependencia de un único medio',
     ],
-    costoMensual:
-      'Coste estimado: 80–250 €/mes (varía según la combinación: abono + bici/patinete o uso puntual de coche/taxi)',
+    costoMensual: textoCoste('combinacion'),
   },
 };
 
@@ -374,14 +427,17 @@ export const CON_ARTICULO: Record<TipoTransporte, string> = {
 /**
  * Mínimo del coste mensual que publica cada ficha, en euros: último criterio de desempate.
  * Bici o patinete 5 € · transporte público 20 € · combinación 80 € · moto 100 € · coche 400 €.
+ * Se deriva de `COSTE_MENSUAL`, para que no pueda divergir de lo que se enseña.
  */
-export const COSTE_MENSUAL_MINIMO: Record<TipoTransporte, number> = {
-  bici_patinete: 5,
-  transporte_publico: 20,
-  combinacion: 80,
-  moto_escuter: 100,
-  coche_propio: 400,
-};
+export const COSTE_MENSUAL_MINIMO = Object.fromEntries(
+  CLAVES.map((k) => [k, COSTE_MENSUAL[k].min]),
+) as Record<TipoTransporte, number>;
+
+/** Lista legible: «A, B y C». */
+export function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
+}
 
 /** Nombre corto de lo que pregunta cada pregunta, para citar la respuesta en las razones. */
 export const TEMA: Record<number, string> = {
@@ -398,19 +454,60 @@ export const TEMA: Record<number, string> = {
 };
 
 /** Las preguntas que deshacen un empate, en orden, y cómo se dice cada una. */
-const DESEMPATE: { pregunta: number; motivo: string }[] = [
-  { pregunta: 10, motivo: 'responde mejor a lo que has indicado sobre tu movilidad física' },
-  { pregunta: 1, motivo: 'encaja mejor con la distancia de tu trayecto' },
+const DESEMPATE: { pregunta: number; motivo: string; frente: (otros: string) => string }[] = [
+  {
+    pregunta: 10,
+    motivo: 'responde mejor a lo que has indicado sobre tu movilidad física',
+    frente: (otros) => `responde mejor que ${otros} a lo que has indicado sobre tu movilidad física`,
+  },
+  {
+    pregunta: 1,
+    motivo: 'encaja mejor con la distancia de tu trayecto',
+    frente: (otros) => `encaja mejor que ${otros} con la distancia de tu trayecto`,
+  },
 ];
+
+/** Último criterio: el menor coste mensual mínimo de `COSTE_MENSUAL`. */
+const POR_COSTE = {
+  motivo: 'su coste mensual es el más bajo',
+  frente: (otros: string) => `cuesta menos al mes que ${otros}`,
+};
+
+/** Por qué se descarta un medio (regla 3 de la cabecera). */
+export type MotivoDescarte = 'sin_red' | 'limitacion' | 'distancia' | 'sin_combinar';
+
+// Índices de las opciones que acotan (la opción n de la pregunta, contando desde 0).
+const P1_15_40 = 2;
+const P1_MAS_40 = 3;
+const P2_SIN_RED = 2;
+const P3_BULTOS_HABITUAL = 0;
+const P5_COSTE_CRITICO = 0;
+const P7_SEGURIDAD_PRIORIDAD = 0;
+const P8_CLIMA_ADVERSO = 0;
+const P10_LIMITACION_IMPORTANTE = 0;
+
+/** Los medios «simples» con los que se arma una combinación multimodal. */
+const SIMPLES: TipoTransporte[] = ['coche_propio', 'transporte_publico', 'moto_escuter', 'bici_patinete'];
 
 export interface Resultado {
   tipo: TipoTransporte;
+  /** El que ganaría por puntos si no se descartara nada. */
+  tipoPorPuntos: TipoTransporte;
+  /** Medios descartados por lo declarado, con el motivo. */
+  descartes: Partial<Record<TipoTransporte, MotivoDescarte>>;
   puntos: Record<TipoTransporte, number>;
-  /** Otros medios con la MISMA puntuación que el recomendado. */
+  /** Otros medios ADMITIDOS con la MISMA puntuación que el recomendado. */
   empatados: TipoTransporte[];
   /** Frase que explica cómo se ha deshecho el empate; vacía si no lo hay. */
   criterioDesempate: string;
+  /**
+   * Los medios descartados que sumaban tantos puntos o más que el recomendado, con la respuesta
+   * que los descarta; vacía si el descarte no ha cambiado nada.
+   */
+  avisoDescarte: string;
   razones: string[];
+  /** Respuestas que juegan en contra del medio recomendado, citadas literalmente. */
+  enContra: string[];
 }
 
 const puntosEnLetra = (n: number) => `${n} ${n === 1 ? 'punto' : 'puntos'}`;
@@ -429,6 +526,22 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
     for (const k of CLAVES) puntos[k] += opcion.pesos[k] ?? 0;
   });
 
+  /** ¿Se ha respondido en la pregunta `id` (1-10) la opción `indice`? */
+  const respondio = (id: number, indice: number) => respuestas[id - 1] === indice;
+  /** La respuesta literal de la pregunta `id`, entre comillas angulares. */
+  const cita = (id: number) => `«${PREGUNTAS[id - 1].opciones[respuestas[id - 1]]?.texto ?? ''}»`;
+
+  // ─ Descartes: lo declarado como imposibilidad no se negocia a puntos ─
+  const descartes: Resultado['descartes'] = {};
+  if (respondio(2, P2_SIN_RED)) descartes.transporte_publico = 'sin_red';
+  if (respondio(10, P10_LIMITACION_IMPORTANTE)) {
+    descartes.bici_patinete = 'limitacion';
+    descartes.moto_escuter = 'limitacion';
+  }
+  if (respondio(1, P1_MAS_40) && !descartes.bici_patinete) descartes.bici_patinete = 'distancia';
+  // Una combinación necesita al menos dos medios que combinar.
+  if (SIMPLES.filter((k) => !descartes[k]).length < 2) descartes.combinacion = 'sin_combinar';
+
   const peso = (pregunta: number, k: TipoTransporte) => aporte[pregunta]?.[k] ?? 0;
   const ordenar = (a: TipoTransporte, b: TipoTransporte) => {
     if (puntos[a] !== puntos[b]) return puntos[b] - puntos[a];
@@ -438,22 +551,48 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
     }
     return COSTE_MENSUAL_MINIMO[a] - COSTE_MENSUAL_MINIMO[b];
   };
-  const orden = [...CLAVES].sort(ordenar);
+  const tipoPorPuntos = [...CLAVES].sort(ordenar)[0];
+  // Nunca queda vacía: el coche no se descarta nunca.
+  const orden = CLAVES.filter((k) => !descartes[k]).sort(ordenar);
   const tipo = orden[0];
 
+  // ─ Empate entre admitidos ─
   const empatados = orden.slice(1).filter((k) => puntos[k] === puntos[tipo]);
   let criterioDesempate = '';
   if (empatados.length > 0) {
-    // El criterio que lo separa de CADA empatado; si no es el mismo para todos, se dicen los
-    // que han intervenido, en su orden.
-    const motivos = [...DESEMPATE.map((d) => d.motivo), 'su coste mensual es el más bajo'];
+    // El criterio que separa al recomendado de CADA empatado. Si es el mismo para todos, se dice
+    // tal cual; si no, cada criterio nombra a los que ha dejado detrás. Antes se encadenaban en
+    // superlativo («y, a igualdad, su coste mensual es el más bajo») aunque otro empatado,
+    // apartado por el primer criterio, costara menos (mismo defecto que selector-mascota, 1442).
     const decisivo = (k: TipoTransporte) => {
       const i = DESEMPATE.findIndex(({ pregunta }) => peso(pregunta, tipo) !== peso(pregunta, k));
       return i === -1 ? DESEMPATE.length : i;
     };
-    const usados = [...new Set(empatados.map(decisivo))].sort((a, b) => a - b).map((i) => motivos[i]);
-    criterioDesempate = `se muestra primero ${CON_ARTICULO[tipo]} porque ${usados.join(' y, a igualdad, ')}`;
+    const criterios = [...DESEMPATE, POR_COSTE];
+    const grupos = [...new Set(empatados.map(decisivo))].sort((a, b) => a - b);
+    const porque = grupos.length === 1
+      ? criterios[grupos[0]].motivo
+      : grupos
+        .map((g) => criterios[g].frente(enumerar(empatados.filter((k) => decisivo(k) === g).map((k) => CON_ARTICULO[k]))))
+        .join(' y ');
+    criterioDesempate = `se muestra primero ${CON_ARTICULO[tipo]} porque ${porque}`;
   }
+
+  // ─ Aviso de descarte: solo si lo descartado competía de verdad ─
+  const MOTIVO: Record<MotivoDescarte, string> = {
+    sin_red: `porque sobre la red de transporte público has respondido ${cita(2)}`,
+    limitacion: `porque has respondido ${cita(10)} sobre tu movilidad física`,
+    distancia: `porque tu trayecto es de ${cita(1)} y la bici o el patinete rinden en trayectos cortos`,
+    sin_combinar: 'porque, con lo que has declarado, no quedan dos medios que combinar',
+  };
+  const apartados = CLAVES
+    .filter((k) => descartes[k] && puntos[k] >= puntos[tipo])
+    .sort(ordenar);
+  const avisoDescarte = apartados.length === 0
+    ? ''
+    : `${apartados.length === 1 ? 'Se ha descartado una opción que sumaba' : 'Se han descartado opciones que sumaban'} tantos puntos o más que ${CON_ARTICULO[tipo]} (${puntosEnLetra(puntos[tipo])}): ${apartados
+      .map((k) => `${CON_ARTICULO[k]} (${puntosEnLetra(puntos[k])}), ${MOTIVO[descartes[k] as MotivoDescarte]}`)
+      .join('; ')}.`;
 
   // ─ Razones: las respuestas que más han sumado al medio recomendado ─
   const razones = PREGUNTAS
@@ -465,5 +604,49 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
       `${TEMA[p.id]}: has respondido «${p.opciones[respuestas[i]].texto}», que suma ${puntosEnLetra(valor)} ${aNombre(CON_ARTICULO[tipo])}.`,
     );
 
-  return { tipo, puntos, empatados, criterioDesempate, razones };
+  // ─ Lo que juega en contra: preferencias declaradas que el medio recomendado no cumple ─
+  const enContra: string[] = [];
+  const esBici = tipo === 'bici_patinete';
+  const esMoto = tipo === 'moto_escuter';
+  const vehiculoAbierto = esBici ? 'bici o patinete' : 'moto o escúter';
+
+  if (esBici && respondio(1, P1_15_40)) {
+    enContra.push(`Distancia: has respondido ${cita(1)}. Es un trayecto largo para hacerlo cada día en bici o patinete, que rinden en trayectos cortos; valora cubrir parte del recorrido en transporte público.`);
+  }
+  if (esMoto && respondio(1, P1_MAS_40)) {
+    enContra.push(`Distancia: has respondido ${cita(1)}. La moto rinde en trayectos medios; a esa distancia pasarás buena parte del recorrido en vías interurbanas y a la intemperie.`);
+  }
+  if (tipo === 'combinacion' && descartes.transporte_publico) {
+    const quedan = SIMPLES.filter((k) => !descartes[k]).map((k) => CON_ARTICULO[k]);
+    enContra.push(`Red de transporte público: has respondido ${cita(2)}. Tu combinación tendrá que apoyarse en ${enumerar(quedan)}, no en el transporte público.`);
+  }
+  if (tipo === 'combinacion' && descartes.bici_patinete === 'limitacion') {
+    enContra.push(`Movilidad física: has respondido ${cita(10)}. En tu combinación quedan fuera la bici, el patinete y la moto.`);
+  }
+  if (esBici && respondio(3, P3_BULTOS_HABITUAL)) {
+    enContra.push(`Carga y bultos: has respondido ${cita(3)}. En bici hace falta portabultos, alforjas o remolque, y el patinete apenas admite carga.`);
+  }
+  if (esMoto && respondio(3, P3_BULTOS_HABITUAL)) {
+    // RGC (RD 1428/2003), art. 12.1 y 12.2: el pasajero de una moto o un ciclomotor debe tener
+    // más de doce años; excepcionalmente, más de siete si conduce su padre, madre o tutor.
+    enContra.push(`Carga y bultos: has respondido ${cita(3)}. Una moto carga poco (baúl o alforjas) y, en España, no puede llevar de pasajero a un menor de 7 años (Reglamento General de Circulación, art. 12).`);
+  }
+  if (respondio(5, P5_COSTE_CRITICO) && (tipo === 'coche_propio' || esMoto || tipo === 'combinacion')) {
+    const masBarato = orden
+      .filter((k) => COSTE_MENSUAL_MINIMO[k] < COSTE_MENSUAL_MINIMO[tipo])
+      .sort((a, b) => COSTE_MENSUAL_MINIMO[a] - COSTE_MENSUAL_MINIMO[b])[0];
+    enContra.push(
+      `Coste mensual: has respondido ${cita(5)}, y ${CON_ARTICULO[tipo]} cuesta ${rangoMensual(tipo)} en la estimación de este test${
+        masBarato ? `; lo más barato que no descartan tus respuestas es ${CON_ARTICULO[masBarato]} (${rangoMensual(masBarato)})` : ''
+      }.`,
+    );
+  }
+  if ((esBici || esMoto) && respondio(7, P7_SEGURIDAD_PRIORIDAD)) {
+    enContra.push(`Seguridad vial: has respondido ${cita(7)}. En ${vehiculoAbierto} vas sin carrocería que te proteja en caso de choque: la protección depende del casco, de la ropa y de la vía (carriles separados, calles de velocidad reducida).`);
+  }
+  if ((esBici || esMoto) && respondio(8, P8_CLIMA_ADVERSO)) {
+    enContra.push(`Clima: has respondido ${cita(8)}. En ${vehiculoAbierto} vas a la intemperie: prevé ropa impermeable o de abrigo y una alternativa para los peores días.`);
+  }
+
+  return { tipo, tipoPorPuntos, descartes, puntos, empatados, criterioDesempate, avisoDescarte, razones, enContra };
 }

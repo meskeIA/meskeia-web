@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { rangoAnual, rangoMensual } from './motor';
 
 export const metadata: Metadata = {
   title: 'Selector de Movilidad Urbana | ¿Coche, Transporte Público o Bici? | meskeIA',
@@ -40,7 +41,16 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber qué medio de transporte se adapta mejor a tu estilo de vida: coche (carro o auto) propio, transporte público, moto o escúter, bicicleta o patinete eléctrico, o una combinación.",
   url: "https://meskeia.com/selector-movilidad-urbana/",
   category: 'UtilityApplication',
-  features: [],
+  // §1.ter: de 4 a 8 características reales (antes `features: []`, hallazgo 1504)
+  features: [
+    'Test de 10 preguntas sobre distancia, red de transporte, horarios, coste, clima y movilidad física',
+    'Recomienda entre coche propio, transporte público, moto o escúter, bici o patinete eléctrico y combinación multimodal',
+    'Descarta lo incompatible con lo que declaras: sin red de transporte público, con limitaciones de movilidad o a más de 40 km',
+    'Explica la recomendación con las respuestas que más han sumado',
+    'Avisa de lo que juega en contra: carga, coste, seguridad vial, clima o distancia',
+    'Anuncia los empates y el criterio que los deshace',
+    'Coste mensual orientativo de cada medio',
+  ],
 });
 
 export const faqJsonLd = {
@@ -52,7 +62,10 @@ export const faqJsonLd = {
       name: '¿Qué medio de transporte urbano es más barato: coche (carro o auto), moto o transporte público?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El transporte público suele ser la opción más económica en ciudades con red bien desarrollada, con costes medios de 400-700 € al año en abono. El coche propio (también llamado carro o auto en Latinoamérica) puede superar los 5.000-8.000 € anuales sumando seguro, combustible, mantenimiento y aparcamiento. La bicicleta y el patinete eléctrico tienen los costes más bajos a largo plazo, aunque requieren una inversión inicial.',
+        // Derivado de COSTE_MENSUAL (./motor.ts), la misma tabla de la tarjeta y de la guía: antes
+        // daba «400-700 € al año» de abono y «5.000-8.000 €» de coche, cifras que no coincidían
+        // con las de la pantalla (hallazgo 1496; regla h de la familia de selectores).
+        text: `Con las horquillas orientativas del test para una ciudad española, lo más barato de mantener es la bicicleta o el patinete eléctrico (${rangoMensual('bici_patinete')}, sin contar la compra), seguido del transporte público con abono (${rangoMensual('transporte_publico')}). La moto o el escúter cuesta ${rangoMensual('moto_escuter')} y el coche propio (también llamado carro o auto en Latinoamérica) ${rangoMensual('coche_propio')}, unos ${rangoAnual('coche_propio')} al año sumando amortización, seguro, combustible, aparcamiento y mantenimiento. Son estimaciones: cambian mucho con la ciudad, el vehículo y el uso.`,
       },
     },
     {

@@ -7,9 +7,11 @@
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* Hero */
+/* Hero: var(--hero-bg), obligatorio en los heroes (8,33:1 con blanco). Era un degradado
+   #2e86ab→#48a9a6 en hexadecimal, igual en los dos temas, y el subtítulo daba 2,82:1
+   (hallazgo 1505). */
 .hero {
-  background: linear-gradient(135deg, #2e86ab 0%, #48a9a6 100%);
+  background: var(--hero-bg);
   color: #ffffff;
   text-align: center;
   padding: 3rem 1.5rem 2.5rem;
@@ -169,8 +171,10 @@
   margin-top: 0.5rem;
 }
 
+/* Fondo de marca con texto blanco: --primary-boton (5,47:1 en los dos temas). Sobre el degradado
+   de marca, «Siguiente →» daba 3,05:1 (hallazgo 1506). */
 .btnPrimary {
-  background: linear-gradient(135deg, #2e86ab, #48a9a6);
+  background: var(--primary-boton);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -193,7 +197,7 @@
 }
 
 .btnPrimary:focus-visible {
-  outline: 2px solid #2e86ab;
+  outline: 2px solid var(--primary-texto);
   outline-offset: 2px;
 }
 
@@ -243,14 +247,25 @@
 .resultadoTitulo {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #2e86ab;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
+}
+
+/* Recibe el foco al mostrarse el resultado (tabIndex -1): anillo solo con teclado */
+.resultadoTitulo:focus {
+  outline: none;
+}
+
+.resultadoTitulo:focus-visible {
+  outline: 2px solid var(--primary-texto);
+  outline-offset: 4px;
 }
 
 .resultadoEtiqueta {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #48a9a6;
+  /* Texto pequeño de marca: --secondary-texto (#48a9a6 daba 2,68:1 en claro; hallazgo 1506) */
+  color: var(--secondary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 1rem;
@@ -304,10 +319,12 @@
   margin-bottom: 0.25rem;
 }
 
+/* Texto de marca: --primary-texto (#2e86ab daba 3,93:1 en claro y 4,1-4,24 en oscuro;
+   hallazgo 1506). Al pasar el ratón, fondo --primary-boton con blanco. */
 .btnReiniciar {
   background-color: transparent;
-  color: #2e86ab;
-  border: 2px solid #2e86ab;
+  color: var(--primary-texto);
+  border: 2px solid var(--primary-texto);
   border-radius: 8px;
   padding: 0.75rem 2rem;
   font-size: 1rem;
@@ -317,12 +334,13 @@
 }
 
 .btnReiniciar:hover {
-  background-color: #2e86ab;
+  background-color: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #ffffff;
 }
 
 .btnReiniciar:focus-visible {
-  outline: 2px solid #2e86ab;
+  outline: 2px solid var(--primary-texto);
   outline-offset: 2px;
 }
 
@@ -478,6 +496,76 @@
 
 [data-theme='dark'] .avisoEmpate {
   background: rgba(63, 165, 209, 0.12);
+}
+
+/* ===== DESCARTES Y LO QUE JUEGA EN CONTRA ===== */
+
+/* Aviso de descarte: un medio que sumaba tantos puntos o más se ha descartado por lo declarado
+   (mismo patrón y colores que .avisoRecorte de selector-mascota) */
+.avisoDescarte {
+  text-align: left;
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #f59e0b;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoDescarte {
+  border-color: #b45309;
+  background: #3a2a08;
+  color: #fde68a;
+}
+
+/* Preferencias declaradas que el medio recomendado no cumple, citadas literalmente */
+.enContra {
+  text-align: left;
+  background-color: #fff8eb;
+  border: 1px solid #f3d9a4;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.5rem;
+}
+
+.enContra h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.5rem;
+}
+
+.enContra ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-primary, #1a1a1a);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.enContra li + li {
+  margin-top: 0.35rem;
+}
+
+[data-theme='dark'] .enContra {
+  background-color: #2f2610;
+  border-color: #5c4a1f;
+}
+
+[data-theme='dark'] .enContra h3,
+[data-theme='dark'] .enContra ul {
+  color: #e5e5e5;
+}
+
+/* La horquilla de coste es una estimación: se dice debajo de la cifra */
+.costoNota {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
 }
 
 
