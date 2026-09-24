@@ -14,8 +14,8 @@ Servidor de desarrollo y producción en el **puerto 3050** (`npm run dev` / `npm
 
 ## ⚠️ Los CLAUDE.md de carpeta NO se cargan de forma fiable: hay que leerlos
 
-Cargaron solos del 28/08 al 09/09/2026 (Claude Code 2.1.247-2.1.266) y **ninguno** del 10 al
-23/09 (siete pruebas el 20-21/09): depende de la versión. Son 26,8 KB de trampas ya pagadas que
+Cargaron solos del 28/08 al 09/09/2026 (Claude Code 2.1.247-2.1.266), **ninguno** del 10 al
+23/09 (siete pruebas el 20-21/09) y uno el 24/09: depende de la versión. Son 26,8 KB de trampas ya pagadas que
 solo se leen si esta tabla lo manda, y se leen **antes de la primera escritura** en ese árbol:
 
 | Antes de tocar… | Lee | Trampa que cubre |
@@ -128,7 +128,7 @@ Las Guías son **landing pages** que agrupan herramientas para un **proceso de d
 
 ### Guías implementadas
 
-15 guías-journey en `app/guia/*/` — la lista viva está en `data/guides-journey.ts`, NO mantener tablas de guías en docs.
+Guías-journey en `app/guia/*/` — la lista viva está en `data/guides-journey.ts`, NO mantener tablas de guías en docs.
 
 **Registro de una guía nueva (2 archivos OBLIGATORIOS)**: `app/guia/page.tsx` (array `guias`) + `data/guides-journey.ts` (array `guidesJourney`). Olvidar el segundo = la guía no aparece.
 
@@ -192,11 +192,9 @@ Cada vertical tiene **un solo sitio** donde se registra, además de los tres de 
 
 En Stemum y Coquinum el orden dentro de la sección **es** el orden de la parrilla. En Cronicum cada cronología va en **exactamente una** puerta.
 
-> **Histórico (2026-07-28)**: las parrillas eran arrays `APPS` hardcodeados en cada
-> `app/{stemum,coquinum}/[seccion]/page.tsx`, así que registrar una app pedía DOS listas (TRES en
-> Coquinum). Dejó `simulador-logica-secuencial` y `ajustar-ecuaciones-quimicas` contadas en el hero
-> de Stemum **sin tarjeta que las enlazase y sin dar ningún error**, y en Coquinum 21 títulos y 17
-> iconos divergidos. Ahora se derivan de `appsDeDisciplina()` / `appsDeCategoria()`.
+> Las parrillas se derivan de `appsDeDisciplina()` / `appsDeCategoria()`: registrar una app es
+> UNA entrada. Por qué dejaron de ser arrays a mano (28/07/2026): cabecera de
+> `scripts/check-verticales.mjs`.
 
 **Candado**: `npm run check:verticales` — lo ejecuta también `npm run build`, y **rompe el build** si falla. Verifica, en los tres portales: que cada slug tenga su carpeta en `app/`, esté en `implemented-apps.ts` y en `applications.ts`, que la disciplina/categoría exista, que ninguna parrilla vuelva a listar apps a mano, y que ninguna cronología se quede sin puerta (ni aparezca en dos, ni una puerta apunte a una cronología inexistente).
 
@@ -252,8 +250,7 @@ meskeIA sirve a todo el público hispanohablante (España + Latam = ~50% del tr�
 **Reglas técnicas adicionales**:
 - Parser: `parseSpanishNumber` (`@/lib`). Con los **dos** separadores manda el último; con uno solo
   la ambigüedad es irreducible y gana el español (`1.234` = mil). Devuelve `NaN` en lo que no es un
-  número (`12abc`, `1e3`), así que no hace falta validar antes de llamarlo. ⚠️ Hasta el 24/08/2026
-  esta línea prometía ambos formatos y el código NO los admitía: `1,234.56` salía 1,23456.
+  número (`12abc`, `1e3`), así que no hace falta validar antes de llamarlo.
 - Moneda: si no es contable-España, símbolo configurable o genérico.
 - En bloques educativos, normativa España solo cuando sea relevante; preferir ejemplos universales.
 
@@ -328,11 +325,8 @@ Cuando se crean **3 o más apps** en una misma sesión, usar agentes en paralelo
 3. Verificar que compila: npm run check:tipos
 ```
 
-⚠️ Aquí decía `npx tsc --noEmit data/fiscal/index.ts`, y **devolvía siempre error** (código 2)
-aunque el código estuviese perfecto: pasarle un fichero hace que tsc ignore el `tsconfig.json`,
-así que el alias `@/lib/formatters` no resuelve y encima entra en conflicto un tipo de
-`@types/dom-webcodecs`. Es el caso simétrico del validador ciego del 14/08 (§TypeScript): uno
-decía siempre «0 errores» sin mirar y este siempre «error» sin que lo haya. Medido el 10/09/2026.
+⚠️ Nunca `npx tsc --noEmit data/fiscal/index.ts`: con un fichero, tsc ignora el `tsconfig.json`
+y da error siempre (§TypeScript).
 
 **Fase paralela (agentes crean apps):**
 
@@ -369,7 +363,7 @@ Mismo criterio del PASO 4.bis de `/nueva-app-meskeia`: si la app tiene estado in
 
 ## Stack Tecnológico: tRPC + React Query
 
-Criterio de uso, ubicación de cada pieza y plantilla de router: skill **`/trpc-meskeia`**. En una frase: tRPC para apps nuevas que consuman datos del servidor; las API Routes existentes (220+) se mantienen y **no se migran**.
+Criterio de uso, ubicación de cada pieza y plantilla de router: skill **`/trpc-meskeia`**. En una frase: tRPC para apps nuevas que consuman datos del servidor; las API Routes existentes se mantienen y **no se migran**.
 
 ---
 
@@ -398,11 +392,7 @@ escrita: `CUADRE_OK="por qué es correcto" git commit -m "…"`.
 
 `npm run cuadre` (y el `pre-commit`, que es donde **bloquea**) — cuenta y compara; no opina.
 Cubre la clase de fallo que los otros candados no pueden ver: **se coló algo que nadie pidió**.
-
-Los 19 candados comprueban propiedades POSITIVAS enumeradas de antemano —«esto debe estar, y
-está»—; ninguno mira un borrado (`grep diff-filter=D scripts/check-*.mjs` devuelve 0). El caso
-que mejor lo enseña es `check:csp`: exige que todo dominio cargado esté PERMITIDO, que es
-coherencia, no novedad — añadir la llamada y el permiso a la vez le cuadra.
+Los demás comprueban propiedades POSITIVAS («esto debe estar, y está»); ninguno mira un borrado.
 
 **Nueve reglas**: test borrado · fichero nuevo en la raíz · candado fuera de la cadena del build ·
 `@ts-ignore`/`eslint-disable`/`allowlist-secret` añadido a código que ya existía · paquete nuevo
@@ -411,14 +401,12 @@ coherencia, no novedad — añadir la llamada y el permiso a la vez le cuadra.
 cae a CERO en un fichero de `app/` o `components/` · registro del catálogo que encoge · fichero
 escrito fuera del ámbito declarado (el repositorio y los `additionalDirectories` de `settings.json`).
 
-**Todas comparan CONJUNTOS antes/después, nunca líneas del diff.** Medido el 15/09/2026: leyendo
-líneas habría bloqueado 21 de 100 commits, porque un reformateo produce las mismas líneas que un
-borrado. Comparando conjuntos, **8 de 400** — y de los 400, los **40 que crearon apps no disparan
-ninguna**: estas reglas miran lo que desaparece, y nacer no es una sorpresa.
+**Todas comparan CONJUNTOS antes/después, nunca líneas del diff**: un reformateo produce las
+mismas líneas que un borrado. Por eso miran lo que DESAPARECE y son ciegas a lo que nace ya sin
+algo —«nacer no es una sorpresa»—, que es lo que cubren los candados sin pasivo.
 
-⚠️ **El radio del cambio NO dispara** (mediana 4 áreas, p95 10, y los que pasan de 12 son lotes
-legítimos: contado, un cambio desbocado y una reparación en lote son el mismo número). Precio
-aceptado: 40 ficheros tocados sin borrar nada pasan en silencio. El radio se imprime en el acta.
+⚠️ **El radio del cambio NO dispara**: contado, un cambio desbocado y una reparación en lote son
+el mismo número. Precio aceptado: 40 ficheros tocados sin borrar nada pasan en silencio.
 
 Lo disparan los hooks, no Claude: `SessionStart` anota la base, `UserPromptSubmit` guarda la
 petición **literal**, el `pre-commit` bloquea y `SessionEnd` reconcilia. Siempre que habla sale un
@@ -426,9 +414,8 @@ petición **literal**, el `pre-commit` bloquea y `SessionEnd` reconcilia. Siempr
 herramienta lo lee el auditado.
 
 > Las 9 reglas con sus precedentes, cómo se desencalla un commit bloqueado y los dos límites del
-> diseño: skill **`/cuadre`**. Sus cinco trampas: **`npm run cuadre:probar-candado`** — la quinta
-> reinyecta 400 commits reales y exige silencio en todos menos 10, porque un detector que gritara
-> «sorpresa» en todo pasaría las otras cuatro con matrícula de honor.
+> diseño: skill **`/cuadre`**. Mediciones y crónica: cabeceras de `scripts/cuadre.mjs` y
+> `scripts/cuadre-motor.mjs`. Sus trampas: **`npm run cuadre:probar-candado`**.
 
 ### Backups y recuperación de Turso
 
@@ -436,8 +423,8 @@ Turso es el **único dato de producción no reproducible desde GitHub**.
 
 | Control | Cadencia | Qué valida |
 |---------|----------|------------|
-| `scripts/backup-turso.mjs` | Diaria 08:06 | Genera el dump (tablas + datos + índices/vistas/disparadores) |
-| Verificador de Backups | Diaria 08:12 | Que el dump carga y sus cifras son coherentes |
+| `scripts/backup-turso.mjs` | Diaria, en la Rutina Matinal (05:30) | Genera el dump (tablas + datos + índices/vistas/disparadores) |
+| Verificador de Backups | Diaria, en la misma cadena, tras los backups | Que el dump carga y sus cifras son coherentes |
 | `npm run ensayo:restauracion` | **Semestral** | La vuelta atrás completa: esquema, índices, integridad y la app operando sobre la copia |
 
 **Antes de ejecutar el ensayo, leer `_private/RUNBOOK-RESTAURACION-TURSO.md`** — contiene
@@ -449,298 +436,172 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 
 ### Candado de accesibilidad JSX
 
-`npm run check:a11y-jsx` — lo ejecuta también `npm run build`, y **rompe el build** si el
-commit escribe un `<button>` sin `type=` o un emoji junto a texto sin `aria-hidden` (las dos
-reglas del CLAUDE.md global §5 cuya corrección es unívoca). Las otras **tres** situaciones
-—`aria-pressed` que falta en un toggle, `aria-pressed` que **sobra**, y emoji en nodo propio—
-exigen criterio y **solo avisan**: un `aria-pressed` en un botón de acción es una regresión, no
-una mejora.
-
-⚠️ Juzga **las líneas que el commit añade**, no el fichero entero, igual que `check:secrets`.
-El catálogo arrastra ~5.000 incumplimientos en 731 ficheros (23/08/2026), así que un candado por
-fichero rompería el build al tocar cualquier app antigua y acabaría desactivado. Lo que el
-fichero ya arrastraba se cuenta y se nombra, pero no detiene nada. Falso positivo:
-`a11y-ok: <razón>` en esa línea o en la anterior.
-
-`npm run check:a11y-jsx -- --todo` mide el pasivo entero (2,5 s, no rompe nada) y
-`node scripts/check-a11y-jsx.mjs <fichero>` audita uno concreto.
-
-> Qué demuestra cada regla por la forma del código, de qué caso salió y por qué tres solo avisan:
-> cabecera de `scripts/check-a11y-jsx.mjs`. Sus casos de prueba, en `scripts/pruebas/a11y-regla5.tsx`.
+`npm run check:a11y-jsx` — en el build, y **rompe el build** si el commit escribe un `<button>`
+sin `type=` o un emoji junto a texto sin `aria-hidden` (las dos reglas del CLAUDE.md global §5
+cuya corrección es unívoca). Las otras tres —`aria-pressed` que falta en un toggle,
+`aria-pressed` que **sobra** y emoji en nodo propio— **solo avisan**: un `aria-pressed` en un
+botón de acción es una regresión, no una mejora.
+Juzga **las líneas que el commit añade** (el catálogo arrastra miles) · Escape:
+`a11y-ok: <razón>` en esa línea o en la anterior · `npm run check:a11y-jsx -- --todo` mide el
+pasivo (2,5 s, no rompe) y `node scripts/check-a11y-jsx.mjs <fichero>` audita uno.
+> Salió de la tanda del Inspector del 21/08/2026: 15 hallazgos en 10 de 10 apps, siempre las
+> mismas reglas. Crónica y pasivo: cabecera de `scripts/check-a11y-jsx.mjs` · casos:
+> `scripts/pruebas/a11y-regla5.tsx`.
 
 ### Candado del aviso legal
 
-`npm run check:legal` — lo ejecuta también `npm run build`, y **rompe el build** si una app de
-`implementedAppsUrls` no monta `<LegalNotice />`. Exige además las dos cosas que impiden que eso
-se cumpla solo en apariencia: que el componente se **monte** y no solo se importe (un import
-huérfano deja la página igual de desnuda), y que **no viva dentro de `<EducationalSection>`**, que
-nace colapsada — es la prohibición expresa de más arriba: un aviso legal no es maquetación.
-
-Salió del Inspector el 18/09/2026: `test-fragilidad` (escala FRAIL, riesgo 1) era la **única de
-las 21 apps `app/test-*`** sin aviso legal, y justo la que pregunta cinco cosas sobre la salud de
-quien la usa. El barrido encontró otras seis, tres de riesgo 1. **El Cuadre no podía verlo**: su
-regla de `LegalNotice` salta cuando el componente cae a CERO comparando antes y después, así que
-cubre la desaparición y es ciega a la ausencia de origen — «nacer no es una sorpresa».
-
-⚠️ **Sin pasivo**: las siete se repararon en el mismo commit que lo creó, así que solo puede
-encenderlo una app nueva. Falso positivo: `legal-ok: <razón>` en el `page.tsx` de la app, y **la
-razón es obligatoria** — la marca a secas también rompe el build.
-
-> Las tres veces que este candado se equivocó antes de estar bien —un comentario que nombraba
-> `<EducationalSection>`, una regex con acentos graves y el `\s*` del escape comiéndose el salto
-> de línea— están en `scripts/pruebas/probar-check-legal-notice.mjs` como casos que exigen que
-> **calle**. Se le reinyectan los 8 con **`npm run legal:probar-candado`**.
+`npm run check:legal` — en el build, y **rompe el build** si una app de `implementedAppsUrls` no
+monta `<LegalNotice />`. Exige que se **monte** y no solo se importe, y que **no viva dentro de
+`<EducationalSection>`**, que nace colapsada (la prohibición de «Estructura estándar»).
+**Sin pasivo** · Escape: `legal-ok: <razón>` en el `page.tsx` de la app, y la razón es
+obligatoria: la marca a secas también rompe.
+> Salió del Inspector el 18/09/2026: `test-fragilidad` (escala FRAIL, riesgo 1) era la única de
+> las 21 apps `app/test-*` sin aviso legal. Crónica y barrido: cabecera de
+> `scripts/check-legal-notice.mjs` · pruebas: `npm run legal:probar-candado`.
 
 ### Candado de las celdas braille
 
-`npm run check:braille` — lo ejecuta también `npm run build`, y **rompe el build** si una celda
-que `conversor-braille` puede EMITIR no tiene entrada en `brailleDots`, o si los puntos de una
-entrada no cuadran con su código Unicode (el bloque U+2800 codifica los puntos en bits, así que
-los de `⠙` = U+2819 son forzosamente 1-4-5).
-
-Salió del **mismo defecto dos veces**, con la lección de la primera escrita en el código: el
-21/08/2026 faltaban los tres indicadores —numeral, mayúscula y latina minúscula— y el 22/09
-(hallazgo 1183) faltaba `⠠`, la primera celda de la barra inclinada, que llega por
-`SIGNOS_COMPUESTOS` y por eso se quedó fuera de aquella reparación. `brailleDots[c] ?? []` no da
-error: devuelve una celda con los seis puntos apagados, y **en la hoja imprimible a escala real
-eso es un espacio**, así que el lector táctil leía «12/05/2026» como «12 ,05 ,2026». Duele en el
-único producto FÍSICO del catálogo, que no se puede desmentir después.
-
-⚠️ **El Cuadre no podía verlo**: compara conjuntos antes/después, así que cubre la desaparición
-de una entrada y es ciego a que nunca existiera — «nacer no es una sorpresa».
-
-⚠️ **Sin pasivo**: las 50 entradas actuales cumplen las dos reglas, así que solo puede
-encenderlo código nuevo. Y **sin escape**, a propósito: una celda emitible sin puntos no tiene
-falso positivo posible, y un patrón que no cuadra con su Unicode es un error de tecleo.
-
-> Qué NO mira (`brailleToText`, y si la celda es la correcta para su carácter en tinta, que eso
-> lo dice el B 2 y no la aritmética): cabecera de `scripts/check-celdas-braille.mjs`. Sus cinco
-> trampas, en `scripts/pruebas/probar-check-celdas-braille.mjs`, y se le reinyectan con
-> **`npm run braille:probar-candado`** — la quinta le renombra la tabla y exige que se PLANTE en
-> vez de dar verde, y es la que destapó que su propio regex leía cualquier `brailleDotsLoQueSea`.
+`npm run check:braille` — en el build, y **rompe el build** si una celda que `conversor-braille`
+puede EMITIR no tiene entrada en `brailleDots` (se dibujaría en blanco: en la hoja punzada, un
+espacio), o si los puntos de una entrada no cuadran con su código Unicode.
+**Sin pasivo** · **sin escape**, a propósito: no hay falso positivo posible.
+⚠️ No mira si la celda es la CORRECTA para su carácter en tinta: eso lo dice el B 2 de la
+Comisión Braille Española, y es trabajo del Inspector contra la fuente.
+> Salió del mismo defecto dos veces: el 21/08/2026 (los tres indicadores) y el 22/09 (hallazgo
+> 1183, `⠠` de la barra inclinada). Crónica y trampas: cabecera de
+> `scripts/check-celdas-braille.mjs` · pruebas: `npm run braille:probar-candado`.
 
 ### Candado del mínimo personal del IRPF
 
-`npm run check:minimo-irpf` — lo ejecuta también `npm run build`, y **rompe el build** si en un
-fichero que calcula IRPF aparece una resta cuyo sustraendo es un mínimo (`- MINIMOS_IRPF_2025.x`,
-`- minimoPersonal`, `- MINIMO_PERSONAL`).
-
-El art. 63.1.2.º LIRPF dice que el mínimo personal y familiar **no reduce la renta**: forma parte
-de la base liquidable general y se grava a TIPO CERO, aplicando la escala DOS VECES —a la base
-completa y al mínimo— y restando la segunda cuota de la primera. Restarlo de la base lo valora al
-tipo MARGINAL y subestima la cuota: hasta **1.443 €/año** solo con el mínimo personal
-(5.550 × (45 − 19) %), y **3.691 €/año** con 70.000 € de base y tres hijos.
-
-La fórmula canónica es **`calcularCuotaIntegraGeneral`** de `@/data/fiscal`, junto a
-`cuotaEscalaGeneral` y `desglosarEscalaGeneral` (esta última para los desgloses en pantalla, que
-son los de la PRIMERA aplicación de la escala y por eso suman más que la cuota).
-
-⚠️ **Sin pasivo**, como `check:og-image`: barre el árbol entero, no solo lo que el commit añade.
-Se drenó el 12/09/2026 migrando los 19 consumidores, así que solo puede encenderlo código nuevo.
-Falso positivo: `minimo-ok: <razón>` en esa línea o en la anterior. La reducción por tributación
-conjunta del art. 84.2 (3.400 / 2.150 €) **sí** se resta de la base y no lo dispara.
-
-> De qué tres reparaciones del mismo defecto en cuatro días salió, y qué NO mira:
-> cabecera de `scripts/check-minimo-irpf.mjs`. Sus casos de prueba, en
-> `scripts/pruebas/minimo-irpf.tsx`; se le reinyectan con **`npm run minimo:probar-candado`**.
+`npm run check:minimo-irpf` — en el build, y **rompe el build** si en un fichero que calcula IRPF
+aparece una resta cuyo sustraendo es un mínimo. El mínimo **no reduce la renta**
+(art. 63.1.2.º LIRPF): se grava a TIPO CERO aplicando la escala dos veces y restando las cuotas;
+restarlo de la base subestima la cuota. Fórmula canónica: **`calcularCuotaIntegraGeneral`** de
+`@/data/fiscal`, con `cuotaEscalaGeneral` y `desglosarEscalaGeneral` (para los desgloses en
+pantalla, que son los de la PRIMERA aplicación y por eso suman más que la cuota).
+Barre el árbol entero, **sin pasivo** · Escape: `minimo-ok: <razón>` en esa línea o la anterior.
+⚠️ La reducción por tributación conjunta del art. 84.2 (3.400 / 2.150 €) **sí** se resta de la base
+y no lo dispara.
+> Salió de tres reparaciones del mismo defecto en cuatro días (09-12/09/2026). Crónica y
+> cifras: cabecera de `scripts/check-minimo-irpf.mjs` · pruebas: `npm run minimo:probar-candado`.
 
 ### Candado del contraste de las cabeceras de tabla
 
-`npm run check:contraste-cabeceras` — lo ejecuta también `npm run build`, y **rompe el build**
-si una cabecera de tabla (`<th>`, `<thead>`, la clase `.th`) pone **texto blanco sobre
-`var(--primary)` o `var(--secondary)`**, en la hoja de estilos o en un `style={{…}}` del JSX.
-Barre **`app/` y `components/`**: nació mirando solo `app/` y el primer defecto que apareció
-después vivía en `components/`, donde un fichero sirve a las 1.001 apps a la vez.
-
-Vigila además que **un token `-texto` no se use como FONDO** con texto blanco encima.
-`--primary-texto`/`--secondary-texto` son para `color:`, y valen lo mismo que sus `-boton` en
-`:root` y en las tres verticales —así que el cambiazo no se ve en claro—, pero en el tema
-**oscuro de meskeIA** se invierten a propósito a un tono claro y el blanco encima cae a
-**2,23:1**. Salió de los 3 usos que había el 22/09/2026 (el hover del botón de
-`EducationalSection`, en claro y en oscuro, y el de copiar de `generador-contrasenas`): los tres
-del mismo commit `f50e3340` que creó los tokens, que reparó el reposo y no midió el hover en
-oscuro. Y como en `:root` los dos tokens son idénticos, ese hover no llegaba a oscurecer nada
-en ningún tema.
-
-Los colores de marca son identidad, no contraste: con blanco encima dan **4,11:1** el azul y
-**2,80:1** el teal, y en oscuro —donde `--primary` aclara a #3FA5D1— caen a **2,79** y **2,23**.
-Un `<th>` es negrita de ~14-16px, o sea texto pequeño: exige 4,5:1. Los tokens que sí valen
-existen desde el 21/08/2026 y se crearon para esto: **`--primary-boton`** (5,47:1) y
-**`--secondary-boton`** (5,15:1), iguales en **ambos temas**. `var(--hero-bg)` no lo enciende:
-da 8,33:1.
-
-Salió del hallazgo 1175 (21/09/2026), tercera vuelta sobre la misma tabla: las tres veces se
-midió el TEXTO de las celdas y nunca la fila del `<thead>`, **cuyo color está en el FONDO**. El
-barrido que lo siguió (683 bloques en 518 ficheros), en la cabecera del script.
-
-⚠️ **Sin pasivo**, como `check:og-image`: barre el árbol entero. Se drenó el 22/09/2026, así que
-solo puede encenderlo código nuevo. Falso positivo: `contraste-ok: <razón>` en esa línea o en el
-comentario anterior, y **la razón es obligatoria** — la marca a secas también rompe el build.
-
-⚠️ **Lo que NO mira**: el color de marca como TEXTO sobre fondo claro (`color: var(--primary)`,
-4,11:1), que se resuelve con `--primary-texto`; y los **2.042 bloques de botones, tabs, badges y
-números de paso** con fondo de marca medidos el 22/09/2026 (1.004 de ellos botones), que son
-campaña aparte porque cambiarlos altera el aspecto de la interacción en 782 apps.
-
-> Las cuatro formas que tenía el pasivo y las dos que NO debe encender: cabecera de
-> `scripts/check-contraste-cabeceras.mjs`. Sus 13 casos de prueba, en
-> `scripts/pruebas/probar-check-contraste-cabeceras.mjs`; se le reinyectan con
-> **`npm run contraste:probar-candado`**, que incluye el caso de origen en sus dos versiones —el
-> `<tr style>` de nave-industrial antes del 1175, que debe FALLAR, y el reparado, que debe CALLAR.
-> La medición por PÍXEL, en `tests/contraste-cabeceras-tabla.spec.ts`, que mide el botón de
-> `EducationalSection` EN HOVER, porque en reposo siempre estuvo bien.
+`npm run check:contraste-cabeceras` — en el build, y **rompe el build** si un `<th>`, `<thead>`
+o `.th` pone **texto blanco sobre `var(--primary)` o `var(--secondary)`** (en CSS o en
+`style={{…}}`): es texto pequeño, exige 4,5:1, y con blanco la marca da 4,11:1 el azul y 2,80:1
+el teal (menos en oscuro). Vigila además que **un token
+`-texto` no se use como FONDO** con blanco encima: `--primary-texto`/`--secondary-texto` son para
+`color:`. Usar **`--primary-boton`** y **`--secondary-boton`**, iguales en **ambos temas**;
+`var(--hero-bg)` (8,33:1) no lo enciende.
+Barre **`app/` y `components/`**, **sin pasivo** · Escape: `contraste-ok: <razón>`, y la razón es
+obligatoria.
+⚠️ **Lo que NO mira**: el color de marca como TEXTO sobre fondo claro (se resuelve con
+`--primary-texto`), ni botones y badges con fondo de marca (campaña aparte).
+> Salió del hallazgo 1175 (21/09/2026): el color del `<thead>` estaba en el FONDO. Crónica:
+> cabecera de `scripts/check-contraste-cabeceras.mjs` · pruebas: `npm run contraste:probar-candado`
+> · por píxel: `tests/contraste-cabeceras-tabla.spec.ts`.
 
 ### Candado del token sin variante oscura
 
-`npm run check:token-oscuro` — lo ejecuta también `npm run build`, y **rompe el build** si un
-`.module.css` declara con color literal un token que `globals.css` define distinto en cada tema
-(`--text-muted`, `--bg-card`, `--border`…) sin redeclararlo en la variante oscura de ese mismo
-selector. La lista de tokens la saca de globals al arrancar, y se planta si no la encuentra.
-
-Salió del drenaje del claro del 22/09/2026 (dd66add0): pasó `--text-muted` a #6E6E6E en el
-`.container` de 364 módulos, y en 4 cuyo bloque oscuro no lo redeclaraba el oscuro cayó a
-**2,48–2,81:1**, pie y aviso legal incluidos. Con #999999 cumplía por casualidad. Llegó a
-producción. Al medir el pasivo salió la forma peor: un **`:root` de módulo** con la paleta
-clara, que es global y en oscuro servía los tokens del claro a toda la página. **Al drenar un
-token en un tema, medir el otro.**
-
-⚠️ **Sin pasivo** para los tokens de texto y superficie. **Fuera, a propósito**: `--primary`,
-`--secondary` y los semánticos, porque 472 módulos redeclaran la marca sin variante oscura
-(campaña aparte). Escape: `oscuro-ok: <razón>`, razón obligatoria. Exige que la variante
-EXISTA; si su valor cumple contraste lo miden `tests/contraste-text-muted-*.spec.ts`, porque
-un valor se decide midiendo contra el fondo REAL (el #757575 de agosto se eligió contra blanco,
-4,60, y sobre #FAFAFA daba 4,41). Sus 16 casos, con los dos de origen sacados de git:
-**`npm run oscuro:probar-candado`**.
+`npm run check:token-oscuro` — en el build, y **rompe el build** si un `.module.css` declara con
+color literal un token que `globals.css` define distinto en cada tema (`--text-muted`,
+`--bg-card`…) sin redeclararlo en la variante oscura de ese mismo selector, también en un
+`:root` de módulo. Saca la lista de tokens de globals y se planta si no la encuentra.
+**Al drenar un token en un tema, medir el otro.**
+**Sin pasivo** · Fuera, a propósito: `--primary`, `--secondary` y los semánticos (campaña aparte)
+· Escape: `oscuro-ok: <razón>`, razón obligatoria.
+⚠️ Exige que la variante EXISTA, no que cumpla: eso lo miden `tests/contraste-text-muted-*.spec.ts`,
+porque un valor se decide midiendo contra el fondo REAL.
+> Salió del drenaje del claro del 22/09/2026 (`dd66add0`): en 4 módulos el oscuro cayó a
+> 2,48–2,81:1. Crónica: cabecera de `scripts/check-token-oscuro.mjs` · pruebas:
+> `npm run oscuro:probar-candado`.
 
 ### Candado del parser numérico
 
-`npm run check:parser` — lo ejecuta también `npm run build`, y **rompe el build** si el commit
-escribe `parseFloat(x.replace(',', '.'))` o cualquier variante del parseo casero. El parser
-canónico es **`parseSpanishNumber`** de `@/lib`.
-
-`parseFloat` se queda con el prefijo numérico y descarta el resto sin avisar (`'12abc'` → 12,
-`'1e3'` → 1000, `'10.5.3'` → 10,5), y el `.replace(',', '.')` de delante lee el millar español
-mil veces más pequeño: «1.500» se convierte en 1,5.
-
-⚠️ Igual que `check:a11y-jsx`, juzga **las líneas que el commit añade**, y por una razón medida:
-el catálogo arrastra **191 usos en 87 ficheros** (25/08/2026), y de una muestra de 60 **35 no
-validan el resultado del parseo**. Sustituirlos en bloque haría aparecer «NaN» en pantalla en más
-de la mitad, porque `parseSpanishNumber` devuelve NaN donde `parseFloat` devolvía un número. El
-pasivo lo drena el Inspector app por app, que es donde se puede comprobar en navegador si esa app
-maneja el NaN o si hay que añadirle la guarda. Falso positivo: `parser-ok: <razón>` en esa línea
-o en la anterior — los hay de verdad, como parsear un `dataset` que escribe la propia app.
-
-`npm run check:parser -- --todo` mide el pasivo entero y `node scripts/check-parser-numerico.mjs
-<fichero>` audita uno concreto.
-
-> De qué dos hallazgos del Inspector salió, y cómo su primera versión era ciega a la forma más
-> habitual del catálogo: cabecera de `scripts/check-parser-numerico.mjs`. Sus casos de prueba, en
-> `scripts/pruebas/parser-numerico.tsx`.
+`npm run check:parser` — en el build, y **rompe el build** si el commit escribe
+`parseFloat(x.replace(',', '.'))` o una variante del parseo casero, que lee «1.500» como 1,5 y
+acepta `'12abc'` como 12. El canónico es **`parseSpanishNumber`** de `@/lib`.
+Juzga **las líneas que el commit añade** · Escape: `parser-ok: <razón>` en esa línea o la
+anterior (los hay: un `dataset` que escribe la propia app) · `npm run check:parser -- --todo`
+mide el pasivo y `node scripts/check-parser-numerico.mjs <fichero>` audita uno.
+⚠️ Sustituirlos en bloque NO: `parseSpanishNumber` devuelve NaN donde `parseFloat` daba un número,
+y buena parte del pasivo no valida el resultado. El pasivo lo drena el Inspector app por app.
+> Salió de `conversor-numeros-letras` (24/08/2026) y `calculadora-masa-madre` (25/08). Crónica y
+> pasivo: cabecera de `scripts/check-parser-numerico.mjs` · casos: `scripts/pruebas/parser-numerico.tsx`.
 
 ### Candado de la hidratación en los tests
 
-`npm run check:hidratacion` — lo ejecuta también `npm run build`, y **rompe el build** si un
-fichero de `tests/` escribe en un input con el setter nativo
-(`HTMLInputElement.prototype`) fuera de **`tests/apps/_hidratacion.ts`**, que es donde vive esa
-escritura con las dos esperas que la hacen válida: `sembrarValor`, `sembrarValorAcotado` (cuando
-el control capa el valor) y `esperarValorEnReact` (para los `fill()`).
-
-`page.goto()` espera al evento `load`: garantiza que los chunks se han descargado, no que React
-los haya ejecutado. Sembrar en esa ventana **cambia el DOM y no llega al estado de React**, así
-que la etiqueta, el `aria-label` y el resultado calculado se quedan en el valor viejo y el test
-pasa en verde midiendo otro escenario. Medido con la CPU al 5 %: pedir 2 enlaces en
-`simulador-vsepr` deja DOM=2 y React=4, y sigue así un segundo después de hidratar. Agravante:
-el intento perdido envenena el rastreador de valor de React, que a partir de ahí descarta por
-duplicado cualquier reintento con ese mismo valor — dos specs llevaban un bucle de 20 reintentos
-que no podía funcionar ni en teoría.
-
-⚠️ **Sin pasivo**, como `check:og-image`: barre el árbol de pruebas entero. Se drenó el
-12/09/2026 migrando los 12 specs, así que solo puede encenderlo un test nuevo. Falso positivo:
-`hidratacion-ok: <razón>` en esa línea o en la anterior — lo hay, el test que reproduce la
-carrera a propósito. **No mira los `fill()` ni los clics** anteriores a la hidratación, que
-corren el mismo riesgo: ahí no hay candado posible por la forma del código, porque un `fill()`
-es correcto o no según lo que el test haya esperado antes.
-
-⚠️ Y hay un fallo que **ningún** testigo detecta: sembrar el valor que el input YA tiene. El
-estado de React coincide desde el principio, así que el caso pasa aunque la app esté sorda.
-`SIEMBRA_ESTRICTA=1 npx playwright test tests/apps` lo audita y nombra cada una.
-
-> De qué dos specs en rojo salió y qué NO mira: cabecera de `scripts/check-hidratacion-tests.mjs`.
-> Sus casos de prueba, en `scripts/pruebas/hidratacion-tests.ts`; se le reinyectan con
-> **`npm run hidratacion:probar-candado`**. La carrera misma se reproduce en
-> `tests/hidratacion-carrera.spec.ts`, estrangulando la CPU.
+`npm run check:hidratacion` — en el build, y **rompe el build** si un test escribe en un input
+con el setter nativo (`HTMLInputElement.prototype`) fuera de **`tests/apps/_hidratacion.ts`**,
+que lo hace con sus esperas: `sembrarValor`, `sembrarValorAcotado` (si el control capa el valor)
+y `esperarValorEnReact` (para los `fill()`).
+`page.goto()` garantiza los chunks descargados, no que React los haya ejecutado: sembrar antes
+cambia el DOM y no el estado, y el test pasa en verde midiendo otro escenario.
+**Sin pasivo** · Escape: `hidratacion-ok: <razón>` en esa línea o la anterior (lo usa
+`tests/hidratacion-carrera.spec.ts`, que reproduce la carrera).
+⚠️ **No mira los `fill()` ni los clics** previos a la hidratación, que corren el mismo riesgo: por
+la forma del código no admiten candado, así que hay que esperar antes. Tampoco ve sembrar el valor
+que el input YA tiene (el caso pasa aunque la app esté sorda): eso lo audita
+`SIEMBRA_ESTRICTA=1 npx playwright test tests/apps`.
+> Salió de dos specs en rojo el 12/09/2026. Crónica: cabecera de
+> `scripts/check-hidratacion-tests.mjs` · pruebas: `npm run hidratacion:probar-candado`.
 
 ### Candado de las familias de apps
 
-`npm run check:familias` — lo ejecuta también `npm run build` (~20 s), y **rompe el build** si
-el testigo de una familia no está en verde o si su tabla no cubre cada `<NumberInput>` de cada
-hermana. Lee la MISMA declaración que la cola del Inspector, `scripts/inspector/familias.mjs`:
-una familia nueva entra en el build con declararla allí.
-
-Es el único candado que **ejecuta** en vez de leer, y a propósito: su caso de origen (el hueco A1
-de compraventa, 23/09/2026) era de DIRECCIÓN —el campo tenía guarda, bandera y aviso, y el aviso
-decía lo contrario— y ninguna forma del código lo delata. La versión estática tentadora («existe
-`esLegible()`») habría dado en rojo tres apps sanas que escriben la guarda inline.
-
-⚠️ **Sin pasivo**: nació con el testigo de compraventa en 52/52 y los 46 campos de sus siete apps
-con fila. Un hueco nuevo se escribe con `falla: '<razón>'` en su fila ANTES de repararlo: no
-rompe, se imprime con su cuenta; y una marca cuyo caso ya pasa **sí** rompe. Un campo que no mueve
-ninguna cifra publicada: `familia-ok: <razón>`. En Vercel se omite la ejecución (no hay navegador).
-
-> Por qué un lote hecho a propósito «en las siete» dejó cinco huecos: cabecera de
-> `scripts/check-familias.mjs`. Sus 7 trampas, con el A1 reinyectado en el código real:
-> **`npm run familias:probar-candado`**.
+`npm run check:familias` — en el build (~20 s), y **rompe el build** si el testigo de una familia
+no está en verde o si su tabla no cubre cada `<NumberInput>` de cada hermana. Lee
+`scripts/inspector/familias.mjs`: una familia nueva entra en el build con declararla allí. Es
+el único que **ejecuta** en vez de leer, porque un aviso que dice lo contrario de lo que pasa no
+lo delata ninguna forma del código.
+**Sin pasivo** · Un hueco se escribe con `falla: '<razón>'` en su fila ANTES de repararlo (no
+rompe y se imprime con su cuenta; una marca cuyo caso ya pasa **sí** rompe) · Escape:
+`familia-ok: <razón>` en un campo que
+no mueve ninguna cifra, razón obligatoria · En Vercel se omite la ejecución.
+> Salió del hueco A1 de compraventa (23/09/2026). Crónica: cabecera de
+> `scripts/check-familias.mjs` · pruebas: `npm run familias:probar-candado`.
 
 ### Candado de la tarjeta social
 
-`npm run check:og-image` — lo ejecuta también `npm run build`. Vigila la imagen con la que un
-enlace se convierte en tarjeta en X, WhatsApp, LinkedIn o Slack.
+`npm run check:og-image` — en el build. **Rompe el build** si una app de portal no declara la og
+de SU portal en `openGraph` y en `twitter`, si una página de portal se queda sin ella, si la
+imagen no existe en `public/` o si cae bajo un redirect de `next.config.ts`; y, **sin pasivo**,
+si cualquier app declara `openGraph` sin `images`.
+⚠️ **Next NO hereda la imagen del layout raíz**: declarar `openGraph` en la página reemplaza
+entero el del padre. Por eso `templates/app-base/` ya trae `images`.
+Recorre el árbol de cada portal (uno nuevo, a `PORTALES`) · Escape: `og-ok: <razón>` en el
+`metadata.ts`.
+⚠️ **Delegum es la excepción: sus apps NO llevan la og del portal**, porque Delegum no sirve apps
+bajo su dominio: su proxy no hace passthrough (`delegum.com/estimador-irpf/` da 404) y solo se ven
+en meskeia.com. `DELEGUM_APP_SLUGS` alimenta Soluciones, no pertenencia. Sí la llevan las páginas
+de su árbol (home, `/datos-fiscales/`, asistente y blog).
+> Salió del 29/08/2026: tarjetas de Coquinum y Cronicum sin imagen. Crónica: cabecera de
+> `scripts/check-og-image.mjs` · pruebas: `npm run og:probar-candado`.
 
-**Rompe el build** si una app de un portal vertical no declara la og de SU portal en `openGraph`
-y en `twitter`, si una página de portal se queda sin ella, si la imagen no existe en `public/`, o
-si la URL cae bajo un redirect de `next.config.ts` que la desvía a otro dominio.
+### Candado de las obligaciones del CLAUDE.md
 
-⚠️ **Next NO hereda la imagen del layout raíz.** El merge de metadata es *shallow*: declarar
-`openGraph` en la página reemplaza entero el del padre, así que la `ogImage` de
-`generateBaseMetadata()` no llega. Con `twitter:card = summary_large_image` y ninguna imagen
-detrás, la tarjeta se degrada a la pequeña con icono de documento. Por eso la plantilla
-`templates/app-base/` ya trae `images`: una app nueva nace con imagen.
-
-**Sin pasivo**: rompe también si cualquier app del catálogo declara `openGraph` sin `images`. Se
-drenó entero el 29/08/2026, así que ya solo puede encenderlo una app nueva escrita sin imagen.
-Escape: `og-ok: <razón>` en el `metadata.ts`. Al abrir un vertical nuevo se añade su entrada a
-`PORTALES` en el script y el candado pasa a exigirlo. Los cuatro están cubiertos: **Coquinum**
-(84 apps), **Stemum** (139 apps + 12 tablas de material de apoyo, que también se publican bajo
-stemum.com), **Cronicum** (sus 182 páginas salen de un solo `generateMetadata`) y **Delegum**
-(21 páginas de portal).
-
-⚠️ **Delegum es la excepción: sus apps NO llevan la og del portal.** No es por falta de lista
-—`DELEGUM_APP_SLUGS` existe, con 91 apps— sino porque **Delegum no sirve apps bajo su dominio**:
-su proxy no hace passthrough de slugs del catálogo, así que `delegum.com/estimador-irpf/` da 404
-mientras `coquinum.com/escandallo-food-cost/` da 200. Esas apps solo se ven bajo `meskeia.com`, de
-modo que ponerles la og de Delegum las marcaría con una marca que el visitante nunca llega a ver.
-`DELEGUM_APP_SLUGS` alimenta *Soluciones* (enrutado por journey), no pertenencia al portal. Lo que
-sí es suyo son las páginas de su árbol: home, fichas de `/datos-fiscales/`, asistente y blog. De
-ahí que el candado recorra el **árbol** de cada portal en vez de una lista de páginas.
-
-> De qué fallo salió, por qué la og de Cronicum no se sirvió nunca pese a que el comentario del
-> código afirmaba lo contrario, y cuáles de sus casos de prueba los escribió el propio candado
-> fallando: cabecera de `scripts/check-og-image.mjs` y `npm run og:probar-candado`.
+`npm run check:claude-md` — en el build, y **rompe el build** si una obligación de este fichero
+desaparece o cambia de sección (la lista vive en el script), si cita un `npm run` o una ruta que
+no existen, o si un «### Candado de…» no está de verdad en la cadena del build. Compara sin
+mayúsculas, negritas ni saltos de línea: reformatear calla.
+Sin escape, a propósito: retirar una obligación es quitarla de la lista, en el mismo commit ·
+**Avisa** (no rompe) si una sección de candado pasa de 1.200 B o no nombra su caso de origen: la
+crónica va a la cabecera de su script, y aquí queda qué rompe, qué barre, el escape y el origen.
+> Salió del 24/09/2026: la poda con prisa del índice de memoria del 23/09 se llevó sus frenos sin
+> que nada diera error, y este fichero crecía ~1.000 B/día. Crónica: cabecera de
+> `scripts/check-claude-md.mjs` · pruebas: `npm run claude-md:probar-candado`.
 
 ### TypeScript
 
-- ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (limitación de RAM en Vercel: el type-check de +1.100 apps agota los 8 GB)
+- ⚠️ `ignoreBuildErrors: true` en `next.config.ts` — el build de producción NO type-chequea (el type-check del catálogo agota los 8 GB de RAM de Vercel)
 - Validación de tipos SIEMPRE en local: **`npm run check:tipos`** antes de commitear cambios sustanciales
   (lo ejecuta también `npm run build`; en Vercel se salta, para no encarecer cada despliegue)
 
   ⚠️ **NO usar `npx tsc --noEmit` a secas: puede estar CIEGO y devolver «0 errores» sin haber
-  mirado nada.** Next escribe `.next/dev/types/routes.d.ts` y `validator.ts` sin truncar, así que
-  al acortarse dejan restos de la versión anterior; sus cientos de errores de SINTAXIS abortan el
-  análisis semántico de todo el proyecto. Y no basta con excluirlos del tsconfig, porque
-  `next-env.d.ts` los importa explícitamente. Descubierto el 14/08/2026 inyectando
-  `const x: number = "texto"` en `app/`: tsc devolvía 0 errores. `check:tipos` los retira si están
-  corruptos, revalida, y **falla si no consigue dejar la validación limpia** — un validador que
-  dice «0 errores» tiene que poder distinguir entre «está bien» y «no he mirado».
+  mirado nada**, por los restos que Next deja en `.next/dev/types/`. `check:tipos` los retira,
+  revalida, y **falla si no consigue dejar la validación limpia**. Tampoco
+  `npx tsc --noEmit <fichero>`: ignora el `tsconfig.json` y da error siempre. Los dos casos
+  (14/08 y 10/09/2026), en la cabecera de `scripts/check-tipos.mjs`.
 - Objetivo: 0 errores TypeScript en todo el proyecto
 - Archivos de tipos custom en `types/`
 - Casts conocidos: Chart.js → `as never`, jStat → `Record`, libs sin tipos → `.d.ts` en `types/`
@@ -763,7 +624,7 @@ Las reglas generales —**UN solo build a la vez**, timeout de **10 minutos (600
 plano y nunca en segundo, no lanzar nada en paralelo, y qué hacer con un `.next/lock` huérfano—
 están en el **CLAUDE.md global §7** y aplican aquí tal cual. Lo propio de meskeIA:
 
-- El proyecto (+1.100 apps) tarda **~1-2 minutos** en este PC (i7-14700/32 GB). El margen hasta
+- El build del catálogo tarda **~1-2 minutos** en este PC (i7-14700/32 GB). El margen hasta
   los 10 minutos cubre los builds fríos: **no dar un build por fallido antes de ese tiempo**.
 - **NUNCA** `npm run check:tipos` mientras un build está corriendo — lo ejecuta ya el propio build.
 - Si hay lock huérfano (existe `.next/lock` sin proceso `next build` activo): `rm -f .next/lock`
@@ -855,10 +716,8 @@ git commit -m "feat: descripción del cambio"
 /push
 ```
 
-**Por qué el lote**: el build es el **65 %** de la factura y sale a **0,073 $ por deploy**; un
-push con 12 commits construye **una** vez. A 210 commits/mes son ~15,3 $; a 2-3 pushes/día,
-4,4-6,6 $ sobre un crédito Pro de 20 $. Reactiva la norma del 26/06-16/07/2026, cuya condición
-de reactivación —«>8-10 pushes/día sostenidos»— se cumplió. El historial no cambia: los commits
+**Por qué el lote**: el build es el **65 %** de la factura, y un push con 12 commits construye
+**una** vez (cifras y antecedentes, en la skill `/push`). El historial no cambia: los commits
 siguen siendo atómicos y `git revert <sha>` de una corrección suelta sigue valiendo.
 
 **Sale con push propio, sin esperar al lote**: lo que hay que verificar EN PRODUCCIÓN (service
@@ -872,8 +731,8 @@ Inspector, típicamente— va al lote. Lo gitignored (`_private/`, `digests/`, l
 `data/app-dates.json` alimenta el `lastModified` del sitemap, y su generador deduce la
 fecha de cada app del `git log` de `app/<slug>/`. Como el build se ejecuta **antes de que el
 commit exista**, el JSON que genera no puede contener ese cambio: sin refrescarlo, el `lastmod`
-va siempre un commit por detrás y hay que corregirlo después con un commit extra (ocurrió en
-`9472e33a` y `83227161` antes de documentarse esto). Con el lote se hace **una vez al día**, en
+va siempre un commit por detrás y hay que corregirlo después con un commit extra (los dos casos,
+en la cabecera de `scripts/generate-app-dates.mjs`). Con el lote se hace **una vez al día**, en
 **commit propio y no con `--amend`** — enmendar modificaría el último commit, que puede ser de
 otra conversación.
 
