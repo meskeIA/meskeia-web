@@ -63,8 +63,16 @@ const casos = [
   {
     nombre: 'primeras-repetidas',
     filas: ['a', 'b', 'c', 'd', 'e', 'f'].map((s) => [s, 'con_hallazgos']),
-    debeAlarmar: /PRIMERA vez/,
-    porque: 'seis primeras inspecciones seguidas con el mismo veredicto',
+    // Caso de origen del 24/09/2026: racha hacia con_hallazgos → se comprueba especificidad
+    // (no vale /ESPECIFICIDAD/ a secas: el aviso antiguo citaba PRUEBA-ESPECIFICIDAD.md y pasaba)
+    debeAlarmar: /PRIMERA vez[\s\S]*La sensibilidad no está en duda[\s\S]*Vistos buenos/,
+    porque: 'seis primeras con hallazgos graves: pide especificidad, no un fallo a propósito',
+  },
+  {
+    nombre: 'primeras-menores',
+    filas: ['a', 'b', 'c', 'd', 'e', 'f'].map((s) => [s, 'con_hallazgos_menores']),
+    debeAlarmar: /PRIMERA vez[\s\S]*a propósito/,
+    porque: 'seis primeras sin nada grave: pide sensibilidad, meter un fallo a propósito',
   },
   {
     nombre: 're-graves',

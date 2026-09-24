@@ -202,12 +202,31 @@ if (primeras.racha > 1)
 if (reinspecciones.racha > 1)
   console.log(`   (re-inspecciones: ${reinspecciones.racha} veredictos "${reinspecciones.veredicto}" seguidos)`);
 
-if (primeras.racha >= UMBRAL_RACHA)
-  console.log(`\n⚠  ${primeras.racha} veredictos "${primeras.veredicto}" seguidos en apps que se miran por PRIMERA vez.\n` +
-              `   La lectura por defecto ya NO es que el catálogo esté bien, sino que el Inspector ha\n` +
-              `   dejado de mirar. Antes de seguir, comprobar que encuentra un fallo conocido (meter uno\n` +
-              `   a propósito en una app y ver si lo caza). El procedimiento y el criterio, escritos ANTES\n` +
-              `   de ejecutar la prueba, están en _private/inspector/PRUEBA-ESPECIFICIDAD.md.`);
+/*
+ * La comprobación depende de HACIA QUÉ LADO se repite (skill /inspector, «Racha de…»). Hasta
+ * el 24/09/2026 este aviso mandaba «meter un fallo a propósito» fuera cual fuera el sentido, y
+ * saltó con 6 "con_hallazgos": ahí la sensibilidad no estaba en duda, y la prueba recomendada
+ * habría verificado justo lo que nadie discutía — la trampa del 16/08 que la skill ya contaba.
+ */
+if (primeras.racha >= UMBRAL_RACHA) {
+  const VENTANA = 20;
+  const recientes = historia.filter(f => f.previas === 0).slice(0, VENTANA).map(f => f.veredicto);
+  const vistosBuenos = recientes.filter(v => v === 'con_hallazgos_menores' || v === 'ok').length;
+  console.log(`\n⚠  ${primeras.racha} veredictos "${primeras.veredicto}" seguidos en apps que se miran por PRIMERA vez.`);
+  if (primeras.veredicto === 'con_hallazgos')
+    console.log(`   La sensibilidad no está en duda: se está encontrando de todo. Lo que se comprueba es la\n` +
+                `   ESPECIFICIDAD, que sepa dar el visto bueno. Dos cosas, por este orden:\n` +
+                `     1. Verificar A MANO el caso reproducible de los graves de la racha.\n` +
+                `     2. Vistos buenos (con_hallazgos_menores u ok) en las últimas ${recientes.length} primeras: ${vistosBuenos}.\n` +
+                `        Si hay alguno, sabe absolver. Solo con 0 se repite la prueba de la app simple y\n` +
+                `        correcta de _private/inspector/PRUEBA-ESPECIFICIDAD.md (hecha el 23/08/2026).\n` +
+                `   Meter un fallo a propósito NO sirve aquí: verificaría lo que nadie discute.`);
+  else
+    console.log(`   La lectura por defecto ya NO es que el catálogo esté bien, sino que el Inspector ha\n` +
+                `   dejado de mirar (sensibilidad). Antes de seguir, comprobar que encuentra un fallo\n` +
+                `   conocido: meterlo a propósito en una app y ver si lo caza, con el criterio de\n` +
+                `   aceptación escrito ANTES de ejecutar la prueba.`);
+}
 
 if (reinspecciones.racha >= UMBRAL_RACHA) {
   if (reinspecciones.veredicto === 'con_hallazgos')
