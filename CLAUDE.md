@@ -12,10 +12,10 @@ Servidor de desarrollo y producción en el **puerto 3050** (`npm run dev` / `npm
 
 ---
 
-## ⚠️ Los CLAUDE.md de carpeta NO se cargan solos: hay que leerlos
+## ⚠️ Los CLAUDE.md de carpeta NO se cargan de forma fiable: hay que leerlos
 
-Medido el 20 y el 21/09/2026 (dos sesiones, siete pruebas): **ninguno de los siete llega al
-contexto** — ni con `Read`, ni con `Edit`, ni con `Grep`. Son 26,8 KB de trampas ya pagadas que
+Cargaron solos del 28/08 al 09/09/2026 (Claude Code 2.1.247-2.1.266) y **ninguno** del 10 al
+23/09 (siete pruebas el 20-21/09): depende de la versión. Son 26,8 KB de trampas ya pagadas que
 solo se leen si esta tabla lo manda, y se leen **antes de la primera escritura** en ese árbol:
 
 | Antes de tocar… | Lee | Trampa que cubre |

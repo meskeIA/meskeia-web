@@ -26,6 +26,7 @@
     "audit:motores": "node scripts/audit-motores-fiscales.mjs",
     "check:memoria": "node scripts/check-memoria.mjs",
     "memoria:probar-ritmo": "node scripts/pruebas/memoria-ritmo.mjs",
+    "memoria:probar-frenos": "node scripts/pruebas/memoria-frenos.mjs",
     "aula:probar-composicion": "node scripts/pruebas/aula-composicion-pais.mjs",
     "generate:app-dates": "node scripts/generate-app-dates.mjs",
     "generate:demandadas": "node scripts/generate-apps-demandadas.mjs",

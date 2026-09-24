@@ -10,6 +10,12 @@
  * resuelto, pero el ritmo real —1,55 fichas/día— agotaba el margen en ~33 días. El nivel no
  * lo veía venir; el ritmo sí. De ahí el caso 1.
  *
+ * ⚠️ Desde el 24/09/2026 corre sobre una memoria SINTÉTICA (171 fichas, índice de 16.001
+ * caracteres), no sobre la real. Antes medía contra el índice de cada día, así que el mismo caso
+ * podía pasar de «avisa» a «calla» con solo podar el índice real: la prueba dependía de lo que
+ * pretendía probar. Ese día el pronóstico pasó a contar días hasta el techo del hook (20.000
+ * car.) y el caso de origen, con su índice de entonces, sigue a ~28 días: tiene que avisar.
+ *
  * Uso:  npm run memoria:probar-ritmo
  */
 import { execFileSync } from 'node:child_process';
@@ -20,6 +26,20 @@ import path from 'node:path';
 const REPO = path.resolve(import.meta.dirname, '..', '..');
 const SCRIPT = path.join(REPO, 'scripts', 'check-memoria.mjs');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'memoria-ritmo-'));
+
+// Memoria sintética del caso de origen. Los nombres NO llevan prefijo `project_`/`feedback_`:
+// check-memoria recorre scripts/ buscando punteros a memorias, y este fichero lo encendería.
+const FICHAS_HOY = 171;
+const CARACTERES_HOY = 16_001;
+const DIR = path.join(TMP, 'memory');
+fs.mkdirSync(DIR);
+const slugs = Array.from({ length: FICHAS_HOY }, (_, i) => `sintetica-${String(i + 1).padStart(3, '0')}`);
+for (const s of slugs) {
+  fs.writeFileSync(path.join(DIR, `${s}.md`), `---\nname: ${s}\ndescription: ficha sintética de la prueba de ritmo\nmetadata:\n  type: project\n---\n\nSintética.\n`);
+}
+let indiceSintetico = '# MEMORY.md sintético\n\n' + slugs.map(s => `- [${s}](${s}.md)`).join('\n') + '\n';
+indiceSintetico += 'x'.repeat(CARACTERES_HOY - indiceSintetico.length);
+fs.writeFileSync(path.join(DIR, 'MEMORY.md'), indiceSintetico);
 
 /**
  * Serie sintética de `dias` lecturas que terminan AYER, con el ritmo pedido.
@@ -48,25 +68,25 @@ const CASOS = [
   {
     nombre: 'CASO DE ORIGEN: 1,55 fichas/día con poco margen',
     porQue: 'es la situación del 28/08/2026 que motivó el candado',
-    serie: serie({ dias: 22, fichasDia: 1.55, fichasHoy: 171, bytesHoy: 16001 }),
+    serie: serie({ dias: 22, fichasDia: 1.55, fichasHoy: FICHAS_HOY, bytesHoy: CARACTERES_HOY }),
     debeAvisar: true,
   },
   {
     nombre: 'Ritmo bajo: 0,25 fichas/día',
     porQue: 'si la regla de destino funciona, el aviso TIENE que desaparecer',
-    serie: serie({ dias: 40, fichasDia: 0.25, fichasHoy: 171, bytesHoy: 16001 }),
+    serie: serie({ dias: 40, fichasDia: 0.25, fichasHoy: FICHAS_HOY, bytesHoy: CARACTERES_HOY }),
     debeAvisar: false,
   },
   {
     nombre: 'Ritmo alto PERO con una poda de 5.188 B por medio',
     porQue: 'una poda hunde los bytes; si el cálculo fuera por bytes, la pendiente saldría plana o negativa y callaría',
-    serie: serie({ dias: 22, fichasDia: 1.55, fichasHoy: 171, bytesHoy: 16001, podaEn: 1 }),
+    serie: serie({ dias: 22, fichasDia: 1.55, fichasHoy: FICHAS_HOY, bytesHoy: CARACTERES_HOY, podaEn: 1 }),
     debeAvisar: true,
   },
   {
     nombre: 'Serie corta: 2 lecturas + la de hoy',
     porQue: 'con tan pocos puntos la pendiente es ruido y no debe pronunciarse',
-    serie: serie({ dias: 2, fichasDia: 1.55, fichasHoy: 171, bytesHoy: 16001 }),
+    serie: serie({ dias: 2, fichasDia: 1.55, fichasHoy: FICHAS_HOY, bytesHoy: CARACTERES_HOY }),
     debeAvisar: false,
   },
 ];
@@ -79,14 +99,17 @@ for (const [i, caso] of CASOS.entries()) {
   fs.writeFileSync(ruta, JSON.stringify(caso.serie));
   let salida;
   try {
+    // La lista de frenos apunta a una ruta inexistente a propósito: el candado de frenos se
+    // planta y los punteros externos reales no encuentran sus fichas. Son errores ajenos al
+    // ritmo, y la prueba solo lee la línea del pronóstico.
     salida = execFileSync('node', [SCRIPT], {
-      env: { ...process.env, SERIE_MEMORIA: ruta },
+      env: { ...process.env, MEMORIA_DIR: DIR, SERIE_MEMORIA: ruta, FRENOS_MEMORIA: path.join(TMP, 'sin-frenos.json') },
       encoding: 'utf8',
     });
   } catch (e) {
     salida = (e.stdout || '') + (e.stderr || '');   // exit 1 por errores ajenos al ritmo
   }
-  const aviso = /llega al umbral de aviso en ~\d+ días/.test(salida);
+  const aviso = /llega al techo del hook en ~\d+ días/.test(salida);
   const ok = aviso === caso.debeAvisar;
   if (!ok) fallos++;
   console.log(`${ok ? '  ✅' : '  ❌'} ${caso.nombre}`);

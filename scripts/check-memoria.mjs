@@ -16,15 +16,20 @@
  *   4. `name:` del frontmatter == nombre de fichero
  *   5. Frontmatter mínimo presente (name, description, type)
  *   6. Punteros externos vivos (agenda.json, _private/, scripts/, código, CLAUDE.md)
- *   7. MEMORY.md con margen sobre los DOS techos —bytes y líneas—, y su serie (delta por sesión)
+ *   7. MEMORY.md con margen sobre los DOS techos —caracteres y líneas—, y su serie (delta por sesión)
  *   8. Ninguna autorreferencia [[a-sí-mismo]]
  *   9. Ningún `node scripts/…` citado que apunte a un script inexistente
- *  10. Pronóstico de RITMO: días hasta el umbral al ritmo actual de fichas nuevas
+ *  10. Pronóstico de RITMO: días hasta el techo del hook al ritmo actual de fichas nuevas
+ *  11. FRENOS: cada freno de la lista sigue en la línea de su ficha (y avisa de los no vigilados)
  *
  * ⚠️ Al probar con MEMORIA_DIR, pasar también SERIE_MEMORIA a una ruta desechable: si no, la
  * ejecución escribe su lectura en la serie real y mete una entrada falsa del día. Se repara
  * volviendo a ejecutar el candado normal (la entrada del día se sobrescribe), pero es más
- * limpio no ensuciarla. Descubierto probando el techo de líneas el 28/08/2026.
+ * limpio no ensuciarla. Descubierto probando el techo de líneas el 28/08/2026. Por lo mismo,
+ * FRENOS_MEMORIA apunta a otra lista de frenos.
+ *
+ * Pruebas: `npm run memoria:probar-ritmo` (pronóstico) y `npm run memoria:probar-frenos`
+ * (frenos, con el caso de origen del 23/09/2026 reinyectado).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,19 +38,33 @@ import os from 'node:os';
 const VERBOSE = process.argv.includes('--verbose');
 const REPO = path.resolve(import.meta.dirname, '..');
 
-// Umbrales del índice. El único dato duro es el LÍMITE DE LECTURA: a partir de ~24,4 KB
-// MEMORY.md deja de cargarse entero, y ahí sí se pierde memoria de verdad.
+// Umbrales del índice, en CARACTERES (unidades UTF-16, `texto.length`), que es como mide el
+// propio Claude Code. Los tres salen del harness, no del tamaño que tuviera el índice un día:
 //
-// Los otros dos se derivan de él (85% y 94%), NO del tamaño que tuviera el índice un día
-// concreto. Hasta el 11/08/2026 el aviso estaba en 17.100 B, que eran los 17.086 B en que
-// quedó el índice tras la consolidación del 06/08 redondeados: un umbral fijado en "como
-// quedó aquel día" se cruza a los pocos días y avisa para siempre. Salía en cada ejecución
-// desde entonces, que es la definición de un semáforo que ha dejado de informar
-// (feedback_semaforo_color_que_informa). Recalibrado con fundamento: el aviso avisa cuando
-// queda poco margen real, no cuando el índice ha vuelto a crecer.
-const UMBRAL_ERROR = 24_400;                              // límite de lectura (dato duro)
-const UMBRAL_AVISO = Math.round(UMBRAL_ERROR * 0.85);     // 20.740 B — margen para reaccionar
-const UMBRAL_CRITICO = Math.round(UMBRAL_ERROR * 0.94);   // 22.936 B — ya casi sin margen
+//   · LÍMITE DE LECTURA — 25.000 car. Por encima, MEMORY.md deja de cargarse entero.
+//   · TECHO DEL HOOK — 20.000 car. (80 %). Desde ahí un hook INTERNO de Claude Code (no está en
+//     ningún settings.json) responde a cada edición del índice con «Compact it to under 17.1KB
+//     now». Es el techo real: pasado este punto, la poda la impone el hook a mitad de la tarea
+//     que sea, con prisa y sin revisión.
+//   · AVISO — 17.500 car. (70 %), el objetivo que pide ese mismo hook. Deja ~2.500 caracteres
+//     —un mes al ritmo de septiembre— para hacer la poda en una sesión dedicada, antes que él.
+//
+// El caso de origen (23/09/2026): el índice pasó el techo del hook, el hook saltó en mitad de
+// una sesión sobre el Inspector y se compactó en UN minuto de 21.749 B a 14.790 B. Ningún
+// enlace se perdió, pero sí la mitad de los 31 vetos que la recomposición de agosto había
+// dejado en el índice a propósito. Se reparó el 24/09. El aviso de entonces estaba en 20.740 B
+// (≈19.900 car.): el mismo punto que el hook, así que nunca dejaba margen para anticiparse.
+//
+// ⚠️ Medido en caracteres y no en bytes porque el hook dijo «20.4KB» con el índice en 21.749 B
+// y 20.877 caracteres (20.877 / 1024 = 20,4). En bytes, los acentos y emojis del índice pesan
+// un 4 % más y los umbrales quedaban desplazados respecto al hook.
+//
+// ⚠️ No es la trampa del 17.100 del 11/08, aunque el número se parezca: aquel era el tamaño en
+// que quedó el índice tras una consolidación («como quedó aquel día») y se cruzaba a los pocos
+// días. Este es un objetivo que fija el harness desde fuera y que no se mueve cuando se poda.
+const LIMITE_LECTURA = 25_000;                               // car. — el «24.4KB read limit»
+const TECHO_HOOK = Math.round(LIMITE_LECTURA * 0.80);        // 20.000 car. — el hook impone la poda
+const UMBRAL_AVISO = Math.round(LIMITE_LECTURA * 0.70);      // 17.500 car. — el objetivo del hook
 
 // El límite NO es solo de tamaño. La documentación oficial dice: «The first 200 lines of
 // MEMORY.md, or the first 25KB, whichever comes first» — son DOS techos y basta con tocar uno.
@@ -124,6 +143,7 @@ const avisos = [];
 
 const indice = fs.readFileSync(path.join(DIR, 'MEMORY.md'), 'utf8');
 const bytesIndice = Buffer.byteLength(indice, 'utf8');
+const caracteresIndice = indice.length;   // unidades UTF-16, como las cuenta el hook
 const ficheros = fs.readdirSync(DIR).filter(f => f.endsWith('.md') && f !== 'MEMORY.md');
 const slugs = new Set(ficheros.map(f => f.replace(/\.md$/, '')));
 
@@ -214,12 +234,16 @@ for (const [token, donde] of rotosExternos) {
 }
 
 // --- 7: tamaño del índice, y su serie ---
-if (bytesIndice > UMBRAL_ERROR) {
-  errores.push(`MEMORY.md ${bytesIndice} B supera el LÍMITE DE LECTURA (${UMBRAL_ERROR} B): deja de cargarse entero`);
-} else if (bytesIndice > UMBRAL_CRITICO) {
-  errores.push(`MEMORY.md ${bytesIndice} B roza el límite de lectura (${UMBRAL_ERROR} B) — podar YA`);
-} else if (bytesIndice > UMBRAL_AVISO) {
-  avisos.push(`MEMORY.md ${bytesIndice} B pasa del 85% del límite de lectura (${UMBRAL_AVISO} B) — queda poco margen`);
+// Punto de millar siempre: `toLocaleString('es-ES')` no agrupa las cifras de cuatro dígitos
+const miles = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+if (caracteresIndice > LIMITE_LECTURA) {
+  errores.push(`MEMORY.md tiene ${miles(caracteresIndice)} car. y supera el LÍMITE DE LECTURA (${miles(LIMITE_LECTURA)}): deja de cargarse entero`);
+} else if (caracteresIndice > TECHO_HOOK) {
+  errores.push(`MEMORY.md tiene ${miles(caracteresIndice)} car. y pasa el TECHO DEL HOOK (${miles(TECHO_HOOK)}): cada edición del índice pedirá compactar YA. ` +
+    `Sesión dedicada de poda ahora, moviendo solo detalle a las fichas; los frenos los vigila la comprobación 11`);
+} else if (caracteresIndice > UMBRAL_AVISO) {
+  avisos.push(`MEMORY.md tiene ${miles(caracteresIndice)} car., por encima del objetivo del hook (${miles(UMBRAL_AVISO)}). ` +
+    `Programar una sesión dedicada de poda antes de los ${miles(TECHO_HOOK)}, donde el hook la impone a mitad de otra tarea`);
 }
 
 // El segundo techo: LÍNEAS. Se cruza el que llegue antes, así que se comprueban por separado.
@@ -237,7 +261,7 @@ const hoy = new Date().toISOString().slice(0, 10);
 let serie = [];
 try { serie = JSON.parse(fs.readFileSync(SERIE, 'utf8')).lecturas ?? []; } catch { /* primera vez */ }
 const previa = serie.filter(l => l.fecha !== hoy).at(-1);
-serie = [...serie.filter(l => l.fecha !== hoy), { fecha: hoy, bytes: bytesIndice, fichas: ficheros.length }].slice(-MAX_SERIE);
+serie = [...serie.filter(l => l.fecha !== hoy), { fecha: hoy, bytes: bytesIndice, caracteres: caracteresIndice, fichas: ficheros.length }].slice(-MAX_SERIE);
 try {
   fs.mkdirSync(path.dirname(SERIE), { recursive: true });
   fs.writeFileSync(SERIE, JSON.stringify({ lecturas: serie }, null, 1));
@@ -271,8 +295,13 @@ if (previa) {
 // El aviso NO dice "poda": dice dónde va lo que entra. Podar es tratar el stock; el flujo se
 // trata en el origen, con la regla de destino de la cabecera de MEMORY.md. Fundir fichas se
 // midió y compra poco: al 50 % pasaba de 33 a 72 días, menos que bajar el flujo un 60 %.
+//
+// Desde el 24/09/2026 cuenta los días hasta el TECHO DEL HOOK, no hasta el aviso: el aviso
+// pasó a estar a un mes del techo a propósito, y medir hasta él haría sonar este pronóstico
+// casi siempre (un color que sale siempre no informa).
 const DIAS_MARGEN_MINIMO = 45;    // por debajo, el aviso todavía da tiempo a reaccionar
 const MIN_LECTURAS = 4;           // con menos, la pendiente es ruido
+const decimal = n => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
 let ritmoTexto = '';
 if (serie.length >= MIN_LECTURAS) {
@@ -282,26 +311,103 @@ if (serie.length >= MIN_LECTURAS) {
   const nuevasFichas = ult.fichas - prim.fichas;
   if (dias >= 7 && nuevasFichas > 0) {
     const fichasDia = nuevasFichas / dias;
-    const costeFicha = bytesIndice / Math.max(ficheros.length, 1);
-    const bytesDia = fichasDia * costeFicha;
-    const diasAviso = Math.round((UMBRAL_AVISO - bytesIndice) / bytesDia);
-    ritmoTexto = `\n   Ritmo: ${fichasDia.toFixed(2)} fichas/día · ${Math.round(bytesDia)} B/día · ` +
-      (diasAviso > 0 ? `~${diasAviso} días hasta el aviso` : 'el aviso YA está superado');
-    if (diasAviso > 0 && diasAviso < DIAS_MARGEN_MINIMO) {
+    const costeFicha = caracteresIndice / Math.max(ficheros.length, 1);
+    const caracteresDia = fichasDia * costeFicha;
+    const diasTecho = Math.round((TECHO_HOOK - caracteresIndice) / caracteresDia);
+    ritmoTexto = `\n   Ritmo: ${decimal(fichasDia)} fichas/día · ${Math.round(caracteresDia)} car./día · ` +
+      (diasTecho > 0 ? `~${diasTecho} días hasta el techo del hook` : 'el techo del hook YA está superado');
+    if (diasTecho > 0 && diasTecho < DIAS_MARGEN_MINIMO) {
       avisos.push(
-        `A este ritmo (${fichasDia.toFixed(2)} fichas/día) el índice llega al umbral de aviso en ~${diasAviso} días. ` +
+        `A este ritmo (${decimal(fichasDia)} fichas/día) el índice llega al techo del hook en ~${diasTecho} días. ` +
         `Antes de crear ficha, mirar la regla de destino de la cabecera de MEMORY.md: un candado, ` +
-        `el CLAUDE.md del directorio o la skill no cuestan un solo byte de índice.`
+        `la skill o la agenda no cuestan un solo carácter de índice.`
       );
     }
   }
 }
 
+// --- 11: FRENOS del índice ---
+//
+// Un freno es la anotación que impide proponer algo ya descartado —«NO», «DESCARTADO»,
+// «CERRADO»— o su contrafreno, el «salvo…» que impide aplicarlo de más. Es lo único que
+// justifica una línea del índice (cabecera de MEMORY.md), y también lo primero que se lleva
+// una compactación con prisa, porque las líneas que explican un freno son las más largas.
+//
+// El caso de origen (23/09/2026): el hook del techo saltó a mitad de otra tarea, el índice se
+// compactó en un minuto y ningún enlace se perdió, así que las comprobaciones 1 a 10 dieron
+// verde. Pero «plano en pág. 2+ → NO», la lista de los clústers cerrados o «si el tercero ES la
+// app, se RETIRA» desaparecieron. El texto seguía en las fichas, y no bastaba: en 248
+// transcripciones no hay ni una ficha recuperada sola, así que una ficha solo se lee cuando la
+// línea del índice da motivo, y una etiqueta pelada no lo da. Es el precedente del Cuadre
+// —comparar lo que había con lo que queda—, pero contra una lista declarada, porque el índice
+// vive fuera del repositorio y no hay un «antes» de git con el que comparar.
+//
+// La lista vive en `_private/` (el repositorio es público, y los frenos son decisiones de
+// producto). Cada entrada ata unas frases a la línea que enlaza su ficha: moverlas a otra
+// línea también cuenta como perderlas, porque el freno tiene que estar donde se lee la ficha.
+// Se compara sin mayúsculas, negritas, backticks ni espacios dobles, para que reformatear no
+// dispare y reescribir el freno sí.
+//
+// Retirar un freno a propósito es quitarlo de la lista: una decisión explícita, no un efecto
+// secundario. Y como un candado que solo vigila lo declarado no puede echar de menos lo que
+// nadie declaró, avisa también de los tramos del índice con un freno en MAYÚSCULAS cuya ficha
+// no tiene entrada: así la lista no envejece en silencio.
+const FRENOS = process.env.FRENOS_MEMORIA || path.join(REPO, '_private', 'frenos-indice-memoria.json');
+const PALABRA_FRENO = /\b(NO|NUNCA|DESCARTAD[OA]S?|CERRAD[OA]S?|VETAD[OA]S?|RETIRA|MUERT[OA]S?|DESESTIMAD[OA]S?)\b/;
+const normalizar = s => s.normalize('NFC').replace(/[*`]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+let frenos = null;
+try {
+  frenos = JSON.parse(fs.readFileSync(FRENOS, 'utf8')).frenos;
+  if (!Array.isArray(frenos) || !frenos.length) throw new Error('la lista está vacía');
+} catch (e) {
+  // Plantarse, no dar verde: sin lista este candado no mira nada, y callar sería mentir
+  errores.push(`No se puede leer la lista de frenos (${path.relative(os.homedir(), FRENOS)}): ${e.message}. Sin ella la comprobación 11 no vigila nada`);
+  frenos = null;
+}
+
+let nFrases = 0;
+if (frenos) {
+  const lineasTexto = indice.split('\n');
+  for (const freno of frenos) {
+    const ficha = freno.ficha ?? null;
+    if (ficha && !ficheros.includes(ficha)) {
+      errores.push(`La lista de frenos cita una ficha que no existe: ${ficha} — lista desfasada`);
+      continue;
+    }
+    // Sin ficha, el freno puede estar en cualquier sitio (cabecera, líneas sin enlace)
+    const donde = ficha ? lineasTexto.filter(l => l.includes(`](${ficha})`)) : [indice];
+    if (!donde.length) continue;   // ficha sin enlace: ya lo dice la comprobación 1
+    const texto = normalizar(donde.join('\n'));
+    for (const frase of freno.frases ?? []) {
+      nFrases++;
+      if (!texto.includes(normalizar(frase))) {
+        errores.push(`Freno perdido en MEMORY.md: «${frase}» (${ficha ?? 'fuera de las líneas de ficha'}). ` +
+          `Si se retira a propósito, quitarlo de ${path.relative(REPO, FRENOS)}`);
+      }
+    }
+  }
+
+  // Tramo = desde el enlace de una ficha hasta el siguiente enlace o el final de la línea
+  const vigiladas = new Set(frenos.map(f => f.ficha).filter(Boolean));
+  for (const linea of lineasTexto) {
+    const enlaces = [...linea.matchAll(/\[[^\]]*\]\(([^)]+\.md)\)/g)];
+    enlaces.forEach((m, i) => {
+      const tramo = linea.slice(m.index, i + 1 < enlaces.length ? enlaces[i + 1].index : linea.length);
+      const palabra = tramo.replace(/\([^)]*\.md\)/, '').match(PALABRA_FRENO)?.[0];
+      if (palabra && !vigiladas.has(m[1])) {
+        avisos.push(`Freno sin vigilar: el tramo de ${m[1]} dice «${palabra}» y la ficha no tiene entrada en ${path.relative(REPO, FRENOS)}`);
+      }
+    });
+  }
+}
+
 // --- Informe ---
-const pct = ((bytesIndice / UMBRAL_ERROR) * 100).toFixed(0);
-const pctLineas = ((lineasIndice / LINEAS_ERROR) * 100).toFixed(0);
+const pct = Math.round((caracteresIndice / LIMITE_LECTURA) * 100);
+const pctLineas = Math.round((lineasIndice / LINEAS_ERROR) * 100);
+const frenosTexto = frenos ? ` · ${nFrases} frenos vigilados` : '';
 console.log(`\n🧾 Memoria del proyecto — ${path.relative(os.homedir(), DIR)}`);
-console.log(`   ${ficheros.length} fichas · MEMORY.md ${(bytesIndice / 1024).toFixed(1)} KB (${pct}%) · ${lineasIndice}/${LINEAS_ERROR} líneas (${pctLineas}%) · ${enlazados.size} enlaces${deltaTexto}${ritmoTexto}`);
+console.log(`   ${ficheros.length} fichas · MEMORY.md ${miles(caracteresIndice)} car. (${pct} % del límite; techo del hook a ${miles(TECHO_HOOK - caracteresIndice)}) · ${lineasIndice}/${LINEAS_ERROR} líneas (${pctLineas} %) · ${enlazados.size} enlaces${frenosTexto}${deltaTexto}${ritmoTexto}`);
 
 if (VERBOSE) {
   const porTipo = {};
@@ -320,4 +426,4 @@ if (errores.length) {
   console.log('');
   process.exit(1);
 }
-console.log(`\n✅ Sin huérfanos, sin enlaces rotos, sin punteros externos muertos.\n`);
+console.log(`\n✅ Sin huérfanos, sin enlaces rotos, sin punteros externos muertos, sin frenos perdidos.\n`);
