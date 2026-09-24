@@ -41,7 +41,7 @@
  */
 
 import fs from 'fs';
-import { abrir } from './db.mjs';
+import { abrir, ahora } from './db.mjs';
 
 // Lo que puede mandar un acta. El subagente sigue diciendo solo "ok" o "con_hallazgos":
 // no tiene que acertar el matiz, porque el veredicto se DERIVA (ver derivarVeredicto).
@@ -133,8 +133,10 @@ const insInsp = db.prepare(`INSERT INTO inspecciones (slug, fecha, modelo, vered
                             VALUES (?, ?, ?, ?, ?, ?, ?)`);
 const insHall = db.prepare(`INSERT INTO hallazgos (inspeccion_id, slug, tipo, severidad, descripcion, caso, fecha)
                             VALUES (?, ?, ?, ?, ?, ?, ?)`);
+// `validada` con hora: es la referencia con la que `--revalidar-reparadas` decide si un
+// hallazgo se cerró DESPUÉS de esta inspección (ver la cabecera de cerrar.mjs)
 const actApp = db.prepare(`UPDATE apps SET ultima_inspeccion = ?, veredicto = ?, test_path = COALESCE(?, test_path),
-                           hash_inspeccionado = hash_codigo || '|' || COALESCE(hash_deps, '') WHERE slug = ?`);
+                           hash_inspeccionado = hash_codigo || '|' || COALESCE(hash_deps, ''), validada = ? WHERE slug = ?`);
 
 let nH = 0;
 for (const a of actas) {
@@ -147,7 +149,7 @@ for (const a of actas) {
     insHall.run(r.lastInsertRowid, a.slug, h.tipo, h.severidad, h.descripcion, h.caso, hoy);
     nH++;
   }
-  actApp.run(hoy, veredicto, a.test_path || null, a.slug);
+  actApp.run(hoy, veredicto, a.test_path || null, ahora(), a.slug);
 }
 
 console.log(`✓ ${actas.length} acta(s) registrada(s) · ${nH} hallazgo(s)`);

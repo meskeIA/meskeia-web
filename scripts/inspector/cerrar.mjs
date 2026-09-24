@@ -8,7 +8,8 @@
  *            npm run inspector:hallazgos -- --arreglado 12,13
  *            npm run inspector:hallazgos -- --descartado 27 --motivo "es correcto: lo confirma la ONCE"
  *            npm run inspector:hallazgos -- --revalidar lupa-digital,conversor-braille
- *            npm run inspector:hallazgos -- --revalidar-reparadas
+ *            npm run inspector:hallazgos -- --revalidar-reparadas   (solo las que tienen un
+ *                                              hallazgo ARREGLADO después de darse por buenas)
  *
  * El Inspector NO repara: deja los hallazgos abiertos y el usuario decide el lote. Falta
  * entonces la otra mitad del ciclo — cerrarlos cuando se arreglen. Sin esto, la base
@@ -17,9 +18,35 @@
  * Un hallazgo se DESCARTA cuando resulta que no era un defecto (el modelo se equivocó, o
  * la app hacía bien lo que parecía mal). Exige `--motivo`: un descarte sin razón escrita
  * es indistinguible de haberlo barrido debajo de la alfombra.
+ *
+ * ── `--revalidar-reparadas` solo revalida lo que la reparación explica (24/09/2026) ──
+ * Hasta ese día revalidaba TODAS las INVALIDADAS sin hallazgos abiertos. Pero una app se
+ * invalida por cualquier cambio, no solo por reparar: otra sesión había añadido una función
+ * nueva (el grupo sanguíneo ABO en simulador-genetica y simulador-punnett) y retocado cuatro
+ * apps de compraventa sin hallazgo que cerrar. La tanda revalidó 16 apps en vez de 10 y sacó
+ * de la cola una función que nadie había inspeccionado. Se deshizo a mano ese día
+ * (`hash_inspeccionado = 'reinvalidada-2026-09-24'`).
+ *
+ * Criterio desde entonces: una INVALIDADA se revalida sola si no tiene hallazgos abiertos Y
+ * tiene al menos uno cerrado como ARREGLADO **después** de la última vez que se dio por buena
+ * (`apps.validada`: su inspección o su revalidación anterior). Ése es el rastro de la
+ * reparación que explica el cambio. Las demás se listan como «sin reparación registrada» y se
+ * quedan en la cola; si se sabe que el cambio está verificado, `--revalidar <slug>` lo dice a
+ * mano, que es la vía explícita.
+ *
+ * Por qué hacen falta horas y no fechas: se inspecciona y se repara el MISMO día (lo normal),
+ * y con días no hay orden. Con «>=» el caso de origen vuelve a colarse —punnett se inspeccionó
+ * y reparó el 11/09 y cambió el 24/09—; con «>» se pierde cada reparación del mismo día. Por
+ * eso `hallazgos.cerrado` y `apps.validada` llevan hora. Lo cerrado antes del 24/09/2026 solo
+ * tiene la marca de día `[ARREGLADO AAAA-MM-DD]`, y ahí se compara con «>» estricto: ante la
+ * duda, la app se queda en la cola (el error que cuesta una inspección, no el que la esconde).
+ *
+ * Límite que NO cubre: si el mismo intervalo mezcla una reparación y un cambio ajeno, la
+ * revalidación da por bueno el conjunto. Por eso se revalida al terminar de reparar, no días
+ * después. Casos: `npm run inspector:probar-revalidar`.
  */
 
-import { abrir, SQL_INVALIDADA } from './db.mjs';
+import { abrir, ahora, SQL_INVALIDADA } from './db.mjs';
 
 const args = process.argv.slice(2);
 const valorDe = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
@@ -68,7 +95,8 @@ function cerrar(ids, estado) {
     process.exit(1);
   }
   const leer = db.prepare('SELECT id, slug, severidad, descripcion, estado FROM hallazgos WHERE id = ?');
-  const upd = db.prepare('UPDATE hallazgos SET estado = ?, descripcion = ? WHERE id = ?');
+  // `cerrado` con hora: lo lee `--revalidar-reparadas` (ver la cabecera)
+  const upd = db.prepare('UPDATE hallazgos SET estado = ?, descripcion = ?, cerrado = ? WHERE id = ?');
   let n = 0;
   for (const id of lista) {
     const h = leer.get(Number(id));
@@ -77,7 +105,7 @@ function cerrar(ids, estado) {
     const nota = estado === 'descartado'
       ? `${h.descripcion} [DESCARTADO ${hoy}: ${MOTIVO}]`
       : `${h.descripcion} [ARREGLADO ${hoy}]`;
-    upd.run(estado, nota, h.id);
+    upd.run(estado, nota, ahora(), h.id);
     console.log(`  ✓ ${id} · ${h.slug} · ${estado}`);
     n++;
   }
@@ -90,7 +118,7 @@ function cerrar(ids, estado) {
 
 if (REABRIR) {
   const leer = db.prepare('SELECT id, slug, estado, descripcion FROM hallazgos WHERE id = ?');
-  const upd = db.prepare("UPDATE hallazgos SET estado = 'abierto', descripcion = ? WHERE id = ?");
+  const upd = db.prepare("UPDATE hallazgos SET estado = 'abierto', descripcion = ?, cerrado = NULL WHERE id = ?");
   for (const id of REABRIR.split(',').map(s => s.trim()).filter(Boolean)) {
     const h = leer.get(Number(id));
     if (!h) { console.error(`  · id ${id}: no existe`); continue; }
@@ -104,7 +132,7 @@ if (REABRIR) {
 }
 function revalidar(slugs) {
   const upd = db.prepare(
-    `UPDATE apps SET hash_inspeccionado = hash_codigo || '|' || COALESCE(hash_deps, '')
+    `UPDATE apps SET hash_inspeccionado = hash_codigo || '|' || COALESCE(hash_deps, ''), validada = ?
      WHERE slug = ? AND ultima_inspeccion IS NOT NULL`,
   );
   const leer = db.prepare('SELECT slug, ultima_inspeccion, veredicto FROM apps WHERE slug = ?');
@@ -113,7 +141,7 @@ function revalidar(slugs) {
     const app = leer.get(slug);
     if (!app) { console.error(`  · ${slug}: no está en el catálogo`); continue; }
     if (!app.ultima_inspeccion) { console.error(`  · ${slug}: nunca se ha inspeccionado`); continue; }
-    upd.run(slug);
+    upd.run(ahora(), slug);
     console.log(`  ✓ ${slug} · la inspección del ${app.ultima_inspeccion} vale para el código de hoy`);
     n++;
   }
@@ -123,20 +151,58 @@ function revalidar(slugs) {
   console.log(`\n${n} revalidada(s) · quedan ${inval} invalidadas en la cola`);
 }
 
-if (REVALIDAR || REVALIDAR_REPARADAS) {
-  const slugs = REVALIDAR
-    ? REVALIDAR.split(',').map(s => s.trim()).filter(Boolean)
-    : db
-        .prepare(`SELECT slug FROM apps WHERE ${SQL_INVALIDADA}`)
-        .all()
-        .map(r => r.slug)
-        .filter(slug =>
-          // Solo las que no arrastran hallazgos abiertos: si queda algo por reparar, la
-          // app tiene que seguir en la cola.
-          db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE slug = ? AND estado = 'abierto'").get(slug).n === 0,
-        );
-  if (!slugs.length) { console.log('\nNo hay nada que revalidar.\n'); process.exit(0); }
-  revalidar(slugs);
+/**
+ * Momento en que se cerró un hallazgo. `cerrado` lleva hora desde el 24/09/2026; lo anterior
+ * solo tiene la marca de día que `cerrar()` deja en la descripción.
+ */
+function momentoCierre(h) {
+  if (h.cerrado) return h.cerrado;
+  const m = (h.descripcion || '').match(/\[ARREGLADO (\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
+/**
+ * ¿Hay una reparación registrada DESPUÉS de la última vez que la app se dio por buena?
+ * Las cadenas ISO se ordenan como fechas. Día contra día compara con «>» estricto (mismo día
+ * = no se sabe = no); una hora contra un día cuenta desde el principio de ese día, que es lo
+ * único que se sabe de una inspección registrada antes de que existiera `validada`.
+ */
+const arreglados = db.prepare("SELECT descripcion, cerrado FROM hallazgos WHERE slug = ? AND estado = 'arreglado'");
+function reparadaDespues(app) {
+  const referencia = app.validada || app.ultima_inspeccion;
+  return arreglados.all(app.slug).some(h => {
+    const c = momentoCierre(h);
+    return c !== null && c > referencia;
+  });
+}
+
+if (REVALIDAR) {
+  // La vía explícita: quien la usa dice que el cambio está verificado
+  revalidar(REVALIDAR.split(',').map(s => s.trim()).filter(Boolean));
+  process.exit(0);
+}
+
+if (REVALIDAR_REPARADAS) {
+  const invalidadas = db
+    .prepare(`SELECT slug, ultima_inspeccion, validada FROM apps WHERE ${SQL_INVALIDADA} ORDER BY slug`)
+    .all();
+  const abiertos = db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE slug = ? AND estado = 'abierto'");
+  const reparadas = [], conAbiertos = [], sinReparacion = [];
+  for (const app of invalidadas) {
+    // Si queda algo por reparar, la app tiene que seguir en la cola
+    if (abiertos.get(app.slug).n > 0) conAbiertos.push(app.slug);
+    else if (reparadaDespues(app)) reparadas.push(app.slug);
+    else sinReparacion.push(app.slug);
+  }
+  if (reparadas.length) revalidar(reparadas);
+  else console.log('\nNo hay ninguna reparación registrada que revalidar.');
+  if (conAbiertos.length)
+    console.log(`\nInvalidadas con hallazgos abiertos (${conAbiertos.length}): se quedan en la cola\n  ${conAbiertos.join(' · ')}`);
+  if (sinReparacion.length) {
+    console.log(`\nInvalidadas sin reparación registrada (${sinReparacion.length}): se quedan en la cola\n  ${sinReparacion.join(' · ')}`);
+    console.log('  Cambiaron por otro motivo que nadie ha verificado. Si consta que lo está:\n  npm run inspector:hallazgos -- --revalidar <slug,slug…>');
+  }
+  console.log('');
   process.exit(0);
 }
 

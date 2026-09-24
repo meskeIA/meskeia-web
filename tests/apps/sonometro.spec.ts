@@ -214,6 +214,47 @@ async function lecturaNumero(page: Page): Promise<number> {
   return Number(texto.replace(/\./g, '').replace(',', '.'));
 }
 
+/**
+ * Espera a que la lectura se ASIENTE en el nivel esperado: tres lecturas seguidas, separadas
+ * 150 ms, todas a menos de medio decibelio (lo mismo que exige `toBeCloseTo(x, 0)`).
+ *
+ * ⚠️ 24/09/2026 — sustituye a «esperar 1,5 s y leer una vez». Ese plazo fijo daba por hecho
+ * que a los 1,5 s el micrófono sintético ya entregaba audio limpio, y con la máquina cargada
+ * no siempre: el audio arranca tarde o llega con microcortes, y una sola lectura caía en uno.
+ * Aquí se sigue leyendo hasta que se cumpla, con un plazo. No afloja lo que se mide: tres
+ * lecturas en 300 ms no las da un transitorio (la ventana de la app es de ~46 ms), así que
+ * una app que se asentara en otro nivel sigue fallando — con el nivel que enseña.
+ */
+async function esperarLecturaEstable(page: Page, esperado: number): Promise<void> {
+  await expect
+    .poll(
+      async () => {
+        const lecturas: number[] = [];
+        for (let i = 0; i < 3; i++) {
+          if (i) await page.waitForTimeout(150);
+          lecturas.push(await lecturaNumero(page));
+        }
+        return lecturas;
+      },
+      { timeout: 20000, message: `la lectura no se asentó en ${esperado} dB(A)` },
+    )
+    .toEqual([
+      expect.closeTo(esperado, 0),
+      expect.closeTo(esperado, 0),
+      expect.closeTo(esperado, 0),
+    ]);
+}
+
+/**
+ * Antes del primer clic: React hidratado (el rastreador del deslizador de calibración) y la
+ * calibración sembrada en localStorage ya en su estado. Un clic anterior se pierde, o mide
+ * con la calibración por defecto (el caso del 13/09/2026, CASO 8).
+ */
+async function esperarAppLista(page: Page, calibracion = CALIBRACION): Promise<void> {
+  await esperarHidratacion(page, ['#calibracion']);
+  await expect(page.locator('[class*="calibracionValor"]')).toContainText(`${calibracion} dB`);
+}
+
 /** Las tres tarjetas de estadísticas, en el orden del DOM: mínimo, máximo, LAeq. */
 async function estadisticas(page: Page): Promise<{ min: string; max: string; laeq: string; duracion: string }> {
   const [min, max, laeq] = (await page.locator('[class*="statValue"]').allInnerTexts()).map((t) =>
@@ -701,11 +742,13 @@ test('HALLAZGO 279 — la aguja apunta al color de la banda que la app declara, 
   await page.addInitScript(() => window.localStorage.setItem('sonometro-calibracion', '60'));
   await micrófonoSintético(page, 1000, 0.002);
   await page.goto(RUTA);
+  // 24/09/2026: hidratación y calibración antes del clic, y la lectura se espera asentada
+  // en vez de leerla una vez a los 1,5 s (flaky en la suite entera; ver esperarLecturaEstable)
+  await esperarAppLista(page, 60);
   await page.getByRole('button', { name: /Iniciar medición/i }).click();
   await esperarLectura(page);
-  await page.waitForTimeout(1500);
+  await esperarLecturaEstable(page, 3.01);
 
-  expect(await lecturaNumero(page)).toBeCloseTo(3.01, 0);
   await expect(page.locator('[class*="levelLabel"]')).toHaveText('Muy silencioso');
   const bajo = await colorBajoLaAguja(page);
   expect(bajo.pintado, 'la punta de la aguja cae fuera de la banda 0-30 dB').toBe(bajo.declarado);
@@ -718,13 +761,13 @@ test('HALLAZGO 279 — la aguja apunta al color de la banda que la app declara, 
   await micrófonoSintético(alta, 1000, 0.5);
   await instrumentar(alta); // siempre DESPUÉS del micrófono sintético
   await alta.goto(RUTA);
+  await esperarAppLista(alta, 120);
   await alta.getByRole('button', { name: /Iniciar medición/i }).click();
   // El estado real del medio antes que el DOM, igual que en `medirTono` (15/09/2026).
   await esperarMedicionEnMarcha(alta);
   await esperarLectura(alta);
-  await alta.waitForTimeout(1500);
+  await esperarLecturaEstable(alta, 111.0);
 
-  expect(await lecturaNumero(alta)).toBeCloseTo(111.0, 0);
   await expect(alta.locator('[class*="levelLabel"]')).toHaveText('Peligroso');
   const altoColor = await colorBajoLaAguja(alta);
   expect(altoColor.pintado, 'la punta de la aguja cae fuera de la banda 100-130 dB').toBe(
@@ -1436,7 +1479,30 @@ test.describe('CASO 10 (móvil)', () => {
     await micrófonoSintético(page, 1000, 0.05);
     await page.goto(RUTA);
 
-    await medirYGuardar(page, 4);
+    /*
+     * ⚠️ 24/09/2026 — sin `medirYGuardar`, que mide los 4 s con el reloj de pared desde que
+     * la lectura deja de ser «--». La app cuenta la duración desde el primer fotograma CON
+     * AUDIO, y con la máquina cargada el micrófono sintético tardaba en entregarlo: la sesión
+     * se quedaba por debajo de los 3 s del suelo, o el clic de arranque caía antes de la
+     * hidratación. Flaky en la suite entera y 2 de 6 con la CPU ocupada. Ahora se espera a
+     * lo que la app mide: hidratada, midiendo 61,0 y con 4 s en SU reloj. `medirYGuardar`
+     * no se toca: el CASO 4 necesita justo lo contrario, no añadir esperas entre clics.
+     */
+    await esperarAppLista(page);
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarLectura(page);
+    await esperarLecturaEstable(page, 60.97);
+    await expect
+      .poll(
+        async () => {
+          const texto = (await estadisticas(page)).duracion; // «4 s» o «1 min 2 s»
+          const [, min = '0', seg = '0'] = texto.match(/^(?:(\d+) min )?(\d+) s$/) ?? [];
+          return Number(min) * 60 + Number(seg);
+        },
+        { timeout: 20000, message: 'la sesión no llegó a 4 s de audio medido' },
+      )
+      .toBeGreaterThanOrEqual(4);
+    await page.getByRole('button', { name: /Detener y guardar/i }).click();
     await expect(filasRegistro(page)).toHaveCount(1);
 
     const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) =>

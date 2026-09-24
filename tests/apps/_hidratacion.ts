@@ -37,6 +37,22 @@ import { ElementHandle, Locator, Page } from '@playwright/test';
  * está, el evento no va a llegar. Y si React lo cambiase algún día, esto fallaría con un
  * mensaje legible en vez de dejar pasar tests que miden la molécula equivocada.
  *
+ * ── «El rastreador llega antes del commit»: sí, y basta igual (24/09/2026) ────
+ * React instala `_valueTracker` (y `__reactFiber$`/`__reactProps$`) en la fase de COMPLETAR
+ * del render de hidratación, antes de confirmarlo. La sospecha era que un evento en ese hueco
+ * se perdiera. No se pierde: cuando un evento discreto (`input`, `click`, `change`…) cae en un
+ * árbol aún deshidratado, React 19 lo hidrata en síncrono y después lo despacha
+ * (`findInstanceBlockingTarget` + `attemptSynchronousHydration` en react-dom 19.2). Lo que sí
+ * lo pierde es llegar ANTES de que exista el rastreador. Medido con la CPU a 1/6 sobre
+ * `simulador-vsepr`, disparando el evento en el primer instante posible:
+ *   · en cuanto el input TIENE rastreador → 8 de 8 llegan al estado, y en los 8 el render
+ *     estaba todavía SIN confirmar;
+ *   · en cuanto el input EXISTE, sin rastreador → 0 de 8 (DOM=2, React=4).
+ * Lo mismo con un botón (`selector-smartphone`, su `esperarHidratacionBotones`): clic en cuanto
+ * tiene `__reactFiber$` → 6 de 6; en cuanto existe → 0 de 6. Para mandar EVENTOS la señal ya
+ * es la justa, y exigir el commit solo añadiría espera. Otra cosa es MEDIR lo pintado: para
+ * eso está `esperarPaginaAsentada`, al final del fichero.
+ *
  * ── Por qué NO basta con mirar el input (12/09/2026) ─────────────────────────
  * Comprobar `el.value` tras sembrar no prueba nada: el DOM es justo lo que sí cambia cuando
  * el evento se pierde. Y el rastreador tampoco sirve como testigo, porque en el caso
@@ -359,4 +375,107 @@ export async function sembrarValorAcotado(
  */
 export async function leerValorEnReact(page: Page, entrada: Entrada): Promise<string | null> {
   return valorEnReact(page, await resolver(page, entrada));
+}
+
+/** Estado de la hidratación de TODA la página, leído del árbol de fibras confirmado. */
+type EstadoPagina = 'pendiente' | 'confirmada' | 'sin-raiz';
+
+/**
+ * Espera a que la página esté hidratada y CONFIRMADA entera, y a que el DOM deje de cambiar.
+ * Es para MEDIR lo que se ve (contraste, alturas, textos), no para mandar eventos: para eso
+ * basta `esperarHidratacion`, que es más barata (ver la cabecera).
+ *
+ * ── De dónde sale (24/09/2026) ───────────────────────────────────────────────
+ * `activarTema` de `tests/contraste-text-muted-auxiliares.ts` esperaba a que ALGÚN nodo del
+ * body tuviera `__reactFiber$` y luego dos fotogramas. El primer nodo con fibra aparece antes
+ * del commit, y las apps que hacen `if (!montado) return null` no pintan nada hasta que corre
+ * su `useEffect`, DESPUÉS del commit. Medido en `visualizador-desigualdad-riqueza` tras aquella
+ * señal: con la máquina cargada, 1 de 3 con el body a altura 0 y sin <h1>; con la CPU a 1/6,
+ * 6 de 6 por debajo de 200 px. El spec no lo habría notado: mide lo que haya y da verde.
+ * Con esta espera, 0 de 6 a CPU 1/6 (≈ 2,5-3,5 s por página en esas condiciones).
+ *
+ * Dos condiciones, porque ninguna basta sola:
+ *   · Hidratación confirmada: la raíz ya no está deshidratada y no queda ningún Suspense
+ *     deshidratado en el árbol ACTUAL. Durante la hidratación el DOM no cambia (se reutiliza
+ *     el del servidor), así que sin esto un rato de DOM quieto no significaría nada.
+ *   · DOM quieto `quietudMs`: los `useEffect` que montan contenido ya corrieron y pintaron. Con
+ *     tope `maximoMs`, porque una app con un temporizador que re-renderiza no se aquieta nunca
+ *     y eso no la hace inmedible.
+ *
+ * Lee internos de React (`__reactContainer$`, `isDehydrated`, `dehydrated`), como el resto del
+ * fichero. Si dejaran de existir, falla con un mensaje legible en vez de medir a ciegas.
+ */
+export async function esperarPaginaAsentada(
+  page: Page,
+  { quietudMs = 300, maximoMs = 4000 }: { quietudMs?: number; maximoMs?: number } = {},
+): Promise<void> {
+  const leerEstado = (): EstadoPagina => {
+    const doc = document as unknown as Record<string, unknown>;
+    const clave = Object.keys(doc).find((k) => k.startsWith('__reactContainer$'));
+    if (!clave) {
+      const hayFibras = Array.from(document.querySelectorAll('body *')).some((el) =>
+        Object.keys(el).some((k) => k.startsWith('__reactFiber$')),
+      );
+      return hayFibras ? 'sin-raiz' : 'pendiente';
+    }
+    interface Fibra {
+      tag: number;
+      child: Fibra | null;
+      sibling: Fibra | null;
+      memoizedState: { isDehydrated?: boolean; dehydrated?: unknown } | null;
+    }
+    const raiz = (doc[clave] as { stateNode: { current: Fibra } }).stateNode;
+    const actual = raiz.current;
+    if (!actual.memoizedState || actual.memoizedState.isDehydrated) return 'pendiente';
+    // 13 = Suspense, 31 = Activity: con `dehydrated` aún esperan su propia hidratación
+    const pila: (Fibra | null)[] = [actual.child];
+    while (pila.length) {
+      const f = pila.pop();
+      if (!f) continue;
+      if ((f.tag === 13 || f.tag === 31) && f.memoizedState?.dehydrated) return 'pendiente';
+      pila.push(f.child, f.sibling);
+    }
+    return 'confirmada';
+  };
+
+  try {
+    await page.waitForFunction(
+      `(${leerEstado.toString()})() !== 'pendiente'`,
+      null,
+      { timeout: ESPERA_HIDRATACION_MS },
+    );
+  } catch {
+    throw new Error(`La página no terminó de hidratarse en ${ESPERA_HIDRATACION_MS} ms: medirla ahora mediría el HTML del servidor.`);
+  }
+  if ((await page.evaluate(`(${leerEstado.toString()})()`)) === 'sin-raiz') {
+    throw new Error(
+      'React ha hidratado nodos pero el documento no tiene «__reactContainer$»: ha cambiado un ' +
+        'interno de React y esta espera ya no sabe cuándo está confirmada la hidratación.',
+    );
+  }
+
+  await page.evaluate(
+    ({ quietud, maximo }) =>
+      new Promise<void>((resolver) => {
+        const fin = (): void => {
+          observador.disconnect();
+          clearTimeout(silencio);
+          clearTimeout(tope);
+          resolver();
+        };
+        let silencio = setTimeout(fin, quietud);
+        const tope = setTimeout(fin, maximo);
+        const observador = new MutationObserver(() => {
+          clearTimeout(silencio);
+          silencio = setTimeout(fin, quietud);
+        });
+        observador.observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          characterData: true,
+        });
+      }),
+    { quietud: quietudMs, maximo: maximoMs },
+  );
 }

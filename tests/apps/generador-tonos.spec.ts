@@ -1,4 +1,5 @@
 import { test, expect, devices, type Page } from '@playwright/test';
+import { esperarValorEnReact } from './_hidratacion';
 
 /**
  * Generador de Tonos — test de regresión (Inspector, 21/08/2026 · re-inspección 10/09/2026)
@@ -767,33 +768,69 @@ test('REGRESIÓN 128 — el barrido respeta el rango 20–20.000 Hz que promete 
   await hasta.pressSequentially('99999', { delay: 30 }); // alcanzable tecleando, sin trucos
   await expect(hasta).toHaveValue('99999');
   await page.locator('#sweep-dur').fill('1');
+  // El estado de React, no el DOM: un `fill` anterior a la hidratación mueve el campo y no
+  // el barrido. Y salir de «Hasta» ya lo ha acotado al techo.
+  await esperarValorEnReact(page, '#sweep-min', 15000);
+  await esperarValorEnReact(page, '#sweep-max', 20000);
+  await esperarValorEnReact(page, '#sweep-dur', 1);
 
   await page.getByRole('button', { name: /Iniciar barrido/ }).click();
 
-  // ⚠️ Campo y oscilador se leen en la MISMA evaluación. Leyéndolos por separado la
-  // comparación era una carrera: el barrido cambia de frecuencia cada 50 ms y aquí el paso
-  // son (20.000 − 15.000)/20 = 250 Hz, así que las dos lecturas caían a veces a un paso de
-  // distancia y el test fallaba una vez de cada tres sin que la app hiciera nada mal
-  // (medido el 10/09/2026: 1 fallo en 3 pasadas completas, 0 en 5 pasadas del test suelto).
+  /*
+   * ⚠️ 24/09/2026 — sin reloj de pared. Hasta ese día se tomaban 12 lecturas cada 120 ms y
+   * se comparaba el máximo del campo con el máximo de `osc.frequency.value`. Ese valor lo
+   * pone el hilo de AUDIO un quantum después del `setValueAtTime`, y con la máquina cargada
+   * llegaba dos pasos tarde: brecha de 500 Hz contra un límite de 300, 2 fallos de 4 en la
+   * suite entera y 4 de 6 con la CPU ocupada, sin que la app hiciera nada mal. Y si el
+   * muestreo no coincidía con la cima del barrido, la cima no se miraba.
+   *
+   * Ahora se lee lo que la app ORDENA (`setValueAtTime`, instrumentado: el registro entero,
+   * no una muestra) y el campo en la misma evaluación, hasta que el barrido haya pasado por
+   * la cima; después, en reposo, se exige que campo, orden y oscilador digan lo mismo.
+   */
+  const PASO = (20000 - 15000) / 20; // 1 s de barrido = 20 pasos de 50 ms
   let maximoMostrado = 0;
-  let maximoEmitido = 0;
-  for (let i = 0; i < 12; i++) {
-    const par = await page.evaluate(() => {
-      const w = window as unknown as { __osciladores: OscillatorNode[] };
-      const osc = w.__osciladores[w.__osciladores.length - 1];
-      const campo = document.querySelector<HTMLInputElement>('input[aria-label="Frecuencia en Hz"]');
-      return { mostrada: Number(campo?.value ?? 0), emitida: osc ? osc.frequency.value : 0 };
-    });
-    maximoMostrado = Math.max(maximoMostrado, par.mostrada);
-    maximoEmitido = Math.max(maximoEmitido, par.emitida);
-    await page.waitForTimeout(120);
-  }
+  await expect
+    .poll(
+      async () => {
+        const foto = await page.evaluate(() => {
+          const w = window as unknown as {
+            __tonos: { osciladores: { frecuenciasAplicadas: number[] }[] };
+          };
+          const campo = document.querySelector<HTMLInputElement>('input[aria-label="Frecuencia en Hz"]');
+          const ordenadas = w.__tonos.osciladores.flatMap((o) => o.frecuenciasAplicadas);
+          return { mostrada: Number(campo?.value ?? 0), maximoOrdenado: Math.max(0, ...ordenadas) };
+        });
+        maximoMostrado = Math.max(maximoMostrado, foto.mostrada);
+        return foto.maximoOrdenado;
+      },
+      { timeout: 15000, message: 'el barrido nunca llegó a la cima del rango' },
+    )
+    .toBeGreaterThanOrEqual(20000 - PASO);
   await page.getByRole('button', { name: /Detener barrido/ }).click();
 
+  // Todo lo que la app ha ordenado cae en el rango que promete —antes llegaba a 99.999— y
+  // por debajo del techo del propio oscilador: nada se recorta en Nyquist, así que lo
+  // emitido es exactamente lo ordenado.
+  const ordenadas = await frecuenciasAplicadas(page);
+  const techo = (await vivo(page))?.maxFrecuencia ?? 0;
+  for (const f of ordenadas) {
+    expect(f, `frecuencia ordenada fuera del rango prometido: ${f}`).toBeGreaterThanOrEqual(20);
+    expect(f, `frecuencia ordenada fuera del rango prometido: ${f}`).toBeLessThanOrEqual(20000);
+    expect(f, `el oscilador recortaría ${f} Hz a su techo de ${techo}`).toBeLessThanOrEqual(techo);
+  }
   expect(maximoMostrado).toBeLessThanOrEqual(20000); // antes llegaba a 99.999
-  // Un paso del barrido son 250 Hz; el defecto que esto vigila abría una brecha de 76.000 Hz
-  // (99.999 mostrados contra 24.000 emitidos, que es donde satura Nyquist).
-  expect(Math.abs(maximoEmitido - maximoMostrado)).toBeLessThanOrEqual(300);
+
+  // Y en reposo el campo enseña lo que suena: la última orden y el valor que el hilo de audio
+  // ya aplica. El defecto abría aquí una brecha de 76.000 Hz (99.999 mostrados contra 24.000
+  // emitidos); se espera a que el oscilador alcance la orden en vez de dar un plazo fijo.
+  const mostradaFinal = Number(await campoFrecuencia(page).inputValue());
+  await expect
+    .poll(async () => (await frecuenciasAplicadas(page)).slice(-1)[0], {
+      message: 'la última frecuencia ordenada no es la que enseña el campo',
+    })
+    .toBe(mostradaFinal);
+  await esperarFrecuencia(page, mostradaFinal, 0);
 });
 
 /**

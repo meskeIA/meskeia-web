@@ -47,7 +47,8 @@ const TABLAS = [
     hash_inspeccionado  TEXT,           -- hash_codigo|hash_deps en el momento de inspeccionar
     veredicto           TEXT,           -- ok | con_hallazgos | no_inspeccionable
     test_path           TEXT,
-    test_estado         TEXT            -- verde | rojo | nulo si aun no tiene test
+    test_estado         TEXT,           -- verde | rojo | nulo si aun no tiene test
+    validada            TEXT            -- ISO con hora: ultima vez que su inspeccion se dio por vigente
   )`,
   `CREATE TABLE IF NOT EXISTS inspecciones (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,7 +71,8 @@ const TABLAS = [
     descripcion   TEXT,
     caso          TEXT NOT NULL,
     estado        TEXT DEFAULT 'abierto',   -- abierto | arreglado | descartado
-    fecha         TEXT
+    fecha         TEXT,
+    cerrado       TEXT      -- ISO con hora: cuando se cerro (nulo si abierto o anterior al 24/09/2026)
   )`,
   `CREATE INDEX IF NOT EXISTS idx_insp_slug ON inspecciones(slug)`,
   `CREATE INDEX IF NOT EXISTS idx_hall_slug ON hallazgos(slug, estado)`,
@@ -88,8 +90,33 @@ export function abrir() {
   fs.mkdirSync(path.dirname(ruta), { recursive: true });
   const db = new DatabaseSync(ruta);
   for (const t of TABLAS) db.prepare(t).run();
+  migrar(db);
   return db;
 }
+
+/**
+ * Columnas añadidas después de crear la base. `CREATE TABLE IF NOT EXISTS` no toca una tabla
+ * que ya existe, así que una base anterior se completa aquí: solo se AÑADEN columnas que
+ * admiten nulo, nunca se reescribe ni se borra nada del histórico.
+ *
+ * `hallazgos.cerrado` y `apps.validada` (24/09/2026) son las dos horas que necesita
+ * `--revalidar-reparadas` para saber si una reparación es POSTERIOR a la última vez que la
+ * app se dio por buena. Con fechas de día no se puede: se inspecciona y se repara el mismo día
+ * (ver la cabecera de `cerrar.mjs`).
+ */
+const COLUMNAS_NUEVAS = [
+  ['hallazgos', 'cerrado', 'TEXT'],
+  ['apps', 'validada', 'TEXT'],
+];
+function migrar(db) {
+  for (const [tabla, columna, tipo] of COLUMNAS_NUEVAS) {
+    const existe = db.prepare(`PRAGMA table_info(${tabla})`).all().some(c => c.name === columna);
+    if (!existe) db.prepare(`ALTER TABLE ${tabla} ADD COLUMN ${columna} ${tipo}`).run();
+  }
+}
+
+/** Momento con hora (ISO UTC) para `hallazgos.cerrado` y `apps.validada`. */
+export const ahora = () => new Date().toISOString();
 
 /**
  * Una app está INVALIDADA si se inspeccionó pero su código o sus datos han cambiado

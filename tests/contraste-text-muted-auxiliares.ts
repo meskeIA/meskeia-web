@@ -10,6 +10,7 @@
  * No es un spec: sin sufijo `.spec`, Playwright no lo recoge como fichero de tests.
  */
 import { expect, type Page } from '@playwright/test';
+import { esperarPaginaAsentada } from './apps/_hidratacion';
 
 /** Umbral AA para texto pequeño: por debajo de 24px, o de 18,66px en negrita. */
 export const UMBRAL = 4.5;
@@ -41,18 +42,18 @@ export async function prepararParaMedir(page: Page): Promise<void> {
  * aún no habían pintado nada: `visualizador-desigualdad-riqueza` hace
  * `if (!montado) return null` y en claro se medía con el body a altura 0 (23/09/2026).
  * En oscuro no se veía porque pulsar el botón ya daba ese tiempo. Si una app solo
- * retrasa una PARTE, la medida saldría corta sin ningún aviso. El testigo es que React
- * haya hidratado algún nodo del body (`__reactFiber$`), y no el botón de tema: la home
- * no tiene, y allí el oscuro lo pone `prefers-color-scheme`. Después, dos fotogramas
- * para que corran los `useEffect` que montan el contenido.
+ * retrasa una PARTE, la medida saldría corta sin ningún aviso. El testigo NO es el botón
+ * de tema: la home no tiene, y allí el oscuro lo pone `prefers-color-scheme`.
+ *
+ * Hasta el 24/09/2026 el testigo era «algún nodo del body con `__reactFiber$`» más dos
+ * fotogramas, y no bastaba: esa clave aparece ANTES del commit, y el `useEffect` que monta
+ * el contenido corre después. Con la máquina cargada, `visualizador-desigualdad-riqueza`
+ * seguía con el body a altura 0 en 1 de 3 cargas (6 de 6 con la CPU a 1/6). Ahora espera a
+ * la hidratación CONFIRMADA y a que el DOM se aquiete: `esperarPaginaAsentada`, en
+ * `tests/apps/_hidratacion.ts`, donde está medido.
  */
 export async function activarTema(page: Page, tema: 'dark' | 'light'): Promise<void> {
-  await page.waitForFunction(
-    () => Array.from(document.querySelectorAll('body *')).some((el) => Object.keys(el).some((k) => k.startsWith('__reactFiber$'))),
-    null,
-    { timeout: 15_000 },
-  );
-  await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
+  await esperarPaginaAsentada(page);
   await page.emulateMedia({ colorScheme: tema });
   const etiqueta = tema === 'dark' ? /Cambiar a modo oscuro/i : /Cambiar a modo claro/i;
   const html = page.locator('html');
