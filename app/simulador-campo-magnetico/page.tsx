@@ -52,12 +52,24 @@ function aSuperindice(exponente: number): string {
     .join('');
 }
 
-/** Notación decimal para valores cotidianos y científica para los extremos. */
+/** Cifras significativas que la notación decimal garantiza como mínimo. */
+const CIFRAS_SIGNIFICATIVAS_MINIMAS = 3;
+
+/**
+ * Notación decimal para valores cotidianos y científica para los extremos.
+ *
+ * En la franja decimal [10⁻³, 10⁵) los `decimales` son un mínimo, no un valor fijo: por debajo
+ * de 1 se amplían hasta conservar 3 cifras significativas. Con decimales fijos, 1,2·10⁻³ T se
+ * escribía «0,001 T» (−17 %) y, con 2 decimales, «0,00 T» (hallazgo 1344).
+ */
 function formatCientifico(valor: number, decimales = 2): string {
   if (!Number.isFinite(valor)) return '—';
   if (valor === 0) return '0';
   const exponente = Math.floor(Math.log10(Math.abs(valor)));
-  if (exponente >= -3 && exponente < 5) return formatNumber(valor, decimales);
+  if (exponente >= -3 && exponente < 5) {
+    const decimalesEfectivos = Math.max(decimales, CIFRAS_SIGNIFICATIVAS_MINIMAS - 1 - exponente);
+    return formatNumber(valor, decimalesEfectivos);
+  }
   const mantisa = valor / Math.pow(10, exponente);
   return `${formatNumber(mantisa, decimales)} × 10${aSuperindice(exponente)}`;
 }
@@ -67,6 +79,31 @@ function formatCientifico(valor: number, decimales = 2): string {
 // ============================================================
 const SVG_W = 760;
 const SVG_H = 420;
+
+/**
+ * Seno y coseno de un ángulo en grados, con los ceros exactos donde la trigonometría los da.
+ * Math.cos(π/2) vale 6,12·10⁻¹⁷ y no 0: multiplicado por v·T pintaba un paso de hélice de
+ * 4·10⁻¹⁷ m con θ = 90° (hallazgo 1345). Son magnitudes adimensionales acotadas por 1, así que
+ * la tolerancia es relativa a esa escala.
+ */
+const TOLERANCIA_TRIGONOMETRICA = 1e-12;
+function senoCosenoGrados(grados: number): { sen: number; cos: number } {
+  const rad = (grados * Math.PI) / 180;
+  const limpiar = (x: number) => (Math.abs(x) < TOLERANCIA_TRIGONOMETRICA ? 0 : x);
+  return { sen: limpiar(Math.sin(rad)), cos: limpiar(Math.cos(rad)) };
+}
+
+/** Fuerza de Lorentz del estado de arranque (protón, 5·10⁶ m/s, 0,5 T, 90°): 4,005·10⁻¹³ N. */
+const FUERZA_REFERENCIA = CARGA_ELEMENTAL * 5e6 * 0.5;
+const LARGO_FUERZA_REFERENCIA = 48; // px de la flecha F con la fuerza de referencia
+const LARGO_FUERZA_MIN = 12; // px: por debajo la punta taparía la línea
+const LARGO_FUERZA_MAX = 120; // px: por encima se sale del lienzo
+
+/** Distancias del control del hilo (m) y su recorrido en el dibujo (px desde el hilo). */
+const DISTANCIA_MIN = 0.005;
+const DISTANCIA_MAX = 0.5;
+const OFFSET_MEDIDA_MIN = 40;
+const OFFSET_MEDIDA_MAX = 340;
 
 export default function SimuladorCampoMagnetico() {
   const [pestana, setPestana] = useState<Pestana>('lorentz');
@@ -135,10 +172,10 @@ export default function SimuladorCampoMagnetico() {
   const lorentz = useMemo(() => {
     const q = Math.abs(particula.cargas) * CARGA_ELEMENTAL;
     const v = velocidad * 1e6;
-    const rad = (anguloVB * Math.PI) / 180;
-    const fuerza = q * v * campo * Math.sin(rad);
-    const vPerpendicular = v * Math.sin(rad);
-    const vParalela = v * Math.cos(rad);
+    const { sen, cos } = senoCosenoGrados(anguloVB);
+    const fuerza = q * v * campo * sen;
+    const vPerpendicular = v * sen;
+    const vParalela = v * cos;
     const radio = campo > 0 ? (particula.masa * vPerpendicular) / (q * campo) : Infinity;
     const periodo = campo > 0 ? (2 * Math.PI * particula.masa) / (q * campo) : Infinity;
     const frecuenciaCiclotron = periodo > 0 ? 1 / periodo : 0;
@@ -344,7 +381,28 @@ export default function SimuladorCampoMagnetico() {
   };
 
   const vectorV = flechaVector(posParticula.x, posParticula.y, dirVelocidad.x, dirVelocidad.y, 62);
-  const vectorF = flechaVector(posParticula.x, posParticula.y, dirFuerza.x, dirFuerza.y, 48);
+  // Largo de F proporcional a la fuerza calculada, acotado para que quepa; con F = 0 no hay
+  // flecha (hallazgo 1346: antes medía siempre 48 px, también con θ = 0°).
+  const largoFuerza =
+    lorentz.fuerza > 0
+      ? Math.min(
+          Math.max((lorentz.fuerza / FUERZA_REFERENCIA) * LARGO_FUERZA_REFERENCIA, LARGO_FUERZA_MIN),
+          LARGO_FUERZA_MAX
+        )
+      : 0;
+  const vectorF = flechaVector(posParticula.x, posParticula.y, dirFuerza.x, dirFuerza.y, largoFuerza);
+
+  // Punto de medida del hilo: se aleja con la distancia en escala logarítmica, porque el control
+  // cubre dos órdenes de magnitud (0,5-50 cm) y en lineal los valores pequeños se amontonarían
+  // junto al hilo (hallazgo 1347: antes estaba fijo en +110 px).
+  const fraccionDistancia = Math.min(
+    Math.max(Math.log(distancia / DISTANCIA_MIN) / Math.log(DISTANCIA_MAX / DISTANCIA_MIN), 0),
+    1
+  );
+  const xMedida = SVG_W / 2 + OFFSET_MEDIDA_MIN + (OFFSET_MEDIDA_MAX - OFFSET_MEDIDA_MIN) * fraccionDistancia;
+  // Las etiquetas pasan a la izquierda del punto cuando no caben a su derecha
+  const etiquetaMedidaIzquierda = xMedida > SVG_W - 200;
+  const xEtiquetaMedida = etiquetaMedidaIzquierda ? xMedida - 12 : xMedida + 12;
 
   return (
     <div className={styles.container}>
@@ -470,7 +528,6 @@ export default function SimuladorCampoMagnetico() {
                   <button
                     type="button"
                     className={styles.calcBtnGhost}
-                    aria-pressed={reproduciendo}
                     onClick={() => setReproduciendo((valor) => !valor)}
                   >
                     <span aria-hidden="true">{reproduciendo ? '⏸' : '▶'}</span>{' '}
@@ -545,24 +602,26 @@ export default function SimuladorCampoMagnetico() {
                       </text>
                     </g>
 
-                    {/* Vector fuerza (centrípeta) */}
-                    <g className={styles.vFuerza}>
-                      <line
-                        x1={posParticula.x}
-                        y1={posParticula.y}
-                        x2={vectorF.finX}
-                        y2={vectorF.finY}
-                        className={styles.vectorLinea}
-                      />
-                      <polygon points={vectorF.puntos} className={styles.vectorPunta} />
-                      <text
-                        x={vectorF.finX + dirFuerza.x * 14}
-                        y={vectorF.finY + dirFuerza.y * 14}
-                        className={styles.vectorTexto}
-                      >
-                        F
-                      </text>
-                    </g>
+                    {/* Vector fuerza (centrípeta): solo si hay fuerza */}
+                    {largoFuerza > 0 && (
+                      <g className={styles.vFuerza}>
+                        <line
+                          x1={posParticula.x}
+                          y1={posParticula.y}
+                          x2={vectorF.finX}
+                          y2={vectorF.finY}
+                          className={styles.vectorLinea}
+                        />
+                        <polygon points={vectorF.puntos} className={styles.vectorPunta} />
+                        <text
+                          x={vectorF.finX + dirFuerza.x * 14}
+                          y={vectorF.finY + dirFuerza.y * 14}
+                          className={styles.vectorTexto}
+                        >
+                          F
+                        </text>
+                      </g>
+                    )}
 
                     {/* Partícula */}
                     <circle
@@ -829,13 +888,43 @@ export default function SimuladorCampoMagnetico() {
                       />
                     ))}
 
-                    {/* Punto de medida a la distancia elegida */}
-                    <circle cx={SVG_W / 2 + 110} cy={SVG_H / 2} r={6} className={styles.puntoMedida} />
-                    <text x={SVG_W / 2 + 122} y={SVG_H / 2 - 14} className={styles.etiquetaCampo}>
+                    {/* Línea de campo que pasa por el punto de medida */}
+                    <ellipse
+                      cx={SVG_W / 2}
+                      cy={SVG_H / 2}
+                      rx={xMedida - SVG_W / 2}
+                      ry={(xMedida - SVG_W / 2) * 0.32}
+                      className={styles.lineaMedida}
+                    />
+                    <line
+                      x1={SVG_W / 2}
+                      y1={SVG_H / 2}
+                      x2={xMedida}
+                      y2={SVG_H / 2}
+                      className={styles.cotaMedida}
+                    />
+
+                    {/* Punto de medida a la distancia elegida (escala logarítmica) */}
+                    <circle cx={xMedida} cy={SVG_H / 2} r={6} className={styles.puntoMedida} />
+                    <text
+                      x={xEtiquetaMedida}
+                      y={SVG_H / 2 - 14}
+                      textAnchor={etiquetaMedidaIzquierda ? 'end' : 'start'}
+                      className={styles.etiquetaCampo}
+                    >
                       B = {formatCientifico(corrientes.campoHilo, 2)} T
                     </text>
-                    <text x={SVG_W / 2 + 122} y={SVG_H / 2 + 4} className={styles.etiquetaSecundaria}>
+                    <text
+                      x={xEtiquetaMedida}
+                      y={SVG_H / 2 + 4}
+                      textAnchor={etiquetaMedidaIzquierda ? 'end' : 'start'}
+                      className={styles.etiquetaSecundaria}
+                    >
                       a {formatNumber(distancia * 100, 1)} cm del hilo
+                    </text>
+
+                    <text x={30} y={SVG_H - 40} className={styles.etiquetaSecundaria}>
+                      Distancia al hilo dibujada en escala logarítmica (0,5 cm a 50 cm)
                     </text>
 
                     {/* Recordatorio de la regla de la mano derecha */}
@@ -926,7 +1015,6 @@ export default function SimuladorCampoMagnetico() {
                 <button
                   type="button"
                   className={styles.chip}
-                  aria-pressed={reproduciendo}
                   onClick={() => setReproduciendo((valor) => !valor)}
                 >
                   <span aria-hidden="true">{reproduciendo ? '⏸' : '▶'}</span>{' '}

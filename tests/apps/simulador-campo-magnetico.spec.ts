@@ -15,7 +15,9 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   · Corrientes: B_hilo = μ₀I/(2πr) · B_espira = μ₀I/(2R) · B_sol = μ₀·(N/L)·I
  *                 F_hilos = μ₀·I₁·|I₂|/(2π·d), atracción si I₂ ≥ 0
  *   · Presentación: formatCientifico(x, d) → notación científica con coma si x < 10⁻³ o
- *     x ≥ 10⁵; en la franja [10⁻³, 10⁵) usa formatNumber(x, d) con d decimales FIJOS.
+ *     x ≥ 10⁵; en la franja [10⁻³, 10⁵) usa formatNumber con d decimales COMO MÍNIMO, ampliados
+ *     por debajo de 1 hasta 3 cifras significativas (reparado el 24/09/2026, hallazgo 1344:
+ *     antes eran d decimales fijos y 1,2·10⁻³ T salía «0,001 T»).
  *
  * Los deslizadores arrancan en: v = 5·10⁶ m/s · B = 0,5 T · θ = 90° · I = 10 A · r = 5 cm ·
  * N = 500 · L = 0,30 m · I₂ = 10 A · d = 2 cm. Cada caso parte de OTRO estado, para que
@@ -29,7 +31,7 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *       B_hilo   = 2·10⁻⁷ · 25 / 0,02            = 2,5·10⁻⁴ T  (250 μT) → «2,500 × 10⁻⁴ T»
  *       B_espira = 4π·10⁻⁷ · 25 / (2 · 0,02)     = 7,853982·10⁻⁴ T      → «7,854 × 10⁻⁴ T»
  *       n = 800 / 0,40 = 2000 /m                                        → «2000 /m»
- *       B_sol    = 4π·10⁻⁷ · 2000 · 25           = 0,0628319 T          → «0,063 T»
+ *       B_sol    = 4π·10⁻⁷ · 2000 · 25           = 0,0628319 T          → «0,0628 T»
  *       Espira / hilo = π exactamente: un 2π de más o de menos salta a la vista.
  *   (b) Lorentz: protón, v = 3·10⁶ m/s, B = 0,2 T, θ = 90°.
  *       F = 1,602176634·10⁻¹⁹ · 3·10⁶ · 0,2 = 9,613060·10⁻¹⁴ N          → «9,61 × 10⁻¹⁴ N»
@@ -38,10 +40,12 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *
  *   CASO 2 (límite)
  *   (a) θ = 0° (v paralela a B), protón a 5·10⁶ m/s en 0,5 T: sen 0 = 0 → F = 0 N, r = 0 m,
- *       v⊥ = 0 m/s. Y el dibujo no debería pintar una flecha F de 48 px con F = 0.
+ *       v⊥ = 0 m/s. Y el dibujo no debe pintar flecha F con F = 0; con fuerza, su largo es
+ *       48 px · F/F_ref (F_ref = fuerza del arranque), acotado a [12, 120] px:
+ *       θ = 30° → sen 30° = 0,5 → 24 px.
  *   (b) θ = 90° (arranque): cos 90° = 0 → la trayectoria es una circunferencia y el paso de la
- *       hélice es 0 m. La app lo calcula con Math.cos(π/2) = 6,12·10⁻¹⁷ y muestra
- *       5·10⁶ · 6,12·10⁻¹⁷ · 1,3119·10⁻⁷ = 4,017·10⁻¹⁷ m.
+ *       hélice es 0 m. La app lo calculaba con Math.cos(π/2) = 6,12·10⁻¹⁷ y mostraba
+ *       5·10⁶ · 6,12·10⁻¹⁷ · 1,3119·10⁻⁷ = 4,017·10⁻¹⁷ m (hallazgo 1345, reparado).
  *   (c) Sentido: ω = −q·B/m. Protón con B saliente (+z) → giro HORARIO visto desde la
  *       pantalla; invertir B → ANTIHORARIO; electrón con B entrante → HORARIO otra vez.
  *   (d) Corriente del segundo hilo invertida: I₁ = 10 A, I₂ = −25 A, d = 10 cm →
@@ -53,9 +57,14 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *       B_hilo = 2·10⁻⁷ · 0,1 / 0,005 = 4·10⁻⁶ T → «4,000 × 10⁻⁶ T»
  *       B_espira = 4π·10⁻⁷ · 0,1 / 0,01 = 1,256637·10⁻⁵ T → «1,257 × 10⁻⁵ T»
  *   (b) Precisión en la franja del militesla: I = 30 A, r = 0,5 cm →
- *       B_hilo = 2·10⁻⁷ · 30 / 0,005 = 1,2·10⁻³ T (1,2 mT). La app escribe «0,001 T» en la
- *       tabla (−17 %) y «B = 0,00 T» en la etiqueta del dibujo, porque en [10⁻³, 10⁻²) usa 3
- *       (o 2) decimales fijos. DEFECTO → test.fail.
+ *       B_hilo = 2·10⁻⁷ · 30 / 0,005 = 1,2·10⁻³ T (1,2 mT) → «0,00120 T» en la tabla y en la
+ *       etiqueta del dibujo (antes «0,001 T» y «B = 0,00 T»: hallazgo 1344, reparado).
+ *       Electrón a 2·10⁶ m/s: E = ½·9,1093837·10⁻³¹·(2·10⁶)² / 1,602176634·10⁻¹⁹
+ *       = 11,3712 eV = 0,0113712 keV → «0,0114 keV».
+ *       I₁ = I₂ = 30 A a 4 cm: F/L = 2·10⁻⁷·30·30/0,04 = 4,5·10⁻³ N/m → «0,00450 N/m».
+ *
+ *   DIBUJO DEL HILO: el punto de medida está a 380 + 40 + 300·ln(r/0,005)/ln(100) px (escala
+ *   logarítmica acotada a 0,5-50 cm): r = 2 cm → 510,3 · r = 40 cm → 705,5.
  */
 
 // ── utilidades ────────────────────────────────────────────────────────────────────────
@@ -120,10 +129,10 @@ test('caso 1a · hilo, espira y solenoide con I = 25 A, r = 2 cm, N = 800, L = 0
 
   // n = N/L = 800/0,40 = 2000 /m (es-ES no agrupa las cifras de cuatro dígitos)
   await expect(valorDeFila(page, 'Espiras por metro')).toHaveText('2000 /m');
-  // B_sol = μ₀·n·I = 4π·10⁻⁷·2000·25 = 0,0628319 T → 3 decimales fijos: «0,063 T»
+  // B_sol = μ₀·n·I = 4π·10⁻⁷·2000·25 = 0,0628319 T → 3 cifras significativas: «0,0628 T»
   const sol = valorDeFila(page, 'Campo del solenoide');
-  await expect(sol).toHaveText('0,063 T');
-  expect(leerCifra(await sol.innerText()) / 0.0628319).toBeCloseTo(1, 1);
+  await expect(sol).toHaveText('0,0628 T');
+  expect(leerCifra(await sol.innerText()) / 0.0628319).toBeCloseTo(1, 2);
 
   // La etiqueta del dibujo repite el campo del hilo
   await expect(page.locator('svg text').filter({ hasText: /^B = / })).toHaveText('B = 2,50 × 10⁻⁴ T');
@@ -187,26 +196,32 @@ test('caso 2d · segundo hilo con la corriente invertida: misma fuerza, pero se 
 });
 
 test('caso 2b · con θ = 90° la trayectoria es circular: el paso de la hélice es 0', async ({ page }) => {
-  // HALLAZGO (24/09/2026): la app calcula v·cos θ·T con Math.cos(π/2) = 6,12·10⁻¹⁷ y en el
-  // estado de arranque muestra «4,017 × 10⁻¹⁷ m» en vez de 0, contradiciendo su propia pista
-  // («Con 90° la trayectoria es circular»). Se parte de otro ángulo para que sembrar pruebe algo.
-  test.fail();
+  // Hallazgo 1345 (reparado 24/09/2026): la app calculaba v·cos θ·T con Math.cos(π/2) =
+  // 6,12·10⁻¹⁷ y en el arranque mostraba «4,017 × 10⁻¹⁷ m». Con 45° el paso sí existe:
+  // 5·10⁶·cos 45°·1,311889·10⁻⁷ = 0,463826 m → «0,464 m». Luego se vuelve a 90°.
   await sembrarValor(page, '#anguloVB', 45);
+  await expect(valorDeFila(page, 'Paso de la hélice')).toHaveText('0,464 m');
   await sembrarValor(page, '#anguloVB', 90);
-  await expect(valorDeFila(page, 'Paso de la hélice')).toHaveText('0 m', { timeout: 2000 });
+  await expect(valorDeFila(page, 'Paso de la hélice')).toHaveText('0 m');
 });
 
 test('caso 2a-dibujo · con F = 0 el lienzo no pinta un vector fuerza', async ({ page }) => {
-  // HALLAZGO (24/09/2026): con θ = 0° la tabla dice «0 N» pero el SVG sigue dibujando la
-  // flecha F con 48 px de largo (y girando), porque su longitud es fija.
-  test.fail();
+  // Hallazgo 1346 (reparado 24/09/2026): con θ = 0° la tabla decía «0 N» pero el SVG seguía
+  // dibujando la flecha F con 48 px de largo fijo. Ahora el largo es 48 px·F/F_ref (acotado).
+  const flecha = page.locator('[class*="vFuerza"] line');
+  const largo = () =>
+    flecha.evaluate((l) => {
+      const n = (a: string) => Number(l.getAttribute(a));
+      return Math.hypot(n('x2') - n('x1'), n('y2') - n('y1'));
+    });
+  // θ = 30° → sen 30° = 0,5 → F = 2,003·10⁻¹³ N → 24 px
+  await sembrarValor(page, '#anguloVB', 30);
+  await expect(valorDeFila(page, 'Fuerza F = q·v·B')).toHaveText('2,00 × 10⁻¹³ N');
+  expect(await largo()).toBeCloseTo(24, 1);
+  // θ = 0° → F = 0 → sin flecha
   await sembrarValor(page, '#anguloVB', 0);
   await expect(valorDeFila(page, 'Fuerza F = q·v·B')).toHaveText('0 N');
-  const largo = await page.locator('[class*="vFuerza"] line').evaluate((l) => {
-    const n = (a: string) => Number(l.getAttribute(a));
-    return Math.hypot(n('x2') - n('x1'), n('y2') - n('y1'));
-  });
-  expect(largo).toBeLessThan(1);
+  await expect(page.locator('[class*="vFuerza"]')).toHaveCount(0);
 });
 
 // ── CASO 3 ────────────────────────────────────────────────────────────────────────────
@@ -224,41 +239,60 @@ test('caso 3a · I negativa y r = 0 se capan al mínimo y el campo sigue finito'
 });
 
 test('caso 3b · 1,2 mT no puede presentarse como «0,001 T» ni el dibujo como «0,00 T»', async ({ page }) => {
-  // HALLAZGO (24/09/2026): formatCientifico usa decimales FIJOS en [10⁻³, 10⁵), así que en la
-  // franja del militesla se come las cifras significativas. I = 30 A, r = 0,5 cm:
-  // B = 2·10⁻⁷·30/0,005 = 1,2·10⁻³ T; la tabla da «0,001 T» (−17 %) y la etiqueta del
-  // lienzo «B = 0,00 T». Precisión 2 (±0,5 %) basta para ver el −17 %.
-  test.fail();
+  // Hallazgo 1344 (reparado 24/09/2026): formatCientifico usaba decimales FIJOS en
+  // [10⁻³, 10⁵) y en la franja del militesla se comía las cifras significativas. I = 30 A,
+  // r = 0,5 cm: B = 2·10⁻⁷·30/0,005 = 1,2·10⁻³ T; la tabla daba «0,001 T» (−17 %) y la
+  // etiqueta del lienzo «B = 0,00 T». Ahora se garantizan 3 cifras significativas.
   await irACorrientes(page);
   await sembrarValor(page, '#corriente', 30);
   await sembrarValor(page, '#distancia', 0.005);
   const hilo = valorDeFila(page, 'Campo de un hilo recto');
-  await expect(hilo).toHaveText(/T$/);
+  await expect(hilo).toHaveText('0,00120 T');
   expect(leerCifra(await hilo.innerText()) / 1.2e-3).toBeCloseTo(1, 2);
-  await expect(page.locator('svg text').filter({ hasText: /^B = / })).not.toHaveText('B = 0,00 T');
+  await expect(page.locator('svg text').filter({ hasText: /^B = / })).toHaveText('B = 0,00120 T');
+  // I₁ = I₂ = 30 A a 4 cm: F/L = 2·10⁻⁷·30·30/0,04 = 4,5·10⁻³ N/m
+  await sembrarValor(page, '#corriente2', 30);
+  await sembrarValor(page, '#separacion', 0.04);
+  await expect(valorDeFila(page, 'Fuerza entre hilos')).toHaveText('0,00450 N/m');
+});
+
+test('caso 3b-energía · electrón a 2·10⁶ m/s: 11,37 eV no puede salir «0,01 keV»', async ({ page }) => {
+  // E = ½·m_e·v² / e = ½·9,1093837·10⁻³¹·(2·10⁶)² / 1,602176634·10⁻¹⁹ = 11,3712 eV
+  // = 0,0113712 keV → 3 cifras significativas: «0,0114 keV» (antes «0,01 keV»: hallazgo 1344)
+  await page.getByRole('button', { name: /Electrón/ }).click();
+  await sembrarValor(page, '#velocidad', 2);
+  const energia = valorDeFila(page, 'Energía cinética');
+  await expect(energia).toHaveText('0,0114 keV');
+  expect(leerCifra(await energia.innerText()) / 0.0113712).toBeCloseTo(1, 2);
 });
 
 // ── Dibujo y accesibilidad ────────────────────────────────────────────────────────────
 
 test('dibujo · el punto de medida del hilo se aleja cuando crece la distancia', async ({ page }) => {
-  // HALLAZGO (24/09/2026): el punto de medida está fijo en cx = 490 sea cual sea r; la
-  // etiqueta cambia («a 2,0 cm» / «a 40,0 cm») pero el dibujo no muestra la distancia.
-  test.fail();
+  // Hallazgo 1347 (reparado 24/09/2026): el punto de medida estaba fijo en cx = 490 sea cual
+  // sea r. Ahora cx = 420 + 300·ln(r/0,005)/ln(100): r = 2 cm → 510,3 · r = 40 cm → 705,5.
   await irACorrientes(page);
   await sembrarValor(page, '#distancia', 0.02);
+  await expect(page.locator('svg text').filter({ hasText: 'del hilo' })).toHaveText('a 2,0 cm del hilo');
   const cerca = Number(await page.locator('[class*="puntoMedida"]').getAttribute('cx'));
+  expect(cerca).toBeCloseTo(510.3, 0);
   await sembrarValor(page, '#distancia', 0.4);
   await expect(page.locator('svg text').filter({ hasText: 'del hilo' })).toHaveText('a 40,0 cm del hilo');
   const lejos = Number(await page.locator('[class*="puntoMedida"]').getAttribute('cx'));
-  expect(lejos).toBeGreaterThan(cerca);
+  expect(lejos).toBeCloseTo(705.5, 0);
+  // Sin salirse del lienzo (760 px)
+  expect(lejos).toBeLessThan(760);
 });
 
 test('a11y · el botón «Pausar» no se anuncia como pulsado mientras la animación corre', async ({ page }) => {
-  // HALLAZGO (24/09/2026): el botón cambia de rótulo (Pausar/Reanudar) Y lleva
-  // aria-pressed={reproduciendo}: al arrancar un lector dice «Pausar, pulsado» con la
-  // animación en marcha. Un botón de acción con rótulo cambiante no lleva aria-pressed.
-  test.fail();
+  // Hallazgo 1348 (reparado 24/09/2026): el botón cambia de rótulo (Pausar/Reanudar) y además
+  // llevaba aria-pressed={reproduciendo}: un lector decía «Pausar, pulsado» con la animación en
+  // marcha. Un botón de acción con rótulo cambiante no lleva aria-pressed.
   const boton = page.getByRole('button', { name: 'Pausar' });
   await expect(boton).toBeVisible();
-  await expect(boton).not.toHaveAttribute('aria-pressed', 'true', { timeout: 2000 });
+  await expect(boton).not.toHaveAttribute('aria-pressed');
+  await boton.click();
+  const reanudar = page.getByRole('button', { name: 'Reanudar' });
+  await expect(reanudar).toBeVisible();
+  await expect(reanudar).not.toHaveAttribute('aria-pressed');
 });

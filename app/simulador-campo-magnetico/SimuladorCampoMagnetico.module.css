@@ -315,6 +315,19 @@
   opacity: 0.75;
 }
 
+.lineaMedida {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.cotaMedida {
+  stroke: var(--primary);
+  stroke-width: 1.2;
+  stroke-dasharray: 2 3;
+}
+
 .puntoMedida {
   fill: var(--primary);
   stroke: white;
@@ -733,6 +746,11 @@
 
 [data-theme='dark'] .hiloPunta {
   fill: #fbbf24;
+}
+
+[data-theme='dark'] .lineaMedida,
+[data-theme='dark'] .cotaMedida {
+  stroke: var(--accent);
 }
 
 [data-theme='dark'] .etiquetaCampo {
