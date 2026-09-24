@@ -20,6 +20,12 @@ interface RegionBadgeProps {
   variant: RegionVariant;
   /** Texto personalizado opcional. Si no se especifica, usa el por defecto de la variante */
   text?: string;
+  /**
+   * Solo en 'es-only': enlazar a los datos fiscales de Delegum como fuente (por defecto sí).
+   * `false` en las apps que aplican solo a España por una ley que NO es fiscal —seguros de salud
+   * u hogar—, donde Delegum no es la fuente de nada de lo que la app dice (24/09/2026).
+   */
+  fuenteDelegum?: boolean;
 }
 
 const DEFAULTS: Record<RegionVariant, { icon: string; text: string; aria: string }> = {
@@ -40,7 +46,7 @@ const DEFAULTS: Record<RegionVariant, { icon: string; text: string; aria: string
   },
 };
 
-export default function RegionBadge({ variant, text }: RegionBadgeProps) {
+export default function RegionBadge({ variant, text, fuenteDelegum = true }: RegionBadgeProps) {
   const def = DEFAULTS[variant];
   const finalText = text || def.text;
 
@@ -52,7 +58,7 @@ export default function RegionBadge({ variant, text }: RegionBadgeProps) {
     >
       <span className={styles.icon} aria-hidden="true">{def.icon}</span>
       <span className={styles.text}>{finalText}</span>
-      {variant === 'es-only' && (
+      {variant === 'es-only' && fuenteDelegum && (
         <a
           href="https://delegum.com/datos-fiscales/"
           className={styles.fuente}
