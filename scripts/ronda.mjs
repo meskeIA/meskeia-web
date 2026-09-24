@@ -262,12 +262,54 @@ async function revisar(ctx, url, tituloHome) {
     if (meta.h1.length === 0) avisos.push('sin <h1>');
     else if (meta.h1.length > 1) avisos.push(`${meta.h1.length} elementos <h1>`);
     if (meta.imgsRotas > 0) avisos.push(`${meta.imgsRotas} imagen(es) que no cargan`);
+
+    if (await tituloTapadoEnMovil(page)) avisos.push('en móvil (390 px) el logo o el botón de tema tapan el título');
   } catch (e) {
     errores.push(`navegación: ${String(e.message).slice(0, 160)}`);
   }
 
   await page.close();
   return { url, errores: [...new Set(errores)], avisos: [...new Set(avisos)], meta };
+}
+
+/**
+ * ¿Pisa la barra fija de MeskeiaLogo (logo a la izquierda, botón de tema a la derecha) el
+ * texto del <h1> a ancho de móvil?
+ *
+ * La ronda barre a 1.280 px y ahí no pasa nunca: el título va centrado y la barra ocupa las
+ * esquinas. Pasa en las apps cuyo hero va a sangre sin dejar arriba el hueco de 80 px de la
+ * plantilla: en móvil el título sube hasta la barra. Se reduce LA MISMA página, sin
+ * recargarla, porque es CSS que responde a `max-width` y así la comprobación casi no cuesta.
+ *
+ * De dónde sale (24/09/2026): revisando `quiz-tabla-periodica` en móvil, el logo tapaba
+ * «Quiz» y su emoji. Barrido del catálogo en producción ese día: 193 de 1.183 URLs, con tres
+ * muestras al azar confirmadas a ojo y 4 de 4 apps sanas conocidas sin marcar.
+ *
+ * Se mide contra las cajas del TEXTO (`Range.getClientRects`), no contra la del <h1>: un h1
+ * de ancho completo roza siempre las esquinas aunque sus letras estén lejos.
+ */
+async function tituloTapadoEnMovil(page) {
+  const original = page.viewportSize();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(150); // un par de fotogramas para recalcular el layout
+  const tapado = await page.evaluate(() => {
+    const barra = [...document.querySelectorAll('body *')].find(e => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return cs.position === 'fixed' && r.top <= 1 && r.height < 120 && r.width > 300
+        && e.querySelector('a[href="/"], a[href="https://meskeia.com/"]');
+    });
+    const h1 = document.querySelector('h1');
+    if (!barra || !h1) return false;
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const letras = [...rango.getClientRects()].filter(c => c.width > 0);
+    const piezas = [...barra.children].map(c => c.getBoundingClientRect()).filter(c => c.width > 0);
+    return piezas.some(p => letras.some(c =>
+      !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom)));
+  });
+  if (original) await page.setViewportSize(original);
+  return tapado;
 }
 
 // ─── Ejecución en cola ────────────────────────────────────────────────────────
