@@ -662,3 +662,332 @@ test.describe('Simulador de Mitosis y Meiosis · casos para clase', () => {
     expect(inventada.ok).toBe(false);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REINSPECCIÓN · 25/09/2026 — los 12 casos EN EL NAVEGADOR y lo que la tanda dejó abierto
+// ═══════════════════════════════════════════════════════════════════════════════
+
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+
+/**
+ * Qué cambió desde el 26/08: 4da98ff9 (12 casos de aula, 21/09), 12829fc3 (margen de ruido
+ * binario en la tolerancia, 22/09) y f30606f6 (cabeceras de tabla a --primary-boton, 25/09).
+ *
+ * LOS 12 CASOS, RESUELTOS A MANO ANTES DE ABRIR LA APP, con el convenio que la propia app
+ * declara (cromosoma = centrómero; una cromátida hermana cuenta como cromosoma solo tras
+ * separarse; la anafase I separa homólogos y es la única que reduce):
+ *    1  mitosis, metafase, 2n=8, cromosomas en la placa ........ 8
+ *    2  ídem, cromátidas ....................................... 8 × 2 = 16
+ *    3  mitosis, anafase, 2n=8, cromosomas por polo ............ 8 (el recuento no baja)
+ *    4  meiosis, anafase I, 2n=8, cromosomas por polo .......... 8 ÷ 2 = 4
+ *    5  ídem, cromátidas por polo .............................. 4 × 2 = 8
+ *    6  meiosis, metafase II, 2n=12, cromátidas por célula ..... n = 6, × 2 = 12
+ *    7  meiosis, anafase II, 2n=12, cromosomas por polo ........ 6
+ *    8  meiosis completa desde un espermatocito ................ 4 células
+ *    9  mitosis humana (2n=46), cada célula hija ............... 46
+ *   10  meiosis humana, cada célula de la telofase II .......... 23
+ *   11  no disyunción en anafase I, gameto del par de más ...... 22 + 2 = 24
+ *   12  Drosophila (2n=8, n=4), gametos por reparto al azar .... 2^4 = 16
+ * 2n = 46: NHGRI, «Chromosomes Fact Sheet» («23 pairs of chromosomes, for a total of 46»).
+ * Drosophila 2n = 8: su genoma tiene «four pairs of chromosomes—an X/Y pair, and three
+ * autosomes» (FlyBase, citado en Wikipedia, «Drosophila melanogaster», sección Genome).
+ */
+const RESPUESTAS_A_MANO: Record<number, { valor: string; respuesta: string }> = {
+  1: { valor: '8', respuesta: 'Respuesta: 8 cromosomas en la placa' },
+  2: { valor: '16', respuesta: 'Respuesta: 16 cromátidas en la célula' },
+  3: { valor: '8', respuesta: 'Respuesta: 8 cromosomas por polo' },
+  4: { valor: '4', respuesta: 'Respuesta: 4 cromosomas por polo' },
+  5: { valor: '8', respuesta: 'Respuesta: 8 cromátidas por polo' },
+  6: { valor: '12', respuesta: 'Respuesta: 12 cromátidas por célula' },
+  7: { valor: '6', respuesta: 'Respuesta: 6 cromosomas por polo' },
+  8: { valor: '4', respuesta: 'Respuesta: 4 células hijas' },
+  9: { valor: '46', respuesta: 'Respuesta: 46 cromosomas por célula hija' },
+  10: { valor: '23', respuesta: 'Respuesta: 23 cromosomas por gameto' },
+  11: { valor: '24', respuesta: 'Respuesta: 24 cromosomas del gameto' },
+  12: { valor: '16', respuesta: 'Respuesta: 16 gametos distintos' },
+};
+
+const ENTRADA_CASOS = '#casos-aula-respuesta';
+const SECCION_CASOS = 'section[aria-labelledby="casos-aula-titulo"]';
+const seccionCasos = (page: Page) => page.locator(SECCION_CASOS);
+
+async function irACasoAula(page: Page, id: number): Promise<void> {
+  const boton = seccionCasos(page).getByRole('button', { name: new RegExp(`^Caso ${id}:`) });
+  await boton.click();
+  await expect(boton).toHaveAttribute('aria-pressed', 'true');
+}
+
+/** Escribe, comprueba y devuelve el veredicto (acotado a la sección: no al route announcer). */
+async function responder(page: Page, valor: string): Promise<string> {
+  const sec = seccionCasos(page);
+  await page.locator(ENTRADA_CASOS).fill(valor);
+  await esperarValorEnReact(page, ENTRADA_CASOS, valor);
+  await sec.getByRole('button', { name: 'Comprobar', exact: true }).click();
+  const veredicto = sec.locator('[role="alert"]');
+  await expect(veredicto).toBeVisible();
+  return ((await veredicto.textContent()) ?? '').trim();
+}
+
+/** Contraste WCAG de un elemento sobre su fondo real (capas de fondo compuestas). */
+async function contrasteDe(page: Page, selector: string): Promise<number> {
+  return page
+    .locator(selector)
+    .first()
+    .evaluate((el) => {
+      type Rgba = { r: number; g: number; b: number; a: number };
+      const leer = (c: string): Rgba | null => {
+        const m = c.match(/rgba?\(([^)]+)\)/);
+        if (!m) return null;
+        const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+        return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+      };
+      const mezcla = (fg: Rgba, bg: Rgba): Rgba => ({
+        r: fg.r * fg.a + bg.r * (1 - fg.a),
+        g: fg.g * fg.a + bg.g * (1 - fg.a),
+        b: fg.b * fg.a + bg.b * (1 - fg.a),
+        a: 1,
+      });
+      const lum = ({ r, g, b }: Rgba) => {
+        const f = (v: number) => {
+          const s = v / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      const capas: Rgba[] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        const c = leer(getComputedStyle(n).backgroundColor);
+        if (c && c.a > 0) capas.push(c);
+        if (c && c.a === 1) break;
+      }
+      let fondo: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+      for (let i = capas.length - 1; i >= 0; i--) fondo = mezcla(capas[i], fondo);
+      const texto = mezcla(leer(getComputedStyle(el).color) as Rgba, fondo);
+      const [a, b] = [lum(texto), lum(fondo)];
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    });
+}
+
+/** Sin transiciones: si no, se mide el color a mitad de camino entre dos estados. */
+async function congelarTransiciones(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: '*,*::before,*::after{transition:none!important;animation:none!important}',
+  });
+}
+
+async function abrirBloqueEducativo(page: Page): Promise<void> {
+  // EducationalSection cambia su aria-label al abrirse («Ver…» → «Ocultar guía educativa»).
+  await page.getByRole('button', { name: 'Ver guía educativa', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Ocultar guía educativa', exact: true })
+  ).toHaveAttribute('aria-expanded', 'true');
+}
+
+test.describe('reinspección 25/09/2026 — casos de aula en el navegador', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+  });
+
+  test('los 12 casos: la respuesta calculada a mano se da por buena y la solución dice lo mismo', async ({
+    page,
+  }) => {
+    const sec = seccionCasos(page);
+    for (let id = 1; id <= 12; id++) {
+      const { valor, respuesta } = RESPUESTAS_A_MANO[id];
+      await irACasoAula(page, id);
+      expect(await responder(page, valor), `caso ${id} con ${valor}`).toContain('¡Correcto!');
+      await sec.getByRole('button', { name: /Ver solución/ }).click();
+      await expect(sec.locator('ol + p'), `caso ${id}`).toHaveText(respuesta);
+    }
+  });
+
+  test('tolerancia en los casos fijos: acepta 46 y «23,0», rechaza el vecino y el doble', async ({
+    page,
+  }) => {
+    // Caso 9 (46 cromosomas por célula hija): tolerancia = 1 % de 46 = 0,46, así que 45 y 47
+    // quedan fuera; 92 es contar las dos células o las cromátidas, y es el DOBLE.
+    await irACasoAula(page, 9);
+    expect(await responder(page, '46')).toContain('¡Correcto!');
+    expect(await responder(page, '45')).toContain('No es correcto');
+    expect(await responder(page, '47')).toContain('No es correcto');
+    const doble = await responder(page, '92');
+    expect(doble).not.toContain('¡Correcto!');
+    expect(doble).toContain('DOBLE');
+
+    // Caso 10 (23): el número escrito de otras formas legítimas se acepta; 22/24 y 46 no.
+    await irACasoAula(page, 10);
+    expect(await responder(page, '23,0')).toContain('¡Correcto!');
+    expect(await responder(page, ' 23 ')).toContain('¡Correcto!');
+    expect(await responder(page, '22')).toContain('No es correcto');
+    expect(await responder(page, '24')).toContain('No es correcto');
+    expect(await responder(page, '46')).not.toContain('¡Correcto!');
+
+    // Caso 11 (24): olvidar el cromosoma de más (23) o tomar el otro polo (22) suspende.
+    await irACasoAula(page, 11);
+    expect(await responder(page, '23')).toContain('No es correcto');
+    expect(await responder(page, '22')).toContain('No es correcto');
+  });
+
+  test('#383 verificado: la FAQ habla de homólogos, no de «pares de hermanas»', async ({ page }) => {
+    await abrirBloqueEducativo(page);
+    const faq = page.getByText('¿Por qué la meiosis produce 4 células y no 2?').locator('..');
+    await expect(faq).toContainText('se separan los');
+    await expect(faq).toContainText('cromosomas homólogos');
+    await expect(faq).not.toContainText('pares de hermanas');
+  });
+
+  test('#381 verificado: en Profase I el bivalente y el crossing-over unen homólogos del MISMO color', async ({
+    page,
+  }) => {
+    // El motor coloca el par 0 (naranja) en la columna izquierda y el par 1 (teal) en la
+    // derecha, y page.tsx une (0,1) y (2,3). Si cada mitad del canvas tiene un solo color y
+    // su propia marca rosa, cada bivalente es de homólogos; antes unía naranja con teal.
+    await elegirModo(page, 'Meiosis');
+    await irAFase(page, 'Profase I');
+    const izquierda = await contarCromosomas(page, { x0: 0, x1: 0.5, y0: 0, y1: 1 });
+    const derecha = await contarCromosomas(page, { x0: 0.5, x1: 1, y0: 0, y1: 1 });
+    expect(new Set(izquierda.colores)).toEqual(new Set(['naranja']));
+    expect(new Set(derecha.colores)).toEqual(new Set(['teal']));
+    expect(izquierda.rosa).toBeGreaterThan(0);
+    expect(derecha.rosa).toBeGreaterThan(0);
+  });
+
+  test('f30606f6: las cabeceras de la tabla comparativa pasan 4,5:1 en claro y en oscuro', async ({
+    page,
+  }) => {
+    await congelarTransiciones(page);
+    await abrirBloqueEducativo(page);
+    // --primary-boton: 5,47:1 medido en claro y 10,73:1 en oscuro el 25/09/2026.
+    expect(await contrasteDe(page, 'th')).toBeGreaterThanOrEqual(4.5);
+    await page.evaluate(() => {
+      document.documentElement.dataset.theme = 'dark';
+    });
+    expect(await contrasteDe(page, 'th')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('modo práctica: con Date.now() = 1790337600010 sale el ejercicio de gametos con 2n = 16', async ({
+    page,
+  }) => {
+    // Precondición del test.fail de la tolerancia en práctica: si el generador cambia y esta
+    // semilla deja de dar este ejercicio, lo avisa ESTE test y no un «expected to fail» mudo.
+    await page.clock.setFixedTime(new Date(1790337600010));
+    await page.reload();
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+    const sec = seccionCasos(page);
+    await sec.getByRole('button', { name: /Practicar/ }).click();
+    await expect(sec.locator('h3 + p')).toContainText('2n = 16');
+    await expect(sec.locator('h3 + p')).toContainText('GENÉTICAMENTE DISTINTOS');
+    // n = 8 pares → 2^8 = 256
+    expect(await responder(page, '256')).toContain('¡Correcto!');
+  });
+});
+
+test.describe('reinspección 25/09/2026 — hallazgos abiertos', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+  });
+
+  test('HALLAZGO tolerancia · en práctica, 255 no puede valer por 256 gametos distintos', async ({
+    page,
+  }) => {
+    // toleranciaDe = máx(0,01; 1 % del valor) se aplica a RECUENTOS ENTEROS: con 256 da 2,56
+    // y acepta 254, 255, 257 y 258. 255 = 2^8 − 1 es el error clásico. Un recuento entero
+    // solo admite el entero exacto.
+    test.fail();
+    await page.clock.setFixedTime(new Date(1790337600010));
+    await page.reload();
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+    await seccionCasos(page).getByRole('button', { name: /Practicar/ }).click();
+    expect(await responder(page, '255')).not.toContain('¡Correcto!');
+  });
+
+  test('HALLAZGO mensajes · caso 12 con «8» no debe recibir la explicación de los polos', async ({
+    page,
+  }) => {
+    // 8 = 2 × 4 (multiplicar n por 2 en vez de elevar 2 a n): el error que la propia pista
+    // anticipa. Hoy el corrector lo trata como «la MITAD» y le habla de homólogos y polos.
+    test.fail();
+    await irACasoAula(page, 12);
+    const motivo = await responder(page, '8');
+    expect(motivo).not.toContain('¡Correcto!');
+    expect(motivo).not.toContain('polo');
+  });
+
+  test('HALLAZGO mensajes · caso 10 con «46» no es un error de cromátidas', async ({ page }) => {
+    // Dar 46 a un gameto humano es no haber reducido (creerlo diploide); el corrector le dice
+    // que repase si se piden cromosomas o cromátidas.
+    test.fail();
+    await irACasoAula(page, 10);
+    const motivo = await responder(page, '46');
+    expect(motivo).not.toContain('¡Correcto!');
+    expect(motivo).not.toContain('cromátidas');
+  });
+
+  test('HALLAZGO región viva · volver a pulsar «Practicar» debe anunciar el enunciado nuevo', async ({
+    page,
+  }) => {
+    // Es el 1212 de simulador-movimiento-circular: 12829fc3 lo reparó en las ocho copias de
+    // CasosAula.tsx, pero aquí la sección vive dentro de page.tsx y se quedó sin tocar.
+    test.fail();
+    const sec = seccionCasos(page);
+    await sec.getByRole('button', { name: /Practicar/ }).click();
+    const vivo = await sec.locator('h3 + p').evaluate((el) => {
+      for (let n: Element | null = el; n && n.tagName !== 'SECTION'; n = n.parentElement) {
+        if (n.getAttribute('aria-live') || n.getAttribute('role') === 'status') return true;
+      }
+      return false;
+    });
+    expect(vivo).toBe(true);
+  });
+
+  test('HALLAZGO contraste · el título del caso (teal sobre #FAFAFA) en claro', async ({ page }) => {
+    // Medido el 25/09/2026: 2,68:1 a 16,8 px en negrita (no es texto grande: exige 4,5:1).
+    test.fail();
+    await congelarTransiciones(page);
+    expect(await contrasteDe(page, `${SECCION_CASOS} h3`)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO contraste · «Comprobar» (blanco sobre --primary) en oscuro', async ({ page }) => {
+    // Medido el 25/09/2026: 2,79:1 en oscuro (4,11:1 en claro).
+    test.fail();
+    await congelarTransiciones(page);
+    await page.evaluate(() => {
+      document.documentElement.dataset.theme = 'dark';
+    });
+    expect(await contrasteDe(page, `${SECCION_CASOS} button:text-is("Comprobar")`)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO contraste · el botón «Auto» del simulador en claro', async ({ page }) => {
+    // Medido el 25/09/2026: 2,68:1 (teal #48A9A6 sobre #FAFAFA a 14,4 px en negrita).
+    test.fail();
+    await congelarTransiciones(page);
+    expect(await contrasteDe(page, 'button[aria-label="Iniciar reproducción automática"]')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO fases · la meiosis tiene 9 fases y la app sigue anunciando 8', async ({ page }) => {
+    // Reparación incompleta del #378: se añadió la Profase II (9 pestañas) pero la tabla
+    // comparativa y la metadata siguen diciendo «8 fases».
+    test.fail();
+    await elegirModo(page, 'Meiosis');
+    await expect(page.getByRole('tab')).toHaveCount(9);
+    await abrirBloqueEducativo(page);
+    await expect(page.locator('td', { hasText: 'meiosis I + meiosis II' })).toContainText('9 fases');
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      'content',
+      /meiosis \(9 fases\)/
+    );
+  });
+
+  test('HALLAZGO bacterias · las bacterias no se reproducen por mitosis', async ({ page }) => {
+    // OpenStax Biology 2e, §10.5: «Prokaryotes, such as bacteria, produce daughter cells by
+    // binary fission» y no tienen huso mitótico. La propia FAQ de la app dice que una célula
+    // sin núcleo no puede hacer mitosis.
+    test.fail();
+    await abrirBloqueEducativo(page);
+    // Se compara el fragmento que casa, no el <body> entero, para que el fallo sea legible.
+    const frase = await page.evaluate(
+      () => document.body.innerText.match(/bacterias[^.]*únicamente por\s+mitosis/)?.[0] ?? null
+    );
+    expect(frase).toBeNull();
+  });
+});

@@ -65,6 +65,36 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *
  *   DIBUJO DEL HILO: el punto de medida está a 380 + 40 + 300·ln(r/0,005)/ln(100) px (escala
  *   logarítmica acotada a 0,5-50 cm): r = 2 cm → 510,3 · r = 40 cm → 705,5.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────────────────
+ * REINSPECCIÓN 25/09/2026 (invalidada por 99857a6b y 0d54c8f9) — casos NUEVOS, resueltos a mano
+ * antes de abrir el navegador, con las constantes de la app: e = 1,602176634·10⁻¹⁹ C,
+ * mₑ = 9,1093837·10⁻³¹ kg, m_p = 1,67262192·10⁻²⁷ kg, μ₀ = 4π·10⁻⁷ T·m/A.
+ *
+ *   R1 · hilo recto, I = 10 A, r = 0,05 m: B = 2·10⁻⁷·10/0,05 = 4·10⁻⁵ T (40 μT) →
+ *        «4,000 × 10⁻⁵ T» y en el dibujo «B = 4,00 × 10⁻⁵ T»; espira μ₀I/(2R) = 1,256637·10⁻⁴ T.
+ *        Partiendo de I = 40 A, r = 0,10 m: 2·10⁻⁷·40/0,10 = 8·10⁻⁵ T → «8,000 × 10⁻⁵ T».
+ *   R2 · electrón, v = 1·10⁶ m/s, B = 0,01 T, θ = 90°:
+ *        F = e·v·B = 1,602177·10⁻¹⁵ N → «1,60 × 10⁻¹⁵ N»
+ *        r = mₑ·v/(e·B) = 9,1093837·10⁻²⁵/1,602176634·10⁻²¹ = 5,685630·10⁻⁴ m → «5,686 × 10⁻⁴ m»
+ *        T = 2π·mₑ/(e·B) = 3,572387·10⁻⁹ s → «3,57 × 10⁻⁹ s» · f = 1/T = 2,799249·10⁸ Hz
+ *        E = ½·mₑ·v²/e = 2,842815 eV = 0,002842815 keV → «0,00284 keV» · paso 0 m.
+ *        Carga negativa con B saliente: ω = −qB/m apunta a +z → giro ANTIHORARIO.
+ *        θ = 30°: F = 8,010883·10⁻¹⁶ N · r = 2,842815·10⁻⁴ m · v⊥ = 5·10⁵ m/s ·
+ *        paso = v·cos 30°·T = 10⁶·0,8660254·3,572387·10⁻⁹ = 3,093778·10⁻³ m → «0,00309 m»
+ *        (rama decimal nueva de formatCientifico, 3 cifras significativas).
+ *        θ = 0°: F = 0, r = 0, v⊥ = 0 y paso = v·T = 3,572387·10⁻³ m → «0,00357 m».
+ *   R3 · solenoide N = 1000, L = 0,50 m, I = 10 A: n = 2000 /m; B = μ₀·n·I = 0,02513274 T → «0,0251 T».
+ *   R4 · bordes de formatCientifico: v = 0,1·10⁶ m/s con θ = 90° da v⊥ = 10⁵ m/s EXACTO →
+ *        «1,00 × 10⁵ m/s»; con θ = 89°, 10⁵·sen 89° = 99.984,77 m/s → «99.984,77 m/s».
+ *        I = 25 A a 0,5 cm: B = 2·10⁻⁷·25/0,005 = 10⁻³ T EXACTO → «0,00100 T»; y en el arranque
+ *        de Corrientes, F/L = 2·10⁻⁷·10·10/0,02 = 10⁻³ N/m → «0,00100 N/m».
+ *   R5 · mantisa que redondea a 10 (hallazgo nuevo): protón, v = 5,2·10⁶ m/s, B = 1,2 T, θ = 90°
+ *        → F = 9,997582·10⁻¹³ N, que con 2 decimales es «1,00 × 10⁻¹² N».
+ *   R6 · inducción (hallazgo nuevo): barra con B = 0,2 T, L = 0,3 m, v = 2 m/s, R = 25 Ω →
+ *        ε = 0,12 V · I = 4,8·10⁻³ A · F = B·I·L = 2,88·10⁻⁴ N · P = ε·I = 5,76·10⁻⁴ W.
+ *        Alternador N = 10, B = 0,1 T, A = 0,01 m², f = 1 Hz → ε_máx = N·B·A·2πf = 0,0628319 V ·
+ *        ε_ef = 0,0444288 V.
  */
 
 // ── utilidades ────────────────────────────────────────────────────────────────────────
@@ -319,4 +349,215 @@ test('a11y · el botón «Pausar» no se anuncia como pulsado mientras la animac
   const reanudar = page.getByRole('button', { name: 'Reanudar' });
   await expect(reanudar).toBeVisible();
   await expect(reanudar).not.toHaveAttribute('aria-pressed');
+});
+
+// ── REINSPECCIÓN 25/09/2026 ───────────────────────────────────────────────────────────
+
+test('R1 · hilo recto: 40 μT con I = 10 A a 5 cm, y B ∝ I/r', async ({ page }) => {
+  await irACorrientes(page);
+  const hilo = valorDeFila(page, 'Campo de un hilo recto');
+  // Se parte de otro estado: I = 40 A, r = 0,10 m → 2·10⁻⁷·40/0,10 = 8·10⁻⁵ T
+  await sembrarValor(page, '#corriente', 40);
+  await sembrarValor(page, '#distancia', 0.1);
+  await expect(hilo).toHaveText('8,000 × 10⁻⁵ T');
+  // I = 10 A, r = 0,05 m → B = μ₀I/(2πr) = 2·10⁻⁷·10/0,05 = 4·10⁻⁵ T (40 μT)
+  await sembrarValor(page, '#corriente', 10);
+  await sembrarValor(page, '#distancia', 0.05);
+  await expect(hilo).toHaveText('4,000 × 10⁻⁵ T');
+  // ±0,5 %: un factor 2π o un prefijo mal puesto quedan muy fuera
+  expect(leerCifra(await hilo.innerText()) / 4e-5).toBeCloseTo(1, 2);
+  await expect(page.locator('svg text').filter({ hasText: /^B = / })).toHaveText('B = 4,00 × 10⁻⁵ T');
+  // Espira μ₀I/(2R) = 4π·10⁻⁷·10/0,10 = 1,256637·10⁻⁴ T
+  await expect(valorDeFila(page, 'Campo en el centro de una espira')).toHaveText('1,257 × 10⁻⁴ T');
+  await expect(page.locator('[class*="resultBlock"]')).not.toContainText(/NaN|∞|Infinity|No definido/);
+});
+
+test('R2 · Lorentz: electrón a 10⁶ m/s en 0,01 T con θ = 90°, 30° y 0°', async ({ page }) => {
+  await page.getByRole('button', { name: /Electrón/ }).click();
+  await sembrarValor(page, '#velocidad', 1);
+  await sembrarValor(page, '#campo', 0.01);
+  const f = valorDeFila(page, 'Fuerza F = q·v·B');
+  const r = valorDeFila(page, 'Radio r =');
+  const periodo = valorDeFila(page, 'Periodo T =');
+  const paso = valorDeFila(page, 'Paso de la hélice');
+  const vPerp = valorDeFila(page, 'Componente v perpendicular');
+
+  // θ = 90° (arranque). F = e·v·B = 1,602177·10⁻¹⁵ N
+  await expect(f).toHaveText('1,60 × 10⁻¹⁵ N');
+  // r = mₑ·v/(e·B) = 5,685630·10⁻⁴ m (precisión 3: el radio lleva 4 cifras)
+  await expect(r).toHaveText('5,686 × 10⁻⁴ m');
+  expect(leerCifra(await r.innerText()) / 5.68563e-4).toBeCloseTo(1, 3);
+  // T = 2π·mₑ/(e·B) = 3,572387·10⁻⁹ s · f = 2,799249·10⁸ Hz
+  await expect(periodo).toHaveText('3,57 × 10⁻⁹ s');
+  await expect(valorDeFila(page, 'Frecuencia de ciclotrón')).toHaveText('2,80 × 10⁸ Hz');
+  await expect(paso).toHaveText('0 m');
+  // E = ½·mₑ·v²/e = 2,842815 eV = 0,002842815 keV → 3 cifras significativas
+  await expect(valorDeFila(page, 'Energía cinética')).toHaveText('0,00284 keV');
+  // Carga negativa con B saliente: ω = −qB/m apunta a +z → antihorario
+  await expect(page.locator('[class*="canvasHint"]')).toContainText('Giro antihorario');
+
+  // θ = 30°: sen = 0,5 · cos = 0,8660254
+  await sembrarValor(page, '#anguloVB', 30);
+  await expect(f).toHaveText('8,01 × 10⁻¹⁶ N');
+  await expect(r).toHaveText('2,843 × 10⁻⁴ m');
+  await expect(vPerp).toHaveText('5,00 × 10⁵ m/s');
+  await expect(periodo).toHaveText('3,57 × 10⁻⁹ s');
+  // paso = v·cos θ·T = 10⁶·0,8660254·3,572387·10⁻⁹ = 3,093778·10⁻³ m (rama decimal nueva)
+  await expect(paso).toHaveText('0,00309 m');
+  expect(leerCifra(await paso.innerText()) / 3.093778e-3).toBeCloseTo(1, 2);
+
+  // θ = 0°: F, r y v⊥ nulos; el «paso» es v·T = 3,572387·10⁻³ m
+  await sembrarValor(page, '#anguloVB', 0);
+  await expect(f).toHaveText('0 N');
+  await expect(r).toHaveText('0 m');
+  await expect(vPerp).toHaveText('0 m/s');
+  await expect(paso).toHaveText('0,00357 m');
+});
+
+test('R3 · solenoide N = 1000, L = 0,50 m, I = 10 A: B = μ₀·n·I = 0,0251 T', async ({ page }) => {
+  await irACorrientes(page);
+  await sembrarValor(page, '#vueltas', 1000);
+  await sembrarValor(page, '#longitudSolenoide', 0.5);
+  // n = 1000/0,50 = 2000 /m · B = 4π·10⁻⁷·2000·10 = 0,02513274 T
+  await expect(valorDeFila(page, 'Espiras por metro')).toHaveText('2000 /m');
+  const sol = valorDeFila(page, 'Campo del solenoide');
+  await expect(sol).toHaveText('0,0251 T');
+  expect(leerCifra(await sol.innerText()) / 0.02513274).toBeCloseTo(1, 2);
+});
+
+test('R4 · bordes de formatCientifico: 10⁵ exacto, justo por debajo y 10⁻³ exacto', async ({ page }) => {
+  const vPerp = valorDeFila(page, 'Componente v perpendicular');
+  // v = 0,1·10⁶ m/s con θ = 90° (arranque) → v⊥ = 10⁵ m/s EXACTO: ya es notación científica
+  await sembrarValor(page, '#velocidad', 0.1);
+  await expect(vPerp).toHaveText('1,00 × 10⁵ m/s');
+  // θ = 89° → 10⁵·sen 89° = 99.984,77 m/s: rama decimal, con el punto de miles
+  await sembrarValor(page, '#anguloVB', 89);
+  await expect(vPerp).toHaveText('99.984,77 m/s');
+
+  await irACorrientes(page);
+  // Arranque de Corrientes: F/L = 2·10⁻⁷·10·10/0,02 = 10⁻³ N/m EXACTO
+  await expect(valorDeFila(page, 'Fuerza entre hilos')).toHaveText('0,00100 N/m');
+  // I = 25 A a 0,5 cm: B = 2·10⁻⁷·25/0,005 = 10⁻³ T EXACTO, en la tabla y en el dibujo
+  await sembrarValor(page, '#corriente', 25);
+  await sembrarValor(page, '#distancia', 0.005);
+  await expect(valorDeFila(page, 'Campo de un hilo recto')).toHaveText('0,00100 T');
+  await expect(page.locator('svg text').filter({ hasText: /^B = / })).toHaveText('B = 0,00100 T');
+});
+
+test('R5 · la mantisa de la notación científica no puede redondear a «10,00»', async ({ page }) => {
+  // HALLAZGO ABIERTO (reinspección 25/09/2026): formatCientifico (page.tsx:73-74) fija el
+  // exponente con Math.floor(log10) ANTES de redondear la mantisa, y una mantisa ≥ 9,995 sale
+  // «10,00». La cifra vale lo mismo; la notación deja de estar normalizada.
+  test.fail();
+  const f = valorDeFila(page, 'Fuerza F = q·v·B');
+  // Protón, v = 5,2·10⁶ m/s, B = 1,2 T, θ = 90° (arranque): F = e·v·B = 9,997582·10⁻¹³ N
+  await sembrarValor(page, '#velocidad', 5.2);
+  await sembrarValor(page, '#campo', 1.2);
+  // El valor numérico es correcto (±0,5 %): lo que falla es cómo se escribe
+  await expect.poll(async () => leerCifra(await f.innerText()) / 9.997582e-13).toBeCloseTo(1, 2);
+  await expect(f).toHaveText('1,00 × 10⁻¹² N'); // hoy «10,00 × 10⁻¹³ N»
+  // v = 1·10⁶ m/s, θ = 89° → v⊥ = 999.847,7 m/s → «1,00 × 10⁶ m/s» (hoy «10,00 × 10⁵ m/s»)
+  await sembrarValor(page, '#velocidad', 1);
+  await sembrarValor(page, '#anguloVB', 89);
+  await expect(valorDeFila(page, 'Componente v perpendicular')).toHaveText('1,00 × 10⁶ m/s');
+  // Borde 10⁻³: v = 0,5·10⁶ m/s, B = 2,61 T, θ = 30° → r = m_p·v·sen 30°/(e·B) = 9,99970·10⁻⁴ m
+  // → «0,00100 m» o «1,000 × 10⁻³ m» (hoy «10,000 × 10⁻⁴ m»)
+  await sembrarValor(page, '#velocidad', 0.5);
+  await sembrarValor(page, '#campo', 2.61);
+  await sembrarValor(page, '#anguloVB', 30);
+  await expect(valorDeFila(page, 'Radio r =')).toHaveText(/^(0,00100|1,000 × 10⁻³) m$/);
+});
+
+test('R6 · inducción: fem, corriente, frenado y potencia conservan sus cifras significativas', async ({ page }) => {
+  // HALLAZGO ABIERTO (reinspección 25/09/2026): la pestaña Inducción presenta con
+  // formatNumber y decimales FIJOS (page.tsx:1340, 1346, 1364, 1377, 1383, 1389, 1395), la
+  // misma clase de defecto que el 1344, en una ruta que no pasa por formatCientifico.
+  test.fail();
+  await page.getByRole('button', { name: 'Inducción', exact: true }).click();
+  await page.getByRole('button', { name: 'Barra sobre raíles' }).click();
+  await esperarHidratacion(page, ['#campoBarra', '#longitudBarra', '#velocidadBarra', '#resistencia']);
+  // Barra: B = 0,2 T, L = 0,3 m, v = 2 m/s, R = 25 Ω
+  await sembrarValor(page, '#campoBarra', 0.2);
+  await sembrarValor(page, '#longitudBarra', 0.3);
+  await sembrarValor(page, '#velocidadBarra', 2);
+  await sembrarValor(page, '#resistencia', 25);
+  // ε = B·L·v = 0,12 V (este sale bien: «0,120 V»)
+  await expect(valorDeFila(page, 'fem inducida')).toHaveText('0,120 V');
+  // I = ε/R = 4,8·10⁻³ A · F = B·I·L = 2,88·10⁻⁴ N · P = ε·I = 5,76·10⁻⁴ W.
+  // Hoy «0,005 A» (+4 %), «0,0003 N» (+4 %) y «0,001 W» (+74 %). Precisión 2 (±0,5 %).
+  expect(leerCifra(await valorDeFila(page, 'Potencia disipada').innerText()) / 5.76e-4).toBeCloseTo(1, 2);
+  expect(leerCifra(await valorDeFila(page, 'Corriente inducida').innerText()) / 4.8e-3).toBeCloseTo(1, 2);
+  expect(leerCifra(await valorDeFila(page, 'Fuerza de frenado').innerText()) / 2.88e-4).toBeCloseTo(1, 2);
+
+  // Alternador: N = 10, B = 0,1 T, A = 0,01 m², f = 1 Hz
+  await page.getByRole('button', { name: 'Espira giratoria' }).click();
+  await esperarHidratacion(page, ['#espiras', '#area', '#campoInduccion', '#frecuencia']);
+  await sembrarValor(page, '#espiras', 10);
+  await sembrarValor(page, '#area', 0.01);
+  await sembrarValor(page, '#campoInduccion', 0.1);
+  await sembrarValor(page, '#frecuencia', 1);
+  // ε_máx = N·B·A·2πf = 0,0628319 V · ε_ef = 0,0444288 V (hoy «0,1 V» y «0,0 V»)
+  expect(leerCifra(await valorDeFila(page, 'fem máxima').innerText()) / 0.0628319).toBeCloseTo(1, 2);
+  expect(leerCifra(await valorDeFila(page, 'fem eficaz').innerText()) / 0.0444288).toBeCloseTo(1, 2);
+});
+
+test('R7 · la cota del dibujo del hilo no tacha el rótulo de la distancia', async ({ page }) => {
+  // HALLAZGO ABIERTO (reinspección 25/09/2026), nacido con la reparación del 1347: la cota
+  // punteada va a y = 210 desde el hilo hasta el punto de medida, y cuando el rótulo pasa a la
+  // izquierda del punto (r ≳ 4,3 cm, arranque incluido) su caja [201; 216] queda tachada.
+  test.fail();
+  await irACorrientes(page);
+  const rotulo = page.locator('svg text').filter({ hasText: 'del hilo' });
+  const cotaTachaRotulo = () =>
+    page.locator('svg[aria-label^="Hilo"]').evaluate((svg) => {
+      const cota = svg.querySelector('[class*="cotaMedida"]');
+      const texto = Array.from(svg.querySelectorAll('text')).find((t) =>
+        (t.textContent ?? '').includes('del hilo'),
+      );
+      if (!cota || !texto) return null;
+      const caja = texto.getBBox();
+      const n = (a: string) => Number(cota.getAttribute(a));
+      const desde = Math.min(n('x1'), n('x2'));
+      const hasta = Math.max(n('x1'), n('x2'));
+      const solapaX = caja.x < hasta && caja.x + caja.width > desde;
+      const solapaY = n('y1') > caja.y && n('y1') < caja.y + caja.height;
+      return solapaX && solapaY;
+    });
+  // Control: a 2 cm el rótulo va a la derecha del punto y la cota no lo toca
+  await sembrarValor(page, '#distancia', 0.02);
+  await expect(rotulo).toHaveText('a 2,0 cm del hilo');
+  expect(await cotaTachaRotulo()).toBe(false);
+  // 5 cm (el arranque): el rótulo pasa a la izquierda, encima de la cota
+  await sembrarValor(page, '#distancia', 0.05);
+  await expect(rotulo).toHaveText('a 5,0 cm del hilo');
+  expect(await cotaTachaRotulo()).toBe(false);
+});
+
+test('R8 · con θ = 0° el texto no anuncia giro ni trayectoria circular', async ({ page }) => {
+  // HALLAZGO ABIERTO (reinspección 25/09/2026): con θ = 0° la tabla da F = 0 y v⊥ = 0 y el
+  // lienzo ya no dibuja circunferencia, pero la pista dice «Giro horario/antihorario · el tamaño
+  // del círculo sigue al radio real» y el aria-label del SVG, «Trayectoria circular de …»
+  // (page.tsx:559 y 651-656). La partícula avanza en línea recta a lo largo de B.
+  test.fail();
+  const pista = page.locator('[class*="canvasHint"]');
+  const lienzo = page.locator('[class*="canvasSvg"]').first();
+  // Control a 90° (arranque): protón con B saliente, circunferencia en sentido horario
+  await expect(pista).toContainText('Giro horario');
+  await expect(lienzo).toHaveAttribute('aria-label', /circular/);
+  await sembrarValor(page, '#anguloVB', 0);
+  await expect(valorDeFila(page, 'Componente v perpendicular')).toHaveText('0 m/s');
+  await expect(page.locator('[class*="trayectoria"]')).toHaveCount(0);
+  await expect(pista).not.toContainText(/Giro (horario|antihorario)/);
+  await expect(lienzo).not.toHaveAttribute('aria-label', /circular/);
+});
+
+test('a11y · 1348 también en Inducción: «Pausar» sin aria-pressed', async ({ page }) => {
+  // El hallazgo 1348 citaba las pestañas Lorentz e Inducción; el test de arriba cubre Lorentz.
+  await page.getByRole('button', { name: 'Inducción', exact: true }).click();
+  await esperarHidratacion(page, ['#espiras']);
+  const boton = page.getByRole('button', { name: 'Pausar' });
+  await expect(boton).toBeVisible();
+  await expect(boton).not.toHaveAttribute('aria-pressed');
+  await boton.click();
+  await expect(page.getByRole('button', { name: 'Reanudar' })).not.toHaveAttribute('aria-pressed');
 });

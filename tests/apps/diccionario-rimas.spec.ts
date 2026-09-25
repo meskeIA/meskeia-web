@@ -62,6 +62,10 @@ import { aFonemas, escandirPalabra } from '../../app/diccionario-rimas/rimas';
  *      1308» del final.
  *   B. Región role="alert" siempre montada bajo el buscador: con texto sin letras pinta un
  *      aviso, y como la búsqueda devuelve null, el resultado anterior desaparece.
+ *
+ * REINSPECCIÓN (25/09/2026, tras 20ecb78f y 3de61f3c): 1308 y 1309 verificados en el
+ * navegador. Casos nuevos por la cadena reordenada de aFonemas y por el aviso «sin vocales»
+ * en los bloques «Reinspección 25/09/2026» del final.
  */
 
 const RUTA = '/diccionario-rimas/';
@@ -359,5 +363,272 @@ test.describe('diccionario-rimas — sospecha: entrada con letras y sin vocales'
     await expect(aviso).toContainText('«DVD» no tiene ninguna vocal');
     await expect(aviso).toContainText('escríbela como suena');
     await expect(resultado(page)).toHaveCount(0);
+  });
+});
+
+/*
+ * REINSPECCIÓN 25/09/2026 — la cadena de sustituciones de aFonemas tras el reorden de 1308.
+ * El riesgo de mover una sustitución de sitio es romper OTRA grafía. Resuelto a mano ANTES de
+ * ejecutar (fonología del español estándar; convención de la app: distinción c/z ≠ s por
+ * defecto, con interruptor de seseo, y yeísmo siempre):
+ *
+ *   pingüino  pin-güi-no («üi»: dos cerradas distintas → diptongo; manda la segunda, la i),
+ *             llana, núcleo «-ino» → camino, destino, vecino. río y libro solo asuenan (i-o).
+ *   cigüeña   ci-güe-ña, llana, «-eña» /eɲa/ → leña, peña, dueña.
+ *   La misma sílaba en tres grafías, con las palabras reales del diccionario (grep de
+ *   public/data/diccionario-es.txt por -ingüe, -ingue, -inge e -inje; de la última, ninguna):
+ *     /iŋgwe/ bilingüe → monolingüe, pingüe, plurilingüe, quinquelingüe, trilingüe
+ *     /iŋge/  pringue  → chingue, curiquingue, fuñingue, lingue, pechelingue, pendingue,
+ *                         pichelingue, pingue, potingue
+ *     /iŋxe/  esfinge  → alfinge, eringe, faringe, laringe, meninge, rinofaringe, siringe, tinge
+ *   averigüe  a-ve-ri-güe, llana, «-igüe» /igwe/ → las 8 del diccionario en -igüe (rigüe,
+ *             tigüe, coligüe…); NO ligue (/ige/).
+ *   guía      guí-a (gu dígrafo; í-a hiato), 2 sílabas, llana, «-ía» → día, vía.
+ *   guion     monosílabo (Ortografía de 2010: gu dígrafo + diptongo io), aguda, «-on» →
+ *             camión, avión, canción, león.
+ *   aguado    a-gua-do (ante a la u SÍ suena: diptongo ua), 3 sílabas, llana, «-ado» → helado,
+ *             pasado.
+ *   queso     que-so, «-eso» → beso · kilo, ki-lo, «-ilo» → hilo · parque, «-arque» /aɾke/ →
+ *             embarque; NO arce (/aɾθe/).
+ *   examen    e-xa-men, 3 sílabas, llana (acaba en n), «-amen» → certamen, dictamen, velamen;
+ *             NO amén (a-mén: aguda, «-én»). La x cae fuera del núcleo.
+ *   búho      bú-ho (la h intercalada no impide el hiato), 2 sílabas, llana, «-úho» /uo/ →
+ *             dúo, avalúo; mundo solo asuena (u-o). («continuo» NO: es con-ti-nuo, llana en «ti»;
+ *             lo anoté mal a mano y la app acierta.)
+ *   hecho     he-cho, «-echo» → pecho, derecho, techo; NO eco.
+ *   carro     «-arro» /aro/ (vibrante múltiple) → barro, jarro, tarro; caro («-aro», /aɾo/) NO
+ *             en consonante y SÍ en asonante (a-o). Al revés: caro → raro, claro, faro; NO carro.
+ */
+
+/** Sílabas de la ficha, con guiones («pin-güi-no»). */
+async function silabeo(page: Page): Promise<string> {
+  const partes = await resultado(page).locator('[class*="fichaPalabra"] span').allTextContents();
+  return partes.join('-');
+}
+
+/** Todas las palabras del resultado: pide «Ver las N» si la lista viene recortada a 300. */
+async function todasLasPalabras(page: Page): Promise<string[]> {
+  const ver = resultado(page).getByRole('button', { name: /^Ver las / });
+  if (await ver.count()) {
+    const total = Number((await ver.textContent())!.replace(/\D/g, ''));
+    await ver.click();
+    await expect(resultado(page).locator('li')).toHaveCount(total, { timeout: 15000 });
+  }
+  return palabrasVisibles(page);
+}
+
+async function consultar(page: Page, palabra: string, tipo: 'consonante' | 'asonante', ficha: string): Promise<string[]> {
+  await buscar(page, palabra);
+  await pestana(page, tipo);
+  await expect(resultado(page).locator('[class*="fichaDatos"]')).toContainText(ficha);
+  await expect(resultado(page)).toContainText(`que riman en ${tipo} con`);
+  return todasLasPalabras(page);
+}
+
+test.describe('diccionario-rimas — reinspección 25/09/2026: diéresis y las tres grafías de la g', () => {
+  test('pingüino: pin-güi-no, llana, -ino; camino, destino, vecino en consonante', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'pingüino', 'consonante', '3 sílabas · llana · rima desde -ino');
+    expect(await silabeo(page)).toBe('pin-güi-no');
+    for (const w of ['camino', 'destino', 'vecino']) expect(lista, `falta ${w} (-ino)`).toContain(w);
+    for (const w of ['río', 'libro']) expect(lista, `${w} solo asuena (i-o)`).not.toContain(w);
+  });
+
+  test('cigüeña: ci-güe-ña, llana, -eña; leña, peña, dueña', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'cigüeña', 'consonante', '3 sílabas · llana · rima desde -eña');
+    expect(await silabeo(page)).toBe('ci-güe-ña');
+    for (const w of ['leña', 'peña', 'dueña']) expect(lista, `falta ${w} (-eña)`).toContain(w);
+  });
+
+  test('/iŋgwe/, /iŋge/ y /iŋxe/ no se mezclan: bilingüe, pringue y esfinge', async ({ page }) => {
+    await abrir(page);
+
+    const bilingue = await consultar(page, 'bilingüe', 'consonante', 'rima desde -ingüe');
+    for (const w of ['monolingüe', 'pingüe', 'plurilingüe', 'quinquelingüe', 'trilingüe']) {
+      expect(bilingue, `falta ${w} (/iŋgwe/)`).toContain(w);
+    }
+    for (const w of bilingue) expect(w, `${w} no es /iŋgwe/`).toMatch(/ingüe$/);
+
+    const pringue = await consultar(page, 'pringue', 'consonante', 'rima desde -ingue');
+    for (const w of ['chingue', 'curiquingue', 'fuñingue', 'lingue', 'pechelingue', 'pendingue', 'pichelingue', 'pingue', 'potingue']) {
+      expect(pringue, `falta ${w} (/iŋge/)`).toContain(w);
+    }
+    for (const w of pringue) expect(w, `${w} no es /iŋge/`).toMatch(/[^ü]ingue$/);
+
+    const esfinge = await consultar(page, 'esfinge', 'consonante', 'rima desde -inge');
+    for (const w of ['alfinge', 'eringe', 'faringe', 'laringe', 'meninge', 'rinofaringe', 'siringe', 'tinge']) {
+      expect(esfinge, `falta ${w} (/iŋxe/)`).toContain(w);
+    }
+    for (const w of esfinge) expect(w, `${w} no es /iŋxe/`).toMatch(/inge$/);
+  });
+
+  test('averigüe: -igüe con rigüe, tigüe y coligüe; ligue (/ige/) no', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'averigüe', 'consonante', '4 sílabas · llana · rima desde -igüe');
+    for (const w of ['rigüe', 'tigüe', 'coligüe']) expect(lista, `falta ${w} (/igwe/)`).toContain(w);
+    expect(lista, 'ligue es /ige/: la u no suena').not.toContain('ligue');
+    for (const w of lista) expect(w, `${w} no es /igwe/`).toMatch(/igüe$/);
+  });
+});
+
+test.describe('diccionario-rimas — reinspección 25/09/2026: gu, qu, k, x, h, ch y rr', () => {
+  test('guía: guí-a, 2 sílabas, llana, -ía; día y vía', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'guía', 'consonante', '2 sílabas · llana · rima desde -ía');
+    expect(await silabeo(page)).toBe('guí-a');
+    for (const w of ['día', 'vía']) expect(lista, `falta ${w} (-ía)`).toContain(w);
+  });
+
+  test('guion: monosílabo (Ortografía 2010), aguda, -on; camión, avión, canción, león', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'guion', 'consonante', '1 sílaba · aguda · rima desde -on');
+    for (const w of ['camión', 'avión', 'canción', 'león']) expect(lista, `falta ${w} (-ón)`).toContain(w);
+  });
+
+  test('aguado: a-gua-do (la u suena ante a), llana, -ado; helado y pasado', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'aguado', 'consonante', '3 sílabas · llana · rima desde -ado');
+    expect(await silabeo(page)).toBe('a-gua-do');
+    for (const w of ['helado', 'pasado']) expect(lista, `falta ${w} (-ado)`).toContain(w);
+  });
+
+  test('qu, k y c: queso con beso, kilo con hilo, parque con embarque y no con arce', async ({ page }) => {
+    await abrir(page);
+    expect(await consultar(page, 'queso', 'consonante', 'rima desde -eso'), 'queso /eso/ = beso').toContain('beso');
+    expect(await consultar(page, 'kilo', 'consonante', 'rima desde -ilo'), 'kilo /ilo/ = hilo').toContain('hilo');
+    const parque = await consultar(page, 'parque', 'consonante', 'rima desde -arque');
+    expect(parque, 'parque /aɾke/ = embarque').toContain('embarque');
+    expect(parque, 'arce es /aɾθe/').not.toContain('arce');
+  });
+
+  test('examen: e-xa-men, llana, -amen; certamen, dictamen, velamen; amén (aguda) no', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'examen', 'consonante', '3 sílabas · llana · rima desde -amen');
+    expect(await silabeo(page)).toBe('e-xa-men');
+    for (const w of ['certamen', 'dictamen', 'velamen']) expect(lista, `falta ${w} (-amen)`).toContain(w);
+    expect(lista, 'amén es aguda: rima en -én').not.toContain('amén');
+  });
+
+  test('búho: bú-ho (hiato con h), llana, -úho /uo/; dúo y avalúo; mundo solo asuena', async ({ page }) => {
+    await abrir(page);
+    const cons = await consultar(page, 'búho', 'consonante', '2 sílabas · llana · rima desde -úho');
+    expect(await silabeo(page)).toBe('bú-ho');
+    for (const w of ['dúo', 'avalúo']) expect(cons, `falta ${w} (/uo/)`).toContain(w);
+    expect(cons, 'continuo es con-ti-nuo, llana en «ti»').not.toContain('continuo');
+    const ason = await consultar(page, 'búho', 'asonante', 'rima desde -úho');
+    expect(ason, 'mundo asuena u-o').toContain('mundo');
+    expect(ason, 'dúo ya es consonante').not.toContain('dúo');
+  });
+
+  test('hecho: -echo con pecho, derecho y techo; eco no', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'hecho', 'consonante', 'rima desde -echo');
+    for (const w of ['pecho', 'derecho', 'techo']) expect(lista, `falta ${w} (-echo)`).toContain(w);
+    expect(lista, 'eco es /eko/').not.toContain('eco');
+  });
+
+  test('carro y caro: rr ≠ r en consonante, iguales en asonante', async ({ page }) => {
+    await abrir(page);
+    const carro = await consultar(page, 'carro', 'consonante', 'rima desde -arro');
+    for (const w of ['barro', 'jarro', 'tarro']) expect(carro, `falta ${w} (/aro/, rr)`).toContain(w);
+    for (const w of carro) expect(w, `${w} no lleva rr`).toMatch(/rro$/);
+
+    const caro = await consultar(page, 'caro', 'consonante', 'rima desde -aro');
+    for (const w of ['raro', 'claro', 'faro']) expect(caro, `falta ${w} (/aɾo/)`).toContain(w);
+    for (const w of caro) expect(w, `${w} lleva rr: no rima en consonante con caro`).not.toMatch(/rro$/);
+
+    const carroAson = await consultar(page, 'carro', 'asonante', 'rima desde -arro');
+    expect(carroAson, 'caro asuena a-o con carro').toContain('caro');
+  });
+});
+
+test.describe('diccionario-rimas — reinspección 25/09/2026: rechazo y rendimiento', () => {
+  test('«psst» y «brr» (sin vocal) y «3,14» y «¿?» (sin letras) avisan y no pintan resultado', async ({ page }) => {
+    await abrir(page);
+    const aviso = page.locator('[role="alert"]:not(#__next-route-announcer__)');
+    for (const [entrada, motivo] of [
+      ['psst', 'no tiene ninguna vocal'],
+      ['brr', 'no tiene ninguna vocal'],
+      ['3,14', 'no contiene ninguna letra'],
+      ['¿?', 'no contiene ninguna letra'],
+    ] as const) {
+      await buscar(page, entrada);
+      await expect(aviso, `«${entrada}»`).toContainText(`«${entrada}» ${motivo}`);
+      await expect(resultado(page), `«${entrada}» no debe pintar resultado`).toHaveCount(0);
+    }
+  });
+
+  // Medido el 25/09/2026: «cantar» da 10.114 consonantes (todo infinitivo en -ar). Se pintan
+  // 300 en ~20 ms y las 10.114 con «Ver las» en ~0,4 s, con una tarea larga máxima de 254 ms.
+  // Los topes de aquí son 10 veces más holgados: vigilan que la página no se congele, no la cifra.
+  test('«cantar»: miles de rimas sin congelar la página (300 de golpe, el resto bajo petición)', async ({ page }) => {
+    await abrir(page);
+    const t0 = Date.now();
+    await buscar(page, 'cantar');
+    await pestana(page, 'consonante');
+    await expect(resultado(page)).toContainText('que riman en consonante con cantar');
+    expect(Date.now() - t0, 'hasta pintar el primer resultado').toBeLessThan(3000);
+    await expect(resultado(page).locator('li')).toHaveCount(300);
+
+    const ver = resultado(page).getByRole('button', { name: /^Ver las / });
+    const total = Number((await ver.textContent())!.replace(/\D/g, ''));
+    expect(total, 'cantar tiene miles de rimas en -ar').toBeGreaterThan(5000);
+    const t1 = Date.now();
+    await ver.click();
+    await expect(resultado(page).locator('li')).toHaveCount(total, { timeout: 15000 });
+    expect(Date.now() - t1, 'hasta pintar todas').toBeLessThan(5000);
+  });
+});
+
+/*
+ * HALLAZGOS ABIERTOS DE LA REINSPECCIÓN (25/09/2026)
+ *
+ *   C. El aviso «no tiene ninguna vocal» (3de61f3c) salta en la región role="alert" con la
+ *      PRIMERA letra de casi cualquier palabra: al teclear «tren», «t» y «tr» no tienen vocal
+ *      todavía. role="alert" es asertivo: el lector de pantalla interrumpe el eco del tecleo
+ *      para leer dos veces un párrafo de 40 palabras sobre siglas. A mano: una palabra que se
+ *      está escribiendo no es una entrada inválida; mientras se teclea «tren» la región de
+ *      alerta no debería recibir ningún texto.
+ *   D. La región aria-live="polite" del resultado envuelve la lista entera (300 <li>, 6.153
+ *      caracteres con «camino»; 10.114 <li> tras «Ver las» con «cantar»), y se reemplaza a
+ *      cada tecla. Lo que hay que anunciar es el recuento, no cientos de palabras.
+ */
+test.describe('diccionario-rimas — hallazgos abiertos de la reinspección 25/09/2026', () => {
+  test('tecleando «tren», la región role="alert" no interrumpe con «no tiene ninguna vocal»', async ({ page }) => {
+    test.fail(); // Hallazgo C del acta 25/09/2026 (introducido por 3de61f3c)
+    await abrir(page);
+    await page.evaluate(() => {
+      const w = window as unknown as { __alertas: string[] };
+      w.__alertas = [];
+      const region = document.querySelector('[role="alert"]:not(#__next-route-announcer__)');
+      if (!region) throw new Error('no está la región role="alert" de la app');
+      new MutationObserver(() => {
+        const t = region.textContent?.trim();
+        if (t) w.__alertas.push(t);
+      }).observe(region, { childList: true, subtree: true, characterData: true });
+    });
+    await page.locator('#palabra').pressSequentially('tren');
+    await esperarValorEnReact(page, '#palabra', 'tren');
+    await expect(resultado(page)).toContainText('rima desde -en');
+    const alertas = await page.evaluate(() => (window as unknown as { __alertas: string[] }).__alertas);
+    expect(alertas, 'alertas asertivas mientras se teclea una palabra válida').toEqual([]);
+  });
+
+  test('la región viva del resultado anuncia el recuento, no la lista de palabras', async ({ page }) => {
+    test.fail(); // Hallazgo D del acta 25/09/2026
+    await abrir(page);
+    await buscar(page, 'camino');
+    await expect(page.getByText('que riman en consonante con camino')).toBeVisible();
+    // Fuera el contenido de <EducationalSection>: es un componente compartido (también lleva
+    // aria-live, con sus 17 <li>) y no se imputa a la app.
+    const enRegionViva = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('[aria-live]:not(#__next-route-announcer__), [role="alert"], [role="status"]')]
+          .filter((r) => !String(r.className).includes('EducationalSection'))
+          .map((r) => r.querySelectorAll('li').length)
+          .reduce((a, b) => a + b, 0),
+    );
+    expect(enRegionViva, 'palabras de la lista dentro de una región aria-live').toBe(0);
   });
 });

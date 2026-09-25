@@ -396,3 +396,332 @@ test.describe('CASO 3 · contenido y aviso sanitario', () => {
     await expect(aviso).toContainText('profesional sanitario');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// REINSPECCIÓN del 25/09/2026 (la app cambió en c7f08196 y 0d54c8f9)
+//
+// Los hallazgos 1355-1361 se re-ejecutaron con su caso y están reparados. Lo que sigue son
+// los casos nuevos que pasan por el código tocado, resueltos a mano antes de abrir la app:
+//
+//   · Móvil 360 px: la sección deja 360 − 2·24 = 312 px, la tarjeta del SVG resta 2·16 de
+//     relleno y 2·1 de borde → el SVG mide 278 px para un viewBox de 528 → escala 0,5265.
+//     Rótulo de etapa (fontSize 10) → 5,27 px; número (12) → 6,32 px; círculo (r 17) →
+//     17,9 px de diámetro. Lighthouse («Document doesn't use legible font sizes»,
+//     developer.chrome.com/docs/lighthouse/seo/font-size): por debajo de 12 px no se lee
+//     sin ampliar. Los círculos, en cambio, están a más de 24 px unos de otros, así que
+//     cumplen WCAG 2.5.8 por la excepción de separación.
+//   · «Célula huésped» (#48A9A6, L = 0,325) pasó en la reparación de 1361 de y=365 (sobre
+//     la tarjeta: 2,80:1 en claro, 4,93:1 en oscuro) a y=335, DENTRO de la célula: sobre el
+//     borde del degradado (~#C9E6F0, L ≈ 0,75) da ≈ 2,1:1, y en oscuro sobre #1E3A4A
+//     (L = 0,038) 4,26:1. «(ADN celular)» (#2E86AB, L = 0,206) sobre el núcleo (~#B3D1E6,
+//     L ≈ 0,61) ≈ 2,6:1. Texto pequeño: exige 4,5:1.
+//   · Rótulo activo (--primary-texto) sobre la tarjeta: 5,47:1 en claro y 4,93:1 en oscuro
+//     (#3FA5D1 sobre #2D2D2D); anillo de foco (--primary): 4,11:1 y 4,93:1, ≥ 3:1.
+// ═════════════════════════════════════════════════════════════════════════════
+
+function rgbDe(s: string): number[] {
+  return (s.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+}
+
+function contrasteWcag(a: number[], b: number[]): number {
+  const canal = (c: number) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+  const l1 = lum(a);
+  const l2 = lum(b);
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
+
+/** Cambia de tema y espera a que la tarjeta del SVG termine la transición a su --bg-card. */
+async function ponerTema(page: Page, tema: 'light' | 'dark'): Promise<void> {
+  await page.evaluate((t) => {
+    document.documentElement.dataset.theme = t;
+  }, tema);
+  const destino = await page.evaluate(() => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background: var(--bg-card); transition: none; position: absolute;';
+    document.body.appendChild(d);
+    const c = getComputedStyle(d).backgroundColor;
+    d.remove();
+    return c;
+  });
+  await expect
+    .poll(() => page.locator('[class*="svgContainer"]').first().evaluate((el) => getComputedStyle(el).backgroundColor))
+    .toBe(destino);
+}
+
+/**
+ * Fondo REAL bajo un rótulo del SVG (hay degradados): se oculta el texto, se fotografía su
+ * caja y se promedian los píxeles en el navegador.
+ */
+async function fondoMedio(page: Page, texto: Locator): Promise<number[]> {
+  await texto.scrollIntoViewIfNeeded();
+  const caja = await texto.boundingBox();
+  if (!caja) throw new Error('El rótulo no tiene caja.');
+  await texto.evaluate((el) => {
+    (el as SVGTextElement).style.visibility = 'hidden';
+  });
+  const png = (await page.screenshot({ clip: caja })).toString('base64');
+  await texto.evaluate((el) => {
+    (el as SVGTextElement).style.visibility = '';
+  });
+  return page.evaluate(async (b64) => {
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + b64;
+    await img.decode();
+    const lienzo = document.createElement('canvas');
+    lienzo.width = img.width;
+    lienzo.height = img.height;
+    const ctx = lienzo.getContext('2d')!;
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(0, 0, lienzo.width, lienzo.height).data;
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      r += d[i];
+      g += d[i + 1];
+      b += d[i + 2];
+      n++;
+    }
+    return [r / n, g / n, b / n];
+  }, png);
+}
+
+test.describe('REINSPECCIÓN 25/09/2026 · lo que tocó la reparación', () => {
+  test('el aviso sanitario es médico, severity high, sin pliegue, fuera de la guía y antes del diagrama (1358)', async ({ page }) => {
+    // _private/DISCLAIMER-POLICY.md, nivel 2 ALTO: collapsible={false}, severity="high", y
+    // nunca dentro de <EducationalSection>. El componente pinta role="note" para high y no
+    // monta botón de pliegue (aria-expanded) cuando la severidad no lo permite.
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    const aviso = page.locator('[class*="disclaimerCard"]');
+    await expect(aviso).toHaveCount(1);
+    await expect(aviso).toHaveClass(/variant-medical/);
+    await expect(aviso).toHaveClass(/severity-high/);
+    await expect(aviso).toHaveAttribute('role', 'note');
+    await expect(aviso.locator('button[aria-expanded]')).toHaveCount(0);
+    expect(await aviso.evaluate((el) => el.closest('[class*="EducationalSection"]') === null)).toBe(true);
+    expect(
+      await aviso.evaluate((el) => {
+        const svg = document.querySelector('svg[role="group"]');
+        return Boolean(svg && el.compareDocumentPosition(svg) & Node.DOCUMENT_POSITION_FOLLOWING);
+      }),
+    ).toBe(true);
+  });
+
+  test('teclado: Enter en el círculo 3 abre su ficha, el foco sigue en él y «Cerrar» lo devuelve a la lista (1360)', async ({ page }) => {
+    // ENTRADA Tab hasta «Etapa 3», Enter → ESPERADO ficha «Liberación del genoma» y el foco en
+    // el mismo círculo (es un conmutador). Cuatro Tab más (4, 5, 6 y «Cerrar»: el título tiene
+    // tabIndex −1) y Enter → ESPERADO foco en el botón 3 de la lista, que vuelve a montarse.
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    await circulo(page, 1).focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(circulo(page, 3)).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(tituloEtapa(page)).toHaveText('Liberación del genoma');
+    await expect(circulo(page, 3)).toBeFocused();
+    await expect(circulo(page, 3)).toHaveAttribute('aria-pressed', 'true');
+    for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Cerrar detalle de etapa' })).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(tituloEtapa(page)).toHaveCount(0);
+    await expect(botonesLista(page).nth(2)).toBeFocused();
+  });
+
+  test('en oscuro, el rótulo activo se lee (≥ 4,5:1) y el anillo de foco se ve (≥ 3:1)', async ({ page }) => {
+    // 0d54c8f9 sacó los rótulos del círculo y les dio --primary-texto al activarse; el test de
+    // la SOSPECHA lo mide en claro. ESPERADO en oscuro: #3FA5D1 sobre #2D2D2D = 4,93:1 en los
+    // seis, y el anillo (--primary, el mismo #3FA5D1) visible con Tab a 4,93:1.
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    await ponerTema(page, 'dark');
+    for (let n = 1; n <= 6; n++) {
+      await circulo(page, n).locator('circle[r="17"]').click();
+      await expect(circulo(page, n)).toHaveAttribute('aria-pressed', 'true');
+      const m = await circulo(page, n).evaluate((g) => ({
+        texto: getComputedStyle(g.querySelectorAll('text')[1]).fill,
+        fondo: getComputedStyle((g as SVGGElement).ownerSVGElement!.parentElement!).backgroundColor,
+      }));
+      expect(contrasteWcag(rgbDe(m.texto), rgbDe(m.fondo)), `rótulo activo de la etapa ${n}`).toBeGreaterThanOrEqual(4.5);
+      await circulo(page, n).locator('circle[r="17"]').click();
+      await expect(circulo(page, n)).toHaveAttribute('aria-pressed', 'false');
+    }
+    await circulo(page, 2).focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(circulo(page, 1)).toBeFocused();
+    const anillo = await circulo(page, 1).evaluate((g) => {
+      const a = g.querySelector('circle[r="23"]') as SVGCircleElement;
+      return {
+        opacidad: getComputedStyle(a).opacity,
+        trazo: getComputedStyle(a).stroke,
+        fondo: getComputedStyle((g as SVGGElement).ownerSVGElement!.parentElement!).backgroundColor,
+      };
+    });
+    expect(anillo.opacidad).toBe('1');
+    expect(contrasteWcag(rgbDe(anillo.trazo), rgbDe(anillo.fondo))).toBeGreaterThanOrEqual(3);
+  });
+
+  test('HALLAZGO · los rótulos fijos del diagrama no llegan a 4,5:1 («Célula huésped», «(ADN celular)»)', async ({ page }) => {
+    // Hallazgo de la reinspección del 25/09/2026. Al mover «Célula huésped» dentro de la célula
+    // (reparación de 1361) quedó a ~2,2:1 en claro sobre el degradado y a 4,26:1 en oscuro
+    // sobre #1E3A4A; «(ADN celular)», #2E86AB sobre el núcleo, ~2,5:1 en los dos temas.
+    // ENTRADA cargar la página, medir cada rótulo sobre el fondo real en claro y en oscuro →
+    // ESPERADO ≥ 4,5:1 (texto pequeño: 11 y 9 unidades, ~9 y ~7 px en escritorio).
+    test.fail();
+    test.setTimeout(90_000);
+    await irAlVisualizador(page);
+    const suspensos: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await ponerTema(page, tema);
+      for (const rotulo of ['Célula huésped', '(ADN celular)']) {
+        const texto = page.locator('svg[role="group"] g[aria-hidden="true"] text', { hasText: rotulo }).first();
+        const fill = await texto.evaluate((el) => getComputedStyle(el).fill);
+        const c = contrasteWcag(rgbDe(fill), await fondoMedio(page, texto));
+        if (c < 4.5) suspensos.push(`${tema} · «${rotulo}» ${c.toFixed(2)}:1`);
+      }
+    }
+    expect(suspensos).toEqual([]);
+  });
+});
+
+test.describe('REINSPECCIÓN 25/09/2026 · móvil de 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 800 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('cada círculo se abre y se cierra con un toque en su centro, sin scroll horizontal (1359)', async ({ page }) => {
+    // Círculos de 17,9 px, separados más de 24 px: el toque en el centro debe acertar.
+    test.setTimeout(90_000);
+    await irAlVisualizador(page);
+    const ancho = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(ancho).toBeLessThanOrEqual(0);
+    const nombres = ['Adhesión', 'Entrada', 'Liberación del genoma', 'Replicación y transcripción', 'Ensamblaje', 'Liberación'];
+    for (let n = 1; n <= 6; n++) {
+      const c = circulo(page, n).locator('circle[r="17"]');
+      await c.scrollIntoViewIfNeeded();
+      const bb = await c.boundingBox();
+      if (!bb) throw new Error(`El círculo ${n} no tiene caja.`);
+      await page.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2);
+      await expect(tituloEtapa(page)).toHaveText(nombres[n - 1]);
+      await page.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2);
+      await expect(tituloEtapa(page)).toHaveCount(0);
+    }
+  });
+
+  test('HALLAZGO · los rótulos y números del diagrama se pintan a 5-6 px y no se leen', async ({ page }) => {
+    // Hallazgo de la reinspección del 25/09/2026. El SVG escala a 0,5265 (278 px para un
+    // viewBox de 528): el rótulo de 10 unidades sale a 5,27 px y el número de 12 a 6,32 px.
+    // ENTRADA 360 × 800 → ESPERADO todo rótulo y número VISIBLE del diagrama ≥ 12 px (umbral de
+    // Lighthouse para texto legible en móvil) · OBTENIDO 5,27 y 6,32 px.
+    test.fail();
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    const pequenos = await page.locator('g[role="button"]').evaluateAll((gs) =>
+      gs.flatMap((g) => {
+        const escala = (g as SVGGElement).getScreenCTM()?.a ?? 1;
+        return [...g.querySelectorAll('text')]
+          .filter((t) => {
+            const cs = getComputedStyle(t);
+            return cs.display !== 'none' && cs.visibility !== 'hidden' && t.getBoundingClientRect().width > 0;
+          })
+          .map((t) => ({ texto: t.textContent ?? '', px: parseFloat(getComputedStyle(t).fontSize) * escala }))
+          .filter((m) => m.px < 12)
+          .map((m) => `«${m.texto}» ${m.px.toFixed(2)} px`);
+      }),
+    );
+    expect(pequenos).toEqual([]);
+  });
+});
+
+test.describe('REINSPECCIÓN 25/09/2026 · contenido cotejado con fuente', () => {
+  test('lo verificado sigue en su sitio: lisis/gemación, episoma frente a provirus, lítico/lisogénico acotado a fagos', async ({ page }) => {
+    // OpenStax Microbiology (2016), 6.2 «The Viral Life Cycle»: la gripe «is one of the few RNA
+    // viruses that replicates in the nucleus», sale por gemación y la célula «is not killed»;
+    // el herpes queda latente en ganglios nerviosos; el genoma integrado del retrovirus es el
+    // «provirus». Lisis y ciclo lisogénico, en la app, atribuidos a bacteriófagos.
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    const integracion = page.locator('table tbody tr').filter({ hasText: 'Integración en huésped' });
+    await expect(integracion.locator('td').nth(1)).toContainText('los herpesvirus persisten como episoma, sin integrarse');
+    await expect(integracion.locator('td').nth(3)).toContainText('provirus');
+    await botonesLista(page).filter({ hasText: 'Liberación del genoma' }).click();
+    await expect(fichaEtapa(page)).toContainText('viajan al núcleo, donde la gripe replica su genoma');
+    await page.getByRole('button', { name: 'Cerrar detalle de etapa' }).click();
+    await botonesLista(page).nth(5).click();
+    await expect(fichaEtapa(page)).toContainText('Es típica de bacteriófagos y algunos virus animales (poliovirus)');
+    await expect(fichaEtapa(page)).toContainText('Es el mecanismo del VIH y de la gripe');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('[class*="eduCard"] h4', { hasText: 'Ciclo lítico' })).toHaveText(
+      'Ciclo lítico vs. ciclo lisogénico (bacteriófagos)',
+    );
+  });
+
+  test('HALLAZGO · ADN, «Lugar de replicación»: falta la excepción de los poxvirus, que replican en el citoplasma', async ({ page }) => {
+    // Hallazgo de la reinspección del 25/09/2026. OpenStax Microbiology 6.2: «Most DNA viruses
+    // can replicate inside the nucleus, with an exception observed in the large DNA viruses,
+    // such as the poxviruses, that can replicate in the cytoplasm». La reparación de 1355 puso
+    // la excepción de la gripe en la columna ARN; la ADN sigue diciendo «Núcleo celular».
+    // ENTRADA pestaña cualquiera, fila «Lugar de replicación», columna Virus ADN → ESPERADO
+    // menciona los poxvirus (o la viruela) · OBTENIDO «Núcleo celular».
+    test.fail();
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    const fila = page.locator('table tbody tr').filter({ hasText: 'Lugar de replicación' });
+    await expect(fila.locator('td').nth(1)).toContainText(/poxvirus|viruela/i);
+  });
+
+  test('HALLAZGO · ARN, «Tasa de mutación»: «sin corrección de errores» no vale para SARS-CoV-2, que la tiene', async ({ page }) => {
+    // Hallazgo de la reinspección del 25/09/2026. Robson et al., «Coronavirus RNA
+    // Proofreading: Molecular Basis and Therapeutic Targeting», Mol Cell 2020;79:710-727
+    // (PMID 32853546): «the capacity of CoVs to proofread and remove mismatched nucleotides
+    // during genome replication and transcription» (exonucleasa nsp14). La fila de ejemplos de
+    // la misma columna pone SARS-CoV-2.
+    // ENTRADA fila «Tasa de mutación», columna Virus ARN → ESPERADO la excepción de los
+    // coronavirus (o que no afirme «sin corrección de errores» para todos) · OBTENIDO «Alta
+    // (sin corrección de errores)».
+    test.fail();
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    const celda = page.locator('table tbody tr').filter({ hasText: 'Tasa de mutación' }).locator('td').nth(2);
+    const texto = (await celda.textContent()) ?? '';
+    expect(/coronavirus/i.test(texto) || !/sin corrección de errores/i.test(texto), `celda: «${texto}»`).toBe(true);
+  });
+
+  test('HALLAZGO · el ciclo lítico de los fagos no «sigue las 6 etapas del visualizador»', async ({ page }) => {
+    // Hallazgo de la reinspección del 25/09/2026. OpenStax Microbiology 6.2: «There are five
+    // stages in the bacteriophage lytic cycle» (attachment, penetration, biosynthesis,
+    // maturation, release) y en la penetración «The phage head and remaining components remain
+    // outside the bacteria»: no hay decapsidación dentro de la célula (la etapa 3 de la app).
+    // ENTRADA «Ver guía educativa», tarjeta del ciclo lítico → ESPERADO sin «sigue las 6 etapas
+    // del visualizador» · OBTENIDO esa frase.
+    test.fail();
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('[class*="eduCard"]').filter({ hasText: 'Ciclo lítico' });
+    await expect(tarjeta).toBeVisible();
+    await expect(tarjeta).not.toContainText('sigue las 6 etapas del visualizador');
+  });
+
+  test('HALLAZGO · «~8%» de retrovirus endógenos va sin el espacio duro antes del %', async ({ page }) => {
+    // Hallazgo de la reinspección del 25/09/2026. Regla del CLAUDE.md global (25/09/2026):
+    // «15 %», separado con espacio duro U+00A0.
+    // ENTRADA pestaña Retrovirus → ESPERADO «8 %» con U+00A0 · OBTENIDO «~8%».
+    test.fail();
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    await page.getByRole('button', { name: 'Retrovirus', exact: true }).click();
+    await expect(page.locator('[class*="tipoCard"]')).toContainText('8 %');
+  });
+});

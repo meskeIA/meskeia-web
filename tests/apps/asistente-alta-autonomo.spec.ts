@@ -1,5 +1,10 @@
 import { test, expect, Page, Locator } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { TARIFA_PLANA_2025 } from '../../data/fiscal/autonomos';
+import { SMI_2026 } from '../../data/fiscal/smi';
+import { AUTONOMO_SOCIETARIO_2025 } from '../../data/fiscal/sociedades';
 
 /**
  * asistente-alta-autonomo — generado por /inspector el 24/09/2026.
@@ -27,8 +32,16 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * ⚠️ es-ES NO agrupa las cifras de cuatro dígitos (minimumGroupingDigits = 2): «1510,57 €»
  * sin punto y «18.322,54 €» con él. Es el formateador compartido, no un defecto de la app.
  *
- * REGRESIONES: al final, una por hallazgo reparado el 24/09/2026 (1370-1375), con la fuente
+ * REGRESIONES: al final, una por hallazgo reparado el 24/09/2026 (1370-1377), con la fuente
  * de cada valor esperado en su comentario.
+ *
+ * REINSPECCIÓN 25/09/2026 — tabla de tramos cotejada contra el texto del BOE
+ * (Orden PJC/297/2026, art. 18, BOE-A-2026-7296):
+ *   tabla reducida: ≤ 670 · > 670 y ≤ 900 · > 900 y < 1.166,70
+ *   tabla general:  ≥ 1.166,70 y ≤ 1.300 · > 1.300 y ≤ 1.500 · … · > 4.050 y ≤ 6.000 · > 6.000
+ * Es decir: todas las fronteras cierran por arriba (≤) MENOS la de 1.166,70, que pertenece al
+ * tramo SIGUIENTE (el primero de la tabla general, tramo 4 de TRAMOS_RETA_2025).
+ * Los casos con `test.fail()` vigilan hallazgos abiertos del acta del 25/09/2026.
  */
 
 const RUTA = '/asistente-alta-autonomo/';
@@ -312,4 +325,291 @@ test('24/09 · IAE: las personas físicas están exentas sin límite de cifra (a
   expect(html).toContain('Las personas físicas están exentas del pago sea cual sea su facturación');
   // Y las cifras del FAQPage salen de data/fiscal: la tarifa plana, 80 €.
   expect(html).toContain('cuota reducida de 80 €/mes durante los primeros 12 meses');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REINSPECCIÓN 25/09/2026
+// ─────────────────────────────────────────────────────────────────────────────
+
+const campoRendimientos = (page: Page) =>
+  page.getByRole('textbox', { name: 'Rendimientos netos mensuales previstos' });
+/** El <strong>Tramo N</strong> del texto de la horquilla. */
+const etiquetaTramo = (page: Page) => page.locator('strong', { hasText: /^Tramo \d+$/ });
+
+async function escribirRendimientos(page: Page, valor: string): Promise<Locator> {
+  const campo = campoRendimientos(page);
+  await campo.fill(valor);
+  await esperarValorEnReact(page, campo, valor);
+  return campo;
+}
+
+/**
+ * Contraste del texto de `selector` contra su fondo REAL: compone las capas con alfa y los
+ * degradados de los ancestros hasta el primer fondo opaco, y devuelve el peor caso.
+ */
+async function contraste(page: Page, selector: string): Promise<number> {
+  return page.locator(selector).first().evaluate((el) => {
+    const parse = (c: string): number[] | null => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return null;
+      const p = m[1].split(',').map(s => parseFloat(s));
+      if (p.length < 4) p.push(1);
+      return p;
+    };
+    const lum = (rgb: number[]) => {
+      const [r, g, b] = rgb.slice(0, 3).map(v => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const componer = (arriba: number[], abajo: number[]) =>
+      [0, 1, 2].map(i => arriba[i] * arriba[3] + abajo[i] * (1 - arriba[3])).concat(1);
+    const capas: { color?: number[]; paradas?: number[][] }[] = [];
+    let base: number[] = [255, 255, 255, 1];
+    let n: Element | null = el;
+    while (n) {
+      const cs = getComputedStyle(n);
+      if (cs.backgroundImage.includes('gradient')) {
+        const paradas = [...cs.backgroundImage.matchAll(/rgba?\([^)]+\)/g)].map(m => parse(m[0]) as number[]);
+        capas.push({ paradas });
+      }
+      const fondo = parse(cs.backgroundColor);
+      if (fondo && fondo[3] > 0) {
+        if (fondo[3] >= 0.99) { base = fondo; break; }
+        capas.push({ color: fondo });
+      }
+      n = n.parentElement;
+    }
+    let fondos: number[][] = [base];
+    for (const capa of capas.reverse()) {
+      if (capa.color) fondos = fondos.map(f => componer(capa.color as number[], f));
+      else fondos = fondos.flatMap(f => (capa.paradas as number[][]).map(p => componer(p, f)));
+    }
+    const texto = parse(getComputedStyle(el).color) as number[];
+    return Math.min(...fondos.map(f => {
+      const t = texto[3] < 1 ? componer(texto, f) : texto;
+      const l1 = lum(t), l2 = lum(f);
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    }));
+  });
+}
+
+test('REGRESIÓN 1376 · type="button", pestañas con aria-pressed, fases con aria-expanded y emojis ocultos', async ({ page }) => {
+  // Antes: type=null en pestañas, fases, «Reiniciar todo» y epígrafes; el ✕ sin aria-label.
+  const sinType = await page.locator('button').evaluateAll(bs =>
+    bs.filter(b => b.getAttribute('type') !== 'button').map(b => (b.textContent ?? '').trim().slice(0, 30)));
+  expect(sinType).toEqual([]);
+
+  const pestana = (n: RegExp) => page.getByRole('button', { name: n });
+  await expect(pestana(/Checklist/)).toHaveAttribute('aria-pressed', 'true');
+  await expect(pestana(/Mis Datos/)).toHaveAttribute('aria-pressed', 'false');
+  await expect(pestana(/Checklist/).locator('span[aria-hidden="true"]')).toHaveText('✅');
+
+  // Fase 1 abierta al cargar; al pulsar la 2, la 2 se abre y la 1 se cierra
+  const fases = page.locator('button[class*="faseHeader"]');
+  await expect(fases.nth(0)).toHaveAttribute('aria-expanded', 'true');
+  await fases.nth(1).click();
+  await expect(fases.nth(1)).toHaveAttribute('aria-expanded', 'true');
+  await expect(fases.nth(0)).toHaveAttribute('aria-expanded', 'false');
+
+  await pestana(/Mis Datos/).click();
+  await expect(pestana(/Mis Datos/)).toHaveAttribute('aria-pressed', 'true');
+  const buscar = page.getByRole('button', { name: 'Ver epígrafes IAE frecuentes' });
+  await expect(buscar).toHaveAttribute('aria-expanded', 'false');
+  await buscar.click();
+  await expect(page.getByRole('button', { name: 'Cerrar la lista de epígrafes' })).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('button[class*="epigrafeItem"]').first()).toHaveAttribute('type', 'button');
+});
+
+test('REGRESIÓN 1377 · las cifras normativas de la prosa son las de data/fiscal', async ({ page }) => {
+  // Valores literales, cotejados con el módulo: si data/fiscal cambia, este test obliga a
+  // mirar que la página lo haya seguido (antes eran literales escritos a mano en page.tsx).
+  //   TARIFA_PLANA_2025.cuota = 80 · SMI_2026.anual = 17.094 · societario 514,99 → «~515 €»
+  expect(TARIFA_PLANA_2025.cuota).toBe(80);
+  expect(SMI_2026.anual).toBe(17094);
+  expect(Math.round(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual)).toBe(515);
+
+  expect(await texto(page.locator('[class*="infoCard"]').filter({ hasText: 'Tarifa plana' }))).toContain('80,00 €/mes');
+  const cuerpo = limpiar((await page.locator('body').textContent()) ?? '');
+  expect(cuerpo).toContain('(17.094 € en 2026)');
+  expect(cuerpo).toContain('del SMI, 17.094 € anuales en 2026');
+  await abrirCostes(page);
+  expect(await texto(page.locator('table tr').filter({ hasText: 'Cuota Seg. Social' }))).toContain('~515 €/mes');
+});
+
+test('25/09 · tramo intermedio de 2026: 2.500 €/mes cae en el tramo 10', async ({ page }) => {
+  // Orden PJC/297/2026, art. 18, tabla general: «> 2.330 y ≤ 2.760» → base 1.356,21 a 2.760,00
+  // (tramo 10 de TRAMOS_RETA_2025).
+  //   base mínima: 1.356,21 × 31,50 % = 427,20615 → 427,21 €
+  //   ahorro con tarifa plana: (427,20615 − 80) × 12 = 4.166,4738 → 4166,47 €
+  //   base máxima: 2.760 × 31,50 % = 869,40 €
+  //   personalizada 1.000 (con el foco) → se acota a 1.356,21 → 427,21 €; al salir, el campo 1356.21
+  await abrirCostes(page);
+  await escribirRendimientos(page, '2.500');
+  await expect(etiquetaTramo(page)).toHaveText('Tramo 10');
+  expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('1356,21 €');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('427,21 €');
+  expect(await texto(ahorro(page))).toBe('4166,47 €');
+  expect(await texto(filaCoste(page, 'Cuota autónomo (anual)'))).toBe('960,00 €');
+
+  await elegirBase(page, 'maxima');
+  expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('2760,00 €');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('869,40 €');
+
+  await elegirBase(page, 'personalizada');
+  const campo = await escribirBase(page, '1000');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('427,21 €');
+  await campo.blur();
+  await expect(campo).toHaveValue('1356.21');
+});
+
+test('25/09 · fronteras que cierran por arriba (≤ 670, ≤ 900, ≤ 6.000) y la de 1.166,69', async ({ page }) => {
+  // Orden PJC/297/2026, art. 18: «≤ 670», «> 670 y ≤ 900», «> 900 y < 1.166,70»,
+  // «> 4.050 y ≤ 6.000», «> 6.000». Cuota mínima = base mínima del tramo × 31,50 %:
+  //   670      → tramo 1:  653,59 → 205,880850 → 205,88 €
+  //   670,01   → tramo 2:  718,95 → 226,469250 → 226,47 €
+  //   900      → tramo 2:  718,95 → 226,47 €
+  //   1.166,69 → tramo 3:  849,67 → 267,646050 → 267,65 €
+  //   6.000    → tramo 14: 1.732,03 → 545,589450 → 545,59 €
+  //   6.000,01 → tramo 15: 1.928,10 → 607,351500 → 607,35 €
+  await abrirCostes(page);
+  const casos: [string, string, string][] = [
+    ['670', 'Tramo 1', '205,88 €'],
+    ['670,01', 'Tramo 2', '226,47 €'],
+    ['900', 'Tramo 2', '226,47 €'],
+    ['1.166,69', 'Tramo 3', '267,65 €'],
+    ['6.000', 'Tramo 14', '545,59 €'],
+    ['6.000,01', 'Tramo 15', '607,35 €'],
+  ];
+  for (const [rend, tramo, cuota] of casos) {
+    await escribirRendimientos(page, rend);
+    await expect(etiquetaTramo(page), rend).toHaveText(tramo);
+    expect(await texto(filaCuota(page, 'Cuota mensual normal')), rend).toBe(cuota);
+  }
+});
+
+test('25/09 · HALLAZGO · 1.166,70 €/mes es el primer tramo de la tabla GENERAL, no el último de la reducida', async ({ page }) => {
+  test.fail(); // Hallazgo del acta 25/09/2026: tramoPorRendimientos usa «≤ rendimientoMax» también en 1.166,70
+  // Orden PJC/297/2026, art. 18: tramo 3 «> 900 y < 1.166,70»; tabla general, tramo 1
+  // «≥ 1.166,70 y ≤ 1.300» (tramo 4 de TRAMOS_RETA_2025, base 950,98 a 1.300,00).
+  //   base mínima: 950,98 × 31,50 % = 299,5587 → 299,56 €
+  // Hoy la app da el tramo 3: base 849,67 y cuota 267,65 €.
+  await abrirCostes(page);
+  await escribirRendimientos(page, '1.166,70');
+  await expect(etiquetaTramo(page)).toHaveText('Tramo 4');
+  expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('950,98 €');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('299,56 €');
+});
+
+test('25/09 · rendimientos que no son un importe válido: negativo, vacío y texto', async ({ page }) => {
+  // Negativo: la tabla dice «≤ 670», así que un rendimiento negativo es tramo 1 (653,59 → 205,88 €),
+  // nunca una cuota negativa; al salir del campo, NumberInput (min 0) lo deja en 0.
+  // Vacío: sin tramo; base mínima general 653,59 → 205,88 €. Texto: el control lo rechaza.
+  await abrirCostes(page);
+  const campo = await escribirRendimientos(page, '-500');
+  await expect(etiquetaTramo(page)).toHaveText('Tramo 1');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('205,88 €');
+  await campo.blur();
+  await expect(campo).toHaveValue('0');
+  await expect(etiquetaTramo(page)).toHaveText('Tramo 1');
+
+  await escribirRendimientos(page, '');
+  await expect(etiquetaTramo(page)).toHaveCount(0);
+  await expect(page.locator('[class*="basesInfo"]').filter({ hasText: 'Sin rendimientos' })).toBeVisible();
+  expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('653,59 €');
+  expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('205,88 €');
+
+  await campo.pressSequentially('abc');
+  await expect(campo).toHaveValue('');
+});
+
+test('25/09 · IAE: la exención de las personas físicas, también en el FAQ visible y en el paso 3', async ({ page }) => {
+  // Art. 82.1.c TRLRHL (RDL 2/2004), texto consolidado del BOE: exentas «las personas físicas,
+  // sean o no residentes»; el límite de 1.000.000 € es para los sujetos pasivos del IS,
+  // sociedades civiles y entidades del art. 35.4 LGT.
+  const faq = page.locator('details').filter({ hasText: '¿Tengo que darme de alta en el IAE?' });
+  const t = limpiar((await faq.textContent()) ?? '');
+  expect(t).toContain('Las personas físicas están exentas de pago sea cual sea su cifra de negocios');
+  expect(t).toContain('el límite de 1.000.000 € es para las sociedades');
+  const paso3 = page.locator('li').filter({ hasText: 'Alta en el IAE (Impuesto Actividades Económicas)' });
+  expect(limpiar((await paso3.textContent()) ?? '')).toContain('exento de pago sea cual sea tu facturación');
+});
+
+test('25/09 · HALLAZGO · «Primera alta» no recoge los 3 años de quien ya disfrutó la tarifa plana', async ({ page }) => {
+  test.fail(); // Hallazgo del acta 25/09/2026
+  // Art. 38 ter.4 Ley 20/2007: el periodo sin alta exigido «será de tres años cuando los
+  // trabajadores autónomos hubieran disfrutado de dichas reducciones en su anterior período de
+  // alta». La opción «Primera alta — hace más de 2 años» concede la tarifa plana sin preguntarlo
+  // (la casilla de pluriactividad sí lo dice). Esperado: que la sección lo pregunte o lo advierta.
+  await page.getByRole('button', { name: /Mis Datos/ }).click();
+  // div: el <h3> de la sección también lleva «datosSeccion» en su clase (datosSeccionTitulo)
+  const seccion = page.locator('div[class*="datosSeccion"]').filter({ hasText: 'Situación Laboral' });
+  await expect(page.getByText('¡Puedes solicitar la tarifa plana!')).toBeVisible();
+  await expect(seccion).toContainText(/3 años|tres años|3 si ya|3 si la/);
+});
+
+test('25/09 · HALLAZGO · el FAQ de pluriactividad sigue prometiendo bonificaciones y devolución por tope de bases', async ({ page }) => {
+  test.fail(); // Hallazgo del acta 25/09/2026 (reparación incompleta de 4962fef7)
+  // Art. 313 LGSS (redacción del RDL 13/2022): reintegro del 50 % del exceso de las cotizaciones
+  // por contingencias comunes sobre la cuantía que fije la LPGE, con tope del 50 % de las cuotas
+  // del RETA. No hay bonificación de la cuota ni devolución por «suma de bases sobre el tope».
+  const faq = page.locator('details').filter({ hasText: '¿Puedo ser autónomo y trabajar por cuenta ajena a la vez?' });
+  const t = limpiar((await faq.textContent()) ?? '');
+  expect(t).not.toContain('puedes tener bonificaciones en la cuota de autónomo');
+  expect(t).not.toContain('Si la suma de bases supera el tope máximo');
+});
+
+test('25/09 · HALLAZGO · Verifactu no es obligatorio «desde 2025»', async ({ page }) => {
+  test.fail(); // Hallazgo del acta 25/09/2026
+  // RD 1007/2023, disposición final 4.ª (redacción del RDL 15/2025): contribuyentes del IS antes
+  // del 1 de enero de 2027; el resto de obligados (autónomos) antes del 1 de julio de 2027.
+  const fases = page.locator('button[class*="faseHeader"]');
+  await fases.filter({ hasText: 'Operatividad' }).click();
+  const item = page.locator('[class*="checklistItem"]').filter({ hasText: 'Elegir software de facturación' });
+  await expect(item).toBeVisible();
+  const t = await texto(item);
+  expect(t).not.toContain('Desde 2025 será obligatorio');
+  expect(t).toContain('2027');
+});
+
+test('25/09 · HALLAZGO · contraste del texto en color de marca, tema claro', async ({ page }) => {
+  test.fail(); // Hallazgo del acta 25/09/2026
+  // Texto normal (15,2 px): WCAG 1.4.3 exige 4,5:1. Medido hoy: «Ahorro primer año» 2,68:1 y
+  // «¡Puedes solicitar la tarifa plana!» 2,55:1 (--secondary sobre fondo claro), «0 €» de la
+  // columna Autónomo 2,87:1 (#27ae60).
+  await page.evaluate(() => { document.documentElement.dataset.theme = 'light'; });
+  await abrirCostes(page);
+  await expect.poll(() => contraste(page, '[class*="cuotaAhorro"] strong')).toBeGreaterThanOrEqual(4.5);
+  await expect.poll(() => contraste(page, 'td[class*="ventaja"]')).toBeGreaterThanOrEqual(4.5);
+  await page.getByRole('button', { name: /Mis Datos/ }).click();
+  await expect.poll(() => contraste(page, '[class*="infoTarifaPlana"]')).toBeGreaterThanOrEqual(4.5);
+});
+
+test('25/09 · HALLAZGO · el % va separado por espacio duro (U+00A0)', async ({ page }) => {
+  test.fail(); // Hallazgo del acta 25/09/2026 (regla del 25/09/2026 del formato español)
+  // «31,50 %» con U+00A0: hoy la fila dice «31,50%», el progreso «0%» y el IS «25 % general»
+  // con espacio normal.
+  const NBSP = String.fromCharCode(160);
+  expect(await page.locator('[class*="progresoValor"]').innerText()).toBe(`0${NBSP}%`);
+  await abrirCostes(page);
+  expect(await filaCuota(page, 'Tipo de cotización').innerText()).toBe(`31,50${NBSP}%`);
+  expect(await page.locator('table tr').filter({ hasText: 'Fiscalidad' }).innerText()).toContain(`25${NBSP}% general`);
+});
+
+test('25/09 · HALLAZGO · la escala del IRPF de la comparativa no sale de data/fiscal', async () => {
+  test.fail(); // Hallazgo del acta 25/09/2026 (dato)
+  // TRAMOS_IRPF_2025 (data/fiscal/irpf.ts) empieza en 19 y acaba en 47; la tabla lo escribe a
+  // mano como «19-47%». Hoy coincide, pero no seguiría un cambio de la escala.
+  const fuente = readFileSync(join(process.cwd(), 'app', 'asistente-alta-autonomo', 'page.tsx'), 'utf8');
+  expect(fuente).not.toMatch(/19-47\s?%/);
+});
+
+test('25/09 · HALLAZGO · el autónomo societario: «al menos la cuarta parte», no «más del 25 %»', async ({ page }) => {
+  test.fail(); // Hallazgo del acta 25/09/2026
+  // Art. 305.2.b LGSS: control efectivo presunto con participación «igual o superior a la cuarta
+  // parte» si tiene funciones de dirección y gerencia (igual o superior a la tercera parte sin
+  // ellas); data/fiscal/sociedades.ts (AUTONOMO_SOCIETARIO_2025.nota) dice «≥25%».
+  const fila = page.locator('table tr').filter({ hasText: 'Cuándo aplica' });
+  expect(limpiar((await fila.textContent()) ?? '')).not.toMatch(/>\s*25\s*%/);
 });

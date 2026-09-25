@@ -26,14 +26,17 @@
  * anunciándolos hasta el 21/09/2026: corregido entonces, porque una lista de hallazgos
  * abiertos que no lo están es exactamente el defecto del hallazgo 867 en otra forma.
  *
- * ⚠️ HALLAZGOS ABIERTOS HOY (21/09/2026), todos con `test.fail()` al final del fichero:
- *   · [21-A] el aviso de la complementaria salta aunque la regularización sea de 0,00 €.
- *   · [21-B] la tarjeta «Aprovecha la reducción de vivienda habitual» anuncia el tope
- *     estatal sin decir que lo es — la mitad sin reparar del hallazgo 861.
- *   · [21-C] la fila del IRPF de la tabla educativa describe la ganancia sin descontar el
- *     IIVTNU de la venta — la fórmula que el hallazgo 862 retiró del `faqJsonLd`.
- *   · [21-D] las dos prórrogas de esa misma tabla van sin unidad, y «otros 6» (adicional)
- *     y «hasta 12» (total) no significan lo mismo.
+ * ✅ Los cuatro que esta cabecera anunciaba como abiertos el 21/09/2026 ([21-A] a [21-D]:
+ * hallazgos 1178 a 1181) se repararon ese mismo día en `7a96924a` y sus tests ya no llevan
+ * `test.fail()`. La lista se quedó aquí hasta el 25/09/2026 (tercera vez que pasa: 867, 1182).
+ *
+ * ⚠️ HALLAZGOS ABIERTOS HOY (25/09/2026), todos con `test.fail()` en el último `describe`
+ * («re-inspección 25/09/2026 (tenencia en meses)»):
+ *   · (a) una fecha de adquisición posterior a hoy se acepta y liquida 0,00 € de plusvalía.
+ *   · (b) en el mes del aniversario la app da el año por cumplido sin saber el día
+ *     (reparación incompleta del 1615, a escala de día).
+ *   · (c) el subtítulo del IIVTNU dice «20 años de tenencia» cuando son 31 o 41.
+ *   · (d) el `%` va pegado a la cifra (regla del espacio duro del 25/09/2026).
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria: todas de `data/fiscal/`):
  *
@@ -76,7 +79,9 @@
  *      01/01/2024: <1 año 0,15 · 1 0,15 · 2 0,14 · 3 0,14 · 4 0,16 · 5 0,18 · 6 0,19 ·
  *      7 0,20 · 8 0,19 · 9 0,15 · 10 0,12 · 11 0,10 · 12-15 0,09 · 16 0,10 · 17 0,13 ·
  *      18 0,17 · 19 0,23 · 20 o más 0,40. Por debajo del año se prorratea por meses
- *      completos, y sin meses (esta app solo pregunta años) se toman 11: 0,15 × 11/12.
+ *      completos. Desde el 25/09/2026 (hallazgo 1615) la app pregunta también el MES de
+ *      adquisición y cuenta meses completos hasta hoy; antes solo preguntaba el año y el
+ *      periodo inferior al año se liquidaba con el techo de 11 meses (0,15 × 11/12).
  *      La tabla NO es monótona, así que un año de desfase en la tenencia unas veces cobra
  *      de más y otras de menos: por eso los casos fijan el año de adquisición como
  *      `ANIO − n` y comprueban el rótulo «(n años hasta hoy)».
@@ -5295,5 +5300,232 @@ test.describe('Hallazgo 1615 · años completos y prorrateo por meses', () => {
     expect(await linea(page, IIVTNU, 'Coeficiente 1 año')).toBe(
       new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(coef1)
     );
+  });
+});
+
+/* ────────────────────────────────────────────────────────────────────────────────────────────
+ * RE-INSPECCIÓN del 25/09/2026, tras `bb45ee12` (hallazgo 1615: años completos y prorrateo por
+ * meses) y `1c83ff86` (coeficientes vigentes del IIVTNU con `coeficienteIIVTNU`).
+ *
+ * Todos los casos se resolvieron a mano ANTES de abrir el navegador. Escenario común, elegido
+ * para que el ISD no tape nada y la plusvalía de la herencia se vea llegar hasta el IRPF:
+ *
+ *   hijo de 45 años (clave 'II', REDUCCIONES_PARENTESCO_IS['II'] = 15.956,87 €) · Andalucía ·
+ *   SIN vivienda habitual · valor de referencia 200.000 € · suelo catastral 48.000 € sobre un
+ *   catastral total de 120.000 € (proporción de suelo 0,4) · venta a los 5 años por 250.000 €.
+ *
+ *   ISD: 200.000 + 3 % de ajuar (PORC_AJUAR_DOMESTICO_IS) = 206.000; − 15.956,87 = 190.043,13
+ *        de base liquidable, por debajo del 1.000.000 de exención de BONIFICACIONES_CCAA_IS
+ *        ['andalucia'] → ISD 0,00 €.
+ *   IIVTNU de la venta: 5 años × 12 = 60 meses → coeficienteIIVTNU(5) = 0,18 →
+ *        48.000 × 0,18 × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 2160,00 €, frente a
+ *        los 5000,00 € del método real (50.000 × 0,4 × 25 %) → valor de transmisión 247.840,00.
+ *   IRPF (TRAMOS_GANANCIAS_PATRIMONIALES_2025): 6.000 × 19 % = 1.140 + el resto al 21 %.
+ *
+ * Los meses se siembran RELATIVOS a hoy (`haceMeses`), así que los esperados valen cualquier día.
+ * Coeficientes: tabla vigente del art. 107.4 TRLRHL (RDL 8/2023) en data/fiscal/inmuebles.ts,
+ * PLUSVALIA_MUNICIPAL_META verificado el 24/09/2026.
+ * ──────────────────────────────────────────────────────────────────────────────────────────── */
+test.describe('Simulador de heredar vivienda — re-inspección 25/09/2026 (tenencia en meses)', () => {
+  async function escenario(page: Page, anio: number, mes: number, valorAdq: number): Promise<void> {
+    await abrir(page);
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'andalucia');
+    await casilla(page, 'viviendaHabitual', false);
+    await mover(page, 'edadHer', 45);
+    await mover(page, 'valorRef', 200000);
+    await mover(page, 'valorSuelo', 48000);
+    await mover(page, 'valorCatastralTotal', 120000);
+    await mover(page, 'anioAdq', anio);
+    await page.selectOption('#mesAdq', String(mes));
+    await mover(page, 'valorAdq', valorAdq);
+    await mover(page, 'aniosVenta', 5);
+    await mover(page, 'valorVta', 250000);
+    // El ISD del escenario tiene que ser 0,00 € para que el resto de la cadena sea la que se lee
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
+    expect(await linea(page, IRPF, '= Valor de transmisión**')).toBe('247.840,00 €');
+  }
+
+  /** Subtítulo del panel del IIVTNU («IIVTNU — N … de tenencia»). */
+  async function subtituloIIVTNU(page: Page): Promise<string> {
+    const p = page.locator('h3', { hasText: IIVTNU }).first().locator('xpath=following-sibling::p[1]');
+    return (await p.innerText()).replace(/\s+/g, ' ').trim();
+  }
+
+  test('#1615 verificado — su caso literal: diciembre de hace 10 años naturales son 9 años (0,15), y 9 meses prorratean', async ({ page }) => {
+    // Hoy (25/09/2026) diciembre de 2016 son 117 meses completos → 9 años → 0,15, y NO los
+    // «10 años» y 0,12 que daba «año actual − año». En diciembre el caso deja de existir.
+    test.skip(new Date().getMonth() === 11, 'en diciembre, diciembre de hace 10 años SON 10 años');
+    await abrir(page);
+    await mover(page, 'anioAdq', ANIO - 10);
+    await page.selectOption('#mesAdq', '12');
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(9 años hasta hoy)');
+    expect(await linea(page, IIVTNU, 'Coeficiente 9 años')).toBe('0,15');
+    // Estado de fábrica: suelo 60.000 € → 60.000 × 0,15 × 25 % = 2250,00 € (gana al real)
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('2250,00 €');
+
+    // Segunda mitad del 1615: 9 meses completos → 0,15 × 9/12 = 0,1125 → 60.000 × 0,1125 × 25 %
+    const nueve = haceMeses(9);
+    await mover(page, 'anioAdq', nueve.anio);
+    await page.selectOption('#mesAdq', String(nueve.mes));
+    expect(await linea(page, IIVTNU, 'Coeficiente, menos de 1 año (prorrateado a 9 meses)')).toBe('0,1125');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('1687,50 €');
+  });
+
+  test('CASO A (normal) — 11 meses prorratean 0,1375 y la cifra llega al IRPF y al total', async ({ page }) => {
+    const adq = haceMeses(11);
+    await escenario(page, adq.anio, adq.mes, 150000);
+    // 0,15 × 11/12 = 0,1375 → 48.000 × 0,1375 × 25 % = 1650,00 €; real 50.000 × 0,4 × 25 % = 5000,00
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(11 meses hasta hoy)');
+    expect(await subtituloIIVTNU(page)).toBe('IIVTNU — 11 meses de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente, menos de 1 año (prorrateado a 11 meses)')).toBe('0,1375');
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('1650,00 €');
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('5000,00 €');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('1650,00 €');
+    // IRPF: 200.000 + 0 + 1.650 = 201.650,00; 247.840 − 201.650 = 46.190,00;
+    // 1.140 + 40.190 × 21 % = 9579,90. Con solo el año (1 año, 0,15 entero) serían 1800,00 y 9548,40.
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('201.650,00 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('46.190,00 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('9579,90 €');
+    // 0 + 1650,00 + 2160,00 + 9579,90
+    expect(await bloqueTotal(page)).toContain('TOTAL 13.389,90 €');
+  });
+
+  test('CASO B (límite) — 12 meses exactos son «1 año»: coeficiente 0,15 entero, 150 € más que con 11', async ({ page }) => {
+    const adq = haceMeses(12);
+    await escenario(page, adq.anio, adq.mes, 150000);
+    // 12 meses → 1 año completo → coeficienteIIVTNU(1) = 0,15 sin prorratear → 48.000 × 0,15 × 25 %
+    expect(await subtituloIIVTNU(page)).toBe('IIVTNU — 1 año de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente 1 año')).toBe('0,15');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('1800,00 €');
+    // 201.800,00 → ganancia 46.040,00 → 1.140 + 40.040 × 21 % = 9548,40
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('201.800,00 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('9548,40 €');
+    // 0 + 1800,00 + 2160,00 + 9548,40
+    expect(await bloqueTotal(page)).toContain('TOTAL 13.508,40 €');
+  });
+
+  test('CASO C (límite) — 19 años y 11 meses pagan con 0,23; al cumplir 20, con 0,40', async ({ page }) => {
+    const casi = haceMeses(19 * 12 + 11);
+    await escenario(page, casi.anio, casi.mes, 80000);
+    // 239 meses → 19 años completos → 0,23 → 48.000 × 0,23 × 25 % = 2760,00 (real: 120.000 × 0,4 × 25 % = 12.000)
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(19 años hasta hoy)');
+    expect(await linea(page, IIVTNU, 'Coeficiente 19 años')).toBe('0,23');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('2760,00 €');
+    // 202.760,00 → 45.080,00 → 1.140 + 39.080 × 21 % = 9346,80 → total 2760 + 2160 + 9346,80
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('9346,80 €');
+    expect(await bloqueTotal(page)).toContain('TOTAL 14.266,80 €');
+
+    const veinte = haceMeses(20 * 12);
+    await mover(page, 'anioAdq', veinte.anio);
+    await page.selectOption('#mesAdq', String(veinte.mes));
+    // 240 meses → «igual o superior a 20 años» → 0,40 → 48.000 × 0,40 × 25 % = 4800,00
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(20 años hasta hoy)');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('4800,00 €');
+    // 204.800,00 → 43.040,00 → 1.140 + 37.040 × 21 % = 8918,40 → total 4800 + 2160 + 8918,40
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('8918,40 €');
+    expect(await bloqueTotal(page)).toContain('TOTAL 15.878,40 €');
+  });
+
+  test('CASO D (límite) — el tope: enero de 1985 paga lo mismo que 20 años (0,40)', async ({ page }) => {
+    await escenario(page, 1985, 1, 80000);
+    // Con enero, los meses completos son (ANIO − 1985) × 12 + (mes de hoy − 1): años = ANIO − 1985
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain(`(${ANIO - 1985} años hasta hoy)`);
+    expect(await panel(page, IIVTNU)).toContain('0,40');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('4800,00 €');
+    expect(await bloqueTotal(page)).toContain('TOTAL 15.878,40 €');
+  });
+
+  test('GUARDA — mismo mes que hoy: 0 meses completos, coeficiente prorrateado a 0 (art. 107.4)', async ({ page }) => {
+    // Adquisición en el mes en curso: ningún mes completo → 0,15 × 0/12 = 0 → 0,00 €. Es lo que
+    // dice la ley («sin tener en cuenta las fracciones de mes»), no un defecto.
+    const hoy = haceMeses(0);
+    await escenario(page, hoy.anio, hoy.mes, 150000);
+    expect(await linea(page, IIVTNU, 'Coeficiente, menos de 1 año (prorrateado a 0 meses)')).toBe('0,0000');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('0,00 €');
+  });
+
+  /**
+   * ❌ ABIERTO 25/09/2026 (operativa, bajo) — una adquisición POSTERIOR a hoy se acepta.
+   * La app cuenta la tenencia «hasta hoy», que es la fecha que toma como fallecimiento, y el
+   * deslizador del año se corta en el año en curso, pero el selector de mes admite los meses que
+   * aún no han llegado. `mesesCompletosDesde` los topa en 0 con `Math.max(0, …)` y la app liquida
+   * en silencio: «0 meses de tenencia», coeficiente 0,0000, plusvalía 0,00 € y un IRPF que sube
+   * porque el valor de adquisición pierde esa cuota. Hoy, con el escenario de arriba y octubre de
+   * 2026: plusvalía 0,00 €, IRPF 9926,40 €, TOTAL 12.086,40 €.
+   */
+  test('HALLAZGO 25/09 (a) — una fecha de adquisición posterior a hoy debe rechazarse, no liquidarse a 0', async ({ page }) => {
+    test.fail(true, 'abierto 25/09/2026: el mes futuro se acepta y liquida 0,00 €');
+    const futuro = haceMeses(-1);
+    test.skip(futuro.anio !== ANIO, 'en diciembre no hay mes futuro dentro del año en curso');
+    await escenario(page, futuro.anio, 1, 150000);
+    const opcion = page.locator(`#mesAdq option[value="${futuro.mes}"]`);
+    if (await opcion.isDisabled()) return; // rechazada en origen
+    await page.selectOption('#mesAdq', String(futuro.mes));
+    if ((await page.locator('#mesAdq').inputValue()) !== String(futuro.mes)) return; // no admitida
+    const causante = (
+      await page.locator('h2', { hasText: 'Datos del causante' }).locator('xpath=..').innerText()
+    ).replace(/\s+/g, ' ');
+    expect(
+      causante,
+      'una adquisición posterior a hoy —la fecha que la app toma como fallecimiento— debe rechazarse o avisarse'
+    ).toMatch(/posterior|futur|todav[ií]a no|a[uú]n no/i);
+    expect(await subtituloIIVTNU(page)).not.toBe('IIVTNU — 0 meses de tenencia');
+  });
+
+  /**
+   * ❌ ABIERTO 25/09/2026 (calculo, bajo) — reparación incompleta del #1615, a escala de día.
+   * La app pregunta año y mes y da por cumplido el aniversario en cuanto llega su MES
+   * (`mesesCompletosDesde` no mira el día; el supuesto está solo en un comentario del código).
+   * Escritura del 28/09/2006 vista el 25/09/2026: el art. 107.4 da 19 años completos (0,23,
+   * 2760,00 € en este escenario); la app solo admite «septiembre de 2006» y liquida 20 años
+   * (0,40, 4800,00 €). Por debajo del año pasa en cualquier mes: 28/08/2026 son 0 meses
+   * completos el 25/09/2026, y «agosto de 2026» liquida 1 mes (0,0125, 150,00 €).
+   * El test pide que el día se pueda expresar o que el supuesto se diga junto al campo.
+   */
+  test('HALLAZGO 25/09 (b) — en el mes del aniversario la app da el año por cumplido sin saber el día', async ({ page }) => {
+    test.fail(true, 'abierto 25/09/2026: el día de la escritura no se pregunta ni se dice que se supone');
+    const veinte = haceMeses(20 * 12);
+    await escenario(page, veinte.anio, veinte.mes, 80000);
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('4800,00 €');
+    const causante = page.locator('h2', { hasText: 'Datos del causante' }).locator('xpath=..');
+    const controlesDia =
+      (await causante.locator('input[type="date"]').count()) + (await causante.getByLabel(/\bd[ií]a\b/i).count());
+    const grupo = (await page.locator('#mesAdq').locator('xpath=..').innerText()).replace(/\s+/g, ' ');
+    expect(
+      controlesDia > 0 || /\bd[ií]as?\b/i.test(grupo),
+      'con la escritura del día 28 y hoy día 25 son 19 años (0,23), no 20 (0,40): el día decide'
+    ).toBe(true);
+  });
+
+  /**
+   * ❌ ABIERTO 25/09/2026 (contenido, bajo) — el panel rotula «20 años de tenencia» con 41.
+   * `textoTenencia(Math.min(plusvalia.mesesTenencia, 240))` (page.tsx:1412) capa el TEXTO en 20
+   * años porque el coeficiente se topa ahí, y el rótulo del deslizador, dos paneles más arriba,
+   * dice «41 años hasta hoy». En el estado de fábrica (enero de 1995) es «31 años hasta hoy»
+   * frente a «IIVTNU — 20 años de tenencia». La fila de data/fiscal se llama «20 o más años».
+   */
+  test('HALLAZGO 25/09 (c) — con 41 años de tenencia el panel no puede decir «20 años de tenencia»', async ({ page }) => {
+    test.fail(true, 'abierto 25/09/2026: el subtítulo del IIVTNU capa la tenencia en 20 años');
+    await escenario(page, 1985, 1, 80000);
+    const anios = ANIO - 1985;
+    expect(await subtituloIIVTNU(page)).toMatch(new RegExp(`\\b${anios} años|20 o más años`));
+  });
+
+  /**
+   * ❌ ABIERTO 25/09/2026 (contenido, bajo) — el `%` va pegado a la cifra en todo el fichero.
+   * Regla del CLAUDE.md global §2 desde el 25/09/2026: `15 %`, separado con espacio duro
+   * (U+00A0); lo que ya lo pega se corrige app a app al pasar el Inspector. Hoy en <main>:
+   * «Tipo municipal (orientativo) 25%», «Tramos: 19% / 21% / 23% / 27% / 30%», «(reducción
+   * 95% ISD…)», «Bonificación CCAA (99,0%)», «Representa el 6,99% del valor de venta»…; y en
+   * el faqJsonLd «bonificaciones del 99%», «19% hasta 6000 €»…
+   */
+  test('HALLAZGO 25/09 (d) — el % va separado de la cifra con espacio duro', async ({ page }) => {
+    test.fail(true, 'abierto 25/09/2026: el % va pegado en el panel, el bloque educativo y el faqJsonLd');
+    await abrir(page);
+    const principal = await page.locator('main').innerText();
+    expect(principal.match(/\d%/g) ?? [], 'cifras con el % pegado en <main>').toEqual([]);
+    const faq = (await faqServida(page)).map((q) => q.acceptedAnswer.text).join(' ');
+    expect(faq.match(/\d%/g) ?? [], 'cifras con el % pegado en el faqJsonLd').toEqual([]);
   });
 });

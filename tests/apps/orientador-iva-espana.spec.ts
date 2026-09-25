@@ -306,3 +306,187 @@ test('los tipos de IVA mostrados salen de data/fiscal (PORCENTAJES_IVA / TIPOS_I
     page.getByRole('group', { name: TIPO, exact: true }).getByRole('button', { name: new RegExp(`^${PORCENTAJES_IVA.general} %`) }),
   ).toHaveAttribute('aria-pressed', 'true');
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Reinspección del 25/09/2026, tras 612a084f y ce66bcd1. Casos nuevos por el código que tocó
+// la reparación, resueltos a mano con el texto consolidado del BOE descargado ese día:
+//   · Ley 37/1992 (BOE-A-1992-28740): arts. 3.Dos, 21, 69, 70, 84.
+//   · Ley 20/1991 del IGIC (BOE-A-1991-14463): art. 17.Tres.Uno.4.
+// ═════════════════════════════════════════════════════════════════════════════
+
+const comparativa = (page: Page) => page.getByRole('region', { name: 'Comparativa del mismo importe por ámbito' });
+
+/** Filas de la tabla comparativa: [ámbito, IVA en factura, total, mecanismo], con los espacios limpios. */
+async function filasComparativa(page: Page): Promise<string[][]> {
+  const filas = await comparativa(page).evaluate((sec) =>
+    [...sec.querySelectorAll('tbody tr')].map((tr) => [...tr.querySelectorAll('td')].map((td) => (td as HTMLElement).innerText)),
+  );
+  return filas.map((f) => f.map(limpiar));
+}
+
+// Art. 69.Uno.1.º: un servicio B2B se localiza en el TAI solo si el destinatario tiene allí su
+// sede; Canarias está excluida del «interior del país» (art. 3.Dos.1.º b). El art. 70.Dos solo
+// devuelve al TAI los servicios del 69.Dos a particulares y el alquiler de medios de transporte,
+// así que un servicio general a una empresa canaria NO está sujeto al IVA español.
+// Base 2.345,67 € (cuatro cifras enteras: «2345,67», sin punto de millar). Al 10 %
+// (PORCENTAJES_IVA.reducido) la fila «España» de la comparativa da 234,567 → «234,57 €» y
+// 2.580,237 → «2580,24 €».
+test('servicio general a empresa de Canarias al 10 %: no sujeto (art. 69.Uno.1.º), el tipo no influye', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Servicios');
+  await elegir(page, CLIENTE, 'Empresa');
+  await elegir(page, TIPO, '10 %');
+  await escribirBase(page, '2.345,67');
+
+  await expect(resultado(page).getByRole('heading', { level: 2 })).toHaveText('Servicios a empresa de Canarias, Ceuta o Melilla (B2B)');
+  const f = await factura(page);
+  expect(f.base).toBe('2345,67 €');
+  expect(f.ivaEtiqueta).toBe('IVA No sujeta');
+  expect(f.iva).toBe('—');
+  expect(f.total).toBe('2345,67 €');
+  await expect(page.getByText('(no influye en este escenario)')).toBeVisible();
+  await expect(resultado(page)).toContainText('Arts. 3 y 69.Uno.1.º Ley 37/1992 (no sujeción por reglas de localización).');
+
+  const filas = await filasComparativa(page);
+  expect(filas).toContainEqual(['España', '234,57 € (10 %)', '2580,24 €', 'IVA repercutido']);
+  expect(filas).toContainEqual(['Canarias / Ceuta / Melilla', '—', '2345,67 €', 'No sujeto / fuera de territorio']);
+});
+
+// Servicio a un particular de Canarias: la cifra es la del servicio GENERAL (69.Uno.2.º, IVA
+// español). Al 4 % (PORCENTAJES_IVA.superreducido) sobre 99,99 €: cuota 3,9996 → «4,00 €»,
+// total 103,9896 → «103,99 €», y lo pintado cuadra (99,99 + 4,00 = 103,99).
+// Los servicios ELECTRÓNICOS van por otro lado: el art. 70.Uno.4.º LIVA solo los pone en el TAI
+// si el particular reside EN el TAI, el 70.Uno.8.º solo si reside en otro Estado miembro, y el
+// art. 17.Tres.Uno.4 de la Ley 20/1991 los localiza en Canarias → IGIC. La app no tiene selector
+// para ellos: tiene que avisarlo, y nombrar el IPSI para Ceuta y Melilla.
+test('servicio a particular de Canarias al 4 % sobre 99,99 €: la factura cuadra y avisa de IGIC e IPSI', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Servicios');
+  await elegir(page, CLIENTE, 'Particular');
+  await elegir(page, TIPO, '4 %');
+  await escribirBase(page, '99,99');
+
+  const f = await factura(page);
+  expect(f.base).toBe('99,99 €');
+  expect(f.ivaEtiqueta).toBe('IVA 4 %');
+  expect(f.iva).toBe('4,00 €');
+  expect(f.total).toBe('103,99 €');
+  expect(importe(f.base) + importe(f.iva)).toBeCloseTo(importe(f.total), 2);
+  await expect(resultado(page)).toContainText('servicio electrónico');
+  await expect(resultado(page)).toContainText('tributan por IGIC, no por IVA');
+  await expect(resultado(page)).toContainText('IPSI');
+});
+
+// Art. 3.Dos.2.º y 3.º: Canarias queda fuera de la «Comunidad» (territorio tercero). Art. 21.1.º:
+// la entrega de bienes que el vendedor expide fuera de la Comunidad está exenta.
+// 15.000 € al 21 % (PORCENTAJES_IVA.general): en Canarias IVA «—» y total 15.000,00 €; la fila
+// «España» de la comparativa, 3.150,00 € → «3150,00 €» y total «18.150,00 €».
+test('bienes a empresa de Canarias al 21 % sobre 15.000 €: exportación exenta (art. 21), distinta de España', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Bienes');
+  await elegir(page, CLIENTE, 'Empresa');
+  await elegir(page, TIPO, '10 %');
+  await elegir(page, TIPO, '21 %');
+  await escribirBase(page, '15.000');
+
+  await expect(resultado(page).getByRole('heading', { level: 2 })).toHaveText('Venta de bienes a Canarias, Ceuta o Melilla');
+  await expect(resultado(page)).toContainText('Operación exenta');
+  const f = await factura(page);
+  expect(f.ivaEtiqueta).toBe('IVA Exenta (0 %)');
+  expect(f.iva).toBe('—');
+  expect(f.total).toBe('15.000,00 €');
+  await expect(resultado(page)).toContainText('Arts. 3 y 21 Ley 37/1992');
+
+  const filas = await filasComparativa(page);
+  expect(filas).toContainEqual(['España', '3150,00 € (21 %)', '18.150,00 €', 'IVA repercutido']);
+  expect(filas).toContainEqual(['Canarias / Ceuta / Melilla', '—', '15.000,00 €', 'Operación exenta']);
+});
+
+// Hallazgo 1329, bordes que el test de «-500» no cubre: la base VACÍA avisa (no pasa a 0 en
+// silencio), un céntimo negativo también se rechaza, y el 0 es una base legítima sin aviso, que
+// además no hace creer que el tipo «no influye» (la app sondea el escenario con base 1).
+test('base vacía, «-0,01» y «0»: avisa en las dos primeras, acepta el cero sin aviso', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'España');
+  const aviso = page.locator('#base-aviso');
+
+  await escribirBase(page, '');
+  await expect(aviso).toHaveText('Escribe la base imponible (importe sin IVA) para ver cómo queda la factura.');
+  await expect(page.locator(BASE)).toHaveAttribute('aria-invalid', 'true');
+  let f = await factura(page);
+  expect([f.base, f.iva, f.total]).toEqual(['0,00 €', '—', '0,00 €']);
+
+  await escribirBase(page, '-0,01');
+  await expect(aviso).toContainText('no puede ser negativa');
+  f = await factura(page);
+  expect(f.total).toBe('0,00 €');
+
+  await escribirBase(page, '0');
+  await expect(aviso).toHaveCount(0);
+  await expect(page.locator(BASE)).not.toHaveAttribute('aria-invalid', 'true');
+  f = await factura(page);
+  expect([f.base, f.iva, f.total]).toEqual(['0,00 €', '—', '0,00 €']);
+  await expect(page.getByText('(no influye en este escenario)')).toHaveCount(0);
+  await expect(comparativa(page)).not.toContainText(/NaN|No definido|-0,00/);
+});
+
+// «De paso» de 612a084f: recibir un servicio de una empresa canaria. Art. 69.Uno.1.º: el
+// destinatario empresario está en el TAI → se localiza en el TAI. Art. 84.Uno.2.º a): el prestador
+// no está establecido en el TAI → el sujeto pasivo es el destinatario (la excepción a' no aplica,
+// porque el destinatario SÍ está establecido). No es una importación: los servicios no pasan
+// por la aduana. 3.000 € al 10 % → autorrepercusión 300,00 €, factura del proveedor 3000,00 €.
+test('servicio recibido de empresa de Canarias al 10 %: inversión del sujeto pasivo (art. 84.Uno.2.º), no importación', async ({ page }) => {
+  await elegir(page, ACCION, 'Recibo la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Servicios');
+  await elegir(page, CLIENTE, 'Empresa');
+  await elegir(page, TIPO, '10 %');
+  await escribirBase(page, '3.000');
+
+  await expect(resultado(page).getByRole('heading', { level: 2 })).toHaveText('Servicios recibidos de Canarias, Ceuta o Melilla');
+  // La insignia del mecanismo (el <span> que sigue al título), no el texto entero: el aviso
+  // dice precisamente «no hay IVA a la importación».
+  await expect(resultado(page).locator('h2 + span')).toHaveText('Inversión del sujeto pasivo');
+  const f = await factura(page);
+  expect(f.ivaEtiqueta).toBe('IVA Autorrepercutes el 10 %');
+  expect(f.iva).toBe('—');
+  expect(f.total).toBe('3000,00 €');
+  await expect(resultado(page)).toContainText('Autorrepercutes 300,00 € de IVA (10 %) en tu modelo 303');
+  await expect(resultado(page)).toContainText('Arts. 69.Uno.1.º y 84.Uno.2.º Ley 37/1992.');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HALLAZGO ABIERTO (25/09/2026): pct() (page.tsx:71) y los literales «Exenta (0 %)» separan el
+// % con un espacio NORMAL (U+0020). La regla del 25/09/2026 (CLAUDE.md global §2) pide espacio
+// duro U+00A0 para que el % no salte solo de línea; a 360 px ya salta en la comparativa.
+// Se compara el carácter crudo con textContent: limpiar() y toContainText normalizarían el espacio.
+test.fail('formato: el % de la factura va separado con espacio duro U+00A0', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'España');
+  await elegir(page, TIPO, '10 %');
+  await elegir(page, TIPO, '21 %');
+  const etiqueta = await resultado(page).locator('strong').first().textContent();
+  expect(etiqueta).toBe(`${PORCENTAJES_IVA.general} %`);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HALLAZGO ABIERTO (25/09/2026): ce66bcd1 añadió al resultado «servicios a particular de
+// Canarias» el aviso de que los servicios electrónicos tributan por IGIC (art. 17.Tres.Uno.4
+// Ley 20/1991; art. 70.Uno.4.º LIVA solo los pone en el TAI si el particular reside en él),
+// pero el pie de la comparativa (page.tsx:842-844) —y la FAQ, page.tsx:941-943, y el faqJsonLd,
+// metadata.ts:89— siguen diciendo sin salvedad que a un particular de allí se le factura con
+// IVA español. Pasa cuando el pie deja de afirmarlo o nombra la salvedad de los electrónicos.
+test.fail('pie de la comparativa: «a un particular, con IVA español» salva los servicios electrónicos', async ({ page }) => {
+  await elegir(page, ACCION, 'Emito la factura');
+  await elegir(page, LUGAR, 'Canarias');
+  await elegir(page, NATURALEZA, 'Servicios');
+  await elegir(page, CLIENTE, 'Particular');
+  const pie = limpiar(await comparativa(page).locator('p').last().innerText());
+  expect(pie).toContain('Canarias');
+  const afirmaIvaParticular = /particular, con IVA español/.test(pie);
+  const salvaElectronicos = /electr[óo]nic/i.test(pie);
+  expect(afirmaIvaParticular && !salvaElectronicos).toBe(false);
+});
