@@ -79,7 +79,8 @@ const BANCO: Record<string, { id: string; nivel: Nivel; correcta: string }> = {
     { id: "b02", nivel: "basico", correcta: "Moby Dick" },
   "¿Quién escribió \"Cien años de soledad\"?":
     { id: "b03", nivel: "basico", correcta: "Gabriel García Márquez" },
-  "¿En qué movimiento literario se enmarca \"Cien años de soledad\"?":
+  // Enunciado reescrito en la reparación del 1712: el realismo mágico no es un «movimiento».
+  "¿Con qué corriente o modo narrativo se asocia \"Cien años de soledad\"?":
     { id: "b04", nivel: "basico", correcta: "Realismo mágico" },
   "¿Quién creó al detective Sherlock Holmes?":
     { id: "b05", nivel: "basico", correcta: "Arthur Conan Doyle" },
@@ -119,7 +120,8 @@ const BANCO: Record<string, { id: string; nivel: Nivel; correcta: string }> = {
     { id: "m04", nivel: "medio", correcta: "Por el camino de Swann" },
   "¿En qué consiste la «teoría del iceberg» de Hemingway?":
     { id: "m05", nivel: "medio", correcta: "Lo importante permanece implícito bajo la superficie del texto" },
-  "¿Qué movimiento literario surge en Latinoamérica en los años 60 con Cortázar, Fuentes y Vargas Llosa?":
+  // Enunciado reescrito en la reparación del 1712: el Boom no es un «movimiento literario».
+  "¿Con qué nombre se conoce el fenómeno editorial y generacional que dio proyección internacional en los años 60 a Cortázar, Fuentes y Vargas Llosa?":
     { id: "m06", nivel: "medio", correcta: "Boom Latinoamericano" },
   "¿Qué escritor chileno ganó el Nobel de Literatura en 1971?":
     { id: "m07", nivel: "medio", correcta: "Pablo Neruda" },
@@ -137,7 +139,8 @@ const BANCO: Record<string, { id: string; nivel: Nivel; correcta: string }> = {
     { id: "m13", nivel: "medio", correcta: "Los hermanos Karamázov" },
   "¿A qué movimiento literario pertenece la obra de Émile Zola?":
     { id: "m14", nivel: "medio", correcta: "Naturalismo" },
-  "¿Qué narrador protagoniza \"El gran Gatsby\" de F. Scott Fitzgerald?":
+  // Enunciado reescrito en la reparación del 1712: antes preguntaba qué narrador «protagoniza».
+  "¿Quién narra \"El gran Gatsby\" de F. Scott Fitzgerald?":
     { id: "m15", nivel: "medio", correcta: "Nick Carraway" },
   "¿De qué obra es la apertura \"Muchos años después, frente al pelotón de fusilamiento…\"?":
     { id: "m16", nivel: "medio", correcta: "Cien años de soledad" },
@@ -639,7 +642,9 @@ test.describe('Regresión de los hallazgos del Inspector', () => {
  * sacó 3, 4, 3 y 4 de 15. Los tramos de `evaluacion()`: ≥ 0,9 Excelente · ≥ 0,7 Muy bien ·
  * ≥ 0,5 Bien · resto Sigue leyendo; barra = Math.round(aciertos / 15 · 100).
  *
- * Los casos que vigilan un defecto de HOY llevan test.fail() y el comportamiento correcto.
+ * Los casos que vigilaban un defecto de HOY llevaban test.fail() y el comportamiento correcto.
+ * Los seis hallazgos (1711-1716) se repararon en la Ronda 15 (25/09/2026): ya sin la marca,
+ * quedan como regresión.
  */
 
 /** Explicación visible tras responder la pregunta en pantalla. */
@@ -833,10 +838,13 @@ test.describe('Re-inspección 25/09/2026', () => {
 
     await expect(page.getByRole('button', { name: /Siguiente|Ver resultado/ })).toHaveCount(0);
 
-    // Pregunta 1 bien; luego Enter sobre otra opción ya deshabilitada
+    // Pregunta 1 bien; luego un clic forzado sobre otra opción ya deshabilitada. (Antes era un
+    // Enter tras intentar enfocarla: desde la reparación del 1714 el foco va a «Siguiente» al
+    // responder y un botón deshabilitado no lo acepta, así que ese Enter avanzaba de pregunta
+    // y el caso dejaba de medir lo que dice.)
     const { iCorrecta, iFallada } = await responderSinHover(page, 'bien');
-    await opciones(page).nth(iFallada).focus().catch(() => {});
-    await page.keyboard.press('Enter');
+    await expect(page.getByRole('button', { name: /Siguiente/ })).toBeFocused();
+    await opciones(page).nth(iFallada).click({ force: true }).catch(() => {});
     await expect(opciones(page).nth(iCorrecta)).toHaveClass(/opcionCorrecta/);
     await expect(page.locator('[class*="opcionIncorrecta"]')).toHaveCount(0);
     await avanzar(page);
@@ -894,12 +902,13 @@ test.describe('Re-inspección 25/09/2026', () => {
    * Lo correcto: el foco queda en la tarjeta de la pregunta, en la opción A o antes de ella.
    */
   test('hallazgo · tras «Siguiente» con teclado el foco no se pierde por detrás de las opciones nuevas', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: activeElement = BODY y el Tab va a «← Cambiar de nivel»
     await arrancar(page, /^Básico/);
     await responderSinHover(page, 'bien');
-    await page.getByRole('button', { name: /Siguiente/ }).focus();
+    // Reparado: al responder, el foco ya está en «Siguiente» (antes caía al <body>)
+    await expect(page.getByRole('button', { name: /Siguiente/ })).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('[class*="quizNumero"]')).toHaveText('2/15');
+    await expect(page.locator('h2[class*="pregunta"]')).toBeFocused();
 
     const foco = await page.evaluate(() => {
       const a = document.activeElement;
@@ -921,7 +930,6 @@ test.describe('Re-inspección 25/09/2026', () => {
    * nota anunciada).
    */
   test('hallazgo · tras «Ver resultado» el foco va a la tarjeta de la nota', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: activeElement = BODY, sin región viva
     test.setTimeout(120_000);
     await arrancar(page, /^Básico/);
     for (let n = 1; n < 15; n++) {
@@ -940,9 +948,19 @@ test.describe('Re-inspección 25/09/2026', () => {
       for (let n: Element | null = card; n; n = n.parentElement) {
         if (n.getAttribute('aria-live') || n.getAttribute('role') === 'status') viva = true;
       }
-      return { focoEnLaNota: !!a && a !== document.body && (card === a || card.contains(a)) && !/Jugar de nuevo/.test(a.textContent ?? ''), viva };
+      // Lo que no vale es que el foco esté en el BOTÓN «Jugar de nuevo» (por debajo de la
+      // nota). Mirar el textContent del elemento enfocado, como se hacía, daba un falso rojo
+      // cuando el foco está en la tarjeta entera, que también contiene ese rótulo.
+      const enJugar = a instanceof HTMLButtonElement && /Jugar de nuevo/.test(a.textContent ?? '');
+      return { focoEnLaNota: !!a && a !== document.body && (card === a || card.contains(a)) && !enJugar, viva };
     });
     expect(r.focoEnLaNota || r.viva, JSON.stringify(r)).toBe(true);
+    // Reparado: el foco va a la tarjeta, cuyo nombre accesible dice la nota
+    await expect(page.locator('[class*="resultadoCard"]')).toBeFocused();
+    await expect(page.locator('[class*="resultadoCard"]')).toHaveAttribute(
+      'aria-label',
+      'Resultado: 1 de 15 correctas. Sigue leyendo. El conocimiento llega con tiempo.'
+    );
   });
 
   /**
@@ -954,7 +972,6 @@ test.describe('Re-inspección 25/09/2026', () => {
    *     (#EC7063) 4,38 · título «Errores frecuentes…» (#c0392b, sin variante oscura) 2,21.
    */
   test('hallazgo · los botones, el rótulo del nivel y el veredicto llegan a 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: 4,11 / 2,87 / 4,36 en claro; 2,79 / 1,59 / 4,38 / 2,21 en oscuro
     test.setTimeout(120_000);
     const medidas: Record<string, number> = {};
 
@@ -1000,7 +1017,6 @@ test.describe('Re-inspección 25/09/2026', () => {
    *     much national boasting» (asaltos armados cada noche en Londres).
    */
   test('hallazgo · las explicaciones de a06 y a12 no afirman nada falso', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: a06 «lo hizo querer ser escritor», a12 «adelantarse» a un libro de 1614
     test.setTimeout(240_000);
     const vistas = await buscarPreguntas(page, /^Avanzado/, ['a06', 'a12']);
     expect(Object.keys(vistas).sort(), 'no salieron a06 y a12 en 8 partidas').toEqual(['a06', 'a12']);
@@ -1009,7 +1025,6 @@ test.describe('Re-inspección 25/09/2026', () => {
   });
 
   test('hallazgo · la explicación de b14 no presenta una Inglaterra tranquila frente a la Revolución', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: b14 «contrasta la Revolución Francesa con la tranquilidad inglesa»
     test.setTimeout(240_000);
     const vistas = await buscarPreguntas(page, /^Básico/, ['b14']);
     expect(vistas.b14, 'no salió b14 en 8 partidas').toBeTruthy();
@@ -1027,7 +1042,6 @@ test.describe('Re-inspección 25/09/2026', () => {
    *     el realismo mágico es una técnica».
    */
   test('hallazgo · m15 y m06 no contradicen su explicación ni el bloque educativo', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: «narrador protagoniza» frente a «narrador-testigo»; Boom «movimiento» frente a «generación»
     test.setTimeout(240_000);
     await page.goto(RUTA);
     const aviso = norm(await page.locator('[class*="warningList"]').textContent());
@@ -1050,7 +1064,6 @@ test.describe('Re-inspección 25/09/2026', () => {
    * Achebe) y la FAQ visible de la propia página las enumera.
    */
   test('hallazgo · el FAQPage y la entrada no describen el banco como solo occidental', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: «Abarca literatura occidental … hasta el siglo XX»
     await page.goto(RUTA);
     const faq = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' ')
@@ -1079,7 +1092,6 @@ test.describe('Re-inspección 25/09/2026 · móvil 360 × 740', () => {
   });
 
   test('hallazgo · tras «Siguiente» la pregunta nueva queda a la vista bajo la barra del logo', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: tras las explicaciones largas el enunciado queda fuera o bajo la barra
     test.setTimeout(240_000);
     const tapar = async (sel: ReturnType<Page['locator']>) => {
       const b = (await sel.boundingBox())!;

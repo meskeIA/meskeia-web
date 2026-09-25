@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -26,6 +26,9 @@ interface PreguntaEnJuego extends Pregunta {
 
 const PREGUNTAS_POR_PARTIDA = 15;
 
+// `color` es el ACENTO del nivel (borde y tinte del botón de selección). El rótulo del nivel
+// durante la partida no lo usa como color de texto: #27AE60 daba 2,87:1 en claro y #8B2635,
+// 1,59:1 en oscuro (hallazgo 1715); lleva su clase con variante para cada tema.
 const NIVEL_CONFIG: Record<Nivel, { label: string; emoji: string; color: string; desc: string }> = {
   basico: { label: 'Básico', emoji: '📗', color: '#27AE60', desc: 'Autores y obras conocidas' },
   medio: { label: 'Medio', emoji: '📘', color: '#2E86AB', desc: 'Contexto y técnicas literarias' },
@@ -79,6 +82,20 @@ function seleccionarPreguntas(nivel: Nivel | 'todos'): PreguntaEnJuego[] {
     .map(barajarOpciones);
 }
 
+/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
+const MARGEN_LOGO = 88;
+
+/**
+ * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
+ */
+function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
+  if (!bloque || !clave) return;
+  const r = clave.getBoundingClientRect();
+  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
 function evaluacion(aciertos: number, total: number): { label: string; emoji: string; color: string } {
   const pct = aciertos / total;
   if (pct >= 0.9) return { label: '¡Excelente! Dominas la literatura.', emoji: '🏆', color: '#F39C12' };
@@ -102,6 +119,31 @@ export default function QuizLiteraturaUniversal() {
     () => (fase === 'resultado' ? evaluacion(aciertos, preguntas.length) : null),
     [fase, aciertos, preguntas.length]
   );
+
+  /**
+   * Foco y vista (hallazgos 1714 y 1716, la forma del 1676/1675 de quiz-tabla-periodica).
+   * · Al responder, la opción pulsada queda `disabled` y el navegador suelta el foco al
+   *   <body>: se lleva a «Siguiente», la única acción que queda.
+   * · Al pulsar «Siguiente» ese botón se desmonta y el foco volvía a caer al <body>, DETRÁS de
+   *   las opciones nuevas (el primer Tab saltaba a «← Cambiar de nivel»). Ahora va al
+   *   enunciado de la pregunta nueva —que el lector lee— y, si no se ve entero bajo el logo
+   *   fijo, la vista vuelve al principio del quiz. En el resultado, a la tarjeta de la nota.
+   */
+  const quizBoxRef = useRef<HTMLElement>(null);
+  const enunciadoRef = useRef<HTMLHeadingElement>(null);
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (fase === 'quiz' && respondida) {
+      botonSiguienteRef.current?.focus();
+    } else if (fase === 'quiz') {
+      traerALaVista(quizBoxRef.current, enunciadoRef.current);
+      enunciadoRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'resultado') {
+      traerALaVista(resultadoRef.current, resultadoRef.current);
+      resultadoRef.current?.focus({ preventScroll: true });
+    }
+  }, [fase, indice, respondida]);
 
   const handleIniciar = useCallback(() => {
     setPreguntas(seleccionarPreguntas(nivelElegido));
@@ -200,7 +242,7 @@ export default function QuizLiteraturaUniversal() {
 
         {/* ── Quiz ── */}
         {fase === 'quiz' && preguntaActual && (
-          <section className={styles.quizBox}>
+          <section className={styles.quizBox} ref={quizBoxRef}>
             {/* Cabecera */}
             <div className={styles.quizCabecera}>
               <div className={styles.quizProgreso}>
@@ -210,7 +252,7 @@ export default function QuizLiteraturaUniversal() {
                 </div>
               </div>
               <div className={styles.quizMeta}>
-                <span className={styles.quizNivel} style={{ color: NIVEL_CONFIG[preguntaActual.nivel].color }}>
+                <span className={`${styles.quizNivel} ${styles[`nivel_${preguntaActual.nivel}`]}`}>
                   <span aria-hidden="true">{NIVEL_CONFIG[preguntaActual.nivel].emoji}</span>{' '}
                   {NIVEL_CONFIG[preguntaActual.nivel].label}
                 </span>
@@ -222,7 +264,7 @@ export default function QuizLiteraturaUniversal() {
             </div>
 
             {/* Pregunta */}
-            <h2 className={styles.pregunta}>{preguntaActual.pregunta}</h2>
+            <h2 className={styles.pregunta} ref={enunciadoRef} tabIndex={-1}>{preguntaActual.pregunta}</h2>
 
             {/* Opciones */}
             <div className={styles.opciones}>
@@ -280,7 +322,7 @@ export default function QuizLiteraturaUniversal() {
             </div>
 
             {respondida && (
-              <button type="button" className={styles.btnSiguiente} onClick={handleSiguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={handleSiguiente} ref={botonSiguienteRef}>
                 {indice + 1 < preguntas.length ? 'Siguiente →' : 'Ver resultado'}
               </button>
             )}
@@ -296,7 +338,13 @@ export default function QuizLiteraturaUniversal() {
         {/* ── Resultado ── */}
         {fase === 'resultado' && evalFinal && (
           <section className={styles.resultadoBox}>
-            <div className={styles.resultadoCard}>
+            <div
+              className={styles.resultadoCard}
+              ref={resultadoRef}
+              tabIndex={-1}
+              role="group"
+              aria-label={`Resultado: ${aciertos} de ${preguntas.length} correctas. ${evalFinal.label}`}
+            >
               <div className={styles.resultadoHeader} style={{ borderColor: evalFinal.color }}>
                 <span className={styles.resultadoEmoji} aria-hidden="true">{evalFinal.emoji}</span>
                 <div>
@@ -328,7 +376,7 @@ export default function QuizLiteraturaUniversal() {
 
         <EducationalSection title="Literatura universal — guía de referencia" subtitle="Movimientos, autores y obras clave de la historia literaria">
           <div className={styles.guideSection}>
-            <p>La literatura universal abarca miles de años de escritura en todas las lenguas. Este quiz cubre un muestreo representativo de las obras y autores que han definido la tradición literaria occidental y latinoamericana.</p>
+            <p>La literatura universal abarca miles de años de escritura en todas las lenguas. Este quiz cubre una muestra de obras y autores de la tradición europea, estadounidense e hispanoamericana, que es el grueso del banco, y también de las literaturas japonesa, china, árabe, persa, india, coreana y africana.</p>
 
             <h3>Niveles del quiz</h3>
             <div className={styles.tableWrapper}>
@@ -472,7 +520,7 @@ export default function QuizLiteraturaUniversal() {
                 <li>Confundir el autor de una obra con el narrador o protagonista de la misma.</li>
                 <li>Asumir que el autor y su obra pertenecen al mismo país (Kafka era checo pero escribía en alemán).</li>
                 <li>Confundir el Modernismo hispánico (Darío, Martí) con el High Modernism anglosajón (Woolf, Joyce).</li>
-                <li>Creer que "Boom Latinoamericano" y "Realismo mágico" son sinónimos: el Boom es una generación, el realismo mágico es una técnica.</li>
+                <li>Creer que "Boom latinoamericano" y "realismo mágico" son sinónimos: el Boom es un fenómeno editorial y generacional de los años 60 y 70; el realismo mágico, un modo de narrar que no practican todos sus autores (Vargas Llosa, por ejemplo, apenas lo usa).</li>
                 <li>Mezclar los libros de la misma saga o del mismo autor sin distinguir cuál es cuál.</li>
               </ul>
             </div>

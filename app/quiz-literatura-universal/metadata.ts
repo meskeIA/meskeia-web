@@ -70,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Qué temas cubre el quiz de literatura universal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El quiz incluye cuatro categorías: autores (quién escribió qué), obras (identificar títulos, personajes y argumentos), movimientos literarios (Romanticismo, Realismo, Modernismo, Vanguardias, etc.) y citas célebres. Abarca literatura occidental desde la Antigüedad griega hasta el siglo XX, con especial atención a los autores más estudiados en educación secundaria y universitaria.',
+        text: 'El quiz incluye cuatro categorías: autores (quién escribió qué), obras (identificar títulos, personajes y argumentos), movimientos literarios (Romanticismo, Realismo, Modernismo, Vanguardias, etc.) y citas célebres. El grueso del banco es literatura europea, estadounidense e hispanoamericana desde la Antigüedad griega hasta hoy, con especial atención a los autores más estudiados en educación secundaria y universitaria, e incluye también preguntas de literatura japonesa, china, árabe, persa, india, coreana y africana, de Murasaki Shikibu a Han Kang.',
       },
     },
     {

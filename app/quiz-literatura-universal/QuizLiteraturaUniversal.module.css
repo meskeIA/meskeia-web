@@ -30,7 +30,9 @@
 
 .seleccionInfo { font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 1.25rem; }
 
-.btnIniciar { padding: 0.9rem 2.5rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s ease; }
+/* Blanco sobre --primary daba 4,11:1 en claro y 2,79:1 en oscuro (hallazgo 1715);
+   --primary-boton vale lo mismo en los dos temas: 5,47:1. */
+.btnIniciar { padding: 0.9rem 2.5rem; background: var(--primary-boton); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s ease; }
 .btnIniciar:hover { opacity: 0.9; }
 
 /* ── Quiz ── */
@@ -44,6 +46,22 @@
 
 .quizMeta { display: flex; gap: 0.75rem; align-items: center; }
 .quizNivel { font-size: 0.8rem; font-weight: 600; }
+/* Rótulo del nivel sobre la tarjeta: #27AE60 daba 2,87:1 en claro y #8B2635, 1,59:1 en oscuro
+   (hallazgo 1715). Un color por nivel y tema, todos ≥ 4,5:1 sobre --bg-card. */
+.nivel_basico { color: #1a7340; }      /* 5,9:1 sobre blanco */
+.nivel_medio { color: var(--primary-texto); }
+.nivel_avanzado { color: #8b2635; }    /* 8,7:1 sobre blanco */
+[data-theme='dark'] .nivel_basico { color: #58d68d; }
+[data-theme='dark'] .nivel_avanzado { color: #f1948a; } /* 6,1:1 sobre #2D2D2D */
+
+/* Recibe el foco por programa al avanzar (tabIndex=-1): no es un control, sin anillo. */
+.pregunta:focus,
+.resultadoCard:focus { outline: none; }
+
+/* Al avanzar, la vista se lleva al principio del quiz o del resultado: este margen deja la
+   barra del logo fijo por encima, sin taparlo (hallazgo 1716). */
+.quizBox,
+.resultadoCard { scroll-margin-top: 88px; }
 .quizCategoria { font-size: 0.8rem; color: var(--text-secondary); }
 
 .pregunta { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0 0 1.5rem; line-height: 1.45; }
@@ -74,13 +92,14 @@
   font-size: 0.75rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.opcionCorrecta .opcionLetra { background: #27AE60; color: white; }
-.opcionIncorrecta .opcionLetra { background: #E74C3C; color: white; }
+/* Letra blanca: #27AE60 daba 2,87:1 y #E74C3C 3,82:1 (hallazgo 1715). */
+.opcionCorrecta .opcionLetra { background: #15803d; color: white; }   /* 5,02:1 */
+.opcionIncorrecta .opcionLetra { background: #b91c1c; color: white; } /* 6,47:1 */
 
 .opcionTexto { font-size: 0.9rem; line-height: 1.4; flex: 1; }
 .opcionMarca { font-size: 1rem; margin-left: auto; flex-shrink: 0; }
-.opcionCorrecta .opcionMarca { color: #27AE60; }
-.opcionIncorrecta .opcionMarca { color: #E74C3C; }
+.opcionCorrecta .opcionMarca { color: #15803d; }
+.opcionIncorrecta .opcionMarca { color: #b91c1c; }
 
 .explicacion { padding: 1rem 1.25rem; border-radius: 10px; margin-bottom: 1.25rem; border-left: 4px solid; }
 .explicacionBien { background: rgba(39,174,96,0.08); border-color: #27AE60; }
@@ -90,10 +109,11 @@
 /* El veredicto en TEXTO: acertar o fallar no puede transmitirse solo con el color y unas
    marcas aria-hidden (WCAG 1.4.1). */
 .explicacionVeredicto { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--text-primary); }
-.explicacionBien .explicacionVeredicto { color: #1E8449; }
-.explicacionMal .explicacionVeredicto { color: #C0392B; }
+/* #1E8449 daba 4,36:1 sobre su tinte (hallazgo 1715). */
+.explicacionBien .explicacionVeredicto { color: #166534; }
+.explicacionMal .explicacionVeredicto { color: #b91c1c; }
 
-.btnSiguiente { display: block; width: 100%; padding: 0.9rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s ease; }
+.btnSiguiente { display: block; width: 100%; padding: 0.9rem; background: var(--primary-boton); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s ease; }
 .btnSiguiente:hover { opacity: 0.9; }
 
 /* Salida de la partida: discreta, para no competir con «Siguiente», pero siempre presente. */
@@ -102,7 +122,7 @@
 .btnAbandonar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
 
 [data-theme='dark'] .explicacionBien .explicacionVeredicto { color: #58D68D; }
-[data-theme='dark'] .explicacionMal .explicacionVeredicto { color: #EC7063; }
+[data-theme='dark'] .explicacionMal .explicacionVeredicto { color: #fca5a5; } /* #EC7063 daba 4,38:1 */
 
 /* ── Resultado ── */
 .resultadoBox { margin-bottom: 2rem; }
@@ -119,7 +139,7 @@
 
 .resultadoBotones { display: flex; gap: 0.75rem; justify-content: center; }
 .btnReiniciar { padding: 0.85rem 2rem; background: transparent; border: 1.5px solid rgba(0,0,0,0.18); border-radius: 10px; color: var(--text-secondary); font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
-.btnReiniciar:hover { border-color: var(--primary); color: var(--primary); }
+.btnReiniciar:hover { border-color: var(--primary); color: var(--primary-texto); }
 
 /* ── Educational v2.0 ── */
 .guideSection { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -146,7 +166,7 @@
 
 .stepGuide { display: flex; flex-direction: column; gap: 1rem; }
 .step { display: flex; gap: 1rem; align-items: flex-start; }
-.stepNumber { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stepNumber { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .stepContent h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0.1rem 0 0.3rem; }
 .stepContent p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
 
@@ -171,6 +191,14 @@
 [data-theme='dark'] .nivelBtn { border-color: rgba(255,255,255,0.12); }
 [data-theme='dark'] .opcion { border-color: rgba(255,255,255,0.12); color: var(--text-primary); }
 [data-theme='dark'] .opcionLetra { background: rgba(255,255,255,0.08); }
+/* `[data-theme='dark'] .opcion` y `.opcionLetra` (0,2,0) pisaban el borde verde/rojo y el
+   círculo de la correcta y la fallada. Con la misma especificidad y después, ganan estas. */
+[data-theme='dark'] .opcionCorrecta { border-color: #22c55e; }
+[data-theme='dark'] .opcionIncorrecta { border-color: #ef4444; }
+[data-theme='dark'] .opcionCorrecta .opcionLetra { background: #15803d; color: white; }
+[data-theme='dark'] .opcionIncorrecta .opcionLetra { background: #b91c1c; color: white; }
+[data-theme='dark'] .opcionCorrecta .opcionMarca { color: #4ade80; }
+[data-theme='dark'] .opcionIncorrecta .opcionMarca { color: #fca5a5; }
 [data-theme='dark'] .progresoBar,
 [data-theme='dark'] .resultadoBarra { background: rgba(255,255,255,0.1); }
 [data-theme='dark'] .btnReiniciar { border-color: rgba(255,255,255,0.18); }
@@ -180,6 +208,9 @@
 [data-theme='dark'] .comparativaTable td { border-bottom-color: rgba(255,255,255,0.06); }
 [data-theme='dark'] .comparativaTable tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
 [data-theme='dark'] .warningBox { background: rgba(231,76,60,0.1); border-color: rgba(231,76,60,0.3); }
+/* #c0392b sin variante oscura daba 2,21:1 (hallazgo 1715). */
+[data-theme='dark'] .warningHeader h4 { color: #f1948a; }
+[data-theme='dark'] .warningList li::before { color: #f1948a; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {

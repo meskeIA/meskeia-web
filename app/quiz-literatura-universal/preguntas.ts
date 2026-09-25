@@ -57,7 +57,9 @@ export const POOL: Pregunta[] = [
   },
   {
     id: 'b04', nivel: 'basico', categoria: 'movimientos',
-    pregunta: '¿En qué movimiento literario se enmarca "Cien años de soledad"?',
+    // Hallazgo 1712: llamaba «movimiento literario» al realismo mágico, y el bloque educativo
+    // enseña que es un modo de narrar, no un movimiento.
+    pregunta: '¿Con qué corriente o modo narrativo se asocia "Cien años de soledad"?',
     opciones: ['Romanticismo', 'Existencialismo', 'Realismo mágico', 'Naturalismo'],
     correcta: 2,
     explicacion: 'El realismo mágico narra hechos extraordinarios con la misma naturalidad que los cotidianos. García Márquez es su nombre más asociado, junto a Juan Rulfo.',
@@ -135,7 +137,10 @@ export const POOL: Pregunta[] = [
     pregunta: '¿Qué novela comienza con «Era el mejor de los tiempos, era el peor de los tiempos»?',
     opciones: ['Oliver Twist', 'Grandes esperanzas', 'Historia de dos ciudades', 'David Copperfield'],
     correcta: 2,
-    explicacion: '"Historia de dos ciudades" (1859) de Charles Dickens comienza con este famoso incipit que contrasta la Revolución Francesa con la tranquilidad inglesa.',
+    // Hallazgo 1711: decía que el íncipit «contrasta la Revolución Francesa con la tranquilidad
+    // inglesa». El capítulo I transcurre en 1775, antes de la Revolución, y pinta una Inglaterra
+    // con asaltos armados cada noche en Londres.
+    explicacion: '"Historia de dos ciudades" (1859) de Charles Dickens comienza con este famoso íncipit hecho de contrastes. El primer capítulo sitúa la acción en 1775 y retrata a la vez la Francia del Antiguo Régimen y una Inglaterra que, según el narrador, tenía poco orden del que presumir: robos a mano armada cada noche en el propio Londres.',
   },
   {
     id: 'b15', nivel: 'basico', categoria: 'movimientos',
@@ -217,10 +222,12 @@ export const POOL: Pregunta[] = [
   },
   {
     id: 'm06', nivel: 'medio', categoria: 'movimientos',
-    pregunta: '¿Qué movimiento literario surge en Latinoamérica en los años 60 con Cortázar, Fuentes y Vargas Llosa?',
+    // Hallazgo 1712: lo llamaba «movimiento literario», y el bloque educativo enseña que el
+    // Boom no es un movimiento sino un fenómeno editorial y generacional.
+    pregunta: '¿Con qué nombre se conoce el fenómeno editorial y generacional que dio proyección internacional en los años 60 a Cortázar, Fuentes y Vargas Llosa?',
     opciones: ['Negrismo', 'Criollismo', 'Boom Latinoamericano', 'Ultraísmo'],
     correcta: 2,
-    explicacion: 'El Boom Latinoamericano (décadas de 1960-70) revolucionó la narrativa mundial. Estos autores experimentaron con el tiempo, el espacio y la perspectiva de maneras nunca vistas.',
+    explicacion: 'El Boom latinoamericano (décadas de 1960-70) llevó la novela latinoamericana a lectores de todo el mundo. No fue un movimiento con programa común: sus autores tenían estilos muy distintos, aunque muchos experimentaron con el tiempo, la estructura y la perspectiva narrativa.',
   },
   {
     id: 'm07', nivel: 'medio', categoria: 'autores',
@@ -282,7 +289,9 @@ export const POOL: Pregunta[] = [
   {
     // Hallazgo 306: pregunta por un PERSONAJE, no por un autor.
     id: 'm15', nivel: 'medio', categoria: 'obras',
-    pregunta: '¿Qué narrador protagoniza "El gran Gatsby" de F. Scott Fitzgerald?',
+    // Hallazgo 1712: preguntaba qué narrador «protagoniza» la novela y la explicación decía que
+    // Nick es narrador-testigo y Gatsby el protagonista: quien pulsaba «Jay Gatsby» tenía razón.
+    pregunta: '¿Quién narra "El gran Gatsby" de F. Scott Fitzgerald?',
     opciones: ['Jay Gatsby', 'Tom Buchanan', 'Jordan Baker', 'Nick Carraway'],
     correcta: 3,
     explicacion: 'Nick Carraway es el narrador-testigo de esta novela de 1925, símbolo del Sueño Americano y la Generación Perdida. Gatsby es el protagonista, pero Nick cuenta.',
@@ -361,7 +370,10 @@ export const POOL: Pregunta[] = [
     pregunta: '¿Qué novela de Juan Rulfo influyó decisivamente en García Márquez y el Boom?',
     opciones: ['El llano en llamas', 'La feria', 'Al filo del agua', 'Pedro Páramo'],
     correcta: 3,
-    explicacion: '"Pedro Páramo" (1955) transcurre en el pueblo fantasmal de Comala, México. García Márquez la describió como el libro que lo hizo querer ser escritor.',
+    // Hallazgo 1711: decía que García Márquez la describió como «el libro que lo hizo querer ser
+    // escritor». En «Breves nostalgias sobre Juan Rulfo» (1980) cuenta que ya tenía libros
+    // publicados y estaba en un «callejón sin salida»; su conmoción fundacional fue Kafka.
+    explicacion: '"Pedro Páramo" (1955) transcurre en el pueblo fantasmal de Comala, México. García Márquez contó en «Breves nostalgias sobre Juan Rulfo» (1980) que se la dio Álvaro Mutis cuando él, con varios libros ya escritos, se sentía «en un callejón sin salida», y que estudiar a fondo a Rulfo le dio «el camino que buscaba para continuar mis libros».',
   },
   {
     id: 'a07', nivel: 'avanzado', categoria: 'movimientos',
@@ -407,7 +419,9 @@ export const POOL: Pregunta[] = [
     pregunta: '¿En qué año publicó Cervantes la segunda parte del Quijote?',
     opciones: ['1605', '1610', '1615', '1620'],
     correcta: 2,
-    explicacion: 'La primera parte es de 1605. La segunda, de 1615, se publicó en parte para adelantarse a la versión apócrifa de Avellaneda (1614), que enfureció a Cervantes.',
+    // Hallazgo 1711: decía que se publicó «para adelantarse» al Avellaneda (1614), un libro que
+    // salió un año ANTES.
+    explicacion: 'La primera parte es de 1605. La segunda salió en 1615, un año después del Quijote apócrifo de Avellaneda (1614). Cervantes, que ya la estaba escribiendo, le responde en el prólogo y dentro de la propia novela: en el capítulo 59 don Quijote conoce ese libro falso y lo desmiente.',
   },
   {
     // Hallazgo 302: la pregunta anterior daba por hecho un «trío del realismo mágico más
