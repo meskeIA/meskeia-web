@@ -1,9 +1,16 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { verbosIrregulares } from '@/data/verbos-irregulares';
+
+/**
+ * Verbos que el quiz PREGUNTA: el banco tiene 75, pero `show` sale del sorteo (hallazgo 316),
+ * y la metadata prometía «75 verbos» (hallazgo 1840). La cifra sale del banco, no a mano.
+ */
+const N = verbosIrregulares.filter((v) => !v.pastSimpleRegular).length;
 
 export const metadata: Metadata = {
   title: 'Quiz Verbos Irregulares en Inglés - Past Simple A1 a B2 | meskeIA',
-  description: 'Aprende los verbos irregulares en inglés con este quiz interactivo. 75 verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa. Sin registro.',
+  description: `Aprende los verbos irregulares en inglés con este quiz interactivo. ${N} verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa. Sin registro.`,
   keywords: 'verbos irregulares ingles, quiz ingles, past simple ejercicios, past participle, aprender ingles, quiz verbos irregulares, inglés nivel A1 A2 B1 B2, ejercicios verbos irregulares',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Quiz Verbos Irregulares en Inglés | meskeIA',
-    description: 'Practica los verbos irregulares en inglés: 75 verbos de A1 a B2, opción múltiple, sin registro.',
+    description: `Practica los verbos irregulares en inglés: ${N} verbos de A1 a B2, opción múltiple, sin registro.`,
     url: 'https://meskeia.com/quiz-verbos-irregulares/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Verbos Irregulares en Inglés | meskeIA',
-    description: 'Aprende los verbos irregulares en inglés: 75 verbos, niveles A1-B2, sin publicidad.',
+    description: `Aprende los verbos irregulares en inglés: ${N} verbos, niveles A1-B2, sin publicidad.`,
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -36,7 +43,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Quiz Verbos Irregulares Inglés",
-  description: "Aprende los verbos irregulares en inglés con este quiz interactivo. 75 verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa. Sin registro.",
+  description: `Aprende los verbos irregulares en inglés con este quiz interactivo. ${N} verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa. Sin registro.`,
   url: "https://meskeia.com/quiz-verbos-irregulares/",
   category: 'EducationalApplication',
   features: [],
@@ -51,7 +58,9 @@ export const faqJsonLd = {
       name: '¿Cuántos verbos irregulares hay en inglés y cuáles son los más importantes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El inglés tiene alrededor de 200 verbos irregulares de uso frecuente, aunque en la práctica cotidiana se utilizan principalmente unos 75-100. Los más importantes por frecuencia de uso son: be, have, do, go, say, get, make, know, think y come. Este quiz incluye 75 verbos clasificados por nivel MCER, desde los esenciales de A1 hasta los menos habituales de B2.',
+        // Hallazgo 1843: esta lista no coincidía con la de la página. Es la de los 10 verbos
+        // más frecuentes del Oxford English Corpus, en su orden, y la página da la misma.
+        text: `El inglés tiene alrededor de 200 verbos irregulares, aunque en la práctica cotidiana se utilizan principalmente unos 75-100. En el Oxford English Corpus, los 10 verbos más frecuentes del inglés son todos irregulares: be, have, do, say, get, make, go, know, take y see. Este quiz pregunta ${N} verbos clasificados por nivel MCER, desde los esenciales de A1 hasta los menos habituales de B2.`,
       },
     },
     {
@@ -67,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Para qué nivel de inglés es útil practicar los verbos irregulares?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los verbos irregulares son imprescindibles desde el nivel A1, donde se aprenden los más básicos (be, have, go, come). A medida que se avanza hacia B1 y B2 aparecen verbos más complejos y menos frecuentes. Dominar las tres formas (infinitivo, past simple, past participle) es obligatorio para superar exámenes oficiales como Cambridge KET, PET o FCE.',
+        text: 'Los verbos irregulares son imprescindibles desde el nivel A1, donde se aprenden los más básicos (be, have, go, come). A medida que se avanza hacia B1 y B2 aparecen verbos más complejos y menos frecuentes. Las tres formas (infinitivo, past simple, past participle) se evalúan en exámenes oficiales como A2 Key, B1 Preliminary o B2 First de Cambridge (antes KET, PET y FCE).',
       },
     },
     {
@@ -86,7 +95,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la mejor forma de memorizar los verbos irregulares en inglés?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La repetición espaciada es el método más eficaz: practicar un poco cada día en lugar de estudiar muchos de una vez. Agrupar los verbos por patrones sonoros también ayuda (bring/brought, buy/bought, think/thought). Complementar la práctica con lectura y escucha de contenidos reales en inglés acelera la retención porque el cerebro asocia las formas con contextos reales.',
+        text: 'La repetición espaciada ayuda: practicar un poco cada día en lugar de estudiar muchos de una vez. Agrupar los verbos por patrones sonoros también ayuda (bring/brought, buy/bought, think/thought). Complementar la práctica con lectura y escucha de contenidos reales en inglés acelera la retención porque el cerebro asocia las formas con contextos reales.',
       },
     },
   ],

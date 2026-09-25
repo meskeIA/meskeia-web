@@ -1,13 +1,14 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizVerbosIrregulares.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import EducationalSection from '@/components/EducationalSection';
+import { formatPercentage } from '@/lib';
 import { verbosIrregulares, VerboIrregular } from '@/data/verbos-irregulares';
 
 type Nivel = 'A1' | 'A2' | 'B1' | 'B2' | 'todos';
@@ -19,15 +20,28 @@ interface PreguntaQuiz {
   respuestaCorrecta: string;
 }
 
+/**
+ * Verbos que el quiz PREGUNTA en cada nivel: `show` queda fuera del sorteo (hallazgo 316).
+ * Todas las cifras de tamaño salen de aquí: la tarjeta de B1 decía «20 verbos» y el aviso de
+ * debajo «tiene 19», y la guía y «Todos los niveles» prometían 75 cuando se preguntan 74
+ * (hallazgo 1840).
+ */
+function preguntablesDe(nivel: Nivel): VerboIrregular[] {
+  const pool = nivel === 'todos' ? verbosIrregulares : verbosIrregulares.filter(v => v.level === nivel);
+  return pool.filter(v => !v.pastSimpleRegular);
+}
+
+const TOTAL_PREGUNTABLES = preguntablesDe('todos').length;
+
 // Emoji y rótulo separados: dentro de la misma cadena el lector de pantalla lee «círculo
 // verde A1 Básico» y el candado check:a11y-jsx no puede verlo, porque viene de una constante
 // y no de texto JSX (hallazgo 317).
 const NIVEL_CONFIG: Record<Nivel, { emoji: string; label: string; desc: string }> = {
-  A1:    { emoji: '🟢', label: 'A1 Básico',          desc: '15 verbos esenciales' },
-  A2:    { emoji: '🟡', label: 'A2 Elemental',       desc: '20 verbos frecuentes' },
-  B1:    { emoji: '🟠', label: 'B1 Intermedio',      desc: '20 verbos habituales' },
-  B2:    { emoji: '🔴', label: 'B2 Avanzado',        desc: '20 verbos complejos'  },
-  todos: { emoji: '⭐', label: 'Todos los niveles',  desc: '75 verbos completos'  },
+  A1:    { emoji: '🟢', label: 'A1 Básico',          desc: `${preguntablesDe('A1').length} verbos esenciales` },
+  A2:    { emoji: '🟡', label: 'A2 Elemental',       desc: `${preguntablesDe('A2').length} verbos frecuentes` },
+  B1:    { emoji: '🟠', label: 'B1 Intermedio',      desc: `${preguntablesDe('B1').length} verbos habituales` },
+  B2:    { emoji: '🔴', label: 'B2 Avanzado',        desc: `${preguntablesDe('B2').length} verbos complejos`  },
+  todos: { emoji: '⭐', label: 'Todos los niveles',  desc: `${TOTAL_PREGUNTABLES} verbos`  },
 };
 
 const OPCIONES_PREGUNTAS = [10, 15, 20];
@@ -42,9 +56,19 @@ function mezclar<T>(arr: T[]): T[] {
   return a;
 }
 
-function generarOpciones(correcto: string, pool: string[]): string[] {
-  const incorrectos = mezclar(pool.filter(o => o !== correcto)).slice(0, 3);
-  return mezclar([correcto, ...incorrectos]);
+/**
+ * Cuatro opciones: la correcta, el INFINITIVO del verbo y distractores del nivel.
+ *
+ * El infinitivo va siempre. Antes solo aparecía cuando era la respuesta —en los A-A-A (put,
+ * cut, hurt, read)—, así que la única opción idéntica a la palabra de la pregunta era la buena
+ * y la forma la delataba. Ahora está en todas: en los A-A-A es la correcta y en el resto es
+ * el distractor clásico de quien no sabe que el verbo cambia (sospecha anotada en la
+ * re-inspección del 25/09/2026).
+ */
+function generarOpciones(correcto: string, infinitivo: string, pool: string[]): string[] {
+  const fijos = infinitivo !== correcto ? [infinitivo] : [];
+  const incorrectos = mezclar(pool.filter(o => o !== correcto && o !== infinitivo)).slice(0, 3 - fijos.length);
+  return mezclar([correcto, ...fijos, ...incorrectos]);
 }
 
 /**
@@ -65,14 +89,9 @@ function matizDelEnunciado(verbo: VerboIrregular): string {
 }
 
 function generarPreguntas(nivel: Nivel, numPreguntas: number): PreguntaQuiz[] {
-  const pool = nivel === 'todos'
-    ? verbosIrregulares
-    : verbosIrregulares.filter(v => v.level === nivel);
-
   // `show` sale del sorteo: su past simple «showed» es regular, es el único en -ed de los 75
-  // y se reconocía sin saber el verbo. Sigue en las tablas del bloque educativo, que es
-  // donde de verdad enseña algo (es irregular en el participio: shown).
-  const preguntables = pool.filter(v => !v.pastSimpleRegular);
+  // y se reconocía sin saber el verbo (es irregular solo en el participio: shown).
+  const preguntables = preguntablesDe(nivel);
 
   const seleccionados = mezclar(preguntables).slice(0, Math.min(numPreguntas, preguntables.length));
   // Los distractores salen del MISMO conjunto: si «showed» apareciera de distractor, se
@@ -81,9 +100,24 @@ function generarPreguntas(nivel: Nivel, numPreguntas: number): PreguntaQuiz[] {
 
   return seleccionados.map(verbo => {
     const correcta = respuestaDe(verbo);
-    const opciones = generarOpciones(correcta, poolRespuestas);
+    const opciones = generarOpciones(correcta, verbo.infinitive, poolRespuestas);
     return { verbo, opciones, respuestaCorrecta: correcta };
   });
+}
+
+/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
+const MARGEN_LOGO = 88;
+
+/**
+ * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del final.
+ * Mismo patrón que quiz-literatura-universal y quiz-simbolos-quimicos.
+ */
+function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
+  if (!bloque || !clave) return;
+  const r = clave.getBoundingClientRect();
+  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 function calcularPuntuacion(correctas: number, total: number): number {
@@ -118,11 +152,43 @@ export default function QuizVerbosIrregularesPage() {
   /** Preguntas ya contestadas, contando la actual en cuanto se responde. */
   const respondidas = preguntaActual + (seleccionada !== null ? 1 : 0);
   /** Verbos PREGUNTABLES del nivel elegido: el techo real de la partida. */
-  const verbosDelNivel = useMemo(
-    () => (nivel === 'todos' ? verbosIrregulares : verbosIrregulares.filter(v => v.level === nivel))
-      .filter(v => !v.pastSimpleRegular).length,
-    [nivel]
-  );
+  const verbosDelNivel = useMemo(() => preguntablesDe(nivel).length, [nivel]);
+
+  /**
+   * Foco y vista (hallazgos 1834 y 1835, la forma del 1812/1813 de quiz-simbolos-quimicos).
+   * · Al responder, la opción pulsada queda `disabled` y el foco caía al <body>: se lleva a
+   *   «Siguiente», la única acción que queda.
+   * · Al pulsar «Siguiente» ese botón se desmonta con el feedback y el foco caía al <body>,
+   *   por DETRÁS del quiz (el primer Tab iba a «Ver Guía Completa»). Ahora va a la tarjeta de
+   *   la pregunta nueva, y el Tab siguiente cae en la opción A.
+   * · En móvil, al avanzar o al empezar la pregunta quedaba bajo el logo fijo o por encima del
+   *   borde: si la tarjeta no se ve entera, la vista sube al principio del quiz (HUD incluido).
+   *   Igual con el resultado, que además recibe el foco para que el lector lo lea.
+   * · Al volver a la configuración desde el resultado, el foco va a su título.
+   */
+  const quizPanelRef = useRef<HTMLDivElement>(null);
+  const preguntaRef = useRef<HTMLDivElement>(null);
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const tituloConfigRef = useRef<HTMLHeadingElement>(null);
+  const vieneDelResultado = useRef(false);
+
+  useEffect(() => {
+    if (pantalla === 'quiz') {
+      if (seleccionada !== null) {
+        botonSiguienteRef.current?.focus();
+      } else {
+        traerALaVista(quizPanelRef.current, preguntaRef.current);
+        preguntaRef.current?.focus({ preventScroll: true });
+      }
+    } else if (pantalla === 'resultado') {
+      traerALaVista(resultadoRef.current, resultadoRef.current);
+      resultadoRef.current?.focus({ preventScroll: true });
+    } else if (pantalla === 'config' && vieneDelResultado.current) {
+      vieneDelResultado.current = false;
+      tituloConfigRef.current?.focus();
+    }
+  }, [pantalla, preguntaActual, seleccionada]);
 
   const iniciarQuiz = useCallback(() => {
     const nuevasPreguntas = generarPreguntas(nivel, numPreguntas);
@@ -153,7 +219,10 @@ export default function QuizVerbosIrregularesPage() {
   }, [esUltima, tiempoInicio]);
 
   const reiniciar = useCallback(() => { iniciarQuiz(); }, [iniciarQuiz]);
-  const volverConfig = useCallback(() => { setPantalla('config'); }, []);
+  const volverConfig = useCallback(() => {
+    vieneDelResultado.current = true;
+    setPantalla('config');
+  }, []);
 
   const puntuacion = useMemo(
     () => calcularPuntuacion(correctas, totalPreguntas),
@@ -187,7 +256,7 @@ export default function QuizVerbosIrregularesPage() {
       {/* ── PANTALLA CONFIGURACIÓN ── */}
       {pantalla === 'config' && (
         <div className={styles.configPanel}>
-          <h2 className={styles.configTitle}>Elige tu nivel</h2>
+          <h2 className={styles.configTitle} ref={tituloConfigRef} tabIndex={-1}>Elige tu nivel</h2>
 
           <div className={styles.nivelGrid}>
             {(Object.entries(NIVEL_CONFIG) as [Nivel, typeof NIVEL_CONFIG[Nivel]][]).map(([key, cfg]) => (
@@ -239,7 +308,7 @@ export default function QuizVerbosIrregularesPage() {
 
       {/* ── PANTALLA QUIZ ── */}
       {pantalla === 'quiz' && pregunta && (
-        <>
+        <div className={styles.quizPanel} ref={quizPanelRef}>
           {/* HUD */}
           <div className={styles.hudBar}>
             <div className={styles.hudItem}>
@@ -257,7 +326,7 @@ export default function QuizVerbosIrregularesPage() {
                     todavía no, así que durante toda la fase de feedback —que es justo cuando
                     se mira la pantalla— la precisión salía al 200 % con 2/2, 150 % con 3/3 y
                     100 % con la primera fallada y la segunda acertada (hallazgo 311). */}
-                {respondidas > 0 ? Math.round((correctas / respondidas) * 100) : 0}%
+                {formatPercentage(respondidas > 0 ? correctas / respondidas : 0, 0)}
               </span>
               <span className={styles.hudLabel}>Precisión</span>
             </div>
@@ -268,6 +337,8 @@ export default function QuizVerbosIrregularesPage() {
               className={styles.progresoFill}
               style={{ width: `${(preguntaActual / totalPreguntas) * 100}%` }}
               role="progressbar"
+              aria-label="Preguntas respondidas"
+              aria-valuetext={`${preguntaActual} de ${totalPreguntas}`}
               aria-valuenow={preguntaActual}
               aria-valuemin={0}
               aria-valuemax={totalPreguntas}
@@ -275,7 +346,7 @@ export default function QuizVerbosIrregularesPage() {
           </div>
 
           {/* Tarjeta de pregunta */}
-          <div className={styles.preguntaCard}>
+          <div className={styles.preguntaCard} ref={preguntaRef} tabIndex={-1}>
             <p className={styles.preguntaNumero}>Pregunta {preguntaActual + 1} de {totalPreguntas}</p>
             <p className={styles.preguntaEtiqueta}>
               ¿Cuál es el Past Simple{matizDelEnunciado(pregunta.verbo)} de...?
@@ -318,7 +389,11 @@ export default function QuizVerbosIrregularesPage() {
                 aria-live="polite"
               >
                 <p className={styles.feedbackTitulo}>
-                  {seleccionada === pregunta.respuestaCorrecta ? '✅ ¡Correcto!' : '❌ Incorrecto'}
+                  {/* El emoji en su nodo y oculto: dentro de la cadena, el lector anunciaba
+                      «marca de cruz, Incorrecto» en la alerta (hallazgo 1838, la forma del 317). */}
+                  {seleccionada === pregunta.respuestaCorrecta
+                    ? <><span aria-hidden="true">✅</span> ¡Correcto!</>
+                    : <><span aria-hidden="true">❌</span> Incorrecto</>}
                 </p>
                 <div className={styles.conjugacion}>
                   <span className={styles.conjForma}>{pregunta.verbo.infinitive}</span>
@@ -340,17 +415,17 @@ export default function QuizVerbosIrregularesPage() {
                 </div>
                 <p className={styles.conjSignificado}>"{pregunta.verbo.spanish}"</p>
               </div>
-              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" ref={botonSiguienteRef} className={styles.btnSiguiente} onClick={siguiente}>
                 {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
               </button>
             </>
           )}
-        </>
+        </div>
       )}
 
       {/* ── PANTALLA RESULTADO ── */}
       {pantalla === 'resultado' && (
-        <div className={styles.resultadoPanel}>
+        <div className={styles.resultadoPanel} ref={resultadoRef} tabIndex={-1}>
           <span className={styles.resultadoEmoji} aria-hidden="true">{resultadoTexto.emoji}</span>
           <h2 className={styles.resultadoTitulo}>{resultadoTexto.titulo}</h2>
           <p className={styles.resultadoPuntos}>{puntuacion} pts</p>
@@ -365,7 +440,7 @@ export default function QuizVerbosIrregularesPage() {
             </div>
             <div className={styles.statR}>
               <span className={styles.statRValor}>
-                {Math.round((correctas / totalPreguntas) * 100)}%
+                {formatPercentage(correctas / totalPreguntas, 0)}
               </span>
               <p className={styles.statRLabel}>Acierto</p>
             </div>
@@ -389,7 +464,7 @@ export default function QuizVerbosIrregularesPage() {
       {/* ── SECCIÓN EDUCATIVA ── */}
       <EducationalSection
         title="Guía completa de verbos irregulares en inglés"
-        subtitle="Todo lo que necesitas saber para dominar los 75 verbos irregulares más usados"
+        subtitle={`Todo lo que necesitas saber para dominar los ${TOTAL_PREGUNTABLES} verbos irregulares del quiz`}
         icon="📖"
       >
 
@@ -443,8 +518,12 @@ export default function QuizVerbosIrregularesPage() {
               </tbody>
             </table>
           </div>
+          {/* Hallazgo 1843: la página y el JSON-LD daban dos «10 más usados» distintos y la
+              página dejaba fuera «know». La lista es la de los 10 verbos más frecuentes del
+              Oxford English Corpus (todos irregulares), en su orden; en el COCA el 10.º es
+              «think» y no «see», por eso se nombra la fuente y no se habla del inglés en general. */}
           <p className={styles.eduNota}>
-            <strong>Los 10 más usados:</strong> be/was-were/been · have/had/had · do/did/done · go/went/gone · get/got/got(ten) · make/made/made · say/said/said · see/saw/seen · come/came/come · take/took/taken
+            <strong>Los 10 verbos más frecuentes (Oxford English Corpus):</strong> be/was-were/been · have/had/had · do/did/done · say/said/said · get/got/got(ten) · make/made/made · go/went/gone · know/knew/known · take/took/taken · see/saw/seen
           </p>
         </section>
 
@@ -474,22 +553,25 @@ export default function QuizVerbosIrregularesPage() {
                 <strong>Adulto preparando el B2 o C1</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Necesitas dominar los verbos irregulares para el examen oficial: Cambridge, EOI o APTIS.
+                Necesitas dominar los verbos irregulares para un examen oficial: Cambridge, APTIS, TOEFL
+                o el certificado de idiomas de tu país.
               </p>
               <p className={styles.escenarioTip}>
                 Practica el nivel B2 diariamente, donde están <em>lay</em>, <em>rise</em>, <em>lead</em> y
-                <em> feed</em>: sus parejas regulares (<em>lie</em>, <em>raise</em>) no entran en el quiz,
-                pero son justo las que hay que tener presentes al responder.
+                <em> feed</em>. Las parejas con las que se confunden no entran en el quiz: <em>raise</em>,
+                que es regular, y <em>lie</em> (tumbarse), que es irregular (<em>lie/lay/lain</em>) pero
+                no está en el banco. Son justo las que hay que tener presentes al responder.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
-                <strong>Opositor con prueba de idioma</strong>
+                <strong>Proceso de selección con prueba de idioma</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Tu convocatoria incluye inglés y hay una prueba de gramática con tiempos verbales.
+                Tu convocatoria (empleo público, beca o empresa) incluye inglés y hay una prueba de
+                gramática con tiempos verbales.
               </p>
               <p className={styles.escenarioTip}>
                 Céntrate en los verbos A-B-C (patrón más evaluado) y practica el modo "Todos los niveles".
@@ -523,17 +605,18 @@ export default function QuizVerbosIrregularesPage() {
               <strong>¿Cuántos verbos irregulares hay en inglés?</strong>
               <p>
                 Se estima que existen unos 200 verbos irregulares en inglés, aunque la mayoría de uso
-                cotidiano se concentra en unos 75-100. Los 75 verbos de este quiz cubren la gran mayoría
-                de los casos que aparecerán en textos y conversaciones habituales.
+                cotidiano se concentra en unos 75-100. Los {TOTAL_PREGUNTABLES} verbos que pregunta este
+                quiz incluyen los más frecuentes de todos.
               </p>
             </li>
 
             <li className={styles.faqItem}>
               <strong>¿Cuáles son los más usados en la práctica?</strong>
               <p>
-                Los 10 verbos irregulares más frecuentes en inglés escrito y oral son: <em>be, have, do, go,
-                get, make, say, see, come</em> y <em>take</em>. Si los dominas perfectamente, ya tienes una
-                base sólida para cualquier nivel B1 o superior.
+                En el Oxford English Corpus, los 10 verbos más frecuentes del inglés son todos
+                irregulares: <em>be, have, do, say, get, make, go, know, take</em> y <em>see</em>. Otros
+                corpus cambian algún puesto (en el estadounidense COCA, <em>think</em> adelanta a
+                <em> see</em>), pero el núcleo es el mismo, y los diez están en el nivel A1 de este quiz.
               </p>
             </li>
 
@@ -568,18 +651,20 @@ export default function QuizVerbosIrregularesPage() {
             <li className={styles.faqItem}>
               <strong>¿Qué verbos son irregulares en inglés pero no en español?</strong>
               <p>
-                Algunos ejemplos llamativos: <em>read/read/read</em> (misma escritura, distinta pronunciación),
-                <em>hear/heard/heard</em> (en español "oír" es regular en muchos tiempos), <em>sleep/slept/slept</em>
-                y <em>feel/felt/felt</em>. Son trampas habituales para hispanohablantes.
+                Algunos ejemplos: <em>buy/bought/bought</em> (comprar), <em>speak/spoke/spoken</em> (hablar),
+                <em>drink/drank/drunk</em> (beber) y <em>read/read/read</em> (leer; misma escritura,
+                distinta pronunciación). Los cuatro verbos españoles son regulares, así que la intuición
+                del español no avisa de que en inglés cambian.
               </p>
             </li>
 
             <li className={styles.faqItem}>
               <strong>¿Cómo memorizarlos de forma efectiva?</strong>
               <p>
-                El método más eficaz combina tres técnicas: (1) aprender por grupos de patrón, no en orden alfabético;
-                (2) usar flashcards con la frase completa, no solo el verbo suelto; (3) repaso espaciado en los
-                intervalos 1-3-7-21 días. Este quiz está diseñado para integrarse con esa cadencia.
+                Tres técnicas que ayudan: (1) aprender por grupos de patrón, no en orden alfabético;
+                (2) usar flashcards con la frase completa, no solo el verbo suelto; (3) repasar a intervalos
+                crecientes (por ejemplo, 1, 3, 7 y 21 días después), que es la idea de la repetición
+                espaciada. Puedes usar una partida de este quiz en cada repaso.
               </p>
             </li>
 
@@ -591,10 +676,12 @@ export default function QuizVerbosIrregularesPage() {
                 <em>feel/felt/felt</em>, y <em>find/found/found</em> vs. <em>found/founded/founded</em>.
               </p>
               <p className={styles.faqTip}>
-                Consejo: de esos pares, el quiz tiene <em>lay</em>, <em>rise</em>, <em>lead</em> y
-                <em> feed</em> en el nivel B2, <em>fall</em> en B1, <em>feel</em> en A2 y <em>find</em> en
-                A1 — sus parejas regulares (<em>lie</em>, <em>raise</em>, <em>found</em>) no entran, porque
-                no son irregulares. Para practicarlos juntos, juega en el nivel <strong>Completo</strong>.
+                Consejo: de esos pares, el quiz tiene <em>lay</em> y <em>rise</em> en el nivel B2,
+                <em>fall</em> en B1, <em>feel</em> en A2 y <em>find</em> en A1. Sus parejas no entran:
+                <em>raise</em> y <em>found</em> (fundar), porque no son irregulares, y <em>lie</em>
+                (tumbarse), que sí lo es (<em>lie/lay/lain</em>) pero no está en el banco. Ojo: solo es
+                regular <em>lie</em> «mentir» (<em>lied/lied</em>), que no es la pareja de <em>lay</em>.
+                Para practicar los que sí están, juega en el nivel <strong>Completo</strong>.
               </p>
             </li>
 
@@ -603,7 +690,7 @@ export default function QuizVerbosIrregularesPage() {
 
         {/* 4. Guía Paso a Paso */}
         <section className={styles.eduBloque}>
-          <h4 className={styles.eduTitulo}>Plan de 30 días para dominar los 75 verbos irregulares</h4>
+          <h4 className={styles.eduTitulo}>Plan de 30 días para dominar los {TOTAL_PREGUNTABLES} verbos irregulares del quiz</h4>
           <p className={styles.eduIntro}>
             Un método estructurado con repetición espaciada para interiorizar los verbos de forma duradera:
           </p>
@@ -662,7 +749,7 @@ export default function QuizVerbosIrregularesPage() {
               <div className={styles.stepContent}>
                 <strong>Días 25–27 — Repaso de errores</strong>
                 <p>Identifica qué verbos has fallado más durante el mes y crea un mini-quiz personalizado
-                con esos 10–15 verbos. Repite hasta 95 % de acierto.</p>
+                con esos 10–15 verbos. Repite hasta 95 % de acierto.</p>
               </div>
             </li>
 
@@ -670,8 +757,8 @@ export default function QuizVerbosIrregularesPage() {
               <span className={styles.stepNumber}>6</span>
               <div className={styles.stepContent}>
                 <strong>Días 28–29 — Modo "Todos los niveles"</strong>
-                <p>Activa el quiz con los 75 verbos completos y 20 preguntas. El objetivo es superar el 85 %
-                de acierto. Si no lo consigues, vuelve al paso 5 con los errores de esta sesión.</p>
+                <p>Activa el nivel Completo ({TOTAL_PREGUNTABLES} verbos) con 20 preguntas. El objetivo es
+                superar el 85 % de acierto. Si no lo consigues, vuelve al paso 5 con los errores de esta sesión.</p>
               </div>
             </li>
 
@@ -680,8 +767,7 @@ export default function QuizVerbosIrregularesPage() {
               <div className={styles.stepContent}>
                 <strong>Día 30 — Test final y mantenimiento</strong>
                 <p>Realiza el quiz completo de 20 preguntas en modo "Todos". A partir de aquí, un repaso
-                semanal de 10 minutos es suficiente para mantener el nivel. La curva del olvido se aplana
-                drásticamente después del primer mes.</p>
+                semanal de 10 minutos ayuda a mantener el nivel.</p>
               </div>
             </li>
 
@@ -709,9 +795,10 @@ export default function QuizVerbosIrregularesPage() {
 
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🕐</span>
-              <strong>Repaso espaciado 1-3-7-21 días</strong>
-              <p>Repasa un verbo nuevo al día siguiente, a los 3 días, a la semana y a los 21 días.
-              Este intervalo combate la curva del olvido de Ebbinghaus y fija el recuerdo a largo plazo.</p>
+              <strong>Repaso espaciado</strong>
+              <p>Repasa un verbo nuevo al día siguiente, a los 3 días, a la semana y a las 3 semanas.
+              Esos intervalos son una pauta habitual, no una cifra exacta: lo que la investigación sobre
+              la memoria respalda es espaciar los repasos en vez de concentrarlos.</p>
             </div>
 
             <div className={styles.tipCard}>
@@ -731,8 +818,9 @@ export default function QuizVerbosIrregularesPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Sesiones cortas y frecuentes</strong>
-              <p>10 minutos diarios superan a 70 minutos semanales en una sola sesión. La memoria trabaja
-              mejor con repetición distribuida. Usa este quiz 5–10 minutos cada mañana antes del trabajo o el estudio.</p>
+              <p>Repartir la práctica en sesiones cortas suele retener mejor que concentrarla en una
+              sola sesión larga (el llamado efecto de espaciado). Una partida de 5–10 minutos al día
+              encaja en cualquier rutina.</p>
             </div>
 
           </div>
@@ -757,7 +845,7 @@ export default function QuizVerbosIrregularesPage() {
                 Los más regularizados erróneamente: <em>go, buy, think, bring, teach</em>.
               </li>
               <li>
-                <strong>Confundir <em>lay/lie/lain</em> vs. <em>lay/laid/laid</em>:</strong> <em>lie</em>
+                <strong>Confundir <em>lie/lay/lain</em> con <em>lay/laid/laid</em>:</strong> <em>lie</em>
                 (yacer) es intransitivo; <em>lay</em> (poner) necesita objeto. "She <em>lay</em> on the sofa"
                 (pasado de <em>lie</em>) vs. "She <em>laid</em> the book on the table" (pasado de <em>lay</em>).
               </li>

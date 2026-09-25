@@ -92,7 +92,7 @@ const CANON: Record<string, { ps: string; pp: string; es: string; nivel: string;
   think:  { ps: 'thought',    pp: 'thought', es: 'pensar',              nivel: 'A1' },
   see:    { ps: 'saw',        pp: 'seen',    es: 'ver',                 nivel: 'A1' },
   say:    { ps: 'said',       pp: 'said',    es: 'decir',               nivel: 'A1' },
-  take:   { ps: 'took',       pp: 'taken',   es: 'tomar / coger',       nivel: 'A1' },
+  take:   { ps: 'took',       pp: 'taken',   es: 'tomar / llevar',      nivel: 'A1' },
   give:   { ps: 'gave',       pp: 'given',   es: 'dar',                 nivel: 'A1' },
   find:   { ps: 'found',      pp: 'found',   es: 'encontrar',           nivel: 'A1' },
   tell:   { ps: 'told',       pp: 'told',    es: 'contar / decir',      nivel: 'A1' },
@@ -106,11 +106,11 @@ const CANON: Record<string, { ps: string; pp: string; es: string; nivel: string;
   run:    { ps: 'ran',     pp: 'run',     es: 'correr',               nivel: 'A2' },
   put:    { ps: 'put',     pp: 'put',     es: 'poner',                nivel: 'A2' },
   sit:    { ps: 'sat',     pp: 'sat',     es: 'sentarse',             nivel: 'A2' },
-  meet:   { ps: 'met',     pp: 'met',     es: 'conocer / quedar',     nivel: 'A2' },
+  meet:   { ps: 'met',     pp: 'met',     es: 'conocer / encontrarse con', nivel: 'A2' },
   leave:  { ps: 'left',    pp: 'left',    es: 'salir / dejar',        nivel: 'A2' },
   lose:   { ps: 'lost',    pp: 'lost',    es: 'perder',               nivel: 'A2' },
   win:    { ps: 'won',     pp: 'won',     es: 'ganar',                nivel: 'A2' },
-  drive:  { ps: 'drove',   pp: 'driven',  es: 'conducir',             nivel: 'A2' },
+  drive:  { ps: 'drove',   pp: 'driven',  es: 'conducir / manejar',   nivel: 'A2' },
   bring:  { ps: 'brought', pp: 'brought', es: 'traer',                nivel: 'A2' },
   speak:  { ps: 'spoke',   pp: 'spoken',  es: 'hablar',               nivel: 'A2' },
   hear:   { ps: 'heard',   pp: 'heard',   es: 'oír',                  nivel: 'A2' },
@@ -124,7 +124,7 @@ const CANON: Record<string, { ps: string; pp: string; es: string; nivel: string;
   cut:    { ps: 'cut',    pp: 'cut',       es: 'cortar',                    nivel: 'B1' },
   fall:   { ps: 'fell',   pp: 'fallen',    es: 'caer',                      nivel: 'B1' },
   fly:    { ps: 'flew',   pp: 'flown',     es: 'volar',                     nivel: 'B1' },
-  forget: { ps: 'forgot', pp: 'forgotten', es: 'olvidar',                   nivel: 'B1' },
+  forget: { ps: 'forgot', pp: 'forgotten', es: 'olvidar',                   nivel: 'B1', variantes: 'participio «forgot» en inglés americano (OALD)', ppAlt: 'forgot (AmE)' },
   grow:   { ps: 'grew',   pp: 'grown',     es: 'crecer',                    nivel: 'B1' },
   hold:   { ps: 'held',   pp: 'held',      es: 'sostener / sujetar',        nivel: 'B1' },
   hurt:   { ps: 'hurt',   pp: 'hurt',      es: 'doler / herir',             nivel: 'B1' },
@@ -218,11 +218,15 @@ const VERBOS_QUE_EL_PLAN_MANDA_PRACTICAR: { verbo: string; nivelQuePideElPlan: s
 ];
 
 /**
- * Parejas regulares que la FAQ nombra para contrastar y que NO están en el banco, porque no
- * son verbos irregulares. La FAQ tiene que decirlo, o vuelve el hallazgo 314 por la puerta
- * de atrás: mandar practicar en el quiz algo que el quiz no tiene.
+ * Parejas que la FAQ nombra para contrastar y que NO están en el banco. La FAQ tiene que
+ * decirlo, o vuelve el hallazgo 314 por la puerta de atrás: mandar practicar en el quiz algo
+ * que el quiz no tiene.
+ *
+ * Hasta el 25/09/2026 se llamaba PAREJAS_REGULARES_… y daba a las tres por regulares, que es
+ * justo el defecto del hallazgo 1841: raise y found (fundar) lo son, pero lie (yacer) es
+ * irregular, lie/lay/lain (OALD, lie¹). Lo que comprueba —que no están en el banco— no cambia.
  */
-const PAREJAS_REGULARES_QUE_LA_FAQ_NOMBRA = ['lie', 'raise', 'found'];
+const PAREJAS_QUE_LA_FAQ_DEJA_FUERA = ['lie', 'raise', 'found'];
 
 // ─── Utilidades de lectura de la pantalla ────────────────────────────────────
 
@@ -384,7 +388,9 @@ test.describe('Quiz Verbos Irregulares', () => {
     await expect(page.locator('[class*="resultadoSubtitulo"]')).toContainText('7 de 10 respuestas correctas');
     const stats = (await page.locator('[class*="statsResultado"]').innerText()).replace(/\s+/g, ' ');
     expect(stats).toContain('7/10');
-    expect(stats).toContain('70%');
+    // `stats` pasa por replace(/\s+/g, ' '), que convierte el espacio duro en uno normal: aquí
+    // se mira la cifra; el espacio duro exacto lo vigila el caso del hallazgo 1839.
+    expect(stats).toContain('70 %');
   });
 
   /**
@@ -432,7 +438,7 @@ test.describe('Quiz Verbos Irregulares', () => {
     await expect(page.locator('[class*="resultadoSubtitulo"]')).toContainText('0 de 15 respuestas correctas');
     const stats = (await page.locator('[class*="statsResultado"]').innerText()).replace(/\s+/g, ' ');
     expect(stats).toContain('0/15');
-    expect(stats).toContain('0%');
+    expect(stats).toMatch(/(^| )0 %/);
   });
 
   /**
@@ -486,7 +492,7 @@ test.describe('Quiz Verbos Irregulares', () => {
     const tras = await hud(page);
     expect(tras.progreso).toBe('1/10');
     expect(tras.correctas, 'el marcador no ha vuelto a cero al reiniciar').toBe('0');
-    expect(tras.precision).toBe('0%');
+    expect(tras.precision).toBe('0\u00A0%');
     await expect(page.locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '0');
   });
 
@@ -507,7 +513,7 @@ test.describe('Quiz Verbos Irregulares', () => {
       const inf = (await verboEnPantalla(page).textContent())!.trim();
       await pulsarOpcion(page, respuestaQueSePregunta(inf));
       const { precision } = await hud(page);
-      expect(precision, `tras acertar ${i} de ${i} la precisión tiene que ser 100 %`).toBe('100%');
+      expect(precision, `tras acertar ${i} de ${i} la precisión tiene que ser 100 %`).toBe('100\u00A0%');
       await botonSiguiente(page).click();
     }
   });
@@ -525,13 +531,13 @@ test.describe('Quiz Verbos Irregulares', () => {
     const ops = await opcionesVisibles(page);
     const incorrecta = ops.find((o) => o !== respuestaQueSePregunta(primero))!;
     await pulsarOpcion(page, incorrecta);
-    expect((await hud(page)).precision, 'tras fallar la primera').toBe('0%');
+    expect((await hud(page)).precision, 'tras fallar la primera').toBe('0\u00A0%');
     await botonSiguiente(page).click();
 
     // Segunda: se acierta.
     const segundo = (await verboEnPantalla(page).textContent())!.trim();
     await pulsarOpcion(page, respuestaQueSePregunta(segundo));
-    expect((await hud(page)).precision, '1 de 2 es el 50 %').toBe('50%');
+    expect((await hud(page)).precision, '1 de 2 es el 50 %').toBe('50\u00A0%');
   });
 
   /**
@@ -607,8 +613,8 @@ test.describe('Quiz Verbos Irregulares', () => {
    */
   test('314b · la FAQ avisa de que las parejas regulares no entran en el quiz', async ({ page }) => {
     const enBanco = new Set(verbosIrregulares.map((v) => v.infinitive));
-    for (const verbo of PAREJAS_REGULARES_QUE_LA_FAQ_NOMBRA) {
-      expect(enBanco.has(verbo), `«${verbo}» es regular y no debería estar en el banco`).toBe(false);
+    for (const verbo of PAREJAS_QUE_LA_FAQ_DEJA_FUERA) {
+      expect(enBanco.has(verbo), `la FAQ dice que «${verbo}» no está en el banco, y está`).toBe(false);
     }
 
     await page.goto(RUTA);
@@ -816,7 +822,8 @@ test.describe('Inspector 25/09/2026', () => {
    *   · B2 tiene 20 verbos, todos preguntables → la partida es de 10, sin aviso, y el botón
    *     dice «Empezar Quiz — 10 preguntas · Nivel B2».
    *   · Los 10 infinitivos son de B2 (CANON) y distintos; las 4 opciones de cada pregunta son
-   *     past simples de B2: los distractores salen del mismo nivel (poolRespuestas).
+   *     past simples de B2 o el infinitivo del propio verbo, que desde el 25/09/2026 es un
+   *     distractor fijo (ver el caso «el infinitivo está en todas las preguntas»).
    *   · Precisión tras cada respuesta: 1-8 → 100 % · tras la 9.ª (8 de 9) → round(88,89) = 89 %
    *     · tras la 10.ª (8 de 10) → 80 %.
    *   · 8/10 = 0,8 → rama «≥ 0,7» de calcularPuntuacion: 60 + (0,8 − 0,7)/0,2 · 40 = 60 + 20 =
@@ -844,7 +851,7 @@ test.describe('Inspector 25/09/2026', () => {
       expect(new Set(ops).size, `Q${i}: ${ops.join(', ')}`).toBe(4);
       const buena = respuestaQueSePregunta(inf);
       expect(ops).toContain(buena);
-      for (const o of ops) expect(pasadosB2.has(o), `Q${i} (${inf}): «${o}» no es un past simple de B2`).toBe(true);
+      for (const o of ops) expect(pasadosB2.has(o) || o === inf, `Q${i} (${inf}): «${o}» no es un past simple de B2 ni el infinitivo`).toBe(true);
 
       const acierta = i <= 8;
       await pulsarOpcion(page, acierta ? buena : ops.find((o) => o !== buena)!);
@@ -1039,6 +1046,32 @@ test.describe('Inspector 25/09/2026', () => {
     expect(mala.opacidad).toBe('1');
   });
 
+  /**
+   * SOSPECHA (1) de la re-inspección, REPARADA el 25/09/2026 — en los A-A-A (put, cut, hurt,
+   * read) el infinitivo solo aparecía entre las opciones cuando ERA la respuesta: la única
+   * opción idéntica a la palabra de la pregunta era la buena. Ahora el infinitivo va en TODAS
+   * las preguntas (correcta en los A-A-A, distractor en el resto), así que no delata nada.
+   * A2 con 20 preguntas recorre sus 20 verbos, put y read incluidos.
+   */
+  test('sospecha (1) reparada · el infinitivo está entre las opciones en todas las preguntas', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A2 Elemental', 20);
+    const aaa: string[] = [];
+    for (let i = 1; i <= 20; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 20`, { exact: true })).toBeVisible();
+      const inf = norm(await verboEnPantalla(page).textContent());
+      const ops = await opcionesVisibles(page);
+      expect(ops, `«${inf}»: el infinitivo no está entre ${ops.join(', ')}`).toContain(inf);
+      expect(new Set(ops).size).toBe(4);
+      if (respuestaQueSePregunta(inf) === inf) aaa.push(inf);
+      await pulsarOpcion(page, respuestaQueSePregunta(inf));
+      await expect(feedback(page)).toContainText('¡Correcto!');
+      await botonSiguiente(page).click();
+    }
+    expect(aaa.sort()).toEqual(['put', 'read']);
+  });
+
   // ───────────────────────────── HALLAZGOS ─────────────────────────────
 
   /**
@@ -1051,7 +1084,8 @@ test.describe('Inspector 25/09/2026', () => {
    * (el patrón reparado hoy en quiz-literatura-universal y quiz-biologia-molecular).
    */
   test('hallazgo · tras «Siguiente pregunta» con el teclado el foco no cae a <body> y el Tab entra en la pregunta nueva', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026): foco en BODY y el Tab va a «Ver Guía Completa»
+    // Reparado el 25/09/2026 (hallazgo 1834): foco a «Siguiente» al responder y a la tarjeta
+    // de la pregunta nueva (tabIndex=-1) al avanzar.
     await abrirHidratada(page);
     await arrancarPartida(page, 'A1 Básico', 10);
     const inf = norm(await verboEnPantalla(page).textContent());
@@ -1073,6 +1107,24 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
+   * 1834b — los otros dos saltos del mismo hallazgo: al responder, el foco va solo a
+   * «Siguiente» (la opción pulsada queda disabled); tras «Ver resultados», al panel del
+   * resultado, que así se anuncia.
+   */
+  test('1834b · al responder el foco va a «Siguiente» y al terminar, al resultado', async ({ page }) => {
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    for (let i = 1; i <= 10; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      await (await botonDeOpcion(page, respuestaQueSePregunta(inf))).focus();
+      await page.keyboard.press('Enter');
+      await expect(botonSiguiente(page), `tras responder la ${i}.ª el foco no está en «Siguiente»`).toBeFocused();
+      await page.keyboard.press('Enter');
+    }
+    await expect(page.locator('[class*="resultadoPanel"]')).toBeFocused();
+  });
+
+  /**
    * HALLAZGO medio (Inspector 25/09/2026) · accesibilidad — sospecha (d) CONFIRMADA.
    * El módulo redefine `--primary: #2E86AB` en `.container` para los DOS temas, y los botones
    * de acción ponen blanco encima: 4,11:1 (< 4,5:1 de WCAG 1.4.3 para texto de 14-17,6 px).
@@ -1082,7 +1134,7 @@ test.describe('Inspector 25/09/2026', () => {
    * Existe --primary-boton (#26718F): 5,47:1 con blanco en los dos temas.
    */
   test('hallazgo · el texto blanco de los botones de acción llega a 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026): 4,11:1 en los seis, en claro y en oscuro
+    // Reparado el 25/09/2026 (hallazgo 1836): los seis fondos pasan a --primary-boton.
     test.setTimeout(90_000);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const medidas: Record<string, number> = {};
@@ -1123,18 +1175,28 @@ test.describe('Inspector 25/09/2026', () => {
    * 25/09/2026. (El verbo grande, el HUD y la puntuación son texto grande: ≥ 3:1, pasan.)
    */
   test('hallazgo · el texto en color de marca de la guía llega a 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): 3,59-4,11 en claro, 2,74-3,50 en oscuro
+    // Reparado el 25/09/2026 (hallazgo 1837): --primary-texto y título de la caja #9C4221.
+    // Se mide el PEOR de cada grupo, no el primero: el consejo de la FAQ va sobre un fondo
+    // tintado (.faqTip) distinto del de las demás respuestas.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const medidas: Record<string, number> = {};
+    const peor = async (loc: Locator): Promise<number> => {
+      const n = await loc.count();
+      expect(n).toBeGreaterThan(0);
+      let min = Infinity;
+      for (let i = 0; i < n; i++) min = Math.min(min, await contraste(loc.nth(i)));
+      return min;
+    };
     for (const tema of ['light', 'dark'] as const) {
       await abrirHidratada(page, tema);
       await page.getByRole('button', { name: 'Ver guía educativa' }).click();
       await page.mouse.move(0, 0);
-      medidas[`${tema} · consejo de escenario`] = await contraste(page.locator('[class*="escenarioTip"]').first());
-      medidas[`${tema} · verbo en la tabla`] = await contraste(page.locator('[class*="comparativaTable"] td em').first());
-      medidas[`${tema} · verbo en la FAQ`] = await contraste(page.locator('[class*="faqItem"] em').first());
-      medidas[`${tema} · verbo en el plan`] = await contraste(page.locator('[class*="stepContent"] em').first());
-      medidas[`${tema} · verbo en errores típicos`] = await contraste(page.locator('[class*="warningList"] em').first());
+      medidas[`${tema} · consejo de escenario`] = await peor(page.locator('[class*="escenarioTip"]'));
+      medidas[`${tema} · verbo en la tabla`] = await peor(page.locator('[class*="comparativaTable"] td em'));
+      medidas[`${tema} · verbo en la FAQ`] = await peor(page.locator('[class*="faqItem"] em'));
+      medidas[`${tema} · verbo en el plan`] = await peor(page.locator('[class*="stepContent"] em'));
+      medidas[`${tema} · verbo en las técnicas`] = await peor(page.locator('[class*="tipCard"] em'));
+      medidas[`${tema} · verbo en errores típicos`] = await peor(page.locator('[class*="warningList"] em'));
       medidas[`${tema} · título de errores típicos`] = await contraste(page.locator('[class*="warningHeader"] strong'));
     }
     const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5);
@@ -1149,7 +1211,7 @@ test.describe('Inspector 25/09/2026', () => {
    * nombre accesible. Medido con ariaSnapshot el 25/09/2026.
    */
   test('hallazgo · el veredicto no anuncia emojis y la barra de progreso tiene nombre', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «❌ Incorrecto» / «✅ ¡Correcto!» en la alerta
+    // Reparado el 25/09/2026 (hallazgo 1838): emoji en su <span aria-hidden> y aria-label en la barra.
     const EMOJI = /\p{Extended_Pictographic}/u;
     await abrirHidratada(page);
     await arrancarPartida(page, 'A1 Básico', 10);
@@ -1175,7 +1237,7 @@ test.describe('Inspector 25/09/2026', () => {
    * fijan «70%», «0%», «100%» y «50%» pegados y habrá que actualizarlos a la vez.
    */
   test('hallazgo · los porcentajes llevan espacio duro antes del %', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «100%» en el HUD, «100%» en la ficha, «95 %» con espacio normal
+    // Reparado el 25/09/2026 (hallazgo 1839): formatPercentage de @/lib y U+00A0 en la guía.
     await abrirHidratada(page);
     await arrancarPartida(page, 'A1 Básico', 10);
     const inf = norm(await verboEnPantalla(page).textContent());
@@ -1198,14 +1260,27 @@ test.describe('Inspector 25/09/2026', () => {
    * días» («activa el quiz con los 75 verbos») y la metadata: se preguntan 74.
    */
   test('hallazgo · la tarjeta de B1 y el aviso no dan dos tamaños distintos del nivel', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «20 verbos habituales» frente a «tiene 19 verbos»
+    // Reparado el 25/09/2026 (hallazgo 1840): todas las cifras de tamaño salen de los verbos
+    // PREGUNTABLES del banco (show fuera): B1 = 19 y «Todos» = 74, en la app y en la metadata.
     await abrirHidratada(page);
     const tarjeta = page.locator('[class*="nivelBtn"]').filter({ hasText: 'B1 Intermedio' });
     await tarjeta.click();
     await page.getByRole('button', { name: '20 preguntas', exact: true }).click();
     const textos = `${norm(await tarjeta.textContent())} · ${norm(await page.locator('[class*="avisoNivel"]').textContent())}`;
     const cifras = [...new Set([...textos.matchAll(/(\d+) verbos/g)].map((m) => m[1]))];
-    expect(cifras, `la pantalla da dos tamaños de B1: ${textos}`).toHaveLength(1);
+    expect(cifras, `la pantalla da dos tamaños de B1: ${textos}`).toEqual(['19']);
+
+    // «Todos los niveles», la guía y la metadata: 74 (75 del banco menos show), nunca 75.
+    const preguntables = Object.keys(CANON).filter((inf) => inf !== 'show').length;
+    expect(preguntables).toBe(74);
+    await expect(page.locator('[class*="nivelBtn"]').filter({ hasText: 'Todos los niveles' })).toContainText(`${preguntables} verbos`);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const cuerpo = norm(await page.locator('body').innerText());
+    expect(cuerpo, 'la página sigue prometiendo 75 verbos').not.toMatch(/\b75 verbos/);
+    const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+    expect(descripcion).toContain(`${preguntables} verbos`);
+    const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(bloques, 'el JSON-LD sigue prometiendo 75 verbos').not.toMatch(/\b75 verbos/);
   });
 
   /**
@@ -1218,11 +1293,13 @@ test.describe('Inspector 25/09/2026', () => {
    * Fuente: Oxford Learner's Dictionaries, lie¹ (estar tumbado), Verb Forms «past simple lay ·
    * past participle lain»; Cambridge Dictionary, lie «past tense lay, past participle lain».
    * Solo lie «mentir» es regular (lied), y no es la pareja de lay. (Ojo: el caso 314b de arriba
-   * y su constante PAREJAS_REGULARES_QUE_LA_FAQ_NOMBRA dan por buena la misma premisa; lo que
+   * y su constante —hoy PAREJAS_QUE_LA_FAQ_DEJA_FUERA— daban por buena la misma premisa; lo que
    * comprueban —que lie, raise y found no están en el banco— sigue siendo cierto.)
    */
   test('hallazgo · la guía no presenta «lie» como verbo regular ni lo conjuga «lay/lie/lain»', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026): «parejas regulares (lie, raise…)» y «lay/lie/lain»
+    // Reparado el 25/09/2026 (hallazgo 1841). Además de no llamarlo regular, la guía tiene que
+    // conjugarlo bien donde lo nombra (lie/lay/lain, OALD lie¹) y separar el «lie» regular
+    // (mentir: lied, OALD lie²).
     await abrirHidratada(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const LIE_REGULAR = /regulares\s*\([^)]*\blie\b/;
@@ -1232,6 +1309,9 @@ test.describe('Inspector 25/09/2026', () => {
     expect(faq, 'la FAQ llama regular a «lie»').not.toMatch(LIE_REGULAR);
     const errores = norm(await page.locator('[class*="warningList"]').textContent());
     expect(errores, 'la caja de errores conjuga «lay/lie/lain»').not.toContain('lay/lie/lain');
+    expect(errores).toContain('lie/lay/lain');
+    expect(escenario).toContain('lie/lay/lain');
+    expect(faq).toMatch(/lie «mentir» \(lied\/lied\)/);
   });
 
   /**
@@ -1243,12 +1323,19 @@ test.describe('Inspector 25/09/2026', () => {
    * sleep y feel no llevan ninguna.
    */
   test('hallazgo · la FAQ no pone como «regulares en español» verbos que la RAE da por irregulares', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): sleep (dormir), feel (sentir) y hear (oír)
+    // Reparado el 25/09/2026 (hallazgo 1842). Los ejemplos pasan a buy (comprar), speak
+    // (hablar), drink (beber) y read (leer): ninguno lleva nota de conjugación irregular en el
+    // DLE (dle.rae.es/comprar, /hablar, /beber) y el DPD dice de «leer» que «es regular desde el
+    // punto de vista morfológico» (rae.es/dpd/leer), frente a «Verbo irregular» en dormir y
+    // sentir (rae.es/dpd/dormir, /sentir). Consultado el 25/09/2026.
     await abrirHidratada(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const item = page.locator('[class*="faqItem"]').filter({ hasText: 'pero no en español' });
-    if ((await item.count()) > 0) {
-      expect(norm(await item.textContent())).not.toMatch(/sleep\/slept|feel\/felt|hear\/heard/);
+    await expect(item).toHaveCount(1);
+    const texto = norm(await item.textContent());
+    expect(texto).not.toMatch(/sleep\/slept|feel\/felt|hear\/heard/);
+    for (const ejemplo of ['buy/bought/bought', 'speak/spoke/spoken', 'drink/drank/drunk', 'read/read/read']) {
+      expect(texto).toContain(ejemplo);
     }
   });
 
@@ -1264,20 +1351,28 @@ test.describe('Inspector 25/09/2026', () => {
    * make, know, take. La página deja fuera «know» (8.º en los dos) y mete «come» (11.º-12.º).
    */
   test('hallazgo · la lista de los 10 más frecuentes es la misma en la página y en el JSON-LD, y contiene los 9 en que coinciden OEC y COCA', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): la página omite «know»; el JSON-LD da otra lista
+    // Reparado el 25/09/2026 (hallazgo 1843). Las tres listas son ahora la de los 10 verbos más
+    // frecuentes del Oxford English Corpus, en su orden (be, have, do, say, get, make, go, know,
+    // take, see: tabla «Parts of speech» de «Most common words in English» en Wikipedia, que
+    // cita «The OEC: Facts about the language», Oxford University Press), y la página nombra la
+    // fuente. Como las frases cambiaron, los regex de extracción se reescribieron: «son todos
+    // irregulares: …». Se exige además el ORDEN del corpus, no solo el conjunto.
+    const OEC = ['be', 'have', 'do', 'say', 'get', 'make', 'go', 'know', 'take', 'see'];
     const NUCLEO = ['be', 'have', 'do', 'say', 'get', 'go', 'make', 'know', 'take'];
-    const lista = (s: string): string[] => s.split(/,\s*|\s+y\s+/).map((v) => v.trim()).filter(Boolean).sort();
+    const lista = (s: string): string[] => s.split(/,\s*|\s+y\s+/).map((v) => v.trim()).filter(Boolean);
     await abrirHidratada(page);
     const faq = norm(await page.locator('[class*="faqItem"]').filter({ hasText: 'más usados en la práctica' }).textContent());
-    const enPagina = lista(grupo(faq, /escrito y oral son: ([^.]+)\./));
-    const nota = norm(await page.locator('[class*="eduNota"]').filter({ hasText: 'Los 10 más usados' }).textContent());
-    const enNota = nota.split(':')[1].split('·').map((t) => t.split('/')[0].trim()).sort();
+    expect(faq).toContain('Oxford English Corpus');
+    const enPagina = lista(grupo(faq, /son todos irregulares: ([^.]+)\./));
+    const nota = norm(await page.locator('[class*="eduNota"]').filter({ hasText: 'Los 10 verbos más frecuentes' }).textContent());
+    expect(nota).toContain('Oxford English Corpus');
+    const enNota = nota.split(':')[1].split('·').map((t) => t.split('/')[0].trim());
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faqLd = bloques.find((b) => b.includes('FAQPage')) ?? '';
-    const enJsonLd = lista(grupo(faqLd, /frecuencia de uso son: ([^.]+)\./));
+    const enJsonLd = lista(grupo(faqLd, /son todos irregulares: ([^.]+)\./));
 
-    expect(enPagina).toHaveLength(10);
-    expect(enNota).toEqual(enPagina);
+    expect(enPagina).toEqual(OEC);
+    expect(enNota).toEqual(OEC);
     expect(enPagina, 'la lista de la página no contiene los 9 en que coinciden OEC y COCA').toEqual(expect.arrayContaining(NUCLEO));
     expect(enJsonLd, 'el FAQPage da otra lista de los 10 más frecuentes').toEqual(enPagina);
   });
@@ -1290,8 +1385,21 @@ test.describe('Inspector 25/09/2026', () => {
    * (en América, «manejar»), «quedar» por meet y los escenarios «EOI» y «Opositor». Ojo al
    * repararlo: el caso «el banco dice la verdad» de arriba fija `es: 'tomar / coger'` en CANON.
    */
+  /**
+   * 1844b — la parte del mismo hallazgo que vive en page.tsx, reparada el 25/09/2026: los
+   * escenarios ya no citan la EOI ni el «Opositor», que son solo de España.
+   */
+  test('1844b · los escenarios de la guía no son solo de España (sin «EOI» ni «Opositor»)', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const escenarios = norm(await page.locator('[class*="escenariosGrid"]').textContent());
+    expect(escenarios).not.toMatch(/\bEOI\b/);
+    expect(escenarios).not.toMatch(/Opositor/);
+  });
+
   test('hallazgo · el significado que el quiz enseña para «take» no usa «coger»', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «"tomar / coger"»
+    // REPARADO el 25/09/2026 (1844): take = «tomar / llevar», drive = «conducir / manejar» y
+    // meet = «conocer / encontrarse con» en data/verbos-irregulares.ts y en CANON.
     await abrirHidratada(page);
     // A1 con 15 preguntas recorre los 15 verbos del nivel, «take» incluido.
     await arrancarPartida(page, 'A1 Básico', 15);
@@ -1332,7 +1440,7 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
   });
 
   test('hallazgo · tras «Siguiente pregunta» el enunciado nuevo no queda bajo la barra fija del logo', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «Pregunta 2 de 10» y el enunciado, bajo el logo
+    // Reparado el 25/09/2026 (hallazgo 1835): traerALaVista + scroll-margin-top bajo la barra.
     const tocar = async (loc: Locator): Promise<void> => {
       const b = await loc.boundingBox();
       if (!b) throw new Error('el elemento no tiene caja');

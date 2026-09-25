@@ -545,7 +545,7 @@ export const implementedAppsUrls = [
   "/checklist-documentos-viaje/",        // Checklist documentos de viaje: España, Europa, internacional
   "/orientador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
-  "/quiz-verbos-irregulares/",           // Quiz verbos irregulares inglés: 75 verbos A1-B2, opción múltiple
+  "/quiz-verbos-irregulares/",           // Quiz verbos irregulares inglés: 74 verbos A1-B2, opción múltiple
   "/quiz-figuras-retoricas/",            // Quiz figuras retóricas: 27 figuras ESO/Bach/Selectividad con feedback educativo
   "/quiz-reinos-naturaleza/",            // Quiz Reinos de la Naturaleza: 43 organismos sorprendentes, clasificación por grupos
   "/guia-seguro-viaje/",                 // Coberturas recomendadas por destino/tipo de viaje + checklist 12 puntos

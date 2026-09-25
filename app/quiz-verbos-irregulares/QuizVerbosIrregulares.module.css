@@ -102,12 +102,15 @@
 
 .nivelBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
+/* Blanco sobre --primary daba 4,11:1; --primary-boton lo lleva a 5,47:1 en los dos temas
+   (hallazgo 1836, igual en .pregBtn.active, .btnIniciar, .btnSiguiente, .btnRejugar y
+   .stepNumber). */
 .nivelBtn.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -142,12 +145,12 @@
 
 .pregBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .pregBtn.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -173,7 +176,7 @@
   display: block;
   width: 100%;
   padding: 1rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -184,7 +187,7 @@
 }
 
 .btnIniciar:hover {
-  background: #256a8a;
+  background: #1E5A73;
 }
 
 .btnIniciar:focus-visible {
@@ -234,6 +237,21 @@
   background: linear-gradient(90deg, var(--primary), var(--secondary));
   border-radius: 3px;
   transition: width 0.4s ease;
+}
+
+/* Al empezar, al avanzar o al acabar, la vista se lleva al principio del quiz o del resultado:
+   este margen deja la barra del logo fijo por encima, sin taparlo (hallazgo 1835). */
+.quizPanel,
+.resultadoPanel {
+  scroll-margin-top: 88px;
+}
+
+/* Reciben el foco por programa (tabIndex=-1): no son controles, no se les pinta el anillo de
+   foco (hallazgo 1834). */
+.preguntaCard:focus,
+.resultadoPanel:focus,
+.configTitle:focus {
+  outline: none;
 }
 
 /* Tarjeta de pregunta */
@@ -299,7 +317,7 @@
 
 .opcion:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.05);
 }
 
@@ -440,7 +458,7 @@
   display: block;
   width: 100%;
   padding: 0.9rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -451,7 +469,7 @@
 }
 
 .btnSiguiente:hover {
-  background: #256a8a;
+  background: #1E5A73;
 }
 
 .btnSiguiente:focus-visible {
@@ -530,7 +548,7 @@
 
 .btnRejugar {
   padding: 0.8rem 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -541,7 +559,7 @@
 }
 
 .btnRejugar:hover {
-  background: #256a8a;
+  background: #1E5A73;
 }
 
 .btnConfig {
@@ -557,7 +575,7 @@
 
 .btnConfig:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnRejugar:focus-visible,
@@ -687,10 +705,13 @@
   background: rgba(46, 134, 171, 0.08);
 }
 
+/* Texto de marca en la guía: --primary daba 3,6-4,1:1 en claro y 2,7-3,5:1 en oscuro, porque
+   .container fija --primary: #2E86AB en los dos temas. --primary-texto es el token de texto
+   de globals.css, con su variante oscura (hallazgo 1837). */
 .comparativaTable td em {
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Escenarios / Casos de uso */
@@ -739,7 +760,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   line-height: 1.4;
   padding-top: 0.4rem;
@@ -787,7 +808,7 @@
 
 .faqItem em {
   font-family: 'Courier New', Courier, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
@@ -834,7 +855,7 @@
   height: 2rem;
   min-width: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
   font-size: 0.9rem;
@@ -861,7 +882,7 @@
 
 .stepContent em {
   font-family: 'Courier New', Courier, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Tips grid */
@@ -903,7 +924,7 @@
 
 .tipCard em {
   font-style: italic;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Warning box */
@@ -933,7 +954,7 @@
 
 .warningHeader strong {
   font-size: 1rem;
-  color: #C05621;
+  color: #9C4221; /* #C05621 daba 3,99:1 sobre el fondo de la caja (hallazgo 1837) */
   font-weight: 700;
 }
 
@@ -964,7 +985,16 @@
 
 .warningList li em {
   font-family: 'Courier New', Courier, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
+}
+
+/* En oscuro, sobre los tres fondos TINTADOS (filas pares de la tabla, consejo de la FAQ y caja
+   de errores) el #3FA5D1 de --primary-texto se queda en 4,0-4,3:1: se aclara el azul
+   (≥ 5,8:1 en los tres, medido el 25/09/2026; hallazgo 1837). */
+[data-theme='dark'] .comparativaTable td em,
+[data-theme='dark'] .faqTip em,
+[data-theme='dark'] .warningList li em {
+  color: #7FC4E3;
 }
 
 /* ── Responsive educativo ── */
