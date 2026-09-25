@@ -5,231 +5,70 @@ import styles from './EstimadorSueldoNeto.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatNumber, formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularReduccionRendimientosTrabajo, REDUCCION_TRIBUTACION_CONJUNTA_2025, calcularDeduccionRentasBajas, limitarDeduccionRendimientosTrabajo, SMI_2026 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026 } from '@/data/fiscal';
+import { calcularBrutoANeto, calcularNetoABruto, tipoMarginal, TIPO_SS_TRABAJADOR, type SituacionFamiliar } from './motor';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
 
-// Situación familiar para IRPF
-type SituacionFamiliar = 'soltero' | 'casado_un_ingreso' | 'casado_dos_ingresos' | 'familia_monoparental';
+// El motor de cálculo (IRPF + SS) vive en ./motor.ts desde el 25/09/2026: lo comparten la
+// calculadora, los ejemplos del bloque educativo y el FAQPage de metadata.ts.
 
-// Datos fiscales centralizados en data/fiscal/irpf.ts
-// FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025 importados al inicio
+/** Ejercicio que se calcula (COTIZACIONES_SS_2026, BASES_SS_2026, DA 61.ª de 2026). */
+const EJERCICIO = FISCAL_IRPF_META.vigencia;
 
-/**
- * Cuota íntegra del IRPF (art. 63.1.2º LIRPF).
- *
- * ⚠️ CORREGIDO EL 12/09/2026. Hasta esta fecha la función restaba el mínimo personal y
- * familiar DE LA BASE antes de aplicar la escala, lo que lo valora al tipo MARGINAL del
- * contribuyente y rebaja la cuota más cuanto más alto es el sueldo. El art. 63.1.2º dice
- * lo contrario: el mínimo «no reduce la renta», forma parte de la base liquidable general
- * y se grava a TIPO CERO aplicando la escala dos veces — una a la base liquidable completa
- * y otra al mínimo — y restando la segunda cuota de la primera. Así el mínimo vale lo
- * mismo (el 19 % de los primeros tramos) para todos los contribuyentes con las mismas
- * circunstancias familiares, que es justamente el efecto que la norma persigue.
- *
- * El error subestimaba la cuota en 610,50 € con 30.000 € de bruto. Con 120.000 € eran
- * 1.443 € y no los 1.054,50 € que dijo el parte original, que confundió el error con la
- * cuota del propio mínimo: 1.443 € es el techo del defecto (5.550 × (45 − 19) %) y se
- * alcanza ya con 80.000 € de bruto. Medido el 12/09/2026.
- *
- * Es el mismo defecto que el commit 2b80033d (09/09/2026) reparó en seis motores de
- * `lib/calculadoras`; esta app quedó fuera porque calculaba por su cuenta. Desde el
- * 12/09/2026 la fórmula tampoco vive aquí: la pone `calcularCuotaIntegraGeneral`.
- *
- * Fuente: art. 63.1.2º Ley 35/2006 (AEAT, Manual práctico Renta 2025, cap. 15).
- */
-function calcularIRPF(baseLiquidable: number, minimoPersonalFamiliar: number): number {
-  return calcularCuotaIntegraGeneral(baseLiquidable, minimoPersonalFamiliar);
-}
+/** «2026-09-09» → «09/09/2026», sin el desliz de día de `new Date(iso)` al oeste de Greenwich. */
+const fechaES = (iso: string) => formatDate(parseISODateLocal(iso));
 
-// Función para calcular la Seguridad Social
-function calcularSeguridadSocial(salarioBrutoAnual: number): { anual: number; mensual: number; desglose: Record<string, number> } {
-  const salarioMensual = salarioBrutoAnual / 12;
+// ─── Cifras del bloque educativo ─────────────────────────────────────────────────────────
+// Hallazgo 1651 (25/09/2026): la tabla «12 vs 14 pagas» y los perfiles estaban escritos a
+// mano con el modelo anterior a 2b80033d y 6dda61c2 y contradecían a la calculadora de esta
+// misma página. Ahora salen del MISMO motor: si el motor cambia, el texto lo sigue.
 
-  // Aplicar la base MÁXIMA de cotización.
-  // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así
-  // que un bruto anual por debajo solo puede ser jornada parcial o parte del año — y entonces
-  // se cotiza por lo cobrado. Hasta el 24/09/2026 se subía a la mínima: 14.000 € a media
-  // jornada cotizaban sobre 17.092,80 € (1.111 € en vez de 910 €).
-  const baseCotizacion = Math.min(salarioMensual, BASES_SS_2026.maxima);
+/** Tabla «12 pagas vs 14 pagas»: 30.000 € brutos, soltero/a sin hijos. */
+const BRUTO_TABLA = 30000;
+const TABLA = calcularBrutoANeto(BRUTO_TABLA, 'soltero', 0, 0, 12);
 
-  const desglose: Record<string, number> = {};
-  let totalMensual = 0;
+/** Perfil «Recién graduado»: 22.000 €, soltero/a, sin hijos. */
+const BRUTO_GRADUADO = 22000;
+const GRADUADO = calcularBrutoANeto(BRUTO_GRADUADO, 'soltero', 0, 0, 12);
 
-  // Calcular cada concepto
-  desglose.contingenciasComunes = baseCotizacion * (COTIZACIONES_SS_2026.contingenciasComunes / 100);
-  desglose.desempleo = baseCotizacion * (COTIZACIONES_SS_2026.desempleo / 100);
-  desglose.formacionProfesional = baseCotizacion * (COTIZACIONES_SS_2026.formacionProfesional / 100);
-  desglose.mef = baseCotizacion * (COTIZACIONES_SS_2026.mef / 100);
+/** Perfil «Técnico medio con familia»: 35.000 €, dos ingresos, 1 hijo (y el mismo sin hijos). */
+const BRUTO_FAMILIA = 35000;
+const FAMILIA = calcularBrutoANeto(BRUTO_FAMILIA, 'casado_dos_ingresos', 1, 0, 12);
+const FAMILIA_SIN_HIJOS = calcularBrutoANeto(BRUTO_FAMILIA, 'casado_dos_ingresos', 0, 0, 12);
+const AHORRO_HIJO = FAMILIA_SIN_HIJOS.irpfAnual - FAMILIA.irpfAnual;
 
-  totalMensual = Object.values(desglose).reduce((a, b) => a + b, 0);
+/** Perfil «Directivo DINK»: 80.000 €, dos ingresos, sin hijos. */
+const BRUTO_DIRECTIVO = 80000;
+const DIRECTIVO = calcularBrutoANeto(BRUTO_DIRECTIVO, 'casado_dos_ingresos', 0, 0, 12);
+const MARGINAL_DIRECTIVO = tipoMarginal(DIRECTIVO.baseLiquidable);
 
-  return {
-    mensual: totalMensual,
-    anual: totalMensual * 12,
-    desglose,
-  };
-}
+/** Perfil «Trabajadora a tiempo parcial»: 14.000 €, un hijo, declaración individual. */
+const BRUTO_PARCIAL = 14000;
+const PARCIAL = calcularBrutoANeto(BRUTO_PARCIAL, 'soltero', 1, 0, 12);
 
-// Función para calcular la reducción por rendimientos del trabajo (art. 20 LIRPF)
-function calcularReduccionRNT(rnt: number): number {
-  return calcularReduccionRendimientosTrabajo(rnt);
-}
+/** Neto del SMI en 14 pagas, soltero/a sin hijos (FAQ avanzadas). */
+const SMI_NETO = calcularBrutoANeto(SMI_2026.anual, 'soltero', 0, 0, 14);
 
-// Mínimo personal y familiar (arts. 57 a 61 LIRPF). Ya NO recibe `situacion`: lo único que
-// dependía de ella era la reducción por tributación conjunta, que se fue a su propia función
-// por no ser un mínimo (ver calcularReduccionTributacionConjunta).
-function calcularMinimosPersonales(
-  numHijos: number,
-  hijosMenores3: number
-): number {
-  let minimos = MINIMOS_IRPF_2025.personal;
-
-  // Añadir por hijos
-  if (numHijos >= 1) minimos += MINIMOS_IRPF_2025.hijo_1;
-  if (numHijos >= 2) minimos += MINIMOS_IRPF_2025.hijo_2;
-  if (numHijos >= 3) minimos += MINIMOS_IRPF_2025.hijo_3;
-  if (numHijos >= 4) minimos += MINIMOS_IRPF_2025.hijo_4_mas * (numHijos - 3);
-
-  // Adicional por hijos menores de 3 años
-  minimos += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
-
-  return minimos;
-}
+/** MEI del trabajador sobre 30.000 € (FAQ avanzadas). */
+const MEI_TABLA = TABLA.ssDesglose.mef * 12;
 
 /**
- * Reducción por tributación conjunta (art. 84.2, reglas 3ª y 4ª LIRPF): solo aplica cuando
- * la unidad familiar declara conjunta, es decir, un único perceptor de ingresos
- * (matrimonio con un solo ingreso, o unidad monoparental con hijos).
- *
- * ⚠️ Vive aparte de `calcularMinimosPersonales` desde el 12/09/2026 porque NO es un mínimo:
- * la norma dice «la base imponible se reducirá en 3.400 euros anuales», así que se resta de
- * la base y se valora al tipo marginal, mientras que el mínimo del art. 63.1.2º se grava a
- * tipo cero. Sumarla al mínimo, como se hacía antes, le daba el tratamiento del otro.
+ * «Ejemplo práctico» (hallazgo 1652): base liquidable de 30.000 € con el mínimo personal
+ * DENTRO, como manda el art. 63.1.2.º — escala a la base, escala al mínimo, y se resta.
  */
-function calcularReduccionTributacionConjunta(
-  situacion: SituacionFamiliar,
-  numHijos: number
-): number {
-  if (situacion === 'casado_un_ingreso') return REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental;
-  if (situacion === 'familia_monoparental' && numHijos > 0) {
-    return REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
-  }
-  return 0;
-}
+const BASE_EJEMPLO = 30000;
+const ESCALA_EJEMPLO = desglosarEscalaGeneral(BASE_EJEMPLO);
+const CUOTA_MINIMO_EJEMPLO = cuotaEscalaGeneral(MINIMOS_IRPF_2025.personal);
+const CUOTA_EJEMPLO = calcularCuotaIntegraGeneral(BASE_EJEMPLO, MINIMOS_IRPF_2025.personal);
 
-// Calcular neto a partir del bruto
-function calcularBrutoANeto(
-  brutoAnual: number,
-  situacion: SituacionFamiliar,
-  numHijos: number,
-  hijosMenores3: number,
-  pagas: number
-): {
-  netoAnual: number;
-  netoMensual: number;
-  irpfAnual: number;
-  irpfPorcentaje: number;
-  ssAnual: number;
-  ssDesglose: Record<string, number>;
-  tipoRetencion: number;
-  deduccionRentasBajas: number;
-} {
-  const ss = calcularSeguridadSocial(brutoAnual);
-  // Rendimiento neto del trabajo (RNT): bruto - SS - gastos deducibles generales (art. 19 LIRPF)
-  const rnt = Math.max(0, brutoAnual - ss.anual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-  // Reducción por obtención de rendimientos del trabajo (art. 20 LIRPF)
-  const reduccionRNT = calcularReduccionRNT(rnt);
-  const baseImponible = Math.max(0, rnt - reduccionRNT);
-  // Base liquidable general = base imponible − reducciones de base (art. 84.2 en tributación
-  // conjunta). El mínimo personal y familiar NO se resta aquí: entra en calcularIRPF.
-  const baseLiquidable = Math.max(
-    0,
-    baseImponible - calcularReduccionTributacionConjunta(situacion, numHijos)
-  );
-  const minimos = calcularMinimosPersonales(numHijos, hijosMenores3);
-  const cuotaIRPF = calcularIRPF(baseLiquidable, minimos);
-  // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
-  // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
-  const deduccion = limitarDeduccionRendimientosTrabajo(
-    calcularDeduccionRentasBajas(brutoAnual, 0, 2026),
-    cuotaIRPF,
-  );
-  const irpfAnual = Math.max(0, cuotaIRPF - deduccion);
-  const tipoRetencion = brutoAnual > 0 ? (irpfAnual / brutoAnual) * 100 : 0;
-  const netoAnual = brutoAnual - ss.anual - irpfAnual;
-
-  return {
-    netoAnual,
-    netoMensual: netoAnual / pagas,
-    irpfAnual,
-    irpfPorcentaje: brutoAnual > 0 ? (irpfAnual / brutoAnual) * 100 : 0,
-    ssAnual: ss.anual,
-    ssDesglose: ss.desglose,
-    tipoRetencion,
-    deduccionRentasBajas: deduccion,
-  };
-}
-
-// Calcular bruto a partir del neto (aproximación iterativa)
-function calcularNetoABruto(
-  netoAnualObjetivo: number,
-  situacion: SituacionFamiliar,
-  numHijos: number,
-  hijosMenores3: number,
-  pagas: number
-): {
-  brutoAnual: number;
-  brutoMensual: number;
-  irpfAnual: number;
-  irpfPorcentaje: number;
-  ssAnual: number;
-  ssDesglose: Record<string, number>;
-  tipoRetencion: number;
-  deduccionRentasBajas: number;
-} {
-  // Estimación inicial: neto / 0.7 (asumiendo ~30% de deducciones)
-  let brutoEstimado = netoAnualObjetivo / 0.7;
-  const tolerancia = 0.01;
-  const maxIteraciones = 100;
-
-  for (let i = 0; i < maxIteraciones; i++) {
-    const resultado = calcularBrutoANeto(brutoEstimado, situacion, numHijos, hijosMenores3, pagas);
-    const diferencia = resultado.netoAnual - netoAnualObjetivo;
-
-    if (Math.abs(diferencia) < tolerancia) {
-      return {
-        brutoAnual: brutoEstimado,
-        brutoMensual: brutoEstimado / pagas,
-        irpfAnual: resultado.irpfAnual,
-        irpfPorcentaje: resultado.irpfPorcentaje,
-        ssAnual: resultado.ssAnual,
-        ssDesglose: resultado.ssDesglose,
-        tipoRetencion: resultado.tipoRetencion,
-        deduccionRentasBajas: resultado.deduccionRentasBajas,
-      };
-    }
-
-    // Ajustar estimación
-    brutoEstimado -= diferencia * 0.8;
-  }
-
-  // Devolver mejor aproximación
-  const resultadoFinal = calcularBrutoANeto(brutoEstimado, situacion, numHijos, hijosMenores3, pagas);
-  return {
-    brutoAnual: brutoEstimado,
-    brutoMensual: brutoEstimado / pagas,
-    irpfAnual: resultadoFinal.irpfAnual,
-    irpfPorcentaje: resultadoFinal.irpfPorcentaje,
-    ssAnual: resultadoFinal.ssAnual,
-    ssDesglose: resultadoFinal.ssDesglose,
-    tipoRetencion: resultadoFinal.tipoRetencion,
-    deduccionRentasBajas: resultadoFinal.deduccionRentasBajas,
-  };
-}
+/** Obligación de declarar (art. 96 LIRPF), hallazgo 1654. */
+const LIMITE_UN_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.unPagador;
+const LIMITE_VARIOS_PAGADORES = OBLIGACION_DECLARAR_2025.trabajo.variosPagadores;
+const LIMITE_SEGUNDO_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador;
 
 export default function EstimadorSueldoNetoPage() {
   const [tipoCalculo, setTipoCalculo] = useState<TipoCalculo>('brutoANeto');
@@ -259,6 +98,10 @@ export default function EstimadorSueldoNetoPage() {
     const pagasNum = parseInt(pagas) || 12;
 
     if (!(salarioNum > 0)) {
+      // Hallazgo 1660: sin esto, tras un cálculo válido el resultado anterior seguía en
+      // pantalla junto a un campo que decía otra cifra.
+      setResultado(null);
+      setCalculado(false);
       alert('Por favor, introduce un salario válido');
       return;
     }
@@ -313,7 +156,7 @@ export default function EstimadorSueldoNetoPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Estimador Sueldo Neto ↔ Bruto</h1>
         <p className={styles.subtitle}>
-          Oriéntate sobre tu salario bruto a neto o viceversa. IRPF y Seguridad Social para España 2025.
+          Oriéntate sobre tu salario bruto a neto o viceversa. IRPF y Seguridad Social para España {EJERCICIO}.
         </p>
       </header>
 
@@ -324,11 +167,21 @@ export default function EstimadorSueldoNetoPage() {
 
       <DisclaimerCard variant="financial" severity="critical" />
 
+      {/* Hallazgo 1653: el cálculo depende de tres fuentes, no de una — la escala y los
+          mínimos (LIRPF), la deducción de la DA 61.ª en su redacción de 2026 y los tipos y
+          bases de cotización de la Orden de cotización del año. */}
       <DataReference
-        normativa={FISCAL_IRPF_META.fuente}
+        normativa={`IRPF ${EJERCICIO}`}
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
+        nota={`La deducción por obtención de rendimientos del trabajo sigue la DA 61.ª LIRPF en la redacción del art. 28 del Real Decreto-ley 5/2026 (cuantías de ${EJERCICIO}). ${FISCAL_IRPF_META.nota}`}
+      />
+      <DataReference
+        normativa={`Cotizaciones del trabajador ${FISCAL_SS_CUENTA_AJENA_META.vigencia}`}
+        fuente={FISCAL_SS_CUENTA_AJENA_META.fuente}
+        verificado={FISCAL_SS_CUENTA_AJENA_META.verificado}
+        urlOficial={FISCAL_SS_CUENTA_AJENA_META.urlOficial}
       />
 
       <div className={styles.mainContent}>
@@ -366,8 +219,9 @@ export default function EstimadorSueldoNetoPage() {
             />
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Situación familiar</label>
+              <label className={styles.label} htmlFor="sueldo-neto-situacion">Situación familiar</label>
               <select
+                id="sueldo-neto-situacion"
                 value={situacion}
                 onChange={(e) => setSituacion(e.target.value as SituacionFamiliar)}
                 className={styles.select}
@@ -399,8 +253,9 @@ export default function EstimadorSueldoNetoPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Número de pagas</label>
+              <label className={styles.label} htmlFor="sueldo-neto-pagas">Número de pagas</label>
               <select
+                id="sueldo-neto-pagas"
                 value={pagas}
                 onChange={(e) => setPagas(e.target.value)}
                 className={styles.select}
@@ -468,7 +323,7 @@ export default function EstimadorSueldoNetoPage() {
                   {resultado.deduccionRentasBajas > 0 && (
                     <div className={styles.desgloseRow}>
                       <span>Deducción por rendimientos del trabajo</span>
-                      <span className={styles.desgloseValue} style={{ color: '#27ae60' }}>-{formatCurrency(resultado.deduccionRentasBajas)}</span>
+                      <span className={`${styles.desgloseValue} ${styles.importeDeduccion}`}>-{formatCurrency(resultado.deduccionRentasBajas)}</span>
                     </div>
                   )}
                   <div className={styles.desgloseRow}>
@@ -529,7 +384,7 @@ export default function EstimadorSueldoNetoPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento profesional</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento profesional</h3>
         <p>
           Este estimador proporciona una <strong>estimación orientativa</strong> basada en{' '}
           <a href={FISCAL_IRPF_META.urlOficial} target="_blank" rel="noopener noreferrer">
@@ -550,7 +405,7 @@ export default function EstimadorSueldoNetoPage() {
           </a>.
         </p>
         <p className={styles.disclaimerFecha}>
-          Datos verificados: {FISCAL_IRPF_META.verificado} | Vigencia: {FISCAL_IRPF_META.vigencia}
+          Datos verificados: {fechaES(FISCAL_IRPF_META.verificado)} | Vigencia: {FISCAL_IRPF_META.vigencia}
         </p>
       </div>
 
@@ -570,7 +425,7 @@ export default function EstimadorSueldoNetoPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>💼 Salario Bruto</h4>
+              <h4><span aria-hidden="true">💼</span> Salario Bruto</h4>
               <p>
                 Incluye tu sueldo base más complementos (antigüedad, peligrosidad, etc.),
                 pagas extras y cualquier retribución en especie. Es la cifra que aparece
@@ -578,10 +433,10 @@ export default function EstimadorSueldoNetoPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💰 Salario Neto</h4>
+              <h4><span aria-hidden="true">💰</span> Salario Neto</h4>
               <p>
                 Es el resultado de restar al bruto las cotizaciones a la Seguridad Social
-                (aproximadamente 6,50%) y la retención del IRPF (variable según tu situación).
+                (un {formatNumber(TIPO_SS_TRABAJADOR, 2)}% en {EJERCICIO}) y la retención del IRPF (variable según tu situación).
                 Es lo que ingresas realmente.
               </p>
             </div>
@@ -597,7 +452,7 @@ export default function EstimadorSueldoNetoPage() {
           </p>
 
           <div className={styles.tramosTable}>
-            <h4>Tramos IRPF 2025 (Estatal + Autonómico medio)</h4>
+            <h4>Tramos IRPF {EJERCICIO} (Estatal + Autonómico medio)</h4>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -622,22 +477,42 @@ export default function EstimadorSueldoNetoPage() {
           </div>
 
           <div className={styles.infoBox}>
-            <h4>📌 Ejemplo práctico</h4>
+            <h4><span aria-hidden="true">📌</span> Ejemplo práctico</h4>
+            {/* Hallazgo 1652: este ejemplo restaba el mínimo personal para llegar a la base
+                liquidable, justo el método que prohíbe el art. 63.1.2.º. El mínimo va DENTRO de
+                la base y se grava a tipo cero: la escala se aplica dos veces y se restan. */}
             <p>
-              Si tu <strong>base liquidable</strong> (lo que queda tras restar a tu bruto la Seguridad
-              Social, los gastos deducibles, la reducción por rendimientos del trabajo y el mínimo
-              personal/familiar) es de 30.000 €, NO pagas el 30% de todo. Pagas:
+              Si tu <strong>base liquidable</strong> (tu bruto menos la Seguridad Social, los gastos
+              deducibles y la reducción por rendimientos del trabajo) es de {formatCurrency(BASE_EJEMPLO)},
+              NO pagas el {formatNumber(ESCALA_EJEMPLO.tramos[ESCALA_EJEMPLO.tramos.length - 1].tipo, 0)}% de todo.
+              Primero se aplica la escala a la base completa:
             </p>
             <ul>
-              <li>19% de los primeros 12.450 € = 2.365,50 €</li>
-              <li>24% de 12.450 € a 20.200 € = 1.860 €</li>
-              <li>30% de 20.200 € a 30.000 € = 2.940 €</li>
-              <li><strong>Total IRPF</strong>: 7.165,50 € (23,88% efectivo sobre la base liquidable, no 30%)</li>
+              {ESCALA_EJEMPLO.tramos.map((t) => (
+                <li key={t.desde}>
+                  {formatNumber(t.tipo, 0)}% de {formatCurrency(t.desde)} a {formatCurrency(t.desde + t.base)} = {formatCurrency(t.cuota)}
+                </li>
+              ))}
+              <li>Cuota de la base: <strong>{formatCurrency(ESCALA_EJEMPLO.cuota)}</strong></li>
             </ul>
             <p>
-              Esa base liquidable de 30.000 € corresponde a un salario bruto considerablemente más alto:
-              las deducciones previas suelen reducir el bruto en varios miles de euros antes de llegar
-              a la base sobre la que se aplican estos tramos.
+              El mínimo personal ({formatCurrency(MINIMOS_IRPF_2025.personal)} sin hijos) no se resta de la
+              base: forma parte de ella y tributa a tipo cero (art. 63.1.2.º de la Ley del IRPF). Por eso
+              la escala se aplica también al mínimo — {formatCurrency(CUOTA_MINIMO_EJEMPLO)} — y esa cuota
+              se descuenta de la anterior:
+            </p>
+            <ul>
+              <li>
+                <strong>Cuota íntegra</strong>: {formatCurrency(ESCALA_EJEMPLO.cuota)} − {formatCurrency(CUOTA_MINIMO_EJEMPLO)} ={' '}
+                <strong>{formatCurrency(CUOTA_EJEMPLO)}</strong> ({formatNumber((CUOTA_EJEMPLO / BASE_EJEMPLO) * 100, 2)}% efectivo
+                sobre la base liquidable)
+              </li>
+            </ul>
+            <p>
+              Si en lugar de eso se restara el mínimo de la base, se ahorraría al tipo más alto que
+              alcanzas y no al {formatNumber(TRAMOS_IRPF_2025[0].tipo, 0)}% del primer tramo, y la cuota
+              saldría más baja de lo que es. Esa base liquidable corresponde a un salario bruto
+              bastante más alto: la Seguridad Social, los gastos deducibles y la reducción se restan antes.
             </p>
           </div>
         </section>
@@ -651,7 +526,7 @@ export default function EstimadorSueldoNetoPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>👤 Lo que pagas tú (trabajador)</h4>
+              <h4><span aria-hidden="true">👤</span> Lo que pagas tú (trabajador)</h4>
               <ul>
                 <li>Contingencias comunes: {formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}%</li>
                 <li>Desempleo: {formatNumber(COTIZACIONES_SS_2026.desempleo, 2)}%</li>
@@ -667,7 +542,7 @@ export default function EstimadorSueldoNetoPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🏢 Lo que paga la empresa</h4>
+              <h4><span aria-hidden="true">🏢</span> Lo que paga la empresa</h4>
               <ul>
                 <li>Contingencias comunes: 23,60%</li>
                 <li>Desempleo: 5,50%</li>
@@ -723,7 +598,8 @@ export default function EstimadorSueldoNetoPage() {
           <h2>12 pagas vs 14 pagas vs extras prorrateadas: ¿cuál te conviene?</h2>
           <p>
             El número de pagas no cambia tu neto anual total, pero sí afecta a cuánto ingresas cada
-            mes. Estos son los tres escenarios para un sueldo bruto de 30.000 € anuales:
+            mes. Estos son los tres escenarios para un sueldo bruto de {formatCurrency(BRUTO_TABLA)} anuales
+            (soltero/a sin hijos, calculados con esta misma herramienta):
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -738,33 +614,33 @@ export default function EstimadorSueldoNetoPage() {
               <tbody>
                 <tr>
                   <td>Bruto mensual</td>
-                  <td>2.500 €</td>
-                  <td>2.143 € (ordinaria)</td>
-                  <td>2.500 € (ya incluye extra)</td>
+                  <td>{formatCurrency(BRUTO_TABLA / 12)}</td>
+                  <td>{formatCurrency(BRUTO_TABLA / 14)} (ordinaria)</td>
+                  <td>{formatCurrency(BRUTO_TABLA / 12)} (ya incluye extra)</td>
                 </tr>
                 <tr>
                   <td>Paga extra</td>
-                  <td>No (0 €)</td>
-                  <td>2.143 € × 2 (jun/dic)</td>
+                  <td>No ({formatCurrency(0)})</td>
+                  <td>{formatCurrency(BRUTO_TABLA / 14)} × 2 (jun/dic)</td>
                   <td>Incluida en mensual</td>
                 </tr>
                 <tr>
                   <td>Neto mensual estimado</td>
-                  <td>~2.027 €</td>
-                  <td>~1.738 € + 2 extras de ~1.738 €</td>
-                  <td>~2.027 €</td>
+                  <td>{formatCurrency(TABLA.netoAnual / 12)}</td>
+                  <td>{formatCurrency(TABLA.netoAnual / 14)} + 2 extras de {formatCurrency(TABLA.netoAnual / 14)}</td>
+                  <td>{formatCurrency(TABLA.netoAnual / 12)}</td>
                 </tr>
                 <tr>
                   <td>Retención mensual IRPF</td>
-                  <td>~311 €</td>
-                  <td>~267 € (mensualidad menor)</td>
-                  <td>~311 €</td>
+                  <td>{formatCurrency(TABLA.irpfAnual / 12)}</td>
+                  <td>{formatCurrency(TABLA.irpfAnual / 14)} (mensualidad menor)</td>
+                  <td>{formatCurrency(TABLA.irpfAnual / 12)}</td>
                 </tr>
                 <tr>
                   <td>Neto anual total</td>
-                  <td>~24.327 €</td>
-                  <td>~24.327 €</td>
-                  <td>~24.327 €</td>
+                  <td>{formatCurrency(TABLA.netoAnual)}</td>
+                  <td>{formatCurrency(TABLA.netoAnual)}</td>
+                  <td>{formatCurrency(TABLA.netoAnual)}</td>
                 </tr>
                 <tr>
                   <td>Ventaja principal</td>
@@ -794,7 +670,7 @@ export default function EstimadorSueldoNetoPage() {
           <h2>Casos de uso: 4 perfiles con números reales</h2>
           <p>
             Cada situación personal genera un neto diferente aunque el bruto sea el mismo.
-            Aquí tienes cuatro ejemplos concretos calculados con los tramos IRPF 2025:
+            Aquí tienes cuatro ejemplos concretos calculados con esta misma herramienta (ejercicio {EJERCICIO}):
           </p>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
@@ -803,18 +679,18 @@ export default function EstimadorSueldoNetoPage() {
                 <h4>Recién graduado</h4>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Perfil:</strong> 22.000 € brutos, soltero/a, sin hijos</p>
+                <p><strong>Perfil:</strong> {formatCurrency(BRUTO_GRADUADO)} brutos, soltero/a, sin hijos</p>
                 <ul>
-                  <li>SS trabajador (6,50%): <strong>1.430 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>16.206 €</strong></li>
-                  <li>IRPF anual (mínimo personal 5.550 €): <strong>~2.025 €</strong></li>
-                  <li>Retención efectiva: <strong>~9,2%</strong></li>
-                  <li>Neto anual: <strong>~18.545 €</strong></li>
-                  <li>Neto mensual (12 pagas): <strong>~1.545 €</strong></li>
+                  <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}%): <strong>{formatCurrency(GRADUADO.ssAnual)}/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(GRADUADO.baseImponible)}</strong></li>
+                  <li>IRPF anual (mínimo personal {formatCurrency(GRADUADO.minimos)}, a tipo cero): <strong>{formatCurrency(GRADUADO.irpfAnual)}</strong></li>
+                  <li>Retención efectiva: <strong>{formatNumber(GRADUADO.tipoRetencion, 2)}%</strong></li>
+                  <li>Neto anual: <strong>{formatCurrency(GRADUADO.netoAnual)}</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>{formatCurrency(GRADUADO.netoMensual)}</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Consejo: Con ingresos inferiores a 22.000 € con un único pagador no estás obligado a declarar la renta.
+                Consejo: Con rendimientos del trabajo de hasta {formatCurrency(LIMITE_UN_PAGADOR)} y un único pagador no estás obligado a declarar la renta.
               </div>
             </div>
 
@@ -824,19 +700,22 @@ export default function EstimadorSueldoNetoPage() {
                 <h4>Técnico medio con familia</h4>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Perfil:</strong> 35.000 € brutos, casado/a (dos ingresos), 1 hijo</p>
+                <p><strong>Perfil:</strong> {formatCurrency(BRUTO_FAMILIA)} brutos, casado/a (dos ingresos), 1 hijo</p>
                 <ul>
-                  <li>SS trabajador (6,50%): <strong>2.275 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>28.362 €</strong></li>
-                  <li>Mínimo personal + hijo 1 (5.550 + 2.400): <strong>7.950 €</strong></li>
-                  <li>IRPF anual: <strong>~4.289 €</strong></li>
-                  <li>Retención efectiva: <strong>~12,3%</strong></li>
-                  <li>Neto anual: <strong>~28.436 €</strong></li>
-                  <li>Impacto del mínimo familiar: ahorra ~720 €/año en IRPF vs soltero</li>
+                  <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}%): <strong>{formatCurrency(FAMILIA.ssAnual)}/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(FAMILIA.baseImponible)}</strong></li>
+                  <li>Mínimo personal + hijo 1 ({formatCurrency(MINIMOS_IRPF_2025.personal)} + {formatCurrency(MINIMOS_IRPF_2025.hijo_1)}): <strong>{formatCurrency(FAMILIA.minimos)}</strong></li>
+                  <li>IRPF anual: <strong>{formatCurrency(FAMILIA.irpfAnual)}</strong></li>
+                  <li>Retención efectiva: <strong>{formatNumber(FAMILIA.tipoRetencion, 2)}%</strong></li>
+                  <li>Neto anual: <strong>{formatCurrency(FAMILIA.netoAnual)}</strong></li>
+                  <li>
+                    Impacto del mínimo por el hijo: {formatCurrency(AHORRO_HIJO)}/año menos de IRPF que la
+                    misma persona sin hijos (el mínimo tributa a tipo cero, así que ahorra al {formatNumber(TRAMOS_IRPF_2025[0].tipo, 0)}%)
+                  </li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Consejo: Actualizar el modelo 145 al tener un hijo puede reducir tu retención mensual unos 60 €.
+                Consejo: Actualizar el modelo 145 al tener un hijo puede reducir tu retención mensual unos {formatCurrency(AHORRO_HIJO / 12)}.
               </div>
             </div>
 
@@ -846,18 +725,18 @@ export default function EstimadorSueldoNetoPage() {
                 <h4>Directivo DINK</h4>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Perfil:</strong> 80.000 € brutos, casado/a (dos ingresos), sin hijos</p>
+                <p><strong>Perfil:</strong> {formatCurrency(BRUTO_DIRECTIVO)} brutos, casado/a (dos ingresos), sin hijos</p>
                 <ul>
-                  <li>SS trabajador (base máx. 5.101 €/mes): <strong>~3.979 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~71.657 €</strong></li>
-                  <li>IRPF anual: <strong>~20.650 €</strong></li>
-                  <li>Tipo efectivo real: <strong>~25,8%</strong></li>
-                  <li>Neto anual: <strong>~55.371 €</strong></li>
-                  <li>Neto mensual (12 pagas): <strong>~4.614 €</strong></li>
+                  <li>SS trabajador (base máx. {formatCurrency(BASES_SS_2026.maxima)}/mes): <strong>{formatCurrency(DIRECTIVO.ssAnual)}/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(DIRECTIVO.baseImponible)}</strong></li>
+                  <li>IRPF anual: <strong>{formatCurrency(DIRECTIVO.irpfAnual)}</strong></li>
+                  <li>Tipo efectivo real: <strong>{formatNumber(DIRECTIVO.tipoRetencion, 2)}%</strong></li>
+                  <li>Neto anual: <strong>{formatCurrency(DIRECTIVO.netoAnual)}</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>{formatCurrency(DIRECTIVO.netoMensual)}</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Consejo: Aportar al plan de pensiones reduce directamente la base imponible — cada 1.000 € aportados ahorras ~450 € en IRPF a este nivel de ingresos (tramo marginal 45%).
+                Consejo: Aportar al plan de pensiones reduce directamente la base imponible — cada 1.000 € aportados ahorran unos {formatCurrency((1000 * MARGINAL_DIRECTIVO) / 100)} en IRPF a este nivel de ingresos (tramo marginal {formatNumber(MARGINAL_DIRECTIVO, 0)}%).
               </div>
             </div>
 
@@ -867,14 +746,19 @@ export default function EstimadorSueldoNetoPage() {
                 <h4>Trabajadora a tiempo parcial</h4>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Perfil:</strong> 14.000 € brutos, reducción por cuidado de hijos (50%)</p>
+                <p><strong>Perfil:</strong> {formatCurrency(BRUTO_PARCIAL)} brutos, reducción por cuidado de hijos (50%), un hijo, declaración individual</p>
                 <ul>
-                  <li>SS trabajador (6,50 % de lo cobrado: a tiempo parcial se cotiza por el salario real, no por la base mínima de jornada completa): <strong>~910 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~3.788 €</strong></li>
-                  <li>Mínimo personal + mínimo por un hijo: <strong>7.950 €</strong></li>
-                  <li>IRPF anual: <strong>0 € (base liquidable negativa, no tributa)</strong></li>
-                  <li>Retención efectiva: <strong>0%</strong></li>
-                  <li>Neto anual: <strong>~13.090 €</strong></li>
+                  <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}% de lo cobrado: a tiempo parcial se cotiza por el salario real, no por la base mínima de jornada completa): <strong>{formatCurrency(PARCIAL.ssAnual)}/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(PARCIAL.baseImponible)}</strong></li>
+                  <li>Mínimo personal + mínimo por un hijo: <strong>{formatCurrency(PARCIAL.minimos)}</strong></li>
+                  <li>
+                    IRPF anual: <strong>{formatCurrency(PARCIAL.irpfAnual)}</strong>
+                    {PARCIAL.irpfAnual === 0 && PARCIAL.baseLiquidable <= PARCIAL.minimos && (
+                      <> (la base no supera el mínimo personal y familiar, que tributa a tipo cero)</>
+                    )}
+                  </li>
+                  <li>Retención efectiva: <strong>{formatNumber(PARCIAL.tipoRetencion, 2)}%</strong></li>
+                  <li>Neto anual: <strong>{formatCurrency(PARCIAL.netoAnual)}</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
@@ -891,7 +775,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Qué es el MEI (Mecanismo de Equidad Intergeneracional) y cuánto me descuentan?</h4>
               <p>
-                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2026, el trabajador paga el <strong>{formatNumber(COTIZACIONES_SS_2026.mef, 2)}%</strong> y la empresa el <strong>0,75%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~45 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
+                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2026, el trabajador paga el <strong>{formatNumber(COTIZACIONES_SS_2026.mef, 2)}%</strong> y la empresa el <strong>0,75%</strong> sobre la base de cotización. Para un sueldo de {formatCurrency(BRUTO_TABLA)} brutos esto representa <strong>{formatCurrency(MEI_TABLA)} anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
               </p>
             </div>
 
@@ -920,14 +804,14 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Cuánto es el SMI 2026 y cómo afecta a mi neto?</h4>
               <p>
-                El SMI 2026 es <strong>{formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas = {formatCurrency(SMI_2026.anual)} brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.142 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
+                El SMI 2026 es <strong>{formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas = {formatCurrency(SMI_2026.anual)} brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>{formatCurrency(SMI_NETO.netoMensual)}</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo de hasta {formatCurrency(LIMITE_UN_PAGADOR)} no están obligados a presentar la declaración de la renta (con un único pagador).
               </p>
             </div>
 
             <div className={styles.faqItemPro}>
               <h4>¿Qué diferencia hay entre contingencias comunes y profesionales?</h4>
               <p>
-                Las <strong>contingencias comunes</strong> (4,70% trabajador) cubren enfermedad común, maternidad, paternidad y jubilación. Las <strong>contingencias profesionales</strong> (variable, cotiza solo la empresa, entre 0,90% y 7,15% según actividad) cubren accidentes de trabajo y enfermedades profesionales. El trabajador no paga directamente por contingencias profesionales; es un coste exclusivamente empresarial.
+                Las <strong>contingencias comunes</strong> ({formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}% trabajador) cubren enfermedad común, maternidad, paternidad y jubilación. Las <strong>contingencias profesionales</strong> (variable, cotiza solo la empresa, entre 0,90% y 7,15% según actividad) cubren accidentes de trabajo y enfermedades profesionales. El trabajador no paga directamente por contingencias profesionales; es un coste exclusivamente empresarial.
               </p>
             </div>
 
@@ -1068,7 +952,7 @@ export default function EstimadorSueldoNetoPage() {
               <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <p>
                 <strong>SMI 2026: {formatCurrency(SMI_2026.mensual14)}/mes en 14 pagas</strong> ({formatCurrency(SMI_2026.anual)} brutos anuales).
-                Ningún contrato puede pactarse por debajo. Los trabajadores con ingresos hasta 22.000 €
+                Ningún contrato puede pactarse por debajo. Los trabajadores con rendimientos del trabajo de hasta {formatCurrency(LIMITE_UN_PAGADOR)}
                 con un único pagador no están obligados a presentar declaración de la renta, aunque
                 pueden hacerlo si el borrador les sale a devolver.
               </p>
@@ -1076,9 +960,10 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <p>
-                <strong>Rendimientos del trabajo superiores a 22.000 €</strong> con un solo pagador
-                están obligados a declarar la renta. Con dos o más pagadores, el límite baja a
-                15.000 € si el segundo pagador supera los 1.500 € anuales. Presentarla fuera de plazo
+                <strong>Rendimientos del trabajo superiores a {formatCurrency(LIMITE_UN_PAGADOR)}</strong> con un solo pagador
+                están obligados a declarar la renta. Con dos o más pagadores, el límite baja a{' '}
+                {formatCurrency(LIMITE_VARIOS_PAGADORES)} si lo cobrado del segundo y restantes pagadores
+                supera los {formatCurrency(LIMITE_SEGUNDO_PAGADOR)} anuales (art. 96 LIRPF). Presentarla fuera de plazo
                 cuando estás obligado conlleva un recargo del 1 % al 15 % si sale a pagar (art. 27 LGT) o,
                 si sale a devolver, una multa de 200 € que baja a 100 € si la presentas antes de que
                 Hacienda te la pida (art. 198 LGT).

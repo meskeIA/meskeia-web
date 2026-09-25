@@ -125,6 +125,14 @@ import { parseSpanishNumber } from '../../lib/formatters';
  * sin suelo de base), tres idas y vueltas Neto→Bruto y los cuatro rechazos (vacío, 0,
  * negativo e «30.000.50»). El motor cuadró al céntimo en todos.
  * Los hallazgos abiertos van al final como `test.fail()`: afirman lo que DEBERÍA pasar.
+ *
+ * ── Reparados 25/09/2026 (hallazgos 1651-1660) ───────────────────────────────
+ * El motor salió de page.tsx a `app/estimador-sueldo-neto/motor.ts`, y de él beben ahora la
+ * calculadora, la tabla «12 vs 14 pagas», los cuatro perfiles, el ejemplo del SMI y las
+ * horquillas del FAQPage (metadata.ts): ninguna cifra del bloque educativo puede volver a
+ * contradecir a la calculadora. El ejemplo práctico grava el mínimo a tipo cero; el año
+ * sale de FISCAL_IRPF_META.vigencia; los límites de la obligación de declarar, de
+ * OBLIGACION_DECLARAR_2025. Los diez `test.fail()` son ya tests normales.
  */
 
 const RUTA = '/estimador-sueldo-neto/';
@@ -563,10 +571,10 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Hallazgos abiertos de la re-inspección del 25/09/2026. Afirman lo que DEBERÍA pasar:
-// hoy fallan a propósito. Al repararlos se les quita el `test.fail()` y quedan de candado.
+// Hallazgos 1651-1660 de la re-inspección del 25/09/2026 — REPARADOS el mismo día. Eran
+// `test.fail()`; hoy son candados de regresión y deben pasar en verde.
 // ═════════════════════════════════════════════════════════════════════════════
-test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
+test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026', () => {
   /**
    * ALTO · El bloque educativo publica cifras del modelo viejo (reducción residual de 2.364 €
    * del art. 20, retirada el 09/09 en 2b80033d, y mínimo valorado al marginal, reparado el 12/09
@@ -579,12 +587,32 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    *     cero es 2.400 × 19 % = 456,00 € (IRPF 6.328,50 € soltero frente a 5.872,50 €).
    *   · 80.000 €, dos ingresos: base 74.021,06 € y neto 52.864,59 €; el perfil dice ~71.657 € y ~55.371 €.
    */
-  test.fail('bloque educativo — la tabla de 30.000 € y los perfiles cuadran con la calculadora', async ({ page }) => {
+  test('bloque educativo — la tabla de 30.000 € y los perfiles cuadran con la calculadora', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     // La tabla es explícitamente «para un sueldo bruto de 30.000 €»: su neto es el del CASO 1.
     expect.soft(cuerpo).toContain('23.124');
     for (const cifraVieja of ['24.327', '~311 €', '16.206', '~18.545', '28.362', '~28.436', '~720 €', '~71.657', '~55.371']) {
       expect.soft(cuerpo, `cifra del modelo viejo «${cifraVieja}»`).not.toContain(cifraVieja);
+    }
+    // Reparado el 25/09/2026: la tabla y los perfiles salen del mismo motor que la calculadora
+    // (app/estimador-sueldo-neto/motor.ts). Cifras recalculadas a mano contra data/fiscal:
+    //   · Tabla 30.000 €: neto 23.124,00 € → 1.927,00 €/mes; IRPF 4.926,00 € → 410,50 €/mes (12 p.)
+    //     y 351,86 € (14 p.); neto por paga en 14: 23.124 / 14 = 1.651,71 €.
+    //   · 22.000 €: SS 1.430 · RNT 18.570 € → reducción art. 20 (segundo tramo decreciente)
+    //     → base 17.227,65 € · cuota escala(17.227,65) − escala(5.550) = 3.512,14 − 1.054,50
+    //     = 2.457,64 € (DA 61.ª: 0, íntegros ≥ 20.048,45) · neto 18.112,36 €.
+    //   · 35.000 €, 1 hijo: SS 2.275 · base 30.725,00 € · mínimo 7.950 € → escala(30.725)
+    //     7.383,00 − escala(7.950) 1.510,50 = 5.872,50 € · neto 26.852,50 € · sin hijo 6.328,50 €
+    //     → ahorro 456,00 € (= 2.400 × 19 %), 38,00 €/mes.
+    //   · 80.000 €: SS 3.978,94 € (base máxima) · base 74.021,06 € · cuota 23.156,48 € ·
+    //     neto 52.864,59 €.
+    for (const cifra of [
+      '1927,00 €', '410,50 €', '351,86 €', '1651,71 €',
+      '17.227,65 €', '2457,64 €', '18.112,36 €',
+      '30.725,00 €', '5872,50 €', '26.852,50 €', '456,00 €', '38,00 €',
+      '74.021,06 €', '23.156,48 €', '52.864,59 €',
+    ]) {
+      expect.soft(cuerpo, `cifra de la calculadora «${cifra}»`).toContain(cifra);
     }
   });
 
@@ -595,9 +623,15 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * art. 63.1.2.º prohíbe (calcularCuotaIntegraGeneral: el mínimo forma parte de la base y se
    * grava a tipo cero). check:minimo-irpf solo mira restas en el CÓDIGO, no la prosa.
    */
-  test.fail('bloque educativo — el ejemplo práctico no resta el mínimo de la base liquidable', async ({ page }) => {
+  test('bloque educativo — el ejemplo práctico no resta el mínimo de la base liquidable', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect(cuerpo).not.toMatch(/tras restar[^)]*mínimo personal/);
+    // Reparado: base 30.000 € con el mínimo DENTRO → escala(30.000) 7.165,50 € − escala(5.550)
+    // 1.054,50 € = 6.111,00 € de cuota íntegra (20,37 % efectivo).
+    expect.soft(cuerpo).toContain('7165,50 €');
+    expect.soft(cuerpo).toContain('1054,50 €');
+    expect.soft(cuerpo).toContain('6111,00 €');
+    expect.soft(cuerpo).toContain('20,37% efectivo');
   });
 
   /**
@@ -607,11 +641,19 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * (calcularDeduccionRentasBajas(…, 2026)): 19.000 € deducen 209,69 € (CASO 0), cuando con la
    * de 2025 serían 0 € (≥ 18.276 €). El propio aviso de la página dice «Vigencia: 2026».
    */
-  test.fail('ejercicio — el hero y el <title> no anuncian 2025 cuando se calcula con 2026', async ({ page }) => {
+  test('ejercicio — el hero y el <title> no anuncian 2025 cuando se calcula con 2026', async ({ page }) => {
     expect.soft(await page.locator('body').innerText()).toContain('Vigencia: 2026');
     const subtitulo = page.locator('header').filter({ has: page.getByRole('heading', { level: 1 }) }).locator('p');
     expect.soft(await subtitulo.innerText()).not.toContain('2025');
     expect.soft(await page.title()).not.toContain('2025');
+    // Reparado: el año se deriva de FISCAL_IRPF_META.vigencia, el mismo que da el aviso.
+    expect.soft(await subtitulo.innerText()).toContain('2026');
+    expect.soft(await page.title()).toContain('2026');
+    // Y la referencia normativa ya no duplica la ley en «normativa» y «fuente»: cita también
+    // la DA 61.ª (RDL 5/2026) y la Orden de cotización.
+    const referencias = limpiar((await page.getByRole('note', { name: 'Datos de referencia normativos' }).allInnerTexts()).join(' '));
+    expect.soft(referencias).toContain('Real Decreto-ley 5/2026');
+    expect.soft(referencias).toContain('Orden PJC/297/2026');
   });
 
   /**
@@ -620,7 +662,7 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * art. 96 LIRPF) es 15.876 €. Los 22.000 € y 1.500 € del mismo párrafo cuadran hoy con el
    * módulo, pero tampoco se derivan de él.
    */
-  test.fail('bloque educativo — el límite con varios pagadores es el de OBLIGACION_DECLARAR_2025 (15.876 €)', async ({ page }) => {
+  test('bloque educativo — el límite con varios pagadores es el de OBLIGACION_DECLARAR_2025 (15.876 €)', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect.soft(cuerpo).not.toContain('el límite baja a 15.000 €');
     expect.soft(cuerpo).toMatch(/15\.876/);
@@ -631,8 +673,11 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * trabajador como «aproximadamente el 6,35 %: 4,70 % + 1,55 % + 0,10 %», sin el MEI; la app
    * aplica COTIZACIONES_SS_2026 = 4,70 + 1,55 + 0,10 + 0,15 = 6,50 % (1.950,00 € con 30.000 €).
    */
-  test.fail('FAQPage — la cotización del trabajador no es el 6,35 % sin MEI', async ({ page }) => {
-    expect(await faqJsonLd(page)).not.toContain('6,35');
+  test('FAQPage — la cotización del trabajador no es el 6,35 % sin MEI', async ({ page }) => {
+    const faq = await faqJsonLd(page);
+    expect.soft(faq).not.toContain('6,35');
+    // Reparado: sale de COTIZACIONES_SS_2026 (4,70 + 1,55 + 0,10 + 0,15).
+    expect.soft(faq).toContain('el 6,50 % de la base de cotización');
   });
 
   /**
@@ -640,17 +685,20 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * 20-22 %; la calculadora de la página da 16,42 % (CASO 1) y 22,41 % (50.000 €: cuota
    * escala(44.750) − escala(5.550) = 12.259,00 − 1.054,50 = 11.204,50 €).
    */
-  test.fail('FAQPage — las horquillas de retención contienen lo que calcula la propia app', async ({ page }) => {
+  test('FAQPage — las horquillas de retención contienen lo que calcula la propia app', async ({ page }) => {
     const faq = await faqJsonLd(page);
     expect.soft(faq).not.toMatch(/30\.000 €, el 12-15 %/);
     expect.soft(faq).not.toMatch(/50\.000 €, el 20-22 %/);
+    // Reparado: las cifras las da el mismo motor que la calculadora (CASO 1 y el de 50.000 €).
+    expect.soft(faq).toContain('con 30.000 €, el 16,42 %');
+    expect.soft(faq).toContain('con 50.000 €, el 22,41 %');
   });
 
   /**
    * BAJO · El aviso final imprime FISCAL_IRPF_META.verificado en crudo: «Datos verificados:
    * 2026-09-09», formato ISO; el DataReference de arriba ya lo da como 09/09/2026.
    */
-  test.fail('aviso — la fecha de verificación va en formato DD/MM/AAAA', async ({ page }) => {
+  test('aviso — la fecha de verificación va en formato DD/MM/AAAA', async ({ page }) => {
     await expect(page.getByText(/^Datos verificados:/)).toHaveText(/^Datos verificados: \d{2}\/\d{2}\/\d{4}/, { timeout: 1000 });
   });
 
@@ -659,7 +707,7 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * visible sin `htmlFor` ni anidamiento: `select.labels.length` es 0 y un lector de pantalla
    * los anuncia sin nombre, justo en el control que cambia el IRPF.
    */
-  test.fail('accesibilidad — los dos desplegables tienen nombre accesible', async ({ page }) => {
+  test('accesibilidad — los dos desplegables tienen nombre accesible', async ({ page }) => {
     expect.soft(await page.getByRole('combobox', { name: 'Situación familiar' }).count()).toBe(1);
     expect.soft(await page.getByRole('combobox', { name: 'Número de pagas' }).count()).toBe(1);
   });
@@ -669,7 +717,7 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * sobre #fff, da 2,87:1 (texto de 15,2 px, peso 500 → umbral AA 4,5:1). En oscuro, sobre
    * #2d2d2d, 4,79:1. Se miden los dos para que el arreglo de uno no rompa el otro.
    */
-  test.fail('accesibilidad — el importe de la deducción llega a 4,5:1 en los dos temas', async ({ page }) => {
+  test('accesibilidad — el importe de la deducción llega a 4,5:1 en los dos temas', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' });
     // Sin transiciones: al cambiar de tema el fondo pasa por grises intermedios, y medido
     // en caliente el oscuro daba 2,55:1 en vez de su 4,79:1 real.
@@ -704,7 +752,7 @@ test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
    * siguen diciendo 30.000,00 € de bruto y 23.124,00 € de neto junto a un campo que dice otra
    * cosa. Debería retirar (o marcar como no vigente) el resultado.
    */
-  test.fail('rechazo tras un resultado — no queda en pantalla el cálculo de otra cifra', async ({ page }) => {
+  test('rechazo tras un resultado — no queda en pantalla el cálculo de otra cifra', async ({ page }) => {
     page.on('dialog', (dialog) => dialog.accept());
     await calcular(page, '30000');
     expect(await hayResultados(page)).toBe(true);
