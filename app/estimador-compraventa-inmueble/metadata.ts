@@ -30,7 +30,7 @@ import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/
  * (8 → 7,75 %) o el de Valencia (10 → 9 %) no llegaría hasta aquí, y la señal
  * estructurada que leen Bing Copilot, ChatGPT y Perplexity envejecería sin aviso.
  */
-const pct = (n: number) => `${String(n).replace('.', ',')} %`;
+const pct = (n: number) => `${String(n).replace('.', ',')}\u00A0%`;
 
 /**
  * Las horquillas de notaría y registro salen del ARANCEL, no de la memoria.
@@ -263,15 +263,15 @@ const faqSchema = generateFAQSchema({
   mainEntity: [
     {
       question: '¿Qué diferencia hay entre ITP e IVA en la compra de una vivienda?',
-      answer: `El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que el IVA al ${IVA_INMUEBLES_2025.obraNueva}% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir en la misma operación: o se paga uno u otro, nunca ambos.`,
+      answer: `El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que el IVA al ${IVA_INMUEBLES_2025.obraNueva}\u00A0% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir en la misma operación: o se paga uno u otro, nunca ambos.`,
     },
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
-      answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP_VIVIENDA.min} % y el ${RANGO_ITP_VIVIENDA.max} % según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el ${pct(HORQUILLA_FEDATARIOS_PCT.min)} al ${pct(HORQUILLA_FEDATARIOS_PCT.max)} del precio. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
+      answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP_VIVIENDA.min}\u00A0% y el ${RANGO_ITP_VIVIENDA.max}\u00A0% según la comunidad autónoma en segunda mano, o IVA al ${IVA_INMUEBLES_2025.obraNueva}\u00A0% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el ${pct(HORQUILLA_FEDATARIOS_PCT.min)} al ${pct(HORQUILLA_FEDATARIOS_PCT.max)} del precio. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',
-      answer: `El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del ${TIPO_AHORRO_MIN}% al ${TIPO_AHORRO_MAX}% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años que venden su vivienda habitual.`,
+      answer: `El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del ${TIPO_AHORRO_MIN}\u00A0% al ${TIPO_AHORRO_MAX}\u00A0% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años que venden su vivienda habitual.`,
     },
     {
       question: '¿Puedo negociar quién paga cada gasto?',
@@ -291,7 +291,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?',
-      answer: `Muchas comunidades aplican tipos reducidos para jóvenes (el tope va de los ${EDAD_JOVEN.min} a los ${EDAD_JOVEN.max} años según la comunidad), familias numerosas, personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos (edad, ingresos, valor máximo del inmueble) varían por comunidad. Consulta la normativa de tu CC.AA.`,
+      answer: `Muchas comunidades aplican tipos reducidos para jóvenes (el tope va de los ${EDAD_JOVEN.min} a los ${EDAD_JOVEN.max} años según la comunidad), familias numerosas, personas con discapacidad (≥33\u00A0%), VPO o municipios en riesgo de despoblación. Los requisitos (edad, ingresos, valor máximo del inmueble) varían por comunidad. Consulta la normativa de tu CC.AA.`,
     },
     {
       question: '¿La gestoría es obligatoria en la compraventa?',
@@ -311,7 +311,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga de ITP al comprar una vivienda de segunda mano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El Impuesto de Transmisiones Patrimoniales (ITP) de una vivienda varía entre el ${RANGO_ITP_VIVIENDA.min} % y el ${RANGO_ITP_VIVIENDA.max} % de su valor según la comunidad autónoma. Cataluña aplica el ${tipoDe('cataluna')} de tipo general y escala hasta el ${techoDe('cataluna')} en los inmuebles de más valor, Madrid el ${tipoDe('madrid')}, Andalucía el ${tipoDe('andalucia')} y el País Vasco el ${tipoDe('pais-vasco')}. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.`,
+        text: `El Impuesto de Transmisiones Patrimoniales (ITP) de una vivienda varía entre el ${RANGO_ITP_VIVIENDA.min}\u00A0% y el ${RANGO_ITP_VIVIENDA.max}\u00A0% de su valor según la comunidad autónoma. Cataluña aplica el ${tipoDe('cataluna')} de tipo general y escala hasta el ${techoDe('cataluna')} en los inmuebles de más valor, Madrid el ${tipoDe('madrid')}, Andalucía el ${tipoDe('andalucia')} y el País Vasco el ${tipoDe('pais-vasco')}. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.`,
       },
     },
     {
@@ -327,7 +327,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos paga el vendedor al vender un inmueble?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN} % y el ${TIPO_AHORRO_MAX} % según el importe. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual: la reinversión del importe obtenido en otra vivienda habitual (art. 38 LIRPF) y la de los mayores de 65 años (art. 33.4.b LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
+        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN}\u00A0% y el ${TIPO_AHORRO_MAX}\u00A0% según el importe. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual: la reinversión del importe obtenido en otra vivienda habitual (art. 38 LIRPF) y la de los mayores de 65 años (art. 33.4.b LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
       },
     },
     {

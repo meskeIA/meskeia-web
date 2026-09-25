@@ -55,6 +55,11 @@
  * mismo criterio de las bases V: «es/será» solo si es seguro. Va en el campo `sinIva` de cada
  * hermana y en el segundo `describe` del final.
  *
+ * **Tercer invariante (25/09/2026), la comisión escrita es la calculada**: el blur del
+ * NumberInput reescribía a «10» una comisión mayor en el estimador, el garaje y el trastero
+ * (max={10}), y el neto cambiaba al salir del campo sin aviso (hallazgo 1796 y su caso de
+ * SOSPECHAS). Va en el tercer `describe` del final, con las cifras resueltas a mano.
+ *
  * ── El invariante ────────────────────────────────────────────────────────────
  * `parseSpanishNumber` devuelve NaN POR DISEÑO ante `2.000.50` (el millar y el decimal a la
  * estadounidense, un copiar y pegar corriente). De ahí:
@@ -106,7 +111,7 @@
  * con el setter nativo fuera de ese módulo rompe el build.
  */
 import { test, expect, type Page, type Locator } from '@playwright/test';
-import { esperarHidratacion, sembrarValor } from '../apps/_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from '../apps/_hidratacion';
 
 /** El texto imposible canónico: millar y decimal a la estadounidense → NaN. */
 const ILEGIBLE = '2.000.50';
@@ -1324,6 +1329,130 @@ test.describe('Testigo de familia — el IGIC que no se calcula en las 7 apps de
         `La gestoría ilegible suma seguro: el aviso tiene que decir «será mayor».\n  Aviso: ${aviso}`,
       ).toMatch(/coste real será mayor/i);
       expect(aviso, `Aviso: ${aviso}`).not.toMatch(/coste real puede ser mayor/i);
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  El tercer invariante (25/09/2026): la comisión que se escribe es la que se calcula
+//
+//  La comisión del vendedor llevaba max={10} en el estimador, el garaje y el trastero, y el
+//  blur del NumberInput reescribía a «10» cualquier valor mayor SIN decirlo: con el foco dentro
+//  la app publicaba el neto de lo escrito y al salir del campo el del 10 %. Hallazgo 1796 en la
+//  referencia; en garaje y trastero, caso anotado en SOSPECHAS con las cifras de abajo.
+//  local-comercial no llevaba max y ya conservaba el 15: entra como control, sin cifras propias
+//  (se mide que el neto con el foco y al salir sea el mismo). Nave, solar y terreno rústico no
+//  tienen pestaña de vendedor.
+//
+//  Cifras a mano (coeficiente del IIVTNU a 10 años = 0,12; tipo orientativo 25 %):
+//   · garaje y trastero: venta 15.000 · compra 12.000 · 10 años · suelo 3.000 · comisión 15 %
+//       comisión 2250,00 · plusvalía 3.000 × 0,12 × 25 % = 90,00
+//       ganancia 15.000 − 2.250 − 90 − 12.000 = 660 → IRPF 660 × 19 % = 125,40
+//       neto 15.000 − 90 − 2.250 − 125,40 = 12.534,60 € (al 10 %: 13.142,10, +607,50)
+//   · estimador: venta 200.000 · compra 150.000 · 10 años · suelo 50.000 · comisión 15 %
+//       comisión 30.000 · plusvalía 1500 · ganancia 18.500 → IRPF 1.140 + 12.500 × 21 % = 3765
+//       neto 200.000 − 1.500 − 30.000 − 3.765 = 164.735,00 € (al 10 %: 172.635,00)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface CasoComision {
+  slug: string;
+  /** `aria-label` del campo de la comisión del vendedor. */
+  etiqueta: string;
+  /** Deja la app en la pestaña de vendedor con el caso preparado (comisión aún en su defecto). */
+  preparar: (page: Page) => Promise<void>;
+  /** Neto calculado a mano con la comisión del 15 %; sin él, solo se exige que no cambie. */
+  neto?: number;
+}
+
+const COMISION_ALTA = '15';
+
+const CASOS_COMISION: readonly CasoComision[] = [
+  {
+    slug: 'simulador-gastos-compraventa-garaje',
+    etiqueta: 'Comisión inmobiliaria del vendedor (%)',
+    preparar: async (page) => {
+      await sembrar(page, 'Precio del garaje / plaza de parking', '15000');
+      await irAPestana(page, 'vendedor');
+      await sembrar(page, 'Precio de compra original del garaje', '12000');
+      await sembrar(page, 'Años de propiedad', '10');
+      await sembrar(page, 'Valor catastral del suelo (€)', '3000');
+    },
+    neto: 12534.6,
+  },
+  {
+    slug: 'simulador-gastos-compraventa-trastero',
+    etiqueta: 'Comisión inmobiliaria (%)',
+    preparar: async (page) => {
+      await sembrar(page, 'Precio del trastero', '15000');
+      await irAPestana(page, 'vendedor');
+      await sembrar(page, 'Precio de compra original', '12000');
+      await sembrar(page, 'Años de propiedad', '10');
+      await sembrar(page, 'Valor catastral del suelo', '3000');
+    },
+    neto: 12534.6,
+  },
+  {
+    slug: 'estimador-compraventa-inmueble',
+    etiqueta: 'Comisión inmobiliaria (%)',
+    preparar: async (page) => {
+      await sembrar(page, 'Precio de la vivienda', '200000');
+      await irAPestana(page, 'vendedor');
+      await sembrar(page, 'Precio de compra original', '150000');
+      await sembrar(page, 'Años de propiedad', '10');
+      await sembrar(page, 'Valor catastral del suelo', '50000');
+    },
+    neto: 164735,
+  },
+  {
+    // Control: ya conservaba lo escrito. Usa su caso base de la tabla de arriba.
+    slug: 'simulador-gastos-compraventa-local-comercial',
+    etiqueta: 'Comisión de la inmobiliaria (%)',
+    preparar: async (page) => {
+      const app = HERMANAS.find((h) => h.slug === 'simulador-gastos-compraventa-local-comercial');
+      if (!app) throw new Error('local-comercial ya no está en HERMANAS');
+      await app.preparar(page, 'base');
+    },
+  },
+];
+
+test.describe('Testigo de familia — la comisión del vendedor no se reescribe al salir del campo', () => {
+  test.describe.configure({ timeout: 60_000 });
+
+  for (const caso of CASOS_COMISION) {
+    test(`${caso.slug} · comisión «${COMISION_ALTA}» — el neto con el foco es el de al salir`, async ({ page }) => {
+      const app = HERMANAS.find((h) => h.slug === caso.slug);
+      if (!app?.cifraVendedor) throw new Error(`${caso.slug} no declara cifraVendedor en HERMANAS`);
+      await page.goto(`/${caso.slug}/`);
+      await esperarHidratacion(page, [sel(app.campos[0].etiqueta)]);
+      await caso.preparar(page);
+
+      // 1) Con el foco: lo escrito.
+      await sembrar(page, caso.etiqueta, COMISION_ALTA);
+      const conFoco = exigirCifra(
+        await leerCifra(page, app.cifraVendedor),
+        'Con la comisión escrita la app tiene que publicar su neto.',
+      );
+      if (caso.neto !== undefined) {
+        expect(conFoco, 'El neto con la comisión del 15 % no es el calculado a mano').toBeCloseTo(caso.neto, 2);
+      }
+
+      // 2) Al salir del campo: el blur del NumberInput no puede reescribirlo.
+      const campo = page.locator(sel(caso.etiqueta));
+      await campo.focus();
+      await campo.blur();
+      const aceptado = await campo.inputValue();
+      await esperarValorEnReact(page, campo, aceptado);
+      expect(aceptado, `Al salir del campo la comisión «${COMISION_ALTA}» se reescribió a «${aceptado}»`).toBe(
+        COMISION_ALTA,
+      );
+      const alSalir = exigirCifra(
+        await leerCifra(page, app.cifraVendedor),
+        'Al salir del campo la app dejó de publicar su neto.',
+      );
+      expect(
+        alSalir,
+        `El neto cambió al salir del campo (${eur.format(conFoco)} → ${eur.format(alSalir)}) sin que el usuario tocara nada`,
+      ).toBeCloseTo(conFoco, 2);
     });
   }
 });

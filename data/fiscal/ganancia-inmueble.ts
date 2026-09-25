@@ -186,19 +186,35 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
   let proporcionReinvertida = 0;
   const importeTotalObtenido = Math.max(0, valorTransmision - positivo(e.reinversion?.principalPendiente));
 
-  if (e.reinversion && e.reinversion.importeReinvertido > 0 && importeTotalObtenido > 0) {
-    proporcionReinvertida = Math.min(1, e.reinversion.importeReinvertido / importeTotalObtenido);
+  /**
+   * Con el principal pendiente IGUAL o MAYOR que el valor de transmisión, el importe total
+   * obtenido del art. 41.1 RIRPF es 0, y cualquier reinversión lo cubre: el art. 41.4 solo hace
+   * proporcional la exención «en el caso de que el importe de la reinversión fuera inferior al
+   * total obtenido», y ninguna reinversión es inferior a 0. Hasta el 25/09/2026 la guarda
+   * `importeTotalObtenido > 0` descartaba la exención ENTERA en ese caso —con 1 € menos de
+   * hipoteca salía EXENTO y con 1 € más, la cuota completa (hallazgo 1797 del Inspector)—.
+   * Sigue haciendo falta reinvertir algo (`importeReinvertido > 0`): el art. 41.1 exige que el
+   * importe «se reinvierta en la adquisición de una nueva vivienda habitual».
+   * Fuente: RD 439/2007, art. 41.1 y 41.4 (BOE-A-2007-6820, texto consolidado).
+   */
+  const cubiertoPorLaHipoteca = importeTotalObtenido <= 0;
+  if (e.reinversion && e.reinversion.importeReinvertido > 0) {
+    proporcionReinvertida = cubiertoPorLaHipoteca
+      ? 1
+      : Math.min(1, e.reinversion.importeReinvertido / importeTotalObtenido);
     exentaPorReinversion = ganancia * proporcionReinvertida;
   }
 
   const baseImponible = Math.max(0, ganancia - exentaPorReinversion);
   const cuotaIRPF = calcularCuotaBaseAhorro(baseImponible);
 
-  const motivoExencion = proporcionReinvertida >= 1
-    ? 'Reinversión total del importe obtenido en una nueva vivienda habitual (art. 38 LIRPF)'
-    : proporcionReinvertida > 0
-      ? `Reinversión parcial: exento el ${formatNumber(proporcionReinvertida * 100, 1)} % de la ganancia (art. 41 RIRPF)`
-      : null;
+  const motivoExencion = proporcionReinvertida >= 1 && cubiertoPorLaHipoteca
+    ? 'Reinversión en una nueva vivienda habitual: el principal pendiente del préstamo iguala o supera el valor de transmisión, así que el importe obtenido es 0 y cualquier reinversión lo cubre (art. 38 LIRPF y art. 41.1 RIRPF)'
+    : proporcionReinvertida >= 1
+      ? 'Reinversión total del importe obtenido en una nueva vivienda habitual (art. 38 LIRPF)'
+      : proporcionReinvertida > 0
+        ? `Reinversión parcial: exento el ${formatNumber(proporcionReinvertida * 100, 1)} % de la ganancia (art. 41 RIRPF)`
+        : null;
 
   return {
     valorAdquisicion,

@@ -1429,9 +1429,22 @@ export default function SimuladorTrasteroCompraventaPage() {
                   onChange={setComisionInmobiliaria}
                   label="Comisión inmobiliaria (%)"
                   placeholder="3"
-                  helperText="Típico: 3-5%. La paga el vendedor"
+                  helperText={'Típico: entre el 3\u00A0% y el 5\u00A0%, aunque es de libre acuerdo y en un trastero barato una tarifa mínima puede superarlo. La paga el vendedor'}
+                  /*
+                    SIN max a propósito (hallazgo 1796 de estimador-compraventa-inmueble, la app de
+                    referencia de la familia). Llevaba max={10}, y el blur del NumberInput
+                    reescribía a «10» cualquier comisión mayor SIN decirlo: con el foco dentro se
+                    publicaba el neto de lo escrito y al salir del campo el del 10 %. La comisión
+                    es libre y aquí, con importes bajos, una tarifa mínima supera el 10 % con
+                    facilidad: se calcula lo escrito, como ya hacía local-comercial. Por encima del
+                    100 % no es una comisión, y se avisa en el propio campo.
+                  */
                   min={0}
-                  max={10}
+                  error={
+                    parseSpanishNumber(comisionInmobiliaria) > 100
+                      ? 'La comisión no puede superar el 100\u00A0% del precio de venta: revisa el porcentaje'
+                      : undefined
+                  }
                 />
 
                 <NumberInput

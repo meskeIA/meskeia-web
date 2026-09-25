@@ -74,6 +74,14 @@ const HORQUILLA_FEDATARIOS = horquillaFedatarios(BANDA_PRECIO_VIVIENDA.min, BAND
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
 /** Redondeo a la decena de euros: son cifras orientativas, no una factura */
 const eurosOrientativos = (n: number) => eurosEnteros(Math.round(n / 10) * 10);
+/**
+ * El `%` separado de la cifra por un espacio DURO (CLAUDE.md global §2, desde el 25/09/2026),
+ * también en los textos que llegan escritos de data/: las notas de cada comunidad, los nombres
+ * de los reducidos («bonif. 10%») o la nota de DataReference los traen pegados, o con un espacio
+ * normal que deja saltar el `%` solo a la línea siguiente (hallazgo 1800). Se corrige al
+ * pintarlos, sin tocar los datos, que comparten otras apps.
+ */
+const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, '$1\u00A0%');
 
 /**
  * Ejemplo «Carlos» del bloque educativo (obra nueva). Su IVA y su AJD salen del mismo
@@ -198,6 +206,12 @@ const objetoAJDDe = (t: TipoInmueble): ObjetoTransmision =>
  */
 const sujetoPlural = (partes: readonly string[]): boolean =>
   partes.length > 1 || /^(los|las)\s/i.test(partes[0] ?? '');
+/**
+ * Cada campo una vez. `veredictoIlegibles` pone en las DOS listas de un veredicto mixto el
+ * importe que mueve la cifra hacia un lado u otro según lo que valga, y `[...menor, ...mayor]`
+ * lo nombraba dos veces seguidas (hallazgo 1798).
+ */
+const sinRepetir = (partes: readonly string[]): string[] => Array.from(new Set(partes));
 /** «Escríbelo» detrás de un importe, «Escríbelos» detrás de dos o más (hallazgo 1555). */
 const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
 
@@ -281,6 +295,12 @@ interface ResultadosVendedor {
   motivoExencion: string | null;
   /** Campos concretos sin rellenar, para no confundir «falta este dato» con «este cálculo no se hizo» */
   faltaPrecioCompra: boolean;
+  /**
+   * El precio de compra está escrito, se lee y es 0 (o negativo mientras el campo tiene el foco,
+   * que el blur reescribe a 0 por su min={0}): no «falta», no vale. Decía «Falta el precio de
+   * compra original» y «Rellena…» con el 0 a la vista (patrón 5 de la familia, hallazgo 1799).
+   */
+  precioCompraNoValido: boolean;
   faltaValorSuelo: boolean;
   faltaAnios: boolean;
   /**
@@ -426,6 +446,38 @@ function calcularVendedor(e: EntradaVendedor) {
   };
 }
 
+/**
+ * El caso de Ana (bloque educativo), por el MISMO cálculo que la pestaña Vendedor.
+ *
+ * Afirmaba «su ganancia patrimonial es de 62.500 €» y dos frases después que Ana «además paga
+ * la plusvalía municipal …, que también minora el valor de transmisión»: la ganancia es 62.500
+ * MENOS esa plusvalía, y con esos datos la calculadora rotula 62.500 «Ganancia patrimonial
+ * (máximo)» (hallazgo 1802, patrón 2 de la familia). Iba tecleada, que es la familia de los
+ * hallazgos 629 y 675. Ahora el ejemplo trae el valor catastral del suelo que la plusvalía
+ * necesita y todas sus cifras salen de `calcularVendedor`.
+ */
+const EJEMPLO_ANA = {
+  precioVenta: 250000,
+  precioCompra: 180000,
+  anios: 8,
+  valorSuelo: 60000,
+  comisionPct: 3,
+} as const;
+const EJEMPLO_ANA_CALCULO = calcularVendedor({
+  precioV: EJEMPLO_ANA.precioVenta,
+  precioC: EJEMPLO_ANA.precioCompra,
+  anios: EJEMPLO_ANA.anios,
+  meses: undefined,
+  valorSuelo: EJEMPLO_ANA.valorSuelo,
+  valorTotal: undefined,
+  comisionPct: EJEMPLO_ANA.comisionPct / 100,
+  otrosVenta: 0,
+  gastosAdquisicion: 0,
+  mejoras: 0,
+  exentoPorEdad: false,
+  reinversion: undefined,
+});
+
 // ===== CONSTANTES =====
 const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
   { value: 'andalucia', label: 'Andalucía' },
@@ -475,12 +527,12 @@ const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; 
   garaje: [{
     url: '/simulador-gastos-compraventa-garaje/',
     nombre: 'Simulador de gastos de compraventa de garaje',
-    matiz: `en obra nueva distingue el garaje transmitido con la vivienda (IVA ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%, hasta 2 plazas) del garaje independiente (IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}%). Aquí se aplica siempre el ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%.`,
+    matiz: `en obra nueva distingue el garaje transmitido con la vivienda (IVA ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}\u00A0%, hasta 2 plazas) del garaje independiente (IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}\u00A0%). Aquí se aplica siempre el ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}\u00A0%.`,
   }],
   trastero: [{
     url: '/simulador-gastos-compraventa-trastero/',
     nombre: 'Simulador de gastos de compraventa de trastero',
-    matiz: `en obra nueva distingue el trastero transmitido con la vivienda (IVA ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%) del trastero independiente (IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}%). Aquí se aplica siempre el ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%.`,
+    matiz: `en obra nueva distingue el trastero transmitido con la vivienda (IVA ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}\u00A0%) del trastero independiente (IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}\u00A0%). Aquí se aplica siempre el ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}\u00A0%.`,
   }],
   local: [{
     url: '/simulador-gastos-compraventa-local-comercial/',
@@ -501,7 +553,7 @@ const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; 
     {
       url: '/simulador-gastos-compraventa-solar/',
       nombre: 'Simulador de gastos de compra de solar',
-      matiz: `en el suelo edificable el impuesto depende de quién vende: IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}% + AJD si vende un promotor o empresario, ITP si vende un particular.`,
+      matiz: `en el suelo edificable el impuesto depende de quién vende: IVA ${formatNumber(PORCENTAJES_IVA.general, 0)}\u00A0% + AJD si vende un promotor o empresario, ITP si vende un particular.`,
     },
   ],
 };
@@ -540,6 +592,12 @@ export default function SimuladorCompraventaPage() {
   const [gastosAdquisicion, setGastosAdquisicion] = useState('');
   const [mejoras, setMejoras] = useState('');
   const [otrosGastosVenta, setOtrosGastosVenta] = useState('');
+  /**
+   * Cómo se pagó AQUELLA compra, para «Estimar por mí» (hallazgo 1794). El botón suponía
+   * siempre segunda mano (ITP) y quien compró obra nueva pagó IVA + AJD: en 200.000 € en Madrid
+   * son 9.500 € más de valor de adquisición, y quedarse corto ahí infla la ganancia y el IRPF.
+   */
+  const [regimenCompraOriginal, setRegimenCompraOriginal] = useState<TipoTransmision>('segunda-mano');
 
   // Exención por reinversión en vivienda habitual (art. 38 LIRPF)
   const [reinvierte, setReinvierte] = useState(false);
@@ -924,7 +982,8 @@ export default function SimuladorCompraventaPage() {
       motivoExencion: hayDatosGanancia ? g.motivoExencion : null,
       // !(x > 0) y no «x <= 0»: con el campo vacío, parseSpanishNumber devuelve NaN, y
       // NaN <= 0 es false — el mismo bug que el propio hallazgo 512 venía a cerrar.
-      faltaPrecioCompra: !(precioC > 0),
+      faltaPrecioCompra: !(precioC > 0) && !(Number.isFinite(precioC) && precioC <= 0),
+      precioCompraNoValido: Number.isFinite(precioC) && precioC <= 0,
       faltaValorSuelo: !plusvaliaResuelta && !(valorSuelo > 0),
       // Un año negativo no «falta»: está escrito y es imposible (patrón 5, hallazgo 1552).
       faltaAnios: !plusvaliaResuelta && !aniosDisponibles && !aniosNegativo,
@@ -952,17 +1011,25 @@ export default function SimuladorCompraventaPage() {
   }, [precioVenta, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble]);
 
   /**
+   * En Canarias, Ceuta y Melilla la obra nueva no pagó IVA sino IGIC o IPSI, que esta app no
+   * calcula: ahí el botón no estima en vez de escribir una cifra sin el impuesto, que se quedaría
+   * corta y, con ella, inflaría la ganancia (la misma dirección del hallazgo 1794).
+   */
+  const sinIvaCompraOriginal =
+    regimenCompraOriginal === 'primera-mano' ? TERRITORIOS_SIN_IVA[ccaa] ?? null : null;
+  /**
    * Estima los impuestos y gastos que el vendedor pagó al comprar el inmueble, para
    * que no tenga que buscarlos en una escritura de hace años. Usa el mismo motor que
-   * la pestaña Comprador (ITP del tipo general de la CCAA + notaría + registro +
-   * gestoría), aplicado sobre el precio de compra original.
+   * la pestaña Comprador (ITP del tipo general de la CCAA, o IVA + AJD si aquella compra fue
+   * de obra nueva, + notaría + registro + gestoría), aplicado sobre el precio de compra
+   * original y con los tipos de HOY: el formulario lo dice junto al botón (hallazgo 1795).
    */
   const estimarGastosAdquisicion = () => {
     const precioC = parseSpanishNumber(precioCompraOriginal);
     // !(x > 0) y no «x <= 0»: con el campo vacío parseSpanishNumber devuelve NaN y
     // «NaN <= 0» es false, así que la guarda no cortaba y el botón escribía la CADENA
     // «No definido» dentro del campo de euros (hallazgo 580, familia del 512).
-    if (!(precioC > 0)) return;
+    if (!(precioC > 0) || sinIvaCompraOriginal) return;
     // SIN tercer argumento, que es lo que activa la escala progresiva. Pasando
     // `tipoGeneral` se cortocircuitaba la rama de tramos y las 7 CCAA con escala
     // (Aragón, Asturias, Baleares, Castilla y León, Cataluña, Extremadura y Valencia)
@@ -971,14 +1038,27 @@ export default function SimuladorCompraventaPage() {
     // el mismo precio. No se aplican tipos reducidos a propósito: es una estimación de
     // lo que se pagó hace años, y el perfil del comprador de entonces no se pregunta.
     // Con el objeto del inmueble: en el País Vasco una vivienda pagó el 4 % y un local el 7 %.
-    const itp = calcularITP(precioC, ccaa, objetoITPDe(tipoInmueble));
+    //
+    // En OBRA NUEVA (hallazgo 1794) no hubo ITP: hubo IVA —el de la vivienda, el del anejo o el
+    // general, con las mismas constantes que la pestaña Comprador— más el AJD de la comunidad.
+    const impuestos =
+      regimenCompraOriginal === 'primera-mano'
+        ? precioC *
+            ((tipoInmueble === 'vivienda'
+              ? IVA_INMUEBLES_2025.obraNueva
+              : INMUEBLES_RESIDENCIALES.includes(tipoInmueble)
+                ? IVA_INMUEBLES_2025.anejoVinculado
+                : PORCENTAJES_IVA.general) /
+              100) +
+          calcularAJD(precioC, ccaa, { objeto: objetoAJDDe(tipoInmueble) })
+        : calcularITP(precioC, ccaa, objetoITPDe(tipoInmueble));
     // Las CUATRO partidas que enumera el rótulo del campo que se rellena («ITP o IVA,
     // notaría, registro y gestoría de aquella compra»). La gestoría faltaba: la pestaña
     // Comprador de esta misma app la suma para el mismo precio (GESTORIA_TIPICA), así que
     // el botón se quedaba corto en el valor de ADQUISICIÓN, y quedarse corto ahí infla la
     // ganancia y el IRPF — la dirección contra la que avisa la cabecera de
     // data/fiscal/ganancia-inmueble.ts (hallazgo 673 del Inspector).
-    const estimado = itp + calcularNotario(precioC) + calcularRegistro(precioC) + GESTORIA_TIPICA;
+    const estimado = impuestos + calcularNotario(precioC) + calcularRegistro(precioC) + GESTORIA_TIPICA;
     setGastosAdquisicion(formatNumber(estimado, 0));
   };
 
@@ -1053,6 +1133,10 @@ export default function SimuladorCompraventaPage() {
     'las mejoras': 'las mejoras (suman al valor de adquisición y REDUCEN el IRPF)',
     'el importe que reinviertes': 'el importe que reinviertes (con él, la ganancia puede quedar exenta por el art. 38 LIRPF)',
     'el valor catastral total': 'el valor catastral total (con él la plusvalía puede salir más barata por el método real)',
+    // Más principal pendiente → menos importe obtenido (art. 41.1 RIRPF) → más proporción
+    // exenta (art. 41.4) → menos IRPF: leerlo SUBE el neto (hallazgo 1798).
+    'el principal pendiente de la hipoteca':
+      'el principal pendiente de la hipoteca (se resta del importe obtenido, así que con él es mayor la parte exenta de la ganancia, art. 41 RIRPF)',
   };
 
   /** Lo que el aviso del neto dice de los importes ilegibles, calculado por el sondeo. */
@@ -1062,7 +1146,21 @@ export default function SimuladorCompraventaPage() {
     if (v.tipo === 'mixto') {
       // Con dos ilegibles opuestos no se puede afirmar una dirección (hallazgo 1229). El verbo
       // concuerda con el sujeto: «las mejoras lo subirían», no «lo subiría» (hallazgo 1555).
-      return `Sin cerrar: ${noSePudoLeer([...v.menor, ...v.mayor])}, y mueven el neto en sentidos contrarios (${enumerar(v.menor)} lo ${sujetoPlural(v.menor) ? 'bajarían' : 'bajaría'}; ${enumerar(v.mayor)} lo ${sujetoPlural(v.mayor) ? 'subirían' : 'subiría'}): no se puede saber si el neto real es mayor o menor que este`;
+      // Un importe que mueve el neto en los DOS sentidos según lo que valga está en las dos
+      // listas del veredicto: se nombra una vez y con su propia frase, no «X lo bajaría; X lo
+      // subiría» (hallazgo 1798).
+      const soloBajan = v.menor.filter((c) => !v.mayor.includes(c));
+      const soloSuben = v.mayor.filter((c) => !v.menor.includes(c));
+      const segun = v.menor.filter((c) => v.mayor.includes(c));
+      const sentidos = [
+        soloBajan.length > 0 ? `${enumerar(soloBajan)} lo ${sujetoPlural(soloBajan) ? 'bajarían' : 'bajaría'}` : null,
+        soloSuben.length > 0 ? `${enumerar(soloSuben)} lo ${sujetoPlural(soloSuben) ? 'subirían' : 'subiría'}` : null,
+        segun.length > 0
+          ? `${enumerar(segun)} lo ${sujetoPlural(segun) ? 'subirían o bajarían según lo que valgan' : 'subiría o bajaría según lo que valga'}`
+          : null,
+      ].filter((x): x is string => x !== null);
+      const todos = sinRepetir([...v.menor, ...v.mayor]);
+      return `Sin cerrar: ${noSePudoLeer(todos)}, y ${sujetoPlural(todos) ? 'mueven' : 'mueve'} el neto en sentidos contrarios (${sentidos.join('; ')}): no se puede saber si el neto real es mayor o menor que este`;
     }
     if (v.tipo === 'mayor' && faltanEnElNeto.length > 0) {
       // Un ilegible que SUBIRÍA el neto no permite afirmar «el neto real es MAYOR» si a la vez
@@ -1080,7 +1178,7 @@ export default function SimuladorCompraventaPage() {
         deducibles.length === 0 || !(resultadosVendedor && resultadosVendedor.irpfGanancia > 0)
           ? ''
           : tipoMarginalAhorro !== null
-            ? ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`
+            ? ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, hasta un ${formatNumber(tipoMarginalAhorro, 0)}\u00A0% de su importe)`
             : ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, así que el neto real baja menos que su importe)`;
       return v.seguro
         ? `No descuenta ${enumerarNi(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
@@ -1115,7 +1213,7 @@ export default function SimuladorCompraventaPage() {
       ? ' Sin el importe que reinviertes, esta cuota NO aplica la exención del art. 38 LIRPF: escríbelo para comprobar si la ganancia queda exenta.'
       : '';
     if (v.tipo === 'mixto' || (pendiente && v.tipo === 'mayor')) {
-      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      const ilegibles = v.tipo === 'mixto' ? sinRepetir([...v.menor, ...v.mayor]) : v.campos;
       return `Sin cerrar: ${pendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven ${que} en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).${art38}`;
     }
     // «Escríbelos» detrás de dos importes (hallazgo 1555).
@@ -1135,7 +1233,7 @@ export default function SimuladorCompraventaPage() {
     const frasePlusvalia = 'No resta la plusvalía municipal, que falta, así que la pérdida real puede ser mayor que esta';
     if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
-      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      const ilegibles = v.tipo === 'mixto' ? sinRepetir([...v.menor, ...v.mayor]) : v.campos;
       return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven la pérdida en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const mayorPerdida = v.tipo === 'menor';
@@ -1152,7 +1250,7 @@ export default function SimuladorCompraventaPage() {
     const frasePlusvalia = 'No resta la plusvalía municipal, que falta: con ella puede haber una pérdida que se compensaría en la declaración';
     if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
-      const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
+      const ilegibles = v.tipo === 'mixto' ? sinRepetir([...v.menor, ...v.mayor]) : v.campos;
       return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y tiran en sentidos contrarios: puede haber ganancia o pérdida. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const ilegible =
@@ -1196,6 +1294,8 @@ export default function SimuladorCompraventaPage() {
 
   /** Los años escritos en negativo: no faltan, son imposibles (patrón 5, hallazgo 1552). */
   const AVISO_ANIOS_NEGATIVOS = 'los años de tenencia no pueden ser negativos';
+  /** El precio de compra escrito como 0 o negativo: no falta, no vale (patrón 5, hallazgo 1799). */
+  const AVISO_PRECIO_COMPRA_NO_VALIDO = 'el precio de compra original tiene que ser mayor que 0';
 
   const netoParcial =
     faltanEnElNeto.length > 0 ||
@@ -1237,7 +1337,7 @@ export default function SimuladorCompraventaPage() {
         fuente={FISCAL_INMUEBLES_META.fuente}
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
-        nota={FISCAL_INMUEBLES_META.nota}
+        nota={separarPorcentajes(FISCAL_INMUEBLES_META.nota)}
       />
 
       {/* Formulario principal */}
@@ -1387,13 +1487,13 @@ export default function SimuladorCompraventaPage() {
                     que no es vivienda, y Valencia pasa al 11 % por encima del millón (hallazgos
                     1581 y 1582). `datosCcaaActual.tipoGeneral` es solo el de la vivienda. */}
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(tipoGeneralITP(ccaa, objetoITPDe(tipoInmueble), precioLeido))}%
+                  {formatTipoNominal(tipoGeneralITP(ccaa, objetoITPDe(tipoInmueble), precioLeido))}&nbsp;%
                 </span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoInmueble) }).tipo)}%
+                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoInmueble) }).tipo)}&nbsp;%
                 </span>
               </div>
             </div>
@@ -1401,10 +1501,10 @@ export default function SimuladorCompraventaPage() {
                 11 % sobre TODO el valor por encima del millón (hallazgos 1581 y 1602). */}
             {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> {subidaITP}
+                <span aria-hidden="true">⚠️</span> {separarPorcentajes(subidaITP)}
               </p>
             )}
-            <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>
+            <p className={styles.infoCcaaNote}>{separarPorcentajes(datosCcaaActual.notas)}</p>
           </div>
 
           {/* Perfil del comprador (solo para ITP y solo inmuebles residenciales) */}
@@ -1434,7 +1534,7 @@ export default function SimuladorCompraventaPage() {
                       <li key={idx}>
                         {/* formatTipoNominal y no el número crudo: «3.5%» es formato US, y dos
                             dedos más abajo la misma página ya escribía «7,00%» bien (hallazgo 721) */}
-                        <strong>{formatTipoNominal(tr.tipo)}%</strong> - {tr.nombre}
+                        <strong>{formatTipoNominal(tr.tipo)}&nbsp;%</strong> - {separarPorcentajes(tr.nombre)}
                         {tr.valorMaximo && <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>}
                       </li>
                     ))}
@@ -1502,7 +1602,7 @@ export default function SimuladorCompraventaPage() {
                     title={
                       resultadosComprador.impuestoNoCalculado
                         ? resultadosComprador.tipoImpuesto
-                        : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                        : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}\u00A0%)`
                     }
                     value={
                       resultadosComprador.impuestoNoCalculado
@@ -1523,7 +1623,7 @@ export default function SimuladorCompraventaPage() {
                       // Tipo EFECTIVO, igual que el del ITP: en Ceuta y Melilla la cuota gradual
                       // se bonifica al 50 % (art. 57 bis TRLITPAJD) y el nominal de la tabla se
                       // desmentía con el importe de al lado (hallazgo 431).
-                      title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}%)`}
+                      title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}\u00A0%)`}
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
@@ -1534,7 +1634,7 @@ export default function SimuladorCompraventaPage() {
                         if (tipoInmueble !== 'vivienda') return undefined;
                         const habitual = tipoAJD(ccaa, { objeto: 'vivienda', viviendaHabitual: true });
                         if (habitual.motivo !== 'vivienda-habitual') return undefined;
-                        return `Si va a ser tu vivienda habitual, en ${datosCcaaActual.nombre} el AJD baja al ${formatTipoNominal(habitual.tipo)} %: serían ${formatCurrency(calcularAJD(resultadosComprador.precioInmueble, ccaa, { objeto: 'vivienda', viviendaHabitual: true }))}. No lo aplicamos porque no lo preguntamos.`;
+                        return `Si va a ser tu vivienda habitual, en ${datosCcaaActual.nombre} el AJD baja al ${formatTipoNominal(habitual.tipo)}\u00A0%: serían ${formatCurrency(calcularAJD(resultadosComprador.precioInmueble, ccaa, { objeto: 'vivienda', viviendaHabitual: true }))}. No lo aplicamos porque no lo preguntamos.`;
                       })()}
                     />
                   )}
@@ -1595,7 +1695,7 @@ export default function SimuladorCompraventaPage() {
                     icon="➕"
                     description={
                       [
-                        `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio`,
+                        `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}\u00A0% sobre el precio`,
                         resultadosComprador.impuestoNoCalculado
                           ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
                           : null,
@@ -1650,9 +1750,9 @@ export default function SimuladorCompraventaPage() {
                         <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
                       </p>
                       <p className={styles.avisoReducidosTexto}>
-                        El cálculo usa el IVA del {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%. Si la
+                        El cálculo usa el IVA del {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;%. Si la
                         vivienda está acogida a un régimen de <strong>protección oficial de régimen especial
-                        o de promoción pública</strong>, el IVA baja al {formatNumber(IVA_INMUEBLES_2025.viviendaProtegida, 0)}%
+                        o de promoción pública</strong>, el IVA baja al {formatNumber(IVA_INMUEBLES_2025.viviendaProtegida, 0)}&nbsp;%
                         (art. 91.Dos.1.6º LIVA): serían{' '}
                         {formatCurrency(resultadosComprador.precioInmueble * (IVA_INMUEBLES_2025.viviendaProtegida / 100))}{' '}
                         en vez de {formatCurrency(resultadosComprador.impuestoTransmision)}. No lo aplicamos
@@ -1674,9 +1774,9 @@ export default function SimuladorCompraventaPage() {
                         {resultadosComprador.tipoElegido.esReducido ? (
                           <>
                             El cálculo aplica el{' '}
-                            <strong>{formatNumber(resultadosComprador.tipoElegido.tipo, 2)}%</strong>
+                            <strong>{formatNumber(resultadosComprador.tipoElegido.tipo, 2)}&nbsp;%</strong>
                             {resultadosComprador.tipoElegido.nombre
-                              ? ` (${resultadosComprador.tipoElegido.nombre})`
+                              ? ` (${separarPorcentajes(resultadosComprador.tipoElegido.nombre)})`
                               : ''}
                             . En {datosCcaaActual.nombre} hay además tipos más bajos que dependen
                             de requisitos que no preguntamos:
@@ -1705,9 +1805,9 @@ export default function SimuladorCompraventaPage() {
                           const topeYaDicho = !r.valorMaximo || topeEnNombre || condiciones.some(diceElTope);
                           return (
                             <li key={r.nombre}>
-                              <strong>{formatNumber(r.tipo, 2)}% — {r.nombre}</strong>
+                              <strong>{formatNumber(r.tipo, 2)}&nbsp;% — {separarPorcentajes(r.nombre)}</strong>
                               <br />
-                              Requisitos: {condiciones.join(' · ')}
+                              Requisitos: {separarPorcentajes(condiciones.join(' · '))}
                               {topeYaDicho ? '' : ` · Valor máximo ${formatCurrency(r.valorMaximo ?? 0)}`}
                               {superaElTope(r, resultadosComprador.precioInmueble) ? ' · ⚠️ tu precio supera ese límite: no podrías acogerte' : ''}
                             </li>
@@ -1816,14 +1916,39 @@ export default function SimuladorCompraventaPage() {
                     helperText="ITP o IVA, notaría, registro y gestoría de aquella compra. Suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
                     min={0}
                   />
+                  {/* Cómo se pagó aquella compra (hallazgo 1794): la obra nueva no pagó ITP sino
+                      IVA + AJD, y estimarla como segunda mano se quedaba corto en el valor de
+                      adquisición. Un <select> y no dos botones: son dos valores cerrados, y así
+                      no compiten por nombre con «Segunda mano»/«Primera mano» del comprador. */}
+                  <label className={styles.labelEstimar} htmlFor="regimen-compra-original">
+                    Para estimarlo, ¿aquella compra fue de segunda mano o de obra nueva?
+                  </label>
+                  <select
+                    id="regimen-compra-original"
+                    value={regimenCompraOriginal}
+                    onChange={(e) => setRegimenCompraOriginal(e.target.value as TipoTransmision)}
+                    className={styles.select}
+                  >
+                    <option value="segunda-mano">De segunda mano (pagaste ITP)</option>
+                    <option value="primera-mano">Obra nueva, a la promotora (pagaste IVA + AJD)</option>
+                  </select>
                   <button
                     type="button"
                     className={styles.btnEstimar}
                     onClick={estimarGastosAdquisicion}
-                    disabled={!(parseSpanishNumber(precioCompraOriginal) > 0)}
+                    disabled={!(parseSpanishNumber(precioCompraOriginal) > 0) || sinIvaCompraOriginal !== null}
+                    aria-describedby="nota-estimar-gastos"
                   >
                     <span aria-hidden="true">✨</span> Estimar por mí
                   </button>
+                  {/* Con qué tipos estima (hallazgo 1795): los de HOY y el general, no los del año
+                      de aquella compra ni un reducido que se pudo pagar entonces. Visible siempre,
+                      no solo tras pulsar: es lo que hay que saber ANTES de fiarse de la cifra. */}
+                  <p id="nota-estimar-gastos" className={styles.notaEstimar}>
+                    {sinIvaCompraOriginal
+                      ? `En ${datosCcaaActual.nombre} la obra nueva no paga IVA sino ${sinIvaCompraOriginal.impuesto} (${sinIvaCompraOriginal.nombre}), que esta app no calcula: escribe lo que pagaste, que figura en tu escritura.`
+                      : 'La estimación aplica los tipos generales vigentes hoy en la comunidad elegida, sin tipos reducidos: si aquella compra pagó otro tipo (el que regía en su año, o uno reducido por edad, familia numerosa o vivienda protegida), escribe lo que figura en tu escritura o en la autoliquidación del impuesto.'}
+                  </p>
                 </div>
 
                 <NumberInput
@@ -1858,9 +1983,21 @@ export default function SimuladorCompraventaPage() {
                   onChange={setComisionInmobiliaria}
                   label="Comisión inmobiliaria (%)"
                   placeholder="3"
-                  helperText="Típico: 3-5%. La paga el vendedor"
+                  helperText={'Típico: entre el 3\u00A0% y el 5\u00A0%, aunque es de libre acuerdo y una tarifa mínima puede superarlo en un inmueble barato. La paga el vendedor'}
+                  /*
+                    SIN max a propósito (hallazgo 1796). Llevaba max={10}, y el blur del NumberInput
+                    reescribía a «10» cualquier comisión mayor SIN decirlo: con el foco dentro se
+                    publicaba el neto de lo escrito y al salir del campo el del 10 %. La comisión es
+                    libre (una tarifa mínima sobre un garaje o un trastero supera el 10 % con
+                    facilidad), así que se calcula lo escrito, como ya hacía local-comercial. Por
+                    encima del 100 % no es una comisión: se avisa en el propio campo.
+                  */
                   min={0}
-                  max={10}
+                  error={
+                    parseSpanishNumber(comisionInmobiliaria) > 100
+                      ? 'La comisión no puede superar el 100\u00A0% del precio de venta: revisa el porcentaje'
+                      : undefined
+                  }
                 />
 
                 <NumberInput
@@ -1975,6 +2112,7 @@ export default function SimuladorCompraventaPage() {
                               ? noSePudoLeer(resultadosVendedor.camposIlegibles)
                               : null,
                             // Escrito, legible e imposible: ni «falta» ni «no se lee» (patrón 5).
+                            resultadosVendedor.precioCompraNoValido ? AVISO_PRECIO_COMPRA_NO_VALIDO : null,
                             resultadosVendedor.aniosNegativos ? AVISO_ANIOS_NEGATIVOS : null,
                           ]
                             .filter((x): x is string => x !== null)
@@ -2106,7 +2244,9 @@ export default function SimuladorCompraventaPage() {
                       !resultadosVendedor.irpfCalculado
                         ? resultadosVendedor.camposIlegibles.includes('el precio de compra original')
                           ? 'El precio de compra original no se ha podido leer: escríbelo con coma decimal (1.234,56). Este impuesto NO está incluido en el neto de abajo.'
-                          : 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                          : resultadosVendedor.precioCompraNoValido
+                            ? `${mayuscula(AVISO_PRECIO_COMPRA_NO_VALIDO)}: corrígelo. Este impuesto NO está incluido en el neto de abajo.`
+                            : 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
                         : // La dirección de los ilegibles la da el sondeo: una cuota exenta por edad
                           // no puede moverse y ya no se rotula «TECHO» borrando el motivo de la
                           // exención (1227); el total catastral la SUBE, no la baja (1228). La
@@ -2115,14 +2255,14 @@ export default function SimuladorCompraventaPage() {
                           (irpfExento
                             ? resultadosVendedor.exentoIRPF
                               ? 'Mayor de 65 años + vivienda habitual'
-                              : resultadosVendedor.motivoExencion ?? 'Ganancia exenta'
+                              : separarPorcentajes(resultadosVendedor.motivoExencion ?? 'Ganancia exenta')
                             : resultadosVendedor.gananciaPatrimonial < 0
                               // No es una exención, es ausencia de ganancia — y la diferencia importa:
                               // una pérdida se compensa en la declaración y una exención no (724).
                               ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                               : resultadosVendedor.gananciaPatrimonial === 0
                                 ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                                : resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro'))
+                                : separarPorcentajes(resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro')))
                     }
                   />
 
@@ -2134,7 +2274,7 @@ export default function SimuladorCompraventaPage() {
                         resultadosVendedor.comisionLegible
                           ? // El número, formateado, y no la cadena tecleada: «3.5» se rotulaba
                             // «(3.5%)», con el punto estadounidense (hallazgo 1558).
-                            `Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}%)`
+                            `Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}\u00A0%)`
                           : 'Comisión inmobiliaria'
                       }
                       value={resultadosVendedor.comisionLegible ? formatCurrency(resultadosVendedor.comisionInmobiliaria) : 'Sin leer'}
@@ -2222,6 +2362,8 @@ export default function SimuladorCompraventaPage() {
                           resultadosVendedor.faltanMeses ? 'elige los meses completos desde la compra' : null,
                           // Un año negativo no «falta»: se corrige (patrón 5, hallazgo 1552).
                           resultadosVendedor.aniosNegativos ? 'corrige los años de tenencia (no pueden ser negativos)' : null,
+                          // Ni un precio de compra 0: está escrito y no vale (hallazgo 1799).
+                          resultadosVendedor.precioCompraNoValido ? 'corrige el precio de compra original (tiene que ser mayor que 0)' : null,
                           resultadosVendedor.camposIlegibles.length > 0 || avisoIlegiblesNeto
                             ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer'
                             : null,
@@ -2305,8 +2447,8 @@ export default function SimuladorCompraventaPage() {
               <h4><span aria-hidden="true">🔄</span> Segunda mano → ITP</h4>
               <p>
                 El <strong>Impuesto de Transmisiones Patrimoniales</strong> grava las compras de inmuebles de segunda mano.
-                Cada comunidad autónoma fija su propio tipo, que en la vivienda va del {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}% (País Vasco) al {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}% (el tramo más alto de las escalas progresivas de Baleares y Cataluña).
-                En el País Vasco ese {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}% es solo de la vivienda: un local, una nave, un terreno o un garaje comprado por separado pagan el {formatNumber(ITP_PV_NO_VIVIENDA, 0)}%.
+                Cada comunidad autónoma fija su propio tipo, que en la vivienda va del {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}&nbsp;% (País Vasco) al {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}&nbsp;% (el tramo más alto de las escalas progresivas de Baleares y Cataluña).
+                En el País Vasco ese {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}&nbsp;% es solo de la vivienda: un local, una nave, un terreno o un garaje comprado por separado pagan el {formatNumber(ITP_PV_NO_VIVIENDA, 0)}&nbsp;%.
               </p>
               <p>
                 La base imponible es el <strong>mayor valor</strong> entre el precio escriturado y el valor de referencia catastral.
@@ -2316,12 +2458,12 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">🆕</span> Primera mano → IVA + AJD</h4>
               <p>
-                Las viviendas nuevas (primera transmisión del promotor) pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</strong>.
-                Los locales comerciales y las naves industriales pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.local, 0)}%</strong>, y el suelo edificable, el tipo general del <strong>{formatNumber(PORCENTAJES_IVA.general, 0)}%</strong> (art. 90 LIVA), que es el que aplica la calculadora de arriba.
+                Las viviendas nuevas (primera transmisión del promotor) pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;%</strong>.
+                Los locales comerciales y las naves industriales pagan <strong>IVA al {formatNumber(IVA_INMUEBLES_2025.local, 0)}&nbsp;%</strong>, y el suelo edificable, el tipo general del <strong>{formatNumber(PORCENTAJES_IVA.general, 0)}&nbsp;%</strong> (art. 90 LIVA), que es el que aplica la calculadora de arriba.
               </p>
               <p>
-                Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados), que en la vivienda va del {formatNumber(RANGO_AJD_VIVIENDA.min, 0)}% al {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}% según la comunidad: el País Vasco exime la primera transmisión de vivienda, por su régimen foral.
-                En locales, naves y suelo va del {formatNumber(RANGO_AJD_OTROS.min, 1)}% al {formatNumber(RANGO_AJD_OTROS.max, 1)}%, también en el País Vasco.
+                Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados), que en la vivienda va del {formatNumber(RANGO_AJD_VIVIENDA.min, 0)}&nbsp;% al {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}&nbsp;% según la comunidad: el País Vasco exime la primera transmisión de vivienda, por su régimen foral.
+                En locales, naves y suelo va del {formatNumber(RANGO_AJD_OTROS.min, 1)}&nbsp;% al {formatNumber(RANGO_AJD_OTROS.max, 1)}&nbsp;%, también en el País Vasco.
               </p>
             </div>
 
@@ -2344,15 +2486,15 @@ export default function SimuladorCompraventaPage() {
                 de 26 de octubre de 2021).
               </p>
               <p>
-                Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}%</strong> como referencia orientativa habitual;
-                cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}%</strong>.
+                Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}&nbsp;%</strong> como referencia orientativa habitual;
+                cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal, 0)}&nbsp;%</strong>.
               </p>
             </div>
 
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">💰</span> IRPF del vendedor</h4>
               <p>
-                La ganancia patrimonial tributa en la <strong>base del ahorro</strong> con tipos del {formatNumber(TIPO_AHORRO_MIN, 0)}% al {formatNumber(TIPO_AHORRO_MAX, 0)}%
+                La ganancia patrimonial tributa en la <strong>base del ahorro</strong> con tipos del {formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% al {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%
                 según el importe.
               </p>
               <p>
@@ -2377,7 +2519,7 @@ export default function SimuladorCompraventaPage() {
           <ul className={styles.listaReducidos}>
             <li><strong>Jóvenes</strong> (cada comunidad fija su propia edad tope, y no coinciden: el panel de beneficios fiscales de arriba muestra la de la comunidad elegida)</li>
             <li><strong>Familias numerosas</strong></li>
-            <li><strong>Personas con discapacidad</strong> (≥33% o ≥65%)</li>
+            <li><strong>Personas con discapacidad</strong> (≥33&nbsp;% o ≥65&nbsp;%)</li>
             <li><strong>VPO</strong> (Vivienda de Protección Oficial)</li>
             <li><strong>Municipios con despoblación</strong></li>
             <li><strong>Víctimas de violencia de género</strong></li>
@@ -2415,20 +2557,20 @@ export default function SimuladorCompraventaPage() {
               <tbody>
                 <tr>
                   <td>IVA</td>
-                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% ({formatNumber(IVA_INMUEBLES_2025.local, 0)}% locales y naves · {formatNumber(PORCENTAJES_IVA.general, 0)}% terrenos)</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;% ({formatNumber(IVA_INMUEBLES_2025.local, 0)}&nbsp;% locales y naves · {formatNumber(PORCENTAJES_IVA.general, 0)}&nbsp;% terrenos)</td>
                   <td>No aplica</td>
                   <td>Comprador</td>
                 </tr>
                 <tr>
                   <td>ITP</td>
                   <td>No aplica</td>
-                  <td>{formatNumber(RANGO_ITP_VIVIENDA.min, 0)}% – {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}% (según CC.AA.)</td>
+                  <td>{formatNumber(RANGO_ITP_VIVIENDA.min, 0)}&nbsp;% – {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}&nbsp;% (según CC.AA.)</td>
                   <td>Comprador</td>
                 </tr>
                 <tr>
                   <td>AJD</td>
-                  <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}%</td>
-                  <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}% (con hipoteca)</td>
+                  <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}&nbsp;% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}&nbsp;%</td>
+                  <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}&nbsp;% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}&nbsp;% (con hipoteca)</td>
                   <td>Comprador · con hipoteca, la entidad financiera (Ley 5/2019)</td>
                 </tr>
                 <tr>
@@ -2439,8 +2581,8 @@ export default function SimuladorCompraventaPage() {
                 </tr>
                 <tr>
                   <td>IRPF ganancia patrimonial</td>
-                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}% – {formatNumber(TIPO_AHORRO_MAX, 0)}%</td>
-                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}% – {formatNumber(TIPO_AHORRO_MAX, 0)}%</td>
+                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% – {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%</td>
+                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% – {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%</td>
                   <td>Vendedor</td>
                 </tr>
                 <tr>
@@ -2472,13 +2614,13 @@ export default function SimuladorCompraventaPage() {
               <p>Marta, {EJEMPLO_MARTA_EDAD} años, compra su primera vivienda habitual de segunda mano en {ITP_CCAA[EJEMPLO_MARTA.ccaa].nombre} por
               {' '}{eurosEnteros(EJEMPLO_MARTA.precio)}. {EJEMPLO_MARTA_JOVEN_APLICA
                 ? <>Al ser menor de {EJEMPLO_MARTA_EDAD_TOPE} años{EJEMPLO_MARTA_TOPE ? <> y no superar los {eurosEnteros(EJEMPLO_MARTA_TOPE)}</> : null}, se aplica el tipo
-              reducido de ITP del {formatTipoNominal(EJEMPLO_MARTA_TIPO_JOVEN)}% ({eurosEnteros(EJEMPLO_MARTA_ITP)}) en lugar del tipo general
-              del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%.</>
+              reducido de ITP del {formatTipoNominal(EJEMPLO_MARTA_TIPO_JOVEN)}&nbsp;% ({eurosEnteros(EJEMPLO_MARTA_ITP)}) en lugar del tipo general
+              del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;%.</>
                 : <>Aunque es menor de {EJEMPLO_MARTA_EDAD_TOPE} años, su compra supera el tope de {EJEMPLO_MARTA_TOPE ? eurosEnteros(EJEMPLO_MARTA_TOPE) : 'valor'} del tipo
-              reducido, así que paga el tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}% ({eurosEnteros(EJEMPLO_MARTA_ITP)}).</>} Además paga
+              reducido, así que paga el tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;% ({eurosEnteros(EJEMPLO_MARTA_ITP)}).</>} Además paga
               unos {eurosEnteros(EJEMPLO_MARTA_GASTOS)} en notaría ({eurosEnteros(EJEMPLO_MARTA_NOTARIA)}), registro ({eurosEnteros(EJEMPLO_MARTA_REGISTRO)}) y gestoría ({eurosEnteros(EJEMPLO_MARTA_GESTORIA)}).</p>
               <div className={styles.casoResultado}>{EJEMPLO_MARTA_JOVEN_APLICA
-                ? <>Ahorra {eurosEnteros(EJEMPLO_MARTA_AHORRO)} frente al tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}%</>
+                ? <>Ahorra {eurosEnteros(EJEMPLO_MARTA_AHORRO)} frente al tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;%</>
                 : <>Sin ahorro: el tipo reducido de jóvenes no alcanza a este precio</>}</div>
             </div>
             <div className={styles.casoCard}>
@@ -2486,11 +2628,11 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji} aria-hidden="true">🏗️</span>
                 <span className={styles.casoTag}>Comprador obra nueva</span>
               </div>
-              <p>Carlos compra un piso nuevo en Valencia por {eurosEnteros(EJEMPLO_OBRA_NUEVA.precio)}. Paga el {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA ({eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA)})
-              más el {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_TIPO)}% de AJD ({eurosEnteros(EJEMPLO_OBRA_NUEVA_AJD)}) al ser la primera transmisión del promotor.
+              <p>Carlos compra un piso nuevo en Valencia por {eurosEnteros(EJEMPLO_OBRA_NUEVA.precio)}. Paga el {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;% de IVA ({eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA)})
+              más el {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_TIPO)}&nbsp;% de AJD ({eurosEnteros(EJEMPLO_OBRA_NUEVA_AJD)}) al ser la primera transmisión del promotor.
               El total de impuestos asciende a {eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA + EJEMPLO_OBRA_NUEVA_AJD)}.
               {EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.motivo === 'vivienda-habitual'
-                ? <> Si el piso va a ser su vivienda habitual, el AJD valenciano baja al {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.tipo)}%.</>
+                ? <> Si el piso va a ser su vivienda habitual, el AJD valenciano baja al {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.tipo)}&nbsp;%.</>
                 : null}</p>
               <div className={styles.casoResultado}>IVA + AJD frente a ITP en segunda mano</div>
             </div>
@@ -2499,12 +2641,14 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji} aria-hidden="true">💸</span>
                 <span className={styles.casoTag}>Vendedor con ganancia</span>
               </div>
-              <p>Ana vende su piso por 250.000 €. Lo compró hace 8 años por 180.000 €. Tras restar
-              la comisión inmobiliaria (3%), que paga ella, su ganancia patrimonial es de 62.500 €,
-              que tributa al {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}% los primeros {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)}, al {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].hasta)} y al {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[2].tipo, 0)}% el resto.
+              <p>Ana vende su piso por {eurosEnteros(EJEMPLO_ANA.precioVenta)}. Lo compró hace {EJEMPLO_ANA.anios} años
+              por {eurosEnteros(EJEMPLO_ANA.precioCompra)}, y el valor catastral de su suelo es de {eurosEnteros(EJEMPLO_ANA.valorSuelo)}.
+              Paga la comisión inmobiliaria ({formatTipoNominal(EJEMPLO_ANA.comisionPct)}&nbsp;%, {eurosEnteros(EJEMPLO_ANA_CALCULO.comision)})
+              y la plusvalía municipal ({eurosEnteros(EJEMPLO_ANA_CALCULO.plusvalia)} por el método objetivo), y las dos
+              minoran el valor de transmisión: su ganancia patrimonial es de {eurosEnteros(EJEMPLO_ANA_CALCULO.ganancia)},
+              que tributa al {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}&nbsp;% los primeros {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)}, al {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}&nbsp;% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].hasta)} y al {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[2].tipo, 0)}&nbsp;% el resto: {formatCurrency(EJEMPLO_ANA_CALCULO.irpf)} de IRPF.
               La gestoría del comprador NO se resta: el art. 35.1 LIRPF solo admite los gastos
-              satisfechos por quien transmite. Además paga la plusvalía municipal por el método
-              más favorable, que también minora el valor de transmisión.</p>
+              satisfechos por quien transmite.</p>
               <div className={styles.casoResultado}>Ganancia patrimonial sujeta a IRPF del ahorro</div>
             </div>
             <div className={styles.casoCard}>
@@ -2527,7 +2671,7 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre ITP e IVA en la compra de una vivienda?</h4>
               <p>El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que
-              el IVA al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir
+              el IVA al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir
               en la misma operación: o se paga uno u otro, nunca ambos.</p>
             </div>
             <div className={styles.faqItem}>
@@ -2558,7 +2702,7 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?</h4>
               <p>Muchas comunidades aplican tipos reducidos para jóvenes, familias numerosas,
-              personas con discapacidad (≥33%), VPO o municipios en riesgo de despoblación. Los requisitos
+              personas con discapacidad (≥33&nbsp;%), VPO o municipios en riesgo de despoblación. Los requisitos
               (edad, ingresos, valor máximo del inmueble) varían por comunidad: la edad tope del tipo joven
               va de los {EDAD_JOVEN.min} a los {EDAD_JOVEN.max} años según dónde compres, y el panel de beneficios fiscales de la
               calculadora muestra la que aplica en cada caso. Consulta la normativa de tu CC.AA.</p>
@@ -2580,7 +2724,7 @@ export default function SimuladorCompraventaPage() {
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <strong>Calcula el presupuesto total antes de firmar</strong>
-                <p>Suma al precio del inmueble entre un {formatNumber(HORQUILLA_GASTOS_COMPRAVENTA.min, 1)}% y un {formatNumber(HORQUILLA_GASTOS_COMPRAVENTA.max, 1)}% adicional
+                <p>Suma al precio del inmueble entre un {formatNumber(HORQUILLA_GASTOS_COMPRAVENTA.min, 1)}&nbsp;% y un {formatNumber(HORQUILLA_GASTOS_COMPRAVENTA.max, 1)}&nbsp;% adicional
                 para gastos e impuestos: el punto exacto dentro de esa horquilla depende de la comunidad, del
                 precio y de si la compra es de obra nueva o de segunda mano. Usa el simulador para obtener la
                 cifra de tu caso.</p>
@@ -2616,9 +2760,9 @@ export default function SimuladorCompraventaPage() {
                 <strong>Liquida los impuestos en el plazo establecido</strong>
                 <p>El ITP o IVA+AJD debe liquidarse en un plazo de {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde
                 la firma ({PLAZO_ITP.baseNormativa}). {PLAZO_ITP.aviso}
-                El incumplimiento genera un recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}%
-                de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
-                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez transcurridos
+                El incumplimiento genera un recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;%
+                de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso,
+                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}&nbsp;% más intereses de demora una vez transcurridos
                 {' '}{ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).</p>
               </div>
             </li>
@@ -2688,14 +2832,14 @@ export default function SimuladorCompraventaPage() {
             <strong>Errores comunes al calcular los gastos de compraventa</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al {formatNumber(PORCENTAJES_IVA.general, 0)}%, que a menudo se olvida en el presupuesto inicial.</li>
+            <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al {formatNumber(PORCENTAJES_IVA.general, 0)}&nbsp;%, que a menudo se olvida en el presupuesto inicial.</li>
             <li><strong>Ignorar el valor de referencia catastral:</strong> Si supera el precio escriturado, Hacienda aplicará ITP sobre ese valor mayor y podrás recibir una comprobación de valores.</li>
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
             <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la escritura ({PLAZO_ITP.baseNormativa}), y hay comunidades que fijan el suyo propio. Pasado ese plazo hay recargo automático
-            desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
-            y del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses.</li>
+            desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;% de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso,
+            y del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}&nbsp;% más intereses una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses.</li>
           </ul>
         </div>
       </EducationalSection>
