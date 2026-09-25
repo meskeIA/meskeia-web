@@ -128,7 +128,8 @@
 }
 
 .tabActive {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  /* Texto blanco: fondo con los tokens -boton (≥ 5:1), no la marca (2,80:1 en el teal). */
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   box-shadow: var(--shadow-sm);
 }
@@ -166,7 +167,8 @@
   align-items: center;
   justify-content: center;
   background: rgba(10, 10, 10, 0.9);
-  color: var(--text-muted);
+  /* El lienzo es negro en LOS DOS temas: gris claro fijo, no --text-muted (3,88:1 en claro). */
+  color: #BDBDBD;
   font-size: 0.95rem;
 }
 
@@ -213,10 +215,18 @@
   background: var(--hover);
 }
 
-.waveTypeActive {
+.waveTypeBtn.waveTypeActive {
   border-color: var(--primary);
   background: var(--focus);
-  color: var(--primary);
+  /* Marca como TEXTO: --primary-texto (4,83:1 en claro; con --primary, 3,65). */
+  color: var(--primary-texto);
+}
+
+/* En oscuro el botón va sobre la TARJETA (#2A2A2A) con el velo de --focus: ahí --primary-texto
+   se queda en 4,08:1. El azul claro de la marca (#7FB3D3) da 5,09:1 sobre ese fondo. */
+[data-theme='dark'] .waveTypeBtn.waveTypeActive,
+[data-theme='dark'] .styleBtn.styleBtnActive {
+  color: #7FB3D3;
 }
 
 .waveIcon {
@@ -322,9 +332,12 @@
   background: var(--hover);
 }
 
-.noteBtnActive {
-  border-color: var(--primary);
-  background: var(--primary);
+/* Dos clases y DESPUÉS del :hover: antes .noteBtn:hover ganaba y dejaba el texto blanco sobre
+   #F5F5F5 (1,08:1) con el puntero encima. Fondo --primary-boton: blanco encima a 5,47:1. */
+.noteBtn.noteBtnActive,
+.noteBtn.noteBtnActive:hover {
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -345,7 +358,7 @@
   font-weight: 700;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -416,6 +429,29 @@
 
 .fileInput {
   display: none;
+}
+
+/* Botón para elegir archivo con teclado o lector de pantalla (hallazgo 1764). */
+.chooseBtn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  min-height: 44px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary-boton);
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chooseBtn:hover {
+  filter: brightness(1.1);
+}
+
+.chooseBtn:focus-visible {
+  outline: 2px solid var(--primary-texto);
+  outline-offset: 3px;
 }
 
 /* File Info */
@@ -507,10 +543,10 @@
   border-color: var(--primary);
 }
 
-.styleBtnActive {
+.styleBtn.styleBtnActive {
   border-color: var(--primary);
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -549,17 +585,18 @@
   padding: var(--spacing-md) var(--spacing-xl);
   font-size: 1rem;
   font-weight: 600;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-texto);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
 }
 
 .exportBtn:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -753,7 +790,8 @@
 }
 
 .comparativaTable th {
-  background: #2E86AB;
+  /* Blanco encima: --primary-boton (5,47:1); el #2E86AB literal daba 4,11:1. */
+  background: var(--primary-boton);
   color: white;
   padding: 0.75rem 1rem;
   text-align: left;
@@ -797,7 +835,7 @@
 
 .escenarioCard h3 {
   font-size: 1rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
 }
 
@@ -826,7 +864,7 @@
 
 .faqItem h3 {
   font-size: 0.95rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }
@@ -855,7 +893,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -899,7 +937,7 @@
 
 .tipCard h3 {
   font-size: 0.9rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }

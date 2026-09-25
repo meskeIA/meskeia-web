@@ -6,6 +6,7 @@ import styles from './GeneradorOndas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { envolventePorColumna, formatearTamano } from './motor';
 
 // Tipos
 type WaveType = 'sine' | 'square' | 'triangle' | 'sawtooth';
@@ -47,12 +48,48 @@ const WAVE_INFO: Record<WaveType, { name: string; description: string; icon: str
   },
 };
 
-// Función para formatear tamaño de archivo
-const formatSize = (bytes: number): string => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-};
+/**
+ * Rampa de ganancia para arrancar, parar, cambiar el volumen y salir de la página, en segundos
+ * (hallazgos 1757-1760; el mismo arreglo que los 1637/1638 de generador-tonos). Un escalón de
+ * ganancia es un transitorio de banda ancha: se oye como un chasquido.
+ */
+const RAMPA_GANANCIA_S = 0.05;
+
+/** Nodos de un tono: se sueltan juntos cuando el oscilador termina de sonar. */
+interface NodosTono {
+  oscilador: OscillatorNode;
+  ganancia: GainNode;
+  analizador: AnalyserNode;
+}
+
+/**
+ * Lleva la ganancia a 0 con una rampa ANCLADA en el valor en curso y programa el stop() del
+ * oscilador al final de la rampa, en el reloj de audio. Sin el setValueAtTime, una rampa de Web
+ * Audio arranca en el evento anterior (la rampa de entrada) y la bajada sería un escalón. Los
+ * nodos se desconectan cuando el oscilador acaba de verdad (onended): desconectarlos en el acto
+ * cortaría la rampa. `alTerminar` se llama en ese mismo momento (p. ej. para cerrar el contexto).
+ * Devuelve el instante de audio en que termina.
+ */
+function apagarTono(ctx: AudioContext, nodos: NodosTono, alTerminar?: () => void): number {
+  const ahora = ctx.currentTime;
+  const fin = ahora + RAMPA_GANANCIA_S;
+  const g = nodos.ganancia.gain;
+  g.cancelScheduledValues(ahora);
+  g.setValueAtTime(g.value, ahora);
+  g.linearRampToValueAtTime(0, fin);
+  nodos.oscilador.onended = () => {
+    nodos.oscilador.disconnect();
+    nodos.ganancia.disconnect();
+    nodos.analizador.disconnect();
+    alTerminar?.();
+  };
+  try {
+    nodos.oscilador.stop(fin);
+  } catch {
+    // El oscilador ya estaba detenido
+  }
+  return fin;
+}
 
 // Función para formatear tiempo
 const formatTime = (seconds: number): string => {
@@ -103,15 +140,22 @@ export default function GeneradorOndasPage() {
   // Iniciar oscilador
   const startOscillator = useCallback(() => {
     const audioContext = getAudioContext();
+    if (audioContext.state === 'suspended') {
+      void audioContext.resume();
+    }
 
     // Crear nodos
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     const analyser = audioContext.createAnalyser();
 
+    const t0 = audioContext.currentTime;
     oscillator.type = waveType;
-    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(volume / 100, audioContext.currentTime);
+    oscillator.frequency.setValueAtTime(frequency, t0);
+    // Rampa de entrada 0 → volumen (hallazgo 1758). El efecto de volumen ya no la pisa: solo
+    // reacciona a cambios del VOLUMEN, no al paso de isPlaying a true.
+    gainNode.gain.setValueAtTime(0, t0);
+    gainNode.gain.linearRampToValueAtTime(volume / 100, t0 + RAMPA_GANANCIA_S);
 
     analyser.fftSize = 2048;
 
@@ -131,20 +175,19 @@ export default function GeneradorOndasPage() {
     drawGeneratorWaveform();
   }, [waveType, frequency, volume, getAudioContext]);
 
-  // Detener oscilador
+  // Detener oscilador: rampa de salida y stop() al final de la rampa (hallazgo 1760). Los refs
+  // se sueltan ya, para que el efecto de volumen no toque la ganancia que se está apagando y un
+  // Reproducir inmediato cree un tono nuevo e independiente.
   const stopOscillator = useCallback(() => {
-    if (oscillatorRef.current) {
-      oscillatorRef.current.stop();
-      oscillatorRef.current.disconnect();
-      oscillatorRef.current = null;
-    }
-    if (gainNodeRef.current) {
-      gainNodeRef.current.disconnect();
-      gainNodeRef.current = null;
-    }
-    if (analyserRef.current) {
-      analyserRef.current.disconnect();
-      analyserRef.current = null;
+    const ctx = audioContextRef.current;
+    const oscilador = oscillatorRef.current;
+    const ganancia = gainNodeRef.current;
+    const analizador = analyserRef.current;
+    oscillatorRef.current = null;
+    gainNodeRef.current = null;
+    analyserRef.current = null;
+    if (ctx && oscilador && ganancia && analizador) {
+      apagarTono(ctx, { oscilador, ganancia, analizador });
     }
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
@@ -169,12 +212,61 @@ export default function GeneradorOndasPage() {
     }
   }, [frequency, isPlaying]);
 
-  // Actualizar volumen en tiempo real
+  /**
+   * Volumen en tiempo real, con rampa anclada en el valor en curso (hallazgos 1758 y 1759).
+   * Dependía de [volume, isPlaying] y hacía setValueAtTime(volumen): al pasar isPlaying a true
+   * pisaba la rampa de entrada, y mover el deslizador era un escalón. Ahora solo reacciona al
+   * volumen; gainNodeRef solo existe mientras el tono suena (stopOscillator lo suelta).
+   */
   useEffect(() => {
-    if (gainNodeRef.current && isPlaying) {
-      gainNodeRef.current.gain.setValueAtTime(volume / 100, audioContextRef.current!.currentTime);
-    }
-  }, [volume, isPlaying]);
+    const ctx = audioContextRef.current;
+    const gain = gainNodeRef.current;
+    if (!ctx || !gain) return;
+    const ahora = ctx.currentTime;
+    gain.gain.cancelScheduledValues(ahora);
+    gain.gain.setValueAtTime(gain.gain.value, ahora);
+    gain.gain.linearRampToValueAtTime(volume / 100, ahora + RAMPA_GANANCIA_S);
+  }, [volume]);
+
+  /**
+   * Limpieza al desmontar (hallazgo 1757). Sin ella, una navegación de cliente con el tono
+   * sonando dejaba vivos oscilador, ganancia y AudioContext: el tono seguía en la app de destino
+   * y ningún Detener lo alcanzaba. Ahora: rampa de salida, stop() al final de la rampa y close()
+   * del contexto cuando el oscilador termina (con un temporizador de respaldo por si el
+   * contexto no llega a avanzar). El ref del contexto se suelta en el acto, para que un
+   * remontaje (StrictMode en desarrollo) cree uno nuevo en vez de reutilizar uno cerrado.
+   */
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      const ctx = audioContextRef.current;
+      const oscilador = oscillatorRef.current;
+      const ganancia = gainNodeRef.current;
+      const analizador = analyserRef.current;
+      audioContextRef.current = null;
+      oscillatorRef.current = null;
+      gainNodeRef.current = null;
+      analyserRef.current = null;
+      if (!ctx) return;
+      let cerrado = false;
+      const cerrar = () => {
+        if (cerrado) return;
+        cerrado = true;
+        ctx.close().catch(() => {
+          // El contexto ya estaba cerrado
+        });
+      };
+      if (oscilador && ganancia && analizador && ctx.state === 'running') {
+        apagarTono(ctx, { oscilador, ganancia, analizador }, cerrar);
+        window.setTimeout(cerrar, RAMPA_GANANCIA_S * 1000 + 500);
+      } else {
+        cerrar();
+      }
+    };
+  }, []);
 
   // Actualizar tipo de onda en tiempo real
   useEffect(() => {
@@ -258,19 +350,22 @@ export default function GeneradorOndasPage() {
       return;
     }
 
-    setAudioFile(file);
-
     try {
       const arrayBuffer = await file.arrayBuffer();
       const audioContext = getAudioContext();
       const buffer = await audioContext.decodeAudioData(arrayBuffer);
 
+      // El archivo se da por cargado solo cuando se ha podido decodificar (hallazgo 1762): antes
+      // se fijaba antes del try y un error dejaba la vista de «archivo cargado» con el lienzo
+      // vacío. El dibujo lo hace el efecto de redibujado, cuando el lienzo ya está montado.
+      setAudioFile(file);
       setAudioBuffer(buffer);
       setAudioDuration(buffer.duration);
-
-      // Dibujar waveform
-      drawVisualizerWaveform(buffer);
     } catch {
+      setAudioFile(null);
+      setAudioBuffer(null);
+      setAudioDuration(0);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       alert('Error al procesar el archivo de audio');
     }
   }, [getAudioContext]);
@@ -286,7 +381,6 @@ export default function GeneradorOndasPage() {
     const width = canvas.width;
     const height = canvas.height;
     const data = buffer.getChannelData(0);
-    const step = Math.ceil(data.length / width);
 
     // Fondo
     ctx.fillStyle = bgColor;
@@ -318,54 +412,31 @@ export default function GeneradorOndasPage() {
         ctx.fillRect(i, centerY - barHeight / 2, barWidth, barHeight);
       }
     } else if (waveformStyle === 'line') {
-      // Estilo línea
-      ctx.beginPath();
+      // Estilo línea: el CONTORNO de la onda, una línea por los máximos y otra por los mínimos
+      // de cada columna (hallazgo 1761). Antes pintaba (min + max)/2, que en cualquier audio
+      // simétrico vale ≈ 0: una recta en el eje fuera cual fuera el volumen.
+      const columnas = envolventePorColumna(data, width);
       ctx.strokeStyle = waveformColor;
       ctx.lineWidth = 2;
-
-      for (let i = 0; i < width; i++) {
-        let min = 1.0;
-        let max = -1.0;
-
-        for (let j = 0; j < step; j++) {
-          const datum = data[i * step + j];
-          if (datum !== undefined) {
-            if (datum < min) min = datum;
-            if (datum > max) max = datum;
-          }
-        }
-
-        const y = centerY + ((min + max) / 2) * amplitude;
-
-        if (i === 0) {
-          ctx.moveTo(i, y);
-        } else {
-          ctx.lineTo(i, y);
-        }
+      ctx.lineJoin = 'round';
+      for (const clave of ['max', 'min'] as const) {
+        ctx.beginPath();
+        columnas.forEach((col, i) => {
+          // En el lienzo la y crece hacia abajo: el máximo va por encima del eje.
+          const y = centerY - col[clave] * amplitude;
+          if (i === 0) ctx.moveTo(i, y);
+          else ctx.lineTo(i, y);
+        });
+        ctx.stroke();
       }
-
-      ctx.stroke();
     } else if (waveformStyle === 'mirror') {
-      // Estilo espejo
+      // Estilo espejo: la banda entre el mínimo y el máximo de cada columna, rellena.
       ctx.fillStyle = waveformColor;
-
-      for (let i = 0; i < width; i++) {
-        let min = 1.0;
-        let max = -1.0;
-
-        for (let j = 0; j < step; j++) {
-          const datum = data[i * step + j];
-          if (datum !== undefined) {
-            if (datum < min) min = datum;
-            if (datum > max) max = datum;
-          }
-        }
-
-        const minY = centerY + min * amplitude;
-        const maxY = centerY + max * amplitude;
-
-        ctx.fillRect(i, minY, 1, maxY - minY);
-      }
+      envolventePorColumna(data, width).forEach((col, i) => {
+        const minY = centerY + col.min * amplitude;
+        const maxY = centerY + col.max * amplitude;
+        ctx.fillRect(i, minY, 1, Math.max(1, maxY - minY));
+      });
     }
   }, [waveformStyle, waveformColor, bgColor]);
 
@@ -427,7 +498,7 @@ export default function GeneradorOndasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>〜</span>
+        <span className={styles.heroIcon} aria-hidden="true">〜</span>
         <h1 className={styles.title}>Generador de Ondas y Visualizador</h1>
         <p className={styles.subtitle}>
           Explora las ondas sonoras: genera tonos, visualiza audio y aprende física del sonido
@@ -487,7 +558,7 @@ export default function GeneradorOndasPage() {
                     onClick={() => setWaveType(type)}
                     aria-pressed={waveType === type}
                   >
-                    <span className={styles.waveIcon}>{WAVE_INFO[type].icon}</span>
+                    <span className={styles.waveIcon} aria-hidden="true">{WAVE_INFO[type].icon}</span>
                     <span className={styles.waveName}>{WAVE_INFO[type].name}</span>
                   </button>
                 ))}
@@ -505,6 +576,8 @@ export default function GeneradorOndasPage() {
                 value={frequency}
                 onChange={(e) => setFrequency(parseInt(e.target.value))}
                 className={styles.slider}
+                aria-label="Frecuencia"
+                aria-valuetext={`${formatNumber(frequency, Number.isInteger(frequency) ? 0 : 2)} Hz`}
               />
               <div className={styles.sliderLabels}>
                 <span>20 Hz (grave)</span>
@@ -540,16 +613,20 @@ export default function GeneradorOndasPage() {
                 value={volume}
                 onChange={(e) => setVolume(parseInt(e.target.value))}
                 className={styles.slider}
+                aria-label="Volumen"
+                aria-valuetext={`${volume} %`}
               />
             </div>
 
-            {/* Botón reproducir */}
+            {/* Botón reproducir. Sin aria-pressed a propósito (hallazgo 1766): el estado ya lo dice
+                el nombre, que cambia de «Reproducir» a «Detener»; con los dos se anunciaba
+                «Detener, conmutador, presionado». */}
             <div className={styles.playSection}>
+              {/* a11y-ok: el nombre cambia con el estado; aria-pressed lo duplicaría (hallazgo 1766) */}
               <button
                 type="button"
                 onClick={togglePlay}
                 className={`${styles.playBtn} ${isPlaying ? styles.playBtnActive : ''}`}
-                aria-pressed={isPlaying}
               >
                 {isPlaying ? <><span aria-hidden="true">⏹️</span> Detener</> : <><span aria-hidden="true">▶️</span> Reproducir</>}
               </button>
@@ -569,13 +646,28 @@ export default function GeneradorOndasPage() {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <span className={styles.dropIcon}>🎵</span>
+                <span className={styles.dropIcon} aria-hidden="true">🎵</span>
                 <p className={styles.dropText}>Arrastra un archivo de audio o haz clic para seleccionar</p>
+                {/* Control real para teclado y lectores de pantalla (hallazgo 1764): la zona es
+                    un <div> y el <input type="file"> va oculto, así que sin este botón no había
+                    forma de cargar un audio sin ratón. */}
+                <button
+                  type="button"
+                  className={styles.chooseBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                >
+                  Elegir archivo de audio
+                </button>
                 <span className={styles.dropHint}>MP3, WAV, OGG, M4A</span>
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="audio/*"
+                  tabIndex={-1}
+                  aria-hidden="true"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleFileSelect(file);
@@ -592,7 +684,7 @@ export default function GeneradorOndasPage() {
                 <div className={styles.fileInfo}>
                   <span className={styles.fileName}>{audioFile.name}</span>
                   <span className={styles.fileMeta}>
-                    {formatSize(audioFile.size)} • {formatTime(audioDuration)}
+                    {formatearTamano(audioFile.size)} • {formatTime(audioDuration)}
                   </span>
                   <button type="button" onClick={clearVisualizer} className={styles.clearBtn}>
                     Cambiar archivo
@@ -643,16 +735,18 @@ export default function GeneradorOndasPage() {
 
                   <div className={styles.colorSection}>
                     <div className={styles.colorPicker}>
-                      <label>Color onda</label>
+                      <label htmlFor="generador-ondas-color-onda">Color onda</label>
                       <input
+                        id="generador-ondas-color-onda"
                         type="color"
                         value={waveformColor}
                         onChange={(e) => setWaveformColor(e.target.value)}
                       />
                     </div>
                     <div className={styles.colorPicker}>
-                      <label>Color fondo</label>
+                      <label htmlFor="generador-ondas-color-fondo">Color fondo</label>
                       <input
+                        id="generador-ondas-color-fondo"
                         type="color"
                         value={bgColor}
                         onChange={(e) => setBgColor(e.target.value)}
@@ -675,22 +769,22 @@ export default function GeneradorOndasPage() {
         {/* Características */}
         <div className={styles.features}>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🎛️</span>
+            <span className={styles.featureIcon} aria-hidden="true">🎛️</span>
             <h4>Generador de tonos</h4>
             <p>Genera ondas senoidales, cuadradas, triangulares y diente de sierra</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🎵</span>
+            <span className={styles.featureIcon} aria-hidden="true">🎵</span>
             <h4>Notas musicales</h4>
             <p>Presets con las frecuencias exactas de las notas Do a Si</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>📊</span>
+            <span className={styles.featureIcon} aria-hidden="true">📊</span>
             <h4>Visualizador</h4>
             <p>Convierte cualquier audio en waveform visual con 3 estilos</p>
           </div>
           <div className={styles.featureCard}>
-            <span className={styles.featureIcon}>🎨</span>
+            <span className={styles.featureIcon} aria-hidden="true">🎨</span>
             <h4>Personalizable</h4>
             <p>Elige colores y estilo, exporta como imagen PNG</p>
           </div>
@@ -744,9 +838,9 @@ export default function GeneradorOndasPage() {
                 <td>Osciladores, LFO</td>
               </tr>
               <tr>
-                <td><strong>20 Hz (infrasónico)</strong></td>
+                <td><strong>20 Hz (límite grave)</strong></td>
                 <td>Variable</td>
-                <td>No audible, solo vibración</td>
+                <td>Límite inferior de lo audible: se nota más como vibración que como tono</td>
                 <td>Efectos sub-graves (cine)</td>
                 <td>Medición de resonancias</td>
               </tr>
@@ -765,11 +859,11 @@ export default function GeneradorOndasPage() {
                 <td>Test de agudeza auditiva</td>
               </tr>
               <tr>
-                <td><strong>20.000 Hz (ultrasónico)</strong></td>
+                <td><strong>20.000 Hz (límite agudo)</strong></td>
                 <td>Variable</td>
-                <td>Límite del oído humano</td>
+                <td>Límite superior del oído joven; baja con la edad</td>
                 <td>No aplicable</td>
-                <td>Ecografías, limpieza ultrasónica</td>
+                <td>Por encima empiezan los ultrasonidos (limpieza por ultrasonidos, de unos 20 a 40 kHz)</td>
               </tr>
             </tbody>
           </table>
@@ -778,28 +872,28 @@ export default function GeneradorOndasPage() {
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🎸 Afinar instrumentos</h3>
+            <h3><span aria-hidden="true">🎸</span> Afinar instrumentos</h3>
             <p>Genera un La4 a 440 Hz con onda senoidal pura como referencia para afinar guitarra, violín o cualquier instrumento acústico sin necesidad de afinador físico.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔬 Experimentos de física</h3>
+            <h3><span aria-hidden="true">🔬</span> Experimentos de física</h3>
             <p>Visualiza en tiempo real las diferencias entre ondas senoidal, cuadrada, triangular y diente de sierra. Ideal para clases de acústica o proyectos de laboratorio.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎮 Efectos 8-bit</h3>
+            <h3><span aria-hidden="true">🎮</span> Efectos 8-bit</h3>
             <p>La onda cuadrada es la base de los sonidos de videojuegos retro (NES, Game Boy). Experimenta con frecuencias para recrear efectos clásicos de chiptune.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔊 Testing de altavoces</h3>
-            <p>Usa un barrido de frecuencias (de 20 Hz a 20.000 Hz) para identificar resonancias, distorsiones o frecuencias problemáticas en tus altavoces o auriculares.</p>
+            <h3><span aria-hidden="true">🔊</span> Probar altavoces en graves y medios</h3>
+            <p>Recorre el deslizador de 20 a 2.000 Hz, despacio y a volumen bajo, para detectar vibraciones, zumbidos o resonancias en graves y medios. Esta app no hace barridos automáticos ni llega a los agudos: para eso, el Generador de Tonos de meskeIA cubre hasta 20.000 Hz.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🧘 Terapia de sonido</h3>
-            <p>Ciertas frecuencias (396 Hz, 528 Hz, 741 Hz) se usan en terapia de sonido. Genera tonos puros para meditación, relajación o técnicas de binaural beats.</p>
+            <h3><span aria-hidden="true">🧘</span> Meditación y relajación</h3>
+            <p>Un tono puro y suave, a volumen bajo, puede servir de fondo para meditar. Las listas de frecuencias «curativas» que circulan en internet (las llamadas «solfeggio») no tienen estudios sólidos que respalden sus supuestos efectos. Y esta app emite un solo tono mono: no sirve para pulsos binaurales, que necesitan una frecuencia distinta en cada oído.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎛️ Producción musical</h3>
-            <p>Usa el visualizador para analizar la forma de onda de grabaciones, identificar clipping o comparar la &quot;densidad armónica&quot; de diferentes instrumentos.</p>
+            <h3><span aria-hidden="true">🎛️</span> Producción musical</h3>
+            <p>Usa el visualizador para ver la envolvente de una grabación: silencios, picos de volumen y tramos que tocan el techo y pueden estar saturados (clipping).</p>
           </div>
         </div>
 
@@ -811,11 +905,11 @@ export default function GeneradorOndasPage() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Puedo usar esto para afinar una guitarra?</h3>
-            <p>Sí. Selecciona onda senoidal y ajusta la frecuencia a la nota que necesitas (Mi6=329,6 Hz, Si3=246,9 Hz, Sol3=196 Hz, Re3=146,8 Hz, La2=110 Hz, Mi2=82,4 Hz). Compara el tono que escuchas con tu instrumento.</p>
+            <p>Sí. Selecciona onda senoidal y ajusta la frecuencia a la nota que necesitas (Mi4=329,6 Hz, Si3=246,9 Hz, Sol3=196 Hz, Re3=146,8 Hz, La2=110 Hz, Mi2=82,4 Hz). Compara el tono que escuchas con tu instrumento.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Por qué la onda cuadrada suena &quot;más fuerte&quot; que la senoidal al mismo volumen?</h3>
-            <p>Porque la onda cuadrada tiene mayor energía RMS. A la misma amplitud de pico, la cuadrada entrega ~1,41 veces más potencia que la senoidal. Por eso parece más intensa.</p>
+            <p>Porque la onda cuadrada tiene mayor valor eficaz (RMS). A la misma amplitud de pico, la cuadrada tiene 1,41 veces (√2) el valor eficaz de la senoidal y, como la potencia va con su cuadrado, el doble de potencia (unos 3 dB más). Además, sus armónicos caen en frecuencias a las que el oído es más sensible.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Qué es la Serie de Fourier que menciona la app?</h3>
@@ -823,7 +917,7 @@ export default function GeneradorOndasPage() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿El visualizador de audio funciona con cualquier archivo?</h3>
-            <p>Sí, con cualquier audio que puedas reproducir en el navegador: MP3, WAV, OGG, AAC. El navegador analiza la señal y muestra la forma de onda en tiempo real usando FFT (Transformada Rápida de Fourier).</p>
+            <p>Con cualquier audio que tu navegador sepa decodificar: MP3, WAV, OGG o AAC, según el navegador. La app lee las muestras del archivo y dibuja su forma de onda completa, la amplitud a lo largo del tiempo, como una imagen fija. No es un analizador de espectro: no reproduce el audio ni calcula su FFT.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Puedo exportar la visualización como imagen?</h3>
@@ -895,34 +989,34 @@ export default function GeneradorOndasPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🎯 Usa senoidal para afinación</h3>
+            <h3><span aria-hidden="true">🎯</span> Usa senoidal para afinación</h3>
             <p>Para afinar instrumentos, la onda senoidal es la más precisa: no tiene armónicos que confundan el oído al comparar tonos.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔉 Empieza con volumen bajo</h3>
+            <h3><span aria-hidden="true">🔉</span> Empieza con volumen bajo</h3>
             <p>Especialmente al generar frecuencias agudas (&gt;1000 Hz), empieza al 20-30% de volumen. Las frecuencias altas pueden ser más molestas de lo esperado.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎵 Aprende las frecuencias de las notas</h3>
+            <h3><span aria-hidden="true">🎵</span> Aprende las frecuencias de las notas</h3>
             <p>La4=440Hz, Sol4=392Hz, Mi4=329,6Hz, Do4=261,6Hz, Si3=246,9Hz. Memorizarlas te ayuda a afinar de oído más rápido.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📊 Combina generador y visualizador</h3>
-            <p>Genera un tono y luego analiza en el visualizador cómo suena mezclado con tu instrumento real. Útil para detectar desafinación.</p>
+            <h3><span aria-hidden="true">📊</span> Compara las formas de onda en el osciloscopio</h3>
+            <p>Con el tono sonando, cambia de senoidal a cuadrada, triangular o diente de sierra: el osciloscopio muestra la forma nueva al instante y el oído nota el cambio de timbre a la misma frecuencia.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎬 Exporta en alta resolución</h3>
-            <p>Para usar el waveform en vídeos o presentaciones, activa pantalla completa antes de exportar para obtener mayor resolución en el PNG.</p>
+            <h3><span aria-hidden="true">🎬</span> Ajusta los colores antes de exportar</h3>
+            <p>El PNG sale siempre a 800 × 200 píxeles. Para vídeos o presentaciones, elige un color de onda y de fondo que contrasten con tu diseño antes de exportar.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⚡ Experimenta con frecuencias extremas</h3>
-            <p>Prueba 20 Hz (sentirás más que oirás), 10.000 Hz (umbral de molestia para muchos) y observa cómo cambia tu percepción del volumen.</p>
+            <h3><span aria-hidden="true">⚡</span> Recorre los extremos del deslizador</h3>
+            <p>Prueba 20 Hz (lo notarás más como vibración que como tono) y sube hasta 2.000 Hz: a igual volumen, los graves parecen mucho más flojos, porque el oído es menos sensible a ellos.</p>
           </div>
         </div>
 
         {/* Aviso importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Protege tu audición</h3>
+          <h3><span aria-hidden="true">⚠️</span> Protege tu audición</h3>
           <ul className={styles.warningList}>
             <li>La exposición prolongada a sonidos por encima de 85 dB puede causar daño auditivo permanente.</li>
             <li>Con auriculares a máximo volumen puedes superar los 100-110 dB fácilmente.</li>
@@ -940,28 +1034,28 @@ export default function GeneradorOndasPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔊 Frecuencia (Hz)</h4>
+              <h4><span aria-hidden="true">🔊</span> Frecuencia (Hz)</h4>
               <p>
                 La frecuencia mide cuántas vibraciones ocurren por segundo. Se mide en Hercios (Hz).
                 A mayor frecuencia, el sonido es más agudo. El oído humano percibe de 20 Hz a 20.000 Hz.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📏 Amplitud</h4>
+              <h4><span aria-hidden="true">📏</span> Amplitud</h4>
               <p>
                 La amplitud determina el volumen del sonido. Mayor amplitud = sonido más fuerte.
                 En la visualización, se ve como ondas más altas.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎸 Timbre</h4>
+              <h4><span aria-hidden="true">🎸</span> Timbre</h4>
               <p>
                 El timbre es lo que hace que un piano suene diferente a una guitarra aunque
                 toquen la misma nota. Depende de los armónicos (ondas adicionales).
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🌊 Longitud de onda</h4>
+              <h4><span aria-hidden="true">🌊</span> Longitud de onda</h4>
               <p>
                 Es la distancia entre dos picos consecutivos de la onda.
                 A mayor frecuencia, menor longitud de onda.
@@ -975,7 +1069,7 @@ export default function GeneradorOndasPage() {
 
           <div className={styles.waveExplanation}>
             <div className={styles.waveCard}>
-              <h4>〜 Onda Senoidal</h4>
+              <h4><span aria-hidden="true">〜</span> Onda Senoidal</h4>
               <p>
                 La onda más pura y simple. No tiene armónicos, solo la frecuencia fundamental.
                 Es el &quot;ladrillo&quot; básico del sonido. Todos los sonidos complejos pueden
@@ -984,7 +1078,7 @@ export default function GeneradorOndasPage() {
               <span className={styles.waveUse}>Uso: Referencia en física, pruebas de audio, tonos puros</span>
             </div>
             <div className={styles.waveCard}>
-              <h4>⊓ Onda Cuadrada</h4>
+              <h4><span aria-hidden="true">⊓</span> Onda Cuadrada</h4>
               <p>
                 Alterna bruscamente entre dos valores. Contiene solo armónicos impares
                 (3ª, 5ª, 7ª...). Suena metálico y brillante.
@@ -992,7 +1086,7 @@ export default function GeneradorOndasPage() {
               <span className={styles.waveUse}>Uso: Música electrónica, videojuegos 8-bit, sintetizadores</span>
             </div>
             <div className={styles.waveCard}>
-              <h4>△ Onda Triangular</h4>
+              <h4><span aria-hidden="true">△</span> Onda Triangular</h4>
               <p>
                 Sube y baja linealmente formando triángulos. También tiene solo armónicos impares,
                 pero decaen más rápido que en la cuadrada. Sonido más suave.
@@ -1000,7 +1094,7 @@ export default function GeneradorOndasPage() {
               <span className={styles.waveUse}>Uso: Simular flautas, sonidos suaves, síntesis substractiva</span>
             </div>
             <div className={styles.waveCard}>
-              <h4>⩘ Onda Diente de Sierra</h4>
+              <h4><span aria-hidden="true">⩘</span> Onda Diente de Sierra</h4>
               <p>
                 Sube gradualmente y cae bruscamente (o viceversa). Contiene TODOS los armónicos,
                 tanto pares como impares. Es la más rica en contenido armónico.

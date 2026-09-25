@@ -42,8 +42,8 @@ import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
  *   con un AnalyserNode: lo que mide ese bus es EXACTAMENTE lo que llega a los altavoces. Los
  *   tiempos del audio se miden con ese reloj y con expect.poll, nunca con esperas de pared.
  *
- * ORDEN: CASOS 1-4 (pasan: red de regresión) · HALLAZGOS con `test.fail()`, que afirman lo que
- * la app DEBERÍA hacer; el día que se reparen, Playwright avisará de que sobra la marca.
+ * ORDEN: CASOS 1-4 (red de regresión) · HALLAZGOS 1757-1777, reparados en la Ronda 15 (25/09/2026):
+ * afirman lo que la app DEBE hacer y ya hace, así que quedan como regresión (sin `test.fail()`).
  */
 
 test.use({ launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] } });
@@ -586,7 +586,7 @@ test('CASO 4 — visualizador: 1 s dura «0:01»; Espejo y Barras miden la ampli
 });
 
 // ============================================================
-// HALLAZGOS (Inspector 25/09/2026) — fallan a propósito
+// HALLAZGOS (Inspector 25/09/2026) — reparados en la Ronda 15, quedan como regresión
 // ============================================================
 
 /**
@@ -600,7 +600,6 @@ test('CASO 4 — visualizador: 1 s dura «0:01»; Espejo y Barras miden la ampli
  * Correcto: al salir de la página, silencio.
  */
 test('HALLAZGO — salir a otra app con el tono sonando lo detiene', async ({ page }) => {
-  test.fail();
   await reproducir(page);
   await page.locator('a[href*="/generador-tonos/"]').first().click();
   await page.waitForURL(/generador-tonos/);
@@ -616,14 +615,25 @@ test('HALLAZGO — salir a otra app con el tono sonando lo detiene', async ({ pa
  * HALLAZGO [bajo, forma de los 1637/1638 de generador-tonos]. Aunque se añada la limpieza, el
  * corte al desmontar debe ir precedido de una rampa de la ganancia a 0 (es lo que hoy falta
  * también en diapason y generador-tonos). Hoy no hay ni corte.
+ *
+ * Ronda 15: la espera se reescribe. Antes esperaba 0,3 s en el reloj de AUDIO del primer
+ * contexto, pero la reparación cierra ese contexto al salir y su reloj se congela: el test no
+ * podía pasar precisamente cuando la app hace lo correcto. Ahora espera a que aparezca el
+ * close() en el registro (llega cuando el oscilador acaba, tras la rampa) y exige además que el
+ * stop() esté programado al FINAL de la rampa, no en el acto: un stop inmediato cortaría la
+ * rampa igual que antes.
  */
 test('HALLAZGO — al salir a otra app, rampa de la ganancia a 0 antes de stop()/close()', async ({ page }) => {
-  test.fail();
   await reproducir(page);
   const desde = (await llamadas(page)).length;
   await page.locator('a[href*="/generador-tonos/"]').first().click();
   await page.waitForURL(/generador-tonos/);
-  await esperarReloj(page, (await reloj(page)) + 0.3);
+  await expect
+    .poll(async () => (await llamadas(page)).slice(desde).some((l) => l.metodo === 'close'), {
+      timeout: 5000,
+      message: 'el AudioContext del generador de ondas no se cierra al salir',
+    })
+    .toBe(true);
   const log = (await llamadas(page)).slice(desde);
   const iCorte = log.findIndex((l) => (l.quien === 'osc0' && l.metodo === 'stop') || l.metodo === 'close');
   expect(iCorte, `llamadas tras salir: ${JSON.stringify(log)}`).toBeGreaterThanOrEqual(0);
@@ -635,6 +645,13 @@ test('HALLAZGO — al salir a otra app, rampa de la ganancia a 0 antes de stop()
   );
   expect(iRampa).toBeGreaterThanOrEqual(0);
   expect(iRampa).toBeLessThan(iCorte);
+  // El stop() va con argumento y no antes del final de la rampa (linearRamp(0, fin) → stop(≥ fin)).
+  const rampa = log[iRampa];
+  const stop = log.find((l) => l.quien === 'osc0' && l.metodo === 'stop');
+  expect(stop?.args.length, 'stop() sin argumento corta en el acto').toBe(1);
+  expect(Number(stop?.args[0])).toBeGreaterThanOrEqual(Number(rampa.args[1]) - 1e-6);
+  // Y el close() llega DESPUÉS del stop: cerrar antes cortaría la rampa.
+  expect(log.findIndex((l) => l.metodo === 'close')).toBeGreaterThan(log.indexOf(stop!));
 });
 
 /**
@@ -646,7 +663,6 @@ test('HALLAZGO — al salir a otra app, rampa de la ganancia a 0 antes de stop()
  * todos. Con la rampa del patrón reparado (0 → 0,5 en 0,1 s) serían ≈ 0,03 · 0,06 · 0,11 · 0,26.
  */
 test('HALLAZGO — Reproducir entra con rampa desde 0, no en escalón', async ({ page }) => {
-  test.fail();
   const inicio = await reproducir(page, 0.15);
   const c = await capturar(page);
   const primera = c.x.findIndex((v) => Math.abs(v) > 1e-6);
@@ -665,7 +681,6 @@ test('HALLAZGO — Reproducir entra con rampa desde 0, no en escalón', async ({
  * emitido baja de 0,45 a 0,05 en 1,0 ms (con una rampa de 50 ms: 40 ms).
  */
 test('HALLAZGO — bajar el volumen a 0 con el tono sonando es una rampa, no un escalón', async ({ page }) => {
-  test.fail();
   const inicio = await reproducir(page, 0.3);
   const antes = await reloj(page);
   await page.locator(VOLUMEN).press('Home');
@@ -685,7 +700,6 @@ test('HALLAZGO — bajar el volumen a 0 con el tono sonando es una rampa, no un 
  * Ojo al repararlo: desconectar la ganancia en el acto también corta la rampa.
  */
 test('HALLAZGO — Detener baja la ganancia con rampa antes de parar el oscilador', async ({ page }) => {
-  test.fail();
   await reproducir(page, 0.3);
   const antes = await reloj(page);
   await botonDetener(page).click();
@@ -703,7 +717,6 @@ test('HALLAZGO — Detener baja la ganancia con rampa antes de parar el oscilado
  * banda del Espejo, 32 px, en torno a t = 5 s).
  */
 test('HALLAZGO — el estilo «Línea» no es una recta plana para un audio que suena', async ({ page }) => {
-  test.fail();
   await cargarAudio(page, 'rampa10s.wav', RAMPA_10S());
   await page.getByRole('button', { name: /Espejo/ }).click();
   await expect.poll(async () => Math.abs((await altoTrazo(page, 400, 400)) - 64)).toBeLessThanOrEqual(3);
@@ -718,7 +731,6 @@ test('HALLAZGO — el estilo «Línea» no es una recta plana para un audio que 
  * «Cambiar archivo» y «Exportar como PNG». Correcto: tras el error, vuelve la zona de carga.
  */
 test('HALLAZGO — un audio corrupto no deja la app en la vista de «archivo cargado»', async ({ page }) => {
-  test.fail();
   const avisos: string[] = [];
   page.on('dialog', (d) => {
     avisos.push(d.message());
@@ -735,7 +747,6 @@ test('HALLAZGO — un audio corrupto no deja la app en la vista de «archivo car
  * 16.044 B / 1.024 = 15,668 → esperado «15,7 KB» · obtenido «15.7 KB».
  */
 test('HALLAZGO — el tamaño del archivo va con coma decimal', async ({ page }) => {
-  test.fail();
   await cargarAudio(page, 'la440_1s.wav', wav(1, () => 0.8));
   await expect(page.locator('[class*="fileMeta"]')).toHaveText('15,7 KB • 0:01', { timeout: 3000 });
 });
@@ -747,7 +758,6 @@ test('HALLAZGO — el tamaño del archivo va con coma decimal', async ({ page })
  * «Ver Guía Completa» (el siguiente control, ya fuera de la herramienta).
  */
 test('HALLAZGO — con teclado se puede elegir un archivo en el visualizador', async ({ page }) => {
-  test.fail();
   await page.getByRole('button', { name: /Visualizador de Audio/ }).click();
   await page.getByRole('button', { name: /Visualizador de Audio/ }).focus();
   await page.keyboard.press('Tab');
@@ -765,10 +775,13 @@ test('HALLAZGO — con teclado se puede elegir un archivo en el visualizador', a
  * color («Color onda», «Color fondo») tampoco: su <label> no lleva htmlFor.
  */
 test('HALLAZGO — los deslizadores y los selectores de color tienen nombre accesible', async ({ page }) => {
-  test.fail();
   await expect(page.getByRole('slider', { name: /Frecuencia/ })).toHaveCount(1, { timeout: 2000 });
   await expect(page.getByRole('slider', { name: /Volumen/ })).toHaveCount(1, { timeout: 2000 });
-  await expect(page.getByRole('slider', { name: /Frecuencia/ })).toHaveAttribute('aria-valuetext', /Hz/);
+  await expect(page.getByRole('slider', { name: /Frecuencia/ })).toHaveAttribute('aria-valuetext', '440 Hz');
+  // Tras Do (C4) el range redondea a 262 (su step), pero el lector debe oír lo que suena: 261,63 Hz.
+  await page.getByRole('button', { name: 'Do (C4)' }).click();
+  await expect(page.getByRole('slider', { name: /Frecuencia/ })).toHaveAttribute('aria-valuetext', '261,63 Hz');
+  await expect(page.getByRole('slider', { name: /Volumen/ })).toHaveAttribute('aria-valuetext', '50 %');
   await cargarAudio(page, 'la440_1s.wav', wav(1, () => 0.8));
   await expect(page.getByLabel('Color onda')).toHaveCount(1, { timeout: 2000 });
 });
@@ -779,7 +792,6 @@ test('HALLAZGO — los deslizadores y los selectores de color tienen nombre acce
  * «Detener, conmutador, presionado». Un estado se expone por el nombre O por aria-pressed.
  */
 test('HALLAZGO — el botón «Detener» no se anuncia además como conmutador presionado', async ({ page }) => {
-  test.fail();
   await reproducir(page, 0.05);
   await expect(botonDetener(page)).not.toHaveAttribute('aria-pressed', 'true', { timeout: 2000 });
 });
@@ -790,7 +802,6 @@ test('HALLAZGO — el botón «Detener» no se anuncia además como conmutador p
  * de los botones de onda (〜 ⊓ △ ⩘) entran en su nombre: «〜 Senoidal», «△ Triangular».
  */
 test('HALLAZGO — emojis e iconos decorativos ocultos a la ayuda técnica', async ({ page }) => {
-  test.fail();
   await expect(page.getByRole('button', { name: 'Senoidal', exact: true })).toHaveCount(1, { timeout: 2000 });
   const titulo = page.locator('h3').filter({ hasText: 'Afinar instrumentos' });
   await expect(titulo.locator('span[aria-hidden="true"]')).toHaveCount(1, { timeout: 2000 });
@@ -854,7 +865,6 @@ const AVISO_LIENZO = '[class*="canvasPlaceholder"] span';
  *     #0A0A0A en LOS DOS temas: 3,88:1 (en oscuro el token vale #9B9B9B y pasa).
  */
 test('HALLAZGO — los controles del generador pasan de 4,5:1 en claro y en oscuro', async ({ page }) => {
-  test.fail();
   await page.emulateMedia({ colorScheme: 'light' });
   await page.addStyleTag({ content: '*{transition:none !important; animation:none !important}' });
   const claro = {
@@ -879,7 +889,6 @@ test('HALLAZGO — los controles del generador pasan de 4,5:1 en claro y en oscu
  * (En oscuro, blanco sobre #333333, se lee.)
  */
 test('HALLAZGO — la nota recién pulsada sigue legible con el puntero encima (tema claro)', async ({ page }) => {
-  test.fail();
   await page.emulateMedia({ colorScheme: 'light' });
   await page.addStyleTag({ content: '*{transition:none !important}' });
   await page.getByRole('button', { name: 'Do (C4)' }).click(); // el puntero se queda encima
@@ -894,7 +903,6 @@ test('HALLAZGO — la nota recién pulsada sigue legible con el puntero encima (
  * (4,11:1) o sobre el degradado de las tarjetas de consejo (3,77:1), a 14,4-16 px.
  */
 test('HALLAZGO — la cabecera de la tabla y los títulos del bloque educativo pasan de 4,5:1', async ({ page }) => {
-  test.fail();
   await page.emulateMedia({ colorScheme: 'light' });
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   expect(await contraste(page, '[class*="comparativaTable"] th'), 'cabecera de tabla').toBeGreaterThanOrEqual(4.5);
@@ -911,7 +919,6 @@ test('HALLAZGO — la cabecera de la tabla y los títulos del bloque educativo p
  * misma página. Las otras cinco cuerdas sí van en notación científica (Si3, Sol3, Re3, La2, Mi2).
  */
 test('HALLAZGO — la 1.ª cuerda de la guitarra es Mi4 = 329,6 Hz, no «Mi6»', async ({ page }) => {
-  test.fail();
   expect(440 * 2 ** (-5 / 12)).toBeCloseTo(329.628, 3);
   await expect(page.getByText(/Mi6=329,6 Hz/)).toHaveCount(0, { timeout: 2000 });
 });
@@ -922,7 +929,6 @@ test('HALLAZGO — la 1.ª cuerda de la guitarra es Mi4 = 329,6 Hz, no «Mi6»',
  * va con el cuadrado: A² / (A²/2) = 2 (+3,01 dB). 1,41 = √2 es la razón de valores eficaces.
  */
 test('HALLAZGO — la cuadrada entrega el doble de potencia que la senoidal, no 1,41 veces', async ({ page }) => {
-  test.fail();
   expect(1 / (1 / Math.SQRT2) ** 2).toBeCloseTo(2, 10);
   await expect(page.getByText(/1,41 veces más potencia/)).toHaveCount(0, { timeout: 2000 });
 });
@@ -936,7 +942,6 @@ test('HALLAZGO — la cuadrada entrega el doble de potencia que la senoidal, no 
 test('HALLAZGO — la guía no promete barridos ni frecuencias por encima de los 2.000 Hz del deslizador', async ({
   page,
 }) => {
-  test.fail();
   await page.locator(FRECUENCIA).press('End');
   await expect(rotuloFrecuencia(page)).toHaveText('Frecuencia: 2000,0 Hz');
   await expect(page.getByText(/barrido de frecuencias \(de 20 Hz a 20\.000 Hz\)/)).toHaveCount(0, { timeout: 2000 });
@@ -952,7 +957,6 @@ test('HALLAZGO — la guía no promete barridos ni frecuencias por encima de los
  *     el visualizador solo abre archivos, no graba, y pasar a su pestaña detiene el tono.
  */
 test('HALLAZGO — «pantalla completa» no cambia la resolución del PNG exportado', async ({ page }) => {
-  test.fail();
   await page.setViewportSize({ width: 1920, height: 1080 });
   await cargarAudio(page, 'rampa10s.wav', RAMPA_10S());
   const [descarga] = await Promise.all([
@@ -974,7 +978,6 @@ test('HALLAZGO — «pantalla completa» no cambia la resolución del PNG export
  * (`getChannelData`, page.tsx 288), en el dominio del tiempo: ni tiempo real ni FFT.
  */
 test('HALLAZGO — el visualizador no se describe como «en tiempo real usando FFT»', async ({ page }) => {
-  test.fail();
   await expect(page.getByText(/muestra la forma de onda en tiempo real usando FFT/)).toHaveCount(0, { timeout: 2000 });
 });
 
@@ -985,7 +988,6 @@ test('HALLAZGO — el visualizador no se describe como «en tiempo real usando F
  * necesitan un tono DISTINTO en cada oído: esta app tiene un solo oscilador, mono.
  */
 test('HALLAZGO — la guía no promete binaural beats con un oscilador mono', async ({ page }) => {
-  test.fail();
   await expect(page.getByText(/binaural beats/)).toHaveCount(0, { timeout: 2000 });
 });
 
@@ -997,7 +999,6 @@ test('HALLAZGO — la guía no promete binaural beats con un oscilador mono', as
  * trabaja a 2-18 MHz, cien veces más.
  */
 test('HALLAZGO — la tabla no llama «infrasónico» a 20 Hz ni pone ecografías a 20.000 Hz', async ({ page }) => {
-  test.fail();
   await expect(page.getByText('20 Hz (infrasónico)')).toHaveCount(0, { timeout: 2000 });
   await expect(page.getByText(/Ecografías/)).toHaveCount(0, { timeout: 2000 });
 });
