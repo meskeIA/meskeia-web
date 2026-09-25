@@ -582,3 +582,23 @@ export const OBLIGACION_DECLARAR_2025 = {
     indemnizacionDespido: true, // Exenta hasta el límite legal (art. 7.e LIRPF)
   },
 };
+
+// ─── Aportaciones al sistema de previsión social del cónyuge (art. 51.7 LIRPF) ─
+// Añadido el 25/09/2026 (estimador-irpf, hallazgo 1860 y sospecha del consejo del plan de
+// pensiones). Lo que reduce la base es lo que el contribuyente aporta AL PLAN DEL CÓNYUGE, no
+// lo que aporta el cónyuge; y el umbral de 8.000 € mide los rendimientos netos del trabajo y de
+// actividades económicas del cónyuge, no todas sus rentas. Es un límite propio, adicional al
+// del art. 52 (LIMITES_PLAN_PENSIONES_2025).
+
+export const APORTACIONES_PLAN_CONYUGE_META = {
+  fuente: 'Ley 35/2006 del IRPF, art. 51.7 (redacción vigente desde el 01/01/2022)',
+  verificado: '2026-09-25',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a51',
+};
+
+export const APORTACIONES_PLAN_CONYUGE = {
+  /** Reducción máxima por lo aportado al sistema de previsión social del cónyuge, €/año. */
+  limiteAnual: 1000,
+  /** El cónyuge no obtiene rendimientos netos del trabajo ni de actividades económicas, o menos de esto, €/año. */
+  rendimientosMaximosConyuge: 8000,
+};

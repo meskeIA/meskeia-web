@@ -229,7 +229,9 @@ test('CASO 6 (límite alto) · 400.000 € brutos entra en el tramo del 47 %', a
   const ultimaFila = page.locator('table').first().locator('tbody tr').last();
   await expect(ultimaFila.locator('td').nth(0)).toHaveText(/^300\.000,00\s€$/);
   await expect(ultimaFila.locator('td').nth(1)).toHaveText('En adelante');
-  await expect(ultimaFila.locator('td').nth(2)).toHaveText('47%');
+  // Desde el 25/09/2026 el % va separado con espacio duro (hallazgo 1857): textContent y no
+  // toHaveText, que normaliza el U+00A0 a espacio y aceptaría también uno normal.
+  expect(await ultimaFila.locator('td').nth(2).textContent()).toBe('47\u00A0%');
   expect(await tarjeta(page, 'Cuota íntegra')).toBe('169.115,48€');
 });
 
@@ -395,7 +397,11 @@ test('CASO 15 · hallazgo 1315: el bloque educativo no dice que el mínimo reduz
 
 test('CASO 16 · hallazgo 1316: el FAQPage publica la escala que aplica la app, con el tramo del 47 %', async ({ page }) => {
   const faqs = await page.locator('script[type="application/ld+json"]').allTextContents();
-  const faq = faqs.find((t) => t.includes('"FAQPage"')) ?? '';
+  const crudo = faqs.find((t) => t.includes('"FAQPage"')) ?? '';
+  // El % va con espacio duro desde el 25/09/2026 (hallazgo 1857); `limpiar` lo lleva a espacio
+  // normal para leer el texto, y la última línea vigila que el duro siga ahí.
+  const faq = limpiar(crudo);
+  expect(crudo).toContain('al 47\u00A0%');
   expect(faq).toContain('más de 300.000 € al 47 %');
   expect(faq).not.toContain('22,5');
   // Base de 40.000 €: marginal 37 % · efectivo (escala(40.000) − 1.054,50) / 40.000
@@ -409,7 +415,7 @@ test('CASO 17 · hallazgo 1317: la tabla educativa de tramos sale de TRAMOS_IRPF
   const filas = tabla.locator('tbody tr');
   await expect(filas).toHaveCount(6);
   await expect(filas.last().locator('td').nth(0)).toHaveText(/^300\.000\s€$/);
-  await expect(filas.last().locator('td').nth(2)).toHaveText('47 %');
+  expect(await filas.last().locator('td').nth(2).textContent()).toBe('47\u00A0%');
 });
 
 test('CASO 18 · hallazgo 1318: los emojis junto a texto llevan aria-hidden', async ({ page }) => {
@@ -423,8 +429,9 @@ test('CASO 18 · hallazgo 1318: los emojis junto a texto llevan aria-hidden', as
 // ═════════════════════════════════════════════════════════════════════════════
 // Inspector 25/09/2026 — re-inspección tras el cambio del art. 20 en data/fiscal
 // (reducción medida antes de los 2.000 € de la letra f), commit 8a6fb75b).
-// CASOS 19 y 20 pasan; el CASO 21 y los HALLAZGOS van con test.fail(): afirman lo
-// correcto y hoy fallan. Al repararlos se quita la marca y quedan como regresión.
+// CASOS 19 y 20 pasaban; el CASO 21 y los hallazgos 1854-1861 se escribieron con test.fail()
+// y se repararon el mismo 25/09/2026: quedan como regresión (CASOS 21 a 28), más dos
+// sospechas anotadas en la tanda (CASOS 29 y 30).
 // ═════════════════════════════════════════════════════════════════════════════
 
 /** El aviso propio de la app (no el de DisclaimerCard ni el anunciador de rutas). */
@@ -525,73 +532,89 @@ test('CASO 20 (límite) · 0 € de trabajo y 350.000 € de dividendos: último
   await expect(nota).toContainText('1054,50');
 });
 
-test('CASO 21 (rechazo) · unas retenciones ilegibles («4.928.70») no pueden estimarse como 0 €', async ({ page }) => {
-  // HALLAZGO medio (Inspector 25/09/2026)
-  test.fail();
+test('CASO 21 (rechazo) · hallazgo 1854: unas retenciones o un capital ilegibles no se estiman como 0 €', async ({ page }) => {
   // «4.928.70» no es un número para el parser canónico (dos puntos y el último grupo de dos
-  // cifras: parseSpanishNumber → NaN) y el campo lo conserva tras el blur. La app hace `|| 0` y
-  // estima con 0 € retenidos: «A PAGAR 4928,70 €», la cuota íntegra entera de 30.000 € (CASO 4),
-  // cuando quien lo tecleó quería declarar 4.928,70 € ya retenidos (resultado ≈ 0 €). Lo mismo
-  // pasa con un capital ilegible («1.2.3») junto a un bruto válido. Lo correcto es lo que ya hace
-  // con el bruto ilegible (CASO 8): no estimar y avisar.
+  // cifras: parseSpanishNumber → NaN) y el campo lo conserva tras el blur. Hasta el 25/09/2026
+  // la app hacía `|| 0` y estimaba con 0 € retenidos: «A PAGAR 4928,70 €», la cuota íntegra
+  // entera de 30.000 € (CASO 4), cuando quien lo tecleó quería declarar 4.928,70 € ya
+  // retenidos. Lo mismo con un capital ilegible («1.2.3») junto a un bruto válido. Ahora hace
+  // lo que ya hacía con el bruto ilegible (CASO 8): no estima y avisa.
   await estimar(page, { bruto: '30000', retenciones: '4.928.70' });
   await expect(page.locator(SEL_RETENCIONES)).toHaveValue('4.928.70');
   await expect(page.locator(SEL_IMPORTE_FINAL).or(avisoApp(page).locator('p')).first()).toBeVisible();
 
-  await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveCount(0);   // hoy: «4928,70 €» a pagar
-  await expect(avisoApp(page)).not.toBeEmpty();
+  await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveCount(0);
+  await expect(avisoApp(page)).toContainText('«4.928.70»');
+  await expect(avisoApp(page)).toContainText('Retenciones ya practicadas');
+
+  // Con las retenciones bien escritas, el resultado sale y el aviso se retira.
+  await escribir(page, SEL_RETENCIONES, '4928,70');
+  await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
+  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(0, 1);
+  await expect(avisoApp(page)).toBeEmpty();
+
+  // Un capital ilegible BORRA el resultado anterior (hallazgo 1313) y avisa.
+  await escribir(page, SEL_CAPITAL, '1.2.3');
+  await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
+  await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveCount(0);
+  await expect(avisoApp(page)).toContainText('«1.2.3»');
 });
 
-test('HALLAZGO · «0,5» hijos a cargo se estima como 0 hijos sin decir nada', async ({ page }) => {
-  // HALLAZGO bajo (Inspector 25/09/2026)
-  test.fail();
-  // El campo admite decimales (NumberInput) y conserva «0,5» tras el blur, pero la página lo lee
-  // con parseInt('0,5') = 0: el mínimo queda en 5.550 € (sin descendiente) y la cuota en
-  // 4.928,70 € (CASO 4), como si no hubiera hijo. Quien tiene la custodia compartida y teclea
-  // «0,5» pierde el mínimo entero: con «1» y «Casado/a (dos ingresos)» serían 5.550 + 1.200 =
-  // 6.750 € (art. 61.1.ª), 228 € menos de cuota. Un número de hijos no entero se rechaza.
+test('CASO 22 · hallazgo 1855: «0,5» hijos a cargo se rechaza en vez de estimarse como 0 hijos', async ({ page }) => {
+  // El campo admite decimales (NumberInput) y conserva «0,5» tras el blur. Hasta el 25/09/2026
+  // la página lo leía con parseInt('0,5') = 0: mínimo 5.550 € (sin descendiente) y cuota
+  // 4.928,70 € (CASO 4), como si no hubiera hijo. Un número de hijos no entero se rechaza.
   await estimar(page, { bruto: '30000', situacion: 'casado_dos_ingresos', hijos: '0,5' });
   await expect(page.locator(SEL_HIJOS)).toHaveValue('0,5');
   await expect(page.locator(SEL_IMPORTE_FINAL).or(avisoApp(page).locator('p')).first()).toBeVisible();
 
-  await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveCount(0);   // hoy: resultado con 0 hijos
-  await expect(avisoApp(page)).not.toBeEmpty();
+  await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveCount(0);
+  await expect(avisoApp(page)).toContainText('número entero');
+
+  // Con «1» y «Casado/a (dos ingresos)»: 5.550 + 2.400 / 2 = 6.750 € (art. 61.1.ª)
+  //   escala(26.059) = 5.983,20 − 6.750 × 19 % (1.282,50) = 4.700,70 €
+  await escribir(page, SEL_HIJOS, '1');
+  await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
+  expect(await tarjeta(page, 'Mínimos personales')).toBe('6750,00€');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4700,70€');
 });
 
-test('HALLAZGO · el pie del aviso imprime la fecha de verificación en ISO («2026-09-09»)', async ({ page }) => {
-  // HALLAZGO bajo (Inspector 25/09/2026) — misma forma que el hallazgo 1657 de estimador-sueldo-neto.
-  test.fail();
-  // FISCAL_IRPF_META.verificado = '2026-09-09' (data/fiscal/irpf.ts). DataReference, en la misma
-  // página, la formatea: «Última verificación: 09/09/2026». El pie del aviso la pega tal cual:
-  // «Datos verificados: 2026-09-09 | Ejercicio calculado: 2025» (page.tsx, `disclaimerFecha`).
+test('CASO 23 · hallazgo 1856: el pie del aviso da la fecha de verificación en DD/MM/AAAA', async ({ page }) => {
+  // FISCAL_IRPF_META.verificado es ISO (data/fiscal/irpf.ts). DataReference, en la misma
+  // página, la formatea: «Última verificación: 09/09/2026». Hasta el 25/09/2026 el pie del
+  // aviso la pegaba tal cual: «Datos verificados: 2026-09-09 | Ejercicio calculado: 2025».
   const referencia = limpiar(await page.getByRole('note', { name: 'Datos de referencia normativos' }).innerText());
   const fecha = (referencia.match(/Última verificación: (\d{2}\/\d{2}\/\d{4})/) ?? [])[1] ?? '';
-  expect(fecha).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);   // montaje: DataReference sí da DD/MM/AAAA (hoy 09/09/2026)
+  expect(fecha).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);   // montaje: DataReference sí da DD/MM/AAAA
 
   await expect(page.locator('p', { hasText: 'Datos verificados:' })).toHaveText(
     `Datos verificados: ${fecha} | Ejercicio calculado: 2025`,
   );
 });
 
-test('HALLAZGO · el % del desglose por tramos va pegado a la cifra («19%»)', async ({ page }) => {
-  // HALLAZGO bajo (Inspector 25/09/2026): desde el 25/09/2026 el % va separado con espacio duro
-  // (CLAUDE.md global §2). Base general de 30.000 € → tramos 19, 24 y 30; 8.000 € de capital →
-  // tramos del ahorro 19 y 21. Hoy las cinco celdas dicen «19%», «24%», «30%», «19%», «21%».
-  test.fail();
+test('CASO 24 · hallazgo 1857: el % del desglose y del tipo efectivo va separado con espacio duro', async ({ page }) => {
+  // Desde el 25/09/2026 el % va separado con espacio duro (CLAUDE.md global §2). Base general de
+  // 30.000 € → tramos 19, 24 y 30; 8.000 € de capital → tramos del ahorro 19 y 21. Hasta ese
+  // día las cinco celdas decían «19%», «24%», «30%», «19%», «21%».
   await estimar(page, { bruto: '30000', capital: '8000' });
   const tipos = page.locator('table[class*="tramosTable"] tbody tr td:nth-child(3)');
   await expect(tipos).toHaveCount(5);   // montaje: las dos tablas del resultado
 
-  expect(await tipos.allTextContents()).toEqual(['19 %', '24 %', '30 %', '19 %', '21 %']);
+  expect(await tipos.allTextContents()).toEqual(['19\u00A0%', '24\u00A0%', '30\u00A0%', '19\u00A0%', '21\u00A0%']);
+
+  // La tarjeta del tipo efectivo: ResultCard separa la unidad solo con un margin CSS, así que
+  // la app le pasa la unidad con el espacio duro delante.
+  const h3 = page.getByRole('heading', { level: 3, name: 'Tipo efectivo', exact: true });
+  const valor = (await h3.locator('xpath=../following-sibling::div[1]//p').textContent()) ?? '';
+  expect(valor).toMatch(/^\d+,\d{2} %$/);
 });
 
-test('HALLAZGO · en oscuro, el --primary local del módulo anula el de globals.css y el texto de marca baja a 3,5:1', async ({ page }) => {
-  // HALLAZGO medio (Inspector 25/09/2026). EstimadorIRPF.module.css redeclara --primary: #2E86AB
-  // en .container y no lo redeclara en [data-theme='dark'] .container, así que en oscuro tapa el
-  // #3FA5D1 de globals.css. Medido: enlace del aviso #2E86AB sobre #2D2A1A = 3,51:1 (14,4 px);
-  // título «Desglose por tramos» #2E86AB sobre #2A2A2A = 3,50:1 (17,6 px negrita, no es texto
-  // grande). Con el #3FA5D1 de globals el título daría ≈ 5,1:1.
-  test.fail();
+test('CASO 25 · hallazgo 1858: en oscuro el texto de marca pasa de 4,5:1', async ({ page }) => {
+  // EstimadorIRPF.module.css redeclaraba --primary: #2E86AB en .container y no en
+  // [data-theme='dark'] .container, así que en oscuro tapaba el #3FA5D1 de globals.css. Medido
+  // antes de reparar: enlace del aviso 3,51:1; título «Desglose por tramos» 3,50:1; h4 del FAQ
+  // 3,50:1; primera columna de la comparativa 3,21:1. Ahora el módulo no redeclara la marca y
+  // el texto usa --primary-texto (#3FA5D1 en oscuro).
   await page.addInitScript(() => {
     try {
       localStorage.setItem('meskeia-theme', 'dark');
@@ -608,50 +631,96 @@ test('HALLAZGO · en oscuro, el --primary local del módulo anula el de globals.
   const enlaceAviso = page.locator('h3', { hasText: 'Herramienta de Orientación' }).locator('xpath=..').getByRole('link').first();
   const tituloTramos = page.getByRole('heading', { level: 3, name: /Desglose por tramos IRPF/ });
   await expect(tituloTramos).toBeVisible();
-  expect(await contrasteDe(enlaceAviso)).toBeGreaterThanOrEqual(4.5);   // hoy 3,51
-  expect(await contrasteDe(tituloTramos)).toBeGreaterThanOrEqual(4.5);  // hoy 3,50
+  expect(await contrasteDe(enlaceAviso)).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(tituloTramos)).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.locator('[class*="faqItem"] h4').first())).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.locator('table[class*="comparativaTable"] tbody td').first())).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.locator('[class*="faqTip"]'))).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.getByRole('button', { name: 'Estimar IRPF', exact: true }))).toBeGreaterThanOrEqual(4.5);
 });
 
-test('HALLAZGO · en claro, el texto de marca y el blanco sobre marca no llegan a 4,5:1', async ({ page }) => {
-  // HALLAZGO bajo (Inspector 25/09/2026). Medido en claro: consejo del FAQ (.faqTip, #48A9A6 sobre
-  // #EDF6F6, 13,2 px) = 2,55:1; enlace del aviso (#2E86AB sobre #FFF3CD) = 3,71:1; botón «Estimar
-  // IRPF» (blanco sobre #2E86AB, 16 px) = 4,11:1. globals.css ya trae --primary-texto,
-  // --secondary-texto y --primary-boton para esto.
-  test.fail();
+test('CASO 26 · hallazgo 1859: en claro el texto de marca y el blanco sobre marca pasan de 4,5:1', async ({ page }) => {
+  // Medido antes de reparar: consejo del FAQ (.faqTip) 2,55:1; enlace del aviso 3,71:1; botón
+  // «Estimar IRPF» 4,11:1; h4 de la guía y del FAQ 4,11:1; primera columna de la comparativa
+  // 3,77:1; insignia «A ingresar en Hacienda» 4,15:1.
   await esperarPaginaAsentada(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await estimar(page, { bruto: '30000' });
 
   const enlaceAviso = page.locator('h3', { hasText: 'Herramienta de Orientación' }).locator('xpath=..').getByRole('link').first();
-  expect(await contrasteDe(page.locator('[class*="faqTip"]'))).toBeGreaterThanOrEqual(4.5);   // hoy 2,55
-  expect(await contrasteDe(enlaceAviso)).toBeGreaterThanOrEqual(4.5);                           // hoy 3,71
-  expect(await contrasteDe(page.getByRole('button', { name: 'Estimar IRPF', exact: true }))).toBeGreaterThanOrEqual(4.5); // hoy 4,11
+  expect(await contrasteDe(page.locator('[class*="faqTip"]'))).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(enlaceAviso)).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.getByRole('button', { name: 'Estimar IRPF', exact: true }))).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.locator('[class*="guideCard"] h4').first())).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.locator('[class*="faqItem"] h4').first())).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.locator('table[class*="comparativaTable"] tbody td').first())).toBeGreaterThanOrEqual(4.5);
+  expect(await contrasteDe(page.locator('[class*="resultadoBadgePagar"]'))).toBeGreaterThanOrEqual(4.5);
 });
 
-test('HALLAZGO (dato) · el umbral del segundo pagador y los límites del plan de pensiones están tecleados a mano', async ({ page }) => {
-  // HALLAZGO bajo (Inspector 25/09/2026). OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador =
-  // 1500 (data/fiscal/irpf.ts): la tabla comparativa lo imprime desde data/fiscal con el
-  // formateador de la página, «más de 1500 €» (cuatro cifras sin punto, RAE 2010). El FAQ de los
-  // dos pagadores y el consejo del modelo 145 lo llevan escrito a mano: «1.500 €». Igual los
-  // límites del plan de pensiones (LIMITES_PLAN_PENSIONES_2025: 1500 / 8500 / 10.000 €, en el FAQ
-  // y en un consejo) y la deducción por maternidad (DEDUCCION_MATERNIDAD_IRPF: 1200, 100 y 1000 €).
-  test.fail();
+test('CASO 27 · hallazgo 1860: el umbral del segundo pagador y los límites del plan de pensiones salen de data/fiscal', async ({ page }) => {
+  // OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador = 1500 y LIMITES_PLAN_PENSIONES_2025
+  // (1500 / 8500 / 10.000 €) en data/fiscal. Hasta el 25/09/2026 el FAQ y los consejos los
+  // llevaban escritos a mano y agrupados con punto («1.500 €»), contra la regla de las cuatro
+  // cifras que sí sigue la comparativa («más de 1500 €»).
   await expect(page.locator('table[class*="comparativaTable"]')).toContainText('más de 1500 €');   // montaje
 
   const pagadores = limpiar((await parrafo(page, '¿Cómo afecta tener dos pagadores').textContent()) ?? '');
   const plan = limpiar((await parrafo(page, '¿Puedo deducir el plan de pensiones').textContent()) ?? '');
-  expect(pagadores).toMatch(/más de 1500(,00)? €/);   // hoy «más de 1.500 €»
-  expect(plan).toMatch(/1500(,00)? € anuales/);       // hoy «1.500 € anuales»
-  expect(plan).toMatch(/8500(,00)? €/);               // hoy «8.500 €»
+  expect(pagadores).toMatch(/más de 1500 €/);
+  expect(plan).toMatch(/1500 € anuales/);
+  expect(plan).toMatch(/8500 €/);
+  expect(plan).toMatch(/10\.000 € anuales/);
+  expect(plan).toContain('19–47 %');
+
+  const modelo145 = limpiar((await page.locator('[class*="tipCard"]', { hasText: 'modelo 145' }).textContent()) ?? '');
+  expect(modelo145).toContain('más de 1500 € anuales');
+
+  // Ninguna cifra de cuatro dígitos agrupada con punto en el bloque educativo.
+  for (const seccion of await page.locator('[class*="guideSection"]').allTextContents()) {
+    expect(limpiar(seccion)).not.toMatch(/(?<![\d.])\d\.\d{3} €/);
+  }
 });
 
-test('HALLAZGO · el FAQ de la deducción por maternidad deja fuera a quien cobraba el desempleo al nacer el hijo', async ({ page }) => {
-  // HALLAZGO medio (Inspector 25/09/2026). DEDUCCION_MATERNIDAD_IRPF.situacionesConDerecho
-  // (data/fiscal/maternidad.ts; art. 81 LIRPF en la redacción de la Ley 31/2022, desde el
-  // 01/01/2023): de alta en la SS o mutualidad, percibiendo prestación o subsidio de desempleo al
-  // nacer el menor, o alta posterior con 30 días cotizados. El FAQ dice «para madres trabajadoras
-  // que coticen a la SS», la redacción anterior a 2023.
-  test.fail();
+test('CASO 28 · hallazgo 1861: el FAQ de la deducción por maternidad incluye a quien cobraba el desempleo al nacer el hijo', async ({ page }) => {
+  // Art. 81.1 LIRPF en la redacción de la Ley 31/2022 (BOE-A-2022-22128, desde el 01/01/2023):
+  // de alta en la SS o mutualidad, percibiendo prestación o subsidio de desempleo al nacer el
+  // menor, o alta posterior con 30 días cotizados (DEDUCCION_MATERNIDAD_IRPF.situacionesConDerecho).
+  // Hasta el 25/09/2026 el FAQ decía «para madres trabajadoras que coticen a la SS».
   const texto = limpiar((await parrafo(page, '¿Qué es la deducción por maternidad').textContent()) ?? '');
   expect(texto).toContain('menor de 3 años');   // montaje: es el párrafo de la deducción
   expect(texto).toMatch(/desempleo/);
+  expect(texto).toContain('30 días cotizados');
+  expect(texto).toContain('1200 € anuales');
+  expect(texto).not.toContain('madres trabajadoras que coticen');
+});
+
+test('CASO 29 · sin rendimientos del trabajo, la nota no habla de una reducción del art. 20 perdida', async ({ page }) => {
+  // Sospecha anotada el 25/09/2026: con 0 € de trabajo y más de 6.500 € de capital el desglose
+  // decía «No se aplica la reducción por rendimientos del trabajo: tus otras rentas superan
+  // 6500 €». No había reducción que perder. Igual con un sueldo por encima del último tramo
+  // de la reducción (60.000 €), que no la tendría aunque no hubiera capital.
+  await estimar(page, { bruto: '0', capital: '10000' });
+  await expect(notaGeneral(page)).toBeVisible();
+  await expect(notaGeneral(page)).not.toContainText('No se aplica la reducción');
+
+  await estimar(page, { bruto: '60000', capital: '7000' });
+  await expect(notaGeneral(page)).not.toContainText('No se aplica la reducción');
+
+  // Y sigue diciéndolo cuando sí la pierde (CASO 10 bis).
+  await estimar(page, { bruto: '20000', capital: '7000' });
+  await expect(notaGeneral(page)).toContainText('No se aplica la reducción por rendimientos del trabajo');
+});
+
+test('CASO 30 · art. 51.7: lo que reduce la base es lo que TÚ aportas al plan del cónyuge', async ({ page }) => {
+  // Sospecha anotada el 25/09/2026. El consejo decía «Las aportaciones del cónyuge (hasta
+  // 1.000 €) también reducen tu base si sus rentas son inferiores a 8.000 €». El art. 51.7 LIRPF
+  // (BOE-A-2006-20764, redacción vigente desde el 01/01/2022) habla de las aportaciones del
+  // contribuyente a los sistemas de previsión social de los que sea partícipe el cónyuge, con
+  // 1.000 € de límite, y el umbral de 8.000 € mide los rendimientos netos del trabajo y de
+  // actividades económicas del cónyuge (APORTACIONES_PLAN_CONYUGE de data/fiscal/irpf.ts).
+  const consejo = limpiar((await page.locator('[class*="tipCard"]', { hasText: 'Aporta al plan de pensiones' }).textContent()) ?? '');
+  expect(consejo).toContain('lo que tú aportes a su plan de pensiones también reduce tu base, hasta 1000 € al año');
+  expect(consejo).toContain('rendimientos netos del trabajo ni de actividades económicas');
+  expect(consejo).toContain('menos de 8000 €');
+  expect(consejo).not.toContain('Las aportaciones del cónyuge');
 });

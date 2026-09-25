@@ -50,7 +50,8 @@ export const metadata: Metadata = {
 // 22,5 %, mientras la app aplicaba la escala combinada del 19 al 47 % (hallazgo 1316).
 
 const eur = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 0 : 2)} €`;
-const pct = (n: number): string => `${formatNumber(n, n % 1 === 0 ? 0 : 2)} %`;
+// Espacio duro (U+00A0) entre la cifra y el %, como en la página (RAE 2010; 25/09/2026).
+const pct = (n: number): string => `${formatNumber(n, n % 1 === 0 ? 0 : 2)}\u00A0%`;
 
 function describirEscala(escala: { hasta: number; tipo: number }[]): string {
   return escala

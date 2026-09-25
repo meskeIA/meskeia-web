@@ -5,7 +5,7 @@ import styles from './EstimadorIRPF.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatNumber, formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
@@ -17,6 +17,9 @@ import {
   DEDUCCION_RENDIMIENTOS_TRABAJO_2025,
   MINIMOS_IRPF_2025,
   OBLIGACION_DECLARAR_2025,
+  LIMITES_PLAN_PENSIONES_2025,
+  APORTACIONES_PLAN_CONYUGE,
+  DEDUCCION_MATERNIDAD_IRPF,
   calcularCuotaIntegraGeneral,
 } from '@/data/fiscal';
 import { EJERCICIO, estimarIRPF, type EntradaIRPF, type ResultadoIRPF, type SituacionFamiliar } from './motor';
@@ -58,10 +61,33 @@ const FAQ_BASE = 35200;
 const FAQ_CUOTA = calcularCuotaIntegraGeneral(FAQ_BASE, MINIMOS_IRPF_2025.personal);
 const FAQ_MARGINAL = TRAMOS_IRPF_2025.find((t) => FAQ_BASE <= t.hasta)?.tipo ?? 0;
 
-const pct = (n: number): string => `${formatNumber(n, 2)} %`;
+// Consejo del plan de pensiones: ahorro de una aportación al tipo marginal de un tramo real
+// de la escala (el tercero, el de las rentas medias), no a un tipo escrito a mano.
+const PLAN_MARGINAL = TRAMOS_IRPF_2025[2].tipo;
+const PLAN_APORTACION = 1000;
+
+/** Espacio duro entre la cifra y el %: separa sin dejar el signo solo en otra línea (RAE 2010). */
+const NBSP = '\u00A0';
+const pct = (n: number): string => `${formatNumber(n, 2)}${NBSP}%`;
+/** Tipo de una escala (19, 24, 30…): sin decimales cuando no los tiene. */
+const tipoPct = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 0 : 2)}${NBSP}%`;
 const eur = (n: number): string => formatCurrency(n);
 /** Importe normativo sin céntimos cuando no los tiene (19.747,5 € no se redondea). */
 const eur0 = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 0 : 2)} €`;
+
+/** Importe de un campo: vacío = 0 € · ilegible = null, que se rechaza (hallazgo 1854). */
+function leerImporte(texto: string): number | null {
+  if (texto.trim() === '') return 0;
+  const n = parseSpanishNumber(texto);
+  return Number.isNaN(n) ? null : n;
+}
+
+/** Número de hijos: vacío = 0 · no entero, negativo o ilegible = null (hallazgo 1855). */
+function leerEntero(texto: string): number | null {
+  if (texto.trim() === '') return 0;
+  const n = parseSpanishNumber(texto);
+  return Number.isInteger(n) && n >= 0 ? n : null;
+}
 
 /** Tabla de una escala (general o del ahorro) con los límites que trae data/fiscal. */
 function filasEscala(escala: { hasta: number; tipo: number }[]) {
@@ -89,14 +115,47 @@ export default function EstimadorIRPFPage() {
   const [aviso, setAviso] = useState('');
 
   const calcular = useCallback(() => {
-    const bruto = parseSpanishNumber(rendimientosTrabajo) || 0;
-    const capital = parseSpanishNumber(rendimientosCapital) || 0;
-    const retenciones = parseSpanishNumber(retencionesPracticadas) || 0;
-    const hijos = parseInt(numHijos) || 0;
-    const hijosM3 = parseInt(hijosMenores3) || 0;
+    const bruto = leerImporte(rendimientosTrabajo);
+    const capital = leerImporte(rendimientosCapital);
+    const retenciones = leerImporte(retencionesPracticadas);
+    const hijos = leerEntero(numHijos);
+    const hijosM3 = leerEntero(hijosMenores3);
 
     // Una entrada que no se puede estimar BORRA el resultado anterior: si no, la cifra de la
     // entrada previa seguía a la vista como si fuera de la nueva (hallazgo 1313).
+    const rechazar = (motivo: string) => {
+      setResultado(null);
+      setAviso(motivo);
+    };
+
+    // Un campo ilegible NO vale 0: hasta el 25/09/2026 `parseSpanishNumber(x) || 0` estimaba
+    // unas retenciones «4.928.70» como 0 € retenidos y daba la cuota entera a pagar, con el
+    // campo mostrando lo tecleado (hallazgo 1854).
+    if (bruto === null || capital === null || retenciones === null) {
+      const ilegibles = [
+        { valor: bruto, texto: rendimientosTrabajo, campo: 'Rendimientos del trabajo' },
+        { valor: capital, texto: rendimientosCapital, campo: 'Rendimientos del capital mobiliario' },
+        { valor: retenciones, texto: retencionesPracticadas, campo: 'Retenciones ya practicadas' },
+      ].filter((c) => c.valor === null);
+      rechazar(
+        `No se puede leer ${ilegibles.map((c) => `«${c.texto}» en «${c.campo}»`).join(' ni ')}. `
+        + 'Escribe el importe con coma decimal, por ejemplo 4928,70 o 4.928,70.',
+      );
+      return;
+    }
+
+    // Tampoco un número de hijos no entero: parseInt('0,5') daba 0 y el hijo se perdía sin
+    // aviso (hallazgo 1855). Cada hijo se cuenta entero; el prorrateo del mínimo entre los
+    // progenitores (art. 61.1.ª) lo aplica el motor según la situación, no una fracción de hijo.
+    if (hijos === null || hijosM3 === null) {
+      rechazar('El número de hijos tiene que ser un número entero (0, 1, 2…): cada hijo se cuenta entero.');
+      return;
+    }
+    if (hijosM3 > hijos) {
+      rechazar('No puede haber más hijos menores de 3 años que hijos a cargo.');
+      return;
+    }
+
     if (bruto <= 0 && capital <= 0) {
       setResultado(null);
       setAviso('Introduce unos rendimientos del trabajo o del capital mayores que 0 para estimar el IRPF.');
@@ -191,7 +250,7 @@ export default function EstimadorIRPFPage() {
               onChange={setRendimientosCapital}
               label="Rendimientos del capital mobiliario (opcional)"
               placeholder="0"
-              helperText={`Dividendos e intereses del año. Van a la base del ahorro, con su propia escala (del ${TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo} % al ${TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo} %)`}
+              helperText={`Dividendos e intereses del año. Van a la base del ahorro, con su propia escala (del ${tipoPct(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo)} al ${tipoPct(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo)})`}
               min={0}
             />
 
@@ -234,7 +293,7 @@ export default function EstimadorIRPFPage() {
                 label="Hijos menores de 3 años"
                 placeholder="0"
                 min={0}
-                max={parseInt(numHijos) || 0}
+                max={leerEntero(numHijos) ?? 0}
               />
             </div>
 
@@ -298,7 +357,7 @@ export default function EstimadorIRPFPage() {
                 <ResultCard
                   title="Tipo efectivo"
                   value={formatNumber(resultado.tipoEfectivo, 2)}
-                  unit="%"
+                  unit={`${NBSP}%`}
                   variant="info"
                   icon="📈"
                   description={resultado.baseImponibleAhorro > 0
@@ -354,7 +413,7 @@ export default function EstimadorIRPFPage() {
                           <tr key={i} className={styles.tramoAplicado}>
                             <td>{formatCurrency(t.desde)}</td>
                             <td>{t.hasta !== null ? formatCurrency(t.hasta) : 'En adelante'}</td>
-                            <td>{t.tipo}%</td>
+                            <td>{tipoPct(t.tipo)}</td>
                             <td>{formatCurrency(t.baseAplicada)}</td>
                             <td>{formatCurrency(t.cuota)}</td>
                           </tr>
@@ -408,7 +467,7 @@ export default function EstimadorIRPFPage() {
                             <tr key={i} className={styles.tramoAplicado}>
                               <td>{formatCurrency(t.desde)}</td>
                               <td>{t.hasta !== null ? formatCurrency(t.hasta) : 'En adelante'}</td>
-                              <td>{t.tipo}%</td>
+                              <td>{tipoPct(t.tipo)}</td>
                               <td>{formatCurrency(t.baseAplicada)}</td>
                               <td>{formatCurrency(t.cuota)}</td>
                             </tr>
@@ -466,7 +525,7 @@ export default function EstimadorIRPFPage() {
           o consulta con un asesor fiscal.
         </p>
         <p className={styles.disclaimerFecha}>
-          Datos verificados: {FISCAL_IRPF_META.verificado} | Ejercicio calculado: {EJERCICIO}
+          Datos verificados: {formatDate(parseISODateLocal(FISCAL_IRPF_META.verificado))} | Ejercicio calculado: {EJERCICIO}
         </p>
       </div>
 
@@ -530,7 +589,7 @@ export default function EstimadorIRPFPage() {
                 <tr key={t.desde}>
                   <td>{eur0(t.desde)}</td>
                   <td>{t.hasta !== null ? eur0(t.hasta) : 'En adelante'}</td>
-                  <td>{t.tipo} %</td>
+                  <td>{tipoPct(t.tipo)}</td>
                 </tr>
               ))}
             </tbody>
@@ -549,7 +608,7 @@ export default function EstimadorIRPFPage() {
                 <tr key={t.desde}>
                   <td>{eur0(t.desde)}</td>
                   <td>{t.hasta !== null ? eur0(t.hasta) : 'En adelante'}</td>
-                  <td>{t.tipo} %</td>
+                  <td>{tipoPct(t.tipo)}</td>
                 </tr>
               ))}
             </tbody>
@@ -579,14 +638,14 @@ export default function EstimadorIRPFPage() {
                     más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)} si del 2.º y siguientes
                     llegan más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}
                   </td>
-                  <td>Siempre si ingresos &gt;1.000 € (actividad económica)</td>
+                  <td>Siempre si ingresos &gt;1000 € (actividad económica)</td>
                   <td>Los mismos umbrales que el asalariado: la pensión es rendimiento del trabajo</td>
                   <td>Cada uno con su propio umbral si declaran por separado</td>
                 </tr>
                 <tr>
                   <td><strong>Cómo se retiene</strong></td>
                   <td>La empresa retiene automáticamente en nómina</td>
-                  <td>Clientes retienen 15 % (7 % primeros 3 años); pagos propios trimestrales (mod. 130)</td>
+                  <td>Clientes retienen 15&nbsp;% (7&nbsp;% primeros 3 años); pagos propios trimestrales (mod. 130)</td>
                   <td>La entidad que paga la pensión retiene según su cuantía</td>
                   <td>Cada empleador retiene según sus datos; riesgo de infra-retención</td>
                 </tr>
@@ -670,7 +729,7 @@ export default function EstimadorIRPFPage() {
                 <p><strong>Tipo efectivo:</strong> {pct(ESC_CASADA.tipoEfectivo)} de la base</p>
               </div>
               <div className={styles.escenarioTip}>
-                Si los dos progenitores declaran por separado, el mínimo por los hijos se reparte a partes iguales (art. 61.1.ª LIRPF): {eur((MINIMOS_IRPF_2025.hijo_1 + MINIMOS_IRPF_2025.hijo_2) / 2)} para cada uno, que le ahorran {eur(ESC_CASADA_SIN_HIJOS.cuotaIntegra - ESC_CASADA.cuotaIntegra)} de cuota. El mínimo no reduce la base: se le aplica la escala desde cero, así que se valora al {TRAMOS_IRPF_2025[0].tipo} % y no a su tipo marginal. En la calculadora corresponde a «Casado/a (dos ingresos)».
+                Si los dos progenitores declaran por separado, el mínimo por los hijos se reparte a partes iguales (art. 61.1.ª LIRPF): {eur((MINIMOS_IRPF_2025.hijo_1 + MINIMOS_IRPF_2025.hijo_2) / 2)} para cada uno, que le ahorran {eur(ESC_CASADA_SIN_HIJOS.cuotaIntegra - ESC_CASADA.cuotaIntegra)} de cuota. El mínimo no reduce la base: se le aplica la escala desde cero, así que se valora al {tipoPct(TRAMOS_IRPF_2025[0].tipo)} y no a su tipo marginal. En la calculadora corresponde a «Casado/a (dos ingresos)».
               </div>
             </div>
 
@@ -730,28 +789,35 @@ export default function EstimadorIRPFPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre tipo marginal y tipo efectivo?</h4>
               <p>
-                El <strong>tipo marginal</strong> es el porcentaje que se aplica al último euro que ganas (el del tramo más alto en el que entras). El <strong>tipo efectivo</strong> es el porcentaje real que pagas sobre toda tu base imponible. Por ejemplo, con una base de {eur0(FAQ_BASE)} tu tipo marginal es el {FAQ_MARGINAL} %, pero tu tipo efectivo es el {pct((FAQ_CUOTA / FAQ_BASE) * 100)} ({eur(FAQ_CUOTA)} de cuota, con el mínimo personal a tipo cero), porque los primeros tramos tributan a tipos menores.
+                El <strong>tipo marginal</strong> es el porcentaje que se aplica al último euro que ganas (el del tramo más alto en el que entras). El <strong>tipo efectivo</strong> es el porcentaje real que pagas sobre toda tu base imponible. Por ejemplo, con una base de {eur0(FAQ_BASE)} tu tipo marginal es el {tipoPct(FAQ_MARGINAL)}, pero tu tipo efectivo es el {pct((FAQ_CUOTA / FAQ_BASE) * 100)} ({eur(FAQ_CUOTA)} de cuota, con el mínimo personal a tipo cero), porque los primeros tramos tributan a tipos menores.
               </p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo afecta tener dos pagadores a la declaración?</h4>
               <p>
-                Cada pagador retiene en función de los datos que le has comunicado, sin saber que existe otro. Si el segundo pagador ingresó más de 1.500 € y no ajustaste la retención del primero mediante el <strong>modelo 145</strong>, lo más probable es que la declaración salga <strong>a pagar</strong>. La solución: comunicar al pagador principal los ingresos del segundo para que aumente la retención durante el año.
+                Cada pagador retiene en función de los datos que le has comunicado, sin saber que existe otro. Si el segundo pagador ingresó más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)} y no ajustaste la retención del primero mediante el <strong>modelo 145</strong>, lo más probable es que la declaración salga <strong>a pagar</strong>. La solución: comunicar al pagador principal los ingresos del segundo para que aumente la retención durante el año.
               </p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Puedo deducir el plan de pensiones?</h4>
               <p>
-                Sí. Las aportaciones a planes de pensiones reducen directamente la <strong>base imponible general</strong>. El límite individual es <strong>1.500 € anuales</strong> (desde 2023). Si tu empresa también aporta, el límite conjunto sube a <strong>10.000 € anuales</strong> (1.500 € individuales + hasta 8.500 € empresa). Esta reducción se aplica antes de calcular la cuota, por lo que el ahorro fiscal real depende de tu tipo marginal (19–47 %).
+                Sí. Las aportaciones a planes de pensiones reducen directamente la <strong>base imponible general</strong>. El límite individual es <strong>{eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} anuales</strong> (desde 2022, art. 52.1 LIRPF). Si tu empresa también aporta, el límite conjunto sube a <strong>{eur0(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)} anuales</strong> ({eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} individuales + hasta {eur0(LIMITES_PLAN_PENSIONES_2025.limiteEmpresaAnual)} de contribuciones de la empresa o de tus aportaciones al mismo plan de empleo). Esta reducción se aplica antes de calcular la cuota, por lo que el ahorro fiscal real depende de tu tipo marginal ({TRAMOS_IRPF_2025[0].tipo}–{tipoPct(TRAMOS_IRPF_2025[TRAMOS_IRPF_2025.length - 1].tipo)}).
               </p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es la deducción por maternidad y cuánto es?</h4>
               <p>
-                Es una deducción en cuota (no en base) de hasta <strong>1.200 € anuales</strong> (100 €/mes) por cada hijo menor de 3 años para madres trabajadoras que coticen a la SS. Puede cobrarse de forma anticipada mensualmente (100 €/mes) o bien deducirlo en la declaración anual. Si tienes gastos de custodia en guardería pública o autorizada, la deducción puede ampliarse hasta <strong>1.000 € adicionales</strong>.
+                Es una deducción en la cuota diferencial (no en la base) de hasta <strong>{eur0(DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo)} anuales</strong> ({eur0(DEDUCCION_MATERNIDAD_IRPF.importeMensualPorHijo)} al mes) por cada hijo menor de 3 años que te dé derecho al mínimo por descendientes. Desde 2023 (art. 81.1 LIRPF, en la redacción de la Ley 31/2022) no hace falta estar trabajando: basta con una de estas situaciones:{' '}
+                {DEDUCCION_MATERNIDAD_IRPF.situacionesConDerecho.map((s, i, todas) => (
+                  <span key={s.id}>
+                    {i > 0 && (i === todas.length - 1 ? ' o ' : ', ')}
+                    {s.titulo.charAt(0).toLowerCase() + s.titulo.slice(1)}
+                  </span>
+                ))}
+                . Estar en paro cobrando la prestación o el subsidio de desempleo cuando nace el menor ya da derecho. Puede cobrarse por anticipado cada mes ({DEDUCCION_MATERNIDAD_IRPF.anticipado.formulario.toLowerCase()}) o deducirse en la declaración anual. Si pagas guardería o centro de educación infantil autorizado, se amplía hasta <strong>{eur0(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)} adicionales</strong> por hijo, sin superar lo pagado.
               </p>
             </div>
 
@@ -843,7 +909,7 @@ export default function EstimadorIRPFPage() {
               <div className={styles.stepContent}>
                 <h4>Confirmar, domiciliar o fraccionar el pago</h4>
                 <p>
-                  Si sale a devolver, recibirás el importe en tu cuenta en 4–8 semanas. Si sale a pagar, puedes <strong>domiciliar el pago hasta el 25 de junio</strong> (cargo el 30 de junio) o <strong>fraccionar en dos plazos</strong>: 60 % en junio y el 40 % restante el 5 de noviembre, sin recargo ni intereses. El fraccionamiento es automático si lo marcas al confirmar.
+                  Si sale a devolver, recibirás el importe en tu cuenta en 4–8 semanas. Si sale a pagar, puedes <strong>domiciliar el pago hasta el 25 de junio</strong> (cargo el 30 de junio) o <strong>fraccionar en dos plazos</strong>: 60&nbsp;% en junio y el 40&nbsp;% restante el 5 de noviembre, sin recargo ni intereses. El fraccionamiento es automático si lo marcas al confirmar.
                 </p>
               </div>
             </div>
@@ -868,7 +934,7 @@ export default function EstimadorIRPFPage() {
               <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <h4>Con dos pagadores, ajusta la retención durante el año</h4>
               <p>
-                Si el segundo pagador te paga más de 1.500 € anuales, comunica esa situación a tu pagador principal mediante el <strong>modelo 145</strong>. Así ajustará la retención al alza y evitarás una sorpresa en junio. Es mucho mejor que afrontar un pago inesperado de 500–1.500 € en junio.
+                Si el segundo pagador te paga más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)} anuales, comunica esa situación a tu pagador principal mediante el <strong>modelo 145</strong>. Así ajustará la retención al alza y evitarás una sorpresa en junio. Es mucho mejor que afrontar un pago inesperado en junio.
               </p>
             </div>
 
@@ -876,7 +942,7 @@ export default function EstimadorIRPFPage() {
               <span className={styles.tipIcon} aria-hidden="true">💼</span>
               <h4>Aporta al plan de pensiones antes del 31 de diciembre</h4>
               <p>
-                Las aportaciones reducen la base imponible directamente: con tipo marginal del 30 %, cada 1.000 € aportados suponen <strong>300 € menos de IRPF</strong>. El límite individual es 1.500 €/año. Si tu empresa también aporta, el límite conjunto es 10.000 €. Las aportaciones del cónyuge (hasta 1.000 €) también reducen tu base si sus rentas son inferiores a 8.000 €. Importante: el plan de pensiones difiere la tributación, no la elimina. Al rescatar, el importe tributa íntegro como rendimiento del trabajo. El ahorro real depende de la diferencia entre tu tipo marginal actual y el de la jubilación.
+                Las aportaciones reducen la base imponible directamente: con tipo marginal del {tipoPct(PLAN_MARGINAL)}, cada {eur0(PLAN_APORTACION)} aportados suponen <strong>{eur0((PLAN_APORTACION * PLAN_MARGINAL) / 100)} menos de IRPF</strong>. El límite individual es {eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)}/año. Si tu empresa también aporta, el límite conjunto es {eur0(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)}. Si tu cónyuge no tiene rendimientos netos del trabajo ni de actividades económicas, o suman menos de {eur0(APORTACIONES_PLAN_CONYUGE.rendimientosMaximosConyuge)} al año, lo que tú aportes a <strong>su</strong> plan de pensiones también reduce tu base, hasta {eur0(APORTACIONES_PLAN_CONYUGE.limiteAnual)} al año (art. 51.7 LIRPF). Importante: el plan de pensiones difiere la tributación, no la elimina. Al rescatar, el importe tributa íntegro como rendimiento del trabajo. El ahorro real depende de la diferencia entre tu tipo marginal actual y el de la jubilación.
               </p>
             </div>
 
@@ -922,13 +988,13 @@ export default function EstimadorIRPFPage() {
                 <strong>Olvidar declarar cuentas o inmuebles en el extranjero.</strong> Si tienes cuentas bancarias, inmuebles o valores en el extranjero con saldo superior a 50.000 €, debes presentar el modelo 720. Tras la STJUE de 27/01/2022 y la Ley 5/2022, el régimen sancionador se ajustó al régimen general de la LGT; consulta el detalle vigente en la AEAT.
               </li>
               <li>
-                <strong>No declarar el alquiler de tu vivienda (o segunda residencia).</strong> La AEAT cruza datos con los inquilinos: si tu inquilino se aplica una deducción por alquiler, declara tu NIF, y si tú no declaras los ingresos, Hacienda detectará la discrepancia. Si lo regularizas tú antes de que te lo pida, pagas la cuota más un recargo del 1 % y otro 1 % por cada mes completo de retraso, que pasa a ser del 15 % más intereses de demora pasados 12 meses (art. 27 LGT); si llega antes Hacienda, la cuota va con intereses y sanción.
+                <strong>No declarar el alquiler de tu vivienda (o segunda residencia).</strong> La AEAT cruza datos con los inquilinos: si tu inquilino se aplica una deducción por alquiler, declara tu NIF, y si tú no declaras los ingresos, Hacienda detectará la discrepancia. Si lo regularizas tú antes de que te lo pida, pagas la cuota más un recargo del 1&nbsp;% y otro 1&nbsp;% por cada mes completo de retraso, que pasa a ser del 15&nbsp;% más intereses de demora pasados 12 meses (art. 27 LGT); si llega antes Hacienda, la cuota va con intereses y sanción.
               </li>
               <li>
                 <strong>Ignorar la exención por reinversión en vivienda habitual al vender.</strong> Si vendes tu vivienda habitual y reinviertes el total en otra en el plazo de <strong>2 años</strong>, la ganancia patrimonial queda exenta de IRPF. Si no lo declaras correctamente (aunque no debas pagar), la AEAT puede considerar que no has aplicado la exención correctamente.
               </li>
               <li>
-                <strong>No fraccionar el pago si la cuota es alta.</strong> Si la declaración sale a pagar más de 1.000 € y no tienes liquidez inmediata, el fraccionamiento automático (60 % en junio + 40 % en noviembre) <strong>no tiene coste ni recargo</strong>. Presentarla en plazo sin pagar sí genera recargos del periodo ejecutivo: del 5 %, 10 % o 20 % según cuándo acabes pagando (art. 28 LGT).
+                <strong>No fraccionar el pago si la cuota es alta.</strong> Si la declaración sale a pagar más de 1000 € y no tienes liquidez inmediata, el fraccionamiento automático (60&nbsp;% en junio + 40&nbsp;% en noviembre) <strong>no tiene coste ni recargo</strong>. Presentarla en plazo sin pagar sí genera recargos del periodo ejecutivo: del 5&nbsp;%, 10&nbsp;% o 20&nbsp;% según cuándo acabes pagando (art. 28 LGT).
               </li>
               <li>
                 <strong>Presentar fuera de plazo aunque salga a devolver.</strong> Presentar la declaración después del 30 de junio, aunque el resultado sea a devolver, si estabas obligado a presentarla puede conllevar una <strong>multa de 200 €</strong>, que se queda en la mitad —100 €— si la presentas antes de que Hacienda te la requiera (art. 198 LGT). No existe ventaja fiscal en retrasar una declaración a devolver.

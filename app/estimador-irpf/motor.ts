@@ -78,7 +78,10 @@ export interface ResultadoIRPF {
   gastosDeducibles: number;
   rendimientoNetoTrabajo: number;
   reduccionTrabajo: number;
-  /** La reducción del art. 20 se pierde por tener más de 6.500 € de otras rentas. */
+  /**
+   * La reducción del art. 20 se pierde por tener más de 6.500 € de otras rentas. Solo es
+   * `true` si sin ellas habría reducción: no se pierde lo que no se tenía.
+   */
   reduccionPerdidaPorOtrasRentas: boolean;
   baseImponibleGeneral: number;
   baseImponibleAhorro: number;
@@ -173,7 +176,11 @@ export function estimarIRPF(e: EntradaIRPF): ResultadoIRPF {
   });
   const gastosDeducibles = rendimiento.otrosGastos;
   const rendimientoNetoTrabajo = rendimiento.rendimientoNeto;
-  const reduccionPerdidaPorOtrasRentas = rendimiento.reduccionPerdidaPorOtrasRentas;
+  // El aviso de la reducción perdida solo tiene sentido si, sin esas otras rentas, la habría:
+  // con 0 € de trabajo, o con un rendimiento por encima del último tramo, no había nada que
+  // perder y la nota del desglose hablaba de una reducción inexistente (sospecha del 25/09/2026).
+  const reduccionSinOtrasRentas = calcularRendimientoNetoTrabajo({ integros: bruto, gastosAaE: ssAnual }).reduccion;
+  const reduccionPerdidaPorOtrasRentas = rendimiento.reduccionPerdidaPorOtrasRentas && reduccionSinOtrasRentas > 0;
   const reduccionTrabajo = rendimiento.reduccion;
 
   const baseImponibleGeneral = rendimiento.rendimientoNetoReducido;
