@@ -180,6 +180,12 @@
   --primary-hover: #D9BBFA;
   --secondary: #A855F7;
   --accent: #C99BF5;
+
+  /* El -texto del claro (#6B21A8 / #8B3BD1) cae a ~2:1 sobre el fondo oscuro, y este bloque gana
+     por orden al [data-theme='dark'] general: sin redeclararlo, todo texto de marca del
+     portal era ilegible en oscuro (25/09/2026). Medidos sobre #1A1A1A · #2D2D2D · #333333. */
+  --primary-texto: #C99BF5;   /* 7,87 · 6,22 · 5,71 */;
+  --secondary-texto: #BE8AF3; /* 6,73 · 5,32 · 4,88 */;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -211,6 +217,12 @@
   --primary-hover: #9DC97E;
   --secondary: #6F9A50;
   --accent: #F0B868;
+
+  /* El -texto del claro (#4F7A3A / #5E7547) cae a ~2:1 sobre el fondo oscuro, y este bloque gana
+     por orden al [data-theme='dark'] general: sin redeclararlo, todo texto de marca del
+     portal era ilegible en oscuro (25/09/2026). Medidos sobre #1A1A1A · #2D2D2D · #333333. */
+  --primary-texto: #8FB36B;   /* 7,32 · 5,79 · 5,31 */;
+  --secondary-texto: #7FAA5C; /* 6,47 · 5,12 · 4,70 */;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -244,6 +256,12 @@
   --primary-hover: #E9B488;
   --secondary: #C9742E;
   --accent: #F6C27A;
+
+  /* El -texto del claro (#A24B2A / #9E5A22) cae a ~2:1 sobre el fondo oscuro, y este bloque gana
+     por orden al [data-theme='dark'] general: sin redeclararlo, todo texto de marca del
+     portal era ilegible en oscuro (25/09/2026). Medidos sobre #1A1A1A · #2D2D2D · #333333. */
+  --primary-texto: #E0A06A;   /* 7,80 · 6,17 · 5,66 */;
+  --secondary-texto: #D98A4A; /* 6,37 · 5,04 · 4,62 */;
 }
 
 /* Bajo un dominio vertical (data-brand presente) ocultamos elementos pensados
