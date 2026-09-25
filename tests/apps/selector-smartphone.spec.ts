@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, devices } from '@playwright/test';
 
 /**
  * Asesor de Smartphone (selector-smartphone) — inspección del 20/09/2026
@@ -437,4 +437,431 @@ test('el hero del resultado usa --hero-bg y su texto llega al contraste mínimo 
     expect(await contrasteMinimo(page, '[class*="heroResultados"] p'), `subtítulo, ${tema}`).toBeGreaterThanOrEqual(4.5);
     expect(await contrasteMinimo(page, '[class*="heroResultados"] h1'), `h1, ${tema}`).toBeGreaterThanOrEqual(3);
   }
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 25/09/2026
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// El motor ya no vive en page.tsx: está en `app/selector-smartphone/motor.ts` desde 4fe972a2.
+// Sus reglas, que es de donde sale cada valor esperado de abajo:
+//
+//   puntosiOS       P4 «Sí, varios» +3 · «Alguno» +1 · P5 macOS +2 · Windows −1 → iOS si ≥ 3
+//   puntosGamaAlta  P1 foto +2 · trabajo +1 · P2 intenso +2 · «Con frecuencia» +1
+//                   P3 >7 h +2 · 4-7 h +1 · P6 cámara +2 · rendimiento +1 · P7 «4 años o más» +2
+//                   ≥ 7 pro · ≥ 4 alta · ≥ 1 media · resto básica   (el presupuesto YA NO suma)
+//   TOPE            «Hasta 250 €» básica · «250 – 500 €» media · «500 – 900 €» alta · «Más de 900 €» pro
+//                   recorta si la del perfil es MAYOR que el tope (igual no es recorte)
+//   AMPLÍA          solo «Más de 900 €» con un perfil que no llega a pro
+//
+// Todos los valores esperados se resolvieron a mano ANTES de abrir el navegador.
+
+/** Recorre el test tocando (móvil) en vez de pulsar. */
+async function responderTocando(page: Page, perfil: Perfil): Promise<void> {
+  for (let i = 0; i < perfil.length; i++) {
+    await page.locator('[role="radiogroup"] [role="radio"]', { hasText: perfil[i] }).first().tap();
+    await page
+      .getByRole('button', { name: i === perfil.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' })
+      .tap();
+  }
+}
+
+/** Los textos de un bloque de la pantalla de resultado, en orden. */
+async function textos(page: Page, clase: string): Promise<string[]> {
+  return page
+    .locator(`[class*="${clase}"]`)
+    .evaluateAll((els) => els.map((e) => (e.textContent ?? '').replace(/\s+/g, ' ').trim()));
+}
+
+// P1 trabajo +1 · P2 casual 0 · P3 4-7 h +1 · P6 rendimiento +1 · P7 4 años o más +2 = 5 → alta.
+// P4 «No, ninguno» y P5 Linux: puntosiOS 0 → Android. Tope de «500 – 900 €» = alta: sin recorte.
+const INTERMEDIO: Perfil = [
+  'Trabajo y productividad', 'Casual', '4 – 7 horas', 'No, ninguno', 'Linux',
+  'Rendimiento fluido', '4 años o más', 'Compacto', 'Dispuesto a pagar por calidad', 'Tal vez',
+];
+// P1 foto +2 · P2 intenso +2 · P3 4-7 h +1 · P6 cámara +2 · P7 2-3 años 0 = 7 → pro (umbral justo).
+// P4 «Sí, varios» +3 · P5 macOS +2 = 5 → iOS. Tope de «Hasta 250 €» = básica: recorta de pro a básica.
+const EXIGENTE_APPLE_250: Perfil = [
+  'Fotografía y vídeo', 'Gaming intenso', '4 – 7 horas', 'Sí, varios', 'macOS',
+  'Cámara de calidad', '2 – 3 años', 'Pantalla grande', 'Precio mínimo', 'No, prefiero nuevo',
+];
+// Frontera alta/media. P1 foto +2 · P6 cámara +2 = 4 → alta (el umbral es ≥ 4)…
+const FRONTERA_4: Perfil = [
+  'Fotografía y vídeo', 'No juego o muy poco', 'Menos de 2 horas', 'No, ninguno', 'Linux',
+  'Cámara de calidad', '1 – 2 años', 'Me da igual', 'Dispuesto a pagar por calidad', 'Sí, con garantía',
+];
+// …y cambiando SOLO P1 a trabajo (+1): 3 → media.
+const FRONTERA_3: Perfil = ['Trabajo y productividad', ...FRONTERA_4.slice(1)] as unknown as Perfil;
+
+test.describe('re-inspección 25/09/2026 · casos resueltos a mano', () => {
+  test('caso normal: perfil intermedio con 500 – 900 € → Android, gama alta, sin aviso y el pliego de su perfil', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, INTERMEDIO);
+    await leerResultado(page);
+
+    expect(await textos(page, 'recomendacionValor')).toEqual(['Android', 'Gama alta']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('Precio orientativo: 500 – 900 €');
+    // alta = tope de alta: no es recorte, y no se amplía (el tramo no es «Más de 900 €").
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(0);
+    expect(await textos(page, 'razonItem')).toEqual([
+      'Android ofrece más variedad de modelos, marcas y precios que se adaptan a cualquier necesidad.',
+      'Mayor libertad de personalización y compatibilidad con ecosistemas no Apple (Google, Microsoft…).',
+      'La gama alta te ofrece cámaras con teleobjetivo, pantallas de 120 Hz y rendimiento sólido sin llegar al precio máximo.',
+      'Buscar modelos con varios años de actualizaciones garantizadas prolonga la vida útil del dispositivo.',
+    ]);
+    // Consejos: «Tal vez» → reacondicionado · «4 años o más» → ficha técnica · batería siempre.
+    // Sin 🛒 (solo tramos bajo y medio) ni 📷 (no pidió cámara).
+    const consejos = await textos(page, 'consejoItem');
+    expect(consejos.map((c) => c.split(' ')[0])).toEqual(['💡', '📅', '🔋']);
+    expect(await textos(page, 'caracteristicaItem')).toEqual([
+      '🔄 Actualizaciones del sistema operativo garantizadas: mínimo 5 años desde la compra', // largo y no es entrada
+      '🔋 Batería ≥ 4.500 mAh con carga rápida ≥ 30 W', // 4-7 h
+      '⚡ Procesador de gama alta de la generación más reciente disponible', // «Rendimiento fluido»
+      '🖥️ Pantalla con tasa de refresco ≥ 120 Hz',
+      '💾 RAM ≥ 8 GB',
+      "📐 Formato compacto: pantalla ≤ 6,2'' (evita las variantes «Plus», «XL» o «Ultra»)",
+      '📡 NFC para pagos sin contacto (verifica disponibilidad en tu región)',
+      '📶 Conectividad 5G',
+      '💾 Almacenamiento interno ≥ 256 GB (o ≥ 128 GB con ranura microSD)',
+    ]);
+  });
+
+  test('caso límite: exigente (7 puntos, pro) con «Hasta 250 €» → manda el presupuesto, y lo dice', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, EXIGENTE_APPLE_250);
+    await leerResultado(page);
+
+    expect(await textos(page, 'recomendacionValor')).toEqual(['iPhone (iOS)', 'Gama básica']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('Precio orientativo: 100 – 250 €');
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveText(
+      '💶 Tu uso apuntaba a la gama pro / flagship (900 – 1.500+ €), pero la recomendación se ajusta al presupuesto que has declarado. Lo que sigue es lo mejor que cabe en tu tramo.',
+    );
+    const razones = await textos(page, 'razonItem');
+    expect(razones[2]).toBe(
+      'Tus respuestas sobre uso apuntaban a la gama pro o flagship, pero has declarado un presupuesto hasta 250 €: manda el presupuesto, así que la recomendación se ajusta a lo que cabe en ese tramo.',
+    );
+    // «No, prefiero nuevo» + recorte → ♻️ · tramo bajo → 🛒 · cámara → 📷 · batería siempre.
+    expect((await textos(page, 'consejoItem')).map((c) => c.split(' ')[0])).toEqual(['♻️', '🛒', '📷', '🔋']);
+    // El pliego, escrito para la gama FINAL (básica), no para la del perfil.
+    expect(await textos(page, 'caracteristicaItem')).toEqual([
+      '🔄 Actualizaciones del sistema operativo garantizadas: mínimo 3 años',
+      '🔋 Batería ≥ 4.500 mAh con carga rápida ≥ 30 W',
+      '📷 Cámara principal con estabilización óptica si la encuentras: en este tramo no hay teleobjetivo, y el zoom será digital',
+      '⚡ El procesador más potente que encuentres en este tramo; para juegos exigentes tendrás que bajar la calidad gráfica',
+      '🖥️ Pantalla de 90 Hz si la hay: los 120 Hz empiezan en la gama media',
+      "📐 Pantalla ≥ 6,5'' con tecnología AMOLED o equivalente",
+      '📡 NFC para pagos sin contacto (verifica disponibilidad en tu región)',
+      '📶 Conectividad 5G: en este tramo no está en todos los modelos, compruébalo en la ficha',
+      '💾 Almacenamiento interno ≥ 128 GB',
+    ]);
+  });
+
+  test('caso frontera: 4 puntos es gama alta y 3 es media, y un tope igual a la gama no es recorte', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirTest(page);
+    await responder(page, FRONTERA_4);
+    await leerResultado(page);
+    expect(await textos(page, 'recomendacionValor')).toEqual(['Android', 'Gama alta']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('Precio orientativo: 500 – 900 €');
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(0);
+    expect((await textos(page, 'razonItem'))[2]).toBe(
+      'La gama alta te ofrece cámaras con teleobjetivo, pantallas de 120 Hz y rendimiento sólido sin llegar al precio máximo.',
+    );
+
+    await abrirTest(page);
+    await responder(page, FRONTERA_3);
+    await leerResultado(page);
+    expect(await textos(page, 'recomendacionValor')).toEqual(['Android', 'Gama media']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('Precio orientativo: 250 – 500 €');
+    // Con 500 – 900 € y un perfil de media no hay aviso: solo «Más de 900 €» amplía.
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(0);
+    expect((await textos(page, 'razonItem'))[2]).toBe(
+      'La gama media actual es notable: procesadores rápidos, cámaras decentes y autonomía de todo el día.',
+    );
+  });
+
+  test('robustez: volver de la 10 a la 9 y bajar el presupuesto recalcula con la respuesta NUEVA', async ({ page }) => {
+    // FRONTERA_4 (alta por perfil) hasta la pregunta 10, y desde ahí «Anterior» y «250 – 500 €».
+    // Esperado: 4 puntos → alta > tope media → recorte a media, con el aviso que cita la alta.
+    await abrirTest(page);
+    for (let i = 0; i < 10; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]', { hasText: FRONTERA_4[i] }).first().click();
+      if (i < 9) await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await page.getByRole('button', { name: 'Pregunta anterior' }).click();
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveText(/500 – 900 €/);
+    await page.locator('[role="radiogroup"] [role="radio"]', { hasText: 'Relación calidad-precio óptima' }).click();
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    // La 10 conserva lo que ya se había contestado.
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveText(/Sí, con garantía/);
+    await page.getByRole('button', { name: 'Ver resultado' }).click();
+    await leerResultado(page);
+
+    expect(await textos(page, 'recomendacionValor')).toEqual(['Android', 'Gama media']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('Precio orientativo: 250 – 500 €');
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toContainText('Tu uso apuntaba a la gama alta (500 – 900 €)');
+    expect((await textos(page, 'razonItem'))[2]).toContain('has declarado un presupuesto de 250 a 500 €');
+    // «Sí, con garantía» → 💡 · tramo medio → 🛒 (no estaba con 500 – 900 €) · cámara → 📷 · 🔋.
+    expect((await textos(page, 'consejoItem')).map((c) => c.split(' ')[0])).toEqual(['💡', '🛒', '📷', '🔋']);
+    expect(await textos(page, 'caracteristicaItem')).toContain('📷 Cámara principal con apertura ≤ f/1,9 y modo noche incluido');
+  });
+
+  test('robustez: «Repetir el test» sin recargar vuelve a cero y no arrastra el aviso anterior', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirTest(page);
+    await responder(page, EXIGENTE_APPLE_250); // deja un aviso de recorte en pantalla
+    await leerResultado(page);
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(1);
+
+    await page.getByRole('button', { name: 'Repetir el test' }).click();
+    await page.getByRole('button', { name: /Empezar el test/ }).click();
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await expect(page.locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '0');
+    // Ninguna pregunta llega con una respuesta de la vuelta anterior.
+    for (let i = 0; i < 10; i++) {
+      await expect(page.locator('[role="radio"][aria-checked="true"]'), `pregunta ${i + 1}`).toHaveCount(0);
+      await expect(
+        page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }),
+      ).toBeDisabled();
+      await page.locator('[role="radiogroup"] [role="radio"]', { hasText: FRONTERA_3[i] }).first().click();
+      await page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+    }
+    await leerResultado(page);
+    // FRONTERA_3: 3 puntos → media, 500 – 900 € → sin recorte. Nada de iPhone ni del aviso de antes.
+    expect(await textos(page, 'recomendacionValor')).toEqual(['Android', 'Gama media']);
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(0);
+  });
+
+  test.fail('iPhone con presupuesto de gama básica: no hay iPhone nuevo en ese tramo y la app no lo dice', async ({ page }) => {
+    // HALLAZGO ABIERTO. El sistema operativo se decide solo con P4 y P5; el presupuesto no lo
+    // mira nunca. Resultado: «iPhone (iOS)» junto a «Gama básica · 100 – 250 €» a quien acaba de
+    // responder «No, prefiero nuevo», y el iPhone nuevo más barato de apple.com/es es el iPhone 17e,
+    // «Desde 859,00 €» (consultado el 25/09/2026). Barrido del motor: 91.392 de los 147.456
+    // perfiles que salen iOS (62 %) reciben gama básica o media, 30.464 de ellos con «prefiero
+    // nuevo». Debería: o avisar de que en ese tramo solo hay iPhone reacondicionado / ninguno
+    // nuevo, o no proponer iPhone nuevo donde no existe.
+    await abrirTest(page);
+    await responder(page, EXIGENTE_APPLE_250);
+    const texto = await leerResultado(page);
+    expect(texto).toContain('iPhone (iOS)');
+    expect(texto).toContain('Precio orientativo: 100 – 250 €');
+    expect(texto, 'la pantalla dice algo del precio real del iPhone en ese tramo').toMatch(
+      /iPhone[^.]{0,160}(nuevo|reacondicionad)/i,
+    );
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Invariante de la familia, con TECLADO (el testigo de familia solo hace clic)
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('re-inspección 25/09/2026 · teclado', () => {
+  test('Espacio marca el radio con el foco, Tab pasa al siguiente, y sigue habiendo uno solo marcado', async ({ page }) => {
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.nth(0).focus();
+    await page.keyboard.press('Space');
+    await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('Tab');
+    await expect(radios.nth(1)).toBeFocused();
+    await page.keyboard.press('Space');
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
+    await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'false');
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(1);
+    // Y Enter en «Siguiente» avanza con la respuesta dada por teclado.
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
+    await expect(page.locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '1');
+  });
+
+  test.fail('las flechas no mueven la selección dentro del radiogroup', async ({ page }) => {
+    // HALLAZGO ABIERTO (bajo). Un role="radio" promete el teclado del patrón de radios (WAI-ARIA
+    // APG): flecha abajo/derecha lleva el foco a la opción siguiente y la marca, y el grupo es UNA
+    // parada de Tab. Aquí son <button> sueltos: las flechas no hacen nada y cada opción es una
+    // parada de Tab. Medido: ArrowDown y ArrowRight sobre «Uso básico» → el foco no se mueve y no
+    // se marca nada. Mismo armazón en las 11 hermanas.
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.nth(0).focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
+  });
+
+  test.fail('tras «Siguiente» el foco se cae a <body> y el Tab salta a «Apps relacionadas»', async ({ page }) => {
+    // HALLAZGO ABIERTO (medio). «Siguiente» se desactiva en cuanto llega la pregunta nueva (aún
+    // sin responder) y el foco, que estaba en él, cae a <body>. El siguiente Tab sale DESPUÉS del
+    // cuestionario: primera tarjeta de «Apps relacionadas». Medido: 18 Tab para volver a la
+    // primera opción, en cada una de las 9 transiciones. Debería quedar dentro de la pregunta
+    // nueva (su enunciado o su primera opción). Mismo armazón en las 11 hermanas.
+    await abrirTest(page);
+    await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
+    const dentro = await page.evaluate(() => !!document.activeElement?.closest('[class*="testContainer"]'));
+    expect(dentro, 'el foco sigue dentro del cuestionario').toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Móvil: invariante de familia con toques y la pantalla a la que se llega
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('re-inspección 25/09/2026 · móvil (Pixel 7)', () => {
+  test.use({
+    viewport: { width: 412, height: 839 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('con toques: un solo radio marcado y la barra pinta en píxeles lo que anuncia, en las 10 preguntas', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-smartphone/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    const barra = page.locator('[role="progressbar"]');
+    for (let i = 0; i < 10; i++) {
+      await expect(page.getByText(`Pregunta ${i + 1} de 10`).first()).toBeVisible();
+      // Anunciado: (valuenow − valuemin) / (valuemax − valuemin) = i / 10.
+      const [ahora, min, max] = await Promise.all(
+        ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'].map(async (a) => Number(await barra.getAttribute(a))),
+      );
+      expect((ahora - min) / (max - min), `anunciado en la pregunta ${i + 1}`).toBeCloseTo(i / 10, 6);
+      await expect
+        .poll(() => barra.evaluate((el) => (el.firstElementChild as HTMLElement).getBoundingClientRect().width / el.clientWidth))
+        .toBeCloseTo(i / 10, 2);
+      const radios = page.locator('[role="radiogroup"] [role="radio"]');
+      await radios.nth(1).tap();
+      await radios.nth(0).tap();
+      await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(1);
+      await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }).tap();
+    }
+    await page.getByRole('heading', { name: 'Tu smartphone ideal' }).waitFor();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  });
+
+  test.fail('al tocar «Ver resultado» la recomendación queda dos pantallas por encima y el foco en <body>', async ({ page }) => {
+    // HALLAZGO ABIERTO (medio). El resultado sustituye al cuestionario en el sitio y la página
+    // se queda desplazada: en un Pixel 7 se aterriza en scrollY 2.576, viendo el final de los
+    // consejos, «Repetir el test», la guía y «Apps relacionadas»; las tarjetas de sistema y gama
+    // quedan 1.912 px por ENCIMA del borde superior. El foco cae a <body>. Las otras diez hermanas
+    // llevan el foco al encabezado del resultado (tituloResultado.current?.focus()); la app de
+    // referencia no. Debería verse el encabezado «Tu smartphone ideal» al llegar.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-smartphone/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await responderTocando(page, FRONTERA_4);
+    const titulo = page.getByRole('heading', { name: 'Tu smartphone ideal' });
+    await titulo.waitFor();
+    await expect(titulo).toBeInViewport({ timeout: 2_000 });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Contraste fuera del hero, y lo que se sirve a buscadores
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.fail('botones de marca y textos pequeños en --primary no llegan a 4,5:1', async ({ page }) => {
+  // HALLAZGO ABIERTO (medio). Medido sobre el fondo computado, con la función de arriba:
+  //   «Empezar el test →» (16,8 px/600, blanco sobre el degradado --primary→--secondary)
+  //       3,21:1 en claro · 2,42:1 en oscuro
+  //   «Siguiente →» (14,4 px/600, mismo degradado)            3,26:1 claro · 2,45:1 oscuro
+  //   «Pregunta N de 10» (13,6 px/600, --primary sobre #FAFAFA)   3,93:1 claro
+  //   «Por qué esta recomendación» (14,4 px/700, --primary)       3,67:1 claro
+  //   «← Repetir el test» (15,2 px/600, --primary)                3,93:1 claro
+  // Ninguno es texto grande: todos exigen 4,5:1. Es la forma que se reparó en las hermanas con
+  // --primary-boton / --primary-texto (mascota 1343, portátil 1414 y 1419); en la app de
+  // referencia sigue igual.
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+  await page.goto('/selector-smartphone/');
+  await esperarHidratacionBotones(page);
+  const medidas: Record<string, number> = {};
+  medidas['Empezar, claro'] = await contrasteMinimo(page, '[class*="btnStart"]');
+  await page.getByRole('button', { name: /Empezar el test/ }).click();
+  await page.locator('[role="radio"]').first().click();
+  medidas['Pregunta N de 10, claro'] = await contrasteMinimo(page, '[class*="progresoPaso"]');
+  medidas['Siguiente, claro'] = await contrasteMinimo(page, '[class*="btnSiguiente"]');
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => !(a instanceof CSSTransition) || a.playState !== 'running'));
+  medidas['Siguiente, oscuro'] = await contrasteMinimo(page, '[class*="btnSiguiente"]');
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+  await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+  // Preguntas 2 a 10 (la 1 ya está respondida): 0 puntos → básica con «Hasta 250 €», sin aviso.
+  const resto: string[] = ['No juego o muy poco', 'Menos de 2 horas', 'No, ninguno', 'Linux', 'Batería larga',
+    '1 – 2 años', 'Me da igual', 'Precio mínimo', 'Sí, con garantía'];
+  for (let i = 0; i < resto.length; i++) {
+    await page.locator('[role="radiogroup"] button', { hasText: resto[i] }).first().click();
+    await page.getByRole('button', { name: i === 8 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+  }
+  await leerResultado(page);
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => !(a instanceof CSSTransition) || a.playState !== 'running'));
+  medidas['Por qué esta recomendación, claro'] = await contrasteMinimo(page, '[class*="razonesTitulo"]');
+  medidas['Repetir el test, claro'] = await contrasteMinimo(page, '[class*="btnRepetir"]');
+  const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5).map(([k, r]) => `${k}: ${r.toFixed(2)}:1`);
+  expect(bajos, 'textos por debajo de 4,5:1').toEqual([]);
+});
+
+test.fail('el HTML servido sigue prometiendo «modelos de referencia» (hallazgo 946, reparado a medias)', async ({ page }) => {
+  // HALLAZGO ABIERTO (medio). El test de arriba busca 'Modelos de referencia' con mayúscula y
+  // pasa; en minúscula sigue en DOS de los cuatro sitios del acta del 20/09: og:description
+  // («sistema operativo, gama y modelos de referencia») y la meta schema:WebApplication
+  // («Incluye modelos de referencia actualizados»). La app no da ningún modelo. Debería: 0.
+  const html = (await (await page.request.get('/selector-smartphone/')).text()).toLowerCase();
+  expect(html).not.toContain('modelos de referencia');
+});
+
+test.fail('el JSON-LD WebApplication sale con featureList vacío', async ({ page }) => {
+  // HALLAZGO ABIERTO (bajo). §1.ter del CLAUDE.md del proyecto: `features` con 4-8
+  // características reales. El `jsonLd` que inyecta layout.tsx lleva `features: []`; las ocho
+  // que hay en metadata.ts viven solo en la meta no estándar schema:WebApplication.
+  const html = await (await page.request.get('/selector-smartphone/')).text();
+  const bloques = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(
+    (m) => JSON.parse(m[1]) as Record<string, unknown>,
+  );
+  const app = bloques.find((b) => b['@type'] === 'WebApplication');
+  expect(app, 'hay un WebApplication').toBeTruthy();
+  expect(((app?.featureList ?? []) as unknown[]).length).toBeGreaterThanOrEqual(4);
+});
+
+test.fail('la banda de Delegum dice «Esta herramienta aplica a España» justo bajo «La metodología es universal»', async ({ page }) => {
+  // HALLAZGO ABIERTO (bajo). Efecto colateral del arreglo del 949: scripts/generate-delegum-es.mjs
+  // toma CUALQUIER RegionBadge es-data como «autodeclaración fiscal-España» (d087d679, 20/09), y
+  // components/DescubreVertical.tsx pinta entonces «⚖️ Esta herramienta aplica a España. Delegum
+  // reúne más herramientas de fiscalidad, derecho laboral y finanzas». En un selector de móvil,
+  // debajo de un aviso que dice lo contrario. Debería: una sola declaración de ámbito, la del badge.
+  await page.goto('/selector-smartphone/');
+  await esperarHidratacionBotones(page);
+  const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+  expect(cuerpo).toContain('La metodología es universal');
+  expect(cuerpo).not.toContain('Esta herramienta aplica a España');
+});
+
+test.fail('pliego de gama básica: «si necesitas 5 años, no los encontrarás aquí» es falso hoy', async ({ page }) => {
+  // HALLAZGO ABIERTO (medio). Con «4 años o más» y «Hasta 250 €» el pliego dice «pide al menos
+  // 3 años, que es lo máximo habitual en este tramo (si necesitas 5, no los encontrarás aquí)».
+  // El Galaxy A17 5G se vende en España desde 229 € (4/128 GB) con 6 actualizaciones de sistema y
+  // 6 años de parches (Xataka Móvil; samsung.com/es), y el Reglamento (UE) 2023/1670, aplicable
+  // desde el 20/06/2025, exige al menos 5 años de actualizaciones del sistema operativo desde el
+  // fin de comercialización del modelo. Sale en 49.152 perfiles del barrido. Debería no afirmar
+  // que 5 años no existen en el tramo.
+  //   P1-P6 SOLO_LLAMAR (0 puntos) + P7 «4 años o más» (+2) = 2 → media, tope básica → básica.
+  const perfil: Perfil = [
+    'Uso básico', 'No juego o muy poco', 'Menos de 2 horas', 'No, ninguno', 'Windows',
+    'Batería larga', '4 años o más', 'Me da igual', 'Precio mínimo', 'Sí, con garantía',
+  ];
+  await abrirTest(page);
+  await responder(page, perfil);
+  const texto = await leerResultado(page);
+  expect(texto).toContain('Gama básica');
+  expect(texto).not.toContain('no los encontrarás aquí');
 });

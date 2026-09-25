@@ -1,5 +1,5 @@
 import { test, expect, devices, type Page } from '@playwright/test';
-import { esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
  * Generador de Tonos — test de regresión (Inspector, 21/08/2026 · re-inspección 10/09/2026)
@@ -51,6 +51,9 @@ import { esperarValorEnReact } from './_hidratacion';
  *   3. HALLAZGOS ABIERTOS (10/09/2026): van con `test.fail()`, la convención de estos
  *      ficheros. Afirman lo que la app DEBERÍA hacer, así que hoy fallan a propósito; el día
  *      que se reparen, Playwright avisará de que hay que quitarles la marca y pasan al bloque 2.
+ *   4. RE-INSPECCIÓN 25/09/2026: la SOSPECHA de la rampa de ganancia (hallazgo 1509 de
+ *      diapason), medida aquí sobre el sonido que sale de la ganancia, y la frecuencia decimal
+ *      tras el cambio de parser 527373e0. Los abiertos, con `test.fail()`.
  */
 
 test.use({
@@ -1025,4 +1028,329 @@ test('HALLAZGO D — el preset llamado «Ultrasonido» debe emitir una frecuenci
   const rotulo = page.locator('[class*="descripcionFrecuencia"]');
   await expect(rotulo).toHaveText(/Muy agudos/);
   await expect(rotulo).not.toHaveText(/ultrasonido/i);
+});
+
+// ============================================================
+// RE-INSPECCIÓN 25/09/2026 — la SOSPECHA de la rampa (hallazgo 1509
+// de diapason) y la frecuencia decimal tras el parser de 527373e0
+// ============================================================
+
+const CAMPO_FRECUENCIA = 'input[aria-label="Frecuencia en Hz"]';
+const DESLIZADOR_VOLUMEN = 'input[aria-label="Volumen"]';
+
+/**
+ * Engancha un AnalyserNode DETRÁS de cada GainNode que crea la app, así que captura el sonido
+ * que sale de verdad, con la ganancia ya aplicada (el de `INSTRUMENTAR` va delante de la
+ * ganancia y por eso no ve la rampa). Guarda también el `currentTime` del contexto al crear la
+ * ganancia, que es el instante en que `iniciarAudio` programa la rampa.
+ *
+ * Por qué el sonido y no `gain.value` muestreado: el hilo principal ve el reloj de audio a saltos
+ * de ~10,7 ms, y con la máquina cargada la primera muestra puede caer pasada la zona donde la
+ * rampa y el escalón se distinguen. El búfer del analizador (32.768 muestras: 0,68 s a 48 kHz,
+ * 0,74 s a 44,1 kHz) es el sonido mismo, muestra a muestra, y no depende de cuándo se lea
+ * — siempre que se lea antes de que el suceso salga de él (ver `esperarAudio`).
+ *
+ * Se registra ANTES que `INSTRUMENTAR` (los addInitScript corren por orden de registro): el
+ * envoltorio de `INSTRUMENTAR` captura este como «el original» y los dos encadenan.
+ */
+function INSTRUMENTAR_SALIDA(): void {
+  const w = window as unknown as {
+    __salidas: { an: AnalyserNode; ctx: AudioContext; t0: number }[];
+  };
+  w.__salidas = [];
+  const crear = AudioContext.prototype.createGain;
+  AudioContext.prototype.createGain = function (this: AudioContext): GainNode {
+    const nodo = crear.call(this);
+    const an = this.createAnalyser();
+    an.fftSize = 32768;
+    nodo.connect(an);
+    w.__salidas.push({ an, ctx: this, t0: this.currentTime });
+    return nodo;
+  };
+}
+
+async function abrirConSalida(page: Page): Promise<void> {
+  await page.addInitScript(INSTRUMENTAR_SALIDA);
+  await abrir(page);
+  await esperarHidratacion(page, [CAMPO_FRECUENCIA, DESLIZADOR_VOLUMEN]);
+}
+
+interface CapturaSalida {
+  sr: number;
+  x: number[];
+}
+
+const gananciasCreadas = (page: Page): Promise<number> =>
+  page.evaluate(() => (window as unknown as { __salidas: unknown[] }).__salidas.length);
+
+/** Segundos de reloj de AUDIO desde que la app creó su última ganancia. */
+const segundosDeAudio = (page: Page): Promise<number> =>
+  page.evaluate(() => {
+    const s = (window as unknown as { __salidas: { ctx: AudioContext; t0: number }[] }).__salidas.at(-1);
+    return s ? s.ctx.currentTime - s.t0 : -1;
+  });
+
+/**
+ * Espera, en el reloj de audio, a que la última ganancia lleve `s` segundos. Sondea cada 20 ms
+ * y no con los intervalos por defecto (hasta 1 s): el analizador solo guarda 0,68 s, y un
+ * sondeo que se pasara de largo leería un búfer del que el suceso ya ha salido.
+ */
+async function esperarAudio(page: Page, s: number): Promise<void> {
+  await expect
+    .poll(() => segundosDeAudio(page), {
+      intervals: [20],
+      timeout: 10000,
+      message: `el reloj de audio nunca llegó a ${s} s`,
+    })
+    .toBeGreaterThanOrEqual(s);
+}
+
+const capturarSalida = (page: Page): Promise<CapturaSalida> =>
+  page.evaluate(() => {
+    const s = (window as unknown as { __salidas: { an: AnalyserNode; ctx: AudioContext }[] }).__salidas.at(-1)!;
+    const x = new Float32Array(s.an.fftSize);
+    s.an.getFloatTimeDomainData(x);
+    return { sr: s.ctx.sampleRate, x: Array.from(x) };
+  });
+
+/**
+ * Amplitud emitida en torno al instante `t` (s), contado desde la muestra `desde`: el máximo de
+ * |x| en ±1,5 ms. A 440 Hz esa ventana abarca 1,3 periodos, así que su máximo ES la ganancia de
+ * ese tramo (el seno llega a su pico dentro); en una rampa de subida, la del final de la ventana.
+ */
+function amplitud(c: CapturaSalida, desde: number, t: number): number {
+  const centro = desde + Math.round(t * c.sr);
+  const media = Math.round(0.0015 * c.sr);
+  let maximo = 0;
+  for (let i = Math.max(0, centro - media); i <= Math.min(c.x.length - 1, centro + media); i++) {
+    maximo = Math.max(maximo, Math.abs(c.x[i]));
+  }
+  return maximo;
+}
+
+/** Primera muestra no nula del búfer: donde empieza a sonar. */
+const primeraMuestra = (c: CapturaSalida): number => c.x.findIndex((v) => Math.abs(v) > 1e-6);
+
+/**
+ * Cuánto tarda la amplitud en bajar del 90 % al 10 % del 30 % de volumen (de 0,27 a 0,03), en
+ * ms: desde la ÚLTIMA ventana que aún pasa de 0,27 hasta la primera que ya no llega a 0,03.
+ */
+function bajada(c: CapturaSalida): { hallada: boolean; ms: number } {
+  const paso = Math.round(0.0005 * c.sr);
+  let ultimoAlto = -1;
+  for (let i = 0; i < c.x.length; i += paso) if (amplitud(c, i, 0) >= 0.27) ultimoAlto = i;
+  if (ultimoAlto < 0) return { hallada: false, ms: NaN };
+  for (let i = ultimoAlto; i < c.x.length; i += paso) {
+    if (amplitud(c, i, 0) <= 0.03) return { hallada: true, ms: ((i - ultimoAlto) / c.sr) * 1000 };
+  }
+  return { hallada: false, ms: NaN };
+}
+
+/**
+ * La rampa de entrada que programa `iniciarAudio` (page.tsx ~311-312):
+ *   gain.setValueAtTime(0, t0) · gain.linearRampToValueAtTime(volumen, t0 + 0,05)
+ * Con el volumen por defecto (30 %): v(t) = 0,3 · t / 0,05 = 6·t, y 0,3 desde los 50 ms. La
+ * ventana de ±1,5 ms toma el máximo, así que en una subida mide 6·(t + 0,0015):
+ *   5 ms → 0,039 · 10 ms → 0,069 · 20 ms → 0,129 · 30 ms → 0,189 · 150 ms → 0,300
+ * Tolerancia ±0,05 (`toBeCloseTo(…, 1)`): el error de la ventana es 0,009, y el defecto se aleja
+ * 0,111 como mínimo (0,300 contra 0,189 a los 30 ms). Validado el 25/09/2026 con una ganancia
+ * montada a mano con esa misma rampa en la página de la app: 0,038 · 0,065 · 0,126 · 0,187.
+ */
+function comprobarEntrada(c: CapturaSalida, etiqueta: string): void {
+  const inicio = primeraMuestra(c);
+  expect(
+    inicio,
+    `${etiqueta}: la captura tiene que empezar en silencio; si no, el arranque ya salió del búfer`,
+  ).toBeGreaterThan(0);
+  const esperados: [number, number][] = [
+    [0.005, 0.039],
+    [0.01, 0.069],
+    [0.02, 0.129],
+    [0.03, 0.189],
+  ];
+  for (const [t, esperado] of esperados) {
+    expect(amplitud(c, inicio, t), `${etiqueta}: amplitud a ${t * 1000} ms del arranque`).toBeCloseTo(
+      esperado,
+      1,
+    );
+  }
+  expect(amplitud(c, inicio, 0.15), `${etiqueta}: volumen asentado (30 %)`).toBeCloseTo(0.3, 2);
+}
+
+/**
+ * [E, bajo — la SOSPECHA de 24/09/2026, confirmada] El tono no tiene rampa de entrada ni de
+ * volumen. `iniciarAudio` programa la ganancia de 0 al volumen en 0,05 s, pero el efecto de
+ * volumen depende de [volumen, reproduciendo] y, en cuanto `reproduciendo` pasa a true, hace
+ * `gain.setValueAtTime(volumen, currentTime)`, que pisa la rampa: es el hallazgo 1509 de
+ * diapason, con la misma forma. Y mover el deslizador es un escalón por la misma línea.
+ *
+ * Medido el 25/09/2026 (volumen 30 %, 440 Hz, 48 kHz):
+ *   eventos de la ganancia, en frío:    setValueAtTime(0, 0) · linearRamp(0,3, 0,05) · setValueAtTime(0,3, 0)
+ *   eventos, en caliente:               setValueAtTime(0, t0) · linearRamp(0,3, t0+0,05) · setValueAtTime(0,3, t0+0,008)
+ *   gain.value en el reloj de audio:    frío 0,300 a los 10,7 ms (esperado 0,064) · caliente 0,300 a los 18,7 ms (esperado 0,112)
+ *   amplitud emitida a 5/10/20/30 ms:   0,300 · 0,300 · 0,300 · 0,300, en frío y en caliente
+ *                                       (esperado 0,039 · 0,069 · 0,129 · 0,189)
+ *   deslizador 30 % → 0 % sonando:      de 0,27 a 0,03 en 0,5 ms, un solo setValueAtTime(0, …)
+ * La metadata no promete nada sobre chasquidos; promete «tonos puros» y «control fino de
+ * volumen», y el código programa una rampa que no llega a sonar. Qué debería pasar: el tono
+ * sube de 0 al volumen en los 0,05 s que programa, y el volumen cambia con rampa.
+ */
+test.fail('HALLAZGO E — en frío, el tono entra con la rampa de 0,05 s que programa, desde 0', async ({
+  page,
+}) => {
+  await abrirConSalida(page);
+  await botonReproducir(page).click();
+  await expect.poll(() => gananciasCreadas(page)).toBe(1);
+  await esperarAudio(page, 0.2);
+  comprobarEntrada(await capturarSalida(page), 'en frío');
+});
+
+test.fail('HALLAZGO E — en caliente (Reproducir → Detener → Reproducir), la entrada es la misma rampa', async ({
+  page,
+}) => {
+  await abrirConSalida(page);
+  await botonReproducir(page).click();
+  await expect.poll(() => gananciasCreadas(page)).toBe(1);
+  await esperarAudio(page, 0.3);
+  await botonDetener(page).click();
+  await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+  await botonReproducir(page).click();
+  await expect.poll(() => gananciasCreadas(page)).toBe(2); // cada Reproducir crea su ganancia
+  await esperarAudio(page, 0.2);
+  comprobarEntrada(await capturarSalida(page), 'en caliente');
+});
+
+test.fail('HALLAZGO E — bajar el volumen con el tono sonando es una rampa, no un escalón', async ({
+  page,
+}) => {
+  await abrirConSalida(page);
+  await botonReproducir(page).click();
+  await expect.poll(() => gananciasCreadas(page)).toBe(1);
+  await esperarAudio(page, 0.2); // pasada la rampa de entrada: suena al 30 %
+  const antes = await segundosDeAudio(page);
+  await page.getByRole('slider', { name: 'Volumen' }).press('Home'); // 30 % → 0 %
+  await expect(page.locator('[class*="volumenValor"]')).toHaveText('0%');
+  await esperarAudio(page, antes + 0.15);
+
+  const b = bajada(await capturarSalida(page));
+  expect(b.hallada, 'la captura contiene la bajada de 0,27 a 0,03').toBe(true);
+  // Con una rampa de 50 ms, como la de entrada y salida del propio código (y la que usa
+  // diapason desde el 1509): (0,27 − 0,03) / 0,3 · 50 = 40 ms. Un escalón baja en menos de una
+  // ventana: medido 0,5 ms. El umbral de 10 ms separa los dos casos sin fijar la duración.
+  expect(b.ms, 'milisegundos de 0,27 a 0,03 al bajar el volumen').toBeGreaterThanOrEqual(10);
+});
+
+/**
+ * [F, bajo] «Detener» tampoco tiene rampa de salida. `detenerAudio` hace
+ * `gain.linearRampToValueAtTime(0, currentTime + 0,05)` SIN anclar antes el valor en curso, y
+ * una rampa de Web Audio empieza en el EVENTO ANTERIOR, no en «ahora»: aquí, el
+ * `linearRamp(0,3, 0,05)` del arranque. Tras T segundos sonando, la rampa va de (0,05 s; 0,3) a
+ * (T + 0,05 s; 0), así que en el instante del clic ya vale 0,3 · 0,05 / T: la ganancia cae de
+ * golpe y lo que queda de rampa es inaudible.
+ *
+ * Medido el 25/09/2026 (volumen 30 %, 1,5 s sonando): gain.value a los 10,7 ms del clic = 0,0069
+ * (esperado con la rampa de 50 ms: 0,3 · (1 − 10,7/50) = 0,236); amplitud emitida de 0,300 a
+ * 0,010 en 5 ms, bajada de 0,27 a 0,03 en 0,5-1,0 ms (esperado ≈ 40 ms). Con un tono de 16.000 Hz,
+ * el corte pone en la banda de 1 a 8 kHz un pico 61,8 dB por debajo del tono, frente a 130,9 dB
+ * con la rampa de 50 ms: el chasquido cae donde el oído es más sensible, también para quien
+ * hace el test de agudos y no oye el tono. Qué debería pasar: la ganancia baja desde el valor
+ * en curso a 0 en los 0,05 s que programa el propio código.
+ */
+test.fail('HALLAZGO F — «Detener» baja la ganancia con la rampa de 0,05 s que programa, no de golpe', async ({
+  page,
+}) => {
+  await abrirConSalida(page);
+  await botonReproducir(page).click();
+  await expect.poll(() => gananciasCreadas(page)).toBe(1);
+  await esperarAudio(page, 1.5);
+  const antes = await segundosDeAudio(page);
+  await botonDetener(page).click();
+  await esperarAudio(page, antes + 0.15);
+
+  const b = bajada(await capturarSalida(page));
+  expect(b.hallada, 'la captura contiene la bajada de 0,27 a 0,03').toBe(true);
+  // Rampa lineal de 50 ms desde 0,3: (0,27 − 0,03) / 0,3 · 50 = 40 ms. Medido: 0,5-1,0 ms.
+  expect(b.ms, 'milisegundos de 0,27 a 0,03 al pulsar Detener').toBeGreaterThanOrEqual(10);
+});
+
+/**
+ * Frecuencia decimal tras 527373e0 (18/09/2026), que pasó el campo a type="text" y lo lee con
+ * `parseSpanishNumber`. Resueltos a mano:
+ *   NORMAL  «261,63» → coma decimal → 261,63 Hz (Do4 = 440·2^(−9/12) = 261,6256), y el preset
+ *           Do (C4) queda marcado: Math.round(261,63) = Math.round(261,63) = 262.
+ *   RECHAZO «25.000» → millar español = 25.000 Hz, fuera del rango → al salir, techo 20.000.
+ *           «1.2.3» → no es un número (NaN) → al salir, suelo 20.
+ */
+test('RE-INSPECCIÓN 25/09 — «261,63» con coma llega al oscilador con sus decimales; «25.000» y «1.2.3» se acotan', async ({
+  page,
+}) => {
+  await abrir(page);
+  await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
+  await botonReproducir(page).click();
+  await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+  const salir = async () => {
+    await campoFrecuencia(page).focus();
+    await campoFrecuencia(page).blur();
+  };
+
+  await sembrarValor(page, CAMPO_FRECUENCIA, '261,63');
+  await esperarFrecuencia(page, 261.63, 2);
+  await expect(page.getByRole('button', { name: /Do \(C4\)/ })).toHaveAttribute('aria-pressed', 'true');
+  await salir();
+  await expect(campoFrecuencia(page)).toHaveValue(/^261[.,]63$/);
+  await esperarFrecuencia(page, 261.63, 2);
+  await salir(); // y una segunda vez, sin teclear: dos decimales no se leen como millar
+  await esperarFrecuencia(page, 261.63, 2);
+
+  await sembrarValor(page, CAMPO_FRECUENCIA, '25.000');
+  await salir();
+  await expect(campoFrecuencia(page)).toHaveValue('20000');
+  await esperarFrecuencia(page, 20000, 0);
+
+  await sembrarValor(page, CAMPO_FRECUENCIA, '1.2.3');
+  await salir();
+  await expect(campoFrecuencia(page)).toHaveValue('20');
+  await esperarFrecuencia(page, 20, 0);
+});
+
+/**
+ * [G, alto] Una frecuencia con TRES decimales salta a 20.000 Hz al enfocar y salir del campo por
+ * segunda vez, sin teclear nada. El onBlur reescribe el campo con `String(n)`, que usa PUNTO
+ * decimal —«261,626» pasa a «261.626», también contra el formato español de la app—, y la
+ * siguiente lectura de `parseSpanishNumber` toma «261.626» por un millar español (un punto
+ * seguido de tres cifras): 261.626 Hz, fuera del rango, acotado al techo. Es la forma del
+ * hallazgo 873, pero con la app releyendo lo que ella misma ha escrito.
+ *
+ * Medido el 25/09/2026, con el tono sonando:
+ *   «261,626» → oscilador 261,626 · 1.ª salida: campo «261.626», oscilador 261,626
+ *             → 2.ª salida: campo «20000», oscilador 20.000 Hz, rótulo «Umbral del ultrasonido»
+ *   igual con «415,305» (La♭4 temperado, 440·2^(−1/12)), «440,125», «20,001» y «999,999».
+ *   No les pasa a «261,6256» ni a «442,5» (cuatro y un decimal no forman grupo de millar).
+ * Qué debería pasar: la frecuencia sigue en 261,626 Hz por muchas veces que se salga del campo.
+ */
+test.fail('HALLAZGO G — una frecuencia con tres decimales sobrevive a enfocar y salir del campo', async ({
+  page,
+}) => {
+  await abrir(page);
+  await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
+  await botonReproducir(page).click();
+  await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+  const salir = async () => {
+    await campoFrecuencia(page).focus();
+    await campoFrecuencia(page).blur();
+  };
+
+  // Do4 con tres decimales: 440·2^(−9/12) = 261,6256 → «261,626». Precisión de 3 decimales:
+  // lo que se vigila es que los decimales sigan siendo decimales.
+  await sembrarValor(page, CAMPO_FRECUENCIA, '261,626');
+  await esperarFrecuencia(page, 261.626, 3);
+  await salir();
+  await expect(campoFrecuencia(page)).toHaveValue(/^261[.,]626$/);
+  await esperarFrecuencia(page, 261.626, 3);
+
+  await salir(); // sin teclear nada
+  await expect(campoFrecuencia(page), 'el campo no debe saltar al techo de 20.000 Hz').toHaveValue(
+    /^261[.,]626$/,
+  );
+  await esperarFrecuencia(page, 261.626, 3);
 });

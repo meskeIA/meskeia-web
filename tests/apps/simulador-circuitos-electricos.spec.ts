@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-circuitos-electricos (segmento cálculo, riesgo 3, 223 usos reales · Stemum)
@@ -129,6 +129,59 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  * P = 10.580,00 W mientras el campo de la pantalla sigue diciendo 0. La pestaña Ley de Ohm sí
  * rechaza I = 0 («Introduce dos valores positivos»), de modo que la misma entrada recibe dos
  * respuestas distintas según la pestaña.                                      → CASO 10
+ *
+ * ── RE-INSPECCIÓN 25/09/2026 — tras 272b0ee7 (logo) y b7733c6d (cabeceras) ───
+ * El fichero, tal cual estaba: 11 de 11 en verde. Los ocho arreglos 868-875 siguen en pie,
+ * comprobados TECLEANDO en escritorio y en Pixel 7: «1.000 + 2.200 + 1.500» a 12 V da
+ * 4700,000 Ω · la terna 230 V / 10 A / 5 Ω se rechaza nombrando los 50 V · horas, días y tarifa
+ * vacíos se nombran uno a uno · los 7 conmutadores llevan aria-pressed y ningún botón va sin
+ * type · la tensión del nodo sale «12,5000» · «0,020» A con 150 Ω da 3,0000 V y la tarifa
+ * «0,145» da 40,0200 € · 230 V / 0 A / 5 Ω se rechaza · «1e3» dice «notación científica».
+ *
+ *   272b0ee7 ✔ en 360, 412, 600 y 768 px el logo no toca el <h1> ni ningún control, en los
+ *            dos temas y también bajo stemum.com, con su píldora más ancha      → CASO 14
+ *            ✘ pero el hueco de 80 px solo vale hasta 768 px, y justo por encima vuelve a tapar
+ *            el principio del título: de 772 a 992 px en meskeia.com y de 772 a 1048 px en
+ *            stemum.com (820 px = iPad Air en vertical; 844-932 px = móvil en horizontal).
+ *            ⚠️ elementFromPoint en el CENTRO del título da verde en todos esos anchos: lo
+ *            tapado es el principio («Simu»), por eso se muestrea el texto entero. → CASO 20
+ *   b7733c6d ✔ las 8 cabeceras (5 de la ficha + 3 de la comparativa) dan 5,47:1 en claro y en
+ *            oscuro sobre el fondo COMPUTADO, y 8,72:1 bajo stemum.com             → CASO 15
+ *
+ * CASOS NUEVOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *
+ *   CASO 11 (normal) — Paralelo tecleado «1.500», «3.000», «12.000» Ω a «7,2» V
+ *       1/Req = 8/12000 + 4/12000 + 1/12000 = 13/12000 → Req = 923,076923… → 923,0769 Ω
+ *       I = 7,2/1500 = 0,0048 · 7,2/3000 = 0,0024 · 7,2/12000 = 0,0006 → total 0,0078 A
+ *       P = 51,84/1500 = 0,03456 · 51,84/3000 = 0,01728 · 51,84/12000 = 0,00432
+ *       P total = 51,84 × 13/12000 = 0,05616 W → 0,0562 W   (suma de ramas ✔)
+ *
+ *   CASO 12 (límite) — Serie «0,047» Ω + «4.700.000» Ω a 9 V: diez órdenes de magnitud
+ *       Req = 4.700.000,047 Ω (los tres decimales tienen que sobrevivir a los siete enteros)
+ *       I = 9 / 4.700.000,047 = 1,9149 µA · V2 = I × 4.700.000 = 8,99999991 V → 9,0000 V
+ *       Y una R de 0 Ω en serie: físicamente es un cable. La app la rechaza nombrando el campo,
+ *       que es una elección conservadora y legítima; si un día se admite, el esperado es el
+ *       mismo Req, porque sumar 0 no cambia nada.
+ *
+ *   CASO 13 (rechazo) — Paralelo 100 Ω ∥ 0 Ω a 12 V: una rama de 0 Ω es un cortocircuito,
+ *       1/Req = 1/100 + 1/0 = ∞ → I = ∞. Se rechaza nombrando R2, sin ficha, sin ∞ ni NaN.
+ *       Y el control positivo: 100 ∥ 50 → Req = 5000/150 = 33,3333 Ω,
+ *       I = 0,12 + 0,24 = 0,36 A, P = 144/33,333… = 4,32 W.
+ *
+ * HALLAZGOS ABIERTOS (al final, con test.fail(): afirman lo que DEBERÍA pasar)
+ *   CASO 16 alto   · «0.020» A y la tarifa «0.793» escritos con punto (México) salen ×1000.
+ *                    La causa está en `lib/formatters.ts`: AGRUPA_CON_PUNTO casa un primer
+ *                    grupo «0», y ningún número se escribe «0.793» para decir 793. No es
+ *                    parseo casero: `check:parser` no tiene nada que ver aquí.
+ *   CASO 17 medio  · cambiar el número de resistencias deja una ficha que ya no describe lo que
+ *                    hay en pantalla: el diagrama se redibuja y la tabla y el Req no.
+ *   CASO 18 medio  · los campos no tienen etiqueta asociada: se anuncian por su placeholder
+ *                    («0», «Ω», «voltios») y horas, días y tarifa no tienen nombre ninguno.
+ *   CASO 19 medio  · el aviso de error, #dc2626 en línea, da 2,85:1 sobre el panel oscuro.
+ *   CASO 20 medio  · el logo tapa el título entre 772 y 992 px (arriba, 272b0ee7).
+ *   CASO 21 bajo   · decimales fijos: 1,91 µA sale «≈0 A (0,00 mA)», 2,5 mW sale «0,00 W», y
+ *                    la R de 0,047 Ω se reimprime «0,05» en la tabla.
+ *   CASO 22 bajo   · la tarifa 0 €/kWh (autoconsumo), que el código declara admitida, se rechaza.
  */
 
 const RUTA = '/simulador-circuitos-electricos/';
@@ -163,6 +216,121 @@ async function teclearComoUsuario(page: Page, campo: Locator, texto: string): Pr
   if (texto !== '') await campo.pressSequentially(texto, { delay: 20 });
   await esperarValorEnReact(page, campo, await campo.inputValue());
 }
+
+/**
+ * Lee una medida hasta que deja de moverse. Leer un color o una caja justo después de cambiar
+ * de tema o de ancho devuelve un fotograma INTERMEDIO de la transición (el logo lleva
+ * `transition: all 0.3s`, y el tema, las suyas): un número que no existe en ningún estado.
+ */
+async function esperarEstable<T>(leer: () => Promise<T>): Promise<T> {
+  let anterior = await leer();
+  for (let i = 0; i < 30; i++) {
+    await new Promise((r) => setTimeout(r, 100));
+    const actual = await leer();
+    if (JSON.stringify(actual) === JSON.stringify(anterior)) return actual;
+    anterior = actual;
+  }
+  return anterior;
+}
+
+/**
+ * Contraste WCAG del texto de un elemento contra su fondo EFECTIVO: los fondos translúcidos de
+ * los ancestros se componen sobre el primero opaco. Se mide el color COMPUTADO, no el CSS
+ * leído con una regex, que no ve ni los tokens redefinidos por tema ni por marca.
+ */
+async function contrasteEfectivo(el: Locator): Promise<number> {
+  return el.evaluate((nodo) => {
+    const rgba = (c: string): number[] => {
+      const n = (c.match(/[\d.]+/g) ?? []).map(Number);
+      return [n[0], n[1], n[2], n.length > 3 ? n[3] : 1];
+    };
+    const capas: number[][] = [];
+    for (let e: Element | null = nodo; e; e = e.parentElement) {
+      const c = rgba(getComputedStyle(e).backgroundColor);
+      if (c[3] > 0) capas.push(c);
+      if (c[3] >= 1) break;
+    }
+    let fondo = [255, 255, 255];
+    for (const c of capas.reverse()) fondo = fondo.map((v, i) => v * (1 - c[3]) + c[i] * c[3]);
+    const lum = ([r, g, b]: number[]): number => {
+      const f = (v: number): number => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const a = lum(rgba(getComputedStyle(nodo).color));
+    const b = lum(fondo);
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  });
+}
+
+interface Caja { izq: number; der: number; arr: number; aba: number }
+
+interface SolapeLogo {
+  /** Puntos del TEXTO del <h1> (muestreados cada 3 px) que caen dentro del logo fijo o del toggle */
+  tapados: number;
+  muestras: number;
+  /** Lo que miraría un elementFromPoint en el centro del título: no basta, ver CASO 20 */
+  centroEsTitulo: boolean;
+  /** Controles de la herramienta cuyo centro cae bajo la barra fija, a scroll 0 */
+  controlesTapados: string[];
+  logo: Caja | null;
+  toggle: Caja | null;
+  titulo: Caja;
+}
+
+/** Cuánto del título y de los controles tapa la barra fija de MeskeiaLogo, a scroll 0. */
+async function solapeDelLogo(page: Page): Promise<SolapeLogo> {
+  return page.evaluate(() => {
+    const BARRA = '[class*="headerBar"]';
+    const h1 = document.querySelector('h1') as HTMLElement;
+    // La caja del BLOQUE h1 ocupa todo el ancho del hero; la que importa es la del texto.
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const lineas = Array.from(rango.getClientRects());
+    let tapados = 0;
+    let muestras = 0;
+    for (const b of lineas) {
+      for (let x = b.left + 1; x < b.right - 1; x += 3) {
+        for (let y = b.top + 2; y < b.bottom - 2; y += 3) {
+          muestras++;
+          if (document.elementFromPoint(x, y)?.closest(BARRA)) tapados++;
+        }
+      }
+    }
+    const titulo = {
+      izq: Math.min(...lineas.map((r) => r.left)),
+      der: Math.max(...lineas.map((r) => r.right)),
+      arr: Math.min(...lineas.map((r) => r.top)),
+      aba: Math.max(...lineas.map((r) => r.bottom)),
+    };
+    const centro = document.elementFromPoint((titulo.izq + titulo.der) / 2, (titulo.arr + titulo.aba) / 2);
+    const controlesTapados = Array.from(document.querySelectorAll<HTMLElement>('main button, main input'))
+      .filter((c) => c.offsetParent !== null)
+      .filter((c) => {
+        const b = c.getBoundingClientRect();
+        return document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2)?.closest(BARRA);
+      })
+      .map((c) => c.textContent?.trim() || c.getAttribute('placeholder') || c.tagName);
+    const caja = (sel: string): Caja | null => {
+      const b = document.querySelector(sel)?.getBoundingClientRect();
+      return b ? { izq: b.left, der: b.right, arr: b.top, aba: b.bottom } : null;
+    };
+    return {
+      tapados,
+      muestras,
+      centroEsTitulo: centro !== null && h1.contains(centro),
+      controlesTapados,
+      logo: caja('[class*="logoContainer"]'),
+      toggle: caja('[class*="themeToggle"]'),
+      titulo,
+    };
+  });
+}
+
+const seCruzan = (a: Caja | null, b: Caja): boolean =>
+  a !== null && a.izq < b.der && b.izq < a.der && a.arr < b.aba && b.arr < a.aba;
 
 test.describe('simulador-circuitos-electricos', () => {
   test.beforeEach(async ({ page }) => {
@@ -566,5 +734,357 @@ test.describe('simulador-circuitos-electricos', () => {
     await expect(page.locator('div[role="status"]')).toBeEmpty();
     // Y en particular, no puede enseñarse una corriente que el usuario no ha escrito.
     await expect(page.getByText('46,0000 A')).toHaveCount(0);
+  });
+
+  // ── RE-INSPECCIÓN 25/09/2026 ──────────────────────────────────────────────────────────────
+
+  test('CASO 11 · paralelo tecleado con punto de millar: 1.500 ∥ 3.000 ∥ 12.000 Ω a 7,2 V', async ({ page }) => {
+    await page.getByRole('button', { name: 'Paralelo', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+    // TECLEADO, no sembrado: así entra el dato de verdad, y el punto de millar es justo lo que
+    // el hallazgo 868 leía como decimal. El CASO 1 lo cubre en serie; este, en paralelo.
+    await teclearComoUsuario(page, resistencia(page, 0), '1.500');
+    await teclearComoUsuario(page, resistencia(page, 1), '3.000');
+    await teclearComoUsuario(page, resistencia(page, 2), '12.000');
+    await teclearComoUsuario(page, page.locator('input[placeholder="voltios"]'), '7,2');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+
+    // 1/Req = 8/12000 + 4/12000 + 1/12000 = 13/12000 → Req = 923,076923… Ω
+    // (y menor que la rama más pequeña, 1500 Ω, como exige el paralelo)
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('923,0769 Ω');
+    // I total = 0,0048 + 0,0024 + 0,0006 = 0,0078 A — que es también V/Req = 7,2 × 13/12000
+    await expect(valorDe(page, 'Corriente total (fuente)')).toHaveText('0,0078 A');
+    // P total = V²/Req = 51,84 × 13/12000 = 0,05616 W
+    await expect(valorDe(page, 'Potencia total disipada')).toHaveText('0,0562 W');
+
+    await expect(filas(page)).toHaveCount(3);
+    // Columnas: R (lo tecleado, ya como número) · V del nodo · I = V/R · P = V²/R
+    const esperado = [
+      ['1500,00', '0,0048', '0,0346'], // 7,2/1500 · 51,84/1500 = 0,03456
+      ['3000,00', '0,0024', '0,0173'], // 7,2/3000 · 51,84/3000 = 0,01728
+      ['12.000,00', '0,0006', '0,0043'], // 7,2/12000 · 51,84/12000 = 0,00432 — el millar, con punto
+    ];
+    for (let i = 0; i < 3; i++) {
+      const celdas = filas(page).nth(i).locator('td');
+      await expect(celdas.nth(1)).toHaveText(esperado[i][0]);
+      await expect(celdas.nth(2)).toHaveText('7,2000');
+      await expect(celdas.nth(3)).toHaveText(esperado[i][1]);
+      await expect(celdas.nth(4)).toHaveText(esperado[i][2]);
+    }
+  });
+
+  test('CASO 12 · límite: serie 0,047 Ω + 4.700.000 Ω a 9 V, y una R de 0 Ω', async ({ page }) => {
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+    await page.getByRole('button', { name: 'Reducir' }).click();
+    await expect(page.locator('input[placeholder="Ω"]')).toHaveCount(2);
+
+    await teclearComoUsuario(page, resistencia(page, 0), '0,047');
+    await teclearComoUsuario(page, resistencia(page, 1), '4.700.000');
+    await teclearComoUsuario(page, page.locator('input[placeholder="voltios"]'), '9');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+
+    // Req = 0,047 + 4.700.000 = 4.700.000,047 Ω: los tres decimales sobreviven a los siete
+    // enteros. Con el parseo del 868 habría salido 4.700,047; con el del 873, 4.700.047.
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('4.700.000,047 Ω');
+    // Casi toda la tensión cae en la grande: V2 = 9 × 4.700.000 / 4.700.000,047 = 8,99999991 V
+    await expect(filas(page)).toHaveCount(2);
+    await expect(filas(page).nth(1).locator('td').nth(1)).toHaveText('4.700.000,00');
+    await expect(filas(page).nth(1).locator('td').nth(2)).toHaveText('9,0000 V');
+
+    // Una R de 0 Ω en serie es un cable. La app la rechaza nombrando el campo y sin ficha: es una
+    // elección conservadora que esta inspección da por buena. Si un día se admite, el esperado
+    // pasa a ser el mismo Req de arriba, porque sumar 0 no cambia nada.
+    await page.getByRole('button', { name: 'Aumentar' }).click();
+    await teclearComoUsuario(page, resistencia(page, 2), '0');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    await expect(page.locator('main [role="alert"]')).toHaveText('R3: tiene que ser mayor que cero.');
+    await expect(page.locator('div[role="status"]')).toBeEmpty();
+  });
+
+  test('CASO 13 · rechazo: una rama de 0 Ω en paralelo es un cortocircuito', async ({ page }) => {
+    await page.getByRole('button', { name: 'Paralelo', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+    await page.getByRole('button', { name: 'Reducir' }).click();
+
+    await teclearComoUsuario(page, resistencia(page, 0), '100');
+    await teclearComoUsuario(page, resistencia(page, 1), '0');
+    await teclearComoUsuario(page, page.locator('input[placeholder="voltios"]'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+
+    // 1/Req = 1/100 + 1/0 = ∞ → Req = 0 e I = 12/0 = ∞: no hay circuito que calcular. Aviso que
+    // nombra la rama, y ninguna ficha detrás (ni «∞», ni «No definido»).
+    const aviso = page.locator('main [role="alert"]');
+    await expect(aviso).toHaveText('R2: tiene que ser mayor que cero.');
+    await expect(page.locator('div[role="status"]')).toBeEmpty();
+
+    // Control: la misma rama con 50 Ω sí calcula. Un aviso que saliera siempre pasaría la mitad
+    // de arriba sin demostrar nada. 100 ∥ 50 = 5000/150 = 33,333… Ω;
+    // I = 12/100 + 12/50 = 0,12 + 0,24 = 0,36 A; P = V²/Req = 144 × 0,03 = 4,32 W.
+    await teclearComoUsuario(page, resistencia(page, 1), '50');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    await expect(aviso).toHaveCount(0);
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('33,3333 Ω');
+    await expect(valorDe(page, 'Corriente total (fuente)')).toHaveText('0,3600 A');
+    await expect(valorDe(page, 'Potencia total disipada')).toHaveText('4,3200 W');
+  });
+
+  /**
+   * CASO 15 — verifica b7733c6d (22/09/2026): las cabeceras de tabla dejaron de poner blanco
+   * sobre el azul de marca (4,11:1) y pasaron a --primary-boton (#26718F, 5,47:1), igual en los
+   * dos temas. Se mide el color COMPUTADO de cada <th> contra su fondo efectivo.
+   */
+  test('CASO 15 · las cabeceras de tabla dan 4,5:1 o más en claro y en oscuro', async ({ page }) => {
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+    for (let i = 0; i < 3; i++) await sembrarValor(page, resistencia(page, i), String((i + 1) * 100));
+    await sembrarValor(page, page.locator('input[placeholder="voltios"]'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+
+    // Las 5 de la tabla por componente y las 3 de la comparativa del bloque educativo
+    await expect(page.locator('div[role="status"] th')).toHaveCount(5);
+    const cabeceras = page.locator('table th');
+    await expect(cabeceras).toHaveCount(8);
+    const medir = async (): Promise<number[]> => {
+      const ratios: number[] = [];
+      for (const th of await cabeceras.all()) ratios.push(Math.round((await contrasteEfectivo(th)) * 100) / 100);
+      return ratios;
+    };
+
+    await esperarPaginaAsentada(page);
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') {
+        // El botón REAL del tema: fijar data-theme a mano lo pisa la app al hidratar, y el test
+        // mediría dos veces el claro creyendo comparar los dos.
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      const ratios = await esperarEstable(medir);
+      expect(ratios).toHaveLength(8);
+      for (const r of ratios) expect(r, `cabecera de tabla, tema ${tema}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test.describe('en móvil y tableta (táctil)', () => {
+    // Enumerado en vez de `...devices['Pixel 7']`: un `devices` dentro de un describe forzaría
+    // un worker nuevo, y estas cinco opciones no.
+    test.use({
+      viewport: { width: 360, height: 800 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.7922.34 Mobile Safari/537.36',
+      deviceScaleFactor: 2.625,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    /**
+     * CASO 14 — verifica 272b0ee7 (24/09/2026): el hero va a sangre y el logo fijo llega hasta
+     * ~52 px en estos anchos; con los 32-40 px de margen de antes tapaba el principio del <h1>.
+     * Ahora el hero deja 80 px arriba. Se muestrea TODO el texto del título, no solo su centro.
+     */
+    test('CASO 14 · hasta 768 px el logo fijo no tapa el título ni ningún control', async ({ page }) => {
+      await esperarPaginaAsentada(page);
+      for (const ancho of [360, 412, 600, 768]) {
+        await page.setViewportSize({ width: ancho, height: 800 });
+        const s = await esperarEstable(() => solapeDelLogo(page));
+        expect(s.muestras, `${ancho} px: el muestreo tiene que haber mirado el título`).toBeGreaterThan(100);
+        expect(s.tapados, `${ancho} px: puntos del título bajo la barra fija`).toBe(0);
+        expect(s.centroEsTitulo, `${ancho} px: elementFromPoint en el centro del título`).toBe(true);
+        expect(seCruzan(s.logo, s.titulo), `${ancho} px: caja del logo contra la del título`).toBe(false);
+        expect(seCruzan(s.toggle, s.titulo), `${ancho} px: caja del toggle contra la del título`).toBe(false);
+        expect(s.controlesTapados, `${ancho} px: controles bajo la barra fija`).toEqual([]);
+      }
+      // El hueco que lo consigue (medido el 25/09: logo hasta 52 px, título desde 79 px)
+      await expect(page.locator('header:has(h1)')).toHaveCSS('padding-top', '80px');
+    });
+
+    /**
+     * CASO 20 (hallazgo nuevo del 25/09/2026, medio) — el arreglo de 272b0ee7 vale hasta 768 px,
+     * y justo por encima el logo recupera su tamaño de escritorio (hasta 77 px de alto y 203 de
+     * ancho) mientras el hero vuelve a sus 40 px de margen: el título empieza a 39 px y el logo
+     * se come «Simu». Medido barriendo el ancho de 4 en 4 px: de 772 a 992 px en meskeia.com y
+     * de 772 a 1048 px en stemum.com, cuya píldora «Stemum › Física» es más ancha. Ahí caen el
+     * iPad Air (820) y el iPad Pro 11" (834) en vertical, y los móviles en horizontal (844-932).
+     * El commit se midió en 360, 390, 768, 1024, 1280 y 1920: ninguno cae dentro del hueco.
+     */
+    test.fail('CASO 20 · a 820 px (iPad Air en vertical) el logo fijo tampoco puede tapar el título', async ({ page }) => {
+      await esperarPaginaAsentada(page);
+      await page.setViewportSize({ width: 820, height: 1180 });
+      const s = await esperarEstable(() => solapeDelLogo(page));
+      // El centro del título queda libre: un elementFromPoint en el centro daría verde aquí.
+      expect(s.centroEsTitulo).toBe(true);
+      // DEBERÍA: 0 puntos del título bajo el logo, como hasta 768 px.
+      // Obtenido el 25/09/2026: el principio del título, tapado.
+      expect(s.tapados, 'puntos del título bajo la barra fija a 820 px').toBe(0);
+    });
+  });
+
+  // ── HALLAZGOS ABIERTOS (25/09/2026): afirman lo que DEBERÍA pasar, así que hoy fallan a
+  // propósito. Cuando se reparen, se les quita el test.fail() y quedan como regresión.
+
+  /**
+   * CASO 16 (alto, cálculo) — el factor 1000 del 873, ahora por el punto decimal que escribe
+   * México (y media Latinoamérica). `parseSpanishNumber` resuelve un separador único a favor del
+   * español, y su AGRUPA_CON_PUNTO (/^\d{1,3}(\.\d{3})+$/) casa también un PRIMER grupo «0»:
+   * «0.020» → 20 y «0.793» → 793. Pero ningún número se escribe «0.793» para decir 793, así que
+   * aquí no hay ambigüedad que resolver a favor de nadie. El defecto vive en lib/formatters.ts
+   * (lo comparten 93 ficheros), no en un parseo casero: check:parser no tenía nada que ver.
+   */
+  test.fail('CASO 16 · «0.020» A y la tarifa «0.793» escritos con punto no se multiplican por mil', async ({ page }) => {
+    const rapido = { timeout: 1500 };
+    // Ley de Ohm, incógnita V (la de arranque): los 20 mA del LED de la FAQ, escritos con punto.
+    // DEBERÍA: V = 0,02 × 150 = 3 V y P = 3 × 0,02 = 0,06 W, lo mismo que el CASO 8 con coma.
+    // Obtenido: V = 3000,0000 V · I = 20,0000 A — 20.000,00 mA · P = 60.000,0000 W.
+    await teclearComoUsuario(page, page.locator('input[placeholder="0"]').nth(0), '0.020');
+    await teclearComoUsuario(page, page.locator('input[placeholder="0"]').nth(1), '150');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(valorDe(page, 'Tensión (V)')).toHaveText('3,0000 V', rapido);
+    await expect(valorDe(page, 'Corriente (I)')).toHaveText('0,0200 A — 20,00 mA', rapido);
+    await expect(valorDe(page, 'Potencia disipada (P)')).toHaveText('0,0600 W', rapido);
+
+    // Potencia: una tarifa como las de la CFE mexicana, con tres decimales y punto.
+    // DEBERÍA: 127 V × 10 A = 1270 W → 1,27 kW × 1 h × 30 días = 38,1 kWh × 0,793 = 30,2133.
+    // Obtenido: 30.213,3000.
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    const campo = (i: number) => page.locator('input[inputMode="decimal"]').nth(i);
+    await teclearComoUsuario(page, campo(0), '127');
+    await teclearComoUsuario(page, campo(1), '10');
+    await teclearComoUsuario(page, campo(5), '0.793');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('38,1000 kWh', rapido);
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('30,2133 €', rapido);
+  });
+
+  /**
+   * CASO 17 (medio, operativa) — «Reducir» y «Aumentar» cambian los campos y redibujan el
+   * diagrama de la ficha al instante, pero la tabla y el Req siguen siendo los del cálculo
+   * anterior: la ficha queda describiendo un circuito que ya no está en pantalla, y el diagrama
+   * vivo le da apariencia de recién calculada. Pasa igual en Paralelo (3 × 60 Ω → «Aumentar»:
+   * 4 campos, 4 ramas dibujadas, 3 filas y Req = 20,0000 Ω).
+   */
+  test.fail('CASO 17 · al cambiar el número de resistencias, la ficha no sigue describiendo el circuito anterior', async ({ page }) => {
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+    await sembrarValor(page, resistencia(page, 0), '100');
+    await sembrarValor(page, resistencia(page, 1), '200');
+    await sembrarValor(page, resistencia(page, 2), '300');
+    await sembrarValor(page, page.locator('input[placeholder="voltios"]'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    // Req = 100 + 200 + 300 = 600 Ω
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('600,000 Ω');
+
+    await page.getByRole('button', { name: 'Reducir' }).click();
+    await expect(page.locator('input[placeholder="Ω"]')).toHaveCount(2);
+    // DEBERÍA: o retirarse la ficha, o describir el circuito de dos que hay en pantalla
+    // (100 + 200 = 300 Ω). Obtenido: Req = 600,000 Ω, tres filas —con una R3 que ya no tiene
+    // campo— y el diagrama, que sí se redibuja, con dos resistencias.
+    const nFilas = await filas(page).count();
+    expect([0, 2], 'filas de la tabla con dos campos en pantalla').toContain(nFilas);
+    if (nFilas > 0) await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('300,000 Ω');
+  });
+
+  /**
+   * CASO 18 (medio, accesibilidad) — ningún <label> está asociado a su campo (ni htmlFor/id ni
+   * envolviéndolo), así que el nombre accesible sale del placeholder: la Ley de Ohm se anuncia
+   * como «0» y «0» —y cuál es I y cuál R cambia con la incógnita—, las resistencias como «Ω» y la
+   * tensión como «voltios». Horas, días y tarifa no tienen placeholder: no tienen nombre ninguno.
+   */
+  test.fail('CASO 18 · cada campo se anuncia con su etiqueta, no con su placeholder', async ({ page }) => {
+    const rapido = { timeout: 1500 };
+    // DEBERÍA: cada etiqueta visible nombrar su campo. Obtenido: 0 campos con esas etiquetas.
+    await expect(page.getByLabel('Corriente I (A)')).toHaveCount(1, rapido);
+    await expect(page.getByLabel('Resistencia R (Ω)')).toHaveCount(1, rapido);
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await expect(page.getByLabel('Tensión de fuente (V)')).toHaveCount(1, rapido);
+    await expect(page.getByRole('textbox', { name: /R1/ })).toHaveCount(1, rapido);
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    for (const etiqueta of [
+      'Tensión V (voltios)',
+      'Corriente I (amperios)',
+      'Resistencia R (ohmios)',
+      'Horas de uso diario',
+      'Días del periodo',
+      'Tarifa eléctrica (€/kWh)',
+    ]) {
+      await expect(page.getByLabel(etiqueta), etiqueta).toHaveCount(1, rapido);
+    }
+  });
+
+  /**
+   * CASO 19 (medio, accesibilidad) — el aviso de error es lo único que dice qué corregir, y lleva
+   * su color en línea (`style={{ color: '#dc2626' }}`, los cuatro de la app). En claro cumple
+   * (4,83:1 sobre #FFFFFF); en oscuro queda sobre el panel --bg-card #2D2D2D a 2,85:1, y es texto
+   * de 14 px: exige 4,5:1. Ningún candado lo ve: check:token-oscuro mira tokens declarados en los
+   * .module.css, no colores literales en un style de JSX.
+   */
+  test.fail('CASO 19 · el aviso de error se lee también en tema oscuro (4,5:1 o más)', async ({ page }) => {
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click(); // los dos campos vacíos
+    const aviso = page.locator('main [role="alert"]');
+    await expect(aviso).toHaveText('Introduce dos valores positivos.');
+    await esperarPaginaAsentada(page);
+    // En claro: #dc2626 sobre #FFFFFF = 4,83:1
+    expect(await esperarEstable(() => contrasteEfectivo(aviso)), 'aviso en claro').toBeGreaterThanOrEqual(4.5);
+
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    // DEBERÍA: 4,5:1 también en oscuro. Obtenido: 2,85:1.
+    expect(await esperarEstable(() => contrasteEfectivo(aviso)), 'aviso en oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * CASO 21 (bajo, cálculo) — los decimales son fijos, y por debajo de lo que caben la cifra se
+   * pierde: `formatNumber` pone «≈0» por debajo de 0,0001, pero entre 0,0001 y lo que redondea a
+   * cero con 2 decimales imprime un cero SIN «≈». Tres síntomas del mismo origen:
+   *   · Serie 0,047 Ω + 4.700.000 Ω a 9 V: I = 1,9149 µA sale «≈0 A (0,00 mA)»
+   *   · la R de 0,047 Ω se reimprime «0,05» en la tabla (formatNumber(r, 2)): otra que la tecleada
+   *   · Potencia 5 V sobre 10 kΩ: P = 2,5 mW sale «0,00 W» al lado de «I = 0,0005 A»; y es justo
+   *     el rango al que manda el consejo «Respeta la potencia máxima… usa el tab de Potencia».
+   */
+  test.fail('CASO 21 · microamperios y milivatios no se imprimen como cero, ni la R tecleada cambia', async ({ page }) => {
+    const rapido = { timeout: 1500 };
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="Ω"]']);
+    await page.getByRole('button', { name: 'Reducir' }).click();
+    await teclearComoUsuario(page, resistencia(page, 0), '0,047');
+    await teclearComoUsuario(page, resistencia(page, 1), '4.700.000');
+    await teclearComoUsuario(page, page.locator('input[placeholder="voltios"]'), '9');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('4.700.000,047 Ω');
+    // DEBERÍA: la fila R1 repite la R tecleada, 0,047. Obtenido: «0,05».
+    await expect(filas(page).nth(0).locator('td').nth(1)).toContainText('0,047', rapido);
+    // DEBERÍA: I = 9 / 4.700.000,047 = 1,9149 µA, legible. Obtenido: «≈0 A (0,00 mA)».
+    await expect(valorDe(page, 'Corriente total')).not.toContainText('0,00 mA', rapido);
+
+    // Potencia: 5 V sobre 10 kΩ → I = 5/10.000 = 0,0005 A · P = 25/10.000 = 0,0025 W
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    const campo = (i: number) => page.locator('input[inputMode="decimal"]').nth(i);
+    await teclearComoUsuario(page, campo(0), '5');
+    await teclearComoUsuario(page, campo(2), '10.000');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(valorDe(page, 'Corriente (I)')).toHaveText('0,0005 A');
+    // DEBERÍA: una potencia distinta de cero. Obtenido: «0,00 W».
+    await expect(valorDe(page, 'Potencia (P)')).not.toHaveText('0,00 W', rapido);
+  });
+
+  /**
+   * CASO 22 (bajo, operativa) — calcPotencia dice, en el comentario de la reparación del 870:
+   * «El cero sí se admite —una tarifa de 0 €/kWh es autoconsumo, y 0 horas da 0 kWh, que no es
+   * una cifra falsa». Pero el motivoDeRechazo que trajo el 874 corre ANTES sobre los seis campos
+   * y rechaza cualquier 0, así que aquella validación quedó muerta: la tarifa 0 y las 0 horas se
+   * rechazan con «tiene que ser mayor que cero».
+   */
+  test.fail('CASO 22 · una tarifa de 0 €/kWh (autoconsumo) da coste cero, no un rechazo', async ({ page }) => {
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    await esperarHidratacion(page, ['input[placeholder="opcional si tienes I y R"]']);
+    const campo = (i: number) => page.locator('input[inputMode="decimal"]').nth(i);
+    await teclearComoUsuario(page, campo(0), '230');
+    await teclearComoUsuario(page, campo(1), '10');
+    await teclearComoUsuario(page, campo(5), '0');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    // DEBERÍA: P = 230 × 10 = 2300 W → 2,3 kW × 1 h × 30 días = 69 kWh, y 69 × 0 = 0 €.
+    // Obtenido: «Tarifa: tiene que ser mayor que cero.» y ninguna ficha.
+    await expect(page.locator('main [role="alert"]')).toHaveCount(0, { timeout: 1500 });
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('69,0000 kWh');
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('0,0000 €');
   });
 });

@@ -768,3 +768,431 @@ test.describe('Simulador del Círculo Trigonométrico · casos para clase', () =
     expect(comprobarRespuesta(Number.NaN, 0.5).motivo).toBe('no-numerico');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 25/09/2026 · 586 usos · riesgo 3
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+import { esperarHidratacion, esperarPaginaAsentada, sembrarValor } from './_hidratacion';
+import { parseSpanishNumber } from '../../lib/formatters';
+
+/**
+ * QUÉ SE HA MIRADO EN ESTA RE-INSPECCIÓN
+ *
+ *   1. La SOSPECHA del digest del 25/09/2026: 3 caídas a «Algo salió mal» el 24/09 con
+ *      «IndexSizeError: Failed to execute 'arc' … The radius provided (-40) is negative», desde
+ *      un móvil 412×915 de Perú (Chrome y navegador de Instagram). −40 es exactamente
+ *      `Math.min(W, H) / 2 − 40` con el lienzo midiendo 0: `dibujar` lee el tamaño con
+ *      getBoundingClientRect, y `arc()` LANZA con un radio negativo. Como `dibujar` corre dentro
+ *      de un useEffect, la excepción la recoge la frontera de error y la página ENTERA se cambia
+ *      por la pantalla de error.
+ *      Reproducido (ver los tests H1 de abajo) con tres condiciones de carga, todas con el
+ *      mensaje idéntico al de producción:
+ *        · el lienzo en display:none al hidratar (CSS inyectado con addInitScript) → −40;
+ *        · la vista sin tamaño al montar (viewport 1×1, luego 412×915: un WebView que monta la
+ *          página antes de tener su tamaño) → −40, y la página NO se recupera al crecer;
+ *        · una vista de ≤ 140 px de ancho → radio −3 (a 100 px, −23). A 160 px ya no cae.
+ *      NO cae con una carga normal a 412×915 con UA de Chrome, de WebView ni de Instagram: el
+ *      navegador no es la condición, lo es el TAMAÑO del lienzo en el instante del montaje. Por
+ *      eso no lo ve la Ronda nocturna, que carga con viewport de escritorio.
+ *
+ *   2. Un mecanismo que agrava lo anterior EN MÓVIL: con ≤ 768 px, `.mainLayout` pasa a
+ *      `flex-direction: column` con `align-items: flex-start`, así que el ancho de
+ *      `.canvasWrapper` es el ancho INTRÍNSECO del lienzo, que es su atributo `width`… que
+ *      escribe `dibujar` (`canvas.width = rect.width * dpr`). Medido: con el atributo a 0 el
+ *      lienzo mide 0 px de ancho; a 100, 100 px; restaurado, 346 px. Consecuencias:
+ *        · un solo dibujo con el lienzo a 0 (resize transitorio) lo deja a 0 PARA SIEMPRE,
+ *          aunque la ventana vuelva a 412×915, y el siguiente cambio de ángulo tira la página;
+ *        · el primer dibujo se hace para el ancho por defecto del lienzo (300 px, búfer
+ *          300 × 1,75 = 525) y se estira a 346 px: búfer 525×525 donde tocaba 605×605.
+ *      En escritorio el lienzo se recupera solo (826×826 tras volver del 1×1).
+ *
+ *   ⚠️ LO QUE ESTO DICE DE LA REPARACIÓN (la sospecha ya lo apuntaba): NO basta un
+ *   `if (radio <= 0) return` a secas. Hay que (a) saltar el dibujo ANTES de escribir
+ *   `canvas.width`/`canvas.height` (líneas 141-142) mientras min(W, H) ≤ 2 × margen — si se
+ *   escribe el 0 primero, en móvil el lienzo ya no vuelve a crecer y ningún observador se
+ *   entera—, y (b) redibujar con un ResizeObserver sobre el lienzo, que además arregla el
+ *   primer dibujo a 300 px. La guarda tiene que cubrir radio ≤ 0, no solo tamaño 0: a 140 px
+ *   de ancho el lienzo mide 74 px y el radio sale −3.
+ *
+ *   3. Los 12 casos de aula (entraron el 21-22/09 y nunca se habían inspeccionado), resueltos a
+ *      mano ANTES de abrir el navegador. Los 12 aceptan la respuesta correcta y rechazan el
+ *      error típico, en escritorio y en móvil. Ninguno cae en un eje (90°/180°/270°): el
+ *      convenio de `casos.ts` los excluye a propósito (tangente inexistente, cuadrante
+ *      inexistente), así que los ejes se comprueban contra el motor.
+ *
+ *   4. Dos defectos de presentación del ángulo, fuera de los casos:
+ *        · H3 · la fracción de π se decide con Math.round(ángulo): cualquier ángulo a menos de
+ *          medio grado de un notable se rotula con la fracción EXACTA. En radianes, 1,5708 rad
+ *          sale «θ = π/2» con tan = −272241,8084 y cuadrante II; 1,565 rad sale «π/2» con
+ *          tan 172,5211; 29,6° sale «π/6». Y el deslizador de radianes NUNCA cae en un notable
+ *          (su rejilla arranca en −2π con paso 0,01), así que cerca de cada uno enseña una
+ *          fracción falsa.
+ *        · H4 · el ángulo en grados se imprime en crudo, con PUNTO decimal y hasta 14 cifras:
+ *          «36.8699°» tras «Ver 36,87° en el círculo» del caso 8, «57.29577951308232°» con
+ *          1 rad, «36.3°» durante la animación. Y el veredicto escribe «30 °» con espacio,
+ *          cuando la propia app escribe «30°» en todo lo demás (y la RAE pega el símbolo de
+ *          grado a la cifra cuando es un ángulo).
+ */
+
+/** Móvil de la sospecha: Galaxy A06 (720×1600 px físicos → 412×915 CSS a 1,75). */
+const MOVIL_A06 = {
+  viewport: { width: 412, height: 915 },
+  userAgent:
+    'Mozilla/5.0 (Linux; Android 14; SM-A065M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+  deviceScaleFactor: 1.75,
+  isMobile: true,
+  hasTouch: true,
+};
+
+/** Recoge los IndexSizeError de arc(), lleguen por la consola (frontera de error) o sin capturar. */
+function vigilarArc(page: Page): string[] {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => {
+    if (/arc|radius/i.test(e.message)) errores.push(e.message);
+  });
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /arc|radius/i.test(m.text())) errores.push(m.text());
+  });
+  return errores;
+}
+
+/** La app se ve (no la pantalla de error) — con timeout corto: el fallo de hoy tiene que salir rápido. */
+async function laAppSeVe(page: Page, motivo: string): Promise<void> {
+  await expect(page.getByRole('heading', { name: 'Algo salió mal' }), motivo).toHaveCount(0, { timeout: 1500 });
+  await expect(page.getByRole('heading', { level: 1 }), motivo).toContainText(
+    'Simulador del Círculo Trigonométrico',
+    { timeout: 1500 },
+  );
+}
+
+/** Tamaño CSS del lienzo, su búfer y si tiene algo pintado en el centro. */
+async function estadoLienzo(page: Page) {
+  return page.evaluate(() => {
+    const c = document.querySelector('canvas');
+    if (!c) return { existe: false, ancho: 0, alto: 0, bufer: 0, dpr: 1, pintado: false };
+    const r = c.getBoundingClientRect();
+    let pintado = false;
+    if (c.width > 0 && c.height > 0) {
+      const px = c.getContext('2d')?.getImageData(Math.floor(c.width / 2), Math.floor(c.height / 2), 1, 1).data;
+      pintado = Boolean(px && px[3] > 0);
+    }
+    return { existe: true, ancho: r.width, alto: r.height, bufer: c.width, dpr: window.devicePixelRatio, pintado };
+  });
+}
+
+/** Inyecta CSS antes de que corra ningún script de la página (y antes de hidratar). */
+async function cssAntesDeHidratar(page: Page, css: string): Promise<void> {
+  await page.addInitScript((regla: string) => {
+    const estilo = document.createElement('style');
+    estilo.id = 'css-prueba-inspector';
+    estilo.textContent = regla;
+    const poner = (): void => {
+      if (!estilo.isConnected) (document.head ?? document.documentElement)?.appendChild(estilo);
+    };
+    poner();
+    new MutationObserver(poner).observe(document, { childList: true, subtree: true });
+  }, css);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// Casos de aula: cada respuesta correcta aceptada y el error típico rechazado
+// ─────────────────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Resueltos a mano, sin mirar la app:
+ *   1  sen 30° = 1/2 = 0,5                         · error: 0,866 (cos 30°, seno por coseno)
+ *   2  cos 120° = −cos 60° = −0,5 (cuadrante II)   · error: 0,5 (sin el signo del cuadrante)
+ *   3  tan(−45°) = (−√2/2)/(√2/2) = −1             · error: 1 (girar en sentido antihorario)
+ *   4  200° está entre 180° y 270° → cuadrante 3    · error: 2
+ *   5  ref(210°) = 210 − 180 = 30°                  · error: 60 (270 − 210, contra el eje vertical)
+ *   6  225 · π/180 = 5π/4 = 3,92699… → 3,93 rad     · error: 12891,55 (225 · 180/π, factor al revés)
+ *   7  5π/6 rad = 5 · 180°/6 = 150°                 · error: 2,62 (dejarlo en radianes)
+ *   8  cos θ = +√(1 − 0,6²) = √0,64 = 0,8           · error: 0,4 (1 − 0,6 sin elevar al cuadrado)
+ *   9  30 · tan 30° = 30/√3 = 10√3 = 17,3205… → 17,32 m · error: 15 (30 · sen 30°)
+ *  10  6 / tan 60° = 6/√3 = 2√3 = 3,4641… → 3,46 m   · error: 10,39 (6 · tan 60°, multiplicar)
+ *  11  20 · sen 390° = 20 · sen 30° = 10 m          · error: 17,32 (20 · cos 30°)
+ *  12  8 · cos 240° = 8 · (−1/2) = −4 cm            · error: 4 (sin el signo)
+ */
+const AULA_A_MANO: ReadonlyArray<{ id: number; bien: string; mal: string; muestra: string }> = [
+  { id: 1, bien: '0,5', mal: '0,866', muestra: 'Correcto: 0,5' },
+  { id: 2, bien: '-0,5', mal: '0,5', muestra: 'Correcto: -0,5' },
+  { id: 3, bien: '-1', mal: '1', muestra: 'Correcto: -1' },
+  { id: 4, bien: '3', mal: '2', muestra: 'cuadrante 3' },
+  { id: 5, bien: '30', mal: '60', muestra: 'Correcto: 30' },
+  { id: 6, bien: '3,93', mal: '12891,55', muestra: '3,93' },
+  { id: 7, bien: '150', mal: '2,62', muestra: 'Correcto: 150' },
+  { id: 8, bien: '0,8', mal: '0,4', muestra: 'Correcto: 0,8' },
+  { id: 9, bien: '17,32', mal: '15', muestra: '17,32' },
+  { id: 10, bien: '3,46', mal: '10,39', muestra: '3,46' },
+  { id: 11, bien: '10', mal: '17,32', muestra: '10 m' },
+  { id: 12, bien: '-4', mal: '4', muestra: '-4 cm' },
+];
+
+async function recorrerCasosDeAula(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['#respuesta-caso-1']);
+  const panel = page.locator('#panel-casos');
+  const veredicto = panel.locator('article p[role="alert"]');
+  const comprobar = panel.getByRole('button', { name: 'Comprobar', exact: true });
+
+  for (const c of AULA_A_MANO) {
+    await panel.getByRole('button', { name: new RegExp(`^Caso ${c.id}:`) }).click();
+    const campo = `#respuesta-caso-${c.id}`;
+
+    await sembrarValor(page, campo, c.mal);
+    await comprobar.click();
+    await expect(veredicto, `caso ${c.id}: «${c.mal}» tiene que suspender`).toContainText('Todavía no');
+
+    await sembrarValor(page, campo, c.bien);
+    await comprobar.click();
+    await expect(veredicto, `caso ${c.id}: «${c.bien}» tiene que aprobar`).toContainText('Correcto');
+    await expect(veredicto, `caso ${c.id}: muestra la respuesta`).toContainText(c.muestra);
+  }
+  await expect(panel.getByText(/Has acertado/)).toContainText('Has acertado 12 de 12');
+}
+
+test.describe('Re-inspección 25/09/2026 · casos de aula en la interfaz', () => {
+  test('escritorio · los 12 aprueban la respuesta correcta y suspenden el error típico', async ({ page }) => {
+    await recorrerCasosDeAula(page);
+  });
+
+  test('«Ver en el círculo» lleva el caso 3 a −45° con sus razones', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#respuesta-caso-1', '#slider-angulo']);
+    await page.getByRole('button', { name: /^Caso 3:/ }).click();
+    await page.getByRole('button', { name: 'Ver -45° en el círculo' }).click();
+    // −45° ≡ 315°: cuadrante IV, sen −√2/2, cos +√2/2, tan −1.
+    await expect(valor(page, 'θ (grados)')).toHaveText('-45°');
+    expect(await razones(page)).toEqual({ sen: '-0,7071', cos: '0,7071', tan: '-1,0000' });
+    await expect(valor(page, 'Cuadrante')).toHaveText('IV');
+  });
+});
+
+test.describe('Re-inspección 25/09/2026 · los ejes y los radianes contra el motor', () => {
+  test('en los ejes el motor da 0 sin signo y ±1, y se niega donde no hay respuesta', () => {
+    // sen/cos de los ejes, de memoria: (cos, sen) = (0, 1) en 90°, (−1, 0) en 180°, (0, −1) en 270°.
+    expect(resolverCaso({ angulo: 90, magnitud: 'seno' }).valor).toBe(1);
+    expect(Object.is(resolverCaso({ angulo: 90, magnitud: 'coseno' }).valor, 0)).toBe(true);
+    expect(resolverCaso({ angulo: 180, magnitud: 'coseno' }).valor).toBe(-1);
+    expect(Object.is(resolverCaso({ angulo: 180, magnitud: 'seno' }).valor, 0)).toBe(true);
+    expect(resolverCaso({ angulo: 270, magnitud: 'seno' }).valor).toBe(-1);
+    // cos 270° es −1,84·10⁻¹⁶ en coma flotante: tiene que salir +0, no −0.
+    expect(Object.is(resolverCaso({ angulo: 270, magnitud: 'coseno' }).valor, 0)).toBe(true);
+    // tan 180° = 0/(−1) = 0.
+    expect(Object.is(resolverCaso({ angulo: 180, magnitud: 'tangente' }).valor, 0)).toBe(true);
+    // Donde no hay respuesta, no la hay: tangente de 90°/270° y cuadrante de un eje.
+    for (const eje of [90, 270]) expect(resolverCaso({ angulo: eje, magnitud: 'tangente' }).ok).toBe(false);
+    for (const eje of [0, 90, 180, 270]) expect(resolverCaso({ angulo: eje, magnitud: 'cuadrante' }).ok).toBe(false);
+    // Ángulo de referencia sobre un eje: 90° → 90°, 180° → 0°, 270° → 90°.
+    expect(resolverCaso({ angulo: 90, magnitud: 'angulo-referencia' }).valor).toBe(90);
+    expect(resolverCaso({ angulo: 180, magnitud: 'angulo-referencia' }).valor).toBe(0);
+    expect(resolverCaso({ angulo: 270, magnitud: 'angulo-referencia' }).valor).toBe(90);
+
+    // Corrección con lo que teclearía un alumno: «0» y «-0» aprueban cos 90°; «1» suspende.
+    const cos90 = resolverCaso({ angulo: 90, magnitud: 'coseno' }).valor;
+    expect(comprobarRespuesta(parseSpanishNumber('0'), cos90).correcto).toBe(true);
+    expect(comprobarRespuesta(parseSpanishNumber('-0'), cos90).correcto).toBe(true);
+    expect(comprobarRespuesta(parseSpanishNumber('1'), cos90).correcto).toBe(false);
+  });
+
+  test('los ejes en radianes: π/2 = 1,5708 · π = 3,1416 · 3π/2 = 4,7124', () => {
+    // 90 · π/180 = π/2 = 1,570796…; 180 → π = 3,141593…; 270 → 3π/2 = 4,712389…
+    expect(resolverCaso({ angulo: 90, magnitud: 'radianes' }).valor).toBe(1.5708);
+    expect(resolverCaso({ angulo: 180, magnitud: 'radianes' }).valor).toBe(3.1416);
+    expect(resolverCaso({ angulo: 270, magnitud: 'radianes' }).valor).toBe(4.7124);
+    // Casos 6 y 7, los dos de radianes: 5π/4 = 3,92699… → 3,927 · 5π/6 → 150°.
+    expect(CASOS[5].respuesta).toBe(3.927);
+    expect(CASOS[6].respuesta).toBe(150);
+
+    const pi2 = resolverCaso({ angulo: 90, magnitud: 'radianes' }).valor;
+    expect(comprobarRespuesta(parseSpanishNumber('1,57'), pi2).correcto, '1,57 redondeado').toBe(true);
+    expect(comprobarRespuesta(parseSpanishNumber('90'), pi2).correcto, 'dejarlo en grados').toBe(false);
+    expect(comprobarRespuesta(parseSpanishNumber('3,14'), pi2).correcto, 'π en vez de π/2').toBe(false);
+    const tres2 = resolverCaso({ angulo: 270, magnitud: 'radianes' }).valor;
+    expect(comprobarRespuesta(parseSpanishNumber('4,71'), tres2).correcto).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// HALLAZGO H1 (operativa, alto) — ABIERTO · la página entera cae si el lienzo mide < 80 px
+// ─────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('Re-inspección 25/09/2026 · H1 · el lienzo sin tamaño al montar tira la página', () => {
+  test.fail(
+    'H1 · con el lienzo en display:none al hidratar, la app se ve y lo dibuja al aparecer',
+    async ({ page }) => {
+      // DEBERÍA: saltarse el dibujo mientras el lienzo mida 0 y dibujarlo en cuanto tenga tamaño
+      // (ResizeObserver). HOY: arc() recibe radio −40 dentro del useEffect y la frontera de error
+      // sustituye la página ENTERA por «Algo salió mal», con el mismo mensaje que en producción.
+      const errores = vigilarArc(page);
+      await cssAntesDeHidratar(page, 'canvas { display: none !important; }');
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      await laAppSeVe(page, 'con el lienzo oculto al hidratar');
+      expect(errores, 'IndexSizeError de arc()').toEqual([]);
+
+      await page.evaluate(() => document.getElementById('css-prueba-inspector')?.remove());
+      await expect
+        .poll(async () => (await estadoLienzo(page)).pintado, { timeout: 2000, message: 'el lienzo se dibuja al aparecer' })
+        .toBe(true);
+    },
+  );
+
+  test.describe('móvil 412×915 (Galaxy A06)', () => {
+    test.use(MOVIL_A06);
+
+    test.fail('H1 · una vista que monta sin tamaño (1×1) y luego crece a 412×915 no cae', async ({ page }) => {
+      // Es lo que hace un WebView (navegador de Instagram, pestaña que se carga oculta) que
+      // monta la página antes de tener su tamaño. HOY: «Algo salió mal» con radio −40, y la
+      // página NO se recupera al crecer la vista.
+      const errores = vigilarArc(page);
+      await page.setViewportSize({ width: 1, height: 1 });
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      await page.setViewportSize({ width: 412, height: 915 });
+      await laAppSeVe(page, 'montada a 1×1 y crecida a 412×915');
+      expect(errores, 'IndexSizeError de arc()').toEqual([]);
+      // 412 − 2 × 16 (contenedor) − 2 × 17 (relleno del marco) ≈ 346 px de lienzo.
+      await expect
+        .poll(async () => (await estadoLienzo(page)).ancho, { timeout: 2000, message: 'el lienzo recupera su ancho' })
+        .toBeGreaterThan(300);
+    });
+
+    test.fail('H1 · a 140 px de ancho (lienzo de 74 px, radio −3) la app no cae', async ({ page }) => {
+      // La guarda tiene que cubrir radio ≤ 0, no solo tamaño 0: min(W, H) / 2 − 40 es negativo
+      // con cualquier lienzo de menos de 80 px. A 160 px de ancho ya no cae.
+      await page.setViewportSize({ width: 140, height: 915 });
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      await laAppSeVe(page, 'vista de 140 px');
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// HALLAZGO H2 (operativa, medio) — ABIERTO · en móvil el lienzo depende de su propio atributo
+// ─────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('Re-inspección 25/09/2026 · H2 · en móvil el lienzo no se recupera de un 0', () => {
+  test.use(MOVIL_A06);
+
+  test('control: una carga normal a 412×915 con UA de móvil NO cae', async ({ page }) => {
+    const errores = vigilarArc(page);
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    await laAppSeVe(page, 'carga normal en móvil');
+    expect(errores).toEqual([]);
+    const l = await estadoLienzo(page);
+    // ~346 px (412 menos contenedor y marco); el defecto que vigila es un lienzo a 0.
+    expect(l.ancho).toBeGreaterThan(300);
+    expect(l.pintado).toBe(true);
+  });
+
+  test('escritorio se recupera solo tras un resize a 1×1 (control del mecanismo)', async ({ browser }) => {
+    const contexto = await browser.newContext({ viewport: { width: 1400, height: 1000 } });
+    const page = await contexto.newPage();
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    await page.setViewportSize({ width: 1, height: 1 });
+    await page.waitForTimeout(300);
+    await page.setViewportSize({ width: 1400, height: 1000 });
+    await expect.poll(async () => (await estadoLienzo(page)).ancho, { timeout: 2000 }).toBeGreaterThan(700);
+    await contexto.close();
+  });
+
+  test.fail('H2 · tras un resize transitorio a 1×1, el lienzo vuelve y un cambio de ángulo no tira la página', async ({ page }) => {
+    // DEBERÍA: al volver a 412×915, el lienzo recupera sus ~346 px y sigue funcionando.
+    // HOY: el resize a 1×1 dibuja con el lienzo a 0 y deja su atributo width = 0; como en móvil
+    // el ancho del marco es el ancho intrínseco del lienzo, se queda a 0×0 aunque la ventana
+    // vuelva a crecer, y el siguiente cambio de ángulo cae a «Algo salió mal» (radio −40).
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    await page.setViewportSize({ width: 1, height: 1 });
+    await page.waitForTimeout(300);
+    await page.setViewportSize({ width: 412, height: 915 });
+    await expect
+      .poll(async () => (await estadoLienzo(page)).ancho, { timeout: 2000, message: 'el lienzo recupera su ancho' })
+      .toBeGreaterThan(300);
+    await page.getByRole('button', { name: 'Ir a 90°' }).click();
+    await laAppSeVe(page, 'cambio de ángulo tras el resize');
+  });
+
+  test.fail('H2 · el primer dibujo en móvil tiene la resolución del lienzo que se ve', async ({ page }) => {
+    // DEBERÍA: búfer = ancho CSS × dpr = 346 × 1,75 = 605 px. HOY: 525 = 300 × 1,75, porque
+    // `dibujar` mide el lienzo con su ancho por defecto (300 px) antes de que el marco crezca
+    // a 346, y nada lo vuelve a dibujar: el círculo sale estirado un 15 % hasta el primer resize.
+    // Tolerancia de 2 px (truncado de 605,5) frente a un defecto de 80.
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    const l = await estadoLienzo(page);
+    expect(Math.abs(l.bufer - l.ancho * l.dpr), `búfer ${l.bufer} para ${l.ancho} px × ${l.dpr}`).toBeLessThanOrEqual(2);
+  });
+
+  test('móvil · los 12 casos de aula aprueban la correcta y suspenden el error típico', async ({ page }) => {
+    await recorrerCasosDeAula(page);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// HALLAZGO H3 (cálculo, medio) — ABIERTO · fracción de π exacta para un ángulo que no lo es
+// ─────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('Re-inspección 25/09/2026 · H3 · la fracción de π sale de redondear el ángulo', () => {
+  test.fail('H3 · 1,565 rad y 29,6° no se rotulan π/2 ni π/6', async ({ page }) => {
+    // π/2 = 1,5708 rad, π/6 = 0,5236 rad. DEBERÍA: rotular la fracción solo cuando el ángulo ES
+    // el notable. HOY: `fracciones[Math.round(angulo)]` pone la fracción exacta a todo lo que
+    // esté a menos de medio grado: 1,565 rad (89,67°) sale «θ = π/2» con tan = 172,5211, y
+    // 1,5708 rad sale «π/2» con tan = −272241,8084 — la tangente que la propia app enseña que
+    // no existe en π/2.
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    await page.getByRole('button', { name: 'Radianes (rad)' }).click();
+    await campoAngulo(page).fill('1.565');
+    await expect(valor(page, 'tan(θ)')).toHaveText('172,5211'); // tan(1,565 rad), el valor es correcto
+    await expect(valor(page, 'θ (radianes)'), '1,565 rad ≠ π/2').not.toHaveText('π/2', { timeout: 1500 });
+    await expect(valor(page, 'θ (radianes)')).toContainText('1,565');
+
+    // Y en grados: 29,6 · π/180 = 0,516617… rad, no π/6 = 0,523599….
+    await page.getByRole('button', { name: 'Grados (°)' }).click();
+    await campoAngulo(page).fill('29.6');
+    await expect(valor(page, 'θ (radianes)'), '29,6° ≠ π/6').toHaveText('0,5166 rad', { timeout: 1500 });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// HALLAZGO H4 (contenido, bajo) — ABIERTO · el ángulo en grados sale en formato de EE. UU.
+// ─────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('Re-inspección 25/09/2026 · H4 · formato del ángulo', () => {
+  test.fail('H4 · «Ver 36,87° en el círculo» del caso 8 no escribe «36.8699°»', async ({ page }) => {
+    // El ángulo del caso 8 es arcsen 0,6 = 36,8699°. DEBERÍA salir con coma y como mucho 4
+    // decimales, igual que el resto del panel. HOY: «θ (grados) 36.8699°» y «θ = 36.8699°», con
+    // punto; con 1 rad en modo radianes, «57.29577951308232°».
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#respuesta-caso-1', '#slider-angulo']);
+    await page.getByRole('button', { name: /^Caso 8:/ }).click();
+    await page.getByRole('button', { name: 'Ver 36,87° en el círculo' }).click();
+    await expect(valor(page, 'sin(θ)')).toHaveText('0,6000'); // el círculo sí llegó al ángulo
+    await expect(valor(page, 'θ (grados)')).toHaveText(/^36,\d{1,4}°$/, { timeout: 1500 });
+
+    await page.getByRole('button', { name: 'Radianes (rad)' }).click();
+    await campoAngulo(page).fill('1');
+    await expect(valor(page, 'sin(θ)')).toHaveText('0,8415');
+    await expect(valor(page, 'θ (grados)')).toHaveText(/^57,\d{1,4}°$/, { timeout: 1500 });
+  });
+
+  test.fail('H4 · el veredicto pega el símbolo de grado a la cifra, como el resto de la app', async ({ page }) => {
+    // Caso 5: ángulo de referencia de 210° = 30°. DEBERÍA: «Correcto: 30°.» como escribe la app
+    // en sus enunciados y botones («sen 30°», «Ver 30° en el círculo»). HOY: «Correcto: 30 °.»
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#respuesta-caso-1']);
+    const panel = page.locator('#panel-casos');
+    await panel.getByRole('button', { name: /^Caso 5:/ }).click();
+    await sembrarValor(page, '#respuesta-caso-5', '30');
+    await panel.getByRole('button', { name: 'Comprobar', exact: true }).click();
+    const veredicto = panel.locator('article p[role="alert"]');
+    await expect(veredicto).toContainText('Correcto');
+    await expect(veredicto).toContainText('Correcto: 30°.', { timeout: 1500 });
+  });
+});

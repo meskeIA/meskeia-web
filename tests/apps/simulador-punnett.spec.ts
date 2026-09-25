@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, devices } from '@playwright/test';
+import { esperarPaginaAsentada } from './_hidratacion';
 
 /**
  * Cuadro de Punnett — Inspector, 11/09/2026 (PRIMERA inspección)
@@ -43,6 +44,9 @@ import { test, expect } from '@playwright/test';
  *      (3 genes)», y la app solo ofrece Monohíbrido y Dihíbrido.
  *   D. Forzar un valor inválido en un <select> desde el DOM deja el desplegable mostrando
  *      «AA» mientras la rejilla calcula con un progenitor «aa» (fallback silencioso).
+ *
+ * RE-INSPECCIÓN 25/09/2026 (invalidada por df61f210, el enlace de la tarjeta ABO): ver el
+ * bloque del final del fichero, con sus casos resueltos a mano y tres hallazgos abiertos.
  */
 
 const RUTA = '/simulador-punnett/';
@@ -175,6 +179,9 @@ test.describe('Cuadro de Punnett', () => {
     );
 
     // Porcentajes fenotípicos: 9/16 = 56,25 % · 3/16 = 18,75 % · 1/16 = 6,25 %.
+    // OJO (25/09/2026): esta línea fija la salida DEFECTUOSA de hoy —enteros y «%» pegado—,
+    // que es el hallazgo A de la re-inspección (ver el final del fichero). Al repararlo, esta
+    // aserción se pondrá en rojo: cambiarla por «9 (56,25 %) … 1 (6,25 %)» en el mismo commit.
     await expect(page.locator('[class*="interpretacionText"]')).toContainText(
       'De las 16 combinaciones: 9 (56%) dominante-dominante, 3 (19%) dominante-recesivo, 3 (19%) recesivo-dominante, 1 (6%) recesivo-recesivo.',
     );
@@ -317,5 +324,434 @@ test.describe('Cuadro de Punnett', () => {
       ['AA', 'AA'],
       ['AA', 'AA'],
     ]);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN 25/09/2026 — vuelve a la cola INVALIDADA por df61f210 (24/09), que añadió a
+ * la tarjeta ABO del bloque educativo un enlace al Simulador de Genética Mendeliana.
+ *
+ * Casos resueltos A MANO antes de abrir el navegador. Gametos en el orden en que los genera
+ * la app (para cada alelo del gen A, cada alelo del gen B); P1 en filas y P2 en columnas.
+ *
+ * CASO 4 (normal) — cruce de prueba dihíbrido AaBb × aabb.
+ *   Gametos P1: AB, Ab, aB, ab · P2 (aabb): ab, ab, ab, ab.
+ *   Fila AB → AaBb ×4 · Ab → Aabb ×4 · aB → aaBb ×4 · ab → aabb ×4.
+ *   Genotípica 4:4:4:4 = 1 AaBb : 1 Aabb : 1 aaBb : 1 aabb · fenotípica 1:1:1:1, 25 % cada una.
+ *
+ * CASO 5 (normal) — AaBb × AaBB.
+ *   Gametos P2 (AaBB): AB, AB, aB, aB.
+ *   Por loci: Aa × Aa = 1 AA : 2 Aa : 1 aa · Bb × BB = 1 BB : 1 Bb. Producto sobre 16:
+ *   AABB 2 · AaBB 4 · AABb 2 · AaBb 4 · aaBB 2 · aaBb 2 → simplificada 1:2:1:2:1:1.
+ *   Fenotípica: todo es B_, así que A_B_ 12 : aaB_ 4 = 3:1. Porcentajes 12,5 % y 25 %.
+ *
+ * CASO 6 (límite) — homocigotos. AA × Aa: gametos A, A × A, a → 2 AA : 2 Aa = 1:1, 100 %
+ *   dominante. aa × aa: 4 aa, 100 % recesivo. CASO 6bis: AABB × aabb → las 16 celdas AaBb
+ *   (1.ª ley también en dihíbrido).
+ *
+ * CASO 7 (límite) — AaBb × Aabb, el que destapa el redondeo del «Resultado:».
+ *   Gametos P2 (Aabb): Ab, Ab, ab, ab.
+ *   Fila AB → AABb, AABb, AaBb, AaBb · fila Ab → AAbb, AAbb, Aabb, Aabb
+ *   Fila aB → AaBb, AaBb, aaBb, aaBb · fila ab → Aabb, Aabb, aabb, aabb
+ *   Genotípica: AABb 2 · AaBb 4 · AAbb 2 · Aabb 4 · aaBb 2 · aabb 2 → 1:2:1:2:1:1
+ *   Fenotípica: A_B_ 6 · A_bb 6 · aaB_ 2 · aabb 2 → 3:3:1:1
+ *   Porcentajes EXACTOS: 37,5 % + 37,5 % + 12,5 % + 12,5 % = 100 %.
+ *
+ * Dominancia incompleta y codominancia: la app NO las ofrece (solo dominancia completa y
+ *   dos modos, ver el test 750). La tarjeta ABO manda al Simulador de Genética, y eso es lo
+ *   que se verifica en el test ENLACE.
+ *
+ * CASO 8 (rechazo) — una <option> INYECTADA que el navegador sí acepta (distinto del test
+ *   754, donde el navegador rechazaba el valor y React recibía cadena vacía): «AAa» en el gen
+ *   A de P1 y «Bx» en el gen B de P2. Esperado: no entra en el estado, React repone el
+ *   desplegable al valor anterior y la rejilla no cambia.
+ *
+ * ENLACE df61f210 — Iᴬi × Iᴮi a mano: gametos Iᴬ, i × Iᴮ, i → IᴬIᴮ (grupo AB), Iᴬi (A),
+ *   Iᴮi (B), ii (O): cuatro grupos a 1/4 = 1:1:1:1, como dice la tarjeta.
+ *
+ * HALLAZGOS ABIERTOS (test.fail — afirman lo que DEBERÍA pasar y hoy fallan a propósito; el
+ * día que se reparen se pondrán en verde: quitar entonces `test.fail` y quedan de regresión):
+ *   A. El «Resultado:» del dihíbrido redondea a entero y pega el «%»: AaBb × Aabb dice
+ *      38 % + 38 % + 13 % + 13 % = 102 %, y AaBb × AaBb 56/19/19/6 en vez de
+ *      56,25/18,75/18,75/6,25. Es el defecto de 751/755, que sobrevive en interpretarDihibrido.
+ *   B. El caso literal del hallazgo 755 sigue en pie: la fila AA × aa de la tabla educativa
+ *      escribe «100 % Aa» junto a «100% portadores», y el resto del bloque, «25% (aa)».
+ *   C. Las cabeceras de las dos tablas ponen texto blanco sobre var(--primary, #2E86AB):
+ *      4,11:1 en claro y 2,79:1 en oscuro, por debajo de 4,5:1. El candado
+ *      check:contraste-cabeceras no lo ve: su regex exige `var(--primary)` SIN fallback.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+const RESULTADO = '[class*="interpretacionText"]';
+const ENLACE_ABO = 'Crúzalo en el Simulador de Genética Mendeliana';
+
+/** Monta un cruce desde la interfaz, como lo haría el alumno. */
+async function montarCruce(
+  page: import('@playwright/test').Page,
+  tipo: 'mono' | 'di',
+  gA: [string, string],
+  gB?: [string, string],
+): Promise<void> {
+  await page
+    .getByRole('button', { name: tipo === 'mono' ? 'Monohíbrido (1 gen)' : 'Dihíbrido (2 genes)' })
+    .click();
+  await page.selectOption('#p1gA', gA[0]);
+  await page.selectOption('#p2gA', gA[1]);
+  if (tipo === 'di' && gB) {
+    await page.selectOption('#p1gB', gB[0]);
+    await page.selectOption('#p2gB', gB[1]);
+  }
+}
+
+/** Contraste WCAG entre el texto de un elemento y su fondo propio (opaco en estas tablas). */
+async function contrasteDe(locator: import('@playwright/test').Locator): Promise<number> {
+  return locator.evaluate((el) => {
+    const canal = (c: number) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (css: string) => {
+      const [r, g, b] = (css.match(/[\d.]+/g) ?? []).map(Number);
+      return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+    };
+    const cs = getComputedStyle(el);
+    const a = lum(cs.color);
+    const b = lum(cs.backgroundColor);
+    return +((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2);
+  });
+}
+
+/** La rejilla del CASO 7 (AaBb × Aabb), resuelta a mano en la cabecera de este bloque. */
+const REJILLA_CASO_7 = [
+  ['AABb', 'AABb', 'AaBb', 'AaBb'],
+  ['AAbb', 'AAbb', 'Aabb', 'Aabb'],
+  ['AaBb', 'AaBb', 'aaBb', 'aaBb'],
+  ['Aabb', 'Aabb', 'aabb', 'aabb'],
+];
+
+test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+  });
+
+  test('CASO 4 — cruce de prueba AaBb × aabb: 1:1:1:1 en genotipos y en fenotipos', async ({ page }) => {
+    await montarCruce(page, 'di', ['Aa', 'aa'], ['Bb', 'bb']);
+
+    // Gametos a mano: P1 AB, Ab, aB, ab · P2 (aabb) cuatro veces ab.
+    await expect(page.locator(`${CUADRO} thead th`)).toHaveText(['P1 \\ P2', 'ab', 'ab', 'ab', 'ab']);
+    await expect(page.locator(`${CUADRO} tbody th`)).toHaveText(['AB', 'Ab', 'aB', 'ab']);
+    expect(await rejilla(page)).toEqual([
+      ['AaBb', 'AaBb', 'AaBb', 'AaBb'],
+      ['Aabb', 'Aabb', 'Aabb', 'Aabb'],
+      ['aaBb', 'aaBb', 'aaBb', 'aaBb'],
+      ['aabb', 'aabb', 'aabb', 'aabb'],
+    ]);
+
+    // 4:4:4:4 simplificado por el mcd, que es 4.
+    expect(await proporcion(page, 0)).toBe('1 AaBb : 1 Aabb : 1 aaBb : 1 aabb');
+    expect(await proporcion(page, 1)).toBe(
+      '1 dominante-dominante : 1 dominante-recesivo : 1 recesivo-dominante : 1 recesivo-recesivo',
+    );
+
+    // 4/16 = 25 % cada fila.
+    expect(await recuento(page)).toEqual([
+      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['Aabb', 'Dom. A / Rec. B (A_bb)', '4', '25 %'],
+      ['aaBb', 'Rec. A / Dom. B (aaB_)', '4', '25 %'],
+      ['aabb', 'Doble recesivo (aabb)', '4', '25 %'],
+    ]);
+
+    // Los conteos del «Resultado:». El formato del porcentaje es el hallazgo A, así que aquí se
+    // admite con espacio y sin él: este test mide los conteos, no el formato.
+    await expect(page.locator(RESULTADO)).toHaveText(
+      /De las 16 combinaciones: 4 \(25 ?%\) dominante-dominante, 4 \(25 ?%\) dominante-recesivo, 4 \(25 ?%\) recesivo-dominante, 4 \(25 ?%\) recesivo-recesivo\./,
+    );
+  });
+
+  test('CASO 5 — AaBb × AaBB: genotípica 1:2:1:2:1:1 y fenotípica 3:1, sumando 100 %', async ({ page }) => {
+    await montarCruce(page, 'di', ['Aa', 'Aa'], ['Bb', 'BB']);
+
+    // Gametos de AaBB a mano: AB, AB, aB, aB (el gen B solo aporta B).
+    await expect(page.locator(`${CUADRO} thead th`)).toHaveText(['P1 \\ P2', 'AB', 'AB', 'aB', 'aB']);
+    expect(await rejilla(page)).toEqual([
+      ['AABB', 'AABB', 'AaBB', 'AaBB'],
+      ['AABb', 'AABb', 'AaBb', 'AaBb'],
+      ['AaBB', 'AaBB', 'aaBB', 'aaBB'],
+      ['AaBb', 'AaBb', 'aaBb', 'aaBb'],
+    ]);
+
+    // Conteos a mano 2:4:2:4:2:2 → entre 2; fenotípica 12:4 → entre 4.
+    expect(await proporcion(page, 0)).toBe('1 AABB : 2 AaBB : 1 AABb : 2 AaBb : 1 aaBB : 1 aaBb');
+    expect(await proporcion(page, 1)).toBe('3 dominante-dominante : 1 recesivo-dominante');
+
+    // 2/16 = 12,5 % y 4/16 = 25 %.
+    const filas = await recuento(page);
+    expect(filas).toEqual([
+      ['AABB', 'Doble dominante (A_B_)', '2', '12,5 %'],
+      ['AaBB', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['AABb', 'Doble dominante (A_B_)', '2', '12,5 %'],
+      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['aaBB', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
+      ['aaBb', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
+    ]);
+    expect(filas.reduce((acc, f) => acc + Number(f[2]), 0)).toBe(16);
+    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
+    expect(suma).toBeCloseTo(100, 6);
+  });
+
+  test('CASO 6 — homocigotos: AA × Aa da 100 % dominante y aa × aa, 100 % recesivo', async ({ page }) => {
+    await montarCruce(page, 'mono', ['AA', 'Aa']);
+    // A mano: gametos A, A × A, a → cada fila es AA, Aa.
+    expect(await rejilla(page)).toEqual([
+      ['AA', 'Aa'],
+      ['AA', 'Aa'],
+    ]);
+    expect(await proporcion(page, 0)).toBe('1 AA : 1 Aa');
+    expect(await proporcion(page, 1)).toBe('1 dominante');
+    expect(await recuento(page)).toEqual([
+      ['AA', 'Dominante (A_)', '2', '50 %'],
+      ['Aa', 'Dominante (A_)', '2', '50 %'],
+    ]);
+    await expect(page.locator(RESULTADO)).toContainText(
+      'El 100 % de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).',
+    );
+
+    await montarCruce(page, 'mono', ['aa', 'aa']);
+    // A mano: a, a × a, a → las cuatro celdas aa.
+    expect(await rejilla(page)).toEqual([
+      ['aa', 'aa'],
+      ['aa', 'aa'],
+    ]);
+    expect(await recuento(page)).toEqual([['aa', 'Recesivo (aa)', '4', '100 %']]);
+    await expect(page.locator(RESULTADO)).toContainText(
+      'El 100 % de la descendencia mostrará el fenotipo recesivo.',
+    );
+  });
+
+  test('CASO 6bis — AABB × aabb: las 16 celdas AaBb (1.ª ley en dihíbrido)', async ({ page }) => {
+    await montarCruce(page, 'di', ['AA', 'aa'], ['BB', 'bb']);
+    // A mano: P1 solo produce AB y P2 solo ab → todas AaBb.
+    expect(await rejilla(page)).toEqual(Array.from({ length: 4 }, () => ['AaBb', 'AaBb', 'AaBb', 'AaBb']));
+    expect(await proporcion(page, 0)).toBe('1 AaBb');
+    expect(await recuento(page)).toEqual([['AaBb', 'Doble dominante (A_B_)', '16', '100 %']]);
+  });
+
+  test('CASO 7 — AaBb × Aabb: rejilla, 3:3:1:1 y recuento exacto que suma 100 %', async ({ page }) => {
+    await montarCruce(page, 'di', ['Aa', 'Aa'], ['Bb', 'bb']);
+
+    await expect(page.locator(`${CUADRO} thead th`)).toHaveText(['P1 \\ P2', 'Ab', 'Ab', 'ab', 'ab']);
+    expect(await rejilla(page)).toEqual(REJILLA_CASO_7);
+    expect(await proporcion(page, 0)).toBe('1 AABb : 2 AaBb : 1 AAbb : 2 Aabb : 1 aaBb : 1 aabb');
+    expect(await proporcion(page, 1)).toBe(
+      '3 dominante-dominante : 3 dominante-recesivo : 1 recesivo-dominante : 1 recesivo-recesivo',
+    );
+    const filas = await recuento(page);
+    expect(filas).toEqual([
+      ['AABb', 'Doble dominante (A_B_)', '2', '12,5 %'],
+      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['AAbb', 'Dom. A / Rec. B (A_bb)', '2', '12,5 %'],
+      ['Aabb', 'Dom. A / Rec. B (A_bb)', '4', '25 %'],
+      ['aaBb', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
+      ['aabb', 'Doble recesivo (aabb)', '2', '12,5 %'],
+    ]);
+    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
+    expect(suma).toBeCloseTo(100, 6);
+    // Los CONTEOS del «Resultado:» (6, 6, 2, 2) sí son correctos; sus porcentajes, no (hallazgo A).
+    await expect(page.locator(RESULTADO)).toHaveText(
+      /6 \([\d,]+ ?%\) dominante-dominante, 6 \([\d,]+ ?%\) dominante-recesivo, 2 \([\d,]+ ?%\) recesivo-dominante, 2 \([\d,]+ ?%\) recesivo-recesivo\./,
+    );
+  });
+
+  test('CASO 8 — una <option> inyectada que el navegador acepta no entra en el estado', async ({ page }) => {
+    await montarCruce(page, 'mono', ['AA', 'AA']);
+    // Vía NO alcanzable por teclado ni ratón: se añade al <select> una opción que la app no
+    // ofrece y se elige. A diferencia del test 754, aquí el navegador SÍ acepta el valor, así
+    // que el evento change llega a React con «AAa» y no con cadena vacía.
+    await page.locator('#p1gA').evaluate((sel) => {
+      const opcion = document.createElement('option');
+      opcion.value = 'AAa';
+      opcion.textContent = 'AAa';
+      sel.appendChild(opcion);
+    });
+    await page.selectOption('#p1gA', 'AAa');
+    // El type guard lo descarta y React repone el desplegable controlado al valor del estado.
+    await expect(page.locator('#p1gA')).toHaveValue('AA');
+    expect(await rejilla(page)).toEqual([
+      ['AA', 'AA'],
+      ['AA', 'AA'],
+    ]);
+
+    // Lo mismo en el gen B, en dihíbrido: AABB × AABB → 16 celdas AABB antes y después.
+    await montarCruce(page, 'di', ['AA', 'AA'], ['BB', 'BB']);
+    await page.locator('#p2gB').evaluate((sel) => {
+      const opcion = document.createElement('option');
+      opcion.value = 'Bx';
+      opcion.textContent = 'Bx';
+      sel.appendChild(opcion);
+    });
+    await page.selectOption('#p2gB', 'Bx');
+    await expect(page.locator('#p2gB')).toHaveValue('BB');
+    await expect(page.locator(`${CUADRO} thead th`)).toHaveText(['P1 \\ P2', 'AB', 'AB', 'AB', 'AB']);
+    expect(await rejilla(page)).toEqual(Array.from({ length: 4 }, () => ['AABB', 'AABB', 'AABB', 'AABB']));
+  });
+
+  test('ENLACE df61f210 — la tarjeta ABO lleva a Humanos → Grupo sanguíneo ABO, donde Iᴬi × Iᴮi da 1:1:1:1', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const enlace = page.getByRole('link', { name: ENLACE_ABO });
+    await expect(enlace).toHaveCount(1);
+    await expect(enlace).toHaveAttribute('href', '/simulador-genetica/');
+    await expect(enlace).toBeVisible();
+
+    // La tarjeta nombra el camino y pone el ejemplo; 753 (codominancia bien enunciada) sigue.
+    const tarjeta = page.locator('[class*="scenarioCard"]').filter({ has: enlace });
+    await expect(tarjeta).toContainText('(Humanos → Grupo sanguíneo ABO), también junto al factor Rh.');
+    await expect(tarjeta).toContainText('produce grupos A, B, AB y O en proporción 1:1:1:1');
+    await expect(tarjeta).toContainText('son codominantes entre sí');
+
+    await enlace.click();
+    await expect(page).toHaveURL(/\/simulador-genetica\/$/);
+    await esperarPaginaAsentada(page);
+
+    // El camino existe tal cual lo escribe la tarjeta: Humanos → «Grupo sanguíneo ABO».
+    await page.getByRole('button', { name: /Humanos/ }).click();
+    const rasgo = page.locator('select[class*="select"]').first();
+    await expect(rasgo.locator('option', { hasText: 'Grupo sanguíneo ABO' })).toHaveCount(1);
+    await rasgo.selectOption({ label: 'Grupo sanguíneo ABO' });
+
+    // Se plantea el cruce del ejemplo de la tarjeta, Iᴬi × Iᴮi (en el motor, AO × BO).
+    const padres = page.locator('[class*="genotypeSelect"]');
+    await padres.nth(0).selectOption('AO');
+    await padres.nth(1).selectOption('BO');
+    await expect(padres.nth(0).locator('option:checked')).toHaveText('Iᴬi');
+    await expect(padres.nth(1).locator('option:checked')).toHaveText('Iᴮi');
+    await page.getByRole('button', { name: /Realizar Cruce/ }).click();
+
+    // A mano: columnas Iᴬ, i (padre) × filas Iᴮ, i (madre) → IᴬIᴮ, Iᴮi, Iᴬi, ii.
+    await expect(page.locator('[class*="cellGenotype"]')).toHaveText(['IᴬIᴮ', 'Iᴮi', 'Iᴬi', 'ii']);
+    await expect(page.locator('[class*="cellPhenotype"]')).toHaveText([
+      'Grupo AB',
+      'Grupo B',
+      'Grupo A',
+      'Grupo O',
+    ]);
+    // 1/4 cada celda. El formato del % es cosa de simulador-genetica; aquí se mide el valor.
+    await expect(page.locator('[class*="cellProbability"]')).toHaveText([
+      /^25(,0)? ?%$/,
+      /^25(,0)? ?%$/,
+      /^25(,0)? ?%$/,
+      /^25(,0)? ?%$/,
+    ]);
+    await page.getByRole('tab', { name: 'Estadísticas', exact: true }).click();
+    await expect(
+      page.locator('[class*="ratioSummary"]').filter({ hasText: 'Grupo AB' }),
+    ).toContainText('1:1:1:1');
+
+    // «También junto al factor Rh»: el dihíbrido admite el Rh como segunda característica.
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await expect(
+      page.locator('select[class*="select"]').nth(1).locator('option', { hasText: 'Factor Rh' }),
+    ).toHaveCount(1);
+  });
+
+  // ============================================================
+  // HALLAZGOS ABIERTOS (ver la cabecera de este bloque)
+  // ============================================================
+  test('HALLAZGO A (abierto) — el «Resultado:» del dihíbrido redondea a entero: AaBb × Aabb suma 102 %', async ({
+    page,
+  }) => {
+    test.fail(true, 'interpretarDihibrido usa Math.round y pega el «%»: hoy dice 38 % + 38 % + 13 % + 13 % = 102 %');
+    await montarCruce(page, 'di', ['Aa', 'Aa'], ['Bb', 'bb']);
+    // A mano (CASO 7): 6/16 = 37,5 % · 6/16 = 37,5 % · 2/16 = 12,5 % · 2/16 = 12,5 %. Debería
+    // decirlo con los decimales exactos y el espacio del formato español, como ya lo dice la
+    // tabla de recuento de la misma pantalla (aaBb, único genotipo aaB_, «12,5 %»).
+    await expect(page.locator(RESULTADO)).toContainText(
+      'De las 16 combinaciones: 6 (37,5 %) dominante-dominante, 6 (37,5 %) dominante-recesivo, 2 (12,5 %) recesivo-dominante, 2 (12,5 %) recesivo-recesivo.',
+      { timeout: 2000 },
+    );
+    // Y el dihíbrido clásico, a mano: 9/16 = 56,25 % · 3/16 = 18,75 % · 1/16 = 6,25 %.
+    await montarCruce(page, 'di', ['Aa', 'Aa'], ['Bb', 'Bb']);
+    await expect(page.locator(RESULTADO)).toContainText(
+      'De las 16 combinaciones: 9 (56,25 %) dominante-dominante, 3 (18,75 %) dominante-recesivo, 3 (18,75 %) recesivo-dominante, 1 (6,25 %) recesivo-recesivo.',
+      { timeout: 2000 },
+    );
+  });
+
+  test('HALLAZGO B (abierto) — la tabla educativa sigue con «100 % Aa» junto a «100% portadores» (755)', async ({
+    page,
+  }) => {
+    test.fail(true, 'la columna «¿Portadores?» y dos tarjetas escriben el % pegado; 755 se cerró sin tocarlas');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // A mano: AA × aa → gametos A × a → las 4 celdas Aa → 100 % Aa, 100 % portadores.
+    const filaAAxaa = page.locator('table[aria-label="Cruces y proporciones"] tbody tr').nth(3);
+    await expect(filaAAxaa.locator('td')).toHaveText(
+      ['AA × aa', '100 % Aa', '100 % dominante', '100 % portadores'],
+      { timeout: 2000 },
+    );
+    // Y en el resto del bloque, ningún porcentaje pegado a su número («25% (aa)», «El 50%…»).
+    for (const zona of ['table[aria-label="Cruces y proporciones"]', '[class*="scenariosGrid"]', '[class*="warningBox"]']) {
+      await expect(page.locator(zona)).not.toContainText(/\d%/, { timeout: 2000 });
+    }
+  });
+
+  test('HALLAZGO C (abierto) — cabeceras de tabla con blanco sobre var(--primary): 4,11:1 en claro, 2,79:1 en oscuro', async ({
+    page,
+  }) => {
+    test.fail(true, '.punnettHeader y .tabla th usan var(--primary, #2E86AB) con texto #fff; el umbral es 4,5:1');
+    // Sin transiciones: en oscuro, medir durante la animación da un color intermedio.
+    await page.addStyleTag({
+      content: '*, *::before, *::after { transition: none !important; animation: none !important; }',
+    });
+    // «A»: gameto en la cabecera del cuadro, 17,6 px en negrita (no llega a «texto grande»,
+    // 18,66 px en negrita). «Genotipo»: cabecera del recuento, 14,72 px en negrita.
+    const gameto = page.locator(`${CUADRO} thead th`).nth(1);
+    const genotipo = page.locator(`${RECUENTO} thead th`).first();
+    expect(await contrasteDe(gameto)).toBeGreaterThanOrEqual(4.5);
+    expect(await contrasteDe(genotipo)).toBeGreaterThanOrEqual(4.5);
+
+    // Oscuro con el botón real: poner `data-theme` a mano lo pisa el gestor de tema.
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    expect(await contrasteDe(gameto)).toBeGreaterThanOrEqual(4.5);
+    expect(await contrasteDe(genotipo)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+// ============================================================
+// Móvil — Pixel 7 enumerado campo a campo (un `...devices[...]` dentro de un describe
+// arrastraría `defaultBrowserType` y forzaría un worker nuevo).
+// ============================================================
+test.describe('Cuadro de Punnett · móvil · re-inspección 25/09/2026', () => {
+  test.use({
+    viewport: devices['Pixel 7'].viewport,
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: devices['Pixel 7'].deviceScaleFactor,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('el dihíbrido AaBb × Aabb cabe sin scroll horizontal y el enlace ABO se abre con el dedo', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    await montarCruce(page, 'di', ['Aa', 'Aa'], ['Bb', 'bb']);
+
+    // La misma rejilla del CASO 7, resuelta a mano.
+    expect(await rejilla(page)).toEqual(REJILLA_CASO_7);
+
+    // 5 columnas (esquina + 4 gametos) en 412 px: la página no se desborda.
+    const anchos = await page.evaluate(() => ({
+      pagina: document.documentElement.scrollWidth,
+      ventana: window.innerWidth,
+    }));
+    expect(anchos.pagina).toBeLessThanOrEqual(anchos.ventana);
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).tap();
+    const enlace = page.getByRole('link', { name: ENLACE_ABO });
+    await enlace.scrollIntoViewIfNeeded();
+    await enlace.tap();
+    await expect(page).toHaveURL(/\/simulador-genetica\/$/);
   });
 });

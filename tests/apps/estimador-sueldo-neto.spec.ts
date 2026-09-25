@@ -1,4 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
+import { parseSpanishNumber } from '../../lib/formatters';
 
 /**
  * Inspector — estimador-sueldo-neto (segmento fiscal, RIESGO 1 CRÍTICO, 17 usos)
@@ -98,9 +101,35 @@ import { test, expect, Page } from '@playwright/test';
  *    marginal, no a tipo cero. Sumarla al mínimo le daba el tratamiento del otro.
  *
  * La aritmética íntegra de cada caso, ya con las dos correcciones, va en su test.
+ *
+ * ── Re-inspección 25/09/2026 (INVALIDADA por 1a4072d9, 24/09/2026) ────────────
+ * Motivo: la deducción por obtención de rendimientos del trabajo pasó a ser la DA 61.ª
+ * sobre los ÍNTEGROS con las cuantías de 2026 (DEDUCCION_RENDIMIENTOS_TRABAJO_2026:
+ * 590,89 € hasta 17.094 €, 590,89 − 0,2 × exceso, 0 € desde 20.048,45 €; art. 28 del
+ * RDL 5/2026, BOE-A-2026-3810), con tope en la cuota íntegra GENERAL
+ * (limitarDeduccionRendimientosTrabajo), y la base de cotización perdió el suelo de la
+ * base mínima de jornada completa.
+ *
+ * Spec previo ejecutado TAL CUAL antes de tocarlo: 7 de 7 en verde. Ningún valor esperado
+ * quedó desfasado: los CASOS 1 y 2 caen fuera de la zona de la DA 61.ª (íntegros ≥
+ * 20.048,45 €) y por encima de la base mínima, y el CASO 0 ya se escribió con 1a4072d9.
+ * Los arreglos 559, 560, 561 y 569 siguen en pie.
+ *
+ * Lo que cambia en el fichero: `calcular()` ya no se fía del valor del DOM (`toHaveValue`)
+ * sino del estado de React (`esperarValorEnReact`), y cada `goto` espera a la hidratación
+ * (`esperarHidratacion`), como manda `tests/apps/_hidratacion.ts`.
+ *
+ * Casos nuevos, resueltos a mano contra data/fiscal ANTES de ejecutar la app (bloque
+ * «Re-inspección 25/09/2026» más abajo): 42.000 € en 14 pagas (normal, desglose entero),
+ * 18.600 € (DA 61.ª parcial), 17.600 € (DA 61.ª topada en la cuota), 9.000 € (bajo el SMI,
+ * sin suelo de base), tres idas y vueltas Neto→Bruto y los cuatro rechazos (vacío, 0,
+ * negativo e «30.000.50»). El motor cuadró al céntimo en todos.
+ * Los hallazgos abiertos van al final como `test.fail()`: afirman lo que DEBERÍA pasar.
  */
 
 const RUTA = '/estimador-sueldo-neto/';
+/** El campo del salario: NumberInput no lleva id estable, pero sí este placeholder. */
+const CAMPO = 'input[placeholder="30000"]';
 
 /** `formatCurrency` separa la cifra del € con un espacio duro (U+00A0). */
 const ESPACIO_DURO = new RegExp(String.fromCharCode(160), 'g');
@@ -119,10 +148,17 @@ async function filaDesglose(page: Page, etiquetaExacta: string): Promise<string>
   return limpiar(await fila.locator('span').nth(1).innerText());
 }
 
+/** Cuántas filas del desglose llevan esa etiqueta (0 si la app no la pinta). */
+async function cuentaFilas(page: Page, etiquetaExacta: string): Promise<number> {
+  return page.locator(`css=div:has(> span:text-is("${etiquetaExacta}"))`).count();
+}
+
 async function calcular(page: Page, salario: string): Promise<void> {
-  const campo = page.getByPlaceholder('30000');
+  const campo = page.locator(CAMPO);
   await campo.fill(salario);
-  await expect(campo).toHaveValue(salario);
+  // El ESTADO de React, no el DOM: si la app aún no hubiera hidratado, el DOM mostraría la
+  // cifra y el cálculo se haría con la anterior (ver tests/apps/_hidratacion.ts).
+  await esperarValorEnReact(page, CAMPO, salario);
   await page.getByRole('button', { name: 'Calcular', exact: true }).click();
 }
 
@@ -134,9 +170,29 @@ async function hayResultados(page: Page): Promise<boolean> {
   return (await page.getByRole('heading', { level: 3, name: 'Salario Neto Anual', exact: true }).count()) > 0;
 }
 
+/** «42.000,01€» → 42000.01, con el parser canónico. */
+async function numeroTarjeta(page: Page, titulo: string): Promise<number> {
+  return parseSpanishNumber((await valorTarjeta(page, titulo)).replace('€', ''));
+}
+
+/** Texto del cuerpo con el bloque educativo abierto (nace colapsado). */
+async function cuerpoConGuiaAbierta(page: Page): Promise<string> {
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  return limpiar(await page.locator('body').innerText());
+}
+
+/** El JSON-LD del FAQPage, tal y como lo sirve el layout. */
+async function faqJsonLd(page: Page): Promise<string> {
+  const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = scripts.find((s) => s.includes('"FAQPage"'));
+  if (!faq) throw new Error('La página no sirve ningún JSON-LD de tipo FAQPage');
+  return faq;
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Estimador Sueldo Neto ↔ Bruto');
+  await esperarHidratacion(page, [CAMPO]);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -260,6 +316,7 @@ test('CASO 3 (reparado) · Calcular con el campo VACÍO dispara el mismo aviso q
  */
 test('Hallazgo 560 — la tabla de tramos IRPF y las cifras de SMI/SS del bloque educativo están ancladas a data/fiscal', async ({ page }) => {
   await page.goto(RUTA);
+  await esperarHidratacion(page, [CAMPO]);
   // El bloque educativo nace colapsado (REGLA #7): hay que abrirlo para que
   // innerText() lo recoja (el contenido está en el DOM pero oculto por CSS).
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -297,6 +354,7 @@ test('Hallazgo 560 — la tabla de tramos IRPF y las cifras de SMI/SS del bloque
  */
 test('Hallazgo 561 — los 4 botones de la app llevan type="button"', async ({ page }) => {
   await page.goto(RUTA);
+  await esperarHidratacion(page, [CAMPO]);
   for (const nombre of ['Bruto → Neto', 'Neto → Bruto', 'Calcular', 'Limpiar']) {
     await expect(page.getByRole('button', { name: nombre, exact: true })).toHaveAttribute('type', 'button');
   }
@@ -320,6 +378,7 @@ test('Hallazgo 561 — los 4 botones de la app llevan type="button"', async ({ p
  */
 test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF que «Soltero/a» por la reducción de tributación conjunta', async ({ page }) => {
   await page.goto(RUTA);
+  await esperarHidratacion(page, [CAMPO]);
   await calcular(page, '30000');
   const netoSoltero = await valorTarjeta(page, 'Salario Neto Anual');
   const irpfSoltero = await filaDesglose(page, 'Retención IRPF anual');
@@ -336,4 +395,320 @@ test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF
   expect(irpfCasadoUnIngreso).toBe('3906,00 €');
   expect(netoCasadoUnIngreso).toBe('24.144,00€');
   expect(netoCasadoUnIngreso).not.toBe(netoSoltero);
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Re-inspección 25/09/2026 — casos resueltos a mano contra data/fiscal/irpf.ts
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotización sin suelo', () => {
+  /**
+   * NORMAL · 42.000 € brutos, soltero/a sin hijos, 14 pagas.
+   *   SS (COTIZACIONES_SS_2026, base 42.000 / 12 = 3.500 €/mes < BASES_SS_2026.maxima 5.101,20):
+   *     contingencias comunes 3.500 × 4,70 % × 12 = 1.974,00 €
+   *     desempleo             3.500 × 1,55 % × 12 =   651,00 €
+   *     formación profesional 3.500 × 0,10 % × 12 =    42,00 €
+   *     MEI                   3.500 × 0,15 % × 12 =    63,00 €   → total 2.730,00 €
+   *   RNT = 42.000 − 2.730 − 2.000 (GASTOS_DEDUCIBLES_TRABAJO_2025, art. 19.2.f) = 37.270,00 €
+   *   Reducción art. 20 = 0 € (RNT ≥ 19.747,5 €, REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)
+   *   Base liquidable general = 37.270,00 € (el mínimo NO se resta: art. 63.1.2.º)
+   *   escala(37.270) = 12.450×19 % + 7.750×24 % + 15.000×30 % + 2.070×37 %
+   *                  = 2.365,50 + 1.860,00 + 4.500,00 + 765,90 = 9.491,40 €
+   *   escala(5.550)  = 1.054,50 € (MINIMOS_IRPF_2025.personal a tipo cero)
+   *   cuota = 9.491,40 − 1.054,50 = 8.436,90 € (calcularCuotaIntegraGeneral)
+   *   DA 61.ª 2026: 0 € (42.000 ≥ 20.048,45 €, DEDUCCION_RENDIMIENTOS_TRABAJO_2026.limiteMaximo)
+   *   Neto = 42.000 − 2.730 − 8.436,90 = 30.833,10 € · /14 = 2.202,36 € · bruto /14 = 3.000,00 €
+   *   Tipo efectivo 8.436,90 / 42.000 = 20,09 % · deducciones 11.166,90 € = 26,59 % del bruto
+   */
+  test('NORMAL · 42.000 € brutos en 14 pagas, soltero/a: desglose completo', async ({ page }) => {
+    await page.locator('select').nth(1).selectOption('14');
+    await calcular(page, '42000');
+    expect(await hayResultados(page)).toBe(true);
+
+    expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('42.000,00€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('30.833,10€');
+    expect(await valorTarjeta(page, 'Bruto Mensual (14 pagas)')).toBe('3000,00€');
+    expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2202,36€');
+
+    expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('1974,00 €');
+    expect(await filaDesglose(page, 'Desempleo (1,55%)')).toBe('651,00 €');
+    expect(await filaDesglose(page, 'Formación profesional (0,10%)')).toBe('42,00 €');
+    expect(await filaDesglose(page, 'MEF - Equidad Intergeneracional (0,15%)')).toBe('63,00 €');
+    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('2730,00 €');
+
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('8436,90 €');
+    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('20,09%');
+    // Fuera de la zona de la DA 61.ª: la fila no se pinta.
+    expect(await cuentaFilas(page, 'Deducción por rendimientos del trabajo')).toBe(0);
+
+    expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('11.166,90 €');
+    expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('26,59%');
+  });
+
+  /**
+   * LÍMITE · 18.600 € brutos: dentro del tramo decreciente de la DA 61.ª de 2026.
+   *   SS = 18.600 × 6,50 % = 1.209,00 € (1.550 €/mes, sin tope ni suelo)
+   *   RNT = 18.600 − 1.209 − 2.000 = 15.391,00 € → reducción art. 20, primer tramo decreciente:
+   *     7.302 − 1,75 × (15.391 − 14.852) = 7.302 − 943,25 = 6.358,75 €
+   *   Base = 15.391 − 6.358,75 = 9.032,25 € → cuota = (9.032,25 − 5.550) × 19 % = 661,63 €
+   *   DA 61.ª (DEDUCCION_RENDIMIENTOS_TRABAJO_2026) sobre los ÍNTEGROS:
+   *     590,89 − 0,2 × (18.600 − 17.094) = 590,89 − 301,20 = 289,69 € (< cuota: sin tope)
+   *   IRPF = 661,6275 − 289,69 = 371,94 € · neto = 18.600 − 1.209 − 371,94 = 17.019,06 €
+   *   Con la redacción de 2025 (340 € hasta 16.576 €, cero desde 18.276 €) la deducción
+   *   sería 0 € y el IRPF 661,63 €: la diferencia es la que vigila este caso.
+   */
+  test('LÍMITE · 18.600 €: la DA 61.ª de 2026 deduce 289,69 € (590,89 − 0,2 × 1.506)', async ({ page }) => {
+    await calcular(page, '18600');
+    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1209,00 €');
+    expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-289,69 €');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('371,94 €');
+    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('2,00%');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('17.019,06€');
+    expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('1580,94 €');
+  });
+
+  /**
+   * LÍMITE · 17.600 € brutos: la deducción supera la cuota y se topa en ella
+   * (limitarDeduccionRendimientosTrabajo: tope = cuota íntegra GENERAL, peso del trabajo 1).
+   *   SS = 17.600 × 6,50 % = 1.144,00 € · RNT = 17.600 − 1.144 − 2.000 = 14.456,00 €
+   *   Reducción art. 20 = 7.302 € (RNT ≤ 14.852) → base 7.154,00 €
+   *   cuota = (7.154 − 5.550) × 19 % = 304,76 €
+   *   DA 61.ª: 590,89 − 0,2 × (17.600 − 17.094) = 489,69 € → topada a 304,76 € → IRPF 0,00 €
+   *   Neto = 17.600 − 1.144 = 16.456,00 €
+   */
+  test('LÍMITE · 17.600 €: la deducción de 489,69 € se topa en la cuota íntegra (304,76 €)', async ({ page }) => {
+    await calcular(page, '17600');
+    expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-304,76 €');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('0,00 €');
+    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1144,00 €');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.456,00€');
+  });
+
+  /**
+   * LÍMITE · 9.000 € brutos, por debajo del SMI anual (SMI_2026.anual = 17.094 €): solo puede
+   * ser jornada parcial o parte del año, y se cotiza por lo cobrado (1a4072d9).
+   *   Base de cotización = 9.000 / 12 = 750 €/mes (SIN subir a BASES_SS_2026.minima)
+   *   contingencias comunes 750 × 4,70 % × 12 = 423,00 € · total 9.000 × 6,50 % = 585,00 €
+   *   Con el suelo antiguo: 1.424,40 × 12 × 6,50 % = 1.111,03 € — lo que vigila este caso.
+   *   RNT = 9.000 − 585 − 2.000 = 6.415 € → reducción art. 20 = 7.302 € → base 0 → cuota 0
+   *   DA 61.ª: 590,89 € topada a la cuota (0 €) → la fila no se pinta · IRPF 0,00 €
+   *   Neto = 9.000 − 585 = 8.415,00 € · /12 = 701,25 €
+   */
+  test('LÍMITE · 9.000 € (bajo el SMI): se cotiza por lo cobrado, 585,00 € y no 1.111,03 €', async ({ page }) => {
+    await calcular(page, '9000');
+    expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('423,00 €');
+    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('585,00 €');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('0,00 €');
+    expect(await cuentaFilas(page, 'Deducción por rendimientos del trabajo')).toBe(0);
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('8415,00€');
+    expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('701,25€');
+  });
+
+  /**
+   * IDA Y VUELTA · Neto → Bruto con los netos que la ida dio arriba. La vuelta itera hasta
+   * que el neto cuadra a 1 céntimo; en el bruto eso son como mucho 0,01 / (dNeto/dBruto):
+   *   · 42.000 €, marginal 37 %: dNeto/dBruto = 0,935 × 0,63 ≈ 0,59 → ±0,02 €
+   *   · 18.600 €, zona de la DA 61.ª: 0,935 − (0,19 × 0,935 × 2,75 + 0,2) ≈ 0,25 → ±0,05 €
+   *   · 9.000 €, sin IRPF: 0,935 → ±0,01 €
+   * Precisión 0 de toBeCloseTo (±0,5 €): el defecto que vigila —una vuelta que no aplique la
+   * misma DA 61.ª o el mismo suelo de cotización que la ida— se mide en cientos de euros
+   * (sin la deducción, 18.600 € volverían ≈ 1.175 € más arriba; con el suelo viejo, 9.000 €
+   * volverían como 9.526,03 €).
+   */
+  test('IDA Y VUELTA · Neto → Bruto devuelve 42.000, 18.600 y 9.000 € desde sus netos', async ({ page }) => {
+    const casos: Array<[string, string, number]> = [
+      ['30833,10', '30.833,10€', 42000],
+      ['17019,06', '17.019,06€', 18600],
+      ['8415', '8415,00€', 9000],
+    ];
+    await page.getByRole('button', { name: 'Neto → Bruto', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Neto → Bruto', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    for (const [neto, netoMostrado, brutoEsperado] of casos) {
+      await calcular(page, neto);
+      // Tres cálculos seguidos en la misma página: se espera a que la tarjeta sea la de ESTE
+      // neto antes de leer el bruto, para no medir el del caso anterior.
+      await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe(netoMostrado);
+      expect(await numeroTarjeta(page, 'Salario Bruto Anual')).toBeCloseTo(brutoEsperado, 0);
+    }
+  });
+
+  /**
+   * RECHAZO · vacío, 0, negativo e ilegible. La guarda es `!(salarioNum > 0)` sobre
+   * `parseSpanishNumber`, que devuelve NaN para «30.000.50» (dos puntos que no agrupan
+   * millares). «-5000» lo reescribe a 0 el blur de NumberInput (min = 0) y cae igual.
+   */
+  test('RECHAZO · vacío, «0», «-5000» y «30.000.50» avisan y no pintan resultados', async ({ page }) => {
+    const avisos: string[] = [];
+    page.on('dialog', async (dialog) => {
+      avisos.push(dialog.message());
+      await dialog.accept();
+    });
+
+    // Vacío: estado inicial de la página.
+    await esperarValorEnReact(page, CAMPO, '');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    expect(avisos).toEqual(['Por favor, introduce un salario válido']);
+    expect(await hayResultados(page)).toBe(false);
+
+    for (const entrada of ['0', '-5000', '30.000.50']) {
+      avisos.length = 0;
+      await limpiarFormulario(page);
+      await esperarValorEnReact(page, CAMPO, '');
+      await calcular(page, entrada);
+      expect(avisos, `entrada «${entrada}»`).toEqual(['Por favor, introduce un salario válido']);
+      expect(await hayResultados(page), `entrada «${entrada}»`).toBe(false);
+    }
+    // «30.000.50» se queda como se escribió: no se reinterpreta como 30.000,50 ni 3.000.050.
+    await expect(page.locator(CAMPO)).toHaveValue('30.000.50');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Hallazgos abiertos de la re-inspección del 25/09/2026. Afirman lo que DEBERÍA pasar:
+// hoy fallan a propósito. Al repararlos se les quita el `test.fail()` y quedan de candado.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgos abiertos — re-inspección del 25/09/2026', () => {
+  /**
+   * ALTO · El bloque educativo publica cifras del modelo viejo (reducción residual de 2.364 €
+   * del art. 20, retirada el 09/09 en 2b80033d, y mínimo valorado al marginal, reparado el 12/09
+   * en 6dda61c2) que contradicen a la calculadora de la misma página. Con la app:
+   *   · 30.000 € (tabla «12 pagas vs 14 pagas»): neto 23.124,00 € e IRPF 410,50 €/mes;
+   *     la tabla dice ~24.327 € y ~311 €.
+   *   · 22.000 € soltero: base 17.227,65 € y neto 18.112,36 €; el perfil dice 16.206 € y ~18.545 €.
+   *   · 35.000 €, dos ingresos, 1 hijo: base 30.725 € y neto 26.852,50 €; el perfil dice 28.362 €
+   *     (= 30.725 − 2.364) y ~28.436 €. «Ahorra ~720 €/año vs soltero»: con el mínimo a tipo
+   *     cero es 2.400 × 19 % = 456,00 € (IRPF 6.328,50 € soltero frente a 5.872,50 €).
+   *   · 80.000 €, dos ingresos: base 74.021,06 € y neto 52.864,59 €; el perfil dice ~71.657 € y ~55.371 €.
+   */
+  test.fail('bloque educativo — la tabla de 30.000 € y los perfiles cuadran con la calculadora', async ({ page }) => {
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    // La tabla es explícitamente «para un sueldo bruto de 30.000 €»: su neto es el del CASO 1.
+    expect.soft(cuerpo).toContain('23.124');
+    for (const cifraVieja of ['24.327', '~311 €', '16.206', '~18.545', '28.362', '~28.436', '~720 €', '~71.657', '~55.371']) {
+      expect.soft(cuerpo, `cifra del modelo viejo «${cifraVieja}»`).not.toContain(cifraVieja);
+    }
+  });
+
+  /**
+   * MEDIO · El «Ejemplo práctico» define la base liquidable como «lo que queda tras restar a tu
+   * bruto la Seguridad Social, los gastos deducibles, la reducción por rendimientos del trabajo
+   * y el mínimo personal/familiar», y le aplica la escala: enseña justo el método que el
+   * art. 63.1.2.º prohíbe (calcularCuotaIntegraGeneral: el mínimo forma parte de la base y se
+   * grava a tipo cero). check:minimo-irpf solo mira restas en el CÓDIGO, no la prosa.
+   */
+  test.fail('bloque educativo — el ejemplo práctico no resta el mínimo de la base liquidable', async ({ page }) => {
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    expect(cuerpo).not.toMatch(/tras restar[^)]*mínimo personal/);
+  });
+
+  /**
+   * MEDIO · Ejercicio declarado frente a ejercicio calculado. Hero, <title>, description, og y
+   * jsonLd dicen «2025», pero el cálculo usa COTIZACIONES_SS_2026 (MEI 0,15 %; en
+   * COTIZACIONES_SS_2025 era 0,12 %), BASES_SS_2026 y la DA 61.ª de 2026
+   * (calcularDeduccionRentasBajas(…, 2026)): 19.000 € deducen 209,69 € (CASO 0), cuando con la
+   * de 2025 serían 0 € (≥ 18.276 €). El propio aviso de la página dice «Vigencia: 2026».
+   */
+  test.fail('ejercicio — el hero y el <title> no anuncian 2025 cuando se calcula con 2026', async ({ page }) => {
+    expect.soft(await page.locator('body').innerText()).toContain('Vigencia: 2026');
+    const subtitulo = page.locator('header').filter({ has: page.getByRole('heading', { level: 1 }) }).locator('p');
+    expect.soft(await subtitulo.innerText()).not.toContain('2025');
+    expect.soft(await page.title()).not.toContain('2025');
+  });
+
+  /**
+   * MEDIO · Obligación de declarar escrita a mano: «Con dos o más pagadores, el límite baja a
+   * 15.000 €», cuando OBLIGACION_DECLARAR_2025.trabajo.variosPagadores (data/fiscal/irpf.ts,
+   * art. 96 LIRPF) es 15.876 €. Los 22.000 € y 1.500 € del mismo párrafo cuadran hoy con el
+   * módulo, pero tampoco se derivan de él.
+   */
+  test.fail('bloque educativo — el límite con varios pagadores es el de OBLIGACION_DECLARAR_2025 (15.876 €)', async ({ page }) => {
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    expect.soft(cuerpo).not.toContain('el límite baja a 15.000 €');
+    expect.soft(cuerpo).toMatch(/15\.876/);
+  });
+
+  /**
+   * MEDIO · El FAQPage (JSON-LD, lo que leen los buscadores con IA) da la cotización del
+   * trabajador como «aproximadamente el 6,35 %: 4,70 % + 1,55 % + 0,10 %», sin el MEI; la app
+   * aplica COTIZACIONES_SS_2026 = 4,70 + 1,55 + 0,10 + 0,15 = 6,50 % (1.950,00 € con 30.000 €).
+   */
+  test.fail('FAQPage — la cotización del trabajador no es el 6,35 % sin MEI', async ({ page }) => {
+    expect(await faqJsonLd(page)).not.toContain('6,35');
+  });
+
+  /**
+   * BAJO · El FAQPage dice que con 30.000 € la retención ronda el 12-15 % y con 50.000 € el
+   * 20-22 %; la calculadora de la página da 16,42 % (CASO 1) y 22,41 % (50.000 €: cuota
+   * escala(44.750) − escala(5.550) = 12.259,00 − 1.054,50 = 11.204,50 €).
+   */
+  test.fail('FAQPage — las horquillas de retención contienen lo que calcula la propia app', async ({ page }) => {
+    const faq = await faqJsonLd(page);
+    expect.soft(faq).not.toMatch(/30\.000 €, el 12-15 %/);
+    expect.soft(faq).not.toMatch(/50\.000 €, el 20-22 %/);
+  });
+
+  /**
+   * BAJO · El aviso final imprime FISCAL_IRPF_META.verificado en crudo: «Datos verificados:
+   * 2026-09-09», formato ISO; el DataReference de arriba ya lo da como 09/09/2026.
+   */
+  test.fail('aviso — la fecha de verificación va en formato DD/MM/AAAA', async ({ page }) => {
+    await expect(page.getByText(/^Datos verificados:/)).toHaveText(/^Datos verificados: \d{2}\/\d{2}\/\d{4}/, { timeout: 1000 });
+  });
+
+  /**
+   * MEDIO · Los dos <select> («Situación familiar», «Número de pagas») llevan un <label>
+   * visible sin `htmlFor` ni anidamiento: `select.labels.length` es 0 y un lector de pantalla
+   * los anuncia sin nombre, justo en el control que cambia el IRPF.
+   */
+  test.fail('accesibilidad — los dos desplegables tienen nombre accesible', async ({ page }) => {
+    expect.soft(await page.getByRole('combobox', { name: 'Situación familiar' }).count()).toBe(1);
+    expect.soft(await page.getByRole('combobox', { name: 'Número de pagas' }).count()).toBe(1);
+  });
+
+  /**
+   * BAJO · El importe de la deducción va con `style={{ color: '#27ae60' }}` literal: en claro,
+   * sobre #fff, da 2,87:1 (texto de 15,2 px, peso 500 → umbral AA 4,5:1). En oscuro, sobre
+   * #2d2d2d, 4,79:1. Se miden los dos para que el arreglo de uno no rompa el otro.
+   */
+  test.fail('accesibilidad — el importe de la deducción llega a 4,5:1 en los dos temas', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    // Sin transiciones: al cambiar de tema el fondo pasa por grises intermedios, y medido
+    // en caliente el oscuro daba 2,55:1 en vez de su 4,79:1 real.
+    await prepararParaMedir(page);
+    await calcular(page, '18600');
+    const importe = page.locator('css=div:has(> span:text-is("Deducción por rendimientos del trabajo")) > span').nth(1);
+    const contraste = () => importe.evaluate((el) => {
+      const nums = (c: string) => (c.match(/[\d.]+/g) ?? []).map(Number);
+      const lum = ([r, g, b]: number[]) => {
+        const f = (v: number) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      const capas: number[][] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        const [r, g, b, a = 1] = nums(getComputedStyle(n).backgroundColor);
+        if (a > 0) capas.push([r, g, b, a]);
+        if (a >= 1) break;
+      }
+      let fondo = [255, 255, 255];
+      for (const [r, g, b, a] of capas.reverse()) fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+      const [l1, l2] = [lum(nums(getComputedStyle(el).color)), lum(fondo)].sort((x, y) => y - x);
+      return (l1 + 0.05) / (l2 + 0.05);
+    });
+    expect.soft(await contraste(), 'tema claro').toBeGreaterThanOrEqual(4.5);
+    await activarTema(page, 'dark');
+    expect.soft(await contraste(), 'tema oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * BAJO · Tras un cálculo válido, una entrada rechazada deja en pantalla el resultado
+   * anterior: 30.000 € → Calcular → «30.000.50» → Calcular salta el aviso, pero las tarjetas
+   * siguen diciendo 30.000,00 € de bruto y 23.124,00 € de neto junto a un campo que dice otra
+   * cosa. Debería retirar (o marcar como no vigente) el resultado.
+   */
+  test.fail('rechazo tras un resultado — no queda en pantalla el cálculo de otra cifra', async ({ page }) => {
+    page.on('dialog', (dialog) => dialog.accept());
+    await calcular(page, '30000');
+    expect(await hayResultados(page)).toBe(true);
+    await calcular(page, '30.000.50');
+    expect(await hayResultados(page)).toBe(false);
+  });
 });
