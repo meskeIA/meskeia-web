@@ -257,7 +257,7 @@
 }
 
 .tabla th {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.6rem 0.9rem;
   text-align: left;
@@ -813,7 +813,7 @@
 }
 
 [data-theme='dark'] .tabla th {
-  background: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
 }
 
 [data-theme='dark'] .tabla td {
@@ -982,7 +982,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.6rem 0.9rem;
   text-align: left;
@@ -1242,7 +1242,7 @@
 }
 
 [data-theme='dark'] .comparativaTable th {
-  background: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
 }
 
 [data-theme='dark'] .comparativaTable td {

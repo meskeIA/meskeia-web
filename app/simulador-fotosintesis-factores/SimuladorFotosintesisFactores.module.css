@@ -411,7 +411,7 @@
 }
 
 .tabla th {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 700;
   padding: 0.7rem 0.9rem;

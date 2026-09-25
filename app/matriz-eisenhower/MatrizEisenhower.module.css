@@ -573,7 +573,7 @@
   border-bottom: 1px solid var(--border, #E5E5E5);
 }
 .eduTablaComparativa thead th {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
   font-size: 0.8rem;

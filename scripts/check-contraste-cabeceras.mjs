@@ -112,7 +112,13 @@ const RAIZ = iRaiz !== -1 ? path.resolve(process.argv[iRaiz + 1]) : RAIZ_DEFECTO
 const VERBOSO = process.argv.includes('--todo');
 
 // ─── Tokens ────────────────────────────────────────────────────────────────────
-const RE_MARCA_FONDO = /var\(\s*--(primary|secondary)\s*\)/;
+/**
+ * Admite el valor de reserva: `var(--primary, #2E86AB)` pinta lo mismo que `var(--primary)`.
+ * Hasta el 25/09/2026 exigía el paréntesis justo detrás del nombre y esa forma pasaba
+ * callada (hallazgo 1670, simulador-punnett: la tabla de recuento a 4,11:1 y 2,79:1).
+ * `--primary-boton` no casa: tras el nombre solo se admite `,` o `)`.
+ */
+const RE_MARCA_FONDO = /var\(\s*--(primary|secondary)\s*(?:,[^)]*)?\)/;
 const RE_BLANCO = /^(#fff|#ffffff|white)$/i;
 const SUSTITUTO = { primary: '--primary-boton', secondary: '--secondary-boton' };
 /** Un token de TEXTO puesto de fondo: en oscuro se invierte y el blanco encima cae a 2,23:1. */
@@ -385,7 +391,7 @@ for (const ruta of ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a), '.tsx')))
     const linea = lineas[n];
     for (const m of linea.matchAll(/style=\{\{([^}]*)\}\}/g)) {
       const cuerpo = m[1];
-      const mf = cuerpo.match(/background(?:Color|Image)?\s*:\s*['"`][^'"`]*var\(\s*--(primary|secondary)\s*\)/);
+      const mf = cuerpo.match(/background(?:Color|Image)?\s*:\s*['"`][^'"`]*var\(\s*--(primary|secondary)\s*(?:,[^)]*)?\)/);
       if (!mf) continue;
       const mc = cuerpo.match(/(?:^|[,{\s])color\s*:\s*['"`]\s*(#fff|#ffffff|white)\s*['"`]/i);
       if (!mc) continue;

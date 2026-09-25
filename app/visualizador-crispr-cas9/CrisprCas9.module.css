@@ -464,7 +464,7 @@
 }
 
 .tabla th {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.88rem;
@@ -1018,7 +1018,7 @@
 }
 
 .comparativaTable th {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #ffffff;
   font-weight: 700;
   padding: 0.75rem 1rem;

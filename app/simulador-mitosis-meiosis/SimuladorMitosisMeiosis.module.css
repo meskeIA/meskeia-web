@@ -284,7 +284,7 @@
 }
 
 .tabla th {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.6rem 0.9rem;
   text-align: left;

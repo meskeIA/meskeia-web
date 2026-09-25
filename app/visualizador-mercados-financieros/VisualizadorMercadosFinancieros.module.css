@@ -809,7 +809,7 @@
 }
 
 .comparativaTable thead tr {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
 }
 

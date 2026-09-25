@@ -319,7 +319,7 @@
 }
 
 .tabla th {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   padding: 0.6rem 0.9rem;
   text-align: left;

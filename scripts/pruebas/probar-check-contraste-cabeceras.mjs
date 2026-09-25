@@ -330,6 +330,40 @@ const CASOS = [
       ].join('\n'),
     },
   },
+  {
+    n: 18,
+    nombre: 'CASO DE ORIGEN 3 · var(--primary, #2E86AB) con reserva (hallazgo 1670, punnett, y 17 más)',
+    debeFallar: true,
+    ficheros: {
+      'app/punnett/Punnett.module.css': [
+        '.tabla th {',
+        '  background: var(--primary, #2E86AB);',
+        '  color: #fff;',
+        '}',
+      ].join('\n'),
+    },
+  },
+  {
+    n: 19,
+    nombre: 'reserva en un estilo EN LÍNEA de un <th>',
+    debeFallar: true,
+    ficheros: {
+      'app/tres/page.tsx': "<th style={{ background: 'var(--secondary, #48A9A6)', color: '#fff' }}>A</th>\n",
+    },
+  },
+  {
+    n: 20,
+    nombre: 'CASO DE ORIGEN 3 REPARADO · --primary-boton, que no debe confundirse con la reserva',
+    debeFallar: false,
+    ficheros: {
+      'app/punnett/Punnett.module.css': [
+        '.tabla th {',
+        '  background: var(--primary-boton);',
+        '  color: #fff;',
+        '}',
+      ].join('\n'),
+    },
+  },
 ];
 
 /** Ejecuta el candado sobre `dir` y dice si se encendió. */
