@@ -124,7 +124,9 @@
 }
 
 .btnStart {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  /* Texto blanco de 16,8 px: exige 4,5:1. El degradado --primary→--secondary daba 3,21:1 en
+     claro y 2,42:1 en oscuro (hallazgo 1682); --primary-boton es el mismo en los dos temas. */
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -162,7 +164,7 @@
 .progresoPaso {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto); /* 1682: --primary daba 3,93:1 sobre el fondo claro */
 }
 
 .progresoCategoria {
@@ -288,7 +290,7 @@
 .btnAnterior:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .btnSiguiente {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--primary-boton); /* 1682: el degradado daba 3,26:1 / 2,45:1 */
   border: none;
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
@@ -416,7 +418,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--primary);
+  color: var(--primary-texto); /* 1682: --primary daba 3,67:1 sobre el tinte de la caja */
   margin: 0 0 0.75rem;
 }
 
@@ -472,9 +474,9 @@
   margin: 0 auto 2rem;
   padding: 0.85rem 1.5rem;
   background: transparent;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-texto);
   border-radius: 10px;
-  color: var(--primary);
+  color: var(--primary-texto); /* 1682: --primary daba 3,93:1 */
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -482,7 +484,7 @@
 }
 
 .btnRepetir:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -541,3 +543,27 @@
   background: #3a2a08;
   color: #fde68a;
 }
+
+/* Aviso de sistema: no hay iPhone nuevo en el tramo recomendado (hallazgo 1678) */
+.avisoSistema {
+  margin: 0 0 var(--spacing-lg, 1.5rem);
+  padding: 0.85rem 1rem;
+  border: 1px solid #f59e0b;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoSistema {
+  border-color: #b45309;
+  background: #3a2a08;
+  color: #fde68a;
+}
+
+/* Enunciado que recibe el foco al cambiar de pregunta (hallazgo 1680) */
+.preguntaTexto:focus { outline: none; }
+.preguntaTexto:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 4px; border-radius: 4px; }
+.heroTitleSm:focus { outline: none; }

@@ -1,6 +1,18 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
+// Una sola lista para el JSON-LD que inyecta layout.tsx y la meta schema:WebApplication. El
+// JSON-LD salía con `features: []` y las ocho vivían solo en la meta (hallazgo 1686).
+const FEATURES = [
+  'Test de 10 preguntas sobre uso, prioridades y presupuesto',
+  'Recomendación de sistema operativo (iOS o Android)',
+  'Recomendación de gama (básica, media, alta o pro) con precio orientativo, ajustada a tu presupuesto',
+  'Pliego de características técnicas a buscar, escrito para la gama recomendada',
+  'Aviso cuando el presupuesto recorta lo que pide tu uso, o cuando no hay iPhone nuevo en tu tramo',
+  'Consejos de compra: cuándo comprar y cuándo conviene un reacondicionado certificado',
+  '100 % en el navegador, sin registro ni instalación',
+];
+
 export const metadata: Metadata = {
   title: 'Selector de Smartphone — ¿Qué móvil o celular me conviene? | meskeIA',
   description:
@@ -22,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: '¿Qué smartphone te conviene? Test en 10 preguntas | meskeIA',
     description:
-      'Descubre el tipo de móvil o celular ideal para tu perfil: sistema operativo, gama y modelos de referencia. Sin marcas patrocinadas, solo tu uso real.',
+      'Descubre el tipo de móvil o celular ideal para tu perfil: sistema operativo, gama y las características técnicas que buscar. Sin marcas patrocinadas, solo tu uso real.',
     type: 'website',
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-smartphone/',
@@ -49,18 +61,9 @@ export const metadata: Metadata = {
       generateWebAppSchema({
         name: 'Selector de Smartphone',
         description:
-          'Test orientativo de 10 preguntas para descubrir qué tipo de smartphone, móvil o celular (sistema operativo, gama y perfil de uso) se adapta mejor a tus necesidades reales. Incluye modelos de referencia actualizados.',
+          'Test orientativo de 10 preguntas para descubrir qué tipo de smartphone, móvil o celular (sistema operativo, gama y perfil de uso) se adapta mejor a tus necesidades reales, con las características técnicas que buscar. No recomienda modelos ni marcas concretas.',
         url: 'https://meskeia.com/selector-smartphone/',
-        features: [
-          'Test de 10 preguntas sobre uso y prioridades',
-          'Recomendación de sistema operativo (iOS / Android)',
-          'Recomendación de gama (básica, media, alta, pro)',
-          'Pliego de características técnicas a buscar, ajustado a tu perfil y a tu presupuesto',
-          'Consejos sobre cuándo comprar y dónde',
-          '100% en el navegador, sin registro ni instalación',
-          'Gratuito y sin publicidad',
-          'En español',
-        ],
+        features: FEATURES,
       })
     ),
   },
@@ -71,7 +74,7 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber qué smartphone (móvil o celular) te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica, con las características técnicas que buscar en cada caso.",
   url: "https://meskeia.com/selector-smartphone/",
   category: 'UtilityApplication',
-  features: [],
+  features: FEATURES,
 });
 
 export const faqJsonLd = {
@@ -99,7 +102,7 @@ export const faqJsonLd = {
       name: '¿Cuánto debería durar un smartphone antes de cambiarlo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un smartphone de gama media o alta debería funcionar correctamente entre 3 y 5 años. El factor limitante suele ser el soporte de actualizaciones del sistema operativo: sin actualizaciones de seguridad, el dispositivo queda expuesto. Android varía mucho por fabricante (2-4 años en la mayoría, hasta 7 en algunos modelos recientes), mientras que Apple garantiza soporte durante más tiempo.',
+        text: 'Un smartphone de gama media o alta debería funcionar correctamente entre 3 y 5 años. El factor limitante suele ser el soporte de actualizaciones del sistema operativo: sin actualizaciones de seguridad, el dispositivo queda expuesto. En Android depende del fabricante y del modelo: los más generosos declaran hasta 7 años, e incluso en la gama de entrada ya hay modelos con 5 o más; Apple suele mantener el soporte durante años. En la Unión Europea, desde el 20/06/2025 (Reglamento (UE) 2023/1670), si el fabricante publica actualizaciones del sistema para un modelo debe ofrecerlas gratis a todas sus unidades hasta al menos 5 años después de que deje de venderse. La cifra que cuenta sigue siendo la que el fabricante declara para ese modelo concreto.',
       },
     },
     {

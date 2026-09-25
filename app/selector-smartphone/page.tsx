@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSmartphone.module.css';
 import {
   calcularResultado,
@@ -219,6 +219,18 @@ export default function SelectorSmartphone() {
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
+
+  // Al cambiar de pantalla o de pregunta se desmonta o se desactiva el botón que tenía el foco
+  // («Empezar», «Siguiente» sin respuesta aún, «Ver resultado»), y el foco caía a <body>: el
+  // siguiente Tab salía después del cuestionario y, en móvil, el resultado quedaba dos pantallas
+  // por encima (hallazgos 1679 y 1680). Se lleva al enunciado de la pregunta nueva o al
+  // encabezado del resultado, que además lo desplaza a la vista.
+  useEffect(() => {
+    if (pantalla === 'resultado') tituloResultado.current?.focus();
+    else if (pantalla === 'test') enunciado.current?.focus();
+  }, [pantalla, paso]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
@@ -226,6 +238,26 @@ export default function SelectorSmartphone() {
 
   function seleccionarOpcion(valor: string) {
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
+  }
+
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG): las flechas mueven el foco a la opción vecina y
+   * la marcan, con vuelta al principio, e Inicio/Fin van a los extremos. El grupo es UNA parada de
+   * Tab (tabindex itinerante). Antes cada opción era una parada y las flechas no hacían nada
+   * (hallazgo 1681).
+   */
+  function teclaEnOpcion(e: React.KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const total = preguntaActual.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(preguntaActual.opciones[destino].valor);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
   }
 
   function avanzar() {
@@ -270,7 +302,7 @@ export default function SelectorSmartphone() {
         </header>
       ) : (
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu smartphone ideal</h1>
+          <h1 className={styles.heroTitleSm} ref={tituloResultado} tabIndex={-1}>Tu smartphone ideal</h1>
           <p className={styles.heroSubtitleSm}>Resultado personalizado basado en tu perfil</p>
         </header>
       )}
@@ -340,9 +372,9 @@ export default function SelectorSmartphone() {
           {/* Pregunta */}
           <div className={styles.preguntaCard}>
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icon}</span>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.pregunta}</h2>
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.pregunta}</h2>
             <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.pregunta}>
-              {preguntaActual.opciones.map(op => (
+              {preguntaActual.opciones.map((op, indice) => (
                 <button
                   key={op.valor}
                   type="button"
@@ -353,6 +385,13 @@ export default function SelectorSmartphone() {
                   // radiogroup y no había un solo radio dentro (hallazgo 950).
                   role="radio"
                   aria-checked={respuestas[preguntaActual.id] === op.valor}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (1681).
+                  tabIndex={
+                    respuestas[preguntaActual.id]
+                      ? respuestas[preguntaActual.id] === op.valor ? 0 : -1
+                      : indice === 0 ? 0 : -1
+                  }
+                  onKeyDown={e => teclaEnOpcion(e, indice)}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>
@@ -429,6 +468,15 @@ export default function SelectorSmartphone() {
             </p>
           )}
 
+          {/* El sistema recomendado no tiene modelos nuevos en la gama que cabe: la app proponía
+              «iPhone» con «Gama básica · 100 – 250 €» sin una palabra sobre el precio real
+              (hallazgo 1678). */}
+          {resultado.avisoSistema && (
+            <p className={styles.avisoSistema} role="note">
+              <span aria-hidden="true">🍎</span> {resultado.avisoSistema}
+            </p>
+          )}
+
           {/* Por qué esta recomendación */}
           <div className={styles.razonesSection}>
             <p className={styles.razonesTitulo}>Por qué esta recomendación</p>
@@ -480,13 +528,22 @@ export default function SelectorSmartphone() {
               <strong>Android</strong> (desarrollado por Google) lo usan Samsung, Xiaomi, Google, OnePlus y la mayoría
               de fabricantes. Ofrece mayor variedad de modelos y precios, más opciones de personalización y mejor
               integración con servicios de Google (Gmail, Drive, Meet). La duración de las actualizaciones varía
-              según fabricante: Google garantiza 7 años, Samsung también 7 años, Xiaomi y otros suelen ofrecer 3-4.
+              según fabricante y modelo: los más generosos declaran hasta 7 años, e incluso en la gama de entrada
+              ya hay modelos con 5 años o más. Mira siempre la cifra que el fabricante declara para el modelo concreto.
+            </p>
+            <p>
+              En la Unión Europea, desde el 20/06/2025 el Reglamento (UE) 2023/1670 obliga a que, si el fabricante
+              publica actualizaciones del sistema para un modelo, las ofrezca gratis a todas sus unidades hasta al
+              menos 5 años después de que ese modelo deje de venderse. Regula cómo se reparten las actualizaciones,
+              no promete versiones nuevas: la cifra declarada sigue siendo la referencia.
             </p>
 
             <h3>Las gamas explicadas</h3>
             <p>
               <strong>Gama básica (hasta 250 €):</strong> ideal para llamadas, mensajería y redes sociales. Las cámaras
               son modestas, el rendimiento suficiente para el uso cotidiano y la batería suele ser generosa en capacidad.
+              En este tramo y en la gama media no hay iPhone nuevo: quien quiera iOS con este presupuesto tiene la vía
+              del reacondicionado certificado.
             </p>
             <p>
               <strong>Gama media (250-500 €):</strong> el segmento con mejor relación calidad-precio del mercado. Pantallas

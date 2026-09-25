@@ -21,6 +21,12 @@
  *     (hallazgo 945). Ahora cada línea se escribe para la gama FINAL.
  *
  * Casos resueltos a mano en tests/selector-smartphone-motor.spec.ts.
+ *
+ *  4. El sistema operativo se decidía sin mirar el precio, así que la app proponía «iPhone
+ *     (iOS)» con «Gama básica · 100 – 250 €» o gama media, tramos en los que Apple no vende
+ *     ningún iPhone nuevo (hallazgo 1678). Ahora, si el presupuesto alcanza el tramo del iPhone
+ *     nuevo más barato, la gama sube hasta él y se dice por qué; si no lo alcanza, la gama se
+ *     queda en el tramo y un aviso explica que ahí solo cabe un reacondicionado.
  */
 
 export type SistemaOS = 'ios' | 'android';
@@ -36,6 +42,10 @@ export interface Resultado {
   recortadaPorPresupuesto: boolean;
   /** El presupuesto la ha subido por encima de lo que el uso necesita. */
   ampliadaPorPresupuesto: boolean;
+  /** La gama sube hasta la del iPhone nuevo más barato, que el presupuesto sí cubre. */
+  elevadaPorSistema: boolean;
+  /** Aviso cuando el sistema recomendado no tiene modelos nuevos en la gama recomendada. */
+  avisoSistema: string | null;
   razones: string[];
   consejos: string[];
   caracteristicas: string[];
@@ -62,6 +72,13 @@ export const ETIQUETA_PRESUPUESTO: Record<string, string> = {
   alto: 'de 500 a 900 €',
   premium: 'de más de 900 €',
 };
+
+/**
+ * Gama del iPhone NUEVO más barato. apple.com/es/shop/buy-iphone, consultado el 25/09/2026: el
+ * modelo de entrada sale «Desde 859,00 €» y el resto por encima de 1.000 €, así que no hay iPhone
+ * nuevo en básica (100-250 €) ni en media (250-500 €). Revisar si Apple lanza uno por debajo.
+ */
+export const GAMA_MINIMA_IPHONE_NUEVO: GamaKey = 'alta';
 
 const NOMBRE_GAMA: Record<GamaKey, string> = {
   basica: 'básica',
@@ -115,6 +132,24 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
   const ampliadaPorPresupuesto = presupuesto === 'premium' && gamaPorPerfil !== 'pro';
   if (ampliadaPorPresupuesto) gama = 'pro';
 
+  // ─ iPhone: no lo hay nuevo por debajo de GAMA_MINIMA_IPHONE_NUEVO ─
+  const gamaDeUso = gama;
+  let elevadaPorSistema = false;
+  let avisoSistema: string | null = null;
+  if (os === 'ios' && esMayor(GAMA_MINIMA_IPHONE_NUEVO, gama)) {
+    if (esMayor(GAMA_MINIMA_IPHONE_NUEVO, tope)) {
+      // El presupuesto no llega: la gama se queda en el tramo, pero se dice qué cabe en él.
+      avisoSistema =
+        respuestas[10] === 'si' || respuestas[10] === 'quizas'
+          ? 'Apple no vende ningún iPhone nuevo en este tramo: el más barato de su tienda supera los 500 €. Aquí la vía es un iPhone reacondicionado certificado de una generación anterior; antes de comprarlo, comprueba cuántos años de actualizaciones le quedan.'
+          : 'Apple no vende ningún iPhone nuevo en este tramo: el más barato de su tienda supera los 500 €. Como prefieres comprar nuevo, las salidas son subir de tramo o elegir un Android nuevo de esta gama; si lo reconsideras, un iPhone reacondicionado certificado sí puede caber en tu presupuesto.';
+    } else {
+      gama = GAMA_MINIMA_IPHONE_NUEVO;
+      elevadaPorSistema = true;
+      avisoSistema = `Con tu uso bastaría la gama ${NOMBRE_GAMA[gamaDeUso]}, pero Apple no vende ningún iPhone nuevo en ese tramo: la recomendación sube a la gama ${NOMBRE_GAMA[gama]}, que es donde empieza el iPhone nuevo y que tu presupuesto cubre.`;
+    }
+  }
+
   // ─ Razones: explican LO QUE SE HA RESPONDIDO, no la gama de salida ─
   if (os === 'ios') {
     razones.push('Tienes otros dispositivos Apple: el ecosistema integrado (AirDrop, iMessage, Handoff) te aporta valor real.');
@@ -130,6 +165,10 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
     );
     razones.push(
       'Si alguna de esas exigencias es innegociable, subir de tramo es la única forma de cubrirla; si no, aquí van las mejores opciones dentro de tu presupuesto.',
+    );
+  } else if (elevadaPorSistema) {
+    razones.push(
+      `Tu uso se cubriría con la gama ${NOMBRE_GAMA[gamaDeUso]}, pero Apple no vende iPhone nuevo en ese tramo: el más barato está en la gama ${NOMBRE_GAMA[gama]}, que tu presupuesto cubre. Si el ecosistema Apple no es decisivo para ti, un Android de gama ${NOMBRE_GAMA[gamaDeUso]} cubriría tu uso por menos.`,
     );
   } else if (ampliadaPorPresupuesto) {
     razones.push(
@@ -178,7 +217,10 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
   if (respuestas[7] === 'largo' && !esEntrada) {
     caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 5 años desde la compra');
   } else if (respuestas[7] === 'largo') {
-    caracteristicas.push('🔄 Actualizaciones garantizadas: pide al menos 3 años, que es lo máximo habitual en este tramo (si necesitas 5, no los encontrarás aquí)');
+    // Antes: «pide al menos 3 años, que es lo máximo habitual en este tramo (si necesitas 5, no
+    // los encontrarás aquí)». Falso: en este tramo ya se venden modelos con 6 años de
+    // actualizaciones del sistema (hallazgo 1684, comprobado el 25/09/2026).
+    caracteristicas.push('🔄 Actualizaciones del sistema operativo: pide 5 años o más. En este tramo ya hay modelos que los declaran, pero no todos: compruébalo en la ficha del modelo concreto');
   } else if (gama === 'pro' || gama === 'alta') {
     caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 4 años');
   } else {
@@ -259,6 +301,8 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
     gamaPorPerfil,
     recortadaPorPresupuesto,
     ampliadaPorPresupuesto,
+    elevadaPorSistema,
+    avisoSistema,
     razones,
     consejos,
     caracteristicas,

@@ -633,8 +633,8 @@ test.describe('re-inspección 25/09/2026 · casos resueltos a mano', () => {
     await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(0);
   });
 
-  test.fail('iPhone con presupuesto de gama básica: no hay iPhone nuevo en ese tramo y la app no lo dice', async ({ page }) => {
-    // HALLAZGO ABIERTO. El sistema operativo se decide solo con P4 y P5; el presupuesto no lo
+  test('iPhone con presupuesto de gama básica: no hay iPhone nuevo en ese tramo, y la app lo dice', async ({ page }) => {
+    // HALLAZGO 1678, reparado. El sistema operativo se decide solo con P4 y P5; el presupuesto no lo
     // mira nunca. Resultado: «iPhone (iOS)» junto a «Gama básica · 100 – 250 €» a quien acaba de
     // responder «No, prefiero nuevo», y el iPhone nuevo más barato de apple.com/es es el iPhone 17e,
     // «Desde 859,00 €» (consultado el 25/09/2026). Barrido del motor: 91.392 de los 147.456
@@ -649,6 +649,44 @@ test.describe('re-inspección 25/09/2026 · casos resueltos a mano', () => {
     expect(texto, 'la pantalla dice algo del precio real del iPhone en ese tramo').toMatch(
       /iPhone[^.]{0,160}(nuevo|reacondicionad)/i,
     );
+    // Reparación: la gama se queda en el tramo declarado (manda el presupuesto) y un aviso dice
+    // que ahí no hay iPhone nuevo. Con «No, prefiero nuevo» ofrece subir de tramo o Android nuevo.
+    await expect(page.locator('[class*="avisoSistema"]')).toHaveText(
+      '🍎 Apple no vende ningún iPhone nuevo en este tramo: el más barato de su tienda supera los 500 €. Como prefieres comprar nuevo, las salidas son subir de tramo o elegir un Android nuevo de esta gama; si lo reconsideras, un iPhone reacondicionado certificado sí puede caber en tu presupuesto.',
+    );
+  });
+
+  test('iPhone con uso modesto y 500 – 900 €: la gama sube a la del iPhone nuevo más barato, y lo dice', async ({ page }) => {
+    // Segundo caso del 1678. P1 básico · P2 no juego · P3 < 2 h · P6 batería · P7 1-2 años = 0
+    // puntos → básica por uso. P4 «Sí, varios» +3 · P5 macOS +2 = 5 → iOS. Tope de 500 – 900 € =
+    // alta. Antes: «iPhone (iOS)» + «Gama básica · 100 – 250 €», cuando el iPhone nuevo más
+    // barato de apple.com/es sale «Desde 859,00 €» (25/09/2026) y el presupuesto sí lo alcanza.
+    // Esperado: gama alta (500 – 900 €), con el porqué en el aviso y en las razones.
+    await abrirTest(page);
+    await responder(page, [
+      'Uso básico', 'No juego o muy poco', 'Menos de 2 horas', 'Sí, varios', 'macOS',
+      'Batería larga', '1 – 2 años', 'Me da igual', 'Dispuesto a pagar por calidad', 'Sí, con garantía',
+    ]);
+    await leerResultado(page);
+    expect(await textos(page, 'recomendacionValor')).toEqual(['iPhone (iOS)', 'Gama alta']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('Precio orientativo: 500 – 900 €');
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoSistema"]')).toHaveText(
+      '🍎 Con tu uso bastaría la gama básica, pero Apple no vende ningún iPhone nuevo en ese tramo: la recomendación sube a la gama alta, que es donde empieza el iPhone nuevo y que tu presupuesto cubre.',
+    );
+    expect((await textos(page, 'razonItem'))[2]).toContain('un Android de gama básica cubriría tu uso por menos');
+  });
+
+  test('Android con el mismo uso modesto y 500 – 900 €: sin aviso de sistema, se queda en básica', async ({ page }) => {
+    // Contraste del anterior: la subida es SOLO por el iPhone. P4 «No, ninguno» → Android.
+    await abrirTest(page);
+    await responder(page, [
+      'Uso básico', 'No juego o muy poco', 'Menos de 2 horas', 'No, ninguno', 'macOS',
+      'Batería larga', '1 – 2 años', 'Me da igual', 'Dispuesto a pagar por calidad', 'Sí, con garantía',
+    ]);
+    await leerResultado(page);
+    expect(await textos(page, 'recomendacionValor')).toEqual(['Android', 'Gama básica']);
+    await expect(page.locator('[class*="avisoSistema"]')).toHaveCount(0);
   });
 });
 
@@ -657,13 +695,16 @@ test.describe('re-inspección 25/09/2026 · casos resueltos a mano', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('re-inspección 25/09/2026 · teclado', () => {
-  test('Espacio marca el radio con el foco, Tab pasa al siguiente, y sigue habiendo uno solo marcado', async ({ page }) => {
+  test('Espacio marca el radio con el foco, la flecha pasa al siguiente, y sigue habiendo uno solo marcado', async ({ page }) => {
+    // Antes decía «Tab pasa al siguiente»: eso consagraba el defecto 1681 (cada opción era una
+    // parada de Tab). En el patrón de radios el grupo es UNA parada y se recorre con flechas;
+    // el fondo del test —Espacio marca, uno solo marcado, Enter avanza— se conserva.
     await abrirTest(page);
     const radios = page.locator('[role="radiogroup"] [role="radio"]');
     await radios.nth(0).focus();
     await page.keyboard.press('Space');
     await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
-    await page.keyboard.press('Tab');
+    await page.keyboard.press('ArrowDown');
     await expect(radios.nth(1)).toBeFocused();
     await page.keyboard.press('Space');
     await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
@@ -676,8 +717,8 @@ test.describe('re-inspección 25/09/2026 · teclado', () => {
     await expect(page.locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '1');
   });
 
-  test.fail('las flechas no mueven la selección dentro del radiogroup', async ({ page }) => {
-    // HALLAZGO ABIERTO (bajo). Un role="radio" promete el teclado del patrón de radios (WAI-ARIA
+  test('las flechas mueven la selección dentro del radiogroup, y el grupo es una sola parada de Tab', async ({ page }) => {
+    // HALLAZGO 1681 (bajo), reparado. Un role="radio" promete el teclado del patrón de radios (WAI-ARIA
     // APG): flecha abajo/derecha lleva el foco a la opción siguiente y la marca, y el grupo es UNA
     // parada de Tab. Aquí son <button> sueltos: las flechas no hacen nada y cada opción es una
     // parada de Tab. Medido: ArrowDown y ArrowRight sobre «Uso básico» → el foco no se mueve y no
@@ -688,10 +729,23 @@ test.describe('re-inspección 25/09/2026 · teclado', () => {
     await page.keyboard.press('ArrowDown');
     await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
     await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
+    // ArrowRight sigue avanzando; Inicio va a la primera y ArrowUp desde ella da la vuelta a la última.
+    await page.keyboard.press('ArrowRight');
+    await expect(radios.nth(2)).toBeFocused();
+    await expect(radios.nth(2)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('Home');
+    await page.keyboard.press('ArrowUp');
+    await expect(radios.nth(3)).toBeFocused();
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(1);
+    // Tabindex itinerante: solo la marcada es parada de Tab, así que Tab sale del grupo (en la
+    // pregunta 1 «Anterior» está desactivado: la siguiente parada es «Siguiente»).
+    expect(await radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([-1, -1, -1, 0]);
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Siguiente pregunta' })).toBeFocused();
   });
 
-  test.fail('tras «Siguiente» el foco se cae a <body> y el Tab salta a «Apps relacionadas»', async ({ page }) => {
-    // HALLAZGO ABIERTO (medio). «Siguiente» se desactiva en cuanto llega la pregunta nueva (aún
+  test('tras «Siguiente» el foco queda en la pregunta nueva, y el Tab va a sus opciones', async ({ page }) => {
+    // HALLAZGO 1680 (medio), reparado: el foco va al enunciado de la pregunta nueva. «Siguiente» se desactiva en cuanto llega la pregunta nueva (aún
     // sin responder) y el foco, que estaba en él, cae a <body>. El siguiente Tab sale DESPUÉS del
     // cuestionario: primera tarjeta de «Apps relacionadas». Medido: 18 Tab para volver a la
     // primera opción, en cada una de las 9 transiciones. Debería quedar dentro de la pregunta
@@ -703,6 +757,9 @@ test.describe('re-inspección 25/09/2026 · teclado', () => {
     await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
     const dentro = await page.evaluate(() => !!document.activeElement?.closest('[class*="testContainer"]'));
     expect(dentro, 'el foco sigue dentro del cuestionario').toBe(true);
+    await expect(page.getByRole('heading', { name: '¿Juegas habitualmente a videojuegos en el móvil?' })).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(page.locator('[role="radiogroup"] [role="radio"]').first()).toBeFocused();
   });
 });
 
@@ -747,8 +804,8 @@ test.describe('re-inspección 25/09/2026 · móvil (Pixel 7)', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   });
 
-  test.fail('al tocar «Ver resultado» la recomendación queda dos pantallas por encima y el foco en <body>', async ({ page }) => {
-    // HALLAZGO ABIERTO (medio). El resultado sustituye al cuestionario en el sitio y la página
+  test('al tocar «Ver resultado» se ve el encabezado del resultado y tiene el foco', async ({ page }) => {
+    // HALLAZGO 1679 (medio), reparado con la forma de las hermanas (foco al encabezado). El resultado sustituye al cuestionario en el sitio y la página
     // se queda desplazada: en un Pixel 7 se aterriza en scrollY 2.576, viendo el final de los
     // consejos, «Repetir el test», la guía y «Apps relacionadas»; las tarjetas de sistema y gama
     // quedan 1.912 px por ENCIMA del borde superior. El foco cae a <body>. Las otras diez hermanas
@@ -762,6 +819,7 @@ test.describe('re-inspección 25/09/2026 · móvil (Pixel 7)', () => {
     const titulo = page.getByRole('heading', { name: 'Tu smartphone ideal' });
     await titulo.waitFor();
     await expect(titulo).toBeInViewport({ timeout: 2_000 });
+    await expect(titulo).toBeFocused();
   });
 });
 
@@ -769,8 +827,8 @@ test.describe('re-inspección 25/09/2026 · móvil (Pixel 7)', () => {
 // Contraste fuera del hero, y lo que se sirve a buscadores
 // ─────────────────────────────────────────────────────────────────────────────
 
-test.fail('botones de marca y textos pequeños en --primary no llegan a 4,5:1', async ({ page }) => {
-  // HALLAZGO ABIERTO (medio). Medido sobre el fondo computado, con la función de arriba:
+test('botones de marca y textos pequeños llegan a 4,5:1 (--primary-boton / --primary-texto)', async ({ page }) => {
+  // HALLAZGO 1682 (medio), reparado. Medido sobre el fondo computado, con la función de arriba:
   //   «Empezar el test →» (16,8 px/600, blanco sobre el degradado --primary→--secondary)
   //       3,21:1 en claro · 2,42:1 en oscuro
   //   «Siguiente →» (14,4 px/600, mismo degradado)            3,26:1 claro · 2,45:1 oscuro
@@ -811,8 +869,8 @@ test.fail('botones de marca y textos pequeños en --primary no llegan a 4,5:1', 
   expect(bajos, 'textos por debajo de 4,5:1').toEqual([]);
 });
 
-test.fail('el HTML servido sigue prometiendo «modelos de referencia» (hallazgo 946, reparado a medias)', async ({ page }) => {
-  // HALLAZGO ABIERTO (medio). El test de arriba busca 'Modelos de referencia' con mayúscula y
+test('el HTML servido no promete «modelos de referencia» en ninguna capitalización (hallazgo 946)', async ({ page }) => {
+  // HALLAZGO 1683 (medio), reparado. El test de arriba busca 'Modelos de referencia' con mayúscula y
   // pasa; en minúscula sigue en DOS de los cuatro sitios del acta del 20/09: og:description
   // («sistema operativo, gama y modelos de referencia») y la meta schema:WebApplication
   // («Incluye modelos de referencia actualizados»). La app no da ningún modelo. Debería: 0.
@@ -820,8 +878,8 @@ test.fail('el HTML servido sigue prometiendo «modelos de referencia» (hallazgo
   expect(html).not.toContain('modelos de referencia');
 });
 
-test.fail('el JSON-LD WebApplication sale con featureList vacío', async ({ page }) => {
-  // HALLAZGO ABIERTO (bajo). §1.ter del CLAUDE.md del proyecto: `features` con 4-8
+test('el JSON-LD WebApplication lleva entre 4 y 8 featureList', async ({ page }) => {
+  // HALLAZGO 1686 (bajo), reparado. §1.ter del CLAUDE.md del proyecto: `features` con 4-8
   // características reales. El `jsonLd` que inyecta layout.tsx lleva `features: []`; las ocho
   // que hay en metadata.ts viven solo en la meta no estándar schema:WebApplication.
   const html = await (await page.request.get('/selector-smartphone/')).text();
@@ -831,10 +889,12 @@ test.fail('el JSON-LD WebApplication sale con featureList vacío', async ({ page
   const app = bloques.find((b) => b['@type'] === 'WebApplication');
   expect(app, 'hay un WebApplication').toBeTruthy();
   expect(((app?.featureList ?? []) as unknown[]).length).toBeGreaterThanOrEqual(4);
+  expect(((app?.featureList ?? []) as unknown[]).length).toBeLessThanOrEqual(8);
 });
 
-test.fail('la banda de Delegum dice «Esta herramienta aplica a España» justo bajo «La metodología es universal»', async ({ page }) => {
-  // HALLAZGO ABIERTO (bajo). Efecto colateral del arreglo del 949: scripts/generate-delegum-es.mjs
+test('la banda de Delegum dice «Esta herramienta aplica a España» justo bajo «La metodología es universal»', async ({ page }) => {
+  // REPARADO el 25/09/2026 (hallazgo 1685, commit d5e27a43): es-data solo lleva banda en las
+  // suites de Delegum, y allí sin declarar ámbito. Antes: Efecto colateral del arreglo del 949: scripts/generate-delegum-es.mjs
   // toma CUALQUIER RegionBadge es-data como «autodeclaración fiscal-España» (d087d679, 20/09), y
   // components/DescubreVertical.tsx pinta entonces «⚖️ Esta herramienta aplica a España. Delegum
   // reúne más herramientas de fiscalidad, derecho laboral y finanzas». En un selector de móvil,
@@ -846,8 +906,11 @@ test.fail('la banda de Delegum dice «Esta herramienta aplica a España» justo 
   expect(cuerpo).not.toContain('Esta herramienta aplica a España');
 });
 
-test.fail('pliego de gama básica: «si necesitas 5 años, no los encontrarás aquí» es falso hoy', async ({ page }) => {
-  // HALLAZGO ABIERTO (medio). Con «4 años o más» y «Hasta 250 €» el pliego dice «pide al menos
+test('pliego de gama básica: pide 5 años de actualizaciones, que existen en el tramo', async ({ page }) => {
+  // HALLAZGO 1684 (medio), reparado. Matiz sobre el acta: el Reglamento (UE) 2023/1670 (anexo II)
+  // no obliga sin condición a dar 5 años; obliga a que, SI el fabricante publica actualizaciones,
+  // las ofrezca gratis a todas las unidades hasta al menos 5 años tras el fin de la
+  // comercialización. Por eso el pliego pide 5 años y remite a la cifra declarada del modelo. Con «4 años o más» y «Hasta 250 €» el pliego dice «pide al menos
   // 3 años, que es lo máximo habitual en este tramo (si necesitas 5, no los encontrarás aquí)».
   // El Galaxy A17 5G se vende en España desde 229 € (4/128 GB) con 6 actualizaciones de sistema y
   // 6 años de parches (Xataka Móvil; samsung.com/es), y el Reglamento (UE) 2023/1670, aplicable
@@ -864,4 +927,11 @@ test.fail('pliego de gama básica: «si necesitas 5 años, no los encontrarás a
   const texto = await leerResultado(page);
   expect(texto).toContain('Gama básica');
   expect(texto).not.toContain('no los encontrarás aquí');
+  expect(await textos(page, 'caracteristicaItem')).toContain(
+    '🔄 Actualizaciones del sistema operativo: pide 5 años o más. En este tramo ya hay modelos que los declaran, pero no todos: compruébalo en la ficha del modelo concreto',
+  );
+  // La guía y el FAQPage tampoco sostienen ya la premisa antigua («3-4», «2-4 años en la mayoría»).
+  const html = await (await page.request.get('/selector-smartphone/')).text();
+  expect(html).not.toContain('suelen ofrecer 3-4');
+  expect(html).not.toContain('2-4 años en la mayoría');
 });
