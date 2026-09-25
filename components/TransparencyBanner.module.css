@@ -122,11 +122,25 @@
   border-color: var(--border);
 }
 
-/* Mobile */
+/* Mobile: el aviso deja de flotar y va en el flujo, al final de la página.
+   Fijo abajo ocupaba el 19-24 % de la pantalla (412×915 y 360×800), justo donde queda el
+   botón principal al bajar hasta él, y el toque se lo llevaba el aviso (hallazgo 1636,
+   generador-loteria, 25/09/2026). Cualquier capa fija abajo tapa lo que haya en esa franja,
+   así que la reserva de espacio no lo arregla. Al final del flujo no tapa nada, y aparecer
+   ahí, después del contenido, no provoca saltos de maquetación. */
 @media (max-width: 640px) {
   .banner {
-    bottom: var(--spacing-md);
-    width: calc(100% - var(--spacing-md) * 2);
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    margin: var(--spacing-md);
+    animation: none;
+  }
+
+  .banner.closing {
+    animation: none;
+    opacity: 0;
   }
 
   .content {
