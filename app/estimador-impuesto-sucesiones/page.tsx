@@ -5,7 +5,7 @@ import styles from './EstimadorSucesiones.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatDate, formatNumber, formatPercentage, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import {
   ESCALA_RECARGO_EXTEMPORANEO,
   porcentajeRecargoExtemporaneo,
@@ -26,6 +26,7 @@ import {
   REDUCCION_SEGURO_VIDA_MAX_IS,
   PLAZO_ISD,
   REDUCCION_VIVIENDA_MAX_IS,
+  REDUCCION_VIVIENDA_PORC_IS,
   REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
   REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS,
   VALORACION_USUFRUCTO_IS,
@@ -34,6 +35,8 @@ import {
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
   REDUCCION_DISCAPACIDAD_33_IS,
   REDUCCION_DISCAPACIDAD_65_IS,
+  REDUCCION_EMPRESA_FAMILIAR_IS,
+  REDUCCION_EMPRESA_FAMILIAR_CATALUNA_IS,
   PORC_AJUAR_DOMESTICO_IS,
   BONIFICACIONES_CCAA_IS,
   TramoTarifaIS,
@@ -66,6 +69,8 @@ interface ResultadoSucesiones {
   totalDeudas: number;
   masaHereditaria: number;
   ajuarDomestico: number;
+  /** Hay seguro de vida en la masa y el ajuar no lo ha tomado como caudal relicto (hallazgo 1824) */
+  segurosFueraDelAjuar: boolean;
   baseImponible: number;
   // Adquisición
   porcentajeAdquisicion: number;
@@ -154,7 +159,7 @@ function aplicarBonificacion(
     return {
       bonificacion: cuotaTributaria * pct,
       porcentaje: pct * 100,
-      detalle: `Bonificación ${formatNumber(pct * 100, 2)}% por escala del art. 58 bis (${config.nombre})`,
+      detalle: `Bonificación ${formatPercentage(pct, 2)} por escala del art. 58 bis (${config.nombre})`,
     };
   }
 
@@ -180,7 +185,7 @@ function aplicarBonificacion(
     return {
       bonificacion: bonif,
       porcentaje: tramoSeleccionado.porcentaje * 100,
-      detalle: `Bonificación ${formatNumber(tramoSeleccionado.porcentaje * 100, 0)} % (${config.nombre})`,
+      detalle: `Bonificación ${formatPercentage(tramoSeleccionado.porcentaje, 0)} (${config.nombre})`,
     };
   }
 
@@ -190,7 +195,7 @@ function aplicarBonificacion(
     return {
       bonificacion: bonif,
       porcentaje: bGrupo.porcentajeMayor * 100,
-      detalle: `Bonificación ${formatNumber(bGrupo.porcentajeMayor * 100, 0)} % (base supera ${formatCurrency(bGrupo.tope)})`,
+      detalle: `Bonificación ${formatPercentage(bGrupo.porcentajeMayor, 0)} (base supera ${formatCurrency(bGrupo.tope)})`,
     };
   }
 
@@ -209,7 +214,7 @@ function aplicarBonificacion(
     return {
       bonificacion: bonif,
       porcentaje: bGrupo.porcentaje * 100,
-      detalle: `Bonificación ${formatNumber(bGrupo.porcentaje * 100, 1)} % (${config.nombre})`,
+      detalle: `Bonificación ${formatPercentage(bGrupo.porcentaje, 1)} (${config.nombre})`,
     };
   }
 
@@ -348,6 +353,44 @@ const EJEMPLO_SOBRINO = calcularSucesion({
 const euros = (n: number) => formatCurrency(n);
 
 /**
+ * Porcentaje para la pantalla, a partir de PUNTOS (95 → «95 %»), con el `%` separado por un
+ * espacio duro: CLAUDE.md global §2 desde el 25/09/2026 (hallazgo 1833). Toda cifra con `%`
+ * de la página pasa por aquí o escribe `&nbsp;%` a mano en la prosa sin cifra derivada.
+ */
+const pct = (puntos: number, decimales = 0) => formatPercentage(puntos / 100, decimales);
+
+/**
+ * Lo que el Grupo III recibe en cada comunidad de régimen común, CONTADO en `data/fiscal`.
+ *
+ * ⚠️ 25/09/2026 (hallazgo 1829) — el consejo de la tarjeta del sobrino tecleaba «doce
+ * comunidades del régimen común no le dan nada» cuando en `BONIFICACIONES_CCAA_IS` son diez,
+ * y a su lado las cifras de Asturias, Madrid, Murcia y Canarias. Contarlas aquí impide que la
+ * frase vuelva a separarse de la tabla que la sostiene.
+ */
+const COMUNES_GRUPO_III = Object.entries(BONIFICACIONES_CCAA_IS).filter(
+  ([, c]) => c.regimen === 'comun',
+);
+const COMUNES_SIN_NADA_GRUPO_III = COMUNES_GRUPO_III.filter(([, c]) => {
+  const iii = c.bonificaciones['III'];
+  return !(iii?.porcentaje ?? 0) && !(iii?.reduccionBase ?? 0);
+}).length;
+const ASTURIAS_REDUCCION_GRUPO_III = BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['III']?.reduccionBase ?? 0;
+const BONIF_GRUPO_III = (ccaa: string) => (BONIFICACIONES_CCAA_IS[ccaa].bonificaciones['III']?.porcentaje ?? 0) * 100;
+
+/** «el 50 %» si Madrid y Murcia bonifican lo mismo al Grupo III, «el X % y el Y %» si no. */
+const MADRID_MURCIA_GRUPO_III = BONIF_GRUPO_III('madrid') === BONIF_GRUPO_III('murcia')
+  ? `el ${pct(BONIF_GRUPO_III('madrid'))}`
+  : `el ${pct(BONIF_GRUPO_III('madrid'))} y el ${pct(BONIF_GRUPO_III('murcia'))}`;
+
+/** Número en letra para la prosa (solo el rango que puede salir: de 0 a 17 comunidades). */
+const EN_LETRA = ['ninguna', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
+  'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete'];
+const enLetra = (n: number) => EN_LETRA[n] ?? String(n);
+
+/** Fecha de verificación del módulo en DD/MM/AAAA, como la del DataReference (hallazgo 1830). */
+const VERIFICADO_SUCESIONES = formatDate(parseISODateLocal(FISCAL_SUCESIONES_META.verificado));
+
+/**
  * Lo que ahorra una REDUCCIÓN, que por definición depende del tramo en que caiga.
  *
  * ⚠️ 14/09/2026 (hallazgo 821) — dos textos cifraban esa horquilla «dependiendo del tramo» y
@@ -366,6 +409,13 @@ const AHORRO_REDUCCION_PARENTESCO = horquillaAhorro(REDUCCIONES_PARENTESCO_IS['I
 const EJEMPLO_AJUAR_HERENCIA = 400000;
 const EJEMPLO_AJUAR_PRESUNTO = EJEMPLO_AJUAR_HERENCIA * PORC_AJUAR_DOMESTICO_IS;
 const AHORRO_AJUAR = horquillaAhorro(EJEMPLO_AJUAR_PRESUNTO);
+/**
+ * El piso del consejo sobre la valoración catastral. Decía «puede ahorrar 1.000–4.000 € en
+ * ISD» por rebajar un 10 % un piso de 300.000 €, sin tramo que lo sostuviera: 30.000 € de base
+ * se mueven entre el primer y el último tipo de la escala (Inspector, 25/09/2026, al paso).
+ */
+const EJEMPLO_VALORACION_PISO = 300000;
+const AHORRO_VALORACION = horquillaAhorro(EJEMPLO_VALORACION_PISO * 0.1);
 
 export default function EstimadorImpuestoSucesionesPage() {
   // Bienes del fallecido
@@ -440,10 +490,27 @@ export default function EstimadorImpuestoSucesionesPage() {
   }, [saldosCuentas, accionesFondos, viviendaHabitual, otrosInmuebles, vehiculos, segurosVida,
       otrosBienes, hipotecas, otrosPrestamos, gastosSepelio]);
 
+  /**
+   * El porcentaje de herencia, leído con la misma regla que los importes: o es utilizable, o
+   * la app se abstiene y lo nombra.
+   *
+   * ⚠️ 25/09/2026 (hallazgo 1822) — un porcentaje NEGATIVO se capaba a 0 en silencio y la app
+   * publicaba «Impuesto estimado 0,00 €» sin ninguna marca: «no pagas nada» como respuesta a
+   * un error de tecleo, en una app de riesgo 1. Los importes negativos ya se rechazaban con
+   * aviso desde el 740, y el porcentaje mayor que 100 se rotula «capado al 100 %» desde el 798;
+   * el negativo no tenía ni lo uno ni lo otro. El vacío sigue valiendo el 100 % (heredero
+   * único) y el 0 sigue siendo un valor con significado (hallazgo 743).
+   */
+  const porcentajeInvalido = useMemo(() => {
+    if (porcentajeHerencia.trim() === '') return false;
+    const n = Number.parseFloat(porcentajeHerencia);
+    return !Number.isFinite(n) || n < 0;
+  }, [porcentajeHerencia]);
+
   const resultado = useMemo((): ResultadoSucesiones | null => {
     if (!ccaa || !grupo) return null;
     // Con un solo importe ilegible no se estima: el aviso lo nombra y el panel no da cifra.
-    if (importes.invalidos.length > 0) return null;
+    if (importes.invalidos.length > 0 || porcentajeInvalido) return null;
 
     // Bienes
     const { bSaldos: v_cuentas, bAcciones: v_acciones, bVivienda: v_vivienda,
@@ -459,7 +526,17 @@ export default function EstimadorImpuestoSucesionesPage() {
 
     // Masa hereditaria
     const masaHereditaria = Math.max(0, totalActivos - totalDeudas);
-    const ajuarDomestico = masaHereditaria * PORC_AJUAR_DOMESTICO_IS;
+    /**
+     * ⚠️ 25/09/2026 (hallazgo 1824) — el ajuar se calculaba también sobre el SEGURO DE VIDA.
+     *
+     * El art. 15 LISD lo valora en «el tres por ciento del importe del caudal relicto del
+     * causante», y el seguro no es caudal relicto: lo percibe el beneficiario por el contrato
+     * (art. 3.1.c LISD) y, como dice la propia guía de esta página, «no forma parte de la
+     * herencia civil». Con solo 100.000 € de seguro, la app añadía 3000 € de ajuar y cobraba
+     * 969,00 € de más a un Grupo IV. El seguro sigue en la base —tributa—, pero no genera ajuar.
+     */
+    const caudalRelicto = Math.max(0, totalActivos - v_seguros - totalDeudas);
+    const ajuarDomestico = caudalRelicto * PORC_AJUAR_DOMESTICO_IS;
     const baseImponibleTotal = masaHereditaria + ajuarDomestico;
 
     /**
@@ -474,6 +551,7 @@ export default function EstimadorImpuestoSucesionesPage() {
      * cuando NO hay porcentaje escrito.
      */
     const porcentajeParseado = Number.parseFloat(porcentajeHerencia);
+    // El negativo ya no llega aquí (`porcentajeInvalido`): solo queda capar por arriba.
     const porcHerencia = Math.min(100, Math.max(0,
       Number.isFinite(porcentajeParseado) ? porcentajeParseado : 100
     )) / 100;
@@ -535,7 +613,12 @@ export default function EstimadorImpuestoSucesionesPage() {
         topeTotal
       ) - reduccionParentesco;
       if (reduccionEdad > 0) {
-        reducciones.push({ concepto: `Por edad (${21 - edadNum} años < 21)`, importe: reduccionEdad });
+        // Rotulaba `${21 - edad} años < 21`, que se lee como la edad del heredero: a uno de 15
+        // le ponía «6 años < 21» y a uno de 0, «21 años < 21» (hallazgo 1831).
+        reducciones.push({
+          concepto: `Por edad (heredero de ${edadNum} ${edadNum === 1 ? 'año' : 'años'}, menor de 21)`,
+          importe: reduccionEdad,
+        });
       }
     }
 
@@ -551,7 +634,10 @@ export default function EstimadorImpuestoSucesionesPage() {
        * tope de 9.195,49 € de base (hallazgo 796 del Inspector). Solo se veía en las
        * comunidades sin bonificación del 99 % en cuota, que en las demás lo aplana.
        */
-      const segurosDelHeredero = v_seguros * porcHerencia;
+      // Y por el tipo de adquisición, por la misma razón que la vivienda de abajo (hallazgo
+      // 1821): la app grava el seguro al porcentaje del usufructo o de la nuda propiedad, y la
+      // reducción no puede pasar de lo que se grava.
+      const segurosDelHeredero = v_seguros * porcHerencia * porcentajeAdquisicion;
       const reduccionSeguro = Math.min(segurosDelHeredero, REDUCCION_SEGURO_VIDA_MAX_IS);
       if (reduccionSeguro > 0) {
         reducciones.push({ concepto: 'Seguro de vida', importe: reduccionSeguro });
@@ -562,7 +648,22 @@ export default function EstimadorImpuestoSucesionesPage() {
     // regla desde el 27/08/2026 (hallazgo 500): esta app tenía su propia copia y concedía el
     // 95% a todo el Grupo III sin comprobar los 65 años ni la convivencia de los 2 años
     // anteriores que exige el art. 20.2.c LISD.
-    const baseViviendaHeredero = v_vivienda * porcHerencia;
+    /**
+     * ⚠️ 25/09/2026 (hallazgo 1821, ALTO) — en USUFRUCTO y NUDA PROPIEDAD la reducción se
+     * calculaba sobre el valor PLENO de la vivienda (`v_vivienda × porcHerencia`), mientras la
+     * base solo la gravaba al porcentaje del derecho adquirido (art. 26.a LISD). El art. 20.2.c
+     * reduce «las adquisiciones mortis causa de la vivienda habitual»: lo adquirido es la nuda
+     * propiedad o el usufructo, y la reducción se practica sobre el valor del DERECHO sobre la
+     * vivienda que entra en la base de este heredero. Medido: un hermano de 70 años en Castilla
+     * y León con la nuda propiedad (81 %) de 120.000 € se reducía 114.000 €, el 117 % de la
+     * vivienda gravada (97.200 €), y liquidaba 10.275,29 € donde salen 15.412,18 €. Es la forma
+     * de los hallazgos 796 (seguro) y 1193 (tope catalán): la reducción por encima de la parte
+     * gravada. En plena propiedad `porcentajeAdquisicion` vale 1 y nada se mueve.
+     *
+     * El tope (122.606,47 € por sujeto pasivo, o el catalán prorrateado) se aplica después,
+     * dentro de `evaluarReduccionVivienda`, sobre este valor ya ajustado.
+     */
+    const baseViviendaHeredero = v_vivienda * porcHerencia * porcentajeAdquisicion;
     /**
      * ⚠️ 22/09/2026 (hallazgo 1193, ALTO) — el VALOR de la vivienda se prorrataba y su TOPE no.
      *
@@ -600,15 +701,15 @@ export default function EstimadorImpuestoSucesionesPage() {
       limiteViviendaCataluna,
     });
     if (vivienda.reduccion > 0) {
-      reducciones.push({ concepto: 'Vivienda habitual (95%)', importe: vivienda.reduccion });
+      reducciones.push({ concepto: `Vivienda habitual (${pct(REDUCCION_VIVIENDA_PORC_IS * 100)})`, importe: vivienda.reduccion });
     }
     const viviendaNoAplicada = vivienda.noAplicada;
 
     // 5. Reducción por discapacidad
     if (discapacidad === '33') {
-      reducciones.push({ concepto: 'Discapacidad 33%–64%', importe: REDUCCION_DISCAPACIDAD_33_IS });
+      reducciones.push({ concepto: `Discapacidad ${pct(33)}–${pct(64)}`, importe: REDUCCION_DISCAPACIDAD_33_IS });
     } else if (discapacidad === '65') {
-      reducciones.push({ concepto: 'Discapacidad ≥65%', importe: REDUCCION_DISCAPACIDAD_65_IS });
+      reducciones.push({ concepto: `Discapacidad ≥${pct(65)}`, importe: REDUCCION_DISCAPACIDAD_65_IS });
     }
 
     // 6. Reducción adicional Asturias
@@ -644,17 +745,29 @@ export default function EstimadorImpuestoSucesionesPage() {
     const idxPatrimonio = Math.min(3, Math.max(0, parseInt(patrimonioIdx) - 1));
     const coeficienteMultiplicador = coeficientes[grupoBase]?.[idxPatrimonio] ?? 1;
 
-    const cuotaTributaria = cuotaIntegra * coeficienteMultiplicador;
+    /**
+     * ⚠️ 25/09/2026 (hallazgo 1823) — a céntimo la cuota tributaria y la bonificación, como en
+     * `calcularSucesion`. El 1195 redondeó la cuota íntegra, pero la tributaria y la
+     * bonificación seguían sin redondear: en Murcia, un sobrino con 100.000 € veía «Cuota
+     * tributaria 18.437,27 €», «– Bonificación 9218,64 €» y «CUOTA A INGRESAR 9218,64 €», y la
+     * resta de lo que se lee da 9218,63 €, que es lo que liquida el motor de las tarjetas de
+     * esta misma página y de la tool del MCP. Ahora la cuota final es la resta de las dos
+     * cifras publicadas.
+     */
+    const aCentimo = (n: number) => Math.round(n * 100) / 100;
+    const cuotaTributaria = aCentimo(cuotaIntegra * coeficienteMultiplicador);
 
     // Bonificación CCAA. `baseAjustada` es la base IMPONIBLE de ESTE heredero —ya con el ajuar
     // y con su porcentaje de herencia o su usufructo aplicados—, que es sobre la que la escala
     // catalana del art. 58 bis construye el porcentaje. El resto de comunidades siguen mirando
     // la liquidable.
-    const { bonificacion, porcentaje, detalle } = aplicarBonificacion(
+    const bonificacionCalculada = aplicarBonificacion(
       cuotaTributaria, baseLiquidable, grupo, ccaa, baseAjustada
     );
+    const { porcentaje, detalle } = bonificacionCalculada;
+    const bonificacion = aCentimo(bonificacionCalculada.bonificacion);
 
-    const cuotaFinal = Math.max(0, cuotaTributaria - bonificacion);
+    const cuotaFinal = aCentimo(Math.max(0, cuotaTributaria - bonificacion));
     // ⚠️ 13/09/2026 — la guarda miraba `baseImponibleTotal` y la división usaba
     // `baseAjustada`, que con el 0 % de herencia vale cero: 0/0 = NaN, y `formatNumber`
     // lo imprime como «No definido» (hallazgo 797, residuo de la reparación del 743).
@@ -665,6 +778,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       totalDeudas,
       masaHereditaria,
       ajuarDomestico,
+      segurosFueraDelAjuar: v_seguros > 0,
       baseImponible: baseImponibleTotal,
       porcentajeAdquisicion,
       baseAjustada,
@@ -686,7 +800,7 @@ export default function EstimadorImpuestoSucesionesPage() {
     };
   }, [
     ccaa, grupo, edad, convivenciaDosAnios, discapacidad, patrimonioIdx, tipoAdquisicion,
-    edadUsufructuario, porcentajeHerencia, importes, ccaaInfo,
+    edadUsufructuario, porcentajeHerencia, porcentajeInvalido, importes, ccaaInfo,
   ]);
 
   return (
@@ -699,7 +813,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           Oriéntate sobre el ISD en las 17 comunidades autónomas antes de hablar con tu asesor fiscal
         </p>
         <p className={styles.metaVerificado}>
-          Datos verificados: {FISCAL_SUCESIONES_META.verificado} — Fuente:{' '}
+          Datos verificados: {VERIFICADO_SUCESIONES} — Fuente:{' '}
           <a href={FISCAL_SUCESIONES_META.urlOficial} target="_blank" rel="noopener noreferrer" className={styles.linkFuente}>
             Agencia Tributaria
           </a>
@@ -733,7 +847,9 @@ export default function EstimadorImpuestoSucesionesPage() {
                 Comunidad autónoma donde residía el fallecido *
               </label>
               <select id="ccaa-causante" className={styles.select} value={ccaa} onChange={(e) => setCcaa(e.target.value)}>
-                <option value="">— Selecciona tu CCAA —</option>
+                {/* Pedía «tu CCAA» bajo una etiqueta que pide la del fallecido y encima de un
+                    helper que dice «No es donde vives tú»: residuo del 736 (hallazgo 1832). */}
+                <option value="">— Selecciona la comunidad del fallecido —</option>
                 <optgroup label="Régimen Común (14 CCAA)">
                   <option value="madrid">Comunidad de Madrid</option>
                   <option value="andalucia">Andalucía</option>
@@ -770,14 +886,17 @@ export default function EstimadorImpuestoSucesionesPage() {
               </span>
             </div>
 
+            {/* Con País Vasco o Navarra la misma nota salía DOS veces seguidas, en esta alerta
+                y en la caja informativa de abajo (hallazgo 1832): la alerta foral la lleva ya,
+                con el nombre de la comunidad, y la caja se reserva para las demás. */}
             {ccaaInfo?.regimen === 'foral' && ccaa !== 'cataluna' && (
               <div className={styles.alertaForal}>
-                <strong><span aria-hidden="true">⚠️</span> Régimen Foral</strong>
+                <strong><span aria-hidden="true">⚠️</span> Régimen Foral — {ccaaInfo.nombre}</strong>
                 <p>{ccaaInfo.notas}</p>
               </div>
             )}
 
-            {ccaaInfo && (
+            {ccaaInfo && !(ccaaInfo.regimen === 'foral' && ccaa !== 'cataluna') && (
               <div className={styles.infoCcaa}>
                 <strong><span aria-hidden="true">ℹ️</span> {ccaaInfo.nombre}</strong>
                 <p>{ccaaInfo.notas}</p>
@@ -828,7 +947,7 @@ export default function EstimadorImpuestoSucesionesPage() {
             <div className={styles.campo}>
               <span className={styles.label} id="etiqueta-discapacidad">Discapacidad reconocida</span>
               <div className={styles.radioGroup} role="radiogroup" aria-labelledby="etiqueta-discapacidad">
-                {[['0','No'], ['33','33%–64%'], ['65','≥65%']].map(([v, l]) => (
+                {[['0','No'], ['33',`${pct(33)}–${pct(64)}`], ['65',`≥${pct(65)}`]].map(([v, l]) => (
                   <label key={v} className={styles.radioLabel}>
                     <input type="radio" value={v} checked={discapacidad === v}
                       onChange={() => setDiscapacidad(v as NivelDiscapacidad)} />
@@ -855,7 +974,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                   onChange={(e) => setPorcentajeHerencia(e.target.value)} min="0" max="100" />
                 <span className={styles.unidad}>%</span>
               </div>
-              <span className={styles.helper}>100% si eres el único heredero</span>
+              <span className={styles.helper}>{pct(100)} si eres el único heredero</span>
             </div>
           </div>
 
@@ -883,12 +1002,12 @@ export default function EstimadorImpuestoSucesionesPage() {
                     no se calcula, son el 70 % (hallazgo 1196). Y cita la norma, como el resto
                     de los datos normativos de esta página. */}
                 <span className={styles.helper}>
-                  {VALORACION_USUFRUCTO_IS.norma}: {VALORACION_USUFRUCTO_IS.porcMaximo}% hasta los{' '}
+                  {VALORACION_USUFRUCTO_IS.norma}: {pct(VALORACION_USUFRUCTO_IS.porcMaximo)} hasta los{' '}
                   {VALORACION_USUFRUCTO_IS.edadUmbralMaximo} años y, desde ahí,{' '}
                   {VALORACION_USUFRUCTO_IS.edadReferencia} − edad, con un mínimo del{' '}
-                  {VALORACION_USUFRUCTO_IS.porcMinimo}%
+                  {pct(VALORACION_USUFRUCTO_IS.porcMinimo)}
                   {edadUsufructuario.trim() !== '' &&
-                    ` → ${formatNumber(porcentajeUsufructoVitalicio(Number.parseInt(edadUsufructuario, 10)) * 100, 0)}%`}
+                    ` → ${formatPercentage(porcentajeUsufructoVitalicio(Number.parseInt(edadUsufructuario, 10)), 0)}`}
                 </span>
               </div>
             )}
@@ -938,7 +1057,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
         {/* ── Panel de resultados ──────────────────────────────────── */}
         <div className={styles.resultsPanel}>
-          {importes.invalidos.length > 0 ? (
+          {importes.invalidos.length > 0 || porcentajeInvalido ? (
             /*
               El aviso NOMBRA los campos, y el panel no da ninguna cifra mientras estén así.
               Antes el importe ilegible se convertía en cero y la estimación salía igual: el
@@ -946,18 +1065,32 @@ export default function EstimadorImpuestoSucesionesPage() {
               masa hereditaria que un signo menos había triplicado (hallazgos 740 y 742).
             */
             <div className={styles.placeholder} role="alert">
-              <p>
-                <span aria-hidden="true">⚠️</span>{' '}
-                {importes.invalidos.length === 1
-                  ? 'Hay un importe que no se puede leer: '
-                  : 'Hay importes que no se pueden leer: '}
-                <strong>{importes.invalidos.join(', ')}</strong>.
-              </p>
-              <p>
-                Escribe solo cifras positivas, con coma para los decimales (por ejemplo
-                «1.234,56»). No se da estimación mientras haya un importe sin leer, porque
-                tomarlo como cero cambiaría la cuota sin avisar.
-              </p>
+              {importes.invalidos.length > 0 && (
+                <>
+                  <p>
+                    <span aria-hidden="true">⚠️</span>{' '}
+                    {importes.invalidos.length === 1
+                      ? 'Hay un importe que no se puede leer: '
+                      : 'Hay importes que no se pueden leer: '}
+                    <strong>{importes.invalidos.join(', ')}</strong>.
+                  </p>
+                  <p>
+                    Escribe solo cifras positivas, con coma para los decimales (por ejemplo
+                    «1.234,56»). No se da estimación mientras haya un importe sin leer, porque
+                    tomarlo como cero cambiaría la cuota sin avisar.
+                  </p>
+                </>
+              )}
+              {/* Hallazgo 1822: el negativo se capaba a 0 % y la app publicaba 0,00 € de
+                  impuesto sin decir nada. Se nombra el campo y no se da cifra. */}
+              {porcentajeInvalido && (
+                <p>
+                  <span aria-hidden="true">⚠️</span>{' '}
+                  El <strong>porcentaje de la herencia que recibes</strong> no puede ser negativo:
+                  escribe un valor entre 0 y 100 (déjalo en 100 si eres el único heredero). No se
+                  da estimación con ese dato, porque tomarlo como 0 daría un impuesto de cero.
+                </p>
+              )}
             </div>
           ) : !resultado ? (
             <div className={styles.placeholder}>
@@ -978,11 +1111,11 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <span className={styles.resultadoValor}>{formatCurrency(resultado.cuotaFinal)}</span>
                 {resultado.porcentajeBonificacion > 0 && (
                   <span className={styles.resultadoNota}>
-                    Bonificación autonómica: {formatNumber(resultado.porcentajeBonificacion, 1)}%
+                    Bonificación autonómica: {pct(resultado.porcentajeBonificacion, 1)}
                   </span>
                 )}
                 <span className={styles.resultadoTipoEfectivo}>
-                  Tipo efectivo: {formatNumber(resultado.tipoEfectivo, 2)}%
+                  Tipo efectivo: {pct(resultado.tipoEfectivo, 2)}
                 </span>
               </div>
 
@@ -992,7 +1125,13 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <div className={styles.linea}><span>Total activos</span><span>{formatCurrency(resultado.totalActivos)}</span></div>
                 {resultado.totalDeudas > 0 && <div className={styles.linea}><span>– Deudas y cargas</span><span>{formatCurrency(resultado.totalDeudas)}</span></div>}
                 <div className={styles.linea}><span>Masa hereditaria neta</span><span>{formatCurrency(resultado.masaHereditaria)}</span></div>
-                <div className={styles.linea}><span>+ Ajuar doméstico (3%)</span><span>{formatCurrency(resultado.ajuarDomestico)}</span></div>
+                <div className={styles.linea}>
+                  <span>
+                    + Ajuar doméstico ({pct(PORC_AJUAR_DOMESTICO_IS * 100)}
+                    {resultado.segurosFueraDelAjuar ? ' del caudal relicto, sin los seguros de vida' : ''})
+                  </span>
+                  <span>{formatCurrency(resultado.ajuarDomestico)}</span>
+                </div>
                 <div className={`${styles.linea} ${styles.lineaTotal}`}><span>Base imponible total</span><span>{formatCurrency(resultado.baseImponible)}</span></div>
               </div>
 
@@ -1006,14 +1145,14 @@ export default function EstimadorImpuestoSucesionesPage() {
                   <div className={styles.linea}>
                     <span>Porcentaje de herencia</span>
                     <span>
-                      {formatNumber(resultado.porcentajeHerenciaAplicado * 100, 2)}%
-                      {Number.parseFloat(porcentajeHerencia) > 100 ? ' (capado al 100 %)' : ''}
+                      {pct(resultado.porcentajeHerenciaAplicado * 100, 2)}
+                      {Number.parseFloat(porcentajeHerencia) > 100 ? ' (capado al 100 %)' : ''}
                     </span>
                   </div>
                   {tipoAdquisicion !== 'plena' && (
                     <div className={styles.linea}>
                       <span>Tipo adquisición ({tipoAdquisicion})</span>
-                      <span>{formatNumber(resultado.porcentajeAdquisicion * 100, 1)}%</span>
+                      <span>{pct(resultado.porcentajeAdquisicion * 100, 1)}</span>
                     </div>
                   )}
                   <div className={`${styles.linea} ${styles.lineaTotal}`}><span>Base ajustada</span><span>{formatCurrency(resultado.baseAjustada)}</span></div>
@@ -1108,7 +1247,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           <li>El ISD contempla decenas de supuestos especiales no incluidos aquí</li>
           <li>Empresas familiares, explotaciones agrarias y otros bienes tienen reducciones especiales</li>
           <li>Las bonificaciones autonómicas pueden tener requisitos formales adicionales</li>
-          <li>El ajuar doméstico ({formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} %) puede impugnarse con prueba en contrario</li>
+          <li>El ajuar doméstico ({pct(PORC_AJUAR_DOMESTICO_IS * 100, 0)}) puede impugnarse con prueba en contrario</li>
         </ul>
         <p className={styles.disclaimerPlazo}>
           <span aria-hidden="true">📅</span> Plazo de autoliquidación: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong> desde el fallecimiento ({PLAZO_ISD.norma}), prorrogable {PLAZO_ISD.mesesProrroga} meses más con intereses de demora, y la prórroga se pide dentro de los {PLAZO_ISD.mesesParaPedirProrroga} primeros
@@ -1132,19 +1271,20 @@ export default function EstimadorImpuestoSucesionesPage() {
           <h3>Pasos del cálculo</h3>
           <ol>
             <li><strong>Masa hereditaria neta:</strong> Total activos – deudas y cargas</li>
-            <li><strong>Ajuar doméstico:</strong> Se añade automáticamente un 3% (salvo prueba en contrario)</li>
+            <li><strong>Ajuar doméstico:</strong> Se añade automáticamente un {pct(PORC_AJUAR_DOMESTICO_IS * 100)} del caudal relicto (salvo prueba en contrario)</li>
             <li><strong>Base imponible:</strong> Masa + ajuar, proporcional al porcentaje heredado</li>
             <li><strong>Reducciones:</strong> Por parentesco, edad, discapacidad, vivienda habitual, seguro de vida</li>
             <li><strong>Base liquidable:</strong> Base imponible – reducciones</li>
             <li><strong>Cuota íntegra:</strong> Aplicando la tarifa correspondiente a la base liquidable</li>
             <li><strong>Coeficiente multiplicador:</strong> Según grupo y patrimonio preexistente</li>
-            <li><strong>Bonificación autonómica:</strong> Las CCAA pueden reducir la cuota hasta el 99,9%</li>
+            <li><strong>Bonificación autonómica:</strong> Las CCAA pueden reducir la cuota hasta el {pct((BONIFICACIONES_CCAA_IS['canarias'].bonificaciones['II']?.porcentaje ?? 0) * 100, 1)}</li>
           </ol>
 
           <h3>Diferencias entre CCAA</h3>
           <p>
             Las comunidades usan dos mecanismos distintos y conviene no confundirlos. Madrid y
-            Canarias bonifican la CUOTA —el 99% y el 99,9% para los grupos más cercanos—, de modo
+            Canarias bonifican la CUOTA —el {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} y
+            el {pct((BONIFICACIONES_CCAA_IS['canarias'].bonificaciones['II']?.porcentaje ?? 0) * 100, 1)} para los grupos más cercanos—, de modo
             que el impuesto queda cerca de cero. Asturias no bonifica en cuota a esos grupos, pero
             les aplica una reducción de {euros(EJEMPLO_ASTURIAS.reduccionAutonomicaBase)} en la
             BASE, que en herencias medianas absorbe la base entera y deja también una cuota de
@@ -1179,15 +1319,15 @@ export default function EstimadorImpuestoSucesionesPage() {
           <p>
             Cataluña <strong>no es territorio foral</strong> —los forales son País Vasco y Navarra—,
             pero sí tiene su propia ley del impuesto (Ley 19/2010): tarifa entre
-            el {formatNumber(TARIFA_CATALUNA_IS[0].tipo, 0)}% y
-            el {formatNumber(TARIFA_CATALUNA_IS[TARIFA_CATALUNA_IS.length - 1].tipo, 0)}% y
+            el {pct(TARIFA_CATALUNA_IS[0].tipo, 0)} y
+            el {pct(TARIFA_CATALUNA_IS[TARIFA_CATALUNA_IS.length - 1].tipo, 0)} y
             reducciones distintas de las estatales, entre
             ellas {euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['I-conyuge'])} para el cónyuge y para el
             hijo, {euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['II-descendiente'])} para el resto de
             descendientes y {euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['II-ascendiente'])} para los
-            ascendientes. País Vasco
-            (tres Haciendas Forales diferentes) y Navarra tienen sistemas muy favorables para
-            familiares directos, con reducciones cercanas al 100%.
+            ascendientes. País Vasco (tres Haciendas Forales, cada una con su norma) y Navarra
+            tienen tarifas y reducciones propias; para cónyuge, hijos y padres la carga suele ser
+            baja, pero depende del territorio y del caso, y esta herramienta solo los aproxima.
           </p>
 
           <h3>Plazos importantes</h3>
@@ -1208,7 +1348,7 @@ export default function EstimadorImpuestoSucesionesPage() {
           <h2>Comparativa de los 4 grupos de parentesco</h2>
           <p>
             El grupo de parentesco es el factor que más condiciona la carga fiscal. La diferencia entre
-            un hijo y un sobrino puede suponer pagar el 0% o más del 30% de la herencia.
+            un hijo y un sobrino puede suponer pagar el 0&nbsp;% o más del 30&nbsp;% de la herencia.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -1225,15 +1365,15 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <tr>
                   <td><strong>Grupo I</strong><br /><small>Descendiente &lt;21 a.</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['I-descendiente'])} + {euros(REDUCCION_EDAD_MENOR_21_IS)} por año &lt;21 (máx. {euros(REDUCCION_EDAD_MENOR_21_MAX_IS)})</td>
-                  <td>1,0000 (patrimonio &lt;402.678 €)</td>
-                  <td>99%–100% en Madrid, Canarias, Galicia, Andalucía</td>
+                  <td>{formatNumber(COEFICIENTES_IS['I'][0], 4)} (patrimonio &lt;402.678 €)</td>
+                  <td>99&nbsp;%–100&nbsp;% en Madrid, Canarias, Galicia, Andalucía</td>
                   <td>Hijo menor de 21 años hereda la vivienda familiar</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo II</strong><br /><small>Descendiente ≥21 a. / cónyuge / ascendiente</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['II'])}</td>
-                  <td>1,0000 (patrimonio &lt;402.678 €)</td>
-                  <td>99%–100% en Madrid, Canarias; 0% en Asturias</td>
+                  <td>{formatNumber(COEFICIENTES_IS['II'][0], 4)} (patrimonio &lt;402.678 €)</td>
+                  <td>99&nbsp;%–100&nbsp;% en Madrid, Canarias; en Asturias, reducción de {euros(BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['II']?.reduccionBase ?? 0)} en la base en vez de bonificación</td>
                   <td>Hijo adulto, cónyuge o padre hereda bienes del fallecido</td>
                 </tr>
                 <tr>
@@ -1245,8 +1385,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 </tr>
                 <tr>
                   <td><strong>Grupo IV</strong><br /><small>Primos, parientes lejanos, extraños</small></td>
-                  <td>0 €</td>
-                  <td>2,0000 (patrimonio &lt;402.678 €)</td>
+                  <td>{euros(REDUCCIONES_PARENTESCO_IS['IV'])}</td>
+                  <td>{formatNumber(COEFICIENTES_IS['IV'][0], 4)} (patrimonio &lt;402.678 €)</td>
                   <td>Generalmente sin bonificación</td>
                   <td>Amigo o pareja no registrada hereda bienes</td>
                 </tr>
@@ -1276,20 +1416,20 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <p>
                   Base imponible: {euros(EJEMPLO_MADRID_PISO)} (piso) +{' '}
                   {euros(EJEMPLO_MADRID.ajuarDomestico)} (ajuar{' '}
-                  {formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} %) ={' '}
+                  {pct(PORC_AJUAR_DOMESTICO_IS * 100, 0)}) ={' '}
                   <strong>{euros(EJEMPLO_MADRID.baseImponibleConAjuar)}</strong>.
                   Reducción por parentesco: {euros(REDUCCIONES_PARENTESCO_IS['II'])}. Reducción vivienda
-                  habitual (95%): mín({euros(EJEMPLO_MADRID_PISO)} × 0,95; {euros(REDUCCION_VIVIENDA_MAX_IS)}) ={' '}
+                  habitual ({pct(REDUCCION_VIVIENDA_PORC_IS * 100)}): mín({euros(EJEMPLO_MADRID_PISO)} × {formatNumber(REDUCCION_VIVIENDA_PORC_IS, 2)}; {euros(REDUCCION_VIVIENDA_MAX_IS)}) ={' '}
                   <strong>{euros(REDUCCION_VIVIENDA_MAX_IS)}</strong>.
                   Base liquidable: {euros(EJEMPLO_MADRID.baseLiquidable)}. Cuota íntegra (tarifa
                   estatal): {euros(EJEMPLO_MADRID.cuotaIntegra)}. Bonificación Madrid{' '}
-                  ({formatNumber(EJEMPLO_MADRID.porcentajeBonificacion, 0)} %):{' '}
+                  ({pct(EJEMPLO_MADRID.porcentajeBonificacion, 0)}):{' '}
                   –{euros(EJEMPLO_MADRID.bonificacionCcaa)}.
                 </p>
                 <p><strong>Cuota final estimada: {euros(EJEMPLO_MADRID.cuotaFinal)}</strong></p>
               </div>
               <div className={styles.escenarioTip}>
-                Madrid tiene bonificación del 99% para Grupos I y II. Un hijo paga prácticamente cero.
+                Madrid tiene bonificación del {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} para Grupos I y II. Un hijo paga prácticamente cero.
               </div>
             </div>
 
@@ -1315,14 +1455,15 @@ export default function EstimadorImpuestoSucesionesPage() {
                     que es lo que se grava. La tarjeta lo dividía entre los 80.000 € de la
                     cuenta y publicaba «4,1 %» donde el panel imprimía «4,01 %»: dos
                     denominadores para la misma operación (hallazgo 1152). */}
-                <p><strong>Cuota final estimada: {euros(EJEMPLO_SOBRINO.cuotaFinal)}</strong> ({formatNumber(EJEMPLO_SOBRINO.tipoEfectivo, 2)} % de la base con ajuar)</p>
+                <p><strong>Cuota final estimada: {euros(EJEMPLO_SOBRINO.cuotaFinal)}</strong> ({pct(EJEMPLO_SOBRINO.tipoEfectivo, 2)} de la base con ajuar)</p>
               </div>
               <div className={styles.escenarioTip}>
                 Al colateral le toca el coeficiente multiplicador de {formatNumber(EJEMPLO_SOBRINO.coeficienteMultiplicador, 4)}, que encarece la cuota
                 frente a hijos y cónyuge. Lo que cambia mucho de una comunidad a otra es qué recibe
-                el Grupo III: doce comunidades del régimen común no le dan nada, Asturias le reduce
-                50.000 € de la base, Madrid y Murcia le bonifican el 50% de la cuota y Canarias el
-                99,9%. Comprueba la tuya antes de dar por hecha la cifra.
+                el Grupo III: {enLetra(COMUNES_SIN_NADA_GRUPO_III)} de las {enLetra(COMUNES_GRUPO_III.length)} comunidades
+                del régimen común no le dan nada, Asturias le reduce {euros(ASTURIAS_REDUCCION_GRUPO_III)} de
+                la base, Madrid y Murcia le bonifican {MADRID_MURCIA_GRUPO_III} de la cuota y Canarias
+                el {pct(BONIF_GRUPO_III('canarias'), 1)}. Comprueba la tuya antes de dar por hecha la cifra.
               </div>
             </div>
 
@@ -1336,10 +1477,10 @@ export default function EstimadorImpuestoSucesionesPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p>
-                  Cataluña aplica tarifa propia ({formatNumber(TARIFA_CATALUNA_IS[0].tipo, 0)}%–
-                  {formatNumber(TARIFA_CATALUNA_IS[TARIFA_CATALUNA_IS.length - 1].tipo, 0)}%) y
+                  Cataluña aplica tarifa propia ({pct(TARIFA_CATALUNA_IS[0].tipo, 0)}–
+                  {pct(TARIFA_CATALUNA_IS[TARIFA_CATALUNA_IS.length - 1].tipo, 0)}) y
                   coeficientes propios. Con el ajuar del{' '}
-                  {formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} % la base imponible sube a{' '}
+                  {pct(PORC_AJUAR_DOMESTICO_IS * 100, 0)} la base imponible sube a{' '}
                   {euros(EJEMPLO_CATALUNA.baseImponibleConAjuar)} y, sin más reducciones que la de
                   parentesco del cónyuge ({euros(EJEMPLO_CATALUNA.reduccionParentesco)} en Cataluña),
                   la base liquidable queda en {euros(EJEMPLO_CATALUNA.baseLiquidable)} y la cuota
@@ -1348,21 +1489,27 @@ export default function EstimadorImpuestoSucesionesPage() {
                 </p>
                 <p>
                   Sobre esa cuota se aplica la bonificación del cónyuge
-                  ({formatNumber(EJEMPLO_CATALUNA.porcentajeBonificacion, 0)} %, art. 58 bis.1 de la
+                  ({pct(EJEMPLO_CATALUNA.porcentajeBonificacion, 0)}, art. 58 bis.1 de la
                   Ley 19/2010), así que la <strong>cuota final estimada es
                   de {euros(EJEMPLO_CATALUNA.cuotaFinal)}</strong> — que es lo que liquida la
                   calculadora de arriba con estos mismos datos.
                 </p>
                 <p>
-                  <strong>La reducción del 95% por empresa familiar</strong> (art. 20.2.c de la
-                  Ley 29/1987 y sección 3ª de la Ley 19/2010) puede dejar la cuota en cero si se
+                  <strong>La reducción del {pct(REDUCCION_EMPRESA_FAMILIAR_CATALUNA_IS.porcentaje)} por empresa
+                  familiar</strong> ({REDUCCION_EMPRESA_FAMILIAR_CATALUNA_IS.norma}; en régimen común,
+                  el {REDUCCION_EMPRESA_FAMILIAR_IS.norma}) puede dejar la cuota en cero si se
                   cumplen los requisitos de permanencia, pero <strong>esta herramienta no la
                   calcula</strong>: la cifra de arriba es el techo, no la factura.
                 </p>
               </div>
               <div className={styles.escenarioTip}>
-                La reducción por empresa familiar (95%) requiere que el causante ejerciera
-                funciones de dirección y que la familia mantenga los bienes 10 años.
+                {/* Decía «10 años», que es el plazo estatal del art. 20.2.c LISD, en la tarjeta
+                    de una herencia CATALANA: el art. 9 de la Ley 19/2010 pide cinco (Inspector,
+                    25/09/2026, verificado en el BOE). */}
+                La reducción por empresa familiar ({pct(REDUCCION_EMPRESA_FAMILIAR_CATALUNA_IS.porcentaje)}) exige,
+                entre otros requisitos, mantener la actividad y lo adquirido
+                durante {REDUCCION_EMPRESA_FAMILIAR_CATALUNA_IS.aniosMantenimiento} años en Cataluña
+                ({REDUCCION_EMPRESA_FAMILIAR_IS.aniosMantenimiento} en régimen común).
               </div>
             </div>
 
@@ -1375,17 +1522,25 @@ export default function EstimadorImpuestoSucesionesPage() {
                 </div>
               </div>
               <div className={styles.escenarioExample}>
+                {/* Daba cifras sin fuente ni sello —«55.000 €–65.000 €» de reducción por
+                    discapacidad y «bonificación del 95 %–100 %»— para tres territorios con
+                    normas distintas que esta app no modela (Inspector, 25/09/2026). Se describe
+                    sin cifras en vez de inventarlas; la estatal sí va derivada de data/fiscal. */}
                 <p>
-                  País Vasco tiene normativa foral propia (Álava, Bizkaia, Gipuzkoa con pequeñas
-                  diferencias). Para descendientes directos con discapacidad ≥33%, la reducción
-                  adicional es de 55.000 €–65.000 € según territorio. La bonificación para
-                  familiares directos es del 95%–100% en la mayoría de supuestos.
+                  País Vasco tiene normativa foral propia, y cada territorio histórico (Álava,
+                  Bizkaia, Gipuzkoa) fija sus reducciones por parentesco y por discapacidad y su
+                  tarifa. Para un hijo menor la carga suele ser baja, pero el importe exacto
+                  depende de la norma foral de cada territorio: esta herramienta solo lo aproxima
+                  con la tarifa estatal.
                 </p>
-                <p><strong>Cuota efectiva generalmente cercana a 0 €</strong></p>
+                <p><strong>Consulta la norma foral de tu territorio o a un asesor</strong></p>
               </div>
               <div className={styles.escenarioTip}>
-                País Vasco, Navarra y Cataluña tienen sus propias reducciones por discapacidad,
-                a menudo más generosas que la estatal ({euros(REDUCCION_DISCAPACIDAD_33_IS)} al 65%).
+                {/* Emparejaba la cifra del 33 %–64 % con el grado del 65 % (hallazgo 1827). */}
+                País Vasco, Navarra y Cataluña tienen sus propias reducciones por discapacidad, que
+                conviene comparar con las estatales: {euros(REDUCCION_DISCAPACIDAD_33_IS)} con un grado
+                del 33&nbsp;% al 64&nbsp;% y {euros(REDUCCION_DISCAPACIDAD_65_IS)} con un grado del 65&nbsp;%
+                o más.
               </div>
             </div>
           </div>
@@ -1398,8 +1553,8 @@ export default function EstimadorImpuestoSucesionesPage() {
             <div className={styles.faqItem}>
               <dt>¿Tengo que pagar si heredo en Madrid o Canarias?</dt>
               <dd>
-                En la práctica, casi nunca. Madrid aplica una bonificación del 99% para los Grupos I y II
-                (cónyuge, descendientes, ascendientes). Canarias aplica el 99,9% para los mismos grupos.
+                En la práctica, casi nunca. Madrid aplica una bonificación del {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} para los Grupos I y II
+                (cónyuge, descendientes, ascendientes). Canarias aplica el {pct((BONIFICACIONES_CCAA_IS['canarias'].bonificaciones['II']?.porcentaje ?? 0) * 100, 1)} para los mismos grupos.
                 La cuota resultante es de céntimos. Sin embargo, <strong>sí estás obligado a autoliquidar
                 aunque la cuota sea cero</strong>, presentando el modelo 650 en el plazo de {PLAZO_ISD.mesesPresentacion} meses.
                 <div className={styles.faqTip}>Presentar aunque la cuota sea 0 evita sanciones por extemporaneidad.</div>
@@ -1414,7 +1569,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 impugna, se usa el valor de mercado. Si declaras por debajo del valor de referencia,
                 Hacienda puede iniciar una comprobación de valores y girar una liquidación complementaria
                 con intereses de demora (actualmente al{' '}
-                {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.interesDemoraAnual, 2)}% anual).
+                {pct(ESCALA_RECARGO_EXTEMPORANEO.interesDemoraAnual, 2)} anual).
               </dd>
             </div>
 
@@ -1436,7 +1591,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 Es un factor que incrementa la cuota íntegra según el grupo de parentesco y el
                 patrimonio preexistente del heredero. Un hijo con menos de 402.678 € de patrimonio
                 usa el coeficiente {formatNumber(COEFICIENTES_IS['II'][0], 4)} (sin incremento). Un sobrino (Grupo III) con el mismo
-                patrimonio usa {formatNumber(COEFICIENTES_IS['III'][0], 4)}, por lo que paga un {formatNumber((COEFICIENTES_IS['III'][0] - 1) * 100, 2)} % más que la cuota íntegra base.
+                patrimonio usa {formatNumber(COEFICIENTES_IS['III'][0], 4)}, por lo que paga un {pct((COEFICIENTES_IS['III'][0] - 1) * 100, 2)} más que la cuota íntegra base.
                 Con patrimonio preexistente superior a 4.020.770 €, el coeficiente llega a{' '}
                 {formatNumber(COEFICIENTES_IS['IV'][COEFICIENTES_IS['IV'].length - 1], 1)} en el Grupo IV.
               </dd>
@@ -1445,9 +1600,9 @@ export default function EstimadorImpuestoSucesionesPage() {
             <div className={styles.faqItem}>
               <dt>¿Cómo afecta la discapacidad a las reducciones?</dt>
               <dd>
-                La normativa estatal establece dos tramos: discapacidad entre el 33% y el 64%
+                La normativa estatal establece dos tramos: discapacidad entre el 33&nbsp;% y el 64&nbsp;%
                 da derecho a una reducción adicional de <strong>{euros(REDUCCION_DISCAPACIDAD_33_IS)}</strong>;
-                discapacidad del 65% o superior da derecho a <strong>{euros(REDUCCION_DISCAPACIDAD_65_IS)}</strong>. Estas reducciones
+                discapacidad del 65&nbsp;% o superior da derecho a <strong>{euros(REDUCCION_DISCAPACIDAD_65_IS)}</strong>. Estas reducciones
                 se suman a las de parentesco. Algunas CCAA (Andalucía, Valencia, Cataluña) amplían
                 estos importes. El grado de discapacidad debe estar reconocido oficialmente antes
                 del devengo del impuesto.
@@ -1458,14 +1613,14 @@ export default function EstimadorImpuestoSucesionesPage() {
               <dt>¿Qué pasa si presento fuera de plazo?</dt>
               <dd>
                 Si presentas antes de que Hacienda te requiera, se aplica el recargo por extemporaneidad
-                espontánea del art. 27.2 LGT: un <strong>{formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase, 0)}% de partida
-                más otro {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes, 0)}% por cada mes completo de retraso</strong>,
+                espontánea del art. 27.2 LGT: un <strong>{pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase, 0)} de partida
+                más otro {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes, 0)} por cada mes completo de retraso</strong>,
                 hasta los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses. A partir de ahí es
-                un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses, 0)}% fijo más intereses de demora
-                (al {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.interesDemoraAnual, 2)}% anual). El recargo se reduce
-                un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago, 0)}% si se paga en período voluntario.
+                un {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses, 0)} fijo más intereses de demora
+                (al {pct(ESCALA_RECARGO_EXTEMPORANEO.interesDemoraAnual, 2)} anual). El recargo se reduce
+                un {pct(ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago, 0)} si se paga en período voluntario.
                 Si Hacienda actúa primero (liquidación de oficio), se aplican sanciones que pueden
-                llegar al 150% de la deuda.
+                llegar al 150&nbsp;% de la deuda.
               </dd>
             </div>
 
@@ -1488,13 +1643,13 @@ export default function EstimadorImpuestoSucesionesPage() {
                   <li><strong>Reducción</strong>: Resta de la base imponible antes de aplicar la tarifa.
                   Ejemplo: reducción por parentesco de {euros(REDUCCIONES_PARENTESCO_IS['II'])} en Grupo II.</li>
                   <li><strong>Bonificación</strong>: Porcentaje que se aplica sobre la cuota tributaria
-                  ya calculada. Ejemplo: Madrid bonifica el 99% de la cuota para Grupo II.</li>
+                  ya calculada. Ejemplo: Madrid bonifica el {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} de la cuota para Grupo II.</li>
                 </ul>
                 Una reducción de {euros(REDUCCIONES_PARENTESCO_IS['II'])} ahorra
                 entre {euros(AHORRO_REDUCCION_PARENTESCO.min)} y {euros(AHORRO_REDUCCION_PARENTESCO.max)} según
-                el tramo en que caiga (del {formatNumber(TARIFA_ESTATAL_IS[0].tipo, 2)} % al{' '}
-                {formatNumber(TARIFA_ESTATAL_IS[TARIFA_ESTATAL_IS.length - 1].tipo, 2)} % de la escala estatal).
-                Una bonificación del 99% sobre una cuota de 10.000 € ahorra 9.900 €.
+                el tramo en que caiga (del {pct(TARIFA_ESTATAL_IS[0].tipo, 2)} al{' '}
+                {pct(TARIFA_ESTATAL_IS[TARIFA_ESTATAL_IS.length - 1].tipo, 2)} de la escala estatal).
+                Una bonificación del 99&nbsp;% sobre una cuota de 10.000 € ahorra 9900 €.
                 <div className={styles.faqTip}>Las bonificaciones autonómicas son en general mucho más potentes que las reducciones estatales.</div>
               </dd>
             </div>
@@ -1529,7 +1684,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                   Acredita si el fallecido otorgó testamento y ante qué notario. Se solicita al
                   Ministerio de Justicia (presencialmente o por correo) con el certificado de
                   defunción. <strong>Plazo mínimo: 15 días hábiles</strong> desde el fallecimiento.
-                  Coste: 3,78 €.
+                  Está sujeto a una tasa del Ministerio de Justicia (modelo 790).
                 </p>
               </div>
             </li>
@@ -1551,7 +1706,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <strong>Calcular la masa hereditaria neta</strong>
                 <p>
                   Inventariar todos los bienes (cuentas, inmuebles, vehículos, fondos, seguros) y
-                  restar las deudas acreditadas. El ajuar doméstico se presume en el 3% salvo
+                  restar las deudas acreditadas. El ajuar doméstico se presume en
+                  el {pct(PORC_AJUAR_DOMESTICO_IS * 100)} del caudal relicto salvo
                   prueba en contrario. Obtener certificados de saldos bancarios a la fecha de
                   fallecimiento y tasaciones de inmuebles si es necesario.
                 </p>
@@ -1632,8 +1788,11 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <p>
                   Desde 2022, los inmuebles se declaran por el valor de referencia catastral.
                   Si es mayor que el valor de mercado, puedes impugnarlo ante la Dirección General
-                  del Catastro aportando tasación pericial. Una reducción del 10% en la valoración
-                  de un piso de 300.000 € puede ahorrar 1.000–4.000 € en ISD.
+                  del Catastro aportando tasación pericial. Una reducción del 10&nbsp;% en la valoración
+                  de un piso de {euros(EJEMPLO_VALORACION_PISO)} rebaja la base
+                  en {euros(EJEMPLO_VALORACION_PISO * 0.1)}: entre {euros(AHORRO_VALORACION.min)} y{' '}
+                  {euros(AHORRO_VALORACION.max)} de cuota íntegra según el tramo, antes de la
+                  bonificación de tu comunidad.
                 </p>
               </div>
             </div>
@@ -1642,7 +1801,7 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div>
                 <strong>Declara el ajuar doméstico correctamente</strong>
                 <p>
-                  Hacienda presume el {formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0)} % del valor de
+                  Hacienda presume el {pct(PORC_AJUAR_DOMESTICO_IS * 100, 0)} del valor de
                   la masa hereditaria neta como ajuar doméstico.
                   Si los muebles, ropa y enseres valen menos, puedes impugnar esta presunción
                   aportando inventario valorado. En una herencia de {euros(EJEMPLO_AJUAR_HERENCIA)}, el
@@ -1657,7 +1816,8 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div>
                 <strong>Aplica la reducción por vivienda habitual</strong>
                 <p>
-                  Si heredas la vivienda habitual del causante, aplica la reducción del 95%
+                  Si heredas la vivienda habitual del causante, aplica la reducción
+                  del {pct(REDUCCION_VIVIENDA_PORC_IS * 100)}
                   sobre su valor (con el límite estatal de {euros(REDUCCION_VIVIENDA_MAX_IS)} por heredero). Cónyuge,
                   descendientes y ascendientes pueden aplicarla. En Cataluña el límite es muy
                   superior —{euros(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)} sobre el valor conjunto de
@@ -1674,10 +1834,11 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div>
                 <strong>Liquida aunque la cuota sea cero</strong>
                 <p>
-                  En CCAA con bonificación del 99%–100% (Madrid, Canarias, Galicia), la cuota
+                  En CCAA con bonificación del 99&nbsp;%–100&nbsp;% (Madrid, Canarias, Galicia), la cuota
                   resultante es prácticamente cero pero la obligación de presentar el modelo 650
-                  subsiste. No presentar conlleva sanción por infracción formal de entre 200 € y
-                  400 € y puede complicar la inscripción de los bienes.
+                  subsiste. No presentar en plazo puede acarrear una sanción por infracción
+                  formal (art. 198 de la Ley General Tributaria) y complicar la inscripción de
+                  los bienes.
                 </p>
               </div>
             </div>
@@ -1694,9 +1855,9 @@ export default function EstimadorImpuestoSucesionesPage() {
             <ul className={styles.warningList}>
               <li>
                 <strong>No declarar en plazo.</strong> El recargo por extemporaneidad espontánea
-                es del {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase, 0)}% más
-                un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes, 0)}% por mes completo de retraso,
-                y un {formatNumber(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses, 0)}% fijo más intereses
+                es del {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase, 0)} más
+                un {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes, 0)} por mes completo de retraso,
+                y un {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses, 0)} fijo más intereses
                 pasados los {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses. Una cuota de
                 10.000 € presentada con 8 meses de retraso genera{' '}
                 {formatCurrency(10000 * porcentajeRecargoExtemporaneo(8) / 100)} de recargo.
@@ -1715,8 +1876,9 @@ export default function EstimadorImpuestoSucesionesPage() {
               </li>
               <li>
                 <strong>Ignorar el ajuar doméstico.</strong> Hacienda presume automáticamente el
-                3% del valor neto como ajuar. Si lo omites en tu declaración, la oficina gestora
-                puede practicar una liquidación paralela incluyendo ese 3% más intereses de demora.
+                {pct(PORC_AJUAR_DOMESTICO_IS * 100)} del caudal relicto como ajuar. Si lo omites en tu
+                declaración, la oficina gestora puede practicar una liquidación paralela incluyendo
+                ese {pct(PORC_AJUAR_DOMESTICO_IS * 100)} más intereses de demora.
               </li>
               <li>
                 <strong>Aceptar la herencia sin inventario cuando hay deudas.</strong> Si el causante

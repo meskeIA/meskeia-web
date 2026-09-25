@@ -183,7 +183,7 @@ test.describe('Estimador ISD — que la corrección no se lleve por delante el r
 
     // Si 'II-descendiente' no se colapsara sobre 'II' al buscar la bonificación, aquí
     // aparecería la cuota íntegra entera en vez del 1 % que deja el 99 % de Madrid.
-    await expect(page.getByText(/Bonificación autonómica: 99,0%/)).toBeVisible();
+    await expect(page.getByText(/Bonificación autonómica: 99,0\s%/)).toBeVisible();
   });
 
   test('Cataluña ya no se presenta como territorio foral', async ({ page }) => {
@@ -494,7 +494,7 @@ test.describe('Reparación 11/09/2026 — formulario, contenido y señal estruct
     // 1 % + 1 % × 8 meses = 9 % de 10.000 € = 900,00 €
     expect(texto).toContain('900,00 €');
     expect(texto).not.toContain('1.500 €');
-    expect(texto).not.toMatch(/5% si tardas hasta 3 meses/);
+    expect(texto).not.toMatch(/5\s?% si tardas hasta 3 meses/);
   });
 
   /**
@@ -646,7 +646,7 @@ test.describe('Re-inspección 12/09/2026 — tarifa del art. 21, coeficiente del
     expect(panel).toContain('1.030.000,00 €');  // base imponible = base liquidable: sin reducciones
     expect(panel).toContain('278.322,67 €');    // cuota íntegra del último tramo del art. 21.2
     expect(panel).toContain('×2,4000');         // COEFICIENTES_IS['IV'][3]
-    expect(panel).toContain('Tipo efectivo: 64,85%');
+    expect(panel).toContain('Tipo efectivo: 64,85 %');
 
     // El Grupo IV no tiene bonificación en Valencia: la cuota tributaria ES la final,
     // sin línea de bonificación por medio (se comprueba en el panel, no en el body)
@@ -703,10 +703,11 @@ test.describe('Estimador ISD — reparación 13/09/2026', () => {
    *
    * Asturias · hijo ≥21 · 1.000.000 € en cuentas · 10.000 € de seguros · 50 % de la herencia.
    * Este heredero percibe 5.000 € del seguro, así que su reducción son 5.000 €, no 9.195,49 €:
-   *   base con ajuar 1.030.000 × 50 % = 515.000 … más el ajuar del seguro → 520.150,00
-   *   − 15.956,87 (parentesco II) − 5.000 (seguro) − 300.000 (Asturias) = 199.193,13
+   *   (1.000.000 + 10.000 de seguro + 30.000 de ajuar de las CUENTAS) × 50 % = 520.000,00
+   *   — hasta el 25/09/2026 el seguro también generaba ajuar y daba 520.150,00 (hallazgo 1824)
+   *   − 15.956,87 (parentesco II) − 5.000 (seguro) − 300.000 (Asturias) = 199.043,13
    *   tarifa estatal, tramo «hasta 239.389,13»:
-   *     23.063,25 + 21,25 % × (199.193,13 − 159.634,83) = 31.469,39
+   *     23.063,25 + 21,25 % × (199.043,13 − 159.634,83) = 31.437,51
    *
    * Solo se ve en las comunidades SIN bonificación del 99 % en cuota: en las demás, el 99 %
    * aplana la diferencia y el defecto quedaba invisible.
@@ -746,7 +747,7 @@ test.describe('Estimador ISD — reparación 13/09/2026', () => {
 
     const texto = await textoPagina(page);
     expect(texto).not.toContain('No definido');
-    expect(texto).toContain('Tipo efectivo: 0,00%');
+    expect(texto).toContain('Tipo efectivo: 0,00 %');
   });
 
   /**
@@ -761,9 +762,9 @@ test.describe('Estimador ISD — reparación 13/09/2026', () => {
     await page.locator('#porcentaje-herencia').fill('150');
 
     const texto = await textoCompleto(page);
-    expect(texto).toContain('100,00%');
+    expect(texto).toContain('100,00 %');
     expect(texto).toContain('capado al 100');
-    expect(texto).not.toMatch(/Porcentaje de herencia\s*150%/);
+    expect(texto).not.toMatch(/Porcentaje de herencia\s*150(,00)?\s?%/);
   });
 
   /**
@@ -812,7 +813,7 @@ test.describe('Estimador ISD — reparación 13/09/2026', () => {
     expect(fuente).toContain('PLAZO_ISD.mesesPresentacion');
     expect(fuente).toContain('PLAZO_ISD.norma');
     // [799] el interés de demora, de la escala de recargos y no a mano
-    expect(fuente).not.toContain('4,0625%');
+    expect(fuente).not.toMatch(/4,0625\s?%/);
     // [800] las cifras del ISD que el fichero YA importaba y escribía a mano
     for (const literal of ['122.606,47 €', '47.858,59 €', '150.253,03 €', '15.956,87 €', '7.993,46 €']) {
       expect(fuente, `sigue tecleado: ${literal}`).not.toContain(`>${literal}<`);
@@ -882,7 +883,7 @@ test.describe('Re-inspección 14/09/2026 — Canarias, el acantilado de Aragón 
     expect(panel).toContain('53.692,81 €');      // cuota íntegra, tramo del 25,50 %
     expect(panel).toContain('53.639,12 €');      // bonificación del 99,9 %
     expect(panel).toContain('Bonificación 99,9 % (Canarias)');
-    expect(panel).toContain('Tipo efectivo: 0,02%');
+    expect(panel).toContain('Tipo efectivo: 0,02 %');
   });
 
   /**
@@ -921,7 +922,7 @@ test.describe('Re-inspección 14/09/2026 — Canarias, el acantilado de Aragón 
     const sobreElLimite = await panelResultados(page);
     expect(sobreElLimite).toContain('3.074.043,13 €');  // base liquidable, ya sobre el tope
     expect(sobreElLimite).toContain('973.297,34 €');    // cuota íntegra = cuota final
-    expect(sobreElLimite).toContain('Tipo efectivo: 31,50%');
+    expect(sobreElLimite).toContain('Tipo efectivo: 31,50 %');
     expect(sobreElLimite, 'sin bonificación al pasar el límite').not.toContain('Bonificación');
   });
 
@@ -1046,7 +1047,7 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
     expect(panel).toContain('75.959,92 €');    // bonificación del 95 %
     // El rótulo tiene que decir 95, no 99: es la diferencia entre 3997,89 € y 799,58 €
     expect(panel).toContain('Bonificación 95,0 % (Islas Baleares)');
-    expect(panel).toContain('Tipo efectivo: 0,97%');
+    expect(panel).toContain('Tipo efectivo: 0,97 %');
   });
 
   /**
@@ -1262,7 +1263,7 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
     const texto = await textoCompleto(page);
     // Un solo tipo efectivo para la misma operación, con el denominador del motor
     expect(texto).toContain('4,01');
-    expect(texto).not.toContain('4,1% del valor heredado');
+    expect(texto).not.toMatch(/4,1\s?% del valor heredado/);
   });
 });
 
@@ -1418,7 +1419,7 @@ test.describe('re-inspección 22/09/2026', () => {
     expect(panel).toContain('36.504,28 €');    // bonificación del 90 %
     // El rótulo tiene que decir 90: con el tramo de al lado serían 0,00 € u 8112,06 €
     expect(panel).toContain('Bonificación 90 % (Castilla-La Mancha)');
-    expect(panel).toContain('Tipo efectivo: 1,58%');
+    expect(panel).toContain('Tipo efectivo: 1,58 %');
   });
 
   /**
@@ -1554,7 +1555,7 @@ test.describe('re-inspección 22/09/2026', () => {
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '80000');
     expect(await cuota(page)).toBe('3306,55 €');
-    expect(await panelResultados(page)).toContain('Tipo efectivo: 4,01%');
+    expect(await panelResultados(page)).toContain('Tipo efectivo: 4,01 %');
     // El desglose cuadra con lo que se lee: 2081,95 × 1,5882 = 3306,5535… → 3306,55
     expect(await panelResultados(page)).toContain('2081,95 €');
 
@@ -1662,10 +1663,10 @@ test.describe('1196 — valoración del usufructo vitalicio (art. 26.a LISD)', (
     await sembrarValor(page, page.locator('#edad-usufructuario'), '15');
 
     const panel = await panelResultados(page);
-    expect(panel, 'el tipo de adquisición aplicado es el 70 % del art. 26.a').toContain('70,0%');
+    expect(panel, 'el tipo de adquisición aplicado es el 70 % del art. 26.a').toContain('70,0 %');
     expect(panel, 'la base ajustada es 103.000 × 70 %').toContain('72.100,00 €');
     // El 74 % que salía de la fórmula sin techo, y su base.
-    expect(panel).not.toContain('74,0%');
+    expect(panel).not.toMatch(/74,0\s?%/);
     expect(panel).not.toContain('76.220,00 €');
   });
 
@@ -1680,14 +1681,14 @@ test.describe('1196 — valoración del usufructo vitalicio (art. 26.a LISD)', (
     await page.getByLabel('Usufructo', { exact: true }).check();
 
     await sembrarValor(page, page.locator('#edad-usufructuario'), '20');
-    expect(await panelResultados(page)).toContain('69,0%');
+    expect(await panelResultados(page)).toContain('69,0 %');
 
     await sembrarValor(page, page.locator('#edad-usufructuario'), '79');
-    expect(await panelResultados(page)).toContain('10,0%');
+    expect(await panelResultados(page)).toContain('10,0 %');
 
     // El suelo del 10 % no se perfora pasados los 79.
     await sembrarValor(page, page.locator('#edad-usufructuario'), '89');
-    expect(await panelResultados(page)).toContain('10,0%');
+    expect(await panelResultados(page)).toContain('10,0 %');
   });
 
   /** El helper del campo cita la norma, como el resto de los datos normativos de la página. */
@@ -1697,8 +1698,8 @@ test.describe('1196 — valoración del usufructo vitalicio (art. 26.a LISD)', (
 
     const helper = await page.locator('#edad-usufructuario').locator('xpath=following-sibling::span[1]').innerText();
     expect(helper).toContain('art. 26.a) de la Ley 29/1987 del ISD');
-    expect(helper).toContain('70% hasta los 20 años');
-    expect(helper).toContain('mínimo del 10%');
+    expect(helper.replace(/\u00a0/g, ' ')).toContain('70 % hasta los 20 años');
+    expect(helper.replace(/\u00a0/g, ' ')).toContain('mínimo del 10 %');
   });
 });
 
@@ -1712,8 +1713,10 @@ test.describe('1196 — valoración del usufructo vitalicio (art. 26.a LISD)', (
 // bonificación. Cada cifra esperada sale de `data/fiscal/sucesiones.ts`, con la constante y el
 // tramo citados en el desarrollo, y se resolvió a mano ANTES de abrir la app.
 //
-// Lo que esta re-inspección encontró roto va con `test.fail()` y afirma lo CORRECTO: cuando se
-// repare, Playwright avisará «expected to fail, but passed» y habrá que venir a quitar la marca.
+// Lo que esta re-inspección encontró roto iba con `test.fail()` y afirmaba lo CORRECTO. Los 13
+// hallazgos (1821-1833) se repararon el mismo 25/09/2026 y las marcas se retiraron: cada testigo
+// sigue vigilando su caso. Donde el testigo exigía una grafía (el «3.990,72» del 1826), se
+// ajustó a la del catálogo y se dice en su línea.
 test.describe('Inspector 25/09/2026', () => {
   /** SOLO la columna de resultados, con los espacios duros normalizados a espacio. */
   const panel = async (page: Page): Promise<string> =>
@@ -1840,7 +1843,7 @@ test.describe('Inspector 25/09/2026', () => {
    * HALLAZGO medio (Inspector 25/09/2026): hoy lo capa a 0 en silencio, enseña «Porcentaje de
    * herencia 0,00 %», base ajustada 0,00 € y publica «Impuesto estimado en Galicia 0,00 €».
    */
-  test.fail('caso a rechazar: un porcentaje de herencia negativo no da cuota cero, da un aviso', async ({ page }) => {
+  test('caso a rechazar: un porcentaje de herencia negativo no da cuota cero, da un aviso', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('galicia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
@@ -1862,7 +1865,7 @@ test.describe('Inspector 25/09/2026', () => {
    * Lo esperado se deriva del sello (hoy '2025-01-01' → '01/01/2025') para que re-sellar el
    * módulo no rompa el testigo.
    */
-  test.fail('la fecha de verificación del hero va en DD/MM/AAAA, como la del DataReference', async ({ page }) => {
+  test('la fecha de verificación del hero va en DD/MM/AAAA, como la del DataReference', async ({ page }) => {
     const [anio, mes, dia] = FISCAL_SUCESIONES_META.verificado.split('-');
     const esperada = `${dia}/${mes}/${anio}`;
 
@@ -1883,7 +1886,7 @@ test.describe('Inspector 25/09/2026', () => {
    * y 18.437,27 − 9218,64 = 9218,63. `calcularSucesion` —el que escribe las tarjetas de esta
    * misma página y la tool del MCP— resta la bonificación publicada y da 9218,63 €.
    */
-  test.fail('la cuota final es la cuota tributaria menos la bonificación que se publica, al céntimo', async ({ page }) => {
+  test('la cuota final es la cuota tributaria menos la bonificación que se publica, al céntimo', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('murcia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
@@ -1922,7 +1925,7 @@ test.describe('Inspector 25/09/2026', () => {
    *
    * La app se queda 5136,89 € por debajo, un 33 %. Tolerancia de medio euro.
    */
-  test.fail('en nuda propiedad la reducción por vivienda va sobre el valor de la nuda propiedad', async ({ page }) => {
+  test('en nuda propiedad la reducción por vivienda va sobre el valor de la nuda propiedad', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('castilla-leon');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#edad-heredero'), '70');
@@ -1947,7 +1950,7 @@ test.describe('Inspector 25/09/2026', () => {
    * El importe sí es correcto: 6 × 3990,72 = 23.944,32 € (REDUCCION_EDAD_MENOR_21_IS; con los
    * 15.956,87 del parentesco suman 39.901,19, por debajo del tope de 47.858,59).
    */
-  test.fail('el concepto de la reducción por edad no presenta los años que faltan como la edad', async ({ page }) => {
+  test('el concepto de la reducción por edad no presenta los años que faltan como la edad', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('extremadura');
     await page.locator('#parentesco').selectOption('I-descendiente');
     await sembrarValor(page, page.locator('#edad-heredero'), '15');
@@ -1995,7 +1998,7 @@ test.describe('Inspector 25/09/2026', () => {
    * valorativa del §1.quinquies.6 del CLAUDE.md del proyecto, y contradice al faqJsonLd de la
    * app («conviene calcular el caso concreto en vez de guiarse por la fama de cada comunidad»).
    */
-  test.fail('la ficha de Asturias y la de Canarias no las califican de más cara o más favorable', async ({ page }) => {
+  test('la ficha de Asturias y la de Canarias no las califican de más cara o más favorable', async ({ page }) => {
     const info = page.locator('[class*="infoCcaa"]');
     await page.locator('#ccaa-causante').selectOption('asturias');
     await expect(info).toContainText('Principado de Asturias');
@@ -2015,7 +2018,7 @@ test.describe('Inspector 25/09/2026', () => {
    * frase teclea esas otras tres cifras, y la tabla comparativa teclea «1,0000», «2,0000» y
    * «0 €» mientras su fila del Grupo III sí lee `COEFICIENTES_IS` y `REDUCCIONES_PARENTESCO_IS`.
    */
-  test.fail('el consejo del Grupo III cuenta las comunidades con data/fiscal, y la tabla no teclea', async ({ page }) => {
+  test('el consejo del Grupo III cuenta las comunidades con data/fiscal, y la tabla no teclea', async ({ page }) => {
     const sinNada = Object.values(BONIFICACIONES_CCAA_IS).filter((c) => {
       const iii = c.bonificaciones['III'];
       return c.regimen === 'comun' && !(iii?.porcentaje ?? 0) && !(iii?.reduccionBase ?? 0);
@@ -2040,7 +2043,7 @@ test.describe('Inspector 25/09/2026', () => {
    * propio panel en el caso límite de arriba. La tarjeta rebaja a un tercio la estatal justo
    * donde la compara con las forales.
    */
-  test.fail('la tarjeta del hijo con discapacidad no atribuye 47.858,59 € al grado del 65 %', async ({ page }) => {
+  test('la tarjeta del hijo con discapacidad no atribuye 47.858,59 € al grado del 65 %', async ({ page }) => {
     const texto = await textoCompleto(page);
     const desde = texto.indexOf('Hijo menor con discapacidad');
     const hasta = texto.indexOf('Preguntas frecuentes sobre el Impuesto');
@@ -2057,7 +2060,7 @@ test.describe('Inspector 25/09/2026', () => {
    *  · Con País Vasco o Navarra la misma nota se imprime DOS veces seguidas: en la alerta foral
    *    y en la caja informativa, las dos con `ccaaInfo.notas`.
    */
-  test.fail('el selector de comunidad no pide «tu» CCAA y la nota foral sale una vez', async ({ page }) => {
+  test('el selector de comunidad no pide «tu» CCAA y la nota foral sale una vez', async ({ page }) => {
     const vacia = await page.locator('#ccaa-causante option').first().innerText();
     expect(vacia).not.toMatch(/tu CCAA/i);
 
@@ -2075,14 +2078,15 @@ test.describe('Inspector 25/09/2026', () => {
    * el defecto que se reparó en el cálculo el 08/09/2026, vivo en el canal que leen las IAs. Las
    * cifras van tecleadas en metadata.ts, que ya importa `PLAZO_ISD` de data/fiscal.
    */
-  test.fail('el faqJsonLd da el tope de 47.858,59 € de la reducción del Grupo I', async ({ page }) => {
+  test('el faqJsonLd da el tope de 47.858,59 € de la reducción del Grupo I', async ({ page }) => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
     const pregunta = (faq.mainEntity as Array<{ name: string; acceptedAnswer: { text: string } }>).find((q) =>
       /reducciones existen por parentesco/.test(q.name),
     );
     expect(pregunta, 'la pregunta de las reducciones por parentesco').toBeTruthy();
-    expect(pregunta!.acceptedAnswer.text).toContain('3.990,72');
+    // Sale de formatCurrency: con cuatro cifras enteras no se agrupa el millar («3990,72 €»).
+    expect(pregunta!.acceptedAnswer.text).toMatch(/3\.?990,72/);
     expect(pregunta!.acceptedAnswer.text).toContain('47.858,59');
   });
 
@@ -2095,7 +2099,7 @@ test.describe('Inspector 25/09/2026', () => {
    * heredero», el helper del usufructo («70% … 10% → 19%»), y las notas de cada comunidad. En la
    * guía, unas cuarenta más. En metadata, la característica «vivienda habitual (95%)».
    */
-  test.fail('ningún porcentaje del formulario ni del panel va pegado a su cifra', async ({ page }) => {
+  test('ningún porcentaje del formulario ni del panel va pegado a su cifra', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('murcia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
@@ -2111,7 +2115,7 @@ test.describe('Inspector 25/09/2026', () => {
    * 3:1 del texto grande). En claro, sobre blanco, 5,39:1. El candado check:token-oscuro no lo
    * ve porque `--bonif` no es un token de globals.css.
    */
-  test.fail('en oscuro las líneas de reducción y bonificación llegan a 4,5:1', async ({ page }) => {
+  test('en oscuro las líneas de reducción y bonificación llegan a 4,5:1', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('murcia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
@@ -2153,7 +2157,7 @@ test.describe('Inspector 25/09/2026', () => {
    *   × 2,0000, sin bonificación para el Grupo IV en Galicia → 24.830,72 €   — la app: 25.799,72 €
    * La app cobra 969,00 € de más (12.899,86 × 2 = 25.799,72).
    */
-  test.fail('el ajuar doméstico no se calcula sobre el seguro de vida', async ({ page }) => {
+  test('el ajuar doméstico no se calcula sobre el seguro de vida', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('galicia');
     await page.locator('#parentesco').selectOption('IV');
     await sembrarValor(page, page.locator('#seguros-vida'), '100000');

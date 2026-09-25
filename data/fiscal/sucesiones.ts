@@ -353,7 +353,38 @@ export const FISCAL_SUCESIONES_CATALUNA_META = {
   nota: 'Verificados el desglose del Grupo II, la reducción por vivienda habitual y la bonificación en cuota del art. 58 bis (99 % al cónyuge y dos escalas ponderadas distintas para los Grupos I y II). NO se modelan las reducciones de empresa familiar, participaciones, fincas rústicas ni patrimonio cultural o natural: si la herencia incluye alguna de ellas, la cuota real puede ser bastante menor, y además esas reducciones dividen por dos los porcentajes de bonificación.',
 };
 
+// ─── Reducción por empresa familiar (NO la modela ningún cálculo) ────────────
+//
+// Solo para la PROSA de las apps: las estimaciones no la aplican y lo dicen. Existe porque
+// `estimador-impuesto-sucesiones` tecleaba «la familia mantenga los bienes 10 años» en la
+// tarjeta de una viuda CATALANA, cuando la Ley 19/2010 pide cinco (Inspector, 25/09/2026).
+// Verificado el 25/09/2026 contra el BOE: art. 20.2.c) LISD («otra del 95 por 100 […] durante
+// los diez años siguientes al fallecimiento del causante») y arts. 6 y 9 de la Ley 19/2010
+// (95 % y «durante los cinco años siguientes a la muerte del causante»).
+
+export const REDUCCION_EMPRESA_FAMILIAR_IS = {
+  porcentaje: 95,
+  aniosMantenimiento: 10,
+  norma: 'art. 20.2.c) de la Ley 29/1987 del ISD',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1987-28141',
+  verificado: '2026-09-25',
+};
+
+export const REDUCCION_EMPRESA_FAMILIAR_CATALUNA_IS = {
+  porcentaje: 95,
+  aniosMantenimiento: 5,
+  norma: 'arts. 6 y 9 de la Ley 19/2010',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2010-10829',
+  verificado: '2026-09-25',
+};
+
 // ─── Bonificaciones autonómicas (17 CCAA) ────────────────────────────────────
+//
+// ⚠️ `notas` DESCRIBE, no califica. Las de Asturias y Canarias decían «Tributación más alta
+// del régimen común» y «La más favorable del régimen común», y la propia herramienta las
+// desmentía: con 300.000 € de un hijo, 0,00 € en Asturias y 53,69 € en Canarias (hallazgo
+// 1825, §1.quinquies.6 del CLAUDE.md). Cuál sale más barata depende del caso. El `%` va
+// separado con espacio duro (` `), como el resto del catálogo desde el 25/09/2026.
 
 export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
 
@@ -368,7 +399,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0.50 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% para Grupos I y II. Grupo III: 50%. ⚠️ La Ley 3/2026, de 30 de junio, de Apoyo a la Empresa Familiar (BOE-A-2026-16019) añadió una reducción del 99% EN BASE por transmisión de empresa individual, negocio profesional o participaciones, extendida a los Grupos I, II y III y a colaterales de cuarto grado, con requisitos de permanencia (5 años) y participación (5% individual o 20% del grupo familiar). Esta estimación NO la aplica: solo modela la bonificación en cuota por parentesco. Si la herencia incluye una empresa familiar, el resultado real puede ser bastante menor.',
+    notas: 'Bonificación 99 % para Grupos I y II. Grupo III: 50 %. ⚠️ La Ley 3/2026, de 30 de junio, de Apoyo a la Empresa Familiar (BOE-A-2026-16019) añadió una reducción del 99 % EN BASE por transmisión de empresa individual, negocio profesional o participaciones, extendida a los Grupos I, II y III y a colaterales de cuarto grado, con requisitos de permanencia (5 años) y participación (5 % individual o 20 % del grupo familiar). Esta estimación NO la aplica: solo modela la bonificación en cuota por parentesco. Si la herencia incluye una empresa familiar, el resultado real puede ser bastante menor.',
   },
 
   'andalucia': {
@@ -382,7 +413,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Exención total si base liquidable < 1.000.000€. Si supera, bonificación 99%.',
+    notas: 'Exención total si base liquidable < 1.000.000 €. Si supera, bonificación 99 %.',
   },
 
   'galicia': {
@@ -396,7 +427,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Exención total si base liquidable < 1.000.000€. Si supera, bonificación 99%.',
+    notas: 'Exención total si base liquidable < 1.000.000 €. Si supera, bonificación 99 %.',
   },
 
   'murcia': {
@@ -410,7 +441,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0.50 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% Grupos I y II, 50% Grupo III.',
+    notas: 'Bonificación 99 % Grupos I y II, 50 % Grupo III.',
   },
 
   'valencia': {
@@ -424,7 +455,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% para Grupos I y II.',
+    notas: 'Bonificación 99 % para Grupos I y II.',
   },
 
   'extremadura': {
@@ -438,7 +469,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% para Grupos I y II.',
+    notas: 'Bonificación 99 % para Grupos I y II.',
   },
 
   'canarias': {
@@ -452,7 +483,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0.999 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99,9% para Grupos I, II y III. La más favorable del régimen común.',
+    notas: 'Bonificación 99,9 % para Grupos I, II y III.',
   },
 
   'castilla-leon': {
@@ -466,7 +497,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% para Grupos I y II.',
+    notas: 'Bonificación 99 % para Grupos I y II.',
   },
 
   'rioja': {
@@ -480,7 +511,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% hasta 500.000€, 98% si supera ese importe.',
+    notas: 'Bonificación 99 % hasta 500.000 €, 98 % si supera ese importe.',
   },
 
   'castilla-mancha': {
@@ -494,7 +525,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación escalonada: 100% hasta 175.000€, decrece hasta 80% si supera 300.000€.',
+    notas: 'Bonificación escalonada: 100 % hasta 175.000 €, decrece hasta 80 % si supera 300.000 €.',
   },
 
   'cantabria': {
@@ -508,7 +539,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Exención total hasta 100.000€, bonificación 99% si supera.',
+    notas: 'Exención total hasta 100.000 €, bonificación 99 % si supera.',
   },
 
   'aragon': {
@@ -522,7 +553,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Exención total hasta 3.000.000€ para Grupos I y II.',
+    notas: 'Exención total hasta 3.000.000 € para Grupos I y II.',
   },
 
   'baleares': {
@@ -536,7 +567,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99% Grupo I, 95% Grupo II.',
+    notas: 'Bonificación 99 % Grupo I, 95 % Grupo II.',
   },
 
   'asturias': {
@@ -550,7 +581,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0, reduccionBase: 50000 },
       'IV':             { porcentaje: 0, reduccionBase: 0 },
     },
-    notas: 'Sin bonificación autonómica. Reducción adicional de 300.000€ en base para Grupos I y II. Tributación más alta del régimen común.',
+    notas: 'Sin bonificación autonómica en cuota. Reducción adicional en base de 300.000 € para los Grupos I y II y de 50.000 € para el Grupo III.',
   },
 
   'cataluna': {
@@ -571,7 +602,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Tarifa propia (7%–32%) y reducciones propias de la Ley 19/2010: 100.000 € al cónyuge y al hijo, 50.000 € al resto de descendientes, 30.000 € a los ascendientes, y vivienda habitual al 95% con tope de 500.000 € sobre el valor conjunto. La bonificación del art. 58 bis es del 99% para el cónyuge y por escala ponderada para el resto de los Grupos I y II.',
+    notas: 'Tarifa propia (7 %–32 %) y reducciones propias de la Ley 19/2010: 100.000 € al cónyuge y al hijo, 50.000 € al resto de descendientes, 30.000 € a los ascendientes, y vivienda habitual al 95 % con tope de 500.000 € sobre el valor conjunto. La bonificación del art. 58 bis es del 99 % para el cónyuge y por escala ponderada para el resto de los Grupos I y II.',
   },
 
   'pais-vasco': {

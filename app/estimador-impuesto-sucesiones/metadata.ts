@@ -1,6 +1,33 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { PLAZO_ISD } from '@/data/fiscal';
+import { formatCurrency, formatPercentage } from '@/lib';
+import {
+  PLAZO_ISD,
+  TARIFA_ESTATAL_IS,
+  BONIFICACIONES_CCAA_IS,
+  REDUCCIONES_PARENTESCO_IS,
+  REDUCCION_EDAD_MENOR_21_IS,
+  REDUCCION_EDAD_MENOR_21_MAX_IS,
+  REDUCCION_VIVIENDA_PORC_IS,
+} from '@/data/fiscal';
+
+/**
+ * Las cifras normativas del JSON-LD, derivadas de `data/fiscal` como las de la página.
+ *
+ * ⚠️ 25/09/2026 (hallazgo 1826) — la respuesta de las reducciones por parentesco daba la del
+ * Grupo I SIN su tope: «15.956,87 € más 3.990,72 € por cada año por debajo de 21», sin «sin
+ * que la reducción pueda exceder de 47.858,59 euros» (art. 20.2.a LISD). Leída así, un recién
+ * nacido reduciría 99.761,99 €, el doble del máximo: el error que se reparó en el cálculo el
+ * 08/09/2026, vivo en el canal que leen las IAs. Las cifras iban tecleadas; ahora salen de
+ * las mismas constantes que liquida la herramienta.
+ */
+const eur = (n: number) => formatCurrency(n);
+const tipoMin = formatPercentage(TARIFA_ESTATAL_IS[0].tipo / 100, 2);
+const tipoMax = formatPercentage(TARIFA_ESTATAL_IS[TARIFA_ESTATAL_IS.length - 1].tipo / 100, 0);
+const umbralTipoMax = eur(TARIFA_ESTATAL_IS[TARIFA_ESTATAL_IS.length - 2].hasta);
+const bonifMadrid = formatPercentage(BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0, 0);
+const reduccionAsturias = eur(BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['II']?.reduccionBase ?? 0);
+const porcVivienda = formatPercentage(REDUCCION_VIVIENDA_PORC_IS, 0);
 
 export const metadata: Metadata = {
   title: 'Estimador del Impuesto de Sucesiones 2025 | meskeIA',
@@ -40,7 +67,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Estimación del ISD en las 17 comunidades autónomas, con sus bonificaciones propias',
     'Tarifa estatal del art. 21.2 LISD y tarifa propia de Cataluña',
-    'Reducciones por parentesco, edad, discapacidad, seguro de vida y vivienda habitual (95%)',
+    `Reducciones por parentesco, edad, discapacidad, seguro de vida y vivienda habitual (${porcVivienda})`,
     'Coeficiente multiplicador por grupo de parentesco y patrimonio preexistente',
     'Usufructo y nuda propiedad por la regla del 89 menos la edad',
     'Reparto por porcentaje de herencia cuando hay varios herederos',
@@ -65,7 +92,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga por el Impuesto de Sucesiones en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La cuota depende de cuatro factores: el valor neto heredado, el grado de parentesco, el patrimonio previo del heredero y la comunidad autónoma. La tarifa estatal oscila entre el 7,65 % para los primeros tramos y el 34 % para importes superiores a 797.555 €. Sobre esa cuota, cada comunidad aplica su propio beneficio, y no todas por la misma vía: Madrid o Andalucía bonifican el 99 % de la CUOTA para cónyuge e hijos, mientras Asturias actúa antes, con una reducción de 300.000 € en la BASE de esos mismos grupos. Los dos caminos pueden acabar en cero, así que cuál resulta más barata depende del importe heredado y del parentesco: conviene calcular el caso concreto en vez de guiarse por la fama de cada comunidad.',
+        text: `La cuota depende de cuatro factores: el valor neto heredado, el grado de parentesco, el patrimonio previo del heredero y la comunidad autónoma. La tarifa estatal oscila entre el ${tipoMin} para los primeros tramos y el ${tipoMax} para bases liquidables superiores a ${umbralTipoMax}. Sobre esa cuota, cada comunidad aplica su propio beneficio, y no todas por la misma vía: Madrid o Andalucía bonifican el ${bonifMadrid} de la CUOTA para cónyuge e hijos, mientras Asturias actúa antes, con una reducción de ${reduccionAsturias} en la BASE de esos mismos grupos. Los dos caminos pueden acabar en cero, así que cuál resulta más barata depende del importe heredado y del parentesco: conviene calcular el caso concreto en vez de guiarse por la fama de cada comunidad.`,
       },
     },
     {
@@ -73,7 +100,7 @@ export const faqJsonLd = {
       name: '¿Qué reducciones existen por parentesco en el Impuesto de Sucesiones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La normativa estatal establece cuatro grupos de parentesco. El Grupo I (descendientes menores de 21 años) tiene una reducción base de 15.956,87 € más 3.990,72 € por cada año por debajo de 21. El Grupo II (cónyuge, hijos y padres mayores de 21) tiene 15.956,87 €. El Grupo III (hermanos, tíos, sobrinos) tiene 7.993,46 €. El Grupo IV (extraños) no tiene reducción estatal. Muchas CCAA mejoran estas reducciones de forma notable.',
+        text: `La normativa estatal (art. 20.2.a de la Ley 29/1987) establece cuatro grupos de parentesco. El Grupo I (descendientes y adoptados menores de 21 años) tiene una reducción de ${eur(REDUCCIONES_PARENTESCO_IS['I-descendiente'])} más ${eur(REDUCCION_EDAD_MENOR_21_IS)} por cada año por debajo de 21, sin que el total pueda exceder de ${eur(REDUCCION_EDAD_MENOR_21_MAX_IS)}. El Grupo II (descendientes de 21 años o más, cónyuge y ascendientes) tiene ${eur(REDUCCIONES_PARENTESCO_IS['II'])}. El Grupo III (hermanos, tíos, sobrinos y afines) tiene ${eur(REDUCCIONES_PARENTESCO_IS['III'])}. El Grupo IV (primos y extraños) no tiene reducción estatal. Muchas CCAA mejoran estas reducciones de forma notable.`,
       },
     },
     {

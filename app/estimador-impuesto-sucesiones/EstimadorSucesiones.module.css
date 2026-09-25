@@ -35,6 +35,11 @@
   --warning-bg: #3D3000;
   --warning-border: #A07800;
   --success-bg: #0D2E1A;
+  /* Sin estas dos, el verde del claro (#1A7A3E) daba 2,66:1 sobre la tarjeta #2A2A2A en las
+     líneas de reducciones y bonificación (hallazgo 1828). #6FCF97 da 7,5:1 sobre #2A2A2A.
+     `--bonif` no es token de globals.css, y por eso check:token-oscuro no lo veía. */
+  --success: #6FCF97;
+  --bonif: #6FCF97;
 }
 
 /* Hero */

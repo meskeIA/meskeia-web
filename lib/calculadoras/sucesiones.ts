@@ -37,6 +37,7 @@ import {
   type BonificacionGrupoIS,
   type TramoEscalaBonificacionIS,
 } from '@/data/fiscal';
+import { formatPercentage } from '@/lib/formatters';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -262,7 +263,7 @@ function aplicarBonificacionIS(
     return {
       bonificacion: cuotaTributaria * pct,
       porcentaje: pct * 100,
-      detalle: `Bonificación ${(pct * 100).toFixed(2).replace('.', ',')}% por escala del art. 58 bis (${config.nombre})`,
+      detalle: `Bonificación ${formatPercentage(pct, 2)} por escala del art. 58 bis (${config.nombre})`,
     };
   }
 
@@ -274,7 +275,7 @@ function aplicarBonificacionIS(
       if (tramo.desde !== undefined && baseLiquidable > tramo.desde) { pct = tramo.porcentaje; }
     }
     const bonif = cuotaTributaria * pct;
-    return { bonificacion: bonif, porcentaje: pct * 100, detalle: `Bonificación escalonada ${(pct * 100).toFixed(0)}% (${config.nombre})` };
+    return { bonificacion: bonif, porcentaje: pct * 100, detalle: `Bonificación escalonada ${formatPercentage(pct, 0)} (${config.nombre})` };
   }
 
   // Exención total por importe (Andalucía, Galicia: base < 1.000.000 €)
@@ -294,13 +295,14 @@ function aplicarBonificacionIS(
   if (bGrupo.tope !== undefined && bGrupo.porcentajeMayor !== undefined) {
     const pct = baseLiquidable <= bGrupo.tope ? (bGrupo.porcentaje ?? 0) : bGrupo.porcentajeMayor;
     const bonif = cuotaTributaria * pct;
-    return { bonificacion: bonif, porcentaje: pct * 100, detalle: `Bonificación ${(pct * 100).toFixed(0)}% (${config.nombre})` };
+    return { bonificacion: bonif, porcentaje: pct * 100, detalle: `Bonificación ${formatPercentage(pct, 0)} (${config.nombre})` };
   }
 
-  // Bonificación fija
+  // Bonificación fija. Con un decimal cuando lo tiene: con `toFixed(0)` el 99,9 % de Canarias
+  // se rotulaba «100%» y parecía una exención (visto al separar el `%`, 25/09/2026).
   if (bGrupo.porcentaje !== undefined && bGrupo.porcentaje > 0) {
     const bonif = cuotaTributaria * bGrupo.porcentaje;
-    return { bonificacion: bonif, porcentaje: bGrupo.porcentaje * 100, detalle: `Bonificación ${(bGrupo.porcentaje * 100).toFixed(0)}% (${config.nombre})` };
+    return { bonificacion: bonif, porcentaje: bGrupo.porcentaje * 100, detalle: `Bonificación ${formatPercentage(bGrupo.porcentaje, Math.round(bGrupo.porcentaje * 1000) % 10 === 0 ? 0 : 1)} (${config.nombre})` };
   }
 
   return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación autonómica para este grupo' };
@@ -480,10 +482,10 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   let tarifaAplicada: string;
   if (esCataluna) {
     tarifa = TARIFA_CATALUNA_IS;
-    tarifaAplicada = 'Tarifa propia Cataluña (7%–32%)';
+    tarifaAplicada = 'Tarifa propia Cataluña (7 %–32 %)';
   } else {
     tarifa = TARIFA_ESTATAL_IS;
-    tarifaAplicada = 'Tarifa estatal régimen común, art. 21.2 LISD (7,65 %–34 %)';
+    tarifaAplicada = 'Tarifa estatal régimen común, art. 21.2 LISD (7,65 %–34 %)';
   }
 
   const cuotaIntegra = r(calcularCuotaIntegraIS(baseLiquidable, tarifa));
