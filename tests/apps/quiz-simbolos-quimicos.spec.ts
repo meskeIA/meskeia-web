@@ -22,8 +22,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   volviera a decir «Tántalo» o moviera un número atómico, esto tiene que fallar.
  * · Los tamaños de partida salen de DIFICULTAD_CONFIG de page.tsx: Fácil 10 preguntas
  *   (solo categoría 'comun'), Medio 15 ('comun'+'conocido'), Difícil 20 (las tres).
- * · Las medallas salen de calcularMedalla(): 100 % «¡Perfecto!», ≥80 «¡Excelente!»,
- *   ≥60 «¡Muy bien!», ≥40 «Bien», <40 «Sigue practicando».
+ * · Las medallas salen de calcularMedalla(aciertos, total): todas «¡Perfecto!», ≥ 90 %
+ *   «¡Excelente!», ≥ 70 % «¡Muy bien!», ≥ 50 % «Vas por buen camino», < 50 % «Sigue practicando»
+ *   (hasta el 25/09/2026 eran 80/60/40 y el tercer escalón se rotulaba «Bien»: hallazgo 1815).
  *
  * ALEATORIEDAD
  * ────────────
@@ -81,6 +82,9 @@ const COMUNES: Record<string, string> = {
  * Nombres en español que el quiz ENSEÑA como respuesta correcta y que más fácilmente se
  * desvían de la forma normalizada. Escritos a mano desde el DLE / la lista de la IUPAC.
  * El 73 está aquí porque figuraba como «Tántalo», que es el personaje mitológico.
+ * «Zinc» y «Kriptón» NO son errores (sospecha revisada el 25/09/2026): el acuerdo de la RAC, la
+ * RAE, la RSEQ y la Fundéu de 2017 (An. Quím. 113, «Adiciones y correcciones») da preferencia a
+ * «zinc» y a «kriptón» y registra «cinc» y «criptón» como variantes.
  */
 const NOMBRES_DELICADOS: Record<number, string> = {
   11: 'Sodio', 19: 'Potasio', 26: 'Hierro', 29: 'Cobre', 30: 'Zinc', 36: 'Kriptón',
@@ -129,7 +133,7 @@ test.describe('Quiz Símbolos Químicos', () => {
    *   · 10 preguntas, todas de los 26 elementos comunes, sin repetir ninguno
    *   · cada símbolo con su Z canónico y su nombre entre las 4 opciones
    *   · tras la pregunta n: «✅ n · 🔥 Racha: n»
-   *   · final: «Has acertado 10 de 10 (100%)», medalla «¡Perfecto!», racha máxima 10,
+   *   · final: «Has acertado 10 de 10 (100 %)», medalla «¡Perfecto!», racha máxima 10,
    *     0 errores y NINGUNA sección «Elementos a repasar»
    */
   test('caso normal: 10 respuestas correctas seguidas dan 10 de 10, racha 10 y medalla ¡Perfecto!', async ({
@@ -178,10 +182,11 @@ test.describe('Quiz Símbolos Químicos', () => {
     const fin = page.locator('[class*="finPanel"]');
     await expect(fin).toContainText('¡Perfecto!'); // 100 % en calcularMedalla()
     await expect(fin.getByText(/Has acertado/)).toContainText('10');
-    await expect(fin.getByText(/Has acertado/)).toContainText('100%');
+    // El % va separado con espacio duro desde el 25/09/2026 (hallazgo 1816)
+    expect(norm(await fin.getByText(/Has acertado/).innerText())).toBe('Has acertado 10 de 10 (100 %)');
     // Aciertos 10 · Errores 0 · Racha máxima 10 · Precisión 100 %
     const stats = (await fin.locator('[class*="statsGrid"]').innerText()).replace(/\s+/g, ' ');
-    expect(stats).toBe('10 Aciertos 0 Errores 10 Racha máxima 100% Precisión');
+    expect(stats).toBe('10 Aciertos 0 Errores 10 Racha máxima 100 % Precisión');
     await expect(fin).not.toContainText('Elementos a repasar');
   });
 
@@ -193,7 +198,7 @@ test.describe('Quiz Símbolos Químicos', () => {
    *   · cada fallo enseña el nombre correcto y su símbolo, resalta la opción correcta,
    *     marca la elegida como mala y deshabilita las cuatro
    *   · en la pregunta 10 el botón dice «Ver resultados», no «Siguiente pregunta»
-   *   · final: «Has acertado 0 de 10 (0%)», medalla «Sigue practicando», racha máxima 0
+   *   · final: «Has acertado 0 de 10 (0 %)», medalla «Sigue practicando», racha máxima 0
    *     y «Elementos a repasar (10)» con los diez elementos preguntados
    */
   test('caso límite: fallarlo todo deja 0 de 10, racha máxima 0 y los 10 elementos a repasar', async ({
@@ -236,10 +241,10 @@ test.describe('Quiz Símbolos Químicos', () => {
     }
 
     const fin = page.locator('[class*="finPanel"]');
-    await expect(fin).toContainText('Sigue practicando'); // <40 % en calcularMedalla()
-    await expect(fin.getByText(/Has acertado/)).toContainText('0%');
+    await expect(fin).toContainText('Sigue practicando'); // < 50 % en calcularMedalla()
+    expect(norm(await fin.getByText(/Has acertado/).innerText())).toBe('Has acertado 0 de 10 (0 %)');
     const stats = (await fin.locator('[class*="statsGrid"]').innerText()).replace(/\s+/g, ' ');
-    expect(stats).toBe('0 Aciertos 10 Errores 0 Racha máxima 0% Precisión');
+    expect(stats).toBe('0 Aciertos 10 Errores 0 Racha máxima 0 % Precisión');
     await expect(page.getByText('Elementos a repasar (10)')).toBeVisible();
     for (const nombre of fallados) {
       await expect(page.locator('[class*="erroresGrid"]')).toContainText(nombre);
@@ -541,9 +546,11 @@ async function jugarFacil(
   modo: 'simbolo' | 'nombre',
   patron: boolean[],
   trasResponder?: (i: number, j: Jugada) => Promise<void>,
+  /** Índice de la pregunta por la que va la partida (0 = empezarla desde la primera). */
+  desde = 0,
 ): Promise<Jugada[]> {
   const jugadas: Jugada[] = [];
-  for (let i = 0; i < patron.length; i++) {
+  for (let i = desde; i < patron.length; i++) {
     await expect(page.getByText(`Pregunta ${i + 1} / ${patron.length}`)).toBeVisible();
     const visto = (await enunciado(page).textContent())!.trim();
     const simbolo = modo === 'simbolo' ? visto : SIMBOLO_DE[visto];
@@ -731,7 +738,7 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    * DEBERÍA: tras avanzar, el foco está dentro del quiz y el primer Tab cae en una opción nueva.
    */
   test('hallazgo (a) · tras «Siguiente» con teclado el foco no cae a <body> y el Tab vuelve a las opciones', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1812, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     // Texto del BOTÓN con foco; '' si el foco no está en un botón (el <body> contiene todo el texto)
     const activoTexto = (): Promise<string> =>
@@ -748,13 +755,21 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
     for (let t = 0; t < 10 && !(await enOpcion()); t++) await page.keyboard.press('Tab');
     await page.keyboard.press('Enter');
     await expect(feedback(page)).toBeVisible();
-    for (let t = 0; t < 10 && !/Siguiente pregunta/.test(await activoTexto()); t++) await page.keyboard.press('Tab');
+    // Al responder, la opción queda disabled: el foco tiene que ir SOLO a «Siguiente», sin Tab
+    await expect.poll(activoTexto).toMatch(/Siguiente pregunta/);
     await page.keyboard.press('Enter');
     await expect(page.getByText('Pregunta 2 / 10')).toBeVisible();
 
     expect(await page.evaluate(() => document.activeElement === document.body), 'el foco cayó a <body>').toBe(false);
     await page.keyboard.press('Tab');
     expect(await enOpcion(), `el primer Tab fue a «${norm(await activoTexto())}»`).toBe(true);
+
+    // Y al acabar, el foco va al resultado (dentro de finPanel), no al <body>
+    await jugarFacil(page, 'simbolo', Array(10).fill(true), undefined, 1);
+    await expect(page.locator('[class*="finPanel"]')).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => !!document.activeElement?.closest('[class*="finPanel"]')))
+      .toBe(true);
   });
 
   /**
@@ -769,13 +784,39 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    * Caso: Fácil, 4 aciertos + 6 fallos → 40 % → hoy «Bien». DEBERÍA: un 4 de 10 no es «Bien».
    */
   test('hallazgo (c) · 4 de 10 (40 %) no se presenta como «Bien»', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1815, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     await arrancarPartida(page, /Símbolo → Nombre/, /^Fácil/);
     await jugarFacil(page, 'simbolo', [true, true, true, true, false, false, false, false, false, false]);
     const fin = page.locator('[class*="finPanel"]');
     expect(norm(await fin.locator('[class*="finSubtitulo"]').innerText())).toMatch(/\(40 ?%\)/);
     expect(norm(await fin.locator('[class*="finTitulo"]').innerText())).not.toBe('Bien');
+    // Reparación: el primer escalón pide la mitad de aciertos; 4 de 10 no lleva medalla
+    expect(norm(await fin.locator('[class*="finTitulo"]').innerText())).toBe('Sigue practicando');
+    // Y la escala se dice en la pantalla, para que el rótulo se pueda juzgar
+    await expect(fin.locator('[class*="escalaNota"]')).toContainText('bronce desde la mitad de aciertos');
+  });
+
+  /**
+   * Los cortes nuevos de la medalla (hallazgo 1815), en su frontera exacta: 5 de 10 es el primer
+   * escalón (bronce, «Vas por buen camino»), 7 de 10 plata y 9 de 10 oro.
+   */
+  test('hallazgo 1815 · los cortes de la medalla: 5, 7 y 9 de 10', async ({ page }) => {
+    test.setTimeout(60_000);
+    const casos: [number, string][] = [
+      [5, 'Vas por buen camino'],
+      [7, '¡Muy bien!'],
+      [9, '¡Excelente!'],
+    ];
+    await abrir(page);
+    await arrancarPartida(page, /Símbolo → Nombre/, /^Fácil/);
+    for (const [n, rotulo] of casos) {
+      const patron = Array.from({ length: 10 }, (_, i) => i < n);
+      await jugarFacil(page, 'simbolo', patron);
+      const fin = page.locator('[class*="finPanel"]');
+      expect(norm(await fin.locator('[class*="finTitulo"]').innerText()), `${n} de 10`).toBe(rotulo);
+      await page.getByRole('button', { name: /Repetir quiz/ }).click();
+    }
   });
 
   /**
@@ -786,7 +827,7 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    * Además, «3.422 °C» (page.tsx:545) agrupa un número de cuatro cifras, que la RAE no agrupa.
    */
   test('hallazgo · el % va separado de la cifra con espacio duro', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1816, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     await arrancarPartida(page, /Símbolo → Nombre/, /^Fácil/);
     await jugarFacil(page, 'simbolo', [true, true, true, true, true, false, false, false, false, false]);
@@ -814,7 +855,7 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    *     3,50:1 en oscuro
    */
   test('hallazgo · todo el texto de la app llega a 4,5:1 en claro y en oscuro', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1814, reparado el 25/09/2026: sin test.fail().
     test.setTimeout(60_000);
     const medidas: Record<string, number> = {};
     for (const tema of ['claro', 'oscuro'] as const) {
@@ -848,7 +889,7 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    * «0 de 10 preguntas respondidas» y tras responder la 10.ª, «9 de 10»; nunca llega a 10.
    */
   test('hallazgo · tras responder la primera, la barra dice «1 de 10 preguntas respondidas»', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1820, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     await arrancarPartida(page, /Símbolo → Nombre/, /^Fácil/);
     await page.locator('[class*="opcionBtn"]').first().click();
@@ -868,12 +909,14 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    * mayúscula y la segunda, si la hay, en minúscula).
    */
   test('hallazgo · el error típico 3 no dice que CO lleva mayúscula y minúscula', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1817, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const avisos = norm((await page.locator('[class*="warningGrid"]').textContent()) ?? '');
     expect(avisos).toContain('monóxido de carbono');
     expect(avisos).not.toContain('CO (con mayúscula y minúscula)');
+    expect(avisos).toContain('CO (dos mayúsculas');
+    expect(avisos).toContain('Co (mayúscula y minúscula) es el símbolo del cobalto');
   });
 
   /**
@@ -883,13 +926,15 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    * Kondev et al., Chinese Physics C 45, 030001, 2021).
    */
   test('hallazgo · el FAQPage no atribuye vidas medias muy cortas a todos los elementos 95-118', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1818, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
     const textos: string[] = faq.mainEntity.map((q: { acceptedAnswer: { text: string } }) => q.acceptedAnswer.text);
     const cuantos = textos.find((t) => t.includes('118 elementos'))!;
     expect(cuantos).not.toContain('tienen vidas medias muy cortas');
+    // curio-247: T½ = 1,56·10⁷ años (NUBASE2020; NNDC/ENSDF)
+    expect(cuantos).toContain('curio-247, unos 15,6 millones de años');
   });
 
   /**
@@ -902,13 +947,16 @@ test.describe('Inspector 25/09/2026 · hallazgos', () => {
    *     versión española de la RSEQ), y los nombres de elemento van en minúscula.
    */
   test('hallazgo · la guía no cuenta «diez» símbolos latinos ni escribe «Einsteinio»', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1819, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const texto = norm((await page.locator('[class*="guideSection"]').allTextContents()).join(' '));
     expect(texto.length, 'la guía no se desplegó').toBeGreaterThan(1000);
     expect(texto).not.toContain('Diez elementos llevan la inicial de su nombre en latín');
     expect(texto).not.toContain('Einsteinio');
+    expect(texto).not.toContain('Son los que más se fallan');
+    expect(texto).toContain('científicos (curio, einstenio)');
+    expect(texto).toContain('S de sulfur y P de phosphorus');
   });
 });
 
@@ -929,7 +977,10 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
   const tocar = async (page: Page, loc: Locator): Promise<void> => {
     const b = await loc.boundingBox();
     if (!b) throw new Error('el elemento no tiene caja');
-    await page.touchscreen.tap(b.x + Math.min(20, b.width / 2), b.y + b.height / 2);
+    // En el centro, no a 20 px del borde izquierdo: bajo `next dev`, el indicador «N» de Next
+    // (abajo a la izquierda) tapa ese borde del botón cuando queda al pie de la pantalla, y el
+    // toque abría su menú en vez de empezar el quiz (visto el 25/09/2026).
+    await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
   };
   const bajarHasta = (page: Page, sel: string): Promise<void> =>
     page.evaluate((s) => {
@@ -964,7 +1015,7 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
    * DEBERÍA: tras «¡Empezar quiz!» el rótulo y el símbolo se ven enteros bajo la barra.
    */
   test('hallazgo · tras «¡Empezar quiz!» la primera pregunta se ve entera bajo la barra fija', async ({ page }) => {
-    test.fail();
+    // Hallazgo 1813, reparado el 25/09/2026: sin test.fail().
     await abrir(page);
     await bajarHasta(page, '[class*="btnIniciar"]');
     await tocar(page, page.getByRole('button', { name: '¡Empezar quiz!' }));

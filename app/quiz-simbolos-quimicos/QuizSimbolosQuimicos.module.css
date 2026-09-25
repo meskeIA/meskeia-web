@@ -221,6 +221,21 @@
 }
 
 /* ── QUIZ ── */
+/* Al empezar o al acabar, la vista se lleva al principio del quiz o del resultado: este margen
+   deja la barra del logo fijo por encima, sin taparlo (hallazgo 1813). */
+.quizPanel,
+.finPanel {
+  scroll-margin-top: 88px;
+}
+
+/* Reciben el foco por programa al avanzar (tabIndex=-1): no son controles, no se les pinta el
+   anillo de foco (hallazgo 1812). */
+.preguntaCard:focus,
+.finPanel:focus,
+.configTitulo:focus {
+  outline: none;
+}
+
 .quizPanel {
   display: flex;
   flex-direction: column;
@@ -434,7 +449,16 @@
 .finSubtitulo {
   font-size: 1.1rem;
   color: var(--text-secondary);
-  margin: 0 0 2rem;
+  margin: 0 0 0.75rem;
+}
+
+/* Qué pide cada medalla: sin ella, el rótulo no se puede juzgar (hallazgo 1815). */
+.escalaNota {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 auto 2rem;
+  max-width: 34rem;
+  line-height: 1.45;
 }
 
 .statsGrid {
@@ -496,9 +520,15 @@
   padding: 0.3rem 0.7rem;
 }
 
+/* Lo que el alumno tiene que estudiar. --color-fail (#ef4444) sobre el tinte rojo daba 3,44:1
+   en claro; el rojo 700 llega a ~6:1. En oscuro, #f87171 ya cumplía (hallazgo 1814). */
 .errorSimbolo {
   font-weight: 800;
   font-size: 1rem;
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .errorSimbolo {
   color: var(--color-fail);
 }
 
@@ -526,9 +556,11 @@
   transition: all 0.2s;
 }
 
+/* --primary como TEXTO daba 4,11:1 en claro y 3,50:1 en oscuro; --primary-texto es el token
+   de marca para texto, definido en los dos temas en globals.css (hallazgo 1814). */
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ══ EDUCATIONAL SECTION CONTENT ══ */
@@ -653,11 +685,12 @@
   padding: var(--spacing-md);
 }
 
+/* Blanco sobre --primary: 4,11:1. --primary-boton lleva el blanco a 5,47:1 (hallazgo 1814). */
 .stepNum {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 800;
   font-size: 0.85rem;
@@ -722,10 +755,11 @@
   margin-top: var(--spacing-xl);
 }
 
+/* 17,6 px en negrita no llega a texto grande: #dc2626 sobre el tinte daba 4,16:1 (1814). */
 .warningBox h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #dc2626;
+  color: #b91c1c;
   margin: 0 0 var(--spacing-lg);
   border-bottom: 2px solid rgba(239, 68, 68, 0.2);
   padding-bottom: 0.5rem;

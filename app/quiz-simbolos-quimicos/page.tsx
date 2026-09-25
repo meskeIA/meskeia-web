@@ -1,10 +1,11 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatPercentage } from '@/lib';
 import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
 type Modo = 'simbolo-nombre' | 'nombre-simbolo';
@@ -61,12 +62,36 @@ function generarPreguntas(modo: Modo, dificultad: Dificultad): Pregunta[] {
   });
 }
 
-function calcularMedalla(pct: number): { emoji: string; texto: string } {
-  if (pct === 100) return { emoji: '🏆', texto: '¡Perfecto!' };
-  if (pct >= 80)  return { emoji: '🥇', texto: '¡Excelente!' };
-  if (pct >= 60)  return { emoji: '🥈', texto: '¡Muy bien!' };
-  if (pct >= 40)  return { emoji: '🥉', texto: 'Bien' };
+/**
+ * Medalla según la proporción de aciertos (hallazgo 1815). Antes rotulaba «Bien» desde el 40 %:
+ * «Bien» es una nota de la escala escolar española (un 6), y aquí se daba a un 4 y a un 5, con
+ * un azar que ya acierta 1 de cada 4 (P(≥ 4 de 10 a ciegas) = 22,4 %). Ahora ningún rótulo es
+ * el nombre de una nota de ningún país, el primer escalón pide la mitad de aciertos (a ciegas,
+ * P(≥ 5 de 10) = 7,8 %) y la escala se explica en la propia pantalla del resultado.
+ * Se compara con enteros (aciertos·10 frente a total·n) para que 13 de 15 (86,7 %) no se
+ * redondee hacia arriba a oro.
+ */
+function calcularMedalla(aciertos: number, total: number): { emoji: string; texto: string } {
+  if (total > 0 && aciertos === total) return { emoji: '🏆', texto: '¡Perfecto!' };
+  if (aciertos * 10 >= total * 9) return { emoji: '🥇', texto: '¡Excelente!' };
+  if (aciertos * 10 >= total * 7) return { emoji: '🥈', texto: '¡Muy bien!' };
+  if (aciertos * 10 >= total * 5) return { emoji: '🥉', texto: 'Vas por buen camino' };
   return { emoji: '📚', texto: 'Sigue practicando' };
+}
+
+/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
+const MARGEN_LOGO = 88;
+
+/**
+ * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del final.
+ * Mismo patrón que quiz-literatura-universal y quiz-biologia-molecular.
+ */
+function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
+  if (!bloque || !clave) return;
+  const r = clave.getBoundingClientRect();
+  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 export default function QuizSimbolosQuimicosPage() {
@@ -82,6 +107,41 @@ export default function QuizSimbolosQuimicosPage() {
   const [erroresDetalle, setErroresDetalle] = useState<{ simbolo: string; nombre: string; respuesta: string }[]>([]);
 
   const preguntaActual = preguntas[indice] ?? null;
+
+  /**
+   * Foco y vista (hallazgos 1812 y 1813, la forma del 1676/1675 de quiz-tabla-periodica).
+   * · Al responder, la opción pulsada queda `disabled` y el navegador soltaba el foco al
+   *   <body>: se lleva a «Siguiente», la única acción que queda.
+   * · Al pulsar «Siguiente» ese botón se desmonta con el feedback y el foco caía al <body>,
+   *   DETRÁS de las opciones nuevas (el primer Tab salía del quiz). Ahora va a la tarjeta de la
+   *   pregunta nueva, y el Tab siguiente cae en la opción A.
+   * · Al pulsar «¡Empezar quiz!» en móvil, el panel de configuración (largo) se sustituía por el
+   *   quiz sin mover la vista y la pregunta quedaba por encima del borde: si la tarjeta de la
+   *   pregunta no se ve entera bajo el logo fijo, la vista sube al principio del quiz. Igual con
+   *   el resultado, que además recibe el foco para que el lector de pantalla lo lea.
+   * · Al volver a la configuración desde el resultado, el foco va a su primer título.
+   */
+  const quizPanelRef = useRef<HTMLDivElement>(null);
+  const preguntaRef = useRef<HTMLDivElement>(null);
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  const finPanelRef = useRef<HTMLDivElement>(null);
+  const tituloInicioRef = useRef<HTMLHeadingElement>(null);
+  const vieneDelResultado = useRef(false);
+
+  useEffect(() => {
+    if (fase === 'respondida') {
+      botonSiguienteRef.current?.focus();
+    } else if (fase === 'jugando') {
+      traerALaVista(quizPanelRef.current, preguntaRef.current);
+      preguntaRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'fin') {
+      traerALaVista(finPanelRef.current, finPanelRef.current);
+      finPanelRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'inicio' && vieneDelResultado.current) {
+      vieneDelResultado.current = false;
+      tituloInicioRef.current?.focus();
+    }
+  }, [fase, indice]);
 
   const iniciarQuiz = useCallback(() => {
     const qs = generarPreguntas(modo, dificultad);
@@ -132,8 +192,12 @@ export default function QuizSimbolosQuimicosPage() {
     }
   }, [indice, preguntas.length]);
 
-  const porcentaje = preguntas.length > 0 ? Math.round((aciertos / preguntas.length) * 100) : 0;
-  const medalla = calcularMedalla(porcentaje);
+  // «50 %» con espacio duro (formato español, CLAUDE.md §2; hallazgo 1816)
+  const porcentaje = formatPercentage(preguntas.length > 0 ? aciertos / preguntas.length : 0, 0);
+  const medalla = calcularMedalla(aciertos, preguntas.length);
+  // La barra se rotula «Preguntas respondidas»: cuenta la actual en cuanto se responde, y así
+  // llega a 10 de 10 (antes contaba el índice y se quedaba en 9; hallazgo 1820).
+  const respondidas = indice + (fase === 'respondida' ? 1 : 0);
 
   const preguntaLabel = useMemo(() => {
     if (!preguntaActual) return '';
@@ -177,7 +241,7 @@ export default function QuizSimbolosQuimicosPage() {
       {fase === 'inicio' && (
         <div className={styles.inicioPanel}>
           <section className={styles.configSection}>
-            <h2 className={styles.configTitulo}>Elige el modo de juego</h2>
+            <h2 className={styles.configTitulo} ref={tituloInicioRef} tabIndex={-1}>Elige el modo de juego</h2>
             <div className={styles.modoGrid}>
               {(Object.entries(MODO_CONFIG) as [Modo, typeof MODO_CONFIG[Modo]][]).map(([key, cfg]) => (
                 <button type="button"
@@ -220,7 +284,7 @@ export default function QuizSimbolosQuimicosPage() {
 
       {/* ── JUGANDO / RESPONDIDA ── */}
       {(fase === 'jugando' || fase === 'respondida') && preguntaActual && (
-        <div className={styles.quizPanel}>
+        <div className={styles.quizPanel} ref={quizPanelRef}>
           {/* Barra de progreso */}
           <div className={styles.progresoBarra}>
             <div className={styles.progresoInfo}>
@@ -241,19 +305,19 @@ export default function QuizSimbolosQuimicosPage() {
             <div className={styles.progresoTrack}>
               <div
                 className={styles.progresoFill}
-                style={{ width: `${((indice) / preguntas.length) * 100}%` }}
+                style={{ width: `${(respondidas / preguntas.length) * 100}%` }}
                 role="progressbar"
                 aria-label="Preguntas respondidas"
                 aria-valuemin={0}
-                aria-valuenow={indice}
+                aria-valuenow={respondidas}
                 aria-valuemax={preguntas.length}
-                aria-valuetext={`${indice} de ${preguntas.length} preguntas respondidas`}
+                aria-valuetext={`${respondidas} de ${preguntas.length} preguntas respondidas`}
               />
             </div>
           </div>
 
           {/* Pregunta */}
-          <div className={styles.preguntaCard}>
+          <div className={styles.preguntaCard} ref={preguntaRef} tabIndex={-1}>
             <p className={styles.preguntaLabel}>{preguntaLabel}</p>
             <div className={styles.elementoDisplay}>
               <span className={styles.elementoTexto}>{preguntaDisplay}</span>
@@ -300,7 +364,7 @@ export default function QuizSimbolosQuimicosPage() {
                   <><span aria-hidden="true">❌</span> La respuesta correcta era: <strong>{preguntaActual.correcta}</strong> ({modo === 'simbolo-nombre' ? `símbolo ${preguntaActual.elemento.simbolo}` : `nombre: ${preguntaActual.elemento.nombre}`})</>
                 )}
               </div>
-              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" ref={botonSiguienteRef} className={styles.btnSiguiente} onClick={siguiente}>
                 {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultados'}
               </button>
             </div>
@@ -310,11 +374,15 @@ export default function QuizSimbolosQuimicosPage() {
 
       {/* ── FIN ── */}
       {fase === 'fin' && (
-        <div className={styles.finPanel}>
+        <div className={styles.finPanel} ref={finPanelRef} tabIndex={-1}>
           <div className={styles.medallaIcon} aria-hidden="true">{medalla.emoji}</div>
           <h2 className={styles.finTitulo}>{medalla.texto}</h2>
           <p className={styles.finSubtitulo}>
-            Has acertado <strong>{aciertos}</strong> de <strong>{preguntas.length}</strong> ({porcentaje}%)
+            Has acertado <strong>{aciertos}</strong> de <strong>{preguntas.length}</strong> ({porcentaje})
+          </p>
+          <p className={styles.escalaNota}>
+            Medallas: bronce desde la mitad de aciertos, plata desde el 70{' '}%, oro desde el
+            90{' '}% y copa con todas. Contestando al azar se acierta, de media, 1 de cada 4.
           </p>
 
           <div className={styles.statsGrid}>
@@ -331,7 +399,7 @@ export default function QuizSimbolosQuimicosPage() {
               <span className={styles.statLabel}>Racha máxima</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statValor}>{porcentaje}%</span>
+              <span className={styles.statValor}>{porcentaje}</span>
               <span className={styles.statLabel}>Precisión</span>
             </div>
           </div>
@@ -356,7 +424,10 @@ export default function QuizSimbolosQuimicosPage() {
             </button>
             <button type="button"
               className={styles.btnSecundario}
-              onClick={() => setFase('inicio')}
+              onClick={() => {
+                vieneDelResultado.current = true;
+                setFase('inicio');
+              }}
             >
               <span aria-hidden="true">⚙️</span> Cambiar configuración
             </button>
@@ -471,7 +542,7 @@ export default function QuizSimbolosQuimicosPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué elemento es el más abundante en la Tierra?</h3>
-              <p>En la corteza terrestre, el oxígeno (O) es el más abundante (~46%), seguido del silicio (Si, ~28%), el aluminio (Al, ~8%), el hierro (Fe, ~5%) y el calcio (Ca, ~4%).</p>
+              <p>En la corteza terrestre, el oxígeno (O) es el más abundante (~46{' '}%), seguido del silicio (Si, ~28{' '}%), el aluminio (Al, ~8{' '}%), el hierro (Fe, ~5{' '}%) y el calcio (Ca, ~4{' '}%).</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Hay elementos que se llaman igual en todos los idiomas?</h3>
@@ -483,7 +554,7 @@ export default function QuizSimbolosQuimicosPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cómo se nombran los nuevos elementos?</h3>
-              <p>La IUPAC (Unión Internacional de Química Pura y Aplicada) es la autoridad que aprueba los nombres. Normalmente se nombran en honor a países (Germanio), científicos (Curio, Einsteinio) o propiedades del elemento.</p>
+              <p>La IUPAC (Unión Internacional de Química Pura y Aplicada) es la autoridad que aprueba los nombres. Normalmente se nombran en honor a lugares (germanio, americio), científicos (curio, einstenio) o propiedades del elemento.</p>
             </div>
           </div>
         </section>
@@ -542,7 +613,7 @@ export default function QuizSimbolosQuimicosPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <h3>El wolframio aguanta el calor</h3>
-              <p>El wolframio (W) tiene el punto de fusión más alto de todos los metales: 3.422 °C. Por eso se usa en filamentos de bombillas y electrodos de soldadura.</p>
+              <p>El wolframio (W) tiene el punto de fusión más alto de todos los metales: 3422 °C. Por eso se usa en filamentos de bombillas y electrodos de soldadura.</p>
             </div>
             {/* Esta tarjeta hablaba OTRA VEZ del mercurio —misma etimología y misma liquidez
                 que la primera— bajo un icono de radiactividad, que el mercurio no es, y con
@@ -552,7 +623,10 @@ export default function QuizSimbolosQuimicosPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📜</span>
               <h3>Los símbolos que no se parecen al nombre</h3>
-              <p>Diez elementos llevan la inicial de su nombre en latín, no en español: sodio es Na (<em>natrium</em>), potasio K (<em>kalium</em>), hierro Fe (<em>ferrum</em>), cobre Cu (<em>cuprum</em>), plata Ag (<em>argentum</em>), oro Au (<em>aurum</em>) y plomo Pb (<em>plumbum</em>). Son los que más se fallan en este quiz.</p>
+              {/* «Diez elementos…» era la cuenta de los símbolos que no casan con el nombre INGLÉS;
+                  en español son más (azufre S y fósforo P, del nivel Fácil, también), y «son los
+                  que más se fallan» no lo sostenía ningún dato: la app no registra fallos (1819). */}
+              <p>Varios elementos llevan la inicial de su nombre en latín, no en español: sodio es Na (<em>natrium</em>), potasio K (<em>kalium</em>), hierro Fe (<em>ferrum</em>), cobre Cu (<em>cuprum</em>), plata Ag (<em>argentum</em>), oro Au (<em>aurum</em>), plomo Pb (<em>plumbum</em>) y estaño Sn (<em>stannum</em>). Hasta el azufre y el fósforo esconden el suyo: S de <em>sulfur</em> y P de <em>phosphorus</em>.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
@@ -581,7 +655,7 @@ export default function QuizSimbolosQuimicosPage() {
             </div>
             <div className={styles.warningItem}>
               <strong>3. Confundir Co (cobalto) con CO (monóxido de carbono)</strong>
-              <p>Co es el símbolo del cobalto. CO (con mayúscula y minúscula) es la fórmula del monóxido de carbono, un compuesto. La diferencia entre mayúsculas y minúsculas es crucial en química.</p>
+              <p>Co (mayúscula y minúscula) es el símbolo del cobalto, un elemento. CO (dos mayúsculas: C de carbono y O de oxígeno) es la fórmula del monóxido de carbono, un compuesto. La segunda letra de un símbolo va siempre en minúscula: una mayúscula de más convierte un elemento en dos.</p>
             </div>
             <div className={styles.warningItem}>
               <strong>4. Olvidar que K es potasio</strong>

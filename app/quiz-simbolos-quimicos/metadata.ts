@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Cuántos elementos tiene la tabla periódica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La tabla periódica actual tiene 118 elementos confirmados, del hidrógeno (H, número atómico 1) al oganesón (Og, número atómico 118). Los elementos del 1 al 94 se encuentran en la naturaleza; los elementos del 95 al 118 son sintéticos, producidos en reactores o aceleradores de partículas y tienen vidas medias muy cortas.',
+        text: 'La tabla periódica actual tiene 118 elementos confirmados, del hidrógeno (H, número atómico 1) al oganesón (Og, número atómico 118). Los elementos del 1 al 94 se encuentran en la naturaleza; los elementos del 95 al 118 son sintéticos, producidos en reactores o aceleradores de partículas. Sus vidas medias van de millones de años en los primeros de ese tramo (el curio-247, unos 15,6 millones de años) a fracciones de segundo en los más pesados.',
       },
     },
     {
