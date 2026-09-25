@@ -49,16 +49,14 @@
 import {
   calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   OBLIGACION_DECLARAR_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 const LIMITE_SEGUNDO_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador;
 const LIMITE_OBLIGACION_UN_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.unPagador;
 const LIMITE_OBLIGACION_SEGUNDO_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.variosPagadores;
-const GASTOS_DEDUCIBLES_TRABAJO = GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -118,13 +116,16 @@ export interface ResultadoIRPFSegundoPagador {
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function estimarCuotaIRPF(rendimientosBrutos: number): number {
-  // Art. 19.2.f: los gastos deducibles se restan ANTES de la reducción del art. 20, y la
-  // reducción se calcula sobre el rendimiento NETO, no sobre los brutos. Compararla contra
-  // los brutos desplazaba los umbrales 2.000 € y era la mitad del defecto de este motor.
-  const rendimientoNetoTrabajo = Math.max(0, rendimientosBrutos - GASTOS_DEDUCIBLES_TRABAJO);
-  const reduccionTrabajo = calcularReduccionRendimientosTrabajo(rendimientoNetoTrabajo);
-
-  const rendimientoNeto = Math.max(0, rendimientoNetoTrabajo - reduccionTrabajo);
+  // Arts. 19 y 20 LIRPF. ⚠️ CORREGIDO EL 25/09/2026: el comentario que había aquí afirmaba
+  // que los 2.000 € de la letra f) del art. 19.2 se restan ANTES de medir la reducción del
+  // art. 20, y es al revés: el art. 20 dice que, «a estos efectos», el rendimiento neto es el
+  // íntegro menos los gastos de las letras a) a e) (hallazgo 1687 de estimador-sueldo-neto).
+  // Este motor no modela la cotización a la SS (la mayoría de segundos pagadores son
+  // pensiones o prestaciones), así que no resta gastos de las letras a) a e).
+  const rendimientoNeto = calcularRendimientoNetoTrabajo({
+    integros: rendimientosBrutos,
+    gastosAaE: 0,
+  }).rendimientoNetoReducido;
 
   // Mínimo personal (soltero orientativo)
   const minimoPersonal = MINIMOS_IRPF_2025.personal;

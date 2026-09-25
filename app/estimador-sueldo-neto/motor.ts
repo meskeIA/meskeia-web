@@ -17,8 +17,7 @@ import {
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
   MINIMOS_IRPF_2025,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
   calcularDeduccionRentasBajas,
   limitarDeduccionRendimientosTrabajo,
@@ -94,22 +93,32 @@ export function calcularSeguridadSocial(salarioBrutoAnual: number): { anual: num
   };
 }
 
-// Mínimo personal y familiar (arts. 57 a 61 LIRPF). Ya NO recibe `situacion`: lo único que
-// dependía de ella era la reducción por tributación conjunta, que se fue a su propia función
-// por no ser un mínimo (ver calcularReduccionTributacionConjunta).
-export function calcularMinimosPersonales(numHijos: number, hijosMenores3: number): number {
-  let minimos = MINIMOS_IRPF_2025.personal;
+/**
+ * Mínimo personal y familiar (arts. 57 a 61 LIRPF).
+ *
+ * Con «Casado/a (dos ingresos)» el mínimo por descendientes entra por MITAD (hallazgo 1688,
+ * 25/09/2026): cada cónyuge tributa por separado y los dos tienen derecho por el hijo común,
+ * así que se prorratea a partes iguales (art. 61.1.ª LIRPF; para la retención, art. 84.2.º
+ * RIRPF: «los descendientes se computarán por mitad»). Hasta esa fecha entraba entero y el
+ * perfil «Técnico medio con familia» contaba 7.950 € de mínimo en vez de 6.750 €.
+ * En tributación conjunta (un solo ingreso) y en la monoparental hay un solo contribuyente:
+ * entero.
+ */
+export function calcularMinimosPersonales(
+  numHijos: number,
+  hijosMenores3: number,
+  situacion: SituacionFamiliar,
+): number {
+  let descendientes = 0;
+  if (numHijos >= 1) descendientes += MINIMOS_IRPF_2025.hijo_1;
+  if (numHijos >= 2) descendientes += MINIMOS_IRPF_2025.hijo_2;
+  if (numHijos >= 3) descendientes += MINIMOS_IRPF_2025.hijo_3;
+  if (numHijos >= 4) descendientes += MINIMOS_IRPF_2025.hijo_4_mas * (numHijos - 3);
+  // Adicional por hijos menores de 3 años (art. 58.2): forma parte del mismo mínimo.
+  descendientes += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
 
-  // Añadir por hijos
-  if (numHijos >= 1) minimos += MINIMOS_IRPF_2025.hijo_1;
-  if (numHijos >= 2) minimos += MINIMOS_IRPF_2025.hijo_2;
-  if (numHijos >= 3) minimos += MINIMOS_IRPF_2025.hijo_3;
-  if (numHijos >= 4) minimos += MINIMOS_IRPF_2025.hijo_4_mas * (numHijos - 3);
-
-  // Adicional por hijos menores de 3 años
-  minimos += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
-
-  return minimos;
+  const parte = situacion === 'casado_dos_ingresos' ? 0.5 : 1;
+  return MINIMOS_IRPF_2025.personal + descendientes * parte;
 }
 
 /**
@@ -156,19 +165,23 @@ export function calcularBrutoANeto(
   pagas: number
 ): ResultadoBrutoANeto {
   const ss = calcularSeguridadSocial(brutoAnual);
-  // Rendimiento neto del trabajo (RNT): bruto - SS - gastos deducibles generales (art. 19 LIRPF)
-  const rnt = Math.max(0, brutoAnual - ss.anual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-  // Reducción por obtención de rendimientos del trabajo (art. 20 LIRPF)
-  const reduccionRNT = calcularReduccionRendimientosTrabajo(rnt);
-  const baseImponible = Math.max(0, rnt - reduccionRNT);
+  // Arts. 19 y 20 LIRPF: la reducción del art. 20 se calcula sobre bruto − SS, SIN restar
+  // antes los 2.000 € de la letra f). Hasta el 25/09/2026 se restaban (hallazgo 1687) y, con
+  // 20.000 € brutos, la reducción salía 4.068 € en vez de 1.194,15 €.
+  const { rendimientoNetoReducido: baseImponible } = calcularRendimientoNetoTrabajo({
+    integros: brutoAnual,
+    gastosAaE: ss.anual,
+  });
   // Base liquidable general = base imponible − reducciones de base (art. 84.2 en tributación
   // conjunta). El mínimo personal y familiar NO se resta aquí: entra en calcularIRPF.
   const baseLiquidable = Math.max(
     0,
     baseImponible - calcularReduccionTributacionConjunta(situacion, numHijos)
   );
-  const minimos = calcularMinimosPersonales(numHijos, hijosMenores3);
-  const cuotaIRPF = calcularIRPF(baseLiquidable, minimos);
+  const minimos = calcularMinimosPersonales(numHijos, hijosMenores3, situacion);
+  // En céntimos, como se liquida: con el SMI la cuota exacta es 590,8905 € y la DA 61.ª deduce
+  // 590,89 €, así que sin redondear quedaba un IRPF de 0,0005 €.
+  const cuotaIRPF = Math.round(calcularIRPF(baseLiquidable, minimos) * 100) / 100;
   // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
   // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
   const deduccion = limitarDeduccionRendimientosTrabajo(

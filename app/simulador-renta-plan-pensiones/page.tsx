@@ -20,9 +20,8 @@ import {
   FISCAL_PLAN_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   COTIZACIONES_SS_2026,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
 } from '@/data/fiscal';
 import styles from './SimuladorRentaPlanPensiones.module.css';
 
@@ -68,17 +67,15 @@ function calcularBaseLiquidable(salarioBruto: number): number {
     COTIZACIONES_SS_2026.mef;
   const ss = salarioBruto * (totalSSPct / 100);
 
-  // Gastos deducibles art. 19 (2.000 €)
-  const rnt = Math.max(0, salarioBruto - ss - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-
-  // Reducción art. 20 (rendimientos del trabajo)
-  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
-
+  // Gastos del art. 19 y reducción del art. 20, medida sobre bruto − SS ANTES de restar los
+  // 2.000 € de la letra f) (hallazgo 1687 de estimador-sueldo-neto, mismo defecto: hasta el
+  // 25/09/2026 se medía después).
+  //
   // Base imponible aproximada. El mínimo personal NO se resta: el art. 63.1.2.º LIRPF lo grava
   // a tipo cero dentro de la cuota, no reduciendo la base, así que la base liquidable general
   // lo lleva dentro. Para las diferencias marginales que calcula esta app es además
   // indiferente, porque el mínimo se cancela al restar dos cuotas del mismo contribuyente.
-  return Math.max(0, rnt - reduccion);
+  return calcularRendimientoNetoTrabajo({ integros: salarioBruto, gastosAaE: ss }).rendimientoNetoReducido;
 }
 
 /** Capital acumulado tras N años aportando aporteAnual con rentabilidad anual rentab (%) */

@@ -150,7 +150,7 @@ async function valorTarjeta(page: Page, titulo: string): Promise<string> {
   return limpiar(await valor.innerText());
 }
 
-/** Importe de una fila del desglose («Retención IRPF anual», «Contingencias comunes (4,70%)»…). */
+/** Importe de una fila del desglose («IRPF anual (cuota estimada)», «Contingencias comunes (4,70%)»…). */
 async function filaDesglose(page: Page, etiquetaExacta: string): Promise<string> {
   const fila = page.locator(`css=div:has(> span:text-is("${etiquetaExacta}"))`).first();
   return limpiar(await fila.locator('span').nth(1).innerText());
@@ -206,15 +206,18 @@ test.beforeEach(async ({ page }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 0 · DA 61.ª de 2026: 19.000 € brutos deducen 209,69 € (590,89 − 0,2 × 1.906)', async ({ page }) => {
   // SS 2026: 19.000 / 12 = 1.583,33 €/mes × 6,50 % × 12 = 1.235,00 €
-  // RNT = 19.000 − 1.235 − 2.000 = 15.765,00 € → reducción art. 20 = 7.302 − 1,75 × 913 = 5.704,25 €
-  // Base = 10.060,75 € → cuota = (10.060,75 − 5.550) × 19 % = 857,04 € (primer tramo entero)
+  // La reducción del art. 20 se mide sobre 19.000 − 1.235 = 17.765,00 € (hallazgo 1687: SIN los
+  //   2.000 € de la letra f) → segundo tramo: 2.364,34 − 1,14 × 91,48 = 2.260,05 €
+  // RNT = 17.765 − 2.000 = 15.765,00 € → base = 15.765 − 2.260,05 = 13.504,95 €
+  // cuota = escala(13.504,95) 2.618,69 − escala(5.550) 1.054,50 = 1.564,19 €
   // Deducción DA 61.ª, redacción de 2026 (art. 28 del RDL 5/2026), sobre los ÍNTEGROS:
-  //   590,89 − 0,2 × (19.000 − 17.094) = 209,69 € → IRPF = 857,04 − 209,69 = 647,35 €
+  //   590,89 − 0,2 × (19.000 − 17.094) = 209,69 € → IRPF = 1.564,19 − 209,69 = 1.354,50 €
+  // Hasta el 25/09/2026 (lectura errónea del art. 20) daba 647,35 €.
   // Hasta el 24/09/2026 la app aplicaba la de 2025 sobre el NETO: 340 × (1 − 913 / 3.424) =
   //   249,34 € → 607,70 € de IRPF.
   await calcular(page, '19000');
   expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-209,69 €');
-  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('647,35 €');
+  expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('1354,50 €');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -236,8 +239,8 @@ test('CASO 1 (normal) · 30.000 € brutos, soltero/a, 0 hijos, 12 pagas', async
   //   escala(5.550)  = 5.550×19 %                     = 1.054,50 €
   //   cuota          = 5.980,50 − 1.054,50            = 4.926,00 €
   // Deducción DA 61.ª: 0 € (30.000 € íntegros superan los 20.048,45 € de 2026).
-  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('4926,00 €');
-  expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('16,42%');
+  expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('4926,00 €');
+  expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('16,42%');
 
   // Seguridad Social — COTIZACIONES_SS_2026 sobre base 2.500 €/mes (sin tope)
   expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('1410,00 €'); // 2.500×4,70%×12
@@ -257,7 +260,9 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
   expect(await hayResultados(page)).toBe(true);
 
   expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('120.000,00€');
-  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('74.864,59€');
+  // 120.000 − 3.978,94 − 41.156,48 = 74.864,58 € (la cuota va en céntimos desde el 25/09/2026;
+  // antes salía 74.864,59 € de sumar la cuota sin redondear, 41.156,475 €)
+  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('74.864,58€');
   expect(await valorTarjeta(page, 'Bruto Mensual (12 pagas)')).toBe('10.000,00€');
   expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('6238,72€');
 
@@ -278,11 +283,11 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
   //   cuota              = 42.210,98 − 1.054,50 = 41.156,48 €
   // Nótese que el mínimo vale aquí lo mismo que en el CASO 1 (1.054,50 €): ese es
   // justamente el efecto que persigue el art. 63.1.2º y el que el cálculo viejo rompía.
-  expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('41.156,48 €');
-  expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('34,30%');
+  expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('41.156,48 €');
+  expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('34,30%');
 
-  // 41.156,48 + 3.978,94 = 45.135,41 € · sobre 120.000 € = 37,61 %
-  expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('45.135,41 €');
+  // 41.156,48 + 3.978,94 = 45.135,42 € · sobre 120.000 € = 37,61 %
+  expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('45.135,42 €');
   expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('37,61%');
 });
 
@@ -389,7 +394,7 @@ test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF
   await esperarHidratacion(page, [CAMPO]);
   await calcular(page, '30000');
   const netoSoltero = await valorTarjeta(page, 'Salario Neto Anual');
-  const irpfSoltero = await filaDesglose(page, 'Retención IRPF anual');
+  const irpfSoltero = await filaDesglose(page, 'IRPF anual (cuota estimada)');
   expect(netoSoltero).toBe('23.124,00€');
   expect(irpfSoltero).toBe('4926,00 €');
 
@@ -397,7 +402,7 @@ test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF
   await page.locator('select').first().selectOption({ label: 'Casado/a (un solo ingreso)' });
   await calcular(page, '30000');
   const netoCasadoUnIngreso = await valorTarjeta(page, 'Salario Neto Anual');
-  const irpfCasadoUnIngreso = await filaDesglose(page, 'Retención IRPF anual');
+  const irpfCasadoUnIngreso = await filaDesglose(page, 'IRPF anual (cuota estimada)');
 
   // Reparado: ya NO coinciden con el soltero, y el importe es el que exige el art. 84.2.3ª.
   expect(irpfCasadoUnIngreso).toBe('3906,00 €');
@@ -443,8 +448,8 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     expect(await filaDesglose(page, 'MEF - Equidad Intergeneracional (0,15%)')).toBe('63,00 €');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('2730,00 €');
 
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('8436,90 €');
-    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('20,09%');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('8436,90 €');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('20,09%');
     // Fuera de la zona de la DA 61.ª: la fila no se pinta.
     expect(await cuentaFilas(page, 'Deducción por rendimientos del trabajo')).toBe(0);
 
@@ -455,40 +460,43 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
   /**
    * LÍMITE · 18.600 € brutos: dentro del tramo decreciente de la DA 61.ª de 2026.
    *   SS = 18.600 × 6,50 % = 1.209,00 € (1.550 €/mes, sin tope ni suelo)
-   *   RNT = 18.600 − 1.209 − 2.000 = 15.391,00 € → reducción art. 20, primer tramo decreciente:
-   *     7.302 − 1,75 × (15.391 − 14.852) = 7.302 − 943,25 = 6.358,75 €
-   *   Base = 15.391 − 6.358,75 = 9.032,25 € → cuota = (9.032,25 − 5.550) × 19 % = 661,63 €
+   *   Reducción art. 20 sobre 18.600 − 1.209 = 17.391,00 € (hallazgo 1687), primer tramo
+   *     decreciente: 7.302 − 1,75 × (17.391 − 14.852) = 7.302 − 4.443,25 = 2.858,75 €
+   *   RNT = 17.391 − 2.000 = 15.391 € → base = 15.391 − 2.858,75 = 12.532,25 €
+   *   cuota = escala(12.532,25) 2.385,24 − 1.054,50 = 1.330,74 €
    *   DA 61.ª (DEDUCCION_RENDIMIENTOS_TRABAJO_2026) sobre los ÍNTEGROS:
    *     590,89 − 0,2 × (18.600 − 17.094) = 590,89 − 301,20 = 289,69 € (< cuota: sin tope)
-   *   IRPF = 661,6275 − 289,69 = 371,94 € · neto = 18.600 − 1.209 − 371,94 = 17.019,06 €
+   *   IRPF = 1.330,74 − 289,69 = 1.041,05 € (5,60 %) · neto = 18.600 − 1.209 − 1.041,05 = 16.349,95 €
    *   Con la redacción de 2025 (340 € hasta 16.576 €, cero desde 18.276 €) la deducción
-   *   sería 0 € y el IRPF 661,63 €: la diferencia es la que vigila este caso.
+   *   sería 0 €: la diferencia es la que vigila este caso.
    */
   test('LÍMITE · 18.600 €: la DA 61.ª de 2026 deduce 289,69 € (590,89 − 0,2 × 1.506)', async ({ page }) => {
     await calcular(page, '18600');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1209,00 €');
     expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-289,69 €');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('371,94 €');
-    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('2,00%');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('17.019,06€');
-    expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('1580,94 €');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('1041,05 €');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('5,60%');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.349,95€');
+    expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('2250,05 €');
   });
 
   /**
-   * LÍMITE · 17.600 € brutos: la deducción supera la cuota y se topa en ella
+   * LÍMITE · 16.000 € brutos: la deducción supera la cuota y se topa en ella
    * (limitarDeduccionRendimientosTrabajo: tope = cuota íntegra GENERAL, peso del trabajo 1).
-   *   SS = 17.600 × 6,50 % = 1.144,00 € · RNT = 17.600 − 1.144 − 2.000 = 14.456,00 €
-   *   Reducción art. 20 = 7.302 € (RNT ≤ 14.852) → base 7.154,00 €
-   *   cuota = (7.154 − 5.550) × 19 % = 304,76 €
-   *   DA 61.ª: 590,89 − 0,2 × (17.600 − 17.094) = 489,69 € → topada a 304,76 € → IRPF 0,00 €
-   *   Neto = 17.600 − 1.144 = 16.456,00 €
+   * Era 17.600 € hasta el 25/09/2026; con la reducción del art. 20 bien medida (1687) la cuota
+   * de 17.600 € (838,09 €) ya supera la deducción y el tope no muerde: hay que bajar del SMI.
+   *   SS = 16.000 × 6,50 % = 1.040,00 € · reducción art. 20 sobre 14.960 €:
+   *     7.302 − 1,75 × 108 = 7.113,00 € · RNT = 14.960 − 2.000 = 12.960 € → base 5.847,00 €
+   *   cuota = (5.847 − 5.550) × 19 % = 56,43 €
+   *   DA 61.ª: 590,89 € (íntegros ≤ 17.094) → topada a 56,43 € → IRPF 0,00 €
+   *   Neto = 16.000 − 1.040 = 14.960,00 €
    */
-  test('LÍMITE · 17.600 €: la deducción de 489,69 € se topa en la cuota íntegra (304,76 €)', async ({ page }) => {
-    await calcular(page, '17600');
-    expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-304,76 €');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('0,00 €');
-    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1144,00 €');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.456,00€');
+  test('LÍMITE · 16.000 €: la deducción de 590,89 € se topa en la cuota íntegra (56,43 €)', async ({ page }) => {
+    await calcular(page, '16000');
+    expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-56,43 €');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('0,00 €');
+    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1040,00 €');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('14.960,00€');
   });
 
   /**
@@ -505,7 +513,7 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     await calcular(page, '9000');
     expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('423,00 €');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('585,00 €');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('0,00 €');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('0,00 €');
     expect(await cuentaFilas(page, 'Deducción por rendimientos del trabajo')).toBe(0);
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('8415,00€');
     expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('701,25€');
@@ -525,7 +533,7 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
   test('IDA Y VUELTA · Neto → Bruto devuelve 42.000, 18.600 y 9.000 € desde sus netos', async ({ page }) => {
     const casos: Array<[string, string, number]> = [
       ['30833,10', '30.833,10€', 42000],
-      ['17019,06', '17.019,06€', 18600],
+      ['16349,95', '16.349,95€', 18600],
       ['8415', '8415,00€', 9000],
     ];
     await page.getByRole('button', { name: 'Neto → Bruto', exact: true }).click();
@@ -591,26 +599,31 @@ test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026
     const cuerpo = await cuerpoConGuiaAbierta(page);
     // La tabla es explícitamente «para un sueldo bruto de 30.000 €»: su neto es el del CASO 1.
     expect.soft(cuerpo).toContain('23.124');
-    for (const cifraVieja of ['24.327', '~311 €', '16.206', '~18.545', '28.362', '~28.436', '~720 €', '~71.657', '~55.371']) {
+    for (const cifraVieja of ['24.327', '~311 €', '16.206', '~18.545', '28.362', '~28.436', '~720 €', '~71.657', '~55.371',
+      // Las del 25/09 por la mañana, con la reducción del art. 20 mal medida (1687) y el mínimo
+      // del hijo entero en dos ingresos (1688).
+      '17.227,65', '18.112,36', '5872,50', '26.852,50', '456,00 €']) {
       expect.soft(cuerpo, `cifra del modelo viejo «${cifraVieja}»`).not.toContain(cifraVieja);
     }
     // Reparado el 25/09/2026: la tabla y los perfiles salen del mismo motor que la calculadora
     // (app/estimador-sueldo-neto/motor.ts). Cifras recalculadas a mano contra data/fiscal:
     //   · Tabla 30.000 €: neto 23.124,00 € → 1.927,00 €/mes; IRPF 4.926,00 € → 410,50 €/mes (12 p.)
     //     y 351,86 € (14 p.); neto por paga en 14: 23.124 / 14 = 1.651,71 €.
-    //   · 22.000 €: SS 1.430 · RNT 18.570 € → reducción art. 20 (segundo tramo decreciente)
-    //     → base 17.227,65 € · cuota escala(17.227,65) − escala(5.550) = 3.512,14 − 1.054,50
-    //     = 2.457,64 € (DA 61.ª: 0, íntegros ≥ 20.048,45) · neto 18.112,36 €.
-    //   · 35.000 €, 1 hijo: SS 2.275 · base 30.725,00 € · mínimo 7.950 € → escala(30.725)
-    //     7.383,00 − escala(7.950) 1.510,50 = 5.872,50 € · neto 26.852,50 € · sin hijo 6.328,50 €
-    //     → ahorro 456,00 € (= 2.400 × 19 %), 38,00 €/mes.
+    //   · 22.000 €: SS 1.430 · la reducción del art. 20 se mide sobre 22.000 − 1.430 =
+    //     20.570 € ≥ 19.747,5 → 0 € (hallazgo 1687: antes se medía sobre 18.570 y daba
+    //     3.342,35 €) → base 18.570,00 € · cuota escala(18.570) 3.834,30 − 1.054,50 = 2.779,80 €
+    //     (DA 61.ª: 0, íntegros ≥ 20.048,45) · neto 17.790,20 €.
+    //   · 35.000 €, 1 hijo, dos ingresos: SS 2.275 · base 30.725,00 € · mínimo 5.550 + 2.400 / 2
+    //     = 6.750 € (hallazgo 1688) → escala(30.725) 7.383,00 − escala(6.750) 1.282,50 =
+    //     6.100,50 € · neto 26.624,50 € · sin hijo 6.328,50 € → ahorro 228,00 € (= 1.200 × 19 %),
+    //     19,00 €/mes.
     //   · 80.000 €: SS 3.978,94 € (base máxima) · base 74.021,06 € · cuota 23.156,48 € ·
-    //     neto 52.864,59 €.
+    //     neto 80.000 − 3.978,94 − 23.156,48 = 52.864,58 €.
     for (const cifra of [
       '1927,00 €', '410,50 €', '351,86 €', '1651,71 €',
-      '17.227,65 €', '2457,64 €', '18.112,36 €',
-      '30.725,00 €', '5872,50 €', '26.852,50 €', '456,00 €', '38,00 €',
-      '74.021,06 €', '23.156,48 €', '52.864,59 €',
+      '18.570,00 €', '2779,80 €', '17.790,20 €',
+      '30.725,00 €', '6100,50 €', '26.624,50 €', '228,00 €', '19,00 €',
+      '74.021,06 €', '23.156,48 €', '52.864,58 €',
     ]) {
       expect.soft(cuerpo, `cifra de la calculadora «${cifra}»`).toContain(cifra);
     }
@@ -828,8 +841,8 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await escribirCampo(page, 'Hijos menores de 3 años', '1');
     await calcular(page, '40000');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('2600,00 €');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('5535,00 €');
-    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('13,84%');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('5535,00 €');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('13,84%');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('31.865,00€');
     expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2276,07€');
   });
@@ -846,8 +859,8 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
   test('LÍMITE · 400.000 €: tramo del 47 %, IRPF 169.036,90 €', async ({ page }) => {
     await calcular(page, '400000');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('3978,94 €');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('169.036,90 €');
-    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('42,26%');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('169.036,90 €');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('42,26%');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('226.984,16€');
   });
 
@@ -873,7 +886,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await escribirCampo(page, 'Número de hijos', '1');
     await escribirCampo(page, 'Hijos menores de 3 años', '3', '1');
     await calcular(page, '30000');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('3938,00 €');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('3938,00 €');
   });
 
   /**
@@ -888,10 +901,10 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    * Hoy la app entra con 16.700 € → reducción 4.068 € → IRPF 1.344,99 €, neto 17.355,01 €.
    * El defecto es de cientos de euros: se comparan las cadenas exactas.
    */
-  test.fail('HALLAZGO art. 20 · 20.000 €: IRPF 2.034,71 € y neto 16.665,29 €', async ({ page }) => {
+  test('HALLAZGO art. 20 · 20.000 €: IRPF 2.034,71 € y neto 16.665,29 €', async ({ page }) => {
     await calcular(page, '20000');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('2034,71 €');
-    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('10,17%');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('2034,71 €');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('10,17%');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.665,29€');
   });
 
@@ -903,11 +916,11 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    *   → la deducción de la DA 61.ª que se pinta es −590,89 € y el IRPF queda en 0,00 €.
    * Hoy: reducción 7.302 € (entrada 13.982,89 €), cuota 214,87 €, deducción pintada −214,87 €.
    */
-  test.fail('HALLAZGO art. 20 · SMI 17.094 €: la cuota íntegra es 590,89 € y la DA 61.ª la anula entera', async ({ page }) => {
+  test('HALLAZGO art. 20 · SMI 17.094 €: la cuota íntegra es 590,89 € y la DA 61.ª la anula entera', async ({ page }) => {
     await page.getByRole('combobox', { name: 'Número de pagas' }).selectOption('14');
     await calcular(page, '17094');
     expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-590,89 €');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('0,00 €');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('0,00 €');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('15.982,89€');
   });
 
@@ -919,7 +932,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    *   neto = 22.000 − 1.430 − 2.779,80 = 17.790,20 €
    * FAQPage, 20.000 €: 2.034,71 / 20.000 = 10,17 % (hoy «6,72 %»).
    */
-  test.fail('HALLAZGO art. 20 · perfil de 22.000 € y FAQPage de 20.000 €', async ({ page }) => {
+  test('HALLAZGO art. 20 · perfil de 22.000 € y FAQPage de 20.000 €', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect.soft(cuerpo).toContain('18.570,00 €');
     expect.soft(cuerpo).toContain('2779,80 €');
@@ -936,12 +949,12 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    *   neto = 35.000 − 2.275 − 6.100,50 = 26.624,50 €
    * Hoy suma los 2.400 € enteros: mínimo 7.950 €, IRPF 5.872,50 €, neto 26.852,50 €.
    */
-  test.fail('HALLAZGO art. 61.1.ª · dos ingresos y 1 hijo: el mínimo del hijo se prorratea (IRPF 6.100,50 €)', async ({ page }) => {
+  test('HALLAZGO art. 61.1.ª · dos ingresos y 1 hijo: el mínimo del hijo se prorratea (IRPF 6.100,50 €)', async ({ page }) => {
     await page.getByRole('combobox', { name: 'Situación familiar' }).selectOption('casado_dos_ingresos');
     await escribirCampo(page, 'Número de hijos', '1');
     await calcular(page, '35000');
-    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('6100,50 €');
-    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('17,43%');
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('6100,50 €');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('17,43%');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('26.624,50€');
   });
 
@@ -951,9 +964,9 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    *   «Impacto del mínimo por el hijo»: IRPF sin hijo 6.328,50 € − con hijo 6.100,50 € = 228,00 €
    *   (= 1.200 × 19 %; hoy 456,00 €), y el consejo del modelo 145: 228 / 12 = 19,00 €/mes (hoy 38,00 €).
    */
-  test.fail('HALLAZGO art. 61.1.ª · el perfil de 35.000 € con 1 hijo en dos ingresos', async ({ page }) => {
+  test('HALLAZGO art. 61.1.ª · el perfil de 35.000 € con 1 hijo en dos ingresos', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
-    expect.soft(cuerpo).toMatch(/Mínimo personal \+ hijo 1[^:]*: 6750,00 €/);
+    expect.soft(cuerpo).toMatch(/Mínimo personal \+ la mitad del de hijo 1[^:]*: 6750,00 €/);
     expect.soft(cuerpo).toContain('Impacto del mínimo por el hijo: 228,00 €');
     expect.soft(cuerpo).toContain('reducir tu retención mensual unos 19,00 €');
   });
@@ -968,16 +981,19 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    *   tipo art. 86 = 16,42 % → retención 4.926,00 € (la app pinta 3.906,00 € y 13,02 %).
    * Lo correcto es cualquiera de las dos: o la fila no se llama «Retención», o vale 4.926,00 €.
    */
-  test.fail('HALLAZGO retención · casado/a con un ingreso: la fila «Retención» no puede ser la cuota de la conjunta', async ({ page }) => {
+  test('HALLAZGO 1689 (reparado) · la cuota anual se rotula como IRPF, no como «Retención»', async ({ page }) => {
+    // Reparado rotulando la cifra por lo que es (la otra salida válida del acta): la app
+    // calcula la cuota anual de la LIRPF, con la reducción del art. 84.2 y la DA 61.ª, que
+    // el procedimiento de retención no aplica. Calcular la retención del reglamento sería
+    // una segunda cifra, y lo que se prometía era el neto.
     await page.getByRole('combobox', { name: 'Situación familiar' }).selectOption('casado_un_ingreso');
     await calcular(page, '30000');
     await expect(page.getByRole('heading', { level: 3, name: 'Salario Neto Anual', exact: true })).toBeVisible();
-    if ((await cuentaFilas(page, 'Retención IRPF anual')) > 0) {
-      expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('4926,00 €');
-    }
-    if ((await cuentaFilas(page, 'Tipo de retención efectivo')) > 0) {
-      expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('16,42%');
-    }
+    expect(await cuentaFilas(page, 'Retención IRPF anual')).toBe(0);
+    expect(await cuentaFilas(page, 'Tipo de retención efectivo')).toBe(0);
+    expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('3906,00 €');
+    await expect(page.getByText('La retención de tu nómina la calcula la empresa')).toBeVisible();
+    expect(await faqJsonLd(page)).not.toContain('el salario neto mensual que recibes en cuenta');
   });
 
   /**
@@ -987,7 +1003,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    * persona, o 1.500 € para cada una CON DISCAPACIDAD → familia de 4: 2.000 €. El paso 3 de la
    * misma página ya dice 500 €.
    */
-  test.fail('HALLAZGO seguro médico · el exento es 500 € por persona (familia de 4: 2.000 €), no 1.500 €', async ({ page }) => {
+  test('HALLAZGO seguro médico · el exento es 500 € por persona (familia de 4: 2.000 €), no 1.500 €', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect.soft(cuerpo).not.toContain('hasta 1.500 € en seguro médico');
     expect.soft(cuerpo).not.toMatch(/4 personas, el límite exento es de 6\.000/);
@@ -999,7 +1015,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    * (data/fiscal/pensiones.ts) ya lo tiene, y el art. 52.1 LIRPF da 1.500 € + 8.500 € «siempre
    * que tal incremento provenga de contribuciones empresariales»: solo empresa → 10.000 €.
    */
-  test.fail('HALLAZGO plan de pensiones · no hay un límite de 8.500 € «si solo aporta la empresa»', async ({ page }) => {
+  test('HALLAZGO plan de pensiones · no hay un límite de 8.500 € «si solo aporta la empresa»', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect(cuerpo).not.toContain('8.500 € si solo aporta la empresa');
   });
@@ -1012,7 +1028,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    *   · «Un seguro médico familiar de 1.500 €/año puede suponer un ahorro de ~380 € en IRPF …
    *     en el tramo del 30 %»: 1.500 × 30 % = 450 €.
    */
-  test.fail('HALLAZGO cifras de ejemplo · subida de 1.000 € (+589,05 €) y seguro de 1.500 € al 30 % (450 €)', async ({ page }) => {
+  test('HALLAZGO cifras de ejemplo · subida de 1.000 € (+589,05 €) y seguro de 1.500 € al 30 % (450 €)', async ({ page }) => {
     await calcular(page, '45000');
     await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('32.600,25€');
     await calcular(page, '46000');

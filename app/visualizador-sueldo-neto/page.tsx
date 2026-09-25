@@ -22,9 +22,8 @@ import {
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
   MINIMOS_IRPF_2025,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   calcularDeduccionRentasBajas,
   limitarDeduccionRendimientosTrabajo,
 } from '@/data/fiscal';
@@ -101,12 +100,13 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
   const totalSS = ssContingencias + ssDesempleo + ssFormacion + ssMEI;
 
   // 2. Base imponible IRPF
-  const rendimientoNeto = brutoAnual - totalSS - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
-
-  // Reducción por rendimientos del trabajo
-  const reduccion = calcularReduccionRendimientosTrabajo(rendimientoNeto);
-
-  const baseImponible = Math.max(0, rendimientoNeto - reduccion);
+  // Gastos del art. 19 y reducción del art. 20, medida sobre bruto − SS ANTES de restar los
+  // 2.000 € de la letra f) (hallazgo 1687 de estimador-sueldo-neto, mismo defecto: hasta el
+  // 25/09/2026 se medía después).
+  const baseImponible = calcularRendimientoNetoTrabajo({
+    integros: brutoAnual,
+    gastosAaE: totalSS,
+  }).rendimientoNetoReducido;
 
   // Minimo personal. NO reduce la base (art. 63.1.2 LIRPF): la base liquidable general lo
   // lleva dentro y se grava a tipo cero restando de la cuota la escala aplicada a el.

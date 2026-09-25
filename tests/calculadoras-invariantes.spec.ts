@@ -1423,18 +1423,21 @@ test.describe('Golden — calcularIRPF (Capa 1 · tarifa progresiva 2025)', () =
     expect(res.cuotaDiferencial).toBeCloseTo(4688, 2);
   });
 
-  test('GOLDEN-AL: 17.000 € trabajo → PRIMER tramo decreciente de la reducción → cuota 457,33 €', () => {
-    // RECALCULADO 09/09/2026. La reducción del art. 20 tiene DOS tramos decrecientes, no uno:
-    //   rntBruto = 15.000, que cae en el primero (14.852 → 17.673,52), con pendiente 1,75:
-    //   reducción = 7.302 − 1,75 × (15.000 − 14.852) = 7.302 − 259 = 7.043,00
-    //   rtn = 15.000 − 7.043 = 7.957 → base 7.957, mínimo 5.550, ambos en el tramo del 19 %
-    //   cuota = (7.957 − 5.550) × 19 % = 457,33 €
+  test('GOLDEN-AL: 17.000 € trabajo → PRIMER tramo decreciente de la reducción → cuota 1.122,33 €', () => {
+    // RECALCULADO 25/09/2026 (hallazgo 1687). La reducción del art. 20 se mide sobre el
+    // íntegro menos los gastos de las letras a) a e) del art. 19.2 —aquí 17.000, que ya llega
+    // sin la SS—, NO sobre lo que queda tras los 2.000 € de la letra f). Hasta hoy se medía
+    // sobre 15.000 y daba 7.043 €: 3.500 € de reducción de más.
+    //   reducción = 7.302 − 1,75 × (17.000 − 14.852) = 7.302 − 3.759 = 3.543,00 (primer tramo)
+    //   rendimiento neto = 17.000 − 2.000 = 15.000 → reducido = 15.000 − 3.543 = 11.457
+    //   base 11.457 y mínimo 5.550, ambos en el tramo del 19 %
+    //   cuota = (11.457 − 5.550) × 19 % = 1.122,33 €
     const res = calcularIRPF({ rendimientosTrabajo: 17000 });
-    expect(res.reduccionRNT).toBeCloseTo(7043, 2);
-    expect(res.rendimientosTrabajoNetos).toBeCloseTo(7957, 2);
-    expect(res.baseLiquidableGeneral).toBeCloseTo(7957, 2);
-    expect(res.cuotaIntegraGeneral).toBeCloseTo(457.33, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(457.33, 2);
+    expect(res.reduccionRNT).toBeCloseTo(3543, 2);
+    expect(res.rendimientosTrabajoNetos).toBeCloseTo(11457, 2);
+    expect(res.baseLiquidableGeneral).toBeCloseTo(11457, 2);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(1122.33, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(1122.33, 2);
   });
 
 });
@@ -2035,12 +2038,16 @@ test.describe('DA 61.ª — deducción por obtención de rendimientos del trabaj
     expect(limitarDeduccionRendimientosTrabajo(340, 1000, 0.25)).toBe(250);
     expect(limitarDeduccionRendimientosTrabajo(340, 0)).toBe(0);
   });
-  test('calcularSueldoNeto (API y MCP) aplica la de 2026: 19.000 € → IRPF 647,35 €', () => {
-    // SS 1.235,00 · RNT 15.765,00 · reducción art. 20 5.704,25 · base 10.060,75
-    // cuota (10.060,75 − 5.550) × 19 % = 857,04 · deducción 590,89 − 0,2 × 1.906 = 209,69
+  test('calcularSueldoNeto (API y MCP) aplica la de 2026: 19.000 € → IRPF 1.354,50 €', () => {
+    // SS 1.235,00 · la reducción del art. 20 se mide sobre 19.000 − 1.235 = 17.765 (hallazgo
+    // 1687; hasta el 25/09/2026 sobre 15.765 y daba 5.704,25): segundo tramo, 2.364,34 − 1,14 ×
+    // 91,48 = 2.260,05 · rendimiento neto 15.765 · base 13.504,95
+    // cuota escala(13.504,95) 2.618,69 − 1.054,50 = 1.564,19 · deducción 590,89 − 0,2 × 1.906 = 209,69
+    // IRPF = 1.564,19 − 209,69 = 1.354,50
     const r = calcularSueldoNeto({ brutoAnual: 19000, situacion: 'soltero', pagas: 14 });
     expect(r.cuotaSSAnual).toBeCloseTo(1235, 2);
-    expect(r.cuotaIRPF).toBeCloseTo(647.35, 2);
+    expect(r.reduccionRNT).toBeCloseTo(2260.05, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(1354.5, 2);
   });
 });
 
@@ -2078,14 +2085,18 @@ test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
     expect(r.netoMensual).toBeCloseTo(1371.21, 2);
   });
 
-  test('GOLDEN-BL: casado con ingresos, bruto 35.000 €, 2 hijos (1 menor de 3), 12 pagas → IRPF 4.777,50 €, neto mensual 2.328,96 €', () => {
-    // ⚠️ RECALCULADO EL 09/09/2026 por las mismas dos correcciones que GOLDEN-BK.
-    // Mínimo personal+familiar = 5.550 + 2.400 (hijo 1º) + 2.700 (hijo 2º) + 2.800 (hijo <3) = 13.450 €.
+  test('GOLDEN-BL: casado con ingresos, bruto 35.000 €, 2 hijos (1 menor de 3), 12 pagas → IRPF 5.578,00 €, neto mensual 2.262,25 €', () => {
+    // ⚠️ RECALCULADO EL 09/09/2026 por las mismas dos correcciones que GOLDEN-BK, y otra vez el
+    // 25/09/2026: con los dos cónyuges con ingresos, cada uno aplica la MITAD del mínimo por
+    // descendientes (art. 61.1.ª LIRPF; hallazgo 1688 de estimador-sueldo-neto). Hasta hoy
+    // entraba entero (13.450 €) y la cuota salía 800,50 € más baja.
+    // Mínimo = 5.550 + (2.400 + 2.700 + 2.800) / 2 = 5.550 + 3.950 = 9.500 €.
     // A mano: base imponible = 35.000 − 2.275,00 (SS) − 2.000 = 30.725,00 → reducción art. 20 = 0
-    //   cuota = escala(30.725) − escala(13.450)
-    //         = (12.450×19 % + 7.750×24 % + 10.525×30 %) − (12.450×19 % + 1.000×24 %)
-    //         = 7.383,00 − 2.605,50 = 4.777,50 €
-    //   neto anual = 35.000 − 2.275 − 4.777,50 = 27.947,50 → /12 = 2.328,96 €/mes
+    //   (medida sobre 35.000 − 2.275 = 32.725 ≥ 19.747,5)
+    //   cuota = escala(30.725) − escala(9.500)
+    //         = (12.450×19 % + 7.750×24 % + 10.525×30 %) − 9.500×19 %
+    //         = 7.383,00 − 1.805,00 = 5.578,00 €
+    //   neto anual = 35.000 − 2.275 − 5.578 = 27.147,00 → /12 = 2.262,25 €/mes · tipo 15,94 %
     const r = calcularSueldoNeto({
       brutoAnual: 35000,
       situacion: 'casado_con_ingresos',
@@ -2096,12 +2107,12 @@ test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
     expect(r.cuotaSSAnual).toBeCloseTo(2275.00, 2);
     expect(r.baseImponible).toBeCloseTo(30725.00, 2);
     expect(r.reduccionRNT).toBeCloseTo(0, 2);
-    expect(r.minimoPersonalFamiliar).toBeCloseTo(13450, 2);
+    expect(r.minimoPersonalFamiliar).toBeCloseTo(9500, 2);
     expect(r.baseLiquidable).toBeCloseTo(30725.00, 2);
-    expect(r.cuotaIRPF).toBeCloseTo(4777.5, 2);
-    expect(r.tipoRetencion).toBeCloseTo(13.65, 2);
-    expect(r.netoAnual).toBeCloseTo(27947.5, 2);
-    expect(r.netoMensual).toBeCloseTo(2328.96, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(5578, 2);
+    expect(r.tipoRetencion).toBeCloseTo(15.94, 2);
+    expect(r.netoAnual).toBeCloseTo(27147, 2);
+    expect(r.netoMensual).toBeCloseTo(2262.25, 2);
   });
 
 });
@@ -3754,14 +3765,23 @@ test.describe('Motores 09/09 — segundo pagador: dos constantes copiadas y enve
     //   15.000 € brutos → 767,47 € cobrados frente a 28,12 € reales   (+739 €)
     //   17.000 € brutos → 1.795,50 € frente a 457,33 €                (+1.338 €)
     //   20.000 € brutos → 2.365,50 € frente a 1.986,99 €              (+378 €)
-    // Ahora la reducción sale de `calcularReduccionRendimientosTrabajo` sobre el RNT.
-    // Valores tras las DOS correcciones (reducción del art. 20 y mínimo en cuota). A mano,
-    // 20.000 € brutos: rnt 18.000 → reducción = 2.364,34 − 1,14×(18.000 − 17.673,52) = 1.992,15
-    //   base 16.007,85 → escala(16.007,85) − escala(5.550) = 3.219,38 − 1.054,50 = 2.164,88
+    // Ahora la reducción sale de `calcularRendimientoNetoTrabajo`.
+    //
+    // ⚠️ RECALCULADO EL 25/09/2026 (hallazgo 1687). La reparación del 09/09 midió la
+    // reducción sobre brutos − 2.000, y el art. 20 manda medirla sobre el íntegro menos los
+    // gastos de las letras a) a e): los 2.000 € de la f) van DESPUÉS. Este motor no modela la
+    // SS, así que se mide sobre los brutos. A mano:
+    //   15.000: reducción 7.302 − 1,75 × 148 = 7.043 · base 13.000 − 7.043 = 5.957
+    //           → (5.957 − 5.550) × 19 % = 77,33
+    //   17.000: reducción 7.302 − 1,75 × 2.148 = 3.543 · base 15.000 − 3.543 = 11.457
+    //           → (11.457 − 5.550) × 19 % = 1.122,33
+    //   20.000: 20.000 ≥ 19.747,5 → reducción 0 · base 18.000
+    //           → escala(18.000) 3.697,50 − 1.054,50 = 2.643,00
+    // Siguen muy por debajo de lo que cobraba el motor antes del 09/09 (767,47 · 1.795,50).
     const casos: Array<[number, number]> = [
-      [15000, 28.12],
-      [17000, 457.33],
-      [20000, 2164.88],
+      [15000, 77.33],
+      [17000, 1122.33],
+      [20000, 2643],
     ];
     for (const [brutos, esperado] of casos) {
       const res = calcularIRPFSegundoPagador({

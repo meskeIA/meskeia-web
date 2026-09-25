@@ -10,9 +10,8 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   cuotaEscalaGeneral,
   calcularCuotaIntegraGeneral,
 } from '@/data/fiscal/irpf';
@@ -36,10 +35,6 @@ function calcularCuota(base: number, tramos: { hasta: number; tipo: number }[]):
     if (baseRestante <= 0) break;
   }
   return cuota;
-}
-
-function calcularReduccionRRT(rnt: number): number {
-  return calcularReduccionRendimientosTrabajo(rnt);
 }
 
 function getMinimoPersonal(edad: number): number {
@@ -123,10 +118,11 @@ function calcularIRPF(fuentes: Fuentes): ResultadoIRPF | null {
 
   // ── Base general: rendimientos trabajo ──────────────────────────────────────
   const totalTrabajo = pension + retiroPP;
-  const gastosDeducibles = totalTrabajo > 0 ? GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral : 0;
-  const rndNetoTrabajo = Math.max(0, totalTrabajo - gastosDeducibles);
-  const reduccionRRT = totalTrabajo > 0 ? calcularReduccionRRT(rndNetoTrabajo) : 0;
-  const rndNetoCuadrado = Math.max(0, rndNetoTrabajo - reduccionRRT);
+  // La reducción del art. 20 se mide ANTES de restar los 2.000 € de la letra f) del art. 19.2
+  // (hallazgo 1687 de estimador-sueldo-neto, mismo defecto: hasta el 25/09/2026 se medía
+  // después).
+  const rendimientoTrabajo = calcularRendimientoNetoTrabajo({ integros: totalTrabajo, gastosAaE: 0 });
+  const rndNetoCuadrado = rendimientoTrabajo.rendimientoNetoReducido;
 
   // ── Alquiler: reducción 50% arrendamiento inmobiliario (rendimiento capital inmobiliario)
   // Nota: la reducción del 60% solo aplica a vivienda habitual arrendada; para orientación usamos 50%
@@ -194,8 +190,8 @@ function calcularIRPF(fuentes: Fuentes): ResultadoIRPF | null {
     pensionAnual: pension,
     retiroPP,
     totalTrabajo,
-    gastosDeducibles,
-    reduccionRRT,
+    gastosDeducibles: rendimientoTrabajo.otrosGastos,
+    reduccionRRT: rendimientoTrabajo.reduccion,
     rndNetoCuadrado,
     capitalMobiliario,
     alquilerNeto: alquilerNetoBruto,

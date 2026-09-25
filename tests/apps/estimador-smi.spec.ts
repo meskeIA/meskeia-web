@@ -54,18 +54,23 @@ test('el neto del SMI 2026 sale de la cadena completa, mínimo incluido', async 
   // Bruto anual = 17.094,00 €
   // Base de cotización mensual = 17.094 / 12 = 1.424,50 €, justo por encima de la mínima
   //   (1.424,40 €), así que no se acota → SS anual = 1.424,50 × 6,50 % × 12 = 1.111,11 €
-  // RNT = 17.094 − 1.111,11 − 2.000 = 13.982,89 € → reducción art. 20 = 7.302,00 € (RNT ≤ 14.852)
-  // Base liquidable general = 13.982,89 − 7.302 = 6.680,89 €, CON el mínimo de 5.550 € dentro.
-  //   escala(6.680,89) = 6.680,89 × 19 % = 1.269,3691 €
+  // Reducción art. 20, medida sobre 17.094 − 1.111,11 = 15.982,89 € (art. 20: SIN restar antes
+  //   los 2.000 € de la letra f); hallazgo 1687) → primer tramo decreciente:
+  //   7.302 − 1,75 × (15.982,89 − 14.852) = 7.302 − 1.979,06 = 5.322,94 €
+  // Rendimiento neto = 15.982,89 − 2.000 = 13.982,89 €
+  // Base liquidable general = 13.982,89 − 5.322,94 = 8.659,95 €, CON el mínimo de 5.550 € dentro.
+  //   escala(8.659,95) = 8.659,95 × 19 % = 1.645,39 €
   //   escala(5.550)    = 1.054,50 €
-  //   cuota íntegra    = 214,8691 €      ← los dos métodos coinciden: ambos en el primer tramo
-  // Deducción DA 61.ª 2026: íntegros 17.094 ≤ 17.094 → 590,89 €, topada en la cuota → 214,87 €
-  //   → IRPF = 0,00 €. La fila enseña lo que de verdad se deduce, no los 590,89 €.
+  //   cuota íntegra    = 590,89 €       ← los dos métodos coinciden: ambos en el primer tramo
+  // Deducción DA 61.ª 2026: íntegros 17.094 ≤ 17.094 → 590,89 €: es EXACTAMENTE la cuota, que
+  //   es para lo que el legislador fijó esa cifra (que quien cobra el SMI no tribute).
+  //   → IRPF = 0,00 €. Hasta el 25/09/2026 la reducción se medía sobre 13.982,89 €, la cuota
+  //   salía 214,87 € y la deducción se topaba ahí: la contraprueba del hallazgo 1687.
   // Neto anual = 17.094 − 1.111,11 − 0 = 15.982,89 € → 1.141,64 €/mes en 14 pagas
   expect(await fila(page, 'Salario bruto anual')).toBe('17.094,00 €');
   expect(await fila(page, 'Seguridad Social (trabajador)')).toBe('-1111,11 €');
   expect(await fila(page, 'IRPF')).toBe('-0,00 €');
-  expect(await fila(page, 'Deducción por rendimientos del trabajo (ya restada del IRPF)')).toBe('+214,87 €');
+  expect(await fila(page, 'Deducción por rendimientos del trabajo (ya restada del IRPF)')).toBe('+590,89 €');
 
   const neto = page.locator('css=div:has(> span > strong:text-is("Salario neto anual"))').first();
   expect(limpiar(await neto.locator('span').nth(1).innerText())).toBe('15.982,89 €');

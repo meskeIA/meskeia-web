@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
 } from '@/components';
 import { formatNumber, formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025 } from '@/data/fiscal';
 import { calcularBrutoANeto, calcularNetoABruto, tipoMarginal, TIPO_SS_TRABAJADOR, type SituacionFamiliar } from './motor';
 
 // Tipos de cálculo
@@ -49,6 +49,18 @@ const MARGINAL_DIRECTIVO = tipoMarginal(DIRECTIVO.baseLiquidable);
 /** Perfil «Trabajadora a tiempo parcial»: 14.000 €, un hijo, declaración individual. */
 const BRUTO_PARCIAL = 14000;
 const PARCIAL = calcularBrutoANeto(BRUTO_PARCIAL, 'soltero', 1, 0, 12);
+
+/**
+ * «Pedir una subida sin tener en cuenta el salto de tramo» (hallazgo 1692): decía «~630 €
+ * netos» por 1.000 € brutos en el tramo del 37 %, olvidando la SS que también paga la subida.
+ * Sale ahora del motor: el mismo sueldo con y sin la subida.
+ */
+const BRUTO_SUBIDA = 45000;
+const SUBIDA_BRUTA = 1000;
+const SUBIDA_NETA =
+  calcularBrutoANeto(BRUTO_SUBIDA + SUBIDA_BRUTA, 'soltero', 0, 0, 12).netoAnual -
+  calcularBrutoANeto(BRUTO_SUBIDA, 'soltero', 0, 0, 12).netoAnual;
+const MARGINAL_SUBIDA = tipoMarginal(calcularBrutoANeto(BRUTO_SUBIDA, 'soltero', 0, 0, 12).baseLiquidable);
 
 /** Neto del SMI en 14 pagas, soltero/a sin hijos (FAQ avanzadas). */
 const SMI_NETO = calcularBrutoANeto(SMI_2026.anual, 'soltero', 0, 0, 14);
@@ -317,7 +329,7 @@ export default function EstimadorSueldoNetoPage() {
                 <div className={styles.desgloseSection}>
                   <h4>IRPF</h4>
                   <div className={styles.desgloseRow}>
-                    <span>Retención IRPF anual</span>
+                    <span>IRPF anual (cuota estimada)</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.irpfAnual)}</span>
                   </div>
                   {resultado.deduccionRentasBajas > 0 && (
@@ -327,9 +339,18 @@ export default function EstimadorSueldoNetoPage() {
                     </div>
                   )}
                   <div className={styles.desgloseRow}>
-                    <span>Tipo de retención efectivo</span>
+                    <span>Tipo efectivo de IRPF</span>
                     <span className={styles.desgloseValue}>{formatNumber(resultado.tipoRetencion, 2)}%</span>
                   </div>
+                  {/* Hallazgo 1689: la cifra es la cuota anual de la LIRPF (con la reducción por
+                      tributación conjunta y la deducción de la DA 61.ª), no la retención del
+                      reglamento, que no aplica ninguna de las dos. Se rotula por lo que es. */}
+                  <p className={styles.desgloseNota}>
+                    Es el IRPF que te corresponde en el año, el que saldría en la declaración de la
+                    renta. La retención de tu nómina la calcula la empresa con el procedimiento del
+                    Reglamento del IRPF y puede ser algo distinta: la diferencia se regulariza al
+                    presentar la declaración.
+                  </p>
                 </div>
 
                 <div className={styles.desgloseSection}>
@@ -631,7 +652,7 @@ export default function EstimadorSueldoNetoPage() {
                   <td>{formatCurrency(TABLA.netoAnual / 12)}</td>
                 </tr>
                 <tr>
-                  <td>Retención mensual IRPF</td>
+                  <td>IRPF por paga (cuota anual repartida)</td>
                   <td>{formatCurrency(TABLA.irpfAnual / 12)}</td>
                   <td>{formatCurrency(TABLA.irpfAnual / 14)} (mensualidad menor)</td>
                   <td>{formatCurrency(TABLA.irpfAnual / 12)}</td>
@@ -684,7 +705,7 @@ export default function EstimadorSueldoNetoPage() {
                   <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}%): <strong>{formatCurrency(GRADUADO.ssAnual)}/año</strong></li>
                   <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(GRADUADO.baseImponible)}</strong></li>
                   <li>IRPF anual (mínimo personal {formatCurrency(GRADUADO.minimos)}, a tipo cero): <strong>{formatCurrency(GRADUADO.irpfAnual)}</strong></li>
-                  <li>Retención efectiva: <strong>{formatNumber(GRADUADO.tipoRetencion, 2)}%</strong></li>
+                  <li>Tipo efectivo de IRPF: <strong>{formatNumber(GRADUADO.tipoRetencion, 2)}%</strong></li>
                   <li>Neto anual: <strong>{formatCurrency(GRADUADO.netoAnual)}</strong></li>
                   <li>Neto mensual (12 pagas): <strong>{formatCurrency(GRADUADO.netoMensual)}</strong></li>
                 </ul>
@@ -704,9 +725,9 @@ export default function EstimadorSueldoNetoPage() {
                 <ul>
                   <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}%): <strong>{formatCurrency(FAMILIA.ssAnual)}/año</strong></li>
                   <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(FAMILIA.baseImponible)}</strong></li>
-                  <li>Mínimo personal + hijo 1 ({formatCurrency(MINIMOS_IRPF_2025.personal)} + {formatCurrency(MINIMOS_IRPF_2025.hijo_1)}): <strong>{formatCurrency(FAMILIA.minimos)}</strong></li>
+                  <li>Mínimo personal + la mitad del de hijo 1 ({formatCurrency(MINIMOS_IRPF_2025.personal)} + {formatCurrency(MINIMOS_IRPF_2025.hijo_1 / 2)}, porque con dos ingresos cada progenitor aplica la mitad): <strong>{formatCurrency(FAMILIA.minimos)}</strong></li>
                   <li>IRPF anual: <strong>{formatCurrency(FAMILIA.irpfAnual)}</strong></li>
-                  <li>Retención efectiva: <strong>{formatNumber(FAMILIA.tipoRetencion, 2)}%</strong></li>
+                  <li>Tipo efectivo de IRPF: <strong>{formatNumber(FAMILIA.tipoRetencion, 2)}%</strong></li>
                   <li>Neto anual: <strong>{formatCurrency(FAMILIA.netoAnual)}</strong></li>
                   <li>
                     Impacto del mínimo por el hijo: {formatCurrency(AHORRO_HIJO)}/año menos de IRPF que la
@@ -757,7 +778,7 @@ export default function EstimadorSueldoNetoPage() {
                       <> (la base no supera el mínimo personal y familiar, que tributa a tipo cero)</>
                     )}
                   </li>
-                  <li>Retención efectiva: <strong>{formatNumber(PARCIAL.tipoRetencion, 2)}%</strong></li>
+                  <li>Tipo efectivo de IRPF: <strong>{formatNumber(PARCIAL.tipoRetencion, 2)}%</strong></li>
                   <li>Neto anual: <strong>{formatCurrency(PARCIAL.netoAnual)}</strong></li>
                 </ul>
               </div>
@@ -866,8 +887,9 @@ export default function EstimadorSueldoNetoPage() {
                   Conceptos como <strong>seguro médico privado (hasta 500 €/año por persona asegurada, exento de IRPF)</strong>,
                   guardería (exenta sin límite para menores de 3 años), tarjeta transporte (hasta 1.500 €/año) o
                   cheques restaurante (hasta 11 €/día) pueden reducir significativamente tu base imponible sin reducir
-                  tu retribución real. Un seguro médico familiar de 1.500 €/año puede suponer un ahorro de
-                  ~380 € en IRPF para un contribuyente en el tramo del 30%.
+                  tu retribución real. Un seguro médico de 1.500 €/año que cubra a tres personas queda exento
+                  entero (3 × 500 €) y, con un tipo marginal del 30 %, supone unos 450 € menos de IRPF
+                  (1.500 × 30 %).
                 </p>
               </div>
             </div>
@@ -878,8 +900,10 @@ export default function EstimadorSueldoNetoPage() {
                 <p>
                   Algunos empleadores aportan al plan de pensiones de empleo una cantidad equivalente a la que
                   aporta el trabajador (matching). Si tu empresa hace esto, es dinero gratis: contribuye hasta el
-                  límite del matching. El límite conjunto empresa + trabajador es de <strong>10.000 €/año</strong>
-                  (o 8.500 € si solo aporta la empresa). Estas aportaciones reducen tu base imponible del IRPF.
+                  límite del matching. El límite conjunto empresa + trabajador es de <strong>{formatCurrency(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)}/año</strong>:
+                  {' '}{formatCurrency(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} más {formatCurrency(LIMITES_PLAN_PENSIONES_2025.limiteEmpresaAnual)} que
+                  exigen contribución de la empresa (art. 52.1 LIRPF), así que la empresa sola también puede llegar
+                  a los {formatCurrency(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)}. Estas aportaciones reducen tu base imponible del IRPF.
                 </p>
               </div>
             </div>
@@ -925,9 +949,11 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🏥</span>
               <p>
-                <strong>Solicita retribución flexible:</strong> hasta 1.500 € en seguro médico están
-                exentos de IRPF por persona asegurada (tú + cónyuge + hijos). Para una familia de
-                4 personas, el límite exento es de 6.000 €/año — un ahorro notable en el tramo del 30%.
+                <strong>Solicita retribución flexible:</strong> hasta 500 € al año en seguro médico están
+                exentos de IRPF por persona asegurada (tú, tu cónyuge y tus hijos), y 1.500 € por cada
+                persona con discapacidad (art. 42.3.c LIRPF). Para una familia de 4 personas sin
+                discapacidad, el límite exento es de 2.000 €/año; lo que lo supere tributa como
+                retribución en especie.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -993,7 +1019,9 @@ export default function EstimadorSueldoNetoPage() {
               </li>
               <li>
                 <strong>Pedir una subida de sueldo sin tener en cuenta el salto de tramo IRPF.</strong>
-                Un aumento de 1.000 € brutos en el tramo del 37% solo se traduce en ~630 € netos más.
+                Con {formatCurrency(BRUTO_SUBIDA)} brutos (tipo marginal del {formatNumber(MARGINAL_SUBIDA, 0)} %), un aumento de
+                {' '}{formatCurrency(SUBIDA_BRUTA)} brutos se traduce en {formatCurrency(SUBIDA_NETA)} netos más, porque la subida
+                paga IRPF y también Seguridad Social.
                 Valora si es más interesante negociar retribución en especie exenta.
               </li>
               <li>

@@ -174,18 +174,23 @@ test('CASO 4 (normal) · 30.000 € brutos, soltero/a, sin hijos → cuota ínte
 
 test('CASO 5 (límite bajo) · 17.500 € y 500 € retenidos: la deducción va sobre los ÍNTEGROS (155,20 €, no 340 €)', async ({ page }) => {
   // SS 2025: 1.458,33 €/mes × 6,47 % × 12 = 1.132,25 €
-  // RNT = 17.500 − 1.132,25 − 2.000 = 14.367,75 € ≤ 14.852 → reducción art. 20 = 7.302 €
-  // Base = 7.065,75 € → cuota íntegra = 1.515,75 × 19 % = 287,99 €
+  // Reducción art. 20, medida sobre 17.500 − 1.132,25 = 16.367,75 € (art. 20: SIN restar antes
+  //   los 2.000 € de la letra f); hallazgo 1687) → primer tramo decreciente:
+  //   7.302 − 1,75 × (16.367,75 − 14.852) = 7.302 − 2.652,56 = 4.649,44 €
+  // Rendimiento neto = 16.367,75 − 2.000 = 14.367,75 € → base = 14.367,75 − 4.649,44 = 9.718,31 €
+  // Cuota íntegra = (9.718,31 − 5.550) × 19 % = 791,98 €
   // Deducción DA 61.ª sobre los ÍNTEGROS: 340 − 0,2 × (17.500 − 16.576) = 155,20 € — la misma
   //   cifra que da la AEAT para 17.500 € en el Ejemplo 3 del Manual Renta 2025. Hasta el
   //   24/09/2026 la app la calculaba sobre el neto (14.367,75 € ≤ 14.852) y daba 340 €.
-  // Cuota tras deducción = 287,99 − 155,20 = 132,79 € → A DEVOLVER 500 − 132,79 = 367,21 €
+  // Cuota tras deducción = 791,98 − 155,20 = 636,78 € → A PAGAR 636,78 − 500 = 136,78 €
+  // (Hasta el 25/09/2026, con la reducción medida sobre 14.367,75 €: cuota 287,99 € y
+  //  «A DEVOLVER 367,21 €».)
   await estimar(page, { bruto: '17500', retenciones: '500' });
 
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(287.99, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(791.98, 1);
   expect(await tarjeta(page, 'Deducción rentas bajas')).toBe('-155,20€');
-  await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A DEVOLVER');
-  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(367.21, 1);
+  await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
+  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(136.78, 1);
 });
 
 test('CASO 5 bis · DA 61.ª: el tope es la cuota GENERAL; la del ahorro no la amplía', async ({ page }) => {
@@ -305,14 +310,17 @@ test('CASO 10 ter · art. 56.2: el mínimo que no cabe en la base general pasa a
 });
 
 test('CASO 11 · hallazgo 1311: sin nómina se conservan los 2.000 € del art. 19.2.f y la reducción del art. 20', async ({ page }) => {
-  // 18.000 € de pensión: sin cotización. RNT = 18.000 − 2.000 = 16.000 €
-  // Reducción art. 20 = 7.302 − 1,75 × (16.000 − 14.852) = 5.293,00 € → base 10.707,00 €
-  // Cuota íntegra = (10.707 − 5.550) × 19 % = 979,83 €. Sin deducción por rendimientos del
-  // trabajo: la AEAT la limita a los «derivados de la prestación efectiva de servicios».
+  // 18.000 € de pensión: sin cotización. La reducción del art. 20 se mide sobre los 18.000 €
+  // íntegros (hallazgo 1687: los 2.000 € de la letra f) se restan después) → segundo tramo:
+  //   2.364,34 − 1,14 × (18.000 − 17.673,52) = 2.364,34 − 372,19 = 1.992,15 €
+  // Rendimiento neto = 18.000 − 2.000 = 16.000 € → base = 16.000 − 1.992,15 = 14.007,85 €
+  // Cuota íntegra = escala(14.007,85) 2.739,38 − 1.054,50 = 1.684,88 €. Sin deducción por
+  // rendimientos del trabajo: la AEAT la limita a los «derivados de la prestación efectiva de
+  // servicios». (Hasta el 25/09/2026: reducción 5.293 €, base 10.707 € y cuota 979,83 €.)
   await estimar(page, { bruto: '18000', sinNomina: true });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('10.707,00€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('979,83€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('14.007,85€');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('1684,88€');
   await expect(page.getByRole('heading', { level: 3, name: 'Deducción rentas bajas' })).toHaveCount(0);
 });
 
@@ -363,12 +371,13 @@ test('CASO 14 · hallazgo 1314: los ejemplos educativos cuadran con la calculado
   expect(casada).toMatch(/8995,2[45] €/);
   expect(casada).not.toContain('28.150');
 
-  // Pensión 18.000 €: reducción 5.293 €, base 10.707 €, cuota 979,83 € (CASO 11);
-  // con el mínimo de ≥65 (6.700 €): (10.707 − 6.700) × 19 % = 761,33 €
+  // Pensión 18.000 €: reducción 1.992,15 €, base 14.007,85 €, cuota 1.684,88 € (CASO 11);
+  // con el mínimo de ≥65 (6.700 €): 2.739,38 − 6.700 × 19 % (1.273) = 1.466,38 €
   const pension = await texto('pension-18000');
-  expect(pension).toContain('5293,00 €');
-  expect(pension).toContain('979,83 €');
-  expect(pension).toContain('761,33 €');
+  expect(pension).toContain('1992,15 €');
+  expect(pension).toContain('1684,88 €');
+  expect(pension).toContain('1466,38 €');
+  expect(pension).not.toContain('5293,00 €');
 
   // Autónomo, 35.000 € netos: escala(35.000) = 4.225,50 + 14.800 × 30 % = 8.665,50 € · − 1.054,50 = 7.611,00 €
   const autonomo = await texto('autonomo-35000');

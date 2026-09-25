@@ -27,12 +27,10 @@
 import {
   MINIMOS_IRPF_2025,
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
-  REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   COTIZACIONES_SS_2025,
   BASES_SS_2025,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   calcularDeduccionRentasBajas,
   limitarDeduccionRendimientosTrabajo,
   calcularCuotaIntegraGeneral,
@@ -165,18 +163,20 @@ export function estimarIRPF(e: EntradaIRPF): ResultadoIRPF {
 
   // Rendimiento neto del trabajo (arts. 19 y 20)
   const ssAnual = e.conNomina ? cotizacionTrabajadorAnual(bruto) : 0;
-  const gastosDeducibles = bruto > 0
-    ? Math.min(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral, Math.max(0, bruto - ssAnual))
-    : 0;
-  const rendimientoNetoTrabajo = Math.max(0, bruto - ssAnual - gastosDeducibles);
+  // La reducción del art. 20 se mide sobre bruto − SS, ANTES de restar los 2.000 € de la
+  // letra f) del art. 19.2 (hallazgo 1687 de estimador-sueldo-neto, mismo defecto: hasta el
+  // 25/09/2026 se medía después). Y se pierde con más de 6.500 € de rentas distintas del trabajo.
+  const rendimiento = calcularRendimientoNetoTrabajo({
+    integros: bruto,
+    gastosAaE: ssAnual,
+    otrasRentas: capital,
+  });
+  const gastosDeducibles = rendimiento.otrosGastos;
+  const rendimientoNetoTrabajo = rendimiento.rendimientoNeto;
+  const reduccionPerdidaPorOtrasRentas = rendimiento.reduccionPerdidaPorOtrasRentas;
+  const reduccionTrabajo = rendimiento.reduccion;
 
-  // Art. 20.2: sin reducción si hay más de 6.500 € de rentas distintas de las del trabajo.
-  const reduccionPerdidaPorOtrasRentas = capital > REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtrasRentas;
-  const reduccionTrabajo = reduccionPerdidaPorOtrasRentas
-    ? 0
-    : Math.min(calcularReduccionRendimientosTrabajo(rendimientoNetoTrabajo), rendimientoNetoTrabajo);
-
-  const baseImponibleGeneral = Math.max(0, rendimientoNetoTrabajo - reduccionTrabajo);
+  const baseImponibleGeneral = rendimiento.rendimientoNetoReducido;
   const baseImponibleAhorro = capital;
 
   // Reducción por tributación conjunta: primero la base general, el remanente la del ahorro.

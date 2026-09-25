@@ -20,6 +20,7 @@ import {
   MINIMOS_IRPF_2025,
   FISCAL_IRPF_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  calcularRendimientoNetoTrabajo,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -181,20 +182,27 @@ export function calcularDevolucionIRPF(p: ParametrosDevolucionIRPF): ResultadoDe
 
   const r = (n: number) => Math.round(n * 100) / 100;
 
-  // ── Reducción por rendimientos del trabajo (art. 20 LIRPF)
-  const rdt = p.rendimientosTrabajoAnuales;
-  let reduccionTrabajo = 0;
-  if (rdt <= 14047.5) reduccionTrabajo = 7302;
-  else if (rdt <= 19747.5) reduccionTrabajo = 7302 - 1.75 * (rdt - 14047.5);
-  else reduccionTrabajo = 2364;
-
   const actEco = p.rendimientosActividadesEconomicas ?? 0;
   const capInmob = p.rendimientosCapitalInmobiliario ?? 0;
   const capMob = p.rendimientosCapitalMobiliario ?? 0;
   const ganPat = p.gananciasPatrimoniales ?? 0;
 
+  // ── Rendimiento neto reducido del trabajo (arts. 19 y 20 LIRPF)
+  // ⚠️ CORREGIDO EL 25/09/2026. Este motor llevaba aún su copia de la reducción del art. 20
+  // con la redacción vieja —umbral 14.047,5 € y un residuo PERMANENTE de 2.364 € para todo
+  // sueldo alto—, aunque data/fiscal/irpf.ts lo daba por migrado desde el 09/09/2026; y no
+  // restaba los 2.000 € de la letra f) del art. 19.2. Ahora lo hace la fuente única, con la
+  // condición de las otras rentas del art. 20 (más de 6.500 € → sin reducción).
+  // No modela la cotización a la SS: `rendimientosTrabajoAnuales` son los brutos.
+  const rdt = p.rendimientosTrabajoAnuales;
+  const rendimientoTrabajo = calcularRendimientoNetoTrabajo({
+    integros: rdt,
+    gastosAaE: 0,
+    otrasRentas: Math.max(0, actEco) + Math.max(0, capInmob) + Math.max(0, capMob) + Math.max(0, ganPat),
+  });
+
   // ── Bases imponibles
-  const baseImponibleGeneral = r(Math.max(0, rdt - reduccionTrabajo) + actEco + capInmob);
+  const baseImponibleGeneral = r(rendimientoTrabajo.rendimientoNetoReducido + actEco + capInmob);
   const baseImponibleAhorro = r(capMob + ganPat);
   const baseImponibleTotal = r(baseImponibleGeneral + baseImponibleAhorro);
 

@@ -38,9 +38,8 @@
 import {
   cuotaEscalaGeneral,
   MINIMOS_IRPF_2025,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
 } from '@/data/fiscal/irpf';
 
 export type RegimenDivorcio = 'gananciales' | 'separacion' | 'participacion';
@@ -109,9 +108,9 @@ const calcularCuotaIRPF = cuotaEscalaGeneral;
  * Aproximación de la app: NO descuenta cotizaciones SS ni mínimo personal.
  */
 function calcularBaseSimplificada(ingresosBrutos: number): number {
-  const rnt = Math.max(0, ingresosBrutos - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
-  return Math.max(0, rnt - reduccion);
+  // La reducción del art. 20 se mide ANTES de restar los 2.000 € de la letra f) del art. 19.2
+  // (hallazgo 1687 de estimador-sueldo-neto, mismo defecto: hasta el 25/09/2026 se medía después).
+  return calcularRendimientoNetoTrabajo({ integros: ingresosBrutos, gastosAaE: 0 }).rendimientoNetoReducido;
 }
 
 /** Suma del mínimo por descendientes (cumulativo por número de hijos). */

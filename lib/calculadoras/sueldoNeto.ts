@@ -13,9 +13,8 @@ import {
   MINIMOS_IRPF_2025,
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   FISCAL_IRPF_META,
   calcularDeduccionRentasBajas,
   limitarDeduccionRendimientosTrabajo,
@@ -71,24 +70,24 @@ const r = (n: number) => Math.round(n * 100) / 100;
 
 
 
-/** Calcula la reducción por rendimientos netos del trabajo */
-function calcularReduccionRNT(rnt: number): number {
-  return calcularReduccionRendimientosTrabajo(rnt);
-}
-
 /** Calcula el mínimo personal y familiar */
 function calcularMinimo(situacion: SituacionFamiliar, numHijos: number, hijosMenores3: number): number {
-  let minimo = MINIMOS_IRPF_2025.personal;
-  // Hijos
   const ordenHijos = [
     MINIMOS_IRPF_2025.hijo_1,
     MINIMOS_IRPF_2025.hijo_2,
     MINIMOS_IRPF_2025.hijo_3,
   ];
+  let descendientes = 0;
   for (let i = 0; i < numHijos; i++) {
-    minimo += i < 3 ? ordenHijos[i] : MINIMOS_IRPF_2025.hijo_4_mas;
+    descendientes += i < 3 ? ordenHijos[i] : MINIMOS_IRPF_2025.hijo_4_mas;
   }
-  minimo += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
+  descendientes += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
+  // Con los dos cónyuges con ingresos cada uno tributa por separado y los dos tienen derecho
+  // por el hijo común: el mínimo por descendientes se prorratea por mitad (art. 61.1.ª LIRPF;
+  // art. 84.2.º RIRPF para la retención). Hasta el 25/09/2026 entraba entero (hallazgo 1688
+  // de estimador-sueldo-neto, mismo defecto).
+  const parte = situacion === 'casado_con_ingresos' ? 0.5 : 1;
+  const minimo = MINIMOS_IRPF_2025.personal + descendientes * parte;
   // Cónyuge sin ingresos (deducción art. 84): no aplica aquí directamente,
   // pero el tipo de retención puede variar. Se simplifica con el mínimo personal.
   return minimo;
@@ -120,15 +119,17 @@ export function calcularSueldoNeto(p: ParametrosSueldoNeto): ResultadoSueldoNeto
   const cuotaSSMensual = baseSS * tipoSS;
   const cuotaSSAnual = r(cuotaSSMensual * 12);
 
-  // Base imponible
-  const baseImponible = Math.max(0, p.brutoAnual - cuotaSSAnual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-
-  // Reducción RNT
-  const reduccionRNT = r(calcularReduccionRNT(baseImponible));
+  // Arts. 19 y 20 LIRPF. La reducción del art. 20 se mide sobre bruto − SS, sin restar antes
+  // los 2.000 € de la letra f): hasta el 25/09/2026 se restaban (hallazgo 1687 de
+  // estimador-sueldo-neto, mismo defecto). `baseImponible` sigue siendo, como en la respuesta
+  // que ya publicaba la API, el rendimiento neto ANTES de la reducción.
+  const rendimiento = calcularRendimientoNetoTrabajo({ integros: p.brutoAnual, gastosAaE: cuotaSSAnual });
+  const baseImponible = rendimiento.rendimientoNeto;
+  const reduccionRNT = r(rendimiento.reduccion);
 
   // Base liquidable general
   const minimoPersonalFamiliar = calcularMinimo(situacion, numHijos, hijosMenores3);
-  const baseLiquidableGeneral = Math.max(0, baseImponible - reduccionRNT);
+  const baseLiquidableGeneral = Math.max(0, rendimiento.rendimientoNetoReducido);
   const baseLiquidable = baseLiquidableGeneral;
 
   // Cuota integra: art. 63.1.2 LIRPF. Reparado a mano el 09/09/2026; desde el 12/09/2026 la

@@ -27,9 +27,8 @@ import {
   MINIMOS_IRPF_2025,
   calcularDeduccionRentasBajas,
   limitarDeduccionRendimientosTrabajo,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
 } from '@/data/fiscal';
 
 // ──────────────────────────────────────────
@@ -57,12 +56,14 @@ function calcularSSMensual(brutoMensual: number): number {
 function calcularIRPFAnual(brutoAnual: number): { irpf: number; deduccion: number } {
   const ssMensual = calcularSSMensual(brutoAnual / 12);
   const ssAnual = ssMensual * 12;
-  const rnt = Math.max(0, brutoAnual - ssAnual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-
-  // Reducción por rendimientos del trabajo (art. 20)
-  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
-
-  const baseImponible = Math.max(0, rnt - reduccion);
+  // Reducción por rendimientos del trabajo (art. 20), medida sobre bruto − SS ANTES de restar los
+  // 2.000 € de la letra f) del art. 19.2. Hasta el 25/09/2026 se medía después (hallazgo 1687 de
+  // estimador-sueldo-neto, mismo defecto), y en esta app era donde más se notaba: con el SMI la
+  // cuota íntegra salía 214,87 € en vez de los 590,89 € que la DA 61.ª anula exactamente.
+  const baseImponible = calcularRendimientoNetoTrabajo({
+    integros: brutoAnual,
+    gastosAaE: ssAnual,
+  }).rendimientoNetoReducido;
 
   // Cuota integra: art. 63.1.2 LIRPF. El minimo personal NO reduce la base; se grava a tipo
   // cero aplicando la escala a la base completa y restando la escala aplicada al minimo.
@@ -71,7 +72,9 @@ function calcularIRPFAnual(brutoAnual: number): { irpf: number; deduccion: numbe
   // escala, que lo valora al tipo marginal y subestima la cuota. Con el SMI el efecto es
   // pequeno porque la reduccion del art. 20 deja la base casi a cero, pero el simulador
   // tambien acepta sueldos por encima del SMI, y ahi el error llegaba a 1.443 EUR/ano.
-  const cuota = calcularCuotaIntegraGeneral(baseImponible, MINIMOS_IRPF_2025.personal);
+  // En céntimos, como se liquida: con el SMI la cuota exacta es 590,8905 € y la DA 61.ª deduce
+  // 590,89 €, así que sin redondear quedaba un IRPF de 0,0005 € que movía el neto mensual.
+  const cuota = Math.round(calcularCuotaIntegraGeneral(baseImponible, MINIMOS_IRPF_2025.personal) * 100) / 100;
 
   // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
   // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.

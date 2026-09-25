@@ -247,7 +247,8 @@ export const GASTOS_DEDUCIBLES_TRABAJO_2025 = {
 
 /**
  * Reducción por obtención de rendimientos del trabajo (art. 20 LIRPF), ejercicio 2025.
- * Se aplica sobre el Rendimiento Neto del Trabajo (ingresos íntegros − gastos del art. 19).
+ * Se aplica sobre el rendimiento íntegro menos los gastos de las letras a) a e) del art. 19.2
+ * — SIN restar los 2.000 € de la letra f) (art. 20, último párrafo; hallazgo 1687).
  *
  * ⚠️ CORREGIDA EL 09/09/2026 contra el Manual práctico de Renta 2025 de la AEAT
  * («Fase 3ª: Determinación del rendimiento neto reducido»). Hasta esa fecha este módulo
@@ -269,9 +270,9 @@ export const GASTOS_DEDUCIBLES_TRABAJO_2025 = {
  * 19.747,5 el segundo da exactamente 0.
  *
  * ⚠️ La reducción exige además NO tener rentas distintas de las del trabajo superiores a
- * 6.500 € (excluidas las exentas). Esa condición no la modela este módulo —el importe se
- * publica en `limiteOtrasRentas` para que quien la necesite la compruebe antes de llamar a
- * `calcularReduccionRendimientosTrabajo`—. El 20/09/2026 dejó de estar solo en este
+ * 6.500 € (excluidas las exentas). La aplica `calcularRendimientoNetoTrabajo` con su
+ * parámetro `otrasRentas` desde el 25/09/2026; el importe vive en `limiteOtrasRentas`,
+ * que también leen los textos de las apps. El 20/09/2026 dejó de estar solo en este
  * comentario: `estimador-irpf-pensionista` lo necesitaba y, al no haber constante, había
  * tomado prestado el umbral homónimo de la deducción de la DA 61.ª. Son
  * DOS artículos distintos que hoy coinciden en 6.500 €: si uno se moviera y el otro no, el
@@ -293,24 +294,107 @@ export const REDUCCION_RENDIMIENTOS_TRABAJO_2025 = {
 };
 
 /**
- * Fuente ÚNICA de la reducción del art. 20. Devuelve la reducción que corresponde a un
- * rendimiento neto del trabajo.
+ * Escala de la reducción del art. 20 sobre el rendimiento que el propio artículo define.
  *
- * Existe para que la fórmula no se reescriba en cada motor y cada app: hasta el 09/09/2026
- * estaba copiada a mano en 14 sitios, y así fue como tres de ellos acabaron con tres
- * versiones distintas de la misma norma (`irpfSegundoPagador` con 5.565/0,
+ * ⚠️ NO SE EXPORTA desde el 25/09/2026 (hallazgo 1687 del Inspector). Recibía «un rendimiento
+ * neto del trabajo» y los 13 llamadores le pasaban el mismo: íntegro − SS − los 2.000 € de
+ * «otros gastos» de la letra f) del art. 19.2. Pero el art. 20, último párrafo, dice que «a
+ * estos efectos, el rendimiento neto del trabajo será el resultante de minorar el rendimiento
+ * íntegro en los gastos previstos en las letras a), b), c), d) y e) del artículo 19.2»: la f)
+ * NO se resta antes. Con la base 2.000 € más baja, en la zona decreciente (brutos de unos
+ * 15.900 a 23.300 €) la reducción salía hasta 3.500 € más alta: 20.000 € brutos daban 4.068 €
+ * de reducción en vez de 1.194,15 €, y un IRPF de 1.344,99 € en vez de 2.034,71 €.
+ * Contraprueba del legislador: la deducción de la DA 61.ª para 2026 (590,89 €) es EXACTAMENTE
+ * la cuota del SMI con la lectura correcta; con la de las apps salían 214,87 €.
+ *
+ * Se llama solo desde `calcularRendimientoNetoTrabajo`, que recibe los gastos por letras y
+ * no deja elegir el orden. Así el defecto no puede volver: no hay número suelto que pasarle.
+ *
+ * Historia anterior: hasta el 09/09/2026 la fórmula estaba copiada a mano en 14 sitios, con
+ * tres versiones distintas de la misma norma (`irpfSegundoPagador` con 5.565/0,
  * `devolucionIRPF` y `dividendoEmpresarial` con 7.302/14.047,5, y este módulo con la
- * redacción vieja). **No reimplementar: importar.**
+ * redacción vieja). **No reimplementar: importar `calcularRendimientoNetoTrabajo`.**
+ *
+ * Fuente: art. 20 Ley 35/2006, redacción del RDL 4/2024 (BOE-A-2006-20764, consultado el
+ * 25/09/2026).
  */
-export function calcularReduccionRendimientosTrabajo(rendimientoNetoTrabajo: number): number {
+function reduccionArt20(rendimientoPrevio: number): number {
   const r = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
-  if (!Number.isFinite(rendimientoNetoTrabajo) || rendimientoNetoTrabajo <= 0) return 0;
-  if (rendimientoNetoTrabajo <= r.limite1) return r.reduccion1;
-  if (rendimientoNetoTrabajo >= r.limite2) return 0;
-  const bruta = rendimientoNetoTrabajo <= r.limiteIntermedio
-    ? r.reduccion1 - r.factorTramo1 * (rendimientoNetoTrabajo - r.limite1)
-    : r.reduccionIntermedia - r.factorTramo2 * (rendimientoNetoTrabajo - r.limiteIntermedio);
+  if (!Number.isFinite(rendimientoPrevio) || rendimientoPrevio <= 0) return 0;
+  if (rendimientoPrevio <= r.limite1) return r.reduccion1;
+  if (rendimientoPrevio >= r.limite2) return 0;
+  const bruta = rendimientoPrevio <= r.limiteIntermedio
+    ? r.reduccion1 - r.factorTramo1 * (rendimientoPrevio - r.limite1)
+    : r.reduccionIntermedia - r.factorTramo2 * (rendimientoPrevio - r.limiteIntermedio);
   return Math.max(0, Math.round(bruta * 100) / 100);
+}
+
+/** Los importes del paso del íntegro a lo que entra en la base imponible general. */
+export interface RendimientoNetoTrabajo {
+  /**
+   * Íntegro − gastos de las letras a) a e) del art. 19.2 (cotizaciones a la SS, derechos
+   * pasivos, colegios de huérfanos, sindicatos y colegios profesionales, defensa jurídica).
+   * Es el rendimiento sobre el que el art. 20 manda calcular su reducción.
+   */
+  rendimientoPrevio: number;
+  /** «Otros gastos» de la letra f), con su tope: no pueden superar `rendimientoPrevio`. */
+  otrosGastos: number;
+  /** Rendimiento neto del trabajo del art. 19: `rendimientoPrevio − otrosGastos`. */
+  rendimientoNeto: number;
+  /**
+   * Reducción del art. 20 efectivamente aplicada: la que da la escala sobre
+   * `rendimientoPrevio`, sin pasar de `rendimientoNeto` (el saldo no puede ser negativo), y
+   * 0 si las rentas distintas del trabajo superan `limiteOtrasRentas`.
+   */
+  reduccion: number;
+  /** `rendimientoNeto − reduccion`: lo que el trabajo aporta a la base imponible general. */
+  rendimientoNetoReducido: number;
+  /** true si la reducción se pierde por tener más de `limiteOtrasRentas` de otras rentas. */
+  reduccionPerdidaPorOtrasRentas: boolean;
+}
+
+/**
+ * Fuente ÚNICA del paso íntegro → rendimiento neto reducido del trabajo (arts. 19 y 20 LIRPF).
+ *
+ * Recibe los gastos POR LETRAS, porque el orden importa: la reducción del art. 20 se calcula
+ * restando solo los de las letras a) a e); los 2.000 € de la letra f) se restan después (ver
+ * `reduccionArt20`).
+ *
+ * @param p.integros      Rendimiento íntegro del trabajo (bruto anual, pensión…).
+ * @param p.gastosAaE     Gastos de las letras a) a e) del art. 19.2; en una nómina, la
+ *                        cotización del trabajador a la SS. **Nunca** los 2.000 € de la f).
+ * @param p.otrosGastos   Letra f). Por defecto `GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral`;
+ *                        pasar el incrementado por movilidad o discapacidad si procede.
+ * @param p.otrasRentas   Rentas distintas del trabajo, excluidas las exentas (art. 20). Por
+ *                        defecto 0.
+ */
+export function calcularRendimientoNetoTrabajo(p: {
+  integros: number;
+  gastosAaE: number;
+  otrosGastos?: number;
+  otrasRentas?: number;
+}): RendimientoNetoTrabajo {
+  const integros = Number.isFinite(p.integros) ? Math.max(0, p.integros) : 0;
+  const gastosAaE = Number.isFinite(p.gastosAaE) ? Math.max(0, p.gastosAaE) : 0;
+  const rendimientoPrevio = Math.max(0, integros - gastosAaE);
+  const otrosGastos = Math.min(
+    Math.max(0, p.otrosGastos ?? GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral),
+    rendimientoPrevio,
+  );
+  const rendimientoNeto = rendimientoPrevio - otrosGastos;
+  const reduccionPerdidaPorOtrasRentas =
+    (p.otrasRentas ?? 0) > REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtrasRentas;
+  const reduccion = reduccionPerdidaPorOtrasRentas
+    ? 0
+    : Math.min(reduccionArt20(rendimientoPrevio), rendimientoNeto);
+  return {
+    rendimientoPrevio,
+    otrosGastos,
+    rendimientoNeto,
+    reduccion,
+    rendimientoNetoReducido: rendimientoNeto - reduccion,
+    reduccionPerdidaPorOtrasRentas,
+  };
 }
 
 // ─── Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF) ─────
@@ -431,8 +515,13 @@ export function limitarDeduccionRendimientosTrabajo(
 
 /**
  * Estima el tipo marginal IRPF a partir de los rendimientos brutos del trabajo.
- * Aplica: cotizaciones SS trabajador → gastos deducibles art. 19 → reducción art. 20 → tramos.
+ * Aplica: cotizaciones SS trabajador → reducción art. 20 y gastos del art. 19.2.f
+ * (`calcularRendimientoNetoTrabajo`) → tramos.
  * Orientativo: no incluye mínimo personal ni otras circunstancias personales/familiares.
+ *
+ * Hasta el 25/09/2026 la reducción se calculaba sobre el rendimiento ya minorado en los
+ * 2.000 € de la letra f) (hallazgo 1687), a través de un `tipoMarginalDesdeRNT` que se
+ * retiró: nadie más lo llamaba y su parámetro era justo el número equivocado.
  */
 export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
   const totalSS =
@@ -440,21 +529,10 @@ export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
     COTIZACIONES_SS_2026.desempleo +
     COTIZACIONES_SS_2026.formacionProfesional +
     COTIZACIONES_SS_2026.mef;
-  const gastosSS = brutos * (totalSS / 100);
-  const rnt = Math.max(0, brutos - gastosSS - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
-  return tipoMarginalDesdeRNT(rnt);
-}
-
-/**
- * Estima el tipo marginal IRPF a partir del rendimiento neto del trabajo (RNT).
- * El RNT es el ingreso ya descontadas cotizaciones SS y gastos deducibles art. 19,
- * pero antes de la reducción art. 20.
- * Aplica: reducción art. 20 → tramos.
- * Orientativo: no incluye mínimo personal ni otras circunstancias.
- */
-export function tipoMarginalDesdeRNT(rnt: number): number {
-  const reduccion = calcularReduccionRendimientosTrabajo(rnt);
-  const baseImponible = Math.max(0, rnt - reduccion);
+  const { rendimientoNetoReducido: baseImponible } = calcularRendimientoNetoTrabajo({
+    integros: brutos,
+    gastosAaE: brutos * (totalSS / 100),
+  });
   for (const tramo of TRAMOS_IRPF_2025) {
     if (baseImponible <= tramo.hasta) return tramo.tipo;
   }

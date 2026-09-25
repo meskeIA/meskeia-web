@@ -74,16 +74,19 @@ test.beforeEach(async ({ page }) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 0 · DA 61.ª de 2026: con 19.000 € la deducción es 209,69 € y el IRPF 647,35 €', async ({ page }) => {
+test('CASO 0 · DA 61.ª de 2026: con 19.000 € la deducción es 209,69 € y el IRPF 1.354,50 €', async ({ page }) => {
   // SS 2026: 19.000 / 12 = 1.583,33 €/mes × 6,50 % × 12 = 1.235,00 €
-  // RNT = 19.000 − 1.235 − 2.000 = 15.765,00 € → reducción art. 20 = 7.302 − 1,75 × 913 = 5.704,25 €
-  // Base = 10.060,75 € → cuota = (10.060,75 − 5.550) × 19 % = 857,04 €
+  // Reducción art. 20, medida sobre 19.000 − 1.235 = 17.765,00 € (art. 20: SIN restar antes los
+  //   2.000 € de la letra f); hallazgo 1687) → segundo tramo: 2.364,34 − 1,14 × 91,48 = 2.260,05 €
+  // Rendimiento neto = 17.765 − 2.000 = 15.765 € → base = 15.765 − 2.260,05 = 13.504,95 €
+  // cuota = escala(13.504,95) 2.618,69 − escala(5.550) 1.054,50 = 1.564,19 €
   // Deducción DA 61.ª de 2026 (art. 28 RDL 5/2026) sobre los ÍNTEGROS:
-  //   590,89 − 0,2 × (19.000 − 17.094) = 209,69 € → IRPF = 647,35 €
-  // Hasta el 24/09/2026: la de 2025 sobre el neto, 249,34 € → 607,70 € de IRPF.
+  //   590,89 − 0,2 × (19.000 − 17.094) = 209,69 € → IRPF = 1.354,50 €
+  // Hasta el 24/09/2026: la de 2025 sobre el neto, 249,34 € → 607,70 € de IRPF. Hasta el
+  // 25/09/2026, con la reducción medida sobre 15.765 € (5.704,25 €): 647,35 € de IRPF.
   await ponerBruto(page, 19000);
   await expect(page.locator('css=div:has(> span:text-is("Sueldo bruto anual"))').first()).toContainText('19.000,00');
-  expect(await cascada(page, 'Retención IRPF')).toBe('− 647,35 €');
+  expect(await cascada(page, 'Retención IRPF')).toBe('− 1354,50 €');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

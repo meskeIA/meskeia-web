@@ -20,9 +20,8 @@ import {
   MINIMOS_IRPF_2025,
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
-  GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   FISCAL_IRPF_META,
   calcularDeduccionRentasBajas,
   limitarDeduccionRendimientosTrabajo,
@@ -55,10 +54,6 @@ interface DesgloseTramoIRPF {
 }
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
-
-function calcularReduccionRRT(rnt: number): number {
-  return calcularReduccionRendimientosTrabajo(rnt);
-}
 
 function calcularMinimoPersonalFamiliar(situacion: SituacionFamiliar): number {
   let minimo = MINIMOS_IRPF_2025.personal;
@@ -145,14 +140,14 @@ export default function SimuladorDesgloseNominaPage() {
     const cotMEI = baseSSAnual * (tMEI / 100);
     const totalSS = cotCC + cotDesempleo + cotFP + cotMEI;
 
-    // 2) Rendimiento Neto del Trabajo
-    const gastosDeducibles =
-      brutoVal > 0 ? GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral : 0;
-    const rnt = Math.max(0, brutoVal - totalSS - gastosDeducibles);
-
-    // 3) Reducción rendimientos del trabajo (art. 20)
-    const reduccion = brutoVal > 0 ? calcularReduccionRRT(rnt) : 0;
-    const baseImponible = Math.max(0, rnt - reduccion);
+    // 2) y 3) Rendimiento neto del trabajo y reducción del art. 20. La reducción se mide sobre
+    //    bruto − SS, ANTES de restar los 2.000 € de la letra f) del art. 19.2 (hallazgo 1687
+    //    de estimador-sueldo-neto, mismo defecto: hasta el 25/09/2026 se medía después).
+    const rendimientoTrabajo = calcularRendimientoNetoTrabajo({ integros: brutoVal, gastosAaE: totalSS });
+    const gastosDeducibles = rendimientoTrabajo.otrosGastos;
+    const rnt = rendimientoTrabajo.rendimientoNeto;
+    const reduccion = rendimientoTrabajo.reduccion;
+    const baseImponible = rendimientoTrabajo.rendimientoNetoReducido;
 
     // 4) Minimos personales y familiares. NO reducen la base (art. 63.1.2 LIRPF): la base
     //    liquidable general los lleva dentro y se gravan a tipo cero dentro de la cuota.

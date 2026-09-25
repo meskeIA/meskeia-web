@@ -16,7 +16,7 @@ import {
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
   FISCAL_IRPF_META,
 } from '@/data/fiscal';
 
@@ -122,17 +122,17 @@ function calcularCuotaTramos(
   return { cuota, desglose };
 }
 
-function calcularReduccionRNT(rnt: number): number {
-  return calcularReduccionRendimientosTrabajo(rnt);
-}
-
 function calcularMinimo(situacion: SituacionFamiliarIRPF, numHijos: number, hijosMenores3: number): number {
   let minimo = MINIMOS_IRPF_2025.personal;
   const ordenHijos = [MINIMOS_IRPF_2025.hijo_1, MINIMOS_IRPF_2025.hijo_2, MINIMOS_IRPF_2025.hijo_3];
+  let descendientes = 0;
   for (let i = 0; i < numHijos; i++) {
-    minimo += i < 3 ? ordenHijos[i] : MINIMOS_IRPF_2025.hijo_4_mas;
+    descendientes += i < 3 ? ordenHijos[i] : MINIMOS_IRPF_2025.hijo_4_mas;
   }
-  minimo += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
+  descendientes += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
+  // Dos cónyuges con ingresos: cada uno aplica la mitad del mínimo por descendientes
+  // (art. 61.1.ª LIRPF). Hasta el 25/09/2026 entraba entero (hallazgo 1688, mismo defecto).
+  minimo += situacion === 'casado_con_ingresos' ? descendientes / 2 : descendientes;
   return minimo;
 }
 
@@ -147,11 +147,16 @@ export function calcularIRPF(p: ParametrosIRPF): ResultadoIRPF {
   const esTrabajador = p.esTrabajador !== false;
 
   // Rendimientos del trabajo netos
-  const gastosDeducibles = esTrabajador ? GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral : 0;
-  const rendimientosTrabajoBrutos = p.rendimientosTrabajo;
-  const rntBruto = Math.max(0, rendimientosTrabajoBrutos - gastosDeducibles);
-  const reduccionRNT = r(esTrabajador ? calcularReduccionRNT(rntBruto) : 0);
-  const rendimientosTrabajoNetos = r(Math.max(0, rntBruto - reduccionRNT));
+  // `rendimientosTrabajo` llega ya sin la SS (bruto − SS), así que es el rendimiento sobre el
+  // que el art. 20 mide su reducción; los 2.000 € de la letra f) se restan DESPUÉS. Hasta el
+  // 25/09/2026 se restaban antes (hallazgo 1687 de estimador-sueldo-neto, mismo defecto).
+  const rendimiento = calcularRendimientoNetoTrabajo({
+    integros: p.rendimientosTrabajo,
+    gastosAaE: 0,
+    otrosGastos: esTrabajador ? GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral : 0,
+  });
+  const reduccionRNT = r(esTrabajador ? rendimiento.reduccion : 0);
+  const rendimientosTrabajoNetos = r(Math.max(0, rendimiento.rendimientoNeto - reduccionRNT));
 
   // Base imponible general
   const capInmob = p.rendimientosCapitalInmobiliario ?? 0;
@@ -208,7 +213,7 @@ export function calcularIRPF(p: ParametrosIRPF): ResultadoIRPF {
 
   return {
     rendimientosTrabajoNetos,
-    gastosDeducibles,
+    gastosDeducibles: rendimiento.otrosGastos,
     reduccionRNT,
     baseImponibleGeneral,
     baseImponibleAhorro,

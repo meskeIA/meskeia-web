@@ -260,6 +260,14 @@
   color: var(--text-primary);
 }
 
+/* Aclaración bajo el IRPF (hallazgo 1689): la cifra es la cuota anual, no la retención. */
+.desgloseNota {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 /* Importe de la deducción de la DA 61.ª (hallazgo 1659): era un #27ae60 literal en línea,
    2,87:1 sobre blanco. #1E7B45 da 5,28:1 sobre #fff; en oscuro, #66BB6A da 5,82:1 sobre #2d2d2d. */
 .desgloseValue.importeDeduccion {

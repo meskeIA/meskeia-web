@@ -16,7 +16,7 @@ import {
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
   OBLIGACION_DECLARAR_2025,
-  calcularReduccionRendimientosTrabajo,
+  calcularRendimientoNetoTrabajo,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -95,10 +95,6 @@ function textoRango(rango: { min: number; max: number }): string {
   return `entre ${formatNumber(rango.min, 0)} y ${formatNumber(rango.max, 0)} €`;
 }
 
-function calcularReduccionRRT(rnt: number): number {
-  return calcularReduccionRendimientosTrabajo(rnt);
-}
-
 function minimoPersonalPorEdad(tramo: TramoEdad): number {
   if (tramo === '75_mas') return MINIMOS_IRPF_2025.personal_75;
   if (tramo === '65_74') return MINIMOS_IRPF_2025.personal_65;
@@ -123,18 +119,20 @@ function estimarIrpfPensionista(
   const rendimientosIntegrosTrabajo = pensionAnual + rescatePP;
   const ingresosTotales = rendimientosIntegrosTrabajo + otrasRentas;
 
-  // Gastos deducibles generales (art. 19.2.f)
-  const gastosDeducibles = GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
-
-  // Rendimientos netos del trabajo
-  const rendimientosNetos = Math.max(0, rendimientosIntegrosTrabajo - gastosDeducibles);
-
-  // Reducción del art. 20, que exige no tener rentas ajenas al trabajo por encima del límite.
-  const reduccionBloqueadaPorOtrasRentas = otrasRentas > LIMITE_OTRAS_RENTAS_ART_20;
-  const reduccionRRT = reduccionBloqueadaPorOtrasRentas ? 0 : calcularReduccionRRT(rendimientosNetos);
-
-  // Rendimiento neto reducido del trabajo
-  const rendimientosNetosReducidos = Math.max(0, rendimientosNetos - reduccionRRT);
+  // Arts. 19 y 20 LIRPF. La reducción del art. 20 se mide sobre los íntegros (una pensión no
+  // tiene gastos de las letras a) a e)), ANTES de restar los 2.000 € de la letra f): hasta el
+  // 25/09/2026 se medía después (hallazgo 1687 de estimador-sueldo-neto, mismo defecto). Y se
+  // pierde con más de LIMITE_OTRAS_RENTAS_ART_20 de rentas ajenas al trabajo.
+  const rendimientoTrabajo = calcularRendimientoNetoTrabajo({
+    integros: rendimientosIntegrosTrabajo,
+    gastosAaE: 0,
+    otrasRentas,
+  });
+  const gastosDeducibles = rendimientoTrabajo.otrosGastos;
+  const rendimientosNetos = rendimientoTrabajo.rendimientoNeto;
+  const reduccionBloqueadaPorOtrasRentas = rendimientoTrabajo.reduccionPerdidaPorOtrasRentas;
+  const reduccionRRT = rendimientoTrabajo.reduccion;
+  const rendimientosNetosReducidos = rendimientoTrabajo.rendimientoNetoReducido;
 
   // Mínimo personal según edad
   const minimoPersonal = minimoPersonalPorEdad(tramo);
@@ -444,11 +442,11 @@ export default function EstimadorIrpfPensionista() {
       <EducationalSection title="¿Cómo tributa la pensión en el IRPF?" subtitle="Rendimientos del trabajo, reducciones y mínimos para jubilados · 2026">
         <p>La pensión pública de jubilación tributa como <strong>rendimiento del trabajo</strong>, igual que un salario. Sin embargo, los pensionistas tienen ventajas fiscales específicas que reducen su factura.</p>
         <h3>Reducción por rendimientos del trabajo</h3>
-        <p>Si tus únicos ingresos son la pensión, aplica una reducción en función de tu renta neta:</p>
+        <p>Si tus únicos ingresos son la pensión, aplica una reducción en función de su importe anual:</p>
         <ul>
-          <li>Renta neta ≤ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)}: reducción de {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)}</li>
+          <li>Pensión anual (sin restar los {formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)} de gastos, art. 20) ≤ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)}: reducción de {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)}</li>
           <li>Entre {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} y {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: reducción decreciente, en dos tramos</li>
-          <li>Renta neta ≥ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: <strong>sin reducción</strong> — esta reducción se agota, no deja importe residual</li>
+          <li>Pensión anual ≥ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: <strong>sin reducción</strong> — esta reducción se agota, no deja importe residual</li>
         </ul>
         <h3>Mínimo personal por edad</h3>
         <p>El mínimo personal genera una deducción efectiva sobre la cuota:</p>

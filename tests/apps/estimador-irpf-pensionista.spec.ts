@@ -105,26 +105,26 @@ test.beforeEach(async ({ page }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 1 · 1.500 €/mes, 67 años — el mínimo de 6.700 € a tipo cero', async ({ page }) => {
   // Rendimientos íntegros = 1.500 × 14 = 21.000,00 €
-  // Rendimiento neto tras art. 19 = 21.000 − 2.000 = 19.000,00 €
-  // Reducción art. 20 (tramo 17.673,52-19.747,5): 2.364,34 − 1,14 × (19.000 − 17.673,52)
-  //   = 2.364,34 − 1,14 × 1.326,48 = 2.364,34 − 1.512,1872 = 852,1528 → 852,15 €
-  // Base imponible = 19.000 − 852,15 = 18.147,85 €, CON el mínimo de 6.700 € dentro.
-  //   escala(18.147,85) = 12.450×19 % + 5.697,85×24 % = 2.365,50 + 1.367,484 = 3.732,984 €
-  //   escala(6.700)     = 6.700×19 %                  = 1.273,00 €
-  //   cuota íntegra     = 2.459,984 → 2.459,98 €
-  // IRPF mensual en 14 pagas = 175,713… → pensión neta 1.324,29 €/mes
+  // Reducción art. 20: se mide sobre los íntegros menos los gastos de las letras a) a e) del
+  //   art. 19.2 (una pensión no tiene), SIN restar los 2.000 € de la letra f): 21.000 ≥
+  //   19.747,5 → 0 €. Hasta el 25/09/2026 se medía sobre 19.000 y daba 852,15 € (hallazgo 1687).
+  // Base imponible = 21.000 − 2.000 = 19.000,00 €, CON el mínimo de 6.700 € dentro.
+  //   escala(19.000) = 12.450×19 % + 6.550×24 % = 2.365,50 + 1.572,00 = 3.937,50 €
+  //   escala(6.700)  = 6.700×19 %               = 1.273,00 €
+  //   cuota íntegra  = 2.664,50 €
+  // IRPF mensual en 14 pagas = 190,321… → pensión neta 1.309,68 €/mes
   //
-  // Si el mínimo se restara de la base: escala(18.147,85 − 6.700) = escala(11.447,85)
-  //   = 2.175,09 €, es decir 284,89 € menos. El error es pequeño aquí porque casi todo el
+  // Si el mínimo se restara de la base: escala(19.000 − 6.700) = escala(12.300)
+  //   = 2.337,00 €, es decir 327,50 € menos. El error es pequeño aquí porque casi todo el
   //   mínimo cae en el primer tramo; crece con la pensión.
   await estimar(page, '1500', '65_74');
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('21.000,00 €');
-  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-852,15 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('18.147,85 €');
+  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-0,00 €');
+  expect(await fila(page, 'Base imponible estimada')).toBe('19.000,00 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('6700,00 €');
-  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2459,98 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1324,29 €/mes');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2664,50 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,68 €/mes');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -171,65 +171,67 @@ test('CASO 4 (normal) · 1.400 €/mes, 68 años — la cadena completa art. 19 
   // Pensión de jubilación en 14 pagas (12 mensualidades + 2 extraordinarias).
   //
   //   Rendimientos íntegros    1.400 × 14                      = 19.600,00 €
+  //   − reducción art. 20, medida sobre los íntegros (art. 20: solo se restan antes los gastos
+  //     de las letras a) a e), que una pensión no tiene; hallazgo 1687). 19.600 cae entre
+  //     17.673,52 y 19.747,5 → segundo tramo decreciente:
+  //       2.364,34 − 1,14 × (19.600 − 17.673,52) = 2.364,34 − 2.196,19 =    168,15 €
   //   − gastos art. 19.2.f                                     =  2.000,00 €
-  //   Rendimiento neto del trabajo (RNT)                       = 17.600,00 €
-  //   − reducción art. 20 (RNT entre 14.852 y 17.673,52 → primer tramo decreciente):
-  //       7.302 − 1,75 × (17.600 − 14.852) = 7.302 − 4.809,00  =  2.493,00 €
-  //   Base imponible (CON el mínimo dentro, art. 63.1.2.º)     = 15.107,00 €
+  //   Base imponible (CON el mínimo dentro, art. 63.1.2.º)     = 17.431,85 €
   //   Mínimo del contribuyente de 65 a 74 años (art. 57.2)     =  6.700,00 €
   //
-  //   escala(15.107,00) = 12.450×19 % + 2.657,00×24 % = 2.365,50 + 637,68 = 3.003,18 €
-  //   escala(6.700,00)  = 6.700×19 %                                      = 1.273,00 €
-  //   cuota íntegra     = 3.003,18 − 1.273,00                             = 1.730,18 €
+  //   escala(17.431,85) = 12.450×19 % + 4.981,85×24 % = 2.365,50 + 1.195,644 = 3.561,144 €
+  //   escala(6.700,00)  = 6.700×19 %                                          = 1.273,00 €
+  //   cuota íntegra     = 3.561,144 − 1.273,00                                = 2.288,14 €
   //
-  //   Tipo efectivo = 1.730,18 / 19.600 = 8,8274… % → 8,8 %
-  //   Pensión neta  = 1.400 − 1.730,18/14 = 1.400 − 123,5843 = 1.276,42 €/mes
+  //   Tipo efectivo = 2.288,14 / 19.600 = 11,674… % → 11,7 %
+  //   Pensión neta  = 1.400 − 2.288,144/14 = 1.400 − 163,439 = 1.236,56 €/mes
   //
+  // Hasta el 25/09/2026 la reducción se medía sobre 17.600 € y daba 2.493,00 € (base
+  // 15.107,00 €, cuota 1.730,18 €): 557,96 € de cuota de menos.
   // Si el mínimo se restara de la base —el defecto que vigila `npm run check:minimo-irpf`—
-  // saldría escala(15.107 − 6.700) = escala(8.407) = 1.597,33 €, o sea 132,85 € menos.
+  // saldría escala(17.431,85 − 6.700) = escala(10.731,85) = 2.039,05 €, o sea 249,09 € menos.
   await estimar(page, '1400', '65_74');
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('19.600,00 €');
   expect(await fila(page, 'Gastos deducibles generales')).toBe('-2000,00 €');
-  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-2493,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('15.107,00 €');
+  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-168,15 €');
+  expect(await fila(page, 'Base imponible estimada')).toBe('17.431,85 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('6700,00 €');
-  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1730,18 €');
-  expect(await fila(page, 'Tipo efectivo estimado')).toBe('8,8%');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1276,42 €/mes');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2288,14 €');
+  expect(await fila(page, 'Tipo efectivo estimado')).toBe('11,7%');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1236,56 €/mes');
 });
 
-test('CASO 5 (borde) · 75 años: la base cae EXACTAMENTE en el mínimo de 8.100 €', async ({ page }) => {
+test('CASO 5 (borde) · 75 años: el euro mensual en que la base cruza el mínimo de 8.100 €', async ({ page }) => {
   // El punto en que un pensionista de 75 años empieza a pagar. No se elige por tanteo: se
   // despeja de la propia norma.
   //
-  // Con RNT entre 14.852 y 17.673,52 la base vale RNT − [7.302 − 1,75 × (RNT − 14.852)],
-  // es decir 2,75 × RNT − 33.293. Igualada al mínimo del art. 57.2 para 75 años o más
-  // (8.100 €): RNT = 15.052,00 €, o sea 17.052,00 € íntegros = 1.218,00 €/mes en 14 pagas.
+  // Con íntegros P entre 14.852 y 17.673,52, la reducción del art. 20 se mide sobre P (una
+  // pensión no tiene gastos de las letras a) a e); hallazgo 1687) y vale 7.302 − 1,75 × (P −
+  // 14.852), así que la base es P − 2.000 − reducción = 2,75 × P − 35.293. Igualada al mínimo
+  // del art. 57.2 para 75 años o más (8.100 €): P = 15.779,27 €, es decir 1.127,09 €/mes en 14
+  // pagas. El borde en euros enteros está entre 1.127 € y 1.128 € al mes.
   //
-  //   Rendimientos íntegros    1.218 × 14                      = 17.052,00 €
-  //   − gastos art. 19.2.f                                     =  2.000,00 €
-  //   RNT                                                      = 15.052,00 €
-  //   − reducción art. 20: 7.302 − 1,75 × (15.052 − 14.852) = 7.302 − 350,00 = 6.952,00 €
-  //   Base imponible                                           =  8.100,00 €
-  //   Mínimo 75+ (art. 57.2)                                   =  8.100,00 €
-  //   cuota = escala(8.100) − escala(8.100) = 0,00 € exactos → la pensión sale íntegra.
-  await estimar(page, '1218', '75_mas');
+  // (Hasta el 25/09/2026 la reducción se medía sobre P − 2.000 y el borde caía en 1.218 €/mes.)
+  //
+  //   1.127 × 14 = 15.778,00 € → reducción 7.302 − 1,75 × 926 = 5.681,50 €
+  //   base = 15.778 − 2.000 − 5.681,50 = 8.096,50 € < 8.100 → cuota 0,00 € → pensión íntegra.
+  await estimar(page, '1127', '75_mas');
 
-  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-6952,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('8100,00 €');
+  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-5681,50 €');
+  expect(await fila(page, 'Base imponible estimada')).toBe('8096,50 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,00 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1218,00 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1127,00 €/mes');
 
   // Un euro más al mes y la cuota deja de ser cero, al 19 % del primer tramo:
-  //   1.219 × 14 = 17.066 → RNT 15.066 → reducción 7.302 − 1,75 × 214 = 6.927,50 €
-  //   base 8.138,50 € → cuota (8.138,50 − 8.100) × 19 % = 38,50 × 0,19 = 7,315 → 7,32 €
+  //   1.128 × 14 = 15.792 → reducción 7.302 − 1,75 × 940 = 5.657,00 €
+  //   base 13.792 − 5.657 = 8.135,00 € → cuota (8.135 − 8.100) × 19 % = 6,65 €
   // Se comprueba que el borde es ese y no otro: si la app acotara mal el mínimo, o si lo
-  // restara de la base, este euro no produciría exactamente 7,32 €.
-  await estimar(page, '1219', '75_mas');
-  expect(await fila(page, 'Base imponible estimada')).toBe('8138,50 €');
-  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('7,32 €');
+  // restara de la base, este euro no produciría exactamente 6,65 €.
+  await estimar(page, '1128', '75_mas');
+  expect(await fila(page, 'Base imponible estimada')).toBe('8135,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('6,65 €');
 });
 
 test('CASO 6 (rechazo) · un dato imposible NO se convierte en un supuesto fiscal', async ({ page }) => {
@@ -318,9 +320,9 @@ test('CASO 8 (alto) · «1.400» en la pensión es 1.400 €/mes, que es lo que 
   await estimar(page, '1.400', '65_74');
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('19.600,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('15.107,00 €');
-  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1730,18 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1276,42 €/mes');
+  expect(await fila(page, 'Base imponible estimada')).toBe('17.431,85 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2288,14 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1236,56 €/mes');
 
   await expect(page.locator(SEL_PENSION)).toHaveValue('1.400');
 });
@@ -402,9 +404,12 @@ test('CASO 10 (dato) · en pantalla solo vive la redacción VIGENTE del art. 20'
   expect(plano).toContain('6500,00 €');    // rentas ajenas al trabajo que admite el art. 20
 
   // El escenario de pensión única, que publicaba «19.000 − 5.565 = 13.435 €», ahora lo resuelve
-  // el mismo motor: 19.000 − 2.000 (art. 19.2.f) − 3.543 (art. 20) = 13.457 €.
-  expect(plano).toContain('3543,00 €');
-  expect(plano).toContain('13.457,00 €');
+  // el mismo motor. Con la reducción del art. 20 medida sobre los íntegros (hallazgo 1687):
+  // 2.364,34 − 1,14 × (19.000 − 17.673,52) = 852,15 € → 19.000 − 2.000 − 852,15 = 16.147,85 €.
+  // (Hasta el 25/09/2026 se medía sobre 17.000 y publicaba 3.543 € y 13.457 €.)
+  expect(plano).toContain('852,15 €');
+  expect(plano).toContain('16.147,85 €');
+  expect(plano).not.toContain('13.457,00 €');
 });
 
 test('CASO 11 (dato) · el FAQPage que leen las IAs lleva las mismas cifras que el motor', async ({ page }) => {
