@@ -121,7 +121,7 @@
 .tipoIcono {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipoNombre {
@@ -155,7 +155,9 @@
 
 .unidadActiva {
   background: var(--bg-card);
-  color: var(--primary);
+  /* --primary da 3,50:1 en oscuro sobre la tarjeta (hallazgo 1793): el token de texto
+     de globals.css cambia de tono con el tema y pasa de 4,5:1 en los dos. */
+  color: var(--primary-texto);
   box-shadow: var(--shadow-sm);
 }
 
@@ -193,9 +195,9 @@
 }
 
 .btnAngulo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Unidad Origen Selector */
@@ -222,9 +224,9 @@
 }
 
 .unidadOrigenActiva {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Results Panel */
@@ -433,7 +435,7 @@
 
 .casoSubtitle {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-bottom: var(--spacing-sm);
 }
@@ -495,7 +497,7 @@
 }
 
 .pasoNum {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 36px;
   height: 36px;
@@ -727,7 +729,7 @@
 
 .escenarioExample {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   font-family: 'Courier New', monospace;
   background: rgba(46, 134, 171, 0.08);
@@ -769,7 +771,7 @@
 .faqTip {
   margin-top: var(--spacing-sm);
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
   background: rgba(72, 169, 166, 0.08);
   padding: var(--spacing-xs) var(--spacing-sm);
@@ -812,7 +814,7 @@
 }
 
 .stepNumber {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   width: 40px;
   height: 40px;
@@ -1030,7 +1032,7 @@
 }
 
 .casosContadorTexto strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.15rem;
 }
 
@@ -1081,7 +1083,7 @@
   height: 34px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #FFFFFF;
   font-weight: 700;
   font-size: 0.95rem;
@@ -1102,8 +1104,8 @@
   letter-spacing: 0.04em;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -1169,9 +1171,10 @@
 }
 
 .casosBtnPrimario {
-  background: var(--primary);
+  /* Blanco sobre --primary da 4,11:1 (hallazgo 1793); --primary-boton, 5,47:1 en los dos temas. */
+  background: var(--primary-boton);
   color: #FFFFFF;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-boton);
 }
 
 .casosBtnPrimario:hover {
@@ -1181,8 +1184,8 @@
 
 .casosBtnSecundario {
   background: transparent;
-  color: var(--primary);
-  border: 2px solid var(--primary);
+  color: var(--primary-texto);
+  border: 2px solid var(--primary-texto);
 }
 
 .casosBtnSecundario:hover {
@@ -1259,7 +1262,7 @@
 }
 
 .casosResultado strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ---- Práctica aleatoria ---- */
@@ -1293,7 +1296,8 @@
 /* ---- Dark mode ---- */
 
 [data-theme='dark'] .casosEtiqueta {
-  background: rgba(127, 179, 211, 0.16);
+  /* Con el 16 % de tinte el acento daba 4,16:1 sobre la tarjeta #333 (hallazgo 1793). */
+  background: rgba(127, 179, 211, 0.08);
   color: var(--accent);
 }
 
@@ -1374,4 +1378,83 @@
   .casosAleatorioCaja {
     padding: var(--spacing-md);
   }
+}
+
+/* ---- Campo de ángulo (admite «π/2» en radianes) y avisos del panel ---- */
+
+.campoAngulo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.campoAnguloEtiqueta {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.campoAnguloInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.campoAnguloInput::placeholder {
+  color: var(--text-muted);
+}
+
+.campoAnguloInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+.campoAnguloAyuda {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.helper {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.avisoDatos {
+  margin: 0;
+  padding: var(--spacing-md);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: rgba(245, 158, 11, 0.12);
+  border-left: 4px solid var(--warning);
+  border-radius: 8px;
+}
+
+.notaDatos {
+  margin: 0 0 var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: var(--hover);
+  border-radius: 8px;
+}
+
+[data-theme='dark'] .campoAnguloInput {
+  background: #333333;
+  border-color: #505050;
+}
+
+[data-theme='dark'] .avisoDatos {
+  background: rgba(245, 158, 11, 0.16);
 }

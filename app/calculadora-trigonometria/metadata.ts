@@ -38,11 +38,12 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Calcula las 6 funciones trigonométricas: seno, coseno, tangente, cosecante, secante y cotangente',
-    'Resolución de triángulos rectángulos con teorema del seno y del coseno',
+    'Resolución de triángulos rectángulos con cualquier pareja de datos: dos lados, o un lado y un ángulo agudo',
     'Conversión entre grados, radianes y gradianes con resultado inmediato',
     'Acceso directo a ángulos notables: 0°, 30°, 45°, 60°, 90°, 180°, 270° y 360°',
-    'Tabla de identidades trigonométricas: Pitágoras, suma de ángulos y doble ángulo',
-    'Modo grados y modo radianes seleccionable en el mismo panel',
+    'Identidades evaluadas para tu ángulo: pitagórica, ángulo doble, ángulo mitad y suma y resta de ángulos',
+    'Modo grados y modo radianes seleccionable en el mismo panel; en radianes admite múltiplos de π (π/2, 3π/4)',
+    '12 casos numerados para clase con corrección de la respuesta y solución paso a paso',
     'Resultados con 8 decimales para cálculos de precisión en física e ingeniería',
   ],
 });
@@ -56,7 +57,7 @@ export const faqJsonLd = {
       name: '¿Qué funciones trigonométricas calcula esta herramienta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Calcula las seis funciones trigonométricas principales: seno (sin), coseno (cos), tangente (tan) y sus recíprocas cosecante (csc), secante (sec) y cotangente (cot). También incluye las funciones inversas arcoseno, arcocoseno y arcotangente para obtener el ángulo a partir de la razón.',
+        text: 'Calcula las seis funciones trigonométricas principales: seno (sin), coseno (cos), tangente (tan) y sus recíprocas cosecante (csc), secante (sec) y cotangente (cot). Indica el cuadrante del ángulo y marca como no definidas las razones que dividen entre cero, como tan 90°. No tiene un campo aparte para las funciones inversas: el modo Triángulo obtiene los ángulos con arcoseno, arcocoseno o arcotangente a partir de dos lados, y los casos para clase 6, 7 y 12 lo explican paso a paso.',
       },
     },
     {
@@ -72,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Puedo resolver un triángulo con esta calculadora trigonométrica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Introduciendo los datos conocidos del triángulo (lados y ángulos) la herramienta aplica el teorema del seno y el teorema del coseno para calcular los elementos desconocidos. Es necesario proporcionar al menos tres datos (incluyendo un lado) para obtener la solución completa.',
+        text: 'Sí, si es un triángulo rectángulo. Basta con dos datos: dos lados, o un lado y un ángulo agudo. Con ellos calcula el resto de lados y ángulos con Pitágoras y SOH-CAH-TOA, además del área y el perímetro; si escribes más de dos datos, comprueba que sean compatibles. Los triángulos oblicuángulos (teorema del seno y del coseno) se explican en la guía de la página, pero la calculadora no los resuelve.',
       },
     },
     {
@@ -80,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Qué son las identidades trigonométricas y para qué sirven?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las identidades trigonométricas son igualdades que se cumplen para cualquier valor del ángulo, como sin²θ + cos²θ = 1 o tan θ = sin θ / cos θ. Se usan para simplificar expresiones, demostrar igualdades y resolver ecuaciones trigonométricas. La calculadora muestra las identidades fundamentales como referencia al trabajar con cada función.',
+        text: 'Las identidades trigonométricas son igualdades que se cumplen para cualquier valor del ángulo, como sin²θ + cos²θ = 1 o tan θ = sin θ / cos θ. Se usan para simplificar expresiones, demostrar igualdades y resolver ecuaciones trigonométricas. La calculadora evalúa para el ángulo que escribas la identidad pitagórica y las de ángulo doble y ángulo mitad y, si das un segundo ángulo, las cuatro de suma y resta.',
       },
     },
     {

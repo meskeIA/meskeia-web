@@ -150,9 +150,17 @@ export function formatearFlexible(valor: number, maxDecimales = 4): string {
 /** Etiqueta de las razones trigonométricas: un cociente de dos longitudes no tiene unidad. */
 export const UNIDAD_RAZON = 'sin unidad';
 
-/** Une un número con su unidad, sin dejar «0,5 sin unidad» en una frase. */
+/**
+ * Une un número con su unidad, sin dejar «0,5 sin unidad» en una frase.
+ *
+ * El símbolo de grado de ángulo va PEGADO a la cifra («28,0725°»), como lo escriben la
+ * Ortografía de la RAE (2010) y el SI —a diferencia de «20 °C»—, y como ya lo escriben los
+ * pasos de la propia solución (hallazgo 1789). Las demás unidades, separadas por un espacio.
+ */
 export function conUnidad(texto: string, etiqueta: string): string {
-  return etiqueta === UNIDAD_RAZON ? texto : `${texto} ${etiqueta}`;
+  if (etiqueta === UNIDAD_RAZON) return texto;
+  if (etiqueta === '°') return `${texto}°`;
+  return `${texto} ${etiqueta}`;
 }
 
 // ============================================================

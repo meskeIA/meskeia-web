@@ -1,29 +1,111 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 import styles from './CalculadoraTrigonometria.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-// La aritmética de los casos (y la conversión grados ⇄ radianes que usa toda la página)
-// vive en casos.ts, fuera de la vista, porque el build compila esta página sin comprobar
-// si la trigonometría está bien. Las dos conversiones se importan con los nombres que ya
-// usaba este componente, para que ninguna de sus cuentas cambie de forma.
+// La aritmética de los casos vive en casos.ts; la de las cuatro calculadoras de arriba, en
+// motor.ts. Las dos fuera de la vista, porque el build compila esta página sin comprobar si
+// la trigonometría está bien: los dos módulos se prueban con casos resueltos a mano.
 import {
   CASOS,
   TOTAL_CASOS,
   comprobarRespuesta,
   conUnidad,
   generarEjercicioAleatorio,
-  gradosARadianes as toRadians,
-  radianesAGrados as toDegrees,
   type ComprobacionTrig,
   type EjercicioTrigonometria,
 } from './casos';
+import {
+  fraccionDePi,
+  identidades,
+  leerAngulo,
+  razones,
+  resolverTriangulo,
+  textoRadianesDeNotable,
+  ubicacion,
+  type Angulo,
+  type Razones,
+  type ResultadoIdentidades,
+  type Triangulo,
+  type Ubicacion,
+} from './motor';
 
 type TipoCalculo = 'funciones' | 'triangulo' | 'conversiones' | 'identidades';
 type UnidadAngulo = 'grados' | 'radianes';
+
+/**
+ * Lo que publica el panel de resultados. Declarada a mano con sus literales (types/CLAUDE.md):
+ * inferida desde el `switch` del useMemo, `tipo` se ensancharía a `string` y leer un campo de
+ * otra rama compilaría y pintaría `undefined`.
+ */
+type Resultado =
+  | { tipo: 'funciones'; angulo: Angulo; razones: Razones; ubicacion: Ubicacion }
+  | { tipo: 'triangulo'; triangulo: Triangulo; nota: string | null }
+  | { tipo: 'conversion'; grados: number; radianes: number; gradianes: number; fraccionPi: string }
+  | { tipo: 'identidades'; valores: ResultadoIdentidades }
+  | { tipo: 'aviso'; mensaje: string };
+
+/** Lo que se escribe en la tarjeta de una razón que no existe en ese ángulo. */
+const NO_DEFINIDA = 'No definida';
+
+const razonTexto = (valor: number | null): string =>
+  valor === null ? NO_DEFINIDA : formatNumber(valor, 8);
+
+const AVISO_NO_NUMERO_GRADOS =
+  'Escribe el ángulo como un número, con coma o punto decimal (por ejemplo 45 o 22,5).';
+const AVISO_NO_NUMERO_RADIANES =
+  'Escribe el ángulo como un número (por ejemplo 0,785) o como múltiplo de π (π/4, 3π/2, 2π; también vale «pi»).';
+
+/** Un campo vacío es `null`; uno escrito que no es un número, NaN (el motor lo explica). */
+const leerDato = (texto: string): number | null =>
+  texto.trim() === '' ? null : parseSpanishNumber(texto);
+
+interface CampoAnguloProps {
+  etiqueta: string;
+  valor: string;
+  onChange: (valor: string) => void;
+  placeholder: string;
+  /** En radianes el teclado de texto deja escribir «π/2»; en grados basta el decimal. */
+  admitePi: boolean;
+  ayuda?: string;
+}
+
+/**
+ * Campo de ángulo propio en vez de NumberInput: NumberInput solo deja teclear cifras, y en
+ * radianes el ángulo notable exacto se escribe «π/2» (hallazgo 1779).
+ */
+function CampoAngulo({ etiqueta, valor, onChange, placeholder, admitePi, ayuda }: CampoAnguloProps) {
+  const id = useId();
+  const idAyuda = `${id}-ayuda`;
+  return (
+    <div className={styles.campoAngulo}>
+      <label className={styles.campoAnguloEtiqueta} htmlFor={id}>
+        {etiqueta}
+      </label>
+      <input
+        id={id}
+        className={styles.campoAnguloInput}
+        type="text"
+        inputMode={admitePi ? 'text' : 'decimal'}
+        autoComplete="off"
+        spellCheck={false}
+        value={valor}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        aria-label={etiqueta}
+        aria-describedby={ayuda ? idAyuda : undefined}
+      />
+      {ayuda && (
+        <p className={styles.campoAnguloAyuda} id={idAyuda}>
+          {ayuda}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function CalculadoraTrigonometriaPage() {
   const [tipoCalculo, setTipoCalculo] = useState<TipoCalculo>('funciones');
@@ -57,210 +139,70 @@ export default function CalculadoraTrigonometriaPage() {
   const [veredictoAleatorio, setVeredictoAleatorio] = useState<ComprobacionTrig | null>(null);
   const [solucionAleatoriaAbierta, setSolucionAleatoriaAbierta] = useState(false);
 
-  const PI = Math.PI;
+  const avisoNoNumero = unidad === 'radianes' ? AVISO_NO_NUMERO_RADIANES : AVISO_NO_NUMERO_GRADOS;
 
-  const resultados = useMemo(() => {
+  const resultados = useMemo<Resultado | null>(() => {
     switch (tipoCalculo) {
       case 'funciones': {
-        const ang = parseSpanishNumber(angulo);
-        if (isNaN(ang)) return null;
-
-        const angRad = unidad === 'grados' ? toRadians(ang) : ang;
-
-        const seno = Math.sin(angRad);
-        const coseno = Math.cos(angRad);
-        const tangente = Math.cos(angRad) !== 0 ? Math.tan(angRad) : null;
-
-        const cosecante = seno !== 0 ? 1 / seno : null;
-        const secante = coseno !== 0 ? 1 / coseno : null;
-        const cotangente = tangente !== null && tangente !== 0 ? 1 / tangente : null;
-
-        // Cuadrante
-        let cuadrante = 1;
-        const angNorm = ((ang % 360) + 360) % 360;
-        if (angNorm > 90 && angNorm <= 180) cuadrante = 2;
-        else if (angNorm > 180 && angNorm <= 270) cuadrante = 3;
-        else if (angNorm > 270) cuadrante = 4;
-
+        const lectura = leerAngulo(angulo, unidad);
+        if (lectura.estado === 'vacio') return null;
+        if (lectura.estado === 'invalido') return { tipo: 'aviso', mensaje: avisoNoNumero };
         return {
           tipo: 'funciones',
-          angulo: ang,
-          anguloRad: angRad,
-          seno,
-          coseno,
-          tangente,
-          cosecante,
-          secante,
-          cotangente,
-          cuadrante
+          angulo: lectura.angulo,
+          razones: razones(lectura.angulo),
+          ubicacion: ubicacion(lectura.angulo),
         };
       }
 
       case 'triangulo': {
-        const a = parseSpanishNumber(ladoA);
-        const b = parseSpanishNumber(ladoB);
-        const c = parseSpanishNumber(hipotenusa);
-        const alfa = parseSpanishNumber(anguloAlfa);
-
-        // Caso 1: Dos catetos dados
-        if (!isNaN(a) && !isNaN(b) && a > 0 && b > 0) {
-          const hip = Math.sqrt(a * a + b * b);
-          const angA = toDegrees(Math.atan(a / b));
-          const angB = 90 - angA;
-
-          return {
-            tipo: 'triangulo',
-            catetoA: a,
-            catetoB: b,
-            hipotenusa: hip,
-            anguloA: angA,
-            anguloB: angB,
-            area: (a * b) / 2,
-            perimetro: a + b + hip
-          };
-        }
-
-        // Caso 2: Cateto e hipotenusa
-        if (!isNaN(a) && !isNaN(c) && a > 0 && c > a) {
-          const bCalc = Math.sqrt(c * c - a * a);
-          const angA = toDegrees(Math.asin(a / c));
-          const angB = 90 - angA;
-
-          return {
-            tipo: 'triangulo',
-            catetoA: a,
-            catetoB: bCalc,
-            hipotenusa: c,
-            anguloA: angA,
-            anguloB: angB,
-            area: (a * bCalc) / 2,
-            perimetro: a + bCalc + c
-          };
-        }
-
-        // Caso 3: Cateto y ángulo
-        if (!isNaN(a) && !isNaN(alfa) && a > 0 && alfa > 0 && alfa < 90) {
-          const alfaRad = toRadians(alfa);
-          const bCalc = a / Math.tan(alfaRad);
-          const cCalc = a / Math.sin(alfaRad);
-
-          return {
-            tipo: 'triangulo',
-            catetoA: a,
-            catetoB: bCalc,
-            hipotenusa: cCalc,
-            anguloA: alfa,
-            anguloB: 90 - alfa,
-            area: (a * bCalc) / 2,
-            perimetro: a + bCalc + cCalc
-          };
-        }
-
-        return null;
+        const resultado = resolverTriangulo({
+          a: leerDato(ladoA),
+          b: leerDato(ladoB),
+          c: leerDato(hipotenusa),
+          alfa: leerDato(anguloAlfa),
+        });
+        if (resultado.estado === 'faltan') return null;
+        if (resultado.estado === 'error') return { tipo: 'aviso', mensaje: resultado.mensaje };
+        return { tipo: 'triangulo', triangulo: resultado.triangulo, nota: resultado.nota };
       }
 
       case 'conversiones': {
-        const val = parseSpanishNumber(valorConvertir);
-        if (isNaN(val)) return null;
-
-        let enGrados: number, enRadianes: number, enGradianes: number;
-
-        switch (unidadOrigen) {
-          case 'grados':
-            enGrados = val;
-            enRadianes = val * PI / 180;
-            enGradianes = val * 10 / 9;
-            break;
-          case 'radianes':
-            enRadianes = val;
-            enGrados = val * 180 / PI;
-            enGradianes = val * 200 / PI;
-            break;
-          case 'gradianes':
-            enGradianes = val;
-            enGrados = val * 9 / 10;
-            enRadianes = val * PI / 200;
-            break;
-          default:
-            return null;
+        const lectura = leerAngulo(valorConvertir, unidadOrigen);
+        if (lectura.estado === 'vacio') return null;
+        if (lectura.estado === 'invalido') {
+          return {
+            tipo: 'aviso',
+            mensaje: unidadOrigen === 'radianes' ? AVISO_NO_NUMERO_RADIANES : AVISO_NO_NUMERO_GRADOS,
+          };
         }
-
-        // Forma fracción de π
-        const fraccionPi = enRadianes / PI;
-        let fraccionStr = '';
-        const fracciones = [
-          { num: 1, den: 6 }, { num: 1, den: 4 }, { num: 1, den: 3 }, { num: 1, den: 2 },
-          { num: 2, den: 3 }, { num: 3, den: 4 }, { num: 5, den: 6 }, { num: 1, den: 1 },
-          { num: 4, den: 3 }, { num: 3, den: 2 }, { num: 2, den: 1 }
-        ];
-
-        for (const f of fracciones) {
-          if (Math.abs(fraccionPi - f.num / f.den) < 0.001) {
-            fraccionStr = f.den === 1 ? `${f.num}π` : `${f.num}π/${f.den}`;
-            break;
-          }
-          if (Math.abs(fraccionPi + f.num / f.den) < 0.001) {
-            fraccionStr = f.den === 1 ? `-${f.num}π` : `-${f.num}π/${f.den}`;
-            break;
-          }
-        }
-
+        const a = lectura.angulo;
         return {
           tipo: 'conversion',
-          grados: enGrados,
-          radianes: enRadianes,
-          gradianes: enGradianes,
-          fraccionPi: fraccionStr || formatNumber(fraccionPi, 4) + 'π'
+          grados: a.grados,
+          radianes: a.radianes,
+          gradianes: (a.grados * 10) / 9,
+          fraccionPi: fraccionDePi(a.cocientePi, (x) => formatNumber(x, 4)),
         };
       }
 
       case 'identidades': {
-        const a = parseSpanishNumber(anguloA);
-        const b = parseSpanishNumber(anguloB2);
-        if (isNaN(a)) return null;
-
-        const aRad = unidad === 'grados' ? toRadians(a) : a;
-        const bRad = !isNaN(b) ? (unidad === 'grados' ? toRadians(b) : b) : 0;
-
-        // Identidades pitagóricas
-        const sin2cos2 = Math.pow(Math.sin(aRad), 2) + Math.pow(Math.cos(aRad), 2);
-
-        // Ángulos dobles
-        const sin2a = Math.sin(2 * aRad);
-        const cos2a = Math.cos(2 * aRad);
-
-        // Ángulos mitad
-        const sinMitad = Math.sin(aRad / 2);
-        const cosMitad = Math.cos(aRad / 2);
-
-        // Suma de ángulos (si b está definido)
-        let sinSuma = null, cosSuma = null, sinResta = null, cosResta = null;
-        if (!isNaN(b)) {
-          sinSuma = Math.sin(aRad) * Math.cos(bRad) + Math.cos(aRad) * Math.sin(bRad);
-          cosSuma = Math.cos(aRad) * Math.cos(bRad) - Math.sin(aRad) * Math.sin(bRad);
-          sinResta = Math.sin(aRad) * Math.cos(bRad) - Math.cos(aRad) * Math.sin(bRad);
-          cosResta = Math.cos(aRad) * Math.cos(bRad) + Math.sin(aRad) * Math.sin(bRad);
+        const lecturaA = leerAngulo(anguloA, unidad);
+        const lecturaB = leerAngulo(anguloB2, unidad);
+        if (lecturaA.estado === 'vacio') return null;
+        if (lecturaA.estado === 'invalido' || lecturaB.estado === 'invalido') {
+          return { tipo: 'aviso', mensaje: avisoNoNumero };
         }
-
         return {
           tipo: 'identidades',
-          sin2cos2,
-          sin2a,
-          cos2a,
-          sinMitad,
-          cosMitad,
-          sinSuma,
-          cosSuma,
-          sinResta,
-          cosResta,
-          tieneB: !isNaN(b)
+          valores: identidades(lecturaA.angulo, lecturaB.estado === 'ok' ? lecturaB.angulo : null),
         };
       }
 
       default:
         return null;
     }
-  }, [tipoCalculo, unidad, angulo, ladoA, ladoB, hipotenusa, anguloAlfa, valorConvertir, unidadOrigen, anguloA, anguloB2]);
+  }, [tipoCalculo, unidad, angulo, ladoA, ladoB, hipotenusa, anguloAlfa, valorConvertir, unidadOrigen, anguloA, anguloB2, avisoNoNumero]);
 
   // ---------------------------------------------------------- Casos para clase
 
@@ -387,11 +329,13 @@ export default function CalculadoraTrigonometriaPage() {
           <div className={styles.inputsSection}>
             {tipoCalculo === 'funciones' && (
               <>
-                <NumberInput
-                  value={angulo}
+                <CampoAngulo
+                  valor={angulo}
                   onChange={setAngulo}
-                  label={`Ángulo (${unidad})`}
-                  placeholder={unidad === 'grados' ? '45' : '0,785'}
+                  etiqueta={`Ángulo (${unidad})`}
+                  placeholder={unidad === 'grados' ? '45' : 'π/4 o 0,785'}
+                  admitePi={unidad === 'radianes'}
+                  ayuda={unidad === 'radianes' ? 'Admite múltiplos de π: π/2, 3π/4, 2π (también «pi»).' : undefined}
                 />
                 <div className={styles.angulosRapidos}>
                   <span>Ángulos notables:</span>
@@ -399,7 +343,9 @@ export default function CalculadoraTrigonometriaPage() {
                     <button
                       key={a}
                       type="button"
-                      onClick={() => setAngulo(unidad === 'grados' ? a.toString() : formatNumber(a * PI / 180, 4))}
+                      // En radianes se escribe el múltiplo EXACTO de π («π/2»), no 1,5708:
+                      // con el redondeo, el botón «90°» daba una tangente de −272.241,8.
+                      onClick={() => setAngulo(unidad === 'grados' ? a.toString() : textoRadianesDeNotable(a))}
                       className={styles.btnAngulo}
                     >
                       {a}°
@@ -411,7 +357,7 @@ export default function CalculadoraTrigonometriaPage() {
 
             {tipoCalculo === 'triangulo' && (
               <>
-                <p className={styles.helper}>Introduce al menos 2 valores</p>
+                <p className={styles.helper}>Escribe dos datos: dos lados, o un lado y el ángulo α</p>
                 <NumberInput
                   value={ladoA}
                   onChange={setLadoA}
@@ -441,11 +387,13 @@ export default function CalculadoraTrigonometriaPage() {
 
             {tipoCalculo === 'conversiones' && (
               <>
-                <NumberInput
-                  value={valorConvertir}
+                <CampoAngulo
+                  valor={valorConvertir}
                   onChange={setValorConvertir}
-                  label="Valor a convertir"
-                  placeholder="90"
+                  etiqueta="Valor a convertir"
+                  placeholder={unidadOrigen === 'radianes' ? 'π/2 o 1,5708' : '90'}
+                  admitePi={unidadOrigen === 'radianes'}
+                  ayuda={unidadOrigen === 'radianes' ? 'En radianes admite múltiplos de π: π/2, 3π/4, 2π.' : undefined}
                 />
                 <div className={styles.unidadOrigenSelector}>
                   {(['grados', 'radianes', 'gradianes'] as const).map(u => (
@@ -465,18 +413,20 @@ export default function CalculadoraTrigonometriaPage() {
 
             {tipoCalculo === 'identidades' && (
               <>
-                <NumberInput
-                  value={anguloA}
+                <CampoAngulo
+                  valor={anguloA}
                   onChange={setAnguloA}
-                  label={`Ángulo A (${unidad})`}
-                  placeholder="30"
+                  etiqueta={`Ángulo A (${unidad})`}
+                  placeholder={unidad === 'grados' ? '30' : 'π/6'}
+                  admitePi={unidad === 'radianes'}
                 />
-                <NumberInput
-                  value={anguloB2}
+                <CampoAngulo
+                  valor={anguloB2}
                   onChange={setAnguloB2}
-                  label={`Ángulo B (${unidad}) - opcional`}
-                  placeholder="45"
-                  helperText="Para suma/resta de ángulos"
+                  etiqueta={`Ángulo B (${unidad}) - opcional`}
+                  placeholder={unidad === 'grados' ? '45' : 'π/4'}
+                  admitePi={unidad === 'radianes'}
+                  ayuda="Para suma/resta de ángulos"
                 />
               </>
             )}
@@ -489,59 +439,77 @@ export default function CalculadoraTrigonometriaPage() {
           {!resultados ? (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">📐</span>
-              <p>Ingresa los valores para calcular</p>
+              <p>
+                {tipoCalculo === 'triangulo'
+                  ? 'Escribe dos datos del triángulo (al menos un lado) para calcular'
+                  : 'Ingresa los valores para calcular'}
+              </p>
             </div>
+          ) : resultados.tipo === 'aviso' ? (
+            <p className={styles.avisoDatos}>
+              <span aria-hidden="true">⚠️</span> {resultados.mensaje}
+            </p>
           ) : (
+            <>
+            {resultados.tipo === 'triangulo' && resultados.nota && (
+              <p className={styles.notaDatos}>{resultados.nota}</p>
+            )}
             <div className={styles.resultsGrid}>
               {resultados.tipo === 'funciones' && (
                 <>
                   <ResultCard
                     title="sin(θ)"
-                    value={formatNumber(resultados.seno ?? 0, 8)}
+                    value={formatNumber(resultados.razones.seno, 8)}
                     variant="highlight"
                     icon="sin"
                   />
                   <ResultCard
                     title="cos(θ)"
-                    value={formatNumber(resultados.coseno ?? 0, 8)}
+                    value={formatNumber(resultados.razones.coseno, 8)}
                     variant="highlight"
                     icon="cos"
                   />
                   <ResultCard
                     title="tan(θ)"
-                    value={resultados.tangente !== null ? formatNumber(resultados.tangente ?? 0, 8) : '∞'}
+                    value={razonTexto(resultados.razones.tangente)}
                     variant="highlight"
                     icon="tan"
+                    description={resultados.razones.tangente === null ? 'cos θ = 0: no se puede dividir entre cero' : undefined}
                   />
                   <ResultCard
                     title="csc(θ)"
-                    value={resultados.cosecante !== null ? formatNumber(resultados.cosecante ?? 0, 8) : '∞'}
+                    value={razonTexto(resultados.razones.cosecante)}
                     variant="info"
                     icon="csc"
+                    description={resultados.razones.cosecante === null ? 'sin θ = 0: no se puede dividir entre cero' : undefined}
                   />
                   <ResultCard
                     title="sec(θ)"
-                    value={resultados.secante !== null ? formatNumber(resultados.secante ?? 0, 8) : '∞'}
+                    value={razonTexto(resultados.razones.secante)}
                     variant="info"
                     icon="sec"
+                    description={resultados.razones.secante === null ? 'cos θ = 0: no se puede dividir entre cero' : undefined}
                   />
                   <ResultCard
                     title="cot(θ)"
-                    value={resultados.cotangente !== null ? formatNumber(resultados.cotangente ?? 0, 8) : '∞'}
+                    value={razonTexto(resultados.razones.cotangente)}
                     variant="info"
                     icon="cot"
+                    description={resultados.razones.cotangente === null ? 'sin θ = 0: no se puede dividir entre cero' : undefined}
                   />
                   <ResultCard
                     title="Cuadrante"
-                    value={`${resultados.cuadrante}°`}
+                    value={resultados.ubicacion.rotulo}
                     variant="default"
                     icon="📍"
+                    description={resultados.ubicacion.detalle}
                   />
                   <ResultCard
                     title="En radianes"
-                    value={formatNumber(resultados.anguloRad ?? 0, 6)}
+                    value={formatNumber(resultados.angulo.radianes, 6)}
                     variant="default"
                     icon="rad"
+                    description={unidad === 'radianes' ? `= ${formatNumber(resultados.angulo.grados, 4)}°` : undefined}
                   />
                 </>
               )}
@@ -550,46 +518,46 @@ export default function CalculadoraTrigonometriaPage() {
                 <>
                   <ResultCard
                     title="Cateto a"
-                    value={formatNumber(resultados.catetoA ?? 0, 4)}
+                    value={formatNumber(resultados.triangulo.a, 4)}
                     variant="default"
                     icon="a"
                   />
                   <ResultCard
                     title="Cateto b"
-                    value={formatNumber(resultados.catetoB ?? 0, 4)}
+                    value={formatNumber(resultados.triangulo.b, 4)}
                     variant="default"
                     icon="b"
                   />
                   <ResultCard
                     title="Hipotenusa c"
-                    value={formatNumber(resultados.hipotenusa ?? 0, 4)}
+                    value={formatNumber(resultados.triangulo.c, 4)}
                     variant="highlight"
                     icon="c"
                   />
                   <ResultCard
                     title="Ángulo A"
-                    value={formatNumber(resultados.anguloA ?? 0, 4)}
+                    value={formatNumber(resultados.triangulo.anguloA, 4)}
                     unit="°"
                     variant="info"
                     icon="α"
                   />
                   <ResultCard
                     title="Ángulo B"
-                    value={formatNumber(resultados.anguloB ?? 0, 4)}
+                    value={formatNumber(resultados.triangulo.anguloB, 4)}
                     unit="°"
                     variant="info"
                     icon="β"
                   />
                   <ResultCard
                     title="Área"
-                    value={formatNumber(resultados.area ?? 0, 4)}
+                    value={formatNumber(resultados.triangulo.area, 4)}
                     unit="u²"
                     variant="default"
                     icon="📐"
                   />
                   <ResultCard
                     title="Perímetro"
-                    value={formatNumber(resultados.perimetro ?? 0, 4)}
+                    value={formatNumber(resultados.triangulo.perimetro, 4)}
                     unit="u"
                     variant="default"
                     icon="📏"
@@ -601,27 +569,27 @@ export default function CalculadoraTrigonometriaPage() {
                 <>
                   <ResultCard
                     title="Grados"
-                    value={formatNumber(resultados.grados ?? 0, 6)}
+                    value={formatNumber(resultados.grados, 6)}
                     unit="°"
                     variant="highlight"
                     icon="°"
                   />
                   <ResultCard
                     title="Radianes"
-                    value={formatNumber(resultados.radianes ?? 0, 6)}
+                    value={formatNumber(resultados.radianes, 6)}
                     variant="highlight"
                     icon="rad"
                   />
                   <ResultCard
                     title="Gradianes"
-                    value={formatNumber(resultados.gradianes ?? 0, 6)}
+                    value={formatNumber(resultados.gradianes, 6)}
                     unit="gon"
                     variant="info"
                     icon="gon"
                   />
                   <ResultCard
                     title="Fracción de π"
-                    value={resultados.fraccionPi ?? ''}
+                    value={resultados.fraccionPi}
                     variant="info"
                     icon="π"
                   />
@@ -632,62 +600,73 @@ export default function CalculadoraTrigonometriaPage() {
                 <>
                   <ResultCard
                     title="sin²θ + cos²θ"
-                    value={formatNumber(resultados.sin2cos2 ?? 0, 8)}
+                    value={formatNumber(resultados.valores.sin2cos2, 8)}
                     variant="success"
                     icon="="
                     description="Siempre = 1"
                   />
                   <ResultCard
                     title="sin(2θ)"
-                    value={formatNumber(resultados.sin2a ?? 0, 8)}
+                    value={formatNumber(resultados.valores.sin2a, 8)}
                     variant="highlight"
                     icon="2θ"
                     description="= 2·sin(θ)·cos(θ)"
                   />
                   <ResultCard
                     title="cos(2θ)"
-                    value={formatNumber(resultados.cos2a ?? 0, 8)}
+                    value={formatNumber(resultados.valores.cos2a, 8)}
                     variant="highlight"
                     icon="2θ"
                     description="= cos²θ - sin²θ"
                   />
                   <ResultCard
                     title="sin(θ/2)"
-                    value={formatNumber(resultados.sinMitad ?? 0, 8)}
+                    value={formatNumber(resultados.valores.sinMitad, 8)}
                     variant="info"
                     icon="θ/2"
                   />
                   <ResultCard
                     title="cos(θ/2)"
-                    value={formatNumber(resultados.cosMitad ?? 0, 8)}
+                    value={formatNumber(resultados.valores.cosMitad, 8)}
                     variant="info"
                     icon="θ/2"
                   />
-                  {resultados.tieneB && (
+                  {resultados.valores.suma && (
                     <>
                       <ResultCard
                         title="sin(A+B)"
-                        value={formatNumber(resultados.sinSuma!, 8)}
+                        value={formatNumber(resultados.valores.suma.sinSuma, 8)}
                         variant="default"
                         icon="A+B"
+                        description="= sin A·cos B + cos A·sin B"
                       />
                       <ResultCard
                         title="cos(A+B)"
-                        value={formatNumber(resultados.cosSuma!, 8)}
+                        value={formatNumber(resultados.valores.suma.cosSuma, 8)}
                         variant="default"
                         icon="A+B"
+                        description="= cos A·cos B - sin A·sin B"
                       />
                       <ResultCard
                         title="sin(A-B)"
-                        value={formatNumber(resultados.sinResta!, 8)}
+                        value={formatNumber(resultados.valores.suma.sinResta, 8)}
                         variant="default"
                         icon="A-B"
+                        description="= sin A·cos B - cos A·sin B"
+                      />
+                      <ResultCard
+                        title="cos(A-B)"
+                        value={formatNumber(resultados.valores.suma.cosResta, 8)}
+                        variant="default"
+                        icon="A-B"
+                        description="= cos A·cos B + sin A·sin B"
                       />
                     </>
                   )}
                 </>
               )}
             </div>
+            </>
           )}
 
           <div className={styles.tablaNotables}>
@@ -942,7 +921,7 @@ export default function CalculadoraTrigonometriaPage() {
 
           {/* Tabla comparativa de las 6 funciones */}
           <section className={styles.guideSection}>
-            <h2>📊 Las 6 Funciones Trigonométricas</h2>
+            <h2><span aria-hidden="true">📊</span> Las 6 Funciones Trigonométricas</h2>
             <div className={styles.tableWrapper}>
               <table className={styles.comparativaTable}>
                 <thead>
@@ -1039,11 +1018,11 @@ export default function CalculadoraTrigonometriaPage() {
 
           {/* Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>👥 ¿Quién usa esta calculadora?</h2>
+            <h2><span aria-hidden="true">👥</span> ¿Quién usa esta calculadora?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎓</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                   <div>
                     <div className={styles.casoTitle}>Estudiante de Bachillerato</div>
                     <div className={styles.casoSubtitle}>Matemáticas II, Física</div>
@@ -1059,23 +1038,26 @@ export default function CalculadoraTrigonometriaPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏛️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏛️</span>
                   <div>
                     <div className={styles.casoTitle}>Arquitecto</div>
                     <div className={styles.casoSubtitle}>Inclinaciones de tejados y rampas</div>
                   </div>
                 </div>
                 <div className={styles.casoDesc}>
-                  Calcula inclinaciones de tejados: un tejado con pendiente 30° tiene
-                  un ratio de 1:1,732 (tan(30°) = 1/√3). Para una rampa accesible (máx 8°),
-                  una longitud horizontal de 6 m requiere una altura máxima de 6×tan(8°) ≈ 0,84 m.
+                  Calcula inclinaciones de tejados: un tejado con pendiente 30° sube 1 por cada
+                  1,732 de avance (tan(30°) = 1/√3). Las normas de edificación suelen dar la
+                  pendiente en tanto por ciento, no en grados: en España, una rampa de itinerario
+                  accesible con un tramo de 6 m en planta admite como máximo un 6 %
+                  (CTE DB SUA 1, apdo. 4.3.1), así que salva 6 × 0,06 = 0,36 m, un ángulo de
+                  arctan(0,06) ≈ 3,43°.
                 </div>
-                <div className={styles.escenarioExample}>Ejemplo: altura tejado = base × tan(ángulo pendiente)</div>
-                <div className={styles.escenarioTip}>Normativa CTE: pendiente tejados residenciales entre 15° y 35° según material</div>
+                <div className={styles.escenarioExample}>Ejemplo: altura = avance horizontal × tan(ángulo); pendiente (%) = 100 × tan(ángulo)</div>
+                <div className={styles.escenarioTip}>No confundas % con grados: una pendiente del 8 % son unos 4,57°, y 8° equivalen a un 14,05 %</div>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⛵</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⛵</span>
                   <div>
                     <div className={styles.casoTitle}>Navegante</div>
                     <div className={styles.casoSubtitle}>Distancias y triangulación GPS</div>
@@ -1092,7 +1074,7 @@ export default function CalculadoraTrigonometriaPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📡</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📡</span>
                   <div>
                     <div className={styles.casoTitle}>Ingeniero de Señales</div>
                     <div className={styles.casoSubtitle}>Análisis de señales periódicas</div>
@@ -1112,7 +1094,7 @@ export default function CalculadoraTrigonometriaPage() {
 
           {/* FAQ */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas Frecuentes sobre Trigonometría</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Trigonometría</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <div className={styles.faqPregunta}>¿Cuándo usar seno vs coseno vs tangente?</div>
@@ -1203,7 +1185,7 @@ export default function CalculadoraTrigonometriaPage() {
 
           {/* Guía paso a paso */}
           <section className={styles.guideSection}>
-            <h2>🗺️ Cómo resolver cualquier triángulo: 7 pasos</h2>
+            <h2><span aria-hidden="true">🗺️</span> Cómo resolver cualquier triángulo: 7 pasos</h2>
             <ol className={styles.stepGuide}>
               <li className={styles.step}>
                 <span className={styles.stepNumber}>1</span>
@@ -1289,7 +1271,7 @@ export default function CalculadoraTrigonometriaPage() {
 
           {/* Mejores Prácticas */}
           <section className={styles.guideSection}>
-            <h2>💡 Mejores Prácticas</h2>
+            <h2><span aria-hidden="true">💡</span> Mejores Prácticas</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">✏️</span>
@@ -1390,7 +1372,7 @@ export default function CalculadoraTrigonometriaPage() {
 
           {/* Conceptos fundamentales (mantenido) */}
           <section className={styles.guideSection}>
-            <h2>📖 Conceptos Fundamentales</h2>
+            <h2><span aria-hidden="true">📖</span> Conceptos Fundamentales</h2>
             <p className={styles.introParagraph}>
               La trigonometría estudia las relaciones entre los ángulos y los lados de los triángulos.
               Es fundamental en física, ingeniería, navegación, astronomía y gráficos por computadora.
