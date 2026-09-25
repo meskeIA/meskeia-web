@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Qué son los gases nobles y por qué no reaccionan?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los gases nobles son los seis elementos del grupo 18: helio, neón, argón, criptón, xenón y radón. Su capa de valencia está completamente llena de electrones (configuración de octeto estable), lo que les confiere una reactividad química extremadamente baja. Por eso se llaman también gases inertes y se usan en aplicaciones donde se necesita un ambiente inerte, como el llenado de bombillas o la soldadura de precisión.',
+        text: 'Los gases nobles son los elementos del grupo 18. La tabla de la IUPAC pone siete: helio, neón, argón, criptón, xenón y radón, que existen en la naturaleza, y el oganesón, sintético y del que apenas se han obtenido unos pocos átomos. En los seis naturales, la capa de valencia está completamente llena de electrones (ocho, o dos en el helio), lo que les confiere una reactividad química extremadamente baja. Por eso se llaman también gases inertes y se usan en aplicaciones donde se necesita un ambiente inerte, como el llenado de bombillas o la soldadura de precisión.',
       },
     },
   ],

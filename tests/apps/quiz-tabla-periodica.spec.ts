@@ -58,10 +58,11 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  * 10 primeras del barajado son las que se piden. No depende de cuántos números gaste React
  * al hidratar, que era la objeción a fijar el PRNG (ver ALEATORIEDAD).
  *
- * Hallazgos ABIERTOS, como test.fail con lo que debería pasar: la pregunta 28 (el grupo 18
- * tiene 7 elementos, no 6), dos explicaciones con un dato que su fuente no sostiene, el tema
- * oscuro que borra el verde/rojo de las opciones, la vista y el foco que no vuelven a la
- * pregunta tras «Siguiente pregunta», y el contraste del veredicto, la nota y los botones.
+ * Hallazgos 1672-1677 (reparados el 25/09/2026; los casos 5-7b, 10b y 14-16b son hoy su
+ * regresión): la pregunta 28 (el grupo 18 tiene 7 elementos, no 6), dos explicaciones con un
+ * dato que su fuente no sostiene, el tema oscuro que borraba el verde/rojo de las opciones, la
+ * vista y el foco que no volvían a la pregunta tras «Siguiente pregunta», y el contraste del
+ * veredicto, la nota y los botones.
  */
 
 const RUTA = '/quiz-tabla-periodica/';
@@ -86,7 +87,7 @@ const CLAVE_IUPAC: Record<string, string> = {
   // ── Grupos y períodos ──
   '¿A qué grupo pertenece el Carbono (C)?': 'Grupo 14', // C con Si, Ge, Sn, Pb
   '¿En qué período se encuentra el Sodio (Na)?': 'Período 3', // Z=11, tercera capa
-  '¿A qué grupo pertenecen los Gases Nobles?': 'Grupo 18', // He, Ne, Ar, Kr, Xe, Rn
+  '¿A qué grupo pertenecen los Gases Nobles?': 'Grupo 18', // He, Ne, Ar, Kr, Xe, Rn, Og
   '¿A qué grupo pertenecen los Halógenos?': 'Grupo 17', // F, Cl, Br, I, At, Ts
   '¿En qué período se encuentran los Lantánidos?': 'Período 6', // La(57) a Lu(71)
   '¿A qué grupo pertenecen los Metales Alcalinos?': 'Grupo 1', // Li, Na, K, Rb, Cs, Fr
@@ -111,11 +112,10 @@ const CLAVE_IUPAC: Record<string, string> = {
   '¿Qué familia incluye al Flúor, Cloro, Bromo y Yodo?': 'Halógenos',
   '¿A qué familia pertenece el Hierro (Fe)?': 'Metales de transición', // grupos 3-12
   '¿Cuál de estos elementos es un metal alcalinotérreo?': 'Calcio (Ca)', // grupo 2: Be, Mg, Ca, Sr, Ba, Ra
-  // OJO — hallazgo ABIERTO del 25/09/2026 (caso 5, test.fail): la tabla de la IUPAC pone
-  // SIETE elementos en el grupo 18 (He, Ne, Ar, Kr, Xe, Rn y Og). Aquí se deja el 6 que la app
-  // marca HOY para que los casos 1-3 no den un rojo por azar cada vez que sale esta pregunta;
-  // cuando se repare, esta línea cambia con ella (o con el enunciado nuevo).
-  '¿Cuántos elementos forman el grupo de los Gases Nobles?': '6',
+  // La tabla de la IUPAC pone SIETE elementos en el grupo 18: He, Ne, Ar, Kr, Xe, Rn y Og
+  // (Koppenol et al., Pure Appl. Chem. 88, 401-405, 2016: el «-on» del oganesón es por ser del
+  // grupo 18). La app marcaba 6 hasta el hallazgo 1672 (caso 5).
+  '¿Cuántos elementos forman el grupo de los Gases Nobles?': '7',
   // ── Curiosidades ──
   '¿Qué elemento da el color rojo a los fuegos artificiales?': 'Estroncio', // Sr rojo, Ba verde, Cu azul-verde, K violeta
   '¿Cuál es el único metal líquido a temperatura ambiente estándar?': 'Mercurio', // Hg
@@ -611,7 +611,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
   });
 
   /**
-   * CASO 5 — HALLAZGO ABIERTO: la pregunta 28 da por mala la respuesta de la IUPAC
+   * CASO 5 — HALLAZGO 1672 (reparado): la pregunta 28 da por mala la respuesta de la IUPAC
    *
    * «¿Cuántos elementos forman el grupo de los Gases Nobles?» pregunta por el GRUPO, y la tabla
    * periódica de la IUPAC (versión del 4/05/2022) pone siete en el grupo 18: He, Ne, Ar, Kr, Xe,
@@ -622,7 +622,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
    * DEBERÍA: pulsar «7» es acierto (o el enunciado pregunta otra cosa con una sola respuesta,
    * p. ej. cuántos gases nobles hay en la naturaleza; entonces se reescribe este caso).
    */
-  test.fail('caso 5 · dato: la pregunta del grupo 18 acepta los 7 elementos de la IUPAC', async ({ page }) => {
+  test('caso 5 · dato: la pregunta del grupo 18 acepta los 7 elementos de la IUPAC', async ({ page }) => {
     await empezarConBanco(page, 'Empezar quiz', [POS_GASES_NOBLES, ...PRIMERAS_DIEZ.slice(1)]);
     await expect(enunciado(page)).toHaveText('¿Cuántos elementos forman el grupo de los Gases Nobles?');
     await pulsarOpcion(page, '7');
@@ -631,11 +631,11 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
   });
 
   /**
-   * CASO 6 — HALLAZGO ABIERTO (el mismo): el FAQPage del JSON-LD dice «los seis elementos del
+   * CASO 6 — HALLAZGO 1672 (reparado, el mismo): el FAQPage del JSON-LD dice «los seis elementos del
    * grupo 18». Es el texto que leen Google y los buscadores de IA. DEBERÍA: no afirmar que el
    * grupo 18 tiene seis elementos (tiene siete, con el oganesón).
    */
-  test.fail('caso 6 · dato: el FAQPage no dice que el grupo 18 tenga seis elementos', async ({ page }) => {
+  test('caso 6 · dato: el FAQPage no dice que el grupo 18 tenga seis elementos', async ({ page }) => {
     const html = await (await page.request.get(RUTA)).text();
     const faq = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
       .map((m) => JSON.parse(m[1]) as { '@type': string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] })
@@ -646,13 +646,13 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
   });
 
   /**
-   * CASO 7a — HALLAZGO ABIERTO: la explicación de la pregunta 38 dice «Le sigue el Xenón con 9
+   * CASO 7a — HALLAZGO 1673 (reparado): la explicación de la pregunta 38 dice «Le sigue el Xenón con 9
    * isótopos estables». El xenón tiene 9 isótopos NATURALES, pero dos son radiactivos con
    * desintegración observada: el ¹²⁴Xe (1,8·10²² años, XENON1T, Nature 568, 532, 2019) y el
    * ¹³⁶Xe (2,2·10²¹ años, EXO-200). NUBASE2020 le deja 7 estables. La respuesta marcada
    * (Estaño, 10 estables) es correcta. DEBERÍA: «9 isótopos naturales», o 7 estables.
    */
-  test.fail('caso 7a · dato: la explicación de los isótopos no le da al xenón 9 estables', async ({ page }) => {
+  test('caso 7a · dato: la explicación de los isótopos no le da al xenón 9 estables', async ({ page }) => {
     await empezarConBanco(page, 'Empezar quiz', [POS_ISOTOPOS, ...PRIMERAS_DIEZ.slice(1)]);
     await expect(enunciado(page)).toHaveText('¿Qué elemento tiene el mayor número de isótopos estables?');
     await pulsarOpcion(page, 'Estaño');
@@ -661,13 +661,13 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
   });
 
   /**
-   * CASO 7b — HALLAZGO ABIERTO: la explicación de la pregunta 20 dice que el hidrógeno es
+   * CASO 7b — HALLAZGO 1673 (reparado): la explicación de la pregunta 20 dice que el hidrógeno es
    * «aproximadamente el 75% de la masa del universo». Es el 75 % de la materia ORDINARIA
    * (bariónica); con la materia oscura, que es ~5/6 de la materia (Planck 2018, A&A 641, A6),
    * se queda en torno al 12 % de la masa. La respuesta marcada (Hidrógeno) es correcta.
    * DEBERÍA: decir de qué masa es el 75 % (materia ordinaria, o masa de los elementos).
    */
-  test.fail('caso 7b · dato: el 75 % del hidrógeno se refiere a la materia ordinaria', async ({ page }) => {
+  test('caso 7b · dato: el 75 % del hidrógeno se refiere a la materia ordinaria', async ({ page }) => {
     await empezarConBanco(page, 'Empezar quiz', [POS_UNIVERSO, ...PRIMERAS_DIEZ.slice(1)]);
     await expect(enunciado(page)).toHaveText('¿Cuál es el elemento más abundante en el universo?');
     await pulsarOpcion(page, 'Hidrógeno');
@@ -746,8 +746,8 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
 
     await expect(enunciado(page)).toHaveText('¿Qué elemento tiene número atómico 1?');
     const textos2 = (await opciones(page).allInnerTexts()).map(limpiar);
-    // Tras avanzar, la vista se queda donde estaba «Siguiente pregunta» (caso 16): hay que
-    // traer las opciones a pantalla antes de leer sus cajas para el ratón.
+    // Desde el hallazgo 1675 la app devuelve la vista al quiz al avanzar (caso 16); se traen
+    // igualmente las opciones a pantalla antes de leer sus cajas para el ratón.
     await opciones(page).nth(3).scrollIntoViewIfNeeded();
     await opciones(page).nth(0).scrollIntoViewIfNeeded();
     const cajaMala = await opciones(page).nth(textos2.indexOf('Helio')).boundingBox();
@@ -798,7 +798,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
   });
 
   /**
-   * CASO 10b — HALLAZGO ABIERTO: tras «Siguiente pregunta» el foco no vuelve a la pregunta
+   * CASO 10b — HALLAZGO 1676 (reparado): tras «Siguiente pregunta» el foco no vuelve a la pregunta
    *
    * El botón que se pulsa desaparece (el bloque de feedback se desmonta) y nadie mueve el foco:
    * cae a <body> y el punto de partida queda DETRÁS de las opciones nuevas, así que el Tab
@@ -807,7 +807,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
    * lector de pantalla no anuncia la pregunta nueva. Es la otra mitad del bucle del 364.
    * DEBERÍA: después de avanzar, el Tab siguiente cae dentro de la tarjeta de la pregunta.
    */
-  test.fail('caso 10b · accesibilidad: tras «Siguiente pregunta» el Tab vuelve a la pregunta nueva', async ({ page }) => {
+  test('caso 10b · accesibilidad: tras «Siguiente pregunta» el Tab vuelve a la pregunta nueva', async ({ page }) => {
     await empezarYAcertarConTeclado(page);
     await page.keyboard.press('Enter');
     await expect(page.getByText(`Pregunta 2 de ${TOTAL_PREGUNTAS}`)).toBeVisible();
@@ -927,7 +927,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
   });
 
   /**
-   * CASO 14 — HALLAZGO ABIERTO: en oscuro las opciones pierden el verde y el rojo
+   * CASO 14 — HALLAZGO 1674 (reparado): en oscuro las opciones pierden el verde y el rojo
    *
    * `[data-theme='dark'] .opcion` (especificidad 0,2,0) pisa el borde y el fondo de
    * `.opcionCorrecta` / `.opcionIncorrecta` (0,1,0), y `[data-theme='dark'] .opcionLetra`,
@@ -937,7 +937,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
    * atenúan. En claro son rgb(22,163,74) y rgb(220,38,38) (caso 9).
    * DEBERÍA: en oscuro la correcta y la fallada se distinguen entre sí y de las apagadas.
    */
-  test.fail('caso 14 · operativa: en oscuro la opción correcta y la fallada no se pintan igual', async ({ page }) => {
+  test('caso 14 · operativa: en oscuro la opción correcta y la fallada no se pintan igual', async ({ page }) => {
     await activarTema(page, 'dark');
     await page.emulateMedia({ reducedMotion: 'reduce' }); // sin la transición de 0,15 s del borde
     await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
@@ -955,7 +955,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
   });
 
   /**
-   * CASO 15 — HALLAZGO ABIERTO: el veredicto, la nota y los botones no llegan al contraste
+   * CASO 15 — HALLAZGO 1677 (reparado): el veredicto, la nota y los botones no llegan al contraste
    *
    * Flujo del test en cada tema: la del Oro fallada con «47», la de Z = 1 acertada y el resto
    * bien → nota 9/10. Medido el 25/09/2026 sobre el fondo computado (umbral 4,5 texto normal,
@@ -967,7 +967,39 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (escritorio)',
    *            2,05 · los dos botones 2,79
    * DEBERÍA: todos por encima de su umbral en los dos temas.
    */
-  test.fail('caso 15 · accesibilidad: veredicto, nota y botones del quiz llegan a su contraste', async ({ page }) => {
+  /**
+   * CASO 16b — HALLAZGO 1675 (reparado), la otra salida: «Ver resultados» a 1.280 × 800
+   *
+   * Medido el 25/09/2026: tras la décima, el círculo de la nota salía en y = −222…−112, por
+   * encima de la pantalla, y el foco caía a <body>. DEBERÍA: el círculo se ve entero bajo el
+   * logo fijo y el foco está en la tarjeta del resultado (no en <body>).
+   */
+  test('caso 16b · operativa: tras «Ver resultados» la nota se ve y el foco no cae a <body>', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await empezarConBanco(page, 'Empezar quiz', [POS_RENIO, ...PRIMERAS_DIEZ.slice(1)]);
+    for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+      await responderBienYAvanzar(page);
+    }
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('10/10');
+    const vista = await page.evaluate(() => {
+      const logo = document.querySelector('[class*="headerBar"]')?.firstElementChild?.getBoundingClientRect();
+      const c = (document.querySelector('[class*="puntuacionCirculo"]') as Element).getBoundingClientRect();
+      return {
+        arriba: Math.round(c.top),
+        abajo: Math.round(c.bottom),
+        finLogo: Math.round(logo?.bottom ?? 0),
+        alto: innerHeight,
+        foco: !!document.activeElement?.closest('[class*="resultadoCard"]'),
+      };
+    });
+    expect(vista.arriba, `nota desde y = ${vista.arriba}; el logo acaba en ${vista.finLogo}`).toBeGreaterThanOrEqual(vista.finLogo);
+    expect(vista.abajo).toBeLessThanOrEqual(vista.alto);
+    expect(vista.foco, 'el foco queda en la tarjeta del resultado').toBe(true);
+  });
+
+  test('caso 15 · accesibilidad: veredicto, nota y botones del quiz llegan a su contraste', async ({ page }) => {
     test.setTimeout(90_000);
     const fallos: string[] = [];
     const anotar = async (tema: string, loc: Locator): Promise<void> => {
@@ -1059,7 +1091,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (móvil 412 px
   });
 
   /**
-   * CASO 16 — HALLAZGO ABIERTO: tras «Siguiente pregunta» la pregunta nueva queda fuera de
+   * CASO 16 — HALLAZGO 1675 (reparado): tras «Siguiente pregunta» la pregunta nueva queda fuera de
    * la vista
    *
    * Al responder, el foco va a «Siguiente pregunta» y el navegador baja la página hasta él
@@ -1072,7 +1104,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (móvil 412 px
    * resultados.
    * DEBERÍA: tras avanzar, el enunciado nuevo se ve entero, por debajo del logo fijo.
    */
-  test.fail('caso 16 · operativa: tras «Siguiente pregunta» el enunciado nuevo se ve bajo el logo', async ({ page }) => {
+  test('caso 16 · operativa: tras «Siguiente pregunta» el enunciado nuevo se ve bajo el logo', async ({ page }) => {
     await empezarConBanco(page, 'Empezar quiz', [POS_RENIO, ...PRIMERAS_DIEZ.slice(1)]);
     await pulsarOpcion(page, 'Renio');
     await botonAvanzar(page).tap();

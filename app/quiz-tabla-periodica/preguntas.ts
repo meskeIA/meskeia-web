@@ -109,7 +109,7 @@ export const BANCO_PREGUNTAS: Pregunta[] = [
     pregunta: '¿A qué grupo pertenecen los Gases Nobles?',
     opciones: ['Grupo 1', 'Grupo 7', 'Grupo 17', 'Grupo 18'],
     correcta: 3,
-    explicacion: 'Los Gases Nobles (He, Ne, Ar, Kr, Xe, Rn) pertenecen al Grupo 18. Tienen la capa de valencia completa, lo que los hace extremadamente poco reactivos.',
+    explicacion: 'Los Gases Nobles (He, Ne, Ar, Kr, Xe, Rn y el sintético Og) pertenecen al Grupo 18. Tienen la capa de valencia completa, lo que los hace extremadamente poco reactivos.',
     categoria: 'grupo-periodo',
   },
   {
@@ -181,7 +181,7 @@ export const BANCO_PREGUNTAS: Pregunta[] = [
     pregunta: '¿Cuál es el elemento más abundante en el universo?',
     opciones: ['Helio', 'Oxígeno', 'Hidrógeno', 'Carbono'],
     correcta: 2,
-    explicacion: 'El Hidrógeno constituye aproximadamente el 75% de la masa del universo. Las estrellas como el Sol son principalmente Hidrógeno.',
+    explicacion: 'El Hidrógeno es unas tres cuartas partes (~75 %) de la masa de la materia ordinaria del universo, la que está hecha de átomos; la materia oscura, que es la mayor parte de la materia, no entra en esa cuenta. Las estrellas como el Sol son principalmente Hidrógeno.',
     categoria: 'propiedades',
   },
   {
@@ -205,7 +205,7 @@ export const BANCO_PREGUNTAS: Pregunta[] = [
     pregunta: '¿Cuál de los siguientes NO es un Gas Noble?',
     opciones: ['Argón (Ar)', 'Kriptón (Kr)', 'Xenón (Xe)', 'Cloro (Cl)'],
     correcta: 3,
-    explicacion: 'El Cloro (Cl) es un halógeno (Grupo 17), no un gas noble. Los gases nobles son He, Ne, Ar, Kr, Xe y Rn, todos en el Grupo 18.',
+    explicacion: 'El Cloro (Cl) es un halógeno (Grupo 17), no un gas noble. Los gases nobles son He, Ne, Ar, Kr, Xe y Rn, todos en el Grupo 18, que completa el Oganesón (Og), sintético.',
     categoria: 'familia',
   },
   {
@@ -243,9 +243,15 @@ export const BANCO_PREGUNTAS: Pregunta[] = [
   {
     id: 28,
     pregunta: '¿Cuántos elementos forman el grupo de los Gases Nobles?',
-    opciones: ['5', '6', '7', '8'],
-    correcta: 1,
-    explicacion: 'Los Gases Nobles son 6: Helio (He), Neón (Ne), Argón (Ar), Kriptón (Kr), Xenón (Xe) y Radón (Rn). El Oganesón (Og) es artificial.',
+    // El 7 va en la A: en la C elevaba esa posición a 20 de 40 respuestas, el límite que vigila
+    // tests/quiz-tabla-periodica-banco.spec.ts contra el sesgo de posición.
+    opciones: ['7', '6', '5', '8'],
+    // 7 según la tabla de la IUPAC. Marcaba 6 y excluía al oganesón «por artificial», un
+    // criterio que el banco no aplica en ningún otro sitio (el tecnecio de la 32 también lo es
+    // y tiene su grupo). La IUPAC le dio la terminación «-on» precisamente por ser del grupo 18
+    // (Koppenol et al., Pure Appl. Chem. 88, 401-405, 2016). Hallazgo 1672.
+    correcta: 0,
+    explicacion: 'El Grupo 18 tiene 7 elementos en la tabla de la IUPAC: Helio (He), Neón (Ne), Argón (Ar), Kriptón (Kr), Xenón (Xe), Radón (Rn) y Oganesón (Og). Los seis primeros existen en la naturaleza; el Oganesón es sintético (se ha obtenido átomo a átomo en laboratorio) y la IUPAC le dio la terminación «-on» precisamente por pertenecer a este grupo.',
     categoria: 'familia',
   },
   {
@@ -330,7 +336,7 @@ export const BANCO_PREGUNTAS: Pregunta[] = [
     pregunta: '¿Qué elemento tiene el mayor número de isótopos estables?',
     opciones: ['Plomo', 'Estaño', 'Teluro', 'Xenón'],
     correcta: 1,
-    explicacion: 'El Estaño (Sn) tiene 10 isótopos estables, más que cualquier otro elemento. Le sigue el Xenón con 9 isótopos estables.',
+    explicacion: 'El Estaño (Sn) tiene 10 isótopos estables, más que cualquier otro elemento. El Xenón tiene 9 isótopos naturales, pero en dos de ellos (¹²⁴Xe y ¹³⁶Xe) se ha observado una desintegración lentísima, con semividas de más de 10²¹ años, así que estables le quedan 7.',
     categoria: 'curiosidad',
   },
   {

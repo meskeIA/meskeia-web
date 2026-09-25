@@ -80,7 +80,7 @@
 
 .badge {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1px solid rgba(46, 134, 171, 0.2);
   border-radius: 20px;
   padding: 0.3rem 0.75rem;
@@ -91,7 +91,9 @@
 /* ===== BOTONES ===== */
 
 .btnPrimario {
-  background: var(--primary);
+  /* Blanco sobre --primary daba 4,11:1 en claro y 2,79:1 en oscuro (hallazgo 1677).
+     --primary-boton vale lo mismo en los dos temas: 5,47:1. */
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 10px;
@@ -104,7 +106,7 @@
 }
 
 .btnPrimario:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   transform: translateY(-1px);
 }
 
@@ -135,7 +137,7 @@
 }
 
 .aciertosProgreso {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
 }
 
@@ -164,7 +166,7 @@
 .categoriaBadge {
   display: inline-block;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1px solid rgba(46, 134, 171, 0.2);
   border-radius: 20px;
   padding: 0.25rem 0.75rem;
@@ -179,6 +181,20 @@
   color: var(--text-primary);
   line-height: 1.5;
   margin: 0 0 1.5rem;
+}
+
+/* El enunciado recibe el foco por programa al avanzar (tabIndex=-1): no es un control, así
+   que no se le pinta el anillo de foco. */
+.preguntaTexto:focus,
+.resultadoCard:focus {
+  outline: none;
+}
+
+/* Al avanzar, la vista se lleva al principio del quiz o del resultado: este margen deja la
+   barra del logo fijo (hasta ~70 px en escritorio) por encima, sin taparlo. */
+.quizArea,
+.resultadoCard {
+  scroll-margin-top: 88px;
 }
 
 .opcionesGrid {
@@ -233,7 +249,7 @@
 }
 
 .opcionCorrecta .opcionLetra {
-  background: #16a34a;
+  background: #15803d; /* blanco encima: 5,02:1 (#16a34a daba 3,30) */
   color: white;
 }
 
@@ -244,7 +260,7 @@
 }
 
 .opcionIncorrecta .opcionLetra {
-  background: #dc2626;
+  background: #b91c1c; /* blanco encima: 6,47:1 */
   color: white;
 }
 
@@ -279,12 +295,13 @@
   color: var(--text-primary);
 }
 
+/* #16a34a daba 3,02:1 y #dc2626 4,34:1 sobre su tinte (hallazgo 1677). */
 .feedbackCorrecto .feedbackResultado {
-  color: #16a34a;
+  color: #166534;
 }
 
 .feedbackIncorrecto .feedbackResultado {
-  color: #dc2626;
+  color: #b91c1c;
 }
 
 .explicacion {
@@ -295,7 +312,7 @@
 }
 
 .btnSiguiente {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 8px;
@@ -307,7 +324,7 @@
 }
 
 .btnSiguiente:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .btnSiguiente:focus-visible {
@@ -337,7 +354,9 @@
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  /* Con --primary → --secondary la nota bajaba a 2,43:1 en oscuro y «/10» a 2,05 (hallazgo
+     1677). Las variantes -boton valen lo mismo en los dos temas: blanco encima ≥ 5,15:1. */
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -353,7 +372,7 @@
 
 .puntuacionTotal {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: white;
   font-weight: 500;
   margin-top: 4px;
 }
@@ -395,7 +414,7 @@
 .statNumero {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -429,13 +448,38 @@
 
 [data-theme='dark'] .opcionLetra {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+/* Tras responder, en oscuro. `[data-theme='dark'] .opcion` (0,2,0) pisaba el borde y el fondo
+   de .opcionCorrecta / .opcionIncorrecta (0,1,0), y la regla de .opcionLetra de arriba, el
+   círculo verde o rojo: la buena y la fallada se pintaban IGUAL (hallazgo 1674). Con la misma
+   especificidad y después en la hoja, ganan estas. */
+[data-theme='dark'] .opcionCorrecta {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+[data-theme='dark'] .opcionIncorrecta {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+[data-theme='dark'] .opcionCorrecta .opcionLetra {
+  background: #15803d;
+  color: white;
+}
+
+[data-theme='dark'] .opcionIncorrecta .opcionLetra {
+  background: #b91c1c;
+  color: white;
 }
 
 [data-theme='dark'] .badge,
 [data-theme='dark'] .categoriaBadge {
   background: rgba(46, 134, 171, 0.15);
   border-color: rgba(46, 134, 171, 0.3);
+  color: #8ccbe8; /* 6,6:1 sobre el tinte; --primary-texto se quedaba en 4,18 */
 }
 
 [data-theme='dark'] .statsGrid {
@@ -450,6 +494,16 @@
 [data-theme='dark'] .feedbackIncorrecto {
   background: rgba(220, 38, 38, 0.12);
   border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* En oscuro el verde y el rojo oscuros del claro se hunden: «¡Correcto!» 3,60 e «Incorrecto»
+   2,67 con los de antes. Estos dan 6,8:1 sobre su tinte. */
+[data-theme='dark'] .feedbackCorrecto .feedbackResultado {
+  color: #4ade80;
+}
+
+[data-theme='dark'] .feedbackIncorrecto .feedbackResultado {
+  color: #fca5a5;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -619,7 +673,7 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-weight: 700;

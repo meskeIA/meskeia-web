@@ -41,6 +41,21 @@ function mezclarArray<T>(arr: T[]): T[] {
   return copia;
 }
 
+/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
+const MARGEN_LOGO = 88;
+
+/**
+ * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
+ * Salto instantáneo, sin animación: es el sitio donde ya estaba el usuario hace un momento.
+ */
+function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
+  if (!bloque || !clave) return;
+  const r = clave.getBoundingClientRect();
+  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
 export default function QuizTablaPeriodicaPage() {
   const [fase, setFase] = useState<Fase>('inicio');
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
@@ -62,6 +77,28 @@ export default function QuizTablaPeriodicaPage() {
   useEffect(() => {
     if (haRespondido) botonSiguienteRef.current?.focus();
   }, [haRespondido, indice]);
+
+  /**
+   * La otra mitad del bucle (hallazgos 1675 y 1676). Al pulsar «Siguiente pregunta» ese botón
+   * se desmonta con el feedback: el foco caía al <body>, el primer Tab saltaba al bloque
+   * educativo (18 Tabs para volver a la opción A) y el lector no anunciaba nada. Y la vista se
+   * quedaba donde estaba el botón, que la explicación había empujado hacia abajo: en móvil el
+   * enunciado nuevo quedaba por encima del borde de la pantalla. Aquí, cada vez que aparece una
+   * pregunta sin responder (o el resultado), el foco va a su enunciado —que el lector lee— y,
+   * si no se ve entero bajo el logo fijo, la vista vuelve al principio del quiz.
+   */
+  const quizAreaRef = useRef<HTMLDivElement>(null);
+  const enunciadoRef = useRef<HTMLParagraphElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (fase === 'jugando' && !haRespondido) {
+      traerALaVista(quizAreaRef.current, enunciadoRef.current);
+      enunciadoRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'resultado') {
+      traerALaVista(resultadoRef.current, resultadoRef.current);
+      resultadoRef.current?.focus({ preventScroll: true });
+    }
+  }, [fase, indice, haRespondido]);
 
   function iniciarQuiz() {
     setPreguntas(mezclarArray(BANCO_PREGUNTAS).slice(0, TOTAL_PREGUNTAS));
@@ -170,7 +207,7 @@ export default function QuizTablaPeriodicaPage() {
         )}
 
         {fase === 'jugando' && pregunta && (
-          <div className={styles.quizArea}>
+          <div className={styles.quizArea} ref={quizAreaRef}>
             <div className={styles.progreso}>
               <div className={styles.progresoInfo}>
                 <span>Pregunta {indice + 1} de {TOTAL_PREGUNTAS}</span>
@@ -189,7 +226,7 @@ export default function QuizTablaPeriodicaPage() {
                 <span aria-hidden="true">{ETIQUETAS_CATEGORIA[pregunta.categoria].emoji}</span>{' '}
                 {ETIQUETAS_CATEGORIA[pregunta.categoria].texto}
               </span>
-              <p className={styles.preguntaTexto}>{pregunta.pregunta}</p>
+              <p className={styles.preguntaTexto} ref={enunciadoRef} tabIndex={-1}>{pregunta.pregunta}</p>
 
               <div className={styles.opcionesGrid}>
                 {pregunta.opciones.map((opcion, i) => {
@@ -246,7 +283,13 @@ export default function QuizTablaPeriodicaPage() {
 
         {fase === 'resultado' && (
           <div className={styles.resultado}>
-            <div className={styles.resultadoCard}>
+            <div
+              className={styles.resultadoCard}
+              ref={resultadoRef}
+              tabIndex={-1}
+              role="group"
+              aria-label={`Resultado: ${totalAciertos} de ${TOTAL_PREGUNTAS} aciertos`}
+            >
               <div className={styles.puntuacionCirculo}>
                 <span className={styles.puntuacionNumero}>{totalAciertos}</span>
                 <span className={styles.puntuacionTotal}>/{TOTAL_PREGUNTAS}</span>
