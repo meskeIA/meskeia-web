@@ -56,7 +56,9 @@ export const faqJsonLd = {
       name: '¿Qué nivel de decibelios se considera ruido excesivo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La Organización Mundial de la Salud recomienda no superar 65 dB en entornos urbanos durante el día y 55 dB por la noche. En muchos países la normativa de ruidos de vecindad fija límites entre 30-40 dB para el interior de viviendas en horario nocturno. Lecturas sostenidas por encima de 85 dB pueden causar daño auditivo progresivo.',
+        // Hallazgo 1705: atribuía a la OMS 65 dB de día, que no es suyo. Cifras de la OMS: Guidelines
+        // for Community Noise (1999) y Night Noise Guidelines for Europe (2009), las mismas de la página.
+        text: 'Como referencia de salud, la Organización Mundial de la Salud sitúa en 50 dB la molestia moderada y en 55 dB la molestia seria en exteriores durante el día (Guidelines for Community Noise, 1999), y propone no superar 40 dB en el exterior de la vivienda por la noche (Night Noise Guidelines, 2009). Los límites legales los fija cada país y municipio: en España, el objetivo nocturno en el interior de una vivienda es de 30 dB en dormitorios y 35 dB en estancias. Lecturas sostenidas por encima de 85 dB pueden causar daño auditivo progresivo.',
       },
     },
     {

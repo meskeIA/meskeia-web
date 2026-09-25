@@ -159,6 +159,17 @@ const FOTOGRAMAS_ESTABILIZACION = 10;
 const FOTOGRAMAS_SIN_SENAL_AVISO = 120;
 
 /**
+ * Hueco entre dos fotogramas a partir del cual se AVISA de que hubo tiempo sin medir, en ms.
+ *
+ * El bucle va con requestAnimationFrame, y el navegador deja de llamarlo cuando la página no se
+ * pinta: pestaña oculta, móvil bloqueado, pantalla apagada porque se denegó el Wake Lock o un
+ * diálogo modal abierto. El audio sigue entrando, pero nadie lo lee (hallazgo 1700). Ese tiempo
+ * nunca cuenta como medido —ver `measureLoop`—; este umbral solo decide cuándo se dice en
+ * pantalla. Un segundo deja fuera los tirones normales de un equipo cargado.
+ */
+const HUECO_AVISO_MS = 1000;
+
+/**
  * Ganancia de la ponderación A a una frecuencia, en dB (IEC 61672-1).
  *
  * La app rotula su estadística principal «LAeq» y todo su bloque educativo remite a límites
@@ -195,6 +206,8 @@ export default function SonometroPage() {
   const [maxDb, setMaxDb] = useState(0);
   const [laeq, setLaeq] = useState(0);
   const [duracion, setDuracion] = useState(0);
+  /** Segundos de la sesión en los que la app no tomó muestras (hallazgo 1700) */
+  const [segundosSinMedir, setSegundosSinMedir] = useState(0);
   const [calibracion, setCalibracion] = useState(CALIBRACION_DEFECTO);
   const [error, setError] = useState<string | null>(null);
   const [permissionState, setPermissionState] = useState<'prompt' | 'granted' | 'denied'>('prompt');
@@ -219,7 +232,28 @@ export default function SonometroPage() {
   const muestrasRef = useRef(0);
   /** Fotogramas seguidos con la ventana entera a cero — ver `measureLoop` (hallazgo 469) */
   const fotogramasSinSenalRef = useRef(0);
-  const inicioRef = useRef(0);
+  /**
+   * Tiempo de audio REALMENTE analizado, en segundos (hallazgo 1700).
+   *
+   * La duración era `performance.now() − inicio`: reloj de pared. Cuando el navegador deja de
+   * llamar a requestAnimationFrame (pestaña oculta, pantalla bloqueada, un diálogo abierto), el
+   * audio sigue entrando pero nadie lo lee, y al volver la duración daba un salto que se anotaba
+   * entero: una fila de «12 s» con un LAeq que cubría unos 4. Ahora cada fotograma aporta lo que
+   * de verdad cubre su ventana de análisis: min(tiempo desde el fotograma anterior, duración de
+   * la ventana). A 60 fps las ventanas (2048 muestras, ~43-46 ms) se solapan y eso es el reloj
+   * de pared; tras un hueco, solo cuenta la última ventana, que es lo que se leyó.
+   */
+  const tiempoMedidoRef = useRef(0);
+  /** Tiempo que pesan las lecturas que entran en el LAeq (sin los fotogramas de arranque) */
+  const pesoLaeqRef = useRef(0);
+  /** Ya ha llegado el primer fotograma con audio: desde él corre la duración de la sesión */
+  const sesionEnMarchaRef = useRef(false);
+  /** Segundos sin muestras acumulados en la sesión (huecos de más de HUECO_AVISO_MS) */
+  const sinMedirRef = useRef(0);
+  /** Momento (performance.now) del fotograma anterior; 0 = aún no ha habido ninguno */
+  const ultimoFotogramaRef = useRef(0);
+  /** Duración de la ventana de análisis, en segundos: fftSize / frecuencia de muestreo */
+  const ventanaSRef = useRef(0);
   // Fotogramas CON AUDIO ya leídos: los primeros no cuentan para las estadísticas
   const fotogramasRef = useRef(0);
   // La calibración se lee dentro del bucle sin recrearlo: si viviera en las
@@ -247,8 +281,9 @@ export default function SonometroPage() {
     try {
       wakeLockRef.current = await navigator.wakeLock.request('screen');
     } catch {
-      // Mejora progresiva: si el navegador lo deniega (batería baja, pestaña oculta...)
-      // la medición sigue funcionando igual, solo que la pantalla podrá apagarse sola.
+      // Mejora progresiva: el navegador puede denegarlo (batería baja, pestaña oculta...). Si
+      // la pantalla se apaga, el bucle de medición se DETIENE con ella: ese tiempo no se mide,
+      // y la duración y el LAeq no lo cuentan (hallazgo 1700; el panel dice cuánto fue).
     }
   }, []);
 
@@ -391,6 +426,23 @@ export default function SonometroPage() {
     const dataArray = new Float32Array(analyserRef.current.fftSize);
     analyserRef.current.getFloatTimeDomainData(dataArray);
 
+    // Tiempo desde el fotograma anterior. Un hueco largo es tiempo en que nadie leyó el audio
+    // (hallazgo 1700): no cuenta como medido —ver `tiempoMedidoRef`— y se anota para decirlo.
+    const ahora = performance.now();
+    const dtS = ultimoFotogramaRef.current === 0 ? 0 : (ahora - ultimoFotogramaRef.current) / 1000;
+    ultimoFotogramaRef.current = ahora;
+    // Lo que de verdad cubre la ventana leída en este fotograma
+    const cubierto = Math.min(dtS, ventanaSRef.current);
+    if (sesionEnMarchaRef.current) {
+      // La duración corre desde el primer fotograma con audio, como antes; lo que cambia es que
+      // cada fotograma aporta solo lo que su ventana cubre, no el reloj de pared.
+      tiempoMedidoRef.current += cubierto;
+      if (dtS * 1000 > HUECO_AVISO_MS) {
+        sinMedirRef.current += dtS - cubierto;
+        setSegundosSinMedir(sinMedirRef.current);
+      }
+    }
+
     /**
      * Los primeros fotogramas no son una medición: son el búfer del analizador antes de que
      * llegue el audio, con TODAS las muestras exactamente a cero. `startMeasuring` llama a
@@ -451,8 +503,7 @@ export default function SonometroPage() {
      * lectura instantánea sí se muestra desde el principio: lo que no se hace es dejar que
      * un artefacto del arranque se quede grabado en el resumen de la sesión.
      */
-    const ahora = performance.now();
-    if (inicioRef.current === 0) inicioRef.current = ahora;
+    sesionEnMarchaRef.current = true;
     if (fotogramasRef.current < FOTOGRAMAS_ESTABILIZACION) {
       fotogramasRef.current += 1;
       animationRef.current = requestAnimationFrame(measureLoop);
@@ -472,11 +523,18 @@ export default function SonometroPage() {
     // datos. Media incremental para no acumular una suma enorme ni guardar el
     // histórico completo en memoria; verificado idéntica al cálculo directo y
     // estable en 216.000 muestras (1 h a 60 fps).
+    //
+    // Cada lectura pesa el TIEMPO de audio que cubre (hallazgo 1700), no «una muestra»: con
+    // fotogramas regulares es lo mismo, pero tras un hueco la única ventana leída cubre su
+    // duración y no el hueco entero, que no se midió.
     const energia = Math.pow(10, db / 10);
     muestrasRef.current += 1;
-    energiaMediaRef.current += (energia - energiaMediaRef.current) / muestrasRef.current;
+    pesoLaeqRef.current += cubierto;
+    if (pesoLaeqRef.current > 0) {
+      energiaMediaRef.current += ((energia - energiaMediaRef.current) * cubierto) / pesoLaeqRef.current;
+    }
     setLaeq(10 * Math.log10(Math.max(energiaMediaRef.current, 1e-10)));
-    setDuracion((performance.now() - inicioRef.current) / 1000);
+    setDuracion(tiempoMedidoRef.current);
 
     animationRef.current = requestAnimationFrame(measureLoop);
   }, [calculateDb, correccionPonderacionA]);
@@ -523,11 +581,17 @@ export default function SonometroPage() {
       setMaxDb(0);
       setLaeq(0);
       setDuracion(0);
+      setSegundosSinMedir(0);
       energiaMediaRef.current = 0;
       muestrasRef.current = 0;
-      // 0 = «aún no ha llegado audio». Lo pone el bucle en su primer fotograma con señal,
-      // para que la duración de la sesión no incluya la espera del micrófono.
-      inicioRef.current = 0;
+      // La duración es tiempo de audio analizado (hallazgo 1700): la espera del micrófono y los
+      // fotogramas de estabilización no suman nada.
+      tiempoMedidoRef.current = 0;
+      pesoLaeqRef.current = 0;
+      sinMedirRef.current = 0;
+      sesionEnMarchaRef.current = false;
+      ultimoFotogramaRef.current = 0;
+      ventanaSRef.current = analyser.fftSize / audioContext.sampleRate;
       fotogramasRef.current = 0;
 
       setIsActive(true);
@@ -586,11 +650,12 @@ export default function SonometroPage() {
    *
    * Es lo que hace el botón «Detener»; `stopMeasuring` a secas se reserva para los caminos
    * en los que no hay nada que anotar (el desmontaje del componente y el fallo al abrir el
-   * micrófono). La duración se toma del reloj de alta resolución y no del estado, que se
-   * refresca por fotograma y podría ir uno por detrás en el momento del clic.
+   * micrófono). La duración es el tiempo de audio que el bucle llegó a analizar
+   * (`tiempoMedidoRef`, hallazgo 1700), no el reloj de pared desde el arranque: los segundos
+   * en que el navegador no dio fotogramas no se midieron y no se anotan.
    */
   const detenerYRegistrar = () => {
-    const segundos = inicioRef.current === 0 ? 0 : (performance.now() - inicioRef.current) / 1000;
+    const segundos = tiempoMedidoRef.current;
     stopMeasuring();
 
     if (muestrasRef.current === 0 || segundos < SEGUNDOS_MINIMOS_REGISTRO) {
@@ -626,10 +691,25 @@ export default function SonometroPage() {
      * se alcanza en dos meses, y el usuario tiene salida (el CSV) pero no sabía que la
      * necesitaba (hallazgo 467).
      */
-    setAvisoRegistro(
+    /*
+     * Y se dice ANTES de borrar (hallazgo 1702): el aviso de arriba llegaba con la medición 61,
+     * cuando la más antigua ya no estaba ni en la tabla, ni en el almacenamiento, ni en el CSV
+     * que el propio aviso manda descargar. La medición que LLENA el registro avisa de que la
+     * siguiente borrará la más antigua, y de cuál es, mientras todavía se puede descargar.
+     */
+    const masAntigua = conLaNueva[MAX_SESIONES - 1];
+    const aviso =
       descartadas > 0
         ? `Medición guardada. El registro está lleno (${MAX_SESIONES} mediciones), así que se ha borrado la más antigua: descarga el CSV antes de seguir si quieres conservar el histórico completo.`
-        : 'Medición guardada en el registro de este navegador.',
+        : conLaNueva.length === MAX_SESIONES && masAntigua
+          ? `Medición guardada. El registro ya está lleno (${MAX_SESIONES} mediciones): la próxima medición borrará la más antigua, la del ${formatDate(new Date(masAntigua.id))}. Descarga el CSV ahora si quieres conservarla.`
+          : 'Medición guardada en el registro de este navegador.';
+    // Si hubo tiempo sin muestras, la fila no lo cuenta, y se dice (hallazgo 1700)
+    const sinMedir = sinMedirRef.current;
+    setAvisoRegistro(
+      sinMedir >= 1
+        ? `${aviso} La duración anotada no incluye ${formatDuracion(sinMedir)} en que la app no pudo tomar muestras (pantalla apagada, pestaña oculta o un diálogo abierto).`
+        : aviso,
     );
   };
 
@@ -703,9 +783,13 @@ export default function SonometroPage() {
     setMaxDb(0);
     setLaeq(0);
     setDuracion(0);
+    setSegundosSinMedir(0);
     energiaMediaRef.current = 0;
     muestrasRef.current = 0;
-    inicioRef.current = performance.now();
+    // La sesión sigue en marcha: la duración vuelve a correr desde ya
+    tiempoMedidoRef.current = 0;
+    pesoLaeqRef.current = 0;
+    sinMedirRef.current = 0;
     fotogramasRef.current = 0;
   };
 
@@ -858,8 +942,16 @@ export default function SonometroPage() {
               </div>
             </div>
             <p className={styles.laeqNota}>
-              <strong>LAeq</strong> = nivel continuo equivalente, en dB(A), de los últimos{' '}
-              <strong>{formatDuracion(duracion)}</strong>. Es el promedio <em>energético</em>,
+              <strong>LAeq</strong> = nivel continuo equivalente, en dB(A), de los{' '}
+              <strong>{formatDuracion(duracion)}</strong> medidos.{' '}
+              {segundosSinMedir >= 1 && (
+                <>
+                  No cuentan <strong>{formatDuracion(segundosSinMedir)}</strong> en que la app
+                  no pudo tomar muestras (pantalla apagada, pestaña oculta o un diálogo abierto):
+                  lo que sonó entonces no está en estas cifras.{' '}
+                </>
+              )}
+              Es el promedio <em>energético</em>,
               el valor que utilizan las normativas de ruido: pondera los picos como
               realmente pesan, a diferencia de una media aritmética de decibelios. La «A» es la
               ponderación en frecuencia de la IEC 61672, la que exige la normativa: rebaja los
@@ -902,7 +994,7 @@ export default function SonometroPage() {
                   documenta con varias sesiones en días y horarios distintos, no con una sola
                   lectura. El registro vive en este navegador y no se envía a ningún sitio,
                   y guarda las {MAX_SESIONES} mediciones más recientes: al llegar a ese tope,
-                  cada nueva medición desplaza a la más antigua ({sesiones.length} de {MAX_SESIONES}
+                  cada nueva medición desplaza a la más antigua ({sesiones.length} de {MAX_SESIONES}{' '}
                   ahora mismo). Descarga el CSV de vez en cuando si quieres conservar el
                   histórico entero, que es justo lo que documenta que la molestia se repite.
                 </p>
@@ -1153,17 +1245,23 @@ export default function SonometroPage() {
         <section className={styles.guideSection}>
           <h2>Normativa sobre ruido en España</h2>
           <p className={styles.introParagraph}>
-            La <strong>Ley 37/2003 del Ruido</strong> establece límites de contaminación acústica.
-            Los ayuntamientos tienen ordenanzas específicas, pero los límites habituales son:
+            La <strong>Ley 37/2003 del Ruido</strong> la desarrolla el <strong>RD 1367/2007</strong>,
+            que fija los objetivos de calidad acústica y los periodos del día. Los ayuntamientos
+            pueden cambiar esos horarios y tener ordenanzas más estrictas, así que la tuya manda:
           </p>
 
+          {/* Hallazgo 1704. Decía «Día (8:00-22:00): 35-40 dB» y «Noche (22:00-8:00)», mientras la
+              FAQ decía 22:00–7:00. RD 1367/2007 (BOE-A-2007-18397): Anexo I, día de 7 a 19, tarde
+              de 19 a 23 y noche de 23 a 7, hora local, modificables por el ayuntamiento; Anexo II,
+              Tabla A, residencial existente Ld/Le 65 y Ln 55; Tabla B, interior de vivienda:
+              estancias 45/45/35 y dormitorios 40/40/30 (Ld/Le/Ln). */}
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">🏠</span> Viviendas (interior)</h4>
               <ul>
-                <li>Día (8:00-22:00): 35-40 dB</li>
-                <li>Noche (22:00-8:00): 30-35 dB</li>
-                <li>Zonas residenciales: 55-65 dB ext.</li>
+                <li>Día (7:00–19:00) y tarde (19:00–23:00): 45 dB en estancias, 40 dB en dormitorios</li>
+                <li>Noche (23:00–7:00): 35 dB en estancias, 30 dB en dormitorios</li>
+                <li>Exterior de zonas residenciales: 65 dB de día y tarde, 55 dB de noche</li>
               </ul>
             </div>
             <div className={styles.contentCard}>
@@ -1269,7 +1367,7 @@ export default function SonometroPage() {
                   <td>Conversación normal, biblioteca, oficina tranquila</td>
                   <td>Ilimitada</td>
                   <td>Sin riesgo auditivo; puede dificultar el sueño cerca del límite superior</td>
-                  <td>Límite interior diurno viviendas: 35–40 dB</td>
+                  <td>Objetivo interior diurno en viviendas: 40–45 dB (RD 1367/2007)</td>
                 </tr>
                 <tr>
                   <td><strong>60–85 dB</strong></td>
@@ -1281,7 +1379,11 @@ export default function SonometroPage() {
                 <tr>
                   <td><strong>85–100 dB</strong></td>
                   <td>Maquinaria industrial, concierto, moto</td>
-                  <td>Máx. 2 h/día a 100 dB; máx. 8 h/día a 85 dB</td>
+                  {/* Hallazgo 1701. Decía «Máx. 2 h/día a 100 dB»: el PEL de la OSHA (90 dB con
+                      5 dB de intercambio) mezclado con el criterio de 85 dB/8 h. Con la regla de
+                      la NIOSH que usa el resto de la página (85 dBA en 8 h y la mitad por cada
+                      3 dB): 8 / 2^((100−85)/3) h = 15 min. */}
+                  <td>Máx. 8 h/día a 85 dB, 2 h a 91 dB y 15 min/día a 100 dB (la mitad por cada 3 dB, criterio NIOSH)</td>
                   <td>Daño auditivo progresivo; fatiga, irritabilidad, acúfenos</td>
                   <td>RD 286/2006: obligación de EPIs a partir de 85 dB(A)</td>
                 </tr>
@@ -1319,7 +1421,7 @@ export default function SonometroPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Quieres reclamar al ayuntamiento que el bar de abajo supera los límites de ruido nocturno.
-                Usas el sonómetro para registrar el nivel en el interior de tu vivienda entre las 22:00 y las 2:00.
+                Usas el sonómetro para registrar el nivel en el interior de tu vivienda entre las 23:00 y las 3:00, ya en el periodo nocturno.
               </p>
               <p className={styles.escenarioTip}>
                 Consejo: documenta varias noches con capturas de pantalla con fecha y hora.
@@ -1386,9 +1488,12 @@ export default function SonometroPage() {
             <li className={styles.faqItem}>
               <strong>¿Cuál es el límite legal de ruido nocturno en España?</strong>
               <p>
-                Depende del municipio, pero la Ley 37/2003 del Ruido fija como referencia 45 dB(A) en
-                el exterior de zonas residenciales durante la noche (22:00–7:00) y 30–35 dB en el interior
-                de viviendas. Las ordenanzas municipales pueden ser más restrictivas.
+                Depende del municipio, pero el RD 1367/2007, que desarrolla la Ley 37/2003 del Ruido,
+                fija la noche (23:00–7:00, salvo que el ayuntamiento cambie el horario) y, para ella,
+                un objetivo de 30 dB(A) en los dormitorios y 35 dB(A) en las estancias de una vivienda.
+                A una actividad, como un bar, le limita el ruido nocturno a 45 dB(A) en el exterior de
+                una zona residencial y a 25 dB(A) el que transmite a un dormitorio colindante. Las
+                ordenanzas municipales pueden ser más restrictivas.
               </p>
             </li>
             <li className={styles.faqItem}>

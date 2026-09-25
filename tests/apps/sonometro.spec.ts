@@ -261,7 +261,9 @@ async function estadisticas(page: Page): Promise<{ min: string; max: string; lae
     t.trim(),
   );
   const nota = (await page.locator('[class*="laeqNota"]').innerText()).replace(/\s+/g, ' ');
-  return { min, max, laeq, duracion: nota.match(/de los últimos (.+?)\./)?.[1] ?? '(?)' };
+  // «de los 12 s medidos.» Decía «de los últimos 12 s.», que con un hueco sin fotogramas no
+  // era verdad: la duración es el audio realmente analizado (hallazgo 1700).
+  return { min, max, laeq, duracion: nota.match(/de los (.+?) medidos\./)?.[1] ?? '(?)' };
 }
 
 /** El micrófono simulado tarda unas décimas: hasta que el contexto corre no hay medición. */
@@ -1652,7 +1654,7 @@ declare global {
   }
 }
 
-/** Segundos que la app PINTA en «de los últimos …» (−1 si no los pinta con ese formato). */
+/** Segundos que la app PINTA en «de los … medidos» (−1 si no los pinta con ese formato). */
 async function segundosDeApp(page: Page): Promise<number> {
   const texto = (await estadisticas(page)).duracion; // «4 s» o «1 min 2 s»
   const [, min = '0', seg = '-1'] = texto.match(/^(?:(\d+) min )?(\d+) s$/) ?? [];
@@ -1811,7 +1813,7 @@ test.describe('CASO 12 (móvil, aviso)', () => {
   });
 
   /*
-   * HALLAZGO (5.ª pasada, 25/09/2026) — el único aviso ACTIVO del tope llega después de borrar.
+   * HALLAZGO REPARADO el 25/09/2026 (ronda 15; era test.fail). Acta (5.ª pasada, 25/09/2026) — el único aviso ACTIVO del tope llega después de borrar.
    * Al guardar la medición que LLENA el registro (la 60) el aviso es el de siempre, «Medición
    * guardada en el registro de este navegador.»: nada dice que la siguiente borrará la del
    * 01/06. El aviso llega con la 61, cuando «noche 1» ya no está ni en la tabla, ni en el
@@ -1821,10 +1823,9 @@ test.describe('CASO 12 (móvil, aviso)', () => {
    * Correcto: al llegar a 60, el aviso de guardado dice que el registro está lleno y que la
    * próxima medición borrará la más antigua.
    */
-  test('HALLAZGO 5.ª pasada — al llenarse el registro (la 60) avisa de que la siguiente borrará la más antigua', async ({
+  test('REPARADO 5.ª pasada — al llenarse el registro (la 60) avisa de que la siguiente borrará la más antigua', async ({
     page,
   }) => {
-    test.fail(); // hallazgo 5.ª pasada: el aviso del tope solo llega DESPUÉS de borrar
     test.setTimeout(60000);
     await sembrarRegistro(page, Array.from({ length: 59 }, (_, i) => sesionDeJunio(59 - i)));
     await micrófonoRegulable(page, 1000, 0.05);
@@ -1841,11 +1842,13 @@ test.describe('CASO 12 (móvil, aviso)', () => {
       avisoRegistro(page),
       'la medición 60 llena el registro y el aviso no dice que la siguiente borrará «noche 1»',
     ).toHaveText(/lleno|tope|siguiente|pr[óo]xima/i);
+    // Y dice CUÁL: «noche 1» es del 01/06/2026 (20:15 UTC, 22:15 en Madrid)
+    await expect(avisoRegistro(page)).toContainText('la próxima medición borrará la más antigua, la del 01/06/2026');
   });
 });
 
 /*
- * HALLAZGO (5.ª pasada, 25/09/2026) — la duración cuenta segundos en los que la app no midió.
+ * HALLAZGO REPARADO el 25/09/2026 (ronda 15; era test.fail). Acta (5.ª pasada, 25/09/2026) — la duración cuenta segundos en los que la app no midió.
  * El bucle de medición va con requestAnimationFrame, que el navegador deja de llamar cuando la
  * página no se pinta: pestaña oculta, móvil bloqueado, otra app delante, pantalla que se apaga
  * porque el Wake Lock fue denegado (batería baja) o un diálogo modal abierto. El audio sigue
@@ -1862,10 +1865,9 @@ test.describe('CASO 12 (móvil, aviso)', () => {
  * Correcto: o el tramo fuerte se mide (máximo 81,0), o la duración anotada no incluye los
  * segundos sin medir.
  */
-test('HALLAZGO 5.ª pasada — los segundos en que la app no toma muestras no pueden figurar como medidos', async ({
+test('REPARADO 5.ª pasada — los segundos en que la app no toma muestras no pueden figurar como medidos', async ({
   page,
 }) => {
-  test.fail(); // hallazgo 5.ª pasada: la duración incluye el hueco sin fotogramas
   test.setTimeout(90000);
   await sembrarRegistro(page, [sesionDeJunio(12)]); // para que exista «Borrar el registro»
   await micrófonoRegulable(page, 1000, 0.05);
@@ -1928,18 +1930,24 @@ test('HALLAZGO 5.ª pasada — los segundos en que la app no toma muestras no pu
     `fila de ${guardada.duracionSegundos.toFixed(1)} s con máximo ${guardada.maxDb.toFixed(1)} y LAeq ` +
       `${guardada.laeq.toFixed(1)}: los 6 s a 81,0 dB(A) no están medidos pero sí contados`,
   ).toBe(true);
+  // Reparado contando solo el audio analizado: la fila no incluye el hueco, y la app lo DICE en
+  // el panel y en el aviso de guardado (≈8 s sin muestras; se acepta de 6 a 9 por el margen del
+  // diálogo y de la ventana de análisis).
+  expect(guardada.duracionSegundos, 'la fila no cuenta el hueco').toBeLessThanOrEqual(limiteSinHueco);
+  const nota = (await page.locator('[class*="laeqNota"]').innerText()).replace(/\s+/g, ' ');
+  expect(nota).toMatch(/No cuentan [6-9] s en que la app no pudo tomar muestras/);
+  await expect(avisoRegistro(page)).toContainText('La duración anotada no incluye');
 });
 
 /*
- * HALLAZGO (5.ª pasada, 25/09/2026) — «(2 de 60ahora mismo)». En page.tsx el contador del
+ * HALLAZGO REPARADO el 25/09/2026 (ronda 15; era test.fail). Acta (5.ª pasada, 25/09/2026) — «(2 de 60ahora mismo)». En page.tsx el contador del
  * tope termina la línea en `{MAX_SESIONES}` y «ahora mismo)» empieza la siguiente: JSX
  * descarta el salto de línea pegado a una expresión, y el espacio se pierde. Es la frase que
  * anuncia el tope, la reparación del 467.
  */
-test('HALLAZGO 5.ª pasada — el contador del tope lleva su espacio: «2 de 60 ahora mismo»', async ({
+test('REPARADO 5.ª pasada — el contador del tope lleva su espacio: «2 de 60 ahora mismo»', async ({
   page,
 }) => {
-  test.fail(); // hallazgo 5.ª pasada: se pinta «60ahora»
   await sembrarRegistro(page, [sesionDeJunio(12), sesionDeJunio(11)]);
   await page.goto(RUTA);
   await expect(filasRegistro(page)).toHaveCount(2);
@@ -1947,17 +1955,16 @@ test('HALLAZGO 5.ª pasada — el contador del tope lleva su espacio: «2 de 60 
 });
 
 /*
- * HALLAZGO (5.ª pasada, 25/09/2026) — la tabla comparativa da a 100 dB «Máx. 2 h/día» en la
+ * HALLAZGO REPARADO el 25/09/2026 (ronda 15; era test.fail). Acta (5.ª pasada, 25/09/2026) — la tabla comparativa da a 100 dB «Máx. 2 h/día» en la
  * fila 85–100 y «Máx. 15 min/día» en la fila siguiente; la tarjeta «Salud auditiva» y la FAQ
  * dicen 15 minutos. La regla que la propia FAQ enuncia —8 h a 85 dB(A) y la mitad por cada
  * 3 dB— da 8 / 2^((100−85)/3) = 8/32 h = 15 min. Las 2 h son el PEL de la OSHA (90 dB y
  * 5 dB de intercambio), mezclado en la misma celda con el criterio de 85 dB: una exposición
  * «segura» ocho veces mayor que la que da el resto de la página.
  */
-test('HALLAZGO 5.ª pasada — la tabla comparativa da a 100 dB los mismos 15 min que el resto de la página', async ({
+test('REPARADO 5.ª pasada — la tabla comparativa da a 100 dB los mismos 15 min que el resto de la página', async ({
   page,
 }) => {
-  test.fail(); // hallazgo 5.ª pasada: la fila 85–100 dice «Máx. 2 h/día a 100 dB»
   await page.goto(RUTA);
   // Control: la FAQ aplica la regla de 3 dB y llega a 15 minutos
   await expect(page.locator('[class*="faqList"]')).toContainText(
@@ -1970,7 +1977,7 @@ test('HALLAZGO 5.ª pasada — la tabla comparativa da a 100 dB los mismos 15 mi
 });
 
 /*
- * HALLAZGO (5.ª pasada, 25/09/2026) — el periodo nocturno cambia dentro de la página: la FAQ
+ * HALLAZGO REPARADO el 25/09/2026 (ronda 15; era test.fail). Acta (5.ª pasada, 25/09/2026) — el periodo nocturno cambia dentro de la página: la FAQ
  * «¿Cuál es el límite legal de ruido nocturno en España?» dice «noche (22:00–7:00)» y la
  * tarjeta «Viviendas (interior)» dice «Noche (22:00-8:00)» (y «Día (8:00-22:00)»). El RD
  * 1367/2007 que desarrolla la Ley 37/2003, Anexo I (BOE-A-2007-18397, consultado el
@@ -1978,10 +1985,9 @@ test('HALLAZGO 5.ª pasada — la tabla comparativa da a 100 dB los mismos 15 mi
  * 23.00 a 7.00, hora local», que el ayuntamiento puede modificar. Y la misma tarjeta da de día
  * «35-40 dB» en interior, cuando la Tabla B del Anexo II fija 40 (dormitorios) y 45 (estancias).
  */
-test('HALLAZGO 5.ª pasada — el periodo noche es el mismo en toda la página y es el del RD 1367/2007', async ({
+test('REPARADO 5.ª pasada — el periodo noche es el mismo en toda la página y es el del RD 1367/2007', async ({
   page,
 }) => {
-  test.fail(); // hallazgo 5.ª pasada: 22:00–7:00 en la FAQ y 22:00-8:00 en la tarjeta
   await page.goto(RUTA);
   const texto = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
   const periodos = [...texto.matchAll(/noche \((\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})\)/gi)].map(
@@ -1990,19 +1996,21 @@ test('HALLAZGO 5.ª pasada — el periodo noche es el mismo en toda la página y
   expect(periodos.length, 'la página nombra el periodo nocturno').toBeGreaterThan(0);
   // RD 1367/2007, Anexo I: «periodo noche de 23.00 a 7.00, hora local»
   expect(periodos).toEqual(periodos.map(() => '23:00-7:00'));
+  // La FAQ del límite nocturno da el mismo periodo, y ya no los 22:00–7:00
+  await expect(page.locator('[class*="faqList"]')).toContainText('la noche (23:00–7:00');
+  expect(texto).not.toMatch(/22:00\s*[-–]\s*[78]:00/);
 });
 
 /*
- * HALLAZGO (5.ª pasada, 25/09/2026) — el FAQPage de metadata.ts (el que leen los buscadores y
+ * HALLAZGO REPARADO el 25/09/2026 (ronda 15; era test.fail). Acta (5.ª pasada, 25/09/2026) — el FAQPage de metadata.ts (el que leen los buscadores y
  * las IAs) atribuye a la OMS «no superar 65 dB en entornos urbanos durante el día y 55 dB por
  * la noche». La propia página, en «Referencias internacionales: qué recomienda la OMS», da 50 y
  * 55 dB en exteriores de día (Guidelines for Community Noise, 1999) y 40 dB de noche (Night
  * Noise Guidelines, 2009). Los 65 dB diurnos no son de la OMS.
  */
-test('HALLAZGO 5.ª pasada — el FAQPage no atribuye a la OMS 65 dB de día, que la página no da', async ({
+test('REPARADO 5.ª pasada — el FAQPage no atribuye a la OMS 65 dB de día, que la página no da', async ({
   page,
 }) => {
-  test.fail(); // hallazgo 5.ª pasada: el JSON-LD dice «65 dB … durante el día»
   await page.goto(RUTA);
   // Control: lo que la página dice que recomienda la OMS
   await expect(page.locator('[class*="guideSection"]', { hasText: 'qué recomienda la OMS' })).toContainText(
