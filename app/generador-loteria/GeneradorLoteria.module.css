@@ -384,6 +384,32 @@
   color: #1a1a1a;
 }
 
+/* El botón Copiar crece para enseñar «Copiada» durante unos segundos */
+.actionBtn.actionBtnConTexto {
+  width: auto;
+  padding: 0 var(--spacing-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* Aviso en la tarjeta cuya combinación no cabe en la lista guardada */
+.avisoTope {
+  margin: var(--spacing-sm) 0 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-left: 3px solid var(--warning);
+  background: var(--hover);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.favoritesCupo {
+  font-weight: 600;
+}
+
 /* Favorites Section */
 .favoritesSection {
   background: var(--bg-card);

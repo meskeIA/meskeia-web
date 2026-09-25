@@ -42,15 +42,26 @@ interface GeneratedResult {
  *
  * Antes vivían solo en el estado de React, así que se perdían al recargar o al cerrar
  * la pestaña — justo lo contrario de lo que promete el texto de la página ("guardar las
- * que quieras conservar", "guardarlas para la semana" en Bonoloto, que sortea de lunes a
- * sábado). Quien las apunta lo hace para jugarlas otro día: si no sobreviven a la sesión,
+ * que quieras conservar", "guardarlas para la semana" en Bonoloto, que sortea todos los
+ * días). Quien las apunta lo hace para jugarlas otro día: si no sobreviven a la sesión,
  * la función no sirve para nada.
  *
  * No sale del dispositivo: no hay servidor ni cuenta detrás, solo `localStorage`.
+ *
+ * Con varias pestañas abiertas (hallazgo 1630, 25/09/2026): cada cambio parte de lo que hay
+ * EN ESE MOMENTO en el almacén, no de la copia en memoria de la pestaña, y la página escucha
+ * el evento `storage` para repintar lo que guarde otra. Antes cada pestaña leía una sola vez
+ * al montarse y reescribía la clave entera con su copia: lo guardado en otra pestaña después
+ * desaparecía sin aviso.
  */
 const CLAVE_FAVORITAS = 'meskeia-loteria-favoritas';
 
-/** Tope de combinaciones guardadas, el mismo que ya aplicaba el estado en memoria. */
+/**
+ * Tope de combinaciones guardadas. Al llegar a él NO se descarta ninguna guardada: la nueva
+ * no entra y se avisa (hallazgo 1631). Antes se hacía `[nueva, ...previas].slice(0, 20)` y la
+ * más antigua se borraba en silencio, contra lo que promete la página («siguen aquí cuando
+ * vuelvas»). El tope se enseña en la propia lista antes de alcanzarlo.
+ */
 const MAX_FAVORITAS = 20;
 
 /**
@@ -60,13 +71,16 @@ const MAX_FAVORITAS = 20;
  * app, de otra pestaña o de una edición manual. Una entrada con un `type` desconocido
  * dejaría `LOTTERY_CONFIG[result.type]` en `undefined` y la página entera caería al pintar
  * su icono, así que se descarta todo lo que no encaje en lugar de confiar en la forma.
+ *
+ * Devuelve `null` si el almacenamiento no está disponible (navegación privada, bloqueado),
+ * para que quien llama distinga «no hay nada guardado» de «no se puede leer».
  */
-function leerFavoritasGuardadas(): GeneratedResult[] {
+function leerFavoritasGuardadas(): GeneratedResult[] | null {
   let crudo: string | null = null;
   try {
     crudo = window.localStorage.getItem(CLAVE_FAVORITAS);
   } catch {
-    return []; // Navegación privada o almacenamiento bloqueado: se sigue sin persistencia
+    return null; // Navegación privada o almacenamiento bloqueado: se sigue sin persistencia
   }
   if (!crudo) return [];
 
@@ -98,9 +112,28 @@ function leerFavoritasGuardadas(): GeneratedResult[] {
   }
 }
 
+/** Escribe la lista en el almacén; si está bloqueado o lleno, la sesión sigue en memoria. */
+function escribirFavoritasGuardadas(lista: GeneratedResult[]): void {
+  try {
+    window.localStorage.setItem(CLAVE_FAVORITAS, JSON.stringify(lista));
+  } catch {
+    // Cuota agotada o almacenamiento bloqueado: la sesión sigue funcionando en memoria
+  }
+}
+
 /** Huella de una combinación, para no guardar dos veces la misma apuesta. */
 function firmaCombinacion(result: GeneratedResult): string {
   return `${result.type}|${result.mainNumbers.join('-')}|${(result.extraNumbers ?? []).join('-')}`;
+}
+
+/** Texto de una combinación tal como se copia y se anuncia: «Euromillones: 3 - 9 - … | Estrellas: 2, 7». */
+function textoCombinacion(result: GeneratedResult): string {
+  const config = LOTTERY_CONFIG[result.type];
+  let texto = `${config.name}: ${result.mainNumbers.join(' - ')}`;
+  if (result.extraNumbers) {
+    texto += ` | ${config.extraName}: ${result.extraNumbers.join(', ')}`;
+  }
+  return texto;
 }
 
 const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
@@ -113,12 +146,12 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraMax: 9,
     extraName: 'Reintegro',
     description: '6 números del 1 al 49 + Reintegro (0-9)',
-    drawDays: 'Jueves y Sábados',
+    drawDays: 'Lunes, jueves y sábados',
     price: '1,00 €',
     anchor: 'generador-primitiva',
     odds: '1 entre 13.983.816',
     oddsLabel: 'acertar los 6 números',
-    blurb: 'Genera combinaciones de 6 números del 1 al 49 para La Primitiva, más el Reintegro (un dígito del 0 al 9). Puedes producir varias apuestas de golpe si juegas boleto múltiple y guardar las que quieras conservar. El sorteo se celebra jueves y sábados.'
+    blurb: 'Genera combinaciones de 6 números del 1 al 49 para La Primitiva, más el Reintegro (un dígito del 0 al 9). Puedes producir varias apuestas de golpe si juegas boleto múltiple y guardar las que quieras conservar. Hay sorteo los lunes, jueves y sábados.'
   },
   euromillones: {
     name: 'Euromillones',
@@ -145,12 +178,12 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraMax: 9,
     extraName: 'Reintegro',
     description: '6 números del 1 al 49 + Reintegro (0-9)',
-    drawDays: 'Lunes a Sábado',
+    drawDays: 'Lunes a domingo (todos los días)',
     price: '0,50 €',
     anchor: 'generador-bonoloto',
     odds: '1 entre 13.983.816',
     oddsLabel: 'acertar los 6 números',
-    blurb: 'Genera combinaciones de Bonoloto: 6 números del 1 al 49 y Reintegro, con las mismas reglas que La Primitiva pero sorteo de lunes a sábado. Como hay sorteo casi a diario, aquí es donde más sentido tiene generar varias combinaciones seguidas y guardarlas para la semana.'
+    blurb: 'Genera combinaciones de Bonoloto: 6 números del 1 al 49 y Reintegro, con las mismas reglas que La Primitiva pero sorteo todos los días, de lunes a domingo. Como hay sorteo a diario, aquí es donde más sentido tiene generar varias combinaciones seguidas y guardarlas para la semana.'
   },
   gordo: {
     name: 'El Gordo de la Primitiva',
@@ -194,27 +227,70 @@ export default function GeneradorLoteriaPage() {
   const [favorites, setFavorites] = useState<GeneratedResult[]>([]);
   const generadorRef = useRef<HTMLDivElement>(null);
 
+  /** Copia en memoria de la lista, para cuando el almacén no se puede leer. */
+  const favoritasRef = useRef<GeneratedResult[]>([]);
+
+  /** Combinación cuyo guardado se rechazó por el tope: su tarjeta enseña el aviso. */
+  const [topeEn, setTopeEn] = useState<string | null>(null);
+
+  /** Resultado del último «Copiar», por botón (`r-<id>` en resultados, `f-<id>` en guardadas). */
+  const [copia, setCopia] = useState<{ clave: string; ok: boolean } | null>(null);
+  const temporizadorCopiaRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Texto de la región aria-live: generar, copiar y el tope se anuncian a quien no ve la pantalla. */
+  const [anuncio, setAnuncio] = useState('');
+
+  /** Cuenta de generaciones: cada una lleva la vista hasta la combinación nueva. */
+  const [generacion, setGeneracion] = useState(0);
+  const primeraNuevaRef = useRef<HTMLDivElement>(null);
+
   /**
    * `localStorage` no existe en el servidor, y leerlo dentro del `useState` inicial haría
    * que el HTML servido y el primer render del navegador no coincidieran (error de
-   * hidratación). Por eso se carga después de montar, y `favoritasCargadas` evita que el
-   * efecto de guardado escriba la lista vacía de ese primer render encima de lo guardado.
+   * hidratación). Por eso se carga después de montar. Se reescribe la clave ya saneada, y
+   * se escucha `storage` para enterarse de lo que guarde otra pestaña.
    */
-  const [favoritasCargadas, setFavoritasCargadas] = useState(false);
-
   useEffect(() => {
-    setFavorites(leerFavoritasGuardadas());
-    setFavoritasCargadas(true);
+    const guardadas = leerFavoritasGuardadas() ?? [];
+    favoritasRef.current = guardadas;
+    setFavorites(guardadas);
+    escribirFavoritasGuardadas(guardadas);
+
+    const alCambiarEnOtraPestana = (e: StorageEvent) => {
+      if (e.key !== null && e.key !== CLAVE_FAVORITAS) return; // key null = se vació todo
+      const lista = leerFavoritasGuardadas() ?? [];
+      favoritasRef.current = lista;
+      setFavorites(lista);
+    };
+    window.addEventListener('storage', alCambiarEnOtraPestana);
+    return () => window.removeEventListener('storage', alCambiarEnOtraPestana);
   }, []);
 
+  useEffect(() => () => {
+    if (temporizadorCopiaRef.current) clearTimeout(temporizadorCopiaRef.current);
+  }, []);
+
+  /**
+   * Aplica un cambio a la lista guardada partiendo de lo que hay AHORA en el almacén (puede
+   * haberlo cambiado otra pestaña), no de la copia en memoria. Solo si el almacén no se puede
+   * leer se parte de la memoria.
+   */
+  const modificarFavoritas = useCallback((cambio: (lista: GeneratedResult[]) => GeneratedResult[]) => {
+    const base = leerFavoritasGuardadas() ?? favoritasRef.current;
+    const nueva = cambio(base);
+    favoritasRef.current = nueva;
+    setFavorites(nueva);
+    escribirFavoritasGuardadas(nueva);
+  }, []);
+
+  // Tras generar, la vista baja hasta la combinación nueva si ha quedado fuera de la pantalla
+  // (hallazgo 1632: en móvil, con el botón al pie, el resultado se pintaba por debajo y no se
+  // veía ni una bola). `block: 'nearest'` no mueve nada si la tarjeta ya se ve.
   useEffect(() => {
-    if (!favoritasCargadas) return;
-    try {
-      window.localStorage.setItem(CLAVE_FAVORITAS, JSON.stringify(favorites));
-    } catch {
-      // Cuota agotada o almacenamiento bloqueado: la sesión sigue funcionando en memoria
-    }
-  }, [favorites, favoritasCargadas]);
+    if (generacion === 0) return;
+    const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    primeraNuevaRef.current?.scrollIntoView({ behavior: reducirMovimiento ? 'auto' : 'smooth', block: 'nearest' });
+  }, [generacion]);
 
   // Desde la ficha de cada modalidad: seleccionarla y subir al generador
   const irAlGenerador = useCallback((type: LotteryType) => {
@@ -262,39 +338,77 @@ export default function GeneradorLoteriaPage() {
 
       setResults(prev => [...newResults, ...prev].slice(0, 50));
       setIsGenerating(false);
+      setTopeEn(null);
+      setGeneracion(g => g + 1);
+      setAnuncio(newResults.length === 1
+        ? `Combinación generada. ${textoCombinacion(newResults[0])}`
+        : `${newResults.length} combinaciones de ${config.name} generadas`);
     }, 300);
   }, [selectedLottery, quantity]);
 
   // Añadir a favoritos.
   // Se compara por la combinación en sí, no por el id: al conservarse entre sesiones, una
   // apuesta repetida se generaría con un id nuevo y quedaría duplicada para siempre.
+  // Con la lista llena NO se descarta ninguna guardada: la nueva no entra y se avisa.
   const addToFavorites = useCallback((result: GeneratedResult) => {
-    setFavorites(prev => {
+    let llena = false;
+    modificarFavoritas(lista => {
       const firma = firmaCombinacion(result);
-      if (prev.some(f => firmaCombinacion(f) === firma)) return prev;
-      return [result, ...prev].slice(0, MAX_FAVORITAS);
+      if (lista.some(f => firmaCombinacion(f) === firma)) return lista;
+      if (lista.length >= MAX_FAVORITAS) {
+        llena = true;
+        return lista;
+      }
+      return [result, ...lista];
     });
-  }, []);
+    if (llena) {
+      setTopeEn(result.id);
+      setAnuncio(`No se ha guardado: ya tienes ${MAX_FAVORITAS} combinaciones guardadas, el máximo. Quita alguna para guardar esta.`);
+    } else {
+      setTopeEn(null);
+      setAnuncio('Combinación guardada en este navegador');
+    }
+  }, [modificarFavoritas]);
 
   // Eliminar de favoritos
   const removeFromFavorites = useCallback((id: string) => {
-    setFavorites(prev => prev.filter(f => f.id !== id));
-  }, []);
+    modificarFavoritas(lista => lista.filter(f => f.id !== id));
+    setTopeEn(null);
+  }, [modificarFavoritas]);
 
   // Vaciar la lista guardada
   const clearFavorites = useCallback(() => {
-    setFavorites([]);
+    modificarFavoritas(() => []);
+    setTopeEn(null);
+  }, [modificarFavoritas]);
+
+  // Copiar al portapapeles, confirmando en el propio botón y en la región aria-live
+  // (hallazgo 1633: antes no cambiaba nada en pantalla y un fallo del portapapeles se perdía).
+  const copyToClipboard = useCallback(async (result: GeneratedResult, clave: string) => {
+    let ok = false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(textoCombinacion(result));
+        ok = true;
+      }
+    } catch {
+      ok = false; // Permiso denegado o contexto no seguro
+    }
+    setCopia({ clave, ok });
+    setAnuncio(ok
+      ? 'Combinación copiada al portapapeles'
+      : 'No se ha podido copiar: el navegador no ha dado acceso al portapapeles. Puedes seleccionar los números y copiarlos a mano.');
+    if (temporizadorCopiaRef.current) clearTimeout(temporizadorCopiaRef.current);
+    temporizadorCopiaRef.current = setTimeout(() => setCopia(null), 2500);
   }, []);
 
-  // Copiar al portapapeles
-  const copyToClipboard = useCallback((result: GeneratedResult) => {
-    const config = LOTTERY_CONFIG[result.type];
-    let text = `${config.name}: ${result.mainNumbers.join(' - ')}`;
-    if (result.extraNumbers) {
-      text += ` | ${config.extraName}: ${result.extraNumbers.join(', ')}`;
-    }
-    navigator.clipboard.writeText(text);
-  }, []);
+  /** Contenido del botón Copiar: el icono, o la confirmación durante unos segundos. */
+  const contenidoCopiar = (clave: string) => {
+    if (copia?.clave !== clave) return '📋';
+    return copia.ok
+      ? <><span aria-hidden="true">✓</span> Copiada</>
+      : <><span aria-hidden="true">✕</span> No copiada</>;
+  };
 
   // Limpiar historial
   const clearHistory = useCallback(() => {
@@ -400,6 +514,7 @@ export default function GeneradorLoteriaPage() {
                 return (
                   <div
                     key={result.id}
+                    ref={index === 0 ? primeraNuevaRef : undefined}
                     className={`${styles.resultCard} ${index === 0 ? styles.latest : ''}`}
                   >
                     <div className={styles.resultHeader}>
@@ -434,12 +549,12 @@ export default function GeneradorLoteriaPage() {
                     <div className={styles.resultActions}>
                       <button
                         type="button"
-                        onClick={() => copyToClipboard(result)}
-                        className={styles.actionBtn}
+                        onClick={() => copyToClipboard(result, `r-${result.id}`)}
+                        className={`${styles.actionBtn} ${copia?.clave === `r-${result.id}` ? styles.actionBtnConTexto : ''}`}
                         title="Copiar"
                         aria-label="Copiar combinación"
                       >
-                        📋
+                        {contenidoCopiar(`r-${result.id}`)}
                       </button>
                       <button
                         type="button"
@@ -452,6 +567,12 @@ export default function GeneradorLoteriaPage() {
                         {isFavorite ? '⭐' : '☆'}
                       </button>
                     </div>
+                    {topeEn === result.id && (
+                      <p className={styles.avisoTope}>
+                        No se ha guardado: ya tienes {MAX_FAVORITAS} combinaciones guardadas, el
+                        máximo. Quita alguna de «Mis combinaciones guardadas» para guardar esta.
+                      </p>
+                    )}
                   </div>
                 );
               })}
@@ -471,7 +592,10 @@ export default function GeneradorLoteriaPage() {
             <p className={styles.favoritesNota}>
               Se guardan en este navegador y siguen aquí cuando vuelvas, aunque cierres la
               página. No se envían a ningún sitio: si vacías los datos del navegador o entras
-              desde otro dispositivo, no aparecerán.
+              desde otro dispositivo, no aparecerán.{' '}
+              <span className={styles.favoritesCupo}>
+                Caben hasta {MAX_FAVORITAS}: llevas {favorites.length}.
+              </span>
             </p>
             <div className={styles.favoritesList}>
               {favorites.map(result => {
@@ -492,6 +616,15 @@ export default function GeneradorLoteriaPage() {
                     </div>
                     <button
                       type="button"
+                      onClick={() => copyToClipboard(result, `f-${result.id}`)}
+                      className={`${styles.actionBtn} ${copia?.clave === `f-${result.id}` ? styles.actionBtnConTexto : ''}`}
+                      title="Copiar"
+                      aria-label={`Copiar la combinación guardada ${result.mainNumbers.join(', ')}`}
+                    >
+                      {contenidoCopiar(`f-${result.id}`)}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => removeFromFavorites(result.id)}
                       className={styles.removeFavorite}
                       aria-label={`Quitar la combinación ${result.mainNumbers.join(', ')} de las guardadas`}
@@ -505,6 +638,10 @@ export default function GeneradorLoteriaPage() {
           </div>
         )}
       </main>
+
+      {/* Anuncios para lectores de pantalla: combinaciones generadas, copiadas o no guardadas.
+          Fuera de <main> para que su texto no duplique la confirmación visible del botón. */}
+      <p className="sr-only" role="status" aria-live="polite">{anuncio}</p>
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <DisclaimerCard
@@ -573,7 +710,7 @@ export default function GeneradorLoteriaPage() {
         <section className={styles.guideSection}>
           <h2>Comparativa de loterías españolas</h2>
           <p>
-            Las principales loterías de la ONCE y LAE tienen reglas y probabilidades muy distintas.
+            Las principales loterías de Loterías y Apuestas del Estado (LAE) tienen reglas y probabilidades muy distintas.
             Esta tabla te ayuda a elegir la que mejor se adapta a tu presupuesto y preferencias.
           </p>
           <div className={styles.tableWrapper}>
@@ -595,7 +732,7 @@ export default function GeneradorLoteriaPage() {
                   <td>1 entre 13.983.816</td>
                   <td>1,00 €</td>
                   <td>3.000.000 €</td>
-                  <td>Jueves y Sábados</td>
+                  <td>Lunes, jueves y sábados</td>
                 </tr>
                 <tr>
                   <td><span aria-hidden="true">🍀</span> Bonoloto</td>
@@ -603,7 +740,7 @@ export default function GeneradorLoteriaPage() {
                   <td>1 entre 13.983.816</td>
                   <td>0,50 €</td>
                   <td>400.000 €</td>
-                  <td>Lunes a Sábado</td>
+                  <td>Lunes a domingo</td>
                 </tr>
                 <tr>
                   <td><span aria-hidden="true">⭐</span> Euromillones</td>
@@ -619,6 +756,18 @@ export default function GeneradorLoteriaPage() {
                   <td>1 entre 31.625.100</td>
                   <td>1,50 €</td>
                   <td>5.000.000 €</td>
+                  <td>Domingos</td>
+                </tr>
+                <tr>
+                  <td><span aria-hidden="true">🏇</span> Lototurf</td>
+                  <td>6 de 31 + Caballo</td>
+                  <td>1 entre 8.835.372</td>
+                  <td>1,00 €</td>
+                  {/* Las normas de LAE (Resolución de 27/07/2007, norma 16.ª) garantizan un fondo
+                      para la primera categoría del primer sorteo de cada ciclo, sin fijar la
+                      cuantía: el millón de euros que repiten muchas webs era solo para el primer
+                      concurso (disposición transitoria primera). No se inventa una cifra. */}
+                  <td>Fondo garantizado por ciclo</td>
                   <td>Domingos</td>
                 </tr>
               </tbody>
@@ -656,7 +805,7 @@ export default function GeneradorLoteriaPage() {
                 <h4>Grupo de amigos o peña</h4>
               </div>
               <p className={styles.escenarioExample}>
-                Jugas en grupo y necesitáis varios boletos distintos. Genera varias
+                Jugáis en grupo y necesitáis varios boletos distintos. Genera varias
                 combinaciones a la vez (hasta 10) para repartir entre los participantes
                 sin duplicados.
               </p>
@@ -768,7 +917,7 @@ export default function GeneradorLoteriaPage() {
               <div className={styles.stepContent}>
                 <strong>Elige la lotería que quieres jugar</strong>
                 <p>
-                  Selecciona entre Primitiva, Bonoloto, Euromillones o El Gordo. Cada una tiene
+                  Selecciona entre Primitiva, Bonoloto, Euromillones, El Gordo o Lototurf. Cada una tiene
                   rangos de números y reglas distintas. Compara la tabla de probabilidades antes
                   de decidir cuánto dinero invertir.
                 </p>

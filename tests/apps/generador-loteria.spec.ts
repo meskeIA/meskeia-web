@@ -629,27 +629,50 @@ test.describe('25/09 · móvil 360×800 — límites y persistencia', () => {
     expect(errores).toEqual([]);
   });
 
-  test.fail('hallazgo 3 · al guardar la combinación nº 21 no se pierde en silencio la más antigua', async ({ page }) => {
-    // DEBERÍA: o conservar todas, o avisar del tope de 20 ANTES de descartar una guardada.
-    // HOY: la lista es [nueva, ...previas].slice(0, 20) — la más antigua (g19) desaparece
-    // del almacén sin ningún aviso en pantalla. Resuelto a mano: 20 previas + 1 = 21 → cae g19.
+  test('hallazgo 3 · al guardar la combinación nº 21 no se pierde en silencio la más antigua', async ({ page }) => {
+    // REPARADO (25/09/2026). Antes la lista era [nueva, ...previas].slice(0, 20): la más
+    // antigua (g19) desaparecía del almacén sin ningún aviso en pantalla.
+    //
+    // El test original exigía a la vez «la nueva entra primera», «siguen siendo 20» y «g19 se
+    // conserva», que no caben juntas (serían 21). Se eligió la otra rama del acta, «avisar
+    // del tope»: con la lista llena la nueva NO entra, ninguna guardada se toca, la tarjeta
+    // dice por qué, y el tope se enseña en la lista antes de alcanzarlo. Descartar en silencio
+    // una combinación que el usuario guardó para jugarla es lo que no debe pasar; subir el tope
+    // solo aplazaría el mismo borrado.
     const veinte = Array.from({ length: 20 }, (_, i) => ({
       id: `g${i}`, type: 'primitiva', mainNumbers: [1, 2, 3, 4, 5, 10 + i], extraNumbers: [i % 10],
       timestamp: `2026-09-${String(20 - i).padStart(2, '0')}T10:00:00.000Z`, // g0 la más reciente
     }));
     await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(veinte) });
-    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(20);
+    const favoritas = page.locator('[class*="favoriteCard"]');
+    await expect(favoritas).toHaveCount(20);
+    // El tope se ve ANTES de llegar a él
+    await expect(page.locator('[class*="favoritesNota"]')).toContainText('Caben hasta 20: llevas 20.');
 
     await generarYGuardarUna(page, 'primitiva');
-    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(20); // precondición: el tope actúa
 
-    // Espera a que el guardado llegue al almacén: la nueva pasa a ser la primera
-    await expect.poll(async () => (await leerFavoritas(page))[0]?.id).not.toBe('g0');
+    // La tarjeta de la nº 21 explica que no se ha guardado y por qué
+    const tarjeta = page.locator('[class*="resultCard"]').first();
+    await expect(tarjeta.locator('[class*="avisoTope"]')).toContainText('No se ha guardado');
+    await expect(tarjeta.locator('[class*="avisoTope"]')).toContainText('20 combinaciones guardadas, el máximo');
+    await expect(tarjeta.getByRole('button', { name: /Guardar esta combinación/ })).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByRole('status').filter({ hasText: 'No se ha guardado' })).toHaveCount(1);
+
+    // Ninguna guardada se ha perdido: las 20 siguen, en su orden, en pantalla y en el almacén
+    await expect(favoritas).toHaveCount(20);
+    expect((await leerFavoritas(page)).map((f) => f.id)).toEqual(veinte.map((g) => g.id));
+
+    // Al quitar una, la nueva ya cabe
+    await page.getByRole('button', { name: 'Quitar la combinación 1, 2, 3, 4, 5, 29 de las guardadas' }).tap();
+    await expect(tarjeta.locator('[class*="avisoTope"]')).toHaveCount(0);
+    await tarjeta.getByRole('button', { name: /Guardar esta combinación/ }).tap();
+    await expect.poll(async () => (await leerFavoritas(page)).length).toBe(20);
     const ids = (await leerFavoritas(page)).map((f) => f.id);
-    expect(ids).toContain('g19'); // HOY falla: g19 ya no está
+    expect(ids).not.toContain('g19');
+    expect(ids.slice(1)).toEqual(veinte.slice(0, 19).map((g) => g.id));
   });
 
-  test.fail('hallazgo 4 · al tocar Generar con el botón al pie de la pantalla, el resultado se ve', async ({ page }) => {
+  test('hallazgo 4 · al tocar Generar con el botón al pie de la pantalla, el resultado se ve', async ({ page }) => {
     // DEBERÍA: llevar la vista al resultado (o anunciarlo) al generar. HOY: los resultados se
     // pintan DEBAJO del botón y la vista no se mueve; con el botón en los últimos ~130 px de
     // la pantalla no se ve ni una bola, y el único cambio visible es el texto «Generando...»
@@ -664,18 +687,22 @@ test.describe('25/09 · móvil 360×800 — límites y persistencia', () => {
     await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
     await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
 
-    const tarjetaVisible = await page.evaluate(() => {
+    // REPARADO (25/09/2026): al generar, la vista baja hasta la tarjeta nueva. El
+    // desplazamiento es suave (salvo prefers-reduced-motion), así que se sondea en vez de
+    // medir una sola vez justo al pintarse.
+    await expect.poll(() => page.evaluate(() => {
       const r = document.querySelector('[class*="resultCard"]')!.getBoundingClientRect();
-      return r.top < window.innerHeight && r.bottom > 0;
-    });
-    expect(tarjetaVisible).toBe(true); // HOY false
+      return r.top >= 0 && r.bottom <= window.innerHeight + 1; // la tarjeta ENTERA a la vista (1 px de redondeo subpíxel)
+    }), { timeout: 3_000 }).toBe(true);
+    // Y se anuncia a quien no ve la pantalla
+    await expect(page.getByRole('status').filter({ hasText: 'Combinación generada. La Primitiva:' })).toHaveCount(1);
   });
 
-  test.fail('hallazgo 8 · en la primera visita el aviso de transparencia no tapa el botón Generar', async ({ page }) => {
+  test('hallazgo 8 · en la primera visita el aviso de transparencia no tapa el botón Generar', async ({ page }) => {
     // Componente COMPARTIDO (components/TransparencyBanner.tsx, en app/layout.tsx), no código
-    // de la app. DEBERÍA: el botón principal recibe el toque cuando se ve al pie de la pantalla.
-    // HOY: el aviso, fijo abajo con z-index 1000, ocupa el 24 % de la vista a 360×800
-    // (591-784 px) y justo ahí queda el botón al bajar hasta él: el toque se lo lleva el aviso.
+    // de la app. REPARADO el 25/09/2026 (hallazgo 1636, commit 6f6feb50): fijo abajo con
+    // z-index 1000 ocupaba el 24 % de la vista a 360×800 (591-784 px), justo donde queda el
+    // botón al bajar hasta él. Hasta 640 px va ahora en el flujo, al final de la página.
     await esperarInteractiva(page);
     await expect(page.getByRole('complementary', { name: 'Aviso de transparencia sobre datos locales' })).toBeVisible();
     const recibeElBoton = await page.evaluate(() => {
@@ -686,14 +713,14 @@ test.describe('25/09 · móvil 360×800 — límites y persistencia', () => {
       const encima = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
       return !!encima && boton.contains(encima);
     });
-    expect(recibeElBoton).toBe(true); // HOY false: lo recibe el aviso
+    expect(recibeElBoton).toBe(true);
   });
 });
 
 test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y contenido', () => {
   test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
-  test.fail('hallazgo 2 · con dos pestañas abiertas, guardar en una no borra lo guardado en la otra', async ({ page }) => {
+  test('hallazgo 2 · con dos pestañas abiertas, guardar en una no borra lo guardado en la otra', async ({ page }) => {
     // DEBERÍA: el almacén acaba con las DOS combinaciones (X de la pestaña nueva, Y de la vieja).
     // HOY: la pestaña vieja cargó la lista antes de que X existiera y no escucha el evento
     // `storage`; al guardar Y reescribe la clave entera con [Y] y X se pierde para siempre.
@@ -729,7 +756,7 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
     await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(esperado);
   });
 
-  test.fail('hallazgo 5 · el botón Copiar confirma que ha copiado', async ({ page }) => {
+  test('hallazgo 5 · el botón Copiar confirma que ha copiado', async ({ page }) => {
     // DEBERÍA: un «Copiada» visible y anunciado (aria-live). HOY: la combinación llega al
     // portapapeles pero la pantalla no cambia nada: el botón parece no responder. Además la
     // promesa de clipboard.writeText no se captura: si falla, falla en silencio.
@@ -739,9 +766,37 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
     await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
     await page.getByRole('button', { name: 'Copiar combinación' }).click();
     await expect(page.locator('main').getByText(/copiad[ao]/i)).toBeVisible({ timeout: 2_000 });
+    // REPARADO (25/09/2026): además de verse en el botón, se anuncia
+    await expect(page.getByRole('status').filter({ hasText: 'Combinación copiada al portapapeles' })).toHaveCount(1);
   });
 
-  test.fail('hallazgo 1 · los días de sorteo de La Primitiva y Bonoloto son los vigentes', async ({ page }) => {
+  test('hallazgo 5 · si el portapapeles falla, el botón Copiar lo dice en vez de callar', async ({ page }) => {
+    await esperarInteractiva(page);
+    await page.evaluate(() => {
+      navigator.clipboard.writeText = () => Promise.reject(new DOMException('denegado', 'NotAllowedError'));
+    });
+    await ponerCantidad(page, 1);
+    await botonGenerar(page).click();
+    await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Copiar combinación' }).click();
+    await expect(page.locator('main').getByText('No copiada')).toBeVisible({ timeout: 2_000 });
+    await expect(page.getByRole('status').filter({ hasText: 'No se ha podido copiar' })).toHaveCount(1);
+  });
+
+  test('hallazgo 5 · las combinaciones guardadas también se pueden copiar', async ({ page }) => {
+    await sembrarYRecargar(page, {
+      [CLAVE_FAVORITAS]: JSON.stringify([{
+        id: 'sesion-01-09', type: 'primitiva', mainNumbers: [7, 14, 21, 28, 35, 42],
+        extraNumbers: [3], timestamp: '2026-09-01T10:00:00.000Z',
+      }]),
+    });
+    await page.getByRole('button', { name: 'Copiar la combinación guardada 7, 14, 21, 28, 35, 42' }).click();
+    await expect.poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe('La Primitiva: 7 - 14 - 21 - 28 - 35 - 42 | Reintegro: 3');
+    await expect(page.locator('[class*="favoriteCard"]').getByText('Copiada')).toBeVisible();
+  });
+
+  test('hallazgo 1 · los días de sorteo de La Primitiva y Bonoloto son los vigentes', async ({ page }) => {
     // Fuente: Loterías y Apuestas del Estado. La Primitiva: «Semanalmente se celebran sorteos
     // los lunes, jueves y sábados». Bonoloto: sorteo de lunes a domingo (el domingo se añadió
     // el 25/09/2022). HOY la app dice «Jueves y Sábados» y «Lunes a Sábado» en el panel, en
@@ -751,6 +806,8 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
     await expect(page.locator('[class*="lotteryInfo"]')).toContainText(/lunes, jueves y s[áa]bados/i);
     await seleccionarLoteria(page, 'bonoloto');
     await expect(page.locator('[class*="lotteryInfo"]')).toContainText(/lunes a domingo/i);
+    // Ni un rastro de los días viejos en la página (fichas, textos, tabla)
+    await expect(page.getByText(/Jueves y S[áa]bados|Lunes a S[áa]bado|de lunes a s[áa]bado/)).toHaveCount(0);
 
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
@@ -759,7 +816,7 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
     expect(texto).not.toContain('se sortea jueves y sábados');
   });
 
-  test.fail('hallazgo 6 · la metadata no promete estadísticas que la página no tiene', async ({ page }) => {
+  test('hallazgo 6 · la metadata no promete estadísticas que la página no tiene', async ({ page }) => {
     // DEBERÍA: o la página ofrece estadísticas de los números, o la descripción y las
     // `features` del JSON-LD dejan de prometerlas. HOY: description «…historial y
     // estadísticas» y feature «Estadísticas básicas de los números generados»; tras generar
@@ -778,12 +835,19 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
     expect({ promete, ofrece }).not.toEqual({ promete: true, ofrece: false });
   });
 
-  test.fail('hallazgo 7 · el bloque educativo no tiene la errata «Jugas» ni atribuye estas loterías a la ONCE', async ({ page }) => {
+  test('hallazgo 7 · el bloque educativo no tiene la errata «Jugas» ni atribuye estas loterías a la ONCE', async ({ page }) => {
     // DEBERÍA: «Jugáis en grupo y necesitáis…» (la frase sigue en vosotros) y «Las principales
     // loterías de Loterías y Apuestas del Estado»: ninguna de las cuatro de la tabla es de la
     // ONCE. HOY: «Jugas en grupo» y «Las principales loterías de la ONCE y LAE».
     // El bloque educativo nace colapsado pero su texto está en el DOM
     await expect(page.getByText(/Jugas en grupo/)).toHaveCount(0);
     await expect(page.getByText(/loterías de la ONCE y LAE/)).toHaveCount(0);
+    // REPARADO (25/09/2026): texto corregido, y Lototurf (que la app genera) entra en la tabla
+    // y en el paso 1 de la guía. Odds: C(31,6) × 12 caballos = 736.281 × 12 = 8.835.372.
+    await expect(page.getByText(/Jugáis en grupo y necesitáis/)).toHaveCount(1);
+    const filaLototurf = page.locator('[class*="comparativaTable"] tr').filter({ hasText: 'Lototurf' });
+    await expect(filaLototurf).toHaveCount(1);
+    await expect(filaLototurf).toContainText('1 entre 8.835.372');
+    await expect(page.getByText(/Euromillones, El Gordo o Lototurf/)).toHaveCount(1);
   });
 });
