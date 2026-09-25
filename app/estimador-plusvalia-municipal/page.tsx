@@ -21,13 +21,34 @@ import {
   coeficienteIIVTNU,
   PLUSVALIA_MUNICIPAL_META,
   PLAZO_IIVTNU,
+  PRESCRIPCION_DEVOLUCION_IIVTNU,
 } from '@/data/fiscal';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
+
+/*
+ * Datos normativos, leídos de su módulo y no escritos a mano (hallazgo 1645 del Inspector,
+ * 25/09/2026): el tipo máximo, el tipo con que arranca el campo y los plazos del art. 110.2
+ * estaban como literales en una docena de sitios, junto a la importación que ya los traía.
+ */
+const TIPO_MAXIMO = PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal;
+const TIPO_POR_DEFECTO = String(PLUSVALIA_MUNICIPAL_META.tipoOrientativo);
+const PLAZO_INTER_VIVOS = `${PLAZO_IIVTNU.diasHabilesInterVivos} días hábiles`;
+const PLAZO_HERENCIAS = `${PLAZO_IIVTNU.mesesMortisCausa} meses`;
+/*
+ * La escala de recargo por presentación tardía del art. 27.2 LGT (Ley 11/2021), compuesta desde
+ * el motor compartido. Hasta el 25/09/2026 la app servía en tres sitios la escala derogada
+ * (5/10/15/20 %), y dos de ellos se contradecían entre sí (hallazgo 1640).
+ */
+const RECARGO = ESCALA_RECARGO_EXTEMPORANEO;
+const TEXTO_RECARGO = `un ${RECARGO.porcentajeBase}% de partida más otro ${RECARGO.porcentajePorMes}% por cada mes completo de retraso, y el ${RECARGO.porcentajeMas12Meses}% más intereses de demora una vez transcurridos ${RECARGO.mesesEscalaProporcional} meses (${RECARGO.baseNormativa})`;
 
 interface ResultadoMetodo {
   baseImponible: number;
   cuota: number;
   valido: boolean;
-  motivo?: string;
+  motivo?: 'sin-ganancia' | 'datos-incompletos' | 'datos-incoherentes';
+  /** Qué falta o qué no cuadra en los datos del método real, dicho por su nombre. */
+  avisos?: string[];
 }
 
 interface Resultado {
@@ -35,6 +56,13 @@ interface Resultado {
   real: ResultadoMetodo | null;
   metodoRecomendado: 'objetivo' | 'real' | null;
   tieneIncrementoReal: boolean;
+  /**
+   * El coeficiente CON EL QUE SE CALCULÓ. La nota «Coeficiente aplicado» salía del estado del
+   * formulario, así que al cambiar los años sin recalcular decía 0,40 junto a una base hecha
+   * con 0,20 (hallazgo 1643).
+   */
+  coeficiente: number;
+  prorrateado: boolean;
 }
 
 export default function EstimadorPlusvaliaMunicipalPage() {
@@ -45,7 +73,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
   // (art. 107.4 TRLRHL). Hasta el 24/09/2026 la FAQ lo prometía y el cálculo no lo hacía:
   // aplicaba el coeficiente entero a cualquier reventa dentro del año (hallazgo 1560).
   const [mesesTenencia, setMesesTenencia] = useState('');
-  const [tipoMunicipal, setTipoMunicipal] = useState('25');
+  const [tipoMunicipal, setTipoMunicipal] = useState(TIPO_POR_DEFECTO);
 
   // Datos método real (opcionales)
   const [usarMetodoReal, setUsarMetodoReal] = useState(false);
@@ -76,8 +104,8 @@ export default function EstimadorPlusvaliaMunicipalPage() {
     if (menosDeUnAnio && mesesTenencia === '') {
       nuevosErrores.push('Con menos de 1 año, indica los meses completos: el coeficiente se prorratea por ellos.');
     }
-    if (!tipoMunicipal || isNaN(tipoNum) || tipoNum <= 0 || tipoNum > 30) {
-      nuevosErrores.push('El tipo impositivo municipal debe estar entre 0,01% y 30%.');
+    if (!tipoMunicipal || isNaN(tipoNum) || tipoNum <= 0 || tipoNum > TIPO_MAXIMO) {
+      nuevosErrores.push(`El tipo impositivo municipal debe estar entre 0,01% y ${formatNumber(TIPO_MAXIMO, 0)}%.`);
     }
 
     if (nuevosErrores.length > 0) {
@@ -104,16 +132,41 @@ export default function EstimadorPlusvaliaMunicipalPage() {
     let tieneIncrementoReal = false;
 
     if (usarMetodoReal) {
-      const precioAdqNum = parseSpanishNumber(precioAdquisicion);
-      const precioTransNum = parseSpanishNumber(precioTransmision);
-      const vcTotalNum = parseSpanishNumber(vcTotal);
+      /*
+       * Cada motivo por su nombre (hallazgo 1644): hasta el 25/09/2026 un campo ilegible o un
+       * suelo mayor que el total caían en «Rellena todos los datos del método real», que pedía
+       * rellenar lo que ya estaba relleno.
+       */
+      const vacios: string[] = [];
+      const avisosReal: string[] = [];
+      const leer = (texto: string, nombre: string): number => {
+        if (texto.trim() === '') {
+          vacios.push(nombre);
+          return NaN;
+        }
+        const n = parseSpanishNumber(texto);
+        if (isNaN(n)) {
+          avisosReal.push(`No se puede leer ${nombre} («${texto}»): escribe el importe con coma para los decimales, p. ej. 150.000,50.`);
+        } else if (n <= 0) {
+          avisosReal.push(`${nombre.charAt(0).toUpperCase()}${nombre.slice(1)} debe ser mayor que 0.`);
+        }
+        return n;
+      };
+      const precioAdqNum = leer(precioAdquisicion, 'el precio de adquisición');
+      const precioTransNum = leer(precioTransmision, 'el precio de transmisión');
+      const vcTotalNum = leer(vcTotal, 'el valor catastral total');
 
-      if (
-        !isNaN(precioAdqNum) && precioAdqNum > 0 &&
-        !isNaN(precioTransNum) && precioTransNum > 0 &&
-        !isNaN(vcTotalNum) && vcTotalNum > 0 &&
-        vcTotalNum >= vcSueloNum
-      ) {
+      if (vacios.length > 0) {
+        avisosReal.push(`Para comparar con el método real, rellena también ${vacios.join(', ')}.`);
+      }
+      if (avisosReal.length === 0 && vcTotalNum < vcSueloNum) {
+        avisosReal.push(
+          `El valor catastral total (${formatCurrency(vcTotalNum)}) no puede ser menor que el del suelo (${formatCurrency(vcSueloNum)}): ` +
+          'el total incluye el suelo y la construcción. Revisa los dos en el recibo del IBI.'
+        );
+      }
+
+      if (avisosReal.length === 0) {
         // Incremento real proporcional al suelo
         const incrementoTotal = precioTransNum - precioAdqNum;
         if (incrementoTotal <= 0) {
@@ -129,24 +182,46 @@ export default function EstimadorPlusvaliaMunicipalPage() {
           tieneIncrementoReal = true;
         }
       } else {
-        real = { baseImponible: 0, cuota: 0, valido: false, motivo: 'datos-incompletos' };
+        real = {
+          baseImponible: 0,
+          cuota: 0,
+          valido: false,
+          motivo: vacios.length > 0 && avisosReal.length === 1 ? 'datos-incompletos' : 'datos-incoherentes',
+          avisos: avisosReal,
+        };
       }
     }
 
-    // Determinar método recomendado (el que da menor cuota para el contribuyente)
+    // Determinar método recomendado (el que da menor cuota para el contribuyente).
+    // Sin incremento real no hay sujeción (art. 104.5 TRLRHL): la cuota es 0 y el más favorable
+    // es el real. Hasta el 25/09/2026 con pérdida no se marcaba ninguno y la única cuota a la
+    // vista era la del objetivo (hallazgo 1642).
     let metodoRecomendado: 'objetivo' | 'real' | null = null;
-    if (real?.valido && tieneIncrementoReal) {
-      metodoRecomendado = real.cuota < objetivo.cuota ? 'real' : 'objetivo';
+    if (real?.valido) {
+      metodoRecomendado = !tieneIncrementoReal || real.cuota < objetivo.cuota ? 'real' : 'objetivo';
     }
 
-    setResultado({ objetivo, real, metodoRecomendado, tieneIncrementoReal });
+    setResultado({
+      objetivo,
+      real,
+      metodoRecomendado,
+      tieneIncrementoReal,
+      coeficiente: coef,
+      prorrateado: menosDeUnAnio,
+    });
+  };
+
+  /** Cualquier cambio en los datos retira el resultado: ya no es el de lo que hay escrito (hallazgo 1643). */
+  const alCambiar = (fijar: (v: string) => void) => (v: string): void => {
+    fijar(v);
+    setResultado(null);
   };
 
   const resetear = () => {
     setVcSuelo('');
     setAniosTenencia('');
     setMesesTenencia('');
-    setTipoMunicipal('25');
+    setTipoMunicipal(TIPO_POR_DEFECTO);
     setPrecioAdquisicion('');
     setPrecioTransmision('');
     setVcTotal('');
@@ -182,8 +257,8 @@ export default function EstimadorPlusvaliaMunicipalPage() {
       <div className={styles.avisoMetodologico}>
         <span className={styles.avisoIcon} aria-hidden="true">ℹ️</span>
         <p>
-          Desde la sentencia del Tribunal Constitucional de noviembre de 2021, puedes elegir entre
-          el <strong>método objetivo</strong> (basado en coeficientes legales) o el <strong>método real</strong>
+          Desde la sentencia del Tribunal Constitucional de octubre de 2021, puedes elegir entre
+          el <strong>método objetivo</strong> (basado en coeficientes legales) o el <strong>método real</strong>{' '}
           (basado en el incremento de valor real). Puedes aplicar el que resulte en una cuota menor, según establece el RDL 26/2021.
         </p>
       </div>
@@ -196,7 +271,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
           <NumberInput
             value={vcSuelo}
-            onChange={setVcSuelo}
+            onChange={alCambiar(setVcSuelo)}
             label="Valor catastral del suelo (€)"
             placeholder="50000"
             helperText="Figura en el recibo del IBI, en la parte de 'valor del suelo'"
@@ -215,7 +290,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             <select
               className={styles.select}
               value={aniosTenencia}
-              onChange={e => { setAniosTenencia(e.target.value); setMesesTenencia(''); }}
+              onChange={e => { setAniosTenencia(e.target.value); setMesesTenencia(''); setResultado(null); }}
               aria-label="Años de tenencia del inmueble"
             >
               <option value="">Selecciona los años</option>
@@ -237,7 +312,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 id="meses-tenencia"
                 className={styles.select}
                 value={mesesTenencia}
-                onChange={e => setMesesTenencia(e.target.value)}
+                onChange={e => alCambiar(setMesesTenencia)(e.target.value)}
               >
                 <option value="">Selecciona los meses</option>
                 {Array.from({ length: 12 }, (_, m) => (
@@ -255,10 +330,10 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
           <NumberInput
             value={tipoMunicipal}
-            onChange={setTipoMunicipal}
+            onChange={alCambiar(setTipoMunicipal)}
             label="Tipo impositivo municipal (%)"
-            placeholder="25"
-            helperText="Consulta el tipo exacto en tu Ayuntamiento. El máximo legal es el 30%."
+            placeholder={TIPO_POR_DEFECTO}
+            helperText={`Consulta el tipo exacto en tu Ayuntamiento. El máximo legal es el ${TIPO_MAXIMO}%.`}
             min={0}
           />
 
@@ -268,9 +343,8 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <input
                 type="checkbox"
                 checked={usarMetodoReal}
-                onChange={e => setUsarMetodoReal(e.target.checked)}
+                onChange={e => { setUsarMetodoReal(e.target.checked); setResultado(null); }}
                 className={styles.toggleInput}
-                aria-label="Activar comparación con método real"
               />
               <span className={styles.toggleText}>
                 Comparar también con el <strong>método real</strong>
@@ -286,7 +360,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <h3 className={styles.subPanelTitle}><span aria-hidden="true">📊</span> Datos para el método real</h3>
               <NumberInput
                 value={precioAdquisicion}
-                onChange={setPrecioAdquisicion}
+                onChange={alCambiar(setPrecioAdquisicion)}
                 label="Precio de adquisición (€)"
                 placeholder="150000"
                 helperText="Precio al que compraste o valor declarado en herencia/donación"
@@ -294,7 +368,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               />
               <NumberInput
                 value={precioTransmision}
-                onChange={setPrecioTransmision}
+                onChange={alCambiar(setPrecioTransmision)}
                 label="Precio de transmisión (€)"
                 placeholder="220000"
                 helperText="Precio al que vendes o valor en la escritura"
@@ -302,7 +376,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               />
               <NumberInput
                 value={vcTotal}
-                onChange={setVcTotal}
+                onChange={alCambiar(setVcTotal)}
                 label="Valor catastral total del inmueble (€)"
                 placeholder="80000"
                 helperText="Valor catastral completo (suelo + construcción), del recibo IBI"
@@ -314,7 +388,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
           {errores.length > 0 && (
             <div className={styles.errores} role="alert">
               {errores.map((e, i) => (
-                <p key={i} className={styles.errorItem}>⚠️ {e}</p>
+                <p key={i} className={styles.errorItem}><span aria-hidden="true">⚠️</span> {e}</p>
               ))}
             </div>
           )}
@@ -324,7 +398,6 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               type="button"
               onClick={calcular}
               className={styles.btnPrimary}
-              aria-label="Obtener estimación orientativa"
             >
               Obtener orientación
             </button>
@@ -362,7 +435,9 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                   value={formatCurrency(resultado.objetivo.cuota)}
                   variant={resultado.metodoRecomendado === 'objetivo' ? 'highlight' : 'default'}
                   icon="🏙️"
-                  description="Base imponible × tipo municipal"
+                  description={resultado.real?.motivo === 'sin-ganancia'
+                    ? 'No se paga si acreditas ante el Ayuntamiento que no hubo incremento (art. 104.5 TRLRHL)'
+                    : 'Base imponible × tipo municipal'}
                 />
               </div>
             </div>
@@ -405,23 +480,24 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               </div>
             )}
 
-            {resultado.real?.motivo === 'datos-incompletos' && (
-              <p className={styles.avisoIncompleto}>
-                ℹ️ Rellena todos los datos del método real para comparar ambas opciones.
-              </p>
+            {resultado.real && !resultado.real.valido && resultado.real.avisos && (
+              <div className={styles.avisoIncompleto} role="alert">
+                {resultado.real.avisos.map((a, i) => (
+                  <p key={i}><span aria-hidden="true">ℹ️</span> {a}</p>
+                ))}
+              </div>
             )}
 
             {/* Nota de coeficiente aplicado */}
-            {coefMostrar !== null && (
-              <div className={styles.notaCalculo}>
-                <p>
-                  {/* Con prorrateo, cuatro decimales: con dos, 0,075 se leía «0,08» junto a una cuota
-                      calculada con 0,075 (regresión del 24/09/2026, al introducir el prorrateo). */}
-                  <strong>Coeficiente aplicado:</strong> {formatNumber(coefMostrar, menosDeUnAnio ? 4 : 2)}&nbsp;
-                  (máximos del art. 107.4 TRLRHL, redacción del RDL 8/2023)
-                </p>
-              </div>
-            )}
+            <div className={styles.notaCalculo}>
+              <p>
+                {/* Con prorrateo, cuatro decimales: con dos, 0,075 se leía «0,08» junto a una cuota
+                    calculada con 0,075 (regresión del 24/09/2026, al introducir el prorrateo).
+                    El coeficiente es el DEL CÁLCULO, no el del formulario (hallazgo 1643). */}
+                <strong>Coeficiente aplicado:</strong> {formatNumber(resultado.coeficiente, resultado.prorrateado ? 4 : 2)}&nbsp;
+                (máximos del art. 107.4 TRLRHL, redacción del RDL 8/2023)
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -442,15 +518,20 @@ export default function EstimadorPlusvaliaMunicipalPage() {
       <div className={styles.avisoEspecifico}>
         <h3 className={styles.avisoEspecificoTitle}><span aria-hidden="true">⚠️</span> Aspectos que esta orientación NO contempla</h3>
         <ul className={styles.avisoLista}>
-          <li>El tipo impositivo exacto de <strong>tu municipio</strong> (puede ser inferior al 30% que fijamos por defecto).</li>
+          {/* El porcentaje es el valor con que arranca el campo: decía «30%» con el campo en 25 y
+              presentaba la cifra como un techo, y no lo es (hallazgo 1641). */}
+          <li>El tipo impositivo exacto de <strong>tu municipio</strong>: puede ser inferior o superior al {TIPO_POR_DEFECTO}% que fijamos por defecto, hasta el máximo legal del {TIPO_MAXIMO}%.</li>
           <li>Posibles <strong>bonificaciones municipales</strong> por herencia entre familiares directos (algunos Ayuntamientos las aplican).</li>
-          <li>Situaciones de <strong>inmuebles adquiridos antes de 1997</strong> con coeficientes de actualización diferentes.</li>
+          {/* Decía «inmuebles adquiridos antes de 1997 con coeficientes de actualización diferentes»:
+              eso es del IRPF. El art. 107.4 termina en «igual o superior a 20 años» y la app lo
+              aplica (hallazgo 1647). Lo que de verdad no contempla son los coeficientes propios. */}
+          <li>Los <strong>coeficientes propios de tu Ayuntamiento</strong>, si su ordenanza aprueba unos inferiores a los máximos legales que aplica esta orientación.</li>
           <li>La posible <strong>exención por reinversión</strong> en vivienda habitual o mayores de 65 años (afecta al IRPF, no a la plusvalía municipal).</li>
           <li>Casos de <strong>transmisiones parciales</strong> o proindivisos.</li>
         </ul>
         <p className={styles.avisoConclusion}>
           Siempre contrasta el resultado con la liquidación del Ayuntamiento o con un asesor fiscal.
-          El plazo para liquidar el impuesto es de <strong>30 días hábiles</strong> desde la transmisión (6 meses en herencias).
+          El plazo para liquidar el impuesto es de <strong>{PLAZO_INTER_VIVOS}</strong> desde la transmisión ({PLAZO_HERENCIAS} en herencias, {PLAZO_IIVTNU.baseNormativa}).
         </p>
       </div>
 
@@ -499,8 +580,8 @@ export default function EstimadorPlusvaliaMunicipalPage() {
         <section className={styles.guideSection}>
           <h2>¿Cuándo se liquida?</h2>
           <ul>
-            <li><strong>Ventas y donaciones:</strong> 30 días hábiles desde la transmisión.</li>
-            <li><strong>Herencias:</strong> 6 meses desde el fallecimiento (prorrogable 6 meses más).</li>
+            <li><strong>Ventas y donaciones:</strong> {PLAZO_INTER_VIVOS} desde la transmisión.</li>
+            <li><strong>Herencias:</strong> {PLAZO_HERENCIAS} desde el fallecimiento, prorrogables hasta {PLAZO_IIVTNU.mesesMaximoConProrroga} meses en total a solicitud del sujeto pasivo ({PLAZO_IIVTNU.baseNormativa}).</li>
           </ul>
         </section>
 
@@ -569,9 +650,11 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                   <td>Alta — si se acredita pérdida real, la cuota es cero</td>
                 </tr>
                 <tr>
+                  {/* Presentaba la no sujeción como una opción del método real (hallazgo 1642). El
+                      art. 104.5 TRLRHL no la liga a ningún método: basta acreditar la pérdida. */}
                   <td><strong>Obligación de tributar si hay pérdida</strong></td>
-                  <td>Sí, salvo que se opte por el método real y se acredite</td>
-                  <td>No — si no hay incremento real, no nace el hecho imponible</td>
+                  <td>No: si acreditas con las escrituras que no hubo incremento, la transmisión no está sujeta, sea cual sea el método (art. 104.5 TRLRHL)</td>
+                  <td>No — si no hay incremento real, no hay sujeción y la cuota es 0 €</td>
                 </tr>
               </tbody>
             </table>
@@ -641,11 +724,17 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               </p>
               <ul>
                 <li>Con el método real, el incremento es negativo → <strong>cuota cero</strong>, no se devengó el impuesto.</li>
-                <li>Si ya lo pagaste antes de 2021, tienes hasta <strong>4 años</strong> para reclamar la devolución (prescripción).</li>
+                {/* Ofrecía reclamar lo pagado «antes de 2021» con 4 años de plazo: por esa misma regla,
+                    todo pago anterior a 2021 prescribió como muy tarde en 2024, y el del ejemplo
+                    (2015) en 2019 (hallazgo 1646). */}
+                <li>
+                  La devolución de lo pagado de más solo se puede pedir durante <strong>{PRESCRIPCION_DEVOLUCION_IIVTNU.anios} años</strong> desde
+                  {' '}{PRESCRIPCION_DEVOLUCION_IIVTNU.desde} ({PRESCRIPCION_DEVOLUCION_IIVTNU.baseNormativa}): un pago de 2015 prescribió en 2019 y ya no se puede reclamar.
+                </li>
                 <li>Necesitas conservar la escritura de compra para acreditar el valor de adquisición.</li>
               </ul>
               <p className={styles.escenarioTip}>
-                La sentencia TC 182/2021 abrió la vía para reclamar plusvalías pagadas con pérdida real. Consulta a un asesor para el procedimiento de devolución.
+                La no sujeción con pérdida la estableció la sentencia TC 59/2017 y hoy la recoge el art. 104.5 TRLRHL. Si pagaste con pérdida dentro del plazo de prescripción, consulta a un asesor para el procedimiento de devolución.
               </p>
             </div>
 
@@ -656,7 +745,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Padre dona a hijo un local comercial. Valor catastral del suelo: <strong>70.000 €</strong>.
-                Tipo municipal: <strong>30 %</strong>. Plazo: <strong>30 días hábiles</strong>.
+                Tipo municipal: <strong>{TIPO_MAXIMO} %</strong>. Plazo: <strong>{PLAZO_INTER_VIVOS}</strong>.
               </p>
               <ul>
                 <li>El <strong>donatario</strong> (quien recibe) es el sujeto pasivo, no el donante.</li>
@@ -664,7 +753,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 <li>Los locales comerciales no tienen bonificaciones familiares habituales (a diferencia de vivienda habitual en algunos municipios).</li>
               </ul>
               <p className={styles.escenarioTip}>
-                Comprueba si el Ayuntamiento aplica el tipo máximo (30%) o uno inferior. Un punto porcentual de diferencia puede suponer cientos de euros.
+                Comprueba si el Ayuntamiento aplica el tipo máximo ({TIPO_MAXIMO}%) o uno inferior. Un punto porcentual de diferencia puede suponer cientos de euros.
               </p>
             </div>
 
@@ -688,10 +777,12 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             <div className={styles.faqItem}>
               <dt>¿Qué pasa si vendí con pérdida durante la crisis de 2008?</dt>
               <dd>
-                Si vendiste por menos de lo que pagaste y el Ayuntamiento te cobró la plusvalía antes de 2021,
-                puedes reclamar la devolución. El plazo de prescripción es de <strong>4 años</strong> desde el
-                ingreso indebido. Necesitas la escritura de compra original para acreditar el valor de adquisición.
-                Presenta un escrito de rectificación de autoliquidación ante el Ayuntamiento.
+                Sin incremento de valor la transmisión no está sujeta (STC 59/2017; hoy, art. 104.5 TRLRHL), pero
+                el derecho a pedir la devolución prescribe a los <strong>{PRESCRIPCION_DEVOLUCION_IIVTNU.anios} años</strong> desde
+                {' '}{PRESCRIPCION_DEVOLUCION_IIVTNU.desde} ({PRESCRIPCION_DEVOLUCION_IIVTNU.baseNormativa}).
+                Una plusvalía pagada en plena crisis, hace más de {PRESCRIPCION_DEVOLUCION_IIVTNU.anios} años, ya no se puede
+                reclamar. Si el pago es más reciente, necesitas la escritura de compra original para acreditar el
+                valor de adquisición y presentar ante el Ayuntamiento la solicitud de rectificación de la autoliquidación.
               </dd>
             </div>
 
@@ -718,7 +809,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             <div className={styles.faqItem}>
               <dt>¿Cómo se calcula si tengo el inmueble menos de 1 año?</dt>
               <dd>
-                Si la tenencia es inferior a 12 meses, el coeficiente de <strong>menos de 1 año</strong>
+                Si la tenencia es inferior a 12 meses, el coeficiente de <strong>menos de 1 año</strong>{' '}
                 ({formatNumber(COEFICIENTES_IIVTNU_2025[0].coeficiente, 2)} como máximo estatal) se prorratea
                 por los meses completos transcurridos (art. 107.4 TRLRHL): con 6 meses se aplica la mitad. En el método real, el incremento también puede ser muy elevado en poco tiempo,
                 por lo que conviene comparar ambos métodos igualmente.
@@ -730,9 +821,8 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <dd>
                 Algunos Ayuntamientos permiten el aplazamiento o fraccionamiento por razones de liquidez,
                 especialmente en herencias. Debes solicitarlo expresamente antes de que venza el plazo de
-                6 meses. Si el plazo vence sin liquidar ni solicitar prórroga, se generan recargos del
-                <strong>5% (1-3 meses), 10% (3-6 meses) o 15% (6-12 meses)</strong>, más intereses de demora
-                a partir de 12 meses.
+                {' '}{PLAZO_HERENCIAS}. Si el plazo vence sin liquidar ni solicitar prórroga y presentas tarde por
+                tu cuenta, sin requerimiento del Ayuntamiento, el recargo es de <strong>{TEXTO_RECARGO}</strong>.
               </dd>
             </div>
 
@@ -750,9 +840,10 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <dt>¿Puedo reclamar una plusvalía pagada cuando en realidad hubo pérdida?</dt>
               <dd>
                 Sí, mediante un escrito de <strong>rectificación de autoliquidación con solicitud de devolución
-                de ingresos indebidos</strong>. El plazo es de 4 años desde el pago. Debes aportar las escrituras
+                de ingresos indebidos</strong>. El plazo es de {PRESCRIPCION_DEVOLUCION_IIVTNU.anios} años desde
+                {' '}{PRESCRIPCION_DEVOLUCION_IIVTNU.desde} ({PRESCRIPCION_DEVOLUCION_IIVTNU.baseNormativa}). Debes aportar las escrituras
                 de compra y venta para demostrar que el precio de transmisión fue inferior al de adquisición.
-                La sentencia TC 182/2021 (octubre 2021) respalda estas reclamaciones.
+                La no sujeción con pérdida la estableció la sentencia TC 59/2017 y hoy la recoge el art. 104.5 TRLRHL.
               </dd>
             </div>
 
@@ -796,7 +887,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 <strong>Calcula por el método objetivo</strong>
                 <p>
                   Fórmula: <em>Valor catastral del suelo × coeficiente (máximo legal según años) × tipo municipal</em>.
-                  El tipo municipal máximo es el 30%; consulta la ordenanza de tu municipio para el tipo real aplicado.
+                  El tipo municipal máximo es el {TIPO_MAXIMO}%; consulta la ordenanza de tu municipio para el tipo real aplicado.
                 </p>
               </div>
             </li>
@@ -830,10 +921,11 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <div className={styles.stepContent}>
                 <strong>Presenta en plazo</strong>
                 <p>
-                  <strong>Ventas y donaciones:</strong> 30 días hábiles desde la firma de la escritura.
-                  <strong> Herencias:</strong> 6 meses desde el fallecimiento (prorrogables otros 6 meses
-                  si se solicita antes del vencimiento). El incumplimiento genera recargos automáticos
-                  desde el 5% hasta el 20%, sin necesidad de que el Ayuntamiento inicie expediente.
+                  <strong>Ventas y donaciones:</strong> {PLAZO_INTER_VIVOS} desde la firma de la escritura.
+                  <strong> Herencias:</strong> {PLAZO_HERENCIAS} desde el fallecimiento, prorrogables hasta
+                  {' '}{PLAZO_IIVTNU.mesesMaximoConProrroga} meses en total a solicitud del sujeto pasivo ({PLAZO_IIVTNU.baseNormativa}).
+                  Si presentas tarde por tu cuenta, sin requerimiento previo, el recargo es de {TEXTO_RECARGO}.
+                  Si es el Ayuntamiento quien lo detecta y te requiere, ya no se aplica el recargo sino el régimen sancionador.
                 </p>
               </div>
             </li>
@@ -866,7 +958,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <div>
                 <strong>En herencias, solicita prórroga a la vez que el IS</strong>
-                <p>El plazo para el IIVTNU (6 meses) y para el Impuesto de Sucesiones son coincidentes. Tramita ambas prórrogas simultáneamente ante el Ayuntamiento y la CCAA.</p>
+                <p>El plazo para el IIVTNU ({PLAZO_HERENCIAS}) y para el Impuesto de Sucesiones son coincidentes. Tramita ambas prórrogas simultáneamente ante el Ayuntamiento y la CCAA.</p>
               </div>
             </div>
 
@@ -874,7 +966,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <div>
                 <strong>Consulta el tipo real de tu Ayuntamiento</strong>
-                <p>El tipo máximo es el 30%, pero muchos municipios aplican tipos inferiores. Un municipio con tipo del 20% supone un 33% menos de cuota que el máximo.</p>
+                <p>El tipo máximo es el {TIPO_MAXIMO}%, pero muchos municipios aplican tipos inferiores. Un municipio con tipo del 20% supone un {formatNumber((1 - 20 / TIPO_MAXIMO) * 100, 0)}% menos de cuota que el máximo.</p>
               </div>
             </div>
 
@@ -907,8 +999,8 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             <ul className={styles.warningList}>
               <li>
                 <strong>No autoliquidar en plazo.</strong> Si presentas voluntariamente fuera de plazo,
-                el recargo es del <strong>5% (hasta 3 meses tarde), 10% (hasta 6 meses), 15% (hasta 12 meses)
-                o 20% (más de 12 meses)</strong>, sin contar posibles intereses de demora.
+                el recargo es de <strong>{TEXTO_RECARGO}</strong>. Aunque el retraso sea de pocos días, el
+                {' '}{RECARGO.porcentajeBase}% de partida se debe desde el primero.
               </li>
               <li>
                 <strong>Calcular solo por un método sin comparar.</strong> Elegir únicamente el método
@@ -916,15 +1008,15 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 La comparación no tiene coste y puede ahorrarte dinero significativo.
               </li>
               <li>
-                <strong>Olvidar el IIVTNU en herencias.</strong> El plazo de 6 meses empieza desde el
+                <strong>Olvidar el IIVTNU en herencias.</strong> El plazo de {PLAZO_HERENCIAS} empieza desde el
                 fallecimiento, no desde la aceptación de la herencia. Es habitual descuidarlo mientras
                 se tramita el IS, lo que genera recargos automáticos.
               </li>
               <li>
-                <strong>No reclamar plusvalías pagadas antes de 2021 con pérdida demostrable.</strong> Si
-                vendiste con pérdida antes de la sentencia TC de octubre de 2021 y pagaste el impuesto,
-                tienes hasta <strong>4 años desde el pago</strong> para solicitar la devolución. El plazo
-                prescribe: no lo dejes para después.
+                <strong>Dejar pasar el plazo para reclamar una plusvalía pagada con pérdida.</strong> Si
+                vendiste con pérdida y pagaste el impuesto, tienes <strong>{PRESCRIPCION_DEVOLUCION_IIVTNU.anios} años
+                desde el pago</strong> para solicitar la devolución ({PRESCRIPCION_DEVOLUCION_IIVTNU.baseNormativa}).
+                Pasado ese plazo prescribe y ya no se puede reclamar.
               </li>
               <li>
                 <strong>Confundir valor catastral total con valor catastral del suelo.</strong> Son importes
@@ -933,10 +1025,10 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 duplicar o triplicar artificialmente la cuota.
               </li>
               <li>
-                <strong>Dejar que el comprador asuma la plusvalía por pacto privado sin precaución.</strong>
+                <strong>Dejar que el comprador asuma la plusvalía por pacto privado sin precaución.</strong>{' '}
                 El pacto entre partes no vincula al Ayuntamiento. Si el comprador incumple, el vendedor
                 responde ante la Administración. Para protegerte, incluye una cláusula de garantía en
-                la escritura y asegúrate de que el comprador dispone de liquidez antes de firmsr.
+                la escritura y asegúrate de que el comprador dispone de liquidez antes de firmar.
               </li>
             </ul>
           </div>

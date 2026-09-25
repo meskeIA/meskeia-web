@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { COEFICIENTES_IIVTNU_2025 } from '@/data/fiscal';
+import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META, PLAZO_IIVTNU } from '@/data/fiscal';
 import { formatNumber } from '@/lib';
 
 // Extremos de la tabla vigente, derivados: hasta el 24/09/2026 el FAQPage los traía escritos
@@ -55,7 +55,8 @@ export const faqJsonLd = {
       name: '¿Qué es la Plusvalía Municipal y cuándo hay que pagarla?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La Plusvalía Municipal o IIVTNU (Impuesto sobre el Incremento de Valor de los Terrenos de Naturaleza Urbana) es un tributo local que grava el aumento de valor del terreno urbano entre la adquisición y la transmisión de un inmueble. Se paga al vender, donar o heredar una propiedad. El sujeto pasivo es el vendedor en caso de compraventa, y el heredero o donatario en transmisiones gratuitas. El plazo de liquidación es de 30 días hábiles en ventas y de 6 meses en herencias.',
+        // Plazos y tipo máximo del módulo, no a mano (hallazgo 1645, 25/09/2026).
+        text: `La Plusvalía Municipal o IIVTNU (Impuesto sobre el Incremento de Valor de los Terrenos de Naturaleza Urbana) es un tributo local que grava el aumento de valor del terreno urbano entre la adquisición y la transmisión de un inmueble. Se paga al vender, donar o heredar una propiedad. El sujeto pasivo es el vendedor en caso de compraventa, y el heredero o donatario en transmisiones gratuitas. El plazo de liquidación es de ${PLAZO_IIVTNU.diasHabilesInterVivos} días hábiles en ventas y de ${PLAZO_IIVTNU.mesesMortisCausa} meses en herencias.`,
       },
     },
     {
@@ -63,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la Plusvalía Municipal después del Real Decreto-ley 26/2021?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Desde noviembre de 2021 (RDL 26/2021), el contribuyente puede elegir entre dos métodos y pagar el que resulte menor. El método objetivo multiplica el valor catastral del suelo por un coeficiente máximo fijado por ley según los años de tenencia (de ${COEF_MENOS_DE_UN_ANIO} por debajo del año, prorrateado por meses completos, a ${COEF_VEINTE_O_MAS} para 20 o más años; cada ayuntamiento puede aplicar uno menor). El método real calcula la ganancia real del suelo comparando el precio de compra y el de venta proporcionales al terreno. El ayuntamiento aplica después el tipo impositivo municipal, que no puede superar el 30 %.`,
+        text: `Desde noviembre de 2021 (RDL 26/2021), el contribuyente puede elegir entre dos métodos y pagar el que resulte menor. El método objetivo multiplica el valor catastral del suelo por un coeficiente máximo fijado por ley según los años de tenencia (de ${COEF_MENOS_DE_UN_ANIO} por debajo del año, prorrateado por meses completos, a ${COEF_VEINTE_O_MAS} para 20 o más años; cada ayuntamiento puede aplicar uno menor). El método real calcula la ganancia real del suelo comparando el precio de compra y el de venta proporcionales al terreno. El ayuntamiento aplica después el tipo impositivo municipal, que no puede superar el ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal} %.`,
       },
     },
     {

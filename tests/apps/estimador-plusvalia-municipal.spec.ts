@@ -57,7 +57,8 @@ function distintivo(page: Page) {
   return page.locator('label', { hasText: 'Años de tenencia' }).locator('span');
 }
 
-const BOTON = 'button[aria-label="Obtener estimación orientativa"]';
+/** Por su texto visible: el `aria-label` que lo renombraba se retiró con el hallazgo 1650 (WCAG 2.5.3). */
+const BOTON = 'button:has-text("Obtener orientación")';
 
 test.describe('Estimador de plusvalía municipal — coeficientes del art. 107.4 TRLRHL', () => {
   /**
@@ -217,11 +218,12 @@ test.describe('Estimador de plusvalía municipal — coeficientes del art. 107.4
  * quitar la marca, comprobar que el test falla POR la afirmación que dice su título.
  * ════════════════════════════════════════════════════════════════════════════════════════ */
 
-const REAL = 'input[aria-label="Activar comparación con método real"]';
+/** La casilla, por su nombre accesible, que desde el hallazgo 1650 es su texto visible. */
+const REAL = (page: Page): Locator => page.getByRole('checkbox', { name: 'Comparar también con el método real' });
 const ADQUISICION = 'input[aria-label="Precio de adquisición (€)"]';
 const TRANSMISION = 'input[aria-label="Precio de transmisión (€)"]';
 const VC_TOTAL = 'input[aria-label="Valor catastral total del inmueble (€)"]';
-/** El botón de calcular, por su texto VISIBLE: el `aria-label` es objeto de un hallazgo abierto. */
+/** El botón de calcular, por su texto VISIBLE (hallazgo 1650). */
 const CALCULAR = (page: Page) => page.locator('button', { hasText: 'Obtener orientación' });
 
 interface DatosMetodoReal {
@@ -232,7 +234,7 @@ interface DatosMetodoReal {
 
 /** Activa el método real y rellena sus tres campos, comprobando cada uno en el estado de React. */
 async function rellenarMetodoReal(page: Page, d: DatosMetodoReal): Promise<void> {
-  await page.locator(REAL).check();
+  await REAL(page).check();
   await expect(page.locator(ADQUISICION)).toBeVisible();
   await escribir(page, ADQUISICION, d.adquisicion);
   await escribir(page, TRANSMISION, d.transmision);
@@ -433,7 +435,11 @@ test.describe('Estimador de plusvalía municipal — inspección del 25/09/2026:
   });
 });
 
-test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/09/2026', () => {
+/*
+ * Reparados el mismo 25/09/2026 (hallazgos 1640-1650): se les quitó el `test.fail()` y quedan
+ * como tests de regresión.
+ */
+test.describe('Estimador de plusvalía municipal — hallazgos del 25/09/2026, reparados', () => {
   /**
    * HALLAZGO (sospecha de SOSPECHAS.md, 1.ª parte) — escala de recargo DEROGADA en tres sitios.
    *
@@ -448,7 +454,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * 10 % = 297,00 €); más de 12 meses → 15 % = 445,50 € + intereses (el aviso dice 20 % =
    * 594,00 €); menos de un mes → 1 % = 29,70 € (el aviso dice 5 % = 148,50 €).
    */
-  test.fail('RECARGOS — ningún texto sirve la escala 5/10/15/20 % anterior a la Ley 11/2021', async ({ page }) => {
+  test('RECARGOS — ningún texto sirve la escala 5/10/15/20 % anterior a la Ley 11/2021', async ({ page }) => {
     await abrir(page);
     await abrirGuia(page);
     const textos = [
@@ -473,7 +479,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * Ayuntamiento al máximo legal cobraría 40.000 × 0,20 × 30 % = 2.400,00 €.
    * DEBERÍA: el porcentaje del texto y el valor inicial del campo, el mismo.
    */
-  test.fail('TIPO POR DEFECTO — el texto «…% que fijamos por defecto» dice el valor con que arranca el campo', async ({ page }) => {
+  test('TIPO POR DEFECTO — el texto «…% que fijamos por defecto» dice el valor con que arranca el campo', async ({ page }) => {
     await abrir(page);
     const inicial = parseSpanishNumber(await page.locator(TIPO).inputValue());
     const aviso = await page.locator('li', { hasText: 'que fijamos por defecto' }).innerText();
@@ -491,7 +497,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * que resulte en una cuota menor») señala al real.
    * DEBERÍA: si el objetivo sigue a la vista, el real lleva «Más favorable».
    */
-  test.fail('PÉRDIDA — con 180.000 → 130.000 € el método real (no sujeción) sale como el más favorable', async ({ page }) => {
+  test('PÉRDIDA — con 180.000 → 130.000 € el método real (no sujeción) sale como el más favorable', async ({ page }) => {
     await abrir(page);
     await escribir(page, SUELO, '50000');
     await escribir(page, TIPO, '30');
@@ -513,7 +519,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * DEBERÍA: lo que haya en pantalla cuadrar consigo mismo (base = suelo × coeficiente
    * aplicado), sea retirando el resultado, recalculando o dejando la nota del cálculo hecho.
    */
-  test.fail('DESCUADRE — tras cambiar los años sin recalcular, base = suelo × «Coeficiente aplicado»', async ({ page }) => {
+  test('DESCUADRE — tras cambiar los años sin recalcular, base = suelo × «Coeficiente aplicado»', async ({ page }) => {
     await abrir(page);
     await escribir(page, SUELO, '40000');
     await escribir(page, TIPO, '30');
@@ -524,6 +530,9 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
     await page.locator(ANIOS).selectOption('20');
     await expect(distintivo(page)).toHaveText('Coeficiente: 0,40');
 
+    // La reparación elegida (hallazgo 1643): cualquier cambio en los datos retira el resultado,
+    // que ya no es el de lo escrito. La nota, además, lee el coeficiente del cálculo hecho.
+    await expect(page.locator('h2', { hasText: 'Estimación orientativa' })).toHaveCount(0);
     if ((await page.locator('h2', { hasText: 'Estimación orientativa' }).count()) > 0) {
       const base = parseSpanishNumber(await cifraDe(seccion(page, 'Método objetivo'), 'Base imponible estimada'));
       const nota = await page.locator('p', { hasText: 'Coeficiente aplicado:' }).innerText();
@@ -540,7 +549,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * inmueble entero. (Lo mismo con un precio ilegible como «2.000.50».)
    * DEBERÍA: un aviso que nombre la incoherencia (el valor catastral total) y no el genérico.
    */
-  test.fail('SUELO > TOTAL — el aviso nombra la incoherencia en vez de pedir que se rellene lo ya relleno', async ({ page }) => {
+  test('SUELO > TOTAL — el aviso nombra la incoherencia en vez de pedir que se rellene lo ya relleno', async ({ page }) => {
     await abrir(page);
     await escribir(page, SUELO, '60000');
     await escribir(page, TIPO, '30');
@@ -550,6 +559,15 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
 
     await expect(page.locator('p', { hasText: 'Rellena todos los datos del método real' })).toHaveCount(0, { timeout: 2000 });
     await expect(page.locator('[role="alert"]', { hasText: /valor catastral total/i })).toHaveCount(1, { timeout: 2000 });
+    // El objetivo sí se calcula: no depende del total. 60.000 × 0,20 × 30 % = 3.600,00 €
+    expect(await cifraDe(seccion(page, 'Método objetivo'), 'Cuota orientativa')).toBe('3600,00 €');
+
+    // Un precio ilegible se nombra también por lo que es, no como un campo vacío
+    await escribir(page, VC_TOTAL, '100000');
+    await escribir(page, ADQUISICION, '2.000.50');
+    await CALCULAR(page).click();
+    await expect(page.locator('[role="alert"]', { hasText: 'No se puede leer el precio de adquisición' })).toHaveCount(1);
+    await expect(page.locator('p', { hasText: 'rellena también' })).toHaveCount(0);
   });
 
   /**
@@ -560,7 +578,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * prescribió a más tardar el 31/12/2024; el de su ejemplo (venta de 2015), en 2019.
    * DEBERÍA: no presentar como vía abierta una reclamación que, por su misma regla, ya no cabe.
    */
-  test.fail('PRESCRIPCIÓN — no se ofrece reclamar pagos «antes de 2021» con un plazo de 4 años ya vencido', async ({ page }) => {
+  test('PRESCRIPCIÓN — no se ofrece reclamar pagos «antes de 2021» con un plazo de 4 años ya vencido', async ({ page }) => {
     await abrir(page);
     await abrirGuia(page);
     await expect(page.locator('li', { hasText: 'Si ya lo pagaste antes de 2021' })).toHaveCount(0, { timeout: 2000 });
@@ -576,7 +594,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * contempla. Adquirido en 1990 y vendido en 2026 → 36 años → «20 o más años», 0,40.
    * (Los coeficientes de actualización por adquisición anterior a 1994/1997 son cosa del IRPF.)
    */
-  test.fail('ANTES DE 1997 — no se anuncia como no contemplado un coeficiente que el IIVTNU no tiene', async ({ page }) => {
+  test('ANTES DE 1997 — no se anuncia como no contemplado un coeficiente que el IIVTNU no tiene', async ({ page }) => {
     await abrir(page);
     await expect(page.locator('li', { hasText: 'coeficientes de actualización' })).toHaveCount(0, { timeout: 2000 });
   });
@@ -586,7 +604,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * se come delante o detrás de un <strong>: «recargos del5%», «método real(basado»,
    * «menos de 1 año(0,15» y «precaución.El pacto».
    */
-  test.fail('ERRATAS — «firmsr», «del5%», «real(basado», «año(0,15» y «precaución.El»', async ({ page }) => {
+  test('ERRATAS — «firmsr», «del5%», «real(basado», «año(0,15» y «precaución.El»', async ({ page }) => {
     await abrir(page);
     await abrirGuia(page);
     const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
@@ -604,7 +622,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * los datos…».
    * DEBERÍA: el texto accesible del aviso empezar por «Introduce…».
    */
-  test.fail('A11Y — el texto accesible del aviso de error no empieza por el emoji', async ({ page }) => {
+  test('A11Y — el texto accesible del aviso de error no empieza por el emoji', async ({ page }) => {
     await abrir(page);
     await CALCULAR(page).click();
     const aviso = page.locator('[role="alert"] p', { hasText: 'Introduce el valor catastral del suelo' });
@@ -629,7 +647,7 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 25/0
    * real». Quien maneja la página por voz dice lo que ve y no la encuentra.
    * DEBERÍA: el nombre accesible contener el texto visible.
    */
-  test.fail('A11Y — el nombre accesible del botón y de la casilla contiene su texto visible', async ({ page }) => {
+  test('A11Y — el nombre accesible del botón y de la casilla contiene su texto visible', async ({ page }) => {
     await abrir(page);
     await expect(page.getByRole('button', { name: 'Obtener orientación' })).toHaveCount(1, { timeout: 2000 });
     await expect(page.getByRole('checkbox', { name: 'Comparar también con el método real' })).toHaveCount(1, { timeout: 2000 });

@@ -303,6 +303,35 @@ export const PLAZO_IIVTNU = {
 };
 
 /**
+ * Plazo para pedir la devolución de una plusvalía municipal ingresada indebidamente.
+ *
+ * ── De dónde sale (25/09/2026, hallazgo 1646 del Inspector) ──────────────────
+ * `estimador-plusvalia-municipal` animaba a reclamar plusvalías «pagadas antes de 2021» con
+ * «4 años para reclamar», escrito a mano en tres sitios. Con esa misma regla, cualquier pago
+ * anterior al 01/01/2021 prescribió como muy tarde a finales de 2024: la app ofrecía como vía
+ * abierta una que su propio plazo cerraba. El plazo no estaba en ningún módulo.
+ *
+ * No es una regla del IIVTNU sino de la LGT, que rige también la gestión de los tributos
+ * locales: prescribe a los cuatro años el derecho a solicitar la devolución de ingresos
+ * indebidos (art. 66.c) y el plazo se cuenta desde el día siguiente al del ingreso, o desde el
+ * día siguiente al fin del plazo de autoliquidación si se pagó dentro de él (art. 67.1).
+ * Verificado en sesión el 25/09/2026 contra el texto consolidado del BOE (API de legislación
+ * consolidada, BOE-A-2003-23186, bloques a66 y a67, últimas versiones).
+ *
+ * ⚠️ La vía de la PÉRDIDA la abrió la STC 59/2017 (11/05/2017), no la STC 182/2021: esta
+ * última anuló el método de cálculo y dejó expresamente fuera las situaciones no impugnadas
+ * antes de su fecha (26/10/2021).
+ */
+export const PRESCRIPCION_DEVOLUCION_IIVTNU = {
+  anios: 4,
+  baseNormativa: 'arts. 66.c) y 67.1 de la Ley General Tributaria (Ley 58/2003)',
+  desde: 'el día siguiente al del pago (o al fin del plazo de autoliquidación, si se pagó dentro de él)',
+  urlReferencia: 'https://www.boe.es/buscar/act.php?id=BOE-A-2003-23186#a66',
+  verificado: '2026-09-25',
+  vigencia: '2026',
+};
+
+/**
  * Coeficientes máximos del IIVTNU por años de generación (art. 107.4 TRLRHL)
  *
  * Los Ayuntamientos pueden aplicar coeficientes INFERIORES a estos máximos.
