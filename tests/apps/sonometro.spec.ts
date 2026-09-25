@@ -477,6 +477,9 @@ test.describe('CASO 3 (móvil)', () => {
   test('en un Pixel 7 mide de un toque, y al detener el resumen se congela a la vista', async ({
     page,
   }) => {
+    // Con la máquina cargada la duración tarda en pintarse (ver la espera de más abajo), y las
+    // esperas encadenadas de este caso no caben ya en los 30 s por defecto.
+    test.setTimeout(60000);
     await instrumentar(page);
     await page.goto(RUTA);
 
@@ -495,8 +498,32 @@ test.describe('CASO 3 (móvil)', () => {
 
     await boton.tap();
     await esperarMedicionEnMarcha(page);
-    await page.waitForTimeout(2500);
     await expect(lecturaTexto(page)).toHaveText(/^\d{1,3},\d$/);
+
+    /*
+     * ⚠️ 25/09/2026 — antes aquí había un `waitForTimeout(2500)` y una sola lectura, y con la
+     * CPU cargada fallaba 3 de 3 («la duración no arrancó»). El test medía con el reloj de
+     * pared y la app no pinta la duración con él: la pinta en el primer fotograma CON AUDIO
+     * posterior a sus 10 de estabilización (FOTOGRAMAS_ESTABILIZACION), que también cuentan
+     * solo si traen audio. Este caso usa el dispositivo falso de Chromium, que entrega PITIDOS:
+     * medido el 25/09/2026, solo el 12-13 % de las ventanas del analizador traen alguna muestra
+     * distinta de cero. Así que la duración aparece al cabo de ~11 / (0,125 · fps) segundos:
+     * 1,8 s del toque a 53 fps, 2,7 s con la CPU a 1/8 (40 fps) y 6,3 s a 1/20 (18 fps), que
+     * es cuando el plazo fijo de 2,5 s se queda corto. No es un defecto de la app: un
+     * micrófono real nunca entrega 2048 ceros exactos y ahí los 10 fotogramas son ~170 ms.
+     * Se espera a lo que la app PINTA. No afloja nada: sigue exigiendo que la duración
+     * arranque, y ahora exige un número de segundos, no solo «algo distinto de 0 s».
+     */
+    await expect
+      .poll(
+        async () => {
+          const texto = (await estadisticas(page)).duracion; // «2 s» o «1 min 2 s»
+          const [, min = '0', seg = '-1'] = texto.match(/^(?:(\d+) min )?(\d+) s$/) ?? [];
+          return Number(min) * 60 + Number(seg);
+        },
+        { timeout: 20000, message: 'la duración no arrancó' },
+      )
+      .toBeGreaterThanOrEqual(1);
 
     const midiendo = await estadisticas(page);
     expect(midiendo.duracion, 'la duración no arrancó').not.toBe('0 s');
@@ -1598,4 +1625,393 @@ test('el icono decorativo de la tarjeta «Mínimo» está oculto al lector, como
     page.locator('[class*="statCard"]').first().locator('[class*="statIcon"]'),
     'la tarjeta del LAeq sí lo oculta; estas dos, no',
   ).toHaveAttribute('aria-hidden', 'true');
+});
+
+// ===========================================================================
+// 5.ª PASADA DEL INSPECTOR · 25/09/2026 — RE-INSPECCIÓN
+//
+// Los 16 hallazgos anteriores siguen cerrados (sus tests, arriba, en verde). Lo nuevo:
+//   · CASO 11 (normal, escritorio): el LAeq de una señal que SUBE Y BAJA, resuelto a mano.
+//   · CASO 12 (móvil, aviso): la medición 61 en un Pixel 7 — el aviso de descarte del 467
+//     se sostiene, y lo borrado ya no está en el CSV.
+//   · Seis hallazgos con `test.fail()`: afirman lo correcto y hoy fallan a propósito.
+//
+// VALORES RESUELTOS A MANO ANTES DE EJECUTAR (fórmula de page.tsx, calibración 90, A(1 kHz)=0):
+//   L(a) = 20·log10(a/√2) + 90 · a=0,05 → 60,969 → «61,0» · a=0,5 → 80,969 → «81,0»
+//   Tono de 1 kHz con la amplitud modulada al 100 % a 2 Hz: g(t) = 0,05·(1 + sen 2π·2t)
+//     potencia media = (0,05²/2)·(1 + 1²/2) → LAeq = 60,969 + 10·log10(1,5) = 62,730 → «62,7»
+//     máximo: ventana de 2048 muestras (~43 ms) centrada en la cresta, donde g = 2·0,05:
+//       60,969 + 20·log10(2) − 0,05 (la ventana promedia la curvatura) = 66,94 → «66,9»
+//     la media ARITMÉTICA de los decibelios daría 60,97 − 6,02 ≈ 54,9: 8 dB por debajo.
+// ===========================================================================
+
+declare global {
+  interface Window {
+    /** Mayor hueco entre dos fotogramas pintados, en ms (sonda del hallazgo del hueco). */
+    __huecoFotogramas?: number;
+  }
+}
+
+/** Segundos que la app PINTA en «de los últimos …» (−1 si no los pinta con ese formato). */
+async function segundosDeApp(page: Page): Promise<number> {
+  const texto = (await estadisticas(page)).duracion; // «4 s» o «1 min 2 s»
+  const [, min = '0', seg = '-1'] = texto.match(/^(?:(\d+) min )?(\d+) s$/) ?? [];
+  return Number(min) * 60 + Number(seg);
+}
+
+/** Espera a que la sesión lleve `segundos` en el reloj de la APP, no en el de pared. */
+async function esperarSegundosDeApp(page: Page, segundos: number): Promise<void> {
+  await expect
+    .poll(() => segundosDeApp(page), {
+      timeout: 30000,
+      message: `la sesión no llegó a ${segundos} s de audio medido`,
+    })
+    .toBeGreaterThanOrEqual(segundos);
+}
+
+/** Texto de la cifra tal como la pinta la app («62,7») → número. */
+const aNúmero = (texto: string): number => Number(texto.trim().replace(',', '.'));
+
+/**
+ * Una medición completa en el móvil: toque, medio en marcha DE VERDAD (contexto 'running' y
+ * pista 'live'), lectura asentada en 61,0 y 4 s en el reloj de la app antes de guardar.
+ */
+async function medirYGuardarEnMóvil(page: Page): Promise<void> {
+  await page.getByRole('button', { name: /Iniciar medición/i }).tap();
+  await esperarMedicionEnMarcha(page);
+  await esperarLectura(page);
+  await esperarLecturaEstable(page, 60.97);
+  await esperarSegundosDeApp(page, 4);
+  await page.getByRole('button', { name: /Detener y guardar/i }).tap();
+}
+
+// ---------------------------------------------------------------------------
+// CASO 11 (normal) — una señal que sube y baja: el LAeq es energético y el máximo, la cresta
+// ---------------------------------------------------------------------------
+// Las pasadas anteriores midieron niveles CONSTANTES y un escalón. Un tono modulado al 100 %
+// tiene un LAeq que no depende de cuánto dure la sesión ni de en qué fase se pulse, así que se
+// puede resolver a mano con exactitud (ver arriba) y separa las dos maneras de promediar por 8 dB.
+test('CASO 11 (normal) — tono modulado: LAeq 62,7 y máximo 66,9, en la fila y en el CSV', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await micrófonoRegulable(page, 1000, 0.05);
+  await instrumentar(page); // siempre DESPUÉS del micrófono sintético
+  await page.goto(RUTA);
+  await esperarAppLista(page);
+
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await esperarMedicionEnMarcha(page);
+  await esperarLectura(page);
+  await esperarLecturaEstable(page, 60.97);
+
+  // Modulación al 100 % a 2 Hz en el reloj de AUDIO: la ganancia pasa a 0,05 + 0,05·sen(2π·2t)
+  await page.evaluate(() => {
+    const ctx = window.__ctxTono as AudioContext;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 2;
+    const profundidad = ctx.createGain();
+    profundidad.gain.value = 0.05;
+    lfo.connect(profundidad).connect((window.__ganancia as GainNode).gain);
+    lfo.start();
+  });
+
+  // La lectura EN VIVO sigue a la señal: seis lecturas en 600 ms no pueden ser iguales
+  const lecturas = new Set<string>();
+  for (let i = 0; i < 6; i++) {
+    lecturas.add((await lecturaTexto(page).innerText()).trim());
+    await page.waitForTimeout(100);
+  }
+  expect(lecturas.size, `la lectura no se mueve con la señal: ${[...lecturas]}`).toBeGreaterThanOrEqual(3);
+
+  // Resetear: las estadísticas empiezan con la señal ya modulada, y 10 s en el reloj de la app
+  await page.getByRole('button', { name: /Resetear/i }).click();
+  await esperarSegundosDeApp(page, 10);
+  const enVivo = await estadisticas(page);
+  expect(aNúmero(enVivo.laeq), 'LAeq energético de un tono modulado al 100 %').toBeCloseTo(62.73, 0);
+  expect(aNúmero(enVivo.max), 'el máximo es la cresta de la modulación').toBeCloseTo(66.94, 0);
+
+  await page.getByRole('button', { name: /Detener y guardar/i }).click();
+  await expect(filasRegistro(page)).toHaveCount(1);
+  await expect(avisoRegistro(page)).toHaveText('Medición guardada en el registro de este navegador.');
+  const panel = await estadisticas(page);
+  const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) => t.trim());
+  // Fecha de hoy en DD/MM/AAAA, hora HH:MM, cifras con coma decimal y un decimal
+  expect(celdas[0]).toBe(hoyEsES());
+  expect(celdas[1]).toMatch(/^\d{2}:\d{2}$/);
+  expect([celdas[3], celdas[5]]).toEqual([panel.laeq, panel.max]);
+  expect(celdas[3]).toMatch(/^\d{2},\d$/);
+  expect(celdas[6]).toBe('90 dB');
+
+  // El CSV dice lo mismo que la fila: «10 s» en la tabla → «10» en su columna de segundos
+  const [descarga] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: /Descargar CSV/i }).click(),
+  ]);
+  const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+  const leido = parsearCsv<string[]>(contenido, { delimiter: ';' });
+  expect(leido.errors).toEqual([]);
+  expect(leido.data).toHaveLength(2);
+  const [fecha, , duracion, laeqCsv, , maxCsv, calibracionCsv] = leido.data[1];
+  expect(fecha).toBe(hoyEsES());
+  expect(`${duracion} s`).toBe(celdas[2]);
+  expect([laeqCsv, maxCsv, calibracionCsv]).toEqual([celdas[3], celdas[5], '90']);
+});
+
+// ---------------------------------------------------------------------------
+// CASO 12 (móvil, aviso) y el hallazgo del aviso que llega tarde — Pixel 7
+// ---------------------------------------------------------------------------
+test.describe('CASO 12 (móvil, aviso)', () => {
+  test.use({ ...PIXEL_7, permissions: ['microphone'] });
+
+  // El cierre del hallazgo 467, ahora en el teléfono y con el CSV: con 60 guardadas, la
+  // medición 61 entra, «noche 1» sale y el aviso lo dice. Lo que sale NO está en el CSV que el
+  // propio aviso manda descargar: se comprueba para que quede escrito qué se pierde.
+  test('en un Pixel 7, la medición 61 avisa de que borró la más antigua, que ya no sale en el CSV', async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await sembrarRegistro(page, Array.from({ length: 60 }, (_, i) => sesionDeJunio(60 - i)));
+    await micrófonoRegulable(page, 1000, 0.05);
+    await instrumentar(page);
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+    await expect(filasRegistro(page)).toHaveCount(60);
+    await expect(page.locator('[class*="registroIntro"]')).toContainText(
+      'guarda las 60 mediciones más recientes: al llegar a ese tope, cada nueva medición desplaza a la más antigua',
+    );
+    await expect(filasRegistro(page).last().locator('input[type="text"]')).toHaveValue('noche 1');
+
+    await medirYGuardarEnMóvil(page);
+
+    await expect(filasRegistro(page)).toHaveCount(60);
+    // Literal de page.tsx (detenerYRegistrar, rama `descartadas > 0`)
+    await expect(avisoRegistro(page)).toHaveText(
+      'Medición guardada. El registro está lleno (60 mediciones), así que se ha borrado la más antigua: descarga el CSV antes de seguir si quieres conservar el histórico completo.',
+    );
+    await expect(filasRegistro(page).last().locator('input[type="text"]')).toHaveValue('noche 2');
+    // Y el micrófono queda cerrado en el teléfono
+    await expect
+      .poll(async () => (await estadoDelMedio(page)).pistas.every((p) => p.estado === 'ended'))
+      .toBe(true);
+
+    const [descarga] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: /Descargar CSV/i }).tap(),
+    ]);
+    const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+    const leido = parsearCsv<string[]>(contenido, { delimiter: ';' });
+    expect(leido.errors).toEqual([]);
+    expect(leido.data, 'cabecera + las 60 mediciones de la tabla').toHaveLength(61);
+    expect(leido.data[1][0], 'la recién medida va primero, con la fecha de hoy').toBe(hoyEsES());
+    // 20·log10(0,05/√2) + 90 = 60,97 → «61,0»
+    expect(aNúmero(leido.data[1][3])).toBeCloseTo(60.97, 0);
+    expect(leido.data[leido.data.length - 1][7]).toBe('noche 2');
+    expect(leido.data.map((f) => f[7]), '«noche 1» se ha perdido también del CSV').not.toContain('noche 1');
+  });
+
+  /*
+   * HALLAZGO (5.ª pasada, 25/09/2026) — el único aviso ACTIVO del tope llega después de borrar.
+   * Al guardar la medición que LLENA el registro (la 60) el aviso es el de siempre, «Medición
+   * guardada en el registro de este navegador.»: nada dice que la siguiente borrará la del
+   * 01/06. El aviso llega con la 61, cuando «noche 1» ya no está ni en la tabla, ni en el
+   * almacenamiento, ni en el CSV que ese mismo aviso manda descargar «para conservar el
+   * histórico completo» (CASO 12, justo arriba). Queda el contador pasivo del párrafo
+   * («60 de 60 ahora mismo»), que sí avisa antes pero hay que ir a leerlo.
+   * Correcto: al llegar a 60, el aviso de guardado dice que el registro está lleno y que la
+   * próxima medición borrará la más antigua.
+   */
+  test('HALLAZGO 5.ª pasada — al llenarse el registro (la 60) avisa de que la siguiente borrará la más antigua', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo 5.ª pasada: el aviso del tope solo llega DESPUÉS de borrar
+    test.setTimeout(60000);
+    await sembrarRegistro(page, Array.from({ length: 59 }, (_, i) => sesionDeJunio(59 - i)));
+    await micrófonoRegulable(page, 1000, 0.05);
+    await instrumentar(page);
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+    await expect(filasRegistro(page)).toHaveCount(59);
+
+    await medirYGuardarEnMóvil(page);
+    await expect(filasRegistro(page)).toHaveCount(60);
+    await expect(filasRegistro(page).last().locator('input[type="text"]')).toHaveValue('noche 1');
+
+    await expect(
+      avisoRegistro(page),
+      'la medición 60 llena el registro y el aviso no dice que la siguiente borrará «noche 1»',
+    ).toHaveText(/lleno|tope|siguiente|pr[óo]xima/i);
+  });
+});
+
+/*
+ * HALLAZGO (5.ª pasada, 25/09/2026) — la duración cuenta segundos en los que la app no midió.
+ * El bucle de medición va con requestAnimationFrame, que el navegador deja de llamar cuando la
+ * página no se pinta: pestaña oculta, móvil bloqueado, otra app delante, pantalla que se apaga
+ * porque el Wake Lock fue denegado (batería baja) o un diálogo modal abierto. El audio sigue
+ * entrando, pero nadie lo lee; y la duración es `performance.now() − inicio`, así que al volver
+ * salta y se anota entera. El panel dice «LAeq … de los últimos 12 s» de un LAeq que solo
+ * cubre ~4 s, y lo que sonó en el hueco no está ni en el LAeq ni en el máximo. El propio
+ * page.tsx lo da por resuelto: su comentario del Wake Lock dice que si el navegador lo deniega
+ * «la medición sigue funcionando igual, solo que la pantalla podrá apagarse sola».
+ * Headless no oculta pestañas (probado: bringToFront, minimizar por CDP y congelar por CDP
+ * dejan visibilityState en 'visible' y el rAF corriendo), así que el hueco se abre con un
+ * diálogo de la PROPIA app: «Borrar el registro» pide confirmación con window.confirm, que
+ * bloquea el hilo principal. Medido el 25/09/2026: sin diálogo, la misma señal da LAeq 77,8 y
+ * máximo 81,0; con el diálogo abierto 8 s, LAeq 61,0 y máximo 61,0 en una fila de «12 s».
+ * Correcto: o el tramo fuerte se mide (máximo 81,0), o la duración anotada no incluye los
+ * segundos sin medir.
+ */
+test('HALLAZGO 5.ª pasada — los segundos en que la app no toma muestras no pueden figurar como medidos', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo 5.ª pasada: la duración incluye el hueco sin fotogramas
+  test.setTimeout(90000);
+  await sembrarRegistro(page, [sesionDeJunio(12)]); // para que exista «Borrar el registro»
+  await micrófonoRegulable(page, 1000, 0.05);
+  await instrumentar(page);
+  await page.addInitScript(() => {
+    window.__huecoFotogramas = 0;
+    let anterior = 0;
+    const paso = (t: number) => {
+      if (anterior) window.__huecoFotogramas = Math.max(window.__huecoFotogramas ?? 0, t - anterior);
+      anterior = t;
+      requestAnimationFrame(paso);
+    };
+    requestAnimationFrame(paso);
+  });
+  await page.goto(RUTA);
+  await esperarAppLista(page);
+  await expect(filasRegistro(page)).toHaveCount(1);
+
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await esperarMedicionEnMarcha(page);
+  await esperarLectura(page);
+  await esperarLecturaEstable(page, 60.97);
+  await esperarSegundosDeApp(page, 3);
+  const segundosAntes = await segundosDeApp(page);
+  const inicioPared = Date.now();
+
+  // En el reloj de AUDIO: dentro de 1 s, seis segundos a a=0,5 (80,97 dB(A)) y vuelta a 0,05
+  await page.evaluate(() => {
+    const ctx = window.__ctxTono as AudioContext;
+    const g = (window.__ganancia as GainNode).gain;
+    const t = ctx.currentTime;
+    g.setValueAtTime(0.05, t + 1);
+    g.linearRampToValueAtTime(0.5, t + 1.05);
+    g.setValueAtTime(0.5, t + 7);
+    g.linearRampToValueAtTime(0.05, t + 7.05);
+    window.__huecoFotogramas = 0;
+  });
+  // El usuario pulsa «Borrar el registro» a media medición y lo piensa 8 s antes de cancelar
+  page.once('dialog', async (dialogo) => {
+    await new Promise((listo) => setTimeout(listo, 8000));
+    await dialogo.dismiss();
+  });
+  await page.getByRole('button', { name: /Borrar el registro/i }).click();
+  await page.waitForTimeout(1500);
+  expect(
+    await page.evaluate(() => window.__huecoFotogramas ?? 0),
+    'el diálogo no llegó a parar los fotogramas: el caso no abrió el hueco',
+  ).toBeGreaterThan(7000);
+
+  await page.getByRole('button', { name: /Detener y guardar/i }).click();
+  const paredTotal = (Date.now() - inicioPared) / 1000;
+  await expect(filasRegistro(page), 'cancelar el borrado conserva la fila y añade la nueva').toHaveCount(2);
+  const [guardada]: SesionSembrada[] = JSON.parse(
+    (await page.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
+  );
+  // Sin el hueco la duración anotada sería ≤ segundosAntes + 1 + paredTotal − 8; con 3 s de margen
+  const limiteSinHueco = segundosAntes + 1 + paredTotal - 5;
+  expect(
+    guardada.maxDb >= 80 || guardada.duracionSegundos <= limiteSinHueco,
+    `fila de ${guardada.duracionSegundos.toFixed(1)} s con máximo ${guardada.maxDb.toFixed(1)} y LAeq ` +
+      `${guardada.laeq.toFixed(1)}: los 6 s a 81,0 dB(A) no están medidos pero sí contados`,
+  ).toBe(true);
+});
+
+/*
+ * HALLAZGO (5.ª pasada, 25/09/2026) — «(2 de 60ahora mismo)». En page.tsx el contador del
+ * tope termina la línea en `{MAX_SESIONES}` y «ahora mismo)» empieza la siguiente: JSX
+ * descarta el salto de línea pegado a una expresión, y el espacio se pierde. Es la frase que
+ * anuncia el tope, la reparación del 467.
+ */
+test('HALLAZGO 5.ª pasada — el contador del tope lleva su espacio: «2 de 60 ahora mismo»', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo 5.ª pasada: se pinta «60ahora»
+  await sembrarRegistro(page, [sesionDeJunio(12), sesionDeJunio(11)]);
+  await page.goto(RUTA);
+  await expect(filasRegistro(page)).toHaveCount(2);
+  await expect(page.locator('[class*="registroIntro"]')).toContainText('(2 de 60 ahora mismo)');
+});
+
+/*
+ * HALLAZGO (5.ª pasada, 25/09/2026) — la tabla comparativa da a 100 dB «Máx. 2 h/día» en la
+ * fila 85–100 y «Máx. 15 min/día» en la fila siguiente; la tarjeta «Salud auditiva» y la FAQ
+ * dicen 15 minutos. La regla que la propia FAQ enuncia —8 h a 85 dB(A) y la mitad por cada
+ * 3 dB— da 8 / 2^((100−85)/3) = 8/32 h = 15 min. Las 2 h son el PEL de la OSHA (90 dB y
+ * 5 dB de intercambio), mezclado en la misma celda con el criterio de 85 dB: una exposición
+ * «segura» ocho veces mayor que la que da el resto de la página.
+ */
+test('HALLAZGO 5.ª pasada — la tabla comparativa da a 100 dB los mismos 15 min que el resto de la página', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo 5.ª pasada: la fila 85–100 dice «Máx. 2 h/día a 100 dB»
+  await page.goto(RUTA);
+  // Control: la FAQ aplica la regla de 3 dB y llega a 15 minutos
+  await expect(page.locator('[class*="faqList"]')).toContainText(
+    'A 100 dB el límite seguro es de unos 15 minutos al día',
+  );
+  const fila = page.locator('[class*="comparativaTable"] tbody tr', { hasText: '85–100 dB' });
+  const exposicion = (await fila.locator('td').nth(2).textContent()) ?? '';
+  const aCien = exposicion.match(/([\d,]+\s*(?:h|min))\/día a 100 dB/)?.[1] ?? '15 min';
+  expect(aCien, `la celda dice «${exposicion}»`).toBe('15 min');
+});
+
+/*
+ * HALLAZGO (5.ª pasada, 25/09/2026) — el periodo nocturno cambia dentro de la página: la FAQ
+ * «¿Cuál es el límite legal de ruido nocturno en España?» dice «noche (22:00–7:00)» y la
+ * tarjeta «Viviendas (interior)» dice «Noche (22:00-8:00)» (y «Día (8:00-22:00)»). El RD
+ * 1367/2007 que desarrolla la Ley 37/2003, Anexo I (BOE-A-2007-18397, consultado el
+ * 25/09/2026): «periodo día de 7.00 a 19.00; periodo tarde de 19.00 a 23.00 y periodo noche de
+ * 23.00 a 7.00, hora local», que el ayuntamiento puede modificar. Y la misma tarjeta da de día
+ * «35-40 dB» en interior, cuando la Tabla B del Anexo II fija 40 (dormitorios) y 45 (estancias).
+ */
+test('HALLAZGO 5.ª pasada — el periodo noche es el mismo en toda la página y es el del RD 1367/2007', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo 5.ª pasada: 22:00–7:00 en la FAQ y 22:00-8:00 en la tarjeta
+  await page.goto(RUTA);
+  const texto = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
+  const periodos = [...texto.matchAll(/noche \((\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})\)/gi)].map(
+    (m) => `${m[1]}-${m[2]}`,
+  );
+  expect(periodos.length, 'la página nombra el periodo nocturno').toBeGreaterThan(0);
+  // RD 1367/2007, Anexo I: «periodo noche de 23.00 a 7.00, hora local»
+  expect(periodos).toEqual(periodos.map(() => '23:00-7:00'));
+});
+
+/*
+ * HALLAZGO (5.ª pasada, 25/09/2026) — el FAQPage de metadata.ts (el que leen los buscadores y
+ * las IAs) atribuye a la OMS «no superar 65 dB en entornos urbanos durante el día y 55 dB por
+ * la noche». La propia página, en «Referencias internacionales: qué recomienda la OMS», da 50 y
+ * 55 dB en exteriores de día (Guidelines for Community Noise, 1999) y 40 dB de noche (Night
+ * Noise Guidelines, 2009). Los 65 dB diurnos no son de la OMS.
+ */
+test('HALLAZGO 5.ª pasada — el FAQPage no atribuye a la OMS 65 dB de día, que la página no da', async ({
+  page,
+}) => {
+  test.fail(); // hallazgo 5.ª pasada: el JSON-LD dice «65 dB … durante el día»
+  await page.goto(RUTA);
+  // Control: lo que la página dice que recomienda la OMS
+  await expect(page.locator('[class*="guideSection"]', { hasText: 'qué recomienda la OMS' })).toContainText(
+    '55 dB en exteriores: molestia seria',
+  );
+  const faq = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((e) => e.textContent ?? '').find((t) => t.includes('FAQPage')) ?? '{}');
+  const primera: string = JSON.parse(faq).mainEntity?.[0]?.acceptedAnswer?.text ?? '';
+  expect(primera).toContain('Organización Mundial de la Salud');
+  expect(primera).not.toMatch(/(OMS|Organizaci[óo]n Mundial de la Salud)[^.]*\b65 dB/);
 });

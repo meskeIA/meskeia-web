@@ -760,3 +760,265 @@ test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026
     expect(await hayResultados(page)).toBe(false);
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Re-inspección 25/09/2026 (2.ª del día, tras reparar 1651-1660)
+// ═════════════════════════════════════════════════════════════════════════════
+/**
+ * Casos resueltos a mano ANTES de ejecutar la app. Fuentes:
+ *   · data/fiscal/irpf.ts — TRAMOS_IRPF_2025, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025,
+ *     REDUCCION_RENDIMIENTOS_TRABAJO_2025, REDUCCION_TRIBUTACION_CONJUNTA_2025,
+ *     DEDUCCION_RENDIMIENTOS_TRABAJO_2026, COTIZACIONES_SS_2026 (6,50 %), BASES_SS_2026.
+ *   · Texto consolidado del BOE que esos módulos citan, leído en sesión el 25/09/2026:
+ *     Ley 35/2006 (BOE-A-2006-20764) arts. 20, 42.3.c, 52.1, 58 y 61; Reglamento del IRPF
+ *     (RD 439/2007, BOE-A-2007-6820) arts. 81, 83, 84, 85 y 86.
+ *
+ * Tres hallazgos de cálculo nuevos, todos con la norma literal:
+ *
+ * 1. ART. 20 LIRPF, último párrafo: «A estos efectos, el rendimiento neto del trabajo será el
+ *    resultante de minorar el rendimiento íntegro en los gastos previstos en las letras a), b),
+ *    c), d) y e) del artículo 19.2». La reducción se ENTRA con el bruto menos la Seguridad
+ *    Social, SIN los 2.000 € de «otros gastos» de la letra f); luego se resta del rendimiento
+ *    neto completo. El art. 83.3.d del Reglamento dice lo mismo para la retención («la cuantía
+ *    del rendimiento neto del trabajo resultante de las minoraciones previstas en los párrafos
+ *    a) y b)»). motor.ts entra con el rendimiento YA minorado en los 2.000 €, así que en la
+ *    zona decreciente (bruto ≈ 15.900-23.300 €) la reducción sale hasta 3.500 € más alta.
+ *    Contraprueba en la propia norma: la DA 61.ª de 2026 vale 590,89 € en el SMI (17.094 €)
+ *    porque es exactamente la cuota íntegra del SMI calculada así —19 % × (8.659,95 − 5.550)—;
+ *    con la lectura de la app la cuota del SMI sería 214,87 € y la deducción no casaría.
+ *    ⚠️ Los goldens del CASO 0 (19.000 €), 18.600 €, 17.600 € y del perfil de 22.000 € del
+ *    bloque educativo, más arriba, se calcularon con la misma lectura: al reparar, recalcularlos.
+ *
+ * 2. ART. 61.1.ª LIRPF y ART. 84.2.º RIRPF: con «Casado/a (dos ingresos)» cada cónyuge declara
+ *    por separado y los dos tienen derecho al mínimo por los hijos comunes: se prorratea a
+ *    partes iguales (1.200 € por el primero). El reglamento de retenciones dice lo mismo
+ *    («Los descendientes se computarán por mitad, excepto cuando el contribuyente tenga
+ *    derecho, de forma exclusiva…»), así que da igual si la app promete cuota o retención.
+ *    El motor suma el mínimo ENTERO (2.400 €). La app hermana estimador-irpf ya prorratea.
+ *
+ * 3. RETENCIÓN frente a CUOTA: el desglose rotula «Retención IRPF anual» y «Tipo de retención
+ *    efectivo», y el FAQPage dice que el neto es «el que recibes en cuenta»; pero la cifra es la
+ *    cuota anual de la LIRPF: aplica la reducción por tributación conjunta del art. 84.2 y la
+ *    deducción de la DA 61.ª, que el procedimiento de retención (RIRPF arts. 82-86) no aplica.
+ */
+test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mínimo por descendientes y textos', () => {
+  /** Escribe en un NumberInput por su nombre accesible y espera a que el ESTADO de React lo recoja. */
+  async function escribirCampo(page: Page, nombre: string, valor: string, esperadoTrasBlur: string = valor): Promise<void> {
+    const campo = page.getByRole('textbox', { name: nombre, exact: true });
+    await campo.fill(valor);
+    await campo.blur();
+    await esperarValorEnReact(page, campo, esperadoTrasBlur);
+  }
+
+  /**
+   * NORMAL · 40.000 € brutos, familia monoparental, 2 hijos (1 menor de 3 años), 14 pagas.
+   *   SS = 40.000 × 6,50 % = 2.600,00 € (3.333,33 €/mes, bajo BASES_SS_2026.maxima)
+   *   Rendimiento neto = 40.000 − 2.600 − 2.000 = 35.400 € · reducción art. 20 = 0 € (entrada
+   *     bruto − SS = 37.400 € ≥ 19.747,5 €, con cualquiera de las dos lecturas)
+   *   Base liquidable = 35.400 − 2.150 (REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental) = 33.250 €
+   *   Mínimo = 5.550 + 2.400 + 2.700 + 2.800 = 13.450 € (entero: el otro progenitor no convive)
+   *   escala(33.250) = 2.365,50 + 1.860,00 + 13.050 × 30 % = 8.140,50 €
+   *   escala(13.450) = 2.365,50 + 1.000 × 24 % = 2.605,50 € → cuota = 5.535,00 € · DA 61.ª: 0 €
+   *   Neto = 40.000 − 2.600 − 5.535 = 31.865,00 € · /14 = 2.276,07 € · tipo 13,84 %
+   */
+  test('NORMAL · 40.000 € monoparental, 2 hijos (1 menor de 3), 14 pagas', async ({ page }) => {
+    await page.getByRole('combobox', { name: 'Situación familiar' }).selectOption('familia_monoparental');
+    await page.getByRole('combobox', { name: 'Número de pagas' }).selectOption('14');
+    await escribirCampo(page, 'Número de hijos', '2');
+    await escribirCampo(page, 'Hijos menores de 3 años', '1');
+    await calcular(page, '40000');
+    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('2600,00 €');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('5535,00 €');
+    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('13,84%');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('31.865,00€');
+    expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2276,07€');
+  });
+
+  /**
+   * LÍMITE · 400.000 € brutos, soltero/a: tramo del 47 % y base de cotización en la máxima.
+   *   SS = 5.101,20 × 6,50 % × 12 = 3.978,94 € (331,578 €/mes)
+   *   Base = 400.000 − 3.978,936 − 2.000 = 394.021,064 €
+   *   escala(394.021,06) = 125.901,50 (cuota acumulada a 300.000 €, la misma que la tabla del
+   *     art. 85.1 RIRPF) + 94.021,064 × 47 % (44.189,90) = 170.091,40 €
+   *   cuota = 170.091,40 − 1.054,50 = 169.036,90 € · neto = 400.000 − 3.978,94 − 169.036,90
+   *   = 226.984,16 € · tipo 42,26 %
+   */
+  test('LÍMITE · 400.000 €: tramo del 47 %, IRPF 169.036,90 €', async ({ page }) => {
+    await calcular(page, '400000');
+    expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('3978,94 €');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('169.036,90 €');
+    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('42,26%');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('226.984,16€');
+  });
+
+  /**
+   * RECHAZO Y ACOTADO · «0» en Neto → Bruto avisa y no pinta nada; «3» hijos menores de 3 años
+   * con 1 hijo se acota a 1 al salir del campo (max = número de hijos) y el cálculo usa 1:
+   *   30.000 €, 1 hijo menor de 3: mínimo = 5.550 + 2.400 + 2.800 = 10.750 €
+   *   escala(26.050) 5.980,50 − escala(10.750) (todo en el primer tramo: 10.750 × 19 %) 2.042,50
+   *   = 3.938,00 € (con «3» sin acotar serían 5.550 + 2.400 + 8.400 = 16.350 € de mínimo)
+   */
+  test('RECHAZO · «0» en Neto → Bruto avisa; 3 menores de 3 con 1 hijo se acotan a 1', async ({ page }) => {
+    const avisos: string[] = [];
+    page.on('dialog', async (dialog) => {
+      avisos.push(dialog.message());
+      await dialog.accept();
+    });
+    await page.getByRole('button', { name: 'Neto → Bruto', exact: true }).click();
+    await calcular(page, '0');
+    expect(avisos).toEqual(['Por favor, introduce un salario válido']);
+    expect(await hayResultados(page)).toBe(false);
+
+    await page.getByRole('button', { name: 'Bruto → Neto', exact: true }).click();
+    await escribirCampo(page, 'Número de hijos', '1');
+    await escribirCampo(page, 'Hijos menores de 3 años', '3', '1');
+    await calcular(page, '30000');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('3938,00 €');
+  });
+
+  /**
+   * HALLAZGO (alto, cálculo) — la reducción del art. 20 se entra con el rendimiento YA minorado
+   * en los 2.000 € del art. 19.2.f. 20.000 € brutos, soltero/a:
+   *   SS = 1.300,00 € · entrada de la reducción = 20.000 − 1.300 = 18.700 € (art. 20, letras a-e)
+   *   reducción = 2.364,34 − 1,14 × (18.700 − 17.673,52) = 1.194,15 €
+   *   base = (20.000 − 1.300 − 2.000) − 1.194,15 = 15.505,85 €
+   *   cuota = escala(15.505,85) 3.098,90 − 1.054,50 = 2.044,40 €
+   *   DA 61.ª = 590,89 − 0,2 × (20.000 − 17.094) = 9,69 € → IRPF 2.034,71 € · tipo 10,17 %
+   *   neto = 20.000 − 1.300 − 2.034,71 = 16.665,29 €
+   * Hoy la app entra con 16.700 € → reducción 4.068 € → IRPF 1.344,99 €, neto 17.355,01 €.
+   * El defecto es de cientos de euros: se comparan las cadenas exactas.
+   */
+  test.fail('HALLAZGO art. 20 · 20.000 €: IRPF 2.034,71 € y neto 16.665,29 €', async ({ page }) => {
+    await calcular(page, '20000');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('2034,71 €');
+    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('10,17%');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.665,29€');
+  });
+
+  /**
+   * HALLAZGO (alto, cálculo) — contraprueba en el SMI (SMI_2026.anual = 17.094 €), 14 pagas.
+   *   SS = 17.094 × 6,50 % = 1.111,11 € · entrada art. 20 = 15.982,89 €
+   *   reducción = 7.302 − 1,75 × 1.130,89 = 5.322,94 € · base = 13.982,89 − 5.322,94 = 8.659,95 €
+   *   cuota = (8.659,95 − 5.550) × 19 % = 590,89 € = DEDUCCION_RENDIMIENTOS_TRABAJO_2026.deduccionMaxima
+   *   → la deducción de la DA 61.ª que se pinta es −590,89 € y el IRPF queda en 0,00 €.
+   * Hoy: reducción 7.302 € (entrada 13.982,89 €), cuota 214,87 €, deducción pintada −214,87 €.
+   */
+  test.fail('HALLAZGO art. 20 · SMI 17.094 €: la cuota íntegra es 590,89 € y la DA 61.ª la anula entera', async ({ page }) => {
+    await page.getByRole('combobox', { name: 'Número de pagas' }).selectOption('14');
+    await calcular(page, '17094');
+    expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-590,89 €');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('0,00 €');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('15.982,89€');
+  });
+
+  /**
+   * HALLAZGO (alto, cálculo) — el mismo defecto en el bloque educativo y en el FAQPage, que
+   * beben del motor. Perfil «Recién graduado», 22.000 € soltero/a:
+   *   SS 1.430 € · entrada art. 20 = 20.570 € ≥ 19.747,5 € → reducción 0 € → base 18.570,00 €
+   *   cuota = escala(18.570) 3.834,30 − 1.054,50 = 2.779,80 € · DA 61.ª 0 € (≥ 20.048,45 €)
+   *   neto = 22.000 − 1.430 − 2.779,80 = 17.790,20 €
+   * FAQPage, 20.000 €: 2.034,71 / 20.000 = 10,17 % (hoy «6,72 %»).
+   */
+  test.fail('HALLAZGO art. 20 · perfil de 22.000 € y FAQPage de 20.000 €', async ({ page }) => {
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    expect.soft(cuerpo).toContain('18.570,00 €');
+    expect.soft(cuerpo).toContain('2779,80 €');
+    expect.soft(cuerpo).toContain('17.790,20 €');
+    expect.soft(await faqJsonLd(page)).toContain('con 20.000 € brutos/año, el 10,17 %');
+  });
+
+  /**
+   * HALLAZGO (alto, cálculo) — sospecha 1: mínimo por descendientes con «Casado/a (dos ingresos)».
+   * 35.000 € brutos, 1 hijo, 12 pagas (el perfil «Técnico medio con familia»):
+   *   SS 2.275 € · base 30.725 € (entrada art. 20 = 32.725 €: reducción 0 € con cualquier lectura)
+   *   mínimo = 5.550 + 2.400 / 2 = 6.750 € (art. 61.1.ª LIRPF; art. 84.2.º RIRPF para la retención)
+   *   cuota = escala(30.725) 7.383,00 − escala(6.750) 1.282,50 = 6.100,50 € · tipo 17,43 %
+   *   neto = 35.000 − 2.275 − 6.100,50 = 26.624,50 €
+   * Hoy suma los 2.400 € enteros: mínimo 7.950 €, IRPF 5.872,50 €, neto 26.852,50 €.
+   */
+  test.fail('HALLAZGO art. 61.1.ª · dos ingresos y 1 hijo: el mínimo del hijo se prorratea (IRPF 6.100,50 €)', async ({ page }) => {
+    await page.getByRole('combobox', { name: 'Situación familiar' }).selectOption('casado_dos_ingresos');
+    await escribirCampo(page, 'Número de hijos', '1');
+    await calcular(page, '35000');
+    expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('6100,50 €');
+    expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('17,43%');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('26.624,50€');
+  });
+
+  /**
+   * HALLAZGO (alto, cálculo) — el perfil del bloque educativo hereda el mínimo entero:
+   *   «Mínimo personal + hijo 1»: 5.550 + 1.200 = 6.750,00 € (hoy 7.950,00 €)
+   *   «Impacto del mínimo por el hijo»: IRPF sin hijo 6.328,50 € − con hijo 6.100,50 € = 228,00 €
+   *   (= 1.200 × 19 %; hoy 456,00 €), y el consejo del modelo 145: 228 / 12 = 19,00 €/mes (hoy 38,00 €).
+   */
+  test.fail('HALLAZGO art. 61.1.ª · el perfil de 35.000 € con 1 hijo en dos ingresos', async ({ page }) => {
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    expect.soft(cuerpo).toMatch(/Mínimo personal \+ hijo 1[^:]*: 6750,00 €/);
+    expect.soft(cuerpo).toContain('Impacto del mínimo por el hijo: 228,00 €');
+    expect.soft(cuerpo).toContain('reducir tu retención mensual unos 19,00 €');
+  });
+
+  /**
+   * HALLAZGO (medio, contenido) — «Retención IRPF anual» rotula la CUOTA anual. 30.000 €,
+   * «Casado/a (un solo ingreso)», 0 hijos. Retención por el Reglamento (arts. 82-86 RIRPF):
+   *   base art. 83 = 30.000 − 1.950 (SS) − 2.000 (19.2.f) − 0 (83.3.d: 28.050 ≥ 19.747,5)
+   *   = 26.050 € — SIN la reducción de 3.400 € del art. 84.2 LIRPF, que el art. 83.3 no recoge
+   *   mínimo art. 84 = 5.550 € · cuota art. 85.1 = 5.980,50 − 1.054,50 = 4.926,00 €
+   *   tope art. 85.3 = 43 % × (30.000 − 17.197, art. 81 situación 2.ª) = 5.505,29 € (no muerde)
+   *   tipo art. 86 = 16,42 % → retención 4.926,00 € (la app pinta 3.906,00 € y 13,02 %).
+   * Lo correcto es cualquiera de las dos: o la fila no se llama «Retención», o vale 4.926,00 €.
+   */
+  test.fail('HALLAZGO retención · casado/a con un ingreso: la fila «Retención» no puede ser la cuota de la conjunta', async ({ page }) => {
+    await page.getByRole('combobox', { name: 'Situación familiar' }).selectOption('casado_un_ingreso');
+    await calcular(page, '30000');
+    await expect(page.getByRole('heading', { level: 3, name: 'Salario Neto Anual', exact: true })).toBeVisible();
+    if ((await cuentaFilas(page, 'Retención IRPF anual')) > 0) {
+      expect(await filaDesglose(page, 'Retención IRPF anual')).toBe('4926,00 €');
+    }
+    if ((await cuentaFilas(page, 'Tipo de retención efectivo')) > 0) {
+      expect(await filaDesglose(page, 'Tipo de retención efectivo')).toBe('16,42%');
+    }
+  });
+
+  /**
+   * HALLAZGO (medio, contenido) — sospecha 2: la tarjeta «Solicita retribución flexible» dice
+   * «hasta 1.500 € en seguro médico están exentos de IRPF por persona asegurada … familia de 4
+   * personas, el límite exento es de 6.000 €/año». Art. 42.3.c.2.º LIRPF: 500 € anuales por
+   * persona, o 1.500 € para cada una CON DISCAPACIDAD → familia de 4: 2.000 €. El paso 3 de la
+   * misma página ya dice 500 €.
+   */
+  test.fail('HALLAZGO seguro médico · el exento es 500 € por persona (familia de 4: 2.000 €), no 1.500 €', async ({ page }) => {
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    expect.soft(cuerpo).not.toContain('hasta 1.500 € en seguro médico');
+    expect.soft(cuerpo).not.toMatch(/4 personas, el límite exento es de 6\.000/);
+  });
+
+  /**
+   * HALLAZGO (bajo, dato) — «El límite conjunto empresa + trabajador es de 10.000 €/año (o
+   * 8.500 € si solo aporta la empresa)», escrito a mano. LIMITES_PLAN_PENSIONES_2025
+   * (data/fiscal/pensiones.ts) ya lo tiene, y el art. 52.1 LIRPF da 1.500 € + 8.500 € «siempre
+   * que tal incremento provenga de contribuciones empresariales»: solo empresa → 10.000 €.
+   */
+  test.fail('HALLAZGO plan de pensiones · no hay un límite de 8.500 € «si solo aporta la empresa»', async ({ page }) => {
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    expect(cuerpo).not.toContain('8.500 € si solo aporta la empresa');
+  });
+
+  /**
+   * HALLAZGO (bajo, contenido) — cifras de ejemplo que no salen de su propia aritmética:
+   *   · «Un aumento de 1.000 € brutos en el tramo del 37 % solo se traduce en ~630 € netos»: la
+   *     calculadora da 45.000 € → 32.600,25 € y 46.000 € → 33.189,30 €: +589,05 € (1.000 − 65 de
+   *     SS − 37 % × 935). Los ~630 € olvidan la Seguridad Social.
+   *   · «Un seguro médico familiar de 1.500 €/año puede suponer un ahorro de ~380 € en IRPF …
+   *     en el tramo del 30 %»: 1.500 × 30 % = 450 €.
+   */
+  test.fail('HALLAZGO cifras de ejemplo · subida de 1.000 € (+589,05 €) y seguro de 1.500 € al 30 % (450 €)', async ({ page }) => {
+    await calcular(page, '45000');
+    await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('32.600,25€');
+    await calcular(page, '46000');
+    await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('33.189,30€');
+    const cuerpo = await cuerpoConGuiaAbierta(page);
+    expect.soft(cuerpo).not.toContain('~630 € netos');
+    expect.soft(cuerpo).not.toContain('~380 € en IRPF');
+  });
+});

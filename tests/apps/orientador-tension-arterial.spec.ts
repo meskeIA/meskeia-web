@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Orientador Tensión Arterial — test de regresión (Inspector; 1.ª pasada 25/08/2026)
@@ -388,4 +389,322 @@ test('REGRESIÓN 296 (MEDIO) · la app cita UNA sola versión de la guía en tod
   expect(html).toContain('ESH 2023');
   expect(html).not.toContain('ESH/ESC 2018');
   expect(html).not.toContain('ESH/ESC 2023');
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN · 25/09/2026
+// ═════════════════════════════════════════════════════════════════════════════════════════
+/**
+ * DE DÓNDE SALEN LOS CORTES DE ESTA TANDA
+ *   ESH 2023, tabla de clasificación de la PA en consulta (citada literalmente por la sinopsis
+ *   de la ERA, PMC11139525): óptima < 120 y < 80 · normal 120–129 y/o 80–84 · normal-alta
+ *   130–139 y/o 85–89 · grado 1 140–159 y/o 90–99 · grado 2 160–179 y/o 100–109 · grado 3
+ *   ≥ 180 y/o ≥ 110 · HTA sistólica aislada ≥ 140 y < 90 · HTA diastólica aislada < 140 y ≥ 90.
+ *   Nota de la tabla: «la categoría la define el nivel MÁS ALTO, sistólico o diastólico», y la
+ *   HTA sistólica/diastólica aislada se gradúa 1, 2 o 3 por el valor de la que está alta.
+ *   Lo que NO sale de la ESH 2023 y la app declara como propio: la fila «Hipotensión < 90/60»
+ *   y la «Crisis hipertensiva ≥ 180 y/o ≥ 120», que la app muestra por delante del grado 3
+ *   (nota bajo su tabla). Los casos de crisis se juzgan contra esa regla declarada.
+ *
+ * TAM = D + (S − D)/3 redondeada (fórmula publicada por la app) · PP = S − D con los tramos
+ * de `valorarPresionPulso` (< 25 muy baja · < 40 baja · 40–60 normal · ≤ 80 elevada · > 80
+ * muy elevada).
+ *
+ * HALLAZGOS DE ESTA TANDA (los test.fail de abajo expresan lo CORRECTO; hoy fallan)
+ *   A · decimales truncados hacia abajo: 179,67/100 (media de 179, 180 y 180, que es lo que
+ *       la propia app pide introducir) sale «HTA Grado 2» en vez de crisis o de rechazo.
+ *   B · el historial pinta la clasificación GUARDADA, no la recalcula: una 175/55 guardada
+ *       antes del 25/08 sigue rotulada «Hipotensión» (el crítico 294 sobrevive en el historial).
+ *   C · el tope de 20 lecturas descarta la más antigua en silencio (la sospecha de page.tsx
+ *       ~225 y ~441, confirmada). No hay media ni tendencia sobre el historial.
+ *   D · los botones «Eliminar» de dos lecturas del mismo día tienen el mismo nombre accesible.
+ *   E · texto blanco sobre el color de categoría: la descripción del resultado de Normal-Alta
+ *       queda a 2,72:1 (AA exige 4,5:1 a 15 px).
+ *   F · en móvil, tras pulsar Calcular con una crisis, la instrucción del 112 queda fuera de
+ *       la pantalla (≈ 580 px por debajo del botón) y la app no desplaza hasta ella.
+ *   G · la tarjeta «Embarazada» define la preeclampsia solo por ≥ 140/90 tras la semana 20;
+ *       la ESH 2023 exige además proteinuria u otra disfunción orgánica/uteroplacentaria.
+ */
+
+const CLAVE_HISTORIAL = 'meskeia-tension-historial';
+
+interface LecturaGuardada {
+  id: string;
+  fecha: string;
+  sistolica: number;
+  diastolica: number;
+  pulso: number | null;
+  clasificacionId: string;
+}
+
+/** Como `medir`, pero esperando a que React haya recogido cada valor antes de pulsar. */
+async function medirHidratado(page: Page, sistolica: string, diastolica: string, pulso = ''): Promise<void> {
+  await esperarHidratacion(page, ['#sistolica', '#diastolica', '#pulso']);
+  const campos: Array<[string, string]> = [['#sistolica', sistolica], ['#diastolica', diastolica], ['#pulso', pulso]];
+  for (const [selector, valor] of campos) {
+    await page.fill(selector, valor);
+    await esperarValorEnReact(page, selector, valor);
+  }
+  await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+}
+
+function filasHistorial(page: Page) {
+  return page.locator('table[aria-label*="Historial"] tbody tr');
+}
+
+/** Siembra el historial ANTES de que la app arranque y recarga; espera a verlo en pantalla. */
+async function abrirConHistorial(page: Page, lecturas: LecturaGuardada[]): Promise<void> {
+  await page.addInitScript(
+    ([clave, valor]) => {
+      window.localStorage.setItem(clave, valor);
+    },
+    [CLAVE_HISTORIAL, JSON.stringify(lecturas)] as const,
+  );
+  await page.goto(RUTA);
+  // La app lee el almacenamiento en un useEffect: hasta que las filas no están, no ha leído.
+  await expect(filasHistorial(page)).toHaveCount(lecturas.length);
+}
+
+test.describe('Re-inspección 25/09/2026', () => {
+  test('ESH 2023 · con sistólica y diastólica en categorías distintas manda la MÁS ALTA', async ({ page }) => {
+    // [sistólica, diastólica, categoría, urgencia] — cada fila resuelta con la tabla ESH 2023
+    const casos: Array<[string, string, string, string]> = [
+      ['128', '92', 'HTA Grado 1', 'Alerta'],       // S normal (120–129), D grado 1 (90–99)
+      ['112', '86', 'Normal-Alta', 'Atención'],     // S óptima, D normal-alta (85–89)
+      ['105', '82', 'Tensión Normal', 'Normal'],    // S óptima, D normal (80–84)
+      ['115', '104', 'HTA Grado 2', 'Urgente'],     // D grado 2 (100–109)
+      ['125', '112', 'HTA Grado 3', 'Emergencia'],  // D grado 3 (≥ 110) con S normal
+      ['139', '90', 'HTA Grado 1', 'Alerta'],       // HTA diastólica aislada (< 140 y ≥ 90) → grado 1
+      ['159', '89', 'HTA Sistólica Aislada (Grado 1)', 'Alerta'],   // aislada, S 140–159
+      ['160', '89', 'HTA Sistólica Aislada (Grado 2)', 'Urgente'],  // aislada, S 160–179
+    ];
+    for (const [sis, dia, esperada, urg] of casos) {
+      await medirHidratado(page, sis, dia);
+      await expect(categoria(page), `${sis}/${dia}`).toHaveText(esperada);
+      await expect(urgencia(page), `${sis}/${dia}`).toContainText(urg);
+    }
+  });
+
+  test('Límites altos · 179/109 grado 2, 179/110 grado 3, y ≥ 180 o ≥ 120 crisis con el 112', async ({ page }) => {
+    await medirHidratado(page, '179', '109');
+    await expect(categoria(page)).toHaveText('HTA Grado 2');
+
+    // D = 110 entra en grado 3 (≥ 110) sin llegar a crisis (≥ 120). TAM = 110 + 69/3 = 133.
+    await medirHidratado(page, '179', '110');
+    await expect(categoria(page)).toHaveText('HTA Grado 3');
+    await expect(urgencia(page)).toContainText('Emergencia');
+    await expect(recomendacion(page)).toContainText('Busca atención médica urgente');
+    await expect(derivadoValor(page, 0)).toContainText('133');
+
+    // Regla declarada por la app (nota de su tabla): ≥ 180 y/o ≥ 120 se rotula crisis.
+    const crisis: Array<[string, string]> = [['180', '110'], ['150', '120'], ['185', '55']];
+    for (const [sis, dia] of crisis) {
+      await medirHidratado(page, sis, dia);
+      await expect(categoria(page), `${sis}/${dia}`).toHaveText('Crisis Hipertensiva');
+      await expect(recomendacion(page), `${sis}/${dia}`).toHaveText(
+        'Recomendación: Acude a urgencias inmediatamente o llama al 112.',
+      );
+    }
+    // 185/55: PP = 130 → «Muy elevada (> 80 mmHg)»; TAM = 55 + 130/3 = 98,33 → 98.
+    await expect(derivadoValor(page, 0)).toContainText('98');
+    await expect(derivadoNota(page, 1)).toHaveText('Muy elevada (> 80 mmHg)');
+  });
+
+  test('Lecturas normales · 118/76 óptima, 90/60 aún no es hipotensión, 88/62 sí', async ({ page }) => {
+    // 118/76: TAM = 76 + 42/3 = 90 · PP = 42 → normal.
+    await medirHidratado(page, '118', '76');
+    await expect(categoria(page)).toHaveText('Tensión Óptima');
+    await expect(derivadoValor(page, 0)).toContainText('90');
+    await expect(derivadoNota(page, 1)).toHaveText('Normal (40–60 mmHg)');
+
+    // La app declara hipotensión «< 90/60»: 90/60 queda fuera. TAM = 60 + 30/3 = 70 · PP 30.
+    await medirHidratado(page, '90', '60');
+    await expect(categoria(page)).toHaveText('Tensión Óptima');
+    await expect(derivadoValor(page, 0)).toContainText('70');
+    await expect(derivadoNota(page, 1)).toHaveText('Baja (< 40 mmHg)');
+
+    await medirHidratado(page, '88', '62');
+    await expect(categoria(page)).toHaveText('Hipotensión');
+  });
+
+  test('Rechazos · iguales, vacío, fuera de rango, pulso imposible y texto: sin resultado ni historial', async ({ page }) => {
+    await medirHidratado(page, '120', '120');
+    await expect(page.locator('#error-sis')).toHaveText('La sistólica debe ser mayor que la diastólica');
+
+    await medirHidratado(page, '', '');
+    await expect(page.locator('#error-sis')).toHaveText('Introduce la tensión sistólica (número entero)');
+    await expect(page.locator('#error-dia')).toHaveText('Introduce la tensión diastólica (número entero)');
+
+    await medirHidratado(page, '301', '80');
+    await expect(page.locator('#error-sis')).toHaveText('Valor fuera de rango (50–300 mmHg)');
+
+    await medirHidratado(page, '120', '29');
+    await expect(page.locator('#error-dia')).toHaveText('Valor fuera de rango (30–200 mmHg)');
+
+    await medirHidratado(page, '120', '80', '10');
+    await expect(page.locator('#error-pulso')).toHaveText('Valor fuera de rango (20–300 ppm)');
+
+    // Texto tecleado en la sistólica (con 80 en la diastólica): el navegador lo deja vacío y la
+    // app lo pide. Venimos de un estado sin #error-sis, así que el aviso es de este paso.
+    await expect(page.locator('#error-sis')).toHaveCount(0);
+    for (const selector of ['#pulso', '#sistolica']) {
+      await page.fill(selector, '');
+      await esperarValorEnReact(page, selector, '');
+    }
+    await page.locator('#sistolica').pressSequentially('abc');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(page.locator('#error-sis')).toHaveText('Introduce la tensión sistólica (número entero)');
+    await expect(page.locator('#error-dia')).toHaveCount(0);
+
+    await expect(categoria(page)).toHaveCount(0);
+    await expect(page.locator('table[aria-label*="Historial"]')).toHaveCount(0);
+  });
+
+  test('Siembra · el historial guardado aparece en pantalla (control de los test.fail B y C)', async ({ page }) => {
+    await abrirConHistorial(page, [
+      { id: 'a', fecha: '2026-09-20T08:00:00.000Z', sistolica: 131, diastolica: 81, pulso: 70, clasificacionId: 'normal-alta' },
+    ]);
+    await expect(filasHistorial(page).first()).toContainText('131');
+    await expect(filasHistorial(page).first()).toContainText('Normal-Alta');
+  });
+
+  // HALLAZGO A (medio) — `parseInt` trunca: la app pide «número entero» pero acepta decimales y
+  // los redondea siempre HACIA ABAJO, es decir, hacia la categoría menos grave. La propia app
+  // pide introducir «la media de tus mediciones» (paso 5), que casi nunca es entera.
+  test('HALLAZGO A · 179,67/100 (media de 179, 180, 180) no puede salir «HTA Grado 2» sin avisar', async ({ page }) => {
+    test.fail(true, 'Hallazgo A (25/09/2026): parseInt trunca 179,67 a 179 y la lectura baja de crisis a grado 2.');
+    await medirHidratado(page, '179.67', '100');
+    // Correcto: o lo rechaza por no ser entero (lo que dice su propio aviso), o redondea a 180
+    // y aplica su regla de crisis (≥ 180). Hoy sale «HTA Grado 2» y pinta «179».
+    const correcto = page
+      .locator('#error-sis')
+      .or(page.locator('[class*="resultadoNombre"]', { hasText: 'Crisis Hipertensiva' }));
+    await expect(correcto).toBeVisible();
+  });
+
+  // HALLAZGO B (medio) — el historial pinta `m.clasificacionId` tal como se guardó. Antes del
+  // 25/08/2026 la app guardaba 'hipotension' para toda lectura con diastólica < 60 (crítico 294).
+  test('HALLAZGO B · una 175/55 guardada antes del 25/08 no puede seguir rotulada «Hipotensión»', async ({ page }) => {
+    test.fail(true, 'Hallazgo B (25/09/2026): el historial no recalcula la clasificación guardada.');
+    await abrirConHistorial(page, [
+      // Exactamente lo que guardaba la versión anterior (git show 5a2b7f35: la hipotensión con OR).
+      { id: 'v1', fecha: '2026-08-10T08:00:00.000Z', sistolica: 175, diastolica: 55, pulso: 68, clasificacionId: 'hipotension' },
+    ]);
+    await expect(filasHistorial(page).first()).toContainText('175');
+    // La misma lectura introducida hoy sale «HTA Sistólica Aislada (Grado 2)» (REGRESIÓN 294).
+    await expect(filasHistorial(page).first().locator('[class*="historialBadge"]')).toHaveText(
+      'HTA Sistólica Aislada (Grado 2)',
+    );
+  });
+
+  // HALLAZGO C (bajo) — `[nueva, ...lista].slice(0, 20)`: la lectura 21 borra la más antigua y
+  // nada en pantalla lo dice (el tope solo figura en el JSON-LD: «hasta 20 entradas»).
+  test('HALLAZGO C · al llegar a 20 lecturas la app avisa de que descarta la más antigua', async ({ page }) => {
+    test.fail(true, 'Hallazgo C (25/09/2026): el tope de 20 descarta la lectura más antigua en silencio.');
+    const veinte: LecturaGuardada[] = Array.from({ length: 20 }, (_, i) => ({
+      id: `s${i}`,
+      // i = 0 → 20/09 (la más reciente, primera) … i = 19 → 01/09 (la más antigua, última)
+      fecha: new Date(Date.UTC(2026, 8, 20 - i, 8, 0)).toISOString(),
+      sistolica: i === 19 ? 131 : 122,
+      diastolica: i === 19 ? 81 : 78,
+      pulso: 70,
+      clasificacionId: i === 19 ? 'normal-alta' : 'normal',
+    }));
+    await abrirConHistorial(page, veinte);
+    await expect(filasHistorial(page).last()).toContainText('01/09/2026');
+
+    await medirHidratado(page, '135', '82');
+    await expect(categoria(page)).toHaveText('Normal-Alta');
+    // Hoy: siguen 20 filas, la del 01/09 (131/81) ha desaparecido y no hay ningún aviso.
+    await expect(page.locator('[class*="historialCard"]')).toContainText(
+      /(hasta|máximo|últimas) 20 (lecturas|mediciones)|más antigua/i,
+    );
+  });
+
+  // HALLAZGO D (bajo, accesibilidad) — aria-label «Eliminar medición del <fecha>», sin hora ni
+  // valores: todas las lecturas de un mismo día comparten nombre para un lector de pantalla.
+  test('HALLAZGO D · dos lecturas del mismo día tienen botones «Eliminar» distinguibles', async ({ page }) => {
+    test.fail(true, 'Hallazgo D (25/09/2026): el nombre accesible solo lleva la fecha.');
+    await medirHidratado(page, '135', '82');
+    await medirHidratado(page, '150', '95');
+    await expect(filasHistorial(page)).toHaveCount(2);
+    const nombres = await page
+      .locator('table[aria-label*="Historial"] tbody button')
+      .evaluateAll((botones) => botones.map((b) => b.getAttribute('aria-label')));
+    expect(new Set(nombres).size).toBe(2);
+  });
+
+  // HALLAZGO E (medio, accesibilidad) — `.resultadoCabecera { color: white }` sobre los colores
+  // de categoría. Medido: óptima 3,02 · normal 2,85 · normal-alta 2,72 · hipotensión 3,36 ·
+  // grado 1 3,23 · grado 2 4,27 en la descripción (15,2 px, opacidad 0,92).
+  test('HALLAZGO E · la descripción del resultado Normal-Alta se lee con contraste AA (≥ 4,5:1)', async ({ page }) => {
+    test.fail(true, 'Hallazgo E (25/09/2026): blanco sobre #CA8A04 da 2,72:1.');
+    await medirHidratado(page, '135', '82');
+    await expect(categoria(page)).toHaveText('Normal-Alta');
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const canal = (c: string) => (c.match(/[\d.]+/g) ?? []).map(Number);
+            const lin = (v: number) => {
+              const x = v / 255;
+              return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+            };
+            const lum = (c: number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+            const cab = document.querySelector('[class*="resultadoCabecera"]') as HTMLElement;
+            const desc = document.querySelector('[class*="resultadoDescripcion"]') as HTMLElement;
+            const fondo = canal(getComputedStyle(cab).backgroundColor);
+            const texto = canal(getComputedStyle(desc).color);
+            const a = Number(getComputedStyle(desc).opacity);
+            const efectivo = texto.slice(0, 3).map((v, i) => v * a + fondo[i] * (1 - a));
+            const [l1, l2] = [lum(efectivo), lum(fondo)].sort((p, q) => q - p);
+            return (l1 + 0.05) / (l2 + 0.05);
+          }),
+        { timeout: 3000 },
+      )
+      .toBeGreaterThanOrEqual(4.5);
+  });
+
+  // HALLAZGO G (bajo, contenido) — ESH 2023 (capítulo de embarazo): ≥ 140/90 tras la semana 20
+  // es HTA gestacional; la preeclampsia añade proteinuria u otra disfunción orgánica materna
+  // o uteroplacentaria.
+  test('HALLAZGO G · la tarjeta «Embarazada» no define la preeclampsia solo por la cifra', async ({ page }) => {
+    test.fail(true, 'Hallazgo G (25/09/2026): preeclampsia definida solo por ≥ 140/90 tras la semana 20.');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('[class*="escenarioCard"]', { hasText: 'Embarazada' });
+    await expect(tarjeta).toBeVisible();
+    await expect(tarjeta).toContainText(/proteinuria|disfunción|daño (de )?órgano/i);
+  });
+
+  test.describe('en móvil (Pixel 7)', () => {
+    // Enumeradas: `...devices['Pixel 7']` trae defaultBrowserType, que no se admite en un describe.
+    const PIXEL_7 = devices['Pixel 7'];
+    test.use({
+      viewport: PIXEL_7.viewport,
+      userAgent: PIXEL_7.userAgent,
+      deviceScaleFactor: PIXEL_7.deviceScaleFactor,
+      isMobile: PIXEL_7.isMobile,
+      hasTouch: PIXEL_7.hasTouch,
+    });
+
+    test('Móvil · 185/125 muestra la cabecera de crisis y la página no desborda en horizontal', async ({ page }) => {
+      await medirHidratado(page, '185', '125');
+      await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
+      await expect(urgencia(page)).toContainText('Emergencia');
+      await expect(categoria(page)).toBeInViewport();
+      const desborde = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(desborde).toBe(0);
+    });
+
+    // HALLAZGO F (bajo) — la recomendación (la única frase que dice QUÉ hacer) va detrás de las
+    // métricas y los derivados; tras pulsar Calcular queda fuera de la pantalla.
+    test('HALLAZGO F · tras pulsar Calcular con una crisis, la instrucción del 112 está a la vista', async ({ page }) => {
+      test.fail(true, 'Hallazgo F (25/09/2026): la recomendación queda ≈ 580 px por debajo del botón.');
+      await medirHidratado(page, '185', '125');
+      await expect(recomendacion(page)).toContainText('112');
+      await expect(recomendacion(page)).toBeInViewport();
+    });
+  });
 });

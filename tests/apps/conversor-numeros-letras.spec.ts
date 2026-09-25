@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — conversor-numeros-letras (segmento CÁLCULO / LENGUA, riesgo 3)
@@ -865,3 +865,285 @@ async function contrasteEfectivo(control: Locator): Promise<number> {
     return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
   });
 }
+
+/**
+ * ══════════════════════════════════════════════════════════════════════════════════════════
+ * CUARTA INSPECCIÓN · 25/09/2026 — re-inspección por FIRMA DE ROTURA
+ * ══════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * La firma (30 días hasta el 24/09/2026): 81,6 % de visitas cortas (catálogo 62,4 %) y 6,6 %
+ * de recargas tras visita corta (catálogo 3,1 %), en 76 visitas. La ventana termina el día de
+ * la reparación de los hallazgos 1537-1544, así que aún no la refleja.
+ *
+ * LO QUE EXPLICA LA FIRMA: los hallazgos 1538 y 1539, reparados el 24/09. Con el campo relleno
+ * con 3.847,50 y el cursor al final, teclear «1500» daba «3.847,501500», que se redondeaba a
+ * 3.847,50: el panel NO cambiaba. Entrar, teclear, no ver nada y recargar es exactamente esa
+ * firma. Hoy se sostiene en escritorio (clic y Tab) y en móvil (toque, segundo toque, es-MX):
+ * lo tecleado sustituye al ejemplo y el texto queda sobre el teclado. Una visita corta, además,
+ * es lo esperable en un conversor: se teclea, se copia y se va.
+ *
+ * ESPERADOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *   CASO 1 (normal) — 21.201 libras. 21.201 = 21 millares + 201. La libra es femenina (DLE,
+ *     s. v. «libra»). Las centenas concuerdan SIEMPRE con el sustantivo femenino y «uno» pasa a
+ *     «una» (DPD, s. v. «uno» §2.3): «doscientas una». Con «mil» interpuesto la concordancia
+ *     es opcional y la app elige la femenina (fijado el 24/09): «veintiuna mil».
+ *       → «veintiuna mil doscientas una libras»
+ *     En euros, masculino y apócope ante el sustantivo (§2.2): «veintiún mil doscientos un euros».
+ *     Y la consulta real de Bing «$17,149.16 pesos»: dos separadores, manda el último → 17.149,16;
+ *     «ciento» porque le sigue un número menor; «dieciséis» con tilde (OLE 2010).
+ *       → «diecisiete mil ciento cuarenta y nueve pesos con dieciséis centavos» · «… con 16/100»
+ *   CASO 2 (límite) — 0 € → «cero euros» (plural con cero). 0,01 £ → «cero libras con un
+ *     penique» (penique m.). 200.000 £ → «doscientas mil libras» (centena femenina ante «mil»).
+ *     1.000.000 £ → «un millón de libras» (DPD, s. v. «millón»: con «de» si no sigue otro
+ *     numeral). 1.000.000.000 £ → «mil millones de libras» (escala larga: no es «un billón»).
+ *   CASO 3 (rechazo) — «1'500.00»: el apóstrofo no es separador en español (DPD, s. v.
+ *     «números» §1.1d: «No debe utilizarse el apóstrofo con este valor: ⊗3’1416»). Y «1,5
+ *     millones» lleva letras. Los dos, con el aviso de la app y SIN ningún importe en letras.
+ *
+ * LA SOSPECHA «M.N.» Y LA MONEDA POR DEFECTO, DESCARTADA COMO HALLAZGO: con el navegador en
+ * es-MX la app arranca en euros («Págese por este pagaré… euros»), igual que en es-ES. Pero no
+ * promete detectar el país ni el formato «M.N.»: ni el <h1> «Números a Letras», ni la metadata,
+ * ni la FAQ, ni el bloque educativo mencionan cheques mexicanos; lo que promete para
+ * Latinoamérica es la fracción «con 50/100», y la da («… pesos con 16/100»), que es una
+ * variante en uso, no un formato incorrecto. El euro se ve en el selector, justo encima del
+ * campo, y un «$» tecleado ya dispara el aviso. Lo que SÍ es un hallazgo, abajo: el «M.N.»
+ * tecleado se tira en silencio con el euro elegido.
+ *
+ * HALLAZGOS (test.fail: afirman lo CORRECTO y hoy fallan; al repararse, se quita la marca)
+ *   A · «Págese» por «Páguese» en la línea modelo para el documento (ortografía)
+ *   B · número suelto: la FAQ niega «tres coma cuarenta y cinco» contra el DPD §3.4
+ *   C · medio céntimo: 0,145 se anuncia «0,15» y se escribe «catorce céntimos»
+ *   D · «M.N.» tecleado con el euro elegido: se descarta sin aviso
+ *   E · «Lps.» (lempira) y «¢» (colón) se rechazan aunque la ayuda diga «con o sin símbolo»
+ */
+test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y norma del DPD', () => {
+  const panel = (page: Page) => page.locator('[role="region"][aria-label="Resultado"]');
+  const texto = (page: Page) => page.locator('p[aria-live="polite"]');
+  // Solo el aviso de la app: getByRole('alert') casaría también con el anunciador de rutas de Next
+  const aviso = (page: Page) => panel(page).locator('[role="alert"]');
+  const notas = (page: Page) => panel(page).locator('[role="status"]');
+
+  /** Escribe como el usuario (fill) y espera a que el ESTADO de React lo haya recogido. */
+  async function escribir(page: Page, entrada: string): Promise<void> {
+    await page.locator('#cantidad').fill(entrada);
+    await esperarValorEnReact(page, '#cantidad', entrada);
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#cantidad']);
+  });
+
+  test('CASO 1 · 21.201 libras y euros, y la consulta real «$17,149.16 pesos»', async ({ page }) => {
+    // DPD «uno» §2.2: apócope ante sustantivo masculino
+    await escribir(page, '21.201');
+    await expect(texto(page)).toHaveText('veintiún mil doscientos un euros');
+
+    // DPD «uno» §2.3: centena y «una» concuerdan con la libra (f.)
+    await page.locator('#moneda').selectOption('GBP');
+    await expect(texto(page)).toHaveText('veintiuna mil doscientas una libras');
+
+    // «$» y «pesos» no dicen QUÉ peso: la app no adivina y avisa hasta que se elige
+    await page.locator('#moneda').selectOption('EUR');
+    await escribir(page, '$17,149.16 pesos');
+    await expect(texto(page)).toHaveText('diecisiete mil ciento cuarenta y nueve euros con dieciséis céntimos');
+    await expect(notas(page)).toContainText('pero el texto sale en euros');
+    await page.locator('#moneda').selectOption('MXN');
+    await expect(texto(page)).toHaveText('diecisiete mil ciento cuarenta y nueve pesos con dieciséis centavos');
+    await expect(notas(page)).toHaveCount(0);
+    // La fracción sobre cien que promete el bloque «Facturas en Latinoamérica»
+    await page.getByRole('button', { name: /Fracción 00\/100/ }).click();
+    await expect(texto(page)).toHaveText('diecisiete mil ciento cuarenta y nueve pesos con 16/100');
+  });
+
+  test('CASO 2 · cero, un penique, centenas femeninas ante «mil», millón y mil millones', async ({ page }) => {
+    await escribir(page, '0');
+    await expect(texto(page)).toHaveText('cero euros');
+
+    await page.locator('#moneda').selectOption('GBP');
+    const casos: Array<[string, string]> = [
+      ['0,01', 'cero libras con un penique'],
+      ['200.000', 'doscientas mil libras'], // DPD «uno» §2.3: la centena concuerda siempre
+      ['1.000.000', 'un millón de libras'], // DPD «millón»: con «de»
+      ['1.000.000.000', 'mil millones de libras'], // escala larga: 10⁹ no es «un billón»
+    ];
+    for (const [entrada, esperado] of casos) {
+      await escribir(page, entrada);
+      await expect(texto(page), entrada).toHaveText(esperado);
+    }
+  });
+
+  test('CASO 3 · el apóstrofo suizo y las cifras con letras se rechazan sin inventar importe', async ({ page }) => {
+    // DPD «números» §1.1d: el apóstrofo no es separador en español (⊗3’1416)
+    for (const entrada of ["1'500.00", "1'234'567,50", '1,5 millones']) {
+      await escribir(page, entrada);
+      await expect(aviso(page), entrada).toHaveText(
+        'No se reconoce esa cantidad. Escribe solo cifras, con coma o punto decimal.',
+      );
+      await expect(texto(page), entrada).toHaveCount(0);
+    }
+  });
+
+  test('FIRMA · con teclado (Tab) lo tecleado también sustituye al ejemplo', async ({ page }) => {
+    await page.locator('#moneda').focus();
+    await page.keyboard.press('Tab');
+    await expect(page.locator('#cantidad')).toBeFocused();
+    await page.keyboard.type('21');
+    await esperarValorEnReact(page, '#cantidad', '21');
+    await expect(texto(page)).toHaveText('veintiún euros');
+  });
+
+  test.describe('con el navegador en español de México (es-MX)', () => {
+    test.use({ locale: 'es-MX' });
+
+    test('SOSPECHA descartada · arranca en euros, pero «$ … M.N.» elige el peso y da la fracción', async ({ page }) => {
+      expect(await page.evaluate(() => navigator.language)).toBe('es-MX');
+      // No promete detectar el país: el euro por defecto se ve en el selector, sobre el campo
+      await expect(page.locator('#moneda')).toHaveValue('EUR');
+
+      await escribir(page, '$1,500.00 M.N.');
+      await expect(page.locator('#moneda')).toHaveValue('EUR'); // «$» es ambiguo: no adivina…
+      await expect(notas(page)).toContainText('«$» puede ser el peso o el dólar'); // …y avisa
+      await page.locator('#moneda').selectOption('MXN');
+      await expect(texto(page)).toHaveText('mil quinientos pesos');
+      await page.getByRole('button', { name: /Fracción 00\/100/ }).click();
+      await expect(texto(page)).toHaveText('mil quinientos pesos con 00/100');
+      await expect(panel(page).locator('em')).toHaveText(
+        '«Págese por este documento la cantidad de mil quinientos pesos con 00/100»',
+      );
+
+      // El formato de México con los dos separadores se lee sin duda que resolver
+      await escribir(page, '830,400.00');
+      await expect(texto(page)).toHaveText('ochocientos treinta mil cuatrocientos pesos con 00/100');
+    });
+
+    /**
+     * HALLAZGO D (bajo, operativa). «M.N.» es «moneda nacional», la marca de los importes de
+     * México. La app lo admite al final de la cifra (separarMarcaMoneda) pero no lo usa: con el
+     * euro elegido, «1,500.00 M.N.» sale «mil quinientos euros» SIN ningún aviso, mientras que
+     * «$1,500.00» sí avisa. Es la clase de fallo del hallazgo 1540 («la marca no se descarta:
+     * elige la moneda o se avisa»). Lo correcto: pasar al peso mexicano o avisar.
+     */
+    test('HALLAZGO D · «1,500.00 M.N.» con el euro elegido no se escribe en euros sin avisar', async ({ page }) => {
+      test.fail();
+      await escribir(page, '1,500.00 M.N.');
+      await expect(texto(page)).toBeVisible();
+      await expect(async () => {
+        const moneda = await page.locator('#moneda').inputValue();
+        const avisos = await notas(page).allInnerTexts();
+        expect(moneda === 'MXN' || avisos.some((a) => a.includes('M.N.'))).toBe(true);
+      }).toPass({ timeout: 2000 });
+    });
+  });
+
+  test.describe('en móvil con el navegador en es-MX (390×844, táctil)', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+      locale: 'es-MX',
+    });
+
+    test('FIRMA · tocar, teclear 1,500.00 tecla a tecla y volver a tocar: sustituye y se ve', async ({ page }) => {
+      const campo = page.locator('#cantidad');
+      await campo.tap();
+      await page.keyboard.type('1,500.00', { delay: 20 });
+      await esperarValorEnReact(page, '#cantidad', '1,500.00');
+      await expect(texto(page)).toHaveText('mil quinientos euros');
+      // Presupuesto del teclado virtual (REGRESIÓN 1538): el texto, en la mitad superior
+      const caja = await texto(page).boundingBox();
+      expect(caja!.y + caja!.height).toBeLessThanOrEqual(422);
+
+      // Salir del campo y volver a tocarlo: lo nuevo sustituye otra vez, no se añade
+      await page.locator('h1').tap();
+      await campo.tap();
+      await page.keyboard.type('830,400.00', { delay: 20 });
+      await esperarValorEnReact(page, '#cantidad', '830,400.00');
+      await expect(texto(page)).toHaveText('ochocientos treinta mil cuatrocientos euros');
+      await expect(texto(page)).toBeInViewport();
+      await expect(page.getByRole('button', { name: /Copiar/ })).toBeInViewport();
+    });
+  });
+
+  /**
+   * HALLAZGO A (medio, contenido). La línea modelo que la app ofrece para el documento dice
+   * «Págese», que no existe: el subjuntivo de «pagar» es «pague» (g → gu ante e) y con el
+   * enclítico, «páguese». Es la fórmula que da el propio DPD (s. v. «números» §3.2a): «Páguese
+   * al portador de este cheque la cantidad de veinticinco mil trescientos treinta y ocho euros».
+   * Sale en TODO importe, en una app que promete «las reglas del español bien aplicadas».
+   * Ojo al reparar: las expectativas de «CASO 1 · 3.847,50 €…», «CASO 2a», «REGRESIÓN 1537» y
+   * «SOSPECHA descartada» copian hoy «Págese» y habrá que corregirlas a la vez.
+   */
+  test('HALLAZGO A · la línea para el documento dice «Páguese», no «Págese»', async ({ page }) => {
+    test.fail();
+    await escribir(page, '1.500');
+    await expect(texto(page)).toHaveText('mil quinientos euros');
+    await expect(panel(page).locator('em')).toHaveText(/^«Páguese /, { timeout: 2000 });
+  });
+
+  /**
+   * HALLAZGO B (medio, contenido). La FAQ (en pantalla y en el FAQPage JSON-LD) responde a
+   * «¿3,45 es "tres coma cuarenta y cinco"?» con «Suelto no: las cifras tras la coma se leen una
+   * a una», y el modo «Número suelto» solo da esa lectura. El DPD (s. v. «números» §3.4) dice
+   * otra cosa: «Para expresar con palabras los números decimales, debe mencionarse primero la
+   * parte entera y después la decimal, unidas ambas por la conjunción y o por la preposición
+   * con: 20,58 = veinte (unidades o enteros) con cincuenta y ocho (centésimas)» — la parte
+   * decimal como NÚMERO—, y la lectura con «coma» («siete coma cero ocho») es un recurso «del
+   * registro oral» que «no es apropiado en documentos de carácter técnico, administrativo o
+   * contable», que son justo los contratos y facturas para los que la app dice servir. La cita
+   * «DPD: 3,45 es "tres coma cuatro cinco", no "cuarenta y cinco"» del CASO 2d no está en el DPD.
+   * Lo correcto: ofrecer la forma escrita del §3.4 para documentos.
+   */
+  test('HALLAZGO B · número suelto: la forma escrita del DPD §3.4 para 3,45', async ({ page }) => {
+    test.fail();
+    await page.getByRole('button', { name: /Número suelto/ }).click();
+    await escribir(page, '3,45');
+    await expect(texto(page)).toBeVisible();
+    await expect(panel(page)).toContainText('tres con cuarenta y cinco centésimas', { timeout: 2000 });
+  });
+
+  /**
+   * HALLAZGO C (bajo, cálculo). cantidadALetras() redondea con Math.round(|v| × 100), y en coma
+   * flotante 0,145 × 100 = 14,499999…, así que escribe 14 céntimos; la etiqueta y el aviso de
+   * redondeo usan formatNumber (Intl), que redondea el decimal tecleado y dicen 0,15. La app
+   * se contradice en pantalla: «se ha leído como 0,15» encima de «catorce céntimos». El motor
+   * promete redondear «igual que haría cualquier factura» (al alza en el medio céntimo). Pasa
+   * en 4.588 de los 100.000 medios céntimos entre 0,005 y 999,995 (0,145 · 0,285 · 1,005 ·
+   * 2,135…).
+   */
+  test('HALLAZGO C · el medio céntimo se escribe como lo anuncia la propia app', async ({ page }) => {
+    test.fail();
+    const etiqueta = panel(page).locator('span').first();
+    await escribir(page, '0,145');
+    await expect(etiqueta).toHaveText('0,15 EUR');
+    await expect(notas(page)).toHaveText('Un importe lleva dos decimales como mucho: 0,145 se ha leído como 0,15.');
+    await expect(texto(page)).toHaveText('cero euros con quince céntimos', { timeout: 2000 });
+    await escribir(page, '1,0050');
+    await expect(etiqueta).toHaveText('1,01 EUR');
+    await expect(texto(page)).toHaveText('un euro con un céntimo', { timeout: 2000 });
+  });
+
+  /**
+   * HALLAZGO E (bajo, operativa). La ayuda del campo dice «con o sin símbolo de moneda», y el
+   * 24/09 se añadieron los de CLDR (hallazgo 1542). Faltan las abreviaturas de uso diario de
+   * dos monedas del selector: «Lps.» para el lempira (Honduras, ~7 % de las visitas en agosto)
+   * y «¢», que sustituye a «₡» en las etiquetas de precios de Costa Rica porque «₡» no está en
+   * el teclado. Las dos se rechazan con «Escribe solo cifras». También «$U» (peso uruguayo) y
+   * «U$S» (dólar en el Río de la Plata).
+   */
+  test('HALLAZGO E · «Lps.» y «¢» se leen como lempiras y colones', async ({ page }) => {
+    test.fail();
+    const casos: Array<[string, string, string]> = [
+      ['Lps. 1,500.00', 'HNL', 'mil quinientos lempiras'],
+      ['¢1.500', 'CRC', 'mil quinientos colones'],
+    ];
+    for (const [entrada, codigo, esperado] of casos) {
+      await page.locator('#moneda').selectOption('EUR');
+      await escribir(page, entrada);
+      await expect(texto(page), entrada).toHaveText(esperado, { timeout: 2000 });
+      await expect(page.locator('#moneda'), entrada).toHaveValue(codigo);
+    }
+  });
+});

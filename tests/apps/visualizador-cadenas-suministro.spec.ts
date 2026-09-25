@@ -797,3 +797,218 @@ test.describe('Inspección 24/09/2026 — re-inspección tras 95060386 y 0d54c8f
     await expect(jit).toContainText('Sistema de Producción Toyota, década de 1950');
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// RE-INSPECCIÓN del 25/09/2026, tras 20901bec (hallazgos 1528-1536).
+//
+// Los 16 hallazgos de las dos inspecciones del 24/09/2026 siguen cubiertos por los tests de arriba
+// (teclado, contraste, SVG en móvil, datos con fuente): se ejecutan tal cual y no se duplican.
+//
+// Casos nuevos, resueltos a mano ANTES de ejecutar la app:
+//   · NORMAL — las 8 partidas del diagrama suman 90,50 + 72 + 9 + 44 + 64,50 + 23 + 58 + 24,50 =
+//     385,50 $ de 453 $ = 85,099 % → los badges (20,0 + 15,9 + 2,0 + 9,7 + 14,2 + 5,1 + 12,8 + 5,4)
+//     suman 85,1. No el 100 %: el resto son partidas que el diagrama no dibuja. Y cada país que el
+//     SVG rotula en la tarjeta aparece en el «País de origen» de su ficha.
+//   · LÍMITE — móvil de 375 × 667 con toque: tocar un componente abre su ficha y el título queda
+//     a la vista; tocar un evento lo despliega; la página no se desborda (la tabla comparativa
+//     desplaza dentro de su contenedor).
+//   · IMPEDIR / VACÍO — al cargar, ningún componente pulsado, ningún evento desplegado y el panel
+//     vacío; el círculo central «~40 países» y las teclas que no son Enter ni Espacio no
+//     seleccionan nada.
+//
+// SOSPECHA del 24/09/2026, cotejada EN SESIÓN el 25/09/2026:
+//   · Batería, «el 75 % de la producción de celdas de batería ocurre en China», en presente y sin
+//     año. IEA, Global EV Outlook 2025, «Electric vehicle batteries»: «China was responsible for
+//     80% of global battery cell production in 2024»; Global EV Outlook 2026: «over 80%» de la
+//     capacidad mundial a finales de 2025. → hallazgo, dato bajo.
+//   · Cámaras, «Sony controla ~45 %…», sin año. Es la cifra de Strategy Analytics para 2021 (45 %
+//     de los ingresos, nota del 21/03/2022). TechInsights, «Smartphone Image Sensor Market Share
+//     Q4 2024»: «Sony Semiconductor ranked top with over 55% share». → hallazgo, dato bajo.
+//   · Memoria, «con hasta 232 capas», en presente. 232 capas fue el récord de Micron (volumen
+//     desde el 26/07/2022). SK hynix produce en masa NAND de 321 capas desde el 21/11/2024 y el
+//     22/05/2025 anunció su UFS 4.1 para móviles sobre 321 capas (la generación móvil anterior ya
+//     era de 238), con envíos en volumen desde el 1.er trimestre de 2026. → hallazgo, dato bajo.
+//   · Guía, «más de 200 proveedores directos y miles […] distribuidos por 43 países». Apple,
+//     apple.com/supply-chain: «Our supply chain includes thousands of supplier facilities in over
+//     60 countries.» → hallazgo, dato bajo. Los «200 proveedores» y los «~40 países» de UN
+//     smartphone no se levantan: no hay fuente que dé la cifra correcta para anclarlos.
+//   · El campo `cosтe` con dos letras cirílicas: ya no existe. 20901bec rehízo el tipo
+//     (`coste: PartidaCoste`) y el grep da 0 coincidencias; queda como regresión.
+//
+// Y uno que salió al cuadrar países con fabricantes (fuentes del 25/09/2026):
+//   · Cámaras: «Japón / China / Suecia» con Sony (Japón), Largan Precision y Sunny Optical.
+//     Largan tiene su sede en «No. 11, Jingke Rd., Nantun Dist., Taichung City 408210, Taiwan»
+//     (largan.com.tw): falta Taiwán, y ningún fabricante nombrado es sueco. Antenas: Murata
+//     (componentes RF) tiene su sede en «Nagaokakyo-shi, Kyoto 617-8555, Japan»
+//     (corporate.murata.com) y Japón no está en el país. → hallazgo, dato bajo.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
+  const componente = (page: Page, nombre: string): Locator =>
+    page.getByRole('button', { name: `Ver detalles de ${nombre}` });
+  const panel = (page: Page): Locator => page.locator('div[class*="panelDetalle"]');
+
+  // CASO NORMAL. Esperados del array COMPONENTES de page.tsx y de TechInsights (desmontaje de
+  // septiembre de 2018, 453 $): [nombre, badge, rótulo del SVG, «País de origen» de la ficha].
+  test('normal — los 8 badges suman el 85,1 % y cada país rotulado en el diagrama está en su ficha', async ({ page }) => {
+    const esperados: Array<[string, string, string, string]> = [
+      ['Pantalla OLED', '20,0', 'Corea del Sur', 'Corea del Sur / China'],
+      ['Procesador (SoC)', '15,9', 'EEUU → Taiwán', 'Diseñado en EEUU/UK — Fabricado en Taiwán/Corea'],
+      ['Batería de litio', '2,0', 'Chile → China', 'Litio de Chile/Australia — Celdas en China'],
+      ['Módulo de cámaras', '9,7', 'Japón / China', 'Japón / China / Suecia'],
+      ['Memoria flash (NAND)', '14,2', 'Japón / Corea', 'Japón / Corea del Sur / China'],
+      ['Antenas 5G', '5,1', 'Finlandia / Suecia', 'Finlandia / Suecia / EEUU'],
+      ['Chasis de aluminio', '12,8', 'China', 'China (fabricación) — Bauxita de Guinea/Australia'],
+      ['Ensamblaje final', '5,4', 'China / India', 'China / India / Vietnam'],
+    ];
+    let suma = 0;
+    for (const [nombre, pct, origenSvg, pais] of esperados) {
+      const g = componente(page, nombre);
+      await expect(g.locator('text').nth(2), `origen rotulado de ${nombre}`).toHaveText(origenSvg);
+      await g.click();
+      await expect(panel(page).getByRole('heading', { name: nombre })).toBeVisible();
+      await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText(`${pct} %`);
+      const fichaPais = page.locator('p[class*="componentePais"]');
+      await expect(fichaPais).toHaveText(`País de origen: ${pais}`);
+      for (const p of origenSvg.split(/→|\//).map((s) => s.trim())) {
+        expect(pais, `«${p}» del diagrama en la ficha de ${nombre}`).toContain(p);
+      }
+      suma += Number(pct.replace(',', '.'));
+    }
+    // 385,50 / 453 = 85,099 % → 85,1.
+    expect(suma).toBeCloseTo(85.1, 5);
+  });
+
+  // CASO IMPEDIR / VACÍO. Esperado del estado inicial de la página (useState(null) en los dos) y
+  // del onKeyDown del <g>, que solo atiende Enter y Espacio.
+  test('vacío — al cargar no hay nada pulsado; el círculo central y otras teclas no seleccionan', async ({ page }) => {
+    const pulsados = () =>
+      page.evaluate(
+        () => [...document.querySelectorAll('g[role="button"]')].filter((g) => g.getAttribute('aria-pressed') === 'true').length,
+      );
+    expect(await pulsados()).toBe(0);
+    await expect(panel(page)).toHaveText(
+      '👆Pulsa cualquier componente del diagrama para ver su país de origen, empresa fabricante y datos curiosos',
+    );
+    await expect(page.locator('[role="listitem"] button[aria-expanded="true"]')).toHaveCount(0);
+    await expect(page.locator('div[class*="timelineDetalle"]')).toHaveCount(0);
+
+    // El círculo central no es un componente.
+    await page.locator('svg[role="group"] text', { hasText: '~40 países' }).click();
+    expect(await pulsados()).toBe(0);
+
+    // Teclas que no son Enter ni Espacio: nada; Enter sí.
+    const bateria = componente(page, 'Batería de litio');
+    for (const tecla of ['a', 'Escape', 'ArrowRight']) {
+      await bateria.focus();
+      await page.keyboard.press(tecla);
+      await expect(bateria, `tecla ${tecla}`).toHaveAttribute('aria-pressed', 'false');
+    }
+    await bateria.focus();
+    await page.keyboard.press('Enter');
+    await expect(bateria).toHaveAttribute('aria-pressed', 'true');
+    expect(await pulsados()).toBe(1);
+  });
+
+  // CASO LÍMITE (móvil). Medido en la exploración: SVG de 309 px, título de la ficha a 467 px de
+  // una pantalla de 667 tras el toque, scrollWidth 375 y la tabla (559 px) dentro de un
+  // contenedor de 327 px con overflow-x auto.
+  test.describe('móvil 375 × 667 con toque', () => {
+    test.use({
+      viewport: { width: 375, height: 667 },
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('móvil — tocar un componente abre su ficha a la vista y tocar un evento lo despliega, sin desbordar', async ({ page }) => {
+      const bateria = componente(page, 'Batería de litio');
+      await bateria.tap();
+      await expect(bateria).toHaveAttribute('aria-pressed', 'true');
+      const titulo = panel(page).getByRole('heading', { name: 'Batería de litio' });
+      await expect(titulo).toBeInViewport();
+      await expect(panel(page).locator('span[class*="costeBadge"]')).toHaveText('2,0 %');
+      await bateria.tap();
+      await expect(bateria).toHaveAttribute('aria-pressed', 'false');
+      await expect(panel(page)).toContainText('Pulsa cualquier componente del diagrama');
+
+      const tailandia = page.getByRole('button', { name: 'Inundaciones en Tailandia' });
+      await tailandia.tap();
+      await expect(tailandia).toHaveAttribute('aria-expanded', 'true');
+      await expect(page.locator('#disrupcion-detalle-3 span[class*="timelineStatNum"]').first()).toHaveText('~4 meses');
+
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+      const tabla = await page.evaluate(() => {
+        const w = document.querySelector('div[class*="tablaWrapper"]') as HTMLElement;
+        return { overflowX: getComputedStyle(w).overflowX, cabe: w.getBoundingClientRect().right <= innerWidth };
+      });
+      expect(tabla).toEqual({ overflowX: 'auto', cabe: true });
+    });
+  });
+
+  // SOSPECHA RESUELTA — el identificador `cosтe` (т y е cirílicas) desapareció con 20901bec.
+  // Entrada: grep de letras cirílicas (U+0400–U+04FF) en page.tsx → esperado 0 · obtenido 0.
+  test('código — ningún carácter cirílico en page.tsx (el campo «cosтe» ya no existe)', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(join(process.cwd(), 'app/visualizador-cadenas-suministro/page.tsx'), 'utf8');
+    const cirilicas = fuente.split('\n').flatMap((l, i) => (/[Ѐ-ӿ]/.test(l) ? [`${i + 1}: ${l.trim()}`] : []));
+    expect(cirilicas).toEqual([]);
+  });
+
+  // HALLAZGO (25/09/2026, dato bajo) — batería. IEA, Global EV Outlook 2025: «China was
+  // responsible for 80% of global battery cell production in 2024». Hoy la ficha dice «el 75 %
+  // […] ocurre en China», en presente, sin año ni fuente. Lo correcto: la cifra de la IEA con su año.
+  test('dato — la cuota china de celdas de batería lleva la cifra de la IEA y su año, no un 75 % sin fecha', async ({ page }) => {
+    test.fail(true, 'Hallazgo del 25/09/2026: «el 75 % de la producción de celdas» sin año; IEA 2024: 80 %');
+    await componente(page, 'Batería de litio').click();
+    const texto = (await panel(page).textContent()) ?? '';
+    expect(texto).not.toMatch(/75\s?% de la producción de celdas/);
+    expect(texto).toContain('IEA');
+    expect(texto).toMatch(/80\s?%/);
+  });
+
+  // HALLAZGO (25/09/2026, dato bajo) — cámaras. «~45 %» es Strategy Analytics para 2021;
+  // TechInsights, Q4 2024: «Sony Semiconductor ranked top with over 55% share».
+  test('dato — la cuota de Sony en sensores de smartphone no es un «~45 %» sin año', async ({ page }) => {
+    test.fail(true, 'Hallazgo del 25/09/2026: «Sony controla ~45 %» (2021) presentado en presente; TechInsights Q4 2024: >55 %');
+    await componente(page, 'Módulo de cámaras').click();
+    const texto = (await panel(page).textContent()) ?? '';
+    expect(texto).not.toMatch(/~45\s?%/);
+    expect(texto).toMatch(/55\s?%/);
+  });
+
+  // HALLAZGO (25/09/2026, dato bajo) — memoria. «Hasta 232 capas» fue el récord de Micron en julio
+  // de 2022; SK hynix produce 321 capas desde el 21/11/2024 y su UFS 4.1 móvil es de 321 capas.
+  test('dato — la ficha de la NAND no da «hasta 232 capas» como techo actual', async ({ page }) => {
+    test.fail(true, 'Hallazgo del 25/09/2026: «hasta 232 capas» (récord de 2022) en presente; SK hynix, 321 capas desde 11/2024');
+    await componente(page, 'Memoria flash (NAND)').click();
+    await expect(panel(page)).not.toContainText('hasta 232 capas');
+  });
+
+  // HALLAZGO (25/09/2026, dato bajo) — guía. «Distribuidos por 43 países»; Apple
+  // (apple.com/supply-chain): «thousands of supplier facilities in over 60 countries».
+  test('dato — la red de proveedores de Apple no se reparte por «43 países» sino por más de 60', async ({ page }) => {
+    test.fail(true, 'Hallazgo del 25/09/2026: «43 países»; Apple, apple.com/supply-chain: «over 60 countries»');
+    const guia = (await page.locator('div[class*="eduCard"]').first().textContent()) ?? '';
+    expect(guia).not.toContain('43 países');
+    expect(guia).toMatch(/60\s+países/);
+  });
+
+  // HALLAZGO (25/09/2026, dato bajo) — países que no casan con los fabricantes de la propia ficha.
+  // Largan Precision: Taichung, Taiwán (largan.com.tw); Murata: Nagaokakyo, Kioto, Japón
+  // (corporate.murata.com). Ningún fabricante de cámaras nombrado es sueco.
+  test('dato — el país de cámaras y antenas incluye el de sus fabricantes (Taiwán, Japón) y no uno sin fabricante', async ({ page }) => {
+    test.fail(true, 'Hallazgo del 25/09/2026: cámaras «Japón / China / Suecia» sin Taiwán (Largan); antenas sin Japón (Murata)');
+    const fichaPais = page.locator('p[class*="componentePais"]');
+    await componente(page, 'Módulo de cámaras').click();
+    await expect(panel(page)).toContainText('Largan Precision');
+    await expect(fichaPais).toContainText('Taiwán');
+    await expect(fichaPais).not.toContainText('Suecia');
+    await componente(page, 'Antenas 5G').click();
+    await expect(panel(page)).toContainText('Murata');
+    await expect(fichaPais).toContainText('Japón');
+  });
+});

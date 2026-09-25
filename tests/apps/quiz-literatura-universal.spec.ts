@@ -626,3 +626,497 @@ test.describe('Regresión de los hallazgos del Inspector', () => {
     expect(enunciados.filter((e) => /trío del realismo mágico/i.test(e)), 'a13: consenso crítico inexistente').toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * RE-INSPECCIÓN DEL 25/09/2026
+ *
+ * Banco a esta fecha (contado en `preguntas.ts`): 19 básicas + 19 medias + 18 avanzadas = 56.
+ * En el CÓDIGO la correcta sigue sesgada (A=11, B=2, C=19, D=24), pero la partida baraja
+ * las opciones al componerse (`barajarOpciones`, page.tsx:62): en 12 partidas reales (180
+ * preguntas) la correcta cayó 47 veces en A, 46 en B, 46 en C y 41 en D, y «siempre A»
+ * sacó 3, 4, 3 y 4 de 15. Los tramos de `evaluacion()`: ≥ 0,9 Excelente · ≥ 0,7 Muy bien ·
+ * ≥ 0,5 Bien · resto Sigue leyendo; barra = Math.round(aciertos / 15 · 100).
+ *
+ * Los casos que vigilan un defecto de HOY llevan test.fail() y el comportamiento correcto.
+ */
+
+/** Explicación visible tras responder la pregunta en pantalla. */
+async function explicacionVisible(page: Page): Promise<string> {
+  return norm(await page.locator('[class*="explicacionTexto"]').innerText());
+}
+
+/**
+ * Juega partidas del nivel hasta haber visto las preguntas `ids` (o agotar `maxPartidas`).
+ * Responde siempre la A: aquí solo interesa lo que la app dice tras responder.
+ */
+async function buscarPreguntas(page: Page, nivel: RegExp, ids: string[], maxPartidas = 8) {
+  const vistas: Record<string, { enunciado: string; explicacion: string }> = {};
+  for (let partida = 0; partida < maxPartidas && ids.some((id) => !vistas[id]); partida++) {
+    await arrancar(page, nivel);
+    for (;;) {
+      const texto = await enunciado(page);
+      await opciones(page).nth(0).click();
+      const ficha = BANCO[texto];
+      if (ficha && ids.includes(ficha.id)) vistas[ficha.id] = { enunciado: texto, explicacion: await explicacionVisible(page) };
+      if (/Ver resultado/.test(await avanzar(page))) break;
+    }
+  }
+  return vistas;
+}
+
+/**
+ * Contraste WCAG del texto de `selector` contra su fondo REAL: compone los fondos
+ * semitransparentes de los antecesores hasta dar con uno opaco.
+ */
+async function contraste(page: Page, selector: string): Promise<number> {
+  return page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) throw new Error(`no existe ${sel}`);
+    const leer = (c: string) => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p[3] ?? 1];
+    };
+    const sobre = (f: number[], b: number[]) => [0, 1, 2].map((i) => f[i] * f[3] + b[i] * (1 - f[3])).concat(1);
+    const capas: number[][] = [];
+    for (let n: Element | null = el; n; n = n.parentElement) {
+      const c = leer(getComputedStyle(n).backgroundColor);
+      if (c[3] > 0) capas.push(c);
+      if (c[3] >= 1) break;
+    }
+    let fondo = [255, 255, 255, 1];
+    for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+    const texto = sobre(leer(getComputedStyle(el).color), fondo);
+    const lum = (c: number[]) => {
+      const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+    };
+    const [a, b] = [lum(texto), lum(fondo)];
+    return Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100;
+  }, selector);
+}
+
+/** Pone el tema por la clave que lee next-themes ANTES de que la página hidrate. */
+async function conTema(page: Page, tema: 'light' | 'dark') {
+  await page.addInitScript((t) => {
+    try { localStorage.setItem('meskeia-theme', t); } catch { /* sin almacenamiento */ }
+  }, tema);
+}
+
+/** Responde la pregunta visible bien o mal y aparta el ratón (el :hover cambia el fondo). */
+async function responderSinHover(page: Page, modo: 'bien' | 'mal') {
+  const ficha = BANCO[await enunciado(page)];
+  const ops = await textosOpcion(page);
+  const iCorrecta = ops.indexOf(ficha.correcta);
+  const iFallada = iCorrecta === 0 ? 1 : 0;
+  await opciones(page).nth(modo === 'bien' ? iCorrecta : iFallada).click();
+  await page.mouse.move(0, 0);
+  return { iCorrecta, iFallada };
+}
+
+test.describe('Re-inspección 25/09/2026', () => {
+  /**
+   * CASO NORMAL — una partida en Medio y otra en Mezcla (Básico y Avanzado ya los cubren
+   * los casos del 25/08). Resuelto a mano:
+   *   · Medio, 12 bien y 3 mal: 12/15 = 0,80 → [0,7 · 0,9) «Muy bien. Buen nivel literario.»
+   *     🌟 · barra Math.round(80) = 80%.
+   *   · Mezcla, 7 bien y 8 mal: 7/15 = 0,4667 < 0,5 → «Sigue leyendo. El conocimiento llega
+   *     con tiempo.» 🌱 · barra Math.round(46,67) = 47%.
+   *   · Las dos anuncian y entregan 15 preguntas distintas (19 y 56 en el banco).
+   */
+  test('caso normal: Medio 12/15 da «Muy bien» y 80 %; Mezcla 7/15 da «Sigue leyendo» y 47 %', async ({ page }) => {
+    test.setTimeout(180_000);
+
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /^Medio/ }).click();
+    await expect(page.locator('[class*="seleccionInfo"]')).toHaveText('15 preguntas aleatorias · Explicación tras cada respuesta');
+    await page.getByRole('button', { name: /Empezar el quiz/ }).click();
+    const medio = await jugarPartida(page, 12);
+    expect(medio.total).toBe(15);
+    expect(new Set(medio.ids).size).toBe(15);
+    expect(medio.ids.every((id) => id.startsWith('m')), `Medio ha colado otro nivel: ${medio.ids.join(',')}`).toBe(true);
+    expect(await resultado(page)).toEqual({
+      puntuacion: '12 / 15 correctas',
+      etiqueta: 'Muy bien. Buen nivel literario.', // 0,80 ∈ [0,7 · 0,9)
+      emoji: '🌟',
+      barra: '80%',
+    });
+
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /^Mezcla/ }).click();
+    await expect(page.locator('[class*="seleccionInfo"]')).toHaveText('15 preguntas aleatorias · Explicación tras cada respuesta');
+    await page.getByRole('button', { name: /Empezar el quiz/ }).click();
+    const mezcla = await jugarPartida(page, 7);
+    expect(mezcla.total).toBe(15);
+    expect(new Set(mezcla.ids).size).toBe(15);
+    expect(await resultado(page)).toEqual({
+      puntuacion: '7 / 15 correctas',
+      etiqueta: 'Sigue leyendo. El conocimiento llega con tiempo.', // 0,4667 < 0,5
+      emoji: '🌱',
+      barra: '47%', // Math.round(7/15*100)
+    });
+  });
+
+  /**
+   * CASO LÍMITE — el umbral del 0,9 de `evaluacion()`. Con 15 preguntas no hay 13,5
+   * aciertos: 13/15 = 0,8667 se queda en «Muy bien» y 14/15 = 0,9333 ya es «Excelente».
+   *   · Básico 13/15 → «Muy bien. Buen nivel literario.» 🌟 · barra Math.round(86,67) = 87%.
+   *   · Avanzado 14/15 → «¡Excelente! Dominas la literatura.» 🏆 · barra Math.round(93,33) = 93%.
+   */
+  test('caso límite: 13/15 se queda en «Muy bien» (87 %) y 14/15 ya es «¡Excelente!» (93 %)', async ({ page }) => {
+    test.setTimeout(180_000);
+    await arrancar(page, /^Básico/);
+    await jugarPartida(page, 13);
+    expect(await resultado(page)).toEqual({
+      puntuacion: '13 / 15 correctas',
+      etiqueta: 'Muy bien. Buen nivel literario.', // 0,8667 < 0,9
+      emoji: '🌟',
+      barra: '87%',
+    });
+
+    await arrancar(page, /^Avanzado/);
+    await jugarPartida(page, 14);
+    expect(await resultado(page)).toEqual({
+      puntuacion: '14 / 15 correctas',
+      etiqueta: '¡Excelente! Dominas la literatura.', // 0,9333 ≥ 0,9
+      emoji: '🏆',
+      barra: '93%',
+    });
+  });
+
+  /**
+   * 300, visto desde el jugador: en el banco de Medio la correcta está 10 de 19 veces en
+   * la D (preguntas.ts), así que sin el barajado «siempre D» rondaría el 50 %. Barajando,
+   * lo esperable son ~4 de 15 por partida (~11 de 45). Se exige menos de la mitad en tres
+   * partidas seguidas (45 preguntas: P(≥ 23 aciertos al azar) ≈ 10⁻⁵) y que ninguna letra
+   * se quede sin ser nunca la correcta.
+   */
+  test('300 · pulsar siempre la D en Medio no aprueba: la posición no delata la respuesta', async ({ page }) => {
+    test.setTimeout(180_000);
+    const cuenta: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+    let aciertosD = 0;
+    for (let partida = 0; partida < 3; partida++) {
+      await arrancar(page, /^Medio/);
+      let enEsta = 0;
+      for (;;) {
+        const ficha = BANCO[await enunciado(page)];
+        const ops = await textosOpcion(page);
+        const letra = 'ABCD'[ops.indexOf(ficha.correcta)];
+        cuenta[letra]++;
+        if (letra === 'D') enEsta++;
+        await opciones(page).nth(3).click(); // siempre la D
+        if (/Ver resultado/.test(await avanzar(page))) break;
+      }
+      // El marcador cuenta exactamente las veces que la D era la buena
+      expect((await resultado(page)).puntuacion).toBe(`${enEsta} / 15 correctas`);
+      aciertosD += enEsta;
+    }
+    const detalle = JSON.stringify(cuenta);
+    expect(aciertosD, `«siempre D» acierta demasiado · reparto ${detalle}`).toBeLessThan(23);
+    for (const l of ['A', 'B', 'C', 'D']) expect(cuenta[l], `la ${l} nunca es la correcta · ${detalle}`).toBeGreaterThan(0);
+  });
+
+  /**
+   * OPERATIVA QUE DEBE IMPEDIRSE — resuelto a mano:
+   *   · Antes de responder no existe «Siguiente →» (page.tsx:282 lo pinta solo si respondida).
+   *   · Enter sobre una opción ya bloqueada no cambia la respuesta.
+   *   · Abandonar a mitad («← Cambiar de nivel») con 2 aciertos y empezar otra partida
+   *     de Básico toda fallada tiene que dar «0 / 15 correctas»: handleIniciar pone
+   *     aciertos a 0, el abandono no arrastra nada.
+   */
+  test('operativa: sin «Siguiente» antes de responder, respuesta bloqueada y abandono que no arrastra aciertos', async ({ page }) => {
+    test.setTimeout(120_000);
+    await arrancar(page, /^Básico/);
+
+    await expect(page.getByRole('button', { name: /Siguiente|Ver resultado/ })).toHaveCount(0);
+
+    // Pregunta 1 bien; luego Enter sobre otra opción ya deshabilitada
+    const { iCorrecta, iFallada } = await responderSinHover(page, 'bien');
+    await opciones(page).nth(iFallada).focus().catch(() => {});
+    await page.keyboard.press('Enter');
+    await expect(opciones(page).nth(iCorrecta)).toHaveClass(/opcionCorrecta/);
+    await expect(page.locator('[class*="opcionIncorrecta"]')).toHaveCount(0);
+    await avanzar(page);
+    await responder(page, 'bien'); // 2 aciertos
+    expect(await contador(page)).toBe('2/15');
+
+    await page.getByRole('button', { name: /Cambiar de nivel/ }).click();
+    await expect(page.getByRole('heading', { name: 'Elige el nivel de dificultad' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Básico/ })).toHaveAttribute('aria-pressed', 'true');
+
+    await page.getByRole('button', { name: /Empezar el quiz/ }).click();
+    expect(await contador(page)).toBe('1/15');
+    await jugarPartida(page, 0);
+    expect(await resultado(page)).toEqual({
+      puntuacion: '0 / 15 correctas', // los 2 aciertos de la partida abandonada no cuentan
+      etiqueta: 'Sigue leyendo. El conocimiento llega con tiempo.',
+      emoji: '🌱',
+      barra: '0%',
+    });
+  });
+
+  /**
+   * SOSPECHA DESCARTADA (la forma del 1674 de quiz-tabla-periodica). En oscuro,
+   * `[data-theme='dark'] .opcion` (0,2,0) SÍ pisa el borde verde o rojo y
+   * `[data-theme='dark'] .opcionLetra` el círculo, pero —a diferencia de aquella app— esta
+   * regla no toca el fondo: correcta rgba(39, 174, 96, 0.1), fallada rgba(231, 76, 60, 0.1)
+   * y neutra transparente, más las marcas ✓ y ✗ en su color. Medido el 25/09/2026: se
+   * distinguen. Esto fija que se sigan distinguiendo.
+   */
+  test('sospecha 1674 descartada: en oscuro la correcta y la fallada no se pintan igual', async ({ page }) => {
+    await conTema(page, 'dark');
+    await arrancar(page, /^Básico/);
+    const { iCorrecta, iFallada } = await responderSinHover(page, 'mal');
+    const iNeutra = [0, 1, 2, 3].find((i) => i !== iCorrecta && i !== iFallada)!;
+
+    const pintura = async (i: number) =>
+      opciones(page).nth(i).evaluate((b) => ({
+        fondo: getComputedStyle(b).backgroundColor,
+        marca: b.querySelector('[class*="opcionMarca"]')?.textContent ?? null,
+      }));
+    // Espera a que termine la transición de 0,15 s de .opcion
+    await expect.poll(async () => (await pintura(iCorrecta)).fondo).toBe('rgba(39, 174, 96, 0.1)');
+    expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe('dark');
+
+    const [bien, mal, neutra] = [await pintura(iCorrecta), await pintura(iFallada), await pintura(iNeutra)];
+    expect(bien).toEqual({ fondo: 'rgba(39, 174, 96, 0.1)', marca: '✓' });
+    expect(mal).toEqual({ fondo: 'rgba(231, 76, 60, 0.1)', marca: '✗' });
+    expect(neutra).toEqual({ fondo: 'rgba(0, 0, 0, 0)', marca: null });
+  });
+
+  /**
+   * HALLAZGO (accesibilidad) — al pulsar «Siguiente →» el botón se desmonta y el foco cae a
+   * <body>; el punto de partida de la navegación queda DETRÁS de las opciones nuevas y el
+   * primer Tab salta a «← Cambiar de nivel». Medido el 25/09/2026 en escritorio y a 412 px.
+   * Lo correcto: el foco queda en la tarjeta de la pregunta, en la opción A o antes de ella.
+   */
+  test('hallazgo · tras «Siguiente» con teclado el foco no se pierde por detrás de las opciones nuevas', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: activeElement = BODY y el Tab va a «← Cambiar de nivel»
+    await arrancar(page, /^Básico/);
+    await responderSinHover(page, 'bien');
+    await page.getByRole('button', { name: /Siguiente/ }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="quizNumero"]')).toHaveText('2/15');
+
+    const foco = await page.evaluate(() => {
+      const a = document.activeElement;
+      const caja = document.querySelector('[class*="quizBox"]');
+      const opA = [...document.querySelectorAll('button')].find((b) => b.querySelector('[class*="opcionLetra"]'))!;
+      return {
+        enBody: a === document.body,
+        enLaTarjeta: !!caja && !!a && caja.contains(a),
+        antesDeLaA: !!a && (a === opA || !!(a.compareDocumentPosition(opA) & Node.DOCUMENT_POSITION_FOLLOWING)),
+      };
+    });
+    expect(foco).toEqual({ enBody: false, enLaTarjeta: true, antesDeLaA: true });
+  });
+
+  /**
+   * HALLAZGO (accesibilidad) — la otra mitad: tras «Ver resultado» el foco también cae a
+   * <body>, la nota no está en ninguna región viva y el primer Tab va a «Jugar de nuevo»,
+   * por debajo de la puntuación. Lo correcto: el foco en la tarjeta del resultado (o la
+   * nota anunciada).
+   */
+  test('hallazgo · tras «Ver resultado» el foco va a la tarjeta de la nota', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: activeElement = BODY, sin región viva
+    test.setTimeout(120_000);
+    await arrancar(page, /^Básico/);
+    for (let n = 1; n < 15; n++) {
+      await responder(page, 'mal');
+      await avanzar(page);
+    }
+    await responder(page, 'bien');
+    await page.getByRole('button', { name: /Ver resultado/ }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="resultadoPuntuacion"]')).toHaveText('1 / 15 correctas');
+
+    const r = await page.evaluate(() => {
+      const card = document.querySelector('[class*="resultadoCard"]')!;
+      const a = document.activeElement;
+      let viva = false;
+      for (let n: Element | null = card; n; n = n.parentElement) {
+        if (n.getAttribute('aria-live') || n.getAttribute('role') === 'status') viva = true;
+      }
+      return { focoEnLaNota: !!a && a !== document.body && (card === a || card.contains(a)) && !/Jugar de nuevo/.test(a.textContent ?? ''), viva };
+    });
+    expect(r.focoEnLaNota || r.viva, JSON.stringify(r)).toBe(true);
+  });
+
+  /**
+   * HALLAZGO (accesibilidad) — la forma del 1677 de quiz-tabla-periodica. Umbral 4,5:1
+   * (ninguno de estos textos llega a «grande»: 16 px/600 como mucho). Medido el 25/09/2026:
+   *   claro: «Empezar el quiz →» y «Siguiente →» (blanco sobre --primary) 4,11 · rótulo
+   *     «Básico» (#27AE60) 2,87 · «¡Correcto!» (#1E8449 sobre su tinte) 4,36.
+   *   oscuro: los mismos botones 2,79 · rótulo «Avanzado» (#8B2635) 1,59 · «Incorrecto»
+   *     (#EC7063) 4,38 · título «Errores frecuentes…» (#c0392b, sin variante oscura) 2,21.
+   */
+  test('hallazgo · los botones, el rótulo del nivel y el veredicto llegan a 4,5:1 en los dos temas', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: 4,11 / 2,87 / 4,36 en claro; 2,79 / 1,59 / 4,38 / 2,21 en oscuro
+    test.setTimeout(120_000);
+    const medidas: Record<string, number> = {};
+
+    // ── Claro ──
+    await conTema(page, 'light');
+    await arrancar(page, /^Básico/);
+    medidas['claro · rótulo Básico'] = await contraste(page, '[class*="quizNivel"]');
+    await responderSinHover(page, 'bien');
+    await expect(page.locator('[class*="explicacionVeredicto"]')).toHaveText('¡Correcto!');
+    medidas['claro · ¡Correcto!'] = await contraste(page, '[class*="explicacionVeredicto"]');
+    medidas['claro · Siguiente'] = await contraste(page, '[class*="btnSiguiente"]');
+
+    // ── Oscuro ──
+    const oscura = await page.context().newPage();
+    await conTema(oscura, 'dark');
+    await arrancar(oscura, /^Avanzado/);
+    expect(await oscura.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe('dark');
+    medidas['oscuro · rótulo Avanzado'] = await contraste(oscura, '[class*="quizNivel"]');
+    await responderSinHover(oscura, 'mal');
+    await expect(oscura.locator('[class*="explicacionVeredicto"]')).toContainText('Incorrecto.');
+    medidas['oscuro · Incorrecto'] = await contraste(oscura, '[class*="explicacionVeredicto"]');
+    medidas['oscuro · Siguiente'] = await contraste(oscura, '[class*="btnSiguiente"]');
+    medidas['oscuro · Errores frecuentes'] = await contraste(oscura, '[class*="warningHeader"] h4');
+
+    const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5);
+    expect(bajos, JSON.stringify(medidas)).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO (dato) — tres explicaciones afirman algo falso; la respuesta marcada es buena
+   * en las tres, pero la FAQ de la app dice que las explicaciones «son correctas».
+   *   · a06: «García Márquez la describió como el libro que lo hizo querer ser escritor».
+   *     En «Breves nostalgias sobre Juan Rulfo» (1980) cuenta que cuando Mutis le dio
+   *     «Pedro Páramo» ya tenía publicado un libro y tres más inéditos, y que Rulfo le dio
+   *     «el camino que buscaba para continuar mis libros»; la conmoción comparable, dice, fue
+   *     la noche en que leyó «La metamorfosis» de Kafka, diez años antes.
+   *   · a12: «se publicó en parte para adelantarse a la versión apócrifa de Avellaneda
+   *     (1614)». La segunda parte es de 1615: no puede adelantarse a un libro que salió un
+   *     año antes (las dos fechas están en la propia explicación).
+   *   · b14: el íncipit «contrasta la Revolución Francesa con la tranquilidad inglesa». El
+   *     capítulo I («The Period») transcurre en 1775, catorce años antes de la Revolución, y
+   *     dice de Inglaterra «there was scarcely an amount of order and protection to justify
+   *     much national boasting» (asaltos armados cada noche en Londres).
+   */
+  test('hallazgo · las explicaciones de a06 y a12 no afirman nada falso', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: a06 «lo hizo querer ser escritor», a12 «adelantarse» a un libro de 1614
+    test.setTimeout(240_000);
+    const vistas = await buscarPreguntas(page, /^Avanzado/, ['a06', 'a12']);
+    expect(Object.keys(vistas).sort(), 'no salieron a06 y a12 en 8 partidas').toEqual(['a06', 'a12']);
+    expect(vistas.a06.explicacion).not.toMatch(/lo hizo querer ser escritor/i);
+    expect(vistas.a12.explicacion).not.toMatch(/adelantarse a la versi[oó]n ap[oó]crifa/i);
+  });
+
+  test('hallazgo · la explicación de b14 no presenta una Inglaterra tranquila frente a la Revolución', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: b14 «contrasta la Revolución Francesa con la tranquilidad inglesa»
+    test.setTimeout(240_000);
+    const vistas = await buscarPreguntas(page, /^Básico/, ['b14']);
+    expect(vistas.b14, 'no salió b14 en 8 partidas').toBeTruthy();
+    expect(vistas.b14.explicacion).not.toMatch(/tranquilidad inglesa/i);
+  });
+
+  /**
+   * HALLAZGO (contenido) — enunciados que la propia app desmiente:
+   *   · m15 pregunta «¿Qué narrador PROTAGONIZA "El gran Gatsby"?» y su explicación dice
+   *     que Nick es el «narrador-testigo» y que «Gatsby es el protagonista»: quien pulsa
+   *     «Jay Gatsby» por leer el enunciado al pie de la letra recibe «Incorrecto» y, acto
+   *     seguido, la razón que le daba la razón.
+   *   · m06 llama «movimiento literario» al Boom (y b04 al realismo mágico), mientras el
+   *     aviso «Errores frecuentes» del bloque educativo dice que «el Boom es una generación,
+   *     el realismo mágico es una técnica».
+   */
+  test('hallazgo · m15 y m06 no contradicen su explicación ni el bloque educativo', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: «narrador protagoniza» frente a «narrador-testigo»; Boom «movimiento» frente a «generación»
+    test.setTimeout(240_000);
+    await page.goto(RUTA);
+    const aviso = norm(await page.locator('[class*="warningList"]').textContent());
+    const vistas = await buscarPreguntas(page, /^Medio/, ['m15', 'm06']);
+    expect(Object.keys(vistas).sort(), 'no salieron m15 y m06 en 8 partidas').toEqual(['m06', 'm15']);
+
+    const m15Contradice = /narrador protagoniza/i.test(vistas.m15.enunciado) && /narrador-testigo/i.test(vistas.m15.explicacion);
+    expect(m15Contradice, `m15: «${vistas.m15.enunciado}» / «${vistas.m15.explicacion}»`).toBe(false);
+
+    const m06Contradice = /movimiento literario/i.test(vistas.m06.enunciado) && /el Boom es una generación/i.test(aviso);
+    expect(m06Contradice, `m06: «${vistas.m06.enunciado}» / aviso: «${aviso}»`).toBe(false);
+  });
+
+  /**
+   * HALLAZGO (contenido) — la primera respuesta del FAQPage (lo que leen Bing Copilot y
+   * ChatGPT) dice «Abarca literatura occidental desde la Antigüedad griega hasta el siglo
+   * XX», y el párrafo de entrada del bloque educativo, «la tradición literaria occidental y
+   * latinoamericana». Desde el 25/08/2026 el banco tiene diez preguntas no occidentales
+   * (Genji, Las mil y una noches, Tagore, Mahfuz, Bashō, Cao Xueqin, Mo Yan, Rumi, Han Kang,
+   * Achebe) y la FAQ visible de la propia página las enumera.
+   */
+  test('hallazgo · el FAQPage y la entrada no describen el banco como solo occidental', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: «Abarca literatura occidental … hasta el siglo XX»
+    await page.goto(RUTA);
+    const faq = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' ')
+    );
+    const entrada = norm(await page.locator('[class*="guideSection"] > p').first().textContent());
+    expect(faq).not.toMatch(/Abarca literatura occidental/);
+    expect(entrada).not.toMatch(/tradición literaria occidental y latinoamericana/);
+  });
+});
+
+/**
+ * HALLAZGO (operativa) — en un móvil de 360 px, tras una explicación larga, «Siguiente →»
+ * deja la pregunta nueva por encima de la pantalla o bajo la barra fija del logo (62 px):
+ * nadie devuelve la vista al enunciado. Medido el 25/09/2026 con desplazamiento mínimo
+ * (el que haría un dedo para ver «Siguiente» entero): 3-4 de 14 transiciones por partida
+ * (tras b18, a13, a14, a09, a18: enunciado en y = −90…−10 o 4…111) y la nota final en
+ * y = −61…42. A 412 × 915 no pasa.
+ */
+test.describe('Re-inspección 25/09/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('hallazgo · tras «Siguiente» la pregunta nueva queda a la vista bajo la barra del logo', async ({ page }) => {
+    test.fail(); // hallazgo del 25/09/2026: tras las explicaciones largas el enunciado queda fuera o bajo la barra
+    test.setTimeout(240_000);
+    const tapar = async (sel: ReturnType<Page['locator']>) => {
+      const b = (await sel.boundingBox())!;
+      await page.touchscreen.tap(b.x + Math.min(20, b.width / 2), b.y + b.height / 2);
+    };
+    const ocultas: string[] = [];
+    for (const nivel of [/^Avanzado/, /^Básico/]) {
+      await page.goto(RUTA);
+      await page.getByRole('button', { name: nivel }).tap();
+      await page.getByRole('button', { name: /Empezar el quiz/ }).tap();
+      for (let n = 1; n <= 15; n++) {
+        // El usuario sube lo justo para ver el enunciado bajo la barra, o baja para ver la D
+        await page.evaluate(() => {
+          const h = document.querySelector('h2[class*="pregunta"]')!.getBoundingClientRect();
+          const bs = [...document.querySelectorAll('button')].filter((b) => b.querySelector('[class*="opcionLetra"]'));
+          const d = bs[3].getBoundingClientRect();
+          if (h.top < 70) scrollBy(0, h.top - 70);
+          else if (d.bottom > innerHeight) scrollBy(0, d.bottom - innerHeight + 10);
+        });
+        const ficha = BANCO[await enunciado(page)];
+        await tapar(opciones(page).nth(0));
+        // …y baja lo justo para ver «Siguiente» entero
+        await page.evaluate(() => {
+          const b = [...document.querySelectorAll('button')].find((x) => /Siguiente|Ver resultado/.test(x.textContent ?? ''))!;
+          const r = b.getBoundingClientRect();
+          if (r.bottom > innerHeight - 10) scrollBy(0, r.bottom - innerHeight + 10);
+        });
+        await tapar(page.getByRole('button', { name: /Siguiente|Ver resultado/ }));
+        const objetivo = n < 15 ? 'h2[class*="pregunta"]' : '[class*="resultadoPuntuacion"]';
+        await expect(page.locator(objetivo)).toBeVisible();
+        const [arriba, barra] = await page.evaluate((sel) => [
+          document.querySelector(sel)!.getBoundingClientRect().top,
+          document.querySelector('[class*="headerBar"]')?.getBoundingClientRect().bottom ?? 0,
+        ], objetivo);
+        if (arriba < barra) ocultas.push(`tras ${ficha.id}: ${n < 15 ? 'enunciado' : 'nota'} en y=${Math.round(arriba)} (barra hasta ${Math.round(barra)})`);
+      }
+    }
+    expect(ocultas).toEqual([]);
+  });
+});

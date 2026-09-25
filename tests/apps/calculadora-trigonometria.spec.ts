@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
+import {
+  esperarHidratacion,
+  esperarPaginaAsentada,
+  esperarValorEnReact,
+} from './_hidratacion';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -235,5 +241,573 @@ test.describe('Modo práctica aleatorio', () => {
       expect(s2.ok, `semilla ${s}: ${s2.error}`).toBe(true);
       expect(s2.valor, `semilla ${s}`).toBeCloseTo(e.respuesta, 6);
     }
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspección del 25/09/2026 (Opus 5.5) — PRIMERA inspección, contra el build de producción
+ * local (puerto 3050). Los tests de arriba prueban `casos.ts` sin navegador; los de aquí
+ * prueban lo que la PÁGINA publica, que es otra cosa: las cuatro calculadoras de la vista
+ * (Funciones, Triángulo, Conversiones, Identidades) hacen sus propias cuentas en page.tsx y
+ * NO usan las funciones protegidas de casos.ts (salvo la conversión grados ⇄ radianes).
+ *
+ * QUÉ PROMETE
+ *   <h1> «Calculadora de Trigonometría»; subtítulo «Funciones trigonométricas, resolución de
+ *   triángulos, conversiones e identidades». La metadata añade «Resultados con 8 decimales»,
+ *   los ángulos notables 0°…360° como acceso directo, y —solo en el JSON-LD— funciones
+ *   inversas y el teorema del seno y del coseno (ver el hallazgo de la promesa, al final).
+ *
+ * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *
+ *   NORMAL — θ = 30°: sen = 1/2 = 0,5 · cos = √3/2 = 0,866025404 · tan = √3/3 = 0,577350269
+ *     csc = 2 · sec = 2/√3 = 1,154700538 · cot = √3 = 1,732050808 · π/6 = 0,523598776 rad
+ *     A 8 decimales: 0,50000000 · 0,86602540 · 0,57735027 · 2,00000000 · 1,15470054 ·
+ *     1,73205081 · y 0,523599 a 6. Cuadrante I. θ = −30° → cuadrante IV.
+ *   NORMAL — triángulo rectángulo de catetos 3 y 4: c = √(9 + 16) = 5 · A = arctan(3/4) =
+ *     36,8699° · B = 90 − 36,8699 = 53,1301° (A + B + 90 = 180) · área 3·4/2 = 6 · perímetro 12.
+ *   NORMAL — 3 rad (= 3·180/π = 171,887°): sen 3 = 0,14112001 · cos 3 = −0,98999250 ·
+ *     tan 3 = −0,14254654 · cuadrante II (90° < 171,9° < 180°).
+ *   LÍMITE — ángulos cuadrantales: sen 180° = 0 y cos 90° = 0 EXACTOS; tan 90° y tan 270°
+ *     no existen (cos = 0), ni csc/cot en 180° y 360° (sen = 0). La tabla de la propia app los
+ *     escribe «∞». Y un ángulo sobre un eje (90°, 180°, 270°, 360°) no está en NINGÚN
+ *     cuadrante: es cuadrantal.
+ *   LÍMITE — hipotenusa 10 y ángulo 30° (el caso 4 de la propia app): a = 10·sen 30° = 5 ·
+ *     b = 10·cos 30° = 8,6603 · B = 60°. Cateto b = 4 e hipotenusa 5: a = √(25 − 16) = 3.
+ *     Cateto b = 4 y α = 30°: a = 4·tan 30° = 2,3094 · c = 4/cos 30° = 4,6188.
+ *   LÍMITE — conversiones: 180° = π rad = 200 gon · 1 rad = 57,295780° = 63,661977 gon ·
+ *     100 gon = 90° = π/2.
+ *   LÍMITE — identidades con A = 30°, B = 60°: sen 2A = sen 60° = 0,86602540 · cos 2A = 0,5 ·
+ *     sen 15° = 0,25881905 · cos 15° = 0,96592583 · sen(A+B) = 1 · sen(A−B) = −0,5 ·
+ *     cos(A−B) = cos(−30°) = 0,86602540.
+ *   RECHAZO — catetos 1 y 2 con hipotenusa 10: √(1 + 4) = 2,2361 ≠ 10, no hay triángulo
+ *     rectángulo con esos tres lados. Cateto 5 con hipotenusa 3: la hipotenusa es siempre el
+ *     lado mayor. En los casos para clase, «doce» no es un número.
+ *
+ * RESULTADO: las razones de ángulos no cuadrantales, el triángulo desde dos catetos, las
+ * conversiones, las identidades y el corrector de los 12 casos salen exactos cifra a cifra.
+ * Fallan los bordes: los cuadrantales publican el ruido del coma flotante como resultado
+ * (tan 90° = 16.331.239.353.195.370), el cuadrante se calcula en grados aunque la entrada
+ * esté en radianes, y la mitad de las parejas de datos del triángulo no calculan nada. Los
+ * hallazgos abiertos van con `test.fail()`: afirman lo que DEBERÍA pasar y hoy fallan a
+ * propósito. Cuando se reparen, se les quita la marca y quedan como candado.
+ * ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspección 25/09/2026', () => {
+  const RUTA = '/calculadora-trigonometria/';
+
+  /** El panel de resultados (hay más de un `role="status"` posible en la página). */
+  const panelResultados = (page: Page): Locator =>
+    page
+      .locator('[role="status"]')
+      .filter({ has: page.getByRole('heading', { level: 2, name: 'Resultados', exact: true }) });
+
+  /** El valor que publica una ResultCard, localizada por su título. */
+  const valorDe = (page: Page, titulo: string): Locator =>
+    panelResultados(page)
+      .getByRole('heading', { level: 3, name: titulo, exact: true })
+      .locator('xpath=../following-sibling::div[1]/p');
+
+  /** Escribe en un NumberInput como un usuario y espera a que el ESTADO de React lo recoja. */
+  async function escribir(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.getByLabel(etiqueta, { exact: true });
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+
+  async function abrir(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Ángulo (grados)"]']);
+  }
+
+  async function modo(page: Page, nombre: string): Promise<void> {
+    const boton = page.getByRole('button', { name: nombre, exact: true });
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+  }
+
+  /** Relación de contraste WCAG del texto de un elemento contra su fondo REAL compuesto. */
+  async function contrasteDe(elemento: Locator): Promise<number> {
+    return elemento.evaluate((el) => {
+      const aRgba = (c: string): number[] => {
+        const m = c.match(/rgba?\(([^)]+)\)/);
+        if (!m) return [255, 255, 255, 1];
+        const v = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+        return [v[0], v[1], v[2], v.length > 3 ? v[3] : 1];
+      };
+      const mezclar = (arriba: number[], abajo: number[]): number[] => [
+        arriba[0] * arriba[3] + abajo[0] * (1 - arriba[3]),
+        arriba[1] * arriba[3] + abajo[1] * (1 - arriba[3]),
+        arriba[2] * arriba[3] + abajo[2] * (1 - arriba[3]),
+        1,
+      ];
+      const capas: number[][] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        const c = aRgba(getComputedStyle(n).backgroundColor);
+        if (c[3] > 0) {
+          capas.push(c);
+          if (c[3] >= 1) break;
+        }
+      }
+      let fondo = [255, 255, 255, 1];
+      for (let i = capas.length - 1; i >= 0; i--) fondo = mezclar(capas[i], fondo);
+      const texto = mezclar(aRgba(getComputedStyle(el).color), fondo);
+      const lum = (c: number[]): number => {
+        const f = (x: number): number => {
+          const s = x / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+      };
+      const l1 = lum(texto);
+      const l2 = lum(fondo);
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    });
+  }
+
+  // ─────────────────────────────────────────────────────── lo que está bien (candado)
+
+  test('Funciones, 30°: las seis razones a 8 decimales y el ángulo en radianes', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, 'Ángulo (grados)', '30');
+    // Valores de la cabecera de este bloque: √3/2, √3/3, 2/√3 y √3 redondeados a 8 decimales.
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('0,50000000');
+    await expect(valorDe(page, 'cos(θ)')).toHaveText('0,86602540');
+    await expect(valorDe(page, 'tan(θ)')).toHaveText('0,57735027');
+    await expect(valorDe(page, 'csc(θ)')).toHaveText('2,00000000');
+    await expect(valorDe(page, 'sec(θ)')).toHaveText('1,15470054');
+    await expect(valorDe(page, 'cot(θ)')).toHaveText('1,73205081');
+    await expect(valorDe(page, 'En radianes')).toHaveText('0,523599'); // π/6
+  });
+
+  test('Funciones, −30°: signos del cuarto cuadrante', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, 'Ángulo (grados)', '-30');
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('-0,50000000');
+    await expect(valorDe(page, 'cos(θ)')).toHaveText('0,86602540');
+    await expect(valorDe(page, 'tan(θ)')).toHaveText('-0,57735027');
+    // −30° ≡ 330°: cuadrante IV. Se admite «4…» o «IV» para no atar este candado a la
+    // notación, que es otro hallazgo (ver abajo).
+    await expect(valorDe(page, 'Cuadrante')).toHaveText(/^(4|IV)\b/);
+  });
+
+  test('Funciones en radianes, 3 rad: razones correctas', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Radianes');
+    await escribir(page, 'Ángulo (radianes)', '3');
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('0,14112001'); // sen 3
+    await expect(valorDe(page, 'cos(θ)')).toHaveText('-0,98999250'); // cos 3
+    await expect(valorDe(page, 'tan(θ)')).toHaveText('-0,14254654'); // tan 3
+  });
+
+  test('Triángulo desde dos catetos 3 y 4: 5, 36,8699° y 53,1301°', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Triángulo');
+    await escribir(page, 'Cateto a (opuesto)', '3');
+    await escribir(page, 'Cateto b (adyacente)', '4');
+    await expect(valorDe(page, 'Hipotenusa c')).toHaveText('5,0000'); // √(9+16)
+    await expect(valorDe(page, 'Ángulo A')).toHaveText('36,8699°'); // arctan(3/4)
+    await expect(valorDe(page, 'Ángulo B')).toHaveText('53,1301°'); // 90 − 36,8699
+    await expect(valorDe(page, 'Área')).toHaveText('6,0000u²');
+    await expect(valorDe(page, 'Perímetro')).toHaveText('12,0000u');
+  });
+
+  test('Triángulo desde cateto a y ángulo α (5 y 30°): b = 8,6603, c = 10', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Triángulo');
+    await escribir(page, 'Cateto a (opuesto)', '5');
+    await escribir(page, 'Ángulo α (grados)', '30');
+    await expect(valorDe(page, 'Cateto b')).toHaveText('8,6603'); // 5 / tan 30°
+    await expect(valorDe(page, 'Hipotenusa c')).toHaveText('10,0000'); // 5 / sen 30°
+    await expect(valorDe(page, 'Ángulo B')).toHaveText('60,0000°');
+  });
+
+  test('Conversiones: 180° = π rad = 200 gon; 1 rad = 57,295780°; 100 gon = 90°', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Conversiones');
+    await escribir(page, 'Valor a convertir', '180');
+    await expect(valorDe(page, 'Radianes')).toHaveText('3,141593');
+    await expect(valorDe(page, 'Gradianes')).toHaveText('200,000000gon');
+    await modo(page, 'Radianes');
+    await escribir(page, 'Valor a convertir', '1');
+    await expect(valorDe(page, 'Grados')).toHaveText('57,295780°'); // 180/π
+    await expect(valorDe(page, 'Gradianes')).toHaveText('63,661977gon'); // 200/π
+    await modo(page, 'Gradianes');
+    await escribir(page, 'Valor a convertir', '100');
+    await expect(valorDe(page, 'Grados')).toHaveText('90,000000°');
+    await expect(valorDe(page, 'Radianes')).toHaveText('1,570796'); // π/2
+  });
+
+  test('Identidades con A = 30° y B = 60°', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Identidades');
+    await escribir(page, 'Ángulo A (grados)', '30');
+    await escribir(page, 'Ángulo B (grados) - opcional', '60');
+    await expect(valorDe(page, 'sin²θ + cos²θ')).toHaveText('1,00000000');
+    await expect(valorDe(page, 'sin(2θ)')).toHaveText('0,86602540'); // sen 60°
+    await expect(valorDe(page, 'cos(2θ)')).toHaveText('0,50000000'); // cos 60°
+    await expect(valorDe(page, 'sin(θ/2)')).toHaveText('0,25881905'); // sen 15°
+    await expect(valorDe(page, 'cos(θ/2)')).toHaveText('0,96592583'); // cos 15°
+    await expect(valorDe(page, 'sin(A+B)')).toHaveText('1,00000000'); // sen 90°
+    await expect(valorDe(page, 'sin(A-B)')).toHaveText('-0,50000000'); // sen(−30°)
+  });
+
+  test('Casos para clase: acepta la cifra que imprime y rechaza la mala', async ({ page }) => {
+    await abrir(page);
+    const caso = (n: number): Locator =>
+      page.locator('article').filter({ has: page.locator(`#respuesta-caso-${n}`) });
+
+    // Caso 1: sen 30° = 0,5. El coseno de 30° (0,866) es el error típico de razón.
+    await caso(1).locator('#respuesta-caso-1').fill('0,5');
+    await esperarValorEnReact(page, '#respuesta-caso-1', '0,5');
+    await caso(1).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso(1).getByRole('alert')).toContainText('Correcto: 0,5.');
+    await caso(1).locator('#respuesta-caso-1').fill('0,866');
+    await esperarValorEnReact(page, '#respuesta-caso-1', '0,866');
+    await caso(1).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso(1).getByRole('alert')).toContainText('Todavía no');
+
+    // Caso 7: arcsen(8/17) = 28,0725°. Se acepta redondeado a 2 decimales; el complementario
+    // 61,93° (arccos del mismo cociente) es el fallo típico y se rechaza.
+    await caso(7).locator('#respuesta-caso-7').fill('28,07');
+    await esperarValorEnReact(page, '#respuesta-caso-7', '28,07');
+    await caso(7).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso(7).getByRole('alert')).toContainText('Correcto');
+    await caso(7).locator('#respuesta-caso-7').fill('61,93');
+    await esperarValorEnReact(page, '#respuesta-caso-7', '61,93');
+    await caso(7).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso(7).getByRole('alert')).toContainText('Todavía no');
+
+    // Caso 9: 0,9 / sen 6° = 8,6101 m.
+    await caso(9).locator('#respuesta-caso-9').fill('8,61');
+    await esperarValorEnReact(page, '#respuesta-caso-9', '8,61');
+    await caso(9).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso(9).getByRole('alert')).toContainText('Correcto: 8,6101 m.');
+
+    // Texto: se distingue de una respuesta equivocada.
+    await caso(12).locator('#respuesta-caso-12').fill('doce');
+    await esperarValorEnReact(page, '#respuesta-caso-12', 'doce');
+    await caso(12).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso(12).getByRole('alert')).toContainText('Eso no es un número');
+
+    await expect(page.getByText(/Has resuelto/)).toContainText('Has resuelto 1 de 12');
+  });
+
+  test('Práctica aleatoria: acepta la cifra de su propia solución y rechaza 0', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ejercicio aleatorio' }).click();
+    const verSolucion = page.locator('button[aria-controls="solucion-aleatoria"]');
+    await verSolucion.click();
+    const resultado = (await page.locator('#solucion-aleatoria strong').innerText()).trim();
+    const cifra = resultado.split(' ')[0]; // «12,3456 m» → «12,3456»
+    const comprobar = verSolucion.locator('xpath=preceding-sibling::button[1]');
+    const veredicto = page
+      .locator('#solucion-aleatoria')
+      .locator('xpath=preceding-sibling::p[@role="alert"]');
+
+    await page.locator('#respuesta-aleatoria').fill(cifra);
+    await esperarValorEnReact(page, '#respuesta-aleatoria', cifra);
+    await comprobar.click();
+    await expect(veredicto).toContainText('Correcto');
+
+    // Lados de 3 a 28 y ángulos de 15° a 75°: ninguna respuesta vale menos de 0,77.
+    await page.locator('#respuesta-aleatoria').fill('0');
+    await esperarValorEnReact(page, '#respuesta-aleatoria', '0');
+    await comprobar.click();
+    await expect(veredicto).toContainText('Todavía no');
+  });
+
+  test.describe('Móvil 375 px', () => {
+    test.use({
+      viewport: { width: 375, height: 812 },
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('sin scroll horizontal, ni con el número más largo que publica hoy (tan 90°)', async ({ page }) => {
+      await abrir(page);
+      await page.getByRole('button', { name: '90°', exact: true }).click();
+      await expect(valorDe(page, 'sin(θ)')).toHaveText('1,00000000');
+      const anchos = await page.evaluate(() => ({
+        pagina: document.documentElement.scrollWidth,
+        vista: document.documentElement.clientWidth,
+      }));
+      expect(anchos.pagina).toBeLessThanOrEqual(anchos.vista);
+    });
+  });
+
+  // ──────────────────────────────────────── HALLAZGOS ABIERTOS (fallan hoy a propósito)
+
+  // Hallazgo: page.tsx calcula tan como Math.tan si Math.cos(θ) !== 0, y Math.cos(π/2) vale
+  // 6,1·10⁻¹⁷, no 0. El ruido del coma flotante se publica como resultado. casos.ts ya tiene
+  // la versión buena (`tangente`, que corta en 90° + k·180° comparando en grados) y la vista
+  // no la usa.
+  test.fail('90°: tan y sec no existen (la tabla de la app dice ∞), no 16 billones', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: '90°', exact: true }).click();
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('1,00000000');
+    // Hoy: «16.331.239.353.195.370,00000000» en tan y en sec.
+    await expect(valorDe(page, 'tan(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+    await expect(valorDe(page, 'sec(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+  });
+
+  test.fail('180°: csc y cot no existen (sen 180° = 0), no ±8,2·10¹⁵', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: '180°', exact: true }).click();
+    await expect(valorDe(page, 'cos(θ)')).toHaveText('-1,00000000');
+    // Hoy: csc «8.165.619.676.597.685,00000000» y cot «-8.165.619.676.597.685,00000000».
+    await expect(valorDe(page, 'csc(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+    await expect(valorDe(page, 'cot(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+  });
+
+  test.fail('270°: tan y sec no existen (cos 270° = 0), no ±5,4·10¹⁵', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: '270°', exact: true }).click();
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('-1,00000000');
+    // Hoy: tan «5.443.746.451.065.123,00000000» y sec «-5.443.746.451.065.123,00000000».
+    await expect(valorDe(page, 'tan(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+    await expect(valorDe(page, 'sec(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+  });
+
+  test.fail('360°: csc y cot no existen (sen 360° = 0), no −4,1·10¹⁵', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: '360°', exact: true }).click();
+    await expect(valorDe(page, 'cos(θ)')).toHaveText('1,00000000');
+    // Hoy: csc y cot «-4.082.809.838.298.842,50000000».
+    await expect(valorDe(page, 'csc(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+    await expect(valorDe(page, 'cot(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+  });
+
+  // Hallazgo: formatNumber escribe «≈0» para |x| < 0,0001, así que el ruido 1,2·10⁻¹⁶ de
+  // sen 180° sale como un cero APROXIMADO. Es un cero exacto, el mismo que la app imprime
+  // «0,00000000» para sen 0° y que su tabla de notables escribe «0» para cos 90°.
+  test.fail('sen 180° y cos 90° son 0 exactos, no «≈0»', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, 'Ángulo (grados)', '180');
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('0,00000000'); // hoy «≈0»
+    await escribir(page, 'Ángulo (grados)', '90');
+    await expect(valorDe(page, 'cos(θ)')).toHaveText('0,00000000'); // hoy «≈0»
+  });
+
+  // Hallazgo: en modo radianes los botones de ángulos notables escriben el ángulo redondeado a
+  // 4 decimales (90° → «1,5708»), que ya no es π/2: tan(1,5708) = −272.241,8. El botón dice
+  // «90°» y la tangente sale NEGATIVA y finita.
+  test.fail('Radianes, botón «90°»: tan no existe, no −272.241,8', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Radianes');
+    await page.getByRole('button', { name: '90°', exact: true }).click();
+    await expect(page.getByLabel('Ángulo (radianes)', { exact: true })).toHaveValue('1,5708');
+    // Hoy: «-272.241,80840928». Con 180° sale csc «-136.120,90420647»; con 270°, tan «-90.747,26946832».
+    await expect(valorDe(page, 'tan(θ)')).toHaveText(/^(∞|no definid|no existe)/i);
+  });
+
+  // Hallazgo: page.tsx:80 normaliza `ang`, que en modo radianes ES el número en radianes, como
+  // si fueran grados: 3 rad (171,9°) cae en «1°» (primer cuadrante). Todo ángulo en radianes
+  // menor de 90 —es decir, cualquiera que se escriba— sale en el cuadrante I.
+  test.fail('Radianes, 3 rad (171,9°): cuadrante II, no I', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Radianes');
+    await escribir(page, 'Ángulo (radianes)', '3');
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('0,14112001');
+    await expect(valorDe(page, 'Cuadrante')).toHaveText(/^(2|II)\b/); // hoy «1°»
+  });
+
+  // Hallazgo (sospecha 2, confirmada): page.tsx:79-83 asigna los ejes a un cuadrante (90° → I,
+  // 180° → II, 270° → III, 360° → I). Un ángulo sobre un eje es CUADRANTAL: no está en
+  // ninguno, y es justo donde cambian los signos que el bloque educativo enseña por cuadrantes.
+  test.fail('90°, 180°, 270° y 360° no están en ningún cuadrante', async ({ page }) => {
+    await abrir(page);
+    for (const angulo of ['90', '180', '270', '360']) {
+      await escribir(page, 'Ángulo (grados)', angulo);
+      // Hoy: «1°», «2°», «3°» y «1°».
+      await expect(valorDe(page, 'Cuadrante'), `${angulo}°`).toHaveText(/eje|cuadrantal|ninguno/i);
+    }
+  });
+
+  // Hallazgo (sospecha 2, confirmada): el cuadrante se rotula con el SÍMBOLO DE GRADO
+  // (U+00B0): «2°» se lee «dos grados». El ordinal sería «2.º» (º, U+00BA, con punto), y el
+  // bloque educativo de la propia página los numera I, II, III y IV.
+  test.fail('135°: el cuadrante se rotula II (o 2.º), no «2°»', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, 'Ángulo (grados)', '135');
+    await expect(valorDe(page, 'sin(θ)')).toHaveText('0,70710678');
+    await expect(valorDe(page, 'Cuadrante')).not.toContainText('°'); // hoy «2°»
+  });
+
+  // Hallazgo: de las seis parejas de dos datos (el panel dice «Introduce al menos 2 valores»),
+  // solo tres calculan: a+b, a+c y a+α. Hipotenusa + ángulo —el caso 4 de la propia página—,
+  // cateto b + hipotenusa y cateto b + ángulo dejan «Ingresa los valores para calcular».
+  test.fail('Triángulo: hipotenusa 10 y α = 30° dan a = 5 y b = 8,6603', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Triángulo');
+    await escribir(page, 'Hipotenusa c', '10');
+    await escribir(page, 'Ángulo α (grados)', '30');
+    await expect(valorDe(page, 'Cateto a')).toHaveText('5,0000'); // 10 · sen 30°
+    await expect(valorDe(page, 'Cateto b')).toHaveText('8,6603'); // 10 · cos 30°
+  });
+
+  test.fail('Triángulo: cateto b = 4 e hipotenusa 5 dan a = 3', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Triángulo');
+    await escribir(page, 'Cateto b (adyacente)', '4');
+    await escribir(page, 'Hipotenusa c', '5');
+    await expect(valorDe(page, 'Cateto a')).toHaveText('3,0000'); // √(25 − 16)
+    await expect(valorDe(page, 'Ángulo A')).toHaveText('36,8699°'); // arcsen(3/5)
+  });
+
+  test.fail('Triángulo: cateto b = 4 y α = 30° dan a = 2,3094 y c = 4,6188', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Triángulo');
+    await escribir(page, 'Cateto b (adyacente)', '4');
+    await escribir(page, 'Ángulo α (grados)', '30');
+    await expect(valorDe(page, 'Cateto a')).toHaveText('2,3094'); // 4 · tan 30°
+    await expect(valorDe(page, 'Hipotenusa c')).toHaveText('4,6188'); // 4 / cos 30°
+  });
+
+  // Hallazgo: con los tres lados, el caso «dos catetos» gana y la hipotenusa tecleada se
+  // DESCARTA sin aviso: 1, 2 y 10 publican un triángulo de hipotenusa 2,2361. Igual con
+  // a = 3, b = 4, α = 60°: publica A = 36,8699° y el 60° desaparece.
+  test.fail('Triángulo 1, 2, 10: no publica una hipotenusa distinta de la tecleada', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Triángulo');
+    await escribir(page, 'Cateto a (opuesto)', '1');
+    await escribir(page, 'Cateto b (adyacente)', '2');
+    await escribir(page, 'Hipotenusa c', '10');
+    await expect(panelResultados(page)).not.toContainText('2,2361'); // hoy «Hipotenusa c 2,2361»
+  });
+
+  // Hallazgo: un dato imposible se trata como un dato que FALTA. Cateto 5 con hipotenusa 3 (o
+  // α = 0°, o α = 90°) deja «Ingresa los valores para calcular», aunque los dos valores estén
+  // escritos. casos.ts tiene ya el texto (ERROR_HIPOTENUSA_MENOR) y la vista no lo usa.
+  test.fail('Triángulo: cateto 5 con hipotenusa 3 explica que la hipotenusa es el lado mayor', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Triángulo');
+    await escribir(page, 'Cateto a (opuesto)', '5');
+    await escribir(page, 'Hipotenusa c', '3');
+    await expect(panelResultados(page)).toContainText(/hipotenusa/i);
+    await expect(panelResultados(page)).not.toContainText('Ingresa los valores para calcular');
+  });
+
+  // Hallazgo: la fracción de π se escribe «1π» y «1π/2», y 0° sale «0,0000π».
+  test.fail('Conversiones: 180° es «π», 90° es «π/2» y 0° es «0»', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Conversiones');
+    await escribir(page, 'Valor a convertir', '180');
+    await expect(valorDe(page, 'Fracción de π')).toHaveText('π'); // hoy «1π»
+    await escribir(page, 'Valor a convertir', '90');
+    await expect(valorDe(page, 'Fracción de π')).toHaveText('π/2'); // hoy «1π/2»
+    await escribir(page, 'Valor a convertir', '0');
+    await expect(valorDe(page, 'Fracción de π')).toHaveText('0'); // hoy «0,0000π»
+  });
+
+  // Hallazgo: page.tsx calcula cosResta (cos(A−B)) y nunca lo pinta; el panel de suma y resta
+  // enseña tres de las cuatro fórmulas que el bloque educativo escribe (cos(A±B)).
+  test.fail('Identidades: aparece cos(A−B) = 0,86602540 con A = 30° y B = 60°', async ({ page }) => {
+    await abrir(page);
+    await modo(page, 'Identidades');
+    await escribir(page, 'Ángulo A (grados)', '30');
+    await escribir(page, 'Ángulo B (grados) - opcional', '60');
+    await expect(valorDe(page, 'sin(A-B)')).toHaveText('-0,50000000');
+    await expect(valorDe(page, 'cos(A-B)')).toHaveText('0,86602540'); // cos(−30°); hoy no existe
+  });
+
+  // Hallazgo (sospecha 1, confirmada en pantalla): conUnidad (casos.ts:155) separa con un
+  // espacio el símbolo de grado de ángulo: «28,0725 °». La Ortografía de la RAE (2010) y el SI
+  // lo escriben pegado a la cifra («28,0725°»), a diferencia de «°C». Los pasos de la misma
+  // solución ya lo escriben pegado («θ = 28,0725°»): dos grafías en la misma caja.
+  test.fail('Caso 7: el veredicto y la solución escriben «28,0725°», pegado', async ({ page }) => {
+    await abrir(page);
+    const caso7 = page.locator('article').filter({ has: page.locator('#respuesta-caso-7') });
+    await caso7.locator('#respuesta-caso-7').fill('28,07');
+    await esperarValorEnReact(page, '#respuesta-caso-7', '28,07');
+    await caso7.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(caso7.getByRole('alert')).toContainText('Correcto: 28,0725°.'); // hoy «28,0725 °.»
+    await caso7.getByRole('button', { name: 'Ver solución' }).click();
+    await expect(caso7.locator('#solucion-caso-7 strong')).toHaveText('28,0725°'); // hoy «28,0725 °»
+  });
+
+  // Hallazgo: el ejemplo del arquitecto dice «rampa accesible (máx 8°)» y calcula 6·tan 8° ≈
+  // 0,84 m. El CTE DB SUA 4.3.1 limita las rampas de itinerario accesible al 10 % (< 3 m), 8 %
+  // (< 6 m) y 6 % en el resto: por CIENTO, no grados. 8° son un 14,05 %, fuera de toda rampa
+  // accesible; con 6 m el tope es 6 % → 0,36 m.
+  test.fail('Bloque educativo: la rampa accesible no se limita a «8°»', async ({ page }) => {
+    await abrir(page);
+    const texto = (await page.locator('body').textContent()) ?? '';
+    expect(texto).not.toContain('rampa accesible (máx 8°)');
+  });
+
+  // Hallazgo: el FAQPage del JSON-LD (lo que leen los buscadores y las IAs) promete
+  // arcoseno/arcocoseno/arcotangente y resolver triángulos con el teorema del seno y del
+  // coseno «con al menos tres datos». La interfaz no tiene ningún campo para una razón que
+  // invertir ni para un triángulo que no sea rectángulo.
+  test.fail('La promesa del JSON-LD se cumple en la interfaz', async ({ page }) => {
+    await abrir(page);
+    const jsonLd = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).join(' ');
+    if (jsonLd.includes('arcoseno, arcocoseno y arcotangente')) {
+      await expect(page.getByLabel(/arcsen|arcoseno|valor de la razón/i)).not.toHaveCount(0);
+    }
+    if (jsonLd.includes('teorema del coseno')) {
+      await expect(
+        page.getByRole('button', { name: /oblicu|cualquier triángulo/i }),
+      ).not.toHaveCount(0);
+    }
+  });
+
+  // Hallazgo: seis <h2> del bloque educativo llevan el emoji sin aria-hidden, así que el lector
+  // de pantalla lo lee dentro del título. Lo delata
+  // `node scripts/check-a11y-jsx.mjs app/calculadora-trigonometria/page.tsx` (L945…L1393).
+  test.fail('Bloque educativo: los títulos se anuncian sin el emoji', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // Testigo de que la guía está abierta y el título es visible: sin «exact» sí lo encuentra.
+    await expect(
+      page.getByRole('heading', { level: 2, name: /Las 6 Funciones Trigonométricas/ }),
+    ).toHaveCount(1);
+    // Hoy su nombre accesible es «📊 Las 6 Funciones Trigonométricas».
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Las 6 Funciones Trigonométricas', exact: true }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Mejores Prácticas', exact: true }),
+    ).toHaveCount(1);
+  });
+
+  // Hallazgo: contraste por debajo de 4,5:1 en texto pequeño. En claro, la etiqueta «Cálculo
+  // directo / Situación real» de cada caso (--primary sobre su 12 %) da 3,28:1; en oscuro, el
+  // botón activo «Grados (°)» (--primary sobre --bg-card) da 3,50:1. «Comprobar» (blanco sobre
+  // --primary) da 4,11:1 en los dos temas.
+  test.fail('Contraste en claro: la etiqueta de los casos llega a 4,5:1', async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('meskeia-theme', 'light');
+      } catch {
+        /* sin almacenamiento: el tema por defecto ya es claro */
+      }
+    });
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    const etiqueta = page.locator('article').first().getByText('Cálculo directo', { exact: true });
+    expect(await contrasteDe(etiqueta)).toBeGreaterThanOrEqual(4.5); // hoy 3,28
+  });
+
+  test.fail('Contraste en oscuro: el botón activo «Grados (°)» llega a 4,5:1', async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('meskeia-theme', 'dark');
+      } catch {
+        /* sin almacenamiento no hay tema oscuro que medir */
+      }
+    });
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    const boton = page.getByRole('button', { name: 'Grados (°)', exact: true });
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+    expect(await contrasteDe(boton)).toBeGreaterThanOrEqual(4.5); // hoy 3,50
   });
 });

@@ -720,3 +720,398 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
     await expect(fila).not.toContainText('−37,79');
   });
 });
+
+/*
+ * ─────────────────────────────────────────────────────────────────────────────
+ * RE-INSPECCIÓN del 25/09/2026, tras 3c41c63e y 78876cf2.
+ *
+ * Aquí se registra CADA llamada que la app hace a una AudioParam (frecuencia y ganancia), a
+ * start/stop del oscilador y a close() del contexto, con el reloj de audio del momento. Así se
+ * comprueba el patrón de rampas tal como se programa (entrada, volumen y salida ANTES del stop),
+ * no solo el valor que la ganancia tiene al muestrearla.
+ *
+ * Valores esperados, a mano (temperamento igual, La4 = 440 Hz; n = 12·log2(f/440) semitonos;
+ * nota = la de round(n); cents = 1200·log2(f / f_nota)):
+ *   · 452 Hz: n = 12·log2(1,027273) = +0,4658 → La4, 1200·log2(452/440) = +46,58 → «+46,6 cents».
+ *   · 453 Hz: n = +0,5041 → La♯4 (440·2^(1/12) = 466,164 Hz), 1200·log2(453/466,164) = −49,59
+ *     → «−49,6 cents». La frontera del cuarto de tono está en 440·2^(0,5/12) = 452,89 Hz.
+ *   · 27,5 Hz = La0 (440/16), la tecla más grave del piano; 27 Hz = 1200·log2(27/27,5) = −31,77.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+interface Llamada {
+  quien: string;
+  metodo: string;
+  args: number[];
+  /** Reloj de audio (ctx.currentTime) en el instante de la llamada */
+  ct: number;
+}
+
+declare global {
+  interface Window {
+    __llamadas: Llamada[];
+  }
+}
+
+test.describe('Inspección 25/09/2026 — re-inspección 2: rampas programadas, deslizador, decimales y datos', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__llamadas = [];
+      const dueno = new WeakMap<object, { id: string; ctx: BaseAudioContext }>();
+      const proto = BaseAudioContext.prototype;
+      const crearOsc = proto.createOscillator;
+      const crearGan = proto.createGain;
+      let nOsc = 0;
+      let nGan = 0;
+      proto.createOscillator = function (this: BaseAudioContext) {
+        const nodo = crearOsc.call(this);
+        const id = `osc${nOsc++}`;
+        dueno.set(nodo, { id, ctx: this });
+        dueno.set(nodo.frequency, { id: `${id}.frequency`, ctx: this });
+        return nodo;
+      };
+      proto.createGain = function (this: BaseAudioContext) {
+        const nodo = crearGan.call(this);
+        const id = `gain${nGan++}`;
+        dueno.set(nodo, { id, ctx: this });
+        dueno.set(nodo.gain, { id: `${id}.gain`, ctx: this });
+        return nodo;
+      };
+      const anotar = (obj: object, metodo: string, args: unknown[]): void => {
+        const d = dueno.get(obj);
+        if (!d) return;
+        window.__llamadas.push({
+          quien: d.id,
+          metodo,
+          args: args.filter((a): a is number => typeof a === 'number'),
+          ct: d.ctx.currentTime,
+        });
+      };
+      const param = AudioParam.prototype as unknown as Record<string, (...a: number[]) => AudioParam>;
+      for (const metodo of [
+        'setValueAtTime',
+        'linearRampToValueAtTime',
+        'exponentialRampToValueAtTime',
+        'setTargetAtTime',
+        'cancelScheduledValues',
+      ]) {
+        const original = param[metodo];
+        param[metodo] = function (this: AudioParam, ...args: number[]) {
+          anotar(this, metodo, args);
+          return original.apply(this, args);
+        };
+      }
+      const osc = OscillatorNode.prototype;
+      const arrancar = osc.start;
+      const parar = osc.stop;
+      osc.start = function (this: OscillatorNode, ...args: [number?]) {
+        anotar(this, 'start', args);
+        return arrancar.apply(this, args);
+      };
+      osc.stop = function (this: OscillatorNode, ...args: [number?]) {
+        anotar(this, 'stop', args);
+        return parar.apply(this, args);
+      };
+      const cerrar = AudioContext.prototype.close;
+      AudioContext.prototype.close = function (this: AudioContext) {
+        window.__llamadas.push({ quien: 'ctx', metodo: 'close', args: [], ct: this.currentTime });
+        return cerrar.call(this);
+      };
+    });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+  });
+
+  const llamadas = (page: Page): Promise<Llamada[]> => page.evaluate(() => window.__llamadas);
+
+  test('caso normal: Reproducir, volumen y Detener programan rampa de entrada, de volumen y de salida ANTES del stop', async ({
+    page,
+  }) => {
+    const nota = page.getByTestId('nota-cercana');
+    // 440 Hz = La4 exacto (0 cents).
+    await expect(nota).toHaveText('LaA4afinada (0 cents)');
+
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([440]);
+    let log = await llamadas(page);
+    // Frecuencia fijada en el reloj de audio antes de arrancar.
+    const freq = log.find((l) => l.quien === 'osc0.frequency' && l.metodo === 'setValueAtTime');
+    expect(freq?.args[0]).toBe(440);
+    // Entrada: setValueAtTime(0, t0) y linearRamp(0,5, t0 + 0,1); el start, después.
+    const iAncla = log.findIndex((l) => l.quien === 'gain0.gain' && l.metodo === 'setValueAtTime');
+    const iRampa = log.findIndex((l) => l.quien === 'gain0.gain' && l.metodo === 'linearRampToValueAtTime');
+    const iStart = log.findIndex((l) => l.quien === 'osc0' && l.metodo === 'start');
+    expect(log[iAncla].args[0], 'la entrada parte de 0').toBe(0);
+    expect(log[iRampa].args[0], 'hasta el volumen (50 %)').toBeCloseTo(0.5, 6);
+    expect(log[iRampa].args[1] - log[iAncla].args[1], 'rampa de entrada de 0,1 s').toBeCloseTo(0.1, 6);
+    expect(iAncla).toBeLessThan(iStart);
+    expect(iRampa).toBeLessThan(iStart);
+
+    // Volumen con el tono sonando (0,50 → 0,49): cancelar, anclar en el valor en curso y rampa de 0,05 s.
+    await page.waitForTimeout(250); // pasada la rampa de entrada
+    let desde = (await llamadas(page)).length;
+    await page.getByRole('slider', { name: 'Volumen' }).press('ArrowLeft');
+    await expect(page.getByRole('slider', { name: 'Volumen' })).toHaveAttribute('aria-valuetext', '49 %');
+    await expect.poll(async () => (await llamadas(page)).length).toBeGreaterThan(desde + 2);
+    log = (await llamadas(page)).slice(desde);
+    expect(log.map((l) => l.metodo)).toEqual(['cancelScheduledValues', 'setValueAtTime', 'linearRampToValueAtTime']);
+    expect(log[1].args[0], 'anclada en el valor en curso').toBeCloseTo(0.5, 3);
+    expect(log[2].args[0]).toBeCloseTo(0.49, 6);
+    expect(log[2].args[1] - log[1].args[1], 'rampa de volumen de 0,05 s').toBeCloseTo(0.05, 6);
+
+    // Detener: rampa a 0 anclada en el valor en curso y el stop en el mismo instante en que acaba.
+    await page.waitForTimeout(150);
+    desde = (await llamadas(page)).length;
+    await botonReproducir(page).click();
+    await expect(botonReproducir(page)).toHaveAttribute('aria-label', PARADO);
+    log = (await llamadas(page)).slice(desde);
+    expect(log.map((l) => `${l.quien}.${l.metodo}`)).toEqual([
+      'gain0.gain.cancelScheduledValues',
+      'gain0.gain.setValueAtTime',
+      'gain0.gain.linearRampToValueAtTime',
+      'osc0.stop',
+    ]);
+    expect(log[1].args[0], 'anclada en 0,49').toBeCloseTo(0.49, 3);
+    expect(log[2].args[0]).toBe(0);
+    expect(log[2].args[1] - log[1].args[1], 'rampa de salida de 0,1 s').toBeCloseTo(0.1, 6);
+    expect(log[3].args[0], 'stop al final de la rampa, en el reloj de audio').toBeCloseTo(log[2].args[1], 6);
+  });
+
+  test('caso normal: el preset 415 con el tono sonando retoca la frecuencia; la nota es Sol♯4 −1,3 cents', async ({
+    page,
+  }) => {
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([440]);
+    await page.getByRole('button', { name: /La 415Hz/ }).click();
+    // 1200·log2(415/440) = −101,27 cents del La4: la temperada más cercana es Sol♯4 = 415,305 Hz,
+    // de la que 415 Hz dista 1200·log2(415/415,305) = −1,27 → «−1,3 cents».
+    await expect(page.getByTestId('nota-cercana')).toHaveText('Sol♯G♯4−1,3 cents');
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([415]);
+    const cambio = (await llamadas(page)).filter((l) => l.quien === 'osc0.frequency').at(-1);
+    expect(cambio?.metodo).toBe('setValueAtTime');
+    expect(cambio?.args[0]).toBe(415);
+  });
+
+  test('caso límite: 452 Hz es La4 +46,6 cents y 453 Hz ya es La♯4 −49,6 cents (frontera en 452,89 Hz)', async ({
+    page,
+  }) => {
+    await botonReproducir(page).click();
+    const nota = page.getByTestId('nota-cercana');
+    const casos: [string, string][] = [
+      ['452', 'LaA4+46,6 cents'], // n = +0,4658 → La4; 1200·log2(452/440) = +46,58
+      ['453', 'La♯A♯4−49,6 cents'], // n = +0,5041 → La♯4 (466,164 Hz); 1200·log2(453/466,164) = −49,59
+    ];
+    for (const [entrada, texto] of casos) {
+      await page.locator(CAMPO).fill(entrada);
+      await esperarValorEnReact(page, CAMPO, entrada);
+      await expect(pantalla(page)).toHaveText(entrada);
+      await expect(nota, `${entrada} Hz`).toHaveText(texto);
+      await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([Number(entrada)]);
+    }
+  });
+
+  test('caso de rechazo: 19 → 20 y 2001 → 2000 al salir del campo; texto tecleado vuelve a 440', async ({
+    page,
+  }) => {
+    const campo = page.locator(CAMPO);
+    await botonReproducir(page).click();
+    // 19 está fuera (mínimo 20): mientras se escribe no cambia lo que suena; al salir, se recorta.
+    await page.getByRole('button', { name: /La 442Hz/ }).click();
+    await campo.fill('19');
+    await expect(pantalla(page), 'mientras se escribe, sigue el 442').toHaveText('442');
+    await campo.blur();
+    await esperarValorEnReact(page, CAMPO, '20');
+    await expect(pantalla(page)).toHaveText('20');
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([20]);
+
+    await campo.fill('2001');
+    await expect(pantalla(page)).toHaveText('20');
+    await campo.blur();
+    await esperarValorEnReact(page, CAMPO, '2000');
+    await expect(pantalla(page)).toHaveText('2000');
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([2000]);
+
+    // Letras tecleadas en un campo numérico: el navegador deja el valor vacío → el La estándar.
+    await page.getByRole('button', { name: /La 442Hz/ }).click();
+    await campo.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.type('abc');
+    await campo.blur();
+    await esperarValorEnReact(page, CAMPO, '440');
+    await expect(pantalla(page)).toHaveText('440');
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([440]);
+  });
+
+  /**
+   * Lo que un lector de pantalla anuncia para el deslizador de frecuencia, o null si no está
+   * visible. aria-valuetext manda sobre el número (WAI-ARIA 1.2); sin él, un <input type="range">
+   * anuncia su valor del DOM, ya recortado a [min, max]. Medido el 25/09/2026 en el árbol de
+   * accesibilidad de Chrome (CDP, Accessibility.getFullAXTree) con 1.000 Hz sonando: value 480,
+   * valuetext «480». Ojo: ese árbol NO refleja aria-valuetext en un range nativo (muestra el valor
+   * del DOM también con el atributo puesto), por eso aquí se lee el atributo.
+   */
+  async function valorAccesibleDeslizador(page: Page): Promise<string | null> {
+    const deslizador = page.locator('input[type="range"]:not([aria-label="Volumen"])');
+    if ((await deslizador.count()) === 0 || !(await deslizador.first().isVisible())) return null;
+    const primero = deslizador.first();
+    return (
+      (await primero.getAttribute('aria-valuetext')) ??
+      (await primero.getAttribute('aria-valuenow')) ??
+      (await primero.inputValue())
+    );
+  }
+
+  /*
+   * HALLAZGO (25/09/2026, sospecha confirmada). El deslizador de frecuencia va de 400 a 480; con
+   * una frecuencia fuera de ese rango, el <input type="range"> recorta su valor al extremo y no
+   * lleva aria-valuetext: con 1.000 Hz sonando, el lector de pantalla anuncia «480» (medido en
+   * el árbol de accesibilidad de Chrome: value 480, valuetext «480»); con 20 Hz, «400». Además,
+   * End o → no hacen nada (el DOM ya está en 480) y ← salta de 1.000 a 479 Hz.
+   * Correcto: si el deslizador se expone, su valor accesible dice la frecuencia que suena.
+   */
+  test('hallazgo: con 1.000 Hz sonando, el deslizador de frecuencia no anuncia 480', async ({ page }) => {
+    test.fail();
+    await page.locator(CAMPO).fill('1000');
+    await esperarValorEnReact(page, CAMPO, '1000');
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([1000]);
+    const valor = await valorAccesibleDeslizador(page);
+    if (valor !== null) {
+      expect(valor, 'suena 1.000 Hz').toMatch(/1\.?000/);
+    }
+    await page.locator(CAMPO).fill('20');
+    await esperarValorEnReact(page, CAMPO, '20');
+    const valor20 = await valorAccesibleDeslizador(page);
+    if (valor20 !== null) {
+      expect(valor20, 'suena 20 Hz').toMatch(/\b20\b/);
+    }
+  });
+
+  /*
+   * HALLAZGO (25/09/2026). El campo lee con parseInt: los decimales se TRUNCAN (no se redondean,
+   * aunque aplicarFrecuencia redondea), y el navegador sí acepta «27,5» y lo entrega como «27.5».
+   * 27,5 Hz es el La0, la tecla más grave del piano: suena 27 Hz, 1200·log2(27/27,5) = −31,8 cents
+   * (la propia etiqueta lo delata: «La A0 −31,8 cents»). 440,9 → 440 en vez de 441.
+   * Correcto: suena el valor pedido o, si la app solo admite enteros, el entero más cercano.
+   */
+  test('hallazgo: 27,5 Hz (La0) no se trunca a 27 Hz, ni 440,9 a 440', async ({ page }) => {
+    test.fail();
+    await botonReproducir(page).click();
+    const campo = page.locator(CAMPO);
+    const casos: [string, number, number][] = [
+      ['27.5', 27.5, 28], // La0 = 440/16 = 27,5 Hz; redondeado, 28
+      ['440.9', 440.9, 441], // redondeado, 441
+    ];
+    for (const [entrada, exacto, redondeado] of casos) {
+      await page.getByRole('button', { name: /La 442Hz/ }).click();
+      await expect.poll(async () => (await sonando(page))[0]?.frecuencia).toBe(442);
+      await campo.fill(entrada);
+      await campo.blur();
+      // Se sondea hasta que suene uno de los dos valores aceptables (partiendo de 442, que no lo es).
+      await expect
+        .poll(
+          async () => {
+            const f = (await sonando(page))[0]?.frecuencia;
+            return `${f} Hz`;
+          },
+          { message: `campo «${entrada}»: debe sonar ${exacto} o ${redondeado} Hz`, timeout: 2000 },
+        )
+        .toMatch(new RegExp(`^(${String(exacto).replace('.', '\\.')}|${redondeado}) Hz$`));
+    }
+  });
+
+  /*
+   * HALLAZGO (25/09/2026). Al desmontar la página con el tono sonando (clic en una app
+   * relacionada: navegación de cliente), el efecto de limpieza hace oscillator.stop() sin
+   * argumento y audioContext.close() en el mismo instante, sin ninguna rampa sobre la ganancia:
+   * el tono se corta en seco desde 0,5, el chasquido que Detener sí evita.
+   * Correcto: una rampa de la ganancia a 0 antes de parar el oscilador o cerrar el contexto.
+   */
+  test('hallazgo: salir a otra app con el tono sonando hace rampa de salida antes de cortar', async ({ page }) => {
+    test.fail();
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([440]);
+    await page.waitForTimeout(300); // pasada la rampa de entrada: la ganancia está en 0,5
+    const desde = (await llamadas(page)).length;
+    await page.locator('a[href*="/afinador-instrumentos/"]').first().click();
+    await page.waitForURL(/afinador-instrumentos/);
+    await page.waitForTimeout(500);
+    const log = (await llamadas(page)).slice(desde);
+    const iCorte = log.findIndex((l) => (l.quien === 'osc0' && l.metodo === 'stop') || l.metodo === 'close');
+    expect(iCorte, `llamadas: ${JSON.stringify(log)}`).toBeGreaterThanOrEqual(0);
+    const iRampa = log.findIndex(
+      (l) =>
+        l.quien === 'gain0.gain' &&
+        ((l.metodo === 'linearRampToValueAtTime' && l.args[0] === 0) || (l.metodo === 'setTargetAtTime' && l.args[0] === 0)),
+    );
+    expect(iRampa, `rampa a 0 antes del corte · llamadas: ${JSON.stringify(log)}`).toBeGreaterThanOrEqual(0);
+    expect(iRampa).toBeLessThan(iCorte);
+  });
+
+  /*
+   * HALLAZGO (25/09/2026, sospecha confirmada con fuentes consultadas en sesión). La fila
+   * «Europeo alto · 442,0 Hz» pone como usuarias a las «Orquestas de Viena, Berlín». La
+   * Filarmónica de Viena afina a 443 Hz: en.wikipedia «Vienna Philharmonic» («The orchestra's
+   * standard tuning pitch is A4=443 Hz», citando wienerphilharmoniker.at, «Viennese Sound»);
+   * de.wikipedia «Kammerton» («2016 wird allerdings auch bei den Wiener Philharmonikern auf
+   * 443 Hz (+12 Cent) eingestimmt», citando a C. Hellsberg, «Gedanken zum Stimmton», Bühne 9/2016;
+   * antes, 444-445 Hz). Y Berlín sale a la vez en la fila de 442 y en la de 443.
+   */
+  test('hallazgo: la tabla no pone a Viena en 442 Hz', async ({ page }) => {
+    test.fail();
+    const fila442 = page.locator('table tbody tr').filter({ hasText: '442,0 Hz' });
+    await expect(fila442).toHaveCount(1);
+    await expect(fila442).not.toContainText('Viena');
+  });
+
+  /*
+   * HALLAZGO (25/09/2026). El escenario «Afinar guitarra acústica» dice: genera el La4 a 440 Hz,
+   * toca la cuerda La (5ª) «y ajusta la clavija hasta que ambos tonos suenen igual». La 5ª cuerda
+   * al aire es La2 = 110 Hz (en.wikipedia «Guitar tunings», afinación estándar: «5 (A) | 110.00 Hz
+   * | A2»), dos octavas por debajo: nunca «suenan igual». Se compara con su armónico del traste 5
+   * (4 × 110 = 440 Hz) o se genera 110 Hz, que el campo libre admite.
+   * Correcto: el escenario menciona los 110 Hz, el armónico o la diferencia de octavas.
+   */
+  test('hallazgo: el escenario de guitarra no manda igualar la 5ª cuerda al aire con 440 Hz', async ({ page }) => {
+    test.fail();
+    const tarjeta = page.locator('[class*="escenarioCard"]').filter({ hasText: 'Afinar guitarra acústica' });
+    await expect(tarjeta).toHaveCount(1);
+    await expect(tarjeta).toContainText(/110 Hz|armónico|octava/);
+  });
+
+  test('móvil 390 px: sin scroll horizontal, y lo que suena es lo que se toca (415, triangular, 452)', async ({
+    browser,
+  }) => {
+    const ctx = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+    const movil = await ctx.newPage();
+    await instrumentarAudio(movil);
+    await movil.goto(RUTA);
+    await esperarHidratacion(movil, [CAMPO]);
+    const anchos = await movil.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      cliente: document.documentElement.clientWidth,
+    }));
+    expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
+
+    await movil.getByRole('button', { name: /La 415Hz/ }).tap();
+    await movil.getByRole('button', { name: /Triangular/ }).tap();
+    await movil.getByRole('button', { name: /tono de referencia/ }).tap();
+    await expect.poll(async () => (await sonando(movil)).map((o) => [o.tipo, o.frecuencia])).toEqual([['triangle', 415]]);
+    await movil.locator(CAMPO).tap();
+    await movil.locator(CAMPO).fill('452');
+    await esperarValorEnReact(movil, CAMPO, '452');
+    // 452 Hz: La4 +46,58 cents (a mano, arriba).
+    await expect(movil.getByTestId('nota-cercana')).toHaveText('LaA4+46,6 cents');
+    await expect.poll(async () => (await sonando(movil)).map((o) => [o.tipo, o.frecuencia])).toEqual([['triangle', 452]]);
+    await movil.getByRole('button', { name: /tono de referencia/ }).tap();
+    await expect.poll(() => sonando(movil)).toHaveLength(0);
+    await ctx.close();
+  });
+});
