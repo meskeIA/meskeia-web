@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Ciclo del Carbono y del Nitrógeno: Ciclos Biogeoquímicos | meskeIA',
-  description: 'Los ciclos biogeoquímicos explicados con diagramas interactivos: el ciclo del carbono y el ciclo del nitrógeno, etapa por etapa. Incluye la pirámide trófica y la regla del 10% del flujo de energía.',
+  description: 'Los ciclos biogeoquímicos explicados con diagramas interactivos: el ciclo del carbono y el ciclo del nitrógeno, etapa por etapa. Incluye la pirámide trófica y la regla del 10 % del flujo de energía.',
   keywords: 'ecosistema, pirámide trófica, cadena trófica, regla del 10 por ciento, ciclo carbono, ciclo nitrógeno, flujo energía, red trófica, productores, consumidores, descomponedores, ecología',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Ciclo del Carbono y del Nitrógeno',
-    description: 'Pirámide trófica, regla del 10%, ciclos biogeoquímicos y datos fascinantes sobre ecología explicados visualmente.',
+    description: 'Pirámide trófica, regla del 10 %, ciclos biogeoquímicos y datos fascinantes sobre ecología explicados visualmente.',
     url: 'https://meskeia.com/visualizador-ecosistema/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -34,12 +34,12 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Ciclo del Carbono y del Nitrógeno',
-  description: 'Explicador visual interactivo sobre ecosistemas: pirámide trófica con 4 niveles, regla del 10% del flujo de energía, ciclos biogeoquímicos del carbono y nitrógeno, redes tróficas y datos fascinantes sobre ecología y naturaleza.',
+  description: 'Explicador visual interactivo sobre ecosistemas: pirámide trófica con 4 niveles, regla del 10 % del flujo de energía, ciclos biogeoquímicos del carbono y nitrógeno, redes tróficas y datos fascinantes sobre ecología y naturaleza.',
   url: 'https://meskeia.com/visualizador-ecosistema/',
   category: 'EducationalApplication',
   features: [
     'Pirámide trófica interactiva con 4 niveles y descomponedores',
-    'Regla del 10%: flujo de energía entre niveles tróficos',
+    'Regla del 10 %: flujo de energía entre niveles tróficos, como media y no como ley',
     'Ciclos biogeoquímicos del carbono y nitrógeno con diagramas circulares',
     'Datos fascinantes sobre ecología y naturaleza',
   ],
@@ -54,15 +54,19 @@ export const faqJsonLd = {
       name: '¿Qué es la pirámide trófica y cómo funciona?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pirámide trófica representa los niveles de alimentación en un ecosistema: productores (plantas), consumidores primarios (herbívoros), consumidores secundarios (carnívoros) y descomponedores. Cada nivel obtiene energía del inferior, pero solo transfiere aproximadamente el 10% de esa energía al siguiente nivel; el resto se pierde como calor. Por eso las poblaciones de depredadores son siempre mucho menores que las de sus presas.',
+        // Hallazgo 1743: metía a los descomponedores como nivel (la app dice que no lo son) y decía
+        // «siempre» de una pirámide de números que puede invertirse.
+        text: 'La pirámide trófica representa los niveles de alimentación de un ecosistema: productores (plantas, algas), consumidores primarios (herbívoros) y consumidores secundarios y terciarios (carnívoros). Los descomponedores no ocupan un nivel propio: reciclan la materia muerta de todos ellos. Cada nivel aprovecha de media en torno al 10 % de la energía del anterior, así que la pirámide de energía se estrecha al subir. Las de biomasa y número de individuos suelen hacerlo también, pero pueden invertirse: en el mar, el zooplancton puede pesar más que el fitoplancton del que se alimenta, y un solo árbol sostiene a miles de insectos.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué es la regla del 10% en ecología?',
+      name: '¿Qué es la regla del 10 % en ecología?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La regla del 10% establece que al pasar de un nivel trófico al siguiente solo se transfiere el 10% de la energía disponible; el 90% restante se disipa como calor metabólico. Esto significa que se necesitan 10 kg de plantas para producir 1 kg de herbívoro, y 10 kg de herbívoro para producir 1 kg de carnívoro. Esta limitación explica por qué las cadenas alimentarias rara vez superan los 4-5 eslabones.',
+        // Hallazgo 1734: la enunciaba como ley exacta y decía que «el 90 % restante se disipa como
+        // calor metabólico», contra el reparto de la propia app (respiración, desechos, no consumido).
+        text: 'Es una aproximación, no una ley exacta: de media, en torno al 10 % de la energía de un nivel trófico pasa a formar parte del siguiente. El resto no llega: una parte se disipa como calor en la respiración y otra queda en heces, desechos y partes no consumidas, que aprovechan los descomponedores. Se suele atribuir a Raymond Lindeman (1942), que citó eficiencias desde el 0,1 % hasta el 37,5 %, así que la cifra real varía mucho entre ecosistemas. Aplicada a grandes rasgos, hacen falta del orden de 10 kg de plantas por kg de herbívoro, y explica por qué las cadenas alimentarias rara vez superan los cuatro o cinco eslabones.',
       },
     },
     {

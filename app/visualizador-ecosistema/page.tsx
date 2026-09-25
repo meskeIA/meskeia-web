@@ -2,6 +2,7 @@
 // @disclaimer: exempt
 
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import styles from './Ecosistema.module.css';
 import {
   MeskeiaLogo,
@@ -11,8 +12,14 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  flujoEnergia,
+  formatEntero,
+  formatPorcentaje,
+  kgProductorPorKg,
+  porcentajeDeLosProductores,
+} from './motor';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -30,9 +37,19 @@ interface SeccionInfo {
 const SECCIONES: SeccionInfo[] = [
   { id: 'ciclos', titulo: 'Ciclos biogeoquímicos', icono: '🔄', subtitulo: 'El carbono y el nitrógeno nunca se destruyen' },
   { id: 'piramide', titulo: 'Pirámide trófica', icono: '🔺', subtitulo: 'Los niveles de la vida: quién come a quién' },
-  { id: 'regla10', titulo: 'Regla del 10%', icono: '⚡', subtitulo: 'Por qué se pierde el 90% de la energía' },
+  { id: 'regla10', titulo: 'Regla del 10 %', icono: '⚡', subtitulo: 'Por qué la energía disminuye tanto al subir de nivel' },
   { id: 'datos', titulo: 'Datos fascinantes', icono: '🌍', subtitulo: 'Naturaleza en números que sorprenden' },
 ];
+
+// Colores de nivel. `color` es el tono de identidad (bordes y barras, sin texto encima);
+// `colorTexto` es un token del módulo con variante clara y oscura, porque los tonos -600 de
+// Tailwind como texto pequeño daban 2,6-3,9:1 (hallazgo 1738).
+const TONOS = {
+  productor: { color: '#16A34A', colorTexto: 'var(--eco-productor)' },
+  primario: { color: '#CA8A04', colorTexto: 'var(--eco-primario)' },
+  secundario: { color: '#EA580C', colorTexto: 'var(--eco-secundario)' },
+  terciario: { color: '#DC2626', colorTexto: 'var(--eco-terciario)' },
+};
 
 // ─────────────────────────────────────────────
 // Datos: Pirámide trófica
@@ -42,65 +59,91 @@ interface NivelTrofico {
   nombre: string;
   icono: string;
   color: string;
+  colorTexto: string;
   colorFondo: string;
-  anchoPct: number;
+  /** Ancho del escalón en escritorio y en móvil. Crecen de arriba abajo en los dos: con el
+   *  10 % de antes el nivel superior medía 77 px y su texto se salía, y en móvil un
+   *  `min-width: 80%` igualaba los tres de arriba (hallazgo 1737). */
+  ancho: string;
+  anchoMovil: string;
+  /** Transferencias desde los productores: de aquí sale el % de energía (motor.ts). */
+  transferencias: number;
   ejemplos: string[];
   biomasa: string;
   numEspecies: string;
   descripcion: string;
-  energia: string;
 }
 
+// Biomasa y especies: antes eran el ÷10 aplicado donde no aplica («~1.000 kg por hectárea»,
+// «Miles» de especies de herbívoros; hallazgo 1736). Fuentes: Whittaker y Likens (1975),
+// biomasa vegetal media por ecosistema; Kew, State of the World's Plants 2016 (~391.000
+// plantas vasculares); casi la mitad del ~1 millón de insectos descritos son fitófagos;
+// World Spider Catalog (más de 50.000 arañas descritas, todas depredadoras).
 const NIVELES_TROFICOS: NivelTrofico[] = [
   {
     nombre: 'Consumidores terciarios',
     icono: '🦅',
-    color: '#DC2626',
+    ...TONOS.terciario,
     colorFondo: 'rgba(220,38,38,0.1)',
-    anchoPct: 10,
-    ejemplos: ['Águilas', 'Lobos', 'Tiburones', 'Orcas', 'Leones'],
-    biomasa: '~1 kg por hectárea',
-    numEspecies: 'Muy pocas (decenas)',
-    descripcion: 'Superdepredadores. No tienen depredadores naturales. Regulan las poblaciones de niveles inferiores.',
-    energia: '0,1% de la energía original',
+    ancho: '40%',
+    anchoMovil: '55%',
+    transferencias: 3,
+    ejemplos: ['Águilas', 'Lobos', 'Atún', 'Tiburones', 'Orcas'],
+    biomasa: 'La más pequeña de la pirámide: pocos individuos grandes, repartidos en territorios amplios.',
+    numEspecies: 'Pocas en comparación con los niveles de abajo (cientos, no cientos de miles).',
+    descripcion: 'Depredadores de lo alto de la cadena: de adultos tienen pocos o ningún depredador natural. Regulan las poblaciones de los niveles inferiores.',
   },
   {
     nombre: 'Consumidores secundarios',
     icono: '🦊',
-    color: '#EA580C',
+    ...TONOS.secundario,
     colorFondo: 'rgba(234,88,12,0.1)',
-    anchoPct: 25,
-    ejemplos: ['Zorros', 'Serpientes', 'Ranas', 'Búhos', 'Atún'],
-    biomasa: '~10 kg por hectárea',
-    numEspecies: 'Centenares',
+    ancho: '60%',
+    anchoMovil: '70%',
+    transferencias: 2,
+    ejemplos: ['Zorros', 'Serpientes', 'Ranas', 'Búhos', 'Arañas'],
+    biomasa: 'En casi todos los ecosistemas, menor que la de los herbívoros de los que se alimentan.',
+    numEspecies: 'Decenas de miles como mínimo: solo las arañas, todas depredadoras, superan las 50.000 especies descritas.',
     descripcion: 'Carnívoros que se alimentan de herbívoros. Controlan las poblaciones de consumidores primarios.',
-    energia: '1% de la energía original',
   },
   {
     nombre: 'Consumidores primarios',
     icono: '🐇',
-    color: '#CA8A04',
+    ...TONOS.primario,
     colorFondo: 'rgba(202,138,4,0.1)',
-    anchoPct: 50,
+    ancho: '80%',
+    anchoMovil: '85%',
+    transferencias: 1,
     ejemplos: ['Conejos', 'Ciervos', 'Zooplancton', 'Saltamontes', 'Vacas'],
-    biomasa: '~100 kg por hectárea',
-    numEspecies: 'Miles',
-    descripcion: 'Herbívoros. Transforman la materia vegetal en proteína animal. Son la base de los carnívoros.',
-    energia: '10% de la energía original',
+    biomasa: 'En tierra, muy inferior a la vegetal. En el mar puede superar a la del fitoplancton que comen: la pirámide de biomasa se invierte porque el fitoplancton se renueva en días.',
+    numEspecies: 'Cientos de miles: casi la mitad del ~1 millón de insectos descritos come plantas, tantos como plantas vasculares hay.',
+    descripcion: 'Herbívoros. Transforman la materia vegetal en tejido animal. Son la base de los carnívoros.',
   },
   {
     nombre: 'Productores',
     icono: '🌿',
-    color: '#16A34A',
+    ...TONOS.productor,
     colorFondo: 'rgba(22,163,74,0.1)',
-    anchoPct: 100,
+    ancho: '100%',
+    anchoMovil: '100%',
+    transferencias: 0,
     ejemplos: ['Plantas', 'Algas', 'Fitoplancton', 'Cianobacterias', 'Musgos'],
-    biomasa: '~1.000 kg por hectárea',
-    numEspecies: 'Cientos de miles',
+    biomasa: 'En tierra, la mayor de la pirámide: de unas 7 t por hectárea en matorral desértico a unas 450 t en selva tropical (Whittaker y Likens, 1975). En mar abierto, apenas unos kilos de fitoplancton por hectárea.',
+    numEspecies: 'Unas 391.000 plantas vasculares conocidas (Kew, 2016), más algas y cianobacterias.',
     descripcion: 'Fotosíntesis: convierten la energía solar en materia orgánica. Son la base de toda la vida.',
-    energia: '100% — capturan ~1% de la energía solar',
   },
 ];
+
+/** «≈ 0,1 % de la energía de los productores» · la base dice lo que captan del sol. */
+function energiaDelNivel(nivel: NivelTrofico): string {
+  if (nivel.transferencias === 0) return `${formatPorcentaje(100)} · captan en torno al ${formatPorcentaje(1)} de la luz solar`;
+  return `≈ ${formatPorcentaje(porcentajeDeLosProductores(nivel.transferencias))} de la energía de los productores`;
+}
+
+// El atún está en el nivel superior de la pirámide (3 transferencias sobre el fitoplancton):
+// con la media del 10 %, 10³ = 1.000 kg por kg (hallazgo 1735).
+const NIVEL_ATUN = NIVELES_TROFICOS.find((n) => n.ejemplos.includes('Atún'));
+const KG_FITO_POR_KG_ATUN = kgProductorPorKg(NIVEL_ATUN?.transferencias ?? 3);
 
 interface Descomponedor {
   nombre: string;
@@ -115,23 +158,25 @@ const DESCOMPONEDORES: Descomponedor[] = [
 ];
 
 // ─────────────────────────────────────────────
-// Datos: Regla del 10%
+// Datos: Regla del 10 %
 // ─────────────────────────────────────────────
 
 interface NivelEnergia {
   nivel: string;
   icono: string;
-  kcal: number;
   color: string;
-  perdida: string;
+  colorTexto: string;
 }
 
-const FLUJO_ENERGIA: NivelEnergia[] = [
-  { nivel: 'Productores (plantas)', icono: '🌿', kcal: 10000, color: '#16A34A', perdida: '' },
-  { nivel: 'Herbívoros (conejo)', icono: '🐇', kcal: 1000, color: '#CA8A04', perdida: '9.000 kcal perdidas como calor, respiración y desechos' },
-  { nivel: 'Carnívoros (zorro)', icono: '🦊', kcal: 100, color: '#EA580C', perdida: '900 kcal perdidas como calor, respiración y desechos' },
-  { nivel: 'Superdepredador (águila)', icono: '🦅', kcal: 10, color: '#DC2626', perdida: '90 kcal perdidas como calor, respiración y desechos' },
+const NIVELES_FLUJO: NivelEnergia[] = [
+  { nivel: 'Productores (plantas)', icono: '🌿', ...TONOS.productor },
+  { nivel: 'Herbívoros (conejo)', icono: '🐇', ...TONOS.primario },
+  { nivel: 'Carnívoros (zorro)', icono: '🦊', ...TONOS.secundario },
+  { nivel: 'Superdepredador (águila)', icono: '🦅', ...TONOS.terciario },
 ];
+
+const BASE_KCAL = 10000;
+const FLUJO = flujoEnergia(BASE_KCAL, NIVELES_FLUJO.length);
 
 interface DestinoPerdida {
   destino: string;
@@ -140,6 +185,8 @@ interface DestinoPerdida {
   explicacion: string;
 }
 
+// Reparto ORIENTATIVO de la energía de un nivel: la vista lo presenta así, y el FAQPage ya no
+// dice que «el 90 % restante se disipa como calor» (hallazgo 1734).
 const DESTINO_ENERGIA: DestinoPerdida[] = [
   { destino: 'Respiración celular (calor)', porcentaje: 60, icono: '🌡️', explicacion: 'Los organismos queman energía para moverse, crecer y mantener la temperatura corporal' },
   { destino: 'Desechos y excreciones', porcentaje: 20, icono: '💩', explicacion: 'Heces, orina y otros productos metabólicos que no se asimilan' },
@@ -165,6 +212,10 @@ interface CicloBio {
   nombre: string;
   icono: string;
   color: string;
+  /** Texto del centro del diagrama (token con variante oscura). */
+  colorTexto: string;
+  /** Fondo del botón activo, con texto blanco encima: ≥ 4,5:1 en los dos temas. */
+  colorBoton: string;
   etapas: EtapaCiclo[];
   impactoHumano: string;
 }
@@ -175,12 +226,14 @@ const CICLOS: CicloBio[] = [
     nombre: 'Ciclo del Carbono',
     icono: '🌱',
     color: '#16A34A',
+    colorTexto: 'var(--eco-productor)',
+    colorBoton: '#166534',
     etapas: [
       { nombre: 'Fotosíntesis', icono: '☀️', descripcion: 'Las plantas absorben CO₂ y lo convierten en glucosa usando la luz solar.', detalle: '6CO₂ + 6H₂O + luz → C₆H₁₂O₆ + 6O₂' },
       { nombre: 'Respiración', icono: '🫁', descripcion: 'Todos los seres vivos queman glucosa y liberan CO₂ de vuelta a la atmósfera.', detalle: 'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + energía' },
-      { nombre: 'Descomposición', icono: '🍄', descripcion: 'Los descomponedores liberan CO₂ al descomponer materia orgánica muerta.', detalle: 'Hongos y bacterias procesan ~90% de la materia muerta en bosques' },
+      { nombre: 'Descomposición', icono: '🍄', descripcion: 'Los descomponedores liberan CO₂ al descomponer materia orgánica muerta.', detalle: 'En tierra, en torno al 90 % de la producción vegetal no se la come ningún herbívoro: acaba como materia muerta que procesan hongos y bacterias (Gessner et al., 2010)' },
       { nombre: 'Combustibles fósiles', icono: '⛽', descripcion: 'El carbono almacenado durante millones de años se libera al quemar petróleo, carbón y gas.', detalle: 'La humanidad libera ~36.000 millones de toneladas de CO₂ al año' },
-      { nombre: 'Océanos (sumidero)', icono: '🌊', descripcion: 'Los océanos absorben ~25% del CO₂ emitido por los humanos, acidificándose.', detalle: 'El pH oceánico ha bajado 0,1 unidades desde la era preindustrial (un 30% más ácido)' },
+      { nombre: 'Océanos (sumidero)', icono: '🌊', descripcion: 'Los océanos absorben ~25 % del CO₂ emitido por los humanos, acidificándose.', detalle: 'El pH oceánico ha bajado 0,1 unidades desde la era preindustrial (un 30 % más ácido)' },
     ],
     impactoHumano: 'La quema de combustibles fósiles libera carbono que estuvo enterrado millones de años, acelerando el efecto invernadero y el cambio climático.',
   },
@@ -189,8 +242,10 @@ const CICLOS: CicloBio[] = [
     nombre: 'Ciclo del Nitrógeno',
     icono: '🔵',
     color: '#2563EB',
+    colorTexto: 'var(--eco-nitrogeno)',
+    colorBoton: '#1D4ED8',
     etapas: [
-      { nombre: 'Fijación', icono: '🦠', descripcion: 'Bacterias del suelo (Rhizobium) convierten el N₂ atmosférico en amoniaco (NH₃).', detalle: 'El 78% del aire es N₂, pero los seres vivos no pueden usarlo directamente' },
+      { nombre: 'Fijación', icono: '🦠', descripcion: 'Bacterias del suelo (Rhizobium) convierten el N₂ atmosférico en amoniaco (NH₃).', detalle: 'El 78 % del aire es N₂, pero los seres vivos no pueden usarlo directamente' },
       { nombre: 'Nitrificación', icono: '⚗️', descripcion: 'Otras bacterias transforman el NH₃ en nitritos (NO₂⁻) y luego en nitratos (NO₃⁻).', detalle: 'Los nitratos son la forma que las plantas pueden absorber por las raíces' },
       { nombre: 'Asimilación', icono: '🌱', descripcion: 'Las plantas absorben NO₃⁻ y lo usan para fabricar aminoácidos y proteínas.', detalle: 'El nitrógeno es esencial para el ADN, proteínas y clorofila' },
       { nombre: 'Consumo y descomposición', icono: '🐇', descripcion: 'Los animales obtienen nitrógeno al comer plantas. Al morir, los descomponedores lo devuelven al suelo.', detalle: 'Las heces y la orina son ricas en compuestos nitrogenados (urea, ácido úrico)' },
@@ -212,14 +267,22 @@ interface DatoFascinante {
 }
 
 const DATOS_FASCINANTES: DatoFascinante[] = [
-  { icono: '🌿', titulo: 'Eficiencia solar', dato: 'Solo ~1%', detalle: 'Los productores capturan apenas el 1% de la energía solar que reciben. El resto se refleja o se convierte en calor.' },
-  { icono: '🐺', titulo: 'Lobos de Yellowstone', dato: 'Cambiaron ríos', detalle: 'Reintroducir lobos en 1995 redujo la población de ciervos, la vegetación se recuperó, las raíces estabilizaron las orillas y los ríos cambiaron de curso. Es el ejemplo más famoso de cascada trófica.' },
-  { icono: '🌊', titulo: 'Fitoplancton', dato: '50-80% del O₂', detalle: 'El fitoplancton marino produce entre el 50% y el 80% del oxígeno que respiras. Son organismos microscópicos, pero su impacto es planetario.' },
+  { icono: '🌿', titulo: 'Eficiencia solar', dato: 'Solo ~1 %', detalle: 'Los productores capturan en torno al 1 % (a menudo menos) de la energía solar que reciben. El resto se refleja o se convierte en calor.' },
+  // Hallazgo 1741: el efecto sobre los ríos se afirmaba como hecho. Es una hipótesis debatida:
+  // Marshall, Hobbs y Cooper (2013, Proc. R. Soc. B) y Hobbs et al. (2024, Ecological Monographs).
+  { icono: '🐺', titulo: 'Lobos de Yellowstone', dato: '¿Cambiaron los ríos?', detalle: 'Tras reintroducir lobos en 1995 se describió una cascada trófica: menos uapitíes ramoneando, recuperación de sauces y álamos y, según la hipótesis que popularizó el vídeo «How Wolves Change Rivers», orillas más estables. Es un caso muy debatido: estudios de campo de 20 años (Marshall, Hobbs y Cooper, 2013; Hobbs et al., 2024) encuentran que los sauces apenas se recuperan donde los arroyos se encajaron tras desaparecer los castores, y que el efecto de los lobos es menor de lo que se contó.' },
+  { icono: '🌊', titulo: 'Fitoplancton', dato: '50-80 % del O₂', detalle: 'Según la NOAA, entre el 50 % y el 80 % del oxígeno que se produce en la Tierra sale del océano, sobre todo del fitoplancton. Son organismos microscópicos, pero su impacto es planetario.' },
   { icono: '🍄', titulo: 'Sin descomponedores', dato: 'Tierra cubierta de muertos', detalle: 'Sin hongos y bacterias descomponedoras, la materia orgánica muerta se acumularía sin reciclarse. La Tierra estaría literalmente cubierta de cadáveres y hojarasca.' },
-  { icono: '🐜', titulo: 'Hormigas', dato: '15-20% biomasa animal', detalle: 'Las hormigas representan entre el 15% y el 20% de la biomasa animal terrestre. Hay aproximadamente 20.000 billones de hormigas en el planeta.' },
+  // Antes: «15-20 % de la biomasa animal terrestre», una cifra antigua que el recuento de
+  // Schultheiss et al. (2022, PNAS) deja muy por encima: ~12 Mt de carbono en total.
+  { icono: '🐜', titulo: 'Hormigas', dato: '~20.000 billones', detalle: 'Se estima que hay unos 20.000 billones de hormigas (Schultheiss et al., 2022), con unos 12 millones de toneladas de carbono: más que todas las aves y los mamíferos salvajes juntos.' },
   { icono: '🌡️', titulo: 'Efecto invernadero natural', dato: '+33 °C', detalle: 'Sin el efecto invernadero natural (sin intervención humana), la temperatura media de la Tierra sería -18 °C en vez de 15 °C. El problema es el exceso de gases añadido por la actividad humana.' },
-  { icono: '🔄', titulo: 'Tu agua es antigua', dato: 'Miles de millones de años', detalle: 'El agua de tu cuerpo ha pasado por el ciclo hidrológico miles de millones de veces. Las mismas moléculas estuvieron en dinosaurios, volcanes y glaciares.' },
-  { icono: '🐟', titulo: 'El atún y el fitoplancton', dato: '10.000 → 1 kg', detalle: 'Se necesitan aproximadamente 10.000 kg de fitoplancton para producir 1 kg de atún, porque la energía se pierde en cada nivel trófico.' },
+  // Hallazgo 1740: decía «miles de millones de veces». USGS: ~1.386 millones de km³ de agua y
+  // ~577.000 km³ evaporados al año (502.800 del océano + 74.200 de tierra) → ~2.400 años por
+  // vuelta; en ~4.000 millones de años, del orden de 1,5 millones de vueltas.
+  { icono: '🔄', titulo: 'Tu agua es antigua', dato: 'Miles de millones de años', detalle: 'La Tierra tiene unos 1.386 millones de km³ de agua y cada año se evaporan unos 577.000: de media, una molécula tarda unos 2.400 años en dar la vuelta al ciclo hidrológico. Desde que hay océanos, eso da del orden de un millón y medio de vueltas. Las mismas moléculas estuvieron en glaciares, nubes y dinosaurios.' },
+  // Hallazgo 1735: decía «10.000 kg», que exige cuatro transferencias (un quinto nivel).
+  { icono: '🐟', titulo: 'El atún y el fitoplancton', dato: 'Miles de kg → 1 kg', detalle: `Con la media del 10 % por nivel, 1 kg de atún exige del orden de ${formatEntero(kgProductorPorKg(3))} a ${formatEntero(Math.round(kgProductorPorKg(3.4) / 100) * 100)} kg de fitoplancton: el atún rabil se alimenta en torno al nivel trófico 4,4 (FishBase), unas 3,4 transferencias por encima del fitoplancton (10 elevado a 3 = ${formatEntero(kgProductorPorKg(3))}; 10 elevado a 3,4 ≈ ${formatEntero(Math.round(kgProductorPorKg(3.4) / 100) * 100)}). Como la eficiencia real varía mucho, es un orden de magnitud, no una cifra exacta.` },
 ];
 
 // ─────────────────────────────────────────────
@@ -232,7 +295,11 @@ function SeccionPiramide() {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>La <strong>pirámide trófica</strong> muestra cómo se organiza la vida: los productores en la base sostienen a todos los demás niveles. Cada nivel tiene menos biomasa y menos energía.</p>
+        <p>
+          La <strong>pirámide trófica</strong> muestra cómo se organiza la vida: los productores en la base sostienen a todos los demás niveles.
+          Lo que siempre disminuye al subir es la <strong>energía</strong>. La biomasa y el número de individuos suelen disminuir, pero pueden
+          invertirse: en el mar, el zooplancton puede pesar más que el fitoplancton que come, y un solo árbol alimenta a miles de insectos.
+        </p>
       </div>
 
       {/* Pirámide visual */}
@@ -243,23 +310,24 @@ function SeccionPiramide() {
             type="button"
             className={`${styles.piramideNivel} ${nivelActivo === i ? styles.piramideNivelActivo : ''}`}
             style={{
-              width: `${nivel.anchoPct}%`,
+              '--ancho': nivel.ancho,
+              '--ancho-movil': nivel.anchoMovil,
               background: nivelActivo === i ? nivel.colorFondo : undefined,
               borderColor: nivelActivo === i ? nivel.color : undefined,
-            }}
+            } as CSSProperties}
             onClick={() => setNivelActivo(nivelActivo === i ? null : i)}
             aria-expanded={nivelActivo === i}
             aria-label={`${nivel.nombre}: ${nivel.ejemplos.join(', ')}`}
           >
             <span className={styles.piramideIcono} aria-hidden="true">{nivel.icono}</span>
             <span className={styles.piramideNombre}>{nivel.nombre}</span>
-            <span className={styles.piramideEnergia} style={{ color: nivel.color }}>{nivel.energia}</span>
+            <span className={styles.piramideEnergia} style={{ color: nivel.colorTexto }}>{energiaDelNivel(nivel)}</span>
           </button>
         ))}
         {/* Flechas de energía */}
         <div className={styles.piramideFlechas} aria-hidden="true">
           <span className={styles.piramideFlechaTexto}>Energía ↑</span>
-          <span className={styles.piramideFlechaSub}>Se pierde 90% en cada nivel</span>
+          <span className={styles.piramideFlechaSub}>Se pierde ~90&nbsp;% en cada nivel</span>
         </div>
       </div>
 
@@ -313,8 +381,9 @@ function SeccionPiramide() {
 
       <div className={styles.insight}>
         <p>
-          Se necesitan aproximadamente <strong>{formatNumber(10000, 0)} kg de fitoplancton</strong> para producir <strong>1 kg de atún</strong>.
-          Cada nivel trófico sostiene al siguiente, pero con enormes pérdidas de energía.
+          Con la media del 10&nbsp;% por nivel, <strong>1 kg de atún</strong>, en lo alto de la pirámide, exige del orden de{' '}
+          <strong>{formatEntero(KG_FITO_POR_KG_ATUN)} kg de fitoplancton</strong>: tres transferencias ({formatEntero(KG_FITO_POR_KG_ATUN)} → {formatEntero(kgProductorPorKg(2))} → {formatEntero(kgProductorPorKg(1))} → 1).
+          Es un orden de magnitud, no una cifra exacta: la eficiencia real cambia mucho de un ecosistema a otro.
         </p>
       </div>
     </div>
@@ -322,7 +391,7 @@ function SeccionPiramide() {
 }
 
 // ─────────────────────────────────────────────
-// Sección 2: Regla del 10%
+// Sección 2: Regla del 10 %
 // ─────────────────────────────────────────────
 
 function SeccionRegla10() {
@@ -331,7 +400,14 @@ function SeccionRegla10() {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>En cada nivel trófico, solo el <strong>10% de la energía</strong> pasa al siguiente. El 90% restante se pierde como calor, desechos y partes no consumidas.</p>
+        {/* Hallazgo 1734: se enunciaba como ley exacta. Mismo arreglo que en
+            simulador-ecosistema-trofico (hallazgo 1610). */}
+        <p>
+          La llamada <strong>regla del 10&nbsp;%</strong>, que se suele atribuir a Raymond Lindeman (1942), resume una media:
+          de la energía de un nivel trófico, en promedio solo <strong>en torno al 10&nbsp;%</strong> llega a formar parte del siguiente.
+          No es una ley exacta: Lindeman citó eficiencias desde el 0,1&nbsp;% hasta el 37,5&nbsp;%. Las cifras de abajo aplican esa media
+          al pie de la letra para ver el orden de magnitud.
+        </p>
       </div>
 
       {/* Barras decrecientes de energía */}
@@ -340,40 +416,42 @@ function SeccionRegla10() {
           <span aria-hidden="true">☀️</span>
           <span>Energía solar</span>
         </div>
-        {FLUJO_ENERGIA.map((nivel, i) => (
+        {NIVELES_FLUJO.map((nivel, i) => (
           <div key={i} className={styles.flujoNivel}>
             <div className={styles.flujoInfo}>
               <span aria-hidden="true">{nivel.icono}</span>
               <span className={styles.flujoNombre}>{nivel.nivel}</span>
-              <span className={styles.flujoKcal} style={{ color: nivel.color }}>{formatNumber(nivel.kcal, 0)} kcal</span>
+              <span className={styles.flujoKcal} style={{ color: nivel.colorTexto }}>{formatEntero(FLUJO[i].kcal)} kcal</span>
             </div>
             <div className={styles.flujoTrack}>
               <div
                 className={styles.flujoRelleno}
                 style={{
-                  width: `${(nivel.kcal / 10000) * 100}%`,
+                  width: `${(FLUJO[i].kcal / BASE_KCAL) * 100}%`,
                   background: nivel.color,
                 }}
               />
             </div>
-            {nivel.perdida && (
+            {FLUJO[i].perdida > 0 && (
               <div className={styles.flujoPerdida}>
                 <span className={styles.flujoFlechaPerdida} aria-hidden="true">↘</span>
-                <span className={styles.flujoPerdidaTexto}>{nivel.perdida}</span>
+                <span className={styles.flujoPerdidaTexto}>
+                  {formatEntero(FLUJO[i].perdida)} kcal que no pasan: calor de la respiración, desechos y partes no consumidas
+                </span>
               </div>
             )}
-            {i < FLUJO_ENERGIA.length - 1 && (
+            {i < NIVELES_FLUJO.length - 1 && (
               <div className={styles.flujoConector} aria-hidden="true">
-                <span>▼ solo 10% pasa</span>
+                <span>▼ de media, en torno al 10&nbsp;% pasa</span>
               </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* ¿Dónde va el 90%? */}
+      {/* ¿Adónde va el resto? */}
       <div className={styles.destinoCard}>
-        <h3 className={styles.destinoTitulo}>¿Dónde va el 90% que se pierde?</h3>
+        <h3 className={styles.destinoTitulo}>¿Adónde va la energía que no pasa?</h3>
         <div className={styles.destinoGrid}>
           {DESTINO_ENERGIA.map((d, i) => (
             <button
@@ -384,7 +462,7 @@ function SeccionRegla10() {
               aria-expanded={destinoActivo === i}
             >
               <span className={styles.destinoIcono} aria-hidden="true">{d.icono}</span>
-              <span className={styles.destinoPct}>{d.porcentaje}%</span>
+              <span className={styles.destinoPct}>{formatPorcentaje(d.porcentaje)}</span>
               <span className={styles.destinoNombre}>{d.destino}</span>
               {destinoActivo === i && (
                 <span className={styles.destinoExplicacion}>{d.explicacion}</span>
@@ -392,49 +470,58 @@ function SeccionRegla10() {
             </button>
           ))}
         </div>
+        <p className={styles.destinoNota}>
+          Reparto orientativo. Varía mucho entre organismos: en los animales de sangre caliente la respiración se lleva
+          bastante más, y en muchos invertebrados, menos.
+        </p>
       </div>
 
-      {/* Implicación vegetariana */}
+      {/* Implicación en la dieta: la regla aplicada al pie de la letra, sin hectáreas inventadas */}
       <div className={styles.implicacionCard}>
-        <h3 className={styles.implicacionTitulo}>Implicación: eficiencia de la dieta</h3>
+        <h3 className={styles.implicacionTitulo}>Implicación: un eslabón más en la dieta</h3>
         <div className={styles.implicacionGrid}>
           <div className={styles.implicacionCol}>
-            <span className={styles.implicacionColTitulo}><span aria-hidden="true">🥬</span> Dieta vegetariana</span>
+            <span className={styles.implicacionColTitulo}><span aria-hidden="true">🥬</span> Alimentos vegetales</span>
             <div className={styles.implicacionDato}>
-              <span className={styles.implicacionLabel}>Niveles tróficos</span>
+              <span className={styles.implicacionLabel}>Transferencias</span>
               <span className={styles.implicacionValor}>1 (plantas → humano)</span>
             </div>
             <div className={styles.implicacionDato}>
-              <span className={styles.implicacionLabel}>Eficiencia</span>
-              <span className={styles.implicacionValor} style={{ color: '#16A34A' }}>10%</span>
+              <span className={styles.implicacionLabel}>Energía vegetal que llega</span>
+              <span className={`${styles.implicacionValor} ${styles.valorProductor}`}>≈&nbsp;{formatPorcentaje(porcentajeDeLosProductores(1))}</span>
             </div>
             <div className={styles.implicacionDato}>
-              <span className={styles.implicacionLabel}>Terreno para 1 persona</span>
-              <span className={styles.implicacionValor}>~0,2 ha</span>
+              <span className={styles.implicacionLabel}>Plantas por cada 100 kcal que comes</span>
+              <span className={styles.implicacionValor}>≈&nbsp;{formatEntero(100 * kgProductorPorKg(1))} kcal</span>
             </div>
           </div>
           <div className={styles.implicacionCol}>
-            <span className={styles.implicacionColTitulo}><span aria-hidden="true">🥩</span> Dieta carnívora</span>
+            <span className={styles.implicacionColTitulo}><span aria-hidden="true">🥩</span> Alimentos animales</span>
             <div className={styles.implicacionDato}>
-              <span className={styles.implicacionLabel}>Niveles tróficos</span>
+              <span className={styles.implicacionLabel}>Transferencias</span>
               <span className={styles.implicacionValor}>2 (plantas → animal → humano)</span>
             </div>
             <div className={styles.implicacionDato}>
-              <span className={styles.implicacionLabel}>Eficiencia</span>
-              <span className={styles.implicacionValor} style={{ color: '#DC2626' }}>1%</span>
+              <span className={styles.implicacionLabel}>Energía vegetal que llega</span>
+              <span className={`${styles.implicacionValor} ${styles.valorTerciario}`}>≈&nbsp;{formatPorcentaje(porcentajeDeLosProductores(2))}</span>
             </div>
             <div className={styles.implicacionDato}>
-              <span className={styles.implicacionLabel}>Terreno para 1 persona</span>
-              <span className={styles.implicacionValor}>~2 ha (10x más)</span>
+              <span className={styles.implicacionLabel}>Plantas por cada 100 kcal que comes</span>
+              <span className={styles.implicacionValor}>≈&nbsp;{formatEntero(100 * kgProductorPorKg(2))} kcal (10 veces más)</span>
             </div>
           </div>
         </div>
+        <p className={styles.implicacionNota}>
+          Es la media del 10&nbsp;% aplicada al pie de la letra, para ver el orden de magnitud. La conversión real depende
+          mucho del animal y de cómo se cría, y los rumiantes aprovechan pastos que las personas no pueden comer: la superficie
+          de cultivo necesaria no sale de multiplicar por 10.
+        </p>
       </div>
 
       <div className={styles.insight}>
         <p>
-          Por cada nivel que subes en la pirámide, <strong>pierdes el 90% de la energía</strong>.
-          Esto explica por qué hay muchas más plantas que herbívoros, y muchos más herbívoros que depredadores.
+          Como en cada paso se pierde <strong>de media en torno al 90&nbsp;%</strong>, la energía disponible cae muy deprisa al subir.
+          Por eso hay mucha más energía en los productores que en los superdepredadores, y las cadenas tróficas rara vez pasan de cuatro o cinco eslabones.
         </p>
       </div>
     </div>
@@ -449,7 +536,7 @@ function SeccionCiclos() {
   const [cicloActivo, setCicloActivo] = useState<CicloId>('carbono');
   const [etapaActiva, setEtapaActiva] = useState<number | null>(null);
 
-  const ciclo = CICLOS.find(c => c.id === cicloActivo)!;
+  const ciclo = CICLOS.find(c => c.id === cicloActivo) ?? CICLOS[0];
 
   return (
     <div className={styles.seccionContent}>
@@ -466,7 +553,7 @@ function SeccionCiclos() {
             className={`${styles.cicloToggleBtn} ${cicloActivo === c.id ? styles.cicloToggleActivo : ''}`}
             onClick={() => { setCicloActivo(c.id); setEtapaActiva(null); }}
             aria-pressed={cicloActivo === c.id}
-            style={cicloActivo === c.id ? { borderColor: c.color, background: c.color } : {}}
+            style={cicloActivo === c.id ? { borderColor: c.colorBoton, background: c.colorBoton } : {}}
           >
             <span aria-hidden="true">{c.icono}</span> {c.nombre}
           </button>
@@ -504,7 +591,7 @@ function SeccionCiclos() {
             );
           })}
           {/* Centro del diagrama */}
-          <div className={styles.cicloCentro} style={{ color: ciclo.color }}>
+          <div className={styles.cicloCentro} style={{ color: ciclo.colorTexto }}>
             <span className={styles.cicloCentroIcono} aria-hidden="true">{ciclo.icono}</span>
             <span className={styles.cicloCentroNombre}>{ciclo.nombre}</span>
           </div>
@@ -565,6 +652,15 @@ function SeccionCiclos() {
 // Sección 4: Datos fascinantes
 // ─────────────────────────────────────────────
 
+/** Organismo de la cadena o la red: el emoji no llega al lector (hallazgo 1742). */
+function Organismo({ icono, nombre }: { icono: string; nombre: string }) {
+  return (
+    <span>
+      <span aria-hidden="true">{icono}</span> {nombre}
+    </span>
+  );
+}
+
 function SeccionDatos() {
   const [datoActivo, setDatoActivo] = useState<number | null>(null);
 
@@ -600,13 +696,13 @@ function SeccionDatos() {
           <div className={styles.redCol}>
             <span className={styles.redColTitulo}>Cadena trófica (simplificado)</span>
             <div className={styles.redCadena}>
-              <span>🌿 Planta</span>
+              <Organismo icono="🌿" nombre="Planta" />
               <span aria-hidden="true">→</span>
-              <span>🐇 Conejo</span>
+              <Organismo icono="🐇" nombre="Conejo" />
               <span aria-hidden="true">→</span>
-              <span>🦊 Zorro</span>
+              <Organismo icono="🦊" nombre="Zorro" />
               <span aria-hidden="true">→</span>
-              <span>🦅 Águila</span>
+              <Organismo icono="🦅" nombre="Águila" />
             </div>
             <p className={styles.redDesc}>Lineal, un solo camino. Útil para entender el concepto, pero irreal.</p>
           </div>
@@ -614,21 +710,21 @@ function SeccionDatos() {
             <span className={styles.redColTitulo}>Red trófica (realista)</span>
             <div className={styles.redMalla}>
               <div className={styles.redFilaMalla}>
-                <span>🌿 Planta</span>
-                <span>🌾 Semillas</span>
-                <span>🫐 Frutos</span>
+                <Organismo icono="🌿" nombre="Planta" />
+                <Organismo icono="🌾" nombre="Semillas" />
+                <Organismo icono="🫐" nombre="Frutos" />
               </div>
               <div className={styles.redFlechasMalla} aria-hidden="true">↙ ↓ ↘</div>
               <div className={styles.redFilaMalla}>
-                <span>🐇 Conejo</span>
-                <span>🐁 Ratón</span>
-                <span>🦗 Insectos</span>
+                <Organismo icono="🐇" nombre="Conejo" />
+                <Organismo icono="🐁" nombre="Ratón" />
+                <Organismo icono="🦗" nombre="Insectos" />
               </div>
               <div className={styles.redFlechasMalla} aria-hidden="true">↙ ↓ ↘</div>
               <div className={styles.redFilaMalla}>
-                <span>🦊 Zorro</span>
-                <span>🐍 Serpiente</span>
-                <span>🐸 Rana</span>
+                <Organismo icono="🦊" nombre="Zorro" />
+                <Organismo icono="🐍" nombre="Serpiente" />
+                <Organismo icono="🐸" nombre="Rana" />
               </div>
             </div>
             <p className={styles.redDesc}>Interconectada. Un animal come varias cosas y es comido por varios. Más estable.</p>
@@ -728,17 +824,24 @@ export default function VisualizadorEcosistemaPage() {
           </p>
 
           <h3>¿Qué es una cascada trófica?</h3>
+          {/* Hallazgo 1741: afirmaba como hecho que «los ríos literalmente cambiaron de curso». */}
           <p>
             Es un efecto dominó que se produce cuando la eliminación o reintroducción de un
-            superdepredador altera toda la cadena. El caso más conocido: reintroducir lobos en
-            Yellowstone (1995) redujo los ciervos, la vegetación se recuperó, las raíces estabilizaron
-            las orillas y los ríos literalmente cambiaron de curso.
+            depredador altera los niveles de debajo. El ejemplo más citado es la reintroducción de
+            lobos en Yellowstone (1995): se describió que redujo la presión de los uapitíes sobre sauces
+            y álamos, y se llegó a proponer que estabilizó las orillas de los ríos. Es una hipótesis
+            debatida: estudios de campo como los de Marshall, Hobbs y Cooper (2013) y Hobbs et al. (2024)
+            encuentran un efecto mucho menor, limitado por el agua disponible y por la desaparición de
+            los castores, y otros depredadores (pumas, osos) y la caza humana también cuentan. Casos
+            menos discutidos son el de las nutrias marinas, los erizos y los bosques de kelp en el Pacífico.
           </p>
 
           <div className={styles.warningBox}>
-            <strong>Nota:</strong> los datos de este explicador son aproximaciones con fines educativos,
-            basados en fuentes de ecología general (Campbell Biology, IPCC, FAO, National Geographic).
-            Los valores de biomasa y eficiencia varían según el ecosistema concreto. Última revisión: 2025.
+            <strong>Nota:</strong> los datos de este explicador son aproximaciones con fines educativos.
+            La regla del 10&nbsp;% es una media con mucha dispersión (Lindeman, 1942); biomasa vegetal por
+            ecosistema: Whittaker y Likens (1975); especies de plantas: Kew (2016); agua: USGS; hormigas:
+            Schultheiss et al. (2022); nivel trófico del atún: FishBase. Los valores reales varían según
+            el ecosistema concreto. Última revisión: 25/09/2026.
           </div>
         </EducationalSection>
 

@@ -18,7 +18,12 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   Pirámide: 100 % → 10 % → 1 % → 0,1 %, cada nivel ÷ 10. Cuadra con el flujo.
  *   => La aritmética es coherente con lo que dice. El defecto de la sospecha es de CONTENIDO.
  *
- * LOS DEFECTOS QUE DEJA DOCUMENTADOS (test.fail, 25/09/2026)
+ * REPARADOS el 25/09/2026 (hallazgos 1734-1743): los test.fail de abajo ya son test normales.
+ *   Las cifras de la regla del 10 % salen ahora de app/visualizador-ecosistema/motor.ts, y el atún
+ *   pasó al nivel superior de la pirámide (nivel trófico ~4,4 en FishBase): 0,1 % → 1.000 kg de
+ *   fitoplancton por kg, tres transferencias (1.000 → 100 → 10 → 1).
+ *
+ * LOS DEFECTOS QUE DEJÓ DOCUMENTADOS la inspección (test.fail, 25/09/2026)
  *   · Sospecha confirmada: la regla del 10 % se enuncia como ley exacta («solo el 10% de la
  *     energía pasa al siguiente», «▼ solo 10% pasa», «pierdes el 90%») y el FAQPage dice que el
  *     90 % «se disipa como calor metabólico», contra el 60/20/10 de la propia app. Es la forma del
@@ -166,7 +171,7 @@ test('caso límite — una sola sección, una sola ficha, y cambiar de ciclo cie
 // no contradiga el reparto de la propia app. Obtenido: «En cada nivel trófico, solo el 10% de la
 // energía pasa al siguiente» sin matiz, y el FAQ «el 90% restante se disipa como calor
 // metabólico» frente al 60 % respiración + 20 % desechos + 10 % no consumido de DESTINO_ENERGIA.
-test.fail('sospecha — la regla del 10 % se presenta como media, y el FAQ no contradice el reparto de la app', async ({
+test('sospecha — la regla del 10 % se presenta como media, y el FAQ no contradice el reparto de la app', async ({
   page,
 }) => {
   await irA(page, 'Regla del 10');
@@ -189,7 +194,7 @@ test.fail('sospecha — la regla del 10 % se presenta como media, y el FAQ no co
 // de su nivel). Atún en «Consumidores secundarios» (1 %) → 100 kg. Obtenido: la tarjeta del mismo
 // nivel dice 1 % y el recuadro de debajo «10.000 kg de fitoplancton para 1 kg de atún» (0,01 %,
 // un quinto nivel que la pirámide no tiene). El atún real está en torno al nivel trófico 4-4,5.
-test.fail('atún — los kg de fitoplancton por kg de atún cuadran con el nivel donde la pirámide lo pone', async ({ page }) => {
+test('atún — los kg de fitoplancton por kg de atún cuadran con el nivel donde la pirámide lo pone', async ({ page }) => {
   await irA(page, 'Pirámide trófica');
   let pctAtun = NaN;
   for (let i = 0; i < 4; i++) {
@@ -197,7 +202,9 @@ test.fail('atún — los kg de fitoplancton por kg de atún cuadran con el nivel
     const ejemplos = (await page.locator('span[class*="nivelDatoValor"]').first().textContent()) ?? '';
     if (ejemplos.includes('Atún')) pctAtun = porcentaje((await niveles(page).nth(i).locator('span[class*="piramideEnergia"]').textContent()) ?? '');
   }
-  expect(pctAtun).toBe(1); // hoy: «Consumidores secundarios · 1% de la energía original»
+  // Antes: «Consumidores secundarios · 1 %» con «10.000 kg» debajo. Reparado: el atún está en el
+  // nivel superior (≈ 0,1 %), que con la media del 10 % da 100 / 0,1 = 1.000 kg por kg.
+  expect(pctAtun).toBe(0.1);
   const insight = (await contenido(page).locator('div[class*="insight"]').textContent()) ?? '';
   const kgFito = entero(insight.match(/([\d.]+)\s*kg de fitoplancton/)?.[1] ?? 'NaN');
   expect(kgFito).toBe(100 / pctAtun);
@@ -211,33 +218,42 @@ test.fail('atún — los kg de fitoplancton por kg de atún cuadran con el nivel
 // menos biomasa» no vale para los ejemplos que la propia app pone. Consumidores primarios «Miles»
 // de especies frente a «Cientos de miles» de productores: solo los insectos fitófagos son del orden
 // de las ~390.000 plantas vasculares (Kew, 2016).
-test.fail('biomasa y especies — no son el 10 % aplicado donde no aplica', async ({ page }) => {
+test('biomasa y especies — no son el 10 % aplicado donde no aplica', async ({ page }) => {
   await irA(page, 'Pirámide trófica');
   const dato = (etiqueta: string) =>
     page.locator('div[class$="__nivelDato"]').filter({ hasText: etiqueta }).locator('span[class*="nivelDatoValor"]');
   await niveles(page).nth(3).click();
   await expect(dato('Biomasa')).not.toHaveText('~1.000 kg por hectárea');
+  await expect(dato('Biomasa')).toContainText('t por hectárea'); // del orden de toneladas, con su fuente
+  await expect(dato('Biomasa')).toContainText('Whittaker y Likens');
   await niveles(page).nth(2).click();
   await expect(dato('N.º de especies')).not.toHaveText('Miles');
+  await expect(dato('N.º de especies')).toContainText('Cientos de miles');
+  // Y la frase general ya no dice que cada nivel tenga menos biomasa: la del mar se invierte.
+  await expect(contenido(page).locator('div[class*="contexto"]')).not.toContainText('Cada nivel tiene menos biomasa');
+  await expect(contenido(page).locator('div[class*="contexto"]')).toContainText('pueden invertirse');
 });
 
 // HALLAZGO — «Tu agua es antigua». Entrada: Datos fascinantes → «Tu agua es antigua».
 // Esperado, a mano: agua total ~1.386 millones de km³ / evaporación global ~500.000 km³ al año
 // ≈ 2.800 años por vuelta; en ~4.000 millones de años ≈ 1,4 millones de vueltas, no «miles de
 // millones de veces» (tres órdenes de magnitud por encima).
-test.fail('dato — el agua no ha dado «miles de millones» de vueltas al ciclo hidrológico', async ({ page }) => {
+test('dato — el agua no ha dado «miles de millones» de vueltas al ciclo hidrológico', async ({ page }) => {
   await irA(page, 'Datos fascinantes');
   const tarjeta = page.locator('div[class*="datosGrid"] > button').filter({ hasText: 'Tu agua es antigua' });
   await tarjeta.click();
   await expect(tarjeta).toHaveAttribute('aria-expanded', 'true');
   await expect(tarjeta).not.toContainText('miles de millones de veces');
+  // USGS: 1.386 millones de km³ / 577.000 km³ al año ≈ 2.400 años por vuelta → ~1,5 millones en 4.000 Ma.
+  await expect(tarjeta).toContainText('2.400 años');
+  await expect(tarjeta).toContainText('un millón y medio de vueltas');
 });
 
 // HALLAZGO — Yellowstone. Entrada: Datos → «Lobos de Yellowstone» y la guía educativa.
 // Esperado: el efecto sobre los ríos como hipótesis discutida (Marshall, Hobbs y Cooper, 2013,
 // Proc. R. Soc. B; Hobbs et al., 2024, Ecological Monographs), no como hecho. Obtenido: «los ríos
 // cambiaron de curso» y «los ríos literalmente cambiaron de curso».
-test.fail('contenido — los ríos de Yellowstone no se afirman como hecho', async ({ page }) => {
+test('contenido — los ríos de Yellowstone no se afirman como hecho', async ({ page }) => {
   await irA(page, 'Datos fascinantes');
   await page.locator('div[class*="datosGrid"] > button').filter({ hasText: 'Lobos de Yellowstone' }).click();
   // Texto de la página sin <script> ni <style> (la guía educativa está en el DOM aunque nazca plegada).
@@ -248,13 +264,14 @@ test.fail('contenido — los ríos de Yellowstone no se afirman como hecho', asy
   });
   expect(texto).toContain('Yellowstone');
   expect(texto).not.toMatch(/ríos (literalmente )?cambiaron de curso/);
+  expect(texto).toMatch(/debatid/);
 });
 
 // HALLAZGO — formato español. Entrada: abrir las cuatro secciones y cada una de sus fichas.
 // Esperado: «10 %» con espacio (como quedó simulador-ecosistema-trofico, 0d54c8f9), «1.000 kcal»
 // como sus vecinas «10.000» y «9.000», y «10 veces» en vez de «10x». Obtenido: «10%», «1000 kcal»
 // (formatNumber con es-ES no agrupa cuatro cifras) y «~2 ha (10x más)».
-test.fail('formato — ningún «N%» pegado, «1.000 kcal» y nada de «10x»', async ({ page }) => {
+test('formato — ningún «N%» pegado, «1.000 kcal» y nada de «10x»', async ({ page }) => {
   let texto = (await page.locator('nav[aria-label="Secciones del explicador"]').textContent()) ?? '';
   for (const seccion of ['Ciclos biogeoquímicos', 'Pirámide trófica', 'Regla del 10', 'Datos fascinantes']) {
     await irA(page, seccion);
@@ -330,7 +347,7 @@ async function contrasteMinimo(page: Page, selector: string): Promise<number> {
 //            «10%» de la dieta 3,02 · «Ciclo del Carbono» del centro 3,16 · datoCifra 3,67
 //   oscuro → «1%» de la dieta #DC2626 2,62 · «0,1% de la energía» 2,97 · datoCifra #2E86AB 3,50
 //            (el módulo redeclara --primary sin variante oscura) · «Ciclo del Nitrógeno» 3,37
-test.fail('contraste — cifras de nivel, flujo, dieta, datos y centro del ciclo a 4,5:1 en claro y en oscuro', async ({
+test('contraste — cifras de nivel, flujo, dieta, datos y centro del ciclo a 4,5:1 en claro y en oscuro', async ({
   page,
 }) => {
   const grupos: Array<[string, string]> = [
@@ -368,7 +385,7 @@ test.fail('contraste — cifras de nivel, flujo, dieta, datos y centro del ciclo
 // Esperado: el icono, el nombre y la energía de cada nivel dentro de su botón. Obtenido: el nivel
 // superior mide 77 px (10 % del ancho) y su contenido ocupa ~188 px: el águila y «0,1% de la
 // energía original» se pintan fuera del borde.
-test.fail('pirámide — en escritorio cada nivel contiene su texto', async ({ page }) => {
+test('pirámide — en escritorio cada nivel contiene su texto', async ({ page }) => {
   await irA(page, 'Pirámide trófica');
   const fuera = await niveles(page).evaluateAll((bs) =>
     bs.flatMap((b) => {
@@ -413,17 +430,30 @@ test.describe('móvil 375 × 667 con toque', () => {
   // HALLAZGO — en móvil la pirámide deja de serlo. `.piramideNivel { min-width: 80% }` iguala los
   // tres niveles de consumidores: medido 262 · 262 · 262 · 327 px. Esperado: anchos crecientes de
   // arriba abajo, que es lo que la sección enseña.
-  test.fail('móvil — los niveles de la pirámide se ensanchan de arriba abajo', async ({ page }) => {
+  test('móvil — los niveles de la pirámide se ensanchan de arriba abajo', async ({ page }) => {
     await nav(page).filter({ hasText: 'Pirámide trófica' }).tap();
     const anchos = await niveles(page).evaluateAll((bs) => bs.map((b) => Math.round(b.getBoundingClientRect().width)));
     for (let i = 1; i < anchos.length; i++) expect(anchos[i], `anchos ${anchos.join(' · ')}`).toBeGreaterThan(anchos[i - 1]);
+    // Y, más estrechos, cada nivel sigue conteniendo su texto (el mismo criterio que en escritorio).
+    const fuera = await niveles(page).evaluateAll((bs) =>
+      bs.flatMap((b) => {
+        const r = b.getBoundingClientRect();
+        return [...b.querySelectorAll('span')]
+          .filter((s) => {
+            const q = s.getBoundingClientRect();
+            return q.left < r.left - 1 || q.right > r.right + 1;
+          })
+          .map((s) => s.textContent ?? '');
+      }),
+    );
+    expect(fuera).toEqual([]);
   });
 });
 
 // HALLAZGO — 13 emojis sin aria-hidden en «Cadena trófica vs Red trófica» (L603-631 de page.tsx,
 // `node scripts/check-a11y-jsx.mjs`). Esperado: el lector no los anuncia. Obtenido: el árbol de
 // accesibilidad lee «🌿 Planta 🐇 Conejo 🦊 Zorro…».
-test.fail('accesibilidad — los emojis de la cadena y la red trófica no llegan al lector', async ({ page }) => {
+test('accesibilidad — los emojis de la cadena y la red trófica no llegan al lector', async ({ page }) => {
   await irA(page, 'Datos fascinantes');
   const arbol = await page.locator('div[class*="redCard"]').ariaSnapshot();
   expect(arbol).not.toMatch(/\p{Extended_Pictographic}/u);
@@ -433,7 +463,7 @@ test.fail('accesibilidad — los emojis de la cadena y la red trófica no llegan
 // forman parte de la pirámide», y sin «siempre» para una pirámide de números que puede invertirse.
 // Obtenido: «productores…, consumidores secundarios (carnívoros) y descomponedores» y «las
 // poblaciones de depredadores son siempre mucho menores que las de sus presas».
-test.fail('FAQ — la pirámide no incluye a los descomponedores como nivel', async ({ page }) => {
+test('FAQ — la pirámide no incluye a los descomponedores como nivel', async ({ page }) => {
   const respuesta = await page.evaluate(() => {
     for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
       const j = JSON.parse(s.textContent ?? '{}');

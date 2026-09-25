@@ -1,14 +1,21 @@
 .container {
-  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  /* --primary y --secondary ya NO se redeclaran aquí: sin variante oscura tapaban el #3FA5D1
+     global del tema oscuro (hallazgo 1738). Se heredan de globals.css. */
+  --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
   --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #6E6E6E;
   --border: #E5E5E5; --hover: #F5F5F5;
   --radius: 12px; --radius-large: 16px;
   --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  /* Colores de nivel COMO TEXTO (hallazgo 1738). Los -600 daban 2,6-3,9:1; estos -800 dan
+     ≥ 6,8:1 sobre blanco y ≥ 5,6:1 sobre el tinte del nivel activo. */
+  --eco-productor: #166534; --eco-primario: #854D0E; --eco-secundario: #9A3412;
+  --eco-terciario: #B91C1C; --eco-nitrogeno: #1D4ED8;
   max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
   background: var(--bg-primary); min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333; }
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333;
+  --eco-productor: #4ADE80; --eco-primario: #FACC15; --eco-secundario: #FB923C; --eco-terciario: #F87171; --eco-nitrogeno: #60A5FA; }
 .hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: var(--hero-bg); border-radius: var(--radius-large); color: white; }
 .title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
 .subtitle { font-size: 1.1rem; opacity: 0.92; }
@@ -16,9 +23,9 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -32,14 +39,16 @@
 
 /* ─── Sección 1: Pirámide trófica ─── */
 .piramide { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); position: relative; padding-right: 80px; }
-.piramideNivel { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-primary); min-height: 50px; }
+/* Ancho por nivel en --ancho / --ancho-movil (page.tsx), crecientes de arriba abajo. El contenido
+   se parte en dos líneas si no cabe, en vez de salirse del borde (hallazgo 1737). */
+.piramideNivel { width: var(--ancho); max-width: 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: var(--spacing-sm); row-gap: 0.15rem; text-align: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-primary); min-height: 50px; }
 .piramideNivel:hover { transform: translateY(-2px); border-color: var(--primary); }
 .piramideNivelActivo { border-width: 3px; }
 .piramideIcono { font-size: 1.5rem; }
 .piramideNombre { font-size: 0.85rem; font-weight: 700; }
 .piramideEnergia { font-size: 0.75rem; font-weight: 600; }
 .piramideFlechas { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
-.piramideFlechaTexto { font-size: 0.82rem; font-weight: 700; color: var(--primary); writing-mode: vertical-rl; text-orientation: mixed; }
+.piramideFlechaTexto { font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); writing-mode: vertical-rl; text-orientation: mixed; }
 .piramideFlechaSub { font-size: 0.65rem; color: var(--text-muted); writing-mode: vertical-rl; text-orientation: mixed; }
 
 .nivelDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
@@ -65,7 +74,7 @@
 
 /* ─── Sección 2: Regla del 10% ─── */
 .flujoEnergia { display: flex; flex-direction: column; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
-.flujoSol { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); font-size: 1.1rem; font-weight: 700; color: #CA8A04; margin-bottom: var(--spacing-sm); }
+.flujoSol { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); font-size: 1.1rem; font-weight: 700; color: var(--eco-primario); margin-bottom: var(--spacing-sm); }
 .flujoNivel { display: flex; flex-direction: column; gap: 0.3rem; }
 .flujoInfo { display: flex; align-items: center; gap: var(--spacing-sm); }
 .flujoNombre { font-size: 0.88rem; color: var(--text-primary); font-weight: 600; flex: 1; }
@@ -75,7 +84,7 @@
 .flujoPerdida { display: flex; align-items: center; gap: 0.3rem; padding-left: var(--spacing-lg); }
 .flujoFlechaPerdida { color: var(--text-muted); font-size: 0.8rem; }
 .flujoPerdidaTexto { font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
-.flujoConector { text-align: center; font-size: 0.75rem; color: var(--primary); font-weight: 600; padding: 0.2rem 0; }
+.flujoConector { text-align: center; font-size: 0.75rem; color: var(--primary-texto); font-weight: 600; padding: 0.2rem 0; }
 
 .destinoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
 .destinoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
@@ -84,8 +93,9 @@
 .destinoItem:hover { border-color: var(--primary); }
 .destinoItemActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
 .destinoIcono { font-size: 1.5rem; }
-.destinoPct { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+.destinoPct { font-size: 1.3rem; font-weight: 800; color: var(--primary-texto); }
 .destinoNombre { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); line-height: 1.3; }
+.destinoNota { font-size: 0.78rem; color: var(--text-secondary); text-align: center; line-height: 1.4; margin: var(--spacing-md) 0 0; }
 .destinoExplicacion { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: var(--spacing-sm); border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
 
 /* Comparativa dieta */
@@ -98,6 +108,9 @@
 .implicacionDato:last-child { border-bottom: none; }
 .implicacionLabel { font-size: 0.82rem; color: var(--text-secondary); }
 .implicacionValor { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); text-align: right; }
+.valorProductor { color: var(--eco-productor); }
+.valorTerciario { color: var(--eco-terciario); }
+.implicacionNota { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin: var(--spacing-md) 0 0; }
 
 /* ─── Sección 3: Ciclos biogeoquímicos ─── */
 .cicloToggle { display: flex; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-xl); }
@@ -137,7 +150,7 @@
 .datoCard:hover { border-color: var(--primary); transform: translateY(-2px); }
 .datoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
 .datoIcono { font-size: 1.8rem; }
-.datoCifra { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
+.datoCifra { font-size: 1.1rem; font-weight: 800; color: var(--primary-texto); }
 .datoTitulo { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); line-height: 1.3; }
 .datoDetalle { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: var(--spacing-sm); border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
 
@@ -170,7 +183,7 @@
   .navSecciones { grid-template-columns: repeat(2, 1fr); }
   .piramide { padding-right: 0; }
   .piramideFlechas { display: none; }
-  .piramideNivel { min-width: 80%; }
+  .piramideNivel { width: var(--ancho-movil); padding: var(--spacing-sm); }
   .nivelDetalleGrid { grid-template-columns: 1fr; }
   .descomponedoresGrid { grid-template-columns: 1fr; }
   .destinoGrid { grid-template-columns: repeat(2, 1fr); }
