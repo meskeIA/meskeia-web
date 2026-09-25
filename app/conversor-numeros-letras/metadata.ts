@@ -97,10 +97,12 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Se dice tres coma cuarenta y cinco o tres coma cuatro cinco?',
+      // Hallazgo 1707 (25/09/2026): negaba «tres coma cuarenta y cinco» y daba solo la lectura
+      // cifra a cifra. DPD, s. v. «números» §3.4. Mismo texto que la FAQ visible de page.tsx.
+      name: '¿Cómo se escribe 3,45 en letras: «tres coma cuarenta y cinco» o «tres coma cuatro cinco»?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Al leer un número decimal suelto, las cifras tras la coma se leen una a una: 3,45 es «tres coma cuatro cinco». Cosa distinta es una cantidad de dinero, donde los céntimos forman una unidad y sí se leen como número: 3,45 € son «tres euros con cuarenta y cinco céntimos».',
+        text: 'En un documento, con la parte entera y después la decimal como número, unidas por «con» o por «y»: «tres con cuarenta y cinco centésimas», que es la forma que da el Diccionario panhispánico de dudas. Leer la coma, sea «tres coma cuarenta y cinco» o «tres coma cuatro cinco», es frecuente y admisible al hablar, pero no apropiado en textos técnicos, administrativos o contables. Si es dinero, los céntimos forman número: 3,45 € son «tres euros con cuarenta y cinco céntimos».',
       },
     },
   ],

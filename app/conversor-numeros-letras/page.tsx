@@ -29,15 +29,24 @@ import {
   type EstiloFraccion,
   type MarcaMoneda,
 } from '@/lib/numeroALetras';
+import { importeRedondeado, decimalEscrito, lecturasOrales, MAX_DECIMALES_ESCRITOS } from './motor';
 
 type Modo = 'importe' | 'numero';
 
 interface Resultado {
   texto: string;
   error: string;
+  /** En modo importe, ya redondeado al céntimo sobre las cifras tecleadas (hallazgo 1708) */
   valor?: number;
   partes?: PartesNumericas;
+  /** Número suelto: lecturas en voz alta con «coma» (registro oral, DPD §3.4) */
+  orales?: string[];
+  /** Número suelto con más decimales de los que tienen nombre: solo hay lectura cifra a cifra */
+  sinFormaEscrita?: boolean;
 }
+
+/** «M.N.» (moneda nacional) al final de lo tecleado, tal como se escribió */
+const MONEDA_NACIONAL = /M\.?\s?N\.?$/i;
 
 const MENSAJE_NO_RECONOCIDA = 'No se reconoce esa cantidad. Escribe solo cifras, con coma o punto decimal.';
 
@@ -98,7 +107,8 @@ export default function ConversorNumerosLetrasPage() {
     if (limpio === '') return { texto: '', error: '' };
 
     // `partesNumericas` da además las cifras decimales TAL COMO SE TECLEARON: el número ya no
-    // recuerda el cero final de 0,50 y esta app promete leerlas «una a una».
+    // recuerda el cero final de 0,50, y es lo que decide la fracción (cincuenta centésimas,
+    // no cinco décimas) y el redondeo exacto del importe al céntimo.
     const partes = partesNumericas(lectura.cifra);
     const valor = parseSpanishNumber(lectura.cifra);
     if (!partes || !Number.isFinite(valor)) {
@@ -118,8 +128,13 @@ export default function ConversorNumerosLetrasPage() {
     // se va a leer: 999.999.999.999,995 se redondea a un billón y no cabe. Sin esto, esa
     // franja de un céntimo se colaba y salía el mensaje interno del motor —con el número sin
     // formato español— en lugar del aviso que la propia app promete (hallazgo 263).
+    //
+    // El redondeo al céntimo se hace sobre las CIFRAS tecleadas, no con Math.round(|v| × 100),
+    // que en coma flotante deja 0,145 en 14 céntimos (hallazgo 1708): así el texto, la
+    // etiqueta y el aviso de redondeo leen el mismo importe.
+    const importe = importeRedondeado(partes);
     const enteroQueSeLee = modo === 'importe'
-      ? Math.floor(Math.round(Math.abs(valor) * 100) / 100)
+      ? Math.floor(Math.abs(importe))
       : Math.floor(Math.abs(valor));
     if (enteroQueSeLee > LIMITE_NUMERO_A_LETRAS) {
       return {
@@ -129,13 +144,23 @@ export default function ConversorNumerosLetrasPage() {
     }
 
     try {
-      const texto =
-        modo === 'importe'
-          ? cantidadALetras(valor, { moneda, estiloFraccion, mayusculas }).texto
-          : mayusculas
-            ? numeroALetras(valor, 'masculino', partes.decimales).toUpperCase()
-            : numeroALetras(valor, 'masculino', partes.decimales);
-      return { texto, error: '', valor, partes };
+      if (modo === 'importe') {
+        const texto = cantidadALetras(importe, { moneda, estiloFraccion, mayusculas }).texto;
+        return { texto, error: '', valor: importe, partes };
+      }
+      // Número suelto: primero la forma escrita del DPD §3.4 («tres con cuarenta y cinco
+      // centésimas»), que es la de los documentos; la de «coma» va aparte, como lectura oral
+      // (hallazgo 1707). Con más de 12 decimales la fracción no tiene nombre: cifra a cifra.
+      const escrito = decimalEscrito(partes);
+      const texto = escrito ?? numeroALetras(valor, 'masculino', partes.decimales);
+      return {
+        texto: mayusculas ? texto.toUpperCase() : texto,
+        error: '',
+        valor,
+        partes,
+        orales: escrito ? lecturasOrales(valor, partes) : [],
+        sinFormaEscrita: escrito === null,
+      };
     } catch (e) {
       return { texto: '', error: e instanceof Error ? e.message : 'No se ha podido convertir la cantidad.' };
     }
@@ -228,6 +253,19 @@ export default function ConversorNumerosLetrasPage() {
   const nombresMarca = marca ? nombrarMonedas(marca.codigos, 'o') : '';
   const monedaDeLaMarca =
     marca?.codigos.length === 1 ? MONEDAS.find((m) => m.codigo === marca.codigos[0]) : undefined;
+
+  /**
+   * Hallazgo 1709: «M.N.» (moneda nacional) se admitía al final de la cifra y se tiraba en
+   * silencio, así que «1,500.00 M.N.» salía en euros sin decir nada. No dice por sí solo cuál
+   * es la moneda —el motor no la elige, y hace bien—, pero se avisa como cualquier otra marca,
+   * con el peso mexicano, que es donde se usa en las facturas, a un clic.
+   */
+  const despues = lectura.despues.trim();
+  const monedaNacional = !resultado.error && MONEDA_NACIONAL.test(despues)
+    ? despues.match(MONEDA_NACIONAL)?.[0] ?? null
+    : null;
+  const pesoMexicano = MONEDAS.find((m) => m.codigo === 'MXN');
+  const textosFuera = [...(marca?.textos ?? []), ...(monedaNacional ? [monedaNacional] : [])];
 
   return (
     <div className={styles.container}>
@@ -352,11 +390,33 @@ export default function ConversorNumerosLetrasPage() {
             </p>
 
             {/* La moneda escrita junto a la cifra: elegida, contradicha o sobrante (1540) */}
-            {marca && modo === 'numero' && (
+            {textosFuera.length > 0 && modo === 'numero' && (
               <p className={styles.nota} role="status">
-                En «Número suelto» no se escribe la moneda: {citar(marca.textos)} se ha dejado
-                fuera. Para escribirla, elige «Importe con moneda».
+                En «Número suelto» no se escribe la moneda: {citar(textosFuera)}{' '}
+                {textosFuera.length > 1 ? 'se han dejado' : 'se ha dejado'} fuera. Para
+                escribirla, elige «Importe con moneda».
               </p>
+            )}
+            {monedaNacional && !marca && modo === 'importe' && moneda.codigo !== 'MXN' && (
+              <div className={styles.aviso} role="status">
+                <p className={styles.avisoTexto}>
+                  «{monedaNacional}» (moneda nacional) no dice cuál es la moneda, y el texto sale
+                  en <strong>{moneda.plural}</strong>, la moneda elegida. Se usa sobre todo en los
+                  importes de México; si es otra, elígela en «Moneda».
+                </p>
+                {pesoMexicano && (
+                  <button
+                    type="button"
+                    className={styles.avisoBtn}
+                    onClick={() => {
+                      setCodigoMoneda(pesoMexicano.codigo);
+                      setMonedaPorMarca(null);
+                    }}
+                  >
+                    Escribir en pesos mexicanos
+                  </button>
+                )}
+              </div>
             )}
             {marca && modo === 'importe' && marcaCuadra && monedaPorMarca === moneda.codigo && (
               <p className={styles.nota} role="status">
@@ -412,13 +472,35 @@ export default function ConversorNumerosLetrasPage() {
                 </button>
               </div>
             )}
+            {/* Hallazgo 1706: «Páguese» (subjuntivo de «pagar», g → gu ante e), la fórmula
+                del DPD, s. v. «números» §3.2a; decía «Págese». */}
             {modo === 'importe' && (
               <p className={styles.resultadoDocumento}>
                 <span aria-hidden="true">📄</span> En un documento:{' '}
                 <em>
-                  «Págese por este {moneda.codigo === 'EUR' ? 'pagaré' : 'documento'} la cantidad de{' '}
+                  «Páguese por este {moneda.codigo === 'EUR' ? 'pagaré' : 'documento'} la cantidad de{' '}
                   {resultado.texto}»
                 </em>
+              </p>
+            )}
+            {modo === 'numero' && resultado.orales && resultado.orales.length > 0 && (
+              <p className={styles.resultadoDocumento}>
+                <span aria-hidden="true">🗣️</span> En voz alta también se dice{' '}
+                {resultado.orales.map((o, i) => (
+                  <span key={o}>
+                    {i > 0 ? ' o ' : ''}
+                    <em>«{o}»</em>
+                  </span>
+                ))}
+                . Es lectura del registro oral: el Diccionario panhispánico de dudas no la
+                considera apropiada en documentos técnicos, administrativos o contables.
+              </p>
+            )}
+            {modo === 'numero' && resultado.sinFormaEscrita && (
+              <p className={styles.resultadoDocumento}>
+                Con más de {MAX_DECIMALES_ESCRITOS} cifras decimales la app no escribe la fracción
+                con su nombre (la última que tiene, las billonésimas, llega a {MAX_DECIMALES_ESCRITOS}):
+                las cifras se leen una a una tras «coma».
               </p>
             )}
           </>
@@ -634,10 +716,18 @@ export default function ConversorNumerosLetrasPage() {
             </p>
           </li>
           <li className={styles.faqItem}>
-            <strong>¿3,45 es «tres coma cuarenta y cinco»?</strong>
+            {/* Hallazgo 1707: DPD, s. v. «números» §3.4. Mismo texto que el FAQPage de metadata.ts */}
+            <strong>
+              ¿Cómo se escribe 3,45 en letras: «tres coma cuarenta y cinco» o «tres coma cuatro
+              cinco»?
+            </strong>
             <p>
-              Suelto no: las cifras tras la coma se leen una a una, «tres coma cuatro cinco». Como
-              dinero sí forman número: «tres euros con cuarenta y cinco céntimos».
+              En un documento, con la parte entera y después la decimal como número, unidas por
+              «con» o por «y»: «tres con cuarenta y cinco centésimas», que es la forma que da el
+              Diccionario panhispánico de dudas. Leer la coma, sea «tres coma cuarenta y cinco» o
+              «tres coma cuatro cinco», es frecuente y admisible al hablar, pero no apropiado en
+              textos técnicos, administrativos o contables. Si es dinero, los céntimos forman
+              número: 3,45 € son «tres euros con cuarenta y cinco céntimos».
             </p>
           </li>
         </ul>

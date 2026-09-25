@@ -99,7 +99,7 @@ test('CASO 1 · 3.847,50 € con la parte entera y los céntimos como número', 
 
   // Y va entera a la línea que la app invita a copiar en un documento.
   await expect(page.locator('[role="region"][aria-label="Resultado"] em')).toHaveText(
-    '«Págese por este pagaré la cantidad de tres mil ochocientos cuarenta y siete euros con cincuenta céntimos»',
+    '«Páguese por este pagaré la cantidad de tres mil ochocientos cuarenta y siete euros con cincuenta céntimos»',
   );
 
   // El mismo importe con el formato de cheque latinoamericano: fracción sobre cien.
@@ -165,7 +165,7 @@ test('CASO 2a · el millón redondo lleva «de» y el compuesto no', async ({ pa
   // con:», y lo que se copia al pagaré.
   expect(await enLetras(page, '1.000.000')).toBe('un millón de euros');
   await expect(page.locator('[role="region"][aria-label="Resultado"] em')).toHaveText(
-    '«Págese por este pagaré la cantidad de un millón de euros»',
+    '«Páguese por este pagaré la cantidad de un millón de euros»',
   );
   expect(await enLetras(page, '2.000.000')).toBe('dos millones de euros');
   expect(await enLetras(page, '21.000.000')).toBe('veintiún millones de euros');
@@ -242,12 +242,15 @@ test('CASO 2d · cero, negativo, redondeo a céntimos y lectura cifra a cifra', 
   expect(await enLetras(page, '0,005')).toBe('cero euros con un céntimo');
   expect(await enLetras(page, '0,004')).toBe('cero euros');
 
-  // Número suelto: los decimales se leen cifra a cifra tras «coma», incluido el cero final
-  // que el usuario tecleó (DPD: 3,45 es «tres coma cuatro cinco», no «cuarenta y cinco»).
+  // Número suelto: la forma escrita del DPD, s. v. «números» §3.4 (hallazgo 1707): parte entera
+  // «con» la decimal como número, y la fracción según las cifras tecleadas. Con parte entera
+  // cero, solo la decimal («0,675 = seiscientas setenta y cinco milésimas», el ejemplo del DPD).
+  // La cita anterior («DPD: 3,45 es "tres coma cuatro cinco"») no estaba en el DPD.
   await page.getByRole('button', { name: /Número suelto/ }).click();
-  expect(await enLetras(page, '3,45')).toBe('tres coma cuatro cinco');
-  expect(await enLetras(page, '0,50')).toBe('cero coma cinco cero');
-  expect(await enLetras(page, '0,05')).toBe('cero coma cero cinco');
+  expect(await enLetras(page, '3,45')).toBe('tres con cuarenta y cinco centésimas');
+  expect(await enLetras(page, '0,50')).toBe('cincuenta centésimas');
+  expect(await enLetras(page, '0,05')).toBe('cinco centésimas');
+  expect(await enLetras(page, '0,675')).toBe('seiscientas setenta y cinco milésimas');
   expect(await enLetras(page, '21')).toBe('veintiuno'); // suelto va sin apócope
 });
 
@@ -339,19 +342,27 @@ test('REGRESIÓN 4 · la frontera del tope, céntimo a céntimo', async ({ page 
  * lo que devuelve partesNumericas() y lo único que las recuerda.
  */
 test('REGRESIÓN 5 · el número suelto conserva el cero final de los decimales', async ({ page }) => {
+  // Desde el hallazgo 1707 (25/09/2026) la forma principal es la escrita del DPD §3.4, y el
+  // cero final tecleado decide la fracción: 0,50 son cincuenta CENTÉSIMAS, 0,5 cinco décimas.
+  // La lectura cifra a cifra sigue, como lectura oral, con el cero final incluido.
   await page.getByRole('button', { name: /Número suelto/ }).click();
-  expect(await enLetras(page, '0,50')).toBe('cero coma cinco cero');
-  expect(await enLetras(page, '1,20')).toBe('uno coma dos cero');
+  const oral = page.locator('[role="region"][aria-label="Resultado"] p', { hasText: 'En voz alta' });
+  expect(await enLetras(page, '0,50')).toBe('cincuenta centésimas');
+  await expect(oral).toContainText('«cero coma cinco cero»');
+  expect(await enLetras(page, '0,5')).toBe('cinco décimas');
+  expect(await enLetras(page, '1,20')).toBe('uno con veinte centésimas');
+  await expect(oral).toContainText('«uno coma dos cero»');
   expect(await enLetras(page, '3.847,50')).toBe(
-    'tres mil ochocientos cuarenta y siete coma cinco cero',
+    'tres mil ochocientos cuarenta y siete con cincuenta centésimas',
   );
   // También cuando las cifras llegan en formato internacional
   expect(await enLetras(page, '3,847.50')).toBe(
-    'tres mil ochocientos cuarenta y siete coma cinco cero',
+    'tres mil ochocientos cuarenta y siete con cincuenta centésimas',
   );
-  expect(await enLetras(page, '0,000')).toBe('cero coma cero cero cero');
-  // Y sigue leyendo cifra a cifra lo que no lleva cero final
-  expect(await enLetras(page, '3,45')).toBe('tres coma cuatro cinco');
+  // Todo ceros: no hay fracción que nombrar, pero la lectura oral conserva las tres cifras
+  expect(await enLetras(page, '0,000')).toBe('cero');
+  await expect(oral).toContainText('«cero coma cero cero cero»');
+  expect(await enLetras(page, '3,45')).toBe('tres con cuarenta y cinco centésimas');
 });
 
 // ─── TESTIGO DEL HALLAZGO ABIERTO (afirma el fallo tal y como está hoy) ───────
@@ -566,7 +577,7 @@ test.describe('Inspección 24/09/2026 — importes reales, lempira, móvil y tem
     expect(await enLetras(page, '200')).toBe('doscientos lempiras');
     expect(await enLetras(page, '21.000')).toBe('veintiún mil lempiras');
     await expect(page.locator('[role="region"][aria-label="Resultado"] em')).toHaveText(
-      '«Págese por este documento la cantidad de veintiún mil lempiras»',
+      '«Páguese por este documento la cantidad de veintiún mil lempiras»',
     );
   });
 
@@ -656,14 +667,16 @@ test.describe('Inspección 24/09/2026 — importes reales, lempira, móvil y tem
   test('REGRESIÓN 1543 · en número suelto la etiqueta enseña la cifra que se lee', async ({ page }) => {
     await page.getByRole('button', { name: /Número suelto/ }).click();
     const etiqueta = panel(page).locator('span').first();
-    expect(await enLetras(page, '1,5')).toBe('uno coma cinco');
+    // Texto en la forma escrita del DPD §3.4 desde el hallazgo 1707; la fracción la decide el
+    // número de cifras tecleadas, las mismas que enseña la etiqueta.
+    expect(await enLetras(page, '1,5')).toBe('uno con cinco décimas');
     await expect(etiqueta).toHaveText('1,5');
-    expect(await enLetras(page, '0,001')).toBe('cero coma cero cero uno');
+    expect(await enLetras(page, '0,001')).toBe('una milésima');
     await expect(etiqueta).toHaveText('0,001');
-    expect(await enLetras(page, '3,14159')).toBe('tres coma uno cuatro uno cinco nueve');
+    expect(await enLetras(page, '3,14159')).toBe('tres con catorce mil ciento cincuenta y nueve cienmilésimas');
     await expect(etiqueta).toHaveText('3,14159');
-    // El cero final tecleado, que el texto lee (REGRESIÓN 5), también está en la etiqueta
-    expect(await enLetras(page, '12.345,50')).toBe('doce mil trescientos cuarenta y cinco coma cinco cero');
+    // El cero final tecleado, que decide la fracción (REGRESIÓN 5), también está en la etiqueta
+    expect(await enLetras(page, '12.345,50')).toBe('doce mil trescientos cuarenta y cinco con cincuenta centésimas');
     await expect(etiqueta).toHaveText('12.345,50');
     expect(await enLetras(page, '-7')).toBe('menos siete');
     await expect(etiqueta).toHaveText('-7');
@@ -688,8 +701,9 @@ test.describe('Inspección 24/09/2026 — importes reales, lempira, móvil y tem
     await expect(panel(page).locator('[role="status"]')).toHaveCount(0);
     // En número suelto no se redondea: se leen todas las cifras
     await page.getByRole('button', { name: /Número suelto/ }).click();
+    // 501500 millonésimas (seis cifras): la centena concuerda con la fracción femenina
     expect(await enLetras(page, '3.847,501500')).toBe(
-      'tres mil ochocientos cuarenta y siete coma cinco cero uno cinco cero cero',
+      'tres mil ochocientos cuarenta y siete con quinientas una mil quinientas millonésimas',
     );
     await expect(panel(page).locator('[role="status"]')).toHaveCount(0);
   });
@@ -901,7 +915,7 @@ async function contrasteEfectivo(control: Locator): Promise<number> {
  *     millones» lleva letras. Los dos, con el aviso de la app y SIN ningún importe en letras.
  *
  * LA SOSPECHA «M.N.» Y LA MONEDA POR DEFECTO, DESCARTADA COMO HALLAZGO: con el navegador en
- * es-MX la app arranca en euros («Págese por este pagaré… euros»), igual que en es-ES. Pero no
+ * es-MX la app arranca en euros («Páguese por este pagaré… euros»), igual que en es-ES. Pero no
  * promete detectar el país ni el formato «M.N.»: ni el <h1> «Números a Letras», ni la metadata,
  * ni la FAQ, ni el bloque educativo mencionan cheques mexicanos; lo que promete para
  * Latinoamérica es la fracción «con 50/100», y la da («… pesos con 16/100»), que es una
@@ -915,6 +929,10 @@ async function contrasteEfectivo(control: Locator): Promise<number> {
  *   C · medio céntimo: 0,145 se anuncia «0,15» y se escribe «catorce céntimos»
  *   D · «M.N.» tecleado con el euro elegido: se descarta sin aviso
  *   E · «Lps.» (lempira) y «¢» (colón) se rechazan aunque la ayuda diga «con o sin símbolo»
+ *
+ * REPARADOS el 25/09/2026 (Ronda 15): A = 1706, B = 1707, C = 1708 y D = 1709; sus marcas se
+ * retiran y cada uno lleva debajo casos de más. E = 1710 sigue ABIERTO: los símbolos viven en
+ * SIMBOLOS de lib/numeroALetras.ts, que es compartido y queda fuera de la reparación de la app.
  */
 test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y norma del DPD', () => {
   const panel = (page: Page) => page.locator('[role="region"][aria-label="Resultado"]');
@@ -1008,7 +1026,7 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
       await page.getByRole('button', { name: /Fracción 00\/100/ }).click();
       await expect(texto(page)).toHaveText('mil quinientos pesos con 00/100');
       await expect(panel(page).locator('em')).toHaveText(
-        '«Págese por este documento la cantidad de mil quinientos pesos con 00/100»',
+        '«Páguese por este documento la cantidad de mil quinientos pesos con 00/100»',
       );
 
       // El formato de México con los dos separadores se lee sin duda que resolver
@@ -1024,7 +1042,6 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
      * elige la moneda o se avisa»). Lo correcto: pasar al peso mexicano o avisar.
      */
     test('HALLAZGO D · «1,500.00 M.N.» con el euro elegido no se escribe en euros sin avisar', async ({ page }) => {
-      test.fail();
       await escribir(page, '1,500.00 M.N.');
       await expect(texto(page)).toBeVisible();
       await expect(async () => {
@@ -1032,6 +1049,16 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
         const avisos = await notas(page).allInnerTexts();
         expect(moneda === 'MXN' || avisos.some((a) => a.includes('M.N.'))).toBe(true);
       }).toPass({ timeout: 2000 });
+      // Reparado avisando (no adivina: «M.N.» no dice cuál es la moneda), con el peso a un clic
+      await expect(notas(page)).toContainText('«M.N.» (moneda nacional) no dice cuál es la moneda');
+      await page.getByRole('button', { name: 'Escribir en pesos mexicanos' }).click();
+      await expect(page.locator('#moneda')).toHaveValue('MXN');
+      await expect(texto(page)).toHaveText('mil quinientos pesos');
+      await expect(notas(page)).toHaveCount(0);
+      // En número suelto, «M.N.» se dice que queda fuera, como cualquier otra marca
+      await page.getByRole('button', { name: /Número suelto/ }).click();
+      await expect(texto(page)).toHaveText('mil quinientos');
+      await expect(notas(page)).toContainText('«M.N.» se ha dejado fuera');
     });
   });
 
@@ -1077,7 +1104,6 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
    * «SOSPECHA descartada» copian hoy «Págese» y habrá que corregirlas a la vez.
    */
   test('HALLAZGO A · la línea para el documento dice «Páguese», no «Págese»', async ({ page }) => {
-    test.fail();
     await escribir(page, '1.500');
     await expect(texto(page)).toHaveText('mil quinientos euros');
     await expect(panel(page).locator('em')).toHaveText(/^«Páguese /, { timeout: 2000 });
@@ -1097,11 +1123,48 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
    * Lo correcto: ofrecer la forma escrita del §3.4 para documentos.
    */
   test('HALLAZGO B · número suelto: la forma escrita del DPD §3.4 para 3,45', async ({ page }) => {
-    test.fail();
     await page.getByRole('button', { name: /Número suelto/ }).click();
     await escribir(page, '3,45');
     await expect(texto(page)).toBeVisible();
     await expect(panel(page)).toContainText('tres con cuarenta y cinco centésimas', { timeout: 2000 });
+    // Sin negar la lectura con «coma»: queda como lectura oral, con las dos formas y el aviso
+    // del DPD sobre los documentos técnicos, administrativos o contables
+    const oral = panel(page).locator('p', { hasText: 'En voz alta' });
+    await expect(oral).toContainText('«tres coma cuarenta y cinco» o «tres coma cuatro cinco»');
+    await expect(oral).toContainText('no la considera apropiada en documentos técnicos, administrativos o contables');
+    // El ejemplo del propio DPD con parte entera cero y «siete coma cero ocho»
+    await escribir(page, '0,675');
+    await expect(texto(page)).toHaveText('seiscientas setenta y cinco milésimas');
+    await escribir(page, '7,08');
+    await expect(texto(page)).toHaveText('siete con ocho centésimas');
+    await expect(oral).toContainText('«siete coma cero ocho»');
+    // La fracción concuerda en femenino y en singular con una sola parte
+    await escribir(page, '2,01');
+    await expect(texto(page)).toHaveText('dos con una centésima');
+    await escribir(page, '0,21');
+    await expect(texto(page)).toHaveText('veintiuna centésimas');
+    // Más de 12 decimales: sin nombre de fracción, cifra a cifra y dicho
+    await escribir(page, '1,1234567890123');
+    await expect(texto(page)).toHaveText('uno coma uno dos tres cuatro cinco seis siete ocho nueve cero uno dos tres');
+    await expect(panel(page)).toContainText('Con más de 12 cifras decimales');
+  });
+
+  // La FAQ visible y el FAQPage JSON-LD dicen lo mismo, y ninguno niega «tres coma cuarenta y cinco»
+  test('HALLAZGO B · la FAQ visible y el FAQPage coinciden y siguen el DPD §3.4', async ({ page }) => {
+    const pregunta = '¿Cómo se escribe 3,45 en letras: «tres coma cuarenta y cinco» o «tres coma cuatro cinco»?';
+    const item = page.locator('li', { hasText: '¿Cómo se escribe 3,45 en letras' });
+    const visible = ((await item.locator('p').textContent()) ?? '').replace(/\s+/g, ' ').trim();
+    expect(visible).toContain('«tres con cuarenta y cinco centésimas»');
+    expect(visible).not.toContain('Suelto no');
+    const ld = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? ''),
+    );
+    const faq = ld.map((t) => JSON.parse(t)).find((j) => j['@type'] === 'FAQPage') as {
+      mainEntity: Array<{ name: string; acceptedAnswer: { text: string } }>;
+    };
+    const entrada = faq.mainEntity.find((q) => q.name === pregunta);
+    expect(entrada?.acceptedAnswer.text).toBe(visible);
+    expect(((await item.locator('strong').textContent()) ?? '').replace(/\s+/g, ' ').trim()).toBe(pregunta);
   });
 
   /**
@@ -1114,7 +1177,6 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
    * 2,135…).
    */
   test('HALLAZGO C · el medio céntimo se escribe como lo anuncia la propia app', async ({ page }) => {
-    test.fail();
     const etiqueta = panel(page).locator('span').first();
     await escribir(page, '0,145');
     await expect(etiqueta).toHaveText('0,15 EUR');
@@ -1123,6 +1185,16 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
     await escribir(page, '1,0050');
     await expect(etiqueta).toHaveText('1,01 EUR');
     await expect(texto(page)).toHaveText('un euro con un céntimo', { timeout: 2000 });
+    // Otros dos de la lista (a mano: la tercera decimal es 5 → al alza) y uno por debajo
+    await escribir(page, '0,285');
+    await expect(texto(page)).toHaveText('cero euros con veintinueve céntimos');
+    await escribir(page, '2,135');
+    await expect(etiqueta).toHaveText('2,14 EUR');
+    await expect(texto(page)).toHaveText('dos euros con catorce céntimos');
+    await escribir(page, '2,134');
+    await expect(texto(page)).toHaveText('dos euros con trece céntimos');
+    await escribir(page, '-0,145');
+    await expect(texto(page)).toHaveText('menos cero euros con quince céntimos');
   });
 
   /**
@@ -1133,11 +1205,16 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
    * el teclado. Las dos se rechazan con «Escribe solo cifras». También «$U» (peso uruguayo) y
    * «U$S» (dólar en el Río de la Plata).
    */
-  test('HALLAZGO E · «Lps.» y «¢» se leen como lempiras y colones', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO E (1710, reparado) · «Lps.», «¢», «$U» y «U$S» se leen con su moneda', async ({ page }) => {
+    // Reparado el 25/09/2026 en SIMBOLOS de lib/numeroALetras.ts. «20 U$S» cubre además el
+    // símbolo detrás de la cifra (leerDetras). Cada caso lleva una marca distinta de la del
+    // anterior: la app solo cambia de moneda cuando CAMBIA la marca, para no pisar una elección
+    // manual mientras se sigue tecleando.
     const casos: Array<[string, string, string]> = [
       ['Lps. 1,500.00', 'HNL', 'mil quinientos lempiras'],
       ['¢1.500', 'CRC', 'mil quinientos colones'],
+      ['$U 250', 'UYU', 'doscientos cincuenta pesos'],
+      ['20 U$S', 'USD', 'veinte dólares'],
     ];
     for (const [entrada, codigo, esperado] of casos) {
       await page.locator('#moneda').selectOption('EUR');

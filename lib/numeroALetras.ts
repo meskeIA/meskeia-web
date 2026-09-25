@@ -277,9 +277,11 @@ export function cantidadALetras(valor: number, opciones: OpcionesCantidad): Cant
 }
 
 /**
- * Escribe un número suelto en letras, sin moneda. Los decimales se leen cifra a
- * cifra tras la palabra «coma», que es como se leen en español: 3,45 es «tres
- * coma cuatro cinco», no «tres coma cuarenta y cinco».
+ * Escribe un número suelto en letras, sin moneda, con los decimales leídos cifra a
+ * cifra tras «coma»: 3,45 → «tres coma cuatro cinco». Es UNA de las lecturas orales
+ * que admite el DPD (§3.4), junto a «tres coma cuarenta y cinco»; la forma escrita
+ * que recomienda para documentos es «tres con cuarenta y cinco centésimas», y esa
+ * la compone `conversor-numeros-letras/motor.ts` (hallazgo 1707, 25/09/2026).
  */
 export function numeroALetras(
   valor: number,
@@ -381,6 +383,14 @@ const SIMBOLOS: Array<{ simbolo: string; codigos: string[] }> = [
   { simbolo: 'S/', codigos: ['PEN'] },
   { simbolo: 'Bs', codigos: ['BOB', 'VES'] },
   { simbolo: 'Gs', codigos: ['PYG'] },
+  // Abreviaturas de uso diario que no están en CLDR (hallazgo 1710): «Lps.» para el lempira,
+  // «U$S» para el dólar en el Río de la Plata, «$U» para el peso uruguayo y «¢», que en Costa
+  // Rica sustituye a «₡» porque este no está en el teclado. Van antes que «L» y «$»: la tabla
+  // se recorre en orden y gana el primer símbolo que encaja.
+  { simbolo: 'Lps', codigos: ['HNL'] },
+  { simbolo: 'U$S', codigos: ['USD'] },
+  { simbolo: '$U', codigos: ['UYU'] },
+  { simbolo: '¢', codigos: ['CRC'] },
   { simbolo: '€', codigos: ['EUR'] },
   { simbolo: '£', codigos: ['GBP'] },
   { simbolo: '₡', codigos: ['CRC'] },
