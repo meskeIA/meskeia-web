@@ -250,7 +250,7 @@ export default function EstimadorImpuestoDonacionesPage() {
         <ul>
           <li>El impuesto lo paga quien <strong>recibe</strong> la donación (donatario), no quien la hace</li>
           <li>CCAA competente: donde reside habitualmente el donatario los últimos 5 años</li>
-          <li>Empresa familiar, explotaciones agrarias y otros bienes tienen reducciones especiales</li>
+          <li>Empresa familiar, explotaciones agrarias y otros bienes tienen reducciones especiales que esta estimación no calcula</li>
           <li>Castilla-La Mancha: la bonificación requiere escritura pública</li>
           <li><strong>Plazo: 1 mes desde la donación (Modelo 651). Consulta siempre con asesor fiscal.</strong></li>
         </ul>
@@ -632,19 +632,26 @@ export default function EstimadorImpuestoDonacionesPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🏢</span>
-                <strong>Padres donan negocio familiar a hijo en Cataluña</strong>
+                <strong>Padres donan su negocio familiar a un hijo</strong>
               </div>
+              {/*
+                25/09/2026 — la empresa familiar queda FUERA de esta estimación por criterio: la
+                reducción depende de valorar la empresa y de requisitos que solo comprueba un
+                asesor. Este escenario daba una cuota de «≈ 750 €» con la reducción aplicada,
+                una cifra de algo que la calculadora no hace. Se deja el caso, sin cifra.
+              */}
               <p className={styles.escenarioExample}>
-                Valor empresa: 300.000 €. Si aplica la reducción del 95% por empresa familiar
-                (art. 20.6 LISD), base neta: 15.000 €. Tarifa reducida Cataluña (Grupo II,
-                escritura pública): 5%–9%. Cuota estimada sobre 15.000 €: ≈ 750 €.
-                <strong> Sin la reducción del 95%, la cuota superaría los 35.000 €.</strong>
+                <strong>Esta herramienta no calcula este caso.</strong> La donación de una
+                empresa individual, un negocio profesional o participaciones en una empresa
+                familiar tiene reducciones propias, estatales (art. 20.6 LISD) y autonómicas,
+                que pueden cambiar la cuota por completo. Aplicarlas exige valorar la empresa y
+                comprobar requisitos sobre la actividad, la participación del donante y la
+                permanencia posterior del negocio.
               </p>
               <p className={styles.escenarioTip}>
-                La reducción del 95% para empresa familiar requiere cumplir requisitos estrictos:
-                actividad económica real, participación mínima del 5% (15% en grupo familiar),
-                y que el donante ejerza funciones de dirección con retribución superior al 50%
-                de sus rendimientos del trabajo.
+                Si lo que se dona es una empresa, la cifra de la calculadora no sirve como
+                referencia: la valoración y la comprobación de requisitos corresponden a un
+                asesor fiscal con la documentación del negocio.
               </p>
             </div>
 
@@ -946,13 +953,13 @@ export default function EstimadorImpuestoDonacionesPage() {
 
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🏢</span>
-              <strong>Explorar la reducción del 95% en empresa familiar</strong>
+              <strong>Si se dona una empresa, consultar antes con un asesor fiscal</strong>
               <p>
-                El art. 20.6 LISD permite una reducción del 95% en donaciones de participaciones
-                en empresa o negocio familiar si se cumplen los requisitos: actividad económica real,
-                participación mínima del 5% individual o 15% familiar, funciones de dirección del
-                donante con retribución superior al 50% de sus rendimientos del trabajo, y
-                mantenimiento del donatario durante 10 años.
+                La donación de una empresa o de participaciones en un negocio familiar tiene
+                reducciones especiales que esta herramienta no calcula. Dependen de cómo se valore
+                la empresa y de requisitos que solo se pueden comprobar con su documentación, y
+                se pierden si no se cumplen: conviene revisarlos con un asesor fiscal antes de
+                formalizar la donación.
               </p>
             </div>
 

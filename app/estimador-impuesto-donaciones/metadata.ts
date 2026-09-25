@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cuándo no hay que pagar el Impuesto de Donaciones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Hay situaciones en las que la cuota puede ser cero o mínima: cuando la comunidad autónoma aplica una bonificación del 99-100% para el grupo I y II de parentesco (hijos, cónyuge, padres), o cuando el importe donado está por debajo de las reducciones personales disponibles. Además, algunas CCAA eximen totalmente donaciones de empresa familiar o vivienda habitual. Consultar siempre con un asesor fiscal antes de formalizar la donación.',
+        text: 'Hay situaciones en las que la cuota puede ser cero o mínima: cuando la comunidad autónoma aplica una bonificación del 99-100% para el grupo I y II de parentesco (hijos, cónyuge, padres), o cuando el importe donado está por debajo de las reducciones personales disponibles. Las donaciones de una empresa familiar tienen reducciones especiales, estatales y autonómicas, que esta estimación no calcula: exigen valorar la empresa y comprobar requisitos con su documentación. Consultar siempre con un asesor fiscal antes de formalizar la donación.',
       },
     },
   ],
