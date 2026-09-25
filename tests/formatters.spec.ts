@@ -259,6 +259,24 @@ test.describe('parseSpanishNumber', () => {
     expect(parseSpanishNumber('50%')).toBe(50);
     expect(parseSpanishNumber('+1.234,56')).toBe(1234.56);
   });
+
+  // Hallazgo 1661 (simulador-circuitos-electricos, 25/09/2026): «0.020» se leía como 20.
+  // Un grupo de millares nunca empieza por cero, así que ahí el punto solo puede ser decimal.
+  test('un cero delante del punto lo hace decimal: no hay «cero mil»', () => {
+    expect(parseSpanishNumber('0.020')).toBe(0.02);
+    expect(parseSpanishNumber('0.793')).toBe(0.793);
+    expect(parseSpanishNumber('-0.500')).toBe(-0.5);
+    expect(parseSpanishNumber('0,500')).toBe(0.5);
+    expect(parseSpanishNumber('0.020.000')).toBeNaN();
+    expect(parseSpanishNumber('0,020,000')).toBeNaN();
+    expect(parseSpanishNumber('0.020,5')).toBeNaN();
+    // Lo que ya funcionaba sigue igual
+    expect(parseSpanishNumber('1.500')).toBe(1500);
+    expect(parseSpanishNumber('100.000')).toBe(100000);
+    expect(parseSpanishNumber('4.700.000')).toBe(4700000);
+    expect(parseSpanishNumber('1,234.56')).toBe(1234.56);
+    expect(lecturaAmbiguaAlternativa('0,500')).toBeNull();
+  });
 });
 
 /**

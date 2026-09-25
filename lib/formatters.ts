@@ -192,9 +192,14 @@ export function parseSpanishNumberOr(input: string, porDefecto = 0): number {
  * `Intl` separa el símbolo de moneda— y un símbolo de moneda o porcentaje pegado al
  * número, para que releer lo que escribió `formatCurrency` siga funcionando.
  */
-// Un separador agrupa millares si parte el número en grupos de exactamente tres cifras
-const AGRUPA_CON_PUNTO = /^\d{1,3}(\.\d{3})+$/;
-const AGRUPA_CON_COMA = /^\d{1,3}(,\d{3})+$/;
+// Un separador agrupa millares si parte el número en grupos de exactamente tres cifras, y el
+// primero no empieza por cero: «0.020» y «0.793» son decimales en cualquier convenio, porque
+// nadie escribe «cero mil». Hasta el 25/09/2026 se leían como 20 y 793, mil veces más, y así
+// le llegaba a simulador-circuitos-electricos el punto decimal de México y buena parte de
+// Latinoamérica (hallazgo 1661). Con un primer grupo de 1 a 9 la ambigüedad sigue siendo
+// irreducible y gana el español: «1.234» = mil doscientos treinta y cuatro.
+const AGRUPA_CON_PUNTO = /^[1-9]\d{0,2}(\.\d{3})+$/;
+const AGRUPA_CON_COMA = /^[1-9]\d{0,2}(,\d{3})+$/;
 
 /**
  * Las tres piezas de lo que el usuario tecleó, o `null` si no es un número.
@@ -305,7 +310,8 @@ export function lecturaAmbiguaAlternativa(
   // Una sola coma, tres cifras detrás y de una a tres delante: tanto puede ser el decimal
   // español como el millar americano. Con dos comas («85,911,818») el millar ya se delata
   // solo, y con otro número de decimales («830,40», «830,4») no hay millar posible.
-  if (!/^\d{1,3},\d{3}$/.test(cuerpo)) return null;
+  // Con un cero delante («0,500») el millar tampoco es plausible.
+  if (!/^[1-9]\d{0,2},\d{3}$/.test(cuerpo)) return null;
 
   const valor = signo * Number(cuerpo.replace(',', ''));
   if (!Number.isFinite(valor)) return null;
