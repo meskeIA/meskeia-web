@@ -185,8 +185,23 @@ export function redondear(n: number, decimales = 4): number {
   return Math.round(n * factor) / factor + 0;
 }
 
+/**
+ * Número con los decimales fijos del panel, en formato español COMPLETO: coma decimal y
+ * punto de millares. Con `toFixed().replace()` una tangente grande salía «-272241,8084», sin
+ * separador de millares (hallazgo 1619). `redondear` va antes para no enseñar «-0,0000».
+ */
 export function formatearNumero(n: number, decimales = 4): string {
-  return redondear(n, decimales).toFixed(decimales).replace('.', ',');
+  return formatNumber(redondear(n, decimales), decimales);
+}
+
+/**
+ * Un ángulo en grados, con coma, como mucho 4 decimales y el símbolo PEGADO a la cifra.
+ *
+ * Se imprimía en crudo (`${angulo}°`): «36.8699°» tras «Ver 36,87° en el círculo»,
+ * «57.29577951308232°» con 1 rad, «36.3°» durante la animación (hallazgo 1619).
+ */
+export function formatearGrados(anguloGrados: number): string {
+  return `${formatearRespuesta(anguloGrados)}°`;
 }
 
 /**
@@ -247,6 +262,9 @@ export function formatearRespuesta(valor: number, maxDecimales = 4): string {
 export function conUnidad(texto: string, etiqueta: string): string {
   if (etiqueta === UNIDAD_RAZON) return texto;
   if (etiqueta === UNIDAD_CUADRANTE) return `cuadrante ${texto}`;
+  // El símbolo de grado de un ángulo va pegado a la cifra (RAE), como en el resto de la app:
+  // el veredicto escribía «Correcto: 30 °.» junto a enunciados que dicen «30°» (hallazgo 1619).
+  if (etiqueta === '°') return `${texto}°`;
   return `${texto} ${etiqueta}`;
 }
 

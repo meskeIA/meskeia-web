@@ -18,6 +18,7 @@ import {
   calcularTangente,
   comprobarRespuesta,
   conUnidad,
+  formatearGrados,
   formatearNumero,
   formatearRespuesta,
   generarEjercicioAleatorio,
@@ -135,18 +136,32 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Resolución Retina/HiDPI
-    const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
-
     const W = rect.width;
     const H = rect.height;
+    const margen = 40;
+
+    /**
+     * Sin sitio para el círculo, no se dibuja: se espera al ResizeObserver.
+     *
+     * Con el lienzo oculto, o montado antes de que la vista tenga tamaño (un WebView de
+     * Instagram, una pestaña que carga en segundo plano), mide 0 y el radio salía
+     * 0/2 − 40 = −40: `arc()` lanza IndexSizeError con un radio negativo y la frontera de
+     * error sustituía la página ENTERA por «Algo salió mal» — las tres caídas del 24/09/2026
+     * en móviles (hallazgo 1616). La guarda cubre radio ≤ 0, no solo tamaño 0: un lienzo de
+     * 74 px da radio −3. Y va ANTES de escribir `canvas.width`: poner el atributo a 0 dejaba
+     * el lienzo a 0×0 para siempre en móvil, donde su ancho dependía de él (hallazgo 1617).
+     */
+    if (Math.min(W, H) <= 2 * margen) return;
+
+    // Resolución Retina/HiDPI
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.scale(dpr, dpr);
+
     const cx = W / 2;
     const cy = H / 2;
-    const margen = 40;
     const radio = Math.min(W, H) / 2 - margen;
 
     // Detectar dark mode
@@ -334,11 +349,24 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     dibujar(angulo);
   }, [angulo, dibujar]);
 
-  // Re-dibujar en resize
+  // Re-dibujar en resize de la ventana (cubre también el cambio de devicePixelRatio al hacer
+  // zoom, que no cambia el tamaño CSS del lienzo y el ResizeObserver no ve).
   useEffect(() => {
     const handleResize = () => dibujar(anguloRef.current);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, [dibujar]);
+
+  // Re-dibujar cuando cambia el tamaño del PROPIO lienzo: al aparecer tras estar oculto, al
+  // tener tamaño por fin una vista que montó sin él, o al asentarse el primer layout. El
+  // `resize` de la ventana no se entera de nada de eso, y el dibujo que se saltó la guarda
+  // de `dibujar` se quedaría en blanco (hallazgo 1616).
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => dibujar(anguloRef.current));
+    observer.observe(canvas);
+    return () => observer.disconnect();
   }, [dibujar]);
 
   // Re-dibujar al cambiar tema
@@ -388,14 +416,25 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   const cosVal = Math.cos(rad);
   const cuadrante = obtenerCuadrante(angulo);
 
-  const anguloEnRadianes = (angulo * Math.PI / 180).toFixed(4).replace('.', ',');
   const fracciones: Record<number, string> = {
     0: '0', 30: 'π/6', 45: 'π/4', 60: 'π/3', 90: 'π/2',
     120: '2π/3', 135: '3π/4', 150: '5π/6', 180: 'π',
     210: '7π/6', 225: '5π/4', 240: '4π/3', 270: '3π/2',
     300: '5π/3', 315: '7π/4', 330: '11π/6', 360: '2π',
   };
-  const fraccionRad = fracciones[Math.round(angulo)] ?? `${anguloEnRadianes} rad`;
+  /**
+   * La fracción de π solo se rotula cuando el ángulo ES el notable, no cuando está cerca.
+   *
+   * Con `fracciones[Math.round(angulo)]` todo ángulo a menos de medio grado de un notable
+   * salía con la fracción EXACTA: 1,5708 rad se rotulaba «π/2» junto a tan = −272.241,8084
+   * (la tangente que la app enseña que no existe en π/2), y 29,6° salía «π/6» siendo
+   * 0,5166 rad (hallazgo 1618). El margen de 1e-9 solo absorbe el ruido de coma flotante.
+   */
+  const anguloEntero = Math.round(angulo);
+  const esNotableExacto = Math.abs(angulo - anguloEntero) < 1e-9;
+  const fraccionRad = (esNotableExacto ? fracciones[anguloEntero] : undefined)
+    ?? `${formatearNumero(rad)} rad`;
+  const anguloGradosTexto = formatearGrados(angulo);
 
   // ============================================
   // CASOS DE AULA
@@ -538,7 +577,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
         <div className={styles.sliderRow}>
           <label className={styles.sliderLabel} htmlFor="slider-angulo">
             θ =&nbsp;
-            <strong>{unidad === 'grados' ? `${angulo}°` : fraccionRad}</strong>
+            <strong>{unidad === 'grados' ? anguloGradosTexto : fraccionRad}</strong>
           </label>
           <div className={styles.sliderInputRow}>
             <input
@@ -612,7 +651,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           <canvas
             ref={canvasRef}
             className={styles.canvas}
-            aria-label={`Círculo trigonométrico con ángulo ${angulo}°`}
+            aria-label={`Círculo trigonométrico con ángulo ${anguloGradosTexto}`}
           />
         </div>
 
@@ -622,7 +661,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
 
           <div className={styles.valueRow}>
             <span className={styles.valueName}>θ (grados)</span>
-            <span className={styles.valueNum}>{angulo}°</span>
+            <span className={styles.valueNum}>{anguloGradosTexto}</span>
           </div>
           <div className={styles.valueRow}>
             <span className={styles.valueName}>θ (radianes)</span>

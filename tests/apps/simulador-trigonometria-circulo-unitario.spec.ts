@@ -1015,11 +1015,11 @@ test.describe('Re-inspección 25/09/2026 · los ejes y los radianes contra el mo
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
-// HALLAZGO H1 (operativa, alto) — ABIERTO · la página entera cae si el lienzo mide < 80 px
+// HALLAZGO H1 (operativa, alto) — REPARADO 25/09/2026 · la página entera cae si el lienzo mide < 80 px
 // ─────────────────────────────────────────────────────────────────────────────────────────
 
 test.describe('Re-inspección 25/09/2026 · H1 · el lienzo sin tamaño al montar tira la página', () => {
-  test.fail(
+  test(
     'H1 · con el lienzo en display:none al hidratar, la app se ve y lo dibuja al aparecer',
     async ({ page }) => {
       // DEBERÍA: saltarse el dibujo mientras el lienzo mida 0 y dibujarlo en cuanto tenga tamaño
@@ -1032,7 +1032,13 @@ test.describe('Re-inspección 25/09/2026 · H1 · el lienzo sin tamaño al monta
       await laAppSeVe(page, 'con el lienzo oculto al hidratar');
       expect(errores, 'IndexSizeError de arc()').toEqual([]);
 
-      await page.evaluate(() => document.getElementById('css-prueba-inspector')?.remove());
+      // Se VACÍA la regla en vez de retirar el <style>: `cssAntesDeHidratar` lo vuelve a
+      // insertar en cuanto sale del documento (su MutationObserver), así que `.remove()` dejaba
+      // el lienzo oculto para siempre y el test medía eso, no la app.
+      await page.evaluate(() => {
+        const estilo = document.getElementById('css-prueba-inspector');
+        if (estilo) estilo.textContent = '';
+      });
       await expect
         .poll(async () => (await estadoLienzo(page)).pintado, { timeout: 2000, message: 'el lienzo se dibuja al aparecer' })
         .toBe(true);
@@ -1042,7 +1048,7 @@ test.describe('Re-inspección 25/09/2026 · H1 · el lienzo sin tamaño al monta
   test.describe('móvil 412×915 (Galaxy A06)', () => {
     test.use(MOVIL_A06);
 
-    test.fail('H1 · una vista que monta sin tamaño (1×1) y luego crece a 412×915 no cae', async ({ page }) => {
+    test('H1 · una vista que monta sin tamaño (1×1) y luego crece a 412×915 no cae', async ({ page }) => {
       // Es lo que hace un WebView (navegador de Instagram, pestaña que se carga oculta) que
       // monta la página antes de tener su tamaño. HOY: «Algo salió mal» con radio −40, y la
       // página NO se recupera al crecer la vista.
@@ -1059,7 +1065,7 @@ test.describe('Re-inspección 25/09/2026 · H1 · el lienzo sin tamaño al monta
         .toBeGreaterThan(300);
     });
 
-    test.fail('H1 · a 140 px de ancho (lienzo de 74 px, radio −3) la app no cae', async ({ page }) => {
+    test('H1 · a 140 px de ancho (lienzo de 74 px, radio −3) la app no cae', async ({ page }) => {
       // La guarda tiene que cubrir radio ≤ 0, no solo tamaño 0: min(W, H) / 2 − 40 es negativo
       // con cualquier lienzo de menos de 80 px. A 160 px de ancho ya no cae.
       await page.setViewportSize({ width: 140, height: 915 });
@@ -1071,7 +1077,7 @@ test.describe('Re-inspección 25/09/2026 · H1 · el lienzo sin tamaño al monta
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
-// HALLAZGO H2 (operativa, medio) — ABIERTO · en móvil el lienzo depende de su propio atributo
+// HALLAZGO H2 (operativa, medio) — REPARADO 25/09/2026 · en móvil el lienzo depende de su propio atributo
 // ─────────────────────────────────────────────────────────────────────────────────────────
 
 test.describe('Re-inspección 25/09/2026 · H2 · en móvil el lienzo no se recupera de un 0', () => {
@@ -1101,7 +1107,7 @@ test.describe('Re-inspección 25/09/2026 · H2 · en móvil el lienzo no se recu
     await contexto.close();
   });
 
-  test.fail('H2 · tras un resize transitorio a 1×1, el lienzo vuelve y un cambio de ángulo no tira la página', async ({ page }) => {
+  test('H2 · tras un resize transitorio a 1×1, el lienzo vuelve y un cambio de ángulo no tira la página', async ({ page }) => {
     // DEBERÍA: al volver a 412×915, el lienzo recupera sus ~346 px y sigue funcionando.
     // HOY: el resize a 1×1 dibuja con el lienzo a 0 y deja su atributo width = 0; como en móvil
     // el ancho del marco es el ancho intrínseco del lienzo, se queda a 0×0 aunque la ventana
@@ -1118,7 +1124,7 @@ test.describe('Re-inspección 25/09/2026 · H2 · en móvil el lienzo no se recu
     await laAppSeVe(page, 'cambio de ángulo tras el resize');
   });
 
-  test.fail('H2 · el primer dibujo en móvil tiene la resolución del lienzo que se ve', async ({ page }) => {
+  test('H2 · el primer dibujo en móvil tiene la resolución del lienzo que se ve', async ({ page }) => {
     // DEBERÍA: búfer = ancho CSS × dpr = 346 × 1,75 = 605 px. HOY: 525 = 300 × 1,75, porque
     // `dibujar` mide el lienzo con su ancho por defecto (300 px) antes de que el marco crezca
     // a 346, y nada lo vuelve a dibujar: el círculo sale estirado un 15 % hasta el primer resize.
@@ -1135,11 +1141,11 @@ test.describe('Re-inspección 25/09/2026 · H2 · en móvil el lienzo no se recu
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
-// HALLAZGO H3 (cálculo, medio) — ABIERTO · fracción de π exacta para un ángulo que no lo es
+// HALLAZGO H3 (cálculo, medio) — REPARADO 25/09/2026 · fracción de π exacta para un ángulo que no lo es
 // ─────────────────────────────────────────────────────────────────────────────────────────
 
 test.describe('Re-inspección 25/09/2026 · H3 · la fracción de π sale de redondear el ángulo', () => {
-  test.fail('H3 · 1,565 rad y 29,6° no se rotulan π/2 ni π/6', async ({ page }) => {
+  test('H3 · 1,565 rad y 29,6° no se rotulan π/2 ni π/6', async ({ page }) => {
     // π/2 = 1,5708 rad, π/6 = 0,5236 rad. DEBERÍA: rotular la fracción solo cuando el ángulo ES
     // el notable. HOY: `fracciones[Math.round(angulo)]` pone la fracción exacta a todo lo que
     // esté a menos de medio grado: 1,565 rad (89,67°) sale «θ = π/2» con tan = 172,5211, y
@@ -1161,11 +1167,11 @@ test.describe('Re-inspección 25/09/2026 · H3 · la fracción de π sale de red
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
-// HALLAZGO H4 (contenido, bajo) — ABIERTO · el ángulo en grados sale en formato de EE. UU.
+// HALLAZGO H4 (contenido, bajo) — REPARADO 25/09/2026 · el ángulo en grados sale en formato de EE. UU.
 // ─────────────────────────────────────────────────────────────────────────────────────────
 
 test.describe('Re-inspección 25/09/2026 · H4 · formato del ángulo', () => {
-  test.fail('H4 · «Ver 36,87° en el círculo» del caso 8 no escribe «36.8699°»', async ({ page }) => {
+  test('H4 · «Ver 36,87° en el círculo» del caso 8 no escribe «36.8699°»', async ({ page }) => {
     // El ángulo del caso 8 es arcsen 0,6 = 36,8699°. DEBERÍA salir con coma y como mucho 4
     // decimales, igual que el resto del panel. HOY: «θ (grados) 36.8699°» y «θ = 36.8699°», con
     // punto; con 1 rad en modo radianes, «57.29577951308232°».
@@ -1182,7 +1188,7 @@ test.describe('Re-inspección 25/09/2026 · H4 · formato del ángulo', () => {
     await expect(valor(page, 'θ (grados)')).toHaveText(/^57,\d{1,4}°$/, { timeout: 1500 });
   });
 
-  test.fail('H4 · el veredicto pega el símbolo de grado a la cifra, como el resto de la app', async ({ page }) => {
+  test('H4 · el veredicto pega el símbolo de grado a la cifra, como el resto de la app', async ({ page }) => {
     // Caso 5: ángulo de referencia de 210° = 30°. DEBERÍA: «Correcto: 30°.» como escribe la app
     // en sus enunciados y botones («sen 30°», «Ver 30° en el círculo»). HOY: «Correcto: 30 °.»
     await page.goto(RUTA);
