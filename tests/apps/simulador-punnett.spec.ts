@@ -179,11 +179,10 @@ test.describe('Cuadro de Punnett', () => {
     );
 
     // Porcentajes fenotípicos: 9/16 = 56,25 % · 3/16 = 18,75 % · 1/16 = 6,25 %.
-    // OJO (25/09/2026): esta línea fija la salida DEFECTUOSA de hoy —enteros y «%» pegado—,
-    // que es el hallazgo A de la re-inspección (ver el final del fichero). Al repararlo, esta
-    // aserción se pondrá en rojo: cambiarla por «9 (56,25 %) … 1 (6,25 %)» en el mismo commit.
+    // Hasta el 25/09/2026 esta línea fijaba la salida defectuosa (enteros y «%» pegado,
+    // 56/19/19/6); reparada con el hallazgo 1668, ahora exige los valores exactos.
     await expect(page.locator('[class*="interpretacionText"]')).toContainText(
-      'De las 16 combinaciones: 9 (56%) dominante-dominante, 3 (19%) dominante-recesivo, 3 (19%) recesivo-dominante, 1 (6%) recesivo-recesivo.',
+      'De las 16 combinaciones: 9 (56,25 %) dominante-dominante, 3 (18,75 %) dominante-recesivo, 3 (18,75 %) recesivo-dominante, 1 (6,25 %) recesivo-recesivo.',
     );
   });
 
@@ -369,8 +368,7 @@ test.describe('Cuadro de Punnett', () => {
  * ENLACE df61f210 — Iᴬi × Iᴮi a mano: gametos Iᴬ, i × Iᴮ, i → IᴬIᴮ (grupo AB), Iᴬi (A),
  *   Iᴮi (B), ii (O): cuatro grupos a 1/4 = 1:1:1:1, como dice la tarjeta.
  *
- * HALLAZGOS ABIERTOS (test.fail — afirman lo que DEBERÍA pasar y hoy fallan a propósito; el
- * día que se reparen se pondrán en verde: quitar entonces `test.fail` y quedan de regresión):
+ * REPARADOS el 25/09/2026 (eran test.fail; hoy son de regresión):
  *   A. El «Resultado:» del dihíbrido redondea a entero y pega el «%»: AaBb × Aabb dice
  *      38 % + 38 % + 13 % + 13 % = 102 %, y AaBb × AaBb 56/19/19/6 en vez de
  *      56,25/18,75/18,75/6,25. Es el defecto de 751/755, que sobrevive en interpretarDihibrido.
@@ -379,6 +377,9 @@ test.describe('Cuadro de Punnett', () => {
  *   C. Las cabeceras de las dos tablas ponen texto blanco sobre var(--primary, #2E86AB):
  *      4,11:1 en claro y 2,79:1 en oscuro, por debajo de 4,5:1. El candado
  *      check:contraste-cabeceras no lo ve: su regex exige `var(--primary)` SIN fallback.
+ *      Reparado: `.punnettHeader` y `.tabla th` pasan a `var(--primary-boton)` (5,47:1).
+ *   D. (1671) La tarjeta de esta app en los RelatedApps de simulador-genetica la describía
+ *      «(EBAU/Bachillerato)», términos España-only (regla 1.bis). Reparado en app-relations.ts.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 const RESULTADO = '[class*="interpretacionText"]';
@@ -656,12 +657,11 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
   });
 
   // ============================================================
-  // HALLAZGOS ABIERTOS (ver la cabecera de este bloque)
+  // REPARADOS el 25/09/2026 (hallazgos 1668-1671; eran `test.fail`, ver la cabecera del bloque)
   // ============================================================
-  test('HALLAZGO A (abierto) — el «Resultado:» del dihíbrido redondea a entero: AaBb × Aabb suma 102 %', async ({
+  test('REPARADO 25/09 (1668) — el «Resultado:» del dihíbrido da los % exactos: AaBb × Aabb suma 100 %', async ({
     page,
   }) => {
-    test.fail(true, 'interpretarDihibrido usa Math.round y pega el «%»: hoy dice 38 % + 38 % + 13 % + 13 % = 102 %');
     await montarCruce(page, 'di', ['Aa', 'Aa'], ['Bb', 'bb']);
     // A mano (CASO 7): 6/16 = 37,5 % · 6/16 = 37,5 % · 2/16 = 12,5 % · 2/16 = 12,5 %. Debería
     // decirlo con los decimales exactos y el espacio del formato español, como ya lo dice la
@@ -678,10 +678,9 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     );
   });
 
-  test('HALLAZGO B (abierto) — la tabla educativa sigue con «100 % Aa» junto a «100% portadores» (755)', async ({
+  test('REPARADO 25/09 (1669) — la tabla educativa escribe «100 % portadores», con el espacio (755)', async ({
     page,
   }) => {
-    test.fail(true, 'la columna «¿Portadores?» y dos tarjetas escriben el % pegado; 755 se cerró sin tocarlas');
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     // A mano: AA × aa → gametos A × a → las 4 celdas Aa → 100 % Aa, 100 % portadores.
     const filaAAxaa = page.locator('table[aria-label="Cruces y proporciones"] tbody tr').nth(3);
@@ -695,10 +694,9 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     }
   });
 
-  test('HALLAZGO C (abierto) — cabeceras de tabla con blanco sobre var(--primary): 4,11:1 en claro, 2,79:1 en oscuro', async ({
+  test('REPARADO 25/09 (1670) — las cabeceras de tabla con texto blanco llegan a 4,5:1 en claro y en oscuro', async ({
     page,
   }) => {
-    test.fail(true, '.punnettHeader y .tabla th usan var(--primary, #2E86AB) con texto #fff; el umbral es 4,5:1');
     // Sin transiciones: en oscuro, medir durante la animación da un color intermedio.
     await page.addStyleTag({
       content: '*, *::before, *::after { transition: none !important; animation: none !important; }',
@@ -715,6 +713,16 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     expect(await contrasteDe(gameto)).toBeGreaterThanOrEqual(4.5);
     expect(await contrasteDe(genotipo)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('REPARADO 25/09 (1671) — la tarjeta de Punnett en simulador-genetica no dice EBAU ni Bachillerato', async ({
+    page,
+  }) => {
+    await page.goto('/simulador-genetica/');
+    const tarjeta = page.getByRole('link', { name: 'Ir a Cuadro de Punnett' });
+    await expect(tarjeta.first()).toBeVisible();
+    await expect(tarjeta.first()).toContainText('educación media');
+    await expect(tarjeta.first()).not.toContainText(/EBAU|Bachillerato/);
   });
 });
 

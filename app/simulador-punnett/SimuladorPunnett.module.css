@@ -138,8 +138,11 @@
   overflow: hidden;
 }
 
+/* Blanco sobre --primary daba 4,11:1 en claro y 2,79:1 en oscuro, por debajo del 4,5:1 del
+   texto pequeño (17,6 px en negrita no llega a «grande»). --primary-boton: 5,47:1 en ambos
+   temas (hallazgo 1670). */
 .punnettHeader {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 700;
   font-size: 1.1rem;

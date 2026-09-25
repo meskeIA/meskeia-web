@@ -242,12 +242,15 @@ function interpretarDihibrido(celdas: CeldaPunnett[]): string {
   const dr = celdas.filter(c => c.fenotipo === 'dominante-recesivo').length;
   const rd = celdas.filter(c => c.fenotipo === 'recesivo-dominante').length;
   const rr = celdas.filter(c => c.fenotipo === 'recesivo-recesivo').length;
+  // Mismo criterio que la tabla de recuento: con Math.round, AaBb × Aabb sumaba 102 % y el
+  // dihíbrido clásico daba 56/19/19/6 en vez de 56,25/18,75/18,75/6,25 (hallazgo 1668).
+  const pct = (n: number): string => `${porcentaje((n / total) * 100)} %`;
   return (
     `De las ${total} combinaciones: ` +
-    `${dd} (${Math.round((dd / total) * 100)}%) dominante-dominante, ` +
-    `${dr} (${Math.round((dr / total) * 100)}%) dominante-recesivo, ` +
-    `${rd} (${Math.round((rd / total) * 100)}%) recesivo-dominante, ` +
-    `${rr} (${Math.round((rr / total) * 100)}%) recesivo-recesivo.`
+    `${dd} (${pct(dd)}) dominante-dominante, ` +
+    `${dr} (${pct(dr)}) dominante-recesivo, ` +
+    `${rd} (${pct(rd)}) recesivo-dominante, ` +
+    `${rr} (${pct(rr)}) recesivo-recesivo.`
   );
 }
 
@@ -667,25 +670,25 @@ export default function SimuladorPunnettPage() {
                   <td>AA × Aa</td>
                   <td>1 AA : 1 Aa</td>
                   <td>100 % dominante</td>
-                  <td>50% portadores</td>
+                  <td>50 % portadores</td>
                 </tr>
                 <tr>
                   <td>Aa × Aa</td>
                   <td>1 AA : 2 Aa : 1 aa</td>
                   <td>3 dom : 1 rec (3:1)</td>
-                  <td>50% portadores</td>
+                  <td>50 % portadores</td>
                 </tr>
                 <tr>
                   <td>AA × aa</td>
                   <td>100 % Aa</td>
                   <td>100 % dominante</td>
-                  <td>100% portadores</td>
+                  <td>100 % portadores</td>
                 </tr>
                 <tr>
                   <td>Aa × aa</td>
                   <td>1 Aa : 1 aa</td>
                   <td>1 dom : 1 rec (1:1)</td>
-                  <td>50% portadores</td>
+                  <td>50 % portadores</td>
                 </tr>
                 <tr>
                   <td>aa × aa</td>
@@ -740,7 +743,7 @@ export default function SimuladorPunnettPage() {
               <strong>Enfermedades autosómicas recesivas (fibrosis quística)</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 Si ambos progenitores son portadores (Aa × Aa), el riesgo de descendencia
-                afectada es 25% (aa). El 50% serán portadores asintomáticos. Cruce Mendel clásico.
+                afectada es 25 % (aa). El 50 % serán portadores asintomáticos. Cruce Mendel clásico.
               </p>
             </div>
           </div>
@@ -925,7 +928,7 @@ export default function SimuladorPunnettPage() {
             <li>
               <strong>Creer que los alelos recesivos desaparecen</strong>: los portadores (Aa) mantienen
               el alelo recesivo en silencio. Puede reaparecer en generaciones futuras si dos portadores
-              se cruzan (Aa × Aa → 25% aa).
+              se cruzan (Aa × Aa → 25 % aa).
             </li>
             <li>
               <strong>Olvidar que el dihíbrido tiene 16 combinaciones</strong>: cada progenitor
