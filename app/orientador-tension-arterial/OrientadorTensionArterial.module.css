@@ -1,13 +1,17 @@
 /* ─── Variables de clasificación ───────────────────────────────────────────── */
+/* Son el FONDO de la cabecera del resultado y de las pastillas del historial, con texto
+   blanco encima, así que cada uno cumple 4,5:1 con el blanco (hallazgo 1721, 25/09/2026:
+   con los tonos 600 de antes seis de las ocho categorías se quedaban entre 2,72 y 4,27:1).
+   Iguales en los dos temas: el texto blanco va sobre el propio color, no sobre la página. */
 :root {
-  --cl-hipotension:  #3B82F6;   /* Azul */
-  --cl-optima:       #16A34A;   /* Verde */
-  --cl-normal:       #65A30D;   /* Verde-lima */
-  --cl-normal-alta:  #CA8A04;   /* Amarillo-ocre */
-  --cl-hta1:         #EA580C;   /* Naranja */
-  --cl-hta2:         #DC2626;   /* Rojo */
-  --cl-hta3:         #991B1B;   /* Rojo oscuro */
-  --cl-crisis:       #7F1D1D;   /* Granate */
+  --cl-hipotension:  #1D4ED8;   /* Azul — 6,70:1 con blanco */
+  --cl-optima:       #15803D;   /* Verde — 5,02:1 */
+  --cl-normal:       #4D7C0F;   /* Verde-lima — 4,99:1 */
+  --cl-normal-alta:  #A16207;   /* Amarillo-ocre — 4,92:1 */
+  --cl-hta1:         #C2410C;   /* Naranja — 5,18:1 */
+  --cl-hta2:         #B91C1C;   /* Rojo — 6,47:1 */
+  --cl-hta3:         #991B1B;   /* Rojo oscuro — 8,31:1 */
+  --cl-crisis:       #7F1D1D;   /* Granate — 10,02:1 */
 }
 
 /* ─── Contenedor ───────────────────────────────────────────────────────────── */
@@ -222,7 +226,8 @@
 
 .resultadoUrgencia {
   display: inline-block;
-  background: rgba(255,255,255,0.2);
+  /* Oscurece en vez de aclarar: con un velo blanco la pastilla «Atención» bajaba a 2,33:1. */
+  background: rgba(0,0,0,0.25);
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -239,7 +244,6 @@
 .resultadoDescripcion {
   margin: 0;
   font-size: 0.95rem;
-  opacity: 0.92;
 }
 
 .resultadoMetricas {
@@ -343,6 +347,16 @@
   border-top: 1px solid var(--border, #e5e5e5);
   font-size: 0.9rem;
   color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.resultadoRedondeo {
+  margin: 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border, #e5e5e5);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -519,6 +533,36 @@
   white-space: nowrap;
 }
 
+/* Lectura guardada que no se puede clasificar: sin color de categoría, que sería inventado. */
+.historialIlegible {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 20px;
+  border: 1px dashed var(--text-secondary);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.historialTope {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.historialDescartada {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 4px solid #B45309;
+  background: #FFF7ED;
+  color: #7C2D12;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
 .btnEliminar {
   width: 26px;
   height: 26px;
@@ -599,8 +643,20 @@
 }
 
 [data-theme='dark'] .resultadoDerivados,
+[data-theme='dark'] .resultadoRecomendacion,
+[data-theme='dark'] .resultadoRedondeo,
 [data-theme='dark'] .resultadoCabecera + .resultadoMetricas {
   border-top-color: #3a3a3a;
+}
+
+[data-theme='dark'] .resultadoRedondeo {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .historialDescartada {
+  background: #2a1f00;
+  border-left-color: #F59E0B;
+  color: #FCD34D;
 }
 
 [data-theme='dark'] .btnPeligro:hover {

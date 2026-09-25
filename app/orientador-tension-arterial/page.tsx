@@ -1,124 +1,35 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './OrientadorTensionArterial.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatDate } from '@/lib';
+import { formatDate, formatNumber } from '@/lib';
+import {
+  CLASIFICACIONES,
+  MAX_HISTORIAL,
+  agregarAlHistorial,
+  calcularPresionPulso,
+  calcularTAM,
+  clasificarGuardada,
+  clasificarTension,
+  esSistolicaAislada,
+  leerLectura,
+  nombreClasificacion,
+  normalizarHistorial,
+  valorarPresionPulso,
+  type ClasificacionId,
+  type ErroresLectura,
+  type Lectura,
+  type Medicion,
+  type Urgencia,
+} from './motor';
 
-// ─── Tipos ───────────────────────────────────────────────────────────────────
+// ─── Etiquetas de urgencia ───────────────────────────────────────────────────
 
-type ClasificacionId =
-  | 'hipotension'
-  | 'optima'
-  | 'normal'
-  | 'normal-alta'
-  | 'hta-grado-1'
-  | 'hta-grado-2'
-  | 'hta-grado-3'
-  | 'crisis-hipertensiva'
-  | 'sistolica-aislada';
-
-interface Clasificacion {
-  id: ClasificacionId;
-  nombre: string;
-  descripcion: string;
-  recomendacion: string;
-  color: string;
-  urgencia: 'normal' | 'atencion' | 'alerta' | 'urgente' | 'emergencia';
-}
-
-interface Medicion {
-  id: string;
-  fecha: string; // ISO string
-  sistolica: number;
-  diastolica: number;
-  pulso: number | null;
-  clasificacionId: ClasificacionId;
-}
-
-// ─── Clasificaciones ESH 2023 ────────────────────────────────────────────
-
-const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
-  hipotension: {
-    id: 'hipotension',
-    nombre: 'Hipotensión',
-    descripcion: 'Tensión arterial por debajo de los valores normales (< 90/60 mmHg)',
-    recomendacion: 'Consulta con tu médico si presentas síntomas como mareos, cansancio o desmayos.',
-    color: 'var(--cl-hipotension)',
-    urgencia: 'atencion',
-  },
-  optima: {
-    id: 'optima',
-    nombre: 'Tensión Óptima',
-    descripcion: 'Tensión arterial en los valores más saludables (< 120/80 mmHg)',
-    recomendacion: 'Excelente. Mantén tus hábitos de vida saludable.',
-    color: 'var(--cl-optima)',
-    urgencia: 'normal',
-  },
-  normal: {
-    id: 'normal',
-    nombre: 'Tensión Normal',
-    descripcion: 'Tensión arterial dentro del rango normal (120–129 / 80–84 mmHg)',
-    recomendacion: 'Bien. Continúa con hábitos saludables y revisiones periódicas.',
-    color: 'var(--cl-normal)',
-    urgencia: 'normal',
-  },
-  'normal-alta': {
-    id: 'normal-alta',
-    nombre: 'Normal-Alta',
-    descripcion: 'Tensión en el límite superior de la normalidad (130–139 / 85–89 mmHg)',
-    recomendacion: 'Presta atención a tu dieta, reduce el sodio y haz ejercicio regular. Consulta a tu médico.',
-    color: 'var(--cl-normal-alta)',
-    urgencia: 'atencion',
-  },
-  'hta-grado-1': {
-    id: 'hta-grado-1',
-    nombre: 'HTA Grado 1',
-    descripcion: 'Hipertensión leve (140–159 / 90–99 mmHg)',
-    recomendacion: 'Consulta a tu médico. Pueden recomendarse cambios en el estilo de vida o tratamiento.',
-    color: 'var(--cl-hta1)',
-    urgencia: 'alerta',
-  },
-  'hta-grado-2': {
-    id: 'hta-grado-2',
-    nombre: 'HTA Grado 2',
-    descripcion: 'Hipertensión moderada (160–179 / 100–109 mmHg)',
-    recomendacion: 'Consulta a tu médico con prontitud. Suele requerir tratamiento farmacológico.',
-    color: 'var(--cl-hta2)',
-    urgencia: 'urgente',
-  },
-  'hta-grado-3': {
-    id: 'hta-grado-3',
-    nombre: 'HTA Grado 3',
-    descripcion: 'Hipertensión severa (≥ 180 / ≥ 110 mmHg)',
-    recomendacion: 'Busca atención médica urgente. No esperes para consultar.',
-    color: 'var(--cl-hta3)',
-    urgencia: 'emergencia',
-  },
-  'crisis-hipertensiva': {
-    id: 'crisis-hipertensiva',
-    nombre: 'Crisis Hipertensiva',
-    descripcion: 'Tensión sistólica ≥ 180 mmHg y/o diastólica ≥ 120 mmHg',
-    // Sin emoji: la cadena se lee en voz alta y un lector de pantalla antepondría
-    // «señal de advertencia» a la única instrucción urgente de la app (hallazgo 297).
-    recomendacion: 'Acude a urgencias inmediatamente o llama al 112.',
-    color: 'var(--cl-crisis)',
-    urgencia: 'emergencia',
-  },
-  'sistolica-aislada': {
-    id: 'sistolica-aislada',
-    nombre: 'HTA Sistólica Aislada',
-    descripcion: 'Sistólica elevada con diastólica normal (≥ 140 / < 90 mmHg)',
-    recomendacion: 'Consulta a tu médico. Es frecuente en personas mayores y requiere seguimiento.',
-    color: 'var(--cl-hta1)',
-    urgencia: 'alerta',
-  },
-};
-
-const URGENCIA_ETIQUETAS: Record<Clasificacion['urgencia'], { emoji: string; texto: string }> = {
+const URGENCIA_ETIQUETAS: Record<Urgencia, { emoji: string; texto: string }> = {
   normal:     { emoji: '✅', texto: 'Normal' },
   atencion:   { emoji: '👀', texto: 'Atención' },
   alerta:     { emoji: '⚠️', texto: 'Alerta' },
@@ -126,95 +37,14 @@ const URGENCIA_ETIQUETAS: Record<Clasificacion['urgencia'], { emoji: string; tex
   emergencia: { emoji: '🚨', texto: 'Emergencia' },
 };
 
-// ─── Lógica de clasificación ESH 2023 ────────────────────────────────────
-
-/**
- * Clasifica una lectura según la tabla de la ESH 2023.
- *
- * La regla que gobierna toda la tabla es que **manda la categoría más alta de las dos**:
- * si la sistólica cae en grado 2 y la diastólica es normal, la lectura es de grado 2. De
- * ahí que las ramas vayan de mayor a menor gravedad y que la hipotensión se evalúe la
- * ÚLTIMA: hasta el 25/08/2026 iba la segunda y con OR, así que toda lectura con
- * diastólica < 60 se resolvía como «Hipotensión» sin llegar a mirar la sistólica —
- * 175/55 salía rotulada como tensión baja (hallazgo 294 del Inspector).
- *
- * La HTA sistólica aislada NO es una rama de esta función: la guía la gradúa por el valor
- * de la sistólica, así que es un matiz sobre el grado (ver `esSistolicaAislada`), no una
- * categoría que lo sustituya. Rotular 175/55 como «sistólica aislada» a secas rebajaba su
- * urgencia de «urgente» (grado 2) a «alerta».
- */
-function clasificarTension(sis: number, dia: number): ClasificacionId {
-  // Crisis hipertensiva (prioridad máxima) — PAS ≥ 180 y/o PAD ≥ 120
-  if (sis >= 180 || dia >= 120) return 'crisis-hipertensiva';
-
-  // HTA Grado 3
-  if (sis >= 180 || dia >= 110) return 'hta-grado-3';
-
-  // HTA Grado 2
-  if (sis >= 160 || dia >= 100) return 'hta-grado-2';
-
-  // HTA Grado 1
-  if (sis >= 140 || dia >= 90) return 'hta-grado-1';
-
-  // Normal-alta
-  if (sis >= 130 || dia >= 85) return 'normal-alta';
-
-  // Hipotensión — solo cuando NADA está elevado, para que nunca eclipse a una HTA. Va aquí
-  // y no al final para no perder los casos de diastólica baja con sistólica de 120-129
-  // (125/58), que la versión anterior sí avisaba.
-  if (sis < 90 || dia < 60) return 'hipotension';
-
-  // Normal
-  if (sis >= 120 || dia >= 80) return 'normal';
-
-  // Óptima
-  return 'optima';
-}
-
-/**
- * Patrón de HTA sistólica aislada: sistólica alta con diastólica normal, típico de la
- * rigidez arterial del mayor. Se superpone al grado, que lo fija la sistólica.
- */
-function esSistolicaAislada(sis: number, dia: number): boolean {
-  return sis >= 140 && dia < 90;
-}
-
-/** Nombre que se muestra: el del grado, con el matiz del patrón cuando lo hay. */
-function nombreClasificacion(clId: ClasificacionId, sis: number, dia: number): string {
-  const base = CLASIFICACIONES[clId].nombre;
-  if (!esSistolicaAislada(sis, dia)) return base;
-  if (clId === 'hta-grado-1') return 'HTA Sistólica Aislada (Grado 1)';
-  if (clId === 'hta-grado-2') return 'HTA Sistólica Aislada (Grado 2)';
-  if (clId === 'hta-grado-3') return 'HTA Sistólica Aislada (Grado 3)';
-  return base;
-}
-
-function calcularTAM(sis: number, dia: number): number {
-  // TAM = diastólica + (sistólica - diastólica) / 3
-  return Math.round(dia + (sis - dia) / 3);
-}
-
-function calcularPresionPulso(sis: number, dia: number): number {
-  return sis - dia;
-}
-
-function valorarPresionPulso(pp: number): string {
-  if (pp < 25) return 'Muy baja (< 25 mmHg)';
-  if (pp < 40) return 'Baja (< 40 mmHg)';
-  if (pp <= 60) return 'Normal (40–60 mmHg)';
-  if (pp <= 80) return 'Elevada (> 60 mmHg)';
-  return 'Muy elevada (> 80 mmHg)';
-}
-
 // ─── Historial (localStorage) ─────────────────────────────────────────────────
 
 const STORAGE_KEY = 'meskeia-tension-historial';
-const MAX_HISTORIAL = 20;
 
 function cargarHistorial(): Medicion[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Medicion[]) : [];
+    return raw ? normalizarHistorial(JSON.parse(raw)) : [];
   } catch {
     return [];
   }
@@ -228,15 +58,29 @@ function guardarHistorial(mediciones: Medicion[]): void {
   }
 }
 
+/** Fecha y hora de una lectura guardada; `null` si lo guardado no es una fecha. */
+function fechaYHora(iso: string): { fecha: string; hora: string } | null {
+  const d = new Date(iso);
+  if (iso === '' || Number.isNaN(d.getTime())) return null;
+  return {
+    fecha: formatDate(d),
+    hora: d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+  };
+}
+
+function valorGuardado(v: number | null): string {
+  return v === null ? '—' : formatNumber(v, Number.isInteger(v) ? 0 : 1);
+}
+
 // ─── Componente resultado ─────────────────────────────────────────────────────
 
 interface ResultadoProps {
-  sistolica: number;
-  diastolica: number;
-  pulso: number | null;
+  lectura: Lectura;
+  recomendacionRef: React.RefObject<HTMLDivElement | null>;
 }
 
-function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
+function Resultado({ lectura, recomendacionRef }: ResultadoProps) {
+  const { sis: sistolica, dia: diastolica, pulso, redondeos } = lectura;
   const clId = clasificarTension(sistolica, diastolica);
   const cl = CLASIFICACIONES[clId];
   const aislada = esSistolicaAislada(sistolica, diastolica);
@@ -261,9 +105,31 @@ function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
         <p className={styles.resultadoDescripcion}>{descripcion}</p>
       </div>
 
+      {/* La recomendación va pegada a la cabecera: es la única frase que dice QUÉ hacer, y
+          detrás de métricas y derivados quedaba fuera de la pantalla del móvil (hallazgo 1722).
+          Sin role/aria-live propios: el contenedor del resultado ya es role="status"
+          aria-live="polite", y anidar aquí un role="alert" (que implica assertive) hacía que
+          la recomendación se anunciase dos veces (hallazgo 297). */}
+      <div className={styles.resultadoRecomendacion} ref={recomendacionRef}>
+        <strong>Recomendación:</strong> {cl.recomendacion}
+      </div>
+
+      {redondeos.length > 0 && (
+        <p className={styles.resultadoRedondeo}>
+          La guía define sus cortes en valores enteros, así que se ha redondeado al más próximo:{' '}
+          {redondeos.map((r, i) => (
+            <span key={r.campo}>
+              {i > 0 ? ' · ' : ''}
+              {r.campo} {formatNumber(r.tecleado, r.decimales)} → <strong>{r.usado}</strong>
+            </span>
+          ))}
+          .
+        </p>
+      )}
+
       <div className={styles.resultadoMetricas}>
         <div className={styles.metrica}>
-          <span className={styles.metricaValor} style={{ color: cl.color }}>
+          <span className={styles.metricaValor}>
             {sistolica}
             <span className={styles.metricaUnidad}>mmHg</span>
           </span>
@@ -271,7 +137,7 @@ function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
         </div>
         <div className={styles.metricaSeparador}>/</div>
         <div className={styles.metrica}>
-          <span className={styles.metricaValor} style={{ color: cl.color }}>
+          <span className={styles.metricaValor}>
             {diastolica}
             <span className={styles.metricaUnidad}>mmHg</span>
           </span>
@@ -302,13 +168,6 @@ function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
           <span className={styles.derivadoValor}>{pp} <small>mmHg</small></span>
           <span className={styles.derivadoNota}>{ppLabel}</span>
         </div>
-      </div>
-
-      {/* Sin role/aria-live propios: el contenedor del resultado ya es role="status"
-          aria-live="polite", y anidar aquí un role="alert" (que implica assertive)
-          hacía que la recomendación se anunciase dos veces (hallazgo 297). */}
-      <div className={styles.resultadoRecomendacion}>
-        <strong>Recomendación:</strong> {cl.recomendacion}
       </div>
     </div>
   );
@@ -378,70 +237,48 @@ export default function CalculadoraTensionArterial() {
   const [sistolica, setSistolica] = useState('');
   const [diastolica, setDiastolica] = useState('');
   const [pulso, setPulso] = useState('');
-  const [resultado, setResultado] = useState<{ sis: number; dia: number; pulso: number | null } | null>(null);
-  const [errores, setErrores] = useState<{ sis?: string; dia?: string; pulso?: string }>({});
+  const [resultado, setResultado] = useState<Lectura | null>(null);
+  const [errores, setErrores] = useState<ErroresLectura>({});
   const [historial, setHistorial] = useState<Medicion[]>([]);
+  // Lecturas que el tope de MAX_HISTORIAL acaba de expulsar: se dicen, no se pierden en
+  // silencio (hallazgo 1719).
+  const [descartadas, setDescartadas] = useState<Medicion[]>([]);
   const [mostrarTabla, setMostrarTabla] = useState(false);
+  const recomendacionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setHistorial(cargarHistorial());
   }, []);
 
-  const validar = useCallback((): boolean => {
-    const nuevosErrores: typeof errores = {};
-    const sisNum = parseInt(sistolica, 10);
-    const diaNum = parseInt(diastolica, 10);
-
-    if (!sistolica || isNaN(sisNum)) {
-      nuevosErrores.sis = 'Introduce la tensión sistólica (número entero)';
-    } else if (sisNum < 50 || sisNum > 300) {
-      nuevosErrores.sis = 'Valor fuera de rango (50–300 mmHg)';
-    }
-
-    if (!diastolica || isNaN(diaNum)) {
-      nuevosErrores.dia = 'Introduce la tensión diastólica (número entero)';
-    } else if (diaNum < 30 || diaNum > 200) {
-      nuevosErrores.dia = 'Valor fuera de rango (30–200 mmHg)';
-    }
-
-    if (!nuevosErrores.sis && !nuevosErrores.dia && sisNum <= diaNum) {
-      nuevosErrores.sis = 'La sistólica debe ser mayor que la diastólica';
-    }
-
-    if (pulso) {
-      const pulsoNum = parseInt(pulso, 10);
-      if (isNaN(pulsoNum) || pulsoNum < 20 || pulsoNum > 300) {
-        nuevosErrores.pulso = 'Valor fuera de rango (20–300 ppm)';
-      }
-    }
-
-    setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
-  }, [sistolica, diastolica, pulso]);
+  // Tras calcular, que la recomendación quede a la vista: en móvil el resultado nace por
+  // debajo del pliegue y la instrucción del 112 no se veía (hallazgo 1722). `nearest` no
+  // desplaza nada si ya está en pantalla, que es lo habitual en escritorio.
+  useEffect(() => {
+    if (!resultado || !recomendacionRef.current) return;
+    const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    recomendacionRef.current.scrollIntoView({ block: 'nearest', behavior: reducido ? 'auto' : 'smooth' });
+  }, [resultado]);
 
   const calcular = useCallback(() => {
-    if (!validar()) return;
+    const { lectura, errores: nuevosErrores } = leerLectura(sistolica, diastolica, pulso);
+    setErrores(nuevosErrores);
+    if (!lectura) return;
 
-    const sisNum = parseInt(sistolica, 10);
-    const diaNum = parseInt(diastolica, 10);
-    const pulsoNum = pulso ? parseInt(pulso, 10) : null;
+    setResultado(lectura);
 
-    setResultado({ sis: sisNum, dia: diaNum, pulso: pulsoNum });
-
-    // Guardar en historial
-    const clId = clasificarTension(sisNum, diaNum);
+    // Guardar en historial — sin la categoría: se deriva de los valores al pintarla.
     const nuevaMedicion: Medicion = {
       id: Math.random().toString(36).slice(2, 9),
       fecha: new Date().toISOString(),
-      sistolica: sisNum,
-      diastolica: diaNum,
-      pulso: pulsoNum,
-      clasificacionId: clId,
+      sistolica: lectura.sis,
+      diastolica: lectura.dia,
+      pulso: lectura.pulso,
     };
-    const nuevoHistorial = [nuevaMedicion, ...historial].slice(0, MAX_HISTORIAL);
+    const { historial: nuevoHistorial, descartadas: fuera } = agregarAlHistorial(nuevaMedicion, historial);
     setHistorial(nuevoHistorial);
+    setDescartadas(fuera);
     guardarHistorial(nuevoHistorial);
-  }, [sistolica, diastolica, pulso, validar, historial]);
+  }, [sistolica, diastolica, pulso, historial]);
 
   const limpiar = useCallback(() => {
     setSistolica('');
@@ -454,12 +291,14 @@ export default function CalculadoraTensionArterial() {
   const eliminarMedicion = useCallback((id: string) => {
     const nuevo = historial.filter(m => m.id !== id);
     setHistorial(nuevo);
+    setDescartadas([]);
     guardarHistorial(nuevo);
   }, [historial]);
 
   const limpiarHistorial = useCallback(() => {
     if (!confirm('¿Borrar todo el historial de mediciones?')) return;
     setHistorial([]);
+    setDescartadas([]);
     guardarHistorial([]);
   }, []);
 
@@ -517,7 +356,8 @@ export default function CalculadoraTensionArterial() {
               id="sistolica"
               className={`${styles.input} ${errores.sis ? styles.inputError : ''}`}
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
+              step="any"
               placeholder="ej. 120"
               min={50}
               max={300}
@@ -539,7 +379,8 @@ export default function CalculadoraTensionArterial() {
               id="diastolica"
               className={`${styles.input} ${errores.dia ? styles.inputError : ''}`}
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
+              step="any"
               placeholder="ej. 80"
               min={30}
               max={200}
@@ -561,7 +402,8 @@ export default function CalculadoraTensionArterial() {
               id="pulso"
               className={`${styles.input} ${errores.pulso ? styles.inputError : ''}`}
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
+              step="any"
               placeholder="ej. 72"
               min={20}
               max={300}
@@ -586,7 +428,7 @@ export default function CalculadoraTensionArterial() {
       <div role="status" aria-live="polite" aria-atomic="true">
         {resultado && (
           <div className={styles.resultadoWrapper}>
-            <Resultado sistolica={resultado.sis} diastolica={resultado.dia} pulso={resultado.pulso} />
+            <Resultado lectura={resultado} recomendacionRef={recomendacionRef} />
           </div>
         )}
       </div>
@@ -613,6 +455,28 @@ export default function CalculadoraTensionArterial() {
               Borrar historial
             </button>
           </div>
+          <p className={styles.historialTope}>
+            Se guardan las últimas {MAX_HISTORIAL} mediciones ({historial.length} de {MAX_HISTORIAL}).
+            Al añadir una más se descarta la más antigua: si llevas un registro para tu médico,
+            anótalo también fuera de la app.
+          </p>
+          <div role="status" aria-live="polite">
+            {descartadas.length > 0 && (
+              <p className={styles.historialDescartada}>
+                Se ha descartado la medición más antigua para no pasar de {MAX_HISTORIAL}:{' '}
+                {descartadas.map((m) => {
+                  const cuando = fechaYHora(m.fecha);
+                  return (
+                    <span key={m.id}>
+                      {valorGuardado(m.sistolica)}/{valorGuardado(m.diastolica)} mmHg
+                      {cuando ? ` del ${cuando.fecha} a las ${cuando.hora}` : ''}
+                    </span>
+                  );
+                })}
+                .
+              </p>
+            )}
+          </div>
           <div className={styles.historialWrapper}>
             <table className={styles.historialTabla} aria-label="Historial de mediciones de tensión arterial">
               <thead>
@@ -627,30 +491,43 @@ export default function CalculadoraTensionArterial() {
               </thead>
               <tbody>
                 {historial.map(m => {
-                  const cl = CLASIFICACIONES[m.clasificacionId];
-                  const fecha = new Date(m.fecha);
-                  const fechaFormateada = formatDate(fecha);
-                  const horaFormateada = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                  // La categoría se RECALCULA con las reglas de hoy: lo guardado por una
+                  // versión anterior puede estar mal clasificado (hallazgo 1718).
+                  const cl = clasificarGuardada(m);
+                  const cuando = fechaYHora(m.fecha);
+                  const textoFecha = cuando ? `${cuando.fecha} ${cuando.hora}` : 'Fecha desconocida';
+                  const valores = `${valorGuardado(m.sistolica)}/${valorGuardado(m.diastolica)}`;
+                  // Fecha, hora y valores: dos lecturas del mismo día tenían el mismo nombre
+                  // accesible y no se sabía cuál se borraba (hallazgo 1720).
+                  const nombreEliminar = cuando
+                    ? `Eliminar medición ${valores} del ${cuando.fecha} a las ${cuando.hora}`
+                    : `Eliminar medición ${valores} de fecha desconocida`;
                   return (
                     <tr key={m.id}>
-                      <td className={styles.historialFecha}>{fechaFormateada} {horaFormateada}</td>
-                      <td><strong>{m.sistolica}</strong></td>
-                      <td><strong>{m.diastolica}</strong></td>
-                      <td>{m.pulso ?? '—'}</td>
+                      <td className={styles.historialFecha}>{textoFecha}</td>
+                      <td><strong>{valorGuardado(m.sistolica)}</strong></td>
+                      <td><strong>{valorGuardado(m.diastolica)}</strong></td>
+                      <td>{valorGuardado(m.pulso)}</td>
                       <td>
-                        <span
-                          className={styles.historialBadge}
-                          style={{ background: cl.color }}
-                        >
-                          {nombreClasificacion(m.clasificacionId, m.sistolica, m.diastolica)}
-                        </span>
+                        {cl ? (
+                          <span
+                            className={styles.historialBadge}
+                            style={{ background: CLASIFICACIONES[cl.id].color }}
+                          >
+                            {cl.nombre}
+                          </span>
+                        ) : (
+                          <span className={styles.historialIlegible}>
+                            Lectura ilegible, sin clasificar
+                          </span>
+                        )}
                       </td>
                       <td>
                         <button
                           className={styles.btnEliminar}
                           onClick={() => eliminarMedicion(m.id)}
                           type="button"
-                          aria-label={`Eliminar medición del ${fechaFormateada}`}
+                          aria-label={nombreEliminar}
                           title="Eliminar"
                         >✕</button>
                       </td>
@@ -771,7 +648,7 @@ export default function CalculadoraTensionArterial() {
           </div>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">🤰</span> Embarazada</h3>
-            <p>La tensión arterial se controla estrechamente durante el embarazo. La preeclampsia (sistólica ≥140 o diastólica ≥90 después de la semana 20) es una emergencia obstétrica que requiere atención inmediata.</p>
+            <p>La tensión arterial se controla estrechamente durante el embarazo. Una tensión ≥140/90 que aparece después de la semana 20 es hipertensión gestacional y necesita control médico. Si además hay proteinuria u otra disfunción orgánica de la madre (renal, hepática, neurológica o hematológica) o uteroplacentaria (como un crecimiento fetal restringido), se habla de preeclampsia, que requiere valoración médica urgente. Esta herramienta no está pensada para el embarazo: sigue las indicaciones de tu equipo obstétrico.</p>
           </div>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">📱</span> Primera medición</h3>
@@ -849,7 +726,7 @@ export default function CalculadoraTensionArterial() {
             <div className={styles.stepNumber}>5</div>
             <div className={styles.stepContent}>
               <h3>Introduce los valores en la calculadora</h3>
-              <p>Usa la media de tus mediciones. Introduce sistólica, diastólica y opcionalmente el pulso. La app calculará la clasificación ESH 2023, la TAM y la presión de pulso.</p>
+              <p>Usa la media de tus mediciones (si tiene decimales, la app la redondea al mmHg entero más próximo, que es como la guía fija sus cortes). Introduce sistólica, diastólica y opcionalmente el pulso. La app calculará la clasificación ESH 2023, la TAM y la presión de pulso.</p>
             </div>
           </div>
           <div className={styles.step}>
