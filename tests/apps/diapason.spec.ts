@@ -962,15 +962,14 @@ test.describe('Inspección 25/09/2026 — re-inspección 2: rampas programadas, 
   }
 
   /*
-   * HALLAZGO (25/09/2026, sospecha confirmada). El deslizador de frecuencia va de 400 a 480; con
+   * HALLAZGO REPARADO el 25/09/2026 (ronda 15; antes test.fail). Acta original (25/09/2026, sospecha confirmada). El deslizador de frecuencia va de 400 a 480; con
    * una frecuencia fuera de ese rango, el <input type="range"> recorta su valor al extremo y no
    * lleva aria-valuetext: con 1.000 Hz sonando, el lector de pantalla anuncia «480» (medido en
    * el árbol de accesibilidad de Chrome: value 480, valuetext «480»); con 20 Hz, «400». Además,
    * End o → no hacen nada (el DOM ya está en 480) y ← salta de 1.000 a 479 Hz.
    * Correcto: si el deslizador se expone, su valor accesible dice la frecuencia que suena.
    */
-  test('hallazgo: con 1.000 Hz sonando, el deslizador de frecuencia no anuncia 480', async ({ page }) => {
-    test.fail();
+  test('1729 · con 1.000 Hz sonando, el deslizador de frecuencia no anuncia 480', async ({ page }) => {
     await page.locator(CAMPO).fill('1000');
     await esperarValorEnReact(page, CAMPO, '1000');
     await botonReproducir(page).click();
@@ -988,14 +987,13 @@ test.describe('Inspección 25/09/2026 — re-inspección 2: rampas programadas, 
   });
 
   /*
-   * HALLAZGO (25/09/2026). El campo lee con parseInt: los decimales se TRUNCAN (no se redondean,
+   * HALLAZGO REPARADO el 25/09/2026 (ronda 15; antes test.fail). Acta original (25/09/2026). El campo lee con parseInt: los decimales se TRUNCAN (no se redondean,
    * aunque aplicarFrecuencia redondea), y el navegador sí acepta «27,5» y lo entrega como «27.5».
    * 27,5 Hz es el La0, la tecla más grave del piano: suena 27 Hz, 1200·log2(27/27,5) = −31,8 cents
    * (la propia etiqueta lo delata: «La A0 −31,8 cents»). 440,9 → 440 en vez de 441.
    * Correcto: suena el valor pedido o, si la app solo admite enteros, el entero más cercano.
    */
-  test('hallazgo: 27,5 Hz (La0) no se trunca a 27 Hz, ni 440,9 a 440', async ({ page }) => {
-    test.fail();
+  test('1733 · 27,5 Hz (La0) no se trunca a 27 Hz, ni 440,9 a 440', async ({ page }) => {
     await botonReproducir(page).click();
     const campo = page.locator(CAMPO);
     const casos: [string, number, number][] = [
@@ -1011,24 +1009,30 @@ test.describe('Inspección 25/09/2026 — re-inspección 2: rampas programadas, 
       await expect
         .poll(
           async () => {
+            // AudioParam guarda float32: 440,9 se lee como 440,8999938964844. Se compara a la
+            // centésima, que es la precisión con la que la app fija la frecuencia.
             const f = (await sonando(page))[0]?.frecuencia;
-            return `${f} Hz`;
+            return `${f === undefined ? f : Math.round(f * 100) / 100} Hz`;
           },
           { message: `campo «${entrada}»: debe sonar ${exacto} o ${redondeado} Hz`, timeout: 2000 },
         )
         .toMatch(new RegExp(`^(${String(exacto).replace('.', '\\.')}|${redondeado}) Hz$`));
     }
+    // La pantalla lo dice en formato español y la nota es el La0 exacto: 440/16 = 27,5 Hz.
+    await campo.fill('27.5');
+    await campo.blur();
+    await expect(pantalla(page)).toHaveText('27,5');
+    await expect(page.getByTestId('nota-cercana')).toHaveText('LaA0afinada (0 cents)');
   });
 
   /*
-   * HALLAZGO (25/09/2026). Al desmontar la página con el tono sonando (clic en una app
+   * HALLAZGO REPARADO el 25/09/2026 (ronda 15; antes test.fail). Acta original (25/09/2026). Al desmontar la página con el tono sonando (clic en una app
    * relacionada: navegación de cliente), el efecto de limpieza hace oscillator.stop() sin
    * argumento y audioContext.close() en el mismo instante, sin ninguna rampa sobre la ganancia:
    * el tono se corta en seco desde 0,5, el chasquido que Detener sí evita.
    * Correcto: una rampa de la ganancia a 0 antes de parar el oscilador o cerrar el contexto.
    */
-  test('hallazgo: salir a otra app con el tono sonando hace rampa de salida antes de cortar', async ({ page }) => {
-    test.fail();
+  test('1730 · salir a otra app con el tono sonando hace rampa de salida antes de cortar', async ({ page }) => {
     await botonReproducir(page).click();
     await expect.poll(async () => (await sonando(page)).map((o) => o.frecuencia)).toEqual([440]);
     await page.waitForTimeout(300); // pasada la rampa de entrada: la ganancia está en 0,5
@@ -1049,7 +1053,7 @@ test.describe('Inspección 25/09/2026 — re-inspección 2: rampas programadas, 
   });
 
   /*
-   * HALLAZGO (25/09/2026, sospecha confirmada con fuentes consultadas en sesión). La fila
+   * HALLAZGO REPARADO el 25/09/2026 (ronda 15; antes test.fail). Acta original (25/09/2026, sospecha confirmada con fuentes consultadas en sesión). La fila
    * «Europeo alto · 442,0 Hz» pone como usuarias a las «Orquestas de Viena, Berlín». La
    * Filarmónica de Viena afina a 443 Hz: en.wikipedia «Vienna Philharmonic» («The orchestra's
    * standard tuning pitch is A4=443 Hz», citando wienerphilharmoniker.at, «Viennese Sound»);
@@ -1057,23 +1061,21 @@ test.describe('Inspección 25/09/2026 — re-inspección 2: rampas programadas, 
    * 443 Hz (+12 Cent) eingestimmt», citando a C. Hellsberg, «Gedanken zum Stimmton», Bühne 9/2016;
    * antes, 444-445 Hz). Y Berlín sale a la vez en la fila de 442 y en la de 443.
    */
-  test('hallazgo: la tabla no pone a Viena en 442 Hz', async ({ page }) => {
-    test.fail();
+  test('1731 · la tabla no pone a Viena en 442 Hz', async ({ page }) => {
     const fila442 = page.locator('table tbody tr').filter({ hasText: '442,0 Hz' });
     await expect(fila442).toHaveCount(1);
     await expect(fila442).not.toContainText('Viena');
   });
 
   /*
-   * HALLAZGO (25/09/2026). El escenario «Afinar guitarra acústica» dice: genera el La4 a 440 Hz,
+   * HALLAZGO REPARADO el 25/09/2026 (ronda 15; antes test.fail). Acta original (25/09/2026). El escenario «Afinar guitarra acústica» dice: genera el La4 a 440 Hz,
    * toca la cuerda La (5ª) «y ajusta la clavija hasta que ambos tonos suenen igual». La 5ª cuerda
    * al aire es La2 = 110 Hz (en.wikipedia «Guitar tunings», afinación estándar: «5 (A) | 110.00 Hz
    * | A2»), dos octavas por debajo: nunca «suenan igual». Se compara con su armónico del traste 5
    * (4 × 110 = 440 Hz) o se genera 110 Hz, que el campo libre admite.
    * Correcto: el escenario menciona los 110 Hz, el armónico o la diferencia de octavas.
    */
-  test('hallazgo: el escenario de guitarra no manda igualar la 5ª cuerda al aire con 440 Hz', async ({ page }) => {
-    test.fail();
+  test('1732 · el escenario de guitarra no manda igualar la 5ª cuerda al aire con 440 Hz', async ({ page }) => {
     const tarjeta = page.locator('[class*="escenarioCard"]').filter({ hasText: 'Afinar guitarra acústica' });
     await expect(tarjeta).toHaveCount(1);
     await expect(tarjeta).toContainText(/110 Hz|armónico|octava/);

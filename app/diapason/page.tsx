@@ -18,8 +18,8 @@ const FRECUENCIAS_PRESET: FrecuenciaPreset[] = [
   // Decía «Afinación alternativa "natural"»: la etiqueta del movimiento 432 que la FAQ desmiente,
   // no la del diapasón histórico italiano (hallazgo 1508, ver la fila de la tabla).
   { nombre: 'La 432Hz', frecuencia: 432, descripcion: 'Italia 1881-1884 · diapasón de Verdi' },
-  { nombre: 'La 442Hz', frecuencia: 442, descripcion: 'Orquestas europeas' },
-  { nombre: 'La 443Hz', frecuencia: 443, descripcion: 'Algunas orquestas (Berlín)' },
+  { nombre: 'La 442Hz', frecuencia: 442, descripcion: 'Orquestas europeas (Suiza, Italia…)' },
+  { nombre: 'La 443Hz', frecuencia: 443, descripcion: 'Orquestas alemanas y austriacas' },
   { nombre: 'La 415Hz', frecuencia: 415, descripcion: 'Barroco · convención historicista' },
   { nombre: 'La 466Hz', frecuencia: 466, descripcion: 'Chorton · convención historicista' },
 ];
@@ -57,6 +57,58 @@ function notaMasCercana(frecuencia: number): NotaCercana {
   };
 }
 
+/**
+ * Precisión de la frecuencia: centésimas de hercio (hallazgo 1733).
+ *
+ * El campo leía con parseInt y TRUNCABA los decimales que el navegador sí acepta: el La0
+ * (27,5 Hz, la tecla más grave del piano) sonaba a 27 Hz, −31,8 cents; el Científico de la
+ * tabla (430,54 Hz) sonaba a 430. Un OscillatorNode admite frecuencias no enteras.
+ */
+function redondearFrecuencia(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+/** La frecuencia con los decimales que de verdad tiene (440 → «440», 27,5 → «27,5»). */
+function textoFrecuencia(f: number): string {
+  const r = redondearFrecuencia(f);
+  const decimales = Number.isInteger(r) ? 0 : Math.abs(Math.round(r * 10) - r * 10) < 1e-9 ? 1 : 2;
+  return formatNumber(r, decimales);
+}
+
+/**
+ * Apaga un tono con una rampa de ganancia a 0 y para el oscilador al final de la rampa, en el
+ * reloj de audio. Detener, el arranque defensivo y el desmontaje pasan por aquí: cortar en seco
+ * desde la ganancia en curso es el chasquido que la rampa evita (hallazgo 1730, el desmontaje
+ * hacía stop() y close() en el mismo instante). La desconexión y lo que haya que hacer después
+ * (cerrar el contexto al desmontar) van en `onended`, cuando el oscilador ya ha callado.
+ */
+function apagarConRampa(
+  ctx: AudioContext,
+  osc: OscillatorNode,
+  gain: GainNode | null,
+  segundos: number,
+  alAcabar?: () => void,
+): void {
+  const ahora = ctx.currentTime;
+  const fin = ahora + segundos;
+  if (gain) {
+    gain.gain.cancelScheduledValues(ahora);
+    gain.gain.setValueAtTime(gain.gain.value, ahora);
+    gain.gain.linearRampToValueAtTime(0, fin);
+  }
+  osc.onended = () => {
+    osc.disconnect();
+    gain?.disconnect();
+    alAcabar?.();
+  };
+  osc.stop(fin);
+}
+
+/** Rampa de salida de Detener. */
+const RAMPA_SALIDA_S = 0.1;
+/** Rampa de salida al desmontar la página (navegar a otra app con el tono sonando). */
+const RAMPA_DESMONTAJE_S = 0.05;
+
 function textoCents(cents: number): string {
   const redondeo = Math.round(cents * 10) / 10;
   if (redondeo === 0) return 'afinada (0 cents)';
@@ -81,10 +133,17 @@ export default function DiapasonPage() {
 
   /** Única puerta para cambiar la frecuencia desde fuera del campo (slider y presets) */
   const aplicarFrecuencia = (n: number) => {
-    const v = Math.max(DIAPASON_MIN, Math.min(DIAPASON_MAX, Math.round(n)));
+    const v = Math.max(DIAPASON_MIN, Math.min(DIAPASON_MAX, redondearFrecuencia(n)));
     setFrecuencia(v);
     setFrecuenciaTexto(String(v));
   };
+
+  /**
+   * Número del campo libre. Un <input type="number"> entrega siempre su valor en notación JS
+   * («27.5» aunque se teclee «27,5»), así que se lee con valueAsNumber, que da NaN si está
+   * vacío o no es un número. parseInt truncaba los decimales (hallazgo 1733).
+   */
+  const leerCampo = (input: HTMLInputElement): number => input.valueAsNumber;
   const [reproduciendo, setReproduciendo] = useState(false);
   const [volumen, setVolumen] = useState(0.5);
   const [tipoOnda, setTipoOnda] = useState<OscillatorType>('sine');
@@ -93,14 +152,28 @@ export default function DiapasonPage() {
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
 
-  // Inicializar AudioContext
+  /*
+   * Al desmontar (navegar a otra app con el tono sonando): rampa corta a 0 y el contexto se
+   * cierra cuando el oscilador ya ha callado. Antes hacía stop() y close() en el mismo instante,
+   * sin rampa: se cortaba en seco desde el volumen en curso (hallazgo 1730).
+   */
   useEffect(() => {
     return () => {
-      if (oscillatorRef.current) {
-        oscillatorRef.current.stop();
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
+      const ctx = audioContextRef.current;
+      const osc = oscillatorRef.current;
+      const gain = gainNodeRef.current;
+      audioContextRef.current = null;
+      oscillatorRef.current = null;
+      gainNodeRef.current = null;
+      if (!ctx) return;
+      if (osc && ctx.state === 'running') {
+        apagarConRampa(ctx, osc, gain, RAMPA_DESMONTAJE_S, () => {
+          void ctx.close();
+        });
+      } else {
+        // Sin tono o con el contexto suspendido (no suena nada): no hay chasquido que evitar.
+        osc?.stop();
+        void ctx.close();
       }
     };
   }, []);
@@ -117,11 +190,12 @@ export default function DiapasonPage() {
    * stop en el reloj de audio: nunca queda un oscilador vivo fuera de oscillatorRef.
    */
   const iniciarAudio = useCallback(() => {
-    // Por si quedara alguno (no debería): nunca dos osciladores a la vez.
-    if (oscillatorRef.current) {
-      oscillatorRef.current.stop();
-      oscillatorRef.current.disconnect();
+    // Por si quedara alguno (no debería): nunca dos osciladores a la vez. Sale con rampa, como
+    // cualquier otra parada.
+    if (oscillatorRef.current && audioContextRef.current) {
+      apagarConRampa(audioContextRef.current, oscillatorRef.current, gainNodeRef.current, RAMPA_DESMONTAJE_S);
       oscillatorRef.current = null;
+      gainNodeRef.current = null;
     }
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -156,18 +230,8 @@ export default function DiapasonPage() {
     oscillatorRef.current = null;
     gainNodeRef.current = null;
     if (ctx && osc) {
-      const fin = ctx.currentTime + 0.1;
-      if (gain) {
-        // Rampa corta hasta 0 para evitar el chasquido, y el stop en el mismo instante.
-        gain.gain.cancelScheduledValues(ctx.currentTime);
-        gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, fin);
-      }
-      osc.stop(fin);
-      osc.onended = () => {
-        osc.disconnect();
-        gain?.disconnect();
-      };
+      // Rampa corta hasta 0 para evitar el chasquido, y el stop en el mismo instante.
+      apagarConRampa(ctx, osc, gain, RAMPA_SALIDA_S);
     }
     setReproduciendo(false);
   }, []);
@@ -217,6 +281,17 @@ export default function DiapasonPage() {
 
   const nota = notaMasCercana(frecuencia);
 
+  /*
+   * Lo que anuncia el deslizador de frecuencia (hallazgo 1729). Va de 400 a 480 Hz; con la
+   * frecuencia fuera de ese rango, el <input type="range"> recorta su valor al extremo y el lector
+   * anunciaba «480» con 1.000 Hz sonando. aria-valuetext manda sobre el valor numérico: dice
+   * siempre la frecuencia que suena y, si está fuera, que el deslizador no llega hasta ella.
+   */
+  const deslizadorFuera = frecuencia < 400 || frecuencia > 480;
+  const textoDeslizador = deslizadorFuera
+    ? `${textoFrecuencia(frecuencia)} Hz, fuera del rango del deslizador (400 a 480 Hz)`
+    : `${textoFrecuencia(frecuencia)} Hz`;
+
   const seleccionarPreset = (preset: FrecuenciaPreset) => {
     aplicarFrecuencia(preset.frecuencia);
   };
@@ -237,7 +312,7 @@ export default function DiapasonPage() {
       {/* Diapasón principal */}
       <div className={styles.diapasonCard}>
         <div className={styles.frecuenciaDisplay}>
-          <span className={styles.frecuenciaNumero}>{frecuencia}</span>
+          <span className={styles.frecuenciaNumero}>{textoFrecuencia(frecuencia)}</span>
           <span className={styles.frecuenciaUnidad}>Hz</span>
         </div>
 
@@ -325,21 +400,26 @@ export default function DiapasonPage() {
             max="480"
             step="1"
             value={frecuencia}
-            onChange={(e) => aplicarFrecuencia(parseInt(e.target.value, 10))}
+            onChange={(e) => aplicarFrecuencia(e.target.valueAsNumber)}
             className={styles.customSlider}
             aria-label="Frecuencia en Hz (400 a 480)"
+            aria-valuetext={textoDeslizador}
           />
           <input
             type="number"
             min="20"
             max="2000"
+            step="0.01"
             value={frecuenciaTexto}
             onChange={(e) => {
               setFrecuenciaTexto(e.target.value);
-              const n = parseInt(e.target.value, 10);
+              const n = redondearFrecuencia(leerCampo(e.target));
               if (Number.isFinite(n) && n >= DIAPASON_MIN && n <= DIAPASON_MAX) setFrecuencia(n);
             }}
-            onBlur={() => aplicarFrecuencia(parseInt(frecuenciaTexto, 10) || 440)}
+            onBlur={(e) => {
+              const n = leerCampo(e.target);
+              aplicarFrecuencia(Number.isFinite(n) ? n : 440);
+            }}
             aria-label="Frecuencia personalizada en Hz"
             className={styles.customInput}
           />
@@ -400,11 +480,16 @@ export default function DiapasonPage() {
                 <td>Mayoría de orquestas, grabaciones</td>
                 <td>Referencia (0 cents)</td>
               </tr>
+              {/* Hallazgo 1731. Decía «Orquestas de Viena, Berlín» en 442 Hz, con Berlín también en
+                  la fila de 443. La Filarmónica de Viena afina a 443 Hz (C. Hellsberg, «Gedanken zum
+                  Stimmton», Bühne 9/2016, citado en de.wikipedia «Kammerton»), y en las orquestas
+                  alemanas y austriacas se ha asentado el 443; el 442 predomina en Suiza e Italia
+                  (misma fuente). */}
               <tr>
                 <td><strong>Europeo alto</strong></td>
                 <td>442,0 Hz</td>
-                <td>Siglo XX / Europa central</td>
-                <td>Orquestas de Viena, Berlín</td>
+                <td>Siglo XX / Europa</td>
+                <td>Orquestas de Suiza e Italia, entre otras</td>
                 <td>+7,85 cents (más brillante)</td>
               </tr>
               <tr>
@@ -415,10 +500,10 @@ export default function DiapasonPage() {
                 <td>+3,93 cents</td>
               </tr>
               <tr>
-                <td><strong>Berlinés</strong></td>
+                <td><strong>Germánico</strong></td>
                 <td>443,0 Hz</td>
-                <td>Siglo XX / Alemania</td>
-                <td>Filarmónica de Berlín</td>
+                <td>Siglo XX / Alemania y Austria</td>
+                <td>Orquestas alemanas y austriacas (Filarmónicas de Berlín y de Viena)</td>
                 <td>+11,76 cents</td>
               </tr>
               <tr>
@@ -469,7 +554,10 @@ export default function DiapasonPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">🎸</span> Afinar guitarra acústica</h3>
-            <p>Genera el La4 a 440 Hz con onda senoidal pura. Toca la cuerda La (5ª) de tu guitarra y ajusta la clavija hasta que ambos tonos suenen igual. Sin necesidad de app de afinación.</p>
+            {/* Hallazgo 1732. Mandaba igualar la 5ª cuerda al aire con el La4 de 440 Hz: esa
+                cuerda es el La2 = 110 Hz (en.wikipedia «Guitar tunings»), dos octavas por debajo,
+                y nunca «suenan igual». */}
+            <p>La 5ª cuerda al aire es el La2, a 110 Hz: dos octavas por debajo del La4. Escribe 110 en la frecuencia personalizada, con onda senoidal, y ajusta la clavija hasta que desaparezcan los batimentos. Si prefieres el La4 a 440 Hz, compáralo con el armónico del traste 5 de esa cuerda (4 × 110 = 440 Hz), rozándola sin pisar justo encima del traste.</p>
           </div>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">🎻</span> Ensayo de orquesta</h3>
@@ -567,7 +655,7 @@ export default function DiapasonPage() {
             <div className={styles.stepNumber}>5</div>
             <div className={styles.stepContent}>
               <h3>Toca la cuerda o nota de referencia</h3>
-              <p>Toca el La de tu instrumento (cuerda 5ª en guitarra, cuerda 2ª en violín). Escucha simultáneamente ambos tonos para detectar batimentos (pulsaciones de desafinación).</p>
+              <p>Toca el La de tu instrumento (en el violín, la 2ª cuerda al aire; en la guitarra, la 5ª cuerda suena a 110 Hz, dos octavas por debajo: genera 110 Hz o usa su armónico del traste 5). Escucha simultáneamente ambos tonos para detectar batimentos (pulsaciones de desafinación).</p>
             </div>
           </div>
           <div className={styles.step}>
