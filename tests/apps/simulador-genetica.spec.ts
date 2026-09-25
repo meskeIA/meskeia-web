@@ -2258,3 +2258,41 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: hallazgos reparados', () => 
     expect(await textoLegible()).not.toContain('🎨');
   });
 });
+
+/* ────────────────────────────────────────────────────────────────────────────────────────────
+ * REPARADO el 25/09/2026 (hallazgo 1614). En móvil la fila de pestañas medía ≥ 553 px y, con
+ * la columna en `1fr` a secas, ensanchaba .mainContent a 619 px; body lleva overflow-x: hidden,
+ * así que los paneles quedaban cortados sin scroll: «Población» y «Pedigree» fuera de la
+ * pantalla y la columna derecha del cuadro de Punnett cortada. `scrollWidth` del documento no
+ * lo delata (el recorte lo esconde), por eso se mide la caja de cada pestaña y de la rejilla.
+ * ──────────────────────────────────────────────────────────────────────────────────────────── */
+test.describe('Hallazgo 1614 · móvil 375 × 812', () => {
+  test.use({ viewport: { width: 375, height: 812 } });
+
+  test('las cuatro pestañas y el cuadro de Punnett caben en la pantalla', async ({ page }) => {
+    // Solo mide la maquetación, que sale ya del HTML del servidor: no hace falta hidratar.
+    await page.goto(RUTA);
+    const pestanas = page.getByRole('tab');
+    await expect(pestanas).toHaveCount(4);
+    for (let i = 0; i < 4; i++) {
+      const caja = (await pestanas.nth(i).boundingBox())!;
+      expect(caja.x).toBeGreaterThanOrEqual(0);
+      expect(caja.x + caja.width).toBeLessThanOrEqual(375);
+    }
+    const rejilla = (await page.locator('[class*="mainContent"]').first().boundingBox())!;
+    expect(rejilla.x + rejilla.width).toBeLessThanOrEqual(375);
+    // El cuadro puede desbordar su contenedor, pero entonces con scroll propio, no recortado.
+    const cuadro = page.locator('[class*="punnettContainer"]').first();
+    const { ancho, cabe, desplazable } = await cuadro.evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const estilo = getComputedStyle(el);
+      return {
+        ancho: r.right,
+        cabe: el.scrollWidth <= el.clientWidth + 1,
+        desplazable: estilo.overflowX === 'auto' || estilo.overflowX === 'scroll',
+      };
+    });
+    expect(ancho).toBeLessThanOrEqual(375);
+    expect(cabe || desplazable).toBe(true);
+  });
+});
