@@ -29,9 +29,13 @@
   --text-primary: #E5E5E5;
   --text-secondary: #B0B0B0;
   --border: #404040;
+  /* Hallazgo 1877: sin variante oscura, #C0392B sobre #3D1A18 daba 2,84:1 y #1A7A3E sobre
+     #2A2A2A, 2,66:1. Medidos: #F1948A sobre #3D1A18 ≈ 6,9:1; #6FCF97 sobre #2A2A2A ≈ 7,5:1. */
+  --danger: #F1948A;
   --danger-bg: #3D1A18;
   --warning-bg: #3D3000;
   --warning-border: #A07800;
+  --bonif: #6FCF97;
 }
 
 .hero {
@@ -360,6 +364,31 @@
 .lineaBonif {
   color: var(--bonif);
   font-size: 0.85rem;
+}
+
+.notaDesglose {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0;
+  line-height: 1.5;
+}
+
+/* Grupos de radios con su pregunta como <legend> (hallazgo 1875) */
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 1rem;
+  min-width: 0;
+}
+
+.fieldset legend {
+  padding: 0;
+}
+
+.listaErrores {
+  text-align: left;
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
 }
 
 .guideSection {

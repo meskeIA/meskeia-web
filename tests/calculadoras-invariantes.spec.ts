@@ -1651,14 +1651,25 @@ test.describe('Golden — calcularRendimientoCapitalInmobiliario (Capa 1)', () =
 // CAPA 1 — Golden tests: calcularDonacion (Impuesto de Donaciones ISD)
 // Ley 29/1987 ISD — tarifa estatal 16 tramos + tarifa Cataluña + bonificaciones CCAA.
 // Verificación interna. Deuda técnica: bonificaciones autonómicas verificadas 2025-01-01.
+//
+// 25/09/2026 (hallazgo 1862 del Inspector): AW, AY y AZ consagraban el defecto. Restaban de la
+// base las reducciones por parentesco y discapacidad del art. 20.2.a LISD, que la ley reserva a
+// las adquisiciones «mortis causa»; en una donación, sin reducción autonómica propia, «la base
+// liquidable coincidirá, en todo caso, con la imponible» (art. 20.5 LISD, BOE-A-1987-28141,
+// consultado en el BOE consolidado el 25/09/2026). Las cifras nuevas están recalculadas a mano
+// con la tarifa del art. 21.2 (TARIFA_ESTATAL_ISD) y los coeficientes del art. 22.2. El motor
+// no modela reducciones autonómicas propias de donaciones en ninguna comunidad.
 // ────────────────────────────────────────────────────────────────────────────
 
 test.describe('Golden — calcularDonacion (Capa 1 · ISD donaciones)', () => {
 
-  test('GOLDEN-AW: Madrid, I-descendiente, 30.000 € → cuotaFinal 11,26 € (bonif 99%)', () => {
-    // reduccionParentesco = 15.956,87 → baseNetaReducida = 14.043,13
-    // Tarifa estatal tramo 2: 611,50 + (14.043,13 − 7.993,46) × 8,5% = 1.125,72
-    // bonif 99% → cuotaFinal ≈ 11,26 €, tipoEfectivo ≈ 0,04%
+  test('GOLDEN-AW: Madrid, I-descendiente, 30.000 € → cuotaFinal 26,52 € (bonif 99 %)', () => {
+    // Sin reducción por parentesco (art. 20.5 LISD) → base liquidable = 30.000
+    // Tarifa estatal, tramo de 23.968,36 a 31.955,81:
+    //   2.037,26 + (30.000 − 23.968,36) × 10,20 % = 2.037,26 + 615,22728 = 2.652,48728
+    // × 1,0000 (Grupo I, patrimonio hasta 402.678,11 €)
+    // bonif 99 % → 2.652,48728 × 0,01 = 26,5248728 → 26,52 €; tipo 26,52487 / 30.000 = 0,088 % → 0,09
+    // (Antes: 11,26 €, con la reducción mortis causa de 15.956,87 € restada — hallazgo 1862.)
     const res = calcularDonacion({
       valorDonacion: 30000,
       ccaa: 'madrid',
@@ -1666,14 +1677,14 @@ test.describe('Golden — calcularDonacion (Capa 1 · ISD donaciones)', () => {
     });
     expect(res.baseImponible).toBe(30000);
     expect(res.baseLiquidable).toBe(30000);
-    expect(res.reduccionParentesco).toBeCloseTo(15956.87, 2);
-    expect(res.baseNetaReducida).toBeCloseTo(14043.13, 2);
-    expect(res.cuotaIntegra).toBeCloseTo(1125.72, 2);
+    expect(res.reduccionParentesco).toBe(0);
+    expect(res.baseNetaReducida).toBe(30000);
+    expect(res.cuotaIntegra).toBeCloseTo(2652.49, 2);
     expect(res.coeficienteMultiplicador).toBe(1);
-    expect(res.cuotaTributaria).toBeCloseTo(1125.72, 2);
+    expect(res.cuotaTributaria).toBeCloseTo(2652.49, 2);
     expect(res.porcentajeBonificacion).toBe(99);
-    expect(res.cuotaFinal).toBeCloseTo(11.26, 2);
-    expect(res.tipoEfectivo).toBeCloseTo(0.04, 2);
+    expect(res.cuotaFinal).toBeCloseTo(26.52, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.09, 2);
     expect(res.esForal).toBe(false);
   });
 
@@ -1697,8 +1708,11 @@ test.describe('Golden — calcularDonacion (Capa 1 · ISD donaciones)', () => {
   });
 
   test('GOLDEN-AY: Cataluña, I-descendiente, 100.000 €, escritura → tarifa reducida 5%, cuota 5.000 €', () => {
-    // Régimen foral. Tarifa reducida (Grupos I/II + escritura): 0 + 100.000 × 5% = 5.000.
+    // Tarifa reducida (Grupos I/II + escritura): 0 + 100.000 × 5% = 5.000.
     // Sin reducción de parentesco (Cataluña aplica su propia tarifa). Sin bonificación.
+    // 25/09/2026 (hallazgo 1869): Cataluña es de RÉGIMEN COMÚN —el impuesto le está cedido por la
+    // Ley 22/2009 como al resto—; forales solo son el País Vasco y Navarra. Esta golden decía
+    // «Régimen foral» y exigía esForal = true: consagraba el dato erróneo del módulo.
     const res = calcularDonacion({
       valorDonacion: 100000,
       ccaa: 'cataluna',
@@ -1712,26 +1726,49 @@ test.describe('Golden — calcularDonacion (Capa 1 · ISD donaciones)', () => {
     expect(res.cuotaTributaria).toBeCloseTo(5000, 2);
     expect(res.cuotaFinal).toBeCloseTo(5000, 2);
     expect(res.tipoEfectivo).toBeCloseTo(5, 2);
-    expect(res.esForal).toBe(true);
+    expect(res.esForal).toBe(false);
     expect(res.tarifaAplicada).toContain('reducida');
   });
 
-  test('GOLDEN-AZ: Madrid, I-descendiente, 80.000 €, discapacidad ≥65% → baseNetaReducida 0, cuota 0 €', () => {
-    // reduccionParentesco 15.956,87 + reduccionDiscapacidad 150.253,03 > 80.000.
-    // baseNetaReducida = max(0, 80.000 − 15.956,87 − 150.253,03) = 0 → cuota = 0.
+  test('GOLDEN-AZ: Madrid, I-descendiente, 80.000 €, discapacidad ≥65 % → sin reducciones mortis causa, cuota 91,85 €', () => {
+    // Las reducciones del art. 20.2.a LISD (15.956,87 por parentesco y 150.253,03 por discapacidad
+    // ≥ 65 %) son mortis causa: en donaciones no se aplican (art. 20.5). Antes esta golden exigía
+    // base 0 y cuota 0 € (hallazgo 1862). El motor no modela beneficios por discapacidad propios
+    // de Madrid en donaciones; la discapacidad no cambia la cifra aquí.
+    // Tarifa estatal, tramo de 79.880,52 a 119.757,67:
+    //   9.166,06 + (80.000 − 79.880,52) × 16,15 % = 9.166,06 + 19,29602 = 9.185,35602
+    // × 1,0000 → bonif 99 % → 9.185,35602 × 0,01 = 91,8535602 → 91,85 €; tipo 0,1148 % → 0,11
     const res = calcularDonacion({
       valorDonacion: 80000,
       ccaa: 'madrid',
       grupo: 'I-descendiente',
       discapacidad: '65',
     });
-    expect(res.reduccionParentesco).toBeCloseTo(15956.87, 2);
-    expect(res.reduccionDiscapacidad).toBeCloseTo(150253.03, 2);
-    expect(res.baseNetaReducida).toBe(0);
-    expect(res.cuotaIntegra).toBe(0);
-    expect(res.cuotaTributaria).toBe(0);
-    expect(res.cuotaFinal).toBe(0);
-    expect(res.tipoEfectivo).toBe(0);
+    expect(res.reduccionParentesco).toBe(0);
+    expect(res.reduccionDiscapacidad).toBe(0);
+    expect(res.baseNetaReducida).toBe(80000);
+    expect(res.cuotaIntegra).toBeCloseTo(9185.36, 2);
+    expect(res.cuotaTributaria).toBeCloseTo(9185.36, 2);
+    expect(res.cuotaFinal).toBeCloseTo(91.85, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.11, 2);
+  });
+
+  test('GOLDEN-AZ-bis: Castilla-La Mancha, II, 200.000 €, escritura → bonificación escalonada 90 %, cuota 3.164,08 €', () => {
+    // Hallazgo 1863. Art. 17 bis.1 Ley 8/2013 (BOE-A-2014-1368, redacción de la Ley 3/2016):
+    // base liquidable «igual o superior a 120.000 euros e inferior a 240.000» → 90 %.
+    // Tarifa estatal, tramo de 159.634,83 a 239.389,13:
+    //   23.063,25 + (200.000 − 159.634,83) × 21,25 % = 23.063,25 + 8.577,598625 = 31.640,848625
+    // × 1,0000 → − 90 % → 3.164,0848625 → 3.164,08 €
+    const res = calcularDonacion({
+      valorDonacion: 200000,
+      ccaa: 'castilla-mancha',
+      grupo: 'II',
+      escrituraPublica: true,
+    });
+    expect(res.baseLiquidable).toBe(200000);
+    expect(res.cuotaIntegra).toBeCloseTo(31640.85, 2);
+    expect(res.porcentajeBonificacion).toBe(90);
+    expect(res.cuotaFinal).toBeCloseTo(3164.08, 2);
   });
 
 });

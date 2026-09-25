@@ -48,7 +48,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Impuesto de Donaciones y cuándo se paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Impuesto de Donaciones (ISD, modalidad inter vivos) es un tributo que paga quien recibe una donación de dinero, inmuebles u otros bienes. Se devenga en el momento de la donación y el plazo de autoliquidación es de 30 días hábiles desde la escritura o el acto de entrega. Lo gestiona la comunidad autónoma del donatario (quien recibe), no el donante.',
+        text: 'El Impuesto de Donaciones (ISD, modalidad inter vivos) es un tributo que paga quien recibe una donación de dinero, inmuebles u otros bienes. Se devenga en el momento de la donación y el plazo general de autoliquidación es de 30 días hábiles desde el día siguiente (art. 67.1.b del Reglamento del impuesto), salvo que la comunidad fije otro. Si se dona un inmueble, tributa en la comunidad donde está situado; si se dona dinero u otros bienes, en la de residencia habitual de quien recibe.',
       },
     },
     {
@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga por recibir una donación de dinero de los padres?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende de la comunidad autónoma. Las diferencias son muy grandes: algunas regiones como Madrid, Galicia, Canarias o la Comunidad Valenciana tienen bonificaciones del 75-99% para donaciones entre padres e hijos, lo que puede reducir la cuota casi a cero. En cambio, comunidades con menor bonificación pueden exigir tipos efectivos del 5-15% o más. El parentesco y el valor de la donación también determinan la cuota final.',
+        text: 'Depende de la comunidad autónoma, porque cada una bonifica un porcentaje distinto de la cuota. Con 100.000 € de un padre a un hijo, la tarifa estatal da 12.415,36 € de cuota; con una bonificación del 99 % quedan 124,15 €, y sin bonificación se paga entera. En las donaciones no se aplican las reducciones estatales por parentesco, que son solo de las herencias. El parentesco, el patrimonio previo y el valor de la donación también determinan la cuota final.',
       },
     },
     {
@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Es lo mismo el Impuesto de Donaciones que el Impuesto de Sucesiones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No, aunque forman parte del mismo tributo (ISD). El Impuesto de Sucesiones grava las transmisiones por causa de muerte (herencias y legados), mientras que el Impuesto de Donaciones grava las transmisiones en vida (inter vivos). Usan tarifas similares pero la normativa autonómica puede establecer bonificaciones diferentes para cada modalidad.',
+        text: 'No, aunque forman parte del mismo tributo (ISD). El Impuesto de Sucesiones grava las transmisiones por causa de muerte (herencias y legados), mientras que el Impuesto de Donaciones grava las transmisiones en vida (inter vivos). Comparten la tarifa estatal, pero las reducciones estatales por parentesco y discapacidad solo se aplican a las herencias (art. 20 de la Ley 29/1987), y cada comunidad puede fijar bonificaciones distintas para cada modalidad.',
       },
     },
     {
@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Cómo calcula el estimador el impuesto por comunidad autónoma?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El estimador aplica la tarifa estatal según el valor neto recibido, el grupo de parentesco y el patrimonio preexistente del donatario, y luego incorpora los coeficientes multiplicadores y las bonificaciones autonómicas vigentes para 2025. Cubre el régimen común, así como los regímenes forales de Cataluña, País Vasco y Navarra, que tienen normativa propia.',
+        text: 'El estimador aplica la tarifa estatal según el valor neto recibido, el grupo de parentesco y el patrimonio preexistente del donatario, y luego incorpora los coeficientes multiplicadores y las bonificaciones autonómicas vigentes para 2025. Cubre las 15 comunidades de régimen común, incluida Cataluña con su tarifa propia, y da una aproximación para los regímenes forales del País Vasco y Navarra.',
       },
     },
     {
@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cuándo no hay que pagar el Impuesto de Donaciones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Hay situaciones en las que la cuota puede ser cero o mínima: cuando la comunidad autónoma aplica una bonificación del 99-100% para el grupo I y II de parentesco (hijos, cónyuge, padres), o cuando el importe donado está por debajo de las reducciones personales disponibles. Las donaciones de una empresa familiar tienen reducciones especiales, estatales y autonómicas, que esta estimación no calcula: exigen valorar la empresa y comprobar requisitos con su documentación. Consultar siempre con un asesor fiscal antes de formalizar la donación.',
+        text: 'La obligación de declarar existe siempre, pero la cuota puede ser cero o mínima cuando la comunidad aplica una bonificación del 99 % o del 100 % a los grupos I y II de parentesco (hijos, cónyuge, padres), o una exención por importe. A diferencia de las herencias, en las donaciones no hay reducciones estatales por parentesco que dejen exentas las cantidades pequeñas. Las donaciones de una empresa familiar tienen reducciones especiales, estatales y autonómicas, que esta estimación no calcula: exigen valorar la empresa y comprobar requisitos con su documentación. Consultar siempre con un asesor fiscal antes de formalizar la donación.',
       },
     },
   ],
