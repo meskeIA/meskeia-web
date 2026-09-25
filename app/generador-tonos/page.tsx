@@ -29,6 +29,25 @@ const FREC_MIN = 20;
 const FREC_MAX = 20000;
 const acotarFrecuencia = (n: number) => Math.max(FREC_MIN, Math.min(FREC_MAX, n));
 
+/**
+ * La frecuencia tal como la app la ESCRIBE en su propio campo: coma decimal y sin punto de
+ * millares («261,626», «20000»). Hallazgo 1639: se escribía con `String(n)`, que usa punto
+ * decimal, y al volver a leerlo `parseSpanishNumber` tomaba «261.626» por un millar español
+ * (punto seguido de tres cifras): la segunda vez que se salía del campo, 261,626 Hz pasaban a
+ * 261.626 y se acotaban a 20.000 Hz. Con la coma no hay lectura ambigua posible, y además es el
+ * formato español que la app debe mostrar. No se usa `formatNumber` porque fija los decimales
+ * (y redondear destruye los presets, ver `aplicarFrecuencia`) y porque agrupa los millares,
+ * que el campo no necesita.
+ */
+const textoFrecuencia = (n: number) => String(n).replace('.', ',');
+
+/**
+ * Rampa de ganancia para arrancar, parar y cambiar el volumen, en segundos (hallazgos 1637 y
+ * 1638). Un escalón de ganancia es un transitorio de banda ancha: se oye como chasquido, y al
+ * parar un tono agudo lo pone en 1-8 kHz, donde el oído es más sensible.
+ */
+const RAMPA_GANANCIA_S = 0.05;
+
 /** Duración del barrido, en segundos. Los mismos límites que declara su campo. */
 const DUR_MIN = 1;
 const DUR_MAX = 60;
@@ -223,7 +242,7 @@ export default function GeneradorTonosPage() {
     // Quien necesite un entero, como el barrido, lo redondea antes de llamar.
     const v = acotarFrecuencia(n);
     setFrecuencia(v);
-    setFrecuenciaTexto(String(v));
+    setFrecuenciaTexto(textoFrecuencia(v));
   }, []);
   const [sweepMaxTexto, setSweepMaxTexto] = useState('2000');
   const [sweepDuracion, setSweepDuracion] = useState(DUR_DEFECTO);
@@ -308,8 +327,9 @@ export default function GeneradorTonosPage() {
       oscillator.type = tipoOnda;
       oscillator.frequency.setValueAtTime(frecuencia, ctx.currentTime);
 
+      // Rampa de entrada 0 → volumen. Ya no la pisa el efecto de volumen (hallazgo 1637).
       gainNode.gain.setValueAtTime(0, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(volumen, ctx.currentTime + 0.05);
+      gainNode.gain.linearRampToValueAtTime(volumen, ctx.currentTime + RAMPA_GANANCIA_S);
 
       oscillator.connect(gainNode);
       gainNode.connect(ctx.destination);
@@ -333,20 +353,34 @@ export default function GeneradorTonosPage() {
     setSweep(false);
 
     const oscillator = oscillatorRef.current;
+    const gain = gainNodeRef.current;
     const ctx = audioContextRef.current;
+    // La ganancia se suelta ya: el efecto de volumen solo actúa sobre la del tono que suena.
+    gainNodeRef.current = null;
 
-    if (gainNodeRef.current && ctx) {
-      gainNodeRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
-    }
-
-    setTimeout(() => {
+    if (ctx) {
+      // Rampa de salida anclada en el valor EN CURSO (hallazgo 1638). Sin el setValueAtTime,
+      // una rampa de Web Audio arranca en el evento anterior —el linearRamp del arranque—, así
+      // que tras T s sonando la ganancia ya valía 0,3·0,05/T al pulsar: caía de golpe.
+      const ahora = ctx.currentTime;
+      const fin = ahora + RAMPA_GANANCIA_S;
+      if (gain) {
+        gain.gain.cancelScheduledValues(ahora);
+        gain.gain.setValueAtTime(gain.gain.value, ahora);
+        gain.gain.linearRampToValueAtTime(0, fin);
+      }
+      // El stop va en el reloj de AUDIO, al final de la rampa: con un setTimeout de 50 ms en el
+      // reloj de pared podía llegar antes de que la rampa terminara y cortar el tono a medias.
       if (oscillator) {
         try {
-          oscillator.stop();
+          oscillator.stop(fin);
         } catch {
           // El oscilador ya estaba detenido
         }
       }
+    }
+
+    setTimeout(() => {
       // Solo limpiar el estado si nadie ha iniciado un nuevo oscilador mientras tanto
       if (oscillatorRef.current === oscillator) {
         oscillatorRef.current = null;
@@ -478,7 +512,12 @@ export default function GeneradorTonosPage() {
         puntos.push({ frecuencia: f, db: restarRuido(senal, ruido.get(f) ?? -Infinity) });
       }
 
-      ganancia.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+      // Rampa de salida anclada en el valor en curso: sin el setValueAtTime arrancaría en el
+      // evento anterior y la ganancia caería de golpe (mismo defecto que el hallazgo 1638).
+      const finMedida = ctx.currentTime;
+      ganancia.gain.cancelScheduledValues(finMedida);
+      ganancia.gain.setValueAtTime(ganancia.gain.value, finMedida);
+      ganancia.gain.linearRampToValueAtTime(0, finMedida + RAMPA_GANANCIA_S);
       const curva = normalizarCurva(puntos);
 
       if (resumirCurva(curva).medidos === 0) {
@@ -539,12 +578,25 @@ export default function GeneradorTonosPage() {
     }
   }, [frecuencia]);
 
-  // Actualizar volumen en tiempo real
+  /**
+   * Volumen en tiempo real, con rampa (hallazgo 1637; el mismo arreglo que el 1509 de diapason).
+   *
+   * Dependía de [volumen, reproduciendo] y hacía setValueAtTime(volumen, currentTime): al pasar
+   * `reproduciendo` a true se ejecutaba justo después de iniciarAudio y PISABA su rampa de
+   * entrada, así que el tono arrancaba de golpe; y mover el deslizador era un escalón. Ahora
+   * solo reacciona al VOLUMEN (gainNodeRef solo existe mientras suena: detenerAudio lo suelta)
+   * y lleva la ganancia al valor nuevo con una rampa corta desde el valor en curso, también si
+   * llega a mitad de la rampa de entrada.
+   */
   useEffect(() => {
-    if (gainNodeRef.current && audioContextRef.current && reproduciendo) {
-      gainNodeRef.current.gain.setValueAtTime(volumen, audioContextRef.current.currentTime);
-    }
-  }, [volumen, reproduciendo]);
+    const ctx = audioContextRef.current;
+    const gain = gainNodeRef.current;
+    if (!ctx || !gain) return;
+    const ahora = ctx.currentTime;
+    gain.gain.cancelScheduledValues(ahora);
+    gain.gain.setValueAtTime(gain.gain.value, ahora);
+    gain.gain.linearRampToValueAtTime(volumen, ahora + RAMPA_GANANCIA_S);
+  }, [volumen]);
 
   // Actualizar tipo de onda
   useEffect(() => {
@@ -687,7 +739,7 @@ export default function GeneradorTonosPage() {
               const leido = parseSpanishNumber(frecuenciaTexto);
               const n = acotarFrecuencia(Number.isFinite(leido) ? leido : FREC_MIN);
               setFrecuencia(n);
-              setFrecuenciaTexto(String(n));
+              setFrecuenciaTexto(textoFrecuencia(n));
             }}
             className={styles.frecuenciaInput}
             aria-label="Frecuencia en Hz"

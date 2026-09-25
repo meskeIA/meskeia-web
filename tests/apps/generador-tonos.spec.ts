@@ -348,10 +348,10 @@ test('CASO 1 — 440 Hz senoidal crea un oscilador real a 440 Hz, y los cambios 
   await expect(campoFrecuencia(page)).toHaveValue('1000');
   await esperarFrecuencia(page, 1000, 0);
 
-  // Preset Do (C4): 440·2^(−9/12) = 261,6256 → la app anuncia 261.63 Hz.
+  // Preset Do (C4): 440·2^(−9/12) = 261,6256 → la app escribe «261,63» en el campo, con coma decimal (hallazgo 1639: con punto, «261.626» se releía como millar).
   expect(440 * Math.pow(2, -9 / 12)).toBeCloseTo(261.63, 2);
   await page.getByRole('button', { name: /Do \(C4\)/ }).click();
-  await expect(campoFrecuencia(page)).toHaveValue('261.63');
+  await expect(campoFrecuencia(page)).toHaveValue('261,63');
   await esperarFrecuencia(page, 261.63, 2);
   // La franja que rotula la app para esa frecuencia (tabla educativa: 250–500 Hz).
   await expect(page.getByText('Medios-bajos - Calidez')).toBeVisible();
@@ -488,7 +488,8 @@ test('CASO 3 — un valor fuera de rango se satura en el borde y nunca genera Na
   await campoFrecuencia(page).press('Control+a');
   await campoFrecuencia(page).pressSequentially('abc', { delay: 30 });
   await campoFrecuencia(page).blur();
-  await expect(campoFrecuencia(page)).toHaveValue(/^\d+(\.\d+)?$/);
+  // Coma decimal: la app escribe el campo en formato español desde el hallazgo 1639.
+  await expect(campoFrecuencia(page)).toHaveValue(/^\d+(,\d+)?$/);
 
   // Ninguna de las frecuencias que la app ha llegado a aplicar es NaN ni absurda.
   const aplicadas = await frecuenciasAplicadas(page);
@@ -959,7 +960,7 @@ test('HALLAZGO B — si el botón dice que está barriendo, el barrido tiene que
  * emite presets decimales. Basta con enfocar el campo y salir, sin teclear nada, para
  * desafinar la referencia:
  *
- *   preset Do (C4) → campo «261.63», oscilador a 261,63 Hz, preset marcado como activo
+ *   preset Do (C4) → campo «261,63», oscilador a 261,63 Hz, preset marcado como activo
  *   click en el campo + blur → campo «261», oscilador a 261 Hz, preset ya NO activo
  *   desafinación: 1200·log2(261,63/261) = 4,17 cents
  *
@@ -975,13 +976,13 @@ test('HALLAZGO C — enfocar y salir del campo no debe desafinar el preset elegi
   await page.getByRole('button', { name: /Do \(C4\)/ }).click();
   await botonReproducir(page).click();
   await esperarFrecuencia(page, 261.63, 2);
-  await expect(campoFrecuencia(page)).toHaveValue('261.63');
+  await expect(campoFrecuencia(page)).toHaveValue('261,63');
 
   await campoFrecuencia(page).click();
   await campoFrecuencia(page).blur(); // no se teclea NADA
 
   await expect(campoFrecuencia(page), 'el campo no debería perder los decimales').toHaveValue(
-    '261.63',
+    '261,63',
   );
   await esperarFrecuencia(page, 261.63, 2);
   await expect(page.getByRole('button', { name: /Do \(C4\)/ })).toHaveAttribute(
@@ -1194,8 +1195,13 @@ function comprobarEntrada(c: CapturaSalida, etiqueta: string): void {
  * La metadata no promete nada sobre chasquidos; promete «tonos puros» y «control fino de
  * volumen», y el código programa una rampa que no llega a sonar. Qué debería pasar: el tono
  * sube de 0 al volumen en los 0,05 s que programa, y el volumen cambia con rampa.
+ *
+ * REPARADO el 25/09/2026 (hallazgo 1637), con el mismo arreglo que el 1509 de diapason: el efecto
+ * de volumen solo depende de [volumen], y lleva la ganancia al valor nuevo con
+ * cancelScheduledValues + setValueAtTime(valor en curso) + linearRamp de 0,05 s. Los tres tests
+ * dejan de ser test.fail y quedan como regresión.
  */
-test.fail('HALLAZGO E — en frío, el tono entra con la rampa de 0,05 s que programa, desde 0', async ({
+test('HALLAZGO E — en frío, el tono entra con la rampa de 0,05 s que programa, desde 0', async ({
   page,
 }) => {
   await abrirConSalida(page);
@@ -1205,7 +1211,7 @@ test.fail('HALLAZGO E — en frío, el tono entra con la rampa de 0,05 s que pro
   comprobarEntrada(await capturarSalida(page), 'en frío');
 });
 
-test.fail('HALLAZGO E — en caliente (Reproducir → Detener → Reproducir), la entrada es la misma rampa', async ({
+test('HALLAZGO E — en caliente (Reproducir → Detener → Reproducir), la entrada es la misma rampa', async ({
   page,
 }) => {
   await abrirConSalida(page);
@@ -1220,7 +1226,7 @@ test.fail('HALLAZGO E — en caliente (Reproducir → Detener → Reproducir), l
   comprobarEntrada(await capturarSalida(page), 'en caliente');
 });
 
-test.fail('HALLAZGO E — bajar el volumen con el tono sonando es una rampa, no un escalón', async ({
+test('HALLAZGO E — bajar el volumen con el tono sonando es una rampa, no un escalón', async ({
   page,
 }) => {
   await abrirConSalida(page);
@@ -1255,8 +1261,13 @@ test.fail('HALLAZGO E — bajar el volumen con el tono sonando es una rampa, no 
  * con la rampa de 50 ms: el chasquido cae donde el oído es más sensible, también para quien
  * hace el test de agudos y no oye el tono. Qué debería pasar: la ganancia baja desde el valor
  * en curso a 0 en los 0,05 s que programa el propio código.
+ *
+ * REPARADO el 25/09/2026 (hallazgo 1638): `detenerAudio` ancla la rampa con
+ * cancelScheduledValues + setValueAtTime(valor en curso) y programa el stop del oscilador en el
+ * reloj de audio, al final de la rampa (antes un setTimeout de 50 ms podía cortarla). La rampa de
+ * salida de `medirRespuesta` se ancla igual.
  */
-test.fail('HALLAZGO F — «Detener» baja la ganancia con la rampa de 0,05 s que programa, no de golpe', async ({
+test('HALLAZGO F — «Detener» baja la ganancia con la rampa de 0,05 s que programa, no de golpe', async ({
   page,
 }) => {
   await abrirConSalida(page);
@@ -1297,7 +1308,7 @@ test('RE-INSPECCIÓN 25/09 — «261,63» con coma llega al oscilador con sus de
   await esperarFrecuencia(page, 261.63, 2);
   await expect(page.getByRole('button', { name: /Do \(C4\)/ })).toHaveAttribute('aria-pressed', 'true');
   await salir();
-  await expect(campoFrecuencia(page)).toHaveValue(/^261[.,]63$/);
+  await expect(campoFrecuencia(page)).toHaveValue(/^261,63$/);
   await esperarFrecuencia(page, 261.63, 2);
   await salir(); // y una segunda vez, sin teclear: dos decimales no se leen como millar
   await esperarFrecuencia(page, 261.63, 2);
@@ -1327,8 +1338,13 @@ test('RE-INSPECCIÓN 25/09 — «261,63» con coma llega al oscilador con sus de
  *   igual con «415,305» (La♭4 temperado, 440·2^(−1/12)), «440,125», «20,001» y «999,999».
  *   No les pasa a «261,6256» ni a «442,5» (cuatro y un decimal no forman grupo de millar).
  * Qué debería pasar: la frecuencia sigue en 261,626 Hz por muchas veces que se salga del campo.
+ *
+ * REPARADO el 25/09/2026 (hallazgo 1639): la app escribe el campo con coma decimal y sin punto
+ * de millares («261,626», «20000»), que `parseSpanishNumber` no puede leer de otra manera. Por
+ * eso el esperado se estrecha de /261[.,]626/ a la coma sola, y el CASO 1 y el HALLAZGO C, que
+ * esperaban «261.63», pasan a «261,63»: consagraban el punto decimal que causaba el defecto.
  */
-test.fail('HALLAZGO G — una frecuencia con tres decimales sobrevive a enfocar y salir del campo', async ({
+test('HALLAZGO G — una frecuencia con tres decimales sobrevive a enfocar y salir del campo', async ({
   page,
 }) => {
   await abrir(page);
@@ -1345,12 +1361,12 @@ test.fail('HALLAZGO G — una frecuencia con tres decimales sobrevive a enfocar 
   await sembrarValor(page, CAMPO_FRECUENCIA, '261,626');
   await esperarFrecuencia(page, 261.626, 3);
   await salir();
-  await expect(campoFrecuencia(page)).toHaveValue(/^261[.,]626$/);
+  await expect(campoFrecuencia(page)).toHaveValue(/^261,626$/);
   await esperarFrecuencia(page, 261.626, 3);
 
   await salir(); // sin teclear nada
   await expect(campoFrecuencia(page), 'el campo no debe saltar al techo de 20.000 Hz').toHaveValue(
-    /^261[.,]626$/,
+    /^261,626$/,
   );
   await esperarFrecuencia(page, 261.626, 3);
 });
