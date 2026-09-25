@@ -109,7 +109,9 @@ export const faqJsonLd = {
       name: '¿Qué tipos de mutaciones cubre el quiz?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El bloque de mutaciones incluye preguntas sobre mutaciones génicas (sustitución, inserción y deleción de bases), mutaciones cromosómicas estructurales (inversión, translocación, deleción e inversión) y numéricas (aneuploidía y poliploidía). También se abordan conceptos de mutágenos físicos y químicos y la diferencia entre mutaciones silenciosas, de sentido erróneo y sin sentido.',
+        // Hallazgo 1751: prometía mutaciones cromosómicas, aneuploidías y mutágenos que ninguna
+        // de las 30 preguntas trata. Dice solo lo que hay en las 6 del bloque.
+        text: 'El bloque de mutaciones tiene 6 preguntas sobre mutaciones génicas o puntuales: mutaciones sin sentido (un codón pasa a ser de parada), sinónimas o silenciosas, de cambio de marco por inserción de una base, de ganancia de función, la reparación por escisión de nucleótidos de los dímeros de timina que causa la radiación UV y la base molecular de la anemia de células falciformes (Glu→Val en la posición 6 de la beta-globina). No incluye mutaciones cromosómicas ni genómicas.',
       },
     },
   ],

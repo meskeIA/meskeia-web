@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -9,24 +9,23 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 import styles from './QuizBiologiaMolecular.module.css';
+import {
+  componerPartida,
+  esCorrecta,
+  obtenerClasificacion,
+  type Categoria,
+  type Pregunta,
+  type PreguntaEnJuego,
+} from './motor';
 
 // ============================================================================
 // TIPOS
 // ============================================================================
 
-type Categoria = 'adn-arn' | 'replicacion' | 'transcripcion' | 'traduccion' | 'mutaciones';
 type Modo = 'examen' | 'practica';
 type EstadoQuiz = 'inicio' | 'jugando' | 'respondida' | 'fin';
-
-interface Pregunta {
-  id: number;
-  categoria: Categoria;
-  pregunta: string;
-  opciones: string[];
-  correcta: number;
-  explicacion: string;
-}
 
 interface ResultadoCategoria {
   categoria: Categoria;
@@ -38,14 +37,27 @@ interface ResultadoCategoria {
 // DATOS: ETIQUETAS DE CATEGORÍAS
 // ============================================================================
 
-const ETIQUETAS_CATEGORIA: Record<Categoria, string> = {
-  'adn-arn': '🧬 ADN y ARN',
-  'replicacion': '🔄 Replicación',
-  'transcripcion': '📋 Transcripción',
-  'traduccion': '🔤 Traducción',
-  'mutaciones': '⚠️ Mutaciones',
+// Emoji y rótulo separados: dentro de una misma cadena el lector de pantalla verbalizaba
+// «ADN doble hélice ADN y ARN» y no había forma de marcar el emoji aria-hidden (hallazgo 1755).
+const ETIQUETAS_CATEGORIA: Record<Categoria, { emoji: string; texto: string }> = {
+  'adn-arn': { emoji: '🧬', texto: 'ADN y ARN' },
+  'replicacion': { emoji: '🔄', texto: 'Replicación' },
+  'transcripcion': { emoji: '📋', texto: 'Transcripción' },
+  'traduccion': { emoji: '🔤', texto: 'Traducción' },
+  'mutaciones': { emoji: '⚠️', texto: 'Mutaciones' },
 };
 
+function EtiquetaCategoria({ categoria }: { categoria: Categoria }) {
+  return (
+    <>
+      <span aria-hidden="true">{ETIQUETAS_CATEGORIA[categoria].emoji}</span>{' '}
+      {ETIQUETAS_CATEGORIA[categoria].texto}
+    </>
+  );
+}
+
+// Color de ACENTO de cada categoría: solo borde, tinte de fondo y barras. Como color de texto
+// no llegaba a 4,5:1 (el rótulo «Replicación» daba 2,63 en claro; hallazgo 1748).
 const COLORES_CATEGORIA: Record<Categoria, string> = {
   'adn-arn': '#2E86AB',
   'replicacion': '#48A9A6',
@@ -53,6 +65,20 @@ const COLORES_CATEGORIA: Record<Categoria, string> = {
   'traduccion': '#C47D2A',
   'mutaciones': '#C0392B',
 };
+
+/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
+const MARGEN_LOGO = 88;
+
+/**
+ * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
+ */
+function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
+  if (!bloque || !clave) return;
+  const r = clave.getBoundingClientRect();
+  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
 
 // ============================================================================
 // DATOS: 30 PREGUNTAS
@@ -275,16 +301,19 @@ const PREGUNTAS: Pregunta[] = [
   {
     id: 18,
     categoria: 'transcripcion',
-    pregunta: '¿Qué función tiene la cola poli-A en el ARNm?',
+    // Hallazgo 1746: «Facilita el inicio de la traducción» era una opción FALSA y es una
+    // función reconocida de la cola (Tarun y Sachs, EMBO J 1996; Wells et al., Mol Cell 1998).
+    // Pasa a formar parte de la respuesta buena y su hueco lo ocupa un distractor falso.
+    pregunta: '¿Qué función tiene la cola poli-A en el ARNm eucariota?',
     opciones: [
-      'Facilita el inicio de la traducción',
+      'Indica al espliceosoma dónde cortar los intrones',
       'Marca el ARNm para degradación inmediata',
-      'Protege el ARNm de la degradación y facilita su exportación al citoplasma',
+      'Protege el ARNm de la degradación, ayuda a exportarlo al citoplasma y favorece el inicio de la traducción',
       'Señala el codón de inicio',
     ],
     correcta: 2,
     explicacion:
-      'La poliadenilación (adición de 150-250 adeninas al extremo 3\') prolonga la vida media del ARNm y es necesaria para la exportación nuclear. La PABP (proteína de unión a poli-A) interactúa con factores de iniciación.',
+      'La poliadenilación (adición de unas 200-250 adeninas al extremo 3\' en mamíferos) prolonga la vida media del ARNm y participa en su exportación nuclear. Además, la PABP (proteína de unión a poli-A) se une al factor de iniciación eIF4G, que está unido a la caperuza 5\': el ARNm se «cierra» en un bucle y eso favorece el inicio de la traducción.',
   },
 
   // ---- Traducción (6) ----
@@ -313,7 +342,7 @@ const PREGUNTAS: Pregunta[] = [
     opciones: ['1', '2', '3', '4'],
     correcta: 2,
     explicacion:
-      'Los 3 codones de parada son UAA ("ámbar"), UAG ("ocre") y UGA ("ópalo"). No codifican ningún aminoácido convencional. Son reconocidos por factores de liberación (eRF1 en eucariotas) que desencadenan la disociación del ribosoma.',
+      'Los 3 codones de parada son UAG ("ámbar"), UAA ("ocre") y UGA ("ópalo"). No codifican ningún aminoácido convencional. Son reconocidos por factores de liberación (eRF1 en eucariotas) que desencadenan la disociación del ribosoma.',
   },
   {
     id: 22,
@@ -327,7 +356,7 @@ const PREGUNTAS: Pregunta[] = [
     ],
     correcta: 3,
     explicacion:
-      'Las proteínas secretadas o de membrana se traducen en ribosomas del RE rugoso. Las proteínas citoplasmáticas se traducen en ribosomas libres. Las proteínas mitocondriales se traducen en los ribosomas mitocondriales (similares a bacterianos).',
+      'Las proteínas secretadas o de membrana se traducen en ribosomas del RE rugoso. Las proteínas citoplasmáticas se traducen en ribosomas libres. La mayoría de las proteínas mitocondriales (más de 1.100 en humanos) también se codifican en el núcleo, se traducen en ribosomas citosólicos y se importan a la mitocondria; solo las 13 que codifica el ADN mitocondrial humano se traducen en los ribosomas propios de la mitocondria (similares a los bacterianos).',
   },
   {
     id: 23,
@@ -457,22 +486,7 @@ const CATEGORIAS_ORDEN: Categoria[] = [
   'mutaciones',
 ];
 
-function mezclarArray<T>(arr: T[]): T[] {
-  const copia = [...arr];
-  for (let i = copia.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copia[i], copia[j]] = [copia[j], copia[i]];
-  }
-  return copia;
-}
-
-function obtenerClasificacion(pct: number): { texto: string; emoji: string } {
-  if (pct === 100) return { texto: '¡Perfecto!', emoji: '🏆' };
-  if (pct >= 80) return { texto: 'Sobresaliente', emoji: '🌟' };
-  if (pct >= 60) return { texto: 'Notable', emoji: '👍' };
-  if (pct >= 40) return { texto: 'Aprobado', emoji: '😊' };
-  return { texto: 'Insuficiente', emoji: '😟' };
-}
+const LETRAS = ['A', 'B', 'C', 'D'];
 
 // ============================================================================
 // COMPONENTE PRINCIPAL
@@ -482,53 +496,78 @@ export default function QuizBiologiaMolecularPage() {
   const [estado, setEstado] = useState<EstadoQuiz>('inicio');
   const [modo, setModo] = useState<Modo>('examen');
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria>('adn-arn');
-  const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
+  const [preguntas, setPreguntas] = useState<PreguntaEnJuego[]>([]);
   const [indice, setIndice] = useState(0);
-  const [respuesta, setRespuesta] = useState<number | null>(null);
+  /** Texto de la opción pulsada (la corrección va por identidad, no por posición). */
+  const [respuesta, setRespuesta] = useState<string | null>(null);
   const [resultados, setResultados] = useState<boolean[]>([]);
-  const [racha, setRacha] = useState(0);
   const [rachaMax, setRachaMax] = useState(0);
   const [rachaActual, setRachaActual] = useState(0);
 
   const preguntaActual = preguntas[indice];
   const totalPreguntas = preguntas.length;
   const aciertos = resultados.filter(Boolean).length;
+  const acertada = preguntaActual !== undefined && respuesta !== null && esCorrecta(preguntaActual, respuesta);
+
+  /**
+   * Foco y vista (hallazgos 1749 y 1750, la forma del 1676/1675 de quiz-tabla-periodica).
+   * · Al responder, la opción pulsada queda `disabled` y el navegador suelta el foco al
+   *   <body>: se lleva a «Siguiente», la única acción que queda.
+   * · Al pulsar «Siguiente» ese botón se desmonta con el feedback y el foco volvía a caer al
+   *   <body>, DETRÁS de las opciones nuevas (el primer Tab saltaba a la guía educativa). Ahora
+   *   va al enunciado de la pregunta nueva —que el lector lee— y, si no se ve entero bajo el
+   *   logo fijo, la vista vuelve al principio del quiz. En el resultado, a la tarjeta de la nota.
+   * · Al salir de una partida (hallazgo 1756) o volver del resultado, al título del inicio.
+   */
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  const quizAreaRef = useRef<HTMLDivElement>(null);
+  const enunciadoRef = useRef<HTMLParagraphElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const tituloInicioRef = useRef<HTMLHeadingElement>(null);
+  const vieneDeSalir = useRef(false);
+
+  useEffect(() => {
+    if (estado === 'respondida') {
+      botonSiguienteRef.current?.focus();
+    } else if (estado === 'jugando') {
+      traerALaVista(quizAreaRef.current, enunciadoRef.current);
+      enunciadoRef.current?.focus({ preventScroll: true });
+    } else if (estado === 'fin') {
+      traerALaVista(resultadoRef.current, resultadoRef.current);
+      resultadoRef.current?.focus({ preventScroll: true });
+    } else if (estado === 'inicio' && vieneDeSalir.current) {
+      vieneDeSalir.current = false;
+      tituloInicioRef.current?.focus();
+    }
+  }, [estado, indice]);
 
   const iniciarQuiz = useCallback(() => {
-    let seleccionadas: Pregunta[];
-    if (modo === 'examen') {
-      seleccionadas = mezclarArray(PREGUNTAS);
-    } else {
-      seleccionadas = mezclarArray(
-        PREGUNTAS.filter((p) => p.categoria === categoriaSeleccionada)
-      );
-    }
-    setPreguntas(seleccionadas);
+    // Se baraja aquí, en el clic (cliente), y no al pintar: ni desajuste de hidratación ni
+    // opciones que cambien de sitio entre responder y pulsar «Siguiente».
+    const banco = modo === 'examen' ? PREGUNTAS : PREGUNTAS.filter((p) => p.categoria === categoriaSeleccionada);
+    setPreguntas(componerPartida(banco));
     setIndice(0);
     setRespuesta(null);
     setResultados([]);
-    setRacha(0);
     setRachaMax(0);
     setRachaActual(0);
     setEstado('jugando');
   }, [modo, categoriaSeleccionada]);
 
   const responder = useCallback(
-    (idx: number) => {
-      if (estado !== 'jugando' || respuesta !== null) return;
-      const esCorrecto = idx === preguntaActual.correcta;
-      setRespuesta(idx);
-      setResultados((prev) => [...prev, esCorrecto]);
+    (opcion: string) => {
+      if (estado !== 'jugando' || respuesta !== null || !preguntaActual) return;
+      const bien = esCorrecta(preguntaActual, opcion);
+      setRespuesta(opcion);
+      setResultados((prev) => [...prev, bien]);
       setEstado('respondida');
 
-      if (esCorrecto) {
+      if (bien) {
         const nuevaRacha = rachaActual + 1;
         setRachaActual(nuevaRacha);
         setRachaMax((prev) => Math.max(prev, nuevaRacha));
-        setRacha(nuevaRacha);
       } else {
         setRachaActual(0);
-        setRacha(0);
       }
     },
     [estado, respuesta, preguntaActual, rachaActual]
@@ -545,12 +584,12 @@ export default function QuizBiologiaMolecularPage() {
   }, [indice, totalPreguntas]);
 
   const reiniciar = useCallback(() => {
+    vieneDeSalir.current = true;
     setEstado('inicio');
     setPreguntas([]);
     setIndice(0);
     setRespuesta(null);
     setResultados([]);
-    setRacha(0);
     setRachaMax(0);
     setRachaActual(0);
   }, []);
@@ -568,7 +607,7 @@ export default function QuizBiologiaMolecularPage() {
   }).filter((d) => d.total > 0);
 
   const porcentaje = totalPreguntas > 0 ? Math.round((aciertos / totalPreguntas) * 100) : 0;
-  const clasificacion = obtenerClasificacion(porcentaje);
+  const clasificacion = obtenerClasificacion(aciertos, totalPreguntas);
 
   // ============================================================================
   // RENDER
@@ -579,7 +618,7 @@ export default function QuizBiologiaMolecularPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🧬 Quiz Biología Molecular</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🧬</span> Quiz Biología Molecular</h1>
         <p className={styles.heroSubtitle}>
           30 preguntas sobre ADN, ARN, replicación, transcripción, traducción y mutaciones
         </p>
@@ -593,8 +632,8 @@ export default function QuizBiologiaMolecularPage() {
         {estado === 'inicio' && (
           <div className={styles.inicio}>
             <div className={styles.inicioCard}>
-              <div className={styles.inicioEmoji}>🔬</div>
-              <h2 className={styles.inicioTitulo}>¿Dominas la biología molecular?</h2>
+              <div className={styles.inicioEmoji} aria-hidden="true">🔬</div>
+              <h2 className={styles.inicioTitulo} ref={tituloInicioRef} tabIndex={-1}>¿Dominas la biología molecular?</h2>
               <p className={styles.inicioDesc}>
                 Pon a prueba tus conocimientos sobre el dogma central: ADN → ARN → proteína.
                 30 preguntas en 5 categorías con explicaciones detalladas.
@@ -642,7 +681,7 @@ export default function QuizBiologiaMolecularPage() {
                         onClick={() => setCategoriaSeleccionada(cat)}
                         aria-pressed={categoriaSeleccionada === cat}
                       >
-                        {ETIQUETAS_CATEGORIA[cat]}
+                        <EtiquetaCategoria categoria={cat} />
                       </button>
                     ))}
                   </div>
@@ -654,7 +693,7 @@ export default function QuizBiologiaMolecularPage() {
                 <div className={styles.categoriasBadges}>
                   {CATEGORIAS_ORDEN.map((cat) => (
                     <span key={cat} className={styles.badge}>
-                      {ETIQUETAS_CATEGORIA[cat]}
+                      <EtiquetaCategoria categoria={cat} />
                     </span>
                   ))}
                 </div>
@@ -669,7 +708,7 @@ export default function QuizBiologiaMolecularPage() {
 
         {/* ===== PANTALLA PREGUNTA ===== */}
         {(estado === 'jugando' || estado === 'respondida') && preguntaActual && (
-          <div className={styles.quizArea}>
+          <div className={styles.quizArea} ref={quizAreaRef}>
             {/* Progreso */}
             <div className={styles.progreso}>
               <div className={styles.progresoInfo}>
@@ -677,11 +716,11 @@ export default function QuizBiologiaMolecularPage() {
                 <div className={styles.progresoStats}>
                   {rachaActual >= 2 && (
                     <span className={styles.rachaBadge}>
-                      🔥 Racha: {rachaActual}
+                      <span aria-hidden="true">🔥</span> Racha: {rachaActual}
                     </span>
                   )}
                   <span className={styles.aciertosBadge}>
-                    ✓ {aciertos} aciertos
+                    <span aria-hidden="true">✓</span> {aciertos} {aciertos === 1 ? 'acierto' : 'aciertos'}
                   </span>
                 </div>
               </div>
@@ -697,31 +736,40 @@ export default function QuizBiologiaMolecularPage() {
             <div className={styles.preguntaCard}>
               <span
                 className={styles.categoriaBadge}
-                style={{ color: COLORES_CATEGORIA[preguntaActual.categoria], borderColor: `${COLORES_CATEGORIA[preguntaActual.categoria]}40`, background: `${COLORES_CATEGORIA[preguntaActual.categoria]}12` }}
+                style={{ borderColor: `${COLORES_CATEGORIA[preguntaActual.categoria]}40`, background: `${COLORES_CATEGORIA[preguntaActual.categoria]}12` }}
               >
-                {ETIQUETAS_CATEGORIA[preguntaActual.categoria]}
+                <EtiquetaCategoria categoria={preguntaActual.categoria} />
               </span>
 
-              <p className={styles.preguntaTexto}>{preguntaActual.pregunta}</p>
+              <p className={styles.preguntaTexto} ref={enunciadoRef} tabIndex={-1}>{preguntaActual.pregunta}</p>
 
               <div className={styles.opcionesGrid}>
                 {preguntaActual.opciones.map((opcion, i) => {
                   let claseExtra = '';
+                  // Cuál era la buena no puede decirse solo con color (WCAG 1.4.1, hallazgo
+                  // 1754): va también en el nombre accesible de la opción.
+                  let marca = '';
                   if (estado === 'respondida') {
-                    if (i === preguntaActual.correcta) claseExtra = styles.opcionCorrecta;
-                    else if (i === respuesta) claseExtra = styles.opcionIncorrecta;
-                    else claseExtra = styles.opcionApagada;
+                    if (opcion === preguntaActual.correcta) {
+                      claseExtra = styles.opcionCorrecta;
+                      marca = ' (respuesta correcta)';
+                    } else if (opcion === respuesta) {
+                      claseExtra = styles.opcionIncorrecta;
+                      marca = ' (tu respuesta, incorrecta)';
+                    } else {
+                      claseExtra = styles.opcionApagada;
+                    }
                   }
                   return (
                     <button
-                      key={i}
+                      key={opcion}
                       type="button"
                       className={`${styles.opcion} ${claseExtra}`}
-                      onClick={() => responder(i)}
+                      onClick={() => responder(opcion)}
                       disabled={estado === 'respondida'}
-                      aria-label={`Opción ${['A', 'B', 'C', 'D'][i]}: ${opcion}`}
+                      aria-label={`Opción ${LETRAS[i]}: ${opcion}${marca}`}
                     >
-                      <span className={styles.opcionLetra}>{['A', 'B', 'C', 'D'][i]}</span>
+                      <span className={styles.opcionLetra}>{LETRAS[i]}</span>
                       <span>{opcion}</span>
                     </button>
                   );
@@ -731,36 +779,60 @@ export default function QuizBiologiaMolecularPage() {
               {/* Feedback */}
               {estado === 'respondida' && (
                 <div
-                  className={`${styles.feedback} ${respuesta === preguntaActual.correcta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}
+                  className={`${styles.feedback} ${acertada ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}
                   role="alert"
                   aria-live="polite"
                 >
                   <p className={styles.feedbackResultado}>
-                    {respuesta === preguntaActual.correcta ? '✓ ¡Correcto!' : '✗ Incorrecto'}
+                    {acertada ? (
+                      <><span aria-hidden="true">✓</span> ¡Correcto!</>
+                    ) : (
+                      <><span aria-hidden="true">✗</span> Incorrecto</>
+                    )}
                   </p>
+                  {!acertada && (
+                    <p className={styles.respuestaCorrecta}>
+                      La respuesta correcta era: <strong>{preguntaActual.correcta}</strong>
+                    </p>
+                  )}
                   <p className={styles.explicacion}>{preguntaActual.explicacion}</p>
-                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
+                  <button type="button" className={styles.btnSiguiente} onClick={siguiente} ref={botonSiguienteRef}>
                     {indice + 1 >= totalPreguntas ? 'Ver resultados →' : 'Siguiente pregunta →'}
                   </button>
                 </div>
               )}
             </div>
+
+            {/* Empezada una partida no había forma de salir de ella ni de cambiar de modo sin
+                responder las 30 o recargar la página (hallazgo 1756). */}
+            <button type="button" className={styles.btnSalir} onClick={reiniciar}>
+              <span aria-hidden="true">←</span> Salir de la partida
+            </button>
           </div>
         )}
 
         {/* ===== PANTALLA RESULTADO ===== */}
         {estado === 'fin' && (
           <div className={styles.resultado}>
-            <div className={styles.resultadoCard}>
+            <div
+              className={styles.resultadoCard}
+              ref={resultadoRef}
+              tabIndex={-1}
+              role="group"
+              aria-label={`Resultado: ${aciertos} de ${totalPreguntas} aciertos, ${clasificacion.texto}`}
+            >
               <div className={styles.puntuacionCirculo}>
                 <span className={styles.puntuacionNumero}>{aciertos}</span>
                 <span className={styles.puntuacionTotal}>/{totalPreguntas}</span>
               </div>
 
               <div className={styles.clasificacion}>
-                <span className={styles.clasificacionEmoji}>{clasificacion.emoji}</span>
+                <span className={styles.clasificacionEmoji} aria-hidden="true">{clasificacion.emoji}</span>
                 <p className={styles.clasificacionTexto}>{clasificacion.texto}</p>
                 <p className={styles.clasificacionPct}>{porcentaje}%</p>
+                <p className={styles.clasificacionNota}>
+                  Nota: {formatNumber(clasificacion.nota, 1)} sobre 10
+                </p>
               </div>
 
               <div className={styles.statsGrid}>
@@ -787,7 +859,7 @@ export default function QuizBiologiaMolecularPage() {
                     return (
                       <div key={d.categoria} className={styles.desgloseItem}>
                         <div className={styles.desgloseHeader}>
-                          <span className={styles.desgloseCat}>{ETIQUETAS_CATEGORIA[d.categoria]}</span>
+                          <span className={styles.desgloseCat}><EtiquetaCategoria categoria={d.categoria} /></span>
                           <span className={styles.desgloseScore}>{d.correctas}/{d.total}</span>
                         </div>
                         <div className={styles.desgloseBarra}>
@@ -844,13 +916,14 @@ export default function QuizBiologiaMolecularPage() {
                 </tr>
                 <tr>
                   <td><strong>Dirección síntesis</strong></td>
-                  <td>5\' → 3\' (ARNm)</td>
+                  {/* En texto JSX `\'` no es un escape: se veía la barra (hallazgo 1753). */}
+                  <td>{"5' → 3' (ARNm)"}</td>
                   <td>N-terminal → C-terminal</td>
                 </tr>
                 <tr>
                   <td><strong>Molde</strong></td>
-                  <td>Hebra molde del ADN (3\' → 5\')</td>
-                  <td>ARNm (5\' → 3\')</td>
+                  <td>{"Hebra molde del ADN (3' → 5')"}</td>
+                  <td>{"ARNm (5' → 3')"}</td>
                 </tr>
                 <tr>
                   <td><strong>Monómeros</strong></td>
@@ -875,7 +948,7 @@ export default function QuizBiologiaMolecularPage() {
             </li>
             <li>
               <strong>La helicasa es increíblemente rápida</strong>: en procariotas, la helicasa puede
-              desenvuelver la doble hélice a ~1.000 pb/segundo. La replicación completa del cromosoma
+              separar las hebras de la doble hélice a ~1.000 pb/segundo. La replicación completa del cromosoma
               de E. coli (4,6 Mpb) tarda aproximadamente 40 minutos.
             </li>
             <li>

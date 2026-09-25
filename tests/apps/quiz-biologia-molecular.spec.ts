@@ -14,7 +14,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   categorías», «explicaciones detalladas tras cada respuesta», «puntuación, racha y
  *   clasificación final con desglose por categoría».
  * · Banco (PREGUNTAS de page.tsx): 30 preguntas, 6 por categoría. Examen = las 30 barajadas;
- *   práctica = las 6 de la categoría barajadas. Las OPCIONES no se barajan.
+ *   práctica = las 6 de la categoría barajadas. Desde la reparación del 1745 (Ronda 15,
+ *   25/09/2026) también se barajan las OPCIONES de cada pregunta, y la corrección va por el
+ *   texto de la opción, no por su posición (motor.ts).
  *
  * DE DÓNDE SALEN LOS VALORES ESPERADOS
  * ────────────────────────────────────
@@ -26,17 +28,19 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *     aciertos   = resultados.filter(Boolean).length
  *     Errores    = totalPreguntas − aciertos
  *     porcentaje = Math.round(aciertos / totalPreguntas · 100)
- *   y obtenerClasificacion(): 100 «¡Perfecto!» 🏆 · ≥80 «Sobresaliente» 🌟 · ≥60 «Notable» 👍 ·
- *   ≥40 «Aprobado» 😊 · resto «Insuficiente» 😟. La racha máxima es la mayor serie de aciertos
- *   seguidos.
+ *   y obtenerClasificacion() de motor.ts, sobre la nota = aciertos·10/total con la escala
+ *   española (RD 1125/2003, art. 5.4; reparación del 1752): pleno «¡Perfecto!» 🏆 · ≥9
+ *   «Sobresaliente» 🌟 · ≥7 «Notable» 👍 · ≥5 «Aprobado» 😊 · resto «Insuficiente» 😟. La nota se
+ *   muestra con un decimal («Nota: 6,7 sobre 10»). La racha máxima es la mayor serie de
+ *   aciertos seguidos.
  *
  * ALEATORIEDAD
  * ────────────
  * `mezclarArray` usa Math.random. Los casos generales juegan con la clave en la mano (leen el
  * enunciado y pulsan la opción que dice la biología). Los que necesitan una pregunta concreta
  * programan Math.random DENTRO de la misma tarea que el clic en «Comenzar quiz» (como el caso 4
- * de quiz-tabla-periodica): solo lo consume mezclarArray, y se comprueba que gasta exactamente
- * 29 números para barajar 30.
+ * de quiz-tabla-periodica): los 29 primeros números los gasta el barajado del ORDEN de las 30
+ * preguntas (se comprueba), y los siguientes, el de las opciones, que sale del azar real.
  *
  * Los casos que vigilan un defecto de HOY expresan el comportamiento CORRECTO y llevan
  * test.fail() con el hallazgo en el comentario, para que el fichero quede en verde.
@@ -81,8 +85,10 @@ const CLAVE: Record<string, string> = {
   '¿Qué proceso elimina los intrones del pre-ARNm?': 'Splicing (corte y empalme)',
   '¿Qué es el splicing alternativo?':
     'El proceso por el que diferentes combinaciones de exones generan distintas proteínas desde un mismo gen',
-  // Ver el hallazgo de la poli-A: «Facilita el inicio de la traducción» TAMBIÉN es cierta.
-  '¿Qué función tiene la cola poli-A en el ARNm?': 'Protege el ARNm de la degradación y facilita su exportación al citoplasma',
+  // Hallazgo 1746: «facilita el inicio de la traducción» TAMBIÉN es cierta (PABP–eIF4G), así
+  // que ya no es una opción falsa: forma parte de la respuesta buena.
+  '¿Qué función tiene la cola poli-A en el ARNm eucariota?':
+    'Protege el ARNm de la degradación, ayuda a exportarlo al citoplasma y favorece el inicio de la traducción',
   // ── Traducción ──
   '¿Cuántas bases forman un codón?': '3',
   '¿Cuál es el codón de inicio de la traducción?': 'AUG',
@@ -223,6 +229,7 @@ async function resultado(page: Page) {
     etiqueta: (document.querySelector('[class*="clasificacionTexto"]')?.textContent ?? '').trim(),
     emoji: (document.querySelector('[class*="clasificacionEmoji"]')?.textContent ?? '').trim(),
     pct: (document.querySelector('[class*="clasificacionPct"]')?.textContent ?? '').trim(),
+    nota: (document.querySelector('[class*="clasificacionNota"]')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
     stats: [...document.querySelectorAll('[class*="statItem"]')].map((s) => (s.textContent ?? '').trim()),
   }));
 }
@@ -269,12 +276,13 @@ test.describe('Quiz Biología Molecular', () => {
    *
    * Resuelto a mano ANTES de ejecutar:
    *   · 30 preguntas distintas (las 30 del banco barajadas), cabecera «Pregunta n de 30».
-   *   · 20/30 → Math.round(66,67) = 67 % → tramo [60 · 80) → «Notable» 👍.
+   *   · 20/30 → Math.round(66,67) = 67 % · nota 200/30 = 6,67 → «6,7» → tramo [5 · 7) →
+   *     «Aprobado» 😊 (antes del 1752 decía «Notable»).
    *   · Errores 30 − 20 = 10 · racha máx. 20 (las 20 primeras seguidas).
    *   · Desglose: 6 por categoría, y la suma de aciertos por categoría = 20.
    * Además, la clave a mano coincide con lo que la app marca como correcto en las 30.
    */
-  test('caso normal: examen con 20 bien y 10 mal da 20/30, 67 % y «Notable»', async ({ page }) => {
+  test('caso normal: examen con 20 bien y 10 mal da 20/30, 67 %, nota 6,7 y «Aprobado»', async ({ page }) => {
     test.setTimeout(120_000);
     await abrir(page);
 
@@ -291,9 +299,10 @@ test.describe('Quiz Biología Molecular', () => {
 
     expect(await resultado(page)).toEqual({
       circulo: '20/30',
-      etiqueta: 'Notable', // 67 ∈ [60 · 80)
-      emoji: '👍',
+      etiqueta: 'Aprobado', // nota 6,67 ∈ [5 · 7)
+      emoji: '😊',
       pct: '67%', // Math.round(20/30·100)
+      nota: 'Nota: 6,7 sobre 10',
       stats: ['20Aciertos', '10Errores', '20Racha máx.'],
     });
     const desglose = await page.locator('[class*="desgloseScore"]').allInnerTexts();
@@ -319,6 +328,7 @@ test.describe('Quiz Biología Molecular', () => {
       etiqueta: '¡Perfecto!',
       emoji: '🏆',
       pct: '100%',
+      nota: 'Nota: 10,0 sobre 10',
       stats: ['6Aciertos', '0Errores', '6Racha máx.'],
     });
     await expect(page.locator('[class*="desgloseItem"]')).toHaveCount(1);
@@ -332,37 +342,45 @@ test.describe('Quiz Biología Molecular', () => {
       etiqueta: 'Insuficiente',
       emoji: '😟',
       pct: '0%',
+      nota: 'Nota: 0,0 sobre 10',
       stats: ['0Aciertos', '6Errores', '0Racha máx.'],
     });
     await expect(page.locator('[class*="desgloseItem"]')).toContainText('Mutaciones0/6');
   });
 
   /**
-   * CASO LÍMITE — los umbrales de obtenerClasificacion() alrededor del 80 y del 40.
-   *   · Práctica 5/6 → Math.round(83,33) = 83 % → «Sobresaliente» 🌟 · 4/6 → 67 % → «Notable».
-   *   · Examen 11/30 → Math.round(36,67) = 37 % → «Insuficiente» 😟 (por debajo del 40).
-   * El 12/30 = 40 % va en el hallazgo de la escala de notas, abajo.
+   * CASO LÍMITE — los umbrales de obtenerClasificacion() (escala española, reparación 1752).
+   *   · Práctica 5/6 → nota 8,33 → [7 · 9) «Notable» 👍 · 4/6 → nota 6,67 → [5 · 7) «Aprobado» 😊.
+   *   · Práctica 3/6 → nota 5 justo → «Aprobado» (el corte incluye el 5).
+   *   · Examen 11/30 → nota 3,67 → «Insuficiente» 😟.
+   * El 12/30 (un 4) va en el caso del hallazgo 1752, abajo.
    */
-  test('caso límite: 5/6 «Sobresaliente», 4/6 «Notable» y 11/30 «Insuficiente»', async ({ page }) => {
-    test.setTimeout(120_000);
+  test('caso límite: 5/6 «Notable», 4/6 y 3/6 «Aprobado» y 11/30 «Insuficiente»', async ({ page }) => {
+    test.setTimeout(150_000);
     await abrir(page);
     await empezar(page, 'practica', 'Replicación');
     await jugar(page, POR_CATEGORIA, 5);
-    expect(await resultado(page)).toMatchObject({ circulo: '5/6', etiqueta: 'Sobresaliente', emoji: '🌟', pct: '83%' });
+    expect(await resultado(page)).toMatchObject({ circulo: '5/6', etiqueta: 'Notable', emoji: '👍', pct: '83%', nota: 'Nota: 8,3 sobre 10' });
 
     await page.getByRole('button', { name: 'Volver al inicio' }).click();
     await empezar(page, 'practica', 'Traducción');
     await jugar(page, POR_CATEGORIA, 4);
-    expect(await resultado(page)).toMatchObject({ circulo: '4/6', etiqueta: 'Notable', emoji: '👍', pct: '67%' });
+    expect(await resultado(page)).toMatchObject({ circulo: '4/6', etiqueta: 'Aprobado', emoji: '😊', pct: '67%', nota: 'Nota: 6,7 sobre 10' });
+
+    await page.getByRole('button', { name: 'Volver al inicio' }).click();
+    await empezar(page, 'practica', 'ADN y ARN');
+    await jugar(page, POR_CATEGORIA, 3);
+    expect(await resultado(page)).toMatchObject({ circulo: '3/6', etiqueta: 'Aprobado', pct: '50%', nota: 'Nota: 5,0 sobre 10' });
 
     await page.getByRole('button', { name: 'Volver al inicio' }).click();
     await empezar(page, 'examen');
     await jugar(page, TOTAL_EXAMEN, 11);
     expect(await resultado(page)).toEqual({
       circulo: '11/30',
-      etiqueta: 'Insuficiente', // 37 < 40
+      etiqueta: 'Insuficiente', // nota 3,67 < 5
       emoji: '😟',
       pct: '37%',
+      nota: 'Nota: 3,7 sobre 10',
       stats: ['11Aciertos', '19Errores', '11Racha máx.'],
     });
   });
@@ -408,6 +426,7 @@ test.describe('Quiz Biología Molecular', () => {
       etiqueta: 'Insuficiente',
       emoji: '😟',
       pct: '3%', // Math.round(3,33)
+      nota: 'Nota: 0,3 sobre 10',
       stats: ['1Aciertos', '29Errores', '1Racha máx.'],
     });
 
@@ -437,14 +456,17 @@ test.describe('Quiz Biología Molecular', () => {
     expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe('light');
     // globals.css anima el fondo de TODO (`* { transition: background-color 0.3s }`); aun
     // reducida a 0,01 ms, la lectura inmediata da el valor de partida: se sondea.
-    await expect.poll(() => pintura(iCorrecta)).toBe('rgb(22, 163, 74) | rgb(22, 163, 74) | 1');
-    expect(await pintura(iPulsada)).toBe('rgb(220, 38, 38) | rgb(220, 38, 38) | 1');
+    // El círculo de la letra se oscureció en la reparación del 1748 para que la letra blanca
+    // llegue a 4,5:1 (#15803d 5,02 · #b91c1c 6,47); el borde sigue siendo el verde/rojo de antes.
+    await expect.poll(() => pintura(iCorrecta)).toBe('rgb(22, 163, 74) | rgb(21, 128, 61) | 1');
+    expect(await pintura(iPulsada)).toBe('rgb(220, 38, 38) | rgb(185, 28, 28) | 1');
     expect(await pintura(iNeutra)).toBe('rgba(0, 0, 0, 0.1) | rgba(0, 0, 0, 0.06) | 0.4');
   });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HALLAZGOS DE LA 1.ª PASADA (25/09/2026). Cada uno expresa el comportamiento CORRECTO.
+// Reparados en la Ronda 15 (25/09/2026): ya sin test.fail(), quedan como regresión.
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Hallazgos del Inspector', () => {
@@ -459,7 +481,6 @@ test.describe('Hallazgos del Inspector', () => {
    * DEBERÍA: correcta y fallada se distinguen entre sí y de una neutra.
    */
   test('1674 · en oscuro la correcta y la fallada no se pintan igual', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: correcta = fallada en fondo, borde, texto y letra
     await abrir(page, 'dark');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await empezar(page, 'examen');
@@ -488,7 +509,6 @@ test.describe('Hallazgos del Inspector', () => {
    * 60 % (con reparto al azar lo esperable son ~7-8 por letra).
    */
   test('hallazgo · la correcta no se concentra en una letra: la posición no delata la respuesta', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: A=0, C=19 de 30 en cada examen
     test.setTimeout(120_000);
     await abrir(page);
     await empezar(page, 'examen');
@@ -508,18 +528,24 @@ test.describe('Hallazgos del Inspector', () => {
    * Wells et al., Mol Cell 1998). La propia explicación lo dice: «La PABP … interactúa con
    * factores de iniciación». Quien lo sabe recibe «✗ Incorrecto».
    * DEBERÍA: pulsar esa opción no da «Incorrecto» (o la opción deja de estar entre las falsas).
+   *
+   * REPARADO (Ronda 15): el inicio de la traducción pasa a formar parte de la respuesta buena
+   * y su hueco lo ocupa un distractor falso («Indica al espliceosoma dónde cortar los
+   * intrones»). Se comprueba que ninguna opción FALSA habla de la traducción y que acertar
+   * da «¡Correcto!» con una explicación que nombra PABP y eIF4G.
    */
   test('hallazgo · poli-A: «Facilita el inicio de la traducción» no se castiga como falsa', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: da «✗ Incorrecto» a una afirmación cierta
     await abrir(page);
     await empezarConOrden(page, [POS_POLI_A]);
-    await expect(enunciado(page)).toHaveText('¿Qué función tiene la cola poli-A en el ARNm?');
+    await expect(enunciado(page)).toHaveText('¿Qué función tiene la cola poli-A en el ARNm eucariota?');
     const ops = await textosOpcion(page);
-    const i = ops.indexOf('Facilita el inicio de la traducción');
-    if (i >= 0) {
-      await opciones(page).nth(i).click();
-      await expect(page.locator('[class*="feedbackResultado"]')).not.toContainText('Incorrecto');
-    }
+    const correcta = CLAVE['¿Qué función tiene la cola poli-A en el ARNm eucariota?'];
+    const falsas = ops.filter((o) => o !== correcta);
+    expect(falsas).toHaveLength(3);
+    for (const f of falsas) expect(f, 'una opción falsa que habla de la traducción').not.toMatch(/traducción/i);
+    await responder(page, 'bien');
+    await expect(page.locator('[class*="feedbackResultado"]')).toContainText('¡Correcto!');
+    expect(norm(await explicacion(page).innerText())).toMatch(/PABP.*eIF4G/);
   });
 
   /**
@@ -532,7 +558,6 @@ test.describe('Hallazgos del Inspector', () => {
    *     (Anderson et al., Nature 1981), que son las que traduce el mitorribosoma.
    */
   test('hallazgo · las explicaciones de los codones stop y de la traducción mitocondrial no afirman nada falso', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: ámbar/ocre intercambiados; «las proteínas mitocondriales» en mitorribosomas
     await abrir(page);
     await empezarConOrden(page, [POS_STOP, POS_TRADUCCION]);
     await expect(enunciado(page)).toHaveText('¿Cuántos codones de parada (stop) existen en el código genético estándar?');
@@ -555,7 +580,6 @@ test.describe('Hallazgos del Inspector', () => {
    * «inversión». Si el banco llega a cubrirlo, este caso se reescribe.
    */
   test('hallazgo · el FAQPage no promete mutaciones cromosómicas ni mutágenos que el banco no tiene', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: promete translocación, aneuploidía, poliploidía y mutágenos químicos
     const html = await (await page.request.get(RUTA)).text();
     expect(html).toContain('"@type":"FAQPage"');
     expect(html).toContain('"@type":"WebApplication"');
@@ -569,7 +593,6 @@ test.describe('Hallazgos del Inspector', () => {
    * curioso de la helicasa dice «desenvuelver».
    */
   test('hallazgo · el bloque educativo no enseña «\\\'» ni «desenvuelver»', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: «5\' → 3\'» en tres celdas y «desenvuelver»
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const tabla = await page.locator('table').innerText();
@@ -581,7 +604,6 @@ test.describe('Hallazgos del Inspector', () => {
 
   /** HALLAZGO (contenido) — tras acertar la primera, el marcador dice «✓ 1 aciertos». */
   test('hallazgo · con un acierto el marcador dice «1 acierto», en singular', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: «✓ 1 aciertos»
     await abrir(page);
     await empezar(page, 'examen');
     await responder(page, 'bien');
@@ -597,7 +619,6 @@ test.describe('Hallazgos del Inspector', () => {
    * DEBERÍA: un 40 % no se presenta como «Aprobado».
    */
   test('hallazgo · 12/30 (un 4 sobre 10) no se presenta como «Aprobado»', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: 40 % → «Aprobado»
     test.setTimeout(120_000);
     await abrir(page);
     await empezar(page, 'examen');
@@ -605,6 +626,9 @@ test.describe('Hallazgos del Inspector', () => {
     const r = await resultado(page);
     expect(r.pct).toBe('40%'); // Math.round(12/30·100)
     expect(r.etiqueta).not.toBe('Aprobado');
+    // Reparado: nota 120/30 = 4 → «Insuficiente», y la nota se ve en cifras (Latam-friendly:
+    // los nombres de la escala española no se entienden sin su número).
+    expect(r).toMatchObject({ etiqueta: 'Insuficiente', emoji: '😟', nota: 'Nota: 4,0 sobre 10' });
   });
 
   /**
@@ -614,9 +638,13 @@ test.describe('Hallazgos del Inspector', () => {
    * del quiz, y hacen falta 5 Shift+Tab para volver a la opción A. En cada una de las 29
    * transiciones. Medido el 25/09/2026.
    * DEBERÍA: después de avanzar, el Tab siguiente cae dentro de la tarjeta de la pregunta.
+   *
+   * REPARADO (Ronda 15) como en quiz-tabla-periodica: al responder, el foco va SOLO a
+   * «Siguiente» (ya no hace falta el Tab que pedía el acta: si se pulsara, pasaría de largo), y
+   * al avanzar, al enunciado nuevo (tabIndex=-1), de modo que el primer Tab cae en la opción A.
+   * Lo mismo al final: «Ver resultados» deja el foco en la tarjeta de la nota.
    */
   test('hallazgo · tras «Siguiente pregunta» el Tab vuelve a la pregunta nueva', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: foco en BODY y el Tab va a «Ver guía educativa»
     await abrir(page);
     let enComenzar = false;
     for (let t = 0; t < 40 && !enComenzar; t++) {
@@ -633,13 +661,30 @@ test.describe('Hallazgos del Inspector', () => {
     for (let k = 0; k < ops.indexOf(correcta); k++) await page.keyboard.press('Tab');
     await page.keyboard.press('Enter');
     await expect(page.locator('[class*="feedbackCorrecto"]')).toBeVisible();
-    await page.keyboard.press('Tab');
     await expect(botonAvanzar(page)).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.getByText('Pregunta 2 de 30')).toBeVisible();
+    await expect(enunciado(page)).toBeFocused();
     await page.keyboard.press('Tab');
     const dentro = await page.evaluate(() => !!document.activeElement?.closest('[class*="preguntaCard"]'));
     expect(dentro, 'el primer Tab tras avanzar cae en la pregunta nueva').toBe(true);
+    await expect(opciones(page).first()).toBeFocused();
+  });
+
+  test('reparación 1749 · tras «Ver resultados» el foco va a la tarjeta de la nota, y al salir, al inicio', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    await empezar(page, 'practica', 'Traducción');
+    for (let n = 1; n <= POR_CATEGORIA; n++) {
+      await responder(page, 'bien');
+      await expect(botonAvanzar(page)).toBeFocused();
+      await page.keyboard.press('Enter');
+    }
+    const tarjeta = page.locator('[class*="resultadoCard"]');
+    await expect(tarjeta).toBeFocused();
+    await expect(tarjeta).toHaveAttribute('aria-label', 'Resultado: 6 de 6 aciertos, ¡Perfecto!');
+    await page.getByRole('button', { name: 'Volver al inicio' }).click();
+    await expect(page.getByRole('heading', { name: '¿Dominas la biología molecular?' })).toBeFocused();
   });
 
   /**
@@ -650,7 +695,6 @@ test.describe('Hallazgos del Inspector', () => {
    * DEBERÍA: el nombre de la opción correcta o el aviso dicen en texto cuál era.
    */
   test('hallazgo · tras fallar, la respuesta correcta se dice también en texto', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: solo color; aria-label sin cambios
     await abrir(page);
     await empezar(page, 'examen');
     const { iCorrecta } = await responder(page, 'mal');
@@ -667,7 +711,6 @@ test.describe('Hallazgos del Inspector', () => {
    * la tarjeta de inicio.
    */
   test('hallazgo · ningún emoji llega al árbol de accesibilidad del <h1> ni de <main>', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: 🧬 en el h1, 🔬 y las cinco categorías en <main>
     await abrir(page);
     const EMOJI = /\p{Extended_Pictographic}/u;
     expect(await page.locator('h1').ariaSnapshot()).not.toMatch(EMOJI);
@@ -682,10 +725,16 @@ test.describe('Hallazgos del Inspector', () => {
    * pasar a la práctica hay que responder las 30 o recargar la página.
    */
   test('hallazgo · se puede salir de una partida sin recargar la página', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: ningún botón de salida durante la partida
     await abrir(page);
     await empezar(page, 'examen');
     await expect(page.locator('main').getByRole('button', { name: /Salir|Abandonar|Volver|Terminar|Cambiar/ })).not.toHaveCount(0);
+    // Reparado: «Salir de la partida» vuelve al inicio, deja cambiar de modo y no arrastra nada
+    await responder(page, 'bien');
+    await page.getByRole('button', { name: 'Salir de la partida' }).click();
+    await expect(page.getByRole('heading', { name: '¿Dominas la biología molecular?' })).toBeFocused();
+    await empezar(page, 'practica', 'Mutaciones');
+    await expect(page.getByText('Pregunta 1 de 6')).toBeVisible();
+    await expect(aciertosBadge(page)).toHaveText('✓ 0 aciertos');
   });
 
   /**
@@ -699,7 +748,6 @@ test.describe('Hallazgos del Inspector', () => {
    * Existe --primary-boton (#26718F, 5,47:1 con blanco en los dos temas).
    */
   test('hallazgo · botones, veredicto, marcador y rótulos llegan a 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: 4,11 / 3,05 / 2,68 / 2,62 en claro; 2,79 / 2,70 en oscuro
     test.setTimeout(90_000);
     const medidas: Record<string, number> = {};
     for (const tema of ['light', 'dark'] as const) {
@@ -720,6 +768,24 @@ test.describe('Hallazgos del Inspector', () => {
       await responder(p, 'bien');
       await p.mouse.move(0, 0);
       medidas[`${tema} · Correcto`] = await contraste(p.locator('[class*="feedbackResultado"]'));
+      // Añadido en la reparación: la racha (sale con 2 seguidas), el aviso de la respuesta
+      // buena y, al final, el porcentaje y la nota.
+      await botonAvanzar(p).click();
+      await responder(p, 'bien');
+      await p.mouse.move(0, 0);
+      medidas[`${tema} · Racha`] = await contraste(p.locator('[class*="rachaBadge"]'));
+      await botonAvanzar(p).click();
+      await responder(p, 'mal');
+      await p.mouse.move(0, 0);
+      medidas[`${tema} · respuesta correcta era`] = await contraste(p.locator('[class*="respuestaCorrecta"]'));
+      for (let n = 5; n <= POR_CATEGORIA; n++) {
+        await botonAvanzar(p).click();
+        await responder(p, 'bien');
+      }
+      await botonAvanzar(p).click();
+      medidas[`${tema} · porcentaje`] = await contraste(p.locator('[class*="clasificacionPct"]'));
+      medidas[`${tema} · nota`] = await contraste(p.locator('[class*="clasificacionNota"]'));
+      medidas[`${tema} · Volver`] = await contraste(p.getByRole('button', { name: 'Volver al inicio' }));
     }
     const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5);
     expect(bajos, JSON.stringify(medidas)).toEqual([]);
@@ -745,7 +811,6 @@ test.describe('Hallazgos del Inspector · móvil 360 × 740', () => {
   });
 
   test('hallazgo · tras «Siguiente pregunta» el enunciado nuevo no queda bajo el logo fijo', async ({ page }) => {
-    test.fail(); // hallazgo del 25/09/2026: tras la falciforme el enunciado queda en y = 7…54, bajo el logo
     const tocar = async (loc: Locator): Promise<void> => {
       const b = await loc.boundingBox();
       if (!b) throw new Error('sin caja');
